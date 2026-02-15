@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { isPast, formatLocalDate } from '../lib/date-utils'
 import { useCardStore } from '../stores/card-store'
 import { CardFormModal } from '../components/card/CardFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
@@ -98,10 +99,10 @@ export function DeckDetailPage() {
   // Stats
   const newCount = cards.filter((c) => c.srs_status === 'new').length
   const reviewCount = cards.filter(
-    (c) => c.srs_status === 'review' && c.next_review_at && new Date(c.next_review_at) <= new Date()
+    (c) => c.srs_status === 'review' && c.next_review_at && isPast(c.next_review_at)
   ).length
   const learningCount = cards.filter(
-    (c) => c.srs_status === 'learning' && c.next_review_at && new Date(c.next_review_at) <= new Date()
+    (c) => c.srs_status === 'learning' && c.next_review_at && isPast(c.next_review_at)
   ).length
 
   // Template fields for table headers
@@ -223,6 +224,13 @@ export function DeckDetailPage() {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
             학습 시작
+          </button>
+          <button
+            onClick={() => navigate(`/decks/${deckId}/edit`)}
+            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+          >
+            <Settings className="w-4 h-4" />
+            편집
           </button>
           <button
             onClick={() => { setEditingCard(null); setShowCardForm(true) }}
@@ -385,21 +393,23 @@ export function DeckDetailPage() {
                         <StatusBadge status={card.srs_status} />
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">
-                        {new Date(card.created_at).toLocaleDateString('ko-KR')}
+                        {formatLocalDate(card.created_at)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleEditCard(card)}
-                            className="text-xs text-gray-500 hover:text-blue-600 px-2 py-1 cursor-pointer"
+                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
+                            title="편집"
                           >
-                            편집
+                            <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeletingCard(card)}
-                            className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 cursor-pointer"
+                            className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+                            title="삭제"
                           >
-                            삭제
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>

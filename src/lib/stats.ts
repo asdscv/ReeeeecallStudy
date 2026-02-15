@@ -1,12 +1,8 @@
 import { supabase } from './supabase'
+import { utcToLocalDateKey, dateToLocalKey, parseUTC } from './date-utils'
 import type { StudyLog } from '../types/database'
 
 // ─── Pure Functions (testable without Supabase) ──────────────────────
-
-/** Format a Date as YYYY-MM-DD */
-function toDateKey(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 
 /**
  * Forecast: count reviews per day for the next N days.
@@ -24,15 +20,13 @@ export function getForecastReviews(
   for (let i = 0; i < days; i++) {
     const d = new Date(today)
     d.setDate(d.getDate() + i)
-    buckets.push({ date: toDateKey(d), count: 0 })
+    buckets.push({ date: dateToLocalKey(d), count: 0 })
   }
 
   // Count cards per bucket
   for (const card of cards) {
     if (!card.next_review_at) continue
-    const reviewDate = new Date(card.next_review_at)
-    reviewDate.setHours(0, 0, 0, 0)
-    const key = toDateKey(reviewDate)
+    const key = utcToLocalDateKey(card.next_review_at)
     const bucket = buckets.find((b) => b.date === key)
     if (bucket) bucket.count++
   }
@@ -51,7 +45,7 @@ export function getHeatmapData(
 
   const map = new Map<string, number>()
   for (const log of logs) {
-    const key = toDateKey(new Date(log.studied_at))
+    const key = utcToLocalDateKey(log.studied_at)
     map.set(key, (map.get(key) ?? 0) + 1)
   }
 
@@ -74,7 +68,7 @@ export function getDailyStudyCounts(
   // Count logs by date
   const map = new Map<string, number>()
   for (const log of logs) {
-    const key = toDateKey(new Date(log.studied_at))
+    const key = utcToLocalDateKey(log.studied_at)
     map.set(key, (map.get(key) ?? 0) + 1)
   }
 
@@ -83,7 +77,7 @@ export function getDailyStudyCounts(
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today)
     d.setDate(d.getDate() - i)
-    const key = toDateKey(d)
+    const key = dateToLocalKey(d)
     result.push({ date: key, count: map.get(key) ?? 0 })
   }
 
@@ -100,18 +94,18 @@ export function getStreakDays(logs: { studied_at: string }[]): number {
   // Collect unique study dates
   const dates = new Set<string>()
   for (const log of logs) {
-    dates.add(toDateKey(new Date(log.studied_at)))
+    dates.add(utcToLocalDateKey(log.studied_at))
   }
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
   // Check today first
-  if (!dates.has(toDateKey(today))) return 0
+  if (!dates.has(dateToLocalKey(today))) return 0
 
   let streak = 0
   const d = new Date(today)
-  while (dates.has(toDateKey(d))) {
+  while (dates.has(dateToLocalKey(d))) {
     streak++
     d.setDate(d.getDate() - 1)
   }
@@ -143,7 +137,7 @@ export function groupCardsByDate(
 
   const map = new Map<string, number>()
   for (const card of cards) {
-    const key = toDateKey(new Date(card.created_at))
+    const key = utcToLocalDateKey(card.created_at)
     map.set(key, (map.get(key) ?? 0) + 1)
   }
 
@@ -200,6 +194,23 @@ export function calculateDeckStats(
     avgInterval: Math.round(avgInterval * 100) / 100,
     masteryRate,
   }
+}
+
+/**
+ * Filter study logs to only include entries within the last N days.
+ */
+export function filterLogsByPeriod(
+  logs: { studied_at: string }[],
+  days: number,
+): { studied_at: string }[] {
+  const cutoff = new Date()
+  cutoff.setHours(0, 0, 0, 0)
+  cutoff.setDate(cutoff.getDate() - days + 1)
+
+  return logs.filter((log) => {
+    const d = parseUTC(log.studied_at)
+    return d >= cutoff
+  })
 }
 
 // ─── Supabase Query Functions ────────────────────────────────────────

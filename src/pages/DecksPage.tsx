@@ -11,7 +11,6 @@ export function DecksPage() {
   const { decks, stats, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
 
   const [showCreate, setShowCreate] = useState(false)
-  const [editDeck, setEditDeck] = useState<Deck | null>(null)
   const [deletingDeck, setDeletingDeck] = useState<Deck | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
@@ -67,7 +66,6 @@ export function DecksPage() {
               key={deck.id}
               deck={deck}
               stats={getStatsForDeck(deck.id)}
-              onEdit={setEditDeck}
               onDelete={setDeletingDeck}
             />
           ))}
@@ -78,13 +76,6 @@ export function DecksPage() {
       <DeckFormModal
         open={showCreate}
         onClose={() => setShowCreate(false)}
-      />
-
-      {/* Edit Modal */}
-      <DeckFormModal
-        open={!!editDeck}
-        onClose={() => setEditDeck(null)}
-        editDeck={editDeck}
       />
 
       {/* Delete Confirm */}

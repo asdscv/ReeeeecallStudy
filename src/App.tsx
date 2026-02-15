@@ -14,6 +14,7 @@ import { DeckDetailPage } from './pages/DeckDetailPage'
 import { StudySetupPage } from './pages/StudySetupPage'
 import { StudySessionPage } from './pages/StudySessionPage'
 import { TemplateEditPage } from './pages/TemplateEditPage'
+import { DeckEditPage } from './pages/DeckEditPage'
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
@@ -62,6 +63,7 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/decks" element={<DecksPage />} />
           <Route path="/decks/:deckId" element={<DeckDetailPage />} />
+          <Route path="/decks/:deckId/edit" element={<DeckEditPage />} />
           <Route path="/decks/:deckId/study/setup" element={<StudySetupPage />} />
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/templates/:templateId/edit" element={<TemplateEditPage />} />

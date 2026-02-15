@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts'
 import type { Card, StudyLog } from '../../types/database'
 import { calculateDeckStats, getDailyStudyCounts, fetchDeckStudyLogs } from '../../lib/stats'
+import { daysAgoUTC, formatDateKeyShort } from '../../lib/date-utils'
 
 interface DeckStatsTabProps {
   deckId: string
@@ -22,9 +23,7 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      const logs = await fetchDeckStudyLogs(deckId, thirtyDaysAgo.toISOString())
+      const logs = await fetchDeckStudyLogs(deckId, daysAgoUTC(30))
       setStudyLogs(logs)
       setLoading(false)
     }
@@ -105,10 +104,7 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 11 }}
-                tickFormatter={(val: string) => {
-                  const d = new Date(val + 'T00:00:00')
-                  return `${d.getMonth() + 1}/${d.getDate()}`
-                }}
+                tickFormatter={(val: string) => formatDateKeyShort(val)}
                 interval={4}
               />
               <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={30} />

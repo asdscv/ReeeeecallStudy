@@ -17,6 +17,9 @@ interface ExportData {
     fields: TemplateField[]
     front_layout: CardTemplate['front_layout']
     back_layout: CardTemplate['back_layout']
+    layout_mode: CardTemplate['layout_mode']
+    front_html: string
+    back_html: string
   }
   cards: Array<{
     field_values: Record<string, string>
@@ -64,6 +67,9 @@ export function generateExportJSON(deck: Deck, template: CardTemplate, cards: Ca
       fields: template.fields,
       front_layout: template.front_layout,
       back_layout: template.back_layout,
+      layout_mode: template.layout_mode,
+      front_html: template.front_html,
+      back_html: template.back_html,
     },
     cards: cards.map((c) => ({
       field_values: c.field_values,

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MoreVertical } from 'lucide-react'
+import { formatRelativeTime } from '../../lib/date-utils'
 import type { Deck } from '../../types/database'
 
 interface DeckStats {
@@ -14,11 +15,10 @@ interface DeckStats {
 interface DeckCardProps {
   deck: Deck
   stats?: DeckStats
-  onEdit: (deck: Deck) => void
   onDelete: (deck: Deck) => void
 }
 
-export function DeckCard({ deck, stats, onEdit, onDelete }: DeckCardProps) {
+export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -28,17 +28,7 @@ export function DeckCard({ deck, stats, onEdit, onDelete }: DeckCardProps) {
 
   const formatLastStudied = (dateStr: string | null) => {
     if (!dateStr) return '학습 기록 없음'
-    const date = new Date(dateStr)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMin = Math.floor(diffMs / 60000)
-    if (diffMin < 1) return '방금 전'
-    if (diffMin < 60) return `${diffMin}분 전`
-    const diffHour = Math.floor(diffMin / 60)
-    if (diffHour < 24) return `${diffHour}시간 전`
-    const diffDay = Math.floor(diffHour / 24)
-    if (diffDay < 30) return `${diffDay}일 전`
-    return date.toLocaleDateString('ko-KR')
+    return formatRelativeTime(dateStr)
   }
 
   return (
@@ -73,7 +63,7 @@ export function DeckCard({ deck, stats, onEdit, onDelete }: DeckCardProps) {
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-8 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-32">
                   <button
-                    onClick={() => { setMenuOpen(false); onEdit(deck) }}
+                    onClick={() => { setMenuOpen(false); navigate(`/decks/${deck.id}/edit`) }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                   >
                     수정

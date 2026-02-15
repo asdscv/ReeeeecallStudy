@@ -1,4 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { localDateKeyToDate, formatDateKeyShort } from '../../lib/date-utils'
 
 interface ForecastWidgetProps {
   data: { date: string; count: number }[]
@@ -7,9 +8,9 @@ interface ForecastWidgetProps {
 export function ForecastWidget({ data }: ForecastWidgetProps) {
   // Format date labels as short weekday (월, 화, ...)
   const chartData = data.map((d) => {
-    const date = new Date(d.date + 'T00:00:00')
+    const date = localDateKeyToDate(d.date)
     const dayLabel = date.toLocaleDateString('ko-KR', { weekday: 'short' })
-    const dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
+    const dateLabel = formatDateKeyShort(d.date)
     return { ...d, label: `${dateLabel}(${dayLabel})` }
   })
 

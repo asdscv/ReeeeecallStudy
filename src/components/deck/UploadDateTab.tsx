@@ -1,5 +1,6 @@
 import type { Card, CardTemplate } from '../../types/database'
 import { groupCardsByDate } from '../../lib/stats'
+import { utcToLocalDateKey, formatLocalTime } from '../../lib/date-utils'
 
 interface UploadDateTabProps {
   cards: Card[]
@@ -22,11 +23,7 @@ export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProp
   return (
     <div className="space-y-4">
       {groups.map(({ date, count }) => {
-        const dateCards = cards.filter((c) => {
-          const d = new Date(c.created_at)
-          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-          return key === date
-        })
+        const dateCards = cards.filter((c) => utcToLocalDateKey(c.created_at) === date)
 
         return (
           <div key={date} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -47,7 +44,7 @@ export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProp
                     </span>
                   ))}
                   <span className="text-xs text-gray-400 shrink-0">
-                    {new Date(card.created_at).toLocaleTimeString('ko-KR', {
+                    {formatLocalTime(card.created_at, 'ko-KR', {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
