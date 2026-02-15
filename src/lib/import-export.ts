@@ -1,0 +1,171 @@
+import Papa from 'papaparse'
+import type { Deck, CardTemplate, Card, TemplateField } from '../types/database'
+
+// --- Export Types ---
+
+interface ExportData {
+  version: number
+  exportedAt: string
+  deck: {
+    name: string
+    description: string | null
+    color: string
+    icon: string
+  }
+  template: {
+    name: string
+    fields: TemplateField[]
+    front_layout: CardTemplate['front_layout']
+    back_layout: CardTemplate['back_layout']
+  }
+  cards: Array<{
+    field_values: Record<string, string>
+    tags: string[]
+  }>
+}
+
+// --- Import Types ---
+
+export interface ImportCard {
+  field_values: Record<string, string>
+  tags: string[]
+}
+
+interface ImportJSONResult {
+  deckName: string
+  template: { name: string; fields: TemplateField[] } | null
+  cards: ImportCard[]
+}
+
+interface ValidationResult {
+  valid: ImportCard[]
+  invalid: ImportCard[]
+}
+
+interface DuplicateResult {
+  duplicates: ImportCard[]
+  unique: ImportCard[]
+}
+
+// --- Export Functions ---
+
+export function generateExportJSON(deck: Deck, template: CardTemplate, cards: Card[]): string {
+  const data: ExportData = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    deck: {
+      name: deck.name,
+      description: deck.description,
+      color: deck.color,
+      icon: deck.icon,
+    },
+    template: {
+      name: template.name,
+      fields: template.fields,
+      front_layout: template.front_layout,
+      back_layout: template.back_layout,
+    },
+    cards: cards.map((c) => ({
+      field_values: c.field_values,
+      tags: c.tags,
+    })),
+  }
+  return JSON.stringify(data, null, 2)
+}
+
+export function generateExportCSV(cards: Card[], fields: TemplateField[]): string {
+  const headers = [...fields.map((f) => f.name), '태그']
+  const rows = cards.map((card) => {
+    const row: Record<string, string> = {}
+    for (const field of fields) {
+      row[field.name] = card.field_values[field.key] ?? ''
+    }
+    row['태그'] = card.tags.join(';')
+    return row
+  })
+
+  return Papa.unparse({
+    fields: headers,
+    data: rows.map((row) => headers.map((h) => row[h])),
+  })
+}
+
+// --- Import Functions ---
+
+export function parseImportJSON(jsonString: string): ImportJSONResult {
+  const data = JSON.parse(jsonString)
+
+  if (!data.cards || !Array.isArray(data.cards)) {
+    throw new Error('Invalid import file: cards array is missing')
+  }
+
+  return {
+    deckName: data.deck?.name ?? '',
+    template: data.template
+      ? { name: data.template.name, fields: data.template.fields }
+      : null,
+    cards: data.cards.map((c: Record<string, unknown>) => ({
+      field_values: (c.field_values ?? {}) as Record<string, string>,
+      tags: Array.isArray(c.tags) ? (c.tags as string[]) : [],
+    })),
+  }
+}
+
+export function parseImportCSV(csvString: string, fieldMapping: Record<string, string>): ImportCard[] {
+  const result = Papa.parse<Record<string, string>>(csvString, {
+    header: true,
+    skipEmptyLines: true,
+  })
+
+  return result.data.map((row) => {
+    const fieldValues: Record<string, string> = {}
+    for (const [csvHeader, fieldKey] of Object.entries(fieldMapping)) {
+      if (row[csvHeader] !== undefined) {
+        fieldValues[fieldKey] = row[csvHeader]
+      }
+    }
+
+    const tagsRaw = row['태그'] ?? ''
+    const tags = tagsRaw
+      ? tagsRaw.split(';').map((t) => t.trim()).filter(Boolean)
+      : []
+
+    return { field_values: fieldValues, tags }
+  })
+}
+
+export function validateImportCards(cards: ImportCard[]): ValidationResult {
+  const valid: ImportCard[] = []
+  const invalid: ImportCard[] = []
+
+  for (const card of cards) {
+    const hasValue = Object.values(card.field_values).some((v) => v.trim() !== '')
+    if (hasValue) {
+      valid.push(card)
+    } else {
+      invalid.push(card)
+    }
+  }
+
+  return { valid, invalid }
+}
+
+export function detectDuplicates(existingCards: Card[], newCards: ImportCard[]): DuplicateResult {
+  const existingKeys = new Set(
+    existingCards.map((c) => JSON.stringify(c.field_values))
+  )
+
+  const duplicates: ImportCard[] = []
+  const unique: ImportCard[] = []
+
+  for (const card of newCards) {
+    const key = JSON.stringify(card.field_values)
+    if (existingKeys.has(key)) {
+      duplicates.push(card)
+    } else {
+      unique.push(card)
+    }
+  }
+
+  return { duplicates, unique }
+}

@@ -1,0 +1,216 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string
+          display_name: string | null
+          daily_new_limit: number
+          default_study_mode: StudyMode
+          timezone: string
+          theme: 'light' | 'dark' | 'system'
+          tts_enabled: boolean
+          tts_lang: string
+          tts_provider: 'web_speech' | 'edge_tts'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          display_name?: string | null
+          daily_new_limit?: number
+          default_study_mode?: StudyMode
+          timezone?: string
+          theme?: 'light' | 'dark' | 'system'
+          tts_enabled?: boolean
+          tts_lang?: string
+          tts_provider?: 'web_speech' | 'edge_tts'
+        }
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
+      }
+      card_templates: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          fields: TemplateField[]
+          front_layout: LayoutItem[]
+          back_layout: LayoutItem[]
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          fields: TemplateField[]
+          front_layout: LayoutItem[]
+          back_layout: LayoutItem[]
+          is_default?: boolean
+        }
+        Update: Partial<Database['public']['Tables']['card_templates']['Insert']>
+      }
+      decks: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          default_template_id: string | null
+          color: string
+          icon: string
+          is_archived: boolean
+          sort_order: number
+          next_position: number
+          srs_settings: SrsSettings
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          default_template_id?: string | null
+          color?: string
+          icon?: string
+          is_archived?: boolean
+          sort_order?: number
+          next_position?: number
+          srs_settings?: SrsSettings
+        }
+        Update: Partial<Database['public']['Tables']['decks']['Insert']>
+      }
+      cards: {
+        Row: {
+          id: string
+          deck_id: string
+          user_id: string
+          template_id: string
+          field_values: Record<string, string>
+          tags: string[]
+          sort_position: number
+          srs_status: SrsStatus
+          ease_factor: number
+          interval_days: number
+          repetitions: number
+          next_review_at: string | null
+          last_reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          deck_id: string
+          user_id: string
+          template_id: string
+          field_values: Record<string, string>
+          tags?: string[]
+          sort_position: number
+          srs_status?: SrsStatus
+          ease_factor?: number
+          interval_days?: number
+          repetitions?: number
+          next_review_at?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['cards']['Insert']>
+      }
+      deck_study_state: {
+        Row: {
+          id: string
+          user_id: string
+          deck_id: string
+          new_start_pos: number
+          review_start_pos: number
+          new_batch_size: number
+          review_batch_size: number
+          sequential_pos: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          deck_id: string
+          new_start_pos?: number
+          review_start_pos?: number
+          new_batch_size?: number
+          review_batch_size?: number
+          sequential_pos?: number
+        }
+        Update: Partial<Database['public']['Tables']['deck_study_state']['Insert']>
+      }
+      study_logs: {
+        Row: {
+          id: string
+          user_id: string
+          card_id: string
+          deck_id: string
+          study_mode: StudyMode
+          rating: string
+          prev_interval: number | null
+          new_interval: number | null
+          prev_ease: number | null
+          new_ease: number | null
+          review_duration_ms: number | null
+          studied_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          card_id: string
+          deck_id: string
+          study_mode: StudyMode
+          rating: string
+          prev_interval?: number | null
+          new_interval?: number | null
+          prev_ease?: number | null
+          new_ease?: number | null
+          review_duration_ms?: number | null
+        }
+        Update: Partial<Database['public']['Tables']['study_logs']['Insert']>
+      }
+    }
+  }
+}
+
+export type StudyMode = 'srs' | 'sequential_review' | 'random' | 'sequential' | 'by_date'
+export type SrsStatus = 'new' | 'learning' | 'review' | 'suspended'
+
+export type TemplateField = {
+  key: string
+  name: string
+  type: 'text' | 'image' | 'audio'
+  order: number
+  tts_enabled?: boolean
+  tts_lang?: string
+}
+
+export type LayoutItem = {
+  field_key: string
+  style: 'primary' | 'secondary' | 'hint' | 'detail' | 'media'
+}
+
+export type SrsSettings = {
+  again_days: number
+  hard_days: number
+  good_days: number
+  easy_days: number
+}
+
+export const DEFAULT_SRS_SETTINGS: SrsSettings = {
+  again_days: 0,
+  hard_days: 1,
+  good_days: 1,
+  easy_days: 4,
+}
+
+// Row type shortcuts
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type CardTemplate = Database['public']['Tables']['card_templates']['Row']
+export type Deck = Database['public']['Tables']['decks']['Row']
+export type Card = Database['public']['Tables']['cards']['Row']
+export type DeckStudyState = Database['public']['Tables']['deck_study_state']['Row']
+export type StudyLog = Database['public']['Tables']['study_logs']['Row']
