@@ -23,6 +23,7 @@ import { DeckSharePage } from './pages/DeckSharePage'
 import { AcceptInvitePage } from './pages/AcceptInvitePage'
 import { MySharesPage } from './pages/MySharesPage'
 import { GuidePage } from './pages/GuidePage'
+import { ApiDocsPage } from './pages/ApiDocsPage'
 import { LandingPage } from './pages/LandingPage'
 
 function App() {
@@ -98,6 +99,7 @@ function App() {
           <Route path="/templates/:templateId/edit" element={<TemplateEditPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/guide" element={<GuidePage />} />
+          <Route path="/api-docs" element={<ApiDocsPage />} />
         </Route>
 
         {/* Fallback */}

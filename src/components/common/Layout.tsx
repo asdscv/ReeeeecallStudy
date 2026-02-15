@@ -11,6 +11,7 @@ const navItems = [
   { path: '/templates', label: '카드', icon: '📋' },
   { path: '/history', label: '학습 기록', icon: '📝' },
   { path: '/settings', label: '설정', icon: '⚙️' },
+  { path: '/api-docs', label: 'API', icon: '📡' },
 ]
 
 export function Layout() {
