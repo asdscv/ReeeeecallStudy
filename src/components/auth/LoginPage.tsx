@@ -52,7 +52,7 @@ export function LoginPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
             <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 mx-auto" />
+            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
             <p className="text-gray-500 mt-3">이메일로 간편 로그인</p>
           </div>
 

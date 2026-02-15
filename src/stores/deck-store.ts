@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { guard } from '../lib/rate-limit-instance'
 import type { Deck, CardTemplate, SrsSettings } from '../types/database'
 
 interface DeckStats {
@@ -43,6 +44,10 @@ export const useDeckStore = create<DeckState>((set, get) => ({
 
   fetchDecks: async () => {
     set({ loading: true, error: null })
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Fetch own decks
     const { data, error } = await supabase
       .from('decks')
       .select('*')
@@ -52,9 +57,39 @@ export const useDeckStore = create<DeckState>((set, get) => ({
 
     if (error) {
       set({ error: error.message, loading: false })
-    } else {
-      set({ decks: (data ?? []) as Deck[], loading: false })
+      return
     }
+
+    let allDecks = (data ?? []) as Deck[]
+
+    // Fetch subscribed decks (via active subscribe shares)
+    if (user) {
+      const { data: shares } = await supabase
+        .from('deck_shares')
+        .select('deck_id')
+        .eq('recipient_id', user.id)
+        .eq('share_mode', 'subscribe')
+        .eq('status', 'active')
+
+      if (shares && shares.length > 0) {
+        const subscribedDeckIds = shares.map((s: { deck_id: string }) => s.deck_id)
+        const existingDeckIds = new Set(allDecks.map((d) => d.id))
+        const newIds = subscribedDeckIds.filter((id: string) => !existingDeckIds.has(id))
+
+        if (newIds.length > 0) {
+          const { data: subscribedDecks } = await supabase
+            .from('decks')
+            .select('*')
+            .in('id', newIds)
+
+          if (subscribedDecks) {
+            allDecks = [...allDecks, ...(subscribedDecks as Deck[])]
+          }
+        }
+      }
+    }
+
+    set({ decks: allDecks, loading: false })
   },
 
   fetchStats: async (userId: string) => {
@@ -80,6 +115,9 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   },
 
   createDeck: async (input) => {
+    const check = guard.check('deck_create', 'decks_total')
+    if (!check.allowed) { set({ error: check.message ?? '요청 제한에 도달했습니다.' }); return null }
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
@@ -110,6 +148,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
       return null
     }
 
+    guard.recordSuccess('decks_total')
     await get().fetchDecks()
     await get().fetchStats(user.id)
     return deck as Deck

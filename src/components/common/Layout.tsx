@@ -6,9 +6,10 @@ import { useAuthStore } from '../../stores/auth-store'
 const navItems = [
   { path: '/quick-study', label: '빠른 학습', icon: '⚡' },
   { path: '/', label: '대시보드', icon: '📊' },
-  { path: '/history', label: '학습 기록', icon: '📝' },
   { path: '/decks', label: '덱', icon: '📚' },
+  { path: '/marketplace', label: '마켓', icon: '🏪' },
   { path: '/templates', label: '카드', icon: '📋' },
+  { path: '/history', label: '학습 기록', icon: '📝' },
   { path: '/settings', label: '설정', icon: '⚙️' },
 ]
 

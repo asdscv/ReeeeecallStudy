@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { guard } from '../lib/rate-limit-instance'
 import type { Card } from '../types/database'
 
 interface CardState {
@@ -45,15 +46,23 @@ export const useCardStore = create<CardState>((set, get) => ({
   },
 
   createCard: async (input) => {
+    const check = guard.check('card_create', 'cards_total')
+    if (!check.allowed) { set({ error: check.message ?? '요청 제한에 도달했습니다.' }); return null }
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
-    // 현재 덱의 next_position 가져오기
+    // 현재 덱의 next_position + readonly 체크
     const { data: deck } = await supabase
       .from('decks')
-      .select('next_position')
+      .select('next_position, is_readonly')
       .eq('id', input.deck_id)
       .single()
+
+    if (deck && (deck as { is_readonly: boolean }).is_readonly) {
+      set({ error: '읽기 전용 덱에는 카드를 추가할 수 없습니다.' })
+      return null
+    }
 
     const position = (deck as { next_position: number } | null)?.next_position ?? 0
 
@@ -85,11 +94,26 @@ export const useCardStore = create<CardState>((set, get) => ({
       .update({ next_position: position + 1 } as Record<string, unknown>)
       .eq('id', input.deck_id)
 
+    guard.recordSuccess('cards_total')
     await get().fetchCards(input.deck_id)
     return card as Card
   },
 
   updateCard: async (id, data) => {
+    // readonly 체크
+    const existingCard = get().cards.find((c) => c.id === id)
+    if (existingCard) {
+      const { data: deck } = await supabase
+        .from('decks')
+        .select('is_readonly')
+        .eq('id', existingCard.deck_id)
+        .single()
+      if (deck && (deck as { is_readonly: boolean }).is_readonly) {
+        set({ error: '읽기 전용 덱의 카드를 수정할 수 없습니다.' })
+        return
+      }
+    }
+
     const { error } = await supabase
       .from('cards')
       .update(data as Record<string, unknown>)

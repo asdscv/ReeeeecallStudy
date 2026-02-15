@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { calculateSRS, type SrsRating } from '../lib/srs'
 import { computeSequentialReviewPositions } from '../lib/study-session-utils'
+import { guard } from '../lib/rate-limit-instance'
+import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
 
 type Phase = 'idle' | 'loading' | 'studying' | 'completed'
@@ -33,6 +35,7 @@ interface StudyState {
   sessionStartedAt: number
   sessionStats: SessionStats
   studyState: DeckStudyState | null
+  srsSource: SrsSource
 
   initSession: (config: StudyConfig) => Promise<void>
   flipCard: () => void
@@ -60,22 +63,31 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   sessionStartedAt: Date.now(),
   sessionStats: { ...initialStats },
   studyState: null,
+  srsSource: 'embedded',
 
   initSession: async (config: StudyConfig) => {
+    const check = guard.check('study_session_start', 'study_sessions_daily')
+    if (!check.allowed) { set({ phase: 'idle' }); return }
+
     set({ phase: 'loading', config })
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { set({ phase: 'idle' }); return }
 
-    // Fetch deck template and srs_settings
+    // Fetch deck template, srs_settings, and sharing info
     const { data: deck } = await supabase
       .from('decks')
-      .select('default_template_id, srs_settings')
+      .select('default_template_id, srs_settings, share_mode, user_id, source_owner_id')
       .eq('id', config.deckId)
       .single()
 
-    const deckData = deck as { default_template_id: string | null; srs_settings: SrsSettings | null } | null
+    const deckData = deck as { default_template_id: string | null; srs_settings: SrsSettings | null; share_mode: string | null; user_id: string; source_owner_id: string | null } | null
     const srsSettings = deckData?.srs_settings ?? null
+
+    // Determine SRS source (embedded vs progress_table)
+    const srsSource = deckData
+      ? getSrsSource({ share_mode: deckData.share_mode, user_id: deckData.user_id, source_owner_id: deckData.source_owner_id }, user.id)
+      : 'embedded' as SrsSource
 
     let template: CardTemplate | null = null
     if (deckData && deckData.default_template_id) {
@@ -131,38 +143,74 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           newCardLimit = (profile as { daily_new_limit: number }).daily_new_limit
         }
 
-        // learning cards due now
-        const { data: learning } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .eq('srs_status', 'learning')
-          .lte('next_review_at', now)
-          .order('next_review_at', { ascending: true })
+        if (srsSource === 'progress_table') {
+          // Subscribe deck: fetch cards + join with user_card_progress
+          const { data: allCards } = await supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .order('sort_position', { ascending: true })
 
-        // review cards due now
-        const { data: review } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .eq('srs_status', 'review')
-          .lte('next_review_at', now)
-          .order('next_review_at', { ascending: true })
+          const { data: progressData } = await supabase
+            .from('user_card_progress')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .eq('user_id', user.id)
 
-        // new cards — limited by user's daily_new_limit setting
-        const { data: newCards } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .eq('srs_status', 'new')
-          .order('sort_position', { ascending: true })
-          .limit(newCardLimit)
+          const progressMap = new Map<string, UserCardProgress>()
+          for (const p of (progressData ?? []) as UserCardProgress[]) {
+            progressMap.set(p.card_id, p)
+          }
 
-        cards = [
-          ...((learning ?? []) as Card[]),
-          ...((review ?? []) as Card[]),
-          ...((newCards ?? []) as Card[]),
-        ]
+          const mergedCards = ((allCards ?? []) as Card[]).map((card) => {
+            const progress = progressMap.get(card.id)
+            return mergeCardWithProgress(card, progress) as Card
+          })
+
+          const learning = mergedCards.filter(
+            (c) => c.srs_status === 'learning' && c.next_review_at && c.next_review_at <= now
+          )
+          const review = mergedCards.filter(
+            (c) => c.srs_status === 'review' && c.next_review_at && c.next_review_at <= now
+          )
+          const newC = mergedCards.filter((c) => c.srs_status === 'new').slice(0, newCardLimit)
+
+          cards = [...learning, ...review, ...newC]
+        } else {
+          // Embedded: original path
+          // learning cards due now
+          const { data: learning } = await supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .eq('srs_status', 'learning')
+            .lte('next_review_at', now)
+            .order('next_review_at', { ascending: true })
+
+          // review cards due now
+          const { data: review } = await supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .eq('srs_status', 'review')
+            .lte('next_review_at', now)
+            .order('next_review_at', { ascending: true })
+
+          // new cards — limited by user's daily_new_limit setting
+          const { data: newCards } = await supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .eq('srs_status', 'new')
+            .order('sort_position', { ascending: true })
+            .limit(newCardLimit)
+
+          cards = [
+            ...((learning ?? []) as Card[]),
+            ...((review ?? []) as Card[]),
+            ...((newCards ?? []) as Card[]),
+          ]
+        }
         break
       }
 
@@ -256,6 +304,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         phase: 'completed',
         template,
         srsSettings,
+        srsSource,
         queue: [],
         studyState: typedStudyState,
         sessionStats: { ...initialStats, totalCards: 0 },
@@ -263,10 +312,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       return
     }
 
+    guard.recordSuccess('study_sessions_daily')
     set({
       phase: 'studying',
       template,
       srsSettings,
+      srsSource,
       queue: cards,
       studyState: typedStudyState,
       currentIndex: 0,
@@ -282,7 +333,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource } = get()
     if (!config) return
 
     const card = queue[currentIndex]
@@ -301,17 +352,36 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       newInterval = srsResult.interval_days
       newEase = srsResult.ease_factor
 
-      await supabase
-        .from('cards')
-        .update({
-          ease_factor: srsResult.ease_factor,
-          interval_days: srsResult.interval_days,
-          repetitions: srsResult.repetitions,
-          srs_status: srsResult.srs_status,
-          next_review_at: srsResult.next_review_at,
-          last_reviewed_at: new Date().toISOString(),
-        } as Record<string, unknown>)
-        .eq('id', card.id)
+      if (srsSource === 'progress_table') {
+        // Subscribe deck: write to user_card_progress
+        await supabase
+          .from('user_card_progress')
+          .upsert({
+            user_id: user.id,
+            card_id: card.id,
+            deck_id: config.deckId,
+            ease_factor: srsResult.ease_factor,
+            interval_days: srsResult.interval_days,
+            repetitions: srsResult.repetitions,
+            srs_status: srsResult.srs_status,
+            next_review_at: srsResult.next_review_at,
+            last_reviewed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          } as Record<string, unknown>, { onConflict: 'user_id,card_id' })
+      } else {
+        // Embedded: write to cards table
+        await supabase
+          .from('cards')
+          .update({
+            ease_factor: srsResult.ease_factor,
+            interval_days: srsResult.interval_days,
+            repetitions: srsResult.repetitions,
+            srs_status: srsResult.srs_status,
+            next_review_at: srsResult.next_review_at,
+            last_reviewed_at: new Date().toISOString(),
+          } as Record<string, unknown>)
+          .eq('id', card.id)
+      }
     }
 
     // Log study
@@ -420,6 +490,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       config: null,
       template: null,
       srsSettings: null,
+      srsSource: 'embedded',
       queue: [],
       currentIndex: 0,
       isFlipped: false,

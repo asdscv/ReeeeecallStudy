@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { isPast, formatLocalDate } from '../lib/date-utils'
 import { useCardStore } from '../stores/card-store'
@@ -225,25 +225,38 @@ export function DeckDetailPage() {
           >
             학습 시작
           </button>
+          {!deck.is_readonly && (
+            <button
+              onClick={() => navigate(`/decks/${deckId}/edit`)}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            >
+              <Settings className="w-4 h-4" />
+              편집
+            </button>
+          )}
           <button
-            onClick={() => navigate(`/decks/${deckId}/edit`)}
+            onClick={() => navigate(`/decks/${deckId}/share`)}
             className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
-            <Settings className="w-4 h-4" />
-            편집
+            <Share2 className="w-4 h-4" />
+            공유
           </button>
-          <button
-            onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-            className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
-          >
-            + 카드
-          </button>
-          <button
-            onClick={() => setShowImport(true)}
-            className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
-          >
-            가져오기
-          </button>
+          {!deck.is_readonly && (
+            <button
+              onClick={() => { setEditingCard(null); setShowCardForm(true) }}
+              className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            >
+              + 카드
+            </button>
+          )}
+          {!deck.is_readonly && (
+            <button
+              onClick={() => setShowImport(true)}
+              className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            >
+              가져오기
+            </button>
+          )}
           <button
             onClick={() => setShowExport(true)}
             className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"

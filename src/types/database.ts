@@ -72,6 +72,10 @@ export interface Database {
           sort_order: number
           next_position: number
           srs_settings: SrsSettings
+          share_mode: ShareMode | null
+          source_deck_id: string | null
+          source_owner_id: string | null
+          is_readonly: boolean
           created_at: string
           updated_at: string
         }
@@ -87,6 +91,10 @@ export interface Database {
           sort_order?: number
           next_position?: number
           srs_settings?: SrsSettings
+          share_mode?: ShareMode | null
+          source_deck_id?: string | null
+          source_owner_id?: string | null
+          is_readonly?: boolean
         }
         Update: Partial<Database['public']['Tables']['decks']['Insert']>
       }
@@ -212,6 +220,8 @@ export interface Database {
 export type StudyMode = 'srs' | 'sequential_review' | 'random' | 'sequential' | 'by_date'
 export type SrsStatus = 'new' | 'learning' | 'review' | 'suspended'
 export type LayoutMode = 'default' | 'custom'
+export type ShareMode = 'copy' | 'subscribe' | 'snapshot'
+export type ShareStatus = 'pending' | 'active' | 'revoked' | 'declined'
 
 export type TemplateField = {
   key: string
@@ -251,3 +261,49 @@ export type Card = Database['public']['Tables']['cards']['Row']
 export type DeckStudyState = Database['public']['Tables']['deck_study_state']['Row']
 export type StudyLog = Database['public']['Tables']['study_logs']['Row']
 export type StudySession = Database['public']['Tables']['study_sessions']['Row']
+
+// Sharing types
+export type DeckShare = {
+  id: string
+  deck_id: string
+  owner_id: string
+  recipient_id: string | null
+  share_mode: ShareMode
+  status: ShareStatus
+  invite_code: string | null
+  invite_email: string | null
+  copied_deck_id: string | null
+  created_at: string
+  accepted_at: string | null
+}
+
+export type MarketplaceListing = {
+  id: string
+  deck_id: string
+  owner_id: string
+  title: string
+  description: string | null
+  tags: string[]
+  category: string
+  share_mode: ShareMode
+  card_count: number
+  acquire_count: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type UserCardProgress = {
+  id: string
+  user_id: string
+  card_id: string
+  deck_id: string
+  srs_status: SrsStatus
+  ease_factor: number
+  interval_days: number
+  repetitions: number
+  next_review_at: string | null
+  last_reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}

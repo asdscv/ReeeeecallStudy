@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { guard } from '../lib/rate-limit-instance'
 import type { CardTemplate, TemplateField, LayoutItem, LayoutMode } from '../types/database'
 
 interface TemplateState {
@@ -51,6 +52,9 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   },
 
   createTemplate: async (input) => {
+    const check = guard.check('card_create', 'templates_total')
+    if (!check.allowed) { set({ error: check.message ?? '요청 제한에 도달했습니다.' }); return null }
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
@@ -75,6 +79,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       return null
     }
 
+    guard.recordSuccess('templates_total')
     await get().fetchTemplates()
     return tmpl as CardTemplate
   },

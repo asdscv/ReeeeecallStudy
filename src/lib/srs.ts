@@ -1,7 +1,14 @@
-import type { Card, SrsSettings } from '../types/database'
+import type { SrsSettings } from '../types/database'
 import { DEFAULT_SRS_SETTINGS } from '../types/database'
 
 export type SrsRating = 'again' | 'hard' | 'good' | 'easy'
+
+export interface SrsCardData {
+  srs_status: 'new' | 'learning' | 'review' | 'suspended'
+  ease_factor: number
+  interval_days: number
+  repetitions: number
+}
 
 export interface SrsResult {
   ease_factor: number
@@ -11,7 +18,7 @@ export interface SrsResult {
   next_review_at: string
 }
 
-export function calculateSRS(card: Card, rating: SrsRating, settings?: SrsSettings): SrsResult {
+export function calculateSRS(card: SrsCardData, rating: SrsRating, settings?: SrsSettings): SrsResult {
   const s = settings ?? DEFAULT_SRS_SETTINGS
   const now = new Date()
   let ease = card.ease_factor
@@ -98,7 +105,7 @@ export function calculateSRS(card: Card, rating: SrsRating, settings?: SrsSettin
   }
 }
 
-export function previewIntervals(card: Card, settings?: SrsSettings): Record<SrsRating, string> {
+export function previewIntervals(card: SrsCardData, settings?: SrsSettings): Record<SrsRating, string> {
   const ratings: SrsRating[] = ['again', 'hard', 'good', 'easy']
   const result = {} as Record<SrsRating, string>
   for (const rating of ratings) {

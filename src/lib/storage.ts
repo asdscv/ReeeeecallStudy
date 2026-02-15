@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { guard } from './rate-limit-instance'
 
 const IMAGE_MAX_SIZE = 5 * 1024 * 1024 // 5MB
 const AUDIO_MAX_SIZE = 10 * 1024 * 1024 // 10MB
@@ -61,6 +62,11 @@ export async function uploadFile(
   fieldKey: string,
   fieldType: 'image' | 'audio'
 ): Promise<string> {
+  const check = guard.check('storage_upload', 'storage_bytes', file.size)
+  if (!check.allowed) {
+    throw new Error(check.message ?? '업로드 제한에 도달했습니다.')
+  }
+
   const validation = validateFile(file, fieldType)
   if (!validation.valid) {
     throw new Error(validation.error)
@@ -78,6 +84,7 @@ export async function uploadFile(
     throw new Error(`업로드 실패: ${error.message}`)
   }
 
+  guard.recordSuccess('storage_bytes', file.size)
   const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path)
   return urlData.publicUrl
 }

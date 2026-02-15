@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
 import { formatRelativeTime } from '../../lib/date-utils'
+import { ShareBadge } from '../sharing/ShareBadge'
+import { useAuthStore } from '../../stores/auth-store'
 import type { Deck } from '../../types/database'
 
 interface DeckStats {
@@ -19,6 +21,7 @@ interface DeckCardProps {
 
 export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
 
   const totalCards = stats?.total_cards ?? 0
   const dueCards = (stats?.review_cards ?? 0) + (stats?.learning_cards ?? 0)
@@ -47,6 +50,7 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
         <div className="flex items-center gap-2 min-w-0 mb-2 sm:mb-3">
           <span className="text-xl sm:text-2xl shrink-0">{deck.icon}</span>
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{deck.name}</h3>
+          {user && <ShareBadge deck={deck} userId={user.id} />}
         </div>
 
         {/* Description */}

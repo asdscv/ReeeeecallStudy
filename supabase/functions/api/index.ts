@@ -3,6 +3,7 @@ import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
 import { createClient } from '@supabase/supabase-js'
+import { rateLimitMiddleware } from './middleware/rate-limit.ts'
 
 // ─── Helpers ──────────────────────────────────────────────────
 
@@ -541,6 +542,8 @@ app.use('/v1/*', async (c, next) => {
   await next()
 })
 
+app.use('/v1/*', rateLimitMiddleware)
+
 // ─── Route Handlers ───────────────────────────────────────────
 
 // GET /v1/me
@@ -885,6 +888,378 @@ app.openapi(deleteTemplateRoute, async (c) => {
     .eq('id', templateId)
     .eq('user_id', userId)
 
+  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  return c.json({ data: { deleted: true } }, 200)
+})
+
+// ─── Marketplace & Sharing Schemas ───────────────────────────
+
+const MarketplaceListingSchema = z.object({
+  id: z.string().uuid(),
+  deck_id: z.string().uuid(),
+  owner_id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  tags: z.array(z.string()),
+  category: z.string(),
+  share_mode: z.enum(['copy', 'subscribe', 'snapshot']),
+  card_count: z.number().int(),
+  acquire_count: z.number().int(),
+  is_active: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+}).openapi('MarketplaceListing')
+
+const DeckShareSchema = z.object({
+  id: z.string().uuid(),
+  deck_id: z.string().uuid(),
+  owner_id: z.string().uuid(),
+  recipient_id: z.string().uuid().nullable(),
+  share_mode: z.enum(['copy', 'subscribe', 'snapshot']),
+  status: z.enum(['pending', 'active', 'revoked', 'declined']),
+  invite_code: z.string().nullable(),
+  invite_email: z.string().nullable(),
+  copied_deck_id: z.string().uuid().nullable(),
+  created_at: z.string(),
+  accepted_at: z.string().nullable(),
+}).openapi('DeckShare')
+
+const ListingIdParamSchema = z.object({
+  listingId: z.string().uuid().openapi({ param: { name: 'listingId', in: 'path' } }),
+})
+
+const ShareIdParamSchema = z.object({
+  shareId: z.string().uuid().openapi({ param: { name: 'shareId', in: 'path' } }),
+})
+
+// ─── Marketplace Route Definitions ──────────────────────────
+
+const listMarketplaceRoute = createRoute({
+  method: 'get',
+  path: '/v1/marketplace',
+  tags: ['Marketplace'],
+  summary: '마켓플레이스 리스팅 목록',
+  security: [{ Bearer: [] }],
+  responses: {
+    200: { description: '리스팅 목록', content: { 'application/json': { schema: z.object({ data: z.array(MarketplaceListingSchema) }) } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const getMarketplaceRoute = createRoute({
+  method: 'get',
+  path: '/v1/marketplace/{listingId}',
+  tags: ['Marketplace'],
+  summary: '리스팅 상세 조회',
+  security: [{ Bearer: [] }],
+  request: { params: ListingIdParamSchema },
+  responses: {
+    200: { description: '리스팅 상세', content: { 'application/json': { schema: z.object({ data: MarketplaceListingSchema }) } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+    404: { description: '리스팅 없음', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const createMarketplaceRoute = createRoute({
+  method: 'post',
+  path: '/v1/marketplace',
+  tags: ['Marketplace'],
+  summary: '덱을 마켓에 게시',
+  security: [{ Bearer: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            deck_id: z.string().uuid(),
+            title: z.string().min(1),
+            description: z.string().optional(),
+            tags: z.array(z.string()).optional(),
+            category: z.string().optional(),
+            share_mode: z.enum(['copy', 'subscribe', 'snapshot']),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: { description: '게시 성공', content: { 'application/json': { schema: z.object({ data: MarketplaceListingSchema }) } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const deleteMarketplaceRoute = createRoute({
+  method: 'delete',
+  path: '/v1/marketplace/{listingId}',
+  tags: ['Marketplace'],
+  summary: '게시 취소',
+  security: [{ Bearer: [] }],
+  request: { params: ListingIdParamSchema },
+  responses: {
+    200: { description: '게시 취소 성공', content: { 'application/json': { schema: SuccessDeleteSchema } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+    404: { description: '리스팅 없음', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+// ─── Sharing Route Definitions ──────────────────────────────
+
+const createShareRoute = createRoute({
+  method: 'post',
+  path: '/v1/shares',
+  tags: ['Sharing'],
+  summary: '공유 생성',
+  security: [{ Bearer: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            deck_id: z.string().uuid(),
+            share_mode: z.enum(['copy', 'subscribe', 'snapshot']),
+            invite_email: z.string().optional(),
+            generate_link: z.boolean().optional(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: { description: '공유 생성 성공', content: { 'application/json': { schema: z.object({ data: DeckShareSchema }) } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const acceptShareRoute = createRoute({
+  method: 'post',
+  path: '/v1/shares/accept',
+  tags: ['Sharing'],
+  summary: '초대 수락',
+  security: [{ Bearer: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            invite_code: z.string().min(1),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: { description: '수락 성공', content: { 'application/json': { schema: z.object({ data: z.object({ deck_id: z.string().uuid() }) }) } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+    404: { description: '초대 없음', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const listSharesRoute = createRoute({
+  method: 'get',
+  path: '/v1/shares',
+  tags: ['Sharing'],
+  summary: '내 공유 목록',
+  security: [{ Bearer: [] }],
+  responses: {
+    200: { description: '공유 목록', content: { 'application/json': { schema: z.object({ data: z.object({ sent: z.array(DeckShareSchema), received: z.array(DeckShareSchema) }) }) } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const deleteShareRoute = createRoute({
+  method: 'delete',
+  path: '/v1/shares/{shareId}',
+  tags: ['Sharing'],
+  summary: '공유 취소/구독 해지',
+  security: [{ Bearer: [] }],
+  request: { params: ShareIdParamSchema },
+  responses: {
+    200: { description: '취소 성공', content: { 'application/json': { schema: SuccessDeleteSchema } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
+    404: { description: '공유 없음', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+// ─── Marketplace Handlers ────────────────────────────────────
+
+// GET /v1/marketplace
+app.openapi(listMarketplaceRoute, async (c) => {
+  const sb = c.get('supabase')
+  const { data, error } = await sb
+    .from('marketplace_listings')
+    .select('*')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+
+  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  return c.json({ data: data ?? [] }, 200)
+})
+
+// GET /v1/marketplace/{listingId}
+app.openapi(getMarketplaceRoute, async (c) => {
+  const sb = c.get('supabase')
+  const { listingId } = c.req.valid('param')
+
+  const { data, error } = await sb
+    .from('marketplace_listings')
+    .select('*')
+    .eq('id', listingId)
+    .single()
+
+  if (error || !data) return c.json({ error: { code: 'NOT_FOUND', message: 'Listing not found' } }, 404)
+  return c.json({ data }, 200)
+})
+
+// POST /v1/marketplace
+app.openapi(createMarketplaceRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+  const body = c.req.valid('json')
+
+  // Verify deck ownership
+  const { data: deck } = await sb.from('decks').select('id').eq('id', body.deck_id).eq('user_id', userId).single()
+  if (!deck) return c.json({ error: { code: 'NOT_FOUND', message: 'Deck not found' } }, 404)
+
+  // Get card count
+  const { count } = await sb.from('cards').select('*', { count: 'exact', head: true }).eq('deck_id', body.deck_id)
+
+  const { data, error } = await sb
+    .from('marketplace_listings')
+    .insert({
+      deck_id: body.deck_id,
+      owner_id: userId,
+      title: body.title.trim(),
+      description: body.description?.trim() || null,
+      tags: body.tags ?? [],
+      category: body.category ?? 'general',
+      share_mode: body.share_mode,
+      card_count: count ?? 0,
+      is_active: true,
+    })
+    .select()
+    .single()
+
+  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  return c.json({ data }, 201)
+})
+
+// DELETE /v1/marketplace/{listingId}
+app.openapi(deleteMarketplaceRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+  const { listingId } = c.req.valid('param')
+
+  const { data: listing } = await sb.from('marketplace_listings').select('id').eq('id', listingId).eq('owner_id', userId).single()
+  if (!listing) return c.json({ error: { code: 'NOT_FOUND', message: 'Listing not found' } }, 404)
+
+  const { error } = await sb.from('marketplace_listings').update({ is_active: false }).eq('id', listingId)
+  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  return c.json({ data: { deleted: true } }, 200)
+})
+
+// ─── Sharing Handlers ────────────────────────────────────────
+
+// POST /v1/shares
+app.openapi(createShareRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+  const body = c.req.valid('json')
+
+  // Verify deck ownership
+  const { data: deck } = await sb.from('decks').select('id').eq('id', body.deck_id).eq('user_id', userId).single()
+  if (!deck) return c.json({ error: { code: 'NOT_FOUND', message: 'Deck not found' } }, 404)
+
+  // Generate invite code if requested
+  let inviteCode = null
+  if (body.generate_link) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const bytes = crypto.getRandomValues(new Uint8Array(8))
+    inviteCode = Array.from(bytes).map(b => chars[b % chars.length]).join('')
+  }
+
+  const { data, error } = await sb
+    .from('deck_shares')
+    .insert({
+      deck_id: body.deck_id,
+      owner_id: userId,
+      share_mode: body.share_mode,
+      invite_code: inviteCode,
+      invite_email: body.invite_email || null,
+      status: 'pending',
+    })
+    .select()
+    .single()
+
+  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  return c.json({ data }, 201)
+})
+
+// POST /v1/shares/accept
+app.openapi(acceptShareRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+  const body = c.req.valid('json')
+
+  const { data: share, error: findError } = await sb
+    .from('deck_shares')
+    .select('*')
+    .eq('invite_code', body.invite_code)
+    .eq('status', 'pending')
+    .single()
+
+  if (findError || !share) return c.json({ error: { code: 'NOT_FOUND', message: 'Invalid or expired invite code' } }, 404)
+
+  if (share.owner_id === userId) {
+    return c.json({ error: { code: 'VALIDATION_ERROR', message: 'Cannot accept your own invite' } }, 400)
+  }
+
+  let deckId = share.deck_id
+
+  if (share.share_mode === 'subscribe') {
+    await sb.from('deck_shares').update({ recipient_id: userId, status: 'active', accepted_at: new Date().toISOString() }).eq('id', share.id)
+    await sb.rpc('init_subscriber_progress', { p_user_id: userId, p_deck_id: share.deck_id })
+  } else {
+    const isReadonly = share.share_mode === 'snapshot'
+    const { data: newDeckId, error: rpcError } = await sb.rpc('copy_deck_for_user', {
+      p_source_deck_id: share.deck_id, p_recipient_id: userId, p_is_readonly: isReadonly, p_share_mode: share.share_mode,
+    })
+    if (rpcError) return c.json({ error: { code: 'DB_ERROR', message: rpcError.message } }, 500)
+    deckId = newDeckId
+    await sb.from('deck_shares').update({ recipient_id: userId, status: 'active', accepted_at: new Date().toISOString(), copied_deck_id: newDeckId }).eq('id', share.id)
+  }
+
+  return c.json({ data: { deck_id: deckId } }, 200)
+})
+
+// GET /v1/shares
+app.openapi(listSharesRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+
+  const { data: sent } = await sb.from('deck_shares').select('*').eq('owner_id', userId).order('created_at', { ascending: false })
+  const { data: received } = await sb.from('deck_shares').select('*').eq('recipient_id', userId).order('created_at', { ascending: false })
+
+  return c.json({ data: { sent: sent ?? [], received: received ?? [] } }, 200)
+})
+
+// DELETE /v1/shares/{shareId}
+app.openapi(deleteShareRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+  const { shareId } = c.req.valid('param')
+
+  const { data: share } = await sb.from('deck_shares').select('id, owner_id, recipient_id')
+    .eq('id', shareId)
+    .single()
+
+  if (!share) return c.json({ error: { code: 'NOT_FOUND', message: 'Share not found' } }, 404)
+
+  // Allow owner or recipient to revoke
+  if (share.owner_id !== userId && share.recipient_id !== userId) {
+    return c.json({ error: { code: 'NOT_FOUND', message: 'Share not found' } }, 404)
+  }
+
+  const { error } = await sb.from('deck_shares').update({ status: 'revoked' }).eq('id', shareId)
   if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
   return c.json({ data: { deleted: true } }, 200)
 })
