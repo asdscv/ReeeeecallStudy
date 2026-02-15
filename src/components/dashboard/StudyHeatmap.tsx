@@ -23,8 +23,8 @@ export function StudyHeatmap({ data }: StudyHeatmapProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">학습 잔디</h3>
+    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+      <h3 className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">학습 잔디</h3>
       <div className="overflow-x-auto">
         <CalendarHeatmap
           startDate={startDate}

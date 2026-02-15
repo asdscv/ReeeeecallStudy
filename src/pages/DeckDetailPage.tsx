@@ -106,7 +106,7 @@ export function DeckDetailPage() {
   ).length
 
   // Template fields for table headers
-  const displayFields = template?.fields.slice(0, 3) ?? []
+  const displayFields = template?.fields ?? []
 
   // Filtered cards
   const filteredCards = cards.filter((card) => {
@@ -185,68 +185,68 @@ export function DeckDetailPage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <button
           onClick={() => navigate('/decks')}
           className="text-sm text-gray-500 hover:text-gray-700 mb-2 cursor-pointer"
         >
           ← 덱 목록
         </button>
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-3xl">{deck.icon}</span>
-          <h1 className="text-2xl font-bold text-gray-900">{deck.name}</h1>
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <span className="text-2xl sm:text-3xl">{deck.icon}</span>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{deck.name}</h1>
         </div>
         {deck.description && (
-          <p className="text-gray-500">{deck.description}</p>
+          <p className="text-sm sm:text-base text-gray-500">{deck.description}</p>
         )}
 
         {/* Stats badges */}
-        <div className="flex items-center gap-3 mt-3">
-          <span className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3">
+          <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-full">
             전체 {cards.length}장
           </span>
           {newCount > 0 && (
-            <span className="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-full">
+            <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-blue-50 text-blue-700 rounded-full">
               새 카드 {newCount}
             </span>
           )}
           {(reviewCount + learningCount) > 0 && (
-            <span className="px-3 py-1 text-sm bg-amber-50 text-amber-700 rounded-full">
-              복습 예정 {reviewCount + learningCount}
+            <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-amber-50 text-amber-700 rounded-full">
+              복습 {reviewCount + learningCount}
             </span>
           )}
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-3 mt-4">
+        {/* Action buttons — scroll horizontally on mobile */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
           <button
             onClick={() => navigate(`/decks/${deckId}/study/setup`)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
             학습 시작
           </button>
           <button
             onClick={() => navigate(`/decks/${deckId}/edit`)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
             <Settings className="w-4 h-4" />
             편집
           </button>
           <button
             onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
-            + 카드 추가
+            + 카드
           </button>
           <button
             onClick={() => setShowImport(true)}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
             가져오기
           </button>
           <button
             onClick={() => setShowExport(true)}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
             내보내기
           </button>
@@ -254,12 +254,12 @@ export function DeckDetailPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex border-b border-gray-200 mb-4">
+      <div className="flex border-b border-gray-200 mb-4 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition cursor-pointer ${
+            className={`px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 transition cursor-pointer whitespace-nowrap ${
               activeTab === tab.id
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -274,13 +274,13 @@ export function DeckDetailPage() {
       {activeTab === 'cards' && (
         <>
           {/* Search & Filter bar */}
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
               placeholder="카드 검색..."
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
+              className="flex-1 px-3 sm:px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
             />
             <select
               value={statusFilter}
@@ -297,29 +297,29 @@ export function DeckDetailPage() {
 
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
-            <div className="flex items-center gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
               <span className="text-sm text-blue-700 font-medium">
-                {selectedIds.size}개 선택됨
+                {selectedIds.size}개 선택
               </span>
               <button
                 onClick={() => setShowBulkDelete(true)}
                 className="px-3 py-1 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer"
               >
-                선택 삭제
+                삭제
               </button>
               <button
                 onClick={() => setSelectedIds(new Set())}
                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
               >
-                선택 해제
+                해제
               </button>
             </div>
           )}
 
-          {/* Card list table */}
+          {/* Card list */}
           {cards.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-              <div className="text-5xl mb-4">🃏</div>
+            <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+              <div className="text-4xl sm:text-5xl mb-4">🃏</div>
               <p className="text-gray-500 mb-4">카드가 없습니다. 카드를 추가해보세요.</p>
               <button
                 onClick={() => { setEditingCard(null); setShowCardForm(true) }}
@@ -333,97 +333,163 @@ export function DeckDetailPage() {
               검색 결과가 없습니다.
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="px-4 py-3 w-10">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.size === filteredCards.length && filteredCards.length > 0}
-                        onChange={toggleSelectAll}
-                        className="cursor-pointer"
-                      />
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-10">
-                      #
-                    </th>
-                    {displayFields.map((field) => (
-                      <th
-                        key={field.key}
-                        className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3"
-                      >
-                        {field.name}
-                      </th>
-                    ))}
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-24">
-                      상태
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-28">
-                      추가일
-                    </th>
-                    <th className="px-4 py-3 w-20" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedCards.map((card, i) => (
-                    <tr
-                      key={card.id}
-                      className="border-b border-gray-100 hover:bg-gray-50"
-                    >
-                      <td className="px-4 py-3">
+            <>
+              {/* Desktop table (hidden on mobile) */}
+              <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="px-4 py-3 w-10">
                         <input
                           type="checkbox"
-                          checked={selectedIds.has(card.id)}
-                          onChange={() => toggleSelect(card.id)}
+                          checked={selectedIds.size === filteredCards.length && filteredCards.length > 0}
+                          onChange={toggleSelectAll}
                           className="cursor-pointer"
                         />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-400">{startIdx + i + 1}</td>
+                      </th>
+                      <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-10">
+                        #
+                      </th>
                       {displayFields.map((field) => (
-                        <td
+                        <th
                           key={field.key}
-                          className="px-4 py-3 text-sm text-gray-900 cursor-pointer"
-                          onClick={() => handleEditCard(card)}
+                          className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3"
                         >
-                          {card.field_values[field.key] || '-'}
-                        </td>
+                          {field.name}
+                        </th>
                       ))}
-                      <td className="px-4 py-3">
-                        <StatusBadge status={card.srs_status} />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-400">
-                        {formatLocalDate(card.created_at)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleEditCard(card)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
-                            title="편집"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeletingCard(card)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
-                            title="삭제"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
+                      <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-24">
+                        상태
+                      </th>
+                      <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-28">
+                        추가일
+                      </th>
+                      <th className="px-4 py-3 w-20" />
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paginatedCards.map((card, i) => (
+                      <tr
+                        key={card.id}
+                        className="border-b border-gray-100 hover:bg-gray-50"
+                      >
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(card.id)}
+                            onChange={() => toggleSelect(card.id)}
+                            className="cursor-pointer"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-400">{startIdx + i + 1}</td>
+                        {displayFields.map((field) => (
+                          <td
+                            key={field.key}
+                            className="px-4 py-3 text-sm text-gray-900 cursor-pointer max-w-[200px]"
+                            onClick={() => handleEditCard(card)}
+                          >
+                            <div className="truncate">
+                              {card.field_values[field.key] || '-'}
+                            </div>
+                          </td>
+                        ))}
+                        <td className="px-4 py-3">
+                          <StatusBadge status={card.srs_status} />
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-400">
+                          {formatLocalDate(card.created_at)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleEditCard(card)}
+                              className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
+                              title="편집"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setDeletingCard(card)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+                              title="삭제"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile card view (hidden on desktop) */}
+              <div className="md:hidden space-y-2">
+                {/* Select all */}
+                <div className="flex items-center gap-2 px-1 mb-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.size === filteredCards.length && filteredCards.length > 0}
+                    onChange={toggleSelectAll}
+                    className="cursor-pointer"
+                  />
+                  <span className="text-xs text-gray-500">전체 선택</span>
+                </div>
+                {paginatedCards.map((card, i) => (
+                  <div
+                    key={card.id}
+                    className="bg-white rounded-xl border border-gray-200 p-3"
+                  >
+                    <div className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(card.id)}
+                        onChange={() => toggleSelect(card.id)}
+                        className="cursor-pointer mt-1 shrink-0"
+                      />
+                      <div
+                        className="flex-1 min-w-0 cursor-pointer"
+                        onClick={() => handleEditCard(card)}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-gray-400">#{startIdx + i + 1}</span>
+                          <StatusBadge status={card.srs_status} />
+                        </div>
+                        {displayFields.slice(0, 3).map((field) => (
+                          <p key={field.key} className="text-sm text-gray-900 truncate">
+                            <span className="text-xs text-gray-400 mr-1">{field.name}:</span>
+                            {card.field_values[field.key] || '-'}
+                          </p>
+                        ))}
+                        <p className="text-xs text-gray-400 mt-1">
+                          {formatLocalDate(card.created_at)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <button
+                          onClick={() => handleEditCard(card)}
+                          className="p-2 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeletingCard(card)}
+                          className="p-2 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-3 bg-white rounded-xl border border-gray-200">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">
-                      {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / 총 {filteredCards.length}장
+                    <span className="text-xs sm:text-sm text-gray-500">
+                      {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / {filteredCards.length}장
                     </span>
                     <select
                       value={cardsPerPage}
@@ -442,26 +508,26 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage <= 1}
-                      className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                       let page: number
-                      if (totalPages <= 7) {
+                      if (totalPages <= 5) {
                         page = i + 1
-                      } else if (currentPage <= 4) {
+                      } else if (currentPage <= 3) {
                         page = i + 1
-                      } else if (currentPage >= totalPages - 3) {
-                        page = totalPages - 6 + i
+                      } else if (currentPage >= totalPages - 2) {
+                        page = totalPages - 4 + i
                       } else {
-                        page = currentPage - 3 + i
+                        page = currentPage - 2 + i
                       }
                       return (
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`w-8 h-8 text-sm rounded cursor-pointer ${
+                          className={`w-9 h-9 text-sm rounded cursor-pointer ${
                             currentPage === page
                               ? 'bg-blue-600 text-white'
                               : 'hover:bg-gray-100 text-gray-700'
@@ -474,14 +540,14 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage >= totalPages}
-                      className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
               )}
-            </div>
+            </>
           )}
         </>
       )}

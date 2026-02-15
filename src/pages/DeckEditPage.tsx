@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, Layers } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -146,29 +146,39 @@ export function DeckEditPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => navigate(-1)}
             className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer"
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">덱 편집</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">덱 편집</h1>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition"
-        >
-          <Save size={16} />
-          {saving ? '저장 중...' : '저장'}
-        </button>
+        <div className="flex items-center gap-2 sm:gap-3 pl-10 sm:pl-0">
+          <button
+            onClick={() => navigate(`/decks/${deckId}`)}
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 cursor-pointer transition"
+          >
+            <Layers size={16} />
+            <span className="hidden sm:inline">카드 관리</span>
+            <span className="sm:hidden">카드</span>
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition"
+          >
+            <Save size={16} />
+            {saving ? '저장 중...' : '저장'}
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left: Deck Settings */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">덱 설정</h2>
           <DeckSettingsForm
             values={formValues}
@@ -178,15 +188,15 @@ export function DeckEditPage() {
         </div>
 
         {/* Right: Deck Stats */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Period tabs */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h2 className="text-lg font-semibold text-gray-900">덱 통계</h2>
             <TimePeriodTabs value={period} onChange={setPeriod} />
           </div>
 
           {/* Summary cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             <StatCard label="전체 카드" value={deckStats.totalCards} />
             <StatCard label="숙달률" value={`${deckStats.masteryRate}%`} />
             <StatCard label="연속 학습" value={`${streak}일`} />
@@ -194,13 +204,13 @@ export function DeckEditPage() {
           </div>
 
           {/* Pie chart */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">상태 분포</h3>
+          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+            <h3 className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">상태 분포</h3>
             {deckStats.totalCards === 0 ? (
               <p className="text-sm text-gray-400 py-8 text-center">카드가 없습니다</p>
             ) : (
-              <div className="flex items-center gap-6">
-                <ResponsiveContainer width={160} height={160}>
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <ResponsiveContainer width={140} height={140}>
                   <PieChart>
                     <Pie
                       data={pieData}
@@ -247,9 +257,9 @@ export function DeckEditPage() {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <p className="text-xl font-bold text-gray-900">{value}</p>
+    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+      <p className="text-xs text-gray-500 mb-0.5 sm:mb-1">{label}</p>
+      <p className="text-lg sm:text-xl font-bold text-gray-900">{value}</p>
     </div>
   )
 }

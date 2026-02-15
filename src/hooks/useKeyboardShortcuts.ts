@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { StudyMode } from '../types/database'
+import { resolveKeyAction } from '../lib/keyboard-actions'
 
 interface UseKeyboardShortcutsOptions {
   isFlipped: boolean
@@ -26,35 +27,21 @@ export function useKeyboardShortcuts({
         return
       }
 
-      if (e.key === 'Escape') {
-        onExit()
-        return
-      }
+      const action = resolveKeyAction(e.key, isFlipped, mode)
+      if (!action) return
 
-      if (!isFlipped) {
-        // Front side: flip
-        if (e.key === ' ' || e.key === 'Enter') {
+      switch (action.type) {
+        case 'exit':
+          onExit()
+          break
+        case 'flip':
           e.preventDefault()
           onFlip()
-        }
-      } else {
-        // Back side: rate
-        if (mode === 'srs') {
-          if (e.key === '1') onRate('again')
-          else if (e.key === '2') onRate('hard')
-          else if (e.key === '3') onRate('good')
-          else if (e.key === '4') onRate('easy')
-        } else {
-          // Non-SRS modes
-          if (e.key === 'ArrowRight' || e.key === ' ') {
-            e.preventDefault()
-            if (mode === 'sequential_review') {
-              onRate('known')
-            } else {
-              onRate('next')
-            }
-          }
-        }
+          break
+        case 'rate':
+          e.preventDefault()
+          onRate(action.rating)
+          break
       }
     }
 

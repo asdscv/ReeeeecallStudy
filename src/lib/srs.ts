@@ -45,24 +45,27 @@ export function calculateSRS(card: Card, rating: SrsRating, settings?: SrsSettin
       if (card.repetitions === 0) {
         interval = s.hard_days
       } else {
-        interval = Math.max(1, Math.round(interval * 1.2))
+        // Anki: ensure interval strictly increases (prevent stagnation)
+        interval = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
       }
       return {
         ease_factor: round(ease),
         interval_days: interval,
         repetitions: reps,
-        srs_status: card.srs_status === 'learning' ? 'learning' : 'review',
+        srs_status: card.srs_status === 'review' ? 'review' : 'learning',
         next_review_at: addDays(now, interval).toISOString(),
       }
 
-    case 'good':
+    case 'good': {
       reps += 1
       if (card.repetitions === 0) {
         interval = s.good_days
       } else if (card.repetitions === 1) {
         interval = Math.max(s.good_days, 3)
       } else {
-        interval = Math.round(interval * ease)
+        // Anki: ensure interval strictly increases AND good > hard
+        const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
+        interval = Math.max(hardIvl + 1, Math.round(card.interval_days * ease))
       }
       return {
         ease_factor: round(ease),
@@ -71,14 +74,18 @@ export function calculateSRS(card: Card, rating: SrsRating, settings?: SrsSettin
         srs_status: 'review',
         next_review_at: addDays(now, interval).toISOString(),
       }
+    }
 
-    case 'easy':
+    case 'easy': {
       ease = Math.min(4.0, ease + 0.15)
       reps += 1
       if (card.repetitions === 0) {
         interval = s.easy_days
       } else {
-        interval = Math.round(interval * ease * 1.3)
+        // Anki: ensure easy > good > hard (chain the constraints)
+        const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
+        const goodIvl = Math.max(hardIvl + 1, Math.round(card.interval_days * card.ease_factor))
+        interval = Math.max(goodIvl + 1, Math.round(card.interval_days * ease * 1.3))
       }
       return {
         ease_factor: round(ease),
@@ -87,6 +94,7 @@ export function calculateSRS(card: Card, rating: SrsRating, settings?: SrsSettin
         srs_status: 'review',
         next_review_at: addDays(now, interval).toISOString(),
       }
+    }
   }
 }
 

@@ -91,9 +91,9 @@ export function DashboardPage() {
   const dailyData = getDailyStudyCounts(filteredLogs, days)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">대시보드</h1>
         <TimePeriodTabs value={period} onChange={setPeriod} />
       </div>
 
@@ -106,7 +106,7 @@ export function DashboardPage() {
 
       {shouldShowHeatmap(period) && <StudyHeatmap data={heatmapData} />}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <ForecastWidget data={forecastData} />
         <DailyStudyChart data={dailyData} />
       </div>

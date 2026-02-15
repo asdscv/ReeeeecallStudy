@@ -50,13 +50,13 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
   const todayStr = todayDateKey()
 
   return (
-    <div className="bg-white border border-gray-300 rounded-lg p-3">
+    <div className="bg-white border border-gray-300 rounded-lg p-2 sm:p-3">
       {/* Month Navigation */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
         <button
           type="button"
           onClick={prevMonth}
-          className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -69,7 +69,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
         <button
           type="button"
           onClick={nextMonth}
-          className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
