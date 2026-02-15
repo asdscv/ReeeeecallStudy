@@ -222,7 +222,7 @@ export function LandingPage() {
             오늘부터 더 스마트하게 학습하세요
           </h2>
           <p className="text-gray-500 text-base sm:text-lg mb-8">
-            무료로 시작하세요. 이메일만으로 간편하게 가입합니다.
+            무료로 시작하세요. 이메일과 비밀번호로 간편하게 가입합니다.
           </p>
           <button
             onClick={goLogin}

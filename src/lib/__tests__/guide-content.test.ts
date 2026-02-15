@@ -28,6 +28,16 @@ describe('GUIDE_SECTIONS', () => {
     }
   })
 
+  it('login guide should describe email/password authentication', () => {
+    const gettingStarted = GUIDE_SECTIONS.find((s) => s.id === 'getting-started')
+    expect(gettingStarted).toBeDefined()
+    const loginItem = gettingStarted!.items.find((i) => i.title === '로그인')
+    expect(loginItem).toBeDefined()
+    expect(loginItem!.body).toContain('비밀번호')
+    expect(loginItem!.body).not.toContain('매직 링크')
+    expect(loginItem!.body).not.toContain('비밀번호 없이')
+  })
+
   it('all section ids should be unique', () => {
     const ids = GUIDE_SECTIONS.map((s) => s.id)
     expect(new Set(ids).size).toBe(ids.length)

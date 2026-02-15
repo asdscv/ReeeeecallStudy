@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import { useAuthStore } from './stores/auth-store'
 import { LoginPage } from './components/auth/LoginPage'
 import { AuthCallback } from './components/auth/AuthCallback'
+import { ResetPasswordPage } from './components/auth/ResetPasswordPage'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { Layout } from './components/common/Layout'
 import { DashboardPage } from './pages/DashboardPage'
@@ -65,6 +66,7 @@ function App() {
           element={user ? <Navigate to="/" replace /> : <LoginPage />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* Study session (outside Layout for fullscreen focus) */}
         <Route

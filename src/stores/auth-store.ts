@@ -7,7 +7,11 @@ interface AuthState {
   session: Session | null
   loading: boolean
   initialize: () => Promise<void>
-  signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
+  signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<{ error: Error | null }>
+  resetPassword: (email: string) => Promise<{ error: Error | null }>
+  updatePassword: (password: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
 }
 
@@ -33,13 +37,39 @@ export const useAuthStore = create<AuthState>((set) => ({
     })
   },
 
-  signInWithMagicLink: async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
+  signIn: async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    return { error: error ? new Error(error.message) : null }
+  },
+
+  signUp: async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
       email,
+      password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
+    return { error: error ? new Error(error.message) : null }
+  },
+
+  signInWithProvider: async (provider: 'google' | 'github' | 'apple') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    })
+    return { error: error ? new Error(error.message) : null }
+  },
+
+  resetPassword: async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    })
+    return { error: error ? new Error(error.message) : null }
+  },
+
+  updatePassword: async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password })
     return { error: error ? new Error(error.message) : null }
   },
 
