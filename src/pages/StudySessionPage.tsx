@@ -1,6 +1,6 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useMemo } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { X, Volume2 } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useStudyStore } from '../stores/study-store'
 import { useAuthStore } from '../stores/auth-store'
 import { supabase } from '../lib/supabase'
@@ -10,16 +10,9 @@ import { SrsRatingButtons } from '../components/study/SrsRatingButtons'
 import { SimpleRatingButtons } from '../components/study/SimpleRatingButtons'
 import { StudySummary } from '../components/study/StudySummary'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
-import { speakWithProfile, stopSpeaking, getCardAudioUrl, getCardTTSText, speak } from '../lib/tts'
+import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak } from '../lib/tts'
+import { loadSettings, shouldShowButtons, type StudyInputSettings } from '../lib/study-input-settings'
 import type { StudyMode, Profile } from '../types/database'
-
-interface SwipeSettings {
-  enabled: boolean
-  left: string
-  right: string
-  up: string
-  down: string
-}
 
 export function StudySessionPage() {
   const { deckId } = useParams<{ deckId: string }>()
@@ -43,17 +36,7 @@ export function StudySessionPage() {
   } = useStudyStore()
 
   const [profile, setProfile] = useState<Pick<Profile, 'tts_enabled' | 'tts_lang'> | null>(null)
-  const [swipeSettings, setSwipeSettings] = useState<SwipeSettings | null>(null)
-
-  // Load swipe settings from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('reeecall-swipe-settings')
-    if (saved) {
-      try {
-        setSwipeSettings(JSON.parse(saved))
-      } catch { /* ignore */ }
-    }
-  }, [])
+  const [inputSettings] = useState<StudyInputSettings>(() => loadSettings())
 
   // Fetch profile for TTS settings
   useEffect(() => {
@@ -93,36 +76,24 @@ export function StudySessionPage() {
     }
   }, [deckId, searchParams, initSession])
 
-  // TTS on flip
+  // Compute TTS fields for current card
+  const currentCard = queue[currentIndex] ?? null
+  const frontTTSFields = useMemo(() => {
+    if (!currentCard || !template) return []
+    return getTTSFieldsForLayout(currentCard, template, 'front')
+  }, [currentCard, template])
+  const backTTSFields = useMemo(() => {
+    if (!currentCard || !template) return []
+    return getTTSFieldsForLayout(currentCard, template, 'back')
+  }, [currentCard, template])
+
+  // Auto-TTS on flip (only when profile.tts_enabled)
   useEffect(() => {
-    if (isFlipped && template && config) {
-      const card = queue[currentIndex]
-      if (!card) return
-
-      const audioUrl = getCardAudioUrl(card, template)
-      if (audioUrl) {
-        const audio = new Audio(audioUrl)
-        audio.play().catch(() => {})
-        return
-      }
-
-      if (profile) {
-        const primaryItem = template.back_layout.find(item => item.style === 'primary')
-        if (primaryItem) {
-          const text = card.field_values[primaryItem.field_key]
-          if (text) {
-            speakWithProfile(text, profile)
-          }
-        }
-      }
-    }
-  }, [isFlipped, currentIndex, template, config, queue, profile])
-
-  const handleManualTTS = useCallback(() => {
-    if (!template) return
+    if (!isFlipped || !template || !config) return
     const card = queue[currentIndex]
     if (!card) return
 
+    // Audio field takes priority
     const audioUrl = getCardAudioUrl(card, template)
     if (audioUrl) {
       const audio = new Audio(audioUrl)
@@ -130,16 +101,11 @@ export function StudySessionPage() {
       return
     }
 
-    const layout = isFlipped ? template.back_layout : template.front_layout
-    const ttsText = getCardTTSText(card, { ...template, front_layout: layout })
-    if (ttsText) {
-      if (profile?.tts_lang) {
-        speak(ttsText, profile.tts_lang)
-      } else {
-        speak(ttsText)
-      }
+    // Auto-read TTS-enabled fields if profile setting is on
+    if (profile?.tts_enabled && backTTSFields.length > 0) {
+      speak(backTTSFields[0].text, backTTSFields[0].lang)
     }
-  }, [template, queue, currentIndex, isFlipped, profile])
+  }, [isFlipped, currentIndex, template, config, queue, profile, backTTSFields])
 
   const handleRate = useCallback((rating: string) => {
     rateCard(rating)
@@ -209,10 +175,7 @@ export function StudySessionPage() {
     )
   }
 
-  const currentCard = queue[currentIndex]
   if (!currentCard) return null
-
-  const hasTTS = profile?.tts_enabled || (template && getCardAudioUrl(currentCard, template))
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -224,15 +187,6 @@ export function StudySessionPage() {
             total={sessionStats.totalCards}
           />
           <div className="flex items-center gap-2 ml-4">
-            {hasTTS && (
-              <button
-                onClick={handleManualTTS}
-                className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                title="발음 듣기"
-              >
-                <Volume2 className="w-5 h-5" />
-              </button>
-            )}
             <button
               onClick={handleExit}
               className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
@@ -249,22 +203,24 @@ export function StudySessionPage() {
         template={template}
         isFlipped={isFlipped}
         onFlip={handleFlip}
-        onManualTTS={handleManualTTS}
-        showTTSButton={!!hasTTS}
+        frontTTSFields={frontTTSFields}
+        backTTSFields={backTTSFields}
         onSwipeRate={handleRate}
-        swipeSettings={swipeSettings}
+        inputSettings={inputSettings}
       />
 
-      {/* Rating buttons */}
-      <div className="px-6 py-6 max-w-2xl mx-auto w-full">
-        {isFlipped ? (
-          config?.mode === 'srs' ? (
-            <SrsRatingButtons card={currentCard} srsSettings={srsSettings} onRate={handleRate} />
-          ) : (
-            <SimpleRatingButtons mode={config?.mode ?? 'random'} onRate={handleRate} />
-          )
-        ) : null}
-      </div>
+      {/* Rating buttons (hidden in swipe mode) */}
+      {shouldShowButtons(inputSettings) && (
+        <div className="px-3 sm:px-6 py-3 sm:py-6 max-w-2xl mx-auto w-full">
+          {isFlipped ? (
+            config?.mode === 'srs' ? (
+              <SrsRatingButtons card={currentCard} srsSettings={srsSettings} onRate={handleRate} />
+            ) : (
+              <SimpleRatingButtons mode={config?.mode ?? 'random'} onRate={handleRate} />
+            )
+          ) : null}
+        </div>
+      )}
     </div>
   )
 }

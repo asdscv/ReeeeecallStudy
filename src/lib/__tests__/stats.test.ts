@@ -58,6 +58,18 @@ describe('getForecastReviews', () => {
     expect(result).toHaveLength(7)
     result.forEach((d) => expect(d.count).toBe(0))
   })
+
+  it('counts overdue cards (next_review_at in the past) in today bucket', () => {
+    const cards = [
+      { next_review_at: daysFromNow(-3) }, // 3 days overdue
+      { next_review_at: daysFromNow(-1) }, // 1 day overdue
+      { next_review_at: daysFromNow(0) },  // due today
+      { next_review_at: daysFromNow(2) },  // future
+    ]
+    const result = getForecastReviews(cards)
+    expect(result[0].count).toBe(3) // 2 overdue + 1 today = 3
+    expect(result[2].count).toBe(1) // day 2
+  })
 })
 
 describe('getHeatmapData', () => {
@@ -241,8 +253,9 @@ describe('calculateDeckStats', () => {
     expect(result.newCount).toBe(1)
     expect(result.learningCount).toBe(1)
     expect(result.reviewCount).toBe(2)
-    expect(result.avgEase).toBeCloseTo(2.4, 1)
-    expect(result.avgInterval).toBeCloseTo(10.25, 1)
+    // averages exclude new cards (only learning + review)
+    expect(result.avgEase).toBeCloseTo(2.37, 1) // (2.3 + 2.7 + 2.1) / 3
+    expect(result.avgInterval).toBeCloseTo(13.67, 1) // (1 + 30 + 10) / 3
     expect(result.masteryRate).toBe(25) // 1 out of 4 is mature (interval >= 21)
   })
 
@@ -252,5 +265,33 @@ describe('calculateDeckStats', () => {
     expect(result.avgEase).toBe(0)
     expect(result.avgInterval).toBe(0)
     expect(result.masteryRate).toBe(0)
+  })
+
+  it('excludes new cards from avgEase and avgInterval', () => {
+    const cards = [
+      { srs_status: 'new' as const, ease_factor: 2.5, interval_days: 0, repetitions: 0 },
+      { srs_status: 'new' as const, ease_factor: 2.5, interval_days: 0, repetitions: 0 },
+      { srs_status: 'learning' as const, ease_factor: 2.3, interval_days: 1, repetitions: 1 },
+      { srs_status: 'review' as const, ease_factor: 2.7, interval_days: 30, repetitions: 5 },
+    ]
+    const result = calculateDeckStats(cards)
+    // avgEase should only include learning + review: (2.3 + 2.7) / 2 = 2.5
+    expect(result.avgEase).toBe(2.5)
+    // avgInterval should only include learning + review: (1 + 30) / 2 = 15.5
+    expect(result.avgInterval).toBe(15.5)
+    // totalCards still counts all
+    expect(result.totalCards).toBe(4)
+    expect(result.newCount).toBe(2)
+  })
+
+  it('returns 0 avgEase/avgInterval when only new cards exist', () => {
+    const cards = [
+      { srs_status: 'new' as const, ease_factor: 2.5, interval_days: 0, repetitions: 0 },
+      { srs_status: 'new' as const, ease_factor: 2.5, interval_days: 0, repetitions: 0 },
+    ]
+    const result = calculateDeckStats(cards)
+    expect(result.avgEase).toBe(0)
+    expect(result.avgInterval).toBe(0)
+    expect(result.totalCards).toBe(2)
   })
 })

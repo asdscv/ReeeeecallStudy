@@ -13,7 +13,7 @@ export function TimePeriodTabs({ value, onChange }: TimePeriodTabsProps) {
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`px-3 py-1.5 text-sm font-medium transition cursor-pointer ${
+          className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition cursor-pointer ${
             value === opt.value
               ? 'bg-blue-600 text-white'
               : 'bg-white text-gray-600 hover:bg-gray-50'

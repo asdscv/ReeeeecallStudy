@@ -34,11 +34,11 @@ export function DecksPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">내 덱</h1>
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">내 덱</h1>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+          className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
         >
           + 새 덱 만들기
         </button>
@@ -49,9 +49,9 @@ export function DecksPage() {
           <div className="text-4xl animate-pulse">📚</div>
         </div>
       ) : decks.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <div className="text-5xl mb-4">📚</div>
-          <p className="text-gray-500 mb-4">아직 덱이 없습니다. 새 덱을 만들어보세요.</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+          <div className="text-4xl sm:text-5xl mb-4">📚</div>
+          <p className="text-gray-500 mb-4 text-sm sm:text-base">아직 덱이 없습니다. 새 덱을 만들어보세요.</p>
           <button
             onClick={() => setShowCreate(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
@@ -60,7 +60,7 @@ export function DecksPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {decks.map((deck) => (
             <DeckCard
               key={deck.id}

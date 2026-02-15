@@ -4,15 +4,14 @@ import { ArrowLeft } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { utcToLocalDateKey, localDateToUTCRange, todayDateKey } from '../lib/date-utils'
 import { DatePicker } from '../components/study/DatePicker'
+import {
+  STUDY_MODE_OPTIONS,
+  DEFAULT_BATCH_SIZE,
+  MIN_BATCH_SIZE,
+  MAX_BATCH_SIZE,
+  isBatchSizeConfigurable,
+} from '../lib/study-session-utils'
 import type { Deck, StudyMode } from '../types/database'
-
-const modeOptions: { value: StudyMode; emoji: string; label: string; desc: string }[] = [
-  { value: 'srs', emoji: '🧠', label: 'SRS (간격 반복)', desc: '복습 시기에 따라 자동으로 카드를 선별합니다' },
-  { value: 'sequential_review', emoji: '🔄', label: '순차 복습', desc: '새 카드와 복습 카드를 순서대로 학습합니다' },
-  { value: 'random', emoji: '🎲', label: '랜덤', desc: '카드를 무작위로 섞어 학습합니다' },
-  { value: 'sequential', emoji: '➡️', label: '순차', desc: '카드를 순서대로 학습합니다' },
-  { value: 'by_date', emoji: '📅', label: '일자별 학습', desc: '특정 날짜에 업로드한 카드만 학습합니다' },
-]
 
 export function StudySetupPage() {
   const { deckId } = useParams<{ deckId: string }>()
@@ -23,7 +22,7 @@ export function StudySetupPage() {
   const [cardCount, setCardCount] = useState(0)
 
   const [mode, setMode] = useState<StudyMode>('srs')
-  const [batchSize, setBatchSize] = useState(20)
+  const [batchSize, setBatchSize] = useState(DEFAULT_BATCH_SIZE)
 
   // by_date mode state
   const [selectedDate, setSelectedDate] = useState(() => todayDateKey())
@@ -117,14 +116,14 @@ export function StudySetupPage() {
     <div className="max-w-lg mx-auto">
       <button
         onClick={() => navigate(`/decks/${deckId}`)}
-        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4 cursor-pointer"
+        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3 sm:mb-4 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         {deck.name}
       </button>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">학습 설정</h1>
-      <p className="text-gray-500 text-sm mb-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">학습 설정</h1>
+      <p className="text-gray-500 text-sm mb-4 sm:mb-6">
         {deck.icon} {deck.name} · {cardCount}장
       </p>
 
@@ -132,12 +131,12 @@ export function StudySetupPage() {
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">학습 모드</label>
         <div className="space-y-2">
-          {modeOptions.map((opt) => (
+          {STUDY_MODE_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => setMode(opt.value)}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
+              className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
                 mode === opt.value
                   ? 'border-blue-500 bg-blue-50'
                   : 'border-gray-200 hover:border-gray-300'
@@ -155,21 +154,23 @@ export function StudySetupPage() {
         </div>
       </div>
 
-      {/* Batch size (not for SRS or by_date) */}
-      {mode !== 'srs' && mode !== 'by_date' && (
+      {/* Batch size (only for configurable modes) */}
+      {isBatchSizeConfigurable(mode) && (
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             배치 크기
           </label>
           <input
             type="number"
-            min={1}
-            max={200}
+            min={MIN_BATCH_SIZE}
+            max={MAX_BATCH_SIZE}
             value={batchSize}
-            onChange={(e) => setBatchSize(Number(e.target.value) || 20)}
+            onChange={(e) => setBatchSize(Number(e.target.value) || DEFAULT_BATCH_SIZE)}
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
           />
-          <p className="text-xs text-gray-400 mt-1">한 세션에 학습할 카드 수</p>
+          <p className="text-xs text-gray-400 mt-1">
+            한 세션에 학습할 카드 수 ({MIN_BATCH_SIZE}~{MAX_BATCH_SIZE})
+          </p>
         </div>
       )}
 

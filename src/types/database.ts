@@ -178,6 +178,33 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['study_logs']['Insert']>
       }
+      study_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          deck_id: string
+          study_mode: string
+          cards_studied: number
+          total_cards: number
+          total_duration_ms: number
+          ratings: Record<string, number>
+          started_at: string
+          completed_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          deck_id: string
+          study_mode: string
+          cards_studied: number
+          total_cards: number
+          total_duration_ms: number
+          ratings: Record<string, number>
+          started_at: string
+          completed_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['study_sessions']['Insert']>
+      }
     }
   }
 }
@@ -223,3 +250,4 @@ export type Deck = Database['public']['Tables']['decks']['Row']
 export type Card = Database['public']['Tables']['cards']['Row']
 export type DeckStudyState = Database['public']['Tables']['deck_study_state']['Row']
 export type StudyLog = Database['public']['Tables']['study_logs']['Row']
+export type StudySession = Database['public']['Tables']['study_sessions']['Row']

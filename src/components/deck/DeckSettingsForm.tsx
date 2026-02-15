@@ -74,7 +74,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
       {/* 색상 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">색상</label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {COLORS.map((c) => (
             <button
               key={c}
@@ -92,7 +92,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
       {/* 아이콘 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">아이콘</label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {ICONS.map((ic) => (
             <button
               key={ic}
@@ -134,7 +134,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         <label className="block text-sm font-medium text-gray-700 mb-2">
           SRS 초기 간격 (일)
         </label>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {SRS_FIELDS.map(({ key, label, color: clr }) => (
             <div key={key} className="text-center">
               <label className={`block text-xs font-semibold mb-1 ${clr}`}>

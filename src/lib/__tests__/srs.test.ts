@@ -66,6 +66,12 @@ describe('calculateSRS', () => {
       const result = calculateSRS(card, 'hard')
       expect(result.srs_status).toBe('learning')
     })
+
+    it('should set status to learning when card is new (not skip to review)', () => {
+      const card = makeCard({ srs_status: 'new', repetitions: 0 })
+      const result = calculateSRS(card, 'hard')
+      expect(result.srs_status).toBe('learning')
+    })
   })
 
   describe('good rating', () => {
@@ -114,6 +120,59 @@ describe('calculateSRS', () => {
       // ease becomes 2.65, interval = round(3 * 2.65 * 1.3) = round(10.335) = 10
       expect(result.ease_factor).toBe(2.65)
       expect(result.interval_days).toBe(10)
+    })
+  })
+
+  describe('interval progression (anti-stagnation)', () => {
+    it('hard on review card with interval=1 must progress to 2 (not stay at 1)', () => {
+      const card = makeCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 2, interval_days: 1 })
+      const result = calculateSRS(card, 'hard')
+      expect(result.interval_days).toBe(2) // max(1+1, round(1*1.2)=1) = 2
+    })
+
+    it('hard on review card with interval=2 must progress to 3 (not stay at 2)', () => {
+      const card = makeCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 2 })
+      const result = calculateSRS(card, 'hard')
+      expect(result.interval_days).toBe(3) // max(2+1, round(2*1.2)=2) = 3
+    })
+
+    it('good on review card with low ease and interval=1 must progress beyond hard', () => {
+      // hard = max(1+1, round(1*1.2)=1) = 2
+      // good = max(2+1=3, round(1*1.3)=1) = 3
+      const card = makeCard({ srs_status: 'review', ease_factor: 1.3, repetitions: 2, interval_days: 1 })
+      const result = calculateSRS(card, 'good')
+      expect(result.interval_days).toBe(3)
+    })
+
+    it('good on review card with low ease and interval=2 must progress beyond hard', () => {
+      // hard = max(2+1, round(2*1.2)=2) = 3
+      // good = max(3+1=4, round(2*1.3)=3) = 4
+      const card = makeCard({ srs_status: 'review', ease_factor: 1.3, repetitions: 3, interval_days: 2 })
+      const result = calculateSRS(card, 'good')
+      expect(result.interval_days).toBe(4)
+    })
+
+    it('easy interval must always be greater than good interval for same card', () => {
+      const card = makeCard({ srs_status: 'review', ease_factor: 1.3, repetitions: 2, interval_days: 1 })
+      const good = calculateSRS(card, 'good')
+      const easy = calculateSRS(card, 'easy')
+      expect(easy.interval_days).toBeGreaterThan(good.interval_days)
+    })
+
+    it('good interval must always be greater than hard interval for same card', () => {
+      const card = makeCard({ srs_status: 'review', ease_factor: 1.3, repetitions: 2, interval_days: 1 })
+      const hard = calculateSRS(card, 'hard')
+      const good = calculateSRS(card, 'good')
+      expect(good.interval_days).toBeGreaterThan(hard.interval_days)
+    })
+
+    it('interval ordering: hard < good < easy for review card with large interval', () => {
+      const card = makeCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 5, interval_days: 30 })
+      const hard = calculateSRS(card, 'hard')
+      const good = calculateSRS(card, 'good')
+      const easy = calculateSRS(card, 'easy')
+      expect(hard.interval_days).toBeLessThan(good.interval_days)
+      expect(good.interval_days).toBeLessThan(easy.interval_days)
     })
   })
 

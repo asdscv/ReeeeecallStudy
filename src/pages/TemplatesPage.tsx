@@ -51,16 +51,16 @@ export function TemplatesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">카드 템플릿</h1>
-          <p className="text-sm text-gray-500 mt-1">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">카드 템플릿</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             카드의 필드 구성과 앞/뒷면 레이아웃을 관리합니다.
           </p>
         </div>
         <button
           onClick={handleNew}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+          className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer shrink-0"
         >
           + 새 템플릿
         </button>
@@ -73,9 +73,9 @@ export function TemplatesPage() {
       )}
 
       {templates.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <div className="text-5xl mb-4">📋</div>
-          <p className="text-gray-500 mb-4">템플릿이 없습니다. 새 템플릿을 만들어보세요.</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+          <div className="text-4xl sm:text-5xl mb-4">📋</div>
+          <p className="text-gray-500 mb-4 text-sm sm:text-base">템플릿이 없습니다. 새 템플릿을 만들어보세요.</p>
           <button
             onClick={handleNew}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
@@ -130,11 +130,11 @@ function TemplateCard({
   const [showMenu, setShowMenu] = useState(false)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 hover:shadow-sm transition">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
             {template.is_default && (
               <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full font-medium">
                 기본
@@ -143,7 +143,7 @@ function TemplateCard({
           </div>
 
           {/* Fields summary */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
             {template.fields.map((field) => (
               <span
                 key={field.key}
@@ -156,7 +156,7 @@ function TemplateCard({
           </div>
 
           {/* Layout preview */}
-          <div className="flex gap-4 text-xs text-gray-400">
+          <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-gray-400">
             <span>앞면: {template.front_layout.length}개 필드</span>
             <span>뒷면: {template.back_layout.length}개 필드</span>
             <span>생성: {formatLocalDate(template.created_at)}</span>

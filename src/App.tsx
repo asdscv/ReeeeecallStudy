@@ -15,6 +15,8 @@ import { StudySetupPage } from './pages/StudySetupPage'
 import { StudySessionPage } from './pages/StudySessionPage'
 import { TemplateEditPage } from './pages/TemplateEditPage'
 import { DeckEditPage } from './pages/DeckEditPage'
+import { QuickStudyPage } from './pages/QuickStudyPage'
+import { StudyHistoryPage } from './pages/StudyHistoryPage'
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
@@ -26,7 +28,7 @@ function App() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-4xl animate-pulse">📚</div>
+        <img src="/favicon.png" alt="" className="w-12 h-12 animate-pulse" />
       </div>
     )
   }
@@ -61,6 +63,8 @@ function App() {
           }
         >
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/quick-study" element={<QuickStudyPage />} />
+          <Route path="/history" element={<StudyHistoryPage />} />
           <Route path="/decks" element={<DecksPage />} />
           <Route path="/decks/:deckId" element={<DeckDetailPage />} />
           <Route path="/decks/:deckId/edit" element={<DeckEditPage />} />

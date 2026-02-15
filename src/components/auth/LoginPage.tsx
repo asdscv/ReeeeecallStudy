@@ -51,8 +51,9 @@ export function LoginPage() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">ReeeCall Study</h1>
-            <p className="text-gray-500 mt-2">이메일로 간편 로그인</p>
+            <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
+            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 mx-auto" />
+            <p className="text-gray-500 mt-3">이메일로 간편 로그인</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

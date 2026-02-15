@@ -34,6 +34,37 @@ export function getCardTTSText(card: Card, template: CardTemplate): string | nul
   return null
 }
 
+export interface TTSFieldInfo {
+  fieldKey: string
+  text: string
+  lang: string
+}
+
+export function getTTSFieldsForLayout(
+  card: Card,
+  template: CardTemplate,
+  side: 'front' | 'back',
+): TTSFieldInfo[] {
+  const layout = side === 'front' ? template.front_layout : template.back_layout
+  const result: TTSFieldInfo[] = []
+
+  for (const item of layout) {
+    const field = template.fields.find((f) => f.key === item.field_key)
+    if (!field || field.type !== 'text' || !field.tts_enabled) continue
+
+    const value = card.field_values[field.key]
+    if (!value) continue
+
+    result.push({
+      fieldKey: field.key,
+      text: value,
+      lang: field.tts_lang || 'en-US',
+    })
+  }
+
+  return result
+}
+
 export function getCardAudioUrl(card: Card, template: CardTemplate): string | null {
   // Find first audio type field that has a URL value
   for (const field of template.fields) {

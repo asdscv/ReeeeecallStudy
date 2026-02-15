@@ -311,11 +311,11 @@ export function TemplateEditPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <button
             onClick={() => navigate('/templates')}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer"
+            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer shrink-0"
           >
             <ArrowLeft size={20} />
           </button>
@@ -324,26 +324,27 @@ export function TemplateEditPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="템플릿 이름"
-            className="text-2xl font-bold text-gray-900 bg-transparent outline-none border-b-2 border-transparent focus:border-blue-500 transition px-1"
+            className="text-lg sm:text-2xl font-bold text-gray-900 bg-transparent outline-none border-b-2 border-transparent focus:border-blue-500 transition px-1 min-w-0 w-full"
           />
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition shrink-0"
         >
           <Save size={16} />
-          {saving ? '저장 중...' : '저장'}
+          <span className="hidden sm:inline">{saving ? '저장 중...' : '저장'}</span>
+          <span className="sm:hidden">{saving ? '...' : '저장'}</span>
         </button>
       </div>
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Field Management */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">필드 관리</h2>
-            <span className="text-sm text-gray-400">
+        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">필드 관리</h2>
+            <span className="text-xs sm:text-sm text-gray-400">
               (최대 10개, 현재 {fields.length}개)
             </span>
           </div>
@@ -385,7 +386,7 @@ export function TemplateEditPage() {
                   />
 
                   {/* Type label (text only) */}
-                  <span className="px-2 py-1.5 text-sm text-gray-400">
+                  <span className="hidden sm:inline px-2 py-1.5 text-sm text-gray-400">
                     텍스트
                   </span>
 
@@ -466,8 +467,8 @@ export function TemplateEditPage() {
         {/* Right: Layout mode toggle + Front & Back layout */}
         <div className="space-y-6">
           {/* Layout mode toggle */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">레이아웃 모드</h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">레이아웃 모드</h2>
             <div className="flex rounded-lg border border-gray-200 overflow-hidden">
               <button
                 type="button"
@@ -584,17 +585,17 @@ function LayoutSection({
   getFieldName: (key: string) => string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
+    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+      <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">{title}</h2>
 
       {/* Layout fields */}
       <div className="space-y-2 mb-3">
         {layout.map((item) => (
           <div
             key={item.field_key}
-            className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg flex-wrap"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 bg-green-50 border border-green-200 rounded-lg flex-wrap"
           >
-            <span className="text-sm font-medium text-gray-700 flex-1 min-w-[60px]">
+            <span className="text-xs sm:text-sm font-medium text-gray-700 flex-1 min-w-[50px]">
               {getFieldName(item.field_key)}
             </span>
             <select
@@ -706,8 +707,8 @@ function CustomHtmlSection({
   )
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="text-lg font-semibold text-gray-900 mb-3">{title}</h2>
+    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+      <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">{title}</h2>
 
       {/* Field name chips */}
       <div className="flex flex-wrap gap-1.5 mb-3">

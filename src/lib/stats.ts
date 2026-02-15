@@ -23,12 +23,18 @@ export function getForecastReviews(
     buckets.push({ date: dateToLocalKey(d), count: 0 })
   }
 
-  // Count cards per bucket
+  // Count cards per bucket (overdue cards go into today's bucket)
+  const todayKey = buckets[0].date
   for (const card of cards) {
     if (!card.next_review_at) continue
     const key = utcToLocalDateKey(card.next_review_at)
     const bucket = buckets.find((b) => b.date === key)
-    if (bucket) bucket.count++
+    if (bucket) {
+      bucket.count++
+    } else if (key < todayKey) {
+      // Overdue card — count as due today
+      buckets[0].count++
+    }
   }
 
   return buckets
@@ -181,8 +187,15 @@ export function calculateDeckStats(
   const newCount = cards.filter((c) => c.srs_status === 'new').length
   const learningCount = cards.filter((c) => c.srs_status === 'learning').length
   const reviewCount = cards.filter((c) => c.srs_status === 'review').length
-  const avgEase = cards.reduce((s, c) => s + c.ease_factor, 0) / total
-  const avgInterval = cards.reduce((s, c) => s + c.interval_days, 0) / total
+  // Only include cards that have been studied (learning/review) in averages
+  const studiedCards = cards.filter((c) => c.srs_status !== 'new')
+  const studiedCount = studiedCards.length
+  const avgEase = studiedCount > 0
+    ? studiedCards.reduce((s, c) => s + c.ease_factor, 0) / studiedCount
+    : 0
+  const avgInterval = studiedCount > 0
+    ? studiedCards.reduce((s, c) => s + c.interval_days, 0) / studiedCount
+    : 0
   const masteryRate = getMasteryRate(cards)
 
   return {

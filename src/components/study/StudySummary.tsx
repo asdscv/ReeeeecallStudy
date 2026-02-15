@@ -18,12 +18,12 @@ export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummary
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full mx-auto px-6 text-center">
-        <div className="text-5xl mb-6">🎉</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">학습 완료!</h1>
-        <p className="text-gray-500 mb-8">수고하셨습니다</p>
+      <div className="max-w-md w-full mx-auto px-4 sm:px-6 text-center">
+        <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">🎉</div>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">학습 완료!</h1>
+        <p className="text-gray-500 mb-6 sm:mb-8">수고하셨습니다</p>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 space-y-4">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 space-y-3 sm:space-y-4">
           <StatRow label="학습 카드" value={`${stats.cardsStudied} / ${stats.totalCards}장`} />
           <StatRow label="소요 시간" value={`${minutes}분 ${seconds}초`} />
           <StatRow label="카드당 평균" value={`${avgMs}초`} />
@@ -45,16 +45,16 @@ export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummary
           )}
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             onClick={onBackToDeck}
-            className="flex-1 px-4 py-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition cursor-pointer"
+            className="flex-1 px-4 py-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
             덱으로 돌아가기
           </button>
           <button
             onClick={onStudyAgain}
-            className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition cursor-pointer"
+            className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
             다시 학습
           </button>

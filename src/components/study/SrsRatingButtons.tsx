@@ -18,14 +18,14 @@ export function SrsRatingButtons({ card, srsSettings, onRate }: SrsRatingButtons
   const intervals = previewIntervals(card, srsSettings ?? undefined)
 
   return (
-    <div className="grid grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
       {buttons.map((btn) => (
         <button
           key={btn.rating}
           onClick={() => onRate(btn.rating)}
-          className={`py-4 text-white rounded-lg font-medium transition-colors flex flex-col items-center gap-1 cursor-pointer ${btn.color}`}
+          className={`py-3 sm:py-4 text-white rounded-lg font-medium transition-colors flex flex-col items-center gap-0.5 sm:gap-1 cursor-pointer ${btn.color}`}
         >
-          <span className="text-lg">{btn.label}</span>
+          <span className="text-base sm:text-lg">{btn.label}</span>
           <span className="text-xs opacity-80">{intervals[btn.rating]}</span>
         </button>
       ))}
