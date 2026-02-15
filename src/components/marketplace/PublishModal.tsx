@@ -4,6 +4,27 @@ import { useMarketplaceStore } from '../../stores/marketplace-store'
 import { MARKETPLACE_CATEGORIES } from '../../lib/marketplace'
 import type { ShareMode } from '../../types/database'
 
+const PUBLISH_SHARE_MODES: { value: ShareMode; label: string; desc: string; detail: string }[] = [
+  {
+    value: 'copy',
+    label: '복사',
+    desc: '가져간 사람이 자유롭게 편집할 수 있습니다.',
+    detail: '카드 추가·수정·삭제가 모두 가능합니다. 원본과 완전히 분리되어 서로 영향을 주지 않습니다.',
+  },
+  {
+    value: 'subscribe',
+    label: '구독',
+    desc: '원본과 연동되고, 학습 진도는 각자 별도입니다.',
+    detail: '내가 카드를 추가하면 구독자에게도 반영됩니다. 학습 기록(SRS)은 각자 따로 관리됩니다. 구독자는 카드를 편집할 수 없습니다.',
+  },
+  {
+    value: 'snapshot',
+    label: '스냅샷',
+    desc: '현재 상태의 읽기 전용 복사본입니다.',
+    detail: '지금 시점의 카드를 그대로 복사하되, 수정이 불가합니다. 이후 원본을 업데이트해도 스냅샷에는 반영되지 않습니다.',
+  },
+]
+
 interface PublishModalProps {
   open: boolean
   onClose: () => void
@@ -98,15 +119,32 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">공유 모드</label>
-            <select
-              value={shareMode}
-              onChange={(e) => setShareMode(e.target.value as ShareMode)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
-            >
-              <option value="copy">복사 (독립적인 복사본)</option>
-              <option value="subscribe">구독 (원본 연동, 진도 별도)</option>
-              <option value="snapshot">스냅샷 (읽기 전용 복사)</option>
-            </select>
+            <div className="space-y-2">
+              {PUBLISH_SHARE_MODES.map((m) => (
+                <label
+                  key={m.value}
+                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${
+                    shareMode === m.value
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="publishShareMode"
+                    value={m.value}
+                    checked={shareMode === m.value}
+                    onChange={() => setShareMode(m.value)}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{m.label}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{m.desc}</div>
+                    <div className="text-xs text-gray-400 mt-1 leading-relaxed">{m.detail}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}

@@ -22,6 +22,8 @@ import { MarketplaceDetailPage } from './pages/MarketplaceDetailPage'
 import { DeckSharePage } from './pages/DeckSharePage'
 import { AcceptInvitePage } from './pages/AcceptInvitePage'
 import { MySharesPage } from './pages/MySharesPage'
+import { GuidePage } from './pages/GuidePage'
+import { LandingPage } from './pages/LandingPage'
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
@@ -42,6 +44,20 @@ function App() {
     <BrowserRouter>
       <Toaster richColors position="top-right" />
       <Routes>
+        {/* Landing page for non-authenticated users */}
+        <Route
+          path="/"
+          element={user ? (
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          ) : (
+            <LandingPage />
+          )}
+        >
+          {user && <Route index element={<DashboardPage />} />}
+        </Route>
+
         {/* Auth routes */}
         <Route
           path="/auth/login"
@@ -67,7 +83,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<DashboardPage />} />
           <Route path="/quick-study" element={<QuickStudyPage />} />
           <Route path="/history" element={<StudyHistoryPage />} />
           <Route path="/decks" element={<DecksPage />} />
@@ -82,6 +97,7 @@ function App() {
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/templates/:templateId/edit" element={<TemplateEditPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/guide" element={<GuidePage />} />
         </Route>
 
         {/* Fallback */}

@@ -10,10 +10,25 @@ interface ShareModalProps {
   deckName: string
 }
 
-const SHARE_MODES: { value: ShareMode; label: string; desc: string }[] = [
-  { value: 'copy', label: '복사', desc: '수신자가 독립적인 복사본을 갖게 됩니다.' },
-  { value: 'subscribe', label: '구독', desc: '원본이 업데이트되면 구독자도 변경을 봅니다. 학습 진도는 각자 별도.' },
-  { value: 'snapshot', label: '스냅샷', desc: '현재 상태의 읽기 전용 복사본을 생성합니다.' },
+const SHARE_MODES: { value: ShareMode; label: string; desc: string; detail: string }[] = [
+  {
+    value: 'copy',
+    label: '복사',
+    desc: '독립적인 복사본을 갖게 됩니다.',
+    detail: '상대방이 카드를 자유롭게 편집·추가·삭제할 수 있습니다. 원본과 완전히 분리되어 서로 영향을 주지 않습니다.',
+  },
+  {
+    value: 'subscribe',
+    label: '구독',
+    desc: '원본과 연동되고, 학습 진도는 각자 별도입니다.',
+    detail: '내가 카드를 추가하면 구독자에게도 반영됩니다. 단, 학습 기록(SRS 진도)은 각자 따로 관리되어 자기 속도로 학습합니다. 구독자는 카드를 편집할 수 없습니다.',
+  },
+  {
+    value: 'snapshot',
+    label: '스냅샷',
+    desc: '현재 상태의 읽기 전용 복사본입니다.',
+    detail: '지금 시점의 카드를 그대로 복사하되, 상대방이 수정할 수 없습니다. 이후 원본을 업데이트해도 스냅샷에는 반영되지 않습니다.',
+  },
 ]
 
 export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps) {
@@ -91,7 +106,8 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
                     />
                     <div>
                       <div className="text-sm font-medium text-gray-900">{m.label}</div>
-                      <div className="text-xs text-gray-500">{m.desc}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{m.desc}</div>
+                      <div className="text-xs text-gray-400 mt-1 leading-relaxed">{m.detail}</div>
                     </div>
                   </label>
                 ))}

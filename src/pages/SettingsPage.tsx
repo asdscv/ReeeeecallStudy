@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
 import { formatLocalDateTime } from '../lib/date-utils'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import {
   loadSettings,
@@ -42,6 +43,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function SettingsPage() {
+  const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
@@ -203,6 +205,21 @@ export function SettingsPage() {
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">설정</h1>
 
       <div className="space-y-4 sm:space-y-6">
+        {/* Guide link */}
+        <button
+          onClick={() => navigate('/guide')}
+          className="w-full bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-3 hover:bg-gray-50 transition cursor-pointer text-left"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-gray-900">사용법 가이드</div>
+            <div className="text-xs text-gray-500 mt-0.5">기능 설명, 학습 팁, 공유 방법 등을 확인하세요</div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
+        </button>
+
         {/* Profile */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">프로필</h2>
