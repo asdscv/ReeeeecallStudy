@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { todayDateKey } from '../../lib/date-utils'
 
 interface DatePickerProps {
   selectedDate: string
@@ -46,8 +47,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
 
   const totalCells = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7
 
-  const today = new Date()
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const todayStr = todayDateKey()
 
   return (
     <div className="bg-white border border-gray-300 rounded-lg p-3">

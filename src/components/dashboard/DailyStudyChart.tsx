@@ -1,15 +1,17 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { formatDateKeyShort } from '../../lib/date-utils'
 
 interface DailyStudyChartProps {
   data: { date: string; count: number }[]
+  title?: string
 }
 
-export function DailyStudyChart({ data }: DailyStudyChartProps) {
-  // Show tick labels every 5 days to avoid clutter
+export function DailyStudyChart({ data, title = '일별 학습량' }: DailyStudyChartProps) {
+  const tickInterval = Math.max(1, Math.floor(data.length / 6))
+
   const chartData = data.map((d, i) => {
-    const date = new Date(d.date + 'T00:00:00')
-    const label = i % 5 === 0 || i === data.length - 1
-      ? `${date.getMonth() + 1}/${date.getDate()}`
+    const label = i % tickInterval === 0 || i === data.length - 1
+      ? formatDateKeyShort(d.date)
       : ''
     return { ...d, label }
   })
@@ -19,7 +21,7 @@ export function DailyStudyChart({ data }: DailyStudyChartProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-700">일별 학습량 (30일)</h3>
+        <h3 className="text-sm font-medium text-gray-700">{title}</h3>
         <span className="text-xs text-gray-400">총 {totalStudied}회</span>
       </div>
       {totalStudied === 0 ? (

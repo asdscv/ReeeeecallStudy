@@ -9,6 +9,7 @@ import {
 import { useCardStore } from '../../stores/card-store'
 import { useAuthStore } from '../../stores/auth-store'
 import { uploadFile, deleteFile, validateFile } from '../../lib/storage'
+import { reconcileFieldValues } from '../../lib/card-utils'
 import type { Card, CardTemplate, TemplateField } from '../../types/database'
 
 interface CardFormModalProps {
@@ -36,15 +37,16 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
 
   useEffect(() => {
     if (editCard) {
-      setFieldValues(editCard.field_values ?? {})
+      setFieldValues(reconcileFieldValues(fields, editCard.field_values))
       setTags(editCard.tags ?? [])
     } else {
-      setFieldValues({})
+      setFieldValues(reconcileFieldValues(fields, {}))
       setTags([])
     }
     setTagInput('')
     setFileError(null)
     setUploadingField(null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCard, open])
 
   const handleFieldChange = (key: string, value: string) => {
@@ -149,7 +151,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     setLoading(true)
 
     if (editCard) {
-      await updateCard(editCard.id, { field_values: fieldValues, tags })
+      await updateCard(editCard.id, { field_values: reconcileFieldValues(fields, fieldValues), tags })
     } else {
       // Create card first, then upload pending files
       const textValues: Record<string, string> = {}
@@ -214,6 +216,9 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                   {field.name}
                   {field.order === 0 && <span className="text-red-500 ml-1">*</span>}
                 </label>
+                {field.detail && (
+                  <p className="text-xs text-gray-400 mb-1.5">{field.detail}</p>
+                )}
                 {field.type === 'text' ? (
                   <input
                     type="text"

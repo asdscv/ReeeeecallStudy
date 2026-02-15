@@ -263,7 +263,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   flipCard: () => {
-    set({ isFlipped: true })
+    set((state) => ({ isFlipped: !state.isFlipped }))
   },
 
   rateCard: async (rating: string) => {

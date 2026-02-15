@@ -7,6 +7,7 @@ import {
   getMasteryRate,
   groupCardsByDate,
   calculateDeckStats,
+  filterLogsByPeriod,
 } from '../stats'
 
 // Helper: create ISO date string for N days from now
@@ -186,6 +187,44 @@ describe('groupCardsByDate', () => {
 
   it('returns empty array for no cards', () => {
     expect(groupCardsByDate([])).toEqual([])
+  })
+})
+
+describe('filterLogsByPeriod', () => {
+  it('filters to last 7 days only', () => {
+    const logs = [
+      { studied_at: daysAgo(0) },
+      { studied_at: daysAgo(3) },
+      { studied_at: daysAgo(6) },
+      { studied_at: daysAgo(10) },
+      { studied_at: daysAgo(30) },
+    ]
+    const result = filterLogsByPeriod(logs, 7)
+    expect(result).toHaveLength(3)
+  })
+
+  it('returns all logs for 365 days if all within range', () => {
+    const logs = [
+      { studied_at: daysAgo(0) },
+      { studied_at: daysAgo(100) },
+      { studied_at: daysAgo(364) },
+    ]
+    const result = filterLogsByPeriod(logs, 365)
+    expect(result).toHaveLength(3)
+  })
+
+  it('returns empty array for empty input', () => {
+    expect(filterLogsByPeriod([], 7)).toEqual([])
+  })
+
+  it('filters to today only with days=1', () => {
+    const logs = [
+      { studied_at: daysAgo(0) },
+      { studied_at: daysAgo(1) },
+      { studied_at: daysAgo(5) },
+    ]
+    const result = filterLogsByPeriod(logs, 1)
+    expect(result).toHaveLength(1)
   })
 })
 

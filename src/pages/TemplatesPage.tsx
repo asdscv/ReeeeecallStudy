@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTemplateStore } from '../stores/template-store'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
+import { formatLocalDate } from '../lib/date-utils'
 import type { CardTemplate } from '../types/database'
 
 export function TemplatesPage() {
@@ -158,7 +159,7 @@ function TemplateCard({
           <div className="flex gap-4 text-xs text-gray-400">
             <span>앞면: {template.front_layout.length}개 필드</span>
             <span>뒷면: {template.back_layout.length}개 필드</span>
-            <span>생성: {new Date(template.created_at).toLocaleDateString('ko-KR')}</span>
+            <span>생성: {formatLocalDate(template.created_at)}</span>
           </div>
         </div>
 

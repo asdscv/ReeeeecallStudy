@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus, Info } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
+import { formatLocalDateTime } from '../lib/date-utils'
 import { useAuthStore } from '../stores/auth-store'
 import type { Profile } from '../types/database'
 
@@ -388,14 +389,13 @@ export function SettingsPage() {
               {/* Dates */}
               <div className="space-y-0.5">
                 <p className="text-sm text-gray-400">
-                  생성일: {new Date(apiKeyData.createdAt).toLocaleString('ko-KR')}
+                  생성일: {formatLocalDateTime(apiKeyData.createdAt)}
                 </p>
                 <p className="text-sm text-gray-400">
                   만료일: {(() => {
                     const exp = new Date(apiKeyData.createdAt)
                     exp.setDate(exp.getDate() + 30)
-                    const now = new Date()
-                    const daysLeft = Math.max(0, Math.ceil((exp.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+                    const daysLeft = Math.max(0, Math.ceil((exp.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
                     return `${exp.toLocaleString('ko-KR')} (${daysLeft}일 남음)`
                   })()}
                 </p>

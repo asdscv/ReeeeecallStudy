@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import type { CardTemplate, TemplateField, LayoutItem } from '../types/database'
+import type { CardTemplate, TemplateField, LayoutItem, LayoutMode } from '../types/database'
 
 interface TemplateState {
   templates: CardTemplate[]
@@ -13,13 +13,19 @@ interface TemplateState {
     fields: TemplateField[]
     front_layout: LayoutItem[]
     back_layout: LayoutItem[]
+    layout_mode?: LayoutMode
+    front_html?: string
+    back_html?: string
   }) => Promise<CardTemplate | null>
   updateTemplate: (id: string, data: {
     name?: string
     fields?: TemplateField[]
     front_layout?: LayoutItem[]
     back_layout?: LayoutItem[]
-  }) => Promise<void>
+    layout_mode?: LayoutMode
+    front_html?: string
+    back_html?: string
+  }) => Promise<boolean>
   deleteTemplate: (id: string) => Promise<boolean>
   duplicateTemplate: (id: string) => Promise<CardTemplate | null>
 }
@@ -56,6 +62,9 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         fields: input.fields,
         front_layout: input.front_layout,
         back_layout: input.back_layout,
+        layout_mode: input.layout_mode ?? 'default',
+        front_html: input.front_html ?? '',
+        back_html: input.back_html ?? '',
         is_default: false,
       } as Record<string, unknown>)
       .select()
@@ -78,10 +87,11 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
 
     if (error) {
       set({ error: error.message })
-      return
+      return false
     }
 
     await get().fetchTemplates()
+    return true
   },
 
   deleteTemplate: async (id) => {
@@ -132,6 +142,9 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         fields: original.fields,
         front_layout: original.front_layout,
         back_layout: original.back_layout,
+        layout_mode: original.layout_mode,
+        front_html: original.front_html,
+        back_html: original.back_html,
         is_default: false,
       } as Record<string, unknown>)
       .select()

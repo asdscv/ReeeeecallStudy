@@ -38,6 +38,9 @@ export interface Database {
           fields: TemplateField[]
           front_layout: LayoutItem[]
           back_layout: LayoutItem[]
+          layout_mode: LayoutMode
+          front_html: string
+          back_html: string
           is_default: boolean
           created_at: string
           updated_at: string
@@ -49,6 +52,9 @@ export interface Database {
           fields: TemplateField[]
           front_layout: LayoutItem[]
           back_layout: LayoutItem[]
+          layout_mode?: LayoutMode
+          front_html?: string
+          back_html?: string
           is_default?: boolean
         }
         Update: Partial<Database['public']['Tables']['card_templates']['Insert']>
@@ -178,12 +184,14 @@ export interface Database {
 
 export type StudyMode = 'srs' | 'sequential_review' | 'random' | 'sequential' | 'by_date'
 export type SrsStatus = 'new' | 'learning' | 'review' | 'suspended'
+export type LayoutMode = 'default' | 'custom'
 
 export type TemplateField = {
   key: string
   name: string
   type: 'text' | 'image' | 'audio'
   order: number
+  detail?: string
   tts_enabled?: boolean
   tts_lang?: string
 }
@@ -191,6 +199,7 @@ export type TemplateField = {
 export type LayoutItem = {
   field_key: string
   style: 'primary' | 'secondary' | 'hint' | 'detail' | 'media'
+  font_size?: number
 }
 
 export type SrsSettings = {

@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Volume2 } from 'lucide-react'
+import { renderCardFace } from '../../lib/card-renderer'
+import { getLayoutItemStyle } from '../../lib/layout-styles'
 import type { Card, CardTemplate, LayoutItem } from '../../types/database'
 
 interface StudyCardProps {
@@ -40,7 +42,7 @@ export function StudyCard({
   const backLayout = template?.back_layout ?? []
   const fields = template?.fields ?? []
 
-  // Get primary display values
+  // Get primary display values (fallback when no layout)
   const frontValue = frontLayout.length > 0
     ? card.field_values[frontLayout[0].field_key] ?? ''
     : Object.values(card.field_values)[0] ?? ''
@@ -48,6 +50,16 @@ export function StudyCard({
   const backValue = backLayout.length > 0
     ? card.field_values[backLayout[0].field_key] ?? ''
     : Object.values(card.field_values)[1] ?? Object.values(card.field_values)[0] ?? ''
+
+  // Centralized rendering decision (memoized)
+  const frontRender = useMemo(
+    () => renderCardFace(template, card, 'front'),
+    [template, card],
+  )
+  const backRender = useMemo(
+    () => renderCardFace(template, card, 'back'),
+    [template, card],
+  )
 
   // Swipe handlers
   function handleTouchStart(e: React.TouchEvent) {
@@ -110,32 +122,32 @@ export function StudyCard({
               transition={{ duration: 0.4 }}
               style={{ transformStyle: 'preserve-3d' }}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[400px] cursor-pointer"
-              onClick={!isFlipped ? onFlip : undefined}
+              onClick={onFlip}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               {/* Front Face */}
               <div
-                className="absolute inset-0 p-12 flex flex-col items-center justify-center"
+                className="absolute inset-0 p-8 sm:p-12 flex flex-col items-center justify-center"
                 style={{
                   backfaceVisibility: 'hidden',
                   display: isFlipped ? 'none' : 'flex',
                 }}
               >
-                {frontLayout.length > 0 ? (
-                  <div className="space-y-4 text-center">
-                    {frontLayout.map((item, idx) => (
-                      <LayoutItemRenderer
-                        key={idx}
-                        item={item}
-                        value={card.field_values[item.field_key] ?? ''}
-                        fieldType={fields.find(f => f.key === item.field_key)?.type ?? 'text'}
-                      />
-                    ))}
-                  </div>
+                {frontRender.mode === 'custom' ? (
+                  <div
+                    className="prose prose-sm max-w-none text-center"
+                    dangerouslySetInnerHTML={{ __html: frontRender.html }}
+                  />
+                ) : frontLayout.length > 0 ? (
+                  <CardFaceLayout
+                    layout={frontLayout}
+                    fieldValues={card.field_values}
+                    fields={fields}
+                  />
                 ) : (
-                  <div className="text-5xl font-bold text-gray-900 text-center">
+                  <div className="text-5xl font-bold text-gray-900 text-center tracking-tight">
                     {frontValue}
                   </div>
                 )}
@@ -146,31 +158,36 @@ export function StudyCard({
 
               {/* Back Face */}
               <div
-                className="absolute inset-0 p-12 flex flex-col items-center justify-center"
+                className="absolute inset-0 p-8 sm:p-12 flex flex-col items-center justify-center"
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                   display: isFlipped ? 'flex' : 'none',
                 }}
               >
-                <div className="text-xl text-gray-400 mb-4">
-                  {frontValue}
-                </div>
-                {backLayout.length > 0 ? (
-                  <div className="space-y-4 text-center">
-                    {backLayout.map((item, idx) => (
-                      <LayoutItemRenderer
-                        key={idx}
-                        item={item}
-                        value={card.field_values[item.field_key] ?? ''}
-                        fieldType={fields.find(f => f.key === item.field_key)?.type ?? 'text'}
-                      />
-                    ))}
-                  </div>
+                {backRender.mode === 'custom' ? (
+                  <div
+                    className="prose prose-sm max-w-none text-center"
+                    dangerouslySetInnerHTML={{ __html: backRender.html }}
+                  />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 text-center">
-                    {backValue}
-                  </div>
+                  <>
+                    {/* Small reminder of front value */}
+                    <div className="text-base text-gray-300 mb-6 tracking-wide">
+                      {frontValue}
+                    </div>
+                    {backLayout.length > 0 ? (
+                      <CardFaceLayout
+                        layout={backLayout}
+                        fieldValues={card.field_values}
+                        fields={fields}
+                      />
+                    ) : (
+                      <div className="text-4xl font-bold text-gray-900 text-center tracking-tight">
+                        {backValue}
+                      </div>
+                    )}
+                  </>
                 )}
                 {showTTSButton && onManualTTS && (
                   <button
@@ -178,7 +195,7 @@ export function StudyCard({
                       e.stopPropagation()
                       onManualTTS()
                     }}
-                    className="mt-4 p-2 text-blue-600 hover:text-blue-700 transition-colors"
+                    className="mt-6 p-2.5 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                     title="TTS 재생"
                   >
                     <Volume2 className="w-6 h-6" />
@@ -200,6 +217,54 @@ export function StudyCard({
   )
 }
 
+// ── Card Face Layout ─────────────────────────────────────
+// Renders a list of layout items with proper visual hierarchy,
+// spacing, and separators between different style groups.
+
+function CardFaceLayout({
+  layout,
+  fieldValues,
+  fields,
+}: {
+  layout: LayoutItem[]
+  fieldValues: Record<string, string>
+  fields: { key: string; type: string }[]
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 w-full max-w-lg text-center">
+      {layout.map((item, idx) => {
+        const value = fieldValues[item.field_key] ?? ''
+        const fieldType = fields.find(f => f.key === item.field_key)?.type ?? 'text'
+
+        // Insert a subtle divider before hint/detail sections
+        // (only if preceded by a primary/secondary item)
+        const prevStyle = idx > 0 ? layout[idx - 1].style : null
+        const needsDivider =
+          idx > 0 &&
+          (item.style === 'hint' || item.style === 'detail') &&
+          (prevStyle === 'primary' || prevStyle === 'secondary')
+
+        return (
+          <div key={item.field_key + '-' + idx} className="w-full">
+            {needsDivider && (
+              <div className="w-12 h-px bg-gray-200 mx-auto mb-3" />
+            )}
+            <LayoutItemRenderer
+              item={item}
+              value={value}
+              fieldType={fieldType as 'text' | 'image' | 'audio'}
+            />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Layout Item Renderer ─────────────────────────────────
+// Renders a single layout item using getLayoutItemStyle for
+// consistent styling with optional custom font sizes.
+
 function LayoutItemRenderer({
   item,
   value,
@@ -211,32 +276,36 @@ function LayoutItemRenderer({
 }) {
   if (!value) return null
 
+  // Image rendering
   if (item.style === 'media' || fieldType === 'image') {
     return (
-      <div className="flex justify-center">
-        <img src={value} alt="" className="max-h-64 rounded-lg object-contain" />
+      <div className="flex justify-center py-1">
+        <img
+          src={value}
+          alt=""
+          className="max-h-64 rounded-xl object-contain shadow-sm"
+        />
       </div>
     )
   }
 
+  // Audio rendering
   if (fieldType === 'audio') {
     return (
-      <div className="flex justify-center">
-        <audio controls src={value} className="w-full max-w-md" />
+      <div className="flex justify-center py-1">
+        <audio controls src={value} className="w-full max-w-sm" />
       </div>
     )
   }
 
-  const styleClasses: Record<string, string> = {
-    primary: 'text-4xl font-bold text-gray-900',
-    secondary: 'text-xl text-gray-700',
-    hint: 'text-lg italic text-gray-400',
-    detail: 'text-base text-gray-600',
-    media: 'text-base text-gray-600',
-  }
+  // Text rendering with style-aware classes + font size
+  const { className, fontSize } = getLayoutItemStyle(item.style, item.font_size)
 
   return (
-    <p className={styleClasses[item.style] ?? styleClasses.primary}>
+    <p
+      className={className}
+      style={{ fontSize: `${fontSize}px`, lineHeight: fontSize >= 32 ? 1.2 : 1.5 }}
+    >
       {value}
     </p>
   )

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { utcToLocalDateKey, localDateToUTCRange, todayDateKey } from '../lib/date-utils'
 import { DatePicker } from '../components/study/DatePicker'
 import type { Deck, StudyMode } from '../types/database'
 
@@ -25,10 +26,7 @@ export function StudySetupPage() {
   const [batchSize, setBatchSize] = useState(20)
 
   // by_date mode state
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date()
-    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-  })
+  const [selectedDate, setSelectedDate] = useState(() => todayDateKey())
   const [datesWithCards, setDatesWithCards] = useState<Set<string>>(new Set())
   const [dateCardCount, setDateCardCount] = useState(0)
 
@@ -58,8 +56,7 @@ export function StudySetupPage() {
       if (cardDates) {
         const dates = new Set<string>()
         cardDates.forEach((c: { created_at: string }) => {
-          const d = new Date(c.created_at)
-          dates.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+          dates.add(utcToLocalDateKey(c.created_at))
         })
         setDatesWithCards(dates)
       }
@@ -73,8 +70,7 @@ export function StudySetupPage() {
   useEffect(() => {
     if (!deckId || mode !== 'by_date' || !selectedDate) return
     const fetchCount = async () => {
-      const dateStart = `${selectedDate}T00:00:00`
-      const dateEnd = `${selectedDate}T23:59:59`
+      const { start: dateStart, end: dateEnd } = localDateToUTCRange(selectedDate)
       const { count } = await supabase
         .from('cards')
         .select('*', { count: 'exact', head: true })
@@ -106,8 +102,9 @@ export function StudySetupPage() {
       batchSize: String(batchSize),
     })
     if (mode === 'by_date' && selectedDate) {
-      params.set('dateStart', `${selectedDate}T00:00:00`)
-      params.set('dateEnd', `${selectedDate}T23:59:59`)
+      const { start, end } = localDateToUTCRange(selectedDate)
+      params.set('dateStart', start)
+      params.set('dateEnd', end)
     }
     navigate(`/decks/${deckId}/study?${params.toString()}`)
   }

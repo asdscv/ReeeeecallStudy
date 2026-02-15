@@ -2,19 +2,24 @@ import { useEffect, useState } from 'react'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
+import { daysAgoUTC } from '../lib/date-utils'
 import {
   getForecastReviews,
   getHeatmapData,
   getDailyStudyCounts,
   getStreakDays,
   getMasteryRate,
+  filterLogsByPeriod,
 } from '../lib/stats'
+import { periodToDays, shouldShowHeatmap } from '../lib/time-period'
+import type { TimePeriod } from '../lib/time-period'
 import type { Card, StudyLog } from '../types/database'
 import { StatsSummaryCards } from '../components/dashboard/StatsSummaryCards'
 import { StudyHeatmap } from '../components/dashboard/StudyHeatmap'
 import { ForecastWidget } from '../components/dashboard/ForecastWidget'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { RecentDecks } from '../components/dashboard/RecentDecks'
+import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 
 export function DashboardPage() {
   const { user } = useAuthStore()
@@ -23,6 +28,7 @@ export function DashboardPage() {
   const [allCards, setAllCards] = useState<Card[]>([])
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [dataLoading, setDataLoading] = useState(true)
+  const [period, setPeriod] = useState<TimePeriod>('1m')
 
   useEffect(() => {
     fetchDecks()
@@ -44,13 +50,11 @@ export function DashboardPage() {
         .eq('user_id', user.id)
 
       // Fetch study logs from last year
-      const oneYearAgo = new Date()
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
       const { data: logs } = await supabase
         .from('study_logs')
         .select('*')
         .eq('user_id', user.id)
-        .gte('studied_at', oneYearAgo.toISOString())
+        .gte('studied_at', daysAgoUTC(365))
         .order('studied_at', { ascending: false })
 
       if (!cancelled) {
@@ -72,19 +76,26 @@ export function DashboardPage() {
     )
   }
 
-  // Compute dashboard stats
+  // Compute dashboard stats (streak & mastery use full data)
   const totalCards = stats.reduce((sum, s) => sum + s.total_cards, 0)
   const dueToday = stats.reduce((sum, s) => sum + s.review_cards + s.learning_cards, 0)
   const streak = getStreakDays(studyLogs)
   const masteryRate = getMasteryRate(allCards)
 
-  const heatmapData = getHeatmapData(studyLogs)
+  // Filter logs by selected period for charts
+  const days = periodToDays(period)
+  const filteredLogs = filterLogsByPeriod(studyLogs, days)
+
+  const heatmapData = getHeatmapData(filteredLogs)
   const forecastData = getForecastReviews(allCards)
-  const dailyData = getDailyStudyCounts(studyLogs)
+  const dailyData = getDailyStudyCounts(filteredLogs, days)
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
+        <TimePeriodTabs value={period} onChange={setPeriod} />
+      </div>
 
       <StatsSummaryCards
         totalCards={totalCards}
@@ -93,7 +104,7 @@ export function DashboardPage() {
         masteryRate={masteryRate}
       />
 
-      <StudyHeatmap data={heatmapData} />
+      {shouldShowHeatmap(period) && <StudyHeatmap data={heatmapData} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ForecastWidget data={forecastData} />
