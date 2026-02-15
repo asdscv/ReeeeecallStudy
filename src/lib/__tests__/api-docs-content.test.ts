@@ -5,7 +5,6 @@ import {
   getApiSection,
   getMethodColor,
   getStatusColor,
-  type ApiDocsSection,
   type ApiEndpoint,
 } from '../api-docs-content'
 
