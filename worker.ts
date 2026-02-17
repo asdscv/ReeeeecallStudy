@@ -1,4 +1,4 @@
-// Cloudflare Worker — API 프록시 + 정적 에셋 서빙
+// Cloudflare Worker — API 프록시 + SPA fallback
 const SUPABASE_FN = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api/v1'
 
 interface Env {
@@ -47,7 +47,12 @@ export default {
       })
     }
 
-    // 나머지 → 정적 에셋 (SPA fallback 포함)
-    return env.ASSETS.fetch(request)
+    // 정적 에셋 시도 → 404면 index.html (SPA fallback)
+    const assetRes = await env.ASSETS.fetch(request)
+    if (assetRes.status === 404) {
+      const indexReq = new Request(new URL('/', url).toString(), request)
+      return env.ASSETS.fetch(indexReq)
+    }
+    return assetRes
   },
 }
