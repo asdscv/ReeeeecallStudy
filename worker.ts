@@ -9,6 +9,13 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
 
+    // 디버그: Worker 실행 확인용 (테스트 후 제거)
+    if (url.pathname === '/__worker-test') {
+      return new Response(JSON.stringify({ worker: true, path: url.pathname }), {
+        headers: { 'Content-Type': 'application/json', 'X-Worker': 'active' },
+      })
+    }
+
     // OPTIONS preflight
     if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/v1/')) {
       return new Response(null, {
