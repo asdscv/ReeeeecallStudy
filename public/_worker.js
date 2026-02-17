@@ -1,12 +1,8 @@
-// Cloudflare Worker — API 프록시 + 정적 에셋 서빙
+// Cloudflare Pages _worker.js — API 프록시
 const SUPABASE_FN = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api/v1'
 
-interface Env {
-  ASSETS: Fetcher
-}
-
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request, env) {
     const url = new URL(request.url)
 
     // OPTIONS preflight
