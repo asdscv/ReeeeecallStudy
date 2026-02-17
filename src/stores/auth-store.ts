@@ -50,9 +50,19 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (!_subscription) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          const currentUser = useAuthStore.getState().user
+          const newUser = session?.user ?? null
+
+          // Skip update if the user hasn't actually changed — prevents
+          // unnecessary re-renders when Supabase refreshes the session on
+          // tab focus.
+          if (currentUser?.id === newUser?.id && !useAuthStore.getState().loading) {
+            return
+          }
+
           set({
             session,
-            user: session?.user ?? null,
+            user: newUser,
             loading: false,
           })
         })
