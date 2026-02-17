@@ -113,7 +113,7 @@ export function LandingPage() {
       {/* ─── App Preview ────────────────────── */}
       <section className="px-4 pb-16 sm:pb-24">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gray-900 rounded-2xl p-8 sm:p-10 text-center">
+          <div className="bg-gray-900 rounded-2xl p-4 sm:p-8 lg:p-10 text-center">
             <img src="/favicon.png" alt="" className="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-5 opacity-90" />
             <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-20 sm:h-28 mx-auto mb-2 brightness-0 invert" />
             <p className="text-gray-400 text-lg sm:text-2xl">스마트한 플래시카드 학습 플랫폼</p>
@@ -147,7 +147,7 @@ export function LandingPage() {
 
       {/* ─── Benefits ──────────────────────── */}
       <section id="benefits" className="py-16 sm:py-24 px-4">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
               왜 ReeeeecallStudy인가?
@@ -197,7 +197,7 @@ export function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-12">간단한 3단계로 시작</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
             {[
               { step: '1', icon: BookOpen, title: '덱 만들기', desc: '주제별로 카드를 묶는 덱을 만들고,\n카드를 추가하세요.' },
               { step: '2', icon: Brain, title: '학습하기', desc: 'SRS가 최적의 타이밍에\n복습 카드를 제시합니다.' },

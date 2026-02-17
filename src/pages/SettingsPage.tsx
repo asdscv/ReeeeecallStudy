@@ -397,9 +397,9 @@ export function SettingsPage() {
 
           {/* New key form */}
           {showKeyForm && !apiKeyData && (
-            <div className="border border-gray-200 rounded-xl p-5 mb-4">
+            <div className="border border-gray-200 rounded-xl p-4 sm:p-5 mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">키 이름</label>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <input
                   type="text"
                   value={newKeyName}
@@ -408,19 +408,21 @@ export function SettingsPage() {
                   className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm"
                   onKeyDown={(e) => { if (e.key === 'Enter') handleGenerateApiKey() }}
                 />
-                <button
-                  onClick={handleGenerateApiKey}
-                  disabled={generating}
-                  className="px-4 py-2.5 text-sm text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:opacity-50 transition cursor-pointer font-medium"
-                >
-                  {generating ? '생성 중...' : '생성'}
-                </button>
-                <button
-                  onClick={() => { setShowKeyForm(false); setNewKeyName('') }}
-                  className="px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition cursor-pointer"
-                >
-                  취소
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleGenerateApiKey}
+                    disabled={generating}
+                    className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:opacity-50 transition cursor-pointer font-medium"
+                  >
+                    {generating ? '생성 중...' : '생성'}
+                  </button>
+                  <button
+                    onClick={() => { setShowKeyForm(false); setNewKeyName('') }}
+                    className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition cursor-pointer"
+                  >
+                    취소
+                  </button>
+                </div>
               </div>
             </div>
           )}

@@ -69,7 +69,7 @@ export function LoginPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full mx-4 text-center">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
             <div className="text-5xl mb-4">📧</div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">이메일을 확인해주세요</h2>
             <p className="text-gray-500 mb-2">
@@ -95,8 +95,8 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <div className="text-center mb-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
             <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
             <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
             <p className="text-gray-500 mt-3">{title}</p>

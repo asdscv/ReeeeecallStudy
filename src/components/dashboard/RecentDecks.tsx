@@ -45,7 +45,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
           return (
             <div
               key={deck.id}
-              className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-sm transition cursor-pointer"
+              className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 hover:shadow-sm transition cursor-pointer"
               onClick={() => navigate(`/decks/${deck.id}`)}
             >
               <div className="flex items-center justify-between">

@@ -189,7 +189,7 @@ export function Layout() {
                       <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {isOpen && (
-                      <div className="pl-8">
+                      <div className="pl-6">
                         {item.children.map((child) => (
                           <Link
                             key={child.path}

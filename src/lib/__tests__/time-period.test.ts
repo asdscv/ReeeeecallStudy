@@ -14,6 +14,8 @@ describe('periodToDays', () => {
     ['3m', 90],
     ['6m', 180],
     ['1y', 365],
+    ['2y', 730],
+    ['5y', 1825],
   ])('maps %s → %d', (period, expected) => {
     expect(periodToDays(period)).toBe(expected)
   })
@@ -25,23 +27,32 @@ describe('shouldShowHeatmap', () => {
     expect(shouldShowHeatmap('1w')).toBe(false)
   })
 
-  it('returns true for 1m, 3m, 6m, 1y', () => {
+  it('returns true for 1m and longer', () => {
     expect(shouldShowHeatmap('1m')).toBe(true)
     expect(shouldShowHeatmap('3m')).toBe(true)
     expect(shouldShowHeatmap('6m')).toBe(true)
     expect(shouldShowHeatmap('1y')).toBe(true)
+    expect(shouldShowHeatmap('2y')).toBe(true)
+    expect(shouldShowHeatmap('5y')).toBe(true)
   })
 })
 
 describe('TIME_PERIOD_OPTIONS', () => {
-  it('has 6 options', () => {
-    expect(TIME_PERIOD_OPTIONS).toHaveLength(6)
+  it('has 8 options', () => {
+    expect(TIME_PERIOD_OPTIONS).toHaveLength(8)
   })
 
-  it('each option has value and label', () => {
+  it('each option has value, label, and days', () => {
     for (const opt of TIME_PERIOD_OPTIONS) {
       expect(opt.value).toBeTruthy()
       expect(opt.label).toBeTruthy()
+      expect(opt.days).toBeGreaterThan(0)
+    }
+  })
+
+  it('days match periodToDays output', () => {
+    for (const opt of TIME_PERIOD_OPTIONS) {
+      expect(periodToDays(opt.value)).toBe(opt.days)
     }
   })
 })

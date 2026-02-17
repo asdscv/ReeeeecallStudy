@@ -185,7 +185,7 @@ export function QuickStudyPage() {
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-md shadow-xl"
+            className="bg-white rounded-2xl w-full max-w-sm sm:max-w-md shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 sm:p-5 border-b border-gray-100">

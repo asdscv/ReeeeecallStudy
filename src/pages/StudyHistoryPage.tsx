@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Clock, Layers } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ChevronLeft, ChevronRight, Clock, Layers } from 'lucide-react'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
@@ -14,6 +15,24 @@ import {
   aggregateLogsToSessions,
   mergeSessionsWithLogs,
 } from '../lib/study-history'
+import {
+  filterSessionsByPeriod,
+  computeOverviewStats,
+  computeModeBreakdown,
+  computeDailySessionCounts,
+  computeRatingDistribution,
+  computeSessionDurationTrend,
+  computeStudyTimeByMode,
+} from '../lib/study-history-stats'
+import { getStreakDays } from '../lib/stats'
+import { periodToDays } from '../lib/time-period'
+import type { TimePeriod } from '../lib/time-period'
+import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
+import { OverviewStatsCards } from '../components/study-history/OverviewStatsCards'
+import { StudyVolumeChart } from '../components/study-history/StudyVolumeChart'
+import { RatingDistributionChart } from '../components/study-history/RatingDistributionChart'
+import { SessionDurationChart } from '../components/study-history/SessionDurationChart'
+import { ModeBreakdownCards } from '../components/study-history/ModeBreakdownCards'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
 
 const PAGE_SIZE = 15
@@ -23,12 +42,12 @@ const PAGE_SIZE = 15
 interface DeckProgress {
   deck: Deck
   totalCards: number
-  studiedCards: number      // cards that are NOT "new" (at least seen once)
+  studiedCards: number
   newCards: number
   learningCards: number
   reviewCards: number
-  sequentialPos: number     // for sequential mode
-  newStartPos: number       // for sequential_review mode
+  sequentialPos: number
+  newStartPos: number
 }
 
 export function StudyHistoryPage() {
@@ -39,6 +58,7 @@ export function StudyHistoryPage() {
   const [allLogs, setAllLogs] = useState<StudyLog[]>([])
   const [deckProgress, setDeckProgress] = useState<DeckProgress[]>([])
   const [loading, setLoading] = useState(true)
+  const [period, setPeriod] = useState<TimePeriod>('1m')
   const [deckFilter, setDeckFilter] = useState<string>('all')
   const [modeFilter, setModeFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
@@ -87,7 +107,6 @@ export function StudyHistoryPage() {
         const logSessions = aggregateLogsToSessions(logs)
         setSessions(mergeSessionsWithLogs(realSessions, logSessions))
 
-        // Build deck progress map
         const stateMap = new Map(studyStates.map((s) => [s.deck_id, s]))
         const deckCardMap = new Map<string, Pick<Card, 'id' | 'deck_id' | 'srs_status'>[]>()
         for (const card of cards) {
@@ -97,7 +116,6 @@ export function StudyHistoryPage() {
         }
 
         setDeckProgress(
-          // Only include decks that have cards
           Array.from(deckCardMap.entries())
             .map(([deckId, deckCards]) => {
               const deck = decks.find((d) => d.id === deckId)
@@ -129,6 +147,50 @@ export function StudyHistoryPage() {
     return () => { cancelled = true }
   }, [user, decks])
 
+  // ── Derived data (memoized) ──
+
+  const days = periodToDays(period)
+
+  const periodSessions = useMemo(
+    () => filterSessionsByPeriod(sessions, days),
+    [sessions, days]
+  )
+
+  const overviewStats = useMemo(
+    () => computeOverviewStats(periodSessions),
+    [periodSessions]
+  )
+
+  const streak = useMemo(() => getStreakDays(allLogs), [allLogs])
+
+  const dailyCounts = useMemo(
+    () => computeDailySessionCounts(periodSessions, days),
+    [periodSessions, days]
+  )
+
+  const ratingDist = useMemo(
+    () => computeRatingDistribution(periodSessions),
+    [periodSessions]
+  )
+
+  const durationTrend = useMemo(
+    () => computeSessionDurationTrend(periodSessions, days),
+    [periodSessions, days]
+  )
+
+  const modeBreakdown = useMemo(
+    () => computeModeBreakdown(periodSessions),
+    [periodSessions]
+  )
+
+  const timeByMode = useMemo(
+    () => computeStudyTimeByMode(periodSessions),
+    [periodSessions]
+  )
+
+  // Reset page when filters change
+  useEffect(() => { setCurrentPage(1) }, [period])
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -140,7 +202,8 @@ export function StudyHistoryPage() {
   const deckMap = new Map<string, Deck>(decks.map((d) => [d.id, d]))
   const progressMap = new Map(deckProgress.map((p) => [p.deck.id, p]))
 
-  let filtered = sessions
+  // Session list filtering (separate from period-filtered chart data)
+  let filtered = periodSessions
   if (deckFilter !== 'all') {
     filtered = filterSessionsByDeck(filtered, deckFilter)
   }
@@ -152,19 +215,34 @@ export function StudyHistoryPage() {
     paginateSessions(filtered, currentPage, PAGE_SIZE)
 
   const groups = groupSessionsByDate(paginatedItems)
-  const uniqueModes = Array.from(new Set(sessions.map((s) => s.study_mode)))
-  const sessionDeckIds = new Set(sessions.map((s) => s.deck_id))
+  const uniqueModes = Array.from(new Set(periodSessions.map((s) => s.study_mode)))
+  const sessionDeckIds = new Set(periodSessions.map((s) => s.deck_id))
   const sessionDecks = decks.filter((d) => sessionDeckIds.has(d.id))
 
   return (
-    <div>
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-        학습 기록
-      </h1>
+    <div className="space-y-4 sm:space-y-6">
+      {/* ── Header + Period Selection ── */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+          학습 기록
+        </h1>
+        <TimePeriodTabs value={period} onChange={setPeriod} />
+      </div>
 
-      {/* ── Deck Progress Overview ── */}
+      {/* ── Overview Stats Cards ── */}
+      <OverviewStatsCards stats={overviewStats} streak={streak} />
+
+      {/* ── Charts Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <StudyVolumeChart data={dailyCounts} />
+        <RatingDistributionChart data={ratingDist} />
+        <SessionDurationChart data={durationTrend} />
+        <ModeBreakdownCards breakdown={modeBreakdown} timeByMode={timeByMode} />
+      </div>
+
+      {/* ── Deck Progress ── */}
       {deckProgress.length > 0 && (
-        <div className="mb-6">
+        <div>
           <h2 className="text-sm font-semibold text-gray-500 mb-3">덱별 진도</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {deckProgress.map((p) => (
@@ -174,118 +252,122 @@ export function StudyHistoryPage() {
         </div>
       )}
 
-      {/* ── Filters ── */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 sm:mb-6">
-        <select
-          value={deckFilter}
-          onChange={(e) => { setDeckFilter(e.target.value); setCurrentPage(1) }}
-          className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
-        >
-          <option value="all">전체 덱</option>
-          {sessionDecks.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.icon} {d.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={modeFilter}
-          onChange={(e) => { setModeFilter(e.target.value); setCurrentPage(1) }}
-          className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
-        >
-          <option value="all">전체 모드</option>
-          {uniqueModes.map((m) => (
-            <option key={m} value={m}>
-              {getStudyModeEmoji(m)} {getStudyModeLabel(m)}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* ── Session List Section ── */}
+      <div>
+        <h2 className="text-sm font-semibold text-gray-500 mb-3">세션 목록</h2>
 
-      {/* ── Session list ── */}
-      {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
-          <div className="text-4xl sm:text-5xl mb-4">📝</div>
-          <p className="text-gray-500">
-            {sessions.length === 0
-              ? '아직 학습 기록이 없습니다. 학습을 시작해보세요!'
-              : '필터 조건에 맞는 기록이 없습니다.'}
-          </p>
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
+          <select
+            value={deckFilter}
+            onChange={(e) => { setDeckFilter(e.target.value); setCurrentPage(1) }}
+            className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
+          >
+            <option value="all">전체 덱</option>
+            {sessionDecks.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.icon} {d.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={modeFilter}
+            onChange={(e) => { setModeFilter(e.target.value); setCurrentPage(1) }}
+            className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
+          >
+            <option value="all">전체 모드</option>
+            {uniqueModes.map((m) => (
+              <option key={m} value={m}>
+                {getStudyModeEmoji(m)} {getStudyModeLabel(m)}
+              </option>
+            ))}
+          </select>
         </div>
-      ) : (
-        <>
-          <div className="space-y-4 sm:space-y-6">
-            {groups.map((group) => (
-              <div key={group.date}>
-                <h2 className="text-sm font-semibold text-gray-500 mb-2 sm:mb-3">
-                  {group.date}
-                </h2>
-                <div className="space-y-2">
-                  {group.sessions.map((session) => (
-                    <SessionCard
-                      key={session.id}
-                      session={session}
-                      deck={deckMap.get(session.deck_id)}
-                      progress={progressMap.get(session.deck_id)}
-                      allLogs={allLogs}
-                    />
-                  ))}
+
+        {/* Session list */}
+        {filtered.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+            <div className="text-4xl sm:text-5xl mb-4">📝</div>
+            <p className="text-gray-500">
+              {sessions.length === 0
+                ? '아직 학습 기록이 없습니다. 학습을 시작해보세요!'
+                : '필터 조건에 맞는 기록이 없습니다.'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4 sm:space-y-6">
+              {groups.map((group) => (
+                <div key={group.date}>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-2 sm:mb-3">
+                    {group.date}
+                  </h3>
+                  <div className="space-y-2">
+                    {group.sessions.map((session) => (
+                      <SessionCard
+                        key={session.id}
+                        session={session}
+                        deck={deckMap.get(session.deck_id)}
+                        progress={progressMap.get(session.deck_id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-4 sm:mt-6 bg-white rounded-xl border border-gray-200">
+                <span className="text-xs sm:text-sm text-gray-500">
+                  {startIdx + 1}~{Math.min(endIdx, filtered.length)} / {filtered.length}건
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage <= 1}
+                    className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    let page: number
+                    if (totalPages <= 5) {
+                      page = i + 1
+                    } else if (currentPage <= 3) {
+                      page = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      page = totalPages - 4 + i
+                    } else {
+                      page = currentPage - 2 + i
+                    }
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-9 h-9 text-sm rounded cursor-pointer ${
+                          currentPage === page
+                            ? 'bg-blue-600 text-white'
+                            : 'hover:bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  })}
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage >= totalPages}
+                    className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-4 sm:mt-6 bg-white rounded-xl border border-gray-200">
-              <span className="text-xs sm:text-sm text-gray-500">
-                {startIdx + 1}~{Math.min(endIdx, filtered.length)} / {filtered.length}건
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage <= 1}
-                  className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  let page: number
-                  if (totalPages <= 5) {
-                    page = i + 1
-                  } else if (currentPage <= 3) {
-                    page = i + 1
-                  } else if (currentPage >= totalPages - 2) {
-                    page = totalPages - 4 + i
-                  } else {
-                    page = currentPage - 2 + i
-                  }
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-9 h-9 text-sm rounded cursor-pointer ${
-                        currentPage === page
-                          ? 'bg-blue-600 text-white'
-                          : 'hover:bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                })}
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage >= totalPages}
-                  className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -335,22 +417,18 @@ function DeckProgressCard({ progress: p }: { progress: DeckProgress }) {
   )
 }
 
-// ── SessionCard: expandable with card-level detail ──
+// ── SessionCard: navigates to detail page ──
 
 function SessionCard({
   session,
   deck,
   progress,
-  allLogs,
 }: {
   session: StudySession
   deck?: Deck
   progress?: DeckProgress
-  allLogs: StudyLog[]
 }) {
-  const [expanded, setExpanded] = useState(false)
-  const [detailLogs, setDetailLogs] = useState<(StudyLog & { card?: Card })[]>([])
-  const [detailLoading, setDetailLoading] = useState(false)
+  const navigate = useNavigate()
 
   const time = new Date(session.completed_at)
   const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`
@@ -358,49 +436,20 @@ function SessionCard({
   const ratingEntries = Object.entries(session.ratings)
   const totalRatings = ratingEntries.reduce((s, [, c]) => s + c, 0)
 
-  const handleToggle = async () => {
-    if (expanded) {
-      setExpanded(false)
-      return
-    }
-
-    setExpanded(true)
-    setDetailLoading(true)
-
-    const sessionDate = new Date(session.completed_at)
-    const dateStr = `${sessionDate.getFullYear()}-${String(sessionDate.getMonth() + 1).padStart(2, '0')}-${String(sessionDate.getDate()).padStart(2, '0')}`
-
-    const matchedLogs = allLogs.filter((log) => {
-      if (log.deck_id !== session.deck_id) return false
-      if (log.study_mode !== session.study_mode) return false
-      const d = new Date(log.studied_at)
-      const logDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-      return logDate === dateStr
+  const handleClick = () => {
+    navigate('/history/detail', {
+      state: {
+        session,
+        deckName: deck?.name ?? '삭제된 덱',
+        deckIcon: deck?.icon ?? '📚',
+      },
     })
-
-    const cardIds = [...new Set(matchedLogs.map((l) => l.card_id))]
-    let cardMap = new Map<string, Card>()
-    if (cardIds.length > 0) {
-      const { data: cards } = await supabase
-        .from('cards')
-        .select('*')
-        .in('id', cardIds)
-      if (cards) {
-        cardMap = new Map((cards as Card[]).map((c) => [c.id, c]))
-      }
-    }
-
-    setDetailLogs(
-      matchedLogs.map((log) => ({ ...log, card: cardMap.get(log.card_id) }))
-    )
-    setDetailLoading(false)
   }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      {/* Summary row — clickable */}
       <button
-        onClick={handleToggle}
+        onClick={handleClick}
         className="w-full text-left p-3 sm:p-4 hover:bg-gray-50 transition cursor-pointer"
       >
         <div className="flex items-center gap-3">
@@ -452,99 +501,17 @@ function SessionCard({
             </div>
           </div>
 
-          {/* Expand icon */}
+          {/* Navigate icon */}
           <div className="shrink-0 text-gray-400">
-            {expanded
-              ? <ChevronUp className="w-4 h-4" />
-              : <ChevronDown className="w-4 h-4" />}
+            <ChevronRight className="w-4 h-4" />
           </div>
         </div>
       </button>
-
-      {/* Detail panel */}
-      {expanded && (
-        <div className="border-t border-gray-100">
-          {detailLoading ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-400">
-              불러오는 중...
-            </div>
-          ) : detailLogs.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-400">
-              상세 기록이 없습니다.
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              <div className="px-4 py-2 bg-gray-50 flex items-center gap-4 text-[11px] font-medium text-gray-500 uppercase">
-                <span className="flex-1">카드</span>
-                <span className="w-16 text-center">평가</span>
-                <span className="w-16 text-right hidden sm:block">소요 시간</span>
-              </div>
-              {detailLogs.map((log, i) => (
-                <DetailRow key={log.id ?? i} log={log} index={i} />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Detail row: single card study record ──
-
-function DetailRow({
-  log,
-  index,
-}: {
-  log: StudyLog & { card?: Card }
-  index: number
-}) {
-  const cardPreview = getCardPreview(log.card)
-
-  return (
-    <div className="px-4 py-2.5 flex items-center gap-4 hover:bg-gray-50/50">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400 shrink-0 w-5 text-right">{index + 1}</span>
-          <span className="text-sm text-gray-800 truncate">{cardPreview}</span>
-        </div>
-      </div>
-      <div className="w-16 text-center shrink-0">
-        <RatingBadge rating={log.rating} />
-      </div>
-      <div className="w-16 text-right shrink-0 text-xs text-gray-400 hidden sm:block">
-        {log.review_duration_ms ? formatDuration(log.review_duration_ms) : '-'}
-      </div>
     </div>
   )
 }
 
 // ── Helpers ──
-
-function getCardPreview(card?: Card): string {
-  if (!card) return '(삭제된 카드)'
-  const values = Object.values(card.field_values)
-  if (values.length === 0) return '(내용 없음)'
-  const front = values[0]?.slice(0, 40) || ''
-  const back = values[1]?.slice(0, 30) || ''
-  if (back) return `${front} → ${back}`
-  return front
-}
-
-function RatingBadge({ rating }: { rating: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    again: { label: 'Again', className: 'bg-red-50 text-red-600 border-red-200' },
-    hard: { label: 'Hard', className: 'bg-orange-50 text-orange-600 border-orange-200' },
-    good: { label: 'Good', className: 'bg-green-50 text-green-700 border-green-200' },
-    easy: { label: 'Easy', className: 'bg-blue-50 text-blue-600 border-blue-200' },
-  }
-  const c = config[rating] ?? { label: rating, className: 'bg-gray-50 text-gray-600 border-gray-200' }
-  return (
-    <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded border ${c.className}`}>
-      {c.label}
-    </span>
-  )
-}
 
 function getRatingLabel(rating: string): string {
   const labels: Record<string, string> = {

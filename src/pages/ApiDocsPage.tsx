@@ -105,8 +105,8 @@ function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
           {endpoint.queryParams && endpoint.queryParams.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Query Parameters</h4>
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <table className="w-full text-xs">
+              <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+                <table className="w-full text-xs whitespace-nowrap">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="text-left p-2 font-medium text-gray-600">이름</th>

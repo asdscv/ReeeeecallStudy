@@ -93,16 +93,16 @@ export function DeckSharePage() {
 
         {deckListing ? (
           <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{deckListing.title}</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{deckListing.title}</p>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {deckListing.acquire_count}명 사용 중 · {deckListing.is_active ? '활성' : '비활성'}
                 </p>
               </div>
               <button
                 onClick={() => unpublishDeck(deckListing.id)}
-                className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
+                className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer shrink-0 self-start sm:self-center"
               >
                 게시 취소
               </button>

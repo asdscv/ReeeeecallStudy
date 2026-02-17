@@ -18,6 +18,7 @@ import { TemplateEditPage } from './pages/TemplateEditPage'
 import { DeckEditPage } from './pages/DeckEditPage'
 import { QuickStudyPage } from './pages/QuickStudyPage'
 import { StudyHistoryPage } from './pages/StudyHistoryPage'
+import { SessionDetailPage } from './pages/SessionDetailPage'
 import { MarketplacePage } from './pages/MarketplacePage'
 import { MarketplaceDetailPage } from './pages/MarketplaceDetailPage'
 import { DeckSharePage } from './pages/DeckSharePage'
@@ -88,6 +89,7 @@ function App() {
         >
           <Route path="/quick-study" element={<QuickStudyPage />} />
           <Route path="/history" element={<StudyHistoryPage />} />
+          <Route path="/history/detail" element={<SessionDetailPage />} />
           <Route path="/decks" element={<DecksPage />} />
           <Route path="/decks/:deckId" element={<DeckDetailPage />} />
           <Route path="/decks/:deckId/edit" element={<DeckEditPage />} />
