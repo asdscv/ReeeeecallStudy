@@ -1,0 +1,5 @@
+# API proxy → Supabase Edge Function
+/api/v1/*  https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api/v1/:splat  200
+
+# SPA fallback (모든 나머지 경로 → index.html)
+/*  /index.html  200

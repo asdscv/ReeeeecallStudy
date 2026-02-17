@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { ArrowRight, Brain, Layers, BarChart3, Share2, Globe, Smartphone, Zap, BookOpen, CheckCircle2 } from 'lucide-react'
 
 const FEATURES = [
@@ -240,6 +240,9 @@ export function LandingPage() {
             <div className="flex items-center gap-2">
               <img src="/favicon.png" alt="" className="w-7 h-7" />
               <span className="font-bold text-gray-900">ReeeeecallStudy</span>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <Link to="/docs/api" className="hover:text-gray-700 transition no-underline">API 문서</Link>
             </div>
             <p className="text-sm text-gray-400">
               &copy; 2026 ReeeeecallStudy. All rights reserved.
