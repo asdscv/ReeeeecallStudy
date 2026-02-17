@@ -1,14 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useAuthStore } from '../../stores/auth-store'
+import { localizeAuthError } from '../../lib/auth-errors'
 
 export function ResetPasswordPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [sessionChecked, setSessionChecked] = useState(false)
   const updatePassword = useAuthStore((s) => s.updatePassword)
+  const session = useAuthStore((s) => s.session)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!session) {
+      navigate('/auth/login', { replace: true })
+    } else {
+      setSessionChecked(true)
+    }
+  }, [session, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,11 +40,14 @@ export function ResetPasswordPage() {
     setLoading(false)
 
     if (error) {
-      setError(error.message)
+      setError(localizeAuthError(error.message))
     } else {
+      toast.success('비밀번호가 변경되었습니다.')
       navigate('/', { replace: true })
     }
   }
+
+  if (!sessionChecked) return null
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

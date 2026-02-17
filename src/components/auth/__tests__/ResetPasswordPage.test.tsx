@@ -2,7 +2,12 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { toast } from 'sonner'
 import { ResetPasswordPage } from '../ResetPasswordPage'
+
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
 
 // ─── Mocks ──────────────────────────────────────────────────
 const mockNavigate = vi.fn()
@@ -12,10 +17,11 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockUpdatePassword = vi.fn()
+let mockSession: unknown = { user: { id: 'u1' }, access_token: 'tok' }
 
 vi.mock('../../../stores/auth-store', () => ({
   useAuthStore: (selector: (s: Record<string, unknown>) => unknown) =>
-    selector({ updatePassword: mockUpdatePassword }),
+    selector({ updatePassword: mockUpdatePassword, session: mockSession }),
 }))
 
 const renderPage = () =>
@@ -27,6 +33,25 @@ const renderPage = () =>
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockSession = { user: { id: 'u1' }, access_token: 'tok' }
+})
+
+// ─── Session guard ──────────────────────────────────────────
+describe('Session guard', () => {
+  it('should redirect to /auth/login when session is null', () => {
+    mockSession = null
+    renderPage()
+
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/login', { replace: true })
+    expect(screen.queryByText('새 비밀번호 설정')).not.toBeInTheDocument()
+  })
+
+  it('should render form when session exists', () => {
+    renderPage()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByText('새 비밀번호 설정')).toBeInTheDocument()
+  })
 })
 
 // ─── Rendering ──────────────────────────────────────────────
@@ -84,6 +109,7 @@ describe('Submission', () => {
     await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
 
     expect(mockUpdatePassword).toHaveBeenCalledWith('newpass123')
+    expect(toast.success).toHaveBeenCalledWith('비밀번호가 변경되었습니다.')
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
   })
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../stores/auth-store'
+import { localizeAuthError } from '../../lib/auth-errors'
 
 type Mode = 'login' | 'signup' | 'forgot'
 
@@ -20,6 +21,7 @@ export function LoginPage() {
     setMode(newMode)
     setError(null)
     setSuccessMessage(null)
+    setPassword('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +33,7 @@ export function LoginPage() {
       const { error } = await resetPassword(email)
       setLoading(false)
       if (error) {
-        setError(error.message)
+        setError(localizeAuthError(error.message))
       } else {
         setSuccessMessage('비밀번호 재설정 링크를 이메일로 보냈습니다.')
       }
@@ -47,7 +49,7 @@ export function LoginPage() {
       const { error } = await signUp(email, password)
       setLoading(false)
       if (error) {
-        setError(error.message)
+        setError(localizeAuthError(error.message))
       } else {
         setSuccessMessage('인증 메일을 보냈습니다. 메일의 링크를 클릭하면 가입이 완료됩니다.')
       }
@@ -57,7 +59,7 @@ export function LoginPage() {
     const { error } = await signIn(email, password)
     setLoading(false)
     if (error) {
-      setError(error.message)
+      setError(localizeAuthError(error.message))
     } else {
       navigate('/', { replace: true })
     }

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { User, Session } from '@supabase/supabase-js'
+import type { User, Session, Subscription } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
 interface AuthState {
@@ -12,7 +12,20 @@ interface AuthState {
   signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<{ error: Error | null }>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
   updatePassword: (password: string) => Promise<{ error: Error | null }>
-  signOut: () => Promise<void>
+  signOut: () => Promise<{ error: Error | null }>
+}
+
+// Module-level guards — prevent duplicate subscriptions across multiple initialize() calls
+let _initializePromise: Promise<void> | null = null
+let _subscription: Subscription | null = null
+
+/** Reset module-level internals — for tests only */
+export function _resetAuthStoreInternals() {
+  _initializePromise = null
+  if (_subscription) {
+    _subscription.unsubscribe()
+    _subscription = null
+  }
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -20,61 +33,100 @@ export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   loading: true,
 
-  initialize: async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    set({
-      session,
-      user: session?.user ?? null,
-      loading: false,
-    })
+  initialize: () => {
+    if (_initializePromise) return _initializePromise
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      set({
-        session,
-        user: session?.user ?? null,
-        loading: false,
-      })
-    })
+    _initializePromise = (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        set({
+          session,
+          user: session?.user ?? null,
+          loading: false,
+        })
+      } catch {
+        set({ session: null, user: null, loading: false })
+      }
+
+      if (!_subscription) {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          set({
+            session,
+            user: session?.user ?? null,
+            loading: false,
+          })
+        })
+        _subscription = subscription
+      }
+    })()
+
+    return _initializePromise
   },
 
   signIn: async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error: error ? new Error(error.message) : null }
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      return { error: error ? new Error(error.message) : null }
+    } catch (e) {
+      return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
   },
 
   signUp: async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    return { error: error ? new Error(error.message) : null }
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      return { error: error ? new Error(error.message) : null }
+    } catch (e) {
+      return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
   },
 
   signInWithProvider: async (provider: 'google' | 'github' | 'apple') => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    })
-    return { error: error ? new Error(error.message) : null }
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      })
+      return { error: error ? new Error(error.message) : null }
+    } catch (e) {
+      return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
   },
 
   resetPassword: async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback`,
-    })
-    return { error: error ? new Error(error.message) : null }
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      })
+      return { error: error ? new Error(error.message) : null }
+    } catch (e) {
+      return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
   },
 
   updatePassword: async (password: string) => {
-    const { error } = await supabase.auth.updateUser({ password })
-    return { error: error ? new Error(error.message) : null }
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+      return { error: error ? new Error(error.message) : null }
+    } catch (e) {
+      return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
   },
 
   signOut: async () => {
-    await supabase.auth.signOut()
-    set({ user: null, session: null })
+    try {
+      const { error } = await supabase.auth.signOut()
+      set({ user: null, session: null })
+      return { error: error ? new Error(error.message) : null }
+    } catch (e) {
+      set({ user: null, session: null })
+      return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
   },
 }))

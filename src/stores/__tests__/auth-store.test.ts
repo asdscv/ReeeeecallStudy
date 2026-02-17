@@ -18,7 +18,7 @@ const mockSupabase = vi.hoisted(() => ({
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
 
-import { useAuthStore } from '../auth-store'
+import { useAuthStore, _resetAuthStoreInternals } from '../auth-store'
 
 // ─── Helpers ────────────────────────────────────────────────
 const resetStore = () =>
@@ -30,6 +30,7 @@ const fakeSession = { user: fakeUser, access_token: 'tok' } as never
 beforeEach(() => {
   vi.clearAllMocks()
   resetStore()
+  _resetAuthStoreInternals()
 })
 
 // ─── initialize ─────────────────────────────────────────────
@@ -86,6 +87,35 @@ describe('initialize', () => {
     expect(useAuthStore.getState().user).toBe(fakeUser)
     expect(useAuthStore.getState().session).toBe(fakeSession)
   })
+
+  it('should set loading:false when getSession throws', async () => {
+    mockSupabase.auth.getSession.mockRejectedValue(new Error('Network error'))
+
+    await useAuthStore.getState().initialize()
+
+    const state = useAuthStore.getState()
+    expect(state.user).toBeNull()
+    expect(state.session).toBeNull()
+    expect(state.loading).toBe(false)
+  })
+
+  it('should return the same promise and call getSession only once on multiple calls', async () => {
+    mockSupabase.auth.getSession.mockResolvedValue({
+      data: { session: fakeSession },
+    })
+
+    const p1 = useAuthStore.getState().initialize()
+    const p2 = useAuthStore.getState().initialize()
+    const p3 = useAuthStore.getState().initialize()
+
+    expect(p1).toBe(p2)
+    expect(p2).toBe(p3)
+
+    await p1
+
+    expect(mockSupabase.auth.getSession).toHaveBeenCalledTimes(1)
+    expect(mockSupabase.auth.onAuthStateChange).toHaveBeenCalledTimes(1)
+  })
 })
 
 // ─── signIn ─────────────────────────────────────────────────
@@ -118,6 +148,15 @@ describe('signIn', () => {
 
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Invalid credentials')
+  })
+
+  it('should return Error when signInWithPassword throws', async () => {
+    mockSupabase.auth.signInWithPassword.mockRejectedValue(new Error('Network error'))
+
+    const { error } = await useAuthStore.getState().signIn('a@b.com', 'pass123')
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Network error')
   })
 })
 
@@ -154,6 +193,15 @@ describe('signUp', () => {
 
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Email taken')
+  })
+
+  it('should return Error when signUp throws', async () => {
+    mockSupabase.auth.signUp.mockRejectedValue(new Error('Network error'))
+
+    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123')
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Network error')
   })
 })
 
@@ -203,6 +251,15 @@ describe('signInWithProvider', () => {
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('OAuth failed')
   })
+
+  it('should return Error when signInWithOAuth throws', async () => {
+    mockSupabase.auth.signInWithOAuth.mockRejectedValue(new Error('Network error'))
+
+    const { error } = await useAuthStore.getState().signInWithProvider('google')
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Network error')
+  })
 })
 
 // ─── resetPassword ──────────────────────────────────────────
@@ -236,6 +293,15 @@ describe('resetPassword', () => {
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Rate limit')
   })
+
+  it('should return Error when resetPasswordForEmail throws', async () => {
+    mockSupabase.auth.resetPasswordForEmail.mockRejectedValue(new Error('Network error'))
+
+    const { error } = await useAuthStore.getState().resetPassword('a@b.com')
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Network error')
+  })
 })
 
 // ─── updatePassword ─────────────────────────────────────────
@@ -268,19 +334,57 @@ describe('updatePassword', () => {
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Too weak')
   })
+
+  it('should return Error when updateUser throws', async () => {
+    mockSupabase.auth.updateUser.mockRejectedValue(new Error('Network error'))
+
+    const { error } = await useAuthStore.getState().updatePassword('newpass')
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Network error')
+  })
 })
 
 // ─── signOut ────────────────────────────────────────────────
 describe('signOut', () => {
   it('should call supabase signOut and clear state', async () => {
-    mockSupabase.auth.signOut.mockResolvedValue({})
+    mockSupabase.auth.signOut.mockResolvedValue({ error: null })
 
     // Set some user state first
     useAuthStore.setState({ user: fakeUser, session: fakeSession })
 
-    await useAuthStore.getState().signOut()
+    const { error } = await useAuthStore.getState().signOut()
 
     expect(mockSupabase.auth.signOut).toHaveBeenCalled()
+    expect(useAuthStore.getState().user).toBeNull()
+    expect(useAuthStore.getState().session).toBeNull()
+    expect(error).toBeNull()
+  })
+
+  it('should clear state and return error when signOut returns error', async () => {
+    mockSupabase.auth.signOut.mockResolvedValue({
+      error: { message: 'Sign out failed' },
+    })
+
+    useAuthStore.setState({ user: fakeUser, session: fakeSession })
+
+    const { error } = await useAuthStore.getState().signOut()
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Sign out failed')
+    expect(useAuthStore.getState().user).toBeNull()
+    expect(useAuthStore.getState().session).toBeNull()
+  })
+
+  it('should clear state and return error when signOut throws', async () => {
+    mockSupabase.auth.signOut.mockRejectedValue(new Error('Network error'))
+
+    useAuthStore.setState({ user: fakeUser, session: fakeSession })
+
+    const { error } = await useAuthStore.getState().signOut()
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error!.message).toBe('Network error')
     expect(useAuthStore.getState().user).toBeNull()
     expect(useAuthStore.getState().session).toBeNull()
   })

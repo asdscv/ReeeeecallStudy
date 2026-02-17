@@ -2,7 +2,7 @@ import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { AuthCallback } from '../AuthCallback'
+import { AuthCallback, _setCapturedHash } from '../AuthCallback'
 
 // ─── Mocks ──────────────────────────────────────────────────
 const mockNavigate = vi.fn()
@@ -24,6 +24,10 @@ vi.mock('../../../lib/supabase', () => ({
   },
 }))
 
+type AuthCallback = (event: string, session: unknown) => void
+
+const fakeSession = { user: { id: 'u1' }, access_token: 'tok' }
+
 const renderCallback = () =>
   render(
     <MemoryRouter>
@@ -34,11 +38,8 @@ const renderCallback = () =>
 beforeEach(() => {
   vi.clearAllMocks()
   vi.useFakeTimers()
-  // Reset hash
-  Object.defineProperty(window, 'location', {
-    writable: true,
-    value: { ...window.location, hash: '' },
-  })
+  // Reset captured hash to empty (no hash)
+  _setCapturedHash('')
 })
 
 afterEach(() => {
@@ -61,27 +62,27 @@ describe('Loading state', () => {
 // ─── Auth state change events ───────────────────────────────
 describe('Auth state change events', () => {
   it('should navigate to / on SIGNED_IN', () => {
-    let callback: (event: string) => void = () => {}
-    mockOnAuthStateChange.mockImplementation((cb: (event: string) => void) => {
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
       callback = cb
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
     renderCallback()
-    act(() => callback('SIGNED_IN'))
+    act(() => callback('SIGNED_IN', fakeSession))
 
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
   })
 
   it('should navigate to /auth/reset-password on PASSWORD_RECOVERY', () => {
-    let callback: (event: string) => void = () => {}
-    mockOnAuthStateChange.mockImplementation((cb: (event: string) => void) => {
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
       callback = cb
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
     renderCallback()
-    act(() => callback('PASSWORD_RECOVERY'))
+    act(() => callback('PASSWORD_RECOVERY', fakeSession))
 
     expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
   })
@@ -90,50 +91,154 @@ describe('Auth state change events', () => {
 // ─── Recovery hash type handling ────────────────────────────
 describe('Recovery hash type handling', () => {
   it('should navigate to /auth/reset-password when hash contains type=recovery, even on SIGNED_IN event', () => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#access_token=abc&type=recovery' },
-    })
+    _setCapturedHash('#access_token=abc&type=recovery')
 
-    let callback: (event: string) => void = () => {}
-    mockOnAuthStateChange.mockImplementation((cb: (event: string) => void) => {
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
       callback = cb
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
     renderCallback()
-    act(() => callback('SIGNED_IN'))
+    act(() => callback('SIGNED_IN', fakeSession))
 
     // Even though event is SIGNED_IN, hash type=recovery should take precedence
     expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
   })
 
   it('should navigate to / on SIGNED_IN when hash type is not recovery', () => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#access_token=abc&type=signup' },
-    })
+    _setCapturedHash('#access_token=abc&type=signup')
 
-    let callback: (event: string) => void = () => {}
-    mockOnAuthStateChange.mockImplementation((cb: (event: string) => void) => {
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
       callback = cb
       return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
     })
 
     renderCallback()
-    act(() => callback('SIGNED_IN'))
+    act(() => callback('SIGNED_IN', fakeSession))
 
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+  })
+
+  it('should navigate to /auth/reset-password on INITIAL_SESSION with recovery hash AND valid session', () => {
+    _setCapturedHash('#access_token=abc&type=recovery')
+
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('INITIAL_SESSION', fakeSession))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
+  })
+
+  it('should NOT navigate on INITIAL_SESSION with recovery hash but NULL session (race condition guard)', () => {
+    _setCapturedHash('#access_token=abc&type=recovery')
+
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('INITIAL_SESSION', null))
+
+    // Must NOT navigate — session doesn't exist yet, wait for SIGNED_IN/PASSWORD_RECOVERY
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('should navigate on SIGNED_IN after INITIAL_SESSION with null session was skipped', () => {
+    _setCapturedHash('#access_token=abc&type=recovery')
+
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+
+    // INITIAL_SESSION fires first with null session — skipped
+    act(() => callback('INITIAL_SESSION', null))
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    // Then SIGNED_IN fires with valid session — should navigate
+    act(() => callback('SIGNED_IN', fakeSession))
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it('should NOT navigate on INITIAL_SESSION without recovery hash', () => {
+    _setCapturedHash('#access_token=abc&type=signup')
+
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('INITIAL_SESSION', fakeSession))
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+})
+
+// ─── Double navigation prevention ───────────────────────────
+describe('Double navigation prevention', () => {
+  it('should only navigate once when multiple events fire', () => {
+    _setCapturedHash('#access_token=abc&type=recovery')
+
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+
+    // Fire multiple events
+    act(() => {
+      callback('SIGNED_IN', fakeSession)
+      callback('PASSWORD_RECOVERY', fakeSession)
+    })
+
+    // Should only navigate once
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
+  })
+
+  it('should not show timeout error after successful navigation', () => {
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('SIGNED_IN', fakeSession))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+
+    // Advance past timeout
+    act(() => {
+      vi.advanceTimersByTime(10000)
+    })
+
+    // Should not show timeout error since navigation already happened
+    expect(screen.queryByText('처리 시간이 초과되었습니다. 다시 시도해주세요.')).not.toBeInTheDocument()
   })
 })
 
 // ─── Hash error handling ────────────────────────────────────
 describe('Hash error handling', () => {
   it('should show otp_expired error from hash', () => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#error_code=otp_expired&error_description=OTP+expired' },
-    })
+    _setCapturedHash('#error_code=otp_expired&error_description=OTP+expired')
 
     renderCallback()
 
@@ -141,10 +246,7 @@ describe('Hash error handling', () => {
   })
 
   it('should show access_denied error from hash', () => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#error_code=access_denied&error_description=Access+denied' },
-    })
+    _setCapturedHash('#error_code=access_denied&error_description=Access+denied')
 
     renderCallback()
 
@@ -152,10 +254,7 @@ describe('Hash error handling', () => {
   })
 
   it('should show fallback error description from hash', () => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#error_code=unknown_error&error_description=Something+went+wrong' },
-    })
+    _setCapturedHash('#error_code=unknown_error&error_description=Something+went+wrong')
 
     renderCallback()
 
@@ -163,10 +262,7 @@ describe('Hash error handling', () => {
   })
 
   it('should show generic error when no description', () => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#error_code=unknown_error' },
-    })
+    _setCapturedHash('#error_code=unknown_error')
 
     renderCallback()
 
@@ -203,10 +299,7 @@ describe('Error view', () => {
   it('should show "로그인 페이지로 돌아가기" button and navigate on click', async () => {
     vi.useRealTimers()
 
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...window.location, hash: '#error_code=otp_expired' },
-    })
+    _setCapturedHash('#error_code=otp_expired')
 
     const user = userEvent.setup()
     renderCallback()
