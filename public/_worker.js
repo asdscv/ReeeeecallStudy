@@ -1,20 +1,9 @@
-// Cloudflare Worker — API 프록시 + SPA fallback
+// Cloudflare Pages Advanced Mode — API 프록시 + SPA fallback
 const SUPABASE_FN = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api/v1'
 
-interface Env {
-  ASSETS: Fetcher
-}
-
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request, env) {
     const url = new URL(request.url)
-
-    // 디버그: Worker 실행 확인용 (테스트 후 제거)
-    if (url.pathname === '/__worker-test') {
-      return new Response(JSON.stringify({ worker: true, path: url.pathname }), {
-        headers: { 'Content-Type': 'application/json', 'X-Worker': 'active' },
-      })
-    }
 
     // OPTIONS preflight
     if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/v1/')) {
@@ -57,8 +46,7 @@ export default {
     // 정적 에셋 시도 → 404면 index.html (SPA fallback)
     const assetRes = await env.ASSETS.fetch(request)
     if (assetRes.status === 404) {
-      const indexReq = new Request(new URL('/', url).toString(), request)
-      return env.ASSETS.fetch(indexReq)
+      return env.ASSETS.fetch(new URL('/', url).toString())
     }
     return assetRes
   },
