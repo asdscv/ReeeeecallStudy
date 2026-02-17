@@ -87,6 +87,46 @@ describe('Auth state change events', () => {
   })
 })
 
+// ─── Recovery hash type handling ────────────────────────────
+describe('Recovery hash type handling', () => {
+  it('should navigate to /auth/reset-password when hash contains type=recovery, even on SIGNED_IN event', () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '#access_token=abc&type=recovery' },
+    })
+
+    let callback: (event: string) => void = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: (event: string) => void) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('SIGNED_IN'))
+
+    // Even though event is SIGNED_IN, hash type=recovery should take precedence
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
+  })
+
+  it('should navigate to / on SIGNED_IN when hash type is not recovery', () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '#access_token=abc&type=signup' },
+    })
+
+    let callback: (event: string) => void = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: (event: string) => void) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('SIGNED_IN'))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+  })
+})
+
 // ─── Hash error handling ────────────────────────────────────
 describe('Hash error handling', () => {
   it('should show otp_expired error from hash', () => {

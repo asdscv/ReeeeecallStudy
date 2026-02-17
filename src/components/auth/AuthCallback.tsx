@@ -8,8 +8,10 @@ export function AuthCallback() {
 
   useEffect(() => {
     const hash = window.location.hash
-    if (hash) {
-      const params = new URLSearchParams(hash.substring(1))
+    const params = hash ? new URLSearchParams(hash.substring(1)) : null
+    const hashType = params?.get('type')
+
+    if (params) {
       const errorCode = params.get('error_code')
       const errorDesc = params.get('error_description')
 
@@ -23,8 +25,10 @@ export function AuthCallback() {
       }
     }
 
+    const isRecovery = hashType === 'recovery'
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      if (isRecovery || event === 'PASSWORD_RECOVERY') {
         navigate('/auth/reset-password', { replace: true })
       } else if (event === 'SIGNED_IN') {
         navigate('/', { replace: true })
