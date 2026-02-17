@@ -1,4 +1,4 @@
-// Cloudflare Pages Advanced Mode — API 프록시 + SPA fallback
+// Cloudflare Worker — API 프록시 + SPA fallback
 const SUPABASE_FN = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api/v1'
 
 export default {
@@ -43,11 +43,7 @@ export default {
       })
     }
 
-    // 정적 에셋 시도 → 404면 index.html (SPA fallback)
-    const assetRes = await env.ASSETS.fetch(request)
-    if (assetRes.status === 404) {
-      return env.ASSETS.fetch(new URL('/', url).toString())
-    }
-    return assetRes
+    // 정적 에셋은 assets 바인딩이 자동 처리 (wrangler.jsonc의 assets 설정)
+    return new Response('Not Found', { status: 404 })
   },
 }
