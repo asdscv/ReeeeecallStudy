@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('i18next', () => ({
   default: { language: 'en', t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue || key },

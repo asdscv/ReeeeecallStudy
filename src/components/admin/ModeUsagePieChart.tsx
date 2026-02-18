@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import type { PieLabelRenderProps } from 'recharts'
 import { useTranslation } from 'react-i18next'
 import { studyModeLabel } from '../../lib/admin-stats'
 import type { ModeUsagePercentage } from '../../lib/admin-stats'
@@ -27,13 +28,13 @@ export function ModeUsagePieChart({ data }: ModeUsagePieChartProps) {
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label={({ mode, percentage }) => `${t(studyModeLabel(mode), mode)} (${percentage}%)`}
+              label={(props: PieLabelRenderProps) => `${t(studyModeLabel(String(props.mode ?? '')), String(props.mode ?? ''))} (${Math.round((props.percent ?? 0) * 100)}%)`}
             >
               {data.map((_, index) => (
                 <Cell key={index} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value: number) => [value, t('study.sessions')]} />
+            <Tooltip formatter={(value) => [Number(value), t('study.sessions')]} />
             <Legend formatter={(value: string) => t(studyModeLabel(value), value)} />
           </PieChart>
         </ResponsiveContainer>

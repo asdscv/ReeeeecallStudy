@@ -67,7 +67,7 @@ export function AdminUsersPage() {
                 <Cell fill="#3b82f6" />
                 <Cell fill="#d1d5db" />
               </Pie>
-              <Tooltip formatter={(value: number, name: string) => [value.toLocaleString(), name === 'active' ? t('users.active') : t('users.inactive')]} />
+              <Tooltip formatter={(value, name) => [Number(value).toLocaleString(), name === 'active' ? t('users.active') : t('users.inactive')]} />
               <Legend formatter={(value: string) => value === 'active' ? t('users.active') : t('users.inactive')} />
             </PieChart>
           </ResponsiveContainer>

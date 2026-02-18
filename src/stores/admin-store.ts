@@ -144,7 +144,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     const chartsFresh = isFresh(get()._fetchedAt, 'users') && get().userSignups.length > 0
     set({ usersLoading: true, usersError: null })
     try {
-      const promises: Promise<unknown>[] = [
+      const promises: PromiseLike<unknown>[] = [
         supabase
           .from('profiles')
           .select('id, display_name, created_at, role')
@@ -162,13 +162,13 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
       const results = await Promise.all(promises)
 
-      const usersRes = results[0] as Awaited<ReturnType<typeof supabase.from<'profiles'>>>
+      const usersRes = results[0] as { data?: unknown[]; error?: unknown }
       const countRes = results[1] as { count: number | null; error: unknown }
 
-      if ((usersRes as { error?: unknown }).error) throw (usersRes as { error: unknown }).error
+      if (usersRes.error) throw usersRes.error
       if (countRes.error) throw countRes.error
 
-      const profiles = ((usersRes as { data?: unknown[] }).data ?? []) as { id: string; display_name: string | null; created_at: string; role: string }[]
+      const profiles = (usersRes.data ?? []) as { id: string; display_name: string | null; created_at: string; role: string }[]
 
       const updates: Partial<AdminState> = {
         userList: profiles,

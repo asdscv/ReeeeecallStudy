@@ -197,7 +197,7 @@ describe('aggregateRatings', () => {
   })
 
   it('aggregates ratings from multiple sessions', () => {
-    const sessions = [
+    const sessions: { ratings: Record<string, number> }[] = [
       { ratings: { good: 5, easy: 3 } },
       { ratings: { good: 2, hard: 1 } },
     ]

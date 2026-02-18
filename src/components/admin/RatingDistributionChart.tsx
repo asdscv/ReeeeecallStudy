@@ -28,7 +28,7 @@ export function RatingDistributionChart({ data }: RatingDistributionChartProps) 
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="rating" tick={{ fontSize: 11 }} tickFormatter={(v: string) => t(ratingLabel(v), v)} />
             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={35} />
-            <Tooltip labelFormatter={(label: string) => t(ratingLabel(label), label)} formatter={(value: number) => [value.toLocaleString(), t('study.cards')]} />
+            <Tooltip labelFormatter={(label) => t(ratingLabel(String(label)), String(label))} formatter={(value) => [Number(value).toLocaleString(), t('study.cards')]} />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {data.map((entry, index) => (
                 <Cell key={index} fill={RATING_COLORS[entry.rating] ?? '#6b7280'} />
