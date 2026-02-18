@@ -15,12 +15,12 @@ export function Layout() {
   const navItems: NavItem[] = [
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
     { kind: 'link', path: '/', label: t('nav.dashboard'), icon: '📊' },
-    { kind: 'group', label: t('nav.decksCards'), icon: '📚', children: [
+    { kind: 'group', label: t('nav.study'), icon: '📚', children: [
       { path: '/decks', label: t('nav.decks'), icon: '📚' },
       { path: '/templates', label: t('nav.cards'), icon: '📋' },
+      { path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
+      { path: '/history', label: t('nav.studyHistory'), icon: '📝' },
     ]},
-    { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
-    { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: '📝' },
     { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
     ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: '🛡️' }] : []),
   ]

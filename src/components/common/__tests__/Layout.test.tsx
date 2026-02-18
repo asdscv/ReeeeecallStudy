@@ -26,53 +26,57 @@ beforeEach(() => {
 
 // ─── Cycle 1: 기본 렌더링 ─────────────────────────────────────
 describe('기본 렌더링', () => {
-  it('탑레벨 링크 5개가 렌더된다', () => {
+  it('탑레벨 링크 3개가 렌더된다 (빠른학습, 대시보드, 설정)', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0] // desktop nav
 
     expect(within(nav).getByText('nav.quickStudy')).toBeInTheDocument()
     expect(within(nav).getByText('nav.dashboard')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.marketplace')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.studyHistory')).toBeInTheDocument()
     expect(within(nav).getByText('nav.settings')).toBeInTheDocument()
   })
 
-  it('덱/카드 그룹 버튼이 렌더된다', () => {
+  it('마켓과 학습기록은 탑레벨 링크가 아니다', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    expect(within(nav).getByRole('button', { name: /nav\.decksCards/ })).toBeInTheDocument()
+    // These should not be top-level links; they're inside the study group
+    const topLinks = within(nav).getAllByRole('link')
+    const topLinkTexts = topLinks.map(l => l.textContent)
+    expect(topLinkTexts.join('')).not.toContain('nav.marketplace')
+    expect(topLinkTexts.join('')).not.toContain('nav.studyHistory')
   })
 
-  it('가이드 그룹은 네비에 없다', () => {
+  it('학습 그룹 버튼이 렌더된다', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    expect(within(nav).queryByRole('button', { name: /guide/ })).not.toBeInTheDocument()
-    expect(within(nav).queryByText('API')).not.toBeInTheDocument()
+    expect(within(nav).getByRole('button', { name: /nav\.study/ })).toBeInTheDocument()
   })
 
-  it('그룹 자식은 기본적으로 숨겨진다', () => {
+  it('그룹 자식(덱, 카드, 마켓, 학습기록)은 기본적으로 숨겨진다', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    // 덱/카드 그룹의 자식
     expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
     expect(within(nav).queryByText('nav.cards')).not.toBeInTheDocument()
+    expect(within(nav).queryByText('nav.marketplace')).not.toBeInTheDocument()
+    expect(within(nav).queryByText('nav.studyHistory')).not.toBeInTheDocument()
   })
 })
 
 // ─── Cycle 2: 데스크톱 드롭다운 열기/닫기 ─────────────────────
 describe('데스크톱 드롭다운', () => {
-  it('그룹 클릭 시 자식이 표시된다', async () => {
+  it('학습 그룹 클릭 시 4개 자식이 모두 표시된다', async () => {
     const user = userEvent.setup()
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
 
     expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
     expect(within(nav).getByText('nav.cards')).toBeInTheDocument()
+    expect(within(nav).getByText('nav.marketplace')).toBeInTheDocument()
+    expect(within(nav).getByText('nav.studyHistory')).toBeInTheDocument()
   })
 
   it('같은 그룹 재클릭 시 닫힌다', async () => {
@@ -80,8 +84,8 @@ describe('데스크톱 드롭다운', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.decksCards/ }))
-    await user.click(within(nav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
 
     expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
   })
@@ -91,7 +95,7 @@ describe('데스크톱 드롭다운', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
     expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
 
     // 외부 (body) 클릭
@@ -112,27 +116,43 @@ describe('활성 상태', () => {
     expect(link).toHaveClass('text-blue-700')
   })
 
-  it('자식 경로일 때 그룹 버튼이 활성 스타일을 갖는다', () => {
+  it('/decks 경로에서 학습 그룹 버튼이 활성 스타일을 갖는다', () => {
     renderLayout('/decks')
     const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.decksCards/ })
+    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
     expect(btn).toHaveClass('bg-blue-50')
     expect(btn).toHaveClass('text-blue-700')
   })
 
-  it('중첩 경로(/decks/abc)에서도 그룹 버튼이 활성된다', () => {
+  it('중첩 경로(/decks/abc)에서도 학습 그룹 버튼이 활성된다', () => {
     renderLayout('/decks/abc')
     const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.decksCards/ })
+    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
     expect(btn).toHaveClass('bg-blue-50')
   })
 
-  it('/templates 경로에서 덱/카드 그룹이 활성된다', () => {
+  it('/templates 경로에서 학습 그룹이 활성된다', () => {
     renderLayout('/templates')
     const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.decksCards/ })
+    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
+
+    expect(btn).toHaveClass('bg-blue-50')
+  })
+
+  it('/marketplace 경로에서 학습 그룹이 활성된다', () => {
+    renderLayout('/marketplace')
+    const nav = screen.getAllByRole('navigation')[0]
+    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
+
+    expect(btn).toHaveClass('bg-blue-50')
+  })
+
+  it('/history 경로에서 학습 그룹이 활성된다', () => {
+    renderLayout('/history')
+    const nav = screen.getAllByRole('navigation')[0]
+    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
     expect(btn).toHaveClass('bg-blue-50')
   })
@@ -147,9 +167,8 @@ describe('모바일 아코디언', () => {
     const hamburger = screen.getByRole('button', { name: /menu/ })
     await user.click(hamburger)
 
-    // 모바일 메뉴에 그룹 버튼이 보인다
     const mobileNav = screen.getAllByRole('navigation')[1]
-    expect(within(mobileNav).getByRole('button', { name: /nav\.decksCards/ })).toBeInTheDocument()
+    expect(within(mobileNav).getByRole('button', { name: /nav\.study/ })).toBeInTheDocument()
   })
 
   it('모바일 그룹 자식은 기본 숨김이다', async () => {
@@ -160,19 +179,22 @@ describe('모바일 아코디언', () => {
 
     const mobileNav = screen.getAllByRole('navigation')[1]
     expect(within(mobileNav).queryByText('nav.decks')).not.toBeInTheDocument()
+    expect(within(mobileNav).queryByText('nav.marketplace')).not.toBeInTheDocument()
   })
 
-  it('모바일 그룹 클릭 시 자식이 확장된다', async () => {
+  it('모바일 학습 그룹 클릭 시 4개 자식이 확장된다', async () => {
     const user = userEvent.setup()
     renderLayout()
 
     await user.click(screen.getByRole('button', { name: /menu/ }))
     const mobileNav = screen.getAllByRole('navigation')[1]
 
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
 
     expect(within(mobileNav).getByText('nav.decks')).toBeInTheDocument()
     expect(within(mobileNav).getByText('nav.cards')).toBeInTheDocument()
+    expect(within(mobileNav).getByText('nav.marketplace')).toBeInTheDocument()
+    expect(within(mobileNav).getByText('nav.studyHistory')).toBeInTheDocument()
   })
 
   it('모바일 그룹 재클릭 시 자식이 축소된다', async () => {
@@ -182,8 +204,8 @@ describe('모바일 아코디언', () => {
     await user.click(screen.getByRole('button', { name: /menu/ }))
     const mobileNav = screen.getAllByRole('navigation')[1]
 
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.decksCards/ }))
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
+    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
 
     expect(within(mobileNav).queryByText('nav.decks')).not.toBeInTheDocument()
   })
@@ -194,7 +216,7 @@ describe('모바일 아코디언', () => {
 
     await user.click(screen.getByRole('button', { name: /menu/ }))
     const mobileNav = screen.getAllByRole('navigation')[1]
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
 
     await user.click(within(mobileNav).getByText('nav.decks'))
 
@@ -205,14 +227,16 @@ describe('모바일 아코디언', () => {
 
 // ─── Cycle 5: 링크 정확성 ─────────────────────────────────────
 describe('링크 정확성', () => {
-  it('자식 아이템의 href가 올바르다', async () => {
+  it('학습 그룹 자식의 href가 올바르다', async () => {
     const user = userEvent.setup()
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
     expect(within(nav).getByText('nav.decks').closest('a')).toHaveAttribute('href', '/decks')
     expect(within(nav).getByText('nav.cards').closest('a')).toHaveAttribute('href', '/templates')
+    expect(within(nav).getByText('nav.marketplace').closest('a')).toHaveAttribute('href', '/marketplace')
+    expect(within(nav).getByText('nav.studyHistory').closest('a')).toHaveAttribute('href', '/history')
   })
 
   it('데스크톱 자식 클릭 시 드롭다운이 닫힌다', async () => {
@@ -220,7 +244,7 @@ describe('링크 정확성', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
     await user.click(within(nav).getByText('nav.decks'))
 
     expect(within(nav).queryByText('nav.cards')).not.toBeInTheDocument()
@@ -233,16 +257,16 @@ describe('엣지 케이스', () => {
     const user = userEvent.setup()
     renderLayout()
 
-    // 데스크톱에서 덱/카드 열기
+    // 데스크톱에서 학습 그룹 열기
     const desktopNav = screen.getAllByRole('navigation')[0]
-    await user.click(within(desktopNav).getByRole('button', { name: /nav\.decksCards/ }))
+    await user.click(within(desktopNav).getByRole('button', { name: /nav\.study/ }))
     expect(within(desktopNav).getByText('nav.decks')).toBeInTheDocument()
 
     // 모바일 메뉴 열기
     await user.click(screen.getByRole('button', { name: /menu/ }))
     const mobileNav = screen.getAllByRole('navigation')[1]
 
-    // 모바일에서는 덱/카드 자식이 안 보여야 함 (독립 상태)
+    // 모바일에서는 자식이 안 보여야 함 (독립 상태)
     expect(within(mobileNav).queryByText('nav.decks')).not.toBeInTheDocument()
   })
 
@@ -250,16 +274,15 @@ describe('엣지 케이스', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    const deckBtn = within(nav).getByRole('button', { name: /nav\.decksCards/ })
-    expect(deckBtn.tagName).toBe('BUTTON')
+    const studyBtn = within(nav).getByRole('button', { name: /nav\.study/ })
+    expect(studyBtn.tagName).toBe('BUTTON')
   })
 
   it('ChevronDown 아이콘이 그룹 버튼에 렌더된다', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    const deckBtn = within(nav).getByRole('button', { name: /nav\.decksCards/ })
-    // lucide-react의 ChevronDown은 svg로 렌더됨
-    expect(deckBtn.querySelector('svg')).toBeInTheDocument()
+    const studyBtn = within(nav).getByRole('button', { name: /nav\.study/ })
+    expect(studyBtn.querySelector('svg')).toBeInTheDocument()
   })
 })
