@@ -267,8 +267,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         const { newCards, reviewCards } = buildSequentialReviewQueue(
           allCards.map(c => ({ id: c.id, sort_position: c.sort_position, srs_status: c.srs_status })),
           typedStudyState,
-          typedStudyState.new_batch_size,
-          typedStudyState.review_batch_size,
+          Number.MAX_SAFE_INTEGER,  // All new cards — never limit
+          config.batchSize,         // User's batch size controls review cards
         )
 
         // Map back to full Card objects

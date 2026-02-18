@@ -2,23 +2,28 @@
   "modes": {
     "srs": {
       "label": "SRS (Spaced Repetition)",
-      "description": "Automatically selects cards based on review timing"
+      "description": "Automatically selects cards based on review timing",
+      "detail": "Reviews at optimal intervals based on memory curve. Rated Again/Hard/Good/Easy to adjust intervals. Wrong cards reappear within the same session."
     },
     "sequential_review": {
       "label": "Sequential Review",
-      "description": "Study new and review cards in order"
+      "description": "All new cards + review cards in order",
+      "detail": "All new cards are always included. Batch size controls how many existing cards to review. Cycles back to the beginning after reaching the end."
     },
     "random": {
       "label": "Random",
-      "description": "Shuffle cards randomly for study"
+      "description": "Shuffle cards randomly for study",
+      "detail": "Randomly draws cards up to batch size from the deck. All non-suspended cards are eligible regardless of SRS status."
     },
     "sequential": {
       "label": "Sequential",
-      "description": "Study cards in order"
+      "description": "Study cards in order",
+      "detail": "Studies cards in sort order up to batch size. Remembers your position and continues from where you left off. Wraps around after reaching the end."
     },
     "by_date": {
       "label": "By Date",
-      "description": "Study cards uploaded on a specific date"
+      "description": "Study cards uploaded on a specific date",
+      "detail": "Collects and studies only cards added on the selected date. Useful for quickly reviewing newly added cards."
     }
   },
   "quickStudy": {
@@ -34,6 +39,7 @@
     "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count}} cards",
     "batchSize": "Batch Size",
     "batchSizeDesc": "Cards to study per session ({{min}}~{{max}})",
+    "batchSizeDescReview": "Review cards per session — all new cards included ({{min}}~{{max}})",
     "backToModeSelect": "← Back to Mode Selection"
   },
   "setup": {

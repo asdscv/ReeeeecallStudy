@@ -21,11 +21,12 @@ describe('STUDY_MODE_OPTIONS', () => {
     expect(values).toEqual(['srs', 'sequential_review', 'random', 'sequential', 'by_date'])
   })
 
-  it('each option has emoji, label, desc', () => {
+  it('each option has emoji, label, desc, detail', () => {
     for (const opt of STUDY_MODE_OPTIONS) {
       expect(opt.emoji.length).toBeGreaterThan(0)
       expect(opt.label.length).toBeGreaterThan(0)
       expect(opt.desc.length).toBeGreaterThan(0)
+      expect(opt.detail.length).toBeGreaterThan(0)
     }
   })
 })

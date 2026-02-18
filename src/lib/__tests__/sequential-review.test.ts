@@ -142,6 +142,40 @@ describe('buildSequentialReviewQueue', () => {
     })
   })
 
+  describe('all new cards returned when newBatchSize is very large', () => {
+    it('should return ALL new cards when newBatchSize exceeds card count', () => {
+      const cards = [
+        makeCard('c1', 0),
+        makeCard('c2', 1),
+        makeCard('c3', 2),
+        makeCard('c4', 3),
+        makeCard('c5', 4),
+      ]
+      const state = { new_start_pos: 0, review_start_pos: 0 }
+      // Pass very large newBatchSize = all new cards should be returned
+      const result = buildSequentialReviewQueue(cards, state, 99999, 10)
+
+      expect(result.newCards).toHaveLength(5)
+    })
+
+    it('should return all 20 new cards + 30 review cards with batchSize=30', () => {
+      // Simulate: 100 cards, 80 studied (review), 20 new
+      const cards: MockCard[] = []
+      for (let i = 0; i < 80; i++) {
+        cards.push(makeCard(`r${i}`, i, 'review'))
+      }
+      for (let i = 80; i < 100; i++) {
+        cards.push(makeCard(`n${i}`, i, 'new'))
+      }
+      const state = { new_start_pos: 80, review_start_pos: 0 }
+      // All new cards + 30 review cards
+      const result = buildSequentialReviewQueue(cards, state, 99999, 30)
+
+      expect(result.newCards).toHaveLength(20)
+      expect(result.reviewCards).toHaveLength(30)
+    })
+  })
+
   describe('empty deck', () => {
     it('should return empty arrays for empty card list', () => {
       const state = { new_start_pos: 0, review_start_pos: 0 }

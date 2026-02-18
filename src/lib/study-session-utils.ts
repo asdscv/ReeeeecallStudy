@@ -7,14 +7,15 @@ export interface StudyModeOption {
   emoji: string
   label: string
   desc: string
+  detail: string
 }
 
 export const STUDY_MODE_OPTIONS: StudyModeOption[] = [
-  { value: 'srs', emoji: '🧠', label: 'study:modes.srs.label', desc: 'study:modes.srs.description' },
-  { value: 'sequential_review', emoji: '🔄', label: 'study:modes.sequential_review.label', desc: 'study:modes.sequential_review.description' },
-  { value: 'random', emoji: '🎲', label: 'study:modes.random.label', desc: 'study:modes.random.description' },
-  { value: 'sequential', emoji: '➡️', label: 'study:modes.sequential.label', desc: 'study:modes.sequential.description' },
-  { value: 'by_date', emoji: '📅', label: 'study:modes.by_date.label', desc: 'study:modes.by_date.description' },
+  { value: 'srs', emoji: '🧠', label: 'study:modes.srs.label', desc: 'study:modes.srs.description', detail: 'study:modes.srs.detail' },
+  { value: 'sequential_review', emoji: '🔄', label: 'study:modes.sequential_review.label', desc: 'study:modes.sequential_review.description', detail: 'study:modes.sequential_review.detail' },
+  { value: 'random', emoji: '🎲', label: 'study:modes.random.label', desc: 'study:modes.random.description', detail: 'study:modes.random.detail' },
+  { value: 'sequential', emoji: '➡️', label: 'study:modes.sequential.label', desc: 'study:modes.sequential.description', detail: 'study:modes.sequential.detail' },
+  { value: 'by_date', emoji: '📅', label: 'study:modes.by_date.label', desc: 'study:modes.by_date.description', detail: 'study:modes.by_date.detail' },
 ]
 
 // ─── Batch Size ─────────────────────────────────────────────

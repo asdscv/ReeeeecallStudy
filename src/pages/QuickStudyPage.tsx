@@ -291,7 +291,9 @@ export function QuickStudyPage() {
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  {t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
+                  {selectedMode === 'sequential_review'
+                    ? t('quickStudy.batchSizeDescReview', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })
+                    : t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
                 </p>
                 <button
                   onClick={handleStartStudy}
