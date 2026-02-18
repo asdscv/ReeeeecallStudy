@@ -8,6 +8,7 @@ import { ContentSkeleton } from '../components/content/ContentSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
 import { SEOHead } from '../components/content/SEOHead'
 import { buildCollectionPageJsonLd } from '../lib/content-seo'
+import { SEO } from '../lib/seo-config'
 
 export function ContentListPage() {
   const { t, i18n } = useTranslation('content')
@@ -28,9 +29,15 @@ export function ContentListPage() {
       <SEOHead
         title={t('seo.listTitle')}
         description={t('seo.listDescription')}
+        ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
-        canonicalUrl="https://reeeeecallstudy.com/content"
+        canonicalUrl={`${SEO.SITE_URL}/content`}
         jsonLd={buildCollectionPageJsonLd()}
+        hreflangAlternates={[
+          { lang: 'en', href: `${SEO.SITE_URL}/content?lang=en` },
+          { lang: 'ko', href: `${SEO.SITE_URL}/content?lang=ko` },
+          { lang: 'x-default', href: `${SEO.SITE_URL}/content` },
+        ]}
       />
       <ContentNav backTo="/landing" />
 

@@ -1,7 +1,6 @@
 import i18next from 'i18next'
 import type { ContentDetail } from '../types/content-blocks'
-
-const SITE_URL = 'https://reeeeecallstudy.com'
+import { SEO } from './seo-config'
 
 export function buildArticleJsonLd(article: ContentDetail) {
   return {
@@ -9,26 +8,53 @@ export function buildArticleJsonLd(article: ContentDetail) {
     '@type': 'Article',
     headline: article.meta_title || article.title,
     description: article.meta_description || article.subtitle || '',
-    image: article.og_image_url || article.thumbnail_url || `${SITE_URL}/favicon.png`,
+    image: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
     datePublished: article.published_at,
     dateModified: article.updated_at,
     author: {
       '@type': 'Organization',
-      name: article.author_name || 'ReeeCall',
+      name: article.author_name || SEO.AUTHOR_NAME,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'ReeeeecallStudy',
+      name: SEO.BRAND_NAME,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_URL}/favicon.png`,
+        url: SEO.DEFAULT_OG_IMAGE,
       },
     },
     inLanguage: article.locale,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SITE_URL}/content/${article.slug}`,
+      '@id': `${SEO.SITE_URL}/content/${article.slug}`,
     },
+  }
+}
+
+export function buildBreadcrumbJsonLd(article: ContentDetail) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: SEO.BRAND_NAME,
+        item: SEO.SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Learning Insights',
+        item: `${SEO.SITE_URL}/content`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: article.title,
+        item: `${SEO.SITE_URL}/content/${article.slug}`,
+      },
+    ],
   }
 }
 
@@ -38,7 +64,8 @@ export function buildCollectionPageJsonLd() {
     '@type': 'CollectionPage',
     name: i18next.t('content:seo.listTitle'),
     description: i18next.t('content:seo.listDescription'),
-    url: `${SITE_URL}/content`,
+    url: `${SEO.SITE_URL}/content`,
+    inLanguage: i18next.language || SEO.DEFAULT_LOCALE,
   }
 }
 
@@ -46,11 +73,12 @@ export function buildWebApplicationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'ReeeeecallStudy',
+    name: SEO.BRAND_NAME,
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
     description: i18next.t('landing:hero.description', { defaultValue: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm' }),
-    url: SITE_URL,
+    url: SEO.SITE_URL,
+    inLanguage: i18next.language || SEO.DEFAULT_LOCALE,
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -58,10 +86,10 @@ export function buildWebApplicationJsonLd() {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'ReeeeecallStudy',
+      name: SEO.BRAND_NAME,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_URL}/favicon.png`,
+        url: SEO.DEFAULT_OG_IMAGE,
       },
     },
   }
@@ -69,8 +97,8 @@ export function buildWebApplicationJsonLd() {
 
 export function buildHreflangAlternates(slug: string) {
   return [
-    { lang: 'en', href: `${SITE_URL}/content/${slug}?lang=en` },
-    { lang: 'ko', href: `${SITE_URL}/content/${slug}?lang=ko` },
-    { lang: 'x-default', href: `${SITE_URL}/content/${slug}` },
+    { lang: 'en', href: `${SEO.SITE_URL}/content/${slug}?lang=en` },
+    { lang: 'ko', href: `${SEO.SITE_URL}/content/${slug}?lang=ko` },
+    { lang: 'x-default', href: `${SEO.SITE_URL}/content/${slug}` },
   ]
 }

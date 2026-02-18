@@ -14,6 +14,8 @@ const ALLOWED_COLORS = [
 
 const HIGHLIGHT_VARIANTS = ['blue', 'green', 'amber']
 
+const BRAND_SUFFIX = ' | ReeeeecallStudy'
+
 // Strip markdown formatting (**bold**, *italic*) from plain text fields
 function stripMarkdown(str) {
   if (typeof str !== 'string') return str
@@ -144,6 +146,19 @@ export function validateArticle(article) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(article.slug)) errors.push('slug must be lowercase kebab-case')
   if (!article.meta_title || typeof article.meta_title !== 'string') errors.push('meta_title required')
   if (!article.meta_description || typeof article.meta_description !== 'string') errors.push('meta_description required')
+
+  // Enforce brand suffix on meta_title
+  if (article.meta_title && !article.meta_title.endsWith(BRAND_SUFFIX)) {
+    article.meta_title = article.meta_title + BRAND_SUFFIX
+  }
+  // Truncate meta_title to 60 chars
+  if (article.meta_title && article.meta_title.length > 60) {
+    article.meta_title = article.meta_title.slice(0, 60 - BRAND_SUFFIX.length) + BRAND_SUFFIX
+  }
+  // Truncate meta_description to 155 chars
+  if (article.meta_description && article.meta_description.length > 155) {
+    article.meta_description = article.meta_description.slice(0, 152) + '...'
+  }
   if (!Array.isArray(article.tags) || article.tags.length === 0) errors.push('tags array required')
   if (typeof article.reading_time_minutes !== 'number') errors.push('reading_time_minutes must be a number')
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ArrowRight, Brain, Layers, BarChart3, Share2, Globe, Smartphone, Zap, BookOpen, CheckCircle2 } from 'lucide-react'
 import { SEOHead } from '../components/content/SEOHead'
 import { buildWebApplicationJsonLd } from '../lib/content-seo'
+import { SEO } from '../lib/seo-config'
 import { useContentStore } from '../stores/content-store'
 
 const FEATURE_ICONS = [
@@ -68,10 +69,15 @@ export function LandingPage() {
       <SEOHead
         title={t('seo.title')}
         description={t('seo.description')}
-        ogImage="/favicon.png"
+        ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
-        canonicalUrl="https://reeeeecallstudy.com"
+        canonicalUrl={`${SEO.SITE_URL}/landing`}
         jsonLd={buildWebApplicationJsonLd()}
+        hreflangAlternates={[
+          { lang: 'en', href: `${SEO.SITE_URL}/landing?lang=en` },
+          { lang: 'ko', href: `${SEO.SITE_URL}/landing?lang=ko` },
+          { lang: 'x-default', href: `${SEO.SITE_URL}/landing` },
+        ]}
       />
       <LandingNav />
 

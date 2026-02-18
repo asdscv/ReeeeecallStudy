@@ -4,10 +4,15 @@ interface SEOHeadProps {
   title: string
   description: string
   ogImage?: string
+  ogImageWidth?: number
+  ogImageHeight?: number
   ogType?: 'article' | 'website'
   canonicalUrl?: string
-  jsonLd?: object
+  jsonLd?: object | object[]
   hreflangAlternates?: Array<{ lang: string; href: string }>
+  publishedTime?: string
+  modifiedTime?: string
+  articleSection?: string
 }
 
 export function SEOHead(props: SEOHeadProps) {

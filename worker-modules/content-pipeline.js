@@ -134,6 +134,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
   }
 
   // Build DB record
+  const SITE_URL = 'https://reeeeecallstudy.com'
   const record = {
     title: article.title,
     subtitle: article.subtitle || null,
@@ -145,7 +146,9 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     meta_description: article.meta_description,
     reading_time_minutes: article.reading_time_minutes || 5,
     thumbnail_url: thumbnailUrl || null,
-    author_name: 'ReeeCall',
+    og_image_url: thumbnailUrl || null,
+    canonical_url: `${SITE_URL}/content/${article.slug}`,
+    author_name: 'ReeeeecallStudy',
     is_published: true,
     published_at: new Date().toISOString(),
   }

@@ -2,8 +2,10 @@
 import { runContentPipeline } from './worker-modules/content-pipeline.js'
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
 const SITE_URL = 'https://reeeeecallstudy.com'
+const BRAND_NAME = 'ReeeeecallStudy'
+const TWITTER_HANDLE = '@reeeeecallstudy'
 
-const BOT_UA = /googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|linkedinbot|slurp|duckduckbot/i
+const BOT_UA = /googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|linkedinbot|slurp|duckduckbot|naverbot|yeti/i
 
 function getSupabaseRestUrl(env) {
   return env.SUPABASE_URL
@@ -74,45 +76,78 @@ async function handleContentBotRequest(url, env) {
 
     const blocks = article.content_blocks || []
     const textContent = extractTextFromBlocks(blocks)
-    const jsonLd = {
+    const ogImage = article.og_image_url || article.thumbnail_url || `${SITE_URL}/favicon.png`
+    const articleSection = (article.tags || [])[0] || 'Education'
+
+    const articleJsonLd = {
       '@context': 'https://schema.org',
       '@type': 'Article',
       headline: article.meta_title || article.title,
       description: article.meta_description || article.subtitle || '',
-      image: article.og_image_url || article.thumbnail_url || `${SITE_URL}/favicon.png`,
+      image: ogImage,
       datePublished: article.published_at,
       dateModified: article.updated_at,
-      author: { '@type': 'Organization', name: article.author_name || 'ReeeCall' },
+      author: { '@type': 'Organization', name: article.author_name || BRAND_NAME, url: SITE_URL },
       publisher: {
         '@type': 'Organization',
-        name: 'ReeeeecallStudy',
+        name: BRAND_NAME,
         logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.png` },
       },
       inLanguage: article.locale,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/content/${slug}` },
+    }
+
+    const breadcrumbJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: BRAND_NAME, item: SITE_URL },
+        { '@type': 'ListItem', position: 2, name: 'Learning Insights', item: `${SITE_URL}/content` },
+        { '@type': 'ListItem', position: 3, name: article.title, item: `${SITE_URL}/content/${slug}` },
+      ],
     }
 
     const html = `<!DOCTYPE html>
 <html lang="${escapeHtml(article.locale)}">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <title>${escapeHtml(article.meta_title || article.title)}</title>
 <meta name="description" content="${escapeHtml(article.meta_description || article.subtitle || '')}">
+<meta name="author" content="${escapeHtml(article.author_name || BRAND_NAME)}">
 <meta property="og:title" content="${escapeHtml(article.meta_title || article.title)}">
 <meta property="og:description" content="${escapeHtml(article.meta_description || article.subtitle || '')}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="${SITE_URL}/content/${escapeHtml(slug)}">
-${article.og_image_url ? `<meta property="og:image" content="${escapeHtml(article.og_image_url)}">` : ''}
+<meta property="og:image" content="${escapeHtml(ogImage)}">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:site_name" content="${BRAND_NAME}">
+<meta property="og:locale" content="${article.locale === 'ko' ? 'ko_KR' : 'en_US'}">
+<meta property="og:locale:alternate" content="${article.locale === 'ko' ? 'en_US' : 'ko_KR'}">
+${article.published_at ? `<meta property="article:published_time" content="${escapeHtml(article.published_at)}">` : ''}
+${article.updated_at ? `<meta property="article:modified_time" content="${escapeHtml(article.updated_at)}">` : ''}
+<meta property="article:section" content="${escapeHtml(articleSection)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="${TWITTER_HANDLE}">
+<meta name="twitter:title" content="${escapeHtml(article.meta_title || article.title)}">
+<meta name="twitter:description" content="${escapeHtml(article.meta_description || article.subtitle || '')}">
+<meta name="twitter:image" content="${escapeHtml(ogImage)}">
 <link rel="canonical" href="${SITE_URL}/content/${escapeHtml(slug)}">
 <link rel="alternate" hreflang="en" href="${SITE_URL}/content/${escapeHtml(slug)}?lang=en">
 <link rel="alternate" hreflang="ko" href="${SITE_URL}/content/${escapeHtml(slug)}?lang=ko">
 <link rel="alternate" hreflang="x-default" href="${SITE_URL}/content/${escapeHtml(slug)}">
-<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+<script type="application/ld+json">${JSON.stringify(articleJsonLd)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
 </head>
 <body>
 <article>
+<header>
 <h1>${escapeHtml(article.title)}</h1>
 ${article.subtitle ? `<p>${escapeHtml(article.subtitle)}</p>` : ''}
-<div>${escapeHtml(textContent)}</div>
+${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">${new Date(article.published_at).toISOString().split('T')[0]}</time>` : ''}
+</header>
+<section>${escapeHtml(textContent)}</section>
 </article>
 </body>
 </html>`
@@ -127,8 +162,10 @@ ${article.subtitle ? `<p>${escapeHtml(article.subtitle)}</p>` : ''}
   }
 
   // List page
+  const listLang = url.searchParams.get('lang') || 'en'
+
   const res = await fetch(
-    `${restUrl}/contents?is_published=eq.true&select=slug,title,subtitle,locale,published_at&order=published_at.desc&limit=50`,
+    `${restUrl}/contents?is_published=eq.true&locale=eq.${listLang}&select=slug,title,subtitle,locale,published_at&order=published_at.desc&limit=50`,
     {
       headers: {
         apikey: anonKey,
@@ -140,12 +177,19 @@ ${article.subtitle ? `<p>${escapeHtml(article.subtitle)}</p>` : ''}
   const data = await res.json()
   const articles = data || []
 
+  const isKo = listLang === 'ko'
+  const listTitle = isKo ? '학습 인사이트 | ReeeeecallStudy' : 'Learning Insights | ReeeeecallStudy'
+  const listDesc = isKo
+    ? '과학적으로 검증된 학습 전략과 간격 반복 학습법을 알아보세요.'
+    : 'Discover science-backed learning strategies and spaced repetition tips.'
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Learning Insights | ReeeCall',
-    description: 'Discover science-backed learning strategies and spaced repetition tips.',
+    name: listTitle,
+    description: listDesc,
     url: `${SITE_URL}/content`,
+    inLanguage: listLang,
   }
 
   const articlesHtml = articles
@@ -153,41 +197,67 @@ ${article.subtitle ? `<p>${escapeHtml(article.subtitle)}</p>` : ''}
     .join('\n')
 
   const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="${listLang}">
 <head>
 <meta charset="UTF-8">
-<title>Learning Insights | ReeeCall</title>
-<meta name="description" content="Discover science-backed learning strategies and spaced repetition tips.">
-<meta property="og:title" content="Learning Insights | ReeeCall">
-<meta property="og:description" content="Discover science-backed learning strategies and spaced repetition tips.">
+<meta name="robots" content="index, follow">
+<title>${listTitle}</title>
+<meta name="description" content="${escapeHtml(listDesc)}">
+<meta property="og:title" content="${listTitle}">
+<meta property="og:description" content="${escapeHtml(listDesc)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${SITE_URL}/content">
+<meta property="og:image" content="${SITE_URL}/favicon.png">
+<meta property="og:site_name" content="${BRAND_NAME}">
+<meta property="og:locale" content="${isKo ? 'ko_KR' : 'en_US'}">
+<meta property="og:locale:alternate" content="${isKo ? 'en_US' : 'ko_KR'}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="${TWITTER_HANDLE}">
+<meta name="twitter:title" content="${listTitle}">
+<meta name="twitter:description" content="${escapeHtml(listDesc)}">
 <link rel="canonical" href="${SITE_URL}/content">
+<link rel="alternate" hreflang="en" href="${SITE_URL}/content?lang=en">
+<link rel="alternate" hreflang="ko" href="${SITE_URL}/content?lang=ko">
+<link rel="alternate" hreflang="x-default" href="${SITE_URL}/content">
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
-<h1>Learning Insights</h1>
+<main>
+<h1>${isKo ? '학습 인사이트' : 'Learning Insights'}</h1>
 <ul>${articlesHtml}</ul>
+</main>
 </body>
 </html>`
 
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
+      'Content-Language': listLang,
       'Cache-Control': 'public, max-age=3600',
     },
   })
 }
 
-async function handleLandingBotRequest(env) {
+async function handleLandingBotRequest(url, env) {
+  const lang = url.searchParams.get('lang') || 'en'
+  const isKo = lang === 'ko'
+
+  const pageTitle = isKo
+    ? 'ReeeeecallStudy — 간격 반복 학습 기반 스마트 플래시카드'
+    : 'ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition'
+  const pageDesc = isKo
+    ? '과학적으로 검증된 간격 반복(SRS) 알고리즘으로 더 빠르고 오래 기억하세요.'
+    : 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer.'
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'ReeeeecallStudy',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
-    description: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm',
+    description: pageDesc,
     url: SITE_URL,
+    inLanguage: lang,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: {
       '@type': 'Organization',
@@ -197,27 +267,43 @@ async function handleLandingBotRequest(env) {
   }
 
   const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
 <meta charset="UTF-8">
-<title>ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition</title>
-<meta name="description" content="Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer.">
-<meta property="og:title" content="ReeeeecallStudy">
-<meta property="og:description" content="Smart flashcard learning platform with SRS">
+<meta name="robots" content="index, follow">
+<title>${escapeHtml(pageTitle)}</title>
+<meta name="description" content="${escapeHtml(pageDesc)}">
+<meta property="og:title" content="${BRAND_NAME}">
+<meta property="og:description" content="${escapeHtml(pageDesc)}">
 <meta property="og:image" content="${SITE_URL}/favicon.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
 <meta property="og:type" content="website">
-<link rel="canonical" href="${SITE_URL}">
+<meta property="og:site_name" content="${BRAND_NAME}">
+<meta property="og:locale" content="${isKo ? 'ko_KR' : 'en_US'}">
+<meta property="og:locale:alternate" content="${isKo ? 'en_US' : 'ko_KR'}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="${TWITTER_HANDLE}">
+<meta name="twitter:title" content="${BRAND_NAME}">
+<meta name="twitter:description" content="${escapeHtml(pageDesc)}">
+<link rel="canonical" href="${SITE_URL}/landing">
+<link rel="alternate" hreflang="en" href="${SITE_URL}/landing?lang=en">
+<link rel="alternate" hreflang="ko" href="${SITE_URL}/landing?lang=ko">
+<link rel="alternate" hreflang="x-default" href="${SITE_URL}/landing">
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
-<h1>ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition</h1>
-<p>Maximize your learning efficiency with scientifically proven spaced repetition (SRS). Remember faster and longer.</p>
+<main>
+<h1>${escapeHtml(pageTitle)}</h1>
+<p>${escapeHtml(pageDesc)}</p>
+</main>
 </body>
 </html>`
 
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
+      'Content-Language': lang,
       'Cache-Control': 'public, max-age=3600',
     },
   })
@@ -276,11 +362,17 @@ async function handleSitemap(env) {
     <loc>${SITE_URL}/landing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/landing?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="${SITE_URL}/landing?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/landing"/>
   </url>
   <url>
     <loc>${SITE_URL}/content</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/content?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="${SITE_URL}/content?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/content"/>
   </url>
   <url>
     <loc>${SITE_URL}/docs/api</loc>
@@ -317,7 +409,7 @@ export default {
         return handleContentBotRequest(url, env)
       }
       if (url.pathname === '/' || url.pathname === '/landing') {
-        return handleLandingBotRequest(env)
+        return handleLandingBotRequest(url, env)
       }
     }
 

@@ -1,0 +1,20 @@
+{
+  "name": "ReeeeecallStudy",
+  "short_name": "ReeeCall",
+  "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm",
+  "start_url": "/landing",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

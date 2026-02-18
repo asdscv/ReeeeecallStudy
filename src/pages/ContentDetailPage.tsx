@@ -6,7 +6,8 @@ import { BlockRenderer } from '../components/content/BlockRenderer'
 import { ContentDetailSkeleton } from '../components/content/ContentDetailSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
 import { SEOHead } from '../components/content/SEOHead'
-import { buildArticleJsonLd, buildHreflangAlternates } from '../lib/content-seo'
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates } from '../lib/content-seo'
+import { SEO } from '../lib/seo-config'
 
 export function ContentDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -52,11 +53,14 @@ export function ContentDetailPage() {
       <SEOHead
         title={currentArticle.meta_title || currentArticle.title}
         description={currentArticle.meta_description || currentArticle.subtitle || ''}
-        ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || undefined}
+        ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || SEO.DEFAULT_OG_IMAGE}
         ogType="article"
-        canonicalUrl={currentArticle.canonical_url || `https://reeeeecallstudy.com/content/${currentArticle.slug}`}
-        jsonLd={buildArticleJsonLd(currentArticle)}
+        canonicalUrl={currentArticle.canonical_url || `${SEO.SITE_URL}/content/${currentArticle.slug}`}
+        jsonLd={[buildArticleJsonLd(currentArticle), buildBreadcrumbJsonLd(currentArticle)]}
         hreflangAlternates={buildHreflangAlternates(currentArticle.slug)}
+        publishedTime={currentArticle.published_at}
+        modifiedTime={currentArticle.updated_at}
+        articleSection={currentArticle.tags?.[0]}
       />
       <ContentNav
         backTo="/content"

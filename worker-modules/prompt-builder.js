@@ -14,8 +14,8 @@ Return a **pure JSON object** (no markdown fences, no extra text) with this exac
   "slug": "lowercase-kebab-case-url-slug (always in English, 3-6 words)",
   "reading_time_minutes": 5,
   "tags": ["tag1", "tag2", "tag3"],
-  "meta_title": "SEO title (under 60 chars, includes primary keyword)",
-  "meta_description": "SEO description (under 155 chars, compelling)",
+  "meta_title": "SEO title (30-45 chars, brand suffix added automatically)",
+  "meta_description": "SEO description (70-155 chars, keyword-rich, compelling)",
   "content_blocks": [...]
 }
 
@@ -73,11 +73,18 @@ Each block has "type" and "props":
 - NEVER present made-up study results as facts
 - Only mention well-known, widely accepted concepts (e.g., "spaced repetition improves long-term retention")
 - Use general, qualitative descriptions instead of specific numbers (e.g., "research suggests significant improvement" instead of "studies show 85% improvement")
-- The CTA should naturally tie the article topic to ReeeeecallStudy's flashcard/SRS features`
+- The CTA should naturally tie the article topic to ReeeeecallStudy's flashcard/SRS features
+
+## SEO Guidelines
+
+- meta_title: 30-45 characters (a brand suffix " | ReeeeecallStudy" is appended automatically, do NOT include it). Place the primary keyword near the beginning.
+- meta_description: 70-155 characters. Include primary keyword in the first 70 chars. Write a compelling summary that encourages clicks.
+- tags: Use 3-5 tags relevant to the topic. Use lowercase, single-word or hyphenated tags.
+- slug: 3-6 words, lowercase kebab-case, always in English, include primary keyword.`
 
 const LOCALE_INSTRUCTIONS = {
   en: 'Write the entire article in English. The slug must be in English lowercase kebab-case.',
-  ko: 'Write the entire article in Korean (한국어). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Korean.',
+  ko: 'Write the entire article in Korean (한국어). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Korean. For SEO: use Korean keywords that Korean users would search on Naver and Google Korea. meta_title and meta_description must be in Korean.',
 }
 
 export function buildPrompt(topic, locale) {
