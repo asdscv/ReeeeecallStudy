@@ -26,48 +26,55 @@ export async function runContentPipeline(env, cron) {
     info('Fetched recent content', { count: recentContent.length })
 
     // 2. Extract recently used subtopic IDs from tags
-    const recentTags = recentContent
-      .flatMap((c) => c.tags || [])
-    const recentSubtopicIds = [...new Set(recentTags)].slice(0, 20)
+    const recentTags = recentContent.flatMap((c) => c.tags || [])
+    const usedSubtopicIds = [...new Set(recentTags)]
 
-    // 3. Select topic
-    const topic = selectTopic(recentSubtopicIds)
-    info('Topic selected', { category: topic.category, subtopic: topic.id })
+    const topicCount = PIPELINE_DEFAULTS.topicsPerRun
+    info('Generating topics', { count: topicCount })
 
-    // 4. Generate thumbnail image (shared across locales)
-    let thumbnailUrl = null
-    try {
-      const imagePrompt = buildImagePrompt(topic)
-      const tempImageUrl = await generateImage(env, imagePrompt)
-
-      // Download and upload to Supabase Storage for persistence
-      const imageRes = await fetch(tempImageUrl)
-      if (imageRes.ok) {
-        const imageBuffer = await imageRes.arrayBuffer()
-        const imagePath = `${topic.id}-${Date.now()}`
-        thumbnailUrl = await db.uploadImage(imagePath, imageBuffer, 'image/jpeg')
-      }
-    } catch (err) {
-      warn('Image generation failed, continuing without image', { error: err.message })
-    }
-
-    // 5. Generate content for each locale
-    let sharedSlug = null
-
-    for (const locale of LOCALES) {
+    for (let t = 0; t < topicCount; t++) {
       try {
-        const article = await generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl)
-        if (article && locale === 'en') {
-          sharedSlug = article.slug
+        // 3. Select topic (exclude already-picked ones this run)
+        const topic = selectTopic(usedSubtopicIds)
+        usedSubtopicIds.push(topic.id)
+        info('Topic selected', { index: t + 1, category: topic.category, subtopic: topic.id })
+
+        // 4. Generate thumbnail image (shared across locales)
+        let thumbnailUrl = null
+        try {
+          const imagePrompt = buildImagePrompt(topic)
+          const tempImageUrl = await generateImage(env, imagePrompt)
+
+          const imageRes = await fetch(tempImageUrl)
+          if (imageRes.ok) {
+            const imageBuffer = await imageRes.arrayBuffer()
+            const imagePath = `${topic.id}-${Date.now()}`
+            thumbnailUrl = await db.uploadImage(imagePath, imageBuffer, 'image/jpeg')
+          }
+        } catch (err) {
+          warn('Image generation failed, continuing without image', { error: err.message })
         }
-        info('Locale completed', { locale, slug: article?.slug })
+
+        // 5. Generate content for each locale
+        let sharedSlug = null
+
+        for (const locale of LOCALES) {
+          try {
+            const article = await generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl)
+            if (article && locale === 'en') {
+              sharedSlug = article.slug
+            }
+            info('Locale completed', { locale, slug: article?.slug })
+          } catch (err) {
+            error('Locale failed', { locale, error: err.message })
+          }
+        }
       } catch (err) {
-        error('Locale failed', { locale, error: err.message })
-        // Continue with next locale
+        error('Topic failed', { index: t + 1, error: err.message })
       }
     }
 
-    info('Pipeline completed')
+    info('Pipeline completed', { topicsRequested: topicCount })
   } catch (err) {
     error('Pipeline failed', { error: err.message, stack: err.stack })
   }
