@@ -1,0 +1,42 @@
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import { LandingPage } from '../LandingPage'
+
+vi.mock('../../stores/content-store', () => ({
+  useContentStore: () => ({
+    items: [],
+    listLoading: false,
+    fetchContents: vi.fn(),
+  }),
+}))
+
+function renderLanding() {
+  return render(
+    <MemoryRouter>
+      <LandingPage />
+    </MemoryRouter>,
+  )
+}
+
+describe('LandingNav', () => {
+  it('should render Insights link pointing to /content', () => {
+    renderLanding()
+    // t('nav.blog', 'Insights') returns 'Insights' in test (empty resources, defaultValue)
+    const links = screen.getAllByRole('link', { name: 'Insights' })
+    // nav + footer both have Insights link; nav is first
+    expect(links[0]).toHaveAttribute('href', '/content')
+  })
+
+  it('should render Login link pointing to /auth/login', () => {
+    renderLanding()
+    const link = screen.getByRole('link', { name: 'Log in' })
+    expect(link).toHaveAttribute('href', '/auth/login')
+  })
+
+  it('should render Get Started button pointing to /auth/login', () => {
+    renderLanding()
+    const link = screen.getByRole('link', { name: 'Get Started' })
+    expect(link).toHaveAttribute('href', '/auth/login')
+  })
+})

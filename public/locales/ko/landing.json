@@ -169,7 +169,8 @@
   },
   "nav": {
     "blog": "인사이트",
-    "login": "로그인"
+    "login": "로그인",
+    "start": "시작하기"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
 import { localizeAuthError } from '../../lib/auth-errors'
@@ -99,8 +99,10 @@ export function LoginPage() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           <div className="text-center mb-6 sm:mb-8">
-            <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
+            <Link to="/landing" className="inline-block no-underline">
+              <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
+              <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
+            </Link>
             <p className="text-gray-500 mt-3">{title}</p>
           </div>
 

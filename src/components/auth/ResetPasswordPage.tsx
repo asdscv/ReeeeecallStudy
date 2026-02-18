@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthStore } from '../../stores/auth-store'
@@ -56,7 +56,9 @@ export function ResetPasswordPage() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
+            <Link to="/landing" aria-label="landing">
+              <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
+            </Link>
             <h2 className="text-xl font-bold text-gray-900">{t('resetPassword.title')}</h2>
             <p className="text-gray-500 mt-2">{t('resetPassword.subtitle')}</p>
           </div>

@@ -35,6 +35,15 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
+// ─── Logo link ──────────────────────────────────────────────
+describe('Logo link', () => {
+  it('should have logo wrapped in a link to /landing', () => {
+    renderLogin()
+    const link = screen.getByRole('link', { name: /ReeeeecallStudy/i })
+    expect(link).toHaveAttribute('href', '/landing')
+  })
+})
+
 // ─── Login mode ─────────────────────────────────────────────
 describe('Login mode', () => {
   it('should render login form by default', () => {

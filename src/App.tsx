@@ -50,7 +50,10 @@ function App() {
     <BrowserRouter>
       <Toaster richColors position="top-right" />
       <Routes>
-        {/* Landing page for non-authenticated users */}
+        {/* Landing page (public) */}
+        <Route path="/landing" element={<LandingPage />} />
+
+        {/* Root: authenticated → dashboard, otherwise → redirect to landing */}
         <Route
           path="/"
           element={user ? (
@@ -58,7 +61,7 @@ function App() {
               <Layout />
             </ProtectedRoute>
           ) : (
-            <LandingPage />
+            <Navigate to="/landing" replace />
           )}
         >
           {user && <Route index element={<DashboardPage />} />}
@@ -115,7 +118,7 @@ function App() {
         </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to={user ? '/' : '/landing'} replace />} />
       </Routes>
     </BrowserRouter>
   )

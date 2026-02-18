@@ -23,7 +23,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
               {backLabel}
             </Link>
           )}
-          <Link to="/" className="flex items-center gap-2 no-underline">
+          <Link to="/landing" className="flex items-center gap-2 no-underline">
             <img src="/favicon.png" alt="" className="w-8 h-8" />
             <span className="font-bold text-gray-900 hidden sm:inline">ReeeeecallStudy</span>
           </Link>

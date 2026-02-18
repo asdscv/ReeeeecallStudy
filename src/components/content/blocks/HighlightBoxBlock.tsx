@@ -1,4 +1,5 @@
 import type { HighlightBoxBlock as HighlightBoxBlockType } from '../../../types/content-blocks'
+import { parseInlineMarkdown } from '../../../lib/content-blocks'
 
 const VARIANT_STYLES: Record<string, string> = {
   blue: 'bg-blue-600 text-white',
@@ -13,7 +14,7 @@ export function HighlightBoxBlock({ props }: { props: HighlightBoxBlockType['pro
   return (
     <div className={`rounded-2xl p-6 sm:p-8 my-8 ${style}`}>
       <h3 className="text-xl sm:text-2xl font-bold mb-2">{props.title}</h3>
-      <p className="opacity-90 leading-relaxed">{props.description}</p>
+      <p className="opacity-90 leading-relaxed">{parseInlineMarkdown(props.description)}</p>
     </div>
   )
 }

@@ -32,7 +32,7 @@ export function ContentListPage() {
         canonicalUrl="https://reeeeecallstudy.com/content"
         jsonLd={buildCollectionPageJsonLd()}
       />
-      <ContentNav backTo="/" />
+      <ContentNav backTo="/landing" />
 
       <main className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
         <div className="text-center mb-10 sm:mb-14 pb-12">

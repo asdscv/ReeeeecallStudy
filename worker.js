@@ -273,6 +273,11 @@ async function handleSitemap(env) {
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>${SITE_URL}/landing</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>${SITE_URL}/content</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -311,7 +316,7 @@ export default {
       if (url.pathname === '/content' || url.pathname.startsWith('/content/')) {
         return handleContentBotRequest(url, env)
       }
-      if (url.pathname === '/') {
+      if (url.pathname === '/' || url.pathname === '/landing') {
         return handleLandingBotRequest(env)
       }
     }

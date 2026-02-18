@@ -36,6 +36,15 @@ beforeEach(() => {
   mockSession = { user: { id: 'u1' }, access_token: 'tok' }
 })
 
+// ─── Logo link ──────────────────────────────────────────────
+describe('Logo link', () => {
+  it('should have favicon wrapped in a link to /landing', () => {
+    renderPage()
+    const link = screen.getByRole('link', { name: /landing/i })
+    expect(link).toHaveAttribute('href', '/landing')
+  })
+})
+
 // ─── Session guard ──────────────────────────────────────────
 describe('Session guard', () => {
   it('should redirect to /auth/login when session is null', () => {

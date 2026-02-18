@@ -14,6 +14,12 @@ const ALLOWED_COLORS = [
 
 const HIGHLIGHT_VARIANTS = ['blue', 'green', 'amber']
 
+// Strip markdown formatting (**bold**, *italic*) from plain text fields
+function stripMarkdown(str) {
+  if (typeof str !== 'string') return str
+  return str.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1')
+}
+
 const blockValidators = {
   hero(props) {
     if (!props.title || typeof props.title !== 'string') return 'hero: title required'
@@ -31,25 +37,14 @@ const blockValidators = {
     return null
   },
 
-  blockquote(props) {
-    if (!props.text || typeof props.text !== 'string') return 'blockquote: text required'
-    return null
-  },
-
-  statistics(props) {
-    if (!Array.isArray(props.items) || props.items.length === 0) return 'statistics: items array required'
-    for (const item of props.items) {
-      if (!item.value || !item.label) return 'statistics: each item needs value and label'
-    }
-    return null
-  },
-
   feature_cards(props) {
     if (!Array.isArray(props.items) || props.items.length === 0) return 'feature_cards: items array required'
     for (const item of props.items) {
       if (!item.icon || !item.title || !item.description) {
         return 'feature_cards: each item needs icon, title, description'
       }
+      item.title = stripMarkdown(item.title)
+      item.description = stripMarkdown(item.description)
       if (!ALLOWED_ICONS.includes(item.icon)) {
         item.icon = 'star' // fallback
       }
@@ -66,6 +61,8 @@ const blockValidators = {
       if (!item.heading || !item.description) {
         return 'numbered_list: each item needs heading and description'
       }
+      item.heading = stripMarkdown(item.heading)
+      item.description = stripMarkdown(item.description)
     }
     return null
   },
@@ -73,6 +70,8 @@ const blockValidators = {
   highlight_box(props) {
     if (!props.title || typeof props.title !== 'string') return 'highlight_box: title required'
     if (!props.description || typeof props.description !== 'string') return 'highlight_box: description required'
+    props.title = stripMarkdown(props.title)
+    props.description = stripMarkdown(props.description)
     if (props.variant && !HIGHLIGHT_VARIANTS.includes(props.variant)) {
       props.variant = 'blue' // fallback
     }
@@ -119,8 +118,8 @@ export function validateContentBlocks(blocks) {
       continue
     }
 
-    if (block.type === 'image') {
-      errors.push(`block[${i}]: image type not allowed`)
+    if (['image', 'blockquote', 'statistics'].includes(block.type)) {
+      errors.push(`block[${i}]: ${block.type} type not allowed`)
       continue
     }
 
