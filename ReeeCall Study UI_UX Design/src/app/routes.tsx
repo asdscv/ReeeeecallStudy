@@ -1,4 +1,7 @@
 import { createBrowserRouter } from 'react-router';
+import { Landing } from './pages/Landing';
+import { Content } from './pages/Content';
+import { ContentDetail } from './pages/ContentDetail';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { DeckList } from './pages/DeckList';
@@ -11,6 +14,18 @@ import { Layout } from './components/Layout';
 import { AuthGuard } from './components/AuthGuard';
 
 export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Landing />,
+  },
+  {
+    path: '/content',
+    element: <Content />,
+  },
+  {
+    path: '/content/:id',
+    element: <ContentDetail />,
+  },
   {
     path: '/auth/login',
     element: <Login />,
@@ -31,7 +46,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        path: '/',
+        path: '/dashboard',
         element: <Dashboard />,
       },
       {

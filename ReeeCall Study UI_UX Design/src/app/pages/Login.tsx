@@ -13,7 +13,7 @@ export function Login() {
   useEffect(() => {
     const user = getCurrentUser();
     if (user) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [navigate]);
 
@@ -28,7 +28,7 @@ export function Login() {
     try {
       setCurrentUser(name.trim());
       toast.success('로그인되었습니다!');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       toast.error('로그인에 실패했습니다.');

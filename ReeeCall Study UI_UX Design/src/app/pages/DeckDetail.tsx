@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Plus, Play, FileDown, FileUp, Search, Settings2, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Play, FileDown, FileUp, Search, Settings2, Edit2, Trash2, X, Filter, Tag } from 'lucide-react';
 import { getDeck, getCards, createCard as createCardStorage, deleteDeck, updateDeck, getTemplates, getTemplate, deleteCard, updateCard } from '../lib/storage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { StudyModeModal } from '../components/StudyModeModal';
+import { DeckStats } from '../components/DeckStats';
 import { toast } from 'sonner';
 
 interface Field {
@@ -58,12 +59,29 @@ export function DeckDetail() {
   const [currentPage, setCurrentPage] = useState(1);
   const [cardsPerPage, setCardsPerPage] = useState(20);
   const [editingCard, setEditingCard] = useState<Card | null>(null);
+  
+  // Search and Filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<Card['status'] | 'all'>('all');
+  const [tagFilter, setTagFilter] = useState<string>('');
+  const [allTags, setAllTags] = useState<string[]>([]);
 
   useEffect(() => {
     fetchDeck();
     fetchCards();
     loadVoices();
   }, [id]);
+
+  useEffect(() => {
+    // Extract all unique tags from cards
+    const tags = new Set<string>();
+    cards.forEach(card => {
+      if (card.tags) {
+        card.tags.forEach(tag => tags.add(tag));
+      }
+    });
+    setAllTags(Array.from(tags).sort());
+  }, [cards]);
 
   function loadVoices() {
     const voices = speechSynthesis.getVoices();
@@ -137,6 +155,30 @@ export function DeckDetail() {
     if (!c.nextReview) return true;
     return new Date(c.nextReview) <= new Date();
   }).length;
+
+  // Apply search and filters
+  const filteredCards = cards.filter(card => {
+    // Search filter - search in all field values
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = Object.values(card.fields).some(value =>
+        value.toLowerCase().includes(query)
+      );
+      if (!matchesSearch) return false;
+    }
+
+    // Status filter
+    if (statusFilter !== 'all' && card.status !== statusFilter) {
+      return false;
+    }
+
+    // Tag filter
+    if (tagFilter && (!card.tags || !card.tags.includes(tagFilter))) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="space-y-6">
@@ -232,6 +274,129 @@ export function DeckDetail() {
             </div>
           ) : (
             <>
+              {/* Search and Filter Bar */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex flex-col md:flex-row gap-3">
+                  {/* Search Input */}
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      placeholder="카드 내용 검색..."
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Status Filter */}
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-gray-500" />
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => {
+                        setStatusFilter(e.target.value as Card['status'] | 'all');
+                        setCurrentPage(1);
+                      }}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    >
+                      <option value="all">모든 상태</option>
+                      <option value="new">새 카드</option>
+                      <option value="learning">학습중</option>
+                      <option value="review">복습</option>
+                      <option value="suspended">보류</option>
+                    </select>
+                  </div>
+
+                  {/* Tag Filter */}
+                  {allTags.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-gray-500" />
+                      <select
+                        value={tagFilter}
+                        onChange={(e) => {
+                          setTagFilter(e.target.value);
+                          setCurrentPage(1);
+                        }}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                      >
+                        <option value="">모든 태그</option>
+                        {allTags.map(tag => (
+                          <option key={tag} value={tag}>{tag}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Clear Filters Button */}
+                  {(searchQuery || statusFilter !== 'all' || tagFilter) && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setStatusFilter('all');
+                        setTagFilter('');
+                        setCurrentPage(1);
+                      }}
+                      className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap"
+                    >
+                      필터 초기화
+                    </button>
+                  )}
+                </div>
+
+                {/* Active Filters Display */}
+                {(searchQuery || statusFilter !== 'all' || tagFilter) && (
+                  <div className="mt-3 flex items-center gap-2 flex-wrap">
+                    <span className="text-xs text-gray-500">활성 필터:</span>
+                    {searchQuery && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
+                        검색: "{searchQuery}"
+                        <button onClick={() => setSearchQuery('')} className="hover:text-blue-900">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
+                    {statusFilter !== 'all' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
+                        상태: {statusFilter === 'new' ? '새 카드' : statusFilter === 'learning' ? '학습중' : statusFilter === 'review' ? '복습' : '보류'}
+                        <button onClick={() => setStatusFilter('all')} className="hover:text-blue-900">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
+                    {tagFilter && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
+                        태그: {tagFilter}
+                        <button onClick={() => setTagFilter('')} className="hover:text-blue-900">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-500">
+                      ({filteredCards.length}장 결과)
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {filteredCards.length === 0 ? (
+                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+                  <p className="text-gray-500 mb-2">검색 결과가 없습니다.</p>
+                  <p className="text-sm text-gray-400">필터를 조정하거나 초기화해보세요.</p>
+                </div>
+              ) : (
+                <>
               {/* Pagination Controls */}
               <div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center gap-2">
@@ -252,8 +417,8 @@ export function DeckDetail() {
                   </select>
                 </div>
                 <div className="text-sm text-gray-600">
-                  전체 {cards.length}장 중 {((currentPage - 1) * cardsPerPage) + 1}-
-                  {Math.min(currentPage * cardsPerPage, cards.length)}장 표시
+                  전체 {filteredCards.length}장 중 {((currentPage - 1) * cardsPerPage) + 1}-
+                  {Math.min(currentPage * cardsPerPage, filteredCards.length)}장 표시
                 </div>
               </div>
 
@@ -281,7 +446,7 @@ export function DeckDetail() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {cards
+                    {filteredCards
                       .slice((currentPage - 1) * cardsPerPage, currentPage * cardsPerPage)
                       .map((card) => (
                         <tr key={card.id} className="hover:bg-gray-50">
@@ -344,10 +509,10 @@ export function DeckDetail() {
                   이전
                 </button>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.ceil(cards.length / cardsPerPage) }, (_, i) => i + 1)
+                  {Array.from({ length: Math.ceil(filteredCards.length / cardsPerPage) }, (_, i) => i + 1)
                     .filter(page => {
                       // Show: first, last, current, and 2 pages around current
-                      const totalPages = Math.ceil(cards.length / cardsPerPage);
+                      const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
                       return (
                         page === 1 ||
                         page === totalPages ||
@@ -377,21 +542,21 @@ export function DeckDetail() {
                     })}
                 </div>
                 <button
-                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(cards.length / cardsPerPage), p + 1))}
-                  disabled={currentPage === Math.ceil(cards.length / cardsPerPage)}
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredCards.length / cardsPerPage), p + 1))}
+                  disabled={currentPage === Math.ceil(filteredCards.length / cardsPerPage)}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   다음
                 </button>
               </div>
+                </>
+              )}
             </>
           )}
         </TabsContent>
 
         <TabsContent value="stats">
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <p className="text-gray-500">통계 기능 준비 중입니다.</p>
-          </div>
+          <DeckStats deckId={id!} />
         </TabsContent>
       </Tabs>
 

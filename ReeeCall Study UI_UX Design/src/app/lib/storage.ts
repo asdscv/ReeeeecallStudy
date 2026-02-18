@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   CARDS: 'reeecall_cards',
   TEMPLATES: 'reeecall_templates',
   SESSIONS: 'reeecall_sessions',
+  API_KEYS: 'reeecall_api_keys',
 };
 
 // User management
@@ -310,4 +311,62 @@ export function getStats() {
     streak: 0, // TODO: Calculate streak
     heatmap: heatmapData,
   };
+}
+
+// API Key management
+export function getApiKeys() {
+  const keys = localStorage.getItem(STORAGE_KEYS.API_KEYS);
+  return keys ? JSON.parse(keys) : [];
+}
+
+export function createApiKey(name: string, expiresInDays: number) {
+  const keys = getApiKeys();
+  
+  // Generate random API key (format: rc_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)
+  const randomPart = Array.from(crypto.getRandomValues(new Uint8Array(24)))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+  const apiKey = `rc_${randomPart}`;
+  
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + expiresInDays * 24 * 60 * 60 * 1000);
+  
+  const newKey = {
+    id: crypto.randomUUID(),
+    name,
+    key: apiKey,
+    createdAt: now.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+    lastUsedAt: null,
+  };
+  
+  keys.push(newKey);
+  localStorage.setItem(STORAGE_KEYS.API_KEYS, JSON.stringify(keys));
+  return newKey;
+}
+
+export function deleteApiKey(id: string) {
+  const keys = getApiKeys();
+  const filtered = keys.filter((k: any) => k.id !== id);
+  localStorage.setItem(STORAGE_KEYS.API_KEYS, JSON.stringify(filtered));
+}
+
+export function validateApiKey(apiKey: string) {
+  const keys = getApiKeys();
+  const key = keys.find((k: any) => k.key === apiKey);
+  
+  if (!key) return false;
+  
+  // Check if expired
+  const now = new Date();
+  const expiresAt = new Date(key.expiresAt);
+  if (expiresAt < now) return false;
+  
+  // Update last used
+  const updatedKeys = keys.map((k: any) => 
+    k.id === key.id ? { ...k, lastUsedAt: now.toISOString() } : k
+  );
+  localStorage.setItem(STORAGE_KEYS.API_KEYS, JSON.stringify(updatedKeys));
+  
+  return true;
 }
