@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /content
+Allow: /content/*
+Allow: /docs/api
+Disallow: /auth/
+Disallow: /decks/
+Disallow: /settings
+Disallow: /history
+Disallow: /quick-study
+Disallow: /marketplace
+Disallow: /my-shares
+Disallow: /templates
+Disallow: /api/
+
+Sitemap: https://reeeeecallstudy.com/sitemap.xml

@@ -1,0 +1,23 @@
+{
+  "list": {
+    "title": "Learning Insights",
+    "subtitle": "Tips and inspiration for better learning",
+    "noArticles": "No articles published yet. Check back soon!",
+    "readingTime": "{{minutes}} min read",
+    "reachedEnd": "You've seen all articles",
+    "loadingMore": "Loading more articles..."
+  },
+  "detail": {
+    "backToList": "Back to Insights",
+    "readingTime": "{{minutes}} min"
+  },
+  "cta": {
+    "title": "Start with ReeeCall",
+    "description": "Experience efficient learning right now",
+    "button": "Get Started Free"
+  },
+  "seo": {
+    "listTitle": "Learning Insights | ReeeCall",
+    "listDescription": "Discover science-backed learning strategies and spaced repetition tips."
+  }
+}

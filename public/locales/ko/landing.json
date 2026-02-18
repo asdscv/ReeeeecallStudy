@@ -167,6 +167,9 @@
     "subtitle": "무료로 시작하세요. 이메일과 비밀번호로 간편하게 가입합니다.",
     "button": "시작하기"
   },
+  "nav": {
+    "blog": "인사이트"
+  },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API 문서"

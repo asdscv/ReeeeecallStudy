@@ -27,6 +27,8 @@ import { MySharesPage } from './pages/MySharesPage'
 import { GuidePage } from './pages/GuidePage'
 import { ApiDocsPage } from './pages/ApiDocsPage'
 import { PublicApiDocsPage } from './pages/PublicApiDocsPage'
+import { ContentListPage } from './pages/ContentListPage'
+import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
 
 function App() {
@@ -69,8 +71,10 @@ function App() {
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {/* Public API docs (no auth required) */}
+        {/* Public routes (no auth required) */}
         <Route path="/docs/api" element={<PublicApiDocsPage />} />
+        <Route path="/content" element={<ContentListPage />} />
+        <Route path="/content/:slug" element={<ContentDetailPage />} />
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* Study session (outside Layout for fullscreen focus) */}

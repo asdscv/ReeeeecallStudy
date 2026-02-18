@@ -1,6 +1,8 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Brain, Layers, BarChart3, Share2, Globe, Smartphone, Zap, BookOpen, CheckCircle2 } from 'lucide-react'
+import { SEOHead } from '../components/content/SEOHead'
+import { buildWebApplicationJsonLd } from '../lib/content-seo'
 
 const FEATURE_ICONS = [
   { icon: Brain, color: 'bg-blue-100 text-blue-600', key: 'srs' },
@@ -12,14 +14,21 @@ const FEATURE_ICONS = [
 ]
 
 function LandingNav() {
+  const { t } = useTranslation('landing')
+
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
-      <div className="max-w-6xl mx-auto px-4 flex items-center justify-center py-4">
+      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between py-4">
         <div className="flex items-center gap-3.5">
           <img src="/favicon.png" alt="" className="w-14 h-14 sm:w-16 sm:h-16" />
           <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-14 sm:h-16 hidden sm:block" />
           <span className="font-extrabold text-gray-900 sm:hidden text-3xl tracking-tight">ReeeeecallStudy</span>
         </div>
+        <nav className="flex items-center gap-4">
+          <Link to="/content" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
+            {t('nav.blog', 'Insights')}
+          </Link>
+        </nav>
       </div>
     </header>
   )
@@ -40,6 +49,14 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        title="ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition"
+        description="Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
+        ogImage="/favicon.png"
+        ogType="website"
+        canonicalUrl="https://reeeeecallstudy.com"
+        jsonLd={buildWebApplicationJsonLd()}
+      />
       <LandingNav />
 
       {/* ─── Hero ────────────────────────────── */}
@@ -210,6 +227,7 @@ export function LandingPage() {
               <span className="font-bold text-gray-900">ReeeeecallStudy</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-gray-500">
+              <Link to="/content" className="hover:text-gray-700 transition no-underline">{t('nav.blog', 'Insights')}</Link>
               <Link to="/docs/api" className="hover:text-gray-700 transition no-underline">{t('footer.apiDocs')}</Link>
             </div>
             <p className="text-sm text-gray-400">

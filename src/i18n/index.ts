@@ -28,6 +28,7 @@ i18n
       'guide',
       'api-docs',
       'landing',
+      'content',
     ],
     defaultNS: 'common',
 

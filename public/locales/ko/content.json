@@ -1,0 +1,23 @@
+{
+  "list": {
+    "title": "학습 인사이트",
+    "subtitle": "더 나은 학습을 위한 팁과 영감",
+    "noArticles": "아직 게시된 글이 없습니다. 곧 업데이트됩니다!",
+    "readingTime": "{{minutes}}분 읽기",
+    "reachedEnd": "모든 글을 확인했습니다",
+    "loadingMore": "더 많은 글 불러오는 중..."
+  },
+  "detail": {
+    "backToList": "인사이트 목록으로",
+    "readingTime": "{{minutes}}분"
+  },
+  "cta": {
+    "title": "ReeeCall로 시작하기",
+    "description": "지금 바로 효율적인 학습을 경험하세요",
+    "button": "무료로 시작하기"
+  },
+  "seo": {
+    "listTitle": "학습 인사이트 | ReeeCall",
+    "listDescription": "과학적으로 검증된 학습 전략과 간격 반복 팁을 알아보세요."
+  }
+}

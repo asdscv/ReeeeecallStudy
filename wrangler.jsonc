@@ -5,5 +5,11 @@
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
+  },
+  // Set these via: wrangler secret put SUPABASE_URL / SUPABASE_ANON_KEY
+  // Or in Cloudflare dashboard > Pages > Settings > Environment variables
+  "vars": {
+    "SUPABASE_URL": "https://ixdapelfikaneexnskfm.supabase.co",
+    "SUPABASE_ANON_KEY": ""
   }
 }

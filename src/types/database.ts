@@ -14,6 +14,7 @@ export interface Database {
           tts_enabled: boolean
           tts_lang: string
           tts_provider: 'web_speech' | 'edge_tts'
+          locale: string
           created_at: string
           updated_at: string
         }
@@ -27,6 +28,7 @@ export interface Database {
           tts_enabled?: boolean
           tts_lang?: string
           tts_provider?: 'web_speech' | 'edge_tts'
+          locale?: string
         }
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
@@ -289,6 +291,27 @@ export type MarketplaceListing = {
   card_count: number
   acquire_count: number
   is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type Content = {
+  id: string
+  slug: string
+  locale: string
+  title: string
+  subtitle: string | null
+  thumbnail_url: string | null
+  content_blocks: unknown[]
+  reading_time_minutes: number
+  tags: string[]
+  meta_title: string | null
+  meta_description: string | null
+  og_image_url: string | null
+  canonical_url: string | null
+  author_name: string
+  is_published: boolean
+  published_at: string | null
   created_at: string
   updated_at: string
 }

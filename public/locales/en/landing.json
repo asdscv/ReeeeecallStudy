@@ -167,6 +167,9 @@
     "subtitle": "Start free. Sign up easily with email and password.",
     "button": "Get Started"
   },
+  "nav": {
+    "blog": "Insights"
+  },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API Docs"
