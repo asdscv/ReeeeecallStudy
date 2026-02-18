@@ -76,6 +76,8 @@ export function StudyCard({
   // Pointer-based swipe handlers (works on both mouse and touch)
   function handlePointerDown(e: React.PointerEvent) {
     if (!swipeEnabled || !isFlipped) return
+    // Don't capture pointer if the event originated from an interactive element (e.g. TTS button)
+    if ((e.target as HTMLElement).closest('button')) return
     const el = e.currentTarget as HTMLElement
     el.setPointerCapture(e.pointerId)
     setPointerOrigin({ x: e.clientX, y: e.clientY })
@@ -145,7 +147,11 @@ export function StudyCard({
                 userSelect: pointerOrigin ? 'none' : 'auto',
               }}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative overflow-hidden"
-              onClick={onFlip}
+              onClick={(e) => {
+                // Don't flip if clicking on an interactive element (e.g. TTS button)
+                if ((e.target as HTMLElement).closest('button')) return
+                onFlip()
+              }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -309,10 +315,11 @@ function CardFaceLayout({
                     e.stopPropagation()
                     speak(ttsInfo.text, ttsInfo.lang)
                   }}
-                  className="p-1 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="p-2.5 -m-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0"
                   title={t('card.ttsPlay')}
                 >
-                  <Volume2 className="w-4 h-4" />
+                  <Volume2 className="w-5 h-5" />
                 </button>
               )}
               <LayoutItemRenderer
