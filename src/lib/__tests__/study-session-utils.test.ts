@@ -146,6 +146,7 @@ describe('computeSequentialReviewPositions', () => {
     const result = computeSequentialReviewPositions(queue, state)
 
     expect(result.new_start_pos).toBe(10)
-    expect(result.review_start_pos).toBe(10)
+    // review_start_pos advances past the last studied review card (pos 7 + 1 = 8)
+    expect(result.review_start_pos).toBe(8)
   })
 })

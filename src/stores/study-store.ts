@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { calculateSRS, type SrsRating } from '../lib/srs'
-import { computeSequentialReviewPositions } from '../lib/study-session-utils'
+import { buildSequentialReviewQueue, computeSequentialReviewPositions } from '../lib/study-session-utils'
+import { SrsQueueManager, type QueueCard } from '../lib/study-queue'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
@@ -36,6 +37,8 @@ interface StudyState {
   sessionStats: SessionStats
   studyState: DeckStudyState | null
   srsSource: SrsSource
+  srsQueueManager: SrsQueueManager | null
+  maxCardPosition: number
 
   initSession: (config: StudyConfig) => Promise<void>
   flipCard: () => void
@@ -64,6 +67,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   sessionStats: { ...initialStats },
   studyState: null,
   srsSource: 'embedded',
+  srsQueueManager: null,
+  maxCardPosition: 0,
 
   initSession: async (config: StudyConfig) => {
     const check = guard.check('study_session_start', 'study_sessions_daily')
@@ -126,8 +131,19 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     const typedStudyState = studyState as DeckStudyState | null
 
+    // Get max card position for wrap-around calculations
+    const { data: maxPosData } = await supabase
+      .from('cards')
+      .select('sort_position')
+      .eq('deck_id', config.deckId)
+      .order('sort_position', { ascending: false })
+      .limit(1)
+      .single()
+    const maxCardPosition = (maxPosData as { sort_position: number } | null)?.sort_position ?? 0
+
     // Build card queue based on mode
     let cards: Card[] = []
+    let srsQueueManager: SrsQueueManager | null = null
     const now = new Date().toISOString()
 
     switch (config.mode) {
@@ -143,8 +159,21 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           newCardLimit = (profile as { daily_new_limit: number }).daily_new_limit
         }
 
+        // Count new cards already studied today (across all sessions)
+        const todayStart = new Date()
+        todayStart.setHours(0, 0, 0, 0)
+        const { count: todayNewCount } = await supabase
+          .from('study_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('deck_id', config.deckId)
+          .eq('user_id', user.id)
+          .eq('study_mode', 'srs')
+          .gte('studied_at', todayStart.toISOString())
+
+        // Remaining new cards for today
+        const remainingNewToday = Math.max(0, newCardLimit - (todayNewCount ?? 0))
+
         if (srsSource === 'progress_table') {
-          // Subscribe deck: fetch cards + join with user_card_progress
           const { data: allCards } = await supabase
             .from('cards')
             .select('*')
@@ -173,12 +202,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           const review = mergedCards.filter(
             (c) => c.srs_status === 'review' && c.next_review_at && c.next_review_at <= now
           )
-          const newC = mergedCards.filter((c) => c.srs_status === 'new').slice(0, newCardLimit)
+          const newC = mergedCards.filter((c) => c.srs_status === 'new').slice(0, remainingNewToday)
 
           cards = [...learning, ...review, ...newC]
         } else {
           // Embedded: original path
-          // learning cards due now
           const { data: learning } = await supabase
             .from('cards')
             .select('*')
@@ -187,7 +215,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             .lte('next_review_at', now)
             .order('next_review_at', { ascending: true })
 
-          // review cards due now
           const { data: review } = await supabase
             .from('cards')
             .select('*')
@@ -196,14 +223,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             .lte('next_review_at', now)
             .order('next_review_at', { ascending: true })
 
-          // new cards — limited by user's daily_new_limit setting
           const { data: newCards } = await supabase
             .from('cards')
             .select('*')
             .eq('deck_id', config.deckId)
             .eq('srs_status', 'new')
             .order('sort_position', { ascending: true })
-            .limit(newCardLimit)
+            .limit(remainingNewToday)
 
           cards = [
             ...((learning ?? []) as Card[]),
@@ -211,36 +237,46 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             ...((newCards ?? []) as Card[]),
           ]
         }
+
+        // Create SRS queue manager for intra-session requeue
+        if (cards.length > 0) {
+          const queueCards: QueueCard[] = cards.map(c => ({
+            id: c.id,
+            srs_status: c.srs_status,
+            ease_factor: c.ease_factor,
+            interval_days: c.interval_days,
+            repetitions: c.repetitions,
+          }))
+          srsQueueManager = new SrsQueueManager(queueCards, srsSettings ?? undefined)
+        }
         break
       }
 
       case 'sequential_review': {
         if (!typedStudyState) break
-        // new cards from new_start_pos
-        const { data: newCards } = await supabase
+
+        // Fetch all cards for this deck
+        const { data: allDeckCards } = await supabase
           .from('cards')
           .select('*')
           .eq('deck_id', config.deckId)
-          .gte('sort_position', typedStudyState.new_start_pos)
-          .eq('srs_status', 'new')
           .order('sort_position', { ascending: true })
-          .limit(typedStudyState.new_batch_size)
 
-        // review cards in [review_start_pos, new_start_pos)
-        const { data: reviewCards } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .gte('sort_position', typedStudyState.review_start_pos)
-          .lt('sort_position', typedStudyState.new_start_pos)
-          .neq('srs_status', 'suspended')
-          .order('sort_position', { ascending: true })
-          .limit(typedStudyState.review_batch_size)
+        const allCards = (allDeckCards ?? []) as Card[]
 
-        cards = [
-          ...((newCards ?? []) as Card[]),
-          ...((reviewCards ?? []) as Card[]),
-        ]
+        const { newCards, reviewCards } = buildSequentialReviewQueue(
+          allCards.map(c => ({ id: c.id, sort_position: c.sort_position, srs_status: c.srs_status })),
+          typedStudyState,
+          typedStudyState.new_batch_size,
+          typedStudyState.review_batch_size,
+        )
+
+        // Map back to full Card objects
+        const cardMap = new Map(allCards.map(c => [c.id, c]))
+        const newCardsFull = newCards.map(c => cardMap.get(c.id)!).filter(Boolean)
+        const reviewCardsFull = reviewCards.map(c => cardMap.get(c.id)!).filter(Boolean)
+
+        cards = [...newCardsFull, ...reviewCardsFull]
         break
       }
 
@@ -266,6 +302,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
       case 'sequential': {
         if (!typedStudyState) break
+
+        // Try from current position
         const { data: seqCards } = await supabase
           .from('cards')
           .select('*')
@@ -276,6 +314,19 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           .limit(config.batchSize)
 
         cards = (seqCards ?? []) as Card[]
+
+        // Wrap around if no cards found
+        if (cards.length === 0) {
+          const { data: wrapCards } = await supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .neq('srs_status', 'suspended')
+            .order('sort_position', { ascending: true })
+            .limit(config.batchSize)
+
+          cards = (wrapCards ?? []) as Card[]
+        }
         break
       }
 
@@ -307,6 +358,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         srsSource,
         queue: [],
         studyState: typedStudyState,
+        srsQueueManager: null,
+        maxCardPosition,
         sessionStats: { ...initialStats, totalCards: 0 },
       })
       return
@@ -320,6 +373,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       srsSource,
       queue: cards,
       studyState: typedStudyState,
+      srsQueueManager,
+      maxCardPosition,
       currentIndex: 0,
       isFlipped: false,
       cardStartTime: Date.now(),
@@ -333,10 +388,18 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager } = get()
     if (!config) return
 
-    const card = queue[currentIndex]
+    // Determine current card based on mode
+    const isSrsMode = config.mode === 'srs' && srsQueueManager
+    const card = isSrsMode
+      ? (() => {
+          const qc = srsQueueManager!.currentCard()
+          return qc ? queue.find(c => c.id === qc.id) ?? queue[currentIndex] : queue[currentIndex]
+        })()
+      : queue[currentIndex]
+
     if (!card) return
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -345,6 +408,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     const durationMs = Date.now() - cardStartTime
     let newInterval = card.interval_days
     let newEase = card.ease_factor
+    let updatedQueue = queue
 
     // SRS mode: update card SRS fields
     if (config.mode === 'srs') {
@@ -353,7 +417,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       newEase = srsResult.ease_factor
 
       if (srsSource === 'progress_table') {
-        // Subscribe deck: write to user_card_progress
         await supabase
           .from('user_card_progress')
           .upsert({
@@ -369,7 +432,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             updated_at: new Date().toISOString(),
           } as Record<string, unknown>, { onConflict: 'user_id,card_id' })
       } else {
-        // Embedded: write to cards table
         await supabase
           .from('cards')
           .update({
@@ -381,6 +443,26 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             last_reviewed_at: new Date().toISOString(),
           } as Record<string, unknown>)
           .eq('id', card.id)
+      }
+
+      // Update card data in queue so requeued cards show correct SRS state
+      const queueIndex = queue.findIndex(c => c.id === card.id)
+      if (queueIndex >= 0) {
+        updatedQueue = [...queue]
+        updatedQueue[queueIndex] = {
+          ...updatedQueue[queueIndex],
+          ease_factor: srsResult.ease_factor,
+          interval_days: srsResult.interval_days,
+          repetitions: srsResult.repetitions,
+          srs_status: srsResult.srs_status as Card['srs_status'],
+          next_review_at: srsResult.next_review_at,
+          last_reviewed_at: new Date().toISOString(),
+        }
+      }
+
+      // Advance the SRS queue manager (handles requeue for 'again')
+      if (srsQueueManager) {
+        srsQueueManager.rateCard(rating as SrsRating)
       }
     }
 
@@ -404,11 +486,14 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     const updatedRatings = { ...sessionStats.ratings }
     updatedRatings[rating] = (updatedRatings[rating] || 0) + 1
 
-    const nextIndex = currentIndex + 1
-    const isComplete = nextIndex >= queue.length
+    // Determine if session is complete
+    const isComplete = isSrsMode
+      ? srsQueueManager!.isComplete()
+      : currentIndex + 1 >= queue.length
 
     if (isComplete) {
       set({
+        queue: updatedQueue,
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
@@ -417,25 +502,46 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         },
         phase: 'completed',
       })
-      // Run endSession logic
       await get().endSession()
     } else {
-      set({
-        currentIndex: nextIndex,
-        isFlipped: false,
-        cardStartTime: Date.now(),
-        sessionStats: {
-          ...sessionStats,
-          cardsStudied: sessionStats.cardsStudied + 1,
-          ratings: updatedRatings,
-          totalDurationMs: sessionStats.totalDurationMs + durationMs,
-        },
-      })
+      // For SRS mode, get the next card from queue manager
+      if (isSrsMode) {
+        const nextQueueCard = srsQueueManager!.currentCard()
+        const nextCardIndex = nextQueueCard
+          ? updatedQueue.findIndex(c => c.id === nextQueueCard.id)
+          : currentIndex + 1
+
+        set({
+          queue: updatedQueue,
+          currentIndex: nextCardIndex >= 0 ? nextCardIndex : currentIndex + 1,
+          isFlipped: false,
+          cardStartTime: Date.now(),
+          sessionStats: {
+            ...sessionStats,
+            cardsStudied: sessionStats.cardsStudied + 1,
+            ratings: updatedRatings,
+            totalDurationMs: sessionStats.totalDurationMs + durationMs,
+          },
+        })
+      } else {
+        set({
+          queue: updatedQueue,
+          currentIndex: currentIndex + 1,
+          isFlipped: false,
+          cardStartTime: Date.now(),
+          sessionStats: {
+            ...sessionStats,
+            cardsStudied: sessionStats.cardsStudied + 1,
+            ratings: updatedRatings,
+            totalDurationMs: sessionStats.totalDurationMs + durationMs,
+          },
+        })
+      }
     }
   },
 
   endSession: async () => {
-    const { config, queue, studyState, sessionStats, sessionStartedAt } = get()
+    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition } = get()
     if (!config || !studyState) return
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -460,7 +566,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     // Update deck_study_state based on mode
     if (config.mode === 'sequential_review' && queue.length > 0) {
-      const positions = computeSequentialReviewPositions(queue, studyState)
+      const positions = computeSequentialReviewPositions(queue, studyState, maxCardPosition)
 
       await supabase
         .from('deck_study_state')
@@ -473,10 +579,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     if (config.mode === 'sequential' && queue.length > 0) {
       const maxPos = Math.max(...queue.map(c => c.sort_position))
+      const nextPos = maxPos + 1
+
+      // Wrap around if past all cards
       await supabase
         .from('deck_study_state')
         .update({
-          sequential_pos: maxPos + 1,
+          sequential_pos: nextPos > maxCardPosition ? 0 : nextPos,
         } as Record<string, unknown>)
         .eq('id', studyState.id)
     }
@@ -498,6 +607,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       sessionStartedAt: Date.now(),
       sessionStats: { ...initialStats },
       studyState: null,
+      srsQueueManager: null,
+      maxCardPosition: 0,
     })
   },
 }))

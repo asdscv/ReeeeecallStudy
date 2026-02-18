@@ -34,19 +34,81 @@ export function clampBatchSize(value: number): number {
   return Math.max(MIN_BATCH_SIZE, Math.min(MAX_BATCH_SIZE, Math.round(value)))
 }
 
-// ─── Sequential Review ──────────────────────────────────────
+// ─── Sequential Review Queue Builder ────────────────────────
+
+interface SeqCard {
+  id: string
+  sort_position: number
+  srs_status: 'new' | 'learning' | 'review' | 'suspended'
+}
+
+/**
+ * Build the sequential review queue with wrap-around support.
+ *
+ * Logic:
+ * 1. Fetch new cards (srs_status='new') starting from new_start_pos
+ * 2. Fetch review cards (non-new, non-suspended) starting from review_start_pos
+ * 3. If no new cards AND no review cards from current positions, wrap around to 0
+ * 4. Returns { newCards, reviewCards } for the session
+ */
+export function buildSequentialReviewQueue<T extends SeqCard>(
+  allCards: T[],
+  state: Pick<DeckStudyState, 'new_start_pos' | 'review_start_pos'>,
+  newBatchSize: number,
+  reviewBatchSize: number,
+): { newCards: T[]; reviewCards: T[] } {
+  if (allCards.length === 0) {
+    return { newCards: [], reviewCards: [] }
+  }
+
+  const sorted = [...allCards].sort((a, b) => a.sort_position - b.sort_position)
+
+  // --- New cards ---
+  const newCards = sorted
+    .filter(c => c.srs_status === 'new' && c.sort_position >= state.new_start_pos)
+    .slice(0, newBatchSize)
+
+  // --- Review cards ---
+  const reviewable = sorted.filter(c => c.srs_status !== 'new' && c.srs_status !== 'suspended')
+
+  let reviewCards: T[]
+
+  if (newCards.length > 0) {
+    // Have new cards — review the window [review_start_pos, new_start_pos)
+    reviewCards = reviewable
+      .filter(c => c.sort_position >= state.review_start_pos && c.sort_position < state.new_start_pos)
+      .slice(0, reviewBatchSize)
+  } else {
+    // No new cards — review from review_start_pos onward
+    reviewCards = reviewable
+      .filter(c => c.sort_position >= state.review_start_pos)
+      .slice(0, reviewBatchSize)
+
+    // If no review cards found, wrap around to beginning
+    if (reviewCards.length === 0 && reviewable.length > 0) {
+      reviewCards = reviewable.slice(0, reviewBatchSize)
+    }
+  }
+
+  return { newCards, reviewCards }
+}
+
+// ─── Position Computation ───────────────────────────────────
 
 /**
  * Compute new positions for sequential_review mode after a session ends.
  *
- * Sliding window logic:
- *   - new_start_pos advances past the new cards studied
- *   - review_start_pos shifts to the previous new_start_pos,
- *     so the next session reviews the batch just learned
+ * Enhanced with wrap-around:
+ * - When new cards exist: advance new_start_pos, shift review window
+ * - When only review cards: advance review_start_pos past studied cards
+ * - When positions exceed maxCardPosition: wrap to 0
+ *
+ * @param maxCardPosition - Maximum sort_position across all cards in the deck (for wrap detection)
  */
 export function computeSequentialReviewPositions(
   queue: Pick<Card, 'sort_position' | 'srs_status'>[],
   currentState: Pick<DeckStudyState, 'new_start_pos' | 'review_start_pos'>,
+  maxCardPosition?: number,
 ): { new_start_pos: number; review_start_pos: number } {
   if (queue.length === 0) {
     return {
@@ -56,12 +118,26 @@ export function computeSequentialReviewPositions(
   }
 
   const newCards = queue.filter(c => c.srs_status === 'new')
-  const newMaxPos = newCards.length > 0
-    ? Math.max(...newCards.map(c => c.sort_position)) + 1
-    : currentState.new_start_pos
+
+  if (newCards.length > 0) {
+    // Normal case: advance past new cards
+    const newMaxPos = Math.max(...newCards.map(c => c.sort_position)) + 1
+    return {
+      new_start_pos: newMaxPos,
+      review_start_pos: currentState.new_start_pos,
+    }
+  }
+
+  // No new cards in queue — only review cards were studied
+  // Advance review_start_pos past the studied review cards
+  const maxStudiedPos = Math.max(...queue.map(c => c.sort_position))
+  const nextReviewPos = maxStudiedPos + 1
+
+  // Wrap around if we've gone past all cards
+  const shouldWrap = maxCardPosition !== undefined && nextReviewPos > maxCardPosition
 
   return {
-    new_start_pos: newMaxPos,
-    review_start_pos: currentState.new_start_pos,
+    new_start_pos: currentState.new_start_pos,
+    review_start_pos: shouldWrap ? 0 : nextReviewPos,
   }
 }
