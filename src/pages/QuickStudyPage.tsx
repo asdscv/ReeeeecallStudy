@@ -25,6 +25,7 @@ export function QuickStudyPage() {
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null)
   const [selectedMode, setSelectedMode] = useState<StudyMode | null>(null)
   const [batchSize, setBatchSize] = useState(DEFAULT_BATCH_SIZE)
+  const [batchSizeInput, setBatchSizeInput] = useState(String(DEFAULT_BATCH_SIZE))
 
   // by_date state
   const [selectedDate, setSelectedDate] = useState(() => todayDateKey())
@@ -264,8 +265,29 @@ export function QuickStudyPage() {
                   type="number"
                   min={MIN_BATCH_SIZE}
                   max={MAX_BATCH_SIZE}
-                  value={batchSize}
-                  onChange={(e) => setBatchSize(Number(e.target.value) || DEFAULT_BATCH_SIZE)}
+                  value={batchSizeInput}
+                  onChange={(e) => {
+                    const raw = e.target.value
+                    setBatchSizeInput(raw)
+                    const n = Number(raw)
+                    if (Number.isFinite(n) && n >= MIN_BATCH_SIZE && n <= MAX_BATCH_SIZE) {
+                      setBatchSize(Math.round(n))
+                    }
+                  }}
+                  onBlur={() => {
+                    const n = Number(batchSizeInput)
+                    if (!Number.isFinite(n) || n < MIN_BATCH_SIZE) {
+                      setBatchSize(MIN_BATCH_SIZE)
+                      setBatchSizeInput(String(MIN_BATCH_SIZE))
+                    } else if (n > MAX_BATCH_SIZE) {
+                      setBatchSize(MAX_BATCH_SIZE)
+                      setBatchSizeInput(String(MAX_BATCH_SIZE))
+                    } else {
+                      const clamped = Math.round(n)
+                      setBatchSize(clamped)
+                      setBatchSizeInput(String(clamped))
+                    }
+                  }}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
                 />
                 <p className="text-xs text-gray-400 mt-1">

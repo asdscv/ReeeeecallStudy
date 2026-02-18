@@ -68,7 +68,7 @@ describe('clampBatchSize', () => {
   })
 
   it('clamps above maximum to MAX_BATCH_SIZE', () => {
-    expect(clampBatchSize(999)).toBe(MAX_BATCH_SIZE)
+    expect(clampBatchSize(1500)).toBe(MAX_BATCH_SIZE)
   })
 
   it('rounds to nearest integer', () => {
@@ -93,8 +93,8 @@ describe('batch size constants', () => {
     expect(MIN_BATCH_SIZE).toBe(1)
   })
 
-  it('MAX_BATCH_SIZE is 200', () => {
-    expect(MAX_BATCH_SIZE).toBe(200)
+  it('MAX_BATCH_SIZE is 1000', () => {
+    expect(MAX_BATCH_SIZE).toBe(1000)
   })
 })
 

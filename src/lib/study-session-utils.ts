@@ -21,7 +21,7 @@ export const STUDY_MODE_OPTIONS: StudyModeOption[] = [
 
 export const DEFAULT_BATCH_SIZE = 20
 export const MIN_BATCH_SIZE = 1
-export const MAX_BATCH_SIZE = 200
+export const MAX_BATCH_SIZE = 1000
 
 /** Whether a study mode supports user-configurable batch size. */
 export function isBatchSizeConfigurable(mode: StudyMode): boolean {
