@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "quickStudy": "빠른 학습",
+    "dashboard": "대시보드",
+    "decksCards": "덱/카드",
+    "decks": "덱",
+    "cards": "카드",
+    "marketplace": "마켓",
+    "studyHistory": "학습 기록",
+    "settings": "설정"
+  },
+  "actions": {
+    "save": "저장",
+    "saving": "저장 중...",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "create": "만들기",
+    "add": "추가",
+    "remove": "제거",
+    "confirm": "확인",
+    "ok": "확인",
+    "back": "뒤로",
+    "next": "다음",
+    "close": "닫기",
+    "copy": "복사",
+    "duplicate": "복제",
+    "search": "검색",
+    "selectAll": "전체 선택",
+    "deselect": "해제",
+    "show": "보기",
+    "hide": "숨기기",
+    "startStudy": "학습 시작",
+    "logout": "로그아웃"
+  },
+  "status": {
+    "loading": "로딩 중...",
+    "processing": "처리 중...",
+    "new": "새 카드",
+    "learning": "학습중",
+    "review": "복습",
+    "suspended": "중단"
+  },
+  "units": {
+    "cards": "장",
+    "cardsSuffix": "{{count}}장",
+    "sessions": "세션",
+    "items": "개",
+    "days": "일",
+    "minutes": "분",
+    "seconds": "초",
+    "times": "회",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}}개씩"
+  },
+  "timePeriod": {
+    "1d": "1일",
+    "1w": "1주",
+    "1m": "1개월",
+    "3m": "3개월",
+    "6m": "6개월",
+    "1y": "1년",
+    "2y": "2년",
+    "5y": "5년"
+  },
+  "confirmDialog": {
+    "cancel": "취소",
+    "processing": "처리 중...",
+    "confirm": "확인"
+  },
+  "delete": "삭제",
+  "deselect": "해제",
+  "duplicate": "복제",
+  "edit": "편집",
+  "save": "저장",
+  "saving": "저장 중...",
+  "selectAll": "전체 선택",
+  "menu": "메뉴",
+  "copiedToClipboard": "클립보드에 복사되었습니다"
+}

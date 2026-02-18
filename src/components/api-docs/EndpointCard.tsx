@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { getMethodColor, getStatusColor, type ApiEndpoint } from '../../lib/api-docs-content'
 import { CodeBlock } from './CodeBlock'
 
 export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
+  const { t } = useTranslation('api-docs')
   const [open, setOpen] = useState(false)
 
   return (
@@ -16,7 +18,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
           {endpoint.method}
         </span>
         <code className="text-sm text-gray-700 font-mono flex-1 truncate">{endpoint.path}</code>
-        <span className="text-xs text-gray-500 hidden sm:inline shrink-0">{endpoint.summary}</span>
+        <span className="text-xs text-gray-500 hidden sm:inline shrink-0">{t(endpoint.summary)}</span>
         {open ? (
           <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" />
         ) : (
@@ -26,7 +28,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
 
       {open && (
         <div className="border-t border-gray-100 p-4 space-y-4 bg-gray-50/50">
-          <p className="text-sm text-gray-700">{endpoint.description}</p>
+          <p className="text-sm text-gray-700">{t(endpoint.description)}</p>
 
           {endpoint.headers && endpoint.headers.length > 0 && (
             <div>
@@ -37,7 +39,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
                     <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-gray-700">{h.name}</code>
                     <span className="text-gray-400">:</span>
                     <code className="text-gray-500">{h.value}</code>
-                    {h.required && <span className="text-red-400 text-[10px]">필수</span>}
+                    {h.required && <span className="text-red-400 text-[10px]">{t('required')}</span>}
                   </div>
                 ))}
               </div>
@@ -52,7 +54,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
                   <div key={p.name} className="text-xs">
                     <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-gray-700">{p.name}</code>
                     <span className="text-gray-400 ml-2">{p.type}</span>
-                    <span className="text-gray-500 ml-2">— {p.description}</span>
+                    <span className="text-gray-500 ml-2">— {t(p.description)}</span>
                   </div>
                 ))}
               </div>
@@ -66,10 +68,10 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
                 <table className="w-full text-xs whitespace-nowrap">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="text-left p-2 font-medium text-gray-600">이름</th>
-                      <th className="text-left p-2 font-medium text-gray-600">타입</th>
-                      <th className="text-left p-2 font-medium text-gray-600">필수</th>
-                      <th className="text-left p-2 font-medium text-gray-600">설명</th>
+                      <th className="text-left p-2 font-medium text-gray-600">{t('table.name')}</th>
+                      <th className="text-left p-2 font-medium text-gray-600">{t('table.type')}</th>
+                      <th className="text-left p-2 font-medium text-gray-600">{t('table.required')}</th>
+                      <th className="text-left p-2 font-medium text-gray-600">{t('table.description')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -78,7 +80,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
                         <td className="p-2"><code className="font-mono text-gray-700">{p.name}</code></td>
                         <td className="p-2 text-gray-500">{p.type}</td>
                         <td className="p-2">{p.required ? <span className="text-red-500">Y</span> : <span className="text-gray-400">N</span>}</td>
-                        <td className="p-2 text-gray-600">{p.description}</td>
+                        <td className="p-2 text-gray-600">{t(p.description)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -111,7 +113,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
                     className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 ${getStatusColor(sc.code)}`}
                   >
                     <span className="font-bold">{sc.code}</span>
-                    <span className="text-gray-500">{sc.description}</span>
+                    <span className="text-gray-500">{t(sc.description)}</span>
                   </span>
                 ))}
               </div>

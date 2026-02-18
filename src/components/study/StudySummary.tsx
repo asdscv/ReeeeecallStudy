@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface StudySummaryProps {
   stats: {
     totalCards: number
@@ -10,6 +12,7 @@ interface StudySummaryProps {
 }
 
 export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummaryProps) {
+  const { t } = useTranslation('study')
   const minutes = Math.floor(stats.totalDurationMs / 60000)
   const seconds = Math.floor((stats.totalDurationMs % 60000) / 1000)
   const avgMs = stats.cardsStudied > 0
@@ -20,24 +23,24 @@ export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummary
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4 sm:px-6 text-center">
         <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">🎉</div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">학습 완료!</h1>
-        <p className="text-gray-500 mb-6 sm:mb-8">수고하셨습니다</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{t('summary.completed')}</h1>
+        <p className="text-gray-500 mb-6 sm:mb-8">{t('summary.wellDone')}</p>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 space-y-3 sm:space-y-4">
-          <StatRow label="학습 카드" value={`${stats.cardsStudied} / ${stats.totalCards}장`} />
-          <StatRow label="소요 시간" value={`${minutes}분 ${seconds}초`} />
-          <StatRow label="카드당 평균" value={`${avgMs}초`} />
+          <StatRow label={t('summary.cardsStudied')} value={t('summary.cardCount', { studied: stats.cardsStudied, total: stats.totalCards })} />
+          <StatRow label={t('summary.timeSpent')} value={t('summary.timeFormat', { minutes, seconds })} />
+          <StatRow label={t('summary.avgPerCard')} value={t('summary.secondsFormat', { seconds: avgMs })} />
 
           {Object.keys(stats.ratings).length > 0 && (
             <div className="pt-3 border-t border-gray-100">
-              <p className="text-sm text-gray-400 mb-2">평가 분포</p>
+              <p className="text-sm text-gray-400 mb-2">{t('summary.ratingDistribution')}</p>
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 {Object.entries(stats.ratings).map(([rating, count]) => (
                   <span
                     key={rating}
                     className={`px-3 py-1 rounded-full text-sm font-medium ${ratingColor(rating)}`}
                   >
-                    {ratingLabel(rating)} {count}
+                    {ratingLabel(rating, t)} {count}
                   </span>
                 ))}
               </div>
@@ -50,13 +53,13 @@ export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummary
             onClick={onBackToDeck}
             className="flex-1 px-4 py-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
-            덱으로 돌아가기
+            {t('summary.backToDeck')}
           </button>
           <button
             onClick={onStudyAgain}
             className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
-            다시 학습
+            {t('summary.studyAgain')}
           </button>
         </div>
       </div>
@@ -73,15 +76,15 @@ function StatRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-function ratingLabel(rating: string): string {
+function ratingLabel(rating: string, t: (key: string) => string): string {
   const map: Record<string, string> = {
     again: 'Again',
     hard: 'Hard',
     good: 'Good',
     easy: 'Easy',
-    known: '알고 있음',
-    unknown: '모름',
-    next: '다음',
+    known: t('rating.known'),
+    unknown: t('rating.unknown'),
+    next: t('rating.next'),
   }
   return map[rating] ?? rating
 }

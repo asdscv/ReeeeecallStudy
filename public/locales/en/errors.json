@@ -1,0 +1,56 @@
+{
+  "auth": {
+    "invalidCredentials": "Email or password is incorrect.",
+    "emailNotConfirmed": "Email not verified. Please check your inbox.",
+    "userAlreadyRegistered": "This email is already registered.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "emailRateLimit": "Too many requests. Please try again later.",
+    "securityDelay": "For security, please try again later.",
+    "newPasswordSameAsOld": "New password must be different from the old password.",
+    "invalidEmailFormat": "Invalid email format."
+  },
+  "rateLimit": {
+    "tooFast": "Too many requests. Try again in {{seconds}}s."
+  },
+  "quota": {
+    "limitReached": "{{resource}} limit reached ({{current}}/{{limit}})"
+  },
+  "storage": {
+    "imageTooLarge": "Images must be 5MB or less.",
+    "imageFormatUnsupported": "Supported image formats: JPG, PNG, WebP",
+    "audioTooLarge": "Audio files must be 10MB or less.",
+    "audioFormatUnsupported": "Supported audio formats: MP3, OGG, WAV",
+    "uploadLimitReached": "Upload limit reached.",
+    "uploadFailed": "Upload failed: {{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "Please enter a key name.",
+    "nameMustBeString": "Key name must be a string.",
+    "nameTooLong": "Key name must be {{maxLength}} characters or less.",
+    "nameNoControlChars": "Key name cannot contain control characters."
+  },
+  "card": {
+    "readonlyDeckNoAdd": "Cannot add cards to a read-only deck.",
+    "readonlyDeckNoEdit": "Cannot modify cards in a read-only deck.",
+    "rateLimitReached": "Request limit reached."
+  },
+  "deck": {
+    "rateLimitReached": "Request limit reached."
+  },
+  "template": {
+    "rateLimitReached": "Request limit reached.",
+    "cannotDeleteDefault": "Default template cannot be deleted.",
+    "inUseByDecks": "Cannot delete — {{count}} deck(s) use this template."
+  },
+  "marketplace": {
+    "listingNotFound": "Listing not found.",
+    "cannotImportOwn": "You cannot import your own deck."
+  },
+  "sharing": {
+    "invalidOrExpired": "Invalid or expired invite code.",
+    "cannotAcceptOwn": "You cannot accept your own deck."
+  },
+  "fileValidationFailed": "File validation failed",
+  "uploadFailed": "Upload failed.",
+  "parseError": "File parsing failed."
+}

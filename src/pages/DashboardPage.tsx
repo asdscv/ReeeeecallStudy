@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
@@ -22,6 +23,7 @@ import { RecentDecks } from '../components/dashboard/RecentDecks'
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 
 export function DashboardPage() {
+  const { t } = useTranslation('dashboard')
   const { user } = useAuthStore()
   const { decks, stats, loading, fetchDecks, fetchStats } = useDeckStore()
 
@@ -93,7 +95,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">대시보드</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
         <TimePeriodTabs value={period} onChange={setPeriod} />
       </div>
 

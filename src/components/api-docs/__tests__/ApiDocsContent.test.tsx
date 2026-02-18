@@ -24,7 +24,7 @@ function renderContent(variant: 'public' | 'authenticated' = 'authenticated') {
 describe('ApiDocsContent', () => {
   it('renders search input', () => {
     renderContent()
-    expect(screen.getByPlaceholderText(/검색/)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('searchPlaceholder')).toBeInTheDocument()
   })
 
   it('renders table of contents with all section titles', () => {
@@ -45,41 +45,43 @@ describe('ApiDocsContent', () => {
 
   it('filters sections when typing in search', () => {
     renderContent()
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '인증' } })
-    expect(screen.getByText('인증')).toBeInTheDocument()
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    // Search for a term that appears in a section title i18n key
+    fireEvent.change(input, { target: { value: 'authentication' } })
+    expect(screen.getByText('sections.authentication.title')).toBeInTheDocument()
   })
 
   it('shows no results message when search has no matches', () => {
     renderContent()
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '존재하지않는검색어xyz99' } })
-    expect(screen.getByText(/결과가 없습니다/)).toBeInTheDocument()
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    fireEvent.change(input, { target: { value: 'nonexistentsearchxyz99' } })
+    expect(screen.getByText(/noResults/)).toBeInTheDocument()
   })
 
   it('hides TOC when searching', () => {
     renderContent()
-    expect(screen.getByText('목차')).toBeInTheDocument()
+    expect(screen.getByText('tableOfContents')).toBeInTheDocument()
 
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '인증' } })
-    expect(screen.queryByText('목차')).not.toBeInTheDocument()
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    fireEvent.change(input, { target: { value: 'authentication' } })
+    expect(screen.queryByText('tableOfContents')).not.toBeInTheDocument()
   })
 
   it('passes authenticated variant to QuickStartBanner', () => {
     renderContent('authenticated')
-    expect(screen.getByText('설정 페이지')).toBeInTheDocument()
+    expect(screen.getByText('quickStart.settingsPage')).toBeInTheDocument()
   })
 
   it('passes public variant to QuickStartBanner', () => {
     renderContent('public')
-    expect(screen.getByText('회원가입')).toBeInTheDocument()
+    expect(screen.getByText('quickStart.signup')).toBeInTheDocument()
   })
 
   it('displays endpoint method badges when section is expanded by search', () => {
     renderContent()
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '덱 목록' } })
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    // Search for endpoint path to expand the section
+    fireEvent.change(input, { target: { value: '/decks' } })
     const getBadges = screen.getAllByText('GET')
     expect(getBadges.length).toBeGreaterThan(0)
   })

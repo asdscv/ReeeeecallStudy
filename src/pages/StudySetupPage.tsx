@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -14,6 +15,7 @@ import {
 import type { Deck, StudyMode } from '../types/database'
 
 export function StudySetupPage() {
+  const { t } = useTranslation('study')
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
 
@@ -85,7 +87,7 @@ export function StudySetupPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="text-gray-500">로딩 중...</div>
+        <div className="text-gray-500">{t('session.loading')}</div>
       </div>
     )
   }
@@ -122,14 +124,14 @@ export function StudySetupPage() {
         {deck.name}
       </button>
 
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">학습 설정</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('setup.title')}</h1>
       <p className="text-gray-500 text-sm mb-4 sm:mb-6">
-        {deck.icon} {deck.name} · {cardCount}장
+        {t('setup.deckInfo', { icon: deck.icon, name: deck.name, count: cardCount })}
       </p>
 
       {/* Mode selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">학습 모드</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('setup.studyMode')}</label>
         <div className="space-y-2">
           {STUDY_MODE_OPTIONS.map((opt) => (
             <button
@@ -158,7 +160,7 @@ export function StudySetupPage() {
       {isBatchSizeConfigurable(mode) && (
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            배치 크기
+            {t('quickStudy.batchSize')}
           </label>
           <input
             type="number"
@@ -169,7 +171,7 @@ export function StudySetupPage() {
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
           />
           <p className="text-xs text-gray-400 mt-1">
-            한 세션에 학습할 카드 수 ({MIN_BATCH_SIZE}~{MAX_BATCH_SIZE})
+            {t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
           </p>
         </div>
       )}
@@ -178,7 +180,7 @@ export function StudySetupPage() {
       {mode === 'by_date' && (
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            업로드 날짜 선택
+            {t('setup.selectUploadDate')}
           </label>
           <DatePicker
             selectedDate={selectedDate}
@@ -188,8 +190,8 @@ export function StudySetupPage() {
           <div className="mt-2 text-sm font-medium text-blue-600">
             {selectedDate && (() => {
               const [year, month, day] = selectedDate.split('-').map(Number)
-              return `${year}년 ${month}월 ${day}일`
-            })()} 업로드: {dateCardCount}장
+              return t('setup.uploadDate', { year, month, day, count: dateCardCount })
+            })()}
           </div>
         </div>
       )}
@@ -199,7 +201,7 @@ export function StudySetupPage() {
         disabled={isStartDisabled}
         className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
       >
-        학습 시작
+        {t('quickStudy.startStudy')}
       </button>
     </div>
   )

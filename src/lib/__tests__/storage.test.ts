@@ -53,14 +53,14 @@ describe('validateFile', () => {
       const file = mockFile('big.jpg', 6 * 1024 * 1024, 'image/jpeg')
       const result = validateFile(file, 'image')
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('5MB')
+      expect(result.error).toBe('errors:storage.imageTooLarge')
     })
 
     it('should reject unsupported image type', () => {
       const file = mockFile('test.gif', 1024, 'image/gif')
       const result = validateFile(file, 'image')
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('jpg')
+      expect(result.error).toBe('errors:storage.imageFormatUnsupported')
     })
   })
 
@@ -85,14 +85,14 @@ describe('validateFile', () => {
       const file = mockFile('big.mp3', 11 * 1024 * 1024, 'audio/mpeg')
       const result = validateFile(file, 'audio')
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('10MB')
+      expect(result.error).toBe('errors:storage.audioTooLarge')
     })
 
     it('should reject unsupported audio type', () => {
       const file = mockFile('test.flac', 1024, 'audio/flac')
       const result = validateFile(file, 'audio')
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('mp3')
+      expect(result.error).toBe('errors:storage.audioFormatUnsupported')
     })
   })
 })

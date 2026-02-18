@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Clock, Layers } from 'lucide-react'
 import { useAuthStore } from '../stores/auth-store'
@@ -7,7 +8,6 @@ import { supabase } from '../lib/supabase'
 import {
   formatDuration,
   groupSessionsByDate,
-  getStudyModeLabel,
   getStudyModeEmoji,
   filterSessionsByDeck,
   filterSessionsByMode,
@@ -51,6 +51,7 @@ interface DeckProgress {
 }
 
 export function StudyHistoryPage() {
+  const { t } = useTranslation(['history', 'common', 'study'])
   const { user } = useAuthStore()
   const { decks, fetchDecks } = useDeckStore()
 
@@ -224,7 +225,7 @@ export function StudyHistoryPage() {
       {/* ── Header + Period Selection ── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-          학습 기록
+          {t('title')}
         </h1>
         <TimePeriodTabs value={period} onChange={setPeriod} />
       </div>
@@ -243,7 +244,7 @@ export function StudyHistoryPage() {
       {/* ── Deck Progress ── */}
       {deckProgress.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-500 mb-3">덱별 진도</h2>
+          <h2 className="text-sm font-semibold text-gray-500 mb-3">{t('tabs.deckProgress')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {deckProgress.map((p) => (
               <DeckProgressCard key={p.deck.id} progress={p} />
@@ -254,7 +255,7 @@ export function StudyHistoryPage() {
 
       {/* ── Session List Section ── */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-500 mb-3">세션 목록</h2>
+        <h2 className="text-sm font-semibold text-gray-500 mb-3">{t('tabs.sessionList')}</h2>
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
@@ -263,7 +264,7 @@ export function StudyHistoryPage() {
             onChange={(e) => { setDeckFilter(e.target.value); setCurrentPage(1) }}
             className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
           >
-            <option value="all">전체 덱</option>
+            <option value="all">{t('filters.allDecks')}</option>
             {sessionDecks.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.icon} {d.name}
@@ -275,10 +276,10 @@ export function StudyHistoryPage() {
             onChange={(e) => { setModeFilter(e.target.value); setCurrentPage(1) }}
             className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
           >
-            <option value="all">전체 모드</option>
+            <option value="all">{t('filters.allModes')}</option>
             {uniqueModes.map((m) => (
               <option key={m} value={m}>
-                {getStudyModeEmoji(m)} {getStudyModeLabel(m)}
+                {getStudyModeEmoji(m)} {t(`study:modes.${m}.label`)}
               </option>
             ))}
           </select>
@@ -290,8 +291,8 @@ export function StudyHistoryPage() {
             <div className="text-4xl sm:text-5xl mb-4">📝</div>
             <p className="text-gray-500">
               {sessions.length === 0
-                ? '아직 학습 기록이 없습니다. 학습을 시작해보세요!'
-                : '필터 조건에 맞는 기록이 없습니다.'}
+                ? t('empty')
+                : t('noMatch')}
             </p>
           </div>
         ) : (
@@ -320,7 +321,7 @@ export function StudyHistoryPage() {
             {totalPages > 1 && (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-4 sm:mt-6 bg-white rounded-xl border border-gray-200">
                 <span className="text-xs sm:text-sm text-gray-500">
-                  {startIdx + 1}~{Math.min(endIdx, filtered.length)} / {filtered.length}건
+                  {t('common:pagination.rangeOf', { start: startIdx + 1, end: Math.min(endIdx, filtered.length), total: filtered.length })}
                 </span>
                 <div className="flex items-center gap-1">
                   <button
@@ -375,6 +376,7 @@ export function StudyHistoryPage() {
 // ── Deck Progress Card ──
 
 function DeckProgressCard({ progress: p }: { progress: DeckProgress }) {
+  const { t } = useTranslation('history')
   const pct = p.totalCards > 0 ? Math.round((p.studiedCards / p.totalCards) * 100) : 0
 
   return (
@@ -396,7 +398,7 @@ function DeckProgressCard({ progress: p }: { progress: DeckProgress }) {
       <div className="flex items-center justify-between text-xs">
         <span className="text-gray-500">
           <span className="font-semibold text-gray-900">{p.studiedCards}</span>
-          <span className="text-gray-400"> / {p.totalCards}장</span>
+          <span className="text-gray-400"> / {t('deckProgress.total', { count: p.totalCards })}</span>
         </span>
         <span className="font-semibold text-blue-600">{pct}%</span>
       </div>
@@ -404,13 +406,13 @@ function DeckProgressCard({ progress: p }: { progress: DeckProgress }) {
       {/* Status breakdown */}
       <div className="flex items-center gap-2 mt-2 text-[11px]">
         {p.newCards > 0 && (
-          <span className="text-blue-600">미학습 {p.newCards}</span>
+          <span className="text-blue-600">{t('deckProgress.notStudied', { count: p.newCards })}</span>
         )}
         {p.learningCards > 0 && (
-          <span className="text-amber-600">학습중 {p.learningCards}</span>
+          <span className="text-amber-600">{t('deckProgress.learning', { count: p.learningCards })}</span>
         )}
         {p.reviewCards > 0 && (
-          <span className="text-green-600">복습 {p.reviewCards}</span>
+          <span className="text-green-600">{t('deckProgress.review', { count: p.reviewCards })}</span>
         )}
       </div>
     </div>
@@ -428,6 +430,7 @@ function SessionCard({
   deck?: Deck
   progress?: DeckProgress
 }) {
+  const { t } = useTranslation(['history', 'study'])
   const navigate = useNavigate()
 
   const time = new Date(session.completed_at)
@@ -440,7 +443,7 @@ function SessionCard({
     navigate('/history/detail', {
       state: {
         session,
-        deckName: deck?.name ?? '삭제된 덱',
+        deckName: deck?.name ?? t('deletedDeck'),
         deckIcon: deck?.icon ?? '📚',
       },
     })
@@ -459,10 +462,10 @@ function SessionCard({
             {/* Deck name + mode + time */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold text-gray-900 truncate">
-                {deck?.name ?? '삭제된 덱'}
+                {deck?.name ?? t('deletedDeck')}
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 shrink-0">
-                {getStudyModeEmoji(session.study_mode)} {getStudyModeLabel(session.study_mode)}
+                {getStudyModeEmoji(session.study_mode)} {t(`study:modes.${session.study_mode}.label`)}
               </span>
               <span className="text-xs text-gray-400 shrink-0">{timeStr}</span>
             </div>
@@ -471,7 +474,7 @@ function SessionCard({
             <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
               <span className="inline-flex items-center gap-1">
                 <Layers className="w-3.5 h-3.5" />
-                {session.cards_studied}장
+                {t('sessionCard.cardsStudied', { count: session.cards_studied })}
                 {progress && (
                   <span className="text-gray-400">/ {progress.totalCards}</span>
                 )}

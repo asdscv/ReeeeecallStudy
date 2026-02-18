@@ -82,22 +82,22 @@ describe('getDeckShareLabel', () => {
     source_owner_id: null as string | null,
   }
 
-  it('should return "내 덱" for own deck with no share mode', () => {
-    expect(getDeckShareLabel(baseDeck, 'owner-1')).toBe('내 덱')
+  it('should return i18n key for own deck with no share mode', () => {
+    expect(getDeckShareLabel(baseDeck, 'owner-1')).toBe('sharing:deckLabel.myDeck')
   })
 
-  it('should return "구독 중" for subscribed deck', () => {
+  it('should return i18n key for subscribed deck', () => {
     const deck = { ...baseDeck, share_mode: 'subscribe' as ShareMode, source_owner_id: 'other' }
-    expect(getDeckShareLabel(deck, 'owner-1')).toBe('구독 중')
+    expect(getDeckShareLabel(deck, 'owner-1')).toBe('sharing:deckLabel.subscribed')
   })
 
-  it('should return "스냅샷" for snapshot deck', () => {
+  it('should return i18n key for snapshot deck', () => {
     const deck = { ...baseDeck, share_mode: 'snapshot' as ShareMode, source_owner_id: 'other' }
-    expect(getDeckShareLabel(deck, 'owner-1')).toBe('스냅샷')
+    expect(getDeckShareLabel(deck, 'owner-1')).toBe('sharing:deckLabel.snapshot')
   })
 
-  it('should return "복사본" for copied deck', () => {
+  it('should return i18n key for copied deck', () => {
     const deck = { ...baseDeck, share_mode: 'copy' as ShareMode, source_owner_id: 'other' }
-    expect(getDeckShareLabel(deck, 'owner-1')).toBe('복사본')
+    expect(getDeckShareLabel(deck, 'owner-1')).toBe('sharing:deckLabel.copy')
   })
 })

@@ -10,11 +10,11 @@ export interface StudyModeOption {
 }
 
 export const STUDY_MODE_OPTIONS: StudyModeOption[] = [
-  { value: 'srs', emoji: '🧠', label: 'SRS (간격 반복)', desc: '복습 시기에 따라 자동으로 카드를 선별합니다' },
-  { value: 'sequential_review', emoji: '🔄', label: '순차 복습', desc: '새 카드와 복습 카드를 순서대로 학습합니다' },
-  { value: 'random', emoji: '🎲', label: '랜덤', desc: '카드를 무작위로 섞어 학습합니다' },
-  { value: 'sequential', emoji: '➡️', label: '순차', desc: '카드를 순서대로 학습합니다' },
-  { value: 'by_date', emoji: '📅', label: '일자별 학습', desc: '특정 날짜에 업로드한 카드만 학습합니다' },
+  { value: 'srs', emoji: '🧠', label: 'study:modes.srs.label', desc: 'study:modes.srs.description' },
+  { value: 'sequential_review', emoji: '🔄', label: 'study:modes.sequential_review.label', desc: 'study:modes.sequential_review.description' },
+  { value: 'random', emoji: '🎲', label: 'study:modes.random.label', desc: 'study:modes.random.description' },
+  { value: 'sequential', emoji: '➡️', label: 'study:modes.sequential.label', desc: 'study:modes.sequential.description' },
+  { value: 'by_date', emoji: '📅', label: 'study:modes.by_date.label', desc: 'study:modes.by_date.description' },
 ]
 
 // ─── Batch Size ─────────────────────────────────────────────

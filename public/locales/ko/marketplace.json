@@ -1,0 +1,39 @@
+{
+  "title": "마켓플레이스",
+  "noResults": "검색 결과가 없습니다.",
+  "noListings": "아직 게시된 덱이 없습니다.",
+  "searchPlaceholder": "덱 검색...",
+  "allCategories": "전체 카테고리",
+  "sortNewest": "최신순",
+  "sortPopular": "인기순",
+  "sortCardCount": "카드 수",
+  "categories": {
+    "general": "일반",
+    "language": "언어",
+    "science": "과학",
+    "math": "수학",
+    "history": "역사",
+    "programming": "프로그래밍",
+    "trivia": "상식",
+    "exam": "시험 준비",
+    "other": "기타"
+  },
+  "shareModes": {
+    "copy": "복사",
+    "subscribe": "구독",
+    "snapshot": "스냅샷"
+  },
+  "listing": {
+    "cardCount": "{{count}}장",
+    "userCount": "{{count}}명 사용 중"
+  },
+  "detail": {
+    "back": "← 마켓플레이스",
+    "cardCount": "{{count}}장",
+    "userCount": "{{count}}명 사용 중",
+    "getDeck": "이 덱 가져오기",
+    "importing": "가져오는 중...",
+    "cardPreview": "카드 미리보기 (최대 10장)",
+    "noCards": "카드가 없습니다."
+  }
+}

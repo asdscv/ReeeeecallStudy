@@ -28,6 +28,6 @@ describe('DocsNav', () => {
 
   it('renders "시작하기" button', () => {
     renderNav()
-    expect(screen.getByText('시작하기')).toBeInTheDocument()
+    expect(screen.getByText('getStarted')).toBeInTheDocument()
   })
 })

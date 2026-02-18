@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Copy, Check } from 'lucide-react'
 import { useSharingStore } from '../../stores/sharing-store'
 import type { ShareMode } from '../../types/database'
@@ -10,33 +11,34 @@ interface ShareModalProps {
   deckName: string
 }
 
-const SHARE_MODES: { value: ShareMode; label: string; desc: string; detail: string }[] = [
-  {
-    value: 'copy',
-    label: '복사',
-    desc: '독립적인 복사본을 갖게 됩니다.',
-    detail: '상대방이 카드를 자유롭게 편집·추가·삭제할 수 있습니다. 원본과 완전히 분리되어 서로 영향을 주지 않습니다.',
-  },
-  {
-    value: 'subscribe',
-    label: '구독',
-    desc: '원본과 연동되고, 학습 진도는 각자 별도입니다.',
-    detail: '내가 카드를 추가하면 구독자에게도 반영됩니다. 단, 학습 기록(SRS 진도)은 각자 따로 관리되어 자기 속도로 학습합니다. 구독자는 카드를 편집할 수 없습니다.',
-  },
-  {
-    value: 'snapshot',
-    label: '스냅샷',
-    desc: '현재 상태의 읽기 전용 복사본입니다.',
-    detail: '지금 시점의 카드를 그대로 복사하되, 상대방이 수정할 수 없습니다. 이후 원본을 업데이트해도 스냅샷에는 반영되지 않습니다.',
-  },
-]
-
 export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps) {
+  const { t } = useTranslation('sharing')
   const { createShare, error } = useSharingStore()
   const [mode, setMode] = useState<ShareMode>('copy')
   const [loading, setLoading] = useState(false)
   const [inviteLink, setInviteLink] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+
+  const SHARE_MODES: { value: ShareMode; labelKey: string; descKey: string; detailKey: string }[] = [
+    {
+      value: 'copy',
+      labelKey: 'shareMode.copy.label',
+      descKey: 'shareMode.copy.desc',
+      detailKey: 'shareMode.copy.detail',
+    },
+    {
+      value: 'subscribe',
+      labelKey: 'shareMode.subscribe.label',
+      descKey: 'shareMode.subscribe.desc',
+      detailKey: 'shareMode.subscribe.detail',
+    },
+    {
+      value: 'snapshot',
+      labelKey: 'shareMode.snapshot.label',
+      descKey: 'shareMode.snapshot.desc',
+      detailKey: 'shareMode.snapshot.detail',
+    },
+  ]
 
   if (!open) return null
 
@@ -72,7 +74,7 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={handleClose}>
       <div className="bg-white rounded-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">덱 공유</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('shareDeck')}</h3>
           <button onClick={handleClose} className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer">
             <X className="w-5 h-5" />
           </button>
@@ -80,13 +82,13 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
 
         <div className="p-4 space-y-4">
           <p className="text-sm text-gray-600">
-            <span className="font-medium">"{deckName}"</span> 덱을 공유합니다.
+            {t('shareDeckDesc', { name: deckName })}
           </p>
 
           {!inviteLink ? (
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">공유 모드</label>
+                <label className="text-sm font-medium text-gray-700">{t('shareMode.label')}</label>
                 {SHARE_MODES.map((m) => (
                   <label
                     key={m.value}
@@ -105,9 +107,9 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
                       className="mt-0.5"
                     />
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{m.label}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">{m.desc}</div>
-                      <div className="text-xs text-gray-400 mt-1 leading-relaxed">{m.detail}</div>
+                      <div className="text-sm font-medium text-gray-900">{t(m.labelKey)}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{t(m.descKey)}</div>
+                      <div className="text-xs text-gray-400 mt-1 leading-relaxed">{t(m.detailKey)}</div>
                     </div>
                   </label>
                 ))}
@@ -120,12 +122,12 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
                 disabled={loading}
                 className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
               >
-                {loading ? '생성 중...' : '초대 링크 생성'}
+                {loading ? t('creating') : t('createInviteLink')}
               </button>
             </>
           ) : (
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">초대 링크</label>
+              <label className="text-sm font-medium text-gray-700">{t('inviteLink')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -141,7 +143,7 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
                 </button>
               </div>
               <p className="text-xs text-gray-500">
-                이 링크를 공유하면 상대방이 덱에 접근할 수 있습니다.
+                {t('linkShareInfo')}
               </p>
             </div>
           )}

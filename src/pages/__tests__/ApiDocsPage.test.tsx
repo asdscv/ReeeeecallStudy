@@ -26,17 +26,17 @@ function renderPage() {
 describe('ApiDocsPage', () => {
   it('renders the page title', () => {
     renderPage()
-    expect(screen.getByText('API 문서')).toBeInTheDocument()
+    expect(screen.getByText('title')).toBeInTheDocument()
   })
 
   it('renders subtitle', () => {
     renderPage()
-    expect(screen.getByText(/외부 도구와 연동/)).toBeInTheDocument()
+    expect(screen.getByText('subtitle')).toBeInTheDocument()
   })
 
   it('renders search input', () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/검색/)
+    const input = screen.getByPlaceholderText('searchPlaceholder')
     expect(input).toBeInTheDocument()
   })
 
@@ -60,26 +60,27 @@ describe('ApiDocsPage', () => {
 
   it('filters sections when typing in search', () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '인증' } })
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    // Search for a term that appears in a section title i18n key
+    fireEvent.change(input, { target: { value: 'authentication' } })
 
-    // Authentication section should be visible
-    expect(screen.getByText('인증')).toBeInTheDocument()
+    // Authentication section should be visible (title is the i18n key)
+    expect(screen.getByText('sections.authentication.title')).toBeInTheDocument()
   })
 
   it('shows no results message when search has no matches', () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '존재하지않는검색어xyz99' } })
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    fireEvent.change(input, { target: { value: 'nonexistentsearchxyz99' } })
 
-    expect(screen.getByText(/결과가 없습니다/)).toBeInTheDocument()
+    expect(screen.getByText(/noResults/)).toBeInTheDocument()
   })
 
   it('displays endpoint method badges when section is expanded by search', () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/검색/)
-    // Search for deck endpoints to expand the section
-    fireEvent.change(input, { target: { value: '덱 목록' } })
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    // Search for endpoint path to expand the section
+    fireEvent.change(input, { target: { value: '/decks' } })
 
     const getBadges = screen.getAllByText('GET')
     expect(getBadges.length).toBeGreaterThan(0)
@@ -87,8 +88,8 @@ describe('ApiDocsPage', () => {
 
   it('displays endpoint paths when section is expanded by search', () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/검색/)
-    fireEvent.change(input, { target: { value: '덱 목록 조회' } })
+    const input = screen.getByPlaceholderText('searchPlaceholder')
+    fireEvent.change(input, { target: { value: '/decks' } })
 
     // Endpoint paths are visible in expanded state
     const pathElements = screen.getAllByText('/decks')

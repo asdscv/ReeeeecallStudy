@@ -24,18 +24,18 @@ export interface LayoutItemStyleResult {
  * Each option has a pixel value and a human-readable label.
  */
 export const FONT_SIZE_OPTIONS: { value: number; label: string }[] = [
-  { value: 12, label: '12px (아주 작게)' },
-  { value: 14, label: '14px (작게)' },
-  { value: 16, label: '16px (기본)' },
-  { value: 18, label: '18px' },
-  { value: 20, label: '20px' },
-  { value: 24, label: '24px (중간)' },
-  { value: 28, label: '28px' },
-  { value: 32, label: '32px (크게)' },
-  { value: 40, label: '40px' },
-  { value: 48, label: '48px (아주 크게)' },
-  { value: 56, label: '56px' },
-  { value: 64, label: '64px (최대)' },
+  { value: 12, label: 'template:fontSize.extraSmall' },
+  { value: 14, label: 'template:fontSize.small' },
+  { value: 16, label: 'template:fontSize.default' },
+  { value: 18, label: 'template:fontSize.18px' },
+  { value: 20, label: 'template:fontSize.20px' },
+  { value: 24, label: 'template:fontSize.medium' },
+  { value: 28, label: 'template:fontSize.28px' },
+  { value: 32, label: 'template:fontSize.large' },
+  { value: 40, label: 'template:fontSize.40px' },
+  { value: 48, label: 'template:fontSize.extraLarge' },
+  { value: 56, label: 'template:fontSize.56px' },
+  { value: 64, label: 'template:fontSize.max' },
 ]
 
 /**

@@ -1,0 +1,37 @@
+{
+  "title": "대시보드",
+  "stats": {
+    "totalCards": "전체 카드",
+    "todayReview": "오늘 복습",
+    "streak": "연속 학습",
+    "masteryRate": "숙달률"
+  },
+  "dailyChart": {
+    "title": "일별 학습량",
+    "total": "총 {{count}}회",
+    "noData": "아직 학습 기록이 없습니다",
+    "tooltipTimes": "{{value}}회",
+    "tooltipLabel": "학습"
+  },
+  "forecast": {
+    "title": "복습 예측 (7일)",
+    "noData": "예정된 복습이 없습니다",
+    "tooltipCards": "{{value}}장",
+    "tooltipLabel": "복습 예정"
+  },
+  "recentDecks": {
+    "title": "덱 현황",
+    "noDecks": "아직 덱이 없습니다. 덱을 만들어보세요!",
+    "goToDecks": "덱 관리로 이동",
+    "cardCount": "{{count}}장",
+    "newCards": "새 {{count}}",
+    "reviewCards": "복습 {{count}}",
+    "study": "학습"
+  },
+  "heatmap": {
+    "title": "학습 잔디",
+    "noStudy": "학습 없음",
+    "studyCount": "{{date}}: {{count}}회 학습",
+    "tooltip": "{{date}}: {{count}}회 학습"
+  }
+}

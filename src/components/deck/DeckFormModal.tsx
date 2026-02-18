@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ interface DeckFormModalProps {
 }
 
 export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
+  const { t } = useTranslation('decks')
   const { createDeck, updateDeck, templates } = useDeckStore()
 
   const [formValues, setFormValues] = useState<DeckSettingsFormValues>({
@@ -87,7 +89,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{editDeck ? '덱 수정' : '새 덱 만들기'}</DialogTitle>
+          <DialogTitle>{editDeck ? t('form.editTitle') : t('form.createTitle')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <DeckSettingsForm
@@ -102,14 +104,14 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
               onClick={onClose}
               className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
             >
-              취소
+              {t('form.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || !formValues.name.trim()}
               className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
             >
-              {loading ? '저장 중...' : editDeck ? '수정' : '만들기'}
+              {loading ? t('form.saving') : editDeck ? t('form.save') : t('form.create')}
             </button>
           </DialogFooter>
         </form>

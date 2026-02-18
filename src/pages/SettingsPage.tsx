@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -14,20 +15,21 @@ import {
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
 
-const SWIPE_DIRECTIONS: { key: keyof SwipeDirectionMap; label: string; icon: typeof ArrowLeft }[] = [
-  { key: 'left', label: '왼쪽 스와이프', icon: ArrowLeft },
-  { key: 'right', label: '오른쪽 스와이프', icon: ArrowRight },
-  { key: 'up', label: '위쪽 스와이프', icon: ArrowUp },
-  { key: 'down', label: '아래쪽 스와이프', icon: ArrowDown },
+const SWIPE_DIRECTIONS: { key: keyof SwipeDirectionMap; labelKey: string; icon: typeof ArrowLeft }[] = [
+  { key: 'left', labelKey: 'settings.answerMode.swipeLeft', icon: ArrowLeft },
+  { key: 'right', labelKey: 'settings.answerMode.swipeRight', icon: ArrowRight },
+  { key: 'up', labelKey: 'settings.answerMode.swipeUp', icon: ArrowUp },
+  { key: 'down', labelKey: 'settings.answerMode.swipeDown', icon: ArrowDown },
 ]
 
 function CopyButton({ text }: { text: string }) {
+  const { t } = useTranslation('settings')
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(text)
     setCopied(true)
-    toast.success('클립보드에 복사되었습니다')
+    toast.success(t('apiKey.copied'))
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -35,7 +37,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={handleCopy}
       className="p-1.5 text-gray-400 hover:text-gray-600 transition cursor-pointer"
-      title="복사"
+      title={t('apiKey.copy')}
     >
       {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
     </button>
@@ -43,6 +45,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function SettingsPage() {
+  const { t } = useTranslation('settings')
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
 
@@ -123,7 +126,7 @@ export function SettingsPage() {
       .eq('id', user.id)
 
     setSaving(false)
-    toast.success('설정이 저장되었습니다!')
+    toast.success(t('saved'))
   }
 
   const [generating, setGenerating] = useState(false)
@@ -159,7 +162,7 @@ export function SettingsPage() {
         } as Record<string, unknown>)
 
       if (error) {
-        toast.error('키 생성에 실패했습니다: ' + error.message)
+        toast.error(t('apiKey.generateError') + ': ' + error.message)
         return
       }
 
@@ -169,9 +172,9 @@ export function SettingsPage() {
       setShowApiKey(true)
       setShowKeyForm(false)
       setNewKeyName('')
-      toast.success('API 키가 생성되었습니다. 이 키는 다시 볼 수 없으니 복사해두세요!')
+      toast.success(t('apiKey.generated'))
     } catch (err) {
-      toast.error('키 생성 중 오류가 발생했습니다')
+      toast.error(t('apiKey.generateError'))
       console.error('[API Key]', err)
     } finally {
       setGenerating(false)
@@ -189,20 +192,20 @@ export function SettingsPage() {
     setApiKeyData(null)
     setShowApiKey(false)
     localStorage.removeItem('reeeeecall-api-key-data')
-    toast.success('API 키가 삭제되었습니다')
+    toast.success(t('apiKey.deleted'))
   }
 
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="text-gray-500">로딩 중...</div>
+        <div className="text-gray-500">{t('loading')}</div>
       </div>
     )
   }
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">설정</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{t('title')}</h1>
 
       <div className="space-y-4 sm:space-y-6">
         {/* Guide links */}
@@ -215,8 +218,8 @@ export function SettingsPage() {
               <BookOpen className="w-5 h-5" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-gray-900">사용법 가이드</div>
-              <div className="text-xs text-gray-500 mt-0.5">기능 설명, 학습 팁, 공유 방법</div>
+              <div className="text-sm font-semibold text-gray-900">{t('guide.title')}</div>
+              <div className="text-xs text-gray-500 mt-0.5">{t('guide.desc')}</div>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
           </button>
@@ -228,8 +231,8 @@ export function SettingsPage() {
               <Key className="w-5 h-5" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-gray-900">API 문서</div>
-              <div className="text-xs text-gray-500 mt-0.5">API 엔드포인트, 인증, 사용 예시</div>
+              <div className="text-sm font-semibold text-gray-900">{t('apiDocs.title')}</div>
+              <div className="text-xs text-gray-500 mt-0.5">{t('apiDocs.desc')}</div>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
           </button>
@@ -237,19 +240,19 @@ export function SettingsPage() {
 
         {/* Profile */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">프로필</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.title')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.email')}</label>
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">표시 이름</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.displayName')}</label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="이름을 입력하세요"
+                placeholder={t('profile.displayNamePlaceholder')}
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               />
             </div>
@@ -258,11 +261,11 @@ export function SettingsPage() {
 
         {/* SRS Study Settings */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">SRS 학습</h2>
-          <p className="text-sm text-gray-500 mb-4">SRS (간격 반복) 모드에서 한 세션에 추가되는 새 카드 수를 설정합니다</p>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('srs.title')}</h2>
+          <p className="text-sm text-gray-500 mb-4">{t('srs.description')}</p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              새 카드 한도
+              {t('srs.newCardLimit')}
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -273,18 +276,18 @@ export function SettingsPage() {
                 max={9999}
                 className="w-28 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               />
-              <span className="text-sm text-gray-500">장</span>
+              <span className="text-sm text-gray-500">{t('srs.cards')}</span>
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              SRS 학습 시 복습 카드 외에 추가로 나오는 새 카드의 최대 수입니다. 복습 카드는 이 한도에 영향을 받지 않습니다.
+              {t('srs.help')}
             </p>
           </div>
         </section>
 
         {/* Answer Input Mode */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">답변 방식</h2>
-          <p className="text-sm text-gray-500 mb-4">학습 중 답변을 선택하는 방식을 설정합니다</p>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('answerMode.title')}</h2>
+          <p className="text-sm text-gray-500 mb-4">{t('answerMode.description')}</p>
 
           {/* Mode selection cards */}
           <div className="grid grid-cols-2 gap-3 mb-4">
@@ -298,8 +301,8 @@ export function SettingsPage() {
               }`}
             >
               <div className="text-2xl mb-2">👆</div>
-              <div className="text-sm font-semibold text-gray-900">버튼</div>
-              <div className="text-xs text-gray-500 mt-1">버튼을 눌러 답변 선택</div>
+              <div className="text-sm font-semibold text-gray-900">{t('answerMode.button')}</div>
+              <div className="text-xs text-gray-500 mt-1">{t('answerMode.buttonDesc')}</div>
             </button>
             <button
               type="button"
@@ -311,8 +314,8 @@ export function SettingsPage() {
               }`}
             >
               <div className="text-2xl mb-2">👋</div>
-              <div className="text-sm font-semibold text-gray-900">스와이프</div>
-              <div className="text-xs text-gray-500 mt-1">카드를 밀어서 답변 선택</div>
+              <div className="text-sm font-semibold text-gray-900">{t('answerMode.swipe')}</div>
+              <div className="text-xs text-gray-500 mt-1">{t('answerMode.swipeDesc')}</div>
             </button>
           </div>
 
@@ -320,18 +323,18 @@ export function SettingsPage() {
           {inputSettings.mode === 'swipe' && (
             <div className="space-y-4 pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600">
-                각 방향에 동작을 할당하세요. 설정하지 않은 방향은 비활성화됩니다.
+                {t('answerMode.directionsHelp')}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {SWIPE_DIRECTIONS.map(({ key, label, icon: Icon }) => (
+                {SWIPE_DIRECTIONS.map(({ key, labelKey, icon: Icon }) => (
                   <div key={key} className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600">
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
                       <label className="text-sm font-medium text-gray-700 mb-1 block">
-                        {label}
+                        {t(labelKey)}
                       </label>
                       <select
                         value={inputSettings.directions[key]}
@@ -341,11 +344,11 @@ export function SettingsPage() {
                         })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                       >
-                        <option value="">설정 안함</option>
-                        <option value="again">Again (다시)</option>
-                        <option value="hard">Hard (어려움)</option>
-                        <option value="good">Good (적당)</option>
-                        <option value="easy">Easy (쉬움)</option>
+                        <option value="">{t('answerMode.notSet')}</option>
+                        <option value="again">{t('answerMode.again')}</option>
+                        <option value="hard">{t('answerMode.hard')}</option>
+                        <option value="good">{t('answerMode.good')}</option>
+                        <option value="easy">{t('answerMode.easy')}</option>
                       </select>
                     </div>
                   </div>
@@ -354,7 +357,7 @@ export function SettingsPage() {
 
               <div className="p-3 bg-blue-50 rounded-lg">
                 <p className="text-xs text-blue-800">
-                  추천 설정: 왼쪽=Again, 오른쪽=Good (빠른 학습에 유용)
+                  {t('answerMode.recommendation')}
                 </p>
               </div>
             </div>
@@ -363,8 +366,8 @@ export function SettingsPage() {
 
         {/* TTS settings */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">자동 TTS 읽기</h2>
-          <p className="text-sm text-gray-500 mb-4">카드 뒤집기 시 TTS 설정된 필드를 자동으로 읽어줍니다</p>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('tts.title')}</h2>
+          <p className="text-sm text-gray-500 mb-4">{t('tts.description')}</p>
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
@@ -372,39 +375,39 @@ export function SettingsPage() {
               onChange={(e) => setTtsEnabled(e.target.checked)}
               className="cursor-pointer"
             />
-            <span className="text-sm text-gray-700">자동 읽기 활성화</span>
+            <span className="text-sm text-gray-700">{t('tts.enable')}</span>
           </label>
           <p className="text-xs text-gray-400 mt-3">
-            TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다.
+            {t('tts.help')}
           </p>
         </section>
 
         {/* API Key Management */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-lg font-semibold text-gray-900">API 키 관리</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('apiKey.title')}</h2>
             {!apiKeyData && !showKeyForm && (
               <button
                 onClick={() => setShowKeyForm(true)}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition cursor-pointer font-medium"
               >
                 <Plus size={16} />
-                새 키 생성
+                {t('apiKey.generate')}
               </button>
             )}
           </div>
-          <p className="text-sm text-gray-500 mb-5">최대 1개의 API 키를 생성할 수 있습니다</p>
+          <p className="text-sm text-gray-500 mb-5">{t('apiKey.limit')}</p>
 
           {/* New key form */}
           {showKeyForm && !apiKeyData && (
             <div className="border border-gray-200 rounded-xl p-4 sm:p-5 mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">키 이름</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('apiKey.keyName')}</label>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <input
                   type="text"
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
-                  placeholder="예: my-script"
+                  placeholder={t('apiKey.keyNamePlaceholder')}
                   className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm"
                   onKeyDown={(e) => { if (e.key === 'Enter') handleGenerateApiKey() }}
                 />
@@ -414,13 +417,13 @@ export function SettingsPage() {
                     disabled={generating}
                     className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:opacity-50 transition cursor-pointer font-medium"
                   >
-                    {generating ? '생성 중...' : '생성'}
+                    {generating ? t('apiKey.generating') : t('apiKey.create')}
                   </button>
                   <button
                     onClick={() => { setShowKeyForm(false); setNewKeyName('') }}
                     className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition cursor-pointer"
                   >
-                    취소
+                    {t('apiKey.cancel')}
                   </button>
                 </div>
               </div>
@@ -438,10 +441,10 @@ export function SettingsPage() {
                 <button
                   onClick={revokeApiKey}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
-                  title="삭제"
+                  title={t('apiKey.delete')}
                 >
                   <Trash2 size={14} />
-                  삭제
+                  {t('apiKey.delete')}
                 </button>
               </div>
 
@@ -454,7 +457,7 @@ export function SettingsPage() {
                   <button
                     onClick={() => setShowApiKey(!showApiKey)}
                     className="p-2 text-gray-400 hover:text-gray-600 transition cursor-pointer"
-                    title={showApiKey ? '숨기기' : '보기'}
+                    title={showApiKey ? t('apiKey.hide') : t('apiKey.show')}
                   >
                     {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -463,14 +466,14 @@ export function SettingsPage() {
               ) : (
                 <div className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400 font-mono mb-3">
                   rc_{'\u2022'.repeat(32)}
-                  <span className="ml-2 text-xs text-gray-400 font-sans">(보안상 다시 볼 수 없습니다)</span>
+                  <span className="ml-2 text-xs text-gray-400 font-sans">({t('apiKey.masked')})</span>
                 </div>
               )}
 
               {/* Dates */}
               <div className="space-y-0.5">
                 <p className="text-sm text-gray-400">
-                  생성일: {formatLocalDateTime(apiKeyData.createdAt)}
+                  {t('apiKey.createdAt')}: {formatLocalDateTime(apiKeyData.createdAt)}
                 </p>
               </div>
             </div>
@@ -478,7 +481,7 @@ export function SettingsPage() {
 
           {!apiKeyData && !showKeyForm && (
             <div className="text-center py-6 text-sm text-gray-400">
-              생성된 API 키가 없습니다.
+              {t('apiKey.noKeys')}
             </div>
           )}
         </section>
@@ -486,12 +489,12 @@ export function SettingsPage() {
         {/* Logout */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">계정</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('account.title')}</h2>
             <button
               onClick={signOut}
               className="px-4 py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
             >
-              로그아웃
+              {t('account.logout')}
             </button>
           </div>
         </section>
@@ -502,7 +505,7 @@ export function SettingsPage() {
           disabled={saving}
           className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer"
         >
-          {saving ? '저장 중...' : '설정 저장'}
+          {saving ? t('saving') : t('save')}
         </button>
       </div>
     </div>

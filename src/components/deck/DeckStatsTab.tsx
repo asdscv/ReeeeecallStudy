@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts'
 import type { Card, StudyLog } from '../../types/database'
 import { calculateDeckStats, getDailyStudyCounts, fetchDeckStudyLogs } from '../../lib/stats'
@@ -17,6 +18,7 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
+  const { t } = useTranslation('decks')
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -43,17 +45,17 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
     <div className="space-y-6">
       {/* Summary grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard label="전체 카드" value={stats.totalCards} />
-        <StatCard label="숙달률" value={`${stats.masteryRate}%`} />
-        <StatCard label="평균 쉬움도" value={stats.avgEase.toFixed(2)} />
-        <StatCard label="평균 간격" value={`${stats.avgInterval}일`} />
+        <StatCard label={t('stats.totalCards')} value={stats.totalCards} />
+        <StatCard label={t('stats.masteryRate')} value={`${stats.masteryRate}%`} />
+        <StatCard label={t('stats.avgEase')} value={stats.avgEase.toFixed(2)} />
+        <StatCard label={t('stats.avgInterval')} value={t('stats.days', { count: stats.avgInterval })} />
       </div>
 
       {/* Status distribution pie chart */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">상태 분포</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">{t('stats.statusDistribution')}</h3>
         {stats.totalCards === 0 ? (
-          <p className="text-sm text-gray-400 py-8 text-center">카드가 없습니다</p>
+          <p className="text-sm text-gray-400 py-8 text-center">{t('stats.noCards')}</p>
         ) : (
           <div className="flex items-center gap-6">
             <ResponsiveContainer width={160} height={160}>
@@ -71,7 +73,7 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [`${value}장`]} />
+                <Tooltip formatter={(value) => [t('stats.cardCount', { count: Number(value) })]} />
               </PieChart>
             </ResponsiveContainer>
             <div className="space-y-2">
@@ -82,7 +84,7 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
                     style={{ backgroundColor: d.color }}
                   />
                   <span className="text-gray-700">{d.name}</span>
-                  <span className="text-gray-400">{d.value}장</span>
+                  <span className="text-gray-400">{t('stats.cardCount', { count: d.value })}</span>
                 </div>
               ))}
             </div>
@@ -92,11 +94,11 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
 
       {/* Daily study chart */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">일별 학습량 (30일)</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">{t('stats.dailyStudy')}</h3>
         {loading ? (
-          <p className="text-sm text-gray-400 py-8 text-center animate-pulse">로딩 중...</p>
+          <p className="text-sm text-gray-400 py-8 text-center animate-pulse">{t('stats.loading')}</p>
         ) : studyLogs.length === 0 ? (
-          <p className="text-sm text-gray-400 py-8 text-center">학습 기록이 없습니다</p>
+          <p className="text-sm text-gray-400 py-8 text-center">{t('stats.noStudyRecords')}</p>
         ) : (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={dailyData}>
@@ -109,7 +111,7 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
               />
               <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={30} />
               <Tooltip
-                formatter={(value) => [`${value}회`, '학습']}
+                formatter={(value) => [t('stats.studyCount', { count: Number(value) }), t('stats.study')]}
                 labelFormatter={(label) => String(label)}
               />
               <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />

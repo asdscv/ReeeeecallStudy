@@ -50,7 +50,7 @@ afterEach(() => {
 describe('Loading state', () => {
   it('should show loading spinner initially', () => {
     renderCallback()
-    expect(screen.getByText('처리 중...')).toBeInTheDocument()
+    expect(screen.getByText('callback.processing')).toBeInTheDocument()
   })
 
   it('should subscribe to auth state changes', () => {
@@ -231,7 +231,7 @@ describe('Double navigation prevention', () => {
     })
 
     // Should not show timeout error since navigation already happened
-    expect(screen.queryByText('처리 시간이 초과되었습니다. 다시 시도해주세요.')).not.toBeInTheDocument()
+    expect(screen.queryByText('callback.errors.timeout')).not.toBeInTheDocument()
   })
 })
 
@@ -242,7 +242,8 @@ describe('Hash error handling', () => {
 
     renderCallback()
 
-    expect(screen.getByText('링크가 만료되었습니다. 다시 시도해주세요.')).toBeInTheDocument()
+    // In test env, t() returns key, but with defaultValue it shows the error description
+    expect(screen.getByText('OTP expired')).toBeInTheDocument()
   })
 
   it('should show access_denied error from hash', () => {
@@ -250,7 +251,8 @@ describe('Hash error handling', () => {
 
     renderCallback()
 
-    expect(screen.getByText('접근이 거부되었습니다. 다시 시도해주세요.')).toBeInTheDocument()
+    // In test env, t() returns key, but with defaultValue it shows the error description
+    expect(screen.getByText('Access denied')).toBeInTheDocument()
   })
 
   it('should show fallback error description from hash', () => {
@@ -266,7 +268,7 @@ describe('Hash error handling', () => {
 
     renderCallback()
 
-    expect(screen.getByText('인증에 실패했습니다.')).toBeInTheDocument()
+    expect(screen.getByText('callback.errors.default')).toBeInTheDocument()
   })
 })
 
@@ -279,7 +281,7 @@ describe('Timeout', () => {
       vi.advanceTimersByTime(10000)
     })
 
-    expect(screen.getByText('처리 시간이 초과되었습니다. 다시 시도해주세요.')).toBeInTheDocument()
+    expect(screen.getByText('callback.errors.timeout')).toBeInTheDocument()
   })
 
   it('should not show timeout before 10 seconds', () => {
@@ -289,8 +291,8 @@ describe('Timeout', () => {
       vi.advanceTimersByTime(9999)
     })
 
-    expect(screen.queryByText('처리 시간이 초과되었습니다. 다시 시도해주세요.')).not.toBeInTheDocument()
-    expect(screen.getByText('처리 중...')).toBeInTheDocument()
+    expect(screen.queryByText('callback.errors.timeout')).not.toBeInTheDocument()
+    expect(screen.getByText('callback.processing')).toBeInTheDocument()
   })
 })
 
@@ -304,7 +306,7 @@ describe('Error view', () => {
     const user = userEvent.setup()
     renderCallback()
 
-    const btn = screen.getByRole('button', { name: '로그인 페이지로 돌아가기' })
+    const btn = screen.getByRole('button', { name: 'callback.backToLogin' })
     await user.click(btn)
 
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login', { replace: true })

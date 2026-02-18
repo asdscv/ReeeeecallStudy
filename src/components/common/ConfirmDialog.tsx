@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -24,10 +25,11 @@ export function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmLabel = '확인',
+  confirmLabel,
   danger = false,
   loading = false,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation('common')
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent>
@@ -40,7 +42,7 @@ export function ConfirmDialog({
             onClick={onClose}
             className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
           >
-            취소
+            {t('confirmDialog.cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -51,7 +53,7 @@ export function ConfirmDialog({
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {loading ? '처리 중...' : confirmLabel}
+            {loading ? t('confirmDialog.processing') : (confirmLabel || t('confirmDialog.confirm'))}
           </button>
         </DialogFooter>
       </DialogContent>

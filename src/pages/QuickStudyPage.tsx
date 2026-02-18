@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
@@ -16,6 +17,7 @@ import {
 import type { Deck, StudyMode } from '../types/database'
 
 export function QuickStudyPage() {
+  const { t } = useTranslation(['study', 'common'])
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { decks, stats, loading, fetchDecks, fetchStats } = useDeckStore()
@@ -123,7 +125,7 @@ export function QuickStudyPage() {
   return (
     <div>
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-        <span className="mr-2">⚡</span>빠른 학습
+        <>⚡{t('quickStudy.title')}</>
       </h1>
 
       {loading ? (
@@ -133,7 +135,7 @@ export function QuickStudyPage() {
       ) : decks.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <div className="text-5xl mb-4">📚</div>
-          <p className="text-gray-500">덱이 없습니다. 먼저 덱을 만들어주세요.</p>
+          <p className="text-gray-500">{t('quickStudy.noDecks')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
@@ -157,17 +159,17 @@ export function QuickStudyPage() {
                     </span>
                   </div>
                   <div className="text-xs sm:text-sm text-gray-500 mb-1.5 sm:mb-2">
-                    {deckStats?.total_cards ?? 0}장
+                    {t('quickStudy.cardCount', { count: deckStats?.total_cards ?? 0 })}
                   </div>
                   <div className="flex flex-wrap gap-1 sm:gap-2">
                     {(deckStats?.new_cards ?? 0) > 0 && (
                       <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-blue-100 text-blue-700">
-                        새 {deckStats!.new_cards}
+                        {t('quickStudy.newCards', { count: deckStats!.new_cards })}
                       </span>
                     )}
                     {(deckStats?.review_cards ?? 0) > 0 && (
                       <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-orange-100 text-orange-700">
-                        복습 {deckStats!.review_cards}
+                        {t('quickStudy.reviewCards', { count: deckStats!.review_cards })}
                       </span>
                     )}
                   </div>
@@ -194,10 +196,10 @@ export function QuickStudyPage() {
               </h2>
               <p className="text-sm text-gray-500 mt-1">
                 {selectedMode === 'by_date'
-                  ? '학습할 날짜를 선택하세요'
+                  ? t('quickStudy.selectDate')
                   : selectedMode
-                    ? '배치 크기를 설정하세요'
-                    : '학습 모드를 선택하세요'}
+                    ? t('quickStudy.setBatchSize')
+                    : t('quickStudy.selectMode')}
               </p>
             </div>
 
@@ -212,8 +214,8 @@ export function QuickStudyPage() {
                   >
                     <span className="text-xl">{opt.emoji}</span>
                     <div>
-                      <div className="font-medium text-gray-900 text-sm">{opt.label}</div>
-                      <div className="text-xs text-gray-500">{opt.desc}</div>
+                      <div className="font-medium text-gray-900 text-sm">{t(opt.label)}</div>
+                      <div className="text-xs text-gray-500">{t(opt.desc)}</div>
                     </div>
                   </button>
                 ))}
@@ -225,7 +227,7 @@ export function QuickStudyPage() {
                   <span className="text-lg">
                     {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.emoji}
                   </span>
-                  {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.label}
+                  {t(STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.label ?? '')}
                 </div>
                 <DatePicker
                   selectedDate={selectedDate}
@@ -235,15 +237,15 @@ export function QuickStudyPage() {
                 <div className="mt-2 text-sm font-medium text-blue-600">
                   {selectedDate && (() => {
                     const [year, month, day] = selectedDate.split('-').map(Number)
-                    return `${year}년 ${month}월 ${day}일`
-                  })()} 업로드: {dateCardCount}장
+                    return t('quickStudy.uploadDate', { year, month, day, count: dateCardCount })
+                  })()}
                 </div>
                 <button
                   onClick={handleStartStudy}
                   disabled={dateCardCount === 0}
                   className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
                 >
-                  학습 시작
+                  {t('quickStudy.startStudy')}
                 </button>
               </div>
             ) : (
@@ -253,10 +255,10 @@ export function QuickStudyPage() {
                   <span className="text-lg">
                     {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.emoji}
                   </span>
-                  {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.label}
+                  {t(STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.label ?? '')}
                 </div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  배치 크기
+                  {t('quickStudy.batchSize')}
                 </label>
                 <input
                   type="number"
@@ -267,13 +269,13 @@ export function QuickStudyPage() {
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  한 세션에 학습할 카드 수 ({MIN_BATCH_SIZE}~{MAX_BATCH_SIZE})
+                  {t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
                 </p>
                 <button
                   onClick={handleStartStudy}
                   className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition cursor-pointer"
                 >
-                  학습 시작
+                  {t('quickStudy.startStudy')}
                 </button>
               </div>
             )}
@@ -283,7 +285,7 @@ export function QuickStudyPage() {
                 onClick={selectedMode ? () => setSelectedMode(null) : closeModal}
                 className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
               >
-                {selectedMode ? '← 모드 선택으로' : '취소'}
+                {selectedMode ? t('quickStudy.backToModeSelect') : t('common:actions.cancel')}
               </button>
             </div>
           </div>

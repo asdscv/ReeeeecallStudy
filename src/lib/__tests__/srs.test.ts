@@ -197,18 +197,18 @@ describe('previewIntervals', () => {
     const card = makeCard()
     const preview = previewIntervals(card)
 
-    expect(preview.again).toBe('10분')
-    expect(preview.hard).toBe('1일')
-    expect(preview.good).toBe('1일')
-    expect(preview.easy).toBe('4일')
+    expect(preview.again).toBe('srs:interval.minutes')
+    expect(preview.hard).toBe('srs:interval.oneDay')
+    expect(preview.good).toBe('srs:interval.oneDay')
+    expect(preview.easy).toBe('srs:interval.days:4')
   })
 
   it('should show larger intervals for reviewed cards', () => {
     const card = makeCard({ ease_factor: 2.5, repetitions: 3, interval_days: 10 })
     const preview = previewIntervals(card)
 
-    expect(preview.again).toBe('10분')
-    expect(preview.hard).toBe('12일')
-    expect(preview.good).toBe('25일')  // round(10 * 2.5) = 25
+    expect(preview.again).toBe('srs:interval.minutes')
+    expect(preview.hard).toBe('srs:interval.days:12')
+    expect(preview.good).toBe('srs:interval.days:25')  // round(10 * 2.5) = 25
   })
 })

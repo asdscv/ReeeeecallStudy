@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -15,6 +16,7 @@ import type { Deck, Card, CardTemplate } from '../types/database'
 type TabId = 'cards' | 'upload-date' | 'stats'
 
 export function DeckDetailPage() {
+  const { t } = useTranslation(['decks', 'common'])
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
 
@@ -177,9 +179,9 @@ export function DeckDetailPage() {
   }
 
   const tabs: { id: TabId; label: string }[] = [
-    { id: 'cards', label: '카드 목록' },
-    { id: 'upload-date', label: '업로드 일자' },
-    { id: 'stats', label: '통계' },
+    { id: 'cards', label: t('decks:detail.tabs.cardList') },
+    { id: 'upload-date', label: t('decks:detail.tabs.uploadDate') },
+    { id: 'stats', label: t('decks:detail.tabs.statistics') },
   ]
 
   return (
@@ -190,7 +192,7 @@ export function DeckDetailPage() {
           onClick={() => navigate('/decks')}
           className="text-sm text-gray-500 hover:text-gray-700 mb-2 cursor-pointer"
         >
-          ← 덱 목록
+          {t('decks:detail.backToList')}
         </button>
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="text-2xl sm:text-3xl">{deck.icon}</span>
@@ -203,16 +205,16 @@ export function DeckDetailPage() {
         {/* Stats badges */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3">
           <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-full">
-            전체 {cards.length}장
+            {t('decks:detail.totalCards', { count: cards.length })}
           </span>
           {newCount > 0 && (
             <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-blue-50 text-blue-700 rounded-full">
-              새 카드 {newCount}
+              {t('decks:detail.newCards', { count: newCount })}
             </span>
           )}
           {(reviewCount + learningCount) > 0 && (
             <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-amber-50 text-amber-700 rounded-full">
-              복습 {reviewCount + learningCount}
+              {t('decks:detail.reviewCards', { count: reviewCount + learningCount })}
             </span>
           )}
         </div>
@@ -223,7 +225,7 @@ export function DeckDetailPage() {
             onClick={() => navigate(`/decks/${deckId}/study/setup`)}
             className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
-            학습 시작
+            {t('decks:detail.startStudy')}
           </button>
           {!deck.is_readonly && (
             <button
@@ -231,7 +233,7 @@ export function DeckDetailPage() {
               className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
             >
               <Settings className="w-4 h-4" />
-              편집
+              {t('decks:detail.edit')}
             </button>
           )}
           <button
@@ -239,14 +241,14 @@ export function DeckDetailPage() {
             className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
             <Share2 className="w-4 h-4" />
-            공유
+            {t('decks:detail.share')}
           </button>
           {!deck.is_readonly && (
             <button
               onClick={() => { setEditingCard(null); setShowCardForm(true) }}
               className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
             >
-              + 카드
+              {t('decks:detail.addCard')}
             </button>
           )}
           {!deck.is_readonly && (
@@ -254,14 +256,14 @@ export function DeckDetailPage() {
               onClick={() => setShowImport(true)}
               className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
             >
-              가져오기
+              {t('decks:detail.import')}
             </button>
           )}
           <button
             onClick={() => setShowExport(true)}
             className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
-            내보내기
+            {t('decks:detail.export')}
           </button>
         </div>
       </div>
@@ -292,7 +294,7 @@ export function DeckDetailPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
-              placeholder="카드 검색..."
+              placeholder={t('decks:detail.searchPlaceholder')}
               className="flex-1 px-3 sm:px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
             />
             <select
@@ -300,7 +302,7 @@ export function DeckDetailPage() {
               onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}
               className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
             >
-              <option value="all">전체 상태</option>
+              <option value="all">{t('decks:detail.allStatus')}</option>
               <option value="new">New</option>
               <option value="learning">Learning</option>
               <option value="review">Review</option>
@@ -312,19 +314,19 @@ export function DeckDetailPage() {
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 sm:gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
               <span className="text-sm text-blue-700 font-medium">
-                {selectedIds.size}개 선택
+                {t('decks:detail.selectedCount', { count: selectedIds.size })}
               </span>
               <button
                 onClick={() => setShowBulkDelete(true)}
                 className="px-3 py-1 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer"
               >
-                삭제
+                {t('common:delete')}
               </button>
               <button
                 onClick={() => setSelectedIds(new Set())}
                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
               >
-                해제
+                {t('common:deselect')}
               </button>
             </div>
           )}
@@ -333,17 +335,17 @@ export function DeckDetailPage() {
           {cards.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
               <div className="text-4xl sm:text-5xl mb-4">🃏</div>
-              <p className="text-gray-500 mb-4">카드가 없습니다. 카드를 추가해보세요.</p>
+              <p className="text-gray-500 mb-4">{t('decks:detail.noCards')}</p>
               <button
                 onClick={() => { setEditingCard(null); setShowCardForm(true) }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
               >
-                + 첫 번째 카드 추가
+                {t('decks:detail.addFirstCard')}
               </button>
             </div>
           ) : filteredCards.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
-              검색 결과가 없습니다.
+              {t('decks:detail.noSearchResults')}
             </div>
           ) : (
             <>
@@ -361,7 +363,7 @@ export function DeckDetailPage() {
                         />
                       </th>
                       <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-10">
-                        #
+                        {t('decks:detail.columns.number')}
                       </th>
                       {displayFields.map((field) => (
                         <th
@@ -372,10 +374,10 @@ export function DeckDetailPage() {
                         </th>
                       ))}
                       <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-24">
-                        상태
+                        {t('decks:detail.columns.status')}
                       </th>
                       <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-28">
-                        추가일
+                        {t('decks:detail.columns.addedDate')}
                       </th>
                       <th className="px-4 py-3 w-20" />
                     </tr>
@@ -417,14 +419,14 @@ export function DeckDetailPage() {
                             <button
                               onClick={() => handleEditCard(card)}
                               className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
-                              title="편집"
+                              title={t('common:edit')}
                             >
                               <Pencil className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setDeletingCard(card)}
                               className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
-                              title="삭제"
+                              title={t('common:delete')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -446,7 +448,7 @@ export function DeckDetailPage() {
                     onChange={toggleSelectAll}
                     className="cursor-pointer"
                   />
-                  <span className="text-xs text-gray-500">전체 선택</span>
+                  <span className="text-xs text-gray-500">{t('common:selectAll')}</span>
                 </div>
                 {paginatedCards.map((card, i) => (
                   <div
@@ -502,7 +504,7 @@ export function DeckDetailPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-3 bg-white rounded-xl border border-gray-200">
                   <div className="flex items-center gap-2">
                     <span className="text-xs sm:text-sm text-gray-500">
-                      {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / {filteredCards.length}장
+                      {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / {t('decks:detail.totalCards', { count: filteredCards.length })}
                     </span>
                     <select
                       value={cardsPerPage}
@@ -513,7 +515,7 @@ export function DeckDetailPage() {
                       className="text-sm border border-gray-300 rounded px-2 py-1 outline-none"
                     >
                       {[10, 20, 30, 50, 100].map((n) => (
-                        <option key={n} value={n}>{n}개씩</option>
+                        <option key={n} value={n}>{t('decks:detail.perPage', { count: n })}</option>
                       ))}
                     </select>
                   </div>
@@ -613,9 +615,9 @@ export function DeckDetailPage() {
         open={!!deletingCard}
         onClose={() => setDeletingCard(null)}
         onConfirm={handleDeleteCard}
-        title="카드 삭제"
-        message="이 카드를 삭제하시겠습니까? 되돌릴 수 없습니다."
-        confirmLabel="삭제"
+        title={t('decks:detail.deleteCard')}
+        message={t('decks:detail.deleteCardConfirm')}
+        confirmLabel={t('common:delete')}
         danger
         loading={deleteLoading}
       />
@@ -625,9 +627,9 @@ export function DeckDetailPage() {
         open={showBulkDelete}
         onClose={() => setShowBulkDelete(false)}
         onConfirm={handleBulkDelete}
-        title="카드 일괄 삭제"
-        message={`선택한 ${selectedIds.size}개의 카드를 삭제하시겠습니까? 되돌릴 수 없습니다.`}
-        confirmLabel="삭제"
+        title={t('decks:detail.bulkDelete')}
+        message={t('decks:detail.bulkDeleteConfirm', { count: selectedIds.size })}
+        confirmLabel={t('common:delete')}
         danger
         loading={deleteLoading}
       />

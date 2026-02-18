@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ interface ExportModalProps {
 type ExportFormat = 'json' | 'csv'
 
 export function ExportModal({ open, onClose, deck, template, cards }: ExportModalProps) {
+  const { t } = useTranslation('import-export')
   const [format, setFormat] = useState<ExportFormat>('json')
 
   const handleExport = () => {
@@ -59,16 +61,16 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>카드 내보내기</DialogTitle>
+          <DialogTitle>{t('exportCards')}</DialogTitle>
         </DialogHeader>
         {!template ? (
-          <p className="text-gray-500">템플릿이 없어 내보내기할 수 없습니다.</p>
+          <p className="text-gray-500">{t('noTemplate')}</p>
         ) : cards.length === 0 ? (
-          <p className="text-gray-500">내보낼 카드가 없습니다.</p>
+          <p className="text-gray-500">{t('noCards')}</p>
         ) : (
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">내보내기 형식</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t('format')}</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setFormat('json')}
@@ -80,7 +82,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                 >
                   <p className="font-medium text-gray-900">JSON</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    덱/템플릿 메타데이터 포함. 다른 기기에서 복원 가능.
+                    {t('jsonDesc')}
                   </p>
                 </button>
                 <button
@@ -93,14 +95,14 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                 >
                   <p className="font-medium text-gray-900">CSV</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    엑셀/구글 시트에서 편집 가능. 카드 데이터만 포함.
+                    {t('csvDesc')}
                   </p>
                 </button>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
-              <span className="font-medium">{cards.length}</span>개의 카드를 내보냅니다.
+              {t('exportCount', { count: cards.length })}
             </div>
 
             <DialogFooter>
@@ -108,13 +110,13 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                 onClick={onClose}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
-                취소
+                {t('cancel')}
               </button>
               <button
                 onClick={handleExport}
                 className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
               >
-                내보내기
+                {t('export')}
               </button>
             </DialogFooter>
           </div>

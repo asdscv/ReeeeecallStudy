@@ -173,7 +173,7 @@ describe('validateKeyName', () => {
     const longName = 'a'.repeat(API_KEY_NAME_MAX_LENGTH + 1)
     const result = validateKeyName(longName)
     expect(result.valid).toBe(false)
-    expect(result.error).toContain(`${API_KEY_NAME_MAX_LENGTH}`)
+    expect(result.error).toBe('errors:apiKey.nameTooLong')
   })
 
   it('accepts name at max length', () => {

@@ -1,0 +1,99 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS (Spaced Repetition)",
+      "description": "Automatically selects cards based on review timing"
+    },
+    "sequential_review": {
+      "label": "Sequential Review",
+      "description": "Study new and review cards in order"
+    },
+    "random": {
+      "label": "Random",
+      "description": "Shuffle cards randomly for study"
+    },
+    "sequential": {
+      "label": "Sequential",
+      "description": "Study cards in order"
+    },
+    "by_date": {
+      "label": "By Date",
+      "description": "Study cards uploaded on a specific date"
+    }
+  },
+  "quickStudy": {
+    "title": "Quick Study",
+    "noDecks": "No decks. Please create a deck first.",
+    "cardCount": "{{count}} cards",
+    "newCards": "New {{count}}",
+    "reviewCards": "Review {{count}}",
+    "selectDate": "Select a date to study",
+    "setBatchSize": "Set batch size",
+    "selectMode": "Select a study mode",
+    "startStudy": "Start Study",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count}} cards",
+    "batchSize": "Batch Size",
+    "batchSizeDesc": "Cards to study per session ({{min}}~{{max}})",
+    "backToModeSelect": "← Back to Mode Selection"
+  },
+  "setup": {
+    "title": "Study Setup",
+    "deckInfo": "{{icon}} {{name}} · {{count}} cards",
+    "studyMode": "Study Mode",
+    "selectUploadDate": "Select Upload Date",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count}} cards"
+  },
+  "session": {
+    "loading": "Loading...",
+    "noCards": "No cards to study",
+    "allReviewed": "All cards reviewed!",
+    "backToDeck": "Back to Deck"
+  },
+  "card": {
+    "tapToFlip": "Tap to flip",
+    "tapToSeeAnswer": "Tap card to see answer",
+    "tapToReveal": "Tap card to see answer",
+    "ttsPlay": "Play TTS"
+  },
+  "rating": {
+    "dontKnow": "Don't Know",
+    "knowIt": "Know It",
+    "known": "Known",
+    "unknown": "Unknown",
+    "next": "Next →"
+  },
+  "summary": {
+    "title": "Study Complete!",
+    "completed": "Study Complete!",
+    "greatJob": "Great job!",
+    "wellDone": "Great job! Keep up the good work.",
+    "studyCards": "Study Cards",
+    "cardsStudied": "Cards Studied",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "Time Spent",
+    "timeFormat": "{{minutes}}m {{seconds}}s",
+    "avgPerCard": "Avg Per Card",
+    "secondsFormat": "{{seconds}}s",
+    "ratingDistribution": "Rating Distribution",
+    "backToDeck": "Back to Deck",
+    "studyAgain": "Study Again",
+    "knowIt": "Know It",
+    "dontKnow": "Don't Know",
+    "next": "Next"
+  },
+  "weekdays": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import type { RatingDistribution } from '../../lib/study-history-stats'
 
@@ -20,16 +21,17 @@ const RATING_LABELS: Record<string, string> = {
 }
 
 export function RatingDistributionChart({ data }: RatingDistributionChartProps) {
+  const { t } = useTranslation('history')
   const total = data.reduce((s, d) => s + d.count, 0)
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
       <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <h3 className="text-sm font-medium text-gray-700">평가 분포</h3>
-        <span className="text-xs text-gray-400">총 {total}건</span>
+        <h3 className="text-sm font-medium text-gray-700">{t('charts.ratingDistribution')}</h3>
+        <span className="text-xs text-gray-400">{t('charts.ratingTotal', { count: total })}</span>
       </div>
       {total === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">평가 데이터가 없습니다</p>
+        <p className="text-sm text-gray-400 py-8 text-center">{t('charts.noRatingData')}</p>
       ) : (
         <div className="flex items-center gap-4">
           <ResponsiveContainer width="50%" height={180}>
@@ -53,7 +55,7 @@ export function RatingDistributionChart({ data }: RatingDistributionChartProps) 
               </Pie>
               <Tooltip
                 formatter={(value, name) => [
-                  `${value}건 (${Math.round((Number(value) / total) * 100)}%)`,
+                  t('chart.countPercent', { count: Number(value), percent: Math.round((Number(value) / total) * 100) }),
                   RATING_LABELS[String(name)] ?? name,
                 ]}
               />

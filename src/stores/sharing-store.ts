@@ -107,14 +107,14 @@ export const useSharingStore = create<SharingState>((set, get) => ({
       .single()
 
     if (findError || !share) {
-      set({ error: '유효하지 않거나 만료된 초대 코드입니다.' })
+      set({ error: 'errors:sharing.invalidOrExpired' })
       return null
     }
 
     const typedShare = share as DeckShare
 
     if (typedShare.owner_id === user.id) {
-      set({ error: '자신의 덱은 수락할 수 없습니다.' })
+      set({ error: 'errors:sharing.cannotAcceptOwn' })
       return null
     }
 

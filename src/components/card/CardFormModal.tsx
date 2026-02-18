@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ interface CardFormModalProps {
 }
 
 export function CardFormModal({ open, onClose, deckId, template, editCard }: CardFormModalProps) {
+  const { t } = useTranslation('cards')
   const { createCard, updateCard } = useCardStore()
   const user = useAuthStore((s) => s.user)
 
@@ -75,7 +77,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     const fieldType = field.type as 'image' | 'audio'
     const validation = validateFile(file, fieldType)
     if (!validation.valid) {
-      setFileError(validation.error ?? '파일 유효성 검사 실패')
+      setFileError(validation.error ?? t('fileValidationFailed'))
       return
     }
 
@@ -98,7 +100,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
         pendingFilesRef.current[field.key] = file
       }
     } catch (e) {
-      setFileError(e instanceof Error ? e.message : '업로드에 실패했습니다.')
+      setFileError(e instanceof Error ? e.message : t('uploadFailed'))
     } finally {
       setUploadingField(null)
     }
@@ -197,10 +199,10 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{editCard ? '카드 수정' : '새 카드 추가'}</DialogTitle>
+          <DialogTitle>{editCard ? t('editCard') : t('addCard')}</DialogTitle>
         </DialogHeader>
         {!template ? (
-          <p className="text-gray-500">이 덱에 템플릿이 설정되지 않았습니다. 덱 설정에서 기본 템플릿을 지정해주세요.</p>
+          <p className="text-gray-500">{t('noTemplateSet')}</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {fileError && (
@@ -232,7 +234,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                     {uploadingField === field.key ? (
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                        <span>업로드 중...</span>
+                        <span>{t('uploading')}</span>
                       </div>
                     ) : fieldValues[field.key] ? (
                       <div>
@@ -246,20 +248,20 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                           onClick={() => handleRemoveFile(field)}
                           className="text-red-500 text-xs cursor-pointer"
                         >
-                          제거
+                          {t('remove')}
                         </button>
                       </div>
                     ) : (
                       <div>
-                        <p className="mb-2">이미지를 업로드하세요</p>
+                        <p className="mb-2">{t('uploadImage')}</p>
                         <button
                           type="button"
                           onClick={() => fileInputRefs.current[field.key]?.click()}
                           className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs hover:bg-gray-200 cursor-pointer"
                         >
-                          파일 선택
+                          {t('selectFile')}
                         </button>
-                        <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP (최대 5MB)</p>
+                        <p className="text-xs text-gray-400 mt-1">{t('imageFormats')}</p>
                         <input
                           ref={(el) => { fileInputRefs.current[field.key] = el }}
                           type="file"
@@ -278,7 +280,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                     {uploadingField === field.key ? (
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                        <span>업로드 중...</span>
+                        <span>{t('uploading')}</span>
                       </div>
                     ) : fieldValues[field.key] ? (
                       <div className="flex items-center justify-center gap-2">
@@ -288,20 +290,20 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                           onClick={() => handleRemoveFile(field)}
                           className="text-red-500 text-xs cursor-pointer"
                         >
-                          제거
+                          {t('remove')}
                         </button>
                       </div>
                     ) : (
                       <div>
-                        <p className="mb-2">오디오를 업로드하세요</p>
+                        <p className="mb-2">{t('uploadAudio')}</p>
                         <button
                           type="button"
                           onClick={() => fileInputRefs.current[field.key]?.click()}
                           className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs hover:bg-gray-200 cursor-pointer"
                         >
-                          파일 선택
+                          {t('selectFile')}
                         </button>
-                        <p className="text-xs text-gray-400 mt-1">MP3, OGG, WAV (최대 10MB)</p>
+                        <p className="text-xs text-gray-400 mt-1">{t('audioFormats')}</p>
                         <input
                           ref={(el) => { fileInputRefs.current[field.key] = el }}
                           type="file"
@@ -321,7 +323,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">태그</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('tags')}</label>
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {tags.map((tag) => (
                   <span
@@ -344,7 +346,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleAddTag}
-                placeholder="태그 입력 후 Enter"
+                placeholder={t('tagsPlaceholder')}
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               />
             </div>
@@ -356,14 +358,14 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                 onClick={onClose}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
-                취소
+                {t('cancel')}
               </button>
               <button
                 type="submit"
                 disabled={loading || uploadingField !== null}
                 className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
               >
-                {loading ? '저장 중...' : editCard ? '수정' : '추가'}
+                {loading ? t('saving') : editCard ? t('edit') : t('add')}
               </button>
             </DialogFooter>
           </form>

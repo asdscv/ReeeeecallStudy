@@ -71,14 +71,14 @@ function getDateString(ms: number): string {
   return new Date(ms).toISOString().split('T')[0]
 }
 
-const RESOURCE_LABELS: Record<ResourceType, string> = {
-  api_requests_daily: 'API 요청 (일일)',
-  storage_bytes: '저장 공간',
-  cards_total: '카드 수',
-  decks_total: '덱 수',
-  templates_total: '템플릿 수',
-  study_sessions_daily: '학습 세션 (일일)',
-  file_uploads_daily: '파일 업로드 (일일)',
+export const RESOURCE_LABELS: Record<ResourceType, string> = {
+  api_requests_daily: 'errors:quota.resources.api_requests_daily',
+  storage_bytes: 'errors:quota.resources.storage_bytes',
+  cards_total: 'errors:quota.resources.cards_total',
+  decks_total: 'errors:quota.resources.decks_total',
+  templates_total: 'errors:quota.resources.templates_total',
+  study_sessions_daily: 'errors:quota.resources.study_sessions_daily',
+  file_uploads_daily: 'errors:quota.resources.file_uploads_daily',
 }
 
 export function createUsageQuota(
@@ -107,7 +107,7 @@ export function createUsageQuota(
           allowed: false,
           current,
           limit,
-          message: `${RESOURCE_LABELS[resource]} 한도에 도달했습니다 (${current}/${limit})`,
+          message: 'errors:quota.limitReached',
         }
       }
 

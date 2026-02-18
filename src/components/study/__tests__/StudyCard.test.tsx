@@ -208,7 +208,7 @@ describe('StudyCard — swipe hints', () => {
         inputSettings={buttonSettings}
       />,
     )
-    expect(screen.getByText('카드를 탭하여 답을 확인하세요')).toBeInTheDocument()
+    expect(screen.getByText('card.tapToFlip')).toBeInTheDocument()
   })
 
   it('does not show swipe hint when inputSettings is null', () => {

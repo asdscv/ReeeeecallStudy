@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -15,18 +16,18 @@ interface TemplateFormModalProps {
   editTemplate?: CardTemplate | null
 }
 
-const FIELD_TYPES: { value: TemplateField['type']; label: string }[] = [
-  { value: 'text', label: '텍스트' },
-  { value: 'image', label: '이미지' },
-  { value: 'audio', label: '오디오' },
+const FIELD_TYPES: { value: TemplateField['type']; labelKey: string }[] = [
+  { value: 'text', labelKey: 'templates:fieldTypes.text' },
+  { value: 'image', labelKey: 'templates:fieldTypes.image' },
+  { value: 'audio', labelKey: 'templates:fieldTypes.audio' },
 ]
 
-const STYLE_OPTIONS: { value: LayoutItem['style']; label: string; desc: string }[] = [
-  { value: 'primary', label: 'Primary', desc: '가장 큰 글씨' },
-  { value: 'secondary', label: 'Secondary', desc: '보조 텍스트' },
-  { value: 'hint', label: 'Hint', desc: '작은 힌트' },
-  { value: 'detail', label: 'Detail', desc: '상세 정보' },
-  { value: 'media', label: 'Media', desc: '이미지/오디오' },
+const STYLE_OPTIONS: { value: LayoutItem['style']; label: string; descKey: string }[] = [
+  { value: 'primary', label: 'Primary', descKey: 'templates:styleOptions.primary' },
+  { value: 'secondary', label: 'Secondary', descKey: 'templates:styleOptions.secondary' },
+  { value: 'hint', label: 'Hint', descKey: 'templates:styleOptions.hint' },
+  { value: 'detail', label: 'Detail', descKey: 'templates:styleOptions.detail' },
+  { value: 'media', label: 'Media', descKey: 'templates:styleOptions.media' },
 ]
 
 function generateKey(): string {
@@ -34,6 +35,7 @@ function generateKey(): string {
 }
 
 export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormModalProps) {
+  const { t } = useTranslation('templates')
   const { createTemplate, updateTemplate } = useTemplateStore()
 
   const [name, setName] = useState('')
@@ -52,8 +54,8 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
     } else {
       setName('')
       setFields([
-        { key: 'front', name: '앞면', type: 'text', order: 0 },
-        { key: 'back', name: '뒷면', type: 'text', order: 1 },
+        { key: 'front', name: t('defaultFields.front'), type: 'text', order: 0 },
+        { key: 'back', name: t('defaultFields.back'), type: 'text', order: 1 },
       ])
       setFrontLayout([{ field_key: 'front', style: 'primary' }])
       setBackLayout([{ field_key: 'back', style: 'primary' }])
@@ -66,7 +68,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
     if (fields.length >= 10) return
     const newField: TemplateField = {
       key: generateKey(),
-      name: `필드 ${fields.length + 1}`,
+      name: t('form.fieldNumber', { number: fields.length + 1 }),
       type: 'text',
       order: fields.length,
     }
@@ -150,17 +152,17 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{editTemplate ? '템플릿 수정' : '새 템플릿'}</DialogTitle>
+          <DialogTitle>{editTemplate ? t('form.editTitle') : t('form.createTitle')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Template name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">템플릿 이름</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form.templateName')}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="예: 영어 단어장"
+              placeholder={t('form.namePlaceholder')}
               className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               required
             />
@@ -179,7 +181,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab === 'fields' ? `필드 (${fields.length}/10)` : tab === 'front' ? '앞면 레이아웃' : '뒷면 레이아웃'}
+                {tab === 'fields' ? t('form.fieldsTab', { current: fields.length, max: 10 }) : tab === 'front' ? t('form.frontLayoutTab') : t('form.backLayoutTab')}
               </button>
             ))}
           </div>
@@ -212,7 +214,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     value={field.name}
                     onChange={(e) => updateField(i, { name: e.target.value })}
                     className="flex-1 px-3 py-1.5 rounded border border-gray-300 text-sm text-gray-900 outline-none focus:border-blue-500"
-                    placeholder="필드 이름"
+                    placeholder={t('form.fieldNamePlaceholder')}
                   />
                   <select
                     value={field.type}
@@ -220,7 +222,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     className="px-2 py-1.5 rounded border border-gray-300 text-sm text-gray-700 outline-none"
                   >
                     {FIELD_TYPES.map((ft) => (
-                      <option key={ft.value} value={ft.value}>{ft.label}</option>
+                      <option key={ft.value} value={ft.value}>{t(ft.labelKey)}</option>
                     ))}
                   </select>
                   <button
@@ -239,7 +241,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                   onClick={addField}
                   className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 cursor-pointer transition"
                 >
-                  + 필드 추가
+                  {t('form.addField')}
                 </button>
               )}
             </div>
@@ -275,14 +277,14 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
               onClick={onClose}
               className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
             >
-              취소
+              {t('form.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
             >
-              {loading ? '저장 중...' : editTemplate ? '수정' : '만들기'}
+              {loading ? t('form.saving') : editTemplate ? t('form.save') : t('form.create')}
             </button>
           </DialogFooter>
         </form>
@@ -302,6 +304,8 @@ function LayoutEditor({
   onToggle: (fieldKey: string) => void
   onStyleChange: (fieldKey: string, style: LayoutItem['style']) => void
 }) {
+  const { t } = useTranslation('templates')
+
   return (
     <div className="space-y-2 max-h-64 overflow-y-auto">
       {fields.map((field) => {
@@ -339,7 +343,7 @@ function LayoutEditor({
                         ? 'bg-blue-600 text-white'
                         : 'bg-white border border-gray-300 text-gray-600 hover:border-blue-400'
                     }`}
-                    title={style.desc}
+                    title={t(style.descKey)}
                   >
                     {style.label}
                   </button>
@@ -350,7 +354,7 @@ function LayoutEditor({
         )
       })}
       {fields.length === 0 && (
-        <p className="text-sm text-gray-400 text-center py-4">먼저 필드를 추가하세요.</p>
+        <p className="text-sm text-gray-400 text-center py-4">{t('form.addFieldsFirst')}</p>
       )}
     </div>
   )

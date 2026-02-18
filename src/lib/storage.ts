@@ -26,17 +26,17 @@ export function validateFile(
 ): { valid: boolean; error?: string } {
   if (fieldType === 'image') {
     if (file.size > IMAGE_MAX_SIZE) {
-      return { valid: false, error: '이미지 파일은 5MB 이하만 가능합니다.' }
+      return { valid: false, error: 'errors:storage.imageTooLarge' }
     }
     if (!IMAGE_TYPES.includes(file.type)) {
-      return { valid: false, error: '지원하는 이미지 형식: jpg, png, webp' }
+      return { valid: false, error: 'errors:storage.imageFormatUnsupported' }
     }
   } else {
     if (file.size > AUDIO_MAX_SIZE) {
-      return { valid: false, error: '오디오 파일은 10MB 이하만 가능합니다.' }
+      return { valid: false, error: 'errors:storage.audioTooLarge' }
     }
     if (!AUDIO_TYPES.includes(file.type)) {
-      return { valid: false, error: '지원하는 오디오 형식: mp3, ogg, wav' }
+      return { valid: false, error: 'errors:storage.audioFormatUnsupported' }
     }
   }
   return { valid: true }
@@ -64,7 +64,7 @@ export async function uploadFile(
 ): Promise<string> {
   const check = guard.check('storage_upload', 'storage_bytes', file.size)
   if (!check.allowed) {
-    throw new Error(check.message ?? '업로드 제한에 도달했습니다.')
+    throw new Error(check.message ?? 'errors:storage.uploadLimitReached')
   }
 
   const validation = validateFile(file, fieldType)
@@ -81,7 +81,7 @@ export async function uploadFile(
   })
 
   if (error) {
-    throw new Error(`업로드 실패: ${error.message}`)
+    throw new Error('errors:storage.uploadFailed')
   }
 
   guard.recordSuccess('storage_bytes', file.size)

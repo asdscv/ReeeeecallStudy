@@ -1,0 +1,211 @@
+{
+  "title": "API Documentation",
+  "subtitle": "Manage study data by integrating with external tools",
+  "publicSubtitle": "Manage study data by integrating with external tools using ReeeeecallStudy API",
+  "userGuideLink": "User Guide",
+  "getStarted": "Get Started",
+  "required": "required",
+  "searchPlaceholder": "Search endpoints...",
+  "noResults": "No results found for \"{{query}}\"",
+  "copy": "Copy",
+  "tableOfContents": "Table of Contents",
+  "quickStart": {
+    "title": "Quick Start",
+    "settingsPage": "Settings page",
+    "step1Auth": " — Generate your API key in the API Key section.",
+    "signup": "Sign up",
+    "step1Public": "and generate your API key in Settings.",
+    "step2": "Add the header",
+    "step2Suffix": "to every request.",
+    "step3": "Start making API calls! Check the endpoints below."
+  },
+  "table": {
+    "name": "Name",
+    "type": "Type",
+    "required": "Required",
+    "description": "Description"
+  },
+  "footer": {
+    "home": "Home",
+    "login": "Log In"
+  },
+  "sections": {
+    "overview": {
+      "title": "Overview",
+      "description": "Use the ReeeeecallStudy API to manage study data from external tools, scripts, and apps.",
+      "items": {
+        "what": {
+          "title": "What is the API?",
+          "body": "The ReeeeecallStudy API is a RESTful API that lets you view and manage decks, cards, study history, and more via HTTP requests. Use it for automation scripts, third-party app integration, and data analysis."
+        },
+        "baseUrl": {
+          "title": "Base URL",
+          "body": "All API requests are based on the Supabase project URL.\n\nBase URL: https://your-project.supabase.co/rest/v1"
+        },
+        "responseFormat": {
+          "title": "Response Format",
+          "body": "All responses are in JSON format with Content-Type: application/json.\n\nOn success, resource data is returned. On error, responses follow { \"error\": \"message\" } format."
+        }
+      }
+    },
+    "authentication": {
+      "title": "Authentication",
+      "description": "All requests are authenticated using an API key.",
+      "items": {
+        "getKey": {
+          "title": "Getting an API Key",
+          "body": "Settings → API Key section → Click 'Generate New API Key'.\nEnter a name (max 64 chars) to receive a 35-character key starting with rc_.\n\n⚠️ The key is only shown once. Copy it to a safe place!"
+        },
+        "method": {
+          "title": "Authentication Method",
+          "body": "Pass your API key as a Bearer token in the Authorization header.\n\nAuthorization: Bearer rc_your_api_key_here\n\nMissing or invalid keys return 401 Unauthorized."
+        },
+        "management": {
+          "title": "Key Management",
+          "body": "• You can have up to 1 API key\n• If lost, delete the existing key and create a new one\n• Delete unused keys immediately\n• Use environment variables instead of hardcoding keys"
+        }
+      }
+    },
+    "rateLimits": {
+      "title": "Rate Limits",
+      "description": "Request counts are limited for API stability.",
+      "items": {
+        "free": {
+          "title": "Free Tier",
+          "body": "• Daily API requests: 1,000\n• API calls per minute: 60\n• Card creates per minute: 30\n• Bulk card creates per minute: 5 (max 100 per request)\n• Total cards: 5,000\n• Total decks: 50"
+        },
+        "pro": {
+          "title": "Pro Tier",
+          "body": "• Daily API requests: 10,000\n• API calls per minute: 300\n• Card creates per minute: 120\n• Bulk card creates per minute: 20\n• Total cards: 50,000\n• Total decks: 500"
+        },
+        "exceeded": {
+          "title": "When Limits Are Exceeded",
+          "body": "Returns 429 Too Many Requests.\n\nResponse headers include:\n• X-RateLimit-Limit: Max requests\n• X-RateLimit-Remaining: Remaining requests\n• Retry-After: Wait time in seconds"
+        }
+      }
+    },
+    "decks": {
+      "title": "Decks API",
+      "description": "View and manage decks (card collections).",
+      "endpoints": {
+        "list": {
+          "summary": "List Decks",
+          "description": "Retrieve all decks for the user."
+        },
+        "detail": {
+          "summary": "Get Deck Details",
+          "description": "Retrieve detailed information for a specific deck."
+        },
+        "create": {
+          "summary": "Create Deck",
+          "description": "Create a new deck."
+        }
+      },
+      "params": {
+        "page": "Page number (default: 1)",
+        "perPage": "Items per page (default: 50, max: 100)",
+        "deckId": "Deck ID to query"
+      }
+    },
+    "cards": {
+      "title": "Cards API",
+      "description": "View, create, and modify cards.",
+      "endpoints": {
+        "list": {
+          "summary": "List Cards",
+          "description": "Retrieve cards in a specific deck."
+        },
+        "create": {
+          "summary": "Create Card",
+          "description": "Add a new card to a deck. Single card or bulk create up to 100."
+        },
+        "update": {
+          "summary": "Update Card",
+          "description": "Modify an existing card's field values or tags."
+        },
+        "delete": {
+          "summary": "Delete Card",
+          "description": "Delete a specific card. This action cannot be undone."
+        }
+      },
+      "params": {
+        "deckId": "Deck ID",
+        "cardId": "Card ID",
+        "status": "SRS status filter (new, learning, review, suspended)",
+        "tag": "Tag filter"
+      }
+    },
+    "study": {
+      "title": "Study API",
+      "description": "View study history and manage session data.",
+      "endpoints": {
+        "due": {
+          "summary": "Get Due Cards",
+          "description": "Retrieve cards due for review today."
+        },
+        "history": {
+          "summary": "Study History",
+          "description": "Retrieve study session records."
+        },
+        "stats": {
+          "summary": "Study Statistics",
+          "description": "Retrieve overall study statistics and dashboard data."
+        }
+      },
+      "params": {
+        "deckId": "Deck ID",
+        "from": "Start date (e.g., 2025-01-01)",
+        "to": "End date (e.g., 2025-01-31)",
+        "period": "Period (1w, 1m, 3m, 6m, 1y)"
+      }
+    },
+    "templates": {
+      "title": "Templates API",
+      "description": "View card templates.",
+      "endpoints": {
+        "list": {
+          "summary": "List Templates",
+          "description": "Retrieve all card templates for the user."
+        },
+        "detail": {
+          "summary": "Get Template Details",
+          "description": "Retrieve full template information including fields and layouts."
+        }
+      },
+      "params": {
+        "templateId": "Template ID"
+      }
+    },
+    "examples": {
+      "title": "Code Examples",
+      "description": "Examples of calling the API with various languages and tools."
+    },
+    "errors": {
+      "title": "Error Handling",
+      "description": "Error response format and common error codes.",
+      "items": {
+        "format": {
+          "title": "Error Response Format",
+          "body": "All errors return:\n\n{\n  \"error\": \"Error message\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"Additional info (optional)\"\n}"
+        },
+        "statusCodes": {
+          "title": "HTTP Status Codes",
+          "body": "• 200 OK — Success\n• 201 Created — Resource created\n• 204 No Content — Deleted (no response body)\n• 400 Bad Request — Invalid request (missing fields, validation failure)\n• 401 Unauthorized — Auth failure (missing or invalid API key)\n• 404 Not Found — Resource not found\n• 429 Too Many Requests — Rate limit exceeded\n• 500 Internal Server Error — Server error"
+        },
+        "validation": {
+          "title": "Validation Errors",
+          "body": "Card create/update validation failures return per-field errors as array:\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+        }
+      }
+    },
+    "statusCodes": {
+      "200": "Success",
+      "201": "Created",
+      "204": "Deleted (no response body)",
+      "400": "Bad request (missing required fields)",
+      "401": "Authentication failed",
+      "404": "Not found",
+      "429": "Rate limit exceeded"
+    }
+  }
+}

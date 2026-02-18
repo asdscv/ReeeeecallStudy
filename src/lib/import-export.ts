@@ -79,14 +79,16 @@ export function generateExportJSON(deck: Deck, template: CardTemplate, cards: Ca
   return JSON.stringify(data, null, 2)
 }
 
-export function generateExportCSV(cards: Card[], fields: TemplateField[]): string {
-  const headers = [...fields.map((f) => f.name), '태그']
+export const TAGS_COLUMN_KEY = 'import:tags'
+
+export function generateExportCSV(cards: Card[], fields: TemplateField[], tagsLabel = 'Tags'): string {
+  const headers = [...fields.map((f) => f.name), tagsLabel]
   const rows = cards.map((card) => {
     const row: Record<string, string> = {}
     for (const field of fields) {
       row[field.name] = card.field_values[field.key] ?? ''
     }
-    row['태그'] = card.tags.join(';')
+    row[tagsLabel] = card.tags.join(';')
     return row
   })
 
@@ -117,7 +119,7 @@ export function parseImportJSON(jsonString: string): ImportJSONResult {
   }
 }
 
-export function parseImportCSV(csvString: string, fieldMapping: Record<string, string>): ImportCard[] {
+export function parseImportCSV(csvString: string, fieldMapping: Record<string, string>, tagsLabel = 'Tags'): ImportCard[] {
   const result = Papa.parse<Record<string, string>>(csvString, {
     header: true,
     skipEmptyLines: true,
@@ -131,7 +133,7 @@ export function parseImportCSV(csvString: string, fieldMapping: Record<string, s
       }
     }
 
-    const tagsRaw = row['태그'] ?? ''
+    const tagsRaw = row[tagsLabel] ?? row['태그'] ?? row['Tags'] ?? ''
     const tags = tagsRaw
       ? tagsRaw.split(';').map((t) => t.trim()).filter(Boolean)
       : []

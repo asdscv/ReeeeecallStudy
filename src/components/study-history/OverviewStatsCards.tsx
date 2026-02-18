@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../../lib/study-history'
 import type { OverviewStats } from '../../lib/study-history-stats'
 
@@ -7,12 +8,14 @@ interface OverviewStatsCardsProps {
 }
 
 export function OverviewStatsCards({ stats, streak }: OverviewStatsCardsProps) {
+  const { t } = useTranslation('history')
+
   const items = [
-    { label: '세션 수', value: `${stats.totalSessions}회`, color: 'text-gray-900' },
-    { label: '학습 카드', value: `${stats.totalCardsStudied}장`, color: 'text-blue-600' },
-    { label: '총 학습 시간', value: formatDuration(stats.totalTimeMs), color: 'text-purple-600' },
-    { label: '평균 성과', value: `${stats.avgPerformance}%`, color: 'text-green-600' },
-    { label: '연속 학습', value: `${streak}일`, color: 'text-amber-600' },
+    { label: t('overview.sessions'), value: t('overview.sessionsValue', { count: stats.totalSessions }), color: 'text-gray-900' },
+    { label: t('overview.studyCards'), value: t('overview.cardsValue', { count: stats.totalCardsStudied }), color: 'text-blue-600' },
+    { label: t('overview.totalTime'), value: formatDuration(stats.totalTimeMs), color: 'text-purple-600' },
+    { label: t('overview.avgPerformance'), value: `${stats.avgPerformance}%`, color: 'text-green-600' },
+    { label: t('overview.streak'), value: t('overview.streakValue', { count: streak }), color: 'text-amber-600' },
   ]
 
   return (

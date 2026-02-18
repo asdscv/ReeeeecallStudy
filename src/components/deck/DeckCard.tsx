@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { formatRelativeTime } from '../../lib/date-utils'
 import { ShareBadge } from '../sharing/ShareBadge'
 import { useAuthStore } from '../../stores/auth-store'
@@ -22,13 +23,14 @@ interface DeckCardProps {
 export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  const { t } = useTranslation('decks')
 
   const totalCards = stats?.total_cards ?? 0
   const dueCards = (stats?.review_cards ?? 0) + (stats?.learning_cards ?? 0)
   const newCards = stats?.new_cards ?? 0
 
   const formatLastStudied = (dateStr: string | null) => {
-    if (!dateStr) return '학습 기록 없음'
+    if (!dateStr) return t('card.noStudyRecord')
     return formatRelativeTime(dateStr)
   }
 
@@ -60,12 +62,12 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
 
         {/* Stats */}
         <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
-          <span>{totalCards}장</span>
+          <span>{t('card.totalCards', { count: totalCards })}</span>
           {newCards > 0 && (
-            <span className="text-blue-600">새 카드 {newCards}</span>
+            <span className="text-blue-600">{t('card.newCards', { count: newCards })}</span>
           )}
           {dueCards > 0 && (
-            <span className="text-amber-600">복습 {dueCards}</span>
+            <span className="text-amber-600">{t('card.review', { count: dueCards })}</span>
           )}
         </div>
 
@@ -78,14 +80,14 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
             <button
               onClick={() => navigate(`/decks/${deck.id}/edit`)}
               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer"
-              title="수정"
+              title={t('card.edit')}
             >
               <Pencil className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(deck)}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition cursor-pointer"
-              title="삭제"
+              title={t('card.delete')}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -93,7 +95,7 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
               onClick={() => navigate(`/decks/${deck.id}/study/setup`)}
               className="px-3 sm:px-4 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer"
             >
-              학습 시작
+              {t('card.startStudy')}
             </button>
           </div>
         </div>

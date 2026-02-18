@@ -1,0 +1,99 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS (간격 반복)",
+      "description": "복습 시기에 따라 자동으로 카드를 선별합니다"
+    },
+    "sequential_review": {
+      "label": "순차 복습",
+      "description": "새 카드와 복습 카드를 순서대로 학습합니다"
+    },
+    "random": {
+      "label": "랜덤",
+      "description": "카드를 무작위로 섞어 학습합니다"
+    },
+    "sequential": {
+      "label": "순차",
+      "description": "카드를 순서대로 학습합니다"
+    },
+    "by_date": {
+      "label": "일자별 학습",
+      "description": "특정 날짜에 업로드한 카드만 학습합니다"
+    }
+  },
+  "quickStudy": {
+    "title": "빠른 학습",
+    "noDecks": "덱이 없습니다. 먼저 덱을 만들어주세요.",
+    "cardCount": "{{count}}장",
+    "newCards": "새 {{count}}",
+    "reviewCards": "복습 {{count}}",
+    "selectDate": "학습할 날짜를 선택하세요",
+    "setBatchSize": "배치 크기를 설정하세요",
+    "selectMode": "학습 모드를 선택하세요",
+    "startStudy": "학습 시작",
+    "uploadDate": "{{year}}년 {{month}}월 {{day}}일 업로드: {{count}}장",
+    "batchSize": "배치 크기",
+    "batchSizeDesc": "한 세션에 학습할 카드 수 ({{min}}~{{max}})",
+    "backToModeSelect": "← 모드 선택으로"
+  },
+  "setup": {
+    "title": "학습 설정",
+    "deckInfo": "{{icon}} {{name}} · {{count}}장",
+    "studyMode": "학습 모드",
+    "selectUploadDate": "업로드 날짜 선택",
+    "uploadDate": "{{year}}년 {{month}}월 {{day}}일 업로드: {{count}}장"
+  },
+  "session": {
+    "loading": "로딩 중...",
+    "noCards": "학습할 카드가 없습니다",
+    "allReviewed": "모든 카드를 복습했습니다!",
+    "backToDeck": "덱으로 돌아가기"
+  },
+  "card": {
+    "tapToFlip": "탭하여 뒤집기",
+    "tapToSeeAnswer": "카드를 탭하여 답을 확인하세요",
+    "tapToReveal": "카드를 탭하여 답을 확인하세요",
+    "ttsPlay": "TTS 재생"
+  },
+  "rating": {
+    "dontKnow": "모름",
+    "knowIt": "알고 있음",
+    "known": "알고 있음",
+    "unknown": "모름",
+    "next": "다음 →"
+  },
+  "summary": {
+    "title": "학습 완료!",
+    "completed": "학습 완료!",
+    "greatJob": "수고하셨습니다",
+    "wellDone": "수고하셨습니다! 이 페이스로 계속 화이팅하세요.",
+    "studyCards": "학습 카드",
+    "cardsStudied": "학습한 카드",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "소요 시간",
+    "timeFormat": "{{minutes}}분 {{seconds}}초",
+    "avgPerCard": "카드당 평균",
+    "secondsFormat": "{{seconds}}초",
+    "ratingDistribution": "평가 분포",
+    "backToDeck": "덱으로 돌아가기",
+    "studyAgain": "다시 학습",
+    "knowIt": "알고 있음",
+    "dontKnow": "모름",
+    "next": "다음"
+  },
+  "weekdays": {
+    "sun": "일",
+    "mon": "월",
+    "tue": "화",
+    "wed": "수",
+    "thu": "목",
+    "fri": "금",
+    "sat": "토"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["일", "월", "화", "수", "목", "금", "토"]
+  }
+}

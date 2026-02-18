@@ -30,7 +30,7 @@ export function createRateLimitGuard(options: RateLimitGuardOptions): RateLimitG
         return {
           allowed: false,
           reason: 'rate_limited',
-          message: `요청이 너무 빠릅니다. ${Math.ceil((rateResult.retryAfterMs ?? 0) / 1000)}초 후에 다시 시도해주세요.`,
+          message: 'errors:rateLimit.tooFast',
           retryAfterMs: rateResult.retryAfterMs,
         }
       }

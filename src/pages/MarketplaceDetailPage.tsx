@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { useAuthStore } from '../stores/auth-store'
 import type { MarketplaceListing, Card, CardTemplate } from '../types/database'
 
-const MODE_LABELS: Record<string, string> = {
-  copy: '복사',
-  subscribe: '구독',
-  snapshot: '스냅샷',
-}
-
 export function MarketplaceDetailPage() {
+  const { t } = useTranslation(['marketplace', 'common'])
   const { listingId } = useParams<{ listingId: string }>()
   const navigate = useNavigate()
   const { user } = useAuthStore()
@@ -105,14 +101,14 @@ export function MarketplaceDetailPage() {
         onClick={() => navigate('/marketplace')}
         className="text-sm text-gray-500 hover:text-gray-700 mb-4 cursor-pointer"
       >
-        ← 마켓플레이스
+        {t('marketplace:detail.back')}
       </button>
 
       <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-4">
         <div className="flex items-start justify-between mb-3">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{listing.title}</h1>
           <span className="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-full shrink-0 ml-3">
-            {MODE_LABELS[listing.share_mode] ?? listing.share_mode}
+            {t(`marketplace:shareModes.${listing.share_mode}`, listing.share_mode)}
           </span>
         </div>
 
@@ -131,8 +127,8 @@ export function MarketplaceDetailPage() {
         )}
 
         <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-          <span>{listing.card_count}장</span>
-          <span>{listing.acquire_count}명 사용 중</span>
+          <span>{t('marketplace:detail.cardCount', { count: listing.card_count })}</span>
+          <span>{t('marketplace:detail.userCount', { count: listing.acquire_count })}</span>
           <span>{listing.category}</span>
         </div>
 
@@ -142,7 +138,7 @@ export function MarketplaceDetailPage() {
             disabled={acquiring}
             className="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
           >
-            {acquiring ? '가져오는 중...' : '이 덱 가져오기'}
+            {acquiring ? t('marketplace:detail.importing') : t('marketplace:detail.getDeck')}
           </button>
         )}
 
@@ -152,11 +148,11 @@ export function MarketplaceDetailPage() {
       {/* Card preview */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-sm font-medium text-gray-700">카드 미리보기 (최대 10장)</h2>
+          <h2 className="text-sm font-medium text-gray-700">{t('marketplace:detail.cardPreview')}</h2>
         </div>
 
         {previewCards.length === 0 ? (
-          <div className="p-6 text-center text-gray-500 text-sm">카드가 없습니다.</div>
+          <div className="p-6 text-center text-gray-500 text-sm">{t('marketplace:detail.noCards')}</div>
         ) : (
           <div className="divide-y divide-gray-100">
             {previewCards.map((card, i) => (

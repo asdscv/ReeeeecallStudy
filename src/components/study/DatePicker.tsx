@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { todayDateKey } from '../../lib/date-utils'
 
@@ -9,6 +10,7 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DatePickerProps) {
+  const { t } = useTranslation('study')
   const [currentMonth, setCurrentMonth] = useState(() => {
     const date = selectedDate ? new Date(selectedDate) : new Date()
     return new Date(date.getFullYear(), date.getMonth(), 1)
@@ -77,7 +79,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
 
       {/* Day Headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
+        {[t('weekdays.sun'), t('weekdays.mon'), t('weekdays.tue'), t('weekdays.wed'), t('weekdays.thu'), t('weekdays.fri'), t('weekdays.sat')].map((day) => (
           <div
             key={day}
             className="aspect-square flex items-center justify-center text-xs font-medium text-gray-500"

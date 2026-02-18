@@ -1,0 +1,122 @@
+{
+  "title": "Settings",
+  "loading": "Loading...",
+  "saving": "Saving...",
+  "save": "Save Settings",
+  "saved": "Settings saved!",
+  "saveButton": "Save Settings",
+
+  "links": {
+    "userGuide": "User Guide",
+    "userGuideDesc": "Feature guide, learning tips, sharing methods",
+    "apiDocs": "API Documentation",
+    "apiDocsDesc": "API endpoints, authentication, usage examples"
+  },
+
+  "guide": {
+    "title": "User Guide",
+    "desc": "Feature guide, learning tips, sharing methods"
+  },
+
+  "apiDocs": {
+    "title": "API Documentation",
+    "desc": "API endpoints, authentication, usage examples"
+  },
+
+  "profile": {
+    "title": "Profile",
+    "email": "Email",
+    "displayName": "Display name",
+    "displayNamePlaceholder": "Enter your name",
+    "namePlaceholder": "Enter your name"
+  },
+
+  "language": {
+    "title": "Language",
+    "label": "Display language",
+    "en": "English",
+    "ko": "한국어"
+  },
+
+  "srs": {
+    "title": "SRS Learning",
+    "description": "Set the number of new cards added per session in SRS (spaced repetition) mode",
+    "newCardLimit": "New Card Limit",
+    "cards": "cards",
+    "cardsUnit": "cards",
+    "help": "Max number of new cards in addition to review cards in SRS learning. Review cards are not affected by this limit.",
+    "newCardNote": "Max number of new cards in addition to review cards in SRS learning. Review cards are not affected by this limit."
+  },
+
+  "answerMode": {
+    "title": "Answer Mode",
+    "description": "Set how you choose answers during study",
+    "button": "Button",
+    "buttonDesc": "Select answer by pressing button",
+    "swipe": "Swipe",
+    "swipeDesc": "Select answer by swiping card",
+    "directionsHelp": "Assign actions to each direction. Unset directions are disabled.",
+    "swipeDirections": "Assign actions to each direction. Unset directions are disabled.",
+    "swipeLeft": "Swipe left",
+    "swipeRight": "Swipe right",
+    "swipeUp": "Swipe up",
+    "swipeDown": "Swipe down",
+    "notSet": "Not set",
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "recommendation": "Recommended: Left=Again, Right=Good (useful for fast learning)"
+  },
+
+  "tts": {
+    "title": "Auto TTS Reading",
+    "description": "Auto-read TTS-enabled fields when flipping card",
+    "enable": "Enable auto reading",
+    "help": "TTS language follows field settings in card template. Play button always shows regardless of auto reading.",
+    "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading."
+  },
+
+  "apiKey": {
+    "title": "API Key Management",
+    "limit": "You can create up to 1 API key",
+    "maxKeys": "You can create up to 1 API key",
+    "generate": "Generate",
+    "generateNew": "Generate New Key",
+    "keyName": "Key name",
+    "keyNamePlaceholder": "e.g., my-script",
+    "namePlaceholder": "e.g., my-script",
+    "create": "Create",
+    "generating": "Generating...",
+    "generateFailed": "Failed to generate key: ",
+    "generated": "API key generated. Copy it now — you won't see it again!",
+    "generateError": "Error generating key",
+    "delete": "Delete",
+    "deleted": "API key deleted",
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "copied": "API key copied!",
+    "show": "Show key",
+    "hide": "Hide key",
+    "masked": "Cannot be viewed again for security",
+    "createdAt": "Created",
+    "created": "Created: {{date}}",
+    "noKeys": "No API key generated.",
+    "noKey": "No API key generated.",
+    "securityNote": "Cannot be viewed again for security"
+  },
+
+  "account": {
+    "title": "Account",
+    "logout": "Log out"
+  },
+
+  "settings": {
+    "answerMode": {
+      "swipeLeft": "Swipe left",
+      "swipeRight": "Swipe right",
+      "swipeUp": "Swipe up",
+      "swipeDown": "Swipe down"
+    }
+  }
+}

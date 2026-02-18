@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Deck } from '../../types/database'
 
 interface DeckStat {
@@ -15,18 +16,19 @@ interface RecentDecksProps {
 }
 
 export function RecentDecks({ decks, stats }: RecentDecksProps) {
+  const { t } = useTranslation('dashboard')
   const navigate = useNavigate()
 
   if (decks.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
         <div className="text-5xl mb-4">📚</div>
-        <p className="text-gray-500 mb-4">아직 덱이 없습니다. 덱을 만들어보세요!</p>
+        <p className="text-gray-500 mb-4">{t('recentDecks.noDecks')}</p>
         <button
           onClick={() => navigate('/decks')}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
         >
-          덱 관리로 이동
+          {t('recentDecks.goToDecks')}
         </button>
       </div>
     )
@@ -34,7 +36,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
 
   return (
     <div>
-      <h3 className="text-sm font-medium text-gray-700 mb-3">덱 현황</h3>
+      <h3 className="text-sm font-medium text-gray-700 mb-3">{t('recentDecks.title')}</h3>
       <div className="grid gap-3">
         {decks.map((deck) => {
           const deckStat = stats.find((s) => s.deck_id === deck.id)
@@ -53,18 +55,18 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
                   <span className="text-2xl">{deck.icon}</span>
                   <div className="min-w-0">
                     <h4 className="font-medium text-gray-900 truncate">{deck.name}</h4>
-                    <p className="text-xs text-gray-400">{total}장</p>
+                    <p className="text-xs text-gray-400">{t('recentDecks.cardCount', { count: total })}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {newCards > 0 && (
                     <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs">
-                      새 {newCards}
+                      {t('recentDecks.newCards', { count: newCards })}
                     </span>
                   )}
                   {review > 0 && (
                     <span className="px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded-full text-xs">
-                      복습 {review}
+                      {t('recentDecks.reviewCards', { count: review })}
                     </span>
                   )}
                   <button
@@ -74,7 +76,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
                     }}
                     className="ml-2 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition cursor-pointer"
                   >
-                    학습
+                    {t('recentDecks.study')}
                   </button>
                 </div>
               </div>

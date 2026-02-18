@@ -1,0 +1,173 @@
+{
+  "title": "Share Management",
+  "directShare": "Direct Share",
+  "createShareLink": "+ Create Share Link",
+  "marketplace": "Marketplace",
+  "userCount": "{{count}} users · {{status}}",
+  "active": "Active",
+  "inactive": "Inactive",
+  "unpublish": "Unpublish",
+  "publishNote": "Publishing to market allows anyone to find this deck.",
+  "publishButton": "Publish to Market",
+
+  "noSubscribers": "No users shared with yet.",
+  "inviteLink": "Invite link",
+  "cancel": "Revoke",
+  "shareDeck": "Share Deck",
+  "shareDeckDesc": "Sharing \"{{name}}\" deck.",
+  "creating": "Creating...",
+  "createInviteLink": "Generate Invite Link",
+  "linkShareInfo": "Share this link to give access to the deck.",
+
+  "shareMode": {
+    "label": "Share Mode",
+    "copy": {
+      "label": "Copy",
+      "desc": "Recipients can freely edit.",
+      "detail": "All card operations possible. Cards, add/edit/delete included. Fully independent from the original."
+    },
+    "subscribe": {
+      "label": "Subscribe",
+      "desc": "Synced with original, study progress is separate.",
+      "detail": "When I add cards, subscribers also get them. Card editing is not allowed. Study progress is tracked individually."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "desc": "Read-only copy of current state.",
+      "detail": "Copy current cards exactly, but editing is not allowed. A one-time snapshot of the deck."
+    }
+  },
+
+  "shareModes": {
+    "copy": {
+      "label": "Copy",
+      "desc": "Recipients can freely edit.",
+      "detail": "All card operations possible. Cards, add/edit/delete included. Fully independent from the original."
+    },
+    "subscribe": {
+      "label": "Subscribe",
+      "desc": "Synced with original, study progress is separate.",
+      "detail": "When I add cards, subscribers also get them. Card editing is not allowed. Study progress is tracked individually."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "desc": "Read-only copy of current state.",
+      "detail": "Copy current cards exactly, but editing is not allowed. A one-time snapshot of the deck."
+    }
+  },
+
+  "mode": {
+    "subscribe": "Subscribed",
+    "snapshot": "Snapshot",
+    "copy": "Copy"
+  },
+
+  "modal": {
+    "title": "Share Deck",
+    "description": "Sharing \"{{name}}\" deck.",
+    "shareMode": "Share Mode",
+    "creating": "Creating...",
+    "createInviteLink": "Generate Invite Link",
+    "inviteLink": "Invite Link",
+    "inviteLinkNote": "Share this link to give access to the deck."
+  },
+  "publish": {
+    "title": "Publish to Market",
+    "titleLabel": "Title",
+    "description": "Description",
+    "category": "Category",
+    "tags": "Tags (comma-separated)",
+    "tagsPlaceholder": "e.g., english, vocabulary, TOEIC",
+    "shareMode": "Share Mode",
+    "publishing": "Publishing...",
+    "publishButton": "Publish to Market",
+    "submit": "Publish"
+  },
+  "modes": {
+    "copy": {
+      "label": "Copy",
+      "shortDesc": "Recipients can freely edit.",
+      "longDesc": "All card operations possible. Cards, add/edit/delete included. Fully independent from the original."
+    },
+    "subscribe": {
+      "label": "Subscribe",
+      "shortDesc": "Synced with original, study progress is separate.",
+      "longDesc": "When I add cards, subscribers also get them. Card editing is not allowed. Study progress is tracked individually."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "shortDesc": "Read-only copy of current state.",
+      "longDesc": "Copy current cards exactly, but editing is not allowed. A one-time snapshot of the deck."
+    }
+  },
+  "badge": {
+    "subscribed": "Subscribed",
+    "snapshot": "Snapshot",
+    "copy": "Copy"
+  },
+  "subscribers": {
+    "noUsers": "No users shared with yet.",
+    "inviteLink": "Invite link",
+    "revoke": "Revoke"
+  },
+  "status": {
+    "pending": "Pending",
+    "active": "Active",
+    "revoked": "Revoked",
+    "declined": "Declined"
+  },
+  "myShares": {
+    "title": "My Shares",
+    "sent": "Sent Shares",
+    "noSent": "No shared decks yet.",
+    "received": "Received Shares",
+    "noReceived": "No received shares yet.",
+    "unsubscribe": "Unsubscribe",
+    "cancel": "Revoke",
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "revoked": "Revoked",
+      "declined": "Declined"
+    },
+    "mode": {
+      "copy": "Copy",
+      "subscribe": "Subscribe",
+      "snapshot": "Snapshot"
+    }
+  },
+  "acceptInvite": {
+    "title": "Deck Invitation",
+    "inviteCode": "Invite code",
+    "accept": "Accept Invitation",
+    "accepting": "Accepting...",
+    "accepted": "Accepted!",
+    "redirecting": "Redirecting to deck..."
+  },
+  "deckShare": {
+    "title": "Share Management",
+    "directSharing": "Direct Sharing",
+    "createShareLink": "Create Share Link",
+    "marketplace": "Marketplace",
+    "usersUsing": "{{count}} users using",
+    "active": "Active",
+    "inactive": "Inactive",
+    "unpublish": "Unpublish",
+    "publishDescription": "Publishing to market allows anyone to find this deck.",
+    "publish": "Publish to Market"
+  },
+  "invite": {
+    "title": "Deck Invitation",
+    "code": "Invite code:",
+    "accept": "Accept Invitation",
+    "accepting": "Accepting...",
+    "accepted": "Accepted!",
+    "redirecting": "Redirecting to deck..."
+  },
+  "deckLabel": {
+    "myDeck": "My Deck",
+    "subscribed": "Subscribed",
+    "snapshot": "Snapshot",
+    "copy": "Copy"
+  }
+}

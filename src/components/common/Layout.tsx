@@ -1,26 +1,28 @@
 import { useState, useRef, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
 
 type NavLink = { kind: 'link'; path: string; label: string; icon: string }
 type NavGroup = { kind: 'group'; label: string; icon: string; children: { path: string; label: string; icon: string }[] }
 type NavItem = NavLink | NavGroup
 
-const navItems: NavItem[] = [
-  { kind: 'link', path: '/quick-study', label: '빠른 학습', icon: '⚡' },
-  { kind: 'link', path: '/', label: '대시보드', icon: '📊' },
-  { kind: 'group', label: '덱/카드', icon: '📚', children: [
-    { path: '/decks', label: '덱', icon: '📚' },
-    { path: '/templates', label: '카드', icon: '📋' },
-  ]},
-  { kind: 'link', path: '/marketplace', label: '마켓', icon: '🏪' },
-  { kind: 'link', path: '/history', label: '학습 기록', icon: '📝' },
-  { kind: 'link', path: '/settings', label: '설정', icon: '⚙️' },
-]
-
 export function Layout() {
+  const { t } = useTranslation('common')
   const { user, signOut } = useAuthStore()
+
+  const navItems: NavItem[] = [
+    { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
+    { kind: 'link', path: '/', label: t('nav.dashboard'), icon: '📊' },
+    { kind: 'group', label: t('nav.decksCards'), icon: '📚', children: [
+      { path: '/decks', label: t('nav.decks'), icon: '📚' },
+      { path: '/templates', label: t('nav.cards'), icon: '📋' },
+    ]},
+    { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
+    { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: '📝' },
+    { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
+  ]
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openDesktopGroup, setOpenDesktopGroup] = useState<string | null>(null)
@@ -137,12 +139,12 @@ export function Layout() {
               onClick={signOut}
               className="hidden md:inline text-sm text-gray-400 hover:text-gray-600 cursor-pointer"
             >
-              로그아웃
+              {t('actions.logout')}
             </button>
 
             {/* Mobile hamburger */}
             <button
-              aria-label="메뉴"
+              aria-label={t('menu')}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer"
             >
@@ -214,7 +216,7 @@ export function Layout() {
                   onClick={() => { setMobileMenuOpen(false); signOut() }}
                   className="text-sm text-red-500 hover:text-red-600 cursor-pointer shrink-0 ml-4"
                 >
-                  로그아웃
+                  {t('actions.logout')}
                 </button>
               </div>
             </nav>

@@ -1,0 +1,20 @@
+{
+  "editCard": "카드 편집",
+  "addCard": "카드 추가",
+  "noTemplateSet": "이 덱에 설정된 템플릿이 없습니다.",
+  "fileValidationFailed": "파일 검증에 실패했습니다.",
+  "uploadFailed": "업로드에 실패했습니다.",
+  "uploading": "업로드 중...",
+  "remove": "제거",
+  "uploadImage": "이미지를 업로드하세요",
+  "selectFile": "파일 선택",
+  "imageFormats": "JPG, PNG, WebP 지원",
+  "uploadAudio": "오디오를 업로드하세요",
+  "audioFormats": "MP3, OGG, WAV 지원",
+  "tags": "태그",
+  "tagsPlaceholder": "태그를 입력하고 Enter를 누르세요",
+  "cancel": "취소",
+  "saving": "저장 중...",
+  "edit": "편집",
+  "add": "추가"
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useSharingStore } from '../stores/sharing-store'
 import { ShareModal } from '../components/sharing/ShareModal'
@@ -9,6 +10,7 @@ import { useMarketplaceStore } from '../stores/marketplace-store'
 import type { Deck } from '../types/database'
 
 export function DeckSharePage() {
+  const { t } = useTranslation('sharing')
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
   const { myShares, fetchMyShares, revokeShare } = useSharingStore()
@@ -65,17 +67,17 @@ export function DeckSharePage() {
         ← {deck.name}
       </button>
 
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">공유 관리</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">{t('deckShare.title')}</h1>
 
       {/* Direct sharing */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-900">직접 공유</h2>
+          <h2 className="text-base font-semibold text-gray-900">{t('deckShare.directSharing')}</h2>
           <button
             onClick={() => setShowShareModal(true)}
             className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
-            + 공유 링크 생성
+            + {t('deckShare.createShareLink')}
           </button>
         </div>
 
@@ -88,7 +90,7 @@ export function DeckSharePage() {
       {/* Marketplace */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-900">마켓플레이스</h2>
+          <h2 className="text-base font-semibold text-gray-900">{t('deckShare.marketplace')}</h2>
         </div>
 
         {deckListing ? (
@@ -97,25 +99,25 @@ export function DeckSharePage() {
               <div className="min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{deckListing.title}</p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {deckListing.acquire_count}명 사용 중 · {deckListing.is_active ? '활성' : '비활성'}
+                  {t('deckShare.usersUsing', { count: deckListing.acquire_count })} · {deckListing.is_active ? t('deckShare.active') : t('deckShare.inactive')}
                 </p>
               </div>
               <button
                 onClick={() => unpublishDeck(deckListing.id)}
                 className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer shrink-0 self-start sm:self-center"
               >
-                게시 취소
+                {t('deckShare.unpublish')}
               </button>
             </div>
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-            <p className="text-sm text-gray-500 mb-3">마켓에 게시하면 누구나 이 덱을 찾을 수 있습니다.</p>
+            <p className="text-sm text-gray-500 mb-3">{t('deckShare.publishDescription')}</p>
             <button
               onClick={() => setShowPublishModal(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
             >
-              마켓에 게시
+              {t('deckShare.publish')}
             </button>
           </div>
         )}

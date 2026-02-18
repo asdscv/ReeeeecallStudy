@@ -1,0 +1,175 @@
+{
+  "hero": {
+    "badge": "The Start of Smart Learning",
+    "title": "Learning That Transcends",
+    "titleHighlight": "Memory Limits",
+    "title1": "Learning That Transcends",
+    "title2": "Memory Limits",
+    "description": "Maximize your learning efficiency with scientifically proven spaced repetition (SRS).",
+    "subDescription": "With ReeeeecallStudy, you can remember faster and longer.",
+    "subtitle1": "Maximize your learning efficiency with scientifically proven spaced repetition (SRS).",
+    "subtitle2": "With ReeeeecallStudy, you can remember faster and longer.",
+    "startFree": "Start Free",
+    "learnMore": "Learn More",
+    "cta": {
+      "start": "Start Free",
+      "learn": "Learn More"
+    }
+  },
+  "tagline": "Smart Flashcard Learning Platform",
+  "preview": {
+    "tagline": "Smart Flashcard Learning Platform"
+  },
+  "features": {
+    "title": "Powerful Features",
+    "subtitle": "All tools for efficient learning in one place",
+    "srs": {
+      "title": "Smart SRS Algorithm",
+      "description": "Maximize long-term memory with scientifically verified spaced repetition. Auto-adjust review timing with 4-level ratings: Again/Hard/Good/Easy.",
+      "desc": "Maximize long-term memory with scientifically verified spaced repetition. Auto-adjust review timing with 4-level ratings: Again/Hard/Good/Easy."
+    },
+    "modes": {
+      "title": "5 Study Modes",
+      "description": "Supports SRS, Random, Sequential, Sequential Review, and By Date — study modes for every situation.",
+      "desc": "Supports SRS, Random, Sequential, Sequential Review, and By Date — study modes for every situation."
+    },
+    "stats": {
+      "title": "Real-time Stats & Dashboard",
+      "description": "Track progress at a glance with detailed stats: study heatmap, review forecast, daily study volume.",
+      "desc": "Track progress at a glance with detailed stats: study heatmap, review forecast, daily study volume."
+    },
+    "sharing": {
+      "title": "Deck Sharing & Marketplace",
+      "description": "Share decks in 3 modes (Copy, Subscribe, Snapshot) and browse other users' decks in the marketplace.",
+      "desc": "Share decks in 3 modes (Copy, Subscribe, Snapshot) and browse other users' decks in the marketplace."
+    },
+    "tts": {
+      "title": "Multilingual TTS",
+      "description": "Auto voice reading in Korean, English, Japanese, Chinese, and more with per-field language settings.",
+      "desc": "Auto voice reading in Korean, English, Japanese, Chinese, and more with per-field language settings."
+    },
+    "responsive": {
+      "title": "Responsive Design",
+      "description": "Works perfectly on PC, tablet, and mobile. Learn on the go with swipe mode.",
+      "desc": "Works perfectly on PC, tablet, and mobile. Learn on the go with swipe mode."
+    }
+  },
+  "featuresSection": {
+    "title": "Powerful Features",
+    "subtitle": "All tools for efficient learning in one place"
+  },
+  "why": {
+    "title": "Why ReeeeecallStudy?",
+    "subtitle": "Next-generation flashcard tool combining spaced repetition with modern UI",
+    "points": [
+      "Scientifically verified SRS learning algorithm",
+      "Intuitive and clean user interface",
+      "Flexible card structure with custom templates",
+      "CSV/JSON import and export support",
+      "Tag-based search and filtering",
+      "Deck sharing & community marketplace",
+      "Detailed learning statistics and analysis",
+      "External integration via API key"
+    ]
+  },
+  "benefitsSection": {
+    "title": "Why ReeeeecallStudy?",
+    "subtitle": "Next-generation flashcard tool combining spaced repetition with modern UI",
+    "cta": "Get Started Now"
+  },
+  "benefits": {
+    "0": "Scientifically verified SRS learning algorithm",
+    "1": "Intuitive and clean user interface",
+    "2": "Flexible card structure with custom templates",
+    "3": "CSV/JSON import and export support",
+    "4": "Tag-based search and filtering",
+    "5": "Deck sharing & community marketplace",
+    "6": "Detailed learning statistics and analysis",
+    "7": "External integration via API key"
+  },
+  "metrics": {
+    "efficiency": {
+      "label": "Learning Efficiency",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "interval": {
+      "label": "Avg Review Interval",
+      "value": "15 days",
+      "change": "+8 days"
+    },
+    "accuracy": {
+      "label": "Accuracy Rate",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "daily": {
+      "label": "Daily Study Cards",
+      "value": "45 cards",
+      "change": "+30 cards"
+    }
+  },
+  "stats": {
+    "0": {
+      "label": "Learning Efficiency",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "1": {
+      "label": "Avg Review Interval",
+      "value": "15 days",
+      "change": "+8 days"
+    },
+    "2": {
+      "label": "Accuracy Rate",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "3": {
+      "label": "Daily Study Cards",
+      "value": "45 cards",
+      "change": "+30 cards"
+    }
+  },
+  "steps": {
+    "title": "Start in 3 Simple Steps",
+    "step1": {
+      "title": "Create a Deck",
+      "description": "Create a deck to organize cards by topic, then add your cards."
+    },
+    "step2": {
+      "title": "Study",
+      "description": "SRS presents review cards at the optimal timing."
+    },
+    "step3": {
+      "title": "Track Progress",
+      "description": "Check learning stats and growth trends on the dashboard."
+    }
+  },
+  "howItWorks": {
+    "title": "Start in 3 Simple Steps",
+    "step1": {
+      "title": "Create a Deck",
+      "desc": "Create a deck to organize cards by topic, then add your cards."
+    },
+    "step2": {
+      "title": "Study",
+      "desc": "SRS presents review cards at the optimal timing."
+    },
+    "step3": {
+      "title": "Track Progress",
+      "desc": "Check learning stats and growth trends on the dashboard."
+    }
+  },
+  "cta": {
+    "title": "Learn Smarter Starting Today",
+    "description": "Start free. Sign up easily with email and password.",
+    "subtitle": "Start free. Sign up easily with email and password.",
+    "button": "Get Started"
+  },
+  "footer": {
+    "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
+    "apiDocs": "API Docs"
+  },
+  "floatingCta": "Start Now"
+}

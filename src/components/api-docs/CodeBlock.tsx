@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Copy, Check } from 'lucide-react'
 
 export function CodeBlock({ code, language }: { code: string; language?: string }) {
+  const { t } = useTranslation('api-docs')
   const [copied, setCopied] = useState(false)
 
   const handleCopy = useCallback(async () => {
@@ -20,7 +22,7 @@ export function CodeBlock({ code, language }: { code: string; language?: string 
       <button
         onClick={handleCopy}
         className="absolute top-2 right-2 p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 text-gray-300 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-        title="복사"
+        title={t('copy')}
       >
         {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
       </button>

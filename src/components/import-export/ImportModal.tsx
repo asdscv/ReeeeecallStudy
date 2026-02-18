@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ type ImportStep = 'upload' | 'mapping' | 'preview' | 'importing' | 'done'
 type DuplicateMode = 'skip' | 'overwrite' | 'add'
 
 export function ImportModal({ open, onClose, deckId, templateId, template, onComplete }: ImportModalProps) {
+  const { t } = useTranslation('import-export')
   const { cards: existingCards, createCard } = useCardStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -100,10 +102,10 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         sessionStorage.setItem('__import_csv_raw', text)
         setStep('mapping')
       } else {
-        setError('JSON 또는 CSV 파일만 지원합니다.')
+        setError(t('unsupportedFormat'))
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : '파일 파싱에 실패했습니다.')
+      setError(e instanceof Error ? e.message : t('parseFailed'))
     }
   }
 
@@ -134,7 +136,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
       setStep('preview')
       sessionStorage.removeItem('__import_csv_raw')
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'CSV 파싱에 실패했습니다.')
+      setError(e instanceof Error ? e.message : t('csvParseFailed'))
     }
   }
 
@@ -184,7 +186,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>카드 가져오기</DialogTitle>
+          <DialogTitle>{t('importCards')}</DialogTitle>
         </DialogHeader>
 
         {error && (
@@ -204,14 +206,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             onDrop={handleDrop}
           >
             <div className="text-4xl mb-3">📁</div>
-            <p className="text-gray-600 mb-2">파일을 여기에 드래그하거나</p>
+            <p className="text-gray-600 mb-2">{t('dragFile')}</p>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
             >
-              파일 선택
+              {t('selectFile')}
             </button>
-            <p className="text-gray-400 text-xs mt-3">JSON 또는 CSV 파일 지원</p>
+            <p className="text-gray-400 text-xs mt-3">{t('supportedFormats')}</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -226,11 +228,11 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {step === 'mapping' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              CSV 헤더를 템플릿 필드에 매핑해주세요.
+              {t('mapHeaders')}
             </p>
             <div className="space-y-2">
               {csvHeaders
-                .filter((h) => h !== '태그')
+                .filter((h) => h !== 'Tags' && h !== '태그')
                 .map((header) => (
                   <div key={header} className="flex items-center gap-3">
                     <span className="w-32 text-sm text-gray-700 truncate">{header}</span>
@@ -242,7 +244,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                       }
                       className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-sm outline-none"
                     >
-                      <option value="">-- 건너뛰기 --</option>
+                      <option value="">{t('skipField')}</option>
                       {templateFields.map((f) => (
                         <option key={f.key} value={f.key}>
                           {f.name} ({f.key})
@@ -257,14 +259,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                 onClick={() => { resetState(); setStep('upload') }}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
-                뒤로
+                {t('back')}
               </button>
               <button
                 onClick={handleMappingConfirm}
                 disabled={Object.values(fieldMapping).filter(Boolean).length === 0}
                 className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
               >
-                다음
+                {t('next')}
               </button>
             </DialogFooter>
           </div>
@@ -276,16 +278,16 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             {/* Stats */}
             <div className="flex items-center gap-3 text-sm">
               <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
-                유효 {parsedCards.length}개
+                {t('validCount', { count: parsedCards.length })}
               </span>
               {invalidCount > 0 && (
                 <span className="px-3 py-1 bg-red-50 text-red-700 rounded-full">
-                  무효 {invalidCount}개
+                  {t('invalidCount', { count: invalidCount })}
                 </span>
               )}
               {duplicateCount > 0 && (
                 <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full">
-                  중복 {duplicateCount}개
+                  {t('duplicateCount', { count: duplicateCount })}
                 </span>
               )}
             </div>
@@ -319,7 +321,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                 </table>
                 {parsedCards.length > 5 && (
                   <p className="text-xs text-gray-400 mt-1">
-                    ... 외 {parsedCards.length - 5}개
+                    {t('moreCards', { count: parsedCards.length - 5 })}
                   </p>
                 )}
               </div>
@@ -328,13 +330,13 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             {/* Duplicate handling */}
             {duplicateCount > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">중복 카드 처리</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">{t('duplicateHandling')}</p>
                 <div className="flex gap-2">
                   {([
-                    ['skip', '건너뛰기'],
-                    ['overwrite', '덮어쓰기'],
-                    ['add', '새로 추가'],
-                  ] as const).map(([value, label]) => (
+                    ['skip', 'skip'],
+                    ['overwrite', 'overwrite'],
+                    ['add', 'addNew'],
+                  ] as const).map(([value, labelKey]) => (
                     <button
                       key={value}
                       onClick={() => setDuplicateMode(value)}
@@ -344,7 +346,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                           : 'border-gray-300 text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      {label}
+                      {t(`duplicateMode.${labelKey}`)}
                     </button>
                   ))}
                 </div>
@@ -358,14 +360,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                 }}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
-                취소
+                {t('cancel')}
               </button>
               <button
                 onClick={handleImport}
                 disabled={parsedCards.length === 0}
                 className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
               >
-                가져오기 ({parsedCards.length}개)
+                {t('import', { count: parsedCards.length })}
               </button>
             </DialogFooter>
           </div>
@@ -375,7 +377,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {step === 'importing' && (
           <div className="text-center py-8">
             <div className="text-4xl mb-3 animate-pulse">📥</div>
-            <p className="text-gray-600">가져오는 중...</p>
+            <p className="text-gray-600">{t('importing')}</p>
           </div>
         )}
 
@@ -383,15 +385,15 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {step === 'done' && (
           <div className="text-center py-6 space-y-3">
             <div className="text-4xl">✅</div>
-            <p className="text-gray-900 font-medium">가져오기 완료</p>
+            <p className="text-gray-900 font-medium">{t('importComplete')}</p>
             <p className="text-sm text-gray-500">
-              총 {result.total}개 중 {result.added}개 추가, {result.skipped}개 건너뜀
+              {t('importSummary', { total: result.total, added: result.added, skipped: result.skipped })}
             </p>
             <button
               onClick={handleDone}
               className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
             >
-              확인
+              {t('confirm')}
             </button>
           </div>
         )}

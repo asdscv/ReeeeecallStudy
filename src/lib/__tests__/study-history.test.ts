@@ -33,40 +33,40 @@ function makeSession(overrides: Partial<StudySession> = {}): StudySession {
 
 describe('formatDuration', () => {
   it('formats seconds only', () => {
-    expect(formatDuration(5000)).toBe('5초')
+    expect(formatDuration(5000)).toBe('common:duration.seconds:5')
   })
 
   it('formats minutes and seconds', () => {
-    expect(formatDuration(90000)).toBe('1분 30초')
+    expect(formatDuration(90000)).toBe('common:duration.minutes:1 common:duration.seconds:30')
   })
 
   it('formats minutes only when seconds are 0', () => {
-    expect(formatDuration(120000)).toBe('2분')
+    expect(formatDuration(120000)).toBe('common:duration.minutes:2')
   })
 
   it('formats hours only', () => {
-    expect(formatDuration(3600000)).toBe('1시간')
+    expect(formatDuration(3600000)).toBe('common:duration.hours:1')
   })
 
   it('formats hours and minutes (no seconds)', () => {
-    expect(formatDuration(3660000)).toBe('1시간 1분')
+    expect(formatDuration(3660000)).toBe('common:duration.hours:1 common:duration.minutes:1')
   })
 
   it('formats hours and minutes, drops seconds', () => {
-    expect(formatDuration(3661000)).toBe('1시간 1분')
+    expect(formatDuration(3661000)).toBe('common:duration.hours:1 common:duration.minutes:1')
   })
 
   it('returns 0초 for 0', () => {
-    expect(formatDuration(0)).toBe('0초')
+    expect(formatDuration(0)).toBe('common:duration.zeroSeconds')
   })
 
   it('returns 0초 for negative', () => {
-    expect(formatDuration(-1000)).toBe('0초')
+    expect(formatDuration(-1000)).toBe('common:duration.zeroSeconds')
   })
 
   it('handles large durations', () => {
     // 2 hours 30 minutes
-    expect(formatDuration(9000000)).toBe('2시간 30분')
+    expect(formatDuration(9000000)).toBe('common:duration.hours:2 common:duration.minutes:30')
   })
 })
 
@@ -140,23 +140,23 @@ describe('groupSessionsByDate', () => {
 
 describe('getStudyModeLabel', () => {
   it('returns SRS for srs', () => {
-    expect(getStudyModeLabel('srs')).toBe('SRS')
+    expect(getStudyModeLabel('srs')).toBe('study:mode.srs')
   })
 
   it('returns 순차 복습 for sequential_review', () => {
-    expect(getStudyModeLabel('sequential_review')).toBe('순차 복습')
+    expect(getStudyModeLabel('sequential_review')).toBe('study:mode.sequentialReview')
   })
 
   it('returns 랜덤 for random', () => {
-    expect(getStudyModeLabel('random')).toBe('랜덤')
+    expect(getStudyModeLabel('random')).toBe('study:mode.random')
   })
 
   it('returns 순차 for sequential', () => {
-    expect(getStudyModeLabel('sequential')).toBe('순차')
+    expect(getStudyModeLabel('sequential')).toBe('study:mode.sequential')
   })
 
   it('returns 날짜별 for by_date', () => {
-    expect(getStudyModeLabel('by_date')).toBe('날짜별')
+    expect(getStudyModeLabel('by_date')).toBe('study:mode.byDate')
   })
 
   it('returns raw mode for unknown', () => {

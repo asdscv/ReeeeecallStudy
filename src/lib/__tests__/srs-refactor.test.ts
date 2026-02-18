@@ -86,9 +86,9 @@ describe('SrsCardData backward compatibility', () => {
     const data = makeSrsData()
     const preview = previewIntervals(data)
 
-    expect(preview.again).toBe('10분')
-    expect(preview.hard).toBe('1일')
-    expect(preview.good).toBe('1일')
-    expect(preview.easy).toBe('4일')
+    expect(preview.again).toBe('srs:interval.minutes')
+    expect(preview.hard).toBe('srs:interval.oneDay')
+    expect(preview.good).toBe('srs:interval.oneDay')
+    expect(preview.easy).toBe('srs:interval.days:4')
   })
 })

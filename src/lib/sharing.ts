@@ -40,16 +40,16 @@ export function canUserModifyDeck(deck: ShareableDeck, userId: string): boolean 
 }
 
 export function getDeckShareLabel(deck: ShareableDeck, _userId: string): string {
-  if (!deck.share_mode || !deck.source_owner_id) return '내 덱'
+  if (!deck.share_mode || !deck.source_owner_id) return 'sharing:deckLabel.myDeck'
 
   switch (deck.share_mode) {
     case 'subscribe':
-      return '구독 중'
+      return 'sharing:deckLabel.subscribed'
     case 'snapshot':
-      return '스냅샷'
+      return 'sharing:deckLabel.snapshot'
     case 'copy':
-      return '복사본'
+      return 'sharing:deckLabel.copy'
     default:
-      return '내 덱'
+      return 'sharing:deckLabel.myDeck'
   }
 }

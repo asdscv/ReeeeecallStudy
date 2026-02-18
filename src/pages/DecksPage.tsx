@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
 import { DeckCard } from '../components/deck/DeckCard'
@@ -7,6 +8,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import type { Deck } from '../types/database'
 
 export function DecksPage() {
+  const { t } = useTranslation(['decks', 'common'])
   const { user } = useAuthStore()
   const { decks, stats, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
 
@@ -35,12 +37,12 @@ export function DecksPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">내 덱</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('decks:title')}</h1>
         <button
           onClick={() => setShowCreate(true)}
           className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
         >
-          + 새 덱 만들기
+          {t('decks:createNew')}
         </button>
       </div>
 
@@ -51,12 +53,12 @@ export function DecksPage() {
       ) : decks.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📚</div>
-          <p className="text-gray-500 mb-4 text-sm sm:text-base">아직 덱이 없습니다. 새 덱을 만들어보세요.</p>
+          <p className="text-gray-500 mb-4 text-sm sm:text-base">{t('decks:empty')}</p>
           <button
             onClick={() => setShowCreate(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
-            + 첫 번째 덱 만들기
+            {t('decks:createFirst')}
           </button>
         </div>
       ) : (
@@ -83,9 +85,9 @@ export function DecksPage() {
         open={!!deletingDeck}
         onClose={() => setDeletingDeck(null)}
         onConfirm={handleDelete}
-        title="덱 삭제"
-        message={`"${deletingDeck?.name}" 덱과 모든 카드가 삭제됩니다. 되돌릴 수 없습니다.`}
-        confirmLabel="삭제"
+        title={t('decks:deleteDeck')}
+        message={t('decks:deleteConfirm', { name: deletingDeck?.name })}
+        confirmLabel={t('common:actions.delete')}
         danger
         loading={deleteLoading}
       />

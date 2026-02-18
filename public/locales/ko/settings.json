@@ -1,0 +1,122 @@
+{
+  "title": "설정",
+  "loading": "불러오는 중...",
+  "saving": "저장 중...",
+  "save": "설정 저장",
+  "saved": "설정이 저장되었습니다!",
+  "saveButton": "설정 저장",
+
+  "links": {
+    "userGuide": "사용법 가이드",
+    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
+    "apiDocs": "API 문서",
+    "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+  },
+
+  "guide": {
+    "title": "사용법 가이드",
+    "desc": "기능 설명, 학습 팁, 공유 방법"
+  },
+
+  "apiDocs": {
+    "title": "API 문서",
+    "desc": "API 엔드포인트, 인증, 사용 예시"
+  },
+
+  "profile": {
+    "title": "프로필",
+    "email": "이메일",
+    "displayName": "표시 이름",
+    "displayNamePlaceholder": "이름을 입력하세요",
+    "namePlaceholder": "이름을 입력하세요"
+  },
+
+  "language": {
+    "title": "언어",
+    "label": "표시 언어",
+    "en": "English",
+    "ko": "한국어"
+  },
+
+  "srs": {
+    "title": "SRS 학습",
+    "description": "SRS (간격 반복) 모드에서 한 세션에 추가되는 새 카드 수를 설정합니다",
+    "newCardLimit": "새 카드 한도",
+    "cards": "장",
+    "cardsUnit": "장",
+    "help": "SRS 학습 시 복습 카드 외에 추가로 나오는 새 카드의 최대 수입니다. 복습 카드는 이 한도에 영향을 받지 않습니다.",
+    "newCardNote": "SRS 학습 시 복습 카드 외에 추가로 나오는 새 카드의 최대 수입니다. 복습 카드는 이 한도에 영향을 받지 않습니다."
+  },
+
+  "answerMode": {
+    "title": "답변 방식",
+    "description": "학습 중 답변을 선택하는 방식을 설정합니다",
+    "button": "버튼",
+    "buttonDesc": "버튼을 눌러 답변 선택",
+    "swipe": "스와이프",
+    "swipeDesc": "카드를 밀어서 답변 선택",
+    "directionsHelp": "각 방향에 동작을 할당하세요. 설정하지 않은 방향은 비활성화됩니다.",
+    "swipeDirections": "각 방향에 동작을 할당하세요. 설정하지 않은 방향은 비활성화됩니다.",
+    "swipeLeft": "왼쪽 스와이프",
+    "swipeRight": "오른쪽 스와이프",
+    "swipeUp": "위쪽 스와이프",
+    "swipeDown": "아래쪽 스와이프",
+    "notSet": "설정 안함",
+    "again": "Again (다시)",
+    "hard": "Hard (어려움)",
+    "good": "Good (적당)",
+    "easy": "Easy (쉬움)",
+    "recommendation": "추천 설정: 왼쪽=Again, 오른쪽=Good (빠른 학습에 유용)"
+  },
+
+  "tts": {
+    "title": "자동 TTS 읽기",
+    "description": "카드 뒤집기 시 TTS 설정된 필드를 자동으로 읽어줍니다",
+    "enable": "자동 읽기 활성화",
+    "help": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다.",
+    "note": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다."
+  },
+
+  "apiKey": {
+    "title": "API 키 관리",
+    "limit": "최대 1개의 API 키를 생성할 수 있습니다",
+    "maxKeys": "최대 1개의 API 키를 생성할 수 있습니다",
+    "generate": "생성",
+    "generateNew": "새 키 생성",
+    "keyName": "키 이름",
+    "keyNamePlaceholder": "예: my-script",
+    "namePlaceholder": "예: my-script",
+    "create": "생성",
+    "generating": "생성 중...",
+    "generateFailed": "키 생성에 실패했습니다: ",
+    "generated": "API 키가 생성되었습니다. 이 키는 다시 볼 수 없으니 복사해두세요!",
+    "generateError": "키 생성 중 오류가 발생했습니다",
+    "delete": "삭제",
+    "deleted": "API 키가 삭제되었습니다",
+    "cancel": "취소",
+    "copy": "복사",
+    "copied": "API 키가 복사되었습니다!",
+    "show": "키 보기",
+    "hide": "키 숨기기",
+    "masked": "보안상 다시 볼 수 없습니다",
+    "createdAt": "생성일",
+    "created": "생성일: {{date}}",
+    "noKeys": "생성된 API 키가 없습니다.",
+    "noKey": "생성된 API 키가 없습니다.",
+    "securityNote": "보안상 다시 볼 수 없습니다"
+  },
+
+  "account": {
+    "title": "계정",
+    "logout": "로그아웃"
+  },
+
+  "settings": {
+    "answerMode": {
+      "swipeLeft": "왼쪽 스와이프",
+      "swipeRight": "오른쪽 스와이프",
+      "swipeUp": "위쪽 스와이프",
+      "swipeDown": "아래쪽 스와이프"
+    }
+  }
+}

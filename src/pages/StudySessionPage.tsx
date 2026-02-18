@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { useStudyStore } from '../stores/study-store'
@@ -15,6 +16,7 @@ import { loadSettings, shouldShowButtons, type StudyInputSettings } from '../lib
 import type { StudyMode, Profile } from '../types/database'
 
 export function StudySessionPage() {
+  const { t } = useTranslation('study')
   const { deckId } = useParams<{ deckId: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -133,7 +135,7 @@ export function StudySessionPage() {
   if (phase === 'loading') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">로딩 중...</div>
+        <div className="text-gray-500">{t('session.loading')}</div>
       </div>
     )
   }
@@ -161,14 +163,14 @@ export function StudySessionPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            학습할 카드가 없습니다
+            {t('session.noCards')}
           </h2>
-          <p className="text-gray-500 mb-6">모든 카드를 복습했습니다!</p>
+          <p className="text-gray-500 mb-6">{t('session.allReviewed')}</p>
           <button
             onClick={handleExit}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
           >
-            덱으로 돌아가기
+            {t('session.backToDeck')}
           </button>
         </div>
       </div>

@@ -53,7 +53,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
 
   createTemplate: async (input) => {
     const check = guard.check('card_create', 'templates_total')
-    if (!check.allowed) { set({ error: check.message ?? '요청 제한에 도달했습니다.' }); return null }
+    if (!check.allowed) { set({ error: check.message ?? 'errors:rateLimit.reached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
@@ -103,7 +103,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
     // 기본 템플릿은 삭제 불가
     const tmpl = get().templates.find((t) => t.id === id)
     if (tmpl?.is_default) {
-      set({ error: '기본 템플릿은 삭제할 수 없습니다.' })
+      set({ error: 'errors:template.cannotDeleteDefault' })
       return false
     }
 
@@ -114,7 +114,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       .eq('default_template_id', id)
 
     if (decks && decks.length > 0) {
-      set({ error: `이 템플릿을 사용하는 덱이 ${decks.length}개 있어 삭제할 수 없습니다.` })
+      set({ error: 'errors:template.inUseByDecks' })
       return false
     }
 
@@ -143,7 +143,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       .from('card_templates')
       .insert({
         user_id: user.id,
-        name: `${original.name} (복사본)`,
+        name: `${original.name} (Copy)`,
         fields: original.fields,
         front_layout: original.front_layout,
         back_layout: original.back_layout,

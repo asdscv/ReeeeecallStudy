@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "quickStudy": "Quick Study",
+    "dashboard": "Dashboard",
+    "decksCards": "Decks/Cards",
+    "decks": "Decks",
+    "cards": "Cards",
+    "marketplace": "Marketplace",
+    "studyHistory": "Study History",
+    "settings": "Settings"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "ok": "OK",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "copy": "Copy",
+    "duplicate": "Duplicate",
+    "search": "Search",
+    "selectAll": "Select All",
+    "deselect": "Deselect",
+    "show": "Show",
+    "hide": "Hide",
+    "startStudy": "Start Study",
+    "logout": "Logout"
+  },
+  "status": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "new": "New",
+    "learning": "Learning",
+    "review": "Review",
+    "suspended": "Suspended"
+  },
+  "units": {
+    "cards": "cards",
+    "cardsSuffix": "{{count}} cards",
+    "sessions": "sessions",
+    "items": "items",
+    "days": "days",
+    "minutes": "min",
+    "seconds": "sec",
+    "times": "times",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}} per page"
+  },
+  "timePeriod": {
+    "1d": "1D",
+    "1w": "1W",
+    "1m": "1M",
+    "3m": "3M",
+    "6m": "6M",
+    "1y": "1Y",
+    "2y": "2Y",
+    "5y": "5Y"
+  },
+  "confirmDialog": {
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "confirm": "Confirm"
+  },
+  "delete": "Delete",
+  "deselect": "Deselect",
+  "duplicate": "Duplicate",
+  "edit": "Edit",
+  "save": "Save",
+  "saving": "Saving...",
+  "selectAll": "Select All",
+  "menu": "Menu",
+  "copiedToClipboard": "Copied to clipboard"
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, GripVertical, X, ChevronDown, Save, Volume2, Trash2 } from 'lucide-react'
 import { useTemplateStore } from '../stores/template-store'
@@ -16,27 +17,31 @@ const STYLE_OPTIONS: { value: LayoutItem['style']; label: string }[] = [
   { value: 'media', label: 'Media' },
 ]
 
-const TTS_LANGUAGES = [
-  { value: '', label: '언어 선택' },
-  { value: 'ko-KR', label: '한국어' },
-  { value: 'en-US', label: 'English (US)' },
-  { value: 'en-GB', label: 'English (UK)' },
-  { value: 'ja-JP', label: '日本語' },
-  { value: 'zh-CN', label: '中文 (简体)' },
-  { value: 'zh-TW', label: '中文 (繁體)' },
-  { value: 'es-ES', label: 'Español' },
-  { value: 'fr-FR', label: 'Français' },
-  { value: 'de-DE', label: 'Deutsch' },
-  { value: 'pt-BR', label: 'Português' },
-  { value: 'vi-VN', label: 'Tiếng Việt' },
-  { value: 'th-TH', label: 'ไทย' },
-]
+function getTtsLanguages(t: (key: string) => string) {
+  return [
+    { value: '', label: t('ttsLanguageSelect') },
+    { value: 'ko-KR', label: t('ttsKorean') },
+    { value: 'en-US', label: 'English (US)' },
+    { value: 'en-GB', label: 'English (UK)' },
+    { value: 'ja-JP', label: '日本語' },
+    { value: 'zh-CN', label: '中文 (简体)' },
+    { value: 'zh-TW', label: '中文 (繁體)' },
+    { value: 'es-ES', label: 'Español' },
+    { value: 'fr-FR', label: 'Français' },
+    { value: 'de-DE', label: 'Deutsch' },
+    { value: 'pt-BR', label: 'Português' },
+    { value: 'vi-VN', label: 'Tiếng Việt' },
+    { value: 'th-TH', label: 'ไทย' },
+  ]
+}
 
 function generateKey(): string {
   return `field_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
 }
 
 export function TemplateEditPage() {
+  const { t } = useTranslation('templates')
+  const TTS_LANGUAGES = getTtsLanguages(t)
   const { templateId } = useParams<{ templateId: string }>()
   const navigate = useNavigate()
   const { templates, fetchTemplates, createTemplate, updateTemplate } = useTemplateStore()
@@ -78,8 +83,8 @@ export function TemplateEditPage() {
     if (isNew) {
       setName('')
       setFields([
-        { key: 'front', name: '앞면', type: 'text', order: 0 },
-        { key: 'back', name: '뒷면', type: 'text', order: 1 },
+        { key: 'front', name: t('edit.front'), type: 'text', order: 0 },
+        { key: 'back', name: t('edit.back'), type: 'text', order: 1 },
       ])
       setFrontLayout([{ field_key: 'front', style: 'primary' }])
       setBackLayout([{ field_key: 'back', style: 'primary' }])
@@ -104,7 +109,7 @@ export function TemplateEditPage() {
     if (fields.length >= 10) return
     const newField: TemplateField = {
       key: generateKey(),
-      name: `필드 ${fields.length + 1}`,
+      name: t('edit.fieldDefault', { index: fields.length + 1 }),
       type: 'text',
       order: fields.length,
     }
@@ -135,11 +140,11 @@ export function TemplateEditPage() {
   const handleTtsTest = (index: number) => {
     const field = fields[index]
     if (!field.tts_lang) {
-      toast.error('언어를 선택해주세요')
+      toast.error(t('edit.selectLanguage'))
       return
     }
     stopSpeaking()
-    speak(field.name || '테스트', field.tts_lang)
+    speak(field.name || t('edit.test'), field.tts_lang)
   }
 
   // Drag & drop for fields reorder
@@ -228,11 +233,11 @@ export function TemplateEditPage() {
   // Save
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.error('템플릿 이름을 입력해주세요.')
+      toast.error(t('edit.nameRequired'))
       return
     }
     if (fields.length === 0) {
-      toast.error('필드를 1개 이상 추가해주세요.')
+      toast.error(t('edit.fieldsRequired'))
       return
     }
 
@@ -253,10 +258,10 @@ export function TemplateEditPage() {
         back_html: backHtml,
       })
       if (created) {
-        toast.success('템플릿이 생성되었습니다.')
+        toast.success(t('edit.created'))
         navigate('/templates', { replace: true })
       } else {
-        toast.error('템플릿 생성에 실패했습니다. 콘솔을 확인해주세요.')
+        toast.error(t('edit.createFailed'))
       }
     } else {
       const success = await updateTemplate(templateId!, {
@@ -269,9 +274,9 @@ export function TemplateEditPage() {
         back_html: backHtml,
       })
       if (success) {
-        toast.success('템플릿이 저장되었습니다.')
+        toast.success(t('edit.saved'))
       } else {
-        toast.error('템플릿 저장에 실패했습니다. DB 마이그레이션(005)을 확인해주세요.')
+        toast.error(t('edit.saveFailed'))
       }
     }
     setSaving(false)
@@ -281,12 +286,12 @@ export function TemplateEditPage() {
   if (!isNew && !template && templates.length > 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-gray-500 mb-4">템플릿을 찾을 수 없습니다.</p>
+        <p className="text-gray-500 mb-4">{t('edit.notFound')}</p>
         <button
           onClick={() => navigate('/templates')}
           className="text-blue-600 hover:text-blue-700 text-sm font-medium cursor-pointer"
         >
-          템플릿 목록으로 돌아가기
+          {t('edit.backToList')}
         </button>
       </div>
     )
@@ -323,7 +328,7 @@ export function TemplateEditPage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="템플릿 이름"
+            placeholder={t('form.templateName')}
             className="text-lg sm:text-2xl font-bold text-gray-900 bg-transparent outline-none border-b-2 border-transparent focus:border-blue-500 transition px-1 min-w-0 w-full"
           />
         </div>
@@ -333,8 +338,8 @@ export function TemplateEditPage() {
           className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition shrink-0"
         >
           <Save size={16} />
-          <span className="hidden sm:inline">{saving ? '저장 중...' : '저장'}</span>
-          <span className="sm:hidden">{saving ? '...' : '저장'}</span>
+          <span className="hidden sm:inline">{saving ? `${t('common:saving')}...` : t('common:save')}</span>
+          <span className="sm:hidden">{saving ? '...' : t('common:save')}</span>
         </button>
       </div>
 
@@ -343,9 +348,9 @@ export function TemplateEditPage() {
         {/* Left: Field Management */}
         <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">필드 관리</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">{t('edit.fieldManagement')}</h2>
             <span className="text-xs sm:text-sm text-gray-400">
-              (최대 10개, 현재 {fields.length}개)
+              {t('edit.fieldCount', { count: fields.length })}
             </span>
           </div>
 
@@ -382,12 +387,12 @@ export function TemplateEditPage() {
                     value={field.name}
                     onChange={(e) => updateField(i, { name: e.target.value })}
                     className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-900 outline-none focus:border-blue-500 transition"
-                    placeholder="필드 이름"
+                    placeholder={t('edit.fieldName')}
                   />
 
                   {/* Type label (text only) */}
                   <span className="hidden sm:inline px-2 py-1.5 text-sm text-gray-400">
-                    텍스트
+                    {t('edit.text')}
                   </span>
 
                   {/* TTS toggle */}
@@ -421,7 +426,7 @@ export function TemplateEditPage() {
                     value={field.detail || ''}
                     onChange={(e) => updateField(i, { detail: e.target.value || undefined })}
                     className="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 outline-none focus:border-blue-400 transition bg-white"
-                    placeholder="필드 설명 (선택)"
+                    placeholder={t('edit.fieldDescription')}
                   />
                 </div>
 
@@ -445,7 +450,7 @@ export function TemplateEditPage() {
                       onClick={() => handleTtsTest(i)}
                       className="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-200 cursor-pointer transition shrink-0"
                     >
-                      테스트
+                      {t('edit.test')}
                     </button>
                   </div>
                 )}
@@ -459,7 +464,7 @@ export function TemplateEditPage() {
               onClick={addField}
               className="w-full mt-3 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 cursor-pointer transition"
             >
-              + 필드 추가
+              {t('edit.addField')}
             </button>
           )}
         </div>
@@ -468,7 +473,7 @@ export function TemplateEditPage() {
         <div className="space-y-6">
           {/* Layout mode toggle */}
           <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">레이아웃 모드</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">{t('edit.layoutMode')}</h2>
             <div className="flex rounded-lg border border-gray-200 overflow-hidden">
               <button
                 type="button"
@@ -479,7 +484,7 @@ export function TemplateEditPage() {
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                디폴트
+                {t('edit.defaultMode')}
               </button>
               <button
                 type="button"
@@ -490,12 +495,12 @@ export function TemplateEditPage() {
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                설정 (HTML)
+                {t('edit.customMode')}
               </button>
             </div>
             {layoutMode === 'custom' && (
               <p className="text-xs text-gray-400 mt-2">
-                HTML에서 <code className="bg-gray-100 px-1 rounded">{`{{필드이름}}`}</code>으로 필드를 삽입할 수 있습니다.
+                {t('edit.htmlHelp', { curly: '{{' })}
               </p>
             )}
           </div>
@@ -504,7 +509,7 @@ export function TemplateEditPage() {
             <>
               {/* Front layout */}
               <LayoutSection
-                title="앞면 설정"
+                title={t('edit.frontSettings')}
                 layout={frontLayout}
                 fields={fields}
                 availableFields={availableFrontFields}
@@ -519,7 +524,7 @@ export function TemplateEditPage() {
 
               {/* Back layout */}
               <LayoutSection
-                title="뒷면 설정"
+                title={t('edit.backSettings')}
                 layout={backLayout}
                 fields={fields}
                 availableFields={availableBackFields}
@@ -536,7 +541,7 @@ export function TemplateEditPage() {
             <>
               {/* Custom HTML: Front */}
               <CustomHtmlSection
-                title="앞면 HTML"
+                title={t('edit.frontHtml')}
                 html={frontHtml}
                 onHtmlChange={setFrontHtml}
                 fields={fields}
@@ -544,7 +549,7 @@ export function TemplateEditPage() {
 
               {/* Custom HTML: Back */}
               <CustomHtmlSection
-                title="뒷면 HTML"
+                title={t('edit.backHtml')}
                 html={backHtml}
                 onHtmlChange={setBackHtml}
                 fields={fields}
@@ -584,6 +589,8 @@ function LayoutSection({
   onFontSizeChange: (fieldKey: string, fontSize: number | undefined) => void
   getFieldName: (key: string) => string
 }) {
+  const { t } = useTranslation('templates')
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
       <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">{title}</h2>
@@ -616,10 +623,10 @@ function LayoutSection({
                 onFontSizeChange(item.field_key, val ? Number(val) : undefined)
               }}
               className="px-2 py-1 text-xs rounded-lg border border-gray-300 text-gray-600 outline-none cursor-pointer"
-              title="폰트 크기"
+              title={t('edit.fontSize')}
             >
               <option value="">
-                기본 ({DEFAULT_FONT_SIZES[item.style]}px)
+                {t('edit.defaultFontSize', { size: DEFAULT_FONT_SIZES[item.style] })}
               </option>
               {FONT_SIZE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -637,7 +644,7 @@ function LayoutSection({
           </div>
         ))}
         {layout.length === 0 && (
-          <p className="text-sm text-gray-400 py-2">필드를 추가해주세요.</p>
+          <p className="text-sm text-gray-400 py-2">{t('edit.addFieldsFirst')}</p>
         )}
       </div>
 
@@ -649,7 +656,7 @@ function LayoutSection({
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 cursor-pointer font-medium"
           >
-            + 필드 추가
+            {t('edit.addField')}
             <ChevronDown size={14} />
           </button>
           {dropdownOpen && (
@@ -674,7 +681,7 @@ function LayoutSection({
 
       {/* Preview */}
       <div className="border-t border-gray-200 pt-4">
-        <p className="text-xs text-gray-400 mb-2">미리보기</p>
+        <p className="text-xs text-gray-400 mb-2">{t('edit.preview')}</p>
         <CardPreview layout={layout} fields={fields} getFieldName={getFieldName} />
       </div>
     </div>
@@ -694,6 +701,8 @@ function CustomHtmlSection({
   onHtmlChange: (html: string) => void
   fields: TemplateField[]
 }) {
+  const { t } = useTranslation('templates')
+
   // Build sample values using field names for preview
   const sampleValues: Record<string, string> = {}
   for (const field of fields) {
@@ -718,7 +727,7 @@ function CustomHtmlSection({
             type="button"
             onClick={() => onHtmlChange(html + `{{${f.name}}}`)}
             className="px-2.5 py-1 text-xs bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 cursor-pointer transition font-medium"
-            title={`{{${f.name}}} 삽입`}
+            title={t('insertField', { name: f.name })}
           >
             {`{{${f.name}}}`}
           </button>
@@ -731,13 +740,13 @@ function CustomHtmlSection({
         onChange={(e) => onHtmlChange(e.target.value)}
         rows={8}
         className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm text-gray-900 font-mono outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition resize-y"
-        placeholder={`<div style="text-align:center">\n  <h1>{{${fields[0]?.name ?? '앞면'}}}</h1>\n</div>`}
+        placeholder={`<div style="text-align:center">\n  <h1>{{${fields[0]?.name ?? 'Front'}}}</h1>\n</div>`}
       />
 
       {/* Live preview */}
       {html.trim() && (
         <div className="mt-3 border-t border-gray-200 pt-3">
-          <p className="text-xs text-gray-400 mb-2">미리보기</p>
+          <p className="text-xs text-gray-400 mb-2">{t('edit.preview')}</p>
           <div
             className="bg-gray-50 rounded-xl border border-gray-200 p-6 min-h-[80px] prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: renderedPreview }}
@@ -759,10 +768,12 @@ function CardPreview({
   fields: TemplateField[]
   getFieldName: (key: string) => string
 }) {
+  const { t } = useTranslation('templates')
+
   if (layout.length === 0) {
     return (
       <div className="bg-gray-50 rounded-xl border border-gray-200 p-8 text-center">
-        <p className="text-sm text-gray-400">표시할 필드가 없습니다</p>
+        <p className="text-sm text-gray-400">{t('edit.noFieldsToDisplay')}</p>
       </div>
     )
   }

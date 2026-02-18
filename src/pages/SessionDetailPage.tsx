@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock, Layers, TrendingUp, BarChart3, Zap, Target } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -14,6 +15,7 @@ import type { StudySession, StudyLog, Card } from '../types/database'
 type LogWithCard = StudyLog & { card?: Card }
 
 export function SessionDetailPage() {
+  const { t } = useTranslation(['history', 'common'])
   const location = useLocation()
   const navigate = useNavigate()
   const state = location.state as {
@@ -101,7 +103,7 @@ export function SessionDetailPage() {
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
-        학습 기록으로
+        {t('sessionDetail.backToHistory')}
       </button>
 
       {/* Common Header */}
@@ -123,7 +125,7 @@ export function SessionDetailPage() {
         <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
           <span className="inline-flex items-center gap-1">
             <Layers className="w-4 h-4 text-gray-400" />
-            {session.cards_studied}장 학습
+            {t('sessionDetail.cardsStudied', { count: session.cards_studied })}
           </span>
           <span className="inline-flex items-center gap-1">
             <Clock className="w-4 h-4 text-gray-400" />
@@ -132,7 +134,7 @@ export function SessionDetailPage() {
           {totalRatings > 0 && (
             <span className="inline-flex items-center gap-1">
               <Target className="w-4 h-4 text-gray-400" />
-              성과 {performance}%
+              {t('sessionDetail.performance', { value: performance })}
             </span>
           )}
         </div>
@@ -165,7 +167,7 @@ export function SessionDetailPage() {
       {loading ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
           <div className="text-2xl animate-pulse mb-2">...</div>
-          <p className="text-sm text-gray-400">상세 기록을 불러오는 중...</p>
+          <p className="text-sm text-gray-400">{t('sessionDetail.loadingDetails')}</p>
         </div>
       ) : (
         <>
@@ -187,7 +189,7 @@ export function SessionDetailPage() {
             <CardDetailTable logs={logs} isSrs={isSrs} />
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-              <p className="text-sm text-gray-400">상세 기록이 없습니다.</p>
+              <p className="text-sm text-gray-400">{t('sessionDetail.noDetails')}</p>
             </div>
           )}
         </>
@@ -199,6 +201,7 @@ export function SessionDetailPage() {
 // ── SRS Section ──
 
 function SrsSection({ logs }: { logs: LogWithCard[] }) {
+  const { t } = useTranslation('history')
   const srsStats = computeSrsStats(logs)
 
   return (
@@ -207,30 +210,30 @@ function SrsSection({ logs }: { logs: LogWithCard[] }) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
           icon={<Target className="w-4 h-4 text-green-600" />}
-          label="유지율"
+          label={t('sessionDetail.retention')}
           value={`${srsStats.retentionRate}%`}
         />
         <StatCard
           icon={<TrendingUp className="w-4 h-4 text-blue-600" />}
-          label="평균 간격 성장"
-          value={srsStats.avgIntervalGrowth > 0 ? `+${srsStats.avgIntervalGrowth}일` : `${srsStats.avgIntervalGrowth}일`}
+          label={t('sessionDetail.avgIntervalGrowth')}
+          value={t('session.intervalDays', { count: srsStats.avgIntervalGrowth })}
         />
         <StatCard
           icon={<Zap className="w-4 h-4 text-amber-600" />}
-          label="평균 Ease"
+          label={t('sessionDetail.avgEase')}
           value={String(srsStats.avgNewEase)}
         />
         <StatCard
           icon={<BarChart3 className="w-4 h-4 text-purple-600" />}
-          label="총 리뷰"
-          value={`${srsStats.totalReviews}회`}
+          label={t('sessionDetail.totalReviews')}
+          value={t('session.reviewCount', { count: srsStats.totalReviews })}
         />
       </div>
 
       {/* Ease distribution chart */}
       {srsStats.easeDistribution.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Ease 분포</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('sessionDetail.easeDistribution')}</h3>
           <div className="space-y-2">
             {srsStats.easeDistribution.map((d) => {
               const maxCount = Math.max(...srsStats.easeDistribution.map((e) => e.count))
@@ -268,24 +271,25 @@ function SummaryCards({
   performance: number
   showPerformance: boolean
 }) {
+  const { t } = useTranslation('history')
   const avgSpeed = totalCards > 0 ? Math.round(totalDurationMs / totalCards) : 0
 
   return (
     <div className={`grid gap-3 ${showPerformance ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'}`}>
       <StatCard
         icon={<Layers className="w-4 h-4 text-blue-600" />}
-        label="총 카드"
-        value={`${totalCards}장`}
+        label={t('sessionDetail.totalCards')}
+        value={t('session.cardCount', { count: totalCards })}
       />
       <StatCard
         icon={<Clock className="w-4 h-4 text-gray-600" />}
-        label="평균 소요시간"
+        label={t('sessionDetail.avgTime')}
         value={formatDuration(avgSpeed)}
       />
       {showPerformance && (
         <StatCard
           icon={<Target className="w-4 h-4 text-green-600" />}
-          label="성과 점수"
+          label={t('sessionDetail.performanceScore')}
           value={`${performance}%`}
         />
       )}
@@ -320,6 +324,7 @@ function StatCard({
 const DETAIL_PAGE_SIZE = 20
 
 function CardDetailTable({ logs, isSrs }: { logs: LogWithCard[]; isSrs: boolean }) {
+  const { t } = useTranslation('history')
   const [page, setPage] = useState(1)
   const totalPages = Math.max(1, Math.ceil(logs.length / DETAIL_PAGE_SIZE))
   const startIdx = (page - 1) * DETAIL_PAGE_SIZE
@@ -329,23 +334,23 @@ function CardDetailTable({ logs, isSrs }: { logs: LogWithCard[]; isSrs: boolean 
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <h3 className="text-sm font-semibold text-gray-700">
-          카드별 상세
+          {t('sessionDetail.cardDetails')}
         </h3>
-        <span className="text-xs text-gray-400">{logs.length}건</span>
+        <span className="text-xs text-gray-400">{t('session.logCount', { count: logs.length })}</span>
       </div>
 
       {/* Table header */}
       <div className="px-4 py-2 bg-gray-50 flex items-center gap-3 text-[11px] font-medium text-gray-500 uppercase">
         <span className="w-6 text-center shrink-0">#</span>
-        <span className="flex-1">카드</span>
-        <span className="w-16 text-center shrink-0">평가</span>
+        <span className="flex-1">{t('sessionDetail.card')}</span>
+        <span className="w-16 text-center shrink-0">{t('sessionDetail.rating')}</span>
         {isSrs && (
           <>
-            <span className="w-24 text-center shrink-0 hidden sm:block">간격 변화</span>
-            <span className="w-24 text-center shrink-0 hidden sm:block">Ease 변화</span>
+            <span className="w-24 text-center shrink-0 hidden sm:block">{t('sessionDetail.intervalChange')}</span>
+            <span className="w-24 text-center shrink-0 hidden sm:block">{t('sessionDetail.easeChange')}</span>
           </>
         )}
-        <span className="w-16 text-right shrink-0 hidden sm:block">소요시간</span>
+        <span className="w-16 text-right shrink-0 hidden sm:block">{t('sessionDetail.timeSpent')}</span>
       </div>
 
       {/* Table rows */}
@@ -366,7 +371,7 @@ function CardDetailTable({ logs, isSrs }: { logs: LogWithCard[]; isSrs: boolean 
               <>
                 <span className="w-24 text-center text-xs text-gray-500 shrink-0 hidden sm:block">
                   {log.prev_interval != null && log.new_interval != null
-                    ? `${log.prev_interval}일 → ${log.new_interval}일`
+                    ? t('session.intervalChange', { prev: log.prev_interval, next: log.new_interval })
                     : '-'}
                 </span>
                 <span className="w-24 text-center text-xs text-gray-500 shrink-0 hidden sm:block">
@@ -387,7 +392,7 @@ function CardDetailTable({ logs, isSrs }: { logs: LogWithCard[]; isSrs: boolean 
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
           <span className="text-xs text-gray-500">
-            {startIdx + 1}~{Math.min(startIdx + DETAIL_PAGE_SIZE, logs.length)} / {logs.length}건
+            {t('session.paginationInfo', { start: startIdx + 1, end: Math.min(startIdx + DETAIL_PAGE_SIZE, logs.length), total: logs.length })}
           </span>
           <div className="flex items-center gap-1">
             <button
@@ -415,9 +420,10 @@ function CardDetailTable({ logs, isSrs }: { logs: LogWithCard[]; isSrs: boolean 
 // ── Helpers ──
 
 function getCardPreview(card?: Card): string {
-  if (!card) return '(삭제된 카드)'
+  const { t } = useTranslation('history')
+  if (!card) return t('sessionDetail.deletedCard')
   const values = Object.values(card.field_values)
-  if (values.length === 0) return '(내용 없음)'
+  if (values.length === 0) return t('sessionDetail.noContent')
   const front = values[0]?.slice(0, 40) || ''
   const back = values[1]?.slice(0, 30) || ''
   if (back) return `${front} → ${back}`

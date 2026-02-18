@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { ListingCard } from '../components/marketplace/ListingCard'
@@ -9,6 +10,7 @@ import type { MarketplaceListing } from '../types/database'
 const PAGE_SIZE = 12
 
 export function MarketplacePage() {
+  const { t } = useTranslation(['marketplace', 'common'])
   const navigate = useNavigate()
   const { loading, filters, fetchListings, setFilters, getFilteredListings } = useMarketplaceStore()
   const [currentPage, setCurrentPage] = useState(1)
@@ -36,7 +38,7 @@ export function MarketplacePage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">마켓플레이스</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('marketplace:title')}</h1>
       </div>
 
       <div className="mb-4">
@@ -59,8 +61,8 @@ export function MarketplacePage() {
           <div className="text-4xl sm:text-5xl mb-4">🏪</div>
           <p className="text-gray-500 text-sm sm:text-base">
             {filters.query || filters.category
-              ? '검색 결과가 없습니다.'
-              : '아직 게시된 덱이 없습니다.'}
+              ? t('marketplace:noResults')
+              : t('marketplace:noListings')}
           </p>
         </div>
       ) : (
@@ -79,7 +81,7 @@ export function MarketplacePage() {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-4 sm:mt-6 bg-white rounded-xl border border-gray-200">
               <span className="text-xs sm:text-sm text-gray-500">
-                {startIdx + 1}~{Math.min(startIdx + PAGE_SIZE, filteredListings.length)} / {filteredListings.length}개
+                {t('common:pagination.rangeOf', { start: startIdx + 1, end: Math.min(startIdx + PAGE_SIZE, filteredListings.length), total: filteredListings.length })}
               </span>
               <div className="flex items-center gap-1">
                 <button

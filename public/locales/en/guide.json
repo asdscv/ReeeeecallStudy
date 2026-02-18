@@ -1,0 +1,273 @@
+{
+  "title": "User Guide",
+  "subtitle": "Learn all features of ReeeeecallStudy",
+  "searchPlaceholder": "Search features (e.g., SRS, Import, Share...)",
+  "tableOfContents": "Table of Contents",
+  "noResults": "No results for \"{{query}}\".",
+  "sections": {
+    "getting-started": {
+      "title": "Getting Started",
+      "items": {
+        "login": {
+          "title": "Login",
+          "body": "Log in with your email and password. When you sign up, a verification email is sent — click the link to complete registration. You can receive a reset link if you forget your password."
+        },
+        "dashboard": {
+          "title": "Home (Dashboard)",
+          "body": "After login, the dashboard appears. See total cards, today's review cards, study streak, and mastery rate at a glance. Check the study heatmap to see if you've been studying consistently, and use the review forecast chart to predict upcoming study volume."
+        },
+        "navigation": {
+          "title": "Navigation",
+          "body": "On PC, use the top menu bar; on mobile, tap the hamburger (☰) menu. Available menus: Quick Study, Dashboard, Decks, Market, Cards (Templates), Study History, Settings."
+        }
+      }
+    },
+    "decks": {
+      "title": "Deck Management",
+      "items": {
+        "create": {
+          "title": "Create a Deck",
+          "body": "On the Decks page, press the 'New Deck' button. Set the name, description, icon, and color. A deck is like a folder that groups flashcards by topic."
+        },
+        "detail": {
+          "title": "Deck Detail View",
+          "body": "Click a deck to see its card list. Use the top buttons to add cards, import, export, share, or edit the deck. Filtering by card status (new/learning/review/suspended) and search are also supported."
+        },
+        "edit": {
+          "title": "Edit Deck",
+          "body": "On the deck edit page, change the name, description, icon, color, and default template. SRS settings (Again/Hard/Good/Easy intervals) can be adjusted per deck. Deck statistics (card status distribution, mastery rate, study heatmap) are shown at the bottom."
+        },
+        "delete": {
+          "title": "Delete Deck",
+          "body": "Press the delete icon on the deck list to see a confirmation dialog. Deleting a deck also removes all its cards — be careful."
+        }
+      }
+    },
+    "cards": {
+      "title": "Card Management",
+      "items": {
+        "add": {
+          "title": "Add Cards",
+          "body": "Press 'Add Card' on the deck detail page. Fill in the fields defined in the template (e.g., front, back). Add tags separated by commas for later search and filtering."
+        },
+        "editDelete": {
+          "title": "Edit & Delete Cards",
+          "body": "Click a card in the list to open the edit modal. Modify field content and tags. You can delete individual cards or select multiple for bulk deletion."
+        },
+        "searchFilter": {
+          "title": "Search & Filter",
+          "body": "Enter keywords in the search bar at the top of the deck detail page to search across all fields and tags. Select a status filter (new, learning, review, suspended) to view only specific cards."
+        },
+        "srsReset": {
+          "title": "SRS Reset",
+          "body": "Resetting a card's SRS status returns it to 'new' status. Use this when you want to start learning from scratch."
+        }
+      }
+    },
+    "templates": {
+      "title": "Card Templates",
+      "items": {
+        "what": {
+          "title": "What is a Template?",
+          "body": "A template defines a card's structure — which fields it has and how they're arranged on front and back. For example, an 'English Vocab' template might have fields for word, meaning, and example sentence. One template can be shared across multiple decks."
+        },
+        "createEdit": {
+          "title": "Create & Edit Templates",
+          "body": "Press 'New Template' in the Cards menu. Add fields and set name, type (text/image/audio). Drag to reorder fields. Add descriptions to fields as guides for card creation."
+        },
+        "layout": {
+          "title": "Front & Back Layout",
+          "body": "Default mode: Place fields on front/back sides and set style (primary, secondary, hint, detail, media) and font size. Custom HTML mode: Use {{fieldName}} syntax for freeform HTML layout."
+        },
+        "tts": {
+          "title": "TTS (Text-to-Speech)",
+          "body": "Enable TTS per field and select a language (Korean, English, Japanese, Chinese, etc.). When studying, cards auto-read when flipped, or press the speaker button for manual playback. Toggle auto-read in Settings."
+        }
+      }
+    },
+    "study": {
+      "title": "Study",
+      "items": {
+        "modes": {
+          "title": "Study Modes",
+          "body": "• SRS (Spaced Repetition): Automatically adjusts review timing based on memory curve. The most efficient method for long-term memorization.\n• Random: Randomly draws cards from the deck.\n• Sequential: Studies cards in order. Remembers your position to continue.\n• By Date: Studies only cards added on a specific date."
+        },
+        "srsMethod": {
+          "title": "How SRS Works",
+          "body": "See the card front, recall the answer, then flip. Choose one of 4 buttons:\n• Again: Don't remember → short interval, shown again soon\n• Hard: Barely remember → interval increases slightly\n• Good: Remember well → normal review interval\n• Easy: Perfect recall → interval increases significantly\n\nThe more honest your ratings, the better SRS works."
+        },
+        "quickStudy": {
+          "title": "Quick Study",
+          "body": "Select a deck directly on the Quick Study page to start. Each deck shows new/review card counts for quick decision-making."
+        },
+        "sessionFlow": {
+          "title": "Study Session Flow",
+          "body": "1. Select deck → Set study mode → Start\n2. See card front → Tap/click to flip → Choose rating\n3. After all cards, a summary shows study count, time spent, and rating distribution.\n\nKeyboard shortcuts: Space (flip), 1 (Again), 2 (Hard), 3 (Good), 4 (Easy)"
+        },
+        "swipeMode": {
+          "title": "Swipe Mode",
+          "body": "Switch answer mode to 'Swipe' in Settings to rate cards by swiping. Assign ratings to each direction (up/down/left/right). Great for one-handed mobile study."
+        },
+        "srsCustom": {
+          "title": "Customizing SRS Settings",
+          "body": "Adjust Again/Hard/Good/Easy default intervals (days) on the deck edit page. For example, increasing Easy interval to 7 days reduces review frequency for easy cards. The 'New Card Limit' in Settings controls how many new cards appear per session."
+        }
+      }
+    },
+    "import-export": {
+      "title": "Import & Export",
+      "items": {
+        "jsonImport": {
+          "title": "JSON Import",
+          "body": "On the deck detail page, click 'Import' → select a JSON file. JSON files exported from ReeeeecallStudy can be directly imported, ideal for backup and restore. Includes deck metadata and template info."
+        },
+        "csvImport": {
+          "title": "CSV Import",
+          "body": "CSV files (saved from Excel) can also be imported. A mapping step appears to match column names to template fields, with auto-matching. A 'Tags' column with semicolons (;) is auto-recognized."
+        },
+        "duplicates": {
+          "title": "Duplicate Handling",
+          "body": "When importing, existing cards with identical content are flagged as duplicates. You can skip, overwrite, or add them. Preview valid/invalid/duplicate card counts before final import."
+        },
+        "jsonExport": {
+          "title": "JSON Export",
+          "body": "Deck detail → 'Export' → JSON downloads the deck info, template, and all cards as one JSON file. Use for transferring to other devices/accounts or backup."
+        },
+        "csvExport": {
+          "title": "CSV Export",
+          "body": "CSV format can be opened directly in Excel/Google Sheets. Includes BOM for proper Korean display in Excel."
+        }
+      }
+    },
+    "sharing": {
+      "title": "Deck Sharing",
+      "items": {
+        "copy": {
+          "title": "Share Mode: Copy",
+          "body": "Gives the recipient an independent copy of the deck. They can freely edit, add, and delete cards. After sharing, the original and copy don't affect each other. Best for customization."
+        },
+        "subscribe": {
+          "title": "Share Mode: Subscribe",
+          "body": "The recipient 'subscribes' to your deck. When you add cards, subscribers get them too. However, study progress (SRS) is tracked independently. Subscribers can't edit cards. Great for teacher↔student or study groups."
+        },
+        "snapshot": {
+          "title": "Share Mode: Snapshot",
+          "body": "Creates a read-only copy of the deck at the current point in time. Recipients can only study, not edit. Future updates to the original aren't reflected. Use when you want to share 'the exact current state'."
+        },
+        "inviteLink": {
+          "title": "Sending Invite Links",
+          "body": "Deck detail → Share button → Select share mode → 'Generate Invite Link' creates a unique link. Send via messenger, email, etc. The recipient clicks to accept."
+        },
+        "manage": {
+          "title": "Managing Shares",
+          "body": "Check sent/received shares on the 'My Shares' page near Settings. You can revoke active shares or unsubscribe from subscriptions."
+        }
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace",
+      "items": {
+        "what": {
+          "title": "What is the Marketplace?",
+          "body": "A space to search and get decks shared by other users. Filter by category (language, certification, programming, etc.) and tags, sort by popularity or newest."
+        },
+        "getDeck": {
+          "title": "Getting a Deck",
+          "body": "Click a deck in the marketplace to see details. Preview the first 10 cards, then press 'Get' to add it to your decks. Behavior varies by share mode (copy/subscribe/snapshot)."
+        },
+        "publish": {
+          "title": "Publishing Your Deck",
+          "body": "Deck detail → Share → 'Publish to Market'. Set title, description, category, tags, and share mode. Once published, all users can search for it. You can unpublish anytime."
+        }
+      }
+    },
+    "history": {
+      "title": "Study History & Statistics",
+      "items": {
+        "viewHistory": {
+          "title": "Viewing Study History",
+          "body": "View all study sessions by date on the Study History page. Click a session to see per-card details (rating, time spent). Filter by deck or mode."
+        },
+        "deckProgress": {
+          "title": "Deck Progress",
+          "body": "Deck progress cards appear at the top of Study History. See completion rate and card counts by status (new/learning/review) at a glance."
+        },
+        "dashboardStats": {
+          "title": "Dashboard Statistics",
+          "body": "Switch between period tabs (1W/1M/3M/6M/1Y) on the dashboard to view the study heatmap, daily study volume chart, and review forecast."
+        }
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "items": {
+        "profile": {
+          "title": "Profile",
+          "body": "Set your display name. Email cannot be changed."
+        },
+        "srsLimit": {
+          "title": "SRS New Card Limit",
+          "body": "Set the maximum number of new cards added per SRS session. Review cards are not affected by this limit. Adjust to control your study volume."
+        },
+        "answerMode": {
+          "title": "Answer Mode (Button/Swipe)",
+          "body": "Button mode: Rate by pressing buttons at the bottom.\nSwipe mode: Rate by swiping cards. Assign ratings (Again/Hard/Good/Easy) to each direction."
+        },
+        "autoTts": {
+          "title": "Auto TTS",
+          "body": "Auto-reads TTS-enabled fields when flipping cards. Even when off, the speaker button for manual playback is always available."
+        },
+        "apiKey": {
+          "title": "API Key",
+          "body": "Generate an API key to access ReeeeecallStudy data from external tools (scripts, apps). The key is shown only once — be sure to copy it. Up to 1 key allowed."
+        }
+      }
+    },
+    "api": {
+      "title": "API Integration",
+      "items": {
+        "what": {
+          "title": "What is the API?",
+          "body": "The ReeeeecallStudy API lets you view and manage decks, cards, and study history data from external scripts, apps, and automation tools. Works with any programming language — Python, JavaScript, etc."
+        },
+        "getKey": {
+          "title": "Getting an API Key",
+          "body": "Settings → API Key section → Click 'Generate New API Key'. Enter a key name and a key starting with rc_ will be issued.\n\n⚠️ The key is only shown once. Be sure to copy it to a safe place!"
+        },
+        "docsPage": {
+          "title": "API Documentation Page",
+          "body": "View the full API docs from the 'API' menu in the top navigation or at /api-docs. Includes request/response formats, code examples, rate limits, and error handling for each endpoint."
+        },
+        "endpoints": {
+          "title": "Key Endpoints",
+          "body": "• Deck API: List decks, create deck\n• Card API: List cards, create (including bulk), edit, delete\n• Study API: Due cards, study history, statistics\n• Template API: List templates\n\nSee the API docs page for details."
+        },
+        "rateLimits": {
+          "title": "Rate Limits",
+          "body": "Request counts are limited for API stability. Free tier:\n• Daily API requests: 1,000\n• API calls per minute: 60\n• Card creates per minute: 30\n\nExceeding limits returns 429 Too Many Requests."
+        }
+      }
+    },
+    "tips": {
+      "title": "Study Tips",
+      "items": {
+        "daily": {
+          "title": "Study a Little Every Day",
+          "body": "SRS is most effective with daily consistency. 10–20 minutes a day is enough. Fill up the study heatmap on your dashboard!"
+        },
+        "again": {
+          "title": "Don't Be Afraid of Again",
+          "body": "In SRS, 'Again' isn't failure. Honestly marking cards you don't remember as 'Again' helps the system show them at the right time. Forcing 'Good' actually reduces effectiveness."
+        },
+        "concise": {
+          "title": "Keep Cards Concise",
+          "body": "Put just one concept per card. Short, clear cards like 'apple = 사과' are far more effective than 'apple, pear, grape, strawberry...'."
+        },
+        "tags": {
+          "title": "Use Tags",
+          "body": "Add tags for quick filtering later. Examples: 'grammar', 'verbs', 'Chapter1', etc."
+        }
+      }
+    }
+  }
+}

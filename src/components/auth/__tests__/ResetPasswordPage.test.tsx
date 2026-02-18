@@ -43,14 +43,14 @@ describe('Session guard', () => {
     renderPage()
 
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login', { replace: true })
-    expect(screen.queryByText('새 비밀번호 설정')).not.toBeInTheDocument()
+    expect(screen.queryByText('resetPassword.title')).not.toBeInTheDocument()
   })
 
   it('should render form when session exists', () => {
     renderPage()
 
     expect(mockNavigate).not.toHaveBeenCalled()
-    expect(screen.getByText('새 비밀번호 설정')).toBeInTheDocument()
+    expect(screen.getByText('resetPassword.title')).toBeInTheDocument()
   })
 })
 
@@ -58,15 +58,15 @@ describe('Session guard', () => {
 describe('Rendering', () => {
   it('should render the reset password form', () => {
     renderPage()
-    expect(screen.getByText('새 비밀번호 설정')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('새 비밀번호 (6자 이상)')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('비밀번호 확인')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '비밀번호 변경' })).toBeInTheDocument()
+    expect(screen.getByText('resetPassword.title')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'resetPassword.changeButton' })).toBeInTheDocument()
   })
 
   it('should disable submit when fields are empty', () => {
     renderPage()
-    expect(screen.getByRole('button', { name: '비밀번호 변경' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'resetPassword.changeButton' })).toBeDisabled()
   })
 })
 
@@ -76,11 +76,11 @@ describe('Validation', () => {
     const user = userEvent.setup()
     renderPage()
 
-    await user.type(screen.getByPlaceholderText('새 비밀번호 (6자 이상)'), '123')
-    await user.type(screen.getByPlaceholderText('비밀번호 확인'), '123')
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.type(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder'), '123')
+    await user.type(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder'), '123')
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
 
-    expect(screen.getByText('비밀번호는 6자 이상이어야 합니다.')).toBeInTheDocument()
+    expect(screen.getByText('resetPassword.passwordTooShort')).toBeInTheDocument()
     expect(mockUpdatePassword).not.toHaveBeenCalled()
   })
 
@@ -88,11 +88,11 @@ describe('Validation', () => {
     const user = userEvent.setup()
     renderPage()
 
-    await user.type(screen.getByPlaceholderText('새 비밀번호 (6자 이상)'), 'pass123')
-    await user.type(screen.getByPlaceholderText('비밀번호 확인'), 'pass456')
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.type(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder'), 'pass123')
+    await user.type(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder'), 'pass456')
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
 
-    expect(screen.getByText('비밀번호가 일치하지 않습니다.')).toBeInTheDocument()
+    expect(screen.getByText('resetPassword.passwordMismatch')).toBeInTheDocument()
     expect(mockUpdatePassword).not.toHaveBeenCalled()
   })
 })
@@ -104,12 +104,12 @@ describe('Submission', () => {
     const user = userEvent.setup()
     renderPage()
 
-    await user.type(screen.getByPlaceholderText('새 비밀번호 (6자 이상)'), 'newpass123')
-    await user.type(screen.getByPlaceholderText('비밀번호 확인'), 'newpass123')
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.type(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder'), 'newpass123')
+    await user.type(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder'), 'newpass123')
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
 
     expect(mockUpdatePassword).toHaveBeenCalledWith('newpass123')
-    expect(toast.success).toHaveBeenCalledWith('비밀번호가 변경되었습니다.')
+    expect(toast.success).toHaveBeenCalledWith('resetPassword.success')
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
   })
 
@@ -118,9 +118,9 @@ describe('Submission', () => {
     const user = userEvent.setup()
     renderPage()
 
-    await user.type(screen.getByPlaceholderText('새 비밀번호 (6자 이상)'), 'newpass123')
-    await user.type(screen.getByPlaceholderText('비밀번호 확인'), 'newpass123')
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.type(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder'), 'newpass123')
+    await user.type(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder'), 'newpass123')
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
 
     expect(screen.getByText('Too weak')).toBeInTheDocument()
     expect(mockNavigate).not.toHaveBeenCalled()
@@ -134,11 +134,11 @@ describe('Submission', () => {
     const user = userEvent.setup()
     renderPage()
 
-    await user.type(screen.getByPlaceholderText('새 비밀번호 (6자 이상)'), 'newpass123')
-    await user.type(screen.getByPlaceholderText('비밀번호 확인'), 'newpass123')
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.type(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder'), 'newpass123')
+    await user.type(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder'), 'newpass123')
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
 
-    expect(screen.getByText('변경 중...')).toBeInTheDocument()
+    expect(screen.getByText('resetPassword.changing')).toBeInTheDocument()
   })
 })
 
@@ -153,13 +153,13 @@ describe('Edge cases', () => {
     renderPage()
 
     // First attempt — error
-    await user.type(screen.getByPlaceholderText('새 비밀번호 (6자 이상)'), 'newpass123')
-    await user.type(screen.getByPlaceholderText('비밀번호 확인'), 'newpass123')
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.type(screen.getByPlaceholderText('resetPassword.newPasswordPlaceholder'), 'newpass123')
+    await user.type(screen.getByPlaceholderText('resetPassword.confirmPasswordPlaceholder'), 'newpass123')
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
     expect(screen.getByText('Too weak')).toBeInTheDocument()
 
     // Second attempt — success
-    await user.click(screen.getByRole('button', { name: '비밀번호 변경' }))
+    await user.click(screen.getByRole('button', { name: 'resetPassword.changeButton' }))
     expect(screen.queryByText('Too weak')).not.toBeInTheDocument()
   })
 })

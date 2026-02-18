@@ -126,10 +126,10 @@ describe('MARKETPLACE_CATEGORIES', () => {
     expect(MARKETPLACE_CATEGORIES.length).toBeGreaterThanOrEqual(5)
   })
 
-  it('should have value and label for each category', () => {
+  it('should have value and labelKey for each category', () => {
     for (const cat of MARKETPLACE_CATEGORIES) {
       expect(cat.value).toBeTruthy()
-      expect(cat.label).toBeTruthy()
+      expect(cat.labelKey).toBeTruthy()
     }
   })
 })

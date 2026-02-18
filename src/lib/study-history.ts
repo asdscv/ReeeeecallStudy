@@ -1,8 +1,8 @@
 import type { StudySession, StudyLog } from '../types/database'
 
-/** Format milliseconds to human-readable Korean duration string */
+/** Format milliseconds to human-readable duration string */
 export function formatDuration(ms: number): string {
-  if (ms <= 0) return '0초'
+  if (ms <= 0) return 'common:duration.zeroSeconds'
 
   const totalSeconds = Math.floor(ms / 1000)
   const hours = Math.floor(totalSeconds / 3600)
@@ -10,11 +10,11 @@ export function formatDuration(ms: number): string {
   const seconds = totalSeconds % 60
 
   const parts: string[] = []
-  if (hours > 0) parts.push(`${hours}시간`)
-  if (minutes > 0) parts.push(`${minutes}분`)
-  if (seconds > 0 && hours === 0) parts.push(`${seconds}초`)
+  if (hours > 0) parts.push(`common:duration.hours:${hours}`)
+  if (minutes > 0) parts.push(`common:duration.minutes:${minutes}`)
+  if (seconds > 0 && hours === 0) parts.push(`common:duration.seconds:${seconds}`)
 
-  return parts.join(' ') || '0초'
+  return parts.join(' ') || 'common:duration.zeroSeconds'
 }
 
 /** Calculate performance score (0~100) from ratings */
@@ -70,11 +70,11 @@ export function groupSessionsByDate(
 /** Get human-readable label for study mode */
 export function getStudyModeLabel(mode: string): string {
   const labels: Record<string, string> = {
-    srs: 'SRS',
-    sequential_review: '순차 복습',
-    random: '랜덤',
-    sequential: '순차',
-    by_date: '날짜별',
+    srs: 'study:mode.srs',
+    sequential_review: 'study:mode.sequentialReview',
+    random: 'study:mode.random',
+    sequential: 'study:mode.sequential',
+    by_date: 'study:mode.byDate',
   }
   return labels[mode] ?? mode
 }

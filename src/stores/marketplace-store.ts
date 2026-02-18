@@ -130,14 +130,14 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       .single()
 
     if (listingError || !listing) {
-      set({ error: '리스팅을 찾을 수 없습니다.' })
+      set({ error: 'errors:marketplace.listingNotFound' })
       return null
     }
 
     const typedListing = listing as MarketplaceListing
 
     if (typedListing.owner_id === user.id) {
-      set({ error: '자신의 덱은 가져올 수 없습니다.' })
+      set({ error: 'errors:marketplace.cannotImportOwn' })
       return null
     }
 

@@ -1,0 +1,56 @@
+{
+  "auth": {
+    "invalidCredentials": "이메일 또는 비밀번호가 올바르지 않습니다.",
+    "emailNotConfirmed": "이메일 인증이 완료되지 않았습니다. 메일함을 확인해주세요.",
+    "userAlreadyRegistered": "이미 가입된 이메일입니다.",
+    "passwordTooShort": "비밀번호는 6자 이상이어야 합니다.",
+    "emailRateLimit": "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    "securityDelay": "보안을 위해 잠시 후 다시 시도해주세요.",
+    "newPasswordSameAsOld": "새 비밀번호는 기존 비밀번호와 달라야 합니다.",
+    "invalidEmailFormat": "올바른 이메일 형식이 아닙니다."
+  },
+  "rateLimit": {
+    "tooFast": "요청이 너무 빠릅니다. {{seconds}}초 후에 다시 시도해주세요."
+  },
+  "quota": {
+    "limitReached": "{{resource}} 한도에 도달했습니다 ({{current}}/{{limit}})"
+  },
+  "storage": {
+    "imageTooLarge": "이미지 파일은 5MB 이하만 가능합니다.",
+    "imageFormatUnsupported": "지원하는 이미지 형식: jpg, png, webp",
+    "audioTooLarge": "오디오 파일은 10MB 이하만 가능합니다.",
+    "audioFormatUnsupported": "지원하는 오디오 형식: mp3, ogg, wav",
+    "uploadLimitReached": "업로드 제한에 도달했습니다.",
+    "uploadFailed": "업로드 실패: {{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "키 이름을 입력해주세요",
+    "nameMustBeString": "키 이름은 문자열이어야 합니다",
+    "nameTooLong": "키 이름은 {{maxLength}}자 이내여야 합니다",
+    "nameNoControlChars": "키 이름에 제어 문자를 포함할 수 없습니다"
+  },
+  "card": {
+    "readonlyDeckNoAdd": "읽기 전용 덱에는 카드를 추가할 수 없습니다.",
+    "readonlyDeckNoEdit": "읽기 전용 덱의 카드를 수정할 수 없습니다.",
+    "rateLimitReached": "요청 제한에 도달했습니다."
+  },
+  "deck": {
+    "rateLimitReached": "요청 제한에 도달했습니다."
+  },
+  "template": {
+    "rateLimitReached": "요청 제한에 도달했습니다.",
+    "cannotDeleteDefault": "기본 템플릿은 삭제할 수 없습니다.",
+    "inUseByDecks": "이 템플릿을 사용하는 덱이 {{count}}개 있어 삭제할 수 없습니다."
+  },
+  "marketplace": {
+    "listingNotFound": "리스팅을 찾을 수 없습니다.",
+    "cannotImportOwn": "자신의 덱은 가져올 수 없습니다."
+  },
+  "sharing": {
+    "invalidOrExpired": "유효하지 않거나 만료된 초대 코드입니다.",
+    "cannotAcceptOwn": "자신의 덱은 수락할 수 없습니다."
+  },
+  "fileValidationFailed": "파일 유효성 검사 실패",
+  "uploadFailed": "업로드에 실패했습니다.",
+  "parseError": "파일 파싱에 실패했습니다."
+}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface StatsSummaryCardsProps {
   totalCards: number
   dueToday: number
@@ -6,11 +8,12 @@ interface StatsSummaryCardsProps {
 }
 
 export function StatsSummaryCards({ totalCards, dueToday, streak, masteryRate }: StatsSummaryCardsProps) {
+  const { t } = useTranslation(['dashboard', 'common'])
   const items = [
-    { label: '전체 카드', value: totalCards, color: 'text-gray-900' },
-    { label: '오늘 복습', value: dueToday, color: 'text-amber-600' },
-    { label: '연속 학습', value: `${streak}일`, color: 'text-green-600' },
-    { label: '숙달률', value: `${masteryRate}%`, color: 'text-blue-600' },
+    { label: t('dashboard:stats.totalCards'), value: totalCards, color: 'text-gray-900' },
+    { label: t('dashboard:stats.todayReview'), value: dueToday, color: 'text-amber-600' },
+    { label: t('dashboard:stats.streak'), value: `${streak}${t('common:units.days')}`, color: 'text-green-600' },
+    { label: t('dashboard:stats.masteryRate'), value: `${masteryRate}%`, color: 'text-blue-600' },
   ]
 
   return (

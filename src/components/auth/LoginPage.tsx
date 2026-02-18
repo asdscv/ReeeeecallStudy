@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
 import { localizeAuthError } from '../../lib/auth-errors'
 
 type Mode = 'login' | 'signup' | 'forgot'
 
 export function LoginPage() {
+  const { t } = useTranslation('auth')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mode, setMode] = useState<Mode>('login')
@@ -33,25 +35,25 @@ export function LoginPage() {
       const { error } = await resetPassword(email)
       setLoading(false)
       if (error) {
-        setError(localizeAuthError(error.message))
+        setError(t(localizeAuthError(error.message) as string))
       } else {
-        setSuccessMessage('비밀번호 재설정 링크를 이메일로 보냈습니다.')
+        setSuccessMessage(t('resetLinkSent'))
       }
       return
     }
 
     if (mode === 'signup') {
       if (password.length < 6) {
-        setError('비밀번호는 6자 이상이어야 합니다.')
+        setError(t('resetPassword.passwordTooShort'))
         setLoading(false)
         return
       }
       const { error } = await signUp(email, password)
       setLoading(false)
       if (error) {
-        setError(localizeAuthError(error.message))
+        setError(t(localizeAuthError(error.message) as string))
       } else {
-        setSuccessMessage('인증 메일을 보냈습니다. 메일의 링크를 클릭하면 가입이 완료됩니다.')
+        setSuccessMessage(t('emailVerification.signupSuccess'))
       }
       return
     }
@@ -59,7 +61,7 @@ export function LoginPage() {
     const { error } = await signIn(email, password)
     setLoading(false)
     if (error) {
-      setError(localizeAuthError(error.message))
+      setError(t(localizeAuthError(error.message) as string))
     } else {
       navigate('/', { replace: true })
     }
@@ -71,7 +73,7 @@ export function LoginPage() {
         <div className="max-w-md w-full mx-4 text-center">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
             <div className="text-5xl mb-4">📧</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">이메일을 확인해주세요</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('emailVerification.title')}</h2>
             <p className="text-gray-500 mb-2">
               <span className="font-medium text-gray-700">{email}</span>
             </p>
@@ -80,7 +82,7 @@ export function LoginPage() {
               onClick={() => switchMode('login')}
               className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
             >
-              로그인 페이지로 돌아가기
+              {t('emailVerification.backToLogin')}
             </button>
           </div>
         </div>
@@ -88,9 +90,9 @@ export function LoginPage() {
     )
   }
 
-  const title = { login: '로그인', signup: '회원가입', forgot: '비밀번호 찾기' }[mode]
-  const submitLabel = { login: '로그인', signup: '회원가입', forgot: '재설정 링크 보내기' }[mode]
-  const loadingLabel = { login: '로그인 중...', signup: '가입 중...', forgot: '보내는 중...' }[mode]
+  const title = { login: t('loginTitle'), signup: t('signupTitle'), forgot: t('forgotPasswordTitle') }[mode]
+  const submitLabel = { login: t('loginButton'), signup: t('signupButton'), forgot: t('sendResetLink') }[mode]
+  const loadingLabel = { login: t('loggingIn'), signup: t('signingUp'), forgot: t('sending') }[mode]
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -117,7 +119,7 @@ export function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호 (6자 이상)"
+                placeholder={t('passwordPlaceholder')}
                 required
                 minLength={6}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
@@ -135,7 +137,7 @@ export function LoginPage() {
                   onClick={() => switchMode('forgot')}
                   className="text-sm text-gray-400 hover:text-blue-600 cursor-pointer"
                 >
-                  비밀번호를 잊으셨나요?
+                  {t('forgotPasswordLink')}
                 </button>
               </div>
             )}
@@ -155,16 +157,16 @@ export function LoginPage() {
                 onClick={() => switchMode('login')}
                 className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
               >
-                로그인으로 돌아가기
+                {t('backToLogin')}
               </button>
             ) : (
               <p>
-                {mode === 'signup' ? '이미 계정이 있으신가요?' : '계정이 없으신가요?'}{' '}
+                {mode === 'signup' ? t('alreadyHaveAccount') : t('noAccount')}{' '}
                 <button
                   onClick={() => switchMode(mode === 'signup' ? 'login' : 'signup')}
                   className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                 >
-                  {mode === 'signup' ? '로그인' : '회원가입'}
+                  {mode === 'signup' ? t('login') : t('signup')}
                 </button>
               </p>
             )}

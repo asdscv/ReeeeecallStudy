@@ -10,16 +10,17 @@ describe('GUIDE_SECTIONS', () => {
     expect(GUIDE_SECTIONS.length).toBeGreaterThanOrEqual(5)
   })
 
-  it('every section should have id, title, icon, and non-empty items', () => {
+  it('every section should have id, title (i18n key), icon, and non-empty items', () => {
     for (const section of GUIDE_SECTIONS) {
       expect(section.id).toBeTruthy()
       expect(section.title).toBeTruthy()
+      expect(section.title).toContain('sections.')
       expect(section.icon).toBeTruthy()
       expect(section.items.length).toBeGreaterThan(0)
     }
   })
 
-  it('every item should have title and body', () => {
+  it('every item should have title and body (i18n keys)', () => {
     for (const section of GUIDE_SECTIONS) {
       for (const item of section.items) {
         expect(item.title).toBeTruthy()
@@ -28,14 +29,12 @@ describe('GUIDE_SECTIONS', () => {
     }
   })
 
-  it('login guide should describe email/password authentication', () => {
+  it('login guide item should exist with i18n key', () => {
     const gettingStarted = GUIDE_SECTIONS.find((s) => s.id === 'getting-started')
     expect(gettingStarted).toBeDefined()
-    const loginItem = gettingStarted!.items.find((i) => i.title === '로그인')
+    const loginItem = gettingStarted!.items.find((i) => i.title.includes('login'))
     expect(loginItem).toBeDefined()
-    expect(loginItem!.body).toContain('비밀번호')
-    expect(loginItem!.body).not.toContain('매직 링크')
-    expect(loginItem!.body).not.toContain('비밀번호 없이')
+    expect(loginItem!.body).toContain('login')
   })
 
   it('all section ids should be unique', () => {
@@ -57,49 +56,44 @@ describe('getSection', () => {
 })
 
 describe('searchGuide', () => {
+  // Mock t function: returns the key as-is (identity)
+  const mockT = (key: string) => key
+
   it('should return all sections when query is empty', () => {
-    const result = searchGuide('')
+    const result = searchGuide('', mockT)
     expect(result.length).toBe(GUIDE_SECTIONS.length)
   })
 
   it('should return all sections for whitespace query', () => {
-    const result = searchGuide('   ')
+    const result = searchGuide('   ', mockT)
     expect(result.length).toBe(GUIDE_SECTIONS.length)
   })
 
-  it('should filter sections by section title', () => {
-    // Every section has a title — search for a word from the first section title
-    const firstTitle = GUIDE_SECTIONS[0].title
-    const word = firstTitle.split(' ')[0]
-    if (!word) return // skip if title is somehow empty
+  it('should filter sections by section title key', () => {
+    // Search for a substring of the first section title key
+    const word = 'getting-started'
 
-    const result = searchGuide(word)
+    const result = searchGuide(word, mockT)
     expect(result.length).toBeGreaterThan(0)
-    // At least one returned section should match
     const titles = result.map((s) => s.title)
     expect(titles.some((t) => t.includes(word))).toBe(true)
   })
 
-  it('should filter sections by item title or body', () => {
-    // Pick a word from the first item of the first section body
-    const body = GUIDE_SECTIONS[0].items[0].body
-    const words = body.split(/\s+/).filter((w) => w.length > 2)
-    if (words.length === 0) return
-
-    const keyword = words[0]
-    const result = searchGuide(keyword)
+  it('should filter sections by item title or body key', () => {
+    // Search for a substring of a known item key
+    const keyword = 'login'
+    const result = searchGuide(keyword, mockT)
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should be case-insensitive', () => {
-    const result1 = searchGuide('SRS')
-    const result2 = searchGuide('srs')
+    const result1 = searchGuide('SRS', mockT)
+    const result2 = searchGuide('srs', mockT)
     expect(result1.length).toBe(result2.length)
   })
 
   it('should return sections with only matching items', () => {
-    // Use a very specific search term unlikely to appear everywhere
-    const result = searchGuide('SRS')
+    const result = searchGuide('srs', mockT)
     for (const section of result) {
       const sectionTitleMatch = section.title.toLowerCase().includes('srs')
       const itemMatch = section.items.some(

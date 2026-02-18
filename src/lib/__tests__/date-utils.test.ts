@@ -223,31 +223,31 @@ describe('formatRelativeTime', () => {
     vi.useRealTimers()
   })
 
-  it('should return "방금 전" for less than 1 minute ago', () => {
+  it('should return "now" for less than 1 minute ago', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-02-15T12:00:30Z'))
-    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('방금 전')
+    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('now')
     vi.useRealTimers()
   })
 
-  it('should return "N분 전" for minutes ago', () => {
+  it('should return "N minutes ago" for minutes ago', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-02-15T12:05:00Z'))
-    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('5분 전')
+    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('5 minutes ago')
     vi.useRealTimers()
   })
 
-  it('should return "N시간 전" for hours ago', () => {
+  it('should return "N hours ago" for hours ago', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-02-15T15:00:00Z'))
-    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('3시간 전')
+    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('3 hours ago')
     vi.useRealTimers()
   })
 
-  it('should return "N일 전" for days ago', () => {
+  it('should return "N days ago" for days ago', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-02-18T12:00:00Z'))
-    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('3일 전')
+    expect(formatRelativeTime('2026-02-15T12:00:00Z')).toBe('3 days ago')
     vi.useRealTimers()
   })
 
@@ -255,8 +255,8 @@ describe('formatRelativeTime', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-04-15T12:00:00Z'))
     const result = formatRelativeTime('2026-02-15T12:00:00Z')
-    // Should be a localized date string, not "N일 전"
-    expect(result).not.toContain('일 전')
+    // Should be a localized date string, not "N days ago"
+    expect(result).not.toContain('days ago')
     expect(result).toBeTruthy()
     vi.useRealTimers()
   })

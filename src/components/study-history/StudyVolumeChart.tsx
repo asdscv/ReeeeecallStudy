@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { formatDateKeyShort } from '../../lib/date-utils'
 import type { DailySessionCount } from '../../lib/study-history-stats'
@@ -7,6 +8,8 @@ interface StudyVolumeChartProps {
 }
 
 export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
+  const { t } = useTranslation('history')
+
   const tickInterval = Math.max(1, Math.floor(data.length / 6))
 
   const chartData = data
@@ -21,11 +24,11 @@ export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
       <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <h3 className="text-sm font-medium text-gray-700">학습량 추이</h3>
-        <span className="text-xs text-gray-400">{totalSessions}세션 / {totalCards}장</span>
+        <h3 className="text-sm font-medium text-gray-700">{t('charts.studyVolume')}</h3>
+        <span className="text-xs text-gray-400">{t('charts.volumeSummary', { sessions: totalSessions, cards: totalCards })}</span>
       </div>
       {totalSessions === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">해당 기간에 학습 기록이 없습니다</p>
+        <p className="text-sm text-gray-400 py-8 text-center">{t('charts.noDataForPeriod')}</p>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData}>
@@ -39,8 +42,8 @@ export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={25} />
             <Tooltip
               formatter={(value, name) => [
-                `${value}${name === 'sessions' ? '회' : '장'}`,
-                name === 'sessions' ? '세션' : '카드',
+                name === 'sessions' ? t('units.sessions', { count: Number(value) }) : t('units.cards', { count: Number(value) }),
+                name === 'sessions' ? t('units.sessions') : t('units.cards'),
               ]}
               labelFormatter={(_label, payload) => {
                 const item = payload?.[0] as { payload?: { date?: string } } | undefined
@@ -48,7 +51,7 @@ export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
               }}
             />
             <Legend
-              formatter={(value: string) => (value === 'sessions' ? '세션' : '카드')}
+              formatter={(value: string) => (value === 'sessions' ? t('units.sessions') : t('units.cards'))}
               wrapperStyle={{ fontSize: 12 }}
             />
             <Bar dataKey="sessions" fill="#3b82f6" radius={[4, 4, 0, 0]} />

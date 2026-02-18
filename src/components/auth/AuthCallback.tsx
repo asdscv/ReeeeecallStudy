@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 
 // Module-level hash capture — executes synchronously on module load,
@@ -12,13 +13,8 @@ export function _setCapturedHash(hash: string) {
   _capturedHash = hash
 }
 
-// Error code → message map
-const errorMessages: Record<string, string> = {
-  otp_expired: '링크가 만료되었습니다. 다시 시도해주세요.',
-  access_denied: '접근이 거부되었습니다. 다시 시도해주세요.',
-}
-
 export function AuthCallback() {
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const navigatedRef = useRef(false)
@@ -33,7 +29,8 @@ export function AuthCallback() {
       const errorDesc = params.get('error_description')
 
       if (errorCode) {
-        setError(errorMessages[errorCode] || errorDesc?.replace(/\+/g, ' ') || '인증에 실패했습니다.')
+        const errorKey = `callback.errors.${errorCode}`
+        setError(t(errorKey, { defaultValue: errorDesc?.replace(/\+/g, ' ') || t('callback.errors.default') }))
         return
       }
     }
@@ -68,7 +65,7 @@ export function AuthCallback() {
 
     const timeout = setTimeout(() => {
       if (!navigatedRef.current) {
-        setError('처리 시간이 초과되었습니다. 다시 시도해주세요.')
+        setError(t('callback.errors.timeout'))
       }
     }, 10000)
 
@@ -88,7 +85,7 @@ export function AuthCallback() {
             onClick={() => navigate('/auth/login', { replace: true })}
             className="mt-4 px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
-            로그인 페이지로 돌아가기
+            {t('callback.backToLogin')}
           </button>
         </div>
       </div>
@@ -99,7 +96,7 @@ export function AuthCallback() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="text-4xl mb-4 animate-spin">⏳</div>
-        <p className="text-gray-500">처리 중...</p>
+        <p className="text-gray-500">{t('callback.processing')}</p>
       </div>
     </div>
   )

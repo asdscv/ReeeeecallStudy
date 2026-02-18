@@ -1,0 +1,88 @@
+{
+  "title": "학습 기록",
+  "tabs": {
+    "deckProgress": "덱별 진도",
+    "sessionList": "세션 목록"
+  },
+  "filters": {
+    "allDecks": "전체 덱",
+    "allModes": "전체 모드"
+  },
+  "empty": "아직 학습 기록이 없습니다. 학습을 시작해보세요!",
+  "noMatch": "필터 조건에 맞는 기록이 없습니다.",
+  "deletedDeck": "삭제된 덱",
+  "deckProgress": {
+    "total": "{{count}}장",
+    "notStudied": "미학습 {{count}}",
+    "learning": "학습중 {{count}}",
+    "review": "복습 {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}}일",
+    "reviewCount": "{{count}}회 복습",
+    "cardCount": "{{count}}장",
+    "logCount": "{{count}}건",
+    "intervalChange": "{{prev}}일 → {{next}}일",
+    "paginationInfo": "{{start}}-{{end}} / 총 {{total}}건"
+  },
+  "sessionCard": {
+    "cardsStudied": "{{count}}장 학습"
+  },
+  "sessionDetail": {
+    "backToHistory": "학습 기록으로",
+    "cardsStudied": "{{count}}장 학습",
+    "performance": "성과 {{value}}%",
+    "loadingDetails": "상세 기록을 불러오는 중...",
+    "noDetails": "상세 기록이 없습니다.",
+    "retention": "유지율",
+    "avgIntervalGrowth": "평균 간격 성장",
+    "avgEase": "평균 Ease",
+    "totalReviews": "총 리뷰",
+    "easeDistribution": "Ease 분포",
+    "totalCards": "총 카드",
+    "avgTime": "평균 소요시간",
+    "performanceScore": "성과 점수",
+    "cardDetails": "카드별 상세",
+    "card": "카드",
+    "rating": "평가",
+    "intervalChange": "간격 변화",
+    "easeChange": "Ease 변화",
+    "timeSpent": "소요시간",
+    "deletedCard": "(삭제된 카드)",
+    "noContent": "(내용 없음)"
+  },
+  "overview": {
+    "sessions": "세션 수",
+    "sessionsValue": "{{count}}회",
+    "studyCards": "학습 카드",
+    "cardsValue": "{{count}}장",
+    "totalTime": "총 학습 시간",
+    "avgPerformance": "평균 성과",
+    "streak": "연속 학습",
+    "streakValue": "{{count}}일"
+  },
+  "chart": {
+    "countPercent": "{{count}}건 ({{percent}}%)"
+  },
+  "charts": {
+    "studyVolume": "학습량 추이",
+    "volumeSummary": "{{sessions}}세션 / {{cards}}장",
+    "noDataForPeriod": "해당 기간에 학습 기록이 없습니다",
+    "sessionDuration": "세션 평균 소요시간",
+    "sessionCount": "{{count}}세션",
+    "avgDuration": "평균 소요시간",
+    "ratingDistribution": "평가 분포",
+    "ratingTotal": "총 {{count}}건",
+    "noRatingData": "평가 데이터가 없습니다",
+    "modeBreakdown": "모드별 분석",
+    "noModeData": "모드별 데이터가 없습니다",
+    "sessionCountLabel": "{{count}}세션",
+    "cardCountLabel": "{{count}}장",
+    "performance": "성과"
+  },
+  "units": {
+    "sessions": "세션",
+    "cards": "장",
+    "min": "분"
+  }
+}

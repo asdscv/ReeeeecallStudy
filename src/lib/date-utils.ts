@@ -96,19 +96,19 @@ export function isPast(timestamp: string): boolean {
 
 /**
  * Format a Supabase UTC timestamp as a localized date string.
- * e.g., "2026. 2. 15." (ko-KR)
+ * e.g., "2/15/2026" (en-US) or "2026. 2. 15." (ko-KR)
  */
-export function formatLocalDate(timestamp: string, locale = 'ko-KR'): string {
+export function formatLocalDate(timestamp: string, locale = 'en-US'): string {
   return parseUTC(timestamp).toLocaleDateString(locale)
 }
 
 /**
  * Format a Supabase UTC timestamp as a localized time string.
- * e.g., "오후 3:30" (ko-KR)
+ * e.g., "3:30 PM" (en-US) or "오후 3:30" (ko-KR)
  */
 export function formatLocalTime(
   timestamp: string,
-  locale = 'ko-KR',
+  locale = 'en-US',
   options?: Intl.DateTimeFormatOptions,
 ): string {
   return parseUTC(timestamp).toLocaleTimeString(locale, options)
@@ -117,28 +117,30 @@ export function formatLocalTime(
 /**
  * Format a Supabase UTC timestamp as a localized date+time string.
  */
-export function formatLocalDateTime(timestamp: string, locale = 'ko-KR'): string {
+export function formatLocalDateTime(timestamp: string, locale = 'en-US'): string {
   return parseUTC(timestamp).toLocaleString(locale)
 }
 
 /**
- * Format a Supabase UTC timestamp as a relative time string.
- * "방금 전", "5분 전", "3시간 전", "7일 전", or localized date for 30+ days.
+ * Format a Supabase UTC timestamp as a relative time string using Intl.RelativeTimeFormat.
+ * e.g., "3 hours ago" (en-US) or "3시간 전" (ko-KR), or localized date for 30+ days.
  */
-export function formatRelativeTime(timestamp: string, locale = 'ko-KR'): string {
+export function formatRelativeTime(timestamp: string, locale = 'en-US'): string {
   const d = parseUTC(timestamp)
   const now = Date.now()
   const diffMs = now - d.getTime()
   const diffMin = Math.floor(diffMs / 60_000)
 
-  if (diffMin < 1) return '방금 전'
-  if (diffMin < 60) return `${diffMin}분 전`
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+
+  if (diffMin < 1) return rtf.format(0, 'second')
+  if (diffMin < 60) return rtf.format(-diffMin, 'minute')
 
   const diffHour = Math.floor(diffMin / 60)
-  if (diffHour < 24) return `${diffHour}시간 전`
+  if (diffHour < 24) return rtf.format(-diffHour, 'hour')
 
   const diffDay = Math.floor(diffHour / 24)
-  if (diffDay < 30) return `${diffDay}일 전`
+  if (diffDay < 30) return rtf.format(-diffDay, 'day')
 
   return d.toLocaleDateString(locale)
 }

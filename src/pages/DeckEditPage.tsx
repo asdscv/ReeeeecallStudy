@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, Layers } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
@@ -30,6 +31,7 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function DeckEditPage() {
+  const { t } = useTranslation('decks')
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
   const { updateDeck, templates, fetchTemplates } = useDeckStore()
@@ -102,7 +104,7 @@ export function DeckEditPage() {
 
   const handleSave = async () => {
     if (!deckId || !formValues.name.trim()) {
-      toast.error('덱 이름을 입력해주세요.')
+      toast.error(t('edit.nameRequired'))
       return
     }
 
@@ -116,7 +118,7 @@ export function DeckEditPage() {
       srs_settings: formValues.srsSettings,
     })
     setSaving(false)
-    toast.success('덱이 저장되었습니다.')
+    toast.success(t('edit.saved'))
   }
 
   if (loading) {
@@ -154,7 +156,7 @@ export function DeckEditPage() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">덱 편집</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('edit.title')}</h1>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 pl-10 sm:pl-0">
           <button
@@ -162,8 +164,8 @@ export function DeckEditPage() {
             className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 cursor-pointer transition"
           >
             <Layers size={16} />
-            <span className="hidden sm:inline">카드 관리</span>
-            <span className="sm:hidden">카드</span>
+            <span className="hidden sm:inline">{t('edit.cardManagement')}</span>
+            <span className="sm:hidden">{t('edit.cards')}</span>
           </button>
           <button
             onClick={handleSave}
@@ -171,7 +173,7 @@ export function DeckEditPage() {
             className="flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition"
           >
             <Save size={16} />
-            {saving ? '저장 중...' : '저장'}
+            {saving ? `${t('edit.save')}...` : t('edit.save')}
           </button>
         </div>
       </div>
@@ -179,7 +181,7 @@ export function DeckEditPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left: Deck Settings */}
         <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">덱 설정</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('edit.deckSettings')}</h2>
           <DeckSettingsForm
             values={formValues}
             onChange={setFormValues}
@@ -191,23 +193,23 @@ export function DeckEditPage() {
         <div className="space-y-4 sm:space-y-6">
           {/* Period tabs */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold text-gray-900">덱 통계</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('edit.deckStats')}</h2>
             <TimePeriodTabs value={period} onChange={setPeriod} />
           </div>
 
           {/* Summary cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-            <StatCard label="전체 카드" value={deckStats.totalCards} />
-            <StatCard label="숙달률" value={`${deckStats.masteryRate}%`} />
-            <StatCard label="연속 학습" value={`${streak}일`} />
-            <StatCard label="평균 간격" value={`${deckStats.avgInterval}일`} />
+            <StatCard label={t('edit.totalCards')} value={deckStats.totalCards} />
+            <StatCard label={t('edit.masteryRate')} value={`${deckStats.masteryRate}%`} />
+            <StatCard label={t('edit.streak')} value={t('edit.streakValue', { count: streak })} />
+            <StatCard label={t('edit.avgInterval')} value={t('edit.intervalValue', { count: deckStats.avgInterval })} />
           </div>
 
           {/* Pie chart */}
           <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">상태 분포</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">{t('edit.statusDistribution')}</h3>
             {deckStats.totalCards === 0 ? (
-              <p className="text-sm text-gray-400 py-8 text-center">카드가 없습니다</p>
+              <p className="text-sm text-gray-400 py-8 text-center">{t('edit.noCards')}</p>
             ) : (
               <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                 <ResponsiveContainer width={140} height={140}>
@@ -225,7 +227,7 @@ export function DeckEditPage() {
                         <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [`${value}장`]} />
+                    <Tooltip formatter={(value) => [t('edit.cardsValue', { count: Number(value) })]} />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-2">
@@ -236,7 +238,7 @@ export function DeckEditPage() {
                         style={{ backgroundColor: d.color }}
                       />
                       <span className="text-gray-700">{d.name}</span>
-                      <span className="text-gray-400">{d.value}장</span>
+                      <span className="text-gray-400">{t('edit.cardsValue', { count: d.value })}</span>
                     </div>
                   ))}
                 </div>

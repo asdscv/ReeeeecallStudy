@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 
 export function DocsNav() {
+  const { t } = useTranslation('api-docs')
   const navigate = useNavigate()
 
   return (
@@ -18,7 +20,7 @@ export function DocsNav() {
           onClick={() => navigate('/auth/login')}
           className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition cursor-pointer"
         >
-          시작하기 <ArrowRight className="w-4 h-4" />
+          {t('getStarted')} <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </header>

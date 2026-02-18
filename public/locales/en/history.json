@@ -1,0 +1,88 @@
+{
+  "title": "Study History",
+  "tabs": {
+    "deckProgress": "Deck Progress",
+    "sessionList": "Session List"
+  },
+  "filters": {
+    "allDecks": "All Decks",
+    "allModes": "All Modes"
+  },
+  "empty": "No study history yet. Start learning!",
+  "noMatch": "No records matching filter.",
+  "deletedDeck": "Deleted Deck",
+  "deckProgress": {
+    "total": "{{count}} cards",
+    "notStudied": "Not Studied {{count}}",
+    "learning": "Learning {{count}}",
+    "review": "Review {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}}d",
+    "reviewCount": "{{count}} reviews",
+    "cardCount": "{{count}} cards",
+    "logCount": "{{count}} logs",
+    "intervalChange": "{{prev}}d → {{next}}d",
+    "paginationInfo": "{{start}}-{{end}} of {{total}}"
+  },
+  "sessionCard": {
+    "cardsStudied": "{{count}} cards studied"
+  },
+  "sessionDetail": {
+    "backToHistory": "Study History",
+    "cardsStudied": "{{count}} cards studied",
+    "performance": "Performance {{value}}%",
+    "loadingDetails": "Loading details...",
+    "noDetails": "No details.",
+    "retention": "Retention Rate",
+    "avgIntervalGrowth": "Avg Interval Growth",
+    "avgEase": "Average Ease",
+    "totalReviews": "Total Reviews",
+    "easeDistribution": "Ease Distribution",
+    "totalCards": "Total Cards",
+    "avgTime": "Avg Time",
+    "performanceScore": "Performance Score",
+    "cardDetails": "Card Details",
+    "card": "Card",
+    "rating": "Rating",
+    "intervalChange": "Interval Change",
+    "easeChange": "Ease Change",
+    "timeSpent": "Time",
+    "deletedCard": "(Deleted card)",
+    "noContent": "(No content)"
+  },
+  "overview": {
+    "sessions": "Sessions",
+    "sessionsValue": "{{count}} sessions",
+    "studyCards": "Study Cards",
+    "cardsValue": "{{count}} cards",
+    "totalTime": "Total Study Time",
+    "avgPerformance": "Avg Performance",
+    "streak": "Study Streak",
+    "streakValue": "{{count}} days"
+  },
+  "chart": {
+    "countPercent": "{{count}} ({{percent}}%)"
+  },
+  "charts": {
+    "studyVolume": "Study Volume",
+    "volumeSummary": "{{sessions}} sessions / {{cards}} cards",
+    "noDataForPeriod": "No study records for this period",
+    "sessionDuration": "Avg Session Duration",
+    "sessionCount": "{{count}} sessions",
+    "avgDuration": "Avg Duration",
+    "ratingDistribution": "Rating Distribution",
+    "ratingTotal": "Total {{count}}",
+    "noRatingData": "No rating data",
+    "modeBreakdown": "Mode Breakdown",
+    "noModeData": "No mode data",
+    "sessionCountLabel": "{{count}} sessions",
+    "cardCountLabel": "{{count}} cards",
+    "performance": "Performance"
+  },
+  "units": {
+    "sessions": "sessions",
+    "cards": "cards",
+    "min": "min"
+  }
+}

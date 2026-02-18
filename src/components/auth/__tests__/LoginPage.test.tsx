@@ -39,14 +39,14 @@ beforeEach(() => {
 describe('Login mode', () => {
   it('should render login form by default', () => {
     renderLogin()
-    expect(screen.getByRole('button', { name: '로그인' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'loginButton' })).toBeInTheDocument()
     expect(screen.getByPlaceholderText('your@email.com')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('비밀번호 (6자 이상)')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('passwordPlaceholder')).toBeInTheDocument()
   })
 
   it('should disable submit when fields are empty', () => {
     renderLogin()
-    const btn = screen.getByRole('button', { name: '로그인' })
+    const btn = screen.getByRole('button', { name: 'loginButton' })
     expect(btn).toBeDisabled()
   })
 
@@ -56,8 +56,8 @@ describe('Login mode', () => {
     renderLogin()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('비밀번호 (6자 이상)'), 'pass123')
-    await user.click(screen.getByRole('button', { name: '로그인' }))
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'loginButton' }))
 
     expect(mockSignIn).toHaveBeenCalledWith('a@b.com', 'pass123')
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
@@ -69,8 +69,8 @@ describe('Login mode', () => {
     renderLogin()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('비밀번호 (6자 이상)'), 'wrong')
-    await user.click(screen.getByRole('button', { name: '로그인' }))
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'wrong')
+    await user.click(screen.getByRole('button', { name: 'loginButton' }))
 
     expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
     expect(mockNavigate).not.toHaveBeenCalled()
@@ -78,18 +78,18 @@ describe('Login mode', () => {
 
   it('should show "비밀번호를 잊으셨나요?" link', () => {
     renderLogin()
-    expect(screen.getByText('비밀번호를 잊으셨나요?')).toBeInTheDocument()
+    expect(screen.getByText('forgotPasswordLink')).toBeInTheDocument()
   })
 
   it('should switch to signup mode', async () => {
     const user = userEvent.setup()
     renderLogin()
 
-    await user.click(screen.getByText('회원가입'))
+    await user.click(screen.getByText('signup'))
 
     // In signup mode, text changes to "이미 계정이 있으신가요?"
-    expect(screen.getByText('이미 계정이 있으신가요?')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '회원가입' })).toBeInTheDocument()
+    expect(screen.getByText('alreadyHaveAccount')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'signupButton' })).toBeInTheDocument()
   })
 })
 
@@ -98,14 +98,14 @@ describe('Signup mode', () => {
   const goToSignup = async () => {
     const user = userEvent.setup()
     renderLogin()
-    await user.click(screen.getByText('회원가입'))
+    await user.click(screen.getByText('signup'))
     return user
   }
 
   it('should show signup form after switching', async () => {
     await goToSignup()
     // Submit button should say 회원가입
-    const buttons = screen.getAllByText('회원가입')
+    const buttons = screen.getAllByText('signupButton')
     expect(buttons.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -114,13 +114,13 @@ describe('Signup mode', () => {
     const user = await goToSignup()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('비밀번호 (6자 이상)'), '123')
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), '123')
 
     // Submit button — find the one that's a submit type
-    const submitBtn = screen.getByRole('button', { name: '회원가입' })
+    const submitBtn = screen.getByRole('button', { name: 'signupButton' })
     await user.click(submitBtn)
 
-    expect(screen.getByText('비밀번호는 6자 이상이어야 합니다.')).toBeInTheDocument()
+    expect(screen.getByText('resetPassword.passwordTooShort')).toBeInTheDocument()
     expect(mockSignUp).not.toHaveBeenCalled()
   })
 
@@ -129,11 +129,11 @@ describe('Signup mode', () => {
     const user = await goToSignup()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('비밀번호 (6자 이상)'), 'pass123')
-    await user.click(screen.getByRole('button', { name: '회원가입' }))
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
     expect(mockSignUp).toHaveBeenCalledWith('a@b.com', 'pass123')
-    expect(screen.getByText('이메일을 확인해주세요')).toBeInTheDocument()
+    expect(screen.getByText('emailVerification.title')).toBeInTheDocument()
   })
 
   it('should show error on signUp failure', async () => {
@@ -141,17 +141,17 @@ describe('Signup mode', () => {
     const user = await goToSignup()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('비밀번호 (6자 이상)'), 'pass123')
-    await user.click(screen.getByRole('button', { name: '회원가입' }))
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
     expect(screen.getByText('Email taken')).toBeInTheDocument()
   })
 
   it('should switch back to login with "로그인" link', async () => {
     const user = await goToSignup()
-    await user.click(screen.getByText('로그인'))
+    await user.click(screen.getByText('login'))
     // Should now show login form
-    expect(screen.getByText('비밀번호를 잊으셨나요?')).toBeInTheDocument()
+    expect(screen.getByText('forgotPasswordLink')).toBeInTheDocument()
   })
 })
 
@@ -160,7 +160,7 @@ describe('Forgot password mode', () => {
   const goToForgot = async () => {
     const user = userEvent.setup()
     renderLogin()
-    await user.click(screen.getByText('비밀번호를 잊으셨나요?'))
+    await user.click(screen.getByText('forgotPasswordLink'))
     return user
   }
 
@@ -168,8 +168,8 @@ describe('Forgot password mode', () => {
     await goToForgot()
 
     expect(screen.getByPlaceholderText('your@email.com')).toBeInTheDocument()
-    expect(screen.queryByPlaceholderText('비밀번호 (6자 이상)')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '재설정 링크 보내기' })).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('passwordPlaceholder')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'sendResetLink' })).toBeInTheDocument()
   })
 
   it('should call resetPassword and show success message', async () => {
@@ -177,10 +177,10 @@ describe('Forgot password mode', () => {
     const user = await goToForgot()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.click(screen.getByRole('button', { name: '재설정 링크 보내기' }))
+    await user.click(screen.getByRole('button', { name: 'sendResetLink' }))
 
     expect(mockResetPassword).toHaveBeenCalledWith('a@b.com')
-    expect(screen.getByText('이메일을 확인해주세요')).toBeInTheDocument()
+    expect(screen.getByText('emailVerification.title')).toBeInTheDocument()
   })
 
   it('should show error on resetPassword failure', async () => {
@@ -188,15 +188,15 @@ describe('Forgot password mode', () => {
     const user = await goToForgot()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.click(screen.getByRole('button', { name: '재설정 링크 보내기' }))
+    await user.click(screen.getByRole('button', { name: 'sendResetLink' }))
 
     expect(screen.getByText('Rate limit')).toBeInTheDocument()
   })
 
   it('should switch back to login with "로그인으로 돌아가기"', async () => {
     const user = await goToForgot()
-    await user.click(screen.getByText('로그인으로 돌아가기'))
-    expect(screen.getByText('비밀번호를 잊으셨나요?')).toBeInTheDocument()
+    await user.click(screen.getByText('backToLogin'))
+    expect(screen.getByText('forgotPasswordLink')).toBeInTheDocument()
   })
 })
 
@@ -208,17 +208,17 @@ describe('Success message view', () => {
     renderLogin()
 
     // Go to signup and submit
-    await user.click(screen.getByText('회원가입'))
+    await user.click(screen.getByText('signup'))
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('비밀번호 (6자 이상)'), 'pass123')
-    await user.click(screen.getByRole('button', { name: '회원가입' }))
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
     // Now in success view
-    expect(screen.getByText('이메일을 확인해주세요')).toBeInTheDocument()
+    expect(screen.getByText('emailVerification.title')).toBeInTheDocument()
     expect(screen.getByText('a@b.com')).toBeInTheDocument()
 
     // Click back to login
-    await user.click(screen.getByText('로그인 페이지로 돌아가기'))
+    await user.click(screen.getByText('emailVerification.backToLogin'))
     expect(screen.getByPlaceholderText('your@email.com')).toBeInTheDocument()
   })
 })

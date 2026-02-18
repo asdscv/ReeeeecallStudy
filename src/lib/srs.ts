@@ -116,11 +116,11 @@ export function previewIntervals(card: SrsCardData, settings?: SrsSettings): Rec
 }
 
 function formatInterval(days: number): string {
-  if (days === 0) return '10분'
-  if (days === 1) return '1일'
-  if (days < 30) return `${days}일`
-  if (days < 365) return `${Math.round(days / 30)}개월`
-  return `${(days / 365).toFixed(1)}년`
+  if (days === 0) return 'srs:interval.minutes'
+  if (days === 1) return 'srs:interval.oneDay'
+  if (days < 30) return `srs:interval.days:${days}`
+  if (days < 365) return `srs:interval.months:${Math.round(days / 30)}`
+  return `srs:interval.years:${(days / 365).toFixed(1)}`
 }
 
 function addDays(date: Date, days: number): Date {

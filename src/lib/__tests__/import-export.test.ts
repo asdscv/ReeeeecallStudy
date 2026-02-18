@@ -129,7 +129,7 @@ describe('generateExportCSV', () => {
     const cards = [makeCard({ field_values: { front: 'hello' }, tags: ['a', 'b'] })]
 
     const csv = generateExportCSV(cards, fields)
-    expect(csv).toContain('태그')
+    expect(csv).toContain('Tags')
     expect(csv).toContain('a;b')
   })
 })

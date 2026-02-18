@@ -47,7 +47,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
   createCard: async (input) => {
     const check = guard.check('card_create', 'cards_total')
-    if (!check.allowed) { set({ error: check.message ?? '요청 제한에 도달했습니다.' }); return null }
+    if (!check.allowed) { set({ error: check.message ?? 'errors:rateLimit.reached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
@@ -60,7 +60,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       .single()
 
     if (deck && (deck as { is_readonly: boolean }).is_readonly) {
-      set({ error: '읽기 전용 덱에는 카드를 추가할 수 없습니다.' })
+      set({ error: 'errors:card.readonlyDeckAdd' })
       return null
     }
 
@@ -109,7 +109,7 @@ export const useCardStore = create<CardState>((set, get) => ({
         .eq('id', existingCard.deck_id)
         .single()
       if (deck && (deck as { is_readonly: boolean }).is_readonly) {
-        set({ error: '읽기 전용 덱의 카드를 수정할 수 없습니다.' })
+        set({ error: 'errors:card.readonlyDeckEdit' })
         return
       }
     }

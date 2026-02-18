@@ -1,0 +1,39 @@
+{
+  "title": "Marketplace",
+  "noResults": "No search results.",
+  "noListings": "No decks published yet.",
+  "searchPlaceholder": "Search decks...",
+  "allCategories": "All Categories",
+  "sortNewest": "Newest",
+  "sortPopular": "Popular",
+  "sortCardCount": "Card Count",
+  "categories": {
+    "general": "General",
+    "language": "Language",
+    "science": "Science",
+    "math": "Math",
+    "history": "History",
+    "programming": "Programming",
+    "trivia": "Trivia",
+    "exam": "Exam Prep",
+    "other": "Other"
+  },
+  "shareModes": {
+    "copy": "Copy",
+    "subscribe": "Subscribe",
+    "snapshot": "Snapshot"
+  },
+  "listing": {
+    "cardCount": "{{count}} cards",
+    "userCount": "{{count}} users"
+  },
+  "detail": {
+    "back": "← Marketplace",
+    "cardCount": "{{count}} cards",
+    "userCount": "{{count}} users",
+    "getDeck": "Get This Deck",
+    "importing": "Importing...",
+    "cardPreview": "Card Preview (max 10)",
+    "noCards": "No cards."
+  }
+}

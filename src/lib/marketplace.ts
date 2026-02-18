@@ -23,15 +23,15 @@ export interface ListingFilters {
 export type SortBy = 'newest' | 'popular' | 'card_count'
 
 export const MARKETPLACE_CATEGORIES = [
-  { value: 'general', label: '일반' },
-  { value: 'language', label: '언어' },
-  { value: 'science', label: '과학' },
-  { value: 'math', label: '수학' },
-  { value: 'history', label: '역사' },
-  { value: 'programming', label: '프로그래밍' },
-  { value: 'trivia', label: '상식' },
-  { value: 'exam', label: '시험 준비' },
-  { value: 'other', label: '기타' },
+  { value: 'general', labelKey: 'marketplace:categories.general' },
+  { value: 'language', labelKey: 'marketplace:categories.language' },
+  { value: 'science', labelKey: 'marketplace:categories.science' },
+  { value: 'math', labelKey: 'marketplace:categories.math' },
+  { value: 'history', labelKey: 'marketplace:categories.history' },
+  { value: 'programming', labelKey: 'marketplace:categories.programming' },
+  { value: 'trivia', labelKey: 'marketplace:categories.trivia' },
+  { value: 'exam', labelKey: 'marketplace:categories.exam' },
+  { value: 'other', labelKey: 'marketplace:categories.other' },
 ] as const
 
 export function filterListings(

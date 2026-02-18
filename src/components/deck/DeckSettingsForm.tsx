@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { SrsSettings, CardTemplate } from '../../types/database'
 
 export const COLORS = [
@@ -30,6 +31,7 @@ interface DeckSettingsFormProps {
 }
 
 export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFormProps) {
+  const { t } = useTranslation('decks')
   const { name, description, color, icon, templateId, srsSettings } = values
 
   const update = (patch: Partial<DeckSettingsFormValues>) => {
@@ -45,13 +47,13 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
       {/* 이름 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          덱 이름 <span className="text-red-500">*</span>
+          {t('settings.deckName')} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => update({ name: e.target.value })}
-          placeholder="예: HSK 5급"
+          placeholder={t('settings.namePlaceholder')}
           required
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
         />
@@ -60,12 +62,12 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
       {/* 설명 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          설명 (선택)
+          {t('settings.description')}
         </label>
         <textarea
           value={description}
           onChange={(e) => update({ description: e.target.value })}
-          placeholder="덱에 대한 설명"
+          placeholder={t('settings.descriptionPlaceholder')}
           rows={2}
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 resize-none"
         />
@@ -73,7 +75,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
 
       {/* 색상 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">색상</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.color')}</label>
         <div className="flex flex-wrap gap-2">
           {COLORS.map((c) => (
             <button
@@ -91,7 +93,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
 
       {/* 아이콘 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">아이콘</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.icon')}</label>
         <div className="flex flex-wrap gap-2">
           {ICONS.map((ic) => (
             <button
@@ -113,17 +115,17 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
       {/* 기본 템플릿 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          기본 카드 템플릿
+          {t('settings.defaultTemplate')}
         </label>
         <select
           value={templateId}
           onChange={(e) => update({ templateId: e.target.value })}
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
         >
-          <option value="">선택 안 함</option>
-          {templates.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name} {t.is_default ? '(기본)' : ''}
+          <option value="">{t('settings.noSelection')}</option>
+          {templates.map((tmpl) => (
+            <option key={tmpl.id} value={tmpl.id}>
+              {tmpl.name} {tmpl.is_default ? t('settings.defaultLabel') : ''}
             </option>
           ))}
         </select>
@@ -132,7 +134,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
       {/* SRS 간격 설정 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          SRS 초기 간격 (일)
+          {t('settings.srsInterval')}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {SRS_FIELDS.map(({ key, label, color: clr }) => (
@@ -152,7 +154,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           ))}
         </div>
         <p className="text-xs text-gray-400 mt-1.5">
-          Again 0 = 10분 후 재학습. 이후 반복 시 간격이 자동으로 증가합니다.
+          {t('settings.srsNote')}
         </p>
       </div>
     </div>

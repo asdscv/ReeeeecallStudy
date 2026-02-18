@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { StudyMode } from '../../types/database'
 
 interface SimpleRatingButtonsProps {
@@ -6,6 +7,7 @@ interface SimpleRatingButtonsProps {
 }
 
 export function SimpleRatingButtons({ mode, onRate }: SimpleRatingButtonsProps) {
+  const { t } = useTranslation('study')
   if (mode === 'sequential_review') {
     return (
       <div className="flex items-center gap-3">
@@ -13,13 +15,13 @@ export function SimpleRatingButtons({ mode, onRate }: SimpleRatingButtonsProps) 
           onClick={() => onRate('unknown')}
           className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition cursor-pointer"
         >
-          모름
+          {t('rating.unknown')}
         </button>
         <button
           onClick={() => onRate('known')}
           className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium transition cursor-pointer"
         >
-          알고 있음
+          {t('rating.known')}
         </button>
       </div>
     )
@@ -32,7 +34,7 @@ export function SimpleRatingButtons({ mode, onRate }: SimpleRatingButtonsProps) 
         onClick={() => onRate('next')}
         className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition cursor-pointer"
       >
-        다음 →
+        {t('rating.next')}
       </button>
     </div>
   )

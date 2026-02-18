@@ -1,0 +1,20 @@
+{
+  "editCard": "Edit Card",
+  "addCard": "Add Card",
+  "noTemplateSet": "No template has been set for this deck.",
+  "fileValidationFailed": "File validation failed.",
+  "uploadFailed": "Upload failed.",
+  "uploading": "Uploading...",
+  "remove": "Remove",
+  "uploadImage": "Upload an image",
+  "selectFile": "Select File",
+  "imageFormats": "JPG, PNG, WebP supported",
+  "uploadAudio": "Upload audio",
+  "audioFormats": "MP3, OGG, WAV supported",
+  "tags": "Tags",
+  "tagsPlaceholder": "Type a tag and press Enter",
+  "cancel": "Cancel",
+  "saving": "Saving...",
+  "edit": "Edit",
+  "add": "Add"
+}

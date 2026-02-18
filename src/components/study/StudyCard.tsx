@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'motion/react'
 import { Volume2 } from 'lucide-react'
 import { renderCardFace } from '../../lib/card-renderer'
@@ -38,6 +39,7 @@ export function StudyCard({
   onSwipeRate,
   inputSettings,
 }: StudyCardProps) {
+  const { t } = useTranslation('study')
   const [pointerOrigin, setPointerOrigin] = useState<{ x: number; y: number } | null>(null)
   const [swipeDelta, setSwipeDelta] = useState({ x: 0, y: 0 })
   const [preview, setPreview] = useState<SwipePreview | null>(null)
@@ -185,6 +187,7 @@ export function StudyCard({
                       fieldValues={frontFace.fieldValues}
                       fields={frontFace.fields}
                       ttsFields={frontTTSFields}
+                      t={t}
                     />
                   ) : (
                     <div className="text-3xl sm:text-5xl font-bold text-gray-900 text-center tracking-tight break-words">
@@ -194,7 +197,7 @@ export function StudyCard({
                 </div>
                 {/* Hint — pinned to bottom */}
                 <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
-                  탭하여 뒤집기
+                  {t('card.tapToFlip')}
                 </div>
               </div>
 
@@ -229,6 +232,7 @@ export function StudyCard({
                           fieldValues={backFace.fieldValues}
                           fields={backFace.fields}
                           ttsFields={backTTSFields}
+                          t={t}
                         />
                       ) : (
                         <div className="text-2xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight break-words">
@@ -253,7 +257,7 @@ export function StudyCard({
         {/* Flip hint */}
         {!isFlipped && (
           <div className="text-center mt-3 sm:mt-6 text-gray-400 text-xs sm:text-sm">
-            카드를 탭하여 답을 확인하세요
+            {t('card.tapToReveal')}
           </div>
         )}
       </div>
@@ -270,11 +274,13 @@ function CardFaceLayout({
   fieldValues,
   fields,
   ttsFields,
+  t,
 }: {
   layout: LayoutItem[]
   fieldValues: Record<string, string>
   fields: { key: string; type: string }[]
   ttsFields?: TTSFieldInfo[]
+  t: (key: string) => string
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 w-full max-w-lg text-center">
@@ -304,7 +310,7 @@ function CardFaceLayout({
                     speak(ttsInfo.text, ttsInfo.lang)
                   }}
                   className="p-1 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0"
-                  title="TTS 재생"
+                  title={t('card.ttsPlay')}
                 >
                   <Volume2 className="w-4 h-4" />
                 </button>

@@ -1,4 +1,4 @@
-// ─── API Docs Content — API 문서 페이지 데이터 ──────────────────
+// ─── API Docs Content — API 문서 페이지 데이터 (i18n keys) ──────────────────
 
 export interface ApiEndpoint {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -19,7 +19,7 @@ export interface ApiDocsSection {
   icon: string
   description: string
   endpoints?: ApiEndpoint[]
-  items?: { title: string; body: string }[]
+  items?: { title: string; body: string; isCode?: boolean }[]
 }
 
 export const API_BASE_URL = 'https://your-project.supabase.co/rest/v1'
@@ -28,21 +28,21 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'overview',
-    title: '개요',
+    title: 'sections.overview.title',
     icon: '📡',
-    description: 'ReeeeecallStudy API를 사용하면 외부 도구, 스크립트, 앱에서 학습 데이터를 관리할 수 있습니다.',
+    description: 'sections.overview.description',
     items: [
       {
-        title: 'API란?',
-        body: 'ReeeeecallStudy API는 RESTful API로, HTTP 요청을 통해 덱, 카드, 학습 기록 등의 데이터를 조회하고 관리할 수 있습니다. 자동화 스크립트, 서드파티 앱 연동, 데이터 분석 등에 활용할 수 있습니다.',
+        title: 'sections.overview.items.what.title',
+        body: 'sections.overview.items.what.body',
       },
       {
-        title: 'Base URL',
-        body: '모든 API 요청의 기본 URL은 Supabase 프로젝트 URL을 기반으로 합니다.\n\nBase URL: https://your-project.supabase.co/rest/v1',
+        title: 'sections.overview.items.baseUrl.title',
+        body: 'sections.overview.items.baseUrl.body',
       },
       {
-        title: '응답 형식',
-        body: '모든 응답은 JSON 형식으로 반환됩니다. Content-Type은 application/json입니다.\n\n성공 시 해당 리소스의 데이터가 반환되고, 오류 시 { "error": "메시지" } 형식으로 반환됩니다.',
+        title: 'sections.overview.items.responseFormat.title',
+        body: 'sections.overview.items.responseFormat.body',
       },
     ],
   },
@@ -50,21 +50,21 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'authentication',
-    title: '인증',
+    title: 'sections.authentication.title',
     icon: '🔐',
-    description: 'API 키를 사용하여 모든 요청을 인증합니다.',
+    description: 'sections.authentication.description',
     items: [
       {
-        title: 'API 키 발급',
-        body: '설정 페이지 → API 키 섹션에서 "새 API 키 생성" 버튼을 클릭합니다.\n키 이름(최대 64자)을 입력하고 생성하면 rc_ 로 시작하는 35자리 키가 발급됩니다.\n\n⚠️ 키는 생성 시 한 번만 표시됩니다. 반드시 안전한 곳에 복사해두세요!',
+        title: 'sections.authentication.items.getKey.title',
+        body: 'sections.authentication.items.getKey.body',
       },
       {
-        title: '인증 방법',
-        body: '모든 API 요청의 Authorization 헤더에 Bearer 토큰으로 API 키를 전달합니다.\n\nAuthorization: Bearer rc_your_api_key_here\n\nAPI 키가 없거나 잘못된 경우 401 Unauthorized 오류가 반환됩니다.',
+        title: 'sections.authentication.items.method.title',
+        body: 'sections.authentication.items.method.body',
       },
       {
-        title: '키 관리',
-        body: '• 최대 1개의 API 키를 보유할 수 있습니다\n• 키를 분실한 경우 기존 키를 삭제하고 새로 생성합니다\n• 사용하지 않는 키는 즉시 삭제하세요\n• 키를 코드에 직접 포함하지 말고 환경 변수로 관리하세요',
+        title: 'sections.authentication.items.management.title',
+        body: 'sections.authentication.items.management.body',
       },
     ],
   },
@@ -72,21 +72,21 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'rate-limits',
-    title: '요청 제한',
+    title: 'sections.rateLimits.title',
     icon: '⏱️',
-    description: 'API 안정성을 위해 요청 수가 제한됩니다.',
+    description: 'sections.rateLimits.description',
     items: [
       {
-        title: 'Free 티어',
-        body: '• 일일 API 요청: 1,000건\n• 분당 API 호출: 60회\n• 분당 카드 생성: 30건\n• 분당 일괄 카드 생성: 5회 (회당 최대 100장)\n• 총 카드 수: 5,000개\n• 총 덱 수: 50개',
+        title: 'sections.rateLimits.items.free.title',
+        body: 'sections.rateLimits.items.free.body',
       },
       {
-        title: 'Pro 티어',
-        body: '• 일일 API 요청: 10,000건\n• 분당 API 호출: 300회\n• 분당 카드 생성: 120건\n• 분당 일괄 카드 생성: 20회\n• 총 카드 수: 50,000개\n• 총 덱 수: 500개',
+        title: 'sections.rateLimits.items.pro.title',
+        body: 'sections.rateLimits.items.pro.body',
       },
       {
-        title: '제한 초과 시',
-        body: '요청 제한에 도달하면 429 Too Many Requests 응답이 반환됩니다.\n\n응답 헤더에 포함된 정보:\n• X-RateLimit-Limit: 최대 요청 수\n• X-RateLimit-Remaining: 남은 요청 수\n• Retry-After: 재시도까지 대기 시간(초)',
+        title: 'sections.rateLimits.items.exceeded.title',
+        body: 'sections.rateLimits.items.exceeded.body',
       },
     ],
   },
@@ -94,21 +94,21 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'decks',
-    title: '덱 API',
+    title: 'sections.decks.title',
     icon: '📚',
-    description: '덱(카드 묶음)을 조회하고 관리합니다.',
+    description: 'sections.decks.description',
     endpoints: [
       {
         method: 'GET',
         path: '/decks',
-        summary: '덱 목록 조회',
-        description: '사용자의 모든 덱 목록을 조회합니다.',
+        summary: 'sections.decks.endpoints.list.summary',
+        description: 'sections.decks.endpoints.list.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         queryParams: [
-          { name: 'page', type: 'number', required: false, description: '페이지 번호 (기본: 1)' },
-          { name: 'per_page', type: 'number', required: false, description: '페이지당 항목 수 (기본: 50, 최대: 100)' },
+          { name: 'page', type: 'number', required: false, description: 'sections.decks.params.page' },
+          { name: 'per_page', type: 'number', required: false, description: 'sections.decks.params.perPage' },
         ],
         responseBody: `[
   {
@@ -122,21 +122,21 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   }
 ]`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
-          { code: 429, description: '요청 제한 초과' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 429, description: 'sections.statusCodes.429' },
         ],
       },
       {
         method: 'GET',
         path: '/decks/:deckId',
-        summary: '덱 상세 조회',
-        description: '특정 덱의 상세 정보를 조회합니다.',
+        summary: 'sections.decks.endpoints.detail.summary',
+        description: 'sections.decks.endpoints.detail.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: '조회할 덱의 ID' },
+          { name: 'deckId', type: 'string (UUID)', description: 'sections.decks.params.deckId' },
         ],
         responseBody: `{
   "id": "uuid",
@@ -156,16 +156,16 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   "updated_at": "2025-01-20T14:30:00Z"
 }`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '덱을 찾을 수 없음' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
       {
         method: 'POST',
         path: '/decks',
-        summary: '새 덱 생성',
-        description: '새로운 덱을 생성합니다.',
+        summary: 'sections.decks.endpoints.create.summary',
+        description: 'sections.decks.endpoints.create.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
           { name: 'Content-Type', value: 'application/json', required: true },
@@ -185,10 +185,10 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   "created_at": "2025-02-01T10:00:00Z"
 }`,
         statusCodes: [
-          { code: 201, description: '생성 성공' },
-          { code: 400, description: '잘못된 요청 (필수 필드 누락)' },
-          { code: 401, description: '인증 실패' },
-          { code: 429, description: '요청 제한 초과' },
+          { code: 201, description: 'sections.statusCodes.201' },
+          { code: 400, description: 'sections.statusCodes.400' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 429, description: 'sections.statusCodes.429' },
         ],
       },
     ],
@@ -197,26 +197,26 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'cards',
-    title: '카드 API',
+    title: 'sections.cards.title',
     icon: '🃏',
-    description: '카드를 조회, 생성, 수정합니다.',
+    description: 'sections.cards.description',
     endpoints: [
       {
         method: 'GET',
         path: '/decks/:deckId/cards',
-        summary: '카드 목록 조회',
-        description: '특정 덱에 속한 카드 목록을 조회합니다.',
+        summary: 'sections.cards.endpoints.list.summary',
+        description: 'sections.cards.endpoints.list.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: '덱 ID' },
+          { name: 'deckId', type: 'string (UUID)', description: 'sections.cards.params.deckId' },
         ],
         queryParams: [
-          { name: 'page', type: 'number', required: false, description: '페이지 번호 (기본: 1)' },
-          { name: 'per_page', type: 'number', required: false, description: '페이지당 항목 수 (기본: 50, 최대: 100)' },
-          { name: 'status', type: 'string', required: false, description: 'SRS 상태 필터 (new, learning, review, suspended)' },
-          { name: 'tag', type: 'string', required: false, description: '태그 필터' },
+          { name: 'page', type: 'number', required: false, description: 'sections.decks.params.page' },
+          { name: 'per_page', type: 'number', required: false, description: 'sections.decks.params.perPage' },
+          { name: 'status', type: 'string', required: false, description: 'sections.cards.params.status' },
+          { name: 'tag', type: 'string', required: false, description: 'sections.cards.params.tag' },
         ],
         responseBody: `[
   {
@@ -235,22 +235,22 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   }
 ]`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '덱을 찾을 수 없음' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
       {
         method: 'POST',
         path: '/decks/:deckId/cards',
-        summary: '카드 생성',
-        description: '덱에 새 카드를 추가합니다. 단일 카드 또는 배열로 최대 100장까지 일괄 생성 가능합니다.',
+        summary: 'sections.cards.endpoints.create.summary',
+        description: 'sections.cards.endpoints.create.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
           { name: 'Content-Type', value: 'application/json', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: '덱 ID' },
+          { name: 'deckId', type: 'string (UUID)', description: 'sections.cards.params.deckId' },
         ],
         requestBody: `// 단일 카드
 {
@@ -283,25 +283,25 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   ]
 }`,
         statusCodes: [
-          { code: 201, description: '생성 성공' },
-          { code: 400, description: '잘못된 요청 (유효성 검증 실패)' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '덱을 찾을 수 없음' },
-          { code: 429, description: '요청 제한 초과' },
+          { code: 201, description: 'sections.statusCodes.201' },
+          { code: 400, description: 'sections.statusCodes.400' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+          { code: 429, description: 'sections.statusCodes.429' },
         ],
       },
       {
         method: 'PATCH',
         path: '/decks/:deckId/cards/:cardId',
-        summary: '카드 수정',
-        description: '기존 카드의 필드 값이나 태그를 수정합니다.',
+        summary: 'sections.cards.endpoints.update.summary',
+        description: 'sections.cards.endpoints.update.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
           { name: 'Content-Type', value: 'application/json', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: '덱 ID' },
-          { name: 'cardId', type: 'string (UUID)', description: '카드 ID' },
+          { name: 'deckId', type: 'string (UUID)', description: 'sections.cards.params.deckId' },
+          { name: 'cardId', type: 'string (UUID)', description: 'sections.cards.params.cardId' },
         ],
         requestBody: `{
   "field_values": {
@@ -320,28 +320,28 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   "updated_at": "2025-02-01T12:00:00Z"
 }`,
         statusCodes: [
-          { code: 200, description: '수정 성공' },
-          { code: 400, description: '잘못된 요청' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '카드를 찾을 수 없음' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 400, description: 'sections.statusCodes.400' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
       {
         method: 'DELETE',
         path: '/decks/:deckId/cards/:cardId',
-        summary: '카드 삭제',
-        description: '특정 카드를 삭제합니다. 이 작업은 되돌릴 수 없습니다.',
+        summary: 'sections.cards.endpoints.delete.summary',
+        description: 'sections.cards.endpoints.delete.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: '덱 ID' },
-          { name: 'cardId', type: 'string (UUID)', description: '카드 ID' },
+          { name: 'deckId', type: 'string (UUID)', description: 'sections.cards.params.deckId' },
+          { name: 'cardId', type: 'string (UUID)', description: 'sections.cards.params.cardId' },
         ],
         statusCodes: [
-          { code: 204, description: '삭제 성공 (응답 본문 없음)' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '카드를 찾을 수 없음' },
+          { code: 204, description: 'sections.statusCodes.204' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
     ],
@@ -350,20 +350,20 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'study',
-    title: '학습 API',
+    title: 'sections.study.title',
     icon: '📖',
-    description: '학습 기록을 조회하고 학습 세션 데이터를 관리합니다.',
+    description: 'sections.study.description',
     endpoints: [
       {
         method: 'GET',
         path: '/decks/:deckId/study/due',
-        summary: '복습 예정 카드 조회',
-        description: '오늘 복습해야 할 카드 목록을 조회합니다.',
+        summary: 'sections.study.endpoints.due.summary',
+        description: 'sections.study.endpoints.due.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: '덱 ID' },
+          { name: 'deckId', type: 'string (UUID)', description: 'sections.study.params.deckId' },
         ],
         responseBody: `{
   "due_count": 12,
@@ -379,25 +379,25 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   ]
 }`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '덱을 찾을 수 없음' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
       {
         method: 'GET',
         path: '/study/history',
-        summary: '학습 기록 조회',
-        description: '학습 세션 기록을 조회합니다.',
+        summary: 'sections.study.endpoints.history.summary',
+        description: 'sections.study.endpoints.history.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         queryParams: [
-          { name: 'deck_id', type: 'string (UUID)', required: false, description: '특정 덱의 기록만 조회' },
-          { name: 'from', type: 'string (ISO date)', required: false, description: '시작 날짜 (예: 2025-01-01)' },
-          { name: 'to', type: 'string (ISO date)', required: false, description: '종료 날짜 (예: 2025-01-31)' },
-          { name: 'page', type: 'number', required: false, description: '페이지 번호' },
-          { name: 'per_page', type: 'number', required: false, description: '페이지당 항목 수' },
+          { name: 'deck_id', type: 'string (UUID)', required: false, description: 'sections.study.params.deckId' },
+          { name: 'from', type: 'string (ISO date)', required: false, description: 'sections.study.params.from' },
+          { name: 'to', type: 'string (ISO date)', required: false, description: 'sections.study.params.to' },
+          { name: 'page', type: 'number', required: false, description: 'sections.decks.params.page' },
+          { name: 'per_page', type: 'number', required: false, description: 'sections.decks.params.perPage' },
         ],
         responseBody: `[
   {
@@ -417,20 +417,20 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   }
 ]`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
         ],
       },
       {
         method: 'GET',
         path: '/study/stats',
-        summary: '학습 통계 조회',
-        description: '전체 학습 통계와 대시보드 데이터를 조회합니다.',
+        summary: 'sections.study.endpoints.stats.summary',
+        description: 'sections.study.endpoints.stats.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         queryParams: [
-          { name: 'period', type: 'string', required: false, description: '기간 (1w, 1m, 3m, 6m, 1y)' },
+          { name: 'period', type: 'string', required: false, description: 'sections.study.params.period' },
         ],
         responseBody: `{
   "total_cards": 500,
@@ -444,8 +444,8 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   ]
 }`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
         ],
       },
     ],
@@ -454,15 +454,15 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'templates',
-    title: '템플릿 API',
+    title: 'sections.templates.title',
     icon: '📋',
-    description: '카드 템플릿을 조회합니다.',
+    description: 'sections.templates.description',
     endpoints: [
       {
         method: 'GET',
         path: '/templates',
-        summary: '템플릿 목록 조회',
-        description: '사용자의 모든 카드 템플릿 목록을 조회합니다.',
+        summary: 'sections.templates.endpoints.list.summary',
+        description: 'sections.templates.endpoints.list.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
@@ -479,20 +479,20 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   }
 ]`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
         ],
       },
       {
         method: 'GET',
         path: '/templates/:templateId',
-        summary: '템플릿 상세 조회',
-        description: '특정 템플릿의 전체 정보(필드, 레이아웃 포함)를 조회합니다.',
+        summary: 'sections.templates.endpoints.detail.summary',
+        description: 'sections.templates.endpoints.detail.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         pathParams: [
-          { name: 'templateId', type: 'string (UUID)', description: '템플릿 ID' },
+          { name: 'templateId', type: 'string (UUID)', description: 'sections.templates.params.templateId' },
         ],
         responseBody: `{
   "id": "uuid",
@@ -514,9 +514,9 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   "created_at": "2025-01-05T12:00:00Z"
 }`,
         statusCodes: [
-          { code: 200, description: '성공' },
-          { code: 401, description: '인증 실패' },
-          { code: 404, description: '템플릿을 찾을 수 없음' },
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
     ],
@@ -525,13 +525,56 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
   {
     id: 'examples',
-    title: '코드 예시',
+    title: 'sections.examples.title',
     icon: '💻',
-    description: '다양한 언어와 도구로 API를 호출하는 예시입니다.',
+    description: 'sections.examples.description',
     items: [
       {
         title: 'cURL',
-        body: `# 덱 목록 조회
+        body: '',
+        isCode: true,
+      },
+      {
+        title: 'JavaScript (fetch)',
+        body: '',
+        isCode: true,
+      },
+      {
+        title: 'Python (requests)',
+        body: '',
+        isCode: true,
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
+  {
+    id: 'errors',
+    title: 'sections.errors.title',
+    icon: '⚠️',
+    description: 'sections.errors.description',
+    items: [
+      {
+        title: 'sections.errors.items.format.title',
+        body: 'sections.errors.items.format.body',
+      },
+      {
+        title: 'sections.errors.items.statusCodes.title',
+        body: 'sections.errors.items.statusCodes.body',
+      },
+      {
+        title: 'sections.errors.items.validation.title',
+        body: 'sections.errors.items.validation.body',
+      },
+    ],
+  },
+]
+
+/** Code examples — language-agnostic, kept as-is */
+export const CODE_EXAMPLES: Record<string, { title: string; code: string }> = {
+  curl: {
+    title: 'cURL',
+    code: `# 덱 목록 조회
 curl -X GET "https://your-project.supabase.co/rest/v1/decks" \\
   -H "Authorization: Bearer rc_your_api_key"
 
@@ -540,10 +583,10 @@ curl -X POST "https://your-project.supabase.co/rest/v1/decks/{deckId}/cards" \\
   -H "Authorization: Bearer rc_your_api_key" \\
   -H "Content-Type: application/json" \\
   -d '{"template_id":"uuid","field_values":{"front":"hello","back":"안녕"}}'`,
-      },
-      {
-        title: 'JavaScript (fetch)',
-        body: `const API_KEY = process.env.REEEEECALL_API_KEY;
+  },
+  javascript: {
+    title: 'JavaScript (fetch)',
+    code: `const API_KEY = process.env.REEEEECALL_API_KEY;
 const BASE = "https://your-project.supabase.co/rest/v1";
 
 // 덱 목록 조회
@@ -563,10 +606,10 @@ const result = await fetch(\`\${BASE}/decks/\${deckId}/cards\`, {
     { template_id: tid, field_values: { front: "dog", back: "강아지" } }
   ])
 }).then(r => r.json());`,
-      },
-      {
-        title: 'Python (requests)',
-        body: `import os, requests
+  },
+  python: {
+    title: 'Python (requests)',
+    code: `import os, requests
 
 API_KEY = os.environ["REEEEECALL_API_KEY"]
 BASE = "https://your-project.supabase.co/rest/v1"
@@ -586,61 +629,43 @@ result = requests.post(
     headers={**headers, "Content-Type": "application/json"},
     json=card
 ).json()`,
-      },
-    ],
   },
-
-  // ───────────────────────────────────────────────────
-  {
-    id: 'errors',
-    title: '오류 처리',
-    icon: '⚠️',
-    description: '에러 응답의 형식과 일반적인 오류 코드를 안내합니다.',
-    items: [
-      {
-        title: '오류 응답 형식',
-        body: `모든 오류는 다음 형식으로 반환됩니다:\n\n{\n  "error": "오류 메시지",\n  "code": "ERROR_CODE",\n  "details": "추가 정보 (선택)"\n}`,
-      },
-      {
-        title: '주요 HTTP 상태 코드',
-        body: '• 200 OK — 요청 성공\n• 201 Created — 리소스 생성 성공\n• 204 No Content — 삭제 성공 (응답 본문 없음)\n• 400 Bad Request — 잘못된 요청 (필수 필드 누락, 유효성 검증 실패)\n• 401 Unauthorized — 인증 실패 (API 키 없거나 잘못됨)\n• 404 Not Found — 리소스를 찾을 수 없음\n• 429 Too Many Requests — 요청 제한 초과\n• 500 Internal Server Error — 서버 내부 오류',
-      },
-      {
-        title: '유효성 검증 오류',
-        body: '카드 생성/수정 시 유효성 검증에 실패하면 각 필드별 오류 메시지가 배열로 반환됩니다:\n\n{\n  "error": "Validation failed",\n  "errors": [\n    "[0] template_id is required",\n    "[0] field_values must have at least one field"\n  ]\n}',
-      },
-    ],
-  },
-]
+}
 
 /** ID로 API 문서 섹션 찾기 */
 export function getApiSection(id: string): ApiDocsSection | undefined {
   return API_DOCS_SECTIONS.find((s) => s.id === id)
 }
 
-/** 키워드 검색 — 매칭되는 섹션만 반환 */
-export function searchApiDocs(query: string): ApiDocsSection[] {
+/** 키워드 검색 — 매칭되는 섹션만 반환 (번역된 텍스트에서 검색) */
+export function searchApiDocs(query: string, t: (key: string) => string): ApiDocsSection[] {
   const q = query.trim().toLowerCase()
   if (!q) return API_DOCS_SECTIONS
 
   return API_DOCS_SECTIONS
     .map((section) => {
       const sectionMatch =
-        section.title.toLowerCase().includes(q) ||
-        section.description.toLowerCase().includes(q)
+        t(section.title).toLowerCase().includes(q) ||
+        t(section.description).toLowerCase().includes(q)
 
       // items 검색
       const matchingItems = section.items?.filter(
-        (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.body.toLowerCase().includes(q)
+        (item) => {
+          // code example items have literal titles, not i18n keys
+          const titleText = item.isCode ? item.title : t(item.title)
+          const bodyText = item.isCode ? (CODE_EXAMPLES[Object.keys(CODE_EXAMPLES).find(k => CODE_EXAMPLES[k].title === item.title) || '']?.code || '') : t(item.body)
+          return (
+            titleText.toLowerCase().includes(q) ||
+            bodyText.toLowerCase().includes(q)
+          )
+        }
       )
 
       // endpoints 검색
       const matchingEndpoints = section.endpoints?.filter(
         (ep) =>
-          ep.summary.toLowerCase().includes(q) ||
-          ep.description.toLowerCase().includes(q) ||
+          t(ep.summary).toLowerCase().includes(q) ||
+          t(ep.description).toLowerCase().includes(q) ||
           ep.path.toLowerCase().includes(q) ||
           ep.method.toLowerCase().includes(q)
       )

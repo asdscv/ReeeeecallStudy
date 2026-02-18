@@ -13,12 +13,14 @@ describe('API_DOCS_SECTIONS', () => {
     expect(API_DOCS_SECTIONS.length).toBeGreaterThanOrEqual(5)
   })
 
-  it('every section should have id, title, icon, and description', () => {
+  it('every section should have id, title (i18n key), icon, and description (i18n key)', () => {
     for (const section of API_DOCS_SECTIONS) {
       expect(section.id).toBeTruthy()
       expect(section.title).toBeTruthy()
+      expect(section.title).toContain('sections.')
       expect(section.icon).toBeTruthy()
       expect(section.description).toBeTruthy()
+      expect(section.description).toContain('sections.')
     }
   })
 
@@ -35,18 +37,19 @@ describe('API_DOCS_SECTIONS', () => {
     }
   })
 
-  it('endpoint items should have body text', () => {
+  it('section items should have title and body (i18n keys or literal)', () => {
     for (const section of API_DOCS_SECTIONS) {
       if (section.items) {
         for (const item of section.items) {
           expect(item.title).toBeTruthy()
-          expect(item.body).toBeTruthy()
+          // body can be empty string for code example items
+          expect(typeof item.body).toBe('string')
         }
       }
     }
   })
 
-  it('endpoints should have valid method, path, summary, description', () => {
+  it('endpoints should have valid method, path, summary (i18n key), description (i18n key)', () => {
     const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     for (const section of API_DOCS_SECTIONS) {
       if (section.endpoints) {
@@ -55,7 +58,9 @@ describe('API_DOCS_SECTIONS', () => {
           expect(ep.path).toBeTruthy()
           expect(ep.path.startsWith('/')).toBe(true)
           expect(ep.summary).toBeTruthy()
+          expect(ep.summary).toContain('sections.')
           expect(ep.description).toBeTruthy()
+          expect(ep.description).toContain('sections.')
         }
       }
     }
@@ -129,40 +134,38 @@ describe('getApiSection', () => {
 })
 
 describe('searchApiDocs', () => {
+  // Mock t function: returns the key as-is (identity)
+  const mockT = (key: string) => key
+
   it('should return all sections when query is empty', () => {
-    const result = searchApiDocs('')
+    const result = searchApiDocs('', mockT)
     expect(result.length).toBe(API_DOCS_SECTIONS.length)
   })
 
   it('should return all sections for whitespace query', () => {
-    const result = searchApiDocs('   ')
+    const result = searchApiDocs('   ', mockT)
     expect(result.length).toBe(API_DOCS_SECTIONS.length)
   })
 
-  it('should filter by section title', () => {
-    const result = searchApiDocs('인증')
+  it('should filter by section title key', () => {
+    const result = searchApiDocs('authentication', mockT)
     expect(result.length).toBeGreaterThan(0)
     const authFound = result.some((s) => s.id === 'authentication')
     expect(authFound).toBe(true)
   })
 
-  it('should filter by section description', () => {
-    const result = searchApiDocs('RESTful')
-    expect(result.length).toBeGreaterThan(0)
-  })
-
-  it('should filter by item title or body', () => {
-    const result = searchApiDocs('API 키')
+  it('should filter by section description key', () => {
+    const result = searchApiDocs('overview.description', mockT)
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should filter by endpoint path', () => {
-    const result = searchApiDocs('/decks')
+    const result = searchApiDocs('/decks', mockT)
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should filter by endpoint method', () => {
-    const result = searchApiDocs('POST')
+    const result = searchApiDocs('POST', mockT)
     expect(result.length).toBeGreaterThan(0)
     for (const section of result) {
       if (section.endpoints) {
@@ -175,25 +178,20 @@ describe('searchApiDocs', () => {
     }
   })
 
-  it('should filter by endpoint summary', () => {
-    const result = searchApiDocs('카드 생성')
-    expect(result.length).toBeGreaterThan(0)
-  })
-
   it('should be case-insensitive', () => {
-    const result1 = searchApiDocs('GET')
-    const result2 = searchApiDocs('get')
+    const result1 = searchApiDocs('GET', mockT)
+    const result2 = searchApiDocs('get', mockT)
     expect(result1.length).toBe(result2.length)
   })
 
   it('should return empty array for unmatched query', () => {
-    const result = searchApiDocs('xyz존재하지않는키워드999')
+    const result = searchApiDocs('xyz존재하지않는키워드999', mockT)
     expect(result.length).toBe(0)
   })
 
   it('should return section with only matching items when section title does not match', () => {
-    // 'cURL' appears in code examples items, but 'examples' section title is '코드 예시'
-    const result = searchApiDocs('cURL')
+    // 'cURL' appears in code examples items (literal title)
+    const result = searchApiDocs('cURL', mockT)
     const exSection = result.find((s) => s.id === 'examples')
     if (exSection && exSection.items) {
       const hasCurl = exSection.items.some(

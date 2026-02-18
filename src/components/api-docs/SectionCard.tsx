@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { type ApiDocsSection } from '../../lib/api-docs-content'
+import { CODE_EXAMPLES, type ApiDocsSection } from '../../lib/api-docs-content'
 import { CodeBlock } from './CodeBlock'
 import { EndpointCard } from './EndpointCard'
 
@@ -15,6 +16,7 @@ export function isCodeContent(text: string): boolean {
 }
 
 export function SectionCard({ section, defaultOpen }: { section: ApiDocsSection; defaultOpen: boolean }) {
+  const { t } = useTranslation('api-docs')
   const [open, setOpen] = useState(defaultOpen)
 
   return (
@@ -25,8 +27,8 @@ export function SectionCard({ section, defaultOpen }: { section: ApiDocsSection;
       >
         <span className="text-2xl shrink-0">{section.icon}</span>
         <div className="flex-1 min-w-0">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">{section.title}</h2>
-          <p className="text-xs text-gray-500 mt-0.5 truncate">{section.description}</p>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">{t(section.title)}</h2>
+          <p className="text-xs text-gray-500 mt-0.5 truncate">{t(section.description)}</p>
         </div>
         {open ? (
           <ChevronUp className="w-5 h-5 text-gray-400 shrink-0" />
@@ -39,16 +41,22 @@ export function SectionCard({ section, defaultOpen }: { section: ApiDocsSection;
         <div className="border-t border-gray-100">
           {section.items && section.items.length > 0 && (
             <div className="divide-y divide-gray-100">
-              {section.items.map((item, i) => (
-                <div key={i} className="px-4 sm:px-5 py-3 sm:py-4">
-                  <h3 className="text-sm font-semibold text-gray-800 mb-1.5">{item.title}</h3>
-                  {isCodeContent(item.body) ? (
-                    <CodeBlock code={item.body} />
-                  ) : (
-                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{item.body}</p>
-                  )}
-                </div>
-              ))}
+              {section.items.map((item, i) => {
+                const itemTitle = item.isCode ? item.title : t(item.title)
+                const itemBody = item.isCode
+                  ? (CODE_EXAMPLES[Object.keys(CODE_EXAMPLES).find(k => CODE_EXAMPLES[k].title === item.title) || '']?.code || '')
+                  : t(item.body)
+                return (
+                  <div key={i} className="px-4 sm:px-5 py-3 sm:py-4">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-1.5">{itemTitle}</h3>
+                    {item.isCode || isCodeContent(itemBody) ? (
+                      <CodeBlock code={itemBody} />
+                    ) : (
+                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{itemBody}</p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
 

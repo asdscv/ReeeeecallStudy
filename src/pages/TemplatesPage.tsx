@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useTemplateStore } from '../stores/template-store'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
@@ -6,6 +7,7 @@ import { formatLocalDate } from '../lib/date-utils'
 import type { CardTemplate } from '../types/database'
 
 export function TemplatesPage() {
+  const { t } = useTranslation('templates')
   const navigate = useNavigate()
   const { templates, loading, error, fetchTemplates, deleteTemplate, duplicateTemplate } = useTemplateStore()
 
@@ -53,16 +55,16 @@ export function TemplatesPage() {
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">카드 템플릿</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            카드의 필드 구성과 앞/뒷면 레이아웃을 관리합니다.
+            {t('subtitle')}
           </p>
         </div>
         <button
           onClick={handleNew}
           className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer shrink-0"
         >
-          + 새 템플릿
+          {t('createNew')}
         </button>
       </div>
 
@@ -75,12 +77,12 @@ export function TemplatesPage() {
       {templates.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📋</div>
-          <p className="text-gray-500 mb-4 text-sm sm:text-base">템플릿이 없습니다. 새 템플릿을 만들어보세요.</p>
+          <p className="text-gray-500 mb-4 text-sm sm:text-base">{t('empty')}</p>
           <button
             onClick={handleNew}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
           >
-            + 첫 번째 템플릿 만들기
+            {t('createFirst')}
           </button>
         </div>
       ) : (
@@ -102,13 +104,13 @@ export function TemplatesPage() {
         open={!!deletingTemplate}
         onClose={() => { setDeletingTemplate(null); setDeleteError(null) }}
         onConfirm={handleDelete}
-        title="템플릿 삭제"
+        title={t('deleteTemplate')}
         message={
           deleteError
             ? deleteError
-            : `"${deletingTemplate?.name}" 템플릿을 삭제하시겠습니까?`
+            : t('deleteConfirm', { name: deletingTemplate?.name })
         }
-        confirmLabel="삭제"
+        confirmLabel={t('common:delete')}
         danger
         loading={deleteLoading}
       />
@@ -127,6 +129,7 @@ function TemplateCard({
   onDelete: () => void
   onDuplicate: () => void
 }) {
+  const { t } = useTranslation('templates')
   const [showMenu, setShowMenu] = useState(false)
 
   return (
@@ -137,7 +140,7 @@ function TemplateCard({
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
             {template.is_default && (
               <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full font-medium">
-                기본
+                {t('defaultBadge')}
               </span>
             )}
           </div>
@@ -157,9 +160,9 @@ function TemplateCard({
 
           {/* Layout preview */}
           <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-gray-400">
-            <span>앞면: {template.front_layout.length}개 필드</span>
-            <span>뒷면: {template.back_layout.length}개 필드</span>
-            <span>생성: {formatLocalDate(template.created_at)}</span>
+            <span>{t('frontFields', { count: template.front_layout.length })}</span>
+            <span>{t('backFields', { count: template.back_layout.length })}</span>
+            <span>{t('created', { date: formatLocalDate(template.created_at) })}</span>
           </div>
         </div>
 
@@ -179,20 +182,20 @@ function TemplateCard({
                   onClick={() => { onEdit(); setShowMenu(false) }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                 >
-                  편집
+                  {t('common:edit')}
                 </button>
                 <button
                   onClick={() => { onDuplicate(); setShowMenu(false) }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                 >
-                  복제
+                  {t('common:duplicate')}
                 </button>
                 {!template.is_default && (
                   <button
                     onClick={() => { onDelete(); setShowMenu(false) }}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
                   >
-                    삭제
+                    {t('common:delete')}
                   </button>
                 )}
               </div>

@@ -48,18 +48,18 @@ export function isValidApiKeyFormat(key: unknown): key is string {
 /** Validate a key name (non-empty, within max length, no control chars). */
 export function validateKeyName(name: unknown): { valid: boolean; error?: string } {
   if (typeof name !== 'string') {
-    return { valid: false, error: '키 이름은 문자열이어야 합니다' }
+    return { valid: false, error: 'errors:apiKey.nameMustBeString' }
   }
   const trimmed = name.trim()
   if (trimmed.length === 0) {
-    return { valid: false, error: '키 이름을 입력해주세요' }
+    return { valid: false, error: 'errors:apiKey.nameRequired' }
   }
   if (trimmed.length > API_KEY_NAME_MAX_LENGTH) {
-    return { valid: false, error: `키 이름은 ${API_KEY_NAME_MAX_LENGTH}자 이내여야 합니다` }
+    return { valid: false, error: 'errors:apiKey.nameTooLong' }
   }
   // Reject control characters
   if (/[\x00-\x1f\x7f]/.test(trimmed)) {
-    return { valid: false, error: '키 이름에 제어 문자를 포함할 수 없습니다' }
+    return { valid: false, error: 'errors:apiKey.nameNoControlChars' }
   }
   return { valid: true }
 }

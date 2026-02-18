@@ -24,7 +24,7 @@ function renderPage() {
 describe('PublicApiDocsPage', () => {
   it('renders page title', () => {
     renderPage()
-    expect(screen.getByText('API 문서')).toBeInTheDocument()
+    expect(screen.getByText('title')).toBeInTheDocument()
   })
 
   it('renders DocsNav with logo', () => {
@@ -35,12 +35,12 @@ describe('PublicApiDocsPage', () => {
 
   it('renders "시작하기" button from DocsNav', () => {
     renderPage()
-    expect(screen.getByText('시작하기')).toBeInTheDocument()
+    expect(screen.getByText('getStarted')).toBeInTheDocument()
   })
 
   it('renders public variant QuickStartBanner (회원가입 link)', () => {
     renderPage()
-    expect(screen.getByText('회원가입')).toBeInTheDocument()
+    expect(screen.getByText('quickStart.signup')).toBeInTheDocument()
   })
 
   it('renders DocsFooter with copyright', () => {
@@ -50,12 +50,12 @@ describe('PublicApiDocsPage', () => {
 
   it('renders search input', () => {
     renderPage()
-    expect(screen.getByPlaceholderText(/검색/)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('searchPlaceholder')).toBeInTheDocument()
   })
 
   it('renders footer links', () => {
     renderPage()
-    expect(screen.getByText('홈')).toBeInTheDocument()
-    expect(screen.getByText('로그인')).toBeInTheDocument()
+    expect(screen.getByText('footer.home')).toBeInTheDocument()
+    expect(screen.getByText('footer.login')).toBeInTheDocument()
   })
 })
