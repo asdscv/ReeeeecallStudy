@@ -1,4 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+
+vi.mock('i18next', () => ({
+  default: { t: (key: string) => key },
+}))
+
 import {
   formatDuration,
   getSessionPerformance,
@@ -32,41 +37,46 @@ function makeSession(overrides: Partial<StudySession> = {}): StudySession {
 // ── formatDuration ──
 
 describe('formatDuration', () => {
+  // With i18next mocked to return keys, t('common:units.seconds') => 'common:units.seconds'
+  const sec = 'common:units.seconds'
+  const min = 'common:units.minutes'
+  const hr = 'common:units.hours'
+
   it('formats seconds only', () => {
-    expect(formatDuration(5000)).toBe('common:duration.seconds:5')
+    expect(formatDuration(5000)).toBe(`5${sec}`)
   })
 
   it('formats minutes and seconds', () => {
-    expect(formatDuration(90000)).toBe('common:duration.minutes:1 common:duration.seconds:30')
+    expect(formatDuration(90000)).toBe(`1${min} 30${sec}`)
   })
 
   it('formats minutes only when seconds are 0', () => {
-    expect(formatDuration(120000)).toBe('common:duration.minutes:2')
+    expect(formatDuration(120000)).toBe(`2${min}`)
   })
 
   it('formats hours only', () => {
-    expect(formatDuration(3600000)).toBe('common:duration.hours:1')
+    expect(formatDuration(3600000)).toBe(`1${hr}`)
   })
 
   it('formats hours and minutes (no seconds)', () => {
-    expect(formatDuration(3660000)).toBe('common:duration.hours:1 common:duration.minutes:1')
+    expect(formatDuration(3660000)).toBe(`1${hr} 1${min}`)
   })
 
   it('formats hours and minutes, drops seconds', () => {
-    expect(formatDuration(3661000)).toBe('common:duration.hours:1 common:duration.minutes:1')
+    expect(formatDuration(3661000)).toBe(`1${hr} 1${min}`)
   })
 
-  it('returns 0초 for 0', () => {
-    expect(formatDuration(0)).toBe('common:duration.zeroSeconds')
+  it('returns 0sec for 0', () => {
+    expect(formatDuration(0)).toBe(`0${sec}`)
   })
 
-  it('returns 0초 for negative', () => {
-    expect(formatDuration(-1000)).toBe('common:duration.zeroSeconds')
+  it('returns 0sec for negative', () => {
+    expect(formatDuration(-1000)).toBe(`0${sec}`)
   })
 
   it('handles large durations', () => {
     // 2 hours 30 minutes
-    expect(formatDuration(9000000)).toBe('common:duration.hours:2 common:duration.minutes:30')
+    expect(formatDuration(9000000)).toBe(`2${hr} 30${min}`)
   })
 })
 
@@ -139,28 +149,29 @@ describe('groupSessionsByDate', () => {
 // ── getStudyModeLabel ──
 
 describe('getStudyModeLabel', () => {
-  it('returns SRS for srs', () => {
-    expect(getStudyModeLabel('srs')).toBe('study:mode.srs')
+  // With i18next mocked, t() returns the key itself
+  it('returns translated label for srs', () => {
+    expect(getStudyModeLabel('srs')).toBe('study:modes.srs.label')
   })
 
-  it('returns 순차 복습 for sequential_review', () => {
-    expect(getStudyModeLabel('sequential_review')).toBe('study:mode.sequentialReview')
+  it('returns translated label for sequential_review', () => {
+    expect(getStudyModeLabel('sequential_review')).toBe('study:modes.sequential_review.label')
   })
 
-  it('returns 랜덤 for random', () => {
-    expect(getStudyModeLabel('random')).toBe('study:mode.random')
+  it('returns translated label for random', () => {
+    expect(getStudyModeLabel('random')).toBe('study:modes.random.label')
   })
 
-  it('returns 순차 for sequential', () => {
-    expect(getStudyModeLabel('sequential')).toBe('study:mode.sequential')
+  it('returns translated label for sequential', () => {
+    expect(getStudyModeLabel('sequential')).toBe('study:modes.sequential.label')
   })
 
-  it('returns 날짜별 for by_date', () => {
-    expect(getStudyModeLabel('by_date')).toBe('study:mode.byDate')
+  it('returns translated label for by_date', () => {
+    expect(getStudyModeLabel('by_date')).toBe('study:modes.by_date.label')
   })
 
   it('returns raw mode for unknown', () => {
-    expect(getStudyModeLabel('custom_mode')).toBe('custom_mode')
+    expect(getStudyModeLabel('custom_mode')).toBe('study:modes.custom_mode.label')
   })
 })
 

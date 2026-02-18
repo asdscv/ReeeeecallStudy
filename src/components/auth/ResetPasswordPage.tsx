@@ -42,7 +42,7 @@ export function ResetPasswordPage() {
     setLoading(false)
 
     if (error) {
-      setError(localizeAuthError(error.message))
+      setError(t(localizeAuthError(error.message)))
     } else {
       toast.success(t('resetPassword.success'))
       navigate('/', { replace: true })

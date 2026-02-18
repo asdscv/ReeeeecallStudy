@@ -1,3 +1,4 @@
+import i18next from 'i18next'
 import type { SrsSettings } from '../types/database'
 import { DEFAULT_SRS_SETTINGS } from '../types/database'
 
@@ -116,11 +117,11 @@ export function previewIntervals(card: SrsCardData, settings?: SrsSettings): Rec
 }
 
 function formatInterval(days: number): string {
-  if (days === 0) return 'srs:interval.minutes'
-  if (days === 1) return 'srs:interval.oneDay'
-  if (days < 30) return `srs:interval.days:${days}`
-  if (days < 365) return `srs:interval.months:${Math.round(days / 30)}`
-  return `srs:interval.years:${(days / 365).toFixed(1)}`
+  if (days === 0) return i18next.t('study:interval.lessThanTenMin')
+  if (days === 1) return i18next.t('study:interval.oneDay')
+  if (days < 30) return i18next.t('study:interval.days', { count: days })
+  if (days < 365) return i18next.t('study:interval.months', { count: Math.round(days / 30) })
+  return i18next.t('study:interval.years', { count: parseFloat((days / 365).toFixed(1)) })
 }
 
 function addDays(date: Date, days: number): Date {

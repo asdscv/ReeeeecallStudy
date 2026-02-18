@@ -1,4 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+
+vi.mock('i18next', () => ({
+  default: { t: (key: string, opts?: Record<string, unknown>) => opts?.count !== undefined ? `${key}:${opts.count}` : key },
+}))
+
 import { calculateSRS, previewIntervals, type SrsCardData } from '../srs'
 import type { Card } from '../../types/database'
 
@@ -86,9 +91,9 @@ describe('SrsCardData backward compatibility', () => {
     const data = makeSrsData()
     const preview = previewIntervals(data)
 
-    expect(preview.again).toBe('srs:interval.minutes')
-    expect(preview.hard).toBe('srs:interval.oneDay')
-    expect(preview.good).toBe('srs:interval.oneDay')
-    expect(preview.easy).toBe('srs:interval.days:4')
+    expect(preview.again).toBe('study:interval.lessThanTenMin')
+    expect(preview.hard).toBe('study:interval.oneDay')
+    expect(preview.good).toBe('study:interval.oneDay')
+    expect(preview.easy).toBe('study:interval.days:4')
   })
 })

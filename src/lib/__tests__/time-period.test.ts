@@ -42,10 +42,9 @@ describe('TIME_PERIOD_OPTIONS', () => {
     expect(TIME_PERIOD_OPTIONS).toHaveLength(8)
   })
 
-  it('each option has value, label, and days', () => {
+  it('each option has value and days', () => {
     for (const opt of TIME_PERIOD_OPTIONS) {
       expect(opt.value).toBeTruthy()
-      expect(opt.label).toBeTruthy()
       expect(opt.days).toBeGreaterThan(0)
     }
   })

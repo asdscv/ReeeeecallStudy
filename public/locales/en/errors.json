@@ -13,7 +13,16 @@
     "tooFast": "Too many requests. Try again in {{seconds}}s."
   },
   "quota": {
-    "limitReached": "{{resource}} limit reached ({{current}}/{{limit}})"
+    "limitReached": "{{resource}} limit reached ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Daily API requests",
+      "storage_bytes": "Storage",
+      "cards_total": "Total cards",
+      "decks_total": "Total decks",
+      "templates_total": "Total templates",
+      "study_sessions_daily": "Daily study sessions",
+      "file_uploads_daily": "Daily file uploads"
+    }
   },
   "storage": {
     "imageTooLarge": "Images must be 5MB or less.",
@@ -49,6 +58,9 @@
   "sharing": {
     "invalidOrExpired": "Invalid or expired invite code.",
     "cannotAcceptOwn": "You cannot accept your own deck."
+  },
+  "import": {
+    "invalidFile": "Invalid import file: cards array is missing."
   },
   "fileValidationFailed": "File validation failed",
   "uploadFailed": "Upload failed.",

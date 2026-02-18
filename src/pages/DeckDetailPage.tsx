@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2 } from 'lucide-react'
@@ -16,7 +17,8 @@ import type { Deck, Card, CardTemplate } from '../types/database'
 type TabId = 'cards' | 'upload-date' | 'stats'
 
 export function DeckDetailPage() {
-  const { t } = useTranslation(['decks', 'common'])
+  const { t, i18n } = useTranslation(['decks', 'common'])
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
 
@@ -303,10 +305,10 @@ export function DeckDetailPage() {
               className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
             >
               <option value="all">{t('decks:detail.allStatus')}</option>
-              <option value="new">New</option>
-              <option value="learning">Learning</option>
-              <option value="review">Review</option>
-              <option value="suspended">Suspended</option>
+              <option value="new">{t('common:status.new')}</option>
+              <option value="learning">{t('common:status.learning')}</option>
+              <option value="review">{t('common:status.review')}</option>
+              <option value="suspended">{t('common:status.suspended')}</option>
             </select>
           </div>
 
@@ -412,7 +414,7 @@ export function DeckDetailPage() {
                           <StatusBadge status={card.srs_status} />
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-400">
-                          {formatLocalDate(card.created_at)}
+                          {formatLocalDate(card.created_at, dateLocale)}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">
@@ -477,7 +479,7 @@ export function DeckDetailPage() {
                           </p>
                         ))}
                         <p className="text-xs text-gray-400 mt-1">
-                          {formatLocalDate(card.created_at)}
+                          {formatLocalDate(card.created_at, dateLocale)}
                         </p>
                       </div>
                       <div className="flex items-center gap-0.5 shrink-0">
@@ -638,16 +640,17 @@ export function DeckDetailPage() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    new: { label: 'New', className: 'bg-blue-50 text-blue-700' },
-    learning: { label: 'Learning', className: 'bg-amber-50 text-amber-700' },
-    review: { label: 'Review', className: 'bg-green-50 text-green-700' },
-    suspended: { label: 'Suspended', className: 'bg-gray-100 text-gray-500' },
+  const styles: Record<string, string> = {
+    new: 'bg-blue-50 text-blue-700',
+    learning: 'bg-amber-50 text-amber-700',
+    review: 'bg-green-50 text-green-700',
+    suspended: 'bg-gray-100 text-gray-500',
   }
-  const c = config[status] ?? config.new
+  const className = styles[status] ?? styles.new
+  const label = i18next.t(`common:status.${status}`, { defaultValue: status })
   return (
-    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${c.className}`}>
-      {c.label}
+    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${className}`}>
+      {label}
     </span>
   )
 }

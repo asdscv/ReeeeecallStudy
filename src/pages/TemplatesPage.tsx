@@ -70,7 +70,7 @@ export function TemplatesPage() {
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
-          {error}
+          {t(error)}
         </div>
       )}
 
@@ -107,7 +107,7 @@ export function TemplatesPage() {
         title={t('deleteTemplate')}
         message={
           deleteError
-            ? deleteError
+            ? t(deleteError)
             : t('deleteConfirm', { name: deletingTemplate?.name })
         }
         confirmLabel={t('common:delete')}
@@ -129,7 +129,8 @@ function TemplateCard({
   onDelete: () => void
   onDuplicate: () => void
 }) {
-  const { t } = useTranslation('templates')
+  const { t, i18n } = useTranslation('templates')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const [showMenu, setShowMenu] = useState(false)
 
   return (
@@ -162,7 +163,7 @@ function TemplateCard({
           <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-gray-400">
             <span>{t('frontFields', { count: template.front_layout.length })}</span>
             <span>{t('backFields', { count: template.back_layout.length })}</span>
-            <span>{t('created', { date: formatLocalDate(template.created_at) })}</span>
+            <span>{t('created', { date: formatLocalDate(template.created_at, dateLocale) })}</span>
           </div>
         </div>
 

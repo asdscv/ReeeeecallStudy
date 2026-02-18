@@ -47,7 +47,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
   createCard: async (input) => {
     const check = guard.check('card_create', 'cards_total')
-    if (!check.allowed) { set({ error: check.message ?? 'errors:rateLimit.reached' }); return null }
+    if (!check.allowed) { set({ error: check.message ?? 'errors:card.rateLimitReached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
@@ -60,7 +60,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       .single()
 
     if (deck && (deck as { is_readonly: boolean }).is_readonly) {
-      set({ error: 'errors:card.readonlyDeckAdd' })
+      set({ error: 'errors:card.readonlyDeckNoAdd' })
       return null
     }
 
@@ -109,7 +109,7 @@ export const useCardStore = create<CardState>((set, get) => ({
         .eq('id', existingCard.deck_id)
         .single()
       if (deck && (deck as { is_readonly: boolean }).is_readonly) {
-        set({ error: 'errors:card.readonlyDeckEdit' })
+        set({ error: 'errors:card.readonlyDeckNoEdit' })
         return
       }
     }

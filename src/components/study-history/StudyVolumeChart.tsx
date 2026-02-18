@@ -8,7 +8,8 @@ interface StudyVolumeChartProps {
 }
 
 export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
-  const { t } = useTranslation('history')
+  const { t, i18n } = useTranslation('history')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
 
   const tickInterval = Math.max(1, Math.floor(data.length / 6))
 
@@ -37,7 +38,7 @@ export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
               dataKey="date"
               tick={{ fontSize: 10 }}
               ticks={tickDates}
-              tickFormatter={(date: string) => formatDateKeyShort(date)}
+              tickFormatter={(date: string) => formatDateKeyShort(date, dateLocale)}
             />
             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={25} />
             <Tooltip

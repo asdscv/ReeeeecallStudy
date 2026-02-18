@@ -80,6 +80,12 @@
     "cardCountLabel": "{{count}} cards",
     "performance": "Performance"
   },
+  "ratings": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
   "units": {
     "sessions": "sessions",
     "cards": "cards",

@@ -80,6 +80,12 @@
     "cardCountLabel": "{{count}}장",
     "performance": "성과"
   },
+  "ratings": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "좋음",
+    "easy": "쉬움"
+  },
   "units": {
     "sessions": "세션",
     "cards": "장",

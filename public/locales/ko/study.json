@@ -95,5 +95,18 @@
   },
   "datePicker": {
     "weekdays": ["일", "월", "화", "수", "목", "금", "토"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10분",
+    "oneDay": "1일",
+    "days": "{{count}}일",
+    "months": "{{count}}개월",
+    "years": "{{count}}년"
+  },
+  "srsRating": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "좋음",
+    "easy": "쉬움"
   }
 }

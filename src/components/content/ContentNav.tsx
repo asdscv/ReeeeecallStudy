@@ -12,7 +12,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
-      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between py-3">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between py-3">
         <div className="flex items-center gap-4">
           {backTo && (
             <Link
@@ -33,7 +33,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
             to="/auth/login"
             className="text-sm text-gray-600 hover:text-gray-900 transition no-underline"
           >
-            {t('hero.cta.learn', 'Log in')}
+            {t('nav.login')}
           </Link>
           <Link
             to="/auth/login"

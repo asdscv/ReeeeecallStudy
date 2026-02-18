@@ -16,10 +16,10 @@ import {
 import type { Profile } from '../types/database'
 
 const SWIPE_DIRECTIONS: { key: keyof SwipeDirectionMap; labelKey: string; icon: typeof ArrowLeft }[] = [
-  { key: 'left', labelKey: 'settings.answerMode.swipeLeft', icon: ArrowLeft },
-  { key: 'right', labelKey: 'settings.answerMode.swipeRight', icon: ArrowRight },
-  { key: 'up', labelKey: 'settings.answerMode.swipeUp', icon: ArrowUp },
-  { key: 'down', labelKey: 'settings.answerMode.swipeDown', icon: ArrowDown },
+  { key: 'left', labelKey: 'answerMode.swipeLeft', icon: ArrowLeft },
+  { key: 'right', labelKey: 'answerMode.swipeRight', icon: ArrowRight },
+  { key: 'up', labelKey: 'answerMode.swipeUp', icon: ArrowUp },
+  { key: 'down', labelKey: 'answerMode.swipeDown', icon: ArrowDown },
 ]
 
 function CopyButton({ text }: { text: string }) {
@@ -45,7 +45,8 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function SettingsPage() {
-  const { t } = useTranslation('settings')
+  const { t, i18n } = useTranslation('settings')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
 
@@ -138,7 +139,7 @@ export function SettingsPage() {
     const { validateKeyName, generateApiKey: genKey, hashApiKey } = await import('../lib/api-key')
     const nameResult = validateKeyName(newKeyName)
     if (!nameResult.valid) {
-      toast.error(nameResult.error!)
+      toast.error(t(nameResult.error!))
       return
     }
     const name = newKeyName.trim()
@@ -162,7 +163,7 @@ export function SettingsPage() {
         } as Record<string, unknown>)
 
       if (error) {
-        toast.error(t('apiKey.generateError') + ': ' + error.message)
+        toast.error(t('apiKey.generateError'))
         return
       }
 
@@ -473,7 +474,7 @@ export function SettingsPage() {
               {/* Dates */}
               <div className="space-y-0.5">
                 <p className="text-sm text-gray-400">
-                  {t('apiKey.createdAt')}: {formatLocalDateTime(apiKeyData.createdAt)}
+                  {t('apiKey.createdAt')}: {formatLocalDateTime(apiKeyData.createdAt, dateLocale)}
                 </p>
               </div>
             </div>

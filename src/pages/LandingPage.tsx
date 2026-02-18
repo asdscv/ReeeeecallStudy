@@ -50,8 +50,8 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
-        title="ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition"
-        description="Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
+        title={t('seo.title')}
+        description={t('seo.description')}
         ogImage="/favicon.png"
         ogType="website"
         canonicalUrl="https://reeeeecallstudy.com"
@@ -231,7 +231,7 @@ export function LandingPage() {
               <Link to="/docs/api" className="hover:text-gray-700 transition no-underline">{t('footer.apiDocs')}</Link>
             </div>
             <p className="text-sm text-gray-400">
-              &copy; 2026 ReeeeecallStudy. All rights reserved.
+              {t('footer.copyright')}
             </p>
           </div>
         </div>

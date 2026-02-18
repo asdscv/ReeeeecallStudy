@@ -149,7 +149,8 @@ export function formatRelativeTime(timestamp: string, locale = 'en-US'): string 
  * Format a YYYY-MM-DD date key as short "M/D" string (for chart ticks).
  * e.g., "2026-02-15" → "2/15"
  */
-export function formatDateKeyShort(dateKey: string): string {
-  const [, month, day] = dateKey.split('-').map(Number)
-  return `${month}/${day}`
+export function formatDateKeyShort(dateKey: string, locale = 'en-US'): string {
+  const [year, month, day] = dateKey.split('-').map(Number)
+  const d = new Date(year, month - 1, day)
+  return d.toLocaleDateString(locale, { month: 'numeric', day: 'numeric' })
 }

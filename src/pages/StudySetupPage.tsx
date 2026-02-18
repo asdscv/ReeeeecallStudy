@@ -147,8 +147,8 @@ export function StudySetupPage() {
               <div className="flex items-start gap-3">
                 <div className="text-2xl">{opt.emoji}</div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900 text-sm">{opt.label}</div>
-                  <div className="text-xs text-gray-500">{opt.desc}</div>
+                  <div className="font-medium text-gray-900 text-sm">{t(opt.label)}</div>
+                  <div className="text-xs text-gray-500">{t(opt.desc)}</div>
                 </div>
               </div>
             </button>

@@ -140,9 +140,9 @@ export function DeckEditPage() {
   const streak = getStreakDays(studyLogs)
 
   const pieData = [
-    { name: 'New', value: deckStats.newCount, color: STATUS_COLORS.new },
-    { name: 'Learning', value: deckStats.learningCount, color: STATUS_COLORS.learning },
-    { name: 'Review', value: deckStats.reviewCount, color: STATUS_COLORS.review },
+    { name: t('common:status.new'), value: deckStats.newCount, color: STATUS_COLORS.new },
+    { name: t('common:status.learning'), value: deckStats.learningCount, color: STATUS_COLORS.learning },
+    { name: t('common:status.review'), value: deckStats.reviewCount, color: STATUS_COLORS.review },
   ].filter((d) => d.value > 0)
 
   return (

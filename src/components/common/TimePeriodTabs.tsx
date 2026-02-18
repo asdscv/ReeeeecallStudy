@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { TIME_PERIOD_OPTIONS, type TimePeriod } from '../../lib/time-period'
 
 interface TimePeriodTabsProps {
@@ -6,6 +7,8 @@ interface TimePeriodTabsProps {
 }
 
 export function TimePeriodTabs({ value, onChange }: TimePeriodTabsProps) {
+  const { t } = useTranslation('common')
+
   return (
     <div className="overflow-x-auto -mx-1 px-1">
       <div className="flex rounded-lg border border-gray-200 overflow-hidden w-max">
@@ -20,7 +23,7 @@ export function TimePeriodTabs({ value, onChange }: TimePeriodTabsProps) {
                 : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
-            {opt.label}
+            {t(`timePeriod.${opt.value}`)}
           </button>
         ))}
       </div>

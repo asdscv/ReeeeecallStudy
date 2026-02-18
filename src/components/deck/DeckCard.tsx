@@ -23,7 +23,8 @@ interface DeckCardProps {
 export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const { t } = useTranslation('decks')
+  const { t, i18n } = useTranslation('decks')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
 
   const totalCards = stats?.total_cards ?? 0
   const dueCards = (stats?.review_cards ?? 0) + (stats?.learning_cards ?? 0)
@@ -31,7 +32,7 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
 
   const formatLastStudied = (dateStr: string | null) => {
     if (!dateStr) return t('card.noStudyRecord')
-    return formatRelativeTime(dateStr)
+    return formatRelativeTime(dateStr, dateLocale)
   }
 
   const goToDetail = () => navigate(`/decks/${deck.id}`)

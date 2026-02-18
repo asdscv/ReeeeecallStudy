@@ -129,7 +129,7 @@ export function MarketplaceDetailPage() {
         <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
           <span>{t('marketplace:detail.cardCount', { count: listing.card_count })}</span>
           <span>{t('marketplace:detail.userCount', { count: listing.acquire_count })}</span>
-          <span>{listing.category}</span>
+          <span>{t('marketplace:categories.' + listing.category, listing.category)}</span>
         </div>
 
         {!isOwner && (
@@ -142,7 +142,7 @@ export function MarketplaceDetailPage() {
           </button>
         )}
 
-        {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+        {error && <p className="text-sm text-red-600 mt-2">{t(error)}</p>}
       </div>
 
       {/* Card preview */}

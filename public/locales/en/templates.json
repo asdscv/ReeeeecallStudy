@@ -91,5 +91,19 @@
     "hint": "Small hint",
     "detail": "Detail info",
     "media": "Image/Audio"
+  },
+  "fontSize": {
+    "extraSmall": "Extra Small (12px)",
+    "small": "Small (14px)",
+    "default": "Default (16px)",
+    "18px": "18px",
+    "20px": "20px",
+    "medium": "Medium (24px)",
+    "28px": "28px",
+    "large": "Large (32px)",
+    "40px": "40px",
+    "extraLarge": "Extra Large (48px)",
+    "56px": "56px",
+    "max": "Max (64px)"
   }
 }

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import i18next from 'i18next'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
 import type { CardTemplate, TemplateField, LayoutItem, LayoutMode } from '../types/database'
@@ -53,7 +54,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
 
   createTemplate: async (input) => {
     const check = guard.check('card_create', 'templates_total')
-    if (!check.allowed) { set({ error: check.message ?? 'errors:rateLimit.reached' }); return null }
+    if (!check.allowed) { set({ error: check.message ?? 'errors:template.rateLimitReached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
@@ -114,7 +115,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       .eq('default_template_id', id)
 
     if (decks && decks.length > 0) {
-      set({ error: 'errors:template.inUseByDecks' })
+      set({ error: i18next.t('errors:template.inUseByDecks', { count: decks.length }) })
       return false
     }
 
@@ -143,7 +144,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       .from('card_templates')
       .insert({
         user_id: user.id,
-        name: `${original.name} (Copy)`,
+        name: `${original.name} (${i18next.t('common:duplicate')})`,
         fields: original.fields,
         front_layout: original.front_layout,
         back_layout: original.back_layout,

@@ -1,3 +1,5 @@
+import i18next from 'i18next'
+
 export type ShareMode = 'copy' | 'subscribe' | 'snapshot'
 
 const VALID_SHARE_MODES: ShareMode[] = ['copy', 'subscribe', 'snapshot']
@@ -40,16 +42,16 @@ export function canUserModifyDeck(deck: ShareableDeck, userId: string): boolean 
 }
 
 export function getDeckShareLabel(deck: ShareableDeck, _userId: string): string {
-  if (!deck.share_mode || !deck.source_owner_id) return 'sharing:deckLabel.myDeck'
+  if (!deck.share_mode || !deck.source_owner_id) return i18next.t('sharing:deckLabel.myDeck')
 
   switch (deck.share_mode) {
     case 'subscribe':
-      return 'sharing:deckLabel.subscribed'
+      return i18next.t('sharing:deckLabel.subscribed')
     case 'snapshot':
-      return 'sharing:deckLabel.snapshot'
+      return i18next.t('sharing:deckLabel.snapshot')
     case 'copy':
-      return 'sharing:deckLabel.copy'
+      return i18next.t('sharing:deckLabel.copy')
     default:
-      return 'sharing:deckLabel.myDeck'
+      return i18next.t('sharing:deckLabel.myDeck')
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock, Layers, TrendingUp, BarChart3, Zap, Target } from 'lucide-react'
@@ -93,7 +94,11 @@ export function SessionDetailPage() {
   const isSrs = session.study_mode === 'srs'
 
   const completedAt = new Date(session.completed_at)
-  const dateStr = `${completedAt.getFullYear()}. ${completedAt.getMonth() + 1}. ${completedAt.getDate()}. ${String(completedAt.getHours()).padStart(2, '0')}:${String(completedAt.getMinutes()).padStart(2, '0')}`
+  const sessionLocale = i18next.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateStr = completedAt.toLocaleString(sessionLocale, {
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -431,28 +436,23 @@ function getCardPreview(card?: Card): string {
 }
 
 function RatingBadge({ rating }: { rating: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    again: { label: 'Again', className: 'bg-red-50 text-red-600 border-red-200' },
-    hard: { label: 'Hard', className: 'bg-orange-50 text-orange-600 border-orange-200' },
-    good: { label: 'Good', className: 'bg-green-50 text-green-700 border-green-200' },
-    easy: { label: 'Easy', className: 'bg-blue-50 text-blue-600 border-blue-200' },
+  const styles: Record<string, string> = {
+    again: 'bg-red-50 text-red-600 border-red-200',
+    hard: 'bg-orange-50 text-orange-600 border-orange-200',
+    good: 'bg-green-50 text-green-700 border-green-200',
+    easy: 'bg-blue-50 text-blue-600 border-blue-200',
   }
-  const c = config[rating] ?? { label: rating, className: 'bg-gray-50 text-gray-600 border-gray-200' }
+  const className = styles[rating] ?? 'bg-gray-50 text-gray-600 border-gray-200'
+  const label = i18next.t(`history:ratings.${rating}`, { defaultValue: rating })
   return (
-    <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded border ${c.className}`}>
-      {c.label}
+    <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded border ${className}`}>
+      {label}
     </span>
   )
 }
 
 function getRatingLabel(rating: string): string {
-  const labels: Record<string, string> = {
-    again: 'Again',
-    hard: 'Hard',
-    good: 'Good',
-    easy: 'Easy',
-  }
-  return labels[rating] ?? rating
+  return i18next.t(`history:ratings.${rating}`, { defaultValue: rating })
 }
 
 function getRatingBarColor(rating: string): string {

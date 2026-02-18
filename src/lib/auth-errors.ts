@@ -3,11 +3,11 @@ const errorMap: Record<string, string> = {
   'Email not confirmed': 'errors:auth.emailNotConfirmed',
   'User already registered': 'errors:auth.userAlreadyRegistered',
   'Password should be at least 6 characters': 'errors:auth.passwordTooShort',
-  'Email rate limit exceeded': 'errors:auth.rateLimitExceeded',
+  'Email rate limit exceeded': 'errors:auth.emailRateLimit',
   'For security purposes, you can only request this after':
-    'errors:auth.securityCooldown',
+    'errors:auth.securityDelay',
   'New password should be different from the old password':
-    'errors:auth.samePassword',
+    'errors:auth.newPasswordSameAsOld',
   'Unable to validate email address: invalid format':
     'errors:auth.invalidEmailFormat',
 }

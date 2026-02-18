@@ -77,7 +77,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     const fieldType = field.type as 'image' | 'audio'
     const validation = validateFile(file, fieldType)
     if (!validation.valid) {
-      setFileError(validation.error ?? t('fileValidationFailed'))
+      setFileError(validation.error ?? 'cards:fileValidationFailed')
       return
     }
 
@@ -100,7 +100,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
         pendingFilesRef.current[field.key] = file
       }
     } catch (e) {
-      setFileError(e instanceof Error ? e.message : t('uploadFailed'))
+      setFileError(e instanceof Error ? e.message : 'cards:uploadFailed')
     } finally {
       setUploadingField(null)
     }
@@ -207,7 +207,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
           <form onSubmit={handleSubmit} className="space-y-4">
             {fileError && (
               <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">
-                {fileError}
+                {t(fileError)}
               </div>
             )}
 

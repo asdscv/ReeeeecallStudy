@@ -22,12 +22,12 @@ const FIELD_TYPES: { value: TemplateField['type']; labelKey: string }[] = [
   { value: 'audio', labelKey: 'templates:fieldTypes.audio' },
 ]
 
-const STYLE_OPTIONS: { value: LayoutItem['style']; label: string; descKey: string }[] = [
-  { value: 'primary', label: 'Primary', descKey: 'templates:styleOptions.primary' },
-  { value: 'secondary', label: 'Secondary', descKey: 'templates:styleOptions.secondary' },
-  { value: 'hint', label: 'Hint', descKey: 'templates:styleOptions.hint' },
-  { value: 'detail', label: 'Detail', descKey: 'templates:styleOptions.detail' },
-  { value: 'media', label: 'Media', descKey: 'templates:styleOptions.media' },
+const STYLE_OPTIONS: { value: LayoutItem['style']; labelKey: string; descKey: string }[] = [
+  { value: 'primary', labelKey: 'templates:styleOptions.primary', descKey: 'templates:styleOptions.primary' },
+  { value: 'secondary', labelKey: 'templates:styleOptions.secondary', descKey: 'templates:styleOptions.secondary' },
+  { value: 'hint', labelKey: 'templates:styleOptions.hint', descKey: 'templates:styleOptions.hint' },
+  { value: 'detail', labelKey: 'templates:styleOptions.detail', descKey: 'templates:styleOptions.detail' },
+  { value: 'media', labelKey: 'templates:styleOptions.media', descKey: 'templates:styleOptions.media' },
 ]
 
 function generateKey(): string {
@@ -345,7 +345,7 @@ function LayoutEditor({
                     }`}
                     title={t(style.descKey)}
                   >
-                    {style.label}
+                    {t(style.labelKey)}
                   </button>
                 ))}
               </div>

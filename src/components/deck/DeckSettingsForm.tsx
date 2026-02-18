@@ -8,11 +8,11 @@ export const COLORS = [
 
 export const ICONS = ['📚', '📖', '🇨🇳', '🇺🇸', '🇯🇵', '🧠', '💡', '📝']
 
-export const SRS_FIELDS: { key: keyof SrsSettings; label: string; color: string }[] = [
-  { key: 'again_days', label: 'Again', color: 'text-red-500' },
-  { key: 'hard_days', label: 'Hard', color: 'text-amber-500' },
-  { key: 'good_days', label: 'Good', color: 'text-blue-500' },
-  { key: 'easy_days', label: 'Easy', color: 'text-green-500' },
+export const SRS_FIELDS: { key: keyof SrsSettings; labelKey: string; color: string }[] = [
+  { key: 'again_days', labelKey: 'study:srsRating.again', color: 'text-red-500' },
+  { key: 'hard_days', labelKey: 'study:srsRating.hard', color: 'text-amber-500' },
+  { key: 'good_days', labelKey: 'study:srsRating.good', color: 'text-blue-500' },
+  { key: 'easy_days', labelKey: 'study:srsRating.easy', color: 'text-green-500' },
 ]
 
 export interface DeckSettingsFormValues {
@@ -137,10 +137,10 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           {t('settings.srsInterval')}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {SRS_FIELDS.map(({ key, label, color: clr }) => (
+          {SRS_FIELDS.map(({ key, labelKey, color: clr }) => (
             <div key={key} className="text-center">
               <label className={`block text-xs font-semibold mb-1 ${clr}`}>
-                {label}
+                {t(labelKey)}
               </label>
               <input
                 type="number"

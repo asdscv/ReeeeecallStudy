@@ -9,12 +9,12 @@ import { renderCustomHTML } from '../lib/template-renderer'
 import { FONT_SIZE_OPTIONS, getLayoutItemStyle, DEFAULT_FONT_SIZES } from '../lib/layout-styles'
 import type { TemplateField, LayoutItem, LayoutMode } from '../types/database'
 
-const STYLE_OPTIONS: { value: LayoutItem['style']; label: string }[] = [
-  { value: 'primary', label: 'Primary' },
-  { value: 'secondary', label: 'Secondary' },
-  { value: 'hint', label: 'Hint' },
-  { value: 'detail', label: 'Detail' },
-  { value: 'media', label: 'Media' },
+const STYLE_OPTIONS: { value: LayoutItem['style']; labelKey: string }[] = [
+  { value: 'primary', labelKey: 'styleOptions.primary' },
+  { value: 'secondary', labelKey: 'styleOptions.secondary' },
+  { value: 'hint', labelKey: 'styleOptions.hint' },
+  { value: 'detail', labelKey: 'styleOptions.detail' },
+  { value: 'media', labelKey: 'styleOptions.media' },
 ]
 
 function getTtsLanguages(t: (key: string) => string) {
@@ -612,7 +612,7 @@ function LayoutSection({
             >
               {STYLE_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>
-                  {s.label}
+                  {t(s.labelKey)}
                 </option>
               ))}
             </select>
@@ -630,7 +630,7 @@ function LayoutSection({
               </option>
               {FONT_SIZE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(opt.label)}
                 </option>
               ))}
             </select>

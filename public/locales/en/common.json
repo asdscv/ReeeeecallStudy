@@ -47,6 +47,7 @@
     "sessions": "sessions",
     "items": "items",
     "days": "days",
+    "hours": "h",
     "minutes": "min",
     "seconds": "sec",
     "times": "times",

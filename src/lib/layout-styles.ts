@@ -24,18 +24,18 @@ export interface LayoutItemStyleResult {
  * Each option has a pixel value and a human-readable label.
  */
 export const FONT_SIZE_OPTIONS: { value: number; label: string }[] = [
-  { value: 12, label: 'template:fontSize.extraSmall' },
-  { value: 14, label: 'template:fontSize.small' },
-  { value: 16, label: 'template:fontSize.default' },
-  { value: 18, label: 'template:fontSize.18px' },
-  { value: 20, label: 'template:fontSize.20px' },
-  { value: 24, label: 'template:fontSize.medium' },
-  { value: 28, label: 'template:fontSize.28px' },
-  { value: 32, label: 'template:fontSize.large' },
-  { value: 40, label: 'template:fontSize.40px' },
-  { value: 48, label: 'template:fontSize.extraLarge' },
-  { value: 56, label: 'template:fontSize.56px' },
-  { value: 64, label: 'template:fontSize.max' },
+  { value: 12, label: 'templates:fontSize.extraSmall' },
+  { value: 14, label: 'templates:fontSize.small' },
+  { value: 16, label: 'templates:fontSize.default' },
+  { value: 18, label: 'templates:fontSize.18px' },
+  { value: 20, label: 'templates:fontSize.20px' },
+  { value: 24, label: 'templates:fontSize.medium' },
+  { value: 28, label: 'templates:fontSize.28px' },
+  { value: 32, label: 'templates:fontSize.large' },
+  { value: 40, label: 'templates:fontSize.40px' },
+  { value: 48, label: 'templates:fontSize.extraLarge' },
+  { value: 56, label: 'templates:fontSize.56px' },
+  { value: 64, label: 'templates:fontSize.max' },
 ]
 
 /**

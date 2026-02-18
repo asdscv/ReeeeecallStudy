@@ -8,13 +8,14 @@ interface DailyStudyChartProps {
 }
 
 export function DailyStudyChart({ data, title }: DailyStudyChartProps) {
-  const { t } = useTranslation('dashboard')
+  const { t, i18n } = useTranslation('dashboard')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const displayTitle = title ?? t('dailyChart.title')
   const tickInterval = Math.max(1, Math.floor(data.length / 6))
 
   const chartData = data.map((d, i) => {
     const label = i % tickInterval === 0 || i === data.length - 1
-      ? formatDateKeyShort(d.date)
+      ? formatDateKeyShort(d.date, dateLocale)
       : ''
     return { ...d, label }
   })

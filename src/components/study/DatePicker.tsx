@@ -10,7 +10,8 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DatePickerProps) {
-  const { t } = useTranslation('study')
+  const { t, i18n } = useTranslation('study')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const [currentMonth, setCurrentMonth] = useState(() => {
     const date = selectedDate ? new Date(selectedDate) : new Date()
     return new Date(date.getFullYear(), date.getMonth(), 1)
@@ -63,7 +64,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
           <ChevronLeft className="w-4 h-4" />
         </button>
         <div className="font-medium text-sm">
-          {currentMonth.toLocaleDateString('ko-KR', {
+          {currentMonth.toLocaleDateString(dateLocale, {
             year: 'numeric',
             month: 'long',
           })}

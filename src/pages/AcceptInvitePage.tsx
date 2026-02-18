@@ -43,7 +43,7 @@ export function AcceptInvitePage() {
               {t('acceptInvite.inviteCode')}: <span className="font-mono font-medium text-gray-700">{inviteCode}</span>
             </p>
 
-            {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+            {error && <p className="text-sm text-red-600 mb-4">{t(error)}</p>}
 
             <button
               onClick={handleAccept}

@@ -1,4 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+
+vi.mock('i18next', () => ({
+  default: { t: (key: string, opts?: Record<string, unknown>) => opts?.count !== undefined ? `${key}:${opts.count}` : key },
+}))
+
 import { calculateSRS, previewIntervals } from '../srs'
 import type { Card } from '../../types/database'
 
@@ -197,18 +202,18 @@ describe('previewIntervals', () => {
     const card = makeCard()
     const preview = previewIntervals(card)
 
-    expect(preview.again).toBe('srs:interval.minutes')
-    expect(preview.hard).toBe('srs:interval.oneDay')
-    expect(preview.good).toBe('srs:interval.oneDay')
-    expect(preview.easy).toBe('srs:interval.days:4')
+    expect(preview.again).toBe('study:interval.lessThanTenMin')
+    expect(preview.hard).toBe('study:interval.oneDay')
+    expect(preview.good).toBe('study:interval.oneDay')
+    expect(preview.easy).toBe('study:interval.days:4')
   })
 
   it('should show larger intervals for reviewed cards', () => {
     const card = makeCard({ ease_factor: 2.5, repetitions: 3, interval_days: 10 })
     const preview = previewIntervals(card)
 
-    expect(preview.again).toBe('srs:interval.minutes')
-    expect(preview.hard).toBe('srs:interval.days:12')
-    expect(preview.good).toBe('srs:interval.days:25')  // round(10 * 2.5) = 25
+    expect(preview.again).toBe('study:interval.lessThanTenMin')
+    expect(preview.hard).toBe('study:interval.days:12')
+    expect(preview.good).toBe('study:interval.days:25')  // round(10 * 2.5) = 25
   })
 })

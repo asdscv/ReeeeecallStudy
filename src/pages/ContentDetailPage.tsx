@@ -40,7 +40,7 @@ export function ContentDetailPage() {
         />
         <div className="max-w-3xl mx-auto px-4 py-20 text-center">
           <p className="text-gray-400 text-lg">
-            {detailError || 'Article not found'}
+            {t('detail.notFound')}
           </p>
         </div>
       </div>
@@ -76,7 +76,7 @@ export function ContentDetailPage() {
               <span className="font-bold text-gray-900">ReeeeecallStudy</span>
             </div>
             <p className="text-sm text-gray-400">
-              &copy; 2026 ReeeeecallStudy. All rights reserved.
+              {t('landing:footer.copyright')}
             </p>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import i18next from 'i18next'
 import type { ContentDetail } from '../types/content-blocks'
 
 const SITE_URL = 'https://reeeeecallstudy.com'
@@ -31,15 +32,12 @@ export function buildArticleJsonLd(article: ContentDetail) {
   }
 }
 
-export function buildCollectionPageJsonLd(locale: string) {
+export function buildCollectionPageJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: locale === 'ko' ? '학습 인사이트 | ReeeCall' : 'Learning Insights | ReeeCall',
-    description:
-      locale === 'ko'
-        ? '과학적으로 검증된 학습 전략과 간격 반복 팁을 알아보세요.'
-        : 'Discover science-backed learning strategies and spaced repetition tips.',
+    name: i18next.t('content:seo.listTitle'),
+    description: i18next.t('content:seo.listDescription'),
     url: `${SITE_URL}/content`,
   }
 }
@@ -51,7 +49,7 @@ export function buildWebApplicationJsonLd() {
     name: 'ReeeeecallStudy',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
-    description: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm',
+    description: i18next.t('landing:hero.description', { defaultValue: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm' }),
     url: SITE_URL,
     offers: {
       '@type': 'Offer',

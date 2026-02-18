@@ -2,6 +2,8 @@
 // Centralized module for answer input mode (button vs swipe).
 // Consolidates SwipeSettings from 3 files into one source of truth.
 
+import i18next from 'i18next'
+
 export type AnswerInputMode = 'button' | 'swipe'
 export type SwipeAction = 'again' | 'hard' | 'good' | 'easy' | ''
 
@@ -49,11 +51,8 @@ const ACTION_COLORS: Record<string, string> = {
   easy: 'rgba(59, 130, 246, VAR)',   // blue-500
 }
 
-const ACTION_LABELS: Record<string, string> = {
-  again: 'Again',
-  hard: 'Hard',
-  good: 'Good',
-  easy: 'Easy',
+function getActionLabel(action: string): string {
+  return i18next.t(`study:srsRating.${action}`, { defaultValue: action })
 }
 
 // ── Validators ───────────────────────────────────────
@@ -169,7 +168,7 @@ export function buildSwipeHintParts(dirs: SwipeDirectionMap): { arrow: string; l
   for (const d of order) {
     const action = dirs[d]
     if (action) {
-      parts.push({ arrow: DIRECTION_ARROWS[d], label: ACTION_LABELS[action] })
+      parts.push({ arrow: DIRECTION_ARROWS[d], label: getActionLabel(action) })
     }
   }
   return parts
@@ -251,7 +250,7 @@ export function previewSwipeAction(
   const progress = Math.min(1, Math.max(0, (distance - DEAD_ZONE) / (SWIPE_THRESHOLD - DEAD_ZONE)))
   const colorTemplate = ACTION_COLORS[action]
   const color = colorTemplate ? colorTemplate.replace('VAR', String(progress * 0.4)) : 'transparent'
-  const label = ACTION_LABELS[action] ?? ''
+  const label = getActionLabel(action) ?? ''
 
   return { action, direction, progress, color, label }
 }

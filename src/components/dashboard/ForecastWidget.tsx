@@ -13,7 +13,7 @@ export function ForecastWidget({ data }: ForecastWidgetProps) {
   const chartData = data.map((d) => {
     const date = localDateKeyToDate(d.date)
     const dayLabel = date.toLocaleDateString(locale, { weekday: 'short' })
-    const dateLabel = formatDateKeyShort(d.date)
+    const dateLabel = formatDateKeyShort(d.date, locale)
     return { ...d, label: `${dateLabel}(${dayLabel})` }
   })
 

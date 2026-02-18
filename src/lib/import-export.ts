@@ -104,7 +104,7 @@ export function parseImportJSON(jsonString: string): ImportJSONResult {
   const data = JSON.parse(jsonString)
 
   if (!data.cards || !Array.isArray(data.cards)) {
-    throw new Error('Invalid import file: cards array is missing')
+    throw new Error('errors:import.invalidFile')
   }
 
   return {

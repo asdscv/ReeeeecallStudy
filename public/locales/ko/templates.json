@@ -91,5 +91,19 @@
     "hint": "\uc791\uc740 \ud78c\ud2b8",
     "detail": "\uc0c1\uc138 \uc815\ubcf4",
     "media": "\uc774\ubbf8\uc9c0/\uc624\ub514\uc624"
+  },
+  "fontSize": {
+    "extraSmall": "\ub9e4\uc6b0 \uc791\uac8c (12px)",
+    "small": "\uc791\uac8c (14px)",
+    "default": "\uae30\ubcf8 (16px)",
+    "18px": "18px",
+    "20px": "20px",
+    "medium": "\uc911\uac04 (24px)",
+    "28px": "28px",
+    "large": "\ud06c\uac8c (32px)",
+    "40px": "40px",
+    "extraLarge": "\ub9e4\uc6b0 \ud06c\uac8c (48px)",
+    "56px": "56px",
+    "max": "\ucd5c\ub300 (64px)"
   }
 }

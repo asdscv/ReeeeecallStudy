@@ -23,22 +23,20 @@ export function ContentListPage() {
     fetchContents(true)
   }, [fetchContents, i18n.language])
 
-  const locale = i18n.language?.startsWith('ko') ? 'ko' : 'en'
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <SEOHead
         title={t('seo.listTitle')}
         description={t('seo.listDescription')}
         ogType="website"
         canonicalUrl="https://reeeeecallstudy.com/content"
-        jsonLd={buildCollectionPageJsonLd(locale)}
+        jsonLd={buildCollectionPageJsonLd()}
       />
-      <ContentNav />
+      <ContentNav backTo="/" />
 
-      <main className="max-w-6xl mx-auto px-4 py-10 sm:py-16">
-        <div className="text-center mb-10 sm:mb-14">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3">
+      <main className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
+        <div className="text-center mb-10 sm:mb-14 pb-12">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-3">
             {t('list.title')}
           </h1>
           <p className="text-gray-500 text-base sm:text-lg">
@@ -59,9 +57,9 @@ export function ContentListPage() {
 
         {/* Masonry grid */}
         {items.length > 0 && (
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
             {items.map((item) => (
-              <div key={item.id} className="break-inside-avoid mb-4">
+              <div key={item.id} className="break-inside-avoid mb-5">
                 <ContentCard content={item} />
               </div>
             ))}

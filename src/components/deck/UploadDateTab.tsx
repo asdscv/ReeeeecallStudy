@@ -10,7 +10,8 @@ interface UploadDateTabProps {
 }
 
 export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProps) {
-  const { t } = useTranslation('decks')
+  const { t, i18n } = useTranslation('decks')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const groups = groupCardsByDate(cards)
   const displayFields = template?.fields.slice(0, 2) ?? []
 
@@ -46,7 +47,7 @@ export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProp
                     </span>
                   ))}
                   <span className="text-xs text-gray-400 shrink-0">
-                    {formatLocalTime(card.created_at, 'ko-KR', {
+                    {formatLocalTime(card.created_at, dateLocale, {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}

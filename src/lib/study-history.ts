@@ -1,8 +1,10 @@
+import i18next from 'i18next'
 import type { StudySession, StudyLog } from '../types/database'
 
 /** Format milliseconds to human-readable duration string */
 export function formatDuration(ms: number): string {
-  if (ms <= 0) return 'common:duration.zeroSeconds'
+  const sec = i18next.t('common:units.seconds')
+  if (ms <= 0) return `0${sec}`
 
   const totalSeconds = Math.floor(ms / 1000)
   const hours = Math.floor(totalSeconds / 3600)
@@ -10,11 +12,11 @@ export function formatDuration(ms: number): string {
   const seconds = totalSeconds % 60
 
   const parts: string[] = []
-  if (hours > 0) parts.push(`common:duration.hours:${hours}`)
-  if (minutes > 0) parts.push(`common:duration.minutes:${minutes}`)
-  if (seconds > 0 && hours === 0) parts.push(`common:duration.seconds:${seconds}`)
+  if (hours > 0) parts.push(`${hours}${i18next.t('common:units.hours')}`)
+  if (minutes > 0) parts.push(`${minutes}${i18next.t('common:units.minutes')}`)
+  if (seconds > 0 && hours === 0) parts.push(`${seconds}${sec}`)
 
-  return parts.join(' ') || 'common:duration.zeroSeconds'
+  return parts.join(' ') || `0${sec}`
 }
 
 /** Calculate performance score (0~100) from ratings */
@@ -52,7 +54,8 @@ export function groupSessionsByDate(
 
   for (const session of sessions) {
     const d = new Date(session.completed_at)
-    const dateKey = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`
+    const locale = i18next.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+    const dateKey = d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
     const arr = groups.get(dateKey) ?? []
     arr.push(session)
     groups.set(dateKey, arr)
@@ -69,14 +72,9 @@ export function groupSessionsByDate(
 
 /** Get human-readable label for study mode */
 export function getStudyModeLabel(mode: string): string {
-  const labels: Record<string, string> = {
-    srs: 'study:mode.srs',
-    sequential_review: 'study:mode.sequentialReview',
-    random: 'study:mode.random',
-    sequential: 'study:mode.sequential',
-    by_date: 'study:mode.byDate',
-  }
-  return labels[mode] ?? mode
+  const key = `study:modes.${mode}.label`
+  const translated = i18next.t(key, { defaultValue: '' })
+  return translated || mode
 }
 
 /** Get emoji for study mode */

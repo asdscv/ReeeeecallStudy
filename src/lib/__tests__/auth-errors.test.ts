@@ -16,13 +16,13 @@ describe('localizeAuthError', () => {
       'errors:auth.passwordTooShort',
     )
     expect(localizeAuthError('Email rate limit exceeded')).toBe(
-      'errors:auth.rateLimitExceeded',
+      'errors:auth.emailRateLimit',
     )
     expect(
       localizeAuthError(
         'New password should be different from the old password',
       ),
-    ).toBe('errors:auth.samePassword')
+    ).toBe('errors:auth.newPasswordSameAsOld')
     expect(
       localizeAuthError('Unable to validate email address: invalid format'),
     ).toBe('errors:auth.invalidEmailFormat')
@@ -33,7 +33,7 @@ describe('localizeAuthError', () => {
       localizeAuthError(
         'For security purposes, you can only request this after 58 seconds',
       ),
-    ).toBe('errors:auth.securityCooldown')
+    ).toBe('errors:auth.securityDelay')
   })
 
   it('should return original message for unknown errors', () => {

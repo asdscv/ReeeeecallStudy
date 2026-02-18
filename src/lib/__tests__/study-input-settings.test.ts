@@ -17,6 +17,16 @@ import {
   type SwipeDirectionMap,
 } from '../study-input-settings'
 
+vi.mock('i18next', () => ({
+  default: {
+    t: (key: string) => {
+      // Return the last segment capitalised, e.g. "study:srsRating.again" → "Again"
+      const last = key.split('.').pop() ?? key
+      return last.charAt(0).toUpperCase() + last.slice(1)
+    },
+  },
+}))
+
 // ── Validators ───────────────────────────────────────
 
 describe('isValidAction', () => {

@@ -168,11 +168,16 @@
     "button": "Get Started"
   },
   "nav": {
-    "blog": "Insights"
+    "blog": "Insights",
+    "login": "Log in"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API Docs"
   },
-  "floatingCta": "Start Now"
+  "floatingCta": "Start Now",
+  "seo": {
+    "title": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
+    "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
+  }
 }

@@ -116,7 +116,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
 
   createDeck: async (input) => {
     const check = guard.check('deck_create', 'decks_total')
-    if (!check.allowed) { set({ error: check.message ?? 'errors:rateLimit.reached' }); return null }
+    if (!check.allowed) { set({ error: check.message ?? 'errors:deck.rateLimitReached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null

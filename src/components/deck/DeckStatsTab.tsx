@@ -18,7 +18,8 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
-  const { t } = useTranslation('decks')
+  const { t, i18n } = useTranslation('decks')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -36,9 +37,9 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
   const dailyData = getDailyStudyCounts(studyLogs)
 
   const pieData = [
-    { name: 'New', value: stats.newCount, color: STATUS_COLORS.new },
-    { name: 'Learning', value: stats.learningCount, color: STATUS_COLORS.learning },
-    { name: 'Review', value: stats.reviewCount, color: STATUS_COLORS.review },
+    { name: t('common:status.new'), value: stats.newCount, color: STATUS_COLORS.new },
+    { name: t('common:status.learning'), value: stats.learningCount, color: STATUS_COLORS.learning },
+    { name: t('common:status.review'), value: stats.reviewCount, color: STATUS_COLORS.review },
   ].filter((d) => d.value > 0)
 
   return (
@@ -106,7 +107,7 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 11 }}
-                tickFormatter={(val: string) => formatDateKeyShort(val)}
+                tickFormatter={(val: string) => formatDateKeyShort(val, dateLocale)}
                 interval={4}
               />
               <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={30} />

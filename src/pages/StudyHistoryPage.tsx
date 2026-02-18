@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Clock, Layers } from 'lucide-react'
@@ -517,13 +518,7 @@ function SessionCard({
 // ── Helpers ──
 
 function getRatingLabel(rating: string): string {
-  const labels: Record<string, string> = {
-    again: 'Again',
-    hard: 'Hard',
-    good: 'Good',
-    easy: 'Easy',
-  }
-  return labels[rating] ?? rating
+  return i18next.t(`history:ratings.${rating}`, { defaultValue: rating })
 }
 
 function getRatingBarColor(rating: string): string {

@@ -95,5 +95,18 @@
   },
   "datePicker": {
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10min",
+    "oneDay": "1d",
+    "days": "{{count}}d",
+    "months": "{{count}}mo",
+    "years": "{{count}}y"
+  },
+  "srsRating": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
   }
 }

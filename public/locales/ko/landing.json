@@ -168,11 +168,16 @@
     "button": "시작하기"
   },
   "nav": {
-    "blog": "인사이트"
+    "blog": "인사이트",
+    "login": "로그인"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API 문서"
   },
-  "floatingCta": "지금 시작하기"
+  "floatingCta": "지금 시작하기",
+  "seo": {
+    "title": "ReeeeecallStudy — 간격 반복으로 스마트한 플래시카드 학습",
+    "description": "과학적으로 검증된 간격 반복(SRS) 알고리즘으로 더 빠르고 오래 기억하는 플래시카드 학습 플랫폼."
+  }
 }

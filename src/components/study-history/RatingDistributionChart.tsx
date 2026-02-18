@@ -13,13 +13,6 @@ const RATING_COLORS: Record<string, string> = {
   easy: '#3b82f6',
 }
 
-const RATING_LABELS: Record<string, string> = {
-  again: 'Again',
-  hard: 'Hard',
-  good: 'Good',
-  easy: 'Easy',
-}
-
 export function RatingDistributionChart({ data }: RatingDistributionChartProps) {
   const { t } = useTranslation('history')
   const total = data.reduce((s, d) => s + d.count, 0)
@@ -56,7 +49,7 @@ export function RatingDistributionChart({ data }: RatingDistributionChartProps) 
               <Tooltip
                 formatter={(value, name) => [
                   t('chart.countPercent', { count: Number(value), percent: Math.round((Number(value) / total) * 100) }),
-                  RATING_LABELS[String(name)] ?? name,
+                  t(`ratings.${String(name)}`, { defaultValue: String(name) }),
                 ]}
               />
             </PieChart>
@@ -69,7 +62,7 @@ export function RatingDistributionChart({ data }: RatingDistributionChartProps) 
                   style={{ backgroundColor: RATING_COLORS[entry.rating] ?? '#9ca3af' }}
                 />
                 <span className="text-xs text-gray-600 flex-1">
-                  {RATING_LABELS[entry.rating] ?? entry.rating}
+                  {t(`ratings.${entry.rating}`, { defaultValue: entry.rating })}
                 </span>
                 <span className="text-xs font-medium text-gray-900">{entry.count}</span>
                 <span className="text-xs text-gray-400 w-10 text-right">{entry.percentage}%</span>

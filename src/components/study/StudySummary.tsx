@@ -78,10 +78,10 @@ function StatRow({ label, value }: { label: string; value: string }) {
 
 function ratingLabel(rating: string, t: (key: string) => string): string {
   const map: Record<string, string> = {
-    again: 'Again',
-    hard: 'Hard',
-    good: 'Good',
-    easy: 'Easy',
+    again: t('srsRating.again'),
+    hard: t('srsRating.hard'),
+    good: t('srsRating.good'),
+    easy: t('srsRating.easy'),
     known: t('rating.known'),
     unknown: t('rating.unknown'),
     next: t('rating.next'),

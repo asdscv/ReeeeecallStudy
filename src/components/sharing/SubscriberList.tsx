@@ -41,7 +41,7 @@ export function SubscriberList({ shares, onRevoke }: SubscriberListProps) {
                   {share.invite_email || share.recipient_id || t('inviteLink')}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs text-gray-400">{share.share_mode}</span>
+                  <span className="text-xs text-gray-400">{t(`mode.${share.share_mode}`)}</span>
                   <span className={`px-1.5 py-0.5 text-xs rounded-full ${status.className}`}>
                     {t(status.labelKey)}
                   </span>
