@@ -2,6 +2,16 @@ import { getSessionPerformance } from './study-history'
 import { dateToLocalKey } from './date-utils'
 import type { StudySession, StudyLog } from '../types/database'
 
+// ── 덱 범위 필터링 ──
+
+export type DeckScope = 'all' | string
+
+/** Filter sessions by deck scope. 'all' returns everything; a deck ID filters to that deck. */
+export function filterSessionsByDeckScope(sessions: StudySession[], scope: DeckScope): StudySession[] {
+  if (scope === 'all') return sessions
+  return sessions.filter((s) => s.deck_id === scope)
+}
+
 // ── 기간 필터링 ──
 
 export function filterSessionsByPeriod(sessions: StudySession[], days: number): StudySession[] {

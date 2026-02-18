@@ -10,7 +10,6 @@ import {
   formatDuration,
   groupSessionsByDate,
   getStudyModeEmoji,
-  filterSessionsByDeck,
   filterSessionsByMode,
   paginateSessions,
   aggregateLogsToSessions,
@@ -18,6 +17,7 @@ import {
 } from '../lib/study-history'
 import {
   filterSessionsByPeriod,
+  filterSessionsByDeckScope,
   computeOverviewStats,
   computeModeBreakdown,
   computeDailySessionCounts,
@@ -25,6 +25,7 @@ import {
   computeSessionDurationTrend,
   computeStudyTimeByMode,
 } from '../lib/study-history-stats'
+import type { DeckScope } from '../lib/study-history-stats'
 import { getStreakDays } from '../lib/stats'
 import { periodToDays } from '../lib/time-period'
 import type { TimePeriod } from '../lib/time-period'
@@ -61,7 +62,7 @@ export function StudyHistoryPage() {
   const [deckProgress, setDeckProgress] = useState<DeckProgress[]>([])
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<TimePeriod>('1m')
-  const [deckFilter, setDeckFilter] = useState<string>('all')
+  const [deckScope, setDeckScope] = useState<DeckScope>('all')
   const [modeFilter, setModeFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -153,45 +154,58 @@ export function StudyHistoryPage() {
 
   const days = periodToDays(period)
 
+  // Step 1: filter by period
   const periodSessions = useMemo(
     () => filterSessionsByPeriod(sessions, days),
     [sessions, days]
   )
 
+  // Step 2: filter by deck scope — this affects ALL charts and stats
+  const scopedSessions = useMemo(
+    () => filterSessionsByDeckScope(periodSessions, deckScope),
+    [periodSessions, deckScope]
+  )
+
   const overviewStats = useMemo(
-    () => computeOverviewStats(periodSessions),
-    [periodSessions]
+    () => computeOverviewStats(scopedSessions),
+    [scopedSessions]
   )
 
   const streak = useMemo(() => getStreakDays(allLogs), [allLogs])
 
   const dailyCounts = useMemo(
-    () => computeDailySessionCounts(periodSessions, days),
-    [periodSessions, days]
+    () => computeDailySessionCounts(scopedSessions, days),
+    [scopedSessions, days]
   )
 
   const ratingDist = useMemo(
-    () => computeRatingDistribution(periodSessions),
-    [periodSessions]
+    () => computeRatingDistribution(scopedSessions),
+    [scopedSessions]
   )
 
   const durationTrend = useMemo(
-    () => computeSessionDurationTrend(periodSessions, days),
-    [periodSessions, days]
+    () => computeSessionDurationTrend(scopedSessions, days),
+    [scopedSessions, days]
   )
 
   const modeBreakdown = useMemo(
-    () => computeModeBreakdown(periodSessions),
-    [periodSessions]
+    () => computeModeBreakdown(scopedSessions),
+    [scopedSessions]
   )
 
   const timeByMode = useMemo(
-    () => computeStudyTimeByMode(periodSessions),
-    [periodSessions]
+    () => computeStudyTimeByMode(scopedSessions),
+    [scopedSessions]
+  )
+
+  // Deck progress filtered by scope
+  const filteredDeckProgress = useMemo(
+    () => deckScope === 'all' ? deckProgress : deckProgress.filter(p => p.deck.id === deckScope),
+    [deckProgress, deckScope]
   )
 
   // Reset page when filters change
-  useEffect(() => { setCurrentPage(1) }, [period])
+  useEffect(() => { setCurrentPage(1) }, [period, deckScope])
 
   if (loading) {
     return (
@@ -204,11 +218,8 @@ export function StudyHistoryPage() {
   const deckMap = new Map<string, Deck>(decks.map((d) => [d.id, d]))
   const progressMap = new Map(deckProgress.map((p) => [p.deck.id, p]))
 
-  // Session list filtering (separate from period-filtered chart data)
-  let filtered = periodSessions
-  if (deckFilter !== 'all') {
-    filtered = filterSessionsByDeck(filtered, deckFilter)
-  }
+  // Session list filtering — mode filter applies on top of scoped sessions
+  let filtered = scopedSessions
   if (modeFilter !== 'all') {
     filtered = filterSessionsByMode(filtered, modeFilter)
   }
@@ -217,18 +228,58 @@ export function StudyHistoryPage() {
     paginateSessions(filtered, currentPage, PAGE_SIZE)
 
   const groups = groupSessionsByDate(paginatedItems)
-  const uniqueModes = Array.from(new Set(periodSessions.map((s) => s.study_mode)))
+  const uniqueModes = Array.from(new Set(scopedSessions.map((s) => s.study_mode)))
+
+  // Decks that have sessions (for the deck scope selector)
   const sessionDeckIds = new Set(periodSessions.map((s) => s.deck_id))
   const sessionDecks = decks.filter((d) => sessionDeckIds.has(d.id))
 
+  // Selected deck info
+  const selectedDeck = deckScope !== 'all' ? deckMap.get(deckScope) : null
+
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* ── Header + Period Selection ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-          {t('title')}
-        </h1>
-        <TimePeriodTabs value={period} onChange={setPeriod} />
+      {/* ── Header + Deck Scope + Period Selection ── */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            {selectedDeck
+              ? <>{selectedDeck.icon} {selectedDeck.name}</>
+              : t('title')}
+          </h1>
+          <TimePeriodTabs value={period} onChange={setPeriod} />
+        </div>
+
+        {/* Deck scope selector — scrollable tabs */}
+        {sessionDecks.length > 0 && (
+          <div className="overflow-x-auto -mx-1 px-1">
+            <div className="flex gap-1.5 w-max">
+              <button
+                onClick={() => setDeckScope('all')}
+                className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
+                  deckScope === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {t('deckScope.all')}
+              </button>
+              {sessionDecks.map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => setDeckScope(d.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
+                    deckScope === d.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {d.icon} {d.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Overview Stats Cards ── */}
@@ -243,11 +294,11 @@ export function StudyHistoryPage() {
       </div>
 
       {/* ── Deck Progress ── */}
-      {deckProgress.length > 0 && (
+      {filteredDeckProgress.length > 0 && (
         <div>
           <h2 className="text-sm font-semibold text-gray-500 mb-3">{t('tabs.deckProgress')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {deckProgress.map((p) => (
+            {filteredDeckProgress.map((p) => (
               <DeckProgressCard key={p.deck.id} progress={p} />
             ))}
           </div>
@@ -258,33 +309,23 @@ export function StudyHistoryPage() {
       <div>
         <h2 className="text-sm font-semibold text-gray-500 mb-3">{t('tabs.sessionList')}</h2>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
-          <select
-            value={deckFilter}
-            onChange={(e) => { setDeckFilter(e.target.value); setCurrentPage(1) }}
-            className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
-          >
-            <option value="all">{t('filters.allDecks')}</option>
-            {sessionDecks.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.icon} {d.name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={modeFilter}
-            onChange={(e) => { setModeFilter(e.target.value); setCurrentPage(1) }}
-            className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
-          >
-            <option value="all">{t('filters.allModes')}</option>
-            {uniqueModes.map((m) => (
-              <option key={m} value={m}>
-                {getStudyModeEmoji(m)} {t(`study:modes.${m}.label`)}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Mode filter */}
+        {uniqueModes.length > 1 && (
+          <div className="flex gap-2 sm:gap-3 mb-4">
+            <select
+              value={modeFilter}
+              onChange={(e) => { setModeFilter(e.target.value); setCurrentPage(1) }}
+              className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none bg-white"
+            >
+              <option value="all">{t('filters.allModes')}</option>
+              {uniqueModes.map((m) => (
+                <option key={m} value={m}>
+                  {getStudyModeEmoji(m)} {t(`study:modes.${m}.label`)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Session list */}
         {filtered.length === 0 ? (

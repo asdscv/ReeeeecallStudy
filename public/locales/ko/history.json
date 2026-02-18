@@ -8,6 +8,10 @@
     "allDecks": "전체 덱",
     "allModes": "전체 모드"
   },
+  "deckScope": {
+    "all": "전체",
+    "label": "대시보드 범위"
+  },
   "empty": "아직 학습 기록이 없습니다. 학습을 시작해보세요!",
   "noMatch": "필터 조건에 맞는 기록이 없습니다.",
   "deletedDeck": "삭제된 덱",

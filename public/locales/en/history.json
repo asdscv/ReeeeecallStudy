@@ -8,6 +8,10 @@
     "allDecks": "All Decks",
     "allModes": "All Modes"
   },
+  "deckScope": {
+    "all": "All",
+    "label": "Dashboard Scope"
+  },
   "empty": "No study history yet. Start learning!",
   "noMatch": "No records matching filter.",
   "deletedDeck": "Deleted Deck",

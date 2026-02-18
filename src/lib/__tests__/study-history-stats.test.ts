@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   filterSessionsByPeriod,
+  filterSessionsByDeckScope,
   computeOverviewStats,
   computeModeBreakdown,
   computeDailySessionCounts,
@@ -438,5 +439,109 @@ describe('computeSrsStats', () => {
     ]
     const stats = computeSrsStats(logs)
     expect(stats.avgIntervalGrowth).toBe(4) // only one valid log
+  })
+})
+
+// ── 10. filterSessionsByDeckScope ──
+
+describe('filterSessionsByDeckScope', () => {
+  const sessions = [
+    makeSession({ id: 's1', deck_id: 'deck-1', cards_studied: 10 }),
+    makeSession({ id: 's2', deck_id: 'deck-2', cards_studied: 5 }),
+    makeSession({ id: 's3', deck_id: 'deck-1', cards_studied: 8 }),
+    makeSession({ id: 's4', deck_id: 'deck-3', cards_studied: 3 }),
+  ]
+
+  it('returns all sessions when scope is "all"', () => {
+    const result = filterSessionsByDeckScope(sessions, 'all')
+    expect(result).toHaveLength(4)
+    expect(result).toEqual(sessions)
+  })
+
+  it('filters to specific deck when scope is a deck ID', () => {
+    const result = filterSessionsByDeckScope(sessions, 'deck-1')
+    expect(result).toHaveLength(2)
+    expect(result.every(s => s.deck_id === 'deck-1')).toBe(true)
+  })
+
+  it('returns empty when no sessions match the deck', () => {
+    const result = filterSessionsByDeckScope(sessions, 'deck-999')
+    expect(result).toHaveLength(0)
+  })
+
+  it('returns empty for empty sessions regardless of scope', () => {
+    expect(filterSessionsByDeckScope([], 'all')).toHaveLength(0)
+    expect(filterSessionsByDeckScope([], 'deck-1')).toHaveLength(0)
+  })
+})
+
+// ── 11. Per-deck stats composition ──
+
+describe('per-deck stats composition', () => {
+  const deck1Sessions = [
+    makeSession({
+      id: 's1',
+      deck_id: 'deck-1',
+      study_mode: 'srs',
+      cards_studied: 10,
+      total_duration_ms: 60000,
+      ratings: { good: 7, easy: 3 },
+      completed_at: daysAgo(0),
+    }),
+    makeSession({
+      id: 's2',
+      deck_id: 'deck-1',
+      study_mode: 'random',
+      cards_studied: 5,
+      total_duration_ms: 30000,
+      ratings: { hard: 3, good: 2 },
+      completed_at: daysAgo(1),
+    }),
+  ]
+  const deck2Sessions = [
+    makeSession({
+      id: 's3',
+      deck_id: 'deck-2',
+      study_mode: 'srs',
+      cards_studied: 20,
+      total_duration_ms: 120000,
+      ratings: { again: 5, good: 15 },
+      completed_at: daysAgo(0),
+    }),
+  ]
+  const allSessions = [...deck1Sessions, ...deck2Sessions]
+
+  it('overview stats differ when filtered by deck vs all', () => {
+    const allStats = computeOverviewStats(filterSessionsByDeckScope(allSessions, 'all'))
+    const deck1Stats = computeOverviewStats(filterSessionsByDeckScope(allSessions, 'deck-1'))
+    const deck2Stats = computeOverviewStats(filterSessionsByDeckScope(allSessions, 'deck-2'))
+
+    expect(allStats.totalSessions).toBe(3)
+    expect(deck1Stats.totalSessions).toBe(2)
+    expect(deck2Stats.totalSessions).toBe(1)
+
+    expect(allStats.totalCardsStudied).toBe(35)
+    expect(deck1Stats.totalCardsStudied).toBe(15)
+    expect(deck2Stats.totalCardsStudied).toBe(20)
+  })
+
+  it('mode breakdown shows only modes used in that deck', () => {
+    const deck1Breakdown = computeModeBreakdown(filterSessionsByDeckScope(allSessions, 'deck-1'))
+    const deck2Breakdown = computeModeBreakdown(filterSessionsByDeckScope(allSessions, 'deck-2'))
+
+    expect(deck1Breakdown).toHaveLength(2) // srs + random
+    expect(deck2Breakdown).toHaveLength(1) // srs only
+    expect(deck1Breakdown.map(b => b.mode).sort()).toEqual(['random', 'srs'])
+    expect(deck2Breakdown[0].mode).toBe('srs')
+  })
+
+  it('rating distribution is deck-specific', () => {
+    const deck1Dist = computeRatingDistribution(filterSessionsByDeckScope(allSessions, 'deck-1'))
+    const deck2Dist = computeRatingDistribution(filterSessionsByDeckScope(allSessions, 'deck-2'))
+
+    // deck-1: good 9, easy 3, hard 3
+    expect(deck1Dist.find(d => d.rating === 'again')).toBeUndefined()
+    // deck-2 has again
+    expect(deck2Dist.find(d => d.rating === 'again')!.count).toBe(5)
   })
 })
