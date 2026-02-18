@@ -29,6 +29,7 @@ i18n
       'api-docs',
       'landing',
       'content',
+      'admin',
     ],
     defaultNS: 'common',
 

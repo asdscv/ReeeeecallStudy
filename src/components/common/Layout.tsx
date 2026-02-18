@@ -10,7 +10,7 @@ type NavItem = NavLink | NavGroup
 
 export function Layout() {
   const { t } = useTranslation('common')
-  const { user, signOut } = useAuthStore()
+  const { user, signOut, role } = useAuthStore()
 
   const navItems: NavItem[] = [
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
@@ -22,6 +22,7 @@ export function Layout() {
     { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
     { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: '📝' },
     { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
+    ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: '🛡️' }] : []),
   ]
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)

@@ -1,0 +1,153 @@
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useAdminStore } from '../../stores/admin-store'
+import { AdminStatCard } from '../../components/admin/AdminStatCard'
+import { AdminErrorState } from '../../components/admin/AdminErrorState'
+import { ContentViewsChart } from '../../components/admin/ContentViewsChart'
+import { PublishingTimelineChart } from '../../components/admin/PublishingTimelineChart'
+import { TagDistributionChart } from '../../components/admin/TagDistributionChart'
+import {
+  computeLocaleDistribution,
+  computeTagCloudData,
+  computePublishingTimeline,
+  formatViewDuration,
+  fillDailyViewGaps,
+  computePopularContentTable,
+} from '../../lib/admin-stats'
+import { formatRelativeTime } from '../../lib/date-utils'
+
+const LOCALE_COLORS: Record<string, 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'gray'> = {
+  ko: 'blue',
+  en: 'green',
+  ja: 'purple',
+  zh: 'orange',
+}
+
+export function AdminContentsPage() {
+  const { t, i18n } = useTranslation('admin')
+  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const { contentsAnalytics, contentsLoading, contentsError, fetchContents } = useAdminStore()
+
+  useEffect(() => {
+    fetchContents()
+  }, [fetchContents])
+
+  if (contentsLoading && !contentsAnalytics) {
+    return <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>
+  }
+
+  if (contentsError) {
+    return <AdminErrorState error={contentsError} onRetry={fetchContents} />
+  }
+
+  const data = contentsAnalytics
+  if (!data) return null
+
+  const locales = computeLocaleDistribution(data.by_locale)
+  const tags = computeTagCloudData(data.top_tags)
+  const timeline = computePublishingTimeline(data.publishing_timeline)
+  const dailyViews = fillDailyViewGaps(data.daily_views, 30)
+  const popularRows = computePopularContentTable(data.popular_content)
+
+  return (
+    <div className="space-y-6">
+      {/* Content stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <AdminStatCard icon="📄" label={t('contents.totalContents')} value={data.total_contents} color="blue" />
+        <AdminStatCard icon="✅" label={t('contents.published')} value={data.published_contents} color="green" />
+        <AdminStatCard icon="📝" label={t('contents.drafts')} value={data.draft_contents} color="gray" />
+        <AdminStatCard icon="⏱" label={t('contents.avgReadingTime')} value={t('contents.minuteShort', { value: data.avg_reading_time_minutes })} color="purple" />
+      </div>
+
+      {/* View stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <AdminStatCard icon="👁" label={t('contents.totalViews')} value={data.total_views} color="blue" />
+        <AdminStatCard icon="👤" label={t('contents.uniqueViewers')} value={data.unique_viewers} color="green" />
+        <AdminStatCard icon="⏳" label={t('contents.avgViewDuration')} value={formatViewDuration(data.avg_view_duration_ms)} color="orange" />
+      </div>
+
+      {/* Locale breakdown */}
+      {locales.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.localeBreakdown')}</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {locales.map((l) => (
+              <AdminStatCard
+                key={l.locale}
+                icon="🌐"
+                label={`${l.locale.toUpperCase()} (${l.percentage}%)`}
+                value={`${l.published}/${l.count}`}
+                color={LOCALE_COLORS[l.locale] ?? 'gray'}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Daily views chart */}
+      <ContentViewsChart data={dailyViews} />
+
+      {/* Publishing timeline */}
+      <PublishingTimelineChart data={timeline} />
+
+      {/* Popular content table */}
+      {popularRows.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.popularContent')}</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-gray-500 text-xs">
+                  <th className="pb-2 text-left font-medium">{t('contents.rank')}</th>
+                  <th className="pb-2 text-left font-medium">{t('contents.contentTitle')}</th>
+                  <th className="pb-2 text-left font-medium">{t('contents.locale')}</th>
+                  <th className="pb-2 text-right font-medium">{t('contents.viewCount')}</th>
+                  <th className="pb-2 text-right font-medium">{t('contents.uniqueViewersCol')}</th>
+                  <th className="pb-2 text-right font-medium">{t('contents.avgDuration')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {popularRows.map((row, i) => (
+                  <tr key={row.id} className="border-b border-gray-100">
+                    <td className="py-2 text-gray-400">{i + 1}</td>
+                    <td className="py-2 text-gray-900 font-medium max-w-[200px] truncate">{row.title}</td>
+                    <td className="py-2 text-gray-500">{row.locale.toUpperCase()}</td>
+                    <td className="py-2 text-right text-gray-900">{row.view_count.toLocaleString()}</td>
+                    <td className="py-2 text-right text-gray-500">{row.unique_viewers.toLocaleString()}</td>
+                    <td className="py-2 text-right text-gray-500">{row.avg_duration}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Top tags */}
+      <TagDistributionChart data={tags} />
+
+      {/* Recently published */}
+      {data.recent_published.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.recentPublished')}</h3>
+          <div className="space-y-3">
+            {data.recent_published.map((item) => (
+              <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {item.locale.toUpperCase()} · {t('contents.readingTime', { value: item.reading_time_minutes })}
+                    {item.tags.length > 0 && ` · ${item.tags.slice(0, 3).join(', ')}`}
+                  </p>
+                </div>
+                <span className="text-xs text-gray-400 ml-3 whitespace-nowrap">
+                  {item.published_at ? formatRelativeTime(item.published_at, dateLocale) : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

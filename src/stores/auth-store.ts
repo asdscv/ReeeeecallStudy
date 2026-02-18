@@ -1,12 +1,16 @@
 import { create } from 'zustand'
 import type { User, Session, Subscription } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import type { UserRole } from '../types/database'
 
 interface AuthState {
   user: User | null
   session: Session | null
   loading: boolean
+  role: UserRole | null
   initialize: () => Promise<void>
+  fetchRole: () => Promise<void>
+  isAdmin: () => boolean
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>
   signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<{ error: Error | null }>
@@ -28,10 +32,35 @@ export function _resetAuthStoreInternals() {
   }
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   session: null,
   loading: true,
+  role: null,
+
+  fetchRole: async () => {
+    const user = get().user
+    if (!user) {
+      set({ role: null })
+      return
+    }
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      if (error || !data) {
+        set({ role: 'user' })
+      } else {
+        set({ role: (data.role as UserRole) ?? 'user' })
+      }
+    } catch {
+      set({ role: 'user' })
+    }
+  },
+
+  isAdmin: () => get().role === 'admin',
 
   initialize: () => {
     if (_initializePromise) return _initializePromise
@@ -44,12 +73,15 @@ export const useAuthStore = create<AuthState>((set) => ({
           user: session?.user ?? null,
           loading: false,
         })
+        if (session?.user) {
+          await useAuthStore.getState().fetchRole()
+        }
       } catch {
         set({ session: null, user: null, loading: false })
       }
 
       if (!_subscription) {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
           const currentUser = useAuthStore.getState().user
           const newUser = session?.user ?? null
 
@@ -65,6 +97,12 @@ export const useAuthStore = create<AuthState>((set) => ({
             user: newUser,
             loading: false,
           })
+
+          if (newUser) {
+            await useAuthStore.getState().fetchRole()
+          } else {
+            set({ role: null })
+          }
         })
         _subscription = subscription
       }
@@ -132,10 +170,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   signOut: async () => {
     try {
       const { error } = await supabase.auth.signOut()
-      set({ user: null, session: null })
+      set({ user: null, session: null, role: null })
       return { error: error ? new Error(error.message) : null }
     } catch (e) {
-      set({ user: null, session: null })
+      set({ user: null, session: null, role: null })
       return { error: e instanceof Error ? e : new Error(String(e)) }
     }
   },

@@ -15,6 +15,7 @@ export interface Database {
           tts_lang: string
           tts_provider: 'web_speech' | 'edge_tts'
           locale: string
+          role: UserRole
           created_at: string
           updated_at: string
         }
@@ -29,6 +30,7 @@ export interface Database {
           tts_lang?: string
           tts_provider?: 'web_speech' | 'edge_tts'
           locale?: string
+          role?: UserRole
         }
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
@@ -219,6 +221,7 @@ export interface Database {
   }
 }
 
+export type UserRole = 'user' | 'admin'
 export type StudyMode = 'srs' | 'sequential_review' | 'random' | 'sequential' | 'by_date'
 export type SrsStatus = 'new' | 'learning' | 'review' | 'suspended'
 export type LayoutMode = 'default' | 'custom'
@@ -329,4 +332,126 @@ export type UserCardProgress = {
   last_reviewed_at: string | null
   created_at: string
   updated_at: string
+}
+
+// ── Admin RPC response types ──
+
+export type AdminOverviewStats = {
+  total_users: number
+  total_decks: number
+  total_cards: number
+  total_sessions: number
+  total_study_time_ms: number
+  total_cards_studied: number
+  total_templates: number
+  total_shared_decks: number
+  total_marketplace_listings: number
+}
+
+export type AdminActiveUsers = {
+  dau: number
+  wau: number
+  mau: number
+  total_users: number
+}
+
+export type AdminUserSignup = {
+  date: string
+  count: number
+}
+
+export type AdminDailyStudyActivity = {
+  date: string
+  sessions: number
+  cards: number
+  total_duration_ms: number
+}
+
+export type AdminModeBreakdown = {
+  mode: string
+  session_count: number
+  total_cards: number
+  total_duration_ms: number
+}
+
+export type AdminContentStats = {
+  total_listings: number
+  active_listings: number
+  total_acquires: number
+  total_shares: number
+  active_shares: number
+  share_by_mode: { mode: string; count: number }[] | null
+  top_categories: { category: string; count: number }[] | null
+}
+
+export type AdminRatingDistribution = {
+  rating: string
+  count: number
+}
+
+export type AdminRecentActivity = {
+  date: string
+  sessions: number
+  active_users: number
+  cards: number
+}
+
+export type AdminSystemStats = {
+  total_api_keys: number
+  active_api_keys: number
+  expired_api_keys: number
+  recently_used_keys: number
+  total_contents: number
+  published_contents: number
+  total_study_logs: number
+}
+
+export type AdminSrsStatusBreakdown = {
+  status: string
+  count: number
+}
+
+export type AdminRetentionMetrics = {
+  prev_month_active: number
+  retained: number
+  retention_rate: number
+  churned: number
+  churn_rate: number
+  new_users_this_month: number
+}
+
+export type AdminPopularContent = {
+  id: string
+  title: string
+  slug: string
+  locale: string
+  view_count: number
+  unique_viewers: number
+  avg_duration_ms: number
+}
+
+export type AdminRecentPublished = {
+  id: string
+  title: string
+  slug: string
+  locale: string
+  published_at: string
+  reading_time_minutes: number
+  tags: string[]
+}
+
+export type AdminContentsAnalytics = {
+  total_contents: number
+  published_contents: number
+  draft_contents: number
+  by_locale: { locale: string; count: number; published: number }[]
+  top_tags: { tag: string; count: number }[]
+  publishing_timeline: { month: string; count: number }[]
+  avg_reading_time_minutes: number
+  total_views: number
+  unique_viewers: number
+  avg_view_duration_ms: number
+  popular_content: AdminPopularContent[]
+  daily_views: { date: string; views: number; unique_viewers: number }[]
+  recent_published: AdminRecentPublished[]
 }

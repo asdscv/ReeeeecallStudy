@@ -6,7 +6,9 @@ import { LoginPage } from './components/auth/LoginPage'
 import { AuthCallback } from './components/auth/AuthCallback'
 import { ResetPasswordPage } from './components/auth/ResetPasswordPage'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
+import { AdminRoute } from './components/auth/AdminRoute'
 import { Layout } from './components/common/Layout'
+import { AdminLayout } from './components/admin/AdminLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { DecksPage } from './pages/DecksPage'
 import { TemplatesPage } from './pages/TemplatesPage'
@@ -30,6 +32,12 @@ import { PublicApiDocsPage } from './pages/PublicApiDocsPage'
 import { ContentListPage } from './pages/ContentListPage'
 import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
+import { AdminOverviewPage } from './pages/admin/AdminOverviewPage'
+import { AdminUsersPage } from './pages/admin/AdminUsersPage'
+import { AdminStudyPage } from './pages/admin/AdminStudyPage'
+import { AdminContentPage } from './pages/admin/AdminContentPage'
+import { AdminContentsPage } from './pages/admin/AdminContentsPage'
+import { AdminSystemPage } from './pages/admin/AdminSystemPage'
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
@@ -115,6 +123,25 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/api-docs" element={<ApiDocsPage />} />
+        </Route>
+
+        {/* Admin routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Layout />
+            </AdminRoute>
+          }
+        >
+          <Route element={<AdminLayout />}>
+            <Route index element={<AdminOverviewPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="study" element={<AdminStudyPage />} />
+            <Route path="market" element={<AdminContentPage />} />
+            <Route path="contents" element={<AdminContentsPage />} />
+            <Route path="system" element={<AdminSystemPage />} />
+          </Route>
         </Route>
 
         {/* Fallback */}

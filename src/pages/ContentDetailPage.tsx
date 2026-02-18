@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useContentStore } from '../stores/content-store'
+import { useContentViewTracking } from '../hooks/useContentViewTracking'
 import { BlockRenderer } from '../components/content/BlockRenderer'
 import { ContentDetailSkeleton } from '../components/content/ContentDetailSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
@@ -13,6 +14,8 @@ export function ContentDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const { t } = useTranslation('content')
   const { currentArticle, detailLoading, detailError, fetchContentBySlug } = useContentStore()
+
+  useContentViewTracking(currentArticle?.id)
 
   useEffect(() => {
     if (slug) {

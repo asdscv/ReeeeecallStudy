@@ -7,7 +7,8 @@
     "cards": "Cards",
     "marketplace": "Marketplace",
     "studyHistory": "Study History",
-    "settings": "Settings"
+    "settings": "Settings",
+    "admin": "Admin"
   },
   "actions": {
     "save": "Save",
