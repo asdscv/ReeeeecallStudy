@@ -45,7 +45,7 @@ describe('PublicApiDocsPage', () => {
 
   it('renders DocsFooter with copyright', () => {
     renderPage()
-    expect(screen.getByText(/All rights reserved/)).toBeInTheDocument()
+    expect(screen.getByText('footer.copyright')).toBeInTheDocument()
   })
 
   it('renders search input', () => {

@@ -168,8 +168,8 @@ describe('StudyCard — swipe hints', () => {
     )
     const hint = screen.getByTestId('swipe-hint')
     expect(hint).toBeInTheDocument()
-    expect(hint.textContent).toContain('Again')
-    expect(hint.textContent).toContain('Good')
+    expect(hint.textContent).toContain('again')
+    expect(hint.textContent).toContain('good')
   })
 
   it('does not show swipe hint in button mode', () => {
