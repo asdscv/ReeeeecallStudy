@@ -208,6 +208,8 @@ ${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">$
 <meta property="og:type" content="website">
 <meta property="og:url" content="${SITE_URL}/content">
 <meta property="og:image" content="${SITE_URL}/favicon.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
 <meta property="og:site_name" content="${BRAND_NAME}">
 <meta property="og:locale" content="${isKo ? 'ko_KR' : 'en_US'}">
 <meta property="og:locale:alternate" content="${isKo ? 'en_US' : 'ko_KR'}">
@@ -215,6 +217,7 @@ ${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">$
 <meta name="twitter:site" content="${TWITTER_HANDLE}">
 <meta name="twitter:title" content="${listTitle}">
 <meta name="twitter:description" content="${escapeHtml(listDesc)}">
+<meta name="twitter:image" content="${SITE_URL}/favicon.png">
 <link rel="canonical" href="${SITE_URL}/content">
 <link rel="alternate" hreflang="en" href="${SITE_URL}/content?lang=en">
 <link rel="alternate" hreflang="ko" href="${SITE_URL}/content?lang=ko">
@@ -252,7 +255,7 @@ async function handleLandingBotRequest(url, env) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'ReeeeecallStudy',
+    name: BRAND_NAME,
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web',
     description: pageDesc,
@@ -261,7 +264,7 @@ async function handleLandingBotRequest(url, env) {
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: {
       '@type': 'Organization',
-      name: 'ReeeeecallStudy',
+      name: BRAND_NAME,
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.png` },
     },
   }
@@ -273,7 +276,7 @@ async function handleLandingBotRequest(url, env) {
 <meta name="robots" content="index, follow">
 <title>${escapeHtml(pageTitle)}</title>
 <meta name="description" content="${escapeHtml(pageDesc)}">
-<meta property="og:title" content="${BRAND_NAME}">
+<meta property="og:title" content="${escapeHtml(pageTitle)}">
 <meta property="og:description" content="${escapeHtml(pageDesc)}">
 <meta property="og:image" content="${SITE_URL}/favicon.png">
 <meta property="og:image:width" content="512">
@@ -284,8 +287,9 @@ async function handleLandingBotRequest(url, env) {
 <meta property="og:locale:alternate" content="${isKo ? 'en_US' : 'ko_KR'}">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="${TWITTER_HANDLE}">
-<meta name="twitter:title" content="${BRAND_NAME}">
+<meta name="twitter:title" content="${escapeHtml(pageTitle)}">
 <meta name="twitter:description" content="${escapeHtml(pageDesc)}">
+<meta name="twitter:image" content="${SITE_URL}/favicon.png">
 <link rel="canonical" href="${SITE_URL}/landing">
 <link rel="alternate" hreflang="en" href="${SITE_URL}/landing?lang=en">
 <link rel="alternate" hreflang="ko" href="${SITE_URL}/landing?lang=ko">

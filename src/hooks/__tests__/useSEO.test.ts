@@ -122,4 +122,65 @@ describe('useSEO', () => {
     renderHook(() => useSEO({ title: 'T', description: 'd' }))
     expect(document.documentElement.lang).toBe('en')
   })
+
+  it('should cleanup og:image dimensions on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({ title: 'T', description: 'd', ogImage: 'https://example.com/img.png' }),
+    )
+    expect(document.querySelector('meta[property="og:image:width"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[property="og:image:width"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:image:height"]')).toBeNull()
+  })
+
+  it('should cleanup article:section on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogType: 'article',
+        publishedTime: '2025-01-01',
+        articleSection: 'Learning',
+      }),
+    )
+    expect(document.querySelector('meta[property="article:section"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[property="article:published_time"]')).toBeNull()
+    expect(document.querySelector('meta[property="article:section"]')).toBeNull()
+  })
+
+  it('should support multiple JSON-LD schemas as array', () => {
+    const schemas = [
+      { '@type': 'Article', headline: 'Test' },
+      { '@type': 'BreadcrumbList', itemListElement: [] },
+    ]
+    renderHook(() => useSEO({ title: 'T', description: 'd', jsonLd: schemas }))
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]')
+    expect(scripts).toHaveLength(2)
+  })
+
+  it('should cleanup all JSON-LD scripts on unmount when array', () => {
+    const schemas = [
+      { '@type': 'Article', headline: 'Test' },
+      { '@type': 'BreadcrumbList', itemListElement: [] },
+    ]
+    const { unmount } = renderHook(() => useSEO({ title: 'T', description: 'd', jsonLd: schemas }))
+    expect(document.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(2)
+    unmount()
+    expect(document.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(0)
+  })
+
+  it('should set article:section for article type', () => {
+    renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogType: 'article',
+        articleSection: 'Learning',
+      }),
+    )
+    const meta = document.querySelector('meta[property="article:section"]')
+    expect(meta).toBeTruthy()
+    expect(meta?.getAttribute('content')).toBe('Learning')
+  })
 })
