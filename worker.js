@@ -1,4 +1,5 @@
-// Cloudflare Worker — API 프록시 + SPA fallback + SEO 프리렌더링
+// Cloudflare Worker — API 프록시 + SPA fallback + SEO 프리렌더링 + AI 콘텐츠 생성
+import { runContentPipeline } from './worker-modules/content-pipeline.js'
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
 const SITE_URL = 'https://reeeeecallstudy.com'
 
@@ -292,6 +293,10 @@ ${contentEntries}</urlset>`
 }
 
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runContentPipeline(env, event.cron))
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url)
     const ua = request.headers.get('user-agent') || ''

@@ -10,6 +10,13 @@
   // Or in Cloudflare dashboard > Pages > Settings > Environment variables
   "vars": {
     "SUPABASE_URL": "https://ixdapelfikaneexnskfm.supabase.co",
-    "SUPABASE_ANON_KEY": ""
+    "SUPABASE_ANON_KEY": "",
+    "XAI_MODEL": "grok-3-mini",
+    "XAI_BASE_URL": "https://api.x.ai/v1"
+  },
+  // AI content generation: daily at 6:00 AM UTC
+  // Secrets needed: wrangler secret put XAI_API_KEY / SUPABASE_SERVICE_KEY
+  "triggers": {
+    "crons": ["0 6 * * *"]
   }
 }
