@@ -27,6 +27,22 @@ interface ExportData {
   }>
 }
 
+// --- Template Export Types ---
+
+interface TemplateExportData {
+  version: number
+  exportedAt: string
+  template: {
+    name: string
+    fields: TemplateField[]
+    front_layout: CardTemplate['front_layout']
+    back_layout: CardTemplate['back_layout']
+    layout_mode: CardTemplate['layout_mode']
+    front_html: string
+    back_html: string
+  }
+}
+
 // --- Import Types ---
 
 export interface ImportCard {
@@ -95,6 +111,43 @@ export function generateExportCSV(cards: Card[], fields: TemplateField[], tagsLa
   return Papa.unparse({
     fields: headers,
     data: rows.map((row) => headers.map((h) => row[h])),
+  })
+}
+
+// --- Template Export Functions ---
+
+export function generateTemplateExportJSON(template: CardTemplate): string {
+  const data: TemplateExportData = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    template: {
+      name: template.name,
+      fields: template.fields,
+      front_layout: template.front_layout,
+      back_layout: template.back_layout,
+      layout_mode: template.layout_mode,
+      front_html: template.front_html,
+      back_html: template.back_html,
+    },
+  }
+  return JSON.stringify(data, null, 2)
+}
+
+export function generateTemplateExportCSV(template: CardTemplate): string {
+  const fieldRows = template.fields.map((f) => ({
+    key: f.key,
+    name: f.name,
+    type: f.type,
+    order: f.order,
+    tts_enabled: f.tts_enabled ? 'true' : 'false',
+    tts_lang: f.tts_lang ?? '',
+  }))
+
+  const headers = ['key', 'name', 'type', 'order', 'tts_enabled', 'tts_lang']
+
+  return Papa.unparse({
+    fields: headers,
+    data: fieldRows.map((row) => headers.map((h) => String(row[h as keyof typeof row]))),
   })
 }
 

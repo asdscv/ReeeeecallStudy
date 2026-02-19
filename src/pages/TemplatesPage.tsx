@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useTemplateStore } from '../stores/template-store'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { formatLocalDate } from '../lib/date-utils'
+import { generateTemplateExportJSON, generateTemplateExportCSV } from '../lib/import-export'
 import type { CardTemplate } from '../types/database'
 
 export function TemplatesPage() {
@@ -41,6 +43,33 @@ export function TemplatesPage() {
 
   const handleDuplicate = async (tmpl: CardTemplate) => {
     await duplicateTemplate(tmpl.id)
+  }
+
+  const downloadFile = (content: string, filename: string, mimeType: string, addBom = false) => {
+    const bom = addBom ? '\uFEFF' : ''
+    const blob = new Blob([bom + content], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportJSON = (tmpl: CardTemplate) => {
+    const json = generateTemplateExportJSON(tmpl)
+    const date = new Date().toISOString().slice(0, 10)
+    downloadFile(json, `template_${tmpl.name}_${date}.json`, 'application/json')
+    toast.success(t('exported'))
+  }
+
+  const handleExportCSV = (tmpl: CardTemplate) => {
+    const csv = generateTemplateExportCSV(tmpl)
+    const date = new Date().toISOString().slice(0, 10)
+    downloadFile(csv, `template_${tmpl.name}_${date}.csv`, 'text/csv', true)
+    toast.success(t('exported'))
   }
 
   if (loading) {
@@ -94,6 +123,8 @@ export function TemplatesPage() {
               onEdit={() => handleEdit(tmpl)}
               onDelete={() => setDeletingTemplate(tmpl)}
               onDuplicate={() => handleDuplicate(tmpl)}
+              onExportJSON={() => handleExportJSON(tmpl)}
+              onExportCSV={() => handleExportCSV(tmpl)}
             />
           ))}
         </div>
@@ -123,84 +154,89 @@ function TemplateCard({
   onEdit,
   onDelete,
   onDuplicate,
+  onExportJSON,
+  onExportCSV,
 }: {
   template: CardTemplate
   onEdit: () => void
   onDelete: () => void
   onDuplicate: () => void
+  onExportJSON: () => void
+  onExportCSV: () => void
 }) {
   const { t, i18n } = useTranslation('templates')
   const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
-  const [showMenu, setShowMenu] = useState(false)
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 hover:shadow-sm transition">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
-            {template.is_default && (
-              <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full font-medium">
-                {t('defaultBadge')}
-              </span>
-            )}
-          </div>
-
-          {/* Fields summary */}
-          <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
-            {template.fields.map((field) => (
-              <span
-                key={field.key}
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
-              >
-                {field.type === 'image' ? '🖼️' : field.type === 'audio' ? '🔊' : '📝'}
-                {field.name}
-              </span>
-            ))}
-          </div>
-
-          {/* Layout preview */}
-          <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-gray-400">
-            <span>{t('frontFields', { count: template.front_layout.length })}</span>
-            <span>{t('backFields', { count: template.back_layout.length })}</span>
-            <span>{t('created', { date: formatLocalDate(template.created_at, dateLocale) })}</span>
-          </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
+          {template.is_default && (
+            <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full font-medium">
+              {t('defaultBadge')}
+            </span>
+          )}
         </div>
 
-        {/* Menu */}
-        <div className="relative ml-3">
+        {/* Fields summary */}
+        <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
+          {template.fields.map((field) => (
+            <span
+              key={field.key}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
+            >
+              {field.type === 'image' ? '🖼️' : field.type === 'audio' ? '🔊' : '📝'}
+              {field.name}
+            </span>
+          ))}
+        </div>
+
+        {/* Layout preview */}
+        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-gray-400 mb-3">
+          <span>{t('frontFields', { count: template.front_layout.length })}</span>
+          <span>{t('backFields', { count: template.back_layout.length })}</span>
+          <span>{t('created', { date: formatLocalDate(template.created_at, dateLocale) })}</span>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
           <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer"
+            onClick={onEdit}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
           >
-            ⋯
+            <span>✏️</span>
+            <span className="hidden sm:inline">{t('common:edit')}</span>
           </button>
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
-                <button
-                  onClick={() => { onEdit(); setShowMenu(false) }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                >
-                  {t('common:edit')}
-                </button>
-                <button
-                  onClick={() => { onDuplicate(); setShowMenu(false) }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                >
-                  {t('common:duplicate')}
-                </button>
-                {!template.is_default && (
-                  <button
-                    onClick={() => { onDelete(); setShowMenu(false) }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
-                  >
-                    {t('common:delete')}
-                  </button>
-                )}
-              </div>
-            </>
+          <button
+            onClick={onDuplicate}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+          >
+            <span>📋</span>
+            <span className="hidden sm:inline">{t('common:duplicate')}</span>
+          </button>
+          <button
+            onClick={onExportJSON}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+          >
+            <span>📄</span>
+            <span className="hidden sm:inline">{t('exportJSON')}</span>
+          </button>
+          <button
+            onClick={onExportCSV}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+          >
+            <span>📊</span>
+            <span className="hidden sm:inline">{t('exportCSV')}</span>
+          </button>
+          {!template.is_default && (
+            <button
+              onClick={onDelete}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer ml-auto"
+            >
+              <span>🗑️</span>
+              <span className="hidden sm:inline">{t('common:delete')}</span>
+            </button>
           )}
         </div>
       </div>

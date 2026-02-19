@@ -81,5 +81,6 @@
   "saving": "Saving...",
   "selectAll": "Select All",
   "menu": "Menu",
-  "copiedToClipboard": "Copied to clipboard"
+  "copiedToClipboard": "Copied to clipboard",
+  "export": "Export"
 }
