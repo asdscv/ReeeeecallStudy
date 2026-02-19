@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Brain, Layers, BarChart3, Share2, Globe, Smartphone, Zap, BookOpen, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Brain, Layers, BarChart3, Share2, Globe, Smartphone, Zap, BookOpen, CheckCircle2, Menu, X } from 'lucide-react'
 import { SEOHead } from '../components/content/SEOHead'
 import {
   buildWebApplicationJsonLd,
@@ -24,16 +24,19 @@ const FEATURE_ICONS = [
 
 function LandingNav() {
   const { t } = useTranslation('landing')
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between py-4">
-        <div className="flex items-center gap-3.5">
-          <img src="/favicon.png" alt="" className="w-14 h-14 sm:w-16 sm:h-16" />
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
+          <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-16 sm:h-16 shrink-0" />
           <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-14 sm:h-16 hidden sm:block" />
-          <span className="font-extrabold text-gray-900 sm:hidden text-3xl tracking-tight">ReeeeecallStudy</span>
+          <span className="font-extrabold text-gray-900 sm:hidden text-lg tracking-tight truncate">ReeeeecallStudy</span>
         </div>
-        <nav className="flex items-center gap-3">
+
+        {/* Desktop nav */}
+        <nav className="hidden sm:flex items-center gap-3">
           <Link to="/content" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
             {t('nav.blog', 'Insights')}
           </Link>
@@ -47,7 +50,45 @@ function LandingNav() {
             {t('nav.start', 'Get Started')}
           </Link>
         </nav>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="sm:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer"
+          aria-label="Menu"
+        >
+          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="sm:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md">
+          <nav className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-1">
+            <Link
+              to="/content"
+              onClick={() => setMenuOpen(false)}
+              className="px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition no-underline"
+            >
+              {t('nav.blog', 'Insights')}
+            </Link>
+            <Link
+              to="/auth/login"
+              onClick={() => setMenuOpen(false)}
+              className="px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition no-underline"
+            >
+              {t('nav.login', 'Log in')}
+            </Link>
+            <Link
+              to="/auth/login"
+              onClick={() => setMenuOpen(false)}
+              className="mx-3 mt-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline text-center"
+            >
+              {t('nav.start', 'Get Started')}
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
@@ -358,14 +399,14 @@ export function LandingPage() {
       {/* ─── Floating CTA ─────────────────────── */}
       <button
         onClick={goLogin}
-        className="group fixed bottom-12 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-16 flex items-center gap-3 px-6 py-4 bg-transparent cursor-pointer z-50 whitespace-nowrap touch-manipulation"
+        className="group fixed bottom-6 sm:bottom-12 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-16 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-transparent cursor-pointer z-50 whitespace-nowrap touch-manipulation"
       >
         <div className="relative">
-          <img src="/favicon.png" alt="" className="w-14 h-14 relative z-10 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12 active:scale-120 active:rotate-12" />
+          <img src="/favicon.png" alt="" className="w-10 h-10 sm:w-14 sm:h-14 relative z-10 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12 active:scale-120 active:rotate-12" />
           <div className="absolute inset-0 bg-blue-500/0 rounded-full blur-xl transition-all duration-300 group-hover:bg-blue-500/40 group-hover:scale-150 group-active:bg-blue-500/40 group-active:scale-150" />
         </div>
         <div className="relative">
-          <span className="text-2xl font-bold text-gray-900 relative z-10 transition-all duration-300 group-hover:text-blue-600 group-hover:tracking-wider group-active:text-blue-600 group-active:tracking-wider">{t('floatingCta')}</span>
+          <span className="text-lg sm:text-2xl font-bold text-gray-900 relative z-10 transition-all duration-300 group-hover:text-blue-600 group-hover:tracking-wider group-active:text-blue-600 group-active:tracking-wider">{t('floatingCta')}</span>
           <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 rounded-full transition-all duration-300 group-hover:w-full group-hover:shadow-[0_0_10px_rgba(59,130,246,0.6)] group-active:w-full group-active:shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
         </div>
       </button>

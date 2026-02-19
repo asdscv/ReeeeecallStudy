@@ -33,7 +33,8 @@ export function ContentViewsChart({ data }: ContentViewsChartProps) {
             <Tooltip
               labelFormatter={(_label, payload) => {
                 const item = payload?.[0] as { payload?: { date?: string } } | undefined
-                return item?.payload?.date ?? ''
+                if (item?.payload?.date) return formatDateKeyShort(item.payload.date, dateLocale)
+                return ''
               }}
             />
             <Legend />

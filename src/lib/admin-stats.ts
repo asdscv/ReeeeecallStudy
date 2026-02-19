@@ -53,19 +53,25 @@ export function fillDailyActivityGaps(
   data: AdminDailyStudyActivity[],
   days: number,
 ): AdminDailyStudyActivity[] {
-  if (data.length === 0) return []
+  const now = new Date()
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 
+  let anchor: Date
   const dataMap = new Map(data.map((d) => [d.date, d]))
 
-  // Find the latest date in data (sort to handle out-of-order input)
-  const dates = data.map((d) => d.date).sort()
-  const latestStr = dates[dates.length - 1]
-  const [y, m, d] = latestStr.split('-').map(Number)
-  const latest = new Date(Date.UTC(y, m - 1, d))
+  if (data.length === 0) {
+    anchor = todayUTC
+  } else {
+    const dates = data.map((d) => d.date).sort()
+    const latestStr = dates[dates.length - 1]
+    const [y, m, d] = latestStr.split('-').map(Number)
+    const latestData = new Date(Date.UTC(y, m - 1, d))
+    anchor = latestData > todayUTC ? latestData : todayUTC
+  }
 
   const result: AdminDailyStudyActivity[] = []
   for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(latest)
+    const date = new Date(anchor)
     date.setUTCDate(date.getUTCDate() - i)
     const key = date.toISOString().split('T')[0]
     const existing = dataMap.get(key)
@@ -419,17 +425,25 @@ export interface DailyViewPoint {
 }
 
 export function fillDailyViewGaps(data: DailyViewPoint[], days: number): DailyViewPoint[] {
-  if (data.length === 0) return []
+  const now = new Date()
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 
+  let anchor: Date
   const dataMap = new Map(data.map((d) => [d.date, d]))
-  const dates = data.map((d) => d.date).sort()
-  const latestStr = dates[dates.length - 1]
-  const [y, m, d] = latestStr.split('-').map(Number)
-  const latest = new Date(Date.UTC(y, m - 1, d))
+
+  if (data.length === 0) {
+    anchor = todayUTC
+  } else {
+    const dates = data.map((d) => d.date).sort()
+    const latestStr = dates[dates.length - 1]
+    const [y, m, d] = latestStr.split('-').map(Number)
+    const latestData = new Date(Date.UTC(y, m - 1, d))
+    anchor = latestData > todayUTC ? latestData : todayUTC
+  }
 
   const result: DailyViewPoint[] = []
   for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(latest)
+    const date = new Date(anchor)
     date.setUTCDate(date.getUTCDate() - i)
     const key = date.toISOString().split('T')[0]
     const existing = dataMap.get(key)

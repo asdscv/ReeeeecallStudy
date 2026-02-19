@@ -147,7 +147,7 @@ export function AdminContentsPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
           <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.topPages')}</h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-gray-200 text-gray-500 text-xs">
                   <th className="pb-2 text-left font-medium">{t('contents.rank')}</th>
@@ -179,7 +179,7 @@ export function AdminContentsPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
           <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.popularContent')}</h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b border-gray-200 text-gray-500 text-xs">
                   <th className="pb-2 text-left font-medium">{t('contents.rank')}</th>

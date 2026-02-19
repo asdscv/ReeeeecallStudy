@@ -44,7 +44,7 @@ export function ContentListPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
         <div className="text-center mb-10 sm:mb-14 pb-12">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-3">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-3">
             {t('list.title')}
           </h1>
           <p className="text-gray-500 text-base sm:text-lg">

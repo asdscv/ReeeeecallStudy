@@ -40,7 +40,7 @@ export function DailyStudyChart({ data, title }: DailyStudyChartProps) {
               formatter={(value) => [t('dailyChart.tooltipTimes', { value }), t('dailyChart.tooltipLabel')]}
               labelFormatter={(_label, payload) => {
                 const item = payload?.[0] as { payload?: { date?: string } } | undefined
-                if (item?.payload?.date) return item.payload.date
+                if (item?.payload?.date) return formatDateKeyShort(item.payload.date, dateLocale)
                 return ''
               }}
             />

@@ -65,7 +65,7 @@ export function AdminStudyPage() {
       ) : (
         <>
           {/* Daily activity charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <DailyActivityChart data={filledActivity} dataKey="sessions" title={t('study.dailySessions')} />
             <DailyActivityChart data={filledActivity} dataKey="cards" title={t('study.dailyCards')} />
             <DailyActivityChart data={filledActivity} dataKey="total_duration_ms" title={t('study.dailyDuration')} />

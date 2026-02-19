@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   computeUserGrowthSeries,
   computeActiveInactiveUsers,
@@ -114,8 +114,20 @@ describe('computeActiveInactiveUsers', () => {
 // ── 3. fillDailyActivityGaps ──
 
 describe('fillDailyActivityGaps', () => {
-  it('returns empty array for empty input', () => {
-    expect(fillDailyActivityGaps([], 7)).toEqual([])
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-02-17T12:00:00Z'))
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('returns filled array of zeroes for empty input (anchored to today)', () => {
+    const result = fillDailyActivityGaps([], 7)
+    expect(result).toHaveLength(7)
+    expect(result[6].date).toBe('2026-02-17')
+    expect(result[0].date).toBe('2026-02-11')
+    expect(result.every(d => d.sessions === 0 && d.cards === 0 && d.total_duration_ms === 0)).toBe(true)
   })
 
   it('fills missing dates with zeroes', () => {
@@ -157,6 +169,20 @@ describe('fillDailyActivityGaps', () => {
     expect(result).toHaveLength(3)
     expect(result[0].sessions).toBe(3)
     expect(result[2].sessions).toBe(5)
+  })
+
+  it('anchors to today when data is stale (latest date < today)', () => {
+    // Today is 2026-02-17, data only has Jan 22
+    const data: AdminDailyStudyActivity[] = [
+      { date: '2026-01-22', sessions: 5, cards: 50, total_duration_ms: 10000 },
+    ]
+    const result = fillDailyActivityGaps(data, 7)
+    expect(result).toHaveLength(7)
+    // Should end at today (2026-02-17), not at the stale date
+    expect(result[6].date).toBe('2026-02-17')
+    expect(result[0].date).toBe('2026-02-11')
+    // All entries should be zero (stale data out of range)
+    expect(result.every(d => d.sessions === 0)).toBe(true)
   })
 })
 
@@ -418,7 +444,15 @@ describe('validateAdminDays', () => {
 // ── 10. fillDailyActivityGaps edge cases ──
 
 describe('fillDailyActivityGaps edge cases', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('handles single date entry', () => {
+    vi.setSystemTime(new Date('2026-01-01T12:00:00Z'))
     const data: AdminDailyStudyActivity[] = [
       { date: '2026-01-01', sessions: 5, cards: 50, total_duration_ms: 10000 },
     ]
@@ -427,7 +461,8 @@ describe('fillDailyActivityGaps edge cases', () => {
     expect(result[0].sessions).toBe(5)
   })
 
-  it('handles days=1 with multiple data points (uses latest only)', () => {
+  it('handles days=1 with multiple data points (uses today as anchor)', () => {
+    vi.setSystemTime(new Date('2026-02-15T12:00:00Z'))
     const data: AdminDailyStudyActivity[] = [
       { date: '2026-02-10', sessions: 1, cards: 10, total_duration_ms: 0 },
       { date: '2026-02-15', sessions: 5, cards: 50, total_duration_ms: 0 },
@@ -439,19 +474,19 @@ describe('fillDailyActivityGaps edge cases', () => {
   })
 
   it('produces consistent UTC dates regardless of local timezone', () => {
-    // Dates from server are always YYYY-MM-DD (date-only strings)
+    vi.setSystemTime(new Date('2026-03-31T12:00:00Z'))
     const data: AdminDailyStudyActivity[] = [
       { date: '2026-03-31', sessions: 3, cards: 30, total_duration_ms: 0 },
     ]
     const result = fillDailyActivityGaps(data, 3)
     expect(result).toHaveLength(3)
-    // Must produce correct sequential dates without local TZ shifting
     expect(result[0].date).toBe('2026-03-29')
     expect(result[1].date).toBe('2026-03-30')
     expect(result[2].date).toBe('2026-03-31')
   })
 
   it('handles month boundary correctly in UTC', () => {
+    vi.setSystemTime(new Date('2026-03-02T12:00:00Z'))
     const data: AdminDailyStudyActivity[] = [
       { date: '2026-03-02', sessions: 1, cards: 10, total_duration_ms: 0 },
     ]
@@ -852,8 +887,20 @@ describe('formatViewDuration', () => {
 // ── 22. fillDailyViewGaps ──
 
 describe('fillDailyViewGaps', () => {
-  it('returns empty for empty input', () => {
-    expect(fillDailyViewGaps([], 7)).toEqual([])
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-02-17T12:00:00Z'))
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('returns filled array of zeroes for empty input (anchored to today)', () => {
+    const result = fillDailyViewGaps([], 7)
+    expect(result).toHaveLength(7)
+    expect(result[6].date).toBe('2026-02-17')
+    expect(result[0].date).toBe('2026-02-11')
+    expect(result.every(d => d.views === 0 && d.unique_viewers === 0)).toBe(true)
   })
 
   it('fills missing dates with zeroes', () => {
@@ -887,6 +934,19 @@ describe('fillDailyViewGaps', () => {
     expect(result).toHaveLength(3)
     expect(result[0].views).toBe(10)
     expect(result[2].views).toBe(20)
+  })
+
+  it('anchors to today when data is stale (latest date < today)', () => {
+    // Today is 2026-02-17, data only has Jan 22
+    const data = [
+      { date: '2026-01-22', views: 100, unique_viewers: 50 },
+    ]
+    const result = fillDailyViewGaps(data, 7)
+    expect(result).toHaveLength(7)
+    expect(result[6].date).toBe('2026-02-17')
+    expect(result[0].date).toBe('2026-02-11')
+    // Stale data is out of the 7-day window
+    expect(result.every(d => d.views === 0)).toBe(true)
   })
 })
 

@@ -5,7 +5,7 @@ interface ContentCardProps {
   content: ContentListItem
 }
 
-const heights = [280, 320, 350, 380, 400, 420]
+const heights = [220, 250, 270, 290, 310, 330]
 
 export function ContentCard({ content }: ContentCardProps) {
   const heightIndex = content.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % heights.length

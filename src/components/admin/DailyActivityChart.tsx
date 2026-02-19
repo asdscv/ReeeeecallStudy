@@ -44,7 +44,8 @@ export function DailyActivityChart({ data, dataKey, title }: DailyActivityChartP
             <Tooltip
               labelFormatter={(_label, payload) => {
                 const item = payload?.[0] as { payload?: { date?: string } } | undefined
-                return item?.payload?.date ?? ''
+                if (item?.payload?.date) return formatDateKeyShort(item.payload.date, dateLocale)
+                return ''
               }}
             />
             <Legend />
