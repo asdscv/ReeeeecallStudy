@@ -74,6 +74,12 @@ export function buildCollectionPageJsonLd() {
     publisher: {
       '@type': 'Organization',
       name: SEO.BRAND_NAME,
+      logo: {
+        '@type': 'ImageObject',
+        url: SEO.DEFAULT_OG_IMAGE,
+        width: SEO.OG_IMAGE_WIDTH,
+        height: SEO.OG_IMAGE_HEIGHT,
+      },
     },
   }
 }

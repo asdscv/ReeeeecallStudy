@@ -136,6 +136,14 @@ describe('buildCollectionPageJsonLd', () => {
     const result = buildCollectionPageJsonLd()
     expect(result.image).toBe(SEO.DEFAULT_OG_IMAGE)
   })
+
+  it('should include publisher logo ImageObject with dimensions', () => {
+    const result = buildCollectionPageJsonLd()
+    expect(result.publisher.logo['@type']).toBe('ImageObject')
+    expect(result.publisher.logo.url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
 })
 
 describe('buildWebApplicationJsonLd', () => {
