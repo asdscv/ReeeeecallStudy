@@ -181,8 +181,17 @@ export function StudySessionPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Branding */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center gap-2">
+          <img src="/favicon.png" alt="" className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
+          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-4 sm:h-5 hidden sm:block" />
+          <span className="text-sm font-bold text-gray-900 sm:hidden">ReeeeecallStudy</span>
+        </div>
+      </div>
+
       {/* Top bar */}
-      <div className="sticky top-0 bg-white border-b border-gray-200">
+      <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <StudyProgressBar
             current={sessionStats.cardsStudied}
