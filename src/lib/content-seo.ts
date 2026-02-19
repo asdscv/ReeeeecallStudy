@@ -141,8 +141,8 @@ export function buildWebApplicationJsonLd() {
 }
 
 export function buildHreflangAlternates(slug: string) {
-  const alternates = SEO.SUPPORTED_LOCALES.map((locale) => ({
-    lang: locale,
+  const alternates: { lang: string; href: string }[] = SEO.SUPPORTED_LOCALES.map((locale) => ({
+    lang: locale as string,
     href: `${SEO.SITE_URL}/content/${slug}?lang=${locale}`,
   }))
   alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}/content/${slug}` })

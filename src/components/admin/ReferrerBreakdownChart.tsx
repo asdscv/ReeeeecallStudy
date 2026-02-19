@@ -38,7 +38,7 @@ export function ReferrerBreakdownChart({ data }: ReferrerBreakdownChartProps) {
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label={({ name, percentage }) => `${name} (${percentage}%)`}
+              label={(props) => `${props.name ?? ''} (${((props.percent ?? 0) * 100).toFixed(0)}%)`}
             >
               {translatedData.map((item) => (
                 <Cell key={item.category} fill={COLORS[item.category] ?? '#6b7280'} />

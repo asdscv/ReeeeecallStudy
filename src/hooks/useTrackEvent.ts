@@ -35,6 +35,6 @@ export function useTrackEvent() {
         p_page_path: pagePath,
         p_session_id: sessionId,
       })
-      .catch((e) => logAnalyticsError('record_analytics_event', e))
+      .then(null, (e: unknown) => logAnalyticsError('record_analytics_event', e))
   }, [])
 }

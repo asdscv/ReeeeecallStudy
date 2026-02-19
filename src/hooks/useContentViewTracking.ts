@@ -62,13 +62,15 @@ export function useContentViewTracking(contentId: string | undefined) {
           p_device_type: deviceType,
           p_viewport_width: viewportWidth,
         })
-        .then(({ data }) => {
-          if (typeof data === 'string' && data.length > 0) {
-            viewIdRef.current = data
-            viewTracker.markViewed(contentId, data)
-          }
-        })
-        .catch((e) => logAnalyticsError('record_content_view', e))
+        .then(
+          ({ data }) => {
+            if (typeof data === 'string' && data.length > 0) {
+              viewIdRef.current = data
+              viewTracker.markViewed(contentId, data)
+            }
+          },
+          (e: unknown) => logAnalyticsError('record_content_view', e),
+        )
     }
 
     const sendDuration = () => {

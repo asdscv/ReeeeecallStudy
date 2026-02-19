@@ -52,6 +52,6 @@ export function usePageTracking() {
         p_device_type: deviceType,
         p_viewport_width: window.innerWidth,
       })
-      .catch((e) => logAnalyticsError('record_page_view', e))
+      .then(null, (e: unknown) => logAnalyticsError('record_page_view', e))
   }, [location.pathname])
 }
