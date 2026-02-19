@@ -24,12 +24,12 @@ export function validateEvent(input: AnalyticsEvent): ValidateEventResult {
   }
 
   const event: AnalyticsEvent = {
-    category: input.category.slice(0, MAX_CATEGORY),
-    action: input.action.slice(0, MAX_ACTION),
+    category: input.category.trim().slice(0, MAX_CATEGORY),
+    action: input.action.trim().slice(0, MAX_ACTION),
   }
 
   if (input.label) {
-    event.label = input.label.slice(0, MAX_LABEL)
+    event.label = input.label.trim().slice(0, MAX_LABEL)
   }
 
   if (input.value !== undefined) {

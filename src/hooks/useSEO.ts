@@ -100,7 +100,8 @@ export function useSEO(options: SEOOptions) {
     if (altLocales.length > 0) {
       setMeta('property', 'og:locale:alternate', altLocales[0])
     }
-    setMeta('property', 'og:url', canonicalUrl || `${window.location.origin}${window.location.pathname}`)
+    const effectiveUrl = canonicalUrl || `${window.location.origin}${window.location.pathname}`
+    setMeta('property', 'og:url', effectiveUrl)
 
     // OG image with dimensions and alt
     if (ogImage) {
@@ -152,8 +153,7 @@ export function useSEO(options: SEOOptions) {
     }
 
     // Canonical — always set to prevent duplicate content issues
-    const effectiveCanonical = canonicalUrl || `${window.location.origin}${window.location.pathname}`
-    setLink('canonical', '', effectiveCanonical)
+    setLink('canonical', '', effectiveUrl)
 
     // Hreflang
     const hreflangKeys: string[] = []

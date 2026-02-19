@@ -163,6 +163,7 @@ export function buildOrganizationJsonLd() {
     },
     sameAs: [
       `https://twitter.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
+      `https://x.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
     ],
     contactPoint: {
       '@type': 'ContactPoint',

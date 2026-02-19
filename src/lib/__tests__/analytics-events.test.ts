@@ -90,4 +90,17 @@ describe('validateEvent', () => {
       expect(result.valid).toBe(true)
     }
   })
+
+  it('trims leading/trailing whitespace from category and action before storing', () => {
+    const result = validateEvent({ category: '  content  ', action: '  share  ' })
+    expect(result.valid).toBe(true)
+    expect(result.event!.category).toBe('content')
+    expect(result.event!.action).toBe('share')
+  })
+
+  it('trims label before storing', () => {
+    const result = validateEvent({ category: 'test', action: 'test', label: '  twitter  ' })
+    expect(result.valid).toBe(true)
+    expect(result.event!.label).toBe('twitter')
+  })
 })

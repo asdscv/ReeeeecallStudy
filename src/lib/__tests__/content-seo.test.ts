@@ -264,6 +264,13 @@ describe('buildOrganizationJsonLd', () => {
     expect(Array.isArray(result.sameAs)).toBe(true)
   })
 
+  it('should include both twitter.com and x.com in sameAs', () => {
+    const result = buildOrganizationJsonLd()
+    const handle = SEO.TWITTER_HANDLE.replace('@', '')
+    expect(result.sameAs).toContain(`https://twitter.com/${handle}`)
+    expect(result.sameAs).toContain(`https://x.com/${handle}`)
+  })
+
   it('should include contactPoint', () => {
     const result = buildOrganizationJsonLd()
     expect(result.contactPoint['@type']).toBe('ContactPoint')
