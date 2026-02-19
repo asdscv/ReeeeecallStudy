@@ -13,6 +13,8 @@ interface SEOHeadProps {
   publishedTime?: string
   modifiedTime?: string
   articleSection?: string
+  keywords?: string[]
+  articleTags?: string[]
 }
 
 export function SEOHead(props: SEOHeadProps) {

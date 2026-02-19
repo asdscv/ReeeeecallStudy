@@ -7,7 +7,7 @@ import { ContentCard } from '../components/content/ContentCard'
 import { ContentSkeleton } from '../components/content/ContentSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
 import { SEOHead } from '../components/content/SEOHead'
-import { buildCollectionPageJsonLd } from '../lib/content-seo'
+import { buildCollectionPageJsonLd, buildOrganizationJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 
 export function ContentListPage() {
@@ -32,7 +32,8 @@ export function ContentListPage() {
         ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
         canonicalUrl={`${SEO.SITE_URL}/content`}
-        jsonLd={buildCollectionPageJsonLd()}
+        jsonLd={[buildCollectionPageJsonLd(), buildOrganizationJsonLd()]}
+        keywords={['spaced repetition', 'learning strategies', 'study tips', 'flashcards', 'active recall', 'memory techniques']}
         hreflangAlternates={[
           { lang: 'en', href: `${SEO.SITE_URL}/content?lang=en` },
           { lang: 'ko', href: `${SEO.SITE_URL}/content?lang=ko` },

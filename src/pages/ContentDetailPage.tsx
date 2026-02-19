@@ -7,7 +7,7 @@ import { BlockRenderer } from '../components/content/BlockRenderer'
 import { ContentDetailSkeleton } from '../components/content/ContentDetailSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
 import { SEOHead } from '../components/content/SEOHead'
-import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates } from '../lib/content-seo'
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates, buildLearningResourceJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 
 export function ContentDetailPage() {
@@ -59,18 +59,24 @@ export function ContentDetailPage() {
         ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || SEO.DEFAULT_OG_IMAGE}
         ogType="article"
         canonicalUrl={currentArticle.canonical_url || `${SEO.SITE_URL}/content/${currentArticle.slug}`}
-        jsonLd={[buildArticleJsonLd(currentArticle), buildBreadcrumbJsonLd(currentArticle)]}
+        jsonLd={[
+          buildArticleJsonLd(currentArticle),
+          buildBreadcrumbJsonLd(currentArticle),
+          buildLearningResourceJsonLd(currentArticle),
+        ]}
         hreflangAlternates={buildHreflangAlternates(currentArticle.slug)}
         publishedTime={currentArticle.published_at}
         modifiedTime={currentArticle.updated_at}
         articleSection={currentArticle.tags?.[0]}
+        keywords={currentArticle.tags}
+        articleTags={currentArticle.tags}
       />
       <ContentNav
         backTo="/content"
         backLabel={t('detail.backToList')}
       />
 
-      <article className="max-w-3xl mx-auto px-4 py-10 sm:py-16">
+      <article className="max-w-3xl mx-auto px-4 py-10 sm:py-16" data-speakable>
         <BlockRenderer blocks={currentArticle.content_blocks} />
       </article>
 

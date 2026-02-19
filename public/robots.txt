@@ -1,5 +1,5 @@
+# ReeeeecallStudy robots.txt
 User-agent: *
-Allow: /
 Allow: /landing
 Allow: /content
 Allow: /content/*
@@ -13,5 +13,33 @@ Disallow: /marketplace
 Disallow: /my-shares
 Disallow: /templates
 Disallow: /api/
+
+# Crawl-delay for polite crawling
+User-agent: Googlebot
+Crawl-delay: 1
+
+User-agent: Bingbot
+Crawl-delay: 2
+
+# Allow AI answer engines
+User-agent: ChatGPT-User
+Allow: /landing
+Allow: /content
+Allow: /content/*
+
+User-agent: PerplexityBot
+Allow: /landing
+Allow: /content
+Allow: /content/*
+
+User-agent: ClaudeBot
+Allow: /landing
+Allow: /content
+Allow: /content/*
+
+User-agent: Google-Extended
+Allow: /landing
+Allow: /content
+Allow: /content/*
 
 Sitemap: https://reeeeecallstudy.com/sitemap.xml

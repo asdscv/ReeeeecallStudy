@@ -3,7 +3,13 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Brain, Layers, BarChart3, Share2, Globe, Smartphone, Zap, BookOpen, CheckCircle2 } from 'lucide-react'
 import { SEOHead } from '../components/content/SEOHead'
-import { buildWebApplicationJsonLd } from '../lib/content-seo'
+import {
+  buildWebApplicationJsonLd,
+  buildOrganizationJsonLd,
+  buildWebSiteJsonLd,
+  buildHowToJsonLd,
+  buildFAQJsonLd,
+} from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 import { useContentStore } from '../stores/content-store'
 
@@ -64,6 +70,27 @@ export function LandingPage() {
 
   const benefits = Array.from({ length: 8 }, (_, i) => t(`benefits.${i}`))
 
+  const howToSteps = [
+    { name: t('howItWorks.step1.title'), text: t('howItWorks.step1.desc') },
+    { name: t('howItWorks.step2.title'), text: t('howItWorks.step2.desc') },
+    { name: t('howItWorks.step3.title'), text: t('howItWorks.step3.desc') },
+  ]
+
+  const faqItems = [
+    { question: t('faq.q1', 'What is spaced repetition (SRS)?'), answer: t('faq.a1', 'Spaced repetition is a scientifically proven learning method that schedules reviews at optimal intervals to maximize long-term memory retention.') },
+    { question: t('faq.q2', 'Is ReeeeecallStudy free?'), answer: t('faq.a2', 'Yes! ReeeeecallStudy is free to use. Sign up with email and password to start learning immediately.') },
+    { question: t('faq.q3', 'What study modes are available?'), answer: t('faq.a3', 'ReeeeecallStudy supports 5 study modes: SRS (spaced repetition), Random, Sequential, Sequential Review, and By Date.') },
+    { question: t('faq.q4', 'Can I share my flashcard decks?'), answer: t('faq.a4', 'Yes! You can share decks in 3 modes: Copy, Subscribe, and Snapshot. Browse other users\' decks in the marketplace.') },
+  ]
+
+  const landingSchemas = [
+    buildWebApplicationJsonLd(),
+    buildOrganizationJsonLd(),
+    buildWebSiteJsonLd(),
+    buildHowToJsonLd(t('howItWorks.title'), howToSteps, 'PT3M'),
+    buildFAQJsonLd(faqItems),
+  ].filter(Boolean)
+
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
@@ -72,7 +99,8 @@ export function LandingPage() {
         ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
         canonicalUrl={`${SEO.SITE_URL}/landing`}
-        jsonLd={buildWebApplicationJsonLd()}
+        jsonLd={landingSchemas}
+        keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
         hreflangAlternates={[
           { lang: 'en', href: `${SEO.SITE_URL}/landing?lang=en` },
           { lang: 'ko', href: `${SEO.SITE_URL}/landing?lang=ko` },
@@ -267,6 +295,28 @@ export function LandingPage() {
           </div>
         </section>
       )}
+
+      {/* ─── FAQ ─────────────────────────────── */}
+      <section className="py-16 sm:py-24 px-4 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-10 text-center">
+            {t('faq.title', 'Frequently Asked Questions')}
+          </h2>
+          <div className="space-y-4">
+            {faqItems.map((item, i) => (
+              <details key={i} className="group bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <summary className="flex items-center justify-between cursor-pointer p-5 text-left font-semibold text-gray-900 hover:bg-gray-50 transition">
+                  {item.question}
+                  <ArrowRight className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-90 shrink-0 ml-4" />
+                </summary>
+                <div className="px-5 pb-5 text-gray-600 leading-relaxed">
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ─── CTA ───────────────────────────── */}
       <section id="cta" className="py-16 sm:py-24 px-4">

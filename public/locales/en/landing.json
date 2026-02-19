@@ -177,6 +177,17 @@
     "apiDocs": "API Docs"
   },
   "floatingCta": "Start Now",
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": "What is spaced repetition (SRS)?",
+    "a1": "Spaced repetition is a scientifically proven learning method that schedules reviews at optimal intervals to maximize long-term memory retention. ReeeeecallStudy uses an advanced SRS algorithm to automatically determine when you should review each flashcard.",
+    "q2": "Is ReeeeecallStudy free?",
+    "a2": "Yes! ReeeeecallStudy is free to use. Sign up with email and password to start learning immediately with all core features including SRS, multiple study modes, and detailed statistics.",
+    "q3": "What study modes are available?",
+    "a3": "ReeeeecallStudy supports 5 study modes: SRS (spaced repetition) for optimal review scheduling, Random for mixed practice, Sequential for ordered review, Sequential Review for systematic revision, and By Date for time-based organization.",
+    "q4": "Can I share my flashcard decks?",
+    "a4": "Yes! You can share decks in 3 modes: Copy (duplicate for others), Subscribe (sync updates), and Snapshot (frozen version). Browse and discover other users' decks in the community marketplace."
+  },
   "seo": {
     "title": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
     "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."

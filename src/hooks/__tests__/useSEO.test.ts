@@ -183,4 +183,110 @@ describe('useSEO', () => {
     expect(meta).toBeTruthy()
     expect(meta?.getAttribute('content')).toBe('Learning')
   })
+
+  it('should set keywords meta tag', () => {
+    renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        keywords: ['spaced repetition', 'flashcards', 'learning'],
+      }),
+    )
+    const meta = document.querySelector('meta[name="keywords"]')
+    expect(meta).toBeTruthy()
+    expect(meta?.getAttribute('content')).toBe('spaced repetition, flashcards, learning')
+  })
+
+  it('should not set keywords meta when keywords is empty', () => {
+    renderHook(() =>
+      useSEO({ title: 'T', description: 'd', keywords: [] }),
+    )
+    const meta = document.querySelector('meta[name="keywords"]')
+    expect(meta).toBeNull()
+  })
+
+  it('should set article:tag meta for each tag', () => {
+    renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogType: 'article',
+        articleTags: ['srs', 'learning', 'memory'],
+      }),
+    )
+    const tags = document.querySelectorAll('meta[property="article:tag"]')
+    expect(tags).toHaveLength(3)
+    expect(tags[0].getAttribute('content')).toBe('srs')
+    expect(tags[1].getAttribute('content')).toBe('learning')
+    expect(tags[2].getAttribute('content')).toBe('memory')
+  })
+
+  it('should cleanup article:tag on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogType: 'article',
+        articleTags: ['srs', 'learning'],
+      }),
+    )
+    expect(document.querySelectorAll('meta[property="article:tag"]')).toHaveLength(2)
+    unmount()
+    expect(document.querySelectorAll('meta[property="article:tag"]')).toHaveLength(0)
+  })
+
+  it('should cleanup keywords meta on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        keywords: ['test'],
+      }),
+    )
+    expect(document.querySelector('meta[name="keywords"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[name="keywords"]')).toBeNull()
+  })
+
+  it('should cleanup all OG and Twitter meta tags on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogImage: 'https://example.com/img.png',
+        canonicalUrl: 'https://example.com',
+      }),
+    )
+    // Verify tags exist
+    expect(document.querySelector('meta[property="og:title"]')).toBeTruthy()
+    expect(document.querySelector('meta[property="og:description"]')).toBeTruthy()
+    expect(document.querySelector('meta[property="og:type"]')).toBeTruthy()
+    expect(document.querySelector('meta[property="og:site_name"]')).toBeTruthy()
+    expect(document.querySelector('meta[property="og:locale"]')).toBeTruthy()
+    expect(document.querySelector('meta[property="og:url"]')).toBeTruthy()
+    expect(document.querySelector('meta[property="og:image"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="description"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:card"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:site"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:title"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:description"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:image"]')).toBeTruthy()
+
+    unmount()
+
+    // All should be cleaned up
+    expect(document.querySelector('meta[property="og:title"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:description"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:type"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:site_name"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:locale"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:url"]')).toBeNull()
+    expect(document.querySelector('meta[property="og:image"]')).toBeNull()
+    expect(document.querySelector('meta[name="description"]')).toBeNull()
+    expect(document.querySelector('meta[name="twitter:card"]')).toBeNull()
+    expect(document.querySelector('meta[name="twitter:site"]')).toBeNull()
+    expect(document.querySelector('meta[name="twitter:title"]')).toBeNull()
+    expect(document.querySelector('meta[name="twitter:description"]')).toBeNull()
+    expect(document.querySelector('meta[name="twitter:image"]')).toBeNull()
+  })
 })

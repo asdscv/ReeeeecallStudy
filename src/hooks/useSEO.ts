@@ -15,6 +15,8 @@ interface SEOOptions {
   publishedTime?: string
   modifiedTime?: string
   articleSection?: string
+  keywords?: string[]
+  articleTags?: string[]
 }
 
 function setMeta(attr: string, key: string, content: string) {
@@ -66,6 +68,8 @@ export function useSEO(options: SEOOptions) {
     publishedTime,
     modifiedTime,
     articleSection,
+    keywords,
+    articleTags,
   } = options
 
   useEffect(() => {
@@ -105,6 +109,23 @@ export function useSEO(options: SEOOptions) {
       if (articleSection) setMeta('property', 'article:section', articleSection)
     }
 
+    // Keywords
+    if (keywords && keywords.length > 0) {
+      setMeta('name', 'keywords', keywords.join(', '))
+    }
+
+    // Article tags (multiple meta tags)
+    const tagEls: HTMLMetaElement[] = []
+    if (ogType === 'article' && articleTags) {
+      for (const tag of articleTags) {
+        const el = document.createElement('meta')
+        el.setAttribute('property', 'article:tag')
+        el.setAttribute('content', tag)
+        document.head.appendChild(el)
+        tagEls.push(el)
+      }
+    }
+
     // Twitter Card
     setMeta('name', 'twitter:card', ogImage ? 'summary_large_image' : 'summary')
     setMeta('name', 'twitter:site', SEO.TWITTER_HANDLE)
@@ -142,20 +163,53 @@ export function useSEO(options: SEOOptions) {
     return () => {
       document.title = prevTitle
       document.documentElement.lang = prevLang
-      for (const s of scripts) s.remove()
-      if (canonicalUrl) removeLink('canonical')
-      for (const key of hreflangKeys) {
-        removeLink('alternate', key)
-      }
+
+      // Core meta cleanup
+      removeMeta('name', 'description')
+      removeMeta('property', 'og:title')
+      removeMeta('property', 'og:description')
+      removeMeta('property', 'og:type')
+      removeMeta('property', 'og:site_name')
+      removeMeta('property', 'og:locale')
+      if (canonicalUrl) removeMeta('property', 'og:url')
+
+      // OG image cleanup
       if (ogImage) {
+        removeMeta('property', 'og:image')
         removeMeta('property', 'og:image:width')
         removeMeta('property', 'og:image:height')
       }
+
+      // Article meta cleanup
       if (ogType === 'article') {
         removeMeta('property', 'article:published_time')
         removeMeta('property', 'article:modified_time')
         removeMeta('property', 'article:section')
       }
+
+      // Keywords cleanup
+      if (keywords && keywords.length > 0) {
+        removeMeta('name', 'keywords')
+      }
+
+      // Article tags cleanup
+      for (const el of tagEls) el.remove()
+
+      // Twitter cleanup
+      removeMeta('name', 'twitter:card')
+      removeMeta('name', 'twitter:site')
+      removeMeta('name', 'twitter:title')
+      removeMeta('name', 'twitter:description')
+      if (ogImage) removeMeta('name', 'twitter:image')
+
+      // Links cleanup
+      if (canonicalUrl) removeLink('canonical')
+      for (const key of hreflangKeys) {
+        removeLink('alternate', key)
+      }
+
+      // JSON-LD cleanup
+      for (const s of scripts) s.remove()
     }
-  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection])
+  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags])
 }
