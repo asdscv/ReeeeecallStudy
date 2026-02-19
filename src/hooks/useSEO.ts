@@ -93,9 +93,10 @@ export function useSEO(options: SEOOptions) {
     setMeta('property', 'og:locale', currentLang === 'ko' ? 'ko_KR' : 'en_US')
     if (canonicalUrl) setMeta('property', 'og:url', canonicalUrl)
 
-    // OG image with dimensions
+    // OG image with dimensions and alt
     if (ogImage) {
       setMeta('property', 'og:image', ogImage)
+      setMeta('property', 'og:image:alt', title)
       const w = ogImageWidth || SEO.OG_IMAGE_WIDTH
       const h = ogImageHeight || SEO.OG_IMAGE_HEIGHT
       setMeta('property', 'og:image:width', String(w))
@@ -131,7 +132,10 @@ export function useSEO(options: SEOOptions) {
     setMeta('name', 'twitter:site', SEO.TWITTER_HANDLE)
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
-    if (ogImage) setMeta('name', 'twitter:image', ogImage)
+    if (ogImage) {
+      setMeta('name', 'twitter:image', ogImage)
+      setMeta('name', 'twitter:image:alt', title)
+    }
 
     // Canonical
     if (canonicalUrl) {
@@ -176,6 +180,7 @@ export function useSEO(options: SEOOptions) {
       // OG image cleanup
       if (ogImage) {
         removeMeta('property', 'og:image')
+        removeMeta('property', 'og:image:alt')
         removeMeta('property', 'og:image:width')
         removeMeta('property', 'og:image:height')
       }
@@ -200,7 +205,10 @@ export function useSEO(options: SEOOptions) {
       removeMeta('name', 'twitter:site')
       removeMeta('name', 'twitter:title')
       removeMeta('name', 'twitter:description')
-      if (ogImage) removeMeta('name', 'twitter:image')
+      if (ogImage) {
+        removeMeta('name', 'twitter:image')
+        removeMeta('name', 'twitter:image:alt')
+      }
 
       // Links cleanup
       if (canonicalUrl) removeLink('canonical')

@@ -248,6 +248,37 @@ describe('useSEO', () => {
     expect(document.querySelector('meta[name="keywords"]')).toBeNull()
   })
 
+  it('should set og:image:alt and twitter:image:alt when ogImage is provided', () => {
+    renderHook(() =>
+      useSEO({
+        title: 'My Article Title',
+        description: 'd',
+        ogImage: 'https://example.com/img.png',
+      }),
+    )
+    const ogAlt = document.querySelector('meta[property="og:image:alt"]')
+    const twAlt = document.querySelector('meta[name="twitter:image:alt"]')
+    expect(ogAlt).toBeTruthy()
+    expect(ogAlt?.getAttribute('content')).toBe('My Article Title')
+    expect(twAlt).toBeTruthy()
+    expect(twAlt?.getAttribute('content')).toBe('My Article Title')
+  })
+
+  it('should cleanup og:image:alt and twitter:image:alt on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogImage: 'https://example.com/img.png',
+      }),
+    )
+    expect(document.querySelector('meta[property="og:image:alt"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:image:alt"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[property="og:image:alt"]')).toBeNull()
+    expect(document.querySelector('meta[name="twitter:image:alt"]')).toBeNull()
+  })
+
   it('should cleanup all OG and Twitter meta tags on unmount', () => {
     const { unmount } = renderHook(() =>
       useSEO({
