@@ -5,6 +5,12 @@ import type {
   AdminActiveUsers,
   AdminRecentActivity,
   AdminPopularContent,
+  AdminReferrerBreakdown,
+  AdminDeviceBreakdown,
+  AdminScrollDepthData,
+  AdminConversionFunnelData,
+  AdminBounceRate,
+  AdminUtmSourceBreakdown,
 } from '../types/database'
 
 // ── User Growth Series ──
@@ -454,5 +460,187 @@ export function computePopularContentTable(data: AdminPopularContent[]): Popular
     view_count: d.view_count,
     unique_viewers: d.unique_viewers,
     avg_duration: formatViewDuration(d.avg_duration_ms),
+  }))
+}
+
+// ── Referrer Breakdown ──
+
+export interface ReferrerBreakdownItem {
+  category: string
+  count: number
+  percentage: number
+}
+
+export function computeReferrerBreakdown(data: AdminReferrerBreakdown[]): ReferrerBreakdownItem[] {
+  if (data.length === 0) return []
+
+  const total = data.reduce((s, d) => s + d.count, 0)
+  if (total === 0) return []
+
+  return data.map((d) => ({
+    category: d.category,
+    count: d.count,
+    percentage: Math.round((d.count / total) * 100),
+  }))
+}
+
+// ── Device Breakdown ──
+
+export interface DeviceBreakdownItem {
+  device: string
+  count: number
+  percentage: number
+}
+
+export function computeDeviceBreakdown(data: AdminDeviceBreakdown[]): DeviceBreakdownItem[] {
+  if (data.length === 0) return []
+
+  const total = data.reduce((s, d) => s + d.count, 0)
+  if (total === 0) return []
+
+  return data.map((d) => ({
+    device: d.device_type,
+    count: d.count,
+    percentage: Math.round((d.count / total) * 100),
+  }))
+}
+
+// ── Scroll Depth Distribution ──
+
+export interface ScrollDepthDistributionItem {
+  label: string
+  milestone: number
+  count: number
+}
+
+export function computeScrollDepthDistribution(data: AdminScrollDepthData[]): ScrollDepthDistributionItem[] {
+  if (data.length === 0) return []
+
+  return data
+    .sort((a, b) => a.milestone - b.milestone)
+    .map((d) => ({
+      label: `${d.milestone}%`,
+      milestone: d.milestone,
+      count: d.count,
+    }))
+}
+
+// ── Conversion Funnel ──
+
+export interface ConversionFunnelStep {
+  label: string
+  key: string
+  count: number
+  percentage: number
+}
+
+export function computeConversionFunnel(data: AdminConversionFunnelData): ConversionFunnelStep[] {
+  const steps: { key: string; label: string; value: number }[] = [
+    { key: 'content_viewers', label: 'Content Viewers', value: data.content_viewers },
+    { key: 'signed_up', label: 'Signed Up', value: data.signed_up },
+    { key: 'created_deck', label: 'Created Deck', value: data.created_deck },
+    { key: 'studied_cards', label: 'Studied Cards', value: data.studied_cards },
+  ]
+
+  const top = steps[0].value || 1
+
+  return steps.map((s) => ({
+    label: s.label,
+    key: s.key,
+    count: s.value,
+    percentage: Math.round((s.value / top) * 100),
+  }))
+}
+
+// ── Merge Daily Summary with Live (Phase 4) ──
+
+export interface DailySummaryRow {
+  date: string
+  view_count: number
+  unique_sessions: number
+  unique_viewers: number
+  avg_duration_ms: number
+}
+
+export function mergeDailySummaryWithLive(
+  summaries: DailySummaryRow[],
+  live: DailyViewPoint[],
+): DailyViewPoint[] {
+  const merged = new Map<string, DailyViewPoint>()
+
+  for (const s of summaries) {
+    merged.set(s.date, {
+      date: s.date,
+      views: s.view_count,
+      unique_viewers: s.unique_viewers,
+    })
+  }
+
+  // Live data overrides summaries for recent days
+  for (const l of live) {
+    merged.set(l.date, l)
+  }
+
+  return Array.from(merged.values()).sort((a, b) => a.date.localeCompare(b.date))
+}
+
+// ── Bounce Rate ──
+
+export interface BounceRateMetrics {
+  bounceRate: number   // percentage 0–100
+  engagedRate: number  // percentage 0–100
+  total: number
+  bounced: number
+  engaged: number
+}
+
+export function computeBounceRate(data: AdminBounceRate): BounceRateMetrics {
+  const total = data.total_content_views
+  if (total === 0) {
+    return { bounceRate: 0, engagedRate: 0, total: 0, bounced: 0, engaged: 0 }
+  }
+  return {
+    bounceRate: Math.round((data.bounced_views / total) * 100),
+    engagedRate: Math.round((data.engaged_views / total) * 100),
+    total,
+    bounced: data.bounced_views,
+    engaged: data.engaged_views,
+  }
+}
+
+// ── Top Pages Table ──
+
+export interface TopPageRow {
+  page_path: string
+  view_count: number
+  unique_visitors: number
+}
+
+export function computeTopPagesTable(data: { page_path: string; view_count: number; unique_visitors: number }[]): TopPageRow[] {
+  return data.map((d) => ({
+    page_path: d.page_path,
+    view_count: d.view_count,
+    unique_visitors: d.unique_visitors,
+  }))
+}
+
+// ── UTM Source Breakdown ──
+
+export interface UtmSourceBreakdownItem {
+  source: string
+  count: number
+  percentage: number
+}
+
+export function computeUtmSourceBreakdown(data: AdminUtmSourceBreakdown[]): UtmSourceBreakdownItem[] {
+  if (data.length === 0) return []
+
+  const total = data.reduce((s, d) => s + d.count, 0)
+  if (total === 0) return []
+
+  return data.map((d) => ({
+    source: d.source,
+    count: d.count,
+    percentage: Math.round((d.count / total) * 100),
   }))
 }

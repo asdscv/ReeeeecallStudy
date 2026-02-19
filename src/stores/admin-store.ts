@@ -14,11 +14,12 @@ import type {
   AdminSrsStatusBreakdown,
   AdminRetentionMetrics,
   AdminContentsAnalytics,
+  AdminPageViewsAnalytics,
 } from '../types/database'
 
 const CACHE_TTL = 5 * 60_000 // 5 minutes
 
-type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'system'
+type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'pageViews' | 'system'
 
 interface AdminState {
   // Overview
@@ -54,6 +55,11 @@ interface AdminState {
   contentsLoading: boolean
   contentsError: string | null
 
+  // Page Views
+  pageViewsAnalytics: AdminPageViewsAnalytics | null
+  pageViewsLoading: boolean
+  pageViewsError: string | null
+
   // System
   systemStats: AdminSystemStats | null
   systemLoading: boolean
@@ -68,6 +74,7 @@ interface AdminState {
   fetchStudyActivity: (days?: number) => Promise<void>
   fetchMarket: () => Promise<void>
   fetchContents: () => Promise<void>
+  fetchPageViews: () => Promise<void>
   fetchSystem: () => Promise<void>
 }
 
@@ -104,11 +111,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   contentsLoading: false,
   contentsError: null,
 
+  pageViewsAnalytics: null,
+  pageViewsLoading: false,
+  pageViewsError: null,
+
   systemStats: null,
   systemLoading: false,
   systemError: null,
 
-  _fetchedAt: { overview: 0, users: 0, study: 0, market: 0, contents: 0, system: 0 },
+  _fetchedAt: { overview: 0, users: 0, study: 0, market: 0, contents: 0, pageViews: 0, system: 0 },
 
   fetchOverview: async () => {
     if (get().overviewLoading) return
@@ -257,6 +268,24 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       set({ contentsError: extractErrorMessage(e) })
     } finally {
       set({ contentsLoading: false })
+    }
+  },
+
+  fetchPageViews: async () => {
+    if (get().pageViewsLoading) return
+    if (isFresh(get()._fetchedAt, 'pageViews') && get().pageViewsAnalytics) return
+    set({ pageViewsLoading: true, pageViewsError: null })
+    try {
+      const { data, error } = await supabase.rpc('admin_page_views_analytics')
+      if (error) throw error
+      set({
+        pageViewsAnalytics: data as AdminPageViewsAnalytics | null,
+        _fetchedAt: { ...get()._fetchedAt, pageViews: Date.now() },
+      })
+    } catch (e) {
+      set({ pageViewsError: extractErrorMessage(e) })
+    } finally {
+      set({ pageViewsLoading: false })
     }
   },
 

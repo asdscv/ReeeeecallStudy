@@ -38,6 +38,12 @@ import { AdminStudyPage } from './pages/admin/AdminStudyPage'
 import { AdminContentPage } from './pages/admin/AdminContentPage'
 import { AdminContentsPage } from './pages/admin/AdminContentsPage'
 import { AdminSystemPage } from './pages/admin/AdminSystemPage'
+import { usePageTracking } from './hooks/usePageTracking'
+
+function PageTracker() {
+  usePageTracking()
+  return null
+}
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
@@ -56,6 +62,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <PageTracker />
       <Toaster richColors position="top-right" />
       <Routes>
         {/* Landing page (public) */}

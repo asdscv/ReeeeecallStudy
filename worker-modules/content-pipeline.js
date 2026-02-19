@@ -5,7 +5,7 @@ import { createLogger, info, warn, error } from './logger.js'
 import { selectTopic } from './topic-registry.js'
 import { buildPrompt } from './prompt-builder.js'
 import { callAI, generateImage } from './ai-client.js'
-import { validateArticle } from './content-schema.js'
+import { validateArticle, enrichCtaUrls } from './content-schema.js'
 import { createSupabaseClient } from './supabase-client.js'
 import { checkDuplicate, appendDateSuffix } from './dedup.js'
 
@@ -101,6 +101,8 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
 
     const validation = validateArticle(raw)
     if (validation.valid) {
+      // Inject enterprise UTM parameters into CTA block URLs
+      enrichCtaUrls(raw, locale)
       article = raw
       break
     }

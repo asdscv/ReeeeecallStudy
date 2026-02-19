@@ -139,7 +139,20 @@
     "topTags": "인기 태그",
     "recentPublished": "최근 발행",
     "readingTime": "{{value}}분 읽기",
-    "minuteShort": "{{value}}분"
+    "minuteShort": "{{value}}분",
+    "referrerBreakdown": "트래픽 소스",
+    "deviceBreakdown": "기기 유형",
+    "scrollDepth": "스크롤 깊이",
+    "scrollDepthDistribution": "스크롤 깊이 분포",
+    "conversionFunnel": "전환 퍼널",
+    "utmSources": "UTM 소스 분석",
+    "users": "사용자",
+    "bounceRate": "이탈률",
+    "engagedRate": "참여율",
+    "totalPageViews": "전체 페이지뷰",
+    "uniqueVisitors": "순 방문자",
+    "topPages": "인기 페이지",
+    "pagePath": "페이지 경로"
   },
   "system": {
     "title": "시스템",

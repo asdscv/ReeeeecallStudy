@@ -139,7 +139,20 @@
     "topTags": "Top Tags",
     "recentPublished": "Recently Published",
     "readingTime": "{{value}} min read",
-    "minuteShort": "{{value}}m"
+    "minuteShort": "{{value}}m",
+    "referrerBreakdown": "Traffic Sources",
+    "deviceBreakdown": "Device Types",
+    "scrollDepth": "Scroll Depth",
+    "scrollDepthDistribution": "Scroll Depth Distribution",
+    "conversionFunnel": "Conversion Funnel",
+    "utmSources": "UTM Source Attribution",
+    "users": "Users",
+    "bounceRate": "Bounce Rate",
+    "engagedRate": "Engaged Rate",
+    "totalPageViews": "Total Page Views",
+    "uniqueVisitors": "Unique Visitors",
+    "topPages": "Top Pages",
+    "pagePath": "Page Path"
   },
   "system": {
     "title": "System",

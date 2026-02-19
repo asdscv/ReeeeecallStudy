@@ -25,6 +25,14 @@ import {
   formatViewDuration,
   fillDailyViewGaps,
   computePopularContentTable,
+  computeReferrerBreakdown,
+  computeDeviceBreakdown,
+  computeScrollDepthDistribution,
+  computeConversionFunnel,
+  mergeDailySummaryWithLive,
+  computeBounceRate,
+  computeTopPagesTable,
+  computeUtmSourceBreakdown,
 } from '../admin-stats'
 import type {
   AdminUserSignup,
@@ -904,5 +912,245 @@ describe('computePopularContentTable', () => {
       { id: '1', title: 'Test', slug: 'test', locale: 'en', view_count: 5, unique_viewers: 3, avg_duration_ms: 0 },
     ])
     expect(result[0].avg_duration).toBe('0s')
+  })
+})
+
+// ── 24. computeReferrerBreakdown ──
+
+describe('computeReferrerBreakdown', () => {
+  it('returns empty for empty input', () => {
+    expect(computeReferrerBreakdown([])).toEqual([])
+  })
+
+  it('computes percentages by category', () => {
+    const result = computeReferrerBreakdown([
+      { category: 'search', count: 60 },
+      { category: 'social', count: 30 },
+      { category: 'direct', count: 10 },
+    ])
+    expect(result).toEqual([
+      { category: 'search', count: 60, percentage: 60 },
+      { category: 'social', count: 30, percentage: 30 },
+      { category: 'direct', count: 10, percentage: 10 },
+    ])
+  })
+
+  it('handles all-zero counts', () => {
+    expect(computeReferrerBreakdown([{ category: 'direct', count: 0 }])).toEqual([])
+  })
+
+  it('handles single category at 100%', () => {
+    const result = computeReferrerBreakdown([{ category: 'search', count: 50 }])
+    expect(result[0].percentage).toBe(100)
+  })
+})
+
+// ── 25. computeDeviceBreakdown ──
+
+describe('computeDeviceBreakdown', () => {
+  it('returns empty for empty input', () => {
+    expect(computeDeviceBreakdown([])).toEqual([])
+  })
+
+  it('computes percentages by device type', () => {
+    const result = computeDeviceBreakdown([
+      { device_type: 'mobile', count: 50 },
+      { device_type: 'desktop', count: 40 },
+      { device_type: 'tablet', count: 10 },
+    ])
+    expect(result).toEqual([
+      { device: 'mobile', count: 50, percentage: 50 },
+      { device: 'desktop', count: 40, percentage: 40 },
+      { device: 'tablet', count: 10, percentage: 10 },
+    ])
+  })
+
+  it('handles all-zero counts', () => {
+    expect(computeDeviceBreakdown([{ device_type: 'desktop', count: 0 }])).toEqual([])
+  })
+})
+
+// ── 26. computeScrollDepthDistribution ──
+
+describe('computeScrollDepthDistribution', () => {
+  it('returns empty for empty input', () => {
+    expect(computeScrollDepthDistribution([])).toEqual([])
+  })
+
+  it('sorts by milestone and adds labels', () => {
+    const result = computeScrollDepthDistribution([
+      { milestone: 75, count: 20 },
+      { milestone: 25, count: 50 },
+      { milestone: 100, count: 10 },
+      { milestone: 0, count: 80 },
+      { milestone: 50, count: 35 },
+    ])
+    expect(result.map((r) => r.milestone)).toEqual([0, 25, 50, 75, 100])
+    expect(result[0].label).toBe('0%')
+    expect(result[4].label).toBe('100%')
+  })
+})
+
+// ── 27. computeConversionFunnel ──
+
+describe('computeConversionFunnel', () => {
+  it('computes funnel steps with percentages', () => {
+    const result = computeConversionFunnel({
+      content_viewers: 1000,
+      signed_up: 200,
+      created_deck: 100,
+      studied_cards: 50,
+    })
+    expect(result).toHaveLength(4)
+    expect(result[0]).toEqual({ label: 'Content Viewers', key: 'content_viewers', count: 1000, percentage: 100 })
+    expect(result[1]).toEqual({ label: 'Signed Up', key: 'signed_up', count: 200, percentage: 20 })
+    expect(result[2]).toEqual({ label: 'Created Deck', key: 'created_deck', count: 100, percentage: 10 })
+    expect(result[3]).toEqual({ label: 'Studied Cards', key: 'studied_cards', count: 50, percentage: 5 })
+  })
+
+  it('handles zero content viewers', () => {
+    const result = computeConversionFunnel({
+      content_viewers: 0,
+      signed_up: 0,
+      created_deck: 0,
+      studied_cards: 0,
+    })
+    expect(result[0].percentage).toBe(0)
+  })
+})
+
+// ── 28. mergeDailySummaryWithLive ──
+
+describe('mergeDailySummaryWithLive', () => {
+  it('merges summaries and live data', () => {
+    const summaries = [
+      { date: '2026-02-10', view_count: 100, unique_sessions: 50, unique_viewers: 40, avg_duration_ms: 5000 },
+      { date: '2026-02-11', view_count: 120, unique_sessions: 60, unique_viewers: 45, avg_duration_ms: 6000 },
+    ]
+    const live = [
+      { date: '2026-02-12', views: 80, unique_viewers: 30 },
+    ]
+    const result = mergeDailySummaryWithLive(summaries, live)
+    expect(result).toHaveLength(3)
+    expect(result[0].date).toBe('2026-02-10')
+    expect(result[0].views).toBe(100)
+    expect(result[2].date).toBe('2026-02-12')
+    expect(result[2].views).toBe(80)
+  })
+
+  it('live data overrides summary for same date', () => {
+    const summaries = [
+      { date: '2026-02-12', view_count: 100, unique_sessions: 50, unique_viewers: 40, avg_duration_ms: 5000 },
+    ]
+    const live = [
+      { date: '2026-02-12', views: 120, unique_viewers: 55 },
+    ]
+    const result = mergeDailySummaryWithLive(summaries, live)
+    expect(result).toHaveLength(1)
+    expect(result[0].views).toBe(120)
+  })
+
+  it('returns empty for both empty', () => {
+    expect(mergeDailySummaryWithLive([], [])).toEqual([])
+  })
+})
+
+// ── 29. computeBounceRate ──
+
+describe('computeBounceRate', () => {
+  it('computes bounce and engaged rates', () => {
+    const result = computeBounceRate({
+      total_content_views: 1000,
+      bounced_views: 400,
+      engaged_views: 600,
+    })
+    expect(result.bounceRate).toBe(40)
+    expect(result.engagedRate).toBe(60)
+    expect(result.total).toBe(1000)
+    expect(result.bounced).toBe(400)
+    expect(result.engaged).toBe(600)
+  })
+
+  it('handles zero total views', () => {
+    const result = computeBounceRate({
+      total_content_views: 0,
+      bounced_views: 0,
+      engaged_views: 0,
+    })
+    expect(result.bounceRate).toBe(0)
+    expect(result.engagedRate).toBe(0)
+  })
+
+  it('handles all bounced', () => {
+    const result = computeBounceRate({
+      total_content_views: 100,
+      bounced_views: 100,
+      engaged_views: 0,
+    })
+    expect(result.bounceRate).toBe(100)
+    expect(result.engagedRate).toBe(0)
+  })
+
+  it('handles all engaged', () => {
+    const result = computeBounceRate({
+      total_content_views: 100,
+      bounced_views: 0,
+      engaged_views: 100,
+    })
+    expect(result.bounceRate).toBe(0)
+    expect(result.engagedRate).toBe(100)
+  })
+})
+
+// ── 30. computeTopPagesTable ──
+
+describe('computeTopPagesTable', () => {
+  it('returns empty for empty input', () => {
+    expect(computeTopPagesTable([])).toEqual([])
+  })
+
+  it('maps page data correctly', () => {
+    const result = computeTopPagesTable([
+      { page_path: '/landing', view_count: 500, unique_visitors: 300 },
+      { page_path: '/content', view_count: 200, unique_visitors: 150 },
+    ])
+    expect(result).toHaveLength(2)
+    expect(result[0].page_path).toBe('/landing')
+    expect(result[0].view_count).toBe(500)
+    expect(result[1].unique_visitors).toBe(150)
+  })
+})
+
+// ── computeUtmSourceBreakdown ──
+
+describe('computeUtmSourceBreakdown', () => {
+  it('returns empty array for empty input', () => {
+    expect(computeUtmSourceBreakdown([])).toEqual([])
+  })
+
+  it('computes percentages correctly', () => {
+    const result = computeUtmSourceBreakdown([
+      { source: 'blog', count: 60 },
+      { source: 'google', count: 30 },
+      { source: 'organic', count: 10 },
+    ])
+    expect(result).toHaveLength(3)
+    expect(result[0]).toEqual({ source: 'blog', count: 60, percentage: 60 })
+    expect(result[1]).toEqual({ source: 'google', count: 30, percentage: 30 })
+    expect(result[2]).toEqual({ source: 'organic', count: 10, percentage: 10 })
+  })
+
+  it('handles single source (100%)', () => {
+    const result = computeUtmSourceBreakdown([{ source: 'blog', count: 42 }])
+    expect(result).toHaveLength(1)
+    expect(result[0].percentage).toBe(100)
+  })
+
+  it('returns empty for all-zero counts', () => {
+    const result = computeUtmSourceBreakdown([
+      { source: 'blog', count: 0 },
+      { source: 'organic', count: 0 },
+    ])
+    expect(result).toEqual([])
   })
 })

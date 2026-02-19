@@ -440,6 +440,56 @@ export type AdminRecentPublished = {
   tags: string[]
 }
 
+export type AdminReferrerBreakdown = {
+  category: string
+  count: number
+}
+
+export type AdminDeviceBreakdown = {
+  device_type: string
+  count: number
+}
+
+export type AdminScrollDepthData = {
+  milestone: number
+  count: number
+}
+
+export type AdminConversionFunnelData = {
+  content_viewers: number
+  signed_up: number
+  created_deck: number
+  studied_cards: number
+}
+
+export type AdminBounceRate = {
+  total_content_views: number
+  bounced_views: number
+  engaged_views: number
+}
+
+export type AdminTopPage = {
+  page_path: string
+  view_count: number
+  unique_visitors: number
+}
+
+export type AdminPageViewsAnalytics = {
+  total_page_views: number
+  unique_visitors: number
+  top_pages: AdminTopPage[]
+  daily_page_views: { date: string; views: number; unique_visitors: number }[]
+  referrer_breakdown: AdminReferrerBreakdown[]
+  device_breakdown: AdminDeviceBreakdown[]
+  utm_sources: { utm_source: string; count: number }[]
+  bounce_rate: AdminBounceRate
+}
+
+export type AdminUtmSourceBreakdown = {
+  source: string
+  count: number
+}
+
 export type AdminContentsAnalytics = {
   total_contents: number
   published_contents: number
@@ -454,4 +504,10 @@ export type AdminContentsAnalytics = {
   popular_content: AdminPopularContent[]
   daily_views: { date: string; views: number; unique_viewers: number }[]
   recent_published: AdminRecentPublished[]
+  referrer_breakdown: AdminReferrerBreakdown[]
+  device_breakdown: AdminDeviceBreakdown[]
+  scroll_depth: AdminScrollDepthData[]
+  conversion_funnel: AdminConversionFunnelData
+  utm_source_breakdown: AdminUtmSourceBreakdown[]
+  cta_clicks: number
 }

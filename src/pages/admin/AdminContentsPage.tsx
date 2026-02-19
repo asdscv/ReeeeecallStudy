@@ -6,6 +6,11 @@ import { AdminErrorState } from '../../components/admin/AdminErrorState'
 import { ContentViewsChart } from '../../components/admin/ContentViewsChart'
 import { PublishingTimelineChart } from '../../components/admin/PublishingTimelineChart'
 import { TagDistributionChart } from '../../components/admin/TagDistributionChart'
+import { ReferrerBreakdownChart } from '../../components/admin/ReferrerBreakdownChart'
+import { DeviceBreakdownChart } from '../../components/admin/DeviceBreakdownChart'
+import { ScrollDepthChart } from '../../components/admin/ScrollDepthChart'
+import { ConversionFunnelChart } from '../../components/admin/ConversionFunnelChart'
+import { UtmSourceChart } from '../../components/admin/UtmSourceChart'
 import {
   computeLocaleDistribution,
   computeTagCloudData,
@@ -13,6 +18,13 @@ import {
   formatViewDuration,
   fillDailyViewGaps,
   computePopularContentTable,
+  computeReferrerBreakdown,
+  computeDeviceBreakdown,
+  computeScrollDepthDistribution,
+  computeConversionFunnel,
+  computeUtmSourceBreakdown,
+  computeBounceRate,
+  computeTopPagesTable,
 } from '../../lib/admin-stats'
 import { formatRelativeTime } from '../../lib/date-utils'
 
@@ -26,11 +38,15 @@ const LOCALE_COLORS: Record<string, 'blue' | 'green' | 'purple' | 'orange' | 'pi
 export function AdminContentsPage() {
   const { t, i18n } = useTranslation('admin')
   const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
-  const { contentsAnalytics, contentsLoading, contentsError, fetchContents } = useAdminStore()
+  const {
+    contentsAnalytics, contentsLoading, contentsError, fetchContents,
+    pageViewsAnalytics, pageViewsLoading, fetchPageViews,
+  } = useAdminStore()
 
   useEffect(() => {
     fetchContents()
-  }, [fetchContents])
+    fetchPageViews()
+  }, [fetchContents, fetchPageViews])
 
   if (contentsLoading && !contentsAnalytics) {
     return <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>
@@ -48,6 +64,16 @@ export function AdminContentsPage() {
   const timeline = computePublishingTimeline(data.publishing_timeline)
   const dailyViews = fillDailyViewGaps(data.daily_views, 30)
   const popularRows = computePopularContentTable(data.popular_content)
+  const referrerData = computeReferrerBreakdown(data.referrer_breakdown ?? [])
+  const deviceData = computeDeviceBreakdown(data.device_breakdown ?? [])
+  const scrollData = computeScrollDepthDistribution(data.scroll_depth ?? [])
+  const funnelData = data.conversion_funnel ? computeConversionFunnel(data.conversion_funnel) : []
+  const utmData = computeUtmSourceBreakdown(data.utm_source_breakdown ?? [])
+
+  // Page views data (loaded independently)
+  const pv = pageViewsAnalytics
+  const bounceMetrics = pv?.bounce_rate ? computeBounceRate(pv.bounce_rate) : null
+  const topPages = pv?.top_pages ? computeTopPagesTable(pv.top_pages) : []
 
   return (
     <div className="space-y-6">
@@ -59,12 +85,26 @@ export function AdminContentsPage() {
         <AdminStatCard icon="⏱" label={t('contents.avgReadingTime')} value={t('contents.minuteShort', { value: data.avg_reading_time_minutes })} color="purple" />
       </div>
 
-      {/* View stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {/* View stats + bounce rate */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <AdminStatCard icon="👁" label={t('contents.totalViews')} value={data.total_views} color="blue" />
         <AdminStatCard icon="👤" label={t('contents.uniqueViewers')} value={data.unique_viewers} color="green" />
         <AdminStatCard icon="⏳" label={t('contents.avgViewDuration')} value={formatViewDuration(data.avg_view_duration_ms)} color="orange" />
+        {bounceMetrics && (
+          <AdminStatCard icon="↩" label={t('contents.bounceRate')} value={`${bounceMetrics.bounceRate}%`} color="pink" />
+        )}
       </div>
+
+      {/* Page views stats */}
+      {pv && !pageViewsLoading && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <AdminStatCard icon="📊" label={t('contents.totalPageViews')} value={pv.total_page_views} color="blue" />
+          <AdminStatCard icon="🧑" label={t('contents.uniqueVisitors')} value={pv.unique_visitors} color="green" />
+          {bounceMetrics && (
+            <AdminStatCard icon="✓" label={t('contents.engagedRate')} value={`${bounceMetrics.engagedRate}%`} color="green" />
+          )}
+        </div>
+      )}
 
       {/* Locale breakdown */}
       {locales.length > 0 && (
@@ -86,6 +126,50 @@ export function AdminContentsPage() {
 
       {/* Daily views chart */}
       <ContentViewsChart data={dailyViews} />
+
+      {/* Referrer & Device breakdown side-by-side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <ReferrerBreakdownChart data={referrerData} />
+        <DeviceBreakdownChart data={deviceData} />
+      </div>
+
+      {/* UTM Source Attribution */}
+      <UtmSourceChart data={utmData} ctaClicks={data.cta_clicks ?? 0} />
+
+      {/* Scroll depth & Conversion funnel */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <ScrollDepthChart data={scrollData} />
+        <ConversionFunnelChart data={funnelData} />
+      </div>
+
+      {/* Top pages table */}
+      {topPages.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.topPages')}</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-gray-500 text-xs">
+                  <th className="pb-2 text-left font-medium">{t('contents.rank')}</th>
+                  <th className="pb-2 text-left font-medium">{t('contents.pagePath')}</th>
+                  <th className="pb-2 text-right font-medium">{t('contents.viewCount')}</th>
+                  <th className="pb-2 text-right font-medium">{t('contents.uniqueViewersCol')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topPages.map((row, i) => (
+                  <tr key={row.page_path} className="border-b border-gray-100">
+                    <td className="py-2 text-gray-400">{i + 1}</td>
+                    <td className="py-2 text-gray-900 font-mono text-xs max-w-[200px] truncate">{row.page_path}</td>
+                    <td className="py-2 text-right text-gray-900">{row.view_count.toLocaleString()}</td>
+                    <td className="py-2 text-right text-gray-500">{row.unique_visitors.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Publishing timeline */}
       <PublishingTimelineChart data={timeline} />

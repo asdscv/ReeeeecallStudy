@@ -1,6 +1,7 @@
 // Block schema validation for AI-generated content
 
 import { PIPELINE_DEFAULTS } from './config.js'
+import { buildCtaUrl } from './utm-builder.js'
 
 const ALLOWED_ICONS = [
   'brain', 'book', 'clock', 'target', 'chart', 'star', 'lightning',
@@ -88,7 +89,8 @@ const blockValidators = {
     if (!props.title || typeof props.title !== 'string') return 'cta: title required'
     if (!props.description || typeof props.description !== 'string') return 'cta: description required'
     if (!props.buttonText || typeof props.buttonText !== 'string') return 'cta: buttonText required'
-    props.buttonUrl = '/auth/login' // always enforce
+    // Base URL always enforced; UTM params injected by enrichCtaUrls()
+    props.buttonUrl = '/auth/login'
     return null
   },
 }
@@ -166,4 +168,26 @@ export function validateArticle(article) {
   if (!blockResult.valid) errors.push(...blockResult.errors)
 
   return { valid: errors.length === 0, errors }
+}
+
+/**
+ * Enrich CTA block buttonUrls with UTM parameters.
+ * Call AFTER validateArticle succeeds — mutates blocks in place.
+ *
+ * @param {object} article - Validated article with slug and content_blocks
+ * @param {string} locale  - Locale code ("en" | "ko")
+ */
+export function enrichCtaUrls(article, locale) {
+  if (!article?.content_blocks || !article.slug) return
+
+  for (const block of article.content_blocks) {
+    if (block.type === 'cta' && block.props) {
+      block.props.buttonUrl = buildCtaUrl(
+        block.props.buttonUrl || '/auth/login',
+        article.slug,
+        locale,
+        'cta',
+      )
+    }
+  }
 }
