@@ -393,7 +393,7 @@ export function LandingPage() {
               {t('footer.copyright')}
             </p>
           </div>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center sm:text-right">
             <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-gray-400 hover:text-gray-600 transition no-underline">
               admin@reeeeecallstudy.xyz
             </a>
