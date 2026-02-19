@@ -12,6 +12,8 @@ Disallow: /quick-study
 Disallow: /marketplace
 Disallow: /my-shares
 Disallow: /templates
+Disallow: /admin
+Disallow: /api-docs
 Disallow: /api/
 
 # Crawl-delay for polite crawling (Googlebot ignores Crawl-delay; use Search Console instead)
