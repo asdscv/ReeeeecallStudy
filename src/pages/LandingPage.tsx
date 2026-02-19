@@ -30,13 +30,13 @@ function LandingNav() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between py-4">
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
-          <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-16 sm:h-16 shrink-0" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-14 sm:h-16 hidden sm:block" />
-          <span className="font-extrabold text-gray-900 sm:hidden text-lg tracking-tight truncate">ReeeeecallStudy</span>
+          <img src="/favicon.png" alt="" className="w-9 h-9 md:w-16 md:h-16 shrink-0 object-contain" />
+          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-14 md:h-16 hidden md:block" />
+          <span className="font-extrabold text-gray-900 md:hidden text-lg tracking-tight truncate">ReeeeecallStudy</span>
         </div>
 
         {/* Desktop nav */}
-        <nav className="hidden sm:flex items-center gap-3">
+        <nav className="hidden md:flex items-center gap-3">
           <Link to="/content" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
             {t('nav.blog', 'Insights')}
           </Link>
@@ -54,7 +54,7 @@ function LandingNav() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="sm:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer"
+          className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer"
           aria-label="Menu"
         >
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -63,7 +63,7 @@ function LandingNav() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="sm:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md">
+        <div className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md">
           <nav className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-1">
             <Link
               to="/content"
@@ -378,7 +378,7 @@ export function LandingPage() {
       </section>
 
       {/* ─── Footer ────────────────────────── */}
-      <footer className="border-t border-gray-200 bg-gray-50">
+      <footer className="border-t border-gray-200 bg-gray-50 pb-20 sm:pb-0">
         <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -393,6 +393,11 @@ export function LandingPage() {
               {t('footer.copyright')}
             </p>
           </div>
+          <div className="mt-4 text-center">
+            <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-gray-400 hover:text-gray-600 transition no-underline">
+              admin@reeeeecallstudy.xyz
+            </a>
+          </div>
         </div>
       </footer>
 
@@ -402,7 +407,7 @@ export function LandingPage() {
         className="group fixed bottom-6 sm:bottom-12 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-16 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-transparent cursor-pointer z-50 whitespace-nowrap touch-manipulation"
       >
         <div className="relative">
-          <img src="/favicon.png" alt="" className="w-10 h-10 sm:w-14 sm:h-14 relative z-10 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12 active:scale-120 active:rotate-12" />
+          <img src="/favicon.png" alt="" className="w-10 h-10 sm:w-14 sm:h-14 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 active:scale-110 active:rotate-12" />
           <div className="absolute inset-0 bg-blue-500/0 rounded-full blur-xl transition-all duration-300 group-hover:bg-blue-500/40 group-hover:scale-150 group-active:bg-blue-500/40 group-active:scale-150" />
         </div>
         <div className="relative">
