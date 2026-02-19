@@ -15,6 +15,7 @@ interface SEOHeadProps {
   articleSection?: string
   keywords?: string[]
   articleTags?: string[]
+  noIndex?: boolean
 }
 
 export function SEOHead(props: SEOHeadProps) {

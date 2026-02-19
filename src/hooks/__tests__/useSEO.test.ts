@@ -335,4 +335,29 @@ describe('useSEO', () => {
     expect(document.querySelector('meta[name="twitter:description"]')).toBeNull()
     expect(document.querySelector('meta[name="twitter:image"]')).toBeNull()
   })
+
+  it('should set robots noindex,nofollow when noIndex is true', () => {
+    renderHook(() =>
+      useSEO({ title: 'Not Found', description: 'd', noIndex: true }),
+    )
+    const meta = document.querySelector('meta[name="robots"]')
+    expect(meta).toBeTruthy()
+    expect(meta?.getAttribute('content')).toBe('noindex, nofollow')
+  })
+
+  it('should not set robots meta when noIndex is not provided', () => {
+    renderHook(() => useSEO({ title: 'T', description: 'd' }))
+    // Should not add a robots meta (default from index.html handles it)
+    const meta = document.querySelector('meta[name="robots"]')
+    expect(meta).toBeNull()
+  })
+
+  it('should cleanup robots meta on unmount when noIndex was set', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({ title: 'Not Found', description: 'd', noIndex: true }),
+    )
+    expect(document.querySelector('meta[name="robots"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[name="robots"]')).toBeNull()
+  })
 })

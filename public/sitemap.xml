@@ -17,14 +17,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://reeeeecallstudy.com/content" />
   </url>
   <url>
-    <loc>https://reeeeecallstudy.com/docs/api</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://reeeeecallstudy.com/docs/api?lang=en" />
-    <xhtml:link rel="alternate" hreflang="ko" href="https://reeeeecallstudy.com/docs/api?lang=ko" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://reeeeecallstudy.com/docs/api" />
-  </url>
-  <url>
     <loc>https://reeeeecallstudy.com/content/mastering-pharmacology-memorization-tips</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>

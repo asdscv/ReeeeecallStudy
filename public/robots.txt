@@ -3,7 +3,7 @@ User-agent: *
 Allow: /landing
 Allow: /content
 Allow: /content/*
-Allow: /docs/api
+Disallow: /docs/
 Disallow: /auth/
 Disallow: /decks/
 Disallow: /settings

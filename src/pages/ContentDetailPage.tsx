@@ -38,6 +38,11 @@ export function ContentDetailPage() {
   if (detailError || !currentArticle) {
     return (
       <div className="min-h-screen bg-white">
+        <SEOHead
+          title={t('detail.notFound')}
+          description=""
+          noIndex
+        />
         <ContentNav
           backTo="/content"
           backLabel={t('detail.backToList')}

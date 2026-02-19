@@ -17,6 +17,7 @@ interface SEOOptions {
   articleSection?: string
   keywords?: string[]
   articleTags?: string[]
+  noIndex?: boolean
 }
 
 function setMeta(attr: string, key: string, content: string) {
@@ -70,6 +71,7 @@ export function useSEO(options: SEOOptions) {
     articleSection,
     keywords,
     articleTags,
+    noIndex,
   } = options
 
   useEffect(() => {
@@ -109,6 +111,11 @@ export function useSEO(options: SEOOptions) {
       if (publishedTime) setMeta('property', 'article:published_time', publishedTime)
       if (modifiedTime) setMeta('property', 'article:modified_time', modifiedTime)
       if (articleSection) setMeta('property', 'article:section', articleSection)
+    }
+
+    // Robots noindex
+    if (noIndex) {
+      setMeta('name', 'robots', 'noindex, nofollow')
     }
 
     // Keywords
@@ -194,6 +201,11 @@ export function useSEO(options: SEOOptions) {
         removeMeta('property', 'article:section')
       }
 
+      // Robots cleanup
+      if (noIndex) {
+        removeMeta('name', 'robots')
+      }
+
       // Keywords cleanup
       if (keywords && keywords.length > 0) {
         removeMeta('name', 'keywords')
@@ -221,5 +233,5 @@ export function useSEO(options: SEOOptions) {
       // JSON-LD cleanup
       for (const s of scripts) s.remove()
     }
-  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags])
+  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags, noIndex])
 }
