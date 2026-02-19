@@ -2,6 +2,16 @@ import i18next from 'i18next'
 import type { ContentDetail } from '../types/content-blocks'
 import { SEO } from './seo-config'
 
+const LOCALE_TO_LANGUAGE: Record<string, string> = {
+  en: 'English',
+  ko: 'Korean',
+  ja: 'Japanese',
+  zh: 'Chinese',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+}
+
 export function buildArticleJsonLd(article: ContentDetail) {
   return {
     '@context': 'https://schema.org',
@@ -56,7 +66,7 @@ export function buildBreadcrumbJsonLd(article: ContentDetail) {
       {
         '@type': 'ListItem',
         position: 2,
-        name: 'Learning Insights',
+        name: i18next.t('content:seo.breadcrumbInsights'),
         item: `${SEO.SITE_URL}/content`,
       },
       {
@@ -131,11 +141,12 @@ export function buildWebApplicationJsonLd() {
 }
 
 export function buildHreflangAlternates(slug: string) {
-  return [
-    { lang: 'en', href: `${SEO.SITE_URL}/content/${slug}?lang=en` },
-    { lang: 'ko', href: `${SEO.SITE_URL}/content/${slug}?lang=ko` },
-    { lang: 'x-default', href: `${SEO.SITE_URL}/content/${slug}` },
-  ]
+  const alternates = SEO.SUPPORTED_LOCALES.map((locale) => ({
+    lang: locale,
+    href: `${SEO.SITE_URL}/content/${slug}?lang=${locale}`,
+  }))
+  alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}/content/${slug}` })
+  return alternates
 }
 
 export function buildOrganizationJsonLd() {
@@ -156,7 +167,7 @@ export function buildOrganizationJsonLd() {
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      availableLanguage: ['English', 'Korean'],
+      availableLanguage: SEO.SUPPORTED_LOCALES.map((l) => LOCALE_TO_LANGUAGE[l] ?? l),
     },
   }
 }
@@ -167,7 +178,7 @@ export function buildWebSiteJsonLd() {
     '@type': 'WebSite',
     name: SEO.BRAND_NAME,
     url: SEO.SITE_URL,
-    inLanguage: ['en', 'ko'],
+    inLanguage: [...SEO.SUPPORTED_LOCALES],
     potentialAction: {
       '@type': 'SearchAction',
       target: `${SEO.SITE_URL}/content?q={search_term_string}`,

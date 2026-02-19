@@ -19,6 +19,7 @@
   },
   "seo": {
     "listTitle": "Learning Insights | ReeeCall",
-    "listDescription": "Discover science-backed learning strategies and spaced repetition tips."
+    "listDescription": "Discover science-backed learning strategies and spaced repetition tips.",
+    "breadcrumbInsights": "Learning Insights"
   }
 }

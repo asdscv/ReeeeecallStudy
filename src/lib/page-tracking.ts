@@ -26,5 +26,7 @@ export function normalizePagePath(path: string): string {
  */
 export function shouldTrackPage(path: string): boolean {
   const normalized = normalizePagePath(path)
-  return !EXCLUDED_PREFIXES.some((prefix) => normalized.startsWith(prefix))
+  return !EXCLUDED_PREFIXES.some(
+    (prefix) => normalized === prefix || normalized.startsWith(prefix + '/'),
+  )
 }

@@ -1062,10 +1062,10 @@ describe('computeConversionFunnel', () => {
       studied_cards: 50,
     })
     expect(result).toHaveLength(4)
-    expect(result[0]).toEqual({ label: 'Content Viewers', key: 'content_viewers', count: 1000, percentage: 100 })
-    expect(result[1]).toEqual({ label: 'Signed Up', key: 'signed_up', count: 200, percentage: 20 })
-    expect(result[2]).toEqual({ label: 'Created Deck', key: 'created_deck', count: 100, percentage: 10 })
-    expect(result[3]).toEqual({ label: 'Studied Cards', key: 'studied_cards', count: 50, percentage: 5 })
+    expect(result[0]).toEqual({ label: 'admin.contents.funnel.contentViewers', key: 'content_viewers', count: 1000, percentage: 100 })
+    expect(result[1]).toEqual({ label: 'admin.contents.funnel.signedUp', key: 'signed_up', count: 200, percentage: 20 })
+    expect(result[2]).toEqual({ label: 'admin.contents.funnel.createdDeck', key: 'created_deck', count: 100, percentage: 10 })
+    expect(result[3]).toEqual({ label: 'admin.contents.funnel.studiedCards', key: 'studied_cards', count: 50, percentage: 5 })
   })
 
   it('handles zero content viewers', () => {

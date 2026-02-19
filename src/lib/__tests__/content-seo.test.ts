@@ -131,6 +131,12 @@ describe('buildBreadcrumbJsonLd', () => {
     const result = buildBreadcrumbJsonLd(mockArticle)
     expect(result.itemListElement[2].name).toBe('Test Article')
   })
+
+  it('should use i18n key for insights breadcrumb instead of hardcoded string', () => {
+    const result = buildBreadcrumbJsonLd(mockArticle)
+    // The breadcrumb name should come from i18n (our mock returns the key)
+    expect(result.itemListElement[1].name).toBe('content:seo.breadcrumbInsights')
+  })
 })
 
 describe('buildCollectionPageJsonLd', () => {
@@ -210,10 +216,14 @@ describe('buildWebApplicationJsonLd', () => {
 })
 
 describe('buildHreflangAlternates', () => {
-  it('should return en, ko, and x-default', () => {
+  it('should return one entry per supported locale plus x-default', () => {
     const result = buildHreflangAlternates('test-slug')
-    expect(result).toHaveLength(3)
-    expect(result.map((r) => r.lang)).toEqual(['en', 'ko', 'x-default'])
+    expect(result).toHaveLength(SEO.SUPPORTED_LOCALES.length + 1)
+    const langs = result.map((r) => r.lang)
+    for (const locale of SEO.SUPPORTED_LOCALES) {
+      expect(langs).toContain(locale)
+    }
+    expect(langs).toContain('x-default')
   })
 
   it('should use SITE_URL from config', () => {
@@ -221,6 +231,12 @@ describe('buildHreflangAlternates', () => {
     for (const alt of result) {
       expect(alt.href).toContain(SEO.SITE_URL)
     }
+  })
+
+  it('should have x-default pointing to slug without lang param', () => {
+    const result = buildHreflangAlternates('test-slug')
+    const xDefault = result.find((r) => r.lang === 'x-default')
+    expect(xDefault?.href).toBe(`${SEO.SITE_URL}/content/test-slug`)
   })
 })
 
@@ -254,6 +270,17 @@ describe('buildOrganizationJsonLd', () => {
     expect(result.contactPoint.contactType).toBe('customer service')
   })
 
+  it('should derive availableLanguage from SEO.SUPPORTED_LOCALES', () => {
+    const result = buildOrganizationJsonLd()
+    // Should have exactly one language per supported locale
+    expect(result.contactPoint.availableLanguage).toHaveLength(SEO.SUPPORTED_LOCALES.length)
+    // Each entry should be a full language name, not a locale code
+    for (const lang of result.contactPoint.availableLanguage) {
+      expect(typeof lang).toBe('string')
+      expect(lang.length).toBeGreaterThan(2) // not just 'en' or 'ko'
+    }
+  })
+
   it('should include logo ImageObject with dimensions', () => {
     const result = buildOrganizationJsonLd()
     expect(result.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
@@ -281,9 +308,9 @@ describe('buildWebSiteJsonLd', () => {
     expect(result.potentialAction['query-input']).toBe('required name=search_term_string')
   })
 
-  it('should include inLanguage', () => {
+  it('should derive inLanguage from SEO.SUPPORTED_LOCALES', () => {
     const result = buildWebSiteJsonLd()
-    expect(result.inLanguage).toEqual(['en', 'ko'])
+    expect(result.inLanguage).toEqual([...SEO.SUPPORTED_LOCALES])
   })
 })
 

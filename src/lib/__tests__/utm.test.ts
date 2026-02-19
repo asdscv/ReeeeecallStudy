@@ -52,4 +52,24 @@ describe('parseUtmParams', () => {
     const result = parseUtmParams('utm_source=direct')
     expect(result.utm_source).toBe('direct')
   })
+
+  it('trims whitespace from values', () => {
+    const result = parseUtmParams('?utm_source=%20google%20&utm_medium=%20cpc%20')
+    expect(result.utm_source).toBe('google')
+    expect(result.utm_medium).toBe('cpc')
+  })
+
+  it('lowercases utm_source and utm_medium for consistent grouping', () => {
+    const result = parseUtmParams('?utm_source=Google&utm_medium=CPC&utm_campaign=Spring')
+    expect(result.utm_source).toBe('google')
+    expect(result.utm_medium).toBe('cpc')
+    // campaign/term/content preserve original case
+    expect(result.utm_campaign).toBe('Spring')
+  })
+
+  it('ignores whitespace-only values', () => {
+    const result = parseUtmParams('?utm_source=%20%20&utm_medium=email')
+    expect(result.utm_source).toBeUndefined()
+    expect(result.utm_medium).toBe('email')
+  })
 })

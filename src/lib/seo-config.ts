@@ -11,3 +11,18 @@ export const SEO = {
   DEFAULT_LOCALE: 'en',
   SUPPORTED_LOCALES: ['en', 'ko'] as const,
 } as const
+
+const OG_LOCALE_MAP: Record<string, string> = {
+  en: 'en_US',
+  ko: 'ko_KR',
+  ja: 'ja_JP',
+  zh: 'zh_CN',
+  es: 'es_ES',
+  fr: 'fr_FR',
+  de: 'de_DE',
+}
+
+/** Map a locale code to an Open Graph locale string (e.g. 'ko' → 'ko_KR'). */
+export function toOgLocale(lang: string): string {
+  return OG_LOCALE_MAP[lang] ?? `${lang}_${lang.toUpperCase()}`
+}

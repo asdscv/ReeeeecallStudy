@@ -97,4 +97,19 @@ describe('categorizeReferrer', () => {
     const result = categorizeReferrer('https://blog.reeecall.com/post', 'reeecall.com')
     expect(result.category).toBe('internal')
   })
+
+  it('categorizes x.com (Twitter rebrand) as social', () => {
+    expect(categorizeReferrer('https://x.com/user/status/123').category).toBe('social')
+  })
+
+  it('does not falsely match internal for domains that contain ownDomain as substring', () => {
+    // "notreeecall.com" contains "reeecall.com" but is NOT our domain
+    const result = categorizeReferrer('https://notreeecall.com/page', 'reeecall.com')
+    expect(result.category).not.toBe('internal')
+  })
+
+  it('correctly identifies exact domain as internal', () => {
+    const result = categorizeReferrer('https://reeecall.com/page', 'reeecall.com')
+    expect(result.category).toBe('internal')
+  })
 })

@@ -550,10 +550,10 @@ export interface ConversionFunnelStep {
 
 export function computeConversionFunnel(data: AdminConversionFunnelData): ConversionFunnelStep[] {
   const steps: { key: string; label: string; value: number }[] = [
-    { key: 'content_viewers', label: 'Content Viewers', value: data.content_viewers },
-    { key: 'signed_up', label: 'Signed Up', value: data.signed_up },
-    { key: 'created_deck', label: 'Created Deck', value: data.created_deck },
-    { key: 'studied_cards', label: 'Studied Cards', value: data.studied_cards },
+    { key: 'content_viewers', label: 'admin.contents.funnel.contentViewers', value: data.content_viewers },
+    { key: 'signed_up', label: 'admin.contents.funnel.signedUp', value: data.signed_up },
+    { key: 'created_deck', label: 'admin.contents.funnel.createdDeck', value: data.created_deck },
+    { key: 'studied_cards', label: 'admin.contents.funnel.studiedCards', value: data.studied_cards },
   ]
 
   const top = steps[0].value || 1

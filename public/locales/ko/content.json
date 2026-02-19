@@ -19,6 +19,7 @@
   },
   "seo": {
     "listTitle": "학습 인사이트 | ReeeCall",
-    "listDescription": "과학적으로 검증된 학습 전략과 간격 반복 팁을 알아보세요."
+    "listDescription": "과학적으로 검증된 학습 전략과 간격 반복 팁을 알아보세요.",
+    "breadcrumbInsights": "학습 인사이트"
   }
 }

@@ -67,7 +67,12 @@ export function AdminContentsPage() {
   const referrerData = computeReferrerBreakdown(data.referrer_breakdown ?? [])
   const deviceData = computeDeviceBreakdown(data.device_breakdown ?? [])
   const scrollData = computeScrollDepthDistribution(data.scroll_depth ?? [])
-  const funnelData = data.conversion_funnel ? computeConversionFunnel(data.conversion_funnel) : []
+  const funnelData = data.conversion_funnel
+    ? computeConversionFunnel(data.conversion_funnel).map((step) => ({
+        ...step,
+        label: t(step.label.replace('admin.', ''), { defaultValue: step.label }),
+      }))
+    : []
   const utmData = computeUtmSourceBreakdown(data.utm_source_breakdown ?? [])
 
   // Page views data (loaded independently)

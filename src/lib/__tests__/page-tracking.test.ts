@@ -88,4 +88,11 @@ describe('shouldTrackPage', () => {
     expect(shouldTrackPage('/admin/')).toBe(false)
     expect(shouldTrackPage('/auth/login/')).toBe(false)
   })
+
+  it('tracks paths that start with excluded prefix but are different segments', () => {
+    expect(shouldTrackPage('/administrator')).toBe(true)
+    expect(shouldTrackPage('/admin-panel')).toBe(true)
+    expect(shouldTrackPage('/authentication')).toBe(true)
+    expect(shouldTrackPage('/authorize')).toBe(true)
+  })
 })

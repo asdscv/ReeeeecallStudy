@@ -16,7 +16,7 @@ export function UtmSourceChart({ data, ctaClicks }: UtmSourceChartProps) {
         <h3 className="text-sm font-medium text-gray-700">{t('contents.utmSources')}</h3>
         {ctaClicks > 0 && (
           <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-            CTA clicks: {ctaClicks.toLocaleString()}
+            {t('contents.ctaClicks')}: {ctaClicks.toLocaleString()}
           </span>
         )}
       </div>

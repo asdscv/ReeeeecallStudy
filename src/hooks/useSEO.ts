@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import i18next from 'i18next'
-import { SEO } from '../lib/seo-config'
+import { SEO, toOgLocale } from '../lib/seo-config'
 
 interface SEOOptions {
   title: string
@@ -92,9 +92,15 @@ export function useSEO(options: SEOOptions) {
     setMeta('property', 'og:description', description)
     setMeta('property', 'og:type', ogType)
     setMeta('property', 'og:site_name', SEO.BRAND_NAME)
-    setMeta('property', 'og:locale', currentLang === 'ko' ? 'ko_KR' : 'en_US')
-    setMeta('property', 'og:locale:alternate', currentLang === 'ko' ? 'en_US' : 'ko_KR')
-    if (canonicalUrl) setMeta('property', 'og:url', canonicalUrl)
+    const ogLocale = toOgLocale(currentLang)
+    const altLocales = SEO.SUPPORTED_LOCALES
+      .filter((l) => l !== currentLang)
+      .map(toOgLocale)
+    setMeta('property', 'og:locale', ogLocale)
+    if (altLocales.length > 0) {
+      setMeta('property', 'og:locale:alternate', altLocales[0])
+    }
+    setMeta('property', 'og:url', canonicalUrl || `${window.location.origin}${window.location.pathname}`)
 
     // OG image with dimensions and alt
     if (ogImage) {
@@ -145,10 +151,9 @@ export function useSEO(options: SEOOptions) {
       setMeta('name', 'twitter:image:alt', title)
     }
 
-    // Canonical
-    if (canonicalUrl) {
-      setLink('canonical', '', canonicalUrl)
-    }
+    // Canonical — always set to prevent duplicate content issues
+    const effectiveCanonical = canonicalUrl || `${window.location.origin}${window.location.pathname}`
+    setLink('canonical', '', effectiveCanonical)
 
     // Hreflang
     const hreflangKeys: string[] = []
@@ -184,7 +189,7 @@ export function useSEO(options: SEOOptions) {
       removeMeta('property', 'og:site_name')
       removeMeta('property', 'og:locale')
       removeMeta('property', 'og:locale:alternate')
-      if (canonicalUrl) removeMeta('property', 'og:url')
+      removeMeta('property', 'og:url')
 
       // OG image cleanup
       if (ogImage) {
@@ -225,7 +230,7 @@ export function useSEO(options: SEOOptions) {
       }
 
       // Links cleanup
-      if (canonicalUrl) removeLink('canonical')
+      removeLink('canonical')
       for (const key of hreflangKeys) {
         removeLink('alternate', key)
       }

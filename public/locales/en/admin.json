@@ -152,7 +152,26 @@
     "totalPageViews": "Total Page Views",
     "uniqueVisitors": "Unique Visitors",
     "topPages": "Top Pages",
-    "pagePath": "Page Path"
+    "pagePath": "Page Path",
+    "ctaClicks": "CTA clicks",
+    "funnel": {
+      "contentViewers": "Content Viewers",
+      "signedUp": "Signed Up",
+      "createdDeck": "Created Deck",
+      "studiedCards": "Studied Cards"
+    },
+    "referrerCategories": {
+      "direct": "Direct",
+      "search": "Search",
+      "social": "Social",
+      "internal": "Internal",
+      "other": "Other"
+    },
+    "deviceTypes": {
+      "mobile": "Mobile",
+      "tablet": "Tablet",
+      "desktop": "Desktop"
+    }
   },
   "system": {
     "title": "System",

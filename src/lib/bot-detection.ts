@@ -1,4 +1,4 @@
-const BOT_PATTERN = /bot|crawler|spider|crawling|slurp|ia_archiver|sogou|headlesschrome|phantomjs|lighthouse|prerender|screaming frog|semrush|ahref|yandex|baidu|duckduck/i
+const BOT_PATTERN = /bot|crawler|spider|crawling|slurp|ia_archiver|sogou|headlesschrome|phantomjs|lighthouse|prerender|screaming frog|semrush|ahref|yandex|baidu|duckduck|facebookexternalhit|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|applebot|twitterbot|pinterestbot/i
 
 /**
  * Detect bots/crawlers by User-Agent string.

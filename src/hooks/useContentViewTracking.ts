@@ -6,25 +6,12 @@ import { viewRateLimiter } from '../lib/view-rate-limiter'
 import { parseUtmParams } from '../lib/utm'
 import { getDeviceType } from '../lib/device-info'
 import { categorizeReferrer } from '../lib/referrer'
+import { getAnalyticsSessionId } from '../lib/analytics-session'
+import { logAnalyticsError } from '../lib/analytics-logger'
 import { useScrollDepthTracking } from './useScrollDepthTracking'
 
 // Module-level tracker persists across re-renders within same page lifecycle
 const viewTracker = createViewDedupTracker()
-
-function getSessionId(): string {
-  const KEY = 'content_view_session'
-  try {
-    let id = sessionStorage.getItem(KEY)
-    if (!id) {
-      id = crypto.randomUUID()
-      sessionStorage.setItem(KEY, id)
-    }
-    return id
-  } catch {
-    // Private browsing or storage disabled
-    return crypto.randomUUID()
-  }
-}
 
 export function useContentViewTracking(contentId: string | undefined) {
   const viewIdRef = useRef<string | null>(null)
@@ -37,7 +24,7 @@ export function useContentViewTracking(contentId: string | undefined) {
     // Bot filtering
     if (isBot(navigator.userAgent)) return
 
-    const sessionId = getSessionId()
+    const sessionId = getAnalyticsSessionId()
     startRef.current = Date.now()
 
     // Capture UTM parameters from current URL
@@ -76,13 +63,12 @@ export function useContentViewTracking(contentId: string | undefined) {
           p_viewport_width: viewportWidth,
         })
         .then(({ data }) => {
-          if (data) {
-            const id = data as string
-            viewIdRef.current = id
-            viewTracker.markViewed(contentId, id)
+          if (typeof data === 'string' && data.length > 0) {
+            viewIdRef.current = data
+            viewTracker.markViewed(contentId, data)
           }
         })
-        .catch(() => {})
+        .catch((e) => logAnalyticsError('record_content_view', e))
     }
 
     const sendDuration = () => {
@@ -112,7 +98,7 @@ export function useContentViewTracking(contentId: string | undefined) {
         },
         body,
         keepalive: true,
-      }).catch(() => {})
+      }).catch((e) => logAnalyticsError('update_content_view_duration', e))
     }
 
     const onVisibilityChange = () => {

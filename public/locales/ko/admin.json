@@ -152,7 +152,26 @@
     "totalPageViews": "전체 페이지뷰",
     "uniqueVisitors": "순 방문자",
     "topPages": "인기 페이지",
-    "pagePath": "페이지 경로"
+    "pagePath": "페이지 경로",
+    "ctaClicks": "CTA 클릭",
+    "funnel": {
+      "contentViewers": "콘텐츠 조회자",
+      "signedUp": "가입 완료",
+      "createdDeck": "덱 생성",
+      "studiedCards": "카드 학습"
+    },
+    "referrerCategories": {
+      "direct": "직접 방문",
+      "search": "검색",
+      "social": "소셜",
+      "internal": "내부",
+      "other": "기타"
+    },
+    "deviceTypes": {
+      "mobile": "모바일",
+      "tablet": "태블릿",
+      "desktop": "데스크탑"
+    }
   },
   "system": {
     "title": "시스템",

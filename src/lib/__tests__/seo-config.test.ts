@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { SEO } from '../seo-config'
+import { SEO, toOgLocale } from '../seo-config'
 
 describe('SEO config', () => {
   it('should export SITE_URL as absolute HTTPS URL', () => {
@@ -26,5 +26,19 @@ describe('SEO config', () => {
   it('should export SUPPORTED_LOCALES with en and ko', () => {
     expect(SEO.SUPPORTED_LOCALES).toContain('en')
     expect(SEO.SUPPORTED_LOCALES).toContain('ko')
+  })
+})
+
+describe('toOgLocale', () => {
+  it('maps en to en_US', () => {
+    expect(toOgLocale('en')).toBe('en_US')
+  })
+
+  it('maps ko to ko_KR', () => {
+    expect(toOgLocale('ko')).toBe('ko_KR')
+  })
+
+  it('provides a sensible fallback for unknown locales', () => {
+    expect(toOgLocale('pt')).toBe('pt_PT')
   })
 })

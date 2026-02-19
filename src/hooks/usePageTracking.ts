@@ -7,21 +7,8 @@ import { parseUtmParams } from '../lib/utm'
 import { getDeviceType } from '../lib/device-info'
 import { categorizeReferrer } from '../lib/referrer'
 import { viewRateLimiter } from '../lib/view-rate-limiter'
-
-function getSessionId(): string {
-  const KEY = 'page_view_session'
-  try {
-    let id = sessionStorage.getItem(KEY)
-    if (!id) {
-      id = crypto.randomUUID()
-      sessionStorage.setItem(KEY, id)
-    }
-    return id
-  } catch {
-    // Private browsing or storage disabled
-    return crypto.randomUUID()
-  }
-}
+import { getAnalyticsSessionId } from '../lib/analytics-session'
+import { logAnalyticsError } from '../lib/analytics-logger'
 
 /**
  * Track page views on route changes.
@@ -44,7 +31,7 @@ export function usePageTracking() {
     // Rate limit page view recording
     if (!viewRateLimiter.checkLimit('page_view').allowed) return
 
-    const sessionId = getSessionId()
+    const sessionId = getAnalyticsSessionId()
     const utm = parseUtmParams(location.search)
     const deviceType = getDeviceType(navigator.userAgent)
     const ownDomain = window.location.hostname
@@ -65,7 +52,6 @@ export function usePageTracking() {
         p_device_type: deviceType,
         p_viewport_width: window.innerWidth,
       })
-      .then(() => {})
-      .catch(() => {})
-  }, [location.pathname, location.search])
+      .catch((e) => logAnalyticsError('record_page_view', e))
+  }, [location.pathname])
 }

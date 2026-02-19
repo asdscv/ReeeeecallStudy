@@ -66,6 +66,42 @@ describe('isBot', () => {
   it('detects Lighthouse', () => {
     expect(isBot('Mozilla/5.0 Chrome/90.0 Mobile Safari/537.36 Chrome-Lighthouse')).toBe(true)
   })
+
+  it('detects Facebook crawler', () => {
+    expect(isBot('facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)')).toBe(true)
+  })
+
+  it('detects LinkedIn bot', () => {
+    expect(isBot('LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)')).toBe(true)
+  })
+
+  it('detects Slack bot', () => {
+    expect(isBot('Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)')).toBe(true)
+  })
+
+  it('detects WhatsApp', () => {
+    expect(isBot('WhatsApp/2.23.20.0')).toBe(true)
+  })
+
+  it('detects Telegram bot', () => {
+    expect(isBot('TelegramBot (like TwitterBot)')).toBe(true)
+  })
+
+  it('detects Discord bot', () => {
+    expect(isBot('Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)')).toBe(true)
+  })
+
+  it('detects Apple bot', () => {
+    expect(isBot('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Applebot/0.1')).toBe(true)
+  })
+
+  it('detects Twitter bot', () => {
+    expect(isBot('Twitterbot/1.0')).toBe(true)
+  })
+
+  it('detects Pinterest bot', () => {
+    expect(isBot('Pinterest/0.2 (+http://www.pinterest.com/) Pinterestbot/1.0')).toBe(true)
+  })
 })
 
 // ── isValidViewDuration ──

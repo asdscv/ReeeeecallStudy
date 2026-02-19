@@ -4,21 +4,8 @@ import { isBot } from '../lib/bot-detection'
 import { validateEvent, type AnalyticsEvent } from '../lib/analytics-events'
 import { viewRateLimiter } from '../lib/view-rate-limiter'
 import { normalizePagePath } from '../lib/page-tracking'
-
-function getSessionId(): string {
-  const KEY = 'analytics_event_session'
-  try {
-    let id = sessionStorage.getItem(KEY)
-    if (!id) {
-      id = crypto.randomUUID()
-      sessionStorage.setItem(KEY, id)
-    }
-    return id
-  } catch {
-    // Private browsing or storage disabled
-    return crypto.randomUUID()
-  }
-}
+import { getAnalyticsSessionId } from '../lib/analytics-session'
+import { logAnalyticsError } from '../lib/analytics-logger'
 
 /**
  * Returns a function to track custom analytics events.
@@ -36,7 +23,7 @@ export function useTrackEvent() {
     if (!viewRateLimiter.checkLimit('analytics_event').allowed) return
 
     const { category, action, label, value } = result.event
-    const sessionId = getSessionId()
+    const sessionId = getAnalyticsSessionId()
     const pagePath = normalizePagePath(window.location.pathname)
 
     supabase
@@ -48,7 +35,6 @@ export function useTrackEvent() {
         p_page_path: pagePath,
         p_session_id: sessionId,
       })
-      .then(() => {})
-      .catch(() => {})
+      .catch((e) => logAnalyticsError('record_analytics_event', e))
   }, [])
 }

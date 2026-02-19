@@ -11,7 +11,7 @@ const SEARCH_DOMAINS = [
 ]
 
 const SOCIAL_DOMAINS = [
-  'facebook', 'twitter', 't.co', 'instagram', 'linkedin',
+  'facebook', 'twitter', 'x.com', 't.co', 'instagram', 'linkedin',
   'reddit', 'youtube', 'tiktok', 'pinterest', 'tumblr',
   'threads.net', 'mastodon',
 ]
@@ -35,8 +35,8 @@ export function categorizeReferrer(referrer: string, ownDomain?: string): Referr
   const domain = extractDomain(referrer)
   if (!domain) return { domain: '', category: 'direct' }
 
-  // Internal check
-  if (ownDomain && domain.includes(ownDomain)) {
+  // Internal check — exact match or subdomain (e.g. blog.example.com → example.com)
+  if (ownDomain && (domain === ownDomain || domain.endsWith('.' + ownDomain))) {
     return { domain, category: 'internal' }
   }
 
