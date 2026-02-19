@@ -86,6 +86,24 @@ describe('buildArticleJsonLd', () => {
     const result = buildArticleJsonLd(mockArticle)
     expect(result.keywords).toBe('learning, srs')
   })
+
+  it('should use ImageObject for image property', () => {
+    const result = buildArticleJsonLd(mockArticle)
+    expect(result.image['@type']).toBe('ImageObject')
+    expect(result.image.url).toBe('https://example.com/og.jpg')
+    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
+
+  it('should include url in author', () => {
+    const result = buildArticleJsonLd(mockArticle)
+    expect(result.author.url).toBe(SEO.SITE_URL)
+  })
+
+  it('should include url in publisher', () => {
+    const result = buildArticleJsonLd(mockArticle)
+    expect(result.publisher.url).toBe(SEO.SITE_URL)
+  })
 })
 
 describe('buildBreadcrumbJsonLd', () => {
@@ -132,9 +150,10 @@ describe('buildCollectionPageJsonLd', () => {
     expect(result.publisher.name).toBe(SEO.BRAND_NAME)
   })
 
-  it('should include image', () => {
+  it('should include image as ImageObject', () => {
     const result = buildCollectionPageJsonLd()
-    expect(result.image).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect(result.image['@type']).toBe('ImageObject')
+    expect(result.image.url).toBe(SEO.DEFAULT_OG_IMAGE)
   })
 
   it('should include publisher logo ImageObject with dimensions', () => {
@@ -143,6 +162,27 @@ describe('buildCollectionPageJsonLd', () => {
     expect(result.publisher.logo.url).toBe(SEO.DEFAULT_OG_IMAGE)
     expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
     expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
+
+  it('should use ImageObject for image property', () => {
+    const result = buildCollectionPageJsonLd()
+    expect(result.image['@type']).toBe('ImageObject')
+    expect(result.image.url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
+
+  it('should include url in publisher', () => {
+    const result = buildCollectionPageJsonLd()
+    expect(result.publisher.url).toBe(SEO.SITE_URL)
+  })
+
+  it('should include mainEntityOfPage', () => {
+    const result = buildCollectionPageJsonLd()
+    expect(result.mainEntityOfPage).toEqual({
+      '@type': 'WebPage',
+      '@id': `${SEO.SITE_URL}/content`,
+    })
   })
 })
 
@@ -161,6 +201,11 @@ describe('buildWebApplicationJsonLd', () => {
     const result = buildWebApplicationJsonLd()
     expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
     expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
+
+  it('should include url in publisher', () => {
+    const result = buildWebApplicationJsonLd()
+    expect(result.publisher.url).toBe(SEO.SITE_URL)
   })
 })
 
@@ -349,5 +394,23 @@ describe('buildLearningResourceJsonLd', () => {
   it('should include isAccessibleForFree', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
     expect(result.isAccessibleForFree).toBe(true)
+  })
+
+  it('should use ImageObject for image property', () => {
+    const result = buildLearningResourceJsonLd(mockArticle)
+    expect(result.image['@type']).toBe('ImageObject')
+    expect(result.image.url).toBe('https://example.com/og.jpg')
+    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
+
+  it('should include url in author', () => {
+    const result = buildLearningResourceJsonLd(mockArticle)
+    expect(result.author.url).toBe(SEO.SITE_URL)
+  })
+
+  it('should include url in publisher', () => {
+    const result = buildLearningResourceJsonLd(mockArticle)
+    expect(result.publisher.url).toBe(SEO.SITE_URL)
   })
 })

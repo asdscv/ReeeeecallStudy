@@ -342,7 +342,7 @@ describe('useSEO', () => {
     )
     const meta = document.querySelector('meta[name="robots"]')
     expect(meta).toBeTruthy()
-    expect(meta?.getAttribute('content')).toBe('noindex, nofollow')
+    expect(meta?.getAttribute('content')).toBe('noindex, follow')
   })
 
   it('should not set robots meta when noIndex is not provided', () => {

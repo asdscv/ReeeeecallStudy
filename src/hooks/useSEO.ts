@@ -115,7 +115,7 @@ export function useSEO(options: SEOOptions) {
 
     // Robots noindex
     if (noIndex) {
-      setMeta('name', 'robots', 'noindex, nofollow')
+      setMeta('name', 'robots', 'noindex, follow')
     }
 
     // Keywords

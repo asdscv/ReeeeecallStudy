@@ -8,7 +8,12 @@ export function buildArticleJsonLd(article: ContentDetail) {
     '@type': 'Article',
     headline: article.meta_title || article.title,
     description: article.meta_description || article.subtitle || '',
-    image: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
+    image: {
+      '@type': 'ImageObject',
+      url: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
+      width: SEO.OG_IMAGE_WIDTH,
+      height: SEO.OG_IMAGE_HEIGHT,
+    },
     datePublished: article.published_at,
     dateModified: article.updated_at,
     wordCount: Math.round(article.reading_time_minutes * 250),
@@ -16,10 +21,12 @@ export function buildArticleJsonLd(article: ContentDetail) {
     author: {
       '@type': 'Organization',
       name: article.author_name || SEO.AUTHOR_NAME,
+      url: SEO.SITE_URL,
     },
     publisher: {
       '@type': 'Organization',
       name: SEO.BRAND_NAME,
+      url: SEO.SITE_URL,
       logo: {
         '@type': 'ImageObject',
         url: SEO.DEFAULT_OG_IMAGE,
@@ -69,17 +76,27 @@ export function buildCollectionPageJsonLd() {
     name: i18next.t('content:seo.listTitle'),
     description: i18next.t('content:seo.listDescription'),
     url: `${SEO.SITE_URL}/content`,
-    image: SEO.DEFAULT_OG_IMAGE,
+    image: {
+      '@type': 'ImageObject',
+      url: SEO.DEFAULT_OG_IMAGE,
+      width: SEO.OG_IMAGE_WIDTH,
+      height: SEO.OG_IMAGE_HEIGHT,
+    },
     inLanguage: i18next.language || SEO.DEFAULT_LOCALE,
     publisher: {
       '@type': 'Organization',
       name: SEO.BRAND_NAME,
+      url: SEO.SITE_URL,
       logo: {
         '@type': 'ImageObject',
         url: SEO.DEFAULT_OG_IMAGE,
         width: SEO.OG_IMAGE_WIDTH,
         height: SEO.OG_IMAGE_HEIGHT,
       },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${SEO.SITE_URL}/content`,
     },
   }
 }
@@ -102,6 +119,7 @@ export function buildWebApplicationJsonLd() {
     publisher: {
       '@type': 'Organization',
       name: SEO.BRAND_NAME,
+      url: SEO.SITE_URL,
       logo: {
         '@type': 'ImageObject',
         url: SEO.DEFAULT_OG_IMAGE,
@@ -200,7 +218,12 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
     '@type': 'LearningResource',
     name: article.meta_title || article.title,
     description: article.meta_description || article.subtitle || '',
-    image: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
+    image: {
+      '@type': 'ImageObject',
+      url: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
+      width: SEO.OG_IMAGE_WIDTH,
+      height: SEO.OG_IMAGE_HEIGHT,
+    },
     datePublished: article.published_at,
     dateModified: article.updated_at,
     educationalLevel: 'beginner',
@@ -212,10 +235,12 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
     author: {
       '@type': 'Organization',
       name: article.author_name || SEO.AUTHOR_NAME,
+      url: SEO.SITE_URL,
     },
     publisher: {
       '@type': 'Organization',
       name: SEO.BRAND_NAME,
+      url: SEO.SITE_URL,
       logo: {
         '@type': 'ImageObject',
         url: SEO.DEFAULT_OG_IMAGE,
