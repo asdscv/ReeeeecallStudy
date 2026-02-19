@@ -148,6 +148,12 @@ describe('buildWebApplicationJsonLd', () => {
     const result = buildWebApplicationJsonLd()
     expect(result.url).toBe(SEO.SITE_URL)
   })
+
+  it('should include publisher logo ImageObject with dimensions', () => {
+    const result = buildWebApplicationJsonLd()
+    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+  })
 })
 
 describe('buildHreflangAlternates', () => {
@@ -193,6 +199,12 @@ describe('buildOrganizationJsonLd', () => {
     const result = buildOrganizationJsonLd()
     expect(result.contactPoint['@type']).toBe('ContactPoint')
     expect(result.contactPoint.contactType).toBe('customer service')
+  })
+
+  it('should include logo ImageObject with dimensions', () => {
+    const result = buildOrganizationJsonLd()
+    expect(result.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 })
 
@@ -310,6 +322,12 @@ describe('buildLearningResourceJsonLd', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
     expect(result.author['@type']).toBe('Organization')
     expect(result.publisher['@type']).toBe('Organization')
+  })
+
+  it('should include publisher logo ImageObject with dimensions', () => {
+    const result = buildLearningResourceJsonLd(mockArticle)
+    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
   it('should include speakable property for AEO with semantic selectors', () => {

@@ -68,6 +68,15 @@ describe('generateSitemapXml', () => {
     expect(xml).toContain('hreflang="x-default"')
   })
 
+  it('should include hreflang alternates for static pages', () => {
+    const xml = generateSitemapXml(staticPages, [])
+    // Static pages should also have hreflang for multilingual support
+    const landingSection = xml.split('<loc>https://reeeeecallstudy.com/landing</loc>')[1].split('</url>')[0]
+    expect(landingSection).toContain('hreflang="en"')
+    expect(landingSection).toContain('hreflang="ko"')
+    expect(landingSection).toContain('hreflang="x-default"')
+  })
+
   it('should combine static and content pages', () => {
     const xml = generateSitemapXml(staticPages, contentPages)
     const urlCount = (xml.match(/<url>/g) || []).length

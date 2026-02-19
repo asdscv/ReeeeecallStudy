@@ -42,7 +42,7 @@ export function generateSitemapXml(
   ]
 
   for (const page of staticPages) {
-    lines.push(buildUrlEntry(page))
+    lines.push(buildUrlEntry(page, true))
   }
 
   for (const page of contentPages) {

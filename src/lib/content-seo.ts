@@ -99,6 +99,8 @@ export function buildWebApplicationJsonLd() {
       logo: {
         '@type': 'ImageObject',
         url: SEO.DEFAULT_OG_IMAGE,
+        width: SEO.OG_IMAGE_WIDTH,
+        height: SEO.OG_IMAGE_HEIGHT,
       },
     },
   }
@@ -121,6 +123,8 @@ export function buildOrganizationJsonLd() {
     logo: {
       '@type': 'ImageObject',
       url: SEO.DEFAULT_OG_IMAGE,
+      width: SEO.OG_IMAGE_WIDTH,
+      height: SEO.OG_IMAGE_HEIGHT,
     },
     sameAs: [
       `https://twitter.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
@@ -209,6 +213,8 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
       logo: {
         '@type': 'ImageObject',
         url: SEO.DEFAULT_OG_IMAGE,
+        width: SEO.OG_IMAGE_WIDTH,
+        height: SEO.OG_IMAGE_HEIGHT,
       },
     },
     mainEntityOfPage: {

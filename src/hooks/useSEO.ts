@@ -91,6 +91,7 @@ export function useSEO(options: SEOOptions) {
     setMeta('property', 'og:type', ogType)
     setMeta('property', 'og:site_name', SEO.BRAND_NAME)
     setMeta('property', 'og:locale', currentLang === 'ko' ? 'ko_KR' : 'en_US')
+    setMeta('property', 'og:locale:alternate', currentLang === 'ko' ? 'en_US' : 'ko_KR')
     if (canonicalUrl) setMeta('property', 'og:url', canonicalUrl)
 
     // OG image with dimensions and alt
@@ -175,6 +176,7 @@ export function useSEO(options: SEOOptions) {
       removeMeta('property', 'og:type')
       removeMeta('property', 'og:site_name')
       removeMeta('property', 'og:locale')
+      removeMeta('property', 'og:locale:alternate')
       if (canonicalUrl) removeMeta('property', 'og:url')
 
       // OG image cleanup

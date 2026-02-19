@@ -279,6 +279,21 @@ describe('useSEO', () => {
     expect(document.querySelector('meta[name="twitter:image:alt"]')).toBeNull()
   })
 
+  it('should set og:locale:alternate for other supported locales', () => {
+    renderHook(() => useSEO({ title: 'T', description: 'd' }))
+    const alt = document.querySelector('meta[property="og:locale:alternate"]')
+    expect(alt).toBeTruthy()
+    // en is current, so ko_KR should be the alternate
+    expect(alt?.getAttribute('content')).toBe('ko_KR')
+  })
+
+  it('should cleanup og:locale:alternate on unmount', () => {
+    const { unmount } = renderHook(() => useSEO({ title: 'T', description: 'd' }))
+    expect(document.querySelector('meta[property="og:locale:alternate"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[property="og:locale:alternate"]')).toBeNull()
+  })
+
   it('should cleanup all OG and Twitter meta tags on unmount', () => {
     const { unmount } = renderHook(() =>
       useSEO({

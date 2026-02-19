@@ -14,10 +14,7 @@ Disallow: /my-shares
 Disallow: /templates
 Disallow: /api/
 
-# Crawl-delay for polite crawling
-User-agent: Googlebot
-Crawl-delay: 1
-
+# Crawl-delay for polite crawling (Googlebot ignores Crawl-delay; use Search Console instead)
 User-agent: Bingbot
 Crawl-delay: 2
 
