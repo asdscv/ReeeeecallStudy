@@ -183,10 +183,9 @@ export function StudySessionPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Branding */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center gap-2">
-          <img src="/favicon.png" alt="" className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-4 sm:h-5 hidden sm:block" />
-          <span className="text-sm font-bold text-gray-900 sm:hidden">ReeeeecallStudy</span>
+        <div className="max-w-4xl mx-auto px-4 py-2.5 sm:py-3 flex items-center justify-center gap-2.5">
+          <img src="/favicon.png" alt="" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-6 sm:h-8 object-contain" />
         </div>
       </div>
 
