@@ -120,8 +120,20 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         body: 'sections.study.items.modes.body',
       },
       {
+        title: 'sections.study.items.srsScience.title',
+        body: 'sections.study.items.srsScience.body',
+      },
+      {
         title: 'sections.study.items.srsMethod.title',
         body: 'sections.study.items.srsMethod.body',
+      },
+      {
+        title: 'sections.study.items.srsCardStates.title',
+        body: 'sections.study.items.srsCardStates.body',
+      },
+      {
+        title: 'sections.study.items.srsIntervals.title',
+        body: 'sections.study.items.srsIntervals.body',
       },
       {
         title: 'sections.study.items.quickStudy.title',
