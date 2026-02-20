@@ -21,6 +21,13 @@ supabase/.temp/
 # Test artifacts
 api test
 
+# Playwright
+playwright-report/
+playwright/.auth/
+test-results/
+blob-report/
+.env.test
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
