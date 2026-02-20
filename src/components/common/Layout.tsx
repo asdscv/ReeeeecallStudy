@@ -10,7 +10,7 @@ type NavItem = NavLink | NavGroup
 
 export function Layout() {
   const { t } = useTranslation('common')
-  const { user, signOut, role } = useAuthStore()
+  const { signOut, role } = useAuthStore()
 
   const navItems: NavItem[] = [
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
