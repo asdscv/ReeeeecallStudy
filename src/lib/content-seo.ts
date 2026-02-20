@@ -7,9 +7,6 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
   ko: 'Korean',
   ja: 'Japanese',
   zh: 'Chinese',
-  es: 'Spanish',
-  fr: 'French',
-  de: 'German',
 }
 
 export function buildArticleJsonLd(article: ContentDetail) {
@@ -23,6 +20,8 @@ export function buildArticleJsonLd(article: ContentDetail) {
       url: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
       width: SEO.OG_IMAGE_WIDTH,
       height: SEO.OG_IMAGE_HEIGHT,
+      name: article.meta_title || article.title,
+      description: article.meta_description || article.subtitle || '',
     },
     datePublished: article.published_at,
     dateModified: article.updated_at,
@@ -44,6 +43,7 @@ export function buildArticleJsonLd(article: ContentDetail) {
         height: SEO.OG_IMAGE_HEIGHT,
       },
     },
+    url: `${SEO.SITE_URL}/content/${article.slug}`,
     inLanguage: article.locale,
     mainEntityOfPage: {
       '@type': 'WebPage',
@@ -120,6 +120,12 @@ export function buildWebApplicationJsonLd() {
     operatingSystem: 'Web',
     description: i18next.t('landing:hero.description', { defaultValue: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm' }),
     url: SEO.SITE_URL,
+    image: {
+      '@type': 'ImageObject',
+      url: SEO.DEFAULT_OG_IMAGE,
+      width: SEO.OG_IMAGE_WIDTH,
+      height: SEO.OG_IMAGE_HEIGHT,
+    },
     inLanguage: i18next.language || SEO.DEFAULT_LOCALE,
     offers: {
       '@type': 'Offer',
@@ -138,6 +144,15 @@ export function buildWebApplicationJsonLd() {
       },
     },
   }
+}
+
+export function buildStaticHreflangAlternates(path: string) {
+  const alternates: { lang: string; href: string }[] = SEO.SUPPORTED_LOCALES.map((locale) => ({
+    lang: locale as string,
+    href: `${SEO.SITE_URL}${path}?lang=${locale}`,
+  }))
+  alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}${path}` })
+  return alternates
 }
 
 export function buildHreflangAlternates(slug: string) {
@@ -236,6 +251,8 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
       url: article.og_image_url || article.thumbnail_url || SEO.DEFAULT_OG_IMAGE,
       width: SEO.OG_IMAGE_WIDTH,
       height: SEO.OG_IMAGE_HEIGHT,
+      name: article.meta_title || article.title,
+      description: article.meta_description || article.subtitle || '',
     },
     datePublished: article.published_at,
     dateModified: article.updated_at,
@@ -267,7 +284,7 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
     },
     speakable: {
       '@type': 'SpeakableSpecification',
-      cssSelector: ['article h1', 'article h2', 'article p'],
+      cssSelector: ['article h1', 'article h2', 'article p', 'article li', 'article blockquote'],
     },
   }
 }

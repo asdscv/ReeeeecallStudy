@@ -9,6 +9,7 @@ import {
   buildCollectionPageJsonLd,
   buildWebApplicationJsonLd,
   buildHreflangAlternates,
+  buildStaticHreflangAlternates,
   buildBreadcrumbJsonLd,
   buildOrganizationJsonLd,
   buildWebSiteJsonLd,
@@ -87,12 +88,14 @@ describe('buildArticleJsonLd', () => {
     expect(result.keywords).toBe('learning, srs')
   })
 
-  it('should use ImageObject for image property', () => {
+  it('should use ImageObject for image with name and description', () => {
     const result = buildArticleJsonLd(mockArticle)
     expect(result.image['@type']).toBe('ImageObject')
     expect(result.image.url).toBe('https://example.com/og.jpg')
     expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
     expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect(result.image.name).toBe(mockArticle.meta_title || mockArticle.title)
+    expect(result.image.description).toBe(mockArticle.meta_description || mockArticle.subtitle)
   })
 
   it('should include url in author', () => {
@@ -103,6 +106,11 @@ describe('buildArticleJsonLd', () => {
   it('should include url in publisher', () => {
     const result = buildArticleJsonLd(mockArticle)
     expect(result.publisher.url).toBe(SEO.SITE_URL)
+  })
+
+  it('should include explicit url property', () => {
+    const result = buildArticleJsonLd(mockArticle)
+    expect(result.url).toBe(`${SEO.SITE_URL}/content/test-article`)
   })
 })
 
@@ -212,6 +220,14 @@ describe('buildWebApplicationJsonLd', () => {
   it('should include url in publisher', () => {
     const result = buildWebApplicationJsonLd()
     expect(result.publisher.url).toBe(SEO.SITE_URL)
+  })
+
+  it('should include image as ImageObject', () => {
+    const result = buildWebApplicationJsonLd()
+    expect(result.image['@type']).toBe('ImageObject')
+    expect(result.image.url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 })
 
@@ -418,12 +434,14 @@ describe('buildLearningResourceJsonLd', () => {
     expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
-  it('should include speakable property for AEO with semantic selectors', () => {
+  it('should include speakable property for AEO with comprehensive selectors', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
     expect(result.speakable['@type']).toBe('SpeakableSpecification')
     expect(result.speakable.cssSelector).toContain('article h1')
     expect(result.speakable.cssSelector).toContain('article h2')
     expect(result.speakable.cssSelector).toContain('article p')
+    expect(result.speakable.cssSelector).toContain('article li')
+    expect(result.speakable.cssSelector).toContain('article blockquote')
   })
 
   it('should include isAccessibleForFree', () => {
@@ -431,12 +449,14 @@ describe('buildLearningResourceJsonLd', () => {
     expect(result.isAccessibleForFree).toBe(true)
   })
 
-  it('should use ImageObject for image property', () => {
+  it('should use ImageObject for image with name and description', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
     expect(result.image['@type']).toBe('ImageObject')
     expect(result.image.url).toBe('https://example.com/og.jpg')
     expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
     expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect(result.image.name).toBe(mockArticle.meta_title || mockArticle.title)
+    expect(result.image.description).toBe(mockArticle.meta_description || mockArticle.subtitle)
   })
 
   it('should include url in author', () => {
@@ -447,5 +467,25 @@ describe('buildLearningResourceJsonLd', () => {
   it('should include url in publisher', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
     expect(result.publisher.url).toBe(SEO.SITE_URL)
+  })
+})
+
+describe('buildStaticHreflangAlternates', () => {
+  it('should include all supported locales plus x-default', () => {
+    const result = buildStaticHreflangAlternates('/content')
+    expect(result).toHaveLength(SEO.SUPPORTED_LOCALES.length + 1)
+    const langs = result.map((r) => r.lang)
+    for (const locale of SEO.SUPPORTED_LOCALES) {
+      expect(langs).toContain(locale)
+    }
+    expect(langs).toContain('x-default')
+  })
+
+  it('should use correct URL pattern with lang query param', () => {
+    const result = buildStaticHreflangAlternates('/landing')
+    const en = result.find((r) => r.lang === 'en')
+    expect(en?.href).toBe(`${SEO.SITE_URL}/landing?lang=en`)
+    const xDefault = result.find((r) => r.lang === 'x-default')
+    expect(xDefault?.href).toBe(`${SEO.SITE_URL}/landing`)
   })
 })

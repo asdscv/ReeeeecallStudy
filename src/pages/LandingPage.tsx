@@ -9,6 +9,7 @@ import {
   buildWebSiteJsonLd,
   buildHowToJsonLd,
   buildFAQJsonLd,
+  buildStaticHreflangAlternates,
 } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 import { useContentStore } from '../stores/content-store'
@@ -142,11 +143,7 @@ export function LandingPage() {
         canonicalUrl={`${SEO.SITE_URL}/landing`}
         jsonLd={landingSchemas}
         keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
-        hreflangAlternates={[
-          { lang: 'en', href: `${SEO.SITE_URL}/landing?lang=en` },
-          { lang: 'ko', href: `${SEO.SITE_URL}/landing?lang=ko` },
-          { lang: 'x-default', href: `${SEO.SITE_URL}/landing` },
-        ]}
+        hreflangAlternates={buildStaticHreflangAlternates('/landing')}
       />
       <LandingNav />
 

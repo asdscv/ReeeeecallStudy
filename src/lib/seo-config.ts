@@ -18,9 +18,6 @@ const OG_LOCALE_MAP: Record<string, string> = {
   ko: 'ko_KR',
   ja: 'ja_JP',
   zh: 'zh_CN',
-  es: 'es_ES',
-  fr: 'fr_FR',
-  de: 'de_DE',
 }
 
 /** Map a locale code to an Open Graph locale string (e.g. 'ko' → 'ko_KR'). */
