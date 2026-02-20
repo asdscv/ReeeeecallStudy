@@ -176,11 +176,32 @@
   "nav": {
     "blog": "Insights",
     "login": "Log in",
-    "start": "Get Started"
+    "start": "Get Started",
+    "features": "Features",
+    "results": "Results",
+    "reviews": "Reviews",
+    "howItWorks": "How It Works",
+    "faq": "FAQ"
+  },
+  "trustBadges": {
+    "free": "Free Forever",
+    "noAds": "No Ads",
+    "privacy": "Privacy First",
+    "languages": "4 Languages",
+    "allDevices": "All Devices"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API Docs"
+    "apiDocs": "API Docs",
+    "tagline": "Smart flashcard learning platform with spaced repetition",
+    "product": "Product",
+    "resources": "Resources",
+    "features": "Features",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "blog": "Insights",
+    "help": "Help",
+    "language": "Language"
   },
   "floatingCta": "Start Now",
   "faq": {
@@ -196,40 +217,39 @@
   },
   "statsSection": {
     "title": "Proven Results",
-    "subtitle": "Results achieved by ReeeeecallStudy users compared to traditional study methods",
+    "subtitle": "Backed by science — see what spaced repetition delivers",
     "baseline": "vs. traditional study",
-    "efficiency": {
-      "label": "Learning Efficiency",
-      "change": "+150%",
-      "description": "Remember more with less time"
+    "retention": {
+      "label": "30-Day Retention",
+      "change": "+75%",
+      "description": "Remember what you learn after 30 days"
     },
-    "interval": {
-      "label": "Review Interval",
-      "unit": "d",
-      "change": "+8 days",
-      "description": "Review intervals grow naturally"
+    "timeSaved": {
+      "label": "Time Saved",
+      "change": "-50%",
+      "description": "Half the study time, same results"
     },
-    "accuracy": {
-      "label": "Accuracy Rate",
-      "change": "+23%",
-      "description": "High accuracy for long-term retention"
+    "completion": {
+      "label": "Daily Completion",
+      "change": "+38%",
+      "description": "Users finish their daily reviews"
     },
-    "daily": {
-      "label": "Daily Cards",
-      "unit": "",
-      "change": "+30 cards",
-      "description": "Efficient study throughput"
+    "learners": {
+      "label": "Active Learners",
+      "change": "+840 this month",
+      "description": "Growing community worldwide"
     }
   },
   "socialProof": {
     "title": "Trusted by Learners Worldwide",
     "subtitle": "Join thousands of students studying smarter",
+    "liveActivity": "{{count}} people studying right now",
     "userCountLabel": "Active Users",
     "cardsStudiedLabel": "Cards Studied",
     "decksCreatedLabel": "Decks Created",
     "testimonials": {
       "0": { "quote": "ReeeeecallStudy helped me pass JLPT N2. The SRS algorithm is incredibly effective!", "author": "Min-Jun Kim", "role": "Language Learner" },
-      "1": { "quote": "Switched from Anki and the interface is so much cleaner. Studying is actually enjoyable now.", "author": "Seo-Yun Lee", "role": "Medical Student" },
+      "1": { "quote": "The interface is so clean and intuitive. Studying is actually enjoyable now.", "author": "Seo-Yun Lee", "role": "Medical Student" },
       "2": { "quote": "The deck sharing feature is amazing. I found decks for almost every subject.", "author": "Yuki Park", "role": "University Student" }
     }
   },

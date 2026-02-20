@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, useReducedMotion } from 'motion/react'
 import { Star, Quote } from 'lucide-react'
@@ -105,6 +105,37 @@ function MarqueeRow({ reviews, direction, speed, lang }: {
   )
 }
 
+// ── Live Activity Badge ──
+function LiveActivityBadge() {
+  const { t } = useTranslation('landing')
+  const prefersReduced = useReducedMotion()
+
+  const [count, setCount] = useState(() => Math.floor(Math.random() * 37) + 12) // 12-48
+
+  const fluctuate = useCallback(() => {
+    setCount((prev) => {
+      const delta = Math.floor(Math.random() * 3) + 1
+      const direction = Math.random() > 0.5 ? 1 : -1
+      const next = prev + delta * direction
+      return Math.max(12, Math.min(48, next))
+    })
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(fluctuate, 30000)
+    return () => clearInterval(interval)
+  }, [fluctuate])
+
+  return (
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-sm text-green-700">
+      <span
+        className={`w-2 h-2 rounded-full bg-green-500 ${prefersReduced ? '' : 'animate-pulse'}`}
+      />
+      <span>{t('socialProof.liveActivity', '{{count}} people studying right now', { count })}</span>
+    </div>
+  )
+}
+
 // ── Main Section ──
 export function SocialProofSection() {
   const { t, i18n } = useTranslation('landing')
@@ -115,7 +146,7 @@ export function SocialProofSection() {
   const row2 = REVIEWS.slice(50, 100)
 
   return (
-    <section className="py-12 sm:py-16 md:py-24 overflow-hidden">
+    <section id="social-proof" className="py-12 sm:py-16 md:py-24 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4">
         <ScrollReveal>
           <div className="text-center mb-8 sm:mb-12">
@@ -129,7 +160,7 @@ export function SocialProofSection() {
         </ScrollReveal>
 
         {/* Counters */}
-        <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-14">
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {COUNTER_ITEMS.map((item, i) => (
             <Counter
               key={item.key}
@@ -138,6 +169,11 @@ export function SocialProofSection() {
               delay={i * 0.15}
             />
           ))}
+        </div>
+
+        {/* Live activity badge */}
+        <div className="flex justify-center mb-8 sm:mb-10">
+          <LiveActivityBadge />
         </div>
       </div>
 

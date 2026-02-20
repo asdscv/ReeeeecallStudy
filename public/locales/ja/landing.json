@@ -176,11 +176,32 @@
   "nav": {
     "blog": "インサイト",
     "login": "ログイン",
-    "start": "今すぐ始める"
+    "start": "今すぐ始める",
+    "features": "機能",
+    "results": "実績",
+    "reviews": "レビュー",
+    "howItWorks": "使い方",
+    "faq": "FAQ"
+  },
+  "trustBadges": {
+    "free": "ずっと無料",
+    "noAds": "広告なし",
+    "privacy": "プライバシー重視",
+    "languages": "4言語対応",
+    "allDevices": "全デバイス対応"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "APIドキュメント"
+    "apiDocs": "APIドキュメント",
+    "tagline": "間隔反復によるスマートフラッシュカード学習プラットフォーム",
+    "product": "製品",
+    "resources": "リソース",
+    "features": "機能",
+    "pricing": "料金",
+    "faq": "FAQ",
+    "blog": "インサイト",
+    "help": "ヘルプ",
+    "language": "言語"
   },
   "floatingCta": "今すぐ始める",
   "faq": {
@@ -196,40 +217,39 @@
   },
   "statsSection": {
     "title": "実証された結果",
-    "subtitle": "ReeeeecallStudyユーザーが従来の学習法と比較して達成した成果",
+    "subtitle": "科学が証明 — 間隔反復が生み出す違い",
     "baseline": "vs. 従来の学習法",
-    "efficiency": {
-      "label": "学習効率",
-      "change": "+150%",
-      "description": "より少ない時間でより多くの記憶"
+    "retention": {
+      "label": "30日後の記憶保持率",
+      "change": "+75%",
+      "description": "30日後も学習内容を記憶"
     },
-    "interval": {
-      "label": "復習間隔",
-      "unit": "日",
-      "change": "+8日",
-      "description": "復習間隔が自然に延びる"
+    "timeSaved": {
+      "label": "学習時間の節約",
+      "change": "-50%",
+      "description": "半分の時間で同じ成果"
     },
-    "accuracy": {
-      "label": "正答率",
-      "change": "+23%",
-      "description": "高い精度で長期記憶を維持"
+    "completion": {
+      "label": "日次復習完了率",
+      "change": "+38%",
+      "description": "毎日の復習を最後まで完了するユーザー"
     },
-    "daily": {
-      "label": "1日のカード数",
-      "unit": "枚",
-      "change": "+30枚",
-      "description": "効率的な学習処理量"
+    "learners": {
+      "label": "アクティブ学習者",
+      "change": "今月+840人",
+      "description": "世界中で成長するコミュニティ"
     }
   },
   "socialProof": {
     "title": "世界中の学習者に信頼されています",
     "subtitle": "よりスマートに学ぶ数千人の学生に参加しましょう",
+    "liveActivity": "現在{{count}}人が学習中",
     "userCountLabel": "アクティブユーザー",
     "cardsStudiedLabel": "学習済みカード",
     "decksCreatedLabel": "作成されたデッキ",
     "testimonials": {
       "0": { "quote": "ReeeeecallStudyのおかげでJLPT N2に合格しました。SRSアルゴリズムが本当に効果的です！", "author": "田中太郎", "role": "語学学習者" },
-      "1": { "quote": "Ankiから乗り換えましたが、インターフェースがずっとすっきりしています。学習が楽しくなりました。", "author": "佐藤花子", "role": "医学生" },
+      "1": { "quote": "インターフェースがとてもクリーンで直感的です。学習が楽しくなりました。", "author": "佐藤花子", "role": "医学生" },
       "2": { "quote": "デッキ共有機能がすごいです。ほぼすべての科目のデッキが見つかりました。", "author": "鈴木一郎", "role": "大学生" }
     }
   },

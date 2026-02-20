@@ -3,12 +3,12 @@ import { Brain, Layers, BarChart3, Share2, Globe, Smartphone } from 'lucide-reac
 import { motion, useReducedMotion } from 'motion/react'
 
 const FEATURE_ICONS = [
-  { icon: Brain, color: 'bg-blue-100 text-blue-600', accent: 'border-t-blue-500', key: 'srs' },
-  { icon: Layers, color: 'bg-purple-100 text-purple-600', accent: 'border-t-purple-500', key: 'modes' },
-  { icon: BarChart3, color: 'bg-green-100 text-green-600', accent: 'border-t-green-500', key: 'stats' },
-  { icon: Share2, color: 'bg-orange-100 text-orange-600', accent: 'border-t-orange-500', key: 'sharing' },
-  { icon: Globe, color: 'bg-pink-100 text-pink-600', accent: 'border-t-pink-500', key: 'tts' },
-  { icon: Smartphone, color: 'bg-indigo-100 text-indigo-600', accent: 'border-t-indigo-500', key: 'responsive' },
+  { icon: Brain, color: 'bg-blue-100 text-blue-600', accent: 'border-t-blue-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(59,130,246,0.5)]', key: 'srs' },
+  { icon: Layers, color: 'bg-purple-100 text-purple-600', accent: 'border-t-purple-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(147,51,234,0.5)]', key: 'modes' },
+  { icon: BarChart3, color: 'bg-green-100 text-green-600', accent: 'border-t-green-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(34,197,94,0.5)]', key: 'stats' },
+  { icon: Share2, color: 'bg-orange-100 text-orange-600', accent: 'border-t-orange-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(249,115,22,0.5)]', key: 'sharing' },
+  { icon: Globe, color: 'bg-pink-100 text-pink-600', accent: 'border-t-pink-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(236,72,153,0.5)]', key: 'tts' },
+  { icon: Smartphone, color: 'bg-indigo-100 text-indigo-600', accent: 'border-t-indigo-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(99,102,241,0.5)]', key: 'responsive' },
 ]
 
 export function FeaturesSection() {
@@ -52,7 +52,7 @@ export function FeaturesSection() {
             <motion.div
               key={f.key}
               variants={prefersReduced ? undefined : item}
-              className={`bg-white rounded-xl border border-gray-200 border-t-4 ${f.accent} p-4 sm:p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}
+              className={`bg-white rounded-xl border border-gray-200 border-t-4 ${f.accent} p-4 sm:p-6 hover:shadow-lg hover:-translate-y-1 ${f.hoverShadow} transition-all duration-300`}
             >
               <motion.div
                 className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mb-3 sm:mb-4 ${f.color}`}

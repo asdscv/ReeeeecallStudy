@@ -176,11 +176,32 @@
   "nav": {
     "blog": "인사이트",
     "login": "로그인",
-    "start": "시작하기"
+    "start": "시작하기",
+    "features": "기능",
+    "results": "결과",
+    "reviews": "리뷰",
+    "howItWorks": "사용 방법",
+    "faq": "FAQ"
+  },
+  "trustBadges": {
+    "free": "영원히 무료",
+    "noAds": "광고 없음",
+    "privacy": "개인정보 보호",
+    "languages": "4개 언어",
+    "allDevices": "모든 기기"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API 문서"
+    "apiDocs": "API 문서",
+    "tagline": "간격 반복 기반 스마트 플래시카드 학습 플랫폼",
+    "product": "제품",
+    "resources": "리소스",
+    "features": "기능",
+    "pricing": "가격",
+    "faq": "FAQ",
+    "blog": "인사이트",
+    "help": "도움말",
+    "language": "언어"
   },
   "floatingCta": "지금 시작하기",
   "faq": {
@@ -196,40 +217,39 @@
   },
   "statsSection": {
     "title": "검증된 결과",
-    "subtitle": "ReeeeecallStudy 사용자가 일반 학습 대비 달성한 성과",
+    "subtitle": "과학이 증명합니다 — 간격 반복이 만드는 차이",
     "baseline": "vs. 일반 학습",
-    "efficiency": {
-      "label": "학습 효율",
-      "change": "+150%",
-      "description": "더 적은 시간으로 더 많은 기억"
+    "retention": {
+      "label": "30일 후 기억 유지율",
+      "change": "+75%",
+      "description": "한 달 뒤에도 학습 내용을 기억"
     },
-    "interval": {
-      "label": "복습 간격",
-      "unit": "일",
-      "change": "+8일",
-      "description": "복습 간격이 자연스럽게 늘어남"
+    "timeSaved": {
+      "label": "학습 시간 절약",
+      "change": "-50%",
+      "description": "절반의 시간으로 같은 성과"
     },
-    "accuracy": {
-      "label": "정답률",
-      "change": "+23%",
-      "description": "높은 정확도로 장기 기억 유지"
+    "completion": {
+      "label": "일일 복습 완료율",
+      "change": "+38%",
+      "description": "매일 복습을 끝까지 완료하는 사용자"
     },
-    "daily": {
-      "label": "일일 카드",
-      "unit": "장",
-      "change": "+30장",
-      "description": "효율적인 학습 처리량"
+    "learners": {
+      "label": "활성 학습자",
+      "change": "이번 달 +840명",
+      "description": "전 세계에서 성장하는 커뮤니티"
     }
   },
   "socialProof": {
     "title": "전 세계 학습자들이 신뢰합니다",
     "subtitle": "더 스마트하게 공부하는 수천 명의 학생에 합류하세요",
+    "liveActivity": "지금 {{count}}명이 공부 중입니다",
     "userCountLabel": "활성 사용자",
     "cardsStudiedLabel": "학습한 카드",
     "decksCreatedLabel": "생성된 덱",
     "testimonials": {
       "0": { "quote": "ReeeeecallStudy 덕분에 JLPT N2에 합격했습니다. SRS 알고리즘이 정말 효과적이에요!", "author": "김민준", "role": "어학 학습자" },
-      "1": { "quote": "Anki에서 전환했는데 인터페이스가 훨씬 깔끔합니다. 학습이 즐거워졌어요.", "author": "이서윤", "role": "의대생" },
+      "1": { "quote": "인터페이스가 깔끔하고 직관적이에요. 학습이 정말 즐거워졌어요.", "author": "이서윤", "role": "의대생" },
       "2": { "quote": "덱 공유 기능이 대단해요. 거의 모든 과목의 덱을 찾을 수 있었습니다.", "author": "박유키", "role": "대학생" }
     }
   },

@@ -12,9 +12,12 @@ import {
 import { SEO } from '../lib/seo-config'
 import { useContentStore } from '../stores/content-store'
 
+import { ScrollProgress } from '../components/landing/ScrollProgress'
 import { LandingNav } from '../components/landing/LandingNav'
 import { HeroSection } from '../components/landing/HeroSection'
+import { TrustBadgesSection } from '../components/landing/TrustBadgesSection'
 import { AppPreviewSection } from '../components/landing/AppPreviewSection'
+import { SectionDivider } from '../components/landing/SectionDivider'
 import { FeaturesSection } from '../components/landing/FeaturesSection'
 import { StatsSection } from '../components/landing/StatsSection'
 import { BenefitsSection } from '../components/landing/BenefitsSection'
@@ -67,16 +70,22 @@ export function LandingPage() {
         keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
         hreflangAlternates={buildStaticHreflangAlternates('/landing')}
       />
+      <ScrollProgress />
       <LandingNav />
       <HeroSection />
+      <TrustBadgesSection />
       <AppPreviewSection />
+      <SectionDivider type="wave" color="#f9fafb" />
       <FeaturesSection />
+      <SectionDivider type="curve" color="#ffffff" />
       <StatsSection />
       <BenefitsSection />
       <SocialProofSection />
+      <SectionDivider type="wave" color="#f9fafb" />
       <HowItWorksSection />
       <InsightsSection />
       <FAQSection />
+      <SectionDivider type="curve" color="#ffffff" />
       <FinalCTASection />
       <FooterSection />
       <FloatingCTA />

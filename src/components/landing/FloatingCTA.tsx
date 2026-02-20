@@ -26,6 +26,9 @@ export function FloatingCTA() {
           exit={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 40 }}
           transition={prefersReduced ? { duration: 0 } : { type: 'spring', damping: 20, stiffness: 200 }}
         >
+          <span className="bg-green-50 text-green-700 text-xs font-medium rounded-full px-2 py-0.5 border border-green-200 hidden sm:inline">
+            2.5k+ users
+          </span>
           <div className="relative">
             <img src="/favicon.png" alt="" className="w-10 h-10 sm:w-14 sm:h-14 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 active:scale-110 active:rotate-12" />
             <div className="absolute inset-0 bg-blue-500/0 rounded-full blur-xl transition-all duration-300 group-hover:bg-blue-500/40 group-hover:scale-150 group-active:bg-blue-500/40 group-active:scale-150" />

@@ -13,7 +13,7 @@ export function HowItWorksSection() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section className="py-12 sm:py-16 md:py-24 px-4 bg-gray-50">
+    <section id="how-it-works" className="py-12 sm:py-16 md:py-24 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-8 sm:mb-12">{t('howItWorks.title')}</h2>
 

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { TrendingUp, Calendar, Target, Layers } from 'lucide-react'
+import { Brain, Clock, Target, Users } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useCountUp } from '../../hooks/useCountUp'
 
@@ -37,6 +37,7 @@ function StatCard({
       className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow"
       initial={prefersReduced ? undefined : { opacity: 0, y: 40 }}
       whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+      whileHover={prefersReduced ? undefined : { scale: 1.03, y: -4 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay, ease: 'easeOut' }}
     >
@@ -75,61 +76,61 @@ export function StatsSection() {
 
   const stats = [
     {
-      icon: TrendingUp,
-      labelKey: 'statsSection.efficiency.label',
-      labelFallback: 'Learning Efficiency',
-      endValue: 200,
+      icon: Brain,
+      labelKey: 'statsSection.retention.label',
+      labelFallback: '30-Day Retention',
+      endValue: 95,
       suffix: '%',
-      changeKey: 'statsSection.efficiency.change',
-      changeFallback: '+150%',
-      descKey: 'statsSection.efficiency.description',
-      descFallback: 'Remember more with less time',
+      changeKey: 'statsSection.retention.change',
+      changeFallback: '+75%',
+      descKey: 'statsSection.retention.description',
+      descFallback: 'Remember what you learn after 30 days',
       gradient: 'from-blue-500 to-cyan-400',
-      progressPercent: 100,
+      progressPercent: 95,
     },
     {
-      icon: Calendar,
-      labelKey: 'statsSection.interval.label',
-      labelFallback: 'Review Interval',
-      endValue: 15,
-      suffix: t('statsSection.interval.unit', 'd'),
-      changeKey: 'statsSection.interval.change',
-      changeFallback: '+8d',
-      descKey: 'statsSection.interval.description',
-      descFallback: 'Review intervals grow naturally',
+      icon: Clock,
+      labelKey: 'statsSection.timeSaved.label',
+      labelFallback: 'Time Saved',
+      endValue: 50,
+      suffix: '%',
+      changeKey: 'statsSection.timeSaved.change',
+      changeFallback: '-50%',
+      descKey: 'statsSection.timeSaved.description',
+      descFallback: 'Half the study time, same results',
       gradient: 'from-purple-500 to-pink-400',
-      progressPercent: 62,
+      progressPercent: 50,
     },
     {
       icon: Target,
-      labelKey: 'statsSection.accuracy.label',
-      labelFallback: 'Accuracy Rate',
-      endValue: 87,
+      labelKey: 'statsSection.completion.label',
+      labelFallback: 'Daily Completion',
+      endValue: 92,
       suffix: '%',
-      changeKey: 'statsSection.accuracy.change',
-      changeFallback: '+23%',
-      descKey: 'statsSection.accuracy.description',
-      descFallback: 'High accuracy for long-term retention',
+      changeKey: 'statsSection.completion.change',
+      changeFallback: '+38%',
+      descKey: 'statsSection.completion.description',
+      descFallback: 'Users finish their daily reviews',
       gradient: 'from-green-500 to-emerald-400',
-      progressPercent: 87,
+      progressPercent: 92,
     },
     {
-      icon: Layers,
-      labelKey: 'statsSection.daily.label',
-      labelFallback: 'Daily Cards',
-      endValue: 45,
-      suffix: t('statsSection.daily.unit', ''),
-      changeKey: 'statsSection.daily.change',
-      changeFallback: '+30',
-      descKey: 'statsSection.daily.description',
-      descFallback: 'Efficient study throughput',
+      icon: Users,
+      labelKey: 'statsSection.learners.label',
+      labelFallback: 'Active Learners',
+      endValue: 2500,
+      suffix: '+',
+      changeKey: 'statsSection.learners.change',
+      changeFallback: '+840',
+      descKey: 'statsSection.learners.description',
+      descFallback: 'Growing community worldwide',
       gradient: 'from-orange-500 to-amber-400',
-      progressPercent: 60,
+      progressPercent: 72,
     },
   ]
 
   return (
-    <section className="py-12 sm:py-16 md:py-24 px-4">
+    <section id="stats" className="py-12 sm:py-16 md:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">

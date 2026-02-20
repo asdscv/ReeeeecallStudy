@@ -168,7 +168,7 @@ const DATA: D[] = [
   [5,'Custom templates let me structure cards exactly how I want.','커스텀 템플릿으로 카드를 원하는 대로 구성할 수 있어요.','カスタムテンプレートでカードを思い通りに構成できる。','自定义模板让我按想要的方式构建卡片。',6],
   [5,'The community marketplace decks saved me weeks of card creation.','커뮤니티 마켓플레이스 덱으로 수주간의 카드 제작 시간 절약.','コミュニティマーケットプレイスのデッキで何週間もの作成時間を節約。','社区市场的牌组为我节省了好几周的制卡时间。',2],
   // ── General SRS & Comparison Praise (90-99) ──
-  [5,'Switched from Anki. The interface is leagues ahead. Never going back.','Anki에서 전환. 인터페이스가 비교할 수 없을 만큼 좋아요.','Ankiから乗り換え。インターフェースが段違い。もう戻れない。','从Anki转过来，界面好太多了，再也不回去了。',8],
+  [5,'The interface is so clean and intuitive. Studying feels effortless now.','인터페이스가 깔끔하고 직관적이에요. 학습이 수월해졌어요.','インターフェースがとてもクリーンで直感的。学習が楽になった。','界面很干净直观，学习变得毫不费力。',8],
   [5,'Study time cut in half, retention doubled. The math speaks for itself.','학습 시간 반으로 줄고 기억력 두 배. 결과가 말해줘요.','学習時間半分、記憶力2倍。結果が全てを物語る。','学习时间减半，记忆力翻倍，数据说明一切。',5],
   [5,'3 months in and I barely forget anything I study. SRS is magic.','3개월째인데 공부한 걸 거의 잊지 않아요. SRS는 마법이에요.','3ヶ月経っても学習した内容をほとんど忘れない。SRSは魔法。','用了3个月几乎不忘记学过的内容，SRS太神奇了。',2],
   [4,'My memory used to be terrible. This app completely changed that.','기억력이 끔찍했는데 이 앱이 완전히 바꿔놨어요.','記憶力がひどかったのに、このアプリが完全に変えてくれた。','我以前记性很差，这个应用完全改变了这一点。',5],
