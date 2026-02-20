@@ -23,17 +23,17 @@ export function HeroSection() {
   }
 
   return (
-    <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-24 px-4 overflow-hidden">
       {/* Floating decorative blobs */}
       {!prefersReduced && (
         <>
           <motion.div
-            className="absolute -top-20 -left-20 w-72 h-72 bg-blue-400 rounded-full blur-3xl opacity-20"
+            className="absolute -top-20 -left-20 w-40 sm:w-72 h-40 sm:h-72 bg-blue-400 rounded-full blur-3xl opacity-15 sm:opacity-20"
             animate={{ y: [0, -30, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           />
           <motion.div
-            className="absolute -bottom-20 -right-20 w-80 h-80 bg-purple-400 rounded-full blur-3xl opacity-20"
+            className="absolute -bottom-20 -right-20 w-48 sm:w-80 h-48 sm:h-80 bg-purple-400 rounded-full blur-3xl opacity-15 sm:opacity-20"
             animate={{ y: [0, 30, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
           />
@@ -55,7 +55,7 @@ export function HeroSection() {
 
         <motion.h1
           variants={prefersReduced ? undefined : fadeUp}
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-4 sm:mb-6"
         >
           {t('hero.title1')}
           <br />
@@ -66,7 +66,7 @@ export function HeroSection() {
 
         <motion.p
           variants={prefersReduced ? undefined : fadeUp}
-          className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
         >
           {t('hero.subtitle1')}
           <br className="hidden sm:block" />

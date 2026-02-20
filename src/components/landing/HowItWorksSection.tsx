@@ -13,11 +13,11 @@ export function HowItWorksSection() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section className="py-16 sm:py-24 px-4 bg-gray-50">
+    <section className="py-12 sm:py-16 md:py-24 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-12">{t('howItWorks.title')}</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-8 sm:mb-12">{t('howItWorks.title')}</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 relative">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 md:gap-8 relative">
           {/* Connecting line (desktop only) */}
           <div className="hidden sm:block absolute top-8 left-[calc(16.67%+32px)] right-[calc(16.67%+32px)] h-0.5 bg-gray-200 z-0">
             <motion.div
@@ -40,7 +40,7 @@ export function HowItWorksSection() {
             >
               <div className="relative">
                 <motion.div
-                  className="w-16 h-16 rounded-full bg-blue-600 text-white text-2xl font-bold flex items-center justify-center mb-5 shadow-lg shadow-blue-600/25 relative z-10"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-blue-600 text-white text-xl sm:text-2xl font-bold flex items-center justify-center mb-4 sm:mb-5 shadow-lg shadow-blue-600/25 relative z-10"
                   initial={prefersReduced ? undefined : { scale: 0.8 }}
                   whileInView={prefersReduced ? undefined : { scale: 1 }}
                   viewport={{ once: true }}

@@ -43,7 +43,7 @@ export function AppPreviewSection() {
   }, [isFlipped, prefersReduced])
 
   return (
-    <section className="px-4 pb-16 sm:pb-24">
+    <section className="px-4 pb-12 sm:pb-16 md:pb-24">
       <ScrollReveal>
         <div className="max-w-4xl mx-auto">
           <div className="bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
@@ -62,7 +62,7 @@ export function AppPreviewSection() {
             {/* Content area */}
             <div className="p-6 sm:p-10 flex flex-col items-center">
               {/* Flashcard with flip */}
-              <div className="w-full max-w-sm h-48 [perspective:1000px] mb-6">
+              <div className="w-full max-w-[280px] sm:max-w-sm h-40 sm:h-48 [perspective:1000px] mb-4 sm:mb-6">
                 <motion.div
                   className="relative w-full h-full [transform-style:preserve-3d]"
                   animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -70,13 +70,13 @@ export function AppPreviewSection() {
                 >
                   {/* Front */}
                   <div className="absolute inset-0 [backface-visibility:hidden] bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center p-6">
-                    <p className="text-3xl font-bold text-white">
+                    <p className="text-2xl sm:text-3xl font-bold text-white">
                       {t('preview.mockFront', 'Hello')}
                     </p>
                   </div>
                   {/* Back */}
                   <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center p-6">
-                    <p className="text-3xl font-bold text-white">
+                    <p className="text-2xl sm:text-3xl font-bold text-white">
                       {t('preview.mockBack', 'Bonjour')}
                     </p>
                   </div>
@@ -100,7 +100,7 @@ export function AppPreviewSection() {
               </div>
 
               {/* Status bar */}
-              <div className="flex items-center gap-3 text-sm text-gray-400">
+              <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400">
                 <span>{t('preview.mockCards', '12/30 cards')}</span>
                 <span className="w-1 h-1 rounded-full bg-gray-600" />
                 <span>{t('preview.mockStreak', 'Streak: 7 days')}</span>

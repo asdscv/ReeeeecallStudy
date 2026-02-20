@@ -10,9 +10,9 @@ export function FinalCTASection() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section id="cta" className="py-16 sm:py-24 px-4">
+    <section id="cta" className="py-12 sm:py-16 md:py-24 px-4">
       <ScrollReveal>
-        <div className="max-w-4xl mx-auto relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-6 sm:px-12 py-14 sm:py-20 text-center">
+        <div className="max-w-4xl mx-auto relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-5 sm:px-10 md:px-12 py-10 sm:py-14 md:py-20 text-center">
           {/* Floating decorative circles */}
           {!prefersReduced && (
             <>
@@ -30,7 +30,7 @@ export function FinalCTASection() {
           )}
 
           <div className="relative z-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 sm:mb-4">
               {t('cta.title')}
             </h2>
             <p className="text-blue-100 text-base sm:text-lg mb-8 max-w-xl mx-auto">
@@ -38,7 +38,7 @@ export function FinalCTASection() {
             </p>
             <motion.button
               onClick={() => navigate('/auth/login')}
-              className="inline-flex items-center gap-2 px-10 py-4 bg-white text-blue-700 text-lg font-semibold rounded-xl hover:bg-blue-50 transition shadow-lg cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-4 bg-white text-blue-700 text-base sm:text-lg font-semibold rounded-xl hover:bg-blue-50 transition shadow-lg cursor-pointer"
               whileHover={prefersReduced ? undefined : { scale: 1.05 }}
               whileTap={prefersReduced ? undefined : { scale: 0.98 }}
             >

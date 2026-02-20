@@ -10,14 +10,14 @@ export function BenefitsSection() {
   const benefits = Array.from({ length: 8 }, (_, i) => t(`benefits.${i}`))
 
   return (
-    <section id="benefits" className="py-16 sm:py-24 px-4">
+    <section id="benefits" className="py-12 sm:py-16 md:py-24 px-4">
       <div className="max-w-4xl mx-auto">
         <ScrollReveal>
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">
               {t('benefitsSection.title')}
             </h2>
-            <p className="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto">
+            <p className="text-gray-500 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
               {t('benefitsSection.subtitle')}
             </p>
           </div>

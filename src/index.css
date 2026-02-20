@@ -136,3 +136,17 @@
   0%, 100% { background-position: 0% center; }
   50% { background-position: 100% center; }
 }
+
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.marquee-container:hover > div {
+  animation-play-state: paused;
+}

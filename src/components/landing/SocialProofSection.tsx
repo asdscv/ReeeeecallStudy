@@ -1,18 +1,16 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, useReducedMotion } from 'motion/react'
+import { Star, Quote } from 'lucide-react'
 import { useCountUp } from '../../hooks/useCountUp'
 import { ScrollReveal } from './ScrollReveal'
+import { REVIEWS, type Review, type Lang } from './reviews-data'
 
+// ── Counter ──
 const COUNTER_ITEMS = [
   { key: 'userCount', end: 2500 },
   { key: 'cardsStudied', end: 150000 },
   { key: 'decksCreated', end: 5000 },
-]
-
-const AVATAR_COLORS = [
-  'bg-blue-500',
-  'bg-purple-500',
-  'bg-green-500',
 ]
 
 function Counter({ endValue, displayLabel, delay }: { endValue: number; displayLabel: string; delay: number }) {
@@ -32,37 +30,106 @@ function Counter({ endValue, displayLabel, delay }: { endValue: number; displayL
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
     >
-      <p className="text-3xl sm:text-4xl font-extrabold text-gray-900">{formatted}</p>
-      <p className="text-sm text-gray-500 mt-1">{displayLabel}</p>
+      <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">{formatted}</p>
+      <p className="text-xs sm:text-sm text-gray-500 mt-1">{displayLabel}</p>
     </motion.div>
   )
 }
 
-export function SocialProofSection() {
-  const { t } = useTranslation('landing')
-
-  const testimonials = [0, 1, 2].map((i) => ({
-    quote: t(`socialProof.testimonials.${i}.quote`, ''),
-    author: t(`socialProof.testimonials.${i}.author`, ''),
-    role: t(`socialProof.testimonials.${i}.role`, ''),
-  }))
+// ── Review Card ──
+function ReviewCard({ review, lang }: { review: Review; lang: Lang }) {
+  const initial = review.author[lang].charAt(0)
 
   return (
-    <section className="py-16 sm:py-24 px-4 bg-gray-50">
-      <div className="max-w-6xl mx-auto">
+    <div className="w-[260px] sm:w-[300px] md:w-[340px] flex-shrink-0 group relative">
+      <div className="h-full bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
+        {/* Accent gradient bar */}
+        <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${review.color}`} />
+
+        {/* Quote icon */}
+        <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-gray-100 absolute top-3 right-3 sm:top-4 sm:right-4" />
+
+        {/* Stars */}
+        <div className="flex gap-0.5 mb-2 sm:mb-3">
+          {Array.from({ length: review.rating }, (_, i) => (
+            <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
+          ))}
+          {Array.from({ length: 5 - review.rating }, (_, i) => (
+            <Star key={`e-${i}`} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-gray-100 text-gray-200" />
+          ))}
+        </div>
+
+        {/* Quote */}
+        <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-3 sm:mb-4 line-clamp-3 relative z-10 min-h-[3rem] sm:min-h-[3.5rem]">
+          &ldquo;{review.quote[lang]}&rdquo;
+        </p>
+
+        {/* Author */}
+        <div className="flex items-center gap-2.5">
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br ${review.color} flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-sm`}>
+            {initial}
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate">{review.author[lang]}</p>
+            <p className="text-[10px] sm:text-xs text-gray-400 truncate">{review.role[lang]}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Marquee Row ──
+function MarqueeRow({ reviews, direction, speed, lang }: {
+  reviews: Review[]
+  direction: 'left' | 'right'
+  speed: number
+  lang: Lang
+}) {
+  const doubled = useMemo(() => [...reviews, ...reviews], [reviews])
+  const animName = direction === 'left' ? 'marquee-left' : 'marquee-right'
+
+  return (
+    <div className="overflow-hidden marquee-container">
+      <div
+        className="flex gap-3 sm:gap-4 w-max"
+        style={{
+          animation: `${animName} ${speed}s linear infinite`,
+        }}
+      >
+        {doubled.map((review, i) => (
+          <ReviewCard key={`${direction}-${i}`} review={review} lang={lang} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Main Section ──
+export function SocialProofSection() {
+  const { t, i18n } = useTranslation('landing')
+  const lang = (i18n.language?.substring(0, 2) || 'en') as Lang
+  const safeLang: Lang = ['en', 'ko', 'ja', 'zh'].includes(lang) ? lang : 'en'
+
+  const row1 = REVIEWS.slice(0, 50)
+  const row2 = REVIEWS.slice(50, 100)
+
+  return (
+    <section className="py-12 sm:py-16 md:py-24 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">
               {t('socialProof.title', 'Trusted by Learners Worldwide')}
             </h2>
-            <p className="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto">
+            <p className="text-gray-500 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
               {t('socialProof.subtitle', 'Join thousands of students studying smarter')}
             </p>
           </div>
         </ScrollReveal>
 
         {/* Counters */}
-        <div className="grid grid-cols-3 gap-6 mb-14">
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-14">
           {COUNTER_ITEMS.map((item, i) => (
             <Counter
               key={item.key}
@@ -72,28 +139,12 @@ export function SocialProofSection() {
             />
           ))}
         </div>
+      </div>
 
-        {/* Testimonials */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {testimonials.map((testimonial, i) => (
-            <ScrollReveal key={i} delay={i * 0.15}>
-              <div className="bg-white rounded-xl border border-gray-200 p-6 h-full">
-                <p className="text-gray-600 leading-relaxed mb-5 italic">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full ${AVATAR_COLORS[i]} flex items-center justify-center text-white font-bold text-sm`}>
-                    {testimonial.author.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{testimonial.author}</p>
-                    <p className="text-xs text-gray-400">{testimonial.role}</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+      {/* Marquee rows - full width, no padding */}
+      <div className="space-y-3 sm:space-y-4">
+        <MarqueeRow reviews={row1} direction="left" speed={120} lang={safeLang} />
+        <MarqueeRow reviews={row2} direction="right" speed={130} lang={safeLang} />
       </div>
     </section>
   )

@@ -32,17 +32,17 @@ export function FeaturesSection() {
   }
 
   return (
-    <section id="features" className="py-16 sm:py-24 px-4 bg-gray-50">
+    <section id="features" className="py-12 sm:py-16 md:py-24 px-4 bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">{t('featuresSection.title')}</h2>
-          <p className="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">{t('featuresSection.title')}</h2>
+          <p className="text-gray-500 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
             {t('featuresSection.subtitle')}
           </p>
         </div>
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6"
           variants={prefersReduced ? undefined : container}
           initial="hidden"
           whileInView="show"
@@ -52,10 +52,10 @@ export function FeaturesSection() {
             <motion.div
               key={f.key}
               variants={prefersReduced ? undefined : item}
-              className={`bg-white rounded-xl border border-gray-200 border-t-4 ${f.accent} p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}
+              className={`bg-white rounded-xl border border-gray-200 border-t-4 ${f.accent} p-4 sm:p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}
             >
               <motion.div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${f.color}`}
+                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mb-3 sm:mb-4 ${f.color}`}
                 whileHover={prefersReduced ? undefined : { rotate: 5, scale: 1.05 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
