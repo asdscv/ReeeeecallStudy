@@ -8,7 +8,8 @@
     "marketplace": "마켓",
     "studyHistory": "학습 기록",
     "settings": "설정",
-    "admin": "관리자"
+    "admin": "관리자",
+    "guide": "사용법"
   },
   "actions": {
     "save": "저장",

@@ -69,3 +69,10 @@ export function maskApiKey(key: string): string {
   if (!isValidApiKeyFormat(key)) return '••••••••'
   return key.slice(0, 7) + '•'.repeat(28)
 }
+
+/** Partial mask: show prefix + first 6 hex + masked middle + last 4 hex. */
+export function maskApiKeyPartial(key: string): string {
+  if (!isValidApiKeyFormat(key)) return '••••••••'
+  // rc_(3) + first 6 hex = 9 chars visible at start, last 4 hex visible at end
+  return key.slice(0, 9) + '•'.repeat(22) + key.slice(-4)
+}

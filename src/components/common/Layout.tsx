@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, BookOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
 
@@ -133,9 +133,10 @@ export function Layout() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden sm:inline text-sm text-gray-500 truncate max-w-[160px]">
-              {user?.email}
-            </span>
+            <Link to="/guide" className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm no-underline transition text-gray-600 hover:bg-gray-100">
+              <BookOpen className="w-4 h-4" />
+              {t('nav.guide')}
+            </Link>
             <button
               onClick={signOut}
               className="hidden md:inline text-sm text-gray-400 hover:text-gray-600 cursor-pointer"
@@ -212,7 +213,14 @@ export function Layout() {
                 )
               })}
               <div className="border-t border-gray-100 mt-2 pt-2 px-3 py-3 flex items-center justify-between">
-                <span className="text-sm text-gray-500 truncate">{user?.email}</span>
+                <Link
+                  to="/guide"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-blue-600 no-underline transition"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  {t('nav.guide')}
+                </Link>
                 <button
                   onClick={() => { setMobileMenuOpen(false); signOut() }}
                   className="text-sm text-red-500 hover:text-red-600 cursor-pointer shrink-0 ml-4"

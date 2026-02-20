@@ -14,6 +14,7 @@ import {
   type SwipeDirectionMap,
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
+import { maskApiKeyPartial } from '../lib/api-key'
 
 const SWIPE_DIRECTIONS: { key: keyof SwipeDirectionMap; labelKey: string; icon: typeof ArrowLeft }[] = [
   { key: 'left', labelKey: 'answerMode.swipeLeft', icon: ArrowLeft },
@@ -60,7 +61,7 @@ export function SettingsPage() {
 
   // API key state
   const [apiKeyData, setApiKeyData] = useState<{ key: string; name: string; createdAt: string } | null>(null)
-  const [showApiKey, setShowApiKey] = useState(false)
+  const [keyDisplayMode, setKeyDisplayMode] = useState<'hidden' | 'partial' | 'full'>('hidden')
   const [newKeyName, setNewKeyName] = useState('')
   const [showKeyForm, setShowKeyForm] = useState(false)
 
@@ -96,16 +97,18 @@ export function SettingsPage() {
     const fetchApiKey = async () => {
       const { data: keyRow } = await supabase
         .from('api_keys')
-        .select('name, created_at')
+        .select('name, created_at, key_plain')
         .eq('user_id', user.id)
         .single()
       if (keyRow) {
-        const row = keyRow as { name: string; created_at: string }
-        // Plain key is only available at creation time; show masked placeholder
-        const saved = localStorage.getItem('reeeeecall-api-key-data')
-        let plainKey = ''
-        if (saved) {
-          try { plainKey = JSON.parse(saved).key ?? '' } catch { /* ignore */ }
+        const row = keyRow as { name: string; created_at: string; key_plain: string | null }
+        // Prefer key_plain from DB; fallback to localStorage for keys created before migration 030
+        let plainKey = row.key_plain ?? ''
+        if (!plainKey) {
+          const saved = localStorage.getItem('reeeeecall-api-key-data')
+          if (saved) {
+            try { plainKey = JSON.parse(saved).key ?? '' } catch { /* ignore */ }
+          }
         }
         setApiKeyData({ key: plainKey, name: row.name, createdAt: row.created_at })
       }
@@ -153,12 +156,13 @@ export function SettingsPage() {
       // Upsert: delete existing key first (one_key_per_user constraint)
       await supabase.from('api_keys').delete().eq('user_id', user.id)
 
-      // Save hash to DB
+      // Save hash + plain key to DB
       const { error } = await supabase
         .from('api_keys')
         .insert({
           user_id: user.id,
           key_hash: keyHash,
+          key_plain: key,
           name,
         } as Record<string, unknown>)
 
@@ -170,7 +174,7 @@ export function SettingsPage() {
       const data = { key, name, createdAt: new Date().toISOString() }
       setApiKeyData(data)
       localStorage.setItem('reeeeecall-api-key-data', JSON.stringify(data))
-      setShowApiKey(true)
+      setKeyDisplayMode('full')
       setShowKeyForm(false)
       setNewKeyName('')
       toast.success(t('apiKey.generated'))
@@ -191,7 +195,7 @@ export function SettingsPage() {
       .eq('user_id', user.id)
 
     setApiKeyData(null)
-    setShowApiKey(false)
+    setKeyDisplayMode('hidden')
     localStorage.removeItem('reeeeecall-api-key-data')
     toast.success(t('apiKey.deleted'))
   }
@@ -449,18 +453,30 @@ export function SettingsPage() {
                 </button>
               </div>
 
-              {/* Key value row */}
+              {/* Key value row — 3-mode display */}
               {apiKeyData.key ? (
                 <div className="flex items-center gap-2 mb-3">
                   <code className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono truncate">
-                    {showApiKey ? apiKeyData.key : apiKeyData.key.slice(0, 6) + '\u2022'.repeat(30)}
+                    {keyDisplayMode === 'full'
+                      ? apiKeyData.key
+                      : keyDisplayMode === 'partial'
+                        ? maskApiKeyPartial(apiKeyData.key)
+                        : 'rc_' + '\u2022'.repeat(32)}
                   </code>
                   <button
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition cursor-pointer"
-                    title={showApiKey ? t('apiKey.hide') : t('apiKey.show')}
+                    onClick={() => setKeyDisplayMode((prev) =>
+                      prev === 'hidden' ? 'partial' : prev === 'partial' ? 'full' : 'hidden'
+                    )}
+                    className={`p-2 transition cursor-pointer ${
+                      keyDisplayMode === 'full' ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                    title={
+                      keyDisplayMode === 'hidden' ? t('apiKey.showPartial')
+                        : keyDisplayMode === 'partial' ? t('apiKey.showFull')
+                          : t('apiKey.hide')
+                    }
                   >
-                    {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {keyDisplayMode === 'hidden' ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                   <CopyButton text={apiKeyData.key} />
                 </div>

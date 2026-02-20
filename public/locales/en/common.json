@@ -8,7 +8,8 @@
     "marketplace": "Marketplace",
     "studyHistory": "Study History",
     "settings": "Settings",
-    "admin": "Admin"
+    "admin": "Admin",
+    "guide": "Guide"
   },
   "actions": {
     "save": "Save",

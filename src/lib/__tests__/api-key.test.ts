@@ -6,6 +6,7 @@ import {
   isValidApiKeyFormat,
   validateKeyName,
   maskApiKey,
+  maskApiKeyPartial,
   API_KEY_PREFIX,
   API_KEY_LENGTH,
   API_KEY_NAME_MAX_LENGTH,
@@ -208,5 +209,41 @@ describe('maskApiKey', () => {
     const masked = maskApiKey(key)
     expect(masked).not.toBe(key)
     expect(masked.length).toBe(35) // 7 visible + 28 dots
+  })
+})
+
+// ─── maskApiKeyPartial ──────────────────────────────────────
+
+describe('maskApiKeyPartial', () => {
+  it('shows prefix + first 6 hex + dots + last 4 hex', () => {
+    const key = 'rc_0123456789abcdef0123456789abcdef'
+    const masked = maskApiKeyPartial(key)
+    // rc_ + 012345 (first 6 hex) + dots + cdef (last 4 hex)
+    expect(masked).toBe('rc_012345' + '•'.repeat(22) + 'cdef')
+  })
+
+  it('has the same total length as the original key', () => {
+    const key = 'rc_0123456789abcdef0123456789abcdef'
+    expect(maskApiKeyPartial(key).length).toBe(key.length)
+  })
+
+  it('returns placeholder for invalid key', () => {
+    expect(maskApiKeyPartial('')).toBe('••••••••')
+    expect(maskApiKeyPartial('invalid')).toBe('••••••••')
+  })
+
+  it('does not leak the full key', () => {
+    const key = generateApiKey()
+    const masked = maskApiKeyPartial(key)
+    expect(masked).not.toBe(key)
+    // Should not contain the middle portion
+    expect(masked).toContain('•')
+  })
+
+  it('shows different prefix/suffix than full key', () => {
+    const key = 'rc_aabbccddee112233aabbccddee1122ff'
+    const masked = maskApiKeyPartial(key)
+    expect(masked.startsWith('rc_aabbcc')).toBe(true)
+    expect(masked.endsWith('22ff')).toBe(true)
   })
 })

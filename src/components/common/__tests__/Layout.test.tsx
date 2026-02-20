@@ -251,7 +251,36 @@ describe('링크 정확성', () => {
   })
 })
 
-// ─── Cycle 6: 엣지 케이스 ─────────────────────────────────────
+// ─── Cycle 6: 사용법 가이드 버튼 ───────────────────────────────
+describe('사용법 가이드 버튼', () => {
+  it('데스크톱에서 사용법 가이드 링크가 표시된다', () => {
+    renderLayout()
+    const guideLink = screen.getAllByText('nav.guide')[0]
+    expect(guideLink.closest('a')).toHaveAttribute('href', '/guide')
+  })
+
+  it('데스크톱에서 이메일이 표시되지 않는다', () => {
+    renderLayout()
+    expect(screen.queryByText('test@example.com')).not.toBeInTheDocument()
+  })
+
+  it('모바일 메뉴에서 사용법 가이드 링크가 표시된다', async () => {
+    const user = userEvent.setup()
+    renderLayout()
+
+    await user.click(screen.getByRole('button', { name: /menu/ }))
+    const mobileNav = screen.getAllByRole('navigation')[1]
+    const guideLink = within(mobileNav).getByText('nav.guide')
+    expect(guideLink.closest('a')).toHaveAttribute('href', '/guide')
+  })
+
+  it('데스크톱에서 로그아웃 버튼은 유지된다', () => {
+    renderLayout()
+    expect(screen.getByText('actions.logout')).toBeInTheDocument()
+  })
+})
+
+// ─── Cycle 7: 엣지 케이스 ─────────────────────────────────────
 describe('엣지 케이스', () => {
   it('데스크톱과 모바일 그룹 상태가 독립적이다', async () => {
     const user = userEvent.setup()

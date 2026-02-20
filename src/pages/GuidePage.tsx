@@ -4,8 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { Search, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
 import { GUIDE_SECTIONS, searchGuide, type GuideSection } from '../lib/guide-content'
 
-function SectionCard({ section, defaultOpen, t }: { section: GuideSection; defaultOpen: boolean; t: (key: string) => string }) {
+function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSection; defaultOpen: boolean; forceOpen?: boolean; t: (key: string) => string }) {
   const [open, setOpen] = useState(defaultOpen)
+
+  useEffect(() => {
+    if (forceOpen) setOpen(true)
+  }, [forceOpen])
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -61,19 +65,21 @@ export function GuidePage() {
   const navigate = useNavigate()
   const { t } = useTranslation('guide')
   const [query, setQuery] = useState('')
+  const [openSectionId, setOpenSectionId] = useState<string | null>(null)
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   const filtered = searchGuide(query, t)
   const isSearching = query.trim().length > 0
 
   const scrollToSection = (id: string) => {
-    sectionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setOpenSectionId(id)
+    requestAnimationFrame(() => {
+      const el = sectionRefs.current[id]
+      if (!el) return
+      const y = el.getBoundingClientRect().top + window.scrollY - 72
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    })
   }
-
-  // Reset refs when filtered changes
-  useEffect(() => {
-    sectionRefs.current = {}
-  }, [query])
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -123,7 +129,7 @@ export function GuidePage() {
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
             >
-              <SectionCard section={section} defaultOpen={isSearching} t={t} />
+              <SectionCard section={section} defaultOpen={isSearching} forceOpen={openSectionId === section.id} t={t} />
             </div>
           ))}
         </div>
