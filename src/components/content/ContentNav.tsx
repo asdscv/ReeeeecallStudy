@@ -27,7 +27,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
           )}
           <Link to="/landing" className="flex items-center gap-2 no-underline">
             <img src="/favicon.png" alt="" className="w-8 h-8" />
-            <span className="font-bold text-gray-900 hidden sm:inline">ReeeeecallStudy</span>
+            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-6 sm:h-8 object-contain hidden sm:inline" />
           </Link>
         </div>
 

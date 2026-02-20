@@ -91,7 +91,7 @@ export function ContentDetailPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <img src="/favicon.png" alt="" className="w-7 h-7" />
-              <span className="font-bold text-gray-900">ReeeeecallStudy</span>
+              <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-5 sm:h-6 object-contain" />
             </div>
             <p className="text-sm text-gray-400">
               {t('landing:footer.copyright')}
