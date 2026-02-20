@@ -24,6 +24,11 @@
       "label": "By Date",
       "description": "Study cards uploaded on a specific date",
       "detail": "Collects and studies only cards added on the selected date. Useful for quickly reviewing newly added cards."
+    },
+    "cramming": {
+      "label": "Cramming Mode",
+      "description": "Intensive review until mastered",
+      "detail": "Cycle all cards round by round. Missed cards repeat until mastered. No impact on SRS schedule."
     }
   },
   "quickStudy": {
@@ -40,7 +45,8 @@
     "batchSize": "Batch Size",
     "batchSizeDesc": "Cards to study per session ({{min}}~{{max}})",
     "batchSizeDescReview": "Review cards per session — all new cards included ({{min}}~{{max}})",
-    "backToModeSelect": "← Back to Mode Selection"
+    "backToModeSelect": "← Back to Mode Selection",
+    "crammingSetup": "Set up cramming options"
   },
   "setup": {
     "title": "Study Setup",
@@ -114,5 +120,42 @@
     "hard": "Hard",
     "good": "Good",
     "easy": "Easy"
+  },
+  "cramming": {
+    "gotIt": "Got It!",
+    "missed": "Didn't Get It",
+    "round": "Round {{round}}",
+    "mastery": "Mastery: {{percentage}}%",
+    "filter": {
+      "title": "Card Filter",
+      "all": "All Cards",
+      "allDesc": "Study all non-suspended cards in the deck",
+      "weak": "Weak Cards Only",
+      "weakDesc": "Cards with low ease factor or new cards",
+      "dueSoon": "Due Soon",
+      "dueSoonDesc": "Cards due for review within 3 days"
+    },
+    "timeLimit": {
+      "title": "Time Limit",
+      "none": "No Limit",
+      "minutes": "{{count}} min"
+    },
+    "shuffle": {
+      "title": "Shuffle Cards",
+      "desc": "Shuffle card order each round"
+    },
+    "summary": {
+      "completed": "Cramming Complete!",
+      "timeUp": "Time's Up!",
+      "wellDone": "Great effort! Keep reviewing to strengthen your memory.",
+      "totalRounds": "Total Rounds",
+      "masteryRate": "Mastery Rate",
+      "cardsStudied": "Cards Studied",
+      "hardestCards": "Hardest Cards",
+      "missedTimes": "missed {{count}}x",
+      "noSrsImpact": "This session did not affect your SRS schedule.",
+      "crammingAgain": "Cram Again",
+      "otherMode": "Other Modes"
+    }
   }
 }

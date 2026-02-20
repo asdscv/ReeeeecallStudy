@@ -12,13 +12,13 @@ import {
 // ─── STUDY_MODE_OPTIONS ─────────────────────────────────────
 
 describe('STUDY_MODE_OPTIONS', () => {
-  it('has 5 modes', () => {
-    expect(STUDY_MODE_OPTIONS).toHaveLength(5)
+  it('has 6 modes', () => {
+    expect(STUDY_MODE_OPTIONS).toHaveLength(6)
   })
 
-  it('includes srs, sequential_review, random, sequential, by_date', () => {
+  it('includes srs, sequential_review, random, sequential, by_date, cramming', () => {
     const values = STUDY_MODE_OPTIONS.map(o => o.value)
-    expect(values).toEqual(['srs', 'sequential_review', 'random', 'sequential', 'by_date'])
+    expect(values).toEqual(['srs', 'sequential_review', 'random', 'sequential', 'by_date', 'cramming'])
   })
 
   it('each option has emoji, label, desc, detail', () => {
@@ -52,6 +52,10 @@ describe('isBatchSizeConfigurable', () => {
 
   it('returns true for sequential', () => {
     expect(isBatchSizeConfigurable('sequential')).toBe(true)
+  })
+
+  it('returns false for cramming mode', () => {
+    expect(isBatchSizeConfigurable('cramming')).toBe(false)
   })
 })
 

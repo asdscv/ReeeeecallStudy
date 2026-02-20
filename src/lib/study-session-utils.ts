@@ -16,6 +16,7 @@ export const STUDY_MODE_OPTIONS: StudyModeOption[] = [
   { value: 'random', emoji: '🎲', label: 'study:modes.random.label', desc: 'study:modes.random.description', detail: 'study:modes.random.detail' },
   { value: 'sequential', emoji: '➡️', label: 'study:modes.sequential.label', desc: 'study:modes.sequential.description', detail: 'study:modes.sequential.detail' },
   { value: 'by_date', emoji: '📅', label: 'study:modes.by_date.label', desc: 'study:modes.by_date.description', detail: 'study:modes.by_date.detail' },
+  { value: 'cramming', emoji: '⚡', label: 'study:modes.cramming.label', desc: 'study:modes.cramming.description', detail: 'study:modes.cramming.detail' },
 ]
 
 // ─── Batch Size ─────────────────────────────────────────────
@@ -26,7 +27,7 @@ export const MAX_BATCH_SIZE = 1000
 
 /** Whether a study mode supports user-configurable batch size. */
 export function isBatchSizeConfigurable(mode: StudyMode): boolean {
-  return mode !== 'srs' && mode !== 'by_date'
+  return mode !== 'srs' && mode !== 'by_date' && mode !== 'cramming'
 }
 
 /** Clamp batch size to valid range. */

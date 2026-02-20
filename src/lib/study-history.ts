@@ -1,5 +1,5 @@
 import i18next from 'i18next'
-import type { StudySession, StudyLog } from '../types/database'
+import type { StudySession, StudyLog, StudyMode } from '../types/database'
 import { toIntlLocale } from './locale-utils'
 
 /** Format milliseconds to human-readable duration string */
@@ -27,6 +27,11 @@ export function getSessionPerformance(ratings: Record<string, number>): number {
     hard: 30,
     good: 70,
     easy: 100,
+    got_it: 100,
+    missed: 0,
+    known: 100,
+    unknown: 0,
+    next: 50,
     '1': 0,
     '2': 33,
     '3': 67,
@@ -86,6 +91,7 @@ export function getStudyModeEmoji(mode: string): string {
     random: '\uD83C\uDFB2',
     sequential: '\u27A1\uFE0F',
     by_date: '\uD83D\uDCC5',
+    cramming: '\u26A1',
   }
   return emojis[mode] ?? '\uD83D\uDCDA'
 }
@@ -144,7 +150,7 @@ export function aggregateLogsToSessions(logs: StudyLog[]): StudySession[] {
   const sessions: StudySession[] = []
 
   for (const [key, groupLogs] of groups.entries()) {
-    const [deckId, studyMode] = key.split('|')
+    const [deckId, studyMode] = key.split('|') as [string, StudyMode, string]
     const first = groupLogs[0]
 
     const ratings: Record<string, number> = {}

@@ -24,6 +24,11 @@
       "label": "日付別",
       "description": "特定の日にアップロードされたカードを学習",
       "detail": "選択した日付に追加されたカードのみを集めて学習します。新しく追加したカードを素早く復習するのに便利です。"
+    },
+    "cramming": {
+      "label": "詰め込みモード",
+      "description": "マスターするまで集中復習",
+      "detail": "すべてのカードをラウンドごとに繰り返します。間違えたカードは正解するまで再出題されます。SRSスケジュールに影響なし。"
     }
   },
   "quickStudy": {
@@ -40,7 +45,8 @@
     "batchSize": "バッチサイズ",
     "batchSizeDesc": "1セッションあたりの学習カード数（{{min}}〜{{max}}）",
     "batchSizeDescReview": "1セッションあたりの復習カード数 — 新規カードはすべて含まれます（{{min}}〜{{max}}）",
-    "backToModeSelect": "← モード選択に戻る"
+    "backToModeSelect": "← モード選択に戻る",
+    "crammingSetup": "詰め込みモードの設定"
   },
   "setup": {
     "title": "学習設定",
@@ -114,5 +120,42 @@
     "hard": "Hard",
     "good": "Good",
     "easy": "Easy"
+  },
+  "cramming": {
+    "gotIt": "わかった！",
+    "missed": "わからない",
+    "round": "ラウンド {{round}}",
+    "mastery": "マスター率: {{percentage}}%",
+    "filter": {
+      "title": "カードフィルター",
+      "all": "すべてのカード",
+      "allDesc": "デッキ内の一時停止されていないすべてのカードを学習",
+      "weak": "苦手なカードのみ",
+      "weakDesc": "難易度が低いカードや新しいカード",
+      "dueSoon": "もうすぐ復習",
+      "dueSoonDesc": "3日以内に復習予定のカード"
+    },
+    "timeLimit": {
+      "title": "制限時間",
+      "none": "制限なし",
+      "minutes": "{{count}}分"
+    },
+    "shuffle": {
+      "title": "カードをシャッフル",
+      "desc": "毎ラウンドカードの順序をシャッフル"
+    },
+    "summary": {
+      "completed": "詰め込み完了！",
+      "timeUp": "時間切れ！",
+      "wellDone": "お疲れ様でした！復習を続けて記憶を強化しましょう。",
+      "totalRounds": "総ラウンド数",
+      "masteryRate": "マスター率",
+      "cardsStudied": "学習カード数",
+      "hardestCards": "最も難しいカード",
+      "missedTimes": "{{count}}回間違い",
+      "noSrsImpact": "このセッションはSRSスケジュールに影響しません。",
+      "crammingAgain": "もう一度詰め込み",
+      "otherMode": "他のモード"
+    }
   }
 }

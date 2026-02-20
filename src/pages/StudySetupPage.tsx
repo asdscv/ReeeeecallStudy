@@ -12,6 +12,8 @@ import {
   MAX_BATCH_SIZE,
   isBatchSizeConfigurable,
 } from '../lib/study-session-utils'
+import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
+import type { CrammingFilter } from '../lib/cramming-queue'
 import type { Deck, StudyMode } from '../types/database'
 
 export function StudySetupPage() {
@@ -26,6 +28,11 @@ export function StudySetupPage() {
   const [mode, setMode] = useState<StudyMode>('srs')
   const [batchSize, setBatchSize] = useState(DEFAULT_BATCH_SIZE)
   const [batchSizeInput, setBatchSizeInput] = useState(String(DEFAULT_BATCH_SIZE))
+
+  // cramming mode state
+  const [crammingFilter, setCrammingFilter] = useState<CrammingFilter>({ type: 'all' })
+  const [crammingTimeLimit, setCrammingTimeLimit] = useState<number | null>(null)
+  const [crammingShuffle, setCrammingShuffle] = useState(true)
 
   // by_date mode state
   const [selectedDate, setSelectedDate] = useState(() => todayDateKey())
@@ -107,6 +114,13 @@ export function StudySetupPage() {
       const { start, end } = localDateToUTCRange(selectedDate)
       params.set('dateStart', start)
       params.set('dateEnd', end)
+    }
+    if (mode === 'cramming') {
+      params.set('crammingFilter', JSON.stringify(crammingFilter))
+      if (crammingTimeLimit != null) {
+        params.set('crammingTimeLimit', String(crammingTimeLimit))
+      }
+      params.set('crammingShuffle', String(crammingShuffle))
     }
     navigate(`/decks/${deckId}/study?${params.toString()}`)
   }
@@ -200,6 +214,20 @@ export function StudySetupPage() {
               ? t('quickStudy.batchSizeDescReview', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })
               : t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
           </p>
+        </div>
+      )}
+
+      {/* Cramming setup */}
+      {mode === 'cramming' && (
+        <div className="mb-6">
+          <CrammingSetupPanel
+            filter={crammingFilter}
+            onFilterChange={setCrammingFilter}
+            timeLimitMinutes={crammingTimeLimit}
+            onTimeLimitChange={setCrammingTimeLimit}
+            shuffle={crammingShuffle}
+            onShuffleChange={setCrammingShuffle}
+          />
         </div>
       )}
 

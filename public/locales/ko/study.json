@@ -24,6 +24,11 @@
       "label": "일자별 학습",
       "description": "특정 날짜에 업로드한 카드만 학습합니다",
       "detail": "선택한 날짜에 추가된 카드만 모아서 학습합니다. 새로 추가한 카드를 빠르게 확인할 때 유용합니다."
+    },
+    "cramming": {
+      "label": "벼락치기 모드",
+      "description": "마스터할 때까지 집중 반복",
+      "detail": "모든 카드를 라운드별로 반복합니다. 틀린 카드는 맞출 때까지 재출제됩니다. SRS 일정에 영향 없음."
     }
   },
   "quickStudy": {
@@ -40,7 +45,8 @@
     "batchSize": "배치 크기",
     "batchSizeDesc": "한 세션에 학습할 카드 수 ({{min}}~{{max}})",
     "batchSizeDescReview": "복습할 카드 수 — 새 카드는 모두 포함 ({{min}}~{{max}})",
-    "backToModeSelect": "← 모드 선택으로"
+    "backToModeSelect": "← 모드 선택으로",
+    "crammingSetup": "벼락치기 옵션을 설정하세요"
   },
   "setup": {
     "title": "학습 설정",
@@ -114,5 +120,42 @@
     "hard": "어려움",
     "good": "좋음",
     "easy": "쉬움"
+  },
+  "cramming": {
+    "gotIt": "알겠어요!",
+    "missed": "모르겠어요",
+    "round": "라운드 {{round}}",
+    "mastery": "마스터: {{percentage}}%",
+    "filter": {
+      "title": "카드 필터",
+      "all": "전체 카드",
+      "allDesc": "덱의 모든 카드를 학습합니다",
+      "weak": "약한 카드만",
+      "weakDesc": "난이도가 낮거나 새 카드만 학습합니다",
+      "dueSoon": "곧 복습 예정",
+      "dueSoonDesc": "3일 이내 복습 예정인 카드"
+    },
+    "timeLimit": {
+      "title": "시간 제한",
+      "none": "제한 없음",
+      "minutes": "{{count}}분"
+    },
+    "shuffle": {
+      "title": "카드 섞기",
+      "desc": "매 라운드마다 카드 순서를 섞습니다"
+    },
+    "summary": {
+      "completed": "벼락치기 완료!",
+      "timeUp": "시간 종료!",
+      "wellDone": "수고하셨습니다! 꾸준히 복습하여 기억을 강화하세요.",
+      "totalRounds": "총 라운드",
+      "masteryRate": "마스터율",
+      "cardsStudied": "학습 카드 수",
+      "hardestCards": "가장 어려운 카드",
+      "missedTimes": "{{count}}회 틀림",
+      "noSrsImpact": "이 세션은 SRS 일정에 영향을 주지 않았습니다.",
+      "crammingAgain": "다시 벼락치기",
+      "otherMode": "다른 모드"
+    }
   }
 }

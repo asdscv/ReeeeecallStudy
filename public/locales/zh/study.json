@@ -24,6 +24,11 @@
       "label": "按日期",
       "description": "学习特定日期上传的卡片",
       "detail": "仅学习在所选日期添加的卡片。适合快速复习新添加的卡片。"
+    },
+    "cramming": {
+      "label": "突击模式",
+      "description": "集中复习直到掌握",
+      "detail": "逐轮循环所有卡片，错误的卡片会重复出现直到掌握。不影响 SRS 复习计划。"
     }
   },
   "quickStudy": {
@@ -40,7 +45,8 @@
     "batchSize": "批次大小",
     "batchSizeDesc": "每次学习的卡片数量 ({{min}}~{{max}})",
     "batchSizeDescReview": "每次复习的卡片数量 — 所有新卡自动包含 ({{min}}~{{max}})",
-    "backToModeSelect": "← 返回模式选择"
+    "backToModeSelect": "← 返回模式选择",
+    "crammingSetup": "设置突击模式选项"
   },
   "setup": {
     "title": "学习设置",
@@ -114,5 +120,42 @@
     "hard": "困难",
     "good": "良好",
     "easy": "简单"
+  },
+  "cramming": {
+    "gotIt": "会了！",
+    "missed": "不会",
+    "round": "第 {{round}} 轮",
+    "mastery": "掌握率: {{percentage}}%",
+    "filter": {
+      "title": "卡片筛选",
+      "all": "全部卡片",
+      "allDesc": "学习牌组中所有未暂停的卡片",
+      "weak": "薄弱卡片",
+      "weakDesc": "难度较低或新卡片",
+      "dueSoon": "即将到期",
+      "dueSoonDesc": "3天内需要复习的卡片"
+    },
+    "timeLimit": {
+      "title": "时间限制",
+      "none": "无限制",
+      "minutes": "{{count}} 分钟"
+    },
+    "shuffle": {
+      "title": "打乱卡片",
+      "desc": "每轮打乱卡片顺序"
+    },
+    "summary": {
+      "completed": "突击完成！",
+      "timeUp": "时间到！",
+      "wellDone": "辛苦了！坚持复习来巩固记忆。",
+      "totalRounds": "总轮数",
+      "masteryRate": "掌握率",
+      "cardsStudied": "学习卡片数",
+      "hardestCards": "最难的卡片",
+      "missedTimes": "错误 {{count}} 次",
+      "noSrsImpact": "此次学习不影响 SRS 复习计划。",
+      "crammingAgain": "再次突击",
+      "otherMode": "其他模式"
+    }
   }
 }

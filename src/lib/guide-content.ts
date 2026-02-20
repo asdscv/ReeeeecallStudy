@@ -151,6 +151,10 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: 'sections.study.items.srsCustom.title',
         body: 'sections.study.items.srsCustom.body',
       },
+      {
+        title: 'sections.study.items.cramming.title',
+        body: 'sections.study.items.cramming.body',
+      },
     ],
   },
 

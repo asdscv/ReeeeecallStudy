@@ -31,6 +31,13 @@ export function resolveKeyAction(
     return null
   }
 
+  // Cramming mode
+  if (mode === 'cramming') {
+    if (key === 'ArrowRight' || key === ' ') return { type: 'rate', rating: 'got_it' }
+    if (key === 'ArrowLeft') return { type: 'rate', rating: 'missed' }
+    return null
+  }
+
   // Non-SRS modes
   if (key === 'ArrowRight' || key === ' ') {
     if (mode === 'sequential_review') return { type: 'rate', rating: 'known' }

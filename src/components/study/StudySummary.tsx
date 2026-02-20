@@ -85,6 +85,8 @@ function ratingLabel(rating: string, t: (key: string) => string): string {
     known: t('rating.known'),
     unknown: t('rating.unknown'),
     next: t('rating.next'),
+    got_it: t('cramming.gotIt'),
+    missed: t('cramming.missed'),
   }
   return map[rating] ?? rating
 }
@@ -98,6 +100,8 @@ function ratingColor(rating: string): string {
     known: 'bg-green-50 text-green-700',
     unknown: 'bg-red-50 text-red-700',
     next: 'bg-gray-100 text-gray-700',
+    got_it: 'bg-green-50 text-green-700',
+    missed: 'bg-red-50 text-red-700',
   }
   return map[rating] ?? 'bg-gray-100 text-gray-700'
 }

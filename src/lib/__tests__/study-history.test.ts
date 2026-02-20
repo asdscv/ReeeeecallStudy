@@ -110,9 +110,14 @@ describe('getSessionPerformance', () => {
     expect(getSessionPerformance({ again: 2, hard: 3, good: 5 })).toBe(44)
   })
 
-  it('uses 50 as default weight for unknown ratings', () => {
-    // 2 × unknown (50) = 100 / 2 = 50
-    expect(getSessionPerformance({ unknown: 2 })).toBe(50)
+  it('unknown rating maps to 0 (sequential_review "don\'t know")', () => {
+    // 2 × unknown (0) = 0 / 2 = 0
+    expect(getSessionPerformance({ unknown: 2 })).toBe(0)
+  })
+
+  it('uses 50 as default weight for unrecognized ratings', () => {
+    // 2 × unrecognized (50) = 100 / 2 = 50
+    expect(getSessionPerformance({ some_future_rating: 2 })).toBe(50)
   })
 })
 

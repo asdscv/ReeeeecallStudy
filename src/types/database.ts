@@ -195,25 +195,27 @@ export interface Database {
           id: string
           user_id: string
           deck_id: string
-          study_mode: string
+          study_mode: StudyMode
           cards_studied: number
           total_cards: number
           total_duration_ms: number
           ratings: Record<string, number>
           started_at: string
           completed_at: string
+          metadata?: Record<string, unknown>
         }
         Insert: {
           id?: string
           user_id: string
           deck_id: string
-          study_mode: string
+          study_mode: StudyMode
           cards_studied: number
           total_cards: number
           total_duration_ms: number
           ratings: Record<string, number>
           started_at: string
           completed_at?: string
+          metadata?: Record<string, unknown>
         }
         Update: Partial<Database['public']['Tables']['study_sessions']['Insert']>
       }
@@ -222,7 +224,7 @@ export interface Database {
 }
 
 export type UserRole = 'user' | 'admin'
-export type StudyMode = 'srs' | 'sequential_review' | 'random' | 'sequential' | 'by_date'
+export type StudyMode = 'srs' | 'sequential_review' | 'random' | 'sequential' | 'by_date' | 'cramming'
 export type SrsStatus = 'new' | 'learning' | 'review' | 'suspended'
 export type LayoutMode = 'default' | 'custom'
 export type ShareMode = 'copy' | 'subscribe' | 'snapshot'

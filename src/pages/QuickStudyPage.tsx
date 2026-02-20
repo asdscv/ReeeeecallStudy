@@ -6,6 +6,8 @@ import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
 import { utcToLocalDateKey, localDateToUTCRange, todayDateKey } from '../lib/date-utils'
 import { DatePicker } from '../components/study/DatePicker'
+import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
+import type { CrammingFilter } from '../lib/cramming-queue'
 import {
   STUDY_MODE_OPTIONS,
   DEFAULT_BATCH_SIZE,
@@ -31,6 +33,11 @@ export function QuickStudyPage() {
   const [selectedDate, setSelectedDate] = useState(() => todayDateKey())
   const [datesWithCards, setDatesWithCards] = useState<Set<string>>(new Set())
   const [dateCardCount, setDateCardCount] = useState(0)
+
+  // cramming state
+  const [crammingFilter, setCrammingFilter] = useState<CrammingFilter>({ type: 'all' })
+  const [crammingTimeLimit, setCrammingTimeLimit] = useState<number | null>(null)
+  const [crammingShuffle, setCrammingShuffle] = useState(true)
 
   useEffect(() => {
     fetchDecks()
@@ -85,6 +92,9 @@ export function QuickStudyPage() {
     setSelectedDate(todayDateKey())
     setDatesWithCards(new Set())
     setDateCardCount(0)
+    setCrammingFilter({ type: 'all' })
+    setCrammingTimeLimit(null)
+    setCrammingShuffle(true)
   }
 
   const handleModeSelect = (mode: StudyMode) => {
@@ -92,6 +102,12 @@ export function QuickStudyPage() {
 
     // by_date — show date picker step in modal
     if (mode === 'by_date') {
+      setSelectedMode(mode)
+      return
+    }
+
+    // cramming — show setup panel step in modal
+    if (mode === 'cramming') {
       setSelectedMode(mode)
       return
     }
@@ -118,6 +134,14 @@ export function QuickStudyPage() {
       const { start, end } = localDateToUTCRange(selectedDate)
       params.set('dateStart', start)
       params.set('dateEnd', end)
+    }
+
+    if (selectedMode === 'cramming') {
+      params.set('crammingFilter', JSON.stringify(crammingFilter))
+      if (crammingTimeLimit != null) {
+        params.set('crammingTimeLimit', String(crammingTimeLimit))
+      }
+      params.set('crammingShuffle', String(crammingShuffle))
     }
 
     navigate(`/decks/${selectedDeck.id}/study?${params.toString()}`)
@@ -198,9 +222,11 @@ export function QuickStudyPage() {
               <p className="text-sm text-gray-500 mt-1">
                 {selectedMode === 'by_date'
                   ? t('quickStudy.selectDate')
-                  : selectedMode
-                    ? t('quickStudy.setBatchSize')
-                    : t('quickStudy.selectMode')}
+                  : selectedMode === 'cramming'
+                    ? t('quickStudy.crammingSetup')
+                    : selectedMode
+                      ? t('quickStudy.setBatchSize')
+                      : t('quickStudy.selectMode')}
               </p>
             </div>
 
@@ -245,6 +271,30 @@ export function QuickStudyPage() {
                   onClick={handleStartStudy}
                   disabled={dateCardCount === 0}
                   className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
+                >
+                  {t('quickStudy.startStudy')}
+                </button>
+              </div>
+            ) : selectedMode === 'cramming' ? (
+              /* Step 2b: Cramming setup panel */
+              <div className="p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                  <span className="text-lg">
+                    {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.emoji}
+                  </span>
+                  {t(STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.label ?? '')}
+                </div>
+                <CrammingSetupPanel
+                  filter={crammingFilter}
+                  onFilterChange={setCrammingFilter}
+                  timeLimitMinutes={crammingTimeLimit}
+                  onTimeLimitChange={setCrammingTimeLimit}
+                  shuffle={crammingShuffle}
+                  onShuffleChange={setCrammingShuffle}
+                />
+                <button
+                  onClick={handleStartStudy}
+                  className="w-full mt-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition cursor-pointer"
                 >
                   {t('quickStudy.startStudy')}
                 </button>

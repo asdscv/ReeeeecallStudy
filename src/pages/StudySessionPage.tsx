@@ -7,12 +7,16 @@ import { useAuthStore } from '../stores/auth-store'
 import { supabase } from '../lib/supabase'
 import { StudyCard } from '../components/study/StudyCard'
 import { StudyProgressBar } from '../components/study/StudyProgressBar'
+import { CrammingProgressBar } from '../components/study/CrammingProgressBar'
 import { SrsRatingButtons } from '../components/study/SrsRatingButtons'
 import { SimpleRatingButtons } from '../components/study/SimpleRatingButtons'
+import { CrammingRatingButtons } from '../components/study/CrammingRatingButtons'
 import { StudySummary } from '../components/study/StudySummary'
+import { CrammingSummary } from '../components/study/CrammingSummary'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak } from '../lib/tts'
 import { loadSettings, shouldShowButtons, type StudyInputSettings } from '../lib/study-input-settings'
+import type { CrammingFilter } from '../lib/cramming-queue'
 import type { StudyMode, Profile } from '../types/database'
 
 export function StudySessionPage() {
@@ -31,6 +35,7 @@ export function StudySessionPage() {
     currentIndex,
     isFlipped,
     sessionStats,
+    crammingManager,
     initSession,
     flipCard,
     rateCard,
@@ -39,6 +44,7 @@ export function StudySessionPage() {
 
   const [profile, setProfile] = useState<Pick<Profile, 'tts_enabled' | 'tts_lang'> | null>(null)
   const [inputSettings] = useState<StudyInputSettings>(() => loadSettings())
+  const [crammingTimeRemaining, setCrammingTimeRemaining] = useState<number | null>(null)
 
   // Fetch profile for TTS settings
   useEffect(() => {
@@ -65,12 +71,32 @@ export function StudySessionPage() {
     const dateStart = searchParams.get('dateStart') || undefined
     const dateEnd = searchParams.get('dateEnd') || undefined
 
+    // Parse cramming params
+    let crammingFilter: CrammingFilter | undefined
+    let crammingTimeLimitMinutes: number | null | undefined
+    let crammingShuffle: boolean | undefined
+
+    if (mode === 'cramming') {
+      const filterStr = searchParams.get('crammingFilter')
+      if (filterStr) {
+        try { crammingFilter = JSON.parse(filterStr) } catch { crammingFilter = { type: 'all' } }
+      } else {
+        crammingFilter = { type: 'all' }
+      }
+      const timeLimitStr = searchParams.get('crammingTimeLimit')
+      crammingTimeLimitMinutes = timeLimitStr ? Number(timeLimitStr) : null
+      crammingShuffle = searchParams.get('crammingShuffle') !== 'false'
+    }
+
     initSession({
       deckId,
       mode,
       batchSize,
       uploadDateStart: dateStart,
       uploadDateEnd: dateEnd,
+      crammingFilter,
+      crammingTimeLimitMinutes,
+      crammingShuffle,
     })
 
     return () => {
@@ -78,8 +104,32 @@ export function StudySessionPage() {
     }
   }, [deckId, searchParams, initSession])
 
-  // Compute TTS fields for current card
-  const currentCard = queue[currentIndex] ?? null
+  // Cramming timer countdown
+  useEffect(() => {
+    if (!crammingManager || !crammingManager.hasTimeLimit() || phase !== 'studying') return
+
+    const interval = setInterval(() => {
+      const remaining = crammingManager.remainingTimeMs()
+      setCrammingTimeRemaining(remaining)
+
+      if (remaining != null && remaining <= 0) {
+        // Time's up - use dedicated store action to gracefully end
+        useStudyStore.getState().crammingTimeUp()
+        clearInterval(interval)
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [crammingManager, phase])
+
+  // Compute current card (cramming uses crammingManager for card ID)
+  const currentCard = useMemo(() => {
+    if (config?.mode === 'cramming' && crammingManager) {
+      const cardId = crammingManager.currentCardId()
+      return cardId ? queue.find(c => c.id === cardId) ?? null : null
+    }
+    return queue[currentIndex] ?? null
+  }, [config, crammingManager, queue, currentIndex])
   const frontTTSFields = useMemo(() => {
     if (!currentCard || !template) return []
     return getTTSFieldsForLayout(currentCard, template, 'front')
@@ -91,12 +141,10 @@ export function StudySessionPage() {
 
   // Auto-TTS on flip (only when profile.tts_enabled)
   useEffect(() => {
-    if (!isFlipped || !template || !config) return
-    const card = queue[currentIndex]
-    if (!card) return
+    if (!isFlipped || !template || !config || !currentCard) return
 
     // Audio field takes priority
-    const audioUrl = getCardAudioUrl(card, template)
+    const audioUrl = getCardAudioUrl(currentCard, template)
     if (audioUrl) {
       const audio = new Audio(audioUrl)
       audio.play().catch(() => {})
@@ -107,7 +155,7 @@ export function StudySessionPage() {
     if (profile?.tts_enabled && backTTSFields.length > 0) {
       speak(backTTSFields[0].text, backTTSFields[0].lang)
     }
-  }, [isFlipped, currentIndex, template, config, queue, profile, backTTSFields])
+  }, [isFlipped, currentCard, template, config, profile, backTTSFields])
 
   const handleRate = useCallback((rating: string) => {
     rateCard(rating)
@@ -142,6 +190,38 @@ export function StudySessionPage() {
 
   // Completed state
   if (phase === 'completed') {
+    if (config?.mode === 'cramming' && crammingManager) {
+      const hardestCards = crammingManager.getHardestCards(5)
+      return (
+        <CrammingSummary
+          stats={sessionStats}
+          crammingMeta={{
+            rounds: crammingManager.currentRound(),
+            masteryPercentage: crammingManager.masteryPercentage(),
+            allMastered: crammingManager.isAllMastered(),
+            hardestCards: hardestCards.map(c => ({
+              cardId: c.cardId,
+              missedCount: c.missedCount,
+            })),
+          }}
+          cards={queue}
+          template={template}
+          onBackToDeck={() => {
+            reset()
+            navigate(`/decks/${deckId}`)
+          }}
+          onCrammingAgain={() => {
+            reset()
+            navigate(`/decks/${deckId}/study/setup`)
+          }}
+          onOtherMode={() => {
+            reset()
+            navigate(`/decks/${deckId}/study/setup`)
+          }}
+        />
+      )
+    }
+
     return (
       <StudySummary
         stats={sessionStats}
@@ -192,10 +272,20 @@ export function StudySessionPage() {
       {/* Top bar */}
       <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <StudyProgressBar
-            current={sessionStats.cardsStudied}
-            total={sessionStats.totalCards}
-          />
+          {config?.mode === 'cramming' && crammingManager ? (
+            <CrammingProgressBar
+              round={crammingManager.currentRound()}
+              remainingInRound={crammingManager.remainingInRound()}
+              totalInRound={crammingManager.totalInRound()}
+              masteryPct={crammingManager.masteryPercentage()}
+              timeRemainingMs={crammingTimeRemaining}
+            />
+          ) : (
+            <StudyProgressBar
+              current={sessionStats.cardsStudied}
+              total={sessionStats.totalCards}
+            />
+          )}
           <div className="flex items-center gap-2 ml-4">
             <button
               onClick={handleExit}
@@ -223,7 +313,9 @@ export function StudySessionPage() {
       {shouldShowButtons(inputSettings) && (
         <div className="px-3 sm:px-6 py-3 sm:py-6 max-w-2xl mx-auto w-full">
           {isFlipped ? (
-            config?.mode === 'srs' ? (
+            config?.mode === 'cramming' ? (
+              <CrammingRatingButtons onRate={handleRate} />
+            ) : config?.mode === 'srs' ? (
               <SrsRatingButtons card={currentCard} srsSettings={srsSettings} onRate={handleRate} />
             ) : (
               <SimpleRatingButtons mode={config?.mode ?? 'random'} onRate={handleRate} />

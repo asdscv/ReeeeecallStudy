@@ -90,7 +90,7 @@
       "items": {
         "modes": {
           "title": "Study Modes",
-          "body": "• SRS (Spaced Repetition): Automatically adjusts review timing based on memory curve. Wrong cards reappear within the same session. The most efficient method for long-term memorization.\n• Sequential Review: Studies all new cards plus a configurable number of review cards. Cycles back to the beginning after reaching the end.\n• Random: Randomly draws cards from the deck.\n• Sequential: Studies cards in order. Remembers your position to continue.\n• By Date: Studies only cards added on a specific date."
+          "body": "• SRS (Spaced Repetition): Automatically adjusts review timing based on memory curve. Wrong cards reappear within the same session. The most efficient method for long-term memorization.\n• Sequential Review: Studies all new cards plus a configurable number of review cards. Cycles back to the beginning after reaching the end.\n• Random: Randomly draws cards from the deck.\n• Sequential: Studies cards in order. Remembers your position to continue.\n• By Date: Studies only cards added on a specific date.\n• Cramming Mode: Intensive round-based review until all cards are mastered. Does not affect your SRS schedule."
         },
         "srsScience": {
           "title": "The Science Behind SRS",
@@ -123,6 +123,10 @@
         "srsCustom": {
           "title": "Customizing SRS Settings",
           "body": "Adjust Again/Hard/Good/Easy default intervals (days) on the deck edit page. For example, increasing Easy interval to 7 days reduces review frequency for easy cards. The 'New Card Limit' in Settings controls how many new cards appear per session."
+        },
+        "cramming": {
+          "title": "Cramming Mode",
+          "body": "Cramming Mode is designed for intensive, last-minute study — perfect before exams or when you need to quickly review all cards.\n\nHow It Works\n1. All selected cards are presented in Round 1\n2. Rate each card as \"Got It\" or \"Didn't Get It\"\n3. Missed cards reappear within the round after a short gap\n4. Cards never answered \"Got It\" move to the next round\n5. Session ends when all cards are mastered (or time runs out)\n\nKey Features\n• Card Filter: Study all cards, weak cards only (low ease factor), or cards due soon\n• Time Limit: Optional — set 15/30/60 minutes or no limit\n• Shuffle: Randomize card order each round\n• Mastery Tracking: Real-time mastery percentage and round progress\n\nSRS Safety\nCramming Mode does NOT affect your SRS schedule. Your ease factors, intervals, and next review dates remain unchanged. Study logs are still recorded for history tracking.\n\nKeyboard Shortcuts\n• Space or → : Got It\n• ← : Didn't Get It\n\nWhen to Use Cramming vs SRS\n• Use SRS for daily, long-term learning\n• Use Cramming for exam prep, quick review, or refreshing forgotten material"
         }
       }
     },
