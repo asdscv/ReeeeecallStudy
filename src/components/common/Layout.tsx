@@ -237,6 +237,26 @@ export function Layout() {
       <main className="max-w-6xl mx-auto px-4 py-4 sm:py-6">
         <Outlet />
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-200 bg-gray-50 pb-20 sm:pb-0">
+        <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <img src="/favicon.png" alt="" className="w-7 h-7" />
+              <span className="font-bold text-gray-900">ReeeeecallStudy</span>
+            </div>
+            <p className="text-sm text-gray-400">
+              {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
+            </p>
+          </div>
+          <div className="mt-4 text-center sm:text-right">
+            <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-gray-400 hover:text-gray-600 transition no-underline">
+              admin@reeeeecallstudy.xyz
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

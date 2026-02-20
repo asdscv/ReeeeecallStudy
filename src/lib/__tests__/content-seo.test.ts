@@ -271,10 +271,11 @@ describe('buildOrganizationJsonLd', () => {
     expect(result.sameAs).toContain(`https://x.com/${handle}`)
   })
 
-  it('should include contactPoint', () => {
+  it('should include contactPoint with email', () => {
     const result = buildOrganizationJsonLd()
     expect(result.contactPoint['@type']).toBe('ContactPoint')
     expect(result.contactPoint.contactType).toBe('customer service')
+    expect(result.contactPoint.email).toBe('admin@reeeeecallstudy.xyz')
   })
 
   it('should derive availableLanguage from SEO.SUPPORTED_LOCALES', () => {

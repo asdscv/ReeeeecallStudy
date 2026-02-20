@@ -360,4 +360,32 @@ describe('useSEO', () => {
     unmount()
     expect(document.querySelector('meta[name="robots"]')).toBeNull()
   })
+
+  it('should set article:author when ogType is article and articleAuthor is provided', () => {
+    renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogType: 'article',
+        articleAuthor: 'ReeeeecallStudy',
+      }),
+    )
+    const meta = document.querySelector('meta[property="article:author"]')
+    expect(meta).toBeTruthy()
+    expect(meta?.getAttribute('content')).toBe('ReeeeecallStudy')
+  })
+
+  it('should cleanup article:author on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useSEO({
+        title: 'T',
+        description: 'd',
+        ogType: 'article',
+        articleAuthor: 'ReeeeecallStudy',
+      }),
+    )
+    expect(document.querySelector('meta[property="article:author"]')).toBeTruthy()
+    unmount()
+    expect(document.querySelector('meta[property="article:author"]')).toBeNull()
+  })
 })

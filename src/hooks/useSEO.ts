@@ -17,6 +17,7 @@ interface SEOOptions {
   articleSection?: string
   keywords?: string[]
   articleTags?: string[]
+  articleAuthor?: string
   noIndex?: boolean
 }
 
@@ -71,6 +72,7 @@ export function useSEO(options: SEOOptions) {
     articleSection,
     keywords,
     articleTags,
+    articleAuthor,
     noIndex,
   } = options
 
@@ -124,6 +126,7 @@ export function useSEO(options: SEOOptions) {
       if (publishedTime) setMeta('property', 'article:published_time', publishedTime)
       if (modifiedTime) setMeta('property', 'article:modified_time', modifiedTime)
       if (articleSection) setMeta('property', 'article:section', articleSection)
+      if (articleAuthor) setMeta('property', 'article:author', articleAuthor)
     }
 
     // Robots noindex
@@ -210,6 +213,7 @@ export function useSEO(options: SEOOptions) {
         removeMeta('property', 'article:published_time')
         removeMeta('property', 'article:modified_time')
         removeMeta('property', 'article:section')
+        removeMeta('property', 'article:author')
       }
 
       // Robots cleanup
@@ -244,5 +248,5 @@ export function useSEO(options: SEOOptions) {
       // JSON-LD cleanup
       for (const s of scripts) s.remove()
     }
-  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags, noIndex])
+  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags, articleAuthor, noIndex])
 }
