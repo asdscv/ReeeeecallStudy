@@ -1,0 +1,39 @@
+{
+  "title": "市场",
+  "noResults": "没有搜索结果。",
+  "noListings": "暂无发布的牌组。",
+  "searchPlaceholder": "搜索牌组...",
+  "allCategories": "全部分类",
+  "sortNewest": "最新",
+  "sortPopular": "热门",
+  "sortCardCount": "卡片数量",
+  "categories": {
+    "general": "综合",
+    "language": "语言",
+    "science": "科学",
+    "math": "数学",
+    "history": "历史",
+    "programming": "编程",
+    "trivia": "知识问答",
+    "exam": "考试备考",
+    "other": "其他"
+  },
+  "shareModes": {
+    "copy": "复制",
+    "subscribe": "订阅",
+    "snapshot": "快照"
+  },
+  "listing": {
+    "cardCount": "{{count}} 张卡片",
+    "userCount": "{{count}} 位用户"
+  },
+  "detail": {
+    "back": "← 市场",
+    "cardCount": "{{count}} 张卡片",
+    "userCount": "{{count}} 位用户",
+    "getDeck": "获取此牌组",
+    "importing": "导入中...",
+    "cardPreview": "卡片预览（最多 10 张）",
+    "noCards": "暂无卡片。"
+  }
+}

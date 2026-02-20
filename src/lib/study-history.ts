@@ -1,5 +1,6 @@
 import i18next from 'i18next'
 import type { StudySession, StudyLog } from '../types/database'
+import { toIntlLocale } from './locale-utils'
 
 /** Format milliseconds to human-readable duration string */
 export function formatDuration(ms: number): string {
@@ -54,7 +55,7 @@ export function groupSessionsByDate(
 
   for (const session of sessions) {
     const d = new Date(session.completed_at)
-    const locale = i18next.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+    const locale = toIntlLocale(i18next.language)
     const dateKey = d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
     const arr = groups.get(dateKey) ?? []
     arr.push(session)

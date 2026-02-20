@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { formatDateKeyShort } from '../../lib/date-utils'
 import { formatDuration } from '../../lib/study-history'
@@ -10,7 +11,7 @@ interface SessionDurationChartProps {
 
 export function SessionDurationChart({ data }: SessionDurationChartProps) {
   const { t, i18n } = useTranslation('history')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
 
   const tickInterval = Math.max(1, Math.floor(data.length / 6))
 

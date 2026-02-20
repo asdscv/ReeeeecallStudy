@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { formatDateKeyShort } from '../../lib/date-utils'
 import type { AdminDailyStudyActivity } from '../../types/database'
 
@@ -17,7 +18,7 @@ interface DailyActivityChartProps {
 
 export function DailyActivityChart({ data, dataKey, title }: DailyActivityChartProps) {
   const { t, i18n } = useTranslation('admin')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const tickInterval = Math.max(1, Math.floor(data.length / 6))
   const fillColor = FILL_COLORS[dataKey] ?? '#6366f1'
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { todayDateKey } from '../../lib/date-utils'
 
@@ -11,7 +12,7 @@ interface DatePickerProps {
 
 export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DatePickerProps) {
   const { t, i18n } = useTranslation('study')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const [currentMonth, setCurrentMonth] = useState(() => {
     const date = selectedDate ? new Date(selectedDate) : new Date()
     return new Date(date.getFullYear(), date.getMonth(), 1)

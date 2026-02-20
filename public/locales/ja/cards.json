@@ -1,0 +1,20 @@
+{
+  "editCard": "カードを編集",
+  "addCard": "カードを追加",
+  "noTemplateSet": "このデッキにテンプレートが設定されていません。",
+  "fileValidationFailed": "ファイル検証に失敗しました。",
+  "uploadFailed": "アップロードに失敗しました。",
+  "uploading": "アップロード中...",
+  "remove": "削除",
+  "uploadImage": "画像をアップロード",
+  "selectFile": "ファイルを選択",
+  "imageFormats": "JPG、PNG、WebP対応",
+  "uploadAudio": "音声をアップロード",
+  "audioFormats": "MP3、OGG、WAV対応",
+  "tags": "タグ",
+  "tagsPlaceholder": "タグを入力してEnterキーを押す",
+  "cancel": "キャンセル",
+  "saving": "保存中...",
+  "edit": "編集",
+  "add": "追加"
+}

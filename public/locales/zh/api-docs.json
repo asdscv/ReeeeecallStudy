@@ -1,0 +1,211 @@
+{
+  "title": "API 文档",
+  "subtitle": "通过与外部工具集成管理学习数据",
+  "publicSubtitle": "使用 ReeeeecallStudy API 通过与外部工具集成管理学习数据",
+  "userGuideLink": "用户指南",
+  "getStarted": "开始使用",
+  "required": "必填",
+  "searchPlaceholder": "搜索端点...",
+  "noResults": "未找到「{{query}}」的相关结果",
+  "copy": "复制",
+  "tableOfContents": "目录",
+  "quickStart": {
+    "title": "快速开始",
+    "settingsPage": "设置页面",
+    "step1Auth": " — 在 API 密钥部分生成您的 API 密钥。",
+    "signup": "注册",
+    "step1Public": "并在设置中生成 API 密钥。",
+    "step2": "在每个请求中添加请求头",
+    "step2Suffix": "。",
+    "step3": "开始调用 API！查看下方的端点。"
+  },
+  "table": {
+    "name": "名称",
+    "type": "类型",
+    "required": "必填",
+    "description": "描述"
+  },
+  "footer": {
+    "home": "首页",
+    "login": "登录"
+  },
+  "sections": {
+    "overview": {
+      "title": "概述",
+      "description": "使用 ReeeeecallStudy API 从外部工具、脚本和应用管理学习数据。",
+      "items": {
+        "what": {
+          "title": "什么是 API？",
+          "body": "ReeeeecallStudy API 是一个 RESTful API，允许您通过 HTTP 请求查看和管理牌组、卡片、学习历史等。可用于自动化脚本、第三方应用集成和数据分析。"
+        },
+        "baseUrl": {
+          "title": "基础 URL",
+          "body": "所有 API 请求基于 Supabase 项目 URL。\n\n基础 URL：https://your-project.supabase.co/rest/v1"
+        },
+        "responseFormat": {
+          "title": "响应格式",
+          "body": "所有响应为 JSON 格式，Content-Type 为 application/json。\n\n成功时返回资源数据。出错时响应格式为 { \"error\": \"message\" }。"
+        }
+      }
+    },
+    "authentication": {
+      "title": "认证",
+      "description": "所有请求通过 API 密钥进行认证。",
+      "items": {
+        "getKey": {
+          "title": "获取 API 密钥",
+          "body": "设置 → API 密钥部分 → 点击「生成新 API 密钥」。\n输入名称（最多 64 个字符）以获得一个 35 个字符、以 rc_ 开头的密钥。\n\n⚠️ 密钥仅显示一次，请复制到安全的地方！"
+        },
+        "method": {
+          "title": "认证方式",
+          "body": "在 Authorization 请求头中以 Bearer 令牌形式传递 API 密钥。\n\nAuthorization: Bearer rc_your_api_key_here\n\n缺少或无效的密钥将返回 401 Unauthorized。"
+        },
+        "management": {
+          "title": "密钥管理",
+          "body": "• 最多可拥有 1 个 API 密钥\n• 如果丢失，删除现有密钥并创建新的\n• 立即删除不使用的密钥\n• 使用环境变量而非在代码中硬编码密钥"
+        }
+      }
+    },
+    "rateLimits": {
+      "title": "速率限制",
+      "description": "为了 API 稳定性，请求数量有限制。",
+      "items": {
+        "free": {
+          "title": "免费版",
+          "body": "• 每日 API 请求：1,000 次\n• 每分钟 API 调用：60 次\n• 每分钟创建卡片：30 张\n• 每分钟批量创建卡片：5 次（每次最多 100 张）\n• 卡片总数：5,000\n• 牌组总数：50"
+        },
+        "pro": {
+          "title": "专业版",
+          "body": "• 每日 API 请求：10,000 次\n• 每分钟 API 调用：300 次\n• 每分钟创建卡片：120 张\n• 每分钟批量创建卡片：20 次\n• 卡片总数：50,000\n• 牌组总数：500"
+        },
+        "exceeded": {
+          "title": "超过限制时",
+          "body": "返回 429 Too Many Requests。\n\n响应头包含：\n• X-RateLimit-Limit：最大请求数\n• X-RateLimit-Remaining：剩余请求数\n• Retry-After：等待时间（秒）"
+        }
+      }
+    },
+    "decks": {
+      "title": "牌组 API",
+      "description": "查看和管理牌组（卡片集合）。",
+      "endpoints": {
+        "list": {
+          "summary": "列出牌组",
+          "description": "获取用户的所有牌组。"
+        },
+        "detail": {
+          "summary": "获取牌组详情",
+          "description": "获取特定牌组的详细信息。"
+        },
+        "create": {
+          "summary": "创建牌组",
+          "description": "创建一个新牌组。"
+        }
+      },
+      "params": {
+        "page": "页码（默认：1）",
+        "perPage": "每页条数（默认：50，最大：100）",
+        "deckId": "要查询的牌组 ID"
+      }
+    },
+    "cards": {
+      "title": "卡片 API",
+      "description": "查看、创建和修改卡片。",
+      "endpoints": {
+        "list": {
+          "summary": "列出卡片",
+          "description": "获取特定牌组中的卡片。"
+        },
+        "create": {
+          "summary": "创建卡片",
+          "description": "向牌组添加新卡片。支持单张或批量创建最多 100 张。"
+        },
+        "update": {
+          "summary": "更新卡片",
+          "description": "修改现有卡片的字段值或标签。"
+        },
+        "delete": {
+          "summary": "删除卡片",
+          "description": "删除特定卡片。此操作不可撤销。"
+        }
+      },
+      "params": {
+        "deckId": "牌组 ID",
+        "cardId": "卡片 ID",
+        "status": "SRS 状态筛选（new、learning、review、suspended）",
+        "tag": "标签筛选"
+      }
+    },
+    "study": {
+      "title": "学习 API",
+      "description": "查看学习历史和管理学习数据。",
+      "endpoints": {
+        "due": {
+          "summary": "获取到期卡片",
+          "description": "获取今天需要复习的卡片。"
+        },
+        "history": {
+          "summary": "学习历史",
+          "description": "获取学习记录。"
+        },
+        "stats": {
+          "summary": "学习统计",
+          "description": "获取整体学习统计和仪表盘数据。"
+        }
+      },
+      "params": {
+        "deckId": "牌组 ID",
+        "from": "开始日期（例：2025-01-01）",
+        "to": "结束日期（例：2025-01-31）",
+        "period": "时间段（1w、1m、3m、6m、1y）"
+      }
+    },
+    "templates": {
+      "title": "模板 API",
+      "description": "查看卡片模板。",
+      "endpoints": {
+        "list": {
+          "summary": "列出模板",
+          "description": "获取用户的所有卡片模板。"
+        },
+        "detail": {
+          "summary": "获取模板详情",
+          "description": "获取完整的模板信息，包括字段和布局。"
+        }
+      },
+      "params": {
+        "templateId": "模板 ID"
+      }
+    },
+    "examples": {
+      "title": "代码示例",
+      "description": "使用各种语言和工具调用 API 的示例。"
+    },
+    "errors": {
+      "title": "错误处理",
+      "description": "错误响应格式和常见错误码。",
+      "items": {
+        "format": {
+          "title": "错误响应格式",
+          "body": "所有错误返回：\n\n{\n  \"error\": \"错误信息\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"附加信息（可选）\"\n}"
+        },
+        "statusCodes": {
+          "title": "HTTP 状态码",
+          "body": "• 200 OK — 成功\n• 201 Created — 资源已创建\n• 204 No Content — 已删除（无响应体）\n• 400 Bad Request — 无效请求（缺少字段、验证失败）\n• 401 Unauthorized — 认证失败（缺少或无效的 API 密钥）\n• 404 Not Found — 资源未找到\n• 429 Too Many Requests — 超过速率限制\n• 500 Internal Server Error — 服务器错误"
+        },
+        "validation": {
+          "title": "验证错误",
+          "body": "卡片创建/更新验证失败时，返回按字段的错误数组：\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+        }
+      }
+    },
+    "statusCodes": {
+      "200": "成功",
+      "201": "已创建",
+      "204": "已删除（无响应体）",
+      "400": "无效请求（缺少必填字段）",
+      "401": "认证失败",
+      "404": "未找到",
+      "429": "超过速率限制"
+    }
+  }
+}

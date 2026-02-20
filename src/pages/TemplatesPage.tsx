@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { toIntlLocale } from '../lib/locale-utils'
 import { toast } from 'sonner'
 import { useTemplateStore } from '../stores/template-store'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
@@ -165,7 +166,7 @@ function TemplateCard({
   onExportCSV: () => void
 }) {
   const { t, i18n } = useTranslation('templates')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 hover:shadow-sm transition">

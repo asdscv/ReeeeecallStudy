@@ -1,0 +1,293 @@
+{
+  "title": "用户指南",
+  "subtitle": "了解 ReeeeecallStudy 的所有功能",
+  "searchPlaceholder": "搜索功能（例：SRS、导入、分享...）",
+  "tableOfContents": "目录",
+  "noResults": "未找到「{{query}}」的相关结果。",
+  "sections": {
+    "getting-started": {
+      "title": "入门指南",
+      "items": {
+        "login": {
+          "title": "登录",
+          "body": "使用邮箱和密码登录。注册时会发送验证邮件 — 点击链接即可完成注册。如果忘记密码，可以接收重置链接。"
+        },
+        "dashboard": {
+          "title": "首页（仪表盘）",
+          "body": "登录后会显示仪表盘。一目了然地查看卡片总数、今日复习卡片、连续学习天数和掌握率。通过学习热力图检查您是否持续学习，利用复习预测图表预测即将到来的学习量。"
+        },
+        "navigation": {
+          "title": "导航",
+          "body": "在电脑端使用顶部菜单栏；在移动端点击汉堡菜单（☰）。可用菜单：快速学习、仪表盘、牌组、市场、卡片（模板）、学习历史、设置。"
+        }
+      }
+    },
+    "decks": {
+      "title": "牌组管理",
+      "items": {
+        "create": {
+          "title": "创建牌组",
+          "body": "在牌组页面点击「新建牌组」按钮。设置名称、描述、图标和颜色。牌组就像一个文件夹，按主题将闪卡分组。"
+        },
+        "detail": {
+          "title": "牌组详情",
+          "body": "点击牌组查看其卡片列表。使用顶部按钮添加卡片、导入、导出、分享或编辑牌组。还支持按卡片状态（新卡/学习中/复习/已暂停）筛选和搜索。"
+        },
+        "edit": {
+          "title": "编辑牌组",
+          "body": "在牌组编辑页面，可以更改名称、描述、图标、颜色和默认模板。SRS 设置（重来/困难/良好/简单的间隔天数）可按牌组调整。底部显示牌组统计数据（卡片状态分布、掌握率、学习热力图）。"
+        },
+        "delete": {
+          "title": "删除牌组",
+          "body": "在牌组列表中点击删除图标会显示确认对话框。删除牌组会同时删除所有卡片 — 请谨慎操作。"
+        }
+      }
+    },
+    "cards": {
+      "title": "卡片管理",
+      "items": {
+        "add": {
+          "title": "添加卡片",
+          "body": "在牌组详情页点击「添加卡片」。填写模板中定义的字段（如正面、背面）。用逗号分隔添加标签，方便后续搜索和筛选。"
+        },
+        "editDelete": {
+          "title": "编辑和删除卡片",
+          "body": "点击列表中的卡片打开编辑弹窗。修改字段内容和标签。可以删除单张卡片或选择多张进行批量删除。"
+        },
+        "searchFilter": {
+          "title": "搜索和筛选",
+          "body": "在牌组详情页顶部的搜索栏输入关键词，可搜索所有字段和标签。选择状态筛选器（新卡、学习中、复习、已暂停）仅查看特定卡片。"
+        },
+        "srsReset": {
+          "title": "SRS 重置",
+          "body": "重置卡片的 SRS 状态会将其恢复为「新卡」状态。当您想从头开始学习时可以使用此功能。"
+        }
+      }
+    },
+    "templates": {
+      "title": "卡片模板",
+      "items": {
+        "what": {
+          "title": "什么是模板？",
+          "body": "模板定义了卡片的结构 — 包含哪些字段以及正面和背面的排列方式。例如，「英语词汇」模板可能有单词、释义和例句字段。一个模板可以在多个牌组中共享使用。"
+        },
+        "createEdit": {
+          "title": "创建和编辑模板",
+          "body": "在卡片菜单中点击「新建模板」。添加字段并设置名称、类型（文本/图片/音频）。拖拽调整字段顺序。为字段添加描述作为创建卡片的指引。"
+        },
+        "layout": {
+          "title": "正面和背面布局",
+          "body": "默认模式：将字段放置在正面/背面，设置样式（主要、次要、提示、详细、媒体）和字体大小。自定义 HTML 模式：使用 {{fieldName}} 语法自由定义 HTML 布局。"
+        },
+        "tts": {
+          "title": "TTS（文字转语音）",
+          "body": "为每个字段启用 TTS 并选择语言（韩语、英语、日语、中文等）。学习时，翻转卡片会自动朗读，也可以点击扬声器按钮手动播放。在设置中切换自动朗读。"
+        }
+      }
+    },
+    "study": {
+      "title": "学习",
+      "items": {
+        "modes": {
+          "title": "学习模式",
+          "body": "• SRS（间隔重复）：根据记忆曲线自动调整复习时间。答错的卡片会在同一次学习中重新出现。长期记忆最有效的方法。\n• 顺序复习：学习所有新卡加上可配置数量的复习卡。到达末尾后从头开始循环。\n• 随机：从牌组中随机抽取卡片。\n• 顺序：按顺序学习卡片。记住您的位置以便继续。\n• 按日期：仅学习特定日期添加的卡片。"
+        },
+        "srsMethod": {
+          "title": "SRS 工作原理",
+          "body": "查看卡片正面，回忆答案，然后翻转。选择 4 个按钮之一：\n• 重来：不记得 → 短间隔，很快再次出现\n• 困难：勉强记得 → 间隔略微增加\n• 良好：记得很好 → 正常复习间隔\n• 简单：完美回忆 → 间隔大幅增加\n\n评分越诚实，SRS 效果越好。"
+        },
+        "quickStudy": {
+          "title": "快速学习",
+          "body": "在快速学习页面直接选择牌组即可开始。每个牌组显示新卡/复习卡数量，方便快速决策。"
+        },
+        "sessionFlow": {
+          "title": "学习流程",
+          "body": "1. 选择牌组 → 设置学习模式 → 开始\n2. 查看卡片正面 → 点击翻转 → 选择评分\n3. 完成所有卡片后，摘要显示学习数量、用时和评分分布。\n\n键盘快捷键：空格（翻转）、1（重来）、2（困难）、3（良好）、4（简单）"
+        },
+        "swipeMode": {
+          "title": "滑动模式",
+          "body": "在设置中将答题模式切换为「滑动」，通过滑动卡片进行评分。为每个方向（上/下/左/右）分配评分。非常适合单手使用手机学习。"
+        },
+        "srsCustom": {
+          "title": "自定义 SRS 设置",
+          "body": "在牌组编辑页面调整重来/困难/良好/简单的默认间隔天数。例如，将「简单」的间隔增加到 7 天可以减少简单卡片的复习频率。设置中的「新卡限制」控制每次学习出现的新卡数量。"
+        }
+      }
+    },
+    "import-export": {
+      "title": "导入和导出",
+      "items": {
+        "jsonImport": {
+          "title": "JSON 导入",
+          "body": "在牌组详情页点击「导入」→ 选择 JSON 文件。从 ReeeeecallStudy 导出的 JSON 文件可以直接导入，适合备份和恢复。包含牌组元数据和模板信息。"
+        },
+        "csvImport": {
+          "title": "CSV 导入",
+          "body": "CSV 文件（从 Excel 保存）也可以导入。会出现映射步骤将列名匹配到模板字段，支持自动匹配。包含分号（;）的「Tags」列会被自动识别。"
+        },
+        "duplicates": {
+          "title": "重复处理",
+          "body": "导入时，与现有卡片内容相同的卡片会被标记为重复。您可以选择跳过、覆盖或新增。最终导入前可预览有效/无效/重复卡片的数量。"
+        },
+        "jsonExport": {
+          "title": "JSON 导出",
+          "body": "牌组详情 → 「导出」→ JSON 将牌组信息、模板和所有卡片下载为一个 JSON 文件。适用于跨设备/账号传输或备份。"
+        },
+        "csvExport": {
+          "title": "CSV 导出",
+          "body": "CSV 格式可直接在 Excel/Google 表格中打开。包含 BOM 以确保在 Excel 中正确显示韩文。"
+        }
+      }
+    },
+    "sharing": {
+      "title": "牌组分享",
+      "items": {
+        "copy": {
+          "title": "分享模式：复制",
+          "body": "为接收者提供牌组的独立副本。可以自由编辑、添加和删除卡片。分享后，原始牌组和副本互不影响。最适合需要自定义的场景。"
+        },
+        "subscribe": {
+          "title": "分享模式：订阅",
+          "body": "接收者「订阅」您的牌组。当您添加卡片时，订阅者也会获得。但学习进度（SRS）独立记录。订阅者不能编辑卡片。非常适合师生关系或学习小组。"
+        },
+        "snapshot": {
+          "title": "分享模式：快照",
+          "body": "创建牌组在当前时间点的只读副本。接收者只能学习，不能编辑。原始牌组的后续更新不会反映到副本中。适合想要分享「当前确切状态」的场景。"
+        },
+        "inviteLink": {
+          "title": "发送邀请链接",
+          "body": "牌组详情 → 分享按钮 → 选择分享模式 → 「生成邀请链接」创建唯一链接。通过消息、邮件等方式发送。接收者点击即可接受。"
+        },
+        "manage": {
+          "title": "管理分享",
+          "body": "在设置附近的「我的分享」页面查看已发送/已接收的分享。可以撤销活跃的分享或取消订阅。"
+        }
+      }
+    },
+    "marketplace": {
+      "title": "市场",
+      "items": {
+        "what": {
+          "title": "什么是市场？",
+          "body": "一个搜索和获取其他用户分享牌组的空间。可按类别（语言、证书、编程等）和标签筛选，按热门或最新排序。"
+        },
+        "getDeck": {
+          "title": "获取牌组",
+          "body": "在市场中点击牌组查看详情。预览前 10 张卡片，然后点击「获取」将其添加到您的牌组。行为因分享模式（复制/订阅/快照）而异。"
+        },
+        "publish": {
+          "title": "发布您的牌组",
+          "body": "牌组详情 → 分享 → 「发布到市场」。设置标题、描述、分类、标签和分享模式。发布后所有用户都可以搜索到。可随时取消发布。"
+        }
+      }
+    },
+    "history": {
+      "title": "学习历史和统计",
+      "items": {
+        "viewHistory": {
+          "title": "查看学习历史",
+          "body": "在学习历史页面按日期查看所有学习记录。点击某次学习查看每张卡片的详情（评分、用时）。可按牌组或模式筛选。"
+        },
+        "deckProgress": {
+          "title": "牌组进度",
+          "body": "牌组进度卡片显示在学习历史顶部。一目了然地查看完成率和各状态（新卡/学习中/复习）的卡片数量。"
+        },
+        "dashboardStats": {
+          "title": "仪表盘统计",
+          "body": "在仪表盘上切换时间段标签（1周/1月/3月/6月/1年）查看学习热力图、每日学习量图表和复习预测。"
+        }
+      }
+    },
+    "settings": {
+      "title": "设置",
+      "items": {
+        "profile": {
+          "title": "个人信息",
+          "body": "设置您的显示名称。邮箱无法更改。"
+        },
+        "srsLimit": {
+          "title": "SRS 新卡限制",
+          "body": "设置每次 SRS 学习中添加的最大新卡数量。复习卡不受此限制影响。调整以控制您的学习量。"
+        },
+        "answerMode": {
+          "title": "答题模式（按钮/滑动）",
+          "body": "按钮模式：点击底部按钮进行评分。\n滑动模式：滑动卡片进行评分。为每个方向分配评分（重来/困难/良好/简单）。"
+        },
+        "autoTts": {
+          "title": "自动 TTS",
+          "body": "翻转卡片时自动朗读启用了 TTS 的字段。即使关闭此选项，手动播放的扬声器按钮始终可用。"
+        },
+        "apiKey": {
+          "title": "API 密钥",
+          "body": "生成 API 密钥以便从外部工具（脚本、应用）访问 ReeeeecallStudy 数据。密钥仅显示一次 — 请务必复制保存。最多允许 1 个密钥。"
+        }
+      }
+    },
+    "api": {
+      "title": "API 指南（使用 AI 自动生成卡片）",
+      "items": {
+        "whatSimple": {
+          "title": "什么是 API？（简单解释）",
+          "body": "API 是「程序之间相互通信的方式」。\n\n就像您在应用中点击按钮创建卡片一样，API 让您可以用文本命令完成同样的事情。\n\n把它想象成餐厅：\n• 菜单 = API 文档（描述您可以发出哪些请求）\n• 点餐 = API 请求（「显示我的牌组」、「添加 100 张卡片」）\n• 上菜 = API 响应（您请求的数据或结果）\n\n最棒的是？您可以让 ChatGPT、Gemini 或 Claude 等 AI 工具为您发送这些命令！\nAI 创建卡片内容并通过 API 自动注册。"
+        },
+        "whyApi": {
+          "title": "为什么使用 API？",
+          "body": "比较逐张制作卡片和使用 API：\n\n手动：每张 30 秒 x 100 张 = 约 50 分钟\nAPI + AI：一次 100 张 = 约 3-5 分钟\n\n使用 API 可以做什么：\n• 告诉 AI「创建 100 张托福词汇卡片」，立即生成\n• 「制作 50 张 JLPT N3 汉字卡片」— 一个请求搞定\n• 从 Excel 或文本文件批量上传数据\n• 无需编程 — 只需与 AI 对话！\n\n按照本指南，任何人都可以在 5 分钟内创建 100 张卡片。"
+        },
+        "getKey": {
+          "title": "获取 API 密钥",
+          "body": "要使用 API，您首先需要一个 API 密钥。它就像一个密码，让您可以从自己的账号访问 API。\n\n获取方法：\n1. 登录 ReeeeecallStudy 应用\n2. 从右上角菜单进入「设置」\n3. 向下滚动到「API 密钥」部分\n4. 点击「生成新 API 密钥」\n5. 输入密钥名称（例：「我的 AI 集成」）\n6. 将显示一个以 rc_ 开头的密钥\n\n重要：密钥仅在此页面显示一次！\n请务必复制并保存到安全的地方。\n\n您的 API 密钥就像密码，切勿与他人分享。"
+        },
+        "step1Prepare": {
+          "title": "步骤 1：准备牌组和卡片模板",
+          "body": "通过 API 添加卡片之前，先在应用中创建牌组和卡片模板。\n\n1. 创建牌组\n• 在应用中进入「牌组」→「新建牌组」\n• 输入名称（例：「托福词汇」）\n• 输入描述（例：「托福必备词汇」）\n\n2. 创建卡片模板\n• 进入「模板」→「新建模板」\n• 输入名称（例：「词汇详情」）\n• 添加字段：\n  - word：文本类型\n  - meaning：文本类型\n  - example：文本类型\n• 将「word」放在正面布局\n• 将「meaning」和「example」放在背面布局\n\n3. 为牌组设置默认模板\n• 在牌组编辑中，选择刚创建的模板作为默认模板\n\n提示：记住字段的键名（word、meaning、example）！\n通过 API 创建卡片时需要使用这些确切的键名。"
+        },
+        "step2Query": {
+          "title": "步骤 2：用 AI 查询牌组/模板 ID",
+          "body": "要添加卡片，您需要牌组 ID 和模板 ID。\n让 AI 来帮您查询！\n\n打开 ChatGPT、Gemini 或 Claude，粘贴以下内容：\n\n─────────────────────────────\n我正在使用一个叫 ReeeeecallStudy 的闪卡应用。\n以下是我的 API 信息：\n• API URL：https://reeeeecallstudy.com/api/v1\n• API Key：rc_在此粘贴您的API密钥\n\n请发出以下两个请求：\n1. 列出我的牌组：GET https://reeeeecallstudy.com/api/v1/decks\n2. 列出我的模板：GET https://reeeeecallstudy.com/api/v1/templates\n\n包含请求头：Authorization: Bearer rc_在此粘贴您的API密钥\n显示每个牌组的 id 和 name，以及每个模板的 id、name 和 fields。\n─────────────────────────────\n\n将「rc_在此粘贴您的API密钥」替换为您的实际 API 密钥！\n\nAI 会显示类似信息：\n• 牌组 ID：a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• 牌组名称：托福词汇\n• 模板 ID：e5f6g7h8-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• 模板字段：word、meaning、example\n\n复制这些 ID — 下一步需要用到！"
+        },
+        "step3AiGenerate": {
+          "title": "步骤 3：让 AI 创建并注册卡片",
+          "body": "这是关键步骤！让 AI 创建卡片并直接注册。\n\n复制下面的提示词，将标记部分替换为您的信息，然后发送给 AI：\n\n─────────────────────────────\n使用 ReeeeecallStudy API 创建闪卡。\n\nAPI 信息：\n• Base URL：https://reeeeecallstudy.com/api/v1\n• API Key：（粘贴您的 API 密钥）\n• Deck ID：（粘贴步骤 2 中的牌组 ID）\n• Template ID：（粘贴步骤 2 中的模板 ID）\n\n创建卡片端点：\nPOST https://reeeeecallstudy.com/api/v1/decks/(牌组 ID)/cards\nHeaders：\n  Authorization: Bearer (API 密钥)\n  Content-Type: application/json\nBody（JSON 数组，最多 100 条）：\n[\n  {\n    \"template_id\": \"(模板 ID)\",\n    \"field_values\": {\n      \"word\": \"英文单词\",\n      \"meaning\": \"释义\",\n      \"example\": \"例句\"\n    },\n    \"tags\": [\"标签\"]\n  }\n]\n\n请求：\n创建 50 张托福必备词汇卡片并通过上述 API 注册。\n每张卡片应包含：\n• word：英文单词\n• meaning：简明释义\n• example：包含该单词的一个例句\n• tags：难度等级（初级 / 中级 / 高级）\n─────────────────────────────\n\n将「50 张托福必备词汇卡片」改为您想要的任何主题！\n示例：\n• 「30 张 JLPT N3 汉字卡片」\n• 「40 张基础西班牙语旅行短语」\n• 「50 张世界历史大事记」\n• 「30 张 Python 编程术语」\n• 「50 张医学解剖学术语」\n\n需要更多卡片？只需说「再创建 50 张不重复的！」"
+        },
+        "aiExamples": {
+          "title": "各 AI 使用技巧（ChatGPT / Gemini / Claude）",
+          "body": "每个 AI 都有略微不同的优势。根据需求选择最合适的！\n\nChatGPT (chat.openai.com)\n• 可通过代码解释器直接运行代码调用 API\n• 技巧：说「运行 Python 代码直接调用 API」，它会执行真实代码注册卡片\n• 最适合：直接 API 调用\n\nGoogle Gemini (gemini.google.com)\n• 集成 Google 搜索获取最新信息\n• 技巧：适合需要最新信息的卡片，如「2025 时事词汇」\n• 最适合：需要最新趋势的卡片\n\nClaude (claude.ai)\n• 擅长处理长文本并生成准确的 JSON\n• 技巧：可一次创建 100 张卡片而不破坏 JSON 格式\n• 最适合：批量生成、复杂卡片结构\n\n通用技巧：\n• 如果 AI 无法调用 API → 说「直接给我 JSON 数据。」然后复制并使用手动注册方法（见下一节）\n• 说「再创建 50 张不与之前重复的卡片」可持续添加\n• 每个请求最多 100 张卡片。更多的话请分成多个请求"
+        },
+        "step4Manual": {
+          "title": "当 AI 无法直接调用 API 时（手动方法）",
+          "body": "如果 AI 无法直接调用 API，别担心！\n只需复制 AI 创建的 JSON 数据并自行发送。\n\n方法一：Swagger UI（最简单，推荐）\n1. 在浏览器中打开 https://reeeeecallstudy.com/api/ui\n2. 点击顶部的「Authorize」→ 输入 API 密钥 → 确认\n3. 找到并展开 POST /v1/decks/{deckId}/cards\n4. 点击「Try it out」\n5. 在 deckId 字段中输入牌组 ID\n6. 将 AI 生成的 JSON 数组粘贴到请求体中\n7. 点击「Execute」→ 完成！\n\n方法二：终端 / 命令提示符\n打开终端（Mac）或 PowerShell（Windows）并运行：\n\ncurl -X POST \"https://reeeeecallstudy.com/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"a round fruit\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\n对于较长的 JSON，先保存到文件：\ncurl -X POST \"https://reeeeecallstudy.com/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\n每个请求最多 100 张卡片。"
+        },
+        "docsPage": {
+          "title": "完整 API 文档",
+          "body": "获取更详细的 API 信息：\n\n• 应用内 API 文档：顶部菜单中的「API」或 /api-docs\n• Swagger UI（交互式测试）：https://reeeeecallstudy.com/api/ui\n• 公开 API 文档：https://reeeeecallstudy.com/docs/api\n\n所有可用端点：\n• 牌组 API：列表、详情、创建\n• 卡片 API：列表、详情、创建（支持批量）、更新、删除\n• 模板 API：列表、详情、创建、更新、删除\n• 学习 API：到期卡片、学习历史、统计\n• 市场 API：列表、发布、删除\n• 分享 API：创建分享、接受邀请、列表、撤销"
+        },
+        "rateLimits": {
+          "title": "速率限制（了解即可）",
+          "body": "为了 API 稳定性，请求数量有限制。\n\n免费版：\n• 每日 API 请求：1,000 次\n• 每分钟 API 调用：60 次\n• 每分钟创建卡片：30 张\n\n超过限制会返回 429 Too Many Requests。\n稍等片刻再试即可。\n\n注意：100 张卡片仅算 1 次 API 调用（批量创建）。\n每天 1,000 次调用，理论上每天最多可创建 100,000 张卡片！"
+        }
+      }
+    },
+    "tips": {
+      "title": "学习技巧",
+      "items": {
+        "daily": {
+          "title": "每天学一点",
+          "body": "SRS 在每天坚持学习时效果最好。每天 10-20 分钟就够了。把仪表盘上的学习热力图填满吧！"
+        },
+        "again": {
+          "title": "不要害怕「重来」",
+          "body": "在 SRS 中，「重来」不代表失败。诚实地将不记得的卡片标记为「重来」能帮助系统在正确的时间展示它们。强行选「良好」反而会降低效果。"
+        },
+        "concise": {
+          "title": "保持卡片简洁",
+          "body": "每张卡片只放一个概念。简短清晰的卡片如「apple = 苹果」比「apple、pear、grape、strawberry...」有效得多。"
+        },
+        "tags": {
+          "title": "善用标签",
+          "body": "添加标签方便后续快速筛选。例如：「语法」、「动词」、「第1章」等。"
+        }
+      }
+    }
+  }
+}

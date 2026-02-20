@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../lib/locale-utils'
 
 export function useLocale() {
   const { i18n } = useTranslation()
@@ -16,7 +17,7 @@ export function useLocale() {
   const formatDate = useCallback(
     (date: Date | string, options?: Intl.DateTimeFormatOptions) => {
       const d = typeof date === 'string' ? new Date(date) : date
-      const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
+      const locale = toIntlLocale(i18n.language)
       return d.toLocaleDateString(locale, options)
     },
     [i18n.language],
@@ -24,7 +25,7 @@ export function useLocale() {
 
   const formatNumber = useCallback(
     (num: number, options?: Intl.NumberFormatOptions) => {
-      const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
+      const locale = toIntlLocale(i18n.language)
       return new Intl.NumberFormat(locale, options).format(num)
     },
     [i18n.language],
@@ -37,7 +38,7 @@ export function useLocale() {
       const diffMs = now - d.getTime()
       const diffMin = Math.floor(diffMs / 60_000)
 
-      const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
+      const locale = toIntlLocale(i18n.language)
       const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
 
       if (diffMin < 1) return rtf.format(0, 'second')

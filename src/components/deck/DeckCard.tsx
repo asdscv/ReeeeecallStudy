@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { formatRelativeTime } from '../../lib/date-utils'
 import { ShareBadge } from '../sharing/ShareBadge'
 import { useAuthStore } from '../../stores/auth-store'
@@ -24,7 +25,7 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { t, i18n } = useTranslation('decks')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
 
   const totalCards = stats?.total_cards ?? 0
   const dueCards = (stats?.review_cards ?? 0) + (stats?.learning_cards ?? 0)

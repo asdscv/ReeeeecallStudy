@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { useAdminStore } from '../../stores/admin-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
@@ -37,7 +38,7 @@ const LOCALE_COLORS: Record<string, 'blue' | 'green' | 'purple' | 'orange' | 'pi
 
 export function AdminContentsPage() {
   const { t, i18n } = useTranslation('admin')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const {
     contentsAnalytics, contentsLoading, contentsError, fetchContents,
     pageViewsAnalytics, pageViewsLoading, fetchPageViews,

@@ -1,0 +1,126 @@
+{
+  "title": "設定",
+  "loading": "読み込み中...",
+  "saving": "保存中...",
+  "save": "設定を保存",
+  "saved": "設定を保存しました！",
+  "saveButton": "設定を保存",
+
+  "links": {
+    "userGuide": "ユーザーガイド",
+    "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
+    "apiDocs": "APIドキュメント",
+    "apiDocsDesc": "APIエンドポイント、認証、使用例"
+  },
+
+  "guide": {
+    "title": "ユーザーガイド",
+    "desc": "機能ガイド、学習のコツ、共有方法"
+  },
+
+  "apiDocs": {
+    "title": "APIドキュメント",
+    "desc": "APIエンドポイント、認証、使用例"
+  },
+
+  "profile": {
+    "title": "プロフィール",
+    "email": "メールアドレス",
+    "displayName": "表示名",
+    "displayNamePlaceholder": "名前を入力",
+    "namePlaceholder": "名前を入力"
+  },
+
+  "language": {
+    "title": "言語",
+    "label": "表示言語",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語"
+  },
+
+  "srs": {
+    "title": "SRS学習",
+    "description": "SRS（間隔反復）モードで1セッションあたりに追加する新規カード数を設定します",
+    "newCardLimit": "新規カード上限",
+    "cards": "枚",
+    "cardsUnit": "枚",
+    "help": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。",
+    "newCardNote": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。"
+  },
+
+  "answerMode": {
+    "title": "回答モード",
+    "description": "学習中の回答方法を設定します",
+    "button": "ボタン",
+    "buttonDesc": "ボタンを押して回答を選択",
+    "swipe": "スワイプ",
+    "swipeDesc": "カードをスワイプして回答を選択",
+    "directionsHelp": "各方向にアクションを割り当てます。未設定の方向は無効になります。",
+    "swipeDirections": "各方向にアクションを割り当てます。未設定の方向は無効になります。",
+    "swipeLeft": "左スワイプ",
+    "swipeRight": "右スワイプ",
+    "swipeUp": "上スワイプ",
+    "swipeDown": "下スワイプ",
+    "notSet": "未設定",
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "recommendation": "おすすめ：左=Again、右=Good（素早い学習に便利）"
+  },
+
+  "tts": {
+    "title": "TTS自動読み上げ",
+    "description": "カードを裏返した時にTTS対応フィールドを自動読み上げ",
+    "enable": "自動読み上げを有効にする",
+    "help": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。",
+    "note": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。"
+  },
+
+  "apiKey": {
+    "title": "APIキー管理",
+    "limit": "APIキーは最大1つまで作成できます",
+    "maxKeys": "APIキーは最大1つまで作成できます",
+    "generate": "生成",
+    "generateNew": "新しいキーを生成",
+    "keyName": "キー名",
+    "keyNamePlaceholder": "例：my-script",
+    "namePlaceholder": "例：my-script",
+    "create": "作成",
+    "generating": "生成中...",
+    "generateFailed": "キーの生成に失敗しました：",
+    "generated": "APIキーを生成しました！",
+    "generateError": "キー生成エラー",
+    "delete": "削除",
+    "deleted": "APIキーを削除しました",
+    "cancel": "キャンセル",
+    "copy": "コピー",
+    "copied": "APIキーをコピーしました！",
+    "show": "キーを表示",
+    "showPartial": "キーを一部表示",
+    "showFull": "キーを完全表示",
+    "hide": "キーを非表示",
+    "masked": "セキュリティのため再表示できません",
+    "createdAt": "作成日",
+    "created": "作成日：{{date}}",
+    "noKeys": "APIキーが生成されていません。",
+    "noKey": "APIキーが生成されていません。",
+    "securityNote": "セキュリティのため再表示できません"
+  },
+
+  "account": {
+    "title": "アカウント",
+    "logout": "ログアウト"
+  },
+
+  "settings": {
+    "answerMode": {
+      "swipeLeft": "左スワイプ",
+      "swipeRight": "右スワイプ",
+      "swipeUp": "上スワイプ",
+      "swipeDown": "下スワイプ"
+    }
+  }
+}

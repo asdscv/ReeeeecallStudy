@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useAdminStore } from '../../stores/admin-store'
 import { UserGrowthChart } from '../../components/admin/UserGrowthChart'
@@ -19,7 +20,7 @@ export function AdminUsersPage() {
     activeUsers, fetchOverview,
   } = useAdminStore()
   const [page, setPage] = useState(0)
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const growthData = useMemo(() => computeUserGrowthSeries(userSignups), [userSignups])
   const activeInactive = useMemo(() => activeUsers ? computeActiveInactiveUsers(activeUsers) : [], [activeUsers])
 

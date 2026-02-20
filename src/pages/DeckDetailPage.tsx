@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../lib/locale-utils'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -18,7 +19,7 @@ type TabId = 'cards' | 'upload-date' | 'stats'
 
 export function DeckDetailPage() {
   const { t, i18n } = useTranslation(['decks', 'common'])
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
 

@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "quickStudy": "快速学习",
+    "dashboard": "仪表盘",
+    "study": "学习",
+    "decks": "牌组",
+    "cards": "卡片",
+    "marketplace": "市场",
+    "studyHistory": "学习历史",
+    "settings": "设置",
+    "admin": "管理",
+    "guide": "指南"
+  },
+  "actions": {
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "add": "添加",
+    "remove": "移除",
+    "confirm": "确认",
+    "ok": "确定",
+    "back": "返回",
+    "next": "下一步",
+    "close": "关闭",
+    "copy": "复制",
+    "duplicate": "复制",
+    "search": "搜索",
+    "selectAll": "全选",
+    "deselect": "取消选择",
+    "show": "显示",
+    "hide": "隐藏",
+    "startStudy": "开始学习",
+    "logout": "退出登录"
+  },
+  "status": {
+    "loading": "加载中...",
+    "processing": "处理中...",
+    "new": "新卡",
+    "learning": "学习中",
+    "review": "复习",
+    "suspended": "已暂停"
+  },
+  "units": {
+    "cards": "张卡片",
+    "cardsSuffix": "{{count}} 张卡片",
+    "sessions": "次学习",
+    "items": "项",
+    "days": "天",
+    "hours": "小时",
+    "minutes": "分钟",
+    "seconds": "秒",
+    "times": "次",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "每页 {{count}} 条"
+  },
+  "timePeriod": {
+    "1d": "1天",
+    "1w": "1周",
+    "1m": "1月",
+    "3m": "3月",
+    "6m": "6月",
+    "1y": "1年",
+    "2y": "2年",
+    "5y": "5年"
+  },
+  "confirmDialog": {
+    "cancel": "取消",
+    "processing": "处理中...",
+    "confirm": "确认"
+  },
+  "delete": "删除",
+  "deselect": "取消选择",
+  "duplicate": "复制",
+  "edit": "编辑",
+  "save": "保存",
+  "saving": "保存中...",
+  "selectAll": "全选",
+  "menu": "菜单",
+  "copiedToClipboard": "已复制到剪贴板",
+  "export": "导出"
+}

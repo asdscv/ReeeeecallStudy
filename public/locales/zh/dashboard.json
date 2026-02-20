@@ -1,0 +1,37 @@
+{
+  "title": "仪表盘",
+  "stats": {
+    "totalCards": "卡片总数",
+    "todayReview": "今日复习",
+    "streak": "连续学习",
+    "masteryRate": "掌握率"
+  },
+  "dailyChart": {
+    "title": "每日学习量",
+    "total": "共 {{count}} 次",
+    "noData": "暂无学习记录",
+    "tooltipTimes": "{{value}} 次",
+    "tooltipLabel": "学习"
+  },
+  "forecast": {
+    "title": "复习预测（7天）",
+    "noData": "暂无待复习内容",
+    "tooltipCards": "{{value}} 张卡片",
+    "tooltipLabel": "待复习"
+  },
+  "recentDecks": {
+    "title": "牌组状态",
+    "noDecks": "暂无牌组，快去创建一个吧！",
+    "goToDecks": "前往牌组管理",
+    "cardCount": "{{count}} 张卡片",
+    "newCards": "新卡 {{count}}",
+    "reviewCards": "复习 {{count}}",
+    "study": "学习"
+  },
+  "heatmap": {
+    "title": "学习热力图",
+    "noStudy": "未学习",
+    "studyCount": "{{date}}：{{count}} 次学习",
+    "tooltip": "{{date}}：{{count}} 次学习"
+  }
+}

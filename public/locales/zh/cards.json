@@ -1,0 +1,20 @@
+{
+  "editCard": "编辑卡片",
+  "addCard": "添加卡片",
+  "noTemplateSet": "此牌组尚未设置模板。",
+  "fileValidationFailed": "文件验证失败。",
+  "uploadFailed": "上传失败。",
+  "uploading": "上传中...",
+  "remove": "移除",
+  "uploadImage": "上传图片",
+  "selectFile": "选择文件",
+  "imageFormats": "支持 JPG、PNG、WebP",
+  "uploadAudio": "上传音频",
+  "audioFormats": "支持 MP3、OGG、WAV",
+  "tags": "标签",
+  "tagsPlaceholder": "输入标签后按回车",
+  "cancel": "取消",
+  "saving": "保存中...",
+  "edit": "编辑",
+  "add": "添加"
+}

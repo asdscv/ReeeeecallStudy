@@ -1,0 +1,25 @@
+{
+  "list": {
+    "title": "学习洞察",
+    "subtitle": "更好学习的技巧和灵感",
+    "noArticles": "暂无发布的文章。请稍后再来！",
+    "readingTime": "{{minutes}} 分钟阅读",
+    "reachedEnd": "您已浏览完所有文章",
+    "loadingMore": "加载更多文章..."
+  },
+  "detail": {
+    "backToList": "返回学习洞察",
+    "readingTime": "{{minutes}} 分钟",
+    "notFound": "未找到文章"
+  },
+  "cta": {
+    "title": "从 ReeeCall 开始",
+    "description": "立即体验高效学习",
+    "button": "免费开始"
+  },
+  "seo": {
+    "listTitle": "学习洞察 | ReeeCall",
+    "listDescription": "发现基于科学的学习策略和间隔重复技巧。",
+    "breadcrumbInsights": "学习洞察"
+  }
+}

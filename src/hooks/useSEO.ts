@@ -97,8 +97,14 @@ export function useSEO(options: SEOOptions) {
       .filter((l) => l !== currentLang)
       .map(toOgLocale)
     setMeta('property', 'og:locale', ogLocale)
-    if (altLocales.length > 0) {
-      setMeta('property', 'og:locale:alternate', altLocales[0])
+    // Add all alternate locale meta tags
+    const altMetaEls: HTMLMetaElement[] = []
+    for (const alt of altLocales) {
+      const el = document.createElement('meta')
+      el.setAttribute('property', 'og:locale:alternate')
+      el.setAttribute('content', alt)
+      document.head.appendChild(el)
+      altMetaEls.push(el)
     }
     const effectiveUrl = canonicalUrl || `${window.location.origin}${window.location.pathname}`
     setMeta('property', 'og:url', effectiveUrl)
@@ -188,7 +194,7 @@ export function useSEO(options: SEOOptions) {
       removeMeta('property', 'og:type')
       removeMeta('property', 'og:site_name')
       removeMeta('property', 'og:locale')
-      removeMeta('property', 'og:locale:alternate')
+      for (const el of altMetaEls) el.remove()
       removeMeta('property', 'og:url')
 
       // OG image cleanup

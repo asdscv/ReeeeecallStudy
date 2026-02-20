@@ -1,0 +1,173 @@
+{
+  "title": "分享管理",
+  "directShare": "直接分享",
+  "createShareLink": "+ 创建分享链接",
+  "marketplace": "市场",
+  "userCount": "{{count}} 位用户 · {{status}}",
+  "active": "活跃",
+  "inactive": "未活跃",
+  "unpublish": "取消发布",
+  "publishNote": "发布到市场后，任何人都可以搜索到此牌组。",
+  "publishButton": "发布到市场",
+
+  "noSubscribers": "暂无分享的用户。",
+  "inviteLink": "邀请链接",
+  "cancel": "撤销",
+  "shareDeck": "分享牌组",
+  "shareDeckDesc": "正在分享「{{name}}」牌组。",
+  "creating": "创建中...",
+  "createInviteLink": "生成邀请链接",
+  "linkShareInfo": "分享此链接以授予牌组访问权限。",
+
+  "shareMode": {
+    "label": "分享模式",
+    "copy": {
+      "label": "复制",
+      "desc": "接收者可自由编辑。",
+      "detail": "可执行所有卡片操作，包括添加、编辑、删除卡片。完全独立于原始牌组。"
+    },
+    "subscribe": {
+      "label": "订阅",
+      "desc": "与原始牌组同步，学习进度独立。",
+      "detail": "当我添加卡片时，订阅者也会获得。不允许编辑卡片。学习进度独立记录。"
+    },
+    "snapshot": {
+      "label": "快照",
+      "desc": "当前状态的只读副本。",
+      "detail": "完整复制当前卡片，但不允许编辑。牌组的一次性快照。"
+    }
+  },
+
+  "shareModes": {
+    "copy": {
+      "label": "复制",
+      "desc": "接收者可自由编辑。",
+      "detail": "可执行所有卡片操作，包括添加、编辑、删除卡片。完全独立于原始牌组。"
+    },
+    "subscribe": {
+      "label": "订阅",
+      "desc": "与原始牌组同步，学习进度独立。",
+      "detail": "当我添加卡片时，订阅者也会获得。不允许编辑卡片。学习进度独立记录。"
+    },
+    "snapshot": {
+      "label": "快照",
+      "desc": "当前状态的只读副本。",
+      "detail": "完整复制当前卡片，但不允许编辑。牌组的一次性快照。"
+    }
+  },
+
+  "mode": {
+    "subscribe": "已订阅",
+    "snapshot": "快照",
+    "copy": "复制"
+  },
+
+  "modal": {
+    "title": "分享牌组",
+    "description": "正在分享「{{name}}」牌组。",
+    "shareMode": "分享模式",
+    "creating": "创建中...",
+    "createInviteLink": "生成邀请链接",
+    "inviteLink": "邀请链接",
+    "inviteLinkNote": "分享此链接以授予牌组访问权限。"
+  },
+  "publish": {
+    "title": "发布到市场",
+    "titleLabel": "标题",
+    "description": "描述",
+    "category": "分类",
+    "tags": "标签（逗号分隔）",
+    "tagsPlaceholder": "例：英语, 词汇, 托福",
+    "shareMode": "分享模式",
+    "publishing": "发布中...",
+    "publishButton": "发布到市场",
+    "submit": "发布"
+  },
+  "modes": {
+    "copy": {
+      "label": "复制",
+      "shortDesc": "接收者可自由编辑。",
+      "longDesc": "可执行所有卡片操作，包括添加、编辑、删除卡片。完全独立于原始牌组。"
+    },
+    "subscribe": {
+      "label": "订阅",
+      "shortDesc": "与原始牌组同步，学习进度独立。",
+      "longDesc": "当我添加卡片时，订阅者也会获得。不允许编辑卡片。学习进度独立记录。"
+    },
+    "snapshot": {
+      "label": "快照",
+      "shortDesc": "当前状态的只读副本。",
+      "longDesc": "完整复制当前卡片，但不允许编辑。牌组的一次性快照。"
+    }
+  },
+  "badge": {
+    "subscribed": "已订阅",
+    "snapshot": "快照",
+    "copy": "复制"
+  },
+  "subscribers": {
+    "noUsers": "暂无分享的用户。",
+    "inviteLink": "邀请链接",
+    "revoke": "撤销"
+  },
+  "status": {
+    "pending": "待处理",
+    "active": "活跃",
+    "revoked": "已撤销",
+    "declined": "已拒绝"
+  },
+  "myShares": {
+    "title": "我的分享",
+    "sent": "已发送的分享",
+    "noSent": "暂无分享的牌组。",
+    "received": "已接收的分享",
+    "noReceived": "暂无接收的分享。",
+    "unsubscribe": "取消订阅",
+    "cancel": "撤销",
+    "status": {
+      "pending": "待处理",
+      "active": "活跃",
+      "revoked": "已撤销",
+      "declined": "已拒绝"
+    },
+    "mode": {
+      "copy": "复制",
+      "subscribe": "订阅",
+      "snapshot": "快照"
+    }
+  },
+  "acceptInvite": {
+    "title": "牌组邀请",
+    "inviteCode": "邀请码",
+    "accept": "接受邀请",
+    "accepting": "接受中...",
+    "accepted": "已接受！",
+    "redirecting": "正在跳转到牌组..."
+  },
+  "deckShare": {
+    "title": "分享管理",
+    "directSharing": "直接分享",
+    "createShareLink": "创建分享链接",
+    "marketplace": "市场",
+    "usersUsing": "{{count}} 位用户使用中",
+    "active": "活跃",
+    "inactive": "未活跃",
+    "unpublish": "取消发布",
+    "publishDescription": "发布到市场后，任何人都可以搜索到此牌组。",
+    "publish": "发布到市场"
+  },
+  "invite": {
+    "title": "牌组邀请",
+    "code": "邀请码：",
+    "accept": "接受邀请",
+    "accepting": "接受中...",
+    "accepted": "已接受！",
+    "redirecting": "正在跳转到牌组..."
+  },
+  "deckLabel": {
+    "myDeck": "我的牌组",
+    "subscribed": "已订阅",
+    "snapshot": "快照",
+    "copy": "复制"
+  }
+}

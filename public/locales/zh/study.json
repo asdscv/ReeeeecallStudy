@@ -1,0 +1,118 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS（间隔重复）",
+      "description": "根据复习时间自动选择卡片",
+      "detail": "基于记忆曲线在最佳间隔进行复习。通过选择「重来/困难/良好/简单」来调整间隔。答错的卡片会在同一次学习中重新出现。"
+    },
+    "sequential_review": {
+      "label": "顺序复习",
+      "description": "按顺序复习所有新卡和复习卡",
+      "detail": "始终包含所有新卡。批次大小控制复习卡的数量。到达末尾后从头开始循环。"
+    },
+    "random": {
+      "label": "随机",
+      "description": "随机打乱卡片进行学习",
+      "detail": "从牌组中随机抽取卡片，数量不超过批次大小。所有未暂停的卡片均可被选中，不受 SRS 状态影响。"
+    },
+    "sequential": {
+      "label": "顺序",
+      "description": "按顺序学习卡片",
+      "detail": "按排列顺序学习卡片，数量不超过批次大小。系统会记住您的位置，下次从上次停止处继续。到达末尾后从头开始。"
+    },
+    "by_date": {
+      "label": "按日期",
+      "description": "学习特定日期上传的卡片",
+      "detail": "仅学习在所选日期添加的卡片。适合快速复习新添加的卡片。"
+    }
+  },
+  "quickStudy": {
+    "title": "快速学习",
+    "noDecks": "暂无牌组，请先创建一个牌组。",
+    "cardCount": "{{count}} 张卡片",
+    "newCards": "新卡 {{count}}",
+    "reviewCards": "复习 {{count}}",
+    "selectDate": "选择学习日期",
+    "setBatchSize": "设置批次大小",
+    "selectMode": "选择学习模式",
+    "startStudy": "开始学习",
+    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片",
+    "batchSize": "批次大小",
+    "batchSizeDesc": "每次学习的卡片数量 ({{min}}~{{max}})",
+    "batchSizeDescReview": "每次复习的卡片数量 — 所有新卡自动包含 ({{min}}~{{max}})",
+    "backToModeSelect": "← 返回模式选择"
+  },
+  "setup": {
+    "title": "学习设置",
+    "deckInfo": "{{icon}} {{name}} · {{count}} 张卡片",
+    "studyMode": "学习模式",
+    "selectUploadDate": "选择上传日期",
+    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片"
+  },
+  "session": {
+    "loading": "加载中...",
+    "noCards": "没有可学习的卡片",
+    "allReviewed": "所有卡片已复习完毕！",
+    "backToDeck": "返回牌组"
+  },
+  "card": {
+    "tapToFlip": "点击翻转",
+    "tapToSeeAnswer": "点击卡片查看答案",
+    "tapToReveal": "点击卡片查看答案",
+    "ttsPlay": "播放 TTS"
+  },
+  "rating": {
+    "dontKnow": "不认识",
+    "knowIt": "认识",
+    "known": "认识",
+    "unknown": "不认识",
+    "next": "下一张 →"
+  },
+  "summary": {
+    "title": "学习完成！",
+    "completed": "学习完成！",
+    "greatJob": "做得好！",
+    "wellDone": "做得好！继续加油。",
+    "studyCards": "学习卡片",
+    "cardsStudied": "已学卡片",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "用时",
+    "timeFormat": "{{minutes}}分 {{seconds}}秒",
+    "avgPerCard": "每卡平均",
+    "secondsFormat": "{{seconds}}秒",
+    "ratingDistribution": "评分分布",
+    "backToDeck": "返回牌组",
+    "studyAgain": "再学一次",
+    "knowIt": "认识",
+    "dontKnow": "不认识",
+    "next": "下一张"
+  },
+  "weekdays": {
+    "sun": "日",
+    "mon": "一",
+    "tue": "二",
+    "wed": "三",
+    "thu": "四",
+    "fri": "五",
+    "sat": "六"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["日", "一", "二", "三", "四", "五", "六"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10分钟",
+    "oneDay": "1天",
+    "days": "{{count}}天",
+    "months": "{{count}}月",
+    "years": "{{count}}年"
+  },
+  "srsRating": {
+    "again": "重来",
+    "hard": "困难",
+    "good": "良好",
+    "easy": "简单"
+  }
+}

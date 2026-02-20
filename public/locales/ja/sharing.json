@@ -1,0 +1,173 @@
+{
+  "title": "共有管理",
+  "directShare": "直接共有",
+  "createShareLink": "+ 共有リンクを作成",
+  "marketplace": "マーケットプレイス",
+  "userCount": "{{count}}人 · {{status}}",
+  "active": "有効",
+  "inactive": "無効",
+  "unpublish": "公開を取り消す",
+  "publishNote": "マーケットに公開すると、誰でもこのデッキを検索できるようになります。",
+  "publishButton": "マーケットに公開",
+
+  "noSubscribers": "まだ共有されたユーザーはいません。",
+  "inviteLink": "招待リンク",
+  "cancel": "取り消す",
+  "shareDeck": "デッキを共有",
+  "shareDeckDesc": "「{{name}}」デッキを共有します。",
+  "creating": "作成中...",
+  "createInviteLink": "招待リンクを生成",
+  "linkShareInfo": "このリンクを共有してデッキへのアクセスを提供します。",
+
+  "shareMode": {
+    "label": "共有モード",
+    "copy": {
+      "label": "コピー",
+      "desc": "受信者は自由に編集できます。",
+      "detail": "すべてのカード操作が可能です。カードの追加・編集・削除を含みます。元のデッキから完全に独立します。"
+    },
+    "subscribe": {
+      "label": "購読",
+      "desc": "元のデッキと同期、学習進捗は個別管理。",
+      "detail": "カードを追加すると購読者にも反映されます。カードの編集はできません。学習進捗は個別に追跡されます。"
+    },
+    "snapshot": {
+      "label": "スナップショット",
+      "desc": "現在の状態の読み取り専用コピー。",
+      "detail": "現在のカードをそのままコピーしますが、編集はできません。デッキの一時点のスナップショットです。"
+    }
+  },
+
+  "shareModes": {
+    "copy": {
+      "label": "コピー",
+      "desc": "受信者は自由に編集できます。",
+      "detail": "すべてのカード操作が可能です。カードの追加・編集・削除を含みます。元のデッキから完全に独立します。"
+    },
+    "subscribe": {
+      "label": "購読",
+      "desc": "元のデッキと同期、学習進捗は個別管理。",
+      "detail": "カードを追加すると購読者にも反映されます。カードの編集はできません。学習進捗は個別に追跡されます。"
+    },
+    "snapshot": {
+      "label": "スナップショット",
+      "desc": "現在の状態の読み取り専用コピー。",
+      "detail": "現在のカードをそのままコピーしますが、編集はできません。デッキの一時点のスナップショットです。"
+    }
+  },
+
+  "mode": {
+    "subscribe": "購読中",
+    "snapshot": "スナップショット",
+    "copy": "コピー"
+  },
+
+  "modal": {
+    "title": "デッキを共有",
+    "description": "「{{name}}」デッキを共有します。",
+    "shareMode": "共有モード",
+    "creating": "作成中...",
+    "createInviteLink": "招待リンクを生成",
+    "inviteLink": "招待リンク",
+    "inviteLinkNote": "このリンクを共有してデッキへのアクセスを提供します。"
+  },
+  "publish": {
+    "title": "マーケットに公開",
+    "titleLabel": "タイトル",
+    "description": "説明",
+    "category": "カテゴリ",
+    "tags": "タグ（カンマ区切り）",
+    "tagsPlaceholder": "例：英語, 単語, TOEIC",
+    "shareMode": "共有モード",
+    "publishing": "公開中...",
+    "publishButton": "マーケットに公開",
+    "submit": "公開"
+  },
+  "modes": {
+    "copy": {
+      "label": "コピー",
+      "shortDesc": "受信者は自由に編集できます。",
+      "longDesc": "すべてのカード操作が可能です。カードの追加・編集・削除を含みます。元のデッキから完全に独立します。"
+    },
+    "subscribe": {
+      "label": "購読",
+      "shortDesc": "元のデッキと同期、学習進捗は個別管理。",
+      "longDesc": "カードを追加すると購読者にも反映されます。カードの編集はできません。学習進捗は個別に追跡されます。"
+    },
+    "snapshot": {
+      "label": "スナップショット",
+      "shortDesc": "現在の状態の読み取り専用コピー。",
+      "longDesc": "現在のカードをそのままコピーしますが、編集はできません。デッキの一時点のスナップショットです。"
+    }
+  },
+  "badge": {
+    "subscribed": "購読中",
+    "snapshot": "スナップショット",
+    "copy": "コピー"
+  },
+  "subscribers": {
+    "noUsers": "まだ共有されたユーザーはいません。",
+    "inviteLink": "招待リンク",
+    "revoke": "取り消す"
+  },
+  "status": {
+    "pending": "保留中",
+    "active": "有効",
+    "revoked": "取り消し済み",
+    "declined": "拒否済み"
+  },
+  "myShares": {
+    "title": "マイ共有",
+    "sent": "送信した共有",
+    "noSent": "共有したデッキはまだありません。",
+    "received": "受信した共有",
+    "noReceived": "受信した共有はまだありません。",
+    "unsubscribe": "購読解除",
+    "cancel": "取り消す",
+    "status": {
+      "pending": "保留中",
+      "active": "有効",
+      "revoked": "取り消し済み",
+      "declined": "拒否済み"
+    },
+    "mode": {
+      "copy": "コピー",
+      "subscribe": "購読",
+      "snapshot": "スナップショット"
+    }
+  },
+  "acceptInvite": {
+    "title": "デッキ招待",
+    "inviteCode": "招待コード",
+    "accept": "招待を受け入れる",
+    "accepting": "受け入れ中...",
+    "accepted": "受け入れました！",
+    "redirecting": "デッキに移動中..."
+  },
+  "deckShare": {
+    "title": "共有管理",
+    "directSharing": "直接共有",
+    "createShareLink": "共有リンクを作成",
+    "marketplace": "マーケットプレイス",
+    "usersUsing": "{{count}}人が利用中",
+    "active": "有効",
+    "inactive": "無効",
+    "unpublish": "公開を取り消す",
+    "publishDescription": "マーケットに公開すると、誰でもこのデッキを検索できるようになります。",
+    "publish": "マーケットに公開"
+  },
+  "invite": {
+    "title": "デッキ招待",
+    "code": "招待コード：",
+    "accept": "招待を受け入れる",
+    "accepting": "受け入れ中...",
+    "accepted": "受け入れました！",
+    "redirecting": "デッキに移動中..."
+  },
+  "deckLabel": {
+    "myDeck": "マイデッキ",
+    "subscribed": "購読中",
+    "snapshot": "スナップショット",
+    "copy": "コピー"
+  }
+}

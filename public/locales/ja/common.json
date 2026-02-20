@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "quickStudy": "クイック学習",
+    "dashboard": "ダッシュボード",
+    "study": "学習",
+    "decks": "デッキ",
+    "cards": "カード",
+    "marketplace": "マーケットプレイス",
+    "studyHistory": "学習履歴",
+    "settings": "設定",
+    "admin": "管理者",
+    "guide": "ガイド"
+  },
+  "actions": {
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "add": "追加",
+    "remove": "削除",
+    "confirm": "確認",
+    "ok": "OK",
+    "back": "戻る",
+    "next": "次へ",
+    "close": "閉じる",
+    "copy": "コピー",
+    "duplicate": "複製",
+    "search": "検索",
+    "selectAll": "すべて選択",
+    "deselect": "選択解除",
+    "show": "表示",
+    "hide": "非表示",
+    "startStudy": "学習開始",
+    "logout": "ログアウト"
+  },
+  "status": {
+    "loading": "読み込み中...",
+    "processing": "処理中...",
+    "new": "新規",
+    "learning": "学習中",
+    "review": "復習",
+    "suspended": "一時停止"
+  },
+  "units": {
+    "cards": "枚",
+    "cardsSuffix": "{{count}}枚",
+    "sessions": "回",
+    "items": "件",
+    "days": "日",
+    "hours": "時間",
+    "minutes": "分",
+    "seconds": "秒",
+    "times": "回",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}}件ずつ表示"
+  },
+  "timePeriod": {
+    "1d": "1日",
+    "1w": "1週",
+    "1m": "1ヶ月",
+    "3m": "3ヶ月",
+    "6m": "6ヶ月",
+    "1y": "1年",
+    "2y": "2年",
+    "5y": "5年"
+  },
+  "confirmDialog": {
+    "cancel": "キャンセル",
+    "processing": "処理中...",
+    "confirm": "確認"
+  },
+  "delete": "削除",
+  "deselect": "選択解除",
+  "duplicate": "複製",
+  "edit": "編集",
+  "save": "保存",
+  "saving": "保存中...",
+  "selectAll": "すべて選択",
+  "menu": "メニュー",
+  "copiedToClipboard": "クリップボードにコピーしました",
+  "export": "エクスポート"
+}

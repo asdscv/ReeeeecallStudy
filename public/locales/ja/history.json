@@ -1,0 +1,98 @@
+{
+  "title": "学習履歴",
+  "tabs": {
+    "deckProgress": "デッキ進捗",
+    "sessionList": "セッション一覧"
+  },
+  "filters": {
+    "allDecks": "すべてのデッキ",
+    "allModes": "すべてのモード"
+  },
+  "deckScope": {
+    "all": "すべて",
+    "label": "ダッシュボード範囲"
+  },
+  "empty": "学習履歴がまだありません。学習を始めましょう！",
+  "noMatch": "フィルターに一致する記録がありません。",
+  "deletedDeck": "削除されたデッキ",
+  "deckProgress": {
+    "total": "{{count}}枚",
+    "notStudied": "未学習 {{count}}",
+    "learning": "学習中 {{count}}",
+    "review": "復習 {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}}日",
+    "reviewCount": "{{count}}回復習",
+    "cardCount": "{{count}}枚",
+    "logCount": "{{count}}件のログ",
+    "intervalChange": "{{prev}}日 → {{next}}日",
+    "paginationInfo": "{{start}}-{{end}} / {{total}}"
+  },
+  "sessionCard": {
+    "cardsStudied": "{{count}}枚学習"
+  },
+  "sessionDetail": {
+    "backToHistory": "学習履歴",
+    "cardsStudied": "{{count}}枚学習",
+    "performance": "パフォーマンス {{value}}%",
+    "loadingDetails": "詳細を読み込み中...",
+    "noDetails": "詳細がありません。",
+    "retention": "記憶保持率",
+    "avgIntervalGrowth": "平均間隔成長",
+    "avgEase": "平均易度",
+    "totalReviews": "復習総数",
+    "easeDistribution": "易度分布",
+    "totalCards": "カード総数",
+    "avgTime": "平均時間",
+    "performanceScore": "パフォーマンススコア",
+    "cardDetails": "カード詳細",
+    "card": "カード",
+    "rating": "評価",
+    "intervalChange": "間隔変更",
+    "easeChange": "易度変更",
+    "timeSpent": "所要時間",
+    "deletedCard": "（削除されたカード）",
+    "noContent": "（内容なし）"
+  },
+  "overview": {
+    "sessions": "セッション",
+    "sessionsValue": "{{count}}回",
+    "studyCards": "学習カード",
+    "cardsValue": "{{count}}枚",
+    "totalTime": "合計学習時間",
+    "avgPerformance": "平均パフォーマンス",
+    "streak": "学習連続日数",
+    "streakValue": "{{count}}日"
+  },
+  "chart": {
+    "countPercent": "{{count}}（{{percent}}%）"
+  },
+  "charts": {
+    "studyVolume": "学習量",
+    "volumeSummary": "{{sessions}}セッション / {{cards}}枚",
+    "noDataForPeriod": "この期間の学習記録がありません",
+    "sessionDuration": "平均セッション時間",
+    "sessionCount": "{{count}}セッション",
+    "avgDuration": "平均時間",
+    "ratingDistribution": "評価分布",
+    "ratingTotal": "合計{{count}}",
+    "noRatingData": "評価データがありません",
+    "modeBreakdown": "モード内訳",
+    "noModeData": "モードデータがありません",
+    "sessionCountLabel": "{{count}}セッション",
+    "cardCountLabel": "{{count}}枚",
+    "performance": "パフォーマンス"
+  },
+  "ratings": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
+  "units": {
+    "sessions": "セッション",
+    "cards": "枚",
+    "min": "分"
+  }
+}

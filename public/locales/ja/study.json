@@ -1,0 +1,118 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS（間隔反復）",
+      "description": "復習タイミングに基づいてカードを自動選択",
+      "detail": "記憶曲線に基づいた最適な間隔で復習します。Again/Hard/Good/Easyで評価して間隔を調整します。間違えたカードは同じセッション内で再表示されます。"
+    },
+    "sequential_review": {
+      "label": "順次復習",
+      "description": "すべての新規カード＋復習カードを順番に",
+      "detail": "すべての新規カードが常に含まれます。バッチサイズで既存カードの復習数を制御します。最後まで到達すると最初に戻ります。"
+    },
+    "random": {
+      "label": "ランダム",
+      "description": "カードをランダムにシャッフルして学習",
+      "detail": "デッキからバッチサイズ分のカードをランダムに選択します。SRSステータスに関係なく、一時停止されていないすべてのカードが対象です。"
+    },
+    "sequential": {
+      "label": "順次",
+      "description": "カードを順番に学習",
+      "detail": "ソート順でバッチサイズ分のカードを学習します。前回の位置を記憶して続きから再開します。最後まで到達すると最初に戻ります。"
+    },
+    "by_date": {
+      "label": "日付別",
+      "description": "特定の日にアップロードされたカードを学習",
+      "detail": "選択した日付に追加されたカードのみを集めて学習します。新しく追加したカードを素早く復習するのに便利です。"
+    }
+  },
+  "quickStudy": {
+    "title": "クイック学習",
+    "noDecks": "デッキがありません。まずデッキを作成してください。",
+    "cardCount": "{{count}}枚",
+    "newCards": "新規 {{count}}",
+    "reviewCards": "復習 {{count}}",
+    "selectDate": "学習する日付を選択",
+    "setBatchSize": "バッチサイズを設定",
+    "selectMode": "学習モードを選択",
+    "startStudy": "学習開始",
+    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚",
+    "batchSize": "バッチサイズ",
+    "batchSizeDesc": "1セッションあたりの学習カード数（{{min}}〜{{max}}）",
+    "batchSizeDescReview": "1セッションあたりの復習カード数 — 新規カードはすべて含まれます（{{min}}〜{{max}}）",
+    "backToModeSelect": "← モード選択に戻る"
+  },
+  "setup": {
+    "title": "学習設定",
+    "deckInfo": "{{icon}} {{name}} · {{count}}枚",
+    "studyMode": "学習モード",
+    "selectUploadDate": "アップロード日を選択",
+    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚"
+  },
+  "session": {
+    "loading": "読み込み中...",
+    "noCards": "学習するカードがありません",
+    "allReviewed": "すべてのカードを復習しました！",
+    "backToDeck": "デッキに戻る"
+  },
+  "card": {
+    "tapToFlip": "タップして裏返す",
+    "tapToSeeAnswer": "カードをタップして答えを見る",
+    "tapToReveal": "カードをタップして答えを見る",
+    "ttsPlay": "TTS再生"
+  },
+  "rating": {
+    "dontKnow": "わからない",
+    "knowIt": "わかる",
+    "known": "既知",
+    "unknown": "未知",
+    "next": "次へ →"
+  },
+  "summary": {
+    "title": "学習完了！",
+    "completed": "学習完了！",
+    "greatJob": "お疲れ様でした！",
+    "wellDone": "お疲れ様でした！この調子で頑張りましょう。",
+    "studyCards": "学習カード",
+    "cardsStudied": "学習したカード",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "所要時間",
+    "timeFormat": "{{minutes}}分{{seconds}}秒",
+    "avgPerCard": "1枚あたりの平均",
+    "secondsFormat": "{{seconds}}秒",
+    "ratingDistribution": "評価分布",
+    "backToDeck": "デッキに戻る",
+    "studyAgain": "もう一度学習",
+    "knowIt": "わかる",
+    "dontKnow": "わからない",
+    "next": "次へ"
+  },
+  "weekdays": {
+    "sun": "日",
+    "mon": "月",
+    "tue": "火",
+    "wed": "水",
+    "thu": "木",
+    "fri": "金",
+    "sat": "土"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["日", "月", "火", "水", "木", "金", "土"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10分",
+    "oneDay": "1日",
+    "days": "{{count}}日",
+    "months": "{{count}}ヶ月",
+    "years": "{{count}}年"
+  },
+  "srsRating": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  }
+}

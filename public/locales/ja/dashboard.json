@@ -1,0 +1,37 @@
+{
+  "title": "ダッシュボード",
+  "stats": {
+    "totalCards": "カード総数",
+    "todayReview": "今日の復習",
+    "streak": "学習連続日数",
+    "masteryRate": "習得率"
+  },
+  "dailyChart": {
+    "title": "日別学習量",
+    "total": "合計{{count}}回",
+    "noData": "学習記録がまだありません",
+    "tooltipTimes": "{{value}}回",
+    "tooltipLabel": "学習"
+  },
+  "forecast": {
+    "title": "復習予測（7日間）",
+    "noData": "予定された復習はありません",
+    "tooltipCards": "{{value}}枚",
+    "tooltipLabel": "復習予定"
+  },
+  "recentDecks": {
+    "title": "デッキ状況",
+    "noDecks": "デッキがまだありません。作成しましょう！",
+    "goToDecks": "デッキ管理へ",
+    "cardCount": "{{count}}枚",
+    "newCards": "新規 {{count}}",
+    "reviewCards": "復習 {{count}}",
+    "study": "学習"
+  },
+  "heatmap": {
+    "title": "学習ヒートマップ",
+    "noStudy": "学習なし",
+    "studyCount": "{{date}}：{{count}}回学習",
+    "tooltip": "{{date}}：{{count}}回学習"
+  }
+}

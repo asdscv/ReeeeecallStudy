@@ -1,0 +1,39 @@
+{
+  "title": "マーケットプレイス",
+  "noResults": "検索結果がありません。",
+  "noListings": "公開されたデッキはまだありません。",
+  "searchPlaceholder": "デッキを検索...",
+  "allCategories": "すべてのカテゴリ",
+  "sortNewest": "新しい順",
+  "sortPopular": "人気順",
+  "sortCardCount": "カード数順",
+  "categories": {
+    "general": "一般",
+    "language": "語学",
+    "science": "科学",
+    "math": "数学",
+    "history": "歴史",
+    "programming": "プログラミング",
+    "trivia": "雑学",
+    "exam": "試験対策",
+    "other": "その他"
+  },
+  "shareModes": {
+    "copy": "コピー",
+    "subscribe": "購読",
+    "snapshot": "スナップショット"
+  },
+  "listing": {
+    "cardCount": "{{count}}枚",
+    "userCount": "{{count}}人"
+  },
+  "detail": {
+    "back": "← マーケットプレイス",
+    "cardCount": "{{count}}枚",
+    "userCount": "{{count}}人",
+    "getDeck": "このデッキを取得",
+    "importing": "インポート中...",
+    "cardPreview": "カードプレビュー（最大10枚）",
+    "noCards": "カードがありません。"
+  }
+}

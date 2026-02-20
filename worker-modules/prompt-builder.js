@@ -85,6 +85,8 @@ Each block has "type" and "props":
 const LOCALE_INSTRUCTIONS = {
   en: 'Write the entire article in English. The slug must be in English lowercase kebab-case.',
   ko: 'Write the entire article in Korean (한국어). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Korean. For SEO: use Korean keywords that Korean users would search on Naver and Google Korea. meta_title and meta_description must be in Korean.',
+  zh: 'Write the entire article in Simplified Chinese (简体中文). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Simplified Chinese. For SEO: use Chinese keywords that Chinese users would search on Baidu and Google China. meta_title and meta_description must be in Simplified Chinese.',
+  ja: 'Write the entire article in Japanese (日本語). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Japanese. For SEO: use Japanese keywords that Japanese users would search on Google Japan and Yahoo Japan. meta_title and meta_description must be in Japanese.',
 }
 
 export function buildPrompt(topic, locale) {

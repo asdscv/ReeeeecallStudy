@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { ContentListItem, ContentDetail } from '../types/content-blocks'
 import i18n from '../i18n'
+import { toContentLocale } from '../lib/locale-utils'
 
 const PAGE_SIZE = 12
 
@@ -45,7 +46,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
 
     set({ listLoading: true, listError: null })
 
-    const currentLocale = i18n.language?.startsWith('ko') ? 'ko' : 'en'
+    const currentLocale = toContentLocale(i18n.language)
     const cursor = reset ? null : get().cursor
 
     let query = supabase
@@ -90,7 +91,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
   fetchContentBySlug: async (slug: string) => {
     set({ detailLoading: true, detailError: null, currentArticle: null })
 
-    const currentLocale = i18n.language?.startsWith('ko') ? 'ko' : 'en'
+    const currentLocale = toContentLocale(i18n.language)
 
     // Try current locale first
     let { data, error } = await supabase

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts'
 import type { Card, StudyLog } from '../../types/database'
 import { calculateDeckStats, getDailyStudyCounts, fetchDeckStudyLogs } from '../../lib/stats'
@@ -19,7 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
   const { t, i18n } = useTranslation('decks')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [loading, setLoading] = useState(true)
 

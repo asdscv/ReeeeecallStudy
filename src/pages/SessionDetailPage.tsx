@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../lib/locale-utils'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock, Layers, TrendingUp, BarChart3, Zap, Target } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -94,7 +95,7 @@ export function SessionDetailPage() {
   const isSrs = session.study_mode === 'srs'
 
   const completedAt = new Date(session.completed_at)
-  const sessionLocale = i18next.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const sessionLocale = toIntlLocale(i18next.language)
   const dateStr = completedAt.toLocaleString(sessionLocale, {
     year: 'numeric', month: 'numeric', day: 'numeric',
     hour: '2-digit', minute: '2-digit',

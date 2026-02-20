@@ -1,0 +1,126 @@
+{
+  "title": "设置",
+  "loading": "加载中...",
+  "saving": "保存中...",
+  "save": "保存设置",
+  "saved": "设置已保存！",
+  "saveButton": "保存设置",
+
+  "links": {
+    "userGuide": "用户指南",
+    "userGuideDesc": "功能说明、学习技巧、分享方法",
+    "apiDocs": "API 文档",
+    "apiDocsDesc": "API 端点、认证、使用示例"
+  },
+
+  "guide": {
+    "title": "用户指南",
+    "desc": "功能说明、学习技巧、分享方法"
+  },
+
+  "apiDocs": {
+    "title": "API 文档",
+    "desc": "API 端点、认证、使用示例"
+  },
+
+  "profile": {
+    "title": "个人信息",
+    "email": "邮箱",
+    "displayName": "显示名称",
+    "displayNamePlaceholder": "请输入您的名称",
+    "namePlaceholder": "请输入您的名称"
+  },
+
+  "language": {
+    "title": "语言",
+    "label": "显示语言",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語"
+  },
+
+  "srs": {
+    "title": "SRS 学习",
+    "description": "设置 SRS（间隔重复）模式下每次学习添加的新卡数量",
+    "newCardLimit": "新卡限制",
+    "cards": "张",
+    "cardsUnit": "张",
+    "help": "SRS 学习中除复习卡外的最大新卡数量。复习卡不受此限制影响。",
+    "newCardNote": "SRS 学习中除复习卡外的最大新卡数量。复习卡不受此限制影响。"
+  },
+
+  "answerMode": {
+    "title": "答题模式",
+    "description": "设置学习时的答题方式",
+    "button": "按钮",
+    "buttonDesc": "通过点击按钮选择答案",
+    "swipe": "滑动",
+    "swipeDesc": "通过滑动卡片选择答案",
+    "directionsHelp": "为每个方向分配操作。未设置的方向将被禁用。",
+    "swipeDirections": "为每个方向分配操作。未设置的方向将被禁用。",
+    "swipeLeft": "向左滑动",
+    "swipeRight": "向右滑动",
+    "swipeUp": "向上滑动",
+    "swipeDown": "向下滑动",
+    "notSet": "未设置",
+    "again": "重来",
+    "hard": "困难",
+    "good": "良好",
+    "easy": "简单",
+    "recommendation": "推荐：左滑=重来，右滑=良好（适合快速学习）"
+  },
+
+  "tts": {
+    "title": "自动 TTS 朗读",
+    "description": "翻转卡片时自动朗读启用了 TTS 的字段",
+    "enable": "启用自动朗读",
+    "help": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
+    "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。"
+  },
+
+  "apiKey": {
+    "title": "API 密钥管理",
+    "limit": "最多可创建 1 个 API 密钥",
+    "maxKeys": "最多可创建 1 个 API 密钥",
+    "generate": "生成",
+    "generateNew": "生成新密钥",
+    "keyName": "密钥名称",
+    "keyNamePlaceholder": "例：my-script",
+    "namePlaceholder": "例：my-script",
+    "create": "创建",
+    "generating": "生成中...",
+    "generateFailed": "密钥生成失败：",
+    "generated": "API 密钥已生成！",
+    "generateError": "生成密钥时出错",
+    "delete": "删除",
+    "deleted": "API 密钥已删除",
+    "cancel": "取消",
+    "copy": "复制",
+    "copied": "API 密钥已复制！",
+    "show": "显示密钥",
+    "showPartial": "部分显示密钥",
+    "showFull": "显示完整密钥",
+    "hide": "隐藏密钥",
+    "masked": "出于安全考虑，无法再次查看",
+    "createdAt": "创建时间",
+    "created": "创建时间：{{date}}",
+    "noKeys": "尚未生成 API 密钥。",
+    "noKey": "尚未生成 API 密钥。",
+    "securityNote": "出于安全考虑，无法再次查看"
+  },
+
+  "account": {
+    "title": "账号",
+    "logout": "退出登录"
+  },
+
+  "settings": {
+    "answerMode": {
+      "swipeLeft": "向左滑动",
+      "swipeRight": "向右滑动",
+      "swipeUp": "向上滑动",
+      "swipeDown": "向下滑动"
+    }
+  }
+}

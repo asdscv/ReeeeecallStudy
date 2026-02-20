@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { formatDateKeyShort } from '../../lib/date-utils'
 import type { AdminRecentActivity } from '../../types/database'
 
@@ -9,7 +10,7 @@ interface RecentActivityChartProps {
 
 export function RecentActivityChart({ data }: RecentActivityChartProps) {
   const { t, i18n } = useTranslation('admin')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
 
   const chartData = data.map((d) => ({
     ...d,

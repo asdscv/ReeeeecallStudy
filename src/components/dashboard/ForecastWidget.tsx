@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { localDateKeyToDate, formatDateKeyShort } from '../../lib/date-utils'
 
 interface ForecastWidgetProps {
@@ -9,7 +10,7 @@ interface ForecastWidgetProps {
 export function ForecastWidget({ data }: ForecastWidgetProps) {
   const { t, i18n } = useTranslation('dashboard')
   // Format date labels as short weekday
-  const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
+  const locale = toIntlLocale(i18n.language)
   const chartData = data.map((d) => {
     const date = localDateKeyToDate(d.date)
     const dayLabel = date.toLocaleDateString(locale, { weekday: 'short' })

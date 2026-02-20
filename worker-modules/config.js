@@ -1,6 +1,6 @@
 // Configuration constants and environment variable helpers
 
-export const LOCALES = ['en', 'ko']
+export const LOCALES = ['en', 'ko', 'zh', 'ja']
 
 export const PIPELINE_DEFAULTS = {
   topicsPerRun: 10,

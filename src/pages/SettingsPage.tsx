@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe } from 'lucide-react'
+import { toIntlLocale } from '../lib/locale-utils'
+import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
 import { formatLocalDateTime } from '../lib/date-utils'
@@ -47,7 +49,8 @@ function CopyButton({ text }: { text: string }) {
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation('settings')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
+  const { changeLanguage } = useLocale()
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
 
@@ -261,6 +264,29 @@ export function SettingsPage() {
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               />
             </div>
+          </div>
+        </section>
+
+        {/* Language */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Globe className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">{t('language.title')}</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {(['en', 'ko', 'zh', 'ja'] as const).map((lng) => (
+              <button
+                key={lng}
+                onClick={() => changeLanguage(lng)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                  i18n.language === lng
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {t(`language.${lng}`)}
+              </button>
+            ))}
           </div>
         </section>
 

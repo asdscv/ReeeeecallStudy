@@ -9,7 +9,7 @@ export const SEO = {
   THEME_COLOR: '#2563eb',
   AUTHOR_NAME: 'ReeeeecallStudy',
   DEFAULT_LOCALE: 'en',
-  SUPPORTED_LOCALES: ['en', 'ko'] as const,
+  SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja'] as const,
 } as const
 
 const OG_LOCALE_MAP: Record<string, string> = {

@@ -3,7 +3,7 @@
 function tokenize(text) {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s\uac00-\ud7af]/g, '')
+    .replace(/[^a-z0-9\s\uac00-\ud7af\u4e00-\u9fff\u3040-\u30ff\u31f0-\u31ff\u3400-\u4dbf]/g, '')
     .split(/\s+/)
     .filter(Boolean)
 }

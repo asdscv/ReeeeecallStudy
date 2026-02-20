@@ -1,0 +1,211 @@
+{
+  "title": "APIドキュメント",
+  "subtitle": "外部ツールと連携して学習データを管理",
+  "publicSubtitle": "ReeeeecallStudy APIを使って外部ツールと連携し、学習データを管理",
+  "userGuideLink": "ユーザーガイド",
+  "getStarted": "はじめる",
+  "required": "必須",
+  "searchPlaceholder": "エンドポイントを検索...",
+  "noResults": "「{{query}}」の検索結果が見つかりません",
+  "copy": "コピー",
+  "tableOfContents": "目次",
+  "quickStart": {
+    "title": "クイックスタート",
+    "settingsPage": "設定ページ",
+    "step1Auth": " — APIキーセクションでAPIキーを生成します。",
+    "signup": "会員登録",
+    "step1Public": "して、設定でAPIキーを生成します。",
+    "step2": "すべてのリクエストにヘッダー",
+    "step2Suffix": "を追加します。",
+    "step3": "API呼び出しを開始しましょう！以下のエンドポイントを確認してください。"
+  },
+  "table": {
+    "name": "名前",
+    "type": "型",
+    "required": "必須",
+    "description": "説明"
+  },
+  "footer": {
+    "home": "ホーム",
+    "login": "ログイン"
+  },
+  "sections": {
+    "overview": {
+      "title": "概要",
+      "description": "ReeeeecallStudy APIを使って外部ツール、スクリプト、アプリから学習データを管理します。",
+      "items": {
+        "what": {
+          "title": "APIとは？",
+          "body": "ReeeeecallStudy APIは、HTTPリクエストでデッキ、カード、学習履歴などを表示・管理できるRESTful APIです。自動化スクリプト、サードパーティアプリとの連携、データ分析に使用できます。"
+        },
+        "baseUrl": {
+          "title": "ベースURL",
+          "body": "すべてのAPIリクエストはSupabaseプロジェクトURLを基準にします。\n\nベースURL：https://your-project.supabase.co/rest/v1"
+        },
+        "responseFormat": {
+          "title": "レスポンス形式",
+          "body": "すべてのレスポンスはJSON形式で、Content-Type: application/jsonです。\n\n成功時はリソースデータが返されます。エラー時は { \"error\": \"メッセージ\" } 形式のレスポンスになります。"
+        }
+      }
+    },
+    "authentication": {
+      "title": "認証",
+      "description": "すべてのリクエストはAPIキーで認証されます。",
+      "items": {
+        "getKey": {
+          "title": "APIキーの取得",
+          "body": "設定 → APIキーセクション →「新しいキーを生成」をクリック。\n名前（最大64文字）を入力すると、rc_で始まる35文字のキーが発行されます。\n\n⚠️ キーは一度だけ表示されます。安全な場所にコピーしてください！"
+        },
+        "method": {
+          "title": "認証方法",
+          "body": "AuthorizationヘッダーにBearerトークンとしてAPIキーを渡します。\n\nAuthorization: Bearer rc_your_api_key_here\n\nキーが不足または無効な場合は401 Unauthorizedが返されます。"
+        },
+        "management": {
+          "title": "キー管理",
+          "body": "・APIキーは最大1つまで\n・紛失した場合は既存のキーを削除して新規作成\n・使用していないキーは直ちに削除\n・ハードコーディングせず環境変数を使用"
+        }
+      }
+    },
+    "rateLimits": {
+      "title": "レート制限",
+      "description": "APIの安定性のためリクエスト数に制限があります。",
+      "items": {
+        "free": {
+          "title": "無料プラン",
+          "body": "・1日のAPIリクエスト数：1,000\n・1分あたりのAPI呼び出し数：60\n・1分あたりのカード作成数：30\n・1分あたりの一括カード作成数：5（1リクエストあたり最大100）\n・カード総数：5,000\n・デッキ総数：50"
+        },
+        "pro": {
+          "title": "Proプラン",
+          "body": "・1日のAPIリクエスト数：10,000\n・1分あたりのAPI呼び出し数：300\n・1分あたりのカード作成数：120\n・1分あたりの一括カード作成数：20\n・カード総数：50,000\n・デッキ総数：500"
+        },
+        "exceeded": {
+          "title": "制限超過時",
+          "body": "429 Too Many Requestsが返されます。\n\nレスポンスヘッダーに含まれる情報：\n・X-RateLimit-Limit：最大リクエスト数\n・X-RateLimit-Remaining：残りリクエスト数\n・Retry-After：待機時間（秒）"
+        }
+      }
+    },
+    "decks": {
+      "title": "デッキAPI",
+      "description": "デッキ（カードコレクション）の表示と管理を行います。",
+      "endpoints": {
+        "list": {
+          "summary": "デッキ一覧",
+          "description": "ユーザーのすべてのデッキを取得します。"
+        },
+        "detail": {
+          "summary": "デッキ詳細",
+          "description": "特定のデッキの詳細情報を取得します。"
+        },
+        "create": {
+          "summary": "デッキ作成",
+          "description": "新しいデッキを作成します。"
+        }
+      },
+      "params": {
+        "page": "ページ番号（デフォルト：1）",
+        "perPage": "1ページあたりの件数（デフォルト：50、最大：100）",
+        "deckId": "取得するデッキのID"
+      }
+    },
+    "cards": {
+      "title": "カードAPI",
+      "description": "カードの表示、作成、変更を行います。",
+      "endpoints": {
+        "list": {
+          "summary": "カード一覧",
+          "description": "特定のデッキのカードを取得します。"
+        },
+        "create": {
+          "summary": "カード作成",
+          "description": "デッキにカードを追加します。1枚ずつまたは最大100枚の一括作成が可能です。"
+        },
+        "update": {
+          "summary": "カード更新",
+          "description": "既存カードのフィールド値またはタグを変更します。"
+        },
+        "delete": {
+          "summary": "カード削除",
+          "description": "特定のカードを削除します。この操作は元に戻せません。"
+        }
+      },
+      "params": {
+        "deckId": "デッキID",
+        "cardId": "カードID",
+        "status": "SRSステータスフィルター（new、learning、review、suspended）",
+        "tag": "タグフィルター"
+      }
+    },
+    "study": {
+      "title": "学習API",
+      "description": "学習履歴の表示とセッションデータの管理を行います。",
+      "endpoints": {
+        "due": {
+          "summary": "復習予定カード取得",
+          "description": "今日復習が必要なカードを取得します。"
+        },
+        "history": {
+          "summary": "学習履歴",
+          "description": "学習セッション記録を取得します。"
+        },
+        "stats": {
+          "summary": "学習統計",
+          "description": "全体の学習統計とダッシュボードデータを取得します。"
+        }
+      },
+      "params": {
+        "deckId": "デッキID",
+        "from": "開始日（例：2025-01-01）",
+        "to": "終了日（例：2025-01-31）",
+        "period": "期間（1w、1m、3m、6m、1y）"
+      }
+    },
+    "templates": {
+      "title": "テンプレートAPI",
+      "description": "カードテンプレートの表示を行います。",
+      "endpoints": {
+        "list": {
+          "summary": "テンプレート一覧",
+          "description": "ユーザーのすべてのカードテンプレートを取得します。"
+        },
+        "detail": {
+          "summary": "テンプレート詳細",
+          "description": "フィールドとレイアウトを含む完全なテンプレート情報を取得します。"
+        }
+      },
+      "params": {
+        "templateId": "テンプレートID"
+      }
+    },
+    "examples": {
+      "title": "コード例",
+      "description": "さまざまな言語やツールでAPIを呼び出す例です。"
+    },
+    "errors": {
+      "title": "エラーハンドリング",
+      "description": "エラーレスポンスの形式と一般的なエラーコードです。",
+      "items": {
+        "format": {
+          "title": "エラーレスポンス形式",
+          "body": "すべてのエラーは以下の形式で返されます：\n\n{\n  \"error\": \"エラーメッセージ\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"追加情報（任意）\"\n}"
+        },
+        "statusCodes": {
+          "title": "HTTPステータスコード",
+          "body": "・200 OK — 成功\n・201 Created — リソース作成完了\n・204 No Content — 削除完了（レスポンスボディなし）\n・400 Bad Request — 無効なリクエスト（フィールド不足、バリデーション失敗）\n・401 Unauthorized — 認証失敗（APIキーの不足または無効）\n・404 Not Found — リソースが見つからない\n・429 Too Many Requests — レート制限超過\n・500 Internal Server Error — サーバーエラー"
+        },
+        "validation": {
+          "title": "バリデーションエラー",
+          "body": "カードの作成/更新時のバリデーション失敗はフィールドごとのエラーが配列で返されます：\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+        }
+      }
+    },
+    "statusCodes": {
+      "200": "成功",
+      "201": "作成完了",
+      "204": "削除完了（レスポンスボディなし）",
+      "400": "不正なリクエスト（必須フィールド不足）",
+      "401": "認証失敗",
+      "404": "見つからない",
+      "429": "レート制限超過"
+    }
+  }
+}

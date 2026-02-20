@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { formatDateKeyShort } from '../../lib/date-utils'
 
 interface DailyStudyChartProps {
@@ -9,7 +10,7 @@ interface DailyStudyChartProps {
 
 export function DailyStudyChart({ data, title }: DailyStudyChartProps) {
   const { t, i18n } = useTranslation('dashboard')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const displayTitle = title ?? t('dailyChart.title')
   const tickInterval = Math.max(1, Math.floor(data.length / 6))
 

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '../../lib/locale-utils'
 import type { Card, CardTemplate } from '../../types/database'
 import { groupCardsByDate } from '../../lib/stats'
 import { utcToLocalDateKey, formatLocalTime } from '../../lib/date-utils'
@@ -11,7 +12,7 @@ interface UploadDateTabProps {
 
 export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProps) {
   const { t, i18n } = useTranslation('decks')
-  const dateLocale = i18n.language?.startsWith('ko') ? 'ko-KR' : 'en-US'
+  const dateLocale = toIntlLocale(i18n.language)
   const groups = groupCardsByDate(cards)
   const displayFields = template?.fields.slice(0, 2) ?? []
 

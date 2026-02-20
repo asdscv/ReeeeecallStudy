@@ -1,0 +1,68 @@
+{
+  "auth": {
+    "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
+    "emailNotConfirmed": "メールが未認証です。受信トレイを確認してください。",
+    "userAlreadyRegistered": "このメールアドレスは既に登録されています。",
+    "passwordTooShort": "パスワードは6文字以上である必要があります。",
+    "emailRateLimit": "リクエストが多すぎます。しばらくしてからお試しください。",
+    "securityDelay": "セキュリティのため、しばらくしてからお試しください。",
+    "newPasswordSameAsOld": "新しいパスワードは以前のパスワードと異なる必要があります。",
+    "invalidEmailFormat": "メールアドレスの形式が正しくありません。"
+  },
+  "rateLimit": {
+    "tooFast": "リクエストが多すぎます。{{seconds}}秒後にお試しください。"
+  },
+  "quota": {
+    "limitReached": "{{resource}}の上限に達しました（{{current}}/{{limit}}）",
+    "resources": {
+      "api_requests_daily": "1日のAPIリクエスト数",
+      "storage_bytes": "ストレージ",
+      "cards_total": "カード総数",
+      "decks_total": "デッキ総数",
+      "templates_total": "テンプレート総数",
+      "study_sessions_daily": "1日の学習セッション数",
+      "file_uploads_daily": "1日のファイルアップロード数"
+    }
+  },
+  "storage": {
+    "imageTooLarge": "画像は5MB以下である必要があります。",
+    "imageFormatUnsupported": "対応画像形式：JPG、PNG、WebP",
+    "audioTooLarge": "音声ファイルは10MB以下である必要があります。",
+    "audioFormatUnsupported": "対応音声形式：MP3、OGG、WAV",
+    "uploadLimitReached": "アップロード上限に達しました。",
+    "uploadFailed": "アップロード失敗：{{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "キー名を入力してください。",
+    "nameMustBeString": "キー名は文字列である必要があります。",
+    "nameTooLong": "キー名は{{maxLength}}文字以下である必要があります。",
+    "nameNoControlChars": "キー名に制御文字を含めることはできません。"
+  },
+  "card": {
+    "readonlyDeckNoAdd": "読み取り専用デッキにカードを追加できません。",
+    "readonlyDeckNoEdit": "読み取り専用デッキのカードを編集できません。",
+    "rateLimitReached": "リクエスト上限に達しました。"
+  },
+  "deck": {
+    "rateLimitReached": "リクエスト上限に達しました。"
+  },
+  "template": {
+    "rateLimitReached": "リクエスト上限に達しました。",
+    "cannotDeleteDefault": "デフォルトテンプレートは削除できません。",
+    "inUseByDecks": "削除できません — {{count}}個のデッキがこのテンプレートを使用しています。"
+  },
+  "marketplace": {
+    "listingNotFound": "リスティングが見つかりません。",
+    "cannotImportOwn": "自分のデッキはインポートできません。"
+  },
+  "sharing": {
+    "invalidOrExpired": "無効または期限切れの招待コードです。",
+    "cannotAcceptOwn": "自分のデッキは受け取れません。"
+  },
+  "import": {
+    "invalidFile": "無効なインポートファイル：カード配列がありません。"
+  },
+  "fileValidationFailed": "ファイル検証に失敗しました",
+  "uploadFailed": "アップロードに失敗しました。",
+  "parseError": "ファイルの解析に失敗しました。"
+}

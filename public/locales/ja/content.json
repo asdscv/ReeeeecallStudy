@@ -1,0 +1,25 @@
+{
+  "list": {
+    "title": "学習インサイト",
+    "subtitle": "より良い学習のためのヒントとインスピレーション",
+    "noArticles": "まだ記事が公開されていません。後でもう一度確認してください！",
+    "readingTime": "{{minutes}}分で読了",
+    "reachedEnd": "すべての記事を表示しました",
+    "loadingMore": "さらに記事を読み込み中..."
+  },
+  "detail": {
+    "backToList": "インサイトに戻る",
+    "readingTime": "{{minutes}}分",
+    "notFound": "記事が見つかりません"
+  },
+  "cta": {
+    "title": "ReeeCallで始めよう",
+    "description": "今すぐ効率的な学習を体験しましょう",
+    "button": "無料で始める"
+  },
+  "seo": {
+    "listTitle": "学習インサイト | ReeeCall",
+    "listDescription": "科学に基づいた学習戦略と間隔反復のヒントを発見しましょう。",
+    "breadcrumbInsights": "学習インサイト"
+  }
+}
