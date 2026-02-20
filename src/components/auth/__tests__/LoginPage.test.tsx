@@ -14,6 +14,7 @@ vi.mock('react-router-dom', async () => {
 const mockSignIn = vi.fn()
 const mockSignUp = vi.fn()
 const mockResetPassword = vi.fn()
+const mockCheckNicknameAvailability = vi.fn()
 
 vi.mock('../../../stores/auth-store', () => ({
   useAuthStore: (selector: (s: Record<string, unknown>) => unknown) =>
@@ -21,6 +22,7 @@ vi.mock('../../../stores/auth-store', () => ({
       signIn: mockSignIn,
       signUp: mockSignUp,
       resetPassword: mockResetPassword,
+      checkNicknameAvailability: mockCheckNicknameAvailability,
     }),
 }))
 
@@ -96,7 +98,6 @@ describe('Login mode', () => {
 
     await user.click(screen.getByText('signup'))
 
-    // In signup mode, text changes to "이미 계정이 있으신가요?"
     expect(screen.getByText('alreadyHaveAccount')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'signupButton' })).toBeInTheDocument()
   })
@@ -113,44 +114,153 @@ describe('Signup mode', () => {
 
   it('should show signup form after switching', async () => {
     await goToSignup()
-    // Submit button should say 회원가입
     const buttons = screen.getAllByText('signupButton')
     expect(buttons.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('should validate password length < 6', async () => {
-    mockSignUp.mockResolvedValue({ error: null })
+  it('should show nickname check button', async () => {
+    await goToSignup()
+    expect(screen.getByRole('button', { name: 'checkAvailability' })).toBeInTheDocument()
+  })
+
+  it('should show confirm password field', async () => {
+    await goToSignup()
+    expect(screen.getByPlaceholderText('confirmPasswordPlaceholder')).toBeInTheDocument()
+  })
+
+  it('should block signup if nickname not checked', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
     const user = await goToSignup()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), '123')
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TestUser')
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcd123!')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcd123!')
+    await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
-    // Submit button — find the one that's a submit type
-    const submitBtn = screen.getByRole('button', { name: 'signupButton' })
-    await user.click(submitBtn)
-
-    expect(screen.getByText('resetPassword.passwordTooShort')).toBeInTheDocument()
+    expect(screen.getByText('nicknameCheckRequired')).toBeInTheDocument()
     expect(mockSignUp).not.toHaveBeenCalled()
   })
 
-  it('should call signUp and show success message', async () => {
+  it('should show nickname available after check', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'NewUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+
+    expect(await screen.findByTestId('nickname-available')).toBeInTheDocument()
+  })
+
+  it('should show nickname taken after check', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: false, error: null })
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TakenUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+
+    expect(await screen.findByTestId('nickname-taken')).toBeInTheDocument()
+  })
+
+  it('should reset nickname check when nickname changes', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'NewUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+    expect(await screen.findByTestId('nickname-available')).toBeInTheDocument()
+
+    // Change nickname — check should reset
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), '2')
+    expect(screen.queryByTestId('nickname-available')).not.toBeInTheDocument()
+  })
+
+  it('should block signup if password fails rules', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TestUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+    await screen.findByTestId('nickname-available')
+
+    // Password without symbol
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcdefg1')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcdefg1')
+    await user.click(screen.getByRole('button', { name: 'signupButton' }))
+
+    // Error text appears both in the rule indicator and as form error — use getAllByText
+    const matches = screen.getAllByText('passwordRules.needsSymbol')
+    expect(matches.length).toBeGreaterThanOrEqual(1)
+    expect(mockSignUp).not.toHaveBeenCalled()
+  })
+
+  it('should block signup if passwords do not match', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TestUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+    await screen.findByTestId('nickname-available')
+
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcd123!')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcd123?')
+    await user.click(screen.getByRole('button', { name: 'signupButton' }))
+
+    // Mismatch text appears both in real-time indicator and form error
+    const matches = screen.getAllByText('passwordRules.mismatch')
+    expect(matches.length).toBeGreaterThanOrEqual(1)
+    expect(mockSignUp).not.toHaveBeenCalled()
+  })
+
+  it('should show password rule indicator when typing password', async () => {
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'a')
+
+    expect(screen.getByTestId('password-rules')).toBeInTheDocument()
+  })
+
+  it('should show real-time password mismatch warning', async () => {
+    const user = await goToSignup()
+
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcd123!')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcd123?')
+
+    expect(screen.getByTestId('password-mismatch')).toBeInTheDocument()
+  })
+
+  it('should call signUp with valid input and show success', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
     mockSignUp.mockResolvedValue({ error: null })
     const user = await goToSignup()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TestUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+    await screen.findByTestId('nickname-available')
+
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcd123!')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcd123!')
     await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
-    expect(mockSignUp).toHaveBeenCalledWith('a@b.com', 'pass123')
+    expect(mockSignUp).toHaveBeenCalledWith('a@b.com', 'Abcd123!', 'TestUser')
     expect(screen.getByText('emailVerification.title')).toBeInTheDocument()
   })
 
   it('should show error on signUp failure', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
     mockSignUp.mockResolvedValue({ error: new Error('Email taken') })
     const user = await goToSignup()
 
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TestUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+    await screen.findByTestId('nickname-available')
+
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcd123!')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcd123!')
     await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
     expect(screen.getByText('Email taken')).toBeInTheDocument()
@@ -159,7 +269,6 @@ describe('Signup mode', () => {
   it('should switch back to login with "로그인" link', async () => {
     const user = await goToSignup()
     await user.click(screen.getByText('login'))
-    // Should now show login form
     expect(screen.getByText('forgotPasswordLink')).toBeInTheDocument()
   })
 })
@@ -212,6 +321,7 @@ describe('Forgot password mode', () => {
 // ─── Success message view ───────────────────────────────────
 describe('Success message view', () => {
   it('should show "로그인 페이지로 돌아가기" button and switch back', async () => {
+    mockCheckNicknameAvailability.mockResolvedValue({ available: true, error: null })
     mockSignUp.mockResolvedValue({ error: null })
     const user = userEvent.setup()
     renderLogin()
@@ -219,7 +329,12 @@ describe('Success message view', () => {
     // Go to signup and submit
     await user.click(screen.getByText('signup'))
     await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
-    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.type(screen.getByPlaceholderText('nicknamePlaceholder'), 'TestUser')
+    await user.click(screen.getByRole('button', { name: 'checkAvailability' }))
+    await screen.findByTestId('nickname-available')
+
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'Abcd123!')
+    await user.type(screen.getByPlaceholderText('confirmPasswordPlaceholder'), 'Abcd123!')
     await user.click(screen.getByRole('button', { name: 'signupButton' }))
 
     // Now in success view

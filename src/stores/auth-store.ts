@@ -16,6 +16,7 @@ interface AuthState {
   signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<{ error: Error | null }>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
   updatePassword: (password: string) => Promise<{ error: Error | null }>
+  checkNicknameAvailability: (nickname: string) => Promise<{ available: boolean; error: Error | null }>
   signOut: () => Promise<{ error: Error | null }>
 }
 
@@ -165,6 +166,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { error: error ? new Error(error.message) : null }
     } catch (e) {
       return { error: e instanceof Error ? e : new Error(String(e)) }
+    }
+  },
+
+  checkNicknameAvailability: async (nickname: string) => {
+    try {
+      const { data, error } = await supabase.rpc('check_nickname_available', {
+        p_nickname: nickname.trim(),
+      })
+      if (error) return { available: false, error: new Error(error.message) }
+      if (!data) return { available: false, error: new Error('No data returned') }
+      return { available: (data as { available: boolean }).available, error: null }
+    } catch (e) {
+      return { available: false, error: e instanceof Error ? e : new Error(String(e)) }
     }
   },
 

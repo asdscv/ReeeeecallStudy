@@ -14,6 +14,7 @@ const mockSupabase = vi.hoisted(() => ({
     updateUser: vi.fn(),
     signOut: vi.fn(),
   },
+  rpc: vi.fn(),
 }))
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
@@ -343,6 +344,83 @@ describe('updatePassword', () => {
 
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Network error')
+  })
+})
+
+// ─── checkNicknameAvailability ──────────────────────────────
+describe('checkNicknameAvailability', () => {
+  it('should return available:true when nickname is available', async () => {
+    mockSupabase.rpc.mockResolvedValue({
+      data: { available: true },
+      error: null,
+    })
+
+    const result = await useAuthStore.getState().checkNicknameAvailability('NewUser')
+
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('check_nickname_available', {
+      p_nickname: 'NewUser',
+    })
+    expect(result).toEqual({ available: true, error: null })
+  })
+
+  it('should return available:false when nickname is taken', async () => {
+    mockSupabase.rpc.mockResolvedValue({
+      data: { available: false },
+      error: null,
+    })
+
+    const result = await useAuthStore.getState().checkNicknameAvailability('TakenUser')
+
+    expect(result).toEqual({ available: false, error: null })
+  })
+
+  it('should return error when RPC returns an error', async () => {
+    mockSupabase.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'RPC failed' },
+    })
+
+    const result = await useAuthStore.getState().checkNicknameAvailability('Test')
+
+    expect(result.available).toBe(false)
+    expect(result.error).toBeInstanceOf(Error)
+    expect(result.error!.message).toBe('RPC failed')
+  })
+
+  it('should return error when RPC throws', async () => {
+    mockSupabase.rpc.mockRejectedValue(new Error('Network error'))
+
+    const result = await useAuthStore.getState().checkNicknameAvailability('Test')
+
+    expect(result.available).toBe(false)
+    expect(result.error).toBeInstanceOf(Error)
+    expect(result.error!.message).toBe('Network error')
+  })
+
+  it('should return error when data is null', async () => {
+    mockSupabase.rpc.mockResolvedValue({
+      data: null,
+      error: null,
+    })
+
+    const result = await useAuthStore.getState().checkNicknameAvailability('Test')
+
+    expect(result.available).toBe(false)
+    expect(result.error).toBeInstanceOf(Error)
+    expect(result.error!.message).toBe('No data returned')
+  })
+
+  it('should trim the nickname before sending', async () => {
+    mockSupabase.rpc.mockResolvedValue({
+      data: { available: true },
+      error: null,
+    })
+
+    await useAuthStore.getState().checkNicknameAvailability('  Spaced  ')
+
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('check_nickname_available', {
+      p_nickname: 'Spaced',
+    })
   })
 })
 

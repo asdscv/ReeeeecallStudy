@@ -3,21 +3,55 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
 import { localizeAuthError } from '../../lib/auth-errors'
+import { validatePassword, validatePasswordMatch } from '../../lib/password-validation'
 
 type Mode = 'login' | 'signup' | 'forgot'
+
+function PasswordRuleIndicator({ password }: { password: string }) {
+  const { t } = useTranslation('auth')
+  const result = validatePassword(password)
+
+  const rules = [
+    { key: 'passwordRules.tooShort', passed: !result.errors.includes('passwordRules.tooShort') },
+    { key: 'passwordRules.needsLetter', passed: !result.errors.includes('passwordRules.needsLetter') },
+    { key: 'passwordRules.needsNumber', passed: !result.errors.includes('passwordRules.needsNumber') },
+    { key: 'passwordRules.needsSymbol', passed: !result.errors.includes('passwordRules.needsSymbol') },
+  ]
+
+  return (
+    <div className="text-xs space-y-1" data-testid="password-rules">
+      <p className="text-gray-500 font-medium">{t('passwordRules.title')}</p>
+      {rules.map((rule) => (
+        <div key={rule.key} className={`flex items-center gap-1.5 ${rule.passed ? 'text-green-600' : 'text-gray-400'}`}>
+          <span>{rule.passed ? '\u2713' : '\u25CB'}</span>
+          <span>{t(rule.key)}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export function LoginPage() {
   const { t } = useTranslation('auth')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [nickname, setNickname] = useState('')
   const [mode, setMode] = useState<Mode>('login')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+  // Nickname check state
+  const [nicknameChecked, setNicknameChecked] = useState(false)
+  const [nicknameAvailable, setNicknameAvailable] = useState(false)
+  const [nicknameCheckLoading, setNicknameCheckLoading] = useState(false)
+  const [nicknameCheckError, setNicknameCheckError] = useState<string | null>(null)
+
   const signIn = useAuthStore((s) => s.signIn)
   const signUp = useAuthStore((s) => s.signUp)
   const resetPassword = useAuthStore((s) => s.resetPassword)
+  const checkNicknameAvailability = useAuthStore((s) => s.checkNicknameAvailability)
   const navigate = useNavigate()
 
   const switchMode = (newMode: Mode) => {
@@ -25,7 +59,36 @@ export function LoginPage() {
     setError(null)
     setSuccessMessage(null)
     setPassword('')
+    setConfirmPassword('')
     setNickname('')
+    setNicknameChecked(false)
+    setNicknameAvailable(false)
+    setNicknameCheckError(null)
+  }
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value)
+    // Reset check state when nickname changes
+    setNicknameChecked(false)
+    setNicknameAvailable(false)
+    setNicknameCheckError(null)
+  }
+
+  const handleNicknameCheck = async () => {
+    if (!nickname.trim()) return
+    setNicknameCheckLoading(true)
+    setNicknameCheckError(null)
+
+    const { available, error } = await checkNicknameAvailability(nickname)
+    setNicknameCheckLoading(false)
+    setNicknameChecked(true)
+
+    if (error) {
+      setNicknameCheckError(t('nicknameCheckFailed'))
+      setNicknameAvailable(false)
+    } else {
+      setNicknameAvailable(available)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,11 +108,28 @@ export function LoginPage() {
     }
 
     if (mode === 'signup') {
-      if (password.length < 6) {
-        setError(t('resetPassword.passwordTooShort'))
+      // 1. Nickname check required
+      if (!nicknameChecked || !nicknameAvailable) {
+        setError(t('nicknameCheckRequired'))
         setLoading(false)
         return
       }
+
+      // 2. Password rules
+      const pwResult = validatePassword(password)
+      if (!pwResult.valid) {
+        setError(t(pwResult.errors[0]))
+        setLoading(false)
+        return
+      }
+
+      // 3. Password match
+      if (!validatePasswordMatch(password, confirmPassword)) {
+        setError(t('passwordRules.mismatch'))
+        setLoading(false)
+        return
+      }
+
       const { error } = await signUp(email, password, nickname.trim())
       setLoading(false)
       if (error) {
@@ -96,6 +176,13 @@ export function LoginPage() {
   const submitLabel = { login: t('loginButton'), signup: t('signupButton'), forgot: t('sendResetLink') }[mode]
   const loadingLabel = { login: t('loggingIn'), signup: t('signingUp'), forgot: t('sending') }[mode]
 
+  const isSubmitDisabled =
+    loading ||
+    !email ||
+    (mode !== 'forgot' && !password) ||
+    (mode === 'signup' && !nickname.trim()) ||
+    (mode === 'signup' && !confirmPassword)
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full mx-4">
@@ -119,15 +206,37 @@ export function LoginPage() {
             />
 
             {mode === 'signup' && (
-              <input
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder={t('nicknamePlaceholder')}
-                required
-                minLength={1}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
-              />
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => handleNicknameChange(e.target.value)}
+                    placeholder={t('nicknamePlaceholder')}
+                    required
+                    minLength={2}
+                    maxLength={12}
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleNicknameCheck}
+                    disabled={!nickname.trim() || nicknameCheckLoading}
+                    className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer text-sm whitespace-nowrap border border-gray-300"
+                  >
+                    {nicknameCheckLoading ? t('checking') : t('checkAvailability')}
+                  </button>
+                </div>
+                {nicknameChecked && nicknameAvailable && (
+                  <p className="text-xs text-green-600 mt-1" data-testid="nickname-available">{t('nicknameAvailable')}</p>
+                )}
+                {nicknameChecked && !nicknameAvailable && !nicknameCheckError && (
+                  <p className="text-xs text-red-600 mt-1" data-testid="nickname-taken">{t('nicknameTaken')}</p>
+                )}
+                {nicknameCheckError && (
+                  <p className="text-xs text-red-600 mt-1" data-testid="nickname-check-error">{nicknameCheckError}</p>
+                )}
+              </div>
             )}
 
             {mode !== 'forgot' && (
@@ -137,9 +246,28 @@ export function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('passwordPlaceholder')}
                 required
-                minLength={6}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
               />
+            )}
+
+            {mode === 'signup' && password.length > 0 && (
+              <PasswordRuleIndicator password={password} />
+            )}
+
+            {mode === 'signup' && (
+              <div>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={t('confirmPasswordPlaceholder')}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+                />
+                {confirmPassword && !validatePasswordMatch(password, confirmPassword) && (
+                  <p className="text-xs text-red-600 mt-1" data-testid="password-mismatch">{t('passwordRules.mismatch')}</p>
+                )}
+              </div>
             )}
 
             {error && (
@@ -160,7 +288,7 @@ export function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !email || (mode !== 'forgot' && !password) || (mode === 'signup' && !nickname.trim())}
+              disabled={isSubmitDisabled}
               className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               {loading ? loadingLabel : submitLabel}
