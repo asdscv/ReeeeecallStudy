@@ -12,7 +12,7 @@ interface AuthState {
   fetchRole: () => Promise<void>
   isAdmin: () => boolean
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>
   signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<{ error: Error | null }>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
   updatePassword: (password: string) => Promise<{ error: Error | null }>
@@ -120,13 +120,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  signUp: async (email: string, password: string) => {
+  signUp: async (email: string, password: string, displayName: string) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: { display_name: displayName },
         },
       })
       return { error: error ? new Error(error.message) : null }

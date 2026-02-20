@@ -10,6 +10,7 @@ export function LoginPage() {
   const { t } = useTranslation('auth')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [nickname, setNickname] = useState('')
   const [mode, setMode] = useState<Mode>('login')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -24,6 +25,7 @@ export function LoginPage() {
     setError(null)
     setSuccessMessage(null)
     setPassword('')
+    setNickname('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +50,7 @@ export function LoginPage() {
         setLoading(false)
         return
       }
-      const { error } = await signUp(email, password)
+      const { error } = await signUp(email, password, nickname.trim())
       setLoading(false)
       if (error) {
         setError(t(localizeAuthError(error.message) as string))
@@ -116,6 +118,18 @@ export function LoginPage() {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
             />
 
+            {mode === 'signup' && (
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder={t('nicknamePlaceholder')}
+                required
+                minLength={1}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+              />
+            )}
+
             {mode !== 'forgot' && (
               <input
                 type="password"
@@ -146,7 +160,7 @@ export function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !email || (mode !== 'forgot' && !password)}
+              disabled={loading || !email || (mode !== 'forgot' && !password) || (mode === 'signup' && !nickname.trim())}
               className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               {loading ? loadingLabel : submitLabel}

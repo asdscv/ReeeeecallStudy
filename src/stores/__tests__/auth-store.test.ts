@@ -162,16 +162,17 @@ describe('signIn', () => {
 
 // ─── signUp ─────────────────────────────────────────────────
 describe('signUp', () => {
-  it('should call signUp with email, password, and redirectTo', async () => {
+  it('should call signUp with email, password, displayName, and redirectTo', async () => {
     mockSupabase.auth.signUp.mockResolvedValue({ error: null })
 
-    await useAuthStore.getState().signUp('a@b.com', 'pass123')
+    await useAuthStore.getState().signUp('a@b.com', 'pass123', 'TestUser')
 
     expect(mockSupabase.auth.signUp).toHaveBeenCalledWith({
       email: 'a@b.com',
       password: 'pass123',
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: { display_name: 'TestUser' },
       },
     })
   })
@@ -179,7 +180,7 @@ describe('signUp', () => {
   it('should return null error on success', async () => {
     mockSupabase.auth.signUp.mockResolvedValue({ error: null })
 
-    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123')
+    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123', 'TestUser')
 
     expect(error).toBeNull()
   })
@@ -189,7 +190,7 @@ describe('signUp', () => {
       error: { message: 'Email taken' },
     })
 
-    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123')
+    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123', 'TestUser')
 
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Email taken')
@@ -198,7 +199,7 @@ describe('signUp', () => {
   it('should return Error when signUp throws', async () => {
     mockSupabase.auth.signUp.mockRejectedValue(new Error('Network error'))
 
-    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123')
+    const { error } = await useAuthStore.getState().signUp('a@b.com', 'pass123', 'TestUser')
 
     expect(error).toBeInstanceOf(Error)
     expect(error!.message).toBe('Network error')
