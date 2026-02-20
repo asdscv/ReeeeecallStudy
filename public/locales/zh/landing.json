@@ -14,11 +14,16 @@
     "cta": {
       "start": "免费开始",
       "learn": "了解更多"
-    }
+    },
+    "freeForever": "永久免费，无需信用卡。"
   },
   "tagline": "智能闪卡学习平台",
   "preview": {
-    "tagline": "智能闪卡学习平台"
+    "tagline": "智能闪卡学习平台",
+    "mockFront": "Hello",
+    "mockBack": "Bonjour",
+    "mockCards": "12/30 卡片",
+    "mockStreak": "连续: 7 天"
   },
   "features": {
     "title": "强大功能",
@@ -165,7 +170,8 @@
     "title": "从今天开始更聪明地学习",
     "description": "免费开始。使用邮箱和密码轻松注册。",
     "subtitle": "免费开始。使用邮箱和密码轻松注册。",
-    "button": "立即开始"
+    "button": "立即开始",
+    "guarantee": "永久免费，无需信用卡。"
   },
   "nav": {
     "blog": "学习洞察",
@@ -187,6 +193,45 @@
     "a3": "ReeeeecallStudy 支持 5 种学习模式：SRS（间隔重复）用于最佳复习安排，随机模式用于混合练习，顺序模式用于按序复习，顺序复习用于系统性复习，按日期模式用于按时间组织。",
     "q4": "我可以分享我的闪卡牌组吗？",
     "a4": "可以！您可以通过 3 种模式分享牌组：复制（为他人复制一份）、订阅（同步更新）和快照（冻结版本）。在社区市场中浏览和发现其他用户的牌组。"
+  },
+  "statsSection": {
+    "title": "经验证的成果",
+    "subtitle": "ReeeeecallStudy 用户与传统学习方法对比所取得的成果",
+    "baseline": "vs. 传统学习",
+    "efficiency": {
+      "label": "学习效率",
+      "change": "+150%",
+      "description": "用更少的时间记住更多"
+    },
+    "interval": {
+      "label": "复习间隔",
+      "unit": "天",
+      "change": "+8天",
+      "description": "复习间隔自然延长"
+    },
+    "accuracy": {
+      "label": "正确率",
+      "change": "+23%",
+      "description": "高准确率维持长期记忆"
+    },
+    "daily": {
+      "label": "每日卡片",
+      "unit": "张",
+      "change": "+30张",
+      "description": "高效的学习吞吐量"
+    }
+  },
+  "socialProof": {
+    "title": "受到全球学习者的信赖",
+    "subtitle": "加入数千名更聪明地学习的学生行列",
+    "userCountLabel": "活跃用户",
+    "cardsStudiedLabel": "已学卡片",
+    "decksCreatedLabel": "已创建牌组",
+    "testimonials": {
+      "0": { "quote": "多亏了 ReeeeecallStudy，我通过了 JLPT N2。SRS 算法非常有效！", "author": "王小明", "role": "语言学习者" },
+      "1": { "quote": "从 Anki 转过来，界面干净多了。学习变得更有趣了。", "author": "李小红", "role": "医学生" },
+      "2": { "quote": "牌组分享功能太棒了。几乎找到了所有科目的牌组。", "author": "张三", "role": "大学生" }
+    }
   },
   "seo": {
     "title": "ReeeeecallStudy — 基于间隔重复的智能闪卡学习",

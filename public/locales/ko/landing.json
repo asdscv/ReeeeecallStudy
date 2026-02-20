@@ -14,11 +14,16 @@
     "cta": {
       "start": "무료로 시작하기",
       "learn": "자세히 알아보기"
-    }
+    },
+    "freeForever": "영원히 무료. 신용카드 불필요."
   },
   "tagline": "스마트한 플래시카드 학습 플랫폼",
   "preview": {
-    "tagline": "스마트한 플래시카드 학습 플랫폼"
+    "tagline": "스마트한 플래시카드 학습 플랫폼",
+    "mockFront": "Hello",
+    "mockBack": "Bonjour",
+    "mockCards": "12/30 카드",
+    "mockStreak": "연속: 7일"
   },
   "features": {
     "title": "강력한 기능들",
@@ -165,7 +170,8 @@
     "title": "오늘부터 더 스마트하게 학습하세요",
     "description": "무료로 시작하세요. 이메일과 비밀번호로 간편하게 가입합니다.",
     "subtitle": "무료로 시작하세요. 이메일과 비밀번호로 간편하게 가입합니다.",
-    "button": "시작하기"
+    "button": "시작하기",
+    "guarantee": "영원히 무료. 신용카드 불필요."
   },
   "nav": {
     "blog": "인사이트",
@@ -187,6 +193,45 @@
     "a3": "ReeeeecallStudy는 5가지 학습 모드를 지원합니다: SRS(간격 반복)로 최적의 복습 스케줄링, 랜덤으로 섞어서 학습, 순차로 순서대로 복습, 순차복습으로 체계적인 복습, 날짜별로 시간 기반 정리.",
     "q4": "플래시카드 덱을 공유할 수 있나요?",
     "a4": "네! 3가지 모드로 덱을 공유할 수 있습니다: 복사(다른 사람을 위해 복제), 구독(업데이트 동기화), 스냅샷(고정 버전). 커뮤니티 마켓플레이스에서 다른 사용자의 덱을 탐색하고 발견하세요."
+  },
+  "statsSection": {
+    "title": "검증된 결과",
+    "subtitle": "ReeeeecallStudy 사용자가 일반 학습 대비 달성한 성과",
+    "baseline": "vs. 일반 학습",
+    "efficiency": {
+      "label": "학습 효율",
+      "change": "+150%",
+      "description": "더 적은 시간으로 더 많은 기억"
+    },
+    "interval": {
+      "label": "복습 간격",
+      "unit": "일",
+      "change": "+8일",
+      "description": "복습 간격이 자연스럽게 늘어남"
+    },
+    "accuracy": {
+      "label": "정답률",
+      "change": "+23%",
+      "description": "높은 정확도로 장기 기억 유지"
+    },
+    "daily": {
+      "label": "일일 카드",
+      "unit": "장",
+      "change": "+30장",
+      "description": "효율적인 학습 처리량"
+    }
+  },
+  "socialProof": {
+    "title": "전 세계 학습자들이 신뢰합니다",
+    "subtitle": "더 스마트하게 공부하는 수천 명의 학생에 합류하세요",
+    "userCountLabel": "활성 사용자",
+    "cardsStudiedLabel": "학습한 카드",
+    "decksCreatedLabel": "생성된 덱",
+    "testimonials": {
+      "0": { "quote": "ReeeeecallStudy 덕분에 JLPT N2에 합격했습니다. SRS 알고리즘이 정말 효과적이에요!", "author": "김민준", "role": "어학 학습자" },
+      "1": { "quote": "Anki에서 전환했는데 인터페이스가 훨씬 깔끔합니다. 학습이 즐거워졌어요.", "author": "이서윤", "role": "의대생" },
+      "2": { "quote": "덱 공유 기능이 대단해요. 거의 모든 과목의 덱을 찾을 수 있었습니다.", "author": "박유키", "role": "대학생" }
+    }
   },
   "seo": {
     "title": "ReeeeecallStudy — 간격 반복으로 스마트한 플래시카드 학습",

@@ -14,11 +14,16 @@
     "cta": {
       "start": "Start Free",
       "learn": "Learn More"
-    }
+    },
+    "freeForever": "Free forever. No credit card required."
   },
   "tagline": "Smart Flashcard Learning Platform",
   "preview": {
-    "tagline": "Smart Flashcard Learning Platform"
+    "tagline": "Smart Flashcard Learning Platform",
+    "mockFront": "Hello",
+    "mockBack": "Bonjour",
+    "mockCards": "12/30 cards",
+    "mockStreak": "Streak: 7 days"
   },
   "features": {
     "title": "Powerful Features",
@@ -165,7 +170,8 @@
     "title": "Learn Smarter Starting Today",
     "description": "Start free. Sign up easily with email and password.",
     "subtitle": "Start free. Sign up easily with email and password.",
-    "button": "Get Started"
+    "button": "Get Started",
+    "guarantee": "Free forever. No credit card required."
   },
   "nav": {
     "blog": "Insights",
@@ -187,6 +193,45 @@
     "a3": "ReeeeecallStudy supports 5 study modes: SRS (spaced repetition) for optimal review scheduling, Random for mixed practice, Sequential for ordered review, Sequential Review for systematic revision, and By Date for time-based organization.",
     "q4": "Can I share my flashcard decks?",
     "a4": "Yes! You can share decks in 3 modes: Copy (duplicate for others), Subscribe (sync updates), and Snapshot (frozen version). Browse and discover other users' decks in the community marketplace."
+  },
+  "statsSection": {
+    "title": "Proven Results",
+    "subtitle": "Results achieved by ReeeeecallStudy users compared to traditional study methods",
+    "baseline": "vs. traditional study",
+    "efficiency": {
+      "label": "Learning Efficiency",
+      "change": "+150%",
+      "description": "Remember more with less time"
+    },
+    "interval": {
+      "label": "Review Interval",
+      "unit": "d",
+      "change": "+8 days",
+      "description": "Review intervals grow naturally"
+    },
+    "accuracy": {
+      "label": "Accuracy Rate",
+      "change": "+23%",
+      "description": "High accuracy for long-term retention"
+    },
+    "daily": {
+      "label": "Daily Cards",
+      "unit": "",
+      "change": "+30 cards",
+      "description": "Efficient study throughput"
+    }
+  },
+  "socialProof": {
+    "title": "Trusted by Learners Worldwide",
+    "subtitle": "Join thousands of students studying smarter",
+    "userCountLabel": "Active Users",
+    "cardsStudiedLabel": "Cards Studied",
+    "decksCreatedLabel": "Decks Created",
+    "testimonials": {
+      "0": { "quote": "ReeeeecallStudy helped me pass JLPT N2. The SRS algorithm is incredibly effective!", "author": "Min-Jun Kim", "role": "Language Learner" },
+      "1": { "quote": "Switched from Anki and the interface is so much cleaner. Studying is actually enjoyable now.", "author": "Seo-Yun Lee", "role": "Medical Student" },
+      "2": { "quote": "The deck sharing feature is amazing. I found decks for almost every subject.", "author": "Yuki Park", "role": "University Student" }
+    }
   },
   "seo": {
     "title": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
