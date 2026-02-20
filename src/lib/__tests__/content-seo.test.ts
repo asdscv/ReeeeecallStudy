@@ -33,7 +33,7 @@ const mockArticle: ContentDetail = {
   meta_title: 'Test Article | ReeeeecallStudy',
   meta_description: 'Test description',
   og_image_url: 'https://example.com/og.jpg',
-  canonical_url: 'https://reeeeecallstudy.com/content/test-article',
+  canonical_url: 'https://reeeeecallstudy.xyz/content/test-article',
   author_name: 'ReeeeecallStudy',
   is_published: true,
   published_at: '2025-01-01T00:00:00Z',

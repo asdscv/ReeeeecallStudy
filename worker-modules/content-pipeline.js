@@ -136,7 +136,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
   }
 
   // Build DB record
-  const SITE_URL = 'https://reeeeecallstudy.com'
+  const SITE_URL = 'https://reeeeecallstudy.xyz'
   const record = {
     title: article.title,
     subtitle: article.subtitle || null,

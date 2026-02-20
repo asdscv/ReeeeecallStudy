@@ -41,4 +41,4 @@ Allow: /landing
 Allow: /content
 Allow: /content/*
 
-Sitemap: https://reeeeecallstudy.com/sitemap.xml
+Sitemap: https://reeeeecallstudy.xyz/sitemap.xml

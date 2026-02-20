@@ -1,7 +1,7 @@
 // Cloudflare Worker — API 프록시 + SPA fallback + SEO 프리렌더링 + AI 콘텐츠 생성
 import { runContentPipeline } from './worker-modules/content-pipeline.js'
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
-const SITE_URL = 'https://reeeeecallstudy.com'
+const SITE_URL = 'https://reeeeecallstudy.xyz'
 const BRAND_NAME = 'ReeeeecallStudy'
 const TWITTER_HANDLE = '@reeeeecallstudy'
 
