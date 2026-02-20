@@ -15,6 +15,7 @@ interface SEOHeadProps {
   articleSection?: string
   keywords?: string[]
   articleTags?: string[]
+  articleAuthor?: string
   noIndex?: boolean
 }
 

@@ -8,6 +8,7 @@ export const SEO = {
   OG_IMAGE_HEIGHT: 630,
   THEME_COLOR: '#2563eb',
   AUTHOR_NAME: 'ReeeeecallStudy',
+  CONTACT_EMAIL: 'admin@reeeeecallstudy.xyz',
   DEFAULT_LOCALE: 'en',
   SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja'] as const,
 } as const

@@ -75,6 +75,7 @@ export function ContentDetailPage() {
         articleSection={currentArticle.tags?.[0]}
         keywords={currentArticle.tags}
         articleTags={currentArticle.tags}
+        articleAuthor={currentArticle.author_name || SEO.AUTHOR_NAME}
       />
       <ContentNav
         backTo="/content"

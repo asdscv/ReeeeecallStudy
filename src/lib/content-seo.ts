@@ -168,6 +168,7 @@ export function buildOrganizationJsonLd() {
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
+      email: SEO.CONTACT_EMAIL,
       availableLanguage: SEO.SUPPORTED_LOCALES.map((l) => LOCALE_TO_LANGUAGE[l] ?? l),
     },
   }
