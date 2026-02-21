@@ -7,6 +7,7 @@ import { BlockRenderer } from '../components/content/BlockRenderer'
 import { ContentDetailSkeleton } from '../components/content/ContentDetailSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
 import { SEOHead } from '../components/content/SEOHead'
+import { FooterSection } from '../components/landing/FooterSection'
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates, buildLearningResourceJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 
@@ -86,20 +87,7 @@ export function ContentDetailPage() {
         <BlockRenderer blocks={currentArticle.content_blocks} />
       </article>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <img src="/favicon.png" alt="" className="w-7 h-7" />
-              <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-5 sm:h-6 object-contain" />
-            </div>
-            <p className="text-sm text-gray-400">
-              {t('landing:footer.copyright')}
-            </p>
-          </div>
-        </div>
-      </footer>
+      <FooterSection />
     </div>
   )
 }

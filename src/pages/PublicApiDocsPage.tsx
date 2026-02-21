@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { DocsNav, DocsFooter, ApiDocsContent } from '../components/api-docs'
+import { DocsNav, ApiDocsContent } from '../components/api-docs'
+import { FooterSection } from '../components/landing/FooterSection'
 
 export function PublicApiDocsPage() {
   const { t } = useTranslation('api-docs')
@@ -22,7 +23,7 @@ export function PublicApiDocsPage() {
         </div>
       </main>
 
-      <DocsFooter />
+      <FooterSection />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { ContentCard } from '../components/content/ContentCard'
 import { ContentSkeleton } from '../components/content/ContentSkeleton'
 import { ContentNav } from '../components/content/ContentNav'
 import { SEOHead } from '../components/content/SEOHead'
+import { FooterSection } from '../components/landing/FooterSection'
 import { buildCollectionPageJsonLd, buildOrganizationJsonLd, buildStaticHreflangAlternates } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 
@@ -83,6 +84,8 @@ export function ContentListPage() {
           )}
         </div>
       </main>
+
+      <FooterSection />
     </div>
   )
 }
