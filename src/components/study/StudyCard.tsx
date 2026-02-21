@@ -58,6 +58,8 @@ export function StudyCard({
   const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
   /** Suppress click immediately after a successful swipe */
   const swipedRef = useRef(false)
+  /** Ref for the card body div — used to attach non-passive touchmove listener */
+  const cardBodyRef = useRef<HTMLDivElement | null>(null)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
 
@@ -73,6 +75,22 @@ export function StudyCard({
       setIsSwiping(false)
     }
   }, [card.id])
+
+  // ── Non-passive touchmove: prevent Safari back-gesture during swipe ──
+  useEffect(() => {
+    const el = cardBodyRef.current
+    if (!el) return
+    function onTouchMove(e: TouchEvent) {
+      // Only preventDefault when we've committed to a swipe gesture.
+      // This lets card-content scrolling work normally.
+      if (committedRef.current === 'swipe') {
+        e.preventDefault()
+      }
+    }
+    // Must be { passive: false } so preventDefault() works on Safari
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => el.removeEventListener('touchmove', onTouchMove)
+  })
 
   // Resolve card face content
   const frontFace = useMemo(
@@ -209,6 +227,7 @@ export function StudyCard({
             style={{ perspective: '1000px' }}
           >
             <motion.div
+              ref={cardBodyRef}
               animate={{ rotateY: isFlipped ? 180 : 0 }}
               transition={{ duration: 0.4 }}
               style={{
@@ -218,7 +237,9 @@ export function StudyCard({
                   : undefined,
                 touchAction,
                 userSelect: isSwiping ? 'none' : 'auto',
-              }}
+                WebkitUserSelect: isSwiping ? 'none' : 'auto',
+                WebkitTouchCallout: 'none',
+              } as React.CSSProperties}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative"
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
@@ -237,8 +258,9 @@ export function StudyCard({
                   style={{
                     backgroundColor: preview.color,
                     backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
-                  }}
+                  } as React.CSSProperties}
                 >
                   <span
                     className="text-2xl font-bold text-white drop-shadow-md"
@@ -250,18 +272,26 @@ export function StudyCard({
               )}
 
               {/*
-                Card face architecture:
-                - Outer div: 3D layer (backface-visibility, transform, overflow-hidden)
-                  overflow-hidden creates a stacking context so backface-visibility
-                  properly hides ALL children when the face rotates away.
+                Card face architecture (Safari-compatible):
+                - Outer div: 3D layer (backface-visibility, transform, clip-path)
+                  clip-path clips content to rounded bounds without blocking Safari
+                  child scroll (unlike overflow:hidden). translateZ(0) on front face
+                  ensures Safari respects backface-visibility:hidden.
                 - Inner div: scroll layer (overflow-y-auto, no transform)
                   Separated from 3D transform so mobile touch scroll works.
+                - Non-passive touchmove listener on card body: e.preventDefault()
+                  only when committedRef === 'swipe' to block Safari back-gesture.
               */}
 
               {/* ═══ Front Face ═══ */}
               <div
-                className="absolute inset-0 rounded-2xl overflow-hidden"
-                style={{ backfaceVisibility: 'hidden' }}
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  transform: 'translateZ(0)',  // Safari needs explicit 3D transform for backface-visibility
+                  clipPath: 'inset(0 round 16px)',  // clips content without blocking Safari child scroll (unlike overflow:hidden)
+                } as React.CSSProperties}
               >
                 {/* Decorative header — fixed above scroll */}
                 {frontRender.mode !== 'custom' && (
@@ -275,7 +305,10 @@ export function StudyCard({
                 {/* Scroll layer — no CSS transform → mobile touch scroll works */}
                 <div
                   className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
+                  style={{
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehavior: 'none',
+                  }}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center">
                     {frontRender.mode === 'custom' ? (
@@ -305,8 +338,13 @@ export function StudyCard({
 
               {/* ═══ Back Face ═══ */}
               <div
-                className="absolute inset-0 rounded-2xl overflow-hidden"
-                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                className="absolute inset-0 rounded-2xl"
+                style={{
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg)',
+                  clipPath: 'inset(0 round 16px)',  // clips content without blocking Safari child scroll
+                } as React.CSSProperties}
               >
                 {/* Decorative header — fixed above scroll */}
                 {backRender.mode !== 'custom' && (
@@ -320,7 +358,10 @@ export function StudyCard({
                 {/* Scroll layer — no CSS transform → mobile touch scroll works */}
                 <div
                   className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
+                  style={{
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehavior: 'none',
+                  }}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center">
                     {backRender.mode === 'custom' ? (
