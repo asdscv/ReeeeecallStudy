@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Brain, Lock, Globe, Smartphone, Download } from 'lucide-react'
+import { Brain, Share2, Globe, Smartphone, Upload } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 
 const BADGES = [
@@ -13,9 +13,9 @@ const BADGES = [
     hoverGlow: 'hover:shadow-blue-100',
   },
   {
-    key: 'privacy',
-    icon: Lock,
-    label: 'Privacy First',
+    key: 'sharing',
+    icon: Share2,
+    label: 'Deck Sharing',
     iconBg: 'bg-violet-100',
     iconColor: 'text-violet-500',
     borderColor: 'border-violet-200/60',
@@ -40,9 +40,9 @@ const BADGES = [
     hoverGlow: 'hover:shadow-emerald-100',
   },
   {
-    key: 'export',
-    icon: Download,
-    label: 'Export Anytime',
+    key: 'import',
+    icon: Upload,
+    label: 'CSV & API Import',
     iconBg: 'bg-orange-100',
     iconColor: 'text-orange-500',
     borderColor: 'border-orange-200/60',

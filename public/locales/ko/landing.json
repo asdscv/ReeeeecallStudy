@@ -185,10 +185,10 @@
   },
   "trustBadges": {
     "srs": "스마트 SRS",
-    "privacy": "개인정보 보호",
+    "sharing": "덱 공유",
     "languages": "4개 언어",
     "allDevices": "모든 기기",
-    "export": "언제든 내보내기"
+    "import": "CSV & API 업로드"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",

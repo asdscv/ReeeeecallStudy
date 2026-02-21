@@ -185,10 +185,10 @@
   },
   "trustBadges": {
     "srs": "智能SRS",
-    "privacy": "隐私优先",
+    "sharing": "牌组共享",
     "languages": "4种语言",
     "allDevices": "全设备支持",
-    "export": "随时导出"
+    "import": "CSV & API导入"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
