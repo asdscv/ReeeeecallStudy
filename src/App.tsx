@@ -65,27 +65,14 @@ function App() {
       <PageTracker />
       <Toaster richColors position="top-right" />
       <Routes>
-        {/* Landing page (public) */}
-        <Route path="/landing" element={<LandingPage />} />
-
-        {/* Root: authenticated → dashboard, otherwise → redirect to landing */}
-        <Route
-          path="/"
-          element={user ? (
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          ) : (
-            <Navigate to="/landing" replace />
-          )}
-        >
-          {user && <Route index element={<DashboardPage />} />}
-        </Route>
+        {/* Root: always landing page (SEO-friendly, single canonical URL) */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/landing" element={<Navigate to="/" replace />} />
 
         {/* Auth routes */}
         <Route
           path="/auth/login"
-          element={user ? <Navigate to="/" replace /> : <LoginPage />}
+          element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
@@ -113,6 +100,7 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/quick-study" element={<QuickStudyPage />} />
           <Route path="/history" element={<StudyHistoryPage />} />
           <Route path="/history/detail" element={<SessionDetailPage />} />
@@ -152,7 +140,7 @@ function App() {
         </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to={user ? '/' : '/landing'} replace />} />
+        <Route path="*" element={<Navigate to={user ? '/dashboard' : '/'} replace />} />
       </Routes>
     </BrowserRouter>
   )

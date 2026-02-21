@@ -11,7 +11,7 @@ export function DocsNav() {
       <div className="max-w-4xl mx-auto px-4 flex items-center justify-between py-3 sm:py-4">
         <div
           className="flex items-center gap-2.5 cursor-pointer"
-          onClick={() => navigate('/landing')}
+          onClick={() => navigate('/')}
         >
           <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10" />
           <span className="font-bold text-gray-900 text-lg sm:text-xl">ReeeeecallStudy</span>

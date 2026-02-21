@@ -65,10 +65,10 @@ export function LandingPage() {
         description={t('seo.description')}
         ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
-        canonicalUrl={`${SEO.SITE_URL}/landing`}
+        canonicalUrl={SEO.SITE_URL}
         jsonLd={landingSchemas}
         keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
-        hreflangAlternates={buildStaticHreflangAlternates('/landing')}
+        hreflangAlternates={buildStaticHreflangAlternates('/')}
       />
       <ScrollProgress />
       <LandingNav />

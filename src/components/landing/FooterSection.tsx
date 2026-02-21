@@ -81,22 +81,22 @@ export function FooterSection() {
               </h4>
               <ul className="space-y-2 list-none p-0 m-0">
                 <li>
-                  <a href="/landing#features" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/#features" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
                     {t('footer.features', 'Features')}
                   </a>
                 </li>
                 <li>
-                  <a href="/landing#stats" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/#stats" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
                     {t('footer.results', 'Results')}
                   </a>
                 </li>
                 <li>
-                  <a href="/landing#how-it-works" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/#how-it-works" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
                     {t('footer.howItWorks', 'How It Works')}
                   </a>
                 </li>
                 <li>
-                  <a href="/landing#faq" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/#faq" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
                     {t('footer.faq', 'FAQ')}
                   </a>
                 </li>

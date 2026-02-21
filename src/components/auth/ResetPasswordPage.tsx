@@ -45,7 +45,7 @@ export function ResetPasswordPage() {
       setError(t(localizeAuthError(error.message)))
     } else {
       toast.success(t('resetPassword.success'))
-      navigate('/', { replace: true })
+      navigate('/dashboard', { replace: true })
     }
   }
 
@@ -56,7 +56,7 @@ export function ResetPasswordPage() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <Link to="/landing" aria-label="landing">
+            <Link to="/" aria-label="landing">
               <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
             </Link>
             <h2 className="text-xl font-bold text-gray-900">{t('resetPassword.title')}</h2>

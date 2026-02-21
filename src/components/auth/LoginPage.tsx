@@ -145,7 +145,7 @@ export function LoginPage() {
     if (error) {
       setError(t(localizeAuthError(error.message) as string))
     } else {
-      navigate('/', { replace: true })
+      navigate('/dashboard', { replace: true })
     }
   }
 
@@ -188,7 +188,7 @@ export function LoginPage() {
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           <div className="text-center mb-6 sm:mb-8">
-            <Link to="/landing" className="inline-block no-underline">
+            <Link to="/" className="inline-block no-underline">
               <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
               <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
             </Link>

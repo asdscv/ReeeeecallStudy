@@ -37,7 +37,7 @@ export function ContentListPage() {
         keywords={['spaced repetition', 'learning strategies', 'study tips', 'flashcards', 'active recall', 'memory techniques']}
         hreflangAlternates={buildStaticHreflangAlternates('/content')}
       />
-      <ContentNav backTo="/landing" />
+      <ContentNav backTo="/" />
 
       <main className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
         <div className="text-center mb-10 sm:mb-14 pb-12">

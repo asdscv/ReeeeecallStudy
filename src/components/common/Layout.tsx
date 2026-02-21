@@ -14,7 +14,7 @@ export function Layout() {
 
   const navItems: NavItem[] = [
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
-    { kind: 'link', path: '/', label: t('nav.dashboard'), icon: '📊' },
+    { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: '📊' },
     { kind: 'group', label: t('nav.study'), icon: '📚', children: [
       { path: '/decks', label: t('nav.decks'), icon: '📚' },
       { path: '/templates', label: t('nav.cards'), icon: '📋' },
@@ -31,7 +31,7 @@ export function Layout() {
   const desktopNavRef = useRef<HTMLElement>(null)
 
   const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/'
+    if (path === '/dashboard') return location.pathname === '/dashboard'
     return location.pathname.startsWith(path)
   }
 
@@ -73,7 +73,7 @@ export function Layout() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="shrink-0 no-underline flex items-center gap-2">
+          <Link to="/dashboard" className="shrink-0 no-underline flex items-center gap-2">
             <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10 object-contain" />
             <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 sm:h-11 object-contain" />
           </Link>

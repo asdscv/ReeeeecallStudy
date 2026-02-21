@@ -52,7 +52,7 @@ export function AuthCallback() {
           // Hash-based fallback: SIGNED_IN fired but hash says recovery
           safeNavigate('/auth/reset-password')
         } else {
-          safeNavigate('/')
+          safeNavigate('/dashboard')
         }
       } else if (event === 'INITIAL_SESSION') {
         if (isRecovery && session) {

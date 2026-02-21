@@ -39,7 +39,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function main() {
   const staticPages = [
-    { loc: `${SITE_URL}/landing`, changefreq: 'weekly' as const, priority: 1.0 },
+    { loc: SITE_URL, changefreq: 'weekly' as const, priority: 1.0 },
     { loc: `${SITE_URL}/content`, changefreq: 'daily' as const, priority: 0.9 },
   ]
 
