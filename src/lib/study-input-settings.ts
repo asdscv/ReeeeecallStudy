@@ -267,6 +267,26 @@ export function previewSwipeAction(
   return { action, direction, progress, color, label }
 }
 
+// ── Touch Action ─────────────────────────────────────
+
+/**
+ * Compute the CSS `touch-action` value based on configured swipe directions.
+ *
+ * - Horizontal-only (left/right): `pan-y` → allows vertical card-content scroll
+ * - Vertical-only (up/down):      `pan-x` → allows horizontal card-content scroll
+ * - Both axes:                     `none`  → full gesture control, no scroll
+ * - No directions / inactive:      `auto`  → normal browser behaviour
+ */
+export function computeTouchAction(dirs: SwipeDirectionMap, isSwipeActive: boolean): string {
+  if (!isSwipeActive) return 'auto'
+  const hasH = !!dirs.left || !!dirs.right
+  const hasV = !!dirs.up || !!dirs.down
+  if (hasH && hasV) return 'none'
+  if (hasH) return 'pan-y'
+  if (hasV) return 'pan-x'
+  return 'auto'
+}
+
 export function getActionColor(action: SwipeAction, opacity: number): string {
   const template = ACTION_COLORS[action]
   if (!template) return 'transparent'

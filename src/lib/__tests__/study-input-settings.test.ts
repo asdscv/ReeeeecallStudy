@@ -16,6 +16,7 @@ import {
   DEAD_ZONE,
   SWIPE_VELOCITY_THRESHOLD,
   SWIPE_VELOCITY_DISTANCE,
+  computeTouchAction,
   type StudyInputSettings,
   type SwipeDirectionMap,
 } from '../study-input-settings'
@@ -395,5 +396,44 @@ describe('previewSwipeAction', () => {
     const result = previewSwipeAction(60, 0, dirs)
     expect(result!.color).toContain('rgba')
     expect(result!.color).not.toBe('transparent')
+  })
+})
+
+// ── Touch Action ────────────────────────────────────
+
+describe('computeTouchAction', () => {
+  it('returns auto when inactive', () => {
+    const dirs: SwipeDirectionMap = { left: 'again', right: 'good', up: 'hard', down: 'easy' }
+    expect(computeTouchAction(dirs, false)).toBe('auto')
+  })
+
+  it('returns pan-y for horizontal-only swipe', () => {
+    const dirs: SwipeDirectionMap = { left: 'again', right: 'good', up: '', down: '' }
+    expect(computeTouchAction(dirs, true)).toBe('pan-y')
+  })
+
+  it('returns pan-x for vertical-only swipe', () => {
+    const dirs: SwipeDirectionMap = { left: '', right: '', up: 'hard', down: 'easy' }
+    expect(computeTouchAction(dirs, true)).toBe('pan-x')
+  })
+
+  it('returns none for four-direction swipe', () => {
+    const dirs: SwipeDirectionMap = { left: 'again', right: 'good', up: 'hard', down: 'easy' }
+    expect(computeTouchAction(dirs, true)).toBe('none')
+  })
+
+  it('returns none for mixed axes (left + up)', () => {
+    const dirs: SwipeDirectionMap = { left: 'again', right: '', up: 'hard', down: '' }
+    expect(computeTouchAction(dirs, true)).toBe('none')
+  })
+
+  it('returns auto when no directions configured', () => {
+    const dirs: SwipeDirectionMap = { left: '', right: '', up: '', down: '' }
+    expect(computeTouchAction(dirs, true)).toBe('auto')
+  })
+
+  it('returns pan-y for single horizontal direction', () => {
+    const dirs: SwipeDirectionMap = { left: 'again', right: '', up: '', down: '' }
+    expect(computeTouchAction(dirs, true)).toBe('pan-y')
   })
 })

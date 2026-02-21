@@ -11,6 +11,7 @@ import {
   resolveSwipeAction,
   previewSwipeAction,
   buildSwipeHintText,
+  computeTouchAction,
   type StudyInputSettings,
   type SwipePreview,
 } from '../../lib/study-input-settings'
@@ -149,8 +150,14 @@ export function StudyCard({
   const dragTranslateX = pointerOrigin ? swipeDelta.x * DAMPEN : 0
   const dragTranslateY = pointerOrigin ? swipeDelta.y * DAMPEN : 0
 
+  // Smart touch-action: allows card-content scrolling on the non-swipe axis
+  const touchAction = computeTouchAction(
+    inputSettings?.directions ?? { left: '', right: '', up: '', down: '' },
+    swipeEnabled && isFlipped,
+  )
+
   return (
-    <div className="flex-1 flex items-center justify-center p-2 sm:p-4">
+    <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
       <div className="w-full max-w-2xl">
         {/*
           mode="popLayout": old card is removed from flow immediately, exits
@@ -175,7 +182,7 @@ export function StudyCard({
                 transform: pointerOrigin
                   ? `rotateY(${isFlipped ? 180 : 0}deg) translate(${dragTranslateX}px, ${dragTranslateY}px)`
                   : undefined,
-                touchAction: (swipeEnabled && isFlipped) ? 'none' : 'auto',
+                touchAction,
                 userSelect: pointerOrigin ? 'none' : 'auto',
               }}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative"
@@ -216,7 +223,7 @@ export function StudyCard({
               {/* Front Face — faces viewer when rotateY is 0 */}
               <div
                 className="absolute inset-0 p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto rounded-2xl"
-                style={{ backfaceVisibility: 'hidden' }}
+                style={{ backfaceVisibility: 'hidden', overscrollBehavior: 'contain' }}
               >
                 {frontRender.mode !== 'custom' && (
                   <>
@@ -257,6 +264,7 @@ export function StudyCard({
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
+                  overscrollBehavior: 'contain',
                 }}
               >
                 {backRender.mode !== 'custom' && (
