@@ -323,17 +323,17 @@ describe('resolveSwipeAction', () => {
   // ── Velocity-based detection ──────────────────────────
 
   it('triggers swipe at reduced distance with high velocity', () => {
-    // Below normal threshold (50) but above velocity distance (25)
-    // velocity >= SWIPE_VELOCITY_THRESHOLD (0.4 px/ms)
-    const result = resolveSwipeAction(30, 0, dirs, undefined, 0.5)
+    // Below normal threshold but above SWIPE_VELOCITY_DISTANCE
+    // velocity >= SWIPE_VELOCITY_THRESHOLD
+    const result = resolveSwipeAction(SWIPE_VELOCITY_DISTANCE + 5, 0, dirs, undefined, SWIPE_VELOCITY_THRESHOLD + 0.1)
     expect(result).not.toBeNull()
     expect(result!.action).toBe('good')
     expect(result!.direction).toBe('right')
   })
 
   it('does not trigger at reduced distance with low velocity', () => {
-    // Below normal threshold and velocity below threshold
-    const result = resolveSwipeAction(30, 0, dirs, undefined, 0.2)
+    // Below normal threshold and velocity below SWIPE_VELOCITY_THRESHOLD
+    const result = resolveSwipeAction(30, 0, dirs, undefined, SWIPE_VELOCITY_THRESHOLD - 0.2)
     expect(result).toBeNull()
   })
 
