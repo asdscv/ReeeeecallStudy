@@ -255,7 +255,7 @@ export function StudyCard({
               iOS Safari momentum scroll works natively.
             */}
             <div
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 h-[55vh] sm:h-[65vh] cursor-pointer relative flex flex-col"
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 h-[45vh] sm:h-[55vh] cursor-pointer relative flex flex-col"
               style={cardStyle}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
