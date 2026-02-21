@@ -23,7 +23,9 @@
     "mockFront": "Hello",
     "mockBack": "Bonjour",
     "mockCards": "12/30 cards",
-    "mockStreak": "Streak: 7 days"
+    "mockStreak": "Streak: 7 days",
+    "mockMeaning": "Hello (French)",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
   },
   "features": {
     "title": "Powerful Features",
@@ -197,7 +199,8 @@
     "product": "Product",
     "resources": "Resources",
     "features": "Features",
-    "pricing": "Pricing",
+    "results": "Results",
+    "howItWorks": "How It Works",
     "faq": "FAQ",
     "blog": "Insights",
     "help": "Help",

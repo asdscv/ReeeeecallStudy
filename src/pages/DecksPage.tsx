@@ -10,7 +10,7 @@ import type { Deck } from '../types/database'
 export function DecksPage() {
   const { t } = useTranslation(['decks', 'common'])
   const { user } = useAuthStore()
-  const { decks, stats, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
+  const { decks, stats, templates, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
 
   const [showCreate, setShowCreate] = useState(false)
   const [deletingDeck, setDeletingDeck] = useState<Deck | null>(null)
@@ -32,6 +32,11 @@ export function DecksPage() {
 
   const getStatsForDeck = (deckId: string) => {
     return stats.find((s) => s.deck_id === deckId)
+  }
+
+  const getTemplateName = (templateId: string | null) => {
+    if (!templateId) return undefined
+    return templates.find((t) => t.id === templateId)?.name
   }
 
   return (
@@ -68,6 +73,7 @@ export function DecksPage() {
               key={deck.id}
               deck={deck}
               stats={getStatsForDeck(deck.id)}
+              templateName={getTemplateName(deck.default_template_id)}
               onDelete={setDeletingDeck}
             />
           ))}

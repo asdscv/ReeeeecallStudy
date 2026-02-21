@@ -18,10 +18,11 @@ interface DeckStats {
 interface DeckCardProps {
   deck: Deck
   stats?: DeckStats
+  templateName?: string
   onDelete: (deck: Deck) => void
 }
 
-export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
+export function DeckCard({ deck, stats, templateName, onDelete }: DeckCardProps) {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { t, i18n } = useTranslation('decks')
@@ -56,6 +57,24 @@ export function DeckCard({ deck, stats, onDelete }: DeckCardProps) {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{deck.name}</h3>
           {user && <ShareBadge deck={deck} userId={user.id} />}
         </div>
+
+        {/* Template */}
+        {templateName ? (
+          <p className="text-xs mb-1 text-gray-400">
+            📋 {templateName}
+          </p>
+        ) : (
+          <p className="text-xs mb-1 text-amber-500 flex items-center gap-1.5">
+            <span>📋 {t('card.templateNotSet')}</span>
+            <span
+              role="link"
+              onClick={(e) => { e.stopPropagation(); navigate(`/decks/${deck.id}/edit`) }}
+              className="text-amber-600 underline underline-offset-2 hover:text-amber-700 cursor-pointer"
+            >
+              {t('card.goToSettings')}
+            </span>
+          </p>
+        )}
 
         {/* Description */}
         {deck.description && (

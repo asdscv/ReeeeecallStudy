@@ -86,9 +86,14 @@ export function FooterSection() {
                   </a>
                 </li>
                 <li>
-                  <Link to="/auth/login" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
-                    {t('footer.pricing', 'Pricing')}
-                  </Link>
+                  <a href="#stats" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                    {t('footer.results', 'Results')}
+                  </a>
+                </li>
+                <li>
+                  <a href="#how-it-works" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                    {t('footer.howItWorks', 'How It Works')}
+                  </a>
                 </li>
                 <li>
                   <a href="#faq" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">

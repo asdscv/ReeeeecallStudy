@@ -150,3 +150,12 @@
 .marquee-container:hover > div {
   animation-play-state: paused;
 }
+
+/* Hide scrollbar for horizontal scroll strips */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

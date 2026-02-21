@@ -23,7 +23,9 @@
     "mockFront": "Hello",
     "mockBack": "Bonjour",
     "mockCards": "12/30 카드",
-    "mockStreak": "연속: 7일"
+    "mockStreak": "연속: 7일",
+    "mockMeaning": "안녕하세요 (프랑스어)",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
   },
   "features": {
     "title": "강력한 기능들",
@@ -197,7 +199,8 @@
     "product": "제품",
     "resources": "리소스",
     "features": "기능",
-    "pricing": "가격",
+    "results": "결과",
+    "howItWorks": "사용 방법",
     "faq": "FAQ",
     "blog": "인사이트",
     "help": "도움말",

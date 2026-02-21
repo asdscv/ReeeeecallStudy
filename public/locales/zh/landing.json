@@ -23,7 +23,9 @@
     "mockFront": "Hello",
     "mockBack": "Bonjour",
     "mockCards": "12/30 卡片",
-    "mockStreak": "连续: 7 天"
+    "mockStreak": "连续: 7 天",
+    "mockMeaning": "你好（法语）",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
   },
   "features": {
     "title": "强大功能",
@@ -197,7 +199,8 @@
     "product": "产品",
     "resources": "资源",
     "features": "功能",
-    "pricing": "定价",
+    "results": "成果",
+    "howItWorks": "使用方法",
     "faq": "FAQ",
     "blog": "学习洞察",
     "help": "帮助",

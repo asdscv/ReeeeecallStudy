@@ -14,6 +14,7 @@ import {
   type StudyInputSettings,
   type SwipePreview,
 } from '../../lib/study-input-settings'
+import { SwipeGuide } from './SwipeGuide'
 import type { Card, CardTemplate, LayoutItem } from '../../types/database'
 
 interface StudyCardProps {
@@ -177,9 +178,17 @@ export function StudyCard({
 
               {/* Front Face */}
               <div
-                className="p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+                className="relative p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
                 style={{ display: isFlipped ? 'none' : 'flex', minHeight: 'inherit', maxHeight: 'inherit' }}
               >
+                {frontRender.mode !== 'custom' && (
+                  <>
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-2xl" />
+                    <div className="absolute top-2 right-3 text-[10px] font-semibold text-blue-400 tracking-wider uppercase">
+                      {t('card.front')}
+                    </div>
+                  </>
+                )}
                 {/* Content — vertically & horizontally centered */}
                 <div className="flex-1 flex flex-col items-center justify-center">
                   {frontRender.mode === 'custom' ? (
@@ -209,7 +218,7 @@ export function StudyCard({
 
               {/* Back Face */}
               <div
-                className="p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+                className="relative p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
                 style={{
                   transform: 'rotateY(180deg)',
                   display: isFlipped ? 'flex' : 'none',
@@ -217,6 +226,14 @@ export function StudyCard({
                   maxHeight: 'inherit',
                 }}
               >
+                {backRender.mode !== 'custom' && (
+                  <>
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-teal-500 rounded-t-2xl" />
+                    <div className="absolute top-2 left-3 text-[10px] font-semibold text-teal-400 tracking-wider uppercase">
+                      {t('card.back')}
+                    </div>
+                  </>
+                )}
                 {/* Content — vertically & horizontally centered */}
                 <div className="flex-1 flex flex-col items-center justify-center">
                   {backRender.mode === 'custom' ? (
@@ -248,6 +265,14 @@ export function StudyCard({
                     </>
                   )}
                 </div>
+
+                {/* Swipe edge arrows — fade out after 2s */}
+                {swipeEnabled && inputSettings && (
+                  <SwipeGuide
+                    directions={inputSettings.directions}
+                    visible={isFlipped && !pointerOrigin}
+                  />
+                )}
               </div>
             </motion.div>
           </motion.div>

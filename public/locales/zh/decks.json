@@ -129,6 +129,8 @@
     "uploadAudio": "上传音频",
     "audioFormats": "MP3、OGG、WAV（最大 10MB）",
     "tags": "标签",
-    "tagsPlaceholder": "输入标签后按回车"
+    "tagsPlaceholder": "输入标签后按回车",
+    "templateNotSet": "请设置模板",
+    "goToSettings": "去设置 →"
   }
 }

@@ -23,7 +23,9 @@
     "mockFront": "Hello",
     "mockBack": "Bonjour",
     "mockCards": "12/30 カード",
-    "mockStreak": "連続: 7日"
+    "mockStreak": "連続: 7日",
+    "mockMeaning": "こんにちは（フランス語）",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
   },
   "features": {
     "title": "強力な機能",
@@ -197,7 +199,8 @@
     "product": "製品",
     "resources": "リソース",
     "features": "機能",
-    "pricing": "料金",
+    "results": "実績",
+    "howItWorks": "使い方",
     "faq": "FAQ",
     "blog": "インサイト",
     "help": "ヘルプ",

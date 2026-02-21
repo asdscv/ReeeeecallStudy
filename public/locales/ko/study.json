@@ -65,7 +65,9 @@
     "tapToFlip": "탭하여 뒤집기",
     "tapToSeeAnswer": "카드를 탭하여 답을 확인하세요",
     "tapToReveal": "카드를 탭하여 답을 확인하세요",
-    "ttsPlay": "TTS 재생"
+    "ttsPlay": "TTS \uc7ac\uc0dd",
+    "front": "\uc55e\uba74",
+    "back": "\ub4b7\uba74"
   },
   "rating": {
     "dontKnow": "모름",

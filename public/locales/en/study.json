@@ -65,7 +65,9 @@
     "tapToFlip": "Tap to flip",
     "tapToSeeAnswer": "Tap card to see answer",
     "tapToReveal": "Tap card to see answer",
-    "ttsPlay": "Play TTS"
+    "ttsPlay": "Play TTS",
+    "front": "FRONT",
+    "back": "BACK"
   },
   "rating": {
     "dontKnow": "Don't Know",

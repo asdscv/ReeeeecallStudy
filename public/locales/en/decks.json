@@ -129,6 +129,8 @@
     "uploadAudio": "Upload audio",
     "audioFormats": "MP3, OGG, WAV (max 10MB)",
     "tags": "Tags",
-    "tagsPlaceholder": "Enter tag then press Enter"
+    "tagsPlaceholder": "Enter tag then press Enter",
+    "templateNotSet": "Please set a template",
+    "goToSettings": "Go to settings \u2192"
   }
 }

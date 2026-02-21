@@ -129,6 +129,8 @@
     "uploadAudio": "音声をアップロード",
     "audioFormats": "MP3、OGG、WAV（最大10MB）",
     "tags": "タグ",
-    "tagsPlaceholder": "タグを入力してEnterキーを押す"
+    "tagsPlaceholder": "タグを入力してEnterキーを押す",
+    "templateNotSet": "テンプレートを設定してください",
+    "goToSettings": "設定へ →"
   }
 }
