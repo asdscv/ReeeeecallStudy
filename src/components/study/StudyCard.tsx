@@ -178,7 +178,7 @@ export function StudyCard({
                 touchAction: (swipeEnabled && isFlipped) ? 'none' : 'auto',
                 userSelect: pointerOrigin ? 'none' : 'auto',
               }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative overflow-hidden"
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative"
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
                 onFlip()
@@ -193,7 +193,8 @@ export function StudyCard({
                   className="absolute inset-0 z-10 pointer-events-none rounded-2xl flex items-center justify-center"
                   style={{
                     backgroundColor: preview.color,
-                    transform: isFlipped ? 'rotateY(180deg)' : undefined,
+                    backfaceVisibility: 'hidden',
+                    transform: 'rotateY(180deg)',
                   }}
                 >
                   <span
@@ -205,10 +206,17 @@ export function StudyCard({
                 </div>
               )}
 
-              {/* Front Face */}
+              {/*
+                3D card flip using backface-visibility: hidden.
+                Both faces are always in the DOM (absolute positioned).
+                The browser's 3D engine hides whichever face is rotated away.
+                This eliminates the flash caused by display:none/flex toggling.
+              */}
+
+              {/* Front Face — faces viewer when rotateY is 0 */}
               <div
-                className="relative p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                style={{ display: isFlipped ? 'none' : 'flex', minHeight: 'inherit', maxHeight: 'inherit' }}
+                className="absolute inset-0 p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto rounded-2xl"
+                style={{ backfaceVisibility: 'hidden' }}
               >
                 {frontRender.mode !== 'custom' && (
                   <>
@@ -243,14 +251,12 @@ export function StudyCard({
                 </div>
               </div>
 
-              {/* Back Face */}
+              {/* Back Face — faces viewer when parent rotateY is 180 */}
               <div
-                className="relative p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+                className="absolute inset-0 p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto rounded-2xl"
                 style={{
+                  backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
-                  display: isFlipped ? 'flex' : 'none',
-                  minHeight: 'inherit',
-                  maxHeight: 'inherit',
                 }}
               >
                 {backRender.mode !== 'custom' && (
