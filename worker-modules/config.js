@@ -10,6 +10,7 @@ export const PIPELINE_DEFAULTS = {
   maxRetries: 3,
   recentContentLimit: 100,
   maxValidationRetries: 3,
+  topicGenerationCount: 14,
 }
 
 export const RETRY_DELAYS = [1000, 3000, 8000]

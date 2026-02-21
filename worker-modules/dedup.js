@@ -62,6 +62,37 @@ export function checkDuplicate(article, recentContent) {
   return { isDuplicate: false }
 }
 
+/**
+ * Check if an article duplicates another article generated in the SAME pipeline run.
+ * Catches cases where the AI generates similar content for different topics.
+ *
+ * @param {object} article - { slug, title, tags, locale }
+ * @param {object} runState - { slugs: Set<string>, titles: Array<{title, locale}> }
+ * @returns {{ isDuplicate: boolean, reason?: string, similarity?: number }}
+ */
+export function checkSameRunDuplicate(article, runState) {
+  if (!runState) return { isDuplicate: false }
+
+  // 1. Exact slug collision within this run
+  const slugKey = `${article.slug}__${article.locale}`
+  if (runState.slugs.has(slugKey)) {
+    return { isDuplicate: true, reason: 'same_run_slug_collision' }
+  }
+
+  // 2. Title similarity against same-run articles (same locale only)
+  const sameLocaleTitles = (runState.titles || []).filter(
+    t => t.locale === article.locale,
+  )
+  for (const t of sameLocaleTitles) {
+    const sim = jaccardSimilarity(article.title, t.title)
+    if (sim > 0.5) {
+      return { isDuplicate: true, reason: 'same_run_title_similar', similarity: sim }
+    }
+  }
+
+  return { isDuplicate: false }
+}
+
 export function appendDateSuffix(slug) {
   const d = new Date()
   const suffix = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`

@@ -80,7 +80,19 @@ Each block has "type" and "props":
 - meta_title: 30-45 characters (a brand suffix " | ReeeeecallStudy" is appended automatically, do NOT include it). Place the primary keyword near the beginning.
 - meta_description: 70-155 characters. Include primary keyword in the first 70 chars. Write a compelling summary that encourages clicks.
 - tags: Use 3-5 tags relevant to the topic. Use lowercase, single-word or hyphenated tags.
-- slug: 3-6 words, lowercase kebab-case, always in English, include primary keyword.`
+- slug: 3-6 words, lowercase kebab-case, always in English, include primary keyword.
+
+## Title Diversity (CRITICAL)
+
+- NEVER start a title with these overused patterns: "Mastering", "The Ultimate Guide to", "How to", "The Complete", "Everything You Need to Know About", "A Comprehensive Guide to", "Unlocking"
+- Vary title styles across these formats:
+  - Questions: "Why Does Your Brain Forget? The Science of Spaced Repetition"
+  - Benefits: "Remember 90% More: Active Recall Techniques That Work"
+  - Curiosity gaps: "The Study Method Top Students Won't Tell You About"
+  - Imperatives: "Stop Cramming: Build Lasting Knowledge with These Techniques"
+  - Provocative: "Your Note-Taking System Is Broken -- Here's What to Do Instead"
+  - Specific: "5 Evidence-Based Ways to Study Organic Chemistry"
+- If previous titles from this batch are provided, ensure your title is stylistically DIFFERENT from all of them`
 
 const LOCALE_INSTRUCTIONS = {
   en: 'Write the entire article in English. The slug must be in English lowercase kebab-case.',
@@ -89,7 +101,9 @@ const LOCALE_INSTRUCTIONS = {
   ja: 'Write the entire article in Japanese (日本語). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Japanese. For SEO: use Japanese keywords that Japanese users would search on Google Japan and Yahoo Japan. meta_title and meta_description must be in Japanese.',
 }
 
-export function buildPrompt(topic, locale) {
+export function buildPrompt(topic, locale, options = {}) {
+  const { previousTitles = [] } = options
+
   const topicContext = `## Topic Assignment
 
 Category: ${topic.category}
@@ -100,10 +114,15 @@ Suggested tags: ${topic.tags.join(', ')}
 
 Write a unique, insightful article about "${topic.titleHint}" within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.`
 
+  let titleAvoidance = ''
+  if (previousTitles.length > 0) {
+    titleAvoidance = `\n\n## Previously Generated Titles (DO NOT use similar titles or styles)\n${previousTitles.map(t => `- "${t}"`).join('\n')}\n\nYour title MUST be stylistically different from all of the above.`
+  }
+
   const localeInstruction = LOCALE_INSTRUCTIONS[locale] || LOCALE_INSTRUCTIONS.en
 
   return {
     system: SYSTEM_PROMPT,
-    user: `${topicContext}\n\n## Language\n\n${localeInstruction}`,
+    user: `${topicContext}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
   }
 }

@@ -2,12 +2,13 @@
 
 import { LOCALES, PIPELINE_DEFAULTS } from './config.js'
 import { createLogger, info, warn, error } from './logger.js'
+import { generateTopics } from './topic-generator.js'
 import { selectTopic } from './topic-registry.js'
 import { buildPrompt } from './prompt-builder.js'
 import { callAI, generateImage } from './ai-client.js'
 import { validateArticle, enrichCtaUrls } from './content-schema.js'
 import { createSupabaseClient } from './supabase-client.js'
-import { checkDuplicate, appendDateSuffix } from './dedup.js'
+import { checkDuplicate, checkSameRunDuplicate, appendDateSuffix } from './dedup.js'
 
 function generateRunId() {
   return `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
@@ -25,41 +26,47 @@ export async function runContentPipeline(env, cron) {
     const recentContent = await db.getRecentContent(PIPELINE_DEFAULTS.recentContentLimit)
     info('Fetched recent content', { count: recentContent.length })
 
-    // 2. Extract recently used subtopic IDs from tags
-    const recentTags = recentContent.flatMap((c) => c.tags || [])
-    const usedSubtopicIds = [...new Set(recentTags)]
-
     const topicCount = PIPELINE_DEFAULTS.topicsPerRun
-    const maxTopics = topicCount + PIPELINE_DEFAULTS.maxExtraTopics
-    info('Generating topics', { count: topicCount, maxTopics })
 
     // Track per-locale success counts
     const successCount = {}
     for (const locale of LOCALES) successCount[locale] = 0
 
+    // Run-level state for same-run dedup and title diversity
+    const runState = {
+      slugs: new Set(),
+      titles: [],
+      enTitles: [],
+    }
+
+    // 2. Generate topics via AI (replaces static topic selection)
+    let topics
+    try {
+      topics = await generateTopics(env, recentContent, PIPELINE_DEFAULTS.topicGenerationCount)
+      info('AI topics generated', { count: topics.length })
+    } catch (err) {
+      warn('Topic generation failed, using static fallback', { error: err.message })
+      const recentTags = recentContent.flatMap(c => c.tags || [])
+      const usedSubtopicIds = [...new Set(recentTags)]
+      topics = []
+      for (let i = 0; i < topicCount; i++) {
+        topics.push(selectTopic([...usedSubtopicIds, ...topics.map(t => t.id)]))
+      }
+    }
+
     let topicsAttempted = 0
 
-    while (topicsAttempted < maxTopics) {
-      // Stop if all locales met the target
-      const allMet = LOCALES.every((l) => successCount[l] >= topicCount)
+    // Iterate over pre-generated topics
+    for (const topic of topics) {
+      const allMet = LOCALES.every(l => successCount[l] >= topicCount)
       if (allMet) break
-
-      // After main batch, only continue if there's a shortfall
-      if (topicsAttempted >= topicCount) {
-        const anyShort = LOCALES.some((l) => successCount[l] < topicCount)
-        if (!anyShort) break
-        info('Extra topic attempt to fill shortfall', { topicsAttempted, successCount })
-      }
 
       topicsAttempted++
 
       try {
-        // 3. Select topic (exclude already-picked ones this run)
-        const topic = selectTopic(usedSubtopicIds)
-        usedSubtopicIds.push(topic.id)
-        info('Topic selected', { index: topicsAttempted, category: topic.category, subtopic: topic.id })
+        info('Topic selected', { index: topicsAttempted, category: topic.category, subtopic: topic.id || topic.titleHint })
 
-        // 4. Generate thumbnail image (shared across locales)
+        // 3. Generate thumbnail image (shared across locales)
         let thumbnailUrl = null
         try {
           const imagePrompt = buildImagePrompt(topic)
@@ -68,31 +75,38 @@ export async function runContentPipeline(env, cron) {
           const imageRes = await fetch(tempImageUrl)
           if (imageRes.ok) {
             const imageBuffer = await imageRes.arrayBuffer()
-            const imagePath = `${topic.id}-${Date.now()}`
+            const imagePath = `${topic.id || 'topic'}-${Date.now()}`
             thumbnailUrl = await db.uploadImage(imagePath, imageBuffer, 'image/jpeg')
           }
         } catch (err) {
           warn('Image generation failed, continuing without image', { error: err.message })
         }
 
-        // 5. Generate en first (need slug for other locales)
+        // 4. Generate EN first (need slug + title for other locales and run tracking)
         let sharedSlug = null
         try {
-          const enArticle = await generateForLocale(env, db, topic, 'en', recentContent, null, thumbnailUrl)
+          const enArticle = await generateForLocale(
+            env, db, topic, 'en', recentContent, null, thumbnailUrl, runState,
+          )
           if (enArticle) {
             sharedSlug = enArticle.slug
             successCount.en++
+
+            runState.slugs.add(`${enArticle.slug}__en`)
+            runState.titles.push({ title: enArticle.title, locale: 'en' })
+            runState.enTitles.push(enArticle.title)
+
             info('Locale completed', { locale: 'en', slug: enArticle.slug })
           }
         } catch (err) {
           error('Locale failed', { locale: 'en', error: err.message })
         }
 
-        // 6. Generate ko, zh, ja in parallel
-        const otherLocales = LOCALES.filter((l) => l !== 'en')
+        // 5. Generate ko, zh, ja in parallel
+        const otherLocales = LOCALES.filter(l => l !== 'en')
         const results = await Promise.allSettled(
-          otherLocales.map((locale) =>
-            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl),
+          otherLocales.map(locale =>
+            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState),
           ),
         )
 
@@ -100,6 +114,8 @@ export async function runContentPipeline(env, cron) {
           const locale = otherLocales[i]
           if (result.status === 'fulfilled' && result.value) {
             successCount[locale]++
+            runState.slugs.add(`${result.value.slug}__${locale}`)
+            runState.titles.push({ title: result.value.title, locale })
             info('Locale completed', { locale, slug: result.value.slug })
           } else {
             const reason = result.status === 'rejected' ? result.reason?.message : 'no result returned'
@@ -121,24 +137,25 @@ function buildImagePrompt(topic) {
   return `A modern, clean editorial illustration for a blog article about "${topic.titleHint}" in the context of ${topic.category}. Abstract, minimal style with soft gradients and geometric shapes. No text, no letters, no words. Professional, educational tone. Vibrant but not overwhelming colors.`
 }
 
-async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl) {
-  info('Generating content', { locale, topic: topic.id })
+async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState) {
+  info('Generating content', { locale, topic: topic.id || topic.titleHint })
 
-  const prompt = buildPrompt(topic, locale)
+  const prompt = buildPrompt(topic, locale, {
+    previousTitles: runState.enTitles || [],
+  })
   let article = null
 
   // Retry generation up to maxValidationRetries times
   for (let attempt = 0; attempt < PIPELINE_DEFAULTS.maxValidationRetries; attempt++) {
     const raw = await callAI(env, prompt.system, prompt.user)
 
-    // Use shared slug from en if available (for ko locale)
+    // Use shared slug from en if available (for non-en locales)
     if (sharedSlug && locale !== 'en') {
       raw.slug = sharedSlug
     }
 
     const validation = validateArticle(raw)
     if (validation.valid) {
-      // Inject enterprise UTM parameters into CTA block URLs
       enrichCtaUrls(raw, locale)
       article = raw
       break
@@ -151,12 +168,21 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     throw new Error(`Failed to generate valid content after ${PIPELINE_DEFAULTS.maxValidationRetries} attempts`)
   }
 
-  // Deduplication check
-  let dupCheck = checkDuplicate(
+  // Same-run dedup check
+  const sameRunCheck = checkSameRunDuplicate(
+    { slug: article.slug, title: article.title, tags: article.tags, locale },
+    runState,
+  )
+  if (sameRunCheck.isDuplicate) {
+    info('Same-run duplicate detected, adding date suffix', { reason: sameRunCheck.reason })
+    article.slug = appendDateSuffix(article.slug)
+  }
+
+  // DB-level dedup check
+  const dupCheck = checkDuplicate(
     { slug: article.slug, title: article.title, tags: article.tags, locale },
     recentContent,
   )
-
   if (dupCheck.isDuplicate) {
     info('Duplicate detected, adding date suffix', { reason: dupCheck.reason })
     article.slug = appendDateSuffix(article.slug)
