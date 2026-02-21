@@ -60,23 +60,33 @@ export function StudyCard({
   const prevCardIdRef = useRef(card.id)
   const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
   const swipedRef = useRef(false)
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
 
   // ── 2D flip animation ──────────────────────────────────
   // No CSS 3D at all. Fade out → swap content → fade in.
   // Card body has ZERO transforms when idle → iOS momentum scroll works.
+  // Timer managed via ref to avoid cleanup-clears-timer bug.
   useEffect(() => {
     const target = isFlipped ? 'back' : 'front'
-    if (displaySide !== target && !isFading) {
-      setIsFading(true)
-      const timer = setTimeout(() => {
-        setDisplaySide(target)
-        setIsFading(false)
-      }, 150)
-      return () => clearTimeout(timer)
+
+    // Cancel any in-flight fade
+    if (fadeTimerRef.current) {
+      clearTimeout(fadeTimerRef.current)
+      fadeTimerRef.current = null
+      setIsFading(false)
     }
-  }, [isFlipped, displaySide, isFading])
+
+    if (displaySide === target) return
+
+    setIsFading(true)
+    fadeTimerRef.current = setTimeout(() => {
+      fadeTimerRef.current = null
+      setDisplaySide(target)
+      setIsFading(false)
+    }, 150)
+  }, [isFlipped, displaySide]) // isFading intentionally excluded — it's output, not input
 
   // ── Reset ALL state when card changes ──────────────────
   useEffect(() => {
@@ -85,6 +95,7 @@ export function StudyCard({
       pointerOriginRef.current = null
       deltaRef.current = { x: 0, y: 0 }
       committedRef.current = 'none'
+      if (fadeTimerRef.current) { clearTimeout(fadeTimerRef.current); fadeTimerRef.current = null }
       setSwipeDelta({ x: 0, y: 0 })
       setPreview(null)
       setIsSwiping(false)
