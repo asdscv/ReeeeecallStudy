@@ -38,10 +38,10 @@ beforeEach(() => {
 
 // ─── Logo link ──────────────────────────────────────────────
 describe('Logo link', () => {
-  it('should have favicon wrapped in a link to /landing', () => {
+  it('should have favicon wrapped in a link to /', () => {
     renderPage()
     const link = screen.getByRole('link', { name: /landing/i })
-    expect(link).toHaveAttribute('href', '/landing')
+    expect(link).toHaveAttribute('href', '/')
   })
 })
 
@@ -119,7 +119,7 @@ describe('Submission', () => {
 
     expect(mockUpdatePassword).toHaveBeenCalledWith('newpass123')
     expect(toast.success).toHaveBeenCalledWith('resetPassword.success')
-    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
   it('should show error on updatePassword failure', async () => {

@@ -30,13 +30,13 @@ describe('LandingNav', () => {
 
   it('should render Login link pointing to /auth/login', () => {
     renderLanding()
-    const link = screen.getByRole('link', { name: 'Log in' })
-    expect(link).toHaveAttribute('href', '/auth/login')
+    const links = screen.getAllByRole('link', { name: 'Log in' })
+    expect(links[0]).toHaveAttribute('href', '/auth/login')
   })
 
   it('should render Get Started button pointing to /auth/login', () => {
     renderLanding()
-    const link = screen.getByRole('link', { name: 'Get Started' })
-    expect(link).toHaveAttribute('href', '/auth/login')
+    const links = screen.getAllByRole('link', { name: 'Get Started' })
+    expect(links[0]).toHaveAttribute('href', '/auth/login')
   })
 })

@@ -3,7 +3,7 @@ import { generateSitemapXml } from '../sitemap'
 
 describe('generateSitemapXml', () => {
   const staticPages = [
-    { loc: 'https://reeeeecallstudy.xyz/landing', changefreq: 'weekly' as const, priority: 1.0 },
+    { loc: 'https://reeeeecallstudy.xyz', changefreq: 'weekly' as const, priority: 1.0 },
     { loc: 'https://reeeeecallstudy.xyz/content', changefreq: 'daily' as const, priority: 0.9 },
   ]
 
@@ -39,7 +39,7 @@ describe('generateSitemapXml', () => {
 
   it('should include all static pages', () => {
     const xml = generateSitemapXml(staticPages, [])
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/landing</loc>')
+    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz</loc>')
     expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/content</loc>')
   })
 
@@ -71,7 +71,7 @@ describe('generateSitemapXml', () => {
   it('should include hreflang alternates for static pages', () => {
     const xml = generateSitemapXml(staticPages, [])
     // Static pages should also have hreflang for multilingual support
-    const landingSection = xml.split('<loc>https://reeeeecallstudy.xyz/landing</loc>')[1].split('</url>')[0]
+    const landingSection = xml.split('<loc>https://reeeeecallstudy.xyz</loc>')[1].split('</url>')[0]
     expect(landingSection).toContain('hreflang="en"')
     expect(landingSection).toContain('hreflang="ko"')
     expect(landingSection).toContain('hreflang="x-default"')

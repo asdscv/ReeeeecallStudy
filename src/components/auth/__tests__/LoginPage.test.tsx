@@ -39,10 +39,10 @@ beforeEach(() => {
 
 // ─── Logo link ──────────────────────────────────────────────
 describe('Logo link', () => {
-  it('should have logo wrapped in a link to /landing', () => {
+  it('should have logo wrapped in a link to /', () => {
     renderLogin()
     const link = screen.getByRole('link', { name: /ReeeeecallStudy/i })
-    expect(link).toHaveAttribute('href', '/landing')
+    expect(link).toHaveAttribute('href', '/')
   })
 })
 
@@ -71,7 +71,7 @@ describe('Login mode', () => {
     await user.click(screen.getByRole('button', { name: 'loginButton' }))
 
     expect(mockSignIn).toHaveBeenCalledWith('a@b.com', 'pass123')
-    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
   it('should show error message on signIn failure', async () => {

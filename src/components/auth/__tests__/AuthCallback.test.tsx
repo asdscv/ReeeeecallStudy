@@ -61,7 +61,7 @@ describe('Loading state', () => {
 
 // ─── Auth state change events ───────────────────────────────
 describe('Auth state change events', () => {
-  it('should navigate to / on SIGNED_IN', () => {
+  it('should navigate to /dashboard on SIGNED_IN', () => {
     let callback: AuthCallback = () => {}
     mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
       callback = cb
@@ -71,7 +71,7 @@ describe('Auth state change events', () => {
     renderCallback()
     act(() => callback('SIGNED_IN', fakeSession))
 
-    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
   it('should navigate to /auth/reset-password on PASSWORD_RECOVERY', () => {
@@ -106,7 +106,7 @@ describe('Recovery hash type handling', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
   })
 
-  it('should navigate to / on SIGNED_IN when hash type is not recovery', () => {
+  it('should navigate to /dashboard on SIGNED_IN when hash type is not recovery', () => {
     _setCapturedHash('#access_token=abc&type=signup')
 
     let callback: AuthCallback = () => {}
@@ -118,7 +118,7 @@ describe('Recovery hash type handling', () => {
     renderCallback()
     act(() => callback('SIGNED_IN', fakeSession))
 
-    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
   it('should navigate to /auth/reset-password on INITIAL_SESSION with recovery hash AND valid session', () => {
@@ -223,7 +223,7 @@ describe('Double navigation prevention', () => {
     renderCallback()
     act(() => callback('SIGNED_IN', fakeSession))
 
-    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
 
     // Advance past timeout
     act(() => {

@@ -13,7 +13,7 @@ vi.mock('../../../stores/auth-store', () => ({
   }),
 }))
 
-const renderLayout = (initialPath = '/') =>
+const renderLayout = (initialPath = '/dashboard') =>
   render(
     <MemoryRouter initialEntries={[initialPath]}>
       <Layout />

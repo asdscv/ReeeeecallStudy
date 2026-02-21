@@ -38,10 +38,10 @@ describe('DocsNav', () => {
     expect(screen.getByText('getStarted')).toBeInTheDocument()
   })
 
-  it('navigates to /landing when logo is clicked', async () => {
+  it('navigates to / when logo is clicked', async () => {
     const user = userEvent.setup()
     renderNav()
     await user.click(screen.getByText('ReeeeecallStudy'))
-    expect(mockNavigate).toHaveBeenCalledWith('/landing')
+    expect(mockNavigate).toHaveBeenCalledWith('/')
   })
 })

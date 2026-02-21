@@ -482,10 +482,10 @@ describe('buildStaticHreflangAlternates', () => {
   })
 
   it('should use correct URL pattern with lang query param', () => {
-    const result = buildStaticHreflangAlternates('/landing')
+    const result = buildStaticHreflangAlternates('/')
     const en = result.find((r) => r.lang === 'en')
-    expect(en?.href).toBe(`${SEO.SITE_URL}/landing?lang=en`)
+    expect(en?.href).toBe(`${SEO.SITE_URL}/?lang=en`)
     const xDefault = result.find((r) => r.lang === 'x-default')
-    expect(xDefault?.href).toBe(`${SEO.SITE_URL}/landing`)
+    expect(xDefault?.href).toBe(`${SEO.SITE_URL}/`)
   })
 })

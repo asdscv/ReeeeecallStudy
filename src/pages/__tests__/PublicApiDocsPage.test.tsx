@@ -43,9 +43,10 @@ describe('PublicApiDocsPage', () => {
     expect(screen.getByText('quickStart.signup')).toBeInTheDocument()
   })
 
-  it('renders DocsFooter with copyright', () => {
+  it('renders footer with copyright', () => {
     renderPage()
-    expect(screen.getByText('footer.copyright')).toBeInTheDocument()
+    // FooterSection uses defaultValue fallbacks
+    expect(screen.getByText(/© 2026 ReeeeecallStudy/)).toBeInTheDocument()
   })
 
   it('renders search input', () => {
@@ -53,9 +54,10 @@ describe('PublicApiDocsPage', () => {
     expect(screen.getByPlaceholderText('searchPlaceholder')).toBeInTheDocument()
   })
 
-  it('renders footer links', () => {
+  it('renders footer resource links', () => {
     renderPage()
-    expect(screen.getByText('footer.home')).toBeInTheDocument()
-    expect(screen.getByText('footer.login')).toBeInTheDocument()
+    // FooterSection uses defaultValue fallbacks
+    expect(screen.getByText('Insights')).toBeInTheDocument()
+    expect(screen.getByText('API Docs')).toBeInTheDocument()
   })
 })

@@ -12,9 +12,9 @@ function renderNav() {
 }
 
 describe('ContentNav', () => {
-  it('should render logo link pointing to /landing', () => {
+  it('should render logo link pointing to /', () => {
     renderNav()
     const link = screen.getByRole('link', { name: /ReeeeecallStudy/i })
-    expect(link).toHaveAttribute('href', '/landing')
+    expect(link).toHaveAttribute('href', '/')
   })
 })

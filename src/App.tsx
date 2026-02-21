@@ -65,8 +65,8 @@ function App() {
       <PageTracker />
       <Toaster richColors position="top-right" />
       <Routes>
-        {/* Root: always landing page (SEO-friendly, single canonical URL) */}
-        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        {/* Root: always landing page regardless of auth state */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/landing" element={<Navigate to="/" replace />} />
 
         {/* Auth routes */}
