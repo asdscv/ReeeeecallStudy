@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Menu, X } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useScrollspy } from '../../hooks/useScrollspy'
+import { useAuthStore } from '../../stores/auth-store'
 
 const SECTION_IDS = ['features', 'stats', 'social-proof', 'how-it-works', 'faq']
 
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
 
 export function LandingNav() {
   const { t } = useTranslation('landing')
+  const { user } = useAuthStore()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -81,15 +83,26 @@ export function LandingNav() {
           <Link to="/content" className="text-sm text-gray-500 hover:text-gray-900 transition px-3 py-2 no-underline">
             {t('nav.blog', 'Insights')}
           </Link>
-          <Link to="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 transition px-3 py-2 no-underline">
-            {t('nav.login', 'Log in')}
-          </Link>
-          <Link
-            to="/auth/login"
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline ml-1"
-          >
-            {t('nav.start', 'Get Started')}
-          </Link>
+          {user ? (
+            <Link
+              to="/dashboard"
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline ml-1"
+            >
+              {t('nav.dashboard', 'Dashboard')}
+            </Link>
+          ) : (
+            <>
+              <Link to="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 transition px-3 py-2 no-underline">
+                {t('nav.login', 'Log in')}
+              </Link>
+              <Link
+                to="/auth/login"
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline ml-1"
+              >
+                {t('nav.start', 'Get Started')}
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Tablet/small desktop nav - show only action buttons */}
@@ -97,15 +110,26 @@ export function LandingNav() {
           <Link to="/content" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
             {t('nav.blog', 'Insights')}
           </Link>
-          <Link to="/auth/login" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
-            {t('nav.login', 'Log in')}
-          </Link>
-          <Link
-            to="/auth/login"
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline"
-          >
-            {t('nav.start', 'Get Started')}
-          </Link>
+          {user ? (
+            <Link
+              to="/dashboard"
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline"
+            >
+              {t('nav.dashboard', 'Dashboard')}
+            </Link>
+          ) : (
+            <>
+              <Link to="/auth/login" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
+                {t('nav.login', 'Log in')}
+              </Link>
+              <Link
+                to="/auth/login"
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline"
+              >
+                {t('nav.start', 'Get Started')}
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Mobile hamburger */}
@@ -143,20 +167,32 @@ export function LandingNav() {
             >
               {t('nav.blog', 'Insights')}
             </Link>
-            <Link
-              to="/auth/login"
-              onClick={() => setMenuOpen(false)}
-              className="px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition no-underline"
-            >
-              {t('nav.login', 'Log in')}
-            </Link>
-            <Link
-              to="/auth/login"
-              onClick={() => setMenuOpen(false)}
-              className="mx-3 mt-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline text-center"
-            >
-              {t('nav.start', 'Get Started')}
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="mx-3 mt-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline text-center"
+              >
+                {t('nav.dashboard', 'Dashboard')}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/auth/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition no-underline"
+                >
+                  {t('nav.login', 'Log in')}
+                </Link>
+                <Link
+                  to="/auth/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="mx-3 mt-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline text-center"
+                >
+                  {t('nav.start', 'Get Started')}
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}
