@@ -297,8 +297,8 @@ describe('resolveSwipeAction', () => {
   })
 
   it('returns null when below threshold', () => {
-    // SWIPE_THRESHOLD is 50, so 30,20 should be below
-    expect(resolveSwipeAction(30, 20, dirs)).toBeNull()
+    // SWIPE_THRESHOLD is 30, so 20,15 should be below
+    expect(resolveSwipeAction(20, 15, dirs)).toBeNull()
   })
 
   it('returns null for unassigned direction', () => {
@@ -333,16 +333,16 @@ describe('resolveSwipeAction', () => {
   })
 
   it('does not trigger at reduced distance with low velocity', () => {
-    // Below normal threshold and velocity below SWIPE_VELOCITY_THRESHOLD
-    const result = resolveSwipeAction(30, 0, dirs, undefined, SWIPE_VELOCITY_THRESHOLD - 0.2)
+    // Below normal threshold (30) and velocity below SWIPE_VELOCITY_THRESHOLD
+    const result = resolveSwipeAction(20, 0, dirs, undefined, SWIPE_VELOCITY_THRESHOLD - 0.2)
     expect(result).toBeNull()
   })
 
   it('uses normal threshold when velocity is undefined', () => {
-    // 40 < SWIPE_THRESHOLD (50), no velocity
-    expect(resolveSwipeAction(40, 0, dirs)).toBeNull()
-    // 55 > SWIPE_THRESHOLD (50), no velocity
-    expect(resolveSwipeAction(55, 0, dirs)).not.toBeNull()
+    // 25 < SWIPE_THRESHOLD (30), no velocity
+    expect(resolveSwipeAction(25, 0, dirs)).toBeNull()
+    // 35 > SWIPE_THRESHOLD (30), no velocity
+    expect(resolveSwipeAction(35, 0, dirs)).not.toBeNull()
   })
 
   it('velocity detection works in all directions', () => {

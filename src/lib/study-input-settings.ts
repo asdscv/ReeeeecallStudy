@@ -24,7 +24,7 @@ export interface StudyInputSettings {
 
 const STORAGE_KEY = 'reeeeecall-study-input-settings'
 const LEGACY_KEY = 'reeecall-swipe-settings'  // keep old key name for migration
-export const SWIPE_THRESHOLD = 50
+export const SWIPE_THRESHOLD = 30
 
 const VALID_ACTIONS: ReadonlySet<string> = new Set(['again', 'hard', 'good', 'easy', ''])
 const VALID_MODES: ReadonlySet<string> = new Set(['button', 'swipe'])
@@ -184,7 +184,7 @@ export function buildSwipeHintText(dirs: SwipeDirectionMap): string {
 /** Minimum velocity (px/ms) that allows reduced-distance swipe detection */
 export const SWIPE_VELOCITY_THRESHOLD = 0.4
 /** When velocity exceeds SWIPE_VELOCITY_THRESHOLD, the distance threshold drops to this */
-export const SWIPE_VELOCITY_DISTANCE = 25
+export const SWIPE_VELOCITY_DISTANCE = 15
 
 export interface SwipeResult {
   action: SwipeAction
@@ -233,7 +233,7 @@ export interface SwipePreview {
   label: string
 }
 
-export const DEAD_ZONE = 10
+export const DEAD_ZONE = 8
 
 export function previewSwipeAction(
   dx: number,

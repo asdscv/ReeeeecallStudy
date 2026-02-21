@@ -12,6 +12,7 @@ import {
   previewSwipeAction,
   buildSwipeHintText,
   computeTouchAction,
+  DEAD_ZONE,
   type StudyInputSettings,
   type SwipePreview,
 } from '../../lib/study-input-settings'
@@ -48,6 +49,10 @@ export function StudyCard({
   const [preview, setPreview] = useState<SwipePreview | null>(null)
   const deltaRef = useRef({ x: 0, y: 0 })
   const prevCardIdRef = useRef(card.id)
+  /** Direction commitment: 'none' → waiting, 'swipe' → JS handles, 'scroll' → browser handles */
+  const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
+  /** Suppress click immediately after a successful swipe */
+  const swipedRef = useRef(false)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
 
@@ -60,6 +65,7 @@ export function StudyCard({
       setSwipeDelta({ x: 0, y: 0 })
       setPreview(null)
       deltaRef.current = { x: 0, y: 0 }
+      committedRef.current = 'none'
     }
   }, [card.id])
 
@@ -89,66 +95,97 @@ export function StudyCard({
     [inputSettings, swipeEnabled],
   )
 
-  // ── Pointer-based swipe handlers ──────────────────────
+  // ── Direction Commitment swipe handlers ─────────────
+  // On pointerdown we record the origin but do NOT capture the pointer.
+  // The first significant movement decides intent:
+  //   horizontal → 'swipe' (capture pointer, JS handles)
+  //   vertical   → 'scroll' (let browser scroll card content natively)
+  // This lets mobile users scroll long card content while still swiping.
+
+  function resetSwipeState() {
+    setPointerOrigin(null)
+    deltaRef.current = { x: 0, y: 0 }
+    setSwipeDelta({ x: 0, y: 0 })
+    setPreview(null)
+    committedRef.current = 'none'
+  }
+
   function handlePointerDown(e: React.PointerEvent) {
     if (!swipeEnabled || !isFlipped) return
     if ((e.target as HTMLElement).closest('button')) return
-    const el = e.currentTarget as HTMLElement
-    el.setPointerCapture(e.pointerId)
+    // Record origin — do NOT setPointerCapture yet (would block native scroll)
     setPointerOrigin({ x: e.clientX, y: e.clientY, t: Date.now() })
     deltaRef.current = { x: 0, y: 0 }
     setSwipeDelta({ x: 0, y: 0 })
     setPreview(null)
+    committedRef.current = 'none'
   }
 
   function handlePointerMove(e: React.PointerEvent) {
     if (!swipeEnabled || !pointerOrigin || !isFlipped || !inputSettings) return
+    if (committedRef.current === 'scroll') return // browser is scrolling
+
     const dx = e.clientX - pointerOrigin.x
     const dy = e.clientY - pointerOrigin.y
+
+    // ── Direction commitment phase ──────────────────
+    if (committedRef.current === 'none') {
+      const absDx = Math.abs(dx)
+      const absDy = Math.abs(dy)
+      if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return // still in dead zone
+
+      if (absDx >= absDy) {
+        // Horizontal-dominant → swipe intent
+        committedRef.current = 'swipe'
+        try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
+      } else {
+        // Vertical-dominant → let browser scroll card content
+        committedRef.current = 'scroll'
+        return
+      }
+    }
+
+    // ── Committed to swipe — track delta & preview ──
     deltaRef.current = { x: dx, y: dy }
     setSwipeDelta({ x: dx, y: dy })
     setPreview(previewSwipeAction(dx, dy, inputSettings.directions))
   }
 
   function handlePointerUp(e: React.PointerEvent) {
-    const el = e.currentTarget as HTMLElement
-    el.releasePointerCapture(e.pointerId)
+    if (committedRef.current === 'swipe') {
+      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch {}
+    }
 
-    if (!swipeEnabled || !pointerOrigin || !isFlipped || !inputSettings) {
-      setPointerOrigin(null)
-      deltaRef.current = { x: 0, y: 0 }
-      setSwipeDelta({ x: 0, y: 0 })
-      setPreview(null)
+    if (!swipeEnabled || !pointerOrigin || !isFlipped || !inputSettings || committedRef.current !== 'swipe') {
+      resetSwipeState()
       return
     }
 
     const d = deltaRef.current
-    // Calculate velocity (px/ms) for velocity-based detection
     const elapsed = Math.max(1, Date.now() - pointerOrigin.t)
     const distance = Math.sqrt(d.x * d.x + d.y * d.y)
     const velocity = distance / elapsed
 
     const result = resolveSwipeAction(d.x, d.y, inputSettings.directions, undefined, velocity)
-    if (result) {
-      // Clear state first, then fire rating
-      setPointerOrigin(null)
-      deltaRef.current = { x: 0, y: 0 }
-      setSwipeDelta({ x: 0, y: 0 })
-      setPreview(null)
-      onSwipeRate?.(result.action)
-      return
-    }
+    resetSwipeState()
 
-    // Swipe didn't meet threshold — snap back
-    setPointerOrigin(null)
-    deltaRef.current = { x: 0, y: 0 }
-    setSwipeDelta({ x: 0, y: 0 })
-    setPreview(null)
+    if (result) {
+      // Suppress the click that follows pointerup so new card doesn't flip
+      swipedRef.current = true
+      setTimeout(() => { swipedRef.current = false }, 300)
+      onSwipeRate?.(result.action)
+    }
   }
 
-  // Computed card transform during drag
-  const dragTranslateX = pointerOrigin ? swipeDelta.x * DAMPEN : 0
-  const dragTranslateY = pointerOrigin ? swipeDelta.y * DAMPEN : 0
+  /** Browser took over (e.g. native scroll started) — clean up */
+  function handlePointerCancel() {
+    resetSwipeState()
+  }
+
+  // Computed card transform during active swipe drag (not during scroll)
+  const isSwiping = pointerOrigin && committedRef.current === 'swipe'
+  const dragTranslateX = isSwiping ? swipeDelta.x * DAMPEN : 0
+  const dragTranslateY = isSwiping ? swipeDelta.y * DAMPEN : 0
 
   // Smart touch-action: allows card-content scrolling on the non-swipe axis
   const touchAction = computeTouchAction(
@@ -179,23 +216,25 @@ export function StudyCard({
               transition={{ duration: 0.4 }}
               style={{
                 transformStyle: 'preserve-3d',
-                transform: pointerOrigin
+                transform: isSwiping
                   ? `rotateY(${isFlipped ? 180 : 0}deg) translate(${dragTranslateX}px, ${dragTranslateY}px)`
                   : undefined,
                 touchAction,
-                userSelect: pointerOrigin ? 'none' : 'auto',
+                userSelect: isSwiping ? 'none' : 'auto',
               }}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative"
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
+                if (swipedRef.current) return // suppress click after swipe
                 onFlip()
               }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
             >
-              {/* Swipe color overlay — only during active drag */}
-              {preview && pointerOrigin && (
+              {/* Swipe color overlay — only during active swipe drag */}
+              {preview && isSwiping && (
                 <div
                   className="absolute inset-0 z-10 pointer-events-none rounded-2xl flex items-center justify-center"
                   style={{
@@ -308,7 +347,7 @@ export function StudyCard({
                 {swipeEnabled && inputSettings && (
                   <SwipeGuide
                     directions={inputSettings.directions}
-                    visible={isFlipped && !pointerOrigin}
+                    visible={isFlipped && !isSwiping}
                   />
                 )}
               </div>
