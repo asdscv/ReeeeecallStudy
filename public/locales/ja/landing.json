@@ -184,10 +184,11 @@
     "faq": "FAQ"
   },
   "trustBadges": {
-    "noAds": "広告なし",
+    "srs": "スマートSRS",
     "privacy": "プライバシー重視",
     "languages": "4言語対応",
-    "allDevices": "全デバイス対応"
+    "allDevices": "全デバイス対応",
+    "export": "いつでもエクスポート"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",

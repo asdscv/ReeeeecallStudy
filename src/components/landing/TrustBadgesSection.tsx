@@ -1,34 +1,34 @@
 import { useTranslation } from 'react-i18next'
-import { Ban, Lock, Globe, Smartphone } from 'lucide-react'
+import { Brain, Lock, Globe, Smartphone, Download } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 
 const BADGES = [
   {
-    key: 'noAds',
-    icon: Ban,
-    label: 'No Ads',
-    iconBg: 'bg-rose-100',
-    iconColor: 'text-rose-500',
-    borderColor: 'border-rose-200/60',
-    hoverGlow: 'hover:shadow-rose-100',
-  },
-  {
-    key: 'privacy',
-    icon: Lock,
-    label: 'Privacy First',
+    key: 'srs',
+    icon: Brain,
+    label: 'Smart SRS',
     iconBg: 'bg-blue-100',
     iconColor: 'text-blue-500',
     borderColor: 'border-blue-200/60',
     hoverGlow: 'hover:shadow-blue-100',
   },
   {
-    key: 'languages',
-    icon: Globe,
-    label: '4 Languages',
+    key: 'privacy',
+    icon: Lock,
+    label: 'Privacy First',
     iconBg: 'bg-violet-100',
     iconColor: 'text-violet-500',
     borderColor: 'border-violet-200/60',
     hoverGlow: 'hover:shadow-violet-100',
+  },
+  {
+    key: 'languages',
+    icon: Globe,
+    label: '4 Languages',
+    iconBg: 'bg-cyan-100',
+    iconColor: 'text-cyan-500',
+    borderColor: 'border-cyan-200/60',
+    hoverGlow: 'hover:shadow-cyan-100',
   },
   {
     key: 'allDevices',
@@ -38,6 +38,15 @@ const BADGES = [
     iconColor: 'text-emerald-500',
     borderColor: 'border-emerald-200/60',
     hoverGlow: 'hover:shadow-emerald-100',
+  },
+  {
+    key: 'export',
+    icon: Download,
+    label: 'Export Anytime',
+    iconBg: 'bg-orange-100',
+    iconColor: 'text-orange-500',
+    borderColor: 'border-orange-200/60',
+    hoverGlow: 'hover:shadow-orange-100',
   },
 ] as const
 
@@ -58,7 +67,7 @@ export function TrustBadgesSection() {
   return (
     <section className="py-8 sm:py-10 px-4">
       <motion.div
-        className="max-w-3xl mx-auto flex flex-wrap justify-center gap-3 sm:gap-4"
+        className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3 sm:gap-4"
         variants={prefersReduced ? undefined : container}
         initial="hidden"
         whileInView="show"

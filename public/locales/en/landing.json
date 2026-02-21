@@ -184,10 +184,11 @@
     "faq": "FAQ"
   },
   "trustBadges": {
-    "noAds": "No Ads",
+    "srs": "Smart SRS",
     "privacy": "Privacy First",
     "languages": "4 Languages",
-    "allDevices": "All Devices"
+    "allDevices": "All Devices",
+    "export": "Export Anytime"
   },
   "footer": {
     "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
