@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'motion/react'
 import { Volume2 } from 'lucide-react'
@@ -28,7 +28,8 @@ interface StudyCardProps {
   inputSettings?: StudyInputSettings | null
 }
 
-const DAMPEN = 0.3
+/** Card follows finger at 60% of actual movement (higher = more responsive) */
+const DAMPEN = 0.6
 
 export function StudyCard({
   card,
@@ -41,12 +42,25 @@ export function StudyCard({
   inputSettings,
 }: StudyCardProps) {
   const { t } = useTranslation('study')
-  const [pointerOrigin, setPointerOrigin] = useState<{ x: number; y: number } | null>(null)
+  const [pointerOrigin, setPointerOrigin] = useState<{ x: number; y: number; t: number } | null>(null)
   const [swipeDelta, setSwipeDelta] = useState({ x: 0, y: 0 })
   const [preview, setPreview] = useState<SwipePreview | null>(null)
   const deltaRef = useRef({ x: 0, y: 0 })
+  const prevCardIdRef = useRef(card.id)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
+
+  // ── Reset ALL swipe state when card changes ───────────
+  // This prevents overlay color from leaking to the next card
+  useEffect(() => {
+    if (prevCardIdRef.current !== card.id) {
+      prevCardIdRef.current = card.id
+      setPointerOrigin(null)
+      setSwipeDelta({ x: 0, y: 0 })
+      setPreview(null)
+      deltaRef.current = { x: 0, y: 0 }
+    }
+  }, [card.id])
 
   // Resolve card face content (handles mismatched keys, null templates, empty layouts)
   const frontFace = useMemo(
@@ -74,14 +88,13 @@ export function StudyCard({
     [inputSettings, swipeEnabled],
   )
 
-  // Pointer-based swipe handlers (works on both mouse and touch)
+  // ── Pointer-based swipe handlers ──────────────────────
   function handlePointerDown(e: React.PointerEvent) {
     if (!swipeEnabled || !isFlipped) return
-    // Don't capture pointer if the event originated from an interactive element (e.g. TTS button)
     if ((e.target as HTMLElement).closest('button')) return
     const el = e.currentTarget as HTMLElement
     el.setPointerCapture(e.pointerId)
-    setPointerOrigin({ x: e.clientX, y: e.clientY })
+    setPointerOrigin({ x: e.clientX, y: e.clientY, t: Date.now() })
     deltaRef.current = { x: 0, y: 0 }
     setSwipeDelta({ x: 0, y: 0 })
     setPreview(null)
@@ -109,11 +122,23 @@ export function StudyCard({
     }
 
     const d = deltaRef.current
-    const result = resolveSwipeAction(d.x, d.y, inputSettings.directions)
+    // Calculate velocity (px/ms) for velocity-based detection
+    const elapsed = Math.max(1, Date.now() - pointerOrigin.t)
+    const distance = Math.sqrt(d.x * d.x + d.y * d.y)
+    const velocity = distance / elapsed
+
+    const result = resolveSwipeAction(d.x, d.y, inputSettings.directions, undefined, velocity)
     if (result) {
+      // Clear state first, then fire rating
+      setPointerOrigin(null)
+      deltaRef.current = { x: 0, y: 0 }
+      setSwipeDelta({ x: 0, y: 0 })
+      setPreview(null)
       onSwipeRate?.(result.action)
+      return
     }
 
+    // Swipe didn't meet threshold — snap back
     setPointerOrigin(null)
     deltaRef.current = { x: 0, y: 0 }
     setSwipeDelta({ x: 0, y: 0 })
@@ -127,12 +152,18 @@ export function StudyCard({
   return (
     <div className="flex-1 flex items-center justify-center p-2 sm:p-4">
       <div className="w-full max-w-2xl">
-        <AnimatePresence mode="wait">
+        {/*
+          mode="popLayout": old card is removed from flow immediately, exits
+          as absolute overlay. New card enters simultaneously. This prevents
+          the old card from showing its front face during a slow exit.
+        */}
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={card.id}
+            layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, transition: { duration: 0.12 } }}
             className="relative"
             style={{ perspective: '1000px' }}
           >
@@ -149,7 +180,6 @@ export function StudyCard({
               }}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative overflow-hidden"
               onClick={(e) => {
-                // Don't flip if clicking on an interactive element (e.g. TTS button)
                 if ((e.target as HTMLElement).closest('button')) return
                 onFlip()
               }}
@@ -157,13 +187,12 @@ export function StudyCard({
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
             >
-              {/* Swipe color overlay */}
+              {/* Swipe color overlay — only during active drag */}
               {preview && pointerOrigin && (
                 <div
                   className="absolute inset-0 z-10 pointer-events-none rounded-2xl flex items-center justify-center"
                   style={{
                     backgroundColor: preview.color,
-                    // Flip the overlay so it appears correctly on the back face
                     transform: isFlipped ? 'rotateY(180deg)' : undefined,
                   }}
                 >
@@ -189,7 +218,6 @@ export function StudyCard({
                     </div>
                   </>
                 )}
-                {/* Content — vertically & horizontally centered */}
                 <div className="flex-1 flex flex-col items-center justify-center">
                   {frontRender.mode === 'custom' ? (
                     <div
@@ -210,7 +238,6 @@ export function StudyCard({
                     </div>
                   )}
                 </div>
-                {/* Hint — pinned to bottom */}
                 <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
                   {t('card.tapToFlip')}
                 </div>
@@ -234,7 +261,6 @@ export function StudyCard({
                     </div>
                   </>
                 )}
-                {/* Content — vertically & horizontally centered */}
                 <div className="flex-1 flex flex-col items-center justify-center">
                   {backRender.mode === 'custom' ? (
                     <div
@@ -243,7 +269,6 @@ export function StudyCard({
                     />
                   ) : (
                     <>
-                      {/* Small reminder of front value */}
                       {frontFace.primaryValue && (
                         <div className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-6 tracking-wide">
                           {frontFace.primaryValue}
@@ -266,7 +291,6 @@ export function StudyCard({
                   )}
                 </div>
 
-                {/* Swipe edge arrows — fade out after 2s */}
                 {swipeEnabled && inputSettings && (
                   <SwipeGuide
                     directions={inputSettings.directions}
@@ -297,8 +321,6 @@ export function StudyCard({
 }
 
 // ── Card Face Layout ─────────────────────────────────────
-// Renders a list of layout items with proper visual hierarchy,
-// spacing, and separators between different style groups.
 
 function CardFaceLayout({
   layout,
@@ -320,8 +342,6 @@ function CardFaceLayout({
         const fieldType = fields.find(f => f.key === item.field_key)?.type ?? 'text'
         const ttsInfo = ttsFields?.find(t => t.fieldKey === item.field_key)
 
-        // Insert a subtle divider before hint/detail sections
-        // (only if preceded by a primary/secondary item)
         const prevStyle = idx > 0 ? layout[idx - 1].style : null
         const needsDivider =
           idx > 0 &&
@@ -361,8 +381,6 @@ function CardFaceLayout({
 }
 
 // ── Layout Item Renderer ─────────────────────────────────
-// Renders a single layout item using getLayoutItemStyle for
-// consistent styling with optional custom font sizes.
 
 function LayoutItemRenderer({
   item,
@@ -375,7 +393,6 @@ function LayoutItemRenderer({
 }) {
   if (!value) return null
 
-  // Image rendering
   if (item.style === 'media' || fieldType === 'image') {
     return (
       <div className="flex justify-center py-1">
@@ -388,7 +405,6 @@ function LayoutItemRenderer({
     )
   }
 
-  // Audio rendering
   if (fieldType === 'audio') {
     return (
       <div className="flex justify-center py-1">
@@ -397,7 +413,6 @@ function LayoutItemRenderer({
     )
   }
 
-  // Text rendering with style-aware classes + font size
   const { className, fontSize } = getLayoutItemStyle(item.style, item.font_size)
 
   return (

@@ -167,4 +167,74 @@ export class StudySessionPage extends BasePage {
     const text = await this.masteryText.textContent()
     return text ?? ''
   }
+
+  // ─── Swipe Actions ────────────────────────────────────
+
+  /** Enable swipe mode by setting localStorage before navigating */
+  async enableSwipeMode() {
+    await this.page.evaluate(() => {
+      localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify({
+        version: 2,
+        mode: 'swipe',
+        directions: { left: 'again', right: 'good', up: 'hard', down: 'easy' },
+      }))
+    })
+  }
+
+  /** The main card container for swipe interactions */
+  get cardContainer(): Locator {
+    return this.page.locator('.rounded-2xl').first()
+  }
+
+  /** Swipe hint text (visible in swipe mode when back face shown) */
+  get swipeHint(): Locator {
+    return this.page.locator('[data-testid="swipe-hint"]')
+  }
+
+  /** Swipe overlay (color feedback during swipe) */
+  get swipeOverlay(): Locator {
+    return this.page.locator('.pointer-events-none.rounded-2xl')
+  }
+
+  /**
+   * Simulate a swipe gesture on the card.
+   * @param direction — 'left' | 'right' | 'up' | 'down'
+   * @param distance — pixels to move (default 80, well above 50px threshold)
+   */
+  async swipeCard(direction: 'left' | 'right' | 'up' | 'down', distance = 80) {
+    const card = this.cardContainer
+    const box = await card.boundingBox()
+    if (!box) throw new Error('Card not visible for swipe')
+
+    const cx = box.x + box.width / 2
+    const cy = box.y + box.height / 2
+
+    let endX = cx
+    let endY = cy
+    switch (direction) {
+      case 'left': endX = cx - distance; break
+      case 'right': endX = cx + distance; break
+      case 'up': endY = cy - distance; break
+      case 'down': endY = cy + distance; break
+    }
+
+    // Simulate pointer events with intermediate steps for smooth swipe
+    await this.page.mouse.move(cx, cy)
+    await this.page.mouse.down()
+    const steps = 5
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps
+      await this.page.mouse.move(
+        cx + (endX - cx) * t,
+        cy + (endY - cy) * t,
+      )
+      await this.page.waitForTimeout(20)
+    }
+    await this.page.mouse.up()
+  }
+
+  /** Check if the card background has a swipe color overlay */
+  async hasSwipeColorOverlay(): Promise<boolean> {
+    return this.swipeOverlay.isVisible({ timeout: 500 }).catch(() => false)
+  }
 }

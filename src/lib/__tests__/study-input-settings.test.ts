@@ -13,6 +13,9 @@ import {
   resolveSwipeAction,
   previewSwipeAction,
   SWIPE_THRESHOLD,
+  DEAD_ZONE,
+  SWIPE_VELOCITY_THRESHOLD,
+  SWIPE_VELOCITY_DISTANCE,
   type StudyInputSettings,
   type SwipeDirectionMap,
 } from '../study-input-settings'
@@ -293,7 +296,8 @@ describe('resolveSwipeAction', () => {
   })
 
   it('returns null when below threshold', () => {
-    expect(resolveSwipeAction(50, 30, dirs)).toBeNull()
+    // SWIPE_THRESHOLD is 50, so 30,20 should be below
+    expect(resolveSwipeAction(30, 20, dirs)).toBeNull()
   })
 
   it('returns null for unassigned direction', () => {
@@ -315,6 +319,38 @@ describe('resolveSwipeAction', () => {
     const result = resolveSwipeAction(50, -150, dirs)
     expect(result?.direction).toBe('up')
   })
+
+  // ── Velocity-based detection ──────────────────────────
+
+  it('triggers swipe at reduced distance with high velocity', () => {
+    // Below normal threshold (50) but above velocity distance (25)
+    // velocity >= SWIPE_VELOCITY_THRESHOLD (0.4 px/ms)
+    const result = resolveSwipeAction(30, 0, dirs, undefined, 0.5)
+    expect(result).not.toBeNull()
+    expect(result!.action).toBe('good')
+    expect(result!.direction).toBe('right')
+  })
+
+  it('does not trigger at reduced distance with low velocity', () => {
+    // Below normal threshold and velocity below threshold
+    const result = resolveSwipeAction(30, 0, dirs, undefined, 0.2)
+    expect(result).toBeNull()
+  })
+
+  it('uses normal threshold when velocity is undefined', () => {
+    // 40 < SWIPE_THRESHOLD (50), no velocity
+    expect(resolveSwipeAction(40, 0, dirs)).toBeNull()
+    // 55 > SWIPE_THRESHOLD (50), no velocity
+    expect(resolveSwipeAction(55, 0, dirs)).not.toBeNull()
+  })
+
+  it('velocity detection works in all directions', () => {
+    const highVel = 0.5
+    expect(resolveSwipeAction(-30, 0, dirs, undefined, highVel)?.direction).toBe('left')
+    expect(resolveSwipeAction(30, 0, dirs, undefined, highVel)?.direction).toBe('right')
+    expect(resolveSwipeAction(0, -30, dirs, undefined, highVel)?.direction).toBe('up')
+    expect(resolveSwipeAction(0, 30, dirs, undefined, highVel)?.direction).toBe('down')
+  })
 })
 
 // ── Preview ──────────────────────────────────────────
@@ -322,12 +358,13 @@ describe('resolveSwipeAction', () => {
 describe('previewSwipeAction', () => {
   const dirs: SwipeDirectionMap = { left: 'again', right: 'good', up: '', down: '' }
 
-  it('returns null in dead zone (< 20px)', () => {
-    expect(previewSwipeAction(10, 5, dirs)).toBeNull()
+  it(`returns null in dead zone (< ${DEAD_ZONE}px)`, () => {
+    // DEAD_ZONE is 10, so 5,3 should be inside dead zone
+    expect(previewSwipeAction(5, 3, dirs)).toBeNull()
   })
 
   it('calculates progress 0 at dead zone boundary', () => {
-    const result = previewSwipeAction(20, 0, dirs)
+    const result = previewSwipeAction(DEAD_ZONE, 0, dirs)
     expect(result).not.toBeNull()
     expect(result!.progress).toBeCloseTo(0, 1)
   })

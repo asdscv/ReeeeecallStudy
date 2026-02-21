@@ -24,7 +24,7 @@ export interface StudyInputSettings {
 
 const STORAGE_KEY = 'reeeeecall-study-input-settings'
 const LEGACY_KEY = 'reeecall-swipe-settings'  // keep old key name for migration
-export const SWIPE_THRESHOLD = 100
+export const SWIPE_THRESHOLD = 50
 
 const VALID_ACTIONS: ReadonlySet<string> = new Set(['again', 'hard', 'good', 'easy', ''])
 const VALID_MODES: ReadonlySet<string> = new Set(['button', 'swipe'])
@@ -181,6 +181,11 @@ export function buildSwipeHintText(dirs: SwipeDirectionMap): string {
 
 // ── Swipe Resolution ─────────────────────────────────
 
+/** Minimum velocity (px/ms) that allows reduced-distance swipe detection */
+export const SWIPE_VELOCITY_THRESHOLD = 0.4
+/** When velocity exceeds SWIPE_VELOCITY_THRESHOLD, the distance threshold drops to this */
+export const SWIPE_VELOCITY_DISTANCE = 25
+
 export interface SwipeResult {
   action: SwipeAction
   direction: Direction
@@ -191,12 +196,19 @@ export function resolveSwipeAction(
   dy: number,
   dirs: SwipeDirectionMap,
   threshold: number = SWIPE_THRESHOLD,
+  velocity?: number,
 ): SwipeResult | null {
   const absDx = Math.abs(dx)
   const absDy = Math.abs(dy)
 
+  // Use reduced threshold if velocity is high enough
+  const effectiveThreshold =
+    velocity != null && velocity >= SWIPE_VELOCITY_THRESHOLD
+      ? SWIPE_VELOCITY_DISTANCE
+      : threshold
+
   // Must exceed threshold
-  if (absDx < threshold && absDy < threshold) return null
+  if (absDx < effectiveThreshold && absDy < effectiveThreshold) return null
 
   let direction: Direction
   if (absDx > absDy) {
@@ -221,7 +233,7 @@ export interface SwipePreview {
   label: string
 }
 
-const DEAD_ZONE = 20
+export const DEAD_ZONE = 10
 
 export function previewSwipeAction(
   dx: number,
