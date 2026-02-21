@@ -58,8 +58,6 @@ export function StudyCard({
   const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
   /** Suppress click immediately after a successful swipe */
   const swipedRef = useRef(false)
-  /** Ref for the card body div — used to attach non-passive touchmove listener */
-  const cardBodyRef = useRef<HTMLDivElement | null>(null)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
 
@@ -75,22 +73,6 @@ export function StudyCard({
       setIsSwiping(false)
     }
   }, [card.id])
-
-  // ── Non-passive touchmove: prevent Safari back-gesture during swipe ──
-  useEffect(() => {
-    const el = cardBodyRef.current
-    if (!el) return
-    function onTouchMove(e: TouchEvent) {
-      // Only preventDefault when we've committed to a swipe gesture.
-      // This lets card-content scrolling work normally.
-      if (committedRef.current === 'swipe') {
-        e.preventDefault()
-      }
-    }
-    // Must be { passive: false } so preventDefault() works on Safari
-    el.addEventListener('touchmove', onTouchMove, { passive: false })
-    return () => el.removeEventListener('touchmove', onTouchMove)
-  })
 
   // Resolve card face content
   const frontFace = useMemo(
@@ -227,7 +209,6 @@ export function StudyCard({
             style={{ perspective: '1000px' }}
           >
             <motion.div
-              ref={cardBodyRef}
               animate={{ rotateY: isFlipped ? 180 : 0 }}
               transition={{ duration: 0.4 }}
               style={{
@@ -236,6 +217,7 @@ export function StudyCard({
                   ? `rotateY(${isFlipped ? 180 : 0}deg) translate(${dragTranslateX}px, ${dragTranslateY}px)`
                   : undefined,
                 touchAction,
+                overscrollBehavior: 'none',
                 userSelect: isSwiping ? 'none' : 'auto',
                 WebkitUserSelect: isSwiping ? 'none' : 'auto',
                 WebkitTouchCallout: 'none',
@@ -279,8 +261,8 @@ export function StudyCard({
                   ensures Safari respects backface-visibility:hidden.
                 - Inner div: scroll layer (overflow-y-auto, no transform)
                   Separated from 3D transform so mobile touch scroll works.
-                - Non-passive touchmove listener on card body: e.preventDefault()
-                  only when committedRef === 'swipe' to block Safari back-gesture.
+                - NO non-passive touchmove listener — it blocks iOS momentum scroll.
+                  touch-action:pan-y + overscrollBehavior:none handle gesture boundaries.
               */}
 
               {/* ═══ Front Face ═══ */}
