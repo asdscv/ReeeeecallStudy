@@ -44,9 +44,14 @@ export function StudyCard({
   inputSettings,
 }: StudyCardProps) {
   const { t } = useTranslation('study')
-  const [pointerOrigin, setPointerOrigin] = useState<{ x: number; y: number; t: number } | null>(null)
+
+  // ── Render-affecting state (only these cause re-renders) ──
   const [swipeDelta, setSwipeDelta] = useState({ x: 0, y: 0 })
   const [preview, setPreview] = useState<SwipePreview | null>(null)
+  const [isSwiping, setIsSwiping] = useState(false)
+
+  // ── Refs (no re-renders — critical for scroll performance) ──
+  const pointerOriginRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const deltaRef = useRef({ x: 0, y: 0 })
   const prevCardIdRef = useRef(card.id)
   /** Direction commitment: 'none' → waiting, 'swipe' → JS handles, 'scroll' → browser handles */
@@ -57,19 +62,19 @@ export function StudyCard({
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
 
   // ── Reset ALL swipe state when card changes ───────────
-  // This prevents overlay color from leaking to the next card
   useEffect(() => {
     if (prevCardIdRef.current !== card.id) {
       prevCardIdRef.current = card.id
-      setPointerOrigin(null)
-      setSwipeDelta({ x: 0, y: 0 })
-      setPreview(null)
+      pointerOriginRef.current = null
       deltaRef.current = { x: 0, y: 0 }
       committedRef.current = 'none'
+      setSwipeDelta({ x: 0, y: 0 })
+      setPreview(null)
+      setIsSwiping(false)
     }
   }, [card.id])
 
-  // Resolve card face content (handles mismatched keys, null templates, empty layouts)
+  // Resolve card face content
   const frontFace = useMemo(
     () => resolveCardFaceContent(template, card, 'front'),
     [template, card],
@@ -79,7 +84,7 @@ export function StudyCard({
     [template, card],
   )
 
-  // Custom HTML rendering decision (memoized)
+  // Custom HTML rendering decision
   const frontRender = useMemo(
     () => renderCardFace(template, card, 'front'),
     [template, card],
@@ -96,47 +101,45 @@ export function StudyCard({
   )
 
   // ── Direction Commitment swipe handlers ─────────────
-  // On pointerdown we record the origin but do NOT capture the pointer.
-  // The first significant movement decides intent:
-  //   horizontal → 'swipe' (capture pointer, JS handles)
-  //   vertical   → 'scroll' (let browser scroll card content natively)
-  // This lets mobile users scroll long card content while still swiping.
+  // pointerOrigin is a REF (not state) so touch-start doesn't trigger re-render.
+  // Only isSwiping/swipeDelta/preview are state → re-renders only during active swipe.
 
   function resetSwipeState() {
-    setPointerOrigin(null)
+    pointerOriginRef.current = null
     deltaRef.current = { x: 0, y: 0 }
+    committedRef.current = 'none'
     setSwipeDelta({ x: 0, y: 0 })
     setPreview(null)
-    committedRef.current = 'none'
+    setIsSwiping(false)
   }
 
   function handlePointerDown(e: React.PointerEvent) {
     if (!swipeEnabled || !isFlipped) return
     if ((e.target as HTMLElement).closest('button')) return
-    // Record origin — do NOT setPointerCapture yet (would block native scroll)
-    setPointerOrigin({ x: e.clientX, y: e.clientY, t: Date.now() })
+    // Record origin as ref — NO setState → NO re-render → smooth scroll start
+    pointerOriginRef.current = { x: e.clientX, y: e.clientY, t: Date.now() }
     deltaRef.current = { x: 0, y: 0 }
-    setSwipeDelta({ x: 0, y: 0 })
-    setPreview(null)
     committedRef.current = 'none'
   }
 
   function handlePointerMove(e: React.PointerEvent) {
-    if (!swipeEnabled || !pointerOrigin || !isFlipped || !inputSettings) return
-    if (committedRef.current === 'scroll') return // browser is scrolling
+    const origin = pointerOriginRef.current
+    if (!swipeEnabled || !origin || !isFlipped || !inputSettings) return
+    if (committedRef.current === 'scroll') return
 
-    const dx = e.clientX - pointerOrigin.x
-    const dy = e.clientY - pointerOrigin.y
+    const dx = e.clientX - origin.x
+    const dy = e.clientY - origin.y
 
     // ── Direction commitment phase ──────────────────
     if (committedRef.current === 'none') {
       const absDx = Math.abs(dx)
       const absDy = Math.abs(dy)
-      if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return // still in dead zone
+      if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return
 
       if (absDx >= absDy) {
         // Horizontal-dominant → swipe intent
         committedRef.current = 'swipe'
+        setIsSwiping(true) // only NOW trigger re-render
         try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
       } else {
         // Vertical-dominant → let browser scroll card content
@@ -156,13 +159,14 @@ export function StudyCard({
       try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch {}
     }
 
-    if (!swipeEnabled || !pointerOrigin || !isFlipped || !inputSettings || committedRef.current !== 'swipe') {
+    const origin = pointerOriginRef.current
+    if (!swipeEnabled || !origin || !isFlipped || !inputSettings || committedRef.current !== 'swipe') {
       resetSwipeState()
       return
     }
 
     const d = deltaRef.current
-    const elapsed = Math.max(1, Date.now() - pointerOrigin.t)
+    const elapsed = Math.max(1, Date.now() - origin.t)
     const distance = Math.sqrt(d.x * d.x + d.y * d.y)
     const velocity = distance / elapsed
 
@@ -170,7 +174,6 @@ export function StudyCard({
     resetSwipeState()
 
     if (result) {
-      // Suppress the click that follows pointerup so new card doesn't flip
       swipedRef.current = true
       setTimeout(() => { swipedRef.current = false }, 300)
       onSwipeRate?.(result.action)
@@ -182,8 +185,7 @@ export function StudyCard({
     resetSwipeState()
   }
 
-  // Computed card transform during active swipe drag (not during scroll)
-  const isSwiping = pointerOrigin && committedRef.current === 'swipe'
+  // Computed card transform during active swipe
   const dragTranslateX = isSwiping ? swipeDelta.x * DAMPEN : 0
   const dragTranslateY = isSwiping ? swipeDelta.y * DAMPEN : 0
 
@@ -196,11 +198,6 @@ export function StudyCard({
   return (
     <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
       <div className="w-full max-w-2xl">
-        {/*
-          mode="popLayout": old card is removed from flow immediately, exits
-          as absolute overlay. New card enters simultaneously. This prevents
-          the old card from showing its front face during a slow exit.
-        */}
         <AnimatePresence mode="popLayout">
           <motion.div
             key={card.id}
@@ -225,7 +222,7 @@ export function StudyCard({
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative"
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
-                if (swipedRef.current) return // suppress click after swipe
+                if (swipedRef.current) return
                 onFlip()
               }}
               onPointerDown={handlePointerDown}
@@ -253,22 +250,17 @@ export function StudyCard({
               )}
 
               {/*
-                3D card flip using backface-visibility: hidden.
-                Both faces are always in the DOM (absolute positioned).
-                The browser's 3D engine hides whichever face is rotated away.
-                This eliminates the flash caused by display:none/flex toggling.
+                Card face architecture:
+                - Outer div: 3D layer (backface-visibility, transform, overflow-hidden)
+                  overflow-hidden creates a stacking context so backface-visibility
+                  properly hides ALL children when the face rotates away.
+                - Inner div: scroll layer (overflow-y-auto, no transform)
+                  Separated from 3D transform so mobile touch scroll works.
               */}
 
-              {/*
-                Card face architecture: 3D layer (outer) + scroll layer (inner).
-                Mobile WebKit/Blink cannot touch-scroll an element that has both
-                overflow:auto AND a CSS transform on the SAME element.
-                Splitting them into parent/child fixes mobile touch scroll.
-              */}
-
-              {/* Front Face — 3D layer (handles backface-visibility) */}
+              {/* ═══ Front Face ═══ */}
               <div
-                className="absolute inset-0 rounded-2xl"
+                className="absolute inset-0 rounded-2xl overflow-hidden"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 {/* Decorative header — fixed above scroll */}
@@ -280,10 +272,10 @@ export function StudyCard({
                     </div>
                   </>
                 )}
-                {/* Scroll layer — no transform, mobile touch scroll works */}
+                {/* Scroll layer — no CSS transform → mobile touch scroll works */}
                 <div
                   className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{ overscrollBehavior: 'contain' }}
+                  style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center">
                     {frontRender.mode === 'custom' ? (
@@ -311,9 +303,9 @@ export function StudyCard({
                 </div>
               </div>
 
-              {/* Back Face — 3D layer (handles backface-visibility + rotateY) */}
+              {/* ═══ Back Face ═══ */}
               <div
-                className="absolute inset-0 rounded-2xl"
+                className="absolute inset-0 rounded-2xl overflow-hidden"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 {/* Decorative header — fixed above scroll */}
@@ -325,10 +317,10 @@ export function StudyCard({
                     </div>
                   </>
                 )}
-                {/* Scroll layer — no transform, mobile touch scroll works */}
+                {/* Scroll layer — no CSS transform → mobile touch scroll works */}
                 <div
                   className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{ overscrollBehavior: 'contain' }}
+                  style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center">
                     {backRender.mode === 'custom' ? (
