@@ -28,7 +28,7 @@ export function ContentDetailPage() {
     return (
       <div className="min-h-screen bg-white">
         <ContentNav
-          backTo="/content"
+          backTo="/insight"
           backLabel={t('detail.backToList')}
         />
         <ContentDetailSkeleton />
@@ -45,7 +45,7 @@ export function ContentDetailPage() {
           noIndex
         />
         <ContentNav
-          backTo="/content"
+          backTo="/insight"
           backLabel={t('detail.backToList')}
         />
         <div className="max-w-3xl mx-auto px-4 py-20 text-center">
@@ -64,7 +64,7 @@ export function ContentDetailPage() {
         description={currentArticle.meta_description || currentArticle.subtitle || ''}
         ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || SEO.DEFAULT_OG_IMAGE}
         ogType="article"
-        canonicalUrl={currentArticle.canonical_url || `${SEO.SITE_URL}/content/${currentArticle.slug}`}
+        canonicalUrl={currentArticle.canonical_url || `${SEO.SITE_URL}/insight/${currentArticle.slug}`}
         jsonLd={[
           buildArticleJsonLd(currentArticle),
           buildBreadcrumbJsonLd(currentArticle),
@@ -79,7 +79,7 @@ export function ContentDetailPage() {
         articleAuthor={currentArticle.author_name || SEO.AUTHOR_NAME}
       />
       <ContentNav
-        backTo="/content"
+        backTo="/insight"
         backLabel={t('detail.backToList')}
       />
 

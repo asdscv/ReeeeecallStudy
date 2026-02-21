@@ -79,8 +79,8 @@ function App() {
 
         {/* Public routes (no auth required) */}
         <Route path="/docs/api" element={<PublicApiDocsPage />} />
-        <Route path="/content" element={<ContentListPage />} />
-        <Route path="/content/:slug" element={<ContentDetailPage />} />
+        <Route path="/insight" element={<ContentListPage />} />
+        <Route path="/insight/:slug" element={<ContentDetailPage />} />
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* Study session (outside Layout for fullscreen focus) */}

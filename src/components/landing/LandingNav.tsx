@@ -80,7 +80,7 @@ export function LandingNav() {
 
           <div className="w-px h-5 bg-gray-200 mx-2" />
 
-          <Link to="/content" className="text-sm text-gray-500 hover:text-gray-900 transition px-3 py-2 no-underline">
+          <Link to="/insight" className="text-sm text-gray-500 hover:text-gray-900 transition px-3 py-2 no-underline">
             {t('nav.blog', 'Insights')}
           </Link>
           {user ? (
@@ -107,7 +107,7 @@ export function LandingNav() {
 
         {/* Tablet/small desktop nav - show only action buttons */}
         <nav className="hidden md:flex lg:hidden items-center gap-3">
-          <Link to="/content" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
+          <Link to="/insight" className="text-sm text-gray-600 hover:text-gray-900 transition no-underline">
             {t('nav.blog', 'Insights')}
           </Link>
           {user ? (
@@ -161,7 +161,7 @@ export function LandingNav() {
             ))}
             <div className="h-px bg-gray-100 my-1" />
             <Link
-              to="/content"
+              to="/insight"
               onClick={() => setMenuOpen(false)}
               className="px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition no-underline"
             >

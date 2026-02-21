@@ -33,7 +33,7 @@ const mockArticle: ContentDetail = {
   meta_title: 'Test Article | ReeeeecallStudy',
   meta_description: 'Test description',
   og_image_url: 'https://example.com/og.jpg',
-  canonical_url: 'https://reeeeecallstudy.xyz/content/test-article',
+  canonical_url: 'https://reeeeecallstudy.xyz/insight/test-article',
   author_name: 'ReeeeecallStudy',
   is_published: true,
   published_at: '2025-01-01T00:00:00Z',
@@ -51,7 +51,7 @@ describe('buildArticleJsonLd', () => {
     const result = buildArticleJsonLd(mockArticle)
     expect(result.mainEntityOfPage).toEqual({
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/content/test-article`,
+      '@id': `${SEO.SITE_URL}/insight/test-article`,
     })
   })
 
@@ -110,7 +110,7 @@ describe('buildArticleJsonLd', () => {
 
   it('should include explicit url property', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.url).toBe(`${SEO.SITE_URL}/content/test-article`)
+    expect(result.url).toBe(`${SEO.SITE_URL}/insight/test-article`)
   })
 })
 
@@ -131,8 +131,8 @@ describe('buildBreadcrumbJsonLd', () => {
   it('should have correct URLs in breadcrumb chain', () => {
     const result = buildBreadcrumbJsonLd(mockArticle)
     expect(result.itemListElement[0].item).toBe(SEO.SITE_URL)
-    expect(result.itemListElement[1].item).toBe(`${SEO.SITE_URL}/content`)
-    expect(result.itemListElement[2].item).toBe(`${SEO.SITE_URL}/content/test-article`)
+    expect(result.itemListElement[1].item).toBe(`${SEO.SITE_URL}/insight`)
+    expect(result.itemListElement[2].item).toBe(`${SEO.SITE_URL}/insight/test-article`)
   })
 
   it('should use article title as last breadcrumb name', () => {
@@ -195,7 +195,7 @@ describe('buildCollectionPageJsonLd', () => {
     const result = buildCollectionPageJsonLd()
     expect(result.mainEntityOfPage).toEqual({
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/content`,
+      '@id': `${SEO.SITE_URL}/insight`,
     })
   })
 })
@@ -252,7 +252,7 @@ describe('buildHreflangAlternates', () => {
   it('should have x-default pointing to slug without lang param', () => {
     const result = buildHreflangAlternates('test-slug')
     const xDefault = result.find((r) => r.lang === 'x-default')
-    expect(xDefault?.href).toBe(`${SEO.SITE_URL}/content/test-slug`)
+    expect(xDefault?.href).toBe(`${SEO.SITE_URL}/insight/test-slug`)
   })
 })
 
@@ -472,7 +472,7 @@ describe('buildLearningResourceJsonLd', () => {
 
 describe('buildStaticHreflangAlternates', () => {
   it('should include all supported locales plus x-default', () => {
-    const result = buildStaticHreflangAlternates('/content')
+    const result = buildStaticHreflangAlternates('/insight')
     expect(result).toHaveLength(SEO.SUPPORTED_LOCALES.length + 1)
     const langs = result.map((r) => r.lang)
     for (const locale of SEO.SUPPORTED_LOCALES) {

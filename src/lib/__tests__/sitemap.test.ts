@@ -4,18 +4,18 @@ import { generateSitemapXml } from '../sitemap'
 describe('generateSitemapXml', () => {
   const staticPages = [
     { loc: 'https://reeeeecallstudy.xyz', changefreq: 'weekly' as const, priority: 1.0 },
-    { loc: 'https://reeeeecallstudy.xyz/content', changefreq: 'daily' as const, priority: 0.9 },
+    { loc: 'https://reeeeecallstudy.xyz/insight', changefreq: 'daily' as const, priority: 0.9 },
   ]
 
   const contentPages = [
     {
-      loc: 'https://reeeeecallstudy.xyz/content/spaced-repetition-guide',
+      loc: 'https://reeeeecallstudy.xyz/insight/spaced-repetition-guide',
       lastmod: '2025-06-01T00:00:00Z',
       changefreq: 'monthly' as const,
       priority: 0.8,
     },
     {
-      loc: 'https://reeeeecallstudy.xyz/content/active-recall-techniques',
+      loc: 'https://reeeeecallstudy.xyz/insight/active-recall-techniques',
       lastmod: '2025-07-15T00:00:00Z',
       changefreq: 'monthly' as const,
       priority: 0.8,
@@ -40,13 +40,13 @@ describe('generateSitemapXml', () => {
   it('should include all static pages', () => {
     const xml = generateSitemapXml(staticPages, [])
     expect(xml).toContain('<loc>https://reeeeecallstudy.xyz</loc>')
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/content</loc>')
+    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/insight</loc>')
   })
 
   it('should include all content pages', () => {
     const xml = generateSitemapXml([], contentPages)
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/content/spaced-repetition-guide</loc>')
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/content/active-recall-techniques</loc>')
+    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/insight/spaced-repetition-guide</loc>')
+    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/insight/active-recall-techniques</loc>')
   })
 
   it('should include lastmod for content pages', () => {

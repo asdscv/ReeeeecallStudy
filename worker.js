@@ -90,7 +90,7 @@ async function handleContentBotRequest(url, env) {
     return new Response('Bot prerendering not configured', { status: 500 })
   }
 
-  const slugMatch = url.pathname.match(/^\/content\/(.+)$/)
+  const slugMatch = url.pathname.match(/^\/insight\/(.+)$/)
 
   if (slugMatch) {
     // Detail page
@@ -134,7 +134,7 @@ async function handleContentBotRequest(url, env) {
         logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.png` },
       },
       inLanguage: article.locale,
-      mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/content/${slug}` },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}` },
     }
 
     const breadcrumbJsonLd = {
@@ -142,8 +142,8 @@ async function handleContentBotRequest(url, env) {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: BRAND_NAME, item: SITE_URL },
-        { '@type': 'ListItem', position: 2, name: 'Learning Insights', item: `${SITE_URL}/content` },
-        { '@type': 'ListItem', position: 3, name: article.title, item: `${SITE_URL}/content/${slug}` },
+        { '@type': 'ListItem', position: 2, name: 'Learning Insights', item: `${SITE_URL}/insight` },
+        { '@type': 'ListItem', position: 3, name: article.title, item: `${SITE_URL}/insight/${slug}` },
       ],
     }
 
@@ -158,7 +158,7 @@ async function handleContentBotRequest(url, env) {
 <meta property="og:title" content="${escapeHtml(article.meta_title || article.title)}">
 <meta property="og:description" content="${escapeHtml(article.meta_description || article.subtitle || '')}">
 <meta property="og:type" content="article">
-<meta property="og:url" content="${SITE_URL}/content/${escapeHtml(slug)}">
+<meta property="og:url" content="${SITE_URL}/insight/${escapeHtml(slug)}">
 <meta property="og:image" content="${escapeHtml(ogImage)}">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
@@ -173,8 +173,8 @@ ${article.updated_at ? `<meta property="article:modified_time" content="${escape
 <meta name="twitter:title" content="${escapeHtml(article.meta_title || article.title)}">
 <meta name="twitter:description" content="${escapeHtml(article.meta_description || article.subtitle || '')}">
 <meta name="twitter:image" content="${escapeHtml(ogImage)}">
-<link rel="canonical" href="${SITE_URL}/content/${escapeHtml(slug)}">
-${buildHreflangTags(`/content/${escapeHtml(slug)}`, true)}
+<link rel="canonical" href="${SITE_URL}/insight/${escapeHtml(slug)}">
+${buildHreflangTags(`/insight/${escapeHtml(slug)}`, true)}
 <script type="application/ld+json">${JSON.stringify(articleJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
 </head>
@@ -223,12 +223,12 @@ ${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">$
     '@type': 'CollectionPage',
     name: listTitle,
     description: listDesc,
-    url: `${SITE_URL}/content`,
+    url: `${SITE_URL}/insight`,
     inLanguage: listLang,
   }
 
   const articlesHtml = articles
-    .map((a) => `<li><a href="${SITE_URL}/content/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a></li>`)
+    .map((a) => `<li><a href="${SITE_URL}/insight/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a></li>`)
     .join('\n')
 
   const html = `<!DOCTYPE html>
@@ -241,7 +241,7 @@ ${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">$
 <meta property="og:title" content="${listTitle}">
 <meta property="og:description" content="${escapeHtml(listDesc)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="${SITE_URL}/content">
+<meta property="og:url" content="${SITE_URL}/insight">
 <meta property="og:image" content="${SITE_URL}/favicon.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
@@ -253,8 +253,8 @@ ${buildOgLocaleAlternates(listLang)}
 <meta name="twitter:title" content="${listTitle}">
 <meta name="twitter:description" content="${escapeHtml(listDesc)}">
 <meta name="twitter:image" content="${SITE_URL}/favicon.png">
-<link rel="canonical" href="${SITE_URL}/content">
-${buildHreflangTags('/content', true)}
+<link rel="canonical" href="${SITE_URL}/insight">
+${buildHreflangTags('/insight', true)}
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
@@ -368,12 +368,12 @@ async function handleSitemap(env) {
     for (const [slug, locales] of Object.entries(slugMap)) {
       const lastmod = Object.values(locales).sort().pop()
       contentEntries += `  <url>
-    <loc>${SITE_URL}/content/${slug}</loc>
+    <loc>${SITE_URL}/insight/${slug}</loc>
     <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/content/${slug}?lang=${l}"/>`).join('\n')}
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/content/${slug}"/>
+${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight/${slug}"/>
   </url>\n`
     }
   }
@@ -394,11 +394,11 @@ ${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" 
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/landing"/>
   </url>
   <url>
-    <loc>${SITE_URL}/content</loc>
+    <loc>${SITE_URL}/insight</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/content?lang=${l}"/>`).join('\n')}
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/content"/>
+${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight"/>
   </url>
   <url>
     <loc>${SITE_URL}/docs/api</loc>
@@ -431,7 +431,7 @@ export default {
 
     // Bot prerendering for content and landing pages
     if (BOT_UA.test(ua)) {
-      if (url.pathname === '/content' || url.pathname.startsWith('/content/')) {
+      if (url.pathname === '/insight' || url.pathname.startsWith('/insight/')) {
         return handleContentBotRequest(url, env)
       }
       if (url.pathname === '/' || url.pathname === '/landing') {

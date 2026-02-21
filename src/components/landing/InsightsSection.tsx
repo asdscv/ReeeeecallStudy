@@ -24,7 +24,7 @@ export function InsightsSection() {
           {contentItems.slice(0, 3).map((item, i) => (
             <ScrollReveal key={item.id} delay={i * 0.1}>
               <Link
-                to={`/content/${item.slug}`}
+                to={`/insight/${item.slug}`}
                 className="group block rounded-2xl overflow-hidden no-underline transition-transform duration-300 hover:scale-[0.98] h-[280px]"
               >
                 {item.thumbnail_url ? (
@@ -49,7 +49,7 @@ export function InsightsSection() {
         <ScrollReveal delay={0.3}>
           <div className="text-center mt-8">
             <Link
-              to="/content"
+              to="/insight"
               className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800 transition no-underline"
             >
               {t('nav.blog', 'Insights')} <ArrowRight className="w-4 h-4" />

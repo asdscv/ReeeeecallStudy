@@ -30,14 +30,34 @@ export async function runContentPipeline(env, cron) {
     const usedSubtopicIds = [...new Set(recentTags)]
 
     const topicCount = PIPELINE_DEFAULTS.topicsPerRun
-    info('Generating topics', { count: topicCount })
+    const maxTopics = topicCount + PIPELINE_DEFAULTS.maxExtraTopics
+    info('Generating topics', { count: topicCount, maxTopics })
 
-    for (let t = 0; t < topicCount; t++) {
+    // Track per-locale success counts
+    const successCount = {}
+    for (const locale of LOCALES) successCount[locale] = 0
+
+    let topicsAttempted = 0
+
+    while (topicsAttempted < maxTopics) {
+      // Stop if all locales met the target
+      const allMet = LOCALES.every((l) => successCount[l] >= topicCount)
+      if (allMet) break
+
+      // After main batch, only continue if there's a shortfall
+      if (topicsAttempted >= topicCount) {
+        const anyShort = LOCALES.some((l) => successCount[l] < topicCount)
+        if (!anyShort) break
+        info('Extra topic attempt to fill shortfall', { topicsAttempted, successCount })
+      }
+
+      topicsAttempted++
+
       try {
         // 3. Select topic (exclude already-picked ones this run)
         const topic = selectTopic(usedSubtopicIds)
         usedSubtopicIds.push(topic.id)
-        info('Topic selected', { index: t + 1, category: topic.category, subtopic: topic.id })
+        info('Topic selected', { index: topicsAttempted, category: topic.category, subtopic: topic.id })
 
         // 4. Generate thumbnail image (shared across locales)
         let thumbnailUrl = null
@@ -55,26 +75,43 @@ export async function runContentPipeline(env, cron) {
           warn('Image generation failed, continuing without image', { error: err.message })
         }
 
-        // 5. Generate content for each locale
+        // 5. Generate en first (need slug for other locales)
         let sharedSlug = null
-
-        for (const locale of LOCALES) {
-          try {
-            const article = await generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl)
-            if (article && locale === 'en') {
-              sharedSlug = article.slug
-            }
-            info('Locale completed', { locale, slug: article?.slug })
-          } catch (err) {
-            error('Locale failed', { locale, error: err.message })
+        try {
+          const enArticle = await generateForLocale(env, db, topic, 'en', recentContent, null, thumbnailUrl)
+          if (enArticle) {
+            sharedSlug = enArticle.slug
+            successCount.en++
+            info('Locale completed', { locale: 'en', slug: enArticle.slug })
           }
+        } catch (err) {
+          error('Locale failed', { locale: 'en', error: err.message })
         }
+
+        // 6. Generate ko, zh, ja in parallel
+        const otherLocales = LOCALES.filter((l) => l !== 'en')
+        const results = await Promise.allSettled(
+          otherLocales.map((locale) =>
+            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl),
+          ),
+        )
+
+        results.forEach((result, i) => {
+          const locale = otherLocales[i]
+          if (result.status === 'fulfilled' && result.value) {
+            successCount[locale]++
+            info('Locale completed', { locale, slug: result.value.slug })
+          } else {
+            const reason = result.status === 'rejected' ? result.reason?.message : 'no result returned'
+            error('Locale failed', { locale, error: reason })
+          }
+        })
       } catch (err) {
-        error('Topic failed', { index: t + 1, error: err.message })
+        error('Topic failed', { index: topicsAttempted, error: err.message })
       }
     }
 
-    info('Pipeline completed', { topicsRequested: topicCount })
+    info('Pipeline completed', { topicsAttempted, successCount, target: topicCount })
   } catch (err) {
     error('Pipeline failed', { error: err.message, stack: err.stack })
   }
@@ -123,16 +160,6 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
   if (dupCheck.isDuplicate) {
     info('Duplicate detected, adding date suffix', { reason: dupCheck.reason })
     article.slug = appendDateSuffix(article.slug)
-
-    // Re-check with new slug
-    dupCheck = checkDuplicate(
-      { slug: article.slug, title: article.title, tags: article.tags, locale },
-      recentContent,
-    )
-
-    if (dupCheck.isDuplicate) {
-      throw new Error(`Still duplicate after slug modification: ${dupCheck.reason}`)
-    }
   }
 
   // Build DB record
@@ -149,7 +176,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     reading_time_minutes: article.reading_time_minutes || 5,
     thumbnail_url: thumbnailUrl || null,
     og_image_url: thumbnailUrl || null,
-    canonical_url: `${SITE_URL}/content/${article.slug}`,
+    canonical_url: `${SITE_URL}/insight/${article.slug}`,
     author_name: 'ReeeeecallStudy',
     is_published: true,
     published_at: new Date().toISOString(),

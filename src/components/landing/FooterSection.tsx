@@ -110,7 +110,7 @@ export function FooterSection() {
               </h4>
               <ul className="space-y-2 list-none p-0 m-0">
                 <li>
-                  <Link to="/content" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <Link to="/insight" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
                     {t('footer.blog', 'Insights')}
                   </Link>
                 </li>

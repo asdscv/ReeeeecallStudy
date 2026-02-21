@@ -43,11 +43,11 @@ export function buildArticleJsonLd(article: ContentDetail) {
         height: SEO.OG_IMAGE_HEIGHT,
       },
     },
-    url: `${SEO.SITE_URL}/content/${article.slug}`,
+    url: `${SEO.SITE_URL}/insight/${article.slug}`,
     inLanguage: article.locale,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/content/${article.slug}`,
+      '@id': `${SEO.SITE_URL}/insight/${article.slug}`,
     },
   }
 }
@@ -67,13 +67,13 @@ export function buildBreadcrumbJsonLd(article: ContentDetail) {
         '@type': 'ListItem',
         position: 2,
         name: i18next.t('content:seo.breadcrumbInsights'),
-        item: `${SEO.SITE_URL}/content`,
+        item: `${SEO.SITE_URL}/insight`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: article.title,
-        item: `${SEO.SITE_URL}/content/${article.slug}`,
+        item: `${SEO.SITE_URL}/insight/${article.slug}`,
       },
     ],
   }
@@ -85,7 +85,7 @@ export function buildCollectionPageJsonLd() {
     '@type': 'CollectionPage',
     name: i18next.t('content:seo.listTitle'),
     description: i18next.t('content:seo.listDescription'),
-    url: `${SEO.SITE_URL}/content`,
+    url: `${SEO.SITE_URL}/insight`,
     image: {
       '@type': 'ImageObject',
       url: SEO.DEFAULT_OG_IMAGE,
@@ -106,7 +106,7 @@ export function buildCollectionPageJsonLd() {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/content`,
+      '@id': `${SEO.SITE_URL}/insight`,
     },
   }
 }
@@ -158,9 +158,9 @@ export function buildStaticHreflangAlternates(path: string) {
 export function buildHreflangAlternates(slug: string) {
   const alternates: { lang: string; href: string }[] = SEO.SUPPORTED_LOCALES.map((locale) => ({
     lang: locale as string,
-    href: `${SEO.SITE_URL}/content/${slug}?lang=${locale}`,
+    href: `${SEO.SITE_URL}/insight/${slug}?lang=${locale}`,
   }))
-  alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}/content/${slug}` })
+  alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}/insight/${slug}` })
   return alternates
 }
 
@@ -198,7 +198,7 @@ export function buildWebSiteJsonLd() {
     inLanguage: [...SEO.SUPPORTED_LOCALES],
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SEO.SITE_URL}/content?q={search_term_string}`,
+      target: `${SEO.SITE_URL}/insight?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   }
@@ -280,7 +280,7 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/content/${article.slug}`,
+      '@id': `${SEO.SITE_URL}/insight/${article.slug}`,
     },
     speakable: {
       '@type': 'SpeakableSpecification',

@@ -1,8 +1,8 @@
 # ReeeeecallStudy robots.txt
 User-agent: *
 Allow: /landing
-Allow: /content
-Allow: /content/*
+Allow: /insight
+Allow: /insight/*
 Disallow: /docs/
 Disallow: /auth/
 Disallow: /decks/
@@ -23,22 +23,22 @@ Crawl-delay: 2
 # Allow AI answer engines
 User-agent: ChatGPT-User
 Allow: /landing
-Allow: /content
-Allow: /content/*
+Allow: /insight
+Allow: /insight/*
 
 User-agent: PerplexityBot
 Allow: /landing
-Allow: /content
-Allow: /content/*
+Allow: /insight
+Allow: /insight/*
 
 User-agent: ClaudeBot
 Allow: /landing
-Allow: /content
-Allow: /content/*
+Allow: /insight
+Allow: /insight/*
 
 User-agent: Google-Extended
 Allow: /landing
-Allow: /content
-Allow: /content/*
+Allow: /insight
+Allow: /insight/*
 
 Sitemap: https://reeeeecallstudy.xyz/sitemap.xml

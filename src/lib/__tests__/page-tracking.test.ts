@@ -3,15 +3,15 @@ import { normalizePagePath, shouldTrackPage } from '../page-tracking'
 
 describe('normalizePagePath', () => {
   it('removes trailing slash', () => {
-    expect(normalizePagePath('/content/')).toBe('/content')
+    expect(normalizePagePath('/insight/')).toBe('/insight')
   })
 
   it('removes query parameters', () => {
-    expect(normalizePagePath('/content?utm_source=google')).toBe('/content')
+    expect(normalizePagePath('/insight?utm_source=google')).toBe('/insight')
   })
 
   it('removes hash fragment', () => {
-    expect(normalizePagePath('/content#section')).toBe('/content')
+    expect(normalizePagePath('/insight#section')).toBe('/insight')
   })
 
   it('keeps root path as /', () => {
@@ -19,11 +19,11 @@ describe('normalizePagePath', () => {
   })
 
   it('normalizes double slashes', () => {
-    expect(normalizePagePath('/content//detail')).toBe('/content/detail')
+    expect(normalizePagePath('/insight//detail')).toBe('/insight/detail')
   })
 
   it('handles complex paths', () => {
-    expect(normalizePagePath('/content/my-article/?ref=home#top')).toBe('/content/my-article')
+    expect(normalizePagePath('/insight/my-article/?ref=home#top')).toBe('/insight/my-article')
   })
 
   it('handles empty string', () => {
@@ -37,8 +37,8 @@ describe('shouldTrackPage', () => {
   })
 
   it('tracks content pages', () => {
-    expect(shouldTrackPage('/content')).toBe(true)
-    expect(shouldTrackPage('/content/my-article')).toBe(true)
+    expect(shouldTrackPage('/insight')).toBe(true)
+    expect(shouldTrackPage('/insight/my-article')).toBe(true)
   })
 
   it('tracks landing page', () => {

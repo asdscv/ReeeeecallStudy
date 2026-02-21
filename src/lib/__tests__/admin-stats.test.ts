@@ -1172,7 +1172,7 @@ describe('computeTopPagesTable', () => {
   it('maps page data correctly', () => {
     const result = computeTopPagesTable([
       { page_path: '/landing', view_count: 500, unique_visitors: 300 },
-      { page_path: '/content', view_count: 200, unique_visitors: 150 },
+      { page_path: '/insight', view_count: 200, unique_visitors: 150 },
     ])
     expect(result).toHaveLength(2)
     expect(result[0].page_path).toBe('/landing')

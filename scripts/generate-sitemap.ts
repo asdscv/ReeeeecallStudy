@@ -40,7 +40,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 async function main() {
   const staticPages = [
     { loc: SITE_URL, changefreq: 'weekly' as const, priority: 1.0 },
-    { loc: `${SITE_URL}/content`, changefreq: 'daily' as const, priority: 0.9 },
+    { loc: `${SITE_URL}/insight`, changefreq: 'daily' as const, priority: 0.9 },
   ]
 
   // Fetch all published content slugs
@@ -56,7 +56,7 @@ async function main() {
   }
 
   const contentPages = (data ?? []).map((row) => ({
-    loc: `${SITE_URL}/content/${row.slug}`,
+    loc: `${SITE_URL}/insight/${row.slug}`,
     lastmod: row.updated_at,
     changefreq: 'monthly' as const,
     priority: 0.8,

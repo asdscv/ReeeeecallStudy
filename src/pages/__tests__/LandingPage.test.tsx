@@ -20,12 +20,12 @@ function renderLanding() {
 }
 
 describe('LandingNav', () => {
-  it('should render Insights link pointing to /content', () => {
+  it('should render Insights link pointing to /insight', () => {
     renderLanding()
     // t('nav.blog', 'Insights') returns 'Insights' in test (empty resources, defaultValue)
     const links = screen.getAllByRole('link', { name: 'Insights' })
     // nav + footer both have Insights link; nav is first
-    expect(links[0]).toHaveAttribute('href', '/content')
+    expect(links[0]).toHaveAttribute('href', '/insight')
   })
 
   it('should render Login link pointing to /auth/login', () => {

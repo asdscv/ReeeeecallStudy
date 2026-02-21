@@ -32,10 +32,10 @@ export function ContentListPage() {
         description={t('seo.listDescription')}
         ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
-        canonicalUrl={`${SEO.SITE_URL}/content`}
+        canonicalUrl={`${SEO.SITE_URL}/insight`}
         jsonLd={[buildCollectionPageJsonLd(), buildOrganizationJsonLd()]}
         keywords={['spaced repetition', 'learning strategies', 'study tips', 'flashcards', 'active recall', 'memory techniques']}
-        hreflangAlternates={buildStaticHreflangAlternates('/content')}
+        hreflangAlternates={buildStaticHreflangAlternates('/insight')}
       />
       <ContentNav backTo="/" />
 

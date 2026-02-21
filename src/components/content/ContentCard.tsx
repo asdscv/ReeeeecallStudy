@@ -13,7 +13,7 @@ export function ContentCard({ content }: ContentCardProps) {
 
   return (
     <Link
-      to={`/content/${content.slug}`}
+      to={`/insight/${content.slug}`}
       className="block group rounded-2xl overflow-hidden no-underline transition-transform duration-300 hover:scale-[0.98]"
       style={{ height: cardHeight }}
     >
