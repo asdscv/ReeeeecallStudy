@@ -238,7 +238,7 @@ export function StudyCard({
   }
 
   return (
-    <div className="flex-1 flex items-stretch justify-center p-2 sm:p-4 overflow-hidden">
+    <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
       <div className="w-full max-w-2xl">
         <AnimatePresence mode="popLayout">
           <motion.div
@@ -247,7 +247,7 @@ export function StudyCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, transition: { duration: 0.12 } }}
-            className="relative h-full"
+            className="relative"
           >
             {/*
               Card body — NO perspective, NO preserve-3d, NO rotateY.
@@ -255,7 +255,7 @@ export function StudyCard({
               iOS Safari momentum scroll works natively.
             */}
             <div
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 h-full cursor-pointer relative flex flex-col"
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 h-[55vh] sm:h-[65vh] cursor-pointer relative flex flex-col"
               style={cardStyle}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
