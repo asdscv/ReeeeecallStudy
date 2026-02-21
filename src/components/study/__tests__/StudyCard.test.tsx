@@ -92,9 +92,8 @@ describe('StudyCard — back face rendering', () => {
     )
     // Back face should render "World" from field_values['back']
     expect(screen.getByText('World')).toBeInTheDocument()
-    // "Hello" appears in both front face (display:none) and back face reminder
-    const helloElements = screen.getAllByText('Hello')
-    expect(helloElements.length).toBeGreaterThanOrEqual(2)
+    // "Hello" appears in back face as the front-face reminder text
+    expect(screen.getByText('Hello')).toBeInTheDocument()
   })
 
   it('renders fallback when template field keys do not match card field_values', () => {
@@ -129,9 +128,8 @@ describe('StudyCard — back face rendering', () => {
         onFlip={() => {}}
       />,
     )
-    // "Hello" appears in front face (display:none) + back face reminder
-    const helloElements = screen.getAllByText('Hello')
-    expect(helloElements.length).toBeGreaterThanOrEqual(2)
+    // "Hello" appears in back face as the front-face reminder text
+    expect(screen.getByText('Hello')).toBeInTheDocument()
     // Back value: second value "World"
     expect(screen.getByText('World')).toBeInTheDocument()
   })

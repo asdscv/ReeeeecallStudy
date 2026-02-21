@@ -49,17 +49,34 @@ export function StudyCard({
   const [swipeDelta, setSwipeDelta] = useState({ x: 0, y: 0 })
   const [preview, setPreview] = useState<SwipePreview | null>(null)
   const [isSwiping, setIsSwiping] = useState(false)
+  /** True only during the 0.4s flip animation — enables preserve-3d */
+  const [isAnimating, setIsAnimating] = useState(false)
 
   // ── Refs (no re-renders — critical for scroll performance) ──
   const pointerOriginRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const deltaRef = useRef({ x: 0, y: 0 })
   const prevCardIdRef = useRef(card.id)
+  const prevIsFlippedRef = useRef(isFlipped)
   /** Direction commitment: 'none' → waiting, 'swipe' → JS handles, 'scroll' → browser handles */
   const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
   /** Suppress click immediately after a successful swipe */
   const swipedRef = useRef(false)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
+
+  // ── Flip animation tracking ────────────────────────────
+  // Enable preserve-3d ONLY during the flip animation.
+  // After animation, switch to flat mode → iOS Safari momentum scroll works.
+  useEffect(() => {
+    if (prevIsFlippedRef.current !== isFlipped) {
+      prevIsFlippedRef.current = isFlipped
+      setIsAnimating(true)
+    }
+  }, [isFlipped])
+
+  // Which faces to render: both during animation, only active face otherwise
+  const showFront = isAnimating || !isFlipped
+  const showBack = isAnimating || isFlipped
 
   // ── Reset ALL swipe state when card changes ───────────
   useEffect(() => {
@@ -71,6 +88,7 @@ export function StudyCard({
       setSwipeDelta({ x: 0, y: 0 })
       setPreview(null)
       setIsSwiping(false)
+      setIsAnimating(false)
     }
   }, [card.id])
 
@@ -209,10 +227,15 @@ export function StudyCard({
             style={{ perspective: '1000px' }}
           >
             <motion.div
-              animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.4 }}
+              animate={{
+                rotateY: isAnimating ? (isFlipped ? 180 : 0) : 0,
+              }}
+              transition={{ duration: isAnimating ? 0.4 : 0 }}
+              onAnimationComplete={() => {
+                if (isAnimating) setIsAnimating(false)
+              }}
               style={{
-                transformStyle: 'preserve-3d',
+                transformStyle: isAnimating ? 'preserve-3d' : undefined,
                 transform: isSwiping
                   ? `rotateY(${isFlipped ? 180 : 0}deg) translate(${dragTranslateX}px, ${dragTranslateY}px)`
                   : undefined,
@@ -233,16 +256,11 @@ export function StudyCard({
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerCancel}
             >
-              {/* Swipe color overlay — only during active swipe drag */}
-              {preview && isSwiping && (
+              {/* Swipe color overlay — only during active swipe (never during flip) */}
+              {preview && isSwiping && !isAnimating && (
                 <div
                   className="absolute inset-0 z-10 pointer-events-none rounded-2xl flex items-center justify-center"
-                  style={{
-                    backgroundColor: preview.color,
-                    backfaceVisibility: 'hidden',
-                    WebkitBackfaceVisibility: 'hidden',
-                    transform: 'rotateY(180deg)',
-                  } as React.CSSProperties}
+                  style={{ backgroundColor: preview.color }}
                 >
                   <span
                     className="text-2xl font-bold text-white drop-shadow-md"
@@ -254,130 +272,125 @@ export function StudyCard({
               )}
 
               {/*
-                Card face architecture (Safari-compatible):
-                - Outer div: 3D layer (backface-visibility, transform, overflow:clip)
-                  overflow:clip clips content (respects border-radius) without creating
-                  a scroll container → child scroll works on iOS Safari.
-                  translateZ(0) on front face ensures Safari respects backface-visibility.
-                - Inner div: scroll layer (overflow-y-auto, no transform)
-                  Separated from 3D transform so mobile touch scroll works.
-                  No overscroll-behavior here — iOS Safari bug can block all scrolling.
-                - NO non-passive touchmove — kills iOS momentum scroll.
-                  touch-action:pan-y + card-body overscrollBehavior handle gestures.
+                Card architecture — conditional 3D:
+                - During flip animation (isAnimating): preserve-3d + backface-visibility
+                  + 3D transforms on face divs. Scroll disabled (0.4s only).
+                - Normal interaction (!isAnimating): flat mode, only active face rendered,
+                  NO 3D transforms → iOS Safari momentum scroll works perfectly.
               */}
 
               {/* ═══ Front Face ═══ */}
-              <div
-                className="absolute inset-0 rounded-2xl"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'translateZ(0)',  // Safari needs explicit 3D transform for backface-visibility
-                  overflow: 'clip',  // clips content (respects border-radius) without blocking child scroll
-                } as React.CSSProperties}
-              >
-                {/* Decorative header — fixed above scroll */}
-                {frontRender.mode !== 'custom' && (
-                  <>
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-2xl z-10" />
-                    <div className="absolute top-2 right-3 text-[10px] font-semibold text-blue-400 tracking-wider uppercase z-10">
-                      {t('card.front')}
-                    </div>
-                  </>
-                )}
-                {/* Scroll layer — no CSS transform → mobile touch scroll works */}
+              {showFront && (
                 <div
-                  className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{ WebkitOverflowScrolling: 'touch' }}
+                  className="absolute inset-0 rounded-2xl"
+                  style={isAnimating ? {
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                    overflow: 'clip',
+                  } as React.CSSProperties : undefined}
                 >
-                  <div className="flex-1 flex flex-col items-center justify-center">
-                    {frontRender.mode === 'custom' ? (
-                      <div
-                        className="prose prose-sm max-w-none text-center"
-                        dangerouslySetInnerHTML={{ __html: frontRender.html }}
-                      />
-                    ) : frontFace.effectiveLayout.length > 0 ? (
-                      <CardFaceLayout
-                        layout={frontFace.effectiveLayout}
-                        fieldValues={frontFace.fieldValues}
-                        fields={frontFace.fields}
-                        ttsFields={frontTTSFields}
-                        t={t}
-                      />
-                    ) : (
-                      <div className="text-3xl sm:text-5xl font-bold text-gray-900 text-center tracking-tight break-words">
-                        {frontFace.fallbackValue}
+                  {frontRender.mode !== 'custom' && (
+                    <>
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-2xl z-10" />
+                      <div className="absolute top-2 right-3 text-[10px] font-semibold text-blue-400 tracking-wider uppercase z-10">
+                        {t('card.front')}
                       </div>
-                    )}
-                  </div>
-                  <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
-                    {t('card.tapToFlip')}
+                    </>
+                  )}
+                  <div
+                    className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+                    style={{ WebkitOverflowScrolling: 'touch' }}
+                  >
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                      {frontRender.mode === 'custom' ? (
+                        <div
+                          className="prose prose-sm max-w-none text-center"
+                          dangerouslySetInnerHTML={{ __html: frontRender.html }}
+                        />
+                      ) : frontFace.effectiveLayout.length > 0 ? (
+                        <CardFaceLayout
+                          layout={frontFace.effectiveLayout}
+                          fieldValues={frontFace.fieldValues}
+                          fields={frontFace.fields}
+                          ttsFields={frontTTSFields}
+                          t={t}
+                        />
+                      ) : (
+                        <div className="text-3xl sm:text-5xl font-bold text-gray-900 text-center tracking-tight break-words">
+                          {frontFace.fallbackValue}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
+                      {t('card.tapToFlip')}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* ═══ Back Face ═══ */}
-              <div
-                className="absolute inset-0 rounded-2xl"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)',
-                  overflow: 'clip',  // clips content (respects border-radius) without blocking child scroll
-                } as React.CSSProperties}
-              >
-                {/* Decorative header — fixed above scroll */}
-                {backRender.mode !== 'custom' && (
-                  <>
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-teal-500 rounded-t-2xl z-10" />
-                    <div className="absolute top-2 left-3 text-[10px] font-semibold text-teal-400 tracking-wider uppercase z-10">
-                      {t('card.back')}
-                    </div>
-                  </>
-                )}
-                {/* Scroll layer — no CSS transform → mobile touch scroll works */}
+              {showBack && (
                 <div
-                  className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{ WebkitOverflowScrolling: 'touch' }}
+                  className="absolute inset-0 rounded-2xl"
+                  style={isAnimating ? {
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transform: 'rotateY(180deg)',
+                    overflow: 'clip',
+                  } as React.CSSProperties : undefined}
                 >
-                  <div className="flex-1 flex flex-col items-center justify-center">
-                    {backRender.mode === 'custom' ? (
-                      <div
-                        className="prose prose-sm max-w-none text-center"
-                        dangerouslySetInnerHTML={{ __html: backRender.html }}
+                  {backRender.mode !== 'custom' && (
+                    <>
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-teal-500 rounded-t-2xl z-10" />
+                      <div className="absolute top-2 left-3 text-[10px] font-semibold text-teal-400 tracking-wider uppercase z-10">
+                        {t('card.back')}
+                      </div>
+                    </>
+                  )}
+                  <div
+                    className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+                    style={{ WebkitOverflowScrolling: 'touch' }}
+                  >
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                      {backRender.mode === 'custom' ? (
+                        <div
+                          className="prose prose-sm max-w-none text-center"
+                          dangerouslySetInnerHTML={{ __html: backRender.html }}
+                        />
+                      ) : (
+                        <>
+                          {frontFace.primaryValue && (
+                            <div className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-6 tracking-wide">
+                              {frontFace.primaryValue}
+                            </div>
+                          )}
+                          {backFace.effectiveLayout.length > 0 ? (
+                            <CardFaceLayout
+                              layout={backFace.effectiveLayout}
+                              fieldValues={backFace.fieldValues}
+                              fields={backFace.fields}
+                              ttsFields={backTTSFields}
+                              t={t}
+                            />
+                          ) : (
+                            <div className="text-2xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight break-words">
+                              {backFace.fallbackValue}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {swipeEnabled && inputSettings && (
+                      <SwipeGuide
+                        directions={inputSettings.directions}
+                        visible={isFlipped && !isSwiping}
                       />
-                    ) : (
-                      <>
-                        {frontFace.primaryValue && (
-                          <div className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-6 tracking-wide">
-                            {frontFace.primaryValue}
-                          </div>
-                        )}
-                        {backFace.effectiveLayout.length > 0 ? (
-                          <CardFaceLayout
-                            layout={backFace.effectiveLayout}
-                            fieldValues={backFace.fieldValues}
-                            fields={backFace.fields}
-                            ttsFields={backTTSFields}
-                            t={t}
-                          />
-                        ) : (
-                          <div className="text-2xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight break-words">
-                            {backFace.fallbackValue}
-                          </div>
-                        )}
-                      </>
                     )}
                   </div>
-
-                  {swipeEnabled && inputSettings && (
-                    <SwipeGuide
-                      directions={inputSettings.directions}
-                      visible={isFlipped && !isSwiping}
-                    />
-                  )}
                 </div>
-              </div>
+              )}
             </motion.div>
           </motion.div>
         </AnimatePresence>
