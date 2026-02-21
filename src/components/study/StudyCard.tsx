@@ -45,40 +45,40 @@ export function StudyCard({
 }: StudyCardProps) {
   const { t } = useTranslation('study')
 
-  // ── Render-affecting state (only these cause re-renders) ──
+  // ── Render-affecting state ──
   const [swipeDelta, setSwipeDelta] = useState({ x: 0, y: 0 })
   const [preview, setPreview] = useState<SwipePreview | null>(null)
   const [isSwiping, setIsSwiping] = useState(false)
-  /** True only during the 0.4s flip animation — enables preserve-3d */
-  const [isAnimating, setIsAnimating] = useState(false)
 
-  // ── Refs (no re-renders — critical for scroll performance) ──
+  // 2D flip: which side is currently displayed + fade animation
+  const [displaySide, setDisplaySide] = useState<'front' | 'back'>(isFlipped ? 'back' : 'front')
+  const [isFading, setIsFading] = useState(false)
+
+  // ── Refs (no re-renders) ──
   const pointerOriginRef = useRef<{ x: number; y: number; t: number } | null>(null)
   const deltaRef = useRef({ x: 0, y: 0 })
   const prevCardIdRef = useRef(card.id)
-  const prevIsFlippedRef = useRef(isFlipped)
-  /** Direction commitment: 'none' → waiting, 'swipe' → JS handles, 'scroll' → browser handles */
   const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
-  /** Suppress click immediately after a successful swipe */
   const swipedRef = useRef(false)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
 
-  // ── Flip animation tracking ────────────────────────────
-  // Enable preserve-3d ONLY during the flip animation.
-  // After animation, switch to flat mode → iOS Safari momentum scroll works.
+  // ── 2D flip animation ──────────────────────────────────
+  // No CSS 3D at all. Fade out → swap content → fade in.
+  // Card body has ZERO transforms when idle → iOS momentum scroll works.
   useEffect(() => {
-    if (prevIsFlippedRef.current !== isFlipped) {
-      prevIsFlippedRef.current = isFlipped
-      setIsAnimating(true)
+    const target = isFlipped ? 'back' : 'front'
+    if (displaySide !== target && !isFading) {
+      setIsFading(true)
+      const timer = setTimeout(() => {
+        setDisplaySide(target)
+        setIsFading(false)
+      }, 150)
+      return () => clearTimeout(timer)
     }
-  }, [isFlipped])
+  }, [isFlipped, displaySide, isFading])
 
-  // Which faces to render: both during animation, only active face otherwise
-  const showFront = isAnimating || !isFlipped
-  const showBack = isAnimating || isFlipped
-
-  // ── Reset ALL swipe state when card changes ───────────
+  // ── Reset ALL state when card changes ──────────────────
   useEffect(() => {
     if (prevCardIdRef.current !== card.id) {
       prevCardIdRef.current = card.id
@@ -88,7 +88,8 @@ export function StudyCard({
       setSwipeDelta({ x: 0, y: 0 })
       setPreview(null)
       setIsSwiping(false)
-      setIsAnimating(false)
+      setDisplaySide('front')
+      setIsFading(false)
     }
   }, [card.id])
 
@@ -102,7 +103,7 @@ export function StudyCard({
     [template, card],
   )
 
-  // Custom HTML rendering decision
+  // Custom HTML rendering
   const frontRender = useMemo(
     () => renderCardFace(template, card, 'front'),
     [template, card],
@@ -118,10 +119,7 @@ export function StudyCard({
     [inputSettings, swipeEnabled],
   )
 
-  // ── Direction Commitment swipe handlers ─────────────
-  // pointerOrigin is a REF (not state) so touch-start doesn't trigger re-render.
-  // Only isSwiping/swipeDelta/preview are state → re-renders only during active swipe.
-
+  // ── Direction Commitment swipe handlers ─────────────────
   function resetSwipeState() {
     pointerOriginRef.current = null
     deltaRef.current = { x: 0, y: 0 }
@@ -134,7 +132,6 @@ export function StudyCard({
   function handlePointerDown(e: React.PointerEvent) {
     if (!swipeEnabled || !isFlipped) return
     if ((e.target as HTMLElement).closest('button')) return
-    // Record origin as ref — NO setState → NO re-render → smooth scroll start
     pointerOriginRef.current = { x: e.clientX, y: e.clientY, t: Date.now() }
     deltaRef.current = { x: 0, y: 0 }
     committedRef.current = 'none'
@@ -148,25 +145,21 @@ export function StudyCard({
     const dx = e.clientX - origin.x
     const dy = e.clientY - origin.y
 
-    // ── Direction commitment phase ──────────────────
     if (committedRef.current === 'none') {
       const absDx = Math.abs(dx)
       const absDy = Math.abs(dy)
       if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return
 
       if (absDx >= absDy) {
-        // Horizontal-dominant → swipe intent
         committedRef.current = 'swipe'
-        setIsSwiping(true) // only NOW trigger re-render
+        setIsSwiping(true)
         try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
       } else {
-        // Vertical-dominant → let browser scroll card content
         committedRef.current = 'scroll'
         return
       }
     }
 
-    // ── Committed to swipe — track delta & preview ──
     deltaRef.current = { x: dx, y: dy }
     setSwipeDelta({ x: dx, y: dy })
     setPreview(previewSwipeAction(dx, dy, inputSettings.directions))
@@ -198,20 +191,40 @@ export function StudyCard({
     }
   }
 
-  /** Browser took over (e.g. native scroll started) — clean up */
   function handlePointerCancel() {
     resetSwipeState()
   }
 
-  // Computed card transform during active swipe
+  // Computed swipe drag offset
   const dragTranslateX = isSwiping ? swipeDelta.x * DAMPEN : 0
   const dragTranslateY = isSwiping ? swipeDelta.y * DAMPEN : 0
 
-  // Smart touch-action: allows card-content scrolling on the non-swipe axis
+  // Touch-action for swipe vs scroll
   const touchAction = computeTouchAction(
     inputSettings?.directions ?? { left: '', right: '', up: '', down: '' },
     swipeEnabled && isFlipped,
   )
+
+  // ── Card body style: ZERO 3D — only 2D transforms when needed ──
+  const cardStyle: React.CSSProperties = {
+    touchAction,
+    userSelect: isSwiping ? 'none' : 'auto',
+    WebkitUserSelect: isSwiping ? 'none' : 'auto',
+    WebkitTouchCallout: 'none',
+  }
+
+  // Only apply transform during active swipe or fade (idle = NO transform)
+  if (isSwiping) {
+    cardStyle.transform = `translate(${dragTranslateX}px, ${dragTranslateY}px)`
+  } else if (isFading) {
+    cardStyle.opacity = 0
+    cardStyle.transform = 'scale(0.97)'
+  }
+
+  // Transition only for fade animation, not during swipe
+  if (!isSwiping) {
+    cardStyle.transition = 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out'
+  }
 
   return (
     <div className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
@@ -224,28 +237,15 @@ export function StudyCard({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, transition: { duration: 0.12 } }}
             className="relative"
-            style={{ perspective: '1000px' }}
           >
-            <motion.div
-              animate={{
-                rotateY: isAnimating ? (isFlipped ? 180 : 0) : 0,
-              }}
-              transition={{ duration: isAnimating ? 0.4 : 0 }}
-              onAnimationComplete={() => {
-                if (isAnimating) setIsAnimating(false)
-              }}
-              style={{
-                transformStyle: isAnimating ? 'preserve-3d' : undefined,
-                transform: isSwiping
-                  ? `rotateY(${isFlipped ? 180 : 0}deg) translate(${dragTranslateX}px, ${dragTranslateY}px)`
-                  : undefined,
-                touchAction,
-                overscrollBehavior: 'none',
-                userSelect: isSwiping ? 'none' : 'auto',
-                WebkitUserSelect: isSwiping ? 'none' : 'auto',
-                WebkitTouchCallout: 'none',
-              } as React.CSSProperties}
+            {/*
+              Card body — NO perspective, NO preserve-3d, NO rotateY.
+              Pure 2D div. Scroll container lives in a normal 2D context.
+              iOS Safari momentum scroll works natively.
+            */}
+            <div
               className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[280px] sm:min-h-[400px] max-h-[70vh] cursor-pointer relative"
+              style={cardStyle}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
                 if (swipedRef.current) return
@@ -256,8 +256,8 @@ export function StudyCard({
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerCancel}
             >
-              {/* Swipe color overlay — only during active swipe (never during flip) */}
-              {preview && isSwiping && !isAnimating && (
+              {/* Swipe color overlay */}
+              {preview && isSwiping && (
                 <div
                   className="absolute inset-0 z-10 pointer-events-none rounded-2xl flex items-center justify-center"
                   style={{ backgroundColor: preview.color }}
@@ -271,88 +271,53 @@ export function StudyCard({
                 </div>
               )}
 
-              {/*
-                Card architecture — conditional 3D:
-                - During flip animation (isAnimating): preserve-3d + backface-visibility
-                  + 3D transforms on face divs. Scroll disabled (0.4s only).
-                - Normal interaction (!isAnimating): flat mode, only active face rendered,
-                  NO 3D transforms → iOS Safari momentum scroll works perfectly.
-              */}
-
-              {/* ═══ Front Face ═══ */}
-              {showFront && (
-                <div
-                  className="absolute inset-0 rounded-2xl"
-                  style={isAnimating ? {
-                    backfaceVisibility: 'hidden',
-                    WebkitBackfaceVisibility: 'hidden',
-                    transform: 'translateZ(0)',
-                    overflow: 'clip',
-                  } as React.CSSProperties : undefined}
-                >
-                  {frontRender.mode !== 'custom' && (
-                    <>
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-2xl z-10" />
-                      <div className="absolute top-2 right-3 text-[10px] font-semibold text-blue-400 tracking-wider uppercase z-10">
-                        {t('card.front')}
-                      </div>
-                    </>
-                  )}
-                  <div
-                    className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                    style={{ WebkitOverflowScrolling: 'touch' }}
-                  >
-                    <div className="flex-1 flex flex-col items-center justify-center">
-                      {frontRender.mode === 'custom' ? (
-                        <div
-                          className="prose prose-sm max-w-none text-center"
-                          dangerouslySetInnerHTML={{ __html: frontRender.html }}
-                        />
-                      ) : frontFace.effectiveLayout.length > 0 ? (
-                        <CardFaceLayout
-                          layout={frontFace.effectiveLayout}
-                          fieldValues={frontFace.fieldValues}
-                          fields={frontFace.fields}
-                          ttsFields={frontTTSFields}
-                          t={t}
-                        />
-                      ) : (
-                        <div className="text-3xl sm:text-5xl font-bold text-gray-900 text-center tracking-tight break-words">
-                          {frontFace.fallbackValue}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
-                      {t('card.tapToFlip')}
-                    </div>
+              {/* Decorative header */}
+              {frontRender.mode !== 'custom' && displaySide === 'front' && (
+                <>
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-2xl z-10" />
+                  <div className="absolute top-2 right-3 text-[10px] font-semibold text-blue-400 tracking-wider uppercase z-10">
+                    {t('card.front')}
                   </div>
-                </div>
+                </>
+              )}
+              {backRender.mode !== 'custom' && displaySide === 'back' && (
+                <>
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-teal-500 rounded-t-2xl z-10" />
+                  <div className="absolute top-2 left-3 text-[10px] font-semibold text-teal-400 tracking-wider uppercase z-10">
+                    {t('card.back')}
+                  </div>
+                </>
               )}
 
-              {/* ═══ Back Face ═══ */}
-              {showBack && (
-                <div
-                  className="absolute inset-0 rounded-2xl"
-                  style={isAnimating ? {
-                    backfaceVisibility: 'hidden',
-                    WebkitBackfaceVisibility: 'hidden',
-                    transform: 'rotateY(180deg)',
-                    overflow: 'clip',
-                  } as React.CSSProperties : undefined}
-                >
-                  {backRender.mode !== 'custom' && (
-                    <>
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-teal-500 rounded-t-2xl z-10" />
-                      <div className="absolute top-2 left-3 text-[10px] font-semibold text-teal-400 tracking-wider uppercase z-10">
-                        {t('card.back')}
+              {/* Scroll layer — pure 2D, no 3D ancestor */}
+              <div
+                className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  {displaySide === 'front' ? (
+                    // ── Front content ──
+                    frontRender.mode === 'custom' ? (
+                      <div
+                        className="prose prose-sm max-w-none text-center"
+                        dangerouslySetInnerHTML={{ __html: frontRender.html }}
+                      />
+                    ) : frontFace.effectiveLayout.length > 0 ? (
+                      <CardFaceLayout
+                        layout={frontFace.effectiveLayout}
+                        fieldValues={frontFace.fieldValues}
+                        fields={frontFace.fields}
+                        ttsFields={frontTTSFields}
+                        t={t}
+                      />
+                    ) : (
+                      <div className="text-3xl sm:text-5xl font-bold text-gray-900 text-center tracking-tight break-words">
+                        {frontFace.fallbackValue}
                       </div>
-                    </>
-                  )}
-                  <div
-                    className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                    style={{ WebkitOverflowScrolling: 'touch' }}
-                  >
-                    <div className="flex-1 flex flex-col items-center justify-center">
+                    )
+                  ) : (
+                    // ── Back content ──
+                    <>
                       {backRender.mode === 'custom' ? (
                         <div
                           className="prose prose-sm max-w-none text-center"
@@ -380,22 +345,30 @@ export function StudyCard({
                           )}
                         </>
                       )}
-                    </div>
-
-                    {swipeEnabled && inputSettings && (
-                      <SwipeGuide
-                        directions={inputSettings.directions}
-                        visible={isFlipped && !isSwiping}
-                      />
-                    )}
-                  </div>
+                    </>
+                  )}
                 </div>
-              )}
-            </motion.div>
+
+                {/* Tap-to-flip hint (front face) */}
+                {displaySide === 'front' && (
+                  <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
+                    {t('card.tapToFlip')}
+                  </div>
+                )}
+
+                {/* Swipe guide (back face, swipe mode) */}
+                {displaySide === 'back' && swipeEnabled && inputSettings && (
+                  <SwipeGuide
+                    directions={inputSettings.directions}
+                    visible={isFlipped && !isSwiping}
+                  />
+                )}
+              </div>
+            </div>
           </motion.div>
         </AnimatePresence>
 
-        {/* Swipe hint (shown when flipped + swipe mode) */}
+        {/* Swipe hint text */}
         {isFlipped && swipeEnabled && hintText && (
           <div className="text-center mt-4 text-gray-400 text-sm" data-testid="swipe-hint">
             {hintText}
