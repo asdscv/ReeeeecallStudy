@@ -4,6 +4,7 @@ export const LOCALES = ['en', 'ko', 'zh', 'ja']
 
 export const PIPELINE_DEFAULTS = {
   topicsPerRun: 10,
+  maxExtraTopics: 5,
   maxBlocks: 13,
   minBlocks: 7,
   maxRetries: 3,
