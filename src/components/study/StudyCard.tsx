@@ -255,14 +255,15 @@ export function StudyCard({
 
               {/*
                 Card face architecture (Safari-compatible):
-                - Outer div: 3D layer (backface-visibility, transform, clip-path)
-                  clip-path clips content to rounded bounds without blocking Safari
-                  child scroll (unlike overflow:hidden). translateZ(0) on front face
-                  ensures Safari respects backface-visibility:hidden.
+                - Outer div: 3D layer (backface-visibility, transform, overflow:clip)
+                  overflow:clip clips content (respects border-radius) without creating
+                  a scroll container → child scroll works on iOS Safari.
+                  translateZ(0) on front face ensures Safari respects backface-visibility.
                 - Inner div: scroll layer (overflow-y-auto, no transform)
                   Separated from 3D transform so mobile touch scroll works.
-                - NO non-passive touchmove listener — it blocks iOS momentum scroll.
-                  touch-action:pan-y + overscrollBehavior:none handle gesture boundaries.
+                  No overscroll-behavior here — iOS Safari bug can block all scrolling.
+                - NO non-passive touchmove — kills iOS momentum scroll.
+                  touch-action:pan-y + card-body overscrollBehavior handle gestures.
               */}
 
               {/* ═══ Front Face ═══ */}
@@ -272,7 +273,7 @@ export function StudyCard({
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                   transform: 'translateZ(0)',  // Safari needs explicit 3D transform for backface-visibility
-                  clipPath: 'inset(0 round 16px)',  // clips content without blocking Safari child scroll (unlike overflow:hidden)
+                  overflow: 'clip',  // clips content (respects border-radius) without blocking child scroll
                 } as React.CSSProperties}
               >
                 {/* Decorative header — fixed above scroll */}
@@ -287,10 +288,7 @@ export function StudyCard({
                 {/* Scroll layer — no CSS transform → mobile touch scroll works */}
                 <div
                   className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{
-                    WebkitOverflowScrolling: 'touch',
-                    overscrollBehavior: 'none',
-                  }}
+                  style={{ WebkitOverflowScrolling: 'touch' }}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center">
                     {frontRender.mode === 'custom' ? (
@@ -325,7 +323,7 @@ export function StudyCard({
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
-                  clipPath: 'inset(0 round 16px)',  // clips content without blocking Safari child scroll
+                  overflow: 'clip',  // clips content (respects border-radius) without blocking child scroll
                 } as React.CSSProperties}
               >
                 {/* Decorative header — fixed above scroll */}
@@ -340,10 +338,7 @@ export function StudyCard({
                 {/* Scroll layer — no CSS transform → mobile touch scroll works */}
                 <div
                   className="h-full p-4 sm:p-8 lg:p-12 flex flex-col overflow-y-auto"
-                  style={{
-                    WebkitOverflowScrolling: 'touch',
-                    overscrollBehavior: 'none',
-                  }}
+                  style={{ WebkitOverflowScrolling: 'touch' }}
                 >
                   <div className="flex-1 flex flex-col items-center justify-center">
                     {backRender.mode === 'custom' ? (
