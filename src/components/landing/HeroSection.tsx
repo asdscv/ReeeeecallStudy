@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Zap, Lock } from 'lucide-react'
+import { ArrowRight, Zap } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 
 const EASE_OUT = [0.16, 1, 0.3, 1] as const
@@ -93,13 +93,8 @@ export function HeroSection() {
           </button>
         </motion.div>
 
-        <motion.p
-          variants={prefersReduced ? undefined : fadeUp}
-          className="mt-6 text-sm text-gray-400 flex items-center justify-center gap-1.5"
-        >
-          <Lock className="w-3.5 h-3.5" />
-          {t('hero.freeForever', 'Free forever. No credit card required.')}
-        </motion.p>
+        {/* spacer */}
+        <div className="mt-6" />
       </motion.div>
     </section>
   )
