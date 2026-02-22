@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ─── Supabase mock (HOISTED — runs before imports) ──────────
-const mockUpdate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: null, error: null }) })
-const mockInsert = vi.fn().mockReturnValue({ select: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: null, error: null }) }) })
-const mockInsertPlain = vi.fn().mockResolvedValue({ data: null, error: null })
-
 const mockSupabase = vi.hoisted(() => {
   const chainable = () => {
     const chain: Record<string, any> = {}
@@ -60,6 +56,10 @@ function makeCard(id: string, pos: number, status: Card['srs_status'] = 'new'): 
   return {
     id,
     deck_id: 'deck-1',
+    user_id: 'user-1',
+    template_id: 'tmpl-1',
+    field_values: { front: `front-${id}`, back: `back-${id}` },
+    tags: [],
     sort_position: pos,
     srs_status: status,
     ease_factor: 2.5,
@@ -67,11 +67,9 @@ function makeCard(id: string, pos: number, status: Card['srs_status'] = 'new'): 
     repetitions: 0,
     next_review_at: null,
     last_reviewed_at: null,
-    front: { text: `front-${id}` },
-    back: { text: `back-${id}` },
     created_at: '2025-01-01',
     updated_at: '2025-01-01',
-  } as Card
+  } as unknown as Card
 }
 
 const fakeStudyState: DeckStudyState = {
