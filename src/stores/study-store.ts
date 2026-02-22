@@ -4,6 +4,7 @@ import { calculateSRS, type SrsRating } from '../lib/srs'
 import { advanceSequentialReviewPosition, buildSequentialReviewQueue } from '../lib/study-session-utils'
 import { SrsQueueManager, type QueueCard } from '../lib/study-queue'
 import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating } from '../lib/cramming-queue'
+import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
@@ -37,11 +38,13 @@ interface StudyState {
   currentIndex: number
   isFlipped: boolean
   isRating: boolean
+  exitDirection: ExitDirection | null
   cardStartTime: number
   sessionStartedAt: number
   sessionStats: SessionStats
   studyState: DeckStudyState | null
   srsSource: SrsSource
+  userId: string | null
   srsQueueManager: SrsQueueManager | null
   crammingManager: CrammingQueueManager | null
   maxCardPosition: number
@@ -70,10 +73,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   currentIndex: 0,
   isFlipped: false,
   isRating: false,
+  exitDirection: null,
   cardStartTime: Date.now(),
   sessionStartedAt: Date.now(),
   sessionStats: { ...initialStats },
   studyState: null,
+  userId: null,
   srsSource: 'embedded',
   srsQueueManager: null,
   crammingManager: null,
@@ -87,6 +92,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { set({ phase: 'idle' }); return }
+    set({ userId: user.id })
 
     // Fetch deck template, srs_settings, and sharing info
     const { data: deck } = await supabase
@@ -433,9 +439,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, studyState, maxCardPosition } = get()
-    if (!config || isRating) return
-    set({ isRating: true })
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, studyState, maxCardPosition, userId } = get()
+    if (!config || isRating || !userId) return
+    set({ isRating: true, exitDirection: getRatingExitDirection(rating) })
 
     const isSrsMode = config.mode === 'srs' && srsQueueManager
     const isCrammingMode = config.mode === 'cramming' && crammingManager
@@ -454,13 +460,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     if (!card) return
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
     const durationMs = Date.now() - cardStartTime
     let newInterval = card.interval_days
     let newEase = card.ease_factor
     let updatedQueue = queue
+    let srsResult: ReturnType<typeof calculateSRS> | null = null
 
     if (isCrammingMode) {
       // Cramming mode: NO SRS calculation, just advance the cramming manager
@@ -468,39 +472,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       const crammingRating: CrammingRating = rating === 'known' ? 'got_it' : rating === 'unknown' ? 'missed' : rating as CrammingRating
       crammingManager!.rateCard(crammingRating)
     } else if (config.mode === 'srs') {
-      // SRS mode: update card SRS fields
-      const srsResult = calculateSRS(card, rating as SrsRating, srsSettings ?? undefined)
+      // SRS mode: calculate SRS synchronously
+      srsResult = calculateSRS(card, rating as SrsRating, srsSettings ?? undefined)
       newInterval = srsResult.interval_days
       newEase = srsResult.ease_factor
-
-      if (srsSource === 'progress_table') {
-        await supabase
-          .from('user_card_progress')
-          .upsert({
-            user_id: user.id,
-            card_id: card.id,
-            deck_id: config.deckId,
-            ease_factor: srsResult.ease_factor,
-            interval_days: srsResult.interval_days,
-            repetitions: srsResult.repetitions,
-            srs_status: srsResult.srs_status,
-            next_review_at: srsResult.next_review_at,
-            last_reviewed_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          } as Record<string, unknown>, { onConflict: 'user_id,card_id' })
-      } else {
-        await supabase
-          .from('cards')
-          .update({
-            ease_factor: srsResult.ease_factor,
-            interval_days: srsResult.interval_days,
-            repetitions: srsResult.repetitions,
-            srs_status: srsResult.srs_status,
-            next_review_at: srsResult.next_review_at,
-            last_reviewed_at: new Date().toISOString(),
-          } as Record<string, unknown>)
-          .eq('id', card.id)
-      }
 
       const queueIndex = queue.findIndex(c => c.id === card!.id)
       if (queueIndex >= 0) {
@@ -521,31 +496,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
     }
 
-    // Log study
-    await supabase
-      .from('study_logs')
-      .insert({
-        user_id: user.id,
-        card_id: card.id,
-        deck_id: config.deckId,
-        study_mode: config.mode,
-        rating,
-        prev_interval: card.interval_days,
-        new_interval: newInterval,
-        prev_ease: card.ease_factor,
-        new_ease: newEase,
-        review_duration_ms: durationMs,
-      } as Record<string, unknown>)
-
-    // Per-card position update for sequential_review
+    // Per-card position update for sequential_review (sync state update)
+    let updatedStudyState = studyState
+    let posUpdate: Record<string, number> | null = null
     if (config.mode === 'sequential_review' && studyState) {
-      const posUpdate = advanceSequentialReviewPosition(card, maxCardPosition)
-      const updatedStudyState = { ...studyState, ...posUpdate }
-      await supabase
-        .from('deck_study_state')
-        .update(posUpdate as Record<string, unknown>)
-        .eq('id', studyState.id)
-      set({ studyState: updatedStudyState })
+      posUpdate = advanceSequentialReviewPosition(card, maxCardPosition)
+      updatedStudyState = { ...studyState, ...posUpdate }
     }
 
     // Update stats
@@ -567,10 +523,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       ? srsQueueManager!.studiedCount() + srsQueueManager!.remaining()
       : sessionStats.totalCards
 
+    // ★ Optimistic UI update — set state BEFORE DB writes ★
+    // Brief delay so :active press effect is visible before buttons unmount
+    await new Promise(r => setTimeout(r, 120))
+
     if (isComplete) {
       set({
         queue: updatedQueue,
         isRating: false,
+        studyState: updatedStudyState,
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
@@ -580,9 +541,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         },
         phase: 'completed',
       })
-      await get().endSession()
     } else if (isCrammingMode) {
-      // Cramming: get next card from cramming manager
       const nextCardId = crammingManager!.currentCardId()
       const nextCardIndex = nextCardId
         ? queue.findIndex(c => c.id === nextCardId)
@@ -594,6 +553,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         isFlipped: false,
         isRating: false,
         cardStartTime: Date.now(),
+        studyState: updatedStudyState,
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
@@ -613,6 +573,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         isFlipped: false,
         isRating: false,
         cardStartTime: Date.now(),
+        studyState: updatedStudyState,
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
@@ -628,6 +589,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         isFlipped: false,
         isRating: false,
         cardStartTime: Date.now(),
+        studyState: updatedStudyState,
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
@@ -636,14 +598,85 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         },
       })
     }
+
+    // ★ Background DB writes (fire-and-forget) ★
+    const dbWrites: PromiseLike<unknown>[] = []
+
+    // SRS DB update
+    if (config.mode === 'srs' && srsResult) {
+      if (srsSource === 'progress_table') {
+        dbWrites.push(
+          supabase
+            .from('user_card_progress')
+            .upsert({
+              user_id: userId,
+              card_id: card.id,
+              deck_id: config.deckId,
+              ease_factor: srsResult.ease_factor,
+              interval_days: srsResult.interval_days,
+              repetitions: srsResult.repetitions,
+              srs_status: srsResult.srs_status,
+              next_review_at: srsResult.next_review_at,
+              last_reviewed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            } as Record<string, unknown>, { onConflict: 'user_id,card_id' })
+        )
+      } else {
+        dbWrites.push(
+          supabase
+            .from('cards')
+            .update({
+              ease_factor: srsResult.ease_factor,
+              interval_days: srsResult.interval_days,
+              repetitions: srsResult.repetitions,
+              srs_status: srsResult.srs_status,
+              next_review_at: srsResult.next_review_at,
+              last_reviewed_at: new Date().toISOString(),
+            } as Record<string, unknown>)
+            .eq('id', card.id)
+        )
+      }
+    }
+
+    // Study log
+    dbWrites.push(
+      supabase
+        .from('study_logs')
+        .insert({
+          user_id: userId,
+          card_id: card.id,
+          deck_id: config.deckId,
+          study_mode: config.mode,
+          rating,
+          prev_interval: card.interval_days,
+          new_interval: newInterval,
+          prev_ease: card.ease_factor,
+          new_ease: newEase,
+          review_duration_ms: durationMs,
+        } as Record<string, unknown>)
+    )
+
+    // Sequential review position save
+    if (posUpdate && studyState) {
+      dbWrites.push(
+        supabase
+          .from('deck_study_state')
+          .update(posUpdate as Record<string, unknown>)
+          .eq('id', studyState.id)
+      )
+    }
+
+    Promise.all(dbWrites).catch(err => console.error('[study-store] DB write failed:', err))
+
+    // endSession also fire-and-forget
+    if (isComplete) {
+      get().endSession().catch(err => console.error('[study-store] endSession failed:', err))
+    }
   },
 
   endSession: async () => {
-    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager } = get()
-    if (!config) return
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId } = get()
+    if (!config || !userId) return
 
     // Build metadata for cramming sessions
     let metadata: Record<string, unknown> | undefined
@@ -667,7 +700,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       await supabase
         .from('study_sessions')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           deck_id: config.deckId,
           study_mode: config.mode,
           cards_studied: sessionStats.cardsStudied,
@@ -733,11 +766,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       config: null,
       template: null,
       srsSettings: null,
+      userId: null,
       srsSource: 'embedded',
       queue: [],
       currentIndex: 0,
       isFlipped: false,
       isRating: false,
+      exitDirection: null,
       cardStartTime: Date.now(),
       sessionStartedAt: Date.now(),
       sessionStats: { ...initialStats },

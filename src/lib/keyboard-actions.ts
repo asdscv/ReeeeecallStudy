@@ -38,16 +38,9 @@ export function resolveKeyAction(
     return null
   }
 
-  // Non-SRS modes
-  if (key === 'ArrowRight' || key === ' ') {
-    if (mode === 'sequential_review') return { type: 'rate', rating: 'known' }
-    return { type: 'rate', rating: 'next' }
-  }
-
-  if (key === 'ArrowLeft') {
-    if (mode === 'sequential_review') return { type: 'rate', rating: 'unknown' }
-    return null
-  }
+  // Non-SRS modes (sequential_review, random, sequential, by_date)
+  if (key === 'ArrowRight' || key === ' ') return { type: 'rate', rating: 'known' }
+  if (key === 'ArrowLeft') return { type: 'rate', rating: 'unknown' }
 
   return null
 }

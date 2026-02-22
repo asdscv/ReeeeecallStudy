@@ -91,6 +91,7 @@ const resetStore = () =>
     config: null,
     template: null,
     srsSettings: null,
+    userId: null,
     srsSource: 'embedded',
     queue: [],
     currentIndex: 0,
@@ -121,6 +122,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
       currentIndex: 0,
       isFlipped: true,
       isRating: false,
+      userId: 'user-1',
       cardStartTime: Date.now() - 1000,
       sessionStartedAt: Date.now() - 5000,
       sessionStats: { totalCards: cards.length, cardsStudied: 0, ratings: {}, totalDurationMs: 0 },
@@ -147,6 +149,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
     })
 
     await useStudyStore.getState().rateCard('known')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
     // Verify deck_study_state.update was called with correct position
     expect(mockSupabase.from).toHaveBeenCalledWith('deck_study_state')
@@ -168,6 +171,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
     })
 
     await useStudyStore.getState().rateCard('unknown')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
     expect(updateFn).toHaveBeenCalledWith({ review_start_pos: 11 })
     expect(updateEq).toHaveBeenCalledWith('id', 'state-1')
@@ -187,6 +191,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
     })
 
     await useStudyStore.getState().rateCard('known')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
     expect(updateFn).toHaveBeenCalledWith({ review_start_pos: 0 })
   })
@@ -204,6 +209,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
     })
 
     await useStudyStore.getState().rateCard('known')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
     // Local studyState should be updated
     const state = useStudyStore.getState()
@@ -219,6 +225,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
       currentIndex: 0,
       isFlipped: true,
       isRating: false,
+      userId: 'user-1',
       cardStartTime: Date.now() - 1000,
       sessionStartedAt: Date.now() - 5000,
       sessionStats: { totalCards: cards.length, cardsStudied: 0, ratings: {}, totalDurationMs: 0 },
@@ -237,6 +244,7 @@ describe('rateCard — sequential_review per-card position saving', () => {
     })
 
     await useStudyStore.getState().rateCard('next')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
     // deck_study_state.update should NOT have been called
     expect(updateFn).not.toHaveBeenCalled()
@@ -266,8 +274,10 @@ describe('rateCard — sequential_review per-card position saving', () => {
 
     // Rate card 1
     await useStudyStore.getState().rateCard('known')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
     // Rate card 2
     await useStudyStore.getState().rateCard('known')
+    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
     // Should have 2 DB updates with incrementing positions
     expect(updateCalls).toEqual([
@@ -291,6 +301,7 @@ describe('endSession — sequential_review positions NOT saved', () => {
       config: { deckId: 'deck-1', mode: 'sequential_review', batchSize: 20 },
       queue: cards,
       currentIndex: 1,
+      userId: 'user-1',
       sessionStartedAt: Date.now() - 5000,
       sessionStats: { totalCards: 2, cardsStudied: 2, ratings: { known: 2 }, totalDurationMs: 3000 },
       studyState: { ...fakeStudyState, review_start_pos: 7 },
@@ -322,6 +333,7 @@ describe('endSession — sequential_review positions NOT saved', () => {
       config: { deckId: 'deck-1', mode: 'sequential', batchSize: 20 },
       queue: cards,
       currentIndex: 1,
+      userId: 'user-1',
       sessionStartedAt: Date.now() - 5000,
       sessionStats: { totalCards: 2, cardsStudied: 2, ratings: { next: 2 }, totalDurationMs: 3000 },
       studyState: { ...fakeStudyState, sequential_pos: 5 },

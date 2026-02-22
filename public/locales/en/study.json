@@ -133,7 +133,7 @@
       "all": "All Cards",
       "allDesc": "Study all non-suspended cards in the deck",
       "weak": "Weak Cards Only",
-      "weakDesc": "Cards with low ease factor or new cards",
+      "weakDesc": "Difficult cards (low ease factor) or new cards",
       "dueSoon": "Due Soon",
       "dueSoonDesc": "Cards due for review within 3 days"
     },

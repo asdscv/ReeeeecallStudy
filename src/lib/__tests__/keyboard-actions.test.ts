@@ -87,22 +87,25 @@ describe('resolveKeyAction', () => {
 
   // ─── Other non-SRS modes (random, sequential, by_date) ─
   describe.each(['random', 'sequential', 'by_date'] as const)('%s mode (flipped)', (mode) => {
-    it('ArrowRight → next', () => {
+    it('ArrowRight → known', () => {
       expect(resolveKeyAction('ArrowRight', true, mode)).toEqual({
         type: 'rate',
-        rating: 'next',
+        rating: 'known',
       })
     })
 
-    it('Space → next', () => {
+    it('Space → known', () => {
       expect(resolveKeyAction(' ', true, mode)).toEqual({
         type: 'rate',
-        rating: 'next',
+        rating: 'known',
       })
     })
 
-    it('ArrowLeft does nothing in non-sequential_review modes', () => {
-      expect(resolveKeyAction('ArrowLeft', true, mode)).toBeNull()
+    it('ArrowLeft → unknown', () => {
+      expect(resolveKeyAction('ArrowLeft', true, mode)).toEqual({
+        type: 'rate',
+        rating: 'unknown',
+      })
     })
   })
 })

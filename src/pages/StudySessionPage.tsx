@@ -36,6 +36,7 @@ export function StudySessionPage() {
     isFlipped,
     sessionStats,
     crammingManager,
+    exitDirection,
     initSession,
     flipCard,
     rateCard,
@@ -318,6 +319,7 @@ export function StudySessionPage() {
         onSwipeRate={handleRate}
         inputSettings={inputSettings}
         swipeDirections={swipeDirections}
+        exitDirection={exitDirection}
       />
 
       {/* Rating buttons (hidden in swipe mode) */}

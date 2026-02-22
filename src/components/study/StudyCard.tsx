@@ -19,6 +19,7 @@ import {
   type SwipePreview,
 } from '../../lib/study-input-settings'
 import { SwipeGuide } from './SwipeGuide'
+import type { ExitDirection } from '../../lib/study-exit-direction'
 import type { Card, CardTemplate, LayoutItem } from '../../types/database'
 
 interface StudyCardProps {
@@ -31,6 +32,7 @@ interface StudyCardProps {
   onSwipeRate?: (rating: string) => void
   inputSettings?: StudyInputSettings | null
   swipeDirections?: SwipeDirectionMap
+  exitDirection?: ExitDirection | null
 }
 
 /** Card follows finger at 60% of actual movement (higher = more responsive) */
@@ -46,6 +48,7 @@ export function StudyCard({
   onSwipeRate,
   inputSettings,
   swipeDirections,
+  exitDirection,
 }: StudyCardProps) {
   const { t } = useTranslation('study')
 
@@ -292,7 +295,13 @@ export function StudyCard({
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, transition: { duration: 0.12 } }}
+            exit={
+              exitDirection === 'left'
+                ? { x: -300, opacity: 0, rotate: -8, transition: { duration: 0.25 } }
+                : exitDirection === 'right'
+                  ? { x: 300, opacity: 0, rotate: 8, transition: { duration: 0.25 } }
+                  : { opacity: 0, transition: { duration: 0.12 } }
+            }
             className="relative"
           >
             {/*

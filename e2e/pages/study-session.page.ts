@@ -22,6 +22,23 @@ export class StudySessionPage extends BasePage {
     return this.page.locator('button').filter({ has: this.page.locator('svg.w-5.h-5') })
   }
 
+  // ─── Unknown/Known Locators ─────────────────────────
+
+  /** Unknown button (red) */
+  get unknownButton(): Locator {
+    return this.page.getByRole('button', { name: /^Unknown$|^모름$/i })
+  }
+
+  /** Known button (green) */
+  get knownButton(): Locator {
+    return this.page.getByRole('button', { name: /^Known$|^알고 있음$/i })
+  }
+
+  /** Next button (blue, legacy — should no longer appear) */
+  get nextButton(): Locator {
+    return this.page.getByRole('button', { name: /Next →|다음 →/i })
+  }
+
   // ─── Cramming-Specific Locators ──────────────────────
 
   /** Got It button (green) */
@@ -96,6 +113,30 @@ export class StudySessionPage extends BasePage {
       // Fallback: click the card container (rounded white area)
       await this.page.locator('.rounded-2xl, .rounded-3xl').first().click()
     }
+  }
+
+  /** Rate current card as "Known" */
+  async rateKnown() {
+    await this.knownButton.click()
+  }
+
+  /** Rate current card as "Unknown" */
+  async rateUnknown() {
+    await this.unknownButton.click()
+  }
+
+  /** Flip and rate as Known in one action */
+  async flipAndRateKnown() {
+    await this.flipCard()
+    await this.knownButton.waitFor({ state: 'visible', timeout: 5000 })
+    await this.rateKnown()
+  }
+
+  /** Flip and rate as Unknown in one action */
+  async flipAndRateUnknown() {
+    await this.flipCard()
+    await this.unknownButton.waitFor({ state: 'visible', timeout: 5000 })
+    await this.rateUnknown()
   }
 
   /** Rate current card as "Got It" */
