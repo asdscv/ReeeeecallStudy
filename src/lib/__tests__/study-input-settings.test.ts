@@ -96,7 +96,7 @@ describe('validateSettings', () => {
     })
     expect(result.version).toBe(3)
     expect(result.mode).toBe('swipe')
-    expect((result as Record<string, unknown>).directions).toBeUndefined()
+    expect((result as unknown as Record<string, unknown>).directions).toBeUndefined()
   })
 })
 
