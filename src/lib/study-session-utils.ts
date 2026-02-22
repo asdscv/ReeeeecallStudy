@@ -107,6 +107,25 @@ export function buildSequentialReviewQueue<T extends SeqCard>(
   return { newCards, reviewCards }
 }
 
+// ─── Per-Card Position Advance ──────────────────────────────
+
+/**
+ * Compute the next sequential_review position after a single card is rated.
+ *
+ * - For new cards: advance new_start_pos (never wrap — exceeding max signals "all consumed")
+ * - For review/learning cards: advance review_start_pos (wrap to 0 when past maxCardPosition)
+ */
+export function advanceSequentialReviewPosition(
+  card: Pick<Card, 'sort_position' | 'srs_status'>,
+  maxCardPosition: number,
+): { new_start_pos?: number; review_start_pos?: number } {
+  const nextPos = card.sort_position + 1
+  if (card.srs_status === 'new') {
+    return { new_start_pos: nextPos }  // never wrap
+  }
+  return { review_start_pos: nextPos > maxCardPosition ? 0 : nextPos }
+}
+
 // ─── Position Computation ───────────────────────────────────
 
 /**

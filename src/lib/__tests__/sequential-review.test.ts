@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  advanceSequentialReviewPosition,
   buildSequentialReviewQueue,
   computeSequentialReviewPositions,
 } from '../study-session-utils'
@@ -326,6 +327,66 @@ describe('Bug C: review_start_pos should track reviewed cards', () => {
     expect(result.new_start_pos).toBe(7)
     // No review cards studied, so review_start_pos = old new_start_pos (fallback)
     expect(result.review_start_pos).toBe(5)
+  })
+})
+
+// ─── advanceSequentialReviewPosition ────────────────────────
+
+describe('advanceSequentialReviewPosition', () => {
+  it('should advance new_start_pos for a new card', () => {
+    const result = advanceSequentialReviewPosition(
+      { sort_position: 5, srs_status: 'new' },
+      39,
+    )
+    expect(result).toEqual({ new_start_pos: 6 })
+  })
+
+  it('should advance review_start_pos for a review card', () => {
+    const result = advanceSequentialReviewPosition(
+      { sort_position: 10, srs_status: 'review' },
+      39,
+    )
+    expect(result).toEqual({ review_start_pos: 11 })
+  })
+
+  it('should wrap review_start_pos to 0 when past maxCardPosition', () => {
+    const result = advanceSequentialReviewPosition(
+      { sort_position: 39, srs_status: 'review' },
+      39,
+    )
+    expect(result).toEqual({ review_start_pos: 0 })
+  })
+
+  it('should never wrap new_start_pos (exceeds max = all consumed)', () => {
+    const result = advanceSequentialReviewPosition(
+      { sort_position: 39, srs_status: 'new' },
+      39,
+    )
+    expect(result).toEqual({ new_start_pos: 40 })
+  })
+
+  it('should advance learning card as review (non-new)', () => {
+    const result = advanceSequentialReviewPosition(
+      { sort_position: 15, srs_status: 'learning' },
+      39,
+    )
+    expect(result).toEqual({ review_start_pos: 16 })
+  })
+
+  it('should produce correct positions for consecutive calls', () => {
+    const cards = [
+      { sort_position: 5, srs_status: 'new' as const },
+      { sort_position: 6, srs_status: 'new' as const },
+      { sort_position: 0, srs_status: 'review' as const },
+      { sort_position: 1, srs_status: 'review' as const },
+    ]
+    const results = cards.map(c => advanceSequentialReviewPosition(c, 39))
+    expect(results).toEqual([
+      { new_start_pos: 6 },
+      { new_start_pos: 7 },
+      { review_start_pos: 1 },
+      { review_start_pos: 2 },
+    ])
   })
 })
 

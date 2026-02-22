@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { calculateSRS, type SrsRating } from '../lib/srs'
-import { buildSequentialReviewQueue, computeSequentialReviewPositions } from '../lib/study-session-utils'
+import { advanceSequentialReviewPosition, buildSequentialReviewQueue } from '../lib/study-session-utils'
 import { SrsQueueManager, type QueueCard } from '../lib/study-queue'
 import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating } from '../lib/cramming-queue'
 import { guard } from '../lib/rate-limit-instance'
@@ -433,7 +433,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, studyState, maxCardPosition } = get()
     if (!config || isRating) return
     set({ isRating: true })
 
@@ -536,6 +536,17 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         new_ease: newEase,
         review_duration_ms: durationMs,
       } as Record<string, unknown>)
+
+    // Per-card position update for sequential_review
+    if (config.mode === 'sequential_review' && studyState) {
+      const posUpdate = advanceSequentialReviewPosition(card, maxCardPosition)
+      const updatedStudyState = { ...studyState, ...posUpdate }
+      await supabase
+        .from('deck_study_state')
+        .update(posUpdate as Record<string, unknown>)
+        .eq('id', studyState.id)
+      set({ studyState: updatedStudyState })
+    }
 
     // Update stats
     const updatedRatings = { ...sessionStats.ratings }
@@ -670,19 +681,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     }
 
     // Update deck_study_state based on mode (requires studyState)
+    // Note: sequential_review positions are saved per-card in rateCard()
     if (studyState) {
-      if (config.mode === 'sequential_review' && queue.length > 0) {
-        const positions = computeSequentialReviewPositions(queue, studyState, maxCardPosition)
-
-        await supabase
-          .from('deck_study_state')
-          .update({
-            new_start_pos: positions.new_start_pos,
-            review_start_pos: positions.review_start_pos,
-          } as Record<string, unknown>)
-          .eq('id', studyState.id)
-      }
-
       if (config.mode === 'sequential' && queue.length > 0) {
         const typedState = studyState as DeckStudyState
         // Detect wrapped queue (cards with positions before the session start)
