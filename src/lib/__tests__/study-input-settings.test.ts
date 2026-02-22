@@ -387,10 +387,10 @@ describe('resolveSwipeAction', () => {
   })
 
   it('uses normal threshold when velocity is undefined', () => {
-    // 25 < SWIPE_THRESHOLD (30), no velocity
-    expect(resolveSwipeAction(25, 0, dirs)).toBeNull()
-    // 35 > SWIPE_THRESHOLD (30), no velocity
-    expect(resolveSwipeAction(35, 0, dirs)).not.toBeNull()
+    // 90 < SWIPE_THRESHOLD (100), no velocity
+    expect(resolveSwipeAction(90, 0, dirs)).toBeNull()
+    // 110 > SWIPE_THRESHOLD (100), no velocity
+    expect(resolveSwipeAction(110, 0, dirs)).not.toBeNull()
   })
 
   it('velocity detection works in all directions', () => {
@@ -412,10 +412,11 @@ describe('previewSwipeAction', () => {
     expect(previewSwipeAction(5, 3, dirs)).toBeNull()
   })
 
-  it('calculates progress 0 at dead zone boundary', () => {
-    const result = previewSwipeAction(DEAD_ZONE, 0, dirs)
-    expect(result).not.toBeNull()
-    expect(result!.progress).toBeCloseTo(0, 1)
+  it('returns null between dead zone and threshold', () => {
+    // 20px is above DEAD_ZONE (8) but below SWIPE_THRESHOLD (30)
+    expect(previewSwipeAction(20, 0, dirs)).toBeNull()
+    expect(previewSwipeAction(DEAD_ZONE, 0, dirs)).toBeNull()
+    expect(previewSwipeAction(SWIPE_THRESHOLD - 1, 0, dirs)).toBeNull()
   })
 
   it('calculates progress 1 at threshold', () => {
@@ -430,7 +431,7 @@ describe('previewSwipeAction', () => {
   })
 
   it('returns correct action and label', () => {
-    const result = previewSwipeAction(-60, 0, dirs)
+    const result = previewSwipeAction(-150, 0, dirs)
     expect(result!.action).toBe('again')
     expect(result!.label).toBe('Again')
     expect(result!.direction).toBe('left')
@@ -440,15 +441,16 @@ describe('previewSwipeAction', () => {
     expect(previewSwipeAction(0, -60, dirs)).toBeNull()
   })
 
-  it('includes color with opacity based on progress', () => {
-    const result = previewSwipeAction(60, 0, dirs)
+  it('includes color with fixed opacity 0.4 at threshold', () => {
+    const result = previewSwipeAction(150, 0, dirs)
     expect(result!.color).toContain('rgba')
+    expect(result!.color).toContain('0.4')
     expect(result!.color).not.toBe('transparent')
   })
 
   it('works with unknown/known actions', () => {
     const nonSrsDirs: SwipeDirectionMap = { left: 'unknown', right: 'known', up: '', down: '' }
-    const result = previewSwipeAction(-60, 0, nonSrsDirs)
+    const result = previewSwipeAction(-150, 0, nonSrsDirs)
     expect(result!.action).toBe('unknown')
     expect(result!.label).toBe('Unknown')
     expect(result!.color).toContain('rgba')

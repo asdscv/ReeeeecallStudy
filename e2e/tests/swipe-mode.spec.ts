@@ -191,6 +191,91 @@ test.describe('Swipe Mode — Card Gestures', () => {
   })
 })
 
+test.describe('Swipe Mode — Overlay Visibility', () => {
+
+  async function setupSwipeSession(
+    quickStudyPage: any,
+    studySessionPage: any,
+    page: any,
+  ): Promise<boolean> {
+    await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
+    await quickStudyPage.selectFirstDeck()
+    await quickStudyPage.selectMode('🎲')
+    await quickStudyPage.startStudy()
+    await page.waitForURL(/\/study\?/, { timeout: 10_000 })
+    await page.waitForTimeout(2000)
+    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    return !noCards
+  }
+
+  test('Swipe overlay NOT visible below threshold', async ({
+    quickStudyPage,
+    studySessionPage,
+    page,
+  }) => {
+    const hasCards = await setupSwipeSession(quickStudyPage, studySessionPage, page)
+    if (!hasCards) { test.skip(true, 'No cards in deck'); return }
+
+    await studySessionPage.flipCard()
+    await page.waitForTimeout(500)
+
+    // Swipe 20px right (below SWIPE_THRESHOLD of 30px) and HOLD
+    const card = studySessionPage.cardContainer
+    const box = await card.boundingBox()
+    if (!box) { test.skip(true, 'Card not visible'); return }
+
+    const cx = box.x + box.width / 2
+    const cy = box.y + box.height / 2
+
+    await page.mouse.move(cx, cy)
+    await page.mouse.down()
+    for (let i = 1; i <= 5; i++) {
+      await page.mouse.move(cx + (20 / 5) * i, cy)
+      await page.waitForTimeout(20)
+    }
+    // Hold — check overlay is NOT visible
+    await page.waitForTimeout(100)
+    const overlayVisible = await studySessionPage.swipeOverlay.isVisible({ timeout: 300 }).catch(() => false)
+    expect(overlayVisible).toBe(false)
+
+    await page.mouse.up()
+  })
+
+  test('Swipe overlay visible at threshold', async ({
+    quickStudyPage,
+    studySessionPage,
+    page,
+  }) => {
+    const hasCards = await setupSwipeSession(quickStudyPage, studySessionPage, page)
+    if (!hasCards) { test.skip(true, 'No cards in deck'); return }
+
+    await studySessionPage.flipCard()
+    await page.waitForTimeout(500)
+
+    // Swipe 80px right (well above SWIPE_THRESHOLD of 30px) and HOLD
+    const card = studySessionPage.cardContainer
+    const box = await card.boundingBox()
+    if (!box) { test.skip(true, 'Card not visible'); return }
+
+    const cx = box.x + box.width / 2
+    const cy = box.y + box.height / 2
+
+    await page.mouse.move(cx, cy)
+    await page.mouse.down()
+    for (let i = 1; i <= 5; i++) {
+      await page.mouse.move(cx + (80 / 5) * i, cy)
+      await page.waitForTimeout(20)
+    }
+    // Hold — check overlay IS visible
+    await page.waitForTimeout(100)
+    const overlay = studySessionPage.swipeOverlay
+    await expect(overlay).toBeVisible({ timeout: 1000 })
+
+    await page.mouse.up()
+  })
+})
+
 test.describe('Swipe Mode — Mobile Viewport', () => {
   test.use({ viewport: { width: 393, height: 851 } })
 

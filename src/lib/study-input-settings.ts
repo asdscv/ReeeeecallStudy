@@ -24,7 +24,7 @@ export interface StudyInputSettings {
 
 const STORAGE_KEY = 'reeeeecall-study-input-settings'
 const LEGACY_KEY = 'reeecall-swipe-settings'  // keep old key name for migration
-export const SWIPE_THRESHOLD = 30
+export const SWIPE_THRESHOLD = 100
 
 const VALID_ACTIONS: ReadonlySet<string> = new Set(['again', 'hard', 'good', 'easy', 'unknown', 'known', ''])
 const VALID_MODES: ReadonlySet<string> = new Set(['button', 'swipe'])
@@ -249,28 +249,24 @@ export function previewSwipeAction(
   const absDx = Math.abs(dx)
   const absDy = Math.abs(dy)
 
-  // Dead zone
-  if (absDx < DEAD_ZONE && absDy < DEAD_ZONE) return null
+  // No visual feedback until swipe threshold is reached
+  if (absDx < SWIPE_THRESHOLD && absDy < SWIPE_THRESHOLD) return null
 
   let direction: Direction
-  let distance: number
   if (absDx > absDy) {
     direction = dx > 0 ? 'right' : 'left'
-    distance = absDx
   } else {
     direction = dy > 0 ? 'down' : 'up'
-    distance = absDy
   }
 
   const action = dirs[direction]
   if (!action) return null
 
-  const progress = Math.min(1, Math.max(0, (distance - DEAD_ZONE) / (SWIPE_THRESHOLD - DEAD_ZONE)))
   const colorTemplate = ACTION_COLORS[action]
-  const color = colorTemplate ? colorTemplate.replace('VAR', String(progress * 0.4)) : 'transparent'
+  const color = colorTemplate ? colorTemplate.replace('VAR', '0.4') : 'transparent'
   const label = getActionLabel(action) ?? ''
 
-  return { action, direction, progress, color, label }
+  return { action, direction, progress: 1, color, label }
 }
 
 // ── Touch Action ─────────────────────────────────────
