@@ -6,6 +6,7 @@ import {
   computeModeBreakdown,
   computeDailySessionCounts,
   computeRatingDistribution,
+  computeGroupedRatingDistribution,
   computeSessionDurationTrend,
   computeStudyTimeByMode,
   computePerformanceTrend,
@@ -543,5 +544,172 @@ describe('per-deck stats composition', () => {
     expect(deck1Dist.find(d => d.rating === 'again')).toBeUndefined()
     // deck-2 has again
     expect(deck2Dist.find(d => d.rating === 'again')!.count).toBe(5)
+  })
+})
+
+// ── 12. computeGroupedRatingDistribution ──
+
+describe('computeGroupedRatingDistribution', () => {
+  it('returns empty array for empty sessions', () => {
+    expect(computeGroupedRatingDistribution([])).toEqual([])
+  })
+
+  it('returns single SRS group for SRS-only sessions', () => {
+    const sessions = [
+      makeSession({ study_mode: 'srs', ratings: { again: 2, hard: 3, good: 10, easy: 5 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(1)
+    expect(result[0].groupId).toBe('srs')
+    expect(result[0].total).toBe(20)
+    expect(result[0].ratings.map(r => r.rating)).toEqual(['again', 'hard', 'good', 'easy'])
+  })
+
+  it('returns single simple group for random-mode sessions', () => {
+    const sessions = [
+      makeSession({ study_mode: 'random', ratings: { unknown: 4, known: 6 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(1)
+    expect(result[0].groupId).toBe('simple')
+    expect(result[0].ratings.map(r => r.rating)).toEqual(['unknown', 'known'])
+  })
+
+  it('returns single cramming group for cramming sessions', () => {
+    const sessions = [
+      makeSession({ study_mode: 'cramming', ratings: { missed: 3, got_it: 7 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(1)
+    expect(result[0].groupId).toBe('cramming')
+    expect(result[0].ratings.map(r => r.rating)).toEqual(['missed', 'got_it'])
+  })
+
+  it('separates SRS + simple into two groups', () => {
+    const sessions = [
+      makeSession({ id: 's1', study_mode: 'srs', ratings: { good: 10, easy: 5 } }),
+      makeSession({ id: 's2', study_mode: 'random', ratings: { unknown: 3, known: 7 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(2)
+    expect(result[0].groupId).toBe('srs')
+    expect(result[1].groupId).toBe('simple')
+  })
+
+  it('returns all 3 groups when all modes are present', () => {
+    const sessions = [
+      makeSession({ id: 's1', study_mode: 'srs', ratings: { good: 5 } }),
+      makeSession({ id: 's2', study_mode: 'sequential', ratings: { known: 3 } }),
+      makeSession({ id: 's3', study_mode: 'cramming', ratings: { got_it: 2 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(3)
+    expect(result.map(g => g.groupId)).toEqual(['srs', 'simple', 'cramming'])
+  })
+
+  it('maintains registry order (srs → simple → cramming)', () => {
+    const sessions = [
+      makeSession({ id: 's1', study_mode: 'cramming', ratings: { got_it: 1 } }),
+      makeSession({ id: 's2', study_mode: 'srs', ratings: { good: 1 } }),
+      makeSession({ id: 's3', study_mode: 'random', ratings: { known: 1 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result.map(g => g.groupId)).toEqual(['srs', 'simple', 'cramming'])
+  })
+
+  it('excludes "next" rating from distribution', () => {
+    const sessions = [
+      makeSession({ study_mode: 'srs', ratings: { good: 5, next: 10 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(1)
+    expect(result[0].total).toBe(5)
+    expect(result[0].ratings.find(r => r.rating === 'next')).toBeUndefined()
+  })
+
+  it('computes correct percentages per group', () => {
+    const sessions = [
+      makeSession({ study_mode: 'srs', ratings: { again: 1, hard: 2, good: 3, easy: 4 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    const group = result[0]
+    expect(group.total).toBe(10)
+    expect(group.ratings.find(r => r.rating === 'again')!.percentage).toBe(10)
+    expect(group.ratings.find(r => r.rating === 'easy')!.percentage).toBe(40)
+  })
+
+  it('aggregates multiple sessions of the same group', () => {
+    const sessions = [
+      makeSession({ id: 's1', study_mode: 'random', ratings: { unknown: 3, known: 7 } }),
+      makeSession({ id: 's2', study_mode: 'sequential', ratings: { unknown: 2, known: 8 } }),
+      makeSession({ id: 's3', study_mode: 'by_date', ratings: { known: 5 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(1)
+    expect(result[0].groupId).toBe('simple')
+    expect(result[0].total).toBe(25)
+    expect(result[0].ratings.find(r => r.rating === 'unknown')!.count).toBe(5)
+    expect(result[0].ratings.find(r => r.rating === 'known')!.count).toBe(20)
+  })
+
+  it('skips group when all ratings are excluded', () => {
+    const sessions = [
+      makeSession({ study_mode: 'srs', ratings: { next: 10 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(0)
+  })
+
+  it('skips group when ratings are empty', () => {
+    const sessions = [
+      makeSession({ study_mode: 'srs', ratings: {} }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(0)
+  })
+
+  it('i18nKey matches the registry definition', () => {
+    const sessions = [
+      makeSession({ id: 's1', study_mode: 'srs', ratings: { good: 1 } }),
+      makeSession({ id: 's2', study_mode: 'random', ratings: { known: 1 } }),
+      makeSession({ id: 's3', study_mode: 'cramming', ratings: { got_it: 1 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result[0].i18nKey).toBe('ratingGroups.srs')
+    expect(result[1].i18nKey).toBe('ratingGroups.simple')
+    expect(result[2].i18nKey).toBe('ratingGroups.cramming')
+  })
+
+  it('excludes cross-group ratings (e.g. "good" in random-mode session)', () => {
+    // Real-world case: a random-mode session may contain legacy "good" ratings
+    const sessions = [
+      makeSession({ study_mode: 'random', ratings: { good: 16, unknown: 12, known: 39 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result).toHaveLength(1)
+    expect(result[0].groupId).toBe('simple')
+    // "good" must NOT appear — it belongs to the SRS group
+    expect(result[0].ratings.map(r => r.rating)).toEqual(['unknown', 'known'])
+    expect(result[0].total).toBe(51) // only unknown + known
+    expect(result[0].ratings.find(r => r.rating === 'good')).toBeUndefined()
+  })
+
+  it('excludes cross-group ratings from total calculation', () => {
+    const sessions = [
+      makeSession({ study_mode: 'cramming', ratings: { missed: 1, got_it: 9, good: 5 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    expect(result[0].total).toBe(10) // only missed + got_it, not good
+    expect(result[0].ratings).toHaveLength(2)
+  })
+
+  it('handles session with only cross-group ratings (skips group)', () => {
+    // A random-mode session that somehow only has SRS ratings
+    const sessions = [
+      makeSession({ study_mode: 'random', ratings: { good: 5, easy: 3 } }),
+    ]
+    const result = computeGroupedRatingDistribution(sessions)
+    // No simple-group ratings found, so group should be skipped
+    expect(result).toHaveLength(0)
   })
 })

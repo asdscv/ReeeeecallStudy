@@ -53,6 +53,7 @@ interface StudyState {
   flipCard: () => void
   rateCard: (rating: string) => Promise<void>
   endSession: () => Promise<void>
+  exitSession: () => Promise<void>
   crammingTimeUp: () => Promise<void>
   reset: () => void
 }
@@ -740,6 +741,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     }
 
     set({ phase: 'completed' })
+  },
+
+  exitSession: async () => {
+    const { phase, isRating, sessionStats, cardStartTime } = get()
+    if (phase !== 'studying' || isRating) return
+    if (sessionStats.cardsStudied === 0) return
+
+    const currentCardDuration = Date.now() - cardStartTime
+    set({
+      sessionStats: {
+        ...sessionStats,
+        totalDurationMs: sessionStats.totalDurationMs + currentCardDuration,
+      },
+      phase: 'completed',
+    })
+    await get().endSession()
   },
 
   crammingTimeUp: async () => {

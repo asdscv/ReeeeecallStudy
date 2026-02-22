@@ -84,11 +84,20 @@
     "cardCountLabel": "{{count}}장",
     "performance": "성과"
   },
+  "ratingGroups": {
+    "srs": "간격 반복",
+    "simple": "일반",
+    "cramming": "크래밍"
+  },
   "ratings": {
     "again": "다시",
     "hard": "어려움",
     "good": "좋음",
-    "easy": "쉬움"
+    "easy": "쉬움",
+    "known": "알고 있음",
+    "unknown": "모름",
+    "got_it": "맞춤",
+    "missed": "틀림"
   },
   "units": {
     "sessions": "세션",

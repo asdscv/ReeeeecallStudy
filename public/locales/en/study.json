@@ -91,6 +91,8 @@
     "ratingDistribution": "Rating Distribution",
     "backToDeck": "Back to Deck",
     "studyAgain": "Study Again",
+    "sessionEnded": "Session Ended",
+    "progressSoFar": "Here's your progress so far.",
     "knowIt": "Know It",
     "dontKnow": "Don't Know",
     "next": "Next"
@@ -156,8 +158,26 @@
       "hardestCards": "Hardest Cards",
       "missedTimes": "missed {{count}}x",
       "noSrsImpact": "This session did not affect your SRS schedule.",
+      "sessionEnded": "Session Ended",
       "crammingAgain": "Cram Again",
       "otherMode": "Other Modes"
+    }
+  },
+  "noCards": {
+    "otherMode": "Study Other Mode",
+    "srs": {
+      "title": "All Caught Up!",
+      "message": "No cards due for review right now. Check back later!"
+    },
+    "cramming": {
+      "weakTitle": "No Weak Cards",
+      "weakMessage": "All your cards are in good shape!",
+      "dueSoonTitle": "Nothing Due Soon",
+      "dueSoonMessage": "No cards are due for review within 3 days."
+    },
+    "generic": {
+      "title": "No Cards to Study",
+      "message": "There are no cards matching your criteria."
     }
   }
 }

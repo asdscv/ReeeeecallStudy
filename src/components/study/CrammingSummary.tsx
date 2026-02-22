@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import type { SessionSummaryType } from '../../lib/study-summary-type'
 import type { Card, CardTemplate } from '../../types/database'
 
 interface CrammingSummaryStats {
@@ -20,6 +21,7 @@ interface CrammingSummaryProps {
   crammingMeta: CrammingMeta
   cards: Card[]
   template: CardTemplate | null
+  summaryType?: SessionSummaryType
   onBackToDeck: () => void
   onCrammingAgain: () => void
   onOtherMode: () => void
@@ -30,6 +32,7 @@ export function CrammingSummary({
   crammingMeta,
   cards,
   template,
+  summaryType = 'complete',
   onBackToDeck,
   onCrammingAgain,
   onOtherMode,
@@ -38,6 +41,7 @@ export function CrammingSummary({
   const minutes = Math.floor(stats.totalDurationMs / 60000)
   const seconds = Math.floor((stats.totalDurationMs % 60000) / 1000)
 
+  const isPartial = summaryType === 'partial'
   const cardMap = new Map(cards.map(c => [c.id, c]))
 
   // Get front text from card for hardest cards display
@@ -59,11 +63,13 @@ export function CrammingSummary({
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4 sm:px-6 text-center">
-        <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">⚡</div>
+        <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">{isPartial ? '\uD83D\uDCCA' : '\u26A1'}</div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          {crammingMeta.allMastered
-            ? t('cramming.summary.completed')
-            : t('cramming.summary.timeUp')}
+          {isPartial
+            ? t('cramming.summary.sessionEnded')
+            : crammingMeta.allMastered
+              ? t('cramming.summary.completed')
+              : t('cramming.summary.timeUp')}
         </h1>
         <p className="text-gray-500 mb-6 sm:mb-8">{t('cramming.summary.wellDone')}</p>
 

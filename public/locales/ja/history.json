@@ -84,11 +84,20 @@
     "cardCountLabel": "{{count}}枚",
     "performance": "パフォーマンス"
   },
+  "ratingGroups": {
+    "srs": "間隔反復",
+    "simple": "一般",
+    "cramming": "クラミング"
+  },
   "ratings": {
     "again": "Again",
     "hard": "Hard",
     "good": "Good",
-    "easy": "Easy"
+    "easy": "Easy",
+    "known": "覚えた",
+    "unknown": "忘れた",
+    "got_it": "正解",
+    "missed": "不正解"
   },
   "units": {
     "sessions": "セッション",

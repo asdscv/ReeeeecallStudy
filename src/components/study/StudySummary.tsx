@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import type { SessionSummaryType } from '../../lib/study-summary-type'
 
 interface StudySummaryProps {
   stats: {
@@ -7,11 +8,12 @@ interface StudySummaryProps {
     ratings: Record<string, number>
     totalDurationMs: number
   }
+  summaryType?: SessionSummaryType
   onBackToDeck: () => void
   onStudyAgain: () => void
 }
 
-export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummaryProps) {
+export function StudySummary({ stats, summaryType = 'complete', onBackToDeck, onStudyAgain }: StudySummaryProps) {
   const { t } = useTranslation('study')
   const minutes = Math.floor(stats.totalDurationMs / 60000)
   const seconds = Math.floor((stats.totalDurationMs % 60000) / 1000)
@@ -19,12 +21,18 @@ export function StudySummary({ stats, onBackToDeck, onStudyAgain }: StudySummary
     ? Math.round(stats.totalDurationMs / stats.cardsStudied / 1000)
     : 0
 
+  const isPartial = summaryType === 'partial'
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4 sm:px-6 text-center">
-        <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">🎉</div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{t('summary.completed')}</h1>
-        <p className="text-gray-500 mb-6 sm:mb-8">{t('summary.wellDone')}</p>
+        <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">{isPartial ? '\uD83D\uDCCA' : '\uD83C\uDF89'}</div>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          {isPartial ? t('summary.sessionEnded') : t('summary.completed')}
+        </h1>
+        <p className="text-gray-500 mb-6 sm:mb-8">
+          {isPartial ? t('summary.progressSoFar') : t('summary.wellDone')}
+        </p>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 space-y-3 sm:space-y-4">
           <StatRow label={t('summary.cardsStudied')} value={t('summary.cardCount', { studied: stats.cardsStudied, total: stats.totalCards })} />

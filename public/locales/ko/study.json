@@ -91,6 +91,8 @@
     "ratingDistribution": "평가 분포",
     "backToDeck": "덱으로 돌아가기",
     "studyAgain": "다시 학습",
+    "sessionEnded": "학습 종료",
+    "progressSoFar": "여기까지의 학습 결과입니다.",
     "knowIt": "알고 있음",
     "dontKnow": "모름",
     "next": "다음"
@@ -156,8 +158,26 @@
       "hardestCards": "가장 어려운 카드",
       "missedTimes": "{{count}}회 틀림",
       "noSrsImpact": "이 세션은 SRS 일정에 영향을 주지 않았습니다.",
+      "sessionEnded": "세션 종료",
       "crammingAgain": "다시 벼락치기",
       "otherMode": "다른 모드"
+    }
+  },
+  "noCards": {
+    "otherMode": "다른 모드로 학습",
+    "srs": {
+      "title": "모두 완료!",
+      "message": "지금은 복습할 카드가 없습니다. 나중에 다시 확인하세요!"
+    },
+    "cramming": {
+      "weakTitle": "약한 카드 없음",
+      "weakMessage": "모든 카드가 양호한 상태입니다!",
+      "dueSoonTitle": "곧 복습할 카드 없음",
+      "dueSoonMessage": "3일 이내에 복습할 카드가 없습니다."
+    },
+    "generic": {
+      "title": "학습할 카드 없음",
+      "message": "조건에 맞는 카드가 없습니다."
     }
   }
 }

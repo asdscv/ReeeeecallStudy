@@ -1,5 +1,7 @@
 import { getSessionPerformance } from './study-history'
 import { dateToLocalKey } from './date-utils'
+import { RATING_GROUP_REGISTRY, STUDY_MODE_TO_GROUP } from './rating-groups'
+import type { RatingGroupId } from './rating-groups'
 import type { StudySession, StudyLog } from '../types/database'
 
 // ── 덱 범위 필터링 ──
@@ -147,6 +149,67 @@ export function computeRatingDistribution(sessions: StudySession[]): RatingDistr
       count,
       percentage: Math.round((count / total) * 100),
     }))
+}
+
+// ── 모드 그룹별 평가 분포 ──
+
+export interface GroupedRatingDistribution {
+  groupId: RatingGroupId
+  i18nKey: string
+  ratings: RatingDistribution[]
+  total: number
+}
+
+export function computeGroupedRatingDistribution(sessions: StudySession[]): GroupedRatingDistribution[] {
+  if (sessions.length === 0) return []
+
+  // Partition sessions by group
+  const groupSessions = new Map<RatingGroupId, StudySession[]>()
+  for (const s of sessions) {
+    const groupId = STUDY_MODE_TO_GROUP[s.study_mode]
+    if (!groupId) continue
+    const arr = groupSessions.get(groupId) ?? []
+    arr.push(s)
+    groupSessions.set(groupId, arr)
+  }
+
+  const result: GroupedRatingDistribution[] = []
+
+  for (const groupDef of RATING_GROUP_REGISTRY) {
+    const sess = groupSessions.get(groupDef.id)
+    if (!sess || sess.length === 0) continue
+
+    // Aggregate only ratings defined in this group's registry
+    const allowedRatings = new Set(groupDef.ratings)
+    const counts = new Map<string, number>()
+    for (const s of sess) {
+      for (const [rating, count] of Object.entries(s.ratings)) {
+        if (!allowedRatings.has(rating)) continue
+        counts.set(rating, (counts.get(rating) ?? 0) + count)
+      }
+    }
+
+    const total = Array.from(counts.values()).reduce((s, c) => s + c, 0)
+    if (total === 0) continue
+
+    // Ratings in registry order
+    const ratings: RatingDistribution[] = groupDef.ratings
+      .filter((r) => counts.has(r))
+      .map((r) => ({
+        rating: r,
+        count: counts.get(r)!,
+        percentage: Math.round((counts.get(r)! / total) * 100),
+      }))
+
+    result.push({
+      groupId: groupDef.id,
+      i18nKey: groupDef.i18nKey,
+      ratings,
+      total,
+    })
+  }
+
+  return result
 }
 
 // ── 세션 소요시간 트렌드 ──

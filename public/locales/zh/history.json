@@ -84,11 +84,20 @@
     "cardCountLabel": "{{count}} 张卡片",
     "performance": "表现"
   },
+  "ratingGroups": {
+    "srs": "间隔重复",
+    "simple": "普通",
+    "cramming": "突击"
+  },
   "ratings": {
     "again": "重来",
     "hard": "困难",
     "good": "良好",
-    "easy": "简单"
+    "easy": "简单",
+    "known": "已知",
+    "unknown": "不知道",
+    "got_it": "答对",
+    "missed": "答错"
   },
   "units": {
     "sessions": "次",

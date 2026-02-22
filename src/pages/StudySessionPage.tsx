@@ -13,6 +13,8 @@ import { SimpleRatingButtons } from '../components/study/SimpleRatingButtons'
 import { CrammingRatingButtons } from '../components/study/CrammingRatingButtons'
 import { StudySummary } from '../components/study/StudySummary'
 import { CrammingSummary } from '../components/study/CrammingSummary'
+import { NoCardsDue } from '../components/study/NoCardsDue'
+import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak } from '../lib/tts'
 import { loadSettings, shouldShowButtons, getDirectionsForMode, type StudyInputSettings, type SwipeDirectionMap } from '../lib/study-input-settings'
@@ -40,6 +42,7 @@ export function StudySessionPage() {
     initSession,
     flipCard,
     rateCard,
+    exitSession,
     reset,
   } = useStudyStore()
 
@@ -173,9 +176,13 @@ export function StudySessionPage() {
   }, [rateCard])
 
   const handleExit = useCallback(() => {
-    reset()
-    navigate(`/decks/${deckId}`)
-  }, [reset, navigate, deckId])
+    if (sessionStats.cardsStudied > 0) {
+      exitSession()
+    } else {
+      reset()
+      navigate(`/decks/${deckId}`)
+    }
+  }, [sessionStats.cardsStudied, exitSession, reset, navigate, deckId])
 
   const handleFlip = useCallback(() => {
     flipCard()
@@ -201,6 +208,25 @@ export function StudySessionPage() {
 
   // Completed state
   if (phase === 'completed') {
+    const summaryType = getSessionSummaryType(sessionStats.totalCards, sessionStats.cardsStudied)
+
+    if (summaryType === 'no-cards') {
+      return (
+        <NoCardsDue
+          mode={config?.mode ?? 'srs'}
+          crammingFilter={config?.crammingFilter}
+          onBackToDeck={() => {
+            reset()
+            navigate(`/decks/${deckId}`)
+          }}
+          onOtherMode={() => {
+            reset()
+            navigate(`/decks/${deckId}/study/setup`)
+          }}
+        />
+      )
+    }
+
     if (config?.mode === 'cramming' && crammingManager) {
       const hardestCards = crammingManager.getHardestCards(5)
       return (
@@ -217,6 +243,7 @@ export function StudySessionPage() {
           }}
           cards={queue}
           template={template}
+          summaryType={summaryType}
           onBackToDeck={() => {
             reset()
             navigate(`/decks/${deckId}`)
@@ -236,6 +263,7 @@ export function StudySessionPage() {
     return (
       <StudySummary
         stats={sessionStats}
+        summaryType={summaryType}
         onBackToDeck={() => {
           reset()
           navigate(`/decks/${deckId}`)

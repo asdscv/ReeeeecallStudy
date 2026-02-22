@@ -89,6 +89,8 @@
     "ratingDistribution": "評価分布",
     "backToDeck": "デッキに戻る",
     "studyAgain": "もう一度学習",
+    "sessionEnded": "セッション終了",
+    "progressSoFar": "ここまでの学習状況です。",
     "knowIt": "わかる",
     "dontKnow": "わからない",
     "next": "次へ"
@@ -154,8 +156,26 @@
       "hardestCards": "最も難しいカード",
       "missedTimes": "{{count}}回間違い",
       "noSrsImpact": "このセッションはSRSスケジュールに影響しません。",
+      "sessionEnded": "セッション終了",
       "crammingAgain": "もう一度詰め込み",
       "otherMode": "他のモード"
+    }
+  },
+  "noCards": {
+    "otherMode": "他のモードで学習",
+    "srs": {
+      "title": "すべて完了！",
+      "message": "現在復習するカードはありません。後でもう一度確認してください！"
+    },
+    "cramming": {
+      "weakTitle": "苦手なカードなし",
+      "weakMessage": "すべてのカードが良好な状態です！",
+      "dueSoonTitle": "もうすぐ復習するカードなし",
+      "dueSoonMessage": "3日以内に復習するカードはありません。"
+    },
+    "generic": {
+      "title": "学習するカードがありません",
+      "message": "条件に合うカードがありません。"
     }
   }
 }

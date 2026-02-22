@@ -21,7 +21,7 @@ import {
   computeOverviewStats,
   computeModeBreakdown,
   computeDailySessionCounts,
-  computeRatingDistribution,
+  computeGroupedRatingDistribution,
   computeSessionDurationTrend,
   computeStudyTimeByMode,
 } from '../lib/study-history-stats'
@@ -179,7 +179,7 @@ export function StudyHistoryPage() {
   )
 
   const ratingDist = useMemo(
-    () => computeRatingDistribution(scopedSessions),
+    () => computeGroupedRatingDistribution(scopedSessions),
     [scopedSessions]
   )
 

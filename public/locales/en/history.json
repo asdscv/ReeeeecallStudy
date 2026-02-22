@@ -84,11 +84,20 @@
     "cardCountLabel": "{{count}} cards",
     "performance": "Performance"
   },
+  "ratingGroups": {
+    "srs": "Spaced Repetition",
+    "simple": "General",
+    "cramming": "Cramming"
+  },
   "ratings": {
     "again": "Again",
     "hard": "Hard",
     "good": "Good",
-    "easy": "Easy"
+    "easy": "Easy",
+    "known": "Known",
+    "unknown": "Unknown",
+    "got_it": "Got it",
+    "missed": "Missed"
   },
   "units": {
     "sessions": "sessions",
