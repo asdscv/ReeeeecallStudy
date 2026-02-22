@@ -57,18 +57,7 @@
     "buttonDesc": "ボタンを押して回答を選択",
     "swipe": "スワイプ",
     "swipeDesc": "カードをスワイプして回答を選択",
-    "directionsHelp": "各方向にアクションを割り当てます。未設定の方向は無効になります。",
-    "swipeDirections": "各方向にアクションを割り当てます。未設定の方向は無効になります。",
-    "swipeLeft": "左スワイプ",
-    "swipeRight": "右スワイプ",
-    "swipeUp": "上スワイプ",
-    "swipeDown": "下スワイプ",
-    "notSet": "未設定",
-    "again": "Again",
-    "hard": "Hard",
-    "good": "Good",
-    "easy": "Easy",
-    "recommendation": "おすすめ：左=Again、右=Good（素早い学習に便利）"
+    "swipeAutoNote": "スワイプ方向は学習モードに応じて自動設定されます。\n• SRS: ← Again / → Good\n• その他: ← 分からない / → 知っている"
   },
 
   "tts": {
@@ -115,12 +104,5 @@
     "logout": "ログアウト"
   },
 
-  "settings": {
-    "answerMode": {
-      "swipeLeft": "左スワイプ",
-      "swipeRight": "右スワイプ",
-      "swipeUp": "上スワイプ",
-      "swipeDown": "下スワイプ"
-    }
-  }
+  "settings": {}
 }

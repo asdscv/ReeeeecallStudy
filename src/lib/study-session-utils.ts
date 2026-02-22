@@ -86,9 +86,14 @@ export function buildSequentialReviewQueue<T extends SeqCard>(
       .filter(c => c.sort_position >= state.review_start_pos)
       .slice(0, reviewBatchSize)
 
-    // If no review cards found, wrap around to beginning
-    if (reviewCards.length === 0 && reviewable.length > 0) {
-      reviewCards = reviewable.slice(0, reviewBatchSize)
+    // Wrap around: if we got fewer than the batch size, fill from the beginning
+    if (reviewCards.length < reviewBatchSize && reviewable.length > 0) {
+      const remaining = reviewBatchSize - reviewCards.length
+      const selectedIds = new Set(reviewCards.map(c => c.id))
+      const wrapCards = reviewable
+        .filter(c => !selectedIds.has(c.id))
+        .slice(0, remaining)
+      reviewCards = [...reviewCards, ...wrapCards]
     }
   }
 
@@ -124,14 +129,28 @@ export function computeSequentialReviewPositions(
   if (newCards.length > 0) {
     // Normal case: advance past new cards
     const newMaxPos = Math.max(...newCards.map(c => c.sort_position)) + 1
+    // Wrap new_start_pos if it exceeds maxCardPosition
+    const wrappedNewPos = maxCardPosition !== undefined && newMaxPos > maxCardPosition ? 0 : newMaxPos
     return {
-      new_start_pos: newMaxPos,
+      new_start_pos: wrappedNewPos,
       review_start_pos: currentState.new_start_pos,
     }
   }
 
   // No new cards in queue — only review cards were studied
-  // Advance review_start_pos past the studied review cards
+  // Detect if the queue contains wrapped-around cards (positions before review_start_pos)
+  const wrappedCards = queue.filter(c => c.sort_position < currentState.review_start_pos)
+
+  if (wrappedCards.length > 0) {
+    // Queue wrapped around — next position is after the last wrapped card
+    const maxWrappedPos = Math.max(...wrappedCards.map(c => c.sort_position))
+    return {
+      new_start_pos: currentState.new_start_pos,
+      review_start_pos: maxWrappedPos + 1,
+    }
+  }
+
+  // No wrap — advance past studied cards
   const maxStudiedPos = Math.max(...queue.map(c => c.sort_position))
   const nextReviewPos = maxStudiedPos + 1
 

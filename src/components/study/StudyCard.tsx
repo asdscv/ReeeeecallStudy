@@ -12,8 +12,10 @@ import {
   previewSwipeAction,
   buildSwipeHintText,
   computeTouchAction,
+  DEFAULT_DIRECTIONS,
   DEAD_ZONE,
   type StudyInputSettings,
+  type SwipeDirectionMap,
   type SwipePreview,
 } from '../../lib/study-input-settings'
 import { SwipeGuide } from './SwipeGuide'
@@ -28,6 +30,7 @@ interface StudyCardProps {
   backTTSFields?: TTSFieldInfo[]
   onSwipeRate?: (rating: string) => void
   inputSettings?: StudyInputSettings | null
+  swipeDirections?: SwipeDirectionMap
 }
 
 /** Card follows finger at 60% of actual movement (higher = more responsive) */
@@ -42,6 +45,7 @@ export function StudyCard({
   backTTSFields,
   onSwipeRate,
   inputSettings,
+  swipeDirections,
 }: StudyCardProps) {
   const { t } = useTranslation('study')
 
@@ -63,6 +67,7 @@ export function StudyCard({
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
+  const dirs = swipeDirections ?? DEFAULT_DIRECTIONS
 
   // ── 2D flip animation ──────────────────────────────────
   // No CSS 3D at all. Fade out → swap content → fade in.
@@ -126,8 +131,8 @@ export function StudyCard({
 
   // Swipe hint text
   const hintText = useMemo(
-    () => (inputSettings && swipeEnabled ? buildSwipeHintText(inputSettings.directions) : ''),
-    [inputSettings, swipeEnabled],
+    () => (swipeEnabled ? buildSwipeHintText(dirs) : ''),
+    [swipeEnabled, dirs],
   )
 
   // ── Direction Commitment swipe handlers ─────────────────
@@ -150,7 +155,7 @@ export function StudyCard({
 
   function handlePointerMove(e: React.PointerEvent) {
     const origin = pointerOriginRef.current
-    if (!swipeEnabled || !origin || !isFlipped || !inputSettings) return
+    if (!swipeEnabled || !origin || !isFlipped) return
     if (committedRef.current === 'scroll') return
 
     const dx = e.clientX - origin.x
@@ -173,7 +178,7 @@ export function StudyCard({
 
     deltaRef.current = { x: dx, y: dy }
     setSwipeDelta({ x: dx, y: dy })
-    setPreview(previewSwipeAction(dx, dy, inputSettings.directions))
+    setPreview(previewSwipeAction(dx, dy, dirs))
   }
 
   function handlePointerUp(e: React.PointerEvent) {
@@ -182,7 +187,7 @@ export function StudyCard({
     }
 
     const origin = pointerOriginRef.current
-    if (!swipeEnabled || !origin || !isFlipped || !inputSettings || committedRef.current !== 'swipe') {
+    if (!swipeEnabled || !origin || !isFlipped || committedRef.current !== 'swipe') {
       resetSwipeState()
       return
     }
@@ -192,7 +197,7 @@ export function StudyCard({
     const distance = Math.sqrt(d.x * d.x + d.y * d.y)
     const velocity = distance / elapsed
 
-    const result = resolveSwipeAction(d.x, d.y, inputSettings.directions, undefined, velocity)
+    const result = resolveSwipeAction(d.x, d.y, dirs, undefined, velocity)
     resetSwipeState()
 
     if (result) {
@@ -212,7 +217,7 @@ export function StudyCard({
 
   // Touch-action for swipe vs scroll
   const touchAction = computeTouchAction(
-    inputSettings?.directions ?? { left: '', right: '', up: '', down: '' },
+    dirs,
     swipeEnabled && isFlipped,
   )
 
@@ -368,9 +373,9 @@ export function StudyCard({
                 )}
 
                 {/* Swipe guide (back face, swipe mode) */}
-                {displaySide === 'back' && swipeEnabled && inputSettings && (
+                {displaySide === 'back' && swipeEnabled && (
                   <SwipeGuide
-                    directions={inputSettings.directions}
+                    directions={dirs}
                     visible={isFlipped && !isSwiping}
                   />
                 )}

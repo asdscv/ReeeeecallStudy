@@ -1,7 +1,6 @@
 import {
   isValidAction,
   isValidMode,
-  validateDirections,
   validateSettings,
   migrateLegacy,
   loadSettings,
@@ -12,6 +11,8 @@ import {
   buildSwipeHintText,
   resolveSwipeAction,
   previewSwipeAction,
+  getDirectionsForMode,
+  getActionLabel,
   SWIPE_THRESHOLD,
   DEAD_ZONE,
   SWIPE_VELOCITY_THRESHOLD,
@@ -34,7 +35,7 @@ vi.mock('i18next', () => ({
 // ── Validators ───────────────────────────────────────
 
 describe('isValidAction', () => {
-  it('accepts valid actions', () => {
+  it('accepts valid SRS actions', () => {
     expect(isValidAction('again')).toBe(true)
     expect(isValidAction('hard')).toBe(true)
     expect(isValidAction('good')).toBe(true)
@@ -42,8 +43,13 @@ describe('isValidAction', () => {
     expect(isValidAction('')).toBe(true)
   })
 
+  it('accepts unknown/known actions', () => {
+    expect(isValidAction('unknown')).toBe(true)
+    expect(isValidAction('known')).toBe(true)
+  })
+
   it('rejects invalid values', () => {
-    expect(isValidAction('unknown')).toBe(false)
+    expect(isValidAction('bogus')).toBe(false)
     expect(isValidAction(null)).toBe(false)
     expect(isValidAction(undefined)).toBe(false)
     expect(isValidAction(42)).toBe(false)
@@ -63,52 +69,91 @@ describe('isValidMode', () => {
   })
 })
 
-describe('validateDirections', () => {
-  it('returns defaults for null/undefined', () => {
-    const result = validateDirections(null)
-    expect(result).toEqual({ left: 'again', right: 'good', up: '', down: '' })
-  })
-
-  it('returns defaults for non-object', () => {
-    expect(validateDirections('string')).toEqual({ left: 'again', right: 'good', up: '', down: '' })
-  })
-
-  it('preserves valid directions', () => {
-    const result = validateDirections({ left: 'hard', right: 'easy', up: 'again', down: 'good' })
-    expect(result).toEqual({ left: 'hard', right: 'easy', up: 'again', down: 'good' })
-  })
-
-  it('replaces invalid directions with defaults', () => {
-    const result = validateDirections({ left: 'invalid', right: 'good', up: 99, down: null })
-    expect(result.left).toBe('again')
-    expect(result.right).toBe('good')
-    expect(result.up).toBe('')
-    expect(result.down).toBe('')
-  })
-})
-
 describe('validateSettings', () => {
   it('returns defaults for null', () => {
     const result = validateSettings(null)
-    expect(result.version).toBe(2)
+    expect(result.version).toBe(3)
     expect(result.mode).toBe('button')
-    expect(result.directions).toEqual({ left: 'again', right: 'good', up: '', down: '' })
   })
 
-  it('preserves valid v2 data', () => {
-    const input = {
-      version: 2,
-      mode: 'swipe',
-      directions: { left: 'again', right: 'good', up: 'hard', down: 'easy' },
-    }
+  it('preserves valid data', () => {
+    const input = { version: 3, mode: 'swipe' }
     const result = validateSettings(input)
     expect(result.mode).toBe('swipe')
-    expect(result.directions.up).toBe('hard')
+    expect(result.version).toBe(3)
   })
 
   it('corrects invalid mode', () => {
-    const result = validateSettings({ version: 2, mode: 'tap', directions: {} })
+    const result = validateSettings({ version: 3, mode: 'tap' })
     expect(result.mode).toBe('button')
+  })
+
+  it('migrates v2 format (drops directions)', () => {
+    const result = validateSettings({
+      version: 2,
+      mode: 'swipe',
+      directions: { left: 'again', right: 'good', up: '', down: '' },
+    })
+    expect(result.version).toBe(3)
+    expect(result.mode).toBe('swipe')
+    expect((result as Record<string, unknown>).directions).toBeUndefined()
+  })
+})
+
+// ── getDirectionsForMode ─────────────────────────────
+
+describe('getDirectionsForMode', () => {
+  it('returns SRS directions for srs mode', () => {
+    const dirs = getDirectionsForMode('srs')
+    expect(dirs).toEqual({ left: 'again', right: 'good', up: '', down: '' })
+  })
+
+  it('returns unknown/known for sequential_review', () => {
+    const dirs = getDirectionsForMode('sequential_review')
+    expect(dirs).toEqual({ left: 'unknown', right: 'known', up: '', down: '' })
+  })
+
+  it('returns unknown/known for cramming', () => {
+    const dirs = getDirectionsForMode('cramming')
+    expect(dirs).toEqual({ left: 'unknown', right: 'known', up: '', down: '' })
+  })
+
+  it('returns unknown/known for random', () => {
+    const dirs = getDirectionsForMode('random')
+    expect(dirs).toEqual({ left: 'unknown', right: 'known', up: '', down: '' })
+  })
+
+  it('returns unknown/known for sequential', () => {
+    const dirs = getDirectionsForMode('sequential')
+    expect(dirs).toEqual({ left: 'unknown', right: 'known', up: '', down: '' })
+  })
+
+  it('returns unknown/known for by_date', () => {
+    const dirs = getDirectionsForMode('by_date')
+    expect(dirs).toEqual({ left: 'unknown', right: 'known', up: '', down: '' })
+  })
+
+  it('returns unknown/known for undefined mode', () => {
+    const dirs = getDirectionsForMode(undefined)
+    expect(dirs).toEqual({ left: 'unknown', right: 'known', up: '', down: '' })
+  })
+})
+
+// ── getActionLabel ───────────────────────────────────
+
+describe('getActionLabel', () => {
+  it('returns label for SRS actions', () => {
+    expect(getActionLabel('again')).toBe('Again')
+    expect(getActionLabel('good')).toBe('Good')
+  })
+
+  it('returns label for unknown/known actions', () => {
+    expect(getActionLabel('unknown')).toBe('Unknown')
+    expect(getActionLabel('known')).toBe('Known')
+  })
+
+  it('returns raw action for unknown actions', () => {
+    expect(getActionLabel('bogus')).toBe('bogus')
   })
 })
 
@@ -117,9 +162,8 @@ describe('validateSettings', () => {
 describe('migrateLegacy', () => {
   it('converts enabled:true to mode:swipe', () => {
     const result = migrateLegacy({ enabled: true, left: 'again', right: 'good', up: '', down: '' })
-    expect(result.version).toBe(2)
+    expect(result.version).toBe(3)
     expect(result.mode).toBe('swipe')
-    expect(result.directions.left).toBe('again')
   })
 
   it('converts enabled:false to mode:button', () => {
@@ -127,18 +171,10 @@ describe('migrateLegacy', () => {
     expect(result.mode).toBe('button')
   })
 
-  it('handles missing/invalid direction values', () => {
-    const result = migrateLegacy({ enabled: true, left: 'invalid', right: 'good' })
-    expect(result.directions.left).toBe('again') // default
-    expect(result.directions.right).toBe('good')
-    expect(result.directions.up).toBe('')
-    expect(result.directions.down).toBe('')
-  })
-
   it('returns defaults for null input', () => {
     const result = migrateLegacy(null)
     expect(result.mode).toBe('button')
-    expect(result.version).toBe(2)
+    expect(result.version).toBe(3)
   })
 })
 
@@ -152,11 +188,18 @@ describe('loadSettings', () => {
   it('returns defaults when nothing is stored', () => {
     const result = loadSettings()
     expect(result.mode).toBe('button')
-    expect(result.version).toBe(2)
+    expect(result.version).toBe(3)
   })
 
-  it('loads v2 settings when present', () => {
-    const stored: StudyInputSettings = {
+  it('loads v3 settings when present', () => {
+    const stored: StudyInputSettings = { version: 3, mode: 'swipe' }
+    localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify(stored))
+    const result = loadSettings()
+    expect(result.mode).toBe('swipe')
+  })
+
+  it('migrates v2 settings to v3', () => {
+    const stored = {
       version: 2,
       mode: 'swipe',
       directions: { left: 'again', right: 'good', up: '', down: '' },
@@ -164,6 +207,7 @@ describe('loadSettings', () => {
     localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify(stored))
     const result = loadSettings()
     expect(result.mode).toBe('swipe')
+    expect(result.version).toBe(3)
   })
 
   it('migrates legacy settings and removes legacy key', () => {
@@ -172,22 +216,21 @@ describe('loadSettings', () => {
     }))
     const result = loadSettings()
     expect(result.mode).toBe('swipe')
-    expect(result.directions.right).toBe('easy')
     // Legacy key should be removed
     expect(localStorage.getItem('reeecall-swipe-settings')).toBeNull()
-    // v2 key should be saved
+    // v3 key should be saved
     expect(localStorage.getItem('reeeeecall-study-input-settings')).not.toBeNull()
   })
 
-  it('prefers v2 over legacy', () => {
+  it('prefers v3 over legacy', () => {
     localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify({
-      version: 2, mode: 'button', directions: { left: '', right: '', up: '', down: '' },
+      version: 3, mode: 'button',
     }))
     localStorage.setItem('reeecall-swipe-settings', JSON.stringify({
       enabled: true, left: 'again', right: 'good', up: '', down: '',
     }))
     const result = loadSettings()
-    expect(result.mode).toBe('button') // v2 wins
+    expect(result.mode).toBe('button') // v3 wins
   })
 })
 
@@ -197,29 +240,19 @@ describe('saveSettings', () => {
   })
 
   it('stores settings in localStorage', () => {
-    const settings: StudyInputSettings = {
-      version: 2,
-      mode: 'swipe',
-      directions: { left: 'again', right: 'good', up: '', down: '' },
-    }
+    const settings: StudyInputSettings = { version: 3, mode: 'swipe' }
     saveSettings(settings)
     const stored = JSON.parse(localStorage.getItem('reeeeecall-study-input-settings')!)
     expect(stored.mode).toBe('swipe')
-    expect(stored.directions.left).toBe('again')
+    expect(stored.version).toBe(3)
   })
 })
 
 // ── Derived Booleans ─────────────────────────────────
 
 describe('shouldShowButtons / shouldEnableSwipe', () => {
-  const buttonSettings: StudyInputSettings = {
-    version: 2, mode: 'button',
-    directions: { left: 'again', right: 'good', up: '', down: '' },
-  }
-  const swipeSettings: StudyInputSettings = {
-    version: 2, mode: 'swipe',
-    directions: { left: 'again', right: 'good', up: '', down: '' },
-  }
+  const buttonSettings: StudyInputSettings = { version: 3, mode: 'button' }
+  const swipeSettings: StudyInputSettings = { version: 3, mode: 'swipe' }
 
   it('shouldShowButtons true only for button mode', () => {
     expect(shouldShowButtons(buttonSettings)).toBe(true)
@@ -257,6 +290,15 @@ describe('buildSwipeHintParts', () => {
   it('returns empty array when all directions are empty', () => {
     const dirs: SwipeDirectionMap = { left: '', right: '', up: '', down: '' }
     expect(buildSwipeHintParts(dirs)).toEqual([])
+  })
+
+  it('works with unknown/known actions', () => {
+    const dirs: SwipeDirectionMap = { left: 'unknown', right: 'known', up: '', down: '' }
+    const parts = buildSwipeHintParts(dirs)
+    expect(parts).toEqual([
+      { arrow: '←', label: 'Unknown' },
+      { arrow: '→', label: 'Known' },
+    ])
   })
 })
 
@@ -321,6 +363,12 @@ describe('resolveSwipeAction', () => {
     expect(result?.direction).toBe('up')
   })
 
+  it('works with unknown/known actions', () => {
+    const nonSrsDirs: SwipeDirectionMap = { left: 'unknown', right: 'known', up: '', down: '' }
+    expect(resolveSwipeAction(-150, 0, nonSrsDirs)).toEqual({ action: 'unknown', direction: 'left' })
+    expect(resolveSwipeAction(150, 0, nonSrsDirs)).toEqual({ action: 'known', direction: 'right' })
+  })
+
   // ── Velocity-based detection ──────────────────────────
 
   it('triggers swipe at reduced distance with high velocity', () => {
@@ -360,7 +408,7 @@ describe('previewSwipeAction', () => {
   const dirs: SwipeDirectionMap = { left: 'again', right: 'good', up: '', down: '' }
 
   it(`returns null in dead zone (< ${DEAD_ZONE}px)`, () => {
-    // DEAD_ZONE is 10, so 5,3 should be inside dead zone
+    // DEAD_ZONE is 8, so 5,3 should be inside dead zone
     expect(previewSwipeAction(5, 3, dirs)).toBeNull()
   })
 
@@ -396,6 +444,14 @@ describe('previewSwipeAction', () => {
     const result = previewSwipeAction(60, 0, dirs)
     expect(result!.color).toContain('rgba')
     expect(result!.color).not.toBe('transparent')
+  })
+
+  it('works with unknown/known actions', () => {
+    const nonSrsDirs: SwipeDirectionMap = { left: 'unknown', right: 'known', up: '', down: '' }
+    const result = previewSwipeAction(-60, 0, nonSrsDirs)
+    expect(result!.action).toBe('unknown')
+    expect(result!.label).toBe('Unknown')
+    expect(result!.color).toContain('rgba')
   })
 })
 

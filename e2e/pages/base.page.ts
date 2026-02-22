@@ -45,9 +45,9 @@ export class BasePage {
 
   async waitForLoadingToDisappear() {
     // Common pattern: wait for any loading spinner to disappear
-    const spinner = this.page.locator('.animate-pulse, .animate-spin')
+    const spinner = this.page.locator('.animate-pulse, .animate-spin').first()
     if (await spinner.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await spinner.waitFor({ state: 'hidden', timeout: 10_000 })
+      await spinner.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {})
     }
   }
 }

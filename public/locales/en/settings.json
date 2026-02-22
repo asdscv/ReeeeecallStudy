@@ -57,18 +57,7 @@
     "buttonDesc": "Select answer by pressing button",
     "swipe": "Swipe",
     "swipeDesc": "Select answer by swiping card",
-    "directionsHelp": "Assign actions to each direction. Unset directions are disabled.",
-    "swipeDirections": "Assign actions to each direction. Unset directions are disabled.",
-    "swipeLeft": "Swipe left",
-    "swipeRight": "Swipe right",
-    "swipeUp": "Swipe up",
-    "swipeDown": "Swipe down",
-    "notSet": "Not set",
-    "again": "Again",
-    "hard": "Hard",
-    "good": "Good",
-    "easy": "Easy",
-    "recommendation": "Recommended: Left=Again, Right=Good (useful for fast learning)"
+    "swipeAutoNote": "Swipe directions are set automatically based on study mode.\n• SRS: ← Again / → Good\n• Other modes: ← Unknown / → Known"
   },
 
   "tts": {
@@ -115,12 +104,5 @@
     "logout": "Log out"
   },
 
-  "settings": {
-    "answerMode": {
-      "swipeLeft": "Swipe left",
-      "swipeRight": "Swipe right",
-      "swipeUp": "Swipe up",
-      "swipeDown": "Swipe down"
-    }
-  }
+  "settings": {}
 }

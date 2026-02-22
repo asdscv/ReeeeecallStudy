@@ -169,6 +169,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         }
 
         // Count new cards already studied today (across all sessions)
+        // Filter by prev_interval=0 + prev_ease=2.5 to only count cards that were truly new
+        // (not learning/review cards being re-studied)
         const todayStart = new Date()
         todayStart.setHours(0, 0, 0, 0)
         const { count: todayNewCount } = await supabase
@@ -178,6 +180,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           .eq('user_id', user.id)
           .eq('study_mode', 'srs')
           .gte('studied_at', todayStart.toISOString())
+          .eq('prev_interval', 0)
+          .eq('prev_ease', 2.5)
 
         // Remaining new cards for today
         const remainingNewToday = Math.max(0, newCardLimit - (todayNewCount ?? 0))
@@ -324,17 +328,20 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
         cards = (seqCards ?? []) as Card[]
 
-        // Wrap around if no cards found
-        if (cards.length === 0) {
+        // Wrap around: fill remaining from beginning if partial batch
+        if (cards.length < config.batchSize) {
+          const remaining = config.batchSize - cards.length
+          const existingIds = new Set(cards.map(c => c.id))
           const { data: wrapCards } = await supabase
             .from('cards')
             .select('*')
             .eq('deck_id', config.deckId)
             .neq('srs_status', 'suspended')
             .order('sort_position', { ascending: true })
-            .limit(config.batchSize)
+            .limit(remaining)
 
-          cards = (wrapCards ?? []) as Card[]
+          const uniqueWrapCards = ((wrapCards ?? []) as Card[]).filter(c => !existingIds.has(c.id))
+          cards = [...cards, ...uniqueWrapCards]
         }
         break
       }
@@ -457,7 +464,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     if (isCrammingMode) {
       // Cramming mode: NO SRS calculation, just advance the cramming manager
-      crammingManager!.rateCard(rating as CrammingRating)
+      // Map unified unknown/known → missed/got_it
+      const crammingRating: CrammingRating = rating === 'known' ? 'got_it' : rating === 'unknown' ? 'missed' : rating as CrammingRating
+      crammingManager!.rateCard(crammingRating)
     } else if (config.mode === 'srs') {
       // SRS mode: update card SRS fields
       const srsResult = calculateSRS(card, rating as SrsRating, srsSettings ?? undefined)
@@ -542,6 +551,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       isComplete = currentIndex + 1 >= queue.length
     }
 
+    // After SRS requeue, totalCards may have increased
+    const updatedTotalCards = isSrsMode
+      ? srsQueueManager!.studiedCount() + srsQueueManager!.remaining()
+      : sessionStats.totalCards
+
     if (isComplete) {
       set({
         queue: updatedQueue,
@@ -549,6 +563,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
+          totalCards: updatedTotalCards,
           ratings: updatedRatings,
           totalDurationMs: sessionStats.totalDurationMs + durationMs,
         },
@@ -590,6 +605,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         sessionStats: {
           ...sessionStats,
           cardsStudied: sessionStats.cardsStudied + 1,
+          totalCards: updatedTotalCards,
           ratings: updatedRatings,
           totalDurationMs: sessionStats.totalDurationMs + durationMs,
         },
@@ -668,8 +684,18 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
 
       if (config.mode === 'sequential' && queue.length > 0) {
-        const maxPos = Math.max(...queue.map(c => c.sort_position))
-        const nextPos = maxPos + 1
+        const typedState = studyState as DeckStudyState
+        // Detect wrapped queue (cards with positions before the session start)
+        const wrappedCards = queue.filter(c => c.sort_position < typedState.sequential_pos)
+
+        let nextPos: number
+        if (wrappedCards.length > 0) {
+          // Queue wrapped — continue after the last wrapped card
+          nextPos = Math.max(...wrappedCards.map(c => c.sort_position)) + 1
+        } else {
+          const maxPos = Math.max(...queue.map(c => c.sort_position))
+          nextPos = maxPos + 1
+        }
 
         await supabase
           .from('deck_study_state')

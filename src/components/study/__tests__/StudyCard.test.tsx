@@ -1,7 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import { StudyCard } from '../StudyCard'
 import type { Card, CardTemplate } from '../../../types/database'
-import type { StudyInputSettings } from '../../../lib/study-input-settings'
+import type { StudyInputSettings, SwipeDirectionMap } from '../../../lib/study-input-settings'
+
+// Mock i18next for getActionLabel in study-input-settings
+vi.mock('i18next', () => ({
+  default: {
+    t: (key: string) => {
+      const last = key.split('.').pop() ?? key
+      return last.charAt(0).toUpperCase() + last.slice(1)
+    },
+  },
+}))
 
 // Mock motion/react to avoid animation issues in tests
 vi.mock('motion/react', () => ({
@@ -68,17 +78,11 @@ const mockTemplate: CardTemplate = {
   updated_at: '2024-01-01T00:00:00Z',
 }
 
-const swipeSettings: StudyInputSettings = {
-  version: 2,
-  mode: 'swipe',
-  directions: { left: 'again', right: 'good', up: '', down: '' },
-}
+const swipeSettings: StudyInputSettings = { version: 3, mode: 'swipe' }
+const buttonSettings: StudyInputSettings = { version: 3, mode: 'button' }
 
-const buttonSettings: StudyInputSettings = {
-  version: 2,
-  mode: 'button',
-  directions: { left: 'again', right: 'good', up: '', down: '' },
-}
+const srsDirections: SwipeDirectionMap = { left: 'again', right: 'good', up: '', down: '' }
+const nonSrsDirections: SwipeDirectionMap = { left: 'unknown', right: 'known', up: '', down: '' }
 
 describe('StudyCard — back face rendering', () => {
   it('renders back value from template layout when keys match', () => {
@@ -154,7 +158,7 @@ describe('StudyCard — back face rendering', () => {
 })
 
 describe('StudyCard — swipe hints', () => {
-  it('shows swipe hint when flipped + swipe mode', () => {
+  it('shows swipe hint when flipped + swipe mode (SRS directions)', () => {
     render(
       <StudyCard
         card={mockCard}
@@ -162,12 +166,30 @@ describe('StudyCard — swipe hints', () => {
         isFlipped={true}
         onFlip={() => {}}
         inputSettings={swipeSettings}
+        swipeDirections={srsDirections}
       />,
     )
     const hint = screen.getByTestId('swipe-hint')
     expect(hint).toBeInTheDocument()
-    expect(hint.textContent).toContain('again')
-    expect(hint.textContent).toContain('good')
+    expect(hint.textContent).toContain('Again')
+    expect(hint.textContent).toContain('Good')
+  })
+
+  it('shows swipe hint with unknown/known for non-SRS directions', () => {
+    render(
+      <StudyCard
+        card={mockCard}
+        template={mockTemplate}
+        isFlipped={true}
+        onFlip={() => {}}
+        inputSettings={swipeSettings}
+        swipeDirections={nonSrsDirections}
+      />,
+    )
+    const hint = screen.getByTestId('swipe-hint')
+    expect(hint).toBeInTheDocument()
+    expect(hint.textContent).toContain('Unknown')
+    expect(hint.textContent).toContain('Known')
   })
 
   it('does not show swipe hint in button mode', () => {
@@ -178,6 +200,7 @@ describe('StudyCard — swipe hints', () => {
         isFlipped={true}
         onFlip={() => {}}
         inputSettings={buttonSettings}
+        swipeDirections={srsDirections}
       />,
     )
     expect(screen.queryByTestId('swipe-hint')).not.toBeInTheDocument()
@@ -191,6 +214,7 @@ describe('StudyCard — swipe hints', () => {
         isFlipped={false}
         onFlip={() => {}}
         inputSettings={swipeSettings}
+        swipeDirections={srsDirections}
       />,
     )
     expect(screen.queryByTestId('swipe-hint')).not.toBeInTheDocument()

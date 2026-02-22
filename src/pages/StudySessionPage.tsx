@@ -15,7 +15,7 @@ import { StudySummary } from '../components/study/StudySummary'
 import { CrammingSummary } from '../components/study/CrammingSummary'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak } from '../lib/tts'
-import { loadSettings, shouldShowButtons, type StudyInputSettings } from '../lib/study-input-settings'
+import { loadSettings, shouldShowButtons, getDirectionsForMode, type StudyInputSettings, type SwipeDirectionMap } from '../lib/study-input-settings'
 import type { CrammingFilter } from '../lib/cramming-queue'
 import type { StudyMode, Profile } from '../types/database'
 
@@ -42,8 +42,8 @@ export function StudySessionPage() {
     reset,
   } = useStudyStore()
 
-  const [profile, setProfile] = useState<Pick<Profile, 'tts_enabled' | 'tts_lang'> | null>(null)
-  const [inputSettings] = useState<StudyInputSettings>(() => loadSettings())
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [inputSettings, setInputSettings] = useState<StudyInputSettings>(() => loadSettings())
   const [crammingTimeRemaining, setCrammingTimeRemaining] = useState<number | null>(null)
 
   // Fetch profile for TTS settings
@@ -52,11 +52,15 @@ export function StudySessionPage() {
     const fetchProfile = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('tts_enabled, tts_lang')
+        .select('*')
         .eq('id', user.id)
         .single()
       if (data) {
-        setProfile(data as Pick<Profile, 'tts_enabled' | 'tts_lang'>)
+        const p = data as Profile
+        setProfile(p)
+        if (p.answer_mode && (p.answer_mode === 'button' || p.answer_mode === 'swipe')) {
+          setInputSettings({ version: 3, mode: p.answer_mode })
+        }
       }
     }
     fetchProfile()
@@ -121,6 +125,12 @@ export function StudySessionPage() {
 
     return () => clearInterval(interval)
   }, [crammingManager, phase])
+
+  // Compute swipe directions based on study mode
+  const swipeDirections = useMemo<SwipeDirectionMap>(
+    () => getDirectionsForMode(config?.mode),
+    [config?.mode],
+  )
 
   // Compute current card (cramming uses crammingManager for card ID)
   const currentCard = useMemo(() => {
@@ -307,6 +317,7 @@ export function StudySessionPage() {
         backTTSFields={backTTSFields}
         onSwipeRate={handleRate}
         inputSettings={inputSettings}
+        swipeDirections={swipeDirections}
       />
 
       {/* Rating buttons (hidden in swipe mode) */}

@@ -57,18 +57,7 @@
     "buttonDesc": "通过点击按钮选择答案",
     "swipe": "滑动",
     "swipeDesc": "通过滑动卡片选择答案",
-    "directionsHelp": "为每个方向分配操作。未设置的方向将被禁用。",
-    "swipeDirections": "为每个方向分配操作。未设置的方向将被禁用。",
-    "swipeLeft": "向左滑动",
-    "swipeRight": "向右滑动",
-    "swipeUp": "向上滑动",
-    "swipeDown": "向下滑动",
-    "notSet": "未设置",
-    "again": "重来",
-    "hard": "困难",
-    "good": "良好",
-    "easy": "简单",
-    "recommendation": "推荐：左滑=重来，右滑=良好（适合快速学习）"
+    "swipeAutoNote": "滑动方向根据学习模式自动设置。\n• SRS: ← 重来 / → 良好\n• 其他模式: ← 不知道 / → 知道"
   },
 
   "tts": {
@@ -115,12 +104,5 @@
     "logout": "退出登录"
   },
 
-  "settings": {
-    "answerMode": {
-      "swipeLeft": "向左滑动",
-      "swipeRight": "向右滑动",
-      "swipeUp": "向上滑动",
-      "swipeDown": "向下滑动"
-    }
-  }
+  "settings": {}
 }

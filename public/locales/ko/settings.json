@@ -57,18 +57,7 @@
     "buttonDesc": "버튼을 눌러 답변 선택",
     "swipe": "스와이프",
     "swipeDesc": "카드를 밀어서 답변 선택",
-    "directionsHelp": "각 방향에 동작을 할당하세요. 설정하지 않은 방향은 비활성화됩니다.",
-    "swipeDirections": "각 방향에 동작을 할당하세요. 설정하지 않은 방향은 비활성화됩니다.",
-    "swipeLeft": "왼쪽 스와이프",
-    "swipeRight": "오른쪽 스와이프",
-    "swipeUp": "위쪽 스와이프",
-    "swipeDown": "아래쪽 스와이프",
-    "notSet": "설정 안함",
-    "again": "Again (다시)",
-    "hard": "Hard (어려움)",
-    "good": "Good (적당)",
-    "easy": "Easy (쉬움)",
-    "recommendation": "추천 설정: 왼쪽=Again, 오른쪽=Good (빠른 학습에 유용)"
+    "swipeAutoNote": "스와이프 방향은 학습 모드에 따라 자동 설정됩니다.\n• SRS: ← Again / → Good\n• 기타 모드: ← 모름 / → 알고 있음"
   },
 
   "tts": {
@@ -115,12 +104,5 @@
     "logout": "로그아웃"
   },
 
-  "settings": {
-    "answerMode": {
-      "swipeLeft": "왼쪽 스와이프",
-      "swipeRight": "오른쪽 스와이프",
-      "swipeUp": "위쪽 스와이프",
-      "swipeDown": "아래쪽 스와이프"
-    }
-  }
+  "settings": {}
 }

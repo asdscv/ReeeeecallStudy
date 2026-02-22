@@ -3,9 +3,10 @@
 // Consolidates SwipeSettings from 3 files into one source of truth.
 
 import i18next from 'i18next'
+import type { StudyMode } from '../types/database'
 
 export type AnswerInputMode = 'button' | 'swipe'
-export type SwipeAction = 'again' | 'hard' | 'good' | 'easy' | ''
+export type SwipeAction = 'again' | 'hard' | 'good' | 'easy' | 'unknown' | 'known' | ''
 
 export interface SwipeDirectionMap {
   left: SwipeAction
@@ -15,9 +16,8 @@ export interface SwipeDirectionMap {
 }
 
 export interface StudyInputSettings {
-  version: 2
+  version: 3
   mode: AnswerInputMode
-  directions: SwipeDirectionMap
 }
 
 // ── Constants ────────────────────────────────────────
@@ -26,10 +26,10 @@ const STORAGE_KEY = 'reeeeecall-study-input-settings'
 const LEGACY_KEY = 'reeecall-swipe-settings'  // keep old key name for migration
 export const SWIPE_THRESHOLD = 30
 
-const VALID_ACTIONS: ReadonlySet<string> = new Set(['again', 'hard', 'good', 'easy', ''])
+const VALID_ACTIONS: ReadonlySet<string> = new Set(['again', 'hard', 'good', 'easy', 'unknown', 'known', ''])
 const VALID_MODES: ReadonlySet<string> = new Set(['button', 'swipe'])
 
-const DEFAULT_DIRECTIONS: SwipeDirectionMap = {
+export const DEFAULT_DIRECTIONS: SwipeDirectionMap = {
   left: 'again',
   right: 'good',
   up: '',
@@ -37,9 +37,8 @@ const DEFAULT_DIRECTIONS: SwipeDirectionMap = {
 }
 
 const DEFAULT_SETTINGS: StudyInputSettings = {
-  version: 2,
+  version: 3,
   mode: 'button',
-  directions: { ...DEFAULT_DIRECTIONS },
 }
 
 // ── Action color mapping ─────────────────────────────
@@ -49,10 +48,35 @@ const ACTION_COLORS: Record<string, string> = {
   hard: 'rgba(249, 115, 22, VAR)',   // orange-500
   good: 'rgba(34, 197, 94, VAR)',    // green-500
   easy: 'rgba(59, 130, 246, VAR)',   // blue-500
+  unknown: 'rgba(239, 68, 68, VAR)', // red-500
+  known: 'rgba(34, 197, 94, VAR)',   // green-500
 }
 
-function getActionLabel(action: string): string {
-  return i18next.t(`study:srsRating.${action}`, { defaultValue: action })
+// ── Action labels (per-action i18n) ──────────────────
+
+const ACTION_I18N_KEYS: Record<string, string> = {
+  again: 'study:srsRating.again',
+  hard: 'study:srsRating.hard',
+  good: 'study:srsRating.good',
+  easy: 'study:srsRating.easy',
+  unknown: 'study:rating.unknown',
+  known: 'study:rating.known',
+}
+
+export function getActionLabel(action: string): string {
+  const key = ACTION_I18N_KEYS[action]
+  if (key) return i18next.t(key, { defaultValue: action })
+  return action
+}
+
+// ── Fixed directions per study mode ─────────────────
+
+export function getDirectionsForMode(mode?: StudyMode): SwipeDirectionMap {
+  if (mode === 'srs') {
+    return { left: 'again', right: 'good', up: '', down: '' }
+  }
+  // sequential_review, cramming, random, sequential, by_date
+  return { left: 'unknown', right: 'known', up: '', down: '' }
 }
 
 // ── Validators ───────────────────────────────────────
@@ -65,24 +89,12 @@ export function isValidMode(value: unknown): value is AnswerInputMode {
   return typeof value === 'string' && VALID_MODES.has(value)
 }
 
-export function validateDirections(raw: unknown): SwipeDirectionMap {
-  if (!raw || typeof raw !== 'object') return { ...DEFAULT_DIRECTIONS }
-  const obj = raw as Record<string, unknown>
-  return {
-    left: isValidAction(obj.left) ? obj.left : DEFAULT_DIRECTIONS.left,
-    right: isValidAction(obj.right) ? obj.right : DEFAULT_DIRECTIONS.right,
-    up: isValidAction(obj.up) ? obj.up : DEFAULT_DIRECTIONS.up,
-    down: isValidAction(obj.down) ? obj.down : DEFAULT_DIRECTIONS.down,
-  }
-}
-
 export function validateSettings(raw: unknown): StudyInputSettings {
-  if (!raw || typeof raw !== 'object') return { ...DEFAULT_SETTINGS, directions: { ...DEFAULT_SETTINGS.directions } }
+  if (!raw || typeof raw !== 'object') return { ...DEFAULT_SETTINGS }
   const obj = raw as Record<string, unknown>
   return {
-    version: 2,
+    version: 3,
     mode: isValidMode(obj.mode) ? obj.mode : DEFAULT_SETTINGS.mode,
-    directions: validateDirections(obj.directions),
   }
 }
 
@@ -98,27 +110,21 @@ interface LegacySwipeSettings {
 
 export function migrateLegacy(raw: unknown): StudyInputSettings {
   if (!raw || typeof raw !== 'object') {
-    return { ...DEFAULT_SETTINGS, directions: { ...DEFAULT_SETTINGS.directions } }
+    return { ...DEFAULT_SETTINGS }
   }
   const legacy = raw as Partial<LegacySwipeSettings>
   const mode: AnswerInputMode = legacy.enabled ? 'swipe' : 'button'
-  const directions: SwipeDirectionMap = {
-    left: isValidAction(legacy.left) ? legacy.left : DEFAULT_DIRECTIONS.left,
-    right: isValidAction(legacy.right) ? legacy.right : DEFAULT_DIRECTIONS.right,
-    up: isValidAction(legacy.up) ? legacy.up : DEFAULT_DIRECTIONS.up,
-    down: isValidAction(legacy.down) ? legacy.down : DEFAULT_DIRECTIONS.down,
-  }
-  return { version: 2, mode, directions }
+  return { version: 3, mode }
 }
 
 // ── Persistence ──────────────────────────────────────
 
 export function loadSettings(): StudyInputSettings {
-  // v2 first
-  const v2Raw = localStorage.getItem(STORAGE_KEY)
-  if (v2Raw) {
+  // v3/v2 first
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (raw) {
     try {
-      return validateSettings(JSON.parse(v2Raw))
+      return validateSettings(JSON.parse(raw))
     } catch { /* fall through */ }
   }
 
@@ -127,14 +133,14 @@ export function loadSettings(): StudyInputSettings {
   if (legacyRaw) {
     try {
       const migrated = migrateLegacy(JSON.parse(legacyRaw))
-      // Save as v2 and remove legacy
+      // Save as v3 and remove legacy
       localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated))
       localStorage.removeItem(LEGACY_KEY)
       return migrated
     } catch { /* fall through */ }
   }
 
-  return { ...DEFAULT_SETTINGS, directions: { ...DEFAULT_SETTINGS.directions } }
+  return { ...DEFAULT_SETTINGS }
 }
 
 export function saveSettings(settings: StudyInputSettings): void {

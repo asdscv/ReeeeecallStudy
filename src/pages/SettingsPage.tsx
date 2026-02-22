@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -12,18 +12,9 @@ import {
   loadSettings,
   saveSettings,
   type StudyInputSettings,
-  type SwipeAction,
-  type SwipeDirectionMap,
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
 import { maskApiKeyPartial } from '../lib/api-key'
-
-const SWIPE_DIRECTIONS: { key: keyof SwipeDirectionMap; labelKey: string; icon: typeof ArrowLeft }[] = [
-  { key: 'left', labelKey: 'answerMode.swipeLeft', icon: ArrowLeft },
-  { key: 'right', labelKey: 'answerMode.swipeRight', icon: ArrowRight },
-  { key: 'up', labelKey: 'answerMode.swipeUp', icon: ArrowUp },
-  { key: 'down', labelKey: 'answerMode.swipeDown', icon: ArrowDown },
-]
 
 function CopyButton({ text }: { text: string }) {
   const { t } = useTranslation('settings')
@@ -90,6 +81,12 @@ export function SettingsPage() {
         setDisplayName(p.display_name ?? '')
         setDailyNewLimit(p.daily_new_limit)
         setTtsEnabled(p.tts_enabled)
+        // Sync answer_mode from DB → local state
+        if (p.answer_mode) {
+          const synced: StudyInputSettings = { version: 3, mode: p.answer_mode }
+          setInputSettingsRaw(synced)
+          saveSettings(synced)
+        }
       }
       setLoading(false)
     }
@@ -129,6 +126,7 @@ export function SettingsPage() {
         display_name: displayName.trim() || null,
         daily_new_limit: dailyNewLimit,
         tts_enabled: ttsEnabled,
+        answer_mode: inputSettings.mode,
       } as Record<string, unknown>)
       .eq('id', user.id)
 
@@ -350,47 +348,12 @@ export function SettingsPage() {
             </button>
           </div>
 
-          {/* Direction settings (only in swipe mode) */}
+          {/* Auto-directions info (only in swipe mode) */}
           {inputSettings.mode === 'swipe' && (
-            <div className="space-y-4 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                {t('answerMode.directionsHelp')}
+            <div className="p-3 bg-blue-50 rounded-lg mt-4">
+              <p className="text-xs text-blue-800 whitespace-pre-line">
+                {t('answerMode.swipeAutoNote')}
               </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {SWIPE_DIRECTIONS.map(({ key, labelKey, icon: Icon }) => (
-                  <div key={key} className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="text-sm font-medium text-gray-700 mb-1 block">
-                        {t(labelKey)}
-                      </label>
-                      <select
-                        value={inputSettings.directions[key]}
-                        onChange={(e) => updateInputSettings({
-                          ...inputSettings,
-                          directions: { ...inputSettings.directions, [key]: e.target.value as SwipeAction },
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
-                      >
-                        <option value="">{t('answerMode.notSet')}</option>
-                        <option value="again">{t('answerMode.again')}</option>
-                        <option value="hard">{t('answerMode.hard')}</option>
-                        <option value="good">{t('answerMode.good')}</option>
-                        <option value="easy">{t('answerMode.easy')}</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-xs text-blue-800">
-                  {t('answerMode.recommendation')}
-                </p>
-              </div>
             </div>
           )}
         </section>

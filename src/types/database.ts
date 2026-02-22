@@ -16,6 +16,7 @@ export interface Database {
           tts_provider: 'web_speech' | 'edge_tts'
           locale: string
           role: UserRole
+          answer_mode: 'button' | 'swipe'
           created_at: string
           updated_at: string
         }
@@ -31,6 +32,7 @@ export interface Database {
           tts_provider?: 'web_speech' | 'edge_tts'
           locale?: string
           role?: UserRole
+          answer_mode?: 'button' | 'swipe'
         }
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }

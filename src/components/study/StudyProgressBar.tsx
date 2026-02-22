@@ -4,7 +4,7 @@ interface StudyProgressBarProps {
 }
 
 export function StudyProgressBar({ current, total }: StudyProgressBarProps) {
-  const pct = total > 0 ? Math.round((current / total) * 100) : 0
+  const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0
 
   return (
     <div className="flex items-center gap-3 sm:gap-4 flex-1">
