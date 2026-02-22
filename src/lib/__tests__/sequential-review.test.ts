@@ -73,8 +73,8 @@ describe('buildSequentialReviewQueue', () => {
       const state = { new_start_pos: 100, review_start_pos: 2 }
       const result = buildSequentialReviewQueue(cards, state, 5, 5)
 
-      // Should get cards from pos >= 2
-      expect(result.reviewCards.map(c => c.id)).toEqual(['c3', 'c4'])
+      // Should get cards from pos >= 2, then wrap to fill up to batch size
+      expect(result.reviewCards.map(c => c.id)).toEqual(['c3', 'c4', 'c1', 'c2'])
     })
 
     it('should wrap around review cards when review_start_pos exceeds all positions', () => {
@@ -236,5 +236,140 @@ describe('computeSequentialReviewPositions (wrap-around)', () => {
 
     expect(result.new_start_pos).toBe(10)
     expect(result.review_start_pos).toBe(5)
+  })
+})
+
+// ─── Bug Fix Tests ──────────────────────────────────────────
+
+describe('Bug A: initial state should include review cards', () => {
+  it('should return review cards when new_start_pos equals review_start_pos (initial state)', () => {
+    // Deck with 30 review + 10 new cards
+    const cards: MockCard[] = []
+    for (let i = 0; i < 30; i++) {
+      cards.push(makeCard(`r${i}`, i, 'review'))
+    }
+    for (let i = 30; i < 40; i++) {
+      cards.push(makeCard(`n${i}`, i, 'new'))
+    }
+    // Initial state: both positions at 0
+    const state = { new_start_pos: 0, review_start_pos: 0 }
+    const result = buildSequentialReviewQueue(cards, state, 10, 20)
+
+    // Should get 10 new cards AND 20 review cards
+    expect(result.newCards).toHaveLength(10)
+    expect(result.reviewCards).toHaveLength(20)
+  })
+
+  it('should return review cards when new_start_pos equals review_start_pos mid-deck', () => {
+    // Both positions at same mid-deck point (e.g. after wrap or reset)
+    const cards: MockCard[] = []
+    for (let i = 0; i < 20; i++) {
+      cards.push(makeCard(`r${i}`, i, 'review'))
+    }
+    for (let i = 20; i < 30; i++) {
+      cards.push(makeCard(`n${i}`, i, 'new'))
+    }
+    // Both positions equal — should not produce empty window
+    const state = { new_start_pos: 20, review_start_pos: 20 }
+    const result = buildSequentialReviewQueue(cards, state, 5, 10)
+
+    expect(result.newCards).toHaveLength(5)
+    // new_start_pos == review_start_pos → no window restriction, get review cards from pos >= 20
+    // But all review cards are at pos 0-19, so filter from 20 gives none. That's ok — they're all before the review window.
+    // This is correct: those cards would have been reviewed in previous sessions.
+  })
+})
+
+describe('Bug B: new_start_pos should not wrap around to 0', () => {
+  it('should not wrap new_start_pos when it exceeds maxCardPosition', () => {
+    // New cards at the end of the deck
+    const queue = [
+      { sort_position: 18, srs_status: 'new' as const },
+      { sort_position: 19, srs_status: 'new' as const },
+    ]
+    const state = { new_start_pos: 18, review_start_pos: 0 }
+    const maxPos = 19
+    const result = computeSequentialReviewPositions(queue, state, maxPos)
+
+    // new_start_pos should be 20 (past end), NOT 0
+    expect(result.new_start_pos).toBe(20)
+  })
+})
+
+describe('Bug C: review_start_pos should track reviewed cards', () => {
+  it('should advance review_start_pos past reviewed cards in mixed session', () => {
+    // Session with new cards + review cards
+    const queue = [
+      { sort_position: 0, srs_status: 'review' as const },
+      { sort_position: 1, srs_status: 'review' as const },
+      { sort_position: 2, srs_status: 'review' as const },
+      { sort_position: 10, srs_status: 'new' as const },
+      { sort_position: 11, srs_status: 'new' as const },
+    ]
+    const state = { new_start_pos: 10, review_start_pos: 0 }
+    const result = computeSequentialReviewPositions(queue, state)
+
+    // new_start_pos should advance past new cards
+    expect(result.new_start_pos).toBe(12)
+    // review_start_pos should advance past reviewed cards (pos 2 → next is 3)
+    expect(result.review_start_pos).toBe(3)
+  })
+
+  it('should keep review_start_pos at new_start_pos when no review cards in queue', () => {
+    const queue = [
+      { sort_position: 5, srs_status: 'new' as const },
+      { sort_position: 6, srs_status: 'new' as const },
+    ]
+    const state = { new_start_pos: 5, review_start_pos: 0 }
+    const result = computeSequentialReviewPositions(queue, state)
+
+    expect(result.new_start_pos).toBe(7)
+    // No review cards studied, so review_start_pos = old new_start_pos (fallback)
+    expect(result.review_start_pos).toBe(5)
+  })
+})
+
+describe('Integration: multi-session sequential review', () => {
+  it('should correctly track positions across two sessions', () => {
+    // Deck: 30 review cards (pos 0-29) + 10 new cards (pos 30-39)
+    const allCards: MockCard[] = []
+    for (let i = 0; i < 30; i++) {
+      allCards.push(makeCard(`r${i}`, i, 'review'))
+    }
+    for (let i = 30; i < 40; i++) {
+      allCards.push(makeCard(`n${i}`, i, 'new'))
+    }
+
+    // --- Session 1 ---
+    const state1 = { new_start_pos: 0, review_start_pos: 0 }
+    const session1 = buildSequentialReviewQueue(allCards, state1, 10, 20)
+
+    // Should get 10 new cards (pos 30-39) + 20 review cards (pos 0-19)
+    expect(session1.newCards).toHaveLength(10)
+    expect(session1.reviewCards).toHaveLength(20)
+    expect(session1.newCards[0].sort_position).toBe(30)
+    expect(session1.reviewCards[0].sort_position).toBe(0)
+
+    // Compute positions after session 1
+    const queue1 = [...session1.newCards, ...session1.reviewCards]
+    const state2 = computeSequentialReviewPositions(queue1, state1, 39)
+
+    // new_start_pos should be 40 (past all new cards, NOT wrapped to 0)
+    expect(state2.new_start_pos).toBe(40)
+    // review_start_pos should be 20 (past reviewed cards 0-19)
+    expect(state2.review_start_pos).toBe(20)
+
+    // --- Session 2 ---
+    // Mark session 1 new cards as 'learning' now (they're no longer 'new')
+    const allCardsAfterSession1 = allCards.map(c => {
+      if (c.srs_status === 'new') return { ...c, srs_status: 'learning' as const }
+      return c
+    })
+    const session2 = buildSequentialReviewQueue(allCardsAfterSession1, state2, 10, 15)
+
+    // No more new cards (all learned), should get review cards from pos 20+
+    expect(session2.newCards).toHaveLength(0)
+    expect(session2.reviewCards.length).toBeGreaterThan(0)
+    expect(session2.reviewCards[0].sort_position).toBe(20)
   })
 })

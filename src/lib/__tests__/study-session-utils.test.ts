@@ -131,7 +131,8 @@ describe('computeSequentialReviewPositions', () => {
     const result = computeSequentialReviewPositions(queue, state)
 
     expect(result.new_start_pos).toBe(20)
-    expect(result.review_start_pos).toBe(10)
+    // Bug C fix: review_start_pos advances past actually reviewed cards (max pos 5 → 6)
+    expect(result.review_start_pos).toBe(6)
   })
 
   it('does not change positions when queue is empty', () => {

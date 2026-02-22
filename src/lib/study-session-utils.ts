@@ -76,10 +76,17 @@ export function buildSequentialReviewQueue<T extends SeqCard>(
   let reviewCards: T[]
 
   if (newCards.length > 0) {
-    // Have new cards — review the window [review_start_pos, new_start_pos)
-    reviewCards = reviewable
-      .filter(c => c.sort_position >= state.review_start_pos && c.sort_position < state.new_start_pos)
-      .slice(0, reviewBatchSize)
+    if (state.new_start_pos > state.review_start_pos) {
+      // Normal: review the window [review_start_pos, new_start_pos)
+      reviewCards = reviewable
+        .filter(c => c.sort_position >= state.review_start_pos && c.sort_position < state.new_start_pos)
+        .slice(0, reviewBatchSize)
+    } else {
+      // Initial state or positions overlap: review from review_start_pos with no upper bound
+      reviewCards = reviewable
+        .filter(c => c.sort_position >= state.review_start_pos)
+        .slice(0, reviewBatchSize)
+    }
   } else {
     // No new cards — review from review_start_pos onward
     reviewCards = reviewable
@@ -127,13 +134,19 @@ export function computeSequentialReviewPositions(
   const newCards = queue.filter(c => c.srs_status === 'new')
 
   if (newCards.length > 0) {
-    // Normal case: advance past new cards
+    // Advance past new cards — do NOT wrap to 0 (exceeding max signals "all new cards consumed")
     const newMaxPos = Math.max(...newCards.map(c => c.sort_position)) + 1
-    // Wrap new_start_pos if it exceeds maxCardPosition
-    const wrappedNewPos = maxCardPosition !== undefined && newMaxPos > maxCardPosition ? 0 : newMaxPos
+    // Track review cards actually studied in this session
+    const reviewCards = queue.filter(c => c.srs_status !== 'new')
+    let reviewPos: number
+    if (reviewCards.length > 0) {
+      reviewPos = Math.max(...reviewCards.map(c => c.sort_position)) + 1
+    } else {
+      reviewPos = currentState.new_start_pos
+    }
     return {
-      new_start_pos: wrappedNewPos,
-      review_start_pos: currentState.new_start_pos,
+      new_start_pos: newMaxPos,
+      review_start_pos: reviewPos,
     }
   }
 
