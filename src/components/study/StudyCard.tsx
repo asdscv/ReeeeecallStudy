@@ -65,6 +65,7 @@ export function StudyCard({
   const committedRef = useRef<'none' | 'swipe' | 'scroll'>('none')
   const swipedRef = useRef(false)
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cardBodyRef = useRef<HTMLDivElement>(null)
 
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
   const dirs = swipeDirections ?? DEFAULT_DIRECTIONS
@@ -135,6 +136,24 @@ export function StudyCard({
     [swipeEnabled, dirs],
   )
 
+  // ── Native touchmove: prevent browser gesture takeover during swipe ──
+  // React's onPointerMove can't preventDefault() the underlying touch event.
+  // Without this, the browser starts its own scroll/gesture handling and fires
+  // pointercancel, causing the card to snap back on mobile.
+  useEffect(() => {
+    const el = cardBodyRef.current
+    if (!el) return
+
+    function onTouchMove(e: TouchEvent) {
+      if (committedRef.current === 'swipe') {
+        e.preventDefault()
+      }
+    }
+
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => el.removeEventListener('touchmove', onTouchMove)
+  }, [card.id])
+
   // ── Direction Commitment swipe handlers ─────────────────
   function resetSwipeState() {
     pointerOriginRef.current = null
@@ -169,7 +188,11 @@ export function StudyCard({
       if (absDx >= absDy) {
         committedRef.current = 'swipe'
         setIsSwiping(true)
-        try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
+        // Only capture pointer for mouse — touch has implicit capture,
+        // and setPointerCapture on touch causes pointercancel on mobile browsers.
+        if (e.pointerType === 'mouse') {
+          try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
+        }
       } else {
         committedRef.current = 'scroll'
         return
@@ -182,7 +205,7 @@ export function StudyCard({
   }
 
   function handlePointerUp(e: React.PointerEvent) {
-    if (committedRef.current === 'swipe') {
+    if (committedRef.current === 'swipe' && e.pointerType === 'mouse') {
       try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch {}
     }
 
@@ -208,6 +231,24 @@ export function StudyCard({
   }
 
   function handlePointerCancel() {
+    // On mobile, pointercancel fires when browser takes over the gesture.
+    // If we had committed to a swipe with sufficient delta, complete it.
+    if (committedRef.current === 'swipe' && pointerOriginRef.current) {
+      const d = deltaRef.current
+      const origin = pointerOriginRef.current
+      const elapsed = Math.max(1, Date.now() - origin.t)
+      const distance = Math.sqrt(d.x * d.x + d.y * d.y)
+      const velocity = distance / elapsed
+
+      const result = resolveSwipeAction(d.x, d.y, dirs, undefined, velocity)
+      if (result) {
+        resetSwipeState()
+        swipedRef.current = true
+        setTimeout(() => { swipedRef.current = false }, 300)
+        onSwipeRate?.(result.action)
+        return
+      }
+    }
     resetSwipeState()
   }
 
@@ -260,6 +301,7 @@ export function StudyCard({
               iOS Safari momentum scroll works natively.
             */}
             <div
+              ref={cardBodyRef}
               className="bg-white rounded-2xl shadow-lg border border-gray-200 h-[40vh] sm:h-[55vh] cursor-pointer relative flex flex-col"
               style={cardStyle}
               onClick={(e) => {
@@ -308,7 +350,7 @@ export function StudyCard({
               {/* Scroll layer — pure 2D, no 3D ancestor */}
               <div
                 className="flex-1 min-h-0 overflow-y-auto flex flex-col"
-                style={{ WebkitOverflowScrolling: 'touch' }}
+                style={{ WebkitOverflowScrolling: 'touch', touchAction }}
               >
                 <div className="grow shrink-0 p-4 sm:p-8 lg:p-12 flex flex-col items-center justify-center">
                   {displaySide === 'front' ? (
