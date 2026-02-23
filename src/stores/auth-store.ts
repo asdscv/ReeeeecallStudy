@@ -8,9 +8,11 @@ interface AuthState {
   session: Session | null
   loading: boolean
   role: UserRole | null
+  isOfficial: boolean
   initialize: () => Promise<void>
   fetchRole: () => Promise<void>
   isAdmin: () => boolean
+  isOfficialAccount: () => boolean
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>
   signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<{ error: Error | null }>
@@ -38,30 +40,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   loading: true,
   role: null,
+  isOfficial: false,
 
   fetchRole: async () => {
     const user = get().user
     if (!user) {
-      set({ role: null })
+      set({ role: null, isOfficial: false })
       return
     }
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, is_official')
         .eq('id', user.id)
         .single()
       if (error || !data) {
-        set({ role: 'user' })
+        set({ role: 'user', isOfficial: false })
       } else {
-        set({ role: (data.role as UserRole) ?? 'user' })
+        set({ role: (data.role as UserRole) ?? 'user', isOfficial: !!data.is_official })
       }
     } catch {
-      set({ role: 'user' })
+      set({ role: 'user', isOfficial: false })
     }
   },
 
   isAdmin: () => get().role === 'admin',
+  isOfficialAccount: () => get().isOfficial,
 
   initialize: () => {
     if (_initializePromise) return _initializePromise
@@ -102,7 +106,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           if (newUser) {
             await useAuthStore.getState().fetchRole()
           } else {
-            set({ role: null })
+            set({ role: null, isOfficial: false })
           }
         })
         _subscription = subscription
@@ -185,10 +189,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signOut: async () => {
     try {
       const { error } = await supabase.auth.signOut()
-      set({ user: null, session: null, role: null })
+      set({ user: null, session: null, role: null, isOfficial: false })
       return { error: error ? new Error(error.message) : null }
     } catch (e) {
-      set({ user: null, session: null, role: null })
+      set({ user: null, session: null, role: null, isOfficial: false })
       return { error: e instanceof Error ? e : new Error(String(e)) }
     }
   },

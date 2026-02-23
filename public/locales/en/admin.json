@@ -56,7 +56,13 @@
     "retained": "Retained Users",
     "churned": "Churned Users",
     "newUsersThisMonth": "New This Month",
-    "prevMonthActive": "Last Month Active"
+    "prevMonthActive": "Last Month Active",
+    "official": "Official",
+    "setOfficial": "Set Official",
+    "officialStatus": {
+      "on": "Official",
+      "off": "Set Official"
+    }
   },
   "study": {
     "title": "Study Activity",

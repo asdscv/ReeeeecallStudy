@@ -16,6 +16,7 @@ export interface Database {
           tts_provider: 'web_speech' | 'edge_tts'
           locale: string
           role: UserRole
+          is_official: boolean
           answer_mode: 'button' | 'swipe'
           created_at: string
           updated_at: string
@@ -32,6 +33,7 @@ export interface Database {
           tts_provider?: 'web_speech' | 'edge_tts'
           locale?: string
           role?: UserRole
+          is_official?: boolean
           answer_mode?: 'button' | 'swipe'
         }
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
@@ -336,6 +338,23 @@ export type UserCardProgress = {
   last_reviewed_at: string | null
   created_at: string
   updated_at: string
+}
+
+// ── Public preview types ──
+
+export interface PublicListingPreview {
+  id: string
+  title: string
+  description: string | null
+  tags: string[]
+  category: string
+  card_count: number
+  acquire_count: number
+  share_mode: string
+  created_at: string
+  owner_name: string | null
+  owner_is_official: boolean
+  sample_fields: { field_values: Record<string, string> }[]
 }
 
 // ── Admin RPC response types ──

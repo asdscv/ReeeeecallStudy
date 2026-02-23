@@ -56,7 +56,13 @@
     "retained": "継続ユーザー",
     "churned": "離脱ユーザー",
     "newUsersThisMonth": "今月の新規",
-    "prevMonthActive": "先月のアクティブ"
+    "prevMonthActive": "先月のアクティブ",
+    "official": "Official",
+    "setOfficial": "Set Official",
+    "officialStatus": {
+      "on": "Official",
+      "off": "Set Official"
+    }
   },
   "study": {
     "title": "学習アクティビティ",

@@ -83,5 +83,9 @@
   "selectAll": "全选",
   "menu": "菜单",
   "copiedToClipboard": "已复制到剪贴板",
-  "export": "导出"
+  "export": "导出",
+  "officialBadge": {
+    "label": "Official",
+    "tooltip": "Official account"
+  }
 }

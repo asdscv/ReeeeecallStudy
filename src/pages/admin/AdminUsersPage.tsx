@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useAdminStore } from '../../stores/admin-store'
+import { OfficialBadge } from '../../components/common/OfficialBadge'
 import { UserGrowthChart } from '../../components/admin/UserGrowthChart'
 import { SignupsChart } from '../../components/admin/SignupsChart'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
@@ -17,9 +18,10 @@ export function AdminUsersPage() {
   const {
     userSignups, userList, userListTotal, retentionMetrics,
     usersLoading, usersError, fetchUsers,
-    activeUsers, fetchOverview,
+    activeUsers, fetchOverview, setOfficialStatus,
   } = useAdminStore()
   const [page, setPage] = useState(0)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const dateLocale = toIntlLocale(i18n.language)
   const growthData = useMemo(() => computeUserGrowthSeries(userSignups), [userSignups])
   const activeInactive = useMemo(() => activeUsers ? computeActiveInactiveUsers(activeUsers) : [], [activeUsers])
@@ -105,13 +107,19 @@ export function AdminUsersPage() {
                   <tr>
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.displayName')}</th>
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.role')}</th>
+                    <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.official')}</th>
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.joinedAt')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {userList.map((u) => (
                     <tr key={u.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-gray-900">{u.display_name || t('users.noName')}</td>
+                      <td className="px-4 py-2 text-gray-900">
+                        <span className="inline-flex items-center gap-1.5">
+                          {u.display_name || t('users.noName')}
+                          {u.is_official && <OfficialBadge />}
+                        </span>
+                      </td>
                       <td className="px-4 py-2">
                         <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                           u.role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
@@ -119,12 +127,32 @@ export function AdminUsersPage() {
                           {t(userRoleLabel(u.role), u.role)}
                         </span>
                       </td>
+                      <td className="px-4 py-2">
+                        <button
+                          type="button"
+                          data-testid={`official-toggle-${u.id}`}
+                          aria-label={`${t('users.setOfficial')}: ${u.display_name || u.id}`}
+                          disabled={togglingId === u.id}
+                          onClick={async () => {
+                            setTogglingId(u.id)
+                            await setOfficialStatus(u.id, !u.is_official)
+                            setTogglingId(null)
+                          }}
+                          className={`text-xs px-2 py-0.5 rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-default ${
+                            u.is_official
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          {togglingId === u.id ? '...' : u.is_official ? t('users.officialStatus.on') : t('users.officialStatus.off')}
+                        </button>
+                      </td>
                       <td className="px-4 py-2 text-gray-500">{formatLocalDate(u.created_at, dateLocale)}</td>
                     </tr>
                   ))}
                   {userList.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">{t('noData')}</td>
+                      <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-400">{t('noData')}</td>
                     </tr>
                   )}
                 </tbody>

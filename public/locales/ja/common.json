@@ -83,5 +83,9 @@
   "selectAll": "すべて選択",
   "menu": "メニュー",
   "copiedToClipboard": "クリップボードにコピーしました",
-  "export": "エクスポート"
+  "export": "エクスポート",
+  "officialBadge": {
+    "label": "Official",
+    "tooltip": "Official account"
+  }
 }

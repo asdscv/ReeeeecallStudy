@@ -56,7 +56,13 @@
     "retained": "留存用户",
     "churned": "流失用户",
     "newUsersThisMonth": "本月新增",
-    "prevMonthActive": "上月活跃"
+    "prevMonthActive": "上月活跃",
+    "official": "Official",
+    "setOfficial": "Set Official",
+    "officialStatus": {
+      "on": "Official",
+      "off": "Set Official"
+    }
   },
   "study": {
     "title": "学习活动",

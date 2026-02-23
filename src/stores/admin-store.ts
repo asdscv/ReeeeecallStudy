@@ -31,7 +31,7 @@ interface AdminState {
 
   // Users
   userSignups: AdminUserSignup[]
-  userList: { id: string; display_name: string | null; created_at: string; role: string }[]
+  userList: { id: string; display_name: string | null; created_at: string; role: string; is_official: boolean }[]
   userListTotal: number
   retentionMetrics: AdminRetentionMetrics | null
   usersLoading: boolean
@@ -76,6 +76,7 @@ interface AdminState {
   fetchContents: () => Promise<void>
   fetchPageViews: () => Promise<void>
   fetchSystem: () => Promise<void>
+  setOfficialStatus: (userId: string, isOfficial: boolean) => Promise<{ error: string | null }>
 }
 
 function isFresh(fetchedAt: Record<SectionKey, number>, key: SectionKey): boolean {
@@ -158,7 +159,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       const promises: PromiseLike<unknown>[] = [
         supabase
           .from('profiles')
-          .select('id, display_name, created_at, role')
+          .select('id, display_name, created_at, role, is_official')
           .order('created_at', { ascending: false })
           .range(page * pageSize, (page + 1) * pageSize - 1),
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
@@ -179,7 +180,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       if (usersRes.error) throw usersRes.error
       if (countRes.error) throw countRes.error
 
-      const profiles = (usersRes.data ?? []) as { id: string; display_name: string | null; created_at: string; role: string }[]
+      const profiles = (usersRes.data ?? []) as { id: string; display_name: string | null; created_at: string; role: string; is_official: boolean }[]
 
       const updates: Partial<AdminState> = {
         userList: profiles,
@@ -304,6 +305,26 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       set({ systemError: extractErrorMessage(e) })
     } finally {
       set({ systemLoading: false })
+    }
+  },
+
+  setOfficialStatus: async (userId: string, isOfficial: boolean) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_official_status', {
+        p_user_id: userId,
+        p_is_official: isOfficial,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+
+      // Update local list after confirmed success
+      set({
+        userList: get().userList.map((u) =>
+          u.id === userId ? { ...u, is_official: isOfficial } : u,
+        ),
+      })
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
     }
   },
 }))

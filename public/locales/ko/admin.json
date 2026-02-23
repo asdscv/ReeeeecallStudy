@@ -56,7 +56,13 @@
     "retained": "유지 사용자",
     "churned": "이탈 사용자",
     "newUsersThisMonth": "이번 달 신규",
-    "prevMonthActive": "지난달 활성"
+    "prevMonthActive": "지난달 활성",
+    "official": "공식",
+    "setOfficial": "공식 지정",
+    "officialStatus": {
+      "on": "공식 계정",
+      "off": "공식 지정"
+    }
   },
   "study": {
     "title": "학습 활동",

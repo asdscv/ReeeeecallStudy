@@ -83,5 +83,9 @@
   "selectAll": "전체 선택",
   "menu": "메뉴",
   "copiedToClipboard": "클립보드에 복사되었습니다",
-  "export": "내보내기"
+  "export": "내보내기",
+  "officialBadge": {
+    "label": "공식",
+    "tooltip": "공식 계정"
+  }
 }
