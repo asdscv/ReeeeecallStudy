@@ -1,6 +1,6 @@
 // Content generation pipeline orchestrator
 
-import { LOCALES, PIPELINE_DEFAULTS } from './config.js'
+import { LOCALES, DEFAULT_LOCALE, PIPELINE_DEFAULTS } from './config.js'
 import { createLogger, info, warn, error } from './logger.js'
 import { generateTopics } from './topic-generator.js'
 import { selectTopic } from './topic-registry.js'
@@ -36,7 +36,7 @@ export async function runContentPipeline(env, cron) {
     const runState = {
       slugs: new Set(),
       titles: [],
-      enTitles: [],
+      primaryTitles: [],
     }
 
     // 2. Generate topics via AI (replaces static topic selection)
@@ -82,28 +82,28 @@ export async function runContentPipeline(env, cron) {
           warn('Image generation failed, continuing without image', { error: err.message })
         }
 
-        // 4. Generate EN first (need slug + title for other locales and run tracking)
+        // 4. Generate default locale first (need slug + title for other locales and run tracking)
         let sharedSlug = null
         try {
-          const enArticle = await generateForLocale(
-            env, db, topic, 'en', recentContent, null, thumbnailUrl, runState,
+          const primaryArticle = await generateForLocale(
+            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState,
           )
-          if (enArticle) {
-            sharedSlug = enArticle.slug
-            successCount.en++
+          if (primaryArticle) {
+            sharedSlug = primaryArticle.slug
+            successCount[DEFAULT_LOCALE]++
 
-            runState.slugs.add(`${enArticle.slug}__en`)
-            runState.titles.push({ title: enArticle.title, locale: 'en' })
-            runState.enTitles.push(enArticle.title)
+            runState.slugs.add(`${primaryArticle.slug}__${DEFAULT_LOCALE}`)
+            runState.titles.push({ title: primaryArticle.title, locale: DEFAULT_LOCALE })
+            runState.primaryTitles.push(primaryArticle.title)
 
-            info('Locale completed', { locale: 'en', slug: enArticle.slug })
+            info('Locale completed', { locale: DEFAULT_LOCALE, slug: primaryArticle.slug })
           }
         } catch (err) {
-          error('Locale failed', { locale: 'en', error: err.message })
+          error('Locale failed', { locale: DEFAULT_LOCALE, error: err.message })
         }
 
-        // 5. Generate ko, zh, ja in parallel
-        const otherLocales = LOCALES.filter(l => l !== 'en')
+        // 5. Generate remaining locales in parallel
+        const otherLocales = LOCALES.filter(l => l !== DEFAULT_LOCALE)
         const results = await Promise.allSettled(
           otherLocales.map(locale =>
             generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState),
@@ -141,7 +141,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
   info('Generating content', { locale, topic: topic.id || topic.titleHint })
 
   const prompt = buildPrompt(topic, locale, {
-    previousTitles: runState.enTitles || [],
+    previousTitles: runState.primaryTitles || [],
   })
   let article = null
 
@@ -149,8 +149,8 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
   for (let attempt = 0; attempt < PIPELINE_DEFAULTS.maxValidationRetries; attempt++) {
     const raw = await callAI(env, prompt.system, prompt.user)
 
-    // Use shared slug from en if available (for non-en locales)
-    if (sharedSlug && locale !== 'en') {
+    // Use shared slug from default locale if available (for other locales)
+    if (sharedSlug && locale !== DEFAULT_LOCALE) {
       raw.slug = sharedSlug
     }
 

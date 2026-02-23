@@ -1,0 +1,92 @@
+{
+  "title": "Ajustes",
+  "loading": "Cargando...",
+  "saving": "Guardando...",
+  "save": "Guardar ajustes",
+  "saved": "¡Ajustes guardados!",
+  "saveButton": "Guardar ajustes",
+  "links": {
+    "userGuide": "Guía de usuario",
+    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
+    "apiDocs": "Documentación API",
+    "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+  },
+  "guide": {
+    "title": "Guía de usuario",
+    "desc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
+  },
+  "apiDocs": {
+    "title": "Documentación API",
+    "desc": "Endpoints API, autenticación, ejemplos de uso"
+  },
+  "profile": {
+    "title": "Perfil",
+    "email": "Correo electrónico",
+    "displayName": "Nombre visible",
+    "displayNamePlaceholder": "Ingresa tu nombre",
+    "namePlaceholder": "Ingresa tu nombre"
+  },
+  "language": {
+    "title": "Idioma"
+  },
+  "srs": {
+    "title": "Aprendizaje SRS",
+    "description": "Establece el número de tarjetas nuevas añadidas por sesión en modo SRS (repetición espaciada)",
+    "newCardLimit": "Límite de tarjetas nuevas",
+    "cards": "tarjetas",
+    "cardsUnit": "tarjetas",
+    "help": "Número máximo de tarjetas nuevas además de las de repaso en aprendizaje SRS. Las tarjetas de repaso no se ven afectadas por este límite.",
+    "newCardNote": "Número máximo de tarjetas nuevas además de las de repaso en aprendizaje SRS. Las tarjetas de repaso no se ven afectadas por este límite."
+  },
+  "answerMode": {
+    "title": "Modo de respuesta",
+    "description": "Establece cómo eliges respuestas durante el estudio",
+    "button": "Botón",
+    "buttonDesc": "Selecciona respuesta presionando un botón",
+    "swipe": "Deslizar",
+    "swipeDesc": "Selecciona respuesta deslizando la tarjeta",
+    "swipeAutoNote": "Las direcciones de deslizamiento se configuran automáticamente según el modo de estudio.\n• SRS: ← Otra vez / → Bien\n• Otros modos: ← No sé / → Lo sé"
+  },
+  "tts": {
+    "title": "Lectura TTS automática",
+    "description": "Leer automáticamente campos con TTS al voltear la tarjeta",
+    "enable": "Activar lectura automática",
+    "help": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
+    "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática."
+  },
+  "apiKey": {
+    "title": "Gestión de clave API",
+    "limit": "Puedes crear hasta 1 clave API",
+    "maxKeys": "Puedes crear hasta 1 clave API",
+    "generate": "Generar",
+    "generateNew": "Generar nueva clave",
+    "keyName": "Nombre de la clave",
+    "keyNamePlaceholder": "ej., mi-script",
+    "namePlaceholder": "ej., mi-script",
+    "create": "Crear",
+    "generating": "Generando...",
+    "generateFailed": "Error al generar la clave: ",
+    "generated": "¡Clave API generada!",
+    "generateError": "Error al generar la clave",
+    "delete": "Eliminar",
+    "deleted": "Clave API eliminada",
+    "cancel": "Cancelar",
+    "copy": "Copiar",
+    "copied": "¡Clave API copiada!",
+    "show": "Mostrar clave",
+    "showPartial": "Mostrar clave parcialmente",
+    "showFull": "Mostrar clave completa",
+    "hide": "Ocultar clave",
+    "masked": "No se puede ver de nuevo por seguridad",
+    "createdAt": "Creada",
+    "created": "Creada: {{date}}",
+    "noKeys": "No se ha generado clave API.",
+    "noKey": "No se ha generado clave API.",
+    "securityNote": "No se puede ver de nuevo por seguridad"
+  },
+  "account": {
+    "title": "Cuenta",
+    "logout": "Cerrar sesión"
+  },
+  "settings": {}
+}

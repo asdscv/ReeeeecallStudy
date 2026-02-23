@@ -1,0 +1,20 @@
+{
+  "editCard": "Editar tarjeta",
+  "addCard": "Añadir tarjeta",
+  "noTemplateSet": "No se ha establecido una plantilla para este mazo.",
+  "fileValidationFailed": "La validación del archivo falló.",
+  "uploadFailed": "La subida falló.",
+  "uploading": "Subiendo...",
+  "remove": "Quitar",
+  "uploadImage": "Subir una imagen",
+  "selectFile": "Seleccionar archivo",
+  "imageFormats": "JPG, PNG, WebP soportados",
+  "uploadAudio": "Subir audio",
+  "audioFormats": "MP3, OGG, WAV soportados",
+  "tags": "Etiquetas",
+  "tagsPlaceholder": "Escribe una etiqueta y presiona Enter",
+  "cancel": "Cancelar",
+  "saving": "Guardando...",
+  "edit": "Editar",
+  "add": "Añadir"
+}

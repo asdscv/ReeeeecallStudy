@@ -94,11 +94,15 @@ export function isPast(timestamp: string): boolean {
 
 // ─── Display Formatters ──────────────────────────────
 
+import { toIntlLocale } from './locale-utils'
+
+const DEFAULT_INTL_LOCALE = toIntlLocale(undefined)
+
 /**
  * Format a Supabase UTC timestamp as a localized date string.
  * e.g., "2/15/2026" (en-US) or "2026. 2. 15." (ko-KR)
  */
-export function formatLocalDate(timestamp: string, locale = 'en-US'): string {
+export function formatLocalDate(timestamp: string, locale = DEFAULT_INTL_LOCALE): string {
   return parseUTC(timestamp).toLocaleDateString(locale)
 }
 
@@ -108,7 +112,7 @@ export function formatLocalDate(timestamp: string, locale = 'en-US'): string {
  */
 export function formatLocalTime(
   timestamp: string,
-  locale = 'en-US',
+  locale = DEFAULT_INTL_LOCALE,
   options?: Intl.DateTimeFormatOptions,
 ): string {
   return parseUTC(timestamp).toLocaleTimeString(locale, options)
@@ -117,7 +121,7 @@ export function formatLocalTime(
 /**
  * Format a Supabase UTC timestamp as a localized date+time string.
  */
-export function formatLocalDateTime(timestamp: string, locale = 'en-US'): string {
+export function formatLocalDateTime(timestamp: string, locale = DEFAULT_INTL_LOCALE): string {
   return parseUTC(timestamp).toLocaleString(locale)
 }
 
@@ -125,7 +129,7 @@ export function formatLocalDateTime(timestamp: string, locale = 'en-US'): string
  * Format a Supabase UTC timestamp as a relative time string using Intl.RelativeTimeFormat.
  * e.g., "3 hours ago" (en-US) or "3시간 전" (ko-KR), or localized date for 30+ days.
  */
-export function formatRelativeTime(timestamp: string, locale = 'en-US'): string {
+export function formatRelativeTime(timestamp: string, locale = DEFAULT_INTL_LOCALE): string {
   const d = parseUTC(timestamp)
   const now = Date.now()
   const diffMs = now - d.getTime()
@@ -149,7 +153,7 @@ export function formatRelativeTime(timestamp: string, locale = 'en-US'): string 
  * Format a YYYY-MM-DD date key as short "M/D" string (for chart ticks).
  * e.g., "2026-02-15" → "2/15"
  */
-export function formatDateKeyShort(dateKey: string, locale = 'en-US'): string {
+export function formatDateKeyShort(dateKey: string, locale = DEFAULT_INTL_LOCALE): string {
   const [year, month, day] = dateKey.split('-').map(Number)
   const d = new Date(year, month - 1, day)
   return d.toLocaleDateString(locale, { month: 'numeric', day: 'numeric' })

@@ -189,7 +189,7 @@
   "trustBadges": {
     "srs": "스마트 SRS",
     "sharing": "덱 공유",
-    "languages": "4개 언어",
+    "languages": "{{count}}개 언어",
     "allDevices": "모든 기기",
     "import": "CSV & API 업로드"
   },

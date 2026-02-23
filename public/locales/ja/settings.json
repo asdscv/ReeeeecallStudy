@@ -32,12 +32,7 @@
   },
 
   "language": {
-    "title": "言語",
-    "label": "表示言語",
-    "en": "English",
-    "ko": "한국어",
-    "zh": "中文（简体）",
-    "ja": "日本語"
+    "title": "言語"
   },
 
   "srs": {

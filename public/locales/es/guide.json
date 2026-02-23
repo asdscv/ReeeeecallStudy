@@ -1,0 +1,309 @@
+{
+  "title": "Guia del usuario",
+  "subtitle": "Aprende todas las funciones de ReeeeecallStudy",
+  "searchPlaceholder": "Buscar funciones (ej., SRS, Importar, Compartir...)",
+  "tableOfContents": "Tabla de contenidos",
+  "noResults": "No hay resultados para \"{{query}}\".",
+  "sections": {
+    "getting-started": {
+      "title": "Primeros pasos",
+      "items": {
+        "login": {
+          "title": "Iniciar sesion",
+          "body": "Inicia sesion con tu correo electronico y contrasena. Al registrarte, se envia un correo de verificacion: haz clic en el enlace para completar el registro. Puedes recibir un enlace de restablecimiento si olvidas tu contrasena."
+        },
+        "dashboard": {
+          "title": "Inicio (Panel de control)",
+          "body": "Despues de iniciar sesion, aparece el panel de control. Ve de un vistazo el total de tarjetas, las tarjetas de repaso de hoy, la racha de estudio y la tasa de dominio. Consulta el mapa de calor de estudio para ver si has estudiado de forma constante, y usa el grafico de prevision de repasos para predecir el volumen de estudio proximo."
+        },
+        "navigation": {
+          "title": "Navegacion",
+          "body": "En PC, usa la barra de menu superior; en movil, toca el menu hamburguesa (\u2630). Menus disponibles: Estudio rapido, Panel de control, Mazos, Tarjetas (Plantillas), Marketplace, Historial, Configuracion, Guia."
+        }
+      }
+    },
+    "decks": {
+      "title": "Gestion de mazos",
+      "items": {
+        "create": {
+          "title": "Crear un mazo",
+          "body": "En la pagina de Mazos, pulsa el boton 'Nuevo mazo'. Establece el nombre, la descripcion, el icono y el color. Un mazo es como una carpeta que agrupa tarjetas por tema."
+        },
+        "detail": {
+          "title": "Vista detallada del mazo",
+          "body": "Haz clic en un mazo para ver su lista de tarjetas. Usa los botones superiores para agregar tarjetas, importar, exportar, compartir o editar el mazo. Tambien se admite el filtrado por estado de tarjeta (nueva/aprendiendo/repaso/suspendida) y la busqueda."
+        },
+        "edit": {
+          "title": "Editar mazo",
+          "body": "En la pagina de edicion del mazo, cambia el nombre, la descripcion, el icono, el color y la plantilla predeterminada. Los ajustes de SRS (intervalos de Otra vez/Dificil/Bien/Facil) se pueden ajustar por mazo. Las estadisticas del mazo (distribucion de estados de tarjetas, tasa de dominio, mapa de calor de estudio) se muestran en la parte inferior."
+        },
+        "delete": {
+          "title": "Eliminar mazo",
+          "body": "Pulsa el icono de eliminar en la lista de mazos para ver un dialogo de confirmacion. Eliminar un mazo tambien elimina todas sus tarjetas; ten cuidado."
+        }
+      }
+    },
+    "cards": {
+      "title": "Gestion de tarjetas",
+      "items": {
+        "add": {
+          "title": "Agregar tarjetas",
+          "body": "Pulsa 'Agregar tarjeta' en la pagina de detalle del mazo. Rellena los campos definidos en la plantilla (ej., anverso, reverso). Agrega etiquetas separadas por comas para busqueda y filtrado posterior."
+        },
+        "editDelete": {
+          "title": "Editar y eliminar tarjetas",
+          "body": "Haz clic en una tarjeta de la lista para abrir el modal de edicion. Modifica el contenido de los campos y las etiquetas. Puedes eliminar tarjetas individuales o seleccionar varias para eliminacion masiva."
+        },
+        "searchFilter": {
+          "title": "Buscar y filtrar",
+          "body": "Escribe palabras clave en la barra de busqueda en la parte superior de la pagina de detalle del mazo para buscar en todos los campos y etiquetas. Selecciona un filtro de estado (nueva, aprendiendo, repaso, suspendida) para ver solo tarjetas especificas."
+        },
+        "srsReset": {
+          "title": "Restablecer SRS",
+          "body": "Restablecer el estado SRS de una tarjeta la devuelve al estado 'nueva'. Usa esto cuando quieras empezar a aprender desde cero."
+        }
+      }
+    },
+    "templates": {
+      "title": "Plantillas de tarjetas",
+      "items": {
+        "what": {
+          "title": "Que es una plantilla?",
+          "body": "Una plantilla define la estructura de una tarjeta: que campos tiene y como se organizan en el anverso y el reverso. Por ejemplo, una plantilla de 'Vocabulario de ingles' podria tener campos para palabra, significado y oracion de ejemplo. Una plantilla se puede compartir entre varios mazos."
+        },
+        "createEdit": {
+          "title": "Crear y editar plantillas",
+          "body": "Pulsa 'Nueva plantilla' en el menu de Tarjetas. Agrega campos y establece nombre, tipo (texto/imagen/audio). Arrastra para reordenar los campos. Agrega descripciones a los campos como guias para la creacion de tarjetas."
+        },
+        "layout": {
+          "title": "Diseno del anverso y reverso",
+          "body": "Modo predeterminado: Coloca campos en los lados del anverso/reverso y establece estilo (principal, secundario, pista, detalle, multimedia) y tamano de fuente. Modo HTML personalizado: Usa la sintaxis {{fieldName}} para un diseno HTML libre."
+        },
+        "tts": {
+          "title": "TTS (Texto a voz)",
+          "body": "Activa TTS por campo y selecciona un idioma (coreano, ingles, japones, chino, etc.). Al estudiar, las tarjetas se leen automaticamente al voltearlas, o pulsa el boton de altavoz para reproduccion manual. Activa o desactiva la lectura automatica en Configuracion."
+        }
+      }
+    },
+    "study": {
+      "title": "Estudio",
+      "items": {
+        "modes": {
+          "title": "Modos de estudio",
+          "body": "\u2022 SRS (Repeticion espaciada): Ajusta automaticamente el momento de repaso basandose en la curva de memoria. Las tarjetas incorrectas reaparecen dentro de la misma sesion. El metodo mas eficiente para la memorizacion a largo plazo. Usa 4 botones (Otra vez/Dificil/Bien/Facil).\n\u2022 Repaso secuencial: Estudia todas las tarjetas nuevas mas un numero configurable de tarjetas de repaso. Vuelve al principio despues de llegar al final.\n\u2022 Aleatorio: Extrae tarjetas del mazo al azar.\n\u2022 Secuencial: Estudia las tarjetas en orden. Recuerda tu posicion para continuar.\n\u2022 Por fecha: Estudia solo las tarjetas agregadas en una fecha especifica.\n\nRepaso secuencial, Aleatorio, Secuencial y Por fecha usan 2 botones simples (No se/Se).\n\n\u2022 Modo intensivo: Repaso intensivo por rondas hasta que todas las tarjetas se dominen. Usa 2 botones (Fallo/Acierto). No afecta tu programacion de SRS."
+        },
+        "srsScience": {
+          "title": "La ciencia detras del SRS",
+          "body": "SRS (Sistema de Repeticion Espaciada) es un metodo de aprendizaje basado en como funciona la memoria humana.\n\nLa curva del olvido de Ebbinghaus\nEl psicologo aleman Hermann Ebbinghaus descubrio la \"curva del olvido\" mediante experimentos en 1885:\n\u2022 20 minutos despues de aprender: ~42% olvidado\n\u2022 1 hora despues: ~56% olvidado\n\u2022 1 dia despues: ~67% olvidado\n\u2022 1 semana despues: ~75% olvidado\n\u2022 1 mes despues: ~79% olvidado\n\nEs decir, la informacion estudiada una sola vez se olvida rapidamente con el tiempo.\n\nEl principio fundamental de la repeticion espaciada\nLa clave del SRS es \"repasar justo antes de olvidar\":\n1. Primer estudio \u2192 repaso despues de 1 dia\n2. Recordado despues de 1 dia \u2192 repaso despues de 3 dias\n3. Recordado despues de 3 dias \u2192 repaso despues de 7 dias\n4. Recordado despues de 7 dias \u2192 repaso despues de 21 dias\n\nAl aumentar gradualmente los intervalos de repaso, puedes almacenar informacion en la memoria a largo plazo con un esfuerzo minimo. Las investigaciones muestran que esto es 2-3 veces mas eficiente que la simple repeticion mecanica.\n\nEl SRS de ReeeeecallStudy se basa en el algoritmo SM-2 probado por Anki, analizando la dificultad de cada tarjeta y el historial de estudio para calcular automaticamente el momento optimo de repaso."
+        },
+        "srsMethod": {
+          "title": "Metodo de estudio SRS \u2014 Guia completa de botones",
+          "body": "Ve el anverso de la tarjeta, recuerda la respuesta y luego voltea. Despues de ver el reverso, pulsa uno de los 4 botones para autoevaluarte.\n\nOtra vez (Boton rojo)\n\"No lo recorde en absoluto\"\n\u2022 Tarjeta nueva: Reaparece despues de 10 minutos (dentro de la misma sesion)\n\u2022 Tarjeta de repaso: El intervalo se reinicia, reaparece despues de 10 minutos\n\u2022 El factor de facilidad disminuye en -0.20\n\u2022 El conteo de repeticiones se reinicia a 0\n\u2192 Si no lo recuerdas, pulsalo con honestidad. Forzar otro boton en realidad reduce la eficiencia del aprendizaje.\n\nDificil (Boton naranja)\n\"Lo recorde, pero fue dificil\"\n\u2022 Tarjeta nueva: Repaso despues de 1 dia\n\u2022 Tarjeta de repaso: Se repasa a ~1.2x el intervalo actual (minimo +1 dia)\n\u2022 El factor de facilidad disminuye en -0.15\n\u2192 Si tardaste varios segundos antes de recordar con dificultad, elige Dificil.\n\nBien (Boton azul)\n\"Lo recorde razonablemente bien\"\n\u2022 Tarjeta nueva: Repaso despues de 1 dia\n\u2022 Segundo repaso: Al menos 3 dias despues\n\u2022 Despues de eso: Intervalo actual \u00d7 factor de facilidad (tipicamente 2.5x)\n\u2022 El factor de facilidad no cambia\n\u2192 Si lo recordaste de forma natural en 1-2 segundos, elige Bien. Este es el boton que pulsaras con mas frecuencia.\n\nFacil (Boton verde)\n\"Lo recorde al instante y perfectamente\"\n\u2022 Tarjeta nueva: Repaso despues de 4 dias\n\u2022 Tarjeta de repaso: Intervalo actual \u00d7 factor de facilidad \u00d7 1.3\n\u2022 El factor de facilidad aumenta en +0.15\n\u2192 Solo pulsa Facil cuando la respuesta venga a tu mente en el instante en que ves la tarjeta.\n\nConsejo: En caso de duda, pulsa Bien. Para la mayoria de las tarjetas, Bien es la calificacion mas adecuada."
+        },
+        "srsCardStates": {
+          "title": "Comprender los estados de las tarjetas",
+          "body": "En el estudio SRS, las tarjetas pasan por 3 estados:\n\nNueva\nTarjetas que aun no se han estudiado.\n\u2022 Aparecen por primera vez en una sesion de estudio\n\u2022 Despues de la primera calificacion, pasan al estado \"Aprendiendo\" o \"Repaso\"\n\u2022 El \"Limite de tarjetas nuevas\" en la configuracion controla cuantas aparecen por sesion\n\nAprendiendo\nTarjetas que aun no se han memorizado completamente (calificadas como Otra vez o Dificil).\n\u2022 Reaparecen en intervalos cortos (10 min a 1 dia)\n\u2022 Calificar como Bien o superior las \"gradua\" al estado de Repaso\n\u2022 Pueden aparecer varias veces dentro de la misma sesion\n\nRepaso\nTarjetas que han entrado en la memoria a largo plazo (calificadas como Bien o Facil).\n\u2022 Los intervalos crecen progresivamente (1 dia \u2192 3 dias \u2192 7 dias \u2192 21 dias \u2192 ...)\n\u2022 Pulsar Otra vez las devuelve a \"Aprendiendo\"\n\u2022 Las tarjetas bien memorizadas pueden tener intervalos de meses o incluso anos\n\nGracias a este sistema de 3 etapas, concentras el tiempo en las tarjetas que no sabes mientras minimizas el repaso de las que ya dominas."
+        },
+        "srsIntervals": {
+          "title": "Intervalos de repaso y factor de facilidad",
+          "body": "El corazon del SRS es el \"Factor de facilidad\" y el \"Intervalo de repaso\".\n\nQue es el factor de facilidad?\nUn numero asignado individualmente a cada tarjeta (predeterminado: 2.50).\n\u2022 Otra vez: -0.20 de disminucion (minimo 1.30)\n\u2022 Dificil: -0.15 de disminucion (minimo 1.30)\n\u2022 Bien: Sin cambio\n\u2022 Facil: +0.15 de aumento (maximo 4.00)\n\nLos intervalos de repaso crecen multiplicando el factor de facilidad:\nEjemplo: Tarjeta con intervalo de 10 dias, factor de facilidad 2.50, calificada como Bien \u2192 proximo intervalo = 10 \u00d7 2.50 = 25 dias\n\nEjemplo de estudio real (Configuracion predeterminada)\nPulsando Bien constantemente en una tarjeta nueva:\n1\u00ba: Despues de 1 dia \u2192 2\u00ba: Despues de 3 dias \u2192 3\u00ba: Despues de 8 dias \u2192 4\u00ba: Despues de 20 dias \u2192 5\u00ba: Despues de 50 dias \u2192 ...\n\nPulsando Otra vez primero, luego Bien:\n1\u00ba (Otra vez): Despues de 10 min \u2192 2\u00ba (Bien): Despues de 1 dia \u2192 3\u00ba (Bien): Despues de 3 dias \u2192 ...\n\nReglas de garantia de intervalo\n\u2022 El intervalo de Dificil siempre aumenta al menos 1 dia respecto al anterior\n\u2022 El intervalo de Bien siempre es mayor que el de Dificil\n\u2022 El intervalo de Facil siempre es mayor que el de Bien\n\nEste sistema asegura que las tarjetas frecuentemente falladas aparezcan mas a menudo, mientras que las tarjetas bien conocidas aparezcan con menos frecuencia."
+        },
+        "quickStudy": {
+          "title": "Estudio rapido",
+          "body": "Selecciona un mazo directamente en la pagina de Estudio rapido para comenzar. Cada mazo muestra el numero de tarjetas nuevas y de repaso para una decision rapida."
+        },
+        "sessionFlow": {
+          "title": "Flujo de la sesion de estudio",
+          "body": "1. Seleccionar mazo \u2192 Establecer modo de estudio \u2192 Iniciar\n2. Ver el anverso de la tarjeta \u2192 Tocar/clic para voltear \u2192 Elegir calificacion\n3. Despues de todas las tarjetas, un resumen muestra el conteo de estudio, el tiempo empleado y la distribucion de calificaciones.\n\nAtalos de teclado (por modo)\n\u2022 Comun: Espacio/Enter (voltear), Escape (salir)\n\u2022 Modo SRS: 1 (Otra vez), 2 (Dificil), 3 (Bien), 4 (Facil)\n\u2022 Modos generales (Repaso secuencial/Aleatorio/Secuencial/Por fecha): \u2192/Espacio (Se), \u2190 (No se)\n\u2022 Intensivo: \u2192/Espacio (Acierto), \u2190 (Fallo)"
+        },
+        "swipeMode": {
+          "title": "Modo deslizar",
+          "body": "Cambia el modo de respuesta a 'Deslizar' en Configuracion para calificar tarjetas deslizando. Ideal para estudiar con una mano en el movil.\n\nDirecciones de deslizamiento por modo:\n\u2022 Modo SRS: \u2190 Otra vez / \u2192 Bien\n\u2022 Modos generales (Repaso secuencial/Aleatorio/Secuencial/Por fecha): \u2190 No se / \u2192 Se\n\u2022 Intensivo: \u2190 Fallo / \u2192 Acierto\n\nDesliza mas de 100px para ver retroalimentacion visual; suelta para confirmar la calificacion."
+        },
+        "srsCustom": {
+          "title": "Personalizar la configuracion de SRS",
+          "body": "Ajusta los intervalos predeterminados de Otra vez/Dificil/Bien/Facil (dias) en la pagina de edicion del mazo. Por ejemplo, aumentar el intervalo de Facil a 7 dias reduce la frecuencia de repaso de las tarjetas faciles. El 'Limite de tarjetas nuevas' en Configuracion controla cuantas tarjetas nuevas aparecen por sesion."
+        },
+        "cramming": {
+          "title": "Modo intensivo",
+          "body": "El modo intensivo esta disenado para el estudio intensivo de ultimo momento, perfecto antes de examenes o cuando necesitas repasar rapidamente todas las tarjetas.\n\nComo funciona\n1. Todas las tarjetas seleccionadas se presentan en la Ronda 1\n2. Califica cada tarjeta como \"Acierto\" o \"Fallo\"\n3. Las tarjetas falladas reaparecen dentro de la ronda despues de un breve intervalo\n4. Las tarjetas nunca calificadas como \"Acierto\" pasan a la siguiente ronda\n5. La sesion termina cuando todas las tarjetas se dominan (o se acaba el tiempo)\n\nCaracteristicas principales\n\u2022 Filtro de tarjetas: Estudia todas las tarjetas, solo las dificiles (factor de facilidad bajo) o las que vencen pronto\n\u2022 Limite de tiempo: Opcional \u2014 establece 15/30/60 minutos o sin limite\n\u2022 Mezclar: Aleatoriza el orden de las tarjetas en cada ronda\n\u2022 Seguimiento de dominio: Porcentaje de dominio en tiempo real y progreso por ronda\n\nSeguridad del SRS\nEl modo intensivo NO afecta tu programacion de SRS. Tus factores de facilidad, intervalos y proximas fechas de repaso permanecen sin cambios. Los registros de estudio aun se guardan para el seguimiento del historial.\n\nAtalos de teclado\n\u2022 Espacio o \u2192 : Acierto\n\u2022 \u2190 : Fallo\n\nCuando usar Intensivo vs SRS\n\u2022 Usa SRS para el aprendizaje diario a largo plazo\n\u2022 Usa Intensivo para preparacion de examenes, repaso rapido o refrescar material olvidado"
+        }
+      }
+    },
+    "import-export": {
+      "title": "Importar y exportar",
+      "items": {
+        "jsonImport": {
+          "title": "Importar JSON",
+          "body": "En la pagina de detalle del mazo, haz clic en 'Importar' \u2192 selecciona un archivo JSON. Los archivos JSON exportados desde ReeeeecallStudy se pueden importar directamente, ideal para copia de seguridad y restauracion. Incluye metadatos del mazo e informacion de la plantilla."
+        },
+        "csvImport": {
+          "title": "Importar CSV",
+          "body": "Los archivos CSV (guardados desde Excel) tambien se pueden importar. Aparece un paso de mapeo para hacer coincidir los nombres de columna con los campos de la plantilla, con coincidencia automatica. Una columna 'Tags' con punto y coma (;) se reconoce automaticamente."
+        },
+        "duplicates": {
+          "title": "Manejo de duplicados",
+          "body": "Al importar, las tarjetas existentes con contenido identico se marcan como duplicadas. Puedes omitirlas, sobrescribirlas o agregarlas. Previsualiza el conteo de tarjetas validas/invalidas/duplicadas antes de la importacion final."
+        },
+        "jsonExport": {
+          "title": "Exportar JSON",
+          "body": "Detalle del mazo \u2192 'Exportar' \u2192 JSON descarga la informacion del mazo, la plantilla y todas las tarjetas como un archivo JSON. Usalo para transferir a otros dispositivos/cuentas o como copia de seguridad."
+        },
+        "csvExport": {
+          "title": "Exportar CSV",
+          "body": "El formato CSV se puede abrir directamente en Excel/Google Sheets. Incluye BOM para la correcta visualizacion del coreano en Excel."
+        }
+      }
+    },
+    "sharing": {
+      "title": "Compartir mazos",
+      "items": {
+        "copy": {
+          "title": "Modo de compartir: Copia",
+          "body": "Entrega al destinatario una copia independiente del mazo. Puede editar, agregar y eliminar tarjetas libremente. Despues de compartir, el original y la copia no se afectan mutuamente. Ideal para personalizacion."
+        },
+        "subscribe": {
+          "title": "Modo de compartir: Suscripcion",
+          "body": "El destinatario se 'suscribe' a tu mazo. Cuando agregas tarjetas, los suscriptores tambien las reciben. Sin embargo, el progreso de estudio (SRS) se rastrea de forma independiente. Los suscriptores no pueden editar tarjetas. Ideal para profesor\u2194estudiante o grupos de estudio."
+        },
+        "snapshot": {
+          "title": "Modo de compartir: Instantanea",
+          "body": "Crea una copia de solo lectura del mazo en el momento actual. Los destinatarios solo pueden estudiar, no editar. Las actualizaciones futuras del original no se reflejan. Usalo cuando quieras compartir 'el estado actual exacto'."
+        },
+        "inviteLink": {
+          "title": "Enviar enlaces de invitacion",
+          "body": "Detalle del mazo \u2192 Boton de compartir \u2192 Seleccionar modo de compartir \u2192 'Generar enlace de invitacion' crea un enlace unico. Envialo por mensajeria, correo electronico, etc. El destinatario hace clic para aceptar."
+        },
+        "manage": {
+          "title": "Gestionar compartidos",
+          "body": "Revisa los compartidos enviados/recibidos en la pagina 'Mis compartidos' cerca de Configuracion. Puedes revocar compartidos activos o cancelar suscripciones."
+        }
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace",
+      "items": {
+        "what": {
+          "title": "Que es el Marketplace?",
+          "body": "Un espacio para buscar y obtener mazos compartidos por otros usuarios. Filtra por categoria (idiomas, certificaciones, programacion, etc.) y etiquetas, ordena por popularidad o mas recientes."
+        },
+        "getDeck": {
+          "title": "Obtener un mazo",
+          "body": "Haz clic en un mazo del marketplace para ver los detalles. Previsualiza las primeras 10 tarjetas, luego pulsa 'Obtener' para agregarlo a tus mazos. El comportamiento varia segun el modo de compartir (copia/suscripcion/instantanea)."
+        },
+        "publish": {
+          "title": "Publicar tu mazo",
+          "body": "Detalle del mazo \u2192 Compartir \u2192 'Publicar en el Market'. Establece titulo, descripcion, categoria, etiquetas y modo de compartir. Una vez publicado, todos los usuarios pueden buscarlo. Puedes despublicarlo en cualquier momento."
+        }
+      }
+    },
+    "history": {
+      "title": "Historial de estudio y estadisticas",
+      "items": {
+        "viewHistory": {
+          "title": "Ver historial de estudio",
+          "body": "Consulta todas las sesiones de estudio por fecha en la pagina de Historial. Haz clic en una sesion para ver los detalles por tarjeta (calificacion, tiempo empleado). Filtra por mazo o modo. El grafico de distribucion de calificaciones esta agrupado por modo (Repeticion espaciada / General / Intensivo)."
+        },
+        "deckProgress": {
+          "title": "Progreso del mazo",
+          "body": "Las tarjetas de progreso del mazo aparecen en la parte superior del Historial de estudio. Ve la tasa de completado y el conteo de tarjetas por estado (nueva/aprendiendo/repaso) de un vistazo."
+        },
+        "dashboardStats": {
+          "title": "Estadisticas del panel de control",
+          "body": "Cambia entre pestanas de periodo (1D/1S/1M/3M/6M/1A/2A/5A) en el panel de control para ver el mapa de calor de estudio, el grafico de volumen de estudio diario y la prevision de repasos."
+        }
+      }
+    },
+    "settings": {
+      "title": "Configuracion",
+      "items": {
+        "profile": {
+          "title": "Perfil",
+          "body": "Establece tu nombre para mostrar. El correo electronico no se puede cambiar."
+        },
+        "srsLimit": {
+          "title": "Limite de tarjetas nuevas en SRS",
+          "body": "Establece el numero maximo de tarjetas nuevas agregadas por sesion de SRS. Las tarjetas de repaso no se ven afectadas por este limite. Ajustalo para controlar tu volumen de estudio."
+        },
+        "answerMode": {
+          "title": "Modo de respuesta (Boton/Deslizar)",
+          "body": "Modo boton: Califica pulsando botones en la parte inferior. El modo SRS muestra 4 botones (Otra vez/Dificil/Bien/Facil), los modos generales muestran 2 botones (No se/Se), y el intensivo muestra 2 botones (Fallo/Acierto).\nModo deslizar: Califica deslizando tarjetas a izquierda o derecha. En SRS: \u2190 Otra vez / \u2192 Bien. En otros modos: \u2190 No se / \u2192 Se."
+        },
+        "autoTts": {
+          "title": "TTS automatico",
+          "body": "Lee automaticamente los campos con TTS habilitado al voltear las tarjetas. Incluso cuando esta desactivado, el boton de altavoz para reproduccion manual siempre esta disponible."
+        },
+        "apiKey": {
+          "title": "Clave API",
+          "body": "Genera una clave API para acceder a los datos de ReeeeecallStudy desde herramientas externas (scripts, aplicaciones). La clave se muestra solo una vez; asegurate de copiarla. Se permite hasta 1 clave."
+        }
+      }
+    },
+    "api": {
+      "title": "Guia de API (Generar tarjetas automaticamente con IA)",
+      "items": {
+        "whatSimple": {
+          "title": "Que es una API? (Explicacion sencilla)",
+          "body": "Una API es \"una forma en que los programas se comunican entre si\".\n\nAl igual que haces clic en botones en la aplicacion para crear tarjetas, una API te permite hacer lo mismo con comandos de texto.\n\nPiensalo como un restaurante:\n\u2022 Menu = Documentacion de la API (describe que solicitudes puedes hacer)\n\u2022 Pedir = Solicitud de API (\"Muestrame mis mazos\", \"Agrega 100 tarjetas\")\n\u2022 Recibir la comida = Respuesta de la API (los datos o el resultado que solicitaste)\n\nLo mejor? Puedes pedirle a herramientas de IA como ChatGPT, Gemini o Claude que envien estos comandos por ti!\nLa IA crea el contenido de las tarjetas Y las registra via API automaticamente."
+        },
+        "whyApi": {
+          "title": "Por que usar la API?",
+          "body": "Compara crear tarjetas una por una vs. usar la API:\n\nManual: 30 segundos por tarjeta x 100 tarjetas = ~50 minutos\nAPI + IA: 100 tarjetas a la vez = ~3-5 minutos\n\nQue puedes hacer con la API:\n\u2022 Decirle a la IA \"Crea 100 tarjetas de vocabulario TOEIC\" y se generan al instante\n\u2022 \"Haz 50 tarjetas de kanji JLPT N3\" \u2014 hecho en una sola solicitud\n\u2022 Subir datos desde Excel o archivos de texto de forma masiva\n\u2022 No se necesita programar \u2014 solo chatea con la IA!\n\nSigue esta guia y cualquiera puede crear 100 tarjetas en 5 minutos."
+        },
+        "getKey": {
+          "title": "Obtener tu clave API",
+          "body": "Para usar la API, primero necesitas una clave API. Es como una contrasena que te permite acceder a la API desde tu cuenta.\n\nComo obtener una:\n1. Inicia sesion en la aplicacion ReeeeecallStudy\n2. Ve a \"Configuracion\" desde el menu superior derecho\n3. Desplazate hacia abajo hasta la seccion \"Clave API\"\n4. Haz clic en \"Generar nueva clave API\"\n5. Ingresa un nombre para tu clave (ej., \"Mi integracion con IA\")\n6. Se mostrara una clave que comienza con rc_\n\nIMPORTANTE: La clave se muestra solo una vez en esta pantalla!\nAsegurate de copiarla y guardarla en un lugar seguro.\n\nTu clave API es como una contrasena. Nunca la compartas con otros."
+        },
+        "step1Prepare": {
+          "title": "Paso 1: Prepara tu mazo y plantilla de tarjetas",
+          "body": "Antes de agregar tarjetas via API, primero crea un mazo y una plantilla de tarjetas en la aplicacion.\n\n1. Crear un mazo\n\u2022 En la aplicacion, ve a \"Mazos\" \u2192 \"Crear nuevo mazo\"\n\u2022 Ingresa un nombre (ej., \"Vocabulario TOEIC\")\n\u2022 Ingresa una descripcion (ej., \"Palabras esenciales de TOEIC\")\n\n2. Crear una plantilla de tarjetas\n\u2022 Ve a \"Plantillas\" \u2192 \"Nueva plantilla\"\n\u2022 Ingresa un nombre (ej., \"Detalle de vocabulario\")\n\u2022 Agrega campos:\n  - word: tipo texto\n  - meaning: tipo texto\n  - example: tipo texto\n\u2022 Coloca \"word\" en el diseno del anverso\n\u2022 Coloca \"meaning\" y \"example\" en el diseno del reverso\n\n3. Establecer la plantilla predeterminada para tu mazo\n\u2022 En la edicion del mazo, selecciona la plantilla que acabas de crear como predeterminada\n\nConsejo: Recuerda los nombres clave de los campos (word, meaning, example)!\nUsaras estas claves exactas al crear tarjetas via API."
+        },
+        "step2Query": {
+          "title": "Paso 2: Encuentra los IDs de tu mazo/plantilla con IA",
+          "body": "Para agregar tarjetas, necesitas el ID de tu mazo y el ID de tu plantilla.\nPidamosle a la IA que los busque!\n\nAbre ChatGPT, Gemini o Claude y pega lo siguiente:\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nEstoy usando una aplicacion de tarjetas llamada ReeeeecallStudy.\nAqui esta mi informacion de API:\n\u2022 URL de API: https://reeeeecallstudy.xyz/api/v1\n\u2022 Clave API: rc_PEGA_TU_CLAVE_API_AQUI\n\nPor favor haz estas dos solicitudes:\n1. Listar mis mazos: GET https://reeeeecallstudy.xyz/api/v1/decks\n2. Listar mis plantillas: GET https://reeeeecallstudy.xyz/api/v1/templates\n\nIncluye el encabezado: Authorization: Bearer rc_PEGA_TU_CLAVE_API_AQUI\nMuestrame el id y nombre de cada mazo, y el id, nombre y campos de cada plantilla.\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nReemplaza \"rc_PEGA_TU_CLAVE_API_AQUI\" con tu clave API real!\n\nLa IA te mostrara informacion como:\n\u2022 ID del mazo: a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n\u2022 Nombre del mazo: Vocabulario TOEIC\n\u2022 ID de la plantilla: e5f6g7h8-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n\u2022 Campos de la plantilla: word, meaning, example\n\nCopia estos IDs \u2014 los necesitaras en el siguiente paso!"
+        },
+        "step3AiGenerate": {
+          "title": "Paso 3: Pide a la IA que cree y registre tarjetas",
+          "body": "Este es el paso clave! Pide a la IA que cree tarjetas y las registre directamente.\n\nCopia el prompt de abajo, reemplaza las partes marcadas con tu informacion y envialo a la IA:\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nCrea tarjetas usando la API de ReeeeecallStudy.\n\nInformacion de la API:\n\u2022 URL base: https://reeeeecallstudy.xyz/api/v1\n\u2022 Clave API: (pega tu clave API aqui)\n\u2022 ID del mazo: (pega el ID de tu mazo del Paso 2)\n\u2022 ID de la plantilla: (pega el ID de tu plantilla del Paso 2)\n\nEndpoint de creacion de tarjetas:\nPOST https://reeeeecallstudy.xyz/api/v1/decks/(ID del mazo)/cards\nHeaders:\n  Authorization: Bearer (clave API)\n  Content-Type: application/json\nBody (array JSON, maximo 100):\n[\n  {\n    \"template_id\": \"(ID de la plantilla)\",\n    \"field_values\": {\n      \"word\": \"palabra en ingles\",\n      \"meaning\": \"definicion\",\n      \"example\": \"oracion de ejemplo\"\n    },\n    \"tags\": [\"etiqueta\"]\n  }\n]\n\nSolicitud:\nCrea 50 tarjetas de vocabulario esencial de TOEIC y registralas a traves de la API anterior.\nCada tarjeta debe tener:\n\u2022 word: palabra en ingles\n\u2022 meaning: definicion concisa\n\u2022 example: una oracion de ejemplo usando la palabra\n\u2022 tags: nivel de dificultad (principiante / intermedio / avanzado)\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nCambia \"50 tarjetas de vocabulario esencial de TOEIC\" por cualquier tema que desees!\nEjemplos:\n\u2022 \"30 tarjetas de kanji JLPT N3\"\n\u2022 \"40 frases basicas de viaje en espanol\"\n\u2022 \"50 eventos de la cronologia de historia mundial\"\n\u2022 \"30 terminos de programacion en Python\"\n\u2022 \"50 terminos de anatomia medica\"\n\nNecesitas mas tarjetas? Solo di \"Crea 50 mas sin duplicados!\""
+        },
+        "aiExamples": {
+          "title": "Consejos para cada IA (ChatGPT / Gemini / Claude)",
+          "body": "Cada IA tiene fortalezas ligeramente diferentes. Usa la mejor para tus necesidades!\n\nChatGPT (chat.openai.com)\n\u2022 Puede ejecutar codigo para llamar a la API directamente a traves del Interprete de codigo\n\u2022 Consejo: Di \"Ejecuta codigo Python para llamar a la API directamente\" y ejecutara codigo real para registrar tarjetas\n\u2022 Mejor para: Llamadas directas a la API\n\nGoogle Gemini (gemini.google.com)\n\u2022 Integrado con Google Search para informacion actualizada\n\u2022 Consejo: Ideal para tarjetas que necesitan informacion actual como \"vocabulario de actualidad 2025\"\n\u2022 Mejor para: Tarjetas que requieren las ultimas tendencias\n\nClaude (claude.ai)\n\u2022 Excelente para manejar texto largo y generar JSON preciso\n\u2022 Consejo: Puede crear 100 tarjetas a la vez sin romper el formato JSON\n\u2022 Mejor para: Generacion masiva, estructuras de tarjetas complejas\n\nConsejos comunes:\n\u2022 Si la IA no puede llamar a la API \u2192 Pide \"Solo muestrame los datos JSON.\" Luego copialos y usa el metodo de registro manual (ver siguiente seccion)\n\u2022 Di \"Crea 50 mas sin superponerse con las tarjetas anteriores\" para adiciones continuas\n\u2022 Maximo 100 tarjetas por solicitud. Para mas, divide en multiples solicitudes"
+        },
+        "step4Manual": {
+          "title": "Cuando la IA no puede llamar a la API directamente (Metodo manual)",
+          "body": "Si la IA no puede llamar a la API directamente, no te preocupes!\nSolo copia los datos JSON que la IA creo y envialos tu mismo.\n\nMetodo 1: Swagger UI (Mas facil, Recomendado)\n1. Abre https://reeeeecallstudy.xyz/api/ui en tu navegador\n2. Haz clic en \"Authorize\" en la parte superior \u2192 Ingresa tu clave API \u2192 Confirma\n3. Busca y expande POST /v1/decks/{deckId}/cards\n4. Haz clic en \"Try it out\"\n5. Ingresa el ID de tu mazo en el campo deckId\n6. Pega el array JSON de la IA en el cuerpo de la solicitud\n7. Haz clic en \"Execute\" \u2192 Listo!\n\nMetodo 2: Terminal / Linea de comandos\nAbre Terminal (Mac) o PowerShell (Windows) y ejecuta:\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"a round fruit\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\nPara JSON largo, guardalo en un archivo primero:\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\nMaximo 100 tarjetas por solicitud."
+        },
+        "docsPage": {
+          "title": "Documentacion completa de la API",
+          "body": "Para informacion mas detallada de la API:\n\n\u2022 Documentacion de API en la aplicacion: \"API\" en el menu superior o /api-docs\n\u2022 Swagger UI (pruebas interactivas): https://reeeeecallstudy.xyz/api/ui\n\u2022 Documentacion publica de la API: https://reeeeecallstudy.xyz/docs/api\n\nTodos los endpoints disponibles:\n\u2022 API de mazos: Listar, detalle, crear\n\u2022 API de tarjetas: Listar, detalle, crear (masivo soportado), actualizar, eliminar\n\u2022 API de plantillas: Listar, detalle, crear, actualizar, eliminar\n\u2022 API de estudio: Tarjetas pendientes, historial de estudio, estadisticas\n\u2022 API de Marketplace: Listar, publicar, eliminar\n\u2022 API de compartir: Crear compartido, aceptar invitacion, listar, revocar"
+        },
+        "rateLimits": {
+          "title": "Limites de uso (Bueno saberlo)",
+          "body": "El numero de solicitudes esta limitado para la estabilidad de la API.\n\nNivel gratuito:\n\u2022 Solicitudes diarias de API: 1,000\n\u2022 Llamadas a la API por minuto: 60\n\u2022 Creacion de tarjetas por minuto: 30\n\nExceder los limites devuelve 429 Too Many Requests.\nEspera un momento e intentalo de nuevo.\n\nNota: 100 tarjetas cuentan como solo 1 llamada a la API (creacion masiva).\nCon 1,000 llamadas diarias, teoricamente podrias crear hasta 100,000 tarjetas por dia!"
+        }
+      }
+    },
+    "tips": {
+      "title": "Consejos de estudio",
+      "items": {
+        "daily": {
+          "title": "Estudia un poco cada dia",
+          "body": "El SRS es mas efectivo con constancia diaria. 10-20 minutos al dia es suficiente. Llena el mapa de calor de estudio en tu panel de control!"
+        },
+        "again": {
+          "title": "No le tengas miedo a Otra vez",
+          "body": "En SRS, 'Otra vez' no es un fracaso. Marcar honestamente las tarjetas que no recuerdas como 'Otra vez' ayuda al sistema a mostrarlas en el momento adecuado. Forzar 'Bien' en realidad reduce la efectividad."
+        },
+        "concise": {
+          "title": "Manten las tarjetas concisas",
+          "body": "Pon solo un concepto por tarjeta. Tarjetas cortas y claras como 'apple = manzana' son mucho mas efectivas que 'apple, pear, grape, strawberry...'."
+        },
+        "tags": {
+          "title": "Usa etiquetas",
+          "body": "Agrega etiquetas para filtrar rapidamente despues. Ejemplos: 'gramatica', 'verbos', 'Capitulo1', etc."
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { Star, Quote } from 'lucide-react'
 import { useCountUp } from '../../hooks/useCountUp'
 import { ScrollReveal } from './ScrollReveal'
 import { REVIEWS, type Review, type Lang } from './reviews-data'
+import { isSupportedLocale, DEFAULT_LOCALE } from '../../lib/locale-utils'
 
 // ── Counter ──
 const COUNTER_ITEMS = [
@@ -139,8 +140,8 @@ function LiveActivityBadge() {
 // ── Main Section ──
 export function SocialProofSection() {
   const { t, i18n } = useTranslation('landing')
-  const lang = (i18n.language?.substring(0, 2) || 'en') as Lang
-  const safeLang: Lang = ['en', 'ko', 'ja', 'zh'].includes(lang) ? lang : 'en'
+  const lang = (i18n.language?.substring(0, 2) || DEFAULT_LOCALE) as Lang
+  const safeLang: Lang = isSupportedLocale(lang) ? lang : DEFAULT_LOCALE
 
   const row1 = REVIEWS.slice(0, 50)
   const row2 = REVIEWS.slice(50, 100)

@@ -189,7 +189,7 @@
   "trustBadges": {
     "srs": "智能SRS",
     "sharing": "牌组共享",
-    "languages": "4种语言",
+    "languages": "{{count}}种语言",
     "allDevices": "全设备支持",
     "import": "CSV & API导入"
   },

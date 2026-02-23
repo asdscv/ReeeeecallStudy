@@ -65,7 +65,9 @@
     "tapToFlip": "点击翻转",
     "tapToSeeAnswer": "点击卡片查看答案",
     "tapToReveal": "点击卡片查看答案",
-    "ttsPlay": "播放 TTS"
+    "ttsPlay": "播放 TTS",
+    "front": "正面",
+    "back": "背面"
   },
   "rating": {
     "dontKnow": "不认识",

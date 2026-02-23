@@ -1,45 +1,19 @@
 // Cloudflare Worker — API 프록시 + SPA fallback + SEO 프리렌더링 + AI 콘텐츠 생성
 import { runContentPipeline } from './worker-modules/content-pipeline.js'
+import { LOCALES, DEFAULT_LOCALE, OG_LOCALE_MAP, LIST_TITLES, LIST_DESCS, LANDING_TITLES, LANDING_DESCS } from './worker-modules/config.js'
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
 const SITE_URL = 'https://reeeeecallstudy.xyz'
 const BRAND_NAME = 'ReeeeecallStudy'
 const TWITTER_HANDLE = '@reeeeecallstudy'
 
-const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja']
-const OG_LOCALE_MAP = { en: 'en_US', ko: 'ko_KR', zh: 'zh_CN', ja: 'ja_JP' }
-const LIST_TITLES = {
-  en: 'Learning Insights | ReeeeecallStudy',
-  ko: '학습 인사이트 | ReeeeecallStudy',
-  zh: '学习洞察 | ReeeeecallStudy',
-  ja: '学習インサイト | ReeeeecallStudy',
-}
-const LIST_DESCS = {
-  en: 'Discover science-backed learning strategies and spaced repetition tips.',
-  ko: '과학적으로 검증된 학습 전략과 간격 반복 학습법을 알아보세요.',
-  zh: '探索经过科学验证的学习策略和间隔重复学习技巧。',
-  ja: '科学的に検証された学習戦略と間隔反復学習のコツを発見しましょう。',
-}
-const LANDING_TITLES = {
-  en: 'ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition',
-  ko: 'ReeeeecallStudy — 간격 반복 학습 기반 스마트 플래시카드',
-  zh: 'ReeeeecallStudy — 基于间隔重复的智能闪卡学习',
-  ja: 'ReeeeecallStudy — 間隔反復学習に基づくスマートフラッシュカード',
-}
-const LANDING_DESCS = {
-  en: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer.',
-  ko: '과학적으로 검증된 간격 반복(SRS) 알고리즘으로 더 빠르고 오래 기억하세요.',
-  zh: '采用经过科学验证的间隔重复(SRS)算法的智能闪卡学习平台。记得更快、更久。',
-  ja: '科学的に実証された間隔反復(SRS)アルゴリズムを搭載したスマートフラッシュカード学習プラットフォーム。より速く、より長く記憶。',
-}
-
 function buildHreflangTags(basePath, queryParam) {
-  return SUPPORTED_LOCALES.map(
+  return LOCALES.map(
     (l) => `<link rel="alternate" hreflang="${l}" href="${SITE_URL}${basePath}${queryParam ? `?lang=${l}` : ''}">`
   ).join('\n') + `\n<link rel="alternate" hreflang="x-default" href="${SITE_URL}${basePath}">`
 }
 
 function buildOgLocaleAlternates(lang) {
-  return SUPPORTED_LOCALES
+  return LOCALES
     .filter((l) => l !== lang)
     .map((l) => `<meta property="og:locale:alternate" content="${OG_LOCALE_MAP[l]}">`)
     .join('\n')
@@ -95,7 +69,7 @@ async function handleContentBotRequest(url, env) {
   if (slugMatch) {
     // Detail page
     const slug = slugMatch[1]
-    const lang = url.searchParams.get('lang') || 'en'
+    const lang = url.searchParams.get('lang') || DEFAULT_LOCALE
 
     const res = await fetch(
       `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&locale=eq.${lang}&limit=1`,
@@ -163,7 +137,7 @@ async function handleContentBotRequest(url, env) {
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:site_name" content="${BRAND_NAME}">
-<meta property="og:locale" content="${OG_LOCALE_MAP[article.locale] || 'en_US'}">
+<meta property="og:locale" content="${OG_LOCALE_MAP[article.locale] || OG_LOCALE_MAP[DEFAULT_LOCALE]}">
 ${buildOgLocaleAlternates(article.locale)}
 ${article.published_at ? `<meta property="article:published_time" content="${escapeHtml(article.published_at)}">` : ''}
 ${article.updated_at ? `<meta property="article:modified_time" content="${escapeHtml(article.updated_at)}">` : ''}
@@ -200,7 +174,7 @@ ${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">$
   }
 
   // List page
-  const listLang = url.searchParams.get('lang') || 'en'
+  const listLang = url.searchParams.get('lang') || DEFAULT_LOCALE
 
   const res = await fetch(
     `${restUrl}/contents?is_published=eq.true&locale=eq.${listLang}&select=slug,title,subtitle,locale,published_at&order=published_at.desc&limit=50`,
@@ -246,7 +220,7 @@ ${article.published_at ? `<time datetime="${escapeHtml(article.published_at)}">$
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:site_name" content="${BRAND_NAME}">
-<meta property="og:locale" content="${OG_LOCALE_MAP[listLang] || 'en_US'}">
+<meta property="og:locale" content="${OG_LOCALE_MAP[listLang] || OG_LOCALE_MAP[DEFAULT_LOCALE]}">
 ${buildOgLocaleAlternates(listLang)}
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="${TWITTER_HANDLE}">
@@ -275,7 +249,7 @@ ${buildHreflangTags('/insight', true)}
 }
 
 async function handleLandingBotRequest(url, env) {
-  const lang = url.searchParams.get('lang') || 'en'
+  const lang = url.searchParams.get('lang') || DEFAULT_LOCALE
   const pageTitle = LANDING_TITLES[lang] || LANDING_TITLES.en
   const pageDesc = LANDING_DESCS[lang] || LANDING_DESCS.en
 
@@ -310,7 +284,7 @@ async function handleLandingBotRequest(url, env) {
 <meta property="og:image:height" content="512">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${BRAND_NAME}">
-<meta property="og:locale" content="${OG_LOCALE_MAP[lang] || 'en_US'}">
+<meta property="og:locale" content="${OG_LOCALE_MAP[lang] || OG_LOCALE_MAP[DEFAULT_LOCALE]}">
 ${buildOgLocaleAlternates(lang)}
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="${TWITTER_HANDLE}">
@@ -372,7 +346,7 @@ async function handleSitemap(env) {
     <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
+${LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight/${slug}"/>
   </url>\n`
     }
@@ -390,14 +364,14 @@ ${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" 
     <loc>${SITE_URL}/landing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/landing?lang=${l}"/>`).join('\n')}
+${LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/landing?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/landing"/>
   </url>
   <url>
     <loc>${SITE_URL}/insight</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
+${LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight"/>
   </url>
   <url>

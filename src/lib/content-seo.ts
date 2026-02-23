@@ -1,13 +1,7 @@
 import i18next from 'i18next'
 import type { ContentDetail } from '../types/content-blocks'
 import { SEO } from './seo-config'
-
-const LOCALE_TO_LANGUAGE: Record<string, string> = {
-  en: 'English',
-  ko: 'Korean',
-  ja: 'Japanese',
-  zh: 'Chinese',
-}
+import { LOCALE_TO_LANGUAGE } from './locale-utils'
 
 export function buildArticleJsonLd(article: ContentDetail) {
   return {

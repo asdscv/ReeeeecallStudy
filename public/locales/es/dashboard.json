@@ -1,0 +1,37 @@
+{
+  "title": "Panel",
+  "stats": {
+    "totalCards": "Total de tarjetas",
+    "todayReview": "Repaso de hoy",
+    "streak": "Racha de estudio",
+    "masteryRate": "Tasa de dominio"
+  },
+  "dailyChart": {
+    "title": "Volumen de estudio diario",
+    "total": "Total {{count}} veces",
+    "noData": "Sin registros de estudio aún",
+    "tooltipTimes": "{{value}} veces",
+    "tooltipLabel": "Estudio"
+  },
+  "forecast": {
+    "title": "Pronóstico de repaso (7 días)",
+    "noData": "Sin repasos programados",
+    "tooltipCards": "{{value}} tarjetas",
+    "tooltipLabel": "Pendientes de repaso"
+  },
+  "recentDecks": {
+    "title": "Estado de mazos",
+    "noDecks": "Sin mazos aún. ¡Crea uno!",
+    "goToDecks": "Ir a gestión de mazos",
+    "cardCount": "{{count}} tarjetas",
+    "newCards": "Nuevas {{count}}",
+    "reviewCards": "Repaso {{count}}",
+    "study": "Estudiar"
+  },
+  "heatmap": {
+    "title": "Mapa de calor de estudio",
+    "noStudy": "Sin estudio",
+    "studyCount": "{{date}}: {{count}} estudios",
+    "tooltip": "{{date}}: {{count}} estudios"
+  }
+}

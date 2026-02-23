@@ -175,7 +175,7 @@ export function validateArticle(article) {
  * Call AFTER validateArticle succeeds — mutates blocks in place.
  *
  * @param {object} article - Validated article with slug and content_blocks
- * @param {string} locale  - Locale code ("en" | "ko")
+ * @param {string} locale  - Locale code (e.g. "en", "ko", "zh", "ja", "es")
  */
 export function enrichCtaUrls(article, locale) {
   if (!article?.content_blocks || !article.slug) return

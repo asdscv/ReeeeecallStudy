@@ -3,13 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { ScrollReveal } from './ScrollReveal'
+import { SUPPORTED_LOCALES, LOCALE_LABELS } from '../../lib/locale-utils'
 
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'ko', label: '한국어' },
-  { code: 'ja', label: '日本語' },
-  { code: 'zh', label: '中文' },
-]
+const LANGUAGES = SUPPORTED_LOCALES.map((code) => ({ code, label: LOCALE_LABELS[code] }))
 
 export function FooterSection() {
   const { t, i18n } = useTranslation('landing')

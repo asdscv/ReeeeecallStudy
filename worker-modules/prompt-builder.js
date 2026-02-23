@@ -1,4 +1,5 @@
 // 3-layer prompt builder for AI content generation
+import { LOCALE_INSTRUCTIONS, DEFAULT_LOCALE } from './config.js'
 
 const SYSTEM_PROMPT = `You are an expert educational content writer for ReeeeecallStudy, a smart flashcard learning platform that uses spaced repetition (SRS).
 
@@ -94,13 +95,6 @@ Each block has "type" and "props":
   - Specific: "5 Evidence-Based Ways to Study Organic Chemistry"
 - If previous titles from this batch are provided, ensure your title is stylistically DIFFERENT from all of them`
 
-const LOCALE_INSTRUCTIONS = {
-  en: 'Write the entire article in English. The slug must be in English lowercase kebab-case.',
-  ko: 'Write the entire article in Korean (한국어). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Korean. For SEO: use Korean keywords that Korean users would search on Naver and Google Korea. meta_title and meta_description must be in Korean.',
-  zh: 'Write the entire article in Simplified Chinese (简体中文). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Simplified Chinese. For SEO: use Chinese keywords that Chinese users would search on Baidu and Google China. meta_title and meta_description must be in Simplified Chinese.',
-  ja: 'Write the entire article in Japanese (日本語). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Japanese. For SEO: use Japanese keywords that Japanese users would search on Google Japan and Yahoo Japan. meta_title and meta_description must be in Japanese.',
-}
-
 export function buildPrompt(topic, locale, options = {}) {
   const { previousTitles = [] } = options
 
@@ -119,7 +113,7 @@ Write a unique, insightful article about "${topic.titleHint}" within the "${topi
     titleAvoidance = `\n\n## Previously Generated Titles (DO NOT use similar titles or styles)\n${previousTitles.map(t => `- "${t}"`).join('\n')}\n\nYour title MUST be stylistically different from all of the above.`
   }
 
-  const localeInstruction = LOCALE_INSTRUCTIONS[locale] || LOCALE_INSTRUCTIONS.en
+  const localeInstruction = LOCALE_INSTRUCTIONS[locale] || LOCALE_INSTRUCTIONS[DEFAULT_LOCALE]
 
   return {
     system: SYSTEM_PROMPT,

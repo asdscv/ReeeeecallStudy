@@ -189,7 +189,7 @@
   "trustBadges": {
     "srs": "Smart SRS",
     "sharing": "Deck Sharing",
-    "languages": "4 Languages",
+    "languages": "{{count}} Languages",
     "allDevices": "All Devices",
     "import": "CSV & API Import"
   },

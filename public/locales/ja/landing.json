@@ -189,7 +189,7 @@
   "trustBadges": {
     "srs": "スマートSRS",
     "sharing": "デッキ共有",
-    "languages": "4言語対応",
+    "languages": "{{count}}言語対応",
     "allDevices": "全デバイス対応",
     "import": "CSV & APIインポート"
   },

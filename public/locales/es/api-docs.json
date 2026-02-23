@@ -1,0 +1,211 @@
+{
+  "title": "Documentacion de la API",
+  "subtitle": "Gestiona los datos de estudio integrando con herramientas externas",
+  "publicSubtitle": "Gestiona los datos de estudio integrando con herramientas externas usando la API de ReeeeecallStudy",
+  "userGuideLink": "Guia del usuario",
+  "getStarted": "Comenzar",
+  "required": "obligatorio",
+  "searchPlaceholder": "Buscar endpoints...",
+  "noResults": "No se encontraron resultados para \"{{query}}\"",
+  "copy": "Copiar",
+  "tableOfContents": "Tabla de contenidos",
+  "quickStart": {
+    "title": "Inicio rapido",
+    "settingsPage": "Pagina de configuracion",
+    "step1Auth": " — Genera tu clave de API en la seccion Clave de API.",
+    "signup": "Registrate",
+    "step1Public": "y genera tu clave de API en Configuracion.",
+    "step2": "Agrega el encabezado",
+    "step2Suffix": "a cada solicitud.",
+    "step3": "Comienza a hacer llamadas a la API! Consulta los endpoints a continuacion."
+  },
+  "table": {
+    "name": "Nombre",
+    "type": "Tipo",
+    "required": "Obligatorio",
+    "description": "Descripcion"
+  },
+  "footer": {
+    "home": "Inicio",
+    "login": "Iniciar sesion"
+  },
+  "sections": {
+    "overview": {
+      "title": "Descripcion general",
+      "description": "Usa la API de ReeeeecallStudy para gestionar datos de estudio desde herramientas externas, scripts y aplicaciones.",
+      "items": {
+        "what": {
+          "title": "Que es la API?",
+          "body": "La API de ReeeeecallStudy es una API RESTful que te permite ver y gestionar mazos, tarjetas, historial de estudio y mas mediante solicitudes HTTP. Usala para scripts de automatizacion, integracion con aplicaciones de terceros y analisis de datos."
+        },
+        "baseUrl": {
+          "title": "URL base",
+          "body": "Todas las solicitudes a la API se basan en la URL del proyecto de Supabase.\n\nURL base: https://your-project.supabase.co/rest/v1"
+        },
+        "responseFormat": {
+          "title": "Formato de respuesta",
+          "body": "Todas las respuestas estan en formato JSON con Content-Type: application/json.\n\nEn caso de exito, se devuelven los datos del recurso. En caso de error, las respuestas siguen el formato { \"error\": \"message\" }."
+        }
+      }
+    },
+    "authentication": {
+      "title": "Autenticacion",
+      "description": "Todas las solicitudes se autentican mediante una clave de API.",
+      "items": {
+        "getKey": {
+          "title": "Obtener una clave de API",
+          "body": "Configuracion → Seccion Clave de API → Haz clic en 'Generar nueva clave de API'.\nIngresa un nombre (maximo 64 caracteres) para recibir una clave de 35 caracteres que comienza con rc_.\n\n⚠️ La clave solo se muestra una vez. Copiala en un lugar seguro!"
+        },
+        "method": {
+          "title": "Metodo de autenticacion",
+          "body": "Pasa tu clave de API como token Bearer en el encabezado Authorization.\n\nAuthorization: Bearer rc_your_api_key_here\n\nLas claves faltantes o invalidas devuelven 401 Unauthorized."
+        },
+        "management": {
+          "title": "Gestion de claves",
+          "body": "• Puedes tener hasta 1 clave de API\n• Si la pierdes, elimina la clave existente y crea una nueva\n• Elimina las claves no utilizadas inmediatamente\n• Usa variables de entorno en lugar de codificar las claves directamente"
+        }
+      }
+    },
+    "rateLimits": {
+      "title": "Limites de frecuencia",
+      "description": "El numero de solicitudes esta limitado para la estabilidad de la API.",
+      "items": {
+        "free": {
+          "title": "Plan gratuito",
+          "body": "• Solicitudes diarias a la API: 1,000\n• Llamadas a la API por minuto: 60\n• Creacion de tarjetas por minuto: 30\n• Creacion masiva de tarjetas por minuto: 5 (maximo 100 por solicitud)\n• Total de tarjetas: 5,000\n• Total de mazos: 50"
+        },
+        "pro": {
+          "title": "Plan Pro",
+          "body": "• Solicitudes diarias a la API: 10,000\n• Llamadas a la API por minuto: 300\n• Creacion de tarjetas por minuto: 120\n• Creacion masiva de tarjetas por minuto: 20\n• Total de tarjetas: 50,000\n• Total de mazos: 500"
+        },
+        "exceeded": {
+          "title": "Cuando se exceden los limites",
+          "body": "Devuelve 429 Too Many Requests.\n\nLos encabezados de respuesta incluyen:\n• X-RateLimit-Limit: Solicitudes maximas\n• X-RateLimit-Remaining: Solicitudes restantes\n• Retry-After: Tiempo de espera en segundos"
+        }
+      }
+    },
+    "decks": {
+      "title": "API de mazos",
+      "description": "Ver y gestionar mazos (colecciones de tarjetas).",
+      "endpoints": {
+        "list": {
+          "summary": "Listar mazos",
+          "description": "Recupera todos los mazos del usuario."
+        },
+        "detail": {
+          "summary": "Obtener detalles del mazo",
+          "description": "Recupera informacion detallada de un mazo especifico."
+        },
+        "create": {
+          "summary": "Crear mazo",
+          "description": "Crea un nuevo mazo."
+        }
+      },
+      "params": {
+        "page": "Numero de pagina (por defecto: 1)",
+        "perPage": "Elementos por pagina (por defecto: 50, maximo: 100)",
+        "deckId": "ID del mazo a consultar"
+      }
+    },
+    "cards": {
+      "title": "API de tarjetas",
+      "description": "Ver, crear y modificar tarjetas.",
+      "endpoints": {
+        "list": {
+          "summary": "Listar tarjetas",
+          "description": "Recupera las tarjetas de un mazo especifico."
+        },
+        "create": {
+          "summary": "Crear tarjeta",
+          "description": "Agrega una nueva tarjeta a un mazo. Creacion individual o masiva de hasta 100."
+        },
+        "update": {
+          "summary": "Actualizar tarjeta",
+          "description": "Modifica los valores de campo o las etiquetas de una tarjeta existente."
+        },
+        "delete": {
+          "summary": "Eliminar tarjeta",
+          "description": "Elimina una tarjeta especifica. Esta accion no se puede deshacer."
+        }
+      },
+      "params": {
+        "deckId": "ID del mazo",
+        "cardId": "ID de la tarjeta",
+        "status": "Filtro de estado SRS (new, learning, review, suspended)",
+        "tag": "Filtro de etiqueta"
+      }
+    },
+    "study": {
+      "title": "API de estudio",
+      "description": "Ver el historial de estudio y gestionar datos de sesion.",
+      "endpoints": {
+        "due": {
+          "summary": "Obtener tarjetas pendientes",
+          "description": "Recupera las tarjetas pendientes de repaso para hoy."
+        },
+        "history": {
+          "summary": "Historial de estudio",
+          "description": "Recupera los registros de sesiones de estudio."
+        },
+        "stats": {
+          "summary": "Estadisticas de estudio",
+          "description": "Recupera las estadisticas generales de estudio y datos del panel de control."
+        }
+      },
+      "params": {
+        "deckId": "ID del mazo",
+        "from": "Fecha de inicio (ej., 2025-01-01)",
+        "to": "Fecha de fin (ej., 2025-01-31)",
+        "period": "Periodo (1w, 1m, 3m, 6m, 1y)"
+      }
+    },
+    "templates": {
+      "title": "API de plantillas",
+      "description": "Ver plantillas de tarjetas.",
+      "endpoints": {
+        "list": {
+          "summary": "Listar plantillas",
+          "description": "Recupera todas las plantillas de tarjetas del usuario."
+        },
+        "detail": {
+          "summary": "Obtener detalles de la plantilla",
+          "description": "Recupera la informacion completa de la plantilla, incluyendo campos y disenos."
+        }
+      },
+      "params": {
+        "templateId": "ID de la plantilla"
+      }
+    },
+    "examples": {
+      "title": "Ejemplos de codigo",
+      "description": "Ejemplos de llamadas a la API con varios lenguajes y herramientas."
+    },
+    "errors": {
+      "title": "Manejo de errores",
+      "description": "Formato de respuesta de error y codigos de error comunes.",
+      "items": {
+        "format": {
+          "title": "Formato de respuesta de error",
+          "body": "Todos los errores devuelven:\n\n{\n  \"error\": \"Error message\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"Additional info (optional)\"\n}"
+        },
+        "statusCodes": {
+          "title": "Codigos de estado HTTP",
+          "body": "• 200 OK — Exito\n• 201 Created — Recurso creado\n• 204 No Content — Eliminado (sin cuerpo de respuesta)\n• 400 Bad Request — Solicitud invalida (campos faltantes, error de validacion)\n• 401 Unauthorized — Error de autenticacion (clave de API faltante o invalida)\n• 404 Not Found — Recurso no encontrado\n• 429 Too Many Requests — Limite de frecuencia excedido\n• 500 Internal Server Error — Error del servidor"
+        },
+        "validation": {
+          "title": "Errores de validacion",
+          "body": "Los errores de validacion al crear/actualizar tarjetas devuelven errores por campo como array:\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+        }
+      }
+    },
+    "statusCodes": {
+      "200": "Exito",
+      "201": "Creado",
+      "204": "Eliminado (sin cuerpo de respuesta)",
+      "400": "Solicitud incorrecta (campos obligatorios faltantes)",
+      "401": "Error de autenticacion",
+      "404": "No encontrado",
+      "429": "Limite de frecuencia excedido"
+    }
+  }
+}

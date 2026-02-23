@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toIntlLocale } from '../../lib/locale-utils'
+import { toIntlLocale, LOCALE_CONFIG, type SupportedLocale } from '../../lib/locale-utils'
 import { useAdminStore } from '../../stores/admin-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
@@ -29,12 +29,9 @@ import {
 } from '../../lib/admin-stats'
 import { formatRelativeTime } from '../../lib/date-utils'
 
-const LOCALE_COLORS: Record<string, 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'gray'> = {
-  ko: 'blue',
-  en: 'green',
-  ja: 'purple',
-  zh: 'orange',
-}
+const LOCALE_COLORS = Object.fromEntries(
+  Object.entries(LOCALE_CONFIG).map(([k, v]) => [k, v.color]),
+) as Record<SupportedLocale, typeof LOCALE_CONFIG[SupportedLocale]['color']>
 
 export function AdminContentsPage() {
   const { t, i18n } = useTranslation('admin')

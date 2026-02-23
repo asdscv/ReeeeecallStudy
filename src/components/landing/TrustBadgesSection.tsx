@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Brain, Share2, Globe, Smartphone, Upload } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { SUPPORTED_LOCALES } from '../../lib/locale-utils'
 
 const BADGES = [
   {
@@ -25,7 +26,7 @@ const BADGES = [
   {
     key: 'languages',
     icon: Globe,
-    label: '4 Languages',
+    label: `${SUPPORTED_LOCALES.length} Languages`,
     iconBg: 'bg-cyan-100',
     iconColor: 'text-cyan-500',
     borderColor: 'border-cyan-200/60',
@@ -96,7 +97,7 @@ export function TrustBadgesSection() {
                 <activeBadge.icon className={`w-3.5 h-3.5 ${activeBadge.iconColor}`} />
               </div>
               <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                {t(`trustBadges.${activeBadge.key}`, activeBadge.label)}
+                {t(`trustBadges.${activeBadge.key}`, { count: SUPPORTED_LOCALES.length, defaultValue: activeBadge.label })}
               </span>
             </motion.div>
           </AnimatePresence>
@@ -138,7 +139,7 @@ export function TrustBadgesSection() {
               <badge.icon className={`w-4 h-4 ${badge.iconColor}`} />
             </div>
             <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-              {t(`trustBadges.${badge.key}`, badge.label)}
+              {t(`trustBadges.${badge.key}`, { count: SUPPORTED_LOCALES.length, defaultValue: badge.label })}
             </span>
           </motion.div>
         ))}
