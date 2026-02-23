@@ -145,7 +145,11 @@ export function LoginPage() {
     if (error) {
       setError(t(localizeAuthError(error.message) as string))
     } else {
-      navigate('/dashboard', { replace: true })
+      const params = new URLSearchParams(window.location.search)
+      const redirectTo = params.get('redirect') || '/dashboard'
+      // Prevent open redirect — only allow same-origin relative paths
+      const safePath = /^\/[a-zA-Z0-9]/.test(redirectTo) ? redirectTo : '/dashboard'
+      navigate(safePath, { replace: true })
     }
   }
 

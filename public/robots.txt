@@ -3,6 +3,8 @@ User-agent: *
 Allow: /landing
 Allow: /insight
 Allow: /insight/*
+Allow: /d/
+Allow: /d/*
 Disallow: /docs/
 Disallow: /auth/
 Disallow: /decks/
@@ -17,28 +19,58 @@ Disallow: /api-docs
 Disallow: /api/
 
 # Crawl-delay for polite crawling (Googlebot ignores Crawl-delay; use Search Console instead)
+# NOTE: Specific User-agent blocks override *, so we must repeat the rules here.
 User-agent: Bingbot
 Crawl-delay: 2
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /docs/
+Disallow: /auth/
+Disallow: /decks/
+Disallow: /settings
+Disallow: /history
+Disallow: /quick-study
+Disallow: /marketplace
+Disallow: /my-shares
+Disallow: /templates
+Disallow: /admin
+Disallow: /api-docs
+Disallow: /api/
 
-# Allow AI answer engines
+# AI answer engines — same public paths, block everything else
 User-agent: ChatGPT-User
 Allow: /landing
 Allow: /insight
 Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
 
 User-agent: PerplexityBot
 Allow: /landing
 Allow: /insight
 Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
 
 User-agent: ClaudeBot
 Allow: /landing
 Allow: /insight
 Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
 
 User-agent: Google-Extended
 Allow: /landing
 Allow: /insight
 Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
 
 Sitemap: https://reeeeecallstudy.xyz/sitemap.xml

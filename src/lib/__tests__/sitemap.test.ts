@@ -87,4 +87,42 @@ describe('generateSitemapXml', () => {
     const xml = generateSitemapXml(staticPages, [])
     expect(xml.trim()).toMatch(/<\/urlset>$/)
   })
+
+  it('should include listing pages when provided as third argument', () => {
+    const listingPages = [
+      {
+        loc: 'https://reeeeecallstudy.xyz/d/abc-123',
+        lastmod: '2025-08-01T00:00:00Z',
+        changefreq: 'weekly' as const,
+        priority: 0.7,
+      },
+    ]
+    const xml = generateSitemapXml(staticPages, contentPages, listingPages)
+    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/d/abc-123</loc>')
+    expect(xml).toContain('<lastmod>2025-08-01</lastmod>')
+    expect(xml).toContain('<priority>0.7</priority>')
+    const urlCount = (xml.match(/<url>/g) || []).length
+    expect(urlCount).toBe(5) // 2 static + 2 content + 1 listing
+  })
+
+  it('should include hreflang alternates for listing pages', () => {
+    const listingPages = [
+      {
+        loc: 'https://reeeeecallstudy.xyz/d/abc-123',
+        changefreq: 'weekly' as const,
+        priority: 0.7,
+      },
+    ]
+    const xml = generateSitemapXml([], [], listingPages)
+    const listingSection = xml.split('<loc>https://reeeeecallstudy.xyz/d/abc-123</loc>')[1].split('</url>')[0]
+    expect(listingSection).toContain('hreflang="en"')
+    expect(listingSection).toContain('hreflang="ko"')
+    expect(listingSection).toContain('hreflang="x-default"')
+  })
+
+  it('should default to empty array when listing pages omitted', () => {
+    const xml = generateSitemapXml(staticPages, contentPages)
+    const urlCount = (xml.match(/<url>/g) || []).length
+    expect(urlCount).toBe(4) // backward compatible
+  })
 })

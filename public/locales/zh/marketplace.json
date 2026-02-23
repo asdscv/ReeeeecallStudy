@@ -35,5 +35,21 @@
     "importing": "导入中...",
     "cardPreview": "卡片预览（最多 10 张）",
     "noCards": "暂无卡片。"
+  },
+  "preview": {
+    "title": "\"{{title}}\" - 闪卡牌组 | ReeeeecallStudy",
+    "description": "{{title}} — {{cardCount}} 张闪卡。在 ReeeeecallStudy 上预览和学习此牌组。",
+    "defaultDescription": "ReeeeecallStudy 上的闪卡牌组",
+    "sampleCards": "示例卡片",
+    "viewInMarket": "在市场中查看",
+    "cardCount": "{{count}} 张卡片",
+    "userCount": "{{count}} 位用户",
+    "by": "作者：{{name}}",
+    "blurredNotice": "登录即可查看此牌组的全部卡片",
+    "ctaLogin": "登录以获取此牌组",
+    "ctaSignup": "免费注册",
+    "notFound": "牌组未找到",
+    "notFoundDescription": "此牌组可能已被移除或不再可用。",
+    "backToHome": "返回首页"
   }
 }

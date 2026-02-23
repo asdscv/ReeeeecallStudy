@@ -35,5 +35,21 @@
     "importing": "インポート中...",
     "cardPreview": "カードプレビュー（最大10枚）",
     "noCards": "カードがありません。"
+  },
+  "preview": {
+    "title": "\"{{title}}\" - フラッシュカードデッキ | ReeeeecallStudy",
+    "description": "{{title}} — フラッシュカード{{cardCount}}枚。ReeeeecallStudyでプレビューして学習しましょう。",
+    "defaultDescription": "ReeeeecallStudyのフラッシュカードデッキ",
+    "sampleCards": "サンプルカード",
+    "viewInMarket": "マーケットプレイスで見る",
+    "cardCount": "{{count}}枚",
+    "userCount": "{{count}}人",
+    "by": "{{name}}",
+    "blurredNotice": "ログインするとこのデッキのすべてのカードを見ることができます",
+    "ctaLogin": "ログインしてデッキを取得",
+    "ctaSignup": "無料で登録",
+    "notFound": "デッキが見つかりません",
+    "notFoundDescription": "このデッキは削除されたか、利用できなくなった可能性があります。",
+    "backToHome": "ホームに戻る"
   }
 }

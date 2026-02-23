@@ -35,5 +35,21 @@
     "importing": "Importing...",
     "cardPreview": "Card Preview (max 10)",
     "noCards": "No cards."
+  },
+  "preview": {
+    "title": "\"{{title}}\" - Flashcard Deck | ReeeeecallStudy",
+    "description": "{{title}} — {{cardCount}} flashcards. Preview and study this deck on ReeeeecallStudy.",
+    "defaultDescription": "Flashcard deck on ReeeeecallStudy",
+    "sampleCards": "Sample Cards",
+    "viewInMarket": "View in Marketplace",
+    "cardCount": "{{count}} cards",
+    "userCount": "{{count}} users",
+    "by": "by {{name}}",
+    "blurredNotice": "Log in to see all cards in this deck",
+    "ctaLogin": "Log in to get this deck",
+    "ctaSignup": "Sign up free",
+    "notFound": "Deck not found",
+    "notFoundDescription": "This deck may have been removed or is no longer available.",
+    "backToHome": "Back to Home"
   }
 }

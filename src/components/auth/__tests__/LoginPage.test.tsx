@@ -33,8 +33,15 @@ const renderLogin = () =>
     </MemoryRouter>,
   )
 
+const originalLocation = window.location
+
 beforeEach(() => {
   vi.clearAllMocks()
+  // Ensure clean window.location.search between tests
+  Object.defineProperty(window, 'location', {
+    writable: true,
+    value: { ...originalLocation, search: '' },
+  })
 })
 
 // ─── Logo link ──────────────────────────────────────────────
@@ -85,6 +92,58 @@ describe('Login mode', () => {
 
     expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('should redirect to ?redirect param after successful login', async () => {
+    mockSignIn.mockResolvedValue({ error: null })
+    // Simulate ?redirect=/marketplace/xyz in location
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, search: '?redirect=/marketplace/xyz' },
+    })
+
+    const user = userEvent.setup()
+    renderLogin()
+
+    await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'loginButton' }))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/marketplace/xyz', { replace: true })
+  })
+
+  it('should prevent open redirect with protocol-relative URLs', async () => {
+    mockSignIn.mockResolvedValue({ error: null })
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, search: '?redirect=//evil.com' },
+    })
+
+    const user = userEvent.setup()
+    renderLogin()
+
+    await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'loginButton' }))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
+  })
+
+  it('should prevent open redirect with backslash prefix', async () => {
+    mockSignIn.mockResolvedValue({ error: null })
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, search: '?redirect=/\\evil.com' },
+    })
+
+    const user = userEvent.setup()
+    renderLogin()
+
+    await user.type(screen.getByPlaceholderText('your@email.com'), 'a@b.com')
+    await user.type(screen.getByPlaceholderText('passwordPlaceholder'), 'pass123')
+    await user.click(screen.getByRole('button', { name: 'loginButton' }))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
   })
 
   it('should show "비밀번호를 잊으셨나요?" link', () => {

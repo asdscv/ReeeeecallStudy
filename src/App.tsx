@@ -32,6 +32,7 @@ import { PublicApiDocsPage } from './pages/PublicApiDocsPage'
 import { ContentListPage } from './pages/ContentListPage'
 import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
+import { PublicListingPage } from './pages/PublicListingPage'
 import { AdminOverviewPage } from './pages/admin/AdminOverviewPage'
 import { AdminUsersPage } from './pages/admin/AdminUsersPage'
 import { AdminStudyPage } from './pages/admin/AdminStudyPage'
@@ -43,6 +44,15 @@ import { usePageTracking } from './hooks/usePageTracking'
 function PageTracker() {
   usePageTracking()
   return null
+}
+
+/** Redirect already-logged-in users visiting /auth/login, respecting ?redirect= param */
+function LoginRedirect() {
+  const params = new URLSearchParams(window.location.search)
+  const redirectTo = params.get('redirect') || '/dashboard'
+  // Only allow same-origin relative paths (must start with / followed by alphanumeric)
+  const safePath = /^\/[a-zA-Z0-9]/.test(redirectTo) ? redirectTo : '/dashboard'
+  return <Navigate to={safePath} replace />
 }
 
 function App() {
@@ -73,7 +83,7 @@ function App() {
         {/* Auth routes */}
         <Route
           path="/auth/login"
-          element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+          element={user ? <LoginRedirect /> : <LoginPage />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
@@ -81,6 +91,7 @@ function App() {
         <Route path="/docs/api" element={<PublicApiDocsPage />} />
         <Route path="/insight" element={<ContentListPage />} />
         <Route path="/insight/:slug" element={<ContentDetailPage />} />
+        <Route path="/d/:listingId" element={<PublicListingPage />} />
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* Study session (outside Layout for fullscreen focus) */}

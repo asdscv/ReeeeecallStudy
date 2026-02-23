@@ -62,11 +62,28 @@ async function main() {
     priority: 0.8,
   }))
 
-  const xml = generateSitemapXml(staticPages, contentPages)
+  // Fetch active marketplace listings for public preview pages
+  const { data: listings, error: listingsError } = await supabase
+    .from('marketplace_listings')
+    .select('id, updated_at')
+    .eq('is_active', true)
+
+  if (listingsError) {
+    console.warn('Failed to fetch marketplace listings:', listingsError.message)
+  }
+
+  const listingPages = (listings ?? []).map((row) => ({
+    loc: `${SITE_URL}/d/${row.id}`,
+    lastmod: row.updated_at,
+    changefreq: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  const xml = generateSitemapXml(staticPages, contentPages, listingPages)
   const outPath = resolve(import.meta.dirname, '..', 'public', 'sitemap.xml')
   writeFileSync(outPath, xml, 'utf-8')
 
-  console.log(`Sitemap generated: ${outPath} (${staticPages.length + contentPages.length} URLs)`)
+  console.log(`Sitemap generated: ${outPath} (${staticPages.length + contentPages.length + listingPages.length} URLs)`)
 }
 
 main()

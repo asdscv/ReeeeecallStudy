@@ -35,6 +35,7 @@ function buildUrlEntry(entry: SitemapEntry, includeHreflang = false): string {
 export function generateSitemapXml(
   staticPages: SitemapEntry[],
   contentPages: SitemapEntry[],
+  listingPages: SitemapEntry[] = [],
 ): string {
   const lines = [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -46,6 +47,10 @@ export function generateSitemapXml(
   }
 
   for (const page of contentPages) {
+    lines.push(buildUrlEntry(page, true))
+  }
+
+  for (const page of listingPages) {
     lines.push(buildUrlEntry(page, true))
   }
 
