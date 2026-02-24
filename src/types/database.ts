@@ -255,6 +255,7 @@ export type SrsSettings = {
   hard_days: number
   good_days: number
   easy_days: number
+  learning_steps?: number[]  // minutes per step, e.g. [1, 10]
 }
 
 export const DEFAULT_SRS_SETTINGS: SrsSettings = {
@@ -262,6 +263,7 @@ export const DEFAULT_SRS_SETTINGS: SrsSettings = {
   hard_days: 1,
   good_days: 1,
   easy_days: 4,
+  learning_steps: [1, 10],
 }
 
 // Row type shortcuts

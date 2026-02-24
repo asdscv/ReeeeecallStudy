@@ -1,0 +1,185 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS (Repetición Espaciada)",
+      "description": "Selecciona tarjetas automáticamente según el tiempo de repaso",
+      "detail": "Repasa a intervalos óptimos basados en la curva de memoria. Califica Otra vez/Difícil/Bien/Fácil para ajustar intervalos. Las tarjetas incorrectas reaparecen en la misma sesión."
+    },
+    "sequential_review": {
+      "label": "Repaso secuencial",
+      "description": "Todas las tarjetas nuevas + de repaso en orden",
+      "detail": "Todas las tarjetas nuevas siempre se incluyen. El tamaño del lote controla cuántas tarjetas existentes repasar. Vuelve al principio al llegar al final."
+    },
+    "random": {
+      "label": "Aleatorio",
+      "description": "Mezcla tarjetas aleatoriamente para estudiar",
+      "detail": "Selecciona tarjetas aleatoriamente hasta el tamaño del lote. Todas las tarjetas no suspendidas son elegibles sin importar el estado SRS."
+    },
+    "sequential": {
+      "label": "Secuencial",
+      "description": "Estudia tarjetas en orden",
+      "detail": "Estudia tarjetas en orden hasta el tamaño del lote. Recuerda tu posición y continúa desde donde lo dejaste. Vuelve al inicio al llegar al final."
+    },
+    "by_date": {
+      "label": "Por fecha",
+      "description": "Estudia tarjetas subidas en una fecha específica",
+      "detail": "Recopila y estudia solo tarjetas añadidas en la fecha seleccionada. Útil para repasar rápidamente tarjetas recién añadidas."
+    },
+    "cramming": {
+      "label": "Modo intensivo",
+      "description": "Repaso intensivo hasta dominar",
+      "detail": "Repasa todas las tarjetas ronda por ronda. Las tarjetas fallidas se repiten hasta dominarlas. Sin impacto en el horario SRS."
+    }
+  },
+  "quickStudy": {
+    "title": "Estudio rápido",
+    "noDecks": "Sin mazos. Por favor crea un mazo primero.",
+    "cardCount": "{{count}} tarjetas",
+    "newCards": "Nuevas {{count}}",
+    "reviewCards": "Repaso {{count}}",
+    "selectDate": "Selecciona una fecha para estudiar",
+    "setBatchSize": "Establecer tamaño del lote",
+    "selectMode": "Selecciona un modo de estudio",
+    "startStudy": "Comenzar estudio",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count}} tarjetas",
+    "batchSize": "Tamaño del lote",
+    "batchSizeDesc": "Tarjetas a estudiar por sesión ({{min}}~{{max}})",
+    "batchSizeDescReview": "Tarjetas de repaso por sesión — todas las nuevas incluidas ({{min}}~{{max}})",
+    "backToModeSelect": "← Volver a selección de modo",
+    "crammingSetup": "Configurar opciones de estudio intensivo"
+  },
+  "setup": {
+    "title": "Configuración de estudio",
+    "deckInfo": "{{icon}} {{name}} · {{count}} tarjetas",
+    "studyMode": "Modo de estudio",
+    "selectUploadDate": "Seleccionar fecha de subida",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count}} tarjetas"
+  },
+  "session": {
+    "loading": "Cargando...",
+    "noCards": "No hay tarjetas para estudiar",
+    "allReviewed": "¡Todas las tarjetas repasadas!",
+    "backToDeck": "Volver al mazo"
+  },
+  "card": {
+    "tapToFlip": "Toca para voltear",
+    "tapToSeeAnswer": "Toca la tarjeta para ver la respuesta",
+    "tapToReveal": "Toca la tarjeta para ver la respuesta",
+    "ttsPlay": "Reproducir TTS",
+    "front": "FRENTE",
+    "back": "REVERSO"
+  },
+  "rating": {
+    "dontKnow": "No lo sé",
+    "knowIt": "Lo sé",
+    "known": "Conocida",
+    "unknown": "Desconocida",
+    "next": "Siguiente →"
+  },
+  "summary": {
+    "title": "¡Estudio completado!",
+    "completed": "¡Estudio completado!",
+    "greatJob": "¡Buen trabajo!",
+    "wellDone": "¡Buen trabajo! Sigue así.",
+    "studyCards": "Tarjetas estudiadas",
+    "cardsStudied": "Tarjetas estudiadas",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "Tiempo invertido",
+    "timeFormat": "{{minutes}}m {{seconds}}s",
+    "avgPerCard": "Promedio por tarjeta",
+    "secondsFormat": "{{seconds}}s",
+    "ratingDistribution": "Distribución de calificaciones",
+    "backToDeck": "Volver al mazo",
+    "studyAgain": "Estudiar de nuevo",
+    "sessionEnded": "Sesión finalizada",
+    "progressSoFar": "Aquí está tu progreso hasta ahora.",
+    "knowIt": "Lo sé",
+    "dontKnow": "No lo sé",
+    "next": "Siguiente"
+  },
+  "weekdays": {
+    "sun": "Dom",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mié",
+    "thu": "Jue",
+    "fri": "Vie",
+    "sat": "Sáb"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10min",
+    "minutes": "{{count}}min",
+    "hours": "{{count}}h",
+    "oneDay": "1d",
+    "days": "{{count}}d",
+    "months": "{{count}}m",
+    "years": "{{count}}a"
+  },
+  "srsRating": {
+    "again": "Otra vez",
+    "hard": "Difícil",
+    "good": "Bien",
+    "easy": "Fácil"
+  },
+  "cramming": {
+    "gotIt": "¡Lo sé!",
+    "missed": "No lo sé",
+    "round": "Ronda {{round}}",
+    "mastery": "Dominio: {{percentage}}%",
+    "filter": {
+      "title": "Filtro de tarjetas",
+      "all": "Todas las tarjetas",
+      "allDesc": "Estudiar todas las tarjetas no suspendidas del mazo",
+      "weak": "Solo tarjetas débiles",
+      "weakDesc": "Tarjetas difíciles (factor de facilidad bajo) o nuevas",
+      "dueSoon": "Pendientes pronto",
+      "dueSoonDesc": "Tarjetas pendientes de repaso en 3 días"
+    },
+    "timeLimit": {
+      "title": "Límite de tiempo",
+      "none": "Sin límite",
+      "minutes": "{{count}} min"
+    },
+    "shuffle": {
+      "title": "Mezclar tarjetas",
+      "desc": "Mezclar el orden de tarjetas cada ronda"
+    },
+    "summary": {
+      "completed": "¡Estudio intensivo completado!",
+      "timeUp": "¡Se acabó el tiempo!",
+      "wellDone": "¡Gran esfuerzo! Sigue repasando para fortalecer tu memoria.",
+      "totalRounds": "Total de rondas",
+      "masteryRate": "Tasa de dominio",
+      "cardsStudied": "Tarjetas estudiadas",
+      "hardestCards": "Tarjetas más difíciles",
+      "missedTimes": "fallada {{count}}x",
+      "noSrsImpact": "Esta sesión no afectó tu horario SRS.",
+      "sessionEnded": "Sesión finalizada",
+      "crammingAgain": "Estudiar intensivo de nuevo",
+      "otherMode": "Otros modos"
+    }
+  },
+  "noCards": {
+    "otherMode": "Estudiar otro modo",
+    "srs": {
+      "title": "¡Todo al día!",
+      "message": "No hay tarjetas pendientes de repaso ahora. ¡Vuelve más tarde!"
+    },
+    "cramming": {
+      "weakTitle": "Sin tarjetas débiles",
+      "weakMessage": "¡Todas tus tarjetas están en buen estado!",
+      "dueSoonTitle": "Nada pendiente pronto",
+      "dueSoonMessage": "No hay tarjetas pendientes de repaso en 3 días."
+    },
+    "generic": {
+      "title": "Sin tarjetas para estudiar",
+      "message": "No hay tarjetas que coincidan con tus criterios."
+    }
+  }
+}

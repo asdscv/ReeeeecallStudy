@@ -5,12 +5,15 @@ vi.mock('i18next', () => ({
 }))
 
 import { calculateSRS, previewIntervals, type SrsCardData } from '../srs'
-import type { Card } from '../../types/database'
+import type { Card, SrsSettings } from '../../types/database'
 
 /**
  * Tests that SrsCardData interface works with calculateSRS
  * and that existing Card type still works (backward compatibility).
  */
+
+// Use no-steps settings to test pure review logic (backward compat)
+const NO_STEPS: SrsSettings = { again_days: 0, hard_days: 1, good_days: 1, easy_days: 4, learning_steps: [] }
 
 function makeCard(overrides?: Partial<Card>): Card {
   return {
@@ -46,7 +49,7 @@ function makeSrsData(overrides?: Partial<SrsCardData>): SrsCardData {
 describe('SrsCardData backward compatibility', () => {
   it('should accept SrsCardData (minimal interface) in calculateSRS', () => {
     const data = makeSrsData()
-    const result = calculateSRS(data, 'good')
+    const result = calculateSRS(data, 'good', NO_STEPS)
 
     expect(result.srs_status).toBe('review')
     expect(result.interval_days).toBe(1)
@@ -55,18 +58,18 @@ describe('SrsCardData backward compatibility', () => {
 
   it('should accept full Card object in calculateSRS (unchanged behavior)', () => {
     const card = makeCard()
-    const result = calculateSRS(card, 'good')
+    const result = calculateSRS(card, 'good', NO_STEPS)
 
     expect(result.srs_status).toBe('review')
     expect(result.interval_days).toBe(1)
   })
 
   it('should produce same result for Card and matching SrsCardData', () => {
-    const card = makeCard({ ease_factor: 2.5, repetitions: 2, interval_days: 10 })
+    const card = makeCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 2, interval_days: 10 })
     const data = makeSrsData({ ease_factor: 2.5, repetitions: 2, interval_days: 10, srs_status: 'review' })
 
-    const cardResult = calculateSRS(card, 'good')
-    const dataResult = calculateSRS(data, 'good')
+    const cardResult = calculateSRS(card, 'good', NO_STEPS)
+    const dataResult = calculateSRS(data, 'good', NO_STEPS)
 
     expect(cardResult.ease_factor).toBe(dataResult.ease_factor)
     expect(cardResult.interval_days).toBe(dataResult.interval_days)
@@ -80,20 +83,32 @@ describe('SrsCardData backward compatibility', () => {
       interval_days: 1,
       repetitions: 1,
     })
+    // With default learning_steps [1, 10], a learning card at step 1 + good → graduates
     const result = calculateSRS(progressData, 'good')
 
     expect(result.srs_status).toBe('review')
-    expect(result.interval_days).toBe(3)
-    expect(result.repetitions).toBe(2)
+    expect(result.interval_days).toBe(1) // good_days
+    expect(result.repetitions).toBe(1)
   })
 
-  it('previewIntervals should work with SrsCardData', () => {
+  it('previewIntervals should work with SrsCardData (no steps)', () => {
     const data = makeSrsData()
-    const preview = previewIntervals(data)
+    const preview = previewIntervals(data, NO_STEPS)
 
     expect(preview.again).toBe('study:interval.lessThanTenMin')
     expect(preview.hard).toBe('study:interval.oneDay')
     expect(preview.good).toBe('study:interval.oneDay')
+    expect(preview.easy).toBe('study:interval.days:4')
+  })
+
+  it('previewIntervals should work with SrsCardData (with learning steps)', () => {
+    const data = makeSrsData()
+    const preview = previewIntervals(data) // uses default learning_steps [1, 10]
+
+    // New card with steps: again → 1min, hard → 1min, good → 10min, easy → 4d
+    expect(preview.again).toBe('study:interval.minutes:1')
+    expect(preview.hard).toBe('study:interval.minutes:1')
+    expect(preview.good).toBe('study:interval.minutes:10')
     expect(preview.easy).toBe('study:interval.days:4')
   })
 })

@@ -51,14 +51,15 @@ export class SrsQueueManager {
     return this.queue[this.cursor]
   }
 
-  /** Rate the current card and advance. "again" cards are requeued. */
-  rateCard(rating: SrsRating | string): void {
+  /** Rate the current card and advance. Requeues cards rated "again" or when shouldRequeue=true (learning cards). */
+  rateCard(rating: SrsRating | string, shouldRequeue?: boolean): void {
     const card = this.currentCard()
     if (!card) return
 
     this.studied++
 
-    if (rating === 'again') {
+    const requeue = shouldRequeue ?? (rating === 'again')
+    if (requeue) {
       const count = this.requeueCount.get(card.id) ?? 0
       if (count < MAX_REQUEUE_PER_CARD) {
         this.requeueCount.set(card.id, count + 1)

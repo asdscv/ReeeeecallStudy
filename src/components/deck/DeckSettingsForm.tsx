@@ -42,6 +42,15 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
     update({ srsSettings: { ...srsSettings, [key]: Math.max(0, Math.min(365, value)) } })
   }
 
+  const learningStepsStr = (srsSettings.learning_steps ?? [1, 10]).join(', ')
+  const updateLearningSteps = (raw: string) => {
+    const steps = raw
+      .split(',')
+      .map(s => parseInt(s.trim(), 10))
+      .filter(n => !isNaN(n) && n >= 0 && n <= 1440)
+    update({ srsSettings: { ...srsSettings, learning_steps: steps } })
+  }
+
   return (
     <div className="space-y-4">
       {/* 이름 */}
@@ -155,6 +164,23 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         </div>
         <p className="text-xs text-gray-400 mt-1.5">
           {t('settings.srsNote')}
+        </p>
+      </div>
+
+      {/* Learning Steps */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t('settings.learningSteps')}
+        </label>
+        <input
+          type="text"
+          value={learningStepsStr}
+          onChange={(e) => updateLearningSteps(e.target.value)}
+          placeholder="1, 10"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+        />
+        <p className="text-xs text-gray-400 mt-1.5">
+          {t('settings.learningStepsNote')}
         </p>
       </div>
     </div>

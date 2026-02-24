@@ -112,6 +112,8 @@
   },
   "interval": {
     "lessThanTenMin": "< 10分",
+    "minutes": "{{count}}分",
+    "hours": "{{count}}時間",
     "oneDay": "1日",
     "days": "{{count}}日",
     "months": "{{count}}ヶ月",
