@@ -114,6 +114,8 @@
   },
   "interval": {
     "lessThanTenMin": "< 10分钟",
+    "minutes": "{{count}}分钟",
+    "hours": "{{count}}小时",
     "oneDay": "1天",
     "days": "{{count}}天",
     "months": "{{count}}月",

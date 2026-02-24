@@ -114,6 +114,8 @@
   },
   "interval": {
     "lessThanTenMin": "< 10min",
+    "minutes": "{{count}}min",
+    "hours": "{{count}}h",
     "oneDay": "1d",
     "days": "{{count}}d",
     "months": "{{count}}m",

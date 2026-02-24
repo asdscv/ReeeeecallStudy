@@ -50,7 +50,9 @@
     "noSelection": "No selection",
     "defaultLabel": "(default)",
     "srsInterval": "Initial SRS Intervals (days)",
-    "srsNote": "Again 0 = Relearn after 10 minutes. Interval increases automatically on subsequent reviews."
+    "srsNote": "Again 0 = Relearn after 10 minutes. Interval increases automatically on subsequent reviews.",
+    "learningSteps": "Learning Steps (minutes)",
+    "learningStepsNote": "Comma-separated minutes. New cards pass through these steps before graduating to review. e.g., 1, 10"
   },
   "edit": {
     "title": "Edit Deck",

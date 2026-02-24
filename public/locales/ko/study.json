@@ -114,6 +114,8 @@
   },
   "interval": {
     "lessThanTenMin": "< 10분",
+    "minutes": "{{count}}분",
+    "hours": "{{count}}시간",
     "oneDay": "1일",
     "days": "{{count}}일",
     "months": "{{count}}개월",

@@ -240,10 +240,75 @@ describe('SrsQueueManager', () => {
     })
   })
 
+  describe('rateCard — shouldRequeue parameter', () => {
+    it('should requeue when shouldRequeue=true even if rating is good', () => {
+      const cards = [makeCard('c1'), makeCard('c2'), makeCard('c3'), makeCard('c4'), makeCard('c5')]
+      const mgr = new SrsQueueManager(cards)
+
+      // Rate c1 as "good" but force requeue (learning card scenario)
+      mgr.rateCard('good', true)
+
+      // c1 should be re-inserted in the queue
+      const seen: string[] = []
+      while (!mgr.isComplete()) {
+        const card = mgr.currentCard()!
+        seen.push(card.id)
+        mgr.rateCard('good')
+      }
+      expect(seen).toContain('c1')
+    })
+
+    it('should NOT requeue when shouldRequeue=false even if rating is again', () => {
+      const cards = [makeCard('c1'), makeCard('c2'), makeCard('c3')]
+      const mgr = new SrsQueueManager(cards)
+
+      // Rate c1 as "again" but explicitly prevent requeue
+      mgr.rateCard('again', false)
+
+      const seen: string[] = []
+      while (!mgr.isComplete()) {
+        const card = mgr.currentCard()!
+        seen.push(card.id)
+        mgr.rateCard('good')
+      }
+      // c1 should NOT appear again
+      expect(seen).not.toContain('c1')
+    })
+
+    it('should default to again-based requeue when shouldRequeue is undefined', () => {
+      const cards = [makeCard('c1'), makeCard('c2'), makeCard('c3'), makeCard('c4'), makeCard('c5')]
+      const mgr = new SrsQueueManager(cards)
+
+      // No shouldRequeue → defaults to rating === 'again'
+      mgr.rateCard('again')
+
+      const seen: string[] = []
+      while (!mgr.isComplete()) {
+        const card = mgr.currentCard()!
+        seen.push(card.id)
+        mgr.rateCard('good')
+      }
+      expect(seen).toContain('c1') // requeued because again
+    })
+  })
+
   describe('getSrsResult', () => {
-    it('should return the SRS calculation result for a card rating', () => {
+    it('should return the SRS calculation result for a card rating (with learning steps)', () => {
       const cards = [makeCard('c1', { srs_status: 'new', ease_factor: 2.5, repetitions: 0 })]
       const mgr = new SrsQueueManager(cards)
+
+      const result = mgr.getSrsResult('good')
+      expect(result).toBeDefined()
+      // With default learning_steps [1, 10], good on new card → step 1 (learning)
+      expect(result!.srs_status).toBe('learning')
+      expect(result!.interval_days).toBe(0)
+      expect(result!.repetitions).toBe(1)
+    })
+
+    it('should return review status when no learning steps', () => {
+      const cards = [makeCard('c1', { srs_status: 'new', ease_factor: 2.5, repetitions: 0 })]
+      const settings = { again_days: 0, hard_days: 1, good_days: 1, easy_days: 4, learning_steps: [] as number[] }
+      const mgr = new SrsQueueManager(cards, settings)
 
       const result = mgr.getSrsResult('good')
       expect(result).toBeDefined()
@@ -258,7 +323,7 @@ describe('SrsQueueManager', () => {
 
     it('should use custom SRS settings when provided', () => {
       const cards = [makeCard('c1', { srs_status: 'new', repetitions: 0 })]
-      const settings = { again_days: 1, hard_days: 2, good_days: 3, easy_days: 7 }
+      const settings = { again_days: 1, hard_days: 2, good_days: 3, easy_days: 7, learning_steps: [] as number[] }
       const mgr = new SrsQueueManager(cards, settings)
 
       const result = mgr.getSrsResult('good')
