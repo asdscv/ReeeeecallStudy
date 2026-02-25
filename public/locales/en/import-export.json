@@ -8,6 +8,8 @@
   "exportCount": "{{count}} cards will be exported.",
   "cancel": "Cancel",
   "export": "Export",
+  "exportComplete": "Export Complete",
+  "exportFileSaved": "{{fileName}} has been saved.",
 
   "unsupportedFormat": "Only JSON or CSV files are supported.",
   "parseFailed": "File parsing failed.",

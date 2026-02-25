@@ -21,6 +21,12 @@ interface CardState {
     srs_status?: string
   }) => Promise<void>
   deleteCard: (id: string) => Promise<void>
+  createCards: (data: {
+    deck_id: string
+    template_id: string
+    cards: { field_values: Record<string, string>; tags?: string[] }[]
+    onProgress?: (inserted: number, total: number) => void
+  }) => Promise<number>
   deleteCards: (ids: string[]) => Promise<void>
   resetSRS: (id: string) => Promise<void>
 }
@@ -97,6 +103,43 @@ export const useCardStore = create<CardState>((set, get) => ({
     guard.recordSuccess('cards_total')
     await get().fetchCards(input.deck_id)
     return card as Card
+  },
+
+  createCards: async ({ deck_id, template_id, cards, onProgress }) => {
+    const check = guard.check('bulk_card_create', 'cards_total')
+    if (!check.allowed) { set({ error: check.message ?? 'errors:card.rateLimitReached' }); return 0 }
+
+    const CHUNK_SIZE = 500
+    let totalInserted = 0
+
+    for (let i = 0; i < cards.length; i += CHUNK_SIZE) {
+      const chunk = cards.slice(i, i + CHUNK_SIZE)
+      const payload = chunk.map(c => ({
+        field_values: c.field_values,
+        tags: c.tags ?? [],
+      }))
+
+      const { data, error } = await supabase.rpc('bulk_insert_cards', {
+        p_deck_id: deck_id,
+        p_template_id: template_id,
+        p_cards: payload,
+      })
+
+      if (error) {
+        set({ error: error.message })
+        break
+      }
+
+      const inserted = (data as { inserted: number })?.inserted ?? chunk.length
+      totalInserted += inserted
+      onProgress?.(totalInserted, cards.length)
+    }
+
+    guard.recordSuccess('cards_total', totalInserted)
+    if (!get().error) {
+      await get().fetchCards(deck_id)
+    }
+    return totalInserted
   },
 
   updateCard: async (id, data) => {

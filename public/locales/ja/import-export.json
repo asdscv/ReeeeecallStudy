@@ -8,6 +8,8 @@
   "exportCount": "{{count}}枚のカードがエクスポートされます。",
   "cancel": "キャンセル",
   "export": "エクスポート",
+  "exportComplete": "エクスポート完了",
+  "exportFileSaved": "{{fileName}}が保存されました。",
 
   "unsupportedFormat": "JSONまたはCSVファイルのみ対応しています。",
   "parseFailed": "ファイルの解析に失敗しました。",

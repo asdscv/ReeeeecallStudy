@@ -8,6 +8,8 @@
   "exportCount": "{{count}} thẻ sẽ được xuất.",
   "cancel": "Hủy",
   "export": "Xuất",
+  "exportComplete": "Xuất hoàn tất",
+  "exportFileSaved": "{{fileName}} đã được lưu.",
 
   "unsupportedFormat": "Chỉ hỗ trợ tệp JSON hoặc CSV.",
   "parseFailed": "Phân tích tệp thất bại.",

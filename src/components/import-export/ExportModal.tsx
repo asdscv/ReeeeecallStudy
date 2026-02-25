@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -19,10 +19,24 @@ interface ExportModalProps {
 }
 
 type ExportFormat = 'json' | 'csv'
+type ExportStep = 'select' | 'done'
 
 export function ExportModal({ open, onClose, deck, template, cards }: ExportModalProps) {
   const { t } = useTranslation('import-export')
   const [format, setFormat] = useState<ExportFormat>('json')
+  const [step, setStep] = useState<ExportStep>('select')
+  const [exportedFileName, setExportedFileName] = useState('')
+
+  const resetState = useCallback(() => {
+    setFormat('json')
+    setStep('select')
+    setExportedFileName('')
+  }, [])
+
+  const handleClose = () => {
+    resetState()
+    onClose()
+  }
 
   const handleExport = () => {
     if (!template) return
@@ -46,80 +60,105 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
     const blob = new Blob([bom + content], { type: mimeType })
     const url = URL.createObjectURL(blob)
 
+    const fileName = `${deck.name}_${new Date().toISOString().slice(0, 10)}.${ext}`
     const a = document.createElement('a')
     a.href = url
-    a.download = `${deck.name}_${new Date().toISOString().slice(0, 10)}.${ext}`
+    a.download = fileName
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
 
-    onClose()
+    setExportedFileName(fileName)
+    setStep('done')
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('exportCards')}</DialogTitle>
         </DialogHeader>
-        {!template ? (
-          <p className="text-gray-500">{t('noTemplate')}</p>
-        ) : cards.length === 0 ? (
-          <p className="text-gray-500">{t('noCards')}</p>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">{t('format')}</p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setFormat('json')}
-                  className={`flex-1 p-4 rounded-xl border-2 text-left cursor-pointer transition ${
-                    format === 'json'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <p className="font-medium text-gray-900">JSON</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {t('jsonDesc')}
-                  </p>
-                </button>
-                <button
-                  onClick={() => setFormat('csv')}
-                  className={`flex-1 p-4 rounded-xl border-2 text-left cursor-pointer transition ${
-                    format === 'csv'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <p className="font-medium text-gray-900">CSV</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {t('csvDesc')}
-                  </p>
-                </button>
-              </div>
-            </div>
 
-            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
-              {t('exportCount', { count: cards.length })}
-            </div>
-
-            <DialogFooter>
-              <button
-                onClick={onClose}
-                className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                {t('cancel')}
-              </button>
-              <button
-                onClick={handleExport}
-                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
-              >
-                {t('export')}
-              </button>
-            </DialogFooter>
+        {/* Step: Done */}
+        {step === 'done' && (
+          <div className="text-center py-6 space-y-3">
+            <div className="text-4xl">✅</div>
+            <p className="text-gray-900 font-medium">{t('exportComplete')}</p>
+            <p className="text-sm text-gray-500">
+              {t('exportFileSaved', { fileName: exportedFileName })}
+            </p>
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
+            >
+              {t('confirm')}
+            </button>
           </div>
+        )}
+
+        {/* Step: Select */}
+        {step === 'select' && (
+          <>
+            {!template ? (
+              <p className="text-gray-500">{t('noTemplate')}</p>
+            ) : cards.length === 0 ? (
+              <p className="text-gray-500">{t('noCards')}</p>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">{t('format')}</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setFormat('json')}
+                      className={`flex-1 p-4 rounded-xl border-2 text-left cursor-pointer transition ${
+                        format === 'json'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <p className="font-medium text-gray-900">JSON</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {t('jsonDesc')}
+                      </p>
+                    </button>
+                    <button
+                      onClick={() => setFormat('csv')}
+                      className={`flex-1 p-4 rounded-xl border-2 text-left cursor-pointer transition ${
+                        format === 'csv'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <p className="font-medium text-gray-900">CSV</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {t('csvDesc')}
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                  {t('exportCount', { count: cards.length })}
+                </div>
+
+                <DialogFooter>
+                  <button
+                    onClick={handleClose}
+                    className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    onClick={handleExport}
+                    className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
+                  >
+                    {t('export')}
+                  </button>
+                </DialogFooter>
+              </div>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>

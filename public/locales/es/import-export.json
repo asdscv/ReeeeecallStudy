@@ -8,6 +8,8 @@
   "exportCount": "Se exportarán {{count}} tarjetas.",
   "cancel": "Cancelar",
   "export": "Exportar",
+  "exportComplete": "Exportacion completada",
+  "exportFileSaved": "{{fileName}} se ha guardado.",
   "unsupportedFormat": "Solo se admiten archivos JSON o CSV.",
   "parseFailed": "El análisis del archivo falló.",
   "csvParseFailed": "El análisis del CSV falló.",

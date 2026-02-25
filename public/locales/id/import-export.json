@@ -8,6 +8,8 @@
   "exportCount": "{{count}} kartu akan diekspor.",
   "cancel": "Batal",
   "export": "Ekspor",
+  "exportComplete": "Ekspor selesai",
+  "exportFileSaved": "{{fileName}} telah disimpan.",
 
   "unsupportedFormat": "Hanya file JSON atau CSV yang didukung.",
   "parseFailed": "Penguraian file gagal.",

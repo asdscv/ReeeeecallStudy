@@ -8,6 +8,8 @@
   "exportCount": "{{count}}개의 카드를 내보냅니다.",
   "cancel": "취소",
   "export": "내보내기",
+  "exportComplete": "내보내기 완료",
+  "exportFileSaved": "{{fileName}} 파일이 저장되었습니다.",
 
   "unsupportedFormat": "JSON 또는 CSV 파일만 지원합니다.",
   "parseFailed": "파일 파싱에 실패했습니다.",

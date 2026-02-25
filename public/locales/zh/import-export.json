@@ -8,6 +8,8 @@
   "exportCount": "将导出 {{count}} 张卡片。",
   "cancel": "取消",
   "export": "导出",
+  "exportComplete": "导出完成",
+  "exportFileSaved": "{{fileName}} 已保存。",
 
   "unsupportedFormat": "仅支持 JSON 或 CSV 文件。",
   "parseFailed": "文件解析失败。",

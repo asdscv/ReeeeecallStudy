@@ -178,7 +178,7 @@ export function DeckDetailPage() {
   }
 
   const handleImportComplete = () => {
-    if (deckId) fetchCards(deckId)
+    // createCards already calls fetchCards internally, no need to refetch
   }
 
   const tabs: { id: TabId; label: string }[] = [

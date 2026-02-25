@@ -16,6 +16,7 @@ import {
 } from '../../lib/import-export'
 import type { ImportCard } from '../../lib/import-export'
 import type { CardTemplate } from '../../types/database'
+import { ImportProgressBar } from './ImportProgressBar'
 import Papa from 'papaparse'
 
 interface ImportModalProps {
@@ -32,7 +33,7 @@ type DuplicateMode = 'skip' | 'overwrite' | 'add'
 
 export function ImportModal({ open, onClose, deckId, templateId, template, onComplete }: ImportModalProps) {
   const { t } = useTranslation('import-export')
-  const { cards: existingCards, createCard } = useCardStore()
+  const { cards: existingCards, createCards, error: storeError } = useCardStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState<ImportStep>('upload')
@@ -42,6 +43,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
   const [invalidCount, setInvalidCount] = useState(0)
   const [duplicateCount, setDuplicateCount] = useState(0)
   const [duplicateMode, setDuplicateMode] = useState<DuplicateMode>('skip')
+  const [progress, setProgress] = useState({ done: 0, total: 0 })
   const [result, setResult] = useState({ added: 0, skipped: 0, total: 0 })
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -54,6 +56,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
     setInvalidCount(0)
     setDuplicateCount(0)
     setDuplicateMode('skip')
+    setProgress({ done: 0, total: 0 })
     setResult({ added: 0, skipped: 0, total: 0 })
     setError(null)
     setDragOver(false)
@@ -150,25 +153,18 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
       cardsToImport = unique
     }
 
-    let added = 0
-    const batchSize = 1000
+    setProgress({ done: 0, total: cardsToImport.length })
 
-    for (let i = 0; i < cardsToImport.length; i += batchSize) {
-      const batch = cardsToImport.slice(i, i + batchSize)
-      for (const card of batch) {
-        const created = await createCard({
-          deck_id: deckId,
-          template_id: templateId,
-          field_values: card.field_values,
-          tags: card.tags,
-        })
-        if (created) added++
-      }
-    }
+    const inserted = await createCards({
+      deck_id: deckId,
+      template_id: templateId,
+      cards: cardsToImport.map(c => ({ field_values: c.field_values, tags: c.tags })),
+      onProgress: (done, total) => setProgress({ done, total }),
+    })
 
     setResult({
-      added,
-      skipped: parsedCards.length - added,
+      added: inserted,
+      skipped: parsedCards.length - inserted,
       total: parsedCards.length,
     })
     setStep('done')
@@ -375,20 +371,20 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
 
         {/* Step: Importing */}
         {step === 'importing' && (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-3 animate-pulse">📥</div>
-            <p className="text-gray-600">{t('importing')}</p>
-          </div>
+          <ImportProgressBar done={progress.done} total={progress.total} label={t('importing')} />
         )}
 
         {/* Step: Done */}
         {step === 'done' && (
           <div className="text-center py-6 space-y-3">
-            <div className="text-4xl">✅</div>
+            <div className="text-4xl">{storeError ? '⚠️' : '✅'}</div>
             <p className="text-gray-900 font-medium">{t('importComplete')}</p>
             <p className="text-sm text-gray-500">
               {t('importSummary', { total: result.total, added: result.added, skipped: result.skipped })}
             </p>
+            {storeError && (
+              <p className="text-sm text-red-600">{storeError}</p>
+            )}
             <button
               onClick={handleDone}
               className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
