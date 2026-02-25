@@ -11,6 +11,7 @@ vi.mock('lucide-react', () => ({
   Check: () => <span data-testid="check-icon" />,
   BookOpen: () => <span data-testid="book-icon" />,
   ChevronRight: () => <span data-testid="chevron-right" />,
+  Globe: () => <span data-testid="globe-icon" />,
 }))
 
 function renderPage() {

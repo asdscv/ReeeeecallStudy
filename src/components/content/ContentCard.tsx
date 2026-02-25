@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { ContentListItem } from '../../types/content-blocks'
+import { stripMarkdownText } from '../../lib/content-blocks'
 
 interface ContentCardProps {
   content: ContentListItem
@@ -28,7 +29,7 @@ export function ContentCard({ content }: ContentCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5">
             <h3 className="text-2xl md:text-3xl font-bold text-white leading-snug">
-              {content.title}
+              {stripMarkdownText(content.title)}
             </h3>
           </div>
         </div>
@@ -36,7 +37,7 @@ export function ContentCard({ content }: ContentCardProps) {
         <div className="relative w-full h-full bg-gradient-to-br from-blue-600 to-blue-800">
           <div className="absolute bottom-0 left-0 right-0 p-5">
             <h3 className="text-2xl md:text-3xl font-bold text-white leading-snug">
-              {content.title}
+              {stripMarkdownText(content.title)}
             </h3>
           </div>
         </div>

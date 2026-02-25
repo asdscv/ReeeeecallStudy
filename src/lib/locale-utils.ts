@@ -1,6 +1,16 @@
 export const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
+export const SUPPORTED_LANGUAGE_OPTIONS = [
+  { code: 'en', label: 'English' },
+  { code: 'ko', label: '한국어' },
+  { code: 'zh', label: '中文（简体）' },
+  { code: 'ja', label: '日本語' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'th', label: 'ภาษาไทย' },
+  { code: 'id', label: 'Bahasa Indonesia' },
+] as const satisfies readonly { code: SupportedLocale; label: string }[]
+
 const INTL_LOCALE_MAP: Record<SupportedLocale, string> = {
   en: 'en-US',
   ko: 'ko-KR',

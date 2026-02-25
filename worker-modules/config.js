@@ -3,14 +3,14 @@
 export const LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id']
 
 export const PIPELINE_DEFAULTS = {
-  topicsPerRun: 10,
-  maxExtraTopics: 5,
+  topicsPerRun: 5,
+  maxExtraTopics: 3,
   maxBlocks: 13,
   minBlocks: 7,
   maxRetries: 3,
   recentContentLimit: 100,
   maxValidationRetries: 3,
-  topicGenerationCount: 14,
+  topicGenerationCount: 8,
 }
 
 export const RETRY_DELAYS = [1000, 3000, 8000]

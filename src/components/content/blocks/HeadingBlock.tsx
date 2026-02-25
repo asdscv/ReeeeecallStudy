@@ -1,4 +1,5 @@
 import type { HeadingBlock as HeadingBlockType } from '../../../types/content-blocks'
+import { stripMarkdownText } from '../../../lib/content-blocks'
 
 export function HeadingBlock({ props }: { props: HeadingBlockType['props'] }) {
   const Tag = props.level === 2 ? 'h2' : 'h3'
@@ -11,7 +12,7 @@ export function HeadingBlock({ props }: { props: HeadingBlockType['props'] }) {
       {props.accent !== false && props.level === 2 && (
         <div className="w-12 h-1 bg-blue-600 rounded-full mb-3" />
       )}
-      <Tag className={sizeClass}>{props.text}</Tag>
+      <Tag className={sizeClass}>{stripMarkdownText(props.text)}</Tag>
     </div>
   )
 }

@@ -1,32 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
 import { ScrollReveal } from './ScrollReveal'
-
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'ko', label: '한국어' },
-  { code: 'ja', label: '日本語' },
-  { code: 'zh', label: '中文' },
-]
+import { LanguageSelector } from '../common/LanguageSelector'
 
 export function FooterSection() {
-  const { t, i18n } = useTranslation('landing')
-  const [langOpen, setLangOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  const currentLang = LANGUAGES.find((l) => i18n.language?.startsWith(l.code)) ?? LANGUAGES[0]
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setLangOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  const { t } = useTranslation('landing')
 
   return (
     <footer className="border-t border-gray-200 bg-gray-50 pb-20 sm:pb-0">
@@ -44,34 +22,7 @@ export function FooterSection() {
               </p>
 
               {/* Language switcher */}
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setLangOpen(!langOpen)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition cursor-pointer"
-                >
-                  <span>🌐</span>
-                  <span>{currentLang.label}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${langOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {langOpen && (
-                  <div className="absolute bottom-full mb-1 left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
-                    {LANGUAGES.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          i18n.changeLanguage(lang.code)
-                          setLangOpen(false)
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition cursor-pointer border-none bg-transparent ${
-                          currentLang.code === lang.code ? 'text-blue-600 font-medium' : 'text-gray-600'
-                        }`}
-                      >
-                        {lang.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <LanguageSelector direction="up" />
             </div>
 
             {/* Product column */}

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   SUPPORTED_LOCALES,
+  SUPPORTED_LANGUAGE_OPTIONS,
   resolveLocale,
   toIntlLocale,
   toContentLocale,
@@ -10,6 +11,39 @@ import {
 describe('SUPPORTED_LOCALES', () => {
   it('contains en, ko, zh, ja, vi, th, id', () => {
     expect(SUPPORTED_LOCALES).toEqual(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'])
+  })
+})
+
+describe('SUPPORTED_LANGUAGE_OPTIONS', () => {
+  it('has 7 language options', () => {
+    expect(SUPPORTED_LANGUAGE_OPTIONS).toHaveLength(7)
+  })
+
+  it('codes match SUPPORTED_LOCALES', () => {
+    const codes = SUPPORTED_LANGUAGE_OPTIONS.map((o) => o.code)
+    expect(codes).toEqual(SUPPORTED_LOCALES)
+  })
+
+  it('uses native language names', () => {
+    const labels = SUPPORTED_LANGUAGE_OPTIONS.map((o) => o.label)
+    expect(labels).toEqual([
+      'English',
+      '한국어',
+      '中文（简体）',
+      '日本語',
+      'Tiếng Việt',
+      'ภาษาไทย',
+      'Bahasa Indonesia',
+    ])
+  })
+
+  it('each option has code and label', () => {
+    for (const opt of SUPPORTED_LANGUAGE_OPTIONS) {
+      expect(typeof opt.code).toBe('string')
+      expect(typeof opt.label).toBe('string')
+      expect(opt.code.length).toBeGreaterThan(0)
+      expect(opt.label.length).toBeGreaterThan(0)
+    }
   })
 })
 

@@ -47,11 +47,49 @@ export const CONTENT_ICON_MAP: Record<string, LucideIcon> = {
   rocket: Rocket,
 }
 
+// Strip markdown formatting from plain text fields (frontend safety net)
+export function stripMarkdownText(str: string): string {
+  return str
+    .split('\n')
+    .map((line) => {
+      line = line.replace(/^#{1,6}\s+/, '')
+      line = line.replace(/^>\s?/, '')
+      line = line.replace(/^[-*]\s+/, '')
+      line = line.replace(/^\d+\.\s+/, '')
+      return line
+    })
+    .join('\n')
+    .replace(/```[\s\S]*?```/g, (match) => match.replace(/```\w*/g, ''))
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/~~(.+?)~~/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+}
+
+// Strip block-level markdown markers while preserving inline formatting (**bold**, *italic*, [link])
+function stripBlockMarkdown(str: string): string {
+  return str
+    .split('\n')
+    .map((line) => {
+      line = line.replace(/^#{1,6}\s+/, '')
+      line = line.replace(/^>\s?/, '')
+      line = line.replace(/^[-]\s+/, '')
+      line = line.replace(/^\d+\.\s+/, '')
+      return line
+    })
+    .join('\n')
+    .replace(/```[\s\S]*?```/g, (match) => match.replace(/```\w*/g, ''))
+    .replace(/~~(.+?)~~/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+}
+
 // Inline markdown parser — converts simple markdown to React elements
 // Supports: **bold**, *italic*, [link](url)
+// Pre-strips block-level markers (###, >, -, ```) before inline parsing
 export function parseInlineMarkdown(text: string): ReactNode[] {
   const nodes: ReactNode[] = []
-  let remaining = text
+  let remaining = stripBlockMarkdown(text)
   let key = 0
 
   while (remaining.length > 0) {

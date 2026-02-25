@@ -1,5 +1,5 @@
 import type { NumberedListBlock as NumberedListBlockType } from '../../../types/content-blocks'
-import { parseInlineMarkdown } from '../../../lib/content-blocks'
+import { parseInlineMarkdown, stripMarkdownText } from '../../../lib/content-blocks'
 
 export function NumberedListBlock({ props }: { props: NumberedListBlockType['props'] }) {
   return (
@@ -10,7 +10,7 @@ export function NumberedListBlock({ props }: { props: NumberedListBlockType['pro
             {i + 1}
           </span>
           <div>
-            <h4 className="text-lg font-bold text-gray-900">{item.heading}</h4>
+            <h4 className="text-lg font-bold text-gray-900">{stripMarkdownText(item.heading)}</h4>
             <p className="text-gray-600 mt-1">{parseInlineMarkdown(item.description)}</p>
           </div>
         </li>

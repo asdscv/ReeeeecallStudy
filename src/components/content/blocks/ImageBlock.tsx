@@ -1,4 +1,5 @@
 import type { ImageBlock as ImageBlockType } from '../../../types/content-blocks'
+import { stripMarkdownText } from '../../../lib/content-blocks'
 
 export function ImageBlock({ props }: { props: ImageBlockType['props'] }) {
   return (
@@ -11,7 +12,7 @@ export function ImageBlock({ props }: { props: ImageBlockType['props'] }) {
       />
       {props.caption && (
         <figcaption className="mt-2 text-center text-sm text-gray-500">
-          {props.caption}
+          {stripMarkdownText(props.caption)}
         </figcaption>
       )}
     </figure>

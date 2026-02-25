@@ -1,5 +1,5 @@
 import type { FeatureCardsBlock as FeatureCardsBlockType } from '../../../types/content-blocks'
-import { parseInlineMarkdown } from '../../../lib/content-blocks'
+import { parseInlineMarkdown, stripMarkdownText } from '../../../lib/content-blocks'
 
 const COLOR_MAP: Record<string, string> = {
   blue: 'bg-blue-50 text-blue-700',
@@ -20,7 +20,7 @@ export function FeatureCardsBlock({ props }: { props: FeatureCardsBlockType['pro
 
         return (
           <div key={i} className={`rounded-xl p-5 h-full flex flex-col justify-center ${bgColor}`}>
-            <h4 className="font-bold mb-1">{item.title}</h4>
+            <h4 className="font-bold mb-1">{stripMarkdownText(item.title)}</h4>
             <p className="text-sm opacity-80">{parseInlineMarkdown(item.description)}</p>
           </div>
         )

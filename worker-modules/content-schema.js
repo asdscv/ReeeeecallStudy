@@ -17,15 +17,42 @@ const HIGHLIGHT_VARIANTS = ['blue', 'green', 'amber']
 
 const BRAND_SUFFIX = ' | ReeeeecallStudy'
 
-// Strip markdown formatting (**bold**, *italic*) from plain text fields
-function stripMarkdown(str) {
+// Strip markdown formatting from plain text fields
+export function stripMarkdown(str) {
   if (typeof str !== 'string') return str
-  return str.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1')
+  return str
+    .split('\n')
+    .map((line) => {
+      // Heading markers: #{1,6} at start of line
+      line = line.replace(/^#{1,6}\s+/, '')
+      // Blockquote: > at start of line
+      line = line.replace(/^>\s?/, '')
+      // Unordered list: - or * at start of line (with space)
+      line = line.replace(/^[-*]\s+/, '')
+      // Ordered list: 1. 2. etc at start of line
+      line = line.replace(/^\d+\.\s+/, '')
+      return line
+    })
+    .join('\n')
+    // Fenced code blocks: ```...```
+    .replace(/```[\s\S]*?```/g, (match) => match.replace(/```\w*/g, ''))
+    // Links: [text](url)
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Strikethrough: ~~text~~
+    .replace(/~~(.+?)~~/g, '$1')
+    // Inline code: `code`
+    .replace(/`([^`]+)`/g, '$1')
+    // Bold: **text**
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    // Italic: *text*
+    .replace(/\*(.+?)\*/g, '$1')
 }
 
 const blockValidators = {
   hero(props) {
     if (!props.title || typeof props.title !== 'string') return 'hero: title required'
+    props.title = stripMarkdown(props.title)
+    if (props.subtitle) props.subtitle = stripMarkdown(props.subtitle)
     return null
   },
 
@@ -37,6 +64,7 @@ const blockValidators = {
   heading(props) {
     if (![2, 3].includes(props.level)) return 'heading: level must be 2 or 3'
     if (!props.text || typeof props.text !== 'string') return 'heading: text required'
+    props.text = stripMarkdown(props.text)
     return null
   },
 
@@ -89,6 +117,9 @@ const blockValidators = {
     if (!props.title || typeof props.title !== 'string') return 'cta: title required'
     if (!props.description || typeof props.description !== 'string') return 'cta: description required'
     if (!props.buttonText || typeof props.buttonText !== 'string') return 'cta: buttonText required'
+    props.title = stripMarkdown(props.title)
+    props.description = stripMarkdown(props.description)
+    props.buttonText = stripMarkdown(props.buttonText)
     // Base URL always enforced; UTM params injected by enrichCtaUrls()
     props.buttonUrl = '/auth/login'
     return null
@@ -148,6 +179,12 @@ export function validateArticle(article) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(article.slug)) errors.push('slug must be lowercase kebab-case')
   if (!article.meta_title || typeof article.meta_title !== 'string') errors.push('meta_title required')
   if (!article.meta_description || typeof article.meta_description !== 'string') errors.push('meta_description required')
+
+  // Strip markdown from article-level text fields
+  if (article.title) article.title = stripMarkdown(article.title)
+  if (article.subtitle) article.subtitle = stripMarkdown(article.subtitle)
+  if (article.meta_title) article.meta_title = stripMarkdown(article.meta_title)
+  if (article.meta_description) article.meta_description = stripMarkdown(article.meta_description)
 
   // Enforce brand suffix on meta_title
   if (article.meta_title && !article.meta_title.endsWith(BRAND_SUFFIX)) {
