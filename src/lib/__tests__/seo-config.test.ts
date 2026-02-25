@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { SEO, toOgLocale } from '../seo-config'
+import { SUPPORTED_LOCALES, OG_LOCALE_MAP } from '../locale-utils'
 
 describe('SEO config', () => {
   it('should export SITE_URL as absolute HTTPS URL', () => {
@@ -23,9 +24,10 @@ describe('SEO config', () => {
     expect(SEO.OG_IMAGE_HEIGHT).toBe(630)
   })
 
-  it('should export SUPPORTED_LOCALES with en and ko', () => {
-    expect(SEO.SUPPORTED_LOCALES).toContain('en')
-    expect(SEO.SUPPORTED_LOCALES).toContain('ko')
+  it('should export SUPPORTED_LOCALES with all locales', () => {
+    for (const locale of SUPPORTED_LOCALES) {
+      expect(SEO.SUPPORTED_LOCALES).toContain(locale)
+    }
   })
 
   it('should export SUPPORTED_LOCALES with vi, th, id', () => {
@@ -36,12 +38,8 @@ describe('SEO config', () => {
 })
 
 describe('toOgLocale', () => {
-  it('maps en to en_US', () => {
-    expect(toOgLocale('en')).toBe('en_US')
-  })
-
-  it('maps ko to ko_KR', () => {
-    expect(toOgLocale('ko')).toBe('ko_KR')
+  it.each(SUPPORTED_LOCALES)('maps %s to OG_LOCALE_MAP value', (locale) => {
+    expect(toOgLocale(locale)).toBe(OG_LOCALE_MAP[locale])
   })
 
   it('maps vi to vi_VN', () => {

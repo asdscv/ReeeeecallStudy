@@ -1,0 +1,25 @@
+{
+  "list": {
+    "title": "Artículos de aprendizaje",
+    "subtitle": "Consejos e inspiración para un mejor aprendizaje",
+    "noArticles": "No hay artículos publicados aún. ¡Vuelve pronto!",
+    "readingTime": "{{minutes}} min de lectura",
+    "reachedEnd": "Has visto todos los artículos",
+    "loadingMore": "Cargando más artículos..."
+  },
+  "detail": {
+    "backToList": "Volver a artículos",
+    "readingTime": "{{minutes}} min",
+    "notFound": "Artículo no encontrado"
+  },
+  "cta": {
+    "title": "Comienza con ReeeCall",
+    "description": "Experimenta el aprendizaje eficiente ahora mismo",
+    "button": "Comenzar gratis"
+  },
+  "seo": {
+    "listTitle": "Artículos de aprendizaje | ReeeCall",
+    "listDescription": "Descubre estrategias de aprendizaje respaldadas por la ciencia y consejos de repetición espaciada.",
+    "breadcrumbInsights": "Artículos de aprendizaje"
+  }
+}

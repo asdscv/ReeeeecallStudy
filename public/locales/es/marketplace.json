@@ -1,0 +1,55 @@
+{
+  "title": "Mercado",
+  "noResults": "Sin resultados de búsqueda.",
+  "noListings": "No hay mazos publicados aún.",
+  "searchPlaceholder": "Buscar mazos...",
+  "allCategories": "Todas las categorías",
+  "sortNewest": "Más recientes",
+  "sortPopular": "Popular",
+  "sortCardCount": "Cantidad de tarjetas",
+  "categories": {
+    "general": "General",
+    "language": "Idiomas",
+    "science": "Ciencia",
+    "math": "Matemáticas",
+    "history": "Historia",
+    "programming": "Programación",
+    "trivia": "Trivia",
+    "exam": "Preparación de exámenes",
+    "other": "Otros"
+  },
+  "shareModes": {
+    "copy": "Copiar",
+    "subscribe": "Suscribirse",
+    "snapshot": "Instantánea"
+  },
+  "listing": {
+    "cardCount": "{{count}} tarjetas",
+    "userCount": "{{count}} usuarios"
+  },
+  "detail": {
+    "back": "← Mercado",
+    "cardCount": "{{count}} tarjetas",
+    "userCount": "{{count}} usuarios",
+    "getDeck": "Obtener este mazo",
+    "importing": "Importando...",
+    "cardPreview": "Vista previa de tarjetas (máx 10)",
+    "noCards": "Sin tarjetas."
+  },
+  "preview": {
+    "title": "\"{{title}}\" - Mazo de tarjetas | ReeeeecallStudy",
+    "description": "{{title}} — {{cardCount}} tarjetas. Vista previa y estudia este mazo en ReeeeecallStudy.",
+    "defaultDescription": "Mazo de tarjetas en ReeeeecallStudy",
+    "sampleCards": "Tarjetas de muestra",
+    "viewInMarket": "Ver en el mercado",
+    "cardCount": "{{count}} tarjetas",
+    "userCount": "{{count}} usuarios",
+    "by": "por {{name}}",
+    "blurredNotice": "Inicia sesión para ver todas las tarjetas de este mazo",
+    "ctaLogin": "Inicia sesión para obtener este mazo",
+    "ctaSignup": "Regístrate gratis",
+    "notFound": "Mazo no encontrado",
+    "notFoundDescription": "Este mazo puede haber sido eliminado o ya no está disponible.",
+    "backToHome": "Volver al inicio"
+  }
+}

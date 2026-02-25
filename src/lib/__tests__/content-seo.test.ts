@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../locale-utils'
 
 vi.mock('i18next', () => ({
-  default: { language: 'en', t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue || key },
+  default: { language: DEFAULT_LOCALE, t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue || key },
 }))
 
 import {
@@ -23,7 +24,7 @@ import type { ContentDetail } from '../../types/content-blocks'
 const mockArticle: ContentDetail = {
   id: '1',
   slug: 'test-article',
-  locale: 'en',
+  locale: DEFAULT_LOCALE,
   title: 'Test Article',
   subtitle: 'Test subtitle',
   thumbnail_url: 'https://example.com/thumb.jpg',
@@ -57,7 +58,7 @@ describe('buildArticleJsonLd', () => {
 
   it('should include inLanguage from article locale', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.inLanguage).toBe('en')
+    expect(result.inLanguage).toBe(DEFAULT_LOCALE)
   })
 
   it('should include datePublished and dateModified', () => {
@@ -301,7 +302,7 @@ describe('buildOrganizationJsonLd', () => {
     // Each entry should be a full language name, not a locale code
     for (const lang of result.contactPoint.availableLanguage) {
       expect(typeof lang).toBe('string')
-      expect(lang.length).toBeGreaterThan(2) // not just 'en' or 'ko'
+      expect(lang.length).toBeGreaterThan(2) // full language name, not locale code
     }
   })
 
@@ -483,8 +484,8 @@ describe('buildStaticHreflangAlternates', () => {
 
   it('should use correct URL pattern with lang query param', () => {
     const result = buildStaticHreflangAlternates('/')
-    const en = result.find((r) => r.lang === 'en')
-    expect(en?.href).toBe(`${SEO.SITE_URL}/?lang=en`)
+    const defaultEntry = result.find((r) => r.lang === DEFAULT_LOCALE)
+    expect(defaultEntry?.href).toBe(`${SEO.SITE_URL}/?lang=${DEFAULT_LOCALE}`)
     const xDefault = result.find((r) => r.lang === 'x-default')
     expect(xDefault?.href).toBe(`${SEO.SITE_URL}/`)
   })

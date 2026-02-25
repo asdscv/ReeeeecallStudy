@@ -2,6 +2,7 @@
 
 import { callAI } from './ai-client.js'
 import { selectTopic } from './topic-registry.js'
+import { DEFAULT_LOCALE } from './config.js'
 import { info, warn } from './logger.js'
 
 const TOPIC_GENERATION_SYSTEM_PROMPT = `You are a topic planner for an educational blog about learning, studying, and knowledge retention.
@@ -45,7 +46,7 @@ export async function generateTopics(env, recentContent, count = 12) {
   try {
     const recentTitles = recentContent
       .slice(0, 100)
-      .filter(c => c.locale === 'en' || !c.locale)
+      .filter(c => c.locale === DEFAULT_LOCALE || !c.locale)
       .map(c => c.title)
       .slice(0, 50)
 

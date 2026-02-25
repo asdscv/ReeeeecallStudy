@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { ContentListItem, ContentDetail } from '../types/content-blocks'
 import i18n from '../i18n'
-import { toContentLocale } from '../lib/locale-utils'
+import { toContentLocale, DEFAULT_LOCALE } from '../lib/locale-utils'
 
 const PAGE_SIZE = 12
 
@@ -102,14 +102,14 @@ export const useContentStore = create<ContentState>((set, get) => ({
       .eq('locale', currentLocale)
       .single()
 
-    // Fallback to 'en' if not found in current locale
-    if (error && currentLocale !== 'en') {
+    // Fallback to default locale if not found in current locale
+    if (error && currentLocale !== DEFAULT_LOCALE) {
       const fallback = await supabase
         .from('contents')
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
-        .eq('locale', 'en')
+        .eq('locale', DEFAULT_LOCALE)
         .single()
 
       data = fallback.data

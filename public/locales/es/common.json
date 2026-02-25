@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "quickStudy": "Estudio Rápido",
+    "dashboard": "Panel",
+    "study": "Estudiar",
+    "decks": "Mazos",
+    "cards": "Tarjetas",
+    "marketplace": "Mercado",
+    "studyHistory": "Historial",
+    "settings": "Ajustes",
+    "admin": "Admin",
+    "guide": "Guía"
+  },
+  "actions": {
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "confirm": "Confirmar",
+    "ok": "OK",
+    "back": "Volver",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "copy": "Copiar",
+    "duplicate": "Duplicar",
+    "search": "Buscar",
+    "selectAll": "Seleccionar todo",
+    "deselect": "Deseleccionar",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "startStudy": "Comenzar estudio",
+    "logout": "Cerrar sesión"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "processing": "Procesando...",
+    "new": "Nuevo",
+    "learning": "Aprendiendo",
+    "review": "Repaso",
+    "suspended": "Suspendido"
+  },
+  "units": {
+    "cards": "tarjetas",
+    "cardsSuffix": "{{count}} tarjetas",
+    "sessions": "sesiones",
+    "items": "elementos",
+    "days": "días",
+    "hours": "h",
+    "minutes": "min",
+    "seconds": "seg",
+    "times": "veces",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}} por página"
+  },
+  "timePeriod": {
+    "1d": "1D",
+    "1w": "1S",
+    "1m": "1M",
+    "3m": "3M",
+    "6m": "6M",
+    "1y": "1A",
+    "2y": "2A",
+    "5y": "5A"
+  },
+  "confirmDialog": {
+    "cancel": "Cancelar",
+    "processing": "Procesando...",
+    "confirm": "Confirmar"
+  },
+  "delete": "Eliminar",
+  "deselect": "Deseleccionar",
+  "duplicate": "Duplicar",
+  "edit": "Editar",
+  "save": "Guardar",
+  "saving": "Guardando...",
+  "selectAll": "Seleccionar todo",
+  "menu": "Menú",
+  "copiedToClipboard": "Copiado al portapapeles",
+  "export": "Exportar",
+  "officialBadge": {
+    "label": "Oficial",
+    "tooltip": "Cuenta oficial"
+  }
+}

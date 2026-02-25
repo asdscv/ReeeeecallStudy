@@ -65,7 +65,9 @@
     "tapToFlip": "タップして裏返す",
     "tapToSeeAnswer": "カードをタップして答えを見る",
     "tapToReveal": "カードをタップして答えを見る",
-    "ttsPlay": "TTS再生"
+    "ttsPlay": "TTS再生",
+    "front": "おもて",
+    "back": "うら"
   },
   "rating": {
     "dontKnow": "わからない",

@@ -1,0 +1,168 @@
+{
+  "title": "Gestión de compartir",
+  "directShare": "Compartir directo",
+  "createShareLink": "+ Crear enlace de compartir",
+  "marketplace": "Mercado",
+  "userCount": "{{count}} usuarios · {{status}}",
+  "active": "Activo",
+  "inactive": "Inactivo",
+  "unpublish": "Retirar",
+  "publishNote": "Publicar en el mercado permite que cualquiera encuentre este mazo.",
+  "publishButton": "Publicar en el mercado",
+  "noSubscribers": "Sin usuarios compartidos aún.",
+  "inviteLink": "Enlace de invitación",
+  "cancel": "Revocar",
+  "shareDeck": "Compartir mazo",
+  "shareDeckDesc": "Compartiendo el mazo \"{{name}}\".",
+  "creating": "Creando...",
+  "createInviteLink": "Generar enlace de invitación",
+  "linkShareInfo": "Comparte este enlace para dar acceso al mazo.",
+  "shareMode": {
+    "label": "Modo de compartir",
+    "copy": {
+      "label": "Copiar",
+      "desc": "Los destinatarios pueden editar libremente.",
+      "detail": "Todas las operaciones de tarjetas posibles. Incluye añadir/editar/eliminar tarjetas. Completamente independiente del original."
+    },
+    "subscribe": {
+      "label": "Suscribirse",
+      "desc": "Sincronizado con el original, el progreso de estudio es separado.",
+      "detail": "Cuando añado tarjetas, los suscriptores también las reciben. No se permite editar tarjetas. El progreso de estudio se rastrea individualmente."
+    },
+    "snapshot": {
+      "label": "Instantánea",
+      "desc": "Copia de solo lectura del estado actual.",
+      "detail": "Copia las tarjetas actuales exactamente, pero no se permite editar. Una instantánea única del mazo."
+    }
+  },
+  "shareModes": {
+    "copy": {
+      "label": "Copiar",
+      "desc": "Los destinatarios pueden editar libremente.",
+      "detail": "Todas las operaciones de tarjetas posibles. Incluye añadir/editar/eliminar tarjetas. Completamente independiente del original."
+    },
+    "subscribe": {
+      "label": "Suscribirse",
+      "desc": "Sincronizado con el original, el progreso de estudio es separado.",
+      "detail": "Cuando añado tarjetas, los suscriptores también las reciben. No se permite editar tarjetas. El progreso de estudio se rastrea individualmente."
+    },
+    "snapshot": {
+      "label": "Instantánea",
+      "desc": "Copia de solo lectura del estado actual.",
+      "detail": "Copia las tarjetas actuales exactamente, pero no se permite editar. Una instantánea única del mazo."
+    }
+  },
+  "mode": {
+    "subscribe": "Suscrito",
+    "snapshot": "Instantánea",
+    "copy": "Copiar"
+  },
+  "modal": {
+    "title": "Compartir mazo",
+    "description": "Compartiendo el mazo \"{{name}}\".",
+    "shareMode": "Modo de compartir",
+    "creating": "Creando...",
+    "createInviteLink": "Generar enlace de invitación",
+    "inviteLink": "Enlace de invitación",
+    "inviteLinkNote": "Comparte este enlace para dar acceso al mazo."
+  },
+  "publish": {
+    "title": "Publicar en el mercado",
+    "titleLabel": "Título",
+    "description": "Descripción",
+    "category": "Categoría",
+    "tags": "Etiquetas (separadas por comas)",
+    "tagsPlaceholder": "ej., inglés, vocabulario, TOEIC",
+    "shareMode": "Modo de compartir",
+    "publishing": "Publicando...",
+    "publishButton": "Publicar en el mercado",
+    "submit": "Publicar"
+  },
+  "modes": {
+    "copy": {
+      "label": "Copiar",
+      "shortDesc": "Los destinatarios pueden editar libremente.",
+      "longDesc": "Todas las operaciones de tarjetas posibles. Incluye añadir/editar/eliminar tarjetas. Completamente independiente del original."
+    },
+    "subscribe": {
+      "label": "Suscribirse",
+      "shortDesc": "Sincronizado con el original, el progreso de estudio es separado.",
+      "longDesc": "Cuando añado tarjetas, los suscriptores también las reciben. No se permite editar tarjetas. El progreso de estudio se rastrea individualmente."
+    },
+    "snapshot": {
+      "label": "Instantánea",
+      "shortDesc": "Copia de solo lectura del estado actual.",
+      "longDesc": "Copia las tarjetas actuales exactamente, pero no se permite editar. Una instantánea única del mazo."
+    }
+  },
+  "badge": {
+    "subscribed": "Suscrito",
+    "snapshot": "Instantánea",
+    "copy": "Copiar"
+  },
+  "subscribers": {
+    "noUsers": "Sin usuarios compartidos aún.",
+    "inviteLink": "Enlace de invitación",
+    "revoke": "Revocar"
+  },
+  "status": {
+    "pending": "Pendiente",
+    "active": "Activo",
+    "revoked": "Revocado",
+    "declined": "Rechazado"
+  },
+  "myShares": {
+    "title": "Mis compartidos",
+    "sent": "Compartidos enviados",
+    "noSent": "Sin mazos compartidos aún.",
+    "received": "Compartidos recibidos",
+    "noReceived": "Sin compartidos recibidos aún.",
+    "unsubscribe": "Cancelar suscripción",
+    "cancel": "Revocar",
+    "status": {
+      "pending": "Pendiente",
+      "active": "Activo",
+      "revoked": "Revocado",
+      "declined": "Rechazado"
+    },
+    "mode": {
+      "copy": "Copiar",
+      "subscribe": "Suscribirse",
+      "snapshot": "Instantánea"
+    }
+  },
+  "acceptInvite": {
+    "title": "Invitación de mazo",
+    "inviteCode": "Código de invitación",
+    "accept": "Aceptar invitación",
+    "accepting": "Aceptando...",
+    "accepted": "¡Aceptado!",
+    "redirecting": "Redirigiendo al mazo..."
+  },
+  "deckShare": {
+    "title": "Gestión de compartir",
+    "directSharing": "Compartir directo",
+    "createShareLink": "Crear enlace de compartir",
+    "marketplace": "Mercado",
+    "usersUsing": "{{count}} usuarios usando",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "unpublish": "Retirar",
+    "publishDescription": "Publicar en el mercado permite que cualquiera encuentre este mazo.",
+    "publish": "Publicar en el mercado"
+  },
+  "invite": {
+    "title": "Invitación de mazo",
+    "code": "Código de invitación:",
+    "accept": "Aceptar invitación",
+    "accepting": "Aceptando...",
+    "accepted": "¡Aceptado!",
+    "redirecting": "Redirigiendo al mazo..."
+  },
+  "deckLabel": {
+    "myDeck": "Mi mazo",
+    "subscribed": "Suscrito",
+    "snapshot": "Instantánea",
+    "copy": "Copiar"
+  }
+}

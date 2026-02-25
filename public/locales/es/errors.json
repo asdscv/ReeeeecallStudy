@@ -1,0 +1,68 @@
+{
+  "auth": {
+    "invalidCredentials": "El correo o la contraseña son incorrectos.",
+    "emailNotConfirmed": "Correo no verificado. Por favor revisa tu bandeja de entrada.",
+    "userAlreadyRegistered": "Este correo ya está registrado.",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "emailRateLimit": "Demasiadas solicitudes. Inténtalo más tarde.",
+    "securityDelay": "Por seguridad, inténtalo más tarde.",
+    "newPasswordSameAsOld": "La nueva contraseña debe ser diferente a la anterior.",
+    "invalidEmailFormat": "Formato de correo inválido."
+  },
+  "rateLimit": {
+    "tooFast": "Demasiadas solicitudes. Intenta de nuevo en {{seconds}}s."
+  },
+  "quota": {
+    "limitReached": "Límite de {{resource}} alcanzado ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Solicitudes API diarias",
+      "storage_bytes": "Almacenamiento",
+      "cards_total": "Total de tarjetas",
+      "decks_total": "Total de mazos",
+      "templates_total": "Total de plantillas",
+      "study_sessions_daily": "Sesiones de estudio diarias",
+      "file_uploads_daily": "Subidas de archivos diarias"
+    }
+  },
+  "storage": {
+    "imageTooLarge": "Las imágenes deben ser de 5MB o menos.",
+    "imageFormatUnsupported": "Formatos de imagen soportados: JPG, PNG, WebP",
+    "audioTooLarge": "Los archivos de audio deben ser de 10MB o menos.",
+    "audioFormatUnsupported": "Formatos de audio soportados: MP3, OGG, WAV",
+    "uploadLimitReached": "Límite de subidas alcanzado.",
+    "uploadFailed": "Subida fallida: {{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "Por favor ingresa un nombre para la clave.",
+    "nameMustBeString": "El nombre de la clave debe ser texto.",
+    "nameTooLong": "El nombre de la clave debe tener {{maxLength}} caracteres o menos.",
+    "nameNoControlChars": "El nombre de la clave no puede contener caracteres de control."
+  },
+  "card": {
+    "readonlyDeckNoAdd": "No se pueden añadir tarjetas a un mazo de solo lectura.",
+    "readonlyDeckNoEdit": "No se pueden modificar tarjetas en un mazo de solo lectura.",
+    "rateLimitReached": "Límite de solicitudes alcanzado."
+  },
+  "deck": {
+    "rateLimitReached": "Límite de solicitudes alcanzado."
+  },
+  "template": {
+    "rateLimitReached": "Límite de solicitudes alcanzado.",
+    "cannotDeleteDefault": "La plantilla predeterminada no se puede eliminar.",
+    "inUseByDecks": "No se puede eliminar — {{count}} mazo(s) usan esta plantilla."
+  },
+  "marketplace": {
+    "listingNotFound": "Publicación no encontrada.",
+    "cannotImportOwn": "No puedes importar tu propio mazo."
+  },
+  "sharing": {
+    "invalidOrExpired": "Código de invitación inválido o expirado.",
+    "cannotAcceptOwn": "No puedes aceptar tu propio mazo."
+  },
+  "import": {
+    "invalidFile": "Archivo de importación inválido: falta el arreglo de tarjetas."
+  },
+  "fileValidationFailed": "La validación del archivo falló",
+  "uploadFailed": "La subida falló.",
+  "parseError": "El análisis del archivo falló."
+}

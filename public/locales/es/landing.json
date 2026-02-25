@@ -1,0 +1,264 @@
+{
+  "hero": {
+    "badge": "El Inicio del Aprendizaje Inteligente",
+    "title": "Aprendizaje Que Trasciende",
+    "titleHighlight": "Los Límites de la Memoria",
+    "title1": "Aprendizaje Que Trasciende",
+    "title2": "Los Límites de la Memoria",
+    "description": "Maximiza tu eficiencia de aprendizaje con la repetición espaciada (SRS) científicamente comprobada.",
+    "subDescription": "Con ReeeeecallStudy, puedes recordar más rápido y por más tiempo.",
+    "subtitle1": "Maximiza tu eficiencia de aprendizaje con la repetición espaciada (SRS) científicamente comprobada.",
+    "subtitle2": "Con ReeeeecallStudy, puedes recordar más rápido y por más tiempo.",
+    "startFree": "Comenzar Gratis",
+    "learnMore": "Más Información",
+    "cta": {
+      "start": "Comenzar Gratis",
+      "learn": "Más Información"
+    },
+    "freeForever": "Gratis para siempre. No se requiere tarjeta de crédito."
+  },
+  "tagline": "Plataforma Inteligente de Aprendizaje con Tarjetas",
+  "preview": {
+    "tagline": "Plataforma Inteligente de Aprendizaje con Tarjetas",
+    "mockFront": "Hello",
+    "mockBack": "Bonjour",
+    "mockCards": "12/30 tarjetas",
+    "mockStreak": "Racha: 7 días",
+    "mockMeaning": "Hola (Francés)",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
+  },
+  "features": {
+    "title": "Funciones Poderosas",
+    "subtitle": "Todas las herramientas para un aprendizaje eficiente en un solo lugar",
+    "srs": {
+      "title": "Algoritmo SRS Inteligente",
+      "description": "Maximiza la memoria a largo plazo con la repetición espaciada científicamente verificada. Ajuste automático del tiempo de repaso con 4 niveles de calificación: Otra vez/Difícil/Bien/Fácil.",
+      "desc": "Maximiza la memoria a largo plazo con la repetición espaciada científicamente verificada. Ajuste automático del tiempo de repaso con 4 niveles de calificación: Otra vez/Difícil/Bien/Fácil."
+    },
+    "modes": {
+      "title": "5 Modos de Estudio",
+      "description": "Compatible con SRS, Aleatorio, Secuencial, Repaso Secuencial y Por Fecha — modos de estudio para cada situación.",
+      "desc": "Compatible con SRS, Aleatorio, Secuencial, Repaso Secuencial y Por Fecha — modos de estudio para cada situación."
+    },
+    "stats": {
+      "title": "Estadísticas y Panel en Tiempo Real",
+      "description": "Sigue tu progreso de un vistazo con estadísticas detalladas: mapa de calor de estudio, pronóstico de repasos, volumen de estudio diario.",
+      "desc": "Sigue tu progreso de un vistazo con estadísticas detalladas: mapa de calor de estudio, pronóstico de repasos, volumen de estudio diario."
+    },
+    "sharing": {
+      "title": "Compartir Mazos y Mercado",
+      "description": "Comparte mazos en 3 modos (Copiar, Suscribir, Instantánea) y explora los mazos de otros usuarios en el mercado.",
+      "desc": "Comparte mazos en 3 modos (Copiar, Suscribir, Instantánea) y explora los mazos de otros usuarios en el mercado."
+    },
+    "tts": {
+      "title": "TTS Multilingüe",
+      "description": "Lectura de voz automática en coreano, inglés, japonés, chino y más, con configuración de idioma por campo.",
+      "desc": "Lectura de voz automática en coreano, inglés, japonés, chino y más, con configuración de idioma por campo."
+    },
+    "responsive": {
+      "title": "Diseño Responsivo",
+      "description": "Funciona perfectamente en PC, tableta y móvil. Aprende sobre la marcha con el modo de deslizamiento.",
+      "desc": "Funciona perfectamente en PC, tableta y móvil. Aprende sobre la marcha con el modo de deslizamiento."
+    }
+  },
+  "featuresSection": {
+    "title": "Funciones Poderosas",
+    "subtitle": "Todas las herramientas para un aprendizaje eficiente en un solo lugar"
+  },
+  "why": {
+    "title": "¿Por qué ReeeeecallStudy?",
+    "subtitle": "Herramienta de tarjetas de estudio de nueva generación que combina la repetición espaciada con una interfaz moderna",
+    "points": [
+      "Algoritmo de aprendizaje SRS científicamente verificado",
+      "Interfaz de usuario intuitiva y limpia",
+      "Estructura de tarjetas flexible con plantillas personalizadas",
+      "Soporte de importación y exportación CSV/JSON",
+      "Búsqueda y filtrado basado en etiquetas",
+      "Compartir mazos y mercado comunitario",
+      "Estadísticas y análisis detallados de aprendizaje",
+      "Integración externa mediante clave API"
+    ]
+  },
+  "benefitsSection": {
+    "title": "¿Por qué ReeeeecallStudy?",
+    "subtitle": "Herramienta de tarjetas de estudio de nueva generación que combina la repetición espaciada con una interfaz moderna",
+    "cta": "Comenzar Ahora"
+  },
+  "benefits": {
+    "0": "Algoritmo de aprendizaje SRS científicamente verificado",
+    "1": "Interfaz de usuario intuitiva y limpia",
+    "2": "Estructura de tarjetas flexible con plantillas personalizadas",
+    "3": "Soporte de importación y exportación CSV/JSON",
+    "4": "Búsqueda y filtrado basado en etiquetas",
+    "5": "Compartir mazos y mercado comunitario",
+    "6": "Estadísticas y análisis detallados de aprendizaje",
+    "7": "Integración externa mediante clave API"
+  },
+  "metrics": {
+    "efficiency": {
+      "label": "Eficiencia de Aprendizaje",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "interval": {
+      "label": "Intervalo Promedio de Repaso",
+      "value": "15 días",
+      "change": "+8 días"
+    },
+    "accuracy": {
+      "label": "Tasa de Precisión",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "daily": {
+      "label": "Tarjetas de Estudio Diarias",
+      "value": "45 tarjetas",
+      "change": "+30 tarjetas"
+    }
+  },
+  "stats": {
+    "0": {
+      "label": "Eficiencia de Aprendizaje",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "1": {
+      "label": "Intervalo Promedio de Repaso",
+      "value": "15 días",
+      "change": "+8 días"
+    },
+    "2": {
+      "label": "Tasa de Precisión",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "3": {
+      "label": "Tarjetas de Estudio Diarias",
+      "value": "45 tarjetas",
+      "change": "+30 tarjetas"
+    }
+  },
+  "steps": {
+    "title": "Comienza en 3 Simples Pasos",
+    "step1": {
+      "title": "Crear un Mazo",
+      "description": "Crea un mazo para organizar tarjetas por tema y luego agrega tus tarjetas."
+    },
+    "step2": {
+      "title": "Estudiar",
+      "description": "SRS presenta las tarjetas de repaso en el momento óptimo."
+    },
+    "step3": {
+      "title": "Seguir el Progreso",
+      "description": "Consulta las estadísticas de aprendizaje y las tendencias de crecimiento en el panel."
+    }
+  },
+  "howItWorks": {
+    "title": "Comienza en 3 Simples Pasos",
+    "step1": {
+      "title": "Crear un Mazo",
+      "desc": "Crea un mazo para organizar tarjetas por tema y luego agrega tus tarjetas."
+    },
+    "step2": {
+      "title": "Estudiar",
+      "desc": "SRS presenta las tarjetas de repaso en el momento óptimo."
+    },
+    "step3": {
+      "title": "Seguir el Progreso",
+      "desc": "Consulta las estadísticas de aprendizaje y las tendencias de crecimiento en el panel."
+    }
+  },
+  "cta": {
+    "title": "Aprende de Forma Más Inteligente Desde Hoy",
+    "description": "Comienza gratis. Regístrate fácilmente con correo electrónico y contraseña.",
+    "subtitle": "Comienza gratis. Regístrate fácilmente con correo electrónico y contraseña.",
+    "button": "Comenzar",
+    "guarantee": "Gratis para siempre. No se requiere tarjeta de crédito."
+  },
+  "nav": {
+    "blog": "Artículos",
+    "login": "Iniciar Sesión",
+    "start": "Comenzar",
+    "features": "Funciones",
+    "results": "Resultados",
+    "reviews": "Reseñas",
+    "howItWorks": "Cómo Funciona",
+    "faq": "Preguntas Frecuentes",
+    "dashboard": "Panel"
+  },
+  "trustBadges": {
+    "srs": "SRS Inteligente",
+    "sharing": "Compartir Mazos",
+    "languages": "{{count}} Idiomas",
+    "allDevices": "Todos los Dispositivos",
+    "import": "Importar CSV y API"
+  },
+  "footer": {
+    "copyright": "\u00a9 2026 ReeeeecallStudy. Todos los derechos reservados.",
+    "apiDocs": "Documentación API",
+    "tagline": "Plataforma inteligente de aprendizaje con tarjetas y repetición espaciada",
+    "product": "Producto",
+    "resources": "Recursos",
+    "features": "Funciones",
+    "results": "Resultados",
+    "howItWorks": "Cómo Funciona",
+    "faq": "Preguntas Frecuentes",
+    "blog": "Artículos",
+    "help": "Ayuda",
+    "language": "Idioma"
+  },
+  "floatingCta": "Comenzar Ahora",
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "q1": "¿Qué es la repetición espaciada (SRS)?",
+    "a1": "La repetición espaciada es un método de aprendizaje científicamente comprobado que programa los repasos en intervalos óptimos para maximizar la retención de la memoria a largo plazo. ReeeeecallStudy utiliza un algoritmo SRS avanzado para determinar automáticamente cuándo debes repasar cada tarjeta de estudio.",
+    "q2": "¿ReeeeecallStudy es gratis?",
+    "a2": "¡Sí! ReeeeecallStudy es gratis. Regístrate con correo electrónico y contraseña para comenzar a aprender de inmediato con todas las funciones principales, incluyendo SRS, múltiples modos de estudio y estadísticas detalladas.",
+    "q3": "¿Qué modos de estudio están disponibles?",
+    "a3": "ReeeeecallStudy admite 5 modos de estudio: SRS (repetición espaciada) para una programación óptima de repasos, Aleatorio para práctica mixta, Secuencial para repaso ordenado, Repaso Secuencial para revisión sistemática y Por Fecha para organización basada en el tiempo.",
+    "q4": "¿Puedo compartir mis mazos de tarjetas de estudio?",
+    "a4": "¡Sí! Puedes compartir mazos en 3 modos: Copiar (duplicar para otros), Suscribir (sincronizar actualizaciones) e Instantánea (versión congelada). Explora y descubre los mazos de otros usuarios en el mercado comunitario."
+  },
+  "statsSection": {
+    "title": "Resultados Comprobados",
+    "subtitle": "Respaldado por la ciencia — descubre lo que ofrece la repetición espaciada",
+    "baseline": "vs. estudio tradicional",
+    "retention": {
+      "label": "Retención a 30 Días",
+      "change": "+75%",
+      "description": "Recuerda lo que aprendes después de 30 días"
+    },
+    "timeSaved": {
+      "label": "Tiempo Ahorrado",
+      "change": "-50%",
+      "description": "La mitad del tiempo de estudio, los mismos resultados"
+    },
+    "completion": {
+      "label": "Completación Diaria",
+      "change": "+38%",
+      "description": "Los usuarios terminan sus repasos diarios"
+    },
+    "learners": {
+      "label": "Estudiantes Activos",
+      "change": "+840 este mes",
+      "description": "Comunidad en crecimiento en todo el mundo"
+    }
+  },
+  "socialProof": {
+    "title": "La Confianza de Estudiantes en Todo el Mundo",
+    "subtitle": "Únete a miles de estudiantes que aprenden de forma más inteligente",
+    "liveActivity": "{{count}} personas estudiando ahora mismo",
+    "userCountLabel": "Usuarios Activos",
+    "cardsStudiedLabel": "Tarjetas Estudiadas",
+    "decksCreatedLabel": "Mazos Creados",
+    "testimonials": {
+      "0": { "quote": "ReeeeecallStudy me ayudó a aprobar el JLPT N2. ¡El algoritmo SRS es increíblemente efectivo!", "author": "Min-Jun Kim", "role": "Estudiante de Idiomas" },
+      "1": { "quote": "La interfaz es muy limpia e intuitiva. Estudiar ahora es realmente agradable.", "author": "Seo-Yun Lee", "role": "Estudiante de Medicina" },
+      "2": { "quote": "La función de compartir mazos es increíble. Encontré mazos para casi todos los temas.", "author": "Yuki Park", "role": "Estudiante Universitario" }
+    }
+  },
+  "seo": {
+    "title": "ReeeeecallStudy — Aprendizaje Inteligente con Tarjetas y Repetición Espaciada",
+    "description": "Plataforma inteligente de aprendizaje con tarjetas y algoritmo de repetición espaciada (SRS) científicamente comprobado. Recuerda más rápido y por más tiempo."
+  }
+}

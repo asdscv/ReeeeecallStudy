@@ -2,10 +2,21 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useSEO } from '../useSEO'
 import { SEO } from '../../lib/seo-config'
+import { DEFAULT_LOCALE, OG_LOCALE_MAP, SUPPORTED_LOCALES } from '../../lib/locale-utils'
+
+const mockLocale = vi.hoisted(() => {
+  // vi.mock factory is hoisted, so we inline the default here and keep it in sync via test assertion below
+  return 'en'
+})
 
 vi.mock('i18next', () => ({
-  default: { language: 'en' },
+  default: { language: mockLocale },
 }))
+
+// Guard: if DEFAULT_LOCALE changes, update mockLocale in vi.hoisted above
+it('mockLocale matches DEFAULT_LOCALE', () => {
+  expect(mockLocale).toBe(DEFAULT_LOCALE)
+})
 
 describe('useSEO', () => {
   let originalTitle: string
@@ -36,7 +47,7 @@ describe('useSEO', () => {
     renderHook(() => useSEO({ title: 'T', description: 'd' }))
     const meta = document.querySelector('meta[property="og:locale"]')
     expect(meta).toBeTruthy()
-    expect(meta?.getAttribute('content')).toBe('en_US')
+    expect(meta?.getAttribute('content')).toBe(OG_LOCALE_MAP[DEFAULT_LOCALE])
   })
 
   it('should set twitter:site to configured handle', () => {
@@ -78,20 +89,18 @@ describe('useSEO', () => {
   })
 
   it('should set hreflang alternate links', () => {
+    const testLocales = SUPPORTED_LOCALES.slice(0, 2)
     renderHook(() =>
       useSEO({
         title: 'T',
         description: 'd',
-        hreflangAlternates: [
-          { lang: 'en', href: 'https://example.com/en' },
-          { lang: 'ko', href: 'https://example.com/ko' },
-        ],
+        hreflangAlternates: testLocales.map((l) => ({ lang: l, href: `https://example.com/${l}` })),
       }),
     )
-    const enLink = document.querySelector('link[rel="alternate"][hreflang="en"]') as HTMLLinkElement
-    const koLink = document.querySelector('link[rel="alternate"][hreflang="ko"]') as HTMLLinkElement
-    expect(enLink?.href).toBe('https://example.com/en')
-    expect(koLink?.href).toBe('https://example.com/ko')
+    for (const locale of testLocales) {
+      const link = document.querySelector(`link[rel="alternate"][hreflang="${locale}"]`) as HTMLLinkElement
+      expect(link?.href).toBe(`https://example.com/${locale}`)
+    }
   })
 
   it('should inject JSON-LD script', () => {
@@ -108,19 +117,19 @@ describe('useSEO', () => {
         title: 'T',
         description: 'd',
         canonicalUrl: 'https://example.com',
-        hreflangAlternates: [{ lang: 'en', href: 'https://example.com/en' }],
+        hreflangAlternates: [{ lang: DEFAULT_LOCALE, href: `https://example.com/${DEFAULT_LOCALE}` }],
         jsonLd: { '@type': 'Test' },
       }),
     )
     unmount()
     expect(document.querySelector('script[type="application/ld+json"]')).toBeNull()
     expect(document.querySelector('link[rel="canonical"]')).toBeNull()
-    expect(document.querySelector('link[rel="alternate"][hreflang="en"]')).toBeNull()
+    expect(document.querySelector(`link[rel="alternate"][hreflang="${DEFAULT_LOCALE}"]`)).toBeNull()
   })
 
   it('should set html lang from i18next', () => {
     renderHook(() => useSEO({ title: 'T', description: 'd' }))
-    expect(document.documentElement.lang).toBe('en')
+    expect(document.documentElement.lang).toBe(DEFAULT_LOCALE)
   })
 
   it('should cleanup og:image dimensions on unmount', () => {
@@ -281,10 +290,9 @@ describe('useSEO', () => {
 
   it('should set og:locale:alternate for other supported locales', () => {
     renderHook(() => useSEO({ title: 'T', description: 'd' }))
-    const alt = document.querySelector('meta[property="og:locale:alternate"]')
-    expect(alt).toBeTruthy()
-    // en is current, so ko_KR should be the alternate
-    expect(alt?.getAttribute('content')).toBe('ko_KR')
+    const alternates = document.querySelectorAll('meta[property="og:locale:alternate"]')
+    // Current locale is DEFAULT_LOCALE, so alternates should be all others
+    expect(alternates.length).toBe(SUPPORTED_LOCALES.length - 1)
   })
 
   it('should cleanup og:locale:alternate on unmount', () => {

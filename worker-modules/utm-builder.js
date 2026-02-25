@@ -12,7 +12,7 @@ export const UTM_DEFAULTS = {
  *
  * @param {string} baseUrl - Base URL path (e.g. "/auth/login")
  * @param {string} slug - Article slug used as utm_campaign
- * @param {string} locale - Locale code ("en" | "ko")
+ * @param {string} locale - Locale code (e.g. "en", "ko", "zh", "ja", "es")
  * @param {string} [blockType="cta"] - Block type for utm_content
  * @returns {string} URL with UTM query params appended
  */

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
+import { DEFAULT_LOCALE } from '../locale-utils'
 
 vi.mock('i18next', () => ({
-  default: { language: 'en', t: (key: string) => key },
+  default: { language: DEFAULT_LOCALE, t: (key: string) => key },
 }))
 
 import {

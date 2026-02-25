@@ -1,0 +1,107 @@
+{
+  "title": "Historial de estudio",
+  "tabs": {
+    "deckProgress": "Progreso del mazo",
+    "sessionList": "Lista de sesiones"
+  },
+  "filters": {
+    "allDecks": "Todos los mazos",
+    "allModes": "Todos los modos"
+  },
+  "deckScope": {
+    "all": "Todos",
+    "label": "Alcance del panel"
+  },
+  "empty": "Sin historial de estudio aún. ¡Comienza a aprender!",
+  "noMatch": "Sin registros que coincidan con el filtro.",
+  "deletedDeck": "Mazo eliminado",
+  "deckProgress": {
+    "total": "{{count}} tarjetas",
+    "notStudied": "No estudiadas {{count}}",
+    "learning": "Aprendiendo {{count}}",
+    "review": "Repaso {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}}d",
+    "reviewCount": "{{count}} repasos",
+    "cardCount": "{{count}} tarjetas",
+    "logCount": "{{count}} registros",
+    "intervalChange": "{{prev}}d → {{next}}d",
+    "paginationInfo": "{{start}}-{{end}} de {{total}}"
+  },
+  "sessionCard": {
+    "cardsStudied": "{{count}} tarjetas estudiadas"
+  },
+  "sessionDetail": {
+    "backToHistory": "Historial de estudio",
+    "cardsStudied": "{{count}} tarjetas estudiadas",
+    "performance": "Rendimiento {{value}}%",
+    "loadingDetails": "Cargando detalles...",
+    "noDetails": "Sin detalles.",
+    "retention": "Tasa de retención",
+    "avgIntervalGrowth": "Crecimiento promedio del intervalo",
+    "avgEase": "Facilidad promedio",
+    "totalReviews": "Total de repasos",
+    "easeDistribution": "Distribución de facilidad",
+    "totalCards": "Total de tarjetas",
+    "avgTime": "Tiempo promedio",
+    "performanceScore": "Puntuación de rendimiento",
+    "cardDetails": "Detalles de tarjetas",
+    "card": "Tarjeta",
+    "rating": "Calificación",
+    "intervalChange": "Cambio de intervalo",
+    "easeChange": "Cambio de facilidad",
+    "timeSpent": "Tiempo",
+    "deletedCard": "(Tarjeta eliminada)",
+    "noContent": "(Sin contenido)"
+  },
+  "overview": {
+    "sessions": "Sesiones",
+    "sessionsValue": "{{count}} sesiones",
+    "studyCards": "Tarjetas de estudio",
+    "cardsValue": "{{count}} tarjetas",
+    "totalTime": "Tiempo total de estudio",
+    "avgPerformance": "Rendimiento promedio",
+    "streak": "Racha de estudio",
+    "streakValue": "{{count}} días"
+  },
+  "chart": {
+    "countPercent": "{{count}} ({{percent}}%)"
+  },
+  "charts": {
+    "studyVolume": "Volumen de estudio",
+    "volumeSummary": "{{sessions}} sesiones / {{cards}} tarjetas",
+    "noDataForPeriod": "Sin registros de estudio para este período",
+    "sessionDuration": "Duración promedio de sesión",
+    "sessionCount": "{{count}} sesiones",
+    "avgDuration": "Duración promedio",
+    "ratingDistribution": "Distribución de calificaciones",
+    "ratingTotal": "Total {{count}}",
+    "noRatingData": "Sin datos de calificación",
+    "modeBreakdown": "Desglose por modo",
+    "noModeData": "Sin datos de modo",
+    "sessionCountLabel": "{{count}} sesiones",
+    "cardCountLabel": "{{count}} tarjetas",
+    "performance": "Rendimiento"
+  },
+  "ratingGroups": {
+    "srs": "Repetición espaciada",
+    "simple": "General",
+    "cramming": "Intensivo"
+  },
+  "ratings": {
+    "again": "Otra vez",
+    "hard": "Difícil",
+    "good": "Bien",
+    "easy": "Fácil",
+    "known": "Conocida",
+    "unknown": "Desconocida",
+    "got_it": "Lo sé",
+    "missed": "Fallada"
+  },
+  "units": {
+    "sessions": "sesiones",
+    "cards": "tarjetas",
+    "min": "min"
+  }
+}

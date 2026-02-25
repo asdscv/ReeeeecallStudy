@@ -9,6 +9,7 @@ import { writeFileSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 import { createClient } from '@supabase/supabase-js'
 import { generateSitemapXml } from '../src/lib/sitemap'
+import { DEFAULT_LOCALE } from '../src/lib/locale-utils'
 
 // Load .env file
 const envPath = resolve(import.meta.dirname, '..', '.env')
@@ -48,7 +49,7 @@ async function main() {
     .from('contents')
     .select('slug, updated_at')
     .eq('is_published', true)
-    .eq('locale', 'en') // Use en as primary for sitemap (hreflang handles ko)
+    .eq('locale', DEFAULT_LOCALE) // Use default locale as primary for sitemap
 
   if (error) {
     console.error('Failed to fetch contents:', error.message)
