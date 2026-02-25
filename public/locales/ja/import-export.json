@@ -38,6 +38,7 @@
   "importComplete": "インポート完了",
   "importSummary": "{{total}}件中{{added}}件追加、{{skipped}}件スキップ",
   "confirm": "完了",
+  "downloadTemplate": "CSVテンプレートをダウンロード",
 
   "export_nested": {
     "title": "カードをエクスポート",

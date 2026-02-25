@@ -38,6 +38,7 @@
   "importComplete": "Impor Selesai",
   "importSummary": "Ditambahkan {{added}} dari {{total}}, dilewati {{skipped}}",
   "confirm": "Selesai",
+  "downloadTemplate": "Unduh Templat CSV",
 
   "export_nested": {
     "title": "Ekspor Kartu",

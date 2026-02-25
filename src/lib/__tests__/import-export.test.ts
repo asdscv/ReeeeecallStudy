@@ -2,11 +2,13 @@ import { describe, it, expect } from 'vitest'
 import {
   generateExportJSON,
   generateExportCSV,
+  generateCSVTemplate,
   parseImportJSON,
   parseImportCSV,
   validateImportCards,
   detectDuplicates,
 } from '../import-export'
+import Papa from 'papaparse'
 import type { Deck, CardTemplate, Card, TemplateField } from '../../types/database'
 
 // --- helpers ---
@@ -131,6 +133,45 @@ describe('generateExportCSV', () => {
     const csv = generateExportCSV(cards, fields)
     expect(csv).toContain('Tags')
     expect(csv).toContain('a;b')
+  })
+})
+
+describe('generateCSVTemplate', () => {
+  it('should generate CSV with headers only (no data rows)', () => {
+    const fields: TemplateField[] = [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+      { key: 'back', name: 'Back', type: 'text', order: 1 },
+    ]
+    const csv = generateCSVTemplate(fields)
+    const lines = csv.trim().split('\n')
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toContain('Front')
+    expect(lines[0]).toContain('Back')
+  })
+
+  it('should have Tags as the last column', () => {
+    const fields: TemplateField[] = [
+      { key: 'word', name: 'Word', type: 'text', order: 0 },
+    ]
+    const csv = generateCSVTemplate(fields)
+    const headers = csv.trim().split(',')
+    expect(headers[headers.length - 1]).toBe('Tags')
+  })
+
+  it('should handle empty fields array', () => {
+    const csv = generateCSVTemplate([])
+    expect(csv.trim()).toBe('Tags')
+  })
+
+  it('should be parseable by PapaParse', () => {
+    const fields: TemplateField[] = [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+      { key: 'back', name: 'Back', type: 'text', order: 1 },
+    ]
+    const csv = generateCSVTemplate(fields)
+    const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true })
+    expect(parsed.meta.fields).toEqual(['Front', 'Back', 'Tags'])
+    expect(parsed.data).toHaveLength(0)
   })
 })
 

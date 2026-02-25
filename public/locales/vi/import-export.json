@@ -38,6 +38,7 @@
   "importComplete": "Nhập hoàn tất",
   "importSummary": "Đã thêm {{added}} trong {{total}}, bỏ qua {{skipped}}",
   "confirm": "Xong",
+  "downloadTemplate": "Tải mẫu CSV",
 
   "export_nested": {
     "title": "Xuất thẻ",

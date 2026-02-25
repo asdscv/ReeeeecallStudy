@@ -13,8 +13,10 @@ import {
   parseImportCSV,
   validateImportCards,
   detectDuplicates,
+  generateCSVTemplate,
 } from '../../lib/import-export'
 import type { ImportCard } from '../../lib/import-export'
+import { decodeFileText } from '../../lib/decode-file'
 import type { CardTemplate } from '../../types/database'
 import { ImportProgressBar } from './ImportProgressBar'
 import Papa from 'papaparse'
@@ -48,6 +50,18 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
 
+  const downloadTemplate = useCallback(() => {
+    if (!template) return
+    const csv = generateCSVTemplate(template.fields)
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${template.name}_template.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [template])
+
   const resetState = useCallback(() => {
     setStep('upload')
     setCsvHeaders([])
@@ -69,7 +83,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
 
   const processFile = async (file: File) => {
     setError(null)
-    const text = await file.text()
+    const text = await decodeFileText(file)
     const ext = file.name.split('.').pop()?.toLowerCase()
 
     try {
@@ -210,6 +224,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
               {t('selectFile')}
             </button>
             <p className="text-gray-400 text-xs mt-3">{t('supportedFormats')}</p>
+            {template && (
+              <button
+                onClick={downloadTemplate}
+                className="mt-2 text-blue-600 text-xs underline cursor-pointer"
+              >
+                {t('downloadTemplate')}
+              </button>
+            )}
             <input
               ref={fileInputRef}
               type="file"

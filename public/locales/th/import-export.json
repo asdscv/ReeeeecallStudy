@@ -38,6 +38,7 @@
   "importComplete": "นำเข้าเสร็จสมบูรณ์",
   "importSummary": "เพิ่ม {{added}} จาก {{total}}, ข้าม {{skipped}}",
   "confirm": "เสร็จสิ้น",
+  "downloadTemplate": "ดาวน์โหลดแม่แบบ CSV",
 
   "export_nested": {
     "title": "ส่งออกการ์ด",

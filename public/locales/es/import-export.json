@@ -36,6 +36,7 @@
   "importComplete": "Importación completada",
   "importSummary": "Añadidas {{added}} de {{total}}, omitidas {{skipped}}",
   "confirm": "Listo",
+  "downloadTemplate": "Descargar plantilla CSV",
   "export_nested": {
     "title": "Exportar tarjetas",
     "noTemplate": "No se puede exportar sin una plantilla.",

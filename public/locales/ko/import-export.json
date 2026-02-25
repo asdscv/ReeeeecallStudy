@@ -38,6 +38,7 @@
   "importComplete": "가져오기 완료",
   "importSummary": "총 {{total}}개 중 {{added}}개 추가, {{skipped}}개 건너뜀",
   "confirm": "확인",
+  "downloadTemplate": "CSV 템플릿 다운로드",
 
   "export_nested": {
     "title": "카드 내보내기",

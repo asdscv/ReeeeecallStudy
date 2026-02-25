@@ -38,6 +38,7 @@
   "importComplete": "Import Complete",
   "importSummary": "Added {{added}} of {{total}}, skipped {{skipped}}",
   "confirm": "Done",
+  "downloadTemplate": "Download CSV Template",
 
   "export_nested": {
     "title": "Export Cards",

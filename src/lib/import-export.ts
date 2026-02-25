@@ -151,6 +151,13 @@ export function generateTemplateExportCSV(template: CardTemplate): string {
   })
 }
 
+// --- CSV Template ---
+
+export function generateCSVTemplate(fields: TemplateField[]): string {
+  const headers = [...fields.map((f) => f.name), 'Tags']
+  return Papa.unparse({ fields: headers, data: [] })
+}
+
 // --- Import Functions ---
 
 export function parseImportJSON(jsonString: string): ImportJSONResult {
