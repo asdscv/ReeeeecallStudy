@@ -120,7 +120,7 @@ export function AdminContentsPage() {
                 icon="🌐"
                 label={`${l.locale.toUpperCase()} (${l.percentage}%)`}
                 value={`${l.published}/${l.count}`}
-                color={LOCALE_COLORS[l.locale] ?? 'gray'}
+                color={LOCALE_COLORS[l.locale as SupportedLocale] ?? 'gray'}
               />
             ))}
           </div>

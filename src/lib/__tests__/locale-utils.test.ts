@@ -9,14 +9,14 @@ import {
 } from '../locale-utils'
 
 describe('SUPPORTED_LOCALES', () => {
-  it('contains en, ko, zh, ja, vi, th, id', () => {
-    expect(SUPPORTED_LOCALES).toEqual(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'])
+  it('contains en, ko, zh, ja, vi, th, id, es', () => {
+    expect(SUPPORTED_LOCALES).toEqual(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'])
   })
 })
 
 describe('SUPPORTED_LANGUAGE_OPTIONS', () => {
-  it('has 7 language options', () => {
-    expect(SUPPORTED_LANGUAGE_OPTIONS).toHaveLength(7)
+  it('has 8 language options', () => {
+    expect(SUPPORTED_LANGUAGE_OPTIONS).toHaveLength(8)
   })
 
   it('codes match SUPPORTED_LOCALES', () => {
@@ -34,6 +34,7 @@ describe('SUPPORTED_LANGUAGE_OPTIONS', () => {
       'Tiếng Việt',
       'ภาษาไทย',
       'Bahasa Indonesia',
+      'Español',
     ])
   })
 

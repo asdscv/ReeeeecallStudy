@@ -56,21 +56,21 @@ const NAME_POOLS: Record<Lang, string[]> = {
 
 // --- Roles ---
 const R: Localized[] = [
-  /* 0 */ { en: 'Language Learner', ko: '어학 학습자', ja: '語学学習者', zh: '语言学习者', es: 'Estudiante de idiomas' },
-  /* 1 */ { en: 'Medical Student', ko: '의대생', ja: '医学生', zh: '医学生', es: 'Estudiante de medicina' },
-  /* 2 */ { en: 'University Student', ko: '대학생', ja: '大学生', zh: '大学生', es: 'Universitario' },
-  /* 3 */ { en: 'Graduate Student', ko: '대학원생', ja: '大学院生', zh: '研究生', es: 'Estudiante de posgrado' },
-  /* 4 */ { en: 'High School Student', ko: '고등학생', ja: '高校生', zh: '高中生', es: 'Estudiante de secundaria' },
-  /* 5 */ { en: 'Working Professional', ko: '직장인', ja: '社会人', zh: '职场人', es: 'Profesional' },
-  /* 6 */ { en: 'Teacher', ko: '교사', ja: '教師', zh: '教师', es: 'Profesor' },
-  /* 7 */ { en: 'Exam Candidate', ko: '수험생', ja: '受験生', zh: '考生', es: 'Candidato a examen' },
-  /* 8 */ { en: 'Self-learner', ko: '독학자', ja: '独学者', zh: '自学者', es: 'Autodidacta' },
-  /* 9 */ { en: 'Nursing Student', ko: '간호학생', ja: '看護学生', zh: '护理学生', es: 'Estudiante de enfermería' },
-  /*10 */ { en: 'Engineer', ko: '엔지니어', ja: 'エンジニア', zh: '工程师', es: 'Ingeniero' },
-  /*11 */ { en: 'Developer', ko: '개발자', ja: '開発者', zh: '开发者', es: 'Desarrollador' },
-  /*12 */ { en: 'Pharmacy Student', ko: '약대생', ja: '薬学生', zh: '药学生', es: 'Estudiante de farmacia' },
-  /*13 */ { en: 'Law Student', ko: '법학생', ja: '法学生', zh: '法学生', es: 'Estudiante de derecho' },
-  /*14 */ { en: 'Accountant', ko: '회계사', ja: '会計士', zh: '会计师', es: 'Contador' },
+  /* 0 */ { en: 'Language Learner', ko: '어학 학습자', ja: '語学学習者', zh: '语言学习者', es: 'Estudiante de idiomas', vi: 'Người học ngôn ngữ', th: 'ผู้เรียนภาษา', id: 'Pelajar Bahasa' },
+  /* 1 */ { en: 'Medical Student', ko: '의대생', ja: '医学生', zh: '医学生', es: 'Estudiante de medicina', vi: 'Sinh viên y khoa', th: 'นักศึกษาแพทย์', id: 'Mahasiswa Kedokteran' },
+  /* 2 */ { en: 'University Student', ko: '대학생', ja: '大学生', zh: '大学生', es: 'Universitario', vi: 'Sinh viên đại học', th: 'นักศึกษามหาวิทยาลัย', id: 'Mahasiswa' },
+  /* 3 */ { en: 'Graduate Student', ko: '대학원생', ja: '大学院生', zh: '研究生', es: 'Estudiante de posgrado', vi: 'Nghiên cứu sinh', th: 'นักศึกษาบัณฑิต', id: 'Mahasiswa Pascasarjana' },
+  /* 4 */ { en: 'High School Student', ko: '고등학생', ja: '高校生', zh: '高中生', es: 'Estudiante de secundaria', vi: 'Học sinh THPT', th: 'นักเรียนมัธยม', id: 'Siswa SMA' },
+  /* 5 */ { en: 'Working Professional', ko: '직장인', ja: '社会人', zh: '职场人', es: 'Profesional', vi: 'Người đi làm', th: 'คนทำงาน', id: 'Profesional' },
+  /* 6 */ { en: 'Teacher', ko: '교사', ja: '教師', zh: '教师', es: 'Profesor', vi: 'Giáo viên', th: 'ครู', id: 'Guru' },
+  /* 7 */ { en: 'Exam Candidate', ko: '수험생', ja: '受験生', zh: '考生', es: 'Candidato a examen', vi: 'Thí sinh', th: 'ผู้สอบ', id: 'Peserta Ujian' },
+  /* 8 */ { en: 'Self-learner', ko: '독학자', ja: '独学者', zh: '自学者', es: 'Autodidacta', vi: 'Tự học', th: 'ผู้เรียนด้วยตนเอง', id: 'Otodidak' },
+  /* 9 */ { en: 'Nursing Student', ko: '간호학생', ja: '看護学生', zh: '护理学生', es: 'Estudiante de enfermería', vi: 'Sinh viên điều dưỡng', th: 'นักศึกษาพยาบาล', id: 'Mahasiswa Keperawatan' },
+  /*10 */ { en: 'Engineer', ko: '엔지니어', ja: 'エンジニア', zh: '工程师', es: 'Ingeniero', vi: 'Kỹ sư', th: 'วิศวกร', id: 'Insinyur' },
+  /*11 */ { en: 'Developer', ko: '개발자', ja: '開発者', zh: '开发者', es: 'Desarrollador', vi: 'Lập trình viên', th: 'นักพัฒนา', id: 'Pengembang' },
+  /*12 */ { en: 'Pharmacy Student', ko: '약대생', ja: '薬学生', zh: '药学生', es: 'Estudiante de farmacia', vi: 'Sinh viên dược', th: 'นักศึกษาเภสัช', id: 'Mahasiswa Farmasi' },
+  /*13 */ { en: 'Law Student', ko: '법학생', ja: '法学生', zh: '法学生', es: 'Estudiante de derecho', vi: 'Sinh viên luật', th: 'นักศึกษากฎหมาย', id: 'Mahasiswa Hukum' },
+  /*14 */ { en: 'Accountant', ko: '회계사', ja: '会計士', zh: '会计师', es: 'Contador', vi: 'Kế toán viên', th: 'นักบัญชี', id: 'Akuntan' },
 ]
 
 const COLORS = [

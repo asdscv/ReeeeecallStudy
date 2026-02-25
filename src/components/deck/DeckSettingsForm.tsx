@@ -153,7 +153,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
               </label>
               <input
                 type="number"
-                value={srsSettings[key]}
+                value={srsSettings[key] as number}
                 onChange={(e) => updateSrsField(key, parseInt(e.target.value) || 0)}
                 min={0}
                 max={365}

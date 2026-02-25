@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const
+export const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
 export const DEFAULT_LOCALE: SupportedLocale = 'en'
@@ -11,6 +11,7 @@ export const LOCALE_CONFIG = {
   vi: { intl: 'vi-VN', og: 'vi_VN', label: 'Tiếng Việt', language: 'Vietnamese', color: 'teal' as const },
   th: { intl: 'th-TH', og: 'th_TH', label: 'ภาษาไทย', language: 'Thai', color: 'pink' as const },
   id: { intl: 'id-ID', og: 'id_ID', label: 'Bahasa Indonesia', language: 'Indonesian', color: 'yellow' as const },
+  es: { intl: 'es-ES', og: 'es_ES', label: 'Español', language: 'Spanish', color: 'red' as const },
 } as const
 
 export const SUPPORTED_LANGUAGE_OPTIONS = [
@@ -21,6 +22,7 @@ export const SUPPORTED_LANGUAGE_OPTIONS = [
   { code: 'vi', label: 'Tiếng Việt' },
   { code: 'th', label: 'ภาษาไทย' },
   { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'es', label: 'Español' },
 ] as const satisfies readonly { code: SupportedLocale; label: string }[]
 
 const INTL_LOCALE_MAP: Record<SupportedLocale, string> = {
@@ -31,6 +33,7 @@ const INTL_LOCALE_MAP: Record<SupportedLocale, string> = {
   vi: 'vi-VN',
   th: 'th-TH',
   id: 'id-ID',
+  es: 'es-ES',
 }
 
 export const OG_LOCALE_MAP: Record<SupportedLocale, string> = {
@@ -41,6 +44,7 @@ export const OG_LOCALE_MAP: Record<SupportedLocale, string> = {
   vi: 'vi_VN',
   th: 'th_TH',
   id: 'id_ID',
+  es: 'es_ES',
 }
 
 export const LOCALE_LABELS: Record<SupportedLocale, string> = Object.fromEntries(

@@ -37,10 +37,10 @@ describe('LanguageSelector', () => {
     expect(screen.getByRole('listbox')).toBeInTheDocument()
   })
 
-  it('shows all 7 languages in dropdown', () => {
+  it('shows all 8 languages in dropdown', () => {
     render(<LanguageSelector />)
     fireEvent.click(screen.getByTestId('language-selector-trigger'))
-    expect(screen.getAllByRole('option')).toHaveLength(7)
+    expect(screen.getAllByRole('option')).toHaveLength(8)
   })
 
   it('calls changeLanguage on option click', () => {

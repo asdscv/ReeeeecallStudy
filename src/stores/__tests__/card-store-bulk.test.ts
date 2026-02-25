@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ─── Supabase mock ──────────────────────────────────────────
-const mockFrom = vi.fn()
-const mockRpc = vi.fn()
 const mockSupabase = vi.hoisted(() => ({
   auth: { getUser: vi.fn() },
   from: vi.fn(),
@@ -82,7 +80,7 @@ describe('createCards (bulk)', () => {
 
   it('should call fetchCards exactly once after all chunks', async () => {
     mockSupabase.rpc.mockResolvedValue({ data: { inserted: 3 }, error: null })
-    const chain = setupFetchCardsMock()
+    setupFetchCardsMock()
 
     await useCardStore.getState().createCards({
       deck_id: 'deck-1',
@@ -147,7 +145,7 @@ describe('createCards (bulk)', () => {
   })
 
   it('should return 0 when rate limited', async () => {
-    mockGuard.check.mockReturnValue({ allowed: false, message: 'Rate limited' })
+    mockGuard.check.mockReturnValue({ allowed: false, message: 'Rate limited' } as { allowed: boolean; message?: string })
 
     const result = await useCardStore.getState().createCards({
       deck_id: 'deck-1',

@@ -10,7 +10,7 @@ export const SEO = {
   AUTHOR_NAME: 'ReeeeecallStudy',
   CONTACT_EMAIL: 'admin@reeeeecallstudy.xyz',
   DEFAULT_LOCALE: 'en',
-  SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const,
+  SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const,
 } as const
 
 const OG_LOCALE_MAP: Record<string, string> = {
@@ -21,6 +21,7 @@ const OG_LOCALE_MAP: Record<string, string> = {
   vi: 'vi_VN',
   th: 'th_TH',
   id: 'id_ID',
+  es: 'es_ES',
 }
 
 /** Map a locale code to an Open Graph locale string (e.g. 'ko' → 'ko_KR'). */

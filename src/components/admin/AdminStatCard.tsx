@@ -7,6 +7,9 @@ const COLOR_MAP = {
   orange: 'bg-orange-50 text-orange-700',
   pink: 'bg-pink-50 text-pink-700',
   gray: 'bg-gray-50 text-gray-700',
+  teal: 'bg-teal-50 text-teal-700',
+  yellow: 'bg-yellow-50 text-yellow-700',
+  red: 'bg-red-50 text-red-700',
 } as const
 
 type StatCardColor = keyof typeof COLOR_MAP

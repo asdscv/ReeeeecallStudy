@@ -27,7 +27,15 @@
     "namePlaceholder": "Ingresa tu nombre"
   },
   "language": {
-    "title": "Idioma"
+    "title": "Idioma",
+    "label": "Idioma de visualización",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
   },
   "srs": {
     "title": "Aprendizaje SRS",
