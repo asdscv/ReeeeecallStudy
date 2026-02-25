@@ -1,0 +1,173 @@
+{
+  "title": "Quản lý chia sẻ",
+  "directShare": "Chia sẻ trực tiếp",
+  "createShareLink": "+ Tạo liên kết chia sẻ",
+  "marketplace": "Chợ ứng dụng",
+  "userCount": "{{count}} người dùng · {{status}}",
+  "active": "Đang hoạt động",
+  "inactive": "Không hoạt động",
+  "unpublish": "Gỡ đăng tải",
+  "publishNote": "Đăng tải lên chợ cho phép mọi người tìm thấy bộ thẻ này.",
+  "publishButton": "Đăng lên chợ",
+
+  "noSubscribers": "Chưa chia sẻ với ai.",
+  "inviteLink": "Liên kết mời",
+  "cancel": "Thu hồi",
+  "shareDeck": "Chia sẻ bộ thẻ",
+  "shareDeckDesc": "Đang chia sẻ bộ thẻ \"{{name}}\".",
+  "creating": "Đang tạo...",
+  "createInviteLink": "Tạo liên kết mời",
+  "linkShareInfo": "Chia sẻ liên kết này để cấp quyền truy cập bộ thẻ.",
+
+  "shareMode": {
+    "label": "Chế độ chia sẻ",
+    "copy": {
+      "label": "Sao chép",
+      "desc": "Người nhận có thể tự do chỉnh sửa.",
+      "detail": "Có thể thực hiện tất cả thao tác với thẻ. Bao gồm thêm/sửa/xóa thẻ. Hoàn toàn độc lập với bản gốc."
+    },
+    "subscribe": {
+      "label": "Đăng ký theo dõi",
+      "desc": "Đồng bộ với bản gốc, tiến trình học riêng biệt.",
+      "detail": "Khi tôi thêm thẻ, người theo dõi cũng nhận được. Không được phép chỉnh sửa thẻ. Tiến trình học được theo dõi riêng."
+    },
+    "snapshot": {
+      "label": "Bản chụp",
+      "desc": "Bản sao chỉ đọc của trạng thái hiện tại.",
+      "detail": "Sao chép chính xác các thẻ hiện tại, nhưng không được phép chỉnh sửa. Một bản chụp duy nhất của bộ thẻ."
+    }
+  },
+
+  "shareModes": {
+    "copy": {
+      "label": "Sao chép",
+      "desc": "Người nhận có thể tự do chỉnh sửa.",
+      "detail": "Có thể thực hiện tất cả thao tác với thẻ. Bao gồm thêm/sửa/xóa thẻ. Hoàn toàn độc lập với bản gốc."
+    },
+    "subscribe": {
+      "label": "Đăng ký theo dõi",
+      "desc": "Đồng bộ với bản gốc, tiến trình học riêng biệt.",
+      "detail": "Khi tôi thêm thẻ, người theo dõi cũng nhận được. Không được phép chỉnh sửa thẻ. Tiến trình học được theo dõi riêng."
+    },
+    "snapshot": {
+      "label": "Bản chụp",
+      "desc": "Bản sao chỉ đọc của trạng thái hiện tại.",
+      "detail": "Sao chép chính xác các thẻ hiện tại, nhưng không được phép chỉnh sửa. Một bản chụp duy nhất của bộ thẻ."
+    }
+  },
+
+  "mode": {
+    "subscribe": "Đã đăng ký",
+    "snapshot": "Bản chụp",
+    "copy": "Bản sao"
+  },
+
+  "modal": {
+    "title": "Chia sẻ bộ thẻ",
+    "description": "Đang chia sẻ bộ thẻ \"{{name}}\".",
+    "shareMode": "Chế độ chia sẻ",
+    "creating": "Đang tạo...",
+    "createInviteLink": "Tạo liên kết mời",
+    "inviteLink": "Liên kết mời",
+    "inviteLinkNote": "Chia sẻ liên kết này để cấp quyền truy cập bộ thẻ."
+  },
+  "publish": {
+    "title": "Đăng lên chợ",
+    "titleLabel": "Tiêu đề",
+    "description": "Mô tả",
+    "category": "Danh mục",
+    "tags": "Thẻ gắn (phân cách bằng dấu phẩy)",
+    "tagsPlaceholder": "VD: tiếng anh, từ vựng, TOEIC",
+    "shareMode": "Chế độ chia sẻ",
+    "publishing": "Đang đăng tải...",
+    "publishButton": "Đăng lên chợ",
+    "submit": "Đăng tải"
+  },
+  "modes": {
+    "copy": {
+      "label": "Sao chép",
+      "shortDesc": "Người nhận có thể tự do chỉnh sửa.",
+      "longDesc": "Có thể thực hiện tất cả thao tác với thẻ. Bao gồm thêm/sửa/xóa thẻ. Hoàn toàn độc lập với bản gốc."
+    },
+    "subscribe": {
+      "label": "Đăng ký theo dõi",
+      "shortDesc": "Đồng bộ với bản gốc, tiến trình học riêng biệt.",
+      "longDesc": "Khi tôi thêm thẻ, người theo dõi cũng nhận được. Không được phép chỉnh sửa thẻ. Tiến trình học được theo dõi riêng."
+    },
+    "snapshot": {
+      "label": "Bản chụp",
+      "shortDesc": "Bản sao chỉ đọc của trạng thái hiện tại.",
+      "longDesc": "Sao chép chính xác các thẻ hiện tại, nhưng không được phép chỉnh sửa. Một bản chụp duy nhất của bộ thẻ."
+    }
+  },
+  "badge": {
+    "subscribed": "Đã đăng ký",
+    "snapshot": "Bản chụp",
+    "copy": "Bản sao"
+  },
+  "subscribers": {
+    "noUsers": "Chưa chia sẻ với ai.",
+    "inviteLink": "Liên kết mời",
+    "revoke": "Thu hồi"
+  },
+  "status": {
+    "pending": "Đang chờ",
+    "active": "Đang hoạt động",
+    "revoked": "Đã thu hồi",
+    "declined": "Đã từ chối"
+  },
+  "myShares": {
+    "title": "Chia sẻ của tôi",
+    "sent": "Chia sẻ đã gửi",
+    "noSent": "Chưa chia sẻ bộ thẻ nào.",
+    "received": "Chia sẻ đã nhận",
+    "noReceived": "Chưa nhận chia sẻ nào.",
+    "unsubscribe": "Hủy đăng ký",
+    "cancel": "Thu hồi",
+    "status": {
+      "pending": "Đang chờ",
+      "active": "Đang hoạt động",
+      "revoked": "Đã thu hồi",
+      "declined": "Đã từ chối"
+    },
+    "mode": {
+      "copy": "Sao chép",
+      "subscribe": "Đăng ký theo dõi",
+      "snapshot": "Bản chụp"
+    }
+  },
+  "acceptInvite": {
+    "title": "Lời mời bộ thẻ",
+    "inviteCode": "Mã mời",
+    "accept": "Chấp nhận lời mời",
+    "accepting": "Đang chấp nhận...",
+    "accepted": "Đã chấp nhận!",
+    "redirecting": "Đang chuyển đến bộ thẻ..."
+  },
+  "deckShare": {
+    "title": "Quản lý chia sẻ",
+    "directSharing": "Chia sẻ trực tiếp",
+    "createShareLink": "Tạo liên kết chia sẻ",
+    "marketplace": "Chợ ứng dụng",
+    "usersUsing": "{{count}} người dùng đang sử dụng",
+    "active": "Đang hoạt động",
+    "inactive": "Không hoạt động",
+    "unpublish": "Gỡ đăng tải",
+    "publishDescription": "Đăng tải lên chợ cho phép mọi người tìm thấy bộ thẻ này.",
+    "publish": "Đăng lên chợ"
+  },
+  "invite": {
+    "title": "Lời mời bộ thẻ",
+    "code": "Mã mời:",
+    "accept": "Chấp nhận lời mời",
+    "accepting": "Đang chấp nhận...",
+    "accepted": "Đã chấp nhận!",
+    "redirecting": "Đang chuyển đến bộ thẻ..."
+  },
+  "deckLabel": {
+    "myDeck": "Bộ thẻ của tôi",
+    "subscribed": "Đã đăng ký",
+    "snapshot": "Bản chụp",
+    "copy": "Bản sao"
+  }
+}

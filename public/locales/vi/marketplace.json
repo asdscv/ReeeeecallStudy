@@ -1,0 +1,55 @@
+{
+  "title": "Chợ ứng dụng",
+  "noResults": "Không có kết quả tìm kiếm.",
+  "noListings": "Chưa có bộ thẻ nào được đăng tải.",
+  "searchPlaceholder": "Tìm kiếm bộ thẻ...",
+  "allCategories": "Tất cả danh mục",
+  "sortNewest": "Mới nhất",
+  "sortPopular": "Phổ biến",
+  "sortCardCount": "Số lượng thẻ",
+  "categories": {
+    "general": "Tổng hợp",
+    "language": "Ngôn ngữ",
+    "science": "Khoa học",
+    "math": "Toán học",
+    "history": "Lịch sử",
+    "programming": "Lập trình",
+    "trivia": "Kiến thức thú vị",
+    "exam": "Luyện thi",
+    "other": "Khác"
+  },
+  "shareModes": {
+    "copy": "Sao chép",
+    "subscribe": "Đăng ký theo dõi",
+    "snapshot": "Bản chụp"
+  },
+  "listing": {
+    "cardCount": "{{count}} thẻ",
+    "userCount": "{{count}} người dùng"
+  },
+  "detail": {
+    "back": "← Chợ ứng dụng",
+    "cardCount": "{{count}} thẻ",
+    "userCount": "{{count}} người dùng",
+    "getDeck": "Lấy bộ thẻ này",
+    "importing": "Đang nhập...",
+    "cardPreview": "Xem trước thẻ (tối đa 10)",
+    "noCards": "Không có thẻ."
+  },
+  "preview": {
+    "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | ReeeeecallStudy",
+    "description": "{{title}} — {{cardCount}} thẻ ghi nhớ. Xem trước và học bộ thẻ này trên ReeeeecallStudy.",
+    "defaultDescription": "Bộ thẻ ghi nhớ trên ReeeeecallStudy",
+    "sampleCards": "Thẻ mẫu",
+    "viewInMarket": "Xem trong chợ ứng dụng",
+    "cardCount": "{{count}} thẻ",
+    "userCount": "{{count}} người dùng",
+    "by": "bởi {{name}}",
+    "blurredNotice": "Đăng nhập để xem tất cả thẻ trong bộ thẻ này",
+    "ctaLogin": "Đăng nhập để lấy bộ thẻ này",
+    "ctaSignup": "Đăng ký miễn phí",
+    "notFound": "Không tìm thấy bộ thẻ",
+    "notFoundDescription": "Bộ thẻ này có thể đã bị xóa hoặc không còn khả dụng.",
+    "backToHome": "Quay lại trang chủ"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "auth": {
+    "invalidCredentials": "Email atau kata sandi salah.",
+    "emailNotConfirmed": "Email belum diverifikasi. Silakan periksa kotak masuk Anda.",
+    "userAlreadyRegistered": "Email ini sudah terdaftar.",
+    "passwordTooShort": "Kata sandi minimal 6 karakter.",
+    "emailRateLimit": "Terlalu banyak permintaan. Silakan coba lagi nanti.",
+    "securityDelay": "Untuk keamanan, silakan coba lagi nanti.",
+    "newPasswordSameAsOld": "Kata sandi baru harus berbeda dari kata sandi lama.",
+    "invalidEmailFormat": "Format email tidak valid."
+  },
+  "rateLimit": {
+    "tooFast": "Terlalu banyak permintaan. Coba lagi dalam {{seconds}} detik."
+  },
+  "quota": {
+    "limitReached": "Batas {{resource}} tercapai ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Permintaan API harian",
+      "storage_bytes": "Penyimpanan",
+      "cards_total": "Total kartu",
+      "decks_total": "Total dek",
+      "templates_total": "Total templat",
+      "study_sessions_daily": "Sesi belajar harian",
+      "file_uploads_daily": "Unggahan file harian"
+    }
+  },
+  "storage": {
+    "imageTooLarge": "Gambar harus 5MB atau kurang.",
+    "imageFormatUnsupported": "Format gambar yang didukung: JPG, PNG, WebP",
+    "audioTooLarge": "File audio harus 10MB atau kurang.",
+    "audioFormatUnsupported": "Format audio yang didukung: MP3, OGG, WAV",
+    "uploadLimitReached": "Batas unggahan tercapai.",
+    "uploadFailed": "Gagal mengunggah: {{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "Silakan masukkan nama kunci.",
+    "nameMustBeString": "Nama kunci harus berupa teks.",
+    "nameTooLong": "Nama kunci maksimal {{maxLength}} karakter.",
+    "nameNoControlChars": "Nama kunci tidak boleh mengandung karakter kontrol."
+  },
+  "card": {
+    "readonlyDeckNoAdd": "Tidak dapat menambahkan kartu ke dek hanya-baca.",
+    "readonlyDeckNoEdit": "Tidak dapat mengubah kartu di dek hanya-baca.",
+    "rateLimitReached": "Batas permintaan tercapai."
+  },
+  "deck": {
+    "rateLimitReached": "Batas permintaan tercapai."
+  },
+  "template": {
+    "rateLimitReached": "Batas permintaan tercapai.",
+    "cannotDeleteDefault": "Templat bawaan tidak dapat dihapus.",
+    "inUseByDecks": "Tidak dapat menghapus — {{count}} dek menggunakan templat ini."
+  },
+  "marketplace": {
+    "listingNotFound": "Daftar tidak ditemukan.",
+    "cannotImportOwn": "Anda tidak dapat mengimpor dek Anda sendiri."
+  },
+  "sharing": {
+    "invalidOrExpired": "Kode undangan tidak valid atau telah kedaluwarsa.",
+    "cannotAcceptOwn": "Anda tidak dapat menerima dek Anda sendiri."
+  },
+  "import": {
+    "invalidFile": "File impor tidak valid: array kartu tidak ditemukan."
+  },
+  "fileValidationFailed": "Validasi file gagal",
+  "uploadFailed": "Gagal mengunggah.",
+  "parseError": "Penguraian file gagal."
+}

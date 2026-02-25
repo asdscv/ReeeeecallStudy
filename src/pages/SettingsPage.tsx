@@ -272,7 +272,7 @@ export function SettingsPage() {
             <h2 className="text-lg font-semibold text-gray-900">{t('language.title')}</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {(['en', 'ko', 'zh', 'ja'] as const).map((lng) => (
+            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const).map((lng) => (
               <button
                 key={lng}
                 onClick={() => changeLanguage(lng)}

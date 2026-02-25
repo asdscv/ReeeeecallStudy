@@ -1,0 +1,173 @@
+{
+  "title": "Manajemen Berbagi",
+  "directShare": "Berbagi Langsung",
+  "createShareLink": "+ Buat Tautan Berbagi",
+  "marketplace": "Marketplace",
+  "userCount": "{{count}} pengguna · {{status}}",
+  "active": "Aktif",
+  "inactive": "Tidak Aktif",
+  "unpublish": "Batalkan Publikasi",
+  "publishNote": "Mempublikasikan ke marketplace memungkinkan siapa saja menemukan dek ini.",
+  "publishButton": "Publikasikan ke Marketplace",
+
+  "noSubscribers": "Belum ada pengguna yang berbagi.",
+  "inviteLink": "Tautan undangan",
+  "cancel": "Cabut",
+  "shareDeck": "Bagikan Dek",
+  "shareDeckDesc": "Membagikan dek \"{{name}}\".",
+  "creating": "Membuat...",
+  "createInviteLink": "Buat Tautan Undangan",
+  "linkShareInfo": "Bagikan tautan ini untuk memberikan akses ke dek.",
+
+  "shareMode": {
+    "label": "Mode Berbagi",
+    "copy": {
+      "label": "Salin",
+      "desc": "Penerima dapat mengedit dengan bebas.",
+      "detail": "Semua operasi kartu dimungkinkan. Kartu, tambah/edit/hapus termasuk. Sepenuhnya independen dari aslinya."
+    },
+    "subscribe": {
+      "label": "Berlangganan",
+      "desc": "Sinkron dengan aslinya, progres belajar terpisah.",
+      "detail": "Ketika saya menambahkan kartu, pelanggan juga mendapatkannya. Pengeditan kartu tidak diizinkan. Progres belajar dilacak secara individual."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "desc": "Salinan hanya-baca dari keadaan saat ini.",
+      "detail": "Menyalin kartu saat ini dengan tepat, tetapi pengeditan tidak diizinkan. Snapshot satu kali dari dek."
+    }
+  },
+
+  "shareModes": {
+    "copy": {
+      "label": "Salin",
+      "desc": "Penerima dapat mengedit dengan bebas.",
+      "detail": "Semua operasi kartu dimungkinkan. Kartu, tambah/edit/hapus termasuk. Sepenuhnya independen dari aslinya."
+    },
+    "subscribe": {
+      "label": "Berlangganan",
+      "desc": "Sinkron dengan aslinya, progres belajar terpisah.",
+      "detail": "Ketika saya menambahkan kartu, pelanggan juga mendapatkannya. Pengeditan kartu tidak diizinkan. Progres belajar dilacak secara individual."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "desc": "Salinan hanya-baca dari keadaan saat ini.",
+      "detail": "Menyalin kartu saat ini dengan tepat, tetapi pengeditan tidak diizinkan. Snapshot satu kali dari dek."
+    }
+  },
+
+  "mode": {
+    "subscribe": "Berlangganan",
+    "snapshot": "Snapshot",
+    "copy": "Salin"
+  },
+
+  "modal": {
+    "title": "Bagikan Dek",
+    "description": "Membagikan dek \"{{name}}\".",
+    "shareMode": "Mode Berbagi",
+    "creating": "Membuat...",
+    "createInviteLink": "Buat Tautan Undangan",
+    "inviteLink": "Tautan Undangan",
+    "inviteLinkNote": "Bagikan tautan ini untuk memberikan akses ke dek."
+  },
+  "publish": {
+    "title": "Publikasikan ke Marketplace",
+    "titleLabel": "Judul",
+    "description": "Deskripsi",
+    "category": "Kategori",
+    "tags": "Tag (dipisahkan koma)",
+    "tagsPlaceholder": "contoh: bahasa inggris, kosakata, TOEIC",
+    "shareMode": "Mode Berbagi",
+    "publishing": "Mempublikasikan...",
+    "publishButton": "Publikasikan ke Marketplace",
+    "submit": "Publikasikan"
+  },
+  "modes": {
+    "copy": {
+      "label": "Salin",
+      "shortDesc": "Penerima dapat mengedit dengan bebas.",
+      "longDesc": "Semua operasi kartu dimungkinkan. Kartu, tambah/edit/hapus termasuk. Sepenuhnya independen dari aslinya."
+    },
+    "subscribe": {
+      "label": "Berlangganan",
+      "shortDesc": "Sinkron dengan aslinya, progres belajar terpisah.",
+      "longDesc": "Ketika saya menambahkan kartu, pelanggan juga mendapatkannya. Pengeditan kartu tidak diizinkan. Progres belajar dilacak secara individual."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "shortDesc": "Salinan hanya-baca dari keadaan saat ini.",
+      "longDesc": "Menyalin kartu saat ini dengan tepat, tetapi pengeditan tidak diizinkan. Snapshot satu kali dari dek."
+    }
+  },
+  "badge": {
+    "subscribed": "Berlangganan",
+    "snapshot": "Snapshot",
+    "copy": "Salin"
+  },
+  "subscribers": {
+    "noUsers": "Belum ada pengguna yang berbagi.",
+    "inviteLink": "Tautan undangan",
+    "revoke": "Cabut"
+  },
+  "status": {
+    "pending": "Menunggu",
+    "active": "Aktif",
+    "revoked": "Dicabut",
+    "declined": "Ditolak"
+  },
+  "myShares": {
+    "title": "Berbagi Saya",
+    "sent": "Berbagi Terkirim",
+    "noSent": "Belum ada dek yang dibagikan.",
+    "received": "Berbagi Diterima",
+    "noReceived": "Belum ada berbagi yang diterima.",
+    "unsubscribe": "Berhenti Berlangganan",
+    "cancel": "Cabut",
+    "status": {
+      "pending": "Menunggu",
+      "active": "Aktif",
+      "revoked": "Dicabut",
+      "declined": "Ditolak"
+    },
+    "mode": {
+      "copy": "Salin",
+      "subscribe": "Berlangganan",
+      "snapshot": "Snapshot"
+    }
+  },
+  "acceptInvite": {
+    "title": "Undangan Dek",
+    "inviteCode": "Kode undangan",
+    "accept": "Terima Undangan",
+    "accepting": "Menerima...",
+    "accepted": "Diterima!",
+    "redirecting": "Mengalihkan ke dek..."
+  },
+  "deckShare": {
+    "title": "Manajemen Berbagi",
+    "directSharing": "Berbagi Langsung",
+    "createShareLink": "Buat Tautan Berbagi",
+    "marketplace": "Marketplace",
+    "usersUsing": "{{count}} pengguna menggunakan",
+    "active": "Aktif",
+    "inactive": "Tidak Aktif",
+    "unpublish": "Batalkan Publikasi",
+    "publishDescription": "Mempublikasikan ke marketplace memungkinkan siapa saja menemukan dek ini.",
+    "publish": "Publikasikan ke Marketplace"
+  },
+  "invite": {
+    "title": "Undangan Dek",
+    "code": "Kode undangan:",
+    "accept": "Terima Undangan",
+    "accepting": "Menerima...",
+    "accepted": "Diterima!",
+    "redirecting": "Mengalihkan ke dek..."
+  },
+  "deckLabel": {
+    "myDeck": "Dek Saya",
+    "subscribed": "Berlangganan",
+    "snapshot": "Snapshot",
+    "copy": "Salin"
+  }
+}

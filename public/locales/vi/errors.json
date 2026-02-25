@@ -1,0 +1,68 @@
+{
+  "auth": {
+    "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+    "emailNotConfirmed": "Email chưa được xác minh. Vui lòng kiểm tra hộp thư.",
+    "userAlreadyRegistered": "Email này đã được đăng ký.",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự.",
+    "emailRateLimit": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+    "securityDelay": "Vì lý do bảo mật, vui lòng thử lại sau.",
+    "newPasswordSameAsOld": "Mật khẩu mới phải khác mật khẩu cũ.",
+    "invalidEmailFormat": "Định dạng email không hợp lệ."
+  },
+  "rateLimit": {
+    "tooFast": "Quá nhiều yêu cầu. Thử lại sau {{seconds}} giây."
+  },
+  "quota": {
+    "limitReached": "Đã đạt giới hạn {{resource}} ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Yêu cầu API hàng ngày",
+      "storage_bytes": "Dung lượng lưu trữ",
+      "cards_total": "Tổng số thẻ",
+      "decks_total": "Tổng số bộ thẻ",
+      "templates_total": "Tổng số mẫu",
+      "study_sessions_daily": "Phiên học hàng ngày",
+      "file_uploads_daily": "Tải tệp lên hàng ngày"
+    }
+  },
+  "storage": {
+    "imageTooLarge": "Hình ảnh phải có kích thước 5MB trở xuống.",
+    "imageFormatUnsupported": "Định dạng hình ảnh được hỗ trợ: JPG, PNG, WebP",
+    "audioTooLarge": "Tệp âm thanh phải có kích thước 10MB trở xuống.",
+    "audioFormatUnsupported": "Định dạng âm thanh được hỗ trợ: MP3, OGG, WAV",
+    "uploadLimitReached": "Đã đạt giới hạn tải lên.",
+    "uploadFailed": "Tải lên thất bại: {{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "Vui lòng nhập tên khóa.",
+    "nameMustBeString": "Tên khóa phải là chuỗi ký tự.",
+    "nameTooLong": "Tên khóa phải có {{maxLength}} ký tự trở xuống.",
+    "nameNoControlChars": "Tên khóa không được chứa ký tự điều khiển."
+  },
+  "card": {
+    "readonlyDeckNoAdd": "Không thể thêm thẻ vào bộ thẻ chỉ đọc.",
+    "readonlyDeckNoEdit": "Không thể chỉnh sửa thẻ trong bộ thẻ chỉ đọc.",
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
+  },
+  "deck": {
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
+  },
+  "template": {
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu.",
+    "cannotDeleteDefault": "Không thể xóa mẫu mặc định.",
+    "inUseByDecks": "Không thể xóa — {{count}} bộ thẻ đang sử dụng mẫu này."
+  },
+  "marketplace": {
+    "listingNotFound": "Không tìm thấy danh sách.",
+    "cannotImportOwn": "Bạn không thể nhập bộ thẻ của chính mình."
+  },
+  "sharing": {
+    "invalidOrExpired": "Mã mời không hợp lệ hoặc đã hết hạn.",
+    "cannotAcceptOwn": "Bạn không thể chấp nhận bộ thẻ của chính mình."
+  },
+  "import": {
+    "invalidFile": "Tệp nhập không hợp lệ: thiếu mảng thẻ."
+  },
+  "fileValidationFailed": "Xác thực tệp thất bại",
+  "uploadFailed": "Tải lên thất bại.",
+  "parseError": "Phân tích tệp thất bại."
+}

@@ -1,0 +1,309 @@
+{
+  "title": "Panduan Pengguna",
+  "subtitle": "Pelajari semua fitur ReeeeecallStudy",
+  "searchPlaceholder": "Cari fitur (contoh: SRS, Impor, Berbagi...)",
+  "tableOfContents": "Daftar Isi",
+  "noResults": "Tidak ada hasil untuk \"{{query}}\".",
+  "sections": {
+    "getting-started": {
+      "title": "Memulai",
+      "items": {
+        "login": {
+          "title": "Masuk",
+          "body": "Masuk dengan email dan kata sandi Anda. Saat mendaftar, email verifikasi dikirim — klik tautan untuk menyelesaikan pendaftaran. Anda dapat menerima tautan reset jika lupa kata sandi."
+        },
+        "dashboard": {
+          "title": "Beranda (Dasbor)",
+          "body": "Setelah masuk, dasbor muncul. Lihat total kartu, kartu ulasan hari ini, rentetan belajar, dan tingkat penguasaan secara sekilas. Periksa peta panas belajar untuk melihat apakah Anda belajar secara konsisten, dan gunakan grafik perkiraan ulasan untuk memprediksi volume belajar yang akan datang."
+        },
+        "navigation": {
+          "title": "Navigasi",
+          "body": "Di PC, gunakan bilah menu atas; di ponsel, ketuk menu hamburger (☰). Menu yang tersedia: Belajar Cepat, Dasbor, Dek, Kartu (Templat), Marketplace, Riwayat, Pengaturan, Panduan."
+        }
+      }
+    },
+    "decks": {
+      "title": "Manajemen Dek",
+      "items": {
+        "create": {
+          "title": "Membuat Dek",
+          "body": "Di halaman Dek, tekan tombol 'Dek Baru'. Atur nama, deskripsi, ikon, dan warna. Dek seperti folder yang mengelompokkan kartu kilat berdasarkan topik."
+        },
+        "detail": {
+          "title": "Tampilan Detail Dek",
+          "body": "Klik dek untuk melihat daftar kartunya. Gunakan tombol atas untuk menambah kartu, mengimpor, mengekspor, berbagi, atau mengedit dek. Filter berdasarkan status kartu (baru/sedang dipelajari/ulasan/ditangguhkan) dan pencarian juga didukung."
+        },
+        "edit": {
+          "title": "Edit Dek",
+          "body": "Di halaman edit dek, ubah nama, deskripsi, ikon, warna, dan templat bawaan. Pengaturan SRS (interval Ulangi/Sulit/Baik/Mudah) dapat disesuaikan per dek. Statistik dek (distribusi status kartu, tingkat penguasaan, peta panas belajar) ditampilkan di bagian bawah."
+        },
+        "delete": {
+          "title": "Hapus Dek",
+          "body": "Tekan ikon hapus pada daftar dek untuk melihat dialog konfirmasi. Menghapus dek juga menghapus semua kartunya — hati-hati."
+        }
+      }
+    },
+    "cards": {
+      "title": "Manajemen Kartu",
+      "items": {
+        "add": {
+          "title": "Menambah Kartu",
+          "body": "Tekan 'Tambah Kartu' di halaman detail dek. Isi bidang yang didefinisikan di templat (contoh: depan, belakang). Tambahkan tag yang dipisahkan koma untuk pencarian dan penyaringan nanti."
+        },
+        "editDelete": {
+          "title": "Edit & Hapus Kartu",
+          "body": "Klik kartu di daftar untuk membuka modal edit. Ubah konten bidang dan tag. Anda dapat menghapus kartu individual atau memilih beberapa untuk penghapusan massal."
+        },
+        "searchFilter": {
+          "title": "Cari & Filter",
+          "body": "Masukkan kata kunci di bilah pencarian di bagian atas halaman detail dek untuk mencari di semua bidang dan tag. Pilih filter status (baru, sedang dipelajari, ulasan, ditangguhkan) untuk melihat hanya kartu tertentu."
+        },
+        "srsReset": {
+          "title": "Reset SRS",
+          "body": "Mereset status SRS kartu mengembalikannya ke status 'baru'. Gunakan ini ketika Anda ingin mulai belajar dari awal."
+        }
+      }
+    },
+    "templates": {
+      "title": "Templat Kartu",
+      "items": {
+        "what": {
+          "title": "Apa itu Templat?",
+          "body": "Templat mendefinisikan struktur kartu — bidang apa yang dimiliki dan bagaimana pengaturannya di depan dan belakang. Misalnya, templat 'Kosakata Bahasa Inggris' mungkin memiliki bidang untuk kata, arti, dan contoh kalimat. Satu templat dapat digunakan di beberapa dek."
+        },
+        "createEdit": {
+          "title": "Membuat & Mengedit Templat",
+          "body": "Tekan 'Templat Baru' di menu Kartu. Tambahkan bidang dan atur nama, tipe (teks/gambar/audio). Seret untuk mengatur ulang bidang. Tambahkan deskripsi bidang sebagai panduan untuk pembuatan kartu."
+        },
+        "layout": {
+          "title": "Tata Letak Depan & Belakang",
+          "body": "Mode bawaan: Tempatkan bidang di sisi depan/belakang dan atur gaya (utama, sekunder, petunjuk, detail, media) dan ukuran font. Mode HTML kustom: Gunakan sintaks {{fieldName}} untuk tata letak HTML bebas."
+        },
+        "tts": {
+          "title": "TTS (Teks-ke-Ucapan)",
+          "body": "Aktifkan TTS per bidang dan pilih bahasa (Korea, Inggris, Jepang, Cina, dll.). Saat belajar, kartu dibaca otomatis saat dibalik, atau tekan tombol speaker untuk pemutaran manual. Aktifkan/nonaktifkan pembacaan otomatis di Pengaturan."
+        }
+      }
+    },
+    "study": {
+      "title": "Belajar",
+      "items": {
+        "modes": {
+          "title": "Mode Belajar",
+          "body": "• SRS (Pengulangan Berjarak): Secara otomatis menyesuaikan waktu ulasan berdasarkan kurva memori. Kartu yang salah muncul kembali dalam sesi yang sama. Metode paling efisien untuk menghafal jangka panjang. Menggunakan 4 tombol (Ulangi/Sulit/Baik/Mudah).\n• Ulasan Berurutan: Mempelajari semua kartu baru ditambah sejumlah kartu ulasan yang dapat dikonfigurasi. Kembali ke awal setelah mencapai akhir.\n• Acak: Mengambil kartu secara acak dari dek.\n• Berurutan: Mempelajari kartu secara berurutan. Mengingat posisi Anda untuk melanjutkan.\n• Berdasarkan Tanggal: Mempelajari hanya kartu yang ditambahkan pada tanggal tertentu.\n\nUlasan Berurutan, Acak, Berurutan, dan Berdasarkan Tanggal menggunakan 2 tombol sederhana (Tidak Diketahui/Diketahui).\n\n• Mode Menjejalkan: Ulasan intensif berbasis ronde hingga semua kartu dikuasai. Menggunakan 2 tombol (Terlewat/Mengerti). Tidak memengaruhi jadwal SRS Anda."
+        },
+        "srsScience": {
+          "title": "Ilmu di Balik SRS",
+          "body": "SRS (Sistem Pengulangan Berjarak) adalah metode belajar berdasarkan cara kerja memori manusia.\n\nKurva Lupa Ebbinghaus\nPsikolog Jerman Hermann Ebbinghaus menemukan \"kurva lupa\" melalui eksperimen pada tahun 1885:\n• 20 menit setelah belajar: ~42% terlupakan\n• 1 jam setelahnya: ~56% terlupakan\n• 1 hari setelahnya: ~67% terlupakan\n• 1 minggu setelahnya: ~75% terlupakan\n• 1 bulan setelahnya: ~79% terlupakan\n\nDengan kata lain, informasi yang dipelajari hanya sekali akan terlupakan dengan cepat seiring waktu.\n\nPrinsip Inti Pengulangan Berjarak\nKunci SRS adalah \"mengulas tepat sebelum Anda lupa\":\n1. Belajar pertama → ulas setelah 1 hari\n2. Diingat setelah 1 hari → ulas setelah 3 hari\n3. Diingat setelah 3 hari → ulas setelah 7 hari\n4. Diingat setelah 7 hari → ulas setelah 21 hari\n\nDengan meningkatkan interval ulasan secara bertahap, Anda dapat menyimpan informasi dalam memori jangka panjang dengan usaha minimal. Penelitian menunjukkan ini 2-3x lebih efisien daripada pengulangan menghafal sederhana.\n\nSRS ReeeeecallStudy didasarkan pada algoritma SM-2 yang terbukti oleh Anki, menganalisis kesulitan dan riwayat belajar setiap kartu untuk menghitung waktu ulasan optimal secara otomatis."
+        },
+        "srsMethod": {
+          "title": "Metode Belajar SRS — Panduan Tombol Lengkap",
+          "body": "Lihat bagian depan kartu, ingat jawabannya, lalu balik. Setelah memeriksa bagian belakang, tekan salah satu dari 4 tombol untuk mengevaluasi diri sendiri.\n\nUlangi (Tombol Merah)\n\"Saya sama sekali tidak ingat\"\n• Kartu baru: Muncul kembali setelah 10 menit (dalam sesi yang sama)\n• Kartu ulasan: Interval direset, muncul kembali setelah 10 menit\n• Faktor kemudahan berkurang -0,20\n• Jumlah pengulangan direset ke 0\n→ Jika Anda tidak ingat, tekan dengan jujur. Memaksakan tombol lain justru mengurangi efisiensi belajar.\n\nSulit (Tombol Oranye)\n\"Saya mengingatnya, tetapi sulit\"\n• Kartu baru: Ulas setelah 1 hari\n• Kartu ulasan: Diulas pada ~1,2x interval saat ini (minimum +1 hari)\n• Faktor kemudahan berkurang -0,15\n→ Jika Anda berjuang beberapa detik sebelum akhirnya mengingat, pilih Sulit.\n\nBaik (Tombol Biru)\n\"Saya mengingatnya dengan cukup baik\"\n• Kartu baru: Ulas setelah 1 hari\n• Ulasan kedua: Setidaknya 3 hari kemudian\n• Setelah itu: Interval saat ini × faktor kemudahan (biasanya 2,5x)\n• Faktor kemudahan tidak berubah\n→ Jika Anda mengingat secara alami dalam 1-2 detik, pilih Baik. Ini adalah tombol yang paling sering Anda tekan.\n\nMudah (Tombol Hijau)\n\"Saya mengingat secara instan dan sempurna\"\n• Kartu baru: Ulas setelah 4 hari\n• Kartu ulasan: Interval saat ini × faktor kemudahan × 1,3\n• Faktor kemudahan meningkat +0,15\n→ Hanya tekan Mudah ketika jawaban langsung terlintas di pikiran saat Anda melihat kartu.\n\nKiat: Jika ragu, tekan Baik. Untuk sebagian besar kartu, Baik adalah penilaian yang paling tepat."
+        },
+        "srsCardStates": {
+          "title": "Memahami Status Kartu",
+          "body": "Dalam belajar SRS, kartu melewati 3 status:\n\nBaru\nKartu yang belum dipelajari.\n• Muncul untuk pertama kali dalam sesi belajar\n• Setelah penilaian pertama, berpindah ke status \"Sedang Dipelajari\" atau \"Ulasan\"\n• \"Batas Kartu Baru\" di pengaturan mengontrol berapa banyak yang muncul per sesi\n\nSedang Dipelajari\nKartu yang belum sepenuhnya dihafal (dinilai Ulangi atau Sulit).\n• Muncul kembali pada interval pendek (10 menit hingga 1 hari)\n• Penilaian Baik atau lebih tinggi \"meluluskan\" mereka ke status Ulasan\n• Dapat muncul beberapa kali dalam sesi yang sama\n\nUlasan\nKartu yang telah masuk ke memori jangka panjang (dinilai Baik atau Mudah).\n• Interval bertambah secara progresif (1 hari → 3 hari → 7 hari → 21 hari → ...)\n• Menekan Ulangi mengembalikan mereka ke \"Sedang Dipelajari\"\n• Kartu yang dikuasai dengan baik mungkin memiliki interval berbulan-bulan atau bahkan bertahun-tahun\n\nBerkat sistem 3 tahap ini, Anda memfokuskan waktu pada kartu yang tidak Anda ketahui sambil meminimalkan ulasan kartu yang sudah dikuasai."
+        },
+        "srsIntervals": {
+          "title": "Interval Ulasan & Faktor Kemudahan",
+          "body": "Inti dari SRS adalah \"Faktor Kemudahan\" dan \"Interval Ulasan.\"\n\nApa itu Faktor Kemudahan?\nAngka yang ditetapkan secara individual untuk setiap kartu (bawaan: 2,50).\n• Ulangi: penurunan -0,20 (minimum 1,30)\n• Sulit: penurunan -0,15 (minimum 1,30)\n• Baik: Tidak berubah\n• Mudah: peningkatan +0,15 (maksimum 4,00)\n\nInterval ulasan bertambah dengan mengalikan faktor kemudahan:\nContoh: Kartu dengan interval 10 hari, faktor kemudahan 2,50, dinilai Baik → interval berikutnya = 10 × 2,50 = 25 hari\n\nContoh Belajar Nyata (Pengaturan Bawaan)\nMenekan Baik secara konsisten pada kartu baru:\nKe-1: Setelah 1 hari → Ke-2: Setelah 3 hari → Ke-3: Setelah 8 hari → Ke-4: Setelah 20 hari → Ke-5: Setelah 50 hari → ...\n\nMenekan Ulangi dulu, lalu Baik:\nKe-1 (Ulangi): Setelah 10 mnt → Ke-2 (Baik): Setelah 1 hari → Ke-3 (Baik): Setelah 3 hari → ...\n\nAturan Jaminan Interval\n• Interval Sulit selalu meningkat minimal 1 hari dari sebelumnya\n• Interval Baik selalu lebih besar dari Sulit\n• Interval Mudah selalu lebih besar dari Baik\n\nSistem ini memastikan kartu yang sering terlewat muncul lebih sering, sementara kartu yang dikuasai muncul lebih jarang."
+        },
+        "quickStudy": {
+          "title": "Belajar Cepat",
+          "body": "Pilih dek langsung di halaman Belajar Cepat untuk memulai. Setiap dek menampilkan jumlah kartu baru/ulasan untuk pengambilan keputusan cepat."
+        },
+        "sessionFlow": {
+          "title": "Alur Sesi Belajar",
+          "body": "1. Pilih dek → Atur mode belajar → Mulai\n2. Lihat bagian depan kartu → Ketuk/klik untuk membalik → Pilih penilaian\n3. Setelah semua kartu, ringkasan menampilkan jumlah belajar, waktu yang dihabiskan, dan distribusi penilaian.\n\nPintasan Keyboard (berdasarkan mode)\n• Umum: Spasi/Enter (balik), Escape (keluar)\n• Mode SRS: 1 (Ulangi), 2 (Sulit), 3 (Baik), 4 (Mudah)\n• Mode umum (Ulasan Berurutan/Acak/Berurutan/Berdasarkan Tanggal): →/Spasi (Diketahui), ← (Tidak Diketahui)\n• Menjejalkan: →/Spasi (Mengerti), ← (Terlewat)"
+        },
+        "swipeMode": {
+          "title": "Mode Geser",
+          "body": "Ganti mode jawaban ke 'Geser' di Pengaturan untuk menilai kartu dengan menggeser. Cocok untuk belajar dengan satu tangan di ponsel.\n\nArah geser berdasarkan mode:\n• Mode SRS: ← Ulangi / → Baik\n• Mode umum (Ulasan Berurutan/Acak/Berurutan/Berdasarkan Tanggal): ← Tidak Diketahui / → Diketahui\n• Menjejalkan: ← Terlewat / → Mengerti\n\nGeser melewati 100px untuk melihat umpan balik visual; lepaskan untuk mengonfirmasi penilaian."
+        },
+        "srsCustom": {
+          "title": "Menyesuaikan Pengaturan SRS",
+          "body": "Sesuaikan interval bawaan Ulangi/Sulit/Baik/Mudah (hari) di halaman edit dek. Misalnya, menambah interval Mudah menjadi 7 hari mengurangi frekuensi ulasan untuk kartu mudah. 'Batas Kartu Baru' di Pengaturan mengontrol berapa banyak kartu baru yang muncul per sesi."
+        },
+        "cramming": {
+          "title": "Mode Menjejalkan",
+          "body": "Mode Menjejalkan dirancang untuk belajar intensif di menit-menit terakhir — sempurna sebelum ujian atau saat Anda perlu mengulas semua kartu dengan cepat.\n\nCara Kerjanya\n1. Semua kartu yang dipilih ditampilkan di Ronde 1\n2. Nilai setiap kartu sebagai \"Mengerti\" atau \"Tidak Mengerti\"\n3. Kartu yang terlewat muncul kembali dalam ronde setelah jeda singkat\n4. Kartu yang tidak pernah dijawab \"Mengerti\" berpindah ke ronde berikutnya\n5. Sesi berakhir ketika semua kartu dikuasai (atau waktu habis)\n\nFitur Utama\n• Filter Kartu: Pelajari semua kartu, kartu lemah saja (faktor kemudahan rendah), atau kartu yang segera jatuh tempo\n• Batas Waktu: Opsional — atur 15/30/60 menit atau tanpa batas\n• Acak: Acak urutan kartu setiap ronde\n• Pelacakan Penguasaan: Persentase penguasaan dan progres ronde secara real-time\n\nKeamanan SRS\nMode Menjejalkan TIDAK memengaruhi jadwal SRS Anda. Faktor kemudahan, interval, dan tanggal ulasan berikutnya tetap tidak berubah. Log belajar tetap dicatat untuk pelacakan riwayat.\n\nPintasan Keyboard\n• Spasi atau → : Mengerti\n• ← : Tidak Mengerti\n\nKapan Menggunakan Menjejalkan vs SRS\n• Gunakan SRS untuk pembelajaran harian jangka panjang\n• Gunakan Menjejalkan untuk persiapan ujian, ulasan cepat, atau menyegarkan materi yang terlupakan"
+        }
+      }
+    },
+    "import-export": {
+      "title": "Impor & Ekspor",
+      "items": {
+        "jsonImport": {
+          "title": "Impor JSON",
+          "body": "Di halaman detail dek, klik 'Impor' → pilih file JSON. File JSON yang diekspor dari ReeeeecallStudy dapat langsung diimpor, ideal untuk pencadangan dan pemulihan. Termasuk metadata dek dan info templat."
+        },
+        "csvImport": {
+          "title": "Impor CSV",
+          "body": "File CSV (disimpan dari Excel) juga dapat diimpor. Langkah pemetaan muncul untuk mencocokkan nama kolom ke bidang templat, dengan pencocokan otomatis. Kolom 'Tag' dengan titik koma (;) dikenali secara otomatis."
+        },
+        "duplicates": {
+          "title": "Penanganan Duplikat",
+          "body": "Saat mengimpor, kartu yang ada dengan konten identik ditandai sebagai duplikat. Anda dapat melewati, menimpa, atau menambahkannya. Pratinjau jumlah kartu valid/tidak valid/duplikat sebelum impor akhir."
+        },
+        "jsonExport": {
+          "title": "Ekspor JSON",
+          "body": "Detail dek → 'Ekspor' → JSON mengunduh info dek, templat, dan semua kartu sebagai satu file JSON. Gunakan untuk transfer ke perangkat/akun lain atau cadangan."
+        },
+        "csvExport": {
+          "title": "Ekspor CSV",
+          "body": "Format CSV dapat dibuka langsung di Excel/Google Sheets. Termasuk BOM untuk tampilan karakter yang benar di Excel."
+        }
+      }
+    },
+    "sharing": {
+      "title": "Berbagi Dek",
+      "items": {
+        "copy": {
+          "title": "Mode Berbagi: Salin",
+          "body": "Memberikan penerima salinan independen dari dek. Mereka dapat mengedit, menambah, dan menghapus kartu dengan bebas. Setelah berbagi, asli dan salinan tidak saling memengaruhi. Terbaik untuk kustomisasi."
+        },
+        "subscribe": {
+          "title": "Mode Berbagi: Berlangganan",
+          "body": "Penerima 'berlangganan' dek Anda. Saat Anda menambahkan kartu, pelanggan juga mendapatkannya. Namun, progres belajar (SRS) dilacak secara independen. Pelanggan tidak dapat mengedit kartu. Cocok untuk guru↔siswa atau kelompok belajar."
+        },
+        "snapshot": {
+          "title": "Mode Berbagi: Snapshot",
+          "body": "Membuat salinan hanya-baca dari dek pada titik waktu saat ini. Penerima hanya dapat belajar, tidak mengedit. Pembaruan di masa depan pada aslinya tidak tercermin. Gunakan saat Anda ingin berbagi 'keadaan yang tepat saat ini'."
+        },
+        "inviteLink": {
+          "title": "Mengirim Tautan Undangan",
+          "body": "Detail dek → Tombol Bagikan → Pilih mode berbagi → 'Buat Tautan Undangan' menghasilkan tautan unik. Kirim melalui messenger, email, dll. Penerima mengklik untuk menerima."
+        },
+        "manage": {
+          "title": "Mengelola Berbagi",
+          "body": "Periksa berbagi terkirim/diterima di halaman 'Berbagi Saya' dekat Pengaturan. Anda dapat mencabut berbagi aktif atau berhenti berlangganan dari langganan."
+        }
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace",
+      "items": {
+        "what": {
+          "title": "Apa itu Marketplace?",
+          "body": "Ruang untuk mencari dan mendapatkan dek yang dibagikan oleh pengguna lain. Filter berdasarkan kategori (bahasa, sertifikasi, pemrograman, dll.) dan tag, urutkan berdasarkan popularitas atau terbaru."
+        },
+        "getDeck": {
+          "title": "Mendapatkan Dek",
+          "body": "Klik dek di marketplace untuk melihat detail. Pratinjau 10 kartu pertama, lalu tekan 'Dapatkan' untuk menambahkannya ke dek Anda. Perilaku bervariasi berdasarkan mode berbagi (salin/berlangganan/snapshot)."
+        },
+        "publish": {
+          "title": "Mempublikasikan Dek Anda",
+          "body": "Detail dek → Bagikan → 'Publikasikan ke Marketplace'. Atur judul, deskripsi, kategori, tag, dan mode berbagi. Setelah dipublikasikan, semua pengguna dapat mencarinya. Anda dapat membatalkan publikasi kapan saja."
+        }
+      }
+    },
+    "history": {
+      "title": "Riwayat & Statistik Belajar",
+      "items": {
+        "viewHistory": {
+          "title": "Melihat Riwayat Belajar",
+          "body": "Lihat semua sesi belajar berdasarkan tanggal di halaman Riwayat. Klik sesi untuk melihat detail per kartu (penilaian, waktu yang dihabiskan). Filter berdasarkan dek atau mode. Grafik distribusi penilaian dikelompokkan berdasarkan mode (Pengulangan Berjarak / Umum / Menjejalkan)."
+        },
+        "deckProgress": {
+          "title": "Progres Dek",
+          "body": "Kartu progres dek muncul di bagian atas Riwayat Belajar. Lihat tingkat penyelesaian dan jumlah kartu berdasarkan status (baru/sedang dipelajari/ulasan) secara sekilas."
+        },
+        "dashboardStats": {
+          "title": "Statistik Dasbor",
+          "body": "Beralih antara tab periode (1H/1M/1B/3B/6B/1T/2T/5T) di dasbor untuk melihat peta panas belajar, grafik volume belajar harian, dan perkiraan ulasan."
+        }
+      }
+    },
+    "settings": {
+      "title": "Pengaturan",
+      "items": {
+        "profile": {
+          "title": "Profil",
+          "body": "Atur nama tampilan Anda. Email tidak dapat diubah."
+        },
+        "srsLimit": {
+          "title": "Batas Kartu Baru SRS",
+          "body": "Atur jumlah maksimal kartu baru yang ditambahkan per sesi SRS. Kartu ulasan tidak terpengaruh oleh batas ini. Sesuaikan untuk mengontrol volume belajar Anda."
+        },
+        "answerMode": {
+          "title": "Mode Jawaban (Tombol/Geser)",
+          "body": "Mode tombol: Nilai dengan menekan tombol di bagian bawah. Mode SRS menampilkan 4 tombol (Ulangi/Sulit/Baik/Mudah), mode umum menampilkan 2 tombol (Tidak Diketahui/Diketahui), dan menjejalkan menampilkan 2 tombol (Terlewat/Mengerti).\nMode geser: Nilai dengan menggeser kartu ke kiri atau kanan. Di SRS: ← Ulangi / → Baik. Di mode lain: ← Tidak Diketahui / → Diketahui."
+        },
+        "autoTts": {
+          "title": "TTS Otomatis",
+          "body": "Membaca otomatis bidang dengan TTS saat membalik kartu. Bahkan saat nonaktif, tombol speaker untuk pemutaran manual selalu tersedia."
+        },
+        "apiKey": {
+          "title": "Kunci API",
+          "body": "Buat kunci API untuk mengakses data ReeeeecallStudy dari alat eksternal (skrip, aplikasi). Kunci hanya ditampilkan sekali — pastikan untuk menyalinnya. Maksimal 1 kunci diizinkan."
+        }
+      }
+    },
+    "api": {
+      "title": "Panduan API (Buat Kartu Otomatis dengan AI)",
+      "items": {
+        "whatSimple": {
+          "title": "Apa itu API? (Penjelasan Sederhana)",
+          "body": "API adalah \"cara program berkomunikasi satu sama lain.\"\n\nSeperti Anda mengklik tombol di aplikasi untuk membuat kartu, API memungkinkan Anda melakukan hal yang sama dengan perintah teks.\n\nBayangkan seperti restoran:\n• Menu = dokumentasi API (menjelaskan permintaan apa yang dapat Anda buat)\n• Memesan = permintaan API (\"Tampilkan dek saya\", \"Tambahkan 100 kartu\")\n• Menerima makanan = respons API (data atau hasil yang Anda minta)\n\nBagian terbaiknya? Anda dapat meminta alat AI seperti ChatGPT, Gemini, atau Claude untuk mengirim perintah ini untuk Anda!\nAI membuat konten kartu DAN mendaftarkannya melalui API secara otomatis."
+        },
+        "whyApi": {
+          "title": "Mengapa Menggunakan API?",
+          "body": "Bandingkan membuat kartu satu per satu vs. menggunakan API:\n\nManual: 30 detik per kartu x 100 kartu = ~50 menit\nAPI + AI: 100 kartu sekaligus = ~3-5 menit\n\nApa yang dapat Anda lakukan dengan API:\n• Katakan kepada AI \"Buat 100 kartu kosakata TOEIC\" dan langsung dibuat\n• \"Buat 50 kartu kanji JLPT N3\" — selesai dalam satu permintaan\n• Unggah data dari Excel atau file teks secara massal\n• Tidak perlu pemrograman — cukup mengobrol dengan AI!\n\nIkuti panduan ini dan siapa pun dapat membuat 100 kartu dalam 5 menit."
+        },
+        "getKey": {
+          "title": "Mendapatkan Kunci API Anda",
+          "body": "Untuk menggunakan API, Anda pertama-tama memerlukan kunci API. Ini seperti kata sandi yang memungkinkan Anda mengakses API dari akun Anda.\n\nCara mendapatkannya:\n1. Masuk ke aplikasi ReeeeecallStudy\n2. Buka \"Pengaturan\" dari menu kanan atas\n3. Gulir ke bawah ke bagian \"Kunci API\"\n4. Klik \"Buat Kunci API Baru\"\n5. Masukkan nama untuk kunci Anda (contoh: \"Integrasi AI Saya\")\n6. Kunci yang dimulai dengan rc_ akan ditampilkan\n\nPENTING: Kunci hanya ditampilkan sekali di layar ini!\nPastikan untuk menyalin dan menyimpannya di tempat yang aman.\n\nKunci API Anda seperti kata sandi. Jangan pernah membagikannya dengan orang lain."
+        },
+        "step1Prepare": {
+          "title": "Langkah 1: Siapkan Dek dan Templat Kartu Anda",
+          "body": "Sebelum menambahkan kartu melalui API, pertama buat dek dan templat kartu di aplikasi.\n\n1. Buat Dek\n• Di aplikasi, buka \"Dek\" → \"Buat Dek Baru\"\n• Masukkan nama (contoh: \"Kosakata TOEIC\")\n• Masukkan deskripsi (contoh: \"Kata-kata penting TOEIC\")\n\n2. Buat Templat Kartu\n• Buka \"Templat\" → \"Templat Baru\"\n• Masukkan nama (contoh: \"Detail Kosakata\")\n• Tambahkan bidang:\n  - word: tipe teks\n  - meaning: tipe teks\n  - example: tipe teks\n• Tempatkan \"word\" di tata letak depan\n• Tempatkan \"meaning\" dan \"example\" di tata letak belakang\n\n3. Tetapkan Templat Bawaan untuk Dek Anda\n• Di edit dek, pilih templat yang baru saja Anda buat sebagai bawaan\n\nKiat: Ingat nama kunci bidang (word, meaning, example)!\nAnda akan menggunakan kunci yang sama persis saat membuat kartu melalui API."
+        },
+        "step2Query": {
+          "title": "Langkah 2: Temukan ID Dek/Templat Anda dengan AI",
+          "body": "Untuk menambahkan kartu, Anda memerlukan ID dek dan ID templat.\nAyo minta AI untuk mencarinya!\n\nBuka ChatGPT, Gemini, atau Claude dan tempelkan yang berikut:\n\n─────────────────────────────\nSaya menggunakan aplikasi kartu kilat bernama ReeeeecallStudy.\nBerikut info API saya:\n• URL API: https://reeeeecallstudy.xyz/api/v1\n• Kunci API: rc_TEMPELKAN_KUNCI_API_ANDA_DI_SINI\n\nSilakan buat dua permintaan ini:\n1. Daftar dek saya: GET https://reeeeecallstudy.xyz/api/v1/decks\n2. Daftar templat saya: GET https://reeeeecallstudy.xyz/api/v1/templates\n\nSertakan header: Authorization: Bearer rc_TEMPELKAN_KUNCI_API_ANDA_DI_SINI\nTampilkan id dan nama setiap dek, dan id, nama, serta bidang setiap templat.\n─────────────────────────────\n\nGanti \"rc_TEMPELKAN_KUNCI_API_ANDA_DI_SINI\" dengan kunci API Anda yang sebenarnya!\n\nAI akan menampilkan info seperti:\n• ID Dek: a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• Nama dek: Kosakata TOEIC\n• ID Templat: e5f6g7h8-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• Bidang templat: word, meaning, example\n\nSalin ID ini — Anda akan membutuhkannya di langkah berikutnya!"
+        },
+        "step3AiGenerate": {
+          "title": "Langkah 3: Minta AI untuk Membuat dan Mendaftarkan Kartu",
+          "body": "Ini adalah langkah kuncinya! Minta AI untuk membuat kartu dan mendaftarkannya langsung.\n\nSalin prompt di bawah, ganti bagian yang ditandai dengan info Anda, dan kirim ke AI:\n\n─────────────────────────────\nBuat kartu kilat menggunakan API ReeeeecallStudy.\n\nInfo API:\n• URL Dasar: https://reeeeecallstudy.xyz/api/v1\n• Kunci API: (tempelkan kunci API Anda di sini)\n• ID Dek: (tempelkan ID dek Anda dari Langkah 2)\n• ID Templat: (tempelkan ID templat Anda dari Langkah 2)\n\nEndpoint pembuatan kartu:\nPOST https://reeeeecallstudy.xyz/api/v1/decks/(ID dek)/cards\nHeaders:\n  Authorization: Bearer (kunci API)\n  Content-Type: application/json\nBody (array JSON, maks 100):\n[\n  {\n    \"template_id\": \"(ID templat)\",\n    \"field_values\": {\n      \"word\": \"kata bahasa Inggris\",\n      \"meaning\": \"definisi\",\n      \"example\": \"contoh kalimat\"\n    },\n    \"tags\": [\"tag\"]\n  }\n]\n\nPermintaan:\nBuat 50 kartu kosakata TOEIC esensial dan daftarkan melalui API di atas.\nSetiap kartu harus memiliki:\n• word: kata bahasa Inggris\n• meaning: definisi singkat\n• example: satu contoh kalimat menggunakan kata tersebut\n• tags: tingkat kesulitan (pemula / menengah / lanjutan)\n─────────────────────────────\n\nUbah \"50 kartu kosakata TOEIC esensial\" ke topik apa pun yang Anda inginkan!\nContoh:\n• \"30 kartu kanji JLPT N3\"\n• \"40 frasa perjalanan dasar bahasa Spanyol\"\n• \"50 peristiwa kronologi sejarah dunia\"\n• \"30 istilah pemrograman Python\"\n• \"50 istilah anatomi medis\"\n\nButuh lebih banyak kartu? Cukup katakan \"Buat 50 lagi tanpa duplikat!\""
+        },
+        "aiExamples": {
+          "title": "Kiat untuk Setiap AI (ChatGPT / Gemini / Claude)",
+          "body": "Setiap AI memiliki kekuatan yang sedikit berbeda. Gunakan yang terbaik untuk kebutuhan Anda!\n\nChatGPT (chat.openai.com)\n• Dapat menjalankan kode untuk memanggil API langsung melalui Code Interpreter\n• Kiat: Katakan \"Jalankan kode Python untuk memanggil API secara langsung\" dan akan mengeksekusi kode nyata untuk mendaftarkan kartu\n• Terbaik untuk: Panggilan API langsung\n\nGoogle Gemini (gemini.google.com)\n• Terintegrasi dengan Google Search untuk informasi terbaru\n• Kiat: Cocok untuk kartu yang membutuhkan info terkini seperti \"kosakata berita terkini 2025\"\n• Terbaik untuk: Kartu yang membutuhkan tren terbaru\n\nClaude (claude.ai)\n• Sangat baik dalam menangani teks panjang dan menghasilkan JSON yang akurat\n• Kiat: Dapat membuat 100 kartu sekaligus tanpa merusak format JSON\n• Terbaik untuk: Pembuatan massal, struktur kartu kompleks\n\nKiat Umum:\n• Jika AI gagal memanggil API → Minta \"Cukup tampilkan data JSON-nya.\" Lalu salin dan gunakan metode pendaftaran manual (lihat bagian berikutnya)\n• Katakan \"Buat 50 lagi tanpa tumpang tindih dengan kartu sebelumnya\" untuk penambahan berkelanjutan\n• Maksimal 100 kartu per permintaan. Untuk lebih banyak, bagi menjadi beberapa permintaan"
+        },
+        "step4Manual": {
+          "title": "Ketika AI Tidak Dapat Memanggil API Secara Langsung (Metode Manual)",
+          "body": "Jika AI tidak dapat memanggil API secara langsung, jangan khawatir!\nCukup salin data JSON yang dibuat AI dan kirim sendiri.\n\nMetode 1: Swagger UI (Paling Mudah, Direkomendasikan)\n1. Buka https://reeeeecallstudy.xyz/api/ui di browser Anda\n2. Klik \"Authorize\" di atas → Masukkan kunci API Anda → Konfirmasi\n3. Temukan dan buka POST /v1/decks/{deckId}/cards\n4. Klik \"Try it out\"\n5. Masukkan ID dek Anda di bidang deckId\n6. Tempelkan array JSON dari AI ke body permintaan\n7. Klik \"Execute\" → Selesai!\n\nMetode 2: Terminal / Command Prompt\nBuka Terminal (Mac) atau PowerShell (Windows) dan jalankan:\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/ID_DEK_ANDA/cards\" \\\n  -H \"Authorization: Bearer rc_KUNCI_API_ANDA\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"ID_TEMPLAT_ANDA\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"sebuah buah bulat\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"pemula\"]}]'\n\nUntuk JSON yang panjang, simpan ke file terlebih dahulu:\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/ID_DEK_ANDA/cards\" \\\n  -H \"Authorization: Bearer rc_KUNCI_API_ANDA\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\nMaksimal 100 kartu per permintaan."
+        },
+        "docsPage": {
+          "title": "Dokumentasi API Lengkap",
+          "body": "Untuk informasi API yang lebih detail:\n\n• Dokumen API dalam aplikasi: \"API\" di menu atas atau /api-docs\n• Swagger UI (pengujian interaktif): https://reeeeecallstudy.xyz/api/ui\n• Dokumen API publik: https://reeeeecallstudy.xyz/docs/api\n\nSemua endpoint yang tersedia:\n• API Dek: Daftar, detail, buat\n• API Kartu: Daftar, detail, buat (massal didukung), perbarui, hapus\n• API Templat: Daftar, detail, buat, perbarui, hapus\n• API Belajar: Kartu jatuh tempo, riwayat belajar, statistik\n• API Marketplace: Daftar, publikasikan, hapus\n• API Berbagi: Buat berbagi, terima undangan, daftar, cabut"
+        },
+        "rateLimits": {
+          "title": "Batas Permintaan (Perlu Diketahui)",
+          "body": "Jumlah permintaan dibatasi untuk stabilitas API.\n\nTingkat gratis:\n• Permintaan API harian: 1.000\n• Panggilan API per menit: 60\n• Pembuatan kartu per menit: 30\n\nMelebihi batas mengembalikan 429 Too Many Requests.\nTunggu sebentar dan coba lagi.\n\nCatatan: 100 kartu hanya dihitung sebagai 1 panggilan API (pembuatan massal).\nDengan 1.000 panggilan harian, Anda secara teoritis dapat membuat hingga 100.000 kartu per hari!"
+        }
+      }
+    },
+    "tips": {
+      "title": "Kiat Belajar",
+      "items": {
+        "daily": {
+          "title": "Belajar Sedikit Setiap Hari",
+          "body": "SRS paling efektif dengan konsistensi harian. 10-20 menit per hari sudah cukup. Penuhi peta panas belajar di dasbor Anda!"
+        },
+        "again": {
+          "title": "Jangan Takut dengan Ulangi",
+          "body": "Dalam SRS, 'Ulangi' bukan kegagalan. Menandai kartu yang tidak Anda ingat secara jujur sebagai 'Ulangi' membantu sistem menampilkannya pada waktu yang tepat. Memaksakan 'Baik' justru mengurangi efektivitas."
+        },
+        "concise": {
+          "title": "Buat Kartu Ringkas",
+          "body": "Masukkan hanya satu konsep per kartu. Kartu pendek dan jelas seperti 'apple = apel' jauh lebih efektif daripada 'apple, pear, grape, strawberry...'."
+        },
+        "tags": {
+          "title": "Gunakan Tag",
+          "body": "Tambahkan tag untuk penyaringan cepat nanti. Contoh: 'tata bahasa', 'kata kerja', 'Bab1', dll."
+        }
+      }
+    }
+  }
+}

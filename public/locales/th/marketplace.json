@@ -1,0 +1,55 @@
+{
+  "title": "ตลาด",
+  "noResults": "ไม่พบผลการค้นหา",
+  "noListings": "ยังไม่มีสำรับที่เผยแพร่",
+  "searchPlaceholder": "ค้นหาสำรับ...",
+  "allCategories": "ทุกหมวดหมู่",
+  "sortNewest": "ใหม่สุด",
+  "sortPopular": "ยอดนิยม",
+  "sortCardCount": "จำนวนการ์ด",
+  "categories": {
+    "general": "ทั่วไป",
+    "language": "ภาษา",
+    "science": "วิทยาศาสตร์",
+    "math": "คณิตศาสตร์",
+    "history": "ประวัติศาสตร์",
+    "programming": "การเขียนโปรแกรม",
+    "trivia": "ความรู้ทั่วไป",
+    "exam": "เตรียมสอบ",
+    "other": "อื่นๆ"
+  },
+  "shareModes": {
+    "copy": "คัดลอก",
+    "subscribe": "ติดตาม",
+    "snapshot": "สแนปช็อต"
+  },
+  "listing": {
+    "cardCount": "{{count}} การ์ด",
+    "userCount": "{{count}} ผู้ใช้"
+  },
+  "detail": {
+    "back": "← ตลาด",
+    "cardCount": "{{count}} การ์ด",
+    "userCount": "{{count}} ผู้ใช้",
+    "getDeck": "รับสำรับนี้",
+    "importing": "กำลังนำเข้า...",
+    "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
+    "noCards": "ไม่มีการ์ด"
+  },
+  "preview": {
+    "title": "\"{{title}}\" - สำรับแฟลชการ์ด | ReeeeecallStudy",
+    "description": "{{title}} — {{cardCount}} แฟลชการ์ด ดูตัวอย่างและเรียนสำรับนี้บน ReeeeecallStudy",
+    "defaultDescription": "สำรับแฟลชการ์ดบน ReeeeecallStudy",
+    "sampleCards": "ตัวอย่างการ์ด",
+    "viewInMarket": "ดูในตลาด",
+    "cardCount": "{{count}} การ์ด",
+    "userCount": "{{count}} ผู้ใช้",
+    "by": "โดย {{name}}",
+    "blurredNotice": "เข้าสู่ระบบเพื่อดูการ์ดทั้งหมดในสำรับนี้",
+    "ctaLogin": "เข้าสู่ระบบเพื่อรับสำรับนี้",
+    "ctaSignup": "สมัครฟรี",
+    "notFound": "ไม่พบสำรับ",
+    "notFoundDescription": "สำรับนี้อาจถูกลบหรือไม่พร้อมใช้งานแล้ว",
+    "backToHome": "กลับไปหน้าหลัก"
+  }
+}

@@ -7,6 +7,9 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
   ko: 'Korean',
   ja: 'Japanese',
   zh: 'Chinese',
+  vi: 'Vietnamese',
+  th: 'Thai',
+  id: 'Indonesian',
 }
 
 export function buildArticleJsonLd(article: ContentDetail) {

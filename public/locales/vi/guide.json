@@ -1,0 +1,309 @@
+{
+  "title": "Hướng dẫn sử dụng",
+  "subtitle": "Tìm hiểu tất cả tính năng của ReeeeecallStudy",
+  "searchPlaceholder": "Tìm kiếm tính năng (VD: SRS, Nhập, Chia sẻ...)",
+  "tableOfContents": "Mục lục",
+  "noResults": "Không có kết quả cho \"{{query}}\".",
+  "sections": {
+    "getting-started": {
+      "title": "Bắt đầu",
+      "items": {
+        "login": {
+          "title": "Đăng nhập",
+          "body": "Đăng nhập bằng email và mật khẩu. Khi đăng ký, một email xác minh sẽ được gửi — nhấp vào liên kết để hoàn tất đăng ký. Bạn có thể nhận liên kết đặt lại nếu quên mật khẩu."
+        },
+        "dashboard": {
+          "title": "Trang chủ (Bảng điều khiển)",
+          "body": "Sau khi đăng nhập, bảng điều khiển sẽ xuất hiện. Xem tổng số thẻ, thẻ ôn tập hôm nay, chuỗi học tập và tỷ lệ thành thạo trong nháy mắt. Kiểm tra bản đồ nhiệt học tập để xem bạn đã học đều đặn chưa, và sử dụng biểu đồ dự báo ôn tập để dự đoán khối lượng học sắp tới."
+        },
+        "navigation": {
+          "title": "Điều hướng",
+          "body": "Trên PC, sử dụng thanh menu phía trên; trên di động, nhấn menu hamburger (☰). Các menu có sẵn: Học nhanh, Bảng điều khiển, Bộ thẻ, Thẻ (Mẫu), Chợ ứng dụng, Lịch sử, Cài đặt, Hướng dẫn."
+        }
+      }
+    },
+    "decks": {
+      "title": "Quản lý bộ thẻ",
+      "items": {
+        "create": {
+          "title": "Tạo bộ thẻ",
+          "body": "Trên trang Bộ thẻ, nhấn nút 'Bộ thẻ mới'. Đặt tên, mô tả, biểu tượng và màu sắc. Bộ thẻ giống như một thư mục nhóm các thẻ ghi nhớ theo chủ đề."
+        },
+        "detail": {
+          "title": "Xem chi tiết bộ thẻ",
+          "body": "Nhấp vào bộ thẻ để xem danh sách thẻ. Sử dụng các nút phía trên để thêm thẻ, nhập, xuất, chia sẻ hoặc chỉnh sửa bộ thẻ. Lọc theo trạng thái thẻ (mới/đang học/ôn tập/tạm dừng) và tìm kiếm cũng được hỗ trợ."
+        },
+        "edit": {
+          "title": "Chỉnh sửa bộ thẻ",
+          "body": "Trên trang chỉnh sửa bộ thẻ, thay đổi tên, mô tả, biểu tượng, màu sắc và mẫu mặc định. Cài đặt SRS (khoảng cách Lại/Khó/Tốt/Dễ) có thể điều chỉnh cho từng bộ thẻ. Thống kê bộ thẻ (phân bố trạng thái, tỷ lệ thành thạo, bản đồ nhiệt học tập) được hiển thị ở phía dưới."
+        },
+        "delete": {
+          "title": "Xóa bộ thẻ",
+          "body": "Nhấn biểu tượng xóa trên danh sách bộ thẻ để thấy hộp thoại xác nhận. Xóa bộ thẻ cũng xóa tất cả thẻ bên trong — hãy cẩn thận."
+        }
+      }
+    },
+    "cards": {
+      "title": "Quản lý thẻ",
+      "items": {
+        "add": {
+          "title": "Thêm thẻ",
+          "body": "Nhấn 'Thêm thẻ' trên trang chi tiết bộ thẻ. Điền vào các trường được định nghĩa trong mẫu (VD: mặt trước, mặt sau). Thêm thẻ gắn phân cách bằng dấu phẩy để tìm kiếm và lọc sau này."
+        },
+        "editDelete": {
+          "title": "Sửa & Xóa thẻ",
+          "body": "Nhấp vào thẻ trong danh sách để mở cửa sổ chỉnh sửa. Chỉnh sửa nội dung trường và thẻ gắn. Bạn có thể xóa từng thẻ hoặc chọn nhiều thẻ để xóa hàng loạt."
+        },
+        "searchFilter": {
+          "title": "Tìm kiếm & Lọc",
+          "body": "Nhập từ khóa vào thanh tìm kiếm ở đầu trang chi tiết bộ thẻ để tìm kiếm trên tất cả trường và thẻ gắn. Chọn bộ lọc trạng thái (mới, đang học, ôn tập, tạm dừng) để chỉ xem các thẻ cụ thể."
+        },
+        "srsReset": {
+          "title": "Đặt lại SRS",
+          "body": "Đặt lại trạng thái SRS của thẻ sẽ đưa nó về trạng thái 'mới'. Sử dụng khi bạn muốn bắt đầu học lại từ đầu."
+        }
+      }
+    },
+    "templates": {
+      "title": "Mẫu thẻ",
+      "items": {
+        "what": {
+          "title": "Mẫu là gì?",
+          "body": "Mẫu định nghĩa cấu trúc thẻ — có những trường nào và chúng được sắp xếp như thế nào ở mặt trước và mặt sau. Ví dụ, mẫu 'Từ vựng tiếng Anh' có thể có các trường cho từ, nghĩa và câu ví dụ. Một mẫu có thể được chia sẻ cho nhiều bộ thẻ."
+        },
+        "createEdit": {
+          "title": "Tạo & Sửa mẫu",
+          "body": "Nhấn 'Mẫu mới' trong menu Thẻ. Thêm trường và đặt tên, loại (văn bản/hình ảnh/âm thanh). Kéo để sắp xếp lại trường. Thêm mô tả cho trường làm hướng dẫn khi tạo thẻ."
+        },
+        "layout": {
+          "title": "Bố cục mặt trước & sau",
+          "body": "Chế độ mặc định: Đặt trường ở mặt trước/sau và thiết lập kiểu (chính, phụ, gợi ý, chi tiết, phương tiện) và cỡ chữ. Chế độ HTML tùy chỉnh: Sử dụng cú pháp {{fieldName}} cho bố cục HTML tự do."
+        },
+        "tts": {
+          "title": "TTS (Chuyển văn bản thành giọng nói)",
+          "body": "Bật TTS cho từng trường và chọn ngôn ngữ (tiếng Hàn, tiếng Anh, tiếng Nhật, tiếng Trung, v.v.). Khi học, thẻ tự động đọc khi lật, hoặc nhấn nút loa để phát thủ công. Bật/tắt đọc tự động trong Cài đặt."
+        }
+      }
+    },
+    "study": {
+      "title": "Học tập",
+      "items": {
+        "modes": {
+          "title": "Chế độ học",
+          "body": "• SRS (Lặp lại ngắt quãng): Tự động điều chỉnh thời gian ôn tập dựa trên đường cong trí nhớ. Thẻ sai xuất hiện lại trong cùng phiên. Phương pháp hiệu quả nhất cho ghi nhớ dài hạn. Sử dụng 4 nút (Lại/Khó/Tốt/Dễ).\n• Ôn tập tuần tự: Học tất cả thẻ mới cộng với số lượng thẻ ôn tập có thể cấu hình. Quay lại từ đầu sau khi đến cuối.\n• Ngẫu nhiên: Rút ngẫu nhiên thẻ từ bộ thẻ.\n• Tuần tự: Học thẻ theo thứ tự. Ghi nhớ vị trí để tiếp tục.\n• Theo ngày: Chỉ học thẻ được thêm vào một ngày cụ thể.\n\nÔn tập tuần tự, Ngẫu nhiên, Tuần tự và Theo ngày sử dụng 2 nút đơn giản (Chưa biết/Đã biết).\n\n• Chế độ nhồi nhét: Ôn tập chuyên sâu theo vòng cho đến khi thành thạo tất cả thẻ. Sử dụng 2 nút (Sai/Đúng rồi). Không ảnh hưởng đến lịch SRS."
+        },
+        "srsScience": {
+          "title": "Khoa học đằng sau SRS",
+          "body": "SRS (Hệ thống lặp lại ngắt quãng) là phương pháp học dựa trên cách hoạt động của trí nhớ con người.\n\nĐường cong quên lãng của Ebbinghaus\nNhà tâm lý học người Đức Hermann Ebbinghaus đã phát hiện \"đường cong quên lãng\" qua các thí nghiệm năm 1885:\n• 20 phút sau khi học: ~42% bị quên\n• 1 giờ sau: ~56% bị quên\n• 1 ngày sau: ~67% bị quên\n• 1 tuần sau: ~75% bị quên\n• 1 tháng sau: ~79% bị quên\n\nNói cách khác, thông tin chỉ học một lần sẽ bị quên nhanh chóng theo thời gian.\n\nNguyên lý cốt lõi của lặp lại ngắt quãng\nChìa khóa của SRS là \"ôn tập ngay trước khi quên\":\n1. Học lần đầu → ôn tập sau 1 ngày\n2. Nhớ sau 1 ngày → ôn tập sau 3 ngày\n3. Nhớ sau 3 ngày → ôn tập sau 7 ngày\n4. Nhớ sau 7 ngày → ôn tập sau 21 ngày\n\nBằng cách tăng dần khoảng cách ôn tập, bạn có thể lưu trữ thông tin trong trí nhớ dài hạn với nỗ lực tối thiểu. Nghiên cứu cho thấy phương pháp này hiệu quả gấp 2-3 lần so với lặp lại đơn thuần.\n\nSRS của ReeeeecallStudy dựa trên thuật toán SM-2 đã được chứng minh bởi Anki, phân tích độ khó và lịch sử học của từng thẻ để tự động tính toán thời điểm ôn tập tối ưu."
+        },
+        "srsMethod": {
+          "title": "Phương pháp học SRS — Hướng dẫn đầy đủ về nút bấm",
+          "body": "Xem mặt trước thẻ, nhớ lại đáp án, rồi lật. Sau khi kiểm tra mặt sau, nhấn 1 trong 4 nút để tự đánh giá.\n\nLại (Nút đỏ)\n\"Tôi hoàn toàn không nhớ\"\n• Thẻ mới: Xuất hiện lại sau 10 phút (trong cùng phiên)\n• Thẻ ôn tập: Khoảng cách đặt lại, xuất hiện lại sau 10 phút\n• Hệ số dễ giảm -0.20\n• Số lần lặp đặt lại về 0\n→ Nếu bạn không nhớ, hãy nhấn thật thà. Gượng ép nút khác thực tế làm giảm hiệu quả học.\n\nKhó (Nút cam)\n\"Tôi nhớ lại được, nhưng khó\"\n• Thẻ mới: Ôn tập sau 1 ngày\n• Thẻ ôn tập: Ôn tập ở ~1,2 lần khoảng cách hiện tại (tối thiểu +1 ngày)\n• Hệ số dễ giảm -0.15\n→ Nếu bạn phải suy nghĩ vài giây mới nhớ ra, chọn Khó.\n\nTốt (Nút xanh dương)\n\"Tôi nhớ khá tốt\"\n• Thẻ mới: Ôn tập sau 1 ngày\n• Lần ôn tập thứ hai: Ít nhất 3 ngày sau\n• Sau đó: Khoảng cách hiện tại × hệ số dễ (thường 2,5 lần)\n• Hệ số dễ không thay đổi\n→ Nếu bạn nhớ lại tự nhiên trong 1-2 giây, chọn Tốt. Đây là nút bạn sẽ nhấn nhiều nhất.\n\nDễ (Nút xanh lá)\n\"Tôi nhớ ngay lập tức và hoàn hảo\"\n• Thẻ mới: Ôn tập sau 4 ngày\n• Thẻ ôn tập: Khoảng cách hiện tại × hệ số dễ × 1,3\n• Hệ số dễ tăng +0.15\n→ Chỉ nhấn Dễ khi đáp án hiện ra trong đầu ngay khi bạn nhìn thấy thẻ.\n\nMẹo: Khi phân vân, nhấn Tốt. Đối với hầu hết thẻ, Tốt là đánh giá phù hợp nhất."
+        },
+        "srsCardStates": {
+          "title": "Hiểu các trạng thái thẻ",
+          "body": "Trong học SRS, thẻ trải qua 3 trạng thái:\n\nMới\nThẻ chưa được học.\n• Xuất hiện lần đầu trong phiên học\n• Sau đánh giá đầu tiên, chuyển sang trạng thái \"Đang học\" hoặc \"Ôn tập\"\n• \"Giới hạn thẻ mới\" trong cài đặt kiểm soát số lượng xuất hiện mỗi phiên\n\nĐang học\nThẻ chưa được ghi nhớ hoàn toàn (đánh giá Lại hoặc Khó).\n• Xuất hiện lại với khoảng cách ngắn (10 phút đến 1 ngày)\n• Đánh giá Tốt trở lên sẽ \"tốt nghiệp\" sang trạng thái Ôn tập\n• Có thể xuất hiện nhiều lần trong cùng phiên\n\nÔn tập\nThẻ đã vào trí nhớ dài hạn (đánh giá Tốt hoặc Dễ).\n• Khoảng cách tăng dần (1 ngày → 3 ngày → 7 ngày → 21 ngày → ...)\n• Nhấn Lại sẽ đưa về trạng thái \"Đang học\"\n• Thẻ ghi nhớ tốt có thể có khoảng cách hàng tháng hoặc hàng năm\n\nNhờ hệ thống 3 giai đoạn này, bạn tập trung thời gian vào thẻ chưa biết trong khi giảm thiểu ôn tập các thẻ đã thành thạo."
+        },
+        "srsIntervals": {
+          "title": "Khoảng cách ôn tập & Hệ số dễ",
+          "body": "Trọng tâm của SRS là \"Hệ số dễ\" và \"Khoảng cách ôn tập.\"\n\nHệ số dễ là gì?\nMột con số được gán riêng cho từng thẻ (mặc định: 2,50).\n• Lại: giảm -0,20 (tối thiểu 1,30)\n• Khó: giảm -0,15 (tối thiểu 1,30)\n• Tốt: Không thay đổi\n• Dễ: tăng +0,15 (tối đa 4,00)\n\nKhoảng cách ôn tập tăng bằng cách nhân hệ số dễ:\nVí dụ: Thẻ có khoảng cách 10 ngày, hệ số dễ 2,50, đánh giá Tốt → khoảng cách tiếp = 10 × 2,50 = 25 ngày\n\nVí dụ học thực tế (Cài đặt mặc định)\nNhấn Tốt liên tục trên thẻ mới:\nLần 1: Sau 1 ngày → Lần 2: Sau 3 ngày → Lần 3: Sau 8 ngày → Lần 4: Sau 20 ngày → Lần 5: Sau 50 ngày → ...\n\nNhấn Lại trước, rồi Tốt:\nLần 1 (Lại): Sau 10 phút → Lần 2 (Tốt): Sau 1 ngày → Lần 3 (Tốt): Sau 3 ngày → ...\n\nQuy tắc đảm bảo khoảng cách\n• Khoảng cách của Khó luôn tăng ít nhất 1 ngày so với trước\n• Khoảng cách của Tốt luôn lớn hơn Khó\n• Khoảng cách của Dễ luôn lớn hơn Tốt\n\nHệ thống này đảm bảo thẻ hay sai xuất hiện thường xuyên hơn, trong khi thẻ đã thuộc xuất hiện ít hơn."
+        },
+        "quickStudy": {
+          "title": "Học nhanh",
+          "body": "Chọn bộ thẻ trực tiếp trên trang Học nhanh để bắt đầu. Mỗi bộ thẻ hiển thị số thẻ mới/ôn tập để quyết định nhanh."
+        },
+        "sessionFlow": {
+          "title": "Luồng phiên học",
+          "body": "1. Chọn bộ thẻ → Đặt chế độ học → Bắt đầu\n2. Xem mặt trước thẻ → Chạm/nhấp để lật → Chọn đánh giá\n3. Sau tất cả thẻ, tóm tắt hiển thị số lượng học, thời gian và phân bố đánh giá.\n\nPhím tắt (theo chế độ)\n• Chung: Space/Enter (lật), Escape (thoát)\n• Chế độ SRS: 1 (Lại), 2 (Khó), 3 (Tốt), 4 (Dễ)\n• Chế độ chung (Ôn tập tuần tự/Ngẫu nhiên/Tuần tự/Theo ngày): →/Space (Đã biết), ← (Chưa biết)\n• Nhồi nhét: →/Space (Đúng rồi), ← (Sai)"
+        },
+        "swipeMode": {
+          "title": "Chế độ vuốt",
+          "body": "Chuyển chế độ trả lời sang 'Vuốt' trong Cài đặt để đánh giá thẻ bằng cách vuốt. Tuyệt vời cho việc học một tay trên di động.\n\nHướng vuốt theo chế độ:\n• Chế độ SRS: ← Lại / → Tốt\n• Chế độ chung (Ôn tập tuần tự/Ngẫu nhiên/Tuần tự/Theo ngày): ← Chưa biết / → Đã biết\n• Nhồi nhét: ← Sai / → Đúng rồi\n\nVuốt qua 100px để thấy phản hồi trực quan; thả ra để xác nhận đánh giá."
+        },
+        "srsCustom": {
+          "title": "Tùy chỉnh cài đặt SRS",
+          "body": "Điều chỉnh khoảng cách mặc định Lại/Khó/Tốt/Dễ (ngày) trên trang chỉnh sửa bộ thẻ. Ví dụ, tăng khoảng cách Dễ lên 7 ngày giảm tần suất ôn tập cho thẻ dễ. 'Giới hạn thẻ mới' trong Cài đặt kiểm soát số thẻ mới xuất hiện mỗi phiên."
+        },
+        "cramming": {
+          "title": "Chế độ nhồi nhét",
+          "body": "Chế độ nhồi nhét được thiết kế cho việc học chuyên sâu, vào phút cuối — hoàn hảo trước kỳ thi hoặc khi bạn cần ôn tập nhanh tất cả thẻ.\n\nCách hoạt động\n1. Tất cả thẻ được chọn được trình bày trong Vòng 1\n2. Đánh giá mỗi thẻ là \"Đúng rồi\" hoặc \"Chưa đúng\"\n3. Thẻ sai xuất hiện lại trong vòng sau một khoảng ngắn\n4. Thẻ chưa bao giờ trả lời \"Đúng rồi\" chuyển sang vòng tiếp theo\n5. Phiên kết thúc khi tất cả thẻ được thành thạo (hoặc hết thời gian)\n\nTính năng chính\n• Bộ lọc thẻ: Học tất cả thẻ, chỉ thẻ yếu (hệ số dễ thấp), hoặc thẻ sắp đến hạn\n• Giới hạn thời gian: Tùy chọn — đặt 15/30/60 phút hoặc không giới hạn\n• Xáo trộn: Ngẫu nhiên thứ tự thẻ mỗi vòng\n• Theo dõi thành thạo: Phần trăm thành thạo và tiến trình vòng theo thời gian thực\n\nAn toàn SRS\nChế độ nhồi nhét KHÔNG ảnh hưởng đến lịch SRS. Hệ số dễ, khoảng cách và ngày ôn tập tiếp theo không thay đổi. Nhật ký học vẫn được ghi lại cho lịch sử.\n\nPhím tắt\n• Space hoặc → : Đúng rồi\n• ← : Chưa đúng\n\nKhi nào dùng Nhồi nhét vs SRS\n• Dùng SRS cho học tập hàng ngày, dài hạn\n• Dùng Nhồi nhét để luyện thi, ôn tập nhanh, hoặc ôn lại kiến thức đã quên"
+        }
+      }
+    },
+    "import-export": {
+      "title": "Nhập & Xuất",
+      "items": {
+        "jsonImport": {
+          "title": "Nhập JSON",
+          "body": "Trên trang chi tiết bộ thẻ, nhấp 'Nhập' → chọn tệp JSON. Tệp JSON xuất từ ReeeeecallStudy có thể được nhập trực tiếp, lý tưởng cho sao lưu và khôi phục. Bao gồm siêu dữ liệu bộ thẻ và thông tin mẫu."
+        },
+        "csvImport": {
+          "title": "Nhập CSV",
+          "body": "Tệp CSV (lưu từ Excel) cũng có thể được nhập. Bước ánh xạ xuất hiện để khớp tên cột với trường mẫu, với tự động khớp. Cột 'Tags' với dấu chấm phẩy (;) được tự động nhận diện."
+        },
+        "duplicates": {
+          "title": "Xử lý trùng lặp",
+          "body": "Khi nhập, các thẻ hiện có có nội dung giống nhau được đánh dấu là trùng lặp. Bạn có thể bỏ qua, ghi đè hoặc thêm mới. Xem trước số thẻ hợp lệ/không hợp lệ/trùng lặp trước khi nhập cuối cùng."
+        },
+        "jsonExport": {
+          "title": "Xuất JSON",
+          "body": "Chi tiết bộ thẻ → 'Xuất' → JSON tải xuống thông tin bộ thẻ, mẫu và tất cả thẻ dưới dạng một tệp JSON. Dùng để chuyển sang thiết bị/tài khoản khác hoặc sao lưu."
+        },
+        "csvExport": {
+          "title": "Xuất CSV",
+          "body": "Định dạng CSV có thể mở trực tiếp trong Excel/Google Sheets. Bao gồm BOM để hiển thị đúng các ký tự đa ngôn ngữ trong Excel."
+        }
+      }
+    },
+    "sharing": {
+      "title": "Chia sẻ bộ thẻ",
+      "items": {
+        "copy": {
+          "title": "Chế độ chia sẻ: Sao chép",
+          "body": "Trao cho người nhận một bản sao độc lập của bộ thẻ. Họ có thể tự do chỉnh sửa, thêm và xóa thẻ. Sau khi chia sẻ, bản gốc và bản sao không ảnh hưởng lẫn nhau. Tốt nhất cho việc tùy chỉnh."
+        },
+        "subscribe": {
+          "title": "Chế độ chia sẻ: Đăng ký theo dõi",
+          "body": "Người nhận 'đăng ký theo dõi' bộ thẻ của bạn. Khi bạn thêm thẻ, người theo dõi cũng nhận được. Tuy nhiên, tiến trình học (SRS) được theo dõi độc lập. Người theo dõi không thể sửa thẻ. Tuyệt vời cho giáo viên↔học sinh hoặc nhóm học tập."
+        },
+        "snapshot": {
+          "title": "Chế độ chia sẻ: Bản chụp",
+          "body": "Tạo bản sao chỉ đọc của bộ thẻ tại thời điểm hiện tại. Người nhận chỉ có thể học, không thể sửa. Các cập nhật trong tương lai của bản gốc không được phản ánh. Dùng khi bạn muốn chia sẻ 'trạng thái hiện tại chính xác'."
+        },
+        "inviteLink": {
+          "title": "Gửi liên kết mời",
+          "body": "Chi tiết bộ thẻ → Nút Chia sẻ → Chọn chế độ chia sẻ → 'Tạo liên kết mời' tạo liên kết duy nhất. Gửi qua tin nhắn, email, v.v. Người nhận nhấp để chấp nhận."
+        },
+        "manage": {
+          "title": "Quản lý chia sẻ",
+          "body": "Kiểm tra chia sẻ đã gửi/nhận trên trang 'Chia sẻ của tôi' gần Cài đặt. Bạn có thể thu hồi chia sẻ đang hoạt động hoặc hủy đăng ký theo dõi."
+        }
+      }
+    },
+    "marketplace": {
+      "title": "Chợ ứng dụng",
+      "items": {
+        "what": {
+          "title": "Chợ ứng dụng là gì?",
+          "body": "Một không gian để tìm kiếm và lấy bộ thẻ được chia sẻ bởi người dùng khác. Lọc theo danh mục (ngôn ngữ, chứng chỉ, lập trình, v.v.) và thẻ gắn, sắp xếp theo phổ biến hoặc mới nhất."
+        },
+        "getDeck": {
+          "title": "Lấy bộ thẻ",
+          "body": "Nhấp vào bộ thẻ trong chợ để xem chi tiết. Xem trước 10 thẻ đầu, rồi nhấn 'Lấy' để thêm vào bộ thẻ của bạn. Hành vi khác nhau tùy chế độ chia sẻ (sao chép/đăng ký/bản chụp)."
+        },
+        "publish": {
+          "title": "Đăng tải bộ thẻ",
+          "body": "Chi tiết bộ thẻ → Chia sẻ → 'Đăng lên chợ'. Đặt tiêu đề, mô tả, danh mục, thẻ gắn và chế độ chia sẻ. Sau khi đăng, tất cả người dùng có thể tìm kiếm. Bạn có thể gỡ bất cứ lúc nào."
+        }
+      }
+    },
+    "history": {
+      "title": "Lịch sử & Thống kê học tập",
+      "items": {
+        "viewHistory": {
+          "title": "Xem lịch sử học tập",
+          "body": "Xem tất cả phiên học theo ngày trên trang Lịch sử. Nhấp vào phiên để xem chi tiết từng thẻ (đánh giá, thời gian). Lọc theo bộ thẻ hoặc chế độ. Biểu đồ phân bố đánh giá được nhóm theo chế độ (Lặp lại ngắt quãng / Tổng hợp / Nhồi nhét)."
+        },
+        "deckProgress": {
+          "title": "Tiến trình bộ thẻ",
+          "body": "Thẻ tiến trình bộ thẻ xuất hiện ở đầu Lịch sử học tập. Xem tỷ lệ hoàn thành và số lượng thẻ theo trạng thái (mới/đang học/ôn tập) trong nháy mắt."
+        },
+        "dashboardStats": {
+          "title": "Thống kê bảng điều khiển",
+          "body": "Chuyển đổi giữa các tab thời gian (1N/1T/1Th/3Th/6Th/1Năm/2Năm/5Năm) trên bảng điều khiển để xem bản đồ nhiệt học tập, biểu đồ lượng học hàng ngày và dự báo ôn tập."
+        }
+      }
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "items": {
+        "profile": {
+          "title": "Hồ sơ",
+          "body": "Đặt tên hiển thị. Email không thể thay đổi."
+        },
+        "srsLimit": {
+          "title": "Giới hạn thẻ mới SRS",
+          "body": "Đặt số lượng tối đa thẻ mới được thêm mỗi phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này. Điều chỉnh để kiểm soát khối lượng học."
+        },
+        "answerMode": {
+          "title": "Chế độ trả lời (Nút bấm/Vuốt)",
+          "body": "Chế độ nút bấm: Đánh giá bằng cách nhấn nút phía dưới. Chế độ SRS hiển thị 4 nút (Lại/Khó/Tốt/Dễ), chế độ chung hiển thị 2 nút (Chưa biết/Đã biết), và nhồi nhét hiển thị 2 nút (Sai/Đúng rồi).\nChế độ vuốt: Đánh giá bằng cách vuốt thẻ sang trái hoặc phải. Trong SRS: ← Lại / → Tốt. Trong chế độ khác: ← Chưa biết / → Đã biết."
+        },
+        "autoTts": {
+          "title": "TTS tự động",
+          "body": "Tự động đọc các trường có TTS khi lật thẻ. Ngay cả khi tắt, nút loa để phát thủ công luôn có sẵn."
+        },
+        "apiKey": {
+          "title": "Khóa API",
+          "body": "Tạo khóa API để truy cập dữ liệu ReeeeecallStudy từ công cụ bên ngoài (script, ứng dụng). Khóa chỉ hiển thị một lần — hãy chắc chắn sao chép. Tối đa 1 khóa."
+        }
+      }
+    },
+    "api": {
+      "title": "Hướng dẫn API (Tự động tạo thẻ với AI)",
+      "items": {
+        "whatSimple": {
+          "title": "API là gì? (Giải thích đơn giản)",
+          "body": "API là \"cách để các chương trình giao tiếp với nhau.\"\n\nGiống như bạn nhấp nút trong ứng dụng để tạo thẻ, API cho phép bạn làm điều tương tự bằng lệnh văn bản.\n\nHãy nghĩ nó như một nhà hàng:\n• Thực đơn = Tài liệu API (mô tả những yêu cầu bạn có thể gửi)\n• Gọi món = Yêu cầu API (\"Hiển thị bộ thẻ của tôi\", \"Thêm 100 thẻ\")\n• Nhận món = Phản hồi API (dữ liệu hoặc kết quả bạn yêu cầu)\n\nĐiều tuyệt vời nhất? Bạn có thể nhờ các công cụ AI như ChatGPT, Gemini hoặc Claude gửi những lệnh này cho bạn!\nAI tạo nội dung thẻ VÀ đăng ký chúng qua API tự động."
+        },
+        "whyApi": {
+          "title": "Tại sao sử dụng API?",
+          "body": "So sánh tạo thẻ từng cái vs. sử dụng API:\n\nThủ công: 30 giây mỗi thẻ x 100 thẻ = ~50 phút\nAPI + AI: 100 thẻ cùng lúc = ~3-5 phút\n\nBạn có thể làm gì với API:\n• Bảo AI \"Tạo 100 thẻ từ vựng TOEIC\" và chúng được tạo ngay lập tức\n• \"Tạo 50 thẻ kanji JLPT N3\" — xong trong một yêu cầu\n• Tải dữ liệu từ Excel hoặc tệp văn bản hàng loạt\n• Không cần lập trình — chỉ cần trò chuyện với AI!\n\nLàm theo hướng dẫn này và bất kỳ ai cũng có thể tạo 100 thẻ trong 5 phút."
+        },
+        "getKey": {
+          "title": "Lấy khóa API",
+          "body": "Để sử dụng API, trước tiên bạn cần một khóa API. Nó giống như mật khẩu cho phép bạn truy cập API từ tài khoản.\n\nCách lấy:\n1. Đăng nhập vào ứng dụng ReeeeecallStudy\n2. Vào \"Cài đặt\" từ menu phía trên bên phải\n3. Cuộn xuống phần \"Khóa API\"\n4. Nhấp \"Tạo khóa API mới\"\n5. Nhập tên cho khóa (VD: \"Tích hợp AI của tôi\")\n6. Một khóa bắt đầu bằng rc_ sẽ được hiển thị\n\nQUAN TRỌNG: Khóa chỉ hiển thị một lần trên màn hình này!\nHãy chắc chắn sao chép và lưu ở nơi an toàn.\n\nKhóa API giống như mật khẩu. Đừng bao giờ chia sẻ với người khác."
+        },
+        "step1Prepare": {
+          "title": "Bước 1: Chuẩn bị bộ thẻ và mẫu thẻ",
+          "body": "Trước khi thêm thẻ qua API, hãy tạo bộ thẻ và mẫu thẻ trong ứng dụng trước.\n\n1. Tạo bộ thẻ\n• Trong ứng dụng, vào \"Bộ thẻ\" → \"Tạo bộ thẻ mới\"\n• Nhập tên (VD: \"Từ vựng TOEIC\")\n• Nhập mô tả (VD: \"Từ vựng TOEIC thiết yếu\")\n\n2. Tạo mẫu thẻ\n• Vào \"Mẫu\" → \"Mẫu mới\"\n• Nhập tên (VD: \"Chi tiết từ vựng\")\n• Thêm trường:\n  - word: loại văn bản\n  - meaning: loại văn bản\n  - example: loại văn bản\n• Đặt \"word\" ở bố cục mặt trước\n• Đặt \"meaning\" và \"example\" ở bố cục mặt sau\n\n3. Đặt mẫu mặc định cho bộ thẻ\n• Trong chỉnh sửa bộ thẻ, chọn mẫu vừa tạo làm mặc định\n\nMẹo: Nhớ tên khóa trường (word, meaning, example)!\nBạn sẽ dùng chính xác các khóa này khi tạo thẻ qua API."
+        },
+        "step2Query": {
+          "title": "Bước 2: Tìm ID bộ thẻ/mẫu với AI",
+          "body": "Để thêm thẻ, bạn cần ID bộ thẻ và ID mẫu.\nHãy nhờ AI tra cứu!\n\nMở ChatGPT, Gemini hoặc Claude và dán đoạn sau:\n\n─────────────────────────────\nTôi đang sử dụng ứng dụng thẻ ghi nhớ ReeeeecallStudy.\nĐây là thông tin API:\n• URL API: https://reeeeecallstudy.xyz/api/v1\n• Khóa API: rc_DÁN_KHÓA_API_CỦA_BẠN_VÀO_ĐÂY\n\nVui lòng gửi hai yêu cầu này:\n1. Liệt kê bộ thẻ: GET https://reeeeecallstudy.xyz/api/v1/decks\n2. Liệt kê mẫu: GET https://reeeeecallstudy.xyz/api/v1/templates\n\nThêm header: Authorization: Bearer rc_DÁN_KHÓA_API_CỦA_BẠN_VÀO_ĐÂY\nHiển thị id và tên từng bộ thẻ, và id, tên, trường của từng mẫu.\n─────────────────────────────\n\nThay \"rc_DÁN_KHÓA_API_CỦA_BẠN_VÀO_ĐÂY\" bằng khóa API thực!\n\nAI sẽ hiển thị thông tin như:\n• ID bộ thẻ: a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• Tên bộ thẻ: Từ vựng TOEIC\n• ID mẫu: e5f6g7h8-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• Trường mẫu: word, meaning, example\n\nSao chép các ID này — bạn sẽ cần chúng ở bước tiếp theo!"
+        },
+        "step3AiGenerate": {
+          "title": "Bước 3: Nhờ AI tạo và đăng ký thẻ",
+          "body": "Đây là bước quan trọng! Nhờ AI tạo thẻ và đăng ký trực tiếp.\n\nSao chép prompt bên dưới, thay các phần được đánh dấu bằng thông tin của bạn, và gửi cho AI:\n\n─────────────────────────────\nTạo thẻ ghi nhớ sử dụng API ReeeeecallStudy.\n\nThông tin API:\n• URL gốc: https://reeeeecallstudy.xyz/api/v1\n• Khóa API: (dán khóa API vào đây)\n• ID bộ thẻ: (dán ID bộ thẻ từ Bước 2)\n• ID mẫu: (dán ID mẫu từ Bước 2)\n\nĐiểm cuối tạo thẻ:\nPOST https://reeeeecallstudy.xyz/api/v1/decks/(ID bộ thẻ)/cards\nHeaders:\n  Authorization: Bearer (khóa API)\n  Content-Type: application/json\nBody (mảng JSON, tối đa 100):\n[\n  {\n    \"template_id\": \"(ID mẫu)\",\n    \"field_values\": {\n      \"word\": \"Từ tiếng Anh\",\n      \"meaning\": \"định nghĩa\",\n      \"example\": \"câu ví dụ\"\n    },\n    \"tags\": [\"thẻ gắn\"]\n  }\n]\n\nYêu cầu:\nTạo 50 thẻ từ vựng TOEIC thiết yếu và đăng ký qua API trên.\nMỗi thẻ phải có:\n• word: Từ tiếng Anh\n• meaning: định nghĩa ngắn gọn\n• example: một câu ví dụ sử dụng từ\n• tags: mức độ khó (beginner / intermediate / advanced)\n─────────────────────────────\n\nĐổi \"50 thẻ từ vựng TOEIC thiết yếu\" thành bất kỳ chủ đề nào bạn muốn!\nVí dụ:\n• \"30 thẻ kanji JLPT N3\"\n• \"40 cụm từ du lịch tiếng Tây Ban Nha cơ bản\"\n• \"50 sự kiện lịch sử thế giới\"\n• \"30 thuật ngữ lập trình Python\"\n• \"50 thuật ngữ giải phẫu y học\"\n\nCần thêm thẻ? Chỉ cần nói \"Tạo thêm 50 thẻ không trùng lặp!\""
+        },
+        "aiExamples": {
+          "title": "Mẹo cho từng AI (ChatGPT / Gemini / Claude)",
+          "body": "Mỗi AI có điểm mạnh hơi khác nhau. Sử dụng cái tốt nhất cho nhu cầu!\n\nChatGPT (chat.openai.com)\n• Có thể chạy code để gọi API trực tiếp qua Code Interpreter\n• Mẹo: Nói \"Chạy code Python để gọi API trực tiếp\" và nó sẽ thực thi code thực để đăng ký thẻ\n• Tốt nhất cho: Gọi API trực tiếp\n\nGoogle Gemini (gemini.google.com)\n• Tích hợp với Google Search cho thông tin cập nhật\n• Mẹo: Tuyệt vời cho thẻ cần thông tin mới nhất như \"từ vựng thời sự 2025\"\n• Tốt nhất cho: Thẻ cần xu hướng mới nhất\n\nClaude (claude.ai)\n• Xuất sắc trong xử lý văn bản dài và tạo JSON chính xác\n• Mẹo: Có thể tạo 100 thẻ cùng lúc mà không làm hỏng định dạng JSON\n• Tốt nhất cho: Tạo hàng loạt, cấu trúc thẻ phức tạp\n\nMẹo chung:\n• Nếu AI không gọi được API → Nói \"Chỉ hiển thị dữ liệu JSON.\" Rồi sao chép và dùng phương pháp đăng ký thủ công (xem phần tiếp)\n• Nói \"Tạo thêm 50 thẻ không trùng với thẻ trước\" để bổ sung liên tục\n• Tối đa 100 thẻ mỗi yêu cầu. Nếu cần nhiều hơn, chia thành nhiều yêu cầu"
+        },
+        "step4Manual": {
+          "title": "Khi AI không thể gọi API trực tiếp (Phương pháp thủ công)",
+          "body": "Nếu AI không thể gọi API trực tiếp, đừng lo!\nChỉ cần sao chép dữ liệu JSON mà AI tạo và tự gửi.\n\nPhương pháp 1: Swagger UI (Dễ nhất, Khuyến nghị)\n1. Mở https://reeeeecallstudy.xyz/api/ui trong trình duyệt\n2. Nhấp \"Authorize\" ở trên → Nhập khóa API → Xác nhận\n3. Tìm và mở rộng POST /v1/decks/{deckId}/cards\n4. Nhấp \"Try it out\"\n5. Nhập ID bộ thẻ vào trường deckId\n6. Dán mảng JSON từ AI vào Request body\n7. Nhấp \"Execute\" → Xong!\n\nPhương pháp 2: Terminal / Command Prompt\nMở Terminal (Mac) hoặc PowerShell (Windows) và chạy:\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"a round fruit\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\nVới JSON dài, lưu vào tệp trước:\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\nTối đa 100 thẻ mỗi yêu cầu."
+        },
+        "docsPage": {
+          "title": "Tài liệu API đầy đủ",
+          "body": "Để biết thêm thông tin API chi tiết:\n\n• Tài liệu API trong ứng dụng: \"API\" trong menu trên hoặc /api-docs\n• Swagger UI (kiểm tra tương tác): https://reeeeecallstudy.xyz/api/ui\n• Tài liệu API công khai: https://reeeeecallstudy.xyz/docs/api\n\nTất cả điểm cuối có sẵn:\n• API bộ thẻ: Danh sách, chi tiết, tạo\n• API thẻ: Danh sách, chi tiết, tạo (hỗ trợ hàng loạt), cập nhật, xóa\n• API mẫu: Danh sách, chi tiết, tạo, cập nhật, xóa\n• API học tập: Thẻ đến hạn, lịch sử học, thống kê\n• API chợ: Danh sách, đăng tải, xóa\n• API chia sẻ: Tạo chia sẻ, chấp nhận mời, danh sách, thu hồi"
+        },
+        "rateLimits": {
+          "title": "Giới hạn tốc độ (Nên biết)",
+          "body": "Số lượng yêu cầu bị giới hạn để đảm bảo ổn định API.\n\nGói miễn phí:\n• Yêu cầu API hàng ngày: 1.000\n• Cuộc gọi API mỗi phút: 60\n• Tạo thẻ mỗi phút: 30\n\nVượt giới hạn sẽ trả về 429 Too Many Requests.\nĐợi một chút và thử lại.\n\nLưu ý: 100 thẻ chỉ tính là 1 cuộc gọi API (tạo hàng loạt).\nVới 1.000 cuộc gọi hàng ngày, lý thuyết bạn có thể tạo đến 100.000 thẻ mỗi ngày!"
+        }
+      }
+    },
+    "tips": {
+      "title": "Mẹo học tập",
+      "items": {
+        "daily": {
+          "title": "Học mỗi ngày một chút",
+          "body": "SRS hiệu quả nhất khi học đều đặn hàng ngày. 10-20 phút mỗi ngày là đủ. Lấp đầy bản đồ nhiệt học tập trên bảng điều khiển!"
+        },
+        "again": {
+          "title": "Đừng sợ nút Lại",
+          "body": "Trong SRS, 'Lại' không phải là thất bại. Đánh dấu thật thà các thẻ bạn không nhớ là 'Lại' giúp hệ thống hiển thị chúng vào đúng thời điểm. Gượng ép chọn 'Tốt' thực tế làm giảm hiệu quả."
+        },
+        "concise": {
+          "title": "Giữ thẻ ngắn gọn",
+          "body": "Chỉ đặt một khái niệm trên mỗi thẻ. Thẻ ngắn, rõ ràng như 'apple = quả táo' hiệu quả hơn nhiều so với 'apple, pear, grape, strawberry...'."
+        },
+        "tags": {
+          "title": "Sử dụng thẻ gắn",
+          "body": "Thêm thẻ gắn để lọc nhanh sau này. Ví dụ: 'ngữ pháp', 'động từ', 'Chương1', v.v."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "quickStudy": "เรียนด่วน",
+    "dashboard": "แดชบอร์ด",
+    "study": "เรียน",
+    "decks": "สำรับ",
+    "cards": "การ์ด",
+    "marketplace": "ตลาด",
+    "studyHistory": "ประวัติ",
+    "settings": "ตั้งค่า",
+    "admin": "ผู้ดูแล",
+    "guide": "คู่มือ"
+  },
+  "actions": {
+    "save": "บันทึก",
+    "saving": "กำลังบันทึก...",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "create": "สร้าง",
+    "add": "เพิ่ม",
+    "remove": "ลบออก",
+    "confirm": "ยืนยัน",
+    "ok": "ตกลง",
+    "back": "ย้อนกลับ",
+    "next": "ถัดไป",
+    "close": "ปิด",
+    "copy": "คัดลอก",
+    "duplicate": "ทำสำเนา",
+    "search": "ค้นหา",
+    "selectAll": "เลือกทั้งหมด",
+    "deselect": "ยกเลิกการเลือก",
+    "show": "แสดง",
+    "hide": "ซ่อน",
+    "startStudy": "เริ่มเรียน",
+    "logout": "ออกจากระบบ"
+  },
+  "status": {
+    "loading": "กำลังโหลด...",
+    "processing": "กำลังดำเนินการ...",
+    "new": "ใหม่",
+    "learning": "กำลังเรียน",
+    "review": "ทบทวน",
+    "suspended": "ระงับ"
+  },
+  "units": {
+    "cards": "การ์ด",
+    "cardsSuffix": "{{count}} การ์ด",
+    "sessions": "เซสชัน",
+    "items": "รายการ",
+    "days": "วัน",
+    "hours": "ชม.",
+    "minutes": "นาที",
+    "seconds": "วินาที",
+    "times": "ครั้ง",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}} ต่อหน้า"
+  },
+  "timePeriod": {
+    "1d": "1 วัน",
+    "1w": "1 สัปดาห์",
+    "1m": "1 เดือน",
+    "3m": "3 เดือน",
+    "6m": "6 เดือน",
+    "1y": "1 ปี",
+    "2y": "2 ปี",
+    "5y": "5 ปี"
+  },
+  "confirmDialog": {
+    "cancel": "ยกเลิก",
+    "processing": "กำลังดำเนินการ...",
+    "confirm": "ยืนยัน"
+  },
+  "delete": "ลบ",
+  "deselect": "ยกเลิกการเลือก",
+  "duplicate": "ทำสำเนา",
+  "edit": "แก้ไข",
+  "save": "บันทึก",
+  "saving": "กำลังบันทึก...",
+  "selectAll": "เลือกทั้งหมด",
+  "menu": "เมนู",
+  "copiedToClipboard": "คัดลอกไปยังคลิปบอร์ดแล้ว",
+  "export": "ส่งออก",
+  "officialBadge": {
+    "label": "ทางการ",
+    "tooltip": "บัญชีทางการ"
+  }
+}

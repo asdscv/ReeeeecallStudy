@@ -1,0 +1,20 @@
+{
+  "editCard": "แก้ไขการ์ด",
+  "addCard": "เพิ่มการ์ด",
+  "noTemplateSet": "สำรับนี้ยังไม่ได้ตั้งค่าเทมเพลต",
+  "fileValidationFailed": "การตรวจสอบไฟล์ล้มเหลว",
+  "uploadFailed": "การอัปโหลดล้มเหลว",
+  "uploading": "กำลังอัปโหลด...",
+  "remove": "ลบออก",
+  "uploadImage": "อัปโหลดรูปภาพ",
+  "selectFile": "เลือกไฟล์",
+  "imageFormats": "รองรับ JPG, PNG, WebP",
+  "uploadAudio": "อัปโหลดเสียง",
+  "audioFormats": "รองรับ MP3, OGG, WAV",
+  "tags": "แท็ก",
+  "tagsPlaceholder": "พิมพ์แท็กแล้วกด Enter",
+  "cancel": "ยกเลิก",
+  "saving": "กำลังบันทึก...",
+  "edit": "แก้ไข",
+  "add": "เพิ่ม"
+}

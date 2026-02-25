@@ -85,7 +85,7 @@
   "copiedToClipboard": "已复制到剪贴板",
   "export": "导出",
   "officialBadge": {
-    "label": "Official",
-    "tooltip": "Official account"
+    "label": "官方",
+    "tooltip": "官方账号"
   }
 }

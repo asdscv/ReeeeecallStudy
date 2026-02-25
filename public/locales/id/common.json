@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "quickStudy": "Belajar Cepat",
+    "dashboard": "Dasbor",
+    "study": "Belajar",
+    "decks": "Dek",
+    "cards": "Kartu",
+    "marketplace": "Marketplace",
+    "studyHistory": "Riwayat",
+    "settings": "Pengaturan",
+    "admin": "Admin",
+    "guide": "Panduan"
+  },
+  "actions": {
+    "save": "Simpan",
+    "saving": "Menyimpan...",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "create": "Buat",
+    "add": "Tambah",
+    "remove": "Hapus",
+    "confirm": "Konfirmasi",
+    "ok": "OK",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "close": "Tutup",
+    "copy": "Salin",
+    "duplicate": "Duplikat",
+    "search": "Cari",
+    "selectAll": "Pilih Semua",
+    "deselect": "Batal Pilih",
+    "show": "Tampilkan",
+    "hide": "Sembunyikan",
+    "startStudy": "Mulai Belajar",
+    "logout": "Keluar"
+  },
+  "status": {
+    "loading": "Memuat...",
+    "processing": "Memproses...",
+    "new": "Baru",
+    "learning": "Sedang Dipelajari",
+    "review": "Ulasan",
+    "suspended": "Ditangguhkan"
+  },
+  "units": {
+    "cards": "kartu",
+    "cardsSuffix": "{{count}} kartu",
+    "sessions": "sesi",
+    "items": "item",
+    "days": "hari",
+    "hours": "j",
+    "minutes": "mnt",
+    "seconds": "dtk",
+    "times": "kali",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}} per halaman"
+  },
+  "timePeriod": {
+    "1d": "1H",
+    "1w": "1Mg",
+    "1m": "1B",
+    "3m": "3B",
+    "6m": "6B",
+    "1y": "1T",
+    "2y": "2T",
+    "5y": "5T"
+  },
+  "confirmDialog": {
+    "cancel": "Batal",
+    "processing": "Memproses...",
+    "confirm": "Konfirmasi"
+  },
+  "delete": "Hapus",
+  "deselect": "Batal Pilih",
+  "duplicate": "Duplikat",
+  "edit": "Edit",
+  "save": "Simpan",
+  "saving": "Menyimpan...",
+  "selectAll": "Pilih Semua",
+  "menu": "Menu",
+  "copiedToClipboard": "Disalin ke papan klip",
+  "export": "Ekspor",
+  "officialBadge": {
+    "label": "Resmi",
+    "tooltip": "Akun resmi"
+  }
+}

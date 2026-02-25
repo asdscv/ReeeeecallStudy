@@ -1,0 +1,37 @@
+{
+  "title": "Dasbor",
+  "stats": {
+    "totalCards": "Total Kartu",
+    "todayReview": "Ulasan Hari Ini",
+    "streak": "Rentetan Belajar",
+    "masteryRate": "Tingkat Penguasaan"
+  },
+  "dailyChart": {
+    "title": "Volume Belajar Harian",
+    "total": "Total {{count}} kali",
+    "noData": "Belum ada catatan belajar",
+    "tooltipTimes": "{{value}} kali",
+    "tooltipLabel": "Belajar"
+  },
+  "forecast": {
+    "title": "Perkiraan Ulasan (7 hari)",
+    "noData": "Tidak ada ulasan terjadwal",
+    "tooltipCards": "{{value}} kartu",
+    "tooltipLabel": "Perlu diulas"
+  },
+  "recentDecks": {
+    "title": "Status Dek",
+    "noDecks": "Belum ada dek. Buat satu!",
+    "goToDecks": "Ke Manajemen Dek",
+    "cardCount": "{{count}} kartu",
+    "newCards": "Baru {{count}}",
+    "reviewCards": "Ulasan {{count}}",
+    "study": "Belajar"
+  },
+  "heatmap": {
+    "title": "Peta Panas Belajar",
+    "noStudy": "Tidak belajar",
+    "studyCount": "{{date}}: {{count}} kali belajar",
+    "tooltip": "{{date}}: {{count}} kali belajar"
+  }
+}

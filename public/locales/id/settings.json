@@ -1,0 +1,111 @@
+{
+  "title": "Pengaturan",
+  "loading": "Memuat...",
+  "saving": "Menyimpan...",
+  "save": "Simpan Pengaturan",
+  "saved": "Pengaturan disimpan!",
+  "saveButton": "Simpan Pengaturan",
+
+  "links": {
+    "userGuide": "Panduan Pengguna",
+    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
+    "apiDocs": "Dokumentasi API",
+    "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
+  },
+
+  "guide": {
+    "title": "Panduan Pengguna",
+    "desc": "Panduan fitur, kiat belajar, cara berbagi"
+  },
+
+  "apiDocs": {
+    "title": "Dokumentasi API",
+    "desc": "Endpoint API, autentikasi, contoh penggunaan"
+  },
+
+  "profile": {
+    "title": "Profil",
+    "email": "Email",
+    "displayName": "Nama tampilan",
+    "displayNamePlaceholder": "Masukkan nama Anda",
+    "namePlaceholder": "Masukkan nama Anda"
+  },
+
+  "language": {
+    "title": "Bahasa",
+    "label": "Bahasa tampilan",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+
+  "srs": {
+    "title": "Pembelajaran SRS",
+    "description": "Atur jumlah kartu baru yang ditambahkan per sesi dalam mode SRS (pengulangan berjarak)",
+    "newCardLimit": "Batas Kartu Baru",
+    "cards": "kartu",
+    "cardsUnit": "kartu",
+    "help": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini.",
+    "newCardNote": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini."
+  },
+
+  "answerMode": {
+    "title": "Mode Jawaban",
+    "description": "Atur cara Anda memilih jawaban saat belajar",
+    "button": "Tombol",
+    "buttonDesc": "Pilih jawaban dengan menekan tombol",
+    "swipe": "Geser",
+    "swipeDesc": "Pilih jawaban dengan menggeser kartu",
+    "swipeAutoNote": "Arah geser diatur secara otomatis berdasarkan mode belajar.\n• SRS: ← Ulangi / → Baik\n• Mode lain: ← Tidak Diketahui / → Diketahui"
+  },
+
+  "tts": {
+    "title": "Pembacaan TTS Otomatis",
+    "description": "Baca otomatis bidang dengan TTS saat membalik kartu",
+    "enable": "Aktifkan pembacaan otomatis",
+    "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
+    "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
+  },
+
+  "apiKey": {
+    "title": "Manajemen Kunci API",
+    "limit": "Anda dapat membuat hingga 1 kunci API",
+    "maxKeys": "Anda dapat membuat hingga 1 kunci API",
+    "generate": "Buat",
+    "generateNew": "Buat Kunci Baru",
+    "keyName": "Nama kunci",
+    "keyNamePlaceholder": "contoh: skrip-saya",
+    "namePlaceholder": "contoh: skrip-saya",
+    "create": "Buat",
+    "generating": "Membuat...",
+    "generateFailed": "Gagal membuat kunci: ",
+    "generated": "Kunci API dibuat!",
+    "generateError": "Kesalahan saat membuat kunci",
+    "delete": "Hapus",
+    "deleted": "Kunci API dihapus",
+    "cancel": "Batal",
+    "copy": "Salin",
+    "copied": "Kunci API disalin!",
+    "show": "Tampilkan kunci",
+    "showPartial": "Tampilkan kunci sebagian",
+    "showFull": "Tampilkan kunci lengkap",
+    "hide": "Sembunyikan kunci",
+    "masked": "Tidak dapat dilihat lagi demi keamanan",
+    "createdAt": "Dibuat",
+    "created": "Dibuat: {{date}}",
+    "noKeys": "Belum ada kunci API yang dibuat.",
+    "noKey": "Belum ada kunci API yang dibuat.",
+    "securityNote": "Tidak dapat dilihat lagi demi keamanan"
+  },
+
+  "account": {
+    "title": "Akun",
+    "logout": "Keluar"
+  },
+
+  "settings": {}
+}

@@ -1,0 +1,107 @@
+{
+  "title": "ประวัติการเรียน",
+  "tabs": {
+    "deckProgress": "ความก้าวหน้าสำรับ",
+    "sessionList": "รายการเซสชัน"
+  },
+  "filters": {
+    "allDecks": "สำรับทั้งหมด",
+    "allModes": "โหมดทั้งหมด"
+  },
+  "deckScope": {
+    "all": "ทั้งหมด",
+    "label": "ขอบเขตแดชบอร์ด"
+  },
+  "empty": "ยังไม่มีประวัติการเรียน เริ่มเรียนเลย!",
+  "noMatch": "ไม่มีบันทึกที่ตรงกับตัวกรอง",
+  "deletedDeck": "สำรับที่ถูกลบ",
+  "deckProgress": {
+    "total": "{{count}} การ์ด",
+    "notStudied": "ยังไม่เรียน {{count}}",
+    "learning": "กำลังเรียน {{count}}",
+    "review": "ทบทวน {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}} วัน",
+    "reviewCount": "{{count}} ครั้งทบทวน",
+    "cardCount": "{{count}} การ์ด",
+    "logCount": "{{count}} บันทึก",
+    "intervalChange": "{{prev}} วัน → {{next}} วัน",
+    "paginationInfo": "{{start}}-{{end}} จาก {{total}}"
+  },
+  "sessionCard": {
+    "cardsStudied": "เรียน {{count}} การ์ด"
+  },
+  "sessionDetail": {
+    "backToHistory": "ประวัติการเรียน",
+    "cardsStudied": "เรียน {{count}} การ์ด",
+    "performance": "ประสิทธิภาพ {{value}}%",
+    "loadingDetails": "กำลังโหลดรายละเอียด...",
+    "noDetails": "ไม่มีรายละเอียด",
+    "retention": "อัตราการจดจำ",
+    "avgIntervalGrowth": "การเติบโตของช่วงเวลาเฉลี่ย",
+    "avgEase": "ค่าความง่ายเฉลี่ย",
+    "totalReviews": "จำนวนทบทวนทั้งหมด",
+    "easeDistribution": "การกระจายค่าความง่าย",
+    "totalCards": "การ์ดทั้งหมด",
+    "avgTime": "เวลาเฉลี่ย",
+    "performanceScore": "คะแนนประสิทธิภาพ",
+    "cardDetails": "รายละเอียดการ์ด",
+    "card": "การ์ด",
+    "rating": "คะแนน",
+    "intervalChange": "การเปลี่ยนช่วงเวลา",
+    "easeChange": "การเปลี่ยนค่าความง่าย",
+    "timeSpent": "เวลา",
+    "deletedCard": "(การ์ดที่ถูกลบ)",
+    "noContent": "(ไม่มีเนื้อหา)"
+  },
+  "overview": {
+    "sessions": "เซสชัน",
+    "sessionsValue": "{{count}} เซสชัน",
+    "studyCards": "การ์ดที่เรียน",
+    "cardsValue": "{{count}} การ์ด",
+    "totalTime": "เวลาเรียนทั้งหมด",
+    "avgPerformance": "ประสิทธิภาพเฉลี่ย",
+    "streak": "สถิติเรียนต่อเนื่อง",
+    "streakValue": "{{count}} วัน"
+  },
+  "chart": {
+    "countPercent": "{{count}} ({{percent}}%)"
+  },
+  "charts": {
+    "studyVolume": "ปริมาณการเรียน",
+    "volumeSummary": "{{sessions}} เซสชัน / {{cards}} การ์ด",
+    "noDataForPeriod": "ไม่มีบันทึกการเรียนในช่วงเวลานี้",
+    "sessionDuration": "ระยะเวลาเซสชันเฉลี่ย",
+    "sessionCount": "{{count}} เซสชัน",
+    "avgDuration": "ระยะเวลาเฉลี่ย",
+    "ratingDistribution": "การกระจายคะแนน",
+    "ratingTotal": "ทั้งหมด {{count}}",
+    "noRatingData": "ไม่มีข้อมูลคะแนน",
+    "modeBreakdown": "แยกตามโหมด",
+    "noModeData": "ไม่มีข้อมูลโหมด",
+    "sessionCountLabel": "{{count}} เซสชัน",
+    "cardCountLabel": "{{count}} การ์ด",
+    "performance": "ประสิทธิภาพ"
+  },
+  "ratingGroups": {
+    "srs": "การทบทวนแบบเว้นระยะ",
+    "simple": "ทั่วไป",
+    "cramming": "อัดเข้าหัว"
+  },
+  "ratings": {
+    "again": "อีกครั้ง",
+    "hard": "ยาก",
+    "good": "ดี",
+    "easy": "ง่าย",
+    "known": "รู้แล้ว",
+    "unknown": "ไม่รู้",
+    "got_it": "จำได้",
+    "missed": "พลาด"
+  },
+  "units": {
+    "sessions": "เซสชัน",
+    "cards": "การ์ด",
+    "min": "นาที"
+  }
+}

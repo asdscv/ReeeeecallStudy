@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja'] as const
+export const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
 const INTL_LOCALE_MAP: Record<SupportedLocale, string> = {
@@ -6,6 +6,9 @@ const INTL_LOCALE_MAP: Record<SupportedLocale, string> = {
   ko: 'ko-KR',
   zh: 'zh-CN',
   ja: 'ja-JP',
+  vi: 'vi-VN',
+  th: 'th-TH',
+  id: 'id-ID',
 }
 
 /**

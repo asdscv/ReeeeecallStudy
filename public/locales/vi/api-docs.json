@@ -1,0 +1,211 @@
+{
+  "title": "Tài liệu API",
+  "subtitle": "Quản lý dữ liệu học tập bằng cách tích hợp với công cụ bên ngoài",
+  "publicSubtitle": "Quản lý dữ liệu học tập bằng cách tích hợp với công cụ bên ngoài sử dụng API ReeeeecallStudy",
+  "userGuideLink": "Hướng dẫn sử dụng",
+  "getStarted": "Bắt đầu",
+  "required": "bắt buộc",
+  "searchPlaceholder": "Tìm kiếm điểm cuối...",
+  "noResults": "Không tìm thấy kết quả cho \"{{query}}\"",
+  "copy": "Sao chép",
+  "tableOfContents": "Mục lục",
+  "quickStart": {
+    "title": "Bắt đầu nhanh",
+    "settingsPage": "Trang cài đặt",
+    "step1Auth": " — Tạo khóa API trong phần Khóa API.",
+    "signup": "Đăng ký",
+    "step1Public": "và tạo khóa API trong Cài đặt.",
+    "step2": "Thêm header",
+    "step2Suffix": "vào mọi yêu cầu.",
+    "step3": "Bắt đầu gọi API! Kiểm tra các điểm cuối bên dưới."
+  },
+  "table": {
+    "name": "Tên",
+    "type": "Loại",
+    "required": "Bắt buộc",
+    "description": "Mô tả"
+  },
+  "footer": {
+    "home": "Trang chủ",
+    "login": "Đăng nhập"
+  },
+  "sections": {
+    "overview": {
+      "title": "Tổng quan",
+      "description": "Sử dụng API ReeeeecallStudy để quản lý dữ liệu học tập từ công cụ, script và ứng dụng bên ngoài.",
+      "items": {
+        "what": {
+          "title": "API là gì?",
+          "body": "API ReeeeecallStudy là API RESTful cho phép bạn xem và quản lý bộ thẻ, thẻ, lịch sử học tập và nhiều hơn nữa qua yêu cầu HTTP. Sử dụng cho script tự động hóa, tích hợp ứng dụng bên thứ ba và phân tích dữ liệu."
+        },
+        "baseUrl": {
+          "title": "URL gốc",
+          "body": "Tất cả yêu cầu API dựa trên URL dự án Supabase.\n\nURL gốc: https://your-project.supabase.co/rest/v1"
+        },
+        "responseFormat": {
+          "title": "Định dạng phản hồi",
+          "body": "Tất cả phản hồi ở định dạng JSON với Content-Type: application/json.\n\nKhi thành công, dữ liệu tài nguyên được trả về. Khi lỗi, phản hồi theo định dạng { \"error\": \"message\" }."
+        }
+      }
+    },
+    "authentication": {
+      "title": "Xác thực",
+      "description": "Tất cả yêu cầu được xác thực bằng khóa API.",
+      "items": {
+        "getKey": {
+          "title": "Lấy khóa API",
+          "body": "Cài đặt → Phần Khóa API → Nhấp 'Tạo khóa API mới'.\nNhập tên (tối đa 64 ký tự) để nhận khóa 35 ký tự bắt đầu bằng rc_.\n\n⚠️ Khóa chỉ hiển thị một lần. Sao chép vào nơi an toàn!"
+        },
+        "method": {
+          "title": "Phương thức xác thực",
+          "body": "Truyền khóa API dưới dạng Bearer token trong header Authorization.\n\nAuthorization: Bearer rc_your_api_key_here\n\nKhóa thiếu hoặc không hợp lệ trả về 401 Unauthorized."
+        },
+        "management": {
+          "title": "Quản lý khóa",
+          "body": "• Bạn có thể có tối đa 1 khóa API\n• Nếu mất, xóa khóa hiện tại và tạo mới\n• Xóa ngay các khóa không sử dụng\n• Sử dụng biến môi trường thay vì mã cứng khóa"
+        }
+      }
+    },
+    "rateLimits": {
+      "title": "Giới hạn tốc độ",
+      "description": "Số lượng yêu cầu bị giới hạn để đảm bảo ổn định API.",
+      "items": {
+        "free": {
+          "title": "Gói miễn phí",
+          "body": "• Yêu cầu API hàng ngày: 1.000\n• Cuộc gọi API mỗi phút: 60\n• Tạo thẻ mỗi phút: 30\n• Tạo thẻ hàng loạt mỗi phút: 5 (tối đa 100 mỗi yêu cầu)\n• Tổng số thẻ: 5.000\n• Tổng số bộ thẻ: 50"
+        },
+        "pro": {
+          "title": "Gói Pro",
+          "body": "• Yêu cầu API hàng ngày: 10.000\n• Cuộc gọi API mỗi phút: 300\n• Tạo thẻ mỗi phút: 120\n• Tạo thẻ hàng loạt mỗi phút: 20\n• Tổng số thẻ: 50.000\n• Tổng số bộ thẻ: 500"
+        },
+        "exceeded": {
+          "title": "Khi vượt giới hạn",
+          "body": "Trả về 429 Too Many Requests.\n\nHeader phản hồi bao gồm:\n• X-RateLimit-Limit: Yêu cầu tối đa\n• X-RateLimit-Remaining: Yêu cầu còn lại\n• Retry-After: Thời gian chờ tính bằng giây"
+        }
+      }
+    },
+    "decks": {
+      "title": "API bộ thẻ",
+      "description": "Xem và quản lý bộ thẻ (bộ sưu tập thẻ).",
+      "endpoints": {
+        "list": {
+          "summary": "Danh sách bộ thẻ",
+          "description": "Lấy tất cả bộ thẻ của người dùng."
+        },
+        "detail": {
+          "summary": "Chi tiết bộ thẻ",
+          "description": "Lấy thông tin chi tiết cho một bộ thẻ cụ thể."
+        },
+        "create": {
+          "summary": "Tạo bộ thẻ",
+          "description": "Tạo bộ thẻ mới."
+        }
+      },
+      "params": {
+        "page": "Số trang (mặc định: 1)",
+        "perPage": "Mục mỗi trang (mặc định: 50, tối đa: 100)",
+        "deckId": "ID bộ thẻ cần truy vấn"
+      }
+    },
+    "cards": {
+      "title": "API thẻ",
+      "description": "Xem, tạo và chỉnh sửa thẻ.",
+      "endpoints": {
+        "list": {
+          "summary": "Danh sách thẻ",
+          "description": "Lấy thẻ trong một bộ thẻ cụ thể."
+        },
+        "create": {
+          "summary": "Tạo thẻ",
+          "description": "Thêm thẻ mới vào bộ thẻ. Tạo đơn lẻ hoặc hàng loạt đến 100."
+        },
+        "update": {
+          "summary": "Cập nhật thẻ",
+          "description": "Chỉnh sửa giá trị trường hoặc thẻ gắn của thẻ hiện có."
+        },
+        "delete": {
+          "summary": "Xóa thẻ",
+          "description": "Xóa một thẻ cụ thể. Hành động này không thể hoàn tác."
+        }
+      },
+      "params": {
+        "deckId": "ID bộ thẻ",
+        "cardId": "ID thẻ",
+        "status": "Bộ lọc trạng thái SRS (new, learning, review, suspended)",
+        "tag": "Bộ lọc thẻ gắn"
+      }
+    },
+    "study": {
+      "title": "API học tập",
+      "description": "Xem lịch sử học tập và quản lý dữ liệu phiên.",
+      "endpoints": {
+        "due": {
+          "summary": "Lấy thẻ đến hạn",
+          "description": "Lấy thẻ cần ôn tập hôm nay."
+        },
+        "history": {
+          "summary": "Lịch sử học tập",
+          "description": "Lấy hồ sơ phiên học."
+        },
+        "stats": {
+          "summary": "Thống kê học tập",
+          "description": "Lấy thống kê học tập tổng thể và dữ liệu bảng điều khiển."
+        }
+      },
+      "params": {
+        "deckId": "ID bộ thẻ",
+        "from": "Ngày bắt đầu (VD: 2025-01-01)",
+        "to": "Ngày kết thúc (VD: 2025-01-31)",
+        "period": "Thời kỳ (1w, 1m, 3m, 6m, 1y)"
+      }
+    },
+    "templates": {
+      "title": "API mẫu",
+      "description": "Xem mẫu thẻ.",
+      "endpoints": {
+        "list": {
+          "summary": "Danh sách mẫu",
+          "description": "Lấy tất cả mẫu thẻ của người dùng."
+        },
+        "detail": {
+          "summary": "Chi tiết mẫu",
+          "description": "Lấy thông tin mẫu đầy đủ bao gồm trường và bố cục."
+        }
+      },
+      "params": {
+        "templateId": "ID mẫu"
+      }
+    },
+    "examples": {
+      "title": "Ví dụ mã",
+      "description": "Ví dụ gọi API với các ngôn ngữ và công cụ khác nhau."
+    },
+    "errors": {
+      "title": "Xử lý lỗi",
+      "description": "Định dạng phản hồi lỗi và mã lỗi phổ biến.",
+      "items": {
+        "format": {
+          "title": "Định dạng phản hồi lỗi",
+          "body": "Tất cả lỗi trả về:\n\n{\n  \"error\": \"Thông báo lỗi\",\n  \"code\": \"MÃ_LỖI\",\n  \"details\": \"Thông tin bổ sung (tùy chọn)\"\n}"
+        },
+        "statusCodes": {
+          "title": "Mã trạng thái HTTP",
+          "body": "• 200 OK — Thành công\n• 201 Created — Tài nguyên đã tạo\n• 204 No Content — Đã xóa (không có nội dung phản hồi)\n• 400 Bad Request — Yêu cầu không hợp lệ (thiếu trường, xác thực thất bại)\n• 401 Unauthorized — Xác thực thất bại (thiếu hoặc khóa API không hợp lệ)\n• 404 Not Found — Không tìm thấy tài nguyên\n• 429 Too Many Requests — Vượt giới hạn tốc độ\n• 500 Internal Server Error — Lỗi máy chủ"
+        },
+        "validation": {
+          "title": "Lỗi xác thực",
+          "body": "Lỗi xác thực khi tạo/cập nhật thẻ trả về lỗi theo trường dưới dạng mảng:\n\n{\n  \"error\": \"Xác thực thất bại\",\n  \"errors\": [\n    \"[0] template_id là bắt buộc\",\n    \"[0] field_values phải có ít nhất một trường\"\n  ]\n}"
+        }
+      }
+    },
+    "statusCodes": {
+      "200": "Thành công",
+      "201": "Đã tạo",
+      "204": "Đã xóa (không có nội dung phản hồi)",
+      "400": "Yêu cầu không hợp lệ (thiếu trường bắt buộc)",
+      "401": "Xác thực thất bại",
+      "404": "Không tìm thấy",
+      "429": "Vượt giới hạn tốc độ"
+    }
+  }
+}

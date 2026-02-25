@@ -94,10 +94,10 @@
       "suspended": "一時停止"
     },
     "ratings": {
-      "again": "Again",
-      "hard": "Hard",
-      "good": "Good",
-      "easy": "Easy"
+      "again": "もう一度",
+      "hard": "難しい",
+      "good": "良い",
+      "easy": "簡単"
     },
     "periodDay": "{{count}}日",
     "minuteShort": "{{value}}分"

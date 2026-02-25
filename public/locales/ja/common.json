@@ -85,7 +85,7 @@
   "copiedToClipboard": "クリップボードにコピーしました",
   "export": "エクスポート",
   "officialBadge": {
-    "label": "Official",
-    "tooltip": "Official account"
+    "label": "公式",
+    "tooltip": "公式アカウント"
   }
 }

@@ -1,0 +1,25 @@
+{
+  "list": {
+    "title": "Bài viết học tập",
+    "subtitle": "Mẹo và cảm hứng cho việc học tốt hơn",
+    "noArticles": "Chưa có bài viết nào. Hãy quay lại sau!",
+    "readingTime": "{{minutes}} phút đọc",
+    "reachedEnd": "Bạn đã xem tất cả bài viết",
+    "loadingMore": "Đang tải thêm bài viết..."
+  },
+  "detail": {
+    "backToList": "Quay lại Bài viết",
+    "readingTime": "{{minutes}} phút",
+    "notFound": "Không tìm thấy bài viết"
+  },
+  "cta": {
+    "title": "Bắt đầu với ReeeCall",
+    "description": "Trải nghiệm học tập hiệu quả ngay bây giờ",
+    "button": "Bắt đầu miễn phí"
+  },
+  "seo": {
+    "listTitle": "Bài viết học tập | ReeeCall",
+    "listDescription": "Khám phá chiến lược học tập dựa trên khoa học và mẹo lặp lại ngắt quãng.",
+    "breadcrumbInsights": "Bài viết học tập"
+  }
+}

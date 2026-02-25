@@ -1,0 +1,185 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS (Lặp lại ngắt quãng)",
+      "description": "Tự động chọn thẻ dựa trên thời gian ôn tập",
+      "detail": "Ôn tập theo khoảng thời gian tối ưu dựa trên đường cong trí nhớ. Đánh giá Lại/Khó/Tốt/Dễ để điều chỉnh khoảng cách. Thẻ sai sẽ xuất hiện lại trong cùng phiên học."
+    },
+    "sequential_review": {
+      "label": "Ôn tập tuần tự",
+      "description": "Tất cả thẻ mới + thẻ ôn tập theo thứ tự",
+      "detail": "Tất cả thẻ mới luôn được bao gồm. Kích thước lô kiểm soát số lượng thẻ hiện có cần ôn tập. Quay lại từ đầu sau khi đến cuối."
+    },
+    "random": {
+      "label": "Ngẫu nhiên",
+      "description": "Xáo trộn thẻ ngẫu nhiên để học",
+      "detail": "Rút ngẫu nhiên thẻ theo kích thước lô từ bộ thẻ. Tất cả thẻ không bị tạm dừng đều đủ điều kiện bất kể trạng thái SRS."
+    },
+    "sequential": {
+      "label": "Tuần tự",
+      "description": "Học thẻ theo thứ tự",
+      "detail": "Học thẻ theo thứ tự sắp xếp theo kích thước lô. Ghi nhớ vị trí và tiếp tục từ nơi bạn dừng lại. Quay vòng sau khi đến cuối."
+    },
+    "by_date": {
+      "label": "Theo ngày",
+      "description": "Học thẻ được tải lên vào một ngày cụ thể",
+      "detail": "Thu thập và chỉ học các thẻ được thêm vào ngày đã chọn. Hữu ích để nhanh chóng ôn tập các thẻ mới thêm."
+    },
+    "cramming": {
+      "label": "Chế độ nhồi nhét",
+      "description": "Ôn tập chuyên sâu cho đến khi thành thạo",
+      "detail": "Lặp tất cả thẻ theo từng vòng. Thẻ sai sẽ lặp lại cho đến khi thành thạo. Không ảnh hưởng đến lịch SRS."
+    }
+  },
+  "quickStudy": {
+    "title": "Học nhanh",
+    "noDecks": "Không có bộ thẻ. Vui lòng tạo bộ thẻ trước.",
+    "cardCount": "{{count}} thẻ",
+    "newCards": "Mới {{count}}",
+    "reviewCards": "Ôn tập {{count}}",
+    "selectDate": "Chọn ngày để học",
+    "setBatchSize": "Đặt kích thước lô",
+    "selectMode": "Chọn chế độ học",
+    "startStudy": "Bắt đầu học",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ",
+    "batchSize": "Kích thước lô",
+    "batchSizeDesc": "Số thẻ học mỗi phiên ({{min}}~{{max}})",
+    "batchSizeDescReview": "Số thẻ ôn tập mỗi phiên — tất cả thẻ mới đều được bao gồm ({{min}}~{{max}})",
+    "backToModeSelect": "← Quay lại chọn chế độ",
+    "crammingSetup": "Thiết lập tùy chọn nhồi nhét"
+  },
+  "setup": {
+    "title": "Thiết lập học tập",
+    "deckInfo": "{{icon}} {{name}} · {{count}} thẻ",
+    "studyMode": "Chế độ học",
+    "selectUploadDate": "Chọn ngày tải lên",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ"
+  },
+  "session": {
+    "loading": "Đang tải...",
+    "noCards": "Không có thẻ để học",
+    "allReviewed": "Đã ôn tập tất cả thẻ!",
+    "backToDeck": "Quay lại bộ thẻ"
+  },
+  "card": {
+    "tapToFlip": "Chạm để lật",
+    "tapToSeeAnswer": "Chạm vào thẻ để xem đáp án",
+    "tapToReveal": "Chạm vào thẻ để xem đáp án",
+    "ttsPlay": "Phát TTS",
+    "front": "MẶT TRƯỚC",
+    "back": "MẶT SAU"
+  },
+  "rating": {
+    "dontKnow": "Không biết",
+    "knowIt": "Biết rồi",
+    "known": "Đã biết",
+    "unknown": "Chưa biết",
+    "next": "Tiếp →"
+  },
+  "summary": {
+    "title": "Hoàn thành học tập!",
+    "completed": "Hoàn thành học tập!",
+    "greatJob": "Tuyệt vời!",
+    "wellDone": "Tuyệt vời! Hãy tiếp tục phát huy.",
+    "studyCards": "Thẻ đã học",
+    "cardsStudied": "Thẻ đã học",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "Thời gian học",
+    "timeFormat": "{{minutes}}p {{seconds}}s",
+    "avgPerCard": "Trung bình mỗi thẻ",
+    "secondsFormat": "{{seconds}}s",
+    "ratingDistribution": "Phân bố đánh giá",
+    "backToDeck": "Quay lại bộ thẻ",
+    "studyAgain": "Học lại",
+    "sessionEnded": "Phiên đã kết thúc",
+    "progressSoFar": "Đây là tiến trình của bạn.",
+    "knowIt": "Biết rồi",
+    "dontKnow": "Không biết",
+    "next": "Tiếp"
+  },
+  "weekdays": {
+    "sun": "CN",
+    "mon": "T2",
+    "tue": "T3",
+    "wed": "T4",
+    "thu": "T5",
+    "fri": "T6",
+    "sat": "T7"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10 phút",
+    "minutes": "{{count}} phút",
+    "hours": "{{count}} giờ",
+    "oneDay": "1 ngày",
+    "days": "{{count}} ngày",
+    "months": "{{count}} tháng",
+    "years": "{{count}} năm"
+  },
+  "srsRating": {
+    "again": "Lại",
+    "hard": "Khó",
+    "good": "Tốt",
+    "easy": "Dễ"
+  },
+  "cramming": {
+    "gotIt": "Đúng rồi!",
+    "missed": "Chưa đúng",
+    "round": "Vòng {{round}}",
+    "mastery": "Thành thạo: {{percentage}}%",
+    "filter": {
+      "title": "Bộ lọc thẻ",
+      "all": "Tất cả thẻ",
+      "allDesc": "Học tất cả thẻ không bị tạm dừng trong bộ thẻ",
+      "weak": "Chỉ thẻ yếu",
+      "weakDesc": "Thẻ khó (hệ số dễ thấp) hoặc thẻ mới",
+      "dueSoon": "Sắp đến hạn",
+      "dueSoonDesc": "Thẻ cần ôn tập trong vòng 3 ngày"
+    },
+    "timeLimit": {
+      "title": "Giới hạn thời gian",
+      "none": "Không giới hạn",
+      "minutes": "{{count}} phút"
+    },
+    "shuffle": {
+      "title": "Xáo trộn thẻ",
+      "desc": "Xáo trộn thứ tự thẻ mỗi vòng"
+    },
+    "summary": {
+      "completed": "Hoàn thành nhồi nhét!",
+      "timeUp": "Hết thời gian!",
+      "wellDone": "Nỗ lực tuyệt vời! Hãy tiếp tục ôn tập để củng cố trí nhớ.",
+      "totalRounds": "Tổng số vòng",
+      "masteryRate": "Tỷ lệ thành thạo",
+      "cardsStudied": "Thẻ đã học",
+      "hardestCards": "Thẻ khó nhất",
+      "missedTimes": "sai {{count}} lần",
+      "noSrsImpact": "Phiên này không ảnh hưởng đến lịch SRS của bạn.",
+      "sessionEnded": "Phiên đã kết thúc",
+      "crammingAgain": "Nhồi nhét lại",
+      "otherMode": "Chế độ khác"
+    }
+  },
+  "noCards": {
+    "otherMode": "Học chế độ khác",
+    "srs": {
+      "title": "Đã hoàn thành!",
+      "message": "Hiện không có thẻ nào cần ôn tập. Hãy quay lại sau!"
+    },
+    "cramming": {
+      "weakTitle": "Không có thẻ yếu",
+      "weakMessage": "Tất cả thẻ của bạn đều ổn!",
+      "dueSoonTitle": "Không có thẻ sắp đến hạn",
+      "dueSoonMessage": "Không có thẻ nào cần ôn tập trong vòng 3 ngày."
+    },
+    "generic": {
+      "title": "Không có thẻ để học",
+      "message": "Không có thẻ nào phù hợp với tiêu chí của bạn."
+    }
+  }
+}

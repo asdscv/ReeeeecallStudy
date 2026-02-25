@@ -5,31 +5,43 @@ const SITE_URL = 'https://reeeeecallstudy.xyz'
 const BRAND_NAME = 'ReeeeecallStudy'
 const TWITTER_HANDLE = '@reeeeecallstudy'
 
-const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja']
-const OG_LOCALE_MAP = { en: 'en_US', ko: 'ko_KR', zh: 'zh_CN', ja: 'ja_JP' }
+const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id']
+const OG_LOCALE_MAP = { en: 'en_US', ko: 'ko_KR', zh: 'zh_CN', ja: 'ja_JP', vi: 'vi_VN', th: 'th_TH', id: 'id_ID' }
 const LIST_TITLES = {
   en: 'Learning Insights | ReeeeecallStudy',
   ko: '학습 인사이트 | ReeeeecallStudy',
   zh: '学习洞察 | ReeeeecallStudy',
   ja: '学習インサイト | ReeeeecallStudy',
+  vi: 'Kiến thức Học tập | ReeeeecallStudy',
+  th: 'ข้อมูลเชิงลึกด้านการเรียนรู้ | ReeeeecallStudy',
+  id: 'Wawasan Belajar | ReeeeecallStudy',
 }
 const LIST_DESCS = {
   en: 'Discover science-backed learning strategies and spaced repetition tips.',
   ko: '과학적으로 검증된 학습 전략과 간격 반복 학습법을 알아보세요.',
   zh: '探索经过科学验证的学习策略和间隔重复学习技巧。',
   ja: '科学的に検証された学習戦略と間隔反復学習のコツを発見しましょう。',
+  vi: 'Khám phá các chiến lược học tập dựa trên khoa học và mẹo lặp lại ngắt quãng.',
+  th: 'ค้นพบกลยุทธ์การเรียนรู้ที่ได้รับการพิสูจน์ทางวิทยาศาสตร์และเคล็ดลับการทบทวนแบบเว้นระยะ',
+  id: 'Temukan strategi belajar berbasis sains dan tips pengulangan berjarak.',
 }
 const LANDING_TITLES = {
   en: 'ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition',
   ko: 'ReeeeecallStudy — 간격 반복 학습 기반 스마트 플래시카드',
   zh: 'ReeeeecallStudy — 基于间隔重复的智能闪卡学习',
   ja: 'ReeeeecallStudy — 間隔反復学習に基づくスマートフラッシュカード',
+  vi: 'ReeeeecallStudy — Học Flashcard Thông minh với Lặp lại Ngắt quãng',
+  th: 'ReeeeecallStudy — เรียนรู้ด้วยแฟลชการ์ดอัจฉริยะพร้อมการทบทวนแบบเว้นระยะ',
+  id: 'ReeeeecallStudy — Belajar Flashcard Cerdas dengan Pengulangan Berjarak',
 }
 const LANDING_DESCS = {
   en: 'Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer.',
   ko: '과학적으로 검증된 간격 반복(SRS) 알고리즘으로 더 빠르고 오래 기억하세요.',
   zh: '采用经过科学验证的间隔重复(SRS)算法的智能闪卡学习平台。记得更快、更久。',
   ja: '科学的に実証された間隔反復(SRS)アルゴリズムを搭載したスマートフラッシュカード学習プラットフォーム。より速く、より長く記憶。',
+  vi: 'Nền tảng học flashcard thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn.',
+  th: 'แพลตฟอร์มเรียนรู้ด้วยแฟลชการ์ดอัจฉริยะพร้อมอัลกอริทึมการทบทวนแบบเว้นระยะ (SRS) ที่พิสูจน์แล้วทางวิทยาศาสตร์ จำได้เร็วขึ้นและนานขึ้น',
+  id: 'Platform belajar flashcard cerdas dengan algoritma pengulangan berjarak (SRS) yang terbukti secara ilmiah. Ingat lebih cepat dan lebih lama.',
 }
 
 function buildHreflangTags(basePath, queryParam) {

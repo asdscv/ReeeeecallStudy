@@ -1,0 +1,107 @@
+{
+  "title": "Riwayat Belajar",
+  "tabs": {
+    "deckProgress": "Progres Dek",
+    "sessionList": "Daftar Sesi"
+  },
+  "filters": {
+    "allDecks": "Semua Dek",
+    "allModes": "Semua Mode"
+  },
+  "deckScope": {
+    "all": "Semua",
+    "label": "Cakupan Dasbor"
+  },
+  "empty": "Belum ada riwayat belajar. Mulai belajar!",
+  "noMatch": "Tidak ada catatan yang sesuai dengan filter.",
+  "deletedDeck": "Dek Dihapus",
+  "deckProgress": {
+    "total": "{{count}} kartu",
+    "notStudied": "Belum Dipelajari {{count}}",
+    "learning": "Sedang Dipelajari {{count}}",
+    "review": "Ulasan {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}}hr",
+    "reviewCount": "{{count}} ulasan",
+    "cardCount": "{{count}} kartu",
+    "logCount": "{{count}} log",
+    "intervalChange": "{{prev}}hr → {{next}}hr",
+    "paginationInfo": "{{start}}-{{end}} dari {{total}}"
+  },
+  "sessionCard": {
+    "cardsStudied": "{{count}} kartu dipelajari"
+  },
+  "sessionDetail": {
+    "backToHistory": "Riwayat Belajar",
+    "cardsStudied": "{{count}} kartu dipelajari",
+    "performance": "Performa {{value}}%",
+    "loadingDetails": "Memuat detail...",
+    "noDetails": "Tidak ada detail.",
+    "retention": "Tingkat Retensi",
+    "avgIntervalGrowth": "Pertumbuhan Interval Rata-rata",
+    "avgEase": "Kemudahan Rata-rata",
+    "totalReviews": "Total Ulasan",
+    "easeDistribution": "Distribusi Kemudahan",
+    "totalCards": "Total Kartu",
+    "avgTime": "Waktu Rata-rata",
+    "performanceScore": "Skor Performa",
+    "cardDetails": "Detail Kartu",
+    "card": "Kartu",
+    "rating": "Penilaian",
+    "intervalChange": "Perubahan Interval",
+    "easeChange": "Perubahan Kemudahan",
+    "timeSpent": "Waktu",
+    "deletedCard": "(Kartu dihapus)",
+    "noContent": "(Tidak ada konten)"
+  },
+  "overview": {
+    "sessions": "Sesi",
+    "sessionsValue": "{{count}} sesi",
+    "studyCards": "Kartu Dipelajari",
+    "cardsValue": "{{count}} kartu",
+    "totalTime": "Total Waktu Belajar",
+    "avgPerformance": "Performa Rata-rata",
+    "streak": "Rentetan Belajar",
+    "streakValue": "{{count}} hari"
+  },
+  "chart": {
+    "countPercent": "{{count}} ({{percent}}%)"
+  },
+  "charts": {
+    "studyVolume": "Volume Belajar",
+    "volumeSummary": "{{sessions}} sesi / {{cards}} kartu",
+    "noDataForPeriod": "Tidak ada catatan belajar untuk periode ini",
+    "sessionDuration": "Durasi Sesi Rata-rata",
+    "sessionCount": "{{count}} sesi",
+    "avgDuration": "Durasi Rata-rata",
+    "ratingDistribution": "Distribusi Penilaian",
+    "ratingTotal": "Total {{count}}",
+    "noRatingData": "Tidak ada data penilaian",
+    "modeBreakdown": "Rincian Mode",
+    "noModeData": "Tidak ada data mode",
+    "sessionCountLabel": "{{count}} sesi",
+    "cardCountLabel": "{{count}} kartu",
+    "performance": "Performa"
+  },
+  "ratingGroups": {
+    "srs": "Pengulangan Berjarak",
+    "simple": "Umum",
+    "cramming": "Menjejalkan"
+  },
+  "ratings": {
+    "again": "Ulangi",
+    "hard": "Sulit",
+    "good": "Baik",
+    "easy": "Mudah",
+    "known": "Diketahui",
+    "unknown": "Tidak Diketahui",
+    "got_it": "Mengerti",
+    "missed": "Terlewat"
+  },
+  "units": {
+    "sessions": "sesi",
+    "cards": "kartu",
+    "min": "mnt"
+  }
+}

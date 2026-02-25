@@ -1,0 +1,25 @@
+{
+  "list": {
+    "title": "Wawasan Pembelajaran",
+    "subtitle": "Kiat dan inspirasi untuk pembelajaran yang lebih baik",
+    "noArticles": "Belum ada artikel yang dipublikasikan. Periksa lagi nanti!",
+    "readingTime": "{{minutes}} menit baca",
+    "reachedEnd": "Anda telah melihat semua artikel",
+    "loadingMore": "Memuat lebih banyak artikel..."
+  },
+  "detail": {
+    "backToList": "Kembali ke Wawasan",
+    "readingTime": "{{minutes}} mnt",
+    "notFound": "Artikel tidak ditemukan"
+  },
+  "cta": {
+    "title": "Mulai dengan ReeeeecallStudy",
+    "description": "Rasakan pembelajaran yang efisien sekarang juga",
+    "button": "Mulai Gratis"
+  },
+  "seo": {
+    "listTitle": "Wawasan Pembelajaran | ReeeeecallStudy",
+    "listDescription": "Temukan strategi pembelajaran berbasis sains dan kiat pengulangan berjarak.",
+    "breadcrumbInsights": "Wawasan Pembelajaran"
+  }
+}

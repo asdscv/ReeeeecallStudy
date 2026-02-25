@@ -8,8 +8,8 @@ import {
 } from '../locale-utils'
 
 describe('SUPPORTED_LOCALES', () => {
-  it('contains en, ko, zh, ja', () => {
-    expect(SUPPORTED_LOCALES).toEqual(['en', 'ko', 'zh', 'ja'])
+  it('contains en, ko, zh, ja, vi, th, id', () => {
+    expect(SUPPORTED_LOCALES).toEqual(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'])
   })
 })
 
@@ -50,6 +50,30 @@ describe('resolveLocale', () => {
     expect(resolveLocale('ja-JP')).toBe('ja')
   })
 
+  it('returns vi for "vi"', () => {
+    expect(resolveLocale('vi')).toBe('vi')
+  })
+
+  it('returns vi for "vi-VN"', () => {
+    expect(resolveLocale('vi-VN')).toBe('vi')
+  })
+
+  it('returns th for "th"', () => {
+    expect(resolveLocale('th')).toBe('th')
+  })
+
+  it('returns th for "th-TH"', () => {
+    expect(resolveLocale('th-TH')).toBe('th')
+  })
+
+  it('returns id for "id"', () => {
+    expect(resolveLocale('id')).toBe('id')
+  })
+
+  it('returns id for "id-ID"', () => {
+    expect(resolveLocale('id-ID')).toBe('id')
+  })
+
   it('returns en for unsupported locale "fr"', () => {
     expect(resolveLocale('fr')).toBe('en')
   })
@@ -82,6 +106,18 @@ describe('toIntlLocale', () => {
 
   it('maps undefined → en-US', () => {
     expect(toIntlLocale(undefined)).toBe('en-US')
+  })
+
+  it('maps vi → vi-VN', () => {
+    expect(toIntlLocale('vi')).toBe('vi-VN')
+  })
+
+  it('maps th → th-TH', () => {
+    expect(toIntlLocale('th')).toBe('th-TH')
+  })
+
+  it('maps id → id-ID', () => {
+    expect(toIntlLocale('id')).toBe('id-ID')
   })
 
   it('maps unknown → en-US', () => {
@@ -130,6 +166,18 @@ describe('isSupportedLocale', () => {
 
   it('returns true for ja', () => {
     expect(isSupportedLocale('ja')).toBe(true)
+  })
+
+  it('returns true for vi', () => {
+    expect(isSupportedLocale('vi')).toBe(true)
+  })
+
+  it('returns true for th', () => {
+    expect(isSupportedLocale('th')).toBe(true)
+  })
+
+  it('returns true for id', () => {
+    expect(isSupportedLocale('id')).toBe(true)
   })
 
   it('returns false for fr', () => {

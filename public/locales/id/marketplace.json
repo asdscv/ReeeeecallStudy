@@ -1,0 +1,55 @@
+{
+  "title": "Marketplace",
+  "noResults": "Tidak ada hasil pencarian.",
+  "noListings": "Belum ada dek yang dipublikasikan.",
+  "searchPlaceholder": "Cari dek...",
+  "allCategories": "Semua Kategori",
+  "sortNewest": "Terbaru",
+  "sortPopular": "Populer",
+  "sortCardCount": "Jumlah Kartu",
+  "categories": {
+    "general": "Umum",
+    "language": "Bahasa",
+    "science": "Sains",
+    "math": "Matematika",
+    "history": "Sejarah",
+    "programming": "Pemrograman",
+    "trivia": "Trivia",
+    "exam": "Persiapan Ujian",
+    "other": "Lainnya"
+  },
+  "shareModes": {
+    "copy": "Salin",
+    "subscribe": "Berlangganan",
+    "snapshot": "Snapshot"
+  },
+  "listing": {
+    "cardCount": "{{count}} kartu",
+    "userCount": "{{count}} pengguna"
+  },
+  "detail": {
+    "back": "← Marketplace",
+    "cardCount": "{{count}} kartu",
+    "userCount": "{{count}} pengguna",
+    "getDeck": "Dapatkan Dek Ini",
+    "importing": "Mengimpor...",
+    "cardPreview": "Pratinjau Kartu (maks 10)",
+    "noCards": "Tidak ada kartu."
+  },
+  "preview": {
+    "title": "\"{{title}}\" - Dek Kartu Kilat | ReeeeecallStudy",
+    "description": "{{title}} — {{cardCount}} kartu kilat. Pratinjau dan pelajari dek ini di ReeeeecallStudy.",
+    "defaultDescription": "Dek kartu kilat di ReeeeecallStudy",
+    "sampleCards": "Contoh Kartu",
+    "viewInMarket": "Lihat di Marketplace",
+    "cardCount": "{{count}} kartu",
+    "userCount": "{{count}} pengguna",
+    "by": "oleh {{name}}",
+    "blurredNotice": "Masuk untuk melihat semua kartu di dek ini",
+    "ctaLogin": "Masuk untuk mendapatkan dek ini",
+    "ctaSignup": "Daftar gratis",
+    "notFound": "Dek tidak ditemukan",
+    "notFoundDescription": "Dek ini mungkin telah dihapus atau tidak lagi tersedia.",
+    "backToHome": "Kembali ke Beranda"
+  }
+}
