@@ -109,31 +109,52 @@ export const useCardStore = create<CardState>((set, get) => ({
     const check = guard.check('bulk_card_create', 'cards_total')
     if (!check.allowed) { set({ error: check.message ?? 'errors:card.rateLimitReached' }); return 0 }
 
-    const CHUNK_SIZE = 500
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { set({ error: 'Not authenticated' }); return 0 }
+
+    // Get current deck position
+    const { data: deck } = await supabase
+      .from('decks')
+      .select('next_position')
+      .eq('id', deck_id)
+      .single()
+    let position = (deck as { next_position: number } | null)?.next_position ?? 0
+
+    const CHUNK_SIZE = 200
     let totalInserted = 0
 
     for (let i = 0; i < cards.length; i += CHUNK_SIZE) {
       const chunk = cards.slice(i, i + CHUNK_SIZE)
-      const payload = chunk.map(c => ({
+      const rows = chunk.map((c, idx) => ({
+        deck_id,
+        user_id: user.id,
+        template_id,
         field_values: c.field_values,
         tags: c.tags ?? [],
-      }))
+        sort_position: position + idx,
+        srs_status: 'new',
+        ease_factor: 2.5,
+        interval_days: 0,
+        repetitions: 0,
+      } as Record<string, unknown>))
 
-      const { data, error } = await supabase.rpc('bulk_insert_cards', {
-        p_deck_id: deck_id,
-        p_template_id: template_id,
-        p_cards: payload,
-      })
+      const { error } = await supabase.from('cards').insert(rows)
 
       if (error) {
         set({ error: error.message })
         break
       }
 
-      const inserted = (data as { inserted: number })?.inserted ?? chunk.length
-      totalInserted += inserted
+      position += chunk.length
+      totalInserted += chunk.length
       onProgress?.(totalInserted, cards.length)
     }
+
+    // Update deck next_position
+    await supabase
+      .from('decks')
+      .update({ next_position: position, updated_at: new Date().toISOString() } as Record<string, unknown>)
+      .eq('id', deck_id)
 
     guard.recordSuccess('cards_total', totalInserted)
     if (!get().error) {

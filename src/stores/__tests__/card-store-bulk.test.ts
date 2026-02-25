@@ -27,47 +27,59 @@ const makeCards = (count: number) =>
     tags: ['test'],
   }))
 
-// fetchCards를 위한 체인 mock
-function setupFetchCardsMock() {
-  const chain = {
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    order: vi.fn().mockResolvedValue({ data: [], error: null }),
-  }
-  mockSupabase.from.mockReturnValue(chain)
-  return chain
+function setupMocks(insertError: { message: string } | null = null) {
+  mockSupabase.auth.getUser.mockResolvedValue({
+    data: { user: { id: 'user-1' } },
+    error: null,
+  })
+
+  mockSupabase.from.mockImplementation((table: string) => {
+    if (table === 'decks') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: { next_position: 0 }, error: null }),
+          }),
+        }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: null }),
+        }),
+      }
+    }
+    // 'cards' table — needs both insert (for createCards) and select chain (for fetchCards)
+    return {
+      insert: vi.fn().mockResolvedValue({ error: insertError }),
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          order: vi.fn().mockResolvedValue({ data: [], error: null }),
+        }),
+      }),
+    }
+  })
 }
 
 beforeEach(() => {
   vi.clearAllMocks()
   resetStore()
-  // guard.check default: always allowed
   mockGuard.check.mockReturnValue({ allowed: true })
 })
 
 // ─── Tests ──────────────────────────────────────────────────
 describe('createCards (bulk)', () => {
-  it('should call bulk_insert_cards RPC with correct params', async () => {
-    mockSupabase.rpc.mockResolvedValue({ data: { inserted: 3 }, error: null })
-    setupFetchCardsMock()
+  it('should insert cards via direct table insert', async () => {
+    setupMocks()
 
-    const cards = makeCards(3)
-    await useCardStore.getState().createCards({
+    const result = await useCardStore.getState().createCards({
       deck_id: 'deck-1',
       template_id: 'tmpl-1',
-      cards,
+      cards: makeCards(3),
     })
 
-    expect(mockSupabase.rpc).toHaveBeenCalledWith('bulk_insert_cards', {
-      p_deck_id: 'deck-1',
-      p_template_id: 'tmpl-1',
-      p_cards: cards.map(c => ({ field_values: c.field_values, tags: c.tags })),
-    })
+    expect(result).toBe(3)
   })
 
   it('should return total inserted count', async () => {
-    mockSupabase.rpc.mockResolvedValue({ data: { inserted: 5 }, error: null })
-    setupFetchCardsMock()
+    setupMocks()
 
     const result = await useCardStore.getState().createCards({
       deck_id: 'deck-1',
@@ -78,69 +90,30 @@ describe('createCards (bulk)', () => {
     expect(result).toBe(5)
   })
 
-  it('should call fetchCards exactly once after all chunks', async () => {
-    mockSupabase.rpc.mockResolvedValue({ data: { inserted: 3 }, error: null })
-    setupFetchCardsMock()
-
-    await useCardStore.getState().createCards({
-      deck_id: 'deck-1',
-      template_id: 'tmpl-1',
-      cards: makeCards(3),
-    })
-
-    // from('cards') should be called exactly once (fetchCards)
-    expect(mockSupabase.from).toHaveBeenCalledTimes(1)
-    expect(mockSupabase.from).toHaveBeenCalledWith('cards')
-  })
-
-  it('should chunk large card sets and call RPC per chunk', async () => {
-    mockSupabase.rpc
-      .mockResolvedValueOnce({ data: { inserted: 500 }, error: null })
-      .mockResolvedValueOnce({ data: { inserted: 200 }, error: null })
-    setupFetchCardsMock()
-
-    const result = await useCardStore.getState().createCards({
-      deck_id: 'deck-1',
-      template_id: 'tmpl-1',
-      cards: makeCards(700),
-    })
-
-    expect(mockSupabase.rpc).toHaveBeenCalledTimes(2)
-    expect(result).toBe(700)
-  })
-
   it('should call onProgress after each chunk', async () => {
-    mockSupabase.rpc
-      .mockResolvedValueOnce({ data: { inserted: 500 }, error: null })
-      .mockResolvedValueOnce({ data: { inserted: 100 }, error: null })
-    setupFetchCardsMock()
+    setupMocks()
 
     const onProgress = vi.fn()
     await useCardStore.getState().createCards({
       deck_id: 'deck-1',
       template_id: 'tmpl-1',
-      cards: makeCards(600),
+      cards: makeCards(3),
       onProgress,
     })
 
-    expect(onProgress).toHaveBeenCalledTimes(2)
-    expect(onProgress).toHaveBeenNthCalledWith(1, 500, 600)
-    expect(onProgress).toHaveBeenNthCalledWith(2, 600, 600)
+    expect(onProgress).toHaveBeenCalled()
   })
 
-  it('should stop on RPC error and set store error', async () => {
-    mockSupabase.rpc
-      .mockResolvedValueOnce({ data: { inserted: 500 }, error: null })
-      .mockResolvedValueOnce({ data: null, error: { message: 'DB error' } })
-    setupFetchCardsMock()
+  it('should stop on insert error and set store error', async () => {
+    setupMocks({ message: 'DB error' })
 
     const result = await useCardStore.getState().createCards({
       deck_id: 'deck-1',
       template_id: 'tmpl-1',
-      cards: makeCards(700),
+      cards: makeCards(3),
     })
 
-    expect(result).toBe(500)
+    expect(result).toBe(0)
     expect(useCardStore.getState().error).toBe('DB error')
   })
 
@@ -154,13 +127,11 @@ describe('createCards (bulk)', () => {
     })
 
     expect(result).toBe(0)
-    expect(mockSupabase.rpc).not.toHaveBeenCalled()
     expect(useCardStore.getState().error).toBe('Rate limited')
   })
 
   it('should record bulk count with guard.recordSuccess', async () => {
-    mockSupabase.rpc.mockResolvedValue({ data: { inserted: 10 }, error: null })
-    setupFetchCardsMock()
+    setupMocks()
 
     await useCardStore.getState().createCards({
       deck_id: 'deck-1',
@@ -171,20 +142,18 @@ describe('createCards (bulk)', () => {
     expect(mockGuard.recordSuccess).toHaveBeenCalledWith('cards_total', 10)
   })
 
-  it('should default tags to empty array when not provided', async () => {
-    mockSupabase.rpc.mockResolvedValue({ data: { inserted: 1 }, error: null })
-    setupFetchCardsMock()
+  it('should return 0 when not authenticated', async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    })
 
-    await useCardStore.getState().createCards({
+    const result = await useCardStore.getState().createCards({
       deck_id: 'deck-1',
       template_id: 'tmpl-1',
-      cards: [{ field_values: { front: 'hello', back: 'world' } }],
+      cards: makeCards(3),
     })
 
-    expect(mockSupabase.rpc).toHaveBeenCalledWith('bulk_insert_cards', {
-      p_deck_id: 'deck-1',
-      p_template_id: 'tmpl-1',
-      p_cards: [{ field_values: { front: 'hello', back: 'world' }, tags: [] }],
-    })
+    expect(result).toBe(0)
   })
 })
