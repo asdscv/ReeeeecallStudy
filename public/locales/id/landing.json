@@ -1,0 +1,264 @@
+{
+  "hero": {
+    "badge": "Awal Pembelajaran Cerdas",
+    "title": "Pembelajaran yang Melampaui",
+    "titleHighlight": "Batas Memori",
+    "title1": "Pembelajaran yang Melampaui",
+    "title2": "Batas Memori",
+    "description": "Maksimalkan efisiensi belajar Anda dengan pengulangan berjarak (SRS) yang terbukti secara ilmiah.",
+    "subDescription": "Dengan ReeeeecallStudy, Anda dapat mengingat lebih cepat dan lebih lama.",
+    "subtitle1": "Maksimalkan efisiensi belajar Anda dengan pengulangan berjarak (SRS) yang terbukti secara ilmiah.",
+    "subtitle2": "Dengan ReeeeecallStudy, Anda dapat mengingat lebih cepat dan lebih lama.",
+    "startFree": "Mulai Gratis",
+    "learnMore": "Pelajari Selengkapnya",
+    "cta": {
+      "start": "Mulai Gratis",
+      "learn": "Pelajari Selengkapnya"
+    },
+    "freeForever": "Gratis selamanya. Tanpa kartu kredit."
+  },
+  "tagline": "Platform Pembelajaran Kartu Kilat Cerdas",
+  "preview": {
+    "tagline": "Platform Pembelajaran Kartu Kilat Cerdas",
+    "mockFront": "Hello",
+    "mockBack": "Bonjour",
+    "mockCards": "12/30 kartu",
+    "mockStreak": "Rentetan: 7 hari",
+    "mockMeaning": "Hello (Prancis)",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
+  },
+  "features": {
+    "title": "Fitur Unggulan",
+    "subtitle": "Semua alat untuk pembelajaran efisien dalam satu tempat",
+    "srs": {
+      "title": "Algoritma SRS Cerdas",
+      "description": "Maksimalkan memori jangka panjang dengan pengulangan berjarak yang terverifikasi secara ilmiah. Sesuaikan waktu ulasan otomatis dengan 4 tingkat penilaian: Ulangi/Sulit/Baik/Mudah.",
+      "desc": "Maksimalkan memori jangka panjang dengan pengulangan berjarak yang terverifikasi secara ilmiah. Sesuaikan waktu ulasan otomatis dengan 4 tingkat penilaian: Ulangi/Sulit/Baik/Mudah."
+    },
+    "modes": {
+      "title": "5 Mode Belajar",
+      "description": "Mendukung SRS, Acak, Berurutan, Ulasan Berurutan, dan Berdasarkan Tanggal — mode belajar untuk setiap situasi.",
+      "desc": "Mendukung SRS, Acak, Berurutan, Ulasan Berurutan, dan Berdasarkan Tanggal — mode belajar untuk setiap situasi."
+    },
+    "stats": {
+      "title": "Statistik & Dasbor Real-time",
+      "description": "Lacak progres secara sekilas dengan statistik terperinci: peta panas belajar, perkiraan ulasan, volume belajar harian.",
+      "desc": "Lacak progres secara sekilas dengan statistik terperinci: peta panas belajar, perkiraan ulasan, volume belajar harian."
+    },
+    "sharing": {
+      "title": "Berbagi Dek & Marketplace",
+      "description": "Bagikan dek dalam 3 mode (Salin, Berlangganan, Snapshot) dan jelajahi dek pengguna lain di marketplace.",
+      "desc": "Bagikan dek dalam 3 mode (Salin, Berlangganan, Snapshot) dan jelajahi dek pengguna lain di marketplace."
+    },
+    "tts": {
+      "title": "TTS Multibahasa",
+      "description": "Pembacaan suara otomatis dalam Korea, Inggris, Jepang, Cina, dan lainnya dengan pengaturan bahasa per bidang.",
+      "desc": "Pembacaan suara otomatis dalam Korea, Inggris, Jepang, Cina, dan lainnya dengan pengaturan bahasa per bidang."
+    },
+    "responsive": {
+      "title": "Desain Responsif",
+      "description": "Berfungsi sempurna di PC, tablet, dan ponsel. Belajar di mana saja dengan mode geser.",
+      "desc": "Berfungsi sempurna di PC, tablet, dan ponsel. Belajar di mana saja dengan mode geser."
+    }
+  },
+  "featuresSection": {
+    "title": "Fitur Unggulan",
+    "subtitle": "Semua alat untuk pembelajaran efisien dalam satu tempat"
+  },
+  "why": {
+    "title": "Mengapa ReeeeecallStudy?",
+    "subtitle": "Alat kartu kilat generasi terbaru yang menggabungkan pengulangan berjarak dengan UI modern",
+    "points": [
+      "Algoritma pembelajaran SRS yang terverifikasi secara ilmiah",
+      "Antarmuka pengguna yang intuitif dan bersih",
+      "Struktur kartu fleksibel dengan templat kustom",
+      "Dukungan impor dan ekspor CSV/JSON",
+      "Pencarian dan penyaringan berbasis tag",
+      "Berbagi dek & marketplace komunitas",
+      "Statistik dan analisis pembelajaran terperinci",
+      "Integrasi eksternal melalui kunci API"
+    ]
+  },
+  "benefitsSection": {
+    "title": "Mengapa ReeeeecallStudy?",
+    "subtitle": "Alat kartu kilat generasi terbaru yang menggabungkan pengulangan berjarak dengan UI modern",
+    "cta": "Mulai Sekarang"
+  },
+  "benefits": {
+    "0": "Algoritma pembelajaran SRS yang terverifikasi secara ilmiah",
+    "1": "Antarmuka pengguna yang intuitif dan bersih",
+    "2": "Struktur kartu fleksibel dengan templat kustom",
+    "3": "Dukungan impor dan ekspor CSV/JSON",
+    "4": "Pencarian dan penyaringan berbasis tag",
+    "5": "Berbagi dek & marketplace komunitas",
+    "6": "Statistik dan analisis pembelajaran terperinci",
+    "7": "Integrasi eksternal melalui kunci API"
+  },
+  "metrics": {
+    "efficiency": {
+      "label": "Efisiensi Belajar",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "interval": {
+      "label": "Interval Ulasan Rata-rata",
+      "value": "15 hari",
+      "change": "+8 hari"
+    },
+    "accuracy": {
+      "label": "Tingkat Akurasi",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "daily": {
+      "label": "Kartu Belajar Harian",
+      "value": "45 kartu",
+      "change": "+30 kartu"
+    }
+  },
+  "stats": {
+    "0": {
+      "label": "Efisiensi Belajar",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "1": {
+      "label": "Interval Ulasan Rata-rata",
+      "value": "15 hari",
+      "change": "+8 hari"
+    },
+    "2": {
+      "label": "Tingkat Akurasi",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "3": {
+      "label": "Kartu Belajar Harian",
+      "value": "45 kartu",
+      "change": "+30 kartu"
+    }
+  },
+  "steps": {
+    "title": "Mulai dalam 3 Langkah Sederhana",
+    "step1": {
+      "title": "Buat Dek",
+      "description": "Buat dek untuk mengatur kartu berdasarkan topik, lalu tambahkan kartu Anda."
+    },
+    "step2": {
+      "title": "Belajar",
+      "description": "SRS menyajikan kartu ulasan pada waktu yang optimal."
+    },
+    "step3": {
+      "title": "Lacak Progres",
+      "description": "Periksa statistik pembelajaran dan tren pertumbuhan di dasbor."
+    }
+  },
+  "howItWorks": {
+    "title": "Mulai dalam 3 Langkah Sederhana",
+    "step1": {
+      "title": "Buat Dek",
+      "desc": "Buat dek untuk mengatur kartu berdasarkan topik, lalu tambahkan kartu Anda."
+    },
+    "step2": {
+      "title": "Belajar",
+      "desc": "SRS menyajikan kartu ulasan pada waktu yang optimal."
+    },
+    "step3": {
+      "title": "Lacak Progres",
+      "desc": "Periksa statistik pembelajaran dan tren pertumbuhan di dasbor."
+    }
+  },
+  "cta": {
+    "title": "Belajar Lebih Cerdas Mulai Hari Ini",
+    "description": "Mulai gratis. Daftar mudah dengan email dan kata sandi.",
+    "subtitle": "Mulai gratis. Daftar mudah dengan email dan kata sandi.",
+    "button": "Mulai Sekarang",
+    "guarantee": "Gratis selamanya. Tanpa kartu kredit."
+  },
+  "nav": {
+    "blog": "Wawasan",
+    "login": "Masuk",
+    "start": "Mulai Sekarang",
+    "features": "Fitur",
+    "results": "Hasil",
+    "reviews": "Ulasan",
+    "howItWorks": "Cara Kerja",
+    "faq": "FAQ",
+    "dashboard": "Dasbor"
+  },
+  "trustBadges": {
+    "srs": "SRS Cerdas",
+    "sharing": "Berbagi Dek",
+    "languages": "7 Bahasa",
+    "allDevices": "Semua Perangkat",
+    "import": "Impor CSV & API"
+  },
+  "footer": {
+    "copyright": "\u00a9 2026 ReeeeecallStudy. Hak cipta dilindungi.",
+    "apiDocs": "Dokumentasi API",
+    "tagline": "Platform pembelajaran kartu kilat cerdas dengan pengulangan berjarak",
+    "product": "Produk",
+    "resources": "Sumber Daya",
+    "features": "Fitur",
+    "results": "Hasil",
+    "howItWorks": "Cara Kerja",
+    "faq": "FAQ",
+    "blog": "Wawasan",
+    "help": "Bantuan",
+    "language": "Bahasa"
+  },
+  "floatingCta": "Mulai Sekarang",
+  "faq": {
+    "title": "Pertanyaan yang Sering Diajukan",
+    "q1": "Apa itu pengulangan berjarak (SRS)?",
+    "a1": "Pengulangan berjarak adalah metode pembelajaran yang terbukti secara ilmiah yang menjadwalkan ulasan pada interval optimal untuk memaksimalkan retensi memori jangka panjang. ReeeeecallStudy menggunakan algoritma SRS canggih untuk secara otomatis menentukan kapan Anda harus mengulas setiap kartu kilat.",
+    "q2": "Apakah ReeeeecallStudy gratis?",
+    "a2": "Ya! ReeeeecallStudy gratis untuk digunakan. Daftar dengan email dan kata sandi untuk mulai belajar segera dengan semua fitur inti termasuk SRS, berbagai mode belajar, dan statistik terperinci.",
+    "q3": "Mode belajar apa saja yang tersedia?",
+    "a3": "ReeeeecallStudy mendukung 5 mode belajar: SRS (pengulangan berjarak) untuk penjadwalan ulasan optimal, Acak untuk latihan campuran, Berurutan untuk ulasan teratur, Ulasan Berurutan untuk revisi sistematis, dan Berdasarkan Tanggal untuk organisasi berbasis waktu.",
+    "q4": "Bisakah saya berbagi dek kartu kilat saya?",
+    "a4": "Ya! Anda dapat berbagi dek dalam 3 mode: Salin (duplikat untuk orang lain), Berlangganan (sinkronisasi pembaruan), dan Snapshot (versi beku). Jelajahi dan temukan dek pengguna lain di marketplace komunitas."
+  },
+  "statsSection": {
+    "title": "Hasil Terbukti",
+    "subtitle": "Didukung sains — lihat apa yang dihasilkan pengulangan berjarak",
+    "baseline": "vs. belajar tradisional",
+    "retention": {
+      "label": "Retensi 30 Hari",
+      "change": "+75%",
+      "description": "Ingat apa yang Anda pelajari setelah 30 hari"
+    },
+    "timeSaved": {
+      "label": "Waktu Dihemat",
+      "change": "-50%",
+      "description": "Separuh waktu belajar, hasil sama"
+    },
+    "completion": {
+      "label": "Penyelesaian Harian",
+      "change": "+38%",
+      "description": "Pengguna menyelesaikan ulasan harian mereka"
+    },
+    "learners": {
+      "label": "Pelajar Aktif",
+      "change": "+840 bulan ini",
+      "description": "Komunitas yang berkembang di seluruh dunia"
+    }
+  },
+  "socialProof": {
+    "title": "Dipercaya oleh Pelajar di Seluruh Dunia",
+    "subtitle": "Bergabunglah dengan ribuan siswa yang belajar lebih cerdas",
+    "liveActivity": "{{count}} orang sedang belajar sekarang",
+    "userCountLabel": "Pengguna Aktif",
+    "cardsStudiedLabel": "Kartu Dipelajari",
+    "decksCreatedLabel": "Dek Dibuat",
+    "testimonials": {
+      "0": { "quote": "ReeeeecallStudy membantu saya lulus JLPT N2. Algoritma SRS sangat efektif!", "author": "Budi Santoso", "role": "Pelajar Bahasa" },
+      "1": { "quote": "Antarmukanya sangat bersih dan intuitif. Belajar terasa menyenangkan sekarang.", "author": "Siti Nurhaliza", "role": "Mahasiswa Kedokteran" },
+      "2": { "quote": "Fitur berbagi dek luar biasa. Saya menemukan dek untuk hampir setiap mata pelajaran.", "author": "Ravi Wijaya", "role": "Mahasiswa Universitas" }
+    }
+  },
+  "seo": {
+    "title": "ReeeeecallStudy — Pembelajaran Kartu Kilat Cerdas dengan Pengulangan Berjarak",
+    "description": "Platform pembelajaran kartu kilat cerdas dengan algoritma pengulangan berjarak (SRS) yang terbukti secara ilmiah. Ingat lebih cepat dan lebih lama."
+  }
+}

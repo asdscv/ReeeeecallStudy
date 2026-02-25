@@ -29,11 +29,29 @@ describe('SEO config', () => {
       expect(SEO.SUPPORTED_LOCALES).toContain(locale)
     }
   })
+
+  it('should export SUPPORTED_LOCALES with vi, th, id', () => {
+    expect(SEO.SUPPORTED_LOCALES).toContain('vi')
+    expect(SEO.SUPPORTED_LOCALES).toContain('th')
+    expect(SEO.SUPPORTED_LOCALES).toContain('id')
+  })
 })
 
 describe('toOgLocale', () => {
   it.each(SUPPORTED_LOCALES)('maps %s to OG_LOCALE_MAP value', (locale) => {
     expect(toOgLocale(locale)).toBe(OG_LOCALE_MAP[locale])
+  })
+
+  it('maps vi to vi_VN', () => {
+    expect(toOgLocale('vi')).toBe('vi_VN')
+  })
+
+  it('maps th to th_TH', () => {
+    expect(toOgLocale('th')).toBe('th_TH')
+  })
+
+  it('maps id to id_ID', () => {
+    expect(toOgLocale('id')).toBe('id_ID')
   })
 
   it('provides a sensible fallback for unknown locales', () => {

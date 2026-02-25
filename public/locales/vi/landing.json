@@ -1,0 +1,264 @@
+{
+  "hero": {
+    "badge": "Khởi đầu của việc học thông minh",
+    "title": "Học tập vượt qua",
+    "titleHighlight": "Giới hạn trí nhớ",
+    "title1": "Học tập vượt qua",
+    "title2": "Giới hạn trí nhớ",
+    "description": "Tối đa hóa hiệu quả học tập với phương pháp lặp lại ngắt quãng (SRS) đã được khoa học chứng minh.",
+    "subDescription": "Với ReeeeecallStudy, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
+    "subtitle1": "Tối đa hóa hiệu quả học tập với phương pháp lặp lại ngắt quãng (SRS) đã được khoa học chứng minh.",
+    "subtitle2": "Với ReeeeecallStudy, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
+    "startFree": "Bắt đầu miễn phí",
+    "learnMore": "Tìm hiểu thêm",
+    "cta": {
+      "start": "Bắt đầu miễn phí",
+      "learn": "Tìm hiểu thêm"
+    },
+    "freeForever": "Miễn phí mãi mãi. Không cần thẻ tín dụng."
+  },
+  "tagline": "Nền tảng học thẻ ghi nhớ thông minh",
+  "preview": {
+    "tagline": "Nền tảng học thẻ ghi nhớ thông minh",
+    "mockFront": "Hello",
+    "mockBack": "Bonjour",
+    "mockCards": "12/30 thẻ",
+    "mockStreak": "Chuỗi: 7 ngày",
+    "mockMeaning": "Xin chào (tiếng Pháp)",
+    "mockExample": "\"Bonjour, comment allez-vous?\""
+  },
+  "features": {
+    "title": "Tính năng mạnh mẽ",
+    "subtitle": "Tất cả công cụ cho việc học hiệu quả trong một nơi",
+    "srs": {
+      "title": "Thuật toán SRS thông minh",
+      "description": "Tối đa hóa trí nhớ dài hạn với lặp lại ngắt quãng đã được khoa học xác minh. Tự động điều chỉnh thời gian ôn tập với 4 mức đánh giá: Lại/Khó/Tốt/Dễ.",
+      "desc": "Tối đa hóa trí nhớ dài hạn với lặp lại ngắt quãng đã được khoa học xác minh. Tự động điều chỉnh thời gian ôn tập với 4 mức đánh giá: Lại/Khó/Tốt/Dễ."
+    },
+    "modes": {
+      "title": "5 chế độ học",
+      "description": "Hỗ trợ SRS, Ngẫu nhiên, Tuần tự, Ôn tập tuần tự và Theo ngày — chế độ học cho mọi tình huống.",
+      "desc": "Hỗ trợ SRS, Ngẫu nhiên, Tuần tự, Ôn tập tuần tự và Theo ngày — chế độ học cho mọi tình huống."
+    },
+    "stats": {
+      "title": "Thống kê & Bảng điều khiển thời gian thực",
+      "description": "Theo dõi tiến trình trong nháy mắt với thống kê chi tiết: bản đồ nhiệt học tập, dự báo ôn tập, lượng học hàng ngày.",
+      "desc": "Theo dõi tiến trình trong nháy mắt với thống kê chi tiết: bản đồ nhiệt học tập, dự báo ôn tập, lượng học hàng ngày."
+    },
+    "sharing": {
+      "title": "Chia sẻ bộ thẻ & Chợ ứng dụng",
+      "description": "Chia sẻ bộ thẻ theo 3 chế độ (Sao chép, Đăng ký, Bản chụp) và duyệt bộ thẻ của người dùng khác trong chợ.",
+      "desc": "Chia sẻ bộ thẻ theo 3 chế độ (Sao chép, Đăng ký, Bản chụp) và duyệt bộ thẻ của người dùng khác trong chợ."
+    },
+    "tts": {
+      "title": "TTS đa ngôn ngữ",
+      "description": "Tự động đọc giọng nói bằng tiếng Hàn, tiếng Anh, tiếng Nhật, tiếng Trung và nhiều ngôn ngữ khác với cài đặt ngôn ngữ cho từng trường.",
+      "desc": "Tự động đọc giọng nói bằng tiếng Hàn, tiếng Anh, tiếng Nhật, tiếng Trung và nhiều ngôn ngữ khác với cài đặt ngôn ngữ cho từng trường."
+    },
+    "responsive": {
+      "title": "Thiết kế đáp ứng",
+      "description": "Hoạt động hoàn hảo trên PC, máy tính bảng và di động. Học mọi lúc với chế độ vuốt.",
+      "desc": "Hoạt động hoàn hảo trên PC, máy tính bảng và di động. Học mọi lúc với chế độ vuốt."
+    }
+  },
+  "featuresSection": {
+    "title": "Tính năng mạnh mẽ",
+    "subtitle": "Tất cả công cụ cho việc học hiệu quả trong một nơi"
+  },
+  "why": {
+    "title": "Tại sao chọn ReeeeecallStudy?",
+    "subtitle": "Công cụ thẻ ghi nhớ thế hệ mới kết hợp lặp lại ngắt quãng với giao diện hiện đại",
+    "points": [
+      "Thuật toán học SRS đã được khoa học xác minh",
+      "Giao diện người dùng trực quan và gọn gàng",
+      "Cấu trúc thẻ linh hoạt với mẫu tùy chỉnh",
+      "Hỗ trợ nhập và xuất CSV/JSON",
+      "Tìm kiếm và lọc dựa trên thẻ gắn",
+      "Chia sẻ bộ thẻ & chợ cộng đồng",
+      "Thống kê và phân tích học tập chi tiết",
+      "Tích hợp bên ngoài qua khóa API"
+    ]
+  },
+  "benefitsSection": {
+    "title": "Tại sao chọn ReeeeecallStudy?",
+    "subtitle": "Công cụ thẻ ghi nhớ thế hệ mới kết hợp lặp lại ngắt quãng với giao diện hiện đại",
+    "cta": "Bắt đầu ngay"
+  },
+  "benefits": {
+    "0": "Thuật toán học SRS đã được khoa học xác minh",
+    "1": "Giao diện người dùng trực quan và gọn gàng",
+    "2": "Cấu trúc thẻ linh hoạt với mẫu tùy chỉnh",
+    "3": "Hỗ trợ nhập và xuất CSV/JSON",
+    "4": "Tìm kiếm và lọc dựa trên thẻ gắn",
+    "5": "Chia sẻ bộ thẻ & chợ cộng đồng",
+    "6": "Thống kê và phân tích học tập chi tiết",
+    "7": "Tích hợp bên ngoài qua khóa API"
+  },
+  "metrics": {
+    "efficiency": {
+      "label": "Hiệu quả học tập",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "interval": {
+      "label": "Khoảng cách ôn tập TB",
+      "value": "15 ngày",
+      "change": "+8 ngày"
+    },
+    "accuracy": {
+      "label": "Tỷ lệ chính xác",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "daily": {
+      "label": "Thẻ học hàng ngày",
+      "value": "45 thẻ",
+      "change": "+30 thẻ"
+    }
+  },
+  "stats": {
+    "0": {
+      "label": "Hiệu quả học tập",
+      "value": "200%",
+      "change": "+150%"
+    },
+    "1": {
+      "label": "Khoảng cách ôn tập TB",
+      "value": "15 ngày",
+      "change": "+8 ngày"
+    },
+    "2": {
+      "label": "Tỷ lệ chính xác",
+      "value": "87%",
+      "change": "+23%"
+    },
+    "3": {
+      "label": "Thẻ học hàng ngày",
+      "value": "45 thẻ",
+      "change": "+30 thẻ"
+    }
+  },
+  "steps": {
+    "title": "Bắt đầu trong 3 bước đơn giản",
+    "step1": {
+      "title": "Tạo bộ thẻ",
+      "description": "Tạo bộ thẻ để sắp xếp thẻ theo chủ đề, rồi thêm thẻ."
+    },
+    "step2": {
+      "title": "Học tập",
+      "description": "SRS trình bày thẻ ôn tập vào thời điểm tối ưu."
+    },
+    "step3": {
+      "title": "Theo dõi tiến trình",
+      "description": "Kiểm tra thống kê học tập và xu hướng phát triển trên bảng điều khiển."
+    }
+  },
+  "howItWorks": {
+    "title": "Bắt đầu trong 3 bước đơn giản",
+    "step1": {
+      "title": "Tạo bộ thẻ",
+      "desc": "Tạo bộ thẻ để sắp xếp thẻ theo chủ đề, rồi thêm thẻ."
+    },
+    "step2": {
+      "title": "Học tập",
+      "desc": "SRS trình bày thẻ ôn tập vào thời điểm tối ưu."
+    },
+    "step3": {
+      "title": "Theo dõi tiến trình",
+      "desc": "Kiểm tra thống kê học tập và xu hướng phát triển trên bảng điều khiển."
+    }
+  },
+  "cta": {
+    "title": "Học thông minh hơn từ hôm nay",
+    "description": "Bắt đầu miễn phí. Đăng ký dễ dàng với email và mật khẩu.",
+    "subtitle": "Bắt đầu miễn phí. Đăng ký dễ dàng với email và mật khẩu.",
+    "button": "Bắt đầu ngay",
+    "guarantee": "Miễn phí mãi mãi. Không cần thẻ tín dụng."
+  },
+  "nav": {
+    "blog": "Bài viết",
+    "login": "Đăng nhập",
+    "start": "Bắt đầu ngay",
+    "features": "Tính năng",
+    "results": "Kết quả",
+    "reviews": "Đánh giá",
+    "howItWorks": "Cách hoạt động",
+    "faq": "Câu hỏi thường gặp",
+    "dashboard": "Bảng điều khiển"
+  },
+  "trustBadges": {
+    "srs": "SRS thông minh",
+    "sharing": "Chia sẻ bộ thẻ",
+    "languages": "7 Ngôn ngữ",
+    "allDevices": "Mọi thiết bị",
+    "import": "Nhập CSV & API"
+  },
+  "footer": {
+    "copyright": "\u00a9 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
+    "apiDocs": "Tài liệu API",
+    "tagline": "Nền tảng học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
+    "product": "Sản phẩm",
+    "resources": "Tài nguyên",
+    "features": "Tính năng",
+    "results": "Kết quả",
+    "howItWorks": "Cách hoạt động",
+    "faq": "Câu hỏi thường gặp",
+    "blog": "Bài viết",
+    "help": "Trợ giúp",
+    "language": "Ngôn ngữ"
+  },
+  "floatingCta": "Bắt đầu ngay",
+  "faq": {
+    "title": "Câu hỏi thường gặp",
+    "q1": "Lặp lại ngắt quãng (SRS) là gì?",
+    "a1": "Lặp lại ngắt quãng là phương pháp học đã được khoa học chứng minh, lên lịch ôn tập theo khoảng thời gian tối ưu để tối đa hóa ghi nhớ dài hạn. ReeeeecallStudy sử dụng thuật toán SRS tiên tiến để tự động xác định thời điểm bạn nên ôn tập mỗi thẻ.",
+    "q2": "ReeeeecallStudy có miễn phí không?",
+    "a2": "Có! ReeeeecallStudy miễn phí sử dụng. Đăng ký bằng email và mật khẩu để bắt đầu học ngay với tất cả tính năng cốt lõi bao gồm SRS, nhiều chế độ học và thống kê chi tiết.",
+    "q3": "Có những chế độ học nào?",
+    "a3": "ReeeeecallStudy hỗ trợ 5 chế độ học: SRS (lặp lại ngắt quãng) để lên lịch ôn tập tối ưu, Ngẫu nhiên để luyện tập xáo trộn, Tuần tự để ôn tập theo thứ tự, Ôn tập tuần tự để ôn tập có hệ thống, và Theo ngày để sắp xếp theo thời gian.",
+    "q4": "Tôi có thể chia sẻ bộ thẻ không?",
+    "a4": "Có! Bạn có thể chia sẻ bộ thẻ theo 3 chế độ: Sao chép (nhân bản cho người khác), Đăng ký theo dõi (đồng bộ cập nhật), và Bản chụp (phiên bản cố định). Duyệt và khám phá bộ thẻ của người dùng khác trong chợ cộng đồng."
+  },
+  "statsSection": {
+    "title": "Kết quả đã được chứng minh",
+    "subtitle": "Được khoa học hỗ trợ — xem lặp lại ngắt quãng mang lại gì",
+    "baseline": "so với học truyền thống",
+    "retention": {
+      "label": "Ghi nhớ sau 30 ngày",
+      "change": "+75%",
+      "description": "Nhớ những gì bạn học sau 30 ngày"
+    },
+    "timeSaved": {
+      "label": "Tiết kiệm thời gian",
+      "change": "-50%",
+      "description": "Một nửa thời gian học, cùng kết quả"
+    },
+    "completion": {
+      "label": "Hoàn thành hàng ngày",
+      "change": "+38%",
+      "description": "Người dùng hoàn thành bài ôn tập hàng ngày"
+    },
+    "learners": {
+      "label": "Người học đang hoạt động",
+      "change": "+840 tháng này",
+      "description": "Cộng đồng phát triển trên toàn thế giới"
+    }
+  },
+  "socialProof": {
+    "title": "Được tin dùng bởi người học trên toàn thế giới",
+    "subtitle": "Tham gia cùng hàng nghìn học sinh đang học thông minh hơn",
+    "liveActivity": "{{count}} người đang học ngay bây giờ",
+    "userCountLabel": "Người dùng hoạt động",
+    "cardsStudiedLabel": "Thẻ đã học",
+    "decksCreatedLabel": "Bộ thẻ đã tạo",
+    "testimonials": {
+      "0": { "quote": "ReeeeecallStudy đã giúp tôi đỗ JLPT N2. Thuật toán SRS cực kỳ hiệu quả!", "author": "Nguyễn Minh Tuấn", "role": "Người học ngôn ngữ" },
+      "1": { "quote": "Giao diện rất sạch sẽ và trực quan. Việc học bây giờ thực sự thú vị.", "author": "Trần Thị Mai", "role": "Sinh viên y khoa" },
+      "2": { "quote": "Tính năng chia sẻ bộ thẻ tuyệt vời. Tôi tìm được bộ thẻ cho hầu hết mọi môn.", "author": "Lê Hoàng Nam", "role": "Sinh viên đại học" }
+    }
+  },
+  "seo": {
+    "title": "ReeeeecallStudy — Học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
+    "description": "Nền tảng học thẻ ghi nhớ thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn."
+  }
+}

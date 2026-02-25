@@ -1,0 +1,111 @@
+{
+  "title": "Cài đặt",
+  "loading": "Đang tải...",
+  "saving": "Đang lưu...",
+  "save": "Lưu cài đặt",
+  "saved": "Đã lưu cài đặt!",
+  "saveButton": "Lưu cài đặt",
+
+  "links": {
+    "userGuide": "Hướng dẫn sử dụng",
+    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
+    "apiDocs": "Tài liệu API",
+    "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+  },
+
+  "guide": {
+    "title": "Hướng dẫn sử dụng",
+    "desc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
+  },
+
+  "apiDocs": {
+    "title": "Tài liệu API",
+    "desc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+  },
+
+  "profile": {
+    "title": "Hồ sơ",
+    "email": "Email",
+    "displayName": "Tên hiển thị",
+    "displayNamePlaceholder": "Nhập tên của bạn",
+    "namePlaceholder": "Nhập tên của bạn"
+  },
+
+  "language": {
+    "title": "Ngôn ngữ",
+    "label": "Ngôn ngữ hiển thị",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+
+  "srs": {
+    "title": "Học SRS",
+    "description": "Đặt số lượng thẻ mới được thêm mỗi phiên trong chế độ SRS (lặp lại ngắt quãng)",
+    "newCardLimit": "Giới hạn thẻ mới",
+    "cards": "thẻ",
+    "cardsUnit": "thẻ",
+    "help": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này.",
+    "newCardNote": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này."
+  },
+
+  "answerMode": {
+    "title": "Chế độ trả lời",
+    "description": "Đặt cách bạn chọn câu trả lời khi học",
+    "button": "Nút bấm",
+    "buttonDesc": "Chọn câu trả lời bằng cách nhấn nút",
+    "swipe": "Vuốt",
+    "swipeDesc": "Chọn câu trả lời bằng cách vuốt thẻ",
+    "swipeAutoNote": "Hướng vuốt được đặt tự động dựa trên chế độ học.\n• SRS: ← Lại / → Tốt\n• Chế độ khác: ← Chưa biết / → Đã biết"
+  },
+
+  "tts": {
+    "title": "Đọc TTS tự động",
+    "description": "Tự động đọc các trường có TTS khi lật thẻ",
+    "enable": "Bật đọc tự động",
+    "help": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
+    "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động."
+  },
+
+  "apiKey": {
+    "title": "Quản lý khóa API",
+    "limit": "Bạn có thể tạo tối đa 1 khóa API",
+    "maxKeys": "Bạn có thể tạo tối đa 1 khóa API",
+    "generate": "Tạo",
+    "generateNew": "Tạo khóa mới",
+    "keyName": "Tên khóa",
+    "keyNamePlaceholder": "VD: my-script",
+    "namePlaceholder": "VD: my-script",
+    "create": "Tạo",
+    "generating": "Đang tạo...",
+    "generateFailed": "Tạo khóa thất bại: ",
+    "generated": "Đã tạo khóa API!",
+    "generateError": "Lỗi khi tạo khóa",
+    "delete": "Xóa",
+    "deleted": "Đã xóa khóa API",
+    "cancel": "Hủy",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép khóa API!",
+    "show": "Hiện khóa",
+    "showPartial": "Hiện một phần khóa",
+    "showFull": "Hiện toàn bộ khóa",
+    "hide": "Ẩn khóa",
+    "masked": "Không thể xem lại vì lý do bảo mật",
+    "createdAt": "Đã tạo",
+    "created": "Đã tạo: {{date}}",
+    "noKeys": "Chưa tạo khóa API nào.",
+    "noKey": "Chưa tạo khóa API nào.",
+    "securityNote": "Không thể xem lại vì lý do bảo mật"
+  },
+
+  "account": {
+    "title": "Tài khoản",
+    "logout": "Đăng xuất"
+  },
+
+  "settings": {}
+}

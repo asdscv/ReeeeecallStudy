@@ -1,0 +1,185 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS (Pengulangan Berjarak)",
+      "description": "Memilih kartu secara otomatis berdasarkan waktu ulasan",
+      "detail": "Mengulas pada interval optimal berdasarkan kurva memori. Nilai Ulangi/Sulit/Baik/Mudah untuk menyesuaikan interval. Kartu yang salah muncul kembali dalam sesi yang sama."
+    },
+    "sequential_review": {
+      "label": "Ulasan Berurutan",
+      "description": "Semua kartu baru + kartu ulasan secara berurutan",
+      "detail": "Semua kartu baru selalu disertakan. Ukuran batch mengontrol berapa banyak kartu yang ada untuk diulas. Kembali ke awal setelah mencapai akhir."
+    },
+    "random": {
+      "label": "Acak",
+      "description": "Mengacak kartu untuk dipelajari",
+      "detail": "Mengambil kartu secara acak hingga ukuran batch dari dek. Semua kartu yang tidak ditangguhkan dapat dipilih tanpa memandang status SRS."
+    },
+    "sequential": {
+      "label": "Berurutan",
+      "description": "Belajar kartu secara berurutan",
+      "detail": "Mempelajari kartu sesuai urutan hingga ukuran batch. Mengingat posisi Anda dan melanjutkan dari tempat terakhir. Kembali ke awal setelah mencapai akhir."
+    },
+    "by_date": {
+      "label": "Berdasarkan Tanggal",
+      "description": "Belajar kartu yang diunggah pada tanggal tertentu",
+      "detail": "Mengumpulkan dan mempelajari hanya kartu yang ditambahkan pada tanggal yang dipilih. Berguna untuk mengulas kartu yang baru ditambahkan dengan cepat."
+    },
+    "cramming": {
+      "label": "Mode Menjejalkan",
+      "description": "Ulasan intensif hingga dikuasai",
+      "detail": "Putar semua kartu ronde demi ronde. Kartu yang terlewat diulang hingga dikuasai. Tidak berpengaruh pada jadwal SRS."
+    }
+  },
+  "quickStudy": {
+    "title": "Belajar Cepat",
+    "noDecks": "Tidak ada dek. Silakan buat dek terlebih dahulu.",
+    "cardCount": "{{count}} kartu",
+    "newCards": "Baru {{count}}",
+    "reviewCards": "Ulasan {{count}}",
+    "selectDate": "Pilih tanggal untuk belajar",
+    "setBatchSize": "Atur ukuran batch",
+    "selectMode": "Pilih mode belajar",
+    "startStudy": "Mulai Belajar",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu",
+    "batchSize": "Ukuran Batch",
+    "batchSizeDesc": "Kartu yang dipelajari per sesi ({{min}}~{{max}})",
+    "batchSizeDescReview": "Kartu ulasan per sesi — semua kartu baru disertakan ({{min}}~{{max}})",
+    "backToModeSelect": "← Kembali ke Pilihan Mode",
+    "crammingSetup": "Atur opsi menjejalkan"
+  },
+  "setup": {
+    "title": "Pengaturan Belajar",
+    "deckInfo": "{{icon}} {{name}} · {{count}} kartu",
+    "studyMode": "Mode Belajar",
+    "selectUploadDate": "Pilih Tanggal Unggahan",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu"
+  },
+  "session": {
+    "loading": "Memuat...",
+    "noCards": "Tidak ada kartu untuk dipelajari",
+    "allReviewed": "Semua kartu telah diulas!",
+    "backToDeck": "Kembali ke Dek"
+  },
+  "card": {
+    "tapToFlip": "Ketuk untuk membalik",
+    "tapToSeeAnswer": "Ketuk kartu untuk melihat jawaban",
+    "tapToReveal": "Ketuk kartu untuk melihat jawaban",
+    "ttsPlay": "Putar TTS",
+    "front": "DEPAN",
+    "back": "BELAKANG"
+  },
+  "rating": {
+    "dontKnow": "Tidak Tahu",
+    "knowIt": "Tahu",
+    "known": "Diketahui",
+    "unknown": "Tidak Diketahui",
+    "next": "Berikutnya →"
+  },
+  "summary": {
+    "title": "Belajar Selesai!",
+    "completed": "Belajar Selesai!",
+    "greatJob": "Kerja bagus!",
+    "wellDone": "Kerja bagus! Terus semangat.",
+    "studyCards": "Kartu Dipelajari",
+    "cardsStudied": "Kartu Dipelajari",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "Waktu yang Dihabiskan",
+    "timeFormat": "{{minutes}}mnt {{seconds}}dtk",
+    "avgPerCard": "Rata-rata Per Kartu",
+    "secondsFormat": "{{seconds}}dtk",
+    "ratingDistribution": "Distribusi Penilaian",
+    "backToDeck": "Kembali ke Dek",
+    "studyAgain": "Belajar Lagi",
+    "sessionEnded": "Sesi Berakhir",
+    "progressSoFar": "Berikut progres Anda sejauh ini.",
+    "knowIt": "Tahu",
+    "dontKnow": "Tidak Tahu",
+    "next": "Berikutnya"
+  },
+  "weekdays": {
+    "sun": "Min",
+    "mon": "Sen",
+    "tue": "Sel",
+    "wed": "Rab",
+    "thu": "Kam",
+    "fri": "Jum",
+    "sat": "Sab"
+  },
+  "progress": {
+    "of": "{{current}} / {{total}}"
+  },
+  "datePicker": {
+    "weekdays": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"]
+  },
+  "interval": {
+    "lessThanTenMin": "< 10mnt",
+    "minutes": "{{count}}mnt",
+    "hours": "{{count}}j",
+    "oneDay": "1hr",
+    "days": "{{count}}hr",
+    "months": "{{count}}bl",
+    "years": "{{count}}th"
+  },
+  "srsRating": {
+    "again": "Ulangi",
+    "hard": "Sulit",
+    "good": "Baik",
+    "easy": "Mudah"
+  },
+  "cramming": {
+    "gotIt": "Mengerti!",
+    "missed": "Tidak Mengerti",
+    "round": "Ronde {{round}}",
+    "mastery": "Penguasaan: {{percentage}}%",
+    "filter": {
+      "title": "Filter Kartu",
+      "all": "Semua Kartu",
+      "allDesc": "Pelajari semua kartu yang tidak ditangguhkan dalam dek",
+      "weak": "Kartu Lemah Saja",
+      "weakDesc": "Kartu sulit (faktor kemudahan rendah) atau kartu baru",
+      "dueSoon": "Segera Jatuh Tempo",
+      "dueSoonDesc": "Kartu yang perlu diulas dalam 3 hari"
+    },
+    "timeLimit": {
+      "title": "Batas Waktu",
+      "none": "Tanpa Batas",
+      "minutes": "{{count}} menit"
+    },
+    "shuffle": {
+      "title": "Acak Kartu",
+      "desc": "Acak urutan kartu setiap ronde"
+    },
+    "summary": {
+      "completed": "Menjejalkan Selesai!",
+      "timeUp": "Waktu Habis!",
+      "wellDone": "Usaha yang bagus! Terus ulas untuk memperkuat ingatan Anda.",
+      "totalRounds": "Total Ronde",
+      "masteryRate": "Tingkat Penguasaan",
+      "cardsStudied": "Kartu Dipelajari",
+      "hardestCards": "Kartu Tersulit",
+      "missedTimes": "terlewat {{count}}x",
+      "noSrsImpact": "Sesi ini tidak memengaruhi jadwal SRS Anda.",
+      "sessionEnded": "Sesi Berakhir",
+      "crammingAgain": "Jejalkan Lagi",
+      "otherMode": "Mode Lain"
+    }
+  },
+  "noCards": {
+    "otherMode": "Belajar Mode Lain",
+    "srs": {
+      "title": "Semua Terkendali!",
+      "message": "Tidak ada kartu yang perlu diulas saat ini. Periksa lagi nanti!"
+    },
+    "cramming": {
+      "weakTitle": "Tidak Ada Kartu Lemah",
+      "weakMessage": "Semua kartu Anda dalam kondisi baik!",
+      "dueSoonTitle": "Tidak Ada yang Segera Jatuh Tempo",
+      "dueSoonMessage": "Tidak ada kartu yang perlu diulas dalam 3 hari."
+    },
+    "generic": {
+      "title": "Tidak Ada Kartu untuk Dipelajari",
+      "message": "Tidak ada kartu yang sesuai dengan kriteria Anda."
+    }
+  }
+}

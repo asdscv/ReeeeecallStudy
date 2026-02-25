@@ -1,0 +1,20 @@
+{
+  "editCard": "Edit Kartu",
+  "addCard": "Tambah Kartu",
+  "noTemplateSet": "Tidak ada templat yang ditetapkan untuk dek ini.",
+  "fileValidationFailed": "Validasi file gagal.",
+  "uploadFailed": "Gagal mengunggah.",
+  "uploading": "Mengunggah...",
+  "remove": "Hapus",
+  "uploadImage": "Unggah gambar",
+  "selectFile": "Pilih File",
+  "imageFormats": "JPG, PNG, WebP didukung",
+  "uploadAudio": "Unggah audio",
+  "audioFormats": "MP3, OGG, WAV didukung",
+  "tags": "Tag",
+  "tagsPlaceholder": "Ketik tag dan tekan Enter",
+  "cancel": "Batal",
+  "saving": "Menyimpan...",
+  "edit": "Edit",
+  "add": "Tambah"
+}

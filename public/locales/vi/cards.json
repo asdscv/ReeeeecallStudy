@@ -1,0 +1,20 @@
+{
+  "editCard": "Sửa thẻ",
+  "addCard": "Thêm thẻ",
+  "noTemplateSet": "Chưa đặt mẫu cho bộ thẻ này.",
+  "fileValidationFailed": "Xác thực tệp thất bại.",
+  "uploadFailed": "Tải lên thất bại.",
+  "uploading": "Đang tải lên...",
+  "remove": "Xóa bỏ",
+  "uploadImage": "Tải ảnh lên",
+  "selectFile": "Chọn tệp",
+  "imageFormats": "Hỗ trợ JPG, PNG, WebP",
+  "uploadAudio": "Tải âm thanh lên",
+  "audioFormats": "Hỗ trợ MP3, OGG, WAV",
+  "tags": "Thẻ gắn",
+  "tagsPlaceholder": "Nhập thẻ gắn rồi nhấn Enter",
+  "cancel": "Hủy",
+  "saving": "Đang lưu...",
+  "edit": "Sửa",
+  "add": "Thêm"
+}

@@ -1,0 +1,211 @@
+{
+  "title": "Dokumentasi API",
+  "subtitle": "Kelola data belajar dengan mengintegrasikan alat eksternal",
+  "publicSubtitle": "Kelola data belajar dengan mengintegrasikan alat eksternal menggunakan API ReeeeecallStudy",
+  "userGuideLink": "Panduan Pengguna",
+  "getStarted": "Mulai",
+  "required": "wajib",
+  "searchPlaceholder": "Cari endpoint...",
+  "noResults": "Tidak ada hasil untuk \"{{query}}\"",
+  "copy": "Salin",
+  "tableOfContents": "Daftar Isi",
+  "quickStart": {
+    "title": "Mulai Cepat",
+    "settingsPage": "halaman Pengaturan",
+    "step1Auth": " — Buat kunci API Anda di bagian Kunci API.",
+    "signup": "Daftar",
+    "step1Public": "dan buat kunci API Anda di Pengaturan.",
+    "step2": "Tambahkan header",
+    "step2Suffix": "ke setiap permintaan.",
+    "step3": "Mulai buat panggilan API! Periksa endpoint di bawah."
+  },
+  "table": {
+    "name": "Nama",
+    "type": "Tipe",
+    "required": "Wajib",
+    "description": "Deskripsi"
+  },
+  "footer": {
+    "home": "Beranda",
+    "login": "Masuk"
+  },
+  "sections": {
+    "overview": {
+      "title": "Ikhtisar",
+      "description": "Gunakan API ReeeeecallStudy untuk mengelola data belajar dari alat, skrip, dan aplikasi eksternal.",
+      "items": {
+        "what": {
+          "title": "Apa itu API?",
+          "body": "API ReeeeecallStudy adalah API RESTful yang memungkinkan Anda melihat dan mengelola dek, kartu, riwayat belajar, dan lainnya melalui permintaan HTTP. Gunakan untuk skrip otomatisasi, integrasi aplikasi pihak ketiga, dan analisis data."
+        },
+        "baseUrl": {
+          "title": "URL Dasar",
+          "body": "Semua permintaan API didasarkan pada URL proyek Supabase.\n\nURL Dasar: https://your-project.supabase.co/rest/v1"
+        },
+        "responseFormat": {
+          "title": "Format Respons",
+          "body": "Semua respons dalam format JSON dengan Content-Type: application/json.\n\nPada keberhasilan, data sumber daya dikembalikan. Pada kesalahan, respons mengikuti format { \"error\": \"pesan\" }."
+        }
+      }
+    },
+    "authentication": {
+      "title": "Autentikasi",
+      "description": "Semua permintaan diautentikasi menggunakan kunci API.",
+      "items": {
+        "getKey": {
+          "title": "Mendapatkan Kunci API",
+          "body": "Pengaturan → bagian Kunci API → Klik 'Buat Kunci API Baru'.\nMasukkan nama (maks 64 karakter) untuk menerima kunci 35 karakter yang dimulai dengan rc_.\n\n⚠️ Kunci hanya ditampilkan sekali. Salin ke tempat yang aman!"
+        },
+        "method": {
+          "title": "Metode Autentikasi",
+          "body": "Kirim kunci API Anda sebagai token Bearer di header Authorization.\n\nAuthorization: Bearer rc_kunci_api_anda_di_sini\n\nKunci yang hilang atau tidak valid mengembalikan 401 Unauthorized."
+        },
+        "management": {
+          "title": "Manajemen Kunci",
+          "body": "• Anda dapat memiliki hingga 1 kunci API\n• Jika hilang, hapus kunci yang ada dan buat yang baru\n• Hapus kunci yang tidak digunakan segera\n• Gunakan variabel lingkungan daripada menuliskan kunci secara langsung"
+        }
+      }
+    },
+    "rateLimits": {
+      "title": "Batas Permintaan",
+      "description": "Jumlah permintaan dibatasi untuk stabilitas API.",
+      "items": {
+        "free": {
+          "title": "Tingkat Gratis",
+          "body": "• Permintaan API harian: 1.000\n• Panggilan API per menit: 60\n• Pembuatan kartu per menit: 30\n• Pembuatan kartu massal per menit: 5 (maks 100 per permintaan)\n• Total kartu: 5.000\n• Total dek: 50"
+        },
+        "pro": {
+          "title": "Tingkat Pro",
+          "body": "• Permintaan API harian: 10.000\n• Panggilan API per menit: 300\n• Pembuatan kartu per menit: 120\n• Pembuatan kartu massal per menit: 20\n• Total kartu: 50.000\n• Total dek: 500"
+        },
+        "exceeded": {
+          "title": "Ketika Batas Terlampaui",
+          "body": "Mengembalikan 429 Too Many Requests.\n\nHeader respons termasuk:\n• X-RateLimit-Limit: Permintaan maksimal\n• X-RateLimit-Remaining: Sisa permintaan\n• Retry-After: Waktu tunggu dalam detik"
+        }
+      }
+    },
+    "decks": {
+      "title": "API Dek",
+      "description": "Lihat dan kelola dek (koleksi kartu).",
+      "endpoints": {
+        "list": {
+          "summary": "Daftar Dek",
+          "description": "Ambil semua dek untuk pengguna."
+        },
+        "detail": {
+          "summary": "Detail Dek",
+          "description": "Ambil informasi detail untuk dek tertentu."
+        },
+        "create": {
+          "summary": "Buat Dek",
+          "description": "Buat dek baru."
+        }
+      },
+      "params": {
+        "page": "Nomor halaman (bawaan: 1)",
+        "perPage": "Item per halaman (bawaan: 50, maks: 100)",
+        "deckId": "ID Dek yang akan dicari"
+      }
+    },
+    "cards": {
+      "title": "API Kartu",
+      "description": "Lihat, buat, dan ubah kartu.",
+      "endpoints": {
+        "list": {
+          "summary": "Daftar Kartu",
+          "description": "Ambil kartu dalam dek tertentu."
+        },
+        "create": {
+          "summary": "Buat Kartu",
+          "description": "Tambahkan kartu baru ke dek. Satu kartu atau pembuatan massal hingga 100."
+        },
+        "update": {
+          "summary": "Perbarui Kartu",
+          "description": "Ubah nilai bidang atau tag kartu yang ada."
+        },
+        "delete": {
+          "summary": "Hapus Kartu",
+          "description": "Hapus kartu tertentu. Tindakan ini tidak dapat dibatalkan."
+        }
+      },
+      "params": {
+        "deckId": "ID Dek",
+        "cardId": "ID Kartu",
+        "status": "Filter status SRS (new, learning, review, suspended)",
+        "tag": "Filter tag"
+      }
+    },
+    "study": {
+      "title": "API Belajar",
+      "description": "Lihat riwayat belajar dan kelola data sesi.",
+      "endpoints": {
+        "due": {
+          "summary": "Kartu Jatuh Tempo",
+          "description": "Ambil kartu yang jatuh tempo untuk ulasan hari ini."
+        },
+        "history": {
+          "summary": "Riwayat Belajar",
+          "description": "Ambil catatan sesi belajar."
+        },
+        "stats": {
+          "summary": "Statistik Belajar",
+          "description": "Ambil statistik belajar keseluruhan dan data dasbor."
+        }
+      },
+      "params": {
+        "deckId": "ID Dek",
+        "from": "Tanggal mulai (contoh: 2025-01-01)",
+        "to": "Tanggal akhir (contoh: 2025-01-31)",
+        "period": "Periode (1w, 1m, 3m, 6m, 1y)"
+      }
+    },
+    "templates": {
+      "title": "API Templat",
+      "description": "Lihat templat kartu.",
+      "endpoints": {
+        "list": {
+          "summary": "Daftar Templat",
+          "description": "Ambil semua templat kartu untuk pengguna."
+        },
+        "detail": {
+          "summary": "Detail Templat",
+          "description": "Ambil informasi templat lengkap termasuk bidang dan tata letak."
+        }
+      },
+      "params": {
+        "templateId": "ID Templat"
+      }
+    },
+    "examples": {
+      "title": "Contoh Kode",
+      "description": "Contoh pemanggilan API dengan berbagai bahasa dan alat."
+    },
+    "errors": {
+      "title": "Penanganan Kesalahan",
+      "description": "Format respons kesalahan dan kode kesalahan umum.",
+      "items": {
+        "format": {
+          "title": "Format Respons Kesalahan",
+          "body": "Semua kesalahan mengembalikan:\n\n{\n  \"error\": \"Pesan kesalahan\",\n  \"code\": \"KODE_KESALAHAN\",\n  \"details\": \"Info tambahan (opsional)\"\n}"
+        },
+        "statusCodes": {
+          "title": "Kode Status HTTP",
+          "body": "• 200 OK — Berhasil\n• 201 Created — Sumber daya dibuat\n• 204 No Content — Dihapus (tanpa isi respons)\n• 400 Bad Request — Permintaan tidak valid (bidang hilang, validasi gagal)\n• 401 Unauthorized — Autentikasi gagal (kunci API hilang atau tidak valid)\n• 404 Not Found — Sumber daya tidak ditemukan\n• 429 Too Many Requests — Batas permintaan terlampaui\n• 500 Internal Server Error — Kesalahan server"
+        },
+        "validation": {
+          "title": "Kesalahan Validasi",
+          "body": "Kegagalan validasi pembuatan/pembaruan kartu mengembalikan kesalahan per bidang sebagai array:\n\n{\n  \"error\": \"Validasi gagal\",\n  \"errors\": [\n    \"[0] template_id diperlukan\",\n    \"[0] field_values harus memiliki setidaknya satu bidang\"\n  ]\n}"
+        }
+      }
+    },
+    "statusCodes": {
+      "200": "Berhasil",
+      "201": "Dibuat",
+      "204": "Dihapus (tanpa isi respons)",
+      "400": "Permintaan tidak valid (bidang wajib hilang)",
+      "401": "Autentikasi gagal",
+      "404": "Tidak ditemukan",
+      "429": "Batas permintaan terlampaui"
+    }
+  }
+}

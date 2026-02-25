@@ -122,10 +122,10 @@
     "years": "{{count}}年"
   },
   "srsRating": {
-    "again": "Again",
-    "hard": "Hard",
-    "good": "Good",
-    "easy": "Easy"
+    "again": "もう一度",
+    "hard": "難しい",
+    "good": "良い",
+    "easy": "簡単"
   },
   "cramming": {
     "gotIt": "わかった！",

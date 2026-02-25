@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "quickStudy": "Học nhanh",
+    "dashboard": "Bảng điều khiển",
+    "study": "Học tập",
+    "decks": "Bộ thẻ",
+    "cards": "Thẻ",
+    "marketplace": "Chợ ứng dụng",
+    "studyHistory": "Lịch sử",
+    "settings": "Cài đặt",
+    "admin": "Quản trị",
+    "guide": "Hướng dẫn"
+  },
+  "actions": {
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "create": "Tạo",
+    "add": "Thêm",
+    "remove": "Xóa bỏ",
+    "confirm": "Xác nhận",
+    "ok": "OK",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "close": "Đóng",
+    "copy": "Sao chép",
+    "duplicate": "Nhân bản",
+    "search": "Tìm kiếm",
+    "selectAll": "Chọn tất cả",
+    "deselect": "Bỏ chọn",
+    "show": "Hiện",
+    "hide": "Ẩn",
+    "startStudy": "Bắt đầu học",
+    "logout": "Đăng xuất"
+  },
+  "status": {
+    "loading": "Đang tải...",
+    "processing": "Đang xử lý...",
+    "new": "Mới",
+    "learning": "Đang học",
+    "review": "Ôn tập",
+    "suspended": "Tạm dừng"
+  },
+  "units": {
+    "cards": "thẻ",
+    "cardsSuffix": "{{count}} thẻ",
+    "sessions": "phiên",
+    "items": "mục",
+    "days": "ngày",
+    "hours": "giờ",
+    "minutes": "phút",
+    "seconds": "giây",
+    "times": "lần",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}} mỗi trang"
+  },
+  "timePeriod": {
+    "1d": "1N",
+    "1w": "1T",
+    "1m": "1Th",
+    "3m": "3Th",
+    "6m": "6Th",
+    "1y": "1Năm",
+    "2y": "2Năm",
+    "5y": "5Năm"
+  },
+  "confirmDialog": {
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "confirm": "Xác nhận"
+  },
+  "delete": "Xóa",
+  "deselect": "Bỏ chọn",
+  "duplicate": "Nhân bản",
+  "edit": "Sửa",
+  "save": "Lưu",
+  "saving": "Đang lưu...",
+  "selectAll": "Chọn tất cả",
+  "menu": "Menu",
+  "copiedToClipboard": "Đã sao chép vào bộ nhớ tạm",
+  "export": "Xuất",
+  "officialBadge": {
+    "label": "Chính thức",
+    "tooltip": "Tài khoản chính thức"
+  }
+}

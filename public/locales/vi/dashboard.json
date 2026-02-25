@@ -1,0 +1,37 @@
+{
+  "title": "Bảng điều khiển",
+  "stats": {
+    "totalCards": "Tổng số thẻ",
+    "todayReview": "Ôn tập hôm nay",
+    "streak": "Chuỗi học tập",
+    "masteryRate": "Tỷ lệ thành thạo"
+  },
+  "dailyChart": {
+    "title": "Lượng học hàng ngày",
+    "total": "Tổng cộng {{count}} lần",
+    "noData": "Chưa có hồ sơ học tập",
+    "tooltipTimes": "{{value}} lần",
+    "tooltipLabel": "Học tập"
+  },
+  "forecast": {
+    "title": "Dự báo ôn tập (7 ngày)",
+    "noData": "Không có lịch ôn tập",
+    "tooltipCards": "{{value}} thẻ",
+    "tooltipLabel": "Cần ôn tập"
+  },
+  "recentDecks": {
+    "title": "Trạng thái bộ thẻ",
+    "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ!",
+    "goToDecks": "Đến quản lý bộ thẻ",
+    "cardCount": "{{count}} thẻ",
+    "newCards": "Mới {{count}}",
+    "reviewCards": "Ôn tập {{count}}",
+    "study": "Học"
+  },
+  "heatmap": {
+    "title": "Bản đồ nhiệt học tập",
+    "noStudy": "Không học",
+    "studyCount": "{{date}}: {{count}} lần học",
+    "tooltip": "{{date}}: {{count}} lần học"
+  }
+}

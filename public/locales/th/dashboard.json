@@ -1,0 +1,37 @@
+{
+  "title": "แดชบอร์ด",
+  "stats": {
+    "totalCards": "การ์ดทั้งหมด",
+    "todayReview": "ทบทวนวันนี้",
+    "streak": "สถิติเรียนต่อเนื่อง",
+    "masteryRate": "อัตราความชำนาญ"
+  },
+  "dailyChart": {
+    "title": "ปริมาณการเรียนรายวัน",
+    "total": "ทั้งหมด {{count}} ครั้ง",
+    "noData": "ยังไม่มีบันทึกการเรียน",
+    "tooltipTimes": "{{value}} ครั้ง",
+    "tooltipLabel": "เรียน"
+  },
+  "forecast": {
+    "title": "พยากรณ์การทบทวน (7 วัน)",
+    "noData": "ไม่มีการทบทวนที่กำหนดไว้",
+    "tooltipCards": "{{value}} การ์ด",
+    "tooltipLabel": "ครบกำหนดทบทวน"
+  },
+  "recentDecks": {
+    "title": "สถานะสำรับ",
+    "noDecks": "ยังไม่มีสำรับ สร้างสำรับใหม่เลย!",
+    "goToDecks": "ไปยังการจัดการสำรับ",
+    "cardCount": "{{count}} การ์ด",
+    "newCards": "ใหม่ {{count}}",
+    "reviewCards": "ทบทวน {{count}}",
+    "study": "เรียน"
+  },
+  "heatmap": {
+    "title": "ฮีทแมปการเรียน",
+    "noStudy": "ไม่มีการเรียน",
+    "studyCount": "{{date}}: {{count}} ครั้ง",
+    "tooltip": "{{date}}: {{count}} ครั้ง"
+  }
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe } from 'lucide-react'
-import { toIntlLocale, SUPPORTED_LOCALES, LOCALE_LABELS } from '../lib/locale-utils'
+import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -271,8 +271,8 @@ export function SettingsPage() {
             <Globe className="w-5 h-5 text-gray-500" />
             <h2 className="text-lg font-semibold text-gray-900">{t('language.title')}</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {SUPPORTED_LOCALES.map((lng) => (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const).map((lng) => (
               <button
                 key={lng}
                 onClick={() => changeLanguage(lng)}
@@ -282,7 +282,7 @@ export function SettingsPage() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {LOCALE_LABELS[lng]}
+                {t(`language.${lng}`)}
               </button>
             ))}
           </div>

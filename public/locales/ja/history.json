@@ -90,10 +90,10 @@
     "cramming": "クラミング"
   },
   "ratings": {
-    "again": "Again",
-    "hard": "Hard",
-    "good": "Good",
-    "easy": "Easy",
+    "again": "もう一度",
+    "hard": "難しい",
+    "good": "良い",
+    "easy": "簡単",
     "known": "覚えた",
     "unknown": "忘れた",
     "got_it": "正解",

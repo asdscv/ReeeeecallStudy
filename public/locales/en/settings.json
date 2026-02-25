@@ -32,7 +32,15 @@
   },
 
   "language": {
-    "title": "Language"
+    "title": "Language",
+    "label": "Display language",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
   },
 
   "srs": {

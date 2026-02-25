@@ -1,0 +1,107 @@
+{
+  "title": "Lịch sử học tập",
+  "tabs": {
+    "deckProgress": "Tiến trình bộ thẻ",
+    "sessionList": "Danh sách phiên"
+  },
+  "filters": {
+    "allDecks": "Tất cả bộ thẻ",
+    "allModes": "Tất cả chế độ"
+  },
+  "deckScope": {
+    "all": "Tất cả",
+    "label": "Phạm vi bảng điều khiển"
+  },
+  "empty": "Chưa có lịch sử học tập. Hãy bắt đầu học!",
+  "noMatch": "Không có hồ sơ phù hợp với bộ lọc.",
+  "deletedDeck": "Bộ thẻ đã xóa",
+  "deckProgress": {
+    "total": "{{count}} thẻ",
+    "notStudied": "Chưa học {{count}}",
+    "learning": "Đang học {{count}}",
+    "review": "Ôn tập {{count}}"
+  },
+  "session": {
+    "intervalDays": "{{count}} ngày",
+    "reviewCount": "{{count}} lượt ôn tập",
+    "cardCount": "{{count}} thẻ",
+    "logCount": "{{count}} nhật ký",
+    "intervalChange": "{{prev}} ngày → {{next}} ngày",
+    "paginationInfo": "{{start}}-{{end}} trong {{total}}"
+  },
+  "sessionCard": {
+    "cardsStudied": "Đã học {{count}} thẻ"
+  },
+  "sessionDetail": {
+    "backToHistory": "Lịch sử học tập",
+    "cardsStudied": "Đã học {{count}} thẻ",
+    "performance": "Hiệu suất {{value}}%",
+    "loadingDetails": "Đang tải chi tiết...",
+    "noDetails": "Không có chi tiết.",
+    "retention": "Tỷ lệ ghi nhớ",
+    "avgIntervalGrowth": "Tăng trưởng khoảng cách TB",
+    "avgEase": "Hệ số dễ trung bình",
+    "totalReviews": "Tổng lượt ôn tập",
+    "easeDistribution": "Phân bố hệ số dễ",
+    "totalCards": "Tổng số thẻ",
+    "avgTime": "Thời gian TB",
+    "performanceScore": "Điểm hiệu suất",
+    "cardDetails": "Chi tiết thẻ",
+    "card": "Thẻ",
+    "rating": "Đánh giá",
+    "intervalChange": "Thay đổi khoảng cách",
+    "easeChange": "Thay đổi hệ số dễ",
+    "timeSpent": "Thời gian",
+    "deletedCard": "(Thẻ đã xóa)",
+    "noContent": "(Không có nội dung)"
+  },
+  "overview": {
+    "sessions": "Phiên",
+    "sessionsValue": "{{count}} phiên",
+    "studyCards": "Thẻ đã học",
+    "cardsValue": "{{count}} thẻ",
+    "totalTime": "Tổng thời gian học",
+    "avgPerformance": "Hiệu suất TB",
+    "streak": "Chuỗi học tập",
+    "streakValue": "{{count}} ngày"
+  },
+  "chart": {
+    "countPercent": "{{count}} ({{percent}}%)"
+  },
+  "charts": {
+    "studyVolume": "Lượng học tập",
+    "volumeSummary": "{{sessions}} phiên / {{cards}} thẻ",
+    "noDataForPeriod": "Không có hồ sơ học tập cho giai đoạn này",
+    "sessionDuration": "Thời lượng phiên TB",
+    "sessionCount": "{{count}} phiên",
+    "avgDuration": "Thời lượng TB",
+    "ratingDistribution": "Phân bố đánh giá",
+    "ratingTotal": "Tổng {{count}}",
+    "noRatingData": "Không có dữ liệu đánh giá",
+    "modeBreakdown": "Phân tích chế độ",
+    "noModeData": "Không có dữ liệu chế độ",
+    "sessionCountLabel": "{{count}} phiên",
+    "cardCountLabel": "{{count}} thẻ",
+    "performance": "Hiệu suất"
+  },
+  "ratingGroups": {
+    "srs": "Lặp lại ngắt quãng",
+    "simple": "Tổng hợp",
+    "cramming": "Nhồi nhét"
+  },
+  "ratings": {
+    "again": "Lại",
+    "hard": "Khó",
+    "good": "Tốt",
+    "easy": "Dễ",
+    "known": "Đã biết",
+    "unknown": "Chưa biết",
+    "got_it": "Đúng rồi",
+    "missed": "Sai"
+  },
+  "units": {
+    "sessions": "phiên",
+    "cards": "thẻ",
+    "min": "phút"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "auth": {
+    "invalidCredentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "emailNotConfirmed": "อีเมลยังไม่ได้รับการยืนยัน กรุณาตรวจสอบกล่องจดหมาย",
+    "userAlreadyRegistered": "อีเมลนี้ลงทะเบียนไว้แล้ว",
+    "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+    "emailRateLimit": "มีคำขอมากเกินไป กรุณาลองใหม่ภายหลัง",
+    "securityDelay": "เพื่อความปลอดภัย กรุณาลองใหม่ภายหลัง",
+    "newPasswordSameAsOld": "รหัสผ่านใหม่ต้องแตกต่างจากรหัสผ่านเดิม",
+    "invalidEmailFormat": "รูปแบบอีเมลไม่ถูกต้อง"
+  },
+  "rateLimit": {
+    "tooFast": "มีคำขอมากเกินไป ลองอีกครั้งใน {{seconds}} วินาที"
+  },
+  "quota": {
+    "limitReached": "{{resource}} ถึงขีดจำกัดแล้ว ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "คำขอ API รายวัน",
+      "storage_bytes": "พื้นที่จัดเก็บ",
+      "cards_total": "การ์ดทั้งหมด",
+      "decks_total": "สำรับทั้งหมด",
+      "templates_total": "เทมเพลตทั้งหมด",
+      "study_sessions_daily": "เซสชันการเรียนรายวัน",
+      "file_uploads_daily": "การอัปโหลดไฟล์รายวัน"
+    }
+  },
+  "storage": {
+    "imageTooLarge": "รูปภาพต้องมีขนาดไม่เกิน 5MB",
+    "imageFormatUnsupported": "รูปแบบภาพที่รองรับ: JPG, PNG, WebP",
+    "audioTooLarge": "ไฟล์เสียงต้องมีขนาดไม่เกิน 10MB",
+    "audioFormatUnsupported": "รูปแบบเสียงที่รองรับ: MP3, OGG, WAV",
+    "uploadLimitReached": "ถึงขีดจำกัดการอัปโหลดแล้ว",
+    "uploadFailed": "การอัปโหลดล้มเหลว: {{message}}"
+  },
+  "apiKey": {
+    "nameRequired": "กรุณากรอกชื่อคีย์",
+    "nameMustBeString": "ชื่อคีย์ต้องเป็นข้อความ",
+    "nameTooLong": "ชื่อคีย์ต้องไม่เกิน {{maxLength}} ตัวอักษร",
+    "nameNoControlChars": "ชื่อคีย์ไม่สามารถมีอักขระควบคุม"
+  },
+  "card": {
+    "readonlyDeckNoAdd": "ไม่สามารถเพิ่มการ์ดในสำรับแบบอ่านอย่างเดียว",
+    "readonlyDeckNoEdit": "ไม่สามารถแก้ไขการ์ดในสำรับแบบอ่านอย่างเดียว",
+    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว"
+  },
+  "deck": {
+    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว"
+  },
+  "template": {
+    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว",
+    "cannotDeleteDefault": "ไม่สามารถลบเทมเพลตเริ่มต้นได้",
+    "inUseByDecks": "ไม่สามารถลบได้ — มี {{count}} สำรับที่ใช้เทมเพลตนี้"
+  },
+  "marketplace": {
+    "listingNotFound": "ไม่พบรายการ",
+    "cannotImportOwn": "คุณไม่สามารถนำเข้าสำรับของคุณเอง"
+  },
+  "sharing": {
+    "invalidOrExpired": "รหัสเชิญไม่ถูกต้องหรือหมดอายุ",
+    "cannotAcceptOwn": "คุณไม่สามารถยอมรับสำรับของคุณเอง"
+  },
+  "import": {
+    "invalidFile": "ไฟล์นำเข้าไม่ถูกต้อง: ไม่มีอาร์เรย์การ์ด"
+  },
+  "fileValidationFailed": "การตรวจสอบไฟล์ล้มเหลว",
+  "uploadFailed": "การอัปโหลดล้มเหลว",
+  "parseError": "การแยกวิเคราะห์ไฟล์ล้มเหลว"
+}
