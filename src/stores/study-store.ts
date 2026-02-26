@@ -718,24 +718,27 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     if (studyState) {
       if (config.mode === 'sequential' && queue.length > 0) {
         const typedState = studyState as DeckStudyState
-        // Detect wrapped queue (cards with positions before the session start)
-        const wrappedCards = queue.filter(c => c.sort_position < typedState.sequential_pos)
+        // Only consider cards actually studied (sequential processes in order, so slice is exact)
+        const studiedCards = queue.slice(0, sessionStats.cardsStudied)
 
-        let nextPos: number
-        if (wrappedCards.length > 0) {
-          // Queue wrapped — continue after the last wrapped card
-          nextPos = Math.max(...wrappedCards.map(c => c.sort_position)) + 1
-        } else {
-          const maxPos = Math.max(...queue.map(c => c.sort_position))
-          nextPos = maxPos + 1
+        if (studiedCards.length > 0) {
+          const wrappedCards = studiedCards.filter(c => c.sort_position < typedState.sequential_pos)
+
+          let nextPos: number
+          if (wrappedCards.length > 0) {
+            nextPos = Math.max(...wrappedCards.map(c => c.sort_position)) + 1
+          } else {
+            const maxPos = Math.max(...studiedCards.map(c => c.sort_position))
+            nextPos = maxPos + 1
+          }
+
+          await supabase
+            .from('deck_study_state')
+            .update({
+              sequential_pos: nextPos > maxCardPosition ? 0 : nextPos,
+            } as Record<string, unknown>)
+            .eq('id', studyState.id)
         }
-
-        await supabase
-          .from('deck_study_state')
-          .update({
-            sequential_pos: nextPos > maxCardPosition ? 0 : nextPos,
-          } as Record<string, unknown>)
-          .eq('id', studyState.id)
       }
     }
 
