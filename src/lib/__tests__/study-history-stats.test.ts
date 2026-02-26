@@ -45,6 +45,7 @@ function makeLog(overrides: Partial<StudyLog> = {}): StudyLog {
     prev_ease: null,
     new_ease: null,
     review_duration_ms: 5000,
+    prev_srs_status: null,
     studied_at: '2026-02-15T10:00:00Z',
     ...overrides,
   }

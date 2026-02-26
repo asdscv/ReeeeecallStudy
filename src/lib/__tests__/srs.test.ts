@@ -4,7 +4,7 @@ vi.mock('i18next', () => ({
   default: { t: (key: string, opts?: Record<string, unknown>) => opts?.count !== undefined ? `${key}:${opts.count}` : key },
 }))
 
-import { calculateSRS, previewIntervals, nextDayBoundary, formatMinutes } from '../srs'
+import { calculateSRS, previewIntervals, nextDayBoundary, formatMinutes, getSrsDayStart } from '../srs'
 import type { SrsCardData } from '../srs'
 import type { Card, SrsSettings } from '../../types/database'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
@@ -441,5 +441,168 @@ describe('formatMinutes', () => {
     expect(formatMinutes(60)).toBe('study:interval.hours:1')
     expect(formatMinutes(120)).toBe('study:interval.hours:2')
     expect(formatMinutes(90)).toBe('study:interval.hours:2') // rounds
+  })
+})
+
+// ── Issue 1: getSrsDayStart (Day Boundary) ──────────────
+
+describe('getSrsDayStart', () => {
+  it('should return today 4AM when called at 10AM', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-06-15T10:00:00'))
+    const result = getSrsDayStart()
+    expect(result.getFullYear()).toBe(2025)
+    expect(result.getMonth()).toBe(5) // June = 5
+    expect(result.getDate()).toBe(15)
+    expect(result.getHours()).toBe(4)
+    expect(result.getMinutes()).toBe(0)
+    vi.useRealTimers()
+  })
+
+  it('should return previous day 4AM when called at 2AM', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-06-15T02:00:00'))
+    const result = getSrsDayStart()
+    expect(result.getDate()).toBe(14) // previous day
+    expect(result.getHours()).toBe(4)
+    vi.useRealTimers()
+  })
+
+  it('should return today 4AM when called exactly at 4AM', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-06-15T04:00:00'))
+    const result = getSrsDayStart()
+    expect(result.getDate()).toBe(15)
+    expect(result.getHours()).toBe(4)
+    vi.useRealTimers()
+  })
+
+  it('should support custom dayStartHour', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-06-15T10:00:00'))
+    const result = getSrsDayStart(6)
+    expect(result.getDate()).toBe(15)
+    expect(result.getHours()).toBe(6)
+    vi.useRealTimers()
+  })
+})
+
+// ── Issue 3: Max Interval Cap ────────────────────────────
+
+describe('calculateSRS — Max Interval Cap', () => {
+  const reviewSettings: SrsSettings = { ...DEFAULT_SRS_SETTINGS, learning_steps: [] }
+
+  it('should not clamp interval below max (250 < 365)', () => {
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 100 })
+    const result = calculateSRS(card, 'good', reviewSettings)
+    expect(result.interval_days).toBe(250) // 100 * 2.5
+  })
+
+  it('should clamp interval to 365 when calculation exceeds it', () => {
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 200 })
+    const result = calculateSRS(card, 'good', reviewSettings)
+    expect(result.interval_days).toBe(365) // 200 * 2.5 = 500 → clamped
+  })
+
+  it('should clamp easy interval to 365', () => {
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.65, repetitions: 3, interval_days: 300 })
+    const result = calculateSRS(card, 'easy', reviewSettings)
+    expect(result.interval_days).toBe(365) // huge → clamped
+  })
+
+  it('should respect custom max_interval_days=30', () => {
+    const custom: SrsSettings = { ...reviewSettings, max_interval_days: 30 }
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 20 })
+    const result = calculateSRS(card, 'good', custom)
+    expect(result.interval_days).toBe(30) // 20*2.5=50 → clamped to 30
+  })
+
+  it('should use default 365 when max_interval_days is undefined', () => {
+    const noMax: SrsSettings = { ...reviewSettings }
+    delete (noMax as Record<string, unknown>).max_interval_days
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 200 })
+    const result = calculateSRS(card, 'good', noMax)
+    expect(result.interval_days).toBe(365) // 500 → clamped to default 365
+  })
+
+  it('should clamp hard interval too', () => {
+    const custom: SrsSettings = { ...reviewSettings, max_interval_days: 30 }
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 28 })
+    const result = calculateSRS(card, 'hard', custom)
+    // hard: max(28+1, round(28*1.2)) = max(29, 34) = 34 → clamped to 30
+    expect(result.interval_days).toBe(30)
+  })
+
+  it('should clamp learning graduation (good) when easy_days > max', () => {
+    const custom: SrsSettings = { ...DEFAULT_SRS_SETTINGS, learning_steps: [1], max_interval_days: 2, good_days: 5 }
+    const card = makeSrsCard({ srs_status: 'new' })
+    // new card → good → graduates (single step), good_days=5 → clamped to 2
+    const result = calculateSRS(card, 'good', custom)
+    expect(result.srs_status).toBe('review')
+    expect(result.interval_days).toBe(2)
+  })
+
+  it('should clamp learning graduation (easy) when easy_days > max', () => {
+    const custom: SrsSettings = { ...DEFAULT_SRS_SETTINGS, learning_steps: [1, 10], max_interval_days: 2, easy_days: 10 }
+    const card = makeSrsCard({ srs_status: 'new' })
+    // new card → easy → skips steps, easy_days=10 → clamped to 2
+    const result = calculateSRS(card, 'easy', custom)
+    expect(result.srs_status).toBe('review')
+    expect(result.interval_days).toBe(2)
+  })
+})
+
+// ── Issue 4: again_days=0 should use learning_steps[0] ──
+
+describe('calculateSRS — again lapse uses learning_steps[0]', () => {
+  it('review card again, again_days=0, learning_steps=[1,10] → +1min', () => {
+    const settings: SrsSettings = { ...DEFAULT_SRS_SETTINGS, learning_steps: [1, 10] }
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 10 })
+    const result = calculateSRS(card, 'again', settings)
+
+    expect(result.srs_status).toBe('learning')
+    expect(result.interval_days).toBe(0)
+    expect(result.repetitions).toBe(0)
+
+    const nextReview = new Date(result.next_review_at).getTime()
+    const now = Date.now()
+    expect(nextReview - now).toBeGreaterThan(0.5 * 60 * 1000) // ~1 min
+    expect(nextReview - now).toBeLessThan(2 * 60 * 1000)
+  })
+
+  it('review card again, again_days=0, learning_steps=[5,15] → +5min', () => {
+    const settings: SrsSettings = { ...DEFAULT_SRS_SETTINGS, learning_steps: [5, 15] }
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 10 })
+    const result = calculateSRS(card, 'again', settings)
+
+    expect(result.srs_status).toBe('learning')
+    const nextReview = new Date(result.next_review_at).getTime()
+    const now = Date.now()
+    expect(nextReview - now).toBeGreaterThan(4.5 * 60 * 1000) // ~5 min
+    expect(nextReview - now).toBeLessThan(6 * 60 * 1000)
+  })
+
+  it('review card again, again_days=0, no learning_steps → fallback +10min', () => {
+    const settings: SrsSettings = { again_days: 0, hard_days: 1, good_days: 1, easy_days: 4 }
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 10 })
+    const result = calculateSRS(card, 'again', settings)
+
+    expect(result.srs_status).toBe('learning')
+    const nextReview = new Date(result.next_review_at).getTime()
+    const now = Date.now()
+    expect(nextReview - now).toBeGreaterThan(9 * 60 * 1000)
+    expect(nextReview - now).toBeLessThan(11 * 60 * 1000)
+  })
+
+  it('review card again, again_days=0, learning_steps=[] → fallback +10min', () => {
+    const settings: SrsSettings = { ...DEFAULT_SRS_SETTINGS, learning_steps: [] }
+    const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 10 })
+    const result = calculateSRS(card, 'again', settings)
+
+    expect(result.srs_status).toBe('learning')
+    const nextReview = new Date(result.next_review_at).getTime()
+    const now = Date.now()
+    expect(nextReview - now).toBeGreaterThan(9 * 60 * 1000)
+    expect(nextReview - now).toBeLessThan(11 * 60 * 1000)
   })
 })

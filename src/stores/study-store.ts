@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import { calculateSRS, type SrsRating } from '../lib/srs'
+import { calculateSRS, getSrsDayStart, type SrsRating } from '../lib/srs'
 import { advanceSequentialReviewPosition, buildSequentialReviewQueue } from '../lib/study-session-utils'
 import { SrsQueueManager, type QueueCard } from '../lib/study-queue'
 import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating } from '../lib/cramming-queue'
@@ -176,10 +176,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         }
 
         // Count new cards already studied today (across all sessions)
-        // Filter by prev_interval=0 + prev_ease=2.5 to only count cards that were truly new
-        // (not learning/review cards being re-studied)
-        const todayStart = new Date()
-        todayStart.setHours(0, 0, 0, 0)
+        // Uses SRS day boundary (4AM) instead of midnight for consistency
+        const todayStart = getSrsDayStart()
         const { count: todayNewCount } = await supabase
           .from('study_logs')
           .select('*', { count: 'exact', head: true })
@@ -187,8 +185,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           .eq('user_id', user.id)
           .eq('study_mode', 'srs')
           .gte('studied_at', todayStart.toISOString())
-          .eq('prev_interval', 0)
-          .eq('prev_ease', 2.5)
+          .eq('prev_srs_status', 'new')
 
         // Remaining new cards for today
         const remainingNewToday = Math.max(0, newCardLimit - (todayNewCount ?? 0))
@@ -655,6 +652,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           prev_ease: card.ease_factor,
           new_ease: newEase,
           review_duration_ms: durationMs,
+          prev_srs_status: card.srs_status,
         } as Record<string, unknown>)
     )
 

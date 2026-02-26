@@ -183,6 +183,24 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           {t('settings.learningStepsNote')}
         </p>
       </div>
+
+      {/* Max Interval */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t('settings.maxInterval')}
+        </label>
+        <input
+          type="number"
+          value={srsSettings.max_interval_days ?? 365}
+          onChange={(e) => update({ srsSettings: { ...srsSettings, max_interval_days: Math.max(1, Math.min(3650, parseInt(e.target.value) || 365)) } })}
+          min={1}
+          max={3650}
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+        />
+        <p className="text-xs text-gray-400 mt-1.5">
+          {t('settings.maxIntervalNote')}
+        </p>
+      </div>
     </div>
   )
 }

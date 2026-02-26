@@ -54,7 +54,9 @@
     "srsInterval": "Khoảng cách SRS ban đầu (ngày)",
     "srsNote": "Lại 0 = Học lại sau 10 phút. Khoảng cách tự động tăng trong các lần ôn tập sau.",
     "learningSteps": "Các bước học (phút)",
-    "learningStepsNote": "Phút cách nhau bằng dấu phẩy. Thẻ mới trải qua các bước này trước khi chuyển sang ôn tập. VD: 1, 10"
+    "learningStepsNote": "Phút cách nhau bằng dấu phẩy. Thẻ mới trải qua các bước này trước khi chuyển sang ôn tập. VD: 1, 10",
+    "maxInterval": "Khoảng cách tối đa (ngày)",
+    "maxIntervalNote": "Khoảng cách dài nhất mà thẻ có thể đạt được. Ngăn thẻ biến mất trong nhiều năm. Mặc định: 365 ngày."
   },
   "edit": {
     "title": "Sửa bộ thẻ",

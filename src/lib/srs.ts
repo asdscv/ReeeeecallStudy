@@ -21,6 +21,18 @@ export interface SrsResult {
 
 // ── Helpers ─────────────────────────────────────────────
 
+/**
+ * Returns the start of the current "SRS day" in local time.
+ * By default the SRS day boundary is 4 AM, so studying at 2 AM
+ * still belongs to the previous SRS day.
+ */
+export function getSrsDayStart(dayStartHour: number = 4): Date {
+  const now = new Date()
+  const shifted = new Date(now.getTime() - dayStartHour * 3600_000)
+  shifted.setHours(0, 0, 0, 0)
+  return new Date(shifted.getTime() + dayStartHour * 3600_000)
+}
+
 function round(n: number): number {
   return Math.round(n * 100) / 100
 }
@@ -78,6 +90,7 @@ function calculateLearning(
   // For learning cards, repetitions tracks the current step index
   const currentStep = card.srs_status === 'new' ? 0 : Math.min(card.repetitions, steps.length - 1)
   let ease = card.ease_factor
+  const maxIvl = s.max_interval_days ?? 365
 
   switch (rating) {
     case 'again': {
@@ -110,7 +123,7 @@ function calculateLearning(
       const nextStep = card.srs_status === 'new' ? 1 : currentStep + 1
       if (nextStep >= steps.length) {
         // Graduate to review
-        const interval = s.good_days
+        const interval = Math.min(s.good_days, maxIvl)
         return {
           ease_factor: round(ease),
           interval_days: interval,
@@ -133,7 +146,7 @@ function calculateLearning(
     case 'easy': {
       // Skip all steps, graduate immediately
       ease = Math.min(4.0, ease + 0.15)
-      const interval = s.easy_days
+      const interval = Math.min(s.easy_days, maxIvl)
       return {
         ease_factor: round(ease),
         interval_days: interval,
@@ -151,18 +164,21 @@ function calculateReview(
   let ease = card.ease_factor
   let interval = card.interval_days
   let reps = card.repetitions
+  const maxIvl = s.max_interval_days ?? 365
 
   switch (rating) {
     case 'again':
       ease = Math.max(1.3, ease - 0.20)
       reps = 0
       if (s.again_days === 0) {
+        const steps = getSteps(s)
+        const lapseMinutes = steps.length > 0 ? steps[0] : 10
         return {
           ease_factor: round(ease),
           interval_days: 0,
           repetitions: 0,
           srs_status: 'learning',
-          next_review_at: addMinutes(now, 10).toISOString(),
+          next_review_at: addMinutes(now, lapseMinutes).toISOString(),
         }
       }
       return {
@@ -181,6 +197,7 @@ function calculateReview(
       } else {
         interval = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
       }
+      interval = Math.min(interval, maxIvl)
       return {
         ease_factor: round(ease),
         interval_days: interval,
@@ -199,6 +216,7 @@ function calculateReview(
         const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
         interval = Math.max(hardIvl + 1, Math.round(card.interval_days * ease))
       }
+      interval = Math.min(interval, maxIvl)
       return {
         ease_factor: round(ease),
         interval_days: interval,
@@ -218,6 +236,7 @@ function calculateReview(
         const goodIvl = Math.max(hardIvl + 1, Math.round(card.interval_days * card.ease_factor))
         interval = Math.max(goodIvl + 1, Math.round(card.interval_days * ease * 1.3))
       }
+      interval = Math.min(interval, maxIvl)
       return {
         ease_factor: round(ease),
         interval_days: interval,

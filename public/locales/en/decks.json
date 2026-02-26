@@ -54,7 +54,9 @@
     "srsInterval": "Initial SRS Intervals (days)",
     "srsNote": "Again 0 = Relearn after 10 minutes. Interval increases automatically on subsequent reviews.",
     "learningSteps": "Learning Steps (minutes)",
-    "learningStepsNote": "Comma-separated minutes. New cards pass through these steps before graduating to review. e.g., 1, 10"
+    "learningStepsNote": "Comma-separated minutes. New cards pass through these steps before graduating to review. e.g., 1, 10",
+    "maxInterval": "Maximum Interval (days)",
+    "maxIntervalNote": "The longest interval a card can reach. Prevents cards from disappearing for years. Default: 365 days."
   },
   "edit": {
     "title": "Edit Deck",

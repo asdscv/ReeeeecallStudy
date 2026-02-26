@@ -54,7 +54,9 @@
     "srsInterval": "SRS 初始间隔（天）",
     "srsNote": "「重来」设为 0 = 10 分钟后重新学习。后续复习间隔会自动增加。",
     "learningSteps": "学习步骤（分钟）",
-    "learningStepsNote": "逗号分隔的分钟数。新卡片需要通过这些步骤后才能进入复习阶段。例如：1, 10"
+    "learningStepsNote": "逗号分隔的分钟数。新卡片需要通过这些步骤后才能进入复习阶段。例如：1, 10",
+    "maxInterval": "最大间隔（天）",
+    "maxIntervalNote": "卡片可以达到的最长间隔。防止卡片消失数年。默认：365天。"
   },
   "edit": {
     "title": "编辑牌组",

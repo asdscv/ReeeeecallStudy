@@ -177,6 +177,7 @@ export interface Database {
           prev_ease: number | null
           new_ease: number | null
           review_duration_ms: number | null
+          prev_srs_status: string | null
           studied_at: string
         }
         Insert: {
@@ -191,6 +192,7 @@ export interface Database {
           prev_ease?: number | null
           new_ease?: number | null
           review_duration_ms?: number | null
+          prev_srs_status?: string | null
         }
         Update: Partial<Database['public']['Tables']['study_logs']['Insert']>
       }
@@ -256,6 +258,7 @@ export type SrsSettings = {
   good_days: number
   easy_days: number
   learning_steps?: number[]  // minutes per step, e.g. [1, 10]
+  max_interval_days?: number // maximum interval cap in days
 }
 
 export const DEFAULT_SRS_SETTINGS: SrsSettings = {
@@ -264,6 +267,7 @@ export const DEFAULT_SRS_SETTINGS: SrsSettings = {
   good_days: 1,
   easy_days: 4,
   learning_steps: [1, 10],
+  max_interval_days: 365,
 }
 
 // Row type shortcuts

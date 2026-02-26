@@ -54,7 +54,9 @@
     "srsInterval": "Intervalos SRS iniciales (días)",
     "srsNote": "Otra vez 0 = Reaprender después de 10 minutos. El intervalo aumenta automáticamente en repasos posteriores.",
     "learningSteps": "Pasos de aprendizaje (minutos)",
-    "learningStepsNote": "Minutos separados por comas. Las tarjetas nuevas pasan por estos pasos antes de graduarse a repaso. ej., 1, 10"
+    "learningStepsNote": "Minutos separados por comas. Las tarjetas nuevas pasan por estos pasos antes de graduarse a repaso. ej., 1, 10",
+    "maxInterval": "Intervalo máximo (días)",
+    "maxIntervalNote": "El intervalo más largo que puede alcanzar una tarjeta. Evita que las tarjetas desaparezcan durante años. Predeterminado: 365 días."
   },
   "edit": {
     "title": "Editar mazo",

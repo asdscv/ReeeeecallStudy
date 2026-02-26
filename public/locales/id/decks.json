@@ -54,7 +54,9 @@
     "srsInterval": "Interval SRS Awal (hari)",
     "srsNote": "Ulangi 0 = Pelajari ulang setelah 10 menit. Interval meningkat secara otomatis pada ulasan berikutnya.",
     "learningSteps": "Langkah Belajar (menit)",
-    "learningStepsNote": "Menit dipisahkan koma. Kartu baru melewati langkah-langkah ini sebelum lulus ke ulasan. contoh: 1, 10"
+    "learningStepsNote": "Menit dipisahkan koma. Kartu baru melewati langkah-langkah ini sebelum lulus ke ulasan. contoh: 1, 10",
+    "maxInterval": "Interval Maksimum (hari)",
+    "maxIntervalNote": "Interval terlama yang dapat dicapai kartu. Mencegah kartu menghilang selama bertahun-tahun. Default: 365 hari."
   },
   "edit": {
     "title": "Edit Dek",
