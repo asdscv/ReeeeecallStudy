@@ -97,40 +97,76 @@ beforeEach(() => {
   mockDownloadFile.mockReset()
 })
 
-describe('ExportModal — UX improvements', () => {
+describe('ExportModal', () => {
 
-  // ─── HIGH #1: Loading indicator on export button ───
+  // ─── Stateless export: no done step ────────────────
 
-  describe('Loading indicator', () => {
-    it('should show exporting text on button while download is in progress', async () => {
-      // Make downloadFile block by throwing after we can check state
-      // Since handleExport is synchronous, we verify via the error path
-      // that the button text reverts to 'export' after failure
-      mockDownloadFile.mockImplementation(() => { throw new Error('fail') })
-      const user = userEvent.setup()
-      render(<ExportModal {...defaultProps} />)
-
-      await user.click(screen.getByTestId('export-submit'))
-
-      // After error, button should show normal 'export' text (not stuck on 'exporting')
-      expect(screen.getByTestId('export-submit')).toHaveTextContent('export')
-      expect(screen.getByTestId('export-submit')).not.toBeDisabled()
-    })
-
-    it('should disable export button during successful export and transition to done', async () => {
+  describe('Stateless export flow', () => {
+    it('should stay on select screen after successful export', async () => {
       mockDownloadFile.mockImplementation(() => {})
       const user = userEvent.setup()
       render(<ExportModal {...defaultProps} />)
 
       await user.click(screen.getByTestId('export-submit'))
 
-      // Should transition to done step — export button gone, complete message shown
-      expect(screen.queryByTestId('export-submit')).not.toBeInTheDocument()
-      expect(screen.getByText('exportComplete')).toBeInTheDocument()
+      // Modal stays on select screen — export button still present
+      expect(screen.getByTestId('export-submit')).toBeInTheDocument()
+      expect(screen.getByTestId('export-submit')).not.toBeDisabled()
+      // No done screen
+      expect(screen.queryByText('exportComplete')).not.toBeInTheDocument()
+    })
+
+    it('should allow multiple consecutive exports without reopening', async () => {
+      mockDownloadFile.mockImplementation(() => {})
+      const user = userEvent.setup()
+      render(<ExportModal {...defaultProps} />)
+
+      // First export: CSV
+      await user.click(screen.getByTestId('export-submit'))
+      expect(mockDownloadFile).toHaveBeenCalledTimes(1)
+      expect(mockDownloadFile.mock.calls[0][2]).toMatch(/\.csv$/)
+
+      // Switch to JSON and export again
+      await user.click(screen.getByRole('radio', { name: /JSON/i }))
+      await user.click(screen.getByTestId('export-submit'))
+      expect(mockDownloadFile).toHaveBeenCalledTimes(2)
+      expect(mockDownloadFile.mock.calls[1][2]).toMatch(/\.json$/)
+    })
+
+    it('should allow exporting from both tabs without reopening', async () => {
+      mockDownloadFile.mockImplementation(() => {})
+      const user = userEvent.setup()
+      render(<ExportModal {...defaultProps} />)
+
+      // Export cards CSV
+      await user.click(screen.getByTestId('export-submit'))
+      expect(mockDownloadFile).toHaveBeenCalledTimes(1)
+      expect(mockDownloadFile.mock.calls[0][2]).toMatch(/_cards_/)
+
+      // Switch to template tab and export
+      await user.click(screen.getByTestId('export-tab-template'))
+      await user.click(screen.getByTestId('export-submit'))
+      expect(mockDownloadFile).toHaveBeenCalledTimes(2)
+      expect(mockDownloadFile.mock.calls[1][2]).toMatch(/_template_/)
     })
   })
 
-  // ─── HIGH #2: Error message on download failure ────
+  // ─── Loading indicator ─────────────────────────────
+
+  describe('Loading indicator', () => {
+    it('should show normal export text after failed export (not stuck on exporting)', async () => {
+      mockDownloadFile.mockImplementation(() => { throw new Error('fail') })
+      const user = userEvent.setup()
+      render(<ExportModal {...defaultProps} />)
+
+      await user.click(screen.getByTestId('export-submit'))
+
+      expect(screen.getByTestId('export-submit')).toHaveTextContent('export')
+      expect(screen.getByTestId('export-submit')).not.toBeDisabled()
+    })
+  })
+
+  // ─── Error banner ──────────────────────────────────
 
   describe('Error banner on download failure', () => {
     it('should show error banner when downloadFile throws', async () => {
@@ -140,14 +176,11 @@ describe('ExportModal — UX improvements', () => {
 
       await user.click(screen.getByTestId('export-submit'))
 
-      // Error banner should be visible
       expect(screen.getByText('exportFailed')).toBeInTheDocument()
-      // Should still be on select step
       expect(screen.getByTestId('export-submit')).toBeInTheDocument()
     })
 
     it('should clear error banner when user retries export successfully', async () => {
-      // First attempt: fail
       mockDownloadFile.mockImplementationOnce(() => { throw new Error('fail') })
       const user = userEvent.setup()
       render(<ExportModal {...defaultProps} />)
@@ -155,13 +188,11 @@ describe('ExportModal — UX improvements', () => {
       await user.click(screen.getByTestId('export-submit'))
       expect(screen.getByText('exportFailed')).toBeInTheDocument()
 
-      // Second attempt: succeed
+      // Retry succeeds
       mockDownloadFile.mockImplementationOnce(() => {})
       await user.click(screen.getByTestId('export-submit'))
 
-      // Error should be gone, done step shown
       expect(screen.queryByText('exportFailed')).not.toBeInTheDocument()
-      expect(screen.getByText('exportComplete')).toBeInTheDocument()
     })
 
     it('should clear error banner when switching tabs', async () => {
@@ -172,45 +203,8 @@ describe('ExportModal — UX improvements', () => {
       await user.click(screen.getByTestId('export-submit'))
       expect(screen.getByText('exportFailed')).toBeInTheDocument()
 
-      // Switch tab — error should clear
       await user.click(screen.getByTestId('export-tab-template'))
       expect(screen.queryByText('exportFailed')).not.toBeInTheDocument()
-    })
-  })
-
-  // ─── LOW #3: isExporting reset on success ──────────
-
-  describe('isExporting cleanup on success', () => {
-    it('should not have disabled export button after reopen', async () => {
-      mockDownloadFile.mockImplementation(() => {})
-      const user = userEvent.setup()
-      const { rerender } = render(<ExportModal {...defaultProps} />)
-
-      // Export successfully
-      await user.click(screen.getByTestId('export-submit'))
-      expect(screen.getByText('exportComplete')).toBeInTheDocument()
-
-      // Close and reopen
-      rerender(<ExportModal {...defaultProps} open={false} />)
-      rerender(<ExportModal {...defaultProps} open={true} />)
-
-      // Button should be enabled (isExporting was properly reset)
-      expect(screen.getByTestId('export-submit')).not.toBeDisabled()
-    })
-  })
-
-  // ─── LOW #4: Emoji aria-hidden ─────────────────────
-
-  describe('Accessibility: success emoji', () => {
-    it('should have aria-hidden on success checkmark emoji', async () => {
-      mockDownloadFile.mockImplementation(() => {})
-      const user = userEvent.setup()
-      render(<ExportModal {...defaultProps} />)
-
-      await user.click(screen.getByTestId('export-submit'))
-
-      const emoji = screen.getByText('✅')
-      expect(emoji).toHaveAttribute('aria-hidden', 'true')
     })
   })
 })

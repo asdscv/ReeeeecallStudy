@@ -122,8 +122,8 @@ test.describe('ExportModal — Mode Tabs & Template Export', () => {
     expect(fileName).toContain('_template_')
     expect(fileName).toMatch(/\.csv$/)
 
-    // Done step should appear
-    await expect(exportModalPage.confirmButton).toBeVisible()
+    // Modal stays open — export button still available for further exports
+    await expect(exportModalPage.submitButton).toBeVisible()
   })
 
   test('Template JSON export produces .json download', async ({
