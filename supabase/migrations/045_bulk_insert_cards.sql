@@ -63,3 +63,5 @@ BEGIN
   RETURN jsonb_build_object('inserted', v_inserted);
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.bulk_insert_cards(UUID, UUID, JSONB) TO authenticated;

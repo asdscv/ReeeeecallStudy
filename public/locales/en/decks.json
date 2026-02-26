@@ -26,6 +26,8 @@
     "selectedCount": "{{count}} selected",
     "noCards": "No cards. Try adding a card.",
     "addFirstCard": "+ Add First Card",
+    "importCards": "Import CSV/JSON",
+    "downloadTemplate": "CSV Template",
     "noSearchResults": "No search results.",
     "columns": {
       "number": "#",

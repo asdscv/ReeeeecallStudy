@@ -3,6 +3,8 @@ import {
   generateExportJSON,
   generateExportCSV,
   generateCSVTemplate,
+  generateTemplateExportJSON,
+  generateTemplateExportCSV,
   parseImportJSON,
   parseImportCSV,
   validateImportCards,
@@ -134,6 +136,30 @@ describe('generateExportCSV', () => {
     expect(csv).toContain('Tags')
     expect(csv).toContain('a;b')
   })
+
+  it('should generate header-only CSV when cards array is empty', () => {
+    const fields: TemplateField[] = [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+      { key: 'back', name: 'Back', type: 'text', order: 1 },
+    ]
+    const csv = generateExportCSV([], fields)
+    const lines = csv.trim().split('\n')
+    expect(lines).toHaveLength(1) // header only
+    expect(lines[0]).toContain('Front')
+    expect(lines[0]).toContain('Back')
+    expect(lines[0]).toContain('Tags')
+  })
+
+  it('should produce parseable CSV with empty cards', () => {
+    const fields: TemplateField[] = [
+      { key: 'word', name: 'Word', type: 'text', order: 0 },
+      { key: 'meaning', name: 'Meaning', type: 'text', order: 1 },
+    ]
+    const csv = generateExportCSV([], fields)
+    const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true })
+    expect(parsed.meta.fields).toEqual(['Word', 'Meaning', 'Tags'])
+    expect(parsed.data).toHaveLength(0)
+  })
 })
 
 describe('generateCSVTemplate', () => {
@@ -236,6 +262,22 @@ describe('parseImportCSV', () => {
     const cards = parseImportCSV(csv, fieldMapping)
     expect(cards[0].tags).toEqual(['a', 'b', 'c'])
   })
+
+  it('should trim whitespace around tags and filter empty segments', () => {
+    const csv = 'Front,Tags\nhello, a ; b ;; c '
+    const fieldMapping: Record<string, string> = { 'Front': 'front' }
+
+    const cards = parseImportCSV(csv, fieldMapping)
+    expect(cards[0].tags).toEqual(['a', 'b', 'c'])
+  })
+
+  it('should recognize Korean tag label 태그 as fallback', () => {
+    const csv = 'Front,태그\nhello,greetings;basic'
+    const fieldMapping: Record<string, string> = { 'Front': 'front' }
+
+    const cards = parseImportCSV(csv, fieldMapping)
+    expect(cards[0].tags).toEqual(['greetings', 'basic'])
+  })
 })
 
 describe('validateImportCards', () => {
@@ -285,5 +327,166 @@ describe('detectDuplicates', () => {
     const result = detectDuplicates([], incoming)
     expect(result.duplicates).toHaveLength(0)
     expect(result.unique).toHaveLength(1)
+  })
+})
+
+// --- Template Export Tests ---
+
+describe('generateTemplateExportJSON', () => {
+  it('should generate valid JSON with template metadata', () => {
+    const template = makeTemplate()
+    const json = generateTemplateExportJSON(template)
+    const parsed = JSON.parse(json)
+
+    expect(parsed.version).toBe(1)
+    expect(parsed.exportedAt).toBeDefined()
+    expect(parsed.template.name).toBe('Basic')
+  })
+
+  it('should include fields metadata in template', () => {
+    const template = makeTemplate()
+    const json = generateTemplateExportJSON(template)
+    const parsed = JSON.parse(json)
+
+    expect(parsed.template.fields).toHaveLength(2)
+    expect(parsed.template.fields[0].key).toBe('front')
+    expect(parsed.template.fields[1].key).toBe('back')
+    expect(parsed.template.front_layout).toBeDefined()
+    expect(parsed.template.back_layout).toBeDefined()
+  })
+})
+
+describe('generateTemplateExportCSV', () => {
+  it('should generate CSV with field metadata rows', () => {
+    const template = makeTemplate()
+    const csv = generateTemplateExportCSV(template)
+    const lines = csv.trim().split('\n')
+
+    // Header + 2 field rows
+    expect(lines).toHaveLength(3)
+    expect(lines[0]).toContain('key')
+    expect(lines[0]).toContain('name')
+    expect(lines[0]).toContain('type')
+  })
+
+  it('should be parseable by PapaParse', () => {
+    const template = makeTemplate()
+    const csv = generateTemplateExportCSV(template)
+    const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true })
+
+    expect(parsed.meta.fields).toEqual(['key', 'name', 'type', 'order', 'tts_enabled', 'tts_lang'])
+    expect(parsed.data).toHaveLength(2)
+    expect((parsed.data[0] as Record<string, string>).key).toBe('front')
+    expect((parsed.data[1] as Record<string, string>).key).toBe('back')
+  })
+})
+
+// --- Round-trip Tests ---
+
+describe('Round-trip', () => {
+  it('should preserve data integrity through JSON export → import', () => {
+    const deck = makeDeck()
+    const template = makeTemplate()
+    const cards = [
+      makeCard({ field_values: { front: 'hello', back: '안녕' }, tags: ['greetings', 'basic'] }),
+      makeCard({ id: 'card-2', field_values: { front: 'world', back: '세계' }, tags: [] }),
+    ]
+
+    const json = generateExportJSON(deck, template, cards)
+    const imported = parseImportJSON(json)
+
+    expect(imported.deckName).toBe('Test Deck')
+    expect(imported.cards).toHaveLength(2)
+    expect(imported.cards[0].field_values.front).toBe('hello')
+    expect(imported.cards[0].field_values.back).toBe('안녕')
+    expect(imported.cards[0].tags).toEqual(['greetings', 'basic'])
+    expect(imported.cards[1].field_values.front).toBe('world')
+    expect(imported.cards[1].tags).toEqual([])
+  })
+
+  it('should preserve data integrity through CSV export → import', () => {
+    const fields: TemplateField[] = [
+      { key: 'front', name: '앞면', type: 'text', order: 0 },
+      { key: 'back', name: '뒷면', type: 'text', order: 1 },
+    ]
+    const cards = [
+      makeCard({ field_values: { front: 'hello', back: '안녕' }, tags: ['a', 'b'] }),
+      makeCard({ id: 'card-2', field_values: { front: 'world', back: '세계' }, tags: [] }),
+    ]
+
+    const csv = generateExportCSV(cards, fields)
+    const fieldMapping: Record<string, string> = { '앞면': 'front', '뒷면': 'back' }
+    const imported = parseImportCSV(csv, fieldMapping)
+
+    expect(imported).toHaveLength(2)
+    expect(imported[0].field_values.front).toBe('hello')
+    expect(imported[0].field_values.back).toBe('안녕')
+    expect(imported[0].tags).toEqual(['a', 'b'])
+    expect(imported[1].field_values.front).toBe('world')
+    expect(imported[1].tags).toEqual([])
+  })
+})
+
+// --- Edge Case Tests ---
+
+describe('Edge cases', () => {
+  it('should handle special characters (comma, quote, newline) in CSV round-trip', () => {
+    const fields: TemplateField[] = [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+      { key: 'back', name: 'Back', type: 'text', order: 1 },
+    ]
+    const cards = [
+      makeCard({
+        field_values: { front: 'hello, world', back: 'say "hi"\nand wave' },
+        tags: [],
+      }),
+    ]
+
+    const csv = generateExportCSV(cards, fields)
+    const fieldMapping: Record<string, string> = { 'Front': 'front', 'Back': 'back' }
+    const imported = parseImportCSV(csv, fieldMapping)
+
+    expect(imported).toHaveLength(1)
+    expect(imported[0].field_values.front).toBe('hello, world')
+    expect(imported[0].field_values.back).toBe('say "hi"\nand wave')
+  })
+
+  it('should handle empty tags array', () => {
+    const fields: TemplateField[] = [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+    ]
+    const cards = [makeCard({ field_values: { front: 'test' }, tags: [] })]
+
+    const csv = generateExportCSV(cards, fields)
+    const fieldMapping: Record<string, string> = { 'Front': 'front' }
+    const imported = parseImportCSV(csv, fieldMapping)
+
+    expect(imported[0].tags).toEqual([])
+  })
+
+  it('should treat undefined/null field_values as empty strings in validation', () => {
+    const cards = [
+      { field_values: { front: undefined as unknown as string, back: 'hello' }, tags: [] },
+      { field_values: { front: null as unknown as string, back: null as unknown as string }, tags: [] },
+    ]
+
+    // Card with at least one truthy value should pass (back: 'hello')
+    const result = validateImportCards(cards)
+    expect(result.valid).toHaveLength(1)
+    expect(result.invalid).toHaveLength(1)
+  })
+
+  it('should handle very long strings (10000 chars)', () => {
+    const longString = 'a'.repeat(10000)
+    const fields: TemplateField[] = [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+    ]
+    const cards = [makeCard({ field_values: { front: longString }, tags: [] })]
+
+    const csv = generateExportCSV(cards, fields)
+    const fieldMapping: Record<string, string> = { 'Front': 'front' }
+    const imported = parseImportCSV(csv, fieldMapping)
+
+    expect(imported[0].field_values.front).toBe(longString)
   })
 })

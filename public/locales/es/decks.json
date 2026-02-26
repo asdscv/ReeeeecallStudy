@@ -26,6 +26,8 @@
     "selectedCount": "{{count}} seleccionadas",
     "noCards": "Sin tarjetas. Intenta añadir una tarjeta.",
     "addFirstCard": "+ Añadir primera tarjeta",
+    "importCards": "Importar CSV/JSON",
+    "downloadTemplate": "Plantilla CSV",
     "noSearchResults": "Sin resultados de búsqueda.",
     "columns": {
       "number": "#",

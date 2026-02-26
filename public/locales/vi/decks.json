@@ -26,6 +26,8 @@
     "selectedCount": "Đã chọn {{count}}",
     "noCards": "Không có thẻ. Hãy thử thêm thẻ.",
     "addFirstCard": "+ Thêm thẻ đầu tiên",
+    "importCards": "Nhập CSV/JSON",
+    "downloadTemplate": "Mẫu CSV",
     "noSearchResults": "Không có kết quả tìm kiếm.",
     "columns": {
       "number": "#",

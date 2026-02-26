@@ -87,7 +87,7 @@ export function MarketplacePage() {
                 <button
                   onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
                   disabled={safePage <= 1}
-                  className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                  className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -106,7 +106,7 @@ export function MarketplacePage() {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`w-9 h-9 text-sm rounded cursor-pointer ${
+                      className={`w-10 h-10 text-sm rounded cursor-pointer ${
                         safePage === page
                           ? 'bg-blue-600 text-white'
                           : 'hover:bg-gray-100 text-gray-700'
@@ -119,7 +119,7 @@ export function MarketplacePage() {
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
                   disabled={safePage >= totalPages}
-                  className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                  className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

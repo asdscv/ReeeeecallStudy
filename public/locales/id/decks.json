@@ -26,6 +26,8 @@
     "selectedCount": "{{count}} dipilih",
     "noCards": "Tidak ada kartu. Coba tambahkan kartu.",
     "addFirstCard": "+ Tambah Kartu Pertama",
+    "importCards": "Impor CSV/JSON",
+    "downloadTemplate": "Templat CSV",
     "noSearchResults": "Tidak ada hasil pencarian.",
     "columns": {
       "number": "#",

@@ -26,6 +26,8 @@
     "selectedCount": "已选 {{count}} 张",
     "noCards": "暂无卡片，试着添加一张吧。",
     "addFirstCard": "+ 添加第一张卡片",
+    "importCards": "导入 CSV/JSON",
+    "downloadTemplate": "CSV 模板",
     "noSearchResults": "没有搜索结果。",
     "columns": {
       "number": "#",

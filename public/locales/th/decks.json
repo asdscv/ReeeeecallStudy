@@ -26,6 +26,8 @@
     "selectedCount": "เลือก {{count}} รายการ",
     "noCards": "ไม่มีการ์ด ลองเพิ่มการ์ดดู",
     "addFirstCard": "+ เพิ่มการ์ดแรก",
+    "importCards": "นำเข้า CSV/JSON",
+    "downloadTemplate": "แม่แบบ CSV",
     "noSearchResults": "ไม่พบผลการค้นหา",
     "columns": {
       "number": "#",

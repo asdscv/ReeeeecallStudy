@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -17,6 +17,7 @@ import {
 } from '../../lib/import-export'
 import type { ImportCard } from '../../lib/import-export'
 import { decodeFileText } from '../../lib/decode-file'
+import { downloadFile } from '../../lib/download-file'
 import type { CardTemplate } from '../../types/database'
 import { ImportProgressBar } from './ImportProgressBar'
 import Papa from 'papaparse'
@@ -53,13 +54,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
   const downloadTemplate = useCallback(() => {
     if (!template) return
     const csv = generateCSVTemplate(template.fields)
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${template.name}_template.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadFile(csv, 'text/csv;charset=utf-8', `${template.name}_template.csv`)
   }, [template])
 
   const resetState = useCallback(() => {
@@ -74,10 +69,15 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
     setResult({ added: 0, skipped: 0, total: 0 })
     setError(null)
     setDragOver(false)
+    try { sessionStorage.removeItem('__import_csv_raw') } catch { /* private browsing */ }
   }, [])
 
+  // open → true 전환 시 상태 초기화 (close 시가 아님 → flash 방지)
+  useEffect(() => {
+    if (open) resetState()
+  }, [open, resetState])
+
   const handleClose = () => {
-    resetState()
     onClose()
   }
 
@@ -116,7 +116,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         setFieldMapping(autoMapping)
 
         // Store raw text for later parsing
-        sessionStorage.setItem('__import_csv_raw', text)
+        try { sessionStorage.setItem('__import_csv_raw', text) } catch { /* private browsing */ }
         setStep('mapping')
       } else {
         setError(t('unsupportedFormat'))
@@ -139,7 +139,8 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
   }
 
   const handleMappingConfirm = () => {
-    const raw = sessionStorage.getItem('__import_csv_raw')
+    let raw: string | null = null
+    try { raw = sessionStorage.getItem('__import_csv_raw') } catch { /* private browsing */ }
     if (!raw) return
 
     try {
@@ -151,7 +152,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
       setInvalidCount(invalid.length)
       setDuplicateCount(duplicates.length)
       setStep('preview')
-      sessionStorage.removeItem('__import_csv_raw')
+      try { sessionStorage.removeItem('__import_csv_raw') } catch { /* private browsing */ }
     } catch (e) {
       setError(e instanceof Error ? e.message : t('csvParseFailed'))
     }
@@ -192,8 +193,11 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
   const templateFields = template?.fields ?? []
   const previewCards = parsedCards.slice(0, 5)
 
+  // importing 중에는 닫기 방지
+  const canClose = step !== 'importing'
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose() }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v && canClose) handleClose() }}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t('importCards')}</DialogTitle>
@@ -208,7 +212,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {/* Step: Upload */}
         {step === 'upload' && (
           <div
-            className={`border-2 border-dashed rounded-xl p-10 text-center transition ${
+            className={`border-2 border-dashed rounded-xl p-6 sm:p-10 text-center transition ${
               dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
             }`}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
@@ -227,7 +231,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             {template && (
               <button
                 onClick={downloadTemplate}
-                className="mt-2 text-blue-600 text-xs underline cursor-pointer"
+                className="mt-2 px-3 py-1.5 text-blue-600 text-xs underline cursor-pointer"
               >
                 {t('downloadTemplate')}
               </button>
@@ -253,7 +257,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                 .filter((h) => h !== 'Tags' && h !== '태그')
                 .map((header) => (
                   <div key={header} className="flex items-center gap-3">
-                    <span className="w-32 text-sm text-gray-700 truncate">{header}</span>
+                    <span className="shrink-0 w-24 sm:w-32 text-sm text-gray-700 truncate">{header}</span>
                     <span className="text-gray-400">→</span>
                     <select
                       value={fieldMapping[header] ?? ''}
@@ -294,7 +298,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {step === 'preview' && (
           <div className="space-y-4">
             {/* Stats */}
-            <div className="flex items-center gap-3 text-sm">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
               <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
                 {t('validCount', { count: parsedCards.length })}
               </span>
@@ -349,7 +353,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             {duplicateCount > 0 && (
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">{t('duplicateHandling')}</p>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {([
                     ['skip', 'skip'],
                     ['overwrite', 'overwrite'],

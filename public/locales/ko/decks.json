@@ -26,6 +26,8 @@
     "selectedCount": "{{count}}\uac1c \uc120\ud0dd",
     "noCards": "\uce74\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. \uce74\ub4dc\ub97c \ucd94\uac00\ud574\ubcf4\uc138\uc694.",
     "addFirstCard": "+ \uccab \ubc88\uc9f8 \uce74\ub4dc \ucd94\uac00",
+    "importCards": "CSV/JSON \uac00\uc838\uc624\uae30",
+    "downloadTemplate": "CSV \uc591\uc2dd \ub2e4\uc6b4\ub85c\ub4dc",
     "noSearchResults": "\uac80\uc0c9 \uacb0\uacfc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
     "columns": {
       "number": "#",

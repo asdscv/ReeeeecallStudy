@@ -8,7 +8,7 @@ export function ImportProgressBar({ done, total, label }: ImportProgressBarProps
   const pct = total > 0 ? Math.round((done / total) * 100) : 0
 
   return (
-    <div className="py-10 px-4 space-y-6" data-testid="import-progress">
+    <div className="py-6 sm:py-10 px-4 space-y-6" data-testid="import-progress">
       {/* Spinner with percentage */}
       <div className="text-center space-y-2">
         <div className="relative inline-flex items-center justify-center">

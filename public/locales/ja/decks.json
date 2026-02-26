@@ -26,6 +26,8 @@
     "selectedCount": "{{count}}件選択中",
     "noCards": "カードがありません。カードを追加してみましょう。",
     "addFirstCard": "+ 最初のカードを追加",
+    "importCards": "CSV/JSONインポート",
+    "downloadTemplate": "CSVテンプレート",
     "noSearchResults": "検索結果がありません。",
     "columns": {
       "number": "#",

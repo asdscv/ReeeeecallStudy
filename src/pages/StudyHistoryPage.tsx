@@ -369,7 +369,7 @@ export function StudyHistoryPage() {
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage <= 1}
-                    className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -388,7 +388,7 @@ export function StudyHistoryPage() {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`w-9 h-9 text-sm rounded cursor-pointer ${
+                        className={`w-10 h-10 text-sm rounded cursor-pointer ${
                           currentPage === page
                             ? 'bg-blue-600 text-white'
                             : 'hover:bg-gray-100 text-gray-700'
@@ -401,7 +401,7 @@ export function StudyHistoryPage() {
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage >= totalPages}
-                    className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>

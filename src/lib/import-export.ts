@@ -207,7 +207,7 @@ export function validateImportCards(cards: ImportCard[]): ValidationResult {
   const invalid: ImportCard[] = []
 
   for (const card of cards) {
-    const hasValue = Object.values(card.field_values).some((v) => v.trim() !== '')
+    const hasValue = Object.values(card.field_values).some((v) => v != null && v.trim() !== '')
     if (hasValue) {
       valid.push(card)
     } else {

@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { isPast, formatLocalDate } from '../lib/date-utils'
+import { getPageSelectAllState, togglePageSelectAll } from '../lib/card-selection'
 import { useCardStore } from '../stores/card-store'
 import { CardFormModal } from '../components/card/CardFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
@@ -56,12 +57,49 @@ export function DeckDetailPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [cardsPerPage, setCardsPerPage] = useState(20)
 
+  // Refs (Rules of Hooks: must be before any early return)
+  const selectAllRef = useRef<HTMLInputElement>(null)
+  const selectAllMobileRef = useRef<HTMLInputElement>(null)
+
+  // --- Derived values (safe even when loading — cards defaults to []) ---
+  const newCount = cards.filter((c) => c.srs_status === 'new').length
+  const reviewCount = cards.filter(
+    (c) => c.srs_status === 'review' && c.next_review_at && isPast(c.next_review_at)
+  ).length
+  const learningCount = cards.filter(
+    (c) => c.srs_status === 'learning' && c.next_review_at && isPast(c.next_review_at)
+  ).length
+  const displayFields = template?.fields ?? []
+
+  const filteredCards = cards.filter((card) => {
+    if (statusFilter !== 'all' && card.srs_status !== statusFilter) return false
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      const matchesField = Object.values(card.field_values).some((v) =>
+        v.toLowerCase().includes(q)
+      )
+      const matchesTag = card.tags.some((t) => t.toLowerCase().includes(q))
+      if (!matchesField && !matchesTag) return false
+    }
+    return true
+  })
+
+  const totalPages = Math.ceil(filteredCards.length / cardsPerPage)
+  const safePage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1
+  const startIdx = (safePage - 1) * cardsPerPage
+  const endIdx = startIdx + cardsPerPage
+  const paginatedCards = filteredCards.slice(startIdx, endIdx)
+
+  const pageCardIds = paginatedCards.map((c) => c.id)
+  const selectAllState = getPageSelectAllState(selectedIds, pageCardIds)
+  const validCardIdSet = new Set(cards.map((c) => c.id))
+  const validSelectedCount = Array.from(selectedIds).filter((id) => validCardIdSet.has(id)).length
+
+  // --- All useEffects (must be before early returns) ---
   useEffect(() => {
     if (!deckId) return
-
     const fetchData = async () => {
       setLoading(true)
-
       const { data: deckData } = await supabase
         .from('decks')
         .select('*')
@@ -87,10 +125,27 @@ export function DeckDetailPage() {
       await fetchCards(deckId)
       setLoading(false)
     }
-
     fetchData()
   }, [deckId, navigate, fetchCards])
 
+  // 삭제 후 currentPage가 totalPages를 초과할 때 자동 보정
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [totalPages, currentPage])
+
+  // indeterminate 체크박스 DOM 동기화
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = selectAllState === 'some'
+    }
+    if (selectAllMobileRef.current) {
+      selectAllMobileRef.current.indeterminate = selectAllState === 'some'
+    }
+  }, [selectAllState])
+
+  // --- Early returns (all hooks above, safe) ---
   if (loading || cardsLoading) {
     return (
       <div className="flex justify-center py-20">
@@ -101,39 +156,7 @@ export function DeckDetailPage() {
 
   if (!deck) return null
 
-  // Stats
-  const newCount = cards.filter((c) => c.srs_status === 'new').length
-  const reviewCount = cards.filter(
-    (c) => c.srs_status === 'review' && c.next_review_at && isPast(c.next_review_at)
-  ).length
-  const learningCount = cards.filter(
-    (c) => c.srs_status === 'learning' && c.next_review_at && isPast(c.next_review_at)
-  ).length
-
-  // Template fields for table headers
-  const displayFields = template?.fields ?? []
-
-  // Filtered cards
-  const filteredCards = cards.filter((card) => {
-    if (statusFilter !== 'all' && card.srs_status !== statusFilter) return false
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      const matchesField = Object.values(card.field_values).some((v) =>
-        v.toLowerCase().includes(q)
-      )
-      const matchesTag = card.tags.some((t) => t.toLowerCase().includes(q))
-      if (!matchesField && !matchesTag) return false
-    }
-    return true
-  })
-
-  // Pagination
-  const totalPages = Math.ceil(filteredCards.length / cardsPerPage)
-  const startIdx = (currentPage - 1) * cardsPerPage
-  const endIdx = startIdx + cardsPerPage
-  const paginatedCards = filteredCards.slice(startIdx, endIdx)
-
-  // Selection handlers
+  // --- Event handlers (not hooks) ---
   const toggleSelect = (id: string) => {
     const next = new Set(selectedIds)
     if (next.has(id)) next.delete(id)
@@ -142,11 +165,7 @@ export function DeckDetailPage() {
   }
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === filteredCards.length) {
-      setSelectedIds(new Set())
-    } else {
-      setSelectedIds(new Set(filteredCards.map((c) => c.id)))
-    }
+    setSelectedIds(togglePageSelectAll(selectedIds, pageCardIds))
   }
 
   const handleDeleteCard = async () => {
@@ -154,6 +173,13 @@ export function DeckDetailPage() {
     setDeleteLoading(true)
     const { deleteCard } = useCardStore.getState()
     await deleteCard(deletingCard.id)
+    // 삭제된 카드를 selectedIds에서도 제거
+    setSelectedIds((prev) => {
+      if (!prev.has(deletingCard.id)) return prev
+      const next = new Set(prev)
+      next.delete(deletingCard.id)
+      return next
+    })
     setDeleteLoading(false)
     setDeletingCard(null)
   }
@@ -161,7 +187,11 @@ export function DeckDetailPage() {
   const handleBulkDelete = async () => {
     setDeleteLoading(true)
     const { deleteCards } = useCardStore.getState()
-    await deleteCards(Array.from(selectedIds))
+    // validCardIdSet은 상위 스코프에서 계산됨 — stale ID 방어
+    const idsToDelete = Array.from(selectedIds).filter((id) => validCardIdSet.has(id))
+    if (idsToDelete.length > 0) {
+      await deleteCards(idsToDelete)
+    }
     setDeleteLoading(false)
     setShowBulkDelete(false)
     setSelectedIds(new Set())
@@ -249,23 +279,26 @@ export function DeckDetailPage() {
           {!deck.is_readonly && (
             <button
               onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-              className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
             >
+              <Plus className="w-4 h-4" />
               {t('decks:detail.addCard')}
             </button>
           )}
           {!deck.is_readonly && (
             <button
               onClick={() => setShowImport(true)}
-              className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
             >
+              <Upload className="w-4 h-4" />
               {t('decks:detail.import')}
             </button>
           )}
           <button
             onClick={() => setShowExport(true)}
-            className="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
           >
+            <Download className="w-4 h-4" />
             {t('decks:detail.export')}
           </button>
         </div>
@@ -296,14 +329,14 @@ export function DeckDetailPage() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); setSelectedIds(new Set()) }}
               placeholder={t('decks:detail.searchPlaceholder')}
-              className="flex-1 px-3 sm:px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
+              className="flex-1 px-3 sm:px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
             />
             <select
               value={statusFilter}
-              onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}
-              className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
+              onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); setSelectedIds(new Set()) }}
+              className="px-3 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
             >
               <option value="all">{t('decks:detail.allStatus')}</option>
               <option value="new">{t('common:status.new')}</option>
@@ -311,23 +344,36 @@ export function DeckDetailPage() {
               <option value="review">{t('common:status.review')}</option>
               <option value="suspended">{t('common:status.suspended')}</option>
             </select>
+            <select
+              value={cardsPerPage}
+              onChange={(e) => {
+                setCardsPerPage(Number(e.target.value))
+                setCurrentPage(1)
+                setSelectedIds(new Set())
+              }}
+              className="px-3 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
+            >
+              {[10, 20, 30, 50, 100].map((n) => (
+                <option key={n} value={n}>{t('decks:detail.perPage', { count: n })}</option>
+              ))}
+            </select>
           </div>
 
           {/* Bulk action bar */}
-          {selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 sm:gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
+          {validSelectedCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
               <span className="text-sm text-blue-700 font-medium">
-                {t('decks:detail.selectedCount', { count: selectedIds.size })}
+                {t('decks:detail.selectedCount', { count: validSelectedCount })}
               </span>
               <button
                 onClick={() => setShowBulkDelete(true)}
-                className="px-3 py-1 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer"
+                className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer"
               >
                 {t('common:delete')}
               </button>
               <button
                 onClick={() => setSelectedIds(new Set())}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+                className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
               >
                 {t('common:deselect')}
               </button>
@@ -339,12 +385,30 @@ export function DeckDetailPage() {
             <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
               <div className="text-4xl sm:text-5xl mb-4">🃏</div>
               <p className="text-gray-500 mb-4">{t('decks:detail.noCards')}</p>
-              <button
-                onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
-              >
-                {t('decks:detail.addFirstCard')}
-              </button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+                <button
+                  onClick={() => { setEditingCard(null); setShowCardForm(true) }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+                >
+                  {t('decks:detail.addFirstCard')}
+                </button>
+                {!deck.is_readonly && (
+                  <button
+                    onClick={() => setShowImport(true)}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {t('decks:detail.importCards')}
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowExport(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  {t('decks:detail.downloadTemplate')}
+                </button>
+              </div>
             </div>
           ) : filteredCards.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
@@ -359,8 +423,9 @@ export function DeckDetailPage() {
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <th className="px-4 py-3 w-10">
                         <input
+                          ref={selectAllRef}
                           type="checkbox"
-                          checked={selectedIds.size === filteredCards.length && filteredCards.length > 0}
+                          checked={selectAllState === 'all'}
                           onChange={toggleSelectAll}
                           className="cursor-pointer"
                         />
@@ -444,14 +509,15 @@ export function DeckDetailPage() {
               {/* Mobile card view (hidden on desktop) */}
               <div className="md:hidden space-y-2">
                 {/* Select all */}
-                <div className="flex items-center gap-2 px-1 mb-2">
+                <div className="flex items-center gap-2 px-3 mb-2">
                   <input
+                    ref={selectAllMobileRef}
                     type="checkbox"
-                    checked={selectedIds.size === filteredCards.length && filteredCards.length > 0}
+                    checked={selectAllState === 'all'}
                     onChange={toggleSelectAll}
                     className="cursor-pointer"
                   />
-                  <span className="text-xs text-gray-500">{t('common:selectAll')}</span>
+                  <span className="text-xs text-gray-500">{t('common:selectAllPage')}</span>
                 </div>
                 {paginatedCards.map((card, i) => (
                   <div
@@ -483,16 +549,16 @@ export function DeckDetailPage() {
                           {formatLocalDate(card.created_at, dateLocale)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-0.5 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => handleEditCard(card)}
-                          className="p-2 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
+                          className="p-3 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeletingCard(card)}
-                          className="p-2 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+                          className="p-3 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -505,28 +571,14 @@ export function DeckDetailPage() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-3 bg-white rounded-xl border border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm text-gray-500">
-                      {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / {t('decks:detail.totalCards', { count: filteredCards.length })}
-                    </span>
-                    <select
-                      value={cardsPerPage}
-                      onChange={(e) => {
-                        setCardsPerPage(Number(e.target.value))
-                        setCurrentPage(1)
-                      }}
-                      className="text-sm border border-gray-300 rounded px-2 py-1 outline-none"
-                    >
-                      {[10, 20, 30, 50, 100].map((n) => (
-                        <option key={n} value={n}>{t('decks:detail.perPage', { count: n })}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <span className="text-xs sm:text-sm text-gray-500">
+                    {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / {t('decks:detail.totalCards', { count: filteredCards.length })}
+                  </span>
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage <= 1}
-                      className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
+                      disabled={safePage <= 1}
+                      className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -534,19 +586,19 @@ export function DeckDetailPage() {
                       let page: number
                       if (totalPages <= 5) {
                         page = i + 1
-                      } else if (currentPage <= 3) {
+                      } else if (safePage <= 3) {
                         page = i + 1
-                      } else if (currentPage >= totalPages - 2) {
+                      } else if (safePage >= totalPages - 2) {
                         page = totalPages - 4 + i
                       } else {
-                        page = currentPage - 2 + i
+                        page = safePage - 2 + i
                       }
                       return (
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`w-9 h-9 text-sm rounded cursor-pointer ${
-                            currentPage === page
+                          className={`w-10 h-10 text-sm rounded cursor-pointer ${
+                            safePage === page
                               ? 'bg-blue-600 text-white'
                               : 'hover:bg-gray-100 text-gray-700'
                           }`}
@@ -556,9 +608,9 @@ export function DeckDetailPage() {
                       )
                     })}
                     <button
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage >= totalPages}
-                      className="p-2 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+                      disabled={safePage >= totalPages}
+                      className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -631,7 +683,7 @@ export function DeckDetailPage() {
         onClose={() => setShowBulkDelete(false)}
         onConfirm={handleBulkDelete}
         title={t('decks:detail.bulkDelete')}
-        message={t('decks:detail.bulkDeleteConfirm', { count: selectedIds.size })}
+        message={t('decks:detail.bulkDeleteConfirm', { count: validSelectedCount })}
         confirmLabel={t('common:delete')}
         danger
         loading={deleteLoading}
