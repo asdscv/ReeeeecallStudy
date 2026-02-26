@@ -354,6 +354,22 @@ describe('generateTemplateExportJSON', () => {
     expect(parsed.template.front_layout).toBeDefined()
     expect(parsed.template.back_layout).toBeDefined()
   })
+
+  it('should NOT contain cards property', () => {
+    const template = makeTemplate()
+    const json = generateTemplateExportJSON(template)
+    const parsed = JSON.parse(json)
+
+    expect(parsed).not.toHaveProperty('cards')
+  })
+
+  it('should return empty fields array when template has no fields', () => {
+    const template = makeTemplate({ fields: [] })
+    const json = generateTemplateExportJSON(template)
+    const parsed = JSON.parse(json)
+
+    expect(parsed.template.fields).toEqual([])
+  })
 })
 
 describe('generateTemplateExportCSV', () => {
@@ -378,6 +394,33 @@ describe('generateTemplateExportCSV', () => {
     expect(parsed.data).toHaveLength(2)
     expect((parsed.data[0] as Record<string, string>).key).toBe('front')
     expect((parsed.data[1] as Record<string, string>).key).toBe('back')
+  })
+
+  it('should have correct tts_enabled/tts_lang values', () => {
+    const template = makeTemplate({
+      fields: [
+        { key: 'word', name: 'Word', type: 'text', order: 0, tts_enabled: true, tts_lang: 'en-US' },
+        { key: 'meaning', name: 'Meaning', type: 'text', order: 1, tts_enabled: false, tts_lang: 'ko-KR' },
+      ] as TemplateField[],
+    })
+    const csv = generateTemplateExportCSV(template)
+    const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true })
+
+    const row0 = parsed.data[0] as Record<string, string>
+    const row1 = parsed.data[1] as Record<string, string>
+    expect(row0.tts_enabled).toBe('true')
+    expect(row0.tts_lang).toBe('en-US')
+    expect(row1.tts_enabled).toBe('false')
+    expect(row1.tts_lang).toBe('ko-KR')
+  })
+
+  it('should generate header-only CSV when fields array is empty', () => {
+    const template = makeTemplate({ fields: [] })
+    const csv = generateTemplateExportCSV(template)
+    const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true })
+
+    expect(parsed.meta.fields).toEqual(['key', 'name', 'type', 'order', 'tts_enabled', 'tts_lang'])
+    expect(parsed.data).toHaveLength(0)
   })
 })
 

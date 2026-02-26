@@ -1,4 +1,11 @@
 {
+  "exportTitle": "Xuất",
+  "modeCards": "Dữ liệu thẻ",
+  "modeTemplate": "Mẫu",
+  "templateJsonDesc": "Xuất cấu trúc mẫu (trường, bố cục). Có thể áp dụng cho bộ thẻ khác.",
+  "templateCsvDesc": "Xuất lược đồ trường dưới dạng CSV. Bao gồm khóa/tên/loại.",
+  "templateExportInfo": "Chỉ xuất cấu trúc mẫu, không bao gồm dữ liệu thẻ.",
+  "noCardsForCardExport": "Không có thẻ để xuất. Hãy sử dụng xuất mẫu thay thế.",
   "exportCards": "Xuất thẻ",
   "noTemplate": "Không thể xuất khi chưa có mẫu.",
   "noCards": "Không có thẻ để xuất.",

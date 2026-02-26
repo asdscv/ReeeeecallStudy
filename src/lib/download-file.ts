@@ -11,6 +11,9 @@ export function downloadFile(content: string, mimeType: string, fileName: string
   a.download = fileName
   document.body.appendChild(a)
   a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  // Defer cleanup so the browser can finish initiating the download (Firefox, large files)
+  setTimeout(() => {
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, 100)
 }

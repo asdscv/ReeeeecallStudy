@@ -1,4 +1,11 @@
 {
+  "exportTitle": "Export",
+  "modeCards": "Card Data",
+  "modeTemplate": "Template",
+  "templateJsonDesc": "Export template structure (fields, layout). Applicable to other decks.",
+  "templateCsvDesc": "Export field schema as CSV. Includes key/name/type.",
+  "templateExportInfo": "Exports only the template structure, without card data.",
+  "noCardsForCardExport": "No cards to export. Use template export instead.",
   "exportCards": "Export Cards",
   "noTemplate": "Cannot export without a template.",
   "noCards": "No cards to export.",

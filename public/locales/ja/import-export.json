@@ -1,4 +1,11 @@
 {
+  "exportTitle": "エクスポート",
+  "modeCards": "カードデータ",
+  "modeTemplate": "テンプレート",
+  "templateJsonDesc": "テンプレート構造（フィールド、レイアウト）をエクスポート。他のデッキにも適用可能。",
+  "templateCsvDesc": "フィールドスキーマをCSVでエクスポート。キー/名前/タイプを含みます。",
+  "templateExportInfo": "カードデータなしでテンプレート構造のみエクスポートします。",
+  "noCardsForCardExport": "エクスポートするカードがありません。テンプレートエクスポートをご利用ください。",
   "exportCards": "カードをエクスポート",
   "noTemplate": "テンプレートなしではエクスポートできません。",
   "noCards": "エクスポートするカードがありません。",

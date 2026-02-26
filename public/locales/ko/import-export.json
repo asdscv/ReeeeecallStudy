@@ -1,4 +1,11 @@
 {
+  "exportTitle": "내보내기",
+  "modeCards": "카드 내보내기",
+  "modeTemplate": "양식 내보내기",
+  "templateJsonDesc": "템플릿 구조(필드, 레이아웃) 내보내기. 다른 덱에 적용 가능.",
+  "templateCsvDesc": "필드 스키마를 CSV로 내보내기. 키/이름/타입 포함.",
+  "templateExportInfo": "카드 데이터 없이 템플릿 구조만 내보냅니다.",
+  "noCardsForCardExport": "내보낼 카드가 없습니다. 양식 내보내기를 이용해주세요.",
   "exportCards": "카드 내보내기",
   "noTemplate": "템플릿이 없어 내보내기할 수 없습니다.",
   "noCards": "내보낼 카드가 없습니다.",

@@ -58,17 +58,26 @@ describe('downloadFile', () => {
   })
 
   it('should call revokeObjectURL for cleanup', () => {
+    vi.useFakeTimers()
     downloadFile('content', 'text/plain', 'file.txt')
 
+    // cleanup is deferred via setTimeout
+    vi.advanceTimersByTime(100)
     expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
+    vi.useRealTimers()
   })
 
   it('should create anchor element, click it, and remove it', () => {
+    vi.useFakeTimers()
     downloadFile('data', 'text/plain', 'output.txt')
 
     expect(appendChildSpy).toHaveBeenCalledTimes(1)
     expect(clickSpy).toHaveBeenCalledTimes(1)
+
+    // removeChild is deferred via setTimeout
+    vi.advanceTimersByTime(100)
     expect(removeChildSpy).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
   })
 
   it('should set href to blob URL and download to filename', () => {

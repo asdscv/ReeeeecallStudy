@@ -1,4 +1,11 @@
 {
+  "exportTitle": "导出",
+  "modeCards": "卡片数据",
+  "modeTemplate": "模板",
+  "templateJsonDesc": "导出模板结构（字段、布局）。可应用于其他牌组。",
+  "templateCsvDesc": "将字段架构导出为 CSV。包含键/名称/类型。",
+  "templateExportInfo": "仅导出模板结构，不包含卡片数据。",
+  "noCardsForCardExport": "没有可导出的卡片。请使用模板导出。",
   "exportCards": "导出卡片",
   "noTemplate": "没有模板无法导出。",
   "noCards": "没有可导出的卡片。",

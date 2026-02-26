@@ -1,4 +1,11 @@
 {
+  "exportTitle": "Ekspor",
+  "modeCards": "Data Kartu",
+  "modeTemplate": "Templat",
+  "templateJsonDesc": "Ekspor struktur templat (bidang, tata letak). Dapat diterapkan ke dek lain.",
+  "templateCsvDesc": "Ekspor skema bidang sebagai CSV. Termasuk kunci/nama/tipe.",
+  "templateExportInfo": "Hanya mengekspor struktur templat, tanpa data kartu.",
+  "noCardsForCardExport": "Tidak ada kartu untuk diekspor. Gunakan ekspor templat.",
   "exportCards": "Ekspor Kartu",
   "noTemplate": "Tidak dapat mengekspor tanpa templat.",
   "noCards": "Tidak ada kartu untuk diekspor.",

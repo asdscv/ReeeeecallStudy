@@ -1,4 +1,11 @@
 {
+  "exportTitle": "Exportar",
+  "modeCards": "Datos de tarjetas",
+  "modeTemplate": "Plantilla",
+  "templateJsonDesc": "Exportar estructura de plantilla (campos, diseño). Aplicable a otros mazos.",
+  "templateCsvDesc": "Exportar esquema de campos como CSV. Incluye clave/nombre/tipo.",
+  "templateExportInfo": "Exporta solo la estructura de la plantilla, sin datos de tarjetas.",
+  "noCardsForCardExport": "No hay tarjetas para exportar. Use la exportación de plantilla.",
   "exportCards": "Exportar tarjetas",
   "noTemplate": "No se puede exportar sin una plantilla.",
   "noCards": "No hay tarjetas para exportar.",
