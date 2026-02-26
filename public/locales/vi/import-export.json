@@ -19,6 +19,8 @@
   "exportTemplate": "Tải mẫu",
   "cancel": "Hủy",
   "export": "Xuất",
+  "exporting": "Đang xuất...",
+  "exportFailed": "Tải xuống thất bại. Vui lòng thử lại.",
   "exportComplete": "Xuất hoàn tất",
   "exportFileSaved": "{{fileName}} đã được lưu.",
 

@@ -19,6 +19,8 @@
   "exportTemplate": "Unduh Templat",
   "cancel": "Batal",
   "export": "Ekspor",
+  "exporting": "Mengekspor...",
+  "exportFailed": "Unduhan gagal. Silakan coba lagi.",
   "exportComplete": "Ekspor selesai",
   "exportFileSaved": "{{fileName}} telah disimpan.",
 

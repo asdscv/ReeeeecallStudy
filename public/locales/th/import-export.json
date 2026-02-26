@@ -19,6 +19,8 @@
   "exportTemplate": "ดาวน์โหลดแม่แบบ",
   "cancel": "ยกเลิก",
   "export": "ส่งออก",
+  "exporting": "กำลังส่งออก...",
+  "exportFailed": "ดาวน์โหลดล้มเหลว กรุณาลองอีกครั้ง",
   "exportComplete": "ส่งออกเสร็จสิ้น",
   "exportFileSaved": "{{fileName}} ถูกบันทึกแล้ว",
 

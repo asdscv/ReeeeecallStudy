@@ -19,6 +19,8 @@
   "exportTemplate": "テンプレートをダウンロード",
   "cancel": "キャンセル",
   "export": "エクスポート",
+  "exporting": "エクスポート中...",
+  "exportFailed": "ダウンロードに失敗しました。もう一度お試しください。",
   "exportComplete": "エクスポート完了",
   "exportFileSaved": "{{fileName}}が保存されました。",
 

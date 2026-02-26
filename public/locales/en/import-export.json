@@ -19,6 +19,8 @@
   "exportTemplate": "Download Template",
   "cancel": "Cancel",
   "export": "Export",
+  "exporting": "Exporting...",
+  "exportFailed": "Download failed. Please try again.",
   "exportComplete": "Export Complete",
   "exportFileSaved": "{{fileName}} has been saved.",
 

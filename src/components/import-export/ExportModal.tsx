@@ -43,6 +43,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
   const [step, setStep] = useState<ExportStep>('select')
   const [exportedFileName, setExportedFileName] = useState('')
   const [isExporting, setIsExporting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const resetState = useCallback(() => {
     setMode(hasCards ? 'cards' : 'template')
@@ -50,6 +51,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
     setStep('select')
     setExportedFileName('')
     setIsExporting(false)
+    setError(null)
   }, [hasCards])
 
   useEffect(() => {
@@ -59,6 +61,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
   const handleExport = () => {
     if (isExporting || !template) return
     setIsExporting(true)
+    setError(null)
 
     let content: string
     let mimeType: string
@@ -93,10 +96,12 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
     try {
       downloadFile(content, mimeType, fileName)
     } catch {
+      setError(t('exportFailed'))
       setIsExporting(false)
       return
     }
 
+    setIsExporting(false)
     setExportedFileName(fileName)
     setStep('done')
   }
@@ -116,7 +121,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
         {/* Step: Done */}
         {step === 'done' && (
           <div className="text-center py-6 space-y-3">
-            <div className="text-4xl">✅</div>
+            <div className="text-4xl" aria-hidden="true">✅</div>
             <p className="text-gray-900 font-medium">{t('exportComplete')}</p>
             <p className="text-sm text-gray-500">
               {t('exportFileSaved', { fileName: exportedFileName })}
@@ -147,7 +152,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                       role="tab"
                       aria-selected={mode === tab.id}
                       data-testid={`export-tab-${tab.id}`}
-                      onClick={() => { setMode(tab.id); setFormat('csv') }}
+                      onClick={() => { setMode(tab.id); setFormat('csv'); setError(null) }}
                       className={`px-4 py-2.5 text-sm font-medium border-b-2 cursor-pointer transition min-h-[44px] ${
                         mode === tab.id
                           ? 'border-blue-600 text-blue-600'
@@ -255,6 +260,12 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                   </div>
                 )}
 
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                    {error}
+                  </div>
+                )}
+
                 <DialogFooter>
                   <button
                     type="button"
@@ -270,7 +281,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                     disabled={(mode === 'cards' && !hasCards) || isExporting}
                     className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px]"
                   >
-                    {t('export')}
+                    {isExporting ? t('exporting') : t('export')}
                   </button>
                 </DialogFooter>
               </div>

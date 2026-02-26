@@ -19,6 +19,8 @@
   "exportTemplate": "Descargar plantilla",
   "cancel": "Cancelar",
   "export": "Exportar",
+  "exporting": "Exportando...",
+  "exportFailed": "La descarga falló. Inténtelo de nuevo.",
   "exportComplete": "Exportacion completada",
   "exportFileSaved": "{{fileName}} se ha guardado.",
   "unsupportedFormat": "Solo se admiten archivos JSON o CSV.",

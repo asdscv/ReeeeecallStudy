@@ -19,6 +19,8 @@
   "exportTemplate": "下载模板",
   "cancel": "取消",
   "export": "导出",
+  "exporting": "导出中...",
+  "exportFailed": "下载失败，请重试。",
   "exportComplete": "导出完成",
   "exportFileSaved": "{{fileName}} 已保存。",
 
