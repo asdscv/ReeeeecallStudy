@@ -36,15 +36,15 @@
       "items": {
         "what": {
           "title": "Que es la API?",
-          "body": "La API de ReeeeecallStudy es una API RESTful que te permite ver y gestionar mazos, tarjetas, historial de estudio y mas mediante solicitudes HTTP. Usala para scripts de automatizacion, integracion con aplicaciones de terceros y analisis de datos."
+          "body": "La API de ReeeeecallStudy es una API RESTful que te permite ver y gestionar mazos, tarjetas, plantillas y mas mediante solicitudes HTTP. Usala para scripts de automatizacion, integracion con aplicaciones de terceros y analisis de datos."
         },
         "baseUrl": {
           "title": "URL base",
-          "body": "Todas las solicitudes a la API se basan en la URL del proyecto de Supabase.\n\nURL base: https://your-project.supabase.co/rest/v1"
+          "body": "La URL base para todas las solicitudes a la API.\n\nURL base: https://reeeeecallstudy.xyz/api/v1"
         },
         "responseFormat": {
           "title": "Formato de respuesta",
-          "body": "Todas las respuestas estan en formato JSON con Content-Type: application/json.\n\nEn caso de exito, se devuelven los datos del recurso. En caso de error, las respuestas siguen el formato { \"error\": \"message\" }."
+          "body": "Todas las respuestas estan en formato JSON con Content-Type: application/json.\n\nEn caso de exito, los recursos se devuelven en formato { \"data\": ... }.\nEn caso de error, las respuestas siguen el formato { \"error\": { \"code\": \"...\", \"message\": \"...\" } }."
         }
       }
     },
@@ -84,6 +84,16 @@
         }
       }
     },
+    "profile": {
+      "title": "API de perfil",
+      "description": "Recupera la informacion de perfil del usuario actual.",
+      "endpoints": {
+        "me": {
+          "summary": "Obtener mi perfil",
+          "description": "Recupera el perfil del propietario de la clave de API actual. Crea el perfil automaticamente si no existe."
+        }
+      }
+    },
     "decks": {
       "title": "API de mazos",
       "description": "Ver y gestionar mazos (colecciones de tarjetas).",
@@ -94,7 +104,7 @@
         },
         "detail": {
           "summary": "Obtener detalles del mazo",
-          "description": "Recupera informacion detallada de un mazo especifico."
+          "description": "Recupera informacion detallada y estadisticas de tarjetas (total/nuevas/pendientes) de un mazo especifico."
         },
         "create": {
           "summary": "Crear mazo",
@@ -109,59 +119,33 @@
     },
     "cards": {
       "title": "API de tarjetas",
-      "description": "Ver, crear y modificar tarjetas.",
+      "description": "Ver, crear y eliminar tarjetas.",
       "endpoints": {
         "list": {
           "summary": "Listar tarjetas",
-          "description": "Recupera las tarjetas de un mazo especifico."
+          "description": "Recupera las tarjetas de un mazo especifico con paginacion."
         },
         "create": {
           "summary": "Crear tarjeta",
           "description": "Agrega una nueva tarjeta a un mazo. Creacion individual o masiva de hasta 100."
         },
-        "update": {
-          "summary": "Actualizar tarjeta",
-          "description": "Modifica los valores de campo o las etiquetas de una tarjeta existente."
+        "detail": {
+          "summary": "Obtener detalles de la tarjeta",
+          "description": "Recupera informacion detallada de una tarjeta especifica por ID de tarjeta."
         },
         "delete": {
           "summary": "Eliminar tarjeta",
-          "description": "Elimina una tarjeta especifica. Esta accion no se puede deshacer."
+          "description": "Elimina una tarjeta especifica por ID de tarjeta. Esta accion no se puede deshacer."
         }
       },
       "params": {
         "deckId": "ID del mazo",
-        "cardId": "ID de la tarjeta",
-        "status": "Filtro de estado SRS (new, learning, review, suspended)",
-        "tag": "Filtro de etiqueta"
-      }
-    },
-    "study": {
-      "title": "API de estudio",
-      "description": "Ver el historial de estudio y gestionar datos de sesion.",
-      "endpoints": {
-        "due": {
-          "summary": "Obtener tarjetas pendientes",
-          "description": "Recupera las tarjetas pendientes de repaso para hoy."
-        },
-        "history": {
-          "summary": "Historial de estudio",
-          "description": "Recupera los registros de sesiones de estudio."
-        },
-        "stats": {
-          "summary": "Estadisticas de estudio",
-          "description": "Recupera las estadisticas generales de estudio y datos del panel de control."
-        }
-      },
-      "params": {
-        "deckId": "ID del mazo",
-        "from": "Fecha de inicio (ej., 2025-01-01)",
-        "to": "Fecha de fin (ej., 2025-01-31)",
-        "period": "Periodo (1w, 1m, 3m, 6m, 1y)"
+        "cardId": "ID de la tarjeta"
       }
     },
     "templates": {
       "title": "API de plantillas",
-      "description": "Ver plantillas de tarjetas.",
+      "description": "Ver, crear, actualizar y eliminar plantillas de tarjetas.",
       "endpoints": {
         "list": {
           "summary": "Listar plantillas",
@@ -170,10 +154,72 @@
         "detail": {
           "summary": "Obtener detalles de la plantilla",
           "description": "Recupera la informacion completa de la plantilla, incluyendo campos y disenos."
+        },
+        "create": {
+          "summary": "Crear plantilla",
+          "description": "Crea una nueva plantilla de tarjeta."
+        },
+        "update": {
+          "summary": "Actualizar plantilla",
+          "description": "Actualiza parcialmente una plantilla existente. Solo se actualizan los campos proporcionados."
+        },
+        "delete": {
+          "summary": "Eliminar plantilla",
+          "description": "Elimina una plantilla. No se puede eliminar si hay tarjetas que usan esta plantilla (error 409)."
         }
       },
       "params": {
         "templateId": "ID de la plantilla"
+      }
+    },
+    "marketplace": {
+      "title": "API de marketplace",
+      "description": "Publica y gestiona mazos en el marketplace.",
+      "endpoints": {
+        "list": {
+          "summary": "Listar publicaciones",
+          "description": "Recupera las publicaciones activas del marketplace."
+        },
+        "detail": {
+          "summary": "Obtener detalles de la publicacion",
+          "description": "Recupera informacion detallada de una publicacion especifica del marketplace."
+        },
+        "create": {
+          "summary": "Publicar mazo",
+          "description": "Publica tu mazo en el marketplace."
+        },
+        "delete": {
+          "summary": "Despublicar",
+          "description": "Elimina una publicacion del marketplace."
+        }
+      },
+      "params": {
+        "listingId": "ID de la publicacion"
+      }
+    },
+    "shares": {
+      "title": "API de compartir",
+      "description": "Comparte mazos con otros usuarios y gestiona invitaciones.",
+      "endpoints": {
+        "create": {
+          "summary": "Crear compartido",
+          "description": "Crea un compartido de mazo. Puede enviar enlaces de invitacion o invitaciones por correo electronico."
+        },
+        "accept": {
+          "summary": "Aceptar invitacion",
+          "description": "Acepta una invitacion de compartido usando un codigo de invitacion."
+        },
+        "list": {
+          "summary": "Listar compartidos",
+          "description": "Recupera las listas de compartidos enviados y recibidos."
+        },
+        "delete": {
+          "summary": "Revocar compartido",
+          "description": "Revoca un compartido o cancela la suscripcion."
+        }
+      },
+      "params": {
+        "shareId": "ID del compartido"
       }
     },
     "examples": {
@@ -186,25 +232,25 @@
       "items": {
         "format": {
           "title": "Formato de respuesta de error",
-          "body": "Todos los errores devuelven:\n\n{\n  \"error\": \"Error message\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"Additional info (optional)\"\n}"
+          "body": "Todos los errores devuelven:\n\n{\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"Error message\"\n  }\n}"
         },
         "statusCodes": {
           "title": "Codigos de estado HTTP",
-          "body": "• 200 OK — Exito\n• 201 Created — Recurso creado\n• 204 No Content — Eliminado (sin cuerpo de respuesta)\n• 400 Bad Request — Solicitud invalida (campos faltantes, error de validacion)\n• 401 Unauthorized — Error de autenticacion (clave de API faltante o invalida)\n• 404 Not Found — Recurso no encontrado\n• 429 Too Many Requests — Limite de frecuencia excedido\n• 500 Internal Server Error — Error del servidor"
+          "body": "• 200 OK — Exito\n• 201 Created — Recurso creado\n• 400 Bad Request — Solicitud invalida (campos faltantes, error de validacion)\n• 401 Unauthorized — Error de autenticacion (clave de API faltante o invalida)\n• 404 Not Found — Recurso no encontrado\n• 409 Conflict — Conflicto de recurso (ej., eliminar una plantilla en uso)\n• 429 Too Many Requests — Limite de frecuencia excedido\n• 500 Internal Server Error — Error del servidor"
         },
         "validation": {
           "title": "Errores de validacion",
-          "body": "Los errores de validacion al crear/actualizar tarjetas devuelven errores por campo como array:\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+          "body": "Los errores de validacion devuelven un mensaje de error:\n\n{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"field_values: Required\"\n  }\n}"
         }
       }
     },
     "statusCodes": {
       "200": "Exito",
       "201": "Creado",
-      "204": "Eliminado (sin cuerpo de respuesta)",
       "400": "Solicitud incorrecta (campos obligatorios faltantes)",
       "401": "Error de autenticacion",
       "404": "No encontrado",
+      "409": "Conflicto de recurso (plantilla en uso)",
       "429": "Limite de frecuencia excedido"
     }
   }

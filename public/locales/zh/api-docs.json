@@ -36,15 +36,15 @@
       "items": {
         "what": {
           "title": "什么是 API？",
-          "body": "ReeeeecallStudy API 是一个 RESTful API，允许您通过 HTTP 请求查看和管理牌组、卡片、学习历史等。可用于自动化脚本、第三方应用集成和数据分析。"
+          "body": "ReeeeecallStudy API 是一个 RESTful API，允许您通过 HTTP 请求查看和管理牌组、卡片、模板等。可用于自动化脚本、第三方应用集成和数据分析。"
         },
         "baseUrl": {
           "title": "基础 URL",
-          "body": "所有 API 请求基于 Supabase 项目 URL。\n\n基础 URL：https://your-project.supabase.co/rest/v1"
+          "body": "所有 API 请求的基础 URL。\n\n基础 URL：https://reeeeecallstudy.xyz/api/v1"
         },
         "responseFormat": {
           "title": "响应格式",
-          "body": "所有响应为 JSON 格式，Content-Type 为 application/json。\n\n成功时返回资源数据。出错时响应格式为 { \"error\": \"message\" }。"
+          "body": "所有响应为 JSON 格式，Content-Type 为 application/json。\n\n成功时，资源以 { \"data\": ... } 格式返回。\n出错时，响应格式为 { \"error\": { \"code\": \"...\", \"message\": \"...\" } }。"
         }
       }
     },
@@ -84,6 +84,16 @@
         }
       }
     },
+    "profile": {
+      "title": "个人资料 API",
+      "description": "获取当前用户的个人资料信息。",
+      "endpoints": {
+        "me": {
+          "summary": "获取我的个人资料",
+          "description": "获取当前 API 密钥所有者的个人资料。如果不存在则自动创建。"
+        }
+      }
+    },
     "decks": {
       "title": "牌组 API",
       "description": "查看和管理牌组（卡片集合）。",
@@ -94,7 +104,7 @@
         },
         "detail": {
           "summary": "获取牌组详情",
-          "description": "获取特定牌组的详细信息。"
+          "description": "获取特定牌组的详细信息及卡片统计数据（总数/新卡/待复习）。"
         },
         "create": {
           "summary": "创建牌组",
@@ -109,59 +119,33 @@
     },
     "cards": {
       "title": "卡片 API",
-      "description": "查看、创建和修改卡片。",
+      "description": "查看、创建和删除卡片。",
       "endpoints": {
         "list": {
           "summary": "列出卡片",
-          "description": "获取特定牌组中的卡片。"
+          "description": "获取特定牌组中的卡片（支持分页）。"
         },
         "create": {
           "summary": "创建卡片",
           "description": "向牌组添加新卡片。支持单张或批量创建最多 100 张。"
         },
-        "update": {
-          "summary": "更新卡片",
-          "description": "修改现有卡片的字段值或标签。"
+        "detail": {
+          "summary": "获取卡片详情",
+          "description": "通过卡片 ID 获取特定卡片的详细信息。"
         },
         "delete": {
           "summary": "删除卡片",
-          "description": "删除特定卡片。此操作不可撤销。"
+          "description": "通过卡片 ID 删除特定卡片。此操作不可撤销。"
         }
       },
       "params": {
         "deckId": "牌组 ID",
-        "cardId": "卡片 ID",
-        "status": "SRS 状态筛选（new、learning、review、suspended）",
-        "tag": "标签筛选"
-      }
-    },
-    "study": {
-      "title": "学习 API",
-      "description": "查看学习历史和管理学习数据。",
-      "endpoints": {
-        "due": {
-          "summary": "获取到期卡片",
-          "description": "获取今天需要复习的卡片。"
-        },
-        "history": {
-          "summary": "学习历史",
-          "description": "获取学习记录。"
-        },
-        "stats": {
-          "summary": "学习统计",
-          "description": "获取整体学习统计和仪表盘数据。"
-        }
-      },
-      "params": {
-        "deckId": "牌组 ID",
-        "from": "开始日期（例：2025-01-01）",
-        "to": "结束日期（例：2025-01-31）",
-        "period": "时间段（1w、1m、3m、6m、1y）"
+        "cardId": "卡片 ID"
       }
     },
     "templates": {
       "title": "模板 API",
-      "description": "查看卡片模板。",
+      "description": "查看、创建、更新和删除卡片模板。",
       "endpoints": {
         "list": {
           "summary": "列出模板",
@@ -170,10 +154,72 @@
         "detail": {
           "summary": "获取模板详情",
           "description": "获取完整的模板信息，包括字段和布局。"
+        },
+        "create": {
+          "summary": "创建模板",
+          "description": "创建一个新的卡片模板。"
+        },
+        "update": {
+          "summary": "更新模板",
+          "description": "部分更新现有模板。仅更新提供的字段。"
+        },
+        "delete": {
+          "summary": "删除模板",
+          "description": "删除模板。如果有卡片正在使用该模板则无法删除（409 错误）。"
         }
       },
       "params": {
         "templateId": "模板 ID"
+      }
+    },
+    "marketplace": {
+      "title": "市场 API",
+      "description": "在市场上发布和管理牌组。",
+      "endpoints": {
+        "list": {
+          "summary": "列出上架信息",
+          "description": "获取市场中的活跃上架信息。"
+        },
+        "detail": {
+          "summary": "获取上架详情",
+          "description": "获取特定市场上架信息的详细内容。"
+        },
+        "create": {
+          "summary": "发布牌组",
+          "description": "将您的牌组发布到市场。"
+        },
+        "delete": {
+          "summary": "下架",
+          "description": "从市场中移除上架信息。"
+        }
+      },
+      "params": {
+        "listingId": "上架 ID"
+      }
+    },
+    "shares": {
+      "title": "共享 API",
+      "description": "与其他用户共享牌组并管理邀请。",
+      "endpoints": {
+        "create": {
+          "summary": "创建共享",
+          "description": "创建牌组共享。可发送邀请链接或邮件邀请。"
+        },
+        "accept": {
+          "summary": "接受邀请",
+          "description": "使用邀请码接受共享邀请。"
+        },
+        "list": {
+          "summary": "列出共享",
+          "description": "获取已发送和已接收的共享列表。"
+        },
+        "delete": {
+          "summary": "撤销共享",
+          "description": "撤销共享或取消订阅。"
+        }
+      },
+      "params": {
+        "shareId": "共享 ID"
       }
     },
     "examples": {
@@ -186,25 +232,25 @@
       "items": {
         "format": {
           "title": "错误响应格式",
-          "body": "所有错误返回：\n\n{\n  \"error\": \"错误信息\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"附加信息（可选）\"\n}"
+          "body": "所有错误返回：\n\n{\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"错误信息\"\n  }\n}"
         },
         "statusCodes": {
           "title": "HTTP 状态码",
-          "body": "• 200 OK — 成功\n• 201 Created — 资源已创建\n• 204 No Content — 已删除（无响应体）\n• 400 Bad Request — 无效请求（缺少字段、验证失败）\n• 401 Unauthorized — 认证失败（缺少或无效的 API 密钥）\n• 404 Not Found — 资源未找到\n• 429 Too Many Requests — 超过速率限制\n• 500 Internal Server Error — 服务器错误"
+          "body": "• 200 OK — 成功\n• 201 Created — 资源已创建\n• 400 Bad Request — 无效请求（缺少字段、验证失败）\n• 401 Unauthorized — 认证失败（缺少或无效的 API 密钥）\n• 404 Not Found — 资源未找到\n• 409 Conflict — 资源冲突（例如：删除正在使用的模板）\n• 429 Too Many Requests — 超过速率限制\n• 500 Internal Server Error — 服务器错误"
         },
         "validation": {
           "title": "验证错误",
-          "body": "卡片创建/更新验证失败时，返回按字段的错误数组：\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+          "body": "验证失败时返回错误信息：\n\n{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"field_values: Required\"\n  }\n}"
         }
       }
     },
     "statusCodes": {
       "200": "成功",
       "201": "已创建",
-      "204": "已删除（无响应体）",
       "400": "无效请求（缺少必填字段）",
       "401": "认证失败",
       "404": "未找到",
+      "409": "资源冲突（模板正在使用中）",
       "429": "超过速率限制"
     }
   }

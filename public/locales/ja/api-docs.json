@@ -36,15 +36,15 @@
       "items": {
         "what": {
           "title": "APIとは？",
-          "body": "ReeeeecallStudy APIは、HTTPリクエストでデッキ、カード、学習履歴などを表示・管理できるRESTful APIです。自動化スクリプト、サードパーティアプリとの連携、データ分析に使用できます。"
+          "body": "ReeeeecallStudy APIは、HTTPリクエストでデッキ、カード、テンプレートなどを表示・管理できるRESTful APIです。自動化スクリプト、サードパーティアプリとの連携、データ分析に使用できます。"
         },
         "baseUrl": {
           "title": "ベースURL",
-          "body": "すべてのAPIリクエストはSupabaseプロジェクトURLを基準にします。\n\nベースURL：https://your-project.supabase.co/rest/v1"
+          "body": "すべてのAPIリクエストのベースURLです。\n\nベースURL：https://reeeeecallstudy.xyz/api/v1"
         },
         "responseFormat": {
           "title": "レスポンス形式",
-          "body": "すべてのレスポンスはJSON形式で、Content-Type: application/jsonです。\n\n成功時はリソースデータが返されます。エラー時は { \"error\": \"メッセージ\" } 形式のレスポンスになります。"
+          "body": "すべてのレスポンスはJSON形式で、Content-Type: application/jsonです。\n\n成功時はリソースが { \"data\": ... } 形式でラップされて返されます。\nエラー時は { \"error\": { \"code\": \"...\", \"message\": \"...\" } } 形式のレスポンスになります。"
         }
       }
     },
@@ -84,6 +84,16 @@
         }
       }
     },
+    "profile": {
+      "title": "プロフィールAPI",
+      "description": "現在のユーザーのプロフィール情報を取得します。",
+      "endpoints": {
+        "me": {
+          "summary": "自分のプロフィール取得",
+          "description": "現在のAPIキー所有者のプロフィールを取得します。プロフィールが存在しない場合は自動作成されます。"
+        }
+      }
+    },
     "decks": {
       "title": "デッキAPI",
       "description": "デッキ（カードコレクション）の表示と管理を行います。",
@@ -94,7 +104,7 @@
         },
         "detail": {
           "summary": "デッキ詳細",
-          "description": "特定のデッキの詳細情報を取得します。"
+          "description": "特定のデッキの詳細情報とカード統計（合計・新規・復習予定）を取得します。"
         },
         "create": {
           "summary": "デッキ作成",
@@ -109,59 +119,33 @@
     },
     "cards": {
       "title": "カードAPI",
-      "description": "カードの表示、作成、変更を行います。",
+      "description": "カードの表示、作成、削除を行います。",
       "endpoints": {
         "list": {
           "summary": "カード一覧",
-          "description": "特定のデッキのカードを取得します。"
+          "description": "特定のデッキのカードをページネーション付きで取得します。"
         },
         "create": {
           "summary": "カード作成",
           "description": "デッキにカードを追加します。1枚ずつまたは最大100枚の一括作成が可能です。"
         },
-        "update": {
-          "summary": "カード更新",
-          "description": "既存カードのフィールド値またはタグを変更します。"
+        "detail": {
+          "summary": "カード詳細",
+          "description": "カードIDで特定のカードの詳細情報を取得します。"
         },
         "delete": {
           "summary": "カード削除",
-          "description": "特定のカードを削除します。この操作は元に戻せません。"
+          "description": "カードIDで特定のカードを削除します。この操作は元に戻せません。"
         }
       },
       "params": {
         "deckId": "デッキID",
-        "cardId": "カードID",
-        "status": "SRSステータスフィルター（new、learning、review、suspended）",
-        "tag": "タグフィルター"
-      }
-    },
-    "study": {
-      "title": "学習API",
-      "description": "学習履歴の表示とセッションデータの管理を行います。",
-      "endpoints": {
-        "due": {
-          "summary": "復習予定カード取得",
-          "description": "今日復習が必要なカードを取得します。"
-        },
-        "history": {
-          "summary": "学習履歴",
-          "description": "学習セッション記録を取得します。"
-        },
-        "stats": {
-          "summary": "学習統計",
-          "description": "全体の学習統計とダッシュボードデータを取得します。"
-        }
-      },
-      "params": {
-        "deckId": "デッキID",
-        "from": "開始日（例：2025-01-01）",
-        "to": "終了日（例：2025-01-31）",
-        "period": "期間（1w、1m、3m、6m、1y）"
+        "cardId": "カードID"
       }
     },
     "templates": {
       "title": "テンプレートAPI",
-      "description": "カードテンプレートの表示を行います。",
+      "description": "カードテンプレートの表示、作成、更新、削除を行います。",
       "endpoints": {
         "list": {
           "summary": "テンプレート一覧",
@@ -170,10 +154,72 @@
         "detail": {
           "summary": "テンプレート詳細",
           "description": "フィールドとレイアウトを含む完全なテンプレート情報を取得します。"
+        },
+        "create": {
+          "summary": "テンプレート作成",
+          "description": "新しいカードテンプレートを作成します。"
+        },
+        "update": {
+          "summary": "テンプレート更新",
+          "description": "既存のテンプレートを部分的に更新します。指定したフィールドのみ更新されます。"
+        },
+        "delete": {
+          "summary": "テンプレート削除",
+          "description": "テンプレートを削除します。このテンプレートを使用しているカードがある場合は削除できません（409エラー）。"
         }
       },
       "params": {
         "templateId": "テンプレートID"
+      }
+    },
+    "marketplace": {
+      "title": "マーケットプレイスAPI",
+      "description": "マーケットプレイスへのデッキの公開と管理を行います。",
+      "endpoints": {
+        "list": {
+          "summary": "出品一覧",
+          "description": "アクティブなマーケットプレイスの出品を取得します。"
+        },
+        "detail": {
+          "summary": "出品詳細",
+          "description": "特定のマーケットプレイス出品の詳細情報を取得します。"
+        },
+        "create": {
+          "summary": "デッキを公開",
+          "description": "自分のデッキをマーケットプレイスに公開します。"
+        },
+        "delete": {
+          "summary": "公開を取り消す",
+          "description": "マーケットプレイスから出品を削除します。"
+        }
+      },
+      "params": {
+        "listingId": "出品ID"
+      }
+    },
+    "shares": {
+      "title": "共有API",
+      "description": "他のユーザーとデッキを共有し、招待を管理します。",
+      "endpoints": {
+        "create": {
+          "summary": "共有を作成",
+          "description": "デッキの共有を作成します。招待リンクまたはメール招待を送ることができます。"
+        },
+        "accept": {
+          "summary": "招待を承認",
+          "description": "招待コードを使って共有の招待を承認します。"
+        },
+        "list": {
+          "summary": "共有一覧",
+          "description": "送受信した共有の一覧を取得します。"
+        },
+        "delete": {
+          "summary": "共有を取り消す",
+          "description": "共有を取り消すか、共有から退出します。"
+        }
+      },
+      "params": {
+        "shareId": "共有ID"
       }
     },
     "examples": {
@@ -186,25 +232,25 @@
       "items": {
         "format": {
           "title": "エラーレスポンス形式",
-          "body": "すべてのエラーは以下の形式で返されます：\n\n{\n  \"error\": \"エラーメッセージ\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"追加情報（任意）\"\n}"
+          "body": "すべてのエラーは以下の形式で返されます：\n\n{\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"エラーメッセージ\"\n  }\n}"
         },
         "statusCodes": {
           "title": "HTTPステータスコード",
-          "body": "・200 OK — 成功\n・201 Created — リソース作成完了\n・204 No Content — 削除完了（レスポンスボディなし）\n・400 Bad Request — 無効なリクエスト（フィールド不足、バリデーション失敗）\n・401 Unauthorized — 認証失敗（APIキーの不足または無効）\n・404 Not Found — リソースが見つからない\n・429 Too Many Requests — レート制限超過\n・500 Internal Server Error — サーバーエラー"
+          "body": "・200 OK — 成功\n・201 Created — リソース作成完了\n・400 Bad Request — 無効なリクエスト（フィールド不足、バリデーション失敗）\n・401 Unauthorized — 認証失敗（APIキーの不足または無効）\n・404 Not Found — リソースが見つからない\n・409 Conflict — リソースの競合（例：使用中のテンプレートの削除）\n・429 Too Many Requests — レート制限超過\n・500 Internal Server Error — サーバーエラー"
         },
         "validation": {
           "title": "バリデーションエラー",
-          "body": "カードの作成/更新時のバリデーション失敗はフィールドごとのエラーが配列で返されます：\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+          "body": "バリデーション失敗時はエラーメッセージが返されます：\n\n{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"field_values: Required\"\n  }\n}"
         }
       }
     },
     "statusCodes": {
       "200": "成功",
       "201": "作成完了",
-      "204": "削除完了（レスポンスボディなし）",
       "400": "不正なリクエスト（必須フィールド不足）",
       "401": "認証失敗",
       "404": "見つからない",
+      "409": "リソースの競合（テンプレート使用中）",
       "429": "レート制限超過"
     }
   }
