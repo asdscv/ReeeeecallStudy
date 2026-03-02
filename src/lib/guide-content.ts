@@ -1,8 +1,19 @@
 // ─── Guide Content — 사용법 페이지 데이터 (i18n keys) ──────────────────
 
+export interface GuideItemLink {
+  /** i18n key for the button label */
+  label: string
+  /** External URL (opens in new tab) */
+  href?: string
+  /** Internal React Router path */
+  to?: string
+}
+
 export interface GuideItem {
   title: string
   body: string
+  /** Optional link/button displayed below the body text */
+  link?: GuideItemLink
 }
 
 export interface GuideSection {
@@ -328,6 +339,10 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.api.items.docsPage.title',
         body: 'sections.api.items.docsPage.body',
+        link: {
+          label: 'sections.api.items.docsPage.linkLabel',
+          href: 'https://reeeeecallstudy.xyz/docs/api',
+        },
       },
       {
         title: 'sections.api.items.rateLimits.title',
