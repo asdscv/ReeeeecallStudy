@@ -275,6 +275,7 @@
           "body": "如果 AI 无法直接调用 API，别担心！\n只需复制 AI 创建的 JSON 数据并自行发送。\n\n方法一：Swagger UI（最简单，推荐）\n1. 在浏览器中打开 https://reeeeecallstudy.xyz/api/ui\n2. 点击顶部的「Authorize」→ 输入 API 密钥 → 确认\n3. 找到并展开 POST /v1/decks/{deckId}/cards\n4. 点击「Try it out」\n5. 在 deckId 字段中输入牌组 ID\n6. 将 AI 生成的 JSON 数组粘贴到请求体中\n7. 点击「Execute」→ 完成！\n\n方法二：终端 / 命令提示符\n打开终端（Mac）或 PowerShell（Windows）并运行：\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"a round fruit\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\n对于较长的 JSON，先保存到文件：\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\n每个请求最多 100 张卡片。"
         },
         "docsPage": {
+          "linkLabel": "查看API文档",
           "title": "完整 API 文档",
           "body": "获取更详细的 API 信息：\n\n• 应用内 API 文档：顶部菜单中的「API」或 /api-docs\n• Swagger UI（交互式测试）：https://reeeeecallstudy.xyz/api/ui\n• 公开 API 文档：https://reeeeecallstudy.xyz/docs/api\n\n所有可用端点：\n• 牌组 API：列表、详情、创建\n• 卡片 API：列表、详情、创建（支持批量）、更新、删除\n• 模板 API：列表、详情、创建、更新、删除\n• 学习 API：到期卡片、学习历史、统计\n• 市场 API：列表、发布、删除\n• 分享 API：创建分享、接受邀请、列表、撤销"
         },

@@ -74,3 +74,27 @@ describe('목차 클릭 시 섹션 자동 펼침', () => {
     expect(sectionHeadings.length).toBeGreaterThan(0)
   })
 })
+
+// ─── API Docs 링크 버튼 ───────────────────────────────────────
+
+describe('API Docs 링크 버튼', () => {
+  it('API 섹션을 펼치면 외부 링크 버튼이 렌더링된다', async () => {
+    const user = userEvent.setup()
+    renderGuide()
+
+    // Find and click the API section header to expand it
+    const toc = screen.getByRole('navigation')
+    const tocButtons = within(toc).getAllByRole('button')
+    // API section has icon 📡 — find by section title i18n key content
+    const apiTocButton = tocButtons.find((btn) => btn.textContent?.includes('📡'))
+    expect(apiTocButton).toBeDefined()
+    await user.click(apiTocButton!)
+
+    // Look for the external link (label is the i18n key)
+    const apiDocsLink = screen.getByRole('link', { name: /linkLabel/i })
+    expect(apiDocsLink).toBeInTheDocument()
+    expect(apiDocsLink).toHaveAttribute('href', 'https://reeeeecallstudy.xyz/docs/api')
+    expect(apiDocsLink).toHaveAttribute('target', '_blank')
+    expect(apiDocsLink).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+})

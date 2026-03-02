@@ -99,6 +99,17 @@ const DeckSchema = z
   })
   .openapi('Deck')
 
+const CreateDeckBodySchema = z
+  .object({
+    name: z.string().min(1).max(100).openapi({ example: '영어 단어장' }),
+    description: z.string().max(500).optional().openapi({ example: 'TOEIC 필수 단어' }),
+    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional().default('#3B82F6').openapi({ example: '#3B82F6' }),
+    icon: z.string().max(10).optional().default('📚').openapi({ example: '📚' }),
+    default_template_id: z.string().uuid().optional().openapi({ example: 'c3d4e5f6-0000-0000-0000-000000000000' }),
+    srs_settings: SrsSettingsSchema.optional(),
+  })
+  .openapi('CreateDeckBody')
+
 const DeckStatsSchema = z.object({
   total_cards: z.number().int().openapi({ example: 100 }),
   new_cards: z.number().int().openapi({ example: 20 }),
@@ -259,6 +270,33 @@ curl -H "Authorization: Bearer rc_xxxxx" https://<host>/api/v1/decks/<deckId>
     },
     401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
     404: { description: '덱을 찾을 수 없음', content: { 'application/json': { schema: ErrorSchema } } },
+  },
+})
+
+const createDeckRoute = createRoute({
+  method: 'post',
+  path: '/v1/decks',
+  tags: ['Decks'],
+  summary: '덱 생성',
+  description: `새 덱을 생성합니다.
+
+\`\`\`bash
+curl -X POST -H "Authorization: Bearer rc_xxxxx" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"영어 단어장","color":"#3B82F6","icon":"📚"}' \\
+  https://<host>/api/v1/decks
+\`\`\``,
+  security: [{ Bearer: [] }],
+  request: {
+    body: { content: { 'application/json': { schema: CreateDeckBodySchema } } },
+  },
+  responses: {
+    201: {
+      description: '덱 생성 성공',
+      content: { 'application/json': { schema: z.object({ data: DeckSchema }) } },
+    },
+    400: { description: 'Validation 에러', content: { 'application/json': { schema: ErrorSchema } } },
+    401: { description: '인증 실패', content: { 'application/json': { schema: ErrorSchema } } },
   },
 })
 
@@ -585,6 +623,30 @@ app.openapi(listDecksRoute, async (c) => {
 
   if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
   return c.json({ data: data ?? [] }, 200)
+})
+
+// POST /v1/decks
+app.openapi(createDeckRoute, async (c) => {
+  const userId = c.get('userId')
+  const sb = c.get('supabase')
+  const body = c.req.valid('json')
+
+  const { data: deck, error } = await sb
+    .from('decks')
+    .insert({
+      user_id: userId,
+      name: body.name.trim(),
+      description: body.description || null,
+      color: body.color || '#3B82F6',
+      icon: body.icon || '📚',
+      default_template_id: body.default_template_id || null,
+      srs_settings: body.srs_settings,
+    })
+    .select('id, name, description, color, icon, is_archived, srs_settings, created_at, updated_at')
+    .single()
+
+  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  return c.json({ data: deck }, 201)
 })
 
 // GET /v1/decks/{deckId}

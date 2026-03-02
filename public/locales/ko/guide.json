@@ -275,6 +275,7 @@
           "body": "AI가 직접 API를 호출하지 못하는 경우에도 걱정 마세요!\nAI가 만들어준 JSON 데이터를 복사해서 직접 보내면 됩니다.\n\n방법 1: Swagger UI 사용 (가장 쉬움, 추천)\n1. 브라우저에서 https://reeeeecallstudy.xyz/api/ui 에 접속합니다\n2. 상단 \"Authorize\" 버튼 → API 키 입력 → 확인\n3. POST /v1/decks/{deckId}/cards 항목을 찾아 펼칩니다\n4. \"Try it out\" 버튼 클릭\n5. deckId 란에 덱 ID를 입력\n6. Request body에 AI가 만들어준 JSON 배열을 붙여넣기\n7. \"Execute\" 클릭 → 완료!\n\n방법 2: 터미널/명령 프롬프트 사용\nMac은 터미널, Windows는 PowerShell을 열고 실행:\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/내_덱_ID/cards\" \\\n  -H \"Authorization: Bearer rc_내_API키\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"내_템플릿_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"사과\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\nJSON이 길면 파일로 저장 후 전송:\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/내_덱_ID/cards\" \\\n  -H \"Authorization: Bearer rc_내_API키\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\n한번에 최대 100장까지 생성 가능합니다."
         },
         "docsPage": {
+          "linkLabel": "API 문서 보기",
           "title": "상세 API 문서",
           "body": "더 자세한 API 정보가 필요하다면:\n\n• 앱 내 API 문서: 상단 메뉴의 \"API\" 또는 /api-docs 경로\n• Swagger UI (직접 테스트 가능): https://reeeeecallstudy.xyz/api/ui\n• 공개 API 문서: https://reeeeecallstudy.xyz/docs/api\n\n사용 가능한 모든 엔드포인트:\n• 덱 API: 목록 조회, 상세 조회, 생성\n• 카드 API: 목록 조회, 상세 조회, 생성(일괄 포함), 수정, 삭제\n• 템플릿 API: 목록 조회, 상세 조회, 생성, 수정, 삭제\n• 학습 API: 복습 예정 카드 조회, 학습 기록, 통계\n• 마켓 API: 마켓 리스팅 조회, 게시, 삭제\n• 공유 API: 공유 생성, 초대 수락, 목록, 해지"
         },

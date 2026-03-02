@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, ArrowLeft, ExternalLink } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { GUIDE_SECTIONS, searchGuide, type GuideSection } from '../lib/guide-content'
 
 function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSection; defaultOpen: boolean; forceOpen?: boolean; t: (key: string) => string }) {
@@ -32,6 +33,28 @@ function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSec
             <div key={i} className="px-4 sm:px-5 py-3 sm:py-4">
               <h3 className="text-sm font-semibold text-gray-800 mb-1.5">{t(item.title)}</h3>
               <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{t(item.body)}</p>
+              {item.link && (
+                <div className="mt-3">
+                  {item.link.href ? (
+                    <a
+                      href={item.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                    >
+                      {t(item.link.label)}
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : item.link.to ? (
+                    <Link
+                      to={item.link.to}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                    >
+                      {t(item.link.label)}
+                    </Link>
+                  ) : null}
+                </div>
+              )}
             </div>
           ))}
         </div>

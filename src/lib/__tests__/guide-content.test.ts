@@ -55,6 +55,38 @@ describe('getSection', () => {
   })
 })
 
+describe('GuideItem link support', () => {
+  it('api section docsPage item should have a link field', () => {
+    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
+    expect(apiSection).toBeDefined()
+    const docsItem = apiSection!.items.find((i) => i.title.includes('docsPage'))
+    expect(docsItem).toBeDefined()
+    expect(docsItem!.link).toBeDefined()
+    expect(docsItem!.link!.label).toBeTruthy()
+    expect(docsItem!.link!.href).toBe('https://reeeeecallstudy.xyz/docs/api')
+  })
+
+  it('link field is optional — most items should not have it', () => {
+    const gettingStarted = GUIDE_SECTIONS.find((s) => s.id === 'getting-started')
+    for (const item of gettingStarted!.items) {
+      expect(item.link).toBeUndefined()
+    }
+  })
+
+  it('link with href should be a valid external URL', () => {
+    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
+    const docsItem = apiSection!.items.find((i) => i.link?.href)
+    expect(docsItem).toBeDefined()
+    expect(docsItem!.link!.href).toMatch(/^https?:\/\//)
+  })
+
+  it('link label should be an i18n key', () => {
+    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
+    const docsItem = apiSection!.items.find((i) => i.link)
+    expect(docsItem!.link!.label).toContain('sections.')
+  })
+})
+
 describe('searchGuide', () => {
   // Mock t function: returns the key as-is (identity)
   const mockT = (key: string) => key

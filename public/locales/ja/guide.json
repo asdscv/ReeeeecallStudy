@@ -275,6 +275,7 @@
           "body": "AIがAPIを直接呼び出せなくても心配ありません！\nAIが作成したJSONデータをコピーして自分で送信するだけです。\n\n方法1：Swagger UI（最も簡単、おすすめ）\n1. ブラウザで https://reeeeecallstudy.xyz/api/ui を開く\n2. 上部の「Authorize」→ APIキーを入力 → 確認\n3. POST /v1/decks/{deckId}/cards を見つけて展開\n4. 「Try it out」をクリック\n5. deckIdフィールドにデッキIDを入力\n6. リクエストボディにAIからのJSON配列を貼り付け\n7. 「Execute」→ 完了！\n\n方法2：ターミナル / コマンドプロンプト\nターミナル（Mac）またはPowerShell（Windows）を開いて実行：\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"丸い果物\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\nJSONが長い場合はファイルに保存してから：\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\n1リクエストあたり最大100枚。"
         },
         "docsPage": {
+          "linkLabel": "APIドキュメントを見る",
           "title": "完全なAPIドキュメント",
           "body": "より詳細なAPI情報：\n\n・アプリ内APIドキュメント：トップメニューの「API」または /api-docs\n・Swagger UI（インタラクティブテスト）：https://reeeeecallstudy.xyz/api/ui\n・公開APIドキュメント：https://reeeeecallstudy.xyz/docs/api\n\n利用可能なエンドポイント：\n・デッキAPI：一覧、詳細、作成\n・カードAPI：一覧、詳細、作成（一括対応）、更新、削除\n・テンプレートAPI：一覧、詳細、作成、更新、削除\n・学習API：復習予定カード、学習履歴、統計\n・マーケットプレイスAPI：一覧、公開、削除\n・共有API：共有作成、招待受け入れ、一覧、取り消し"
         },
