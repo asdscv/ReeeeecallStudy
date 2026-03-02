@@ -126,7 +126,7 @@ describe('getApiSection', () => {
   })
 
   it('should find each known section', () => {
-    const knownIds = ['overview', 'authentication', 'rate-limits', 'decks', 'cards', 'study', 'templates', 'examples', 'errors']
+    const knownIds = ['overview', 'authentication', 'rate-limits', 'profile', 'decks', 'cards', 'templates', 'marketplace', 'shares', 'examples', 'errors']
     for (const id of knownIds) {
       expect(getApiSection(id)).toBeDefined()
     }

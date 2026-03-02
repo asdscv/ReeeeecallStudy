@@ -36,15 +36,15 @@
       "items": {
         "what": {
           "title": "API là gì?",
-          "body": "API ReeeeecallStudy là API RESTful cho phép bạn xem và quản lý bộ thẻ, thẻ, lịch sử học tập và nhiều hơn nữa qua yêu cầu HTTP. Sử dụng cho script tự động hóa, tích hợp ứng dụng bên thứ ba và phân tích dữ liệu."
+          "body": "API ReeeeecallStudy là API RESTful cho phép bạn xem và quản lý bộ thẻ, thẻ, mẫu và nhiều hơn nữa qua yêu cầu HTTP. Sử dụng cho script tự động hóa, tích hợp ứng dụng bên thứ ba và phân tích dữ liệu."
         },
         "baseUrl": {
           "title": "URL gốc",
-          "body": "Tất cả yêu cầu API dựa trên URL dự án Supabase.\n\nURL gốc: https://your-project.supabase.co/rest/v1"
+          "body": "URL gốc cho tất cả yêu cầu API.\n\nURL gốc: https://reeeeecallstudy.xyz/api/v1"
         },
         "responseFormat": {
           "title": "Định dạng phản hồi",
-          "body": "Tất cả phản hồi ở định dạng JSON với Content-Type: application/json.\n\nKhi thành công, dữ liệu tài nguyên được trả về. Khi lỗi, phản hồi theo định dạng { \"error\": \"message\" }."
+          "body": "Tất cả phản hồi ở định dạng JSON với Content-Type: application/json.\n\nKhi thành công, tài nguyên được trả về theo định dạng { \"data\": ... }.\nKhi lỗi, phản hồi theo định dạng { \"error\": { \"code\": \"...\", \"message\": \"...\" } }."
         }
       }
     },
@@ -84,6 +84,16 @@
         }
       }
     },
+    "profile": {
+      "title": "API hồ sơ",
+      "description": "Lấy thông tin hồ sơ của người dùng hiện tại.",
+      "endpoints": {
+        "me": {
+          "summary": "Lấy hồ sơ của tôi",
+          "description": "Lấy hồ sơ của chủ sở hữu khóa API hiện tại. Tự động tạo hồ sơ nếu chưa tồn tại."
+        }
+      }
+    },
     "decks": {
       "title": "API bộ thẻ",
       "description": "Xem và quản lý bộ thẻ (bộ sưu tập thẻ).",
@@ -94,7 +104,7 @@
         },
         "detail": {
           "summary": "Chi tiết bộ thẻ",
-          "description": "Lấy thông tin chi tiết cho một bộ thẻ cụ thể."
+          "description": "Lấy thông tin chi tiết và thống kê thẻ (tổng số/mới/đến hạn) cho một bộ thẻ cụ thể."
         },
         "create": {
           "summary": "Tạo bộ thẻ",
@@ -109,59 +119,33 @@
     },
     "cards": {
       "title": "API thẻ",
-      "description": "Xem, tạo và chỉnh sửa thẻ.",
+      "description": "Xem, tạo và xóa thẻ.",
       "endpoints": {
         "list": {
           "summary": "Danh sách thẻ",
-          "description": "Lấy thẻ trong một bộ thẻ cụ thể."
+          "description": "Lấy thẻ trong một bộ thẻ cụ thể với phân trang."
         },
         "create": {
           "summary": "Tạo thẻ",
           "description": "Thêm thẻ mới vào bộ thẻ. Tạo đơn lẻ hoặc hàng loạt đến 100."
         },
-        "update": {
-          "summary": "Cập nhật thẻ",
-          "description": "Chỉnh sửa giá trị trường hoặc thẻ gắn của thẻ hiện có."
+        "detail": {
+          "summary": "Chi tiết thẻ",
+          "description": "Lấy thông tin chi tiết cho một thẻ cụ thể theo ID thẻ."
         },
         "delete": {
           "summary": "Xóa thẻ",
-          "description": "Xóa một thẻ cụ thể. Hành động này không thể hoàn tác."
+          "description": "Xóa một thẻ cụ thể theo ID thẻ. Hành động này không thể hoàn tác."
         }
       },
       "params": {
         "deckId": "ID bộ thẻ",
-        "cardId": "ID thẻ",
-        "status": "Bộ lọc trạng thái SRS (new, learning, review, suspended)",
-        "tag": "Bộ lọc thẻ gắn"
-      }
-    },
-    "study": {
-      "title": "API học tập",
-      "description": "Xem lịch sử học tập và quản lý dữ liệu phiên.",
-      "endpoints": {
-        "due": {
-          "summary": "Lấy thẻ đến hạn",
-          "description": "Lấy thẻ cần ôn tập hôm nay."
-        },
-        "history": {
-          "summary": "Lịch sử học tập",
-          "description": "Lấy hồ sơ phiên học."
-        },
-        "stats": {
-          "summary": "Thống kê học tập",
-          "description": "Lấy thống kê học tập tổng thể và dữ liệu bảng điều khiển."
-        }
-      },
-      "params": {
-        "deckId": "ID bộ thẻ",
-        "from": "Ngày bắt đầu (VD: 2025-01-01)",
-        "to": "Ngày kết thúc (VD: 2025-01-31)",
-        "period": "Thời kỳ (1w, 1m, 3m, 6m, 1y)"
+        "cardId": "ID thẻ"
       }
     },
     "templates": {
       "title": "API mẫu",
-      "description": "Xem mẫu thẻ.",
+      "description": "Xem, tạo, cập nhật và xóa mẫu thẻ.",
       "endpoints": {
         "list": {
           "summary": "Danh sách mẫu",
@@ -170,10 +154,72 @@
         "detail": {
           "summary": "Chi tiết mẫu",
           "description": "Lấy thông tin mẫu đầy đủ bao gồm trường và bố cục."
+        },
+        "create": {
+          "summary": "Tạo mẫu",
+          "description": "Tạo mẫu thẻ mới."
+        },
+        "update": {
+          "summary": "Cập nhật mẫu",
+          "description": "Cập nhật một phần mẫu hiện có. Chỉ các trường được cung cấp mới được cập nhật."
+        },
+        "delete": {
+          "summary": "Xóa mẫu",
+          "description": "Xóa mẫu. Không thể xóa nếu có thẻ đang sử dụng mẫu này (lỗi 409)."
         }
       },
       "params": {
         "templateId": "ID mẫu"
+      }
+    },
+    "marketplace": {
+      "title": "API chợ",
+      "description": "Xuất bản và quản lý bộ thẻ trên chợ.",
+      "endpoints": {
+        "list": {
+          "summary": "Danh sách niêm yết",
+          "description": "Lấy các niêm yết chợ đang hoạt động."
+        },
+        "detail": {
+          "summary": "Chi tiết niêm yết",
+          "description": "Lấy thông tin chi tiết cho một niêm yết chợ cụ thể."
+        },
+        "create": {
+          "summary": "Xuất bản bộ thẻ",
+          "description": "Xuất bản bộ thẻ của bạn lên chợ."
+        },
+        "delete": {
+          "summary": "Hủy xuất bản",
+          "description": "Xóa một niêm yết khỏi chợ."
+        }
+      },
+      "params": {
+        "listingId": "ID niêm yết"
+      }
+    },
+    "shares": {
+      "title": "API chia sẻ",
+      "description": "Chia sẻ bộ thẻ với người dùng khác và quản lý lời mời.",
+      "endpoints": {
+        "create": {
+          "summary": "Tạo chia sẻ",
+          "description": "Tạo chia sẻ bộ thẻ. Có thể gửi liên kết mời hoặc lời mời qua email."
+        },
+        "accept": {
+          "summary": "Chấp nhận lời mời",
+          "description": "Chấp nhận lời mời chia sẻ bằng mã mời."
+        },
+        "list": {
+          "summary": "Danh sách chia sẻ",
+          "description": "Lấy danh sách chia sẻ đã gửi và đã nhận."
+        },
+        "delete": {
+          "summary": "Thu hồi chia sẻ",
+          "description": "Thu hồi chia sẻ hoặc hủy đăng ký."
+        }
+      },
+      "params": {
+        "shareId": "ID chia sẻ"
       }
     },
     "examples": {
@@ -186,25 +232,25 @@
       "items": {
         "format": {
           "title": "Định dạng phản hồi lỗi",
-          "body": "Tất cả lỗi trả về:\n\n{\n  \"error\": \"Thông báo lỗi\",\n  \"code\": \"MÃ_LỖI\",\n  \"details\": \"Thông tin bổ sung (tùy chọn)\"\n}"
+          "body": "Tất cả lỗi trả về:\n\n{\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"Thông báo lỗi\"\n  }\n}"
         },
         "statusCodes": {
           "title": "Mã trạng thái HTTP",
-          "body": "• 200 OK — Thành công\n• 201 Created — Tài nguyên đã tạo\n• 204 No Content — Đã xóa (không có nội dung phản hồi)\n• 400 Bad Request — Yêu cầu không hợp lệ (thiếu trường, xác thực thất bại)\n• 401 Unauthorized — Xác thực thất bại (thiếu hoặc khóa API không hợp lệ)\n• 404 Not Found — Không tìm thấy tài nguyên\n• 429 Too Many Requests — Vượt giới hạn tốc độ\n• 500 Internal Server Error — Lỗi máy chủ"
+          "body": "• 200 OK — Thành công\n• 201 Created — Tài nguyên đã tạo\n• 400 Bad Request — Yêu cầu không hợp lệ (thiếu trường, xác thực thất bại)\n• 401 Unauthorized — Xác thực thất bại (thiếu hoặc khóa API không hợp lệ)\n• 404 Not Found — Không tìm thấy tài nguyên\n• 409 Conflict — Xung đột tài nguyên (VD: xóa mẫu đang được sử dụng)\n• 429 Too Many Requests — Vượt giới hạn tốc độ\n• 500 Internal Server Error — Lỗi máy chủ"
         },
         "validation": {
           "title": "Lỗi xác thực",
-          "body": "Lỗi xác thực khi tạo/cập nhật thẻ trả về lỗi theo trường dưới dạng mảng:\n\n{\n  \"error\": \"Xác thực thất bại\",\n  \"errors\": [\n    \"[0] template_id là bắt buộc\",\n    \"[0] field_values phải có ít nhất một trường\"\n  ]\n}"
+          "body": "Lỗi xác thực trả về thông báo lỗi:\n\n{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"field_values: Required\"\n  }\n}"
         }
       }
     },
     "statusCodes": {
       "200": "Thành công",
       "201": "Đã tạo",
-      "204": "Đã xóa (không có nội dung phản hồi)",
       "400": "Yêu cầu không hợp lệ (thiếu trường bắt buộc)",
       "401": "Xác thực thất bại",
       "404": "Không tìm thấy",
+      "409": "Xung đột tài nguyên (mẫu đang được sử dụng)",
       "429": "Vượt giới hạn tốc độ"
     }
   }

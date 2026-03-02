@@ -36,15 +36,15 @@
       "items": {
         "what": {
           "title": "Apa itu API?",
-          "body": "API ReeeeecallStudy adalah API RESTful yang memungkinkan Anda melihat dan mengelola dek, kartu, riwayat belajar, dan lainnya melalui permintaan HTTP. Gunakan untuk skrip otomatisasi, integrasi aplikasi pihak ketiga, dan analisis data."
+          "body": "API ReeeeecallStudy adalah API RESTful yang memungkinkan Anda melihat dan mengelola dek, kartu, templat, dan lainnya melalui permintaan HTTP. Gunakan untuk skrip otomatisasi, integrasi aplikasi pihak ketiga, dan analisis data."
         },
         "baseUrl": {
           "title": "URL Dasar",
-          "body": "Semua permintaan API didasarkan pada URL proyek Supabase.\n\nURL Dasar: https://your-project.supabase.co/rest/v1"
+          "body": "URL dasar untuk semua permintaan API.\n\nURL Dasar: https://reeeeecallstudy.xyz/api/v1"
         },
         "responseFormat": {
           "title": "Format Respons",
-          "body": "Semua respons dalam format JSON dengan Content-Type: application/json.\n\nPada keberhasilan, data sumber daya dikembalikan. Pada kesalahan, respons mengikuti format { \"error\": \"pesan\" }."
+          "body": "Semua respons dalam format JSON dengan Content-Type: application/json.\n\nPada keberhasilan, sumber daya dikembalikan dalam format { \"data\": ... }.\nPada kesalahan, respons mengikuti format { \"error\": { \"code\": \"...\", \"message\": \"...\" } }."
         }
       }
     },
@@ -84,6 +84,16 @@
         }
       }
     },
+    "profile": {
+      "title": "API Profil",
+      "description": "Ambil informasi profil pengguna saat ini.",
+      "endpoints": {
+        "me": {
+          "summary": "Dapatkan Profil Saya",
+          "description": "Ambil profil pemilik kunci API saat ini. Profil dibuat otomatis jika belum ada."
+        }
+      }
+    },
     "decks": {
       "title": "API Dek",
       "description": "Lihat dan kelola dek (koleksi kartu).",
@@ -94,7 +104,7 @@
         },
         "detail": {
           "summary": "Detail Dek",
-          "description": "Ambil informasi detail untuk dek tertentu."
+          "description": "Ambil informasi detail dan statistik kartu (total/baru/jatuh tempo) untuk dek tertentu."
         },
         "create": {
           "summary": "Buat Dek",
@@ -109,59 +119,33 @@
     },
     "cards": {
       "title": "API Kartu",
-      "description": "Lihat, buat, dan ubah kartu.",
+      "description": "Lihat, buat, dan hapus kartu.",
       "endpoints": {
         "list": {
           "summary": "Daftar Kartu",
-          "description": "Ambil kartu dalam dek tertentu."
+          "description": "Ambil kartu dalam dek tertentu dengan paginasi."
         },
         "create": {
           "summary": "Buat Kartu",
           "description": "Tambahkan kartu baru ke dek. Satu kartu atau pembuatan massal hingga 100."
         },
-        "update": {
-          "summary": "Perbarui Kartu",
-          "description": "Ubah nilai bidang atau tag kartu yang ada."
+        "detail": {
+          "summary": "Detail Kartu",
+          "description": "Ambil informasi detail untuk kartu tertentu berdasarkan ID kartu."
         },
         "delete": {
           "summary": "Hapus Kartu",
-          "description": "Hapus kartu tertentu. Tindakan ini tidak dapat dibatalkan."
+          "description": "Hapus kartu tertentu berdasarkan ID kartu. Tindakan ini tidak dapat dibatalkan."
         }
       },
       "params": {
         "deckId": "ID Dek",
-        "cardId": "ID Kartu",
-        "status": "Filter status SRS (new, learning, review, suspended)",
-        "tag": "Filter tag"
-      }
-    },
-    "study": {
-      "title": "API Belajar",
-      "description": "Lihat riwayat belajar dan kelola data sesi.",
-      "endpoints": {
-        "due": {
-          "summary": "Kartu Jatuh Tempo",
-          "description": "Ambil kartu yang jatuh tempo untuk ulasan hari ini."
-        },
-        "history": {
-          "summary": "Riwayat Belajar",
-          "description": "Ambil catatan sesi belajar."
-        },
-        "stats": {
-          "summary": "Statistik Belajar",
-          "description": "Ambil statistik belajar keseluruhan dan data dasbor."
-        }
-      },
-      "params": {
-        "deckId": "ID Dek",
-        "from": "Tanggal mulai (contoh: 2025-01-01)",
-        "to": "Tanggal akhir (contoh: 2025-01-31)",
-        "period": "Periode (1w, 1m, 3m, 6m, 1y)"
+        "cardId": "ID Kartu"
       }
     },
     "templates": {
       "title": "API Templat",
-      "description": "Lihat templat kartu.",
+      "description": "Lihat, buat, perbarui, dan hapus templat kartu.",
       "endpoints": {
         "list": {
           "summary": "Daftar Templat",
@@ -170,10 +154,72 @@
         "detail": {
           "summary": "Detail Templat",
           "description": "Ambil informasi templat lengkap termasuk bidang dan tata letak."
+        },
+        "create": {
+          "summary": "Buat Templat",
+          "description": "Buat templat kartu baru."
+        },
+        "update": {
+          "summary": "Perbarui Templat",
+          "description": "Perbarui sebagian templat yang ada. Hanya bidang yang diberikan yang diperbarui."
+        },
+        "delete": {
+          "summary": "Hapus Templat",
+          "description": "Hapus templat. Tidak dapat dihapus jika kartu menggunakan templat ini (error 409)."
         }
       },
       "params": {
         "templateId": "ID Templat"
+      }
+    },
+    "marketplace": {
+      "title": "API Marketplace",
+      "description": "Publikasikan dan kelola dek di marketplace.",
+      "endpoints": {
+        "list": {
+          "summary": "Daftar Listing",
+          "description": "Ambil listing marketplace yang aktif."
+        },
+        "detail": {
+          "summary": "Detail Listing",
+          "description": "Ambil informasi detail untuk listing marketplace tertentu."
+        },
+        "create": {
+          "summary": "Publikasikan Dek",
+          "description": "Publikasikan dek Anda ke marketplace."
+        },
+        "delete": {
+          "summary": "Batalkan Publikasi",
+          "description": "Hapus listing dari marketplace."
+        }
+      },
+      "params": {
+        "listingId": "ID Listing"
+      }
+    },
+    "shares": {
+      "title": "API Berbagi",
+      "description": "Bagikan dek dengan pengguna lain dan kelola undangan.",
+      "endpoints": {
+        "create": {
+          "summary": "Buat Berbagi",
+          "description": "Buat berbagi dek. Dapat mengirim tautan undangan atau undangan email."
+        },
+        "accept": {
+          "summary": "Terima Undangan",
+          "description": "Terima undangan berbagi menggunakan kode undangan."
+        },
+        "list": {
+          "summary": "Daftar Berbagi",
+          "description": "Ambil daftar berbagi yang dikirim dan diterima."
+        },
+        "delete": {
+          "summary": "Cabut Berbagi",
+          "description": "Cabut berbagi atau berhenti berlangganan."
+        }
+      },
+      "params": {
+        "shareId": "ID Berbagi"
       }
     },
     "examples": {
@@ -186,25 +232,25 @@
       "items": {
         "format": {
           "title": "Format Respons Kesalahan",
-          "body": "Semua kesalahan mengembalikan:\n\n{\n  \"error\": \"Pesan kesalahan\",\n  \"code\": \"KODE_KESALAHAN\",\n  \"details\": \"Info tambahan (opsional)\"\n}"
+          "body": "Semua kesalahan mengembalikan:\n\n{\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"Pesan kesalahan\"\n  }\n}"
         },
         "statusCodes": {
           "title": "Kode Status HTTP",
-          "body": "• 200 OK — Berhasil\n• 201 Created — Sumber daya dibuat\n• 204 No Content — Dihapus (tanpa isi respons)\n• 400 Bad Request — Permintaan tidak valid (bidang hilang, validasi gagal)\n• 401 Unauthorized — Autentikasi gagal (kunci API hilang atau tidak valid)\n• 404 Not Found — Sumber daya tidak ditemukan\n• 429 Too Many Requests — Batas permintaan terlampaui\n• 500 Internal Server Error — Kesalahan server"
+          "body": "• 200 OK — Berhasil\n• 201 Created — Sumber daya dibuat\n• 400 Bad Request — Permintaan tidak valid (bidang hilang, validasi gagal)\n• 401 Unauthorized — Autentikasi gagal (kunci API hilang atau tidak valid)\n• 404 Not Found — Sumber daya tidak ditemukan\n• 409 Conflict — Konflik sumber daya (misalnya, menghapus templat yang sedang digunakan)\n• 429 Too Many Requests — Batas permintaan terlampaui\n• 500 Internal Server Error — Kesalahan server"
         },
         "validation": {
           "title": "Kesalahan Validasi",
-          "body": "Kegagalan validasi pembuatan/pembaruan kartu mengembalikan kesalahan per bidang sebagai array:\n\n{\n  \"error\": \"Validasi gagal\",\n  \"errors\": [\n    \"[0] template_id diperlukan\",\n    \"[0] field_values harus memiliki setidaknya satu bidang\"\n  ]\n}"
+          "body": "Kegagalan validasi mengembalikan pesan kesalahan:\n\n{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"field_values: Required\"\n  }\n}"
         }
       }
     },
     "statusCodes": {
       "200": "Berhasil",
       "201": "Dibuat",
-      "204": "Dihapus (tanpa isi respons)",
       "400": "Permintaan tidak valid (bidang wajib hilang)",
       "401": "Autentikasi gagal",
       "404": "Tidak ditemukan",
+      "409": "Konflik sumber daya (templat sedang digunakan)",
       "429": "Batas permintaan terlampaui"
     }
   }

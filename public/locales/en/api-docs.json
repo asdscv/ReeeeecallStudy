@@ -36,15 +36,15 @@
       "items": {
         "what": {
           "title": "What is the API?",
-          "body": "The ReeeeecallStudy API is a RESTful API that lets you view and manage decks, cards, study history, and more via HTTP requests. Use it for automation scripts, third-party app integration, and data analysis."
+          "body": "The ReeeeecallStudy API is a RESTful API that lets you view and manage decks, cards, templates, and more via HTTP requests. Use it for automation scripts, third-party app integration, and data analysis."
         },
         "baseUrl": {
           "title": "Base URL",
-          "body": "All API requests are based on the Supabase project URL.\n\nBase URL: https://your-project.supabase.co/rest/v1"
+          "body": "The base URL for all API requests.\n\nBase URL: https://reeeeecallstudy.xyz/api/v1"
         },
         "responseFormat": {
           "title": "Response Format",
-          "body": "All responses are in JSON format with Content-Type: application/json.\n\nOn success, resource data is returned. On error, responses follow { \"error\": \"message\" } format."
+          "body": "All responses are in JSON format with Content-Type: application/json.\n\nOn success, resources are returned wrapped in { \"data\": ... } format.\nOn error, responses follow { \"error\": { \"code\": \"...\", \"message\": \"...\" } } format."
         }
       }
     },
@@ -84,6 +84,16 @@
         }
       }
     },
+    "profile": {
+      "title": "Profile API",
+      "description": "Retrieve the current user's profile information.",
+      "endpoints": {
+        "me": {
+          "summary": "Get My Profile",
+          "description": "Retrieve the profile of the current API key owner. Auto-creates profile if it doesn't exist."
+        }
+      }
+    },
     "decks": {
       "title": "Decks API",
       "description": "View and manage decks (card collections).",
@@ -94,7 +104,7 @@
         },
         "detail": {
           "summary": "Get Deck Details",
-          "description": "Retrieve detailed information for a specific deck."
+          "description": "Retrieve detailed information and card statistics (total/new/due) for a specific deck."
         },
         "create": {
           "summary": "Create Deck",
@@ -109,59 +119,33 @@
     },
     "cards": {
       "title": "Cards API",
-      "description": "View, create, and modify cards.",
+      "description": "View, create, and delete cards.",
       "endpoints": {
         "list": {
           "summary": "List Cards",
-          "description": "Retrieve cards in a specific deck."
+          "description": "Retrieve cards in a specific deck with pagination."
         },
         "create": {
           "summary": "Create Card",
           "description": "Add a new card to a deck. Single card or bulk create up to 100."
         },
-        "update": {
-          "summary": "Update Card",
-          "description": "Modify an existing card's field values or tags."
+        "detail": {
+          "summary": "Get Card Details",
+          "description": "Retrieve detailed information for a specific card by card ID."
         },
         "delete": {
           "summary": "Delete Card",
-          "description": "Delete a specific card. This action cannot be undone."
+          "description": "Delete a specific card by card ID. This action cannot be undone."
         }
       },
       "params": {
         "deckId": "Deck ID",
-        "cardId": "Card ID",
-        "status": "SRS status filter (new, learning, review, suspended)",
-        "tag": "Tag filter"
-      }
-    },
-    "study": {
-      "title": "Study API",
-      "description": "View study history and manage session data.",
-      "endpoints": {
-        "due": {
-          "summary": "Get Due Cards",
-          "description": "Retrieve cards due for review today."
-        },
-        "history": {
-          "summary": "Study History",
-          "description": "Retrieve study session records."
-        },
-        "stats": {
-          "summary": "Study Statistics",
-          "description": "Retrieve overall study statistics and dashboard data."
-        }
-      },
-      "params": {
-        "deckId": "Deck ID",
-        "from": "Start date (e.g., 2025-01-01)",
-        "to": "End date (e.g., 2025-01-31)",
-        "period": "Period (1w, 1m, 3m, 6m, 1y)"
+        "cardId": "Card ID"
       }
     },
     "templates": {
       "title": "Templates API",
-      "description": "View card templates.",
+      "description": "View, create, update, and delete card templates.",
       "endpoints": {
         "list": {
           "summary": "List Templates",
@@ -170,10 +154,72 @@
         "detail": {
           "summary": "Get Template Details",
           "description": "Retrieve full template information including fields and layouts."
+        },
+        "create": {
+          "summary": "Create Template",
+          "description": "Create a new card template."
+        },
+        "update": {
+          "summary": "Update Template",
+          "description": "Partially update an existing template. Only provided fields are updated."
+        },
+        "delete": {
+          "summary": "Delete Template",
+          "description": "Delete a template. Cannot delete if cards are using this template (409 error)."
         }
       },
       "params": {
         "templateId": "Template ID"
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace API",
+      "description": "Publish and manage decks on the marketplace.",
+      "endpoints": {
+        "list": {
+          "summary": "List Listings",
+          "description": "Retrieve active marketplace listings."
+        },
+        "detail": {
+          "summary": "Get Listing Details",
+          "description": "Retrieve detailed information for a specific marketplace listing."
+        },
+        "create": {
+          "summary": "Publish Deck",
+          "description": "Publish your deck to the marketplace."
+        },
+        "delete": {
+          "summary": "Unpublish",
+          "description": "Remove a listing from the marketplace."
+        }
+      },
+      "params": {
+        "listingId": "Listing ID"
+      }
+    },
+    "shares": {
+      "title": "Sharing API",
+      "description": "Share decks with other users and manage invitations.",
+      "endpoints": {
+        "create": {
+          "summary": "Create Share",
+          "description": "Create a deck share. Can send invite links or email invitations."
+        },
+        "accept": {
+          "summary": "Accept Invite",
+          "description": "Accept a share invitation using an invite code."
+        },
+        "list": {
+          "summary": "List Shares",
+          "description": "Retrieve sent and received share lists."
+        },
+        "delete": {
+          "summary": "Revoke Share",
+          "description": "Revoke a share or unsubscribe."
+        }
+      },
+      "params": {
+        "shareId": "Share ID"
       }
     },
     "examples": {
@@ -186,25 +232,25 @@
       "items": {
         "format": {
           "title": "Error Response Format",
-          "body": "All errors return:\n\n{\n  \"error\": \"Error message\",\n  \"code\": \"ERROR_CODE\",\n  \"details\": \"Additional info (optional)\"\n}"
+          "body": "All errors return:\n\n{\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"Error message\"\n  }\n}"
         },
         "statusCodes": {
           "title": "HTTP Status Codes",
-          "body": "• 200 OK — Success\n• 201 Created — Resource created\n• 204 No Content — Deleted (no response body)\n• 400 Bad Request — Invalid request (missing fields, validation failure)\n• 401 Unauthorized — Auth failure (missing or invalid API key)\n• 404 Not Found — Resource not found\n• 429 Too Many Requests — Rate limit exceeded\n• 500 Internal Server Error — Server error"
+          "body": "• 200 OK — Success\n• 201 Created — Resource created\n• 400 Bad Request — Invalid request (missing fields, validation failure)\n• 401 Unauthorized — Auth failure (missing or invalid API key)\n• 404 Not Found — Resource not found\n• 409 Conflict — Resource conflict (e.g., deleting a template in use)\n• 429 Too Many Requests — Rate limit exceeded\n• 500 Internal Server Error — Server error"
         },
         "validation": {
           "title": "Validation Errors",
-          "body": "Card create/update validation failures return per-field errors as array:\n\n{\n  \"error\": \"Validation failed\",\n  \"errors\": [\n    \"[0] template_id is required\",\n    \"[0] field_values must have at least one field\"\n  ]\n}"
+          "body": "Validation failures return an error message:\n\n{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"field_values: Required\"\n  }\n}"
         }
       }
     },
     "statusCodes": {
       "200": "Success",
       "201": "Created",
-      "204": "Deleted (no response body)",
       "400": "Bad request (missing required fields)",
       "401": "Authentication failed",
       "404": "Not found",
+      "409": "Resource conflict (template in use)",
       "429": "Rate limit exceeded"
     }
   }

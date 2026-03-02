@@ -22,7 +22,7 @@ export interface ApiDocsSection {
   items?: { title: string; body: string; isCode?: boolean }[]
 }
 
-export const API_BASE_URL = 'https://your-project.supabase.co/rest/v1'
+export const API_BASE_URL = 'https://reeeeecallstudy.xyz/api/v1'
 
 export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   // ───────────────────────────────────────────────────
@@ -93,6 +93,39 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
 
   // ───────────────────────────────────────────────────
   {
+    id: 'profile',
+    title: 'sections.profile.title',
+    icon: '👤',
+    description: 'sections.profile.description',
+    endpoints: [
+      {
+        method: 'GET',
+        path: '/me',
+        summary: 'sections.profile.endpoints.me.summary',
+        description: 'sections.profile.endpoints.me.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        responseBody: `{
+  "data": {
+    "id": "uuid",
+    "display_name": "John Doe",
+    "daily_new_limit": 20,
+    "tts_enabled": false,
+    "created_at": "2025-01-01T00:00:00Z"
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
+  {
     id: 'decks',
     title: 'sections.decks.title',
     icon: '📚',
@@ -106,25 +139,29 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
-        queryParams: [
-          { name: 'page', type: 'number', required: false, description: 'sections.decks.params.page' },
-          { name: 'per_page', type: 'number', required: false, description: 'sections.decks.params.perPage' },
-        ],
-        responseBody: `[
-  {
-    "id": "uuid",
-    "name": "영단어 기초",
-    "description": "TOEIC 필수 영단어",
-    "icon": "📚",
-    "color": "#3B82F6",
-    "card_count": 150,
-    "created_at": "2025-01-15T09:00:00Z"
-  }
-]`,
+        responseBody: `{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "영단어 기초",
+      "description": "TOEIC 필수 영단어",
+      "icon": "📚",
+      "color": "#3B82F6",
+      "is_archived": false,
+      "srs_settings": {
+        "again_days": 0,
+        "hard_days": 1,
+        "good_days": 1,
+        "easy_days": 4
+      },
+      "created_at": "2025-01-15T09:00:00Z",
+      "updated_at": "2025-01-20T14:30:00Z"
+    }
+  ]
+}`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
           { code: 401, description: 'sections.statusCodes.401' },
-          { code: 429, description: 'sections.statusCodes.429' },
         ],
       },
       {
@@ -139,21 +176,28 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
           { name: 'deckId', type: 'string (UUID)', description: 'sections.decks.params.deckId' },
         ],
         responseBody: `{
-  "id": "uuid",
-  "name": "영단어 기초",
-  "description": "TOEIC 필수 영단어",
-  "icon": "📚",
-  "color": "#3B82F6",
-  "default_template_id": "uuid",
-  "srs_settings": {
-    "again_days": 0,
-    "hard_days": 1,
-    "good_days": 1,
-    "easy_days": 4
-  },
-  "card_count": 150,
-  "created_at": "2025-01-15T09:00:00Z",
-  "updated_at": "2025-01-20T14:30:00Z"
+  "data": {
+    "id": "uuid",
+    "name": "영단어 기초",
+    "description": "TOEIC 필수 영단어",
+    "icon": "📚",
+    "color": "#3B82F6",
+    "is_archived": false,
+    "default_template_id": "uuid",
+    "srs_settings": {
+      "again_days": 0,
+      "hard_days": 1,
+      "good_days": 1,
+      "easy_days": 4
+    },
+    "stats": {
+      "total_cards": 150,
+      "new_cards": 20,
+      "due_cards": 15
+    },
+    "created_at": "2025-01-15T09:00:00Z",
+    "updated_at": "2025-01-20T14:30:00Z"
+  }
 }`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
@@ -177,12 +221,22 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   "color": "#EF4444"
 }`,
         responseBody: `{
-  "id": "new-uuid",
-  "name": "일본어 N3",
-  "description": "JLPT N3 한자 & 문법",
-  "icon": "🇯🇵",
-  "color": "#EF4444",
-  "created_at": "2025-02-01T10:00:00Z"
+  "data": {
+    "id": "new-uuid",
+    "name": "일본어 N3",
+    "description": "JLPT N3 한자 & 문법",
+    "icon": "🇯🇵",
+    "color": "#EF4444",
+    "is_archived": false,
+    "srs_settings": {
+      "again_days": 0,
+      "hard_days": 1,
+      "good_days": 1,
+      "easy_days": 4
+    },
+    "created_at": "2025-02-01T10:00:00Z",
+    "updated_at": "2025-02-01T10:00:00Z"
+  }
 }`,
         statusCodes: [
           { code: 201, description: 'sections.statusCodes.201' },
@@ -215,25 +269,32 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
         queryParams: [
           { name: 'page', type: 'number', required: false, description: 'sections.decks.params.page' },
           { name: 'per_page', type: 'number', required: false, description: 'sections.decks.params.perPage' },
-          { name: 'status', type: 'string', required: false, description: 'sections.cards.params.status' },
-          { name: 'tag', type: 'string', required: false, description: 'sections.cards.params.tag' },
         ],
-        responseBody: `[
-  {
-    "id": "uuid",
-    "template_id": "uuid",
-    "field_values": {
-      "front": "apple",
-      "back": "사과"
-    },
-    "tags": ["과일", "기초"],
-    "srs_status": "review",
-    "ease_factor": 2.5,
-    "interval_days": 7,
-    "next_review_at": "2025-02-08T00:00:00Z",
-    "created_at": "2025-01-10T08:00:00Z"
+        responseBody: `{
+  "data": [
+    {
+      "id": "uuid",
+      "deck_id": "uuid",
+      "template_id": "uuid",
+      "field_values": {
+        "front": "apple",
+        "back": "사과"
+      },
+      "tags": ["과일", "기초"],
+      "srs_status": "review",
+      "ease_factor": 2.5,
+      "interval_days": 7,
+      "next_review_at": "2025-02-08T00:00:00Z",
+      "created_at": "2025-01-10T08:00:00Z",
+      "updated_at": "2025-01-10T08:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 50,
+    "total": 150
   }
-]`,
+}`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
           { code: 401, description: 'sections.statusCodes.401' },
@@ -276,10 +337,20 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
   }
 ]`,
         responseBody: `{
-  "created": 2,
-  "cards": [
-    { "id": "uuid-1", "field_values": { "front": "cat", "back": "고양이" } },
-    { "id": "uuid-2", "field_values": { "front": "dog", "back": "강아지" } }
+  "data": [
+    {
+      "id": "uuid-1",
+      "deck_id": "uuid",
+      "template_id": "uuid",
+      "field_values": { "front": "cat", "back": "고양이" },
+      "tags": ["동물"],
+      "srs_status": "new",
+      "ease_factor": 2.5,
+      "interval_days": 0,
+      "next_review_at": null,
+      "created_at": "2025-02-01T10:00:00Z",
+      "updated_at": "2025-02-01T10:00:00Z"
+    }
   ]
 }`,
         statusCodes: [
@@ -287,165 +358,63 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
           { code: 400, description: 'sections.statusCodes.400' },
           { code: 401, description: 'sections.statusCodes.401' },
           { code: 404, description: 'sections.statusCodes.404' },
-          { code: 429, description: 'sections.statusCodes.429' },
         ],
       },
       {
-        method: 'PATCH',
-        path: '/decks/:deckId/cards/:cardId',
-        summary: 'sections.cards.endpoints.update.summary',
-        description: 'sections.cards.endpoints.update.description',
+        method: 'GET',
+        path: '/cards/:cardId',
+        summary: 'sections.cards.endpoints.detail.summary',
+        description: 'sections.cards.endpoints.detail.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
-          { name: 'Content-Type', value: 'application/json', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: 'sections.cards.params.deckId' },
           { name: 'cardId', type: 'string (UUID)', description: 'sections.cards.params.cardId' },
         ],
-        requestBody: `{
-  "field_values": {
-    "front": "apple (fruit)",
-    "back": "사과 (과일)"
-  },
-  "tags": ["과일", "수정됨"]
-}`,
         responseBody: `{
-  "id": "uuid",
-  "field_values": {
-    "front": "apple (fruit)",
-    "back": "사과 (과일)"
-  },
-  "tags": ["과일", "수정됨"],
-  "updated_at": "2025-02-01T12:00:00Z"
+  "data": {
+    "id": "uuid",
+    "deck_id": "uuid",
+    "template_id": "uuid",
+    "field_values": {
+      "front": "apple",
+      "back": "사과"
+    },
+    "tags": ["과일"],
+    "srs_status": "review",
+    "ease_factor": 2.5,
+    "interval_days": 7,
+    "next_review_at": "2025-02-08T00:00:00Z",
+    "created_at": "2025-01-10T08:00:00Z",
+    "updated_at": "2025-01-15T12:00:00Z"
+  }
 }`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
-          { code: 400, description: 'sections.statusCodes.400' },
           { code: 401, description: 'sections.statusCodes.401' },
           { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
       {
         method: 'DELETE',
-        path: '/decks/:deckId/cards/:cardId',
+        path: '/cards/:cardId',
         summary: 'sections.cards.endpoints.delete.summary',
         description: 'sections.cards.endpoints.delete.description',
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
         pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: 'sections.cards.params.deckId' },
           { name: 'cardId', type: 'string (UUID)', description: 'sections.cards.params.cardId' },
         ],
-        statusCodes: [
-          { code: 204, description: 'sections.statusCodes.204' },
-          { code: 401, description: 'sections.statusCodes.401' },
-          { code: 404, description: 'sections.statusCodes.404' },
-        ],
-      },
-    ],
-  },
-
-  // ───────────────────────────────────────────────────
-  {
-    id: 'study',
-    title: 'sections.study.title',
-    icon: '📖',
-    description: 'sections.study.description',
-    endpoints: [
-      {
-        method: 'GET',
-        path: '/decks/:deckId/study/due',
-        summary: 'sections.study.endpoints.due.summary',
-        description: 'sections.study.endpoints.due.description',
-        headers: [
-          { name: 'Authorization', value: 'Bearer rc_...', required: true },
-        ],
-        pathParams: [
-          { name: 'deckId', type: 'string (UUID)', description: 'sections.study.params.deckId' },
-        ],
         responseBody: `{
-  "due_count": 12,
-  "new_count": 5,
-  "cards": [
-    {
-      "id": "uuid",
-      "field_values": { "front": "apple", "back": "사과" },
-      "srs_status": "review",
-      "interval_days": 3,
-      "next_review_at": "2025-02-01T00:00:00Z"
-    }
-  ]
-}`,
-        statusCodes: [
-          { code: 200, description: 'sections.statusCodes.200' },
-          { code: 401, description: 'sections.statusCodes.401' },
-          { code: 404, description: 'sections.statusCodes.404' },
-        ],
-      },
-      {
-        method: 'GET',
-        path: '/study/history',
-        summary: 'sections.study.endpoints.history.summary',
-        description: 'sections.study.endpoints.history.description',
-        headers: [
-          { name: 'Authorization', value: 'Bearer rc_...', required: true },
-        ],
-        queryParams: [
-          { name: 'deck_id', type: 'string (UUID)', required: false, description: 'sections.study.params.deckId' },
-          { name: 'from', type: 'string (ISO date)', required: false, description: 'sections.study.params.from' },
-          { name: 'to', type: 'string (ISO date)', required: false, description: 'sections.study.params.to' },
-          { name: 'page', type: 'number', required: false, description: 'sections.decks.params.page' },
-          { name: 'per_page', type: 'number', required: false, description: 'sections.decks.params.perPage' },
-        ],
-        responseBody: `[
-  {
-    "id": "uuid",
-    "deck_id": "uuid",
-    "study_mode": "srs",
-    "cards_studied": 25,
-    "total_duration_ms": 600000,
-    "ratings": {
-      "again": 3,
-      "hard": 5,
-      "good": 12,
-      "easy": 5
-    },
-    "started_at": "2025-02-01T09:00:00Z",
-    "completed_at": "2025-02-01T09:10:00Z"
+  "data": {
+    "deleted": true
   }
-]`,
-        statusCodes: [
-          { code: 200, description: 'sections.statusCodes.200' },
-          { code: 401, description: 'sections.statusCodes.401' },
-        ],
-      },
-      {
-        method: 'GET',
-        path: '/study/stats',
-        summary: 'sections.study.endpoints.stats.summary',
-        description: 'sections.study.endpoints.stats.description',
-        headers: [
-          { name: 'Authorization', value: 'Bearer rc_...', required: true },
-        ],
-        queryParams: [
-          { name: 'period', type: 'string', required: false, description: 'sections.study.params.period' },
-        ],
-        responseBody: `{
-  "total_cards": 500,
-  "cards_due_today": 23,
-  "streak_days": 15,
-  "mastery_rate": 0.72,
-  "daily_counts": [
-    { "date": "2025-01-30", "count": 45 },
-    { "date": "2025-01-31", "count": 30 },
-    { "date": "2025-02-01", "count": 50 }
-  ]
 }`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
           { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
         ],
       },
     ],
@@ -466,18 +435,27 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
         headers: [
           { name: 'Authorization', value: 'Bearer rc_...', required: true },
         ],
-        responseBody: `[
-  {
-    "id": "uuid",
-    "name": "기본 (앞/뒤)",
-    "fields": [
-      { "key": "front", "name": "앞면", "type": "text", "order": 0 },
-      { "key": "back", "name": "뒷면", "type": "text", "order": 1 }
-    ],
-    "is_default": true,
-    "created_at": "2025-01-01T00:00:00Z"
-  }
-]`,
+        responseBody: `{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "기본 (앞/뒤)",
+      "fields": [
+        { "key": "front", "name": "앞면", "type": "text", "order": 0 },
+        { "key": "back", "name": "뒷면", "type": "text", "order": 1 }
+      ],
+      "front_layout": [
+        { "field_key": "front", "style": "primary", "font_size": 24 }
+      ],
+      "back_layout": [
+        { "field_key": "back", "style": "primary", "font_size": 20 }
+      ],
+      "is_default": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  ]
+}`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
           { code: 401, description: 'sections.statusCodes.401' },
@@ -495,23 +473,392 @@ export const API_DOCS_SECTIONS: ApiDocsSection[] = [
           { name: 'templateId', type: 'string (UUID)', description: 'sections.templates.params.templateId' },
         ],
         responseBody: `{
-  "id": "uuid",
-  "name": "영단어 상세",
+  "data": {
+    "id": "uuid",
+    "name": "영단어 상세",
+    "fields": [
+      { "key": "word", "name": "단어", "type": "text", "order": 0, "tts_enabled": true, "tts_lang": "en-US" },
+      { "key": "meaning", "name": "뜻", "type": "text", "order": 1 },
+      { "key": "example", "name": "예문", "type": "text", "order": 2 }
+    ],
+    "front_layout": [
+      { "field_key": "word", "style": "primary", "font_size": 24 }
+    ],
+    "back_layout": [
+      { "field_key": "meaning", "style": "primary", "font_size": 20 },
+      { "field_key": "example", "style": "secondary", "font_size": 14 }
+    ],
+    "is_default": false,
+    "created_at": "2025-01-05T12:00:00Z",
+    "updated_at": "2025-01-10T08:00:00Z"
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+      {
+        method: 'POST',
+        path: '/templates',
+        summary: 'sections.templates.endpoints.create.summary',
+        description: 'sections.templates.endpoints.create.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+          { name: 'Content-Type', value: 'application/json', required: true },
+        ],
+        requestBody: `{
+  "name": "나의 템플릿",
   "fields": [
-    { "key": "word", "name": "단어", "type": "text", "order": 0, "tts_enabled": true, "tts_lang": "en-US" },
-    { "key": "meaning", "name": "뜻", "type": "text", "order": 1 },
-    { "key": "example", "name": "예문", "type": "text", "order": 2 }
+    { "key": "front", "name": "앞면", "type": "text", "order": 0 },
+    { "key": "back", "name": "뒷면", "type": "text", "order": 1 }
   ],
   "front_layout": [
-    { "field_key": "word", "style": "primary", "font_size": 24 }
+    { "field_key": "front", "style": "primary", "font_size": 24 }
   ],
   "back_layout": [
-    { "field_key": "meaning", "style": "primary", "font_size": 20 },
-    { "field_key": "example", "style": "secondary", "font_size": 14 }
-  ],
-  "layout_mode": "default",
-  "is_default": false,
-  "created_at": "2025-01-05T12:00:00Z"
+    { "field_key": "back", "style": "primary", "font_size": 20 }
+  ]
+}`,
+        responseBody: `{
+  "data": {
+    "id": "new-uuid",
+    "name": "나의 템플릿",
+    "fields": [
+      { "key": "front", "name": "앞면", "type": "text", "order": 0 },
+      { "key": "back", "name": "뒷면", "type": "text", "order": 1 }
+    ],
+    "front_layout": [
+      { "field_key": "front", "style": "primary", "font_size": 24 }
+    ],
+    "back_layout": [
+      { "field_key": "back", "style": "primary", "font_size": 20 }
+    ],
+    "is_default": false,
+    "created_at": "2025-02-01T10:00:00Z",
+    "updated_at": "2025-02-01T10:00:00Z"
+  }
+}`,
+        statusCodes: [
+          { code: 201, description: 'sections.statusCodes.201' },
+          { code: 400, description: 'sections.statusCodes.400' },
+          { code: 401, description: 'sections.statusCodes.401' },
+        ],
+      },
+      {
+        method: 'PATCH',
+        path: '/templates/:templateId',
+        summary: 'sections.templates.endpoints.update.summary',
+        description: 'sections.templates.endpoints.update.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+          { name: 'Content-Type', value: 'application/json', required: true },
+        ],
+        pathParams: [
+          { name: 'templateId', type: 'string (UUID)', description: 'sections.templates.params.templateId' },
+        ],
+        requestBody: `{
+  "name": "수정된 템플릿 이름"
+}`,
+        responseBody: `{
+  "data": {
+    "id": "uuid",
+    "name": "수정된 템플릿 이름",
+    "fields": [...],
+    "front_layout": [...],
+    "back_layout": [...],
+    "is_default": false,
+    "created_at": "2025-01-05T12:00:00Z",
+    "updated_at": "2025-02-01T15:00:00Z"
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 400, description: 'sections.statusCodes.400' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+      {
+        method: 'DELETE',
+        path: '/templates/:templateId',
+        summary: 'sections.templates.endpoints.delete.summary',
+        description: 'sections.templates.endpoints.delete.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        pathParams: [
+          { name: 'templateId', type: 'string (UUID)', description: 'sections.templates.params.templateId' },
+        ],
+        responseBody: `{
+  "data": {
+    "deleted": true
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+          { code: 409, description: 'sections.statusCodes.409' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
+  {
+    id: 'marketplace',
+    title: 'sections.marketplace.title',
+    icon: '🏪',
+    description: 'sections.marketplace.description',
+    endpoints: [
+      {
+        method: 'GET',
+        path: '/marketplace',
+        summary: 'sections.marketplace.endpoints.list.summary',
+        description: 'sections.marketplace.endpoints.list.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        responseBody: `{
+  "data": [
+    {
+      "id": "uuid",
+      "deck_id": "uuid",
+      "owner_id": "uuid",
+      "title": "TOEIC 필수 영단어 900",
+      "description": "빈출 단어 모음",
+      "tags": ["영어", "TOEIC"],
+      "category": "language",
+      "share_mode": "copy",
+      "card_count": 900,
+      "acquire_count": 42,
+      "is_active": true,
+      "created_at": "2025-01-20T10:00:00Z",
+      "updated_at": "2025-01-20T10:00:00Z"
+    }
+  ]
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+        ],
+      },
+      {
+        method: 'GET',
+        path: '/marketplace/:listingId',
+        summary: 'sections.marketplace.endpoints.detail.summary',
+        description: 'sections.marketplace.endpoints.detail.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        pathParams: [
+          { name: 'listingId', type: 'string (UUID)', description: 'sections.marketplace.params.listingId' },
+        ],
+        responseBody: `{
+  "data": {
+    "id": "uuid",
+    "deck_id": "uuid",
+    "owner_id": "uuid",
+    "title": "TOEIC 필수 영단어 900",
+    "description": "빈출 단어 모음",
+    "tags": ["영어", "TOEIC"],
+    "category": "language",
+    "share_mode": "copy",
+    "card_count": 900,
+    "acquire_count": 42,
+    "is_active": true,
+    "created_at": "2025-01-20T10:00:00Z",
+    "updated_at": "2025-01-20T10:00:00Z"
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+      {
+        method: 'POST',
+        path: '/marketplace',
+        summary: 'sections.marketplace.endpoints.create.summary',
+        description: 'sections.marketplace.endpoints.create.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+          { name: 'Content-Type', value: 'application/json', required: true },
+        ],
+        requestBody: `{
+  "deck_id": "uuid",
+  "title": "나의 영단어장",
+  "description": "직접 정리한 영단어",
+  "tags": ["영어"],
+  "category": "language",
+  "share_mode": "copy"
+}`,
+        responseBody: `{
+  "data": {
+    "id": "new-uuid",
+    "deck_id": "uuid",
+    "owner_id": "uuid",
+    "title": "나의 영단어장",
+    "description": "직접 정리한 영단어",
+    "tags": ["영어"],
+    "category": "language",
+    "share_mode": "copy",
+    "card_count": 50,
+    "acquire_count": 0,
+    "is_active": true,
+    "created_at": "2025-02-01T10:00:00Z",
+    "updated_at": "2025-02-01T10:00:00Z"
+  }
+}`,
+        statusCodes: [
+          { code: 201, description: 'sections.statusCodes.201' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+      {
+        method: 'DELETE',
+        path: '/marketplace/:listingId',
+        summary: 'sections.marketplace.endpoints.delete.summary',
+        description: 'sections.marketplace.endpoints.delete.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        pathParams: [
+          { name: 'listingId', type: 'string (UUID)', description: 'sections.marketplace.params.listingId' },
+        ],
+        responseBody: `{
+  "data": {
+    "deleted": true
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
+  {
+    id: 'shares',
+    title: 'sections.shares.title',
+    icon: '🔗',
+    description: 'sections.shares.description',
+    endpoints: [
+      {
+        method: 'POST',
+        path: '/shares',
+        summary: 'sections.shares.endpoints.create.summary',
+        description: 'sections.shares.endpoints.create.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+          { name: 'Content-Type', value: 'application/json', required: true },
+        ],
+        requestBody: `{
+  "deck_id": "uuid",
+  "share_mode": "copy",
+  "invite_email": "friend@example.com",
+  "generate_link": true
+}`,
+        responseBody: `{
+  "data": {
+    "id": "uuid",
+    "deck_id": "uuid",
+    "owner_id": "uuid",
+    "recipient_id": null,
+    "share_mode": "copy",
+    "status": "pending",
+    "invite_code": "aBcDeFgH",
+    "invite_email": "friend@example.com",
+    "copied_deck_id": null,
+    "created_at": "2025-02-01T10:00:00Z",
+    "accepted_at": null
+  }
+}`,
+        statusCodes: [
+          { code: 201, description: 'sections.statusCodes.201' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+      {
+        method: 'POST',
+        path: '/shares/accept',
+        summary: 'sections.shares.endpoints.accept.summary',
+        description: 'sections.shares.endpoints.accept.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+          { name: 'Content-Type', value: 'application/json', required: true },
+        ],
+        requestBody: `{
+  "invite_code": "aBcDeFgH"
+}`,
+        responseBody: `{
+  "data": {
+    "deck_id": "uuid"
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 400, description: 'sections.statusCodes.400' },
+          { code: 401, description: 'sections.statusCodes.401' },
+          { code: 404, description: 'sections.statusCodes.404' },
+        ],
+      },
+      {
+        method: 'GET',
+        path: '/shares',
+        summary: 'sections.shares.endpoints.list.summary',
+        description: 'sections.shares.endpoints.list.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        responseBody: `{
+  "data": {
+    "sent": [
+      {
+        "id": "uuid",
+        "deck_id": "uuid",
+        "owner_id": "uuid",
+        "recipient_id": "uuid",
+        "share_mode": "copy",
+        "status": "active",
+        "invite_code": "aBcDeFgH",
+        "invite_email": null,
+        "copied_deck_id": "uuid",
+        "created_at": "2025-02-01T10:00:00Z",
+        "accepted_at": "2025-02-02T08:00:00Z"
+      }
+    ],
+    "received": []
+  }
+}`,
+        statusCodes: [
+          { code: 200, description: 'sections.statusCodes.200' },
+          { code: 401, description: 'sections.statusCodes.401' },
+        ],
+      },
+      {
+        method: 'DELETE',
+        path: '/shares/:shareId',
+        summary: 'sections.shares.endpoints.delete.summary',
+        description: 'sections.shares.endpoints.delete.description',
+        headers: [
+          { name: 'Authorization', value: 'Bearer rc_...', required: true },
+        ],
+        pathParams: [
+          { name: 'shareId', type: 'string (UUID)', description: 'sections.shares.params.shareId' },
+        ],
+        responseBody: `{
+  "data": {
+    "deleted": true
+  }
 }`,
         statusCodes: [
           { code: 200, description: 'sections.statusCodes.200' },
@@ -575,11 +922,11 @@ export const CODE_EXAMPLES: Record<string, { title: string; code: string }> = {
   curl: {
     title: 'cURL',
     code: `# 덱 목록 조회
-curl -X GET "https://your-project.supabase.co/rest/v1/decks" \\
+curl -X GET "https://reeeeecallstudy.xyz/api/v1/decks" \\
   -H "Authorization: Bearer rc_your_api_key"
 
 # 카드 생성
-curl -X POST "https://your-project.supabase.co/rest/v1/decks/{deckId}/cards" \\
+curl -X POST "https://reeeeecallstudy.xyz/api/v1/decks/{deckId}/cards" \\
   -H "Authorization: Bearer rc_your_api_key" \\
   -H "Content-Type: application/json" \\
   -d '{"template_id":"uuid","field_values":{"front":"hello","back":"안녕"}}'`,
@@ -587,15 +934,15 @@ curl -X POST "https://your-project.supabase.co/rest/v1/decks/{deckId}/cards" \\
   javascript: {
     title: 'JavaScript (fetch)',
     code: `const API_KEY = process.env.REEEEECALL_API_KEY;
-const BASE = "https://your-project.supabase.co/rest/v1";
+const BASE = "https://reeeeecallstudy.xyz/api/v1";
 
 // 덱 목록 조회
-const decks = await fetch(\`\${BASE}/decks\`, {
+const { data: decks } = await fetch(\`\${BASE}/decks\`, {
   headers: { Authorization: \`Bearer \${API_KEY}\` }
 }).then(r => r.json());
 
 // 카드 일괄 생성
-const result = await fetch(\`\${BASE}/decks/\${deckId}/cards\`, {
+const { data: cards } = await fetch(\`\${BASE}/decks/\${deckId}/cards\`, {
   method: "POST",
   headers: {
     Authorization: \`Bearer \${API_KEY}\`,
@@ -612,11 +959,12 @@ const result = await fetch(\`\${BASE}/decks/\${deckId}/cards\`, {
     code: `import os, requests
 
 API_KEY = os.environ["REEEEECALL_API_KEY"]
-BASE = "https://your-project.supabase.co/rest/v1"
+BASE = "https://reeeeecallstudy.xyz/api/v1"
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
 # 덱 목록 조회
-decks = requests.get(f"{BASE}/decks", headers=headers).json()
+resp = requests.get(f"{BASE}/decks", headers=headers).json()
+decks = resp["data"]
 
 # 카드 생성
 card = {
@@ -628,7 +976,8 @@ result = requests.post(
     f"{BASE}/decks/{deck_id}/cards",
     headers={**headers, "Content-Type": "application/json"},
     json=card
-).json()`,
+).json()
+created_cards = result["data"]`,
   },
 }
 
