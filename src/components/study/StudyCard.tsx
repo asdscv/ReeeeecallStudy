@@ -5,7 +5,7 @@ import { Volume2 } from 'lucide-react'
 import { renderCardFace } from '../../lib/card-renderer'
 import { resolveCardFaceContent } from '../../lib/card-face-resolver'
 import { getLayoutItemStyle } from '../../lib/layout-styles'
-import { speak, type TTSFieldInfo } from '../../lib/tts'
+import { speak, type TTSFieldInfo, type TTSOptions } from '../../lib/tts'
 import {
   shouldEnableSwipe,
   resolveSwipeAction,
@@ -33,6 +33,7 @@ interface StudyCardProps {
   inputSettings?: StudyInputSettings | null
   swipeDirections?: SwipeDirectionMap
   exitDirection?: ExitDirection | null
+  ttsOptions?: TTSOptions
 }
 
 /** Card follows finger at 60% of actual movement (higher = more responsive) */
@@ -49,6 +50,7 @@ export function StudyCard({
   inputSettings,
   swipeDirections,
   exitDirection,
+  ttsOptions,
 }: StudyCardProps) {
   const { t } = useTranslation('study')
 
@@ -491,7 +493,7 @@ function CardFaceLayout({
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    speak(ttsInfo.text, ttsInfo.lang)
+                    speak(ttsInfo.text, ttsInfo.lang, ttsOptions)
                   }}
                   onPointerDown={(e) => e.stopPropagation()}
                   className="p-2.5 -m-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0"

@@ -59,7 +59,10 @@
     "loading": "กำลังโหลด...",
     "noCards": "ไม่มีการ์ดให้เรียน",
     "allReviewed": "ทบทวนการ์ดทั้งหมดแล้ว!",
-    "backToDeck": "กลับไปยังสำรับ"
+    "backToDeck": "กลับไปยังสำรับ",
+    "exitConfirmTitle": "ต้องการจบการเรียนหรือไม่?",
+    "exitConfirmMessage": "ความก้าวหน้าของคุณจะถูกบันทึก",
+    "exitConfirmButton": "จบ"
   },
   "card": {
     "tapToFlip": "แตะเพื่อพลิก",

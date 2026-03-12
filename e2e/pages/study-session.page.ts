@@ -209,6 +209,39 @@ export class StudySessionPage extends BasePage {
     return text ?? ''
   }
 
+  // ─── Progress Bar ────────────────────────────────────
+
+  /** Progress bar text (e.g., "3/10") */
+  get progressText(): Locator {
+    return this.page.locator('.whitespace-nowrap').filter({ hasText: /\d+\/\d+/ })
+  }
+
+  /** Get the current progress text (e.g., "3/10") */
+  async getProgressText(): Promise<string> {
+    return (await this.progressText.textContent()) ?? ''
+  }
+
+  // ─── Exit Confirm Dialog ────────────────────────────
+
+  /** Exit confirm dialog */
+  get exitConfirmDialog(): Locator {
+    return this.page.locator('[role="dialog"]')
+  }
+
+  /** Confirm exit button in dialog */
+  get confirmExitButton(): Locator {
+    return this.exitConfirmDialog.getByRole('button', {
+      name: /End Session|종료|结束|終了|Kết thúc|จบ|Akhiri|Terminar/i,
+    })
+  }
+
+  /** Cancel button in exit dialog */
+  get cancelExitButton(): Locator {
+    return this.exitConfirmDialog.getByRole('button', {
+      name: /Cancel|취소|取消|キャンセル|Hủy|ยกเลิก|Batal|Cancelar/i,
+    })
+  }
+
   // ─── Swipe Actions ────────────────────────────────────
 
   /** Enable swipe mode by persisting to DB via Settings page */

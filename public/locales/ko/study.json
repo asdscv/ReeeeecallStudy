@@ -59,7 +59,10 @@
     "loading": "로딩 중...",
     "noCards": "학습할 카드가 없습니다",
     "allReviewed": "모든 카드를 복습했습니다!",
-    "backToDeck": "덱으로 돌아가기"
+    "backToDeck": "덱으로 돌아가기",
+    "exitConfirmTitle": "학습을 종료하시겠습니까?",
+    "exitConfirmMessage": "현재까지의 학습 기록은 저장됩니다.",
+    "exitConfirmButton": "종료"
   },
   "card": {
     "tapToFlip": "탭하여 뒤집기",

@@ -529,6 +529,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     if (isComplete) {
       set({
         queue: updatedQueue,
+        isFlipped: false,
         isRating: false,
         studyState: updatedStudyState,
         sessionStats: {

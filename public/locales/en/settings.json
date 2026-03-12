@@ -67,6 +67,12 @@
     "title": "Auto TTS Reading",
     "description": "Auto-read TTS-enabled fields when flipping card",
     "enable": "Enable auto reading",
+    "provider": "Voice Engine",
+    "webSpeech": "Device Voice",
+    "webSpeechDesc": "Uses your device's built-in voice",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Higher quality neural voice",
+    "speed": "Reading Speed",
     "help": "TTS language follows field settings in card template. Play button always shows regardless of auto reading.",
     "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading."
   },

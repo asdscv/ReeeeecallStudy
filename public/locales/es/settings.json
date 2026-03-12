@@ -59,6 +59,12 @@
     "title": "Lectura TTS automática",
     "description": "Leer automáticamente campos con TTS al voltear la tarjeta",
     "enable": "Activar lectura automática",
+    "provider": "Motor de voz",
+    "webSpeech": "Voz del dispositivo",
+    "webSpeechDesc": "Usa la voz integrada del dispositivo",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Voz neural de alta calidad",
+    "speed": "Velocidad de lectura",
     "help": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
     "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática."
   },

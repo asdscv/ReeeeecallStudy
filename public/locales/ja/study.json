@@ -59,7 +59,10 @@
     "loading": "読み込み中...",
     "noCards": "学習するカードがありません",
     "allReviewed": "すべてのカードを復習しました！",
-    "backToDeck": "デッキに戻る"
+    "backToDeck": "デッキに戻る",
+    "exitConfirmTitle": "学習を終了しますか？",
+    "exitConfirmMessage": "これまでの学習記録は保存されます。",
+    "exitConfirmButton": "終了"
   },
   "card": {
     "tapToFlip": "タップして裏返す",

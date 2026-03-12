@@ -13,6 +13,7 @@ export interface Database {
           theme: 'light' | 'dark' | 'system'
           tts_enabled: boolean
           tts_lang: string
+          tts_speed: number
           tts_provider: 'web_speech' | 'edge_tts'
           locale: string
           role: UserRole
@@ -30,6 +31,7 @@ export interface Database {
           theme?: 'light' | 'dark' | 'system'
           tts_enabled?: boolean
           tts_lang?: string
+          tts_speed?: number
           tts_provider?: 'web_speech' | 'edge_tts'
           locale?: string
           role?: UserRole

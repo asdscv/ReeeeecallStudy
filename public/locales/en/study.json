@@ -59,7 +59,10 @@
     "loading": "Loading...",
     "noCards": "No cards to study",
     "allReviewed": "All cards reviewed!",
-    "backToDeck": "Back to Deck"
+    "backToDeck": "Back to Deck",
+    "exitConfirmTitle": "End study session?",
+    "exitConfirmMessage": "Your progress so far will be saved.",
+    "exitConfirmButton": "End Session"
   },
   "card": {
     "tapToFlip": "Tap to flip",

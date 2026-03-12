@@ -67,6 +67,12 @@
     "title": "Pembacaan TTS Otomatis",
     "description": "Baca otomatis bidang dengan TTS saat membalik kartu",
     "enable": "Aktifkan pembacaan otomatis",
+    "provider": "Mesin Suara",
+    "webSpeech": "Suara Perangkat",
+    "webSpeechDesc": "Menggunakan suara bawaan perangkat",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Suara neural berkualitas tinggi",
+    "speed": "Kecepatan baca",
     "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
     "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
   },

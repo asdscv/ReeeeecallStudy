@@ -67,6 +67,12 @@
     "title": "自动 TTS 朗读",
     "description": "翻转卡片时自动朗读启用了 TTS 的字段",
     "enable": "启用自动朗读",
+    "provider": "语音引擎",
+    "webSpeech": "设备语音",
+    "webSpeechDesc": "使用设备内置语音",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "高质量神经网络语音",
+    "speed": "朗读速度",
     "help": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
     "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。"
   },

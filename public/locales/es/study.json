@@ -59,7 +59,10 @@
     "loading": "Cargando...",
     "noCards": "No hay tarjetas para estudiar",
     "allReviewed": "¡Todas las tarjetas repasadas!",
-    "backToDeck": "Volver al mazo"
+    "backToDeck": "Volver al mazo",
+    "exitConfirmTitle": "¿Terminar la sesión?",
+    "exitConfirmMessage": "Tu progreso se guardará.",
+    "exitConfirmButton": "Terminar"
   },
   "card": {
     "tapToFlip": "Toca para voltear",

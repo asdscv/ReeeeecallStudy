@@ -14,9 +14,10 @@ import { CrammingRatingButtons } from '../components/study/CrammingRatingButtons
 import { StudySummary } from '../components/study/StudySummary'
 import { CrammingSummary } from '../components/study/CrammingSummary'
 import { NoCardsDue } from '../components/study/NoCardsDue'
+import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
-import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak } from '../lib/tts'
+import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak, type TTSOptions } from '../lib/tts'
 import { loadSettings, shouldShowButtons, getDirectionsForMode, type StudyInputSettings, type SwipeDirectionMap } from '../lib/study-input-settings'
 import type { CrammingFilter } from '../lib/cramming-queue'
 import type { StudyMode, Profile } from '../types/database'
@@ -49,6 +50,7 @@ export function StudySessionPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [inputSettings, setInputSettings] = useState<StudyInputSettings>(() => loadSettings())
   const [crammingTimeRemaining, setCrammingTimeRemaining] = useState<number | null>(null)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   // Fetch profile for TTS settings
   useEffect(() => {
@@ -153,6 +155,12 @@ export function StudySessionPage() {
     return getTTSFieldsForLayout(currentCard, template, 'back')
   }, [currentCard, template])
 
+  // TTS options derived from profile (extensible: rate, pitch, volume, provider)
+  const ttsOptions = useMemo<TTSOptions>(() => ({
+    rate: profile?.tts_speed ?? 0.9,
+    provider: profile?.tts_provider ?? 'web_speech',
+  }), [profile?.tts_speed, profile?.tts_provider])
+
   // Auto-TTS on flip (only when profile.tts_enabled)
   useEffect(() => {
     if (!isFlipped || !template || !config || !currentCard) return
@@ -167,9 +175,16 @@ export function StudySessionPage() {
 
     // Auto-read TTS-enabled fields if profile setting is on
     if (profile?.tts_enabled && backTTSFields.length > 0) {
-      speak(backTTSFields[0].text, backTTSFields[0].lang)
+      speak(backTTSFields[0].text, backTTSFields[0].lang, ttsOptions)
     }
-  }, [isFlipped, currentCard, template, config, profile, backTTSFields])
+  }, [isFlipped, currentCard, template, config, profile, backTTSFields, ttsOptions])
+
+  // Stop TTS when session completes
+  useEffect(() => {
+    if (phase === 'completed') {
+      stopSpeaking()
+    }
+  }, [phase])
 
   const handleRate = useCallback((rating: string) => {
     rateCard(rating)
@@ -177,12 +192,18 @@ export function StudySessionPage() {
 
   const handleExit = useCallback(() => {
     if (sessionStats.cardsStudied > 0) {
-      exitSession()
+      setShowExitConfirm(true)
     } else {
       reset()
       navigate(`/decks/${deckId}`)
     }
-  }, [sessionStats.cardsStudied, exitSession, reset, navigate, deckId])
+  }, [sessionStats.cardsStudied, reset, navigate, deckId])
+
+  const handleConfirmExit = useCallback(() => {
+    setShowExitConfirm(false)
+    stopSpeaking()
+    exitSession()
+  }, [exitSession])
 
   const handleFlip = useCallback(() => {
     flipCard()
@@ -321,7 +342,7 @@ export function StudySessionPage() {
             />
           ) : (
             <StudyProgressBar
-              current={sessionStats.cardsStudied}
+              current={sessionStats.cardsStudied + 1}
               total={sessionStats.totalCards}
             />
           )}
@@ -348,6 +369,7 @@ export function StudySessionPage() {
         inputSettings={inputSettings}
         swipeDirections={swipeDirections}
         exitDirection={exitDirection}
+        ttsOptions={ttsOptions}
       />
 
       {/* Rating buttons (hidden in swipe mode) */}
@@ -364,6 +386,16 @@ export function StudySessionPage() {
           ) : null}
         </div>
       )}
+
+      {/* Exit confirmation dialog */}
+      <ConfirmDialog
+        open={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        onConfirm={handleConfirmExit}
+        title={t('session.exitConfirmTitle')}
+        message={t('session.exitConfirmMessage')}
+        confirmLabel={t('session.exitConfirmButton')}
+      />
     </div>
   )
 }

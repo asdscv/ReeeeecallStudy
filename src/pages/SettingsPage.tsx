@@ -52,6 +52,8 @@ export function SettingsPage() {
   const [displayName, setDisplayName] = useState('')
   const [dailyNewLimit, setDailyNewLimit] = useState(20)
   const [ttsEnabled, setTtsEnabled] = useState(false)
+  const [ttsSpeed, setTtsSpeed] = useState(0.9)
+  const [ttsProvider, setTtsProvider] = useState<'web_speech' | 'edge_tts'>('web_speech')
 
   // API key state
   const [apiKeyData, setApiKeyData] = useState<{ key: string; name: string; createdAt: string } | null>(null)
@@ -81,6 +83,8 @@ export function SettingsPage() {
         setDisplayName(p.display_name ?? '')
         setDailyNewLimit(p.daily_new_limit)
         setTtsEnabled(p.tts_enabled)
+        setTtsSpeed(p.tts_speed ?? 0.9)
+        setTtsProvider(p.tts_provider ?? 'web_speech')
         // Sync answer_mode from DB → local state
         if (p.answer_mode) {
           const synced: StudyInputSettings = { version: 3, mode: p.answer_mode }
@@ -126,6 +130,8 @@ export function SettingsPage() {
         display_name: displayName.trim() || null,
         daily_new_limit: dailyNewLimit,
         tts_enabled: ttsEnabled,
+        tts_speed: ttsSpeed,
+        tts_provider: ttsProvider,
         answer_mode: inputSettings.mode,
       } as Record<string, unknown>)
       .eq('id', user.id)
@@ -371,6 +377,61 @@ export function SettingsPage() {
             />
             <span className="text-sm text-gray-700">{t('tts.enable')}</span>
           </label>
+
+          {/* TTS Provider */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('tts.provider')}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setTtsProvider('web_speech')}
+                className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
+                  ttsProvider === 'web_speech'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="text-sm font-semibold text-gray-900">{t('tts.webSpeech')}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t('tts.webSpeechDesc')}</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTtsProvider('edge_tts')}
+                className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
+                  ttsProvider === 'edge_tts'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="text-sm font-semibold text-gray-900">{t('tts.edgeTts')}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{t('tts.edgeTtsDesc')}</div>
+              </button>
+            </div>
+          </div>
+
+          {/* TTS Speed slider */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('tts.speed')}
+            </label>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-gray-400 w-8">0.5x</span>
+              <input
+                type="range"
+                min={0.5}
+                max={2.0}
+                step={0.1}
+                value={ttsSpeed}
+                onChange={(e) => setTtsSpeed(parseFloat(e.target.value))}
+                className="flex-1 accent-blue-500 cursor-pointer"
+              />
+              <span className="text-xs text-gray-400 w-8">2.0x</span>
+              <span className="text-sm font-medium text-gray-700 w-12 text-right">{ttsSpeed.toFixed(1)}x</span>
+            </div>
+          </div>
+
           <p className="text-xs text-gray-400 mt-3">
             {t('tts.help')}
           </p>

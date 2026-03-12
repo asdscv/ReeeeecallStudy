@@ -59,7 +59,10 @@
     "loading": "加载中...",
     "noCards": "没有可学习的卡片",
     "allReviewed": "所有卡片已复习完毕！",
-    "backToDeck": "返回牌组"
+    "backToDeck": "返回牌组",
+    "exitConfirmTitle": "结束学习？",
+    "exitConfirmMessage": "已学习的内容将被保存。",
+    "exitConfirmButton": "结束"
   },
   "card": {
     "tapToFlip": "点击翻转",

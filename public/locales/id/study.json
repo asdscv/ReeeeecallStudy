@@ -59,7 +59,10 @@
     "loading": "Memuat...",
     "noCards": "Tidak ada kartu untuk dipelajari",
     "allReviewed": "Semua kartu telah diulas!",
-    "backToDeck": "Kembali ke Dek"
+    "backToDeck": "Kembali ke Dek",
+    "exitConfirmTitle": "Akhiri sesi belajar?",
+    "exitConfirmMessage": "Progres Anda akan disimpan.",
+    "exitConfirmButton": "Akhiri"
   },
   "card": {
     "tapToFlip": "Ketuk untuk membalik",

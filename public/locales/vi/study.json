@@ -59,7 +59,10 @@
     "loading": "Đang tải...",
     "noCards": "Không có thẻ để học",
     "allReviewed": "Đã ôn tập tất cả thẻ!",
-    "backToDeck": "Quay lại bộ thẻ"
+    "backToDeck": "Quay lại bộ thẻ",
+    "exitConfirmTitle": "Kết thúc phiên học?",
+    "exitConfirmMessage": "Tiến trình của bạn sẽ được lưu.",
+    "exitConfirmButton": "Kết thúc"
   },
   "card": {
     "tapToFlip": "Chạm để lật",
