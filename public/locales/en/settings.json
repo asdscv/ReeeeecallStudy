@@ -5,6 +5,7 @@
   "save": "Save Settings",
   "saved": "Settings saved!",
   "saveButton": "Save Settings",
+  "autoSaved": "Saved",
 
   "links": {
     "userGuide": "User Guide",
@@ -28,7 +29,12 @@
     "email": "Email",
     "displayName": "Display name",
     "displayNamePlaceholder": "Enter your name",
-    "namePlaceholder": "Enter your name"
+    "namePlaceholder": "Enter your name",
+    "saveBtn": "Save",
+    "nameSaved": "Name saved!",
+    "nameAvailable": "Available",
+    "nameTaken": "This name is already taken",
+    "nameLength": "Name must be 2-12 characters"
   },
 
   "language": {

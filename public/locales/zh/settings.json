@@ -5,6 +5,7 @@
   "save": "保存设置",
   "saved": "设置已保存！",
   "saveButton": "保存设置",
+  "autoSaved": "已自动保存",
 
   "links": {
     "userGuide": "用户指南",
@@ -28,7 +29,12 @@
     "email": "邮箱",
     "displayName": "显示名称",
     "displayNamePlaceholder": "请输入您的名称",
-    "namePlaceholder": "请输入您的名称"
+    "namePlaceholder": "请输入您的名称",
+    "saveBtn": "保存",
+    "nameSaved": "名称已保存！",
+    "nameAvailable": "可以使用",
+    "nameTaken": "该名称已被使用",
+    "nameLength": "名称必须为2-12个字符"
   },
 
   "language": {

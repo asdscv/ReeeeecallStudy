@@ -5,6 +5,7 @@
   "save": "Lưu cài đặt",
   "saved": "Đã lưu cài đặt!",
   "saveButton": "Lưu cài đặt",
+  "autoSaved": "Đã tự động lưu",
 
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
@@ -28,7 +29,12 @@
     "email": "Email",
     "displayName": "Tên hiển thị",
     "displayNamePlaceholder": "Nhập tên của bạn",
-    "namePlaceholder": "Nhập tên của bạn"
+    "namePlaceholder": "Nhập tên của bạn",
+    "saveBtn": "Lưu",
+    "nameSaved": "Đã lưu tên!",
+    "nameAvailable": "Có thể sử dụng",
+    "nameTaken": "Tên này đã được sử dụng",
+    "nameLength": "Tên phải từ 2-12 ký tự"
   },
 
   "language": {

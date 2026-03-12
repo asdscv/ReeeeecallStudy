@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe, Loader2 } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -38,6 +38,19 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+/** Auto-save a single profile field to DB */
+async function autoSaveProfile(
+  userId: string,
+  field: string,
+  value: unknown,
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ [field]: value } as Record<string, unknown>)
+    .eq('id', userId)
+  return !error
+}
+
 export function SettingsPage() {
   const { t, i18n } = useTranslation('settings')
   const dateLocale = toIntlLocale(i18n.language)
@@ -46,14 +59,25 @@ export function SettingsPage() {
   const { user, signOut } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
 
   // Form state
   const [displayName, setDisplayName] = useState('')
+  const [savedDisplayName, setSavedDisplayName] = useState('')
   const [dailyNewLimit, setDailyNewLimit] = useState(20)
+  const [savedDailyNewLimit, setSavedDailyNewLimit] = useState(20)
   const [ttsEnabled, setTtsEnabled] = useState(false)
   const [ttsSpeed, setTtsSpeed] = useState(0.9)
   const [ttsProvider, setTtsProvider] = useState<'web_speech' | 'edge_tts'>('web_speech')
+
+  // Display name validation
+  const [nameChecking, setNameChecking] = useState(false)
+  const [nameAvailable, setNameAvailable] = useState<boolean | null>(null)
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [nameSaving, setNameSaving] = useState(false)
+  const nameCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // SRS save state
+  const [srsSaving, setSrsSaving] = useState(false)
 
   // API key state
   const [apiKeyData, setApiKeyData] = useState<{ key: string; name: string; createdAt: string } | null>(null)
@@ -63,11 +87,122 @@ export function SettingsPage() {
 
   // Study input settings (localStorage — auto-saved on change)
   const [inputSettings, setInputSettingsRaw] = useState<StudyInputSettings>(() => loadSettings())
-  const updateInputSettings = (next: StudyInputSettings) => {
+
+  // ── Auto-save helper ──────────────────────────────────
+  const autoSave = useCallback(async (field: string, value: unknown) => {
+    if (!user) return
+    const ok = await autoSaveProfile(user.id, field, value)
+    if (ok) {
+      toast.success(t('autoSaved'))
+    }
+  }, [user, t])
+
+  // ── Answer mode: auto-save to both localStorage and DB ──
+  const updateAnswerMode = useCallback(async (mode: 'button' | 'swipe') => {
+    const next: StudyInputSettings = { version: 3, mode }
     setInputSettingsRaw(next)
     saveSettings(next)
+    await autoSave('answer_mode', mode)
+  }, [autoSave])
+
+  // ── TTS: auto-save on change ──
+  const updateTtsEnabled = useCallback(async (enabled: boolean) => {
+    setTtsEnabled(enabled)
+    await autoSave('tts_enabled', enabled)
+  }, [autoSave])
+
+  const updateTtsProvider = useCallback(async (provider: 'web_speech' | 'edge_tts') => {
+    setTtsProvider(provider)
+    await autoSave('tts_provider', provider)
+  }, [autoSave])
+
+  const ttsSpeedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const updateTtsSpeed = useCallback((speed: number) => {
+    setTtsSpeed(speed)
+    // Debounce: save after 500ms of no change
+    if (ttsSpeedTimer.current) clearTimeout(ttsSpeedTimer.current)
+    ttsSpeedTimer.current = setTimeout(() => {
+      autoSave('tts_speed', speed)
+    }, 500)
+  }, [autoSave])
+
+  // ── Display name: debounced duplicate check ──
+  const checkNameAvailability = useCallback(async (name: string) => {
+    const trimmed = name.trim()
+    if (!trimmed || trimmed === savedDisplayName) {
+      setNameAvailable(null)
+      setNameError(null)
+      setNameChecking(false)
+      return
+    }
+    if (trimmed.length < 2 || trimmed.length > 12) {
+      setNameAvailable(false)
+      setNameError(t('profile.nameLength'))
+      setNameChecking(false)
+      return
+    }
+    setNameChecking(true)
+    const { data } = await supabase.rpc('check_nickname_available', { p_nickname: trimmed })
+    const result = data as { available: boolean; error?: string } | null
+    if (result?.error === 'invalid_length') {
+      setNameAvailable(false)
+      setNameError(t('profile.nameLength'))
+    } else if (result?.available === false) {
+      setNameAvailable(false)
+      setNameError(t('profile.nameTaken'))
+    } else {
+      setNameAvailable(true)
+      setNameError(null)
+    }
+    setNameChecking(false)
+  }, [savedDisplayName, t])
+
+  const handleNameChange = (value: string) => {
+    setDisplayName(value)
+    setNameAvailable(null)
+    setNameError(null)
+    if (nameCheckTimer.current) clearTimeout(nameCheckTimer.current)
+    const trimmed = value.trim()
+    if (!trimmed || trimmed === savedDisplayName) return
+    nameCheckTimer.current = setTimeout(() => {
+      checkNameAvailability(value)
+    }, 500)
   }
 
+  const handleSaveName = async () => {
+    if (!user) return
+    const trimmed = displayName.trim()
+    if (trimmed === savedDisplayName) return
+    if (trimmed && (trimmed.length < 2 || trimmed.length > 12)) {
+      toast.error(t('profile.nameLength'))
+      return
+    }
+    setNameSaving(true)
+    const ok = await autoSaveProfile(user.id, 'display_name', trimmed || null)
+    if (ok) {
+      setSavedDisplayName(trimmed)
+      setNameAvailable(null)
+      setNameError(null)
+      toast.success(t('profile.nameSaved'))
+    } else {
+      toast.error(t('profile.nameTaken'))
+    }
+    setNameSaving(false)
+  }
+
+  // ── SRS: save button ──
+  const handleSaveSrs = async () => {
+    if (!user) return
+    setSrsSaving(true)
+    const ok = await autoSaveProfile(user.id, 'daily_new_limit', dailyNewLimit)
+    if (ok) {
+      setSavedDailyNewLimit(dailyNewLimit)
+      toast.success(t('autoSaved'))
+    }
+    setSrsSaving(false)
+  }
+
+  // ── Fetch profile on mount ──
   useEffect(() => {
     if (!user) return
 
@@ -81,7 +216,9 @@ export function SettingsPage() {
       const p = data as Profile | null
       if (p) {
         setDisplayName(p.display_name ?? '')
+        setSavedDisplayName(p.display_name ?? '')
         setDailyNewLimit(p.daily_new_limit)
+        setSavedDailyNewLimit(p.daily_new_limit)
         setTtsEnabled(p.tts_enabled)
         setTtsSpeed(p.tts_speed ?? 0.9)
         setTtsProvider(p.tts_provider ?? 'web_speech')
@@ -119,26 +256,6 @@ export function SettingsPage() {
     }
     fetchApiKey()
   }, [user])
-
-  const handleSave = async () => {
-    if (!user) return
-    setSaving(true)
-
-    await supabase
-      .from('profiles')
-      .update({
-        display_name: displayName.trim() || null,
-        daily_new_limit: dailyNewLimit,
-        tts_enabled: ttsEnabled,
-        tts_speed: ttsSpeed,
-        tts_provider: ttsProvider,
-        answer_mode: inputSettings.mode,
-      } as Record<string, unknown>)
-      .eq('id', user.id)
-
-    setSaving(false)
-    toast.success(t('saved'))
-  }
 
   const [generating, setGenerating] = useState(false)
 
@@ -215,6 +332,9 @@ export function SettingsPage() {
     )
   }
 
+  const nameChanged = displayName.trim() !== savedDisplayName
+  const srsChanged = dailyNewLimit !== savedDailyNewLimit
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{t('title')}</h1>
@@ -250,7 +370,7 @@ export function SettingsPage() {
           </button>
         </div>
 
-        {/* Profile */}
+        {/* Profile — has its own save button */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.title')}</h2>
           <div className="space-y-4">
@@ -260,18 +380,48 @@ export function SettingsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.displayName')}</label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder={t('profile.displayNamePlaceholder')}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
-              />
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    placeholder={t('profile.displayNamePlaceholder')}
+                    maxLength={12}
+                    className={`w-full px-4 py-2.5 rounded-lg border outline-none text-gray-900 ${
+                      nameError
+                        ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                        : nameAvailable
+                          ? 'border-green-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
+                          : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                    }`}
+                  />
+                  {nameChecking && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                  )}
+                  {!nameChecking && nameAvailable && (
+                    <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
+                  )}
+                </div>
+                <button
+                  onClick={handleSaveName}
+                  disabled={nameSaving || !nameChanged || nameChecking || nameAvailable === false}
+                  className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium whitespace-nowrap"
+                >
+                  {nameSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
+                </button>
+              </div>
+              {nameError && (
+                <p className="text-xs text-red-500 mt-1">{nameError}</p>
+              )}
+              {nameAvailable && (
+                <p className="text-xs text-green-500 mt-1">{t('profile.nameAvailable')}</p>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Language */}
+        {/* Language — already auto-saves via changeLanguage() */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Globe className="w-5 h-5 text-gray-500" />
@@ -294,7 +444,7 @@ export function SettingsPage() {
           </div>
         </section>
 
-        {/* SRS Study Settings */}
+        {/* SRS Study Settings — has its own save button */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('srs.title')}</h2>
           <p className="text-sm text-gray-500 mb-4">{t('srs.description')}</p>
@@ -312,6 +462,13 @@ export function SettingsPage() {
                 className="w-28 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               />
               <span className="text-sm text-gray-500">{t('srs.cards')}</span>
+              <button
+                onClick={handleSaveSrs}
+                disabled={srsSaving || !srsChanged}
+                className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium"
+              >
+                {srsSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
+              </button>
             </div>
             <p className="text-xs text-gray-400 mt-2">
               {t('srs.help')}
@@ -319,7 +476,7 @@ export function SettingsPage() {
           </div>
         </section>
 
-        {/* Answer Input Mode */}
+        {/* Answer Input Mode — auto-save on click */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('answerMode.title')}</h2>
           <p className="text-sm text-gray-500 mb-4">{t('answerMode.description')}</p>
@@ -328,7 +485,7 @@ export function SettingsPage() {
           <div className="grid grid-cols-2 gap-3 mb-4">
             <button
               type="button"
-              onClick={() => updateInputSettings({ ...inputSettings, mode: 'button' })}
+              onClick={() => updateAnswerMode('button')}
               className={`p-4 rounded-xl border-2 text-left transition cursor-pointer ${
                 inputSettings.mode === 'button'
                   ? 'border-blue-500 bg-blue-50'
@@ -341,7 +498,7 @@ export function SettingsPage() {
             </button>
             <button
               type="button"
-              onClick={() => updateInputSettings({ ...inputSettings, mode: 'swipe' })}
+              onClick={() => updateAnswerMode('swipe')}
               className={`p-4 rounded-xl border-2 text-left transition cursor-pointer ${
                 inputSettings.mode === 'swipe'
                   ? 'border-blue-500 bg-blue-50'
@@ -364,7 +521,7 @@ export function SettingsPage() {
           )}
         </section>
 
-        {/* TTS settings */}
+        {/* TTS settings — auto-save on change */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('tts.title')}</h2>
           <p className="text-sm text-gray-500 mb-4">{t('tts.description')}</p>
@@ -372,7 +529,7 @@ export function SettingsPage() {
             <input
               type="checkbox"
               checked={ttsEnabled}
-              onChange={(e) => setTtsEnabled(e.target.checked)}
+              onChange={(e) => updateTtsEnabled(e.target.checked)}
               className="cursor-pointer"
             />
             <span className="text-sm text-gray-700">{t('tts.enable')}</span>
@@ -386,7 +543,7 @@ export function SettingsPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setTtsProvider('web_speech')}
+                onClick={() => updateTtsProvider('web_speech')}
                 className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
                   ttsProvider === 'web_speech'
                     ? 'border-blue-500 bg-blue-50'
@@ -398,7 +555,7 @@ export function SettingsPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setTtsProvider('edge_tts')}
+                onClick={() => updateTtsProvider('edge_tts')}
                 className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
                   ttsProvider === 'edge_tts'
                     ? 'border-blue-500 bg-blue-50'
@@ -424,7 +581,7 @@ export function SettingsPage() {
                 max={2.0}
                 step={0.1}
                 value={ttsSpeed}
-                onChange={(e) => setTtsSpeed(parseFloat(e.target.value))}
+                onChange={(e) => updateTtsSpeed(parseFloat(e.target.value))}
                 className="flex-1 accent-blue-500 cursor-pointer"
               />
               <span className="text-xs text-gray-400 w-8">2.0x</span>
@@ -565,15 +722,6 @@ export function SettingsPage() {
             </button>
           </div>
         </section>
-
-        {/* Save button — always at the very bottom */}
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer"
-        >
-          {saving ? t('saving') : t('save')}
-        </button>
       </div>
     </div>
   )

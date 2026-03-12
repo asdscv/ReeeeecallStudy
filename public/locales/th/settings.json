@@ -5,6 +5,7 @@
   "save": "บันทึกการตั้งค่า",
   "saved": "บันทึกการตั้งค่าแล้ว!",
   "saveButton": "บันทึกการตั้งค่า",
+  "autoSaved": "บันทึกอัตโนมัติแล้ว",
 
   "links": {
     "userGuide": "คู่มือผู้ใช้",
@@ -28,7 +29,12 @@
     "email": "อีเมล",
     "displayName": "ชื่อที่แสดง",
     "displayNamePlaceholder": "กรอกชื่อของคุณ",
-    "namePlaceholder": "กรอกชื่อของคุณ"
+    "namePlaceholder": "กรอกชื่อของคุณ",
+    "saveBtn": "บันทึก",
+    "nameSaved": "บันทึกชื่อแล้ว!",
+    "nameAvailable": "ใช้ได้",
+    "nameTaken": "ชื่อนี้ถูกใช้แล้ว",
+    "nameLength": "ชื่อต้องมี 2-12 ตัวอักษร"
   },
 
   "language": {

@@ -5,6 +5,7 @@
   "save": "設定を保存",
   "saved": "設定を保存しました！",
   "saveButton": "設定を保存",
+  "autoSaved": "自動保存しました",
 
   "links": {
     "userGuide": "ユーザーガイド",
@@ -28,7 +29,12 @@
     "email": "メールアドレス",
     "displayName": "表示名",
     "displayNamePlaceholder": "名前を入力",
-    "namePlaceholder": "名前を入力"
+    "namePlaceholder": "名前を入力",
+    "saveBtn": "保存",
+    "nameSaved": "名前を保存しました！",
+    "nameAvailable": "使用可能",
+    "nameTaken": "この名前は既に使われています",
+    "nameLength": "名前は2〜12文字で入力してください"
   },
 
   "language": {

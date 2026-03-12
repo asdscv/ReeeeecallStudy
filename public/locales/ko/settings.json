@@ -5,6 +5,7 @@
   "save": "설정 저장",
   "saved": "설정이 저장되었습니다!",
   "saveButton": "설정 저장",
+  "autoSaved": "저장됨",
 
   "links": {
     "userGuide": "사용법 가이드",
@@ -28,7 +29,12 @@
     "email": "이메일",
     "displayName": "표시 이름",
     "displayNamePlaceholder": "이름을 입력하세요",
-    "namePlaceholder": "이름을 입력하세요"
+    "namePlaceholder": "이름을 입력하세요",
+    "saveBtn": "저장",
+    "nameSaved": "이름이 저장되었습니다!",
+    "nameAvailable": "사용 가능",
+    "nameTaken": "이미 사용 중인 이름입니다",
+    "nameLength": "이름은 2~12자여야 합니다"
   },
 
   "language": {

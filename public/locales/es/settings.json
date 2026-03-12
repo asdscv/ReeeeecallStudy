@@ -5,6 +5,7 @@
   "save": "Guardar ajustes",
   "saved": "¡Ajustes guardados!",
   "saveButton": "Guardar ajustes",
+  "autoSaved": "Guardado automáticamente",
   "links": {
     "userGuide": "Guía de usuario",
     "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
@@ -24,7 +25,12 @@
     "email": "Correo electrónico",
     "displayName": "Nombre visible",
     "displayNamePlaceholder": "Ingresa tu nombre",
-    "namePlaceholder": "Ingresa tu nombre"
+    "namePlaceholder": "Ingresa tu nombre",
+    "saveBtn": "Guardar",
+    "nameSaved": "¡Nombre guardado!",
+    "nameAvailable": "Disponible",
+    "nameTaken": "Este nombre ya está en uso",
+    "nameLength": "El nombre debe tener entre 2 y 12 caracteres"
   },
   "language": {
     "title": "Idioma",

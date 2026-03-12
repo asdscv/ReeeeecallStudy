@@ -5,6 +5,7 @@
   "save": "Simpan Pengaturan",
   "saved": "Pengaturan disimpan!",
   "saveButton": "Simpan Pengaturan",
+  "autoSaved": "Tersimpan otomatis",
 
   "links": {
     "userGuide": "Panduan Pengguna",
@@ -28,7 +29,12 @@
     "email": "Email",
     "displayName": "Nama tampilan",
     "displayNamePlaceholder": "Masukkan nama Anda",
-    "namePlaceholder": "Masukkan nama Anda"
+    "namePlaceholder": "Masukkan nama Anda",
+    "saveBtn": "Simpan",
+    "nameSaved": "Nama tersimpan!",
+    "nameAvailable": "Tersedia",
+    "nameTaken": "Nama ini sudah digunakan",
+    "nameLength": "Nama harus 2-12 karakter"
   },
 
   "language": {
