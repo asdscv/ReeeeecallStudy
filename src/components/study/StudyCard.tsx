@@ -377,6 +377,7 @@ export function StudyCard({
                         fieldValues={frontFace.fieldValues}
                         fields={frontFace.fields}
                         ttsFields={frontTTSFields}
+                        ttsOptions={ttsOptions}
                         t={t}
                       />
                     ) : (
@@ -405,6 +406,7 @@ export function StudyCard({
                               fieldValues={backFace.fieldValues}
                               fields={backFace.fields}
                               ttsFields={backTTSFields}
+                              ttsOptions={ttsOptions}
                               t={t}
                             />
                           ) : (
@@ -462,12 +464,14 @@ function CardFaceLayout({
   fieldValues,
   fields,
   ttsFields,
+  ttsOptions,
   t,
 }: {
   layout: LayoutItem[]
   fieldValues: Record<string, string>
   fields: { key: string; type: string }[]
   ttsFields?: TTSFieldInfo[]
+  ttsOptions?: TTSOptions
   t: (key: string) => string
 }) {
   return (
