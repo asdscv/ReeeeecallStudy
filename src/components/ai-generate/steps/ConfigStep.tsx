@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { loadAIConfig, saveAIConfig } from '../../../lib/ai/ai-key-storage'
+import { aiConfigManager } from '../../../lib/ai/secure-storage'
+import { useAuthStore } from '../../../stores/auth-store'
+import { setAIConfigCache } from '../../../stores/ai-generate-store'
 import { getProviders, getProvider } from '../../../lib/ai/provider-registry'
 import { useDeckStore } from '../../../stores/deck-store'
 import type { GenerateMode } from '../../../lib/ai/types'
@@ -81,15 +83,18 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
   const isFullMode = mode === 'full'
 
-  // Load saved config
+  // Load saved config (async decryption)
   useEffect(() => {
-    const saved = loadAIConfig()
-    if (saved) {
-      setProviderId(saved.providerId)
-      setApiKey(saved.apiKey)
-      setModel(saved.model)
-      if (saved.baseUrl) setCustomUrl(saved.baseUrl)
-    }
+    const uid = useAuthStore.getState().user?.id
+    if (!uid) return
+    aiConfigManager.load(uid).then((saved) => {
+      if (saved) {
+        setProviderId(saved.providerId)
+        setApiKey(saved.apiKey)
+        setModel(saved.model)
+        if (saved.baseUrl) setCustomUrl(saved.baseUrl)
+      }
+    })
   }, [])
 
   // Fetch decks for selector (cards_only mode)
@@ -115,9 +120,15 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     }
     const provider = getProvider(providerId)
     if (provider && provider.models.length > 0) {
-      const saved = loadAIConfig()
-      if (saved?.providerId === providerId && saved.model) {
-        setModel(saved.model)
+      const uid = useAuthStore.getState().user?.id
+      if (uid) {
+        aiConfigManager.load(uid).then((saved) => {
+          if (saved?.providerId === providerId && saved.model) {
+            setModel(saved.model)
+          } else {
+            setModel(provider!.models[0].id)
+          }
+        })
       } else {
         setModel(provider.models[0].id)
       }
@@ -146,17 +157,26 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     setCustomFields(updated)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!apiKey.trim() || !topic.trim()) return
     if (!isFullMode && !selectedDeckId) return
 
-    saveAIConfig({
+    const aiConfig = {
       providerId,
       apiKey,
       model,
       baseUrl: providerId === 'custom' ? customUrl : undefined,
-    })
+    }
+
+    // Set in-memory cache immediately (avoids async save/load race)
+    setAIConfigCache(aiConfig)
+
+    // Persist encrypted to storage (non-blocking)
+    const uid = useAuthStore.getState().user?.id
+    if (uid) {
+      aiConfigManager.save(uid, aiConfig).catch(() => { /* storage failure */ })
+    }
 
     onStart({
       topic,
