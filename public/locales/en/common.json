@@ -9,7 +9,8 @@
     "studyHistory": "History",
     "settings": "Settings",
     "admin": "Admin",
-    "guide": "Guide"
+    "guide": "Guide",
+    "aiGenerate": "AI Generate"
   },
   "actions": {
     "save": "Save",

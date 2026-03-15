@@ -9,7 +9,8 @@
     "studyHistory": "Lịch sử",
     "settings": "Cài đặt",
     "admin": "Quản trị",
-    "guide": "Hướng dẫn"
+    "guide": "Hướng dẫn",
+    "aiGenerate": "AI Generate"
   },
   "actions": {
     "save": "Lưu",

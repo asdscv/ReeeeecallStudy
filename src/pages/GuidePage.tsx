@@ -33,6 +33,28 @@ function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSec
             <div key={i} className="px-4 sm:px-5 py-3 sm:py-4">
               <h3 className="text-sm font-semibold text-gray-800 mb-1.5">{t(item.title)}</h3>
               <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{t(item.body)}</p>
+              {item.images && item.images.length > 0 && (
+                <div className="mt-3 space-y-3">
+                  {item.images.map((img, imgIdx) => (
+                    <div key={imgIdx} className="rounded-lg border border-gray-200 overflow-hidden">
+                      {/* PC image (hidden on mobile) */}
+                      <img
+                        src={img.pc}
+                        alt={img.alt || ''}
+                        loading="lazy"
+                        className="hidden sm:block w-full"
+                      />
+                      {/* Mobile image (hidden on PC) */}
+                      <img
+                        src={img.mobile}
+                        alt={img.alt || ''}
+                        loading="lazy"
+                        className="sm:hidden w-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               {item.link && (
                 <div className="mt-3">
                   {item.link.href ? (

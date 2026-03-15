@@ -17,6 +17,7 @@ export function Layout() {
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
     { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: '📊' },
     { kind: 'group', label: t('nav.study'), icon: '📚', children: [
+      { path: '/ai-generate', label: t('nav.aiGenerate'), icon: '🤖' },
       { path: '/decks', label: t('nav.decks'), icon: '📚' },
       { path: '/templates', label: t('nav.cards'), icon: '📋' },
       { path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },

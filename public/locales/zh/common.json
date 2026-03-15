@@ -9,7 +9,8 @@
     "studyHistory": "记录",
     "settings": "设置",
     "admin": "管理",
-    "guide": "指南"
+    "guide": "指南",
+    "aiGenerate": "AI Generate"
   },
   "actions": {
     "save": "保存",

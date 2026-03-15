@@ -9,7 +9,8 @@
     "studyHistory": "Riwayat",
     "settings": "Pengaturan",
     "admin": "Admin",
-    "guide": "Panduan"
+    "guide": "Panduan",
+    "aiGenerate": "AI Generate"
   },
   "actions": {
     "save": "Simpan",
