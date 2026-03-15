@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { useAuthStore } from './stores/auth-store'
+import { useSubscriptionStore } from './stores/subscription-store'
+import { SessionKickedOverlay } from './components/auth/SessionKickedOverlay'
 import { LoginPage } from './components/auth/LoginPage'
 import { AuthCallback } from './components/auth/AuthCallback'
 import { ResetPasswordPage } from './components/auth/ResetPasswordPage'
@@ -58,10 +60,18 @@ function LoginRedirect() {
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
+  const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
 
   useEffect(() => {
     initialize()
   }, [initialize])
+
+  // Start session heartbeat when user is logged in
+  useEffect(() => {
+    if (!user) return
+    const cleanup = startHeartbeat()
+    return cleanup
+  }, [user, startHeartbeat])
 
   if (loading) {
     return (
@@ -74,6 +84,7 @@ function App() {
   return (
     <BrowserRouter>
       <PageTracker />
+      <SessionKickedOverlay />
       <Toaster richColors position="top-right" />
       <Routes>
         {/* Root: landing for guests, dashboard for logged-in users */}

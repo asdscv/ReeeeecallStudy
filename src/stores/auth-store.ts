@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { User, Session, Subscription } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import type { UserRole } from '../types/database'
+import { useSubscriptionStore } from './subscription-store'
 
 interface AuthState {
   user: User | null
@@ -80,6 +81,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         })
         if (session?.user) {
           await useAuthStore.getState().fetchRole()
+          // Initialize subscription & register session
+          await useSubscriptionStore.getState().fetchSubscription()
+          await useSubscriptionStore.getState().registerSession()
         }
       } catch {
         set({ session: null, user: null, loading: false })
@@ -105,6 +109,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
           if (newUser) {
             await useAuthStore.getState().fetchRole()
+            await useSubscriptionStore.getState().fetchSubscription()
+            await useSubscriptionStore.getState().registerSession()
           } else {
             set({ role: null, isOfficial: false })
           }

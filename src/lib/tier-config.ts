@@ -36,8 +36,8 @@ export const TIER_CONFIGS: Record<TierName, TierConfig> = {
     quotas: {
       api_requests_daily: 1_000,
       storage_bytes: 500 * MB,
-      cards_total: 5_000,
-      decks_total: 50,
+      cards_total: 3_000,
+      decks_total: 5,
       templates_total: 20,
       study_sessions_daily: 100,
       file_uploads_daily: 50,
@@ -103,6 +103,14 @@ export function getRateLimit(tier: TierName, operation: OperationType): RateLimi
   return TIER_CONFIGS[tier].rates[operation]
 }
 
+// Module-level tier override — set by subscription store on login.
+// Avoids circular imports between tier-config and subscription-store.
+let _currentTier: TierName = 'free'
+
+export function setCurrentTier(tier: TierName): void {
+  _currentTier = tier
+}
+
 export function getCurrentTier(): TierName {
-  return 'free'
+  return _currentTier
 }

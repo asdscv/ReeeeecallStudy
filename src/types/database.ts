@@ -227,6 +227,49 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['study_sessions']['Insert']>
       }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          tier: 'free' | 'pro' | 'enterprise'
+          status: 'active' | 'canceled' | 'past_due' | 'trialing'
+          started_at: string
+          expires_at: string | null
+          canceled_at: string | null
+          metadata: Record<string, unknown>
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          tier?: 'free' | 'pro' | 'enterprise'
+          status?: 'active' | 'canceled' | 'past_due' | 'trialing'
+          started_at?: string
+          expires_at?: string | null
+          metadata?: Record<string, unknown>
+        }
+        Update: Partial<Database['public']['Tables']['subscriptions']['Insert']>
+      }
+      user_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          device_id: string
+          device_name: string | null
+          ip_address: string | null
+          last_seen_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          device_id: string
+          device_name?: string | null
+          ip_address?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['user_sessions']['Insert']>
+      }
     }
   }
 }
@@ -280,6 +323,8 @@ export type Card = Database['public']['Tables']['cards']['Row']
 export type DeckStudyState = Database['public']['Tables']['deck_study_state']['Row']
 export type StudyLog = Database['public']['Tables']['study_logs']['Row']
 export type StudySession = Database['public']['Tables']['study_sessions']['Row']
+export type Subscription = Database['public']['Tables']['subscriptions']['Row']
+export type UserSession = Database['public']['Tables']['user_sessions']['Row']
 
 // Sharing types
 export type DeckShare = {
