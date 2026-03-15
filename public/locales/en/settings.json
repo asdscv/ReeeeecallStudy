@@ -114,6 +114,27 @@
     "securityNote": "Cannot be viewed again for security"
   },
 
+  "aiProvider": {
+    "title": "AI Providers",
+    "description": "Manage providers and API keys for AI auto-generation",
+    "configured": "Configured",
+    "notSet": "Not set",
+    "edit": "Configure",
+    "delete": "Delete",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key",
+    "model": "Default Model",
+    "baseUrl": "API Base URL",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saved": "AI provider saved",
+    "deleted": "AI provider deleted",
+    "securityNote": "API keys are AES-256 encrypted and stored in your browser. Never sent to our servers.",
+    "custom": "Custom",
+    "customDesc": "OpenAI-compatible API",
+    "noProviders": "No providers configured. Set up above."
+  },
+
   "account": {
     "title": "Account",
     "logout": "Log out"

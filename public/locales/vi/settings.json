@@ -114,6 +114,27 @@
     "securityNote": "Không thể xem lại vì lý do bảo mật"
   },
 
+  "aiProvider": {
+    "title": "Nhà cung cấp AI",
+    "description": "Quản lý nhà cung cấp và khóa API cho tạo tự động AI",
+    "configured": "Đã cấu hình",
+    "notSet": "Chưa đặt",
+    "edit": "Cấu hình",
+    "delete": "Xóa",
+    "apiKey": "Khóa API",
+    "apiKeyPlaceholder": "Nhập khóa API của bạn",
+    "model": "Mô hình mặc định",
+    "baseUrl": "API Base URL",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "saved": "Nhà cung cấp AI đã được lưu",
+    "deleted": "Nhà cung cấp AI đã bị xóa",
+    "securityNote": "Khóa API được mã hóa AES-256 và lưu trong trình duyệt. Không bao giờ gửi đến máy chủ.",
+    "custom": "Tùy chỉnh",
+    "customDesc": "API tương thích OpenAI",
+    "noProviders": "Chưa cấu hình nhà cung cấp. Hãy thiết lập ở trên."
+  },
+
   "account": {
     "title": "Tài khoản",
     "logout": "Đăng xuất"

@@ -114,6 +114,27 @@
     "securityNote": "出于安全考虑，无法再次查看"
   },
 
+  "aiProvider": {
+    "title": "AI 提供商",
+    "description": "管理用于 AI 自动生成的提供商和 API 密钥",
+    "configured": "已配置",
+    "notSet": "未设置",
+    "edit": "配置",
+    "delete": "删除",
+    "apiKey": "API 密钥",
+    "apiKeyPlaceholder": "请输入您的 API 密钥",
+    "model": "默认模型",
+    "baseUrl": "API Base URL",
+    "save": "保存",
+    "cancel": "取消",
+    "saved": "AI 提供商已保存",
+    "deleted": "AI 提供商已删除",
+    "securityNote": "API 密钥经过 AES-256 加密存储在浏览器中，不会发送到我们的服务器。",
+    "custom": "自定义",
+    "customDesc": "OpenAI 兼容 API",
+    "noProviders": "未配置提供商，请在上方设置。"
+  },
+
   "account": {
     "title": "账号",
     "logout": "退出登录"

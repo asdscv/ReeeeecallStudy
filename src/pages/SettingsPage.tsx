@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe, Loader2 } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe, Loader2, Sparkles, Shield, Pencil } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -15,6 +15,9 @@ import {
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
 import { maskApiKeyPartial } from '../lib/api-key'
+import { aiKeyVault } from '../lib/ai/secure-storage'
+import { getProviders, getProvider } from '../lib/ai/provider-registry'
+import type { ProviderKeyMap } from '../lib/ai/secure-storage'
 
 function CopyButton({ text }: { text: string }) {
   const { t } = useTranslation('settings')
@@ -87,6 +90,14 @@ export function SettingsPage() {
 
   // Study input settings (localStorage — auto-saved on change)
   const [inputSettings, setInputSettingsRaw] = useState<StudyInputSettings>(() => loadSettings())
+
+  // AI Provider state
+  const [aiKeys, setAiKeys] = useState<ProviderKeyMap>({})
+  const [aiEditingId, setAiEditingId] = useState<string | null>(null)
+  const [aiEditKey, setAiEditKey] = useState('')
+  const [aiEditModel, setAiEditModel] = useState('')
+  const [aiEditBaseUrl, setAiEditBaseUrl] = useState('')
+  const [aiSaving, setAiSaving] = useState(false)
 
   // ── Auto-save helper ──────────────────────────────────
   const autoSave = useCallback(async (field: string, value: unknown) => {
@@ -255,6 +266,15 @@ export function SettingsPage() {
       }
     }
     fetchApiKey()
+
+    // Load AI provider keys
+    const fetchAiKeys = async () => {
+      try {
+        const keys = await aiKeyVault.loadAll(user.id)
+        setAiKeys(keys)
+      } catch { /* ignore decrypt failures */ }
+    }
+    fetchAiKeys()
   }, [user])
 
   const [generating, setGenerating] = useState(false)
@@ -322,6 +342,77 @@ export function SettingsPage() {
     setKeyDisplayMode('hidden')
     localStorage.removeItem('reeeeecall-api-key-data')
     toast.success(t('apiKey.deleted'))
+  }
+
+  // ── AI Provider handlers ──────────────────────────────
+  const aiProviders = getProviders()
+
+  const CUSTOM_PROVIDER = {
+    id: 'custom',
+    name: t('aiProvider.custom'),
+    baseUrl: '',
+    models: [{ id: 'custom', name: 'Custom Model' }],
+  }
+
+  const allAiProviders = [...aiProviders, CUSTOM_PROVIDER]
+
+  const handleAiEdit = (providerId: string) => {
+    const existing = aiKeys[providerId]
+    const provider = getProvider(providerId) ?? CUSTOM_PROVIDER
+    setAiEditingId(providerId)
+    setAiEditKey(existing?.apiKey ?? '')
+    setAiEditModel(existing?.model ?? provider.models[0]?.id ?? '')
+    setAiEditBaseUrl(existing?.baseUrl ?? '')
+  }
+
+  const handleAiCancel = () => {
+    setAiEditingId(null)
+    setAiEditKey('')
+    setAiEditModel('')
+    setAiEditBaseUrl('')
+  }
+
+  const handleAiSave = async () => {
+    if (!user || !aiEditingId || !aiEditKey.trim()) return
+    setAiSaving(true)
+    try {
+      await aiKeyVault.saveProvider(user.id, aiEditingId, {
+        apiKey: aiEditKey.trim(),
+        model: aiEditModel,
+        baseUrl: aiEditingId === 'custom' ? aiEditBaseUrl.trim() : undefined,
+        savedAt: new Date().toISOString(),
+      })
+      const keys = await aiKeyVault.loadAll(user.id)
+      setAiKeys(keys)
+      setAiEditingId(null)
+      setAiEditKey('')
+      setAiEditModel('')
+      setAiEditBaseUrl('')
+      toast.success(t('aiProvider.saved'))
+    } catch {
+      toast.error('Failed to save')
+    } finally {
+      setAiSaving(false)
+    }
+  }
+
+  const handleAiDelete = async (providerId: string) => {
+    if (!user) return
+    await aiKeyVault.removeProvider(user.id, providerId)
+    const keys = await aiKeyVault.loadAll(user.id)
+    setAiKeys(keys)
+    toast.success(t('aiProvider.deleted'))
+  }
+
+  const getProviderIcon = (providerId: string) => {
+    switch (providerId) {
+      case 'openai': return 'text-green-600 bg-green-50'
+      case 'google': return 'text-blue-600 bg-blue-50'
+      case 'anthropic': return 'text-orange-700 bg-orange-50'
+      case 'xai': return 'text-gray-900 bg-gray-100'
+      case 'custom': return 'text-purple-600 bg-purple-50'
+      default: return 'text-gray-600 bg-gray-50'
+    }
   }
 
   if (loading) {
@@ -592,6 +683,151 @@ export function SettingsPage() {
           <p className="text-xs text-gray-400 mt-3">
             {t('tts.help')}
           </p>
+        </section>
+
+        {/* AI Provider Management */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-5 h-5 text-violet-500" />
+            <h2 className="text-lg font-semibold text-gray-900">{t('aiProvider.title')}</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-5">{t('aiProvider.description')}</p>
+
+          <div className="space-y-3">
+            {allAiProviders.map((provider) => {
+              const isConfigured = !!aiKeys[provider.id]
+              const isEditing = aiEditingId === provider.id
+              const iconClasses = getProviderIcon(provider.id)
+              const models = provider.id === 'custom'
+                ? [{ id: 'custom', name: 'Custom Model' }]
+                : (getProvider(provider.id)?.models ?? provider.models)
+
+              return (
+                <div
+                  key={provider.id}
+                  className="border border-gray-200 rounded-xl p-4"
+                >
+                  {/* Provider row */}
+                  <div className="flex items-center gap-3">
+                    <div className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${iconClasses}`}>
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-gray-900">
+                        {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
+                      </div>
+                      {provider.id === 'custom' && (
+                        <div className="text-xs text-gray-400">{t('aiProvider.customDesc')}</div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isConfigured ? (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-green-50 text-green-700">
+                          {t('aiProvider.configured')}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                          {t('aiProvider.notSet')}
+                        </span>
+                      )}
+                      {!isEditing && (
+                        <button
+                          onClick={() => handleAiEdit(provider.id)}
+                          className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                          {t('aiProvider.edit')}
+                        </button>
+                      )}
+                      {!isEditing && isConfigured && (
+                        <button
+                          onClick={() => handleAiDelete(provider.id)}
+                          className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          {t('aiProvider.delete')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Inline edit form */}
+                  {isEditing && (
+                    <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+                      {/* API Key input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t('aiProvider.apiKey')}
+                        </label>
+                        <input
+                          type="password"
+                          value={aiEditKey}
+                          onChange={(e) => setAiEditKey(e.target.value)}
+                          placeholder={t('aiProvider.apiKeyPlaceholder')}
+                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm font-mono"
+                        />
+                      </div>
+
+                      {/* Model selector */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t('aiProvider.model')}
+                        </label>
+                        <select
+                          value={aiEditModel}
+                          onChange={(e) => setAiEditModel(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm bg-white"
+                        >
+                          {models.map((m) => (
+                            <option key={m.id} value={m.id}>{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Base URL (custom only) */}
+                      {provider.id === 'custom' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('aiProvider.baseUrl')}
+                          </label>
+                          <input
+                            type="url"
+                            value={aiEditBaseUrl}
+                            onChange={(e) => setAiEditBaseUrl(e.target.value)}
+                            placeholder="https://api.example.com/v1"
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm font-mono"
+                          />
+                        </div>
+                      )}
+
+                      {/* Save / Cancel */}
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={handleAiSave}
+                          disabled={aiSaving || !aiEditKey.trim()}
+                          className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium"
+                        >
+                          {aiSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('aiProvider.save')}
+                        </button>
+                        <button
+                          onClick={handleAiCancel}
+                          className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition cursor-pointer"
+                        >
+                          {t('aiProvider.cancel')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Security note */}
+          <div className="flex items-start gap-2 mt-4 p-3 bg-gray-50 rounded-lg">
+            <Shield className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-gray-500">{t('aiProvider.securityNote')}</p>
+          </div>
         </section>
 
         {/* API Key Management */}

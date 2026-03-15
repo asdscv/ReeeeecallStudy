@@ -1,8 +1,15 @@
 import type { AIProviderConfig } from './types'
 import { openaiProvider } from './providers/openai'
 import { xaiProvider } from './providers/xai'
+import { googleProvider } from './providers/google'
+import { anthropicProvider } from './providers/anthropic'
 
-const providers: AIProviderConfig[] = [openaiProvider, xaiProvider]
+const providers: AIProviderConfig[] = [
+  openaiProvider,
+  googleProvider,
+  anthropicProvider,
+  xaiProvider,
+]
 
 export function getProviders(): AIProviderConfig[] {
   return providers

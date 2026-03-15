@@ -114,6 +114,27 @@
     "securityNote": "보안상 다시 볼 수 없습니다"
   },
 
+  "aiProvider": {
+    "title": "AI 프로바이더",
+    "description": "AI 자동 생성에 사용할 프로바이더와 API 키를 관리합니다",
+    "configured": "설정됨",
+    "notSet": "미설정",
+    "edit": "설정",
+    "delete": "삭제",
+    "apiKey": "API 키",
+    "apiKeyPlaceholder": "API 키를 입력하세요",
+    "model": "기본 모델",
+    "baseUrl": "API Base URL",
+    "save": "저장",
+    "cancel": "취소",
+    "saved": "AI 프로바이더가 저장되었습니다",
+    "deleted": "AI 프로바이더가 삭제되었습니다",
+    "securityNote": "API 키는 AES-256 암호화되어 브라우저에 저장됩니다. 서버로 전송되지 않습니다.",
+    "custom": "커스텀",
+    "customDesc": "OpenAI 호환 API",
+    "noProviders": "설정된 프로바이더가 없습니다. 위에서 설정하세요."
+  },
+
   "account": {
     "title": "계정",
     "logout": "로그아웃"
