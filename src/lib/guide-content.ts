@@ -25,6 +25,13 @@ export interface GuideSection {
   items: GuideItem[]
 }
 
+// ─── Helper to shorten image paths ─────────────────────────
+const img = (section: string, name: string) => ({
+  pc: `/images/guide/${section}/${name}-pc.png`,
+  mobile: `/images/guide/${section}/${name}-mobile.png`,
+  alt: name,
+})
+
 export const GUIDE_SECTIONS: GuideSection[] = [
   // ───────────────────────────────────────────────────
   {
@@ -39,10 +46,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.getting-started.items.dashboard.title',
         body: 'sections.getting-started.items.dashboard.body',
+        images: [img('getting-started', 'dashboard')],
       },
       {
         title: 'sections.getting-started.items.navigation.title',
         body: 'sections.getting-started.items.navigation.body',
+        images: [img('getting-started', 'navigation')],
       },
     ],
   },
@@ -56,10 +65,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.decks.items.create.title',
         body: 'sections.decks.items.create.body',
+        images: [img('decks', 'list')],
       },
       {
         title: 'sections.decks.items.detail.title',
         body: 'sections.decks.items.detail.body',
+        images: [img('decks', 'detail')],
       },
       {
         title: 'sections.decks.items.edit.title',
@@ -81,6 +92,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.cards.items.add.title',
         body: 'sections.cards.items.add.body',
+        images: [img('cards', 'table')],
       },
       {
         title: 'sections.cards.items.editDelete.title',
@@ -106,10 +118,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.templates.items.what.title',
         body: 'sections.templates.items.what.body',
+        images: [img('templates', 'list')],
       },
       {
         title: 'sections.templates.items.createEdit.title',
         body: 'sections.templates.items.createEdit.body',
+        images: [img('templates', 'edit')],
       },
       {
         title: 'sections.templates.items.layout.title',
@@ -131,6 +145,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.study.items.modes.title',
         body: 'sections.study.items.modes.body',
+        images: [img('study', 'setup')],
       },
       {
         title: 'sections.study.items.srsScience.title',
@@ -151,6 +166,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.study.items.quickStudy.title',
         body: 'sections.study.items.quickStudy.body',
+        images: [img('study', 'quick-study')],
       },
       {
         title: 'sections.study.items.sessionFlow.title',
@@ -180,6 +196,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.import-export.items.jsonImport.title',
         body: 'sections.import-export.items.jsonImport.body',
+        images: [img('import-export', 'buttons')],
       },
       {
         title: 'sections.import-export.items.csvImport.title',
@@ -209,6 +226,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.sharing.items.copy.title',
         body: 'sections.sharing.items.copy.body',
+        images: [img('sharing', 'share-page')],
       },
       {
         title: 'sections.sharing.items.subscribe.title',
@@ -238,6 +256,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.marketplace.items.what.title',
         body: 'sections.marketplace.items.what.body',
+        images: [img('marketplace', 'browse')],
       },
       {
         title: 'sections.marketplace.items.getDeck.title',
@@ -259,6 +278,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.history.items.viewHistory.title',
         body: 'sections.history.items.viewHistory.body',
+        images: [img('history', 'overview')],
       },
       {
         title: 'sections.history.items.deckProgress.title',
@@ -280,6 +300,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.settings.items.profile.title',
         body: 'sections.settings.items.profile.body',
+        images: [img('settings', 'page')],
       },
       {
         title: 'sections.settings.items.srsLimit.title',
