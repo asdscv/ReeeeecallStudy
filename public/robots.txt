@@ -17,9 +17,9 @@ Disallow: /templates
 Disallow: /admin
 Disallow: /api-docs
 Disallow: /api/
+Disallow: /dashboard
 
 # Crawl-delay for polite crawling (Googlebot ignores Crawl-delay; use Search Console instead)
-# NOTE: Specific User-agent blocks override *, so we must repeat the rules here.
 User-agent: Bingbot
 Crawl-delay: 2
 Allow: /landing
@@ -39,9 +39,26 @@ Disallow: /templates
 Disallow: /admin
 Disallow: /api-docs
 Disallow: /api/
+Disallow: /dashboard
 
-# AI answer engines — same public paths, block everything else
+# AI answer engines — allow public paths, block everything else
 User-agent: ChatGPT-User
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: GPTBot
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: OAI-SearchBot
 Allow: /landing
 Allow: /insight
 Allow: /insight/*
@@ -73,4 +90,57 @@ Allow: /d/
 Allow: /d/*
 Disallow: /
 
+User-agent: Bytespider
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: Amazonbot
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: Cohere-ai
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: YouBot
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
+User-agent: iaskspider
+Allow: /landing
+Allow: /insight
+Allow: /insight/*
+Allow: /d/
+Allow: /d/*
+Disallow: /
+
 Sitemap: https://reeeeecallstudy.xyz/sitemap.xml
+
+# AI/LLM context files
+# https://llmstxt.org/
+# llms.txt: https://reeeeecallstudy.xyz/llms.txt
+# llms-full.txt: https://reeeeecallstudy.xyz/llms-full.txt

@@ -19,9 +19,13 @@ interface ContentState {
   detailLoading: boolean
   detailError: string | null
 
+  // Related
+  relatedArticles: ContentListItem[]
+
   // Actions
   fetchContents: (reset?: boolean) => Promise<void>
   fetchContentBySlug: (slug: string) => Promise<void>
+  fetchRelatedArticles: (slug: string, tags: string[]) => Promise<void>
   resetList: () => void
 }
 
@@ -35,6 +39,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
   currentArticle: null,
   detailLoading: false,
   detailError: null,
+  relatedArticles: [],
 
   fetchContents: async (reset = false) => {
     const state = get()
@@ -122,6 +127,35 @@ export const useContentStore = create<ContentState>((set, get) => ({
     }
 
     set({ currentArticle: data as ContentDetail, detailLoading: false })
+  },
+
+  fetchRelatedArticles: async (slug: string, tags: string[]) => {
+    const currentLocale = toContentLocale(i18n.language)
+    const { data } = await supabase
+      .from('contents')
+      .select('id, slug, title, subtitle, thumbnail_url, reading_time_minutes, tags, published_at')
+      .eq('is_published', true)
+      .eq('locale', currentLocale)
+      .neq('slug', slug)
+      .order('published_at', { ascending: false })
+      .limit(20)
+
+    if (!data || data.length === 0) {
+      set({ relatedArticles: [] })
+      return
+    }
+
+    const tagSet = new Set(tags)
+    const scored = (data as ContentListItem[])
+      .map((item) => ({
+        item,
+        score: (item.tags || []).filter((t) => tagSet.has(t)).length,
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+      .map((s) => s.item)
+
+    set({ relatedArticles: scored })
   },
 
   resetList: () => {

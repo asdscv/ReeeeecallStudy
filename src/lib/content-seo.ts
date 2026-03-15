@@ -13,8 +13,8 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
   es: 'Spanish',
 }
 
-export function buildArticleJsonLd(article: ContentDetail) {
-  return {
+export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string[]) {
+  const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: article.meta_title || article.title,
@@ -49,11 +49,18 @@ export function buildArticleJsonLd(article: ContentDetail) {
     },
     url: `${SEO.SITE_URL}/insight/${article.slug}`,
     inLanguage: article.locale,
+    isAccessibleForFree: true,
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `${SEO.SITE_URL}/insight/${article.slug}`,
     },
   }
+
+  if (relatedSlugs && relatedSlugs.length > 0) {
+    jsonLd.relatedLink = relatedSlugs.map((s) => `${SEO.SITE_URL}/insight/${s}`)
+  }
+
+  return jsonLd
 }
 
 export function buildBreadcrumbJsonLd(article: ContentDetail) {

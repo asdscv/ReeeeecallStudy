@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "インサイトに戻る",
     "readingTime": "{{minutes}}分",
-    "notFound": "記事が見つかりません"
+    "notFound": "記事が見つかりません",
+    "relatedArticles": "関連記事"
   },
   "cta": {
     "title": "ReeeCallで始めよう",

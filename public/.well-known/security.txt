@@ -1,0 +1,3 @@
+Contact: mailto:admin@reeeeecallstudy.xyz
+Preferred-Languages: en, ko
+Canonical: https://reeeeecallstudy.xyz/.well-known/security.txt

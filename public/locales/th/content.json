@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "กลับไปยังบทความ",
     "readingTime": "{{minutes}} นาที",
-    "notFound": "ไม่พบบทความ"
+    "notFound": "ไม่พบบทความ",
+    "relatedArticles": "บทความที่เกี่ยวข้อง"
   },
   "cta": {
     "title": "เริ่มต้นกับ ReeeCall",

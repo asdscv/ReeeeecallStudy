@@ -75,10 +75,26 @@ Each block has "type" and "props":
 - Use general, qualitative descriptions instead of specific numbers (e.g., "research suggests significant improvement" instead of "studies show 85% improvement")
 - The CTA should naturally tie the article topic to ReeeeecallStudy's flashcard/SRS features
 
+## GEO Optimization (Generative Engine Optimization — CRITICAL for 2026 AI visibility)
+
+These techniques are proven by research (Princeton/Georgia Tech, KDD 2024) to increase AI citation rates by 40%+:
+
+1. **Question-first H2 headings**: Frame at least 2 section headings as questions that users might ask AI assistants (e.g., "Why Does Spaced Repetition Work?" instead of "How Spaced Repetition Works"). The first paragraph under each question heading MUST directly answer the question in under 40 words.
+
+2. **Concise answer blocks (40-word rule)**: The first 1-2 sentences of each section must be a complete, self-contained answer. AI engines extract these as snippets. Avoid vague introductions — lead with the answer, then elaborate.
+
+3. **Cite well-known research concepts**: Reference widely known research frameworks by name (e.g., "Ebbinghaus's forgetting curve," "Leitner system," "testing effect," "spacing effect," "interleaving principle," "Bloom's taxonomy"). Do NOT invent citations, but DO name real, well-established concepts.
+
+4. **Include qualitative evidence references**: Use phrases like "Research in cognitive psychology shows that…", "According to learning science principles…", "Studies in educational psychology demonstrate…" to frame claims with authority.
+
+5. **Entity-centric writing**: Consistently name key concepts (e.g., always say "spaced repetition" not "this technique," always say "active recall" not "this method"). AI engines build knowledge graphs from consistent entity mentions.
+
+6. **Fluency optimization**: Write in clear, direct sentences. Avoid jargon without explanation. Each paragraph should convey ONE key idea. This improves AI extraction accuracy by 15-30%.
+
 ## SEO Guidelines
 
 - meta_title: 30-45 characters (a brand suffix " | ReeeeecallStudy" is appended automatically, do NOT include it). Place the primary keyword near the beginning.
-- meta_description: 70-155 characters. Include primary keyword in the first 70 chars. Write a compelling summary that encourages clicks.
+- meta_description: 70-155 characters. Include primary keyword in the first 70 chars. Write a compelling summary that encourages clicks. Frame as a direct answer to a question when possible.
 - tags: Use 3-5 tags relevant to the topic. Use lowercase, single-word or hyphenated tags.
 - slug: 3-6 words, lowercase kebab-case, always in English, include primary keyword.
 

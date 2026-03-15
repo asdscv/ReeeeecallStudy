@@ -69,8 +69,8 @@ describe('buildArticleJsonLd', () => {
 
   it('should include publisher with logo ImageObject', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.publisher['@type']).toBe('Organization')
-    expect(result.publisher.logo['@type']).toBe('ImageObject')
+    expect((result.publisher as any)['@type']).toBe('Organization')
+    expect((result.publisher as any).logo['@type']).toBe('ImageObject')
   })
 
   it('should include wordCount estimated from reading time', () => {
@@ -80,8 +80,8 @@ describe('buildArticleJsonLd', () => {
 
   it('should include logo ImageObject with dimensions', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.publisher as any).logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.publisher as any).logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
   it('should include keywords from tags', () => {
@@ -91,22 +91,22 @@ describe('buildArticleJsonLd', () => {
 
   it('should use ImageObject for image with name and description', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.image['@type']).toBe('ImageObject')
-    expect(result.image.url).toBe('https://example.com/og.jpg')
-    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
-    expect(result.image.name).toBe(mockArticle.meta_title || mockArticle.title)
-    expect(result.image.description).toBe(mockArticle.meta_description || mockArticle.subtitle)
+    expect((result.image as any)['@type']).toBe('ImageObject')
+    expect((result.image as any).url).toBe('https://example.com/og.jpg')
+    expect((result.image as any).width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.image as any).height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.image as any).name).toBe(mockArticle.meta_title || mockArticle.title)
+    expect((result.image as any).description).toBe(mockArticle.meta_description || mockArticle.subtitle)
   })
 
   it('should include url in author', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.author.url).toBe(SEO.SITE_URL)
+    expect((result.author as any).url).toBe(SEO.SITE_URL)
   })
 
   it('should include url in publisher', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.publisher.url).toBe(SEO.SITE_URL)
+    expect((result.publisher as any).url).toBe(SEO.SITE_URL)
   })
 
   it('should include explicit url property', () => {
@@ -161,35 +161,35 @@ describe('buildCollectionPageJsonLd', () => {
 
   it('should include publisher organization', () => {
     const result = buildCollectionPageJsonLd()
-    expect(result.publisher['@type']).toBe('Organization')
+    expect((result.publisher as any)['@type']).toBe('Organization')
     expect(result.publisher.name).toBe(SEO.BRAND_NAME)
   })
 
   it('should include image as ImageObject', () => {
     const result = buildCollectionPageJsonLd()
-    expect(result.image['@type']).toBe('ImageObject')
-    expect(result.image.url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect((result.image as any)['@type']).toBe('ImageObject')
+    expect((result.image as any).url).toBe(SEO.DEFAULT_OG_IMAGE)
   })
 
   it('should include publisher logo ImageObject with dimensions', () => {
     const result = buildCollectionPageJsonLd()
-    expect(result.publisher.logo['@type']).toBe('ImageObject')
-    expect(result.publisher.logo.url).toBe(SEO.DEFAULT_OG_IMAGE)
-    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.publisher as any).logo['@type']).toBe('ImageObject')
+    expect((result.publisher as any).logo.url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect((result.publisher as any).logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.publisher as any).logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
   it('should use ImageObject for image property', () => {
     const result = buildCollectionPageJsonLd()
-    expect(result.image['@type']).toBe('ImageObject')
-    expect(result.image.url).toBe(SEO.DEFAULT_OG_IMAGE)
-    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.image as any)['@type']).toBe('ImageObject')
+    expect((result.image as any).url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect((result.image as any).width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.image as any).height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
   it('should include url in publisher', () => {
     const result = buildCollectionPageJsonLd()
-    expect(result.publisher.url).toBe(SEO.SITE_URL)
+    expect((result.publisher as any).url).toBe(SEO.SITE_URL)
   })
 
   it('should include mainEntityOfPage', () => {
@@ -214,21 +214,21 @@ describe('buildWebApplicationJsonLd', () => {
 
   it('should include publisher logo ImageObject with dimensions', () => {
     const result = buildWebApplicationJsonLd()
-    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.publisher as any).logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.publisher as any).logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
   it('should include url in publisher', () => {
     const result = buildWebApplicationJsonLd()
-    expect(result.publisher.url).toBe(SEO.SITE_URL)
+    expect((result.publisher as any).url).toBe(SEO.SITE_URL)
   })
 
   it('should include image as ImageObject', () => {
     const result = buildWebApplicationJsonLd()
-    expect(result.image['@type']).toBe('ImageObject')
-    expect(result.image.url).toBe(SEO.DEFAULT_OG_IMAGE)
-    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.image as any)['@type']).toBe('ImageObject')
+    expect((result.image as any).url).toBe(SEO.DEFAULT_OG_IMAGE)
+    expect((result.image as any).width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.image as any).height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 })
 
@@ -426,13 +426,13 @@ describe('buildLearningResourceJsonLd', () => {
   it('should include author and publisher', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
     expect(result.author['@type']).toBe('Organization')
-    expect(result.publisher['@type']).toBe('Organization')
+    expect((result.publisher as any)['@type']).toBe('Organization')
   })
 
   it('should include publisher logo ImageObject with dimensions', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
-    expect(result.publisher.logo.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.publisher.logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.publisher as any).logo.width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.publisher as any).logo.height).toBe(SEO.OG_IMAGE_HEIGHT)
   })
 
   it('should include speakable property for AEO with comprehensive selectors', () => {
@@ -452,22 +452,22 @@ describe('buildLearningResourceJsonLd', () => {
 
   it('should use ImageObject for image with name and description', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
-    expect(result.image['@type']).toBe('ImageObject')
-    expect(result.image.url).toBe('https://example.com/og.jpg')
-    expect(result.image.width).toBe(SEO.OG_IMAGE_WIDTH)
-    expect(result.image.height).toBe(SEO.OG_IMAGE_HEIGHT)
-    expect(result.image.name).toBe(mockArticle.meta_title || mockArticle.title)
-    expect(result.image.description).toBe(mockArticle.meta_description || mockArticle.subtitle)
+    expect((result.image as any)['@type']).toBe('ImageObject')
+    expect((result.image as any).url).toBe('https://example.com/og.jpg')
+    expect((result.image as any).width).toBe(SEO.OG_IMAGE_WIDTH)
+    expect((result.image as any).height).toBe(SEO.OG_IMAGE_HEIGHT)
+    expect((result.image as any).name).toBe(mockArticle.meta_title || mockArticle.title)
+    expect((result.image as any).description).toBe(mockArticle.meta_description || mockArticle.subtitle)
   })
 
   it('should include url in author', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
-    expect(result.author.url).toBe(SEO.SITE_URL)
+    expect((result.author as any).url).toBe(SEO.SITE_URL)
   })
 
   it('should include url in publisher', () => {
     const result = buildLearningResourceJsonLd(mockArticle)
-    expect(result.publisher.url).toBe(SEO.SITE_URL)
+    expect((result.publisher as any).url).toBe(SEO.SITE_URL)
   })
 })
 

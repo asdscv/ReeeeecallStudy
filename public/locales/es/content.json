@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "Volver a artículos",
     "readingTime": "{{minutes}} min",
-    "notFound": "Artículo no encontrado"
+    "notFound": "Artículo no encontrado",
+    "relatedArticles": "Artículos relacionados"
   },
   "cta": {
     "title": "Comienza con ReeeCall",

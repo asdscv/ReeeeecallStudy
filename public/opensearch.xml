@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>ReeeeecallStudy</ShortName>
+  <Description>Search learning insights and study strategies on ReeeeecallStudy</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Url type="text/html" template="https://reeeeecallstudy.xyz/insight?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://reeeeecallstudy.xyz/opensearch.xml"/>
+  <Image height="16" width="16" type="image/png">https://reeeeecallstudy.xyz/favicon.png</Image>
+  <LongName>ReeeeecallStudy — Smart Flashcard Learning Insights</LongName>
+  <Tags>spaced repetition flashcards study learning SRS</Tags>
+  <Contact>admin@reeeeecallstudy.xyz</Contact>
+  <Language>en</Language>
+  <Language>ko</Language>
+</OpenSearchDescription>

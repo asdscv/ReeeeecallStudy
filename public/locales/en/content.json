@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "Back to Insights",
     "readingTime": "{{minutes}} min",
-    "notFound": "Article not found"
+    "notFound": "Article not found",
+    "relatedArticles": "Related Articles"
   },
   "cta": {
     "title": "Start with ReeeCall",

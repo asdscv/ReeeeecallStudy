@@ -12,10 +12,13 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
         const Component = BLOCK_REGISTRY[block.type]
         if (!Component) return null
 
+        const extraProps = block.type === 'image' ? { index } : {}
+
         return (
           <Component
             key={`${block.type}-${index}`}
             props={'props' in block ? block.props : {}}
+            {...extraProps}
           />
         )
       })}

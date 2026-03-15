@@ -1,0 +1,44 @@
+# ReeeeecallStudy
+# https://llmstxt.org/
+
+> ReeeeecallStudy is a free smart flashcard learning platform that uses scientifically proven spaced repetition (SRS) to help students memorize any subject faster and retain knowledge longer. Available in 8 languages with 5 study modes.
+
+## What is ReeeeecallStudy?
+
+ReeeeecallStudy is a web-based educational platform at https://reeeeecallstudy.xyz that applies spaced repetition science to flashcard-based learning. It uses a modified SM-2 algorithm to schedule reviews at optimal intervals, leveraging the spacing effect and testing effect from cognitive psychology. The platform is completely free with no premium tier.
+
+## What study modes does ReeeeecallStudy offer?
+
+ReeeeecallStudy provides five study modes: SRS (spaced repetition with optimized scheduling), Cramming (rapid sequential review for exam prep), Quiz (AI-generated multiple choice), Matching (drag-and-drop card pairing), and Writing (type-the-answer with fuzzy matching). Each mode targets different aspects of learning based on desirable difficulties research.
+
+## How does spaced repetition work in ReeeeecallStudy?
+
+ReeeeecallStudy implements the spacing effect — a well-established finding in cognitive psychology that information is better retained when review sessions are spaced over increasing intervals. After each review, users rate their recall (Again/Hard/Good/Easy/Perfect), and the algorithm adjusts the next review interval accordingly, typically following patterns like 1→3→7→14→30 days.
+
+## Is ReeeeecallStudy free?
+
+Yes, ReeeeecallStudy is completely free. All features — including all 5 study modes, unlimited deck creation, marketplace sharing, real-time analytics, and AI-generated educational content — are available to every user at no cost. There is no premium tier, subscription, or paywall.
+
+## What languages does ReeeeecallStudy support?
+
+ReeeeecallStudy supports 8 languages: English, Korean (한국어), Chinese Simplified (简体中文), Japanese (日本語), Spanish (Español), Vietnamese (Tiếng Việt), Thai (ภาษาไทย), and Indonesian (Bahasa Indonesia). Both the UI and all Learning Insights articles are fully available in all supported languages.
+
+## Key Links
+
+- [Homepage](https://reeeeecallstudy.xyz/landing): Main landing page with features overview
+- [Learning Insights](https://reeeeecallstudy.xyz/insight): Daily science-backed articles about learning strategies
+- [Full LLM Context](https://reeeeecallstudy.xyz/llms-full.txt): Comprehensive technical details for AI systems
+- [RSS Feed](https://reeeeecallstudy.xyz/feed.xml): Subscribe to latest learning articles
+- [Atom Feed](https://reeeeecallstudy.xyz/feed.atom): Atom format feed
+- [JSON Feed](https://reeeeecallstudy.xyz/feed.json): JSON format feed
+- [API Documentation](https://reeeeecallstudy.xyz/docs/api): Public REST API docs
+- [Sitemap](https://reeeeecallstudy.xyz/sitemap.xml): All indexed pages
+
+## Learning Insights Topics
+
+The blog publishes daily articles covering: spaced repetition science (Ebbinghaus's forgetting curve, Leitner system), active recall and testing effect, memory techniques (mnemonics, method of loci, chunking), study habit optimization (Pomodoro, interleaving), language learning strategies, exam preparation, and cognitive psychology fundamentals.
+
+## Contact
+
+- Email: admin@reeeeecallstudy.xyz
+- Twitter/X: [@reeeeecallstudy](https://x.com/reeeeecallstudy)

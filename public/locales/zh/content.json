@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "返回学习洞察",
     "readingTime": "{{minutes}} 分钟",
-    "notFound": "未找到文章"
+    "notFound": "未找到文章",
+    "relatedArticles": "相关文章"
   },
   "cta": {
     "title": "从 ReeeCall 开始",

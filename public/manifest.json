@@ -1,20 +1,34 @@
 {
-  "name": "ReeeeecallStudy",
+  "name": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
   "short_name": "ReeeCall",
-  "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm",
+  "description": "Free smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. 5 study modes, deck sharing, and real-time analytics.",
   "start_url": "/landing",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#2563eb",
   "background_color": "#ffffff",
-  "categories": ["education", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "utilities"],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/favicon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Learning Insights",
+      "short_name": "Insights",
+      "description": "Browse science-backed learning strategies",
+      "url": "/insight",
+      "icons": [{ "src": "/favicon.png", "sizes": "512x512" }]
     }
   ]
 }

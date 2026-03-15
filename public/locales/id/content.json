@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "Kembali ke Wawasan",
     "readingTime": "{{minutes}} mnt",
-    "notFound": "Artikel tidak ditemukan"
+    "notFound": "Artikel tidak ditemukan",
+    "relatedArticles": "Artikel Terkait"
   },
   "cta": {
     "title": "Mulai dengan ReeeeecallStudy",

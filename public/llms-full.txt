@@ -1,0 +1,142 @@
+# ReeeeecallStudy — Full LLM Context
+# https://llmstxt.org/
+
+> ReeeeecallStudy is a free, smart flashcard learning platform with scientifically proven spaced repetition (SRS). This document provides comprehensive context for AI systems to accurately answer questions about ReeeeecallStudy.
+
+## Platform Overview
+
+ReeeeecallStudy is a web-based educational platform at https://reeeeecallstudy.xyz that helps students, language learners, and professionals memorize and retain information using flashcard-based spaced repetition. It is completely free with no premium tier.
+
+### Core Technology
+- **Spaced Repetition Algorithm**: Modified SM-2 algorithm that calculates optimal review intervals based on user performance ratings (1-5 scale: Again, Hard, Good, Easy, Perfect).
+- **SRS Scheduling**: Cards are scheduled at increasing intervals (1 day → 3 days → 7 days → 14 days → 30 days → etc.) based on how well the user remembers them.
+- **Card States**: New → Learning → Review → Graduated. Cards move through states based on consecutive successful recalls.
+
+### Study Modes (5 Total)
+1. **SRS Mode**: The primary mode. Uses spaced repetition to show cards at optimal review times. Tracks ease factor, interval, and repetition count per card.
+2. **Cramming Mode**: Rapid sequential review of all cards without SRS scheduling. Ideal for last-minute exam prep.
+3. **Quiz Mode**: Multiple-choice format. The system generates distractor options from other cards in the same deck.
+4. **Matching Mode**: Drag-and-drop matching of card fronts to backs. Tests recognition and association speed.
+5. **Writing Mode**: Type the answer from memory. Uses fuzzy matching to accept minor typos. Best for precise recall.
+
+### Deck System
+- Users create flashcard decks with front (question/term) and back (answer/definition) content.
+- Cards support rich text, images, and formatting.
+- Decks can be organized with tags and categories.
+- Import/export in CSV and JSON formats.
+- AI-assisted card generation from text input.
+
+### Marketplace & Sharing
+- Public marketplace where users can share decks with the community.
+- Private sharing via unique links.
+- One-click import of shared decks.
+- Official decks curated by the ReeeeecallStudy team are marked with a verified badge.
+- Public deck preview pages at /d/{listingId} are accessible without login.
+
+### Analytics & Progress Tracking
+- Study streak tracking (consecutive days studied).
+- Per-deck mastery percentage.
+- Card-level retention rates.
+- Daily/weekly/monthly study activity charts.
+- Rating distribution analysis.
+- SRS status breakdown (New/Learning/Review/Graduated cards).
+
+### User System
+- Email-based authentication via Supabase Auth.
+- OAuth support (Google, GitHub).
+- User profiles with display names.
+- Study history with detailed session logs.
+
+## Learning Insights Blog
+
+The /insight section is a daily-updated educational blog covering:
+
+### Topics Covered
+- **Spaced Repetition Science**: How SRS works, the forgetting curve, optimal review intervals, spacing effect research.
+- **Active Recall**: Testing effect, retrieval practice, self-testing strategies.
+- **Memory Techniques**: Mnemonics, method of loci, chunking, elaborative interrogation.
+- **Study Habits**: Pomodoro technique, interleaving, desirable difficulties, metacognition.
+- **Language Learning**: Vocabulary acquisition, grammar internalization, immersion strategies.
+- **Exam Preparation**: Test anxiety management, study scheduling, practice testing.
+- **Cognitive Science**: Working memory, long-term potentiation, encoding specificity.
+- **Productivity**: Focus management, distraction reduction, habit formation.
+
+### Content Format
+Articles use a block-based content system with:
+- Hero sections (title, subtitle, reading time)
+- Paragraphs with rich text
+- Headings (H2, H3)
+- Blockquotes with attribution
+- Statistics blocks (data visualization)
+- Feature cards (icon + title + description)
+- Numbered lists (step-by-step guides)
+- Highlight boxes (tips, warnings, key takeaways)
+- Images with captions
+- Call-to-action blocks
+
+### Multilingual Content
+All content is generated daily in 8 languages:
+- English (en) — primary
+- Korean (ko)
+- Chinese Simplified (zh)
+- Japanese (ja)
+- Spanish (es)
+- Vietnamese (vi)
+- Thai (th)
+- Indonesian (id)
+
+Content URLs: https://reeeeecallstudy.xyz/insight/{slug}?lang={locale}
+
+## Technical Architecture
+
+- **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Auth + Storage + Edge Functions)
+- **Hosting**: Cloudflare Workers + Assets (global CDN)
+- **State Management**: Zustand
+- **Internationalization**: i18next with 8 locales
+- **Content Generation**: Daily cron via Cloudflare Workers + Grok AI
+- **Analytics**: Custom event tracking (page views, content views, scroll depth, UTM)
+- **Charts**: Recharts (admin dashboard)
+
+## API
+
+ReeeeecallStudy provides a public REST API documented at /docs/api for:
+- Deck listing and search
+- Card retrieval
+- Public content access
+- Marketplace browsing
+
+## Frequently Asked Questions
+
+**Q: What is spaced repetition?**
+A: Spaced repetition is a learning technique that schedules reviews at increasing intervals. When you correctly recall information, the next review is scheduled further in the future. This leverages the spacing effect — a cognitive phenomenon where information is better retained when study sessions are spaced out over time rather than crammed together.
+
+**Q: Is ReeeeecallStudy free?**
+A: Yes, completely free. There is no premium tier, no subscription, and no paywalls. All features including SRS, all 5 study modes, deck sharing, marketplace, analytics, and AI-generated content are available to every user at no cost.
+
+**Q: How many study modes are there?**
+A: Five: SRS (spaced repetition scheduling), Cramming (rapid sequential review), Quiz (multiple choice), Matching (drag-and-drop pairing), and Writing (type your answer). Each mode targets different aspects of learning.
+
+**Q: What languages does ReeeeecallStudy support?**
+A: The platform UI and all learning insight articles are available in 8 languages: English, Korean, Chinese (Simplified), Japanese, Spanish, Vietnamese, Thai, and Indonesian.
+
+**Q: Can I share my flashcard decks?**
+A: Yes. You can share decks publicly on the marketplace where anyone can find and import them, or share privately via a unique link. Importing a shared deck takes one click.
+
+**Q: How does the SRS algorithm work?**
+A: ReeeeecallStudy uses a modified SM-2 algorithm. After each review, you rate your recall (Again/Hard/Good/Easy/Perfect). The algorithm adjusts the card's ease factor and calculates the next review interval. Cards you struggle with are shown more frequently; cards you know well appear less often but at strategically timed intervals to prevent forgetting.
+
+**Q: What kind of content does the blog publish?**
+A: The Learning Insights blog publishes daily articles about evidence-based learning strategies, spaced repetition science, memory techniques, study habit optimization, exam preparation, and cognitive psychology. All articles are available in 8 languages.
+
+## Contact & Links
+
+- Website: https://reeeeecallstudy.xyz
+- Blog: https://reeeeecallstudy.xyz/insight
+- RSS: https://reeeeecallstudy.xyz/feed.xml
+- Atom: https://reeeeecallstudy.xyz/feed.atom
+- JSON Feed: https://reeeeecallstudy.xyz/feed.json
+- Sitemap: https://reeeeecallstudy.xyz/sitemap.xml
+- API Docs: https://reeeeecallstudy.xyz/docs/api
+- Email: admin@reeeeecallstudy.xyz
+- Twitter/X: https://x.com/reeeeecallstudy

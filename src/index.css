@@ -159,3 +159,11 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Core Web Vitals: content-visibility for off-screen sections (reduces INP + rendering cost) */
+section[class*="py-"],
+footer,
+aside {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}

@@ -10,7 +10,8 @@
   "detail": {
     "backToList": "Quay lại Bài viết",
     "readingTime": "{{minutes}} phút",
-    "notFound": "Không tìm thấy bài viết"
+    "notFound": "Không tìm thấy bài viết",
+    "relatedArticles": "Bài viết liên quan"
   },
   "cta": {
     "title": "Bắt đầu với ReeeCall",

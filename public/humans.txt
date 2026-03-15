@@ -1,0 +1,13 @@
+/* TEAM */
+Name: ReeeeecallStudy
+Contact: admin@reeeeecallstudy.xyz
+Twitter: @reeeeecallstudy
+From: South Korea
+
+/* SITE */
+Last update: 2026/03/15
+Standards: HTML5, CSS3, ES2024
+Language: English, Korean, Chinese, Japanese, Spanish, Vietnamese, Thai, Indonesian
+Platform: React 19, TypeScript, Vite, Tailwind CSS
+Backend: Supabase, Cloudflare Workers
+Content: AI-generated daily in 8 languages
