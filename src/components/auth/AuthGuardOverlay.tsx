@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
-import { Brain, BarChart3, Infinity } from 'lucide-react'
+import { Brain, BarChart3, Infinity as InfinityIcon } from 'lucide-react'
 
 const FLIP_INTERVAL = 3000
 const RATING_BUTTONS = ['Again', 'Hard', 'Good', 'Easy']
@@ -117,7 +117,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
 const FEATURES = [
   { icon: Brain, key: 'srs' },
   { icon: BarChart3, key: 'stats' },
-  { icon: Infinity, key: 'unlimited' },
+  { icon: InfinityIcon, key: 'unlimited' },
 ] as const
 
 export function AuthGuardOverlay() {
