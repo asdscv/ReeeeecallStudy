@@ -4,6 +4,8 @@
   "searchPlaceholder": "Buscar funciones (ej., SRS, Importar, Compartir...)",
   "tableOfContents": "Tabla de contenidos",
   "noResults": "No hay resultados para \"{{query}}\".",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "Primeros pasos",

@@ -4,6 +4,8 @@
   "searchPlaceholder": "機能を検索（例：SRS、インポート、共有...）",
   "tableOfContents": "目次",
   "noResults": "「{{query}}」の検索結果がありません。",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "はじめに",

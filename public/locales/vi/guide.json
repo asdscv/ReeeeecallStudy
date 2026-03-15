@@ -4,6 +4,8 @@
   "searchPlaceholder": "Tìm kiếm tính năng (VD: SRS, Nhập, Chia sẻ...)",
   "tableOfContents": "Mục lục",
   "noResults": "Không có kết quả cho \"{{query}}\".",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "Bắt đầu",

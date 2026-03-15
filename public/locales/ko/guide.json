@@ -4,6 +4,8 @@
   "searchPlaceholder": "기능 검색 (예: SRS, 가져오기, 공유...)",
   "tableOfContents": "목차",
   "noResults": "\"{{query}}\"에 대한 결과가 없습니다.",
+  "copyLink": "이 섹션 링크 복사",
+  "linkCopied": "링크가 복사되었습니다!",
   "sections": {
     "getting-started": {
       "title": "시작하기",

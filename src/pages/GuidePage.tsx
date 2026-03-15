@@ -1,11 +1,28 @@
-import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, ChevronDown, ChevronUp, ArrowLeft, ExternalLink } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, ArrowLeft, ExternalLink, Link2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import { GUIDE_SECTIONS, searchGuide, type GuideSection } from '../lib/guide-content'
 
-function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSection; defaultOpen: boolean; forceOpen?: boolean; t: (key: string) => string }) {
+// ─── SectionCard ───────────────────────────────────────────
+
+function SectionCard({
+  section,
+  defaultOpen,
+  forceOpen,
+  highlighted,
+  t,
+  onCopyLink,
+}: {
+  section: GuideSection
+  defaultOpen: boolean
+  forceOpen?: boolean
+  highlighted?: boolean
+  t: (key: string) => string
+  onCopyLink: (sectionId: string) => void
+}) {
   const [open, setOpen] = useState(defaultOpen)
 
   useEffect(() => {
@@ -13,13 +30,25 @@ function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSec
   }, [forceOpen])
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div
+      id={`guide-${section.id}`}
+      className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ${
+        highlighted ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200'
+      }`}
+    >
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 p-4 sm:p-5 text-left cursor-pointer hover:bg-gray-50 transition"
+        className="w-full flex items-center gap-3 p-4 sm:p-5 text-left cursor-pointer hover:bg-gray-50 transition group"
       >
         <span className="text-2xl shrink-0">{section.icon}</span>
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 flex-1">{t(section.title)}</h2>
+        <button
+          onClick={(e) => { e.stopPropagation(); onCopyLink(section.id) }}
+          className="p-1.5 text-gray-300 hover:text-blue-500 rounded-md hover:bg-blue-50 transition cursor-pointer opacity-0 group-hover:opacity-100 shrink-0"
+          title={t('copyLink')}
+        >
+          <Link2 className="w-4 h-4" />
+        </button>
         {open ? (
           <ChevronUp className="w-5 h-5 text-gray-400 shrink-0" />
         ) : (
@@ -37,14 +66,12 @@ function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSec
                 <div className="mt-3 space-y-3">
                   {item.images.map((img, imgIdx) => (
                     <div key={imgIdx} className="rounded-lg border border-gray-200 overflow-hidden">
-                      {/* PC image (hidden on mobile) */}
                       <img
                         src={img.pc}
                         alt={img.alt || ''}
                         loading="lazy"
                         className="hidden sm:block w-full"
                       />
-                      {/* Mobile image (hidden on PC) */}
                       <img
                         src={img.mobile}
                         alt={img.alt || ''}
@@ -85,6 +112,8 @@ function SectionCard({ section, defaultOpen, forceOpen, t }: { section: GuideSec
   )
 }
 
+// ─── TableOfContents ───────────────────────────────────────
+
 function TableOfContents({ sections, onSelect, t }: { sections: GuideSection[]; onSelect: (id: string) => void; t: (key: string) => string }) {
   return (
     <nav className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
@@ -106,23 +135,71 @@ function TableOfContents({ sections, onSelect, t }: { sections: GuideSection[]; 
   )
 }
 
+// ─── GuidePage ─────────────────────────────────────────────
+
 export function GuidePage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { t } = useTranslation('guide')
   const [query, setQuery] = useState('')
   const [openSectionId, setOpenSectionId] = useState<string | null>(null)
+  const [highlightedId, setHighlightedId] = useState<string | null>(null)
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   const filtered = searchGuide(query, t)
   const isSearching = query.trim().length > 0
 
+  // Handle hash-based deep link on mount and hash change
+  const handleHash = useCallback(() => {
+    const hash = location.hash.replace('#', '')
+    if (hash && GUIDE_SECTIONS.some((s) => s.id === hash)) {
+      setOpenSectionId(hash)
+      setHighlightedId(hash)
+      // Scroll after DOM update
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const el = sectionRefs.current[hash]
+          if (!el) return
+          const y = el.getBoundingClientRect().top + window.scrollY - 72
+          window.scrollTo({ top: y, behavior: 'smooth' })
+        }, 100)
+      })
+      // Remove highlight after animation
+      setTimeout(() => setHighlightedId(null), 3000)
+    }
+  }, [location.hash])
+
+  useEffect(() => {
+    handleHash()
+  }, [handleHash])
+
   const scrollToSection = (id: string) => {
+    // Update URL hash without full navigation
+    window.history.replaceState(null, '', `#${id}`)
     setOpenSectionId(id)
+    setHighlightedId(id)
     requestAnimationFrame(() => {
       const el = sectionRefs.current[id]
       if (!el) return
       const y = el.getBoundingClientRect().top + window.scrollY - 72
       window.scrollTo({ top: y, behavior: 'smooth' })
+    })
+    setTimeout(() => setHighlightedId(null), 3000)
+  }
+
+  const copyDeepLink = (sectionId: string) => {
+    const url = `${window.location.origin}/guide#${sectionId}`
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success(t('linkCopied'))
+    }).catch(() => {
+      // Fallback for older browsers
+      const input = document.createElement('input')
+      input.value = url
+      document.body.appendChild(input)
+      input.select()
+      document.execCommand('copy')
+      document.body.removeChild(input)
+      toast.success(t('linkCopied'))
     })
   }
 
@@ -174,7 +251,14 @@ export function GuidePage() {
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
             >
-              <SectionCard section={section} defaultOpen={isSearching} forceOpen={openSectionId === section.id} t={t} />
+              <SectionCard
+                section={section}
+                defaultOpen={isSearching}
+                forceOpen={openSectionId === section.id}
+                highlighted={highlightedId === section.id}
+                t={t}
+                onCopyLink={copyDeepLink}
+              />
             </div>
           ))}
         </div>

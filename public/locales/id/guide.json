@@ -4,6 +4,8 @@
   "searchPlaceholder": "Cari fitur (contoh: SRS, Impor, Berbagi...)",
   "tableOfContents": "Daftar Isi",
   "noResults": "Tidak ada hasil untuk \"{{query}}\".",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "Memulai",

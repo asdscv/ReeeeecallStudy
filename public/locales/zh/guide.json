@@ -4,6 +4,8 @@
   "searchPlaceholder": "搜索功能（例：SRS、导入、分享...）",
   "tableOfContents": "目录",
   "noResults": "未找到「{{query}}」的相关结果。",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "入门指南",
