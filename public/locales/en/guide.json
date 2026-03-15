@@ -4,6 +4,8 @@
   "searchPlaceholder": "Search features (e.g., SRS, Import, Share...)",
   "tableOfContents": "Table of Contents",
   "noResults": "No results for \"{{query}}\".",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "Getting Started",

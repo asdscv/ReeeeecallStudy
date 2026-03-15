@@ -3,7 +3,9 @@
   "subtitle": "เรียนรู้ฟีเจอร์ทั้งหมดของ ReeeeecallStudy",
   "searchPlaceholder": "ค้นหาฟีเจอร์ (เช่น SRS, นำเข้า, แชร์...)",
   "tableOfContents": "สารบัญ",
-  "noResults": "ไม่พบผลลัพธ์สำหรับ \"{{query}}\"",
+  "noResults": "ไม่พบผลลัพธ์สำหรับ \"{{query}}\".",
+  "copyLink": "Copy link to this section",
+  "linkCopied": "Link copied!",
   "sections": {
     "getting-started": {
       "title": "เริ่มต้นใช้งาน",
