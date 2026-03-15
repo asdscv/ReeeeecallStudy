@@ -1448,7 +1448,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
       })
     }
 
-    // 정적 에셋은 assets 바인딩이 자동 처리 (wrangler.jsonc의 assets 설정)
-    return new Response('Not Found', { status: 404 })
+    // 정적 에셋 + SPA fallback은 assets 바인딩이 처리 (wrangler.jsonc의 assets 설정)
+    return env.ASSETS.fetch(request)
   },
 }

@@ -4,13 +4,14 @@
   "compatibility_date": "2026-02-15",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
   },
   // Set these via: wrangler secret put SUPABASE_URL / SUPABASE_ANON_KEY
   // Or in Cloudflare dashboard > Pages > Settings > Environment variables
+  // SUPABASE_ANON_KEY set via: wrangler secret put SUPABASE_ANON_KEY
   "vars": {
     "SUPABASE_URL": "https://ixdapelfikaneexnskfm.supabase.co",
-    "SUPABASE_ANON_KEY": "",
     "XAI_MODEL": "grok-3-mini",
     "XAI_BASE_URL": "https://api.x.ai/v1"
   },
