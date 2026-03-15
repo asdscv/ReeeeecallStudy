@@ -26,6 +26,7 @@ import { MarketplaceDetailPage } from './pages/MarketplaceDetailPage'
 import { DeckSharePage } from './pages/DeckSharePage'
 import { AcceptInvitePage } from './pages/AcceptInvitePage'
 import { MySharesPage } from './pages/MySharesPage'
+import { AIGeneratePage } from './pages/AIGeneratePage'
 import { GuidePage } from './pages/GuidePage'
 import { ApiDocsPage } from './pages/ApiDocsPage'
 import { PublicApiDocsPage } from './pages/PublicApiDocsPage'
@@ -116,6 +117,7 @@ function App() {
           <Route path="/quick-study" element={<QuickStudyPage />} />
           <Route path="/history" element={<StudyHistoryPage />} />
           <Route path="/history/detail" element={<SessionDetailPage />} />
+          <Route path="/ai-generate" element={<AIGeneratePage />} />
           <Route path="/decks" element={<DecksPage />} />
           <Route path="/decks/:deckId" element={<DeckDetailPage />} />
           <Route path="/decks/:deckId/edit" element={<DeckEditPage />} />

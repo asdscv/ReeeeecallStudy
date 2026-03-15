@@ -30,6 +30,7 @@ i18n
       'landing',
       'content',
       'admin',
+      'ai-generate',
     ],
     defaultNS: 'common',
 

@@ -9,7 +9,8 @@
     "studyHistory": "기록",
     "settings": "설정",
     "admin": "관리자",
-    "guide": "사용법"
+    "guide": "사용법",
+    "aiGenerate": "AI 생성"
   },
   "actions": {
     "save": "저장",

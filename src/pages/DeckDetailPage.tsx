@@ -3,7 +3,7 @@ import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { isPast, formatLocalDate } from '../lib/date-utils'
 import { getPageSelectAllState, togglePageSelectAll } from '../lib/card-selection'
@@ -14,6 +14,7 @@ import { ImportModal } from '../components/import-export/ImportModal'
 import { ExportModal } from '../components/import-export/ExportModal'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
+import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import type { Deck, Card, CardTemplate } from '../types/database'
 
 type TabId = 'cards' | 'upload-date' | 'stats'
@@ -52,6 +53,9 @@ export function DeckDetailPage() {
   // Import/Export
   const [showImport, setShowImport] = useState(false)
   const [showExport, setShowExport] = useState(false)
+
+  // AI Generate
+  const [showAIGenerate, setShowAIGenerate] = useState(false)
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -283,6 +287,15 @@ export function DeckDetailPage() {
             >
               <Plus className="w-4 h-4" />
               {t('decks:detail.addCard')}
+            </button>
+          )}
+          {!deck.is_readonly && (
+            <button
+              onClick={() => setShowAIGenerate(true)}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-purple-50 border border-purple-300 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4" />
+              {t('ai-generate:button.aiCards')}
             </button>
           )}
           {!deck.is_readonly && (
@@ -636,6 +649,15 @@ export function DeckDetailPage() {
           cards={cards}
         />
       )}
+
+      {/* AI Generate Modal */}
+      <AIGenerateModal
+        open={showAIGenerate}
+        onClose={() => { setShowAIGenerate(false); if (deckId) fetchCards(deckId) }}
+        initialMode="cards_only"
+        existingDeckId={deckId}
+        existingTemplateId={deck.default_template_id}
+      />
 
       {/* Card Form Modal */}
       <CardFormModal

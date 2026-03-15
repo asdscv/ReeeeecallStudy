@@ -5,6 +5,7 @@ import { useDeckStore } from '../stores/deck-store'
 import { DeckCard } from '../components/deck/DeckCard'
 import { DeckFormModal } from '../components/deck/DeckFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
+import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import type { Deck } from '../types/database'
 
 export function DecksPage() {
@@ -13,6 +14,7 @@ export function DecksPage() {
   const { decks, stats, templates, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
 
   const [showCreate, setShowCreate] = useState(false)
+  const [showAIGenerate, setShowAIGenerate] = useState(false)
   const [deletingDeck, setDeletingDeck] = useState<Deck | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
@@ -43,12 +45,20 @@ export function DecksPage() {
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('decks:title')}</h1>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
-        >
-          {t('decks:createNew')}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowAIGenerate(true)}
+            className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 transition cursor-pointer"
+          >
+            {t('ai-generate:button.aiGenerate')}
+          </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+          >
+            {t('decks:createNew')}
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -79,6 +89,13 @@ export function DecksPage() {
           ))}
         </div>
       )}
+
+      {/* AI Generate Modal */}
+      <AIGenerateModal
+        open={showAIGenerate}
+        onClose={() => { setShowAIGenerate(false); fetchDecks(); if (user) fetchStats(user.id) }}
+        initialMode="full"
+      />
 
       {/* Create Modal */}
       <DeckFormModal
