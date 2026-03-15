@@ -1,5 +1,5 @@
-import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../../stores/auth-store'
+import { AuthGuardOverlay } from './AuthGuardOverlay'
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore()
@@ -13,7 +13,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/auth/login" replace />
+    return <AuthGuardOverlay />
   }
 
   return <>{children}</>
