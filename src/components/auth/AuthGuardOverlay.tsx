@@ -4,26 +4,54 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import { Brain, BarChart3, Infinity as InfinityIcon } from 'lucide-react'
 
+/**
+ * MockBrowserPreview — AppPreviewSection(랜딩)에서 복사 후 AuthGuard용으로 수정
+ *
+ * 랜딩(AppPreviewSection)과의 차이점:
+ * - 첫 flip이 0.75초 후 즉시 실행 (랜딩은 3초 interval만 사용)
+ * - 카드 디자인 업그레이드: Q/A 배지, rounded-2xl, 예문, glow reflection
+ * - 진행률 바 추가 (12/30 cards, 40%)
+ * - 브라우저 크롬: animated border glow, 초록 자물쇠, darker 배경
+ * - 버튼: 선택 시 y:-2 lift 효과, 색상별 shadow, emerald(Good)
+ * - FloatingCard/stat 카드 제거 (오버레이에서는 불필요)
+ * - ScrollReveal/whileHover 제거 (blur 처리 후 인터랙션 없음)
+ */
+const FIRST_FLIP_DELAY = 750  // Show front briefly, then flip
 const FLIP_INTERVAL = 3000
 const RATING_BUTTONS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = [
-  'bg-red-500/80 text-white',
-  'bg-orange-500/80 text-white',
-  'bg-green-500/80 text-white',
-  'bg-blue-500/80 text-white',
+  'bg-red-500 text-white shadow-red-500/40',
+  'bg-orange-500 text-white shadow-orange-500/40',
+  'bg-emerald-500 text-white shadow-emerald-500/40',
+  'bg-blue-500 text-white shadow-blue-500/40',
 ]
 
 function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null }) {
   const { t } = useTranslation('landing')
   const [isFlipped, setIsFlipped] = useState(false)
   const [highlightIdx, setHighlightIdx] = useState(-1)
+  const [flipCount, setFlipCount] = useState(0)
 
+  // First flip: quick (800ms), then regular interval
   useEffect(() => {
     if (prefersReduced) return
-    const interval = setInterval(() => setIsFlipped((prev) => !prev), FLIP_INTERVAL)
-    return () => clearInterval(interval)
+    const firstTimer = setTimeout(() => {
+      setIsFlipped(true)
+      setFlipCount(1)
+    }, FIRST_FLIP_DELAY)
+    return () => clearTimeout(firstTimer)
   }, [prefersReduced])
 
+  useEffect(() => {
+    if (prefersReduced || flipCount === 0) return
+    const interval = setInterval(() => {
+      setIsFlipped((prev) => !prev)
+      setFlipCount((c) => c + 1)
+    }, FLIP_INTERVAL)
+    return () => clearInterval(interval)
+  }, [prefersReduced, flipCount])
+
+  // Sweep highlight across rating buttons after card flips to back
   useEffect(() => {
     if (!isFlipped || prefersReduced) {
       setHighlightIdx(-1)
@@ -34,22 +62,25 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
       setHighlightIdx(idx)
       idx++
       if (idx >= RATING_BUTTONS.length) clearInterval(sweep)
-    }, 300)
+    }, 250)
     return () => clearInterval(sweep)
   }, [isFlipped, prefersReduced])
 
   return (
-    <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/20">
+    <div className="relative bg-gray-950 rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/30 border border-white/5">
+      {/* Animated border glow */}
+      <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-blue-500/30 via-cyan-400/30 to-violet-500/30 blur-sm opacity-60 -z-10" />
+
       {/* Browser chrome */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-gray-800/80 border-b border-gray-700/50">
+      <div className="flex items-center gap-2 px-4 py-3 bg-gray-900/90 border-b border-white/5">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-400/80" />
           <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
           <div className="w-3 h-3 rounded-full bg-green-400/80" />
         </div>
         <div className="ml-3 flex-1 max-w-xs">
-          <div className="px-3 py-1.5 bg-gray-700/60 rounded-lg text-xs text-gray-300 font-mono flex items-center gap-2">
-            <svg className="w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="px-3 py-1.5 bg-white/5 rounded-lg text-xs text-gray-300 font-mono flex items-center gap-2 border border-white/5">
+            <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             <span className="text-gray-400">reeeeecallstudy.xyz</span>
@@ -58,56 +89,102 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
       </div>
 
       {/* Content area */}
-      <div className="relative p-6 sm:p-10 flex flex-col items-center">
+      <div className="relative p-6 sm:p-10 flex flex-col items-center bg-gradient-to-b from-gray-900 to-gray-950">
+        {/* Background grid */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
+            backgroundImage: 'radial-gradient(circle, rgba(59,130,246,0.5) 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
           }}
         />
 
+        {/* Tagline pill */}
+        <motion.div
+          className="mb-5 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+        >
+          <span className="text-xs font-medium text-blue-400 tracking-wide">
+            {t('preview.tagline', 'Smart Flashcard Learning Platform')}
+          </span>
+        </motion.div>
+
         {/* Flashcard with flip */}
-        <div className="w-full max-w-[280px] sm:max-w-sm h-40 sm:h-48 [perspective:1000px] mb-4 sm:mb-6 relative">
+        <div className="w-full max-w-[280px] sm:max-w-sm h-44 sm:h-52 [perspective:1200px] mb-5 sm:mb-6 relative">
+          {/* Card glow reflection */}
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 bg-blue-500/15 blur-2xl rounded-full" />
+
           <motion.div
             className="relative w-full h-full [transform-style:preserve-3d]"
             animate={{ rotateY: isFlipped ? 180 : 0 }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           >
-            <div className="absolute inset-0 [backface-visibility:hidden] bg-gradient-to-br from-blue-500 via-blue-600 to-blue-800 rounded-xl flex items-center justify-center p-6 shadow-lg shadow-blue-600/20">
-              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
-              <p className="text-2xl sm:text-3xl font-bold text-white relative">
+            {/* Front */}
+            <div className="absolute inset-0 [backface-visibility:hidden] bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-6 shadow-xl shadow-blue-600/25 border border-white/10">
+              <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2)_0%,transparent_50%)]" />
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-white/10 text-[10px] text-white/50 font-medium">
+                Q
+              </div>
+              <p className="text-3xl sm:text-4xl font-bold text-white relative">
                 {t('preview.mockFront', 'Hello')}
               </p>
+              <p className="text-xs text-white/40 mt-2 relative">
+                Tap to reveal
+              </p>
             </div>
-            <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 rounded-xl flex flex-col items-center justify-center p-4 sm:p-6 shadow-lg shadow-cyan-600/20">
-              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
-              <p className="text-2xl sm:text-3xl font-bold text-white relative">
+            {/* Back */}
+            <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-600 rounded-2xl flex flex-col items-center justify-center p-4 sm:p-6 shadow-xl shadow-cyan-600/25 border border-white/10">
+              <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2)_0%,transparent_50%)]" />
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-white/10 text-[10px] text-white/50 font-medium">
+                A
+              </div>
+              <p className="text-3xl sm:text-4xl font-bold text-white relative">
                 {t('preview.mockBack', 'Bonjour')}
               </p>
-              <p className="text-xs sm:text-sm text-white/70 mt-1.5 relative">
+              <p className="text-sm text-white/70 mt-2 relative font-medium">
                 {t('preview.mockMeaning', 'Hello (French)')}
+              </p>
+              <p className="text-xs text-white/40 mt-1 relative italic">
+                {t('preview.mockExample', '"Bonjour, comment allez-vous?"')}
               </p>
             </div>
           </motion.div>
         </div>
 
         {/* Rating buttons */}
-        <div className="flex gap-1.5 sm:gap-3 relative">
+        <div className="flex gap-2 sm:gap-3 relative">
           {RATING_BUTTONS.map((label, i) => (
             <motion.div
               key={label}
-              className={`px-2.5 sm:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
+              className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${
                 highlightIdx === i
-                  ? `${RATING_COLORS[i]} shadow-lg`
-                  : 'bg-gray-700/60 text-gray-400 border border-gray-600/30'
+                  ? `${RATING_COLORS[i]} shadow-lg scale-105`
+                  : 'bg-white/5 text-gray-500 border border-white/10'
               }`}
-              animate={highlightIdx === i ? { scale: 1.08 } : { scale: 1 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              animate={highlightIdx === i ? { scale: 1.1, y: -2 } : { scale: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
               {label}
             </motion.div>
           ))}
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-5 w-full max-w-[280px] sm:max-w-sm">
+          <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1.5">
+            <span>{t('preview.mockCards', '12/30 cards')}</span>
+            <span className="text-blue-400/70">40%</span>
+          </div>
+          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: '40%' }}
+              transition={{ duration: 1.5, delay: 0.3, ease: 'easeOut' }}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -120,12 +197,17 @@ const FEATURES = [
   { icon: InfinityIcon, key: 'unlimited' },
 ] as const
 
+// Delay (seconds) before the mock preview blurs and CTA appears
+const REVEAL_DELAY = 2
+
 export function AuthGuardOverlay() {
   const { t } = useTranslation('auth')
   const location = useLocation()
   const navigate = useNavigate()
   const prefersReduced = useReducedMotion()
   const currentPath = location.pathname + location.search
+
+  const d = prefersReduced ? 0 : REVEAL_DELAY
 
   const handleSignup = () => {
     navigate(`/auth/login?mode=signup&redirect=${encodeURIComponent(currentPath)}`)
@@ -192,38 +274,38 @@ export function AuthGuardOverlay() {
       {/* Main layout */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-6xl flex items-center gap-12 lg:gap-16">
-          {/* Mock browser preview — desktop left side, mobile background */}
+
+          {/* Mock browser preview — starts clear, then blurs when CTA appears */}
+          {/* Desktop: left side */}
           <div className="hidden lg:block flex-1 max-w-lg">
             <motion.div
-              className="relative"
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 0.4, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              style={{ filter: 'blur(4px)', pointerEvents: 'none' }}
+              className="relative pointer-events-none"
+              initial={{ opacity: 1, filter: 'blur(0px)' }}
+              animate={{ opacity: 0.4, filter: 'blur(4px)' }}
+              transition={{ duration: 0.8, delay: d, ease: 'easeInOut' }}
             >
               <MockBrowserPreview prefersReduced={!!prefersReduced} />
             </motion.div>
           </div>
 
-          {/* Mobile background mock — behind CTA card */}
+          {/* Mobile: centered background */}
           <div className="lg:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
             <motion.div
               className="w-[90%] max-w-md"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.15 }}
-              transition={{ duration: 0.8 }}
-              style={{ filter: 'blur(6px)' }}
+              initial={{ opacity: 0.8, filter: 'blur(0px)' }}
+              animate={{ opacity: 0.15, filter: 'blur(6px)' }}
+              transition={{ duration: 0.8, delay: d, ease: 'easeInOut' }}
             >
               <MockBrowserPreview prefersReduced={!!prefersReduced} />
             </motion.div>
           </div>
 
-          {/* CTA Glass Card */}
+          {/* CTA Glass Card — fades in after mock blurs */}
           <motion.div
             className="flex-1 max-w-md mx-auto lg:mx-0 relative z-20"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, delay: d + 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 sm:p-10 relative overflow-hidden">
               {/* Inner gradient overlay */}
@@ -235,7 +317,7 @@ export function AuthGuardOverlay() {
                   className="mb-3"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.4, type: 'spring', stiffness: 200, damping: 15 }}
+                  transition={{ duration: 0.5, delay: d + 0.4, type: 'spring', stiffness: 200, damping: 15 }}
                 >
                   <div className="relative">
                     <div className="absolute inset-0 rounded-full bg-blue-500/30 blur-xl scale-150" />
@@ -254,7 +336,7 @@ export function AuthGuardOverlay() {
                   className="h-6 mb-6 brightness-0 invert"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.45 }}
+                  transition={{ delay: d + 0.45 }}
                 />
 
                 {/* Headline */}
@@ -262,7 +344,7 @@ export function AuthGuardOverlay() {
                   className="text-3xl sm:text-4xl font-extrabold mb-3 bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent"
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
+                  transition={{ duration: 0.5, delay: d + 0.5 }}
                 >
                   {t('authGuard.headline')}
                 </motion.h1>
@@ -272,7 +354,7 @@ export function AuthGuardOverlay() {
                   className="text-blue-200/80 text-sm sm:text-base mb-8 leading-relaxed"
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
+                  transition={{ duration: 0.5, delay: d + 0.6 }}
                 >
                   {t('authGuard.subtext')}
                 </motion.p>
@@ -285,7 +367,7 @@ export function AuthGuardOverlay() {
                       className="flex-1 bg-white/5 backdrop-blur border border-white/10 rounded-xl p-3 sm:p-4 flex flex-col items-center gap-2"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.8 + i * 0.1 }}
+                      transition={{ duration: 0.4, delay: d + 0.8 + i * 0.1 }}
                     >
                       <feat.icon className="w-5 h-5 text-blue-300" />
                       <span className="text-xs sm:text-sm text-white/80 font-medium">
@@ -301,11 +383,10 @@ export function AuthGuardOverlay() {
                   className="w-full relative rounded-xl py-4 text-lg font-bold text-white bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 shadow-lg shadow-blue-500/25 overflow-hidden group"
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 1.1 }}
+                  transition={{ duration: 0.5, delay: d + 1.1 }}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Shimmer effect */}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 animate-[shimmer_3s_infinite]" />
                   <span className="relative">
                     {t('authGuard.ctaButton')}
@@ -318,7 +399,7 @@ export function AuthGuardOverlay() {
                   className="w-full mt-3 rounded-xl py-3 text-sm font-medium text-white/80 bg-white/5 border border-white/20 hover:bg-white/10 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 1.3 }}
+                  transition={{ duration: 0.4, delay: d + 1.3 }}
                 >
                   {t('authGuard.loginButton')}
                 </motion.button>
@@ -328,7 +409,7 @@ export function AuthGuardOverlay() {
                   className="mt-5 flex items-center gap-3 text-emerald-400/70 text-xs"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 1.3 }}
+                  transition={{ duration: 0.4, delay: d + 1.3 }}
                 >
                   <span>{t('authGuard.badges.free')}</span>
                   <span className="w-1 h-1 rounded-full bg-emerald-400/40" />
@@ -342,7 +423,7 @@ export function AuthGuardOverlay() {
         </div>
       </div>
 
-      {/* Shimmer keyframe — injected via style tag */}
+      {/* Shimmer keyframe */}
       <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
