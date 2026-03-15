@@ -89,5 +89,6 @@
   "officialBadge": {
     "label": "官方",
     "tooltip": "官方账号"
-  }
+  },
+  "guideHelp": "Help"
 }

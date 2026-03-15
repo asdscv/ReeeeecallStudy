@@ -89,5 +89,6 @@
   "officialBadge": {
     "label": "Oficial",
     "tooltip": "Cuenta oficial"
-  }
+  },
+  "guideHelp": "Help"
 }

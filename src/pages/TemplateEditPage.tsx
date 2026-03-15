@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { speak, stopSpeaking } from '../lib/tts'
 import { renderCustomHTML } from '../lib/template-renderer'
 import { FONT_SIZE_OPTIONS, getLayoutItemStyle, DEFAULT_FONT_SIZES } from '../lib/layout-styles'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { TemplateField, LayoutItem, LayoutMode } from '../types/database'
 
 const STYLE_OPTIONS: { value: LayoutItem['style']; labelKey: string }[] = [
@@ -332,6 +333,7 @@ export function TemplateEditPage() {
             className="text-lg sm:text-2xl font-bold text-gray-900 bg-transparent outline-none border-b-2 border-transparent focus:border-blue-500 transition px-1 min-w-0 w-full"
           />
         </div>
+        <GuideHelpLink section="templates" />
         <button
           onClick={handleSave}
           disabled={saving}

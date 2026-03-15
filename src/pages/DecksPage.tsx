@@ -6,6 +6,7 @@ import { DeckCard } from '../components/deck/DeckCard'
 import { DeckFormModal } from '../components/deck/DeckFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck } from '../types/database'
 
 export function DecksPage() {
@@ -44,7 +45,10 @@ export function DecksPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('decks:title')}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('decks:title')}</h1>
+          <GuideHelpLink section="decks" />
+        </div>
         <div className="flex gap-2">
           <button
             onClick={() => setShowAIGenerate(true)}

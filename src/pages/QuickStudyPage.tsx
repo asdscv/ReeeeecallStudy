@@ -16,6 +16,7 @@ import {
   isBatchSizeConfigurable,
   clampBatchSize,
 } from '../lib/study-session-utils'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck, StudyMode } from '../types/database'
 
 export function QuickStudyPage() {
@@ -149,9 +150,12 @@ export function QuickStudyPage() {
 
   return (
     <div>
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-        <>⚡{t('quickStudy.title')}</>
-      </h1>
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+          <>⚡{t('quickStudy.title')}</>
+        </h1>
+        <GuideHelpLink section="study" />
+      </div>
 
       {loading ? (
         <div className="flex justify-center py-20">

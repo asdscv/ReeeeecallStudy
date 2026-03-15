@@ -7,6 +7,7 @@ import { useTemplateStore } from '../stores/template-store'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { formatLocalDate } from '../lib/date-utils'
 import { generateTemplateExportJSON, generateTemplateExportCSV } from '../lib/import-export'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { CardTemplate } from '../types/database'
 
 export function TemplatesPage() {
@@ -85,7 +86,10 @@ export function TemplatesPage() {
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
+            <GuideHelpLink section="templates" />
+          </div>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {t('subtitle')}
           </p>

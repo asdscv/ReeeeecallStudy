@@ -12,6 +12,7 @@
     "guide": "Guide",
     "aiGenerate": "AI Generate"
   },
+  "guideHelp": "Help",
   "actions": {
     "save": "Save",
     "saving": "Saving...",

@@ -15,6 +15,7 @@ import { ExportModal } from '../components/import-export/ExportModal'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck, Card, CardTemplate } from '../types/database'
 
 type TabId = 'cards' | 'upload-date' | 'stats'
@@ -234,6 +235,7 @@ export function DeckDetailPage() {
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="text-2xl sm:text-3xl">{deck.icon}</span>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{deck.name}</h1>
+          <GuideHelpLink section="decks" />
         </div>
         {deck.description && (
           <p className="text-sm sm:text-base text-gray-500">{deck.description}</p>

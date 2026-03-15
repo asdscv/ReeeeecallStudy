@@ -89,5 +89,6 @@
   "officialBadge": {
     "label": "Chính thức",
     "tooltip": "Tài khoản chính thức"
-  }
+  },
+  "guideHelp": "Help"
 }
