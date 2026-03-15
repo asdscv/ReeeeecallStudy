@@ -7,11 +7,39 @@ import { RecentActivityChart } from '../../components/admin/RecentActivityChart'
 import { computeEngagementMetrics, formatTotalStudyTime, formatStatNumber, computeWeekOverWeekFromDaily } from '../../lib/admin-stats'
 import type { TrendChange } from '../../lib/admin-stats'
 
-function TrendBadge({ trend }: { trend: TrendChange }) {
+function TrendBadge({ trend, label }: { trend: TrendChange; label?: string }) {
   if (trend.direction === 'flat') return <span className="text-xs text-gray-400">-</span>
   const color = trend.direction === 'up' ? 'text-green-600' : 'text-red-500'
   const arrow = trend.direction === 'up' ? '\u2191' : '\u2193'
-  return <span className={`text-xs font-medium ${color}`}>{arrow} {Math.abs(trend.change)}%</span>
+  return (
+    <span className={`text-xs font-medium ${color}`}>
+      {arrow} {Math.abs(trend.change)}%
+      {label && <span className="text-gray-400 font-normal ml-1">{label}</span>}
+    </span>
+  )
+}
+
+function HealthScoreRing({ score }: { score: number }) {
+  const color = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444'
+  const radius = 40
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (score / 100) * circumference
+
+  return (
+    <div className="flex items-center gap-4">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r={radius} fill="none" stroke="#e5e7eb" strokeWidth="8" />
+        <circle
+          cx="50" cy="50" r={radius} fill="none" stroke={color} strokeWidth="8"
+          strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
+          transform="rotate(-90 50 50)" className="transition-all duration-700"
+        />
+        <text x="50" y="50" textAnchor="middle" dy="6" className="text-lg font-bold" fill={color} fontSize="20">
+          {score}
+        </text>
+      </svg>
+    </div>
+  )
 }
 
 export function AdminOverviewPage() {
@@ -24,12 +52,34 @@ export function AdminOverviewPage() {
   const engagement = useMemo(() => activeUsers ? computeEngagementMetrics(activeUsers) : null, [activeUsers])
   const wow = useMemo(() => computeWeekOverWeekFromDaily(recentActivity), [recentActivity])
 
+  // Compute health score based on engagement metrics and trends
+  const healthScore = useMemo(() => {
+    let score = 50 // base
+    if (engagement) {
+      if (engagement.dauMauRatio >= 20) score += 15
+      else if (engagement.dauMauRatio >= 10) score += 8
+      if (engagement.adoptionRate >= 30) score += 15
+      else if (engagement.adoptionRate >= 15) score += 8
+    }
+    if (wow.sessions.direction === 'up') score += 10
+    else if (wow.sessions.direction === 'down') score -= 10
+    if (wow.activeUsers.direction === 'up') score += 10
+    else if (wow.activeUsers.direction === 'down') score -= 10
+    return Math.max(0, Math.min(100, score))
+  }, [engagement, wow])
+
   useEffect(() => {
     fetchOverview()
   }, [fetchOverview])
 
   if (overviewLoading && !overviewStats) {
-    return <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    )
   }
 
   if (overviewError) {
@@ -40,6 +90,33 @@ export function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
+      {/* Health Score + Key Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col items-center justify-center">
+          <HealthScoreRing score={healthScore} />
+          <p className="text-xs text-gray-500 mt-1">{t('overview.healthScore')}</p>
+        </div>
+
+        {/* WoW Trend Indicators */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('overview.weekOverWeek')}</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">{t('study.sessions')}</p>
+              <TrendBadge trend={wow.sessions} />
+            </div>
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">{t('overview.activeUsers')}</p>
+              <TrendBadge trend={wow.activeUsers} />
+            </div>
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">{t('study.cards')}</p>
+              <TrendBadge trend={wow.cards} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Key metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <AdminStatCard icon="👥" label={t('overview.totalUsers')} value={stats?.total_users ?? 0} color="blue" />
@@ -71,25 +148,6 @@ export function AdminOverviewPage() {
             : '-'}
           color="pink"
         />
-      </div>
-
-      {/* WoW Trend Indicators */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">{t('overview.weekOverWeek')}</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">{t('study.sessions')}</p>
-            <TrendBadge trend={wow.sessions} />
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">{t('overview.activeUsers')}</p>
-            <TrendBadge trend={wow.activeUsers} />
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">{t('study.cards')}</p>
-            <TrendBadge trend={wow.cards} />
-          </div>
-        </div>
       </div>
 
       {/* Recent activity chart */}

@@ -30,7 +30,8 @@
     "activeUsers": "Pengguna Aktif",
     "avgSessionDuration": "Durasi Sesi Rata-rata",
     "avgCardsPerSession": "Kartu Rata-rata/Sesi",
-    "weekOverWeek": "Tren Mingguan"
+    "weekOverWeek": "Tren Mingguan",
+    "healthScore": "Skor Kesehatan"
   },
   "users": {
     "title": "Pengguna",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "Resmi",
       "off": "Jadikan Resmi"
-    }
+    },
+    "searchPlaceholder": "Cari berdasarkan nama...",
+    "allRoles": "Semua Peran",
+    "allStatus": "Semua Status",
+    "clearFilters": "Hapus Filter"
   },
   "study": {
     "title": "Aktivitas Belajar",
@@ -113,6 +118,10 @@
     "topCategories": "Kategori Teratas",
     "acquireConversion": "Tingkat Perolehan",
     "shareActivation": "Aktivasi Berbagi",
+    "shareBreakdown": "Analisis Mode Berbagi",
+    "avgAcquiresPerListing": "Rata-rata Perolehan/Daftar",
+    "activeRate": "{{value}}% aktif",
+    "listings": "Daftar",
     "shareModes": {
       "copy": "Salin",
       "subscribe": "Berlangganan",
@@ -160,6 +169,12 @@
     "topPages": "Halaman Teratas",
     "pagePath": "Path Halaman",
     "ctaClicks": "Klik CTA",
+    "dailyPageViews": "Tampilan Halaman Harian",
+    "viewPeriod": "Periode",
+    "dayShort": "hr",
+    "viewsPerContent": "{{value}} per konten",
+    "viewersPerContent": "{{value}} per konten",
+    "engaged": "terlibat",
     "funnel": {
       "contentViewers": "Penonton Konten",
       "signedUp": "Mendaftar",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "Baru Digunakan (7 hari)",
     "totalContents": "Total Konten",
     "publishedContents": "Konten Dipublikasikan",
-    "totalStudyLogs": "Total Log Belajar"
+    "totalStudyLogs": "Total Log Belajar",
+    "draftContents": "Konten Draf",
+    "healthStatus": "Kesehatan Sistem",
+    "apiKeysSection": "Manajemen Kunci API",
+    "contentPipeline": "Pipeline Konten",
+    "studyActivity": "Data Aktivitas Belajar",
+    "studyLogsNote": "Log belajar melacak sesi belajar kartu dan riwayat ulasan pengguna",
+    "health": {
+      "apiKeys": "Kunci API",
+      "content": "Pipeline Konten",
+      "study": "Aktivitas Belajar"
+    }
   },
   "retry": "Coba Lagi",
   "noData": "Tidak ada data tersedia",

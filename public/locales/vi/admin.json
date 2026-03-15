@@ -30,7 +30,8 @@
     "activeUsers": "Người dùng hoạt động",
     "avgSessionDuration": "Thời lượng phiên TB",
     "avgCardsPerSession": "Thẻ TB/Phiên",
-    "weekOverWeek": "Xu hướng tuần qua tuần"
+    "weekOverWeek": "Xu hướng tuần qua tuần",
+    "healthScore": "Điểm sức khỏe"
   },
   "users": {
     "title": "Người dùng",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "Chính thức",
       "off": "Đặt chính thức"
-    }
+    },
+    "searchPlaceholder": "Tìm theo tên...",
+    "allRoles": "Tất cả vai trò",
+    "allStatus": "Tất cả trạng thái",
+    "clearFilters": "Xóa bộ lọc"
   },
   "study": {
     "title": "Hoạt động học tập",
@@ -113,6 +118,10 @@
     "topCategories": "Danh mục hàng đầu",
     "acquireConversion": "Tỷ lệ nhận",
     "shareActivation": "Kích hoạt chia sẻ",
+    "shareBreakdown": "Phân tích chế độ chia sẻ",
+    "avgAcquiresPerListing": "Lượt nhận TB/Danh sách",
+    "activeRate": "{{value}}% hoạt động",
+    "listings": "Danh sách",
     "shareModes": {
       "copy": "Sao chép",
       "subscribe": "Đăng ký theo dõi",
@@ -160,6 +169,12 @@
     "topPages": "Trang hàng đầu",
     "pagePath": "Đường dẫn trang",
     "ctaClicks": "Lượt nhấp CTA",
+    "dailyPageViews": "Lượt xem trang hàng ngày",
+    "viewPeriod": "Thời kỳ",
+    "dayShort": "ngày",
+    "viewsPerContent": "{{value}} mỗi nội dung",
+    "viewersPerContent": "{{value}} mỗi nội dung",
+    "engaged": "tương tác",
     "funnel": {
       "contentViewers": "Người xem nội dung",
       "signedUp": "Đã đăng ký",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "Sử dụng gần đây (7 ngày)",
     "totalContents": "Tổng nội dung",
     "publishedContents": "Nội dung đã đăng",
-    "totalStudyLogs": "Tổng nhật ký học tập"
+    "totalStudyLogs": "Tổng nhật ký học tập",
+    "draftContents": "Nội dung nháp",
+    "healthStatus": "Tình trạng hệ thống",
+    "apiKeysSection": "Quản lý khóa API",
+    "contentPipeline": "Quy trình nội dung",
+    "studyActivity": "Dữ liệu hoạt động học tập",
+    "studyLogsNote": "Nhật ký học tập theo dõi phiên học thẻ và lịch sử ôn tập của người dùng",
+    "health": {
+      "apiKeys": "Khóa API",
+      "content": "Quy trình nội dung",
+      "study": "Hoạt động học tập"
+    }
   },
   "retry": "Thử lại",
   "noData": "Không có dữ liệu",

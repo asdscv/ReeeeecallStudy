@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { toIntlLocale, LOCALE_CONFIG, type SupportedLocale } from '../../lib/locale-utils'
 import { useAdminStore } from '../../stores/admin-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
@@ -26,16 +27,20 @@ import {
   computeUtmSourceBreakdown,
   computeBounceRate,
   computeTopPagesTable,
+  computeConversionRate,
 } from '../../lib/admin-stats'
-import { formatRelativeTime } from '../../lib/date-utils'
+import { formatRelativeTime, formatDateKeyShort } from '../../lib/date-utils'
 
 const LOCALE_COLORS = Object.fromEntries(
   Object.entries(LOCALE_CONFIG).map(([k, v]) => [k, v.color]),
 ) as Record<SupportedLocale, typeof LOCALE_CONFIG[SupportedLocale]['color']>
 
+const VIEW_PERIOD_OPTIONS = [7, 14, 30, 60, 90] as const
+
 export function AdminContentsPage() {
   const { t, i18n } = useTranslation('admin')
   const dateLocale = toIntlLocale(i18n.language)
+  const [viewDays, setViewDays] = useState<number>(30)
   const {
     contentsAnalytics, contentsLoading, contentsError, fetchContents,
     pageViewsAnalytics, pageViewsLoading, fetchPageViews,
@@ -47,7 +52,13 @@ export function AdminContentsPage() {
   }, [fetchContents, fetchPageViews])
 
   if (contentsLoading && !contentsAnalytics) {
-    return <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>
+    return (
+      <div className="space-y-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    )
   }
 
   if (contentsError) {
@@ -60,7 +71,7 @@ export function AdminContentsPage() {
   const locales = computeLocaleDistribution(data.by_locale)
   const tags = computeTagCloudData(data.top_tags)
   const timeline = computePublishingTimeline(data.publishing_timeline)
-  const dailyViews = fillDailyViewGaps(data.daily_views, 30)
+  const dailyViews = fillDailyViewGaps(data.daily_views, viewDays)
   const popularRows = computePopularContentTable(data.popular_content)
   const referrerData = computeReferrerBreakdown(data.referrer_breakdown ?? [])
   const deviceData = computeDeviceBreakdown(data.device_breakdown ?? [])
@@ -78,11 +89,16 @@ export function AdminContentsPage() {
   const bounceMetrics = pv?.bounce_rate ? computeBounceRate(pv.bounce_rate) : null
   const topPages = pv?.top_pages ? computeTopPagesTable(pv.top_pages) : []
 
+  // Computed KPIs
+  const publishRate = data.total_contents > 0 ? computeConversionRate(data.published_contents, data.total_contents) : 0
+  const viewsPerContent = data.published_contents > 0 ? Math.round(data.total_views / data.published_contents) : 0
+  const avgViewersPerContent = data.published_contents > 0 ? Math.round(data.unique_viewers / data.published_contents) : 0
+
   return (
     <div className="space-y-6">
       {/* Content stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <AdminStatCard icon="📄" label={t('contents.totalContents')} value={data.total_contents} color="blue" />
+        <AdminStatCard icon="📄" label={t('contents.totalContents')} value={data.total_contents} color="blue" subtitle={`${publishRate}% ${t('contents.published').toLowerCase()}`} />
         <AdminStatCard icon="✅" label={t('contents.published')} value={data.published_contents} color="green" />
         <AdminStatCard icon="📝" label={t('contents.drafts')} value={data.draft_contents} color="gray" />
         <AdminStatCard icon="⏱" label={t('contents.avgReadingTime')} value={t('contents.minuteShort', { value: data.avg_reading_time_minutes })} color="purple" />
@@ -90,11 +106,11 @@ export function AdminContentsPage() {
 
       {/* View stats + bounce rate */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <AdminStatCard icon="👁" label={t('contents.totalViews')} value={data.total_views} color="blue" />
-        <AdminStatCard icon="👤" label={t('contents.uniqueViewers')} value={data.unique_viewers} color="green" />
+        <AdminStatCard icon="👁" label={t('contents.totalViews')} value={data.total_views} color="blue" subtitle={t('contents.viewsPerContent', { value: viewsPerContent })} />
+        <AdminStatCard icon="👤" label={t('contents.uniqueViewers')} value={data.unique_viewers} color="green" subtitle={t('contents.viewersPerContent', { value: avgViewersPerContent })} />
         <AdminStatCard icon="⏳" label={t('contents.avgViewDuration')} value={formatViewDuration(data.avg_view_duration_ms)} color="orange" />
         {bounceMetrics && (
-          <AdminStatCard icon="↩" label={t('contents.bounceRate')} value={`${bounceMetrics.bounceRate}%`} color="pink" />
+          <AdminStatCard icon="↩" label={t('contents.bounceRate')} value={`${bounceMetrics.bounceRate}%`} color={bounceMetrics.bounceRate > 60 ? 'red' : bounceMetrics.bounceRate > 40 ? 'orange' : 'green'} subtitle={`${bounceMetrics.engaged} ${t('contents.engaged')} / ${bounceMetrics.total}`} />
         )}
       </div>
 
@@ -127,8 +143,34 @@ export function AdminContentsPage() {
         </div>
       )}
 
-      {/* Daily views chart */}
+      {/* Period selector + Daily views chart */}
+      <div className="flex items-center gap-2 mt-2">
+        <span className="text-sm text-gray-600">{t('contents.viewPeriod')}:</span>
+        <div className="flex gap-1">
+          {VIEW_PERIOD_OPTIONS.map((p) => (
+            <button
+              key={p}
+              type="button"
+              aria-pressed={viewDays === p}
+              onClick={() => setViewDays(p)}
+              className={`px-3 py-1 text-xs rounded-full border transition cursor-pointer ${
+                viewDays === p
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+              }`}
+            >
+              {p}{t('contents.dayShort')}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <ContentViewsChart data={dailyViews} />
+
+      {/* Daily page views chart */}
+      {pv?.daily_page_views && pv.daily_page_views.length > 0 && (
+        <DailyPageViewsChart data={pv.daily_page_views} days={viewDays} dateLocale={dateLocale} />
+      )}
 
       {/* Referrer & Device breakdown side-by-side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -234,6 +276,50 @@ export function AdminContentsPage() {
             ))}
           </div>
         </div>
+      )}
+    </div>
+  )
+}
+
+// ── Inline sub-component for daily page views chart ──
+
+function DailyPageViewsChart({ data, days, dateLocale }: { data: { date: string; views: number; unique_visitors: number }[]; days: number; dateLocale: string }) {
+  const { t } = useTranslation('admin')
+
+  const chartData = useMemo(() => {
+    const sliced = data.slice(-days)
+    const tickInterval = Math.max(1, Math.floor(sliced.length / 6))
+    return sliced.map((d, i) => ({
+      ...d,
+      label: i % tickInterval === 0 || i === sliced.length - 1
+        ? formatDateKeyShort(d.date, dateLocale)
+        : '',
+    }))
+  }, [data, days, dateLocale])
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+      <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.dailyPageViews')}</h3>
+      {chartData.length === 0 ? (
+        <p className="text-sm text-gray-400 py-8 text-center">{t('noData')}</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={35} />
+            <RechartsTooltip
+              labelFormatter={(_label, payload) => {
+                const item = payload?.[0] as { payload?: { date?: string } } | undefined
+                if (item?.payload?.date) return formatDateKeyShort(item.payload.date, dateLocale)
+                return ''
+              }}
+            />
+            <Legend />
+            <Bar dataKey="views" name={t('contents.views')} fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="unique_visitors" name={t('contents.uniqueVisitors')} fill="#06b6d4" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       )}
     </div>
   )

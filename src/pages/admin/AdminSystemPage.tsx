@@ -1,8 +1,46 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminStore } from '../../stores/admin-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
+import { computeConversionRate } from '../../lib/admin-stats'
+
+function ProgressBar({ label, value, max, color = 'blue' }: { label: string; value: number; max: number; color?: string }) {
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0
+  const colorMap: Record<string, string> = {
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    orange: 'bg-orange-500',
+    red: 'bg-red-500',
+    purple: 'bg-purple-500',
+  }
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs mb-1">
+        <span className="text-gray-600">{label}</span>
+        <span className="text-gray-900 font-medium">{value.toLocaleString()} / {max.toLocaleString()} ({pct}%)</span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className={`h-2 rounded-full transition-all ${colorMap[color] ?? colorMap.blue}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
+
+function HealthIndicator({ status, label }: { status: 'healthy' | 'warning' | 'critical'; label: string }) {
+  const config = {
+    healthy: { dot: 'bg-green-500', bg: 'bg-green-50', text: 'text-green-700' },
+    warning: { dot: 'bg-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700' },
+    critical: { dot: 'bg-red-500', bg: 'bg-red-50', text: 'text-red-700' },
+  }
+  const c = config[status]
+  return (
+    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${c.bg}`}>
+      <div className={`w-2.5 h-2.5 rounded-full ${c.dot} animate-pulse`} />
+      <span className={`text-xs font-medium ${c.text}`}>{label}</span>
+    </div>
+  )
+}
 
 export function AdminSystemPage() {
   const { t } = useTranslation('admin')
@@ -12,8 +50,45 @@ export function AdminSystemPage() {
     fetchSystem()
   }, [fetchSystem])
 
+  const healthChecks = useMemo(() => {
+    if (!systemStats) return []
+    const s = systemStats
+    const checks: { key: string; status: 'healthy' | 'warning' | 'critical'; label: string }[] = []
+
+    // API key health
+    const expiredRatio = s.total_api_keys > 0 ? s.expired_api_keys / s.total_api_keys : 0
+    checks.push({
+      key: 'api_keys',
+      status: expiredRatio > 0.5 ? 'critical' : expiredRatio > 0.2 ? 'warning' : 'healthy',
+      label: t('system.health.apiKeys'),
+    })
+
+    // Content pipeline health
+    const publishRate = s.total_contents > 0 ? s.published_contents / s.total_contents : 0
+    checks.push({
+      key: 'content',
+      status: publishRate < 0.3 ? 'warning' : 'healthy',
+      label: t('system.health.content'),
+    })
+
+    // Study activity health
+    checks.push({
+      key: 'study',
+      status: s.total_study_logs > 0 ? 'healthy' : 'warning',
+      label: t('system.health.study'),
+    })
+
+    return checks
+  }, [systemStats, t])
+
   if (systemLoading && !systemStats) {
-    return <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    )
   }
 
   if (systemError) {
@@ -22,21 +97,65 @@ export function AdminSystemPage() {
 
   const stats = systemStats
 
+  const apiKeyActiveRate = stats ? computeConversionRate(stats.active_api_keys, stats.total_api_keys) : 0
+  const contentPublishRate = stats ? computeConversionRate(stats.published_contents, stats.total_contents) : 0
+
   return (
     <div className="space-y-6">
+      {/* System Health */}
+      {healthChecks.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('system.healthStatus')}</h3>
+          <div className="flex flex-wrap gap-3">
+            {healthChecks.map((check) => (
+              <HealthIndicator key={check.key} status={check.status} label={check.label} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* API Keys */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <AdminStatCard icon="🔑" label={t('system.totalApiKeys')} value={stats?.total_api_keys ?? 0} color="blue" />
-        <AdminStatCard icon="✅" label={t('system.activeApiKeys')} value={stats?.active_api_keys ?? 0} color="green" />
-        <AdminStatCard icon="⏰" label={t('system.expiredApiKeys')} value={stats?.expired_api_keys ?? 0} color="orange" />
-        <AdminStatCard icon="📡" label={t('system.recentlyUsedKeys')} value={stats?.recently_used_keys ?? 0} color="purple" />
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-medium text-gray-700 mb-4">{t('system.apiKeysSection')}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <AdminStatCard icon="🔑" label={t('system.totalApiKeys')} value={stats?.total_api_keys ?? 0} color="blue" />
+          <AdminStatCard icon="✅" label={t('system.activeApiKeys')} value={stats?.active_api_keys ?? 0} color="green" subtitle={`${apiKeyActiveRate}%`} />
+          <AdminStatCard icon="⏰" label={t('system.expiredApiKeys')} value={stats?.expired_api_keys ?? 0} color={stats && stats.expired_api_keys > 0 ? 'orange' : 'gray'} />
+          <AdminStatCard icon="📡" label={t('system.recentlyUsedKeys')} value={stats?.recently_used_keys ?? 0} color="purple" />
+        </div>
+        {stats && stats.total_api_keys > 0 && (
+          <div className="space-y-3">
+            <ProgressBar label={t('system.activeApiKeys')} value={stats.active_api_keys} max={stats.total_api_keys} color="green" />
+            <ProgressBar label={t('system.expiredApiKeys')} value={stats.expired_api_keys} max={stats.total_api_keys} color="orange" />
+            <ProgressBar label={t('system.recentlyUsedKeys')} value={stats.recently_used_keys} max={stats.total_api_keys} color="purple" />
+          </div>
+        )}
       </div>
 
-      {/* Content & Logs */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <AdminStatCard icon="📄" label={t('system.totalContents')} value={stats?.total_contents ?? 0} color="blue" />
-        <AdminStatCard icon="📢" label={t('system.publishedContents')} value={stats?.published_contents ?? 0} color="green" />
-        <AdminStatCard icon="📊" label={t('system.totalStudyLogs')} value={stats?.total_study_logs ?? 0} color="gray" />
+      {/* Content Pipeline */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-medium text-gray-700 mb-4">{t('system.contentPipeline')}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+          <AdminStatCard icon="📄" label={t('system.totalContents')} value={stats?.total_contents ?? 0} color="blue" />
+          <AdminStatCard icon="📢" label={t('system.publishedContents')} value={stats?.published_contents ?? 0} color="green" subtitle={`${contentPublishRate}%`} />
+          <AdminStatCard icon="📝" label={t('system.draftContents')} value={(stats?.total_contents ?? 0) - (stats?.published_contents ?? 0)} color="gray" />
+        </div>
+        {stats && stats.total_contents > 0 && (
+          <ProgressBar label={t('system.publishedContents')} value={stats.published_contents} max={stats.total_contents} color="green" />
+        )}
+      </div>
+
+      {/* Study Logs */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-medium text-gray-700 mb-4">{t('system.studyActivity')}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <AdminStatCard icon="📊" label={t('system.totalStudyLogs')} value={stats?.total_study_logs ?? 0} color="blue" size="lg" />
+          <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+            <p className="text-xs text-gray-500 text-center">
+              {t('system.studyLogsNote')}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

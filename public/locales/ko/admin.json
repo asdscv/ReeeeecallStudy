@@ -30,7 +30,8 @@
     "activeUsers": "활성 사용자",
     "avgSessionDuration": "평균 세션 시간",
     "avgCardsPerSession": "평균 카드/세션",
-    "weekOverWeek": "주간 대비 추이"
+    "weekOverWeek": "주간 대비 추이",
+    "healthScore": "서비스 건강도"
   },
   "users": {
     "title": "사용자",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "공식 계정",
       "off": "공식 지정"
-    }
+    },
+    "searchPlaceholder": "이름으로 검색...",
+    "allRoles": "모든 역할",
+    "allStatus": "모든 상태",
+    "clearFilters": "필터 초기화"
   },
   "study": {
     "title": "학습 활동",
@@ -110,9 +115,13 @@
     "totalShares": "전체 공유",
     "activeShares": "활성 공유",
     "shareByMode": "공유 방식별",
+    "shareBreakdown": "공유 방식 분석",
     "topCategories": "인기 카테고리",
     "acquireConversion": "획득 전환율",
     "shareActivation": "공유 활성화율",
+    "avgAcquiresPerListing": "평균 획득/등록",
+    "activeRate": "활성율 {{value}}%",
+    "listings": "등록",
     "shareModes": {
       "copy": "복사",
       "subscribe": "구독",
@@ -129,7 +138,8 @@
     "uniqueViewers": "순 방문자",
     "avgViewDuration": "평균 체류 시간",
     "localeBreakdown": "언어별 분포",
-    "dailyViews": "일별 조회수 (30일)",
+    "dailyViews": "일별 콘텐츠 조회수",
+    "dailyPageViews": "일별 페이지뷰",
     "views": "조회수",
     "uniqueLabel": "순 방문",
     "publishingTimeline": "발행 타임라인",
@@ -160,6 +170,11 @@
     "topPages": "인기 페이지",
     "pagePath": "페이지 경로",
     "ctaClicks": "CTA 클릭",
+    "viewPeriod": "조회 기간",
+    "dayShort": "일",
+    "viewsPerContent": "콘텐츠당 {{value}}회",
+    "viewersPerContent": "콘텐츠당 {{value}}명",
+    "engaged": "참여",
     "funnel": {
       "contentViewers": "콘텐츠 조회자",
       "signedUp": "가입 완료",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "최근 사용 (7일)",
     "totalContents": "전체 콘텐츠",
     "publishedContents": "발행된 콘텐츠",
-    "totalStudyLogs": "전체 학습 로그"
+    "draftContents": "초안 콘텐츠",
+    "totalStudyLogs": "전체 학습 로그",
+    "healthStatus": "시스템 상태",
+    "apiKeysSection": "API 키 관리",
+    "contentPipeline": "콘텐츠 파이프라인",
+    "studyActivity": "학습 활동 데이터",
+    "studyLogsNote": "학습 로그는 사용자의 카드 학습 세션 기록입니다",
+    "health": {
+      "apiKeys": "API 키",
+      "content": "콘텐츠",
+      "study": "학습 활동"
+    }
   },
   "retry": "재시도",
   "noData": "데이터가 없습니다",

@@ -70,7 +70,7 @@ interface AdminState {
 
   // Actions
   fetchOverview: () => Promise<void>
-  fetchUsers: (page?: number, pageSize?: number) => Promise<void>
+  fetchUsers: (page?: number, pageSize?: number, filters?: { search?: string; role?: string; official?: boolean }) => Promise<void>
   fetchStudyActivity: (days?: number) => Promise<void>
   fetchMarket: () => Promise<void>
   fetchContents: () => Promise<void>
@@ -150,20 +150,35 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  fetchUsers: async (page = 0, pageSize = 20) => {
+  fetchUsers: async (page = 0, pageSize = 20, filters?: { search?: string; role?: string; official?: boolean }) => {
     if (get().usersLoading) return
     // Users page always fetches for pagination, but skip chart data if fresh
     const chartsFresh = isFresh(get()._fetchedAt, 'users') && get().userSignups.length > 0
     set({ usersLoading: true, usersError: null })
     try {
-      const promises: PromiseLike<unknown>[] = [
-        supabase
-          .from('profiles')
-          .select('id, display_name, created_at, role, is_official')
-          .order('created_at', { ascending: false })
-          .range(page * pageSize, (page + 1) * pageSize - 1),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-      ]
+      let listQuery = supabase
+        .from('profiles')
+        .select('id, display_name, created_at, role, is_official')
+        .order('created_at', { ascending: false })
+      let countQuery = supabase.from('profiles').select('id', { count: 'exact', head: true })
+
+      // Apply filters
+      if (filters?.search) {
+        listQuery = listQuery.ilike('display_name', `%${filters.search}%`)
+        countQuery = countQuery.ilike('display_name', `%${filters.search}%`)
+      }
+      if (filters?.role) {
+        listQuery = listQuery.eq('role', filters.role)
+        countQuery = countQuery.eq('role', filters.role)
+      }
+      if (filters?.official !== undefined) {
+        listQuery = listQuery.eq('is_official', filters.official)
+        countQuery = countQuery.eq('is_official', filters.official)
+      }
+
+      listQuery = listQuery.range(page * pageSize, (page + 1) * pageSize - 1)
+
+      const promises: PromiseLike<unknown>[] = [listQuery, countQuery]
 
       if (!chartsFresh) {
         promises.push(

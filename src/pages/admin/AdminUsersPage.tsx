@@ -22,14 +22,32 @@ export function AdminUsersPage() {
   } = useAdminStore()
   const [page, setPage] = useState(0)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [roleFilter, setRoleFilter] = useState<string>('')
+  const [officialFilter, setOfficialFilter] = useState<string>('')
   const dateLocale = toIntlLocale(i18n.language)
   const growthData = useMemo(() => computeUserGrowthSeries(userSignups), [userSignups])
   const activeInactive = useMemo(() => activeUsers ? computeActiveInactiveUsers(activeUsers) : [], [activeUsers])
 
+  const filters = useMemo(() => ({
+    search: search || undefined,
+    role: roleFilter || undefined,
+    official: officialFilter === '' ? undefined : officialFilter === 'true',
+  }), [search, roleFilter, officialFilter])
+
   useEffect(() => {
-    fetchUsers(page, PAGE_SIZE)
+    fetchUsers(page, PAGE_SIZE, filters)
     fetchOverview()
-  }, [fetchUsers, fetchOverview, page])
+  }, [fetchUsers, fetchOverview, page, filters])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput)
+      setPage(0)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput])
 
   if (usersError) {
     return <AdminErrorState error={usersError} onRetry={() => fetchUsers(page, PAGE_SIZE)} />
@@ -95,7 +113,45 @@ export function AdminUsersPage() {
       {/* User list table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100">
-          <h3 className="text-sm font-medium text-gray-700">{t('users.userList')}</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h3 className="text-sm font-medium text-gray-700">{t('users.userList')}</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="text"
+                placeholder={t('users.searchPlaceholder')}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-40 sm:w-48"
+              />
+              <select
+                value={roleFilter}
+                onChange={(e) => { setRoleFilter(e.target.value); setPage(0) }}
+                className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-gray-50 cursor-pointer"
+              >
+                <option value="">{t('users.allRoles')}</option>
+                <option value="admin">{t('users.roles.admin')}</option>
+                <option value="user">{t('users.roles.user')}</option>
+              </select>
+              <select
+                value={officialFilter}
+                onChange={(e) => { setOfficialFilter(e.target.value); setPage(0) }}
+                className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-gray-50 cursor-pointer"
+              >
+                <option value="">{t('users.allStatus')}</option>
+                <option value="true">{t('users.officialStatus.on')}</option>
+                <option value="false">{t('users.officialStatus.off')}</option>
+              </select>
+              {(search || roleFilter || officialFilter) && (
+                <button
+                  type="button"
+                  onClick={() => { setSearchInput(''); setSearch(''); setRoleFilter(''); setOfficialFilter(''); setPage(0) }}
+                  className="px-2 py-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  {t('users.clearFilters')}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
         {usersLoading ? (
           <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>

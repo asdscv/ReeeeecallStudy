@@ -30,7 +30,8 @@
     "activeUsers": "Usuarios activos",
     "avgSessionDuration": "Duración promedio de sesión",
     "avgCardsPerSession": "Tarjetas promedio/sesión",
-    "weekOverWeek": "Tendencias semana a semana"
+    "weekOverWeek": "Tendencias semana a semana",
+    "healthScore": "Puntuación de salud"
   },
   "users": {
     "title": "Usuarios",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "Oficial",
       "off": "Establecer oficial"
-    }
+    },
+    "searchPlaceholder": "Buscar por nombre...",
+    "allRoles": "Todos los roles",
+    "allStatus": "Todos los estados",
+    "clearFilters": "Limpiar filtros"
   },
   "study": {
     "title": "Actividad de estudio",
@@ -110,9 +115,13 @@
     "totalShares": "Total de compartidos",
     "activeShares": "Compartidos activos",
     "shareByMode": "Compartidos por modo",
+    "shareBreakdown": "Análisis de modos de compartir",
     "topCategories": "Categorías principales",
     "acquireConversion": "Tasa de adquisición",
     "shareActivation": "Activación de compartidos",
+    "avgAcquiresPerListing": "Adquisiciones promedio/publicación",
+    "activeRate": "{{value}}% activo",
+    "listings": "Publicaciones",
     "shareModes": {
       "copy": "Copiar",
       "subscribe": "Suscribirse",
@@ -129,7 +138,8 @@
     "uniqueViewers": "Visitantes únicos",
     "avgViewDuration": "Duración promedio de vista",
     "localeBreakdown": "Desglose por idioma",
-    "dailyViews": "Vistas diarias (30d)",
+    "dailyViews": "Vistas diarias de contenido",
+    "dailyPageViews": "Vistas diarias de página",
     "views": "Vistas",
     "uniqueLabel": "Únicos",
     "publishingTimeline": "Línea de tiempo de publicación",
@@ -160,6 +170,11 @@
     "topPages": "Páginas principales",
     "pagePath": "Ruta de página",
     "ctaClicks": "Clics en CTA",
+    "viewPeriod": "Período",
+    "dayShort": "d",
+    "viewsPerContent": "{{value}} por contenido",
+    "viewersPerContent": "{{value}} por contenido",
+    "engaged": "participación",
     "funnel": {
       "contentViewers": "Lectores de contenido",
       "signedUp": "Registrados",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "Usadas recientemente (7d)",
     "totalContents": "Total de contenidos",
     "publishedContents": "Contenidos publicados",
-    "totalStudyLogs": "Total de registros de estudio"
+    "draftContents": "Contenidos en borrador",
+    "totalStudyLogs": "Total de registros de estudio",
+    "healthStatus": "Estado del sistema",
+    "apiKeysSection": "Gestión de claves API",
+    "contentPipeline": "Pipeline de contenidos",
+    "studyActivity": "Datos de actividad de estudio",
+    "studyLogsNote": "Los registros de estudio rastrean las sesiones de estudio de tarjetas",
+    "health": {
+      "apiKeys": "Claves API",
+      "content": "Pipeline de contenidos",
+      "study": "Actividad de estudio"
+    }
   },
   "retry": "Reintentar",
   "noData": "Sin datos disponibles",

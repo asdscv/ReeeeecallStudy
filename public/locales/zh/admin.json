@@ -30,7 +30,8 @@
     "activeUsers": "活跃用户",
     "avgSessionDuration": "平均学习时长",
     "avgCardsPerSession": "每次平均卡片数",
-    "weekOverWeek": "周环比趋势"
+    "weekOverWeek": "周环比趋势",
+    "healthScore": "健康评分"
   },
   "users": {
     "title": "用户",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "Official",
       "off": "Set Official"
-    }
+    },
+    "searchPlaceholder": "按名称搜索...",
+    "allRoles": "所有角色",
+    "allStatus": "所有状态",
+    "clearFilters": "清除筛选"
   },
   "study": {
     "title": "学习活动",
@@ -113,6 +118,10 @@
     "topCategories": "热门分类",
     "acquireConversion": "获取率",
     "shareActivation": "分享激活",
+    "shareBreakdown": "分享模式分析",
+    "avgAcquiresPerListing": "每条目平均获取数",
+    "activeRate": "{{value}}% 活跃",
+    "listings": "条目",
     "shareModes": {
       "copy": "复制",
       "subscribe": "订阅",
@@ -160,6 +169,12 @@
     "topPages": "热门页面",
     "pagePath": "页面路径",
     "ctaClicks": "CTA 点击",
+    "dailyPageViews": "每日页面浏览量",
+    "viewPeriod": "时间段",
+    "dayShort": "天",
+    "viewsPerContent": "每篇 {{value}}",
+    "viewersPerContent": "每篇 {{value}}",
+    "engaged": "已参与",
     "funnel": {
       "contentViewers": "内容浏览者",
       "signedUp": "已注册",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "近期使用（7天）",
     "totalContents": "总内容",
     "publishedContents": "已发布内容",
-    "totalStudyLogs": "学习日志总数"
+    "totalStudyLogs": "学习日志总数",
+    "draftContents": "草稿内容",
+    "healthStatus": "系统健康",
+    "apiKeysSection": "API 密钥管理",
+    "contentPipeline": "内容管道",
+    "studyActivity": "学习活动数据",
+    "studyLogsNote": "学习日志记录用户卡片学习会话和复习历史",
+    "health": {
+      "apiKeys": "API 密钥",
+      "content": "内容管道",
+      "study": "学习活动"
+    }
   },
   "retry": "重试",
   "noData": "暂无数据",

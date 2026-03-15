@@ -30,7 +30,8 @@
     "activeUsers": "Active Users",
     "avgSessionDuration": "Avg Session Duration",
     "avgCardsPerSession": "Avg Cards/Session",
-    "weekOverWeek": "Week-over-Week Trends"
+    "weekOverWeek": "Week-over-Week Trends",
+    "healthScore": "Health Score"
   },
   "users": {
     "title": "Users",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "Official",
       "off": "Set Official"
-    }
+    },
+    "searchPlaceholder": "Search by name...",
+    "allRoles": "All Roles",
+    "allStatus": "All Status",
+    "clearFilters": "Clear Filters"
   },
   "study": {
     "title": "Study Activity",
@@ -110,9 +115,13 @@
     "totalShares": "Total Shares",
     "activeShares": "Active Shares",
     "shareByMode": "Shares by Mode",
+    "shareBreakdown": "Share Mode Analysis",
     "topCategories": "Top Categories",
     "acquireConversion": "Acquire Rate",
     "shareActivation": "Share Activation",
+    "avgAcquiresPerListing": "Avg Acquires/Listing",
+    "activeRate": "{{value}}% active",
+    "listings": "Listings",
     "shareModes": {
       "copy": "Copy",
       "subscribe": "Subscribe",
@@ -129,7 +138,8 @@
     "uniqueViewers": "Unique Viewers",
     "avgViewDuration": "Avg View Duration",
     "localeBreakdown": "Locale Breakdown",
-    "dailyViews": "Daily Views (30d)",
+    "dailyViews": "Daily Content Views",
+    "dailyPageViews": "Daily Page Views",
     "views": "Views",
     "uniqueLabel": "Unique",
     "publishingTimeline": "Publishing Timeline",
@@ -160,6 +170,11 @@
     "topPages": "Top Pages",
     "pagePath": "Page Path",
     "ctaClicks": "CTA clicks",
+    "viewPeriod": "Period",
+    "dayShort": "d",
+    "viewsPerContent": "{{value}} per content",
+    "viewersPerContent": "{{value}} per content",
+    "engaged": "engaged",
     "funnel": {
       "contentViewers": "Content Viewers",
       "signedUp": "Signed Up",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "Recently Used (7d)",
     "totalContents": "Total Contents",
     "publishedContents": "Published Contents",
-    "totalStudyLogs": "Total Study Logs"
+    "draftContents": "Draft Contents",
+    "totalStudyLogs": "Total Study Logs",
+    "healthStatus": "System Health",
+    "apiKeysSection": "API Key Management",
+    "contentPipeline": "Content Pipeline",
+    "studyActivity": "Study Activity Data",
+    "studyLogsNote": "Study logs track user card study sessions and review history",
+    "health": {
+      "apiKeys": "API Keys",
+      "content": "Content Pipeline",
+      "study": "Study Activity"
+    }
   },
   "retry": "Retry",
   "noData": "No data available",

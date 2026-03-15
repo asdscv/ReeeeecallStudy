@@ -30,7 +30,8 @@
     "activeUsers": "ผู้ใช้ที่ใช้งาน",
     "avgSessionDuration": "ระยะเวลาเซสชันเฉลี่ย",
     "avgCardsPerSession": "การ์ดเฉลี่ย/เซสชัน",
-    "weekOverWeek": "แนวโน้มรายสัปดาห์"
+    "weekOverWeek": "แนวโน้มรายสัปดาห์",
+    "healthScore": "คะแนนสุขภาพ"
   },
   "users": {
     "title": "ผู้ใช้",
@@ -62,7 +63,11 @@
     "officialStatus": {
       "on": "ทางการ",
       "off": "ตั้งเป็นทางการ"
-    }
+    },
+    "searchPlaceholder": "ค้นหาตามชื่อ...",
+    "allRoles": "ทุกบทบาท",
+    "allStatus": "ทุกสถานะ",
+    "clearFilters": "ล้างตัวกรอง"
   },
   "study": {
     "title": "กิจกรรมการเรียน",
@@ -113,6 +118,10 @@
     "topCategories": "หมวดหมู่ยอดนิยม",
     "acquireConversion": "อัตราการรับ",
     "shareActivation": "การเปิดใช้การแชร์",
+    "shareBreakdown": "การวิเคราะห์โหมดแชร์",
+    "avgAcquiresPerListing": "การรับเฉลี่ย/รายการ",
+    "activeRate": "{{value}}% ใช้งาน",
+    "listings": "รายการ",
     "shareModes": {
       "copy": "คัดลอก",
       "subscribe": "ติดตาม",
@@ -160,6 +169,12 @@
     "topPages": "หน้ายอดนิยม",
     "pagePath": "พาธหน้า",
     "ctaClicks": "คลิก CTA",
+    "dailyPageViews": "การเข้าชมหน้ารายวัน",
+    "viewPeriod": "ช่วงเวลา",
+    "dayShort": "วัน",
+    "viewsPerContent": "{{value}} ต่อเนื้อหา",
+    "viewersPerContent": "{{value}} ต่อเนื้อหา",
+    "engaged": "มีส่วนร่วม",
     "funnel": {
       "contentViewers": "ผู้ชมเนื้อหา",
       "signedUp": "สมัครสมาชิก",
@@ -187,7 +202,18 @@
     "recentlyUsedKeys": "ใช้ล่าสุด (7 วัน)",
     "totalContents": "เนื้อหาทั้งหมด",
     "publishedContents": "เนื้อหาที่เผยแพร่",
-    "totalStudyLogs": "บันทึกการเรียนทั้งหมด"
+    "totalStudyLogs": "บันทึกการเรียนทั้งหมด",
+    "draftContents": "เนื้อหาฉบับร่าง",
+    "healthStatus": "สถานะระบบ",
+    "apiKeysSection": "จัดการ API Key",
+    "contentPipeline": "ไปป์ไลน์เนื้อหา",
+    "studyActivity": "ข้อมูลกิจกรรมการเรียน",
+    "studyLogsNote": "บันทึกการเรียนติดตามเซสชันการเรียนการ์ดและประวัติการทบทวนของผู้ใช้",
+    "health": {
+      "apiKeys": "API Key",
+      "content": "ไปป์ไลน์เนื้อหา",
+      "study": "กิจกรรมการเรียน"
+    }
   },
   "retry": "ลองอีกครั้ง",
   "noData": "ไม่มีข้อมูล",
