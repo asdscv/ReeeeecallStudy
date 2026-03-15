@@ -123,23 +123,20 @@ test.describe('Secure AI Key Storage — PC & Mobile', () => {
     }
   })
 
-  test('sign-out clears AI config from localStorage', async ({ page }) => {
+  test('sign-out preserves encrypted AI config (uid-based encryption protects it)', async ({ page }) => {
     await page.goto('/decks')
     await page.waitForTimeout(2000)
 
-    // Seed some data in both keys
+    // Seed encrypted data
     await page.evaluate(() => {
-      localStorage.setItem('reeeeecall-ai-config-v2', '{"v":1,"data":"test","storedAt":"2025-01-01","ttlMs":null}')
-      localStorage.setItem('reeeeecall-ai-config', '{"old":"data"}')
+      localStorage.setItem('reeeeecall-ai-config-v2', '{"v":1,"data":"encrypted-blob","storedAt":"2025-01-01","ttlMs":null}')
     })
 
     // Verify data is there
-    const before = await page.evaluate(() => ({
-      v2: localStorage.getItem('reeeeecall-ai-config-v2'),
-      legacy: localStorage.getItem('reeeeecall-ai-config'),
-    }))
-    expect(before.v2).not.toBeNull()
-    expect(before.legacy).not.toBeNull()
+    const before = await page.evaluate(() =>
+      localStorage.getItem('reeeeecall-ai-config-v2'),
+    )
+    expect(before).not.toBeNull()
 
     // Find and click logout button
     const logoutBtn = page.locator('button').filter({ hasText: /Logout|Sign Out|로그아웃/i }).first()
@@ -147,13 +144,12 @@ test.describe('Secure AI Key Storage — PC & Mobile', () => {
       await logoutBtn.click()
       await page.waitForTimeout(2000)
 
-      // Both keys should be cleared
-      const after = await page.evaluate(() => ({
-        v2: localStorage.getItem('reeeeecall-ai-config-v2'),
-        legacy: localStorage.getItem('reeeeecall-ai-config'),
-      }))
-      expect(after.v2).toBeNull()
-      expect(after.legacy).toBeNull()
+      // Encrypted config should PERSIST after sign-out
+      // (AES-GCM encryption with uid-based key derivation protects it)
+      const after = await page.evaluate(() =>
+        localStorage.getItem('reeeeecall-ai-config-v2'),
+      )
+      expect(after).not.toBeNull()
     }
   })
 

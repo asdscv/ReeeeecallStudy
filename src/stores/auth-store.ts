@@ -189,17 +189,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signOut: async () => {
     try {
       const { error } = await supabase.auth.signOut()
-      // Clear encrypted AI config on sign-out
-      const { aiConfigManager } = await import('../lib/ai/secure-storage')
-      aiConfigManager.clear()
       set({ user: null, session: null, role: null, isOfficial: false })
       return { error: error ? new Error(error.message) : null }
     } catch (e) {
-      // Best-effort clear even on error
-      try {
-        const { aiConfigManager } = await import('../lib/ai/secure-storage')
-        aiConfigManager.clear()
-      } catch { /* ignore */ }
       set({ user: null, session: null, role: null, isOfficial: false })
       return { error: e instanceof Error ? e : new Error(String(e)) }
     }
