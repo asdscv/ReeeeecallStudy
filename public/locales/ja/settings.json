@@ -114,6 +114,27 @@
     "securityNote": "セキュリティのため再表示できません"
   },
 
+  "aiProvider": {
+    "title": "AI プロバイダー",
+    "description": "AI 自動生成に使用するプロバイダーと API キーを管理します",
+    "configured": "設定済み",
+    "notSet": "未設定",
+    "edit": "設定",
+    "delete": "削除",
+    "apiKey": "API キー",
+    "apiKeyPlaceholder": "API キーを入力してください",
+    "model": "デフォルトモデル",
+    "baseUrl": "API Base URL",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "saved": "AI プロバイダーが保存されました",
+    "deleted": "AI プロバイダーが削除されました",
+    "securityNote": "API キーは AES-256 暗号化されてブラウザに保存されます。サーバーには送信されません。",
+    "custom": "カスタム",
+    "customDesc": "OpenAI 互換 API",
+    "noProviders": "プロバイダーが設定されていません。上で設定してください。"
+  },
+
   "account": {
     "title": "アカウント",
     "logout": "ログアウト"

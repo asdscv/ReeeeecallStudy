@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { useAIGenerateStore } from '../stores/ai-generate-store'
 import { useTemplateStore } from '../stores/template-store'
-import { loadAIConfig } from '../lib/ai/ai-key-storage'
+import { aiKeyVault } from '../lib/ai/secure-storage'
 import { ConfigStep } from '../components/ai-generate/steps/ConfigStep'
 import { GeneratingStep } from '../components/ai-generate/steps/GeneratingStep'
 import { ReviewTemplateStep } from '../components/ai-generate/steps/ReviewTemplateStep'
@@ -58,7 +58,7 @@ export function AIGeneratePage() {
   const paramTemplateId = searchParams.get('templateId')
   const initialMode: GenerateMode = paramMode === 'cards_only' ? 'cards_only' : 'full'
 
-  const hasApiKey = !!loadAIConfig()?.apiKey
+  const hasApiKey = aiKeyVault.hasAnyKey()
 
   // Reset store on mount
   useEffect(() => {

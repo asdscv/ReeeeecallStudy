@@ -104,6 +104,27 @@
     "noKey": "No se ha generado clave API.",
     "securityNote": "No se puede ver de nuevo por seguridad"
   },
+  "aiProvider": {
+    "title": "Proveedores de IA",
+    "description": "Gestiona proveedores y claves API para la generación automática con IA",
+    "configured": "Configurado",
+    "notSet": "Sin configurar",
+    "edit": "Configurar",
+    "delete": "Eliminar",
+    "apiKey": "Clave API",
+    "apiKeyPlaceholder": "Ingrese su clave API",
+    "model": "Modelo predeterminado",
+    "baseUrl": "API Base URL",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saved": "Proveedor de IA guardado",
+    "deleted": "Proveedor de IA eliminado",
+    "securityNote": "Las claves API se cifran con AES-256 y se almacenan en su navegador. Nunca se envían a nuestros servidores.",
+    "custom": "Personalizado",
+    "customDesc": "API compatible con OpenAI",
+    "noProviders": "No hay proveedores configurados. Configure uno arriba."
+  },
+
   "account": {
     "title": "Cuenta",
     "logout": "Cerrar sesión"

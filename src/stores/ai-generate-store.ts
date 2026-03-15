@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import i18next from 'i18next'
 import { callAI } from '../lib/ai/ai-client'
-import { loadAIConfig } from '../lib/ai/ai-key-storage'
+import { aiConfigManager } from '../lib/ai/secure-storage'
+import { useAuthStore } from './auth-store'
 import { buildTemplatePrompt, buildDeckPrompt, buildCardsPrompt, type FieldHint } from '../lib/ai/prompts'
 import { validateTemplateResponse, validateDeckResponse, validateCardsResponse } from '../lib/ai/validators'
 import { supabase } from '../lib/supabase'
@@ -75,9 +76,24 @@ const initialState = {
   error: null as string | null,
 }
 
-function getConfig(): AIConfig {
-  const config = loadAIConfig()
+// In-memory cache: set by ConfigStep on submit, used by generate actions.
+// This avoids a storage round-trip race between save and the first load.
+let _cachedAIConfig: AIConfig | null = null
+
+export function setAIConfigCache(config: AIConfig): void {
+  _cachedAIConfig = config
+}
+
+async function getConfig(): Promise<AIConfig> {
+  // 1. Use in-memory cache first (set right before generation starts)
+  if (_cachedAIConfig?.apiKey) return _cachedAIConfig
+
+  // 2. Fallback to encrypted storage
+  const uid = useAuthStore.getState().user?.id
+  if (!uid) throw new Error('NO_API_KEY')
+  const config = await aiConfigManager.load(uid)
   if (!config || !config.apiKey) throw new Error('NO_API_KEY')
+  _cachedAIConfig = config
   return config
 }
 
@@ -110,7 +126,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateTemplate: async () => {
     set({ currentStep: 'generating_template', error: null })
     try {
-      const config = getConfig()
+      const config = await getConfig()
       const uiLang = i18next.language
       const { topic, useCustomHtml, contentLang, fieldHints } = get()
       const { systemPrompt, userPrompt } = buildTemplatePrompt(
@@ -129,7 +145,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateDeck: async () => {
     set({ currentStep: 'generating_deck', error: null })
     try {
-      const config = getConfig()
+      const config = await getConfig()
       const uiLang = i18next.language
       const { topic } = get()
       const { systemPrompt, userPrompt } = buildDeckPrompt(topic, uiLang)
@@ -144,7 +160,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateCards: async () => {
     set({ currentStep: 'generating_cards', error: null })
     try {
-      const config = getConfig()
+      const config = await getConfig()
       const { topic, cardCount, mode, existingDeckId, generatedTemplate, existingTemplateId } = get()
 
       // Get field definitions
@@ -303,5 +319,8 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
     set({ generatedCards: cards.filter((_, i) => i !== index) })
   },
 
-  reset: () => set({ ...initialState }),
+  reset: () => {
+    _cachedAIConfig = null
+    set({ ...initialState })
+  },
 }))
