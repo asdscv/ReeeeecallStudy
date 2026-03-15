@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { ListingCard } from '../components/marketplace/ListingCard'
 import { SearchFilters } from '../components/marketplace/SearchFilters'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { MarketplaceListing } from '../types/database'
 
 const PAGE_SIZE = 12
@@ -39,6 +40,7 @@ export function MarketplacePage() {
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('marketplace:title')}</h1>
+        <GuideHelpLink section="marketplace" />
       </div>
 
       <div className="mb-4">

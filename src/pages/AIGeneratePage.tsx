@@ -12,6 +12,7 @@ import { ReviewCardsStep } from '../components/ai-generate/steps/ReviewCardsStep
 import { DoneStep } from '../components/ai-generate/steps/DoneStep'
 import { ErrorStep } from '../components/ai-generate/steps/ErrorStep'
 import type { GenerateMode, GeneratedTemplateField } from '../lib/ai/types'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { GenerateConfig } from '../components/ai-generate/steps/ConfigStep'
 
 // ─── Step definitions for the wizard ───────────────────────
@@ -157,7 +158,10 @@ export function AIGeneratePage() {
     <div className="max-w-3xl mx-auto">
       {/* ── Header ── */}
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('page.title')}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('page.title')}</h1>
+          <GuideHelpLink section="ai-generate" />
+        </div>
         <p className="text-sm text-gray-500 mt-1">{t('page.subtitle')}</p>
       </div>
 

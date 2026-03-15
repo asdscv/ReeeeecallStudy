@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSharingStore } from '../stores/sharing-store'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { DeckShare } from '../types/database'
 
 const STATUS_BADGE: Record<string, { labelKey: string; className: string }> = {
@@ -63,7 +64,10 @@ export function MySharesPage() {
 
   return (
     <div>
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">{t('myShares.title')}</h1>
+      <div className="flex items-center gap-2 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('myShares.title')}</h1>
+        <GuideHelpLink section="sharing" />
+      </div>
 
       {/* Sent shares */}
       <section className="mb-8">

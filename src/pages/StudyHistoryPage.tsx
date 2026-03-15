@@ -35,6 +35,7 @@ import { StudyVolumeChart } from '../components/study-history/StudyVolumeChart'
 import { RatingDistributionChart } from '../components/study-history/RatingDistributionChart'
 import { SessionDurationChart } from '../components/study-history/SessionDurationChart'
 import { ModeBreakdownCards } from '../components/study-history/ModeBreakdownCards'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
 
 const PAGE_SIZE = 15
@@ -242,11 +243,14 @@ export function StudyHistoryPage() {
       {/* ── Header + Deck Scope + Period Selection ── */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-            {selectedDeck
-              ? <>{selectedDeck.icon} {selectedDeck.name}</>
-              : t('title')}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {selectedDeck
+                ? <>{selectedDeck.icon} {selectedDeck.name}</>
+                : t('title')}
+            </h1>
+            <GuideHelpLink section="history" />
+          </div>
           <TimePeriodTabs value={period} onChange={setPeriod} />
         </div>
 

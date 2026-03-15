@@ -23,6 +23,7 @@ import type { DeckSettingsFormValues } from '../components/deck/DeckSettingsForm
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { StudyHeatmap } from '../components/dashboard/StudyHeatmap'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 
 const STATUS_COLORS: Record<string, string> = {
   new: '#3b82f6',
@@ -157,6 +158,7 @@ export function DeckEditPage() {
             <ArrowLeft size={20} />
           </button>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('edit.title')}</h1>
+          <GuideHelpLink section="decks" />
         </div>
         <div className="flex items-center gap-2 sm:gap-3 pl-10 sm:pl-0">
           <button

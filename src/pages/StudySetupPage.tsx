@@ -14,6 +14,7 @@ import {
 } from '../lib/study-session-utils'
 import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
 import type { CrammingFilter } from '../lib/cramming-queue'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck, StudyMode } from '../types/database'
 
 export function StudySetupPage() {
@@ -139,7 +140,10 @@ export function StudySetupPage() {
         {deck.name}
       </button>
 
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t('setup.title')}</h1>
+      <div className="flex items-center gap-2 mb-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('setup.title')}</h1>
+        <GuideHelpLink section="study" />
+      </div>
       <p className="text-gray-500 text-sm mb-4 sm:mb-6">
         {t('setup.deckInfo', { icon: deck.icon, name: deck.name, count: cardCount })}
       </p>

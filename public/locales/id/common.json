@@ -89,5 +89,6 @@
   "officialBadge": {
     "label": "Resmi",
     "tooltip": "Akun resmi"
-  }
+  },
+  "guideHelp": "Help"
 }

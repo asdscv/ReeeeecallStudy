@@ -7,6 +7,7 @@ import { ShareModal } from '../components/sharing/ShareModal'
 import { SubscriberList } from '../components/sharing/SubscriberList'
 import { PublishModal } from '../components/marketplace/PublishModal'
 import { useMarketplaceStore } from '../stores/marketplace-store'
+import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck } from '../types/database'
 
 export function DeckSharePage() {
@@ -67,7 +68,10 @@ export function DeckSharePage() {
         ← {deck.name}
       </button>
 
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">{t('deckShare.title')}</h1>
+      <div className="flex items-center gap-2 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('deckShare.title')}</h1>
+        <GuideHelpLink section="sharing" />
+      </div>
 
       {/* Direct sharing */}
       <section className="mb-8">
