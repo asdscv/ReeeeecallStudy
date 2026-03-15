@@ -1,81 +1,49 @@
 import { test, expect } from '../fixtures/test-helpers'
 
 /**
- * E2E tests for secure AI key storage (AES-GCM encryption).
- * Tests encryption, migration, sign-out cleanup on both PC and mobile.
+ * E2E tests for secure AI key storage (AES-256-GCM encryption).
+ * Tests encryption, migration, persistence on both PC and mobile.
  */
 
 test.describe('Secure AI Key Storage — PC & Mobile', () => {
-  test('AI config is stored encrypted (not plaintext) in localStorage', async ({ page }) => {
-    await page.goto('/decks')
+  test('AI config is stored encrypted in localStorage (v3 format)', async ({ page }) => {
+    await page.goto('/settings')
     await page.waitForTimeout(2000)
 
-    // Open AI Generate modal
-    const aiBtn = page.locator('button').filter({ hasText: /AI Generate|AI로 만들기/i })
-    if (!(await aiBtn.isVisible())) {
-      test.skip()
-      return
-    }
-    await aiBtn.click()
+    // Configure a provider via Settings page
+    const section = page.locator('section').filter({ hasText: /AI Providers|AI 프로바이더/i })
+    const configureBtn = section.locator('button').filter({ hasText: /Configure|설정/i }).first()
+    await configureBtn.click()
 
-    const dialog = page.locator('[data-slot="dialog-content"]')
-    await expect(dialog).toBeVisible({ timeout: 5_000 })
+    const apiKeyInput = section.locator('input[type="password"]')
+    await apiKeyInput.fill('sk-test-encryption-check-12345')
 
-    // Fill in provider config
-    const providerSelect = dialog.locator('select').first()
-    await providerSelect.selectOption('xai')
+    const saveBtn = section.locator('button').filter({ hasText: /^Save$|^저장$/i }).first()
+    await saveBtn.click()
+    await page.waitForTimeout(1500)
 
-    const apiKeyInput = dialog.locator('input[type="password"]')
-    await apiKeyInput.fill('xai-test-key-for-encryption-check')
-
-    const topicInput = dialog.locator('input[type="text"]').first()
-    await topicInput.fill('test topic')
-
-    const slider = dialog.locator('input[type="range"]')
-    await slider.fill('10')
-
-    // Submit to trigger save
-    const startBtn = dialog.locator('button[type="submit"]')
-    await expect(startBtn).toBeEnabled()
-    await startBtn.click()
-
-    // Wait a moment for save to complete
-    await page.waitForTimeout(1000)
-
-    // Check localStorage for encrypted storage
-    const v2Data = await page.evaluate(() =>
-      localStorage.getItem('reeeeecall-ai-config-v2'),
-    )
-    const legacyData = await page.evaluate(() =>
-      localStorage.getItem('reeeeecall-ai-config'),
+    // Check localStorage for encrypted storage (v3 key)
+    const v3Data = await page.evaluate(() =>
+      localStorage.getItem('reeeeecall-ai-keys-v3'),
     )
 
-    // v2 (encrypted) key should exist
-    expect(v2Data).not.toBeNull()
-
-    if (v2Data) {
-      // Parse the envelope
-      const envelope = JSON.parse(v2Data)
+    expect(v3Data).not.toBeNull()
+    if (v3Data) {
+      const envelope = JSON.parse(v3Data)
       expect(envelope.v).toBe(1)
       expect(envelope.data).toBeTruthy()
-      expect(envelope.storedAt).toBeTruthy()
 
-      // The encrypted data should NOT contain the plaintext API key
-      expect(envelope.data).not.toContain('xai-test-key-for-encryption-check')
-
-      // The raw envelope string should NOT contain the plaintext key
-      expect(v2Data).not.toContain('xai-test-key-for-encryption-check')
+      // Encrypted data should NOT contain plaintext key
+      expect(envelope.data).not.toContain('sk-test-encryption-check-12345')
+      expect(v3Data).not.toContain('sk-test-encryption-check-12345')
     }
-
-    // Legacy plaintext key should NOT exist (new saves go to v2)
-    expect(legacyData).toBeNull()
   })
 
-  test('legacy plaintext config is auto-migrated on load', async ({ page }) => {
-    await page.goto('/decks')
+  test('legacy plaintext config is auto-migrated to v3', async ({ page }) => {
+    await page.goto('/settings')
     await page.waitForTimeout(2000)
 
-    // Seed legacy plaintext data directly
+    // Seed legacy plaintext data
     await page.evaluate(() => {
       localStorage.setItem(
         'reeeeecall-ai-config',
@@ -87,7 +55,10 @@ test.describe('Secure AI Key Storage — PC & Mobile', () => {
       )
     })
 
-    // Open AI Generate to trigger load
+    // Navigate to AI generate to trigger migration via vault load
+    await page.goto('/decks')
+    await page.waitForTimeout(2000)
+
     const aiBtn = page.locator('button').filter({ hasText: /AI Generate|AI로 만들기/i })
     if (!(await aiBtn.isVisible())) {
       test.skip()
@@ -97,86 +68,71 @@ test.describe('Secure AI Key Storage — PC & Mobile', () => {
 
     const dialog = page.locator('[data-slot="dialog-content"]')
     await expect(dialog).toBeVisible({ timeout: 5_000 })
-
-    // Wait for async migration to complete
     await page.waitForTimeout(2000)
 
-    // Check that legacy key was removed
+    // Check that legacy key was removed and v3 key was created
     const legacyData = await page.evaluate(() =>
       localStorage.getItem('reeeeecall-ai-config'),
     )
-
-    // Check that v2 key was created
-    const v2Data = await page.evaluate(() =>
-      localStorage.getItem('reeeeecall-ai-config-v2'),
+    const v3Data = await page.evaluate(() =>
+      localStorage.getItem('reeeeecall-ai-keys-v3'),
     )
 
-    // After migration: legacy should be gone, v2 should exist
     expect(legacyData).toBeNull()
-    expect(v2Data).not.toBeNull()
+    expect(v3Data).not.toBeNull()
 
-    if (v2Data) {
-      const envelope = JSON.parse(v2Data)
+    if (v3Data) {
+      const envelope = JSON.parse(v3Data)
       expect(envelope.v).toBe(1)
-      // Encrypted data should NOT contain the plaintext key
       expect(envelope.data).not.toContain('xai-legacy-key-12345')
     }
   })
 
-  test('sign-out preserves encrypted AI config (uid-based encryption protects it)', async ({ page }) => {
-    await page.goto('/decks')
+  test('sign-out preserves encrypted AI config', async ({ page }) => {
+    await page.goto('/settings')
     await page.waitForTimeout(2000)
 
     // Seed encrypted data
     await page.evaluate(() => {
-      localStorage.setItem('reeeeecall-ai-config-v2', '{"v":1,"data":"encrypted-blob","storedAt":"2025-01-01","ttlMs":null}')
+      localStorage.setItem('reeeeecall-ai-keys-v3', '{"v":1,"data":"encrypted-blob","storedAt":"2025-01-01","ttlMs":null}')
     })
 
-    // Verify data is there
     const before = await page.evaluate(() =>
-      localStorage.getItem('reeeeecall-ai-config-v2'),
+      localStorage.getItem('reeeeecall-ai-keys-v3'),
     )
     expect(before).not.toBeNull()
 
-    // Find and click logout button
-    const logoutBtn = page.locator('button').filter({ hasText: /Logout|Sign Out|로그아웃/i }).first()
+    // Sign out
+    const logoutBtn = page.locator('button').filter({ hasText: /Logout|Sign Out|Log out|로그아웃/i }).first()
     if (await logoutBtn.isVisible()) {
       await logoutBtn.click()
       await page.waitForTimeout(2000)
 
-      // Encrypted config should PERSIST after sign-out
-      // (AES-GCM encryption with uid-based key derivation protects it)
+      // Config should persist (uid-based encryption protects it)
       const after = await page.evaluate(() =>
-        localStorage.getItem('reeeeecall-ai-config-v2'),
+        localStorage.getItem('reeeeecall-ai-keys-v3'),
       )
       expect(after).not.toBeNull()
     }
   })
 
-  test('hasKey returns true for encrypted config', async ({ page }) => {
-    await page.goto('/decks')
+  test('hasAnyKey returns true for stored config', async ({ page }) => {
+    await page.goto('/settings')
     await page.waitForTimeout(2000)
 
-    // Seed encrypted envelope
+    // Seed data
     await page.evaluate(() => {
       localStorage.setItem(
-        'reeeeecall-ai-config-v2',
-        JSON.stringify({
-          v: 1,
-          data: 'encrypted-blob',
-          storedAt: new Date().toISOString(),
-          ttlMs: null,
-        }),
+        'reeeeecall-ai-keys-v3',
+        JSON.stringify({ v: 1, data: 'blob', storedAt: new Date().toISOString(), ttlMs: null }),
       )
     })
 
-    // Navigate to AI generate page — should show "API key saved" hint
     await page.goto('/ai-generate')
     await page.waitForTimeout(2000)
 
-    // The green "API key saved" badge should be visible
-    const savedHint = page.locator('text=/API key saved|API 키가 저장/i')
-    // If the page has this indicator, it means hasKey() returned true
+    // Check for "API key saved" hint
+    const savedHint = page.locator('text=/API key saved|API 키가 저장|apiKeySaved/i')
     if (await savedHint.isVisible()) {
       expect(await savedHint.isVisible()).toBe(true)
     }

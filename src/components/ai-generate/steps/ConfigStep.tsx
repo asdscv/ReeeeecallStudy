@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { aiConfigManager } from '../../../lib/ai/secure-storage'
+import { useNavigate } from 'react-router-dom'
+import { Settings } from 'lucide-react'
+import { aiKeyVault } from '../../../lib/ai/secure-storage'
+import type { ProviderKeyMap } from '../../../lib/ai/secure-storage'
 import { useAuthStore } from '../../../stores/auth-store'
 import { setAIConfigCache } from '../../../stores/ai-generate-store'
 import { getProviders, getProvider } from '../../../lib/ai/provider-registry'
@@ -56,14 +59,17 @@ interface ConfigStepProps {
 
 export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showModeSelect, onModeChange }: ConfigStepProps) {
   const { t } = useTranslation('ai-generate')
+  const navigate = useNavigate()
   const providers = getProviders()
   const { decks, fetchDecks } = useDeckStore()
 
-  // AI provider state
-  const [providerId, setProviderId] = useState('openai')
-  const [apiKey, setApiKey] = useState('')
+  // Stored provider keys
+  const [storedKeys, setStoredKeys] = useState<ProviderKeyMap>({})
+  const [keysLoaded, setKeysLoaded] = useState(false)
+
+  // Selected provider + model
+  const [providerId, setProviderId] = useState('')
   const [model, setModel] = useState('')
-  const [customUrl, setCustomUrl] = useState('')
 
   // Generation config state
   const [topic, setTopic] = useState(initialTopic || '')
@@ -83,19 +89,25 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
   const isFullMode = mode === 'full'
 
-  // Load saved config (async decryption)
+  // Load stored provider keys
   useEffect(() => {
     const uid = useAuthStore.getState().user?.id
-    if (!uid) return
-    aiConfigManager.load(uid).then((saved) => {
-      if (saved) {
-        setProviderId(saved.providerId)
-        setApiKey(saved.apiKey)
-        setModel(saved.model)
-        if (saved.baseUrl) setCustomUrl(saved.baseUrl)
+    if (!uid) {
+      setKeysLoaded(true)
+      return
+    }
+    aiKeyVault.loadAll(uid).then((keys) => {
+      setStoredKeys(keys)
+      // Auto-select first configured provider
+      const configuredIds = Object.keys(keys)
+      if (configuredIds.length > 0 && !providerId) {
+        setProviderId(configuredIds[0])
+        const entry = keys[configuredIds[0]]
+        if (entry.model) setModel(entry.model)
       }
+      setKeysLoaded(true)
     })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch decks for selector (cards_only mode)
   useEffect(() => {
@@ -112,29 +124,22 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     if (existingDeckId) setSelectedDeckId(existingDeckId)
   }, [existingDeckId])
 
-  // Auto-select first model when provider changes
+  // Auto-select model when provider changes
   useEffect(() => {
-    if (providerId === 'custom') {
-      setModel('custom')
-      return
-    }
-    const provider = getProvider(providerId)
-    if (provider && provider.models.length > 0) {
-      const uid = useAuthStore.getState().user?.id
-      if (uid) {
-        aiConfigManager.load(uid).then((saved) => {
-          if (saved?.providerId === providerId && saved.model) {
-            setModel(saved.model)
-          } else {
-            setModel(provider!.models[0].id)
-          }
-        })
-      } else {
+    if (!providerId) return
+    const entry = storedKeys[providerId]
+    if (entry?.model) {
+      setModel(entry.model)
+    } else {
+      const provider = getProvider(providerId)
+      if (provider && provider.models.length > 0) {
         setModel(provider.models[0].id)
       }
     }
-  }, [providerId])
+  }, [providerId, storedKeys])
 
+  const configuredProviders = providers.filter((p) => storedKeys[p.id])
+  const hasCustom = !!storedKeys['custom']
   const currentProvider = getProvider(providerId)
   const models = currentProvider?.models ?? []
 
@@ -157,26 +162,25 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     setCustomFields(updated)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!apiKey.trim() || !topic.trim()) return
+    if (!providerId || !topic.trim()) return
     if (!isFullMode && !selectedDeckId) return
+
+    const entry = storedKeys[providerId]
+    if (!entry?.apiKey) return
+
+    const provider = getProvider(providerId)
 
     const aiConfig = {
       providerId,
-      apiKey,
+      apiKey: entry.apiKey,
       model,
-      baseUrl: providerId === 'custom' ? customUrl : undefined,
+      baseUrl: entry.baseUrl || provider?.baseUrl,
     }
 
-    // Set in-memory cache immediately (avoids async save/load race)
+    // Set in-memory cache immediately
     setAIConfigCache(aiConfig)
-
-    // Persist encrypted to storage (non-blocking)
-    const uid = useAuthStore.getState().user?.id
-    if (uid) {
-      aiConfigManager.save(uid, aiConfig).catch(() => { /* storage failure */ })
-    }
 
     onStart({
       topic,
@@ -194,12 +198,14 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     })
   }
 
+  const hasConfiguredProvider = providerId && storedKeys[providerId]?.apiKey
   const canSubmit =
-    apiKey.trim() &&
+    hasConfiguredProvider &&
     topic.trim() &&
     model &&
-    (providerId !== 'custom' || customUrl.trim()) &&
     (isFullMode || selectedDeckId)
+
+  const noProvidersConfigured = keysLoaded && configuredProviders.length === 0 && !hasCustom
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
@@ -232,70 +238,63 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       <fieldset className="space-y-3 p-3 bg-gray-50 rounded-lg">
         <legend className="text-xs font-semibold text-gray-500 uppercase px-1">{t('config.providerSection')}</legend>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.provider')}</label>
-          <select
-            value={providerId}
-            onChange={(e) => setProviderId(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
-          >
-            {providers.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-            <option value="custom">{t('config.customEndpoint')}</option>
-          </select>
-        </div>
-
-        {providerId === 'custom' && (
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.customUrl')}</label>
-            <input
-              type="url"
-              value={customUrl}
-              onChange={(e) => setCustomUrl(e.target.value)}
-              placeholder="https://api.example.com/v1"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500"
-            />
-          </div>
-        )}
-
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.apiKey')}</label>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder={t('config.apiKeyPlaceholder')}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500"
-          />
-          <p className="text-xs text-gray-400 mt-0.5">{t('config.apiKeyHint')}</p>
-        </div>
-
-        {providerId !== 'custom' && models.length > 0 && (
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.model')}</label>
-            <select
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
+        {noProvidersConfigured ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500 mb-3">{t('config.noProvidersConfigured')}</p>
+            <button
+              type="button"
+              onClick={() => navigate('/settings')}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer font-medium"
             >
-              {models.map((m) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))}
-            </select>
+              <Settings className="w-4 h-4" />
+              {t('config.goToSettings')}
+            </button>
           </div>
-        )}
-        {providerId === 'custom' && (
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.model')}</label>
-            <input
-              type="text"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              placeholder="model-name"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500"
-            />
-          </div>
+        ) : (
+          <>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.provider')}</label>
+              <select
+                value={providerId}
+                onChange={(e) => setProviderId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
+              >
+                <option value="">{t('config.selectProvider')}</option>
+                {configuredProviders.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+                {hasCustom && (
+                  <option value="custom">{t('config.customEndpoint')}</option>
+                )}
+              </select>
+            </div>
+
+            {providerId && providerId !== 'custom' && models.length > 0 && (
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.model')}</label>
+                <select
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
+                >
+                  {models.map((m) => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <p className="text-xs text-gray-400">
+              {t('config.manageInSettings')}{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/settings')}
+                className="text-blue-500 hover:text-blue-700 underline cursor-pointer"
+              >
+                {t('config.settings')}
+              </button>
+            </p>
+          </>
         )}
       </fieldset>
 
