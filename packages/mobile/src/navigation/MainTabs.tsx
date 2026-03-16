@@ -1,3 +1,4 @@
+import { Text } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useTheme } from '../theme'
 import { DashboardScreen } from '../screens/DashboardScreen'
@@ -8,6 +9,19 @@ import { SettingsStack } from './SettingsStack'
 import type { MainTabParamList } from './types'
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
+
+const TAB_ICONS: Record<keyof MainTabParamList, { active: string; inactive: string }> = {
+  HomeTab: { active: '🏠', inactive: '🏠' },
+  DecksTab: { active: '📚', inactive: '📚' },
+  StudyTab: { active: '🧠', inactive: '🧠' },
+  MarketplaceTab: { active: '🏪', inactive: '🏪' },
+  SettingsTab: { active: '⚙️', inactive: '⚙️' },
+}
+
+function TabIcon({ name, focused }: { name: keyof MainTabParamList; focused: boolean }) {
+  const icons = TAB_ICONS[name]
+  return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{focused ? icons.active : icons.inactive}</Text>
+}
 
 export function MainTabs() {
   const theme = useTheme()
@@ -21,15 +35,21 @@ export function MainTabs() {
         tabBarStyle: {
           backgroundColor: theme.colors.surfaceElevated,
           borderTopColor: theme.colors.border,
+          paddingTop: 4,
         },
-        tabBarLabelStyle: { ...theme.typography.caption },
+        tabBarLabelStyle: { ...theme.typography.caption, marginTop: -2 },
       }}
     >
-      <Tab.Screen name="HomeTab" component={DashboardScreen} options={{ tabBarLabel: 'Home' }} />
-      <Tab.Screen name="DecksTab" component={DecksStack} options={{ tabBarLabel: 'Decks' }} />
-      <Tab.Screen name="StudyTab" component={StudyStack} options={{ tabBarLabel: 'Study' }} />
-      <Tab.Screen name="MarketplaceTab" component={MarketplaceStack} options={{ tabBarLabel: 'Market' }} />
-      <Tab.Screen name="SettingsTab" component={SettingsStack} options={{ tabBarLabel: 'Settings' }} />
+      <Tab.Screen name="HomeTab" component={DashboardScreen}
+        options={{ tabBarLabel: 'Home', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
+      <Tab.Screen name="DecksTab" component={DecksStack}
+        options={{ tabBarLabel: 'Decks', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
+      <Tab.Screen name="StudyTab" component={StudyStack}
+        options={{ tabBarLabel: 'Study', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
+      <Tab.Screen name="MarketplaceTab" component={MarketplaceStack}
+        options={{ tabBarLabel: 'Market', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
+      <Tab.Screen name="SettingsTab" component={SettingsStack}
+        options={{ tabBarLabel: 'Settings', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
     </Tab.Navigator>
   )
 }

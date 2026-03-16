@@ -3,6 +3,8 @@ import { DecksListScreen } from '../screens/DecksListScreen'
 import { DeckDetailScreen } from '../screens/DeckDetailScreen'
 import { DeckEditScreen } from '../screens/DeckEditScreen'
 import { CardEditScreen } from '../screens/CardEditScreen'
+import { ImportExportScreen } from '../screens/ImportExportScreen'
+import { PublishDeckScreen } from '../screens/PublishDeckScreen'
 import type { DecksStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<DecksStackParamList>()
@@ -19,6 +21,8 @@ export function DecksStack() {
       <Stack.Screen name="DeckDetail" component={DeckDetailScreen} />
       <Stack.Screen name="DeckEdit" component={DeckEditScreen} />
       <Stack.Screen name="CardEdit" component={CardEditScreen} />
+      <Stack.Screen name="ImportExport" component={ImportExportScreen} />
+      <Stack.Screen name="PublishDeck" component={PublishDeckScreen} />
     </Stack.Navigator>
   )
 }

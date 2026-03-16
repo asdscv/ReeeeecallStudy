@@ -6,6 +6,7 @@ import { Screen, TextInput, Button, Divider } from '../components/ui'
 import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
+import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 
 const LANGUAGES = [
@@ -44,6 +45,7 @@ export function SettingsScreen() {
   })
   const [language, setLanguage] = useState('en')
   const [saving, setSaving] = useState(false)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
 
   // Load profile
   useEffect(() => {
@@ -66,6 +68,27 @@ export function SettingsScreen() {
         }
       })
   }, [user])
+
+  // Load notification status
+  useEffect(() => {
+    notificationService.init()
+    notificationService.isEnabled().then(setNotificationsEnabled)
+  }, [])
+
+  const toggleNotifications = async (enabled: boolean) => {
+    if (enabled) {
+      const granted = await notificationService.requestPermission()
+      if (granted) {
+        await notificationService.scheduleDailyReminder(9, 0)
+        setNotificationsEnabled(true)
+      } else {
+        Alert.alert('Permission Required', 'Enable notifications in device settings.')
+      }
+    } else {
+      await notificationService.cancelDailyReminder()
+      setNotificationsEnabled(false)
+    }
+  }
 
   const saveProfile = useCallback(async (updates: Partial<ProfileData>) => {
     if (!user) return
@@ -217,6 +240,26 @@ export function SettingsScreen() {
                 ))}
               </View>
             </View>
+          )}
+        </SettingsSection>
+
+        <Divider />
+
+        {/* Notifications */}
+        <SettingsSection title="Notifications" theme={theme}>
+          <View style={styles.settingRow}>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Daily Study Reminder</Text>
+            <Switch
+              testID="settings-notification-toggle"
+              value={notificationsEnabled}
+              onValueChange={toggleNotifications}
+              trackColor={{ true: theme.colors.primary }}
+            />
+          </View>
+          {notificationsEnabled && (
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+              You'll be reminded daily at 9:00 AM to review your cards.
+            </Text>
           )}
         </SettingsSection>
 

@@ -28,6 +28,7 @@ export type MainTabParamList = {
 // Home stack
 export type HomeStackParamList = {
   Dashboard: undefined
+  StudyHistory: undefined
 }
 
 // Decks stack (덱 관련 모든 화면)
@@ -36,6 +37,8 @@ export type DecksStackParamList = {
   DeckDetail: { deckId: string }
   DeckEdit: { deckId?: string }              // undefined = 새 덱 생성
   CardEdit: { deckId: string; cardId?: string } // undefined = 새 카드 생성
+  ImportExport: { deckId: string }
+  PublishDeck: { deckId: string }
 }
 
 // Study stack

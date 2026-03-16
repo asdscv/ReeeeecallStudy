@@ -91,6 +91,14 @@ export function DeckDetailScreen() {
               </View>
             </View>
 
+            {/* Action buttons */}
+            <View style={styles.actionRow}>
+              <Button title="📥 Import/Export" variant="outline" size="sm" fullWidth={false}
+                onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-detail-import-export" />
+              <Button title="📤 Publish" variant="outline" size="sm" fullWidth={false}
+                onPress={() => navigation.navigate('PublishDeck', { deckId })} testID="deck-detail-publish" />
+            </View>
+
             {/* Study button */}
             <Button title="Start Study" onPress={() => {}} testID="deck-detail-study" />
 
@@ -158,4 +166,5 @@ const styles = StyleSheet.create({
   badgeRow: { flexDirection: 'row', gap: 6 },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   cardContent: { flex: 1, gap: 2 },
+  actionRow: { flexDirection: 'row', gap: 8 },
 })
