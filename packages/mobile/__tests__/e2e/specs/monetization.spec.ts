@@ -1,11 +1,11 @@
 import SettingsScreen from '../screens/SettingsScreen'
 import PaywallScreen from '../screens/PaywallScreen'
+import { navigateToTab } from '../helpers/navigation'
 
 describe('Monetization Flow', () => {
   describe('Settings — Subscription Section', () => {
     it('should show subscription section in settings', async () => {
-      const tab = $('~SettingsTab')
-      if (await tab.isDisplayed()) await tab.click()
+      await navigateToTab('Settings')
       await SettingsScreen.waitForScreen()
       expect(await SettingsScreen.isDisplayed()).toBe(true)
     })

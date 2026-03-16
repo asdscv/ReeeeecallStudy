@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { initAdapters } from '@reeeeecall/shared/adapters'
+import { initSupabase } from '@reeeeecall/shared/lib/supabase'
 import { RNStorage, RNSessionStorage, supabaseSecureStorage } from './rn-storage'
 import { RNCrypto } from './rn-crypto'
 import { RNDevice } from './rn-device'
@@ -27,6 +28,11 @@ export function initMobilePlatform(): void {
     audio: new RNAudio(),
     platform: new RNPlatform(),
   })
+
+  // Initialize shared Supabase client (used by shared stores/hooks)
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY)
+  }
 }
 
 /**

@@ -1,5 +1,6 @@
 import DecksListScreen from '../screens/DecksListScreen'
 import DeckEditScreen from '../screens/DeckEditScreen'
+import { navigateToTab } from '../helpers/navigation'
 
 describe('Decks CRUD Flow', () => {
   // Assumes user is already logged in
@@ -7,10 +8,7 @@ describe('Decks CRUD Flow', () => {
   describe('DecksListScreen', () => {
     it('should display decks list screen', async () => {
       // Navigate to Decks tab
-      const decksTab = $('~DecksTab')
-      if (await decksTab.isDisplayed()) {
-        await decksTab.click()
-      }
+      await navigateToTab('Decks')
       await DecksListScreen.waitForScreen()
       expect(await DecksListScreen.isDisplayed()).toBe(true)
     })

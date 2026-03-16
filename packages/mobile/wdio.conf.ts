@@ -14,7 +14,7 @@ export const config: WebdriverIO.Config = {
   bail: 0,
 
   waitforTimeout: 10000,
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 600000,
   connectionRetryCount: 3,
 
   framework: 'mocha',
@@ -23,6 +23,12 @@ export const config: WebdriverIO.Config = {
   mochaOpts: {
     ui: 'bdd',
     timeout: 60000,
+  },
+
+  // Login before each spec file
+  before: async function () {
+    const { loginIfNeeded } = await import('./__tests__/e2e/helpers/auth')
+    await loginIfNeeded()
   },
 
   // Hooks for screenshots on failure

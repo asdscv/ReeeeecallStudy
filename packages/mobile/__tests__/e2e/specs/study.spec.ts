@@ -1,14 +1,14 @@
 import StudySetupScreen from '../screens/StudySetupScreen'
 import StudySessionScreen from '../screens/StudySessionScreen'
 import StudySummaryScreen from '../screens/StudySummaryScreen'
+import { navigateToTab } from '../helpers/navigation'
 
 describe('Study Flow', () => {
   // Assumes user is logged in and has at least one deck with cards
 
   describe('StudySetupScreen', () => {
     it('should display study setup screen', async () => {
-      const studyTab = $('~StudyTab')
-      if (await studyTab.isDisplayed()) await studyTab.click()
+      await navigateToTab('Study')
       await StudySetupScreen.waitForScreen()
       expect(await StudySetupScreen.isDisplayed()).toBe(true)
     })

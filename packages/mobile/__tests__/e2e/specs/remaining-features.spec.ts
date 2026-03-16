@@ -1,3 +1,5 @@
+import { navigateToTab } from '../helpers/navigation'
+
 describe('Remaining Features', () => {
   describe('Import/Export', () => {
     it('should display import/export screen from deck detail', async () => {
@@ -51,8 +53,7 @@ describe('Remaining Features', () => {
 
   describe('Notifications', () => {
     it('should show notification toggle in settings', async () => {
-      const tab = $('~SettingsTab')
-      if (await tab.isDisplayed()) await tab.click()
+      await navigateToTab('Settings')
 
       const toggle = $('~settings-notification-toggle')
       if (await toggle.isExisting()) {
