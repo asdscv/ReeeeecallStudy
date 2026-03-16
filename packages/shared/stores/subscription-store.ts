@@ -39,7 +39,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   status: 'none',
   expiresAt: null,
   sessions: [],
-  currentDeviceId: getDeviceId(),
+  currentDeviceId: '',  // Lazy: set on first fetchSubscription/registerSession
   sessionValid: true,
   loading: true,
 
@@ -67,7 +67,11 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   registerSession: async () => {
-    const deviceId = get().currentDeviceId
+    let deviceId = get().currentDeviceId
+    if (!deviceId) {
+      deviceId = getDeviceId()
+      set({ currentDeviceId: deviceId })
+    }
     const deviceName = getDeviceName()
     try {
       const { data, error } = await supabase.rpc('register_session', {
@@ -90,7 +94,11 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   sendHeartbeat: async () => {
-    const deviceId = get().currentDeviceId
+    let deviceId = get().currentDeviceId
+    if (!deviceId) {
+      deviceId = getDeviceId()
+      set({ currentDeviceId: deviceId })
+    }
     try {
       const { data, error } = await supabase.rpc('session_heartbeat', {
         p_device_id: deviceId,
@@ -147,13 +155,18 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
 }))
 
 // Dev helper: test session kicked overlay from browser console (web only)
-if (typeof window !== 'undefined' && typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) {
-  (window as unknown as Record<string, unknown>).__simulateSessionKick = () => {
-    useSubscriptionStore.setState({ sessionValid: false })
-    console.log('[DEV] sessionValid → false (overlay should appear)')
-  };
-  (window as unknown as Record<string, unknown>).__simulateSessionRestore = () => {
-    useSubscriptionStore.setState({ sessionValid: true })
-    console.log('[DEV] sessionValid → true (overlay should disappear)')
+// Guarded: only runs in browser environments with Vite dev server
+try {
+  if (typeof window !== 'undefined' && typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    (window as unknown as Record<string, unknown>).__simulateSessionKick = () => {
+      useSubscriptionStore.setState({ sessionValid: false })
+      console.log('[DEV] sessionValid → false (overlay should appear)')
+    };
+    (window as unknown as Record<string, unknown>).__simulateSessionRestore = () => {
+      useSubscriptionStore.setState({ sessionValid: true })
+      console.log('[DEV] sessionValid → true (overlay should disappear)')
+    }
   }
+} catch {
+  // Silently skip in environments where process is not available
 }
