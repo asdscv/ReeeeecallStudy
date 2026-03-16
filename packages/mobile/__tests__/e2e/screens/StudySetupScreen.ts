@@ -6,11 +6,20 @@ class StudySetupScreenPO {
     try {
       await this.screen.waitForDisplayed({ timeout: 5000 })
     } catch {
-      await this.startButton.waitForDisplayed({ timeout: 10000 })
+      // Screen container not accessible — check for any study element
+      const mode = $('~study-mode-srs')
+      try {
+        await mode.waitForDisplayed({ timeout: 5000 })
+      } catch {
+        // Try scrolling down to find start button
+        await browser.execute('mobile: scroll', { direction: 'down' })
+        await this.startButton.waitForDisplayed({ timeout: 5000 })
+      }
     }
   }
   async isDisplayed() {
     return (await this.screen.isDisplayed().catch(() => false)) ||
+           (await $('~study-mode-srs').isDisplayed().catch(() => false)) ||
            (await this.startButton.isDisplayed().catch(() => false))
   }
 
