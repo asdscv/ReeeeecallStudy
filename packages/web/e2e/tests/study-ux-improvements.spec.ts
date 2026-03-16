@@ -285,8 +285,12 @@ test.describe('TTS Settings Page', () => {
     const currentValue = await slider.inputValue()
     console.log(`[tts-settings] Speed slider value: ${currentValue}`)
 
-    // Change the speed value
-    await slider.fill('1.5')
+    // Change the speed value — use evaluate since .fill() doesn't work on range inputs
+    await slider.evaluate((el: HTMLInputElement) => {
+      el.value = '1.5'
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    })
     await page.waitForTimeout(200)
 
     // Verify the display shows new value
@@ -357,10 +361,14 @@ test.describe('TTS Settings Page', () => {
     const classList = await edgeTtsButton.getAttribute('class')
     expect(classList).toContain('border-blue-500')
 
-    // Change speed
+    // Change speed — use evaluate since .fill() doesn't work on range inputs
     const slider = page.locator('input[type="range"]').first()
     await slider.scrollIntoViewIfNeeded()
-    await slider.fill('1.5')
+    await slider.evaluate((el: HTMLInputElement) => {
+      el.value = '1.5'
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    })
     await page.waitForTimeout(200)
 
     // Verify speed display
@@ -383,7 +391,11 @@ test.describe('TTS Settings Page', () => {
       hasText: /Device Voice|기기 음성|设备语音|デバイス音声/i,
     })
     await webSpeechButton.click()
-    await slider.fill('0.9')
+    await slider.evaluate((el: HTMLInputElement) => {
+      el.value = '0.9'
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    })
     await saveButton.scrollIntoViewIfNeeded()
     await saveButton.click()
     await page.waitForTimeout(1000)

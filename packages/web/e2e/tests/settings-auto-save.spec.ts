@@ -150,8 +150,12 @@ test.describe('Settings — TTS Auto-Save', () => {
     const slider = page.locator('input[type="range"]').first()
     await slider.scrollIntoViewIfNeeded()
 
-    // Change speed
-    await slider.fill('1.5')
+    // Change speed — use evaluate since .fill() doesn't work on range inputs in Playwright
+    await slider.evaluate((el: HTMLInputElement) => {
+      el.value = '1.5'
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    })
 
     // Wait for debounce (500ms) + save
     const toast = page.locator('text=/Saved|저장됨|已自动|自動保存/i')
@@ -159,7 +163,11 @@ test.describe('Settings — TTS Auto-Save', () => {
     console.log('[tts-speed] Auto-saved after debounce')
 
     // Reset
-    await slider.fill('0.9')
+    await slider.evaluate((el: HTMLInputElement) => {
+      el.value = '0.9'
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    })
     await page.waitForTimeout(1000)
   })
 })

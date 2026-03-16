@@ -34,10 +34,12 @@ test.describe('Sequential Review — Resume After Mid-Session Exit', () => {
     studySessionPage,
     page,
   }) => {
-    // Ensure button mode (swipe mode may have been left on by prior tests)
+    // --- Session 1: study 1 card, then exit ---
+    // Navigate first so page context exists, then disable swipe mode
+    await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.disableSwipeMode()
 
-    // --- Session 1: study 1 card, then exit ---
     const hasCards = await startSequentialReview(quickStudyPage, page)
     if (!hasCards) { test.skip(true, 'No cards in deck'); return }
 

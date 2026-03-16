@@ -9,6 +9,7 @@ const OUTPUT_DIR = 'public/images/guide/ai-generate'
 
 test.describe('Capture AI Generate Screenshots', () => {
   test('PC screenshots', async ({ browser }) => {
+    test.skip(!process.env.E2E_GROK_API_KEY, 'Grok API key required')
     test.setTimeout(180_000)
     const context = await browser.newContext({
       viewport: { width: 1280, height: 800 },
@@ -55,6 +56,7 @@ test.describe('Capture AI Generate Screenshots', () => {
   })
 
   test('Mobile screenshots', async ({ browser }) => {
+    test.skip(!process.env.E2E_GROK_API_KEY, 'Grok API key required')
     test.setTimeout(180_000)
     const context = await browser.newContext({
       viewport: { width: 390, height: 844 },

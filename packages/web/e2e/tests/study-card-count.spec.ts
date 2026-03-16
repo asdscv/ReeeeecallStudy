@@ -17,6 +17,7 @@ test.describe('Card Count Diagnosis — 49-card bug', () => {
     quickStudyPage,
     page,
   }) => {
+    test.skip(true, 'Diagnostic test — requires specific deck "영어 회화!" to exist')
     test.setTimeout(60_000)
 
     // Intercept ALL Supabase REST API calls to the cards table
@@ -138,6 +139,7 @@ test.describe('Card Count Diagnosis — 49-card bug', () => {
     quickStudyPage,
     page,
   }) => {
+    test.skip(true, 'Diagnostic test — requires specific deck "영어 회화!" to exist')
     test.setTimeout(60_000)
 
     const cardResponses: Array<{ url: string; count: number; statusDist: Record<string, number> }> = []
@@ -201,6 +203,7 @@ test.describe('Card Count Diagnosis — 49-card bug', () => {
   test('Direct Supabase count — check true total & row limit', async ({
     page,
   }) => {
+    test.skip(true, 'Diagnostic test — requires specific deck ID to exist')
     test.setTimeout(30_000)
 
     const DECK_ID = 'c2b7be09-320b-42a5-8f81-9ef7ebef7d61'
@@ -366,6 +369,7 @@ test.describe('Card Count Diagnosis — 49-card bug', () => {
   test('RPC get_deck_stats vs REST cards query — find RLS discrepancy', async ({
     page,
   }) => {
+    test.skip(true, 'Diagnostic test — requires specific deck ID to exist')
     test.setTimeout(30_000)
 
     const DECK_ID = 'c2b7be09-320b-42a5-8f81-9ef7ebef7d61'

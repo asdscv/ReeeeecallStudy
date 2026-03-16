@@ -18,6 +18,7 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 
@@ -50,6 +51,7 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 
@@ -82,6 +84,7 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 
@@ -110,6 +113,7 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await selectModeByText(page, 'Random')
@@ -146,6 +150,7 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await selectModeByText(page, 'Random')
@@ -243,6 +248,7 @@ test.describe('SwipeGuide — Correct Arrow Positions', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await selectModeByText(page, 'Random')

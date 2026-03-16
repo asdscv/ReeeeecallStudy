@@ -11,6 +11,7 @@ const GROK_API_KEY = process.env.E2E_GROK_API_KEY ?? ''
 
 test.describe('AI Generate — Full Generation Flow', () => {
   test('full flow: generate template + deck + cards with Grok', async ({ page }) => {
+    test.skip(!process.env.E2E_GROK_API_KEY, 'Grok API key required')
     // Increase timeout for AI API calls
     test.setTimeout(120_000)
 
@@ -114,6 +115,7 @@ test.describe('AI Generate — Full Generation Flow', () => {
 
 test.describe('AI Generate — Error Handling', () => {
   test('shows error for invalid API key', async ({ page }) => {
+    test.skip(!process.env.E2E_GROK_API_KEY, 'Grok API key required')
     test.setTimeout(60_000)
 
     await page.goto('/decks')

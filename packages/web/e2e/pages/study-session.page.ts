@@ -19,19 +19,21 @@ export class StudySessionPage extends BasePage {
 
   /** Exit (X) button */
   get exitButton(): Locator {
-    return this.page.locator('button').filter({ has: this.page.locator('svg.w-5.h-5') })
+    // The X button is inside the top bar, in a div with flex items-center gap-2 ml-4
+    // Match button with p-2 class that contains an SVG (lucide X icon)
+    return this.page.locator('button.p-2').filter({ has: this.page.locator('svg') })
   }
 
   // ─── Unknown/Known Locators ─────────────────────────
 
   /** Unknown button (red) */
   get unknownButton(): Locator {
-    return this.page.getByRole('button', { name: /^Unknown$|^모름$/i })
+    return this.page.getByRole('button', { name: /^\s*Unknown\s*$|^\s*모름\s*$/i })
   }
 
   /** Known button (green) */
   get knownButton(): Locator {
-    return this.page.getByRole('button', { name: /^Known$|^알고 있음$/i })
+    return this.page.getByRole('button', { name: /^\s*Known\s*$|^\s*알고 있음\s*$/i })
   }
 
   /** Next button (blue, legacy — should no longer appear) */
@@ -43,12 +45,12 @@ export class StudySessionPage extends BasePage {
 
   /** Got It button (green) */
   get gotItButton(): Locator {
-    return this.page.getByRole('button', { name: /Got It|알겠어요/i })
+    return this.page.getByRole('button', { name: /Got It!|알겠어요/i })
   }
 
   /** Didn't Get It button (red) */
   get missedButton(): Locator {
-    return this.page.getByRole('button', { name: /Didn't Get It|모르겠어요|Get It/i }).first()
+    return this.page.getByRole('button', { name: /Didn't Get It|모르겠어요/i })
   }
 
   /** Cramming progress bar area (contains round badge + mastery) */
@@ -213,12 +215,19 @@ export class StudySessionPage extends BasePage {
 
   /** Progress bar text (e.g., "3/10") */
   get progressText(): Locator {
-    return this.page.locator('.whitespace-nowrap').filter({ hasText: /\d+\/\d+/ })
+    // Match the span with whitespace-nowrap class that contains N/N format,
+    // or fall back to any element with that pattern in the progress bar area
+    return this.page.locator('span.whitespace-nowrap, .whitespace-nowrap').filter({ hasText: /\d+\/\d+/ }).first()
   }
 
   /** Get the current progress text (e.g., "3/10") */
   async getProgressText(): Promise<string> {
-    return (await this.progressText.textContent()) ?? ''
+    // Try the primary locator first, then fall back to any text matching N/N
+    const text = await this.progressText.textContent().catch(() => null)
+    if (text) return text.trim()
+    // Fallback: find any element with progress text pattern
+    const fallback = this.page.locator('text=/\\d+\\/\\d+/').first()
+    return ((await fallback.textContent()) ?? '').trim()
   }
 
   // ─── Exit Confirm Dialog ────────────────────────────

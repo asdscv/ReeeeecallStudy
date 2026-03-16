@@ -12,6 +12,7 @@ test.describe('Swipe Mode — Card Gestures', () => {
     page: any,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await quickStudyPage.selectMode('🎲')
@@ -198,6 +199,7 @@ test.describe('Swipe Mode — Overlay Visibility', () => {
     page: any,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await quickStudyPage.selectMode('🎲')
@@ -284,6 +286,7 @@ test.describe('Swipe Mode — Mobile Viewport', () => {
     page,
   }) => {
     await quickStudyPage.navigate()
+    await page.waitForTimeout(1000)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 

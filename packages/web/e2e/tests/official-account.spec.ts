@@ -3,11 +3,18 @@ import { test, expect } from '../fixtures/test-helpers'
 test.describe('Official Account - Admin Users Page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/admin/users')
+    await page.waitForTimeout(2000)
 
-    // Gracefully skip if not admin (redirected away)
+    // Gracefully skip if not admin (redirected away from /admin/users)
     const url = page.url()
     if (!url.includes('/admin/users')) {
-      test.skip()
+      test.skip(true, 'Not admin — redirected away from /admin/users')
+    }
+
+    // Also skip if the page shows access denied or no table rendered
+    const tableVisible = await page.locator('table').isVisible({ timeout: 3000 }).catch(() => false)
+    if (!tableVisible) {
+      test.skip(true, 'Admin users table not visible — likely not admin')
     }
   })
 

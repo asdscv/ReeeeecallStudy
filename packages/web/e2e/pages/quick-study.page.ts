@@ -36,7 +36,17 @@ export class QuickStudyPage extends BasePage {
 
   async navigate() {
     await this.goto('/quick-study')
+    // Wait for either deck grid (authenticated) or landing page redirect
+    await this.page.waitForTimeout(1000)
+    // If redirected to landing page, auth state was lost — retry with explicit navigation
+    const url = this.page.url()
+    if (url.includes('/landing') || !url.includes('/quick-study')) {
+      await this.goto('/quick-study')
+      await this.page.waitForTimeout(1000)
+    }
     await this.waitForLoadingToDisappear()
+    // Wait for deck grid to appear
+    await this.deckGrid.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {})
   }
 
   /** Select a deck by its name */
