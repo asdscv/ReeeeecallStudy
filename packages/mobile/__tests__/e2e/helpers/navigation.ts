@@ -18,6 +18,14 @@ export async function navigateToTab(tabName: string) {
     return
   }
 
+  // Dismiss keyboard if visible (covers tab bar on iOS)
+  const keyboard = $('-ios class chain:**/XCUIElementTypeKeyboard')
+  if (await keyboard.isDisplayed().catch(() => false)) {
+    // Tap outside to dismiss
+    await $('-ios class chain:**/XCUIElementTypeOther[1]').click().catch(() => {})
+    await browser.pause(500)
+  }
+
   // iOS: Use class chain to find the Nth button in the tab bar
   const iosSelector = `**/XCUIElementTypeTabBar/XCUIElementTypeButton[${idx}]`
   const iosTab = $(`-ios class chain:${iosSelector}`)

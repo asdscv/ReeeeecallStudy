@@ -45,8 +45,9 @@ describe('Decks CRUD Flow', () => {
   describe('Search', () => {
     it('should filter decks by search query', async () => {
       await DecksListScreen.search('Test Deck E2E')
-      // Deck should still be visible
       await browser.pause(500) // wait for filter
+      // Dismiss keyboard so tab bar is accessible for next tests
+      try { await driver.hideKeyboard() } catch { /* no keyboard */ }
     })
   })
 })
