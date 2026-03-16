@@ -146,9 +146,8 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 }))
 
-// Dev helper: test session kicked overlay from browser console
-// Usage: __simulateSessionKick()
-if (import.meta.env.DEV) {
+// Dev helper: test session kicked overlay from browser console (web only)
+if (typeof window !== 'undefined' && typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) {
   (window as unknown as Record<string, unknown>).__simulateSessionKick = () => {
     useSubscriptionStore.setState({ sessionValid: false })
     console.log('[DEV] sessionValid → false (overlay should appear)')

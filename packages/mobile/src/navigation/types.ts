@@ -48,13 +48,13 @@ export type StudyStackParamList = {
 // Marketplace stack
 export type MarketplaceStackParamList = {
   MarketplaceHome: undefined
-  // Phase 5에서 추가: MarketplaceDetail 등
+  MarketplaceDetail: { listingId: string }
 }
 
 // Settings stack
 export type SettingsStackParamList = {
   SettingsHome: undefined
-  // Phase 5에서 추가: Profile, Subscription 등
+  AIGenerate: undefined
 }
 
 // Type-safe navigation hook을 위한 선언 병합
