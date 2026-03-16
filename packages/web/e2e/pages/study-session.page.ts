@@ -19,9 +19,8 @@ export class StudySessionPage extends BasePage {
 
   /** Exit (X) button */
   get exitButton(): Locator {
-    // The X button is inside the top bar, in a div with flex items-center gap-2 ml-4
-    // Match button with p-2 class that contains an SVG (lucide X icon)
-    return this.page.locator('button.p-2').filter({ has: this.page.locator('svg') })
+    // The X button: button with p-2 class containing lucide X icon (w-5 h-5)
+    return this.page.locator('button').filter({ has: this.page.locator('svg.w-5.h-5, svg[class*="w-5"]') })
   }
 
   // ─── Unknown/Known Locators ─────────────────────────

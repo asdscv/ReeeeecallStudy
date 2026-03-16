@@ -13,10 +13,10 @@ const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5173'
 
 export default defineConfig({
   testDir: './e2e/tests',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   timeout: 30_000,
   expect: { timeout: 10_000 },
 
@@ -35,21 +35,12 @@ export default defineConfig({
   },
 
   projects: [
-    // Auth setup — runs first, saves session to reuse across all tests
-    {
-      name: 'setup',
-      testMatch: /.*\.setup\.ts/,
-      testDir: './e2e',
-    },
-
-    // Desktop Chrome
+    // Desktop Chrome — each test does fresh login via fixture
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
     },
 
     // Mobile Chrome
@@ -57,9 +48,7 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
     },
   ],
 

@@ -36,17 +36,11 @@ export class QuickStudyPage extends BasePage {
 
   async navigate() {
     await this.goto('/quick-study')
-    // Wait for either deck grid (authenticated) or landing page redirect
-    await this.page.waitForTimeout(1000)
-    // If redirected to landing page, auth state was lost — retry with explicit navigation
-    const url = this.page.url()
-    if (url.includes('/landing') || !url.includes('/quick-study')) {
-      await this.goto('/quick-study')
-      await this.page.waitForTimeout(1000)
-    }
+    await this.page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
     await this.waitForLoadingToDisappear()
-    // Wait for deck grid to appear
-    await this.deckGrid.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {})
+    // Wait for deck grid to be fully interactive
+    await this.deckGrid.locator('button').first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {})
+    await this.page.waitForTimeout(500)
   }
 
   /** Select a deck by its name */
@@ -59,8 +53,15 @@ export class QuickStudyPage extends BasePage {
   /** Select the first available deck */
   async selectFirstDeck() {
     const firstDeck = this.deckGrid.locator('button').first()
-    await firstDeck.click()
-    await expect(this.modal).toBeVisible()
+    await firstDeck.waitFor({ state: 'visible', timeout: 10_000 })
+    // Retry click until modal appears (handles React hydration race)
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await firstDeck.click()
+      const modalVisible = await this.modal.isVisible({ timeout: 2000 }).catch(() => false)
+      if (modalVisible) return
+      await this.page.waitForTimeout(500)
+    }
+    await expect(this.modal).toBeVisible({ timeout: 5000 })
   }
 
   /** Click a study mode option in the modal */

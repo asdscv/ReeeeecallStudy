@@ -8,12 +8,24 @@ import { test, expect } from '../fixtures/test-helpers'
  * 4. TTS stops on session complete
  */
 
-// ── Helper: flip and rate "known" via keyboard (works in both button & swipe mode) ──
-async function keyboardFlipAndKnown(page: any) {
-  await page.keyboard.press('Space')   // flip
-  await page.waitForTimeout(300)
-  await page.keyboard.press('ArrowRight')  // known
-  await page.waitForTimeout(300)
+// ── Helper: flip and rate "known" via UI click. Returns true if session is still active. ──
+async function flipAndRateKnown(page: any): Promise<boolean> {
+  // Click card to flip
+  const card = page.locator('[class*="cursor-pointer"]').first()
+  await card.click()
+  await page.waitForTimeout(800)
+
+  // Click Known/알고 있음 button (or Got It for cramming)
+  const rateBtn = page.getByRole('button', { name: /Known|알고 있음|Got It|알겠어요/i }).first()
+  if (await rateBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await rateBtn.click()
+  } else {
+    // Fallback: try keyboard
+    await page.keyboard.press('ArrowRight')
+  }
+  await page.waitForTimeout(800)
+  // Return whether we're still in the study session
+  return page.url().includes('/study')
 }
 
 // ── Helper: start a study session (random mode, fast) ──────
@@ -95,7 +107,7 @@ test.describe('Progress Bar — Card Count Display', () => {
     }
 
     // Rate the first card
-    await keyboardFlipAndKnown(page)
+    await flipAndRateKnown(page)
     await page.waitForTimeout(500)
 
     // Second card = 2/N
@@ -125,8 +137,15 @@ test.describe('Exit Confirm Dialog', () => {
     }
 
     // Study 1 card first (so cardsStudied > 0)
-    await keyboardFlipAndKnown(page)
+    await flipAndRateKnown(page)
     await page.waitForTimeout(500)
+
+    // Verify we're still in the study session (not redirected after completion)
+    const stillStudying = page.url().includes('/study')
+    if (!stillStudying) {
+      test.skip(true, 'Session completed after rating — not enough cards')
+      return
+    }
 
     // Click X button
     await studySessionPage.exitButton.first().click()
@@ -153,8 +172,8 @@ test.describe('Exit Confirm Dialog', () => {
     }
 
     // Study 1 card
-    await keyboardFlipAndKnown(page)
-    await page.waitForTimeout(500)
+    const stillActive1 = await flipAndRateKnown(page)
+    if (!stillActive1) { test.skip(true, 'Session completed — not enough cards'); return }
 
     // Open exit dialog
     await studySessionPage.exitButton.first().click()
@@ -185,7 +204,7 @@ test.describe('Exit Confirm Dialog', () => {
     }
 
     // Study 1 card
-    await keyboardFlipAndKnown(page)
+    await flipAndRateKnown(page)
     await page.waitForTimeout(500)
 
     // Open exit dialog and confirm
@@ -246,8 +265,8 @@ test.describe('Exit Confirm Dialog', () => {
     }
 
     // Study 1 card
-    await keyboardFlipAndKnown(page)
-    await page.waitForTimeout(500)
+    const stillActive = await flipAndRateKnown(page)
+    if (!stillActive) { test.skip(true, 'Session completed — not enough cards'); return }
 
     // Press Escape
     await page.keyboard.press('Escape')
@@ -375,29 +394,17 @@ test.describe('TTS Settings Page', () => {
     const speedDisplay = page.locator('text=/1.5x/')
     await expect(speedDisplay).toBeVisible()
 
-    // Save settings — should show success toast
-    const saveButton = page.getByRole('button', { name: /Save|저장|保存/i }).last()
-    await saveButton.scrollIntoViewIfNeeded()
-    await saveButton.click()
+    // TTS settings auto-save on change — wait for success toast
     await page.waitForTimeout(1000)
-
-    // Check for success toast/notification
-    const toast = page.locator('text=/saved|저장되었|保存成功/i')
-    const toastVisible = await toast.first().isVisible({ timeout: 3000 }).catch(() => false)
-    console.log(`[tts-settings] Save toast visible: ${toastVisible}`)
+    const toast = page.locator('text=/saved|저장되었|保存成功|Auto-saved|자동 저장/i')
+    const toastVisible = await toast.first().isVisible({ timeout: 5000 }).catch(() => false)
+    console.log(`[tts-settings] Auto-save toast visible: ${toastVisible}`)
 
     // Reset back to defaults
     const webSpeechButton = page.locator('button').filter({
       hasText: /Device Voice|기기 음성|设备语音|デバイス音声/i,
     })
     await webSpeechButton.click()
-    await slider.evaluate((el: HTMLInputElement) => {
-      el.value = '0.9'
-      el.dispatchEvent(new Event('input', { bubbles: true }))
-      el.dispatchEvent(new Event('change', { bubbles: true }))
-    })
-    await saveButton.scrollIntoViewIfNeeded()
-    await saveButton.click()
     await page.waitForTimeout(1000)
   })
 })
@@ -472,7 +479,7 @@ test.describe('TTS During Study', () => {
 
     // Rate all cards to complete session
     for (let i = 0; i < total; i++) {
-      await keyboardFlipAndKnown(page)
+      await flipAndRateKnown(page)
       await page.waitForTimeout(300)
     }
 
@@ -529,8 +536,8 @@ test.describe('Mobile — Study UX', () => {
     }
 
     // Study 1 card
-    await keyboardFlipAndKnown(page)
-    await page.waitForTimeout(500)
+    const mobileActive = await flipAndRateKnown(page)
+    if (!mobileActive) { test.skip(true, 'Session completed — not enough cards'); return }
 
     // Tap X
     await studySessionPage.exitButton.first().click()

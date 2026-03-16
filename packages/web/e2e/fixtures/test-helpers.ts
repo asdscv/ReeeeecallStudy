@@ -4,18 +4,32 @@ import { StudySessionPage } from '../pages/study-session.page'
 import { ExportModalPage } from '../pages/export-modal.page'
 
 /**
- * Extended test fixtures with Page Object Models.
- * All E2E tests should use this `test` instead of importing from @playwright/test.
+ * Extended test fixtures with Page Object Models + fresh login per test.
  *
- * Usage:
- *   import { test, expect } from '../fixtures/test-helpers'
- *   test('my test', async ({ quickStudyPage, studySessionPage, exportModalPage }) => { ... })
+ * Supabase only allows 1 active session per user, so each test must
+ * re-authenticate instead of sharing a stored auth state.
  */
 export const test = base.extend<{
   quickStudyPage: QuickStudyPage
   studySessionPage: StudySessionPage
   exportModalPage: ExportModalPage
 }>({
+  // Fresh login for every test — bypasses single-session limitation
+  page: async ({ page }, use) => {
+    const email = process.env.E2E_TEST_EMAIL
+    const password = process.env.E2E_TEST_PASSWORD
+    if (email && password) {
+      await page.goto('/auth/login')
+      await page.fill('input[type="email"]', email)
+      await page.fill('input[type="password"]', password)
+      await page.getByRole('button', { name: /Log In|로그인|login/i }).click()
+      await page.waitForURL(url => {
+        const path = new URL(url).pathname
+        return !path.includes('/auth') && !path.includes('/landing')
+      }, { timeout: 15_000 }).catch(() => {})
+    }
+    await use(page)
+  },
   quickStudyPage: async ({ page }, use) => {
     await use(new QuickStudyPage(page))
   },
