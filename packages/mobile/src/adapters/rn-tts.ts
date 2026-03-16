@@ -1,17 +1,18 @@
+import * as Speech from 'expo-speech'
 import type { ITTSAdapter } from '@reeeeecall/shared/adapters/tts'
 
-// TODO: Phase 4 — Replace with expo-speech
 export class RNTTS implements ITTSAdapter {
-  async speak(_text: string, _lang: string, _rate?: number): Promise<void> {
-    // Will use expo-speech
-    console.log('[TTS] Not yet implemented for RN')
+  async speak(text: string, lang: string, rate: number = 0.9): Promise<void> {
+    if (!this.isSupported()) return
+    this.stop()
+    Speech.speak(text, { language: lang, rate, pitch: 1.0 })
   }
 
   stop(): void {
-    // Will use Speech.stop()
+    Speech.stop()
   }
 
   isSupported(): boolean {
-    return false // Enable when expo-speech is integrated
+    return true // expo-speech is always available on iOS/Android
   }
 }

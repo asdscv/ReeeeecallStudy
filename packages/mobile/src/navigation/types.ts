@@ -40,8 +40,9 @@ export type DecksStackParamList = {
 
 // Study stack
 export type StudyStackParamList = {
-  StudyHome: undefined
-  // Phase 4에서 추가: StudySession, StudySummary 등
+  StudySetup: { deckId?: string }
+  StudySession: undefined
+  StudySummary: undefined
 }
 
 // Marketplace stack

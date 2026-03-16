@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useTheme } from '../theme'
 import { DashboardScreen } from '../screens/DashboardScreen'
 import { DecksStack } from './DecksStack'
+import { StudyStack } from './StudyStack'
 import type { MainTabParamList } from './types'
 
 const Tab = createBottomTabNavigator<MainTabParamList>()
@@ -20,7 +21,6 @@ function PlaceholderScreen({ name }: { name: string }) {
   )
 }
 
-function StudyTab() { return <PlaceholderScreen name="Study" /> }
 function MarketplaceTab() { return <PlaceholderScreen name="Marketplace" /> }
 function SettingsTab() { return <PlaceholderScreen name="Settings" /> }
 
@@ -42,7 +42,7 @@ export function MainTabs() {
     >
       <Tab.Screen name="HomeTab" component={DashboardScreen} options={{ tabBarLabel: 'Home' }} />
       <Tab.Screen name="DecksTab" component={DecksStack} options={{ tabBarLabel: 'Decks' }} />
-      <Tab.Screen name="StudyTab" component={StudyTab} options={{ tabBarLabel: 'Study' }} />
+      <Tab.Screen name="StudyTab" component={StudyStack} options={{ tabBarLabel: 'Study' }} />
       <Tab.Screen name="MarketplaceTab" component={MarketplaceTab} options={{ tabBarLabel: 'Market' }} />
       <Tab.Screen name="SettingsTab" component={SettingsTab} options={{ tabBarLabel: 'Settings' }} />
     </Tab.Navigator>
