@@ -12,8 +12,8 @@ describe('Monetization Flow', () => {
 
     it('should show upgrade button for free users', async () => {
       const upgradeBtn = $('~settings-upgrade')
-      // Only visible for free users
       if (await upgradeBtn.isExisting()) {
+        await upgradeBtn.scrollIntoView({ direction: 'down' })
         expect(await upgradeBtn.isDisplayed()).toBe(true)
       }
     })

@@ -15,8 +15,8 @@ describe('Phase 5 Features', () => {
     })
 
     it('should show logout button', async () => {
-      // Scroll down to find logout button
-      await SettingsScreen.logoutButton.scrollIntoView()
+      // Scroll down to find logout button (at bottom of settings)
+      await SettingsScreen.logoutButton.scrollIntoView({ direction: 'down' })
       expect(await SettingsScreen.logoutButton.isDisplayed()).toBe(true)
     })
   })

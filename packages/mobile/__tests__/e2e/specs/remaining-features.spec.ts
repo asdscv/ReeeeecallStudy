@@ -57,6 +57,7 @@ describe('Remaining Features', () => {
 
       const toggle = $('~settings-notification-toggle')
       if (await toggle.isExisting()) {
+        await toggle.scrollIntoView({ direction: 'down' })
         expect(await toggle.isDisplayed()).toBe(true)
       }
     })
