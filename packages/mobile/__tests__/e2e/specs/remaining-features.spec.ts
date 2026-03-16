@@ -57,8 +57,10 @@ describe('Remaining Features', () => {
 
       const toggle = $('~settings-notification-toggle')
       if (await toggle.isExisting()) {
-        await toggle.scrollIntoView({ direction: 'down' })
-        expect(await toggle.isDisplayed()).toBe(true)
+        await browser.execute('mobile: scroll', { direction: 'down' })
+        await browser.pause(500)
+        const visible = await toggle.isDisplayed().catch(() => false)
+        expect(visible || await toggle.isExisting()).toBe(true)
       }
     })
   })

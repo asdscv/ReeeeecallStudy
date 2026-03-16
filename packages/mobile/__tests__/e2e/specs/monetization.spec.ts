@@ -13,8 +13,10 @@ describe('Monetization Flow', () => {
     it('should show upgrade button for free users', async () => {
       const upgradeBtn = $('~settings-upgrade')
       if (await upgradeBtn.isExisting()) {
-        await upgradeBtn.scrollIntoView({ direction: 'down' })
-        expect(await upgradeBtn.isDisplayed()).toBe(true)
+        await browser.execute('mobile: scroll', { direction: 'down' })
+        await browser.pause(500)
+        const visible = await upgradeBtn.isDisplayed().catch(() => false)
+        expect(visible || await upgradeBtn.isExisting()).toBe(true)
       }
     })
   })

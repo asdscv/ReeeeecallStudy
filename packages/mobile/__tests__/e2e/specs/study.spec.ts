@@ -8,6 +8,9 @@ describe('Study Flow', () => {
 
   describe('StudySetupScreen', () => {
     it('should display study setup screen', async () => {
+      // Ensure we start from a clean state
+      await navigateToTab('Home')
+      await browser.pause(500)
       await navigateToTab('Study')
       await StudySetupScreen.waitForScreen()
       expect(await StudySetupScreen.isDisplayed()).toBe(true)
