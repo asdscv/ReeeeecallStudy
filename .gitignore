@@ -28,6 +28,9 @@ test-results/
 blob-report/
 .env.test
 
+# Apple private keys
+AuthKey_*.p8
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
