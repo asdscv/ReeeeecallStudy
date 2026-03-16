@@ -1,12 +1,12 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient, type SupabaseClientOptions } from '@supabase/supabase-js'
 
 let _supabase: SupabaseClient | null = null
 
-export function initSupabase(url: string, anonKey: string): SupabaseClient {
+export function initSupabase(url: string, anonKey: string, options?: SupabaseClientOptions<'public'>): SupabaseClient {
   if (!url || !anonKey) {
     throw new Error('Missing Supabase environment variables')
   }
-  _supabase = createClient(url, anonKey)
+  _supabase = createClient(url, anonKey, options)
   return _supabase
 }
 

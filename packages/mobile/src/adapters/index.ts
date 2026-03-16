@@ -1,6 +1,6 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { initAdapters } from '@reeeeecall/shared/adapters'
-import { initSupabase } from '@reeeeecall/shared/lib/supabase'
+import { initSupabase, getSupabase } from '@reeeeecall/shared/lib/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { RNStorage, RNSessionStorage, supabaseSecureStorage } from './rn-storage'
 import { RNCrypto } from './rn-crypto'
 import { RNDevice } from './rn-device'
@@ -10,8 +10,6 @@ import { RNPlatform } from './rn-platform'
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? ''
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? ''
-
-let _supabase: SupabaseClient | null = null
 
 /**
  * Initialize all platform adapters and Supabase client.
@@ -29,26 +27,10 @@ export function initMobilePlatform(): void {
     platform: new RNPlatform(),
   })
 
-  // Initialize shared Supabase client (used by shared stores/hooks)
+  // Initialize shared Supabase client with mobile-compatible auth storage
+  // This single client is used by ALL shared stores (deck-store, card-store, etc.)
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY)
-  }
-}
-
-/**
- * Get the mobile Supabase client (lazy-initialized with SecureStore).
- * RN requires detectSessionInUrl: false and custom async storage.
- */
-export function getMobileSupabase(): SupabaseClient {
-  if (!_supabase) {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error(
-        'Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_ANON_KEY. ' +
-        'Add them to your .env file.',
-      )
-    }
-
-    _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         storage: supabaseSecureStorage,
         autoRefreshToken: true,
@@ -57,5 +39,12 @@ export function getMobileSupabase(): SupabaseClient {
       },
     })
   }
-  return _supabase
+}
+
+/**
+ * Get the mobile Supabase client.
+ * Uses the shared client initialized by initMobilePlatform().
+ */
+export function getMobileSupabase(): SupabaseClient {
+  return getSupabase()
 }
