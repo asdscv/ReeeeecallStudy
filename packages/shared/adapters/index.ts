@@ -1,16 +1,16 @@
-import type { IStorage, ISessionStorage } from './storage.ts'
-import type { ICryptoAdapter } from './crypto.ts'
-import type { IDeviceAdapter } from './device.ts'
-import type { ITTSAdapter } from './tts.ts'
-import type { IAudioAdapter } from './audio.ts'
-import type { IPlatformAdapter } from './platform.ts'
+import type { IStorage, ISessionStorage } from './storage'
+import type { ICryptoAdapter } from './crypto'
+import type { IDeviceAdapter } from './device'
+import type { ITTSAdapter } from './tts'
+import type { IAudioAdapter } from './audio'
+import type { IPlatformAdapter } from './platform'
 
-export type { IStorage, ISessionStorage } from './storage.ts'
-export type { ICryptoAdapter } from './crypto.ts'
-export type { IDeviceAdapter } from './device.ts'
-export type { ITTSAdapter } from './tts.ts'
-export type { IAudioAdapter } from './audio.ts'
-export type { IPlatformAdapter } from './platform.ts'
+export type { IStorage, ISessionStorage } from './storage'
+export type { ICryptoAdapter } from './crypto'
+export type { IDeviceAdapter } from './device'
+export type { ITTSAdapter } from './tts'
+export type { IAudioAdapter } from './audio'
+export type { IPlatformAdapter } from './platform'
 
 interface AdapterConfig {
   storage: IStorage

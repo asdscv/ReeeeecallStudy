@@ -18,11 +18,42 @@ export type AuthStackParamList = {
 
 // Main tabs (로그인 후)
 export type MainTabParamList = {
-  Home: undefined
-  Decks: undefined
-  Study: undefined
-  Marketplace: undefined
-  Settings: undefined
+  HomeTab: undefined
+  DecksTab: undefined
+  StudyTab: undefined
+  MarketplaceTab: undefined
+  SettingsTab: undefined
+}
+
+// Home stack
+export type HomeStackParamList = {
+  Dashboard: undefined
+}
+
+// Decks stack (덱 관련 모든 화면)
+export type DecksStackParamList = {
+  DecksList: undefined
+  DeckDetail: { deckId: string }
+  DeckEdit: { deckId?: string }              // undefined = 새 덱 생성
+  CardEdit: { deckId: string; cardId?: string } // undefined = 새 카드 생성
+}
+
+// Study stack
+export type StudyStackParamList = {
+  StudyHome: undefined
+  // Phase 4에서 추가: StudySession, StudySummary 등
+}
+
+// Marketplace stack
+export type MarketplaceStackParamList = {
+  MarketplaceHome: undefined
+  // Phase 5에서 추가: MarketplaceDetail 등
+}
+
+// Settings stack
+export type SettingsStackParamList = {
+  SettingsHome: undefined
+  // Phase 5에서 추가: Profile, Subscription 등
 }
 
 // Type-safe navigation hook을 위한 선언 병합

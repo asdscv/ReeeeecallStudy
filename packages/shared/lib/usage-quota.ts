@@ -1,5 +1,5 @@
 import type { TierConfig, ResourceType } from './tier-config'
-import { getStorage } from '../adapters/index.ts'
+import { getStorage } from '../adapters'
 
 const DAILY_RESOURCES: ResourceType[] = [
   'api_requests_daily',

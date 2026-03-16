@@ -1,4 +1,4 @@
-import { getDevice } from '../adapters/index.ts'
+import { getDevice } from '../adapters'
 
 export function getDeviceId(): string {
   return getDevice().getDeviceId()
