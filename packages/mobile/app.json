@@ -3,6 +3,7 @@
     "name": "ReeeeecallStudy",
     "slug": "reeeeecall-study",
     "version": "1.0.0",
+    "scheme": "reeeeecall",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
