@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, Divider } from '../components/ui'
-import { useAuth, useAuthState } from '../hooks'
+import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme } from '../theme'
+import type { SettingsStackParamList } from '../navigation/types'
 import { getMobileSupabase } from '../adapters'
 
 const LANGUAGES = [
@@ -23,10 +26,14 @@ interface ProfileData {
   answer_mode: 'button' | 'swipe'
 }
 
+type Nav = NativeStackNavigationProp<SettingsStackParamList, 'SettingsHome'>
+
 export function SettingsScreen() {
   const theme = useTheme()
+  const navigation = useNavigation<Nav>()
   const { user } = useAuthState()
   const { signOut } = useAuth()
+  const { isPro } = usePurchases()
 
   const [profile, setProfile] = useState<ProfileData>({
     display_name: '',
@@ -215,6 +222,27 @@ export function SettingsScreen() {
 
         <Divider />
 
+        {/* Subscription */}
+        <SettingsSection title="Subscription" theme={theme}>
+          <View style={[styles.subCard, { backgroundColor: isPro ? theme.colors.successLight : theme.colors.surface, borderColor: isPro ? theme.colors.success : theme.colors.border }]}>
+            <Text style={[theme.typography.h3, { color: theme.colors.text }]}>
+              {isPro ? '👑 Pro' : 'Free Plan'}
+            </Text>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+              {isPro ? 'All premium features unlocked' : 'Upgrade for unlimited access'}
+            </Text>
+          </View>
+          {!isPro && (
+            <Button
+              testID="settings-upgrade"
+              title="Upgrade to Pro"
+              onPress={() => navigation.navigate('Paywall')}
+            />
+          )}
+        </SettingsSection>
+
+        <Divider />
+
         {/* Account */}
         <SettingsSection title="Account" theme={theme}>
           <Button
@@ -249,4 +277,5 @@ const styles = StyleSheet.create({
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8, borderWidth: 1.5 },
   speedChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1 },
+  subCard: { padding: 16, borderRadius: 12, borderWidth: 1.5, gap: 4 },
 })

@@ -55,6 +55,7 @@ export type MarketplaceStackParamList = {
 export type SettingsStackParamList = {
   SettingsHome: undefined
   AIGenerate: undefined
+  Paywall: undefined
 }
 
 // Type-safe navigation hook을 위한 선언 병합
