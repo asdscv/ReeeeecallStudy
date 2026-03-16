@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react'
+import { Platform } from 'react-native'
 import * as WebBrowser from 'expo-web-browser'
 import * as AuthSession from 'expo-auth-session'
+import * as AppleAuthentication from 'expo-apple-authentication'
 import { getMobileSupabase } from '../adapters'
 import { validatePassword } from '@reeeeecall/shared/lib/password-validation'
 import { localizeAuthError } from '@reeeeecall/shared/lib/auth-errors'
@@ -118,10 +120,58 @@ export function useAuth(): AuthActions {
   }, [])
 
   const signInWithApple = useCallback(async () => {
-    // TODO: Phase 2+ — Apple Sign-In implementation
-    // iOS: expo-apple-authentication (native)
-    // Android: OAuth web flow (same as Google pattern)
-    return { error: 'Apple Sign-In coming soon' }
+    setLoading(true)
+    try {
+      if (Platform.OS === 'ios') {
+        // Native Apple Sign-In on iOS
+        const credential = await AppleAuthentication.signInAsync({
+          requestedScopes: [
+            AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+            AppleAuthentication.AppleAuthenticationScope.EMAIL,
+          ],
+        })
+
+        if (!credential.identityToken) {
+          return { error: 'Apple Sign-In failed: no identity token' }
+        }
+
+        const supabase = getMobileSupabase()
+        const { error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: credential.identityToken,
+        })
+
+        if (error) return { error: localizeAuthError(error.message) }
+        return {}
+      } else {
+        // Android: OAuth web flow (same pattern as Google)
+        const supabase = getMobileSupabase()
+        const redirectTo = AuthSession.makeRedirectUri()
+
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'apple',
+          options: { redirectTo },
+        })
+
+        if (error) return { error: localizeAuthError(error.message) }
+
+        if (data.url) {
+          const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo)
+          if (result.type !== 'success') {
+            return { error: 'Login was cancelled' }
+          }
+        }
+
+        return {}
+      }
+    } catch (e: any) {
+      if (e?.code === 'ERR_REQUEST_CANCELED') {
+        return { error: 'Login was cancelled' }
+      }
+      return { error: 'Apple login failed' }
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   return {

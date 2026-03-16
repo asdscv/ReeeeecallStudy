@@ -48,7 +48,7 @@ export function LoginPage() {
   const [nicknameCheckLoading, setNicknameCheckLoading] = useState(false)
   const [nicknameCheckError, setNicknameCheckError] = useState<string | null>(null)
 
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null)
 
   const signIn = useAuthStore((s) => s.signIn)
   const signUp = useAuthStore((s) => s.signUp)
@@ -57,15 +57,14 @@ export function LoginPage() {
   const checkNicknameAvailability = useAuthStore((s) => s.checkNicknameAvailability)
   const navigate = useNavigate()
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true)
+  const handleOAuthLogin = async (provider: 'google' | 'apple') => {
+    setOauthLoading(provider)
     setError(null)
-    const { error } = await signInWithProvider('google')
+    const { error } = await signInWithProvider(provider)
     if (error) {
       setError(t('oauthError'))
-      setGoogleLoading(false)
+      setOauthLoading(null)
     }
-    // On success, Supabase redirects to Google — no need to setGoogleLoading(false)
   }
 
   const switchMode = (newMode: Mode) => {
@@ -321,21 +320,36 @@ export function LoginPage() {
                 <div className="flex-1 h-px bg-gray-200" />
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={googleLoading}
-                data-testid="google-login-button"
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
-                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.26c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
-                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
-                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
-                </svg>
-                {googleLoading ? t('loggingIn') : t('continueWithGoogle')}
-              </button>
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => handleOAuthLogin('google')}
+                  disabled={oauthLoading !== null}
+                  data-testid="google-login-button"
+                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                >
+                  <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+                    <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.26c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+                    <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+                    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+                  </svg>
+                  {oauthLoading === 'google' ? t('loggingIn') : t('continueWithGoogle')}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleOAuthLogin('apple')}
+                  disabled={oauthLoading !== null}
+                  data-testid="apple-login-button"
+                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                >
+                  <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.71 14.77c-.8.76-1.68.64-2.53.28-.89-.37-1.71-.39-2.65 0-1.18.5-1.8.35-2.51-.28C2.44 11.22 3.03 5.5 6.99 5.29c1.1.06 1.87.62 2.52.67.96-.2 1.88-.76 2.91-.69 1.23.1 2.15.57 2.76 1.48-2.53 1.52-1.93 4.87.54 5.81-.44 1.15-.99 2.28-2.01 3.22ZM9.41 5.24C9.28 3.34 10.84 1.78 12.66 1.62c.26 2.2-1.98 3.84-3.25 3.62Z" fill="white"/>
+                  </svg>
+                  {oauthLoading === 'apple' ? t('loggingIn') : t('continueWithApple')}
+                </button>
+              </div>
             </>
           )}
 

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, Divider, SocialButton } from '../components/ui'
@@ -50,7 +50,7 @@ export function LoginScreen() {
     setError('')
     const result = await signInWithApple()
     if (result.error) {
-      Alert.alert('Coming Soon', 'Apple Sign-In will be available soon.')
+      setError(result.error)
     }
   }
 
