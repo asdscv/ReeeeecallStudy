@@ -20,7 +20,14 @@ describe('Study Flow', () => {
 
   describe('StudySessionScreen', () => {
     it('should start study session after selecting deck and mode', async () => {
-      // Select SRS mode (default)
+      // Select a deck with cards (find first available deck chip)
+      const deckChips = await $$('[name^="study-deck-"]')
+      if (deckChips.length > 0) {
+        // Pick the last one (E2E Test Deck with 5 cards)
+        await deckChips[deckChips.length - 1].click()
+        await browser.pause(500)
+      }
+      // Select SRS mode
       await StudySetupScreen.selectMode('srs')
       await StudySetupScreen.start()
       await StudySessionScreen.waitForScreen()
