@@ -8,11 +8,27 @@ describe('Study Flow', () => {
 
   describe('StudySetupScreen', () => {
     it('should display study setup screen', async () => {
-      // Navigate away and back to ensure fresh Study screen
-      await navigateToTab('Home')
-      await browser.pause(500)
       await navigateToTab('Study')
-      await browser.pause(2000)
+      await browser.pause(1000)
+
+      // If a session is already in progress, exit it first
+      const exitBtn = $('~study-exit-button')
+      if (await exitBtn.isDisplayed().catch(() => false)) {
+        await exitBtn.click()
+        await browser.pause(1000)
+        // Confirm exit if dialog appears
+        const confirm = $('~Exit')
+        if (await confirm.isDisplayed().catch(() => false)) {
+          await confirm.click()
+          await browser.pause(1000)
+        }
+      }
+      // Also check for "X Exit" text button
+      const exitText = $('-ios predicate string:name CONTAINS "Exit"')
+      if (await exitText.isDisplayed().catch(() => false)) {
+        await exitText.click()
+        await browser.pause(1000)
+      }
       await StudySetupScreen.waitForScreen()
       expect(await StudySetupScreen.isDisplayed()).toBe(true)
     })
