@@ -55,11 +55,15 @@ export function AuthCallback() {
           safeNavigate('/dashboard')
         }
       } else if (event === 'INITIAL_SESSION') {
-        if (isRecovery && session) {
-          // Fallback: hash tokens already processed, session exists
-          safeNavigate('/auth/reset-password')
+        if (session) {
+          if (isRecovery) {
+            safeNavigate('/auth/reset-password')
+          } else {
+            // OAuth PKCE flow: session already established via code exchange
+            safeNavigate('/dashboard')
+          }
         }
-        // No session or non-recovery → ignore, wait for SIGNED_IN/PASSWORD_RECOVERY
+        // No session → ignore, wait for SIGNED_IN/PASSWORD_RECOVERY
       }
     })
 
