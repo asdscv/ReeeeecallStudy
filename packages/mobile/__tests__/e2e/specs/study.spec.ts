@@ -8,11 +8,11 @@ describe('Study Flow', () => {
 
   describe('StudySetupScreen', () => {
     it('should display study setup screen', async () => {
-      // Scroll to top first, then navigate
-      try { await browser.execute('mobile: scroll', { direction: 'up' }) } catch {}
+      // Navigate away and back to ensure fresh Study screen
+      await navigateToTab('Home')
       await browser.pause(500)
       await navigateToTab('Study')
-      await browser.pause(1000)
+      await browser.pause(2000)
       await StudySetupScreen.waitForScreen()
       expect(await StudySetupScreen.isDisplayed()).toBe(true)
     })
