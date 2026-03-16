@@ -87,3 +87,4 @@ Phase 7: Release      (1주)   스토어 출시, 심사, 스크린샷
 | 2026-03-16 | RevenueCat for IAP | Apple/Google 결제 통합, receipt validation 자동화 |
 | 2026-03-16 | 웹은 무료 유지, 앱에서만 Pro 결제 | PG사 불필요, 인앱 결제만으로 수익화 |
 | 2026-03-16 | E2E 테스트 Appium 선택 (Detox 대신) | 업계 표준, 실제 디바이스 클라우드 지원, iOS+Android 동일 API |
+| 2026-03-16 | Google 로그인 웹 완료, Apple 로그인 추후 추가 | Apple은 모바일 출시 전 웹+앱 동시 추가 (App Store 심사 4.8 요구사항) |
