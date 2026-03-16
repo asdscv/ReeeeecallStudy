@@ -11,6 +11,9 @@ describe('Phase 5 Features', () => {
     })
 
     it('should show display name input', async () => {
+      // Scroll to top first (previous test may have scrolled down)
+      await browser.execute('mobile: scroll', { direction: 'up' })
+      await browser.pause(300)
       expect(await SettingsScreen.displayName.isDisplayed()).toBe(true)
     })
 
