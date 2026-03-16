@@ -1,7 +1,6 @@
 /**
  * Navigate to a tab by its label text.
- * iOS: class chain into TabBar buttons by index
- * Android: content-description / accessibility label
+ * React Navigation bottom tabs expose accessibility labels like "Settings, tab, 5 of 5"
  */
 
 const TAB_INDEX: Record<string, number> = {
@@ -19,7 +18,7 @@ export async function navigateToTab(tabName: string) {
     return
   }
 
-  // Dismiss keyboard if visible (covers tab bar)
+  // Dismiss keyboard if covering tab bar
   if (driver.isIOS) {
     const keyboard = $('-ios class chain:**/XCUIElementTypeKeyboard')
     if (await keyboard.isDisplayed().catch(() => false)) {
@@ -30,29 +29,29 @@ export async function navigateToTab(tabName: string) {
     try { await driver.hideKeyboard() } catch { /* no keyboard */ }
   }
 
-  if (driver.isIOS) {
-    // iOS: class chain to find Nth tab bar button
-    const iosTab = $(`-ios class chain:**/XCUIElementTypeTabBar/XCUIElementTypeButton[${idx}]`)
-    if (await iosTab.isDisplayed().catch(() => false)) {
-      await iosTab.click()
-      await browser.pause(1500)
-      return
-    }
-  } else {
-    // Android: find by content-description text
-    const labels = [
-      `${tabName}, tab, ${idx} of 5`,   // React Navigation format
-      tabName,                            // plain label
-      `${tabName}Tab`,                   // testID
-    ]
-    for (const label of labels) {
-      const tab = $(`~${label}`)
-      if (await tab.isDisplayed().catch(() => false)) {
-        await tab.click()
-        await browser.pause(1500)
-        return
-      }
-    }
+  // React Navigation tab: "TabName, tab, N of 5"
+  const label = `${tabName}, tab, ${idx} of 5`
+  const tab = $(`~${label}`)
+  if (await tab.isDisplayed().catch(() => false)) {
+    await tab.click()
+    await browser.pause(1000)
+    return
+  }
+
+  // Fallback: testID
+  const testIdTab = $(`~${tabName}Tab`)
+  if (await testIdTab.isDisplayed().catch(() => false)) {
+    await testIdTab.click()
+    await browser.pause(1000)
+    return
+  }
+
+  // Fallback: plain name
+  const plainTab = $(`~${tabName}`)
+  if (await plainTab.isDisplayed().catch(() => false)) {
+    await plainTab.click()
+    await browser.pause(1000)
+    return
   }
 
   console.log(`[nav] WARNING: Tab "${tabName}" not found`)
