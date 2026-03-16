@@ -12,7 +12,6 @@ test.describe('Swipe Mode — Card Gestures', () => {
     page: any,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
-    // Enable swipe mode AFTER navigation (so localStorage is accessible)
     await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await quickStudyPage.selectMode('🎲')
@@ -253,7 +252,7 @@ test.describe('Swipe Mode — Overlay Visibility', () => {
     await studySessionPage.flipCard()
     await page.waitForTimeout(500)
 
-    // Swipe 80px right (well above SWIPE_THRESHOLD of 30px) and HOLD
+    // Swipe 120px right (above SWIPE_THRESHOLD of 100px) and HOLD
     const card = studySessionPage.cardContainer
     const box = await card.boundingBox()
     if (!box) { test.skip(true, 'Card not visible'); return }
@@ -263,14 +262,14 @@ test.describe('Swipe Mode — Overlay Visibility', () => {
 
     await page.mouse.move(cx, cy)
     await page.mouse.down()
-    for (let i = 1; i <= 5; i++) {
-      await page.mouse.move(cx + (80 / 5) * i, cy)
+    for (let i = 1; i <= 10; i++) {
+      await page.mouse.move(cx + (120 / 10) * i, cy)
       await page.waitForTimeout(20)
     }
     // Hold — check overlay IS visible
-    await page.waitForTimeout(100)
+    await page.waitForTimeout(200)
     const overlay = studySessionPage.swipeOverlay
-    await expect(overlay).toBeVisible({ timeout: 1000 })
+    await expect(overlay).toBeVisible({ timeout: 2000 })
 
     await page.mouse.up()
   })

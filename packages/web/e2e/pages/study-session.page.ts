@@ -244,32 +244,18 @@ export class StudySessionPage extends BasePage {
 
   // ─── Swipe Actions ────────────────────────────────────
 
-  /** Enable swipe mode by persisting to DB via Settings page */
+  /** Enable swipe mode by setting localStorage directly (avoids settings page navigation) */
   async enableSwipeMode() {
-    await this.page.goto('/settings')
-    await this.page.waitForTimeout(2000)
-    const swipeCard = this.page.locator('button').filter({ hasText: /Swipe|스와이프|滑动|スワイプ/i })
-    await swipeCard.scrollIntoViewIfNeeded()
-    await swipeCard.click()
-    await this.page.waitForTimeout(500)
-    const saveButton = this.page.getByRole('button', { name: /Save|저장|保存/i }).last()
-    await saveButton.scrollIntoViewIfNeeded()
-    await saveButton.click()
-    await this.page.waitForTimeout(1500)
+    await this.page.evaluate(() => {
+      localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify({ version: 3, mode: 'swipe' }))
+    })
   }
 
-  /** Disable swipe mode (restore button mode) via Settings page */
+  /** Disable swipe mode (restore button mode) by setting localStorage directly */
   async disableSwipeMode() {
-    await this.page.goto('/settings')
-    await this.page.waitForTimeout(2000)
-    const buttonCard = this.page.locator('button').filter({ hasText: /Button|버튼|按钮|ボタン/i })
-    await buttonCard.scrollIntoViewIfNeeded()
-    await buttonCard.click()
-    await this.page.waitForTimeout(500)
-    const saveButton = this.page.getByRole('button', { name: /Save|저장|保存/i }).last()
-    await saveButton.scrollIntoViewIfNeeded()
-    await saveButton.click()
-    await this.page.waitForTimeout(1500)
+    await this.page.evaluate(() => {
+      localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify({ version: 3, mode: 'button' }))
+    })
   }
 
   /** The main card container for swipe interactions */

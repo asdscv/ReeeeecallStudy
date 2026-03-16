@@ -17,8 +17,8 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     studySessionPage,
     page,
   }) => {
-    await studySessionPage.enableSwipeMode()
     await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 
     // Select SRS mode — auto-starts immediately (no Start button needed)
@@ -49,8 +49,8 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     studySessionPage,
     page,
   }) => {
-    await studySessionPage.enableSwipeMode()
     await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 
     // Select Random mode by text
@@ -81,8 +81,8 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     studySessionPage,
     page,
   }) => {
-    await studySessionPage.enableSwipeMode()
     await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
 
     // Select Sequential Review mode by text
@@ -109,8 +109,8 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     studySessionPage,
     page,
   }) => {
-    await studySessionPage.enableSwipeMode()
     await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
@@ -145,8 +145,8 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     studySessionPage,
     page,
   }) => {
-    await studySessionPage.enableSwipeMode()
     await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
@@ -215,14 +215,9 @@ test.describe('Settings Page — Swipe Direction UI', () => {
     await page.goto('/settings')
     await page.waitForTimeout(1500)
 
-    // Switch to swipe mode
+    // Switch to swipe mode (auto-saves on click)
     const swipeCard = page.locator('button').filter({ hasText: /Swipe|스와이프|滑动|スワイプ/i })
     await swipeCard.click()
-    await page.waitForTimeout(300)
-
-    // Save settings
-    const saveButton = page.getByRole('button', { name: /Save|저장|保存/i }).last()
-    await saveButton.click()
     await page.waitForTimeout(1500)
 
     // Reload page
@@ -233,11 +228,9 @@ test.describe('Settings Page — Swipe Direction UI', () => {
     const swipeSelected = page.locator('.border-blue-500').filter({ hasText: /Swipe|스와이프|滑动|スワイプ/i })
     await expect(swipeSelected).toBeVisible({ timeout: 5000 })
 
-    // Clean up: switch back to button mode
+    // Clean up: switch back to button mode (auto-saves on click)
     const buttonCard = page.locator('button').filter({ hasText: /Button|버튼|按钮|ボタン/i })
     await buttonCard.click()
-    await page.waitForTimeout(300)
-    await saveButton.click()
     await page.waitForTimeout(1000)
   })
 })
@@ -249,8 +242,8 @@ test.describe('SwipeGuide — Correct Arrow Positions', () => {
     studySessionPage,
     page,
   }) => {
-    await studySessionPage.enableSwipeMode()
     await quickStudyPage.navigate()
+    await studySessionPage.enableSwipeMode()
     await quickStudyPage.selectFirstDeck()
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
