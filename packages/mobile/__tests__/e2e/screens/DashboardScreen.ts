@@ -7,11 +7,16 @@ class DashboardScreenPO {
   get logoutButton() { return $('~dashboard-logout') }
 
   async waitForScreen() {
-    await this.screen.waitForDisplayed({ timeout: 15000 })
+    try {
+      await this.screen.waitForDisplayed({ timeout: 5000 })
+    } catch {
+      await this.statDue.waitForDisplayed({ timeout: 10000 })
+    }
   }
 
   async isDisplayed(): Promise<boolean> {
-    return this.screen.isDisplayed()
+    return (await this.screen.isDisplayed().catch(() => false)) ||
+           (await this.statDue.isDisplayed().catch(() => false))
   }
 
   async tapLogout() {

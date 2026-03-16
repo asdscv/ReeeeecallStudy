@@ -2,36 +2,37 @@
  * Navigate to a tab by its label text.
  * React Navigation bottom tabs use labels like "Home, tab, 1 of 5"
  */
+
+const TAB_INDEX: Record<string, number> = {
+  Home: 1,
+  Decks: 2,
+  Study: 3,
+  Market: 4,
+  Settings: 5,
+}
+
 export async function navigateToTab(tabName: string) {
-  // Try testID first
-  const testIdTab = $(`~${tabName}Tab`)
-  if (await testIdTab.isDisplayed().catch(() => false)) {
-    await testIdTab.click()
-    await browser.pause(1000)
+  const idx = TAB_INDEX[tabName]
+  if (!idx) {
+    console.log(`[nav] Unknown tab: ${tabName}`)
     return
   }
 
-  // iOS: match "TabName, tab, N of 5" pattern exactly
-  const iosTab = $(`-ios predicate string:name CONTAINS ", tab," AND name BEGINSWITH "${tabName}"`)
+  // iOS: Use class chain to find the Nth button in the tab bar
+  const iosSelector = `**/XCUIElementTypeTabBar/XCUIElementTypeButton[${idx}]`
+  const iosTab = $(`-ios class chain:${iosSelector}`)
   if (await iosTab.isDisplayed().catch(() => false)) {
     await iosTab.click()
-    await browser.pause(1000)
+    await browser.pause(1500)
     return
   }
 
-  // Android: content-desc contains tab name
-  const androidTab = $(`~${tabName}, tab`)
+  // Android: accessibility label
+  const label = `${tabName}, tab, ${idx} of 5`
+  const androidTab = $(`~${label}`)
   if (await androidTab.isDisplayed().catch(() => false)) {
     await androidTab.click()
-    await browser.pause(1000)
-    return
-  }
-
-  // Last resort: find by exact accessibility label
-  const labelTab = $(`~${tabName}`)
-  if (await labelTab.isDisplayed().catch(() => false)) {
-    await labelTab.click()
-    await browser.pause(1000)
+    await browser.pause(1500)
     return
   }
 

@@ -7,8 +7,17 @@ class StudySessionScreenPO {
   get rateGood() { return $('~study-rate-good') }
   get rateEasy() { return $('~study-rate-easy') }
 
-  async waitForScreen() { await this.screen.waitForDisplayed({ timeout: 15000 }) }
-  async isDisplayed() { return this.screen.isDisplayed() }
+  async waitForScreen() {
+    try {
+      await this.screen.waitForDisplayed({ timeout: 5000 })
+    } catch {
+      await this.cardTap.waitForDisplayed({ timeout: 10000 })
+    }
+  }
+  async isDisplayed() {
+    return (await this.screen.isDisplayed().catch(() => false)) ||
+           (await this.cardTap.isDisplayed().catch(() => false))
+  }
 
   async flipCard() { await this.cardTap.click() }
 

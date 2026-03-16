@@ -2,8 +2,17 @@ class StudySetupScreenPO {
   get screen() { return $('~study-setup-screen') }
   get startButton() { return $('~study-start-button') }
 
-  async waitForScreen() { await this.screen.waitForDisplayed({ timeout: 10000 }) }
-  async isDisplayed() { return this.screen.isDisplayed() }
+  async waitForScreen() {
+    try {
+      await this.screen.waitForDisplayed({ timeout: 5000 })
+    } catch {
+      await this.startButton.waitForDisplayed({ timeout: 10000 })
+    }
+  }
+  async isDisplayed() {
+    return (await this.screen.isDisplayed().catch(() => false)) ||
+           (await this.startButton.isDisplayed().catch(() => false))
+  }
 
   async selectDeck(deckId: string) {
     const deckChip = $(`~study-deck-${deckId}`)
