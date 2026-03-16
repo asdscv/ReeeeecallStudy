@@ -34,6 +34,10 @@ async function isMainScreenVisible(): Promise<string | null> {
 export async function loginIfNeeded() {
   await browser.pause(3000)
 
+  // Scroll to top in case previous spec left the page scrolled down
+  try { await browser.execute('mobile: scroll', { direction: 'up' }) } catch { /* ignore */ }
+  await browser.pause(300)
+
   const foundTab = await isMainScreenVisible()
   if (foundTab) {
     console.log(`[auth] Already logged in (found ${foundTab})`)
