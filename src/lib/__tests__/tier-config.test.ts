@@ -19,8 +19,8 @@ describe('tier-config', () => {
       const free = TIER_CONFIGS.free
       expect(free.quotas.api_requests_daily).toBe(1_000)
       expect(free.quotas.storage_bytes).toBe(500 * 1024 * 1024) // 500MB
-      expect(free.quotas.cards_total).toBe(5_000)
-      expect(free.quotas.decks_total).toBe(50)
+      expect(free.quotas.cards_total).toBe(3_000)
+      expect(free.quotas.decks_total).toBe(5)
       expect(free.quotas.templates_total).toBe(20)
       expect(free.quotas.study_sessions_daily).toBe(100)
       expect(free.quotas.file_uploads_daily).toBe(50)
@@ -71,8 +71,8 @@ describe('tier-config', () => {
 
   describe('getQuotaLimit', () => {
     it('should return the quota limit for a resource', () => {
-      expect(getQuotaLimit('free', 'cards_total')).toBe(5_000)
-      expect(getQuotaLimit('free', 'decks_total')).toBe(50)
+      expect(getQuotaLimit('free', 'cards_total')).toBe(3_000)
+      expect(getQuotaLimit('free', 'decks_total')).toBe(5)
     })
 
     it('should return different limits per tier', () => {

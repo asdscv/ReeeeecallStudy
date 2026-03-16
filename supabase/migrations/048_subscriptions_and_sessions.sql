@@ -116,6 +116,16 @@ BEGIN
     RETURN jsonb_build_object('allowed', false, 'reason', 'not_authenticated');
   END IF;
 
+  -- Admin & official accounts bypass session limits
+  IF EXISTS (SELECT 1 FROM profiles WHERE id = v_user_id AND (role = 'admin' OR is_official = true)) THEN
+    INSERT INTO user_sessions (user_id, device_id, device_name, last_seen_at)
+    VALUES (v_user_id, p_device_id, p_device_name, now())
+    ON CONFLICT (user_id, device_id)
+    DO UPDATE SET last_seen_at = now(), device_name = COALESCE(EXCLUDED.device_name, user_sessions.device_name);
+
+    RETURN jsonb_build_object('allowed', true, 'tier', 'admin', 'max_sessions', 999, 'active_sessions', 1);
+  END IF;
+
   -- Get user tier
   SELECT tier INTO v_tier
   FROM subscriptions

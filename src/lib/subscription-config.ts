@@ -2,11 +2,11 @@
 // Subscription Plan Configuration
 // ============================================================
 // Single source of truth for plan features & limits.
-// To add a new plan: add to PlanName union + PLANS record.
-// To add a new feature: add to PlanFeatures interface + each plan.
+// Quota values (maxDecks, maxCards) are derived from tier-config
+// to avoid duplication.
 // ============================================================
 
-import type { TierName } from './tier-config'
+import { type TierName, TIER_CONFIGS } from './tier-config'
 
 export type PlanName = TierName  // 'free' | 'pro' | 'enterprise'
 
@@ -25,34 +25,30 @@ export interface PlanInfo {
   features: PlanFeatures
 }
 
+// Session limits per plan (only source — DB mirrors these in register_session RPC)
+const SESSION_LIMITS: Record<PlanName, number> = {
+  free: 1,
+  pro: 3,
+  enterprise: 5,
+}
+
+function buildPlanInfo(name: PlanName, label: string): PlanInfo {
+  const quotas = TIER_CONFIGS[name].quotas
+  return {
+    name,
+    label,
+    features: {
+      maxSessions: SESSION_LIMITS[name],
+      maxDecks: quotas.decks_total,
+      maxCards: quotas.cards_total,
+    },
+  }
+}
+
 export const PLANS: Record<PlanName, PlanInfo> = {
-  free: {
-    name: 'free',
-    label: 'Free',
-    features: {
-      maxSessions: 1,
-      maxDecks: 5,
-      maxCards: 3_000,
-    },
-  },
-  pro: {
-    name: 'pro',
-    label: 'Pro',
-    features: {
-      maxSessions: 3,
-      maxDecks: 500,
-      maxCards: 50_000,
-    },
-  },
-  enterprise: {
-    name: 'enterprise',
-    label: 'Enterprise',
-    features: {
-      maxSessions: 5,
-      maxDecks: 5_000,
-      maxCards: 500_000,
-    },
-  },
+  free: buildPlanInfo('free', 'Free'),
+  pro: buildPlanInfo('pro', 'Pro'),
+  enterprise: buildPlanInfo('enterprise', 'Enterprise'),
 }
 
 export function getPlanFeatures(plan: PlanName): PlanFeatures {

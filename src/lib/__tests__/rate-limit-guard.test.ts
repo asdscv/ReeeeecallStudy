@@ -45,7 +45,7 @@ describe('rate-limit-guard', () => {
 
     it('should deny when quota exceeded', () => {
       const { guard, usageQuota } = makeGuard()
-      usageQuota.setUsage('decks_total', 50) // free limit
+      usageQuota.setUsage('decks_total', 5) // free limit
 
       const result = guard.check('deck_create', 'decks_total')
       expect(result.allowed).toBe(false)
@@ -55,7 +55,7 @@ describe('rate-limit-guard', () => {
 
     it('should check rate limit before quota (cheaper check first)', () => {
       const { guard, usageQuota } = makeGuard({ maxRequests: 1 })
-      usageQuota.setUsage('decks_total', 50) // also at quota limit
+      usageQuota.setUsage('decks_total', 5) // also at quota limit
 
       // Use up rate limit
       guard.check('deck_create', 'decks_total')
@@ -74,7 +74,7 @@ describe('rate-limit-guard', () => {
 
     it('should pass quotaAmount to quota check', () => {
       const { guard, usageQuota } = makeGuard()
-      usageQuota.setUsage('cards_total', 4_999)
+      usageQuota.setUsage('cards_total', 2_999)
 
       // 1 more should be fine
       expect(guard.check('card_create', 'cards_total', 1).allowed).toBe(true)

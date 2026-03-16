@@ -15,22 +15,22 @@ describe('usage-quota', () => {
       const result = quota.checkQuota('cards_total')
       expect(result.allowed).toBe(true)
       expect(result.current).toBe(0)
-      expect(result.limit).toBe(5_000)
+      expect(result.limit).toBe(3_000)
     })
 
     it('should deny when at limit', () => {
       const quota = createUsageQuota(getTierConfig('free'), store)
-      quota.setUsage('decks_total', 50) // free limit
+      quota.setUsage('decks_total', 5) // free limit
       const result = quota.checkQuota('decks_total')
       expect(result.allowed).toBe(false)
-      expect(result.current).toBe(50)
-      expect(result.limit).toBe(50)
+      expect(result.current).toBe(5)
+      expect(result.limit).toBe(5)
       expect(result.message).toBeDefined()
     })
 
     it('should check incrementBy parameter', () => {
       const quota = createUsageQuota(getTierConfig('free'), store)
-      quota.setUsage('cards_total', 4_999)
+      quota.setUsage('cards_total', 2_999)
       // 1 more should be fine
       expect(quota.checkQuota('cards_total', 1).allowed).toBe(true)
       // 2 more would exceed
