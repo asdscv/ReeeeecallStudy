@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native'
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
+import { useNavigation, useRoute, useFocusEffect, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
@@ -34,8 +34,11 @@ export function StudySetupScreen() {
   const route = useRoute<Route>()
   const preselectedDeckId = route.params?.deckId
 
-  const { decks, stats } = useDecks()
+  const { decks, stats, refresh } = useDecks()
   const { startSession, phase } = useStudy()
+
+  // Re-fetch deck list when screen comes into focus (tab switch, back navigation)
+  useFocusEffect(useCallback(() => { refresh() }, [refresh]))
 
   const [selectedDeckId, setSelectedDeckId] = useState(preselectedDeckId ?? '')
   const [selectedMode, setSelectedMode] = useState<StudyMode>('srs')

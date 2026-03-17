@@ -144,8 +144,15 @@ export function StudySessionScreen() {
     ])
   }
 
+  // Tap gesture — handles flip (GestureDetector blocks TouchableOpacity taps)
+  const tapGesture = Gesture.Tap()
+    .enabled(!isRating)
+    .onEnd(() => {
+      runOnJS(handleFlip)()
+    })
+
   // Swipe gesture
-  const gesture = Gesture.Pan()
+  const panGesture = Gesture.Pan()
     .enabled(!isRating)
     .onUpdate((e) => {
       translateX.value = e.translationX
@@ -201,8 +208,8 @@ export function StudySessionScreen() {
         </View>
 
         {/* Card area */}
-        <View style={styles.cardArea}>
-          <GestureDetector gesture={gesture}>
+        <View style={styles.cardArea} testID="study-card-area">
+          <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
             <Animated.View style={[styles.cardContainer, cardAnimStyle]}>
               {/* Swipe hint overlay */}
               <Animated.View style={[styles.swipeHint, hintStyle]} />
