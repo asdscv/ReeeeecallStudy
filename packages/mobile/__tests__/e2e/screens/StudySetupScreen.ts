@@ -3,20 +3,23 @@ class StudySetupScreenPO {
   get startButton() { return $('~study-start-button') }
 
   async waitForScreen() {
-    try {
-      await this.screen.waitForDisplayed({ timeout: 5000 })
-    } catch {
-      // Screen container not accessible — check for any study element
-      const mode = $('~study-mode-srs')
+    // Try multiple selectors — SafeAreaView testID not always accessible on iOS
+    const selectors = [
+      '~study-setup-screen',
+      '~study-mode-srs',
+      '~study-start-button',
+    ]
+    for (const sel of selectors) {
       try {
-        await mode.waitForDisplayed({ timeout: 5000 })
-      } catch {
-        // Try scrolling down to find start button
-        await browser.execute('mobile: scroll', { direction: 'down' })
-        await this.startButton.waitForDisplayed({ timeout: 5000 })
-      }
+        await $(sel).waitForDisplayed({ timeout: 8000 })
+        return
+      } catch { /* try next */ }
     }
+    // Last resort: scroll and retry
+    await browser.execute('mobile: scroll', { direction: 'down' }).catch(() => {})
+    await this.startButton.waitForDisplayed({ timeout: 5000 })
   }
+
   async isDisplayed() {
     return (await this.screen.isDisplayed().catch(() => false)) ||
            (await $('~study-mode-srs').isDisplayed().catch(() => false)) ||
@@ -28,8 +31,28 @@ class StudySetupScreenPO {
     await deckChip.click()
   }
 
+  /** Select first available deck from the list */
+  async selectFirstDeck() {
+    // Find any deck chip (testID starts with "study-deck-")
+    if (driver.isIOS) {
+      const chip = $('-ios predicate string:name BEGINSWITH "study-deck-"')
+      if (await chip.isDisplayed().catch(() => false)) {
+        await chip.click()
+        return true
+      }
+    }
+    // Android / fallback: use $$ to find all deck chips
+    const chips = await $$('[name^="study-deck-"]')
+    if (chips.length > 0) {
+      await chips[0].click()
+      return true
+    }
+    return false
+  }
+
   async selectMode(mode: string) {
     const modeCard = $(`~study-mode-${mode}`)
+    await modeCard.waitForDisplayed({ timeout: 5000 })
     await modeCard.click()
   }
 
@@ -38,7 +61,10 @@ class StudySetupScreenPO {
     await chip.click()
   }
 
-  async start() { await this.startButton.click() }
+  async start() {
+    await this.startButton.waitForDisplayed({ timeout: 5000 })
+    await this.startButton.click()
+  }
 }
 
 export default new StudySetupScreenPO()

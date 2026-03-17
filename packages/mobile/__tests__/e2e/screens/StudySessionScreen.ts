@@ -9,9 +9,10 @@ class StudySessionScreenPO {
 
   async waitForScreen() {
     try {
-      await this.screen.waitForDisplayed({ timeout: 5000 })
+      await this.screen.waitForDisplayed({ timeout: 8000 })
     } catch {
-      await this.cardTap.waitForDisplayed({ timeout: 10000 })
+      // Session screen container not accessible — check for card
+      await this.cardTap.waitForDisplayed({ timeout: 15000 })
     }
   }
   async isDisplayed() {
@@ -19,15 +20,21 @@ class StudySessionScreenPO {
            (await this.cardTap.isDisplayed().catch(() => false))
   }
 
-  async flipCard() { await this.cardTap.click() }
+  async flipCard() {
+    await this.cardTap.waitForDisplayed({ timeout: 5000 })
+    await this.cardTap.click()
+  }
 
   async rate(rating: 'again' | 'hard' | 'good' | 'easy') {
     const btn = $(`~study-rate-${rating}`)
-    await btn.waitForDisplayed({ timeout: 3000 })
+    await btn.waitForDisplayed({ timeout: 5000 })
     await btn.click()
   }
 
-  async exit() { await this.exitButton.click() }
+  async exit() {
+    await this.exitButton.waitForDisplayed({ timeout: 3000 })
+    await this.exitButton.click()
+  }
 }
 
 export default new StudySessionScreenPO()

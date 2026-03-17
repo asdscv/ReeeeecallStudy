@@ -4,24 +4,33 @@ import LoginScreen from '../screens/LoginScreen'
  * Check if any bottom tab is visible (i.e. we're on the main screen).
  */
 async function isMainScreenVisible(): Promise<string | null> {
-  const tabNames = ['Home', 'Decks', 'Study', 'Market', 'Settings']
-
-  for (const name of tabNames) {
-    // Try testID
-    if (await $(`~${name}Tab`).isDisplayed().catch(() => false)) {
-      return name
-    }
-    // Try accessibility label (React Navigation format)
-    if (await $(`~${name}`).isDisplayed().catch(() => false)) {
-      return name
-    }
-  }
-
-  // iOS: check tab bar exists
+  // Most reliable: check if the tab bar itself exists
   if (driver.isIOS) {
     const tabBar = $('-ios class chain:**/XCUIElementTypeTabBar')
     if (await tabBar.isDisplayed().catch(() => false)) {
       return 'TabBar'
+    }
+    // Tab bar might be hidden behind debugger banner — check for tab buttons
+    const tabButtons = await $$('-ios class chain:**/XCUIElementTypeTabBar/XCUIElementTypeButton')
+    if (tabButtons.length >= 3) {
+      return 'TabBar'
+    }
+  }
+
+  // Try tabBarTestID selectors
+  const testIDs = ['HomeTab', 'DecksTab', 'StudyTab', 'MarketplaceTab', 'SettingsTab']
+  for (const tid of testIDs) {
+    if (await $(`~${tid}`).isDisplayed().catch(() => false)) {
+      return tid.replace('Tab', '')
+    }
+  }
+
+  // Try React Navigation labels
+  const labels = ['Home', 'Decks', 'Study', 'Market', 'Settings']
+  for (let i = 0; i < labels.length; i++) {
+    const label = `${labels[i]}, tab, ${i + 1} of 5`
+    if (await $(`~${label}`).isDisplayed().catch(() => false)) {
+      return labels[i]
     }
   }
 
