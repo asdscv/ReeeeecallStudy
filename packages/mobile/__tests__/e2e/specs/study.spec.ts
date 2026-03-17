@@ -242,29 +242,46 @@ describe('Study Flow — Full E2E', () => {
     })
 
     it('second SRS session should show "no cards due"', async () => {
-      // Navigate to Study tab and start another SRS session with the same deck
+      // Ensure we're on StudySetup with deck list visible
       await navigateToTab('Study')
       await browser.pause(1000)
+      await browser.execute('mobile: scroll', { direction: 'up' }).catch(() => {})
+      await browser.pause(500)
+
+      // Wait for deck list to refresh (useFocusEffect)
+      await browser.pause(2000)
 
       // Select our test deck again
       const chip = $(`~study-deck-${testDeckId}`)
-      if (await chip.isExisting().catch(() => false)) {
-        await chip.click()
-        await browser.pause(500)
-      }
+      await chip.waitForExist({ timeout: 5000 })
+      await chip.click()
+      await browser.pause(500)
 
-      // Select SRS mode and start
+      // Select SRS mode
+      const srsMode = $('~study-mode-srs')
+      if (!await srsMode.isDisplayed().catch(() => false)) {
+        await browser.execute('mobile: scroll', { direction: 'down' }).catch(() => {})
+        await browser.pause(300)
+      }
       await StudySetupScreen.selectMode('srs')
       await browser.pause(300)
+
+      // Scroll to Start button and press it
       await browser.execute('mobile: scroll', { direction: 'down' }).catch(() => {})
       await browser.pause(300)
       await StudySetupScreen.start()
 
-      // Should immediately go to summary (0 cards due) — no card should appear
+      // 0 cards due → session completes immediately → should go to summary
       let wentToSummary = false
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         if (await StudySummaryScreen.screen.isExisting().catch(() => false)) { wentToSummary = true; break }
         if (await $('~summary-done').isExisting().catch(() => false)) { wentToSummary = true; break }
+        // Also check for "Loading..." on StudySession (means session is processing)
+        if (await $('~study-exit-button').isExisting().catch(() => false)) {
+          // On session screen — wait for it to redirect to summary
+          await browser.pause(1000)
+          continue
+        }
         await browser.pause(1000)
       }
       expect(wentToSummary).toBe(true)
