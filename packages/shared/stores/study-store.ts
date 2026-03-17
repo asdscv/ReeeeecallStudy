@@ -86,10 +86,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   maxCardPosition: 0,
 
   initSession: async (config: StudyConfig) => {
+    // Prevent double-init (React StrictMode / effect re-runs)
+    if (get().phase === 'loading') return
+
     const check = guard.check('study_session_start', 'study_sessions_daily')
     if (!check.allowed) { set({ phase: 'idle' }); return }
 
     set({ phase: 'loading', config })
+
+    try {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { set({ phase: 'idle' }); return }
@@ -430,6 +435,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       sessionStartedAt: Date.now(),
       sessionStats: { ...initialStats, totalCards: cards.length },
     })
+
+    } catch (err) {
+      console.error('[study-store] initSession failed:', err)
+      set({ phase: 'completed', queue: [], sessionStats: { ...initialStats, totalCards: 0 } })
+    }
   },
 
   flipCard: () => {

@@ -92,15 +92,15 @@ export const TIER_CONFIGS: Record<TierName, TierConfig> = {
 }
 
 export function getTierConfig(tier: TierName): TierConfig {
-  return TIER_CONFIGS[tier]
+  return TIER_CONFIGS[tier] ?? TIER_CONFIGS.free
 }
 
 export function getQuotaLimit(tier: TierName, resource: ResourceType): number {
-  return TIER_CONFIGS[tier].quotas[resource]
+  return (TIER_CONFIGS[tier] ?? TIER_CONFIGS.free).quotas[resource]
 }
 
 export function getRateLimit(tier: TierName, operation: OperationType): RateLimitConfig {
-  return TIER_CONFIGS[tier].rates[operation]
+  return (TIER_CONFIGS[tier] ?? TIER_CONFIGS.free).rates[operation]
 }
 
 // Module-level tier override — set by subscription store on login.
@@ -108,7 +108,7 @@ export function getRateLimit(tier: TierName, operation: OperationType): RateLimi
 let _currentTier: TierName = 'free'
 
 export function setCurrentTier(tier: TierName): void {
-  _currentTier = tier
+  _currentTier = TIER_CONFIGS[tier] ? tier : 'free'
 }
 
 export function getCurrentTier(): TierName {
