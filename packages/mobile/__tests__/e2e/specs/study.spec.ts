@@ -6,36 +6,47 @@ import { navigateToTab } from '../helpers/navigation'
 describe('Study Flow', () => {
   describe('StudySetupScreen', () => {
     it('should display study setup screen', async () => {
-      // Navigate away then to Study tab to attempt stack reset
-      await navigateToTab('Home')
-      await browser.pause(500)
+      // Navigate to Study tab
       await navigateToTab('Study')
       await browser.pause(2000)
 
-      // If a session is already in progress, exit it first
-      const exitBtn = $('~study-exit-button')
-      if (await exitBtn.isDisplayed().catch(() => false)) {
-        await exitBtn.click()
-        await browser.pause(1000)
-        // Try multiple confirm button selectors
-        for (const sel of ['~End', '-ios predicate string:name CONTAINS "End"', '-ios predicate string:name CONTAINS "Exit"']) {
-          const btn = $(sel)
-          if (await btn.isDisplayed().catch(() => false)) {
-            await btn.click()
-            await browser.pause(1000)
-            break
-          }
-        }
-      }
-      // Check for summary screen
-      const doneBtn = $('~summary-done')
-      if (await doneBtn.isDisplayed().catch(() => false)) {
-        await doneBtn.click()
-        await browser.pause(1000)
-      }
+      // Debug: what's on screen?
+      await browser.saveScreenshot('./e2e-debug-study-entry.png')
+      const src = await browser.getPageSource()
+      const testIds = src.match(/name="[^"]*study[^"]*"/gi) || []
+      console.log(`[study-debug] study testIDs found: ${testIds.slice(0, 10).join(', ')}`)
 
-      // If still not on setup, navigate away and back again
-      if (!await StudySetupScreen.isDisplayed()) {
+      // Handle stale states: StudySession or StudySummary may be on top of stack
+      // Try up to 3 rounds to get back to StudySetup
+      for (let round = 0; round < 3; round++) {
+        if (await StudySetupScreen.isDisplayed()) break
+
+        // Check for summary "Done" button
+        const doneBtn = $('~summary-done')
+        if (await doneBtn.isDisplayed().catch(() => false)) {
+          await doneBtn.click()
+          await browser.pause(1000)
+          continue
+        }
+
+        // Check for session exit button
+        const exitBtn = $('~study-exit-button')
+        if (await exitBtn.isDisplayed().catch(() => false)) {
+          await exitBtn.click()
+          await browser.pause(500)
+          // Confirm exit dialog
+          for (const sel of ['-ios predicate string:name CONTAINS "End"', '-ios predicate string:name CONTAINS "Exit"', '~End']) {
+            const btn = $(sel)
+            if (await btn.isDisplayed().catch(() => false)) {
+              await btn.click()
+              await browser.pause(1000)
+              break
+            }
+          }
+          continue
+        }
+
+        // Neither found — try navigating away and back
         await navigateToTab('Home')
         await browser.pause(500)
         await navigateToTab('Study')
@@ -88,11 +99,17 @@ describe('Study Flow', () => {
       await browser.pause(300)
       await StudySetupScreen.start()
 
-      // Wait for either session card or summary (cards may be 0 due → immediate completion)
-      const cardAppeared = await StudySessionScreen.cardTap.waitForDisplayed({ timeout: 10000 }).then(() => true).catch(() => false)
-      const summaryAppeared = await StudySummaryScreen.screen.isExisting().catch(() => false)
-      expect(cardAppeared || summaryAppeared).toBe(true)
-      if (!cardAppeared) console.log('[study] Session completed immediately — no due cards')
+      // Wait for either: study card, summary screen, or "no cards" / loading text
+      // Session may complete instantly if deck has 0 eligible cards
+      let sessionReady = false
+      for (let attempt = 0; attempt < 15; attempt++) {
+        if (await StudySessionScreen.cardTap.isDisplayed().catch(() => false)) { sessionReady = true; break }
+        if (await StudySummaryScreen.screen.isExisting().catch(() => false)) { sessionReady = true; break }
+        if (await $('~study-summary-screen').isExisting().catch(() => false)) { sessionReady = true; break }
+        if (await $('~summary-done').isExisting().catch(() => false)) { sessionReady = true; break }
+        await browser.pause(1000)
+      }
+      expect(sessionReady).toBe(true)
     })
 
     it('should show card content', async () => {

@@ -64,6 +64,39 @@ export function StudySessionScreen() {
     rotateY.value = withTiming(isFlipped ? 180 : 0, { duration: 300 })
   }, [isFlipped])
 
+  // ── Animated styles (must be BEFORE early return — React hooks rule) ──
+  const cardAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: cardScale.value },
+    ],
+  }))
+
+  const frontAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ perspective: 1000 }, { rotateY: `${rotateY.value}deg` }],
+    backfaceVisibility: 'hidden' as const,
+    opacity: interpolate(rotateY.value, [0, 90, 180], [1, 0, 0]),
+  }))
+
+  const backAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ perspective: 1000 }, { rotateY: `${rotateY.value - 180}deg` }],
+    backfaceVisibility: 'hidden' as const,
+    opacity: interpolate(rotateY.value, [0, 90, 180], [0, 0, 1]),
+  }))
+
+  const hintStyle = useAnimatedStyle(() => {
+    const absX = Math.abs(translateX.value)
+    const absY = Math.abs(translateY.value)
+    const opacity = interpolate(Math.max(absX, absY), [0, SWIPE_THRESHOLD], [0, 0.8], Extrapolation.CLAMP)
+    let color = 'transparent'
+    if (translateX.value < -30) color = RATING_COLORS.again
+    else if (translateX.value > 30) color = RATING_COLORS.good
+    else if (translateY.value < -30) color = RATING_COLORS.easy
+    else if (translateY.value > 30) color = RATING_COLORS.hard
+    return { opacity, backgroundColor: color }
+  })
+
   if (!currentCard || phase !== 'studying') {
     return (
       <Screen testID="study-session-screen">
@@ -145,40 +178,6 @@ export function StudySessionScreen() {
         cardScale.value = withSpring(1)
       }
     })
-
-  // Animated styles
-  const cardAnimStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: cardScale.value },
-    ],
-  }))
-
-  const frontAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ perspective: 1000 }, { rotateY: `${rotateY.value}deg` }],
-    backfaceVisibility: 'hidden' as const,
-    opacity: interpolate(rotateY.value, [0, 90, 180], [1, 0, 0]),
-  }))
-
-  const backAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ perspective: 1000 }, { rotateY: `${rotateY.value - 180}deg` }],
-    backfaceVisibility: 'hidden' as const,
-    opacity: interpolate(rotateY.value, [0, 90, 180], [0, 0, 1]),
-  }))
-
-  // Swipe hint overlay
-  const hintStyle = useAnimatedStyle(() => {
-    const absX = Math.abs(translateX.value)
-    const absY = Math.abs(translateY.value)
-    const opacity = interpolate(Math.max(absX, absY), [0, SWIPE_THRESHOLD], [0, 0.8], Extrapolation.CLAMP)
-    let color = 'transparent'
-    if (translateX.value < -30) color = RATING_COLORS.again
-    else if (translateX.value > 30) color = RATING_COLORS.good
-    else if (translateY.value < -30) color = RATING_COLORS.easy
-    else if (translateY.value > 30) color = RATING_COLORS.hard
-    return { opacity, backgroundColor: color }
-  })
 
   return (
     <GestureHandlerRootView style={styles.flex}>
