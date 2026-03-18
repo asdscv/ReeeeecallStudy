@@ -124,6 +124,9 @@ export function useAuth(): AuthActions {
     try {
       if (Platform.OS === 'ios') {
         // Native Apple Sign-In on iOS
+        // Apple only provides name/email on FIRST sign-in.
+        // If user chose "Hide My Email", Apple provides a relay address.
+        // If user previously signed in and revoked, email may be null.
         const credential = await AppleAuthentication.signInAsync({
           requestedScopes: [
             AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -135,13 +138,32 @@ export function useAuth(): AuthActions {
           return { error: 'Apple Sign-In failed: no identity token' }
         }
 
+        // Build display name from Apple credential (only available on first sign-in)
+        const fullName = credential.fullName
+        const displayName = fullName
+          ? [fullName.givenName, fullName.familyName].filter(Boolean).join(' ') || undefined
+          : undefined
+
         const supabase = getMobileSupabase()
-        const { error } = await supabase.auth.signInWithIdToken({
+        const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: credential.identityToken,
         })
 
         if (error) return { error: localizeAuthError(error.message) }
+
+        // Update display_name if Apple provided it (only on first sign-in)
+        if (displayName && authData.user) {
+          await supabase.auth.updateUser({
+            data: { display_name: displayName },
+          })
+          // Also update profiles table directly
+          await supabase
+            .from('profiles')
+            .update({ display_name: displayName })
+            .eq('id', authData.user.id)
+        }
+
         return {}
       } else {
         // Android: OAuth web flow (same pattern as Google)
