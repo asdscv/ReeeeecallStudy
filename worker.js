@@ -1182,6 +1182,11 @@ export default {
       })
     }
 
+    // Static HTML pages (privacy policy, terms) — serve directly from assets
+    if (url.pathname.endsWith('.html') && url.pathname !== '/index.html') {
+      return env.ASSETS.fetch(request)
+    }
+
     // Dynamic sitemap (always available)
     if (url.pathname === '/sitemap.xml') {
       return handleSitemap(env)
