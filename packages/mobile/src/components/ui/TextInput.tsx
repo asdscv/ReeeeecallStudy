@@ -5,10 +5,12 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Platform,
   type TextInputProps as RNTextInputProps,
   type ViewStyle,
 } from 'react-native'
 import { useTheme, type Theme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 interface TextInputProps extends Omit<RNTextInputProps, 'style'> {
   label?: string
@@ -43,13 +45,15 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
     const styles = getStyles(theme, !!error, focused)
 
     return (
-      <View style={[styles.wrapper, containerStyle]}>
+      <View style={[styles.wrapper, containerStyle]} {...(Platform.OS === 'android' ? testProps(testID, true) : {})}>
         {label && <Text style={styles.label}>{label}</Text>}
         <View style={styles.container}>
           {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
           <RNTextInput
             ref={ref}
             testID={testID}
+            accessibilityLabel={testID}
+            {...(Platform.OS === 'android' ? { accessible: false } : {})}
             style={styles.input}
             placeholderTextColor={theme.colors.inputPlaceholder}
             secureTextEntry={isPassword && !secureVisible}
@@ -67,7 +71,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
             <TouchableOpacity
               onPress={() => setSecureVisible(!secureVisible)}
               style={styles.icon}
-              testID={testID ? `${testID}-toggle` : undefined}
+              {...testProps(testID ? `${testID}-toggle` : undefined)}
             >
               <Text style={styles.toggleText}>{secureVisible ? 'Hide' : 'Show'}</Text>
             </TouchableOpacity>

@@ -1,12 +1,9 @@
-/**
- * Navigate to a tab by its label text.
- * React Navigation bottom tabs expose accessibility labels like "Settings, tab, 5 of 5"
- */
+import { scrollUp } from './scroll'
 
 /**
  * Tab name → index and actual tabBarTestID mapping.
  * React Navigation bottom tab accessibility label: "Label, tab, N of 5"
- * tabBarTestID values are defined in MainTabs.tsx.
+ * tabBarTestID + tabBarAccessibilityLabel values are defined in MainTabs.tsx.
  */
 const TAB_MAP: Record<string, { idx: number; testID: string }> = {
   Home:     { idx: 1, testID: 'HomeTab' },

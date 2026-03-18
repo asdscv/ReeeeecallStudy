@@ -1,22 +1,18 @@
+import { scrollUp, scrollDown } from '../helpers/scroll'
+
 class StudySetupScreenPO {
   get screen() { return $('~study-setup-screen') }
   get startButton() { return $('~study-start-button') }
 
   async waitForScreen() {
-    // Try multiple selectors — SafeAreaView testID not always accessible on iOS
-    const selectors = [
-      '~study-setup-screen',
-      '~study-mode-srs',
-      '~study-start-button',
-    ]
+    const selectors = ['~study-setup-screen', '~study-mode-srs', '~study-start-button']
     for (const sel of selectors) {
       try {
         await $(sel).waitForDisplayed({ timeout: 8000 })
         return
       } catch { /* try next */ }
     }
-    // Last resort: scroll and retry
-    await browser.execute('mobile: scroll', { direction: 'down' }).catch(() => {})
+    await scrollDown().catch(() => {})
     await this.startButton.waitForDisplayed({ timeout: 5000 })
   }
 
@@ -27,41 +23,38 @@ class StudySetupScreenPO {
   }
 
   async selectDeck(deckId: string) {
+    await scrollUp().catch(() => {})
+    await browser.pause(300)
     const deckChip = $(`~study-deck-${deckId}`)
-    await deckChip.click()
-  }
-
-  /** Select first available deck from the list */
-  async selectFirstDeck() {
-    // Find any deck chip (testID starts with "study-deck-")
-    if (driver.isIOS) {
-      const chip = $('-ios predicate string:name BEGINSWITH "study-deck-"')
-      if (await chip.isDisplayed().catch(() => false)) {
-        await chip.click()
-        return true
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (await deckChip.isExisting().catch(() => false)) {
+        await deckChip.click()
+        return
       }
+      await scrollDown().catch(() => {})
+      await browser.pause(500)
     }
-    // Android / fallback: use $$ to find all deck chips
-    const chips = await $$('[name^="study-deck-"]')
-    if (chips.length > 0) {
-      await chips[0].click()
-      return true
-    }
-    return false
+    await deckChip.waitForExist({ timeout: 5000 })
+    await deckChip.click()
   }
 
   async selectMode(mode: string) {
     const modeCard = $(`~study-mode-${mode}`)
+    for (let i = 0; i < 3; i++) {
+      if (await modeCard.isDisplayed().catch(() => false)) break
+      await scrollDown().catch(() => {})
+      await browser.pause(300)
+    }
     await modeCard.waitForDisplayed({ timeout: 5000 })
     await modeCard.click()
   }
 
-  async selectBatchSize(size: number) {
-    const chip = $(`~study-batch-${size}`)
-    await chip.click()
-  }
-
   async start() {
+    for (let i = 0; i < 3; i++) {
+      if (await this.startButton.isDisplayed().catch(() => false)) break
+      await scrollDown().catch(() => {})
+      await browser.pause(300)
+    }
     await this.startButton.waitForDisplayed({ timeout: 5000 })
     await this.startButton.click()
   }

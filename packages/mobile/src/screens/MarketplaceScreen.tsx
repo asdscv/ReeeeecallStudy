@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, SearchBar, Badge, ListCard } from '../components/ui'
+import { testProps } from '../utils/testProps'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { useTheme } from '../theme'
 import type { MarketplaceStackParamList } from '../navigation/types'
@@ -20,6 +21,15 @@ const CATEGORIES = [
   { value: 'other', label: 'Other' },
 ]
 
+type SortKey = 'popular' | 'newest' | 'most_cards'
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: 'popular', label: 'Popular' },
+  { value: 'newest', label: 'Newest' },
+  { value: 'most_cards', label: 'Most Cards' },
+]
+
+const PAGE_SIZE = 20
+
 export function MarketplaceScreen() {
   const theme = useTheme()
   const navigation = useNavigation<Nav>()
@@ -27,8 +37,13 @@ export function MarketplaceScreen() {
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
+  const [sortBy, setSortBy] = useState<SortKey>('popular')
+  const [page, setPage] = useState(1)
 
   useEffect(() => { fetchListings() }, [fetchListings])
+
+  // Reset page on filter change
+  useEffect(() => { setPage(1) }, [search, category, sortBy])
 
   const filtered = useMemo(() => {
     let result = listings
@@ -41,20 +56,61 @@ export function MarketplaceScreen() {
         l.tags?.some((t: string) => t.toLowerCase().includes(q)),
       )
     }
+    // Sort
+    result = [...result].sort((a, b) => {
+      if (sortBy === 'popular') return (b.acquire_count ?? 0) - (a.acquire_count ?? 0)
+      if (sortBy === 'newest') return (b.created_at ?? '').localeCompare(a.created_at ?? '')
+      if (sortBy === 'most_cards') return (b.card_count ?? 0) - (a.card_count ?? 0)
+      return 0
+    })
     return result
-  }, [listings, search, category])
+  }, [listings, search, category, sortBy])
+
+  const paginatedData = filtered.slice(0, page * PAGE_SIZE)
+  const hasMore = paginatedData.length < filtered.length
+
+  const loadMore = () => {
+    if (hasMore && !loading) setPage((p) => p + 1)
+  }
 
   return (
     <Screen safeArea padding={false} testID="marketplace-screen">
       <FlatList
-        data={filtered}
+        data={paginatedData}
         keyExtractor={(item) => item.id}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchListings} />}
-        contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
+        contentContainerStyle={[styles.list, paginatedData.length === 0 && styles.listEmpty]}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <View style={styles.header}>
             <Text style={[theme.typography.h1, { color: theme.colors.text }]}>Marketplace</Text>
             <SearchBar value={search} onChangeText={setSearch} placeholder="Search decks..." testID="marketplace-search" />
+
+            {/* Sort chips */}
+            <View style={styles.sortRow}>
+              {SORT_OPTIONS.map((opt) => (
+                <TouchableOpacity
+                  key={opt.value}
+                  onPress={() => setSortBy(opt.value)}
+                  testID={`marketplace-sort-${opt.value}`}
+                  style={[
+                    styles.sortChip,
+                    {
+                      backgroundColor: sortBy === opt.value ? theme.colors.primary : theme.colors.surface,
+                      borderColor: sortBy === opt.value ? theme.colors.primary : theme.colors.border,
+                    },
+                  ]}
+                >
+                  <Text style={[
+                    theme.typography.labelSmall,
+                    { color: sortBy === opt.value ? theme.colors.primaryText : theme.colors.text },
+                  ]}>
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             {/* Category filter */}
             <FlatList
@@ -65,7 +121,7 @@ export function MarketplaceScreen() {
               contentContainerStyle={styles.categoryRow}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  testID={`marketplace-cat-${item.value || 'all'}`}
+                  {...testProps(`marketplace-cat-${item.value || 'all'}`)}
                   onPress={() => setCategory(item.value)}
                   style={[
                     styles.categoryChip,
@@ -122,6 +178,13 @@ export function MarketplaceScreen() {
             </View>
           </ListCard>
         )}
+        ListFooterComponent={
+          hasMore ? (
+            <View style={styles.loadMore}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           !loading ? (
             <View style={styles.empty}>
@@ -144,12 +207,15 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 20, paddingBottom: 24, gap: 10 },
   listEmpty: { flex: 1 },
   header: { gap: 12, paddingTop: 16, paddingBottom: 8 },
+  sortRow: { flexDirection: 'row', gap: 8 },
+  sortChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
   categoryRow: { gap: 8 },
   categoryChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
   listingContent: { gap: 6 },
   metaRow: { flexDirection: 'row', gap: 6, marginTop: 4 },
   tagRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   tag: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, overflow: 'hidden' },
+  loadMore: { paddingVertical: 16, alignItems: 'center' },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 40 },
   emptyIcon: { fontSize: 48 },
 })

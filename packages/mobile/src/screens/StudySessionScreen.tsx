@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Screen } from '../components/ui'
+import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
 import { useTheme, type Theme } from '../theme'
 import type { StudyStackParamList } from '../navigation/types'
@@ -191,7 +192,7 @@ export function StudySessionScreen() {
       <Screen safeArea padding={false} testID="study-session-screen">
         {/* Header */}
         <View style={[styles.header, { paddingHorizontal: 20 }]}>
-          <TouchableOpacity onPress={handleExit} testID="study-exit-button">
+          <TouchableOpacity onPress={handleExit} {...testProps('study-exit-button')}>
             <Text style={[theme.typography.body, { color: theme.colors.primary }]}>✕ Exit</Text>
           </TouchableOpacity>
           <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
@@ -208,13 +209,13 @@ export function StudySessionScreen() {
         </View>
 
         {/* Card area */}
-        <View style={styles.cardArea} testID="study-card-area">
+        <View style={styles.cardArea} {...testProps('study-card-area', true)}>
           <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
             <Animated.View style={[styles.cardContainer, cardAnimStyle]}>
               {/* Swipe hint overlay */}
               <Animated.View style={[styles.swipeHint, hintStyle]} />
 
-              <TouchableOpacity activeOpacity={0.95} onPress={handleFlip} testID="study-card-tap">
+              <TouchableOpacity activeOpacity={0.95} onPress={handleFlip} {...testProps('study-card-tap')}>
                 {/* Front face */}
                 <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
                   <CardFace content={fallbackFront} theme={theme} />
@@ -277,7 +278,7 @@ function RatingButton({ label, color, onPress, disabled, testID }: {
 }) {
   return (
     <TouchableOpacity
-      testID={testID}
+      {...testProps(testID)}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}

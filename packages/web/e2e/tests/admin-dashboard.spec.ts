@@ -387,9 +387,12 @@ test.describe('Admin Dashboard', () => {
 
   test.describe('Responsive Layout', () => {
     test('stat cards stack on mobile viewport', async ({ page }) => {
+      // Wait for page to fully load and CSS to be applied
+      await page.waitForTimeout(1000)
       const grid = page.locator('.grid').first()
       await expect(grid).toBeVisible({ timeout: 10_000 })
-      // Grid should be rendered
+      // Grid should be rendered — retry to handle CSS loading race
+      await page.waitForTimeout(500)
       const display = await grid.evaluate(el => getComputedStyle(el).display)
       expect(display).toBe('grid')
     })

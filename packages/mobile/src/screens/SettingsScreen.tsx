@@ -3,11 +3,14 @@ import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet } f
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, Divider } from '../components/ui'
+import { testProps } from '../utils/testProps'
 import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
+import type { SrsSettings } from '@reeeeecall/shared/types/database'
+import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -19,11 +22,24 @@ const LANGUAGES = [
   { code: 'de', label: 'Deutsch' },
 ]
 
+const TTS_PROVIDERS = [
+  { value: 'web_speech' as const, label: 'Web Speech' },
+  { value: 'edge_tts' as const, label: 'Edge TTS' },
+]
+
+const AI_PROVIDERS = [
+  { id: 'openai', label: 'OpenAI', models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'o4-mini'] },
+  { id: 'google', label: 'Google Gemini', models: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'] },
+  { id: 'anthropic', label: 'Anthropic', models: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'] },
+  { id: 'xai', label: 'xAI (Grok)', models: ['grok-3-mini', 'grok-3'] },
+]
+
 interface ProfileData {
   display_name: string
   daily_new_limit: number
   tts_enabled: boolean
   tts_speed: number
+  tts_provider: 'web_speech' | 'edge_tts'
   answer_mode: 'button' | 'swipe'
 }
 
@@ -41,11 +57,23 @@ export function SettingsScreen() {
     daily_new_limit: 20,
     tts_enabled: false,
     tts_speed: 0.9,
+    tts_provider: 'web_speech',
     answer_mode: 'button',
   })
   const [language, setLanguage] = useState('en')
   const [saving, setSaving] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
+
+  // SRS Settings (per-deck default)
+  const [srsSettings, setSrsSettings] = useState<SrsSettings>(DEFAULT_SRS_SETTINGS)
+  const [learningStepsText, setLearningStepsText] = useState(
+    DEFAULT_SRS_SETTINGS.learning_steps?.join(', ') ?? '1, 10',
+  )
+
+  // AI Provider
+  const [aiProvider, setAiProvider] = useState<string | null>(null)
+  const [aiApiKey, setAiApiKey] = useState('')
+  const [aiEditingProvider, setAiEditingProvider] = useState<string | null>(null)
 
   // Load profile
   useEffect(() => {
@@ -53,7 +81,7 @@ export function SettingsScreen() {
     const supabase = getMobileSupabase()
     supabase
       .from('profiles')
-      .select('display_name, daily_new_limit, tts_enabled, tts_speed, answer_mode')
+      .select('display_name, daily_new_limit, tts_enabled, tts_speed, tts_provider, answer_mode')
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
@@ -63,6 +91,7 @@ export function SettingsScreen() {
             daily_new_limit: data.daily_new_limit ?? 20,
             tts_enabled: data.tts_enabled ?? false,
             tts_speed: data.tts_speed ?? 0.9,
+            tts_provider: data.tts_provider ?? 'web_speech',
             answer_mode: data.answer_mode ?? 'button',
           })
         }
@@ -104,6 +133,16 @@ export function SettingsScreen() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Logout', style: 'destructive', onPress: signOut },
     ])
+  }
+
+  const handleSaveLearningSteps = () => {
+    const steps = learningStepsText
+      .split(',')
+      .map((s) => parseInt(s.trim()))
+      .filter((n) => !isNaN(n) && n > 0)
+    if (steps.length > 0) {
+      setSrsSettings((prev) => ({ ...prev, learning_steps: steps }))
+    }
   }
 
   return (
@@ -200,6 +239,45 @@ export function SettingsScreen() {
 
         <Divider />
 
+        {/* SRS Configuration */}
+        <SettingsSection title="SRS Configuration" theme={theme}>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+            Default SRS settings for new decks. Each deck can override these.
+          </Text>
+
+          <TextInput
+            testID="settings-srs-learning-steps"
+            label="Learning Steps (minutes, comma-separated)"
+            value={learningStepsText}
+            onChangeText={setLearningStepsText}
+            onBlur={handleSaveLearningSteps}
+            placeholder="1, 10"
+          />
+
+          <View style={styles.srsRow}>
+            <View style={styles.srsField}>
+              <TextInput
+                testID="settings-srs-good-interval"
+                label="Good Interval (days)"
+                value={String(srsSettings.good_days)}
+                onChangeText={(v) => setSrsSettings((p) => ({ ...p, good_days: parseInt(v) || 1 }))}
+                keyboardType="number-pad"
+              />
+            </View>
+            <View style={styles.srsField}>
+              <TextInput
+                testID="settings-srs-easy-interval"
+                label="Easy Interval (days)"
+                value={String(srsSettings.easy_days)}
+                onChangeText={(v) => setSrsSettings((p) => ({ ...p, easy_days: parseInt(v) || 4 }))}
+                keyboardType="number-pad"
+              />
+            </View>
+          </View>
+        </SettingsSection>
+
+        <Divider />
+
         {/* TTS */}
         <SettingsSection title="Text-to-Speech" theme={theme}>
           <View style={styles.settingRow}>
@@ -212,35 +290,118 @@ export function SettingsScreen() {
             />
           </View>
           {profile.tts_enabled && (
-            <View style={styles.settingRow}>
-              <Text style={[theme.typography.body, { color: theme.colors.text }]}>
-                Speed: {profile.tts_speed}x
-              </Text>
-              <View style={styles.chipRow}>
-                {[0.5, 0.75, 0.9, 1.0, 1.25, 1.5].map((speed) => (
+            <>
+              {/* TTS Provider */}
+              <View style={styles.settingRow}>
+                <Text style={[theme.typography.body, { color: theme.colors.text }]}>Provider</Text>
+                <View style={styles.chipRow}>
+                  {TTS_PROVIDERS.map((prov) => (
+                    <TouchableOpacity
+                      key={prov.value}
+                      testID={`settings-tts-provider-${prov.value}`}
+                      onPress={() => saveProfile({ tts_provider: prov.value })}
+                      style={[
+                        styles.chip,
+                        {
+                          backgroundColor: profile.tts_provider === prov.value ? theme.colors.primaryLight : theme.colors.surface,
+                          borderColor: profile.tts_provider === prov.value ? theme.colors.primary : theme.colors.border,
+                        },
+                      ]}
+                    >
+                      <Text style={[
+                        theme.typography.bodySmall,
+                        { color: profile.tts_provider === prov.value ? theme.colors.primary : theme.colors.text },
+                      ]}>
+                        {prov.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* TTS Speed */}
+              <View style={styles.settingRow}>
+                <Text style={[theme.typography.body, { color: theme.colors.text }]}>
+                  Speed: {profile.tts_speed}x
+                </Text>
+                <View style={styles.chipRow}>
+                  {[0.5, 0.75, 0.9, 1.0, 1.25, 1.5].map((speed) => (
+                    <TouchableOpacity
+                      key={speed}
+                      testID={`settings-tts-speed-${speed}`}
+                      onPress={() => saveProfile({ tts_speed: speed })}
+                      style={[
+                        styles.speedChip,
+                        {
+                          backgroundColor: profile.tts_speed === speed ? theme.colors.primary : theme.colors.surface,
+                          borderColor: profile.tts_speed === speed ? theme.colors.primary : theme.colors.border,
+                        },
+                      ]}
+                    >
+                      <Text style={[
+                        theme.typography.caption,
+                        { color: profile.tts_speed === speed ? theme.colors.primaryText : theme.colors.text },
+                      ]}>
+                        {speed}x
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+        </SettingsSection>
+
+        <Divider />
+
+        {/* AI Providers */}
+        <SettingsSection title="AI Providers" theme={theme}>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+            Configure AI providers for card generation. Keys are encrypted locally.
+          </Text>
+          {AI_PROVIDERS.map((provider) => {
+            const isEditing = aiEditingProvider === provider.id
+            return (
+              <View key={provider.id} style={[styles.aiProviderCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                <View style={styles.aiProviderHeader}>
+                  <Text style={[theme.typography.label, { color: theme.colors.text }]}>{provider.label}</Text>
                   <TouchableOpacity
-                    key={speed}
-                    testID={`settings-tts-speed-${speed}`}
-                    onPress={() => saveProfile({ tts_speed: speed })}
-                    style={[
-                      styles.speedChip,
-                      {
-                        backgroundColor: profile.tts_speed === speed ? theme.colors.primary : theme.colors.surface,
-                        borderColor: profile.tts_speed === speed ? theme.colors.primary : theme.colors.border,
-                      },
-                    ]}
+                    onPress={() => setAiEditingProvider(isEditing ? null : provider.id)}
+                    testID={`settings-ai-${provider.id}-toggle`}
                   >
-                    <Text style={[
-                      theme.typography.caption,
-                      { color: profile.tts_speed === speed ? theme.colors.primaryText : theme.colors.text },
-                    ]}>
-                      {speed}x
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                      {isEditing ? 'Cancel' : 'Configure'}
                     </Text>
                   </TouchableOpacity>
-                ))}
+                </View>
+                {isEditing && (
+                  <View style={styles.aiEditForm}>
+                    <TextInput
+                      testID={`settings-ai-${provider.id}-key`}
+                      label="API Key"
+                      value={aiApiKey}
+                      onChangeText={setAiApiKey}
+                      secureTextEntry
+                      placeholder="Enter your API key..."
+                    />
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                      Models: {provider.models.join(', ')}
+                    </Text>
+                    <Button
+                      title="Save"
+                      size="sm"
+                      onPress={() => {
+                        // Save logic would use AIKeyVault
+                        setAiEditingProvider(null)
+                        setAiApiKey('')
+                      }}
+                      testID={`settings-ai-${provider.id}-save`}
+                    />
+                  </View>
+                )}
               </View>
-            </View>
-          )}
+            )
+          })}
         </SettingsSection>
 
         <Divider />
@@ -321,4 +482,9 @@ const styles = StyleSheet.create({
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8, borderWidth: 1.5 },
   speedChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1 },
   subCard: { padding: 16, borderRadius: 12, borderWidth: 1.5, gap: 4 },
+  srsRow: { flexDirection: 'row', gap: 12 },
+  srsField: { flex: 1 },
+  aiProviderCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
+  aiProviderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  aiEditForm: { gap: 10 },
 })

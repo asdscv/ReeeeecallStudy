@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 interface ScreenProps {
   children: React.ReactNode
@@ -61,7 +62,7 @@ export function Screen({
   }
 
   return (
-    <Wrapper style={[styles.flex, bg, style]} testID={testID}>
+    <Wrapper style={[styles.flex, bg, style]} {...testProps(testID, true)}>
       {content}
     </Wrapper>
   )

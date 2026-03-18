@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useTheme, type Theme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 type BadgeVariant = 'primary' | 'success' | 'warning' | 'error' | 'neutral'
 
@@ -14,7 +15,7 @@ export function Badge({ label, variant = 'neutral', testID }: BadgeProps) {
   const { bg, text } = getVariantColors(theme, variant)
 
   return (
-    <View style={[styles.badge, { backgroundColor: bg }]} testID={testID}>
+    <View style={[styles.badge, { backgroundColor: bg }]} {...testProps(testID)}>
       <Text style={[theme.typography.caption, { color: text, fontWeight: '600' }]}>{label}</Text>
     </View>
   )

@@ -15,6 +15,11 @@ export const config: WebdriverIO.Config = {
     'appium:platformVersion': process.env.ANDROID_PLATFORM_VERSION ?? '14',
     'appium:app': process.env.ANDROID_APP_PATH ?? APK_PATH,
     'appium:noReset': true,
-    'appium:newCommandTimeout': 240,
+    'appium:newCommandTimeout': 300,
+    'appium:uiautomator2ServerInstallTimeout': 120000,
+    'appium:uiautomator2ServerLaunchTimeout': 120000,
+    'appium:adbExecTimeout': 120000,
+    'appium:appPackage': 'com.reeeeecall.study',
+    'appium:appActivity': '.MainActivity',
   }],
 }

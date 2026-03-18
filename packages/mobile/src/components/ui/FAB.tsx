@@ -1,5 +1,6 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { useTheme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 interface FABProps {
   onPress: () => void
@@ -12,7 +13,7 @@ export function FAB({ onPress, icon = '+', testID }: FABProps) {
 
   return (
     <TouchableOpacity
-      testID={testID}
+      {...testProps(testID)}
       onPress={onPress}
       activeOpacity={0.8}
       style={[styles.fab, { backgroundColor: theme.colors.primary }]}

@@ -15,9 +15,12 @@ test.describe('Button Rating — unknown/known buttons in all non-SRS modes', ()
     await quickStudyPage.startStudy()
 
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    // Wait for content: either flip hint (has cards) or no-cards message
+    const flipHint = page.locator('text=/Tap to flip|탭하여 뒤집기|눌러서/i')
+    const noCardsMsg = page.locator('text=/No Cards to Study|No cards|카드가 없/i')
+    await flipHint.or(noCardsMsg).first().waitFor({ timeout: 10_000 }).catch(() => {})
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await noCardsMsg.isVisible().catch(() => false)
     if (noCards) {
       test.skip(true, 'No cards in deck — skipping')
       return
@@ -47,9 +50,12 @@ test.describe('Button Rating — unknown/known buttons in all non-SRS modes', ()
     await quickStudyPage.startStudy()
 
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    // Wait for content: either flip hint (has cards) or no-cards message
+    const flipHint = page.locator('text=/Tap to flip|탭하여 뒤집기|눌러서/i')
+    const noCardsMsg = page.locator('text=/No Cards to Study|No cards|카드가 없/i')
+    await flipHint.or(noCardsMsg).first().waitFor({ timeout: 10_000 }).catch(() => {})
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await noCardsMsg.isVisible().catch(() => false)
     if (noCards) {
       test.skip(true, 'No cards in deck — skipping')
       return
@@ -78,9 +84,12 @@ test.describe('Button Rating — unknown/known buttons in all non-SRS modes', ()
     await quickStudyPage.startStudy()
 
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    // Wait for content: either flip hint (has cards) or no-cards message
+    const flipHint = page.locator('text=/Tap to flip|탭하여 뒤집기|눌러서/i')
+    const noCardsMsg = page.locator('text=/No Cards to Study|No cards|카드가 없/i')
+    await flipHint.or(noCardsMsg).first().waitFor({ timeout: 10_000 }).catch(() => {})
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await noCardsMsg.isVisible().catch(() => false)
     if (noCards) {
       test.skip(true, 'No cards in deck — skipping')
       return

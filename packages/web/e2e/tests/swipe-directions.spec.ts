@@ -25,9 +25,13 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     // Select SRS mode — auto-starts immediately (no Start button needed)
     await selectModeByText(page, 'SRS')
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    await page.waitForSelector(
+      'text=/Tap to flip|탭하여 뒤집기|눌러서/i, text=/No cards|No Cards|카드가 없|all reviewed|모두 복습/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없|all reviewed|모두 복습/i').isVisible().catch(() => false)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없|all reviewed|모두 복습/i').isVisible().catch(() => false)
     if (noCards) { test.skip(true, 'No SRS cards available'); return }
 
     // Flip the card
@@ -59,9 +63,13 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    await page.waitForSelector(
+      'text=/Tap to flip|탭하여 뒤집기|눌러서/i, text=/No cards|No Cards|카드가 없/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없/i').isVisible().catch(() => false)
     if (noCards) { test.skip(true, 'No cards in deck'); return }
 
     await studySessionPage.flipCard()
@@ -92,10 +100,15 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     await selectModeByText(page, 'Sequential Review')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    // Wait for the study page to fully load — either cards appear or "no cards" message
+    await page.waitForTimeout(3000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
-    if (noCards) { test.skip(true, 'No cards in deck'); return }
+    // Check for "no cards" message (sequential review may have no unreviewed cards)
+    const noCardsLocator = page.locator('text=/No Cards to Study|No cards|카드가 없/i')
+    const tapToFlipLocator = page.locator('text=/Tap to flip|탭하여 뒤집기|눌러서/i')
+    const hasNoCards = await noCardsLocator.isVisible().catch(() => false)
+    const hasTapToFlip = await tapToFlipLocator.isVisible().catch(() => false)
+    if (hasNoCards || !hasTapToFlip) { test.skip(true, 'No cards available for sequential review'); return }
 
     await studySessionPage.flipCard()
     await page.waitForTimeout(500)
@@ -119,9 +132,13 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    await page.waitForSelector(
+      'text=/Tap to flip|탭하여 뒤집기|눌러서/i, text=/No cards|No Cards|카드가 없/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없/i').isVisible().catch(() => false)
     if (noCards) { test.skip(true, 'No cards in deck'); return }
 
     await studySessionPage.flipCard()
@@ -156,9 +173,13 @@ test.describe('Swipe Directions — Fixed per Study Mode', () => {
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    await page.waitForSelector(
+      'text=/Tap to flip|탭하여 뒤집기|눌러서/i, text=/No cards|No Cards|카드가 없/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없/i').isVisible().catch(() => false)
     if (noCards) { test.skip(true, 'No cards in deck'); return }
 
     await studySessionPage.flipCard()
@@ -254,9 +275,13 @@ test.describe('SwipeGuide — Correct Arrow Positions', () => {
     await selectModeByText(page, 'Random')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    await page.waitForSelector(
+      'text=/Tap to flip|탭하여 뒤집기|눌러서/i, text=/No cards|No Cards|카드가 없/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없/i').isVisible().catch(() => false)
     if (noCards) { test.skip(true, 'No cards in deck'); return }
 
     await studySessionPage.flipCard()

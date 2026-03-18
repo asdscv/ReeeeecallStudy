@@ -1,5 +1,6 @@
 import { View, TextInput, StyleSheet } from 'react-native'
 import { useTheme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 interface SearchBarProps {
   value: string
@@ -15,6 +16,7 @@ export function SearchBar({ value, onChangeText, placeholder = 'Search...', test
     <View style={[styles.container, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <TextInput
         testID={testID}
+        accessibilityLabel={testID}
         style={[theme.typography.body, styles.input, { color: theme.colors.text }]}
         value={value}
         onChangeText={onChangeText}

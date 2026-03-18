@@ -1,12 +1,23 @@
 /**
  * Page Object: LoginScreen
  * testID convention: {screen}-{element}-{type}
+ *
+ * Android: TextInput components have a wrapper View and inner EditText,
+ * both with the same testID. The ~ selector matches the wrapper (not the EditText).
+ * For setValue, we need the actual EditText element.
  */
 class LoginScreenPO {
   // ── Selectors ──
   get screen() { return $('~login-screen') }
-  get emailInput() { return $('~login-email-input') }
-  get passwordInput() { return $('~login-password-input') }
+  get emailInput() {
+    if (driver.isIOS) return $('~login-email-input')
+    // Android: find the EditText inside the wrapper with matching resource-id
+    return $('//android.widget.EditText[@resource-id="login-email-input"]')
+  }
+  get passwordInput() {
+    if (driver.isIOS) return $('~login-password-input')
+    return $('//android.widget.EditText[@resource-id="login-password-input"]')
+  }
   get submitButton() { return $('~login-submit-button') }
   get errorText() { return $('~login-error-text') }
   get forgotPasswordLink() { return $('~login-forgot-password') }
@@ -16,12 +27,34 @@ class LoginScreenPO {
 
   // ── Actions ──
   async waitForScreen() {
-    await this.screen.waitForDisplayed({ timeout: 10000 })
+    try {
+      await this.screen.waitForDisplayed({ timeout: 10000 })
+    } catch {
+      // Android fallback: check for any login element
+      await $('~login-submit-button').waitForDisplayed({ timeout: 5000 })
+    }
   }
 
   async login(email: string, password: string) {
-    await this.emailInput.setValue(email)
-    await this.passwordInput.setValue(password)
+    // Clear any existing text first
+    const emailEl = await this.emailInput
+    await emailEl.click()
+    await browser.pause(300)
+    await emailEl.clearValue()
+    await emailEl.setValue(email)
+    await browser.pause(300)
+
+    const passEl = await this.passwordInput
+    await passEl.click()
+    await browser.pause(300)
+    await passEl.clearValue()
+    await passEl.setValue(password)
+    await browser.pause(300)
+
+    // Dismiss keyboard before clicking submit
+    try { await driver.hideKeyboard() } catch { /* no keyboard */ }
+    await browser.pause(300)
+
     await this.submitButton.click()
   }
 

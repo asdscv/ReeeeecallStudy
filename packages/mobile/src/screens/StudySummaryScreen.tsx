@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button } from '../components/ui'
+import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
 import { useTheme } from '../theme'
 import type { StudyStackParamList } from '../navigation/types'
@@ -126,7 +127,7 @@ function StatBox({ label, value, theme, testID }: {
   label: string; value: string; theme: ReturnType<typeof useTheme>; testID: string
 }) {
   return (
-    <View style={[styles.statBox, { backgroundColor: theme.colors.surface }]} testID={testID}>
+    <View style={[styles.statBox, { backgroundColor: theme.colors.surface }]} {...testProps(testID)}>
       <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{value}</Text>
       <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{label}</Text>
     </View>

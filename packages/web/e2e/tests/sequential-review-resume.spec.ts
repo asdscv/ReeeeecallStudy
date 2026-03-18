@@ -15,10 +15,13 @@ test.describe('Sequential Review — Resume After Mid-Session Exit', () => {
     await quickStudyPage.selectMode('🔄')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    // Wait for either cards or "no cards" to render
+    await page.waitForTimeout(3000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
-    return !noCards
+    const noCards = await page.locator('text=/No Cards to Study|No cards|카드가 없/i').isVisible().catch(() => false)
+    const hasFlipHint = await page.locator('text=/Tap to flip|탭하여 뒤집기|눌러서/i').isVisible().catch(() => false)
+    if (noCards || !hasFlipHint) return false
+    return true
   }
 
   /**

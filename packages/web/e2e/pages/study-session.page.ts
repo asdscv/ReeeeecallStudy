@@ -252,10 +252,36 @@ export class StudySessionPage extends BasePage {
 
   // ─── Swipe Actions ────────────────────────────────────
 
-  /** Enable swipe mode by setting localStorage directly (avoids settings page navigation) */
+  /**
+   * Enable swipe mode by:
+   * 1. Setting localStorage
+   * 2. Intercepting Supabase profile fetches to inject answer_mode: 'swipe'
+   *    (StudySessionPage fetches profile from DB and overwrites localStorage state)
+   */
   async enableSwipeMode() {
     await this.page.evaluate(() => {
       localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify({ version: 3, mode: 'swipe' }))
+    })
+    // Intercept profile API responses to inject swipe mode
+    await this.page.route('**/rest/v1/profiles*', async (route) => {
+      const response = await route.fetch()
+      const body = await response.text()
+      try {
+        const data = JSON.parse(body)
+        // Response can be object or array
+        if (Array.isArray(data) && data.length > 0) {
+          data[0].answer_mode = 'swipe'
+        } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+          data.answer_mode = 'swipe'
+        }
+        await route.fulfill({
+          status: response.status(),
+          headers: response.headers(),
+          body: JSON.stringify(data),
+        })
+      } catch {
+        await route.fulfill({ response })
+      }
     })
   }
 
@@ -264,6 +290,8 @@ export class StudySessionPage extends BasePage {
     await this.page.evaluate(() => {
       localStorage.setItem('reeeeecall-study-input-settings', JSON.stringify({ version: 3, mode: 'button' }))
     })
+    // Remove any route interception for profiles
+    await this.page.unroute('**/rest/v1/profiles*')
   }
 
   /** The main card container for swipe interactions */

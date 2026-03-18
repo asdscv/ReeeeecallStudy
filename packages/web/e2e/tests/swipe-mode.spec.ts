@@ -18,9 +18,14 @@ test.describe('Swipe Mode — Card Gestures', () => {
     await quickStudyPage.selectMode('🎲')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
+    // Wait for either a card or "no cards" message to appear
+    await page.waitForSelector(
+      '.rounded-2xl, text=/No cards|No Cards|카드가 없/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
 
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없/i').isVisible().catch(() => false)
     return !noCards
   }
 
@@ -205,8 +210,13 @@ test.describe('Swipe Mode — Overlay Visibility', () => {
     await quickStudyPage.selectMode('🎲')
     await quickStudyPage.startStudy()
     await page.waitForURL(/\/study\?/, { timeout: 10_000 })
-    await page.waitForTimeout(2000)
-    const noCards = await page.locator('text=/No cards|카드가 없/i').isVisible().catch(() => false)
+    // Wait for either a card or "no cards" message to appear
+    await page.waitForSelector(
+      '.rounded-2xl, text=/No cards|No Cards|카드가 없/i',
+      { timeout: 10_000 }
+    ).catch(() => {})
+    await page.waitForTimeout(1000)
+    const noCards = await page.locator('text=/No cards|No Cards|카드가 없/i').isVisible().catch(() => false)
     return !noCards
   }
 

@@ -43,9 +43,15 @@ class StudySessionScreenPO {
       return
     }
 
-    // 2. Try "Tap to flip" text (inside the card, not blocked by GestureDetector)
+    // 2. Try "Tap to flip" text
     if (driver.isIOS) {
       const tapText = $('-ios predicate string:label == "Tap to flip"')
+      if (await tapText.isDisplayed().catch(() => false)) {
+        await tapText.click()
+        return
+      }
+    } else {
+      const tapText = $('android=new UiSelector().text("Tap to flip")')
       if (await tapText.isDisplayed().catch(() => false)) {
         await tapText.click()
         return
@@ -59,7 +65,12 @@ class StudySessionScreenPO {
       const size = await area.getSize()
       const centerX = Math.round(loc.x + size.width / 2)
       const centerY = Math.round(loc.y + size.height / 3)
-      await browser.execute('mobile: tap', { x: centerX, y: centerY })
+      if (driver.isIOS) {
+        await browser.execute('mobile: tap', { x: centerX, y: centerY })
+      } else {
+        // Android: use clickGesture for coordinate-based taps
+        await browser.execute('mobile: clickGesture', { x: centerX, y: centerY })
+      }
     }
   }
 

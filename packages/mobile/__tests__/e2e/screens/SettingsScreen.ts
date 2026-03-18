@@ -1,22 +1,63 @@
+import { scrollUp, scrollDown } from '../helpers/scroll'
+
 class SettingsScreenPO {
   get screen() { return $('~settings-screen') }
-  get displayName() { return $('~settings-display-name') }
+  get displayName() {
+    // Android: testID maps to resource-id, not content-desc for EditText
+    // Try accessibility selector first, then Android resource-id
+    if (driver.isAndroid) {
+      return $('android=new UiSelector().resourceId("settings-display-name")')
+    }
+    return $('~settings-display-name')
+  }
   get ttsToggle() { return $('~settings-tts-toggle') }
   get logoutButton() { return $('~settings-logout') }
 
   async waitForScreen() {
-    // settings-screen testID may not be accessible on iOS; fallback to display-name input
-    try {
-      await this.screen.waitForDisplayed({ timeout: 5000 })
-    } catch {
-      await this.displayName.waitForDisplayed({ timeout: 10000 })
+    for (let i = 0; i < 10; i++) {
+      if (await this.screen.isDisplayed().catch(() => false)) return
+      if (await this.screen.isExisting().catch(() => false)) return
+      if (await $('~settings-logout').isExisting().catch(() => false)) return
+      if (await $('~settings-tts-toggle').isExisting().catch(() => false)) return
+      // Check page source for Settings content
+      if (i >= 3) {
+        const source = await browser.getPageSource().catch(() => '')
+        if (source.includes('Settings') && (source.includes('Logout') || source.includes('Display Name'))) return
+      }
+      await browser.pause(1000)
     }
   }
+
   async isDisplayed() {
-    return (await this.screen.isDisplayed().catch(() => false)) ||
-           (await this.displayName.isDisplayed().catch(() => false))
+    if (await this.screen.isDisplayed().catch(() => false)) return true
+    if (await this.screen.isExisting().catch(() => false)) return true
+    if (await $('~settings-logout').isExisting().catch(() => false)) return true
+    // Check page source as final fallback
+    const source = await browser.getPageSource().catch(() => '')
+    return source.includes('Settings') && (source.includes('Logout') || source.includes('Display Name'))
   }
-  async tapLogout() { await this.logoutButton.click() }
+
+  async scrollToDisplayName() {
+    for (let i = 0; i < 3; i++) {
+      if (await this.displayName.isDisplayed().catch(() => false)) return
+      if (await this.displayName.isExisting().catch(() => false)) return
+      await scrollUp().catch(() => {})
+      await browser.pause(500)
+    }
+  }
+
+  async scrollToLogout() {
+    for (let i = 0; i < 8; i++) {
+      if (await this.logoutButton.isDisplayed().catch(() => false)) return
+      await scrollDown().catch(() => {})
+      await browser.pause(400)
+    }
+  }
+
+  async tapLogout() {
+    await this.scrollToLogout()
+    await this.logoutButton.click()
+  }
 }
 
 export default new SettingsScreenPO()

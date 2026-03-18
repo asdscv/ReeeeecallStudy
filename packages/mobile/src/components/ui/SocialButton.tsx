@@ -1,5 +1,6 @@
 import { TouchableOpacity, Text, View, ActivityIndicator, StyleSheet } from 'react-native'
 import { useTheme, type Theme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 type SocialProvider = 'google' | 'apple'
 
@@ -29,7 +30,7 @@ export function SocialButton({
 
   return (
     <TouchableOpacity
-      testID={testID}
+      {...testProps(testID)}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}

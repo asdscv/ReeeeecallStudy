@@ -1,5 +1,6 @@
 import { TouchableOpacity, View, Text, StyleSheet, type ViewStyle } from 'react-native'
 import { useTheme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 interface ListCardProps {
   onPress?: () => void
@@ -22,14 +23,14 @@ export function ListCard({ onPress, children, style, testID }: ListCardProps) {
 
   if (onPress) {
     return (
-      <TouchableOpacity testID={testID} onPress={onPress} activeOpacity={0.7} style={cardStyle}>
+      <TouchableOpacity {...testProps(testID)} onPress={onPress} activeOpacity={0.7} style={cardStyle}>
         {children}
       </TouchableOpacity>
     )
   }
 
   return (
-    <View testID={testID} style={cardStyle}>
+    <View {...testProps(testID)} style={cardStyle}>
       {children}
     </View>
   )

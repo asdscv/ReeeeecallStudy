@@ -41,15 +41,15 @@ export function MainTabs() {
       }}
     >
       <Tab.Screen name="HomeTab" component={DashboardScreen}
-        options={{ tabBarLabel: 'Home', tabBarTestID: 'HomeTab', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
+        options={{ tabBarLabel: 'Home', tabBarTestID: 'HomeTab', tabBarAccessibilityLabel: 'HomeTab', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
       <Tab.Screen name="DecksTab" component={DecksStack}
-        options={{ tabBarLabel: 'Decks', tabBarTestID: 'DecksTab', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
+        options={{ tabBarLabel: 'Decks', tabBarTestID: 'DecksTab', tabBarAccessibilityLabel: 'DecksTab', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
       <Tab.Screen name="StudyTab" component={StudyStack}
-        options={{ tabBarLabel: 'Study', tabBarTestID: 'StudyTab', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
+        options={{ tabBarLabel: 'Study', tabBarTestID: 'StudyTab', tabBarAccessibilityLabel: 'StudyTab', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
       <Tab.Screen name="MarketplaceTab" component={MarketplaceStack}
-        options={{ tabBarLabel: 'Market', tabBarTestID: 'MarketplaceTab', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
+        options={{ tabBarLabel: 'Market', tabBarTestID: 'MarketplaceTab', tabBarAccessibilityLabel: 'MarketplaceTab', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
       <Tab.Screen name="SettingsTab" component={SettingsStack}
-        options={{ tabBarLabel: 'Settings', tabBarTestID: 'SettingsTab', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
+        options={{ tabBarLabel: 'Settings', tabBarTestID: 'SettingsTab', tabBarAccessibilityLabel: 'SettingsTab', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
     </Tab.Navigator>
   )
 }

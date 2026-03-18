@@ -7,6 +7,7 @@ import {
   type TextStyle,
 } from 'react-native'
 import { useTheme, type Theme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -43,17 +44,14 @@ export function Button({
 
   return (
     <TouchableOpacity
-      testID={testID}
+      {...testProps(testID)}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
       style={[styles.container, fullWidth && styles.fullWidth, style]}
     >
       {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === 'primary' ? theme.colors.primaryText : theme.colors.primary}
-        />
+        <ActivityIndicator size="small" color={styles.text.color} />
       ) : (
         <>
           {icon}
@@ -64,24 +62,31 @@ export function Button({
   )
 }
 
-function getStyles(theme: Theme, variant: ButtonVariant, size: ButtonSize, disabled: boolean) {
+function getStyles(theme: Theme, variant: ButtonVariant, size: ButtonSize, isDisabled: boolean) {
   const { colors, borderRadius: br, typography: typo, spacing: sp } = theme
 
-  const sizeMap = {
-    sm: { paddingVertical: sp.sm, paddingHorizontal: sp.lg, ...typo.buttonSmall },
-    md: { paddingVertical: sp.md, paddingHorizontal: sp.xl, ...typo.button },
-    lg: { paddingVertical: sp.lg, paddingHorizontal: sp['2xl'], ...typo.button },
+  const bgMap: Record<ButtonVariant, string> = {
+    primary: colors.buttonPrimary,
+    secondary: colors.buttonSecondary,
+    outline: 'transparent',
+    ghost: 'transparent',
+    danger: colors.error,
   }
 
-  const variantMap: Record<ButtonVariant, { bg: string; text: string; border?: string }> = {
-    primary: { bg: disabled ? colors.buttonDisabled : colors.buttonPrimary, text: colors.primaryText },
-    secondary: { bg: colors.buttonSecondary, text: colors.text },
-    outline: { bg: 'transparent', text: colors.primary, border: colors.border },
-    ghost: { bg: 'transparent', text: colors.primary },
-    danger: { bg: disabled ? colors.buttonDisabled : colors.error, text: colors.primaryText },
+  const textColorMap: Record<ButtonVariant, string> = {
+    primary: colors.primaryText,
+    secondary: colors.text,
+    outline: colors.primary,
+    ghost: colors.primary,
+    danger: colors.primaryText,
   }
 
-  const v = variantMap[variant]
+  const sizeMap: Record<ButtonSize, { py: number; px: number; text: object }> = {
+    sm: { py: sp.sm, px: sp.md, text: typo.buttonSmall ?? typo.labelSmall },
+    md: { py: sp.md, px: sp.xl, text: typo.button ?? typo.label },
+    lg: { py: sp.lg, px: sp['2xl'], text: typo.button ?? typo.label },
+  }
+
   const s = sizeMap[size]
 
   return StyleSheet.create({
@@ -90,19 +95,18 @@ function getStyles(theme: Theme, variant: ButtonVariant, size: ButtonSize, disab
       alignItems: 'center',
       justifyContent: 'center',
       gap: sp.sm,
-      backgroundColor: v.bg,
+      paddingVertical: s.py,
+      paddingHorizontal: s.px,
       borderRadius: br.lg,
-      paddingVertical: s.paddingVertical,
-      paddingHorizontal: s.paddingHorizontal,
-      ...(v.border ? { borderWidth: 1, borderColor: v.border } : {}),
-      opacity: disabled ? 0.5 : 1,
+      backgroundColor: isDisabled ? colors.buttonDisabled : bgMap[variant],
+      borderWidth: variant === 'outline' ? 1.5 : 0,
+      borderColor: variant === 'outline' ? colors.primary : undefined,
+      opacity: isDisabled ? 0.6 : 1,
     },
     fullWidth: { width: '100%' },
     text: {
-      fontSize: s.fontSize,
-      fontWeight: s.fontWeight as TextStyle['fontWeight'],
-      lineHeight: s.lineHeight,
-      color: v.text,
-    },
+      ...s.text,
+      color: isDisabled ? colors.textTertiary : textColorMap[variant],
+    } as TextStyle,
   })
 }

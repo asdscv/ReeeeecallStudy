@@ -1,4 +1,5 @@
 import { navigateToTab } from '../helpers/navigation'
+import { scrollDown } from '../helpers/scroll'
 
 describe('Remaining Features', () => {
   describe('Import/Export', () => {
@@ -57,7 +58,7 @@ describe('Remaining Features', () => {
 
       const toggle = $('~settings-notification-toggle')
       if (await toggle.isExisting()) {
-        await browser.execute('mobile: scroll', { direction: 'down' })
+        await scrollDown().catch(() => {})
         await browser.pause(500)
         const visible = await toggle.isDisplayed().catch(() => false)
         expect(visible || await toggle.isExisting()).toBe(true)

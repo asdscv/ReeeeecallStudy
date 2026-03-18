@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useTheme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 import { Button } from './Button'
 
 interface EmptyStateProps {
@@ -15,7 +16,7 @@ export function EmptyState({ icon = '📭', title, description, actionTitle, onA
   const theme = useTheme()
 
   return (
-    <View style={styles.container} testID={testID}>
+    <View style={styles.container} {...testProps(testID, true)}>
       <Text style={styles.icon}>{icon}</Text>
       <Text style={[theme.typography.h3, { color: theme.colors.text, textAlign: 'center' }]}>{title}</Text>
       {description && (
