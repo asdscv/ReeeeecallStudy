@@ -19,7 +19,7 @@ export class RNStorage implements IStorage {
       SecureStore.setItem(key, value)
     } catch {
       // SecureStore might fail for very large values (>2KB)
-      console.warn(`[RNStorage] Failed to set key: ${key}`)
+      if (__DEV__) console.warn(`[RNStorage] Failed to set key: ${key}`)
     }
   }
 

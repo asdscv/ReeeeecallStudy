@@ -1,8 +1,15 @@
-import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, Platform } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, Button } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
 import { useTheme } from '../theme'
+
+const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
+const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'
+const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
+  ios: 'https://apps.apple.com/account/subscriptions',
+  default: 'https://play.google.com/store/account/subscriptions',
+})
 
 const FEATURES = [
   { icon: '♾️', title: 'Unlimited Decks & Cards', free: '5 decks, 3K cards', pro: 'Unlimited' },
@@ -45,7 +52,6 @@ export function PaywallScreen() {
 
   const monthlyPkg = offering?.monthly
   const annualPkg = offering?.annual
-  const price = monthlyPkg?.product.priceString ?? '$5.99/mo'
 
   const handlePurchase = async (pkg: typeof monthlyPkg) => {
     if (!pkg) {
@@ -128,11 +134,9 @@ export function PaywallScreen() {
             />
           )}
           {!monthlyPkg && !annualPkg && (
-            <Button
-              testID="paywall-subscribe"
-              title={`Subscribe — ${price}`}
-              onPress={() => Alert.alert('Setup Required', 'Configure RevenueCat products first.')}
-            />
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 16 }]}>
+              Subscription products are currently unavailable. Please try again later.
+            </Text>
           )}
         </View>
 
@@ -147,8 +151,33 @@ export function PaywallScreen() {
             loading={purchasing}
           />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-            Payment will be charged to your Apple/Google account. Subscription auto-renews unless cancelled 24 hours before the current period ends.
+            Payment will be charged to your {Platform.OS === 'ios' ? 'Apple ID' : 'Google'} account at confirmation of purchase. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the {Platform.OS === 'ios' ? 'App Store' : 'Play Store'} after purchase.
           </Text>
+          <View style={styles.legalLinks}>
+            <Text
+              testID="paywall-privacy-policy"
+              style={[theme.typography.caption, { color: theme.colors.primary }]}
+              onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+            >
+              Privacy Policy
+            </Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
+            <Text
+              testID="paywall-terms"
+              style={[theme.typography.caption, { color: theme.colors.primary }]}
+              onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
+            >
+              Terms of Service
+            </Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
+            <Text
+              testID="paywall-manage-subscription"
+              style={[theme.typography.caption, { color: theme.colors.primary }]}
+              onPress={() => Linking.openURL(MANAGE_SUBSCRIPTIONS_URL)}
+            >
+              Manage Subscription
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </Screen>
@@ -168,4 +197,5 @@ const styles = StyleSheet.create({
   comparisonRow: { flexDirection: 'row', gap: 12 },
   pricing: { gap: 10, marginTop: 24 },
   footer: { gap: 12, marginTop: 24, alignItems: 'center' },
+  legalLinks: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' },
 })

@@ -4,7 +4,7 @@ import type { IAudioAdapter } from '@reeeeecall/shared/adapters/audio'
 export class RNAudio implements IAudioAdapter {
   async play(_url: string): Promise<void> {
     // Will use expo-av Audio.Sound
-    console.log('[Audio] Not yet implemented for RN')
+    if (__DEV__) console.log('[Audio] Not yet implemented for RN')
   }
 
   stop(): void {

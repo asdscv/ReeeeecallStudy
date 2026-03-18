@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { View, Text, FlatList, Alert, StyleSheet } from 'react-native'
+import { View, Text, FlatList, Alert, StyleSheet, Linking } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Button, Badge, ListCard } from '../components/ui'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { useTheme } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import type { MarketplaceStackParamList } from '../navigation/types'
+
+const SUPPORT_EMAIL = 'support@reeeeecall.com'
 
 type Route = RouteProp<MarketplaceStackParamList, 'MarketplaceDetail'>
 
@@ -43,6 +45,43 @@ export function MarketplaceDetailScreen() {
           <Button title="Go Back" variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
+    )
+  }
+
+  const handleReport = () => {
+    Alert.alert(
+      'Report Content',
+      'Why are you reporting this deck?',
+      [
+        {
+          text: 'Inappropriate Content',
+          onPress: () => {
+            const subject = encodeURIComponent(`Report: Inappropriate Content — ${listing?.title ?? listingId}`)
+            const body = encodeURIComponent(`Listing ID: ${listingId}\nReason: Inappropriate Content\n\nPlease describe the issue:\n`)
+            Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`)
+            Alert.alert('Thank you', 'Your report has been submitted. We will review this content promptly.')
+          },
+        },
+        {
+          text: 'Copyright Violation',
+          onPress: () => {
+            const subject = encodeURIComponent(`Report: Copyright Violation — ${listing?.title ?? listingId}`)
+            const body = encodeURIComponent(`Listing ID: ${listingId}\nReason: Copyright Violation\n\nPlease describe the issue:\n`)
+            Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`)
+            Alert.alert('Thank you', 'Your report has been submitted. We will review this content promptly.')
+          },
+        },
+        {
+          text: 'Spam / Misleading',
+          onPress: () => {
+            const subject = encodeURIComponent(`Report: Spam — ${listing?.title ?? listingId}`)
+            const body = encodeURIComponent(`Listing ID: ${listingId}\nReason: Spam / Misleading\n\nPlease describe the issue:\n`)
+            Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`)
+            Alert.alert('Thank you', 'Your report has been submitted. We will review this content promptly.')
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ],
     )
   }
 
@@ -99,6 +138,14 @@ export function MarketplaceDetailScreen() {
               title={acquiring ? 'Downloading...' : 'Add to My Decks'}
               onPress={handleAcquire}
               loading={acquiring}
+            />
+
+            <Button
+              testID="marketplace-report-button"
+              title="Report Content"
+              variant="ghost"
+              size="sm"
+              onPress={handleReport}
             />
 
             {previewCards.length > 0 && (

@@ -1,15 +1,18 @@
 import { useState, useRef } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen, TextInput, Button } from '../components/ui'
+import { Screen, TextInput, Button, Divider, SocialButton } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../theme'
 import { validatePassword } from '@reeeeecall/shared/lib/password-validation'
 
+const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
+const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'
+
 export function SignUpScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
-  const { signUp, loading } = useAuth()
+  const { signUp, signInWithGoogle, signInWithApple, loading } = useAuth()
 
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
@@ -17,6 +20,18 @@ export function SignUpScreen() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  const handleGoogleSignUp = async () => {
+    setError('')
+    const result = await signInWithGoogle()
+    if (result.error) setError(result.error)
+  }
+
+  const handleAppleSignUp = async () => {
+    setError('')
+    const result = await signInWithApple()
+    if (result.error) setError(result.error)
+  }
 
   const emailRef = useRef<RNTextInput>(null)
   const passwordRef = useRef<RNTextInput>(null)
@@ -73,6 +88,23 @@ export function SignUpScreen() {
             Start your learning journey
           </Text>
         </View>
+
+        {/* Social Sign Up */}
+        <View style={styles.socialSection}>
+          <SocialButton
+            provider="google"
+            onPress={handleGoogleSignUp}
+            loading={loading}
+            testID="signup-google-button"
+          />
+          <SocialButton
+            provider="apple"
+            onPress={handleAppleSignUp}
+            testID="signup-apple-button"
+          />
+        </View>
+
+        <Divider text="or" />
 
         {/* Form */}
         <View style={styles.form}>
@@ -142,6 +174,17 @@ export function SignUpScreen() {
             </Text>
           ) : null}
 
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
+            By creating an account, you agree to our{' '}
+            <Text style={{ color: theme.colors.primary }} onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}>
+              Terms of Service
+            </Text>
+            {' '}and{' '}
+            <Text style={{ color: theme.colors.primary }} onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+              Privacy Policy
+            </Text>
+          </Text>
+
           <Button
             testID="signup-submit-button"
             title="Create Account"
@@ -174,6 +217,7 @@ const styles = StyleSheet.create({
   content: { flex: 1, justifyContent: 'center', gap: 24, paddingVertical: 40 },
   successContent: { flex: 1, justifyContent: 'center', gap: 24, paddingHorizontal: 20 },
   header: { alignItems: 'center' },
+  socialSection: { gap: 12 },
   form: { gap: 16 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
 })

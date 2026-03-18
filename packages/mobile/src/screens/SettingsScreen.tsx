@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, Divider } from '../components/ui'
@@ -11,6 +11,10 @@ import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
+
+const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
+const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'
+const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -133,6 +137,34 @@ export function SettingsScreen() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Logout', style: 'destructive', onPress: signOut },
     ])
+  }
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'This will permanently delete your account and all associated data. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const supabase = getMobileSupabase()
+              // Call server-side RPC to delete all user data
+              const { error } = await supabase.rpc('delete_user_account')
+              if (error) {
+                Alert.alert('Error', 'Failed to delete account. Please contact support.')
+                return
+              }
+              await signOut()
+            } catch {
+              Alert.alert('Error', 'Failed to delete account. Please contact support.')
+            }
+          },
+        },
+      ],
+    )
   }
 
   const handleSaveLearningSteps = () => {
@@ -447,6 +479,48 @@ export function SettingsScreen() {
 
         <Divider />
 
+        {/* Subscription Management */}
+        {isPro && (
+          <>
+            <SettingsSection title="Manage Subscription" theme={theme}>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                Your subscription auto-renews unless cancelled at least 24 hours before the end of the current period. You can manage or cancel your subscription in your device settings.
+              </Text>
+              <Button
+                testID="settings-manage-subscription"
+                title="Manage Subscription"
+                variant="outline"
+                onPress={() => Linking.openURL(MANAGE_SUBSCRIPTIONS_URL)}
+              />
+            </SettingsSection>
+            <Divider />
+          </>
+        )}
+
+        {/* Legal */}
+        <SettingsSection title="Legal" theme={theme}>
+          <TouchableOpacity
+            testID="settings-privacy-policy"
+            onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+            style={styles.linkRow}
+          >
+            <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
+              Privacy Policy
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="settings-terms-of-service"
+            onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
+            style={styles.linkRow}
+          >
+            <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
+              Terms of Service
+            </Text>
+          </TouchableOpacity>
+        </SettingsSection>
+
+        <Divider />
+
         {/* Account */}
         <SettingsSection title="Account" theme={theme}>
           <Button
@@ -454,6 +528,12 @@ export function SettingsScreen() {
             title="Logout"
             variant="danger"
             onPress={handleLogout}
+          />
+          <Button
+            testID="settings-delete-account"
+            title="Delete Account"
+            variant="ghost"
+            onPress={handleDeleteAccount}
           />
         </SettingsSection>
       </ScrollView>
@@ -487,4 +567,5 @@ const styles = StyleSheet.create({
   aiProviderCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
   aiProviderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   aiEditForm: { gap: 10 },
+  linkRow: { paddingVertical: 8 },
 })

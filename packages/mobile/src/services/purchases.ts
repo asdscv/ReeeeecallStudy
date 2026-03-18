@@ -31,7 +31,7 @@ class PurchaseService {
     const apiKey = Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY
 
     if (!apiKey) {
-      console.warn('[PurchaseService] No RevenueCat API key configured')
+      if (__DEV__) console.warn('[PurchaseService] No RevenueCat API key configured')
       return
     }
 
