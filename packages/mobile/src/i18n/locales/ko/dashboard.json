@@ -1,0 +1,32 @@
+{
+  "title": "대시보드",
+  "stats": {
+    "totalCards": "전체 카드",
+    "todayReview": "오늘 복습",
+    "streak": "연속 학습",
+    "masteryRate": "숙달률"
+  },
+  "dailyChart": {
+    "title": "일별 학습량",
+    "noData": "아직 학습 기록이 없습니다"
+  },
+  "forecast": {
+    "title": "복습 예측 (7일)",
+    "noData": "예정된 복습이 없습니다"
+  },
+  "recentDecks": {
+    "title": "최근 덱",
+    "noDecks": "아직 덱이 없습니다. 덱 탭에서 만들어보세요!",
+    "goToDecks": "덱 관리로 이동",
+    "cardCount": "{{count}}장",
+    "newCards": "새 {{count}}",
+    "reviewCards": "복습 {{count}}",
+    "study": "학습"
+  },
+  "heatmap": {
+    "title": "학습 잔디"
+  },
+  "studyHistory": "학습 기록",
+  "studyHistoryDesc": "세션, 통계, 진도 보기",
+  "streakDays": "{{count}}일"
+}

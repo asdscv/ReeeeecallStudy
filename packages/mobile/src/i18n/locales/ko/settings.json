@@ -1,0 +1,90 @@
+{
+  "title": "설정",
+  "profile": {
+    "title": "프로필",
+    "email": "이메일",
+    "displayName": "표시 이름",
+    "displayNamePlaceholder": "2-12자"
+  },
+  "language": {
+    "title": "언어"
+  },
+  "srs": {
+    "title": "SRS 설정",
+    "description": "최적의 학습을 위한 간격 반복 매개변수를 설정합니다.",
+    "dailyNewLimit": "일일 새 카드 한도",
+    "dailyNewLimitHint": "덱별 하루에 표시되는 새 카드의 최대 수."
+  },
+  "answerMode": {
+    "title": "답변 방식",
+    "description": "학습 중 답변을 선택하는 방식을 설정합니다",
+    "button": "버튼",
+    "buttonDesc": "버튼을 눌러 답변 선택",
+    "swipe": "스와이프",
+    "swipeDesc": "카드를 밀어서 답변 선택"
+  },
+  "tts": {
+    "title": "자동 TTS 읽기",
+    "description": "카드 뒤집기 시 TTS 설정된 필드를 자동으로 읽어줍니다",
+    "enable": "자동 읽기 활성화",
+    "voiceEngine": "음성 엔진",
+    "deviceVoice": "기기 음성",
+    "deviceVoiceDesc": "기기에 내장된 음성을 사용합니다",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "고품질 신경망 음성",
+    "readingSpeed": "읽기 속도",
+    "note": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다."
+  },
+  "srsConfig": {
+    "title": "SRS 구성",
+    "description": "새 덱의 기본 SRS 설정. 각 덱에서 재정의할 수 있습니다.",
+    "learningSteps": "학습 단계 (분, 쉼표로 구분)",
+    "goodInterval": "Good 간격 (일)",
+    "easyInterval": "Easy 간격 (일)"
+  },
+  "aiProviders": {
+    "title": "AI 프로바이더",
+    "description": "카드 생성용 AI 프로바이더를 설정합니다. 키는 로컬에 암호화되어 저장됩니다.",
+    "configure": "설정",
+    "cancel": "취소",
+    "apiKey": "API 키",
+    "apiKeyPlaceholder": "API 키를 입력하세요...",
+    "models": "모델",
+    "save": "저장",
+    "securityNote": "API 키는 기기에 암호화되어 저장되며 서버로 전송되지 않습니다."
+  },
+  "notifications": {
+    "title": "알림",
+    "dailyReminder": "일일 학습 알림",
+    "reminderDesc": "매일 오전 9시에 카드 복습을 알려드립니다.",
+    "permissionRequired": "기기 설정에서 알림을 활성화해주세요."
+  },
+  "subscription": {
+    "title": "구독",
+    "pro": "프로",
+    "freePlan": "무료 플랜",
+    "proDesc": "모든 프리미엄 기능 사용 가능",
+    "freeDesc": "무제한 접근을 위해 업그레이드",
+    "upgradeToPro": "프로로 업그레이드",
+    "manageSubscription": "구독 관리"
+  },
+  "legal": {
+    "title": "법률",
+    "privacyPolicy": "개인정보처리방침",
+    "termsOfService": "이용약관"
+  },
+  "account": {
+    "title": "계정",
+    "logout": "로그아웃",
+    "logoutConfirm": "로그아웃 하시겠습니까?",
+    "deleteAccount": "계정 삭제",
+    "deleteConfirm": "계정과 모든 관련 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.",
+    "deleteFailed": "계정 삭제에 실패했습니다. 고객지원에 문의해주세요."
+  },
+  "links": {
+    "userGuide": "사용법 가이드",
+    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
+    "apiDocs": "API 문서",
+    "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+  }
+}

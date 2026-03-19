@@ -9,11 +9,19 @@ import * as Haptics from 'expo-haptics'
 export function useStudy() {
   const store = useStudyStore()
 
-  const startSession = useCallback(async (deckId: string, mode: StudyMode, batchSize = 20) => {
+  const startSession = useCallback(async (
+    deckId: string,
+    mode: StudyMode,
+    batchSize = 20,
+    uploadDateStart?: string,
+    uploadDateEnd?: string,
+  ) => {
     await store.initSession({
       deckId,
       mode,
       batchSize,
+      uploadDateStart,
+      uploadDateEnd,
     })
   }, [store])
 

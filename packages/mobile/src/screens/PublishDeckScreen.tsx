@@ -4,6 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen, TextInput, Button } from '../components/ui'
 import { useDecks } from '../hooks'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import type { DecksStackParamList } from '../navigation/types'
 
@@ -68,7 +69,7 @@ export function PublishDeckScreen() {
       <View style={styles.content}>
         <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
 
-        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>Publish Deck</Text>
+        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>{t('publish.title')}</Text>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
           Share your deck with the community
         </Text>
@@ -122,7 +123,7 @@ export function PublishDeckScreen() {
           ))}
         </View>
 
-        <Button testID="publish-submit" title="Publish to Marketplace" onPress={handlePublish} loading={publishing} disabled={!title.trim()} />
+        <Button testID="publish-submit" title={t('publish.publishButton')} onPress={handlePublish} loading={publishing} disabled={!title.trim()} />
       </View>
     </Screen>
   )

@@ -1,0 +1,90 @@
+{
+  "title": "Settings",
+  "profile": {
+    "title": "Profile",
+    "email": "Email",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "2-12 characters"
+  },
+  "language": {
+    "title": "Language"
+  },
+  "srs": {
+    "title": "SRS Settings",
+    "description": "Configure spaced repetition parameters for optimal learning.",
+    "dailyNewLimit": "Daily New Card Limit",
+    "dailyNewLimitHint": "Maximum number of new cards shown per day per deck."
+  },
+  "answerMode": {
+    "title": "Answer Mode",
+    "description": "Set how you choose answers during study",
+    "button": "Button",
+    "buttonDesc": "Select answer by pressing button",
+    "swipe": "Swipe",
+    "swipeDesc": "Select answer by swiping card"
+  },
+  "tts": {
+    "title": "Auto TTS Reading",
+    "description": "Auto-read TTS-enabled fields when flipping card",
+    "enable": "Enable auto reading",
+    "voiceEngine": "Voice Engine",
+    "deviceVoice": "Device Voice",
+    "deviceVoiceDesc": "Uses your device's built-in voice",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Higher quality neural voice",
+    "readingSpeed": "Reading Speed",
+    "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading."
+  },
+  "srsConfig": {
+    "title": "SRS Configuration",
+    "description": "Default SRS settings for new decks. Each deck can override these.",
+    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "goodInterval": "Good Interval (days)",
+    "easyInterval": "Easy Interval (days)"
+  },
+  "aiProviders": {
+    "title": "AI Providers",
+    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "configure": "Configure",
+    "cancel": "Cancel",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key...",
+    "models": "Models",
+    "save": "Save",
+    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dailyReminder": "Daily Study Reminder",
+    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
+    "permissionRequired": "Enable notifications in device settings."
+  },
+  "subscription": {
+    "title": "Subscription",
+    "pro": "Pro",
+    "freePlan": "Free Plan",
+    "proDesc": "All premium features unlocked",
+    "freeDesc": "Upgrade for unlimited access",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "account": {
+    "title": "Account",
+    "logout": "Logout",
+    "logoutConfirm": "Are you sure you want to sign out?",
+    "deleteAccount": "Delete Account",
+    "deleteConfirm": "This will permanently delete your account and all associated data. This action cannot be undone.",
+    "deleteFailed": "Failed to delete account. Please contact support."
+  },
+  "links": {
+    "userGuide": "User Guide",
+    "userGuideDesc": "Feature guide, learning tips, sharing methods",
+    "apiDocs": "API Documentation",
+    "apiDocsDesc": "API endpoints, authentication, usage examples"
+  }
+}

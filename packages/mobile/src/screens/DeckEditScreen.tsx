@@ -3,15 +3,30 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'rea
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button } from '../components/ui'
+import { StatCard } from '../components/charts/StatCard'
+import { ProgressBar } from '../components/charts/ProgressBar'
 import { useDecks } from '../hooks/useDecks'
-import { useTheme } from '../theme'
+import { useTranslation } from 'react-i18next'
+import { useTheme, palette } from '../theme'
+import { getMobileSupabase } from '../adapters'
+import { calculateDeckStats } from '@reeeeecall/shared/lib/stats'
+import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
+import type { SrsSettings, Card } from '@reeeeecall/shared/types/database'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DeckEdit'>
 type Route = RouteProp<DecksStackParamList, 'DeckEdit'>
 
 const COLORS = ['#3B82F6', '#EF4444', '#22C55E', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#6B7280']
-const ICONS = ['📚', '🧠', '🌍', '💼', '🔬', '🎵', '📐', '🏥']
+const ICONS = ['📚', '📖', '🇨🇳', '🇺🇸', '🇯🇵', '🧠', '💡', '📝']
+
+/** SRS field definitions with colored labels matching web */
+const SRS_INTERVAL_FIELDS: { key: keyof SrsSettings; label: string; color: string }[] = [
+  { key: 'again_days', label: 'Again', color: '#EF4444' },  // red
+  { key: 'hard_days', label: 'Hard', color: '#F59E0B' },   // amber
+  { key: 'good_days', label: 'Good', color: '#22C55E' },   // green
+  { key: 'easy_days', label: 'Easy', color: '#3B82F6' },   // blue
+]
 
 export function DeckEditScreen() {
   const theme = useTheme()
@@ -30,6 +45,17 @@ export function DeckEditScreen() {
   const [templateId, setTemplateId] = useState(existingDeck?.default_template_id ?? '')
   const [saving, setSaving] = useState(false)
 
+  // SRS Settings
+  const existingSrs = (existingDeck as any)?.srs_settings as SrsSettings | undefined
+  const [srsSettings, setSrsSettings] = useState<SrsSettings>(existingSrs ?? { ...DEFAULT_SRS_SETTINGS })
+  const [learningStepsText, setLearningStepsText] = useState(
+    (existingSrs?.learning_steps ?? DEFAULT_SRS_SETTINGS.learning_steps ?? [1, 10]).join(', ')
+  )
+
+  // Statistics (edit mode only)
+  const [cards, setCards] = useState<Card[]>([])
+  const [statsExpanded, setStatsExpanded] = useState(false)
+
   // Auto-select first template
   useEffect(() => {
     if (!templateId && templates.length > 0) {
@@ -38,10 +64,41 @@ export function DeckEditScreen() {
     }
   }, [templates, templateId])
 
+  // Load cards for stats panel (edit mode only)
+  useEffect(() => {
+    if (!deckId) return
+    const supabase = getMobileSupabase()
+    supabase
+      .from('cards')
+      .select('*')
+      .eq('deck_id', deckId)
+      .then(({ data }) => {
+        if (data) setCards(data as Card[])
+      })
+  }, [deckId])
+
+  const parseLearningSteps = (text: string): number[] => {
+    return text
+      .split(',')
+      .map((s) => parseInt(s.trim()))
+      .filter((n) => !isNaN(n) && n > 0 && n <= 1440)
+  }
+
+  const updateSrsField = (key: keyof SrsSettings, value: number) => {
+    setSrsSettings((prev) => ({ ...prev, [key]: Math.max(0, Math.min(365, value)) }))
+  }
+
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Error', 'Deck name is required')
+      Alert.alert(t('edit.nameRequired'), t('edit.nameRequired'))
       return
+    }
+
+    // Parse learning steps from text
+    const steps = parseLearningSteps(learningStepsText)
+    const finalSrs: SrsSettings = {
+      ...srsSettings,
+      learning_steps: steps.length > 0 ? steps : [1, 10],
     }
 
     setSaving(true)
@@ -53,6 +110,7 @@ export function DeckEditScreen() {
           color,
           icon,
           default_template_id: templateId || null,
+          srs_settings: finalSrs,
         })
       } else {
         await createDeck({
@@ -61,25 +119,29 @@ export function DeckEditScreen() {
           color,
           icon,
           default_template_id: templateId || undefined,
+          srs_settings: finalSrs,
         })
       }
       navigation.goBack()
     } catch (e) {
-      Alert.alert('Error', 'Failed to save deck')
+      Alert.alert(t('edit.saveFailed'), t('edit.saveFailed'))
     } finally {
       setSaving(false)
     }
   }
 
+  // Stats computed values (edit mode only)
+  const deckStats = cards.length > 0 ? calculateDeckStats(cards) : null
+
   return (
     <Screen scroll keyboard testID="deck-edit-screen">
       <View style={styles.content}>
         <View style={styles.topRow}>
-          <Button title="← Cancel" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
+          <Button title={t('edit.cancel', { defaultValue: '← Cancel' })} variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
         </View>
 
         <Text style={[theme.typography.h2, { color: theme.colors.text }]}>
-          {isEditing ? 'Edit Deck' : 'New Deck'}
+          {isEditing ? t('edit.title') : t('edit.createTitle')}
         </Text>
 
         {/* Preview */}
@@ -91,8 +153,8 @@ export function DeckEditScreen() {
         {/* Form */}
         <TextInput
           testID="deck-edit-name"
-          label="Name"
-          placeholder="e.g. Spanish Vocabulary"
+          label={t('edit.deckName')}
+          placeholder={t('edit.namePlaceholder')}
           value={name}
           onChangeText={setName}
           autoFocus={!isEditing}
@@ -100,8 +162,8 @@ export function DeckEditScreen() {
 
         <TextInput
           testID="deck-edit-description"
-          label="Description"
-          placeholder="What will you learn?"
+          label={t('edit.description')}
+          placeholder={t('edit.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
           multiline
@@ -110,7 +172,7 @@ export function DeckEditScreen() {
 
         {/* Color picker */}
         <View style={styles.section}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>Color</Text>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('edit.color')}</Text>
           <View style={styles.optionRow}>
             {COLORS.map((c) => (
               <TouchableOpacity
@@ -125,7 +187,7 @@ export function DeckEditScreen() {
 
         {/* Icon picker */}
         <View style={styles.section}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>Icon</Text>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('edit.icon')}</Text>
           <View style={styles.optionRow}>
             {ICONS.map((i) => (
               <TouchableOpacity
@@ -143,7 +205,7 @@ export function DeckEditScreen() {
         {/* Template selector */}
         {templates.length > 0 && (
           <View style={styles.section}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Template</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('edit.template')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.optionRow}>
                 {templates.map((t) => (
@@ -170,9 +232,128 @@ export function DeckEditScreen() {
           </View>
         )}
 
+        {/* ── SRS Settings ── */}
+        <View style={[styles.srsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>SRS Settings</Text>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+            Configure spaced repetition intervals for this deck.
+          </Text>
+
+          {/* Learning Steps */}
+          <TextInput
+            testID="deck-edit-srs-learning-steps"
+            label="Learning Steps (minutes)"
+            value={learningStepsText}
+            onChangeText={setLearningStepsText}
+            placeholder="1, 10"
+          />
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            Comma-separated minutes, e.g. "1, 10" for 1min then 10min steps.
+          </Text>
+
+          {/* Interval fields — 2x2 grid with colored labels */}
+          <View style={styles.srsGrid}>
+            {SRS_INTERVAL_FIELDS.map(({ key, label, color: labelColor }) => (
+              <View key={key} style={styles.srsGridItem}>
+                <Text style={[styles.srsLabel, { color: labelColor }]}>{label}</Text>
+                <TextInput
+                  testID={`deck-edit-srs-${key}`}
+                  value={String(srsSettings[key] as number)}
+                  onChangeText={(v) => updateSrsField(key, parseInt(v) || 0)}
+                  keyboardType="number-pad"
+                  placeholder="0"
+                />
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>days</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* ── Statistics Panel (edit mode only) ── */}
+        {isEditing && deckStats && (
+          <View style={[styles.statsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            <TouchableOpacity
+              style={styles.statsHeader}
+              onPress={() => setStatsExpanded(!statsExpanded)}
+              testID="deck-edit-stats-toggle"
+            >
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Statistics</Text>
+              <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
+                {statsExpanded ? '−' : '+'}
+              </Text>
+            </TouchableOpacity>
+
+            {statsExpanded && (
+              <View style={styles.statsBody}>
+                {/* Summary row */}
+                <View style={styles.statsRow}>
+                  <StatCard label="Total Cards" value={deckStats.totalCards} testID="deck-edit-stat-total" />
+                  <StatCard label="Mastery" value={`${deckStats.masteryRate}%`} testID="deck-edit-stat-mastery" />
+                </View>
+
+                {/* Card status badges */}
+                <View style={[styles.statusCard, { backgroundColor: theme.colors.surface }]}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
+                    Card Status Distribution
+                  </Text>
+                  <View style={styles.badgeRow}>
+                    <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
+                      <View style={[styles.badgeDot, { backgroundColor: palette.blue[500] }]} />
+                      <Text style={[theme.typography.caption, { color: palette.blue[700] }]}>
+                        New: {deckStats.newCount}
+                      </Text>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: '#FFFBEB' }]}>
+                      <View style={[styles.badgeDot, { backgroundColor: '#F59E0B' }]} />
+                      <Text style={[theme.typography.caption, { color: '#92400E' }]}>
+                        Learning: {deckStats.learningCount}
+                      </Text>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: '#F0FDF4' }]}>
+                      <View style={[styles.badgeDot, { backgroundColor: '#22C55E' }]} />
+                      <Text style={[theme.typography.caption, { color: '#166534' }]}>
+                        Review: {deckStats.reviewCount}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Distribution bar */}
+                  {deckStats.totalCards > 0 && (
+                    <View style={styles.distributionBar}>
+                      {[
+                        { count: deckStats.newCount, color: palette.blue[500] },
+                        { count: deckStats.learningCount, color: '#F59E0B' },
+                        { count: deckStats.reviewCount, color: '#22C55E' },
+                      ].map((s, idx) => {
+                        const pct = (s.count / deckStats.totalCards) * 100
+                        if (pct === 0) return null
+                        return (
+                          <View
+                            key={idx}
+                            style={{ width: `${pct}%` as any, height: '100%', backgroundColor: s.color }}
+                          />
+                        )
+                      })}
+                    </View>
+                  )}
+                </View>
+
+                {/* Additional stats */}
+                <View style={styles.statsRow}>
+                  <StatCard label="Avg Interval" value={`${deckStats.avgInterval.toFixed(1)}d`} testID="deck-edit-stat-interval" />
+                  <StatCard label="Avg Ease" value={deckStats.avgEase.toFixed(2)} testID="deck-edit-stat-ease" />
+                </View>
+
+                {/* Mastery bar */}
+                <ProgressBar percentage={deckStats.masteryRate} label="Mastery Rate" testID="deck-edit-mastery-bar" />
+              </View>
+            )}
+          </View>
+        )}
+
         <Button
           testID="deck-edit-save"
-          title={isEditing ? 'Save Changes' : 'Create Deck'}
+          title={isEditing ? t('edit.save') : t('edit.create')}
           onPress={handleSave}
           loading={saving}
           disabled={!name.trim()}
@@ -194,4 +375,19 @@ const styles = StyleSheet.create({
   iconBtn: { width: 44, height: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'transparent' },
   iconText: { fontSize: 22 },
   templateChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8, borderWidth: 1 },
+  // SRS Settings card
+  srsCard: { borderRadius: 12, borderWidth: 1, padding: 16, gap: 10 },
+  srsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  srsGridItem: { width: '47%' as any, gap: 2 },
+  srsLabel: { fontSize: 13, fontWeight: '700', textAlign: 'center' },
+  // Statistics card
+  statsCard: { borderRadius: 12, borderWidth: 1, overflow: 'hidden' },
+  statsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },
+  statsBody: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
+  statsRow: { flexDirection: 'row', gap: 8 },
+  statusCard: { borderRadius: 10, padding: 12, gap: 8 },
+  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  badgeDot: { width: 8, height: 8, borderRadius: 4 },
+  distributionBar: { flexDirection: 'row', height: 10, borderRadius: 5, overflow: 'hidden', marginTop: 4 },
 })

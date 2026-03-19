@@ -38,7 +38,7 @@ export function MiniHeatmap({ data, testID }: MiniHeatmapProps) {
       testID={testID}
     >
       <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-        Activity
+        Study Heatmap
       </Text>
       <View style={styles.grid}>
         {rows.map((row, ri) => (

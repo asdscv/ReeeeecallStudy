@@ -2,8 +2,9 @@ import { useState, useMemo } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, FAB, EmptyState, SearchBar } from '../components/ui'
+import { Screen, FAB, EmptyState, SearchBar, DrawerHeader, Button } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
+import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import type { DecksStackParamList } from '../navigation/types'
 
@@ -19,6 +20,7 @@ type Nav = NativeStackNavigationProp<DecksStackParamList, 'DecksList'>
  */
 export function DecksListScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
   const navigation = useNavigation<Nav>()
   const { decks, stats, loading, refresh, deleteDeck } = useDecks()
   const [search, setSearch] = useState('')
@@ -33,7 +35,7 @@ export function DecksListScreen() {
   }, [decks, search])
 
   const handleDelete = (deckId: string, name: string) => {
-    Alert.alert('Delete Deck', `Are you sure you want to delete "${name}"?`, [
+    Alert.alert(t('deleteDeck'), t('deleteConfirm', { name: "${name}"?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteDeck(deckId) },
     ])
@@ -41,6 +43,7 @@ export function DecksListScreen() {
 
   return (
     <Screen safeArea padding={false} testID="decks-list-screen">
+      <DrawerHeader title={t('title')} />
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -48,8 +51,27 @@ export function DecksListScreen() {
         contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[theme.typography.h2, { color: theme.colors.text }]}>Decks</Text>
-            <SearchBar value={search} onChangeText={setSearch} placeholder="Search decks..." testID="decks-search" />
+            {/* Action buttons — matches web: AI Generate (purple) + Create New (blue) */}
+            <View style={styles.headerButtons}>
+              <TouchableOpacity
+                testID="decks-ai-generate"
+                onPress={() => {
+                  const tabNav = navigation.getParent()
+                  if (tabNav) tabNav.navigate('SettingsTab', { screen: 'AIGenerate' })
+                }}
+                style={[styles.headerBtn, { backgroundColor: '#7C3AED' }]}
+              >
+                <Text style={styles.headerBtnText}>🤖 AI Generate</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="decks-create-new"
+                onPress={() => navigation.navigate('DeckEdit', {})}
+                style={[styles.headerBtn, { backgroundColor: palette.blue[600] }]}
+              >
+                <Text style={styles.headerBtnText}>+ Create New</Text>
+              </TouchableOpacity>
+            </View>
+            <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="decks-search" />
           </View>
         }
         renderItem={({ item }) => {
@@ -120,7 +142,13 @@ export function DecksListScreen() {
                       <Text style={[theme.typography.caption, { color: palette.red[500] }]}>Delete</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate('DeckDetail', { deckId: item.id })}
+                      onPress={() => {
+                        // Navigate to StudyTab with deckId preselected (matches web behavior)
+                        const tabNav = navigation.getParent()
+                        if (tabNav) {
+                          tabNav.navigate('StudyTab', { screen: 'StudySetup', params: { deckId: item.id } })
+                        }
+                      }}
                       style={[styles.studyBtn, { backgroundColor: palette.blue[50] }]}
                       testID={`deck-card-${item.id}-study`}
                     >
@@ -138,9 +166,9 @@ export function DecksListScreen() {
           !loading ? (
             <EmptyState
               icon="📚"
-              title="No decks yet"
-              description="Create your first deck to start learning"
-              actionTitle="Create Deck"
+              title={t('empty')}
+              description={t('emptyDescription')}
+              actionTitle={t('createFirst')}
               onAction={() => navigation.navigate('DeckEdit', {})}
               testID="decks-empty"
             />
@@ -158,7 +186,10 @@ export function DecksListScreen() {
 const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingBottom: 80, gap: 12 },
   listEmpty: { flex: 1 },
-  header: { gap: 12, paddingTop: 16, paddingBottom: 8 },
+  header: { gap: 12, paddingTop: 12, paddingBottom: 8 },
+  headerButtons: { flexDirection: 'row', gap: 8 },
+  headerBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  headerBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
   // Matches web: rounded-xl border overflow-hidden flex
   card: { borderRadius: 12, borderWidth: 1, overflow: 'hidden', flexDirection: 'row' },
   colorBar: { width: 4 },

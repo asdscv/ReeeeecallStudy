@@ -1,0 +1,31 @@
+{
+  "title": "Upgrade to Pro",
+  "subtitle": "Unlock the full power of ReeeeecallStudy",
+  "youArePro": "You're Pro!",
+  "proDesc": "You have access to all premium features.",
+  "done": "Done",
+  "back": "Back",
+  "features": {
+    "unlimitedDecks": { "title": "Unlimited Decks & Cards", "free": "5 decks, 3K cards", "pro": "Unlimited" },
+    "allModes": { "title": "All Study Modes", "free": "SRS + Sequential", "pro": "All 4 modes" },
+    "aiGeneration": { "title": "AI Card Generation", "free": "5/month", "pro": "Unlimited" },
+    "premiumTts": { "title": "Premium TTS", "free": "Basic", "pro": "Edge TTS HD" },
+    "analytics": { "title": "Advanced Analytics", "free": "Basic stats", "pro": "Charts + Forecast" },
+    "marketplace": { "title": "Marketplace Publishing", "free": "Download only", "pro": "Upload + Revenue share" }
+  },
+  "free": "Free",
+  "pro": "Pro",
+  "monthly": "Monthly",
+  "annual": "Annual",
+  "save40": "Save 40%",
+  "unavailable": "This product is not available in your region",
+  "welcomePro": "Welcome to Pro!",
+  "welcomeProDesc": "You now have access to all premium features.",
+  "restorePurchase": "Restore Purchase",
+  "restored": "Your Pro subscription has been restored.",
+  "noRestoreFound": "No previous subscription was found to restore.",
+  "productsUnavailable": "Subscription products are currently unavailable. Please try again later.",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "manageSubscription": "Manage Subscription"
+}

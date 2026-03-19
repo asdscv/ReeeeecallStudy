@@ -1,0 +1,32 @@
+{
+  "title": "Dashboard",
+  "stats": {
+    "totalCards": "Total Cards",
+    "todayReview": "Today's Review",
+    "streak": "Study Streak",
+    "masteryRate": "Mastery Rate"
+  },
+  "dailyChart": {
+    "title": "Daily Study Volume",
+    "noData": "No study records yet"
+  },
+  "forecast": {
+    "title": "Review Forecast (7 days)",
+    "noData": "No scheduled reviews"
+  },
+  "recentDecks": {
+    "title": "Recent Decks",
+    "noDecks": "No decks yet. Go to Decks tab to create one!",
+    "goToDecks": "Go to Deck Management",
+    "cardCount": "{{count}} cards",
+    "newCards": "{{count}} new",
+    "reviewCards": "{{count}} due",
+    "study": "Study"
+  },
+  "heatmap": {
+    "title": "Study Heatmap"
+  },
+  "studyHistory": "Study History",
+  "studyHistoryDesc": "View sessions, stats, and progress",
+  "streakDays": "{{count}}days"
+}

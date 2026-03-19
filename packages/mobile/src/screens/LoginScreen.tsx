@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, Button, Divider, SocialButton } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../theme'
@@ -11,6 +12,7 @@ type Nav = NativeStackNavigationProp<AuthStackParamList, 'Login'>
 
 export function LoginScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('auth')
   const navigation = useNavigation<Nav>()
   const { signIn, signInWithGoogle, signInWithApple, loading } = useAuth()
 
@@ -24,11 +26,11 @@ export function LoginScreen() {
     setError('')
 
     if (!email.trim()) {
-      setError('Please enter your email')
+      setError(t('enterEmail'))
       return
     }
     if (!password) {
-      setError('Please enter your password')
+      setError(t('enterPasswordError'))
       return
     }
 
@@ -60,10 +62,10 @@ export function LoginScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
-            Welcome back
+            {t('welcomeBack')}
           </Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginTop: theme.spacing.sm }]}>
-            Sign in to continue learning
+            {t('signInToContinue')}
           </Text>
         </View>
 
@@ -82,14 +84,14 @@ export function LoginScreen() {
           />
         </View>
 
-        <Divider text="or" />
+        <Divider text={t('orDivider')} />
 
         {/* Email Login */}
         <View style={styles.form}>
           <TextInput
             testID="login-email-input"
-            label="Email"
-            placeholder="you@example.com"
+            label={t('emailLabel')}
+            placeholder={t('emailPlaceholder')}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -103,8 +105,8 @@ export function LoginScreen() {
           <TextInput
             ref={passwordRef}
             testID="login-password-input"
-            label="Password"
-            placeholder="Enter your password"
+            label={t('passwordLabel')}
+            placeholder={t('enterPassword')}
             value={password}
             onChangeText={setPassword}
             isPassword
@@ -125,7 +127,7 @@ export function LoginScreen() {
 
           <Button
             testID="login-submit-button"
-            title="Sign In"
+            title={t('signIn')}
             onPress={handleLogin}
             loading={loading}
             disabled={!email.trim() || !password}
@@ -137,7 +139,7 @@ export function LoginScreen() {
             style={styles.linkButton}
           >
             <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
-              Forgot password?
+              {t('forgotPasswordLink')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -145,14 +147,14 @@ export function LoginScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-            Don't have an account?{' '}
+            {t('noAccount')}{' '}
           </Text>
           <TouchableOpacity
             testID="login-signup-link"
             onPress={() => navigation.navigate('SignUp')}
           >
             <Text style={[theme.typography.label, { color: theme.colors.primary }]}>
-              Sign Up
+              {t('signup')}
             </Text>
           </TouchableOpacity>
         </View>

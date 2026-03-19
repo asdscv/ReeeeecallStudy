@@ -1,0 +1,111 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS Review",
+      "description": "Spaced repetition for long-term memory",
+      "detail": "Cards are scheduled based on your performance"
+    },
+    "sequential_review": {
+      "label": "Sequential Review",
+      "description": "In order, mixing new + review cards",
+      "detail": "Go through cards sequentially from where you left off"
+    },
+    "random": {
+      "label": "Random",
+      "description": "Shuffled cards",
+      "detail": "Cards are randomly selected from the deck"
+    },
+    "sequential": {
+      "label": "Sequential",
+      "description": "Cards in order, one by one",
+      "detail": "Go through cards in the order they were added"
+    },
+    "by_date": {
+      "label": "By Date",
+      "description": "Study cards by upload date",
+      "detail": "Select a date to study cards added on that day"
+    },
+    "cramming": {
+      "label": "Cramming",
+      "description": "Rapid-fire until mastered",
+      "detail": "Missed cards return until you get them all right"
+    }
+  },
+  "setup": {
+    "title": "Study Setup",
+    "deck": "Deck",
+    "studyMode": "Study Mode",
+    "cardsPerSession": "Cards per session",
+    "batchHint": "Between 5 and 500 cards",
+    "selectDeck": "Please choose a deck to study",
+    "startStudy": "Start Study",
+    "startFailed": "Failed to start study session",
+    "dateSelection": "Date Selection",
+    "dateSelectionDesc": "Select a date to study cards added on that day. Date picker will show after starting."
+  },
+  "cramming": {
+    "options": "Cramming Options",
+    "filter": {
+      "title": "Card Filter",
+      "all": "All Cards",
+      "weak": "Weak Cards",
+      "dueSoon": "Due Soon"
+    },
+    "timeLimit": {
+      "title": "Time Limit",
+      "none": "No Limit",
+      "minutes": "{{count}} min"
+    },
+    "shuffle": {
+      "title": "Shuffle Cards"
+    },
+    "summary": {
+      "completed": "Cramming Complete!",
+      "crammingAgain": "Cramming Again"
+    }
+  },
+  "session": {
+    "loading": "Loading...",
+    "exit": "Exit",
+    "endSession": "End Session?",
+    "endMessage": "Your progress so far will be saved.",
+    "continue": "Continue",
+    "end": "End",
+    "tapToFlip": "Tap to flip",
+    "swipeHint": "Tap card to flip · Swipe to rate"
+  },
+  "srsRating": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
+  "rating": {
+    "unknown": "Unknown",
+    "known": "Known",
+    "missed": "Missed",
+    "gotIt": "Got It"
+  },
+  "summary": {
+    "title": "Session Complete!",
+    "crammingTitle": "Cramming Complete!",
+    "cardsStudied": "Cards Studied",
+    "timeSpent": "Time Spent",
+    "avgPerCard": "Avg per Card",
+    "mastery": "Mastery",
+    "ratingDistribution": "Rating Distribution",
+    "backToDeck": "Back to Deck",
+    "studyAgain": "Study Again",
+    "crammingAgain": "Cramming Again"
+  },
+  "ratingLabels": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "missed": "Missed",
+    "got_it": "Got It",
+    "unknown": "Unknown",
+    "known": "Known"
+  }
+}

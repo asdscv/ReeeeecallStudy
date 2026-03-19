@@ -15,6 +15,7 @@ import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-g
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
+import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
 import type { StudyStackParamList } from '../navigation/types'
 
@@ -35,7 +36,7 @@ export function StudySessionScreen() {
   const theme = useTheme()
   const navigation = useNavigation<Nav>()
   const {
-    phase, currentCard, isFlipped, isRating, template,
+    phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
   } = useStudy()
 
@@ -102,7 +103,7 @@ export function StudySessionScreen() {
     return (
       <Screen testID="study-session-screen">
         <View style={styles.center}>
-          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>Loading...</Text>
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>{t('session.loading')}</Text>
         </View>
       </Screen>
     )
@@ -139,9 +140,9 @@ export function StudySessionScreen() {
   }
 
   const handleExit = () => {
-    Alert.alert('End Session?', 'Your progress so far will be saved.', [
-      { text: 'Continue', style: 'cancel' },
-      { text: 'End', style: 'destructive', onPress: () => exitSession() },
+    Alert.alert(t('session.endSession'), t('session.endMessage'), [
+      { text: t('session.continue'), style: 'cancel' },
+      { text: t('session.end'), style: 'destructive', onPress: () => exitSession() },
     ])
   }
 
@@ -193,7 +194,7 @@ export function StudySessionScreen() {
         {/* Header */}
         <View style={[styles.header, { paddingHorizontal: 20 }]}>
           <TouchableOpacity onPress={handleExit} {...testProps('study-exit-button')}>
-            <Text style={[theme.typography.body, { color: theme.colors.primary }]}>✕ Exit</Text>
+            <Text style={[theme.typography.body, { color: theme.colors.primary }]}>✕ {t('session.exit')}</Text>
           </TouchableOpacity>
           <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
             {sessionStats.cardsStudied}/{sessionStats.totalCards}
@@ -233,13 +234,27 @@ export function StudySessionScreen() {
           </GestureDetector>
         </View>
 
-        {/* Rating buttons (visible after flip) */}
+        {/* Rating buttons — mode-specific (matches web) */}
         {isFlipped && (
           <View style={[styles.ratingRow, { paddingHorizontal: 16 }]}>
-            <RatingButton label="Again" color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} testID="study-rate-again" />
-            <RatingButton label="Hard" color={RATING_COLORS.hard} onPress={() => handleRate('hard')} disabled={isRating} testID="study-rate-hard" />
-            <RatingButton label="Good" color={RATING_COLORS.good} onPress={() => handleRate('good')} disabled={isRating} testID="study-rate-good" />
-            <RatingButton label="Easy" color={RATING_COLORS.easy} onPress={() => handleRate('easy')} disabled={isRating} testID="study-rate-easy" />
+            {config?.mode === 'cramming' ? (
+              <>
+                <RatingButton label={t('rating.missed')} color={RATING_COLORS.again} onPress={() => handleRate('missed')} disabled={isRating} testID="study-rate-missed" />
+                <RatingButton label={t('rating.gotIt')} color={RATING_COLORS.good} onPress={() => handleRate('got_it')} disabled={isRating} testID="study-rate-got-it" />
+              </>
+            ) : config?.mode === 'srs' ? (
+              <>
+                <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} testID="study-rate-again" />
+                <RatingButton label={t('srsRating.hard')} color={RATING_COLORS.hard} onPress={() => handleRate('hard')} disabled={isRating} testID="study-rate-hard" />
+                <RatingButton label={t('srsRating.good')} color={RATING_COLORS.good} onPress={() => handleRate('good')} disabled={isRating} testID="study-rate-good" />
+                <RatingButton label={t('srsRating.easy')} color={RATING_COLORS.easy} onPress={() => handleRate('easy')} disabled={isRating} testID="study-rate-easy" />
+              </>
+            ) : (
+              <>
+                <RatingButton label={t('rating.unknown')} color={RATING_COLORS.again} onPress={() => handleRate('unknown')} disabled={isRating} testID="study-rate-unknown" />
+                <RatingButton label={t('rating.known')} color={RATING_COLORS.good} onPress={() => handleRate('known')} disabled={isRating} testID="study-rate-known" />
+              </>
+            )}
           </View>
         )}
 

@@ -1,0 +1,17 @@
+{
+  "title": "Study History",
+  "back": "Back",
+  "all": "All",
+  "allModes": "All Modes",
+  "empty": "No study history yet",
+  "emptyDesc": "Start studying to see your progress here",
+  "studyVolume": "Study Volume",
+  "modeBreakdown": "Mode Breakdown",
+  "deckProgress": "Deck Progress",
+  "sessionList": "Session List",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "unknownDeck": "Unknown Deck",
+  "sessions": "sessions",
+  "cards": "cards"
+}

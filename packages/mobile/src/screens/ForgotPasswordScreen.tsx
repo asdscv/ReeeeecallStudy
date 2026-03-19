@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, Button } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../theme'
 
 export function ForgotPasswordScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('auth')
   const navigation = useNavigation()
   const { resetPassword, loading } = useAuth()
 
@@ -18,7 +20,7 @@ export function ForgotPasswordScreen() {
     setError('')
 
     if (!email.trim()) {
-      setError('Please enter your email')
+      setError(t('enterEmail'))
       return
     }
 
@@ -35,13 +37,13 @@ export function ForgotPasswordScreen() {
       <Screen testID="forgot-password-success-screen">
         <View style={styles.successContent}>
           <Text style={[theme.typography.h2, { color: theme.colors.text, textAlign: 'center' }]}>
-            Check your email
+            {t('resetSentTitle')}
           </Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', marginTop: 12 }]}>
-            If an account exists for {email}, we sent a password reset link.
+            {t('resetSentMessage', { email })}
           </Text>
           <Button
-            title="Back to Login"
+            title={t('backToLogin')}
             variant="secondary"
             onPress={() => navigation.goBack()}
             testID="forgot-password-back-button"
@@ -61,17 +63,17 @@ export function ForgotPasswordScreen() {
           testID="forgot-password-back"
         >
           <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
-            ← Back
+            {'← '}{t('backToLogin', { ns: 'common', defaultValue: 'Back' })}
           </Text>
         </TouchableOpacity>
 
         {/* Header */}
         <View style={styles.header}>
           <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
-            Reset password
+            {t('resetPassword')}
           </Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginTop: theme.spacing.sm }]}>
-            Enter your email and we'll send you a reset link
+            {t('resetDescription')}
           </Text>
         </View>
 
@@ -79,8 +81,8 @@ export function ForgotPasswordScreen() {
         <View style={styles.form}>
           <TextInput
             testID="forgot-password-email-input"
-            label="Email"
-            placeholder="you@example.com"
+            label={t('emailLabel')}
+            placeholder={t('emailPlaceholder')}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -102,7 +104,7 @@ export function ForgotPasswordScreen() {
 
           <Button
             testID="forgot-password-submit-button"
-            title="Send Reset Link"
+            title={t('sendResetLink')}
             onPress={handleReset}
             loading={loading}
             disabled={!email.trim()}

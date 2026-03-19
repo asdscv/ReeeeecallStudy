@@ -10,6 +10,37 @@ import { localizeAuthError } from '@reeeeecall/shared/lib/auth-errors'
 // Dismiss browser on redirect
 WebBrowser.maybeCompleteAuthSession()
 
+/**
+ * Extract access_token & refresh_token from OAuth callback URL and set Supabase session.
+ * Supabase returns tokens in URL fragment: reeeeecall://#access_token=...&refresh_token=...
+ * Or as query params after server-side flow.
+ */
+async function extractAndSetSession(
+  supabase: ReturnType<typeof getMobileSupabase>,
+  url: string,
+): Promise<string | undefined> {
+  try {
+    // Tokens can be in fragment (#) or query (?)
+    const hashPart = url.split('#')[1]
+    const queryPart = url.split('?')[1]
+    const params = new URLSearchParams(hashPart || queryPart || '')
+
+    const accessToken = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+
+    if (accessToken && refreshToken) {
+      const { error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      })
+      if (error) return localizeAuthError(error.message)
+    }
+    return undefined
+  } catch {
+    return 'Failed to process login response'
+  }
+}
+
 export interface AuthActions {
   // Email auth
   signIn: (email: string, password: string) => Promise<{ error?: string }>
@@ -95,7 +126,7 @@ export function useAuth(): AuthActions {
     setLoading(true)
     try {
       const supabase = getMobileSupabase()
-      const redirectTo = AuthSession.makeRedirectUri()
+      const redirectTo = AuthSession.makeRedirectUri({ scheme: 'reeeeecall' })
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -108,6 +139,13 @@ export function useAuth(): AuthActions {
         const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo)
         if (result.type !== 'success') {
           return { error: 'Login was cancelled' }
+        }
+
+        // Extract tokens from callback URL and set Supabase session
+        // Supabase returns tokens in URL fragment: #access_token=...&refresh_token=...
+        if (result.url) {
+          const sessionError = await extractAndSetSession(supabase, result.url)
+          if (sessionError) return { error: sessionError }
         }
       }
 
@@ -168,7 +206,7 @@ export function useAuth(): AuthActions {
       } else {
         // Android: OAuth web flow (same pattern as Google)
         const supabase = getMobileSupabase()
-        const redirectTo = AuthSession.makeRedirectUri()
+        const redirectTo = AuthSession.makeRedirectUri({ scheme: 'reeeeecall' })
 
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'apple',
@@ -181,6 +219,11 @@ export function useAuth(): AuthActions {
           const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo)
           if (result.type !== 'success') {
             return { error: 'Login was cancelled' }
+          }
+
+          if (result.url) {
+            const sessionError = await extractAndSetSession(supabase, result.url)
+            if (sessionError) return { error: sessionError }
           }
         }
 

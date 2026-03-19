@@ -32,8 +32,8 @@ export const palette = {
     950: '#030712',
   },
   // Semantic
-  red: { 400: '#F87171', 500: '#EF4444', 600: '#DC2626' },
-  green: { 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A' },
+  red: { 50: '#FEF2F2', 400: '#F87171', 500: '#EF4444', 600: '#DC2626' },
+  green: { 50: '#F0FDF4', 400: '#4ADE80', 500: '#22C55E', 600: '#16A34A', 700: '#15803D' },
   yellow: { 400: '#FACC15', 500: '#EAB308', 600: '#CA8A04' },
   // Pure
   white: '#FFFFFF',
@@ -75,9 +75,9 @@ export interface ThemeColors {
 export type LightThemeColors = ThemeColors
 
 export const lightColors: ThemeColors = {
-  // Backgrounds
-  background: palette.white,
-  surface: palette.gray[50],
+  // Backgrounds — matches web: bg-gray-50 main, white cards
+  background: palette.gray[50],
+  surface: palette.gray[100],
   surfaceElevated: palette.white,
   // Text
   text: palette.gray[900],

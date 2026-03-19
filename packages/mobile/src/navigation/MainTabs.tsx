@@ -1,7 +1,8 @@
 import { Text } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
-import { DashboardScreen } from '../screens/DashboardScreen'
+import { HomeStack } from './HomeStack'
 import { DecksStack } from './DecksStack'
 import { StudyStack } from './StudyStack'
 import { MarketplaceStack } from './MarketplaceStack'
@@ -25,6 +26,7 @@ function TabIcon({ name, focused }: { name: keyof MainTabParamList; focused: boo
 
 export function MainTabs() {
   const theme = useTheme()
+  const { t } = useTranslation('common')
 
   return (
     <Tab.Navigator
@@ -36,20 +38,25 @@ export function MainTabs() {
           backgroundColor: theme.colors.surfaceElevated,
           borderTopColor: theme.colors.border,
           paddingTop: 4,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 5,
         },
         tabBarLabelStyle: { ...theme.typography.caption, marginTop: -2 },
       }}
     >
-      <Tab.Screen name="HomeTab" component={DashboardScreen}
-        options={{ tabBarLabel: 'Home', tabBarTestID: 'HomeTab', tabBarAccessibilityLabel: 'HomeTab', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
+      <Tab.Screen name="HomeTab" component={HomeStack}
+        options={{ tabBarLabel: t('nav.dashboard'), tabBarTestID: 'HomeTab', tabBarAccessibilityLabel: 'HomeTab', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
       <Tab.Screen name="DecksTab" component={DecksStack}
-        options={{ tabBarLabel: 'Decks', tabBarTestID: 'DecksTab', tabBarAccessibilityLabel: 'DecksTab', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.decks'), tabBarTestID: 'DecksTab', tabBarAccessibilityLabel: 'DecksTab', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
       <Tab.Screen name="StudyTab" component={StudyStack}
-        options={{ tabBarLabel: 'Study', tabBarTestID: 'StudyTab', tabBarAccessibilityLabel: 'StudyTab', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.study'), tabBarTestID: 'StudyTab', tabBarAccessibilityLabel: 'StudyTab', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
       <Tab.Screen name="MarketplaceTab" component={MarketplaceStack}
-        options={{ tabBarLabel: 'Market', tabBarTestID: 'MarketplaceTab', tabBarAccessibilityLabel: 'MarketplaceTab', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.marketplace'), tabBarTestID: 'MarketplaceTab', tabBarAccessibilityLabel: 'MarketplaceTab', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
       <Tab.Screen name="SettingsTab" component={SettingsStack}
-        options={{ tabBarLabel: 'Settings', tabBarTestID: 'SettingsTab', tabBarAccessibilityLabel: 'SettingsTab', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.settings'), tabBarTestID: 'SettingsTab', tabBarAccessibilityLabel: 'SettingsTab', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
     </Tab.Navigator>
   )
 }

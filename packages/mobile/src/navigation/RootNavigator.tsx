@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
-import { MainTabs } from './MainTabs'
+import { MainDrawer } from './MainDrawer'
 import { useAuthState } from '../hooks/useAuthState'
 import { LoadingScreen } from '../components/auth/LoadingScreen'
 import type { RootStackParamList } from './types'
@@ -17,7 +17,7 @@ export function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       {user ? (
-        <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="Main" component={MainDrawer} />
       ) : (
         <Stack.Screen name="Auth" component={AuthStack} />
       )}

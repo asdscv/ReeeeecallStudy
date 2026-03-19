@@ -3,6 +3,7 @@ import { View, Text, FlatList, Alert, StyleSheet, Linking } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Button, Badge, ListCard } from '../components/ui'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import type { MarketplaceStackParamList } from '../navigation/types'
@@ -41,8 +42,8 @@ export function MarketplaceDetailScreen() {
     return (
       <Screen testID="marketplace-detail-screen">
         <View style={styles.center}>
-          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>Listing not found</Text>
-          <Button title="Go Back" variant="secondary" onPress={() => navigation.goBack()} />
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>{t('detail.notFound')}</Text>
+          <Button title={t('detail.goBack')} variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -107,7 +108,7 @@ export function MarketplaceDetailScreen() {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
+            <Button title={t('detail.back', { defaultValue: '← Back to Marketplace' })} variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
 
             <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{listing.title}</Text>
 
@@ -117,9 +118,11 @@ export function MarketplaceDetailScreen() {
               </Text>
             )}
 
+            {/* Stats — matches web: cards, users, category */}
             <View style={styles.metaRow}>
               <Badge label={`${listing.card_count ?? 0} cards`} variant="neutral" />
-              <Badge label={`${listing.acquire_count ?? 0} downloads`} variant="primary" />
+              <Badge label={`${listing.acquire_count ?? 0} users`} variant="primary" />
+              {(listing as any).category && <Badge label={(listing as any).category} variant="neutral" />}
               {listing.share_mode && <Badge label={listing.share_mode} variant="success" />}
             </View>
 
@@ -135,14 +138,14 @@ export function MarketplaceDetailScreen() {
 
             <Button
               testID="marketplace-acquire-button"
-              title={acquiring ? 'Downloading...' : 'Add to My Decks'}
+              title={acquiring ? t('detail.downloading') : t('detail.getDeck')}
               onPress={handleAcquire}
               loading={acquiring}
             />
 
             <Button
               testID="marketplace-report-button"
-              title="Report Content"
+              title={t('detail.reportContent')}
               variant="ghost"
               size="sm"
               onPress={handleReport}

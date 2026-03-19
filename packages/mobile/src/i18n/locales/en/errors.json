@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "invalidCredentials": "Email or password is incorrect.",
+    "emailNotConfirmed": "Email not verified. Please check your inbox.",
+    "userAlreadyRegistered": "This email is already registered.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "emailRateLimit": "Too many requests. Please try again later.",
+    "invalidEmailFormat": "Invalid email format."
+  },
+  "generic": "Something went wrong. Please try again."
+}

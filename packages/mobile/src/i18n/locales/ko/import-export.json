@@ -1,0 +1,19 @@
+{
+  "title": "가져오기 / 내보내기",
+  "importCards": "카드 가져오기",
+  "importCSV": "CSV 가져오기",
+  "importJSON": "JSON 가져오기",
+  "importHint": "CSV: 첫 줄 = 필드명, 각 줄 = 카드 1장\nJSON: 객체 배열 또는 { cards: [...] }",
+  "importSuccess": "\"{{name}}\"에서 {{count}}장의 카드를 가져왔습니다",
+  "importFailed": "CSV 파일 가져오기에 실패했습니다",
+  "importJsonFailed": "JSON 파일 파싱에 실패했습니다",
+  "csvEmpty": "CSV 파일이 비어있거나 데이터 행이 없습니다",
+  "exportCards": "카드 내보내기",
+  "exportCSV": "CSV로 내보내기",
+  "exportJSON": "JSON으로 내보내기",
+  "exportFailed": "CSV 내보내기에 실패했습니다",
+  "exportJsonFailed": "JSON 내보내기에 실패했습니다",
+  "noCards": "내보낼 카드가 없습니다",
+  "sharingUnavailable": "이 기기에서 공유를 사용할 수 없습니다",
+  "back": "뒤로"
+}

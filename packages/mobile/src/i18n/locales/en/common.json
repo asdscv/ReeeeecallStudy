@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "quickStudy": "Quick Study",
+    "dashboard": "Dashboard",
+    "study": "Study",
+    "decks": "Decks",
+    "cards": "Cards",
+    "marketplace": "Marketplace",
+    "studyHistory": "History",
+    "settings": "Settings",
+    "admin": "Admin",
+    "guide": "Guide",
+    "aiGenerate": "AI Generate"
+  },
+  "guideHelp": "Help",
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "ok": "OK",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "copy": "Copy",
+    "search": "Search",
+    "startStudy": "Start Study",
+    "logout": "Logout"
+  },
+  "status": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "new": "New",
+    "learning": "Learning",
+    "review": "Review",
+    "suspended": "Suspended"
+  },
+  "units": {
+    "cards": "cards",
+    "cardsSuffix": "{{count}} cards",
+    "sessions": "sessions",
+    "days": "days",
+    "hours": "h",
+    "minutes": "min",
+    "seconds": "sec"
+  },
+  "timePeriod": {
+    "1d": "1D",
+    "1w": "1W",
+    "1m": "1M",
+    "3m": "3M",
+    "6m": "6M",
+    "1y": "1Y",
+    "2y": "2Y",
+    "5y": "5Y"
+  },
+  "confirmDialog": {
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "confirm": "Confirm"
+  }
+}

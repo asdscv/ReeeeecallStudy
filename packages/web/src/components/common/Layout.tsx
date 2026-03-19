@@ -215,9 +215,12 @@ export function Layout() {
                   </div>
                 )
               })}
-              <div className="border-t border-gray-100 mt-2 pt-2 px-3 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <LanguageSelector compact />
+              {/* Language quick-switch */}
+              <div className="border-t border-gray-100 mt-2 pt-3 px-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <LanguageSelector compact={false} />
+                </div>
+                <div className="flex items-center justify-between">
                   <Link
                     to="/guide"
                     onClick={() => setMobileMenuOpen(false)}
@@ -226,13 +229,13 @@ export function Layout() {
                     <BookOpen className="w-4 h-4" />
                     {t('nav.guide')}
                   </Link>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); signOut() }}
+                    className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer shrink-0 ml-4"
+                  >
+                    {t('actions.logout')}
+                  </button>
                 </div>
-                <button
-                  onClick={() => { setMobileMenuOpen(false); signOut() }}
-                  className="text-sm text-red-500 hover:text-red-600 cursor-pointer shrink-0 ml-4"
-                >
-                  {t('actions.logout')}
-                </button>
               </div>
             </nav>
           </div>

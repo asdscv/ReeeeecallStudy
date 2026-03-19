@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -7,6 +7,7 @@ import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { useDecks } from '../hooks/useDecks'
 import { useCards } from '../hooks/useCards'
+import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import type { DecksStackParamList } from '../navigation/types'
 
@@ -16,26 +17,37 @@ type Route = RouteProp<DecksStackParamList, 'DeckDetail'>
 type TabKey = 'cards' | 'dates' | 'stats'
 
 const TABS: { key: TabKey; label: string }[] = [
-  { key: 'cards', label: 'Cards' },
+  { key: 'cards', label: 'Card List' },
   { key: 'dates', label: 'Upload Date' },
   { key: 'stats', label: 'Statistics' },
 ]
 
-const STATUS_FILTERS = ['all', 'new', 'learning', 'review'] as const
+const STATUS_FILTERS = ['all', 'new', 'learning', 'review', 'suspended'] as const
 type StatusFilter = (typeof STATUS_FILTERS)[number]
+
+const CARDS_PER_PAGE_OPTIONS = [10, 20, 50] as const
 
 export function DeckDetailScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const { deckId } = route.params
 
   const { decks, getStatsForDeck, deleteDeck } = useDecks()
-  const { cards, loading, refresh, deleteCard } = useCards(deckId)
+  const { cards, loading, refresh, deleteCard, deleteCards } = useCards(deckId)
 
   const [activeTab, setActiveTab] = useState<TabKey>('cards')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+
+  // Bulk selection state
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [cardsPerPage, setCardsPerPage] = useState(20)
 
   const deck = decks.find((d) => d.id === deckId)
   const deckStats = getStatsForDeck(deckId)
@@ -54,10 +66,79 @@ export function DeckDetailScreen() {
     return result
   }, [cards, search, statusFilter])
 
+  // Reset to page 1 when search/filter/cardsPerPage changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, statusFilter, cardsPerPage])
+
+  // Exit selection mode clears selections
+  const exitSelectionMode = useCallback(() => {
+    setSelectionMode(false)
+    setSelectedIds(new Set())
+  }, [])
+
+  // Pagination computed values
+  const totalPages = Math.max(1, Math.ceil(filteredCards.length / cardsPerPage))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedCards = useMemo(() => {
+    const start = (safePage - 1) * cardsPerPage
+    return filteredCards.slice(start, start + cardsPerPage)
+  }, [filteredCards, safePage, cardsPerPage])
+
+  // Keep currentPage in bounds when filteredCards shrinks
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [currentPage, totalPages])
+
+  // Selection helpers
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
+
+  const toggleSelectAll = useCallback(() => {
+    const allFilteredIds = filteredCards.map((c) => c.id)
+    const allSelected = allFilteredIds.length > 0 && allFilteredIds.every((id) => selectedIds.has(id))
+    if (allSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(allFilteredIds))
+    }
+  }, [filteredCards, selectedIds])
+
+  const allSelected = filteredCards.length > 0 && filteredCards.every((c) => selectedIds.has(c.id))
+
+  const handleBulkDelete = useCallback(() => {
+    const count = selectedIds.size
+    if (count === 0) return
+    Alert.alert(
+      'Delete Cards',
+      `Delete ${count} selected card${count > 1 ? 's' : ''}? This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteCards(Array.from(selectedIds))
+            exitSelectionMode()
+            refresh()
+          },
+        },
+      ],
+    )
+  }, [selectedIds, deleteCards, exitSelectionMode, refresh])
+
   if (!deck) {
     return (
       <Screen testID="deck-detail-screen">
-        <EmptyState icon="❓" title="Deck not found" actionTitle="Go Back" onAction={() => navigation.goBack()} />
+        <EmptyState icon="❓" title={t('detail.deckNotFound')} actionTitle={t('detail.goBack')} onAction={() => navigation.goBack()} />
       </Screen>
     )
   }
@@ -73,11 +154,130 @@ export function DeckDetailScreen() {
     ])
   }
 
+  const renderSelectionBar = () => {
+    if (!selectionMode) return null
+    return (
+      <View style={[styles.selectionBar, { backgroundColor: theme.colors.primaryLight, borderColor: theme.colors.border }]}>
+        <View style={styles.selectionBarLeft}>
+          <TouchableOpacity onPress={toggleSelectAll} style={styles.selectAllBtn} testID="bulk-select-all">
+            <View style={[
+              styles.checkbox,
+              { borderColor: theme.colors.primary },
+              allSelected && { backgroundColor: theme.colors.primary },
+            ]}>
+              {allSelected && <Text style={styles.checkmark}>✓</Text>}
+            </View>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+              {allSelected ? 'Deselect All' : 'Select All'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]} testID="bulk-selection-count">
+            {selectedIds.size} selected
+          </Text>
+        </View>
+        <View style={styles.selectionBarRight}>
+          {selectedIds.size > 0 && (
+            <Button
+              title="Delete Selected"
+              variant="danger"
+              size="sm"
+              fullWidth={false}
+              onPress={handleBulkDelete}
+              testID="bulk-delete-btn"
+            />
+          )}
+          <Button
+            title="Cancel"
+            variant="ghost"
+            size="sm"
+            fullWidth={false}
+            onPress={exitSelectionMode}
+            testID="bulk-cancel-btn"
+          />
+        </View>
+      </View>
+    )
+  }
+
+  const renderPaginationControls = () => {
+    if (filteredCards.length === 0) return null
+    return (
+      <View style={[styles.paginationContainer, { borderTopColor: theme.colors.border }]}>
+        {/* Cards per page selector */}
+        <View style={styles.perPageRow}>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>Per page:</Text>
+          {CARDS_PER_PAGE_OPTIONS.map((opt) => {
+            const active = cardsPerPage === opt
+            return (
+              <TouchableOpacity
+                key={opt}
+                onPress={() => setCardsPerPage(opt)}
+                style={[
+                  styles.perPageChip,
+                  {
+                    backgroundColor: active ? theme.colors.primary : 'transparent',
+                    borderColor: active ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+                testID={`per-page-${opt}`}
+              >
+                <Text style={[
+                  theme.typography.caption,
+                  { color: active ? theme.colors.primaryText : theme.colors.textSecondary },
+                ]}>
+                  {opt}
+                </Text>
+              </TouchableOpacity>
+            )
+          })}
+        </View>
+
+        {/* Page navigation */}
+        {totalPages > 1 && (
+          <View style={styles.pageNavRow}>
+            <TouchableOpacity
+              onPress={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safePage <= 1}
+              style={[
+                styles.pageBtn,
+                { borderColor: theme.colors.border, opacity: safePage <= 1 ? 0.4 : 1 },
+              ]}
+              testID="pagination-prev"
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>← Prev</Text>
+            </TouchableOpacity>
+
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]} testID="pagination-info">
+              Page {safePage} of {totalPages}
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage >= totalPages}
+              style={[
+                styles.pageBtn,
+                { borderColor: theme.colors.border, opacity: safePage >= totalPages ? 0.4 : 1 },
+              ]}
+              testID="pagination-next"
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>Next →</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Summary */}
+        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
+          Showing {Math.min((safePage - 1) * cardsPerPage + 1, filteredCards.length)}–{Math.min(safePage * cardsPerPage, filteredCards.length)} of {filteredCards.length} cards
+        </Text>
+      </View>
+    )
+  }
+
   const renderHeader = () => (
     <View style={styles.header}>
       {/* Back button — matches web: text-sm text-gray-500 */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>← Back</Text>
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>← {t('detail.backToList')}</Text>
       </TouchableOpacity>
 
       {/* Title: icon + name — matches web: flex items-center gap-2 */}
@@ -97,18 +297,44 @@ export function DeckDetailScreen() {
         {dueCards > 0 && <Text style={[theme.typography.caption, { color: palette.yellow[600] }]}>{dueCards} due</Text>}
       </View>
 
-      {/* Action buttons — matches web: flex-wrap gap-2 mt-4 */}
+      {/* Action buttons — matches web: Study, Edit, Share, Add Card, AI Cards, Import, Export */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.actionScroll}>
         <View style={styles.actionRow}>
-          <Button title="Study" onPress={() => {}} size="sm" fullWidth={false} testID="deck-detail-study" />
-          <Button title="Edit" variant="outline" size="sm" fullWidth={false}
+          <Button title={t('detail.startStudy')} onPress={() => {
+            const tabNav = navigation.getParent()
+            if (tabNav) {
+              tabNav.navigate('StudyTab', { screen: 'StudySetup', params: { deckId } })
+            }
+          }} size="sm" fullWidth={false} testID="deck-detail-study" />
+          <Button title={t('detail.edit')} variant="outline" size="sm" fullWidth={false}
             onPress={() => navigation.navigate('DeckEdit', { deckId })} testID="deck-detail-edit" />
-          <Button title="Import/Export" variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-detail-import-export" />
+          <Button title={t('detail.share')} variant="outline" size="sm" fullWidth={false}
+            onPress={() => navigation.navigate('ShareDeck', { deckId })} testID="deck-detail-share" />
           <Button title="Publish" variant="outline" size="sm" fullWidth={false}
             onPress={() => navigation.navigate('PublishDeck', { deckId })} testID="deck-detail-publish" />
-          <Button title="Delete" variant="danger" size="sm" fullWidth={false}
-            onPress={handleDeleteDeck} testID="deck-detail-delete" />
+          <Button title={t('detail.addCard')} variant="outline" size="sm" fullWidth={false}
+            onPress={() => navigation.navigate('CardEdit', { deckId })} testID="deck-detail-add-card" />
+          <Button title={t('detail.aiCards')} variant="outline" size="sm" fullWidth={false}
+            onPress={() => {
+              const tabNav = navigation.getParent()
+              if (tabNav) {
+                tabNav.navigate('SettingsTab', { screen: 'AIGenerate' })
+              }
+            }} testID="deck-detail-ai-cards" />
+          <Button title={t('detail.import')} variant="outline" size="sm" fullWidth={false}
+            onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-detail-import" />
+          <Button title={t('detail.export')} variant="outline" size="sm" fullWidth={false}
+            onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-detail-export" />
+          {!selectionMode && filteredCards.length > 0 && (
+            <Button
+              title="Select"
+              variant="outline"
+              size="sm"
+              fullWidth={false}
+              onPress={() => setSelectionMode(true)}
+              testID="bulk-select-toggle"
+            />
+          )}
         </View>
       </ScrollView>
 
@@ -140,7 +366,7 @@ export function DeckDetailScreen() {
       {/* Cards tab: search + filter chips */}
       {activeTab === 'cards' && (
         <>
-          <SearchBar value={search} onChangeText={setSearch} placeholder="Search cards..." testID="deck-detail-search" />
+          <SearchBar value={search} onChangeText={setSearch} placeholder={t('detail.searchPlaceholder')} testID="deck-detail-search" />
           <View style={styles.filterRow}>
             {STATUS_FILTERS.map((f) => {
               const active = statusFilter === f
@@ -167,6 +393,8 @@ export function DeckDetailScreen() {
               )
             })}
           </View>
+          {/* Selection bar */}
+          {renderSelectionBar()}
         </>
       )}
     </View>
@@ -201,20 +429,52 @@ export function DeckDetailScreen() {
   return (
     <Screen safeArea padding={false} testID="deck-detail-screen">
       <FlatList
-        data={filteredCards}
+        data={paginatedCards}
         keyExtractor={(item) => item.id}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
-        contentContainerStyle={[styles.list, filteredCards.length === 0 && styles.listEmpty]}
+        contentContainerStyle={[styles.list, paginatedCards.length === 0 && filteredCards.length === 0 && styles.listEmpty]}
         ListHeaderComponent={renderHeader()}
+        ListFooterComponent={renderPaginationControls()}
         renderItem={({ item }) => {
           const fields = Object.values(item.field_values)
+          const isSelected = selectedIds.has(item.id)
           return (
             <TouchableOpacity
-              onPress={() => navigation.navigate('CardEdit', { deckId, cardId: item.id })}
+              onPress={() => {
+                if (selectionMode) {
+                  toggleSelect(item.id)
+                } else {
+                  navigation.navigate('CardEdit', { deckId, cardId: item.id })
+                }
+              }}
+              onLongPress={() => {
+                if (!selectionMode) {
+                  setSelectionMode(true)
+                  setSelectedIds(new Set([item.id]))
+                }
+              }}
               activeOpacity={0.7}
-              style={[styles.cardItem, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+              style={[
+                styles.cardItem,
+                {
+                  backgroundColor: isSelected ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                  borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                },
+              ]}
               testID={`card-item-${item.id}`}
             >
+              {selectionMode && (
+                <View
+                  style={[
+                    styles.checkbox,
+                    { borderColor: theme.colors.primary },
+                    isSelected && { backgroundColor: theme.colors.primary },
+                  ]}
+                  testID={`card-checkbox-${item.id}`}
+                >
+                  {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+              )}
               <View style={styles.cardContent}>
                 {fields.slice(0, 3).map((val, idx) => (
                   <Text
@@ -239,18 +499,27 @@ export function DeckDetailScreen() {
         }}
         ListEmptyComponent={
           !loading ? (
-            <EmptyState
-              icon="🃏"
-              title="No cards yet"
-              description="Add your first card to this deck"
-              actionTitle="Add Card"
-              onAction={() => navigation.navigate('CardEdit', { deckId })}
-              testID="deck-detail-empty"
-            />
+            <View style={styles.emptyContainer}>
+              <EmptyState
+                icon="🃏"
+                title={t('detail.noCards')}
+                actionTitle={t('detail.addFirstCard')}
+                onAction={() => navigation.navigate('CardEdit', { deckId })}
+                testID="deck-detail-empty"
+              />
+              <View style={styles.emptyButtons}>
+                <Button title={t('detail.importCards')} variant="outline" size="sm"
+                  onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-empty-import" />
+                <Button title={t('detail.downloadTemplate')} variant="outline" size="sm"
+                  onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-empty-template" />
+              </View>
+            </View>
           ) : null
         }
       />
-      <FAB onPress={() => navigation.navigate('CardEdit', { deckId })} testID="deck-detail-fab-add" />
+      {!selectionMode && (
+        <FAB onPress={() => navigation.navigate('CardEdit', { deckId })} testID="deck-detail-fab-add" />
+      )}
     </Screen>
   )
 }
@@ -273,4 +542,80 @@ const styles = StyleSheet.create({
   // Matches web mobile card view: rounded-xl border p-3
   cardItem: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, borderWidth: 1, padding: 12, gap: 10 },
   cardContent: { flex: 1, gap: 2 },
+  emptyContainer: { gap: 12 },
+  emptyButtons: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
+
+  // Bulk selection
+  selectionBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 8,
+  },
+  selectionBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  selectionBarRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  selectAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 4,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 16,
+  },
+
+  // Pagination
+  paginationContainer: {
+    paddingTop: 12,
+    paddingBottom: 4,
+    gap: 10,
+    borderTopWidth: 1,
+    marginTop: 4,
+  },
+  perPageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    justifyContent: 'center',
+  },
+  perPageChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  pageNavRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+  },
+  pageBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
 })

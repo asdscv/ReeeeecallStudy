@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, Globe, Loader2, Sparkles, Shield, Pencil } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronRight, ChevronDown, Globe, Loader2, Sparkles, Shield, Pencil, LogOut, Zap, Bot } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -88,7 +88,7 @@ export function SettingsPage() {
   const [newKeyName, setNewKeyName] = useState('')
   const [showKeyForm, setShowKeyForm] = useState(false)
 
-  // Study input settings (localStorage — auto-saved on change)
+  // Study input settings (localStorage)
   const [inputSettings, setInputSettingsRaw] = useState<StudyInputSettings>(() => loadSettings())
 
   // AI Provider state
@@ -98,8 +98,9 @@ export function SettingsPage() {
   const [aiEditModel, setAiEditModel] = useState('')
   const [aiEditBaseUrl, setAiEditBaseUrl] = useState('')
   const [aiSaving, setAiSaving] = useState(false)
+  const [aiCollapsed, setAiCollapsed] = useState(true)
 
-  // ── Auto-save helper ──────────────────────────────────
+  // Auto-save helper
   const autoSave = useCallback(async (field: string, value: unknown) => {
     if (!user) return
     const ok = await autoSaveProfile(user.id, field, value)
@@ -108,7 +109,7 @@ export function SettingsPage() {
     }
   }, [user, t])
 
-  // ── Answer mode: auto-save to both localStorage and DB ──
+  // Answer mode: auto-save
   const updateAnswerMode = useCallback(async (mode: 'button' | 'swipe') => {
     const next: StudyInputSettings = { version: 3, mode }
     setInputSettingsRaw(next)
@@ -116,7 +117,7 @@ export function SettingsPage() {
     await autoSave('answer_mode', mode)
   }, [autoSave])
 
-  // ── TTS: auto-save on change ──
+  // TTS: auto-save on change
   const updateTtsEnabled = useCallback(async (enabled: boolean) => {
     setTtsEnabled(enabled)
     await autoSave('tts_enabled', enabled)
@@ -130,14 +131,13 @@ export function SettingsPage() {
   const ttsSpeedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const updateTtsSpeed = useCallback((speed: number) => {
     setTtsSpeed(speed)
-    // Debounce: save after 500ms of no change
     if (ttsSpeedTimer.current) clearTimeout(ttsSpeedTimer.current)
     ttsSpeedTimer.current = setTimeout(() => {
       autoSave('tts_speed', speed)
     }, 500)
   }, [autoSave])
 
-  // ── Display name: debounced duplicate check ──
+  // Display name: debounced duplicate check
   const checkNameAvailability = useCallback(async (name: string) => {
     const trimmed = name.trim()
     if (!trimmed || trimmed === savedDisplayName) {
@@ -201,7 +201,7 @@ export function SettingsPage() {
     setNameSaving(false)
   }
 
-  // ── SRS: save button ──
+  // SRS: save button
   const handleSaveSrs = async () => {
     if (!user) return
     setSrsSaving(true)
@@ -213,7 +213,7 @@ export function SettingsPage() {
     setSrsSaving(false)
   }
 
-  // ── Fetch profile on mount ──
+  // Fetch profile on mount
   useEffect(() => {
     if (!user) return
 
@@ -233,7 +233,6 @@ export function SettingsPage() {
         setTtsEnabled(p.tts_enabled)
         setTtsSpeed(p.tts_speed ?? 0.9)
         setTtsProvider(p.tts_provider ?? 'web_speech')
-        // Sync answer_mode from DB → local state
         if (p.answer_mode) {
           const synced: StudyInputSettings = { version: 3, mode: p.answer_mode }
           setInputSettingsRaw(synced)
@@ -245,7 +244,7 @@ export function SettingsPage() {
 
     fetchProfile()
 
-    // Load API key from DB (api_keys table)
+    // Load API key from DB
     const fetchApiKey = async () => {
       const { data: keyRow } = await supabase
         .from('api_keys')
@@ -254,7 +253,6 @@ export function SettingsPage() {
         .single()
       if (keyRow) {
         const row = keyRow as { name: string; created_at: string; key_plain: string | null }
-        // Prefer key_plain from DB; fallback to localStorage for keys created before migration 030
         let plainKey = row.key_plain ?? ''
         if (!plainKey) {
           const saved = localStorage.getItem('reeeeecall-api-key-data')
@@ -282,7 +280,6 @@ export function SettingsPage() {
   const handleGenerateApiKey = async () => {
     if (!user || generating) return
 
-    // Validate key name
     const { validateKeyName, generateApiKey: genKey, hashApiKey } = await import('../lib/api-key')
     const nameResult = validateKeyName(newKeyName)
     if (!nameResult.valid) {
@@ -293,14 +290,11 @@ export function SettingsPage() {
 
     setGenerating(true)
     try {
-      // Generate key and hash
       const key = genKey()
       const keyHash = await hashApiKey(key)
 
-      // Upsert: delete existing key first (one_key_per_user constraint)
       await supabase.from('api_keys').delete().eq('user_id', user.id)
 
-      // Save hash + plain key to DB
       const { error } = await supabase
         .from('api_keys')
         .insert({
@@ -344,7 +338,7 @@ export function SettingsPage() {
     toast.success(t('apiKey.deleted'))
   }
 
-  // ── AI Provider handlers ──────────────────────────────
+  // AI Provider handlers
   const aiProviders = getProviders()
 
   const CUSTOM_PROVIDER = {
@@ -425,155 +419,104 @@ export function SettingsPage() {
 
   const nameChanged = displayName.trim() !== savedDisplayName
   const srsChanged = dailyNewLimit !== savedDailyNewLimit
+  const userInitial = (displayName || user?.email || '?')[0].toUpperCase()
 
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">{t('title')}</h1>
 
       <div className="space-y-4 sm:space-y-6">
-        {/* Guide links */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            onClick={() => navigate('/guide')}
-            className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-3 hover:bg-gray-50 transition cursor-pointer text-left"
-          >
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 shrink-0">
-              <BookOpen className="w-5 h-5" />
+
+        {/* ── a) Profile Section ── */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+              <span className="text-2xl font-bold text-white">{userInitial}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-gray-900">{t('guide.title')}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{t('guide.desc')}</div>
+              <p className="text-sm text-gray-500 mb-1">{user?.email}</p>
+              <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${
+                false /* isPro -- add when available */
+                  ? 'bg-green-50 text-green-700 border border-green-200'
+                  : 'bg-gray-100 text-gray-600 border border-gray-200'
+              }`}>
+                Free
+              </span>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.displayName')}</label>
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  placeholder={t('profile.displayNamePlaceholder')}
+                  maxLength={12}
+                  className={`w-full px-4 py-2.5 rounded-lg border outline-none text-gray-900 ${
+                    nameError
+                      ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                      : nameAvailable
+                        ? 'border-green-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
+                        : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                  }`}
+                />
+                {nameChecking && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                )}
+                {!nameChecking && nameAvailable && (
+                  <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
+                )}
+              </div>
+              <button
+                onClick={handleSaveName}
+                disabled={nameSaving || !nameChanged || nameChecking || nameAvailable === false}
+                className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium whitespace-nowrap"
+              >
+                {nameSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
+              </button>
+            </div>
+            {nameError && (
+              <p className="text-xs text-red-500 mt-1">{nameError}</p>
+            )}
+            {nameAvailable && (
+              <p className="text-xs text-green-500 mt-1">{t('profile.nameAvailable')}</p>
+            )}
+          </div>
+        </section>
+
+        {/* ── b) Quick Actions ── */}
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            onClick={() => navigate('/quick-study')}
+            className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 transition cursor-pointer text-center"
+          >
+            <Zap className="w-6 h-6 text-orange-600" />
+            <span className="text-sm font-semibold text-orange-700">{t('quickActions.quickStudy', 'Quick Study')}</span>
           </button>
           <button
-            onClick={() => navigate('/api-docs')}
-            className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-3 hover:bg-gray-50 transition cursor-pointer text-left"
+            onClick={() => navigate('/ai-generate')}
+            className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 transition cursor-pointer text-center"
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-50 text-purple-600 shrink-0">
-              <Key className="w-5 h-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-gray-900">{t('apiDocs.title')}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{t('apiDocs.desc')}</div>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
+            <Bot className="w-6 h-6 text-purple-600" />
+            <span className="text-sm font-semibold text-purple-700">{t('quickActions.aiGenerate', 'AI Generate')}</span>
+          </button>
+          <button
+            onClick={() => navigate('/guide')}
+            className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-blue-100 transition cursor-pointer text-center"
+          >
+            <BookOpen className="w-6 h-6 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-700">{t('quickActions.guide', 'Guide')}</span>
           </button>
         </div>
 
-        {/* Profile — has its own save button */}
+        {/* ── c) Study Settings ── */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.title')}</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.email')}</label>
-              <p className="text-sm text-gray-500">{user?.email}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.displayName')}</label>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder={t('profile.displayNamePlaceholder')}
-                    maxLength={12}
-                    className={`w-full px-4 py-2.5 rounded-lg border outline-none text-gray-900 ${
-                      nameError
-                        ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
-                        : nameAvailable
-                          ? 'border-green-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
-                          : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
-                    }`}
-                  />
-                  {nameChecking && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
-                  )}
-                  {!nameChecking && nameAvailable && (
-                    <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
-                  )}
-                </div>
-                <button
-                  onClick={handleSaveName}
-                  disabled={nameSaving || !nameChanged || nameChecking || nameAvailable === false}
-                  className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium whitespace-nowrap"
-                >
-                  {nameSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
-                </button>
-              </div>
-              {nameError && (
-                <p className="text-xs text-red-500 mt-1">{nameError}</p>
-              )}
-              {nameAvailable && (
-                <p className="text-xs text-green-500 mt-1">{t('profile.nameAvailable')}</p>
-              )}
-            </div>
-          </div>
-        </section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('answerMode.title')}</h2>
 
-        {/* Language — already auto-saves via changeLanguage() */}
-        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="w-5 h-5 text-gray-500" />
-            <h2 className="text-lg font-semibold text-gray-900">{t('language.title')}</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const).map((lng) => (
-              <button
-                key={lng}
-                onClick={() => changeLanguage(lng)}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                  i18n.language === lng
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {t(`language.${lng}`)}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* SRS Study Settings — has its own save button */}
-        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('srs.title')}</h2>
-          <p className="text-sm text-gray-500 mb-4">{t('srs.description')}</p>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('srs.newCardLimit')}
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                value={dailyNewLimit}
-                onChange={(e) => setDailyNewLimit(Math.max(1, Math.min(9999, parseInt(e.target.value) || 1)))}
-                min={1}
-                max={9999}
-                className="w-28 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
-              />
-              <span className="text-sm text-gray-500">{t('srs.cards')}</span>
-              <button
-                onClick={handleSaveSrs}
-                disabled={srsSaving || !srsChanged}
-                className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium"
-              >
-                {srsSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 mt-2">
-              {t('srs.help')}
-            </p>
-          </div>
-        </section>
-
-        {/* Answer Input Mode — auto-save on click */}
-        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('answerMode.title')}</h2>
-          <p className="text-sm text-gray-500 mb-4">{t('answerMode.description')}</p>
-
-          {/* Mode selection cards */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Answer Mode cards */}
+          <div className="grid grid-cols-2 gap-3 mb-5">
             <button
               type="button"
               onClick={() => updateAnswerMode('button')}
@@ -602,235 +545,268 @@ export function SettingsPage() {
             </button>
           </div>
 
-          {/* Auto-directions info (only in swipe mode) */}
           {inputSettings.mode === 'swipe' && (
-            <div className="p-3 bg-blue-50 rounded-lg mt-4">
+            <div className="p-3 bg-blue-50 rounded-lg mb-5">
               <p className="text-xs text-blue-800 whitespace-pre-line">
                 {t('answerMode.swipeAutoNote')}
               </p>
             </div>
           )}
-        </section>
 
-        {/* TTS settings — auto-save on change */}
-        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">{t('tts.title')}</h2>
-          <p className="text-sm text-gray-500 mb-4">{t('tts.description')}</p>
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={ttsEnabled}
-              onChange={(e) => updateTtsEnabled(e.target.checked)}
-              className="cursor-pointer"
-            />
-            <span className="text-sm text-gray-700">{t('tts.enable')}</span>
-          </label>
-
-          {/* TTS Provider */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('tts.provider')}
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => updateTtsProvider('web_speech')}
-                className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
-                  ttsProvider === 'web_speech'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="text-sm font-semibold text-gray-900">{t('tts.webSpeech')}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{t('tts.webSpeechDesc')}</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => updateTtsProvider('edge_tts')}
-                className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
-                  ttsProvider === 'edge_tts'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="text-sm font-semibold text-gray-900">{t('tts.edgeTts')}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{t('tts.edgeTtsDesc')}</div>
-              </button>
-            </div>
-          </div>
-
-          {/* TTS Speed slider */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('tts.speed')}
-            </label>
+          {/* Daily New Card Limit */}
+          <div className="pt-4 border-t border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">{t('srs.newCardLimit')}</h3>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 w-8">0.5x</span>
               <input
-                type="range"
-                min={0.5}
-                max={2.0}
-                step={0.1}
-                value={ttsSpeed}
-                onChange={(e) => updateTtsSpeed(parseFloat(e.target.value))}
-                className="flex-1 accent-blue-500 cursor-pointer"
+                type="number"
+                value={dailyNewLimit}
+                onChange={(e) => setDailyNewLimit(Math.max(1, Math.min(9999, parseInt(e.target.value) || 1)))}
+                min={1}
+                max={9999}
+                className="w-28 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
               />
-              <span className="text-xs text-gray-400 w-8">2.0x</span>
-              <span className="text-sm font-medium text-gray-700 w-12 text-right">{ttsSpeed.toFixed(1)}x</span>
+              <span className="text-sm text-gray-500">{t('srs.cards')}</span>
+              <button
+                onClick={handleSaveSrs}
+                disabled={srsSaving || !srsChanged}
+                className="px-4 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium"
+              >
+                {srsSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
+              </button>
             </div>
+            <p className="text-xs text-gray-400 mt-2">{t('srs.help')}</p>
           </div>
 
-          <p className="text-xs text-gray-400 mt-3">
-            {t('tts.help')}
-          </p>
+          {/* TTS */}
+          <div className="pt-4 border-t border-gray-100 mt-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">{t('tts.title')}</h3>
+            <p className="text-xs text-gray-500 mb-3">{t('tts.description')}</p>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={ttsEnabled}
+                onChange={(e) => updateTtsEnabled(e.target.checked)}
+                className="cursor-pointer"
+              />
+              <span className="text-sm text-gray-700">{t('tts.enable')}</span>
+            </label>
+
+            {ttsEnabled && (
+              <>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tts.provider')}</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => updateTtsProvider('web_speech')}
+                      className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
+                        ttsProvider === 'web_speech'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-sm font-semibold text-gray-900">{t('tts.webSpeech')}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{t('tts.webSpeechDesc')}</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateTtsProvider('edge_tts')}
+                      className={`p-3 rounded-xl border-2 text-left transition cursor-pointer ${
+                        ttsProvider === 'edge_tts'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-sm font-semibold text-gray-900">{t('tts.edgeTts')}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{t('tts.edgeTtsDesc')}</div>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('tts.speed')}</label>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400 w-8">0.5x</span>
+                    <input
+                      type="range"
+                      min={0.5}
+                      max={2.0}
+                      step={0.1}
+                      value={ttsSpeed}
+                      onChange={(e) => updateTtsSpeed(parseFloat(e.target.value))}
+                      className="flex-1 accent-blue-500 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-400 w-8">2.0x</span>
+                    <span className="text-sm font-medium text-gray-700 w-12 text-right">{ttsSpeed.toFixed(1)}x</span>
+                  </div>
+                </div>
+              </>
+            )}
+            <p className="text-xs text-gray-400 mt-3">{t('tts.help')}</p>
+          </div>
         </section>
 
-        {/* AI Provider Management */}
+        {/* ── e) AI Providers (collapsible) ── */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-5 h-5 text-violet-500" />
-            <h2 className="text-lg font-semibold text-gray-900">{t('aiProvider.title')}</h2>
-          </div>
-          <p className="text-sm text-gray-500 mb-5">{t('aiProvider.description')}</p>
+          <button
+            onClick={() => setAiCollapsed(!aiCollapsed)}
+            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-violet-500" />
+              <h2 className="text-lg font-semibold text-gray-900">{t('aiProvider.title')}</h2>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${aiCollapsed ? '' : 'rotate-180'}`} />
+          </button>
 
-          <div className="space-y-3">
-            {allAiProviders.map((provider) => {
-              const isConfigured = !!aiKeys[provider.id]
-              const isEditing = aiEditingId === provider.id
-              const iconClasses = getProviderIcon(provider.id)
-              const models = provider.id === 'custom'
-                ? [{ id: 'custom', name: 'Custom Model' }]
-                : (getProvider(provider.id)?.models ?? provider.models)
+          {!aiCollapsed && (
+            <>
+              <p className="text-sm text-gray-500 mt-2 mb-5">{t('aiProvider.description')}</p>
 
-              return (
-                <div
-                  key={provider.id}
-                  className="border border-gray-200 rounded-xl p-4"
-                >
-                  {/* Provider row */}
-                  <div className="flex items-center gap-3">
-                    <div className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${iconClasses}`}>
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
-                      </div>
-                      {provider.id === 'custom' && (
-                        <div className="text-xs text-gray-400">{t('aiProvider.customDesc')}</div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isConfigured ? (
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-green-50 text-green-700">
-                          {t('aiProvider.configured')}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
-                          {t('aiProvider.notSet')}
-                        </span>
-                      )}
-                      {!isEditing && (
-                        <button
-                          onClick={() => handleAiEdit(provider.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                          {t('aiProvider.edit')}
-                        </button>
-                      )}
-                      {!isEditing && isConfigured && (
-                        <button
-                          onClick={() => handleAiDelete(provider.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          {t('aiProvider.delete')}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+              <div className="space-y-3">
+                {allAiProviders.map((provider) => {
+                  const isConfigured = !!aiKeys[provider.id]
+                  const isEditing = aiEditingId === provider.id
+                  const iconClasses = getProviderIcon(provider.id)
+                  const models = provider.id === 'custom'
+                    ? [{ id: 'custom', name: 'Custom Model' }]
+                    : (getProvider(provider.id)?.models ?? provider.models)
 
-                  {/* Inline edit form */}
-                  {isEditing && (
-                    <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
-                      {/* API Key input */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('aiProvider.apiKey')}
-                        </label>
-                        <input
-                          type="password"
-                          value={aiEditKey}
-                          onChange={(e) => setAiEditKey(e.target.value)}
-                          placeholder={t('aiProvider.apiKeyPlaceholder')}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm font-mono"
-                        />
+                  return (
+                    <div key={provider.id} className="border border-gray-200 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${iconClasses}`}>
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
+                          </div>
+                          {provider.id === 'custom' && (
+                            <div className="text-xs text-gray-400">{t('aiProvider.customDesc')}</div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isConfigured ? (
+                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-green-50 text-green-700">
+                              {t('aiProvider.configured')}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                              {t('aiProvider.notSet')}
+                            </span>
+                          )}
+                          {!isEditing && (
+                            <button
+                              onClick={() => handleAiEdit(provider.id)}
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                              {t('aiProvider.edit')}
+                            </button>
+                          )}
+                          {!isEditing && isConfigured && (
+                            <button
+                              onClick={() => handleAiDelete(provider.id)}
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              {t('aiProvider.delete')}
+                            </button>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Model selector */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('aiProvider.model')}
-                        </label>
-                        <select
-                          value={aiEditModel}
-                          onChange={(e) => setAiEditModel(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm bg-white"
-                        >
-                          {models.map((m) => (
-                            <option key={m.id} value={m.id}>{m.name}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Base URL (custom only) */}
-                      {provider.id === 'custom' && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t('aiProvider.baseUrl')}
-                          </label>
-                          <input
-                            type="url"
-                            value={aiEditBaseUrl}
-                            onChange={(e) => setAiEditBaseUrl(e.target.value)}
-                            placeholder="https://api.example.com/v1"
-                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm font-mono"
-                          />
+                      {isEditing && (
+                        <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiProvider.apiKey')}</label>
+                            <input
+                              type="password"
+                              value={aiEditKey}
+                              onChange={(e) => setAiEditKey(e.target.value)}
+                              placeholder={t('aiProvider.apiKeyPlaceholder')}
+                              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm font-mono"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiProvider.model')}</label>
+                            <select
+                              value={aiEditModel}
+                              onChange={(e) => setAiEditModel(e.target.value)}
+                              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm bg-white"
+                            >
+                              {models.map((m) => (
+                                <option key={m.id} value={m.id}>{m.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {provider.id === 'custom' && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiProvider.baseUrl')}</label>
+                              <input
+                                type="url"
+                                value={aiEditBaseUrl}
+                                onChange={(e) => setAiEditBaseUrl(e.target.value)}
+                                placeholder="https://api.example.com/v1"
+                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-sm font-mono"
+                              />
+                            </div>
+                          )}
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              onClick={handleAiSave}
+                              disabled={aiSaving || !aiEditKey.trim()}
+                              className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium"
+                            >
+                              {aiSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('aiProvider.save')}
+                            </button>
+                            <button
+                              onClick={handleAiCancel}
+                              className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition cursor-pointer"
+                            >
+                              {t('aiProvider.cancel')}
+                            </button>
+                          </div>
                         </div>
                       )}
-
-                      {/* Save / Cancel */}
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          onClick={handleAiSave}
-                          disabled={aiSaving || !aiEditKey.trim()}
-                          className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer font-medium"
-                        >
-                          {aiSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('aiProvider.save')}
-                        </button>
-                        <button
-                          onClick={handleAiCancel}
-                          className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition cursor-pointer"
-                        >
-                          {t('aiProvider.cancel')}
-                        </button>
-                      </div>
                     </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                  )
+                })}
+              </div>
 
-          {/* Security note */}
-          <div className="flex items-start gap-2 mt-4 p-3 bg-gray-50 rounded-lg">
-            <Shield className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-gray-500">{t('aiProvider.securityNote')}</p>
+              <div className="flex items-start gap-2 mt-4 p-3 bg-gray-50 rounded-lg">
+                <Shield className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                <p className="text-xs text-gray-500">{t('aiProvider.securityNote')}</p>
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* ── f) Language ── */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Globe className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">{t('language.title')}</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const).map((lng) => (
+              <button
+                key={lng}
+                onClick={() => changeLanguage(lng)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                  i18n.language === lng
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {t(`language.${lng}`)}
+              </button>
+            ))}
           </div>
         </section>
 
-        {/* API Key Management */}
+        {/* ── API Key Management ── */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-lg font-semibold text-gray-900">{t('apiKey.title')}</h2>
@@ -846,7 +822,6 @@ export function SettingsPage() {
           </div>
           <p className="text-sm text-gray-500 mb-5">{t('apiKey.limit')}</p>
 
-          {/* New key form */}
           {showKeyForm && !apiKeyData && (
             <div className="border border-gray-200 rounded-xl p-4 sm:p-5 mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('apiKey.keyName')}</label>
@@ -878,7 +853,6 @@ export function SettingsPage() {
             </div>
           )}
 
-          {/* Existing key card */}
           {apiKeyData && (
             <div className="border border-gray-200 rounded-xl p-5 mb-4">
               <div className="flex items-center justify-between mb-3">
@@ -896,7 +870,6 @@ export function SettingsPage() {
                 </button>
               </div>
 
-              {/* Key value row — 3-mode display */}
               {apiKeyData.key ? (
                 <div className="flex items-center gap-2 mb-3">
                   <code className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono truncate">
@@ -930,7 +903,6 @@ export function SettingsPage() {
                 </div>
               )}
 
-              {/* Dates */}
               <div className="space-y-0.5">
                 <p className="text-sm text-gray-400">
                   {t('apiKey.createdAt')}: {formatLocalDateTime(apiKeyData.createdAt, dateLocale)}
@@ -946,18 +918,29 @@ export function SettingsPage() {
           )}
         </section>
 
-        {/* Logout */}
-        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">{t('account.title')}</h2>
-            <button
-              onClick={signOut}
-              className="px-4 py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer"
-            >
+        {/* ── i) Legal (compact inline) ── */}
+        <div className="flex items-center justify-center gap-3 py-2 text-sm text-gray-400">
+          <a href="https://reeeeecall.com/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition no-underline text-gray-400">
+            Privacy Policy
+          </a>
+          <span>·</span>
+          <a href="https://reeeeecall.com/terms" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition no-underline text-gray-400">
+            Terms of Service
+          </a>
+        </div>
+
+        {/* ── j) Account (bottom, clear separation) ── */}
+        <div className="border-t border-gray-200 pt-6">
+          <button
+            onClick={signOut}
+            className="w-full py-3 text-sm font-medium text-gray-500 border border-gray-300 rounded-xl hover:bg-gray-50 transition cursor-pointer bg-white"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <LogOut className="w-4 h-4" />
               {t('account.logout')}
-            </button>
-          </div>
-        </section>
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   )

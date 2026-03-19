@@ -1,0 +1,31 @@
+{
+  "title": "프로로 업그레이드",
+  "subtitle": "ReeeeecallStudy의 모든 기능을 잠금 해제하세요",
+  "youArePro": "프로입니다!",
+  "proDesc": "모든 프리미엄 기능을 사용할 수 있습니다.",
+  "done": "완료",
+  "back": "뒤로",
+  "features": {
+    "unlimitedDecks": { "title": "무제한 덱 & 카드", "free": "5개 덱, 3천장", "pro": "무제한" },
+    "allModes": { "title": "모든 학습 모드", "free": "SRS + 순차", "pro": "4가지 모드" },
+    "aiGeneration": { "title": "AI 카드 생성", "free": "월 5회", "pro": "무제한" },
+    "premiumTts": { "title": "프리미엄 TTS", "free": "기본", "pro": "Edge TTS HD" },
+    "analytics": { "title": "고급 분석", "free": "기본 통계", "pro": "차트 + 예측" },
+    "marketplace": { "title": "마켓플레이스 게시", "free": "다운로드만", "pro": "업로드 + 수익 공유" }
+  },
+  "free": "무료",
+  "pro": "프로",
+  "monthly": "월간",
+  "annual": "연간",
+  "save40": "40% 할인",
+  "unavailable": "이 지역에서는 이용할 수 없는 상품입니다",
+  "welcomePro": "프로에 오신 것을 환영합니다!",
+  "welcomeProDesc": "이제 모든 프리미엄 기능을 사용할 수 있습니다.",
+  "restorePurchase": "구매 복원",
+  "restored": "프로 구독이 복원되었습니다.",
+  "noRestoreFound": "복원할 이전 구독을 찾을 수 없습니다.",
+  "productsUnavailable": "현재 구독 상품을 이용할 수 없습니다. 나중에 다시 시도해주세요.",
+  "privacyPolicy": "개인정보처리방침",
+  "termsOfService": "이용약관",
+  "manageSubscription": "구독 관리"
+}

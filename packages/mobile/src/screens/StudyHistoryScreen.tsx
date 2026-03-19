@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, Badge, ListCard } from '../components/ui'
 import { TimePeriodSelector, BarChart } from '../components/charts'
 import { OverviewStatsRow, RatingDistributionBars } from '../components/study-history'
 import { useAuthState } from '../hooks'
 import { useDecks } from '../hooks/useDecks'
+import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
@@ -17,7 +19,9 @@ import {
   computeOverviewStats,
   computeRatingDistribution,
   computeDailySessionCounts,
+  computeModeBreakdown,
   type DeckScope,
+  type ModeBreakdown,
 } from '@reeeeecall/shared/lib/study-history-stats'
 import {
   formatDuration,
@@ -28,6 +32,7 @@ import {
   mergeSessionsWithLogs,
 } from '@reeeeecall/shared/lib/study-history'
 import type { StudySession, StudyLog } from '@reeeeecall/shared/types/database'
+import type { HomeStackParamList } from '../navigation/types'
 
 /**
  * Matches web StudyHistoryPage:
@@ -39,7 +44,7 @@ import type { StudySession, StudyLog } from '@reeeeecall/shared/types/database'
  */
 export function StudyHistoryScreen() {
   const theme = useTheme()
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
   const { user } = useAuthState()
   const { decks } = useDecks()
 
@@ -48,6 +53,7 @@ export function StudyHistoryScreen() {
   const [period, setPeriod] = useState<TimePeriod>('1m')
   const [deckScope, setDeckScope] = useState<DeckScope>('all')
   const [loading, setLoading] = useState(true)
+  const [modeFilter, setModeFilter] = useState<string>('all')
   const mountedRef = useRef(true)
 
   const loadData = useCallback(async () => {
@@ -95,7 +101,12 @@ export function StudyHistoryScreen() {
   const ratingDist = useMemo(() => computeRatingDistribution(scopedSessions), [scopedSessions])
   const dailyCounts = useMemo(() => computeDailySessionCounts(scopedSessions, days), [scopedSessions, days])
   const dailyData = dailyCounts.map((d) => ({ date: d.date, count: d.cards }))
-  const grouped = useMemo(() => groupSessionsByDate(scopedSessions), [scopedSessions])
+  const modeBreakdown = useMemo(() => computeModeBreakdown(scopedSessions), [scopedSessions])
+  const filteredByMode = useMemo(() =>
+    modeFilter === 'all' ? scopedSessions : scopedSessions.filter((s) => s.study_mode === modeFilter),
+    [scopedSessions, modeFilter],
+  )
+  const grouped = useMemo(() => groupSessionsByDate(filteredByMode), [filteredByMode])
 
   // Decks that have sessions (for scope selector)
   const sessionDeckIds = useMemo(() => new Set(periodSessions.map((s) => s.deck_id)), [periodSessions])
@@ -113,12 +124,12 @@ export function StudyHistoryScreen() {
           <View style={styles.header}>
             {/* Back + Title */}
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>← Back</Text>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>← {t('back')}</Text>
             </TouchableOpacity>
 
             <View style={styles.titleRow}>
               <Text style={[theme.typography.h2, { color: theme.colors.text }]}>
-                {selectedDeck ? `${selectedDeck.icon} ${selectedDeck.name}` : 'Study History'}
+                {selectedDeck ? `${selectedDeck.icon} ${selectedDeck.name}` : t('title')}
               </Text>
               <TimePeriodSelector value={period} onChange={setPeriod} testID="history-period" />
             </View>
@@ -139,7 +150,7 @@ export function StudyHistoryScreen() {
                   <Text style={[
                     theme.typography.caption,
                     { color: deckScope === 'all' ? theme.colors.primaryText : theme.colors.text, fontWeight: '500' },
-                  ]}>All</Text>
+                  ]}>{t('all')}</Text>
                 </TouchableOpacity>
                 {sessionDecks.map((d) => (
                   <TouchableOpacity
@@ -167,15 +178,112 @@ export function StudyHistoryScreen() {
 
             {/* Charts: Study volume + Rating distribution */}
             {dailyData.length > 0 && (
-              <BarChart data={dailyData} title="Study Volume" testID="history-barchart" />
+              <BarChart data={dailyData} title={t('studyVolume')} testID="history-barchart" />
             )}
 
             <RatingDistributionBars data={ratingDist} testID="history-ratings" />
 
-            {/* Sessions header */}
+            {/* Mode Breakdown — matches web */}
+            {modeBreakdown.length > 0 && (
+              <View style={styles.modeBreakdownSection}>
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
+                  Mode Breakdown
+                </Text>
+                <View style={styles.modeBreakdownGrid}>
+                  {modeBreakdown.map((mb) => (
+                    <View
+                      key={mb.mode}
+                      style={[styles.modeBreakdownCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                    >
+                      <Text style={styles.modeBreakdownEmoji}>{getStudyModeEmoji(mb.mode)}</Text>
+                      <Text style={[theme.typography.label, { color: theme.colors.text }]}>{getStudyModeLabel(mb.mode)}</Text>
+                      <View style={styles.modeBreakdownStats}>
+                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                          {mb.sessionCount} sessions
+                        </Text>
+                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                          {mb.totalCards} cards
+                        </Text>
+                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                          {formatDuration(mb.totalTimeMs)}
+                        </Text>
+                        <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '500' }]}>
+                          {mb.avgPerformance}%
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Deck Progress — matches web */}
+            {sessionDecks.length > 0 && deckScope === 'all' && (
+              <View style={styles.deckProgressSection}>
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
+                  Deck Progress
+                </Text>
+                {sessionDecks.map((deck) => {
+                  const deckSessions = periodSessions.filter((s) => s.deck_id === deck.id)
+                  const totalCards = deckSessions.reduce((sum, s) => sum + s.cards_studied, 0)
+                  const totalTime = deckSessions.reduce((sum, s) => sum + s.total_duration_ms, 0)
+                  return (
+                    <View
+                      key={deck.id}
+                      style={[styles.deckProgressCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                    >
+                      <View style={styles.deckProgressHeader}>
+                        <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+                          {deck.icon} {deck.name}
+                        </Text>
+                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                          {totalCards} cards · {formatDuration(totalTime)}
+                        </Text>
+                      </View>
+                      <View style={[styles.progressBarBg, { backgroundColor: theme.colors.surface }]}>
+                        <View style={[styles.progressBarFill, { width: `${Math.min(100, (deckSessions.length / Math.max(scopedSessions.length, 1)) * 100)}%`, backgroundColor: theme.colors.primary }]} />
+                      </View>
+                    </View>
+                  )
+                })}
+              </View>
+            )}
+
+            {/* Sessions header + mode filter — matches web */}
             <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-              Sessions
+              Session List
             </Text>
+            {modeBreakdown.length > 1 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.modeFilterScroll}>
+                <View style={styles.modeFilterRow}>
+                  <TouchableOpacity
+                    onPress={() => setModeFilter('all')}
+                    style={[styles.modeFilterChip, {
+                      backgroundColor: modeFilter === 'all' ? theme.colors.primary : theme.colors.surfaceElevated,
+                      borderColor: modeFilter === 'all' ? theme.colors.primary : theme.colors.border,
+                    }]}
+                  >
+                    <Text style={[theme.typography.caption, {
+                      color: modeFilter === 'all' ? theme.colors.primaryText : theme.colors.text,
+                    }]}>{t('allModes')}</Text>
+                  </TouchableOpacity>
+                  {modeBreakdown.map((mb) => (
+                    <TouchableOpacity
+                      key={mb.mode}
+                      onPress={() => setModeFilter(mb.mode)}
+                      style={[styles.modeFilterChip, {
+                        backgroundColor: modeFilter === mb.mode ? theme.colors.primary : theme.colors.surfaceElevated,
+                        borderColor: modeFilter === mb.mode ? theme.colors.primary : theme.colors.border,
+                      }]}
+                    >
+                      <Text style={[theme.typography.caption, {
+                        color: modeFilter === mb.mode ? theme.colors.primaryText : theme.colors.text,
+                      }]}>{getStudyModeEmoji(mb.mode)} {getStudyModeLabel(mb.mode)}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
           </View>
         }
         renderItem={({ item: group }) => (
@@ -186,9 +294,16 @@ export function StudyHistoryScreen() {
             {group.sessions.map((session) => {
               const deck = decks.find((d) => d.id === session.deck_id)
               return (
-                <View
+                <TouchableOpacity
                   key={session.id}
                   style={[styles.sessionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('SessionDetail', {
+                    session,
+                    deckName: deck?.name ?? 'Unknown Deck',
+                    deckIcon: deck?.icon ?? '📚',
+                  })}
+                  testID={`session-card-${session.id}`}
                 >
                   <View style={styles.sessionRow}>
                     <Text style={styles.modeEmoji}>{getStudyModeEmoji(session.study_mode)}</Text>
@@ -200,8 +315,9 @@ export function StudyHistoryScreen() {
                         {getStudyModeLabel(session.study_mode)} · {session.cards_studied} cards · {formatDuration(session.total_duration_ms)}
                       </Text>
                     </View>
+                    <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'>'}</Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               )
             })}
           </View>
@@ -210,7 +326,7 @@ export function StudyHistoryScreen() {
           !loading ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <Text style={styles.emptyEmoji}>📝</Text>
-              <Text style={[theme.typography.h3, { color: theme.colors.text }]}>No study history yet</Text>
+              <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('empty')}</Text>
               <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
                 Start studying to see your progress here
               </Text>
@@ -248,4 +364,20 @@ const styles = StyleSheet.create({
   sessionInfo: { flex: 1, gap: 2 },
   emptyCard: { borderRadius: 12, borderWidth: 1, padding: 32, alignItems: 'center', gap: 8 },
   emptyEmoji: { fontSize: 40 },
+  // Mode filter
+  modeFilterScroll: { flexGrow: 0 },
+  modeFilterRow: { flexDirection: 'row', gap: 6 },
+  modeFilterChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1 },
+  // Mode Breakdown
+  modeBreakdownSection: { gap: 4 },
+  modeBreakdownGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  modeBreakdownCard: { width: '47%' as any, borderRadius: 12, borderWidth: 1, padding: 12, gap: 6 },
+  modeBreakdownEmoji: { fontSize: 20 },
+  modeBreakdownStats: { gap: 2 },
+  // Deck Progress
+  deckProgressSection: { gap: 4 },
+  deckProgressCard: { borderRadius: 12, borderWidth: 1, padding: 12, gap: 8, marginBottom: 6 },
+  deckProgressHeader: { gap: 2 },
+  progressBarBg: { height: 6, borderRadius: 3, overflow: 'hidden' },
+  progressBarFill: { height: '100%', borderRadius: 3 },
 })

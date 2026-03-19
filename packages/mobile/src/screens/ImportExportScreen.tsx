@@ -4,6 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen, Button, Divider } from '../components/ui'
 import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import { fileTransferService } from '../services/file-transfer'
 import type { DecksStackParamList } from '../navigation/types'
@@ -157,16 +158,16 @@ export function ImportExportScreen() {
       <View style={styles.content}>
         <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
 
-        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>Import / Export</Text>
+        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>{t('title')}</Text>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
           {deck?.name} · {cards.length} cards
         </Text>
 
         {/* Import */}
         <View style={styles.section}>
-          <Text style={[theme.typography.h3, { color: theme.colors.text }]}>Import Cards</Text>
-          <Button testID="import-csv" title="Import CSV" variant="outline" onPress={handleImportCSV} loading={importing} />
-          <Button testID="import-json" title="Import JSON" variant="outline" onPress={handleImportJSON} loading={importing} />
+          <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('importCards')}</Text>
+          <Button testID="import-csv" title={t('importCSV')} variant="outline" onPress={handleImportCSV} loading={importing} />
+          <Button testID="import-json" title={t('importJSON')} variant="outline" onPress={handleImportJSON} loading={importing} />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
             CSV: first row = field names, each row = one card{'\n'}
             JSON: array of objects or {'{'} cards: [...] {'}'}
@@ -177,9 +178,9 @@ export function ImportExportScreen() {
 
         {/* Export */}
         <View style={styles.section}>
-          <Text style={[theme.typography.h3, { color: theme.colors.text }]}>Export Cards</Text>
-          <Button testID="export-csv" title="Export as CSV" variant="outline" onPress={handleExportCSV} loading={exporting} />
-          <Button testID="export-json" title="Export as JSON" variant="outline" onPress={handleExportJSON} loading={exporting} />
+          <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('exportCards')}</Text>
+          <Button testID="export-csv" title={t('exportCSV')} variant="outline" onPress={handleExportCSV} loading={exporting} />
+          <Button testID="export-json" title={t('exportJSON')} variant="outline" onPress={handleExportJSON} loading={exporting} />
         </View>
       </View>
     </Screen>

@@ -1,0 +1,67 @@
+{
+  "title": "My Decks",
+  "createNew": "+ Create New",
+  "empty": "No decks yet",
+  "emptyDescription": "Create your first deck to start learning",
+  "createFirst": "Create Deck",
+  "deleteDeck": "Delete Deck",
+  "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
+  "searchPlaceholder": "Search decks...",
+  "aiGenerate": "AI Generate",
+  "detail": {
+    "backToList": "Deck List",
+    "totalCards": "{{count}} cards",
+    "newCards": "{{count}} new",
+    "reviewCards": "{{count}} due",
+    "startStudy": "Start Study",
+    "edit": "Edit",
+    "share": "Share",
+    "addCard": "+ Card",
+    "aiCards": "AI Cards",
+    "import": "Import",
+    "export": "Export",
+    "tabs": {
+      "cardList": "Card List",
+      "uploadDate": "Upload Date",
+      "statistics": "Statistics"
+    },
+    "searchPlaceholder": "Search cards...",
+    "allStatus": "All",
+    "noCards": "No cards. Try adding a card.",
+    "addFirstCard": "+ Add First Card",
+    "importCards": "Import CSV/JSON",
+    "downloadTemplate": "CSV Template",
+    "deckNotFound": "Deck not found",
+    "goBack": "Go Back",
+    "empty": "(empty)"
+  },
+  "edit": {
+    "title": "Edit Deck",
+    "createTitle": "New Deck",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "create": "Create Deck",
+    "deckName": "Name",
+    "namePlaceholder": "e.g. Spanish Vocabulary",
+    "description": "Description",
+    "descriptionPlaceholder": "What will you learn?",
+    "color": "Color",
+    "icon": "Icon",
+    "template": "Template",
+    "deckNamePreview": "Deck Name",
+    "nameRequired": "Deck name is required",
+    "saveFailed": "Failed to save deck"
+  },
+  "card": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "startStudy": "Study"
+  },
+  "stats": {
+    "totalCards": "Total Cards",
+    "new": "New",
+    "learning": "Learning",
+    "review": "Review",
+    "suspended": "Suspended"
+  }
+}

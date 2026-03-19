@@ -3,11 +3,14 @@ import { useTheme } from '../../theme'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
 
 const CHIPS: { value: TimePeriod; label: string }[] = [
+  { value: '1d', label: '1D' },
   { value: '1w', label: '1W' },
   { value: '1m', label: '1M' },
   { value: '3m', label: '3M' },
   { value: '6m', label: '6M' },
   { value: '1y', label: '1Y' },
+  { value: '2y', label: '2Y' },
+  { value: '5y', label: '5Y' },
 ]
 
 interface TimePeriodSelectorProps {

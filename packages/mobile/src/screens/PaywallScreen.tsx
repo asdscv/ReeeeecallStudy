@@ -2,6 +2,7 @@ import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, 
 import { useNavigation } from '@react-navigation/native'
 import { Screen, Button } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 
 const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
@@ -40,11 +41,11 @@ export function PaywallScreen() {
       <Screen testID="paywall-screen">
         <View style={styles.center}>
           <Text style={styles.emoji}>✅</Text>
-          <Text style={[theme.typography.h2, { color: theme.colors.text }]}>You're Pro!</Text>
+          <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('youArePro')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
             You have access to all premium features.
           </Text>
-          <Button title="Done" variant="secondary" onPress={() => navigation.goBack()} />
+          <Button title={t('done')} variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -144,7 +145,7 @@ export function PaywallScreen() {
         <View style={styles.footer}>
           <Button
             testID="paywall-restore"
-            title="Restore Purchase"
+            title={t('restorePurchase')}
             variant="ghost"
             size="sm"
             onPress={handleRestore}

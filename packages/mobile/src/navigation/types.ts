@@ -29,6 +29,11 @@ export type MainTabParamList = {
 export type HomeStackParamList = {
   Dashboard: undefined
   StudyHistory: undefined
+  SessionDetail: {
+    session: import('@reeeeecall/shared/types/database').StudySession
+    deckName: string
+    deckIcon: string
+  }
 }
 
 // Decks stack (덱 관련 모든 화면)
@@ -39,6 +44,7 @@ export type DecksStackParamList = {
   CardEdit: { deckId: string; cardId?: string } // undefined = 새 카드 생성
   ImportExport: { deckId: string }
   PublishDeck: { deckId: string }
+  ShareDeck: { deckId: string }
 }
 
 // Study stack
@@ -59,6 +65,10 @@ export type SettingsStackParamList = {
   SettingsHome: undefined
   AIGenerate: undefined
   Paywall: undefined
+  Guide: undefined
+  TemplatesList: undefined
+  TemplateEdit: { templateId?: string }
+  MyShares: undefined
 }
 
 // Type-safe navigation hook을 위한 선언 병합

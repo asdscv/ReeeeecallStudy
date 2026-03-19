@@ -1,0 +1,111 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS 복습",
+      "description": "장기 기억을 위한 간격 반복",
+      "detail": "학습 성과에 따라 카드가 자동 예약됩니다"
+    },
+    "sequential_review": {
+      "label": "순차 복습",
+      "description": "순서대로, 새 카드 + 복습 카드 혼합",
+      "detail": "이전 위치부터 순서대로 카드를 학습합니다"
+    },
+    "random": {
+      "label": "랜덤",
+      "description": "카드를 무작위로 섞어서",
+      "detail": "덱에서 무작위로 카드를 선택합니다"
+    },
+    "sequential": {
+      "label": "순차",
+      "description": "카드를 순서대로 하나씩",
+      "detail": "추가된 순서대로 카드를 학습합니다"
+    },
+    "by_date": {
+      "label": "날짜별",
+      "description": "업로드 날짜별로 카드 학습",
+      "detail": "특정 날짜에 추가된 카드를 선택하여 학습합니다"
+    },
+    "cramming": {
+      "label": "벼락치기",
+      "description": "마스터할 때까지 집중 반복",
+      "detail": "틀린 카드가 모두 맞출 때까지 반복됩니다"
+    }
+  },
+  "setup": {
+    "title": "학습 설정",
+    "deck": "덱",
+    "studyMode": "학습 모드",
+    "cardsPerSession": "세션당 카드 수",
+    "batchHint": "5~500장 사이",
+    "selectDeck": "학습할 덱을 선택해주세요",
+    "startStudy": "학습 시작",
+    "startFailed": "학습 세션을 시작할 수 없습니다",
+    "dateSelection": "날짜 선택",
+    "dateSelectionDesc": "특정 날짜에 추가된 카드를 학습합니다. 시작 후 날짜 선택기가 표시됩니다."
+  },
+  "cramming": {
+    "options": "벼락치기 옵션",
+    "filter": {
+      "title": "카드 필터",
+      "all": "전체 카드",
+      "weak": "약한 카드",
+      "dueSoon": "곧 복습 예정"
+    },
+    "timeLimit": {
+      "title": "시간 제한",
+      "none": "제한 없음",
+      "minutes": "{{count}}분"
+    },
+    "shuffle": {
+      "title": "카드 섞기"
+    },
+    "summary": {
+      "completed": "벼락치기 완료!",
+      "crammingAgain": "다시 벼락치기"
+    }
+  },
+  "session": {
+    "loading": "로딩 중...",
+    "exit": "종료",
+    "endSession": "학습을 종료하시겠습니까?",
+    "endMessage": "현재까지의 학습 기록은 저장됩니다.",
+    "continue": "계속",
+    "end": "종료",
+    "tapToFlip": "탭하여 뒤집기",
+    "swipeHint": "카드를 탭하여 뒤집기 · 스와이프하여 평가"
+  },
+  "srsRating": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "좋음",
+    "easy": "쉬움"
+  },
+  "rating": {
+    "unknown": "모름",
+    "known": "알고 있음",
+    "missed": "모르겠어요",
+    "gotIt": "알겠어요"
+  },
+  "summary": {
+    "title": "학습 완료!",
+    "crammingTitle": "벼락치기 완료!",
+    "cardsStudied": "학습한 카드",
+    "timeSpent": "소요 시간",
+    "avgPerCard": "카드당 평균",
+    "mastery": "마스터율",
+    "ratingDistribution": "평가 분포",
+    "backToDeck": "덱으로 돌아가기",
+    "studyAgain": "다시 학습",
+    "crammingAgain": "다시 벼락치기"
+  },
+  "ratingLabels": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "좋음",
+    "easy": "쉬움",
+    "missed": "틀림",
+    "got_it": "맞춤",
+    "unknown": "모름",
+    "known": "알고 있음"
+  }
+}

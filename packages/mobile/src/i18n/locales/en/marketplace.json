@@ -1,0 +1,65 @@
+{
+  "title": "Marketplace",
+  "searchPlaceholder": "Search decks...",
+  "noResults": "No decks found",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "all": "All",
+    "language": "Language",
+    "science": "Science",
+    "math": "Math",
+    "history": "History",
+    "programming": "Code",
+    "exam": "Exam",
+    "other": "Other"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}} cards",
+    "userCount": "{{count}} users"
+  },
+  "detail": {
+    "back": "Back to Marketplace",
+    "notFound": "Listing not found",
+    "goBack": "Go Back",
+    "getDeck": "Add to My Decks",
+    "downloading": "Downloading...",
+    "previewCards": "Preview Cards",
+    "noPreview": "No preview available",
+    "success": "Deck added to your collection!",
+    "failed": "Failed to download deck",
+    "reportContent": "Report Content",
+    "reportTitle": "Report Content",
+    "reportQuestion": "Why are you reporting this deck?",
+    "inappropriateContent": "Inappropriate Content",
+    "copyrightViolation": "Copyright Violation",
+    "spam": "Spam / Misleading",
+    "reportThanks": "Your report has been submitted. We will review this content promptly."
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": { "label": "Copy", "description": "Users get an editable copy" },
+      "subscribe": { "label": "Subscribe", "description": "Users get read-only, auto-updated" },
+      "snapshot": { "label": "Snapshot", "description": "Users get read-only copy, no updates" }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

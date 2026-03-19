@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, SearchBar, Badge, ListCard } from '../components/ui'
+import { Screen, SearchBar, Badge, ListCard, DrawerHeader } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import type { MarketplaceStackParamList } from '../navigation/types'
 
@@ -21,11 +22,11 @@ const CATEGORIES = [
   { value: 'other', label: 'Other' },
 ]
 
-type SortKey = 'popular' | 'newest' | 'most_cards'
+type SortKey = 'popular' | 'newest' | 'card_count'
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'popular', label: 'Popular' },
   { value: 'newest', label: 'Newest' },
-  { value: 'most_cards', label: 'Most Cards' },
+  { value: 'card_count', label: 'Most Cards' },
 ]
 
 const PAGE_SIZE = 20
@@ -60,7 +61,7 @@ export function MarketplaceScreen() {
     result = [...result].sort((a, b) => {
       if (sortBy === 'popular') return (b.acquire_count ?? 0) - (a.acquire_count ?? 0)
       if (sortBy === 'newest') return (b.created_at ?? '').localeCompare(a.created_at ?? '')
-      if (sortBy === 'most_cards') return (b.card_count ?? 0) - (a.card_count ?? 0)
+      if (sortBy === 'card_count') return (b.card_count ?? 0) - (a.card_count ?? 0)
       return 0
     })
     return result
@@ -75,6 +76,7 @@ export function MarketplaceScreen() {
 
   return (
     <Screen safeArea padding={false} testID="marketplace-screen">
+      <DrawerHeader title={t('title')} />
       <FlatList
         data={paginatedData}
         keyExtractor={(item) => item.id}
@@ -84,8 +86,7 @@ export function MarketplaceScreen() {
         onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[theme.typography.h1, { color: theme.colors.text }]}>Marketplace</Text>
-            <SearchBar value={search} onChangeText={setSearch} placeholder="Search decks..." testID="marketplace-search" />
+            <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="marketplace-search" />
 
             {/* Sort chips */}
             <View style={styles.sortRow}>
