@@ -15,7 +15,7 @@ CREATE TABLE marketplace_views (
 );
 
 CREATE INDEX idx_mv_listing ON marketplace_views(listing_id, created_at DESC);
-CREATE INDEX idx_mv_listing_day ON marketplace_views(listing_id, (created_at::date));
+CREATE INDEX idx_mv_listing_day ON marketplace_views(listing_id, created_at);
 CREATE INDEX idx_mv_viewer ON marketplace_views(viewer_id) WHERE viewer_id IS NOT NULL;
 CREATE INDEX idx_mv_session ON marketplace_views(listing_id, session_id) WHERE session_id IS NOT NULL;
 
