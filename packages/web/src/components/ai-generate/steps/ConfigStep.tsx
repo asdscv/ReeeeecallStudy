@@ -208,7 +208,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const noProvidersConfigured = keysLoaded && configuredProviders.length === 0 && !hasCustom
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* Mode select */}
       {showModeSelect && onModeChange && (
         <div>
