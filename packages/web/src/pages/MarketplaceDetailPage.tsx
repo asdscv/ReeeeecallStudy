@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { useAuthStore } from '../stores/auth-store'
+import { ReportModal } from '../components/marketplace/ReportModal'
+import { ReviewsSection } from '../components/marketplace/ReviewsSection'
+import { StarRatingInline } from '../components/marketplace/StarRating'
+import { getAnalyticsSessionId } from '../lib/analytics-session'
+import { VerifiedBadge } from '../components/marketplace/ListingCard'
 import type { MarketplaceListing, Card, CardTemplate } from '../types/database'
 
 export function MarketplaceDetailPage() {
@@ -18,6 +23,8 @@ export function MarketplaceDetailPage() {
   const [template, setTemplate] = useState<CardTemplate | null>(null)
   const [loading, setLoading] = useState(true)
   const [acquiring, setAcquiring] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [hasAcquired, setHasAcquired] = useState(false)
 
   useEffect(() => {
     if (!listingId) return
@@ -25,18 +32,39 @@ export function MarketplaceDetailPage() {
     const fetchData = async () => {
       setLoading(true)
 
+      // Try fetching with owner profile join
+      let typedListing: MarketplaceListing | null = null
       const { data: listingData } = await supabase
         .from('marketplace_listings')
-        .select('*')
+        .select('*, profiles!marketplace_listings_owner_id_fkey(display_name, is_official)')
         .eq('id', listingId)
         .single()
 
-      if (!listingData) {
+      if (listingData) {
+        const profile = (listingData as Record<string, unknown>).profiles as
+          | { display_name: string | null; is_official: boolean }
+          | null
+        typedListing = {
+          ...listingData,
+          profiles: undefined,
+          owner_display_name: profile?.display_name ?? null,
+          owner_is_official: profile?.is_official ?? false,
+        } as MarketplaceListing
+      } else {
+        // Fallback without join
+        const { data: fallbackData } = await supabase
+          .from('marketplace_listings')
+          .select('*')
+          .eq('id', listingId)
+          .single()
+        typedListing = fallbackData as MarketplaceListing | null
+      }
+
+      if (!typedListing) {
         navigate('/marketplace', { replace: true })
         return
       }
 
-      const typedListing = listingData as MarketplaceListing
       setListing(typedListing)
 
       // Fetch preview cards (first 10)
@@ -65,11 +93,39 @@ export function MarketplaceDetailPage() {
         setTemplate(tmpl as CardTemplate | null)
       }
 
+      // Check if user has acquired this deck
+      if (user) {
+        const { data: shareData } = await supabase
+          .from('deck_shares')
+          .select('id')
+          .eq('deck_id', typedListing.deck_id)
+          .eq('recipient_id', user.id)
+          .eq('status', 'active')
+          .limit(1)
+        setHasAcquired((shareData ?? []).length > 0)
+      }
+
       setLoading(false)
     }
 
     fetchData()
-  }, [listingId, navigate])
+  }, [listingId, navigate, user])
+
+  // Track marketplace view (fire once per listing visit)
+  const viewTrackedRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!listingId || viewTrackedRef.current === listingId) return
+    viewTrackedRef.current = listingId
+
+    const sessionId = getAnalyticsSessionId()
+    supabase
+      .rpc('record_marketplace_view', {
+        p_listing_id: listingId,
+        p_session_id: sessionId,
+        p_referrer: document.referrer || null,
+      } as Record<string, unknown>)
+      .then(() => {}, () => {}) // fire and forget
+  }, [listingId])
 
   const handleAcquire = async () => {
     if (!listingId) return
@@ -112,6 +168,21 @@ export function MarketplaceDetailPage() {
           </span>
         </div>
 
+        {/* Publisher info with verified badge */}
+        {listing.owner_display_name && (
+          <div className="flex items-center gap-1.5 mb-3">
+            <span className="text-sm text-gray-500">
+              {t('marketplace:detail.publishedBy', { defaultValue: 'by' })} {listing.owner_display_name}
+            </span>
+            {listing.owner_is_official && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                <VerifiedBadge className="w-3.5 h-3.5" />
+                {t('marketplace:verifiedPublisher', { defaultValue: 'Verified Publisher' })}
+              </span>
+            )}
+          </div>
+        )}
+
         {listing.description && (
           <p className="text-sm sm:text-base text-gray-600 mb-4">{listing.description}</p>
         )}
@@ -128,8 +199,15 @@ export function MarketplaceDetailPage() {
 
         <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
           <span>{t('marketplace:detail.cardCount', { count: listing.card_count })}</span>
+          <span className="inline-flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            {listing.view_count ?? 0}
+          </span>
           <span>{t('marketplace:detail.userCount', { count: listing.acquire_count })}</span>
           <span>{t('marketplace:categories.' + listing.category, listing.category)}</span>
+          {(listing.review_count ?? 0) > 0 && (
+            <StarRatingInline rating={listing.avg_rating ?? 0} count={listing.review_count ?? 0} />
+          )}
         </div>
 
         {!isOwner && (
@@ -139,6 +217,15 @@ export function MarketplaceDetailPage() {
             className="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
           >
             {acquiring ? t('marketplace:detail.importing') : t('marketplace:detail.getDeck')}
+          </button>
+        )}
+
+        {!isOwner && (
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="ml-3 px-4 py-2 text-sm text-gray-500 hover:text-red-600 transition cursor-pointer"
+          >
+            {t('marketplace:detail.reportContent', { defaultValue: 'Report' })}
           </button>
         )}
 
@@ -174,6 +261,26 @@ export function MarketplaceDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Reviews Section */}
+      {listingId && (
+        <div className="mt-4">
+          <ReviewsSection
+            listingId={listingId}
+            isOwner={isOwner}
+            hasAcquired={hasAcquired}
+          />
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {listingId && (
+        <ReportModal
+          open={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          listingId={listingId}
+        />
+      )}
     </div>
   )
 }

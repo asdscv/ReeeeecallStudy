@@ -5,6 +5,7 @@
     "users": "Users",
     "study": "Study Activity",
     "market": "Market",
+    "official": "Official",
     "contents": "Contents",
     "system": "System"
   },
@@ -126,7 +127,10 @@
       "copy": "Copy",
       "subscribe": "Subscribe",
       "snapshot": "Snapshot"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "Contents",

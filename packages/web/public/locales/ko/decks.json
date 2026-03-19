@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "\uce74\ub4dc \ubaa9\ub85d",
       "uploadDate": "\uc5c5\ub85c\ub4dc \uc77c\uc790",
-      "statistics": "\ud1b5\uacc4"
+      "statistics": "\ud1b5\uacc4",
+      "versions": "\ubc84\uc804 \uae30\ub85d"
     },
     "searchPlaceholder": "\uce74\ub4dc \uac80\uc0c9...",
     "allStatus": "\uc804\uccb4 \uc0c1\ud0dc",
@@ -39,7 +40,19 @@
     "deleteCardConfirm": "\uc774 \uce74\ub4dc\ub97c \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c? \ub418\ub3cc\ub9b4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
     "bulkDelete": "\uce74\ub4dc \uc77c\uad04 \uc0ad\uc81c",
     "bulkDeleteConfirm": "\uc120\ud0dd\ud55c {{count}}\uac1c\uc758 \uce74\ub4dc\ub97c \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c? \ub418\ub3cc\ub9b4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
-    "noStudyRecords": "\ud559\uc2b5 \uae30\ub85d \uc5c6\uc74c"
+    "noStudyRecords": "\ud559\uc2b5 \uae30\ub85d \uc5c6\uc74c",
+    "aiCards": "AI \uce74\ub4dc"
+  },
+  "sync": {
+    "button": "\ub3d9\uae30\ud654",
+    "syncing": "\ub3d9\uae30\ud654 \uc911...",
+    "pendingChanges": "{{count}}\uac1c \ubcc0\uacbd\uc0ac\ud56d",
+    "lastSynced": "\ub9c8\uc9c0\ub9c9 \ub3d9\uae30\ud654: {{time}}",
+    "neverSynced": "\ub3d9\uae30\ud654 \uc548 \ub428",
+    "syncComplete": "\ub3d9\uae30\ud654 \uc644\ub8cc: {{added}}\uac1c \ucd94\uac00, {{removed}}\uac1c \uc81c\uac70",
+    "noChanges": "\uc774\ubbf8 \ucd5c\uc2e0 \uc0c1\ud0dc\uc785\ub2c8\ub2e4",
+    "syncFailed": "\ub3d9\uae30\ud654 \uc2e4\ud328",
+    "subscribed": "\uad6c\ub3c5 \uc911\uc778 \ub371"
   },
   "settings": {
     "deckName": "\ub371 \uc774\ub984",

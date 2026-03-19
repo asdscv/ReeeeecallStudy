@@ -5,21 +5,26 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, FAB, EmptyState, Badge, ListCard, SearchBar } from '../components/ui'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
+import { VersionHistoryTab } from '../components/deck/VersionHistoryTab'
 import { useDecks } from '../hooks/useDecks'
 import { useCards } from '../hooks/useCards'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
+import { useSyncStore } from '@reeeeecall/shared/stores/sync-store'
+import type { DeckShare } from '@reeeeecall/shared/types/database'
+import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DeckDetail'>
 type Route = RouteProp<DecksStackParamList, 'DeckDetail'>
 
-type TabKey = 'cards' | 'dates' | 'stats'
+type TabKey = 'cards' | 'dates' | 'stats' | 'versions'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'cards', label: 'Card List' },
   { key: 'dates', label: 'Upload Date' },
   { key: 'stats', label: 'Statistics' },
+  { key: 'versions', label: 'Versions' },
 ]
 
 const STATUS_FILTERS = ['all', 'new', 'learning', 'review', 'suspended'] as const
@@ -36,10 +41,19 @@ export function DeckDetailScreen() {
 
   const { decks, getStatsForDeck, deleteDeck } = useDecks()
   const { cards, loading, refresh, deleteCard, deleteCards } = useCards(deckId)
+  const { pendingCounts, syncing, syncSubscribedDeck, fetchPendingCount } = useSyncStore()
 
   const [activeTab, setActiveTab] = useState<TabKey>('cards')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+
+  // Deck ownership for versions tab
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  useEffect(() => {
+    getMobileSupabase().auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id)
+    })
+  }, [])
 
   // Bulk selection state
   const [selectionMode, setSelectionMode] = useState(false)
@@ -49,8 +63,15 @@ export function DeckDetailScreen() {
   const [currentPage, setCurrentPage] = useState(1)
   const [cardsPerPage, setCardsPerPage] = useState(20)
 
+  // Subscription sync state
+  const [subscription, setSubscription] = useState<DeckShare | null>(null)
+  const [syncMessage, setSyncMessage] = useState<string | null>(null)
+
   const deck = decks.find((d) => d.id === deckId)
   const deckStats = getStatsForDeck(deckId)
+  const isSubscribed = !!subscription
+  const pendingCount = pendingCounts[deckId] ?? 0
+  const isSyncing = syncing[deckId] ?? false
 
   const filteredCards = useMemo(() => {
     let result = cards
@@ -70,6 +91,52 @@ export function DeckDetailScreen() {
   useEffect(() => {
     setCurrentPage(1)
   }, [search, statusFilter, cardsPerPage])
+
+  // Check if this is a subscribed deck
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const sb = getMobileSupabase()
+      const { data: { user } } = await sb.auth.getUser()
+      if (!user) return
+      const { data } = await sb
+        .from('deck_shares')
+        .select('*')
+        .eq('deck_id', deckId)
+        .eq('recipient_id', user.id)
+        .eq('share_mode', 'subscribe')
+        .eq('status', 'active')
+        .limit(1)
+        .single()
+      if (data) {
+        setSubscription(data as DeckShare)
+        fetchPendingCount(deckId)
+      }
+    }
+    checkSubscription()
+  }, [deckId, fetchPendingCount])
+
+  const handleSync = useCallback(async () => {
+    setSyncMessage(null)
+    const result = await syncSubscribedDeck(deckId)
+    if (result) {
+      if (result.added === 0 && result.removed === 0) {
+        setSyncMessage(t('sync.noChanges'))
+      } else {
+        setSyncMessage(t('sync.syncComplete', { added: result.added, removed: result.removed }))
+      }
+      refresh()
+    } else {
+      setSyncMessage(t('sync.syncFailed'))
+    }
+    setTimeout(() => setSyncMessage(null), 5000)
+  }, [deckId, syncSubscribedDeck, t, refresh])
+
+  const handleRefreshWithSync = useCallback(async () => {
+    if (isSubscribed) {
+      await handleSync()
+    }
+    refresh()
+  }, [isSubscribed, handleSync, refresh])
 
   // Exit selection mode clears selections
   const exitSelectionMode = useCallback(() => {
@@ -284,10 +351,50 @@ export function DeckDetailScreen() {
       <View style={styles.titleRow}>
         <Text style={styles.titleIcon}>{deck.icon}</Text>
         <Text style={[theme.typography.h2, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>{deck.name}</Text>
+        {isSubscribed && (
+          <View style={[styles.subscribedBadge, { backgroundColor: palette.purple[50] }]}>
+            <Text style={[theme.typography.caption, { color: palette.purple[700], fontWeight: '600' }]}>
+              {t('sync.subscribed')}
+            </Text>
+          </View>
+        )}
       </View>
 
       {deck.description && (
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>{deck.description}</Text>
+      )}
+
+      {/* Sync bar for subscribed decks */}
+      {isSubscribed && (
+        <View style={[styles.syncBar, { backgroundColor: palette.purple[50], borderColor: palette.purple[200] }]}>
+          <TouchableOpacity
+            onPress={handleSync}
+            disabled={isSyncing}
+            style={[styles.syncButton, { backgroundColor: palette.purple[600], opacity: isSyncing ? 0.6 : 1 }]}
+            testID="sync-button"
+          >
+            <Text style={[theme.typography.caption, { color: '#fff', fontWeight: '600' }]}>
+              {isSyncing ? t('sync.syncing') : t('sync.button')}
+            </Text>
+          </TouchableOpacity>
+          {pendingCount > 0 && (
+            <View style={[styles.pendingBadge, { backgroundColor: palette.red[100] }]}>
+              <Text style={[theme.typography.caption, { color: palette.red[700], fontWeight: '600' }]}>
+                {t('sync.pendingChanges', { count: pendingCount })}
+              </Text>
+            </View>
+          )}
+          <Text style={[theme.typography.caption, { color: palette.purple[600], flex: 1 }]}>
+            {subscription?.last_synced_at
+              ? t('sync.lastSynced', { time: new Date(subscription.last_synced_at).toLocaleDateString() })
+              : t('sync.neverSynced')}
+          </Text>
+          {syncMessage && (
+            <Text style={[theme.typography.caption, { color: palette.purple[700], fontWeight: '600' }]}>
+              {syncMessage}
+            </Text>
+          )}
+        </View>
       )}
 
       {/* Stats badges — matches web: flex-wrap gap-2 */}
@@ -400,13 +507,15 @@ export function DeckDetailScreen() {
     </View>
   )
 
+  const isOwner = !!currentUserId && deck?.user_id === currentUserId
+
   // Non-cards tabs
-  if (activeTab === 'dates' || activeTab === 'stats') {
+  if (activeTab === 'dates' || activeTab === 'stats' || activeTab === 'versions') {
     return (
       <Screen safeArea padding={false} testID="deck-detail-screen">
         <ScrollView
           contentContainerStyle={styles.list}
-          refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+          refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefreshWithSync} />}
         >
           {renderHeader()}
           <View style={styles.tabContent}>
@@ -416,8 +525,10 @@ export function DeckDetailScreen() {
                 onCardPress={(cardId) => navigation.navigate('CardEdit', { deckId, cardId })}
                 testID="deck-dates-tab"
               />
-            ) : (
+            ) : activeTab === 'stats' ? (
               <DeckStatsTab cards={cards} testID="deck-stats-tab" />
+            ) : (
+              <VersionHistoryTab deckId={deckId} isOwner={isOwner} testID="deck-versions-tab" />
             )}
           </View>
         </ScrollView>
@@ -431,7 +542,7 @@ export function DeckDetailScreen() {
       <FlatList
         data={paginatedCards}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefreshWithSync} />}
         contentContainerStyle={[styles.list, paginatedCards.length === 0 && filteredCards.length === 0 && styles.listEmpty]}
         ListHeaderComponent={renderHeader()}
         ListFooterComponent={renderPaginationControls()}
@@ -544,6 +655,32 @@ const styles = StyleSheet.create({
   cardContent: { flex: 1, gap: 2 },
   emptyContainer: { gap: 12 },
   emptyButtons: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
+
+  // Subscription sync
+  subscribedBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  syncBar: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 8,
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  syncButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  pendingBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
 
   // Bulk selection
   selectionBar: {

@@ -339,6 +339,22 @@ export type DeckShare = {
   copied_deck_id: string | null
   created_at: string
   accepted_at: string | null
+  last_synced_at: string | null
+}
+
+export type DeckChangeLogEntry = {
+  id: string
+  deck_id: string
+  change_type: 'card_added' | 'card_removed' | 'card_updated' | 'deck_updated'
+  card_id: string | null
+  metadata: Record<string, unknown>
+  created_at: string
+}
+
+export type SyncResult = {
+  added: number
+  removed: number
+  last_synced: string
 }
 
 export type MarketplaceListing = {
@@ -352,9 +368,117 @@ export type MarketplaceListing = {
   share_mode: ShareMode
   card_count: number
   acquire_count: number
+  view_count?: number
+  avg_rating?: number
+  review_count?: number
   is_active: boolean
+  is_paid: boolean
   created_at: string
   updated_at: string
+  owner_display_name?: string | null
+  owner_is_official?: boolean
+}
+
+export type MarketplaceReview = {
+  id: string
+  listing_id: string
+  user_id: string
+  rating: number
+  title: string | null
+  body: string | null
+  is_edited: boolean
+  helpful_count: number
+  created_at: string
+  updated_at: string
+  user_display_name?: string | null
+}
+
+export type ReviewHelpful = {
+  id: string
+  review_id: string
+  user_id: string
+  created_at: string
+}
+
+export type ReviewStats = {
+  avg_rating: number
+  review_count: number
+  rating_1: number
+  rating_2: number
+  rating_3: number
+  rating_4: number
+  rating_5: number
+}
+
+export type ReviewSortBy = 'newest' | 'highest' | 'lowest' | 'most_helpful'
+
+export type BadgeType = 'verified' | 'official' | 'educator' | 'publisher' | 'partner'
+
+export type OfficialAccountSettings = {
+  id: string
+  user_id: string
+  display_badge: BadgeType
+  badge_color: string
+  organization_name: string | null
+  organization_url: string | null
+  verified_at: string
+  verified_by: string | null
+  featured_priority: number
+  max_listings: number
+  can_feature_listings: boolean
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export type OfficialAccount = {
+  user_id: string
+  display_name: string | null
+  is_official: boolean
+  display_badge: BadgeType
+  badge_color: string
+  organization_name: string | null
+  organization_url: string | null
+  featured_priority: number
+  max_listings: number
+  can_feature_listings: boolean
+  verified_at: string | null
+  listing_count: number
+}
+
+export type OfficialListing = MarketplaceListing & {
+  badge_type: BadgeType
+  badge_color: string
+  organization_name: string | null
+  featured_priority: number
+}
+
+export type ReportCategory = 'inappropriate' | 'copyright' | 'spam' | 'misleading' | 'other'
+export type ReportStatus = 'pending' | 'reviewing' | 'resolved' | 'dismissed'
+
+export type MarketplaceReport = {
+  id: string
+  listing_id: string
+  listing_title?: string
+  reporter_id: string
+  reporter_name?: string | null
+  category: ReportCategory
+  description: string | null
+  status: ReportStatus
+  admin_note: string | null
+  resolved_by: string | null
+  resolved_at: string | null
+  created_at: string
+}
+
+export type DeckVersion = {
+  id: string
+  deck_id: string
+  version_number: number
+  change_summary: string | null
+  card_count: number
+  created_by: string
+  created_at: string
 }
 
 export type Content = {

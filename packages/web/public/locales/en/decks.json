@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "Card List",
       "uploadDate": "Upload Date",
-      "statistics": "Statistics"
+      "statistics": "Statistics",
+      "versions": "Versions"
     },
     "searchPlaceholder": "Search cards...",
     "allStatus": "All Status",
@@ -39,7 +40,19 @@
     "deleteCardConfirm": "Delete this card? This cannot be undone.",
     "bulkDelete": "Bulk Delete Cards",
     "bulkDeleteConfirm": "Delete {{count}} selected cards? This cannot be undone.",
-    "noStudyRecords": "No study records"
+    "noStudyRecords": "No study records",
+    "aiCards": "AI Cards"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   },
   "settings": {
     "deckName": "Deck Name",

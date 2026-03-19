@@ -28,6 +28,7 @@ import { MarketplaceDetailPage } from './pages/MarketplaceDetailPage'
 import { DeckSharePage } from './pages/DeckSharePage'
 import { AcceptInvitePage } from './pages/AcceptInvitePage'
 import { MySharesPage } from './pages/MySharesPage'
+import { PublisherDashboardPage } from './pages/PublisherDashboardPage'
 import { AIGeneratePage } from './pages/AIGeneratePage'
 import { GuidePage } from './pages/GuidePage'
 import { ApiDocsPage } from './pages/ApiDocsPage'
@@ -42,6 +43,7 @@ import { AdminStudyPage } from './pages/admin/AdminStudyPage'
 import { AdminContentPage } from './pages/admin/AdminContentPage'
 import { AdminContentsPage } from './pages/admin/AdminContentsPage'
 import { AdminSystemPage } from './pages/admin/AdminSystemPage'
+import { AdminOfficialPage } from './pages/admin/AdminOfficialPage'
 import { usePageTracking } from './hooks/usePageTracking'
 
 function PageTracker() {
@@ -138,6 +140,7 @@ function App() {
           <Route path="/marketplace/:listingId" element={<MarketplaceDetailPage />} />
           <Route path="/invite/:inviteCode" element={<AcceptInvitePage />} />
           <Route path="/my-shares" element={<MySharesPage />} />
+          <Route path="/publisher" element={<PublisherDashboardPage />} />
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/templates/:templateId/edit" element={<TemplateEditPage />} />
           <Route path="/settings" element={<SettingsPage />} />
@@ -159,6 +162,7 @@ function App() {
             <Route path="users" element={<AdminUsersPage />} />
             <Route path="study" element={<AdminStudyPage />} />
             <Route path="market" element={<AdminContentPage />} />
+            <Route path="official" element={<AdminOfficialPage />} />
             <Route path="contents" element={<AdminContentsPage />} />
             <Route path="system" element={<AdminSystemPage />} />
           </Route>

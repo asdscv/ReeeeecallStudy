@@ -295,6 +295,23 @@ export function SettingsScreen() {
           </TouchableOpacity>
         </SectionCard>
 
+        {/* ── Publisher Dashboard ── */}
+        <SectionCard theme={theme}>
+          <TouchableOpacity
+            testID="settings-publisher-stats-link"
+            onPress={() => navigation.navigate('PublisherStats')}
+            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Publisher Dashboard</Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                View stats for your published decks
+              </Text>
+            </View>
+            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
+          </TouchableOpacity>
+        </SectionCard>
+
         {/* ── c) Study Settings ── */}
         <SectionCard theme={theme}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Study Settings</Text>

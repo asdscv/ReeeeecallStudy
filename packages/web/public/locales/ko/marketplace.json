@@ -28,13 +28,30 @@
     "userCount": "{{count}}명 사용 중"
   },
   "detail": {
-    "back": "← 마켓플레이스",
-    "cardCount": "{{count}}장",
-    "userCount": "{{count}}명 사용 중",
-    "getDeck": "이 덱 가져오기",
-    "importing": "가져오는 중...",
-    "cardPreview": "카드 미리보기 (최대 10장)",
-    "noCards": "카드가 없습니다."
+    "back": "\u2190 \ub9c8\ucf13\ud50c\ub808\uc774\uc2a4",
+    "cardCount": "{{count}}\uc7a5",
+    "userCount": "{{count}}\uba85 \uc0ac\uc6a9 \uc911",
+    "getDeck": "\uc774 \ub371 \uac00\uc838\uc624\uae30",
+    "importing": "\uac00\uc838\uc624\ub294 \uc911...",
+    "cardPreview": "\uce74\ub4dc \ubbf8\ub9ac\ubcf4\uae30 (\ucd5c\ub300 10\uc7a5)",
+    "noCards": "\uce74\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
+    "reportContent": "\uc2e0\uace0"
+  },
+  "report": {
+    "title": "\ucf58\ud150\uce20 \uc2e0\uace0",
+    "categoryLabel": "\uc2e0\uace0 \uc0ac\uc720",
+    "categories": {
+      "inappropriate": "\ubd80\uc801\uc808\ud55c \ucf58\ud150\uce20",
+      "copyright": "\uc800\uc791\uad8c \uce68\ud574",
+      "spam": "\uc2a4\ud338",
+      "misleading": "\ud5c8\uc704/\uc624\ud574 \uc720\ubc1c",
+      "other": "\uae30\ud0c0"
+    },
+    "descriptionLabel": "\uc0c1\uc138 \uc124\uba85 (\uc120\ud0dd)",
+    "descriptionPlaceholder": "\ubb38\uc81c\ub97c \uc124\uba85\ud574 \uc8fc\uc138\uc694...",
+    "submit": "\uc2e0\uace0 \uc81c\ucd9c",
+    "submitting": "\uc81c\ucd9c \uc911...",
+    "submitted": "\uc2e0\uace0\uac00 \uc811\uc218\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uac10\uc0ac\ud569\ub2c8\ub2e4!"
   },
   "preview": {
     "title": "\"{{title}}\" - 플래시카드 덱 | ReeeeecallStudy",

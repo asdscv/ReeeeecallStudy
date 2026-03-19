@@ -6,6 +6,7 @@ import { GuideScreen } from '../screens/GuideScreen'
 import { TemplatesListScreen } from '../screens/TemplatesListScreen'
 import { TemplateEditScreen } from '../screens/TemplateEditScreen'
 import { MySharesScreen } from '../screens/MySharesScreen'
+import { PublisherStatsScreen } from '../screens/PublisherStatsScreen'
 import type { SettingsStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>()
@@ -20,6 +21,7 @@ export function SettingsStack() {
       <Stack.Screen name="TemplatesList" component={TemplatesListScreen} />
       <Stack.Screen name="TemplateEdit" component={TemplateEditScreen} />
       <Stack.Screen name="MyShares" component={MySharesScreen} />
+      <Stack.Screen name="PublisherStats" component={PublisherStatsScreen} />
     </Stack.Navigator>
   )
 }

@@ -28,13 +28,30 @@
     "userCount": "{{count}} users"
   },
   "detail": {
-    "back": "← Marketplace",
+    "back": "\u2190 Marketplace",
     "cardCount": "{{count}} cards",
     "userCount": "{{count}} users",
     "getDeck": "Get This Deck",
     "importing": "Importing...",
     "cardPreview": "Card Preview (max 10)",
-    "noCards": "No cards."
+    "noCards": "No cards.",
+    "reportContent": "Report"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   },
   "preview": {
     "title": "\"{{title}}\" - Flashcard Deck | ReeeeecallStudy",

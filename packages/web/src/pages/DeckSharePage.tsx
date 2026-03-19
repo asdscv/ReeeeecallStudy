@@ -8,6 +8,7 @@ import { SubscriberList } from '../components/sharing/SubscriberList'
 import { PublishModal } from '../components/marketplace/PublishModal'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { VersionHistorySection } from '../components/deck/VersionHistorySection'
 import type { Deck } from '../types/database'
 
 export function DeckSharePage() {
@@ -126,6 +127,13 @@ export function DeckSharePage() {
           </div>
         )}
       </section>
+
+      {/* Version History */}
+      {deckId && (
+        <section className="mt-8">
+          <VersionHistorySection deckId={deckId} isOwner={true} />
+        </section>
+      )}
 
       <ShareModal
         open={showShareModal}

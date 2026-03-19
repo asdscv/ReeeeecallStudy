@@ -6,6 +6,7 @@ const TABS = [
   { key: 'users', path: '/admin/users', end: false },
   { key: 'study', path: '/admin/study', end: false },
   { key: 'market', path: '/admin/market', end: false },
+  { key: 'official', path: '/admin/official', end: false },
   { key: 'contents', path: '/admin/contents', end: false },
   { key: 'system', path: '/admin/system', end: false },
 ] as const

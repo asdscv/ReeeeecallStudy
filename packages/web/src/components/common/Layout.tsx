@@ -20,6 +20,7 @@ export function Layout() {
       { path: '/decks', label: t('nav.decks'), icon: '📚' },
       { path: '/templates', label: t('nav.cards'), icon: '📋' },
       { path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
+      { path: '/publisher', label: 'Publisher', icon: '📈' },
       { path: '/history', label: t('nav.studyHistory'), icon: '📝' },
     ]},
     { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },

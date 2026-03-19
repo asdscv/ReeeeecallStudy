@@ -63,5 +63,16 @@
     "learning": "학습중",
     "review": "복습",
     "suspended": "중단"
+  },
+  "sync": {
+    "button": "동기화",
+    "syncing": "동기화 중...",
+    "pendingChanges": "{{count}}개 변경사항",
+    "lastSynced": "마지막 동기화: {{time}}",
+    "neverSynced": "동기화 안 됨",
+    "syncComplete": "동기화 완료: {{added}}개 추가, {{removed}}개 제거",
+    "noChanges": "이미 최신 상태입니다",
+    "syncFailed": "동기화 실패",
+    "subscribed": "구독 중"
   }
 }

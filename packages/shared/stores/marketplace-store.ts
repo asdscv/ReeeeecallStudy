@@ -23,6 +23,7 @@ interface MarketplaceState {
   unpublishDeck: (listingId: string) => Promise<void>
   acquireDeck: (listingId: string) => Promise<{ deckId: string } | null>
   setFilters: (filters: Partial<ListingFilters & { sortBy: SortBy }>) => void
+  resetFilters: () => void
   getFilteredListings: () => MarketplaceListing[]
 }
 
@@ -216,13 +217,13 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
     }))
   },
 
+  resetFilters: () => {
+    set({ filters: { sortBy: 'newest' } })
+  },
+
   getFilteredListings: () => {
     const { listings, filters } = get()
-    const filtered = filterListings(listings as MarketplaceListingData[], {
-      category: filters.category,
-      tags: filters.tags,
-      query: filters.query,
-    })
+    const filtered = filterListings(listings as MarketplaceListingData[], filters)
     return sortListings(filtered, filters.sortBy) as MarketplaceListing[]
   },
 }))

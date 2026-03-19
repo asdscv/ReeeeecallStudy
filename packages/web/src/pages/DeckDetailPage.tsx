@@ -3,11 +3,12 @@ import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus, Sparkles } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus, Sparkles, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { isPast, formatLocalDate } from '../lib/date-utils'
 import { getPageSelectAllState, togglePageSelectAll } from '../lib/card-selection'
 import { useCardStore } from '../stores/card-store'
+import { useSyncStore } from '../stores/sync-store'
 import { CardFormModal } from '../components/card/CardFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { ImportModal } from '../components/import-export/ImportModal'
@@ -16,9 +17,10 @@ import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
-import type { Deck, Card, CardTemplate } from '../types/database'
+import { VersionHistorySection } from '../components/deck/VersionHistorySection'
+import type { Deck, Card, CardTemplate, DeckShare } from '../types/database'
 
-type TabId = 'cards' | 'upload-date' | 'stats'
+type TabId = 'cards' | 'upload-date' | 'stats' | 'versions'
 
 export function DeckDetailPage() {
   const { t, i18n } = useTranslation(['decks', 'common'])
@@ -27,10 +29,13 @@ export function DeckDetailPage() {
   const navigate = useNavigate()
 
   const { cards, loading: cardsLoading, fetchCards } = useCardStore()
+  const { pendingCounts, syncing, syncSubscribedDeck, fetchPendingCount } = useSyncStore()
 
   const [deck, setDeck] = useState<Deck | null>(null)
   const [template, setTemplate] = useState<CardTemplate | null>(null)
   const [loading, setLoading] = useState(true)
+  const [subscription, setSubscription] = useState<DeckShare | null>(null)
+  const [syncMessage, setSyncMessage] = useState<string | null>(null)
 
   // Tab state
   const [activeTab, setActiveTab] = useState<TabId>('cards')
@@ -128,10 +133,31 @@ export function DeckDetailPage() {
       }
 
       await fetchCards(deckId)
+
+      // Check if this is a subscribed deck
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: shareData } = await supabase
+          .from('deck_shares')
+          .select('*')
+          .eq('deck_id', deckId)
+          .eq('recipient_id', user.id)
+          .eq('share_mode', 'subscribe')
+          .eq('status', 'active')
+          .limit(1)
+          .single()
+
+        if (shareData) {
+          setSubscription(shareData as DeckShare)
+          // Fetch pending sync count
+          fetchPendingCount(deckId)
+        }
+      }
+
       setLoading(false)
     }
     fetchData()
-  }, [deckId, navigate, fetchCards])
+  }, [deckId, navigate, fetchCards, fetchPendingCount])
 
   // 삭제 후 currentPage가 totalPages를 초과할 때 자동 보정
   useEffect(() => {
@@ -216,10 +242,34 @@ export function DeckDetailPage() {
     // createCards already calls fetchCards internally, no need to refetch
   }
 
+  const handleSync = async () => {
+    if (!deckId) return
+    setSyncMessage(null)
+    const result = await syncSubscribedDeck(deckId)
+    if (result) {
+      if (result.added === 0 && result.removed === 0) {
+        setSyncMessage(t('decks:sync.noChanges'))
+      } else {
+        setSyncMessage(t('decks:sync.syncComplete', { added: result.added, removed: result.removed }))
+      }
+      // Refresh cards to show new state
+      await fetchCards(deckId)
+    } else {
+      setSyncMessage(t('decks:sync.syncFailed'))
+    }
+    // Auto-clear message after 5 seconds
+    setTimeout(() => setSyncMessage(null), 5000)
+  }
+
+  const isSubscribed = !!subscription
+  const pendingCount = deckId ? (pendingCounts[deckId] ?? 0) : 0
+  const isSyncing = deckId ? (syncing[deckId] ?? false) : false
+
   const tabs: { id: TabId; label: string }[] = [
     { id: 'cards', label: t('decks:detail.tabs.cardList') },
     { id: 'upload-date', label: t('decks:detail.tabs.uploadDate') },
     { id: 'stats', label: t('decks:detail.tabs.statistics') },
+    { id: 'versions', label: t('decks:detail.tabs.versions', { defaultValue: 'Versions' }) },
   ]
 
   return (
@@ -235,10 +285,42 @@ export function DeckDetailPage() {
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="text-2xl sm:text-3xl">{deck.icon}</span>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{deck.name}</h1>
+          {isSubscribed && (
+            <span className="px-2.5 py-1 text-xs font-medium bg-purple-50 text-purple-700 rounded-full">
+              {t('decks:sync.subscribed')}
+            </span>
+          )}
           <GuideHelpLink section="decks" />
         </div>
         {deck.description && (
           <p className="text-sm sm:text-base text-gray-500">{deck.description}</p>
+        )}
+
+        {/* Sync bar for subscribed decks */}
+        {isSubscribed && (
+          <div className="flex flex-wrap items-center gap-3 mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+            <button
+              onClick={handleSync}
+              disabled={isSyncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition disabled:opacity-50 cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? t('decks:sync.syncing') : t('decks:sync.button')}
+            </button>
+            {pendingCount > 0 && (
+              <span className="px-2.5 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                {t('decks:sync.pendingChanges', { count: pendingCount })}
+              </span>
+            )}
+            <span className="text-xs text-purple-600">
+              {subscription?.last_synced_at
+                ? t('decks:sync.lastSynced', { time: formatLocalDate(subscription.last_synced_at, dateLocale) })
+                : t('decks:sync.neverSynced')}
+            </span>
+            {syncMessage && (
+              <span className="text-xs text-purple-700 font-medium">{syncMessage}</span>
+            )}
+          </div>
         )}
 
         {/* Stats badges */}
@@ -649,6 +731,13 @@ export function DeckDetailPage() {
         <DeckStatsTab
           deckId={deckId!}
           cards={cards}
+        />
+      )}
+
+      {activeTab === 'versions' && deckId && (
+        <VersionHistorySection
+          deckId={deckId}
+          isOwner={!deck.is_readonly}
         />
       )}
 

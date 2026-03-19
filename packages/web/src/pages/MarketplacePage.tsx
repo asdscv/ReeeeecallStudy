@@ -1,31 +1,39 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMarketplaceStore } from '../stores/marketplace-store'
+import { useOfficialStore } from '@reeeeecall/shared/stores/official-store'
 import { ListingCard } from '../components/marketplace/ListingCard'
 import { SearchFilters } from '../components/marketplace/SearchFilters'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { OfficialBadge } from '../components/common/OfficialBadge'
+import { extractPopularTags, getTrendingListingIds, countActiveFilters } from '../lib/marketplace'
 import type { MarketplaceListing } from '../types/database'
+import type { MarketplaceListingData } from '../lib/marketplace'
 
 const PAGE_SIZE = 12
 
 export function MarketplacePage() {
   const { t } = useTranslation(['marketplace', 'common'])
   const navigate = useNavigate()
-  const { loading, filters, fetchListings, setFilters, getFilteredListings } = useMarketplaceStore()
+  const { listings, loading, filters, fetchListings, setFilters, resetFilters, getFilteredListings } = useMarketplaceStore()
+  const { officialListings, fetchOfficialListings } = useOfficialStore()
   const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     fetchListings()
-  }, [fetchListings])
+    fetchOfficialListings()
+  }, [fetchListings, fetchOfficialListings])
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [filters.query, filters.category, filters.sortBy])
+  }, [filters])
 
   const filteredListings = getFilteredListings()
+  const popularTags = useMemo(() => extractPopularTags(listings as MarketplaceListingData[]), [listings])
+  const trendingIds = useMemo(() => getTrendingListingIds(listings as MarketplaceListingData[]), [listings])
 
   const totalPages = Math.max(1, Math.ceil(filteredListings.length / PAGE_SIZE))
   const safePage = Math.max(1, Math.min(currentPage, totalPages))
@@ -36,6 +44,8 @@ export function MarketplacePage() {
     navigate(`/marketplace/${listing.id}`)
   }
 
+  const hasActiveFilters = !!(filters.query || filters.category || countActiveFilters(filters) > 0)
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -45,24 +55,59 @@ export function MarketplacePage() {
 
       <div className="mb-4">
         <SearchFilters
-          query={filters.query ?? ''}
-          category={filters.category ?? ''}
-          sortBy={filters.sortBy}
-          onQueryChange={(query) => setFilters({ query })}
-          onCategoryChange={(category) => setFilters({ category: category || undefined })}
-          onSortChange={(sortBy) => setFilters({ sortBy })}
+          filters={filters}
+          popularTags={popularTags}
+          onFilterChange={setFilters}
+          onReset={resetFilters}
         />
       </div>
 
+      {/* Official Decks Featured Section */}
+      {officialListings.length > 0 && (
+        <div className="mb-6" data-testid="official-decks-section">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            {'\u2B50'} {t('marketplace:officialDecks', { defaultValue: 'Official Decks' })}
+          </h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+            {officialListings.map((listing) => (
+              <div
+                key={listing.id}
+                onClick={() => handleListingClick(listing as MarketplaceListing)}
+                className="min-w-[220px] max-w-[260px] bg-white rounded-xl border border-gray-200 p-3 hover:border-blue-300 hover:shadow-md transition cursor-pointer shrink-0"
+                data-testid={`official-listing-${listing.id}`}
+              >
+                <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mb-1">
+                  {listing.title}
+                </h3>
+                {listing.owner_display_name && (
+                  <div className="flex items-center gap-1 mb-2">
+                    <span className="text-xs text-gray-500 truncate">{listing.owner_display_name}</span>
+                    <OfficialBadge
+                      badgeType={(listing as any).badge_type || 'verified'}
+                      badgeColor={(listing as any).badge_color}
+                      size="sm"
+                    />
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <span>{listing.card_count} cards</span>
+                  <span>{listing.acquire_count} users</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="text-4xl animate-pulse">🏪</div>
+          <div className="text-4xl animate-pulse">{'\uD83C\uDFEA'}</div>
         </div>
       ) : filteredListings.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
-          <div className="text-4xl sm:text-5xl mb-4">🏪</div>
+          <div className="text-4xl sm:text-5xl mb-4">{'\uD83C\uDFEA'}</div>
           <p className="text-gray-500 text-sm sm:text-base">
-            {filters.query || filters.category
+            {hasActiveFilters
               ? t('marketplace:noResults')
               : t('marketplace:noListings')}
           </p>
@@ -75,6 +120,7 @@ export function MarketplacePage() {
                 key={listing.id}
                 listing={listing}
                 onClick={handleListingClick}
+                isTrending={trendingIds.has(listing.id)}
               />
             ))}
           </div>

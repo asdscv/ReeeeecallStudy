@@ -23,6 +23,7 @@ interface MarketplaceState {
   unpublishDeck: (listingId: string) => Promise<void>
   acquireDeck: (listingId: string) => Promise<{ deckId: string } | null>
   setFilters: (filters: Partial<ListingFilters & { sortBy: SortBy }>) => void
+  resetFilters: () => void
   getFilteredListings: () => MarketplaceListing[]
 }
 
@@ -36,16 +37,38 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
   fetchListings: async () => {
     set({ loading: true, error: null })
 
+    // Fetch listings with owner profile info via join
     const { data, error } = await supabase
       .from('marketplace_listings')
-      .select('*')
+      .select('*, profiles!marketplace_listings_owner_id_fkey(display_name, is_official)')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
 
     if (error) {
-      set({ error: error.message, loading: false })
+      // Fallback: fetch without join if foreign key name doesn't match
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('marketplace_listings')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+
+      if (fallbackError) {
+        set({ error: fallbackError.message, loading: false })
+      } else {
+        set({ listings: (fallbackData ?? []) as MarketplaceListing[], loading: false })
+      }
     } else {
-      set({ listings: (data ?? []) as MarketplaceListing[], loading: false })
+      // Flatten the joined profile data
+      const listings = (data ?? []).map((row: Record<string, unknown>) => {
+        const profile = row.profiles as { display_name: string | null; is_official: boolean } | null
+        return {
+          ...row,
+          profiles: undefined,
+          owner_display_name: profile?.display_name ?? null,
+          owner_is_official: profile?.is_official ?? false,
+        }
+      }) as unknown as MarketplaceListing[]
+      set({ listings, loading: false })
     }
   },
 
@@ -216,13 +239,13 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
     }))
   },
 
+  resetFilters: () => {
+    set({ filters: { sortBy: 'newest' } })
+  },
+
   getFilteredListings: () => {
     const { listings, filters } = get()
-    const filtered = filterListings(listings as MarketplaceListingData[], {
-      category: filters.category,
-      tags: filters.tags,
-      query: filters.query,
-    })
+    const filtered = filterListings(listings as MarketplaceListingData[], filters)
     return sortListings(filtered, filters.sortBy) as MarketplaceListing[]
   },
 }))
