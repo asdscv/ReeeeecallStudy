@@ -1,109 +1,166 @@
 import { scrollUp } from './scroll'
 
 /**
- * Tab name → index and actual tabBarTestID mapping.
- * React Navigation bottom tab accessibility label: "Label, tab, N of 5"
- * tabBarTestID + tabBarAccessibilityLabel values are defined in MainTabs.tsx.
+ * Drawer testID mapping — language-independent, matches MainDrawer.tsx testID props.
  */
-const TAB_MAP: Record<string, { idx: number; testID: string }> = {
-  Home:     { idx: 1, testID: 'HomeTab' },
-  Decks:    { idx: 2, testID: 'DecksTab' },
-  Study:    { idx: 3, testID: 'StudyTab' },
-  Market:   { idx: 4, testID: 'MarketplaceTab' },
-  Settings: { idx: 5, testID: 'SettingsTab' },
+const DRAWER_TEST_IDS: Record<string, string> = {
+  'Quick Study': 'drawer-quick-study',
+  Dashboard: 'drawer-dashboard',
+  Study: 'drawer-study-group',
+  'AI Generate': 'drawer-ai-generate',
+  Decks: 'drawer-decks',
+  Cards: 'drawer-cards',
+  Marketplace: 'drawer-marketplace',
+  History: 'drawer-history',
+  Settings: 'drawer-settings',
+  Guide: 'drawer-guide',
 }
 
-export async function navigateToTab(tabName: string) {
-  const tab = TAB_MAP[tabName]
-  if (!tab) {
-    console.log(`[nav] Unknown tab: ${tabName}`)
+/**
+ * Open the drawer by tapping the hamburger (☰) button.
+ */
+export async function openDrawer() {
+  // Try accessibility label
+  const menuBtn = $('~Open menu')
+  if (await menuBtn.isDisplayed().catch(() => false)) {
+    await menuBtn.click()
+    await browser.pause(800)
+    return true
+  }
+
+  // iOS: find by class chain — look for the hamburger button area
+  if (driver.isIOS) {
+    const hamburger = $('-ios predicate string:label == "Open menu"')
+    if (await hamburger.isDisplayed().catch(() => false)) {
+      await hamburger.click()
+      await browser.pause(800)
+      return true
+    }
+    const textBtn = $('-ios predicate string:label CONTAINS "☰"')
+    if (await textBtn.isDisplayed().catch(() => false)) {
+      await textBtn.click()
+      await browser.pause(800)
+      return true
+    }
+  } else {
+    const btn = $('android=new UiSelector().description("Open menu")')
+    if (await btn.isDisplayed().catch(() => false)) {
+      await btn.click()
+      await browser.pause(800)
+      return true
+    }
+    const textBtn = $('android=new UiSelector().text("☰")')
+    if (await textBtn.isDisplayed().catch(() => false)) {
+      await textBtn.click()
+      await browser.pause(800)
+      return true
+    }
+  }
+
+  console.log('[nav] WARNING: Could not find hamburger button')
+  return false
+}
+
+/**
+ * Navigate to a screen via the drawer menu using testIDs (language-independent).
+ */
+export async function navigateToDrawerItem(itemName: string) {
+  const studyGroupItems = ['AI Generate', 'Decks', 'Cards', 'Marketplace', 'History']
+  const needsStudyGroup = studyGroupItems.includes(itemName)
+
+  const opened = await openDrawer()
+  if (!opened) {
+    console.log(`[nav] Failed to open drawer for ${itemName}`)
+    return false
+  }
+
+  // If item is inside Study group, expand it first
+  if (needsStudyGroup) {
+    await tapDrawerTestID('drawer-study-group')
+    await browser.pause(500)
+  }
+
+  // Tap the item by testID
+  const testID = DRAWER_TEST_IDS[itemName]
+  if (testID) {
+    await tapDrawerTestID(testID)
+  } else {
+    // Fallback to text-based search
+    await tapDrawerText(itemName)
+  }
+  await browser.pause(1000)
+  return true
+}
+
+/**
+ * Tap a drawer item by testID (language-independent).
+ */
+async function tapDrawerTestID(testID: string) {
+  // Try accessibility id first (works on both platforms)
+  const el = $(`~${testID}`)
+  if (await el.isDisplayed().catch(() => false)) {
+    await el.click()
     return
   }
 
-  // Dismiss React Native debugger warning banner if blocking tab bar
-  if (driver.isIOS) {
-    // Look for the "✕" dismiss button on the yellow/gray warning banner
-    const dismissBanner = $('-ios predicate string:name == "✕" OR name == "×" OR name == "Close"')
-    if (await dismissBanner.isDisplayed().catch(() => false)) {
-      await dismissBanner.click()
-      await browser.pause(500)
+  if (driver.isAndroid) {
+    // Android: try resource-id
+    const androidEl = $(`android=new UiSelector().resourceId("${testID}")`)
+    if (await androidEl.isDisplayed().catch(() => false)) {
+      await androidEl.click()
+      return
     }
-    // Also try generic dismiss: tap X button at bottom-right of warning banner
-    const xButton = $('-ios class chain:**/XCUIElementTypeOther[`label CONTAINS "debugger"`]/../XCUIElementTypeButton')
-    if (await xButton.isDisplayed().catch(() => false)) {
-      await xButton.click()
-      await browser.pause(500)
-    }
-  }
-
-  // Dismiss keyboard if covering tab bar
-  if (driver.isIOS) {
-    const keyboard = $('-ios class chain:**/XCUIElementTypeKeyboard')
-    if (await keyboard.isDisplayed().catch(() => false)) {
-      await $('-ios class chain:**/XCUIElementTypeOther[1]').click().catch(() => {})
-      await browser.pause(500)
-    }
-  } else {
-    try { await driver.hideKeyboard() } catch { /* no keyboard */ }
-  }
-
-  // 1. iOS class chain — Nth tab bar button (most reliable on iOS)
-  //    Use isExisting() instead of isDisplayed() because debugger banner may obscure tab bar
-  if (driver.isIOS) {
-    const classChain = $(`-ios class chain:**/XCUIElementTypeTabBar/XCUIElementTypeButton[${tab.idx}]`)
-    if (await classChain.isExisting().catch(() => false)) {
-      await classChain.click()
-      await browser.pause(1000)
+    const descEl = $(`android=new UiSelector().description("${testID}")`)
+    if (await descEl.isDisplayed().catch(() => false)) {
+      await descEl.click()
       return
     }
   }
 
-  // 2. React Navigation tab: "Label, tab, N of 5"
-  const label = `${tabName}, tab, ${tab.idx} of 5`
-  const labelTab = $(`~${label}`)
-  if (await labelTab.isExisting().catch(() => false)) {
-    await labelTab.click()
-    await browser.pause(1000)
-    return
-  }
+  console.log(`[nav] WARNING: testID "${testID}" not found in drawer`)
+}
 
-  // 3. tabBarTestID
-  const testIdTab = $(`~${tab.testID}`)
-  if (await testIdTab.isExisting().catch(() => false)) {
-    await testIdTab.click()
-    await browser.pause(1000)
-    return
-  }
-
-  // 4. Plain name fallback
-  const plainTab = $(`~${tabName}`)
-  if (await plainTab.isExisting().catch(() => false)) {
-    await plainTab.click()
-    await browser.pause(1000)
-    return
-  }
-
-  // Debug: dump what's visible
-  console.log(`[nav] WARNING: Tab "${tabName}" not found — dumping debug info`)
-  try {
-    // Check if tab bar exists at all
-    if (driver.isIOS) {
-      const tabBar = $('-ios class chain:**/XCUIElementTypeTabBar')
-      const tbVisible = await tabBar.isDisplayed().catch(() => false)
-      console.log(`[nav] TabBar visible: ${tbVisible}`)
-      if (tbVisible) {
-        // Count tab bar buttons
-        const buttons = await $$('-ios class chain:**/XCUIElementTypeTabBar/XCUIElementTypeButton')
-        console.log(`[nav] TabBar buttons found: ${buttons.length}`)
-        for (let i = 0; i < buttons.length; i++) {
-          const label = await buttons[i].getAttribute('label').catch(() => '?')
-          const name = await buttons[i].getAttribute('name').catch(() => '?')
-          console.log(`[nav]   Button[${i}]: label="${label}" name="${name}"`)
-        }
-      }
+/**
+ * Fallback: tap a text element inside the drawer.
+ */
+async function tapDrawerText(text: string) {
+  if (driver.isIOS) {
+    const el = $(`-ios predicate string:label == "${text}"`)
+    if (await el.isDisplayed().catch(() => false)) {
+      await el.click()
+      return
     }
-    await browser.saveScreenshot(`./e2e-debug-nav-${tabName}.png`)
-  } catch (e) {
-    console.log(`[nav] Debug failed: ${e}`)
+    const partial = $(`-ios predicate string:label CONTAINS "${text}"`)
+    if (await partial.isDisplayed().catch(() => false)) {
+      await partial.click()
+      return
+    }
+  } else {
+    const el = $(`android=new UiSelector().text("${text}")`)
+    if (await el.isDisplayed().catch(() => false)) {
+      await el.click()
+      return
+    }
+    const desc = $(`android=new UiSelector().description("${text}")`)
+    if (await desc.isDisplayed().catch(() => false)) {
+      await desc.click()
+      return
+    }
   }
+  console.log(`[nav] WARNING: Text "${text}" not found in drawer`)
+}
+
+/**
+ * Legacy: navigate to tab (wrapper for backward compat).
+ */
+export async function navigateToTab(tabName: string) {
+  const mapping: Record<string, string> = {
+    Home: 'Dashboard',
+    Decks: 'Decks',
+    Study: 'Quick Study',
+    Market: 'Marketplace',
+    Settings: 'Settings',
+  }
+  const drawerItem = mapping[tabName] ?? tabName
+  return navigateToDrawerItem(drawerItem)
 }

@@ -75,6 +75,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           active={isActive('StudyTab')}
           theme={theme}
           onPress={() => go('StudyTab')}
+          testID="drawer-quick-study"
         />
 
         {/* Dashboard */}
@@ -83,6 +84,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           active={isActive('HomeTab')}
           theme={theme}
           onPress={() => go('HomeTab', 'Dashboard')}
+          testID="drawer-dashboard"
         />
 
         {/* Study (group) */}
@@ -90,6 +92,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           onPress={() => setStudyGroupOpen(!studyGroupOpen)}
           style={[styles.menuItem, studyGroupOpen && { backgroundColor: palette.blue[50] }]}
           activeOpacity={0.7}
+          testID="drawer-study-group"
+          accessibilityLabel="drawer-study-group"
         >
           <Text style={styles.menuIcon}>📚</Text>
           <Text style={[styles.menuLabel, { color: theme.colors.text, flex: 1 }]}>{t('nav.study')}</Text>
@@ -101,15 +105,15 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         {studyGroupOpen && (
           <View>
             <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={false} theme={theme}
-              onPress={() => go('SettingsTab', 'AIGenerate')} />
+              onPress={() => go('SettingsTab', 'AIGenerate')} testID="drawer-ai-generate" />
             <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
-              onPress={() => go('DecksTab')} />
+              onPress={() => go('DecksTab')} testID="drawer-decks" />
             <MenuItem icon="📋" label={t('nav.cards')} indent active={false} theme={theme}
-              onPress={() => go('SettingsTab', 'TemplatesList')} />
+              onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
             <MenuItem icon="🏪" label={t('nav.marketplace')} indent active={isActive('MarketplaceTab')} theme={theme}
-              onPress={() => go('MarketplaceTab')} />
+              onPress={() => go('MarketplaceTab')} testID="drawer-marketplace" />
             <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={false} theme={theme}
-              onPress={() => go('HomeTab', 'StudyHistory')} />
+              onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
           </View>
         )}
 
@@ -127,6 +131,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           active={isActive('SettingsTab')}
           theme={theme}
           onPress={() => go('SettingsTab', 'SettingsHome')}
+          testID="drawer-settings"
         />
 
         {/* Admin (conditional) */}
@@ -148,6 +153,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           active={false}
           theme={theme}
           onPress={() => go('SettingsTab', 'Guide')}
+          testID="drawer-guide"
         />
       </ScrollView>
 
@@ -157,14 +163,16 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
   )
 }
 
-function MenuItem({ icon, label, active, theme, onPress, indent }: {
+function MenuItem({ icon, label, active, theme, onPress, indent, testID }: {
   icon: string; label: string; active: boolean
-  theme: ReturnType<typeof useTheme>; onPress: () => void; indent?: boolean
+  theme: ReturnType<typeof useTheme>; onPress: () => void; indent?: boolean; testID?: string
 }) {
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
+      testID={testID}
+      accessibilityLabel={testID}
       style={[
         styles.menuItem,
         indent && styles.menuItemIndent,
