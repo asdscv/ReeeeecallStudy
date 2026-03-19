@@ -3,7 +3,6 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronDown, BookOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
-import { LanguageSelector } from './LanguageSelector'
 
 type NavLink = { kind: 'link'; path: string; label: string; icon: string }
 type NavGroup = { kind: 'group'; label: string; icon: string; children: { path: string; label: string; icon: string }[] }
@@ -11,7 +10,7 @@ type NavItem = NavLink | NavGroup
 
 export function Layout() {
   const { t } = useTranslation('common')
-  const { signOut, role } = useAuthStore()
+  const { role } = useAuthStore()
 
   const navItems: NavItem[] = [
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
@@ -135,17 +134,10 @@ export function Layout() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSelector className="hidden md:flex" />
             <Link to="/guide" className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm no-underline transition text-gray-600 hover:bg-gray-100">
               <BookOpen className="w-4 h-4" />
               {t('nav.guide')}
             </Link>
-            <button
-              onClick={signOut}
-              className="hidden md:inline text-sm text-gray-400 hover:text-gray-600 cursor-pointer"
-            >
-              {t('actions.logout')}
-            </button>
 
             {/* Mobile hamburger */}
             <button
@@ -215,27 +207,15 @@ export function Layout() {
                   </div>
                 )
               })}
-              {/* Language quick-switch */}
               <div className="border-t border-gray-100 mt-2 pt-3 px-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <LanguageSelector compact={false} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Link
-                    to="/guide"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-blue-600 no-underline transition"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    {t('nav.guide')}
-                  </Link>
-                  <button
-                    onClick={() => { setMobileMenuOpen(false); signOut() }}
-                    className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer shrink-0 ml-4"
-                  >
-                    {t('actions.logout')}
-                  </button>
-                </div>
+                <Link
+                  to="/guide"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-blue-600 no-underline transition"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  {t('nav.guide')}
+                </Link>
               </div>
             </nav>
           </div>

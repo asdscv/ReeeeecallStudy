@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { createDrawerNavigator, type DrawerContentComponentProps } from '@react-navigation/drawer'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
-import { useAuth, useAuthState } from '../hooks'
+import { useAuthState } from '../hooks'
 import { getMobileSupabase } from '../adapters'
 
 // Stacks
@@ -34,7 +34,6 @@ const Drawer = createDrawerNavigator<MainTabParamList>()
 function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
   const theme = useTheme()
   const { t, i18n } = useTranslation('common')
-  const { signOut } = useAuth()
   const { user } = useAuthState()
   const [studyGroupOpen, setStudyGroupOpen] = useState(false)
   const [role, setRole] = useState<string>('user')
@@ -60,14 +59,6 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
       navigation.navigate(name)
     }
     navigation.closeDrawer()
-  }
-
-  const handleLogout = () => {
-    navigation.closeDrawer()
-    Alert.alert(t('actions.logout'), t('account.logoutConfirm', { ns: 'settings', defaultValue: 'Are you sure you want to sign out?' }), [
-      { text: t('actions.cancel'), style: 'cancel' },
-      { text: t('actions.logout'), style: 'destructive', onPress: signOut },
-    ])
   }
 
   return (
@@ -160,12 +151,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         />
       </ScrollView>
 
-      {/* Logout at the very bottom, subtle text link */}
-      <View style={[styles.drawerFooter, { borderTopColor: theme.colors.border }]}>
-        <TouchableOpacity onPress={handleLogout} activeOpacity={0.7} style={styles.logoutLink}>
-          <Text style={[styles.logoutText, { color: palette.gray[400] }]}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Footer spacer */}
+      <View style={{ height: 16 }} />
     </SafeAreaView>
   )
 }
@@ -237,10 +224,4 @@ const styles = StyleSheet.create({
   menuLabel: { fontSize: 15 },
   chevron: { fontSize: 14 },
   divider: { borderTopWidth: 1, marginVertical: 8, marginHorizontal: 16 },
-  // Footer with subtle logout
-  drawerFooter: {
-    borderTopWidth: 1, paddingHorizontal: 20, paddingVertical: 16,
-  },
-  logoutLink: { paddingVertical: 4 },
-  logoutText: { fontSize: 14 },
 })
