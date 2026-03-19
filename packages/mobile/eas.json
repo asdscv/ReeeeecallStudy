@@ -24,10 +24,6 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "ascAppId": "",
-        "appleTeamId": ""
-      },
       "android": {
         "track": "internal",
         "releaseStatus": "draft"

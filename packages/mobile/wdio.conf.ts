@@ -57,40 +57,34 @@ export const config: WebdriverIO.Config = {
     const { loginIfNeeded } = await import('./__tests__/e2e/helpers/auth')
     await loginIfNeeded()
 
-    // After login, navigate to Home tab to ensure consistent starting point
-    // (previous spec may have left app on a different screen/tab)
+    // After login, navigate to Home (Dashboard) to ensure consistent starting point.
+    // App now uses drawer navigation (not bottom tabs).
     try {
       const { navigateToTab } = await import('./__tests__/e2e/helpers/navigation')
 
-      // If app is on a stack screen (e.g. DeckEditScreen), tab bar is hidden.
-      // Try pressing back to get to root tab screen first.
-      if (driver.isIOS) {
-        for (let i = 0; i < 3; i++) {
-          const tabBar = $('-ios class chain:**/XCUIElementTypeTabBar')
-          if (await tabBar.isDisplayed().catch(() => false)) break
+      // Try pressing back to get out of nested stack screens
+      for (let i = 0; i < 3; i++) {
+        // Check if we're on a main screen (has drawer hamburger)
+        const hamburger = $('~Open menu')
+        if (await hamburger.isDisplayed().catch(() => false)) break
 
-          // Try back/cancel buttons
+        if (driver.isIOS) {
           const cancelBtn = $('-ios predicate string:label CONTAINS "Cancel" OR label CONTAINS "Back"')
           if (await cancelBtn.isDisplayed().catch(() => false)) {
             await cancelBtn.click().catch(() => {})
             await browser.pause(1000)
             continue
           }
-          break
-        }
-      } else {
-        // Android: use system back to get out of stack screens
-        for (let i = 0; i < 3; i++) {
-          const homeTab = $('~HomeTab')
-          if (await homeTab.isDisplayed().catch(() => false)) break
+        } else {
           try { await driver.back() } catch { /* ignore */ }
           await browser.pause(1000)
         }
+        break
       }
 
       await navigateToTab('Home')
       await browser.pause(500)
-    } catch { /* ignore — auth tests don't have tabs */ }
+    } catch { /* ignore — auth tests don't have drawer yet */ }
   },
 
   // Hooks for screenshots on failure

@@ -1000,3 +1000,503 @@ FTA 확대가 무역에 도움이 돼,Expanding FTAs helps trade.,Free trade agr
 보호무역주의가 확산되고 있어,Protectionism is spreading.,Countries are increasingly putting up trade barriers.,국제,protectionism = 보호무역주의 / trade barriers = 무역 장벽,국제
 관세 전쟁이 소비자 가격을 올려,Tariff wars drive up consumer prices.,Trade tariffs ultimately make things more expensive for shoppers.,국제,tariff war = 관세 전쟁 / consumer prices = 소비자 가격,국제
 경제 안보 개념이 확대되고 있어,The concept of economic security is expanding.,Economic considerations are increasingly viewed through a national security lens.,경제,economic security = 경제 안보 / national security lens = 안보 관점,경제
+AI 규제 법안이 국회에서 논의 중이야,An AI regulation bill is being discussed in the National Assembly.,Lawmakers are debating how to govern artificial intelligence.,기술/AI,AI regulation = AI 규제 / National Assembly = 국회,기술
+생성형 AI가 일자리를 대체할 수 있다는 우려가 커,There are growing concerns that generative AI could replace jobs.,People worry that AI tools like ChatGPT might make certain roles obsolete.,기술/AI,generative AI = 생성형 AI / obsolete = 쓸모없는,기술
+딥페이크 범죄가 사회 문제로 떠올랐어,Deepfake crimes have emerged as a social issue.,Fake AI-generated content is becoming a serious societal concern.,기술/AI,deepfake = 딥페이크 / societal concern = 사회적 우려,기술
+자율주행차 상용화가 빨라지고 있어,Commercialization of autonomous vehicles is accelerating.,Self-driving cars are getting closer to hitting the road for real.,기술/AI,autonomous vehicle = 자율주행차 / commercialization = 상용화,기술
+반도체 공급망 재편이 진행 중이야,Semiconductor supply chain restructuring is underway.,The global chip supply network is being reshuffled.,기술/AI,semiconductor = 반도체 / supply chain = 공급망,기술
+양자 컴퓨팅 기술 경쟁이 치열해,The competition in quantum computing technology is fierce.,Nations are racing to dominate the quantum tech space.,기술/AI,quantum computing = 양자 컴퓨팅 / fierce = 치열한,기술
+개인정보 유출 사고가 계속 발생해,Personal data breaches keep happening.,Data leaks continue to expose people's private information.,기술/AI,data breach = 개인정보 유출 / expose = 노출시키다,기술
+클라우드 보안 강화가 시급해,Strengthening cloud security is urgent.,We need to beef up protection for cloud-based systems right away.,기술/AI,cloud security = 클라우드 보안 / beef up = 강화하다,기술
+AI 윤리 가이드라인 마련이 필요해,We need to establish AI ethics guidelines.,Setting ground rules for responsible AI use is essential.,기술/AI,AI ethics = AI 윤리 / guidelines = 가이드라인,기술
+6G 기술 선점 경쟁이 시작됐어,The race to lead in 6G technology has begun.,Countries are already jockeying for position in next-gen wireless.,기술/AI,6G = 6세대 이동통신 / jockeying for position = 선점 경쟁,기술
+저출산 문제가 갈수록 심각해지고 있어,The low birth rate problem is getting worse.,Declining fertility rates are becoming an increasingly critical issue.,인구/저출산,low birth rate = 저출산 / fertility rate = 출산율,인구
+합계출산율이 역대 최저를 기록했어,The total fertility rate hit an all-time low.,The number of babies born per woman has never been this low.,인구/저출산,total fertility rate = 합계출산율 / all-time low = 역대 최저,인구
+인구 소멸 위기 지역이 늘어나고 있어,"Areas at risk of population extinction are increasing.","More and more communities are facing the threat of depopulation.",인구/저출산,population extinction = 인구 소멸 / depopulation = 인구 감소,인구
+고령화 사회 대비가 부족해,We're not adequately prepared for an aging society.,Our preparations for a graying population fall short.,인구/저출산,aging society = 고령화 사회 / graying population = 고령화 인구,인구
+다문화 가정 지원 정책이 강화돼야 해,Policies supporting multicultural families need to be strengthened.,We should do more to help families from diverse cultural backgrounds.,인구/저출산,multicultural families = 다문화 가정 / diverse backgrounds = 다양한 배경,인구
+육아 휴직 사용률이 아직 낮아,Parental leave usage rates are still low.,Not enough people are actually taking their entitled time off for childcare.,인구/저출산,parental leave = 육아 휴직 / usage rate = 사용률,인구
+지방 소멸 대응 전략이 시급해,Strategies to counter rural depopulation are urgently needed.,We need to act fast to prevent small towns from disappearing.,인구/저출산,rural depopulation = 지방 소멸 / strategies = 전략,인구
+이민 정책 개편 논의가 활발해,Discussions on immigration policy reform are active.,There's a lively debate about overhauling how we handle immigration.,인구/저출산,immigration policy = 이민 정책 / reform = 개편,인구
+돌봄 서비스 확충이 필요해,We need to expand care services.,More resources should go toward building out caregiving support.,인구/저출산,care services = 돌봄 서비스 / expand = 확충하다,인구
+신생아 수가 매년 줄어들고 있어,The number of newborns is decreasing every year.,Fewer and fewer babies are being born each year.,인구/저출산,newborns = 신생아 / decreasing = 감소하는,인구
+집값이 또 오르고 있어서 걱정이야,Housing prices are rising again and it's worrying.,Home values are climbing once more and people are anxious.,부동산,housing prices = 집값 / anxious = 불안한,부동산
+전세 사기 피해가 늘어나고 있어,Jeonse fraud cases are increasing.,More and more tenants are falling victim to rental deposit scams.,부동산,jeonse fraud = 전세 사기 / rental deposit = 보증금,부동산
+부동산 규제 완화가 시장에 영향을 줘,Easing real estate regulations affects the market.,Loosening property rules is shaking up the housing market.,부동산,regulation easing = 규제 완화 / housing market = 주택 시장,부동산
+역전세 현상이 세입자를 불안하게 해,"The reverse jeonse phenomenon is making tenants anxious.","Falling deposit prices are leaving renters worried about getting their money back.",부동산,reverse jeonse = 역전세 / tenants = 세입자,부동산
+재건축 규제가 풀릴 수도 있대,They say reconstruction regulations might be relaxed.,There are hints that rules on rebuilding old apartments could be eased.,부동산,reconstruction = 재건축 / regulations = 규제,부동산
+청년 주거 문제가 심각해,Youth housing problems are serious.,Young people are really struggling to find affordable places to live.,부동산,youth housing = 청년 주거 / affordable = 저렴한,부동산
+공공임대 주택 공급이 부족해,The supply of public rental housing is insufficient.,There aren't enough government-subsidized rental units to go around.,부동산,public rental housing = 공공임대 주택 / subsidized = 보조금 지원,부동산
+주택담보대출 금리가 올라서 부담이야,Mortgage rates have gone up and it's a burden.,Higher home loan interest rates are squeezing homeowners.,부동산,mortgage = 주택담보대출 / interest rate = 금리,부동산
+분양가 상한제 논란이 있어,There's controversy over the price ceiling on new apartments.,The cap on initial sale prices for new housing is a hot-button issue.,부동산,price ceiling = 분양가 상한제 / controversy = 논란,부동산
+갭투자 위험성에 대한 경고가 나와,Warnings about the risks of gap investment are coming out.,Experts are cautioning against leveraged property speculation.,부동산,gap investment = 갭투자 / leveraged speculation = 레버리지 투기,부동산
+기후변화로 이상 기후가 빈번해지고 있어,Extreme weather events are becoming more frequent due to climate change.,Climate change is making unusual weather patterns the new normal.,기후변화,extreme weather = 이상 기후 / frequent = 빈번한,기후변화
+탄소 중립 목표 달성이 쉽지 않아,Achieving carbon neutrality goals isn't easy.,Reaching net-zero emissions targets is proving to be a tall order.,기후변화,carbon neutrality = 탄소 중립 / net-zero = 넷제로,기후변화
+해수면 상승이 섬나라를 위협하고 있어,Rising sea levels are threatening island nations.,Small island states face an existential threat from higher ocean waters.,기후변화,sea level rise = 해수면 상승 / island nations = 섬나라,기후변화
+폭염 일수가 해마다 늘어나고 있어,The number of heat wave days is increasing every year.,We're getting more and more scorching hot days each summer.,기후변화,heat wave = 폭염 / scorching = 찌는 듯한,기후변화
+기후 난민이 새로운 문제로 떠오르고 있어,Climate refugees are emerging as a new issue.,People displaced by environmental disasters are a growing concern.,기후변화,climate refugees = 기후 난민 / displaced = 이주한,기후변화
+온실가스 배출량 감축이 시급해,Reducing greenhouse gas emissions is urgent.,We need to cut carbon output as soon as possible.,기후변화,greenhouse gas = 온실가스 / emissions = 배출량,기후변화
+그린워싱 기업에 대한 비판이 높아,Criticism of greenwashing companies is growing.,Firms that fake their eco-credentials are facing backlash.,기후변화,greenwashing = 그린워싱 / backlash = 반발,기후변화
+기후변화 적응 예산이 부족해,The budget for climate change adaptation is insufficient.,Not enough money is being allocated to prepare for climate impacts.,기후변화,adaptation = 적응 / budget = 예산,기후변화
+산불 위험이 기후변화로 커지고 있어,Wildfire risks are increasing due to climate change.,Changing weather patterns are making forest fires more likely.,기후변화,wildfire = 산불 / weather patterns = 기후 패턴,기후변화
+빙하가 예상보다 빠르게 녹고 있어,Glaciers are melting faster than expected.,Ice sheets are disappearing at an alarming rate.,기후변화,glaciers = 빙하 / melting = 녹는,기후변화
+최저임금 인상 논쟁이 매년 반복돼,The debate over minimum wage increases repeats every year.,The annual fight over raising the wage floor never seems to end.,노동/고용,minimum wage = 최저임금 / wage floor = 최저 임금선,노동
+플랫폼 노동자 보호법이 필요해,A law to protect platform workers is needed.,Gig economy workers deserve legal safeguards.,노동/고용,platform workers = 플랫폼 노동자 / gig economy = 긱 경제,노동
+주 4일제 도입 논의가 활발해,Discussions on introducing a four-day workweek are active.,The idea of working four days a week is gaining serious traction.,노동/고용,four-day workweek = 주 4일제 / gaining traction = 탄력을 받다,노동
+비정규직 차별이 여전히 심각해,Discrimination against non-regular workers is still serious.,Temporary and contract workers continue to face unfair treatment.,노동/고용,non-regular workers = 비정규직 / discrimination = 차별,노동
+청년 실업률이 높은 상태를 유지하고 있어,Youth unemployment rates remain high.,Joblessness among young people stubbornly stays elevated.,노동/고용,youth unemployment = 청년 실업 / elevated = 높은,노동
+워라밸 문화가 확산되고 있어,Work-life balance culture is spreading.,More companies are embracing the importance of personal time.,노동/고용,work-life balance = 워라밸 / embracing = 수용하다,노동
+직장 내 괴롭힘 신고가 늘었어,Reports of workplace bullying have increased.,More employees are speaking up about harassment on the job.,노동/고용,workplace bullying = 직장 내 괴롭힘 / harassment = 괴롭힘,노동
+원격근무 제도화가 논의되고 있어,Institutionalizing remote work is being discussed.,There's a push to make work-from-home policies permanent and official.,노동/고용,remote work = 원격근무 / institutionalize = 제도화하다,노동
+산업재해 사망률을 낮춰야 해,We need to lower the industrial accident death rate.,Workplace fatality rates must come down.,노동/고용,industrial accident = 산업재해 / fatality rate = 사망률,노동
+퇴직연금 제도 개선이 시급해,Retirement pension system reform is urgent.,The way we manage retirement savings needs a serious overhaul.,노동/고용,retirement pension = 퇴직연금 / overhaul = 개혁,노동
+재생에너지 비중을 늘려야 해,We need to increase the share of renewable energy.,A bigger portion of our power should come from clean sources.,에너지,renewable energy = 재생에너지 / clean sources = 청정 에너지원,에너지
+원전 재가동 논란이 있어,There's controversy over restarting nuclear power plants.,Firing up nuclear reactors again is a divisive topic.,에너지,nuclear power plant = 원자력 발전소 / divisive = 논란이 되는,에너지
+전기요금 인상이 불가피하다고 해,They say electricity rate hikes are unavoidable.,Rising power costs seem inevitable at this point.,에너지,electricity rate = 전기요금 / unavoidable = 불가피한,에너지
+수소 경제 전환이 가속화되고 있어,The transition to a hydrogen economy is accelerating.,The shift toward hydrogen-powered industries is picking up speed.,에너지,hydrogen economy = 수소 경제 / transition = 전환,에너지
+에너지 안보가 중요한 이슈야,Energy security is an important issue.,Ensuring stable access to power sources is a top priority.,에너지,energy security = 에너지 안보 / stable access = 안정적 접근,에너지
+태양광 발전 확대에 찬반이 갈려,Opinions are divided on expanding solar power generation.,People are split on whether to push harder for solar energy.,에너지,solar power = 태양광 발전 / divided = 갈리는,에너지
+LNG 가격 변동이 경제에 영향을 줘,LNG price fluctuations affect the economy.,Swings in natural gas prices ripple through the broader economy.,에너지,LNG = 액화천연가스 / fluctuations = 변동,에너지
+에너지 효율 등급제가 강화돼,Energy efficiency rating systems are being strengthened.,Stricter standards for energy labels are being put in place.,에너지,energy efficiency = 에너지 효율 / rating system = 등급제,에너지
+전력 수급 불안이 여름마다 반복돼,Power supply instability recurs every summer.,Electricity shortages become a worry each time the hot season rolls around.,에너지,power supply = 전력 수급 / instability = 불안정,에너지
+소형 모듈 원자로 개발이 주목받고 있어,Small modular reactor development is attracting attention.,Compact nuclear reactors are generating a lot of buzz.,에너지,small modular reactor = 소형 모듈 원자로 / attracting attention = 주목받다,에너지
+한미 동맹 강화가 논의되고 있어,Strengthening the Korea-US alliance is being discussed.,Talks are underway to deepen the bilateral partnership with America.,외교,Korea-US alliance = 한미 동맹 / bilateral = 양자간의,외교
+한중 관계가 복잡해지고 있어,Korea-China relations are getting complicated.,The diplomatic dynamic with Beijing is becoming more intricate.,외교,Korea-China relations = 한중 관계 / diplomatic = 외교적인,외교
+다자외교의 중요성이 커지고 있어,The importance of multilateral diplomacy is growing.,Working through international organizations matters more than ever.,외교,multilateral diplomacy = 다자외교 / international organizations = 국제기구,외교
+경제 외교가 핵심 과제야,Economic diplomacy is a key task.,Trade-focused foreign policy is at the top of the agenda.,외교,economic diplomacy = 경제 외교 / foreign policy = 외교 정책,외교
+공적개발원조 규모를 늘려야 해,We need to increase the scale of official development assistance.,More foreign aid funding is needed to meet our international commitments.,외교,ODA = 공적개발원조 / foreign aid = 대외 원조,외교
+위안부 문제가 외교적으로 민감해,The comfort women issue is diplomatically sensitive.,Historical wartime sexual slavery remains a thorny diplomatic matter.,외교,comfort women = 위안부 / diplomatically sensitive = 외교적으로 민감한,외교
+대사관 기능 강화가 필요해,Embassy functions need to be strengthened.,Our diplomatic missions abroad need more resources and capabilities.,외교,embassy = 대사관 / diplomatic missions = 외교 공관,외교
+비자 정책 변화가 관광에 영향을 줘,Visa policy changes affect tourism.,Tweaks to entry requirements are impacting visitor numbers.,외교,visa policy = 비자 정책 / tourism = 관광,외교
+재외동포 정책이 개선돼야 해,Policies for overseas Koreans need to be improved.,We should do better at supporting Korean diaspora communities.,외교,overseas Koreans = 재외동포 / diaspora = 디아스포라,외교
+정상회담 성과에 대한 평가가 갈려,Assessments of the summit results are divided.,People disagree on whether the leaders' meeting actually accomplished anything.,외교,summit = 정상회담 / assessments = 평가,외교
+북핵 문제 해결이 요원해,Resolving the North Korean nuclear issue seems distant.,A solution to Pyongyang's nuclear program remains elusive.,안보,North Korean nuclear issue = 북핵 문제 / elusive = 파악하기 어려운,안보
+사이버 안보 위협이 증가하고 있어,Cyber security threats are increasing.,Online attacks on critical systems are on the rise.,안보,cyber security = 사이버 안보 / critical systems = 핵심 시스템,안보
+방위비 분담금 협상이 진행 중이야,Defense cost-sharing negotiations are underway.,Talks on how to split the military bill are ongoing.,안보,defense cost-sharing = 방위비 분담 / negotiations = 협상,안보
+군 병력 감축 논의가 있어,There are discussions about military troop reductions.,The idea of downsizing the armed forces is on the table.,안보,troop reductions = 병력 감축 / armed forces = 군대,안보
+미사일 방어 체계 강화가 필요해,Strengthening missile defense systems is necessary.,We need to upgrade our ability to intercept incoming threats.,안보,missile defense = 미사일 방어 / intercept = 요격하다,안보
+첩보 활동에 대한 경각심이 필요해,We need to be alert about espionage activities.,Awareness of spying and intelligence threats should be heightened.,안보,espionage = 첩보 활동 / intelligence = 정보,안보
+무인기 위협에 대한 대비가 부족해,We're not prepared enough for drone threats.,Our defenses against unmanned aerial vehicles need work.,안보,drone = 무인기 / defenses = 방어 체계,안보
+해양 영토 분쟁이 긴장을 높이고 있어,Maritime territorial disputes are raising tensions.,Competing claims over ocean boundaries are fueling conflict.,안보,maritime disputes = 해양 분쟁 / territorial = 영토의,안보
+국방 예산 증액이 논의되고 있어,An increase in the defense budget is being discussed.,There's talk of putting more money into military spending.,안보,defense budget = 국방 예산 / increase = 증액,안보
+예비군 훈련 제도 개편이 필요해,The reserve forces training system needs reform.,How we train military reservists is due for an update.,안보,reserve forces = 예비군 / training system = 훈련 제도,안보
+국민연금 개혁이 시급한 과제야,National pension reform is an urgent task.,Fixing the public retirement system can't wait any longer.,복지,national pension = 국민연금 / reform = 개혁,복지
+기초생활보장 사각지대가 존재해,There are blind spots in the basic livelihood security system.,Some vulnerable people fall through the cracks of the welfare safety net.,복지,basic livelihood security = 기초생활보장 / blind spots = 사각지대,복지
+장애인 복지 예산이 부족해,The welfare budget for people with disabilities is insufficient.,Funding for disability support services falls short of what's needed.,복지,disability welfare = 장애인 복지 / insufficient = 부족한,복지
+독거노인 돌봄 체계가 미흡해,The care system for elderly living alone is inadequate.,Support for seniors who live by themselves needs improvement.,복지,elderly living alone = 독거노인 / care system = 돌봄 체계,복지
+사회안전망 강화가 필요해,Strengthening the social safety net is necessary.,We need a more robust system to catch people who fall on hard times.,복지,social safety net = 사회안전망 / robust = 견고한,복지
+긴급복지 지원 제도가 개선돼야 해,The emergency welfare support system needs improvement.,The way we provide crisis relief to those in need requires an upgrade.,복지,emergency welfare = 긴급복지 / crisis relief = 위기 지원,복지
+보육 서비스 질 향상이 필요해,Improving the quality of childcare services is needed.,We should raise the standard of early childhood care programs.,복지,childcare services = 보육 서비스 / quality improvement = 질 향상,복지
+아동 학대 예방 시스템이 강화돼야 해,The child abuse prevention system needs to be strengthened.,We must do more to protect kids from mistreatment.,복지,child abuse = 아동 학대 / prevention = 예방,복지
+노인 일자리 사업이 확대돼야 해,Senior employment programs should be expanded.,Job opportunities for older adults need to be scaled up.,복지,senior employment = 노인 일자리 / scaled up = 확대된,복지
+자활 사업 참여율을 높여야 해,We need to increase participation rates in self-sufficiency programs.,Getting more people into workforce reintegration initiatives is essential.,복지,self-sufficiency programs = 자활 사업 / participation rate = 참여율,복지
+의대 정원 확대 문제로 갈등이 심해,There's serious conflict over expanding medical school quotas.,The fight over admitting more medical students has gotten intense.,의료,medical school quota = 의대 정원 / conflict = 갈등,의료
+응급실 뺑뺑이 문제가 심각해,The emergency room runaround problem is serious.,Patients being bounced from one ER to another is a critical issue.,의료,emergency room = 응급실 / runaround = 뺑뺑이,의료
+원격진료 확대에 대한 찬반이 있어,There are pros and cons to expanding telemedicine.,People are split on whether remote medical consultations should become mainstream.,의료,telemedicine = 원격진료 / remote consultations = 원격 상담,의료
+의료 인력 부족 문제가 지속돼,The shortage of medical personnel continues.,The healthcare worker deficit shows no signs of easing.,의료,medical personnel = 의료 인력 / shortage = 부족,의료
+건강보험 재정 안정화가 과제야,Stabilizing health insurance finances is a challenge.,Keeping the national health insurance fund solvent is a major task.,의료,health insurance = 건강보험 / stabilize = 안정화하다,의료
+필수의료 붕괴 위기가 심각해,The crisis of essential medical services collapsing is serious.,Core healthcare functions are on the verge of breaking down.,의료,essential medical services = 필수의료 / collapsing = 붕괴,의료
+간호법 제정 논란이 계속돼,Controversy over enacting a nursing law continues.,The debate over standalone legislation for nurses won't die down.,의료,nursing law = 간호법 / enacting = 제정,의료
+정신건강 관리 체계가 부족해,The mental health care system is insufficient.,Our infrastructure for psychological well-being needs a lot of work.,의료,mental health = 정신건강 / infrastructure = 인프라,의료
+지역 의료 격차가 심해지고 있어,Regional medical disparities are getting worse.,The gap in healthcare quality between cities and rural areas is widening.,의료,regional disparities = 지역 격차 / healthcare quality = 의료 수준,의료
+감염병 대응 체계 개선이 필요해,The infectious disease response system needs improvement.,We should upgrade how we handle epidemic outbreaks.,의료,infectious disease = 감염병 / response system = 대응 체계,의료
+유니콘 기업 육성 정책이 강화돼,Policies to nurture unicorn companies are being strengthened.,The government is stepping up efforts to create billion-dollar startups.,스타트업,unicorn company = 유니콘 기업 / nurture = 육성하다,스타트업
+벤처 투자 한파가 계속되고 있어,The venture investment cold spell continues.,Funding for startups has dried up and shows no signs of thawing.,스타트업,venture investment = 벤처 투자 / cold spell = 한파,스타트업
+스타트업 해외 진출 지원이 필요해,Support for startups expanding overseas is needed.,Helping homegrown companies go global should be a priority.,스타트업,overseas expansion = 해외 진출 / support = 지원,스타트업
+액셀러레이터 프로그램이 늘어나고 있어,Accelerator programs are increasing.,More startup incubation and mentorship programs are popping up.,스타트업,accelerator = 액셀러레이터 / incubation = 인큐베이션,스타트업
+창업 실패에 대한 사회적 인식이 바뀌고 있어,Social perceptions of startup failure are changing.,Society is becoming more accepting of entrepreneurial setbacks.,스타트업,startup failure = 창업 실패 / social perception = 사회적 인식,스타트업
+기술 기반 스타트업이 주목받고 있어,Technology-based startups are attracting attention.,Deep tech ventures are in the spotlight.,스타트업,technology-based = 기술 기반 / deep tech = 딥테크,스타트업
+초기 투자 생태계가 위축됐어,The early-stage investment ecosystem has shrunk.,Seed funding for new companies has taken a hit.,스타트업,early-stage investment = 초기 투자 / seed funding = 시드 펀딩,스타트업
+정부 창업 지원금 활용이 비효율적이라는 지적이 있어,There are criticisms that government startup subsidies are used inefficiently.,Some say public funds for new businesses are being wasted.,스타트업,government subsidies = 정부 지원금 / inefficient = 비효율적인,스타트업
+스타트업과 대기업 협업이 늘어나고 있어,Collaborations between startups and large corporations are increasing.,More big companies are partnering with startups for innovation.,스타트업,collaboration = 협업 / large corporations = 대기업,스타트업
+ESG 경영이 스타트업에도 요구돼,ESG management is also required of startups.,Even new companies are expected to meet environmental and social governance standards.,스타트업,ESG = 환경·사회·지배구조 / governance = 지배구조,스타트업
+비트코인 가격 변동성이 여전히 커,Bitcoin price volatility is still high.,The value of Bitcoin continues to swing wildly.,암호화폐,volatility = 변동성 / swing = 변동하다,암호화폐
+가상자산 과세가 논란이야,Taxation of virtual assets is controversial.,How to tax cryptocurrency holdings remains a hot topic.,암호화폐,virtual assets = 가상자산 / taxation = 과세,암호화폐
+CBDC 도입 논의가 진행 중이야,Discussions on introducing CBDCs are underway.,Central bank digital currencies are being seriously considered.,암호화폐,CBDC = 중앙은행 디지털 화폐 / digital currency = 디지털 화폐,암호화폐
+코인 거래소 규제가 강화됐어,Cryptocurrency exchange regulations have been strengthened.,Tighter rules for crypto trading platforms are now in effect.,암호화폐,cryptocurrency exchange = 코인 거래소 / regulations = 규제,암호화폐
+NFT 시장이 급격히 냉각됐어,The NFT market has cooled down dramatically.,The frenzy around non-fungible tokens has fizzled out.,암호화폐,NFT = 대체 불가능 토큰 / cooled down = 냉각되다,암호화폐
+디파이 보안 사고가 빈번해,DeFi security incidents are frequent.,Decentralized finance platforms keep getting hacked.,암호화폐,DeFi = 탈중앙화 금융 / security incidents = 보안 사고,암호화폐
+스테이블코인 규제가 국제적 과제야,Stablecoin regulation is an international challenge.,Setting rules for price-pegged digital currencies is a global task.,암호화폐,stablecoin = 스테이블코인 / regulation = 규제,암호화폐
+가상자산 투자자 보호법이 시행됐어,The virtual asset investor protection act has been implemented.,New laws to safeguard crypto investors are now in force.,암호화폐,investor protection = 투자자 보호 / implemented = 시행된,암호화폐
+블록체인 기술의 실용적 활용이 늘어나고 있어,Practical applications of blockchain technology are increasing.,Real-world uses for distributed ledger tech are expanding.,암호화폐,blockchain = 블록체인 / practical applications = 실용적 활용,암호화폐
+웹3 시대가 다가오고 있다는 전망이 있어,There are forecasts that the Web3 era is approaching.,Some predict a decentralized internet is just around the corner.,암호화폐,Web3 = 웹3 / decentralized internet = 탈중앙화 인터넷,암호화폐
+성별 임금 격차가 여전히 존재해,The gender wage gap still exists.,Women continue to earn less than men for comparable work.,젠더,gender wage gap = 성별 임금 격차 / comparable = 비슷한,젠더
+유리천장 현상이 여전해,The glass ceiling phenomenon persists.,Invisible barriers to women's advancement haven't gone away.,젠더,glass ceiling = 유리천장 / advancement = 승진,젠더
+남녀 갈등이 사회적으로 심화되고 있어,Gender conflict is deepening in society.,Tensions between men and women are getting worse socially.,젠더,gender conflict = 남녀 갈등 / deepening = 심화되는,젠더
+여성 안심 귀가 서비스가 확대돼야 해,Safe return home services for women should be expanded.,Programs that help women get home safely at night need to grow.,젠더,safe return service = 안심 귀가 서비스 / expanded = 확대된,젠더
+직장 내 성희롱 예방 교육이 강화돼,Workplace sexual harassment prevention training is being strengthened.,Companies are beefing up their anti-harassment education programs.,젠더,sexual harassment = 성희롱 / prevention training = 예방 교육,젠더
+디지털 성범죄 처벌이 강화돼야 해,Penalties for digital sex crimes should be strengthened.,Tougher punishment is needed for online sexual offenses.,젠더,digital sex crimes = 디지털 성범죄 / penalties = 처벌,젠더
+양성평등 지수가 낮은 편이야,The gender equality index is on the low side.,Our ranking on gender parity measures isn't great.,젠더,gender equality index = 양성평등 지수 / parity = 평등,젠더
+남성 육아 참여가 늘어나고 있어,Male participation in childcare is increasing.,More dads are getting actively involved in raising their kids.,젠더,male participation = 남성 참여 / childcare = 육아,젠더
+페미니즘에 대한 세대별 인식 차이가 커,There are big generational differences in perceptions of feminism.,Young and old see feminism very differently.,젠더,feminism = 페미니즘 / generational differences = 세대 차이,젠더
+성인지 예산 제도가 확대되고 있어,Gender-responsive budgeting systems are expanding.,More government spending plans now factor in gender impact analysis.,젠더,gender-responsive budgeting = 성인지 예산 / impact analysis = 영향 분석,젠더
+MZ세대와 기성세대 간 갈등이 있어,There's conflict between the MZ generation and older generations.,Younger and older age groups clash on values and work culture.,세대갈등,MZ generation = MZ세대 / older generations = 기성세대,세대갈등
+세대 간 자산 격차가 벌어지고 있어,The intergenerational wealth gap is widening.,Young people are falling further behind older generations financially.,세대갈등,intergenerational = 세대 간 / wealth gap = 자산 격차,세대갈등
+공정성에 대한 세대별 인식이 달라,Generational perceptions of fairness differ.,What counts as fair depends a lot on which generation you ask.,세대갈등,fairness = 공정성 / perceptions = 인식,세대갈등
+청년 세대의 정치 참여가 변화하고 있어,Political participation of the younger generation is changing.,Young people are engaging with politics in new and different ways.,세대갈등,political participation = 정치 참여 / engaging = 참여하는,세대갈등
+세대 갈등 해소를 위한 소통이 필요해,Communication to resolve generational conflict is needed.,We need better dialogue across age groups to bridge the divide.,세대갈등,resolve = 해소하다 / dialogue = 대화,세대갈등
+디지털 리터러시 격차가 세대별로 커,The digital literacy gap is large between generations.,Older folks struggle more with technology than younger people do.,세대갈등,digital literacy = 디지털 리터러시 / gap = 격차,세대갈등
+노인 혐오 문제가 불거지고 있어,The problem of ageism is coming to the surface.,Prejudice against older people is becoming more visible.,세대갈등,ageism = 노인 혐오 / prejudice = 편견,세대갈등
+기성세대의 변화 수용이 중요해,It's important for older generations to accept change.,Established generations need to be more open to new ways of thinking.,세대갈등,accept change = 변화를 수용하다 / established = 기성의,세대갈등
+세대 통합 프로그램이 확대돼야 해,Intergenerational integration programs should be expanded.,More initiatives bringing different age groups together are needed.,세대갈등,intergenerational integration = 세대 통합 / initiatives = 프로그램,세대갈등
+연금 세대 갈등이 심화될 수 있어,Pension generational conflicts could intensify.,Disagreements over retirement benefits between age groups may get worse.,세대갈등,pension = 연금 / intensify = 심화되다,세대갈등
+식량 자급률이 너무 낮아서 걱정이야,The food self-sufficiency rate is too low and it's worrying.,Our ability to feed ourselves without imports is dangerously low.,식량안보,food self-sufficiency = 식량 자급률 / imports = 수입,식량안보
+글로벌 식량 위기가 현실화되고 있어,A global food crisis is becoming a reality.,Worldwide food shortages are no longer hypothetical.,식량안보,global food crisis = 글로벌 식량 위기 / hypothetical = 가정의,식량안보
+곡물 가격 상승이 물가에 영향을 줘,Rising grain prices affect consumer prices.,Higher costs for crops are pushing up the price of everything.,식량안보,grain prices = 곡물 가격 / consumer prices = 소비자 물가,식량안보
+농업 기술 혁신이 식량 문제 해결에 중요해,Agricultural technology innovation is important for solving food problems.,Agtech breakthroughs could be the key to feeding the world.,식량안보,agricultural technology = 농업 기술 / innovation = 혁신,식량안보
+대체육 시장이 성장하고 있어,The alternative meat market is growing.,Plant-based and lab-grown protein options are gaining ground.,식량안보,alternative meat = 대체육 / plant-based = 식물성,식량안보
+식량 수입 의존도를 줄여야 해,We need to reduce dependence on food imports.,Cutting our reliance on foreign food supplies is essential.,식량안보,food imports = 식량 수입 / dependence = 의존도,식량안보
+스마트팜 기술이 주목받고 있어,Smart farm technology is attracting attention.,High-tech farming solutions are generating a lot of interest.,식량안보,smart farm = 스마트팜 / high-tech farming = 첨단 농업,식량안보
+GMO 식품에 대한 논란이 지속돼,Controversy over GMO foods continues.,The debate about genetically modified food shows no sign of ending.,식량안보,GMO = 유전자 변형 / genetically modified = 유전자 변형된,식량안보
+기후변화가 농업 생산성을 위협해,Climate change threatens agricultural productivity.,Shifting weather patterns are putting crop yields at risk.,식량안보,agricultural productivity = 농업 생산성 / crop yields = 작물 수확량,식량안보
+식품 안전 관리가 더 철저해져야 해,Food safety management needs to be more thorough.,Stricter oversight of what we eat is a must.,식량안보,food safety = 식품 안전 / oversight = 감독,식량안보
+민간 우주 기업이 성장하고 있어,Private space companies are growing.,Commercial spaceflight ventures are really taking off.,우주개발,private space companies = 민간 우주 기업 / commercial spaceflight = 상업 우주비행,우주개발
+달 탐사 경쟁이 치열해지고 있어,The competition for lunar exploration is intensifying.,The race to the Moon is heating up again.,우주개발,lunar exploration = 달 탐사 / intensifying = 치열해지는,우주개발
+우주 쓰레기 문제가 심각해,The space debris problem is serious.,Orbital junk is becoming a real hazard for satellites and astronauts.,우주개발,space debris = 우주 쓰레기 / orbital junk = 궤도 쓰레기,우주개발
+위성 인터넷 서비스가 확대되고 있어,Satellite internet services are expanding.,Space-based broadband is reaching more and more users.,우주개발,satellite internet = 위성 인터넷 / broadband = 광대역 통신,우주개발
+화성 탐사 계획이 구체화되고 있어,Mars exploration plans are taking shape.,Concrete roadmaps for missions to Mars are being drawn up.,우주개발,Mars exploration = 화성 탐사 / roadmaps = 로드맵,우주개발
+우주 자원 개발이 새로운 산업으로 주목받아,Space resource development is attracting attention as a new industry.,Mining asteroids and celestial bodies could be the next big business.,우주개발,space resources = 우주 자원 / mining asteroids = 소행성 채굴,우주개발
+한국형 발사체 개발이 진전되고 있어,Development of the Korean launch vehicle is progressing.,Korea's homegrown rocket program is making strides.,우주개발,launch vehicle = 발사체 / progressing = 진전되는,우주개발
+우주 안보 역량 강화가 필요해,We need to strengthen space security capabilities.,Building defense capacity in orbit is becoming a priority.,우주개발,space security = 우주 안보 / capabilities = 역량,우주개발
+우주 관광 시대가 다가오고 있어,The era of space tourism is approaching.,Trips to space for regular people are getting closer to reality.,우주개발,space tourism = 우주 관광 / approaching = 다가오는,우주개발
+소행성 충돌 방어 기술이 연구되고 있어,Asteroid impact defense technology is being researched.,Scientists are working on ways to deflect dangerous space rocks.,우주개발,asteroid impact = 소행성 충돌 / deflect = 편향시키다,우주개발
+가짜뉴스 확산이 민주주의를 위협해,The spread of fake news threatens democracy.,Misinformation is undermining democratic processes.,미디어,fake news = 가짜뉴스 / misinformation = 잘못된 정보,미디어
+언론의 정치적 편향이 문제야,Political bias in the media is a problem.,News outlets leaning too far in one direction is concerning.,미디어,political bias = 정치적 편향 / news outlets = 언론사,미디어
+유튜브 저널리즘의 영향력이 커지고 있어,The influence of YouTube journalism is growing.,Content creators on YouTube are becoming major news sources.,미디어,YouTube journalism = 유튜브 저널리즘 / content creators = 콘텐츠 크리에이터,미디어
+미디어 리터러시 교육이 필요해,Media literacy education is needed.,People need to learn how to critically evaluate information sources.,미디어,media literacy = 미디어 리터러시 / critically evaluate = 비판적으로 평가하다,미디어
+OTT 플랫폼 경쟁이 치열해,Competition among OTT platforms is fierce.,Streaming services are in an all-out war for subscribers.,미디어,OTT = Over The Top / subscribers = 구독자,미디어
+공영방송 개혁 논의가 있어,There are discussions about public broadcasting reform.,How state-funded media should be run is up for debate.,미디어,public broadcasting = 공영방송 / reform = 개혁,미디어
+알고리즘이 뉴스 소비를 왜곡할 수 있어,Algorithms can distort news consumption.,The way social media feeds curate content can create information bubbles.,미디어,algorithm = 알고리즘 / distort = 왜곡하다,미디어
+언론 자유 지수가 하락했어,The press freedom index has declined.,Our ranking on media independence measures has dropped.,미디어,press freedom = 언론 자유 / index = 지수,미디어
+팟캐스트가 새로운 미디어로 성장하고 있어,Podcasts are growing as a new media form.,Audio content is becoming a major way people consume information.,미디어,podcast = 팟캐스트 / audio content = 오디오 콘텐츠,미디어
+기자의 안전 보장이 중요해,Ensuring the safety of journalists is important.,Protecting reporters from threats and violence is a fundamental concern.,미디어,journalist safety = 기자 안전 / fundamental = 근본적인,미디어
+교육과정 개편이 논란이야,Curriculum reform is controversial.,Changes to what students learn in school are causing debate.,교육정책,curriculum reform = 교육과정 개편 / controversial = 논란이 되는,교육정책
+사교육비 부담이 가중되고 있어,The burden of private education costs is increasing.,Families are spending more and more on after-school tutoring.,교육정책,private education = 사교육 / burden = 부담,교육정책
+대학 구조조정이 불가피해,University restructuring is unavoidable.,Some colleges will have to merge or close due to declining enrollment.,교육정책,university restructuring = 대학 구조조정 / enrollment = 입학,교육정책
+AI 교육이 정규 과정에 포함돼야 해,AI education should be included in the regular curriculum.,Teaching artificial intelligence basics in school is becoming essential.,교육정책,AI education = AI 교육 / regular curriculum = 정규 과정,교육정책
+학령인구 감소로 학교 통폐합이 늘어,School consolidations are increasing due to declining student populations.,Fewer kids mean more schools are being merged or shut down.,교육정책,student population = 학령인구 / consolidation = 통폐합,교육정책
+수능 제도 개편 논의가 끊이지 않아,Discussions on reforming the college entrance exam never stop.,The debate about changing the CSAT keeps going on and on.,교육정책,CSAT = 대학수학능력시험 / reform = 개편,교육정책
+교사 수급 불균형이 심각해,The imbalance in teacher supply and demand is serious.,Some subjects have too many teachers while others face shortages.,교육정책,teacher supply = 교사 수급 / imbalance = 불균형,교육정책
+대안학교에 대한 관심이 높아지고 있어,Interest in alternative schools is growing.,More families are looking at non-traditional educational options.,교육정책,alternative schools = 대안학교 / non-traditional = 비전통적,교육정책
+디지털 교과서 도입이 추진되고 있어,Introduction of digital textbooks is being promoted.,The push to replace paper books with digital ones in schools is underway.,교육정책,digital textbooks = 디지털 교과서 / introduction = 도입,교육정책
+고교학점제 시행이 본격화됐어,The high school credit system has been fully implemented.,Students now choose their own courses under a credit-based system.,교육정책,high school credit system = 고교학점제 / implemented = 시행된,교육정책
+검찰 개혁이 지속적인 이슈야,Prosecution reform is an ongoing issue.,Restructuring the prosecutor's office remains a persistent topic.,법률,prosecution reform = 검찰 개혁 / ongoing = 지속적인,법률
+사법부 신뢰가 흔들리고 있어,Trust in the judiciary is being shaken.,Public confidence in the courts is eroding.,법률,judiciary = 사법부 / eroding = 침식되는,법률
+형사 사법 제도 개혁이 필요해,Criminal justice system reform is needed.,The way we handle criminal cases needs a fundamental rethink.,법률,criminal justice = 형사 사법 / reform = 개혁,법률
+디지털 증거 관련 법률이 정비돼야 해,Laws related to digital evidence need to be updated.,Legal frameworks for handling electronic proof in court require modernization.,법률,digital evidence = 디지털 증거 / legal frameworks = 법적 체계,법률
+공익 소송이 늘어나고 있어,Public interest lawsuits are increasing.,More legal cases are being filed for the greater good of society.,법률,public interest lawsuits = 공익 소송 / greater good = 공익,법률
+양형 기준이 논란이 되고 있어,Sentencing guidelines are becoming controversial.,How judges decide punishment lengths is drawing criticism.,법률,sentencing guidelines = 양형 기준 / punishment = 처벌,법률
+국민참여재판 제도가 확대돼야 해,The citizen participation trial system should be expanded.,Jury-like systems where ordinary people help decide cases need to grow.,법률,citizen participation trial = 국민참여재판 / jury = 배심원,법률
+개인정보보호법 강화가 필요해,Strengthening the Personal Information Protection Act is needed.,Privacy laws need to be tougher to keep up with the digital age.,법률,Personal Information Protection Act = 개인정보보호법 / privacy = 프라이버시,법률
+플랫폼 기업 규제 법안이 논의 중이야,A bill to regulate platform companies is being discussed.,Lawmakers are working on rules to rein in big tech platforms.,법률,platform companies = 플랫폼 기업 / regulate = 규제하다,법률
+헌법 개정 논의가 다시 나오고 있어,Discussions on constitutional amendment are coming up again.,The idea of revising the constitution is back on the table.,법률,constitutional amendment = 헌법 개정 / revising = 개정하는,법률
+한류가 세계적으로 영향력을 확대하고 있어,The Korean Wave is expanding its influence worldwide.,K-culture is making an even bigger splash on the global stage.,문화,Korean Wave = 한류 / influence = 영향력,문화
+문화재 반환 요구가 계속되고 있어,Demands for the return of cultural artifacts continue.,Calls for repatriation of stolen heritage items persist.,문화,cultural artifacts = 문화재 / repatriation = 반환,문화
+독립 서점이 다시 주목받고 있어,Independent bookstores are getting attention again.,Small local bookshops are enjoying a surprising comeback.,문화,independent bookstores = 독립 서점 / comeback = 부활,문화
+문화 다양성 정책이 확대돼야 해,Cultural diversity policies should be expanded.,We need stronger measures to promote a variety of cultural expressions.,문화,cultural diversity = 문화 다양성 / promote = 촉진하다,문화
+공연 예술 시장이 회복되고 있어,The performing arts market is recovering.,Live entertainment is bouncing back after tough times.,문화,performing arts = 공연 예술 / recovering = 회복 중인,문화
+전통문화 보존과 현대화 사이에서 균형이 필요해,"Balance is needed between preserving traditional culture and modernization.","We need to honor our heritage while keeping it relevant for today.",문화,preservation = 보존 / modernization = 현대화,문화
+웹툰 산업이 글로벌 시장에서 성장해,The webtoon industry is growing in the global market.,Korean digital comics are capturing readers worldwide.,문화,webtoon = 웹툰 / global market = 글로벌 시장,문화
+예술인 복지 제도가 개선돼야 해,The welfare system for artists needs to be improved.,Support programs for creative professionals require an upgrade.,문화,artist welfare = 예술인 복지 / creative professionals = 예술가,문화
+K-pop 팬덤 문화가 사회에 미치는 영향이 커,The impact of K-pop fandom culture on society is growing.,Fan communities around Korean pop music are shaping social trends.,문화,K-pop fandom = K-pop 팬덤 / social trends = 사회적 트렌드,문화
+문화 콘텐츠 수출이 경제에 기여해,Cultural content exports contribute to the economy.,Entertainment exports are becoming a significant revenue stream.,문화,cultural content = 문화 콘텐츠 / revenue stream = 수입원,문화
+국회 파행이 계속되고 있어,The National Assembly dysfunction continues.,Parliamentary gridlock shows no sign of breaking.,정치,National Assembly = 국회 / gridlock = 교착 상태,정치
+정치 양극화가 심화되고 있어,Political polarization is deepening.,The divide between left and right is getting more extreme.,정치,political polarization = 정치 양극화 / divide = 분열,정치
+선거 제도 개편 논의가 필요해,Discussion on electoral system reform is needed.,It's time to rethink how we run our elections.,정치,electoral system = 선거 제도 / reform = 개편,정치
+지방 자치 분권이 강화돼야 해,Local government decentralization should be strengthened.,Giving more power to regional authorities is important.,정치,decentralization = 분권 / regional authorities = 지방 정부,정치
+공수처 역할에 대한 논란이 있어,There's controversy over the role of the CIO.,The agency investigating corruption among high-ranking officials faces criticism.,정치,CIO = 고위공직자범죄수사처 / corruption = 부패,정치
+정당 개혁이 시급하다는 목소리가 커,Calls for party reform are growing louder.,More people are demanding that political parties clean up their act.,정치,party reform = 정당 개혁 / clean up = 개혁하다,정치
+청원 제도가 시민 참여를 높이고 있어,The petition system is increasing citizen participation.,Public petitions are giving ordinary people a bigger voice in governance.,정치,petition system = 청원 제도 / citizen participation = 시민 참여,정치
+로비 활동 투명성이 확보돼야 해,Transparency in lobbying activities must be ensured.,We need more openness about who's influencing lawmakers and how.,정치,lobbying = 로비 활동 / transparency = 투명성,정치
+국민 투표 활용이 논의되고 있어,The use of national referendums is being discussed.,Putting important decisions directly to the people is on the agenda.,정치,national referendum = 국민 투표 / on the agenda = 의제에 있는,정치
+정치 신인의 진입 장벽이 높아,Entry barriers for political newcomers are high.,It's tough for fresh faces to break into politics.,정치,entry barriers = 진입 장벽 / newcomers = 신인,정치
+국제기구에서 한국의 역할이 커지고 있어,Korea's role in international organizations is growing.,Seoul is taking on more responsibility on the world stage.,국제,international organizations = 국제기구 / responsibility = 책임,국제
+난민 문제가 국제적 과제야,The refugee issue is an international challenge.,Displaced populations are a problem that demands global cooperation.,국제,refugee = 난민 / global cooperation = 국제 협력,국제
+다자주의가 약화되고 있다는 우려가 있어,There are concerns that multilateralism is weakening.,People worry that international cooperation frameworks are breaking down.,국제,multilateralism = 다자주의 / frameworks = 체제,국제
+중동 정세 불안이 유가에 영향을 줘,Middle East instability affects oil prices.,Turmoil in the Middle East sends ripples through energy markets.,국제,Middle East = 중동 / instability = 불안정,국제
+글로벌 공급망 다변화가 필요해,Global supply chain diversification is needed.,Companies need to source from multiple countries to reduce risk.,국제,supply chain = 공급망 / diversification = 다변화,국제
+UN 안보리 개혁 논의가 진행 중이야,Discussions on UN Security Council reform are underway.,The push to restructure the world's top peace and security body continues.,국제,UN Security Council = UN 안보리 / reform = 개혁,국제
+글로벌 사우스의 영향력이 확대되고 있어,The influence of the Global South is expanding.,Developing nations are wielding more clout on the world stage.,국제,Global South = 글로벌 사우스 / wielding clout = 영향력을 행사하다,국제
+인도태평양 전략이 주목받고 있어,The Indo-Pacific strategy is attracting attention.,The geopolitical focus on the Indo-Pacific region is intensifying.,국제,Indo-Pacific = 인도태평양 / geopolitical = 지정학적,국제
+국제 인권 상황이 악화되는 곳이 많아,International human rights situations are worsening in many places.,Civil liberties are deteriorating in numerous countries around the world.,국제,human rights = 인권 / civil liberties = 시민 자유,국제
+국제 테러 위협이 여전히 존재해,International terrorism threats still exist.,The danger of global terrorist attacks hasn't gone away.,국제,terrorism = 테러 / threats = 위협,국제
+혐오 범죄가 증가하고 있어,Hate crimes are on the rise.,Offenses motivated by prejudice are becoming more common.,사회,hate crimes = 혐오 범죄 / prejudice = 편견,사회
+사회적 고립이 새로운 문제로 떠올라,Social isolation is emerging as a new problem.,Loneliness and disconnection are becoming a public health concern.,사회,social isolation = 사회적 고립 / public health concern = 공중 보건 문제,사회
+자살률을 낮추기 위한 대책이 필요해,Measures to reduce the suicide rate are needed.,We urgently need effective strategies to prevent suicide.,사회,suicide rate = 자살률 / measures = 대책,사회
+마약 범죄가 심각해지고 있어,Drug crimes are becoming more serious.,Narcotics-related offenses are escalating at an alarming rate.,사회,drug crimes = 마약 범죄 / escalating = 증가하는,사회
+학교 폭력 예방이 중요해,Preventing school violence is important.,Keeping students safe from bullying and aggression is a top priority.,사회,school violence = 학교 폭력 / prevention = 예방,사회
+고독사 방지 대책이 시급해,Measures to prevent solitary deaths are urgent.,We need to act fast to stop people from dying alone and unnoticed.,사회,solitary death = 고독사 / prevention = 방지,사회
+계층 이동 사다리가 무너지고 있어,The social mobility ladder is collapsing.,Opportunities to move up in society are disappearing.,사회,social mobility = 계층 이동 / collapsing = 무너지는,사회
+자원봉사 문화가 확산돼야 해,Volunteer culture should spread more widely.,A stronger tradition of giving back to the community is needed.,사회,volunteer culture = 자원봉사 문화 / giving back = 사회 환원,사회
+도시 재생 사업이 활성화되고 있어,Urban regeneration projects are being revitalized.,Efforts to breathe new life into declining neighborhoods are gaining momentum.,사회,urban regeneration = 도시 재생 / gaining momentum = 탄력을 받다,사회
+동물 복지에 대한 관심이 높아지고 있어,Interest in animal welfare is growing.,People are paying more attention to how animals are treated.,사회,animal welfare = 동물 복지 / treated = 대우받는,사회
+미중 패권 경쟁이 세계 질서를 바꾸고 있어,The US-China hegemony competition is changing the world order.,The power struggle between America and China is reshaping global dynamics.,국제,hegemony competition = 패권 경쟁 / world order = 세계 질서,국제
+러시아-우크라이나 전쟁의 장기화가 우려돼,Prolongation of the Russia-Ukraine war is concerning.,There's growing worry that the conflict in Ukraine will drag on indefinitely.,국제,prolongation = 장기화 / drag on = 질질 끌다,국제
+대만해협 긴장이 고조되고 있어,Tensions in the Taiwan Strait are escalating.,The situation across the strait is getting more precarious.,안보,Taiwan Strait = 대만해협 / escalating = 고조되는,안보
+유럽 에너지 위기가 산업에 타격을 줘,The European energy crisis is hitting industries hard.,Soaring energy costs in Europe are hammering manufacturers.,에너지,energy crisis = 에너지 위기 / hammering = 타격을 주는,에너지
+아프리카 경제 성장에 주목해야 해,We should pay attention to Africa's economic growth.,The continent's rising economic potential deserves more recognition.,국제,economic growth = 경제 성장 / potential = 잠재력,국제
+환율 변동이 수출입에 영향을 줘,Exchange rate fluctuations affect imports and exports.,Currency swings make it harder for businesses to plan trade.,경제,exchange rate = 환율 / fluctuations = 변동,경제
+금리 인하 기대감이 시장에 반영되고 있어,Expectations of interest rate cuts are being reflected in the market.,Markets are pricing in the possibility of lower borrowing costs.,경제,interest rate cuts = 금리 인하 / pricing in = 반영하다,경제
+가계부채 규모가 우려 수준이야,Household debt levels are at concerning levels.,The amount ordinary families owe has reached alarming proportions.,경제,household debt = 가계부채 / alarming = 우려스러운,경제
+물가 상승률이 좀처럼 안 잡혀,The inflation rate just won't come down.,Prices stubbornly refuse to stop climbing.,경제,inflation rate = 물가 상승률 / stubbornly = 완고하게,경제
+소비자 신뢰 지수가 하락했어,The consumer confidence index has dropped.,People's faith in the economy has taken a dip.,경제,consumer confidence = 소비자 신뢰 / index = 지수,경제
+공급망 리쇼어링이 가속화되고 있어,Supply chain reshoring is accelerating.,More companies are bringing production back to their home countries.,경제,reshoring = 리쇼어링 / production = 생산,경제
+ESG 투자가 주류로 자리잡고 있어,ESG investing is becoming mainstream.,Putting money into companies with good environmental and social practices is the norm now.,경제,ESG investing = ESG 투자 / mainstream = 주류,경제
+핀테크 서비스가 금융 시장을 변화시켜,Fintech services are transforming the financial market.,Digital financial tools are disrupting traditional banking.,경제,fintech = 핀테크 / disrupting = 파괴하는,경제
+글로벌 경기 침체 우려가 커지고 있어,Concerns about a global recession are growing.,Fears of a worldwide economic downturn are mounting.,경제,global recession = 글로벌 경기 침체 / mounting = 커지는,경제
+디지털 전환이 기업의 생존 전략이 됐어,Digital transformation has become a corporate survival strategy.,Going digital is no longer optional for businesses—it's do or die.,경제,digital transformation = 디지털 전환 / survival strategy = 생존 전략,경제
+인플레이션 대응 정책이 효과를 보고 있어,Inflation response policies are showing results.,Measures to tame rising prices are starting to work.,경제,inflation = 인플레이션 / response policies = 대응 정책,경제
+중소기업 지원 정책이 강화돼야 해,SME support policies should be strengthened.,Small and medium businesses need more government backing.,경제,SME = 중소기업 / support policies = 지원 정책,경제
+노조 파업이 산업에 영향을 미쳐,Labor union strikes are affecting industries.,Work stoppages by organized labor are disrupting production.,노동,labor union = 노조 / strikes = 파업,노동
+이주 노동자 권리 보호가 필요해,Protecting migrant worker rights is necessary.,Foreign laborers deserve fair treatment and legal protections.,노동,migrant workers = 이주 노동자 / fair treatment = 공정한 대우,노동
+프리랜서 보호 제도가 미비해,Protections for freelancers are inadequate.,Independent contractors lack the safety nets that regular employees enjoy.,노동,freelancer = 프리랜서 / safety nets = 안전망,노동
+로봇세 도입 논의가 있어,There are discussions about introducing a robot tax.,The idea of taxing companies that replace workers with machines is being explored.,노동,robot tax = 로봇세 / taxing = 과세하다,노동
+재택근무가 새로운 표준이 되고 있어,Working from home is becoming the new normal.,Remote work is establishing itself as a permanent fixture.,노동,working from home = 재택근무 / new normal = 새로운 표준,노동
+전기차 보조금 정책이 변경됐어,Electric vehicle subsidy policies have changed.,Government incentives for buying EVs have been adjusted.,환경,electric vehicle = 전기차 / subsidy = 보조금,환경
+플라스틱 규제가 강화되고 있어,Plastic regulations are being strengthened.,Stricter rules on single-use plastics are being rolled out.,환경,plastic regulations = 플라스틱 규제 / single-use = 일회용,환경
+미세먼지 대책이 효과를 보고 있어,Fine dust countermeasures are showing results.,Efforts to reduce air pollution from particulate matter are paying off.,환경,fine dust = 미세먼지 / countermeasures = 대책,환경
+해양 오염이 생태계를 위협해,Ocean pollution threatens ecosystems.,Marine contamination is putting aquatic life at risk.,환경,ocean pollution = 해양 오염 / ecosystems = 생태계,환경
+탄소세 도입이 논의되고 있어,Introduction of a carbon tax is being discussed.,Putting a price on carbon emissions is under consideration.,환경,carbon tax = 탄소세 / emissions = 배출,환경
+생물 다양성 보전이 시급해,Biodiversity conservation is urgent.,Protecting the variety of life on Earth can't wait.,환경,biodiversity = 생물 다양성 / conservation = 보전,환경
+녹색 금융이 확대되고 있어,Green finance is expanding.,More financial products are being tied to environmental sustainability.,환경,green finance = 녹색 금융 / sustainability = 지속가능성,환경
+전자폐기물 처리 문제가 심각해,The e-waste disposal problem is serious.,Mountains of discarded electronics are piling up with nowhere to go.,환경,e-waste = 전자폐기물 / disposal = 처리,환경
+환경영향평가 제도가 강화돼야 해,The environmental impact assessment system should be strengthened.,We need tougher reviews of how new projects affect the environment.,환경,environmental impact assessment = 환경영향평가 / reviews = 검토,환경
+순환 경제 모델이 주목받고 있어,The circular economy model is attracting attention.,Business models that minimize waste and reuse resources are gaining traction.,환경,circular economy = 순환 경제 / minimize waste = 폐기물 최소화,환경
+사이버 범죄 대응 역량이 부족해,Our capacity to respond to cybercrime is insufficient.,Law enforcement needs more tools and training to fight online criminals.,사회,cybercrime = 사이버 범죄 / law enforcement = 법 집행기관,사회
+보이스피싱 피해가 줄지 않아,Voice phishing damage isn't decreasing.,Phone scam losses remain stubbornly high despite awareness campaigns.,사회,voice phishing = 보이스피싱 / phone scam = 전화 사기,사회
+온라인 혐오 표현 규제가 필요해,Regulation of online hate speech is needed.,We need rules to curb toxic and discriminatory language on the internet.,사회,hate speech = 혐오 표현 / regulation = 규제,사회
+노인 디지털 소외 문제가 심각해,The digital exclusion of the elderly is serious.,Older people are being left behind as everything goes online.,사회,digital exclusion = 디지털 소외 / elderly = 노인,사회
+공공 데이터 개방이 확대돼야 해,Public data openness should be expanded.,More government data should be made freely available to everyone.,사회,public data = 공공 데이터 / openness = 개방,사회
+리모콘 의료 시대가 열리고 있어,The era of remote-controlled medicine is opening up.,Healthcare that can be managed from a distance is becoming reality.,의료,remote medicine = 원격 의료 / managed from a distance = 원격으로 관리되는,의료
+바이오 산업이 차세대 성장 동력이야,The bio industry is the next-generation growth engine.,Biotechnology is poised to be a major driver of future economic growth.,기술,bio industry = 바이오 산업 / growth engine = 성장 동력,기술
+로봇 산업이 빠르게 성장하고 있어,The robot industry is growing rapidly.,Robotics is expanding at an impressive pace across many sectors.,기술,robot industry = 로봇 산업 / sectors = 분야,기술
+드론 산업 규제가 정비돼야 해,Drone industry regulations need to be organized.,Clear rules for commercial drone use are needed.,기술,drone industry = 드론 산업 / regulations = 규제,기술
+메타버스 열풍이 한풀 꺾였어,The metaverse hype has cooled down.,The excitement around virtual worlds has faded somewhat.,기술,metaverse = 메타버스 / hype = 열풍,기술
+자율주행 사고 책임 문제가 복잡해,The liability issue for autonomous driving accidents is complex.,Figuring out who's at fault when a self-driving car crashes is tricky.,기술,liability = 책임 / autonomous driving = 자율주행,기술
+데이터 주권이 중요한 이슈로 떠올라,Data sovereignty has emerged as an important issue.,Control over where data is stored and processed is a growing concern.,기술,data sovereignty = 데이터 주권 / stored = 저장된,기술
+스마트시티 프로젝트가 추진되고 있어,Smart city projects are being promoted.,Tech-driven urban planning initiatives are moving forward.,기술,smart city = 스마트시티 / urban planning = 도시 계획,기술
+전자정부 서비스가 확대되고 있어,E-government services are expanding.,More public services are going digital and available online.,기술,e-government = 전자정부 / digital = 디지털,기술
+핵융합 에너지 연구가 진전을 보여,Nuclear fusion energy research is showing progress.,Breakthroughs in fusion power are bringing clean energy closer.,에너지,nuclear fusion = 핵융합 / breakthroughs = 획기적 발전,에너지
+배터리 기술 경쟁이 치열해,Competition in battery technology is fierce.,The race to build better energy storage is heating up.,기술,battery technology = 배터리 기술 / energy storage = 에너지 저장,기술
+국가 신용등급이 경제에 영향을 줘,National credit ratings affect the economy.,A country's creditworthiness rating impacts its borrowing costs and investment flows.,경제,credit rating = 신용등급 / creditworthiness = 신용도,경제
+무역 적자가 지속되고 있어,The trade deficit continues.,We keep importing more than we export.,경제,trade deficit = 무역 적자 / importing = 수입하는,경제
+외국인 투자 유치가 중요해,Attracting foreign investment is important.,Bringing in overseas capital is crucial for economic growth.,경제,foreign investment = 외국인 투자 / capital = 자본,경제
+국부펀드 운용이 투명해야 해,Sovereign wealth fund management should be transparent.,How we invest our national reserves needs to be open to scrutiny.,경제,sovereign wealth fund = 국부펀드 / transparent = 투명한,경제
+벤처 캐피탈 시장이 위축됐어,The venture capital market has contracted.,Funding availability for high-risk investments has shrunk.,경제,venture capital = 벤처 캐피탈 / contracted = 위축된,경제
+공정거래법 개정이 논의돼,Fair Trade Act amendments are being discussed.,Revisions to competition law are under consideration.,법률,Fair Trade Act = 공정거래법 / amendments = 개정,법률
+집단소송제 도입이 필요하다는 목소리가 있어,There are voices calling for introducing a class action lawsuit system.,Some argue that allowing group lawsuits would better protect consumers.,법률,class action lawsuit = 집단소송 / consumers = 소비자,법률
+사형제 폐지 논의가 재부상했어,Discussions on abolishing the death penalty have resurfaced.,The debate over capital punishment is back in the spotlight.,법률,death penalty = 사형제 / abolishing = 폐지하는,법률
+전자발찌 제도의 실효성이 의문이야,The effectiveness of the electronic ankle monitor system is questionable.,Whether GPS tracking devices on offenders actually work is debatable.,법률,electronic ankle monitor = 전자발찌 / effectiveness = 실효성,법률
+스토킹 처벌법이 강화돼야 해,The stalking punishment law should be strengthened.,Penalties for persistent harassment need to be tougher.,법률,stalking = 스토킹 / punishment = 처벌,법률
+병역 제도 개편 논의가 있어,There are discussions about military service system reform.,How mandatory military duty is structured is being reconsidered.,안보,military service = 병역 / reform = 개편,안보
+사이버 사령부 역할이 중요해지고 있어,The role of the Cyber Command is becoming more important.,Digital warfare capabilities are increasingly vital for national defense.,안보,Cyber Command = 사이버 사령부 / digital warfare = 디지털 전쟁,안보
+방산 수출이 증가하고 있어,Defense industry exports are increasing.,Arms sales to other countries are on the rise.,안보,defense industry = 방산 / arms sales = 무기 판매,안보
+통일 비용에 대한 논의가 필요해,Discussion about unification costs is needed.,We should have a realistic conversation about what reunification would cost.,안보,unification costs = 통일 비용 / reunification = 통일,안보
+민방위 훈련 제도가 현실화돼야 해,Civil defense training needs to become more realistic.,Emergency preparedness drills should better reflect actual threats.,안보,civil defense = 민방위 / emergency preparedness = 비상 대비,안보
+생활 물가가 서민 경제를 압박해,Daily living costs are squeezing ordinary people's finances.,Rising prices for everyday goods are putting a strain on working families.,경제,living costs = 생활 물가 / squeezing = 압박하는,경제
+자영업자 폐업률이 높아,The closure rate for self-employed businesses is high.,Small business owners are shutting down at an alarming rate.,경제,self-employed = 자영업자 / closure rate = 폐업률,경제
+중산층이 줄어들고 있다는 분석이 나와,Analyses show that the middle class is shrinking.,Studies indicate the middle-income bracket is getting thinner.,경제,middle class = 중산층 / shrinking = 줄어드는,경제
+경제 불평등이 사회 불안을 야기해,Economic inequality causes social unrest.,The gap between rich and poor is fueling discontent.,경제,economic inequality = 경제 불평등 / social unrest = 사회 불안,경제
+구독 경제가 소비 트렌드를 바꾸고 있어,The subscription economy is changing consumption trends.,Pay-as-you-go models are reshaping how people spend money.,경제,subscription economy = 구독 경제 / consumption trends = 소비 트렌드,경제
+그린플레이션이 새로운 경제 위협이야,Greenflation is a new economic threat.,The rising costs of going green are creating unexpected price pressures.,경제,greenflation = 그린플레이션 / price pressures = 가격 압박,경제
+리튬 등 핵심 광물 확보 경쟁이 치열해,Competition to secure critical minerals like lithium is fierce.,The scramble for essential raw materials is intensifying globally.,경제,critical minerals = 핵심 광물 / lithium = 리튬,경제
+공유 경제 모델이 규제 과제를 안고 있어,The sharing economy model faces regulatory challenges.,Collaborative consumption platforms struggle with fitting into existing rules.,경제,sharing economy = 공유 경제 / regulatory challenges = 규제 과제,경제
+농촌 고령화가 식량 생산에 영향을 줘,Rural aging affects food production.,An older farming population means fewer people to grow our food.,식량안보,rural aging = 농촌 고령화 / food production = 식량 생산,식량안보
+수산업 지속가능성이 위협받고 있어,Fishery sustainability is being threatened.,Overfishing and pollution are putting the future of seafood at risk.,식량안보,fishery = 수산업 / sustainability = 지속가능성,식량안보
+먹거리 불평등이 존재해,Food inequality exists.,Not everyone has equal access to nutritious meals.,식량안보,food inequality = 먹거리 불평등 / nutritious = 영양가 있는,식량안보
+학교 급식의 질 개선이 필요해,School meal quality needs improvement.,Kids deserve better food in their school cafeterias.,식량안보,school meals = 학교 급식 / quality improvement = 질 개선,식량안보
+도시 농업이 새로운 트렌드야,Urban farming is a new trend.,Growing food in cities is catching on as a sustainable practice.,식량안보,urban farming = 도시 농업 / sustainable = 지속 가능한,식량안보
+정치 자금 투명성이 확보돼야 해,Political funding transparency must be ensured.,Campaign financing needs to be more open and accountable.,정치,political funding = 정치 자금 / transparency = 투명성,정치
+여성 정치 참여가 늘어나야 해,Women's political participation needs to increase.,More women should be represented in government and politics.,정치,women's participation = 여성 참여 / represented = 대표되는,정치
+팩트체크 문화가 정착돼야 해,A fact-checking culture needs to be established.,Verifying claims before sharing them should become second nature.,미디어,fact-checking = 팩트체크 / verifying = 검증하는,미디어
+숏폼 콘텐츠가 미디어 소비를 바꾸고 있어,Short-form content is changing media consumption.,Brief video clips are transforming how people engage with information.,미디어,short-form content = 숏폼 콘텐츠 / media consumption = 미디어 소비,미디어
+언론사 경영난이 심화되고 있어,Financial difficulties for media companies are deepening.,News organizations are struggling to stay afloat financially.,미디어,financial difficulties = 경영난 / stay afloat = 생존하다,미디어
+크리에이터 이코노미가 성장하고 있어,The creator economy is growing.,More people are making a living by producing online content.,미디어,creator economy = 크리에이터 이코노미 / producing content = 콘텐츠 제작,미디어
+뉴스 구독 모델이 확산되고 있어,News subscription models are spreading.,More outlets are putting content behind paywalls.,미디어,subscription model = 구독 모델 / paywall = 유료화,미디어
+고교 무상교육이 정착됐어,Free high school education has been established.,Universal secondary education without tuition is now the standard.,교육정책,free high school education = 고교 무상교육 / tuition = 등록금,교육정책
+평생교육 체계가 강화돼야 해,The lifelong education system should be strengthened.,Continuing education opportunities for adults need more support.,교육정책,lifelong education = 평생교육 / continuing education = 평생학습,교육정책
+특수교육 지원이 부족해,Special education support is insufficient.,Students with disabilities don't get enough educational resources.,교육정책,special education = 특수교육 / educational resources = 교육 자원,교육정책
+코딩 교육 의무화가 시행됐어,Mandatory coding education has been implemented.,Programming classes are now required in schools.,교육정책,coding education = 코딩 교육 / mandatory = 의무적인,교육정책
+대학 등록금 동결이 장기화되고 있어,University tuition freezes are being prolonged.,College fees have been kept flat for years running.,교육정책,tuition freeze = 등록금 동결 / prolonged = 장기화된,교육정책
+입시 제도가 너무 복잡해,The college admissions system is too complicated.,The way students get into university is overly convoluted.,교육정책,college admissions = 입시 / complicated = 복잡한,교육정책
+학생 정신건강 지원이 시급해,Student mental health support is urgently needed.,Schools need to do more to help kids with psychological issues.,교육정책,student mental health = 학생 정신건강 / psychological = 심리적인,교육정책
+농어촌 교육 격차가 심해,The education gap in rural and fishing areas is severe.,Students in the countryside get fewer educational opportunities.,교육정책,rural areas = 농어촌 / education gap = 교육 격차,교육정책
+해외 유학 트렌드가 변화하고 있어,Trends in studying abroad are changing.,Where and why students go overseas for education is shifting.,교육정책,studying abroad = 해외 유학 / trends = 트렌드,교육정책
+장기 요양 보험 제도가 개선돼야 해,The long-term care insurance system needs improvement.,The way we fund elderly care needs a rethink.,복지,long-term care insurance = 장기 요양 보험 / elderly care = 노인 돌봄,복지
+기본소득 도입 논의가 진행 중이야,Discussions on introducing basic income are underway.,The idea of giving everyone a guaranteed regular payment is being explored.,복지,basic income = 기본소득 / guaranteed = 보장된,복지
+사회복지사 처우 개선이 필요해,Improving treatment of social workers is necessary.,Social work professionals deserve better pay and working conditions.,복지,social workers = 사회복지사 / treatment = 처우,복지
+노숙인 지원 체계가 미흡해,The support system for homeless people is inadequate.,Services for people living on the streets need to be bolstered.,복지,homeless = 노숙인 / support system = 지원 체계,복지
+양육비 이행 관리원이 설립됐어,A child support enforcement agency has been established.,A new body to ensure parents pay their child support obligations is up and running.,복지,child support = 양육비 / enforcement = 이행 관리,복지
+건강검진 사각지대가 존재해,Blind spots in health screening exist.,Some people fall through the cracks of preventive health check systems.,의료,health screening = 건강검진 / blind spots = 사각지대,의료
+의료 AI 활용이 확대되고 있어,The use of medical AI is expanding.,Artificial intelligence is playing a bigger role in healthcare.,의료,medical AI = 의료 AI / expanding = 확대되는,의료
+약가 인하 정책이 제약사에 영향을 줘,Drug price reduction policies affect pharmaceutical companies.,Cutting medication costs impacts the profitability of pharma firms.,의료,drug price = 약가 / pharmaceutical companies = 제약사,의료
+의료 관광 산업이 성장하고 있어,The medical tourism industry is growing.,More foreigners are coming for healthcare services.,의료,medical tourism = 의료 관광 / healthcare services = 의료 서비스,의료
+백신 불신이 공중보건을 위협해,Vaccine distrust threatens public health.,Anti-vaccination sentiment puts community health at risk.,의료,vaccine distrust = 백신 불신 / public health = 공중보건,의료
+희귀질환 치료제 접근성이 낮아,Accessibility to rare disease treatments is low.,Getting medicines for uncommon conditions remains difficult.,의료,rare disease = 희귀질환 / accessibility = 접근성,의료
+대체 에너지 개발이 가속화돼야 해,Alternative energy development needs to be accelerated.,We should move faster on developing new power sources.,에너지,alternative energy = 대체 에너지 / accelerated = 가속화된,에너지
+에너지 저장 기술이 핵심이야,Energy storage technology is key.,Better ways to store power are essential for the green transition.,에너지,energy storage = 에너지 저장 / green transition = 녹색 전환,에너지
+원유 가격 변동이 경제를 흔들어,Crude oil price fluctuations shake the economy.,Swings in oil prices send shockwaves through financial markets.,에너지,crude oil = 원유 / fluctuations = 변동,에너지
+탈원전 정책이 재검토되고 있어,The nuclear phase-out policy is being reconsidered.,The decision to abandon nuclear power is being revisited.,에너지,nuclear phase-out = 탈원전 / reconsidered = 재검토되는,에너지
+마이크로그리드 기술이 주목받아,Microgrid technology is attracting attention.,Small-scale local power networks are becoming an attractive solution.,에너지,microgrid = 마이크로그리드 / local power networks = 지역 전력망,에너지
+문화유산 디지털화가 추진되고 있어,Digitization of cultural heritage is being promoted.,Efforts to preserve cultural treasures in digital form are underway.,문화,cultural heritage = 문화유산 / digitization = 디지털화,문화
+게임 산업 규제가 논란이야,Game industry regulation is controversial.,How much the government should control the gaming sector is debated.,문화,game industry = 게임 산업 / regulation = 규제,문화
+문화 소외 지역 지원이 필요해,Support for culturally underserved areas is needed.,Communities with limited access to arts and entertainment deserve help.,문화,culturally underserved = 문화 소외 / support = 지원,문화
+한식 세계화가 진전되고 있어,The globalization of Korean food is progressing.,Korean cuisine is winning fans around the world.,문화,Korean food globalization = 한식 세계화 / cuisine = 요리,문화
+저작권 보호가 강화돼야 해,Copyright protection should be strengthened.,Intellectual property rights need better enforcement in the digital age.,문화,copyright = 저작권 / intellectual property = 지식재산권,문화
+소셜미디어가 여론을 좌우하고 있어,Social media is swaying public opinion.,Online platforms are playing an outsized role in shaping what people think.,미디어,social media = 소셜미디어 / public opinion = 여론,미디어
+언론 윤리 강화가 필요해,Strengthening media ethics is needed.,News organizations should hold themselves to higher moral standards.,미디어,media ethics = 언론 윤리 / moral standards = 도덕적 기준,미디어
+연금 수령 나이가 올라갈 수 있어,The pension eligibility age might go up.,People may have to wait longer before they can start collecting retirement benefits.,복지,pension eligibility = 연금 수령 자격 / retirement benefits = 퇴직 급여,복지
+사회적 기업 활성화가 필요해,Revitalizing social enterprises is needed.,Businesses that prioritize social impact deserve more support.,사회,social enterprises = 사회적 기업 / social impact = 사회적 영향,사회
+디지털 격차 해소가 시급해,Bridging the digital divide is urgent.,Closing the gap between those with and without tech access is critical.,사회,digital divide = 디지털 격차 / bridging = 해소하다,사회
+청년 정책이 실효성 있게 추진돼야 해,Youth policies should be implemented effectively.,Programs for young people need to deliver real results.,사회,youth policies = 청년 정책 / effectively = 실효성 있게,사회
+지역 균형 발전이 국가 과제야,Balanced regional development is a national task.,Ensuring all parts of the country develop equally is a major challenge.,사회,balanced development = 균형 발전 / national task = 국가 과제,사회
+반려동물 관련 법 제도가 정비돼야 해,Pet-related legal systems need to be organized.,Laws governing pet ownership and animal care require updating.,사회,pet-related = 반려동물 관련 / legal systems = 법 제도,사회
+기부 문화 활성화가 필요해,Revitalizing the culture of giving is needed.,We should encourage more charitable donations and philanthropy.,사회,culture of giving = 기부 문화 / philanthropy = 자선,사회
+사회적 거리두기 후유증이 남아 있어,After-effects of social distancing remain.,The psychological and social impacts of pandemic isolation linger.,사회,social distancing = 사회적 거리두기 / after-effects = 후유증,사회
+공공의료 확충이 시급해,Expanding public healthcare is urgent.,Government-run medical facilities need to grow to serve more people.,의료,public healthcare = 공공의료 / expanding = 확충하는,의료
+중증외상센터가 부족해,There aren't enough severe trauma centers.,Specialized emergency facilities for critical injuries are lacking.,의료,severe trauma center = 중증외상센터 / critical injuries = 중증 부상,의료
+무인 매장이 늘어나고 있어,Unmanned stores are increasing.,Cashier-less shops are popping up everywhere.,기술,unmanned stores = 무인 매장 / cashier-less = 무인 계산,기술
+AI 챗봇이 고객 서비스를 대체하고 있어,AI chatbots are replacing customer service.,Automated virtual assistants are handling more and more support queries.,기술,AI chatbot = AI 챗봇 / customer service = 고객 서비스,기술
+디지털 치료제가 주목받고 있어,Digital therapeutics are attracting attention.,Software-based medical treatments are an exciting new frontier.,기술,digital therapeutics = 디지털 치료제 / software-based = 소프트웨어 기반,기술
+기후변화 소송이 늘어나고 있어,Climate change lawsuits are increasing.,More legal actions are being taken against polluters and governments.,기후변화,climate lawsuits = 기후 소송 / legal actions = 법적 조치,기후변화
+탄소 국경세 도입이 논의돼,Introduction of a carbon border tax is being discussed.,A levy on imports based on their carbon footprint is under consideration.,기후변화,carbon border tax = 탄소 국경세 / levy = 부과금,기후변화
+물 부족 문제가 심각해지고 있어,Water scarcity problems are getting worse.,Clean water shortages are becoming a global crisis.,기후변화,water scarcity = 물 부족 / global crisis = 글로벌 위기,기후변화
+기후 정의 운동이 확산되고 있어,The climate justice movement is spreading.,Calls for fair burden-sharing in tackling global warming are growing.,기후변화,climate justice = 기후 정의 / burden-sharing = 부담 분담,기후변화
+국제 학력 평가에서 한국 학생 성적이 변화해,Korean students' scores in international assessments are changing.,Performance of Korean pupils on global tests like PISA is shifting.,교육정책,international assessments = 국제 학력 평가 / PISA = 국제학업성취도평가,교육정책
+아동 돌봄 정책이 강화돼야 해,Child care policies should be strengthened.,Programs supporting working parents with childcare need to be expanded.,복지,child care = 아동 돌봄 / working parents = 맞벌이 부모,복지
+장애인 이동권 보장이 부족해,Guaranteeing mobility rights for people with disabilities is insufficient.,Disabled individuals still face too many barriers getting around.,사회,mobility rights = 이동권 / barriers = 장벽,사회
+재난 대응 체계 개선이 필요해,The disaster response system needs improvement.,How we handle emergencies requires a thorough overhaul.,사회,disaster response = 재난 대응 / overhaul = 전면 개편,사회
+소년범 처벌 강화 논의가 있어,There are discussions about strengthening juvenile offender punishment.,Calls for tougher penalties for young criminals are getting louder.,법률,juvenile offender = 소년범 / tougher penalties = 강화된 처벌,법률
+중대재해처벌법 시행 효과가 논의돼,The effects of the Serious Accidents Punishment Act are being discussed.,Whether the new workplace safety law is actually preventing deaths is debated.,법률,Serious Accidents Punishment Act = 중대재해처벌법 / workplace safety = 산업 안전,법률
+한반도 평화 프로세스가 교착 상태야,The Korean Peninsula peace process is at a standstill.,Diplomatic efforts to achieve peace on the peninsula have stalled.,안보,peace process = 평화 프로세스 / standstill = 교착 상태,안보
+전술핵 재배치 논의가 있어,There are discussions about redeploying tactical nuclear weapons.,The idea of bringing back tactical nukes is being considered by some.,안보,tactical nuclear weapons = 전술핵 / redeploying = 재배치하는,안보
+민간 군사 기업 역할이 확대돼,The role of private military companies is expanding.,Mercenary firms are playing a bigger part in modern conflicts.,안보,private military companies = 민간 군사 기업 / mercenary = 용병,안보
+다문화 사회 통합 정책이 필요해,Multicultural society integration policies are needed.,Better programs to help immigrants assimilate and thrive are essential.,사회,multicultural society = 다문화 사회 / integration = 통합,사회
+재외국민 투표율이 낮아,Overseas citizen voter turnout is low.,Not enough Koreans living abroad exercise their right to vote.,정치,overseas citizen = 재외국민 / voter turnout = 투표율,정치
+선거 연령 하향 논의가 있어,There are discussions about lowering the voting age.,The idea of letting younger people vote is on the table.,정치,voting age = 선거 연령 / lowering = 하향,정치
+정치인 겸직 금지가 강화돼야 해,Bans on politicians holding concurrent positions should be strengthened.,Elected officials shouldn't be allowed to moonlight in private sector roles.,정치,concurrent positions = 겸직 / moonlight = 부업하다,정치
+국회의원 특권 축소 요구가 커,Demands to reduce National Assembly member privileges are growing.,People want lawmakers to give up their perks.,정치,privileges = 특권 / perks = 특혜,정치
+산업 구조 전환이 가속화돼야 해,Industrial structure transformation needs to accelerate.,The shift from old to new industries should happen faster.,경제,industrial structure = 산업 구조 / transformation = 전환,경제
+디지털 세금 도입이 국제적으로 논의돼,Digital taxes are being discussed internationally.,A global framework for taxing tech giants is in the works.,경제,digital tax = 디지털 세금 / tech giants = 거대 기술 기업,경제
+수출 다변화 전략이 필요해,An export diversification strategy is needed.,We should sell to a wider range of countries to reduce dependence.,경제,export diversification = 수출 다변화 / reduce dependence = 의존도 줄이기,경제
+지식재산권 보호가 혁신에 중요해,Intellectual property protection is important for innovation.,Safeguarding IP rights encourages companies to invest in R&D.,경제,intellectual property = 지식재산권 / R&D = 연구개발,경제
+공정 경쟁 환경 조성이 과제야,Creating a fair competition environment is a challenge.,Leveling the playing field for all businesses is no easy task.,경제,fair competition = 공정 경쟁 / leveling the playing field = 공정한 환경 조성,경제
+글로벌 최저 법인세 도입이 추진돼,Implementation of a global minimum corporate tax is being pushed.,Countries are moving toward a universal floor on business taxes.,경제,global minimum corporate tax = 글로벌 최저 법인세 / universal floor = 최저선,경제
+대중교통 요금 인상이 논의돼,Public transit fare increases are being discussed.,The possibility of higher bus and subway fares is under review.,사회,public transit = 대중교통 / fare = 요금,사회
+수도권 과밀 문제가 심각해,The overcrowding problem in the metropolitan area is serious.,Too many people and businesses are concentrated around Seoul.,사회,metropolitan area = 수도권 / overcrowding = 과밀,사회
+정보 격차가 사회 불평등을 심화시켜,The information gap deepens social inequality.,Unequal access to knowledge widens the divide between haves and have-nots.,사회,information gap = 정보 격차 / inequality = 불평등,사회
+공동체 의식 회복이 필요해,Restoring a sense of community is needed.,We need to rebuild the spirit of togetherness in our neighborhoods.,사회,sense of community = 공동체 의식 / togetherness = 유대감,사회
+무인기 배달 서비스가 시범 운영 중이야,Drone delivery services are in pilot operation.,Unmanned aerial deliveries are being tested in select areas.,기술,drone delivery = 무인기 배달 / pilot operation = 시범 운영,기술
+뇌-컴퓨터 인터페이스 기술이 발전하고 있어,Brain-computer interface technology is advancing.,Direct connections between the human mind and machines are becoming feasible.,기술,brain-computer interface = 뇌-컴퓨터 인터페이스 / feasible = 실현 가능한,기술
+합성생물학이 새로운 산업을 만들어,Synthetic biology is creating new industries.,Engineering living organisms for practical purposes is opening up novel markets.,기술,synthetic biology = 합성생물학 / engineering organisms = 생물 공학,기술
+프롭테크가 부동산 시장을 바꾸고 있어,PropTech is changing the real estate market.,Technology is revolutionizing how we buy and sell property.,부동산,PropTech = 프롭테크 / real estate = 부동산,부동산
+임대차 3법의 효과에 대한 평가가 갈려,Assessments of the effects of the three rental laws are divided.,People disagree on whether the new tenancy rules helped or hurt.,부동산,rental laws = 임대차법 / tenancy rules = 임차 규정,부동산
+1인 가구 증가가 주거 시장을 바꿔,The increase in single-person households is changing the housing market.,More people living alone is shifting demand toward smaller units.,부동산,single-person households = 1인 가구 / smaller units = 소형 주택,부동산
+주거 복지 로드맵이 재편돼야 해,The housing welfare roadmap needs to be reorganized.,The government's plan for ensuring everyone has decent housing requires an update.,부동산,housing welfare = 주거 복지 / roadmap = 로드맵,부동산
+건설업 경기 침체가 고용에 영향을 줘,The construction industry recession affects employment.,A slump in building activity is costing jobs.,부동산,construction industry = 건설업 / recession = 경기 침체,부동산
+토지 공개념 논의가 다시 나오고 있어,Discussions on the public concept of land are coming up again.,The idea that land should serve the public interest is being revisited.,부동산,public concept of land = 토지 공개념 / public interest = 공익,부동산
+개발도상국 기후 지원이 확대돼야 해,Climate support for developing countries should be expanded.,Richer nations need to help poorer ones cope with global warming.,기후변화,developing countries = 개발도상국 / climate support = 기후 지원,기후변화
+이상 한파가 에너지 수요를 급증시켜,Unusual cold waves cause energy demand to spike.,Extreme cold snaps dramatically increase the need for heating.,기후변화,cold wave = 한파 / energy demand = 에너지 수요,기후변화
+폭우 피해가 매년 반복되고 있어,Heavy rain damage recurs every year.,Flooding from torrential downpours is becoming an annual disaster.,기후변화,heavy rain = 폭우 / flooding = 홍수,기후변화
+탄소 포집 기술이 주목받아,Carbon capture technology is attracting attention.,Methods to trap and store CO2 are generating significant interest.,기후변화,carbon capture = 탄소 포집 / CO2 = 이산화탄소,기후변화
+도시 열섬 현상이 심해지고 있어,The urban heat island effect is getting worse.,Cities are getting hotter compared to surrounding rural areas.,기후변화,urban heat island = 도시 열섬 / surrounding = 주변의,기후변화
+결혼 기피 현상이 가속화되고 있어,The trend of avoiding marriage is accelerating.,More and more people are choosing not to tie the knot.,인구/저출산,avoiding marriage = 결혼 기피 / accelerating = 가속화되는,인구
+출산 장려금으로는 출산율을 못 올려,Birth incentive payments alone can't raise the birth rate.,Cash bonuses for having babies aren't enough to reverse the fertility decline.,인구/저출산,birth incentive = 출산 장려금 / reverse = 역전시키다,인구
+외국인 노동자 유입이 늘어나고 있어,The influx of foreign workers is increasing.,More migrant laborers are coming in to fill workforce gaps.,인구/저출산,influx = 유입 / workforce gaps = 노동력 부족,인구
+초고령 사회 진입이 임박해,Entry into a super-aged society is imminent.,We're about to become a country where a huge chunk of the population is elderly.,인구/저출산,super-aged society = 초고령 사회 / imminent = 임박한,인구
+세대 간 돌봄 부담이 불균형해,The caregiving burden between generations is unbalanced.,Younger generations bear a disproportionate share of looking after the elderly.,세대갈등,caregiving burden = 돌봄 부담 / disproportionate = 불균형한,세대갈등
+청년 주거비 부담이 과도해,The housing cost burden on young people is excessive.,Young adults are spending way too much of their income on rent.,세대갈등,housing costs = 주거비 / excessive = 과도한,세대갈등
+세대 간 일자리 갈등이 있어,There's intergenerational conflict over jobs.,Young and old workers compete for the same limited positions.,세대갈등,intergenerational conflict = 세대 간 갈등 / compete = 경쟁하다,세대갈등
+디지털 네이티브 세대의 가치관이 달라,The values of the digital native generation are different.,People who grew up with the internet see the world through a different lens.,세대갈등,digital natives = 디지털 네이티브 / values = 가치관,세대갈등
+국민건강보험 보장률을 높여야 해,The national health insurance coverage rate should be raised.,Public health insurance needs to cover a larger share of medical costs.,의료,coverage rate = 보장률 / medical costs = 의료비,의료
+재활 의료 서비스가 부족해,Rehabilitation medical services are insufficient.,There aren't enough resources for patients recovering from injuries or surgery.,의료,rehabilitation = 재활 / recovering = 회복 중인,의료
+노동 시간 유연화가 추진되고 있어,Flexible working hours are being promoted.,The push for more adaptable work schedules is underway.,노동,flexible working hours = 유연 근무제 / adaptable = 유연한,노동
+특성화고 활성화 정책이 필요해,Policies to revitalize specialized high schools are needed.,Vocational high schools need better support and recognition.,교육정책,specialized high schools = 특성화고 / vocational = 직업교육,교육정책
+한일 관계 개선 노력이 계속돼,Efforts to improve Korea-Japan relations continue.,Both sides are working on mending the bilateral relationship.,외교,Korea-Japan relations = 한일 관계 / mending = 개선하는,외교
+글로벌 보건 안보 체계가 강화돼야 해,The global health security system should be strengthened.,International cooperation on pandemic preparedness needs to improve.,외교,global health security = 글로벌 보건 안보 / pandemic preparedness = 팬데믹 대비,외교
+전략물자 수출통제가 강화돼,Strategic materials export controls are being strengthened.,Restrictions on selling sensitive goods abroad are getting tighter.,외교,strategic materials = 전략물자 / export controls = 수출통제,외교
+문화외교의 중요성이 커지고 있어,The importance of cultural diplomacy is growing.,Using culture as a diplomatic tool is becoming more recognized.,외교,cultural diplomacy = 문화외교 / diplomatic tool = 외교 수단,외교
+개발 원조 효과성이 논의돼,Development aid effectiveness is being discussed.,Whether foreign aid actually helps recipient countries is under scrutiny.,외교,development aid = 개발 원조 / effectiveness = 효과성,외교
+공매도 제도 개선이 논의 중이야,Short selling system reforms are being discussed.,Changing the rules around betting against stocks is under review.,경제,short selling = 공매도 / reforms = 개선,경제
+가상화폐 거래세가 도입될 수 있어,A cryptocurrency transaction tax could be introduced.,The government may start taxing every crypto trade.,암호화폐,transaction tax = 거래세 / cryptocurrency = 가상화폐,암호화폐
+사회 양극화 해소가 시급한 과제야,Addressing social polarization is an urgent task.,Bridging the gap between rich and poor requires immediate action.,사회,social polarization = 사회 양극화 / bridging the gap = 격차 해소,사회
+전자상거래 소비자 보호가 강화돼야 해,E-commerce consumer protection should be strengthened.,Online shoppers need better safeguards against fraud and defective goods.,경제,e-commerce = 전자상거래 / consumer protection = 소비자 보호,경제
+국방 기술 자립화가 중요해,Defense technology self-reliance is important.,Developing our own military tech reduces dependence on foreign suppliers.,안보,defense technology = 국방 기술 / self-reliance = 자립화,안보
+도시 교통 체증 해결이 시급해,Solving urban traffic congestion is urgent.,Finding ways to unclog city streets is a pressing matter.,사회,traffic congestion = 교통 체증 / unclog = 해소하다,사회
+지방 재정 자립도가 낮아,Local government fiscal independence is low.,Regional authorities rely too heavily on central government funding.,정치,fiscal independence = 재정 자립도 / central government = 중앙 정부,정치
+탈탄소 산업 전환이 가속화돼야 해,The decarbonization industrial transition needs to accelerate.,Moving industries away from fossil fuels should happen faster.,환경,decarbonization = 탈탄소 / fossil fuels = 화석 연료,환경
+플랫폼 독과점 규제가 필요해,Platform monopoly regulation is needed.,Dominant tech companies shouldn't be allowed to crush competition.,기술,platform monopoly = 플랫폼 독과점 / regulation = 규제,기술
+외국인 범죄에 대한 우려가 커지고 있어,Concerns about crimes by foreigners are growing.,Rising offenses attributed to non-nationals are causing public anxiety.,사회,crimes by foreigners = 외국인 범죄 / public anxiety = 국민 불안,사회
+학생인권조례 논란이 지속돼,Controversy over student rights ordinances continues.,Rules protecting students' rights in school remain a divisive issue.,교육정책,student rights ordinance = 학생인권조례 / divisive = 논쟁적인,교육정책
+해양 주권 수호가 중요해,Protecting maritime sovereignty is important.,Defending our ocean territories is a matter of national interest.,안보,maritime sovereignty = 해양 주권 / national interest = 국가 이익,안보
+산림 보전 정책이 강화돼야 해,Forest conservation policies should be strengthened.,Protecting our woodlands from development and disaster needs more attention.,환경,forest conservation = 산림 보전 / woodlands = 삼림,환경
+식품 물가 안정 대책이 필요해,Measures to stabilize food prices are needed.,The government needs to do more to keep grocery costs in check.,경제,food prices = 식품 물가 / stabilize = 안정시키다,경제
+공무원 연금 개혁이 논의되고 있어,Civil servant pension reform is being discussed.,Changes to government employee retirement benefits are on the table.,복지,civil servant pension = 공무원 연금 / reform = 개혁,복지
+비건 식품 시장이 성장하고 있어,The vegan food market is growing.,Plant-based food products are becoming more popular.,식량안보,vegan food = 비건 식품 / plant-based = 식물성,식량안보
+군인 인권 개선이 필요해,Improving military personnel's human rights is necessary.,Service members deserve better treatment and stronger protections.,안보,military personnel = 군인 / human rights = 인권,안보
+공교육 신뢰 회복이 과제야,Restoring trust in public education is a challenge.,Parents need to believe that public schools can deliver quality learning.,교육정책,public education = 공교육 / trust = 신뢰,교육정책
+사이버 외교가 새로운 영역으로 떠올라,Cyber diplomacy is emerging as a new domain.,Digital governance and internet policy are becoming diplomatic priorities.,외교,cyber diplomacy = 사이버 외교 / digital governance = 디지털 거버넌스,외교
+인터넷 검열에 대한 우려가 있어,There are concerns about internet censorship.,Fears about online content being restricted are growing.,미디어,internet censorship = 인터넷 검열 / restricted = 제한된,미디어
+간병 인력 부족이 심각해,The shortage of caregiving workers is serious.,There aren't enough people to look after patients and the elderly.,의료,caregiving workers = 간병 인력 / shortage = 부족,의료
+스마트 제조업이 확산되고 있어,Smart manufacturing is spreading.,AI-driven factories and automated production lines are becoming the norm.,기술,smart manufacturing = 스마트 제조업 / automated = 자동화된,기술
+해외 투기 자본 규제가 논의돼,Regulation of foreign speculative capital is being discussed.,Controls on hot money flowing in from overseas are under consideration.,경제,speculative capital = 투기 자본 / hot money = 단기 투기 자금,경제
+고용 없는 성장이 문제야,Jobless growth is a problem.,The economy is expanding but not creating enough new positions.,경제,jobless growth = 고용 없는 성장 / expanding = 성장하는,경제
+전세계적 민주주의 후퇴가 우려돼,Global democratic backsliding is concerning.,Democracy is losing ground in many parts of the world.,국제,democratic backsliding = 민주주의 후퇴 / losing ground = 후퇴하는,국제
+도시 소음 공해 대책이 필요해,Measures against urban noise pollution are needed.,City noise levels are harming residents' quality of life.,환경,noise pollution = 소음 공해 / quality of life = 삶의 질,환경
+사립학교 비리 근절이 필요해,Eradicating private school corruption is necessary.,Fraud and mismanagement at private institutions must be stamped out.,교육정책,private school corruption = 사립학교 비리 / eradicating = 근절하는,교육정책
+문화재 불법 거래가 근절돼야 해,Illegal trade in cultural artifacts must be eradicated.,The black market for stolen heritage items needs to be shut down.,문화,illegal trade = 불법 거래 / cultural artifacts = 문화재,문화
+지역 화폐 활성화가 소상공인을 도와,Local currency revitalization helps small business owners.,Community currencies can direct spending toward neighborhood shops.,경제,local currency = 지역 화폐 / small business owners = 소상공인,경제
+반부패 기관의 독립성이 보장돼야 해,The independence of anti-corruption agencies should be guaranteed.,Watchdog organizations fighting graft need to operate free from political pressure.,법률,anti-corruption = 반부패 / independence = 독립성,법률
+장기 기증 문화가 확산돼야 해,Organ donation culture should spread more widely.,More people need to consider signing up as organ donors.,의료,organ donation = 장기 기증 / signing up = 등록하다,의료
+신재생에너지 인력 양성이 시급해,Training workforce for new renewable energy is urgent.,We need more skilled workers in the clean energy sector.,에너지,renewable energy = 신재생에너지 / workforce training = 인력 양성,에너지
+디지털 유산 관련 법률이 필요해,Laws related to digital inheritance are needed.,What happens to your online accounts and data when you die needs legal clarity.,법률,digital inheritance = 디지털 유산 / legal clarity = 법적 명확성,법률
+코워킹 스페이스가 늘어나고 있어,Coworking spaces are increasing.,Shared office environments are popping up in more cities.,노동,coworking space = 코워킹 스페이스 / shared office = 공유 사무실,노동
+긱 경제 노동자 사회보험 적용이 필요해,Gig economy workers need social insurance coverage.,Freelance and on-demand workers should have access to benefits.,노동,gig economy = 긱 경제 / social insurance = 사회보험,노동
+조선업 호황이 경제에 기여해,The shipbuilding boom is contributing to the economy.,A surge in ship orders is boosting economic activity.,경제,shipbuilding = 조선업 / boom = 호황,경제
+과학기술 연구 예산이 확대돼야 해,Science and technology research budgets should be expanded.,More funding for R&D is needed to stay competitive globally.,기술,research budget = 연구 예산 / R&D = 연구개발,기술
+전 국민 고용보험 확대가 추진돼,Universal employment insurance expansion is being pursued.,Efforts to cover all workers under unemployment benefits are underway.,복지,employment insurance = 고용보험 / universal = 전 국민,복지
+지역 소멸 대응 특별법이 제정됐어,A special act to counter regional depopulation has been enacted.,New legislation specifically targeting the decline of rural communities is now law.,인구/저출산,special act = 특별법 / regional depopulation = 지역 소멸,인구
+전통 시장 현대화가 추진돼,Modernization of traditional markets is being promoted.,Upgrades to old-fashioned marketplaces are moving forward.,경제,traditional markets = 전통 시장 / modernization = 현대화,경제
+의무 투표제 도입 논의가 있어,There are discussions about introducing compulsory voting.,Making it mandatory for citizens to cast ballots is being considered.,정치,compulsory voting = 의무 투표제 / mandatory = 의무적인,정치
+미세플라스틱 오염이 건강을 위협해,Microplastic pollution threatens health.,Tiny plastic particles in our environment pose a hidden health risk.,환경,microplastics = 미세플라스틱 / hidden risk = 숨겨진 위험,환경
+우주 관련 법 제도가 정비돼야 해,Space-related legal systems need to be organized.,Laws governing activities in outer space require updating.,우주개발,space law = 우주법 / legal systems = 법 제도,우주개발
+노인 빈곤율을 낮춰야 해,The elderly poverty rate needs to be reduced.,Too many senior citizens are living below the poverty line.,복지,elderly poverty = 노인 빈곤 / poverty line = 빈곤선,복지
+해킹 방지 기술 개발이 시급해,Development of anti-hacking technology is urgent.,Better cybersecurity tools are needed to protect against sophisticated attacks.,기술,anti-hacking = 해킹 방지 / cybersecurity = 사이버 보안,기술
+양심적 병역 거부 제도가 정착돼야 해,The conscientious objection to military service system needs to be established.,Alternative service options for those who refuse to fight on moral grounds should be normalized.,법률,conscientious objection = 양심적 병역 거부 / alternative service = 대체 복무,법률
+글로벌 인재 유치 전략이 필요해,A strategy to attract global talent is needed.,We should make our country more appealing to skilled workers from around the world.,경제,global talent = 글로벌 인재 / attract = 유치하다,경제
+국제 조세 회피 방지가 강화돼,International tax avoidance prevention is being strengthened.,Cracking down on corporations that dodge taxes across borders is intensifying.,경제,tax avoidance = 조세 회피 / cracking down = 단속하다,경제
+대형 재난 보험 체계가 필요해,A large-scale disaster insurance system is needed.,We need comprehensive coverage plans for catastrophic events.,복지,disaster insurance = 재난 보험 / catastrophic = 재앙적인,복지
+민주주의 교육이 학교에서 강화돼야 해,Democracy education should be strengthened in schools.,Teaching students about democratic values and civic participation is vital.,교육정책,democracy education = 민주주의 교육 / civic participation = 시민 참여,교육정책
+국제 정세 불안이 경제에 악영향을 줘,International instability negatively affects the economy.,Geopolitical tensions are dragging down economic performance.,국제,international instability = 국제 정세 불안 / geopolitical = 지정학적,국제
+K-콘텐츠 수출이 사상 최대를 기록해,K-content exports hit an all-time high.,Korean entertainment exports have never been this strong.,문화,K-content = K-콘텐츠 / all-time high = 사상 최대,문화
+전기차 충전 인프라 확충이 시급해,Expanding EV charging infrastructure is urgent.,More charging stations are needed to support the growing number of electric cars.,에너지,EV charging infrastructure = 전기차 충전 인프라 / expanding = 확충,에너지
+국가 데이터 전략이 수립돼야 해,A national data strategy needs to be established.,The country needs a clear plan for how to manage and leverage data resources.,기술,national data strategy = 국가 데이터 전략 / leverage = 활용하다,기술
+사회적 합의 도출이 어려워,Reaching social consensus is difficult.,Getting everyone to agree on controversial policies is a tall order.,사회,social consensus = 사회적 합의 / controversial = 논쟁적인,사회
+아파트 층간소음 분쟁이 심각해,Apartment noise disputes between floors are serious.,Conflicts between upstairs and downstairs neighbors over noise are escalating.,사회,noise disputes = 소음 분쟁 / escalating = 증가하는,사회
+산업 안전 기준이 강화돼야 해,Industrial safety standards should be strengthened.,Workplace safety regulations need to be tougher to prevent accidents.,노동,industrial safety = 산업 안전 / safety standards = 안전 기준,노동
+해외 원전 수출이 확대되고 있어,Overseas nuclear power plant exports are expanding.,Korea is selling more nuclear reactor technology to other countries.,에너지,nuclear power plant exports = 원전 수출 / reactor technology = 원자로 기술,에너지
+이중국적 허용 범위가 논의돼,The scope of dual citizenship allowance is being discussed.,How far to extend the right to hold two passports is under review.,법률,dual citizenship = 이중국적 / allowance = 허용,법률
+공영 주차장 확충이 필요해,Expansion of public parking facilities is needed.,More government-run parking spaces are needed in congested areas.,사회,public parking = 공영 주차장 / expansion = 확충,사회
+식품 표시제 개선이 추진돼,Food labeling improvements are being promoted.,Clearer information on food packaging is being rolled out.,식량안보,food labeling = 식품 표시제 / packaging = 포장,식량안보
+청소년 보호법 개정이 필요해,The Youth Protection Act needs to be amended.,Laws shielding minors from harmful content and exploitation require updating.,법률,Youth Protection Act = 청소년 보호법 / exploitation = 착취,법률
+한류 콘텐츠 불법 유통이 문제야,Illegal distribution of Korean Wave content is a problem.,Piracy of K-dramas and K-pop is hurting the creative industry.,문화,illegal distribution = 불법 유통 / piracy = 불법 복제,문화
+노동 이사제 도입이 논의돼,Introduction of worker directors on boards is being discussed.,The idea of giving employees a seat at the corporate governance table is being explored.,노동,worker directors = 노동 이사 / corporate governance = 기업 지배구조,노동
+과밀 학급 해소가 시급해,Resolving overcrowded classrooms is urgent.,Class sizes need to come down for better educational outcomes.,교육정책,overcrowded classrooms = 과밀 학급 / educational outcomes = 교육 성과,교육정책
+개성공단 재개 논의가 필요해,Discussions on reopening the Kaesong Industrial Complex are needed.,The possibility of restarting the joint inter-Korean factory zone should be explored.,안보,Kaesong Industrial Complex = 개성공단 / reopening = 재개,안보
+녹색 채권 시장이 성장하고 있어,The green bond market is growing.,Environmentally focused financial instruments are becoming more popular.,경제,green bonds = 녹색 채권 / financial instruments = 금융 상품,경제
+치매 국가 책임제가 확대돼야 해,The national dementia responsibility system should be expanded.,Government support for Alzheimer's and dementia patients needs to grow.,의료,dementia = 치매 / national responsibility = 국가 책임제,의료
+위성항법 시스템 자립화가 추진돼,Satellite navigation system self-reliance is being pursued.,Developing our own GPS alternative is a strategic priority.,우주개발,satellite navigation = 위성항법 / self-reliance = 자립화,우주개발
+디지털 교도소 제도가 논의돼,"A digital prison system is being discussed.","Using technology to monitor offenders outside traditional jails is under review.",법률,digital prison = 디지털 교도소 / monitor = 감시하다,법률
+국제 개발 협력이 강화돼야 해,International development cooperation should be strengthened.,Working together with other nations to lift developing countries is important.,외교,international development = 국제 개발 / cooperation = 협력,외교
+수소 충전소 인프라가 부족해,Hydrogen refueling station infrastructure is insufficient.,There aren't enough places to fill up hydrogen-powered vehicles.,에너지,hydrogen refueling station = 수소 충전소 / infrastructure = 인프라,에너지
+공익신고자 보호가 강화돼야 해,Protection for public interest whistleblowers should be strengthened.,People who report wrongdoing deserve stronger legal safeguards.,법률,whistleblower = 공익신고자 / legal safeguards = 법적 보호,법률
+유전자 편집 기술 규제가 필요해,Regulation of gene editing technology is needed.,Rules governing CRISPR and similar tools need to be established.,기술,gene editing = 유전자 편집 / CRISPR = 크리스퍼,기술
+인공지능 저작권 문제가 복잡해,AI copyright issues are complex.,Determining who owns content created by artificial intelligence is a legal puzzle.,기술,AI copyright = AI 저작권 / legal puzzle = 법적 난제,기술
+대체 투자 시장이 성장하고 있어,The alternative investment market is growing.,Non-traditional assets like art and wine are attracting more investors.,경제,alternative investment = 대체 투자 / non-traditional assets = 비전통 자산,경제
+사회공헌 활동이 기업 이미지에 영향을 줘,Corporate social responsibility activities affect company image.,CSR efforts can make or break a brand's public perception.,경제,CSR = 기업의 사회적 책임 / public perception = 대중 인식,경제
+첨단 무기 체계 개발이 가속화돼,Advanced weapons system development is accelerating.,Cutting-edge military hardware is being developed at a faster pace.,안보,advanced weapons = 첨단 무기 / cutting-edge = 최첨단의,안보
+포용적 금융 확대가 필요해,Expanding inclusive finance is needed.,Financial services should be accessible to underserved populations.,경제,inclusive finance = 포용적 금융 / underserved = 소외된,경제
+인공위성 산업이 성장하고 있어,The satellite industry is growing.,Commercial satellite ventures are expanding rapidly.,우주개발,satellite industry = 인공위성 산업 / commercial = 상업적,우주개발
+공공 자전거 시스템이 확대돼,Public bicycle systems are expanding.,Bike-sharing programs are reaching more neighborhoods.,환경,public bicycle = 공공 자전거 / bike-sharing = 자전거 공유,환경
+아동 급식 지원이 확대돼야 해,Child meal support should be expanded.,Programs providing free meals to underprivileged kids need to grow.,복지,child meal support = 아동 급식 지원 / underprivileged = 취약계층,복지
+국제 사이버 규범 수립이 필요해,Establishing international cyber norms is needed.,The world needs agreed-upon rules for state behavior in cyberspace.,안보,cyber norms = 사이버 규범 / cyberspace = 사이버 공간,안보

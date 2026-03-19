@@ -51,46 +51,17 @@ function byResourceId(id: string) {
 }
 
 /**
- * Check if any bottom tab is visible (i.e. we're on the main screen).
+ * Check if we're on a main screen (app uses drawer navigation, not bottom tabs).
+ * Looks for the hamburger (☰) button or known screen testIDs.
  */
 async function isMainScreenVisible(): Promise<string | null> {
-  // Most reliable: check if the tab bar itself is visible (not just existing)
-  if (driver.isIOS) {
-    const tabBar = $('-ios class chain:**/XCUIElementTypeTabBar')
-    if (await tabBar.isDisplayed().catch(() => false)) {
-      return 'TabBar'
-    }
-    // Don't check isExisting() — tab bar may exist in hierarchy but be hidden by stack screens
+  // Most reliable: check if the hamburger menu button is visible (drawer navigator)
+  const hamburger = $('~Open menu')
+  if (await hamburger.isDisplayed().catch(() => false)) {
+    return 'DrawerScreen'
   }
 
-  // Try tabBarTestID selectors (content-desc)
-  const testIDs = ['HomeTab', 'DecksTab', 'StudyTab', 'MarketplaceTab', 'SettingsTab']
-  for (const tid of testIDs) {
-    if (await $(`~${tid}`).isDisplayed().catch(() => false)) {
-      return tid.replace('Tab', '')
-    }
-  }
-
-  // Try React Navigation labels
-  const labels = ['Home', 'Decks', 'Study', 'Market', 'Settings']
-  for (let i = 0; i < labels.length; i++) {
-    const label = `${labels[i]}, tab, ${i + 1} of 5`
-    if (await $(`~${label}`).isDisplayed().catch(() => false)) {
-      return labels[i]
-    }
-  }
-
-  // Android: also try by text (tab labels are rendered as text)
-  if (!driver.isIOS) {
-    for (const label of labels) {
-      const el = $(`android=new UiSelector().text("${label}")`)
-      if (await el.isDisplayed().catch(() => false)) {
-        return label
-      }
-    }
-  }
-
-  // Also check for known screen testIDs (e.g. dashboard, decks-list)
+  // Also check for known screen testIDs
   const screenIDs = ['dashboard-screen', 'decks-list-screen', 'study-setup-screen', 'marketplace-screen', 'settings-screen']
   for (const sid of screenIDs) {
     if (await $(`~${sid}`).isExisting().catch(() => false)) {
@@ -100,6 +71,17 @@ async function isMainScreenVisible(): Promise<string | null> {
     if (!driver.isIOS) {
       if (await byResourceId(sid).isExisting().catch(() => false)) {
         return sid
+      }
+    }
+  }
+
+  // Android: check by text for screen titles
+  if (!driver.isIOS) {
+    const titles = ['Dashboard', 'My Decks', 'Study Setup', 'Marketplace', 'Settings']
+    for (const title of titles) {
+      const el = $(`android=new UiSelector().text("${title}")`)
+      if (await el.isDisplayed().catch(() => false)) {
+        return title
       }
     }
   }

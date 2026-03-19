@@ -996,3 +996,506 @@ GPS가 여기를 못 찾아요 주소가 맞나요?,My GPS can't find this place
 다이빙 자격증이 있어야 하나요?,Do I need a diving certification?,Is a PADI license required?,관광,diving certification = PADI license = 다이빙 자격증,여행
 래프팅 체험 할 수 있나요?,Can I try white water rafting?,Is there a rafting experience available?,관광,white water rafting = 래프팅,여행
 여기 별 보기 좋은 곳이에요?,Is this a good spot for stargazing?,Can I see the stars clearly from here?,관광,stargazing = 별 관측,여행
+탑승권 모바일로 보여줘도 되나요?,Can I show my boarding pass on my phone?,Is a mobile boarding pass accepted?,공항,mobile boarding pass = 모바일 탑승권,여행
+출발 게이트가 어디로 바뀌었는지 확인해 줄 수 있나요?,Could you check where the departure gate has been changed to?,Can you tell me the updated gate number?,공항,departure gate = 출발 게이트,여행
+위탁 수하물 무게 제한이 몇 킬로예요?,What's the weight limit for checked luggage?,How heavy can my checked bag be?,공항,checked luggage = 위탁 수하물,여행
+유아 동반 승객은 먼저 탑승할 수 있나요?,Can passengers with infants board early?,Do families with small children get priority boarding?,공항,priority boarding = 우선 탑승,여행
+환승 시간이 1시간밖에 없는데 괜찮을까요?,I only have a one-hour layover. Will that be enough?,Is a one-hour connection time sufficient?,공항,layover = connection = 환승 시간,여행
+이 짐을 최종 목적지까지 보내줄 수 있나요?,Can you check this bag through to my final destination?,Will my luggage be transferred automatically?,공항,check through = 최종 목적지까지 부치다,여행
+세관 신고할 물건이 없어요,I have nothing to declare at customs.,I don't have any items to declare.,공항,declare = 신고하다 / customs = 세관,여행
+보안 검색대에서 노트북 꺼내야 하나요?,Do I need to take my laptop out at security?,Should I remove my laptop from my bag at the checkpoint?,공항,security checkpoint = 보안 검색대,여행
+면세점에서 액체류 사면 기내 반입 되나요?,If I buy liquids at duty-free can I bring them on the plane?,"Are duty-free liquid purchases allowed in the cabin?",공항,duty-free = 면세점 / liquids = 액체류,여행
+짐이 안 나와요. 수하물 분실 신고하려고요,My luggage didn't come out. I need to file a lost baggage claim.,My bag is missing. Where do I report lost luggage?,공항,lost baggage claim = 수하물 분실 신고,여행
+공항 내 샤워 시설이 있나요?,Are there shower facilities in the airport?,Is there a place to shower at the airport?,공항,shower facilities = 샤워 시설,여행
+경유지에서 공항 밖으로 나갈 수 있어요?,Can I leave the airport during my layover?,Am I allowed to exit the airport during my stopover?,공항,layover = stopover = 경유,여행
+얼마나 연착되나요?,How long is the delay?,How much longer do we have to wait?,공항,delay = 연착 / 지연,여행
+좌석 업그레이드 가능한지 확인해 주세요,Could you check if a seat upgrade is available?,Is there any chance of upgrading my seat?,비행기,seat upgrade = 좌석 업그레이드,여행
+비상구 옆 좌석으로 바꿔주실 수 있나요?,Can I switch to an exit row seat?,Could I move to an emergency exit seat?,비행기,exit row = 비상구 좌석,여행
+착륙 예정 시간이 언제예요?,What's the estimated arrival time?,When are we expected to land?,비행기,estimated arrival = 도착 예정,여행
+기압 변화 때문에 귀가 아파요,My ears hurt from the air pressure changes.,The cabin pressure is making my ears pop painfully.,비행기,air pressure = 기압 / cabin pressure = 기내 기압,여행
+담요 한 장 더 받을 수 있나요?,Could I have another blanket?,May I get an extra blanket please?,비행기,blanket = 담요,여행
+채식 기내식으로 바꿔주실 수 있나요?,Can I switch to a vegetarian meal?,Is it possible to change my meal to vegan?,비행기,vegetarian = 채식 / vegan = 완전 채식,여행
+기장이 난기류가 있을 거라고 했나요?,Did the captain say there would be turbulence?,Was there an announcement about rough air?,비행기,turbulence = 난기류 / rough air = 거친 기류,여행
+옆 좌석 비어 있으면 옮겨도 되나요?,If the seat next to me is empty can I move there?,Am I allowed to switch to a vacant seat?,비행기,vacant seat = 빈 좌석,여행
+이어폰이 고장 난 것 같아요,I think my earphones are broken.,These headphones don't seem to be working.,비행기,earphones = headphones = 이어폰/헤드폰,여행
+기내 면세품 구매는 카드로 돼요?,Can I pay for duty-free items with a card?,Do you accept credit cards for in-flight purchases?,비행기,in-flight purchases = 기내 구매,여행
+비행 중에 좌석 등받이 젖혀도 되나요?,Can I recline my seat during the flight?,Is it okay to lean my seat back?,비행기,recline = 등받이를 젖히다,여행
+입국 심사 줄이 너무 길어요,The immigration line is so long.,The queue at passport control is really long.,공항,immigration = passport control = 입국 심사,여행
+여행자 보험 청구하려면 뭘 준비해야 해요?,What do I need to file a travel insurance claim?,What documents are required for an insurance claim?,여행보험,travel insurance claim = 여행자 보험 청구,여행
+보험 약관에 액티비티 커버가 포함돼 있나요?,"Does the policy cover adventure activities?",Are extreme sports covered under my insurance?,여행보험,policy = 약관 / cover = 보장하다,여행
+여행자 보험 없이 병원 가면 얼마나 나와요?,How much does a hospital visit cost without travel insurance?,What would the medical bill be without insurance?,여행보험,medical bill = 의료비,여행
+보험사에 영문 진단서를 제출해야 해요,I need to submit an English medical certificate to the insurance company.,The insurer requires a diagnosis report in English.,여행보험,medical certificate = 진단서,여행
+항공편 취소 보상은 보험으로 받을 수 있나요?,Can I get compensation through insurance for a cancelled flight?,Does my travel insurance cover flight cancellation?,여행보험,compensation = 보상 / cancellation = 취소,여행
+호텔에 아이 침대 추가할 수 있나요?,Can we add a crib to the room?,Do you have an extra bed for a child?,숙소,crib = 유아용 침대,여행
+체크인 시간 전에 짐을 맡길 수 있나요?,Can I store my luggage before check-in time?,Is there luggage storage available for early arrivals?,숙소,luggage storage = 짐 보관,여행
+수건 교체 좀 부탁드릴게요,Could I get fresh towels please?,I'd like my towels replaced.,숙소,fresh towels = 깨끗한 수건,여행
+룸서비스 메뉴판 좀 볼 수 있을까요?,Could I see the room service menu?,Do you have a room service menu I can look at?,숙소,room service = 룸서비스,여행
+에어컨이 너무 시끄러워서 잠을 못 자겠어요,The AC is so loud I can't sleep.,The air conditioner is making too much noise.,숙소,AC = air conditioner = 에어컨,여행
+옆 방이 너무 시끄러운데 방을 바꿔줄 수 있나요?,The room next door is very noisy. Can I change rooms?,Could I switch to a quieter room?,숙소,change rooms = switch rooms = 방 교환,여행
+체크아웃 시간을 좀 늦춰줄 수 있나요?,Could I get a late checkout?,Is it possible to extend my checkout time?,숙소,late checkout = 늦은 체크아웃,여행
+조식 뷔페 몇 시부터 몇 시까지예요?,What time is the breakfast buffet?,What are the hours for the morning buffet?,숙소,breakfast buffet = 조식 뷔페,여행
+호텔 수영장 이용 시간이 어떻게 되나요?,What are the pool hours?,When is the swimming pool open?,숙소,pool hours = 수영장 이용 시간,여행
+미니바 사용하면 자동으로 청구되나요?,Is the minibar automatically charged?,Does using the minibar get added to my bill?,숙소,minibar = 미니바 / charged = 청구되다,여행
+방에서 바다가 보이는 쪽으로 바꿔주실 수 있나요?,Can I switch to an ocean-view room?,Could I get a room with a sea view?,숙소,ocean view = sea view = 바다 전망,여행
+호텔에서 공항 셔틀 운행하나요?,Does the hotel offer an airport shuttle?,Is there a shuttle bus to the airport from here?,숙소,airport shuttle = 공항 셔틀,여행
+커넥팅 룸으로 예약할 수 있나요?,Can I book connecting rooms?,Are adjoining rooms available?,숙소,connecting rooms = adjoining rooms = 커넥팅 룸,여행
+호텔 피트니스 센터 24시간 이용 가능한가요?,Is the hotel gym open 24 hours?,Can I use the fitness center at any time?,숙소,fitness center = gym = 피트니스 센터,여행
+드라이어가 방에 없는데 빌릴 수 있나요?,There's no hair dryer in the room. Can I borrow one?,Could I get a blow dryer for my room?,숙소,hair dryer = blow dryer = 드라이어,여행
+체크인할 때 신분증이 필요한가요?,Do I need an ID to check in?,Is identification required at check-in?,숙소,ID = identification = 신분증,여행
+디파짓 환불은 언제 돼요?,When will my deposit be refunded?,How soon do I get my deposit back?,숙소,deposit = 디파짓/보증금,여행
+에어비앤비 호스트에게 연락이 안 돼요,I can't reach my Airbnb host.,My Airbnb host isn't responding to my messages.,숙소,host = 호스트 / reach = 연락이 닿다,여행
+게스트하우스에 공용 주방이 있나요?,Does the guesthouse have a shared kitchen?,Is there a communal kitchen I can use?,숙소,shared kitchen = communal kitchen = 공용 주방,여행
+에어비앤비 셀프 체크인 방법을 모르겠어요,I'm not sure how to do the self-check-in at the Airbnb.,How does the Airbnb self-check-in work?,숙소,self-check-in = 셀프 체크인,여행
+게스트하우스 도미토리에 사물함 있나요?,Are there lockers in the dormitory?,Does the dorm room have storage lockers?,숙소,lockers = 사물함 / dormitory = 도미토리,여행
+택시 기본요금이 얼마예요?,What's the base fare for a taxi?,How much is the taxi meter start fee?,교통,base fare = meter start fee = 기본요금,여행
+이 주소로 가주세요. 미터기 켜주세요,Please go to this address. Turn on the meter.,Take me to this address with the meter running please.,교통,meter = 미터기,여행
+여기서 우버 잡기 쉬운가요?,Is it easy to get an Uber from here?,Can I easily hail a rideshare here?,교통,Uber = rideshare = 차량 호출 서비스,여행
+택시 잡으려는데 앱으로 부르는 게 나을까요?,"I want to get a taxi. Should I use an app instead?",Is it better to hail a cab or call one through an app?,교통,hail a cab = 택시를 잡다,여행
+렌터카 반납할 때 기름 가득 채워야 하나요?,Do I need to return the rental car with a full tank?,Should I fill up the gas before returning the car?,교통,full tank = 가득 채운 연료통,여행
+내비게이션 사용법 좀 알려주세요,Can you show me how to use the GPS?,How do I operate the navigation system?,교통,GPS = navigation system = 내비게이션,여행
+이 도로 통행료 있나요?,Is there a toll on this road?,Do I have to pay a toll fee on this highway?,교통,toll = 통행료,여행
+주유소가 가까이 있나요?,Is there a gas station nearby?,Where's the nearest petrol station?,교통,gas station = petrol station = 주유소,여행
+주차 위반 딱지 받았어요 어떻게 해야 해요?,I got a parking ticket. What should I do?,I received a parking fine. How do I pay it?,교통,parking ticket = parking fine = 주차 위반 딱지,여행
+국제선 터미널까지 셔틀 타야 하나요?,Do I need to take a shuttle to the international terminal?,Is there a shuttle to the international departures building?,교통,international terminal = 국제선 터미널,여행
+기차역에서 플랫폼 몇 번인지 어떻게 확인해요?,How do I find which platform at the train station?,Where can I check the platform number?,교통,platform = 플랫폼/승강장,여행
+기차 좌석 예약 안 하면 못 타나요?,Can I ride the train without a seat reservation?,Do I need a reserved seat or can I ride without one?,교통,seat reservation = 좌석 예약,여행
+야간 버스 마지막이 몇 시예요?,What time is the last night bus?,When does the final late-night bus leave?,교통,night bus = late-night bus = 야간 버스,여행
+이 노선이 공항까지 가나요?,Does this route go to the airport?,Will this line take me to the airport?,교통,route = line = 노선,여행
+버스 정류장이 어디서 제일 가까워요?,Where's the nearest bus stop?,Which bus stop is closest to here?,교통,bus stop = 버스 정류장,여행
+트램 노선도 좀 볼 수 있나요?,Can I see the tram route map?,Do you have a streetcar line map?,교통,tram = streetcar = 트램/노면전차,여행
+자전거 대여소가 근처에 있나요?,Is there a bike rental shop nearby?,Where can I rent a bicycle around here?,교통,bike rental = bicycle rental = 자전거 대여,여행
+전동 킥보드 빌리려면 앱이 필요한가요?,Do I need an app to rent an electric scooter?,Is an app required for e-scooter rental?,교통,electric scooter = e-scooter = 전동 킥보드,여행
+페리 왕복 티켓이 얼마예요?,How much is a round-trip ferry ticket?,What's the price for a return ferry ticket?,교통,round-trip = return = 왕복,여행
+수상택시 타는 곳이 어디예요?,Where do I catch the water taxi?,Where's the water taxi dock?,교통,water taxi = 수상택시,여행
+렌터카 보험 꼭 들어야 하나요?,Do I have to get rental car insurance?,Is car rental insurance mandatory?,교통,rental car insurance = 렌터카 보험,여행
+이 레스토랑 예약 없이 가도 되나요?,Can I go to this restaurant without a reservation?,Do I need to book ahead or can I walk in?,식당,walk in = 예약 없이 방문하다,여행
+영어 메뉴판 있나요?,Do you have an English menu?,Is there a menu in English?,식당,English menu = 영어 메뉴,여행
+이 요리에 견과류 들어있나요?,Does this dish contain nuts?,Are there any nuts in this?,식당,nuts = 견과류,여행
+알레르기가 있어서 확인하고 싶어요,"I have allergies, so I'd like to check.",I need to verify due to food allergies.,식당,allergies = 알레르기,여행
+이거 덜 맵게 해줄 수 있나요?,Can you make this less spicy?,Could you tone down the spice level?,식당,less spicy = 덜 맵게 / tone down = 줄이다,여행
+현지인이 추천하는 음식이 뭐예요?,What food do locals recommend?,What's a local favorite dish?,식당,locals = 현지인 / local favorite = 현지 인기,여행
+이 음식이 할랄 인증된 건가요?,Is this food halal certified?,Does this restaurant serve halal food?,식당,halal certified = 할랄 인증,여행
+채식주의자를 위한 메뉴가 있나요?,Do you have a vegetarian menu?,Are there any meat-free options?,식당,vegetarian = meat-free = 채식,여행
+포장해 갈 수 있나요?,Can I get this to go?,Could I have this wrapped up to take away?,식당,to go = take away = 포장,여행
+이 지역 유명한 길거리 음식이 뭐예요?,What's the famous street food in this area?,What's the must-try street food here?,식당,street food = 길거리 음식,여행
+물은 수돗물이에요 생수예요?,Is the water tap or bottled?,Are you serving tap water or mineral water?,식당,tap water = 수돗물 / bottled water = 생수,여행
+추천 메뉴가 뭐예요?,What do you recommend?,What's your best dish?,식당,recommend = 추천하다,여행
+디저트 메뉴도 볼 수 있을까요?,Can I see the dessert menu too?,Do you have a dessert list?,식당,dessert menu = 디저트 메뉴,여행
+와인 페어링 추천해 줄 수 있나요?,Can you recommend a wine pairing?,What wine goes well with this dish?,식당,wine pairing = 와인 페어링,여행
+이 가게 카드 결제 되나요?,Does this shop accept credit cards?,Can I pay by card here?,쇼핑,accept credit cards = 카드 결제가 되다,여행
+세금 환급 받을 수 있나요?,Can I get a tax refund?,Is this eligible for tax-free shopping?,쇼핑,tax refund = tax-free = 세금 환급,여행
+다른 색상도 있나요?,Do you have this in other colors?,Is this available in different colors?,쇼핑,other colors = different colors = 다른 색상,여행
+한 사이즈 큰 거 있어요?,Do you have this one size bigger?,Is there a larger size available?,쇼핑,one size bigger = larger size = 한 사이즈 큰,여행
+이거 세일 중인 건가요?,Is this item on sale?,Is there a discount on this?,쇼핑,on sale = discount = 세일/할인,여행
+기념품 가게 추천해 줄 수 있나요?,Can you recommend a souvenir shop?,Where's a good place to buy souvenirs?,쇼핑,souvenir shop = 기념품 가게,여행
+이 브랜드 면세 가격이 얼마예요?,"What's the duty-free price for this brand?",How much is this brand tax-free?,쇼핑,duty-free price = 면세 가격,여행
+포장 좀 예쁘게 해주실 수 있나요?,Could you gift-wrap this nicely?,Can you wrap this up as a present?,쇼핑,gift-wrap = 선물 포장,여행
+이거 한국으로 배송 되나요?,Can you ship this to Korea?,Do you offer international shipping to Korea?,쇼핑,ship = 배송하다 / international shipping = 해외 배송,여행
+흥정해도 되나요?,Can I bargain?,Is haggling okay here?,쇼핑,bargain = haggle = 흥정하다,여행
+진품인지 어떻게 확인할 수 있어요?,How can I verify this is authentic?,How do I know if this is genuine?,쇼핑,authentic = genuine = 진품,여행
+영수증 좀 주세요,Can I get a receipt?,May I have my receipt please?,쇼핑,receipt = 영수증,여행
+이 시장 영업시간이 어떻게 되나요?,What are the market hours?,When does this market open and close?,쇼핑,market hours = 시장 영업시간,여행
+면세 한도가 얼마예요?,What's the duty-free allowance?,How much can I bring back tax-free?,쇼핑,duty-free allowance = 면세 한도,여행
+여기 현금만 되나요?,Do you only accept cash here?,Is this a cash-only place?,쇼핑,cash-only = 현금만,여행
+약국이 근처에 있나요?,Is there a pharmacy nearby?,Where's the closest drugstore?,긴급상황,pharmacy = drugstore = 약국,여행
+여행자 설사에 먹을 약 추천해 주세요,What medicine do you recommend for traveler's diarrhea?,Can you suggest something for an upset stomach from traveling?,긴급상황,traveler's diarrhea = 여행자 설사,여행
+여권을 잃어버렸어요 대사관에 연락해야 해요,"I lost my passport. I need to contact the embassy.",My passport is missing. How do I reach the embassy?,긴급상황,embassy = 대사관,여행
+소매치기 당했어요,I was pickpocketed.,Someone stole my wallet.,긴급상황,pickpocketed = 소매치기 당하다,여행
+가방을 택시에 놓고 내렸어요,I left my bag in the taxi.,I accidentally forgot my bag in the cab.,긴급상황,left behind = 놓고 내리다,여행
+여기 응급실이 어디예요?,Where is the emergency room?,How do I get to the ER?,긴급상황,emergency room = ER = 응급실,여행
+벌에 쏘였어요 약이 필요해요,I got stung by a bee. I need some medicine.,A bee stung me. Do you have any antihistamine?,긴급상황,stung = 쏘이다 / antihistamine = 항히스타민제,여행
+해파리에 쏘였어요 어떻게 해야 해요?,I got stung by a jellyfish. What should I do?,A jellyfish stung me. How do I treat it?,긴급상황,jellyfish sting = 해파리에 쏘임,여행
+보험 적용되는 병원이 어디 있어요?,"Where is a hospital that accepts my insurance?",Which hospital is covered by my travel insurance?,긴급상황,insurance coverage = 보험 적용,여행
+처방전 없이 살 수 있는 진통제 있나요?,Do you have over-the-counter painkillers?,Can I buy pain medicine without a prescription?,긴급상황,over-the-counter = 처방전 없이 / painkillers = 진통제,여행
+핸드폰을 잃어버렸어요 어디서 신고해요?,I lost my phone. Where do I report it?,My cell phone is missing. Where should I file a report?,긴급상황,report = 신고하다 / file a report = 신고 접수하다,여행
+교통사고 현장에서 뭘 먼저 해야 해요?,What should I do first at an accident scene?,What are the steps to take after a car accident?,긴급상황,accident scene = 사고 현장,여행
+화재 비상구가 어디예요?,Where's the fire exit?,Where is the emergency escape route?,긴급상황,fire exit = emergency escape = 비상구,여행
+구급차 불러주세요,Please call an ambulance.,I need an ambulance right away.,긴급상황,ambulance = 구급차,여행
+음식 알레르기 반응이 나타났어요,I'm having an allergic reaction to the food.,I think I'm having a food allergy attack.,긴급상황,allergic reaction = 알레르기 반응,여행
+숙소에 도둑이 들었어요,My accommodation was broken into.,Someone burglarized my hotel room.,긴급상황,broken into = burglarized = 도둑이 들다,여행
+환전소가 어디 있어요?,Where's the currency exchange?,Where can I exchange money?,환전,currency exchange = 환전소,여행
+오늘 환율이 어떻게 되나요?,What's today's exchange rate?,What rate are you offering today?,환전,exchange rate = 환율,여행
+소액으로 바꿔주실 수 있나요?,Can you give me smaller bills?,Could I get this in smaller denominations?,환전,smaller bills = smaller denominations = 소액권,여행
+수수료가 얼마예요?,What's the commission fee?,How much is the service charge?,환전,commission = service charge = 수수료,여행
+신용카드 해외 결제 수수료가 있나요?,Is there a foreign transaction fee on my credit card?,Does my card charge extra for international purchases?,환전,foreign transaction fee = 해외 결제 수수료,여행
+현금이 부족해요 ATM 어디 있어요?,I'm running low on cash. Where's an ATM?,I need to withdraw money. Is there a nearby ATM?,환전,running low on cash = 현금 부족,여행
+이 나라에서 팁은 필수인가요?,Is tipping mandatory in this country?,Do I have to leave a tip here?,팁문화,mandatory = 필수적인 / tipping = 팁 주기,여행
+팁을 얼마나 줘야 적당해요?,How much tip is appropriate?,What's the standard tipping amount?,팁문화,appropriate = 적당한 / standard = 기본적인,여행
+팁을 카드로 줄 수 있나요?,Can I add the tip to my card?,Is it okay to tip by credit card?,팁문화,add to card = 카드에 추가하다,여행
+여기는 팁 문화가 없다고 들었는데 맞나요?,I heard there's no tipping culture here. Is that right?,Is it true that tips aren't expected in this country?,팁문화,tipping culture = 팁 문화,여행
+택시 기사에게도 팁을 줘야 하나요?,Should I tip the taxi driver too?,Do taxi drivers expect a tip?,팁문화,tip the driver = 기사에게 팁 주다,여행
+이 사원에서 신발 벗어야 하나요?,Do I need to take off my shoes in this temple?,Should I remove my footwear before entering?,문화차이,temple = 사원 / footwear = 신발류,여행
+여기서 사진 찍어도 되나요?,Is it okay to take photos here?,Am I allowed to photograph this?,문화차이,take photos = photograph = 사진 찍다,여행
+이 나라에서는 왼손으로 악수하면 안 되나요?,Is it rude to shake hands with the left hand here?,Should I avoid using my left hand for greetings?,문화차이,rude = 무례한 / greetings = 인사,여행
+현지 인사법이 어떻게 되나요?,What's the local way of greeting?,How do people greet each other here?,문화차이,greeting = 인사법,여행
+이 지역에서 지켜야 할 에티켓이 있나요?,Are there any etiquette rules I should follow here?,What cultural norms should I be aware of?,문화차이,etiquette = 에티켓 / cultural norms = 문화적 규범,여행
+이슬람 국가에서 옷차림 주의사항이 뭐예요?,What's the dress code in Islamic countries?,Are there clothing restrictions I should know about?,문화차이,dress code = 복장 규정,여행
+종교 시설에서 어떤 행동을 주의해야 해요?,What behavior should I be careful about in religious sites?,Are there any dos and don'ts at places of worship?,문화차이,religious sites = places of worship = 종교 시설,여행
+현지 음식 먹는 방법이 특별한가요?,Is there a special way to eat the local food?,Are there any dining customs I should follow?,문화차이,dining customs = 식사 예절,여행
+오늘 날씨 어떨 것 같아요?,What's the weather going to be like today?,How's the forecast for today?,날씨,forecast = 일기예보,여행
+우산 가져가야 할까요?,Should I bring an umbrella?,Do I need to carry an umbrella?,날씨,bring = carry = 가져가다,여행
+내일 비 온다고 하는데 실내 관광지 추천해 주세요,"They say it'll rain tomorrow. Can you suggest indoor attractions?",What indoor activities are there for a rainy day?,날씨,indoor attractions = 실내 관광지,여행
+이번 주 내내 더울까요?,Will it be hot all week?,Is the heatwave expected to continue?,날씨,heatwave = 폭염,여행
+이 시기에 태풍이 올 수 있어요?,Is there a risk of typhoons this time of year?,Could we expect a hurricane during this season?,날씨,typhoon = hurricane = 태풍,여행
+자외선 차단제 좀 빌려도 돼요?,Can I borrow some sunscreen?,Do you have any SPF lotion I could use?,날씨,sunscreen = SPF lotion = 자외선 차단제,여행
+겨울에 이 도시 평균 기온이 몇 도예요?,What's the average temperature in this city during winter?,How cold does it get here in winter?,날씨,average temperature = 평균 기온,여행
+캐리어 무게 줄이려면 뭘 빼야 할까?,"What should I take out to reduce my suitcase weight?",How can I make my luggage lighter?,짐싸기,reduce weight = 무게를 줄이다,여행
+압축 파우치 사용하면 짐이 많이 줄어?,Do compression bags really save space?,Do packing cubes make a big difference?,짐싸기,compression bags = packing cubes = 압축 파우치,여행
+기내 반입 가능한 화장품 크기 제한이 뭐야?,What's the size limit for carry-on cosmetics?,How big can my toiletries be for hand luggage?,짐싸기,carry-on = hand luggage = 기내 반입,여행
+변압기 가져가야 하나?,Do I need to bring a voltage converter?,Should I pack a power adapter?,짐싸기,voltage converter = power adapter = 변압기/어댑터,여행
+짐을 최소한으로 싸는 팁 좀 알려줘,What are some tips for packing light?,How do I pack minimally for a trip?,짐싸기,packing light = 가볍게 짐 싸기,여행
+와이파이 속도가 너무 느려요,The Wi-Fi is really slow.,The internet connection is terrible.,와이파이,Wi-Fi speed = 와이파이 속도,여행
+포켓 와이파이 대여하는 곳 알려주세요,Where can I rent a pocket Wi-Fi?,Is there a portable hotspot rental nearby?,와이파이,pocket Wi-Fi = portable hotspot = 포켓 와이파이,여행
+해외 로밍 요금이 얼마나 되나요?,How much does international roaming cost?,What are the roaming charges abroad?,로밍,international roaming = 해외 로밍,여행
+현지 유심 사는 게 나을까요 로밍이 나을까요?,Is it better to buy a local SIM or use roaming?,Should I get a prepaid SIM card or just roam?,로밍,local SIM = prepaid SIM = 현지 유심,여행
+eSIM 활성화하는 방법 좀 알려주세요,How do I activate an eSIM?,Can you help me set up my eSIM?,로밍,activate = 활성화하다 / eSIM = 내장 유심,여행
+데이터 무제한 유심 있나요?,Do you have an unlimited data SIM?,Is there a SIM card with unlimited data?,로밍,unlimited data = 무제한 데이터,여행
+이 유심 테더링 되나요?,Does this SIM support tethering?,Can I use this SIM as a hotspot?,로밍,tethering = hotspot = 테더링,여행
+비자 면제 국가인지 어떻게 확인해요?,How do I check if my country is visa-exempt?,Where can I find out if I need a visa?,비자,visa-exempt = 비자 면제,여행
+도착 비자 받을 수 있나요?,Can I get a visa on arrival?,Is a visa-on-arrival available?,비자,visa on arrival = 도착 비자,여행
+비자 유효기간이 얼마나 남았는지 확인해야 해요,I need to check how much validity is left on my visa.,How do I verify my visa expiration date?,비자,validity = 유효기간 / expiration = 만료,여행
+체류 기간 연장할 수 있나요?,Can I extend my stay?,Is it possible to get a visa extension?,비자,extend stay = visa extension = 체류 연장,여행
+이 투어 픽업 장소가 어디예요?,Where's the pickup point for this tour?,Where do I meet for the tour?,투어,pickup point = 픽업 장소,여행
+프라이빗 투어로도 가능한가요?,Can I book it as a private tour?,Is a private tour option available?,투어,private tour = 프라이빗 투어,여행
+반나절 투어 있나요?,Do you have half-day tours?,Is there a shorter tour option?,투어,half-day tour = 반나절 투어,여행
+투어 취소 수수료가 있나요?,Is there a cancellation fee for the tour?,Do you charge for tour cancellations?,투어,cancellation fee = 취소 수수료,여행
+가이드가 영어로 설명해 주나요?,Does the guide speak English?,Will the tour be conducted in English?,투어,guide = 가이드 / conducted = 진행되다,여행
+워킹 투어 몇 시간짜리예요?,How long is the walking tour?,What's the duration of the walking tour?,투어,walking tour = 워킹 투어 / duration = 소요 시간,여행
+음식 투어 추천해 줄 수 있나요?,Can you recommend a food tour?,Is there a good culinary tour around here?,투어,food tour = culinary tour = 음식 투어,여행
+야경 투어 있나요?,Is there a night tour?,Do you offer an evening city tour?,투어,night tour = evening tour = 야경 투어,여행
+스노클링 장비 대여 포함인가요?,Is snorkeling gear included in the price?,Does the tour fee cover snorkel equipment?,관광,snorkeling gear = snorkel equipment = 스노클링 장비,여행
+이 해변에서 서핑 배울 수 있나요?,Can I learn to surf at this beach?,Are there surfing lessons available here?,관광,surfing lessons = 서핑 레슨,여행
+산 정상까지 등산로가 잘 되어 있나요?,Is the hiking trail to the summit well-maintained?,Are the mountain trails clearly marked?,관광,summit = 정상 / well-maintained = 잘 정비된,여행
+케이블카 왕복 티켓 얼마예요?,How much is a round-trip cable car ticket?,What's the price for a return trip on the gondola?,관광,cable car = gondola = 케이블카,여행
+이 동굴 투어 얼마나 걸려요?,How long does the cave tour take?,What's the duration of the cave visit?,관광,cave tour = 동굴 투어,여행
+야생 동물 관찰 투어가 있나요?,Is there a wildlife watching tour?,Can I book a safari or animal spotting trip?,관광,wildlife watching = safari = 야생 동물 관찰,여행
+유람선 타는 곳이 어디예요?,Where do I board the sightseeing cruise?,Where's the dock for the river cruise?,관광,sightseeing cruise = river cruise = 유람선,여행
+온천 입장료가 얼마예요?,How much is the hot spring admission?,What's the entrance fee for the thermal bath?,관광,hot spring = thermal bath = 온천,여행
+놀이공원 패스트 패스 있나요?,Is there a fast pass for the amusement park?,Can I buy an express pass to skip the lines?,관광,fast pass = express pass = 패스트 패스,여행
+이 미술관 오디오 가이드 빌릴 수 있나요?,Can I rent an audio guide at this art museum?,Is there an audio tour available for the gallery?,관광,audio guide = audio tour = 오디오 가이드,여행
+이 유적지 가이드 투어가 더 좋은가요?,Is a guided tour better for this historic site?,Should I take the guided tour of these ruins?,관광,historic site = ruins = 유적지,여행
+번지점프 나이 제한 있나요?,Is there an age limit for bungee jumping?,How old do you have to be to bungee jump?,관광,age limit = 나이 제한 / bungee jumping = 번지점프,여행
+짚라인 무게 제한이 있나요?,Is there a weight limit for the zipline?,What's the maximum weight for ziplining?,관광,weight limit = 무게 제한 / zipline = 짚라인,여행
+이 성당 내부 관람이 가능한가요?,Can I visit the inside of this cathedral?,Is the cathedral open for visitors?,관광,cathedral = 성당 / visitors = 관람객,여행
+전망대 올라가는 데 줄이 길어요?,Is there a long line to go up the observation deck?,How long is the wait for the viewing platform?,관광,observation deck = viewing platform = 전망대,여행
+이 축제 기간에 특별한 행사가 있나요?,Are there special events during this festival?,What activities are planned for the festival?,관광,festival = 축제 / special events = 특별 행사,여행
+캠핑장 예약해야 하나요?,Do I need to reserve a campsite?,Should I book the camping ground in advance?,캠핑,campsite = camping ground = 캠핑장,여행
+캠프파이어 해도 되는 구역이 어디예요?,Where am I allowed to make a campfire?,Which area permits open fires?,캠핑,campfire = open fire = 캠프파이어,여행
+텐트 렌탈 가능한가요?,Can I rent a tent?,Is tent rental available at the campsite?,캠핑,tent rental = 텐트 대여,여행
+캠핑장에 화장실 시설이 있나요?,Are there restroom facilities at the campground?,Does the campsite have toilet amenities?,캠핑,restroom facilities = toilet amenities = 화장실 시설,여행
+취사 가능한 캠핑장인가요?,Is cooking allowed at this campsite?,Can I prepare meals at the campground?,캠핑,cooking allowed = 취사 가능,여행
+크루즈 배 안에서 인터넷 되나요?,Is there internet access on the cruise ship?,Can I get Wi-Fi on board the cruise?,크루즈,on board = 배 안에서 / internet access = 인터넷 접속,여행
+크루즈 기항지에서 자유시간이 얼마나 되나요?,How much free time do we get at each port of call?,How long can we explore at each stop?,크루즈,port of call = 기항지 / free time = 자유시간,여행
+멀미약 좀 살 수 있나요?,Can I buy seasickness pills?,Where can I get motion sickness medicine?,크루즈,seasickness = motion sickness = 멀미,여행
+크루즈 뷔페 운영시간이 어떻게 되나요?,What are the buffet hours on the cruise?,When is the cruise ship buffet open?,크루즈,buffet hours = 뷔페 운영시간,여행
+크루즈 드레스 코드가 있나요?,Is there a dress code on the cruise?,What should I wear for dinner on the ship?,크루즈,dress code = 드레스 코드/복장 규정,여행
+이 근처 사진 찍기 좋은 스팟이 어디예요?,Where's a good photo spot near here?,What's the best place to take pictures around here?,사진,photo spot = 사진 스팟,여행
+삼각대 사용해도 되나요?,Am I allowed to use a tripod?,Is tripod use permitted here?,사진,tripod = 삼각대,여행
+여기서 드론 날려도 되나요?,Can I fly a drone here?,Is drone photography allowed in this area?,사진,drone photography = 드론 촬영,여행
+플래시 촬영이 금지돼 있나요?,Is flash photography prohibited?,Are we not allowed to use flash?,사진,flash photography = 플래시 촬영 / prohibited = 금지된,여행
+단체 사진 좀 찍어주실 수 있나요?,Could you take a group photo for us?,Would you mind taking a picture of all of us?,사진,group photo = 단체 사진,여행
+여기 일출 시간이 몇 시예요?,What time is sunrise here?,When does the sun come up?,사진,sunrise = 일출,여행
+일몰 보기 좋은 장소가 어디예요?,Where's the best spot to watch the sunset?,What's a good location for sunset viewing?,사진,sunset = 일몰 / sunset viewing = 일몰 감상,여행
+야시장 가보고 싶어요,I'd like to visit a night market.,Can you take me to a night market?,관광,night market = 야시장,여행
+벼룩시장이 이 근처에 있나요?,Is there a flea market near here?,Are there any secondhand markets nearby?,쇼핑,flea market = secondhand market = 벼룩시장,여행
+현지 공예품 파는 곳이 어디예요?,Where can I buy local handicrafts?,Is there a shop selling handmade goods?,쇼핑,handicrafts = handmade goods = 공예품,여행
+세금 환급 서류 작성 좀 도와주세요,Can you help me fill out the tax refund form?,I need assistance with the VAT refund paperwork.,쇼핑,tax refund form = VAT refund = 세금 환급 서류,여행
+이 제품 보증서 있나요?,Does this product come with a warranty?,Is there a guarantee on this item?,쇼핑,warranty = guarantee = 보증서,여행
+선물용으로 포장 따로 해주실 수 있나요?,Can you wrap these separately as gifts?,Could each one be individually gift-wrapped?,쇼핑,separately = individually = 따로따로,여행
+호텔 컨시어지에게 물어보면 되나요?,Should I ask the hotel concierge?,Can the front desk help me with this?,숙소,concierge = front desk = 컨시어지/프런트,여행
+호텔 세탁 서비스 가격이 어떻게 되나요?,How much is the hotel laundry service?,What are the rates for laundry?,숙소,laundry service = 세탁 서비스,여행
+방에 다리미와 다리미판 있나요?,Is there an iron and ironing board in the room?,Does the room come with ironing facilities?,숙소,iron = 다리미 / ironing board = 다리미판,여행
+객실 청소를 안 해줘도 괜찮아요,"I don't need housekeeping today, thanks.",Please skip the room cleaning today.,숙소,housekeeping = room cleaning = 객실 청소,여행
+늦게 도착할 것 같은데 체크인 괜찮을까요?,I'll be arriving late. Is that okay for check-in?,Can I check in after hours?,숙소,arriving late = 늦게 도착 / after hours = 영업 시간 이후,여행
+조식 포함인가요?,Is breakfast included?,Does the rate include morning meals?,숙소,breakfast included = 조식 포함,여행
+콘센트 타입이 뭐예요?,What type of power outlet do you use?,What kind of plug do I need here?,숙소,power outlet = plug = 콘센트,여행
+여기 체크인 할 때 보증금 내야 하나요?,Do I need to pay a deposit at check-in?,Is a security deposit required?,숙소,security deposit = 보증금,여행
+방 열쇠가 안 돼요,My room key isn't working.,The keycard won't open my door.,숙소,room key = keycard = 방 열쇠/카드키,여행
+욕실 배수구가 막힌 것 같아요,The bathroom drain seems to be clogged.,The bath drain isn't working properly.,숙소,drain = 배수구 / clogged = 막힌,여행
+벽에서 이상한 소리가 나요,There's a strange noise coming from the wall.,I can hear weird sounds through the wall.,숙소,strange noise = weird sounds = 이상한 소리,여행
+난방이 안 돼요 방이 너무 추워요,The heating isn't working. The room is freezing.,There's no heat in my room. It's really cold.,숙소,heating = 난방 / freezing = 매우 추운,여행
+온수가 안 나와요,There's no hot water.,The hot water isn't running.,숙소,hot water = 온수,여행
+버스 와이파이 비밀번호가 뭐예요?,What's the Wi-Fi password on the bus?,Does this bus have Wi-Fi and what's the code?,교통,Wi-Fi password = code = 와이파이 비밀번호,여행
+이 역에서 갈아타야 하나요?,Do I need to transfer at this station?,Should I change trains here?,교통,transfer = change trains = 갈아타다,여행
+막차가 몇 시예요?,What time is the last train?,When does the final service run?,교통,last train = final service = 막차,여행
+첫차가 몇 시에 있어요?,What time is the first train?,When does the earliest service depart?,교통,first train = earliest service = 첫차,여행
+여기서 몇 정거장 더 가야 해요?,How many more stops from here?,How many stations are left?,교통,stops = stations = 정거장,여행
+이 버스가 시내 중심까지 가나요?,Does this bus go to the city center?,Will this bus take me downtown?,교통,city center = downtown = 시내 중심,여행
+급행열차랑 완행열차 차이가 뭐예요?,What's the difference between express and local trains?,How do express and regular trains differ?,교통,express = 급행 / local = regular = 완행,여행
+좌석이 지정석인가요 자유석인가요?,Are these reserved seats or open seating?,Is it assigned seating or first come first served?,교통,reserved seats = assigned seating = 지정석 / open seating = 자유석,여행
+짐 올려놓을 수 있는 선반이 있나요?,Is there an overhead rack for luggage?,Where can I store my bags on the train?,교통,overhead rack = 짐 선반,여행
+렌터카 GPS 추가하면 얼마예요?,How much extra for GPS with the rental car?,What's the add-on price for a navigation system?,교통,add-on = 추가 옵션 / GPS = 내비게이션,여행
+자동차 타이어가 펑크 났어요,I got a flat tire.,My car has a puncture.,교통,flat tire = puncture = 타이어 펑크,여행
+견인차 불러주세요,Please call a tow truck.,I need roadside assistance.,교통,tow truck = 견인차 / roadside assistance = 긴급 도로 서비스,여행
+차가 시동이 안 걸려요,The car won't start.,My vehicle won't turn on.,교통,won't start = won't turn on = 시동이 안 걸리다,여행
+이 길이 일방통행인가요?,Is this a one-way street?,Is this road one-directional?,교통,one-way = one-directional = 일방통행,여행
+유턴해도 되는 곳인가요?,Can I make a U-turn here?,Is a U-turn allowed at this point?,교통,U-turn = 유턴,여행
+여기 주차 요금이 시간당 얼마예요?,How much is parking per hour here?,What's the hourly parking rate?,교통,parking rate = 주차 요금,여행
+비행기 좌석을 창가로 바꿀 수 있나요?,Can I change my seat to a window seat?,Is it possible to switch to a window seat?,비행기,window seat = 창가 좌석,여행
+통로 좌석으로 주세요,I'd like an aisle seat please.,Can I have a seat on the aisle?,비행기,aisle seat = 통로 좌석,여행
+기내에 유아용 바시넷 요청할 수 있나요?,Can I request a bassinet on the plane?,Is an infant bassinet available on this flight?,비행기,bassinet = 바시넷/유아용 침대,여행
+수하물 벨트 몇 번이에요?,Which baggage carousel is ours?,What belt number for our luggage?,공항,baggage carousel = 수하물 벨트,여행
+공항 라운지 일일 이용권 살 수 있나요?,Can I buy a day pass for the airport lounge?,Is there a single-use lounge access option?,공항,day pass = 일일 이용권 / lounge access = 라운지 이용,여행
+탑승 시간이 얼마나 남았어요?,How much time until boarding?,When does boarding start?,공항,boarding time = 탑승 시간,여행
+유모차 게이트 체크인 하면 되나요?,Can I gate-check the stroller?,Should I drop off the stroller at the gate?,공항,gate-check = 게이트 체크인 / stroller = 유모차,여행
+저 비행기가 오버부킹이라고 하는데 어떻게 해요?,"They said my flight is overbooked. What do I do?",The flight is oversold. What are my options?,공항,overbooked = oversold = 오버부킹,여행
+공항 면세점 영업시간이 어떻게 되나요?,What are the duty-free shop hours at the airport?,When does the airport duty-free open and close?,공항,duty-free shop hours = 면세점 영업시간,여행
+트랜짓 호텔 예약할 수 있나요?,Can I book a transit hotel?,Is there an airport hotel for layovers?,공항,transit hotel = 트랜짓 호텔,여행
+이 식당 웨이팅 얼마나 걸려요?,How long is the wait at this restaurant?,What's the estimated wait time for a table?,식당,wait time = 대기 시간 / 웨이팅,여행
+테이블 예약 이름 김으로 했어요,I have a reservation under the name Kim.,The booking is under Kim.,식당,reservation = booking = 예약,여행
+주방장 추천 요리가 뭐예요?,What's the chef's special?,What does the chef recommend?,식당,chef's special = 주방장 추천,여행
+이 메뉴 양이 어느 정도예요?,How big is this dish?,What's the portion size like?,식당,portion size = 양/인분,여행
+여기 유명한 메뉴가 뭐예요?,What's this place known for?,What's the signature dish here?,식당,signature dish = 시그니처 메뉴/대표 메뉴,여행
+아이 메뉴 있나요?,Do you have a kids' menu?,Is there a children's menu?,식당,kids' menu = children's menu = 아이 메뉴,여행
+이 음식 좀 더 익혀주실 수 있나요?,Can you cook this a bit more?,Could you make this more well-done?,식당,well-done = 잘 익힌,여행
+리필 되나요?,Are refills free?,Can I get a free refill?,식당,refills = 리필,여행
+이 지역 와인 한 잔 주세요,A glass of local wine please.,I'll have a glass of the regional wine.,식당,local wine = regional wine = 지역 와인,여행
+매운 정도가 어때요?,How spicy is it?,What's the heat level like?,식당,heat level = 매운 정도,여행
+빵은 무료인가요?,Is the bread complimentary?,Does bread come free with the meal?,식당,complimentary = free = 무료,여행
+유기농 재료를 사용하나요?,Do you use organic ingredients?,Is the food made with organic produce?,식당,organic ingredients = organic produce = 유기농 재료,여행
+여기 화장실 어디예요?,Where's the restroom here?,Could you point me to the bathroom?,식당,restroom = bathroom = 화장실,여행
+테라스 자리에 앉을 수 있나요?,Can we sit on the terrace?,Is there outdoor seating available?,식당,terrace = outdoor seating = 테라스/야외석,여행
+계산서에 팁이 포함돼 있나요?,Is the tip included in the bill?,Does the check already include gratuity?,식당,gratuity = tip = 팁/봉사료,여행
+여기 코르크 차지 있나요?,Is there a corkage fee?,Do you charge for bringing your own wine?,식당,corkage fee = 코르크 차지 (자기 와인 반입비),여행
+얼음 빼주세요,No ice please.,Could you hold the ice?,식당,no ice = hold the ice = 얼음 빼기,여행
+글루텐 프리 빵으로 바꿀 수 있나요?,Can I substitute with gluten-free bread?,Is a gluten-free option available for the bread?,식당,substitute = 대체하다 / gluten-free = 글루텐 프리,여행
+이 지역 맥주 추천해 주세요,What local beer do you recommend?,Can you suggest a regional craft beer?,식당,local beer = regional craft beer = 지역 맥주,여행
+코스 요리 몇 가지로 구성돼 있어요?,How many courses are in the set menu?,What does the prix fixe meal include?,식당,set menu = prix fixe = 코스 요리,여행
+예약 시간보다 30분 늦을 것 같아요,I'll be about 30 minutes late for my reservation.,We're running half an hour behind for our booking.,식당,running behind = 늦다,여행
+뷰가 좋은 자리로 부탁드려요,Could we get a table with a view?,I'd like a seat with a nice view please.,식당,table with a view = 뷰 좋은 자리,여행
+해물 알레르기가 있어요,I'm allergic to seafood.,I have a shellfish allergy.,식당,seafood allergy = shellfish allergy = 해물 알레르기,여행
+이 박물관 입장 무료인가요?,Is admission to this museum free?,Is there free entry to this museum?,관광,admission = entry = 입장,여행
+학생 할인 적용 되나요?,Do you offer a student discount?,Is there a reduced rate for students?,관광,student discount = reduced rate = 학생 할인,여행
+도슨트 투어 시간이 언제예요?,What time is the docent-led tour?,When does the guided museum tour start?,관광,docent = 도슨트/해설사,여행
+이 전시회 언제까지 해요?,How long does this exhibition run?,When does this exhibit end?,관광,exhibition = exhibit = 전시회,여행
+사진 촬영 금지 구역이 어디예요?,Which areas are no-photography zones?,Where is photography not allowed?,관광,no-photography zone = 사진 촬영 금지 구역,여행
+여기서 체험 프로그램 있나요?,Are there any hands-on activities here?,Do you offer interactive experiences?,관광,hands-on activities = interactive experiences = 체험 프로그램,여행
+이 폭포까지 가는 트레일이 쉬운 편이에요?,Is the trail to this waterfall easy?,How difficult is the hike to the waterfall?,관광,trail = hike = 트레일/등산로 / waterfall = 폭포,여행
+패러글라이딩 초보도 할 수 있나요?,Can beginners try paragliding?,Is paragliding available for first-timers?,관광,beginners = first-timers = 초보자,여행
+이 해변 수영 안전한가요?,Is it safe to swim at this beach?,Are the waters safe for swimming here?,관광,safe to swim = 수영하기 안전한,여행
+조류가 세니까 조심하세요,Be careful of the strong currents.,Watch out for the rip tide.,관광,strong currents = rip tide = 조류/이안류,여행
+구명조끼 착용 필수인가요?,Is wearing a life jacket mandatory?,Do I have to put on a life vest?,관광,life jacket = life vest = 구명조끼,여행
+카약 체험 시간이 얼마나 되나요?,How long is the kayaking experience?,What's the duration of the kayak session?,관광,kayaking = 카약 / session = 체험 시간,여행
+동물원 먹이 주기 체험 있나요?,Is there an animal feeding experience at the zoo?,Can I feed the animals at the zoo?,관광,animal feeding = 먹이 주기 체험,여행
+이 다리 건너가도 안전한가요?,Is it safe to cross this bridge?,Can I walk across this bridge safely?,관광,cross = 건너다,여행
+이 절벽에서 뛰어내리는 사람들 있던데 괜찮은 거예요?,I saw people jumping off this cliff. Is that safe?,Is cliff jumping okay here?,관광,cliff jumping = 절벽 다이빙,여행
+스카이다이빙 첫 경험이에요 무섭지 않아요?,It's my first time skydiving. Is it scary?,I've never skydived before. Should I be nervous?,관광,skydiving = 스카이다이빙 / nervous = 긴장되는,여행
+국립공원 입장료가 있나요?,Is there an entrance fee for the national park?,Do I have to pay to enter the national park?,관광,national park = 국립공원 / entrance fee = 입장료,여행
+야생화가 피는 시기가 언제예요?,When is wildflower season?,What time of year do the wildflowers bloom?,관광,wildflower season = 야생화 시즌 / bloom = 피다,여행
+이 근처에 자연 온천이 있나요?,Are there natural hot springs nearby?,Is there a wild hot spring around here?,관광,natural hot springs = wild hot spring = 자연 온천,여행
+별똥별 볼 수 있는 시기인가요?,Is this a good time to see shooting stars?,Can I spot a meteor shower this time of year?,관광,shooting stars = meteor shower = 별똥별/유성우,여행
+이 근처 일출 명소가 어디예요?,"Where's the best sunrise spot near here?",What's the top place to catch the sunrise?,관광,sunrise spot = 일출 명소,여행
+이 사찰 새벽 예불에 참석할 수 있나요?,Can I attend the early morning prayer at this temple?,Is the dawn ceremony open to visitors?,관광,early morning prayer = dawn ceremony = 새벽 예불,여행
+현지 전통 시장 구경하고 싶어요,I want to explore the local traditional market.,Can we visit a traditional marketplace?,관광,traditional market = marketplace = 전통 시장,여행
+이 거리 벽화가 유명하다던데요,"I heard the murals on this street are famous, right?",Is this the street known for its wall art?,관광,murals = wall art = 벽화,여행
+현지 축제에 관광객도 참여할 수 있나요?,Can tourists join the local festival?,Are visitors welcome at the local celebrations?,관광,local festival = celebrations = 현지 축제,여행
+이 성 안에 들어가볼 수 있나요?,Can I go inside this castle?,Is the interior of the castle open to the public?,관광,castle = 성,여행
+이 다리가 야경 명소라고 하던데요,I heard this bridge is famous for night views.,Is this the bridge known for its nighttime scenery?,관광,night views = nighttime scenery = 야경,여행
+워터파크 이용 시 수영모 필수인가요?,Do I need to wear a swim cap at the water park?,Is a bathing cap required at the waterpark?,관광,swim cap = bathing cap = 수영모,여행
+이 해변에 해양 스포츠 장비 대여하는 데 있나요?,Is there water sports equipment rental on this beach?,Can I rent jet skis or paddleboards here?,관광,water sports equipment = 해양 스포츠 장비,여행
+제트스키 면허 없어도 탈 수 있나요?,Can I ride a jet ski without a license?,Do I need a permit for jet skiing?,관광,jet ski = 제트스키 / license = permit = 면허,여행
+사파리 차량에서 내리면 안 되는 거죠?,I shouldn't get out of the safari vehicle right?,Is it against the rules to exit the safari car?,관광,safari vehicle = 사파리 차량,여행
+현지 요리 클래스 등록할 수 있나요?,Can I sign up for a local cooking class?,Are there any cooking workshops available?,관광,cooking class = cooking workshop = 요리 클래스,여행
+와이너리 투어에 시음도 포함돼 있나요?,Does the winery tour include tasting?,Is wine tasting part of the vineyard visit?,관광,winery tour = vineyard visit = 와이너리 투어 / tasting = 시음,여행
+자전거 투어 몇 시간짜리예요?,How long is the bike tour?,What's the duration of the cycling tour?,투어,bike tour = cycling tour = 자전거 투어,여행
+투어 버스에 화장실 있나요?,Is there a restroom on the tour bus?,Does the tour coach have a toilet?,투어,tour bus = tour coach = 투어 버스,여행
+단체 할인 적용 되나요?,Do you offer a group discount?,Is there a reduced rate for groups?,투어,group discount = 단체 할인,여행
+투어 중에 자유시간이 있나요?,Is there free time during the tour?,Do we get some time to explore on our own?,투어,free time = 자유시간,여행
+가이드 팁을 얼마 정도 주는 게 적당해요?,What's a reasonable tip for the guide?,How much should I tip our tour guide?,투어,reasonable tip = 적당한 팁,여행
+투어 일정 변경이 가능한가요?,Can I change the tour schedule?,Is it possible to reschedule the tour?,투어,reschedule = 일정 변경,여행
+이 투어 점심 식사 포함인가요?,Does this tour include lunch?,Is a meal provided on this tour?,투어,include lunch = 점심 포함,여행
+보트 투어 중에 멀미가 날 수 있나요?,Could I get seasick on the boat tour?,Is motion sickness common on this boat trip?,투어,seasick = motion sickness = 멀미,여행
+우기인데 투어 진행되나요?,Does the tour still run during rainy season?,Is the tour available in the wet season?,투어,rainy season = wet season = 우기,여행
+비가 와도 투어 취소 안 되나요?,Does the tour get cancelled if it rains?,Is the tour rain or shine?,투어,rain or shine = 비가 와도 진행,여행
+일정 짜는 것 좀 도와줄 수 있어요?,Can you help me plan my itinerary?,Could you assist with my travel schedule?,여행,itinerary = travel schedule = 여행 일정,여행
+자유 여행이랑 패키지 여행 중에 뭐가 나아?,Is a self-guided trip or a package tour better?,Should I go independent or join a group tour?,여행,self-guided = independent = 자유 여행 / package tour = 패키지,여행
+여행 경비를 줄이는 방법이 있을까?,How can I cut down on travel expenses?,What are some ways to travel on a budget?,여행,travel expenses = 여행 경비 / on a budget = 저예산으로,여행
+배낭여행 처음인데 뭘 준비해야 해?,It's my first backpacking trip. What should I prepare?,I'm a first-time backpacker. What do I need?,여행,backpacking = 배낭여행,여행
+여행 중에 빨래는 어떻게 해?,How do you do laundry while traveling?,What's the best way to wash clothes on the road?,여행,laundry = 빨래 / on the road = 여행 중에,여행
+혼자 여행하기에 안전한 나라가 어디야?,Which countries are safe for solo travel?,Where is it safe to travel alone?,여행,solo travel = 혼자 여행,여행
+여행 블로그에서 본 이 맛집 가보자,Let's go to this restaurant I found on a travel blog.,I saw this place recommended on a travel blog.,여행,travel blog = 여행 블로그,여행
+이 나라 전압이 몇 볼트야?,What's the voltage in this country?,What voltage do they use here?,여행,voltage = 전압,여행
+물 마셔도 안전한 나라인가요?,Is the tap water safe to drink here?,Can I drink the water from the faucet?,여행,tap water = 수돗물 / safe to drink = 마셔도 안전한,여행
+현지 SIM 카드 어디서 살 수 있어요?,Where can I buy a local SIM card?,Where do they sell prepaid SIM cards?,로밍,local SIM card = prepaid SIM = 현지 유심,여행
+구글맵 오프라인 지도 다운받아 놓자,Let's download the offline Google Maps.,We should save the Google Maps offline before we go.,여행,offline maps = 오프라인 지도,여행
+이 나라 콘센트 모양이 어떻게 생겼어?,What do the outlets look like in this country?,What plug shape do they use here?,여행,outlet = plug = 콘센트,여행
+환전 미리 해가는 게 좋을까 현지에서 하는 게 좋을까?,Should I exchange money before I go or at my destination?,Is it better to convert currency in advance or locally?,환전,exchange money = convert currency = 환전하다,여행
+여행용 멀티 어댑터 하나 사야겠다,I need to buy a universal travel adapter.,I should get a multi-plug adapter for the trip.,여행,universal travel adapter = multi-plug adapter = 멀티 어댑터,여행
+여행 중에 중요한 서류는 사본 만들어 놓자,"Let's make copies of important documents for the trip.",We should photocopy our key documents before traveling.,여행,copies = photocopies = 사본,여행
+이 카페 뷰가 끝내줘요,This café has an amazing view.,The view from this café is stunning.,식당,amazing = stunning = 끝내주는,여행
+테이크아웃 가능한가요?,Can I get this to take out?,Is takeout available?,식당,take out = takeout = 테이크아웃,여행
+이 음식에 유제품이 들어가 있나요?,Does this contain dairy?,Are there any dairy products in this dish?,식당,dairy = 유제품,여행
+소스를 따로 주실 수 있나요?,Can I get the sauce on the side?,Could you serve the dressing separately?,식당,on the side = separately = 따로,여행
+이 생선 뼈가 많아요?,Does this fish have a lot of bones?,Is this a bony fish?,식당,bones = 뼈 / bony = 뼈가 많은,여행
+여기 와이파이 되나요?,Do you have Wi-Fi here?,Is there internet available?,식당,Wi-Fi = internet = 와이파이,여행
+따뜻한 물 한 잔 주세요,Could I have a glass of warm water?,Can I get some hot water please?,식당,warm water = hot water = 따뜻한/뜨거운 물,여행
+아이 의자 있나요?,Do you have a high chair?,Is there a booster seat for kids?,식당,high chair = booster seat = 아이 의자,여행
+서빙이 좀 느린 것 같은데 확인해 주세요,The service seems a bit slow. Could you check on our order?,Our food is taking a while. Can you follow up?,식당,follow up = 확인하다 / service = 서빙,여행
+런치 스페셜이 뭐예요?,What's the lunch special?,What are today's lunch specials?,식당,lunch special = 런치 스페셜,여행
+여기 해피아워 시간이 언제예요?,When is happy hour?,What time does happy hour start?,식당,happy hour = 해피아워 (음료 할인 시간),여행
+로컬 맥주 추천 좀 해주세요,"What local beer would you recommend?",Which regional brews do you suggest?,식당,local beer = regional brew = 로컬 맥주,여행
+이 와인 잔으로 주세요,I'll have this wine by the glass.,Can I get this wine as a single glass?,식당,by the glass = 잔으로,여행
+칵테일 메뉴판 있나요?,Do you have a cocktail menu?,Can I see your drink list?,식당,cocktail menu = drink list = 칵테일 메뉴,여행
+이 가격에 세금 포함인가요?,Does this price include tax?,Is tax already included?,쇼핑,include tax = 세금 포함,여행
+다른 매장에도 재고가 있는지 확인해 주실 수 있나요?,Can you check if other branches have it in stock?,Could you see if another location has this available?,쇼핑,in stock = available = 재고가 있는,여행
+이 물건 환불 정책이 어떻게 되나요?,What's the return policy on this item?,Can I return this if it doesn't work out?,쇼핑,return policy = 환불 정책,여행
+무료 시식 있나요?,Are there any free samples?,Can I try a sample before buying?,쇼핑,free samples = 무료 시식/샘플,여행
+이거 면세로 구매할 수 있나요?,Can I buy this duty-free?,Is this item eligible for tax exemption?,쇼핑,duty-free = tax exemption = 면세,여행
+쇼핑백 좀 주실 수 있나요?,Can I get a shopping bag?,Could I have a bag please?,쇼핑,shopping bag = 쇼핑백,여행
+현금 영수증 발급해 주세요,Can I get a cash receipt?,Please issue a cash receipt.,쇼핑,cash receipt = 현금 영수증,여행
+이 사이즈 입어봐도 되나요?,Can I try this size on?,May I try this on in the fitting room?,쇼핑,try on = 입어보다 / fitting room = 탈의실,여행
+이 색이 더 밝은 건 없나요?,Do you have this in a brighter color?,Is there a lighter shade available?,쇼핑,brighter = lighter shade = 더 밝은,여행
+여기 카드 최소 결제 금액이 있나요?,Is there a minimum purchase for card payments?,Do you have a minimum charge for credit cards?,쇼핑,minimum purchase = minimum charge = 최소 결제 금액,여행
+여기서 현지 과일 사도 되나요?,Can I buy local fruit here?,Is it okay to purchase fresh produce here?,쇼핑,local fruit = fresh produce = 현지 과일,여행
+유통기한 확인 좀 해도 될까요?,Can I check the expiration date?,May I look at the best-before date?,쇼핑,expiration date = best-before date = 유통기한,여행
+배터리 충전할 곳이 있나요?,Is there somewhere to charge my phone?,Where can I plug in my device?,와이파이,charge = 충전하다 / plug in = 꽂다,여행
+호텔에서 보조 배터리 빌릴 수 있나요?,Can I borrow a portable charger from the hotel?,Does the hotel lend power banks?,와이파이,portable charger = power bank = 보조 배터리,여행
+여기 와이파이 안 잡히는데 다른 네트워크 있나요?,The Wi-Fi isn't connecting. Is there another network?,I can't pick up the Wi-Fi signal. Any alternatives?,와이파이,connecting = 접속 / network = 네트워크,여행
+데이터 사용량 확인하는 방법 알려주세요,How do I check my data usage?,Where can I see how much data I've used?,로밍,data usage = 데이터 사용량,여행
+해외에서 카카오톡 잘 되나요?,Does KakaoTalk work well overseas?,Can I use KakaoTalk abroad without issues?,로밍,overseas = abroad = 해외에서,여행
+VPN 써야 하는 나라인가요?,Do I need a VPN in this country?,Is a VPN necessary here?,로밍,VPN = 가상 사설 네트워크,여행
+이 공원에 야생 동물 조심해야 하나요?,Should I watch out for wildlife in this park?,Are there dangerous animals in this park?,관광,wildlife = 야생 동물 / watch out = 조심하다,여행
+스쿠버 다이빙 체험 다이브 가능한가요?,Can I do a trial scuba dive?,Is an introductory dive available?,관광,trial dive = introductory dive = 체험 다이빙,여행
+패러세일링 비용이 얼마예요?,How much does parasailing cost?,What's the price for a parasailing ride?,관광,parasailing = 패러세일링,여행
+이 호수에서 보트 빌릴 수 있나요?,Can I rent a boat on this lake?,Is boat rental available at the lake?,관광,boat rental = 보트 대여,여행
+이 섬 주변 스노클링 스팟 추천해 주세요,Can you recommend snorkeling spots around this island?,Where are the best places to snorkel near this island?,관광,snorkeling spots = 스노클링 스팟,여행
+승마 체험 예약할 수 있나요?,Can I book a horseback riding experience?,Is horse riding available for booking?,관광,horseback riding = horse riding = 승마,여행
+ATV 타려면 면허가 필요한가요?,Do I need a license to ride an ATV?,Is a permit required for ATV riding?,관광,ATV = 사륜 오토바이 / permit = 면허,여행
+낙타 타기 체험 얼마예요?,How much is the camel riding experience?,What does a camel ride cost?,관광,camel ride = 낙타 타기,여행
+이 도시 야경 보려면 어디가 좋아요?,Where's the best place to see the city lights at night?,What's the top night view spot in this city?,관광,city lights = night view = 야경,여행
+이 마을 걸어서 구경하기 좋은가요?,Is this village nice to explore on foot?,Can I see this town by walking around?,관광,on foot = walking = 걸어서,여행
+이 해변 일몰이 유명해요?,Is this beach known for its sunsets?,Is the sunset famous at this beach?,관광,sunset = 일몰,여행
+여기 근처 하이킹 코스 추천해 주세요,Can you recommend a hiking trail nearby?,What are some good hikes around here?,관광,hiking trail = 하이킹 코스,여행
+이 등산로 난이도가 어떻게 돼요?,What's the difficulty level of this trail?,How hard is this hiking path?,관광,difficulty level = 난이도,여행
+정상까지 몇 시간 걸려요?,How many hours to reach the summit?,How long is the hike to the top?,관광,summit = top = 정상,여행
+등산 중에 물 보충할 곳이 있나요?,Is there a place to refill water on the hike?,Can I get drinking water along the trail?,관광,refill water = 물 보충,여행
+이 트레일 야간 등산 가능한가요?,Can I hike this trail at night?,Is nighttime hiking allowed on this path?,관광,nighttime hiking = 야간 등산,여행
+캠핑장에서 곰이 나올 수 있나요?,Could bears show up at the campsite?,Is there a risk of bear encounters at this campground?,캠핑,bear encounters = 곰 조우,여행
+캠핑 장비 어디서 빌릴 수 있어요?,Where can I rent camping gear?,Is there a camping equipment rental shop?,캠핑,camping gear = camping equipment = 캠핑 장비,여행
+글램핑 시설 있나요?,Do you have glamping facilities?,Is glamping available here?,캠핑,glamping = 글램핑 (고급 캠핑),여행
+모기 기피제 좀 빌릴 수 있나요?,Can I borrow some insect repellent?,Do you have any mosquito spray?,캠핑,insect repellent = mosquito spray = 모기 기피제,여행
+아침에 안개가 많이 끼나요?,Is there a lot of fog in the mornings?,Does it get misty here in the early hours?,날씨,fog = mist = 안개,여행
+우기 시즌이 언제예요?,When is the rainy season?,What months are considered the wet season?,날씨,rainy season = wet season = 우기,여행
+건기에 가는 게 더 좋은가요?,Is it better to visit during the dry season?,Should I go during the dry months?,날씨,dry season = 건기,여행
+갑자기 날씨가 변할 수 있으니까 겉옷 챙기세요,"The weather can change suddenly, so bring a jacket.",Pack a layer just in case the weather turns.,날씨,layer = jacket = 겉옷,여행
+자외선 지수가 높으니까 모자 쓰세요,"The UV index is high, so wear a hat.",Make sure to wear a hat because of strong UV rays.,날씨,UV index = 자외선 지수,여행
+오늘 풍랑주의보가 있나요?,Is there a rough sea advisory today?,Are there any wave warnings for today?,날씨,rough sea advisory = wave warning = 풍랑주의보,여행
+이번 여행 짐 뭘 챙겨야 할까?,What should I pack for this trip?,What do I need to bring on this vacation?,짐싸기,pack = 챙기다/짐 싸다,여행
+가벼운 여름옷 위주로 싸면 될까?,Should I mostly pack light summer clothes?,Will lightweight summer outfits be enough?,짐싸기,light summer clothes = lightweight outfits = 가벼운 여름옷,여행
+방수 재킷 꼭 챙겨야 할까?,Do I really need a waterproof jacket?,Should I definitely bring a rain jacket?,짐싸기,waterproof jacket = rain jacket = 방수 재킷,여행
+수영복 가져가야 해?,Should I pack a swimsuit?,Do I need to bring swim trunks?,짐싸기,swimsuit = swim trunks = 수영복,여행
+간편하게 세탁할 수 있는 옷으로 싸자,Let's pack clothes that are easy to wash.,Bring quick-dry fabrics that are simple to clean.,짐싸기,easy to wash = quick-dry = 세탁하기 쉬운,여행
+여행용 세면도구 세트 사야 하나?,Do I need to buy a travel toiletry kit?,Should I get a travel-sized wash bag?,짐싸기,travel toiletry kit = wash bag = 여행용 세면도구,여행
+여기서 호텔까지 걸어서 얼마나 걸려요?,How long does it take to walk to the hotel from here?,How far is the hotel on foot?,교통,on foot = 걸어서 / walk = 걷다,여행
+무료 셔틀 버스 시간표 있나요?,Is there a schedule for the free shuttle bus?,When does the complimentary shuttle run?,교통,free shuttle = complimentary shuttle = 무료 셔틀,여행
+이 트램 카드로 지하철도 탈 수 있나요?,Can I use this tram card on the subway too?,Does this transit card work on the metro as well?,교통,transit card = 교통카드 / metro = subway = 지하철,여행
+택시 잡기 어려운 시간대가 있어요?,Are there times when it's hard to get a taxi?,Is there a rush hour when cabs are scarce?,교통,rush hour = 러시아워 / scarce = 부족한,여행
+차선이 반대라서 운전하기 어렵겠다,Driving will be tricky since the lanes are reversed.,It'll be tough driving on the opposite side of the road.,교통,lanes are reversed = 차선이 반대,여행
+좌측 통행인 나라인가요?,Is this a left-hand traffic country?,Do they drive on the left here?,교통,left-hand traffic = 좌측 통행,여행
+이 도시 자전거 도로가 잘 되어 있나요?,Does this city have good bike lanes?,Are the cycling paths well-developed here?,교통,bike lanes = cycling paths = 자전거 도로,여행
+주차장 출차할 때 정산하면 되나요?,Do I pay when I exit the parking garage?,Can I settle the parking fee on my way out?,교통,exit = 출차 / settle = 정산하다,여행
+하이패스 단말기 있나요?,Do you have an electronic toll pass device?,Is there an ETC unit in the car?,교통,electronic toll pass = ETC = 하이패스,여행
+이 페리 예약 없이 탈 수 있나요?,Can I board this ferry without a reservation?,Do I need to book the ferry in advance?,교통,board = 탑승하다 / in advance = 미리,여행
+쾌속선이 더 빠른가요?,Is the speedboat faster?,Would the express boat be quicker?,교통,speedboat = express boat = 쾌속선,여행
+여기서 헬리콥터 투어 있나요?,Are there helicopter tours from here?,Can I take a helicopter ride here?,교통,helicopter tour = 헬리콥터 투어,여행
+공항에서 짐 포장 서비스 있나요?,Is there a luggage wrapping service at the airport?,Can I get my bags shrink-wrapped at the airport?,공항,luggage wrapping = 짐 포장,여행
+게이트가 너무 멀어요. 셔틀 있나요?,My gate is really far. Is there a shuttle?,The gate is quite a walk. Is there a people mover?,공항,shuttle = people mover = 셔틀/이동 수단,여행
+비행기에서 내릴 때 뭐부터 해야 해요?,What do I do first when I get off the plane?,What's the procedure after deplaning?,공항,deplane = 비행기에서 내리다,여행
+이민국 직원이 체류 목적을 물어보면 뭐라고 해요?,What should I say if immigration asks about my purpose of stay?,How do I answer the purpose of visit question?,공항,purpose of stay = purpose of visit = 체류 목적,여행
+도착 로비에서 만나자,Let's meet at the arrivals lobby.,I'll see you in the arrivals hall.,공항,arrivals lobby = arrivals hall = 도착 로비,여행
+짐 카트 어디서 가져오면 돼요?,Where can I get a luggage cart?,Where are the baggage trolleys?,공항,luggage cart = baggage trolley = 짐 카트,여행
+자동 출입국 심사대 사용할 수 있나요?,Can I use the automated immigration gate?,Is the e-passport gate available for me?,공항,automated gate = e-passport gate = 자동 심사대,여행
+반입 금지 물품 목록 좀 볼 수 있나요?,Can I see the list of prohibited items?,Where can I find the restricted goods list?,공항,prohibited items = restricted goods = 반입 금지 물품,여행
+기내에서 충전할 수 있나요?,Can I charge my phone on the plane?,Are there USB ports in the cabin?,비행기,charge = 충전하다 / USB ports = USB 포트,여행
+비행기 안에서 스트레칭 하는 법 알려주세요,How do I stretch during a long flight?,What exercises can I do on the plane?,비행기,stretch = 스트레칭 / exercises = 운동,여행
+장거리 비행 시차 적응 팁 좀 알려주세요,Any tips for dealing with jet lag on long flights?,How do I adjust to the time difference after a long flight?,비행기,jet lag = 시차 부적응 / time difference = 시차,여행
+기내에서 아기가 울면 어떻게 달래요?,"If my baby cries on the plane, how do I calm them?",What are ways to soothe a fussy infant during a flight?,비행기,soothe = calm = 달래다 / fussy = 보채는,여행
+비행기 비상시 산소마스크는 자동으로 내려오나요?,Do oxygen masks drop automatically in an emergency?,Will the oxygen masks deploy on their own?,비행기,oxygen masks = 산소마스크 / deploy = 내려오다,여행
+좌석 밑에 구명조끼가 있다고 했죠?,The life vest is under the seat right?,Did they say the life jacket is beneath the seat?,비행기,life vest = life jacket = 구명조끼,여행
+기내 온도가 너무 추워요,It's freezing cold in the cabin.,The air conditioning on the plane is too cold.,비행기,cabin temperature = 기내 온도,여행
+창문 블라인드 올려도 되나요?,Can I raise the window shade?,Is it okay to open the window blind?,비행기,window shade = window blind = 창문 블라인드,여행
+이륙하기 전에 화장실 다녀와도 되나요?,Can I use the restroom before takeoff?,Am I allowed to go to the lavatory before we depart?,비행기,takeoff = 이륙 / lavatory = restroom = 화장실,여행
+비행기가 흔들릴 때 안전벨트 어떻게 매요?,How do I fasten the seatbelt when there's turbulence?,What's the proper way to buckle up during rough air?,비행기,fasten = buckle up = 매다 / seatbelt = 안전벨트,여행
+기내 잡지 가져가도 되나요?,Can I keep the in-flight magazine?,Am I allowed to take the onboard magazine with me?,비행기,in-flight magazine = onboard magazine = 기내 잡지,여행
+옆 승객이 팔걸이를 다 차지했어요,The passenger next to me is hogging the armrest.,My neighbor is taking up the entire armrest.,비행기,hogging = taking up = 독차지하다 / armrest = 팔걸이,여행
+좌석 앞 주머니에 뭐가 있어요?,What's in the seat pocket in front of me?,Is there anything useful in the seatback pocket?,비행기,seat pocket = seatback pocket = 좌석 앞 주머니,여행
+비행기 화장실 줄이 길어요,The airplane restroom line is long.,There's quite a queue for the lavatory.,비행기,queue = line = 줄,여행
+이 호텔 조식 종류가 다양한가요?,Does this hotel have a good breakfast variety?,Is the morning buffet selection diverse?,숙소,variety = selection = 종류/선택지,여행
+객실에서 바베큐 할 수 있는 곳 있나요?,Is there a barbecue area at the hotel?,Can I grill somewhere on the property?,숙소,barbecue area = grill area = 바베큐 구역,여행
+풀빌라로 예약할 수 있나요?,Can I book a pool villa?,Are there villas with private pools?,숙소,pool villa = 풀빌라,여행
+오션뷰 방이랑 시티뷰 방 가격 차이가 얼마예요?,What's the price difference between ocean view and city view?,How much more is a sea-view room than a city-view room?,숙소,ocean view = sea view = 오션뷰 / city view = 시티뷰,여행
+방에 금고 비밀번호 설정하는 법 좀 알려주세요,How do I set the safe password in my room?,Can you show me how to program the in-room safe?,숙소,safe = 금고 / password = 비밀번호,여행
+호텔 바 영업시간이 어떻게 되나요?,What are the hotel bar hours?,When does the hotel lounge open and close?,숙소,hotel bar = hotel lounge = 호텔 바/라운지,여행
+스파 예약 가능한가요?,Can I book a spa treatment?,Is the spa available for reservations?,숙소,spa treatment = 스파 트리트먼트,여행
+객실 내 커피머신 사용법 좀 알려주세요,How do I use the coffee machine in my room?,Can you explain the in-room coffee maker?,숙소,coffee machine = coffee maker = 커피머신,여행
+호텔 로비에서 택시 불러줄 수 있나요?,Can the hotel lobby call a taxi for me?,Would the front desk arrange a cab?,숙소,arrange a cab = 택시를 잡아주다,여행
+반려동물 동반 가능한 숙소인가요?,Is this a pet-friendly accommodation?,Do you allow pets at this hotel?,숙소,pet-friendly = 반려동물 동반 가능,여행
+엑스트라 베드 추가 비용이 있나요?,Is there an extra charge for an additional bed?,How much is an extra bed?,숙소,extra bed = additional bed = 엑스트라 베드,여행
+이 호텔 근처 편의점 있나요?,Is there a convenience store near the hotel?,Where's the nearest convenience store from here?,숙소,convenience store = 편의점,여행
+호텔에서 우산 빌릴 수 있나요?,Can I borrow an umbrella from the hotel?,Does the hotel lend umbrellas?,숙소,lend = borrow = 빌려주다/빌리다,여행
+분실물 센터가 어디에요?,Where is the lost and found?,Where's the lost property office?,긴급상황,lost and found = lost property = 분실물 센터,여행
+신용카드를 잃어버렸어요. 분실 신고 해야 해요,I lost my credit card. I need to report it.,My credit card is missing. How do I cancel it?,긴급상황,report = cancel = 분실 신고/정지,여행
+의료 통역 서비스가 있나요?,Is there a medical interpretation service?,Can I get a translator at the hospital?,긴급상황,medical interpretation = 의료 통역,여행
+이가 너무 아파요. 치과 어디 있어요?,I have a terrible toothache. Where's a dentist?,My tooth is killing me. Is there a dental clinic nearby?,긴급상황,toothache = 치통 / dentist = dental clinic = 치과,여행
+열이 나고 몸이 아파요,I have a fever and body aches.,I'm running a temperature and feeling achy.,긴급상황,fever = temperature = 열 / body aches = achy = 몸살,여행
+식중독인 것 같아요,I think I have food poisoning.,I might have gotten food poisoning.,긴급상황,food poisoning = 식중독,여행
+다리를 삐었어요,I sprained my leg.,I twisted my ankle.,긴급상황,sprained = twisted = 삐다,여행
+해외에서 사고나면 영사관에 연락해야 해요,If I get in trouble abroad I should contact the consulate.,In case of emergency overseas reach out to the consulate.,긴급상황,consulate = 영사관,여행
+긴급 연락처 저장해 놓으세요,Save the emergency contact numbers.,Make sure you have the emergency contacts stored.,긴급상황,emergency contacts = 긴급 연락처,여행
+여기 근처 24시간 약국 있나요?,Is there a 24-hour pharmacy nearby?,Where's an all-night drugstore around here?,긴급상황,24-hour pharmacy = all-night drugstore = 24시간 약국,여행
+해외 여행 시 예방접종 뭐 맞아야 해요?,What vaccinations do I need for overseas travel?,Which shots are required before traveling abroad?,여행,vaccinations = shots = 예방접종,여행
+말라리아 예방약 처방 받아야 하나요?,Do I need a malaria prevention prescription?,Should I get anti-malaria medication?,여행,malaria prevention = anti-malaria = 말라리아 예방,여행
+현지에서 물 사먹어야 하나요 수돗물 마셔도 되나요?,Should I buy bottled water or is tap water fine?,Is it safe to drink from the tap or should I buy water?,여행,bottled water = 생수 / tap water = 수돗물,여행
+여행 가기 전에 국제 학생증 발급받자,Let's get an international student ID before the trip.,We should apply for an ISIC card before traveling.,여행,international student ID = ISIC card = 국제 학생증,여행
+호스텔에서 짐 잠글 수 있는 자물쇠 가져가야 해,I should bring a padlock for the hostel lockers.,Don't forget to pack a lock for the hostel storage.,여행,padlock = lock = 자물쇠,여행
+여기 수하물 보관함 있나요?,Are there luggage lockers here?,Is there a baggage storage facility?,여행,luggage lockers = baggage storage = 수하물 보관함,여행
+여행 일기 쓰면 좋은 추억이 될 거야,Keeping a travel journal will make great memories.,Writing a travel diary will be a wonderful keepsake.,여행,travel journal = travel diary = 여행 일기,여행
+여기 유심칩 활성화 안 되는데 도와주세요,My SIM card isn't activating. Can you help?,I can't get my SIM to work. Could you assist?,로밍,activate = 활성화하다 / SIM card = 유심칩,여행
+와이파이 연결은 되는데 인터넷이 안 돼요,The Wi-Fi is connected but the internet isn't working.,I'm on the network but can't access anything online.,와이파이,connected = 연결된 / access = 접속,여행
+호텔 비즈니스 센터에서 프린트할 수 있나요?,Can I print something at the hotel business center?,Is there a printer available for guests?,와이파이,business center = 비즈니스 센터 / print = 프린트,여행
+여기서 국제전화 하려면 어떻게 해요?,How do I make an international call from here?,What's the procedure for calling overseas?,로밍,international call = 국제전화,여행
+현지 번호로 전화 오면 받아도 요금이 나나요?,Am I charged if I answer a call from a local number?,Does receiving a local call cost money while roaming?,로밍,charged = 요금이 나다 / roaming = 로밍,여행
+여기 근처 코워킹 스페이스 있나요?,Is there a coworking space nearby?,Where can I find a shared workspace around here?,와이파이,coworking space = shared workspace = 코워킹 스페이스,여행
+비자 인터뷰 어떻게 준비해야 해요?,How should I prepare for the visa interview?,What do I need for the visa appointment?,비자,visa interview = visa appointment = 비자 인터뷰,여행
+관광 비자로 몇 일까지 체류할 수 있어요?,How many days can I stay on a tourist visa?,What's the maximum stay on a tourist visa?,비자,tourist visa = 관광 비자 / maximum stay = 최대 체류 기간,여행
+비자 연장 서류가 뭐가 필요해요?,What documents do I need for a visa extension?,What paperwork is required to extend my visa?,비자,visa extension = 비자 연장 / documents = paperwork = 서류,여행
+출국 심사 줄이 어디예요?,Where's the line for departure immigration?,Which way to the exit passport control?,비자,departure immigration = exit passport control = 출국 심사,여행
+재입국 허가서가 필요한가요?,Do I need a re-entry permit?,Is a re-entry visa required?,비자,re-entry permit = re-entry visa = 재입국 허가서,여행
+여기서 환전하면 수수료가 비싼가요?,Are the exchange fees expensive here?,Is the commission high at this exchange?,환전,exchange fees = commission = 환전 수수료,여행
+달러 소액권으로 바꿔주실 수 있나요?,"Can you give me small dollar bills?",I'd like the dollars in small denominations please.,환전,small bills = small denominations = 소액권,여행
+현금 많이 갖고 다니면 위험하지 않을까?,Isn't it risky to carry a lot of cash?,Is it dangerous to walk around with too much money?,환전,risky = dangerous = 위험한,여행
+트래블러스 체크 사용할 수 있는 곳이 많나요?,Are traveler's checks widely accepted?,Do many places take traveler's cheques?,환전,traveler's checks = traveler's cheques = 여행자 수표,여행
+선불 카드 충전하려는데요,I'd like to reload my prepaid card.,Can I top up my prepaid travel card?,환전,reload = top up = 충전하다 / prepaid card = 선불 카드,여행
+이 나라 동전 종류가 뭐가 있어요?,What types of coins does this country have?,What denominations of coins are used here?,환전,coins = 동전 / denominations = 종류/액면가,여행
+위조지폐 구별하는 법 아세요?,Do you know how to spot counterfeit bills?,How can I tell if a banknote is fake?,환전,counterfeit = fake = 위조 / banknote = 지폐,여행
+여기서 일본 엔화로 바꿀 수 있어요?,Can I exchange to Japanese yen here?,Do you convert to yen at this counter?,환전,Japanese yen = 일본 엔화,여행
+여기 놀거리가 뭐가 있어요?,What is there to do around here?,What kind of activities are available?,여행,activities = 놀거리/활동,여행
+근처에 좋은 바 있나요?,Is there a good bar nearby?,Any bar recommendations around here?,여행,bar = 바/술집,여행
+라이브 음악 하는 곳 있나요?,Is there a place with live music?,Where can I hear live bands?,여행,live music = live bands = 라이브 음악,여행
+이 도시 나이트라이프가 어때요?,What's the nightlife like in this city?,How's the party scene here?,여행,nightlife = party scene = 나이트라이프,여행
+이 근처에 찜질방이나 사우나 있나요?,Is there a sauna or spa bath nearby?,Where can I find a bathhouse around here?,여행,sauna = spa bath = bathhouse = 사우나/찜질방,여행
+현지 가이드 없이 가도 괜찮을까요?,Is it okay to go without a local guide?,Can I visit this place on my own?,여행,local guide = 현지 가이드 / on my own = 혼자서,여행
+이 도시 치안이 괜찮은 편이에요?,Is this city generally safe?,How's the security situation in this city?,여행,safe = 안전한 / security = 치안,여행
+밤에 혼자 돌아다녀도 괜찮을까요?,Is it safe to walk around alone at night?,Can I wander around by myself after dark?,여행,walk around = wander = 돌아다니다 / after dark = 밤에,여행
+관광객 대상 사기 조심해야 해요?,Should I watch out for tourist scams?,Are there common scams targeting tourists?,여행,tourist scams = 관광객 대상 사기,여행
+이 지역 위험한 구역이 어디예요?,Which areas of this region should I avoid?,Are there any unsafe neighborhoods here?,여행,avoid = 피하다 / unsafe = 위험한,여행
+여기 무료 관광 지도 있나요?,Do you have a free tourist map?,Is there a complimentary city map?,관광,tourist map = city map = 관광 지도,여행
+이 도시 투어 버스 노선이 어떻게 되나요?,What's the hop-on hop-off bus route in this city?,How does the sightseeing bus circuit work?,관광,hop-on hop-off = 자유 승하차 / circuit = 순환 노선,여행
+오픈탑 버스 타고 싶은데 어디서 타요?,Where do I catch the open-top bus?,Where's the pickup point for the double-decker tour?,관광,open-top bus = double-decker = 오픈탑 버스,여행
+이 유적지 유네스코 세계문화유산이에요?,Is this historic site a UNESCO World Heritage Site?,Is this place recognized by UNESCO?,관광,UNESCO World Heritage Site = 유네스코 세계문화유산,여행
+여기 오디오 가이드 한국어 지원 되나요?,Is the audio guide available in Korean?,Do you have a Korean audio tour?,관광,audio guide = audio tour = 오디오 가이드,여행
+관람 소요시간이 얼마나 되나요?,How long does it take to see everything?,What's the recommended visit duration?,관광,visit duration = 관람 소요시간,여행
+사진 인화 서비스 있나요?,Is there a photo printing service?,Can I get my photos printed here?,사진,photo printing = 사진 인화,여행
+셀카봉 사용 금지 구역인가요?,Is this a no-selfie-stick zone?,Are selfie sticks banned here?,사진,selfie stick = 셀카봉 / banned = 금지된,여행
+여기 야경 사진 잘 나오나요?,Do night photos turn out well here?,Is this a good spot for night photography?,사진,night photography = 야경 사진,여행
+이 장소 인스타 핫플이에요?,Is this place Instagram-worthy?,Is this a popular spot for social media photos?,사진,Instagram-worthy = 인스타 핫플/인스타 감성,여행
+여기 인생샷 찍기 좋은 포인트예요?,Is this a good spot for the perfect shot?,Where's the best angle for a great photo here?,사진,perfect shot = great photo = 인생샷,여행
+예산 초과했어요. 좀 아껴야겠다,I've gone over budget. I need to cut back.,I've overspent. Time to be more frugal.,여행,over budget = overspent = 예산 초과 / cut back = frugal = 아끼다,여행
+여기 학생증 보여주면 할인 되나요?,Do I get a discount if I show my student ID?,Is there a student rate with valid ID?,쇼핑,student ID = 학생증 / student rate = 학생 할인,여행
+귀국 선물 뭐가 좋을까?,What makes a good souvenir to bring home?,What should I buy as gifts for people back home?,쇼핑,souvenir = gift = 선물/기념품,여행
+이 제품 기내 반입 가능한가요?,Can I bring this item in my carry-on?,Is this allowed in hand luggage?,쇼핑,carry-on = hand luggage = 기내 반입,여행
+이 근처 아울렛 매장 있나요?,Is there an outlet mall nearby?,Where's the nearest factory outlet?,쇼핑,outlet mall = factory outlet = 아울렛,여행
+택시비를 바가지 씌우는 것 같아요,I think the taxi driver is overcharging me.,I feel like the cab fare is inflated.,교통,overcharging = inflated = 바가지 씌우다,여행
+미터기를 안 켜고 있어요,The driver didn't turn on the meter.,The taxi meter isn't running.,교통,meter isn't running = 미터기를 안 켜다,여행
+잔돈이 없는데 카드로 해도 되나요?,"I don't have exact change. Can I pay by card?",I'm short on cash. Do you take cards?,교통,exact change = 잔돈 / short on cash = 현금 부족,여행
+여행 마지막 날인데 뭐 하면 좋을까?,It's our last day. What should we do?,Any suggestions for our final day of the trip?,여행,last day = final day = 마지막 날,여행
