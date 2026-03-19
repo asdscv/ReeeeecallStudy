@@ -789,21 +789,18 @@ export function SettingsPage() {
             <Globe className="w-5 h-5 text-gray-500" />
             <h2 className="text-lg font-semibold text-gray-900">{t('language.title')}</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <select
+            value={i18n.language}
+            onChange={(e) => changeLanguage(e.target.value)}
+            className="w-full sm:w-64 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236B7280\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
+          >
             {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const).map((lng) => (
-              <button
-                key={lng}
-                onClick={() => changeLanguage(lng)}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                  i18n.language === lng
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
+              <option key={lng} value={lng}>
                 {t(`language.${lng}`)}
-              </button>
+              </option>
             ))}
-          </div>
+          </select>
         </section>
 
         {/* ── API Key Management ── */}

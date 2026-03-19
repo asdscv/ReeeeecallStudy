@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -68,6 +68,7 @@ export function SettingsScreen() {
     answer_mode: 'button',
   })
   const [language, setLanguage] = useState(i18n.language || 'en')
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [aiCollapsed, setAiCollapsed] = useState(true)
@@ -521,39 +522,50 @@ export function SettingsScreen() {
 
         {/* ── f) Language ── */}
         <SectionCard theme={theme}>
-          <View style={styles.languageHeader}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Language</Text>
-            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Language</Text>
+          <TouchableOpacity
+            testID="settings-lang-dropdown"
+            onPress={() => setLangDropdownOpen(true)}
+            style={[styles.dropdown, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.dropdownFlag}>
+              {LANGUAGES.find((l) => l.code === language)?.flag ?? '🌐'}
+            </Text>
+            <Text style={[styles.dropdownText, { color: theme.colors.text }]}>
               {LANGUAGES.find((l) => l.code === language)?.label ?? 'English'}
             </Text>
-          </View>
-          <View style={styles.languageGrid}>
-            {LANGUAGES.map((lang) => {
-              const isActive = language === lang.code
-              return (
-                <TouchableOpacity
-                  key={lang.code}
-                  testID={`settings-lang-${lang.code}`}
-                  onPress={() => handleLanguageChange(lang.code)}
-                  style={[
-                    styles.langCard,
-                    {
-                      backgroundColor: isActive ? theme.colors.primary : theme.colors.surfaceElevated,
-                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text style={styles.langFlag}>{lang.flag}</Text>
-                  <Text style={[
-                    styles.langLabel,
-                    { color: isActive ? theme.colors.primaryText : theme.colors.text },
-                  ]}>
-                    {lang.label}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
+            <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>▾</Text>
+          </TouchableOpacity>
+
+          <Modal visible={langDropdownOpen} transparent animationType="fade" onRequestClose={() => setLangDropdownOpen(false)}>
+            <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setLangDropdownOpen(false)}>
+              <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Language</Text>
+                <FlatList
+                  data={LANGUAGES}
+                  keyExtractor={(item) => item.code}
+                  renderItem={({ item: lang }) => {
+                    const isActive = language === lang.code
+                    return (
+                      <TouchableOpacity
+                        testID={`settings-lang-${lang.code}`}
+                        onPress={() => { handleLanguageChange(lang.code); setLangDropdownOpen(false) }}
+                        style={[styles.modalItem, isActive && { backgroundColor: palette.blue[50] }]}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.langFlag}>{lang.flag}</Text>
+                        <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
+                          {lang.label}
+                        </Text>
+                        {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>✓</Text>}
+                      </TouchableOpacity>
+                    )
+                  }}
+                />
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </SectionCard>
 
         {/* ── g) Notifications ── */}
@@ -705,21 +717,31 @@ const styles = StyleSheet.create({
   fieldLabel: { fontSize: 13, fontWeight: '500', marginBottom: 4 },
   settingRow: { gap: 4 },
 
-  // Language
-  languageHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-  },
-  languageGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 8,
-  },
-  langCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 14, paddingVertical: 10,
+  // Language dropdown
+  dropdown: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 14, paddingVertical: 12,
     borderRadius: 10, borderWidth: 1.5,
-    minWidth: 100,
   },
-  langFlag: { fontSize: 18 },
-  langLabel: { fontSize: 14, fontWeight: '500' },
+  dropdownFlag: { fontSize: 20 },
+  dropdownText: { flex: 1, fontSize: 15, fontWeight: '500' },
+  langFlag: { fontSize: 20 },
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center', alignItems: 'center', padding: 40,
+  },
+  modalContent: {
+    width: '100%', maxWidth: 320, borderRadius: 16,
+    paddingVertical: 12, maxHeight: 400,
+  },
+  modalTitle: {
+    fontSize: 16, fontWeight: '600', paddingHorizontal: 20, paddingVertical: 12,
+  },
+  modalItem: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingHorizontal: 20, paddingVertical: 14,
+  },
+  modalItemText: { flex: 1, fontSize: 15, fontWeight: '500' },
 
   // Mode cards
   modeGrid: { flexDirection: 'row', gap: 10 },
