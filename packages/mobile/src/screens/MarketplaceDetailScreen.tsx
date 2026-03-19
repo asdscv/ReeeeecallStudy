@@ -210,7 +210,7 @@ export function MarketplaceDetailScreen() {
         p_session_id: sessionId,
         p_referrer: 'mobile-app',
       } as Record<string, unknown>)
-      .catch(() => {}) // fire and forget
+      .then(() => {}, () => {}) // fire and forget
   }, [listingId])
 
   // Pre-fill form when editing
@@ -561,7 +561,7 @@ export function MarketplaceDetailScreen() {
                     backgroundColor: reportCategory === cat.value ? theme.colors.primaryLight : 'transparent',
                   },
                 ]}
-                testID={\}
+                testID={`report-cat-${cat.value}`}
               >
                 <View style={[
                   reportStyles.radio,

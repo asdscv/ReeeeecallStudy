@@ -13,6 +13,7 @@ type Route = RouteProp<DecksStackParamList, 'ImportExport'>
 
 export function ImportExportScreen() {
   const theme = useTheme()
+  const { t } = useTranslation()
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { deckId } = route.params

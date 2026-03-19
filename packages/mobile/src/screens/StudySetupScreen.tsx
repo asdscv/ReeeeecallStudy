@@ -44,6 +44,7 @@ const TIME_LIMITS = [
 
 export function StudySetupScreen() {
   const theme = useTheme()
+  const { t } = useTranslation()
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const preselectedDeckId = route.params?.deckId

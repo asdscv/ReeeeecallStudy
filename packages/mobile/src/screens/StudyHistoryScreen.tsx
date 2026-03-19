@@ -44,6 +44,7 @@ import type { HomeStackParamList } from '../navigation/types'
  */
 export function StudyHistoryScreen() {
   const theme = useTheme()
+  const { t } = useTranslation()
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
   const { user } = useAuthState()
   const { decks } = useDecks()

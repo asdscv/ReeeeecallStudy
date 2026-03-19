@@ -35,7 +35,7 @@ export function DecksListScreen() {
   }, [decks, search])
 
   const handleDelete = (deckId: string, name: string) => {
-    Alert.alert(t('deleteDeck'), t('deleteConfirm', { name: "${name}"?`, [
+    Alert.alert(t('deleteDeck'), t('deleteConfirm', { name }), [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteDeck(deckId) },
     ])

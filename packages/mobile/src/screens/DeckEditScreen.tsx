@@ -30,6 +30,7 @@ const SRS_INTERVAL_FIELDS: { key: keyof SrsSettings; label: string; color: strin
 
 export function DeckEditScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const deckId = route.params?.deckId

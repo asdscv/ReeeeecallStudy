@@ -48,15 +48,15 @@ export function MainTabs() {
       }}
     >
       <Tab.Screen name="HomeTab" component={HomeStack}
-        options={{ tabBarLabel: t('nav.dashboard'), tabBarTestID: 'HomeTab', tabBarAccessibilityLabel: 'HomeTab', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.dashboard'), tabBarAccessibilityLabel: 'HomeTab', tabBarIcon: ({ focused }) => <TabIcon name="HomeTab" focused={focused} /> }} />
       <Tab.Screen name="DecksTab" component={DecksStack}
-        options={{ tabBarLabel: t('nav.decks'), tabBarTestID: 'DecksTab', tabBarAccessibilityLabel: 'DecksTab', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.decks'), tabBarAccessibilityLabel: 'DecksTab', tabBarIcon: ({ focused }) => <TabIcon name="DecksTab" focused={focused} /> }} />
       <Tab.Screen name="StudyTab" component={StudyStack}
-        options={{ tabBarLabel: t('nav.study'), tabBarTestID: 'StudyTab', tabBarAccessibilityLabel: 'StudyTab', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.study'), tabBarAccessibilityLabel: 'StudyTab', tabBarIcon: ({ focused }) => <TabIcon name="StudyTab" focused={focused} /> }} />
       <Tab.Screen name="MarketplaceTab" component={MarketplaceStack}
-        options={{ tabBarLabel: t('nav.marketplace'), tabBarTestID: 'MarketplaceTab', tabBarAccessibilityLabel: 'MarketplaceTab', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.marketplace'), tabBarAccessibilityLabel: 'MarketplaceTab', tabBarIcon: ({ focused }) => <TabIcon name="MarketplaceTab" focused={focused} /> }} />
       <Tab.Screen name="SettingsTab" component={SettingsStack}
-        options={{ tabBarLabel: t('nav.settings'), tabBarTestID: 'SettingsTab', tabBarAccessibilityLabel: 'SettingsTab', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
+        options={{ tabBarLabel: t('nav.settings'), tabBarAccessibilityLabel: 'SettingsTab', tabBarIcon: ({ focused }) => <TabIcon name="SettingsTab" focused={focused} /> }} />
     </Tab.Navigator>
   )
 }

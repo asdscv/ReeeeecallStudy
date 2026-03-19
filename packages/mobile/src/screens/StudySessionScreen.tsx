@@ -34,6 +34,7 @@ const RATING_COLORS: Record<string, string> = {
 
 export function StudySessionScreen() {
   const theme = useTheme()
+  const { t } = useTranslation()
   const navigation = useNavigation<Nav>()
   const {
     phase, currentCard, isFlipped, isRating, template, config,

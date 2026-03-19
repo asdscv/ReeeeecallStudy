@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput } from '../components/ui'
-import { useTranslation } from 'react-i18next'
+
 import { useTheme, palette } from '../theme'
 
 // ── Inline guide data (matches web guide.json EN) ──────────────────
@@ -151,7 +151,7 @@ export function GuideScreen() {
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>{'← Back'}</Text>
         </TouchableOpacity>
 
-        <Text style={[theme.typography.h2, styles.pageTitle, { color: theme.colors.text }]}>{t('title')}</Text>
+        <Text style={[theme.typography.h2, styles.pageTitle, { color: theme.colors.text }]}>Guide</Text>
         <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginBottom: 12 }]}>
           Learn all features of ReeeeecallStudy
         </Text>
@@ -161,13 +161,13 @@ export function GuideScreen() {
           testID="guide-search"
           value={search}
           onChangeText={setSearch}
-          placeholder={t('searchPlaceholder', { defaultValue: 'Search features (e.g., SRS, Import, Share...)"
+          placeholder={'Search features (e.g., SRS, Import, Share...)'}
         />
 
         {/* Table of Contents — matches web */}
         {!query && (
           <View style={[styles.tocCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.tocTitle, { color: theme.colors.text }]}>{t('tableOfContents')}</Text>
+            <Text style={[styles.tocTitle, { color: theme.colors.text }]}>{'Table of Contents'}</Text>
             {SECTIONS.map((s) => (
               <TouchableOpacity
                 key={s.id}

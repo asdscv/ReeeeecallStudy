@@ -23,6 +23,7 @@ const RATING_COLORS: Record<string, string> = {
 
 export function StudySummaryScreen() {
   const theme = useTheme()
+  const { t } = useTranslation()
   const navigation = useNavigation<Nav>()
   const { sessionStats, config, reset } = useStudy()
 
