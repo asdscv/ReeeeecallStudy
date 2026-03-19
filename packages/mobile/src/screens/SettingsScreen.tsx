@@ -29,8 +29,8 @@ const LANGUAGES = [
 ]
 
 const TTS_PROVIDERS = [
-  { value: 'web_speech' as const, label: 'Device Voice', desc: "Uses your device's built-in voice", note: '' },
-  { value: 'edge_tts' as const, label: 'Edge TTS', desc: 'Higher quality neural voice', note: '* Currently supports English only' },
+  { value: 'web_speech' as const, label: 'Device Voice', desc: "Uses your device's built-in voice", noteKey: '' },
+  { value: 'edge_tts' as const, label: 'Edge TTS', desc: 'Higher quality neural voice', noteKey: 'tts.edgeTtsNote' },
 ]
 
 const AI_PROVIDERS = [
@@ -377,7 +377,7 @@ export function SettingsScreen() {
                     >
                       <Text style={[styles.modeLabel, { color: theme.colors.text }]}>{prov.label}</Text>
                       <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{prov.desc}</Text>
-                      {prov.note ? <Text style={{ fontSize: 11, color: '#F59E0B', marginTop: 2 }}>{prov.note}</Text> : null}
+                      {prov.noteKey ? <Text style={{ fontSize: 11, color: '#F59E0B', marginTop: 2 }}>{t(prov.noteKey, { ns: 'settings' })}</Text> : null}
                     </TouchableOpacity>
                   )
                 })}

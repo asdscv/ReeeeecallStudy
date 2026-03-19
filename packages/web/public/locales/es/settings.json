@@ -70,6 +70,7 @@
     "webSpeechDesc": "Usa la voz integrada del dispositivo",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Voz neural de alta calidad",
+    "edgeTtsNote": "* Actualmente solo compatible con inglés",
     "speed": "Velocidad de lectura",
     "help": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
     "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática."

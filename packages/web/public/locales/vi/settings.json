@@ -78,6 +78,7 @@
     "webSpeechDesc": "Sử dụng giọng nói tích hợp trên thiết bị",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Giọng nói thần kinh chất lượng cao",
+    "edgeTtsNote": "* Hiện chỉ hỗ trợ tiếng Anh",
     "speed": "Tốc độ đọc",
     "help": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
     "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động."

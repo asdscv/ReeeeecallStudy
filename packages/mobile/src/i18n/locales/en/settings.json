@@ -33,7 +33,8 @@
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Higher quality neural voice",
     "readingSpeed": "Reading Speed",
-    "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading."
+    "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading.",
+    "edgeTtsNote": "* Currently supports English only"
   },
   "srsConfig": {
     "title": "SRS Configuration",

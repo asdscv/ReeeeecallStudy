@@ -78,6 +78,7 @@
     "webSpeechDesc": "Uses your device's built-in voice",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Higher quality neural voice",
+    "edgeTtsNote": "* Currently supports English only",
     "speed": "Reading Speed",
     "help": "TTS language follows field settings in card template. Play button always shows regardless of auto reading.",
     "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading."

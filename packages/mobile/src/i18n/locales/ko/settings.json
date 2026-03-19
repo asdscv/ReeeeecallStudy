@@ -33,7 +33,8 @@
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "고품질 신경망 음성",
     "readingSpeed": "읽기 속도",
-    "note": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다."
+    "note": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다.",
+    "edgeTtsNote": "* 현재 영어만 지원됩니다"
   },
   "srsConfig": {
     "title": "SRS 구성",

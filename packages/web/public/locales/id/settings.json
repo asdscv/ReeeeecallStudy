@@ -78,6 +78,7 @@
     "webSpeechDesc": "Menggunakan suara bawaan perangkat",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Suara neural berkualitas tinggi",
+    "edgeTtsNote": "* Saat ini hanya mendukung bahasa Inggris",
     "speed": "Kecepatan baca",
     "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
     "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
