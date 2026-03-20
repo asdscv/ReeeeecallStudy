@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "卡片列表",
       "uploadDate": "上传日期",
-      "statistics": "统计"
+      "statistics": "统计",
+      "versions": "Versions"
     },
     "searchPlaceholder": "搜索卡片...",
     "allStatus": "全部状态",
@@ -39,7 +40,8 @@
     "deleteCardConfirm": "确定删除此卡片？此操作不可撤销。",
     "bulkDelete": "批量删除卡片",
     "bulkDeleteConfirm": "确定删除 {{count}} 张选中的卡片？此操作不可撤销。",
-    "noStudyRecords": "暂无学习记录"
+    "noStudyRecords": "暂无学习记录",
+    "aiCards": "AI Cards"
   },
   "settings": {
     "deckName": "牌组名称",
@@ -138,5 +140,16 @@
     "tagsPlaceholder": "输入标签后按回车",
     "templateNotSet": "请设置模板",
     "goToSettings": "去设置 →"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   }
 }

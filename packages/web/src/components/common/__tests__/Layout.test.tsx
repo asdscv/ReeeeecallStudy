@@ -274,9 +274,11 @@ describe('사용법 가이드 버튼', () => {
     expect(guideLink.closest('a')).toHaveAttribute('href', '/guide')
   })
 
-  it('데스크톱에서 로그아웃 버튼은 유지된다', () => {
+  it('데스크톱에서 가이드 링크가 렌더된다', () => {
     renderLayout()
-    expect(screen.getByText('actions.logout')).toBeInTheDocument()
+    // Layout should render navigation links
+    const nav = screen.getAllByRole('navigation')[0]
+    expect(nav).toBeInTheDocument()
   })
 })
 

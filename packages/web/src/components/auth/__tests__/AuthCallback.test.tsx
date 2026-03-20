@@ -173,7 +173,7 @@ describe('Recovery hash type handling', () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 
-  it('should NOT navigate on INITIAL_SESSION without recovery hash', () => {
+  it('should navigate to dashboard on INITIAL_SESSION with non-recovery hash and valid session', () => {
     _setCapturedHash('#access_token=abc&type=signup')
 
     let callback: AuthCallback = () => {}
@@ -184,6 +184,22 @@ describe('Recovery hash type handling', () => {
 
     renderCallback()
     act(() => callback('INITIAL_SESSION', fakeSession))
+
+    // INITIAL_SESSION with session + non-recovery hash → navigate to dashboard (OAuth PKCE flow)
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true })
+  })
+
+  it('should NOT navigate on INITIAL_SESSION without session', () => {
+    _setCapturedHash('#access_token=abc&type=signup')
+
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+
+    renderCallback()
+    act(() => callback('INITIAL_SESSION', null))
 
     expect(mockNavigate).not.toHaveBeenCalled()
   })

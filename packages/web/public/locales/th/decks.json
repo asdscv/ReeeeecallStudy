@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "รายการการ์ด",
       "uploadDate": "วันที่อัปโหลด",
-      "statistics": "สถิติ"
+      "statistics": "สถิติ",
+      "versions": "Versions"
     },
     "searchPlaceholder": "ค้นหาการ์ด...",
     "allStatus": "สถานะทั้งหมด",
@@ -39,7 +40,8 @@
     "deleteCardConfirm": "ลบการ์ดนี้? ไม่สามารถเลิกทำได้",
     "bulkDelete": "ลบการ์ดหลายรายการ",
     "bulkDeleteConfirm": "ลบ {{count}} การ์ดที่เลือก? ไม่สามารถเลิกทำได้",
-    "noStudyRecords": "ไม่มีบันทึกการเรียน"
+    "noStudyRecords": "ไม่มีบันทึกการเรียน",
+    "aiCards": "AI Cards"
   },
   "settings": {
     "deckName": "ชื่อสำรับ",
@@ -138,5 +140,16 @@
     "tagsPlaceholder": "พิมพ์แท็กแล้วกด Enter",
     "templateNotSet": "กรุณาตั้งค่าเทมเพลต",
     "goToSettings": "ไปที่ตั้งค่า →"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   }
 }

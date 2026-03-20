@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "Lista de tarjetas",
       "uploadDate": "Fecha de subida",
-      "statistics": "Estadísticas"
+      "statistics": "Estadísticas",
+      "versions": "Versions"
     },
     "searchPlaceholder": "Buscar tarjetas...",
     "allStatus": "Todos los estados",
@@ -39,7 +40,8 @@
     "deleteCardConfirm": "¿Eliminar esta tarjeta? Esto no se puede deshacer.",
     "bulkDelete": "Eliminar tarjetas en lote",
     "bulkDeleteConfirm": "¿Eliminar {{count}} tarjetas seleccionadas? Esto no se puede deshacer.",
-    "noStudyRecords": "Sin registros de estudio"
+    "noStudyRecords": "Sin registros de estudio",
+    "aiCards": "AI Cards"
   },
   "settings": {
     "deckName": "Nombre del mazo",
@@ -138,5 +140,16 @@
     "tagsPlaceholder": "Escribe una etiqueta y presiona Enter",
     "templateNotSet": "Por favor establece una plantilla",
     "goToSettings": "Ir a ajustes →"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   }
 }

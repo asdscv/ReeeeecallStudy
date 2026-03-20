@@ -62,7 +62,12 @@
     "backToDeck": "デッキに戻る",
     "exitConfirmTitle": "学習を終了しますか？",
     "exitConfirmMessage": "これまでの学習記録は保存されます。",
-    "exitConfirmButton": "終了"
+    "exitConfirmButton": "終了",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused",
+    "pressSpaceToResume": "Press Space to resume",
+    "undo": "Undo"
   },
   "card": {
     "tapToFlip": "タップして裏返す",
@@ -113,7 +118,15 @@
     "of": "{{current}} / {{total}}"
   },
   "datePicker": {
-    "weekdays": ["日", "月", "火", "水", "木", "金", "土"]
+    "weekdays": [
+      "日",
+      "月",
+      "火",
+      "水",
+      "木",
+      "金",
+      "土"
+    ]
   },
   "interval": {
     "lessThanTenMin": "< 10分",
@@ -184,5 +197,14 @@
       "title": "学習するカードがありません",
       "message": "条件に合うカードがありません。"
     }
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "description": "Available shortcuts during study sessions",
+    "rateCards": "Rate Again / Hard / Good / Easy",
+    "flipOrPause": "Flip card / Pause-Resume",
+    "undoRating": "Undo last rating",
+    "exitStudy": "Exit study",
+    "toggleHelp": "Toggle this help"
   }
 }

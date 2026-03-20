@@ -34,7 +34,8 @@
     "getDeck": "Dapatkan Dek Ini",
     "importing": "Mengimpor...",
     "cardPreview": "Pratinjau Kartu (maks 10)",
-    "noCards": "Tidak ada kartu."
+    "noCards": "Tidak ada kartu.",
+    "reportContent": "Report"
   },
   "preview": {
     "title": "\"{{title}}\" - Dek Kartu Kilat | ReeeeecallStudy",
@@ -51,5 +52,21 @@
     "notFound": "Dek tidak ditemukan",
     "notFoundDescription": "Dek ini mungkin telah dihapus atau tidak lagi tersedia.",
     "backToHome": "Kembali ke Beranda"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   }
 }

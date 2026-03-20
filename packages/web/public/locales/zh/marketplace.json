@@ -34,7 +34,8 @@
     "getDeck": "获取此牌组",
     "importing": "导入中...",
     "cardPreview": "卡片预览（最多 10 张）",
-    "noCards": "暂无卡片。"
+    "noCards": "暂无卡片。",
+    "reportContent": "Report"
   },
   "preview": {
     "title": "\"{{title}}\" - 闪卡牌组 | ReeeeecallStudy",
@@ -51,5 +52,21 @@
     "notFound": "牌组未找到",
     "notFoundDescription": "此牌组可能已被移除或不再可用。",
     "backToHome": "返回首页"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   }
 }

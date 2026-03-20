@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "Danh sách thẻ",
       "uploadDate": "Ngày tải lên",
-      "statistics": "Thống kê"
+      "statistics": "Thống kê",
+      "versions": "Versions"
     },
     "searchPlaceholder": "Tìm kiếm thẻ...",
     "allStatus": "Tất cả trạng thái",
@@ -39,7 +40,8 @@
     "deleteCardConfirm": "Xóa thẻ này? Không thể hoàn tác.",
     "bulkDelete": "Xóa hàng loạt thẻ",
     "bulkDeleteConfirm": "Xóa {{count}} thẻ đã chọn? Không thể hoàn tác.",
-    "noStudyRecords": "Không có hồ sơ học tập"
+    "noStudyRecords": "Không có hồ sơ học tập",
+    "aiCards": "AI Cards"
   },
   "settings": {
     "deckName": "Tên bộ thẻ",
@@ -138,5 +140,16 @@
     "tagsPlaceholder": "Nhập thẻ gắn rồi nhấn Enter",
     "templateNotSet": "Vui lòng đặt mẫu",
     "goToSettings": "Đến cài đặt →"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   }
 }

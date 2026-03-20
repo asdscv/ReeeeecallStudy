@@ -34,7 +34,8 @@
     "getDeck": "Lấy bộ thẻ này",
     "importing": "Đang nhập...",
     "cardPreview": "Xem trước thẻ (tối đa 10)",
-    "noCards": "Không có thẻ."
+    "noCards": "Không có thẻ.",
+    "reportContent": "Report"
   },
   "preview": {
     "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | ReeeeecallStudy",
@@ -51,5 +52,21 @@
     "notFound": "Không tìm thấy bộ thẻ",
     "notFoundDescription": "Bộ thẻ này có thể đã bị xóa hoặc không còn khả dụng.",
     "backToHome": "Quay lại trang chủ"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   }
 }

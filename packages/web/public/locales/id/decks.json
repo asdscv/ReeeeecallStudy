@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "Daftar Kartu",
       "uploadDate": "Tanggal Unggahan",
-      "statistics": "Statistik"
+      "statistics": "Statistik",
+      "versions": "Versions"
     },
     "searchPlaceholder": "Cari kartu...",
     "allStatus": "Semua Status",
@@ -39,7 +40,8 @@
     "deleteCardConfirm": "Hapus kartu ini? Tindakan ini tidak dapat dibatalkan.",
     "bulkDelete": "Hapus Kartu Massal",
     "bulkDeleteConfirm": "Hapus {{count}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
-    "noStudyRecords": "Tidak ada catatan belajar"
+    "noStudyRecords": "Tidak ada catatan belajar",
+    "aiCards": "AI Cards"
   },
   "settings": {
     "deckName": "Nama Dek",
@@ -138,5 +140,16 @@
     "tagsPlaceholder": "Masukkan tag lalu tekan Enter",
     "templateNotSet": "Silakan tetapkan templat",
     "goToSettings": "Ke pengaturan →"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   }
 }

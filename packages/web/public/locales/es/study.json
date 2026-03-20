@@ -62,7 +62,12 @@
     "backToDeck": "Volver al mazo",
     "exitConfirmTitle": "¿Terminar la sesión?",
     "exitConfirmMessage": "Tu progreso se guardará.",
-    "exitConfirmButton": "Terminar"
+    "exitConfirmButton": "Terminar",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused",
+    "pressSpaceToResume": "Press Space to resume",
+    "undo": "Undo"
   },
   "card": {
     "tapToFlip": "Toca para voltear",
@@ -113,7 +118,15 @@
     "of": "{{current}} / {{total}}"
   },
   "datePicker": {
-    "weekdays": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+    "weekdays": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ]
   },
   "interval": {
     "lessThanTenMin": "< 10min",
@@ -184,5 +197,14 @@
       "title": "Sin tarjetas para estudiar",
       "message": "No hay tarjetas que coincidan con tus criterios."
     }
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "description": "Available shortcuts during study sessions",
+    "rateCards": "Rate Again / Hard / Good / Easy",
+    "flipOrPause": "Flip card / Pause-Resume",
+    "undoRating": "Undo last rating",
+    "exitStudy": "Exit study",
+    "toggleHelp": "Toggle this help"
   }
 }
