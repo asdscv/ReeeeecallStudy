@@ -21,5 +21,8 @@ export const config: WebdriverIO.Config = {
     'appium:adbExecTimeout': 120000,
     'appium:appPackage': 'com.reeeeecall.study',
     'appium:appActivity': '.MainActivity',
+    // Auto-dismiss ANR/crash dialogs to prevent test blocking
+    'appium:disableWindowAnimation': true,
+    'appium:ignoreUnimportantViews': false,
   }],
 }

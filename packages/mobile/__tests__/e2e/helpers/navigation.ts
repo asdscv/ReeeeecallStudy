@@ -77,7 +77,18 @@ export async function navigateToDrawerItem(itemName: string) {
   // If item is inside Study group, expand it first
   if (needsStudyGroup) {
     await tapDrawerTestID('drawer-study-group')
-    await browser.pause(500)
+    await browser.pause(1500) // Wait for group expansion animation + re-render
+
+    // Verify the group expanded — retry once if needed
+    const testID = DRAWER_TEST_IDS[itemName]
+    if (testID) {
+      const targetEl = $(`~${testID}`)
+      if (!await targetEl.isExisting().catch(() => false)) {
+        // Group might not have expanded — try tapping again
+        await tapDrawerTestID('drawer-study-group')
+        await browser.pause(1500)
+      }
+    }
   }
 
   // Tap the item by testID

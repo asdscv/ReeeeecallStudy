@@ -83,7 +83,7 @@ describe('Study Flow — Full E2E', () => {
       // Handle stale states from previous runs
       for (let round = 0; round < 3; round++) {
         if (await StudySetupScreen.isDisplayed()) break
-        const done = $('~summary-done')
+        const done = $('~summary-back-to-deck')
         if (await done.isDisplayed().catch(() => false)) { await done.click(); await browser.pause(1000); continue }
         const exit = $('~study-exit-button')
         if (await exit.isDisplayed().catch(() => false)) {
@@ -134,14 +134,8 @@ describe('Study Flow — Full E2E', () => {
     })
 
     it('should show start button', async () => {
-      // Start button is at the bottom — may need multiple scrolls to reach it
-      for (let i = 0; i < 5; i++) {
-        const visible = await StudySetupScreen.startButton.isDisplayed().catch(() => false)
-        const exists = await StudySetupScreen.startButton.isExisting().catch(() => false)
-        if (visible || exists) break
-        await scrollDown().catch(() => {})
-        await browser.pause(500)
-      }
+      // Use UiScrollable on Android to reliably scroll to the start button
+      await StudySetupScreen.scrollToStartButton()
       const visible = await StudySetupScreen.startButton.isDisplayed().catch(() => false)
       const exists = await StudySetupScreen.startButton.isExisting().catch(() => false)
       expect(visible || exists).toBe(true)
@@ -152,27 +146,35 @@ describe('Study Flow — Full E2E', () => {
   describe('StudySessionScreen', () => {
     it('should select test deck and start SRS session', async () => {
       // Scroll to top first — may need multiple scrolls after previous test scrolled down
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 8; i++) {
         await scrollUp().catch(() => {})
         await browser.pause(300)
       }
       await browser.pause(500)
 
       // Select our freshly created test deck (has 3 new cards)
-      // On Android, content-desc may not be set for deck chips — use text selector
-      const byId = $(`~study-deck-${testDeckId}`)
-      const byName = driver.isIOS ? byId : $('android=new UiSelector().text("_E2E Study Test")')
+      let chip: WebdriverIO.Element
 
-      let chip: WebdriverIO.Element = byId
-      // Search for the deck — scroll down from top
-      for (let i = 0; i < 8; i++) {
-        if (await byName.isExisting().catch(() => false)) { chip = byName; break }
-        if (await byId.isExisting().catch(() => false)) { chip = byId; break }
-        await scrollDown().catch(() => {})
-        await browser.pause(300)
+      if (driver.isAndroid) {
+        // Android: use UiScrollable to find deck by text (most reliable)
+        try {
+          chip = $(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("_E2E Study Test"))`)
+          await chip.waitForExist({ timeout: 10000 })
+        } catch {
+          // Fallback to content-desc
+          chip = $(`~study-deck-${testDeckId}`)
+          await chip.waitForExist({ timeout: 5000 })
+        }
+      } else {
+        chip = $(`~study-deck-${testDeckId}`)
+        for (let i = 0; i < 8; i++) {
+          if (await chip.isExisting().catch(() => false)) break
+          await scrollDown().catch(() => {})
+          await browser.pause(300)
+        }
+        await chip.waitForExist({ timeout: 5000 })
       }
 
-      await chip.waitForExist({ timeout: 5000 })
       await chip.click()
       await browser.pause(500)
 
@@ -245,7 +247,7 @@ describe('Study Flow — Full E2E', () => {
       for (let i = 0; i < 10; i++) {
         // Check if session is already complete (summary screen appeared)
         if (await StudySummaryScreen.screen.isExisting().catch(() => false)) break
-        if (await $('~summary-done').isExisting().catch(() => false)) break
+        if (await $('~summary-back-to-deck').isExisting().catch(() => false)) break
 
         const hasCard = await StudySessionScreen.isCardVisible()
         if (!hasCard) break

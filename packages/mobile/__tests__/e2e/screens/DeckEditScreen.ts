@@ -124,9 +124,20 @@ class DeckEditScreenPO {
   async save() {
     // Dismiss keyboard first
     await dismissKeyboard()
+    await browser.pause(500)
+
+    if (driver.isAndroid) {
+      // Use UiScrollable to reliably find the save button
+      try {
+        const el = $('android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().description("deck-edit-save"))')
+        await el.waitForExist({ timeout: 10000 })
+        await el.click()
+        return
+      } catch { /* fallback */ }
+    }
 
     // Scroll down to find save button
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       if (await this.saveButton.isDisplayed().catch(() => false)) break
       await scrollDown().catch(() => {})
       await browser.pause(300)

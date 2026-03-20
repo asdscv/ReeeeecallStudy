@@ -2,20 +2,20 @@
   "cookies": [
     {
       "name": "_ga",
-      "value": "GA1.1.1422218418.1773576727",
+      "value": "GA1.1.786371083.1773652669",
       "domain": "localhost",
       "path": "/",
-      "expires": 1808136727.32479,
+      "expires": 1808212669.128631,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
-      "name": "_ga_61SKTZK5QG",
-      "value": "GS2.1.s1773576727$o1$g1$t1773576728$j59$l0$h0",
+      "name": "_ga_85JRGBB307",
+      "value": "GS2.1.s1773652669$o1$g1$t1773652669$j60$l0$h0",
       "domain": "localhost",
       "path": "/",
-      "expires": 1808136728.728442,
+      "expires": 1808212669.994915,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
@@ -27,7 +27,11 @@
       "localStorage": [
         {
           "name": "sb-ixdapelfikaneexnskfm-auth-token",
-          "value": "{\"access_token\":\"eyJhbGciOiJFUzI1NiIsImtpZCI6IjJhNDM5ZGZiLWU5MzUtNDgxYy1iNTAyLTI5ZDgyMzQ0OWFkOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2l4ZGFwZWxmaWthbmVleG5za2ZtLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJlYWVlNGNkYi00ZmE4LTQ2ODktYTU3My01Y2M2NTMxYTIzMWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzczNTgwMzI4LCJpYXQiOjE3NzM1NzY3MjgsImVtYWlsIjoiYXNkc2N2QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJhc2RzY3ZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiZWFlZTRjZGItNGZhOC00Njg5LWE1NzMtNWNjNjUzMWEyMzFmIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NzM1NzY3Mjh9XSwic2Vzc2lvbl9pZCI6Ijk2Y2FlNjM3LTBkZDctNDZjYy05MDBkLTRkZmQyYjQ1NzJmNSIsImlzX2Fub255bW91cyI6ZmFsc2V9.eJ6ubtvU2n3H9tjmefInMXy1vjZNJAm8Zl2_IUIIWoDQpKm7BE67eavPxE7i3_cPtjNH-6QMByXX0i7fxJi2lg\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1773580328,\"refresh_token\":\"5fad3pku7oh6\",\"user\":{\"id\":\"eaee4cdb-4fa8-4689-a573-5cc6531a231f\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"asdscv@gmail.com\",\"email_confirmed_at\":\"2026-02-14T17:47:31.637635Z\",\"phone\":\"\",\"confirmed_at\":\"2026-02-14T17:47:31.637635Z\",\"last_sign_in_at\":\"2026-03-15T12:12:08.585481004Z\",\"app_metadata\":{\"provider\":\"email\",\"providers\":[\"email\"]},\"user_metadata\":{\"email\":\"asdscv@gmail.com\",\"email_verified\":true,\"phone_verified\":false,\"sub\":\"eaee4cdb-4fa8-4689-a573-5cc6531a231f\"},\"identities\":[{\"identity_id\":\"0c6df5ec-d1f5-4ed1-9cfa-2ac58b318d98\",\"id\":\"eaee4cdb-4fa8-4689-a573-5cc6531a231f\",\"user_id\":\"eaee4cdb-4fa8-4689-a573-5cc6531a231f\",\"identity_data\":{\"email\":\"asdscv@gmail.com\",\"email_verified\":false,\"phone_verified\":false,\"sub\":\"eaee4cdb-4fa8-4689-a573-5cc6531a231f\"},\"provider\":\"email\",\"last_sign_in_at\":\"2026-02-14T17:31:22.822655Z\",\"created_at\":\"2026-02-14T17:31:22.822704Z\",\"updated_at\":\"2026-02-14T17:31:22.822704Z\",\"email\":\"asdscv@gmail.com\"}],\"created_at\":\"2026-02-14T17:31:22.80105Z\",\"updated_at\":\"2026-03-15T12:12:08.605055Z\",\"is_anonymous\":false},\"weak_password\":null}"
+          "value": "{\"access_token\":\"eyJhbGciOiJFUzI1NiIsImtpZCI6IjJhNDM5ZGZiLWU5MzUtNDgxYy1iNTAyLTI5ZDgyMzQ0OWFkOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2l4ZGFwZWxmaWthbmVleG5za2ZtLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOGQyOGQzYi02OGU1LTRlOTMtYjMwNC1lZGU1MDQ2ZTA2ZjgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzczNjU2MjY5LCJpYXQiOjE3NzM2NTI2NjksImVtYWlsIjoibHVrZUByaWN0YXgua3IiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImRpc3BsYXlfbmFtZSI6Imx1a2UifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc3MzY1MjY2OX1dLCJzZXNzaW9uX2lkIjoiYzk4OWI0YmItZDAzOC00NDFkLWIyZGEtN2MzNWFmNzY0NTU4IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.QRoQaUWa_rua174oTk8YFcLuDhREPXn-J5AsttyWv0MBWnD7aaqFUIW9J5FD-fzC30xnH7I8fxSnKaCSqto7nQ\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1773656269,\"refresh_token\":\"4e6icjcjvpok\",\"user\":{\"id\":\"d8d28d3b-68e5-4e93-b304-ede5046e06f8\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"luke@rictax.kr\",\"email_confirmed_at\":\"2026-02-20T08:16:01.708785Z\",\"phone\":\"\",\"confirmed_at\":\"2026-02-20T08:16:01.708785Z\",\"last_sign_in_at\":\"2026-03-16T09:17:49.825763314Z\",\"app_metadata\":{\"provider\":\"email\",\"providers\":[\"email\"]},\"user_metadata\":{\"display_name\":\"luke\"},\"identities\":[],\"created_at\":\"2026-02-20T08:16:01.708785Z\",\"updated_at\":\"2026-03-16T09:17:49.878848Z\",\"is_anonymous\":false},\"weak_password\":null}"
+        },
+        {
+          "name": "reeeeecall_device_id",
+          "value": "05c248dc-56e8-45e1-bc69-732dc08f27a6"
         },
         {
           "name": "reeeeecall-lang",

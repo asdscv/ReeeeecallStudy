@@ -53,7 +53,6 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
             ref={ref}
             testID={testID}
             accessibilityLabel={testID}
-            {...(Platform.OS === 'android' ? { accessible: false } : {})}
             style={styles.input}
             placeholderTextColor={theme.colors.inputPlaceholder}
             secureTextEntry={isPassword && !secureVisible}

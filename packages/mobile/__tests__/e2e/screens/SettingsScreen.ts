@@ -47,8 +47,21 @@ class SettingsScreenPO {
   }
 
   async scrollToLogout() {
-    for (let i = 0; i < 8; i++) {
+    // Try direct visibility first
+    if (await this.logoutButton.isDisplayed().catch(() => false)) return
+
+    if (driver.isAndroid) {
+      // Use UiScrollable to scroll to the logout button (more reliable than manual swipe)
+      try {
+        const el = $('android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId("settings-logout"))')
+        await el.waitForExist({ timeout: 10000 })
+        return
+      } catch { /* fallback to manual scroll */ }
+    }
+
+    for (let i = 0; i < 10; i++) {
       if (await this.logoutButton.isDisplayed().catch(() => false)) return
+      if (await this.logoutButton.isExisting().catch(() => false)) return
       await scrollDown().catch(() => {})
       await browser.pause(400)
     }

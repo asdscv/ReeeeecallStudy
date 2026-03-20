@@ -4,7 +4,7 @@ class StudySummaryScreenPO {
   get accuracy() { return $('~summary-accuracy') }
   get time() { return $('~summary-time') }
   get studyAgainButton() { return $('~summary-study-again') }
-  get doneButton() { return $('~summary-done') }
+  get doneButton() { return $('~summary-back-to-deck') }
 
   async waitForScreen() { await this.screen.waitForDisplayed({ timeout: 10000 }) }
   async isDisplayed() { return this.screen.isDisplayed() }

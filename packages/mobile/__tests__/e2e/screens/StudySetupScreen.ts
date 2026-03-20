@@ -39,7 +39,18 @@ class StudySetupScreenPO {
   }
 
   async selectMode(mode: string) {
-    const modeCard = $(`~study-mode-${mode}`)
+    const modeSelector = `study-mode-${mode}`
+    const modeCard = $(`~${modeSelector}`)
+
+    if (driver.isAndroid) {
+      try {
+        const el = $(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().description("${modeSelector}"))`)
+        await el.waitForExist({ timeout: 8000 })
+        await el.click()
+        return
+      } catch { /* fallback */ }
+    }
+
     for (let i = 0; i < 3; i++) {
       if (await modeCard.isDisplayed().catch(() => false)) break
       await scrollDown().catch(() => {})
@@ -50,13 +61,27 @@ class StudySetupScreenPO {
   }
 
   async start() {
-    for (let i = 0; i < 3; i++) {
-      if (await this.startButton.isDisplayed().catch(() => false)) break
+    await this.scrollToStartButton()
+    await this.startButton.waitForDisplayed({ timeout: 5000 })
+    await this.startButton.click()
+  }
+
+  async scrollToStartButton() {
+    if (await this.startButton.isDisplayed().catch(() => false)) return
+
+    if (driver.isAndroid) {
+      try {
+        const el = $('android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().description("study-start-button"))')
+        await el.waitForExist({ timeout: 8000 })
+        return
+      } catch { /* fallback */ }
+    }
+
+    for (let i = 0; i < 5; i++) {
+      if (await this.startButton.isDisplayed().catch(() => false)) return
       await scrollDown().catch(() => {})
       await browser.pause(300)
     }
-    await this.startButton.waitForDisplayed({ timeout: 5000 })
-    await this.startButton.click()
   }
 }
 

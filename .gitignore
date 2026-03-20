@@ -28,6 +28,9 @@ test-results/
 blob-report/
 .env.test
 
+# Study data (CSV bulk upload sources)
+STUDY_DATA/
+
 # Apple private keys
 AuthKey_*.p8
 
