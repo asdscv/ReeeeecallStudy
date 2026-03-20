@@ -90,5 +90,45 @@
   "officialBadge": {
     "label": "공식",
     "tooltip": "공식 계정"
+  },
+  "onboarding": {
+    "skip": "건너뛰기",
+    "next": "다음",
+    "back": "이전",
+    "finish": "완료",
+    "getStarted": "시작하기",
+    "stepOf": "{{total}}단계 중 {{current}}단계",
+    "welcome": {
+      "title": "Reeeeecall에 오신 것을 환영합니다!",
+      "description": "플래시카드로 가장 스마트하게 공부하는 방법. 덱을 만들고, 카드를 추가하고, 간격 반복 알고리즘으로 학습을 최적화하세요.",
+      "action": "시작하기"
+    },
+    "createDeck": {
+      "title": "첫 번째 덱 만들기",
+      "description": "덱은 특정 주제에 대한 플래시카드 모음입니다. 공부하고 싶은 주제로 하나 만들어 보세요.",
+      "action": "덱 만들기"
+    },
+    "cardTemplate": {
+      "title": "카드 템플릿 선택하기",
+      "description": "템플릿은 카드의 모양을 정의합니다. 기본 앞/뒤 템플릿을 사용하거나, 언어, 시험 등 특화된 템플릿을 선택하세요.",
+      "action": "템플릿 보기"
+    },
+    "addCards": {
+      "title": "덱에 카드 추가하기",
+      "description": "직접 카드를 추가하거나, CSV에서 가져오거나, AI를 사용하여 어떤 주제든 자동으로 카드를 생성하세요.",
+      "action": "카드 추가",
+      "actionAlt": "AI 생성 사용"
+    },
+    "firstStudy": {
+      "title": "학습 시작!",
+      "description": "학습 모드를 선택하세요: 장기 기억을 위한 SRS(간격 반복), 빠른 복습을 위한 랜덤/순차 모드. 각 카드를 평가하여 진도를 추적하세요.",
+      "action": "학습 시작"
+    },
+    "exploreMarket": {
+      "title": "마켓플레이스 탐색",
+      "description": "다른 사용자들이 만든 수천 개의 공유 덱을 발견하세요. 어떤 과목이든 학습 자료를 찾아 바로 학습을 시작하세요.",
+      "action": "마켓 둘러보기",
+      "actionFinish": "설정 완료"
+    }
   }
 }
