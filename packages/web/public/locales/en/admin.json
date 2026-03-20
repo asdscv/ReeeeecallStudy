@@ -7,7 +7,8 @@
     "market": "Market",
     "official": "Official",
     "contents": "Contents",
-    "system": "System"
+    "system": "System",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "Overview",
@@ -218,6 +219,55 @@
       "content": "Content Pipeline",
       "study": "Study Activity"
     }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "users": {
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "Retry",
   "noData": "No data available",

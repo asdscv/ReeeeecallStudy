@@ -10,18 +10,26 @@ import { AdminStatCard } from '../../components/admin/AdminStatCard'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
 import { computeUserGrowthSeries, computeActiveInactiveUsers, formatStatNumber, userRoleLabel } from '../../lib/admin-stats'
 import { formatLocalDate } from '../../lib/date-utils'
+import { exportToCsv, EXPORT_CONFIGS } from '../../lib/csv-export'
 
 const PAGE_SIZE = 20
+
+const STATUS_STYLES: Record<string, string> = {
+  active: 'bg-green-100 text-green-700',
+  suspended: 'bg-yellow-100 text-yellow-700',
+  banned: 'bg-red-100 text-red-700',
+}
 
 export function AdminUsersPage() {
   const { t, i18n } = useTranslation('admin')
   const {
     userSignups, userList, userListTotal, retentionMetrics,
     usersLoading, usersError, fetchUsers,
-    activeUsers, fetchOverview, setOfficialStatus,
+    activeUsers, fetchOverview, setOfficialStatus, setUserStatus,
   } = useAdminStore()
   const [page, setPage] = useState(0)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [statusChangingId, setStatusChangingId] = useState<string | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('')
@@ -114,7 +122,16 @@ export function AdminUsersPage() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h3 className="text-sm font-medium text-gray-700">{t('users.userList')}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-medium text-gray-700">{t('users.userList')}</h3>
+              <button
+                type="button"
+                onClick={() => exportToCsv(EXPORT_CONFIGS.users.filename, userList, EXPORT_CONFIGS.users.columns)}
+                className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded cursor-pointer"
+              >
+                {t('common.exportCsv')}
+              </button>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 type="text"
@@ -164,6 +181,7 @@ export function AdminUsersPage() {
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.displayName')}</th>
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.role')}</th>
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.official')}</th>
+                    <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.setStatus', 'Status')}</th>
                     <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('users.joinedAt')}</th>
                   </tr>
                 </thead>
@@ -203,12 +221,31 @@ export function AdminUsersPage() {
                           {togglingId === u.id ? '...' : u.is_official ? t('users.officialStatus.on') : t('users.officialStatus.off')}
                         </button>
                       </td>
+                      <td className="px-4 py-2">
+                        <select
+                          value={u.user_status || 'active'}
+                          disabled={statusChangingId === u.id}
+                          onChange={async (e) => {
+                            const newStatus = e.target.value as 'active' | 'suspended' | 'banned'
+                            if (newStatus === 'banned' && !confirm(t('users.confirmBan', 'Ban this user?'))) return
+                            if (newStatus === 'suspended' && !confirm(t('users.confirmSuspend', 'Suspend this user?'))) return
+                            setStatusChangingId(u.id)
+                            await setUserStatus(u.id, newStatus)
+                            setStatusChangingId(null)
+                          }}
+                          className={`text-xs px-2 py-0.5 rounded-full cursor-pointer disabled:opacity-50 border-0 ${STATUS_STYLES[u.user_status || 'active'] ?? STATUS_STYLES.active}`}
+                        >
+                          <option value="active">{t('users.status.active', 'Active')}</option>
+                          <option value="suspended">{t('users.status.suspended', 'Suspended')}</option>
+                          <option value="banned">{t('users.status.banned', 'Banned')}</option>
+                        </select>
+                      </td>
                       <td className="px-4 py-2 text-gray-500">{formatLocalDate(u.created_at, dateLocale)}</td>
                     </tr>
                   ))}
                   {userList.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-400">{t('noData')}</td>
+                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">{t('noData')}</td>
                     </tr>
                   )}
                 </tbody>

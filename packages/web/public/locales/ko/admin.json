@@ -7,7 +7,8 @@
     "market": "마켓",
     "official": "공식 계정",
     "contents": "콘텐츠",
-    "system": "시스템"
+    "system": "시스템",
+    "audit": "감사 로그"
   },
   "overview": {
     "title": "개요",
@@ -215,6 +216,55 @@
       "content": "콘텐츠",
       "study": "학습 활동"
     }
+  },
+  "audit": {
+    "title": "감사 로그",
+    "filterAction": "작업",
+    "filterTargetType": "대상 유형",
+    "filterFrom": "시작일",
+    "filterTo": "종료일",
+    "allActions": "모든 작업",
+    "allTargets": "모든 대상",
+    "search": "검색",
+    "reset": "초기화",
+    "time": "시간",
+    "admin": "관리자",
+    "action": "작업",
+    "target": "대상",
+    "details": "상세",
+    "ipAddress": "IP",
+    "noLogs": "감사 로그가 없습니다.",
+    "autoRefresh": "자동 새로고침",
+    "export": "CSV 내보내기",
+    "actions": {
+      "set_official": "공식 지정",
+      "resolve_report": "신고 처리",
+      "set_user_status": "사용자 상태 변경",
+      "update_settings": "설정 변경",
+      "export_data": "데이터 내보내기",
+      "revoke_official": "공식 해제"
+    },
+    "targets": {
+      "user": "사용자",
+      "listing": "등록",
+      "report": "신고",
+      "system": "시스템"
+    }
+  },
+  "users": {
+    "status": {
+      "active": "활성",
+      "suspended": "정지",
+      "banned": "차단"
+    },
+    "setStatus": "상태 변경",
+    "confirmBan": "이 사용자를 차단하시겠습니까?",
+    "confirmSuspend": "이 사용자를 정지하시겠습니까?"
+  },
+  "common": {
+    "refresh": "새로고침",
+    "lastUpdated": "{{time}} 업데이트",
+    "exportCsv": "CSV 내보내기"
   },
   "retry": "재시도",
   "noData": "데이터가 없습니다",
