@@ -5,8 +5,10 @@
     "users": "Người dùng",
     "study": "Hoạt động học tập",
     "market": "Chợ",
+    "official": "Official",
     "contents": "Nội dung",
-    "system": "Hệ thống"
+    "system": "Hệ thống",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "Tổng quan",
@@ -67,7 +69,15 @@
     "searchPlaceholder": "Tìm theo tên...",
     "allRoles": "Tất cả vai trò",
     "allStatus": "Tất cả trạng thái",
-    "clearFilters": "Xóa bộ lọc"
+    "clearFilters": "Xóa bộ lọc",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
   },
   "study": {
     "title": "Hoạt động học tập",
@@ -115,10 +125,10 @@
     "totalShares": "Tổng chia sẻ",
     "activeShares": "Chia sẻ đang hoạt động",
     "shareByMode": "Chia sẻ theo chế độ",
+    "shareBreakdown": "Phân tích chế độ chia sẻ",
     "topCategories": "Danh mục hàng đầu",
     "acquireConversion": "Tỷ lệ nhận",
     "shareActivation": "Kích hoạt chia sẻ",
-    "shareBreakdown": "Phân tích chế độ chia sẻ",
     "avgAcquiresPerListing": "Lượt nhận TB/Danh sách",
     "activeRate": "{{value}}% hoạt động",
     "listings": "Danh sách",
@@ -126,7 +136,10 @@
       "copy": "Sao chép",
       "subscribe": "Đăng ký theo dõi",
       "snapshot": "Bản chụp"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "Nội dung",
@@ -139,6 +152,7 @@
     "avgViewDuration": "Thời lượng xem TB",
     "localeBreakdown": "Phân tích ngôn ngữ",
     "dailyViews": "Lượt xem hàng ngày (30 ngày)",
+    "dailyPageViews": "Lượt xem trang hàng ngày",
     "views": "Lượt xem",
     "uniqueLabel": "Duy nhất",
     "publishingTimeline": "Dòng thời gian đăng tải",
@@ -169,7 +183,6 @@
     "topPages": "Trang hàng đầu",
     "pagePath": "Đường dẫn trang",
     "ctaClicks": "Lượt nhấp CTA",
-    "dailyPageViews": "Lượt xem trang hàng ngày",
     "viewPeriod": "Thời kỳ",
     "dayShort": "ngày",
     "viewsPerContent": "{{value}} mỗi nội dung",
@@ -202,8 +215,8 @@
     "recentlyUsedKeys": "Sử dụng gần đây (7 ngày)",
     "totalContents": "Tổng nội dung",
     "publishedContents": "Nội dung đã đăng",
-    "totalStudyLogs": "Tổng nhật ký học tập",
     "draftContents": "Nội dung nháp",
+    "totalStudyLogs": "Tổng nhật ký học tập",
     "healthStatus": "Tình trạng hệ thống",
     "apiKeysSection": "Quản lý khóa API",
     "contentPipeline": "Quy trình nội dung",
@@ -214,6 +227,84 @@
       "content": "Quy trình nội dung",
       "study": "Hoạt động học tập"
     }
+  },
+  "official": {
+    "title": "Official Accounts",
+    "totalAccounts": "Official Accounts",
+    "totalListings": "Total Listings",
+    "featured": "Featured",
+    "organizations": "Organizations",
+    "addAccount": "+ Add Official Account",
+    "addSubmit": "Add Official",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "revoke": "Revoke",
+    "selectUser": "Select User",
+    "searchUserPlaceholder": "Search by name or UUID...",
+    "selectUserFirst": "Please select a user first",
+    "alreadyOfficial": "Already Official",
+    "noUsersFound": "No users found",
+    "badgeType": "Badge Type",
+    "orgName": "Organization (optional)",
+    "orgNamePlaceholder": "Organization name",
+    "confirmRevoke": "Revoke official status for {{name}}?",
+    "noAccounts": "No official accounts yet",
+    "noAccountsHint": "Click \"+ Add Official Account\" to get started",
+    "colAccount": "Account",
+    "colBadge": "Badge",
+    "colOrg": "Organization",
+    "colListings": "Listings",
+    "colPriority": "Priority",
+    "colActions": "Actions",
+    "maxListings": "Max",
+    "canFeature": "Can feature",
+    "badges": {
+      "verified": "Verified",
+      "official": "Official",
+      "educator": "Educator",
+      "publisher": "Publisher",
+      "partner": "Partner"
+    }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "Thử lại",
   "noData": "Không có dữ liệu",

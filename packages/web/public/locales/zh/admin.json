@@ -5,8 +5,10 @@
     "users": "用户",
     "study": "学习活动",
     "market": "市场",
+    "official": "Official",
     "contents": "内容",
-    "system": "系统"
+    "system": "系统",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "概览",
@@ -67,7 +69,15 @@
     "searchPlaceholder": "按名称搜索...",
     "allRoles": "所有角色",
     "allStatus": "所有状态",
-    "clearFilters": "清除筛选"
+    "clearFilters": "清除筛选",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
   },
   "study": {
     "title": "学习活动",
@@ -115,10 +125,10 @@
     "totalShares": "总分享数",
     "activeShares": "活跃分享",
     "shareByMode": "按模式分享",
+    "shareBreakdown": "分享模式分析",
     "topCategories": "热门分类",
     "acquireConversion": "获取率",
     "shareActivation": "分享激活",
-    "shareBreakdown": "分享模式分析",
     "avgAcquiresPerListing": "每条目平均获取数",
     "activeRate": "{{value}}% 活跃",
     "listings": "条目",
@@ -126,7 +136,10 @@
       "copy": "复制",
       "subscribe": "订阅",
       "snapshot": "快照"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "内容",
@@ -139,6 +152,7 @@
     "avgViewDuration": "平均浏览时长",
     "localeBreakdown": "语言分布",
     "dailyViews": "每日浏览量（30天）",
+    "dailyPageViews": "每日页面浏览量",
     "views": "浏览量",
     "uniqueLabel": "独立",
     "publishingTimeline": "发布时间线",
@@ -169,7 +183,6 @@
     "topPages": "热门页面",
     "pagePath": "页面路径",
     "ctaClicks": "CTA 点击",
-    "dailyPageViews": "每日页面浏览量",
     "viewPeriod": "时间段",
     "dayShort": "天",
     "viewsPerContent": "每篇 {{value}}",
@@ -202,8 +215,8 @@
     "recentlyUsedKeys": "近期使用（7天）",
     "totalContents": "总内容",
     "publishedContents": "已发布内容",
-    "totalStudyLogs": "学习日志总数",
     "draftContents": "草稿内容",
+    "totalStudyLogs": "学习日志总数",
     "healthStatus": "系统健康",
     "apiKeysSection": "API 密钥管理",
     "contentPipeline": "内容管道",
@@ -214,6 +227,84 @@
       "content": "内容管道",
       "study": "学习活动"
     }
+  },
+  "official": {
+    "title": "Official Accounts",
+    "totalAccounts": "Official Accounts",
+    "totalListings": "Total Listings",
+    "featured": "Featured",
+    "organizations": "Organizations",
+    "addAccount": "+ Add Official Account",
+    "addSubmit": "Add Official",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "revoke": "Revoke",
+    "selectUser": "Select User",
+    "searchUserPlaceholder": "Search by name or UUID...",
+    "selectUserFirst": "Please select a user first",
+    "alreadyOfficial": "Already Official",
+    "noUsersFound": "No users found",
+    "badgeType": "Badge Type",
+    "orgName": "Organization (optional)",
+    "orgNamePlaceholder": "Organization name",
+    "confirmRevoke": "Revoke official status for {{name}}?",
+    "noAccounts": "No official accounts yet",
+    "noAccountsHint": "Click \"+ Add Official Account\" to get started",
+    "colAccount": "Account",
+    "colBadge": "Badge",
+    "colOrg": "Organization",
+    "colListings": "Listings",
+    "colPriority": "Priority",
+    "colActions": "Actions",
+    "maxListings": "Max",
+    "canFeature": "Can feature",
+    "badges": {
+      "verified": "Verified",
+      "official": "Official",
+      "educator": "Educator",
+      "publisher": "Publisher",
+      "partner": "Partner"
+    }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "重试",
   "noData": "暂无数据",
