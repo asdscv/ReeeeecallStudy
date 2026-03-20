@@ -691,6 +691,20 @@ export type AdminUtmSourceBreakdown = {
   count: number
 }
 
+export type AdminAuditLog = {
+  id: string
+  admin_id: string
+  admin_display_name: string | null
+  action: string
+  target_type: string
+  target_id: string | null
+  details: Record<string, unknown>
+  ip_address: string | null
+  created_at: string
+}
+
+export type UserStatus = 'active' | 'suspended' | 'banned'
+
 export type AdminContentsAnalytics = {
   total_contents: number
   published_contents: number

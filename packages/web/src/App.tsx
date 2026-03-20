@@ -44,6 +44,7 @@ import { AdminContentPage } from './pages/admin/AdminContentPage'
 import { AdminContentsPage } from './pages/admin/AdminContentsPage'
 import { AdminSystemPage } from './pages/admin/AdminSystemPage'
 import { AdminOfficialPage } from './pages/admin/AdminOfficialPage'
+import { AdminAuditPage } from './pages/admin/AdminAuditPage'
 import { usePageTracking } from './hooks/usePageTracking'
 
 function PageTracker() {
@@ -165,6 +166,7 @@ function App() {
             <Route path="official" element={<AdminOfficialPage />} />
             <Route path="contents" element={<AdminContentsPage />} />
             <Route path="system" element={<AdminSystemPage />} />
+            <Route path="audit" element={<AdminAuditPage />} />
           </Route>
         </Route>
 

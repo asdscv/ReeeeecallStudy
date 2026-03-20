@@ -9,6 +9,7 @@ const TABS = [
   { key: 'official', path: '/admin/official', end: false },
   { key: 'contents', path: '/admin/contents', end: false },
   { key: 'system', path: '/admin/system', end: false },
+  { key: 'audit', path: '/admin/audit', end: false },
 ] as const
 
 export function AdminLayout() {

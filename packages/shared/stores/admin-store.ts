@@ -15,11 +15,21 @@ import type {
   AdminRetentionMetrics,
   AdminContentsAnalytics,
   AdminPageViewsAnalytics,
+  AdminAuditLog,
 } from '../types/database'
 
 const CACHE_TTL = 5 * 60_000 // 5 minutes
 
-type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'pageViews' | 'system'
+type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'pageViews' | 'system' | 'audit'
+
+type UserStatus = 'active' | 'suspended' | 'banned'
+
+interface AuditFilters {
+  action?: string
+  targetType?: string
+  fromDate?: string
+  toDate?: string
+}
 
 interface AdminState {
   // Overview
@@ -31,7 +41,7 @@ interface AdminState {
 
   // Users
   userSignups: AdminUserSignup[]
-  userList: { id: string; display_name: string | null; created_at: string; role: string; is_official: boolean }[]
+  userList: { id: string; display_name: string | null; created_at: string; role: string; is_official: boolean; user_status?: UserStatus }[]
   userListTotal: number
   retentionMetrics: AdminRetentionMetrics | null
   usersLoading: boolean
@@ -65,6 +75,12 @@ interface AdminState {
   systemLoading: boolean
   systemError: string | null
 
+  // Audit Log
+  auditLogs: AdminAuditLog[]
+  auditTotal: number
+  auditLoading: boolean
+  auditError: string | null
+
   // Cache timestamps
   _fetchedAt: Record<SectionKey, number>
 
@@ -77,6 +93,10 @@ interface AdminState {
   fetchPageViews: () => Promise<void>
   fetchSystem: () => Promise<void>
   setOfficialStatus: (userId: string, isOfficial: boolean) => Promise<{ error: string | null }>
+  setUserStatus: (userId: string, status: UserStatus) => Promise<{ error: string | null }>
+  fetchAuditLogs: (page?: number, pageSize?: number, filters?: AuditFilters) => Promise<void>
+  logAction: (action: string, targetType: string, targetId?: string, details?: Record<string, unknown>) => Promise<void>
+  forceRefresh: (section: SectionKey) => void
 }
 
 function isFresh(fetchedAt: Record<SectionKey, number>, key: SectionKey): boolean {
@@ -120,7 +140,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   systemLoading: false,
   systemError: null,
 
-  _fetchedAt: { overview: 0, users: 0, study: 0, market: 0, contents: 0, pageViews: 0, system: 0 },
+  auditLogs: [],
+  auditTotal: 0,
+  auditLoading: false,
+  auditError: null,
+
+  _fetchedAt: { overview: 0, users: 0, study: 0, market: 0, contents: 0, pageViews: 0, system: 0, audit: 0 },
 
   fetchOverview: async () => {
     if (get().overviewLoading) return
@@ -158,7 +183,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     try {
       let listQuery = supabase
         .from('profiles')
-        .select('id, display_name, created_at, role, is_official')
+        .select('id, display_name, created_at, role, is_official, user_status')
         .order('created_at', { ascending: false })
       let countQuery = supabase.from('profiles').select('id', { count: 'exact', head: true })
 
@@ -331,15 +356,86 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       })
       if (error) return { error: extractErrorMessage(error) }
 
-      // Update local list after confirmed success
       set({
         userList: get().userList.map((u) =>
           u.id === userId ? { ...u, is_official: isOfficial } : u,
         ),
       })
+
+      // Log audit action
+      get().logAction('set_official', 'user', userId, { is_official: isOfficial })
+
       return { error: null }
     } catch (e) {
       return { error: extractErrorMessage(e) }
     }
+  },
+
+  setUserStatus: async (userId: string, status: UserStatus) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_user_status', {
+        p_user_id: userId,
+        p_status: status,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+
+      set({
+        userList: get().userList.map((u) =>
+          u.id === userId ? { ...u, user_status: status } : u,
+        ),
+      })
+
+      get().logAction('set_user_status', 'user', userId, { status })
+
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  fetchAuditLogs: async (page = 0, pageSize = 50, filters?: AuditFilters) => {
+    if (get().auditLoading) return
+    set({ auditLoading: true, auditError: null })
+    try {
+      const { data, error } = await supabase.rpc('admin_get_audit_logs', {
+        p_limit: pageSize,
+        p_offset: page * pageSize,
+        p_action: filters?.action || null,
+        p_target_type: filters?.targetType || null,
+        p_from_date: filters?.fromDate || null,
+        p_to_date: filters?.toDate || null,
+      })
+      if (error) throw error
+
+      const result = data as { data: AdminAuditLog[]; total: number } | null
+      set({
+        auditLogs: result?.data ?? [],
+        auditTotal: result?.total ?? 0,
+        _fetchedAt: { ...get()._fetchedAt, audit: Date.now() },
+      })
+    } catch (e) {
+      set({ auditError: extractErrorMessage(e) })
+    } finally {
+      set({ auditLoading: false })
+    }
+  },
+
+  logAction: async (action: string, targetType: string, targetId?: string, details?: Record<string, unknown>) => {
+    try {
+      await supabase.rpc('admin_log_action', {
+        p_action: action,
+        p_target_type: targetType,
+        p_target_id: targetId ?? null,
+        p_details: details ?? {},
+      })
+    } catch {
+      // Silent fail — audit logging should not block UI
+    }
+  },
+
+  forceRefresh: (section: SectionKey) => {
+    set({
+      _fetchedAt: { ...get()._fetchedAt, [section]: 0 },
+    })
   },
 }))
