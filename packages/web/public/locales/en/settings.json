@@ -49,6 +49,14 @@
     "id": "Bahasa Indonesia"
   },
 
+  "theme": {
+    "title": "Theme",
+    "description": "Choose your preferred appearance. System will follow your device settings.",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+
   "srs": {
     "title": "SRS Learning",
     "description": "Set the number of new cards added per session in SRS (spaced repetition) mode",

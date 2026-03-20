@@ -29,6 +29,15 @@ interface SessionStats {
   totalDurationMs: number
 }
 
+interface LastRatedCard {
+  cardId: string
+  previousCard: Card
+  rating: string
+  previousIndex: number
+  previousStats: SessionStats
+  timestamp: number
+}
+
 interface StudyState {
   phase: Phase
   config: StudyConfig | null
@@ -49,12 +58,23 @@ interface StudyState {
   crammingManager: CrammingQueueManager | null
   maxCardPosition: number
 
+  // Pause/Resume state
+  isPaused: boolean
+  pauseStartTime: number | null
+  totalPausedMs: number
+
+  // Undo state
+  lastRatedCard: LastRatedCard | null
+
   initSession: (config: StudyConfig) => Promise<void>
   flipCard: () => void
   rateCard: (rating: string) => Promise<void>
   endSession: () => Promise<void>
   exitSession: () => Promise<void>
   crammingTimeUp: () => Promise<void>
+  pauseSession: () => void
+  resumeSession: () => void
+  undoLastRating: () => void
   reset: () => void
 }
 
@@ -84,6 +104,14 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   srsQueueManager: null,
   crammingManager: null,
   maxCardPosition: 0,
+
+  // Pause/Resume
+  isPaused: false,
+  pauseStartTime: null,
+  totalPausedMs: 0,
+
+  // Undo
+  lastRatedCard: null,
 
   initSession: async (config: StudyConfig) => {
     // Prevent double-init (React StrictMode / effect re-runs)
@@ -447,9 +475,35 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, studyState, maxCardPosition, userId } = get()
-    if (!config || isRating || !userId) return
-    set({ isRating: true, exitDirection: getRatingExitDirection(rating) })
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isPaused, studyState, maxCardPosition, userId } = get()
+    if (!config || isRating || isPaused || !userId) return
+    // Save undo state before rating
+    const undoCard = (() => {
+      let card: Card | undefined
+      if (config.mode === 'cramming' && crammingManager) {
+        const cardId = crammingManager.currentCardId()
+        card = cardId ? queue.find(c => c.id === cardId) : undefined
+      } else if (config.mode === 'srs' && srsQueueManager) {
+        const qc = srsQueueManager.currentCard()
+        card = qc ? queue.find(c => c.id === qc.id) ?? queue[currentIndex] : queue[currentIndex]
+      } else {
+        card = queue[currentIndex]
+      }
+      return card
+    })()
+
+    set({
+      isRating: true,
+      exitDirection: getRatingExitDirection(rating),
+      lastRatedCard: undoCard ? {
+        cardId: undoCard.id,
+        previousCard: { ...undoCard },
+        rating,
+        previousIndex: currentIndex,
+        previousStats: { ...sessionStats, ratings: { ...sessionStats.ratings } },
+        timestamp: Date.now(),
+      } : null,
+    })
 
     const isSrsMode = config.mode === 'srs' && srsQueueManager
     const isCrammingMode = config.mode === 'cramming' && crammingManager
@@ -790,6 +844,46 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     await get().endSession()
   },
 
+  pauseSession: () => {
+    const { phase, isPaused } = get()
+    if (phase !== 'studying' || isPaused) return
+    set({ isPaused: true, pauseStartTime: Date.now() })
+  },
+
+  resumeSession: () => {
+    const { isPaused, pauseStartTime, totalPausedMs, cardStartTime } = get()
+    if (!isPaused || !pauseStartTime) return
+    const pausedDuration = Date.now() - pauseStartTime
+    // Adjust cardStartTime forward by the paused duration so card timing is accurate
+    set({
+      isPaused: false,
+      pauseStartTime: null,
+      totalPausedMs: totalPausedMs + pausedDuration,
+      cardStartTime: cardStartTime + pausedDuration,
+    })
+  },
+
+  undoLastRating: () => {
+    const { lastRatedCard, queue, phase } = get()
+    if (!lastRatedCard || phase !== 'studying') return
+
+    // Restore the card's previous state in the queue
+    const updatedQueue = queue.map(c =>
+      c.id === lastRatedCard.cardId ? { ...lastRatedCard.previousCard } : c
+    )
+
+    set({
+      queue: updatedQueue,
+      currentIndex: lastRatedCard.previousIndex,
+      isFlipped: false,
+      isRating: false,
+      exitDirection: null,
+      sessionStats: lastRatedCard.previousStats,
+      lastRatedCard: null,
+      cardStartTime: Date.now(),
+    })
+  },
+
   reset: () => {
     set({
       phase: 'idle',
@@ -810,6 +904,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       srsQueueManager: null,
       crammingManager: null,
       maxCardPosition: 0,
+      isPaused: false,
+      pauseStartTime: null,
+      totalPausedMs: 0,
+      lastRatedCard: null,
     })
   },
 }))

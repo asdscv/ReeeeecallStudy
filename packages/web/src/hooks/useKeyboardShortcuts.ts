@@ -5,17 +5,25 @@ import { resolveKeyAction } from '../lib/keyboard-actions'
 interface UseKeyboardShortcutsOptions {
   isFlipped: boolean
   mode: StudyMode
+  isPaused?: boolean
   onFlip: () => void
   onRate: (rating: string) => void
   onExit: () => void
+  onPause?: () => void
+  onUndo?: () => void
+  onHelp?: () => void
 }
 
 export function useKeyboardShortcuts({
   isFlipped,
   mode,
+  isPaused = false,
   onFlip,
   onRate,
   onExit,
+  onPause,
+  onUndo,
+  onHelp,
 }: UseKeyboardShortcutsOptions) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -27,7 +35,10 @@ export function useKeyboardShortcuts({
         return
       }
 
-      const action = resolveKeyAction(e.key, isFlipped, mode)
+      const action = resolveKeyAction(e.key, isFlipped, mode, {
+        ctrlKey: e.ctrlKey || e.metaKey,
+        isPaused,
+      })
       if (!action) return
 
       switch (action.type) {
@@ -42,10 +53,22 @@ export function useKeyboardShortcuts({
           e.preventDefault()
           onRate(action.rating)
           break
+        case 'pause':
+          e.preventDefault()
+          onPause?.()
+          break
+        case 'undo':
+          e.preventDefault()
+          onUndo?.()
+          break
+        case 'help':
+          e.preventDefault()
+          onHelp?.()
+          break
       }
     }
 
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [isFlipped, mode, onFlip, onRate, onExit])
+  }, [isFlipped, mode, isPaused, onFlip, onRate, onExit, onPause, onUndo, onHelp])
 }
