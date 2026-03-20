@@ -112,23 +112,21 @@ export function AdminAuditPage() {
 
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  /* ── Build params ── */
-  const params = useMemo(
+  /* ── Build filters ── */
+  const filters = useMemo(
     () => ({
       action: actionFilter === 'all' ? undefined : actionFilter,
-      target_type: targetFilter === 'all' ? undefined : targetFilter,
-      from: toISODate(dateFrom),
-      to: dateTo ? new Date(new Date(dateTo).getTime() + 86_400_000 - 1).toISOString() : undefined,
-      offset: page * PAGE_SIZE,
-      limit: PAGE_SIZE,
+      targetType: targetFilter === 'all' ? undefined : targetFilter,
+      fromDate: toISODate(dateFrom) ?? undefined,
+      toDate: dateTo ? new Date(new Date(dateTo).getTime() + 86_400_000 - 1).toISOString() : undefined,
     }),
-    [actionFilter, targetFilter, dateFrom, dateTo, page],
+    [actionFilter, targetFilter, dateFrom, dateTo],
   )
 
   /* ── Fetch ── */
   const doFetch = useCallback(() => {
-    fetchAuditLogs(params)
-  }, [fetchAuditLogs, params])
+    fetchAuditLogs(page, PAGE_SIZE, filters)
+  }, [fetchAuditLogs, page, filters])
 
   useEffect(() => {
     doFetch()
@@ -471,7 +469,7 @@ interface LogRowProps {
   locale: string
   expanded: boolean
   onToggle: () => void
-  t: (key: string, fallback?: string) => string
+  t: ReturnType<typeof import('react-i18next').useTranslation>['t']
 }
 
 function LogRow({ log, locale, expanded, onToggle, t }: LogRowProps) {
