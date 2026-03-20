@@ -11,12 +11,12 @@ class LoginScreenPO {
   get screen() { return $('~login-screen') }
   get emailInput() {
     if (driver.isIOS) return $('~login-email-input')
-    // Android: find the EditText inside the wrapper with matching resource-id
-    return $('//android.widget.EditText[@resource-id="login-email-input"]')
+    // Android: use UiSelector to find the EditText by content-desc (more reliable than XPath)
+    return $('android=new UiSelector().className("android.widget.EditText").description("login-email-input")')
   }
   get passwordInput() {
     if (driver.isIOS) return $('~login-password-input')
-    return $('//android.widget.EditText[@resource-id="login-password-input"]')
+    return $('android=new UiSelector().className("android.widget.EditText").description("login-password-input")')
   }
   get submitButton() { return $('~login-submit-button') }
   get errorText() { return $('~login-error-text') }

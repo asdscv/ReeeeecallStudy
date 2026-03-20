@@ -658,6 +658,7 @@ export function SettingsScreen() {
 
         <TouchableOpacity
           testID="settings-logout"
+          accessibilityLabel="settings-logout"
           onPress={handleLogout}
           style={[styles.logoutBtn, { borderColor: palette.gray[300] }]}
           activeOpacity={0.7}

@@ -6,28 +6,34 @@ import { scrollUp } from './scroll'
  */
 async function dismissAndroidDialogs() {
   if (driver.isIOS) return
-  try {
-    // "Messages isn't responding" / "App isn't responding" → Click "Wait" or "Close app"
-    const waitBtn = $('android=new UiSelector().resourceId("android:id/aerr_wait")')
-    if (await waitBtn.isExisting().catch(() => false)) {
-      await waitBtn.click()
-      await browser.pause(1000)
-      console.log('[auth] Dismissed ANR dialog (clicked Wait)')
-    }
-    // Also check for "OK" button on crash dialogs
-    const okBtn = $('android=new UiSelector().text("OK")')
-    if (await okBtn.isExisting().catch(() => false)) {
-      await okBtn.click()
-      await browser.pause(500)
-    }
-    // Dismiss notification shade if it's open (can happen from scrollUp swipe)
-    // Press back to dismiss system overlays
-    const statusBar = $('android=new UiSelector().resourceId("com.android.systemui:id/quick_settings_panel")')
-    if (await statusBar.isExisting().catch(() => false)) {
-      try { await driver.back() } catch {}
-      await browser.pause(500)
-    }
-  } catch { /* ignore */ }
+  // Dismiss up to 5 stacked dialogs (system ANR, app ANR, crash, etc.)
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      // "App isn't responding" / "Process system isn't responding" → Click "Wait"
+      const waitBtn = $('android=new UiSelector().resourceId("android:id/aerr_wait")')
+      if (await waitBtn.isExisting().catch(() => false)) {
+        await waitBtn.click()
+        await browser.pause(1000)
+        console.log('[auth] Dismissed ANR dialog (clicked Wait)')
+        continue // check for more dialogs
+      }
+      // Also check for "OK" button on crash dialogs
+      const okBtn = $('android=new UiSelector().text("OK").className("android.widget.Button")')
+      if (await okBtn.isExisting().catch(() => false)) {
+        await okBtn.click()
+        await browser.pause(500)
+        continue
+      }
+      // Dismiss notification shade if it's open (can happen from scrollUp swipe)
+      const statusBar = $('android=new UiSelector().resourceId("com.android.systemui:id/quick_settings_panel")')
+      if (await statusBar.isExisting().catch(() => false)) {
+        try { await driver.back() } catch {}
+        await browser.pause(500)
+        continue
+      }
+      break // no more dialogs
+    } catch { break }
+  }
 }
 
 /**
