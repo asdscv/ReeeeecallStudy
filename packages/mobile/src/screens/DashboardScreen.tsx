@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Platform } from 'react-native'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -10,6 +10,8 @@ import { useTheme, palette } from '../theme'
 import type { HomeStackParamList, MainTabParamList } from '../navigation/types'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
 import { shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
+import { OnboardingModal } from '../components/OnboardingModal'
+import { getMobileSupabase } from '../adapters'
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>
 
@@ -27,11 +29,20 @@ export function DashboardScreen() {
   const navigation = useNavigation<Nav>()
   const tabNav = navigation.getParent<NavigationProp<MainTabParamList>>()
   const [period, setPeriod] = useState<TimePeriod>('1m')
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  useEffect(() => {
+    getMobileSupabase().rpc('get_onboarding_status').then(({ data }) => {
+      const result = data as { completed: boolean } | null
+      if (result && !result.completed) setShowOnboarding(true)
+    }).catch(() => {})
+  }, [])
   const { decks, stats, totalCards, totalDue, streak, mastery, heatmap, dailyCounts, forecastData, loading, refresh } =
     useDashboardData(period)
 
   return (
     <Screen safeArea padding={false} testID="dashboard-screen">
+      <OnboardingModal visible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
       <DrawerHeader title={t('title')} />
       <FlatList
         data={decks}
