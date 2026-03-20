@@ -5,8 +5,10 @@
     "users": "Usuarios",
     "study": "Actividad de estudio",
     "market": "Mercado",
+    "official": "Official",
     "contents": "Contenidos",
-    "system": "Sistema"
+    "system": "Sistema",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "Resumen",
@@ -67,7 +69,15 @@
     "searchPlaceholder": "Buscar por nombre...",
     "allRoles": "Todos los roles",
     "allStatus": "Todos los estados",
-    "clearFilters": "Limpiar filtros"
+    "clearFilters": "Limpiar filtros",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
   },
   "study": {
     "title": "Actividad de estudio",
@@ -126,7 +136,10 @@
       "copy": "Copiar",
       "subscribe": "Suscribirse",
       "snapshot": "Instantánea"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "Contenidos",
@@ -214,6 +227,84 @@
       "content": "Pipeline de contenidos",
       "study": "Actividad de estudio"
     }
+  },
+  "official": {
+    "title": "Official Accounts",
+    "totalAccounts": "Official Accounts",
+    "totalListings": "Total Listings",
+    "featured": "Featured",
+    "organizations": "Organizations",
+    "addAccount": "+ Add Official Account",
+    "addSubmit": "Add Official",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "revoke": "Revoke",
+    "selectUser": "Select User",
+    "searchUserPlaceholder": "Search by name or UUID...",
+    "selectUserFirst": "Please select a user first",
+    "alreadyOfficial": "Already Official",
+    "noUsersFound": "No users found",
+    "badgeType": "Badge Type",
+    "orgName": "Organization (optional)",
+    "orgNamePlaceholder": "Organization name",
+    "confirmRevoke": "Revoke official status for {{name}}?",
+    "noAccounts": "No official accounts yet",
+    "noAccountsHint": "Click \"+ Add Official Account\" to get started",
+    "colAccount": "Account",
+    "colBadge": "Badge",
+    "colOrg": "Organization",
+    "colListings": "Listings",
+    "colPriority": "Priority",
+    "colActions": "Actions",
+    "maxListings": "Max",
+    "canFeature": "Can feature",
+    "badges": {
+      "verified": "Verified",
+      "official": "Official",
+      "educator": "Educator",
+      "publisher": "Publisher",
+      "partner": "Partner"
+    }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "Reintentar",
   "noData": "Sin datos disponibles",

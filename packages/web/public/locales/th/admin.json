@@ -5,8 +5,10 @@
     "users": "ผู้ใช้",
     "study": "กิจกรรมการเรียน",
     "market": "ตลาด",
+    "official": "Official",
     "contents": "เนื้อหา",
-    "system": "ระบบ"
+    "system": "ระบบ",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "ภาพรวม",
@@ -67,7 +69,15 @@
     "searchPlaceholder": "ค้นหาตามชื่อ...",
     "allRoles": "ทุกบทบาท",
     "allStatus": "ทุกสถานะ",
-    "clearFilters": "ล้างตัวกรอง"
+    "clearFilters": "ล้างตัวกรอง",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
   },
   "study": {
     "title": "กิจกรรมการเรียน",
@@ -115,10 +125,10 @@
     "totalShares": "การแชร์ทั้งหมด",
     "activeShares": "การแชร์ที่ใช้งาน",
     "shareByMode": "แชร์ตามโหมด",
+    "shareBreakdown": "การวิเคราะห์โหมดแชร์",
     "topCategories": "หมวดหมู่ยอดนิยม",
     "acquireConversion": "อัตราการรับ",
     "shareActivation": "การเปิดใช้การแชร์",
-    "shareBreakdown": "การวิเคราะห์โหมดแชร์",
     "avgAcquiresPerListing": "การรับเฉลี่ย/รายการ",
     "activeRate": "{{value}}% ใช้งาน",
     "listings": "รายการ",
@@ -126,7 +136,10 @@
       "copy": "คัดลอก",
       "subscribe": "ติดตาม",
       "snapshot": "สแนปช็อต"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "เนื้อหา",
@@ -139,6 +152,7 @@
     "avgViewDuration": "ระยะเวลาชมเฉลี่ย",
     "localeBreakdown": "แยกตามภาษา",
     "dailyViews": "การเข้าชมรายวัน (30 วัน)",
+    "dailyPageViews": "การเข้าชมหน้ารายวัน",
     "views": "การเข้าชม",
     "uniqueLabel": "ไม่ซ้ำ",
     "publishingTimeline": "ไทม์ไลน์การเผยแพร่",
@@ -169,7 +183,6 @@
     "topPages": "หน้ายอดนิยม",
     "pagePath": "พาธหน้า",
     "ctaClicks": "คลิก CTA",
-    "dailyPageViews": "การเข้าชมหน้ารายวัน",
     "viewPeriod": "ช่วงเวลา",
     "dayShort": "วัน",
     "viewsPerContent": "{{value}} ต่อเนื้อหา",
@@ -202,8 +215,8 @@
     "recentlyUsedKeys": "ใช้ล่าสุด (7 วัน)",
     "totalContents": "เนื้อหาทั้งหมด",
     "publishedContents": "เนื้อหาที่เผยแพร่",
-    "totalStudyLogs": "บันทึกการเรียนทั้งหมด",
     "draftContents": "เนื้อหาฉบับร่าง",
+    "totalStudyLogs": "บันทึกการเรียนทั้งหมด",
     "healthStatus": "สถานะระบบ",
     "apiKeysSection": "จัดการ API Key",
     "contentPipeline": "ไปป์ไลน์เนื้อหา",
@@ -214,6 +227,84 @@
       "content": "ไปป์ไลน์เนื้อหา",
       "study": "กิจกรรมการเรียน"
     }
+  },
+  "official": {
+    "title": "Official Accounts",
+    "totalAccounts": "Official Accounts",
+    "totalListings": "Total Listings",
+    "featured": "Featured",
+    "organizations": "Organizations",
+    "addAccount": "+ Add Official Account",
+    "addSubmit": "Add Official",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "revoke": "Revoke",
+    "selectUser": "Select User",
+    "searchUserPlaceholder": "Search by name or UUID...",
+    "selectUserFirst": "Please select a user first",
+    "alreadyOfficial": "Already Official",
+    "noUsersFound": "No users found",
+    "badgeType": "Badge Type",
+    "orgName": "Organization (optional)",
+    "orgNamePlaceholder": "Organization name",
+    "confirmRevoke": "Revoke official status for {{name}}?",
+    "noAccounts": "No official accounts yet",
+    "noAccountsHint": "Click \"+ Add Official Account\" to get started",
+    "colAccount": "Account",
+    "colBadge": "Badge",
+    "colOrg": "Organization",
+    "colListings": "Listings",
+    "colPriority": "Priority",
+    "colActions": "Actions",
+    "maxListings": "Max",
+    "canFeature": "Can feature",
+    "badges": {
+      "verified": "Verified",
+      "official": "Official",
+      "educator": "Educator",
+      "publisher": "Publisher",
+      "partner": "Partner"
+    }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "ลองอีกครั้ง",
   "noData": "ไม่มีข้อมูล",

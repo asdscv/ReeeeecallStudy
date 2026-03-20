@@ -69,7 +69,15 @@
     "searchPlaceholder": "이름으로 검색...",
     "allRoles": "모든 역할",
     "allStatus": "모든 상태",
-    "clearFilters": "필터 초기화"
+    "clearFilters": "필터 초기화",
+    "status": {
+      "active": "활성",
+      "suspended": "정지",
+      "banned": "차단"
+    },
+    "setStatus": "상태 변경",
+    "confirmBan": "이 사용자를 차단하시겠습니까?",
+    "confirmSuspend": "이 사용자를 정지하시겠습니까?"
   },
   "study": {
     "title": "학습 활동",
@@ -128,7 +136,10 @@
       "copy": "복사",
       "subscribe": "구독",
       "snapshot": "스냅샷"
-    }
+    },
+    "reports": "콘텐츠 신고",
+    "pendingReports": "대기 중",
+    "noReports": "신고가 없습니다."
   },
   "contents": {
     "title": "콘텐츠",
@@ -289,16 +300,6 @@
       "report": "신고",
       "system": "시스템"
     }
-  },
-  "users": {
-    "status": {
-      "active": "활성",
-      "suspended": "정지",
-      "banned": "차단"
-    },
-    "setStatus": "상태 변경",
-    "confirmBan": "이 사용자를 차단하시겠습니까?",
-    "confirmSuspend": "이 사용자를 정지하시겠습니까?"
   },
   "common": {
     "refresh": "새로고침",
