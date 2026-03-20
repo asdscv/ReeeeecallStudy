@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 
 // Mock i18next
 vi.mock('react-i18next', () => ({
@@ -20,17 +20,17 @@ vi.mock('react-i18next', () => ({
 
 // Mock radix dialog to render inline for testing
 vi.mock('@radix-ui/react-dialog', () => {
-  const React = require('react')
+  type P = { children: import('react').ReactNode; open?: boolean }
   return {
-    Root: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
+    Root: ({ children, open }: P) =>
       open ? <div data-testid="dialog-root">{children}</div> : null,
-    Portal: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    Overlay: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    Content: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-content">{children}</div>,
-    Title: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-    Description: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
-    Close: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
-    Trigger: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
+    Portal: ({ children }: P) => <>{children}</>,
+    Overlay: ({ children }: P) => <div>{children}</div>,
+    Content: ({ children }: P) => <div data-testid="dialog-content">{children}</div>,
+    Title: ({ children }: P) => <h2>{children}</h2>,
+    Description: ({ children }: P) => <p>{children}</p>,
+    Close: ({ children }: P) => <button>{children}</button>,
+    Trigger: ({ children }: P) => <button>{children}</button>,
   }
 })
 

@@ -39,12 +39,6 @@ function getSystemPreference(): EffectiveTheme {
   return window.matchMedia(MEDIA_QUERY).matches ? 'dark' : 'light'
 }
 
-/** Compute effective theme from preference */
-function resolveTheme(preference: ThemePreference): EffectiveTheme {
-  if (preference === 'system') return getSystemPreference()
-  return preference
-}
-
 /** Apply the dark class to <html> and update <meta name="color-scheme"> */
 function applyThemeToDOM(effective: EffectiveTheme) {
   const root = document.documentElement

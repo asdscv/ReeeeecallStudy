@@ -36,7 +36,7 @@ function escapeCsvValue(value: unknown): string {
 export function exportToCsv(
   filename: string,
   rows: Record<string, unknown>[],
-  columns?: { key: string; label: string }[],
+  columns?: readonly { key: string; label: string }[],
 ): void {
   if (rows.length === 0) return;
 
