@@ -62,7 +62,12 @@
     "backToDeck": "Kembali ke Dek",
     "exitConfirmTitle": "Akhiri sesi belajar?",
     "exitConfirmMessage": "Progres Anda akan disimpan.",
-    "exitConfirmButton": "Akhiri"
+    "exitConfirmButton": "Akhiri",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused",
+    "pressSpaceToResume": "Press Space to resume",
+    "undo": "Undo"
   },
   "card": {
     "tapToFlip": "Ketuk untuk membalik",
@@ -113,7 +118,15 @@
     "of": "{{current}} / {{total}}"
   },
   "datePicker": {
-    "weekdays": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"]
+    "weekdays": [
+      "Min",
+      "Sen",
+      "Sel",
+      "Rab",
+      "Kam",
+      "Jum",
+      "Sab"
+    ]
   },
   "interval": {
     "lessThanTenMin": "< 10mnt",
@@ -184,5 +197,14 @@
       "title": "Tidak Ada Kartu untuk Dipelajari",
       "message": "Tidak ada kartu yang sesuai dengan kriteria Anda."
     }
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "description": "Available shortcuts during study sessions",
+    "rateCards": "Rate Again / Hard / Good / Easy",
+    "flipOrPause": "Flip card / Pause-Resume",
+    "undoRating": "Undo last rating",
+    "exitStudy": "Exit study",
+    "toggleHelp": "Toggle this help"
   }
 }

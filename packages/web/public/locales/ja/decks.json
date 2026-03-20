@@ -19,7 +19,8 @@
     "tabs": {
       "cardList": "カード一覧",
       "uploadDate": "アップロード日",
-      "statistics": "統計"
+      "statistics": "統計",
+      "versions": "Versions"
     },
     "searchPlaceholder": "カードを検索...",
     "allStatus": "すべてのステータス",
@@ -39,7 +40,8 @@
     "deleteCardConfirm": "このカードを削除しますか？この操作は元に戻せません。",
     "bulkDelete": "カードの一括削除",
     "bulkDeleteConfirm": "選択した{{count}}枚のカードを削除しますか？この操作は元に戻せません。",
-    "noStudyRecords": "学習記録がありません"
+    "noStudyRecords": "学習記録がありません",
+    "aiCards": "AI Cards"
   },
   "settings": {
     "deckName": "デッキ名",
@@ -138,5 +140,16 @@
     "tagsPlaceholder": "タグを入力してEnterキーを押す",
     "templateNotSet": "テンプレートを設定してください",
     "goToSettings": "設定へ →"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "pendingChanges": "{{count}} pending",
+    "lastSynced": "Last synced: {{time}}",
+    "neverSynced": "Never synced",
+    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "noChanges": "Already up to date",
+    "syncFailed": "Sync failed",
+    "subscribed": "Subscribed Deck"
   }
 }

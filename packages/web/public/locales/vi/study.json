@@ -62,7 +62,12 @@
     "backToDeck": "Quay lại bộ thẻ",
     "exitConfirmTitle": "Kết thúc phiên học?",
     "exitConfirmMessage": "Tiến trình của bạn sẽ được lưu.",
-    "exitConfirmButton": "Kết thúc"
+    "exitConfirmButton": "Kết thúc",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused",
+    "pressSpaceToResume": "Press Space to resume",
+    "undo": "Undo"
   },
   "card": {
     "tapToFlip": "Chạm để lật",
@@ -113,7 +118,15 @@
     "of": "{{current}} / {{total}}"
   },
   "datePicker": {
-    "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+    "weekdays": [
+      "CN",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7"
+    ]
   },
   "interval": {
     "lessThanTenMin": "< 10 phút",
@@ -184,5 +197,14 @@
       "title": "Không có thẻ để học",
       "message": "Không có thẻ nào phù hợp với tiêu chí của bạn."
     }
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "description": "Available shortcuts during study sessions",
+    "rateCards": "Rate Again / Hard / Good / Easy",
+    "flipOrPause": "Flip card / Pause-Resume",
+    "undoRating": "Undo last rating",
+    "exitStudy": "Exit study",
+    "toggleHelp": "Toggle this help"
   }
 }

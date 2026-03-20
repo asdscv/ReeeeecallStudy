@@ -34,7 +34,8 @@
     "getDeck": "Obtener este mazo",
     "importing": "Importando...",
     "cardPreview": "Vista previa de tarjetas (máx 10)",
-    "noCards": "Sin tarjetas."
+    "noCards": "Sin tarjetas.",
+    "reportContent": "Report"
   },
   "preview": {
     "title": "\"{{title}}\" - Mazo de tarjetas | ReeeeecallStudy",
@@ -51,5 +52,21 @@
     "notFound": "Mazo no encontrado",
     "notFoundDescription": "Este mazo puede haber sido eliminado o ya no está disponible.",
     "backToHome": "Volver al inicio"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   }
 }

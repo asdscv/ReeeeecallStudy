@@ -34,7 +34,8 @@
     "getDeck": "รับสำรับนี้",
     "importing": "กำลังนำเข้า...",
     "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
-    "noCards": "ไม่มีการ์ด"
+    "noCards": "ไม่มีการ์ด",
+    "reportContent": "Report"
   },
   "preview": {
     "title": "\"{{title}}\" - สำรับแฟลชการ์ด | ReeeeecallStudy",
@@ -51,5 +52,21 @@
     "notFound": "ไม่พบสำรับ",
     "notFoundDescription": "สำรับนี้อาจถูกลบหรือไม่พร้อมใช้งานแล้ว",
     "backToHome": "กลับไปหน้าหลัก"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   }
 }

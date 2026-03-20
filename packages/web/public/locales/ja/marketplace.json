@@ -34,7 +34,8 @@
     "getDeck": "このデッキを取得",
     "importing": "インポート中...",
     "cardPreview": "カードプレビュー（最大10枚）",
-    "noCards": "カードがありません。"
+    "noCards": "カードがありません。",
+    "reportContent": "Report"
   },
   "preview": {
     "title": "\"{{title}}\" - フラッシュカードデッキ | ReeeeecallStudy",
@@ -51,5 +52,21 @@
     "notFound": "デッキが見つかりません",
     "notFoundDescription": "このデッキは削除されたか、利用できなくなった可能性があります。",
     "backToHome": "ホームに戻る"
+  },
+  "report": {
+    "title": "Report Content",
+    "categoryLabel": "Reason",
+    "categories": {
+      "inappropriate": "Inappropriate Content",
+      "copyright": "Copyright Violation",
+      "spam": "Spam",
+      "misleading": "Misleading",
+      "other": "Other"
+    },
+    "descriptionLabel": "Details (optional)",
+    "descriptionPlaceholder": "Describe the issue...",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted. Thank you!"
   }
 }
