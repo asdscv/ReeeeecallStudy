@@ -5,8 +5,10 @@
     "users": "Pengguna",
     "study": "Aktivitas Belajar",
     "market": "Marketplace",
+    "official": "Official",
     "contents": "Konten",
-    "system": "Sistem"
+    "system": "Sistem",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "Ikhtisar",
@@ -67,7 +69,15 @@
     "searchPlaceholder": "Cari berdasarkan nama...",
     "allRoles": "Semua Peran",
     "allStatus": "Semua Status",
-    "clearFilters": "Hapus Filter"
+    "clearFilters": "Hapus Filter",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
   },
   "study": {
     "title": "Aktivitas Belajar",
@@ -115,10 +125,10 @@
     "totalShares": "Total Berbagi",
     "activeShares": "Berbagi Aktif",
     "shareByMode": "Berbagi berdasarkan Mode",
+    "shareBreakdown": "Analisis Mode Berbagi",
     "topCategories": "Kategori Teratas",
     "acquireConversion": "Tingkat Perolehan",
     "shareActivation": "Aktivasi Berbagi",
-    "shareBreakdown": "Analisis Mode Berbagi",
     "avgAcquiresPerListing": "Rata-rata Perolehan/Daftar",
     "activeRate": "{{value}}% aktif",
     "listings": "Daftar",
@@ -126,7 +136,10 @@
       "copy": "Salin",
       "subscribe": "Berlangganan",
       "snapshot": "Snapshot"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "Konten",
@@ -139,6 +152,7 @@
     "avgViewDuration": "Durasi Tampilan Rata-rata",
     "localeBreakdown": "Rincian Bahasa",
     "dailyViews": "Tampilan Harian (30 hari)",
+    "dailyPageViews": "Tampilan Halaman Harian",
     "views": "Tampilan",
     "uniqueLabel": "Unik",
     "publishingTimeline": "Lini Masa Publikasi",
@@ -169,7 +183,6 @@
     "topPages": "Halaman Teratas",
     "pagePath": "Path Halaman",
     "ctaClicks": "Klik CTA",
-    "dailyPageViews": "Tampilan Halaman Harian",
     "viewPeriod": "Periode",
     "dayShort": "hr",
     "viewsPerContent": "{{value}} per konten",
@@ -202,8 +215,8 @@
     "recentlyUsedKeys": "Baru Digunakan (7 hari)",
     "totalContents": "Total Konten",
     "publishedContents": "Konten Dipublikasikan",
-    "totalStudyLogs": "Total Log Belajar",
     "draftContents": "Konten Draf",
+    "totalStudyLogs": "Total Log Belajar",
     "healthStatus": "Kesehatan Sistem",
     "apiKeysSection": "Manajemen Kunci API",
     "contentPipeline": "Pipeline Konten",
@@ -214,6 +227,84 @@
       "content": "Pipeline Konten",
       "study": "Aktivitas Belajar"
     }
+  },
+  "official": {
+    "title": "Official Accounts",
+    "totalAccounts": "Official Accounts",
+    "totalListings": "Total Listings",
+    "featured": "Featured",
+    "organizations": "Organizations",
+    "addAccount": "+ Add Official Account",
+    "addSubmit": "Add Official",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "revoke": "Revoke",
+    "selectUser": "Select User",
+    "searchUserPlaceholder": "Search by name or UUID...",
+    "selectUserFirst": "Please select a user first",
+    "alreadyOfficial": "Already Official",
+    "noUsersFound": "No users found",
+    "badgeType": "Badge Type",
+    "orgName": "Organization (optional)",
+    "orgNamePlaceholder": "Organization name",
+    "confirmRevoke": "Revoke official status for {{name}}?",
+    "noAccounts": "No official accounts yet",
+    "noAccountsHint": "Click \"+ Add Official Account\" to get started",
+    "colAccount": "Account",
+    "colBadge": "Badge",
+    "colOrg": "Organization",
+    "colListings": "Listings",
+    "colPriority": "Priority",
+    "colActions": "Actions",
+    "maxListings": "Max",
+    "canFeature": "Can feature",
+    "badges": {
+      "verified": "Verified",
+      "official": "Official",
+      "educator": "Educator",
+      "publisher": "Publisher",
+      "partner": "Partner"
+    }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "Coba Lagi",
   "noData": "Tidak ada data tersedia",

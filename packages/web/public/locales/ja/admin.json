@@ -5,8 +5,10 @@
     "users": "ユーザー",
     "study": "学習アクティビティ",
     "market": "マーケット",
+    "official": "Official",
     "contents": "コンテンツ",
-    "system": "システム"
+    "system": "システム",
+    "audit": "Audit Log"
   },
   "overview": {
     "title": "概要",
@@ -67,7 +69,15 @@
     "searchPlaceholder": "名前で検索...",
     "allRoles": "全ロール",
     "allStatus": "全ステータス",
-    "clearFilters": "フィルターをクリア"
+    "clearFilters": "フィルターをクリア",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?"
   },
   "study": {
     "title": "学習アクティビティ",
@@ -115,10 +125,10 @@
     "totalShares": "共有総数",
     "activeShares": "有効な共有",
     "shareByMode": "モード別共有",
+    "shareBreakdown": "共有モード分析",
     "topCategories": "トップカテゴリ",
     "acquireConversion": "取得率",
     "shareActivation": "共有有効化",
-    "shareBreakdown": "共有モード分析",
     "avgAcquiresPerListing": "出品あたり平均取得数",
     "activeRate": "{{value}}% アクティブ",
     "listings": "出品",
@@ -126,7 +136,10 @@
       "copy": "コピー",
       "subscribe": "購読",
       "snapshot": "スナップショット"
-    }
+    },
+    "reports": "Content Reports",
+    "pendingReports": "pending",
+    "noReports": "No reports found."
   },
   "contents": {
     "title": "コンテンツ",
@@ -139,6 +152,7 @@
     "avgViewDuration": "平均閲覧時間",
     "localeBreakdown": "ロケール内訳",
     "dailyViews": "日別閲覧数（30日）",
+    "dailyPageViews": "日別ページビュー",
     "views": "閲覧数",
     "uniqueLabel": "ユニーク",
     "publishingTimeline": "公開タイムライン",
@@ -169,7 +183,6 @@
     "topPages": "トップページ",
     "pagePath": "ページパス",
     "ctaClicks": "CTAクリック数",
-    "dailyPageViews": "日別ページビュー",
     "viewPeriod": "期間",
     "dayShort": "日",
     "viewsPerContent": "コンテンツあたり {{value}}",
@@ -202,8 +215,8 @@
     "recentlyUsedKeys": "最近使用（7日）",
     "totalContents": "コンテンツ総数",
     "publishedContents": "公開済みコンテンツ",
-    "totalStudyLogs": "学習ログ総数",
     "draftContents": "下書きコンテンツ",
+    "totalStudyLogs": "学習ログ総数",
     "healthStatus": "システムヘルス",
     "apiKeysSection": "APIキー管理",
     "contentPipeline": "コンテンツパイプライン",
@@ -214,6 +227,84 @@
       "content": "コンテンツパイプライン",
       "study": "学習アクティビティ"
     }
+  },
+  "official": {
+    "title": "Official Accounts",
+    "totalAccounts": "Official Accounts",
+    "totalListings": "Total Listings",
+    "featured": "Featured",
+    "organizations": "Organizations",
+    "addAccount": "+ Add Official Account",
+    "addSubmit": "Add Official",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "revoke": "Revoke",
+    "selectUser": "Select User",
+    "searchUserPlaceholder": "Search by name or UUID...",
+    "selectUserFirst": "Please select a user first",
+    "alreadyOfficial": "Already Official",
+    "noUsersFound": "No users found",
+    "badgeType": "Badge Type",
+    "orgName": "Organization (optional)",
+    "orgNamePlaceholder": "Organization name",
+    "confirmRevoke": "Revoke official status for {{name}}?",
+    "noAccounts": "No official accounts yet",
+    "noAccountsHint": "Click \"+ Add Official Account\" to get started",
+    "colAccount": "Account",
+    "colBadge": "Badge",
+    "colOrg": "Organization",
+    "colListings": "Listings",
+    "colPriority": "Priority",
+    "colActions": "Actions",
+    "maxListings": "Max",
+    "canFeature": "Can feature",
+    "badges": {
+      "verified": "Verified",
+      "official": "Official",
+      "educator": "Educator",
+      "publisher": "Publisher",
+      "partner": "Partner"
+    }
+  },
+  "audit": {
+    "title": "Audit Log",
+    "filterAction": "Action",
+    "filterTargetType": "Target Type",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "allActions": "All Actions",
+    "allTargets": "All Targets",
+    "search": "Search",
+    "reset": "Reset",
+    "time": "Time",
+    "admin": "Admin",
+    "action": "Action",
+    "target": "Target",
+    "details": "Details",
+    "ipAddress": "IP",
+    "noLogs": "No audit logs found.",
+    "autoRefresh": "Auto-refresh",
+    "export": "Export CSV",
+    "actions": {
+      "set_official": "Set Official",
+      "resolve_report": "Resolve Report",
+      "set_user_status": "Set User Status",
+      "update_settings": "Update Settings",
+      "export_data": "Export Data",
+      "revoke_official": "Revoke Official"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "report": "Report",
+      "system": "System"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "lastUpdated": "Updated {{time}}",
+    "exportCsv": "Export CSV"
   },
   "retry": "再試行",
   "noData": "データがありません",
