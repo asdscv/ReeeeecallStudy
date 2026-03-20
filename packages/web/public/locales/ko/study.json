@@ -62,7 +62,12 @@
     "backToDeck": "덱으로 돌아가기",
     "exitConfirmTitle": "학습을 종료하시겠습니까?",
     "exitConfirmMessage": "현재까지의 학습 기록은 저장됩니다.",
-    "exitConfirmButton": "종료"
+    "exitConfirmButton": "종료",
+    "pause": "일시정지",
+    "resume": "계속하기",
+    "paused": "일시정지됨",
+    "pressSpaceToResume": "Space를 눌러 계속하기",
+    "undo": "되돌리기"
   },
   "card": {
     "tapToFlip": "탭하여 뒤집기",
@@ -184,5 +189,14 @@
       "title": "학습할 카드 없음",
       "message": "조건에 맞는 카드가 없습니다."
     }
+  },
+  "shortcuts": {
+    "title": "키보드 단축키",
+    "description": "학습 중 사용 가능한 단축키",
+    "rateCards": "Again / Hard / Good / Easy 평가",
+    "flipOrPause": "카드 뒤집기 / 일시정지-재개",
+    "undoRating": "마지막 평가 되돌리기",
+    "exitStudy": "학습 종료",
+    "toggleHelp": "도움말 열기/닫기"
   }
 }

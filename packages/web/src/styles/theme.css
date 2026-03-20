@@ -1,0 +1,88 @@
+/**
+ * Theme CSS Variables
+ *
+ * Provides semantic color tokens that automatically switch between light/dark
+ * based on the .dark class on <html>. These variables are used throughout the
+ * app via CSS var() references and complement the existing Tailwind/shadcn
+ * variables in index.css.
+ *
+ * Usage: var(--bg-primary), var(--text-primary), etc.
+ */
+
+@layer base {
+  :root {
+    /* Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-card: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+
+    /* Borders */
+    --border-primary: #e5e7eb;
+    --border-secondary: #d1d5db;
+
+    /* Text */
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
+    --text-inverse: #ffffff;
+
+    /* Interactive */
+    --bg-hover: #f3f4f6;
+    --bg-active: #e5e7eb;
+
+    /* Semantic: input fields */
+    --input-bg: #f3f3f5;
+    --input-border: #d1d5db;
+    --input-text: #111827;
+    --input-placeholder: #9ca3af;
+
+    /* Semantic: badges / tags */
+    --badge-bg: #f3f4f6;
+    --badge-text: #374151;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark {
+    /* Backgrounds */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --bg-card: #1e293b;
+    --bg-overlay: rgba(0, 0, 0, 0.7);
+
+    /* Borders */
+    --border-primary: #334155;
+    --border-secondary: #475569;
+
+    /* Text */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --text-inverse: #0f172a;
+
+    /* Interactive */
+    --bg-hover: #334155;
+    --bg-active: #475569;
+
+    /* Semantic: input fields */
+    --input-bg: #1e293b;
+    --input-border: #475569;
+    --input-text: #f1f5f9;
+    --input-placeholder: #64748b;
+
+    /* Semantic: badges / tags */
+    --badge-bg: #334155;
+    --badge-text: #cbd5e1;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  }
+}

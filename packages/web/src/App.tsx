@@ -34,6 +34,7 @@ import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
 import { PublicListingPage } from './pages/PublicListingPage'
 import { usePageTracking } from './hooks/usePageTracking'
+import { useTheme } from './hooks/useTheme'
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded heavy pages                                           */
@@ -121,6 +122,9 @@ function LoginRedirect() {
 function App() {
   const { initialize, user, loading } = useAuthStore()
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
+
+  // Apply theme (dark class on <html>) based on user preference / system setting
+  useTheme()
 
   useEffect(() => {
     initialize()

@@ -49,6 +49,14 @@
     "id": "Bahasa Indonesia"
   },
 
+  "theme": {
+    "title": "Giao diện",
+    "description": "Chọn giao diện bạn thích. Hệ thống sẽ theo cài đặt thiết bị của bạn.",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
+  },
+
   "srs": {
     "title": "Học SRS",
     "description": "Đặt số lượng thẻ mới được thêm mỗi phiên trong chế độ SRS (lặp lại ngắt quãng)",

@@ -49,6 +49,14 @@
     "id": "Bahasa Indonesia"
   },
 
+  "theme": {
+    "title": "Tema",
+    "description": "Pilih tampilan yang Anda sukai. Sistem akan mengikuti pengaturan perangkat.",
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem"
+  },
+
   "srs": {
     "title": "Pembelajaran SRS",
     "description": "Atur jumlah kartu baru yang ditambahkan per sesi dalam mode SRS (pengulangan berjarak)",

@@ -43,6 +43,15 @@
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
   },
+
+  "theme": {
+    "title": "Tema",
+    "description": "Elige tu apariencia preferida. El sistema seguirá la configuración de tu dispositivo.",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+
   "srs": {
     "title": "Aprendizaje SRS",
     "description": "Establece el número de tarjetas nuevas añadidas por sesión en modo SRS (repetición espaciada)",
