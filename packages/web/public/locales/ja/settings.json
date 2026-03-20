@@ -49,6 +49,14 @@
     "id": "Bahasa Indonesia"
   },
 
+  "theme": {
+    "title": "テーマ",
+    "description": "お好みの外観を選択してください。システムはデバイスの設定に従います。",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
+  },
+
   "srs": {
     "title": "SRS学習",
     "description": "SRS（間隔反復）モードで1セッションあたりに追加する新規カード数を設定します",

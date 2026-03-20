@@ -49,6 +49,14 @@
     "id": "Bahasa Indonesia"
   },
 
+  "theme": {
+    "title": "主题",
+    "description": "选择您喜欢的外观。系统选项将跟随设备设置。",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "系统"
+  },
+
   "srs": {
     "title": "SRS 学习",
     "description": "设置 SRS（间隔重复）模式下每次学习添加的新卡数量",

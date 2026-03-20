@@ -1,7 +1,7 @@
-import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { X } from 'lucide-react'
+import { X, Pause, Play, Undo2, Keyboard } from 'lucide-react'
 import { useStudyStore } from '../stores/study-store'
 import { useAuthStore } from '../stores/auth-store'
 import { supabase } from '../lib/supabase'
@@ -15,6 +15,7 @@ import { StudySummary } from '../components/study/StudySummary'
 import { CrammingSummary } from '../components/study/CrammingSummary'
 import { NoCardsDue } from '../components/study/NoCardsDue'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
+import { KeyboardShortcutsModal } from '../components/study/KeyboardShortcutsModal'
 import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak, type TTSOptions } from '../lib/tts'
@@ -40,10 +41,15 @@ export function StudySessionPage() {
     sessionStats,
     crammingManager,
     exitDirection,
+    isPaused,
+    lastRatedCard,
     initSession,
     flipCard,
     rateCard,
     exitSession,
+    pauseSession,
+    resumeSession,
+    undoLastRating,
     reset,
   } = useStudyStore()
 
@@ -51,6 +57,9 @@ export function StudySessionPage() {
   const [inputSettings, setInputSettings] = useState<StudyInputSettings>(() => loadSettings())
   const [crammingTimeRemaining, setCrammingTimeRemaining] = useState<number | null>(null)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showUndo, setShowUndo] = useState(false)
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Fetch profile for TTS settings
   useEffect(() => {
@@ -206,16 +215,56 @@ export function StudySessionPage() {
   }, [exitSession])
 
   const handleFlip = useCallback(() => {
+    if (isPaused) return
     flipCard()
-  }, [flipCard])
+  }, [flipCard, isPaused])
+
+  const handlePauseToggle = useCallback(() => {
+    if (isPaused) {
+      resumeSession()
+    } else {
+      pauseSession()
+    }
+  }, [isPaused, pauseSession, resumeSession])
+
+  const handleUndo = useCallback(() => {
+    if (!lastRatedCard) return
+    undoLastRating()
+    setShowUndo(false)
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+  }, [lastRatedCard, undoLastRating])
+
+  const handleToggleShortcuts = useCallback(() => {
+    setShowShortcuts(prev => !prev)
+  }, [])
+
+  // Show undo button for 5 seconds after rating
+  useEffect(() => {
+    if (lastRatedCard) {
+      setShowUndo(true)
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+      undoTimerRef.current = setTimeout(() => {
+        setShowUndo(false)
+      }, 5000)
+    } else {
+      setShowUndo(false)
+    }
+    return () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    }
+  }, [lastRatedCard])
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
     isFlipped,
     mode: config?.mode ?? 'srs',
+    isPaused,
     onFlip: handleFlip,
     onRate: handleRate,
     onExit: handleExit,
+    onPause: handlePauseToggle,
+    onUndo: handleUndo,
+    onHelp: handleToggleShortcuts,
   })
 
   // Loading state
@@ -346,7 +395,21 @@ export function StudySessionPage() {
               total={sessionStats.totalCards}
             />
           )}
-          <div className="flex items-center gap-2 ml-4">
+          <div className="flex items-center gap-1 ml-4">
+            <button
+              onClick={handlePauseToggle}
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+              title={isPaused ? t('session.resume') : t('session.pause')}
+            >
+              {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={handleToggleShortcuts}
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+              title={t('shortcuts.title')}
+            >
+              <Keyboard className="w-5 h-5" />
+            </button>
             <button
               onClick={handleExit}
               className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
@@ -387,6 +450,36 @@ export function StudySessionPage() {
         </div>
       )}
 
+      {/* Undo button */}
+      {showUndo && lastRatedCard && (
+        <div className="fixed bottom-6 left-6 z-20">
+          <button
+            onClick={handleUndo}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg shadow-md hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <Undo2 className="w-4 h-4" />
+            {t('session.undo')}
+          </button>
+        </div>
+      )}
+
+      {/* Pause overlay */}
+      {isPaused && (
+        <div className="fixed inset-0 z-30 bg-black/40 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-3xl font-bold text-white mb-6">{t('session.paused')}</p>
+            <button
+              onClick={handlePauseToggle}
+              className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg shadow-lg hover:bg-gray-100 transition-colors cursor-pointer mx-auto"
+            >
+              <Play className="w-5 h-5" />
+              {t('session.resume')}
+            </button>
+            <p className="text-white/70 text-sm mt-4">{t('session.pressSpaceToResume')}</p>
+          </div>
+        </div>
+      )}
+
       {/* Exit confirmation dialog */}
       <ConfirmDialog
         open={showExitConfirm}
@@ -395,6 +488,12 @@ export function StudySessionPage() {
         title={t('session.exitConfirmTitle')}
         message={t('session.exitConfirmMessage')}
         confirmLabel={t('session.exitConfirmButton')}
+      />
+
+      {/* Keyboard shortcuts modal */}
+      <KeyboardShortcutsModal
+        open={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
       />
     </div>
   )

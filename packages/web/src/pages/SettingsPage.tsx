@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronDown, Globe, Loader2, Sparkles, Shield, Pencil, LogOut, Zap, Bot } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronDown, Globe, Loader2, Sparkles, Shield, Pencil, LogOut, Zap, Bot, Palette } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -8,6 +8,8 @@ import { supabase } from '../lib/supabase'
 import { formatLocalDateTime } from '../lib/date-utils'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
+import { useTheme } from '../hooks/useTheme'
+import { ThemeToggle } from '../components/common/ThemeToggle'
 import {
   loadSettings,
   saveSettings,
@@ -60,6 +62,7 @@ export function SettingsPage() {
   const { changeLanguage } = useLocale()
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
+  const { theme, setTheme } = useTheme()
 
   const [loading, setLoading] = useState(true)
 
@@ -802,6 +805,16 @@ export function SettingsPage() {
               </option>
             ))}
           </select>
+        </section>
+
+        {/* ── f2) Theme ── */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Palette className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">{t('theme.title')}</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">{t('theme.description')}</p>
+          <ThemeToggle theme={theme} onChange={setTheme} />
         </section>
 
         {/* ── API Key Management ── */}
