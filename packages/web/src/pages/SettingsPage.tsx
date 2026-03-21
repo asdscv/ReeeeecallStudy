@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronDown, Globe, Loader2, Sparkles, Shield, Pencil, LogOut, Zap, Bot, Palette } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronDown, Globe, Loader2, Sparkles, Shield, Pencil, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { useTheme } from '../hooks/useTheme'
 import { ThemeToggle } from '../components/common/ThemeToggle'
+import { UserStatsExport } from '../components/settings/UserStatsExport'
 import {
   loadSettings,
   saveSettings,
@@ -71,6 +72,7 @@ export function SettingsPage() {
   const [savedDisplayName, setSavedDisplayName] = useState('')
   const [dailyNewLimit, setDailyNewLimit] = useState(20)
   const [savedDailyNewLimit, setSavedDailyNewLimit] = useState(20)
+  const [dailyGoal, setDailyGoal] = useState<number | null>(null)
   const [ttsEnabled, setTtsEnabled] = useState(false)
   const [ttsSpeed, setTtsSpeed] = useState(0.9)
   const [ttsProvider, setTtsProvider] = useState<'web_speech' | 'edge_tts'>('web_speech')
@@ -233,6 +235,7 @@ export function SettingsPage() {
         setSavedDisplayName(p.display_name ?? '')
         setDailyNewLimit(p.daily_new_limit)
         setSavedDailyNewLimit(p.daily_new_limit)
+        setDailyGoal((p as Record<string, unknown>).daily_study_goal as number | null)
         setTtsEnabled(p.tts_enabled)
         setTtsSpeed(p.tts_speed ?? 0.9)
         setTtsProvider(p.tts_provider ?? 'web_speech')
@@ -939,6 +942,43 @@ export function SettingsPage() {
             Terms of Service
           </a>
         </div>
+
+        {/* ── Daily Study Goal ── */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">{t('goal.title', 'Daily Study Goal')}</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">{t('goal.description', 'Set a daily study target in minutes. Leave empty for no goal.')}</p>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min={1}
+              max={480}
+              placeholder={t('goal.placeholder', 'e.g. 30')}
+              value={dailyGoal ?? ''}
+              onChange={(e) => setDailyGoal(e.target.value ? parseInt(e.target.value, 10) : null)}
+              onBlur={async () => {
+                if (dailyGoal !== null && (dailyGoal < 1 || dailyGoal > 480)) return
+                if (user) {
+                  const ok = await autoSaveProfile(user.id, 'daily_study_goal', dailyGoal)
+                  if (ok) toast.success(t('autoSaved', 'Saved'))
+                }
+              }}
+              className="w-24 px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
+            />
+            <span className="text-sm text-gray-500">{t('goal.unit', 'minutes / day')}</span>
+          </div>
+        </section>
+
+        {/* ── Data Export ── */}
+        <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Download className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">{t('export.title', 'Export My Data')}</h2>
+          </div>
+          <UserStatsExport />
+        </section>
 
         {/* ── j) Account (bottom, clear separation) ── */}
         <div className="border-t border-gray-200 pt-6">

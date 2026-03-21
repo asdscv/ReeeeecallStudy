@@ -68,5 +68,11 @@
     "notFound": "덱을 찾을 수 없습니다",
     "notFoundDescription": "이 덱은 삭제되었거나 더 이상 사용할 수 없습니다.",
     "backToHome": "홈으로 돌아가기"
+  },
+  "difficulty": {
+    "beginner": "초급",
+    "intermediate": "중급",
+    "advanced": "고급",
+    "expert": "전문가"
   }
 }

@@ -68,5 +68,11 @@
     "submit": "Submit Report",
     "submitting": "Submitting...",
     "submitted": "Report submitted. Thank you!"
+  },
+  "difficulty": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "expert": "Expert"
   }
 }
