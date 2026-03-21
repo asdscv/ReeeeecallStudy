@@ -198,5 +198,14 @@
     "undoRating": "마지막 평가 되돌리기",
     "exitStudy": "학습 종료",
     "toggleHelp": "도움말 열기/닫기"
+  },
+  "multiDeck": {
+    "title": "멀티 덱 학습",
+    "selectAll": "전체 선택",
+    "deselectAll": "전체 해제",
+    "noDecks": "덱이 없습니다.",
+    "selected": "{{count}}개 덱 선택됨 ({{cards}}장)",
+    "start": "멀티 덱 학습 시작",
+    "cards": "{{count}}장"
   }
 }

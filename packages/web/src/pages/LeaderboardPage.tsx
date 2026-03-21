@@ -39,7 +39,8 @@ export function LeaderboardPage() {
       } as Record<string, unknown>)
 
       if (error) throw error
-      setEntries((data ?? []) as LeaderboardEntry[])
+      const result = data as { entries: LeaderboardEntry[] } | null
+      setEntries(result?.entries ?? [])
     } catch {
       setEntries([])
     } finally {

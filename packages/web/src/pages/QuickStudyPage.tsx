@@ -17,6 +17,7 @@ import {
   clampBatchSize,
 } from '../lib/study-session-utils'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { MultiDeckSelector } from '../components/study/MultiDeckSelector'
 import type { Deck, StudyMode } from '../types/database'
 
 export function QuickStudyPage() {
@@ -156,6 +157,9 @@ export function QuickStudyPage() {
         </h1>
         <GuideHelpLink section="study" />
       </div>
+
+      {/* Multi-Deck Study */}
+      {decks.length > 1 && <MultiDeckSelector />}
 
       {loading ? (
         <div className="flex justify-center py-20">

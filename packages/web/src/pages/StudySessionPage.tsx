@@ -17,6 +17,7 @@ import { CrammingSummary } from '../components/study/CrammingSummary'
 import { NoCardsDue } from '../components/study/NoCardsDue'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { KeyboardShortcutsModal } from '../components/study/KeyboardShortcutsModal'
+import { PomodoroTimer } from '../components/study/PomodoroTimer'
 import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak, type TTSOptions } from '../lib/tts'
@@ -406,6 +407,7 @@ export function StudySessionPage() {
             >
               {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
             </button>
+            <PomodoroTimer onBreakStart={pauseSession} onBreakEnd={resumeSession} compact />
             <button
               onClick={handleToggleShortcuts}
               className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
