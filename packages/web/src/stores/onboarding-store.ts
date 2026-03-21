@@ -20,6 +20,10 @@ interface OnboardingState {
   showOnboarding: boolean
   loading: boolean
 
+  // Data created during onboarding flow
+  sampleDeckId: string | null
+  sampleTemplateId: string | null
+
   initialize: () => Promise<void>
   completeStep: (stepKey: OnboardingStepKey) => Promise<void>
   nextStep: () => void
@@ -27,6 +31,9 @@ interface OnboardingState {
   goToStep: (index: number) => void
   skip: () => Promise<void>
   dismiss: () => void  // hide without completing
+  restart: () => Promise<void>  // reset onboarding to start over
+  setSampleDeckId: (id: string | null) => void
+  setSampleTemplateId: (id: string | null) => void
 }
 
 export const useOnboardingStore = create<OnboardingState>((set, get) => ({
@@ -35,6 +42,8 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   currentStep: 0,
   showOnboarding: false,
   loading: false,
+  sampleDeckId: null,
+  sampleTemplateId: null,
 
   initialize: async () => {
     set({ loading: true })
@@ -109,6 +118,39 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   dismiss: () => {
     set({ showOnboarding: false })
   },
+
+  restart: async () => {
+    set({ loading: true })
+    try {
+      // Reset onboarding_completed flag on profile
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ onboarding_completed: false })
+          .eq('id', user.id)
+
+        // Delete existing onboarding progress rows
+        await supabase
+          .from('onboarding_progress')
+          .delete()
+          .eq('user_id', user.id)
+      }
+    } catch { /* continue anyway */ }
+
+    set({
+      isCompleted: false,
+      completedSteps: new Set(),
+      currentStep: 0,
+      showOnboarding: true,
+      loading: false,
+      sampleDeckId: null,
+      sampleTemplateId: null,
+    })
+  },
+
+  setSampleDeckId: (id) => set({ sampleDeckId: id }),
+  setSampleTemplateId: (id) => set({ sampleTemplateId: id }),
 }))
 
 function findNextIncompleteStep(completed: Set<OnboardingStepKey>): number {
