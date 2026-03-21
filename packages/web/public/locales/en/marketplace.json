@@ -68,5 +68,11 @@
     "notFound": "Deck not found",
     "notFoundDescription": "This deck may have been removed or is no longer available.",
     "backToHome": "Back to Home"
+  },
+  "difficulty": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "expert": "Expert"
   }
 }

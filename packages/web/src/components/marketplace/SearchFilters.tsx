@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import {
   MARKETPLACE_CATEGORIES,
+  DIFFICULTY_LEVELS,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   countActiveFilters,
@@ -210,6 +211,41 @@ export function SearchFilters({
                     }`}
                   >
                     {t(`shareModes.${mode}`, mode)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Difficulty level */}
+          <div>
+            <span className="text-xs font-medium text-gray-600 mb-1.5 block">
+              {t('difficultyFilter', { defaultValue: 'Difficulty' })}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => onFilterChange({ difficulty: undefined })}
+                className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                  !filters.difficulty
+                    ? 'bg-blue-100 text-blue-700 border-blue-300'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-blue-200'
+                }`}
+              >
+                {t('allDifficulty', { defaultValue: 'All' })}
+              </button>
+              {DIFFICULTY_LEVELS.map(({ value, labelKey }) => {
+                const isActive = filters.difficulty === value
+                return (
+                  <button
+                    key={value}
+                    onClick={() => onFilterChange({ difficulty: isActive ? undefined : value })}
+                    className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                      isActive
+                        ? 'bg-blue-100 text-blue-700 border-blue-300'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-200'
+                    }`}
+                  >
+                    {t(labelKey, value)}
                   </button>
                 )
               })}

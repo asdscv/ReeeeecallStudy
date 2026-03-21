@@ -4,6 +4,7 @@ export {
   type ListingFilters,
   type SortBy,
   MARKETPLACE_CATEGORIES,
+  DIFFICULTY_LEVELS,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   calculateTrendingScore,
