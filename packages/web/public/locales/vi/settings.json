@@ -6,24 +6,20 @@
   "saved": "Đã lưu cài đặt!",
   "saveButton": "Lưu cài đặt",
   "autoSaved": "Đã tự động lưu",
-
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
     "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
     "apiDocs": "Tài liệu API",
     "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
   },
-
   "guide": {
     "title": "Hướng dẫn sử dụng",
     "desc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
   },
-
   "apiDocs": {
     "title": "Tài liệu API",
     "desc": "Điểm cuối API, xác thực, ví dụ sử dụng"
   },
-
   "profile": {
     "title": "Hồ sơ",
     "email": "Email",
@@ -36,7 +32,6 @@
     "nameTaken": "Tên này đã được sử dụng",
     "nameLength": "Tên phải từ 2-12 ký tự"
   },
-
   "language": {
     "title": "Ngôn ngữ",
     "label": "Ngôn ngữ hiển thị",
@@ -48,7 +43,6 @@
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
   },
-
   "theme": {
     "title": "Giao diện",
     "description": "Chọn giao diện bạn thích. Hệ thống sẽ theo cài đặt thiết bị của bạn.",
@@ -56,7 +50,6 @@
     "dark": "Tối",
     "system": "Hệ thống"
   },
-
   "srs": {
     "title": "Học SRS",
     "description": "Đặt số lượng thẻ mới được thêm mỗi phiên trong chế độ SRS (lặp lại ngắt quãng)",
@@ -66,7 +59,6 @@
     "help": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này.",
     "newCardNote": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này."
   },
-
   "answerMode": {
     "title": "Chế độ trả lời",
     "description": "Đặt cách bạn chọn câu trả lời khi học",
@@ -76,7 +68,6 @@
     "swipeDesc": "Chọn câu trả lời bằng cách vuốt thẻ",
     "swipeAutoNote": "Hướng vuốt được đặt tự động dựa trên chế độ học.\n• SRS: ← Lại / → Tốt\n• Chế độ khác: ← Chưa biết / → Đã biết"
   },
-
   "tts": {
     "title": "Đọc TTS tự động",
     "description": "Tự động đọc các trường có TTS khi lật thẻ",
@@ -91,7 +82,6 @@
     "help": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
     "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động."
   },
-
   "apiKey": {
     "title": "Quản lý khóa API",
     "limit": "Bạn có thể tạo tối đa 1 khóa API",
@@ -122,7 +112,6 @@
     "noKey": "Chưa tạo khóa API nào.",
     "securityNote": "Không thể xem lại vì lý do bảo mật"
   },
-
   "aiProvider": {
     "title": "Nhà cung cấp AI",
     "description": "Quản lý nhà cung cấp và khóa API cho tạo tự động AI",
@@ -143,11 +132,24 @@
     "customDesc": "API tương thích OpenAI",
     "noProviders": "Chưa cấu hình nhà cung cấp. Hãy thiết lập ở trên."
   },
-
   "account": {
     "title": "Tài khoản",
     "logout": "Đăng xuất"
   },
-
-  "settings": {}
+  "settings": {},
+  "reminders": {
+    "title": "Study Reminders",
+    "description": "Get reminded to study daily, just like Duolingo.",
+    "enable": "Enable reminders",
+    "time": "Reminder time",
+    "days": "Reminder days",
+    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  }
 }

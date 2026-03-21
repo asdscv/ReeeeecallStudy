@@ -144,6 +144,22 @@
     "noProviders": "No providers configured. Set up above."
   },
 
+  "reminders": {
+    "title": "Study Reminders",
+    "description": "Get reminded to study daily, just like Duolingo.",
+    "enable": "Enable reminders",
+    "time": "Reminder time",
+    "days": "Reminder days",
+    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+
   "account": {
     "title": "Account",
     "logout": "Log out"

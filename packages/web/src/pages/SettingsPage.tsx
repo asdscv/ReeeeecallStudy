@@ -11,6 +11,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { useTheme } from '../hooks/useTheme'
 import { ThemeToggle } from '../components/common/ThemeToggle'
 import { UserStatsExport } from '../components/settings/UserStatsExport'
+import { ReminderSettings } from '../components/settings/ReminderSettings'
 import {
   loadSettings,
   saveSettings,
@@ -970,6 +971,9 @@ export function SettingsPage() {
             <span className="text-sm text-gray-500">{t('goal.unit', 'minutes / day')}</span>
           </div>
         </section>
+
+        {/* ── Study Reminders ── */}
+        <ReminderSettings />
 
         {/* ── Data Export ── */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
