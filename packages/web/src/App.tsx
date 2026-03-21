@@ -35,6 +35,8 @@ import { LandingPage } from './pages/LandingPage'
 import { PublicListingPage } from './pages/PublicListingPage'
 import { usePageTracking } from './hooks/usePageTracking'
 import { useTheme } from './hooks/useTheme'
+import { useOnboardingStore } from './stores/onboarding-store'
+import { OnboardingOverlay } from './components/onboarding/OnboardingOverlay'
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded heavy pages                                           */
@@ -122,6 +124,7 @@ function LoginRedirect() {
 function App() {
   const { initialize, user, loading } = useAuthStore()
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
+  const { showOnboarding, initialize: initOnboarding } = useOnboardingStore()
 
   // Apply theme (dark class on <html>) based on user preference / system setting
   useTheme()
@@ -129,6 +132,11 @@ function App() {
   useEffect(() => {
     initialize()
   }, [initialize])
+
+  // Initialize onboarding when user is logged in
+  useEffect(() => {
+    if (user) initOnboarding()
+  }, [user, initOnboarding])
 
   // Start session heartbeat when user is logged in
   useEffect(() => {
@@ -246,6 +254,7 @@ function App() {
             <Route path="*" element={<Navigate to={user ? '/dashboard' : '/'} replace />} />
           </Routes>
         </Suspense>
+        {showOnboarding && <OnboardingOverlay />}
       </ErrorBoundary>
     </BrowserRouter>
   )

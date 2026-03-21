@@ -98,6 +98,7 @@
     "finish": "Finish",
     "getStarted": "Get Started",
     "stepOf": "Step {{current}} of {{total}}",
+    "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
@@ -105,28 +106,32 @@
     },
     "createDeck": {
       "title": "Create Your First Deck",
-      "description": "A deck is a collection of flashcards on a topic. Create one for any subject you want to study.",
-      "action": "Create Deck"
+      "description": "We've prepared a sample deck for you. Click to create it!",
+      "action": "Create This Deck",
+      "creating": "Creating...",
+      "created": "Deck created!"
     },
     "cardTemplate": {
-      "title": "Choose a Card Template",
-      "description": "Templates define how your cards look. Use the default front/back template, or choose specialized ones for languages, exams, and more.",
-      "action": "View Templates"
+      "title": "Your Card Templates",
+      "description": "These templates are already set up for you. Pick one for your cards.",
+      "fields": "{{count}} fields",
+      "useTemplate": "Use This Template"
     },
     "addCards": {
-      "title": "Add Cards to Your Deck",
-      "description": "Add cards manually, import from CSV, or use AI to generate cards automatically from any topic.",
-      "action": "Add Cards",
-      "actionAlt": "Use AI Generate"
+      "title": "Sample Cards Ready!",
+      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "action": "Add These Cards",
+      "adding": "Adding...",
+      "added": "Cards added!"
     },
     "firstStudy": {
-      "title": "Start Studying!",
-      "description": "Choose your study mode: SRS (spaced repetition) for long-term memory, or random/sequential for quick review. Rate each card to track your progress.",
-      "action": "Start Study"
+      "title": "You're Ready to Study!",
+      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "action": "Start Studying"
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Discover thousands of shared decks created by other users. Find study materials for any subject and start learning instantly.",
+      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
       "action": "Browse Marketplace",
       "actionFinish": "Finish Setup"
     }

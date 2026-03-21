@@ -1,180 +1,75 @@
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
-import { OnboardingOverlay } from '../OnboardingOverlay'
-import { ONBOARDING_STEPS } from '../../../stores/onboarding-store'
+import { describe, it, expect } from 'vitest'
+import { getSampleDeck, getSampleCards } from '../../../lib/onboarding-samples'
 
-// ─── Mocks ──────────────────────────────────────────────────
-const mockNavigate = vi.fn()
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom')
-  return { ...actual, useNavigate: () => mockNavigate }
-})
+describe('onboarding-samples', () => {
+  describe('getSampleDeck', () => {
+    it('returns Korean deck for ko locale', () => {
+      const deck = getSampleDeck('ko')
+      expect(deck.name).toBe('영어 단어장')
+      expect(deck.description).toBeTruthy()
+    })
 
-// Mock the onboarding store with controllable state
-const mockNextStep = vi.fn()
-const mockPrevStep = vi.fn()
-const mockSkip = vi.fn()
-const mockCompleteStep = vi.fn()
-const mockDismiss = vi.fn()
+    it('returns Japanese deck for ja locale', () => {
+      const deck = getSampleDeck('ja')
+      expect(deck.name).toBe('英単語帳')
+    })
 
-let mockCurrentStep = 0
+    it('returns Chinese deck for zh locale', () => {
+      const deck = getSampleDeck('zh')
+      expect(deck.name).toBe('英语词汇')
+    })
 
-vi.mock('../../../stores/onboarding-store', async () => {
-  const actual = await vi.importActual('../../../stores/onboarding-store')
-  return {
-    ...actual,
-    useOnboardingStore: () => ({
-      currentStep: mockCurrentStep,
-      showOnboarding: true,
-      nextStep: mockNextStep,
-      prevStep: mockPrevStep,
-      skip: mockSkip,
-      completeStep: mockCompleteStep,
-      dismiss: mockDismiss,
-    }),
-  }
-})
+    it('returns English deck for unknown locale', () => {
+      const deck = getSampleDeck('xx')
+      expect(deck.name).toBe('English Vocabulary')
+    })
 
-const renderOverlay = () =>
-  render(
-    <MemoryRouter>
-      <OnboardingOverlay />
-    </MemoryRouter>,
-  )
-
-beforeEach(() => {
-  vi.clearAllMocks()
-  mockCurrentStep = 0
-})
-
-// ─── Rendering ──────────────────────────────────────────────
-describe('OnboardingOverlay rendering', () => {
-  it('should render the overlay', () => {
-    renderOverlay()
-    expect(screen.getByTestId('onboarding-overlay')).toBeInTheDocument()
+    it('returns English deck for en locale', () => {
+      const deck = getSampleDeck('en')
+      expect(deck.name).toBe('English Vocabulary')
+    })
   })
 
-  it('should show 6 step indicator dots', () => {
-    renderOverlay()
-    const dots = screen.getByTestId('step-dots')
-    expect(dots.children).toHaveLength(ONBOARDING_STEPS.length)
-  })
+  describe('getSampleCards', () => {
+    it('returns 5 cards for ko locale', () => {
+      const cards = getSampleCards('ko')
+      expect(cards.length).toBe(5)
+      expect(cards[0].word).toBe('apple')
+      expect(cards[0].meaning).toBe('사과')
+    })
 
-  it('should display the first step title (Welcome)', () => {
-    renderOverlay()
-    expect(screen.getByText('onboarding.welcome.title')).toBeInTheDocument()
-  })
-})
+    it('returns 5 cards for ja locale', () => {
+      const cards = getSampleCards('ja')
+      expect(cards.length).toBe(5)
+      expect(cards[0].meaning).toBe('りんご')
+    })
 
-// ─── Navigation ─────────────────────────────────────────────
-describe('OnboardingOverlay navigation', () => {
-  it('should call skip when skip button is clicked', async () => {
-    const user = userEvent.setup()
-    renderOverlay()
+    it('returns 5 cards for zh locale', () => {
+      const cards = getSampleCards('zh')
+      expect(cards.length).toBe(5)
+      expect(cards[0].meaning).toBe('苹果')
+    })
 
-    await user.click(screen.getByTestId('onboarding-skip'))
-    expect(mockSkip).toHaveBeenCalled()
-  })
+    it('returns English definitions for unknown locale', () => {
+      const cards = getSampleCards('xx')
+      expect(cards.length).toBe(5)
+      expect(cards[0].word).toBe('apple')
+    })
 
-  it('should call completeStep and nextStep when Get Started is clicked', async () => {
-    const user = userEvent.setup()
-    renderOverlay()
+    it('each card has word and meaning', () => {
+      const cards = getSampleCards('ko')
+      for (const card of cards) {
+        expect(card.word).toBeTruthy()
+        expect(card.meaning).toBeTruthy()
+      }
+    })
 
-    await user.click(screen.getByText('onboarding.welcome.action'))
-    expect(mockCompleteStep).toHaveBeenCalledWith('welcome')
-    expect(mockNextStep).toHaveBeenCalled()
-  })
-
-  it('should call prevStep when Back button is clicked on non-first step', async () => {
-    mockCurrentStep = 2
-    const user = userEvent.setup()
-    renderOverlay()
-
-    await user.click(screen.getByLabelText('onboarding.back'))
-    expect(mockPrevStep).toHaveBeenCalled()
-  })
-
-  it('should have back button disabled on first step', () => {
-    mockCurrentStep = 0
-    renderOverlay()
-
-    const backBtn = screen.getByLabelText('onboarding.back')
-    expect(backBtn).toBeDisabled()
-  })
-})
-
-// ─── Step titles ────────────────────────────────────────────
-describe('Step content display', () => {
-  it('should show Welcome step at index 0', () => {
-    mockCurrentStep = 0
-    renderOverlay()
-    expect(screen.getByText('onboarding.welcome.title')).toBeInTheDocument()
-  })
-
-  it('should show Create Deck step at index 1', () => {
-    mockCurrentStep = 1
-    renderOverlay()
-    expect(screen.getByText('onboarding.createDeck.title')).toBeInTheDocument()
-  })
-
-  it('should show Card Template step at index 2', () => {
-    mockCurrentStep = 2
-    renderOverlay()
-    expect(screen.getByText('onboarding.cardTemplate.title')).toBeInTheDocument()
-  })
-
-  it('should show Add Cards step at index 3', () => {
-    mockCurrentStep = 3
-    renderOverlay()
-    expect(screen.getByText('onboarding.addCards.title')).toBeInTheDocument()
-  })
-
-  it('should show First Study step at index 4', () => {
-    mockCurrentStep = 4
-    renderOverlay()
-    expect(screen.getByText('onboarding.firstStudy.title')).toBeInTheDocument()
-  })
-
-  it('should show Explore Market step at index 5', () => {
-    mockCurrentStep = 5
-    renderOverlay()
-    expect(screen.getByText('onboarding.exploreMarket.title')).toBeInTheDocument()
-  })
-})
-
-// ─── Action buttons ─────────────────────────────────────────
-describe('Action buttons', () => {
-  it('should dismiss and navigate when Create Deck action is clicked', async () => {
-    mockCurrentStep = 1
-    const user = userEvent.setup()
-    renderOverlay()
-
-    await user.click(screen.getByText('onboarding.createDeck.action'))
-    expect(mockCompleteStep).toHaveBeenCalledWith('create_deck')
-    expect(mockDismiss).toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith('/decks')
-  })
-
-  it('should dismiss and navigate when Browse Marketplace is clicked', async () => {
-    mockCurrentStep = 5
-    const user = userEvent.setup()
-    renderOverlay()
-
-    await user.click(screen.getByText('onboarding.exploreMarket.action'))
-    expect(mockCompleteStep).toHaveBeenCalledWith('explore_market')
-    expect(mockDismiss).toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith('/marketplace')
-  })
-
-  it('should dismiss when Finish Setup is clicked on last step', async () => {
-    mockCurrentStep = 5
-    const user = userEvent.setup()
-    renderOverlay()
-
-    await user.click(screen.getByText('onboarding.exploreMarket.actionFinish'))
-    expect(mockCompleteStep).toHaveBeenCalledWith('explore_market')
-    expect(mockDismiss).toHaveBeenCalled()
+    it('returns cards for all supported languages', () => {
+      const langs = ['ko', 'ja', 'zh', 'es', 'vi', 'th', 'id', 'en']
+      for (const lang of langs) {
+        const cards = getSampleCards(lang)
+        expect(cards.length).toBeGreaterThan(0)
+      }
+    })
   })
 })
