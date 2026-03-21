@@ -16,6 +16,7 @@ export interface MarketplaceListingData {
   updated_at: string
   owner_display_name?: string | null
   owner_is_official?: boolean
+  difficulty_level?: string | null
 }
 
 export interface ListingFilters {
@@ -27,7 +28,15 @@ export interface ListingFilters {
   shareMode?: string
   dateRange?: '7d' | '30d' | '90d' | 'all'
   verifiedOnly?: boolean
+  difficulty?: string
 }
+
+export const DIFFICULTY_LEVELS = [
+  { value: 'beginner', labelKey: 'marketplace:difficulty.beginner' },
+  { value: 'intermediate', labelKey: 'marketplace:difficulty.intermediate' },
+  { value: 'advanced', labelKey: 'marketplace:difficulty.advanced' },
+  { value: 'expert', labelKey: 'marketplace:difficulty.expert' },
+] as const
 
 export type SortBy = 'newest' | 'popular' | 'card_count' | 'top_rated' | 'trending'
 
@@ -71,6 +80,7 @@ export function countActiveFilters(filters: ListingFilters): number {
   if (filters.verifiedOnly) count++
   if (filters.minRating && filters.minRating > 0) count++
   if (filters.tags && filters.tags.length > 0) count++
+  if (filters.difficulty) count++
   return count
 }
 
@@ -136,6 +146,10 @@ export function filterListings(
 
     if (filters.shareMode) {
       if (listing.share_mode !== filters.shareMode) return false
+    }
+
+    if (filters.difficulty) {
+      if (listing.difficulty_level !== filters.difficulty) return false
     }
 
     if (filters.dateRange && filters.dateRange !== 'all') {
