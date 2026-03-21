@@ -1,5 +1,6 @@
 // Cloudflare Worker — API 프록시 + SPA fallback + SEO/AEO 프리렌더링 + AI 콘텐츠 생성
 import { runContentPipeline } from './worker-modules/content-pipeline.js'
+import { sendReminders } from './worker-modules/reminder-sender.js'
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
 const SITE_URL = 'https://reeeeecallstudy.xyz'
 const BRAND_NAME = 'ReeeeecallStudy'
@@ -1166,6 +1167,7 @@ ${items}
 export default {
   async scheduled(event, env, ctx) {
     ctx.waitUntil(runContentPipeline(env, event.cron))
+    ctx.waitUntil(sendReminders(env))
   },
 
   async fetch(request, env) {

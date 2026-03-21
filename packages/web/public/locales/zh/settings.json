@@ -6,24 +6,20 @@
   "saved": "设置已保存！",
   "saveButton": "保存设置",
   "autoSaved": "已自动保存",
-
   "links": {
     "userGuide": "用户指南",
     "userGuideDesc": "功能说明、学习技巧、分享方法",
     "apiDocs": "API 文档",
     "apiDocsDesc": "API 端点、认证、使用示例"
   },
-
   "guide": {
     "title": "用户指南",
     "desc": "功能说明、学习技巧、分享方法"
   },
-
   "apiDocs": {
     "title": "API 文档",
     "desc": "API 端点、认证、使用示例"
   },
-
   "profile": {
     "title": "个人信息",
     "email": "邮箱",
@@ -36,7 +32,6 @@
     "nameTaken": "该名称已被使用",
     "nameLength": "名称必须为2-12个字符"
   },
-
   "language": {
     "title": "语言",
     "label": "显示语言",
@@ -48,7 +43,6 @@
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
   },
-
   "theme": {
     "title": "主题",
     "description": "选择您喜欢的外观。系统选项将跟随设备设置。",
@@ -56,7 +50,6 @@
     "dark": "深色",
     "system": "系统"
   },
-
   "srs": {
     "title": "SRS 学习",
     "description": "设置 SRS（间隔重复）模式下每次学习添加的新卡数量",
@@ -66,7 +59,6 @@
     "help": "SRS 学习中除复习卡外的最大新卡数量。复习卡不受此限制影响。",
     "newCardNote": "SRS 学习中除复习卡外的最大新卡数量。复习卡不受此限制影响。"
   },
-
   "answerMode": {
     "title": "答题模式",
     "description": "设置学习时的答题方式",
@@ -76,7 +68,6 @@
     "swipeDesc": "通过滑动卡片选择答案",
     "swipeAutoNote": "滑动方向根据学习模式自动设置。\n• SRS: ← 重来 / → 良好\n• 其他模式: ← 不知道 / → 知道"
   },
-
   "tts": {
     "title": "自动 TTS 朗读",
     "description": "翻转卡片时自动朗读启用了 TTS 的字段",
@@ -91,7 +82,6 @@
     "help": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
     "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。"
   },
-
   "apiKey": {
     "title": "API 密钥管理",
     "limit": "最多可创建 1 个 API 密钥",
@@ -122,7 +112,6 @@
     "noKey": "尚未生成 API 密钥。",
     "securityNote": "出于安全考虑，无法再次查看"
   },
-
   "aiProvider": {
     "title": "AI 提供商",
     "description": "管理用于 AI 自动生成的提供商和 API 密钥",
@@ -143,11 +132,24 @@
     "customDesc": "OpenAI 兼容 API",
     "noProviders": "未配置提供商，请在上方设置。"
   },
-
   "account": {
     "title": "账号",
     "logout": "退出登录"
   },
-
-  "settings": {}
+  "settings": {},
+  "reminders": {
+    "title": "Study Reminders",
+    "description": "Get reminded to study daily, just like Duolingo.",
+    "enable": "Enable reminders",
+    "time": "Reminder time",
+    "days": "Reminder days",
+    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  }
 }

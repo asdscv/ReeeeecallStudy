@@ -6,24 +6,20 @@
   "saved": "Pengaturan disimpan!",
   "saveButton": "Simpan Pengaturan",
   "autoSaved": "Tersimpan otomatis",
-
   "links": {
     "userGuide": "Panduan Pengguna",
     "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
     "apiDocs": "Dokumentasi API",
     "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
   },
-
   "guide": {
     "title": "Panduan Pengguna",
     "desc": "Panduan fitur, kiat belajar, cara berbagi"
   },
-
   "apiDocs": {
     "title": "Dokumentasi API",
     "desc": "Endpoint API, autentikasi, contoh penggunaan"
   },
-
   "profile": {
     "title": "Profil",
     "email": "Email",
@@ -36,7 +32,6 @@
     "nameTaken": "Nama ini sudah digunakan",
     "nameLength": "Nama harus 2-12 karakter"
   },
-
   "language": {
     "title": "Bahasa",
     "label": "Bahasa tampilan",
@@ -48,7 +43,6 @@
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
   },
-
   "theme": {
     "title": "Tema",
     "description": "Pilih tampilan yang Anda sukai. Sistem akan mengikuti pengaturan perangkat.",
@@ -56,7 +50,6 @@
     "dark": "Gelap",
     "system": "Sistem"
   },
-
   "srs": {
     "title": "Pembelajaran SRS",
     "description": "Atur jumlah kartu baru yang ditambahkan per sesi dalam mode SRS (pengulangan berjarak)",
@@ -66,7 +59,6 @@
     "help": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini.",
     "newCardNote": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini."
   },
-
   "answerMode": {
     "title": "Mode Jawaban",
     "description": "Atur cara Anda memilih jawaban saat belajar",
@@ -76,7 +68,6 @@
     "swipeDesc": "Pilih jawaban dengan menggeser kartu",
     "swipeAutoNote": "Arah geser diatur secara otomatis berdasarkan mode belajar.\n• SRS: ← Ulangi / → Baik\n• Mode lain: ← Tidak Diketahui / → Diketahui"
   },
-
   "tts": {
     "title": "Pembacaan TTS Otomatis",
     "description": "Baca otomatis bidang dengan TTS saat membalik kartu",
@@ -91,7 +82,6 @@
     "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
     "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
   },
-
   "apiKey": {
     "title": "Manajemen Kunci API",
     "limit": "Anda dapat membuat hingga 1 kunci API",
@@ -122,7 +112,6 @@
     "noKey": "Belum ada kunci API yang dibuat.",
     "securityNote": "Tidak dapat dilihat lagi demi keamanan"
   },
-
   "aiProvider": {
     "title": "Penyedia AI",
     "description": "Kelola penyedia dan kunci API untuk pembuatan otomatis AI",
@@ -143,11 +132,24 @@
     "customDesc": "API kompatibel OpenAI",
     "noProviders": "Belum ada penyedia yang dikonfigurasi. Atur di atas."
   },
-
   "account": {
     "title": "Akun",
     "logout": "Keluar"
   },
-
-  "settings": {}
+  "settings": {},
+  "reminders": {
+    "title": "Study Reminders",
+    "description": "Get reminded to study daily, just like Duolingo.",
+    "enable": "Enable reminders",
+    "time": "Reminder time",
+    "days": "Reminder days",
+    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  }
 }

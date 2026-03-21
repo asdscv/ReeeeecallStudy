@@ -144,6 +144,22 @@
     "noProviders": "설정된 프로바이더가 없습니다. 위에서 설정하세요."
   },
 
+  "reminders": {
+    "title": "학습 리마인더",
+    "description": "듀오링고처럼 매일 학습 알림을 받아보세요.",
+    "enable": "리마인더 활성화",
+    "time": "알림 시간",
+    "days": "알림 요일",
+    "preview": "{{days}}에 {{time}}에 알림을 받습니다",
+    "mon": "월",
+    "tue": "화",
+    "wed": "수",
+    "thu": "목",
+    "fri": "금",
+    "sat": "토",
+    "sun": "일"
+  },
+
   "account": {
     "title": "계정",
     "logout": "로그아웃"

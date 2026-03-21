@@ -6,24 +6,20 @@
   "saved": "設定を保存しました！",
   "saveButton": "設定を保存",
   "autoSaved": "自動保存しました",
-
   "links": {
     "userGuide": "ユーザーガイド",
     "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
     "apiDocs": "APIドキュメント",
     "apiDocsDesc": "APIエンドポイント、認証、使用例"
   },
-
   "guide": {
     "title": "ユーザーガイド",
     "desc": "機能ガイド、学習のコツ、共有方法"
   },
-
   "apiDocs": {
     "title": "APIドキュメント",
     "desc": "APIエンドポイント、認証、使用例"
   },
-
   "profile": {
     "title": "プロフィール",
     "email": "メールアドレス",
@@ -36,7 +32,6 @@
     "nameTaken": "この名前は既に使われています",
     "nameLength": "名前は2〜12文字で入力してください"
   },
-
   "language": {
     "title": "言語",
     "label": "表示言語",
@@ -48,7 +43,6 @@
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
   },
-
   "theme": {
     "title": "テーマ",
     "description": "お好みの外観を選択してください。システムはデバイスの設定に従います。",
@@ -56,7 +50,6 @@
     "dark": "ダーク",
     "system": "システム"
   },
-
   "srs": {
     "title": "SRS学習",
     "description": "SRS（間隔反復）モードで1セッションあたりに追加する新規カード数を設定します",
@@ -66,7 +59,6 @@
     "help": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。",
     "newCardNote": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。"
   },
-
   "answerMode": {
     "title": "回答モード",
     "description": "学習中の回答方法を設定します",
@@ -76,7 +68,6 @@
     "swipeDesc": "カードをスワイプして回答を選択",
     "swipeAutoNote": "スワイプ方向は学習モードに応じて自動設定されます。\n• SRS: ← Again / → Good\n• その他: ← 分からない / → 知っている"
   },
-
   "tts": {
     "title": "TTS自動読み上げ",
     "description": "カードを裏返した時にTTS対応フィールドを自動読み上げ",
@@ -91,7 +82,6 @@
     "help": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。",
     "note": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。"
   },
-
   "apiKey": {
     "title": "APIキー管理",
     "limit": "APIキーは最大1つまで作成できます",
@@ -122,7 +112,6 @@
     "noKey": "APIキーが生成されていません。",
     "securityNote": "セキュリティのため再表示できません"
   },
-
   "aiProvider": {
     "title": "AI プロバイダー",
     "description": "AI 自動生成に使用するプロバイダーと API キーを管理します",
@@ -143,11 +132,24 @@
     "customDesc": "OpenAI 互換 API",
     "noProviders": "プロバイダーが設定されていません。上で設定してください。"
   },
-
   "account": {
     "title": "アカウント",
     "logout": "ログアウト"
   },
-
-  "settings": {}
+  "settings": {},
+  "reminders": {
+    "title": "Study Reminders",
+    "description": "Get reminded to study daily, just like Duolingo.",
+    "enable": "Enable reminders",
+    "time": "Reminder time",
+    "days": "Reminder days",
+    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  }
 }
