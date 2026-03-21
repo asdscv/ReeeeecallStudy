@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, ChevronDown, ChevronUp, ArrowLeft, ExternalLink, Link2 } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, ArrowLeft, ExternalLink, Link2, RotateCcw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { GUIDE_SECTIONS, searchGuide, type GuideSection } from '../lib/guide-content'
+import { useOnboardingStore } from '../stores/onboarding-store'
 
 // ─── SectionCard ───────────────────────────────────────────
 
@@ -141,6 +142,8 @@ export function GuidePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { t } = useTranslation('guide')
+  const { t: tCommon } = useTranslation('common')
+  const restartOnboarding = useOnboardingStore((s) => s.restart)
   const [query, setQuery] = useState('')
   const [openSectionId, setOpenSectionId] = useState<string | null>(null)
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
@@ -213,10 +216,17 @@ export function GuidePage() {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
           <p className="text-sm text-gray-500 mt-0.5">{t('subtitle')}</p>
         </div>
+        <button
+          onClick={restartOnboarding}
+          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition cursor-pointer shrink-0"
+        >
+          <RotateCcw className="w-4 h-4" />
+          <span className="hidden sm:inline">{tCommon('onboarding.restartOnboarding')}</span>
+        </button>
       </div>
 
       {/* Search */}

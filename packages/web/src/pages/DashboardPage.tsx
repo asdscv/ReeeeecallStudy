@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth-store'
-import { useOnboardingStore } from '../stores/onboarding-store'
-import { OnboardingOverlay } from '../components/onboarding/OnboardingOverlay'
 import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
 import { daysAgoUTC } from '../lib/date-utils'
@@ -28,17 +26,12 @@ import { GuideHelpLink } from '../components/common/GuideHelpLink'
 export function DashboardPage() {
   const { t } = useTranslation('dashboard')
   const { user } = useAuthStore()
-  const { showOnboarding, initialize: initOnboarding } = useOnboardingStore()
   const { decks, stats, loading, fetchDecks, fetchStats } = useDeckStore()
 
   const [allCards, setAllCards] = useState<Card[]>([])
   const [studyLogs, setStudyLogs] = useState<StudyLog[]>([])
   const [dataLoading, setDataLoading] = useState(true)
   const [period, setPeriod] = useState<TimePeriod>('1m')
-
-  useEffect(() => {
-    initOnboarding()
-  }, [initOnboarding])
 
   useEffect(() => {
     fetchDecks()
@@ -101,8 +94,6 @@ export function DashboardPage() {
   const dailyData = getDailyStudyCounts(filteredLogs, days)
 
   return (
-    <>
-    {showOnboarding && <OnboardingOverlay />}
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -128,6 +119,5 @@ export function DashboardPage() {
 
       <RecentDecks decks={decks} stats={stats} />
     </div>
-    </>
   )
 }

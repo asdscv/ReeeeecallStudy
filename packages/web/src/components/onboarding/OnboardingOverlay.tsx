@@ -41,7 +41,6 @@ export function OnboardingOverlay() {
   const stepDef = ONBOARDING_STEPS[currentStep]
   const StepComponent = STEP_COMPONENTS[currentStep]
   const isFirst = currentStep === 0
-  const isLast = currentStep === totalSteps - 1
 
   // Lock body scroll while overlay is open
   useEffect(() => {
@@ -73,12 +72,8 @@ export function OnboardingOverlay() {
 
   const handleNext = useCallback(() => {
     completeStep(stepDef.key as OnboardingStepKey)
-    if (isLast) {
-      dismiss()
-    } else {
-      nextStep()
-    }
-  }, [completeStep, stepDef.key, isLast, dismiss, nextStep])
+    nextStep()
+  }, [completeStep, stepDef.key, nextStep])
 
   const progressPercent = ((currentStep + 1) / totalSteps) * 100
 
@@ -91,7 +86,7 @@ export function OnboardingOverlay() {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Card */}
-      <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Progress bar */}
         <div className="h-1 bg-gray-100">
           <div
