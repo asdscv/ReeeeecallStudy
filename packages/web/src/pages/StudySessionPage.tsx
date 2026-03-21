@@ -4,6 +4,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { X, Pause, Play, Undo2, Keyboard } from 'lucide-react'
 import { useStudyStore } from '../stores/study-store'
 import { useAuthStore } from '../stores/auth-store'
+import { useAchievementStore } from '../stores/achievement-store'
 import { supabase } from '../lib/supabase'
 import { StudyCard } from '../components/study/StudyCard'
 import { StudyProgressBar } from '../components/study/StudyProgressBar'
@@ -188,12 +189,14 @@ export function StudySessionPage() {
     }
   }, [isFlipped, currentCard, template, config, profile, backTTSFields, ttsOptions])
 
-  // Stop TTS when session completes
+  // Stop TTS and check achievements when session completes
+  const checkAchievements = useAchievementStore(s => s.checkAchievements)
   useEffect(() => {
     if (phase === 'completed') {
       stopSpeaking()
+      checkAchievements()
     }
-  }, [phase])
+  }, [phase, checkAchievements])
 
   const handleRate = useCallback((rating: string) => {
     rateCard(rating)

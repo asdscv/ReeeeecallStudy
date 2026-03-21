@@ -20,6 +20,7 @@ import { StudyHeatmap } from '../components/dashboard/StudyHeatmap'
 import { ForecastWidget } from '../components/dashboard/ForecastWidget'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { RecentDecks } from '../components/dashboard/RecentDecks'
+import { AchievementsSummary } from '../components/dashboard/AchievementsSummary'
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 
@@ -109,6 +110,8 @@ export function DashboardPage() {
         streak={streak}
         masteryRate={masteryRate}
       />
+
+      <AchievementsSummary />
 
       {shouldShowHeatmap(period) && <StudyHeatmap data={heatmapData} />}
 
