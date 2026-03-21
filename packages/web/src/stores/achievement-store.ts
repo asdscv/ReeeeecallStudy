@@ -72,7 +72,8 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
       const { data, error } = await supabase.rpc('check_achievements')
       if (error) throw error
 
-      const newIds = (data ?? []) as string[]
+      const result = data as { new_achievements: string[] } | null
+      const newIds = result?.new_achievements ?? []
 
       if (newIds.length > 0) {
         set({ newlyEarned: newIds })

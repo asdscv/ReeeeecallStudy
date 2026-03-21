@@ -206,5 +206,14 @@
     "undoRating": "Undo last rating",
     "exitStudy": "Exit study",
     "toggleHelp": "Toggle this help"
+  },
+  "multiDeck": {
+    "title": "Multi-Deck Study",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "noDecks": "No decks found.",
+    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "start": "Start Multi-Deck Study",
+    "cards": "{{count}} cards"
   }
 }
