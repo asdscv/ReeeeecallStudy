@@ -244,10 +244,10 @@
     "xpReward": "+{{xp}} XP"
   },
   "streakFreeze": {
-    "title": "스트릭 프리즈",
+    "title": "연속 학습 보호",
     "available": "{{count}}개 보유",
-    "used": "오늘 스트릭이 보호되었습니다!",
-    "earned": "스트릭 프리즈를 획득했습니다!"
+    "used": "오늘 연속 학습이 보호되었습니다!",
+    "earned": "연속 학습 보호권을 획득했습니다!"
   },
   "levelUp": {
     "title": "레벨 업!",
@@ -257,7 +257,7 @@
   },
   "goals": {
     "title": "다음 목표",
-    "streak": "스트릭",
+    "streak": "연속 학습",
     "cards": "학습한 카드",
     "sessions": "학습 세션",
     "time": "학습 시간",
