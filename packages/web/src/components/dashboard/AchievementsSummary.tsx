@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 import { useAchievementStore } from '../../stores/achievement-store'
+import { AchievementIcon } from '../../lib/achievement-icons'
 
 function xpForLevel(level: number): number {
   return level * 100
@@ -76,13 +77,9 @@ export function AchievementsSummary() {
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500 mr-1">{t('achievements.recent')}:</span>
           {recentEarned.map(ach => (
-            <span
-              key={ach.id}
-              className="text-xl"
-              title={t(`achievements.badge.${ach.id}`, ach.id)}
-            >
-              {ach.icon}
-            </span>
+            <div key={ach.id} title={t(`achievements.badge.${ach.id}`, ach.id)}>
+              <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="sm" earned />
+            </div>
           ))}
         </div>
       )}
