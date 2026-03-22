@@ -20,12 +20,10 @@ export function Layout() {
       { path: '/decks', label: t('nav.decks'), icon: '📚' },
       { path: '/templates', label: t('nav.cards'), icon: '📋' },
       { path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
-      { path: '/publisher', label: 'Publisher', icon: '📈' },
+      { path: '/publisher', label: t('nav.publisher'), icon: '📈' },
       { path: '/history', label: t('nav.studyHistory'), icon: '📝' },
-      { path: '/analytics', label: t('nav.analytics'), icon: '📈' },
     ]},
     { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: '🏆' },
-    { kind: 'link', path: '/leaderboard', label: t('nav.leaderboard'), icon: '📊' },
     { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
     ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: '🛡️' }] : []),
   ]

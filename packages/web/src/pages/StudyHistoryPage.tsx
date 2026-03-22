@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, lazy, Suspense } from 'react'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -38,6 +38,12 @@ import { ModeBreakdownCards } from '../components/study-history/ModeBreakdownCar
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
 
+const PersonalAnalyticsContent = lazy(() =>
+  import('./PersonalAnalyticsPage').then(m => ({ default: m.PersonalAnalyticsContent }))
+)
+
+type HistoryTab = 'history' | 'analytics'
+
 const PAGE_SIZE = 15
 
 // ── Per-deck progress info ──
@@ -58,6 +64,7 @@ export function StudyHistoryPage() {
   const { user } = useAuthStore()
   const { decks, fetchDecks } = useDeckStore()
 
+  const [historyTab, setHistoryTab] = useState<HistoryTab>('history')
   const [sessions, setSessions] = useState<StudySession[]>([])
   const [allLogs, setAllLogs] = useState<StudyLog[]>([])
   const [deckProgress, setDeckProgress] = useState<DeckProgress[]>([])
@@ -240,17 +247,53 @@ export function StudyHistoryPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* ── Header + Deck Scope + Period Selection ── */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-              {selectedDeck
-                ? <>{selectedDeck.icon} {selectedDeck.name}</>
-                : t('title')}
-            </h1>
-            <GuideHelpLink section="history" />
+      {/* ── Header ── */}
+      <div className="flex items-center gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+          {selectedDeck
+            ? <>{selectedDeck.icon} {selectedDeck.name}</>
+            : t('title')}
+        </h1>
+        <GuideHelpLink section="history" />
+      </div>
+
+      {/* ── Tab switcher ── */}
+      <div className="flex gap-1 border-b border-gray-200">
+        <button
+          onClick={() => setHistoryTab('history')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition cursor-pointer ${
+            historyTab === 'history'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          {t('common:history.tabs.history')}
+        </button>
+        <button
+          onClick={() => setHistoryTab('analytics')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition cursor-pointer ${
+            historyTab === 'analytics'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          {t('common:history.tabs.analytics')}
+        </button>
+      </div>
+
+      {historyTab === 'analytics' ? (
+        <Suspense fallback={
+          <div className="flex justify-center py-20">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
           </div>
+        }>
+          <PersonalAnalyticsContent />
+        </Suspense>
+      ) : (
+      <>
+      {/* ── Deck Scope + Period Selection ── */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3">
           <TimePeriodTabs value={period} onChange={setPeriod} />
         </div>
 
@@ -415,6 +458,8 @@ export function StudyHistoryPage() {
           </>
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }
