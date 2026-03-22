@@ -230,5 +230,26 @@
     "sessions": "세션",
     "you": "나",
     "empty": "아직 리더보드 데이터가 없습니다. 먼저 학습을 시작하세요!"
+  },
+  "quests": {
+    "title": "일일 퀘스트",
+    "cards": "카드 {{target}}장 학습",
+    "sessions": "{{target}}회 세션 완료",
+    "time": "{{target}}분 학습하기",
+    "perfect": "만점 받기",
+    "completed": "완료!",
+    "xpReward": "+{{xp}} XP"
+  },
+  "streakFreeze": {
+    "title": "스트릭 프리즈",
+    "available": "{{count}}개 보유",
+    "used": "오늘 스트릭이 보호되었습니다!",
+    "earned": "스트릭 프리즈를 획득했습니다!"
+  },
+  "levelUp": {
+    "title": "레벨 업!",
+    "level": "레벨 {{level}}",
+    "message": "잘하고 있어요! 계속 화이팅!",
+    "xpEarned": "+{{xp}} XP"
   }
 }
