@@ -38,6 +38,33 @@ function round(n: number): number {
 }
 
 /**
+ * Mean Reversion — prevents Ease Hell and extreme high ease.
+ * Pulls ease toward the default (2.5) with a gentle force.
+ *
+ * Academic basis: FSRS uses D' = w7*D0(4) + (1-w7)*D for difficulty mean reversion.
+ * Our adaptation: ease = ease + 0.1 * (2.5 - ease)
+ *
+ * Effect: ease 1.3 → 1.42, ease 4.0 → 3.85 (10% pull toward center)
+ */
+function applyMeanReversion(ease: number): number {
+  const DEFAULT_EASE = 2.5
+  const REVERSION_RATE = 0.1
+  return ease + REVERSION_RATE * (DEFAULT_EASE - ease)
+}
+
+/**
+ * Cap interval growth to prevent exponential explosion.
+ * Based on Wickelgren (1974) Power Law — diminishing returns at high stability.
+ *
+ * Max growth: 3× current interval per single review.
+ */
+function capGrowth(newInterval: number, currentInterval: number, maxInterval: number): number {
+  const MAX_GROWTH_FACTOR = 3
+  const capped = Math.min(newInterval, currentInterval * MAX_GROWTH_FACTOR)
+  return Math.min(capped, maxInterval)
+}
+
+/**
  * Schedule review at the start of a future "SRS day".
  * dayStartHour=4 means the SRS day boundary is 4:00 AM local time.
  * For interval >= 1 day, cards are scheduled to the next day boundary
@@ -169,6 +196,8 @@ function calculateReview(
   switch (rating) {
     case 'again':
       ease = Math.max(1.3, ease - 0.20)
+      ease = applyMeanReversion(ease) // Phase 0.2: Mean Reversion
+      ease = Math.max(1.3, ease) // Re-clamp after reversion
       reps = 0
       if (s.again_days === 0) {
         const steps = getSteps(s)
@@ -191,6 +220,8 @@ function calculateReview(
 
     case 'hard':
       ease = Math.max(1.3, ease - 0.15)
+      ease = applyMeanReversion(ease) // Phase 0.2: Mean Reversion
+      ease = Math.max(1.3, ease) // Re-clamp after reversion
       reps += 1
       if (card.repetitions === 0) {
         interval = s.hard_days
@@ -207,6 +238,12 @@ function calculateReview(
       }
 
     case 'good': {
+      // Phase 0.1: Good increases ease slightly (+0.05) — prevents Ease Hell
+      // Academic basis: SM-2 keeps ease flat on "good", causing Ease Hell.
+      // Even Wozniak (SM-2 creator) acknowledged this flaw.
+      ease = Math.min(4.0, ease + 0.05)
+      // Phase 0.2: Mean Reversion — extreme values trend toward 2.5
+      ease = applyMeanReversion(ease)
       reps += 1
       if (card.repetitions === 0) {
         interval = s.good_days
@@ -215,6 +252,8 @@ function calculateReview(
       } else {
         const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
         interval = Math.max(hardIvl + 1, Math.round(card.interval_days * ease))
+        // Phase 0.3: Cap growth — diminishing returns (Wickelgren, 1974)
+        interval = capGrowth(interval, card.interval_days, maxIvl)
       }
       interval = Math.min(interval, maxIvl)
       return {
@@ -228,6 +267,7 @@ function calculateReview(
 
     case 'easy': {
       ease = Math.min(4.0, ease + 0.15)
+      ease = applyMeanReversion(ease) // Phase 0.2: Mean Reversion
       reps += 1
       if (card.repetitions === 0) {
         interval = s.easy_days
@@ -235,6 +275,8 @@ function calculateReview(
         const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
         const goodIvl = Math.max(hardIvl + 1, Math.round(card.interval_days * card.ease_factor))
         interval = Math.max(goodIvl + 1, Math.round(card.interval_days * ease * 1.3))
+        // Phase 0.3: Cap growth — diminishing returns
+        interval = capGrowth(interval, card.interval_days, maxIvl)
       }
       interval = Math.min(interval, maxIvl)
       return {
