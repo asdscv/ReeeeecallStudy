@@ -194,7 +194,7 @@
     "title": "Keyboard Shortcuts",
     "description": "Available shortcuts during study sessions",
     "rateCards": "Rate Again / Hard / Good / Easy",
-    "flipOrPause": "Flip card / Pause-Resume",
+    "flipCard": "Flip card",
     "undoRating": "Undo last rating",
     "exitStudy": "Exit study",
     "toggleHelp": "Toggle this help"
@@ -204,8 +204,11 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selectHint": "Select decks to study together",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards"
+    "cards": " cards",
+    "decksUnit": " decks",
+    "cardsUnit": " cards",
+    "swipeHint": "In swipe mode, swipe left/right to rate cards."
   }
 }

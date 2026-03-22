@@ -194,7 +194,7 @@
     "title": "키보드 단축키",
     "description": "학습 중 사용 가능한 단축키",
     "rateCards": "Again / Hard / Good / Easy 평가",
-    "flipOrPause": "카드 뒤집기 / 일시정지-재개",
+    "flipCard": "카드 뒤집기",
     "undoRating": "마지막 평가 되돌리기",
     "exitStudy": "학습 종료",
     "toggleHelp": "도움말 열기/닫기"
@@ -204,8 +204,11 @@
     "selectAll": "전체 선택",
     "deselectAll": "전체 해제",
     "noDecks": "덱이 없습니다.",
-    "selected": "{{count}}개 덱 선택됨 ({{cards}}장)",
+    "selectHint": "함께 학습할 덱을 선택하세요",
     "start": "멀티 덱 학습 시작",
-    "cards": "{{count}}장"
+    "cards": "장",
+    "decksUnit": "개 덱",
+    "cardsUnit": "장",
+    "swipeHint": "스와이프 모드에서는 좌/우로 밀어서 카드를 평가하세요."
   }
 }
