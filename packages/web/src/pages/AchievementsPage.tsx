@@ -4,13 +4,11 @@ import { Trophy, Lock, ChevronDown, ChevronUp } from 'lucide-react'
 import { useAchievementStore } from '../stores/achievement-store'
 import type { Achievement } from '../stores/achievement-store'
 import { supabase } from '../lib/supabase'
+import { AchievementIcon, CategoryIcon } from '../lib/achievement-icons'
 
 // ── Helpers ──
 
 const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'social', 'milestone']
-const CATEGORY_ICONS: Record<string, string> = {
-  streak: '🔥', study: '📚', social: '🤝', milestone: '🏆',
-}
 
 function xpForLevel(level: number): number { return level * 100 }
 function xpInCurrentLevel(xp: number, level: number): number {
@@ -98,7 +96,7 @@ export function AchievementsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {nextGoals.map(goal => (
               <div key={goal.category} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <span className="text-2xl shrink-0">{goal.icon}</span>
+                <div className="shrink-0"><CategoryIcon category={goal.category} size="md" /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -128,7 +126,9 @@ export function AchievementsPage() {
           <div className="flex gap-4 overflow-x-auto pb-2">
             {recentEarned.map(ach => (
               <div key={ach.id} className="shrink-0 w-32 text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
-                <div className="text-3xl mb-1">{ach.icon}</div>
+                <div className="flex justify-center mb-2">
+                  <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="md" earned />
+                </div>
                 <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                   {t(`achievements.badge.${ach.id}`, ach.id.replace(/_/g, ' '))}
                 </p>
@@ -167,7 +167,7 @@ export function AchievementsPage() {
                 className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{CATEGORY_ICONS[cat]}</span>
+                  <CategoryIcon category={cat} size="sm" />
                   <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {t(`achievements.category.${cat}`)}
                   </span>
@@ -185,7 +185,9 @@ export function AchievementsPage() {
                     {/* Earned badges */}
                     {earnedInCat.map(ach => (
                       <div key={ach.id} className="rounded-xl border border-yellow-300 dark:border-yellow-700 bg-white dark:bg-gray-800 p-3 text-center shadow-sm">
-                        <div className="text-2xl mb-1">{ach.icon}</div>
+                        <div className="flex justify-center mb-1">
+                          <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="sm" earned />
+                        </div>
                         <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                           {t(`achievements.badge.${ach.id}`, ach.id.replace(/_/g, ' '))}
                         </p>
@@ -196,7 +198,9 @@ export function AchievementsPage() {
                     {/* Next locked (visible) */}
                     {nextLocked && (
                       <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-3 text-center opacity-70">
-                        <div className="text-2xl mb-1 grayscale">{nextLocked.icon}</div>
+                        <div className="flex justify-center mb-1">
+                          <AchievementIcon id={nextLocked.id} category={nextLocked.category} dbIcon={nextLocked.icon} size="sm" earned={false} />
+                        </div>
                         <p className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
                           {t(`achievements.badge.${nextLocked.id}`, nextLocked.id.replace(/_/g, ' '))}
                         </p>
