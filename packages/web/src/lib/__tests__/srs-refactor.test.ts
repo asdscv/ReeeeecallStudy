@@ -53,7 +53,7 @@ describe('SrsCardData backward compatibility', () => {
 
     expect(result.srs_status).toBe('review')
     expect(result.interval_days).toBe(1)
-    expect(result.ease_factor).toBe(2.5)
+    expect(result.ease_factor).toBe(2.55) // +0.05 + mean reversion
   })
 
   it('should accept full Card object in calculateSRS (unchanged behavior)', () => {

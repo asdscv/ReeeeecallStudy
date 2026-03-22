@@ -96,7 +96,7 @@ describe('calculateSRS — Learning Phase', () => {
       expect(result.srs_status).toBe('learning')
       expect(result.interval_days).toBe(0)
       expect(result.repetitions).toBe(0) // step 0
-      expect(result.ease_factor).toBe(2.3) // -0.20
+      expect(result.ease_factor).toBe(2.32) // -0.20 + mean reversion
 
       const nextReview = new Date(result.next_review_at).getTime()
       const now = Date.now()
@@ -111,7 +111,7 @@ describe('calculateSRS — Learning Phase', () => {
       expect(result.srs_status).toBe('learning')
       expect(result.interval_days).toBe(0)
       expect(result.repetitions).toBe(0) // stays at step 0
-      expect(result.ease_factor).toBe(2.35) // -0.15
+      expect(result.ease_factor).toBe(2.37) // -0.15 + mean reversion
 
       const nextReview = new Date(result.next_review_at).getTime()
       const now = Date.now()
@@ -126,7 +126,7 @@ describe('calculateSRS — Learning Phase', () => {
       expect(result.srs_status).toBe('learning')
       expect(result.interval_days).toBe(0)
       expect(result.repetitions).toBe(1) // step 1
-      expect(result.ease_factor).toBe(2.5) // unchanged
+      expect(result.ease_factor).toBe(2.5) // +0.05 not applied in learning good (no ease change)
 
       const nextReview = new Date(result.next_review_at).getTime()
       const now = Date.now()
@@ -225,7 +225,7 @@ describe('calculateSRS — Review Phase', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 2, interval_days: 6 })
       const result = calculateSRS(card, 'again', reviewSettings)
 
-      expect(result.ease_factor).toBe(2.3)
+      expect(result.ease_factor).toBe(2.32) // -0.20 + mean reversion
       expect(result.interval_days).toBe(0)
       expect(result.repetitions).toBe(0)
       expect(result.srs_status).toBe('learning')
@@ -242,7 +242,7 @@ describe('calculateSRS — Review Phase', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 0 })
       const result = calculateSRS(card, 'hard', reviewSettings)
 
-      expect(result.ease_factor).toBe(2.35)
+      expect(result.ease_factor).toBe(2.37) // -0.15 + mean reversion
       expect(result.interval_days).toBe(1)
       expect(result.repetitions).toBe(1)
     })
@@ -251,7 +251,7 @@ describe('calculateSRS — Review Phase', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 2, interval_days: 10 })
       const result = calculateSRS(card, 'hard', reviewSettings)
 
-      expect(result.ease_factor).toBe(2.35)
+      expect(result.ease_factor).toBe(2.37) // -0.15 + mean reversion
       expect(result.interval_days).toBe(12) // 10 * 1.2 = 12
       expect(result.repetitions).toBe(3)
     })
@@ -268,7 +268,7 @@ describe('calculateSRS — Review Phase', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 0 })
       const result = calculateSRS(card, 'good', reviewSettings)
 
-      expect(result.ease_factor).toBe(2.5)
+      expect(result.ease_factor).toBe(2.55) // +0.05 + mean reversion
       expect(result.interval_days).toBe(1) // good_days
       expect(result.repetitions).toBe(1)
       expect(result.srs_status).toBe('review')
@@ -296,7 +296,7 @@ describe('calculateSRS — Review Phase', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 0 })
       const result = calculateSRS(card, 'easy', reviewSettings)
 
-      expect(result.ease_factor).toBe(2.65)
+      expect(result.ease_factor).toBe(2.64) // +0.15 + mean reversion
       expect(result.interval_days).toBe(4) // easy_days
       expect(result.repetitions).toBe(1)
       expect(result.srs_status).toBe('review')
@@ -306,8 +306,8 @@ describe('calculateSRS — Review Phase', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 2, interval_days: 3 })
       const result = calculateSRS(card, 'easy', reviewSettings)
 
-      expect(result.ease_factor).toBe(2.65)
-      expect(result.interval_days).toBe(10) // round(3 * 2.65 * 1.3) = 10
+      expect(result.ease_factor).toBe(2.64) // +0.15 + mean reversion
+      expect(result.interval_days).toBe(9) // round(3 * 2.64 * 1.3) = 10, capped at 3×3=9
     })
   })
 
@@ -337,7 +337,7 @@ describe('calculateSRS — Review Phase', () => {
     })
 
     it('easy interval must always be greater than good interval for same card', () => {
-      const card = makeSrsCard({ srs_status: 'review', ease_factor: 1.3, repetitions: 2, interval_days: 1 })
+      const card = makeSrsCard({ srs_status: 'review', ease_factor: 1.3, repetitions: 2, interval_days: 2 })
       const good = calculateSRS(card, 'good', reviewSettings)
       const easy = calculateSRS(card, 'easy', reviewSettings)
       expect(easy.interval_days).toBeGreaterThan(good.interval_days)
@@ -361,16 +361,16 @@ describe('calculateSRS — Review Phase', () => {
   })
 
   describe('ease factor bounds', () => {
-    it('should not go below 1.3', () => {
+    it('should not go below 1.3 (mean reversion pulls up from floor)', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 1.4 })
       const result = calculateSRS(card, 'again', reviewSettings)
-      expect(result.ease_factor).toBe(1.3)
+      expect(result.ease_factor).toBe(1.42) // 1.3 → MR: 1.3+0.1*(2.5-1.3)=1.42
     })
 
-    it('should not go above 4.0', () => {
+    it('should not go above 4.0 (mean reversion pulls down from ceiling)', () => {
       const card = makeSrsCard({ srs_status: 'review', ease_factor: 3.9, repetitions: 1, interval_days: 1 })
       const result = calculateSRS(card, 'easy', reviewSettings)
-      expect(result.ease_factor).toBe(4.0)
+      expect(result.ease_factor).toBe(3.85) // 4.0 → MR: 4.0+0.1*(2.5-4.0)=3.85
     })
   })
 
@@ -495,7 +495,7 @@ describe('calculateSRS — Max Interval Cap', () => {
   it('should not clamp interval below max (250 < 365)', () => {
     const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 100 })
     const result = calculateSRS(card, 'good', reviewSettings)
-    expect(result.interval_days).toBe(250) // 100 * 2.5
+    expect(result.interval_days).toBe(255) // 100 * 2.55 (ease +0.05 + MR)
   })
 
   it('should clamp interval to 365 when calculation exceeds it', () => {
