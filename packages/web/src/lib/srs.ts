@@ -123,6 +123,7 @@ function calculateLearning(
     case 'again': {
       // Reset to step 0
       ease = Math.max(1.3, ease - 0.20)
+      ease = Math.max(1.3, applyMeanReversion(ease)) // Phase 0.2: prevent Ease Hell in learning
       const stepMinutes = steps[0]
       return {
         ease_factor: round(ease),
@@ -136,6 +137,7 @@ function calculateLearning(
     case 'hard': {
       // Repeat current step
       ease = Math.max(1.3, ease - 0.15)
+      ease = Math.max(1.3, applyMeanReversion(ease)) // Phase 0.2: prevent Ease Hell in learning
       const stepMinutes = steps[currentStep]
       return {
         ease_factor: round(ease),
