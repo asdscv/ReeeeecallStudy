@@ -275,7 +275,8 @@ function calculateReview(
         interval = s.easy_days
       } else {
         const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
-        const goodIvl = Math.max(hardIvl + 1, Math.round(card.interval_days * card.ease_factor))
+        // Use current (updated) ease, not card.ease_factor (pre-update value)
+        const goodIvl = Math.max(hardIvl + 1, Math.round(card.interval_days * ease))
         interval = Math.max(goodIvl + 1, Math.round(card.interval_days * ease * 1.3))
         // Phase 0.3: Cap growth — diminishing returns
         interval = capGrowth(interval, card.interval_days, maxIvl)

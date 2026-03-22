@@ -128,6 +128,28 @@ describe('Phase 0: Ease Hell Prevention', () => {
       expect(hard.interval_days).toBeLessThan(good.interval_days)
       expect(good.interval_days).toBeLessThan(easy.interval_days)
     })
+
+    it('easy uses UPDATED ease (not old card.ease_factor) for goodIvl calc', () => {
+      // Regression test: easy case was using card.ease_factor (pre-update)
+      // instead of ease (post-update) for the goodIvl intermediate calculation
+      const card = reviewCard(2.0, 30, 5) // low ease card
+      const good = calculateSRS(card, 'good', settings)
+      const easy = calculateSRS(card, 'easy', settings)
+
+      // easy must always produce longer interval than good for same card
+      expect(easy.interval_days).toBeGreaterThan(good.interval_days)
+    })
+
+    it('ordering holds for extreme ease values', () => {
+      // Test with very low ease (Ease Hell recovery scenario)
+      const card = reviewCard(1.3, 20, 4)
+      const hard = calculateSRS(card, 'hard', settings)
+      const good = calculateSRS(card, 'good', settings)
+      const easy = calculateSRS(card, 'easy', settings)
+
+      expect(hard.interval_days).toBeLessThan(good.interval_days)
+      expect(good.interval_days).toBeLessThan(easy.interval_days)
+    })
   })
 
   describe('Ease factor bounds always respected', () => {
