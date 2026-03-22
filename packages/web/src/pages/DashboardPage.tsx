@@ -118,15 +118,14 @@ export function DashboardPage() {
         masteryRate={masteryRate}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2">
-          <AchievementsSummary />
-        </div>
-        <div className="space-y-4">
-          <StreakFreezeWidget />
-          <DailyQuestsWidget />
-          <NextGoalsWidget />
-        </div>
+      {/* Achievements + Level */}
+      <AchievementsSummary />
+
+      {/* Gamification widgets — 3 column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StreakFreezeWidget />
+        <DailyQuestsWidget />
+        <NextGoalsWidget />
       </div>
 
       {shouldShowHeatmap(period) && <StudyHeatmap data={heatmapData} />}
