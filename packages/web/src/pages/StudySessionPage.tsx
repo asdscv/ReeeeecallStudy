@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { X, Pause, Play, Undo2, Keyboard } from 'lucide-react'
+import { X, Undo2, Keyboard } from 'lucide-react'
 import { useStudyStore } from '../stores/study-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useAchievementStore } from '../stores/achievement-store'
@@ -17,7 +17,7 @@ import { CrammingSummary } from '../components/study/CrammingSummary'
 import { NoCardsDue } from '../components/study/NoCardsDue'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { KeyboardShortcutsModal } from '../components/study/KeyboardShortcutsModal'
-import { PomodoroTimer } from '../components/study/PomodoroTimer'
+// PomodoroTimer available at ../components/study/PomodoroTimer (not used in default study flow)
 import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak, type TTSOptions } from '../lib/tts'
@@ -43,14 +43,11 @@ export function StudySessionPage() {
     sessionStats,
     crammingManager,
     exitDirection,
-    isPaused,
     lastRatedCard,
     initSession,
     flipCard,
     rateCard,
     exitSession,
-    pauseSession,
-    resumeSession,
     undoLastRating,
     reset,
   } = useStudyStore()
@@ -219,17 +216,8 @@ export function StudySessionPage() {
   }, [exitSession])
 
   const handleFlip = useCallback(() => {
-    if (isPaused) return
     flipCard()
-  }, [flipCard, isPaused])
-
-  const handlePauseToggle = useCallback(() => {
-    if (isPaused) {
-      resumeSession()
-    } else {
-      pauseSession()
-    }
-  }, [isPaused, pauseSession, resumeSession])
+  }, [flipCard])
 
   const handleUndo = useCallback(() => {
     if (!lastRatedCard) return
@@ -262,11 +250,9 @@ export function StudySessionPage() {
   useKeyboardShortcuts({
     isFlipped,
     mode: config?.mode ?? 'srs',
-    isPaused,
     onFlip: handleFlip,
     onRate: handleRate,
     onExit: handleExit,
-    onPause: handlePauseToggle,
     onUndo: handleUndo,
     onHelp: handleToggleShortcuts,
   })
@@ -400,17 +386,10 @@ export function StudySessionPage() {
             />
           )}
           <div className="flex items-center gap-1 ml-4">
-            <button
-              onClick={handlePauseToggle}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-              title={isPaused ? t('session.resume') : t('session.pause')}
-            >
-              {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-            </button>
-            <PomodoroTimer onBreakStart={pauseSession} onBreakEnd={resumeSession} compact />
+            {/* Keyboard shortcuts button — PC only (hidden on touch devices) */}
             <button
               onClick={handleToggleShortcuts}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+              className="hidden sm:block p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
               title={t('shortcuts.title')}
             >
               <Keyboard className="w-5 h-5" />
@@ -468,23 +447,6 @@ export function StudySessionPage() {
         </div>
       )}
 
-      {/* Pause overlay */}
-      {isPaused && (
-        <div className="fixed inset-0 z-30 bg-black/40 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-white mb-6">{t('session.paused')}</p>
-            <button
-              onClick={handlePauseToggle}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg shadow-lg hover:bg-gray-100 transition-colors cursor-pointer mx-auto"
-            >
-              <Play className="w-5 h-5" />
-              {t('session.resume')}
-            </button>
-            <p className="text-white/70 text-sm mt-4">{t('session.pressSpaceToResume')}</p>
-          </div>
-        </div>
-      )}
-
       {/* Exit confirmation dialog */}
       <ConfirmDialog
         open={showExitConfirm}
@@ -499,6 +461,7 @@ export function StudySessionPage() {
       <KeyboardShortcutsModal
         open={showShortcuts}
         onClose={() => setShowShortcuts(false)}
+        isSwipeMode={!shouldShowButtons(inputSettings)}
       />
     </div>
   )
