@@ -21,6 +21,8 @@ import { ForecastWidget } from '../components/dashboard/ForecastWidget'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { RecentDecks } from '../components/dashboard/RecentDecks'
 import { AchievementsSummary } from '../components/dashboard/AchievementsSummary'
+import { DailyQuestsWidget } from '../components/dashboard/DailyQuestsWidget'
+import { StreakFreezeWidget } from '../components/dashboard/StreakFreezeWidget'
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 
@@ -115,7 +117,15 @@ export function DashboardPage() {
         masteryRate={masteryRate}
       />
 
-      <AchievementsSummary />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2">
+          <AchievementsSummary />
+        </div>
+        <div className="space-y-4">
+          <StreakFreezeWidget />
+          <DailyQuestsWidget />
+        </div>
+      </div>
 
       {shouldShowHeatmap(period) && <StudyHeatmap data={heatmapData} />}
 

@@ -37,6 +37,7 @@ import { usePageTracking } from './hooks/usePageTracking'
 import { useTheme } from './hooks/useTheme'
 import { useOnboardingStore } from './stores/onboarding-store'
 import { OnboardingOverlay } from './components/onboarding/OnboardingOverlay'
+import { LevelUpCelebration } from './components/common/LevelUpCelebration'
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded heavy pages                                           */
@@ -263,6 +264,7 @@ function App() {
           </Routes>
         </Suspense>
         {showOnboarding && <OnboardingOverlay />}
+        {user && <LevelUpCelebration />}
       </ErrorBoundary>
     </BrowserRouter>
   )

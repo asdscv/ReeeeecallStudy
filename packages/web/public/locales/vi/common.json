@@ -230,5 +230,26 @@
       "history": "History",
       "analytics": "Analytics"
     }
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "cards": "Study {{target}} cards",
+    "sessions": "Complete {{target}} sessions",
+    "time": "Study for {{target}} minutes",
+    "perfect": "Get a perfect score",
+    "completed": "Completed!",
+    "xpReward": "+{{xp}} XP"
+  },
+  "streakFreeze": {
+    "title": "Streak Freeze",
+    "available": "{{count}} available",
+    "used": "Streak protected today!",
+    "earned": "Earned a streak freeze!"
+  },
+  "levelUp": {
+    "title": "Level Up!",
+    "level": "Level {{level}}",
+    "message": "Keep up the great work!",
+    "xpEarned": "+{{xp}} XP"
   }
 }
