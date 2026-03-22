@@ -187,14 +187,24 @@ export function StudySessionPage() {
     }
   }, [isFlipped, currentCard, template, config, profile, backTTSFields, ttsOptions])
 
-  // Stop TTS and check achievements when session completes
+  // Stop TTS, check achievements, and update quest progress when session completes
   const checkAchievements = useAchievementStore(s => s.checkAchievements)
   useEffect(() => {
     if (phase === 'completed') {
       stopSpeaking()
       checkAchievements()
+
+      // Update daily quest progress
+      const cardsStudied = sessionStats.cardsStudied
+      const durationMinutes = Math.round(sessionStats.totalDurationMs / 60000)
+      if (cardsStudied > 0) {
+        supabase.rpc('update_quest_progress', {
+          p_cards_studied: cardsStudied,
+          p_duration_minutes: durationMinutes,
+        }).then(() => {})
+      }
     }
-  }, [phase, checkAchievements])
+  }, [phase, checkAchievements, sessionStats.cardsStudied, sessionStats.totalDurationMs])
 
   const handleRate = useCallback((rating: string) => {
     rateCard(rating)
