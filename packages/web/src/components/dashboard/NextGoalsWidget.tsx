@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
+import { CategoryIcon } from '../../lib/achievement-icons'
 
 interface Goal {
   category: string
@@ -63,7 +64,7 @@ export function NextGoalsWidget() {
       <div className="space-y-3">
         {goals.map((goal) => (
           <div key={goal.category} className="flex items-center gap-3">
-            <span className="text-lg shrink-0">{goal.icon}</span>
+            <div className="shrink-0"><CategoryIcon category={goal.category} size="md" /></div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-600 dark:text-gray-400">
