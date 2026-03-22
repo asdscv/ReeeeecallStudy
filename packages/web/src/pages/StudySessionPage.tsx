@@ -201,19 +201,19 @@ export function StudySessionPage() {
   }, [rateCard])
 
   const handleExit = useCallback(() => {
-    if (sessionStats.cardsStudied > 0) {
-      setShowExitConfirm(true)
-    } else {
-      reset()
-      navigate(`/decks/${deckId}`)
-    }
-  }, [sessionStats.cardsStudied, reset, navigate, deckId])
+    setShowExitConfirm(true)
+  }, [])
 
   const handleConfirmExit = useCallback(() => {
     setShowExitConfirm(false)
     stopSpeaking()
-    exitSession()
-  }, [exitSession])
+    if (sessionStats.cardsStudied > 0) {
+      exitSession()
+    } else {
+      reset()
+      navigate(`/decks/${deckId}`)
+    }
+  }, [sessionStats.cardsStudied, exitSession, reset, navigate, deckId])
 
   const handleFlip = useCallback(() => {
     flipCard()
