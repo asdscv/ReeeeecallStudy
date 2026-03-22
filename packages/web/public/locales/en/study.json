@@ -197,6 +197,12 @@
     "flipCard": "Flip card",
     "undoRating": "Undo last rating",
     "exitStudy": "Exit study",
+    "flipCard": "Flip card (both directions)",
+    "gotIt": "Got It",
+    "missed": "Missed",
+    "known": "Known",
+    "unknown": "Unknown",
+    "swipeHint": "In swipe mode, swipe left/right to rate cards.",
     "toggleHelp": "Toggle this help"
   },
   "multiDeck": {

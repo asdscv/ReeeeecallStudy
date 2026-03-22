@@ -461,6 +461,7 @@ export function StudySessionPage() {
       <KeyboardShortcutsModal
         open={showShortcuts}
         onClose={() => setShowShortcuts(false)}
+        mode={config?.mode ?? 'srs'}
         isSwipeMode={!shouldShowButtons(inputSettings)}
       />
     </div>
