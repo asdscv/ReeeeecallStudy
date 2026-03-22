@@ -13,7 +13,8 @@
     "aiGenerate": "AI Generate",
     "achievements": "Achievements",
     "leaderboard": "Leaderboard",
-    "analytics": "Analytics"
+    "analytics": "Analytics",
+    "publisher": "Publisher Stats"
   },
   "actions": {
     "save": "保存",
@@ -190,6 +191,10 @@
       "first_study": "Complete your first study session",
       "mastery_50": "Reach 50% mastery across all cards",
       "mastery_90": "Reach 90% mastery across all cards"
+    },
+    "tabs": {
+      "badges": "Badges",
+      "leaderboard": "Leaderboard"
     }
   },
   "analytics": {
@@ -219,5 +224,11 @@
     "sessions": "Sessions",
     "you": "You",
     "empty": "No leaderboard data yet. Be the first to study!"
+  },
+  "history": {
+    "tabs": {
+      "history": "History",
+      "analytics": "Analytics"
+    }
   }
 }

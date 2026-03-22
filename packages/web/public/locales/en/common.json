@@ -13,7 +13,8 @@
     "aiGenerate": "AI Generate",
     "achievements": "Achievements",
     "leaderboard": "Leaderboard",
-    "analytics": "Analytics"
+    "analytics": "Analytics",
+    "publisher": "Publisher Stats"
   },
   "guideHelp": "Help",
   "actions": {
@@ -139,8 +140,18 @@
       "actionFinish": "Finish Setup"
     }
   },
+  "history": {
+    "tabs": {
+      "history": "History",
+      "analytics": "Analytics"
+    }
+  },
   "achievements": {
     "title": "Achievements",
+    "tabs": {
+      "badges": "Badges",
+      "leaderboard": "Leaderboard"
+    },
     "level": "Level",
     "xp": "XP",
     "totalXp": "Total XP",

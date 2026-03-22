@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -15,7 +16,8 @@ interface TimeDistribution { hour: string; minutes: number }
 interface ModeEffectiveness { mode: string; retention: number }
 interface ProgressPoint { week: string; mastered: number }
 
-export function PersonalAnalyticsPage() {
+/** Standalone analytics content — can be used as a tab inside StudyHistoryPage */
+export function PersonalAnalyticsContent() {
   const { t } = useTranslation('common')
   const { user } = useAuthStore()
 
@@ -300,4 +302,9 @@ export function PersonalAnalyticsPage() {
       </div>
     </div>
   )
+}
+
+/** Page-level export — redirects to /history since analytics is now a tab there */
+export function PersonalAnalyticsPage() {
+  return <Navigate to="/history" replace />
 }
