@@ -251,5 +251,13 @@
     "level": "Level {{level}}",
     "message": "Keep up the great work!",
     "xpEarned": "+{{xp}} XP"
+  },
+  "goals": {
+    "title": "Next Goals",
+    "streak": "Streak",
+    "cards": "Cards Studied",
+    "sessions": "Sessions",
+    "time": "Study Time",
+    "mastery": "Cards Mastered"
   }
 }
