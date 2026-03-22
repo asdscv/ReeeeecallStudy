@@ -197,6 +197,12 @@
     "flipCard": "카드 뒤집기",
     "undoRating": "마지막 평가 되돌리기",
     "exitStudy": "학습 종료",
+    "flipCard": "카드 뒤집기 (양방향)",
+    "gotIt": "알겠음",
+    "missed": "모르겠음",
+    "known": "알고 있음",
+    "unknown": "모름",
+    "swipeHint": "스와이프 모드에서는 좌/우로 밀어서 카드를 평가하세요.",
     "toggleHelp": "도움말 열기/닫기"
   },
   "multiDeck": {

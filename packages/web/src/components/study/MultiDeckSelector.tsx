@@ -120,7 +120,7 @@ export function MultiDeckSelector() {
             </span>
             <button
               onClick={handleStart}
-              disabled={selectedIds.size < 2}
+              disabled={selectedIds.size === 0}
               className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               {t('study:multiDeck.start')}
