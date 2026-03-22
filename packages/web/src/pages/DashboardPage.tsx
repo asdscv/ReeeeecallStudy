@@ -23,6 +23,7 @@ import { RecentDecks } from '../components/dashboard/RecentDecks'
 import { AchievementsSummary } from '../components/dashboard/AchievementsSummary'
 import { DailyQuestsWidget } from '../components/dashboard/DailyQuestsWidget'
 import { StreakFreezeWidget } from '../components/dashboard/StreakFreezeWidget'
+import { NextGoalsWidget } from '../components/dashboard/NextGoalsWidget'
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 
@@ -124,6 +125,7 @@ export function DashboardPage() {
         <div className="space-y-4">
           <StreakFreezeWidget />
           <DailyQuestsWidget />
+          <NextGoalsWidget />
         </div>
       </div>
 

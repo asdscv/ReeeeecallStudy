@@ -251,5 +251,13 @@
     "level": "레벨 {{level}}",
     "message": "잘하고 있어요! 계속 화이팅!",
     "xpEarned": "+{{xp}} XP"
+  },
+  "goals": {
+    "title": "다음 목표",
+    "streak": "스트릭",
+    "cards": "학습한 카드",
+    "sessions": "학습 세션",
+    "time": "학습 시간",
+    "mastery": "마스터한 카드"
   }
 }
