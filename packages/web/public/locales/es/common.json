@@ -195,7 +195,8 @@
     "tabs": {
       "badges": "Badges",
       "leaderboard": "Leaderboard"
-    }
+    },
+    "more": "more"
   },
   "analytics": {
     "title": "My Analytics",
