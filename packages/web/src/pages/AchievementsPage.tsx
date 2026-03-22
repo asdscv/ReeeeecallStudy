@@ -146,7 +146,7 @@ export function AchievementsPage() {
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           {t('achievements.viewAll', 'All Achievements')}
           <span className="ml-2 text-xs font-normal text-gray-400">
-            {earned.length} / {achievements.length}
+            {earned.length}{t('achievements.earned', ' earned')}
           </span>
         </h2>
 
@@ -171,7 +171,7 @@ export function AchievementsPage() {
                   <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {t(`achievements.category.${cat}`)}
                   </span>
-                  <span className="text-xs text-gray-400">{earnedInCat.length}/{items.length}</span>
+                  <span className="text-xs text-gray-400">{earnedInCat.length}{t('achievements.earned', ' earned')}</span>
                 </div>
                 {isExpanded
                   ? <ChevronUp className="w-4 h-4 text-gray-400" />
