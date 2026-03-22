@@ -207,13 +207,10 @@ export function AchievementsPage() {
                       </div>
                     )}
 
-                    {/* Hidden badges as "???" */}
+                    {/* Hidden badges — just "???" with no count */}
                     {hiddenCount > 0 && (
                       <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30 p-3 text-center flex flex-col items-center justify-center">
-                        <p className="text-lg text-gray-300 dark:text-gray-500 font-bold">???</p>
-                        <p className="text-[10px] text-gray-400 mt-1">
-                          {hiddenCount} {t('achievements.more', 'more')}
-                        </p>
+                        <p className="text-2xl text-gray-300 dark:text-gray-500 font-bold">???</p>
                       </div>
                     )}
                   </div>
