@@ -47,19 +47,23 @@ export function DashboardPage() {
     const fetchDashboardData = async () => {
       setDataLoading(true)
 
-      // Fetch all user cards
-      const { data: cards } = await supabase
-        .from('cards')
-        .select('*')
-        .eq('user_id', user.id)
+      // Fetch cards (only needed columns) and study logs in parallel
+      const [cardsRes, logsRes] = await Promise.all([
+        supabase
+          .from('cards')
+          .select('id, deck_id, srs_status, ease_factor, interval_days, next_review_at')
+          .eq('user_id', user.id),
+        supabase
+          .from('study_logs')
+          .select('id, card_id, deck_id, rating, studied_at')
+          .eq('user_id', user.id)
+          .gte('studied_at', daysAgoUTC(180))
+          .order('studied_at', { ascending: false })
+          .limit(5000),
+      ])
 
-      // Fetch study logs from last year
-      const { data: logs } = await supabase
-        .from('study_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('studied_at', daysAgoUTC(365))
-        .order('studied_at', { ascending: false })
+      const cards = cardsRes.data
+      const logs = logsRes.data
 
       if (!cancelled) {
         setAllCards((cards ?? []) as Card[])

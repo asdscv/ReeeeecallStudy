@@ -11,6 +11,10 @@ export type KeyAction =
 /**
  * Pure function: resolve a keyboard event into a study action.
  * Returns null if the key should be ignored.
+ *
+ * Space/Enter = always flip (front↔back, both directions)
+ * 1/2/3/4 = SRS rating (back side only)
+ * Arrow keys = non-SRS rating (back side only)
  */
 export function resolveKeyAction(
   key: string,
@@ -28,12 +32,13 @@ export function resolveKeyAction(
 
   if (key === 'Escape') return { type: 'exit' }
 
-  if (!isFlipped) {
-    if (key === ' ' || key === 'Enter') return { type: 'flip' }
-    return null
-  }
+  // Space/Enter = flip (both directions: front→back AND back→front)
+  if (key === ' ' || key === 'Enter') return { type: 'flip' }
 
-  // Back side — rate
+  // Rating keys only work when card is flipped (back side)
+  if (!isFlipped) return null
+
+  // SRS mode: 1/2/3/4
   if (mode === 'srs') {
     if (key === '1') return { type: 'rate', rating: 'again' }
     if (key === '2') return { type: 'rate', rating: 'hard' }
@@ -42,15 +47,15 @@ export function resolveKeyAction(
     return null
   }
 
-  // Cramming mode
+  // Cramming mode: Arrow keys
   if (mode === 'cramming') {
-    if (key === 'ArrowRight' || key === ' ') return { type: 'rate', rating: 'got_it' }
+    if (key === 'ArrowRight') return { type: 'rate', rating: 'got_it' }
     if (key === 'ArrowLeft') return { type: 'rate', rating: 'missed' }
     return null
   }
 
-  // Non-SRS modes (sequential_review, random, sequential, by_date)
-  if (key === 'ArrowRight' || key === ' ') return { type: 'rate', rating: 'known' }
+  // Non-SRS modes: Arrow keys
+  if (key === 'ArrowRight') return { type: 'rate', rating: 'known' }
   if (key === 'ArrowLeft') return { type: 'rate', rating: 'unknown' }
 
   return null

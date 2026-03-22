@@ -46,6 +46,9 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   sampleTemplateId: null,
 
   initialize: async () => {
+    // Skip if already loaded (avoid unnecessary RPC on every page)
+    if (get().loading) return
+    if (get().completedSteps.size > 0 || get().isCompleted) return
     set({ loading: true })
     try {
       const { data, error } = await supabase.rpc('get_onboarding_status')
