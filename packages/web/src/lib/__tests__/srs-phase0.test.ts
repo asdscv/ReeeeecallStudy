@@ -140,6 +140,16 @@ describe('Phase 0: Ease Hell Prevention', () => {
       expect(easy.interval_days).toBeGreaterThan(good.interval_days)
     })
 
+    it('ordering preserved when both good and easy hit growth cap', () => {
+      // High ease + large interval → both could hit 3× cap
+      const card = reviewCard(3.5, 100, 5)
+      const good = calculateSRS(card, 'good', settings)
+      const easy = calculateSRS(card, 'easy', settings)
+
+      // easy must STRICTLY exceed good even when both hit cap
+      expect(easy.interval_days).toBeGreaterThan(good.interval_days)
+    })
+
     it('ordering holds for extreme ease values', () => {
       // Test with very low ease (Ease Hell recovery scenario)
       const card = reviewCard(1.3, 20, 4)
