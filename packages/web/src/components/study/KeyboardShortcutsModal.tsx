@@ -10,6 +10,7 @@ import {
 interface KeyboardShortcutsModalProps {
   open: boolean
   onClose: () => void
+  isSwipeMode?: boolean
 }
 
 interface ShortcutEntry {
@@ -17,16 +18,23 @@ interface ShortcutEntry {
   label: string
 }
 
-export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModalProps) {
+export function KeyboardShortcutsModal({ open, onClose, isSwipeMode = false }: KeyboardShortcutsModalProps) {
   const { t } = useTranslation('study')
 
-  const shortcuts: ShortcutEntry[] = [
-    { keys: ['1', '2', '3', '4'], label: t('shortcuts.rateCards') },
-    { keys: ['Space'], label: t('shortcuts.flipOrPause') },
-    { keys: ['Ctrl+Z'], label: t('shortcuts.undoRating') },
-    { keys: ['Escape'], label: t('shortcuts.exitStudy') },
-    { keys: ['?'], label: t('shortcuts.toggleHelp') },
-  ]
+  const shortcuts: ShortcutEntry[] = isSwipeMode
+    ? [
+        { keys: ['Space'], label: t('shortcuts.flipCard', 'Flip card') },
+        { keys: ['Ctrl+Z'], label: t('shortcuts.undoRating') },
+        { keys: ['Escape'], label: t('shortcuts.exitStudy') },
+        { keys: ['?'], label: t('shortcuts.toggleHelp') },
+      ]
+    : [
+        { keys: ['1', '2', '3', '4'], label: t('shortcuts.rateCards') },
+        { keys: ['Space'], label: t('shortcuts.flipCard', 'Flip card') },
+        { keys: ['Ctrl+Z'], label: t('shortcuts.undoRating') },
+        { keys: ['Escape'], label: t('shortcuts.exitStudy') },
+        { keys: ['?'], label: t('shortcuts.toggleHelp') },
+      ]
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
@@ -51,6 +59,12 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
               </div>
             </div>
           ))}
+
+          {isSwipeMode && (
+            <div className="pt-2 text-xs text-gray-500 text-center">
+              {t('shortcuts.swipeHint', 'In swipe mode, swipe left/right to rate cards.')}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

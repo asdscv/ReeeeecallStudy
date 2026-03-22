@@ -5,11 +5,9 @@ import { resolveKeyAction } from '../lib/keyboard-actions'
 interface UseKeyboardShortcutsOptions {
   isFlipped: boolean
   mode: StudyMode
-  isPaused?: boolean
   onFlip: () => void
   onRate: (rating: string) => void
   onExit: () => void
-  onPause?: () => void
   onUndo?: () => void
   onHelp?: () => void
 }
@@ -17,11 +15,9 @@ interface UseKeyboardShortcutsOptions {
 export function useKeyboardShortcuts({
   isFlipped,
   mode,
-  isPaused = false,
   onFlip,
   onRate,
   onExit,
-  onPause,
   onUndo,
   onHelp,
 }: UseKeyboardShortcutsOptions) {
@@ -37,7 +33,6 @@ export function useKeyboardShortcuts({
 
       const action = resolveKeyAction(e.key, isFlipped, mode, {
         ctrlKey: e.ctrlKey || e.metaKey,
-        isPaused,
       })
       if (!action) return
 
@@ -53,10 +48,6 @@ export function useKeyboardShortcuts({
           e.preventDefault()
           onRate(action.rating)
           break
-        case 'pause':
-          e.preventDefault()
-          onPause?.()
-          break
         case 'undo':
           e.preventDefault()
           onUndo?.()
@@ -70,5 +61,5 @@ export function useKeyboardShortcuts({
 
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [isFlipped, mode, isPaused, onFlip, onRate, onExit, onPause, onUndo, onHelp])
+  }, [isFlipped, mode, onFlip, onRate, onExit, onUndo, onHelp])
 }

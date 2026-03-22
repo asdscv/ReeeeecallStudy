@@ -4,7 +4,6 @@ export type KeyAction =
   | { type: 'flip' }
   | { type: 'rate'; rating: string }
   | { type: 'exit' }
-  | { type: 'pause' }
   | { type: 'undo' }
   | { type: 'help' }
   | null
@@ -17,10 +16,9 @@ export function resolveKeyAction(
   key: string,
   isFlipped: boolean,
   mode: StudyMode,
-  options?: { ctrlKey?: boolean; isPaused?: boolean },
+  options?: { ctrlKey?: boolean },
 ): KeyAction {
   const ctrlKey = options?.ctrlKey ?? false
-  const isPaused = options?.isPaused ?? false
 
   // Help toggle always available
   if (key === '?') return { type: 'help' }
@@ -29,12 +27,6 @@ export function resolveKeyAction(
   if (ctrlKey && (key === 'z' || key === 'Z')) return { type: 'undo' }
 
   if (key === 'Escape') return { type: 'exit' }
-
-  // When paused, only Space resumes (no flipping or rating)
-  if (isPaused) {
-    if (key === ' ') return { type: 'pause' }
-    return null
-  }
 
   if (!isFlipped) {
     if (key === ' ' || key === 'Enter') return { type: 'flip' }
