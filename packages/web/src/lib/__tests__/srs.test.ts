@@ -307,7 +307,7 @@ describe('calculateSRS — Review Phase', () => {
       const result = calculateSRS(card, 'easy', reviewSettings)
 
       expect(result.ease_factor).toBe(2.64) // +0.15 + mean reversion
-      expect(result.interval_days).toBe(9) // round(3 * 2.64 * 1.3) = 10, capped at 3×3=9
+      expect(result.interval_days).toBe(10) // round(3 * 2.64 * 1.3) = 10, easy cap 3.5×3=10.5
     })
   })
 
