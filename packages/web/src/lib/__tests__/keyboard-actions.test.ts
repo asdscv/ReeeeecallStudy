@@ -65,10 +65,9 @@ describe('resolveKeyAction', () => {
       })
     })
 
-    it('Space → known', () => {
+    it('Space → flip (back to front)', () => {
       expect(resolveKeyAction(' ', true, 'sequential_review')).toEqual({
-        type: 'rate',
-        rating: 'known',
+        type: 'flip',
       })
     })
 
@@ -94,10 +93,9 @@ describe('resolveKeyAction', () => {
       })
     })
 
-    it('Space → known', () => {
+    it('Space → flip (back to front)', () => {
       expect(resolveKeyAction(' ', true, mode)).toEqual({
-        type: 'rate',
-        rating: 'known',
+        type: 'flip',
       })
     })
 

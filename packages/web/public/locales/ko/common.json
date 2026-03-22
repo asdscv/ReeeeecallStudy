@@ -13,7 +13,8 @@
     "aiGenerate": "AI 생성",
     "achievements": "업적",
     "leaderboard": "리더보드",
-    "analytics": "분석"
+    "analytics": "분석",
+    "publisher": "퍼블리셔 통계"
   },
   "guideHelp": "도움말",
   "actions": {
@@ -139,8 +140,18 @@
       "actionFinish": "설정 완료"
     }
   },
+  "history": {
+    "tabs": {
+      "history": "학습 기록",
+      "analytics": "학습 분석"
+    }
+  },
   "achievements": {
     "title": "업적",
+    "tabs": {
+      "badges": "배지",
+      "leaderboard": "리더보드"
+    },
     "level": "레벨",
     "xp": "경험치",
     "totalXp": "총 경험치",

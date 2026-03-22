@@ -65,17 +65,9 @@ const DeckEditPage = lazy(() =>
   import('./pages/DeckEditPage').then(m => ({ default: m.DeckEditPage }))
 )
 
-// Personal Analytics
-const PersonalAnalyticsPage = lazy(() =>
-  import('./pages/PersonalAnalyticsPage').then(m => ({ default: m.PersonalAnalyticsPage }))
-)
-
-// Achievements & Leaderboard
+// Achievements (includes leaderboard tab)
 const AchievementsPage = lazy(() =>
   import('./pages/AchievementsPage').then(m => ({ default: m.AchievementsPage }))
-)
-const LeaderboardPage = lazy(() =>
-  import('./pages/LeaderboardPage').then(m => ({ default: m.LeaderboardPage }))
 )
 
 // Admin pages
@@ -238,8 +230,8 @@ function App() {
               <Route path="/templates" element={<TemplatesPage />} />
               <Route path="/templates/:templateId/edit" element={<TemplateEditPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
-              <Route path="/leaderboard" element={<LeaderboardPage />} />
-              <Route path="/analytics" element={<PersonalAnalyticsPage />} />
+              <Route path="/leaderboard" element={<Navigate to="/achievements" replace />} />
+              <Route path="/analytics" element={<Navigate to="/history" replace />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/guide" element={<GuidePage />} />
               <Route path="/api-docs" element={<ApiDocsPage />} />
