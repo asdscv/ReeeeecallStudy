@@ -29,7 +29,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
           )}
           <Link to="/" className="flex items-center gap-2 no-underline">
             <img src="/favicon.png" alt="" className="w-8 h-8" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-6 sm:h-8 object-contain hidden sm:inline" />
+            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-6 sm:h-8 object-contain hidden sm:inline dark:brightness-0 dark:invert" />
           </Link>
         </div>
 

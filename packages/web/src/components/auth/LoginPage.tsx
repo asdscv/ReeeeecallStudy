@@ -207,7 +207,7 @@ export function LoginPage() {
           <div className="text-center mb-6 sm:mb-8">
             <Link to="/" className="inline-block no-underline">
               <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
-              <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
+              <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto dark:brightness-0 dark:invert" />
             </Link>
             <p className="text-muted-foreground mt-3">{title}</p>
           </div>

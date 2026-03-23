@@ -270,7 +270,7 @@ export function StudySessionPage() {
   // Loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">{t('session.loading')}</div>
       </div>
     )
@@ -349,7 +349,7 @@ export function StudySessionPage() {
   // Idle / no cards
   if (phase === 'idle' || queue.length === 0) {
     return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">
             {t('session.noCards')}
@@ -369,12 +369,12 @@ export function StudySessionPage() {
   if (!currentCard) return null
 
   return (
-    <div className="h-[100dvh] bg-muted flex flex-col overflow-hidden" style={{ overscrollBehavior: 'contain' }}>
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden" style={{ overscrollBehavior: 'contain' }}>
       {/* Branding */}
       <div className="bg-card border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-2.5 sm:py-3.5 flex items-center justify-center gap-2.5">
           <img src="/favicon.png" alt="" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 sm:h-10 object-contain" />
+          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 sm:h-10 object-contain dark:brightness-0 dark:invert" />
         </div>
       </div>
 

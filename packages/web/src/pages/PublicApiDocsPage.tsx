@@ -6,7 +6,7 @@ export function PublicApiDocsPage() {
   const { t } = useTranslation('api-docs')
 
   return (
-    <div className="min-h-screen bg-muted flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <DocsNav />
 
       <main className="flex-1 px-4 py-6 sm:py-10">
