@@ -202,11 +202,11 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
           <DialogTitle>{editCard ? t('editCard') : t('addCard')}</DialogTitle>
         </DialogHeader>
         {!template ? (
-          <p className="text-gray-500">{t('noTemplateSet')}</p>
+          <p className="text-muted-foreground">{t('noTemplateSet')}</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {fileError && (
-              <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+              <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
                 {t(fileError)}
               </div>
             )}
@@ -214,12 +214,12 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
             {/* Dynamic fields */}
             {fields.map((field) => (
               <div key={field.key}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   {field.name}
-                  {field.order === 0 && <span className="text-red-500 ml-1">*</span>}
+                  {field.order === 0 && <span className="text-destructive ml-1">*</span>}
                 </label>
                 {field.detail && (
-                  <p className="text-xs text-gray-400 mb-1.5">{field.detail}</p>
+                  <p className="text-xs text-content-tertiary mb-1.5">{field.detail}</p>
                 )}
                 {field.type === 'text' ? (
                   <input
@@ -227,13 +227,13 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                     value={fieldValues[field.key] || ''}
                     onChange={(e) => handleFieldChange(field.key, e.target.value)}
                     placeholder={field.name}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+                    className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
                   />
                 ) : field.type === 'image' ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-sm text-gray-400">
+                  <div className="border-2 border-dashed border-border rounded-lg p-4 text-center text-sm text-content-tertiary">
                     {uploadingField === field.key ? (
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-brand border-t-transparent rounded-full animate-spin" />
                         <span>{t('uploading')}</span>
                       </div>
                     ) : fieldValues[field.key] ? (
@@ -246,7 +246,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                         <button
                           type="button"
                           onClick={() => handleRemoveFile(field)}
-                          className="text-red-500 text-xs cursor-pointer"
+                          className="text-destructive text-xs cursor-pointer"
                         >
                           {t('remove')}
                         </button>
@@ -257,11 +257,11 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                         <button
                           type="button"
                           onClick={() => fileInputRefs.current[field.key]?.click()}
-                          className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs hover:bg-gray-200 cursor-pointer"
+                          className="px-3 py-1.5 bg-accent text-foreground rounded-lg text-xs hover:bg-accent cursor-pointer"
                         >
                           {t('selectFile')}
                         </button>
-                        <p className="text-xs text-gray-400 mt-1">{t('imageFormats')}</p>
+                        <p className="text-xs text-content-tertiary mt-1">{t('imageFormats')}</p>
                         <input
                           ref={(el) => { fileInputRefs.current[field.key] = el }}
                           type="file"
@@ -276,10 +276,10 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                     )}
                   </div>
                 ) : field.type === 'audio' ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-sm text-gray-400">
+                  <div className="border-2 border-dashed border-border rounded-lg p-4 text-center text-sm text-content-tertiary">
                     {uploadingField === field.key ? (
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-brand border-t-transparent rounded-full animate-spin" />
                         <span>{t('uploading')}</span>
                       </div>
                     ) : fieldValues[field.key] ? (
@@ -288,7 +288,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                         <button
                           type="button"
                           onClick={() => handleRemoveFile(field)}
-                          className="text-red-500 text-xs cursor-pointer"
+                          className="text-destructive text-xs cursor-pointer"
                         >
                           {t('remove')}
                         </button>
@@ -299,11 +299,11 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                         <button
                           type="button"
                           onClick={() => fileInputRefs.current[field.key]?.click()}
-                          className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs hover:bg-gray-200 cursor-pointer"
+                          className="px-3 py-1.5 bg-accent text-foreground rounded-lg text-xs hover:bg-accent cursor-pointer"
                         >
                           {t('selectFile')}
                         </button>
-                        <p className="text-xs text-gray-400 mt-1">{t('audioFormats')}</p>
+                        <p className="text-xs text-content-tertiary mt-1">{t('audioFormats')}</p>
                         <input
                           ref={(el) => { fileInputRefs.current[field.key] = el }}
                           type="file"
@@ -323,18 +323,18 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('tags')}</label>
+              <label className="block text-sm font-medium text-foreground mb-1">{t('tags')}</label>
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-gray-100 text-gray-700 text-sm rounded-full"
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-accent text-foreground text-sm rounded-full"
                   >
                     {tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                      className="text-content-tertiary hover:text-muted-foreground cursor-pointer"
                     >
                       ×
                     </button>
@@ -347,7 +347,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleAddTag}
                 placeholder={t('tagsPlaceholder')}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+                className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
               />
             </div>
 
@@ -356,14 +356,14 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg hover:bg-muted cursor-pointer"
               >
                 {t('cancel')}
               </button>
               <button
                 type="submit"
                 disabled={loading || uploadingField !== null}
-                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
               >
                 {loading ? t('saving') : editCard ? t('edit') : t('add')}
               </button>

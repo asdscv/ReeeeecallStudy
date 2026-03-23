@@ -86,9 +86,9 @@ export function OnboardingOverlay() {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Card */}
-      <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-lg mx-4 bg-card rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Progress bar */}
-        <div className="h-1 bg-gray-100">
+        <div className="h-1 bg-accent">
           <div
             className="h-full bg-indigo-600 transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
@@ -103,7 +103,7 @@ export function OnboardingOverlay() {
             className={`flex items-center gap-1 text-sm font-medium transition-colors ${
               isFirst
                 ? 'text-transparent cursor-default'
-                : 'text-gray-500 hover:text-gray-700 cursor-pointer'
+                : 'text-muted-foreground hover:text-foreground cursor-pointer'
             }`}
             aria-label={t('onboarding.back')}
           >
@@ -111,13 +111,13 @@ export function OnboardingOverlay() {
             {t('onboarding.back')}
           </button>
 
-          <span className="text-xs text-gray-400 font-medium">
+          <span className="text-xs text-content-tertiary font-medium">
             {t('onboarding.stepOf', { current: currentStep + 1, total: totalSteps })}
           </span>
 
           <button
             onClick={skip}
-            className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            className="flex items-center gap-1 text-sm text-content-tertiary hover:text-muted-foreground transition-colors cursor-pointer"
             data-testid="onboarding-skip"
           >
             {t('onboarding.skip')}
@@ -140,7 +140,7 @@ export function OnboardingOverlay() {
                   ? 'bg-indigo-600 scale-125'
                   : i < currentStep
                     ? 'bg-indigo-300'
-                    : 'bg-gray-200'
+                    : 'bg-accent'
               }`}
               data-testid={`step-dot-${i}`}
             />

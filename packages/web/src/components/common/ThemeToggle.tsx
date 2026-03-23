@@ -45,8 +45,8 @@ export function ThemeToggle({ theme, onChange }: ThemeToggleProps) {
               flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
               transition-all duration-200 cursor-pointer
               ${isActive
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'
+                ? 'bg-card text-foreground shadow-sm dark:bg-slate-700'
+                : 'text-muted-foreground hover:text-foreground dark:text-slate-400 dark:hover:text-slate-200'
               }
             `}
           >

@@ -6,8 +6,8 @@ export function TableOfContents({ sections, onSelect }: { sections: ApiDocsSecti
   const { t } = useTranslation('api-docs')
 
   return (
-    <nav className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-      <h2 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+    <nav className="bg-card rounded-xl border border-border p-4 sm:p-5">
+      <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
         <BookOpen className="w-4 h-4" />
         {t('tableOfContents')}
       </h2>
@@ -16,11 +16,11 @@ export function TableOfContents({ sections, onSelect }: { sections: ApiDocsSecti
           <li key={s.id}>
             <button
               onClick={() => onSelect(s.id)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition cursor-pointer w-full text-left px-2 py-1.5 rounded-lg hover:bg-blue-50"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-brand transition cursor-pointer w-full text-left px-2 py-1.5 rounded-lg hover:bg-brand/10"
             >
               <span>{s.icon}</span>
               <span className="flex-1">{t(s.title)}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+              <ChevronRight className="w-3.5 h-3.5 text-content-tertiary" />
             </button>
           </li>
         ))}

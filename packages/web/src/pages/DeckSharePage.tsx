@@ -64,23 +64,23 @@ export function DeckSharePage() {
     <div>
       <button
         onClick={() => navigate(`/decks/${deckId}`)}
-        className="text-sm text-gray-500 hover:text-gray-700 mb-4 cursor-pointer"
+        className="text-sm text-muted-foreground hover:text-foreground mb-4 cursor-pointer"
       >
         ← {deck.name}
       </button>
 
       <div className="flex items-center gap-2 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('deckShare.title')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('deckShare.title')}</h1>
         <GuideHelpLink section="sharing" />
       </div>
 
       {/* Direct sharing */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-900">{t('deckShare.directSharing')}</h2>
+          <h2 className="text-base font-semibold text-foreground">{t('deckShare.directSharing')}</h2>
           <button
             onClick={() => setShowShareModal(true)}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="px-3 py-1.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             + {t('deckShare.createShareLink')}
           </button>
@@ -95,32 +95,32 @@ export function DeckSharePage() {
       {/* Marketplace */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-900">{t('deckShare.marketplace')}</h2>
+          <h2 className="text-base font-semibold text-foreground">{t('deckShare.marketplace')}</h2>
         </div>
 
         {deckListing ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="bg-card rounded-xl border border-border p-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{deckListing.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-sm font-medium text-foreground truncate">{deckListing.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {t('deckShare.usersUsing', { count: deckListing.acquire_count })} · {deckListing.is_active ? t('deckShare.active') : t('deckShare.inactive')}
                 </p>
               </div>
               <button
                 onClick={() => unpublishDeck(deckListing.id)}
-                className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer shrink-0 self-start sm:self-center"
+                className="px-3 py-1.5 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer shrink-0 self-start sm:self-center"
               >
                 {t('deckShare.unpublish')}
               </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-            <p className="text-sm text-gray-500 mb-3">{t('deckShare.publishDescription')}</p>
+          <div className="bg-card rounded-xl border border-border p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-3">{t('deckShare.publishDescription')}</p>
             <button
               onClick={() => setShowPublishModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
             >
               {t('deckShare.publish')}
             </button>

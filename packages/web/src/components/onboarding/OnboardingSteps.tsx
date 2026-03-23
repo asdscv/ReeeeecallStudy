@@ -36,8 +36,8 @@ function StepLayout({
       <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mb-6">
         {icon}
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-3">{title}</h2>
-      <p className="text-gray-600 mb-8 max-w-sm leading-relaxed">{description}</p>
+      <h2 className="text-2xl font-bold text-foreground mb-3">{title}</h2>
+      <p className="text-muted-foreground mb-8 max-w-sm leading-relaxed">{description}</p>
       {children}
     </div>
   )
@@ -109,18 +109,18 @@ export function CreateDeckStep({ onNext }: StepProps) {
       description={t('onboarding.createDeck.description')}
     >
       {/* Deck preview card */}
-      <div className="w-full max-w-sm bg-gray-50 border border-gray-200 rounded-xl p-5 mb-6 text-left">
+      <div className="w-full max-w-sm bg-muted border border-border rounded-xl p-5 mb-6 text-left">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center text-white text-lg">
+          <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center text-white text-lg">
             <BookOpen className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 truncate">{sample.name}</p>
-            <p className="text-sm text-gray-500 truncate">{sample.description}</p>
+            <p className="font-semibold text-foreground truncate">{sample.name}</p>
+            <p className="text-sm text-muted-foreground truncate">{sample.description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-3 text-xs text-gray-400">
-          <span className="inline-block w-3 h-3 rounded-full bg-blue-500" />
+        <div className="flex items-center gap-2 mt-3 text-xs text-content-tertiary">
+          <span className="inline-block w-3 h-3 rounded-full bg-brand" />
           <span>#3B82F6</span>
         </div>
       </div>
@@ -174,21 +174,21 @@ export function CardTemplateStep({ onNext }: StepProps) {
           <button
             key={tmpl.id}
             onClick={() => handleSelectTemplate(tmpl.id)}
-            className="w-full flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 transition text-left cursor-pointer"
+            className="w-full flex items-center gap-3 p-3 bg-muted border border-border rounded-xl hover:border-indigo-300 hover:bg-indigo-50 transition text-left cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-success/15 flex items-center justify-center text-success shrink-0">
               <Check className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">{tmpl.name}</p>
-              <p className="text-xs text-gray-500">
+              <p className="font-medium text-foreground text-sm truncate">{tmpl.name}</p>
+              <p className="text-xs text-muted-foreground">
                 {tmpl.fields.length} {t('onboarding.cardTemplate.fields', { count: tmpl.fields.length })}
               </p>
             </div>
           </button>
         ))}
         {displayTemplates.length === 0 && (
-          <div className="text-center py-4 text-gray-400 text-sm">
+          <div className="text-center py-4 text-content-tertiary text-sm">
             <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
             {t('status.loading')}
           </div>
@@ -267,12 +267,12 @@ export function AddCardsStep({ onNext }: StepProps) {
         {sampleCards.map((card, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl"
+            className="flex items-center gap-3 p-3 bg-muted border border-border rounded-xl"
           >
             <span className="text-lg">🃏</span>
-            <span className="font-medium text-gray-900 text-sm">{card.word}</span>
-            <span className="text-gray-400 text-sm">&rarr;</span>
-            <span className="text-gray-600 text-sm">{card.meaning}</span>
+            <span className="font-medium text-foreground text-sm">{card.word}</span>
+            <span className="text-content-tertiary text-sm">&rarr;</span>
+            <span className="text-muted-foreground text-sm">{card.meaning}</span>
           </div>
         ))}
       </div>
@@ -320,17 +320,17 @@ export function FirstStudyStep({ onAction }: StepProps) {
       })}
     >
       {/* Study modes preview */}
-      <div className="w-full max-w-sm bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-left space-y-2">
-        <div className="flex items-center gap-2 text-sm text-gray-700">
-          <span className="text-yellow-500">&#11088;</span>
+      <div className="w-full max-w-sm bg-muted border border-border rounded-xl p-4 mb-6 text-left space-y-2">
+        <div className="flex items-center gap-2 text-sm text-foreground">
+          <span className="text-warning">&#11088;</span>
           <span className="font-medium">SRS (Spaced Repetition)</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-700">
-          <span className="text-gray-400">&#8226;</span>
+        <div className="flex items-center gap-2 text-sm text-foreground">
+          <span className="text-content-tertiary">&#8226;</span>
           <span>Random Review</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-700">
-          <span className="text-gray-400">&#8226;</span>
+        <div className="flex items-center gap-2 text-sm text-foreground">
+          <span className="text-content-tertiary">&#8226;</span>
           <span>Sequential</span>
         </div>
       </div>

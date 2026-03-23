@@ -26,7 +26,7 @@ export function ContentListPage() {
   }, [fetchContents, i18n.language])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <SEOHead
         title={t('seo.listTitle')}
         description={t('seo.listDescription')}
@@ -41,10 +41,10 @@ export function ContentListPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
         <div className="text-center mb-10 sm:mb-14 pb-12">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-3">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-foreground mb-3">
             {t('list.title')}
           </h1>
-          <p className="text-gray-500 text-base sm:text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             {t('list.subtitle')}
           </p>
         </div>
@@ -55,8 +55,8 @@ export function ContentListPage() {
         {/* Empty state */}
         {!listLoading && items.length === 0 && (
           <div className="text-center py-20">
-            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">{t('list.noArticles')}</p>
+            <BookOpen className="w-16 h-16 text-content-tertiary mx-auto mb-4" />
+            <p className="text-content-tertiary text-lg">{t('list.noArticles')}</p>
           </div>
         )}
 
@@ -74,13 +74,13 @@ export function ContentListPage() {
         {/* Load more sentinel */}
         <div ref={sentinelRef} className="py-8 text-center">
           {listLoading && items.length > 0 && (
-            <div className="flex items-center justify-center gap-2 text-gray-400">
-              <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+            <div className="flex items-center justify-center gap-2 text-content-tertiary">
+              <div className="w-5 h-5 border-2 border-border border-t-blue-600 rounded-full animate-spin" />
               <span className="text-sm">{t('list.loadingMore')}</span>
             </div>
           )}
           {!hasMore && items.length > 0 && (
-            <p className="text-sm text-gray-400">{t('list.reachedEnd')}</p>
+            <p className="text-sm text-content-tertiary">{t('list.reachedEnd')}</p>
           )}
         </div>
       </main>

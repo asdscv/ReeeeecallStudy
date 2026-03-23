@@ -157,19 +157,19 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Template name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form.templateName')}</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('form.templateName')}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t('form.namePlaceholder')}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+              className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
               required
             />
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-border">
             {(['fields', 'front', 'back'] as const).map((tab) => (
               <button
                 key={tab}
@@ -177,8 +177,8 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 text-sm font-medium border-b-2 cursor-pointer transition ${
                   activeTab === tab
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-brand text-brand'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tab === 'fields' ? t('form.fieldsTab', { current: fields.length, max: 10 }) : tab === 'front' ? t('form.frontLayoutTab') : t('form.backLayoutTab')}
@@ -190,13 +190,13 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
           {activeTab === 'fields' && (
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {fields.map((field, i) => (
-                <div key={field.key} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                <div key={field.key} className="flex items-center gap-2 p-2 bg-muted rounded-lg">
                   <div className="flex flex-col gap-0.5">
                     <button
                       type="button"
                       onClick={() => moveField(i, -1)}
                       disabled={i === 0}
-                      className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-30 cursor-pointer"
+                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 cursor-pointer"
                     >
                       ▲
                     </button>
@@ -204,7 +204,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                       type="button"
                       onClick={() => moveField(i, 1)}
                       disabled={i === fields.length - 1}
-                      className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-30 cursor-pointer"
+                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 cursor-pointer"
                     >
                       ▼
                     </button>
@@ -213,13 +213,13 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     type="text"
                     value={field.name}
                     onChange={(e) => updateField(i, { name: e.target.value })}
-                    className="flex-1 px-3 py-1.5 rounded border border-gray-300 text-sm text-gray-900 outline-none focus:border-blue-500"
+                    className="flex-1 px-3 py-1.5 rounded border border-border text-sm text-foreground outline-none focus:border-brand"
                     placeholder={t('form.fieldNamePlaceholder')}
                   />
                   <select
                     value={field.type}
                     onChange={(e) => updateField(i, { type: e.target.value as TemplateField['type'] })}
-                    className="px-2 py-1.5 rounded border border-gray-300 text-sm text-gray-700 outline-none"
+                    className="px-2 py-1.5 rounded border border-border text-sm text-foreground outline-none"
                   >
                     {FIELD_TYPES.map((ft) => (
                       <option key={ft.value} value={ft.value}>{t(ft.labelKey)}</option>
@@ -229,7 +229,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     type="button"
                     onClick={() => removeField(i)}
                     disabled={fields.length <= 1}
-                    className="text-gray-400 hover:text-red-500 disabled:opacity-30 cursor-pointer text-sm px-1"
+                    className="text-content-tertiary hover:text-destructive disabled:opacity-30 cursor-pointer text-sm px-1"
                   >
                     ✕
                   </button>
@@ -239,7 +239,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                 <button
                   type="button"
                   onClick={addField}
-                  className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 cursor-pointer transition"
+                  className="w-full py-2 border-2 border-dashed border-border rounded-lg text-sm text-muted-foreground hover:border-brand hover:text-brand cursor-pointer transition"
                 >
                   {t('form.addField')}
                 </button>
@@ -275,14 +275,14 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg hover:bg-muted cursor-pointer"
             >
               {t('form.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
             >
               {loading ? t('form.saving') : editTemplate ? t('form.save') : t('form.create')}
             </button>
@@ -316,7 +316,7 @@ function LayoutEditor({
           <div
             key={field.key}
             className={`p-3 rounded-lg border transition ${
-              isSelected ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-gray-50'
+              isSelected ? 'border-brand/30 bg-brand/10' : 'border-border bg-muted'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -327,8 +327,8 @@ function LayoutEditor({
                   onChange={() => onToggle(field.key)}
                   className="cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">{field.name}</span>
-                <span className="text-xs text-gray-400">({field.type})</span>
+                <span className="text-sm font-medium text-foreground">{field.name}</span>
+                <span className="text-xs text-content-tertiary">({field.type})</span>
               </label>
             </div>
             {isSelected && (
@@ -340,8 +340,8 @@ function LayoutEditor({
                     onClick={() => onStyleChange(field.key, style.value)}
                     className={`px-2.5 py-1 text-xs rounded-full cursor-pointer transition ${
                       layoutItem?.style === style.value
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white border border-gray-300 text-gray-600 hover:border-blue-400'
+                        ? 'bg-brand text-white'
+                        : 'bg-card border border-border text-muted-foreground hover:border-brand'
                     }`}
                     title={t(style.descKey)}
                   >
@@ -354,7 +354,7 @@ function LayoutEditor({
         )
       })}
       {fields.length === 0 && (
-        <p className="text-sm text-gray-400 text-center py-4">{t('form.addFieldsFirst')}</p>
+        <p className="text-sm text-content-tertiary text-center py-4">{t('form.addFieldsFirst')}</p>
       )}
     </div>
   )

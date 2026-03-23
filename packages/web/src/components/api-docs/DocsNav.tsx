@@ -9,26 +9,26 @@ export function DocsNav() {
   const { user } = useAuthStore()
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
+    <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border/60">
       <div className="max-w-4xl mx-auto px-4 flex items-center justify-between py-3 sm:py-4">
         <div
           className="flex items-center gap-2.5 cursor-pointer"
           onClick={() => navigate('/')}
         >
           <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10" />
-          <span className="font-bold text-gray-900 text-lg sm:text-xl">ReeeeecallStudy</span>
+          <span className="font-bold text-foreground text-lg sm:text-xl">ReeeeecallStudy</span>
         </div>
         {user ? (
           <Link
             to="/dashboard"
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition no-underline"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline"
           >
             {t('dashboard', 'Dashboard')}
           </Link>
         ) : (
           <button
             onClick={() => navigate('/auth/login')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition cursor-pointer"
           >
             {t('getStarted')} <ArrowRight className="w-4 h-4" />
           </button>

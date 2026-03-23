@@ -2,9 +2,9 @@ import type { HighlightBoxBlock as HighlightBoxBlockType } from '../../../types/
 import { parseInlineMarkdown, stripMarkdownText } from '../../../lib/content-blocks'
 
 const VARIANT_STYLES: Record<string, string> = {
-  blue: 'bg-blue-600 text-white',
-  green: 'bg-green-600 text-white',
-  amber: 'bg-amber-500 text-white',
+  blue: 'bg-brand text-white',
+  green: 'bg-success text-white',
+  amber: 'bg-warning text-white',
 }
 
 export function HighlightBoxBlock({ props }: { props: HighlightBoxBlockType['props'] }) {

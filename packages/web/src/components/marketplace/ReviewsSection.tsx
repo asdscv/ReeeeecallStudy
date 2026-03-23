@@ -80,9 +80,9 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
   const canWriteReview = !!user && !isOwner && hasAcquired
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200">
-        <h2 className="text-sm font-medium text-gray-700">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
+      <div className="px-4 py-3 border-b border-border">
+        <h2 className="text-sm font-medium text-foreground">
           {t('reviews.title', { defaultValue: 'Ratings & Reviews' })}
         </h2>
       </div>
@@ -94,18 +94,18 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
         )}
 
         {stats && stats.review_count === 0 && (
-          <p className="text-sm text-gray-500 text-center py-4">
+          <p className="text-sm text-muted-foreground text-center py-4">
             {t('reviews.noReviews', { defaultValue: 'No reviews yet. Be the first to review!' })}
           </p>
         )}
 
         {/* Write review section */}
         {canWriteReview && (
-          <div className="border-t border-gray-100 pt-4">
+          <div className="border-t border-border pt-4">
             {!showForm && !userReview && (
               <button
                 onClick={() => setShowForm(true)}
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+                className="px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
               >
                 {t('reviews.writeReview', { defaultValue: 'Write a Review' })}
               </button>
@@ -123,13 +123,13 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
           </div>
         )}
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-destructive">{error}</p>}
 
         {/* Sort controls + Review list */}
         {stats && stats.review_count > 0 && (
           <>
-            <div className="flex items-center gap-2 border-t border-gray-100 pt-4">
-              <span className="text-xs text-gray-500">
+            <div className="flex items-center gap-2 border-t border-border pt-4">
+              <span className="text-xs text-muted-foreground">
                 {t('reviews.sortLabel', { defaultValue: 'Sort by:' })}
               </span>
               {SORT_OPTIONS.map((opt) => (
@@ -138,8 +138,8 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
                   onClick={() => handleSortChange(opt.value)}
                   className={`px-3 py-1 text-xs rounded-full border transition cursor-pointer ${
                     sortBy === opt.value
-                      ? 'bg-blue-50 border-blue-200 text-blue-700 font-medium'
-                      : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                      ? 'bg-brand/10 border-brand/30 text-brand font-medium'
+                      : 'bg-card border-border text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   {t(opt.labelKey, { defaultValue: opt.value })}
@@ -147,7 +147,7 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
               ))}
             </div>
 
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {reviews.map((review) => (
                 <ReviewCard
                   key={review.id}
@@ -161,7 +161,7 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
 
             {loading && (
               <div className="text-center py-4">
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-content-tertiary">
                   {t('reviews.loading', { defaultValue: 'Loading...' })}
                 </span>
               </div>
@@ -170,7 +170,7 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
             {hasMore && !loading && (
               <button
                 onClick={() => loadMore(listingId)}
-                className="w-full py-2 text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                className="w-full py-2 text-sm text-brand hover:text-brand font-medium cursor-pointer"
               >
                 {t('reviews.loadMore', { defaultValue: 'Load more reviews' })}
               </button>

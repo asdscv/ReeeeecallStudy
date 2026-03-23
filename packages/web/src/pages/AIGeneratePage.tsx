@@ -159,10 +159,10 @@ export function AIGeneratePage() {
       {/* ── Header ── */}
       <div className="mb-6">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('page.title')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('page.title')}</h1>
           <GuideHelpLink section="ai-generate" />
         </div>
-        <p className="text-sm text-gray-500 mt-1">{t('page.subtitle')}</p>
+        <p className="text-sm text-muted-foreground mt-1">{t('page.subtitle')}</p>
       </div>
 
       {/* ── Wizard Stepper ── */}
@@ -178,17 +178,17 @@ export function AIGeneratePage() {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                       isComplete
-                        ? 'bg-green-500 text-white'
+                        ? 'bg-success text-white'
                         : isActive
-                          ? 'bg-blue-600 text-white ring-4 ring-blue-100'
-                          : 'bg-gray-200 text-gray-500'
+                          ? 'bg-brand text-white ring-4 ring-blue-100'
+                          : 'bg-accent text-muted-foreground'
                     }`}
                   >
                     {isComplete ? '✓' : i + 1}
                   </div>
                   <span
                     className={`text-[10px] sm:text-xs mt-1 whitespace-nowrap ${
-                      isActive ? 'text-blue-600 font-semibold' : 'text-gray-400'
+                      isActive ? 'text-brand font-semibold' : 'text-content-tertiary'
                     }`}
                   >
                     {t(step.labelKey)}
@@ -197,7 +197,7 @@ export function AIGeneratePage() {
                 {!isLast && (
                   <div
                     className={`flex-1 h-0.5 mx-2 mt-[-16px] transition-all duration-500 ${
-                      isComplete ? 'bg-green-400' : 'bg-gray-200'
+                      isComplete ? 'bg-success' : 'bg-accent'
                     }`}
                   />
                 )}
@@ -208,13 +208,13 @@ export function AIGeneratePage() {
       </div>
 
       {/* ── Step Content ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         {/* Config Step */}
         {store.currentStep === 'config' && (
           <div className="p-5 sm:p-6">
             {/* Quick start hint if API key exists */}
             {hasApiKey && (
-              <div className="mb-4 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700 flex items-center gap-2">
+              <div className="mb-4 px-3 py-2 bg-success/10 border border-success/30 rounded-lg text-xs text-success flex items-center gap-2">
                 <span>✓</span>
                 {t('page.apiKeySaved')}
               </div>
@@ -316,11 +316,11 @@ export function AIGeneratePage() {
 
 function InfoCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <div className="flex gap-3 p-3 bg-white rounded-xl border border-gray-100">
+    <div className="flex gap-3 p-3 bg-card rounded-xl border border-border">
       <span className="text-lg shrink-0">{icon}</span>
       <div>
-        <p className="text-xs font-medium text-gray-700">{title}</p>
-        <p className="text-[10px] text-gray-400 mt-0.5">{desc}</p>
+        <p className="text-xs font-medium text-foreground">{title}</p>
+        <p className="text-[10px] text-content-tertiary mt-0.5">{desc}</p>
       </div>
     </div>
   )

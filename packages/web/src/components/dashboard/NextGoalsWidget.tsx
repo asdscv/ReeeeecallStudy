@@ -48,8 +48,8 @@ export function NextGoalsWidget() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-        <div className="h-20 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+      <div className="bg-card rounded-xl border border-border p-4">
+        <div className="h-20 bg-accent rounded animate-pulse" />
       </div>
     )
   }
@@ -57,8 +57,8 @@ export function NextGoalsWidget() {
   if (goals.length === 0) return null
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+    <div className="bg-card rounded-xl border border-border p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3">
         {t('goals.title', 'Next Goals')}
       </h3>
       <div className="space-y-3">
@@ -67,22 +67,22 @@ export function NextGoalsWidget() {
             <div className="shrink-0"><CategoryIcon category={goal.category} size="md" /></div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {t(CATEGORY_LABELS[goal.category] ?? goal.category)}
                 </span>
-                <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
+                <span className="text-xs font-medium text-foreground">
                   {formatValue(goal.category, goal.current)} / {formatValue(goal.category, goal.target)}
                 </span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div className="w-full bg-accent rounded-full h-2">
                 <div
-                  className="h-2 rounded-full bg-blue-500 transition-all duration-500"
+                  className="h-2 rounded-full bg-brand transition-all duration-500"
                   style={{ width: `${Math.min(100, goal.progress)}%` }}
                 />
               </div>
               <div className="flex items-center justify-between mt-0.5">
-                <span className="text-[10px] text-gray-400">{goal.progress}%</span>
-                <span className="text-[10px] text-blue-500 font-medium">+{goal.xp} XP</span>
+                <span className="text-[10px] text-content-tertiary">{goal.progress}%</span>
+                <span className="text-[10px] text-brand font-medium">+{goal.xp} XP</span>
               </div>
             </div>
           </div>

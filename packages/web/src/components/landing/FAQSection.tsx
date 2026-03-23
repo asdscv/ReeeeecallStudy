@@ -14,10 +14,10 @@ function FAQItem({ question, answer }: FAQItemProps) {
   const prefersReduced = useReducedMotion()
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between cursor-pointer p-5 text-left font-semibold text-gray-900 hover:bg-gray-50 transition bg-transparent border-none"
+        className="w-full flex items-center justify-between cursor-pointer p-5 text-left font-semibold text-foreground hover:bg-muted transition bg-transparent border-none"
       >
         <span>{question}</span>
         <motion.div
@@ -25,7 +25,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
           transition={prefersReduced ? { duration: 0 } : { duration: 0.2 }}
           className="shrink-0 ml-4"
         >
-          <ChevronRight className="w-4 h-4 text-gray-400" />
+          <ChevronRight className="w-4 h-4 text-content-tertiary" />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
@@ -37,7 +37,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 text-gray-600 leading-relaxed">
+            <div className="px-5 pb-5 text-muted-foreground leading-relaxed">
               {answer}
             </div>
           </motion.div>
@@ -58,10 +58,10 @@ export function FAQSection() {
   ]
 
   return (
-    <section id="faq" className="py-16 sm:py-24 px-4 bg-gray-50">
+    <section id="faq" className="py-16 sm:py-24 px-4 bg-muted">
       <div className="max-w-3xl mx-auto">
         <ScrollReveal>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-10 text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-10 text-center">
             {t('faq.title', 'Frequently Asked Questions')}
           </h2>
         </ScrollReveal>

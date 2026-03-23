@@ -40,7 +40,7 @@ export function AdminStudyPage() {
     <div className="space-y-6">
       {/* Period selector */}
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600">{t('study.period')}:</span>
+        <span className="text-sm text-muted-foreground">{t('study.period')}:</span>
         <div className="flex gap-1">
           {PERIOD_OPTIONS.map((p) => (
             <button
@@ -50,8 +50,8 @@ export function AdminStudyPage() {
               onClick={() => setDays(p)}
               className={`px-3 py-1 text-xs rounded-full border transition cursor-pointer ${
                 days === p
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                  ? 'bg-brand text-white border-brand'
+                  : 'bg-card text-muted-foreground border-border hover:border-border'
               }`}
             >
               {t('study.periodDay', { count: p })}
@@ -61,7 +61,7 @@ export function AdminStudyPage() {
       </div>
 
       {studyLoading && dailyActivity.length === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">{t('loading')}</p>
+        <p className="text-sm text-content-tertiary py-8 text-center">{t('loading')}</p>
       ) : (
         <>
           {/* Daily activity charts */}
@@ -73,21 +73,21 @@ export function AdminStudyPage() {
 
           {/* SRS Status Breakdown */}
           {srsBreakdown.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">{t('study.srsBreakdown')}</h3>
+            <div className="bg-card rounded-xl border border-border p-4">
+              <h3 className="text-sm font-medium text-foreground mb-3">{t('study.srsBreakdown')}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {srsBreakdown.map((s) => (
-                  <div key={s.status} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div key={s.status} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                     <div
                       className="w-3 h-3 rounded-full flex-shrink-0"
                       style={{ backgroundColor: SRS_COLORS[s.status] ?? '#6b7280' }}
                     />
                     <div className="min-w-0">
-                      <p className="text-xs text-gray-500">{t(srsStatusLabel(s.status), s.status)}</p>
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-xs text-muted-foreground">{t(srsStatusLabel(s.status), s.status)}</p>
+                      <p className="text-sm font-semibold text-foreground">
                         {formatStatNumber(s.count)}
                         {totalCards > 0 && (
-                          <span className="text-xs font-normal text-gray-400 ml-1">
+                          <span className="text-xs font-normal text-content-tertiary ml-1">
                             ({Math.round((s.count / totalCards) * 100)}%)
                           </span>
                         )}
@@ -107,27 +107,27 @@ export function AdminStudyPage() {
 
           {/* Mode Effectiveness Table */}
           {modeEffectiveness.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-100">
-                <h3 className="text-sm font-medium text-gray-700">{t('study.modeEffectiveness')}</h3>
+            <div className="bg-card rounded-xl border border-border overflow-hidden">
+              <div className="px-4 py-3 border-b border-border">
+                <h3 className="text-sm font-medium text-foreground">{t('study.modeEffectiveness')}</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-muted">
                     <tr>
-                      <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500">{t('study.mode')}</th>
-                      <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500">{t('study.sessions')}</th>
-                      <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500">{t('study.avgCardsPerSession')}</th>
-                      <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500">{t('study.avgDurationPerSession')}</th>
+                      <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('study.mode')}</th>
+                      <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-muted-foreground">{t('study.sessions')}</th>
+                      <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-muted-foreground">{t('study.avgCardsPerSession')}</th>
+                      <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-muted-foreground">{t('study.avgDurationPerSession')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border">
                     {modeEffectiveness.map((m) => (
-                      <tr key={m.mode} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-gray-900 font-medium">{t(studyModeLabel(m.mode), m.mode)}</td>
-                        <td className="px-4 py-2 text-right text-gray-600">{formatStatNumber(m.session_count)}</td>
-                        <td className="px-4 py-2 text-right text-gray-600">{formatStatNumber(m.avgCardsPerSession)}</td>
-                        <td className="px-4 py-2 text-right text-gray-600">{t('study.minuteShort', { value: m.avgDurationMin })}</td>
+                      <tr key={m.mode} className="hover:bg-muted">
+                        <td className="px-4 py-2 text-foreground font-medium">{t(studyModeLabel(m.mode), m.mode)}</td>
+                        <td className="px-4 py-2 text-right text-muted-foreground">{formatStatNumber(m.session_count)}</td>
+                        <td className="px-4 py-2 text-right text-muted-foreground">{formatStatNumber(m.avgCardsPerSession)}</td>
+                        <td className="px-4 py-2 text-right text-muted-foreground">{t('study.minuteShort', { value: m.avgDurationMin })}</td>
                       </tr>
                     ))}
                   </tbody>

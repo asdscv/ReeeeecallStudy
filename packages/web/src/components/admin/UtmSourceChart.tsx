@@ -11,17 +11,17 @@ export function UtmSourceChart({ data, ctaClicks }: UtmSourceChartProps) {
   const { t } = useTranslation('admin')
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-700">{t('contents.utmSources')}</h3>
+        <h3 className="text-sm font-medium text-foreground">{t('contents.utmSources')}</h3>
         {ctaClicks > 0 && (
-          <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-brand bg-brand/10 px-2 py-0.5 rounded-full">
             {t('contents.ctaClicks')}: {ctaClicks.toLocaleString()}
           </span>
         )}
       </div>
       {data.length === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">{t('noData')}</p>
+        <p className="text-sm text-content-tertiary py-8 text-center">{t('noData')}</p>
       ) : (
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={data} layout="vertical" margin={{ left: 60 }}>

@@ -26,7 +26,7 @@ export function GeneratingStep({ step, progress }: GeneratingStepProps) {
     <div className="flex flex-col items-center justify-center py-8 gap-6">
       {/* Animated icon */}
       <div className="relative">
-        <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center">
+        <div className="w-20 h-20 rounded-full bg-brand/10 flex items-center justify-center">
           <span className="text-3xl animate-bounce" style={{ animationDuration: '1.5s' }}>
             {step === 'saving' ? '💾' : step === 'generating_template' ? '📋' : step === 'generating_deck' ? '📚' : '🤖'}
           </span>
@@ -36,8 +36,8 @@ export function GeneratingStep({ step, progress }: GeneratingStepProps) {
       </div>
 
       <div className="text-center space-y-1">
-        <p className="text-sm font-semibold text-gray-900">{label}</p>
-        <p className="text-xs text-gray-400">{t('steps.pleaseWait')}</p>
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+        <p className="text-xs text-content-tertiary">{t('steps.pleaseWait')}</p>
       </div>
 
       {/* Sub-step indicators */}
@@ -52,7 +52,7 @@ export function GeneratingStep({ step, progress }: GeneratingStepProps) {
             <div
               key={s}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                isDone ? 'bg-green-400' : isCurrent ? 'bg-blue-500 scale-125' : 'bg-gray-200'
+                isDone ? 'bg-success' : isCurrent ? 'bg-brand scale-125' : 'bg-accent'
               }`}
             />
           )
@@ -62,13 +62,13 @@ export function GeneratingStep({ step, progress }: GeneratingStepProps) {
       {/* Progress bar */}
       {showProgress && (
         <div className="w-full max-w-xs space-y-1">
-          <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+          <div className="bg-accent rounded-full h-2 overflow-hidden">
             <div
               className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-full h-2 transition-all duration-500 ease-out"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-content-tertiary">
             <span>{progress.done} / {progress.total}</span>
             <span>{pct}%</span>
           </div>

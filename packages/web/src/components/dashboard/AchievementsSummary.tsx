@@ -40,24 +40,24 @@ export function AchievementsSummary() {
     .slice(0, 4)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+    <div className="bg-card rounded-xl border border-border p-4 sm:p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 font-bold text-sm">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-warning/15 text-warning font-bold text-sm">
             {level}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-800">
+            <p className="text-sm font-medium text-foreground">
               {t('achievements.level')} {level}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {currentLevelXp} / {nextLevelXp} {t('achievements.xp')}
             </p>
           </div>
         </div>
         <Link
           to="/achievements"
-          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 no-underline transition"
+          className="flex items-center gap-1 text-sm text-brand hover:text-brand no-underline transition"
         >
           {t('achievements.viewAll')}
           <ChevronRight className="w-4 h-4" />
@@ -65,9 +65,9 @@ export function AchievementsSummary() {
       </div>
 
       {/* XP progress bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+      <div className="w-full bg-accent rounded-full h-2 mb-3">
         <div
-          className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+          className="bg-warning h-2 rounded-full transition-all duration-500"
           style={{ width: `${progressPct}%` }}
         />
       </div>
@@ -75,7 +75,7 @@ export function AchievementsSummary() {
       {/* Recent badges */}
       {recentEarned.length > 0 && (
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 mr-1">{t('achievements.recent')}:</span>
+          <span className="text-xs text-muted-foreground mr-1">{t('achievements.recent')}:</span>
           {recentEarned.map(ach => (
             <div key={ach.id} title={t(`achievements.badge.${ach.id}`, ach.id)}>
               <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="sm" earned />

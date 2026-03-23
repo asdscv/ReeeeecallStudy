@@ -31,8 +31,8 @@ function Counter({ endValue, displayLabel, delay }: { endValue: number; displayL
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
     >
-      <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">{formatted}</p>
-      <p className="text-xs sm:text-sm text-gray-500 mt-1">{displayLabel}</p>
+      <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground">{formatted}</p>
+      <p className="text-xs sm:text-sm text-muted-foreground mt-1">{displayLabel}</p>
     </motion.div>
   )
 }
@@ -43,7 +43,7 @@ function ReviewCard({ review, lang }: { review: Review; lang: Lang }) {
 
   return (
     <div className="w-[260px] sm:w-[300px] md:w-[340px] flex-shrink-0 group relative">
-      <div className="h-full bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
+      <div className="h-full bg-card rounded-2xl p-4 sm:p-5 border border-border shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
         {/* Accent gradient bar */}
         <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${review.color}`} />
 
@@ -61,7 +61,7 @@ function ReviewCard({ review, lang }: { review: Review; lang: Lang }) {
         </div>
 
         {/* Quote */}
-        <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-3 sm:mb-4 line-clamp-3 relative z-10 min-h-[3rem] sm:min-h-[3.5rem]">
+        <p className="text-xs sm:text-sm text-foreground leading-relaxed mb-3 sm:mb-4 line-clamp-3 relative z-10 min-h-[3rem] sm:min-h-[3.5rem]">
           &ldquo;{review.quote[lang]}&rdquo;
         </p>
 
@@ -71,8 +71,8 @@ function ReviewCard({ review, lang }: { review: Review; lang: Lang }) {
             {initial}
           </div>
           <div className="min-w-0">
-            <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate">{review.author[lang]}</p>
-            <p className="text-[10px] sm:text-xs text-gray-400 truncate">{review.role[lang]}</p>
+            <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{review.author[lang]}</p>
+            <p className="text-[10px] sm:text-xs text-content-tertiary truncate">{review.role[lang]}</p>
           </div>
         </div>
       </div>
@@ -128,9 +128,9 @@ function LiveActivityBadge() {
   }, [fluctuate])
 
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-sm text-green-700">
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/30 rounded-full text-sm text-success">
       <span
-        className={`w-2 h-2 rounded-full bg-green-500 ${prefersReduced ? '' : 'animate-pulse'}`}
+        className={`w-2 h-2 rounded-full bg-success ${prefersReduced ? '' : 'animate-pulse'}`}
       />
       <span>{t('socialProof.liveActivity', '{{count}} people studying right now', { count })}</span>
     </div>
@@ -151,10 +151,10 @@ export function SocialProofSection() {
       <div className="max-w-6xl mx-auto px-4">
         <ScrollReveal>
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-3 sm:mb-4">
               {t('socialProof.title', 'Trusted by Learners Worldwide')}
             </h2>
-            <p className="text-gray-500 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
               {t('socialProof.subtitle', 'Join thousands of students studying smarter')}
             </p>
           </div>

@@ -54,13 +54,13 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
   const todayStr = todayDateKey()
 
   return (
-    <div className="bg-white border border-gray-300 rounded-lg p-2 sm:p-3">
+    <div className="bg-card border border-border rounded-lg p-2 sm:p-3">
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-2 sm:mb-3">
         <button
           type="button"
           onClick={prevMonth}
-          className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          className="p-2 hover:bg-accent rounded transition-colors cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -73,7 +73,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
         <button
           type="button"
           onClick={nextMonth}
-          className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          className="p-2 hover:bg-accent rounded transition-colors cursor-pointer"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -84,7 +84,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
         {[t('weekdays.sun'), t('weekdays.mon'), t('weekdays.tue'), t('weekdays.wed'), t('weekdays.thu'), t('weekdays.fri'), t('weekdays.sat')].map((day) => (
           <div
             key={day}
-            className="aspect-square flex items-center justify-center text-xs font-medium text-gray-500"
+            className="aspect-square flex items-center justify-center text-xs font-medium text-muted-foreground"
           >
             {day}
           </div>
@@ -117,10 +117,10 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
               onClick={() => handleDateClick(day)}
               className={`
                 aspect-square flex items-center justify-center text-sm rounded-lg transition-colors cursor-pointer
-                ${isSelected ? 'bg-blue-600 text-white font-bold' : ''}
-                ${!isSelected && hasCards ? 'bg-gray-100 text-gray-900 font-semibold hover:bg-gray-200' : ''}
-                ${!isSelected && !hasCards ? 'text-gray-300 hover:bg-gray-50' : ''}
-                ${isToday && !isSelected ? 'ring-2 ring-blue-400' : ''}
+                ${isSelected ? 'bg-brand text-white font-bold' : ''}
+                ${!isSelected && hasCards ? 'bg-accent text-foreground font-semibold hover:bg-accent' : ''}
+                ${!isSelected && !hasCards ? 'text-content-tertiary hover:bg-muted' : ''}
+                ${isToday && !isSelected ? 'ring-2 ring-brand' : ''}
               `}
             >
               {day}

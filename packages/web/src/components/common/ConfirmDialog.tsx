@@ -40,7 +40,7 @@ export function ConfirmDialog({
         <DialogFooter>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+            className="px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg hover:bg-muted cursor-pointer"
           >
             {t('confirmDialog.cancel')}
           </button>
@@ -49,8 +49,8 @@ export function ConfirmDialog({
             disabled={loading}
             className={`px-4 py-2 text-sm text-white rounded-lg cursor-pointer disabled:opacity-50 ${
               danger
-                ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-blue-600 hover:bg-blue-700'
+                ? 'bg-destructive hover:bg-destructive'
+                : 'bg-brand hover:bg-brand'
             }`}
           >
             {loading ? t('confirmDialog.processing') : (confirmLabel || t('confirmDialog.confirm'))}

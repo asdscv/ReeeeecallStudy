@@ -58,56 +58,56 @@ export function AchievementsPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <Trophy className="w-10 h-10 text-yellow-500 animate-pulse" />
+        <Trophy className="w-10 h-10 text-warning animate-pulse" />
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('achievements.title')}</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('achievements.title')}</h1>
 
       {/* Level + XP bar */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+      <div className="bg-card rounded-xl border border-border p-4 sm:p-6">
         <div className="flex items-center gap-4 mb-3">
-          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 font-bold text-xl">
+          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-warning/15 dark:bg-yellow-900/30 text-warning font-bold text-xl">
             {level}
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('achievements.level')} {level}</p>
-            <p className="text-xs text-gray-500">{currentLevelXp} / {nextLevelXp} {t('achievements.xp')}</p>
+            <p className="text-sm font-medium text-foreground">{t('achievements.level')} {level}</p>
+            <p className="text-xs text-muted-foreground">{currentLevelXp} / {nextLevelXp} {t('achievements.xp')}</p>
           </div>
           <div className="text-right">
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{xp.toLocaleString()}</p>
-            <p className="text-xs text-gray-500">{t('achievements.totalXp')}</p>
+            <p className="text-lg font-bold text-foreground">{xp.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">{t('achievements.totalXp')}</p>
           </div>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-          <div className="bg-yellow-500 h-3 rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} />
+        <div className="w-full bg-accent rounded-full h-3">
+          <div className="bg-warning h-3 rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} />
         </div>
       </div>
 
       {/* Section 1: Next Goals (5 categories) */}
       {nextGoals.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+        <div className="bg-card rounded-xl border border-border p-4 sm:p-6">
+          <h2 className="text-sm font-semibold text-foreground mb-4">
             {t('goals.title', 'Next Goals')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {nextGoals.map(goal => (
-              <div key={goal.category} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div key={goal.category} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <div className="shrink-0"><CategoryIcon category={goal.category} size="md" /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-xs font-medium text-foreground">
                       {t(`goals.${goal.category}`, goal.category)}
                     </span>
-                    <span className="text-xs text-blue-600 font-semibold">+{goal.xp} XP</span>
+                    <span className="text-xs text-brand font-semibold">+{goal.xp} XP</span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-1">
-                    <div className="h-2 rounded-full bg-blue-500 transition-all" style={{ width: `${Math.min(100, goal.progress)}%` }} />
+                  <div className="w-full bg-accent rounded-full h-2 mb-1">
+                    <div className="h-2 rounded-full bg-brand transition-all" style={{ width: `${Math.min(100, goal.progress)}%` }} />
                   </div>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-muted-foreground">
                     {formatValue(goal.category, goal.current)} / {formatValue(goal.category, goal.target)}
                   </p>
                 </div>
@@ -119,20 +119,20 @@ export function AchievementsPage() {
 
       {/* Section 2: Recent Earned (last 3) */}
       {recentEarned.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+        <div className="bg-card rounded-xl border border-border p-4 sm:p-6">
+          <h2 className="text-sm font-semibold text-foreground mb-4">
             {t('achievements.recent', 'Recent Achievements')}
           </h2>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {recentEarned.map(ach => (
-              <div key={ach.id} className="shrink-0 w-32 text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+              <div key={ach.id} className="shrink-0 w-32 text-center p-3 bg-warning/10 dark:bg-yellow-900/20 border border-warning/30 dark:border-yellow-800 rounded-xl">
                 <div className="flex justify-center mb-2">
                   <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="md" earned />
                 </div>
-                <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                <p className="text-xs font-medium text-foreground truncate">
                   {t(`achievements.badge.${ach.id}`, ach.id.replace(/_/g, ' '))}
                 </p>
-                <p className="text-[10px] text-gray-400 mt-1">
+                <p className="text-[10px] text-content-tertiary mt-1">
                   {ach.earned_at ? new Date(ach.earned_at).toLocaleDateString() : ''}
                 </p>
               </div>
@@ -143,9 +143,9 @@ export function AchievementsPage() {
 
       {/* Section 3: All Achievements (collapsible by category) */}
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <h2 className="text-sm font-semibold text-foreground">
           {t('achievements.viewAll', 'All Achievements')}
-          <span className="ml-2 text-xs font-normal text-gray-400">
+          <span className="ml-2 text-xs font-normal text-content-tertiary">
             {earned.length}{t('achievements.earned', ' earned')}
           </span>
         </h2>
@@ -161,21 +161,21 @@ export function AchievementsPage() {
           const hiddenCount = items.filter(a => !a.earned).length - (nextLocked ? 1 : 0)
 
           return (
-            <div key={cat} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div key={cat} className="bg-card rounded-xl border border-border overflow-hidden">
               <button
                 onClick={() => setExpandedCategory(isExpanded ? null : cat)}
-                className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <CategoryIcon category={cat} size="sm" />
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  <span className="text-sm font-medium text-foreground">
                     {t(`achievements.category.${cat}`)}
                   </span>
-                  <span className="text-xs text-gray-400">{earnedInCat.length}{t('achievements.earned', ' earned')}</span>
+                  <span className="text-xs text-content-tertiary">{earnedInCat.length}{t('achievements.earned', ' earned')}</span>
                 </div>
                 {isExpanded
-                  ? <ChevronUp className="w-4 h-4 text-gray-400" />
-                  : <ChevronDown className="w-4 h-4 text-gray-400" />
+                  ? <ChevronUp className="w-4 h-4 text-content-tertiary" />
+                  : <ChevronDown className="w-4 h-4 text-content-tertiary" />
                 }
               </button>
 
@@ -184,37 +184,37 @@ export function AchievementsPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     {/* Earned badges */}
                     {earnedInCat.map(ach => (
-                      <div key={ach.id} className="rounded-xl border border-yellow-300 dark:border-yellow-700 bg-white dark:bg-gray-800 p-3 text-center shadow-sm">
+                      <div key={ach.id} className="rounded-xl border border-warning/50 dark:border-yellow-700 bg-card p-3 text-center shadow-sm">
                         <div className="flex justify-center mb-1">
                           <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="sm" earned />
                         </div>
-                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-xs font-medium text-foreground truncate">
                           {t(`achievements.badge.${ach.id}`, ach.id.replace(/_/g, ' '))}
                         </p>
-                        <span className="text-[10px] text-yellow-600">+{ach.xp_reward} XP</span>
+                        <span className="text-[10px] text-warning">+{ach.xp_reward} XP</span>
                       </div>
                     ))}
 
                     {/* Next locked (visible) */}
                     {nextLocked && (
-                      <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-3 text-center opacity-70">
+                      <div className="rounded-xl border border-border bg-muted p-3 text-center opacity-70">
                         <div className="flex justify-center mb-1">
                           <AchievementIcon id={nextLocked.id} category={nextLocked.category} dbIcon={nextLocked.icon} size="sm" earned={false} />
                         </div>
-                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
+                        <p className="text-xs font-medium text-muted-foreground truncate">
                           {t(`achievements.badge.${nextLocked.id}`, nextLocked.id.replace(/_/g, ' '))}
                         </p>
                         <div className="flex items-center justify-center gap-1 mt-1">
-                          <Lock className="w-3 h-3 text-gray-400" />
-                          <span className="text-[10px] text-gray-400">+{nextLocked.xp_reward} XP</span>
+                          <Lock className="w-3 h-3 text-content-tertiary" />
+                          <span className="text-[10px] text-content-tertiary">+{nextLocked.xp_reward} XP</span>
                         </div>
                       </div>
                     )}
 
                     {/* Hidden badges — just "???" with no count */}
                     {hiddenCount > 0 && (
-                      <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30 p-3 text-center flex flex-col items-center justify-center">
-                        <p className="text-2xl text-gray-300 dark:text-gray-500 font-bold">???</p>
+                      <div className="rounded-xl border border-dashed border-border bg-muted/30 p-3 text-center flex flex-col items-center justify-center">
+                        <p className="text-2xl text-content-tertiary dark:text-muted-foreground font-bold">???</p>
                       </div>
                     )}
                   </div>
@@ -226,8 +226,8 @@ export function AchievementsPage() {
       </div>
 
       {achievements.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          <Trophy className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <div className="text-center py-12 text-muted-foreground">
+          <Trophy className="w-12 h-12 mx-auto mb-3 text-content-tertiary" />
           <p>{t('achievements.empty')}</p>
         </div>
       )}

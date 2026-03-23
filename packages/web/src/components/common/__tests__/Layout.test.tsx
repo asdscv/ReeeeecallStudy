@@ -112,8 +112,8 @@ describe('활성 상태', () => {
     const nav = screen.getAllByRole('navigation')[0]
     const link = within(nav).getByText('nav.quickStudy').closest('a')
 
-    expect(link).toHaveClass('bg-blue-50')
-    expect(link).toHaveClass('text-blue-700')
+    expect(link).toHaveClass('bg-brand/10')
+    expect(link).toHaveClass('text-brand')
   })
 
   it('/decks 경로에서 학습 그룹 버튼이 활성 스타일을 갖는다', () => {
@@ -121,8 +121,8 @@ describe('활성 상태', () => {
     const nav = screen.getAllByRole('navigation')[0]
     const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
-    expect(btn).toHaveClass('bg-blue-50')
-    expect(btn).toHaveClass('text-blue-700')
+    expect(btn).toHaveClass('bg-brand/10')
+    expect(btn).toHaveClass('text-brand')
   })
 
   it('중첩 경로(/decks/abc)에서도 학습 그룹 버튼이 활성된다', () => {
@@ -130,7 +130,7 @@ describe('활성 상태', () => {
     const nav = screen.getAllByRole('navigation')[0]
     const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
-    expect(btn).toHaveClass('bg-blue-50')
+    expect(btn).toHaveClass('bg-brand/10')
   })
 
   it('/templates 경로에서 학습 그룹이 활성된다', () => {
@@ -138,7 +138,7 @@ describe('활성 상태', () => {
     const nav = screen.getAllByRole('navigation')[0]
     const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
-    expect(btn).toHaveClass('bg-blue-50')
+    expect(btn).toHaveClass('bg-brand/10')
   })
 
   it('/marketplace 경로에서 학습 그룹이 활성된다', () => {
@@ -146,7 +146,7 @@ describe('활성 상태', () => {
     const nav = screen.getAllByRole('navigation')[0]
     const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
-    expect(btn).toHaveClass('bg-blue-50')
+    expect(btn).toHaveClass('bg-brand/10')
   })
 
   it('/history 경로에서 학습 그룹이 활성된다', () => {
@@ -154,7 +154,7 @@ describe('활성 상태', () => {
     const nav = screen.getAllByRole('navigation')[0]
     const btn = within(nav).getByRole('button', { name: /nav\.study/ })
 
-    expect(btn).toHaveClass('bg-blue-50')
+    expect(btn).toHaveClass('bg-brand/10')
   })
 })
 

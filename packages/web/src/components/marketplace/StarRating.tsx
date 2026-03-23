@@ -30,7 +30,7 @@ export function StarRating({
         return (
           <span
             key={i}
-            className={`${sizeClass} ${filled ? 'text-yellow-400' : 'text-gray-300'} ${interactive ? 'hover:text-yellow-300 transition-colors' : ''}`}
+            className={`${sizeClass} ${filled ? 'text-yellow-400' : 'text-content-tertiary'} ${interactive ? 'hover:text-yellow-300 transition-colors' : ''}`}
             onClick={interactive && onChange ? () => onChange(starValue) : undefined}
             role={interactive ? 'button' : undefined}
             aria-label={interactive ? `Rate ${starValue} star${starValue !== 1 ? 's' : ''}` : undefined}
@@ -56,9 +56,9 @@ export function StarRatingInline({
   if (count === 0) return null
 
   return (
-    <span className={`inline-flex items-center gap-1 ${size === 'sm' ? 'text-xs' : 'text-sm'} text-gray-500`}>
+    <span className={`inline-flex items-center gap-1 ${size === 'sm' ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
       <StarRating rating={rating} size={size} />
-      <span className="font-medium text-gray-700">{rating.toFixed(1)}</span>
+      <span className="font-medium text-foreground">{rating.toFixed(1)}</span>
       <span>({count})</span>
     </span>
   )

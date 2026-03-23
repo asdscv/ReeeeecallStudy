@@ -17,12 +17,12 @@ export function FinalCTASection() {
           {!prefersReduced && (
             <>
               <motion.div
-                className="absolute -top-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"
+                className="absolute -top-10 -left-10 w-40 h-40 bg-card/5 rounded-full blur-2xl"
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
               />
               <motion.div
-                className="absolute -bottom-10 -right-10 w-56 h-56 bg-white/5 rounded-full blur-2xl"
+                className="absolute -bottom-10 -right-10 w-56 h-56 bg-card/5 rounded-full blur-2xl"
                 animate={{ y: [0, 20, 0] }}
                 transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
               />
@@ -38,7 +38,7 @@ export function FinalCTASection() {
             </p>
             <motion.button
               onClick={() => navigate('/auth/login')}
-              className="inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-4 bg-white text-blue-700 text-base sm:text-lg font-semibold rounded-xl hover:bg-blue-50 transition shadow-lg cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-4 bg-card text-brand text-base sm:text-lg font-semibold rounded-xl hover:bg-brand/10 transition shadow-lg cursor-pointer"
               whileHover={prefersReduced ? undefined : { scale: 1.05 }}
               whileTap={prefersReduced ? undefined : { scale: 0.98 }}
             >

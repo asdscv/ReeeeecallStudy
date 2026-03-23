@@ -36,13 +36,13 @@ export function StreakFreezeWidget() {
   const { streak_freezes, freeze_used_today } = info
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-      <h3 className="text-sm font-semibold text-gray-800 mb-2">
+    <div className="bg-card rounded-xl border border-border p-4 sm:p-5">
+      <h3 className="text-sm font-semibold text-foreground mb-2">
         {t('streakFreeze.title')}
       </h3>
 
       {freeze_used_today && (
-        <p className="text-xs text-green-600 font-medium mb-2">
+        <p className="text-xs text-success font-medium mb-2">
           {t('streakFreeze.used')}
         </p>
       )}
@@ -63,7 +63,7 @@ export function StreakFreezeWidget() {
         ))}
       </div>
 
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         {t('streakFreeze.available', { count: streak_freezes })}
       </p>
     </div>

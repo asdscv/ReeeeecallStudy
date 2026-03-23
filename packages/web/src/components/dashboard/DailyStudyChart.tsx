@@ -24,13 +24,13 @@ export function DailyStudyChart({ data, title }: DailyStudyChartProps) {
   const totalStudied = data.reduce((s, d) => s + d.count, 0)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
       <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <h3 className="text-sm font-medium text-gray-700">{displayTitle}</h3>
-        <span className="text-xs text-gray-400">{t('dailyChart.total', { count: totalStudied })}</span>
+        <h3 className="text-sm font-medium text-foreground">{displayTitle}</h3>
+        <span className="text-xs text-content-tertiary">{t('dailyChart.total', { count: totalStudied })}</span>
       </div>
       {totalStudied === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">{t('dailyChart.noData')}</p>
+        <p className="text-sm text-content-tertiary py-8 text-center">{t('dailyChart.noData')}</p>
       ) : (
         <ResponsiveContainer width="100%" height={160}>
           <BarChart data={chartData}>

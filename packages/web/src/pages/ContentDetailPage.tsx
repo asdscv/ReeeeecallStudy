@@ -35,7 +35,7 @@ export function ContentDetailPage() {
 
   if (detailLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-card">
         <ContentNav
           backTo="/insight"
           backLabel={t('detail.backToList')}
@@ -47,7 +47,7 @@ export function ContentDetailPage() {
 
   if (detailError || !currentArticle) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-card">
         <SEOHead
           title={t('detail.notFound')}
           description=""
@@ -58,7 +58,7 @@ export function ContentDetailPage() {
           backLabel={t('detail.backToList')}
         />
         <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-          <p className="text-gray-400 text-lg">
+          <p className="text-content-tertiary text-lg">
             {t('detail.notFound')}
           </p>
         </div>
@@ -67,7 +67,7 @@ export function ContentDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <SEOHead
         title={currentArticle.meta_title || currentArticle.title}
         description={currentArticle.meta_description || currentArticle.subtitle || ''}
@@ -98,7 +98,7 @@ export function ContentDetailPage() {
 
       {relatedArticles.length > 0 && (
         <section className="max-w-3xl mx-auto px-4 pb-12">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
             {t('detail.relatedArticles', { defaultValue: 'Related Articles' })}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -106,18 +106,18 @@ export function ContentDetailPage() {
               <Link
                 key={item.id}
                 to={`/insight/${item.slug}`}
-                className="group block p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all"
+                className="group block p-4 rounded-xl border border-border hover:border-brand/30 hover:shadow-sm transition-all"
               >
-                <h3 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 line-clamp-2">
+                <h3 className="text-sm font-medium text-foreground group-hover:text-brand line-clamp-2">
                   {item.title}
                 </h3>
                 {item.subtitle && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.subtitle}</p>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.subtitle}</p>
                 )}
-                <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 mt-2 text-xs text-content-tertiary">
                   {item.reading_time_minutes && <span>{item.reading_time_minutes} min</span>}
                   {item.tags?.slice(0, 2).map((tag) => (
-                    <span key={tag} className="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-[10px]">
+                    <span key={tag} className="bg-accent text-muted-foreground px-1.5 py-0.5 rounded text-[10px]">
                       {tag}
                     </span>
                   ))}

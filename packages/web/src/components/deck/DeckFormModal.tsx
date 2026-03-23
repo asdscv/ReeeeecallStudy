@@ -102,14 +102,14 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg hover:bg-muted cursor-pointer"
             >
               {t('form.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || !formValues.name.trim()}
-              className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
             >
               {loading ? t('form.saving') : editDeck ? t('form.save') : t('form.create')}
             </button>

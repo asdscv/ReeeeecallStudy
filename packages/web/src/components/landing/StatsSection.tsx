@@ -34,7 +34,7 @@ function StatCard({
   return (
     <motion.div
       ref={ref}
-      className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow"
+      className="bg-card rounded-2xl border border-border p-4 sm:p-6 hover:shadow-lg transition-shadow"
       initial={prefersReduced ? undefined : { opacity: 0, y: 40 }}
       whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
       whileHover={prefersReduced ? undefined : { scale: 1.03, y: -4 }}
@@ -44,14 +44,14 @@ function StatCard({
       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mb-3 sm:mb-4 bg-gradient-to-br ${gradient} text-white`}>
         <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
       </div>
-      <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">{label}</p>
-      <p className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2 sm:mb-3">
+      <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">{label}</p>
+      <p className="text-3xl sm:text-4xl font-extrabold text-foreground mb-2 sm:mb-3">
         {value}
         <span className="text-xl sm:text-2xl">{suffix}</span>
       </p>
 
       {/* Progress bar */}
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+      <div className="h-1.5 bg-accent rounded-full overflow-hidden mb-3">
         <motion.div
           className={`h-full rounded-full bg-gradient-to-r ${gradient}`}
           initial={{ width: 0 }}
@@ -61,11 +61,11 @@ function StatCard({
         />
       </div>
 
-      <p className="text-xs text-gray-400 mb-2">{description}</p>
+      <p className="text-xs text-content-tertiary mb-2">{description}</p>
 
       <div className="flex items-center gap-1.5">
-        <span className="text-sm font-semibold text-green-500">{change}</span>
-        <span className="text-xs text-gray-400">{baseline}</span>
+        <span className="text-sm font-semibold text-success">{change}</span>
+        <span className="text-xs text-content-tertiary">{baseline}</span>
       </div>
     </motion.div>
   )
@@ -133,10 +133,10 @@ export function StatsSection() {
     <section id="stats" className="py-12 sm:py-16 md:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-3 sm:mb-4">
             {t('statsSection.title', 'Proven Results')}
           </h2>
-          <p className="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
             {t('statsSection.subtitle', 'Results achieved by ReeeeecallStudy users compared to traditional study methods')}
           </p>
         </div>

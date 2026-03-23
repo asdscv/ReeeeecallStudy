@@ -96,7 +96,7 @@ export function StudySetupPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="text-gray-500">{t('session.loading')}</div>
+        <div className="text-muted-foreground">{t('session.loading')}</div>
       </div>
     )
   }
@@ -134,23 +134,23 @@ export function StudySetupPage() {
     <div className="max-w-lg mx-auto">
       <button
         onClick={() => navigate(`/decks/${deckId}`)}
-        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3 sm:mb-4 cursor-pointer"
+        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-3 sm:mb-4 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         {deck.name}
       </button>
 
       <div className="flex items-center gap-2 mb-1">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('setup.title')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('setup.title')}</h1>
         <GuideHelpLink section="study" />
       </div>
-      <p className="text-gray-500 text-sm mb-4 sm:mb-6">
+      <p className="text-muted-foreground text-sm mb-4 sm:mb-6">
         {t('setup.deckInfo', { icon: deck.icon, name: deck.name, count: cardCount })}
       </p>
 
       {/* Mode selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">{t('setup.studyMode')}</label>
+        <label className="block text-sm font-medium text-foreground mb-2">{t('setup.studyMode')}</label>
         <div className="space-y-2">
           {STUDY_MODE_OPTIONS.map((opt) => (
             <button
@@ -159,17 +159,17 @@ export function StudySetupPage() {
               onClick={() => setMode(opt.value)}
               className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
                 mode === opt.value
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-brand bg-brand/10'
+                  : 'border-border hover:border-border'
               }`}
             >
               <div className="flex items-start gap-3">
                 <div className="text-2xl">{opt.emoji}</div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900 text-sm">{t(opt.label)}</div>
-                  <div className="text-xs text-gray-500">{t(opt.desc)}</div>
+                  <div className="font-medium text-foreground text-sm">{t(opt.label)}</div>
+                  <div className="text-xs text-muted-foreground">{t(opt.desc)}</div>
                   {mode === opt.value && (
-                    <div className="text-xs text-blue-600 mt-1">{t(opt.detail)}</div>
+                    <div className="text-xs text-brand mt-1">{t(opt.detail)}</div>
                   )}
                 </div>
               </div>
@@ -181,7 +181,7 @@ export function StudySetupPage() {
       {/* Batch size (only for configurable modes) */}
       {isBatchSizeConfigurable(mode) && (
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {t('quickStudy.batchSize')}
           </label>
           <input
@@ -211,9 +211,9 @@ export function StudySetupPage() {
                 setBatchSizeInput(String(clamped))
               }
             }}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
+            className="w-full px-4 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm"
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-content-tertiary mt-1">
             {mode === 'sequential_review'
               ? t('quickStudy.batchSizeDescReview', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })
               : t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
@@ -238,7 +238,7 @@ export function StudySetupPage() {
       {/* Date picker (by_date mode) */}
       {mode === 'by_date' && (
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {t('setup.selectUploadDate')}
           </label>
           <DatePicker
@@ -246,7 +246,7 @@ export function StudySetupPage() {
             onSelectDate={setSelectedDate}
             datesWithCards={datesWithCards}
           />
-          <div className="mt-2 text-sm font-medium text-blue-600">
+          <div className="mt-2 text-sm font-medium text-brand">
             {selectedDate && (() => {
               const [year, month, day] = selectedDate.split('-').map(Number)
               return t('setup.uploadDate', { year, month, day, count: dateCardCount })
@@ -258,7 +258,7 @@ export function StudySetupPage() {
       <button
         onClick={handleStart}
         disabled={isStartDisabled}
-        className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
+        className="w-full py-3 bg-brand hover:bg-brand disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
       >
         {t('quickStudy.startStudy')}
       </button>

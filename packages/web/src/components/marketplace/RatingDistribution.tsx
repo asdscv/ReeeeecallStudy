@@ -19,9 +19,9 @@ export function RatingDistribution({ stats }: RatingDistributionProps) {
     <div className="flex gap-6 items-start">
       {/* Big number + stars */}
       <div className="text-center shrink-0">
-        <div className="text-4xl font-bold text-gray-900">{avg_rating.toFixed(1)}</div>
+        <div className="text-4xl font-bold text-foreground">{avg_rating.toFixed(1)}</div>
         <StarRating rating={avg_rating} size="md" />
-        <div className="text-sm text-gray-500 mt-1">
+        <div className="text-sm text-muted-foreground mt-1">
           {review_count} review{review_count !== 1 ? 's' : ''}
         </div>
       </div>
@@ -32,15 +32,15 @@ export function RatingDistribution({ stats }: RatingDistributionProps) {
           const pct = review_count > 0 ? (count / review_count) * 100 : 0
           return (
             <div key={stars} className="flex items-center gap-2 text-sm">
-              <span className="w-4 text-right text-gray-600 font-medium">{stars}</span>
+              <span className="w-4 text-right text-muted-foreground font-medium">{stars}</span>
               <span className="text-yellow-400 text-xs">{'\u2605'}</span>
-              <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-2.5 bg-accent rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-yellow-400 rounded-full transition-all"
+                  className="h-full bg-warning rounded-full transition-all"
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <span className="w-10 text-right text-gray-400 text-xs">
+              <span className="w-10 text-right text-content-tertiary text-xs">
                 {pct > 0 ? `${Math.round(pct)}%` : ''}
               </span>
             </div>

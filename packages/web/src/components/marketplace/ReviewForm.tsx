@@ -42,19 +42,19 @@ export function ReviewForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           {t('reviews.yourRating', { defaultValue: 'Your Rating' })}
         </label>
         <StarRating rating={rating} size="lg" interactive onChange={setRating} />
         {rating === 0 && (
-          <p className="text-xs text-red-500 mt-1">
+          <p className="text-xs text-destructive mt-1">
             {t('reviews.ratingRequired', { defaultValue: 'Please select a rating' })}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="review-title" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="review-title" className="block text-sm font-medium text-foreground mb-1">
           {t('reviews.titleLabel', { defaultValue: 'Title (optional)' })}
         </label>
         <input
@@ -64,12 +64,12 @@ export function ReviewForm({
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t('reviews.titlePlaceholder', { defaultValue: 'Summarize your experience' })}
           maxLength={100}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
+          className="w-full px-3 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm"
         />
       </div>
 
       <div>
-        <label htmlFor="review-body" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="review-body" className="block text-sm font-medium text-foreground mb-1">
           {t('reviews.bodyLabel', { defaultValue: 'Review (optional)' })}
         </label>
         <textarea
@@ -79,7 +79,7 @@ export function ReviewForm({
           placeholder={t('reviews.bodyPlaceholder', { defaultValue: 'What did you like or dislike about this deck?' })}
           rows={4}
           maxLength={2000}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm resize-none"
+          className="w-full px-3 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm resize-none"
         />
       </div>
 
@@ -87,7 +87,7 @@ export function ReviewForm({
         <button
           type="submit"
           disabled={submitting || rating === 0}
-          className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+          className="px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
         >
           {submitting
             ? t('reviews.submitting', { defaultValue: 'Submitting...' })
@@ -100,7 +100,7 @@ export function ReviewForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2 text-gray-600 hover:text-gray-800 text-sm cursor-pointer"
+            className="px-5 py-2 text-muted-foreground hover:text-foreground text-sm cursor-pointer"
           >
             {t('common:cancel', { defaultValue: 'Cancel' })}
           </button>
@@ -110,7 +110,7 @@ export function ReviewForm({
           <button
             type="button"
             onClick={onDelete}
-            className="px-5 py-2 text-red-600 hover:text-red-800 text-sm ml-auto cursor-pointer"
+            className="px-5 py-2 text-destructive hover:text-destructive text-sm ml-auto cursor-pointer"
           >
             {t('reviews.deleteReview', { defaultValue: 'Delete Review' })}
           </button>

@@ -204,7 +204,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         </DialogHeader>
 
         {error && (
-          <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+          <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
             {t(error)}
           </div>
         )}
@@ -213,25 +213,25 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {step === 'upload' && (
           <div
             className={`border-2 border-dashed rounded-xl p-6 sm:p-10 text-center transition ${
-              dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+              dragOver ? 'border-brand bg-brand/10' : 'border-border'
             }`}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
           >
             <div className="text-4xl mb-3">📁</div>
-            <p className="text-gray-600 mb-2">{t('dragFile')}</p>
+            <p className="text-muted-foreground mb-2">{t('dragFile')}</p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
             >
               {t('selectFile')}
             </button>
-            <p className="text-gray-400 text-xs mt-3">{t('supportedFormats')}</p>
+            <p className="text-content-tertiary text-xs mt-3">{t('supportedFormats')}</p>
             {template && (
               <button
                 onClick={downloadTemplate}
-                className="mt-2 px-3 py-1.5 text-blue-600 text-xs underline cursor-pointer"
+                className="mt-2 px-3 py-1.5 text-brand text-xs underline cursor-pointer"
               >
                 {t('downloadTemplate')}
               </button>
@@ -249,7 +249,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {/* Step: CSV Mapping */}
         {step === 'mapping' && (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               {t('mapHeaders')}
             </p>
             <div className="space-y-2">
@@ -257,14 +257,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                 .filter((h) => h !== 'Tags' && h !== '태그')
                 .map((header) => (
                   <div key={header} className="flex items-center gap-3">
-                    <span className="shrink-0 w-24 sm:w-32 text-sm text-gray-700 truncate">{header}</span>
-                    <span className="text-gray-400">→</span>
+                    <span className="shrink-0 w-24 sm:w-32 text-sm text-foreground truncate">{header}</span>
+                    <span className="text-content-tertiary">→</span>
                     <select
                       value={fieldMapping[header] ?? ''}
                       onChange={(e) =>
                         setFieldMapping((prev) => ({ ...prev, [header]: e.target.value }))
                       }
-                      className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-sm outline-none"
+                      className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm outline-none"
                     >
                       <option value="">{t('skipField')}</option>
                       {templateFields.map((f) => (
@@ -279,14 +279,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             <DialogFooter>
               <button
                 onClick={() => { resetState(); setStep('upload') }}
-                className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg hover:bg-muted cursor-pointer"
               >
                 {t('back')}
               </button>
               <button
                 onClick={handleMappingConfirm}
                 disabled={Object.values(fieldMapping).filter(Boolean).length === 0}
-                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
               >
                 {t('next')}
               </button>
@@ -299,16 +299,16 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
           <div className="space-y-4">
             {/* Stats */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+              <span className="px-3 py-1 bg-brand/10 text-brand rounded-full">
                 {t('validCount', { count: parsedCards.length })}
               </span>
               {invalidCount > 0 && (
-                <span className="px-3 py-1 bg-red-50 text-red-700 rounded-full">
+                <span className="px-3 py-1 bg-destructive/10 text-destructive rounded-full">
                   {t('invalidCount', { count: invalidCount })}
                 </span>
               )}
               {duplicateCount > 0 && (
-                <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full">
+                <span className="px-3 py-1 bg-warning/10 text-warning rounded-full">
                   {t('duplicateCount', { count: duplicateCount })}
                 </span>
               )}
@@ -319,10 +319,10 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 px-2 text-xs text-gray-500">#</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-2 px-2 text-xs text-muted-foreground">#</th>
                       {templateFields.slice(0, 3).map((f) => (
-                        <th key={f.key} className="text-left py-2 px-2 text-xs text-gray-500">
+                        <th key={f.key} className="text-left py-2 px-2 text-xs text-muted-foreground">
                           {f.name}
                         </th>
                       ))}
@@ -330,10 +330,10 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                   </thead>
                   <tbody>
                     {previewCards.map((card, i) => (
-                      <tr key={i} className="border-b border-gray-100">
-                        <td className="py-2 px-2 text-gray-400">{i + 1}</td>
+                      <tr key={i} className="border-b border-border">
+                        <td className="py-2 px-2 text-content-tertiary">{i + 1}</td>
                         {templateFields.slice(0, 3).map((f) => (
-                          <td key={f.key} className="py-2 px-2 text-gray-700 truncate max-w-[200px]">
+                          <td key={f.key} className="py-2 px-2 text-foreground truncate max-w-[200px]">
                             {card.field_values[f.key] || '-'}
                           </td>
                         ))}
@@ -342,7 +342,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                   </tbody>
                 </table>
                 {parsedCards.length > 5 && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-content-tertiary mt-1">
                     {t('moreCards', { count: parsedCards.length - 5 })}
                   </p>
                 )}
@@ -352,7 +352,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             {/* Duplicate handling */}
             {duplicateCount > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">{t('duplicateHandling')}</p>
+                <p className="text-sm font-medium text-foreground mb-2">{t('duplicateHandling')}</p>
                 <div className="flex flex-wrap gap-2">
                   {([
                     ['skip', 'skip'],
@@ -364,8 +364,8 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                       onClick={() => setDuplicateMode(value)}
                       className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer ${
                         duplicateMode === value
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                          ? 'border-brand bg-brand/10 text-brand'
+                          : 'border-border text-muted-foreground hover:bg-muted'
                       }`}
                     >
                       {t(`duplicateMode.${labelKey}`)}
@@ -380,14 +380,14 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
                 onClick={() => {
                   resetState()
                 }}
-                className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg hover:bg-muted cursor-pointer"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleImport}
                 disabled={parsedCards.length === 0}
-                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
               >
                 {t('import', { count: parsedCards.length })}
               </button>
@@ -404,16 +404,16 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
         {step === 'done' && (
           <div className="text-center py-6 space-y-3">
             <div className="text-4xl">{storeError ? '⚠️' : '✅'}</div>
-            <p className="text-gray-900 font-medium">{t('importComplete')}</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-foreground font-medium">{t('importComplete')}</p>
+            <p className="text-sm text-muted-foreground">
               {t('importSummary', { total: result.total, added: result.added, skipped: result.skipped })}
             </p>
             {storeError && (
-              <p className="text-sm text-red-600">{storeError}</p>
+              <p className="text-sm text-destructive">{storeError}</p>
             )}
             <button
               onClick={handleDone}
-              className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand cursor-pointer"
             >
               {t('confirm')}
             </button>

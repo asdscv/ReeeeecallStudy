@@ -28,14 +28,14 @@ export function DoneStep({
     <div className="text-center space-y-6">
       {/* Success animation */}
       <div className="flex justify-center">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center">
           <span className="text-3xl">✓</span>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-bold text-gray-900">{t('done.title')}</h3>
-        <p className="text-sm text-gray-500 mt-1">{t('done.subtitle')}</p>
+        <h3 className="text-lg font-bold text-foreground">{t('done.title')}</h3>
+        <p className="text-sm text-muted-foreground mt-1">{t('done.subtitle')}</p>
       </div>
 
       {/* Summary cards */}
@@ -43,18 +43,18 @@ export function DoneStep({
         {templateName && (
           <div className="px-3 py-2 bg-purple-50 rounded-lg text-center">
             <p className="text-[10px] uppercase text-purple-500 font-semibold">{t('done.template')}</p>
-            <p className="text-sm font-medium text-gray-900 mt-0.5">{templateName}</p>
+            <p className="text-sm font-medium text-foreground mt-0.5">{templateName}</p>
           </div>
         )}
         {deckName && (
-          <div className="px-3 py-2 bg-blue-50 rounded-lg text-center">
-            <p className="text-[10px] uppercase text-blue-500 font-semibold">{t('done.deck')}</p>
-            <p className="text-sm font-medium text-gray-900 mt-0.5">{deckName}</p>
+          <div className="px-3 py-2 bg-brand/10 rounded-lg text-center">
+            <p className="text-[10px] uppercase text-brand font-semibold">{t('done.deck')}</p>
+            <p className="text-sm font-medium text-foreground mt-0.5">{deckName}</p>
           </div>
         )}
-        <div className="px-3 py-2 bg-green-50 rounded-lg text-center">
-          <p className="text-[10px] uppercase text-green-500 font-semibold">{t('done.cards')}</p>
-          <p className="text-sm font-medium text-gray-900 mt-0.5">{cardCount}</p>
+        <div className="px-3 py-2 bg-success/10 rounded-lg text-center">
+          <p className="text-[10px] uppercase text-success font-semibold">{t('done.cards')}</p>
+          <p className="text-sm font-medium text-foreground mt-0.5">{cardCount}</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export function DoneStep({
           <button
             type="button"
             onClick={() => { onClose(); navigate(`/decks/${deckId}`) }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('done.viewDeck')}
             <ArrowRight className="w-4 h-4" />
@@ -75,7 +75,7 @@ export function DoneStep({
             <button
               type="button"
               onClick={() => { onClose(); navigate(`/templates/${templateId}/edit`) }}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-medium hover:bg-gray-50 transition cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 border border-border text-foreground rounded-xl text-xs font-medium hover:bg-muted transition cursor-pointer"
             >
               <Pencil className="w-3.5 h-3.5" />
               {t('done.editTemplate')}
@@ -84,7 +84,7 @@ export function DoneStep({
           <button
             type="button"
             onClick={onAddMore}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 text-gray-700 rounded-xl text-xs font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 border border-border text-foreground rounded-xl text-xs font-medium hover:bg-muted transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             {t('done.addMore')}
