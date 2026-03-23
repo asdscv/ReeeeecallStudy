@@ -72,13 +72,13 @@ export function Layout() {
   const inactiveClass = 'text-muted-foreground hover:bg-accent'
 
   return (
-    <div className="min-h-screen bg-muted">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/dashboard" className="shrink-0 no-underline flex items-center gap-2">
             <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10 object-contain" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 sm:h-11 object-contain" />
+            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 sm:h-11 object-contain dark:brightness-0 dark:invert" />
           </Link>
 
           {/* Desktop nav */}

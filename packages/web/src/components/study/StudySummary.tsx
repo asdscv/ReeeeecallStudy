@@ -24,7 +24,7 @@ export function StudySummary({ stats, summaryType = 'complete', onBackToDeck, on
   const isPartial = summaryType === 'partial'
 
   return (
-    <div className="min-h-screen bg-muted flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4 sm:px-6 text-center">
         <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">{isPartial ? '\uD83D\uDCCA' : '\uD83C\uDF89'}</div>
         <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">

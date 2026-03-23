@@ -55,11 +55,11 @@ export const DEFAULT_FONT_SIZES: Record<StyleName, number> = {
  * per layout style. Font size is handled separately via inline style.
  */
 const STYLE_CLASSES: Record<StyleName, string> = {
-  primary: 'font-bold text-gray-900 tracking-tight',
-  secondary: 'font-semibold text-gray-700',
-  hint: 'italic text-gray-400 border-l-2 border-gray-200 pl-3',
-  detail: 'text-gray-600 leading-relaxed',
-  media: 'text-gray-600',
+  primary: 'font-bold text-foreground tracking-tight',
+  secondary: 'font-semibold text-foreground/80',
+  hint: 'italic text-muted-foreground border-l-2 border-border pl-3',
+  detail: 'text-muted-foreground leading-relaxed',
+  media: 'text-muted-foreground',
 }
 
 /**

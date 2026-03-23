@@ -47,7 +47,7 @@ export function LandingNav() {
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between py-3 sm:py-4">
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
           <img src="/favicon.png" alt="" className="w-9 h-9 md:w-16 md:h-16 shrink-0 object-contain" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-14 md:h-16 hidden md:block" />
+          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-14 md:h-16 hidden md:block dark:brightness-0 dark:invert" />
           <span className="font-extrabold text-foreground md:hidden text-lg tracking-tight truncate">ReeeeecallStudy</span>
         </div>
 
