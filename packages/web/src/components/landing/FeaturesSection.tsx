@@ -2,67 +2,57 @@ import { useTranslation } from 'react-i18next'
 import { Brain, Layers, BarChart3, Share2, Globe, Smartphone } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 
-const FEATURE_ICONS = [
-  { icon: Brain, color: 'bg-brand/15 text-brand', accent: 'border-t-blue-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(59,130,246,0.5)]', key: 'srs' },
-  { icon: Layers, color: 'bg-purple-100 text-purple-600', accent: 'border-t-purple-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(147,51,234,0.5)]', key: 'modes' },
-  { icon: BarChart3, color: 'bg-success/15 text-success', accent: 'border-t-green-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(34,197,94,0.5)]', key: 'stats' },
-  { icon: Share2, color: 'bg-orange-100 text-orange-600', accent: 'border-t-orange-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(249,115,22,0.5)]', key: 'sharing' },
-  { icon: Globe, color: 'bg-pink-100 text-pink-600', accent: 'border-t-pink-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(236,72,153,0.5)]', key: 'tts' },
-  { icon: Smartphone, color: 'bg-indigo-100 text-indigo-600', accent: 'border-t-indigo-500', hoverShadow: 'hover:shadow-[inset_0_0_0_2px_rgba(99,102,241,0.5)]', key: 'responsive' },
+const FEATURES = [
+  { icon: Brain, color: 'bg-blue-500/10 text-blue-600', key: 'srs' },
+  { icon: Layers, color: 'bg-violet-500/10 text-violet-600', key: 'modes' },
+  { icon: BarChart3, color: 'bg-emerald-500/10 text-emerald-600', key: 'stats' },
+  { icon: Share2, color: 'bg-orange-500/10 text-orange-600', key: 'sharing' },
+  { icon: Globe, color: 'bg-pink-500/10 text-pink-600', key: 'tts' },
+  { icon: Smartphone, color: 'bg-indigo-500/10 text-indigo-600', key: 'responsive' },
 ]
 
 export function FeaturesSection() {
   const { t } = useTranslation('landing')
   const prefersReduced = useReducedMotion()
 
-  const features = FEATURE_ICONS.map(f => ({
-    ...f,
-    title: t(`features.${f.key}.title`),
-    desc: t(`features.${f.key}.desc`),
-  }))
-
   const container = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.1 } },
+    show: { transition: { staggerChildren: 0.08 } },
   }
 
   const item = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
   }
 
   return (
-    <section id="features" className="py-12 sm:py-16 md:py-24 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-3 sm:mb-4">{t('featuresSection.title')}</h2>
-          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
+    <section id="features" className="py-16 sm:py-20 md:py-28 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-3">{t('featuresSection.title')}</h2>
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto">
             {t('featuresSection.subtitle')}
           </p>
         </div>
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"
           variants={prefersReduced ? undefined : container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
         >
-          {features.map((f) => (
+          {FEATURES.map((f) => (
             <motion.div
               key={f.key}
               variants={prefersReduced ? undefined : item}
-              className={`bg-card rounded-xl border border-border border-t-4 ${f.accent} p-4 sm:p-6 hover:shadow-lg hover:-translate-y-1 ${f.hoverShadow} transition-all duration-300`}
+              className="bg-card rounded-2xl border border-border p-5 sm:p-6 hover:border-border/80 hover:shadow-sm transition-all duration-300"
             >
-              <motion.div
-                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mb-3 sm:mb-4 ${f.color}`}
-                whileHover={prefersReduced ? undefined : { rotate: 5, scale: 1.05 }}
-                transition={{ type: 'spring', stiffness: 300 }}
-              >
-                <f.icon className="w-6 h-6" />
-              </motion.div>
-              <h3 className="text-base font-bold text-foreground mb-2">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${f.color}`}>
+                <f.icon className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-semibold text-foreground mb-2">{t(`features.${f.key}.title`)}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t(`features.${f.key}.desc`)}</p>
             </motion.div>
           ))}
         </motion.div>
