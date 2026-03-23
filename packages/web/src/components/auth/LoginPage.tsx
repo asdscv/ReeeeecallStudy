@@ -168,7 +168,7 @@ export function LoginPage() {
 
   if (successMessage) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="max-w-md w-full mx-4 text-center">
           <div className="bg-card rounded-2xl shadow-sm border border-border p-6 sm:p-8">
             <div className="text-5xl mb-4">📧</div>
@@ -201,7 +201,7 @@ export function LoginPage() {
     (mode === 'signup' && !confirmPassword)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="max-w-md w-full mx-4">
         <div className="bg-card rounded-2xl shadow-sm border border-border p-6 sm:p-8">
           <div className="text-center mb-6 sm:mb-8">

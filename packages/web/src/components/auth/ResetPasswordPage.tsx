@@ -52,7 +52,7 @@ export function ResetPasswordPage() {
   if (!sessionChecked) return null
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="max-w-md w-full mx-4">
         <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
           <div className="text-center mb-8">

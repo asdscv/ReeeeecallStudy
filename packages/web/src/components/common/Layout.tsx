@@ -230,7 +230,7 @@ export function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-muted pb-20 sm:pb-0">
+      <footer className="border-t border-border bg-background pb-20 sm:pb-0">
         <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">

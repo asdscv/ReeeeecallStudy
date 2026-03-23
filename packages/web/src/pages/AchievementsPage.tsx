@@ -95,7 +95,7 @@ export function AchievementsPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {nextGoals.map(goal => (
-              <div key={goal.category} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div key={goal.category} className="flex items-center gap-3 p-3 bg-card rounded-lg border border-border">
                 <div className="shrink-0"><CategoryIcon category={goal.category} size="md" /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">

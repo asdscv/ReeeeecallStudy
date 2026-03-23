@@ -7,7 +7,7 @@ export function FooterSection() {
   const { t } = useTranslation('landing')
 
   return (
-    <footer className="border-t border-border bg-muted pb-20 sm:pb-0">
+    <footer className="border-t border-border bg-background pb-20 sm:pb-0">
       <div className="max-w-6xl mx-auto px-4 py-10 sm:py-14">
         <ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
