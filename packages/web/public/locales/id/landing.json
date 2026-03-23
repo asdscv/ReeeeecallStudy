@@ -14,8 +14,7 @@
     "cta": {
       "start": "Mulai Gratis",
       "learn": "Pelajari Selengkapnya"
-    },
-    "freeForever": "Gratis selamanya. Tanpa kartu kredit."
+    }
   },
   "tagline": "Platform Pembelajaran Kartu Kilat Cerdas",
   "preview": {
@@ -172,14 +171,14 @@
     "title": "Belajar Lebih Cerdas Mulai Hari Ini",
     "description": "Mulai gratis. Daftar mudah dengan email dan kata sandi.",
     "subtitle": "Mulai gratis. Daftar mudah dengan email dan kata sandi.",
-    "button": "Mulai Sekarang",
-    "guarantee": "Gratis selamanya. Tanpa kartu kredit."
+    "button": "Mulai Sekarang"
   },
   "nav": {
     "blog": "Wawasan",
     "login": "Masuk",
     "start": "Mulai Sekarang",
     "features": "Fitur",
+    "science": "Sains",
     "results": "Hasil",
     "reviews": "Ulasan",
     "howItWorks": "Cara Kerja",
@@ -255,6 +254,60 @@
       "0": { "quote": "ReeeeecallStudy membantu saya lulus JLPT N2. Algoritma SRS sangat efektif!", "author": "Budi Santoso", "role": "Pelajar Bahasa" },
       "1": { "quote": "Antarmukanya sangat bersih dan intuitif. Belajar terasa menyenangkan sekarang.", "author": "Siti Nurhaliza", "role": "Mahasiswa Kedokteran" },
       "2": { "quote": "Fitur berbagi dek luar biasa. Saya menemukan dek untuk hampir setiap mata pelajaran.", "author": "Ravi Wijaya", "role": "Mahasiswa Universitas" }
+    }
+  },
+  "science": {
+    "badge": "Pembelajaran Berbasis Bukti",
+    "title": "Dibangun di Atas Sains Kognitif",
+    "subtitle": "Setiap fitur di ReeeeecallStudy didasarkan pada penelitian peer-reviewed selama puluhan tahun di bidang memori, pembelajaran, dan neurosains.",
+    "chart": {
+      "title": "Retensi Memori Seiring Waktu",
+      "subtitle": "Belajar SKS vs. pengulangan berjarak",
+      "cramming": "Belajar SKS",
+      "srs": "Pengulangan berjarak",
+      "note": "Berdasarkan penelitian kurva lupa Ebbinghaus dan studi pengulangan berjarak. SRS mempertahankan retensi 78%+ bahkan setelah 90 hari melalui ulasan pada interval optimal."
+    },
+    "insight": {
+      "badge": "Sains Pembelajaran",
+      "title": "Mengapa pengulangan berjarak berhasil?",
+      "p1": "Ketika Anda mengingat informasi pada interval yang meningkat, setiap pengambilan yang berhasil memperkuat jalur saraf. Proses ini — disebut konsolidasi memori — mengubah memori jangka pendek yang rapuh menjadi pengetahuan jangka panjang yang tahan lama.",
+      "p2": "Wawasan kunci: mengulang terlalu cepat membuang waktu, mengulang terlalu lambat berarti belajar ulang dari nol. SRS menemukan titik tepat — mengulang tepat sebelum Anda lupa — memaksimalkan retensi dengan usaha minimum.",
+      "stat1": "Retensi 90 hari",
+      "stat2": "Hemat waktu belajar",
+      "stat3": "Penguasaan lebih cepat"
+    },
+    "principlesTitle": "6 Prinsip Berbasis Riset yang Mendukung Pembelajaran Anda",
+    "principles": {
+      "spacing": {
+        "title": "Efek Spasi",
+        "desc": "Menyebar sesi belajar dari waktu ke waktu secara dramatis meningkatkan retensi jangka panjang. Algoritma SRS kami menghitung momen optimal untuk setiap ulasan — tepat sebelum Anda lupa.",
+        "source": "Ebbinghaus (1885), Cepeda et al. (2006)"
+      },
+      "retrieval": {
+        "title": "Pengingatan Aktif",
+        "desc": "Menguji diri sendiri memperkuat memori jauh lebih baik daripada membaca ulang. Setiap kali membalik kartu adalah latihan pengambilan yang memperkuat jalur saraf.",
+        "source": "Roediger & Karpicke (2006)"
+      },
+      "consolidation": {
+        "title": "Konsolidasi Saat Tidur",
+        "desc": "Selama tidur, otak Anda memutar ulang dan mengonsolidasikan memori. Sistem batas hari kami memastikan ulasan selaras dengan siklus tidur-bangun alami Anda untuk retensi maksimal.",
+        "source": "Diekelmann & Born (2010)"
+      },
+      "interleaving": {
+        "title": "Interleaving",
+        "desc": "Mencampur topik berbeda selama belajar meningkatkan diskriminasi dan transfer. Sistem multi-mode kami mendukung latihan berselang-seling lintas dek dan kategori.",
+        "source": "Bjork & Bjork (2011)"
+      },
+      "difficulty": {
+        "title": "Kesulitan yang Diinginkan",
+        "desc": "Membuat pengambilan sedikit lebih sulit secara paradoks memperkuat memori. Sistem penilaian 4 tingkat (Ulangi/Sulit/Baik/Mudah) menciptakan tingkat tantangan yang tepat untuk setiap kartu.",
+        "source": "Bjork (1994)"
+      },
+      "adaptive": {
+        "title": "Penjadwalan Adaptif",
+        "desc": "Setiap kartu beradaptasi secara independen berdasarkan performa Anda. Kartu mudah berjarak hingga berbulan-bulan; kartu sulit tetap dekat hingga dikuasai.",
+        "source": "Lindsey et al. (2014)"
+      }
     }
   },
   "seo": {

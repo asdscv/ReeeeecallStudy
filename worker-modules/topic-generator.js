@@ -5,27 +5,41 @@ import { selectTopic } from './topic-registry.js'
 import { DEFAULT_LOCALE } from './config.js'
 import { info, warn } from './logger.js'
 
-const TOPIC_GENERATION_SYSTEM_PROMPT = `You are a topic planner for an educational blog about learning, studying, and knowledge retention.
+const TOPIC_GENERATION_SYSTEM_PROMPT = `You are a topic planner for an educational blog targeting REAL STUDENTS and TEST TAKERS — people actively preparing for exams, learning languages, or studying for professional certifications.
 
-Generate diverse topic ideas covering ALL domains of study and learning -- not just learning science. Include:
-- STEM subjects (physics, chemistry, biology, mathematics, computer science, engineering)
-- Humanities (history, philosophy, literature, linguistics, anthropology)
-- Social sciences (psychology, sociology, economics, political science)
-- Arts & creative (music theory, art history, design, creative writing)
-- Professional fields (law, medicine, business, accounting, nursing)
-- Languages (English, Korean, Japanese, Chinese, Spanish, etc.)
-- Test preparation (SAT, GRE, TOEFL, IELTS, MCAT, bar exam, CPA, etc.)
-- Study techniques & productivity (note-taking, time management, focus, memory)
-- Technology & digital learning (AI-assisted study, coding bootcamps, online courses)
-- Health & wellness for students (sleep, exercise, stress management, nutrition)
+## CRITICAL RULE: Every topic MUST be directly useful to someone who is studying for a specific exam, learning a language, or preparing for a professional certification. Do NOT generate generic academic theory, philosophy, art criticism, or abstract topics that no student would search for.
+
+Generate topic ideas from these categories (follow the distribution):
+
+### PRIORITY 1 — At least 50% of topics (4+ out of 8):
+- **English proficiency exams**: TOEIC (Part 5 grammar, listening tips, score strategies), TOEFL (writing, speaking, reading), IELTS (band score tips, speaking parts, writing task 2)
+- **English vocabulary & grammar**: word roots, phrasal verbs, collocations, business English, common mistakes, academic vocabulary
+- **Other language exams**: JLPT (N5-N1), HSK, TOPIK, DELE — kanji tips, vocabulary strategies, grammar patterns
+- **College entrance exams**: 수능 (국어/영어/수학), SAT, ACT — subject-specific strategies and study plans
+
+### PRIORITY 2 — Up to 30% of topics (2-3 out of 8):
+- **Graduate exams**: GRE verbal/quant, GMAT, LSAT, MCAT
+- **Professional certifications**: CPA, CFA, AWS, PMP, bar exam, NCLEX
+- **Medical/science study**: anatomy memorization, pharmacology, biology, chemistry
+
+### PRIORITY 3 — At most 1-2 topics:
+- **Study methods**: Only if tied to a SPECIFIC exam or subject (e.g., "How to use flashcards for TOEIC vocabulary" not "The science of memory")
+- **Exam anxiety & planning**: Study schedules, test-day strategies
+
+### NEVER generate topics about:
+- Philosophy, anthropology, art history, creative writing, music theory
+- Generic "learning science" without exam/study context
+- Technology trends, AI, coding bootcamps (unless for a specific cert like AWS)
+- Health & wellness (sleep tips, nutrition, exercise)
+- Abstract productivity advice not tied to exam prep
 
 ## Output Format
 Return a JSON object:
 {
   "topics": [
     {
-      "category": "Domain name (e.g., 'Physics', 'Art History', 'Study Productivity')",
-      "titleHint": "Specific angle (e.g., 'Understanding Quantum Entanglement Through Flashcards')",
+      "category": "Specific category (e.g., 'TOEIC Preparation', 'JLPT Study', 'SAT Math')",
+      "titleHint": "Specific angle (e.g., 'TOEIC Part 5: 10 Grammar Patterns That Always Appear')",
       "keywords": ["keyword1", "keyword2", "keyword3"],
       "tags": ["tag1", "tag2", "tag3"],
       "audience": "Target audience description"
@@ -34,13 +48,11 @@ Return a JSON object:
 }
 
 ## Rules
-- Each topic must have a UNIQUE, specific angle -- not generic overviews
-- Vary the domains widely: no more than 2 topics from the same category
-- Every topic must have a natural connection to studying, learning, or knowledge retention
-- titleHint should suggest a specific, interesting angle, NOT a generic title
-- Include 3-5 keywords per topic (for SEO, these guide the article writer)
+- Each topic must target someone who would search for it while studying for an exam or learning a language
+- titleHint should be specific enough that a student would click on it (e.g., "IELTS Speaking Part 2: How to Structure Your Answer" not "Improving Your Speaking Skills")
+- Include 3-5 keywords per topic that real students would search on Google/Naver/YouTube
 - Include 3 tags per topic (lowercase, hyphenated)
-- audience should be specific (not just "students")`
+- audience should name the specific exam or language (not just "students")`
 
 export async function generateTopics(env, recentContent, count = 12) {
   try {

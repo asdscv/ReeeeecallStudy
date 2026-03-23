@@ -58,7 +58,7 @@ export function FAQSection() {
   ]
 
   return (
-    <section id="faq" className="py-16 sm:py-24 px-4 bg-muted">
+    <section id="faq" className="py-16 sm:py-24 px-4">
       <div className="max-w-3xl mx-auto">
         <ScrollReveal>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-10 text-center">
