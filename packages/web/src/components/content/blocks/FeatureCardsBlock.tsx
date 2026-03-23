@@ -2,13 +2,13 @@ import type { FeatureCardsBlock as FeatureCardsBlockType } from '../../../types/
 import { parseInlineMarkdown, stripMarkdownText } from '../../../lib/content-blocks'
 
 const COLOR_MAP: Record<string, string> = {
-  blue: 'bg-blue-50 text-blue-700',
-  green: 'bg-green-50 text-green-700',
+  blue: 'bg-brand/10 text-brand',
+  green: 'bg-success/10 text-success',
   purple: 'bg-purple-50 text-purple-700',
   orange: 'bg-orange-50 text-orange-700',
   pink: 'bg-pink-50 text-pink-700',
-  amber: 'bg-amber-50 text-amber-700',
-  red: 'bg-red-50 text-red-700',
+  amber: 'bg-warning/10 text-warning',
+  red: 'bg-destructive/10 text-destructive',
   indigo: 'bg-indigo-50 text-indigo-700',
 }
 

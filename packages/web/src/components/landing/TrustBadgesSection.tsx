@@ -9,9 +9,9 @@ const BADGES = [
     key: 'srs',
     icon: Brain,
     label: 'Smart SRS',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-500',
-    borderColor: 'border-blue-200/60',
+    iconBg: 'bg-brand/15',
+    iconColor: 'text-brand',
+    borderColor: 'border-brand/30/60',
     hoverGlow: 'hover:shadow-blue-100',
   },
   {
@@ -91,12 +91,12 @@ export function TrustBadgesSection() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={prefersReduced ? undefined : { opacity: 0, y: -12, scale: 0.95 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
-              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border ${activeBadge.borderColor} shadow-sm`}
+              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-card/80 backdrop-blur-sm border ${activeBadge.borderColor} shadow-sm`}
             >
               <div className={`w-7 h-7 rounded-lg ${activeBadge.iconBg} flex items-center justify-center shrink-0`}>
                 <activeBadge.icon className={`w-3.5 h-3.5 ${activeBadge.iconColor}`} />
               </div>
-              <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+              <span className="text-sm font-semibold text-foreground whitespace-nowrap">
                 {t(`trustBadges.${activeBadge.key}`, { count: SUPPORTED_LOCALES.length, defaultValue: activeBadge.label })}
               </span>
             </motion.div>
@@ -109,7 +109,7 @@ export function TrustBadgesSection() {
             <div
               key={badge.key}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIdx ? 'bg-gray-500 w-3' : 'bg-gray-300'
+                i === activeIdx ? 'bg-muted0 w-3' : 'bg-gray-300'
               }`}
             />
           ))}
@@ -130,7 +130,7 @@ export function TrustBadgesSection() {
             variants={prefersReduced ? undefined : item}
             whileHover={prefersReduced ? undefined : { scale: 1.06, y: -2 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className={`group relative flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border ${badge.borderColor} hover:shadow-lg ${badge.hoverGlow} transition-all duration-300 cursor-default overflow-hidden shrink-0`}
+            className={`group relative flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-card/80 backdrop-blur-sm border ${badge.borderColor} hover:shadow-lg ${badge.hoverGlow} transition-all duration-300 cursor-default overflow-hidden shrink-0`}
           >
             {/* Shimmer overlay */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/60 to-transparent pointer-events-none" />
@@ -138,7 +138,7 @@ export function TrustBadgesSection() {
             <div className={`w-8 h-8 rounded-lg ${badge.iconBg} flex items-center justify-center shrink-0`}>
               <badge.icon className={`w-4 h-4 ${badge.iconColor}`} />
             </div>
-            <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+            <span className="text-sm font-semibold text-foreground whitespace-nowrap">
               {t(`trustBadges.${badge.key}`, { count: SUPPORTED_LOCALES.length, defaultValue: badge.label })}
             </span>
           </motion.div>

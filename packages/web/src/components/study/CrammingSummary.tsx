@@ -61,19 +61,19 @@ export function CrammingSummary({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-muted flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4 sm:px-6 text-center">
         <div className="text-4xl sm:text-5xl mb-4 sm:mb-6">{isPartial ? '\uD83D\uDCCA' : '\u26A1'}</div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
           {isPartial
             ? t('cramming.summary.sessionEnded')
             : crammingMeta.allMastered
               ? t('cramming.summary.completed')
               : t('cramming.summary.timeUp')}
         </h1>
-        <p className="text-gray-500 mb-6 sm:mb-8">{t('cramming.summary.wellDone')}</p>
+        <p className="text-muted-foreground mb-6 sm:mb-8">{t('cramming.summary.wellDone')}</p>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-4 space-y-3 sm:space-y-4">
+        <div className="bg-card rounded-2xl border border-border p-4 sm:p-6 mb-4 space-y-3 sm:space-y-4">
           <StatRow
             label={t('cramming.summary.totalRounds')}
             value={String(crammingMeta.rounds)}
@@ -94,16 +94,16 @@ export function CrammingSummary({
 
           {/* Rating distribution */}
           {Object.keys(stats.ratings).length > 0 && (
-            <div className="pt-3 border-t border-gray-100">
-              <p className="text-sm text-gray-400 mb-2">{t('summary.ratingDistribution')}</p>
+            <div className="pt-3 border-t border-border">
+              <p className="text-sm text-content-tertiary mb-2">{t('summary.ratingDistribution')}</p>
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 {stats.ratings.got_it != null && stats.ratings.got_it > 0 && (
-                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700">
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-success/10 text-success">
                     {t('cramming.gotIt')} {stats.ratings.got_it}
                   </span>
                 )}
                 {stats.ratings.missed != null && stats.ratings.missed > 0 && (
-                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-700">
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-destructive/10 text-destructive">
                     {t('cramming.missed')} {stats.ratings.missed}
                   </span>
                 )}
@@ -113,15 +113,15 @@ export function CrammingSummary({
 
           {/* Hardest cards */}
           {crammingMeta.hardestCards.length > 0 && (
-            <div className="pt-3 border-t border-gray-100">
-              <p className="text-sm text-gray-400 mb-2">{t('cramming.summary.hardestCards')}</p>
+            <div className="pt-3 border-t border-border">
+              <p className="text-sm text-content-tertiary mb-2">{t('cramming.summary.hardestCards')}</p>
               <div className="space-y-1.5">
                 {crammingMeta.hardestCards.map((hc) => (
                   <div key={hc.cardId} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-700 truncate flex-1 text-left">
+                    <span className="text-foreground truncate flex-1 text-left">
                       {getFrontText(hc.cardId)}
                     </span>
-                    <span className="text-red-600 font-medium ml-2 whitespace-nowrap">
+                    <span className="text-destructive font-medium ml-2 whitespace-nowrap">
                       {t('cramming.summary.missedTimes', { count: hc.missedCount })}
                     </span>
                   </div>
@@ -132,14 +132,14 @@ export function CrammingSummary({
         </div>
 
         {/* SRS safety notice */}
-        <p className="text-xs text-gray-400 mb-6">
+        <p className="text-xs text-content-tertiary mb-6">
           {t('cramming.summary.noSrsImpact')}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             onClick={onBackToDeck}
-            className="flex-1 px-4 py-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            className="flex-1 px-4 py-3 bg-card border border-border text-foreground hover:bg-muted rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
             {t('summary.backToDeck')}
           </button>
@@ -151,7 +151,7 @@ export function CrammingSummary({
           </button>
           <button
             onClick={onOtherMode}
-            className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            className="flex-1 px-4 py-3 bg-brand hover:bg-brand text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
             {t('cramming.summary.otherMode')}
           </button>
@@ -164,8 +164,8 @@ export function CrammingSummary({
 function StatRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-gray-500 text-sm">{label}</span>
-      <span className={`font-medium ${highlight ? 'text-green-600' : 'text-gray-900'}`}>
+      <span className="text-muted-foreground text-sm">{label}</span>
+      <span className={`font-medium ${highlight ? 'text-success' : 'text-foreground'}`}>
         {value}
       </span>
     </div>

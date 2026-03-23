@@ -287,10 +287,10 @@ export function TemplateEditPage() {
   if (!isNew && !template && templates.length > 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-gray-500 mb-4">{t('edit.notFound')}</p>
+        <p className="text-muted-foreground mb-4">{t('edit.notFound')}</p>
         <button
           onClick={() => navigate('/templates')}
-          className="text-blue-600 hover:text-blue-700 text-sm font-medium cursor-pointer"
+          className="text-brand hover:text-brand text-sm font-medium cursor-pointer"
         >
           {t('edit.backToList')}
         </button>
@@ -321,7 +321,7 @@ export function TemplateEditPage() {
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <button
             onClick={() => navigate('/templates')}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer shrink-0"
+            className="p-2 text-content-tertiary hover:text-muted-foreground rounded-lg hover:bg-accent cursor-pointer shrink-0"
           >
             <ArrowLeft size={20} />
           </button>
@@ -330,14 +330,14 @@ export function TemplateEditPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t('form.templateName')}
-            className="text-lg sm:text-2xl font-bold text-gray-900 bg-transparent outline-none border-b-2 border-transparent focus:border-blue-500 transition px-1 min-w-0 w-full"
+            className="text-lg sm:text-2xl font-bold text-foreground bg-transparent outline-none border-b-2 border-transparent focus:border-brand transition px-1 min-w-0 w-full"
           />
         </div>
         <GuideHelpLink section="templates" />
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand disabled:opacity-50 cursor-pointer transition shrink-0"
         >
           <Save size={16} />
           <span className="hidden sm:inline">{saving ? `${t('common:saving')}...` : t('common:save')}</span>
@@ -348,10 +348,10 @@ export function TemplateEditPage() {
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Field Management */}
-        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">{t('edit.fieldManagement')}</h2>
-            <span className="text-xs sm:text-sm text-gray-400">
+            <h2 className="text-base sm:text-lg font-semibold text-foreground">{t('edit.fieldManagement')}</h2>
+            <span className="text-xs sm:text-sm text-content-tertiary">
               {t('edit.fieldCount', { count: fields.length })}
             </span>
           </div>
@@ -367,19 +367,19 @@ export function TemplateEditPage() {
                   onDragEnd={handleDragEnd}
                   className={`flex items-center gap-2 p-3 rounded-lg border transition ${
                     dragOverIndex === i
-                      ? 'border-blue-400 bg-blue-50'
+                      ? 'border-brand bg-brand/10'
                       : dragIndex === i
-                        ? 'opacity-50 border-gray-200 bg-gray-50'
-                        : 'border-gray-200 bg-gray-50'
+                        ? 'opacity-50 border-border bg-muted'
+                        : 'border-border bg-muted'
                   }`}
                 >
                   {/* Drag handle */}
-                  <div className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
+                  <div className="cursor-grab active:cursor-grabbing text-content-tertiary hover:text-muted-foreground">
                     <GripVertical size={16} />
                   </div>
 
                   {/* Number */}
-                  <span className="text-xs text-gray-400 font-mono w-5 text-center">
+                  <span className="text-xs text-content-tertiary font-mono w-5 text-center">
                     {i + 1}
                   </span>
 
@@ -388,19 +388,19 @@ export function TemplateEditPage() {
                     type="text"
                     value={field.name}
                     onChange={(e) => updateField(i, { name: e.target.value })}
-                    className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-900 outline-none focus:border-blue-500 transition"
+                    className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm text-foreground outline-none focus:border-brand transition"
                     placeholder={t('edit.fieldName')}
                   />
 
                   {/* Type label (text only) */}
-                  <span className="hidden sm:inline px-2 py-1.5 text-sm text-gray-400">
+                  <span className="hidden sm:inline px-2 py-1.5 text-sm text-content-tertiary">
                     {t('edit.text')}
                   </span>
 
                   {/* TTS toggle */}
                   {field.type === 'text' && (
                     <label className="flex items-center gap-0.5 cursor-pointer px-1">
-                      <Volume2 size={14} className="text-gray-400" />
+                      <Volume2 size={14} className="text-content-tertiary" />
                       <input
                         type="checkbox"
                         checked={!!field.tts_enabled}
@@ -415,7 +415,7 @@ export function TemplateEditPage() {
                     type="button"
                     onClick={() => removeField(i)}
                     disabled={fields.length <= 1}
-                    className="p-1.5 text-red-400 hover:text-red-500 disabled:opacity-30 cursor-pointer rounded-lg hover:bg-red-50 transition"
+                    className="p-1.5 text-destructive/70 hover:text-destructive disabled:opacity-30 cursor-pointer rounded-lg hover:bg-destructive/10 transition"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -427,19 +427,19 @@ export function TemplateEditPage() {
                     type="text"
                     value={field.detail || ''}
                     onChange={(e) => updateField(i, { detail: e.target.value || undefined })}
-                    className="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 outline-none focus:border-blue-400 transition bg-white"
+                    className="w-full px-3 py-1.5 rounded-lg border border-border text-xs text-muted-foreground outline-none focus:border-brand transition bg-card"
                     placeholder={t('edit.fieldDescription')}
                   />
                 </div>
 
                 {/* Per-field TTS settings (directly below the field) */}
                 {field.tts_enabled && (
-                  <div className="ml-8 mr-2 mt-1 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100">
-                    <Volume2 size={14} className="text-blue-500 shrink-0" />
+                  <div className="ml-8 mr-2 mt-1 mb-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-brand/10 border border-blue-100">
+                    <Volume2 size={14} className="text-brand shrink-0" />
                     <select
                       value={field.tts_lang || ''}
                       onChange={(e) => updateField(i, { tts_lang: e.target.value })}
-                      className="flex-1 px-2 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-900 outline-none cursor-pointer focus:border-blue-500 transition bg-white"
+                      className="flex-1 px-2 py-1.5 rounded-lg border border-border text-sm text-foreground outline-none cursor-pointer focus:border-brand transition bg-card"
                     >
                       {TTS_LANGUAGES.map((lang) => (
                         <option key={lang.value} value={lang.value}>
@@ -450,7 +450,7 @@ export function TemplateEditPage() {
                     <button
                       type="button"
                       onClick={() => handleTtsTest(i)}
-                      className="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-200 cursor-pointer transition shrink-0"
+                      className="px-3 py-1.5 bg-brand/15 text-brand rounded-lg text-sm font-medium hover:bg-blue-200 cursor-pointer transition shrink-0"
                     >
                       {t('edit.test')}
                     </button>
@@ -464,7 +464,7 @@ export function TemplateEditPage() {
             <button
               type="button"
               onClick={addField}
-              className="w-full mt-3 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 cursor-pointer transition"
+              className="w-full mt-3 py-2.5 border-2 border-dashed border-border rounded-lg text-sm text-muted-foreground hover:border-brand hover:text-brand cursor-pointer transition"
             >
               {t('edit.addField')}
             </button>
@@ -474,16 +474,16 @@ export function TemplateEditPage() {
         {/* Right: Layout mode toggle + Front & Back layout */}
         <div className="space-y-6">
           {/* Layout mode toggle */}
-          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">{t('edit.layoutMode')}</h2>
-            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+            <h2 className="text-base sm:text-lg font-semibold text-foreground mb-3">{t('edit.layoutMode')}</h2>
+            <div className="flex rounded-lg border border-border overflow-hidden">
               <button
                 type="button"
                 onClick={() => setLayoutMode('default')}
                 className={`flex-1 px-4 py-2.5 text-sm font-medium transition cursor-pointer ${
                   layoutMode === 'default'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                    ? 'bg-brand text-white'
+                    : 'bg-card text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {t('edit.defaultMode')}
@@ -493,15 +493,15 @@ export function TemplateEditPage() {
                 onClick={() => setLayoutMode('custom')}
                 className={`flex-1 px-4 py-2.5 text-sm font-medium transition cursor-pointer ${
                   layoutMode === 'custom'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                    ? 'bg-brand text-white'
+                    : 'bg-card text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {t('edit.customMode')}
               </button>
             </div>
             {layoutMode === 'custom' && (
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-content-tertiary mt-2">
                 {t('edit.htmlHelp', { curly: '{{' })}
               </p>
             )}
@@ -594,23 +594,23 @@ function LayoutSection({
   const { t } = useTranslation('templates')
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-      <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">{title}</h2>
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+      <h2 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">{title}</h2>
 
       {/* Layout fields */}
       <div className="space-y-2 mb-3">
         {layout.map((item) => (
           <div
             key={item.field_key}
-            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 bg-green-50 border border-green-200 rounded-lg flex-wrap"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 bg-success/10 border border-success/30 rounded-lg flex-wrap"
           >
-            <span className="text-xs sm:text-sm font-medium text-gray-700 flex-1 min-w-[50px]">
+            <span className="text-xs sm:text-sm font-medium text-foreground flex-1 min-w-[50px]">
               {getFieldName(item.field_key)}
             </span>
             <select
               value={item.style}
               onChange={(e) => onStyleChange(item.field_key, e.target.value as LayoutItem['style'])}
-              className="px-2 py-1 text-xs rounded-lg border border-gray-300 text-gray-600 outline-none cursor-pointer"
+              className="px-2 py-1 text-xs rounded-lg border border-border text-muted-foreground outline-none cursor-pointer"
             >
               {STYLE_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -624,7 +624,7 @@ function LayoutSection({
                 const val = e.target.value
                 onFontSizeChange(item.field_key, val ? Number(val) : undefined)
               }}
-              className="px-2 py-1 text-xs rounded-lg border border-gray-300 text-gray-600 outline-none cursor-pointer"
+              className="px-2 py-1 text-xs rounded-lg border border-border text-muted-foreground outline-none cursor-pointer"
               title={t('edit.fontSize')}
             >
               <option value="">
@@ -639,14 +639,14 @@ function LayoutSection({
             <button
               type="button"
               onClick={() => onRemove(item.field_key)}
-              className="p-1 text-red-400 hover:text-red-600 cursor-pointer rounded hover:bg-red-50 transition"
+              className="p-1 text-destructive/70 hover:text-destructive cursor-pointer rounded hover:bg-destructive/10 transition"
             >
               <X size={14} />
             </button>
           </div>
         ))}
         {layout.length === 0 && (
-          <p className="text-sm text-gray-400 py-2">{t('edit.addFieldsFirst')}</p>
+          <p className="text-sm text-content-tertiary py-2">{t('edit.addFieldsFirst')}</p>
         )}
       </div>
 
@@ -656,7 +656,7 @@ function LayoutSection({
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 cursor-pointer font-medium"
+            className="flex items-center gap-1 text-sm text-brand hover:text-brand cursor-pointer font-medium"
           >
             {t('edit.addField')}
             <ChevronDown size={14} />
@@ -664,15 +664,15 @@ function LayoutSection({
           {dropdownOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-              <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+              <div className="absolute left-0 mt-1 w-48 bg-card rounded-lg shadow-lg border border-border py-1 z-20">
                 {availableFields.map((f) => (
                   <button
                     key={f.key}
                     onClick={() => onAdd(f.key)}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                    className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
                   >
                     {f.name}
-                    <span className="text-xs text-gray-400 ml-1">({f.type})</span>
+                    <span className="text-xs text-content-tertiary ml-1">({f.type})</span>
                   </button>
                 ))}
               </div>
@@ -682,8 +682,8 @@ function LayoutSection({
       )}
 
       {/* Preview */}
-      <div className="border-t border-gray-200 pt-4">
-        <p className="text-xs text-gray-400 mb-2">{t('edit.preview')}</p>
+      <div className="border-t border-border pt-4">
+        <p className="text-xs text-content-tertiary mb-2">{t('edit.preview')}</p>
         <CardPreview layout={layout} fields={fields} getFieldName={getFieldName} />
       </div>
     </div>
@@ -718,8 +718,8 @@ function CustomHtmlSection({
   )
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-      <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">{title}</h2>
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+      <h2 className="text-base sm:text-lg font-semibold text-foreground mb-3">{title}</h2>
 
       {/* Field name chips */}
       <div className="flex flex-wrap gap-1.5 mb-3">
@@ -728,7 +728,7 @@ function CustomHtmlSection({
             key={f.key}
             type="button"
             onClick={() => onHtmlChange(html + `{{${f.name}}}`)}
-            className="px-2.5 py-1 text-xs bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 cursor-pointer transition font-medium"
+            className="px-2.5 py-1 text-xs bg-brand/10 text-brand rounded-full hover:bg-brand/15 cursor-pointer transition font-medium"
             title={t('insertField', { name: f.name })}
           >
             {`{{${f.name}}}`}
@@ -741,16 +741,16 @@ function CustomHtmlSection({
         value={html}
         onChange={(e) => onHtmlChange(e.target.value)}
         rows={8}
-        className="w-full px-4 py-3 rounded-lg border border-gray-300 text-sm text-gray-900 font-mono outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition resize-y"
+        className="w-full px-4 py-3 rounded-lg border border-border text-sm text-foreground font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition resize-y"
         placeholder={`<div style="text-align:center">\n  <h1>{{${fields[0]?.name ?? 'Front'}}}</h1>\n</div>`}
       />
 
       {/* Live preview */}
       {html.trim() && (
-        <div className="mt-3 border-t border-gray-200 pt-3">
-          <p className="text-xs text-gray-400 mb-2">{t('edit.preview')}</p>
+        <div className="mt-3 border-t border-border pt-3">
+          <p className="text-xs text-content-tertiary mb-2">{t('edit.preview')}</p>
           <div
-            className="bg-gray-50 rounded-xl border border-gray-200 p-6 min-h-[80px] prose prose-sm max-w-none"
+            className="bg-muted rounded-xl border border-border p-6 min-h-[80px] prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: renderedPreview }}
           />
         </div>
@@ -774,8 +774,8 @@ function CardPreview({
 
   if (layout.length === 0) {
     return (
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-8 text-center">
-        <p className="text-sm text-gray-400">{t('edit.noFieldsToDisplay')}</p>
+      <div className="bg-muted rounded-xl border border-border p-8 text-center">
+        <p className="text-sm text-content-tertiary">{t('edit.noFieldsToDisplay')}</p>
       </div>
     )
   }
@@ -783,7 +783,7 @@ function CardPreview({
   const getFieldType = (fieldKey: string) => fields.find((f) => f.key === fieldKey)?.type ?? 'text'
 
   return (
-    <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 min-h-[120px] flex flex-col items-center justify-center gap-3">
+    <div className="bg-muted rounded-xl border border-border p-6 min-h-[120px] flex flex-col items-center justify-center gap-3">
       {layout.map((item, idx) => {
         const fieldType = getFieldType(item.field_key)
         const fieldName = getFieldName(item.field_key)
@@ -792,7 +792,7 @@ function CardPreview({
           return (
             <div
               key={item.field_key}
-              className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs"
+              className="w-24 h-16 bg-accent rounded-lg flex items-center justify-center text-content-tertiary text-xs"
             >
               {fieldType === 'audio' ? '🔊 ' + fieldName : '🖼️ ' + fieldName}
             </div>
@@ -803,7 +803,7 @@ function CardPreview({
           return (
             <div
               key={item.field_key}
-              className="flex items-center gap-1 text-gray-400 text-sm"
+              className="flex items-center gap-1 text-content-tertiary text-sm"
             >
               🔊 {fieldName}
             </div>
@@ -824,7 +824,7 @@ function CardPreview({
         return (
           <div key={item.field_key} className="w-full text-center">
             {needsDivider && (
-              <div className="w-8 h-px bg-gray-200 mx-auto mb-2" />
+              <div className="w-8 h-px bg-accent mx-auto mb-2" />
             )}
             <div
               className={className}

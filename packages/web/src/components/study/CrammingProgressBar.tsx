@@ -36,7 +36,7 @@ export function CrammingProgressBar({
       </span>
 
       {/* Progress bar */}
-      <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
+      <div className="flex-1 h-1 bg-accent rounded-full overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-purple-500 to-violet-500 transition-all duration-300"
           style={{ width: `${progressInRound}%` }}
@@ -44,12 +44,12 @@ export function CrammingProgressBar({
       </div>
 
       {/* Count */}
-      <span className="text-xs font-medium text-gray-600 whitespace-nowrap">
+      <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
         {totalInRound - remainingInRound}/{totalInRound}
       </span>
 
       {/* Divider */}
-      <span className="text-gray-300">|</span>
+      <span className="text-content-tertiary">|</span>
 
       {/* Mastery */}
       <span className="text-xs font-medium text-purple-600 whitespace-nowrap">
@@ -59,8 +59,8 @@ export function CrammingProgressBar({
       {/* Timer */}
       {timeRemainingMs != null && (
         <>
-          <span className="text-gray-300">|</span>
-          <span className={`text-xs font-medium whitespace-nowrap ${timeRemainingMs < 60000 ? 'text-red-600' : 'text-gray-600'}`}>
+          <span className="text-content-tertiary">|</span>
+          <span className={`text-xs font-medium whitespace-nowrap ${timeRemainingMs < 60000 ? 'text-destructive' : 'text-muted-foreground'}`}>
             ⏱ {formatTime(timeRemainingMs)}
           </span>
         </>

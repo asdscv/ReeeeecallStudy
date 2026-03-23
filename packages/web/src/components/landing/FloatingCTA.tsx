@@ -26,16 +26,16 @@ export function FloatingCTA() {
           exit={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 40 }}
           transition={prefersReduced ? { duration: 0 } : { type: 'spring', damping: 20, stiffness: 200 }}
         >
-          <span className="bg-green-50 text-green-700 text-xs font-medium rounded-full px-2 py-0.5 border border-green-200 hidden sm:inline">
+          <span className="bg-success/10 text-success text-xs font-medium rounded-full px-2 py-0.5 border border-success/30 hidden sm:inline">
             2.5k+ users
           </span>
           <div className="relative">
             <img src="/favicon.png" alt="" className="w-10 h-10 sm:w-14 sm:h-14 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 active:scale-110 active:rotate-12" />
-            <div className="absolute inset-0 bg-blue-500/0 rounded-full blur-xl transition-all duration-300 group-hover:bg-blue-500/40 group-hover:scale-150 group-active:bg-blue-500/40 group-active:scale-150" />
+            <div className="absolute inset-0 bg-brand/0 rounded-full blur-xl transition-all duration-300 group-hover:bg-brand/40 group-hover:scale-150 group-active:bg-brand/40 group-active:scale-150" />
           </div>
           <div className="relative">
-            <span className="text-lg sm:text-2xl font-bold text-gray-900 relative z-10 transition-all duration-300 group-hover:text-blue-600 group-hover:tracking-wider group-active:text-blue-600 group-active:tracking-wider">{t('floatingCta')}</span>
-            <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 rounded-full transition-all duration-300 group-hover:w-full group-hover:shadow-[0_0_10px_rgba(59,130,246,0.6)] group-active:w-full group-active:shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
+            <span className="text-lg sm:text-2xl font-bold text-foreground relative z-10 transition-all duration-300 group-hover:text-brand group-hover:tracking-wider group-active:text-brand group-active:tracking-wider">{t('floatingCta')}</span>
+            <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand rounded-full transition-all duration-300 group-hover:w-full group-hover:shadow-[0_0_10px_rgba(59,130,246,0.6)] group-active:w-full group-active:shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
           </div>
         </motion.button>
       )}

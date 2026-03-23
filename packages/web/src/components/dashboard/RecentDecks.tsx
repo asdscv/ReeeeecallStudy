@@ -21,12 +21,12 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
 
   if (decks.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+      <div className="bg-card rounded-xl border border-border p-8 text-center">
         <div className="text-5xl mb-4">📚</div>
-        <p className="text-gray-500 mb-4">{t('recentDecks.noDecks')}</p>
+        <p className="text-muted-foreground mb-4">{t('recentDecks.noDecks')}</p>
         <button
           onClick={() => navigate('/decks')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+          className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
         >
           {t('recentDecks.goToDecks')}
         </button>
@@ -36,7 +36,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
 
   return (
     <div>
-      <h3 className="text-sm font-medium text-gray-700 mb-3">{t('recentDecks.title')}</h3>
+      <h3 className="text-sm font-medium text-foreground mb-3">{t('recentDecks.title')}</h3>
       <div className="grid gap-3">
         {decks.map((deck) => {
           const deckStat = stats.find((s) => s.deck_id === deck.id)
@@ -47,25 +47,25 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
           return (
             <div
               key={deck.id}
-              className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 hover:shadow-sm transition cursor-pointer"
+              className="bg-card rounded-xl border border-border p-3 sm:p-4 hover:shadow-sm transition cursor-pointer"
               onClick={() => navigate(`/decks/${deck.id}`)}
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-2xl">{deck.icon}</span>
                   <div className="min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{deck.name}</h4>
-                    <p className="text-xs text-gray-400">{t('recentDecks.cardCount', { count: total })}</p>
+                    <h4 className="font-medium text-foreground truncate">{deck.name}</h4>
+                    <p className="text-xs text-content-tertiary">{t('recentDecks.cardCount', { count: total })}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 pl-9 sm:pl-0">
                   {newCards > 0 && (
-                    <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs">
+                    <span className="px-2.5 py-0.5 bg-brand/10 text-brand rounded-full text-xs">
                       {t('recentDecks.newCards', { count: newCards })}
                     </span>
                   )}
                   {review > 0 && (
-                    <span className="px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded-full text-xs">
+                    <span className="px-2.5 py-0.5 bg-warning/10 text-warning rounded-full text-xs">
                       {t('recentDecks.reviewCards', { count: review })}
                     </span>
                   )}
@@ -74,7 +74,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
                       e.stopPropagation()
                       navigate(`/decks/${deck.id}/study/setup`)
                     }}
-                    className="ml-auto sm:ml-2 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition cursor-pointer"
+                    className="ml-auto sm:ml-2 px-3 py-1 bg-brand text-white rounded-lg text-xs font-medium hover:bg-brand transition cursor-pointer"
                   >
                     {t('recentDecks.study')}
                   </button>

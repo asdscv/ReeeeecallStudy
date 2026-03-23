@@ -33,40 +33,40 @@ function SectionCard({
   return (
     <div
       id={`guide-${section.id}`}
-      className={`bg-white rounded-xl border overflow-hidden transition-all duration-500 ${
-        highlighted ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200'
+      className={`bg-card rounded-xl border overflow-hidden transition-all duration-500 ${
+        highlighted ? 'border-brand ring-2 ring-blue-100' : 'border-border'
       }`}
     >
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 p-4 sm:p-5 text-left cursor-pointer hover:bg-gray-50 transition group"
+        className="w-full flex items-center gap-3 p-4 sm:p-5 text-left cursor-pointer hover:bg-muted transition group"
       >
         <span className="text-2xl shrink-0">{section.icon}</span>
-        <h2 className="text-base sm:text-lg font-semibold text-gray-900 flex-1">{t(section.title)}</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-foreground flex-1">{t(section.title)}</h2>
         <button
           onClick={(e) => { e.stopPropagation(); onCopyLink(section.id) }}
-          className="p-1.5 text-gray-300 hover:text-blue-500 rounded-md hover:bg-blue-50 transition cursor-pointer opacity-0 group-hover:opacity-100 shrink-0"
+          className="p-1.5 text-content-tertiary hover:text-brand rounded-md hover:bg-brand/10 transition cursor-pointer opacity-0 group-hover:opacity-100 shrink-0"
           title={t('copyLink')}
         >
           <Link2 className="w-4 h-4" />
         </button>
         {open ? (
-          <ChevronUp className="w-5 h-5 text-gray-400 shrink-0" />
+          <ChevronUp className="w-5 h-5 text-content-tertiary shrink-0" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400 shrink-0" />
+          <ChevronDown className="w-5 h-5 text-content-tertiary shrink-0" />
         )}
       </button>
 
       {open && (
-        <div className="border-t border-gray-100 divide-y divide-gray-100">
+        <div className="border-t border-border divide-y divide-border">
           {section.items.map((item, i) => (
             <div key={i} className="px-4 sm:px-5 py-3 sm:py-4">
-              <h3 className="text-sm font-semibold text-gray-800 mb-1.5">{t(item.title)}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{t(item.body)}</p>
+              <h3 className="text-sm font-semibold text-foreground mb-1.5">{t(item.title)}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{t(item.body)}</p>
               {item.images && item.images.length > 0 && (
                 <div className="mt-3 space-y-3">
                   {item.images.map((img, imgIdx) => (
-                    <div key={imgIdx} className="rounded-lg border border-gray-200 overflow-hidden">
+                    <div key={imgIdx} className="rounded-lg border border-border overflow-hidden">
                       <img
                         src={img.pc}
                         alt={img.alt || ''}
@@ -90,7 +90,7 @@ function SectionCard({
                       href={item.link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand bg-brand/10 hover:bg-brand/15 rounded-lg transition"
                     >
                       {t(item.link.label)}
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -98,7 +98,7 @@ function SectionCard({
                   ) : item.link.to ? (
                     <Link
                       to={item.link.to}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand bg-brand/10 hover:bg-brand/15 rounded-lg transition"
                     >
                       {t(item.link.label)}
                     </Link>
@@ -117,14 +117,14 @@ function SectionCard({
 
 function TableOfContents({ sections, onSelect, t }: { sections: GuideSection[]; onSelect: (id: string) => void; t: (key: string) => string }) {
   return (
-    <nav className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-      <h2 className="text-sm font-semibold text-gray-900 mb-3">{t('tableOfContents')}</h2>
+    <nav className="bg-card rounded-xl border border-border p-4 sm:p-5">
+      <h2 className="text-sm font-semibold text-foreground mb-3">{t('tableOfContents')}</h2>
       <ul className="space-y-1.5">
         {sections.map((s) => (
           <li key={s.id}>
             <button
               onClick={() => onSelect(s.id)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition cursor-pointer w-full text-left px-2 py-1 rounded-lg hover:bg-blue-50"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-brand transition cursor-pointer w-full text-left px-2 py-1 rounded-lg hover:bg-brand/10"
             >
               <span>{s.icon}</span>
               <span>{t(s.title)}</span>
@@ -212,13 +212,13 @@ export function GuidePage() {
       <div className="flex items-center gap-3 mb-4 sm:mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+          className="p-2 text-content-tertiary hover:text-muted-foreground rounded-lg hover:bg-accent transition cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{t('subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('subtitle')}</p>
         </div>
         <button
           onClick={restartOnboarding}
@@ -231,13 +231,13 @@ export function GuidePage() {
 
       {/* Search */}
       <div className="relative mb-4 sm:mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-tertiary" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+          className="w-full pl-10 pr-4 py-2.5 border border-border rounded-lg text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
         />
       </div>
 
@@ -252,7 +252,7 @@ export function GuidePage() {
       {filtered.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">🔍</div>
-          <p className="text-sm text-gray-500">{t('noResults', { query })}</p>
+          <p className="text-sm text-muted-foreground">{t('noResults', { query })}</p>
         </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">

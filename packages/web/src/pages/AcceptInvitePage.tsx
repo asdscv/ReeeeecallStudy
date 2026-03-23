@@ -28,27 +28,27 @@ export function AcceptInvitePage() {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 max-w-md w-full text-center">
+      <div className="bg-card rounded-xl border border-border p-6 sm:p-8 max-w-md w-full text-center">
         {accepted ? (
           <>
             <div className="text-5xl mb-4">🎉</div>
-            <h1 className="text-xl font-bold text-gray-900 mb-2">{t('acceptInvite.accepted')}</h1>
-            <p className="text-sm text-gray-500">{t('acceptInvite.redirecting')}</p>
+            <h1 className="text-xl font-bold text-foreground mb-2">{t('acceptInvite.accepted')}</h1>
+            <p className="text-sm text-muted-foreground">{t('acceptInvite.redirecting')}</p>
           </>
         ) : (
           <>
             <div className="text-5xl mb-4">📨</div>
-            <h1 className="text-xl font-bold text-gray-900 mb-2">{t('acceptInvite.title')}</h1>
-            <p className="text-sm text-gray-500 mb-6">
-              {t('acceptInvite.inviteCode')}: <span className="font-mono font-medium text-gray-700">{inviteCode}</span>
+            <h1 className="text-xl font-bold text-foreground mb-2">{t('acceptInvite.title')}</h1>
+            <p className="text-sm text-muted-foreground mb-6">
+              {t('acceptInvite.inviteCode')}: <span className="font-mono font-medium text-foreground">{inviteCode}</span>
             </p>
 
-            {error && <p className="text-sm text-red-600 mb-4">{t(error)}</p>}
+            {error && <p className="text-sm text-destructive mb-4">{t(error)}</p>}
 
             <button
               onClick={handleAccept}
               disabled={loading}
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+              className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
             >
               {loading ? t('acceptInvite.accepting') : t('acceptInvite.accept')}
             </button>

@@ -20,9 +20,9 @@ function PasswordRuleIndicator({ password }: { password: string }) {
 
   return (
     <div className="text-xs space-y-1" data-testid="password-rules">
-      <p className="text-gray-500 font-medium">{t('passwordRules.title')}</p>
+      <p className="text-muted-foreground font-medium">{t('passwordRules.title')}</p>
       {rules.map((rule) => (
-        <div key={rule.key} className={`flex items-center gap-1.5 ${rule.passed ? 'text-green-600' : 'text-gray-400'}`}>
+        <div key={rule.key} className={`flex items-center gap-1.5 ${rule.passed ? 'text-success' : 'text-content-tertiary'}`}>
           <span>{rule.passed ? '\u2713' : '\u25CB'}</span>
           <span>{t(rule.key)}</span>
         </div>
@@ -168,18 +168,18 @@ export function LoginPage() {
 
   if (successMessage) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <div className="max-w-md w-full mx-4 text-center">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+          <div className="bg-card rounded-2xl shadow-sm border border-border p-6 sm:p-8">
             <div className="text-5xl mb-4">📧</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('emailVerification.title')}</h2>
-            <p className="text-gray-500 mb-2">
-              <span className="font-medium text-gray-700">{email}</span>
+            <h2 className="text-xl font-bold text-foreground mb-2">{t('emailVerification.title')}</h2>
+            <p className="text-muted-foreground mb-2">
+              <span className="font-medium text-foreground">{email}</span>
             </p>
-            <p className="text-gray-500 mb-6">{successMessage}</p>
+            <p className="text-muted-foreground mb-6">{successMessage}</p>
             <button
               onClick={() => switchMode('login')}
-              className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+              className="text-sm text-brand hover:text-brand cursor-pointer"
             >
               {t('emailVerification.backToLogin')}
             </button>
@@ -201,15 +201,15 @@ export function LoginPage() {
     (mode === 'signup' && !confirmPassword)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-muted">
       <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6 sm:p-8">
           <div className="text-center mb-6 sm:mb-8">
             <Link to="/" className="inline-block no-underline">
               <img src="/favicon.png" alt="" className="w-16 h-16 mx-auto mb-3" />
               <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-10 mx-auto" />
             </Link>
-            <p className="text-gray-500 mt-3">{title}</p>
+            <p className="text-muted-foreground mt-3">{title}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -219,7 +219,7 @@ export function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+              className="w-full px-4 py-3 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition text-foreground"
             />
 
             {mode === 'signup' && (
@@ -233,25 +233,25 @@ export function LoginPage() {
                     required
                     minLength={2}
                     maxLength={12}
-                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+                    className="flex-1 px-4 py-3 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition text-foreground"
                   />
                   <button
                     type="button"
                     onClick={handleNicknameCheck}
                     disabled={!nickname.trim() || nicknameCheckLoading}
-                    className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer text-sm whitespace-nowrap border border-gray-300"
+                    className="px-4 py-3 bg-accent text-foreground rounded-lg font-medium hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer text-sm whitespace-nowrap border border-border"
                   >
                     {nicknameCheckLoading ? t('checking') : t('checkAvailability')}
                   </button>
                 </div>
                 {nicknameChecked && nicknameAvailable && (
-                  <p className="text-xs text-green-600 mt-1" data-testid="nickname-available">{t('nicknameAvailable')}</p>
+                  <p className="text-xs text-success mt-1" data-testid="nickname-available">{t('nicknameAvailable')}</p>
                 )}
                 {nicknameChecked && !nicknameAvailable && !nicknameCheckError && (
-                  <p className="text-xs text-red-600 mt-1" data-testid="nickname-taken">{t('nicknameTaken')}</p>
+                  <p className="text-xs text-destructive mt-1" data-testid="nickname-taken">{t('nicknameTaken')}</p>
                 )}
                 {nicknameCheckError && (
-                  <p className="text-xs text-red-600 mt-1" data-testid="nickname-check-error">{nicknameCheckError}</p>
+                  <p className="text-xs text-destructive mt-1" data-testid="nickname-check-error">{nicknameCheckError}</p>
                 )}
               </div>
             )}
@@ -263,7 +263,7 @@ export function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('passwordPlaceholder')}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+                className="w-full px-4 py-3 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition text-foreground"
               />
             )}
 
@@ -279,16 +279,16 @@ export function LoginPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder={t('confirmPasswordPlaceholder')}
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-gray-900"
+                  className="w-full px-4 py-3 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition text-foreground"
                 />
                 {confirmPassword && !validatePasswordMatch(password, confirmPassword) && (
-                  <p className="text-xs text-red-600 mt-1" data-testid="password-mismatch">{t('passwordRules.mismatch')}</p>
+                  <p className="text-xs text-destructive mt-1" data-testid="password-mismatch">{t('passwordRules.mismatch')}</p>
                 )}
               </div>
             )}
 
             {error && (
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-destructive">{error}</p>
             )}
 
             {mode === 'login' && (
@@ -296,7 +296,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => switchMode('forgot')}
-                  className="text-sm text-gray-400 hover:text-blue-600 cursor-pointer"
+                  className="text-sm text-content-tertiary hover:text-brand cursor-pointer"
                 >
                   {t('forgotPasswordLink')}
                 </button>
@@ -306,7 +306,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitDisabled}
-              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+              className="w-full py-3 px-4 bg-brand text-white rounded-lg font-medium hover:bg-brand disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               {loading ? loadingLabel : submitLabel}
             </button>
@@ -315,9 +315,9 @@ export function LoginPage() {
           {mode !== 'forgot' && (
             <>
               <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400">{t('orDivider')}</span>
-                <div className="flex-1 h-px bg-gray-200" />
+                <div className="flex-1 h-px bg-accent" />
+                <span className="text-xs text-content-tertiary">{t('orDivider')}</span>
+                <div className="flex-1 h-px bg-accent" />
               </div>
 
               <div className="space-y-3">
@@ -326,7 +326,7 @@ export function LoginPage() {
                   onClick={() => handleOAuthLogin('google')}
                   disabled={oauthLoading !== null}
                   data-testid="google-login-button"
-                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-card border border-border rounded-lg font-medium text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
@@ -342,7 +342,7 @@ export function LoginPage() {
                   onClick={() => handleOAuthLogin('apple')}
                   disabled={oauthLoading !== null}
                   data-testid="apple-login-button"
-                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-foreground disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
                 >
                   <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13.71 14.77c-.8.76-1.68.64-2.53.28-.89-.37-1.71-.39-2.65 0-1.18.5-1.8.35-2.51-.28C2.44 11.22 3.03 5.5 6.99 5.29c1.1.06 1.87.62 2.52.67.96-.2 1.88-.76 2.91-.69 1.23.1 2.15.57 2.76 1.48-2.53 1.52-1.93 4.87.54 5.81-.44 1.15-.99 2.28-2.01 3.22ZM9.41 5.24C9.28 3.34 10.84 1.78 12.66 1.62c.26 2.2-1.98 3.84-3.25 3.62Z" fill="white"/>
@@ -353,11 +353,11 @@ export function LoginPage() {
             </>
           )}
 
-          <div className="text-sm text-center mt-6 text-gray-500 space-y-1">
+          <div className="text-sm text-center mt-6 text-muted-foreground space-y-1">
             {mode === 'forgot' ? (
               <button
                 onClick={() => switchMode('login')}
-                className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                className="text-brand hover:text-brand font-medium cursor-pointer"
               >
                 {t('backToLogin')}
               </button>
@@ -366,7 +366,7 @@ export function LoginPage() {
                 {mode === 'signup' ? t('alreadyHaveAccount') : t('noAccount')}{' '}
                 <button
                   onClick={() => switchMode(mode === 'signup' ? 'login' : 'signup')}
-                  className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                  className="text-brand hover:text-brand font-medium cursor-pointer"
                 >
                   {mode === 'signup' ? t('login') : t('signup')}
                 </button>

@@ -18,7 +18,7 @@ export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProp
 
   if (cards.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+      <div className="bg-card rounded-xl border border-border p-8 text-center text-muted-foreground">
         {t('uploadDate.noCards')}
       </div>
     )
@@ -30,24 +30,24 @@ export function UploadDateTab({ cards, template, onEditCard }: UploadDateTabProp
         const dateCards = cards.filter((c) => utcToLocalDateKey(c.created_at) === date)
 
         return (
-          <div key={date} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">{date}</span>
-              <span className="text-xs text-gray-400">{t('uploadDate.cardCount', { count })}</span>
+          <div key={date} className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="px-4 py-3 bg-muted border-b border-border flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">{date}</span>
+              <span className="text-xs text-content-tertiary">{t('uploadDate.cardCount', { count })}</span>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {dateCards.map((card) => (
                 <div
                   key={card.id}
-                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-4"
+                  className="px-4 py-3 hover:bg-muted cursor-pointer flex items-center gap-4"
                   onClick={() => onEditCard(card)}
                 >
                   {displayFields.map((field) => (
-                    <span key={field.key} className="text-sm text-gray-900 truncate flex-1">
+                    <span key={field.key} className="text-sm text-foreground truncate flex-1">
                       {card.field_values[field.key] || '-'}
                     </span>
                   ))}
-                  <span className="text-xs text-gray-400 shrink-0">
+                  <span className="text-xs text-content-tertiary shrink-0">
                     {formatLocalTime(card.created_at, dateLocale, {
                       hour: '2-digit',
                       minute: '2-digit',

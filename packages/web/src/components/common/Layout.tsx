@@ -68,13 +68,13 @@ export function Layout() {
     })
   }
 
-  const activeClass = 'bg-blue-50 text-blue-700 font-medium'
-  const inactiveClass = 'text-gray-600 hover:bg-gray-100'
+  const activeClass = 'bg-brand/10 text-brand font-medium'
+  const inactiveClass = 'text-muted-foreground hover:bg-accent'
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/dashboard" className="shrink-0 no-underline flex items-center gap-2">
             <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10 object-contain" />
@@ -114,7 +114,7 @@ export function Layout() {
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isOpen && (
-                    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] z-50">
+                    <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px] z-50">
                       {item.children.map((child) => (
                         <Link
                           key={child.path}
@@ -136,7 +136,7 @@ export function Layout() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link to="/guide" className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm no-underline transition text-gray-600 hover:bg-gray-100">
+            <Link to="/guide" className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm no-underline transition text-muted-foreground hover:bg-accent">
               <BookOpen className="w-4 h-4" />
               {t('nav.guide')}
             </Link>
@@ -145,7 +145,7 @@ export function Layout() {
             <button
               aria-label={t('menu')}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer"
+              className="md:hidden p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -154,7 +154,7 @@ export function Layout() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white">
+          <div className="md:hidden border-t border-border bg-card">
             <nav className="max-w-6xl mx-auto px-4 py-2 flex flex-col">
               {navItems.map((item) => {
                 if (item.kind === 'link') {
@@ -209,11 +209,11 @@ export function Layout() {
                   </div>
                 )
               })}
-              <div className="border-t border-gray-100 mt-2 pt-3 px-3">
+              <div className="border-t border-border mt-2 pt-3 px-3">
                 <Link
                   to="/guide"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-blue-600 no-underline transition"
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand no-underline transition"
                 >
                   <BookOpen className="w-4 h-4" />
                   {t('nav.guide')}
@@ -230,19 +230,19 @@ export function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-gray-50 pb-20 sm:pb-0">
+      <footer className="border-t border-border bg-muted pb-20 sm:pb-0">
         <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <img src="/favicon.png" alt="" className="w-7 h-7" />
-              <span className="font-bold text-gray-900">ReeeeecallStudy</span>
+              <span className="font-bold text-foreground">ReeeeecallStudy</span>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-content-tertiary">
               {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
             </p>
           </div>
           <div className="mt-4 text-center sm:text-right">
-            <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-gray-400 hover:text-gray-600 transition no-underline">
+            <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-content-tertiary hover:text-muted-foreground transition no-underline">
               admin@reeeeecallstudy.xyz
             </a>
           </div>

@@ -66,7 +66,7 @@ export function PublisherDashboardPage() {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+          <div key={i} className="h-32 bg-accent rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -74,9 +74,9 @@ export function PublisherDashboardPage() {
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-        <p className="text-red-600 mb-2">{error}</p>
-        <button onClick={fetchPublisherStats} className="text-blue-600 text-sm hover:underline cursor-pointer">
+      <div className="bg-card rounded-xl border border-border p-8 text-center">
+        <p className="text-destructive mb-2">{error}</p>
+        <button onClick={fetchPublisherStats} className="text-brand text-sm hover:underline cursor-pointer">
           Retry
         </button>
       </div>
@@ -87,16 +87,16 @@ export function PublisherDashboardPage() {
   if (!stats || (stats.total_listings === 0 && stats.listings.length === 0)) {
     return (
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Publisher Dashboard</h1>
-        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-6">Publisher Dashboard</h1>
+        <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📊</div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">No Published Listings Yet</h2>
-          <p className="text-gray-500 text-sm mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-2">No Published Listings Yet</h2>
+          <p className="text-muted-foreground text-sm mb-4">
             Publish a deck on the marketplace to start tracking views and acquisitions.
           </p>
           <button
             onClick={() => navigate('/decks')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 cursor-pointer"
+            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand cursor-pointer"
           >
             Go to Decks
           </button>
@@ -107,7 +107,7 @@ export function PublisherDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Publisher Dashboard</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-6">Publisher Dashboard</h1>
 
       {/* ── Overview Cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
@@ -140,10 +140,10 @@ export function PublisherDashboardPage() {
       {/* ── Charts Row ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {/* Daily Views Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Daily Views (Last 30 Days)</h3>
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3">Daily Views (Last 30 Days)</h3>
           {stats.daily_views.length === 0 ? (
-            <p className="text-sm text-gray-400 py-8 text-center">No data yet</p>
+            <p className="text-sm text-content-tertiary py-8 text-center">No data yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={stats.daily_views}>
@@ -163,10 +163,10 @@ export function PublisherDashboardPage() {
         </div>
 
         {/* Top Listings by Views */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Top Listings by Views</h3>
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3">Top Listings by Views</h3>
           {stats.top_listings.length === 0 ? (
-            <p className="text-sm text-gray-400 py-8 text-center">No data yet</p>
+            <p className="text-sm text-content-tertiary py-8 text-center">No data yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={stats.top_listings} layout="vertical">
@@ -189,8 +189,8 @@ export function PublisherDashboardPage() {
 
       {/* Acquisition Trend */}
       {stats.daily_acquires.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Acquisition Trend (Last 30 Days)</h3>
+        <div className="bg-card rounded-xl border border-border p-4 mb-6">
+          <h3 className="text-sm font-medium text-foreground mb-3">Acquisition Trend (Last 30 Days)</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={stats.daily_acquires}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -208,22 +208,22 @@ export function PublisherDashboardPage() {
       )}
 
       {/* ── Listings Table ── */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h3 className="text-sm font-medium text-gray-700">Your Listings</h3>
+      <div className="bg-card rounded-xl border border-border overflow-hidden mb-6">
+        <div className="px-4 py-3 border-b border-border">
+          <h3 className="text-sm font-medium text-foreground">Your Listings</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
+              <tr className="border-b border-border bg-muted">
                 <SortHeader label="Title" sortKey="title" current={sortKey} dir={sortDir} onSort={handleSort} />
                 <SortHeader label="Views" sortKey="view_count" current={sortKey} dir={sortDir} onSort={handleSort} />
                 <SortHeader label="Acquires" sortKey="acquire_count" current={sortKey} dir={sortDir} onSort={handleSort} />
                 <SortHeader label="Conv %" sortKey="conversion_rate" current={sortKey} dir={sortDir} onSort={handleSort} />
                 <SortHeader label="Rating" sortKey="avg_rating" current={sortKey} dir={sortDir} onSort={handleSort} />
                 <SortHeader label="Created" sortKey="created_at" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Status</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Status</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -238,21 +238,21 @@ export function PublisherDashboardPage() {
       {/* ── Recent Activity Feed ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Acquisitions */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Recent Acquisitions</h3>
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3">Recent Acquisitions</h3>
           {stats.recent_acquires.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">No acquisitions yet</p>
+            <p className="text-sm text-content-tertiary text-center py-4">No acquisitions yet</p>
           ) : (
             <div className="space-y-2">
               {stats.recent_acquires.map((acq) => (
                 <div key={acq.id} className="flex items-center gap-2 text-sm">
                   <Download className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                  <span className="text-gray-700 truncate">
+                  <span className="text-foreground truncate">
                     <span className="font-medium">{acq.user_name || 'Anonymous'}</span>
                     {' acquired '}
                     <span className="font-medium">{acq.deck_title}</span>
                   </span>
-                  <span className="text-xs text-gray-400 shrink-0 ml-auto">{timeAgo(acq.accepted_at)}</span>
+                  <span className="text-xs text-content-tertiary shrink-0 ml-auto">{timeAgo(acq.accepted_at)}</span>
                 </div>
               ))}
             </div>
@@ -260,10 +260,10 @@ export function PublisherDashboardPage() {
         </div>
 
         {/* Recent Reviews */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Recent Reviews</h3>
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3">Recent Reviews</h3>
           {stats.recent_reviews.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">No reviews yet</p>
+            <p className="text-sm text-content-tertiary text-center py-4">No reviews yet</p>
           ) : (
             <div className="space-y-2">
               {stats.recent_reviews.map((review) => (
@@ -277,11 +277,11 @@ export function PublisherDashboardPage() {
                         />
                       ))}
                     </div>
-                    <span className="text-gray-600 truncate">{review.deck_title}</span>
-                    <span className="text-xs text-gray-400 ml-auto shrink-0">{timeAgo(review.created_at)}</span>
+                    <span className="text-muted-foreground truncate">{review.deck_title}</span>
+                    <span className="text-xs text-content-tertiary ml-auto shrink-0">{timeAgo(review.created_at)}</span>
                   </div>
                   {review.body && (
-                    <p className="text-gray-500 text-xs mt-1 line-clamp-1">{review.body}</p>
+                    <p className="text-muted-foreground text-xs mt-1 line-clamp-1">{review.body}</p>
                   )}
                 </div>
               ))}
@@ -296,8 +296,8 @@ export function PublisherDashboardPage() {
 // ── Sub-components ──
 
 const COLOR_MAP = {
-  blue: 'bg-blue-50 text-blue-600',
-  green: 'bg-green-50 text-green-600',
+  blue: 'bg-brand/10 text-brand',
+  green: 'bg-success/10 text-success',
   purple: 'bg-purple-50 text-purple-600',
   orange: 'bg-orange-50 text-orange-600',
 }
@@ -309,14 +309,14 @@ function StatCard({ icon, label, value, color }: {
   color: keyof typeof COLOR_MAP
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-card rounded-xl border border-border p-4">
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${COLOR_MAP[color]}`}>
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-gray-500 truncate">{label}</p>
-          <p className="text-lg font-semibold text-gray-900">{value}</p>
+          <p className="text-xs text-muted-foreground truncate">{label}</p>
+          <p className="text-lg font-semibold text-foreground">{value}</p>
         </div>
       </div>
     </div>
@@ -333,13 +333,13 @@ function SortHeader({ label, sortKey: sk, current, dir, onSort }: {
   const isActive = current === sk
   return (
     <th
-      className="px-3 py-2 text-left text-xs font-medium text-gray-500 cursor-pointer select-none hover:text-gray-700"
+      className="px-3 py-2 text-left text-xs font-medium text-muted-foreground cursor-pointer select-none hover:text-foreground"
       onClick={() => onSort(sk)}
     >
       <span className="inline-flex items-center gap-1">
         {label}
-        <ArrowUpDown className={`w-3 h-3 ${isActive ? 'text-blue-600' : 'text-gray-300'}`} />
-        {isActive && <span className="text-blue-600">{dir === 'asc' ? '\u2191' : '\u2193'}</span>}
+        <ArrowUpDown className={`w-3 h-3 ${isActive ? 'text-brand' : 'text-content-tertiary'}`} />
+        {isActive && <span className="text-brand">{dir === 'asc' ? '\u2191' : '\u2193'}</span>}
       </span>
     </th>
   )
@@ -347,24 +347,24 @@ function SortHeader({ label, sortKey: sk, current, dir, onSort }: {
 
 function ListingRow({ listing, navigate }: { listing: PublisherListingStats; navigate: (path: string) => void }) {
   return (
-    <tr className="border-b border-gray-50 hover:bg-gray-50">
-      <td className="px-3 py-2.5 font-medium text-gray-900 max-w-[200px] truncate">{listing.title}</td>
-      <td className="px-3 py-2.5 text-gray-600">{formatNumber(listing.view_count)}</td>
-      <td className="px-3 py-2.5 text-gray-600">{formatNumber(listing.acquire_count)}</td>
-      <td className="px-3 py-2.5 text-gray-600">{listing.conversion_rate}%</td>
+    <tr className="border-b border-gray-50 hover:bg-muted">
+      <td className="px-3 py-2.5 font-medium text-foreground max-w-[200px] truncate">{listing.title}</td>
+      <td className="px-3 py-2.5 text-muted-foreground">{formatNumber(listing.view_count)}</td>
+      <td className="px-3 py-2.5 text-muted-foreground">{formatNumber(listing.acquire_count)}</td>
+      <td className="px-3 py-2.5 text-muted-foreground">{listing.conversion_rate}%</td>
       <td className="px-3 py-2.5">
         <span className="inline-flex items-center gap-1">
           <Star className={`w-3 h-3 ${listing.avg_rating > 0 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`} />
-          <span className="text-gray-600">{listing.avg_rating > 0 ? listing.avg_rating.toFixed(1) : '-'}</span>
+          <span className="text-muted-foreground">{listing.avg_rating > 0 ? listing.avg_rating.toFixed(1) : '-'}</span>
           {listing.review_count > 0 && (
-            <span className="text-gray-400 text-xs">({listing.review_count})</span>
+            <span className="text-content-tertiary text-xs">({listing.review_count})</span>
           )}
         </span>
       </td>
-      <td className="px-3 py-2.5 text-gray-400 text-xs">{new Date(listing.created_at).toLocaleDateString()}</td>
+      <td className="px-3 py-2.5 text-content-tertiary text-xs">{new Date(listing.created_at).toLocaleDateString()}</td>
       <td className="px-3 py-2.5">
         <span className={`px-2 py-0.5 text-xs rounded-full ${
-          listing.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
+          listing.is_active ? 'bg-success/10 text-success' : 'bg-accent text-muted-foreground'
         }`}>
           {listing.is_active ? 'Active' : 'Inactive'}
         </span>
@@ -372,7 +372,7 @@ function ListingRow({ listing, navigate }: { listing: PublisherListingStats; nav
       <td className="px-3 py-2.5">
         <button
           onClick={() => navigate(`/marketplace/${listing.id}`)}
-          className="text-blue-600 hover:text-blue-800 cursor-pointer"
+          className="text-brand hover:text-brand cursor-pointer"
           title="View listing"
         >
           <ExternalLink className="w-4 h-4" />

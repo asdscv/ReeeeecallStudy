@@ -13,15 +13,15 @@ export function HowItWorksSection() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section id="how-it-works" className="py-12 sm:py-16 md:py-24 px-4 bg-gray-50">
+    <section id="how-it-works" className="py-12 sm:py-16 md:py-24 px-4 bg-muted">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-8 sm:mb-12">{t('howItWorks.title')}</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-8 sm:mb-12">{t('howItWorks.title')}</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 md:gap-8 relative">
           {/* Connecting line (desktop only) */}
-          <div className="hidden sm:block absolute top-8 left-[calc(16.67%+32px)] right-[calc(16.67%+32px)] h-0.5 bg-gray-200 z-0">
+          <div className="hidden sm:block absolute top-8 left-[calc(16.67%+32px)] right-[calc(16.67%+32px)] h-0.5 bg-accent z-0">
             <motion.div
-              className="h-full bg-blue-400 origin-left"
+              className="h-full bg-brand origin-left"
               initial={prefersReduced ? undefined : { scaleX: 0 }}
               whileInView={prefersReduced ? undefined : { scaleX: 1 }}
               viewport={{ once: true }}
@@ -40,7 +40,7 @@ export function HowItWorksSection() {
             >
               <div className="relative">
                 <motion.div
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-blue-600 text-white text-xl sm:text-2xl font-bold flex items-center justify-center mb-4 sm:mb-5 shadow-lg shadow-blue-600/25 relative z-10"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand text-white text-xl sm:text-2xl font-bold flex items-center justify-center mb-4 sm:mb-5 shadow-lg shadow-blue-600/25 relative z-10"
                   initial={prefersReduced ? undefined : { scale: 0.8 }}
                   whileInView={prefersReduced ? undefined : { scale: 1 }}
                   viewport={{ once: true }}
@@ -51,7 +51,7 @@ export function HowItWorksSection() {
                 {/* Ring pulse */}
                 {!prefersReduced && (
                   <motion.div
-                    className="absolute inset-0 rounded-full border-2 border-blue-400"
+                    className="absolute inset-0 rounded-full border-2 border-brand"
                     initial={{ scale: 1, opacity: 0.6 }}
                     whileInView={{ scale: 1.5, opacity: 0 }}
                     viewport={{ once: true }}
@@ -59,8 +59,8 @@ export function HowItWorksSection() {
                   />
                 )}
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{t(`howItWorks.${s.key}.title`)}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed whitespace-pre-line max-w-[200px]">{t(`howItWorks.${s.key}.desc`)}</p>
+              <h3 className="text-lg font-bold text-foreground mb-2">{t(`howItWorks.${s.key}.title`)}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line max-w-[200px]">{t(`howItWorks.${s.key}.desc`)}</p>
             </motion.div>
           ))}
         </div>

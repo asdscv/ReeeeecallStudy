@@ -43,23 +43,23 @@ export function MultiDeckSelector() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-4">
+    <div className="bg-card rounded-xl border border-border mb-4">
       {/* Collapsible header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/50 rounded-xl transition-colors"
       >
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <span className="text-sm font-medium text-foreground">
           {t('study:multiDeck.title')}
           {selectedIds.size > 0 && (
-            <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+            <span className="ml-2 text-xs text-brand dark:text-brand/70">
               ({selectedIds.size}{t('common:units.decksCount', '개')})
             </span>
           )}
         </span>
         {expanded
-          ? <ChevronUp className="w-4 h-4 text-gray-400" />
-          : <ChevronDown className="w-4 h-4 text-gray-400" />
+          ? <ChevronUp className="w-4 h-4 text-content-tertiary" />
+          : <ChevronDown className="w-4 h-4 text-content-tertiary" />
         }
       </button>
 
@@ -69,13 +69,13 @@ export function MultiDeckSelector() {
           <div className="flex gap-2 mb-3">
             <button
               onClick={selectAll}
-              className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-100 transition-colors cursor-pointer"
+              className="text-xs px-2 py-1 bg-brand/10 dark:bg-blue-900/30 text-brand dark:text-brand/70 rounded-md hover:bg-brand/15 transition-colors cursor-pointer"
             >
               {t('study:multiDeck.selectAll')}
             </button>
             <button
               onClick={deselectAll}
-              className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-md hover:bg-gray-200 transition-colors cursor-pointer"
+              className="text-xs px-2 py-1 bg-accent text-muted-foreground rounded-md hover:bg-accent transition-colors cursor-pointer"
             >
               {t('study:multiDeck.deselectAll')}
             </button>
@@ -90,20 +90,20 @@ export function MultiDeckSelector() {
                   key={deck.id}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
                     checked
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 border border-transparent'
+                      ? 'bg-brand/10 dark:bg-blue-900/20 border border-brand/30 dark:border-blue-800'
+                      : 'hover:bg-muted/50 border border-transparent'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => toggleDeck(deck.id)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-border text-brand focus:ring-brand"
                   />
-                  <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 truncate">
+                  <span className="flex-1 text-sm text-foreground truncate">
                     {deck.icon} {deck.name}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {st?.total_cards ?? 0}{t('study:multiDeck.cards', { count: st?.total_cards ?? 0 })}
                   </span>
                 </label>
@@ -111,8 +111,8 @@ export function MultiDeckSelector() {
             })}
           </div>
 
-          <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-between border-t border-border pt-3">
+            <span className="text-sm text-muted-foreground">
               {selectedIds.size > 0
                 ? `${selectedIds.size}${t('study:multiDeck.decksUnit', '개 덱')} / ${totalCards}${t('study:multiDeck.cardsUnit', '장')}`
                 : t('study:multiDeck.selectHint', 'Select decks to study together')
@@ -121,7 +121,7 @@ export function MultiDeckSelector() {
             <button
               onClick={handleStart}
               disabled={selectedIds.size === 0}
-              className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-lg hover:bg-brand disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               {t('study:multiDeck.start')}
             </button>

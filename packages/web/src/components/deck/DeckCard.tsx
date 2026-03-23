@@ -41,7 +41,7 @@ export function DeckCard({ deck, stats, templateName, onDelete }: DeckCardProps)
 
   return (
     <div
-      className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-blue-300 hover:shadow-md transition relative flex cursor-pointer"
+      className="bg-card rounded-xl border border-border overflow-hidden hover:border-brand/30 hover:shadow-md transition relative flex cursor-pointer"
       onClick={goToDetail}
     >
       {/* Left color bar */}
@@ -54,22 +54,22 @@ export function DeckCard({ deck, stats, templateName, onDelete }: DeckCardProps)
         {/* Header */}
         <div className="flex items-center gap-2 min-w-0 mb-2 sm:mb-3">
           <span className="text-xl sm:text-2xl shrink-0">{deck.icon}</span>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{deck.name}</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">{deck.name}</h3>
           {user && <ShareBadge deck={deck} userId={user.id} />}
         </div>
 
         {/* Template */}
         {templateName ? (
-          <p className="text-xs mb-1 text-gray-400">
+          <p className="text-xs mb-1 text-content-tertiary">
             📋 {templateName}
           </p>
         ) : (
-          <p className="text-xs mb-1 text-amber-500 flex items-center gap-1.5">
+          <p className="text-xs mb-1 text-warning flex items-center gap-1.5">
             <span>📋 {t('card.templateNotSet')}</span>
             <span
               role="link"
               onClick={(e) => { e.stopPropagation(); navigate(`/decks/${deck.id}/edit`) }}
-              className="text-amber-600 underline underline-offset-2 hover:text-amber-700 cursor-pointer"
+              className="text-warning underline underline-offset-2 hover:text-warning cursor-pointer"
             >
               {t('card.goToSettings')}
             </span>
@@ -78,43 +78,43 @@ export function DeckCard({ deck, stats, templateName, onDelete }: DeckCardProps)
 
         {/* Description */}
         {deck.description && (
-          <p className="text-sm text-gray-500 mb-3 line-clamp-1">{deck.description}</p>
+          <p className="text-sm text-muted-foreground mb-3 line-clamp-1">{deck.description}</p>
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+        <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
           <span>{t('card.totalCards', { count: totalCards })}</span>
           {newCards > 0 && (
-            <span className="text-blue-600">{t('card.newCards', { count: newCards })}</span>
+            <span className="text-brand">{t('card.newCards', { count: newCards })}</span>
           )}
           {dueCards > 0 && (
-            <span className="text-amber-600">{t('card.review', { count: dueCards })}</span>
+            <span className="text-warning">{t('card.review', { count: dueCards })}</span>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
-          <span className="text-xs text-gray-400 truncate mr-2">
+        <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-border">
+          <span className="text-xs text-content-tertiary truncate mr-2">
             {formatLastStudied(stats?.last_studied ?? null)}
           </span>
           <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => navigate(`/decks/${deck.id}/edit`)}
-              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+              className="p-1.5 text-content-tertiary hover:text-muted-foreground hover:bg-accent rounded-lg transition cursor-pointer"
               title={t('card.edit')}
             >
               <Pencil className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(deck)}
-              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition cursor-pointer"
+              className="p-1.5 text-content-tertiary hover:text-destructive hover:bg-destructive/10 rounded-lg transition cursor-pointer"
               title={t('card.delete')}
             >
               <Trash2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => navigate(`/decks/${deck.id}/study/setup`)}
-              className="px-3 sm:px-4 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer"
+              className="px-3 sm:px-4 py-1.5 text-sm font-medium text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer"
             >
               {t('card.startStudy')}
             </button>

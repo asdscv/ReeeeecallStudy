@@ -54,10 +54,10 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
       </div>
 
       {/* Status distribution pie chart */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">{t('stats.statusDistribution')}</h3>
+      <div className="bg-card rounded-xl border border-border p-5">
+        <h3 className="text-sm font-medium text-foreground mb-3">{t('stats.statusDistribution')}</h3>
         {stats.totalCards === 0 ? (
-          <p className="text-sm text-gray-400 py-8 text-center">{t('stats.noCards')}</p>
+          <p className="text-sm text-content-tertiary py-8 text-center">{t('stats.noCards')}</p>
         ) : (
           <div className="flex items-center gap-6">
             <ResponsiveContainer width={160} height={160}>
@@ -85,8 +85,8 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: d.color }}
                   />
-                  <span className="text-gray-700">{d.name}</span>
-                  <span className="text-gray-400">{t('stats.cardCount', { count: d.value })}</span>
+                  <span className="text-foreground">{d.name}</span>
+                  <span className="text-content-tertiary">{t('stats.cardCount', { count: d.value })}</span>
                 </div>
               ))}
             </div>
@@ -95,12 +95,12 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
       </div>
 
       {/* Daily study chart */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">{t('stats.dailyStudy')}</h3>
+      <div className="bg-card rounded-xl border border-border p-5">
+        <h3 className="text-sm font-medium text-foreground mb-3">{t('stats.dailyStudy')}</h3>
         {loading ? (
-          <p className="text-sm text-gray-400 py-8 text-center animate-pulse">{t('stats.loading')}</p>
+          <p className="text-sm text-content-tertiary py-8 text-center animate-pulse">{t('stats.loading')}</p>
         ) : studyLogs.length === 0 ? (
-          <p className="text-sm text-gray-400 py-8 text-center">{t('stats.noStudyRecords')}</p>
+          <p className="text-sm text-content-tertiary py-8 text-center">{t('stats.noStudyRecords')}</p>
         ) : (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={dailyData}>
@@ -127,9 +127,9 @@ export function DeckStatsTab({ deckId, cards }: DeckStatsTabProps) {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <p className="text-xl font-bold text-gray-900">{value}</p>
+    <div className="bg-card rounded-xl border border-border p-4">
+      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      <p className="text-xl font-bold text-foreground">{value}</p>
     </div>
   )
 }

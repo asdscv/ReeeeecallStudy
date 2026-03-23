@@ -10,8 +10,8 @@ export function ContentSkeleton() {
             style={{ height: heights[i % heights.length] }}
           >
             <div className="flex flex-col justify-end h-full p-5">
-              <div className="h-6 bg-white/20 rounded w-3/4 mb-2" />
-              <div className="h-6 bg-white/20 rounded w-1/2" />
+              <div className="h-6 bg-card/20 rounded w-3/4 mb-2" />
+              <div className="h-6 bg-card/20 rounded w-1/2" />
             </div>
           </div>
         </div>

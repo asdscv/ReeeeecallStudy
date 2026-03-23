@@ -212,7 +212,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       {/* Mode select */}
       {showModeSelect && onModeChange && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             {t('config.modeLabel')}
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -223,8 +223,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 onClick={() => onModeChange(m)}
                 className={`px-3 py-2 text-xs rounded-lg border transition cursor-pointer ${
                   mode === m
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    ? 'border-brand bg-brand/10 text-brand'
+                    : 'border-border text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {t(`config.mode.${m}`)}
@@ -235,16 +235,16 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       )}
 
       {/* ── AI Provider Section ── */}
-      <fieldset className="space-y-3 p-3 bg-gray-50 rounded-lg">
-        <legend className="text-xs font-semibold text-gray-500 uppercase px-1">{t('config.providerSection')}</legend>
+      <fieldset className="space-y-3 p-3 bg-muted rounded-lg">
+        <legend className="text-xs font-semibold text-muted-foreground uppercase px-1">{t('config.providerSection')}</legend>
 
         {noProvidersConfigured ? (
           <div className="text-center py-4">
-            <p className="text-sm text-gray-500 mb-3">{t('config.noProvidersConfigured')}</p>
+            <p className="text-sm text-muted-foreground mb-3">{t('config.noProvidersConfigured')}</p>
             <button
               type="button"
               onClick={() => navigate('/settings')}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition cursor-pointer font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer font-medium"
             >
               <Settings className="w-4 h-4" />
               {t('config.goToSettings')}
@@ -253,11 +253,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         ) : (
           <>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.provider')}</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.provider')}</label>
               <select
                 value={providerId}
                 onChange={(e) => setProviderId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
+                className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
               >
                 <option value="">{t('config.selectProvider')}</option>
                 {configuredProviders.map((p) => (
@@ -271,11 +271,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
             {providerId && providerId !== 'custom' && models.length > 0 && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.model')}</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.model')}</label>
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
                 >
                   {models.map((m) => (
                     <option key={m.id} value={m.id}>{m.name}</option>
@@ -284,12 +284,12 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               </div>
             )}
 
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-content-tertiary">
               {t('config.manageInSettings')}{' '}
               <button
                 type="button"
                 onClick={() => navigate('/settings')}
-                className="text-blue-500 hover:text-blue-700 underline cursor-pointer"
+                className="text-brand hover:text-brand underline cursor-pointer"
               >
                 {t('config.settings')}
               </button>
@@ -299,18 +299,18 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       </fieldset>
 
       {/* ── Content Section ── */}
-      <fieldset className="space-y-3 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
-        <legend className="text-xs font-semibold text-blue-600 uppercase px-1">{t('config.contentSection')}</legend>
+      <fieldset className="space-y-3 p-3 bg-brand/10/50 rounded-lg border border-blue-100">
+        <legend className="text-xs font-semibold text-brand uppercase px-1">{t('config.contentSection')}</legend>
 
         {/* Deck selector (cards_only mode) */}
         {!isFullMode && (
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.targetDeck')}</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.targetDeck')}</label>
             <select
               value={selectedDeckId}
               onChange={(e) => setSelectedDeckId(e.target.value)}
-              className={`w-full px-3 py-2 rounded-lg border text-sm outline-none focus:border-blue-500 bg-white ${
-                !selectedDeckId ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 rounded-lg border text-sm outline-none focus:border-brand bg-card ${
+                !selectedDeckId ? 'border-destructive/30' : 'border-border'
               }`}
             >
               <option value="">{t('config.selectDeck')}</option>
@@ -321,28 +321,28 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               ))}
             </select>
             {!selectedDeckId && (
-              <p className="text-xs text-red-500 mt-0.5">{t('config.selectDeckRequired')}</p>
+              <p className="text-xs text-destructive mt-0.5">{t('config.selectDeckRequired')}</p>
             )}
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.topic')}</label>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.topic')}</label>
           <input
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder={t('config.topicPlaceholder')}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500"
+            className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">{t('config.contentLang')}</label>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.contentLang')}</label>
           <select
             value={contentLang}
             onChange={(e) => setContentLang(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 bg-white"
+            className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
           >
             {CONTENT_LANGUAGES.map((l) => (
               <option key={l.value} value={l.value}>
@@ -353,7 +353,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
             {t('config.cardCount')}: {cardCount}
           </label>
           <input
@@ -365,7 +365,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             onChange={(e) => setCardCount(Number(e.target.value))}
             className="w-full"
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-content-tertiary">
             <span>10</span>
             <span>50</span>
           </div>
@@ -379,7 +379,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
           {/* Field mode: auto vs manual */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">{t('config.fieldConfig')}</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t('config.fieldConfig')}</label>
             <div className="grid grid-cols-2 gap-1.5">
               <button
                 type="button"
@@ -387,11 +387,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
                   fieldMode === 'auto'
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'border-border text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <span className="font-medium">{t('config.fieldAuto')}</span>
-                <span className="block text-[10px] text-gray-400 mt-0.5">{t('config.fieldAutoDesc')}</span>
+                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.fieldAutoDesc')}</span>
               </button>
               <button
                 type="button"
@@ -399,11 +399,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
                   fieldMode === 'manual'
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'border-border text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <span className="font-medium">{t('config.fieldManual')}</span>
-                <span className="block text-[10px] text-gray-400 mt-0.5">{t('config.fieldManualDesc')}</span>
+                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.fieldManualDesc')}</span>
               </button>
             </div>
           </div>
@@ -418,12 +418,12 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                     value={field.name}
                     onChange={(e) => updateCustomField(i, { name: e.target.value })}
                     placeholder={`${t('config.fieldName')} ${i + 1}`}
-                    className="flex-1 px-2 py-1.5 text-xs border border-gray-200 rounded outline-none focus:border-purple-500"
+                    className="flex-1 px-2 py-1.5 text-xs border border-border rounded outline-none focus:border-purple-500"
                   />
                   <select
                     value={field.side}
                     onChange={(e) => updateCustomField(i, { side: e.target.value as 'front' | 'back' })}
-                    className="px-2 py-1.5 text-xs border border-gray-200 rounded outline-none bg-white"
+                    className="px-2 py-1.5 text-xs border border-border rounded outline-none bg-card"
                   >
                     <option value="front">{t('config.front')}</option>
                     <option value="back">{t('config.back')}</option>
@@ -432,7 +432,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                     <button
                       type="button"
                       onClick={() => removeCustomField(i)}
-                      className="text-red-400 hover:text-red-600 text-xs cursor-pointer px-1"
+                      className="text-destructive/70 hover:text-destructive text-xs cursor-pointer px-1"
                     >
                       ✕
                     </button>
@@ -453,7 +453,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
           {/* Layout mode */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">{t('config.layoutMode')}</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t('config.layoutMode')}</label>
             <div className="grid grid-cols-2 gap-1.5">
               <button
                 type="button"
@@ -461,11 +461,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
                   !useCustomHtml
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'border-border text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <span className="font-medium">{t('config.layoutDefault')}</span>
-                <span className="block text-[10px] text-gray-400 mt-0.5">{t('config.layoutDefaultDesc')}</span>
+                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.layoutDefaultDesc')}</span>
               </button>
               <button
                 type="button"
@@ -473,11 +473,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
                   useCustomHtml
                     ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'border-border text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <span className="font-medium">{t('config.layoutCustom')}</span>
-                <span className="block text-[10px] text-gray-400 mt-0.5">{t('config.layoutCustomDesc')}</span>
+                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.layoutCustomDesc')}</span>
               </button>
             </div>
           </div>
@@ -487,7 +487,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       <button
         type="submit"
         disabled={!canSubmit}
-        className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {t('config.startGenerate')}
       </button>

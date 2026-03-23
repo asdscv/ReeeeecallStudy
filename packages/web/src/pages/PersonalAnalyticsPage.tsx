@@ -185,22 +185,22 @@ export function PersonalAnalyticsContent() {
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand border-t-transparent" />
       </div>
     )
   }
 
-  const sectionClass = 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6'
+  const sectionClass = 'bg-card rounded-xl border border-border p-4 sm:p-6'
 
   return (
     <div className="max-w-5xl mx-auto py-6 px-4 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      <h1 className="text-2xl font-bold text-foreground">
         {t('analytics.title')}
       </h1>
 
       {/* Retention Curve */}
       <div className={sectionClass}>
-        <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
           {t('analytics.retentionCurve')}
         </h2>
         <div className="h-64">
@@ -220,7 +220,7 @@ export function PersonalAnalyticsContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Weak Topics */}
         <div className={sectionClass}>
-          <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
             {t('analytics.weakTopics')}
           </h2>
           <div className="h-64">
@@ -238,7 +238,7 @@ export function PersonalAnalyticsContent() {
 
         {/* Mode Effectiveness */}
         <div className={sectionClass}>
-          <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
             {t('analytics.modeEffectiveness')}
           </h2>
           <div className="h-64">
@@ -267,7 +267,7 @@ export function PersonalAnalyticsContent() {
 
       {/* Study Time Distribution */}
       <div className={sectionClass}>
-        <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
           {t('analytics.studyTime')}
         </h2>
         <div className="h-64">
@@ -285,7 +285,7 @@ export function PersonalAnalyticsContent() {
 
       {/* Progress Over Time */}
       <div className={sectionClass}>
-        <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
           {t('analytics.progress')}
         </h2>
         <div className="h-64">

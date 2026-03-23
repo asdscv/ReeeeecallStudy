@@ -55,7 +55,7 @@ export function AdminContentsPage() {
     return (
       <div className="space-y-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+          <div key={i} className="h-32 bg-accent rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -128,7 +128,7 @@ export function AdminContentsPage() {
       {/* Locale breakdown */}
       {locales.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.localeBreakdown')}</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.localeBreakdown')}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {locales.map((l) => (
               <AdminStatCard
@@ -145,7 +145,7 @@ export function AdminContentsPage() {
 
       {/* Period selector + Daily views chart */}
       <div className="flex items-center gap-2 mt-2">
-        <span className="text-sm text-gray-600">{t('contents.viewPeriod')}:</span>
+        <span className="text-sm text-muted-foreground">{t('contents.viewPeriod')}:</span>
         <div className="flex gap-1">
           {VIEW_PERIOD_OPTIONS.map((p) => (
             <button
@@ -155,8 +155,8 @@ export function AdminContentsPage() {
               onClick={() => setViewDays(p)}
               className={`px-3 py-1 text-xs rounded-full border transition cursor-pointer ${
                 viewDays === p
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                  ? 'bg-brand text-white border-brand'
+                  : 'bg-card text-muted-foreground border-border hover:border-border'
               }`}
             >
               {p}{t('contents.dayShort')}
@@ -189,12 +189,12 @@ export function AdminContentsPage() {
 
       {/* Top pages table */}
       {topPages.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.topPages')}</h3>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.topPages')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[500px]">
               <thead>
-                <tr className="border-b border-gray-200 text-gray-500 text-xs">
+                <tr className="border-b border-border text-muted-foreground text-xs">
                   <th className="pb-2 text-left font-medium">{t('contents.rank')}</th>
                   <th className="pb-2 text-left font-medium">{t('contents.pagePath')}</th>
                   <th className="pb-2 text-right font-medium">{t('contents.viewCount')}</th>
@@ -203,11 +203,11 @@ export function AdminContentsPage() {
               </thead>
               <tbody>
                 {topPages.map((row, i) => (
-                  <tr key={row.page_path} className="border-b border-gray-100">
-                    <td className="py-2 text-gray-400">{i + 1}</td>
-                    <td className="py-2 text-gray-900 font-mono text-xs max-w-[200px] truncate">{row.page_path}</td>
-                    <td className="py-2 text-right text-gray-900">{row.view_count.toLocaleString()}</td>
-                    <td className="py-2 text-right text-gray-500">{row.unique_visitors.toLocaleString()}</td>
+                  <tr key={row.page_path} className="border-b border-border">
+                    <td className="py-2 text-content-tertiary">{i + 1}</td>
+                    <td className="py-2 text-foreground font-mono text-xs max-w-[200px] truncate">{row.page_path}</td>
+                    <td className="py-2 text-right text-foreground">{row.view_count.toLocaleString()}</td>
+                    <td className="py-2 text-right text-muted-foreground">{row.unique_visitors.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -221,12 +221,12 @@ export function AdminContentsPage() {
 
       {/* Popular content table */}
       {popularRows.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.popularContent')}</h3>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.popularContent')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
-                <tr className="border-b border-gray-200 text-gray-500 text-xs">
+                <tr className="border-b border-border text-muted-foreground text-xs">
                   <th className="pb-2 text-left font-medium">{t('contents.rank')}</th>
                   <th className="pb-2 text-left font-medium">{t('contents.contentTitle')}</th>
                   <th className="pb-2 text-left font-medium">{t('contents.locale')}</th>
@@ -237,13 +237,13 @@ export function AdminContentsPage() {
               </thead>
               <tbody>
                 {popularRows.map((row, i) => (
-                  <tr key={row.id} className="border-b border-gray-100">
-                    <td className="py-2 text-gray-400">{i + 1}</td>
-                    <td className="py-2 text-gray-900 font-medium max-w-[200px] truncate">{row.title}</td>
-                    <td className="py-2 text-gray-500">{row.locale.toUpperCase()}</td>
-                    <td className="py-2 text-right text-gray-900">{row.view_count.toLocaleString()}</td>
-                    <td className="py-2 text-right text-gray-500">{row.unique_viewers.toLocaleString()}</td>
-                    <td className="py-2 text-right text-gray-500">{row.avg_duration}</td>
+                  <tr key={row.id} className="border-b border-border">
+                    <td className="py-2 text-content-tertiary">{i + 1}</td>
+                    <td className="py-2 text-foreground font-medium max-w-[200px] truncate">{row.title}</td>
+                    <td className="py-2 text-muted-foreground">{row.locale.toUpperCase()}</td>
+                    <td className="py-2 text-right text-foreground">{row.view_count.toLocaleString()}</td>
+                    <td className="py-2 text-right text-muted-foreground">{row.unique_viewers.toLocaleString()}</td>
+                    <td className="py-2 text-right text-muted-foreground">{row.avg_duration}</td>
                   </tr>
                 ))}
               </tbody>
@@ -257,19 +257,19 @@ export function AdminContentsPage() {
 
       {/* Recently published */}
       {data.recent_published.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.recentPublished')}</h3>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.recentPublished')}</h3>
           <div className="space-y-3">
             {data.recent_published.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={item.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {item.locale.toUpperCase()} · {t('contents.readingTime', { value: item.reading_time_minutes })}
                     {item.tags.length > 0 && ` · ${item.tags.slice(0, 3).join(', ')}`}
                   </p>
                 </div>
-                <span className="text-xs text-gray-400 ml-3 whitespace-nowrap">
+                <span className="text-xs text-content-tertiary ml-3 whitespace-nowrap">
                   {item.published_at ? formatRelativeTime(item.published_at, dateLocale) : '—'}
                 </span>
               </div>
@@ -298,10 +298,10 @@ function DailyPageViewsChart({ data, days, dateLocale }: { data: { date: string;
   }, [data, days, dateLocale])
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">{t('contents.dailyPageViews')}</h3>
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+      <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.dailyPageViews')}</h3>
       {chartData.length === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">{t('noData')}</p>
+        <p className="text-sm text-content-tertiary py-8 text-center">{t('noData')}</p>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData}>

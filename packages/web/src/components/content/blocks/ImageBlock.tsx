@@ -13,7 +13,7 @@ export function ImageBlock({ props, index }: { props: ImageBlockType['props']; i
         fetchPriority={index !== undefined && index < 2 ? 'high' : undefined}
       />
       {props.caption && (
-        <figcaption className="mt-2 text-center text-sm text-gray-500">
+        <figcaption className="mt-2 text-center text-sm text-muted-foreground">
           {stripMarkdownText(props.caption)}
         </figcaption>
       )}

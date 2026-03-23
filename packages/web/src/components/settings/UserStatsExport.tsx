@@ -86,10 +86,10 @@ export function UserStatsExport() {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <h3 className="text-sm font-medium text-foreground">
         {t('export.title', 'Export My Data')}
       </h3>
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-xs text-muted-foreground">
         {t('export.description', 'Download your data as CSV files.')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -99,16 +99,16 @@ export function UserStatsExport() {
             type="button"
             onClick={() => handleExport(type)}
             disabled={!!exporting}
-            className="flex items-center gap-3 p-3 text-left bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-3 p-3 text-left bg-muted dark:bg-slate-800 rounded-lg border border-border dark:border-slate-700 hover:bg-accent dark:hover:bg-slate-700 transition cursor-pointer disabled:opacity-50"
           >
             {exporting === type ? (
-              <Loader2 className="w-5 h-5 text-blue-500 animate-spin shrink-0" />
+              <Loader2 className="w-5 h-5 text-brand animate-spin shrink-0" />
             ) : (
-              <Download className="w-5 h-5 text-gray-400 shrink-0" />
+              <Download className="w-5 h-5 text-content-tertiary shrink-0" />
             )}
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{desc}</p>
+              <p className="text-sm font-medium text-foreground">{label}</p>
+              <p className="text-xs text-muted-foreground truncate">{desc}</p>
             </div>
           </button>
         ))}

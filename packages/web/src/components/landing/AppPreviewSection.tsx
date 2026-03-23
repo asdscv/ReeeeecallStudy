@@ -7,10 +7,10 @@ const FLIP_INTERVAL = 3000
 
 const RATING_BUTTONS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = [
-  'bg-red-500/80 text-white',
+  'bg-destructive/80 text-white',
   'bg-orange-500/80 text-white',
-  'bg-green-500/80 text-white',
-  'bg-blue-500/80 text-white',
+  'bg-success/80 text-white',
+  'bg-brand/80 text-white',
 ]
 
 function FloatingCard({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -66,7 +66,7 @@ export function AppPreviewSection() {
       {/* Background glow effects — clamped to avoid mobile overflow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(600px,90vw)] h-[min(400px,60vw)] bg-gradient-to-r from-blue-400/20 via-cyan-300/15 to-violet-400/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 left-1/4 w-[min(300px,50vw)] h-[min(300px,50vw)] bg-blue-400/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/3 left-1/4 w-[min(300px,50vw)] h-[min(300px,50vw)] bg-brand/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-[min(250px,40vw)] h-[min(250px,40vw)] bg-violet-400/10 rounded-full blur-3xl animate-pulse [animation-delay:1.5s]" />
       </div>
 
@@ -78,9 +78,9 @@ export function AppPreviewSection() {
               className="absolute -left-16 top-12 z-10"
               delay={0.3}
             >
-              <div className="bg-white/90 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg shadow-blue-500/10 border border-blue-100/60">
-                <div className="text-xs text-gray-500 mb-0.5">{t('preview.mockStreak', 'Streak: 7 days')}</div>
-                <div className="text-lg font-bold text-blue-600">🔥 7</div>
+              <div className="bg-card/90 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg shadow-blue-500/10 border border-blue-100/60">
+                <div className="text-xs text-muted-foreground mb-0.5">{t('preview.mockStreak', 'Streak: 7 days')}</div>
+                <div className="text-lg font-bold text-brand">🔥 7</div>
               </div>
             </FloatingCard>
 
@@ -88,9 +88,9 @@ export function AppPreviewSection() {
               className="absolute -right-12 top-20 z-10"
               delay={0.5}
             >
-              <div className="bg-white/90 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg shadow-emerald-500/10 border border-emerald-100/60">
-                <div className="text-xs text-gray-500 mb-0.5">{t('preview.mockCards', '12/30 cards')}</div>
-                <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="bg-card/90 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg shadow-emerald-500/10 border border-emerald-100/60">
+                <div className="text-xs text-muted-foreground mb-0.5">{t('preview.mockCards', '12/30 cards')}</div>
+                <div className="w-24 h-2 bg-accent rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
                     initial={{ width: 0 }}
@@ -105,10 +105,10 @@ export function AppPreviewSection() {
               className="absolute -left-8 bottom-16 z-10"
               delay={0.7}
             >
-              <div className="bg-white/90 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg shadow-violet-500/10 border border-violet-100/60">
+              <div className="bg-card/90 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg shadow-violet-500/10 border border-violet-100/60">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-xs font-medium text-gray-600">SRS Active</span>
+                  <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                  <span className="text-xs font-medium text-muted-foreground">SRS Active</span>
                 </div>
               </div>
             </FloatingCard>
@@ -124,20 +124,20 @@ export function AppPreviewSection() {
             <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-blue-500/40 via-cyan-400/40 to-violet-500/40 blur-sm opacity-60" />
             <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-r from-blue-500/20 via-cyan-400/20 to-violet-500/20 blur-md" />
 
-            <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/20">
+            <div className="relative bg-foreground rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/20">
               {/* Browser chrome */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-gray-800/80 border-b border-gray-700/50">
+              <div className="flex items-center gap-2 px-4 py-3 bg-foreground/80 border-b border-gray-700/50">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400/80 hover:bg-red-400 transition-colors" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/80 hover:bg-yellow-400 transition-colors" />
-                  <div className="w-3 h-3 rounded-full bg-green-400/80 hover:bg-green-400 transition-colors" />
+                  <div className="w-3 h-3 rounded-full bg-warning/80 hover:bg-warning transition-colors" />
+                  <div className="w-3 h-3 rounded-full bg-success/80 hover:bg-success transition-colors" />
                 </div>
                 <div className="ml-3 flex-1 max-w-xs">
-                  <div className="px-3 py-1.5 bg-gray-700/60 rounded-lg text-xs text-gray-300 font-mono flex items-center gap-2">
-                    <svg className="w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="px-3 py-1.5 bg-gray-700/60 rounded-lg text-xs text-content-tertiary font-mono flex items-center gap-2">
+                    <svg className="w-3 h-3 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
-                    <span className="text-gray-400">reeeeecallstudy.xyz</span>
+                    <span className="text-content-tertiary">reeeeecallstudy.xyz</span>
                   </div>
                 </div>
               </div>
@@ -155,12 +155,12 @@ export function AppPreviewSection() {
 
                 {/* Tagline */}
                 <motion.div
-                  className="mb-4 sm:mb-6 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20"
+                  className="mb-4 sm:mb-6 px-3 py-1 rounded-full bg-brand/10 border border-brand/20"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <span className="text-xs font-medium text-blue-400">
+                  <span className="text-xs font-medium text-brand/70">
                     {t('preview.tagline', 'Smart Flashcard Learning Platform')}
                   </span>
                 </motion.div>
@@ -168,7 +168,7 @@ export function AppPreviewSection() {
                 {/* Flashcard with flip */}
                 <div className="w-full max-w-[280px] sm:max-w-sm h-40 sm:h-48 [perspective:1000px] mb-4 sm:mb-6 relative">
                   {/* Card reflection/shadow */}
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-blue-500/10 blur-xl rounded-full" />
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-brand/10 blur-xl rounded-full" />
 
                   <motion.div
                     className="relative w-full h-full [transform-style:preserve-3d]"
@@ -206,7 +206,7 @@ export function AppPreviewSection() {
                       className={`px-2.5 sm:px-5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
                         highlightIdx === i
                           ? `${RATING_COLORS[i]} shadow-lg`
-                          : 'bg-gray-700/60 text-gray-400 border border-gray-600/30'
+                          : 'bg-gray-700/60 text-content-tertiary border border-gray-600/30'
                       }`}
                       animate={highlightIdx === i ? { scale: 1.08 } : { scale: 1 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -217,9 +217,9 @@ export function AppPreviewSection() {
                 </div>
 
                 {/* Status bar */}
-                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400/60" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand/60" />
                     {t('preview.mockCards', '12/30 cards')}
                   </span>
                   <span className="w-px h-3 bg-gray-700" />

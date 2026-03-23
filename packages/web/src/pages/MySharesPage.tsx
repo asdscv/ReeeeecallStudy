@@ -5,10 +5,10 @@ import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { DeckShare } from '../types/database'
 
 const STATUS_BADGE: Record<string, { labelKey: string; className: string }> = {
-  pending: { labelKey: 'myShares.status.pending', className: 'bg-yellow-50 text-yellow-700' },
-  active: { labelKey: 'myShares.status.active', className: 'bg-green-50 text-green-700' },
-  revoked: { labelKey: 'myShares.status.revoked', className: 'bg-red-50 text-red-700' },
-  declined: { labelKey: 'myShares.status.declined', className: 'bg-gray-100 text-gray-500' },
+  pending: { labelKey: 'myShares.status.pending', className: 'bg-warning/10 text-warning' },
+  active: { labelKey: 'myShares.status.active', className: 'bg-success/10 text-success' },
+  revoked: { labelKey: 'myShares.status.revoked', className: 'bg-destructive/10 text-destructive' },
+  declined: { labelKey: 'myShares.status.declined', className: 'bg-accent text-muted-foreground' },
 }
 
 const MODE_KEY: Record<string, string> = {
@@ -22,13 +22,13 @@ function ShareRow({ share, type, onAction }: { share: DeckShare; type: 'sent' | 
   const status = STATUS_BADGE[share.status] ?? STATUS_BADGE.pending
 
   return (
-    <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+    <div className="flex items-center justify-between p-3 bg-card rounded-lg border border-border">
       <div className="min-w-0">
-        <p className="text-sm text-gray-900 truncate">
+        <p className="text-sm text-foreground truncate">
           {share.invite_email || share.recipient_id || share.invite_code || 'N/A'}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-gray-400">{t(MODE_KEY[share.share_mode] ?? share.share_mode)}</span>
+          <span className="text-xs text-content-tertiary">{t(MODE_KEY[share.share_mode] ?? share.share_mode)}</span>
           <span className={`px-1.5 py-0.5 text-xs rounded-full ${status.className}`}>{t(status.labelKey)}</span>
         </div>
       </div>
@@ -36,7 +36,7 @@ function ShareRow({ share, type, onAction }: { share: DeckShare; type: 'sent' | 
       {share.status === 'active' && (
         <button
           onClick={() => onAction(share.id)}
-          className="text-xs text-red-500 hover:text-red-600 cursor-pointer shrink-0 ml-3"
+          className="text-xs text-destructive hover:text-destructive cursor-pointer shrink-0 ml-3"
         >
           {type === 'sent' ? t('myShares.cancel') : t('myShares.unsubscribe')}
         </button>
@@ -65,15 +65,15 @@ export function MySharesPage() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('myShares.title')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('myShares.title')}</h1>
         <GuideHelpLink section="sharing" />
       </div>
 
       {/* Sent shares */}
       <section className="mb-8">
-        <h2 className="text-base font-semibold text-gray-900 mb-3">{t('myShares.sent')}</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">{t('myShares.sent')}</h2>
         {myShares.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 text-sm">
+          <div className="bg-card rounded-xl border border-border p-6 text-center text-muted-foreground text-sm">
             {t('myShares.noSent')}
           </div>
         ) : (
@@ -92,9 +92,9 @@ export function MySharesPage() {
 
       {/* Received shares */}
       <section>
-        <h2 className="text-base font-semibold text-gray-900 mb-3">{t('myShares.received')}</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">{t('myShares.received')}</h2>
         {sharedWithMe.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 text-sm">
+          <div className="bg-card rounded-xl border border-border p-6 text-center text-muted-foreground text-sm">
             {t('myShares.noReceived')}
           </div>
         ) : (

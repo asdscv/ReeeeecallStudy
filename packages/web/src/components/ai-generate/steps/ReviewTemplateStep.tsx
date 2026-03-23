@@ -43,29 +43,29 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
     <div className="space-y-4">
       {/* Template name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           {t('review.templateName')}
         </label>
         <input
           type="text"
           value={template.name}
           onChange={(e) => onChange({ ...template, name: e.target.value })}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500"
+          className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand"
         />
       </div>
 
       {/* Fields */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-2">{t('review.fields')}</h4>
+        <h4 className="text-sm font-medium text-foreground mb-2">{t('review.fields')}</h4>
         <div className="space-y-2">
           {template.fields.map((field, i) => (
-            <div key={field.key} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-              <span className="text-xs text-gray-400 w-6">{i + 1}</span>
+            <div key={field.key} className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+              <span className="text-xs text-content-tertiary w-6">{i + 1}</span>
               <input
                 type="text"
                 value={field.name}
                 onChange={(e) => updateField(i, { name: e.target.value })}
-                className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded outline-none focus:border-blue-500"
+                className="flex-1 px-2 py-1 text-sm border border-border rounded outline-none focus:border-brand"
               />
               <select
                 value={field.tts_lang || ''}
@@ -73,7 +73,7 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
                   tts_lang: e.target.value || undefined,
                   tts_enabled: !!e.target.value,
                 })}
-                className="px-2 py-1 text-xs border border-gray-200 rounded outline-none"
+                className="px-2 py-1 text-xs border border-border rounded outline-none"
               >
                 <option value="">TTS off</option>
                 <option value="ko-KR">Korean</option>
@@ -91,7 +91,7 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
                 <button
                   type="button"
                   onClick={() => removeField(i)}
-                  className="p-1 text-red-400 hover:text-red-600 cursor-pointer"
+                  className="p-1 text-destructive/70 hover:text-destructive cursor-pointer"
                 >
                   ✕
                 </button>
@@ -121,45 +121,45 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
       {template.layout_mode === 'custom' && (
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               {t('review.frontHtml')}
             </label>
             <textarea
               value={template.front_html}
               onChange={(e) => onChange({ ...template, front_html: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs font-mono outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg border border-border text-xs font-mono outline-none focus:border-brand"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               {t('review.backHtml')}
             </label>
             <textarea
               value={template.back_html}
               onChange={(e) => onChange({ ...template, back_html: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-xs font-mono outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg border border-border text-xs font-mono outline-none focus:border-brand"
             />
           </div>
         </div>
       )}
 
-      <p className="text-xs text-gray-400">{t('review.editTip')}</p>
+      <p className="text-xs text-content-tertiary">{t('review.editTip')}</p>
 
       {/* Actions */}
       <div className="flex gap-2">
         <button
           type="button"
           onClick={onRegenerate}
-          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50 cursor-pointer"
+          className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg text-sm hover:bg-muted cursor-pointer"
         >
           {t('review.regenerate')}
         </button>
         <button
           type="button"
           onClick={onNext}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 cursor-pointer"
+          className="flex-1 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand cursor-pointer"
         >
           {t('review.next')}
         </button>
@@ -183,17 +183,17 @@ function LayoutEditor({
 
   return (
     <div>
-      <h4 className="text-sm font-medium text-gray-700 mb-2">{label}</h4>
+      <h4 className="text-sm font-medium text-foreground mb-2">{label}</h4>
       <div className="space-y-1">
         {items.map((item, i) => {
           const field = fields.find((f) => f.key === item.field_key)
           return (
-            <div key={item.field_key} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-              <span className="text-xs text-gray-500 min-w-[80px] truncate">{field?.name ?? item.field_key}</span>
+            <div key={item.field_key} className="flex items-center gap-2 p-2 bg-muted rounded">
+              <span className="text-xs text-muted-foreground min-w-[80px] truncate">{field?.name ?? item.field_key}</span>
               <select
                 value={item.style}
                 onChange={(e) => onChange(i, { style: e.target.value as GeneratedLayoutItem['style'] })}
-                className="px-2 py-1 text-xs border border-gray-200 rounded outline-none"
+                className="px-2 py-1 text-xs border border-border rounded outline-none"
               >
                 {STYLE_OPTIONS.map((s) => (
                   <option key={s} value={s}>{s}</option>
@@ -202,7 +202,7 @@ function LayoutEditor({
               <select
                 value={item.font_size ?? ''}
                 onChange={(e) => onChange(i, { font_size: e.target.value ? Number(e.target.value) : undefined })}
-                className="px-2 py-1 text-xs border border-gray-200 rounded outline-none"
+                className="px-2 py-1 text-xs border border-border rounded outline-none"
               >
                 <option value="">auto</option>
                 {FONT_SIZE_OPTIONS.map((s) => (

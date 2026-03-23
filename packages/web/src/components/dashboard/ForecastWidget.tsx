@@ -19,10 +19,10 @@ export function ForecastWidget({ data }: ForecastWidgetProps) {
   })
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-      <h3 className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">{t('forecast.title')}</h3>
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+      <h3 className="text-sm font-medium text-foreground mb-2 sm:mb-3">{t('forecast.title')}</h3>
       {data.every((d) => d.count === 0) ? (
-        <p className="text-sm text-gray-400 py-8 text-center">{t('forecast.noData')}</p>
+        <p className="text-sm text-content-tertiary py-8 text-center">{t('forecast.noData')}</p>
       ) : (
         <ResponsiveContainer width="100%" height={160}>
           <BarChart data={chartData}>

@@ -37,26 +37,26 @@ export function VersionHistorySection({ deckId, isOwner }: VersionHistorySection
 
   if (loading && versions.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-card rounded-xl border border-border p-6">
         <div className="animate-pulse space-y-3">
-          <div className="h-5 bg-gray-100 rounded w-40" />
-          <div className="h-4 bg-gray-100 rounded w-full" />
-          <div className="h-4 bg-gray-100 rounded w-3/4" />
+          <div className="h-5 bg-accent rounded w-40" />
+          <div className="h-4 bg-accent rounded w-full" />
+          <div className="h-4 bg-accent rounded w-3/4" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+        <h3 className="text-sm font-medium text-foreground">
           {t('decks:detail.versionHistory', { defaultValue: 'Version History' })}
         </h3>
         {isOwner && (
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium"
+            className="text-xs text-brand hover:text-brand cursor-pointer font-medium"
           >
             {showCreateForm
               ? t('common:cancel', { defaultValue: 'Cancel' })
@@ -67,18 +67,18 @@ export function VersionHistorySection({ deckId, isOwner }: VersionHistorySection
 
       {/* Create form */}
       {showCreateForm && (
-        <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <div className="px-4 py-3 border-b border-border bg-muted">
           <input
             type="text"
             value={changeSummary}
             onChange={(e) => setChangeSummary(e.target.value)}
             placeholder={t('decks:detail.versionSummaryPlaceholder', { defaultValue: 'What changed? (optional)' })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none mb-2"
+            className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none mb-2"
           />
           <button
             onClick={handleCreate}
             disabled={creating}
-            className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+            className="px-4 py-1.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
           >
             {creating
               ? t('decks:detail.creatingVersion', { defaultValue: 'Creating...' })
@@ -88,39 +88,39 @@ export function VersionHistorySection({ deckId, isOwner }: VersionHistorySection
       )}
 
       {error && (
-        <div className="px-4 py-3 text-sm text-red-600">{error}</div>
+        <div className="px-4 py-3 text-sm text-destructive">{error}</div>
       )}
 
       {/* Timeline */}
       {versions.length === 0 ? (
-        <div className="p-6 text-center text-gray-500 text-sm">
+        <div className="p-6 text-center text-muted-foreground text-sm">
           {t('decks:detail.noVersions', { defaultValue: 'No versions recorded yet.' })}
         </div>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {versions.map((version) => (
             <div key={version.id} className="px-4 py-3 flex items-start gap-3">
               <div className="shrink-0 mt-0.5">
-                <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-brand/15 text-brand flex items-center justify-center text-xs font-bold">
                   v{version.version_number}
                 </div>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     {t('decks:detail.versionLabel', {
                       defaultValue: 'Version {{num}}',
                       num: version.version_number,
                     })}
                   </span>
-                  <span className="text-xs text-gray-400 px-2 py-0.5 bg-gray-100 rounded-full">
+                  <span className="text-xs text-content-tertiary px-2 py-0.5 bg-accent rounded-full">
                     {version.card_count} {t('decks:detail.versionCards', { defaultValue: 'cards' })}
                   </span>
                 </div>
                 {version.change_summary && (
-                  <p className="text-sm text-gray-600 truncate">{version.change_summary}</p>
+                  <p className="text-sm text-muted-foreground truncate">{version.change_summary}</p>
                 )}
-                <p className="text-xs text-gray-400 mt-0.5">{formatDate(version.created_at)}</p>
+                <p className="text-xs text-content-tertiary mt-0.5">{formatDate(version.created_at)}</p>
               </div>
             </div>
           ))}

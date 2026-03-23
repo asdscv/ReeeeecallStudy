@@ -63,7 +63,7 @@ export function PomodoroTimer({ onBreakStart, onBreakEnd, compact = false }: Pom
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-full shadow-lg p-2 flex items-center gap-2 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+        className="fixed bottom-4 right-4 z-50 bg-card rounded-full shadow-lg p-2 flex items-center gap-2 border border-border hover:shadow-xl transition-shadow"
         title={t('pomodoro.focus')}
       >
         <svg width={viewSize} height={viewSize}>
@@ -93,16 +93,16 @@ export function PomodoroTimer({ onBreakStart, onBreakEnd, compact = false }: Pom
   }
 
   return (
-    <div className={`${compact ? 'fixed bottom-4 right-4 z-50' : ''} bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 flex flex-col items-center gap-3 w-56`}>
+    <div className={`${compact ? 'fixed bottom-4 right-4 z-50' : ''} bg-card rounded-2xl shadow-lg border border-border p-4 flex flex-col items-center gap-3 w-56`}>
       {compact && (
         <button
           onClick={() => setExpanded(false)}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xs"
+          className="absolute top-2 right-2 text-content-tertiary hover:text-muted-foreground text-xs"
         >
           &minus;
         </button>
       )}
-      <div className={`text-xs font-medium uppercase tracking-wider ${isBreak ? 'text-green-600' : 'text-blue-600'}`}>
+      <div className={`text-xs font-medium uppercase tracking-wider ${isBreak ? 'text-success' : 'text-brand'}`}>
         {isBreak ? t('pomodoro.break') : t('pomodoro.focus')}
       </div>
       <svg width={viewSize} height={viewSize}>
@@ -132,21 +132,21 @@ export function PomodoroTimer({ onBreakStart, onBreakEnd, compact = false }: Pom
         {!isRunning ? (
           <button
             onClick={start}
-            className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-3 py-1 text-sm bg-brand text-white rounded-lg hover:bg-brand transition-colors"
           >
             {t('pomodoro.start')}
           </button>
         ) : (
           <button
             onClick={pause}
-            className="px-3 py-1 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+            className="px-3 py-1 text-sm bg-warning text-white rounded-lg hover:bg-yellow-600 transition-colors"
           >
             {t('pomodoro.pause')}
           </button>
         )}
         <button
           onClick={reset}
-          className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          className="px-3 py-1 text-sm bg-accent text-foreground rounded-lg hover:bg-gray-300 transition-colors"
         >
           {t('pomodoro.reset')}
         </button>

@@ -87,34 +87,34 @@ export function TemplatesPage() {
       <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('title')}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('title')}</h1>
             <GuideHelpLink section="templates" />
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             {t('subtitle')}
           </p>
         </div>
         <button
           onClick={handleNew}
-          className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer shrink-0"
+          className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand transition cursor-pointer shrink-0"
         >
           {t('createNew')}
         </button>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+        <div className="mb-4 p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
           {t(error)}
         </div>
       )}
 
       {templates.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+        <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📋</div>
-          <p className="text-gray-500 mb-4 text-sm sm:text-base">{t('empty')}</p>
+          <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('empty')}</p>
           <button
             onClick={handleNew}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('createFirst')}
           </button>
@@ -173,12 +173,12 @@ function TemplateCard({
   const dateLocale = toIntlLocale(i18n.language)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 hover:shadow-sm transition">
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5 hover:shadow-sm transition">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{template.name}</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">{template.name}</h3>
           {template.is_default && (
-            <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full font-medium">
+            <span className="px-2 py-0.5 text-xs bg-brand/10 text-brand rounded-full font-medium">
               {t('defaultBadge')}
             </span>
           )}
@@ -189,7 +189,7 @@ function TemplateCard({
           {template.fields.map((field) => (
             <span
               key={field.key}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-accent text-muted-foreground text-xs rounded-full"
             >
               {field.type === 'image' ? '🖼️' : field.type === 'audio' ? '🔊' : '📝'}
               {field.name}
@@ -198,38 +198,38 @@ function TemplateCard({
         </div>
 
         {/* Layout preview */}
-        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-gray-400 mb-3">
+        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-content-tertiary mb-3">
           <span>{t('frontFields', { count: template.front_layout.length })}</span>
           <span>{t('backFields', { count: template.back_layout.length })}</span>
           <span>{t('created', { date: formatLocalDate(template.created_at, dateLocale) })}</span>
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
           <button
             onClick={onEdit}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-foreground bg-muted hover:bg-accent rounded-lg transition cursor-pointer"
           >
             <span>✏️</span>
             <span className="hidden sm:inline">{t('common:edit')}</span>
           </button>
           <button
             onClick={onDuplicate}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-foreground bg-muted hover:bg-accent rounded-lg transition cursor-pointer"
           >
             <span>📋</span>
             <span className="hidden sm:inline">{t('common:duplicate')}</span>
           </button>
           <button
             onClick={onExportJSON}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-foreground bg-muted hover:bg-accent rounded-lg transition cursor-pointer"
           >
             <span>📄</span>
             <span className="hidden sm:inline">{t('exportJSON')}</span>
           </button>
           <button
             onClick={onExportCSV}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-foreground bg-muted hover:bg-accent rounded-lg transition cursor-pointer"
           >
             <span>📊</span>
             <span className="hidden sm:inline">{t('exportCSV')}</span>
@@ -237,7 +237,7 @@ function TemplateCard({
           {!template.is_default && (
             <button
               onClick={onDelete}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition cursor-pointer ml-auto"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-destructive bg-destructive/10 hover:bg-destructive/15 rounded-lg transition cursor-pointer ml-auto"
             >
               <span>🗑️</span>
               <span className="hidden sm:inline">{t('common:delete')}</span>

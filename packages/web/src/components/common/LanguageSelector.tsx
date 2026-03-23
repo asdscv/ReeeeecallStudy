@@ -45,7 +45,7 @@ export function LanguageSelector({ direction = 'down', compact = false, classNam
         onKeyDown={handleKeyDown}
         aria-expanded={open}
         aria-haspopup="listbox"
-        className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-gray-600 bg-transparent border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition cursor-pointer"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-muted-foreground bg-transparent border border-border rounded-lg hover:border-border hover:bg-muted transition cursor-pointer"
       >
         <Globe className="w-4 h-4" />
         {!compact && <span>{currentLang.label}</span>}
@@ -54,7 +54,7 @@ export function LanguageSelector({ direction = 'down', compact = false, classNam
       {open && (
         <div
           role="listbox"
-          className={`absolute ${dropdownPosition} left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 min-w-[160px]`}
+          className={`absolute ${dropdownPosition} left-0 bg-card border border-border rounded-lg shadow-lg py-1 z-50 min-w-[160px]`}
         >
           {SUPPORTED_LANGUAGE_OPTIONS.map((lang) => {
             const isSelected = currentLang.code === lang.code
@@ -64,8 +64,8 @@ export function LanguageSelector({ direction = 'down', compact = false, classNam
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => handleSelect(lang.code)}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition cursor-pointer border-none bg-transparent flex items-center justify-between ${
-                  isSelected ? 'text-blue-600 font-medium' : 'text-gray-600'
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted transition cursor-pointer border-none bg-transparent flex items-center justify-between ${
+                  isSelected ? 'text-brand font-medium' : 'text-muted-foreground'
                 }`}
               >
                 <span>{lang.label}</span>

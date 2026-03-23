@@ -26,7 +26,7 @@ export function CrammingSetupPanel({
     <div className="space-y-6">
       {/* Card Filter */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           {t('cramming.filter.title')}
         </label>
         <div className="space-y-2">
@@ -53,7 +53,7 @@ export function CrammingSetupPanel({
 
       {/* Time Limit */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           {t('cramming.timeLimit.title')}
         </label>
         <div className="flex flex-wrap gap-2">
@@ -65,7 +65,7 @@ export function CrammingSetupPanel({
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
                 timeLimitMinutes === preset
                   ? 'bg-purple-100 text-purple-700 border-2 border-purple-500'
-                  : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:border-gray-300'
+                  : 'bg-accent text-foreground border-2 border-transparent hover:border-border'
               }`}
             >
               {preset == null
@@ -79,8 +79,8 @@ export function CrammingSetupPanel({
       {/* Shuffle Toggle */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-700">{t('cramming.shuffle.title')}</p>
-          <p className="text-xs text-gray-500">{t('cramming.shuffle.desc')}</p>
+          <p className="text-sm font-medium text-foreground">{t('cramming.shuffle.title')}</p>
+          <p className="text-xs text-muted-foreground">{t('cramming.shuffle.desc')}</p>
         </div>
         <button
           type="button"
@@ -90,7 +90,7 @@ export function CrammingSetupPanel({
           }`}
         >
           <span
-            className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+            className={`inline-block h-4 w-4 rounded-full bg-card transition-transform ${
               shuffle ? 'translate-x-6' : 'translate-x-1'
             }`}
           />
@@ -118,11 +118,11 @@ function FilterOption({
       className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${
         selected
           ? 'border-purple-500 bg-purple-50'
-          : 'border-gray-200 hover:border-gray-300'
+          : 'border-border hover:border-border'
       }`}
     >
-      <div className="font-medium text-gray-900 text-sm">{label}</div>
-      <div className="text-xs text-gray-500">{desc}</div>
+      <div className="font-medium text-foreground text-sm">{label}</div>
+      <div className="text-xs text-muted-foreground">{desc}</div>
     </button>
   )
 }

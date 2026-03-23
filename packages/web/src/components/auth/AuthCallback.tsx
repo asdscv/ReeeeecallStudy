@@ -81,13 +81,13 @@ export function AuthCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <div className="text-center max-w-sm">
           <div className="text-4xl mb-4">⚠️</div>
-          <p className="text-gray-900 font-medium mb-2">{error}</p>
+          <p className="text-foreground font-medium mb-2">{error}</p>
           <button
             onClick={() => navigate('/auth/login', { replace: true })}
-            className="mt-4 px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="mt-4 px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('callback.backToLogin')}
           </button>
@@ -97,10 +97,10 @@ export function AuthCallback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-muted">
       <div className="text-center">
         <div className="text-4xl mb-4 animate-spin">⏳</div>
-        <p className="text-gray-500">{t('callback.processing')}</p>
+        <p className="text-muted-foreground">{t('callback.processing')}</p>
       </div>
     </div>
   )

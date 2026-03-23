@@ -29,13 +29,13 @@ export function ApiDocsContent({ variant }: { variant: QuickStartVariant }) {
 
       {/* Search */}
       <div className="relative mb-4 sm:mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-tertiary" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+          className="w-full pl-10 pr-4 py-2.5 border border-border rounded-lg text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
         />
       </div>
 
@@ -50,7 +50,7 @@ export function ApiDocsContent({ variant }: { variant: QuickStartVariant }) {
       {filtered.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">🔍</div>
-          <p className="text-sm text-gray-500">{t('noResults', { query })}</p>
+          <p className="text-sm text-muted-foreground">{t('noResults', { query })}</p>
         </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
