@@ -14,8 +14,7 @@
     "cta": {
       "start": "Bắt đầu miễn phí",
       "learn": "Tìm hiểu thêm"
-    },
-    "freeForever": "Miễn phí mãi mãi. Không cần thẻ tín dụng."
+    }
   },
   "tagline": "Nền tảng học thẻ ghi nhớ thông minh",
   "preview": {
@@ -172,14 +171,14 @@
     "title": "Học thông minh hơn từ hôm nay",
     "description": "Bắt đầu miễn phí. Đăng ký dễ dàng với email và mật khẩu.",
     "subtitle": "Bắt đầu miễn phí. Đăng ký dễ dàng với email và mật khẩu.",
-    "button": "Bắt đầu ngay",
-    "guarantee": "Miễn phí mãi mãi. Không cần thẻ tín dụng."
+    "button": "Bắt đầu ngay"
   },
   "nav": {
     "blog": "Bài viết",
     "login": "Đăng nhập",
     "start": "Bắt đầu ngay",
     "features": "Tính năng",
+    "science": "Khoa học",
     "results": "Kết quả",
     "reviews": "Đánh giá",
     "howItWorks": "Cách hoạt động",
@@ -255,6 +254,60 @@
       "0": { "quote": "ReeeeecallStudy đã giúp tôi đỗ JLPT N2. Thuật toán SRS cực kỳ hiệu quả!", "author": "Nguyễn Minh Tuấn", "role": "Người học ngôn ngữ" },
       "1": { "quote": "Giao diện rất sạch sẽ và trực quan. Việc học bây giờ thực sự thú vị.", "author": "Trần Thị Mai", "role": "Sinh viên y khoa" },
       "2": { "quote": "Tính năng chia sẻ bộ thẻ tuyệt vời. Tôi tìm được bộ thẻ cho hầu hết mọi môn.", "author": "Lê Hoàng Nam", "role": "Sinh viên đại học" }
+    }
+  },
+  "science": {
+    "badge": "Học tập dựa trên bằng chứng",
+    "title": "Xây dựng trên Khoa học Nhận thức",
+    "subtitle": "Mọi tính năng của ReeeeecallStudy đều dựa trên hàng thập kỷ nghiên cứu được bình duyệt về trí nhớ, học tập và khoa học thần kinh.",
+    "chart": {
+      "title": "Tỷ lệ ghi nhớ theo thời gian",
+      "subtitle": "Học nhồi nhét vs. lặp lại ngắt quãng",
+      "cramming": "Học nhồi nhét",
+      "srs": "Lặp lại ngắt quãng",
+      "note": "Dựa trên nghiên cứu đường cong quên của Ebbinghaus và các nghiên cứu lặp lại ngắt quãng. SRS duy trì tỷ lệ ghi nhớ trên 78% ngay cả sau 90 ngày thông qua ôn tập ở khoảng cách tối ưu."
+    },
+    "insight": {
+      "badge": "Khoa học học tập",
+      "title": "Tại sao lặp lại ngắt quãng hiệu quả?",
+      "p1": "Khi bạn nhớ lại thông tin ở các khoảng cách tăng dần, mỗi lần truy xuất thành công đều củng cố đường dẫn thần kinh. Quá trình này — gọi là củng cố trí nhớ — biến những ký ức ngắn hạn mong manh thành kiến thức dài hạn bền vững.",
+      "p2": "Nhận thức then chốt: ôn tập quá sớm lãng phí thời gian, ôn tập quá muộn nghĩa là phải học lại từ đầu. SRS tìm ra thời điểm hoàn hảo — ôn tập ngay trước khi bạn quên — tối đa hóa ghi nhớ với nỗ lực tối thiểu.",
+      "stat1": "Ghi nhớ 90 ngày",
+      "stat2": "Tiết kiệm thời gian học",
+      "stat3": "Nắm vững nhanh hơn"
+    },
+    "principlesTitle": "6 Nguyên tắc được nghiên cứu hỗ trợ thúc đẩy việc học của bạn",
+    "principles": {
+      "spacing": {
+        "title": "Hiệu ứng giãn cách",
+        "desc": "Phân bổ các buổi học theo thời gian cải thiện đáng kể khả năng ghi nhớ dài hạn. Thuật toán SRS của chúng tôi tính toán thời điểm tối ưu cho mỗi lần ôn tập — ngay trước khi bạn quên.",
+        "source": "Ebbinghaus (1885), Cepeda et al. (2006)"
+      },
+      "retrieval": {
+        "title": "Hồi tưởng chủ động",
+        "desc": "Tự kiểm tra bản thân giúp tăng cường trí nhớ hiệu quả hơn nhiều so với đọc lại. Mỗi lần lật thẻ là một bài tập truy xuất giúp củng cố các đường dẫn thần kinh.",
+        "source": "Roediger & Karpicke (2006)"
+      },
+      "consolidation": {
+        "title": "Củng cố qua giấc ngủ",
+        "desc": "Trong khi ngủ, não bộ phát lại và củng cố ký ức. Hệ thống ranh giới ngày của chúng tôi đảm bảo việc ôn tập phù hợp với chu kỳ ngủ-thức tự nhiên để đạt hiệu quả ghi nhớ tối đa.",
+        "source": "Diekelmann & Born (2010)"
+      },
+      "interleaving": {
+        "title": "Học xen kẽ",
+        "desc": "Trộn lẫn các chủ đề khác nhau trong khi học giúp cải thiện khả năng phân biệt và chuyển giao. Hệ thống đa chế độ của chúng tôi hỗ trợ thực hành xen kẽ giữa các bộ thẻ và danh mục.",
+        "source": "Bjork & Bjork (2011)"
+      },
+      "difficulty": {
+        "title": "Khó khăn mong muốn",
+        "desc": "Làm cho việc truy xuất khó hơn một chút lại nghịch lý tăng cường trí nhớ. Hệ thống đánh giá 4 mức (Lại/Khó/Tốt/Dễ) tạo mức thử thách phù hợp cho mỗi thẻ.",
+        "source": "Bjork (1994)"
+      },
+      "adaptive": {
+        "title": "Lập lịch thích ứng",
+        "desc": "Mỗi thẻ tự điều chỉnh độc lập dựa trên kết quả của bạn. Thẻ dễ giãn cách đến hàng tháng; thẻ khó giữ khoảng cách ngắn cho đến khi nắm vững.",
+        "source": "Lindsey et al. (2014)"
+      }
     }
   },
   "seo": {

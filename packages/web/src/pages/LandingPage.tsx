@@ -17,10 +17,9 @@ import { LandingNav } from '../components/landing/LandingNav'
 import { HeroSection } from '../components/landing/HeroSection'
 import { TrustBadgesSection } from '../components/landing/TrustBadgesSection'
 import { AppPreviewSection } from '../components/landing/AppPreviewSection'
-import { SectionDivider } from '../components/landing/SectionDivider'
 import { FeaturesSection } from '../components/landing/FeaturesSection'
+import { ScienceSection } from '../components/landing/ScienceSection'
 import { StatsSection } from '../components/landing/StatsSection'
-import { BenefitsSection } from '../components/landing/BenefitsSection'
 import { SocialProofSection } from '../components/landing/SocialProofSection'
 import { HowItWorksSection } from '../components/landing/HowItWorksSection'
 import { InsightsSection } from '../components/landing/InsightsSection'
@@ -75,17 +74,13 @@ export function LandingPage() {
       <HeroSection />
       <TrustBadgesSection />
       <AppPreviewSection />
-      <SectionDivider type="wave" color="#f9fafb" />
       <FeaturesSection />
-      <SectionDivider type="curve" color="#ffffff" />
+      <ScienceSection />
       <StatsSection />
-      <BenefitsSection />
       <SocialProofSection />
-      <SectionDivider type="wave" color="#f9fafb" />
       <HowItWorksSection />
       <InsightsSection />
       <FAQSection />
-      <SectionDivider type="curve" color="#ffffff" />
       <FinalCTASection />
       <FooterSection />
       <FloatingCTA />

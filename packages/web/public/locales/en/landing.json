@@ -14,8 +14,7 @@
     "cta": {
       "start": "Start Free",
       "learn": "Learn More"
-    },
-    "freeForever": "Free forever. No credit card required."
+    }
   },
   "tagline": "Smart Flashcard Learning Platform",
   "preview": {
@@ -172,14 +171,14 @@
     "title": "Learn Smarter Starting Today",
     "description": "Start free. Sign up easily with email and password.",
     "subtitle": "Start free. Sign up easily with email and password.",
-    "button": "Get Started",
-    "guarantee": "Free forever. No credit card required."
+    "button": "Get Started"
   },
   "nav": {
     "blog": "Insights",
     "login": "Log in",
     "start": "Get Started",
     "features": "Features",
+    "science": "Science",
     "results": "Results",
     "reviews": "Reviews",
     "howItWorks": "How It Works",
@@ -255,6 +254,60 @@
       "0": { "quote": "ReeeeecallStudy helped me pass JLPT N2. The SRS algorithm is incredibly effective!", "author": "Min-Jun Kim", "role": "Language Learner" },
       "1": { "quote": "The interface is so clean and intuitive. Studying is actually enjoyable now.", "author": "Seo-Yun Lee", "role": "Medical Student" },
       "2": { "quote": "The deck sharing feature is amazing. I found decks for almost every subject.", "author": "Yuki Park", "role": "University Student" }
+    }
+  },
+  "science": {
+    "badge": "Evidence-Based Learning",
+    "title": "Built on Cognitive Science",
+    "subtitle": "Every feature in ReeeeecallStudy is grounded in decades of peer-reviewed research in memory, learning, and neuroscience.",
+    "chart": {
+      "title": "Memory Retention Over Time",
+      "subtitle": "Traditional cramming vs. spaced repetition",
+      "cramming": "Cramming",
+      "srs": "Spaced Repetition",
+      "note": "Based on Ebbinghaus forgetting curve research and spaced repetition studies. SRS reviews at optimal intervals maintain 78%+ retention even after 90 days."
+    },
+    "insight": {
+      "badge": "The Science",
+      "title": "Why does spaced repetition work?",
+      "p1": "When you recall information at increasing intervals, each successful retrieval strengthens the neural pathway. This process — called memory consolidation — transforms fragile short-term memories into durable long-term knowledge.",
+      "p2": "The key insight: reviewing too early wastes time, reviewing too late means relearning from scratch. SRS finds the sweet spot — reviewing right before you forget — maximizing retention with minimum effort.",
+      "stat1": "90-day retention",
+      "stat2": "less study time",
+      "stat3": "faster mastery"
+    },
+    "principlesTitle": "6 Research-Backed Principles Powering Your Learning",
+    "principles": {
+      "spacing": {
+        "title": "Spacing Effect",
+        "desc": "Spreading study sessions over time dramatically improves long-term retention. Our SRS algorithm calculates the optimal moment for each review — right before you forget.",
+        "source": "Ebbinghaus (1885), Cepeda et al. (2006)"
+      },
+      "retrieval": {
+        "title": "Active Recall",
+        "desc": "Testing yourself strengthens memory far more than re-reading. Every card flip is a retrieval practice trial that reinforces neural pathways.",
+        "source": "Roediger & Karpicke (2006)"
+      },
+      "consolidation": {
+        "title": "Sleep Consolidation",
+        "desc": "During sleep, your brain replays and consolidates memories. Our day-boundary system ensures reviews align with your natural sleep-wake cycle for maximum retention.",
+        "source": "Diekelmann & Born (2010)"
+      },
+      "interleaving": {
+        "title": "Interleaving",
+        "desc": "Mixing different topics during study improves discrimination and transfer. Our multi-mode system supports interleaved practice across decks and categories.",
+        "source": "Bjork & Bjork (2011)"
+      },
+      "difficulty": {
+        "title": "Desirable Difficulties",
+        "desc": "Making retrieval slightly harder paradoxically strengthens memory. The 4-level rating system (Again/Hard/Good/Easy) creates the right challenge level for each card.",
+        "source": "Bjork (1994)"
+      },
+      "adaptive": {
+        "title": "Adaptive Scheduling",
+        "desc": "Each card adapts independently based on your performance. Easy cards space out to months; difficult cards stay close until mastered.",
+        "source": "Lindsey et al. (2014)"
+      }
     }
   },
   "seo": {

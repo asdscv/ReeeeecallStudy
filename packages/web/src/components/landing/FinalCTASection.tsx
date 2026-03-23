@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Lock } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ScrollReveal } from './ScrollReveal'
 
@@ -44,10 +44,6 @@ export function FinalCTASection() {
             >
               {t('cta.button')} <ArrowRight className="w-5 h-5" />
             </motion.button>
-            <p className="mt-5 text-sm text-blue-200 flex items-center justify-center gap-1.5">
-              <Lock className="w-3.5 h-3.5" />
-              {t('cta.guarantee', 'Free forever. No credit card required.')}
-            </p>
           </div>
         </div>
       </ScrollReveal>

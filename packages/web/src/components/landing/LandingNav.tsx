@@ -6,10 +6,11 @@ import { motion } from 'motion/react'
 import { useScrollspy } from '../../hooks/useScrollspy'
 import { useAuthStore } from '../../stores/auth-store'
 
-const SECTION_IDS = ['features', 'stats', 'social-proof', 'how-it-works', 'faq']
+const SECTION_IDS = ['features', 'science', 'stats', 'social-proof', 'how-it-works', 'faq']
 
 const NAV_ITEMS = [
   { id: 'features', key: 'nav.features', fallback: 'Features' },
+  { id: 'science', key: 'nav.science', fallback: 'Science' },
   { id: 'stats', key: 'nav.results', fallback: 'Results' },
   { id: 'social-proof', key: 'nav.reviews', fallback: 'Reviews' },
   { id: 'how-it-works', key: 'nav.howItWorks', fallback: 'How It Works' },

@@ -14,8 +14,7 @@
     "cta": {
       "start": "Comenzar Gratis",
       "learn": "Más Información"
-    },
-    "freeForever": "Gratis para siempre. No se requiere tarjeta de crédito."
+    }
   },
   "tagline": "Plataforma Inteligente de Aprendizaje con Tarjetas",
   "preview": {
@@ -172,14 +171,14 @@
     "title": "Aprende de Forma Más Inteligente Desde Hoy",
     "description": "Comienza gratis. Regístrate fácilmente con correo electrónico y contraseña.",
     "subtitle": "Comienza gratis. Regístrate fácilmente con correo electrónico y contraseña.",
-    "button": "Comenzar",
-    "guarantee": "Gratis para siempre. No se requiere tarjeta de crédito."
+    "button": "Comenzar"
   },
   "nav": {
     "blog": "Artículos",
     "login": "Iniciar Sesión",
     "start": "Comenzar",
     "features": "Funciones",
+    "science": "Ciencia",
     "results": "Resultados",
     "reviews": "Reseñas",
     "howItWorks": "Cómo Funciona",
@@ -255,6 +254,60 @@
       "0": { "quote": "ReeeeecallStudy me ayudó a aprobar el JLPT N2. ¡El algoritmo SRS es increíblemente efectivo!", "author": "Min-Jun Kim", "role": "Estudiante de Idiomas" },
       "1": { "quote": "La interfaz es muy limpia e intuitiva. Estudiar ahora es realmente agradable.", "author": "Seo-Yun Lee", "role": "Estudiante de Medicina" },
       "2": { "quote": "La función de compartir mazos es increíble. Encontré mazos para casi todos los temas.", "author": "Yuki Park", "role": "Estudiante Universitario" }
+    }
+  },
+  "science": {
+    "badge": "Aprendizaje Basado en Evidencia",
+    "title": "Basado en la Ciencia Cognitiva",
+    "subtitle": "Cada función de ReeeeecallStudy se fundamenta en décadas de investigación revisada por pares en memoria, aprendizaje y neurociencia.",
+    "chart": {
+      "title": "Retención de Memoria a lo Largo del Tiempo",
+      "subtitle": "Estudio intensivo vs. repetición espaciada",
+      "cramming": "Estudio intensivo",
+      "srs": "Repetición espaciada",
+      "note": "Basado en la investigación de la curva del olvido de Ebbinghaus y estudios de repetición espaciada. SRS mantiene una retención del 78%+ incluso después de 90 días mediante revisiones en intervalos óptimos."
+    },
+    "insight": {
+      "badge": "La Ciencia",
+      "title": "¿Por qué funciona la repetición espaciada?",
+      "p1": "Cuando recuerdas información a intervalos crecientes, cada recuperación exitosa fortalece la vía neural. Este proceso — llamado consolidación de la memoria — transforma los frágiles recuerdos a corto plazo en conocimiento duradero a largo plazo.",
+      "p2": "La clave: repasar demasiado pronto desperdicia tiempo, repasar demasiado tarde significa reaprender desde cero. SRS encuentra el momento perfecto — repasando justo antes de que olvides — maximizando la retención con el mínimo esfuerzo.",
+      "stat1": "Retención a 90 días",
+      "stat2": "Menos tiempo de estudio",
+      "stat3": "Dominio más rápido"
+    },
+    "principlesTitle": "6 Principios Respaldados por la Investigación que Impulsan tu Aprendizaje",
+    "principles": {
+      "spacing": {
+        "title": "Efecto de Espaciado",
+        "desc": "Distribuir las sesiones de estudio en el tiempo mejora drásticamente la retención a largo plazo. Nuestro algoritmo SRS calcula el momento óptimo para cada revisión — justo antes de que olvides.",
+        "source": "Ebbinghaus (1885), Cepeda et al. (2006)"
+      },
+      "retrieval": {
+        "title": "Recuerdo Activo",
+        "desc": "Ponerte a prueba fortalece la memoria mucho más que releer. Cada vez que volteas una tarjeta es un ejercicio de recuperación que refuerza las vías neurales.",
+        "source": "Roediger & Karpicke (2006)"
+      },
+      "consolidation": {
+        "title": "Consolidación durante el Sueño",
+        "desc": "Durante el sueño, tu cerebro reproduce y consolida los recuerdos. Nuestro sistema de límite diario asegura que las revisiones se alineen con tu ciclo natural de sueño-vigilia para máxima retención.",
+        "source": "Diekelmann & Born (2010)"
+      },
+      "interleaving": {
+        "title": "Intercalación",
+        "desc": "Mezclar diferentes temas durante el estudio mejora la discriminación y la transferencia. Nuestro sistema multimodo soporta práctica intercalada entre mazos y categorías.",
+        "source": "Bjork & Bjork (2011)"
+      },
+      "difficulty": {
+        "title": "Dificultades Deseables",
+        "desc": "Hacer la recuperación ligeramente más difícil paradójicamente fortalece la memoria. El sistema de calificación de 4 niveles (Otra vez/Difícil/Bien/Fácil) crea el nivel de desafío adecuado para cada tarjeta.",
+        "source": "Bjork (1994)"
+      },
+      "adaptive": {
+        "title": "Programación Adaptativa",
+        "desc": "Cada tarjeta se adapta de forma independiente según tu rendimiento. Las tarjetas fáciles se espacian a meses; las difíciles se mantienen cercanas hasta dominarlas.",
+        "source": "Lindsey et al. (2014)"
+      }
     }
   },
   "seo": {
