@@ -14,11 +14,11 @@ const sizeClasses = {
 }
 
 const BADGE_CONFIG: Record<BadgeType, { label: string; bgClass: string; textClass: string }> = {
-  verified: { label: 'Verified', bgClass: 'bg-blue-100', textClass: 'text-blue-700' },
+  verified: { label: 'Verified', bgClass: 'bg-brand/15', textClass: 'text-brand' },
   official: { label: 'Official', bgClass: 'bg-purple-100', textClass: 'text-purple-700' },
-  educator: { label: 'Educator', bgClass: 'bg-green-100', textClass: 'text-green-700' },
-  publisher: { label: 'Publisher', bgClass: 'bg-amber-100', textClass: 'text-amber-700' },
-  partner: { label: 'Partner', bgClass: 'bg-red-100', textClass: 'text-red-700' },
+  educator: { label: 'Educator', bgClass: 'bg-success/15', textClass: 'text-success' },
+  publisher: { label: 'Publisher', bgClass: 'bg-warning/15', textClass: 'text-warning' },
+  partner: { label: 'Partner', bgClass: 'bg-destructive/15', textClass: 'text-destructive' },
 }
 
 export function OfficialBadge({ className = '', size = 'sm', badgeType = 'verified', badgeColor }: OfficialBadgeProps) {

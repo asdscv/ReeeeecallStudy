@@ -92,14 +92,14 @@ export function ReminderSettings() {
   if (!loaded) return null
 
   return (
-    <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+    <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-1">
-        <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <Bell className="w-5 h-5 text-muted-foreground" />
+        <h2 className="text-lg font-semibold text-foreground">
           {t('reminders.title', 'Study Reminders')}
         </h2>
       </div>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         {t('reminders.description', 'Get reminded to study daily, just like Duolingo.')}
       </p>
 
@@ -112,10 +112,10 @@ export function ReminderSettings() {
             onChange={(e) => toggleEnabled(e.target.checked)}
             className="sr-only peer"
           />
-          <div className="w-10 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:ring-2 peer-focus:ring-blue-500/20 rounded-full peer peer-checked:bg-blue-500 transition-colors" />
-          <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-4 transition-transform" />
+          <div className="w-10 h-6 bg-accent peer-focus:ring-2 peer-focus:ring-brand/20 rounded-full peer peer-checked:bg-brand transition-colors" />
+          <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-card rounded-full shadow peer-checked:translate-x-4 transition-transform" />
         </div>
-        <span className="text-sm text-gray-700 dark:text-gray-300">
+        <span className="text-sm text-foreground">
           {t('reminders.enable', 'Enable reminders')}
         </span>
       </label>
@@ -124,13 +124,13 @@ export function ReminderSettings() {
         <div className="space-y-4">
           {/* Time picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               {t('reminders.time', 'Reminder time')}
             </label>
             <select
               value={hour}
               onChange={(e) => changeHour(parseInt(e.target.value, 10))}
-              className="w-40 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="w-40 px-3 py-2 rounded-lg border border-border bg-card text-foreground text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
             >
               {Array.from({ length: 24 }, (_, i) => (
                 <option key={i} value={i}>
@@ -142,7 +142,7 @@ export function ReminderSettings() {
 
           {/* Day selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               {t('reminders.days', 'Reminder days')}
             </label>
             <div className="flex flex-wrap gap-2">
@@ -153,8 +153,8 @@ export function ReminderSettings() {
                   onClick={() => toggleDay(day)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
                     days.includes(day)
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? 'bg-brand text-white'
+                      : 'bg-accent text-muted-foreground hover:bg-accent'
                   }`}
                 >
                   {t(`reminders.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
@@ -164,7 +164,7 @@ export function ReminderSettings() {
           </div>
 
           {/* Preview */}
-          <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg px-3 py-2">
+          <p className="text-sm text-muted-foreground bg-muted rounded-lg px-3 py-2">
             {t('reminders.preview', 'You\'ll receive reminders at {{time}} on {{days}}', {
               time: formatTime(hour),
               days: days.map((d) => t(`reminders.${d}`, d)).join(', '),

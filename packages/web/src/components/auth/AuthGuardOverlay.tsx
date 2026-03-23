@@ -20,10 +20,10 @@ const FIRST_FLIP_DELAY = 750  // Show front briefly, then flip
 const FLIP_INTERVAL = 3000
 const RATING_BUTTONS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = [
-  'bg-red-500 text-white shadow-red-500/40',
+  'bg-destructive text-white shadow-red-500/40',
   'bg-orange-500 text-white shadow-orange-500/40',
   'bg-emerald-500 text-white shadow-emerald-500/40',
-  'bg-blue-500 text-white shadow-blue-500/40',
+  'bg-brand text-white shadow-blue-500/40',
 ]
 
 function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null }) {
@@ -72,18 +72,18 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
       <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-blue-500/30 via-cyan-400/30 to-violet-500/30 blur-sm opacity-60 -z-10" />
 
       {/* Browser chrome */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-gray-900/90 border-b border-white/5">
+      <div className="flex items-center gap-2 px-4 py-3 bg-foreground/90 border-b border-white/5">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-400/80" />
-          <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-          <div className="w-3 h-3 rounded-full bg-green-400/80" />
+          <div className="w-3 h-3 rounded-full bg-warning/80" />
+          <div className="w-3 h-3 rounded-full bg-success/80" />
         </div>
         <div className="ml-3 flex-1 max-w-xs">
-          <div className="px-3 py-1.5 bg-white/5 rounded-lg text-xs text-gray-300 font-mono flex items-center gap-2 border border-white/5">
+          <div className="px-3 py-1.5 bg-card/5 rounded-lg text-xs text-content-tertiary font-mono flex items-center gap-2 border border-white/5">
             <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            <span className="text-gray-400">reeeeecallstudy.xyz</span>
+            <span className="text-content-tertiary">reeeeecallstudy.xyz</span>
           </div>
         </div>
       </div>
@@ -101,12 +101,12 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
 
         {/* Tagline pill */}
         <motion.div
-          className="mb-5 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20"
+          className="mb-5 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <span className="text-xs font-medium text-blue-400 tracking-wide">
+          <span className="text-xs font-medium text-brand/70 tracking-wide">
             {t('preview.tagline', 'Smart Flashcard Learning Platform')}
           </span>
         </motion.div>
@@ -114,7 +114,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
         {/* Flashcard with flip */}
         <div className="w-full max-w-[280px] sm:max-w-sm h-44 sm:h-52 [perspective:1200px] mb-5 sm:mb-6 relative">
           {/* Card glow reflection */}
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 bg-blue-500/15 blur-2xl rounded-full" />
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 bg-brand/15 blur-2xl rounded-full" />
 
           <motion.div
             className="relative w-full h-full [transform-style:preserve-3d]"
@@ -124,7 +124,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
             {/* Front */}
             <div className="absolute inset-0 [backface-visibility:hidden] bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-6 shadow-xl shadow-blue-600/25 border border-white/10">
               <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2)_0%,transparent_50%)]" />
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-white/10 text-[10px] text-white/50 font-medium">
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-card/10 text-[10px] text-white/50 font-medium">
                 Q
               </div>
               <p className="text-3xl sm:text-4xl font-bold text-white relative">
@@ -137,7 +137,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
             {/* Back */}
             <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-600 rounded-2xl flex flex-col items-center justify-center p-4 sm:p-6 shadow-xl shadow-cyan-600/25 border border-white/10">
               <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2)_0%,transparent_50%)]" />
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-white/10 text-[10px] text-white/50 font-medium">
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-card/10 text-[10px] text-white/50 font-medium">
                 A
               </div>
               <p className="text-3xl sm:text-4xl font-bold text-white relative">
@@ -161,7 +161,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
               className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${
                 highlightIdx === i
                   ? `${RATING_COLORS[i]} shadow-lg scale-105`
-                  : 'bg-white/5 text-gray-500 border border-white/10'
+                  : 'bg-card/5 text-muted-foreground border border-white/10'
               }`}
               animate={highlightIdx === i ? { scale: 1.1, y: -2 } : { scale: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -173,11 +173,11 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
 
         {/* Progress bar */}
         <div className="mt-5 w-full max-w-[280px] sm:max-w-sm">
-          <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1.5">
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1.5">
             <span>{t('preview.mockCards', '12/30 cards')}</span>
-            <span className="text-blue-400/70">40%</span>
+            <span className="text-brand/70/70">40%</span>
           </div>
-          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-card/5 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
               initial={{ width: 0 }}
@@ -231,7 +231,7 @@ export function AuthGuardOverlay() {
       {/* Floating orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-blue-500/15 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-brand/15 rounded-full blur-3xl"
           animate={prefersReduced ? undefined : { y: [0, -30, 0], x: [0, 15, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -252,7 +252,7 @@ export function AuthGuardOverlay() {
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-white/30 rounded-full"
+            className="absolute w-1 h-1 bg-card/30 rounded-full"
             style={{
               top: `${15 + i * 14}%`,
               left: `${10 + ((i * 17) % 80)}%`,
@@ -307,7 +307,7 @@ export function AuthGuardOverlay() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: d + 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 sm:p-10 relative overflow-hidden">
+            <div className="bg-card/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 sm:p-10 relative overflow-hidden">
               {/* Inner gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none rounded-3xl" />
 
@@ -320,7 +320,7 @@ export function AuthGuardOverlay() {
                   transition={{ duration: 0.5, delay: d + 0.4, type: 'spring', stiffness: 200, damping: 15 }}
                 >
                   <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-blue-500/30 blur-xl scale-150" />
+                    <div className="absolute inset-0 rounded-full bg-brand/30 blur-xl scale-150" />
                     <img
                       src="/favicon.png"
                       alt="Reeeeecall"
@@ -364,7 +364,7 @@ export function AuthGuardOverlay() {
                   {FEATURES.map((feat, i) => (
                     <motion.div
                       key={feat.key}
-                      className="flex-1 bg-white/5 backdrop-blur border border-white/10 rounded-xl p-3 sm:p-4 flex flex-col items-center gap-2"
+                      className="flex-1 bg-card/5 backdrop-blur border border-white/10 rounded-xl p-3 sm:p-4 flex flex-col items-center gap-2"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: d + 0.8 + i * 0.1 }}
@@ -396,7 +396,7 @@ export function AuthGuardOverlay() {
                 {/* Secondary button */}
                 <motion.button
                   onClick={handleLogin}
-                  className="w-full mt-3 rounded-xl py-3 text-sm font-medium text-white/80 bg-white/5 border border-white/20 hover:bg-white/10 transition-colors"
+                  className="w-full mt-3 rounded-xl py-3 text-sm font-medium text-white/80 bg-card/5 border border-white/20 hover:bg-card/10 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4, delay: d + 1.3 }}

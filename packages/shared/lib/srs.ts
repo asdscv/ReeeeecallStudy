@@ -58,9 +58,8 @@ function applyMeanReversion(ease: number): number {
  *
  * Max growth: 3× current interval per single review.
  */
-function capGrowth(newInterval: number, currentInterval: number, maxInterval: number): number {
-  const MAX_GROWTH_FACTOR = 3
-  const capped = Math.min(newInterval, currentInterval * MAX_GROWTH_FACTOR)
+function capGrowth(newInterval: number, currentInterval: number, maxInterval: number, growthFactor: number = 3): number {
+  const capped = Math.min(newInterval, currentInterval * growthFactor)
   return Math.min(capped, maxInterval)
 }
 
@@ -278,8 +277,8 @@ function calculateReview(
         // Use current (updated) ease, not card.ease_factor (pre-update value)
         const goodIvl = Math.max(hardIvl + 1, Math.round(card.interval_days * ease))
         interval = Math.max(goodIvl + 1, Math.round(card.interval_days * ease * 1.3))
-        // Phase 0.3: Cap growth — diminishing returns
-        interval = capGrowth(interval, card.interval_days, maxIvl)
+        // Phase 0.3: Cap growth — easy gets 3.5× cap (vs good's 3×) to preserve ordering
+        interval = capGrowth(interval, card.interval_days, maxIvl, 3.5)
       }
       interval = Math.min(interval, maxIvl)
       return {

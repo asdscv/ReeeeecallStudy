@@ -11,11 +11,11 @@ export function OverviewStatsCards({ stats, streak }: OverviewStatsCardsProps) {
   const { t } = useTranslation('history')
 
   const items = [
-    { label: t('overview.sessions'), value: t('overview.sessionsValue', { count: stats.totalSessions }), color: 'text-gray-900' },
-    { label: t('overview.studyCards'), value: t('overview.cardsValue', { count: stats.totalCardsStudied }), color: 'text-blue-600' },
+    { label: t('overview.sessions'), value: t('overview.sessionsValue', { count: stats.totalSessions }), color: 'text-foreground' },
+    { label: t('overview.studyCards'), value: t('overview.cardsValue', { count: stats.totalCardsStudied }), color: 'text-brand' },
     { label: t('overview.totalTime'), value: formatDuration(stats.totalTimeMs), color: 'text-purple-600' },
-    { label: t('overview.avgPerformance'), value: `${stats.avgPerformance}%`, color: 'text-green-600' },
-    { label: t('overview.streak'), value: t('overview.streakValue', { count: streak }), color: 'text-amber-600' },
+    { label: t('overview.avgPerformance'), value: `${stats.avgPerformance}%`, color: 'text-success' },
+    { label: t('overview.streak'), value: t('overview.streakValue', { count: streak }), color: 'text-warning' },
   ]
 
   return (
@@ -23,9 +23,9 @@ export function OverviewStatsCards({ stats, streak }: OverviewStatsCardsProps) {
       {items.map((item) => (
         <div
           key={item.label}
-          className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4"
+          className="bg-card rounded-xl border border-border p-3 sm:p-4"
         >
-          <p className="text-xs text-gray-500 mb-0.5">{item.label}</p>
+          <p className="text-xs text-muted-foreground mb-0.5">{item.label}</p>
           <p className={`text-xl sm:text-2xl font-bold ${item.color}`}>{item.value}</p>
         </div>
       ))}

@@ -53,12 +53,12 @@ export function DailyQuestsWidget() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 animate-pulse">
-        <div className="h-5 bg-gray-200 rounded w-32 mb-3" />
+      <div className="bg-card rounded-xl border border-border p-4 sm:p-5 animate-pulse">
+        <div className="h-5 bg-accent rounded w-32 mb-3" />
         <div className="space-y-3">
-          <div className="h-10 bg-gray-100 rounded" />
-          <div className="h-10 bg-gray-100 rounded" />
-          <div className="h-10 bg-gray-100 rounded" />
+          <div className="h-10 bg-accent rounded" />
+          <div className="h-10 bg-accent rounded" />
+          <div className="h-10 bg-accent rounded" />
         </div>
       </div>
     )
@@ -67,8 +67,8 @@ export function DailyQuestsWidget() {
   if (quests.length === 0) return null
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-      <h3 className="text-sm font-semibold text-gray-800 mb-3">
+    <div className="bg-card rounded-xl border border-border p-4 sm:p-5">
+      <h3 className="text-sm font-semibold text-foreground mb-3">
         {t('quests.title')}
       </h3>
       <div className="space-y-3">
@@ -83,8 +83,8 @@ export function DailyQuestsWidget() {
               key={quest.id}
               className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
                 quest.completed
-                  ? 'bg-green-50 border border-green-200'
-                  : 'bg-gray-50 border border-gray-100'
+                  ? 'bg-success/10 border border-success/30'
+                  : 'bg-muted border border-border'
               } ${isPulsing ? 'animate-quest-pulse' : ''}`}
             >
               <span className="text-lg flex-shrink-0">
@@ -93,27 +93,27 @@ export function DailyQuestsWidget() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <p className={`text-xs font-medium truncate ${
-                    quest.completed ? 'text-green-700' : 'text-gray-700'
+                    quest.completed ? 'text-success' : 'text-foreground'
                   }`}>
                     {quest.completed
                       ? t('quests.completed')
                       : t(`quests.${quest.quest_type}`, { target: quest.target_value })}
                   </p>
                   <span className={`text-xs font-medium flex-shrink-0 ml-2 ${
-                    quest.completed ? 'text-green-600' : 'text-yellow-600'
+                    quest.completed ? 'text-success' : 'text-warning'
                   }`}>
                     {t('quests.xpReward', { xp: quest.xp_reward })}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                <div className="w-full bg-accent rounded-full h-1.5">
                   <div
                     className={`h-1.5 rounded-full transition-all duration-500 ${
-                      quest.completed ? 'bg-green-500' : 'bg-blue-500'
+                      quest.completed ? 'bg-success' : 'bg-brand'
                     }`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-gray-500 mt-0.5">
+                <p className="text-[10px] text-muted-foreground mt-0.5">
                   {quest.current_value} / {quest.target_value}
                 </p>
               </div>

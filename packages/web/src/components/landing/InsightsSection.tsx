@@ -15,7 +15,7 @@ export function InsightsSection() {
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-3">
               {t('nav.blog', 'Insights')}
             </h2>
           </div>
@@ -50,7 +50,7 @@ export function InsightsSection() {
           <div className="text-center mt-8">
             <Link
               to="/insight"
-              className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800 transition no-underline"
+              className="inline-flex items-center gap-2 text-brand font-semibold hover:text-brand transition no-underline"
             >
               {t('nav.blog', 'Insights')} <ArrowRight className="w-4 h-4" />
             </Link>

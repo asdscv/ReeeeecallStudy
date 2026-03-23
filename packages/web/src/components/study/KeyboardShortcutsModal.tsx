@@ -57,13 +57,13 @@ export function KeyboardShortcutsModal({ open, onClose, mode = 'srs', isSwipeMod
         </DialogHeader>
         <div className="space-y-3 mt-2">
           {allShortcuts.map((shortcut, i) => (
-            <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <span className="text-sm text-gray-700">{shortcut.label}</span>
+            <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+              <span className="text-sm text-foreground">{shortcut.label}</span>
               <div className="flex items-center gap-1">
                 {shortcut.keys.map((key) => (
                   <kbd
                     key={key}
-                    className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-xs font-mono font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded"
+                    className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-xs font-mono font-medium text-foreground bg-accent border border-border rounded"
                   >
                     {key}
                   </kbd>
@@ -73,7 +73,7 @@ export function KeyboardShortcutsModal({ open, onClose, mode = 'srs', isSwipeMod
           ))}
 
           {isSwipeMode && (
-            <div className="pt-2 text-xs text-gray-500 text-center">
+            <div className="pt-2 text-xs text-muted-foreground text-center">
               {t('shortcuts.swipeHint', 'In swipe mode, swipe left/right to rate cards.')}
             </div>
           )}

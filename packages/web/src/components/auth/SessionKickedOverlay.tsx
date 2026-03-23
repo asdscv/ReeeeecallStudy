@@ -13,7 +13,7 @@ function FloatingOrbs({ prefersReduced }: { prefersReduced: boolean | null }) {
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* Warm warning orbs */}
       <motion.div
-        className="absolute top-1/4 -left-20 w-[300px] h-[300px] bg-amber-500/15 rounded-full blur-3xl"
+        className="absolute top-1/4 -left-20 w-[300px] h-[300px] bg-warning/15 rounded-full blur-3xl"
         animate={{ y: [0, -30, 0], x: [0, 15, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
@@ -75,7 +75,7 @@ function DeviceIllustration({ prefersReduced }: { prefersReduced: boolean | null
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.5, ease }}
       >
-        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-card/5 border border-white/10 flex items-center justify-center">
           <Monitor className="w-5 h-5 text-white/60" />
         </div>
       </motion.div>
@@ -86,7 +86,7 @@ function DeviceIllustration({ prefersReduced }: { prefersReduced: boolean | null
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.5, ease }}
       >
-        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-card/5 border border-white/10 flex items-center justify-center">
           <Smartphone className="w-5 h-5 text-white/60" />
         </div>
       </motion.div>
@@ -175,7 +175,7 @@ export function SessionKickedOverlay() {
           transition={{ duration: 0.6, ease, delay: d }}
         >
           {/* Glass card */}
-          <div className="relative bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="relative bg-card/[0.07] backdrop-blur-xl border border-white/15 rounded-3xl shadow-2xl overflow-hidden">
             {/* Top gradient accent */}
             <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
@@ -191,7 +191,7 @@ export function SessionKickedOverlay() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: d + 0.4, duration: 0.4, ease }}
               >
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/20 text-amber-300 text-xs font-medium">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning/10 border border-amber-400/20 text-amber-300 text-xs font-medium">
                   <Wifi className="w-3 h-3" />
                   {t('sessionKicked.badge')}
                 </span>
@@ -224,11 +224,11 @@ export function SessionKickedOverlay() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: d + 0.7, duration: 0.5, ease }}
               >
-                <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+                <div className="bg-card/5 border border-white/10 rounded-xl p-3 text-center">
                   <Monitor className="w-5 h-5 text-amber-300/80 mx-auto mb-1.5" />
                   <p className="text-white/50 text-xs">{t('sessionKicked.info.otherDevice')}</p>
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+                <div className="bg-card/5 border border-white/10 rounded-xl p-3 text-center">
                   <Shield className="w-5 h-5 text-amber-300/80 mx-auto mb-1.5" />
                   <p className="text-white/50 text-xs">{t('sessionKicked.info.security')}</p>
                 </div>
@@ -256,7 +256,7 @@ export function SessionKickedOverlay() {
               {/* Logout button */}
               <motion.button
                 onClick={handleLogout}
-                className="w-full py-3 rounded-2xl bg-white/5 border border-white/15 text-white/70 font-medium text-sm hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-2xl bg-card/5 border border-white/15 text-white/70 font-medium text-sm hover:bg-card/10 transition-colors flex items-center justify-center gap-2"
                 initial={prefersReduced ? {} : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: d + 1.0, duration: 0.5, ease }}

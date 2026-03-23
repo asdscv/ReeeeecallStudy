@@ -27,11 +27,11 @@ function ErrorFallback({ error, resetError, variant = 'generic' }: FallbackProps
 
   return (
     <div role="alert" className="min-h-[50vh] flex items-center justify-center p-6">
-      <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center max-w-md w-full">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-8 text-center max-w-md w-full">
         {/* Error icon */}
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/15">
           <svg
-            className="h-7 w-7 text-red-600"
+            className="h-7 w-7 text-destructive"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
@@ -45,16 +45,16 @@ function ErrorFallback({ error, resetError, variant = 'generic' }: FallbackProps
           </svg>
         </div>
 
-        <h2 className="text-lg font-semibold text-red-800 mb-2">{title}</h2>
-        <p className="text-sm text-red-600 mb-6">{description}</p>
+        <h2 className="text-lg font-semibold text-destructive mb-2">{title}</h2>
+        <p className="text-sm text-destructive mb-6">{description}</p>
 
         {/* Collapsible error details – dev only */}
         {isDev && (
           <details className="mb-6 text-left">
-            <summary className="cursor-pointer text-xs text-red-500 hover:text-red-700">
+            <summary className="cursor-pointer text-xs text-destructive hover:text-destructive">
               {t('error.boundary.details', 'Error details')}
             </summary>
-            <pre className="mt-2 max-h-40 overflow-auto rounded bg-red-100 p-3 text-xs text-red-800 whitespace-pre-wrap break-words">
+            <pre className="mt-2 max-h-40 overflow-auto rounded bg-destructive/15 p-3 text-xs text-destructive whitespace-pre-wrap break-words">
               {error.message}
               {error.stack && `\n\n${error.stack}`}
             </pre>
@@ -66,13 +66,13 @@ function ErrorFallback({ error, resetError, variant = 'generic' }: FallbackProps
           <button
             type="button"
             onClick={resetError}
-            className="px-5 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+            className="px-5 py-2.5 text-sm font-medium bg-destructive text-white rounded-lg hover:bg-destructive transition cursor-pointer"
           >
             {t('error.boundary.tryAgain', 'Try Again')}
           </button>
           <a
             href="/dashboard"
-            className="px-5 py-2.5 text-sm font-medium bg-white text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition"
+            className="px-5 py-2.5 text-sm font-medium bg-card text-destructive border border-destructive/30 rounded-lg hover:bg-destructive/10 transition"
           >
             {t('error.boundary.goToDashboard', 'Go to Dashboard')}
           </a>

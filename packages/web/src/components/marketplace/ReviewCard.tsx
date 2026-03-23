@@ -21,33 +21,33 @@ export function ReviewCard({ review, isHelpful, isOwnReview, onMarkHelpful }: Re
   const { t } = useTranslation('marketplace')
 
   return (
-    <div className="py-4 border-b border-gray-100 last:border-b-0">
+    <div className="py-4 border-b border-border last:border-b-0">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           {/* Header: user name + rating */}
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-foreground">
               {review.user_display_name || t('reviews.anonymous', { defaultValue: 'Anonymous' })}
             </span>
             <StarRating rating={review.rating} size="sm" />
             {review.is_edited && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-content-tertiary">
                 ({t('reviews.edited', { defaultValue: 'edited' })})
               </span>
             )}
           </div>
 
           {/* Date */}
-          <div className="text-xs text-gray-400 mb-2">{formatDate(review.created_at)}</div>
+          <div className="text-xs text-content-tertiary mb-2">{formatDate(review.created_at)}</div>
 
           {/* Title */}
           {review.title && (
-            <h4 className="text-sm font-semibold text-gray-800 mb-1">{review.title}</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-1">{review.title}</h4>
           )}
 
           {/* Body */}
           {review.body && (
-            <p className="text-sm text-gray-600 whitespace-pre-line">{review.body}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-line">{review.body}</p>
           )}
 
           {/* Helpful button */}
@@ -57,8 +57,8 @@ export function ReviewCard({ review, isHelpful, isOwnReview, onMarkHelpful }: Re
               disabled={isHelpful || isOwnReview}
               className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border transition cursor-pointer ${
                 isHelpful
-                  ? 'bg-blue-50 border-blue-200 text-blue-600'
-                  : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                  ? 'bg-brand/10 border-brand/30 text-brand'
+                  : 'bg-card border-border text-muted-foreground hover:bg-muted'
               } ${isOwnReview ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span>{isHelpful ? '\u{1F44D}' : '\u{1F44D}'}</span>

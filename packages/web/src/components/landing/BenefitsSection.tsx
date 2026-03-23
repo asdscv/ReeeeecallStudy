@@ -14,10 +14,10 @@ export function BenefitsSection() {
       <div className="max-w-4xl mx-auto">
         <ScrollReveal>
           <div className="text-center mb-8 sm:mb-10">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-3 sm:mb-4">
               {t('benefitsSection.title')}
             </h2>
-            <p className="text-gray-500 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
               {t('benefitsSection.subtitle')}
             </p>
           </div>
@@ -27,8 +27,8 @@ export function BenefitsSection() {
           {benefits.map((b, i) => (
             <ScrollReveal key={i} delay={i * 0.06}>
               <div className="flex items-start gap-3 p-3">
-                <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700 text-sm sm:text-base">{b}</span>
+                <CheckCircle2 className="w-5 h-5 text-brand shrink-0 mt-0.5" />
+                <span className="text-foreground text-sm sm:text-base">{b}</span>
               </div>
             </ScrollReveal>
           ))}
@@ -38,7 +38,7 @@ export function BenefitsSection() {
           <div className="text-center">
             <button
               onClick={() => navigate('/auth/login')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-white text-sm font-semibold rounded-xl hover:bg-brand transition shadow-lg shadow-blue-600/20 cursor-pointer"
             >
               {t('benefitsSection.cta')} <ArrowRight className="w-4 h-4" />
             </button>

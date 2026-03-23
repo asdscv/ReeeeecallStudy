@@ -9,10 +9,10 @@ export const COLORS = [
 export const ICONS = ['📚', '📖', '🇨🇳', '🇺🇸', '🇯🇵', '🧠', '💡', '📝']
 
 export const SRS_FIELDS: { key: keyof SrsSettings; labelKey: string; color: string }[] = [
-  { key: 'again_days', labelKey: 'study:srsRating.again', color: 'text-red-500' },
-  { key: 'hard_days', labelKey: 'study:srsRating.hard', color: 'text-amber-500' },
-  { key: 'good_days', labelKey: 'study:srsRating.good', color: 'text-blue-500' },
-  { key: 'easy_days', labelKey: 'study:srsRating.easy', color: 'text-green-500' },
+  { key: 'again_days', labelKey: 'study:srsRating.again', color: 'text-destructive' },
+  { key: 'hard_days', labelKey: 'study:srsRating.hard', color: 'text-warning' },
+  { key: 'good_days', labelKey: 'study:srsRating.good', color: 'text-brand' },
+  { key: 'easy_days', labelKey: 'study:srsRating.easy', color: 'text-success' },
 ]
 
 export interface DeckSettingsFormValues {
@@ -55,8 +55,8 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
     <div className="space-y-4">
       {/* 이름 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('settings.deckName')} <span className="text-red-500">*</span>
+        <label className="block text-sm font-medium text-foreground mb-1">
+          {t('settings.deckName')} <span className="text-destructive">*</span>
         </label>
         <input
           type="text"
@@ -64,13 +64,13 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           onChange={(e) => update({ name: e.target.value })}
           placeholder={t('settings.namePlaceholder')}
           required
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
         />
       </div>
 
       {/* 설명 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           {t('settings.description')}
         </label>
         <textarea
@@ -78,13 +78,13 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           onChange={(e) => update({ description: e.target.value })}
           placeholder={t('settings.descriptionPlaceholder')}
           rows={2}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 resize-none"
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground resize-none"
         />
       </div>
 
       {/* 색상 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.color')}</label>
+        <label className="block text-sm font-medium text-foreground mb-2">{t('settings.color')}</label>
         <div className="flex flex-wrap gap-2">
           {COLORS.map((c) => (
             <button
@@ -92,7 +92,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
               type="button"
               onClick={() => update({ color: c })}
               className={`w-8 h-8 rounded-full cursor-pointer transition-transform ${
-                color === c ? 'ring-2 ring-offset-2 ring-blue-500 scale-110' : ''
+                color === c ? 'ring-2 ring-offset-2 ring-brand scale-110' : ''
               }`}
               style={{ backgroundColor: c }}
             />
@@ -102,7 +102,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
 
       {/* 아이콘 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.icon')}</label>
+        <label className="block text-sm font-medium text-foreground mb-2">{t('settings.icon')}</label>
         <div className="flex flex-wrap gap-2">
           {ICONS.map((ic) => (
             <button
@@ -111,8 +111,8 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
               onClick={() => update({ icon: ic })}
               className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center cursor-pointer transition ${
                 icon === ic
-                  ? 'bg-blue-50 ring-2 ring-blue-500'
-                  : 'bg-gray-50 hover:bg-gray-100'
+                  ? 'bg-brand/10 ring-2 ring-brand'
+                  : 'bg-muted hover:bg-accent'
               }`}
             >
               {ic}
@@ -123,13 +123,13 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
 
       {/* 기본 템플릿 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           {t('settings.defaultTemplate')}
         </label>
         <select
           value={templateId}
           onChange={(e) => update({ templateId: e.target.value })}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
         >
           <option value="">{t('settings.noSelection')}</option>
           {templates.map((tmpl) => (
@@ -142,7 +142,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
 
       {/* SRS 간격 설정 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           {t('settings.srsInterval')}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -157,19 +157,19 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
                 onChange={(e) => updateSrsField(key, parseInt(e.target.value) || 0)}
                 min={0}
                 max={365}
-                className="w-full px-2 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 text-center text-sm"
+                className="w-full px-2 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-center text-sm"
               />
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-1.5">
+        <p className="text-xs text-content-tertiary mt-1.5">
           {t('settings.srsNote')}
         </p>
       </div>
 
       {/* Learning Steps */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           {t('settings.learningSteps')}
         </label>
         <input
@@ -177,16 +177,16 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           value={learningStepsStr}
           onChange={(e) => updateLearningSteps(e.target.value)}
           placeholder="1, 10"
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
         />
-        <p className="text-xs text-gray-400 mt-1.5">
+        <p className="text-xs text-content-tertiary mt-1.5">
           {t('settings.learningStepsNote')}
         </p>
       </div>
 
       {/* Max Interval */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           {t('settings.maxInterval')}
         </label>
         <input
@@ -195,9 +195,9 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           onChange={(e) => update({ srsSettings: { ...srsSettings, max_interval_days: Math.max(1, Math.min(3650, parseInt(e.target.value) || 365)) } })}
           min={1}
           max={3650}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900"
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
         />
-        <p className="text-xs text-gray-400 mt-1.5">
+        <p className="text-xs text-content-tertiary mt-1.5">
           {t('settings.maxIntervalNote')}
         </p>
       </div>

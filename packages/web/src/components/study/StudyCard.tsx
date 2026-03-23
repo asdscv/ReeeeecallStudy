@@ -313,7 +313,7 @@ export function StudyCard({
             */}
             <div
               ref={cardBodyRef}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 h-[40vh] sm:h-[55vh] cursor-pointer relative flex flex-col"
+              className="bg-card rounded-2xl shadow-lg border border-border h-[40vh] sm:h-[55vh] cursor-pointer relative flex flex-col"
               style={cardStyle}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest('button')) return
@@ -343,8 +343,8 @@ export function StudyCard({
               {/* Decorative header */}
               {frontRender.mode !== 'custom' && displaySide === 'front' && (
                 <>
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-2xl z-10" />
-                  <div className="absolute top-2 right-3 text-[10px] font-semibold text-blue-400 tracking-wider uppercase z-10">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-brand rounded-t-2xl z-10" />
+                  <div className="absolute top-2 right-3 text-[10px] font-semibold text-brand/70 tracking-wider uppercase z-10">
                     {t('card.front')}
                   </div>
                 </>
@@ -381,7 +381,7 @@ export function StudyCard({
                         t={t}
                       />
                     ) : (
-                      <div className="text-3xl sm:text-5xl font-bold text-gray-900 text-center tracking-tight break-words">
+                      <div className="text-3xl sm:text-5xl font-bold text-foreground text-center tracking-tight break-words">
                         {frontFace.fallbackValue}
                       </div>
                     )
@@ -396,7 +396,7 @@ export function StudyCard({
                       ) : (
                         <>
                           {frontFace.primaryValue && (
-                            <div className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-6 tracking-wide">
+                            <div className="text-sm sm:text-base text-content-tertiary mb-3 sm:mb-6 tracking-wide">
                               {frontFace.primaryValue}
                             </div>
                           )}
@@ -410,7 +410,7 @@ export function StudyCard({
                               t={t}
                             />
                           ) : (
-                            <div className="text-2xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight break-words">
+                            <div className="text-2xl sm:text-4xl font-bold text-foreground text-center tracking-tight break-words">
                               {backFace.fallbackValue}
                             </div>
                           )}
@@ -422,7 +422,7 @@ export function StudyCard({
 
                 {/* Tap-to-flip hint (front face) */}
                 {displaySide === 'front' && (
-                  <div className="text-xs sm:text-sm text-gray-400 text-center pt-2 sm:pt-4 shrink-0">
+                  <div className="text-xs sm:text-sm text-content-tertiary text-center pt-2 sm:pt-4 shrink-0">
                     {t('card.tapToFlip')}
                   </div>
                 )}
@@ -441,14 +441,14 @@ export function StudyCard({
 
         {/* Swipe hint text */}
         {isFlipped && swipeEnabled && hintText && (
-          <div className="text-center mt-4 text-gray-400 text-sm" data-testid="swipe-hint">
+          <div className="text-center mt-4 text-content-tertiary text-sm" data-testid="swipe-hint">
             {hintText}
           </div>
         )}
 
         {/* Flip hint */}
         {!isFlipped && (
-          <div className="text-center mt-3 sm:mt-6 text-gray-400 text-xs sm:text-sm">
+          <div className="text-center mt-3 sm:mt-6 text-content-tertiary text-xs sm:text-sm">
             {t('card.tapToReveal')}
           </div>
         )}
@@ -490,7 +490,7 @@ function CardFaceLayout({
         return (
           <div key={item.field_key + '-' + idx} className="w-full">
             {needsDivider && (
-              <div className="w-12 h-px bg-gray-200 mx-auto mb-3" />
+              <div className="w-12 h-px bg-accent mx-auto mb-3" />
             )}
             <div className={ttsInfo ? 'flex items-center gap-1 justify-center' : ''}>
               {ttsInfo && (
@@ -500,7 +500,7 @@ function CardFaceLayout({
                     speak(ttsInfo.text, ttsInfo.lang, ttsOptions)
                   }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  className="p-2.5 -m-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0"
+                  className="p-2.5 -m-1.5 text-brand/70 hover:text-brand hover:bg-brand/10 rounded-full transition-colors shrink-0"
                   title={t('card.ttsPlay')}
                 >
                   <Volume2 className="w-5 h-5" />

@@ -12,13 +12,13 @@ export function SimpleRatingButtons({ mode: _mode, onRate }: SimpleRatingButtons
     <div className="flex items-center gap-3">
       <button
         onClick={() => { navigator.vibrate?.(10); onRate('unknown') }}
-        className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 active:scale-95 text-white font-medium transition-all cursor-pointer"
+        className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-destructive hover:bg-destructive active:bg-red-800 active:scale-95 text-white font-medium transition-all cursor-pointer"
       >
         {t('rating.unknown')}
       </button>
       <button
         onClick={() => { navigator.vibrate?.(10); onRate('known') }}
-        className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-green-600 hover:bg-green-700 active:bg-green-800 active:scale-95 text-white font-medium transition-all cursor-pointer"
+        className="flex-1 px-4 sm:px-6 py-3 rounded-xl bg-success hover:bg-success/90 active:bg-green-800 active:scale-95 text-white font-medium transition-all cursor-pointer"
       >
         {t('rating.known')}
       </button>

@@ -49,7 +49,7 @@ export function MarketplacePage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('marketplace:title')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('marketplace:title')}</h1>
         <GuideHelpLink section="marketplace" />
       </div>
 
@@ -65,7 +65,7 @@ export function MarketplacePage() {
       {/* Official Decks Featured Section */}
       {officialListings.length > 0 && (
         <div className="mb-6" data-testid="official-decks-section">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             {'\u2B50'} {t('marketplace:officialDecks', { defaultValue: 'Official Decks' })}
           </h2>
           <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
@@ -73,15 +73,15 @@ export function MarketplacePage() {
               <div
                 key={listing.id}
                 onClick={() => handleListingClick(listing as MarketplaceListing)}
-                className="min-w-[220px] max-w-[260px] bg-white rounded-xl border border-gray-200 p-3 hover:border-blue-300 hover:shadow-md transition cursor-pointer shrink-0"
+                className="min-w-[220px] max-w-[260px] bg-card rounded-xl border border-border p-3 hover:border-brand/30 hover:shadow-md transition cursor-pointer shrink-0"
                 data-testid={`official-listing-${listing.id}`}
               >
-                <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 mb-1">
+                <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">
                   {listing.title}
                 </h3>
                 {listing.owner_display_name && (
                   <div className="flex items-center gap-1 mb-2">
-                    <span className="text-xs text-gray-500 truncate">{listing.owner_display_name}</span>
+                    <span className="text-xs text-muted-foreground truncate">{listing.owner_display_name}</span>
                     <OfficialBadge
                       badgeType={(listing as any).badge_type || 'verified'}
                       badgeColor={(listing as any).badge_color}
@@ -89,7 +89,7 @@ export function MarketplacePage() {
                     />
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-content-tertiary">
                   <span>{listing.card_count} cards</span>
                   <span>{listing.acquire_count} users</span>
                 </div>
@@ -104,9 +104,9 @@ export function MarketplacePage() {
           <div className="text-4xl animate-pulse">{'\uD83C\uDFEA'}</div>
         </div>
       ) : filteredListings.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+        <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">{'\uD83C\uDFEA'}</div>
-          <p className="text-gray-500 text-sm sm:text-base">
+          <p className="text-muted-foreground text-sm sm:text-base">
             {hasActiveFilters
               ? t('marketplace:noResults')
               : t('marketplace:noListings')}
@@ -127,15 +127,15 @@ export function MarketplacePage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-4 sm:mt-6 bg-white rounded-xl border border-gray-200">
-              <span className="text-xs sm:text-sm text-gray-500">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-4 sm:mt-6 bg-card rounded-xl border border-border">
+              <span className="text-xs sm:text-sm text-muted-foreground">
                 {t('common:pagination.rangeOf', { start: startIdx + 1, end: Math.min(startIdx + PAGE_SIZE, filteredListings.length), total: filteredListings.length })}
               </span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
                   disabled={safePage <= 1}
-                  className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                  className="p-2.5 rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -156,8 +156,8 @@ export function MarketplacePage() {
                       onClick={() => setCurrentPage(page)}
                       className={`w-10 h-10 text-sm rounded cursor-pointer ${
                         safePage === page
-                          ? 'bg-blue-600 text-white'
-                          : 'hover:bg-gray-100 text-gray-700'
+                          ? 'bg-brand text-white'
+                          : 'hover:bg-accent text-foreground'
                       }`}
                     >
                       {page}
@@ -167,7 +167,7 @@ export function MarketplacePage() {
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
                   disabled={safePage >= totalPages}
-                  className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                  className="p-2.5 rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

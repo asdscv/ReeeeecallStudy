@@ -278,13 +278,13 @@ export function DeckDetailPage() {
       <div className="mb-4 sm:mb-6">
         <button
           onClick={() => navigate('/decks')}
-          className="text-sm text-gray-500 hover:text-gray-700 mb-2 cursor-pointer"
+          className="text-sm text-muted-foreground hover:text-foreground mb-2 cursor-pointer"
         >
           {t('decks:detail.backToList')}
         </button>
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="text-2xl sm:text-3xl">{deck.icon}</span>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{deck.name}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{deck.name}</h1>
           {isSubscribed && (
             <span className="px-2.5 py-1 text-xs font-medium bg-purple-50 text-purple-700 rounded-full">
               {t('decks:sync.subscribed')}
@@ -293,7 +293,7 @@ export function DeckDetailPage() {
           <GuideHelpLink section="decks" />
         </div>
         {deck.description && (
-          <p className="text-sm sm:text-base text-gray-500">{deck.description}</p>
+          <p className="text-sm sm:text-base text-muted-foreground">{deck.description}</p>
         )}
 
         {/* Sync bar for subscribed decks */}
@@ -308,7 +308,7 @@ export function DeckDetailPage() {
               {isSyncing ? t('decks:sync.syncing') : t('decks:sync.button')}
             </button>
             {pendingCount > 0 && (
-              <span className="px-2.5 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+              <span className="px-2.5 py-1 text-xs font-medium bg-destructive/15 text-destructive rounded-full">
                 {t('decks:sync.pendingChanges', { count: pendingCount })}
               </span>
             )}
@@ -325,16 +325,16 @@ export function DeckDetailPage() {
 
         {/* Stats badges */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3">
-          <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-full">
+          <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-accent text-foreground rounded-full">
             {t('decks:detail.totalCards', { count: cards.length })}
           </span>
           {newCount > 0 && (
-            <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-blue-50 text-blue-700 rounded-full">
+            <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-brand/10 text-brand rounded-full">
               {t('decks:detail.newCards', { count: newCount })}
             </span>
           )}
           {(reviewCount + learningCount) > 0 && (
-            <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-amber-50 text-amber-700 rounded-full">
+            <span className="px-2.5 sm:px-3 py-1 text-xs sm:text-sm bg-warning/10 text-warning rounded-full">
               {t('decks:detail.reviewCards', { count: reviewCount + learningCount })}
             </span>
           )}
@@ -344,14 +344,14 @@ export function DeckDetailPage() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
           <button
             onClick={() => navigate(`/decks/${deckId}/study/setup`)}
-            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('decks:detail.startStudy')}
           </button>
           {!deck.is_readonly && (
             <button
               onClick={() => navigate(`/decks/${deckId}/edit`)}
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
             >
               <Settings className="w-4 h-4" />
               {t('decks:detail.edit')}
@@ -359,7 +359,7 @@ export function DeckDetailPage() {
           )}
           <button
             onClick={() => navigate(`/decks/${deckId}/share`)}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
           >
             <Share2 className="w-4 h-4" />
             {t('decks:detail.share')}
@@ -367,7 +367,7 @@ export function DeckDetailPage() {
           {!deck.is_readonly && (
             <button
               onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               {t('decks:detail.addCard')}
@@ -385,7 +385,7 @@ export function DeckDetailPage() {
           {!deck.is_readonly && (
             <button
               onClick={() => setShowImport(true)}
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
             >
               <Upload className="w-4 h-4" />
               {t('decks:detail.import')}
@@ -393,7 +393,7 @@ export function DeckDetailPage() {
           )}
           <button
             onClick={() => setShowExport(true)}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
           >
             <Download className="w-4 h-4" />
             {t('decks:detail.export')}
@@ -402,15 +402,15 @@ export function DeckDetailPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex border-b border-gray-200 mb-4 overflow-x-auto">
+      <div className="flex border-b border-border mb-4 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 transition cursor-pointer whitespace-nowrap ${
               activeTab === tab.id
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-brand text-brand'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             {tab.label}
@@ -428,12 +428,12 @@ export function DeckDetailPage() {
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); setSelectedIds(new Set()) }}
               placeholder={t('decks:detail.searchPlaceholder')}
-              className="flex-1 px-3 sm:px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-gray-900"
+              className="flex-1 px-3 sm:px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm text-foreground"
             />
             <select
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); setSelectedIds(new Set()) }}
-              className="px-3 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
+              className="px-3 py-2.5 rounded-lg border border-border text-sm text-foreground outline-none"
             >
               <option value="all">{t('decks:detail.allStatus')}</option>
               <option value="new">{t('common:status.new')}</option>
@@ -448,7 +448,7 @@ export function DeckDetailPage() {
                 setCurrentPage(1)
                 setSelectedIds(new Set())
               }}
-              className="px-3 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-700 outline-none"
+              className="px-3 py-2.5 rounded-lg border border-border text-sm text-foreground outline-none"
             >
               {[10, 20, 30, 50, 100].map((n) => (
                 <option key={n} value={n}>{t('decks:detail.perPage', { count: n })}</option>
@@ -458,19 +458,19 @@ export function DeckDetailPage() {
 
           {/* Bulk action bar */}
           {validSelectedCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
-              <span className="text-sm text-blue-700 font-medium">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 p-3 bg-brand/10 rounded-lg">
+              <span className="text-sm text-brand font-medium">
                 {t('decks:detail.selectedCount', { count: validSelectedCount })}
               </span>
               <button
                 onClick={() => setShowBulkDelete(true)}
-                className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 cursor-pointer"
+                className="px-3 py-1.5 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 cursor-pointer"
               >
                 {t('common:delete')}
               </button>
               <button
                 onClick={() => setSelectedIds(new Set())}
-                className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+                className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 {t('common:deselect')}
               </button>
@@ -479,20 +479,20 @@ export function DeckDetailPage() {
 
           {/* Card list */}
           {cards.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+            <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
               <div className="text-4xl sm:text-5xl mb-4">🃏</div>
-              <p className="text-gray-500 mb-4">{t('decks:detail.noCards')}</p>
+              <p className="text-muted-foreground mb-4">{t('decks:detail.noCards')}</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+                  className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
                 >
                   {t('decks:detail.addFirstCard')}
                 </button>
                 {!deck.is_readonly && (
                   <button
                     onClick={() => setShowImport(true)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
                   >
                     <Upload className="w-4 h-4" />
                     {t('decks:detail.importCards')}
@@ -500,7 +500,7 @@ export function DeckDetailPage() {
                 )}
                 <button
                   onClick={() => setShowExport(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
                   {t('decks:detail.downloadTemplate')}
@@ -508,16 +508,16 @@ export function DeckDetailPage() {
               </div>
             </div>
           ) : filteredCards.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+            <div className="bg-card rounded-xl border border-border p-8 text-center text-muted-foreground">
               {t('decks:detail.noSearchResults')}
             </div>
           ) : (
             <>
               {/* Desktop table (hidden on mobile) */}
-              <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
+              <div className="hidden md:block bg-card rounded-xl border border-border overflow-hidden overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200 bg-gray-50">
+                    <tr className="border-b border-border bg-muted">
                       <th className="px-4 py-3 w-10">
                         <input
                           ref={selectAllRef}
@@ -527,21 +527,21 @@ export function DeckDetailPage() {
                           className="cursor-pointer"
                         />
                       </th>
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-10">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase px-4 py-3 w-10">
                         {t('decks:detail.columns.number')}
                       </th>
                       {displayFields.map((field) => (
                         <th
                           key={field.key}
-                          className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3"
+                          className="text-left text-xs font-medium text-muted-foreground uppercase px-4 py-3"
                         >
                           {field.name}
                         </th>
                       ))}
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-24">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase px-4 py-3 w-24">
                         {t('decks:detail.columns.status')}
                       </th>
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase px-4 py-3 w-28">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase px-4 py-3 w-28">
                         {t('decks:detail.columns.addedDate')}
                       </th>
                       <th className="px-4 py-3 w-20" />
@@ -551,7 +551,7 @@ export function DeckDetailPage() {
                     {paginatedCards.map((card, i) => (
                       <tr
                         key={card.id}
-                        className="border-b border-gray-100 hover:bg-gray-50"
+                        className="border-b border-border hover:bg-muted"
                       >
                         <td className="px-4 py-3">
                           <input
@@ -561,11 +561,11 @@ export function DeckDetailPage() {
                             className="cursor-pointer"
                           />
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-400">{startIdx + i + 1}</td>
+                        <td className="px-4 py-3 text-sm text-content-tertiary">{startIdx + i + 1}</td>
                         {displayFields.map((field) => (
                           <td
                             key={field.key}
-                            className="px-4 py-3 text-sm text-gray-900 cursor-pointer max-w-[200px]"
+                            className="px-4 py-3 text-sm text-foreground cursor-pointer max-w-[200px]"
                             onClick={() => handleEditCard(card)}
                           >
                             <div className="truncate">
@@ -576,21 +576,21 @@ export function DeckDetailPage() {
                         <td className="px-4 py-3">
                           <StatusBadge status={card.srs_status} />
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-400">
+                        <td className="px-4 py-3 text-sm text-content-tertiary">
                           {formatLocalDate(card.created_at, dateLocale)}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleEditCard(card)}
-                              className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
+                              className="p-1.5 text-content-tertiary hover:text-brand rounded-md hover:bg-brand/10 transition cursor-pointer"
                               title={t('common:edit')}
                             >
                               <Pencil className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setDeletingCard(card)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+                              className="p-1.5 text-content-tertiary hover:text-destructive rounded-md hover:bg-destructive/10 transition cursor-pointer"
                               title={t('common:delete')}
                             >
                               <Trash2 className="w-4 h-4" />
@@ -614,12 +614,12 @@ export function DeckDetailPage() {
                     onChange={toggleSelectAll}
                     className="cursor-pointer"
                   />
-                  <span className="text-xs text-gray-500">{t('common:selectAllPage')}</span>
+                  <span className="text-xs text-muted-foreground">{t('common:selectAllPage')}</span>
                 </div>
                 {paginatedCards.map((card, i) => (
                   <div
                     key={card.id}
-                    className="bg-white rounded-xl border border-gray-200 p-3"
+                    className="bg-card rounded-xl border border-border p-3"
                   >
                     <div className="flex items-start gap-2">
                       <input
@@ -633,29 +633,29 @@ export function DeckDetailPage() {
                         onClick={() => handleEditCard(card)}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-gray-400">#{startIdx + i + 1}</span>
+                          <span className="text-xs text-content-tertiary">#{startIdx + i + 1}</span>
                           <StatusBadge status={card.srs_status} />
                         </div>
                         {displayFields.slice(0, 3).map((field) => (
-                          <p key={field.key} className="text-sm text-gray-900 truncate">
-                            <span className="text-xs text-gray-400 mr-1">{field.name}:</span>
+                          <p key={field.key} className="text-sm text-foreground truncate">
+                            <span className="text-xs text-content-tertiary mr-1">{field.name}:</span>
                             {card.field_values[field.key] || '-'}
                           </p>
                         ))}
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-content-tertiary mt-1">
                           {formatLocalDate(card.created_at, dateLocale)}
                         </p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => handleEditCard(card)}
-                          className="p-3 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition cursor-pointer"
+                          className="p-3 text-content-tertiary hover:text-brand rounded-md hover:bg-brand/10 transition cursor-pointer"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeletingCard(card)}
-                          className="p-3 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+                          className="p-3 text-content-tertiary hover:text-destructive rounded-md hover:bg-destructive/10 transition cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -667,15 +667,15 @@ export function DeckDetailPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-3 bg-white rounded-xl border border-gray-200">
-                  <span className="text-xs sm:text-sm text-gray-500">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-3 mt-3 bg-card rounded-xl border border-border">
+                  <span className="text-xs sm:text-sm text-muted-foreground">
                     {startIdx + 1}~{Math.min(endIdx, filteredCards.length)} / {t('decks:detail.totalCards', { count: filteredCards.length })}
                   </span>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
                       disabled={safePage <= 1}
-                      className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      className="p-2.5 rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -696,8 +696,8 @@ export function DeckDetailPage() {
                           onClick={() => setCurrentPage(page)}
                           className={`w-10 h-10 text-sm rounded cursor-pointer ${
                             safePage === page
-                              ? 'bg-blue-600 text-white'
-                              : 'hover:bg-gray-100 text-gray-700'
+                              ? 'bg-brand text-white'
+                              : 'hover:bg-accent text-foreground'
                           }`}
                         >
                           {page}
@@ -707,7 +707,7 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
                       disabled={safePage >= totalPages}
-                      className="p-2.5 rounded hover:bg-gray-100 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      className="p-2.5 rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -807,10 +807,10 @@ export function DeckDetailPage() {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    new: 'bg-blue-50 text-blue-700',
-    learning: 'bg-amber-50 text-amber-700',
-    review: 'bg-green-50 text-green-700',
-    suspended: 'bg-gray-100 text-gray-500',
+    new: 'bg-brand/10 text-brand',
+    learning: 'bg-warning/10 text-warning',
+    review: 'bg-success/10 text-success',
+    suspended: 'bg-accent text-muted-foreground',
   }
   const className = styles[status] ?? styles.new
   const label = i18next.t(`common:status.${status}`, { defaultValue: status })

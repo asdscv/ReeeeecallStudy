@@ -24,13 +24,13 @@ export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
   const totalCards = data.reduce((s, d) => s + d.cards, 0)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
       <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <h3 className="text-sm font-medium text-gray-700">{t('charts.studyVolume')}</h3>
-        <span className="text-xs text-gray-400">{t('charts.volumeSummary', { sessions: totalSessions, cards: totalCards })}</span>
+        <h3 className="text-sm font-medium text-foreground">{t('charts.studyVolume')}</h3>
+        <span className="text-xs text-content-tertiary">{t('charts.volumeSummary', { sessions: totalSessions, cards: totalCards })}</span>
       </div>
       {totalSessions === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">{t('charts.noDataForPeriod')}</p>
+        <p className="text-sm text-content-tertiary py-8 text-center">{t('charts.noDataForPeriod')}</p>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData}>

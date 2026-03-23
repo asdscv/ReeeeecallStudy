@@ -28,7 +28,7 @@ export function HeroSection() {
       {!prefersReduced && (
         <>
           <motion.div
-            className="absolute -top-20 -left-20 w-40 sm:w-72 h-40 sm:h-72 bg-blue-400 rounded-full blur-3xl opacity-15 sm:opacity-20"
+            className="absolute -top-20 -left-20 w-40 sm:w-72 h-40 sm:h-72 bg-brand rounded-full blur-3xl opacity-15 sm:opacity-20"
             animate={{ y: [0, -30, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           />
@@ -47,7 +47,7 @@ export function HeroSection() {
         animate="show"
       >
         <motion.div variants={prefersReduced ? undefined : fadeUp}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-600 text-sm font-medium rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand/10 text-brand text-sm font-medium rounded-full mb-6">
             <Zap className="w-4 h-4" />
             {t('hero.badge')}
           </div>
@@ -55,7 +55,7 @@ export function HeroSection() {
 
         <motion.h1
           variants={prefersReduced ? undefined : fadeUp}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-4 sm:mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight mb-4 sm:mb-6"
         >
           {t('hero.title1')}
           <br />
@@ -66,7 +66,7 @@ export function HeroSection() {
 
         <motion.p
           variants={prefersReduced ? undefined : fadeUp}
-          className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
+          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
         >
           {t('hero.subtitle1')}
           <br className="hidden sm:block" />
@@ -79,7 +79,7 @@ export function HeroSection() {
         >
           <motion.button
             onClick={goLogin}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white text-base font-semibold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-brand text-white text-base font-semibold rounded-xl hover:bg-brand transition shadow-lg shadow-blue-600/20 cursor-pointer"
             whileHover={prefersReduced ? undefined : { scale: 1.05, boxShadow: '0 20px 40px rgba(37,99,235,0.3)' }}
             whileTap={prefersReduced ? undefined : { scale: 0.98 }}
           >
@@ -87,7 +87,7 @@ export function HeroSection() {
           </motion.button>
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-            className="w-full sm:w-auto px-8 py-3.5 border border-gray-300 text-gray-700 text-base font-medium rounded-xl hover:bg-gray-50 transition cursor-pointer"
+            className="w-full sm:w-auto px-8 py-3.5 border border-border text-foreground text-base font-medium rounded-xl hover:bg-muted transition cursor-pointer"
           >
             {t('hero.cta.learn')}
           </button>

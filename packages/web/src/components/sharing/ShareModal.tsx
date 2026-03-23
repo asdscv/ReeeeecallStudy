@@ -72,30 +72,30 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={handleClose}>
-      <div className="bg-white rounded-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{t('shareDeck')}</h3>
-          <button onClick={handleClose} className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer">
+      <div className="bg-card rounded-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h3 className="text-lg font-semibold text-foreground">{t('shareDeck')}</h3>
+          <button onClick={handleClose} className="p-1 text-content-tertiary hover:text-muted-foreground cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-4 space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {t('shareDeckDesc', { name: deckName })}
           </p>
 
           {!inviteLink ? (
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">{t('shareMode.label')}</label>
+                <label className="text-sm font-medium text-foreground">{t('shareMode.label')}</label>
                 {SHARE_MODES.map((m) => (
                   <label
                     key={m.value}
                     className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${
                       mode === m.value
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-brand bg-brand/10'
+                        : 'border-border hover:border-border'
                     }`}
                   >
                     <input
@@ -107,42 +107,42 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
                       className="mt-0.5"
                     />
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{t(m.labelKey)}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">{t(m.descKey)}</div>
-                      <div className="text-xs text-gray-400 mt-1 leading-relaxed">{t(m.detailKey)}</div>
+                      <div className="text-sm font-medium text-foreground">{t(m.labelKey)}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{t(m.descKey)}</div>
+                      <div className="text-xs text-content-tertiary mt-1 leading-relaxed">{t(m.detailKey)}</div>
                     </div>
                   </label>
                 ))}
               </div>
 
-              {error && <p className="text-sm text-red-600">{t(error)}</p>}
+              {error && <p className="text-sm text-destructive">{t(error)}</p>}
 
               <button
                 onClick={handleCreate}
                 disabled={loading}
-                className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+                className="w-full py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
               >
                 {loading ? t('creating') : t('createInviteLink')}
               </button>
             </>
           ) : (
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">{t('inviteLink')}</label>
+              <label className="text-sm font-medium text-foreground">{t('inviteLink')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={inviteLink}
                   readOnly
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+                  className="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-muted text-foreground"
                 />
                 <button
                   onClick={handleCopy}
-                  className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                  className="p-2 bg-brand text-white rounded-lg hover:bg-brand transition cursor-pointer"
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {t('linkShareInfo')}
               </p>
             </div>

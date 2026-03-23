@@ -7,7 +7,7 @@ export function FooterSection() {
   const { t } = useTranslation('landing')
 
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 pb-20 sm:pb-0">
+    <footer className="border-t border-border bg-muted pb-20 sm:pb-0">
       <div className="max-w-6xl mx-auto px-4 py-10 sm:py-14">
         <ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
@@ -15,9 +15,9 @@ export function FooterSection() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-3">
                 <img src="/favicon.png" alt="" className="w-8 h-8" />
-                <span className="font-bold text-gray-900 text-lg">ReeeeecallStudy</span>
+                <span className="font-bold text-foreground text-lg">ReeeeecallStudy</span>
               </div>
-              <p className="text-sm text-gray-500 mb-4 max-w-xs">
+              <p className="text-sm text-muted-foreground mb-4 max-w-xs">
                 {t('footer.tagline', 'Smart flashcard learning platform with spaced repetition')}
               </p>
 
@@ -27,27 +27,27 @@ export function FooterSection() {
 
             {/* Product column */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">
+              <h4 className="text-sm font-semibold text-foreground mb-3">
                 {t('footer.product', 'Product')}
               </h4>
               <ul className="space-y-2 list-none p-0 m-0">
                 <li>
-                  <a href="/landing#features" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/landing#features" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.features', 'Features')}
                   </a>
                 </li>
                 <li>
-                  <a href="/landing#stats" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/landing#stats" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.results', 'Results')}
                   </a>
                 </li>
                 <li>
-                  <a href="/landing#how-it-works" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/landing#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.howItWorks', 'How It Works')}
                   </a>
                 </li>
                 <li>
-                  <a href="/landing#faq" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="/landing#faq" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.faq', 'FAQ')}
                   </a>
                 </li>
@@ -56,22 +56,22 @@ export function FooterSection() {
 
             {/* Resources column */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">
+              <h4 className="text-sm font-semibold text-foreground mb-3">
                 {t('footer.resources', 'Resources')}
               </h4>
               <ul className="space-y-2 list-none p-0 m-0">
                 <li>
-                  <Link to="/insight" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <Link to="/insight" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.blog', 'Insights')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/api" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <Link to="/docs/api" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.apiDocs', 'API Docs')}
                   </Link>
                 </li>
                 <li>
-                  <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-gray-500 hover:text-gray-700 transition no-underline">
+                  <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.help', 'Help')}
                   </a>
                 </li>
@@ -80,13 +80,13 @@ export function FooterSection() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm text-gray-400">
+          <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-sm text-content-tertiary">
               {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
             </p>
             <a
               href="mailto:admin@reeeeecallstudy.xyz"
-              className="text-sm text-gray-400 hover:text-gray-600 transition no-underline"
+              className="text-sm text-content-tertiary hover:text-muted-foreground transition no-underline"
             >
               admin@reeeeecallstudy.xyz
             </a>

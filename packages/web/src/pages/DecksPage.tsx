@@ -46,7 +46,7 @@ export function DecksPage() {
     <div>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('decks:title')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('decks:title')}</h1>
           <GuideHelpLink section="decks" />
         </div>
         <div className="flex gap-2">
@@ -58,7 +58,7 @@ export function DecksPage() {
           </button>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('decks:createNew')}
           </button>
@@ -70,12 +70,12 @@ export function DecksPage() {
           <div className="text-4xl animate-pulse">📚</div>
         </div>
       ) : decks.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+        <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📚</div>
-          <p className="text-gray-500 mb-4 text-sm sm:text-base">{t('decks:empty')}</p>
+          <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('decks:empty')}</p>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition cursor-pointer"
+            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('decks:createFirst')}
           </button>

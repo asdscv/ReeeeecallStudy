@@ -18,7 +18,7 @@ const MODE_CLASSES: Record<string, string> = {
 export function VerifiedBadge({ className }: { className?: string }) {
   return (
     <svg
-      className={`w-4 h-4 text-blue-500 shrink-0 ${className ?? ''}`}
+      className={`w-4 h-4 text-brand shrink-0 ${className ?? ''}`}
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-label="Verified publisher"
@@ -38,7 +38,7 @@ export function ListingCard({ listing, onClick, isTrending }: ListingCardProps) 
 
   return (
     <div
-      className="bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition cursor-pointer"
+      className="bg-card rounded-xl border border-border p-4 hover:border-brand/30 hover:shadow-md transition cursor-pointer"
       onClick={() => onClick(listing)}
     >
       <div className="flex items-start justify-between mb-2">
@@ -48,7 +48,7 @@ export function ListingCard({ listing, onClick, isTrending }: ListingCardProps) 
               {'\uD83D\uDD25'}
             </span>
           )}
-          <h3 className="text-base font-semibold text-gray-900 line-clamp-1">{listing.title}</h3>
+          <h3 className="text-base font-semibold text-foreground line-clamp-1">{listing.title}</h3>
         </div>
         <span className={`px-2 py-0.5 text-xs font-medium rounded-full shrink-0 ml-2 ${modeClassName}`}>
           {t(`shareModes.${listing.share_mode}`, listing.share_mode)}
@@ -58,7 +58,7 @@ export function ListingCard({ listing, onClick, isTrending }: ListingCardProps) 
       {/* Publisher line with verified badge */}
       {listing.owner_display_name && (
         <div className="flex items-center gap-1 mb-2">
-          <span className="text-xs text-gray-500 truncate">
+          <span className="text-xs text-muted-foreground truncate">
             {listing.owner_display_name}
           </span>
           {listing.owner_is_official && (
@@ -72,20 +72,20 @@ export function ListingCard({ listing, onClick, isTrending }: ListingCardProps) 
       )}
 
       {listing.description && (
-        <p className="text-sm text-gray-500 mb-3 line-clamp-2">{listing.description}</p>
+        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{listing.description}</p>
       )}
 
       {listing.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {listing.tags.slice(0, 5).map((tag) => (
-            <span key={tag} className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full">
+            <span key={tag} className="px-2 py-0.5 text-xs bg-accent text-muted-foreground rounded-full">
               {tag}
             </span>
           ))}
         </div>
       )}
 
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-xs text-gray-400">
+      <div className="flex items-center justify-between pt-3 border-t border-border text-xs text-content-tertiary">
         <div className="flex items-center gap-3">
           <span>{t('listing.cardCount', { count: listing.card_count })}</span>
           <span className="inline-flex items-center gap-0.5">

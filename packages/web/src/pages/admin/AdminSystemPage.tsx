@@ -8,19 +8,19 @@ import { computeConversionRate } from '../../lib/admin-stats'
 function ProgressBar({ label, value, max, color = 'blue' }: { label: string; value: number; max: number; color?: string }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0
   const colorMap: Record<string, string> = {
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
+    blue: 'bg-brand',
+    green: 'bg-success',
     orange: 'bg-orange-500',
-    red: 'bg-red-500',
+    red: 'bg-destructive',
     purple: 'bg-purple-500',
   }
   return (
     <div>
       <div className="flex items-center justify-between text-xs mb-1">
-        <span className="text-gray-600">{label}</span>
-        <span className="text-gray-900 font-medium">{value.toLocaleString()} / {max.toLocaleString()} ({pct}%)</span>
+        <span className="text-muted-foreground">{label}</span>
+        <span className="text-foreground font-medium">{value.toLocaleString()} / {max.toLocaleString()} ({pct}%)</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="w-full bg-accent rounded-full h-2">
         <div className={`h-2 rounded-full transition-all ${colorMap[color] ?? colorMap.blue}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -29,9 +29,9 @@ function ProgressBar({ label, value, max, color = 'blue' }: { label: string; val
 
 function HealthIndicator({ status, label }: { status: 'healthy' | 'warning' | 'critical'; label: string }) {
   const config = {
-    healthy: { dot: 'bg-green-500', bg: 'bg-green-50', text: 'text-green-700' },
-    warning: { dot: 'bg-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700' },
-    critical: { dot: 'bg-red-500', bg: 'bg-red-50', text: 'text-red-700' },
+    healthy: { dot: 'bg-success', bg: 'bg-success/10', text: 'text-success' },
+    warning: { dot: 'bg-warning', bg: 'bg-warning/10', text: 'text-warning' },
+    critical: { dot: 'bg-destructive', bg: 'bg-destructive/10', text: 'text-destructive' },
   }
   const c = config[status]
   return (
@@ -85,7 +85,7 @@ export function AdminSystemPage() {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+          <div key={i} className="h-32 bg-accent rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -104,8 +104,8 @@ export function AdminSystemPage() {
     <div className="space-y-6">
       {/* System Health */}
       {healthChecks.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('system.healthStatus')}</h3>
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('system.healthStatus')}</h3>
           <div className="flex flex-wrap gap-3">
             {healthChecks.map((check) => (
               <HealthIndicator key={check.key} status={check.status} label={check.label} />
@@ -115,8 +115,8 @@ export function AdminSystemPage() {
       )}
 
       {/* API Keys */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">{t('system.apiKeysSection')}</h3>
+      <div className="bg-card rounded-xl border border-border p-4">
+        <h3 className="text-sm font-medium text-foreground mb-4">{t('system.apiKeysSection')}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           <AdminStatCard icon="🔑" label={t('system.totalApiKeys')} value={stats?.total_api_keys ?? 0} color="blue" />
           <AdminStatCard icon="✅" label={t('system.activeApiKeys')} value={stats?.active_api_keys ?? 0} color="green" subtitle={`${apiKeyActiveRate}%`} />
@@ -133,8 +133,8 @@ export function AdminSystemPage() {
       </div>
 
       {/* Content Pipeline */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">{t('system.contentPipeline')}</h3>
+      <div className="bg-card rounded-xl border border-border p-4">
+        <h3 className="text-sm font-medium text-foreground mb-4">{t('system.contentPipeline')}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
           <AdminStatCard icon="📄" label={t('system.totalContents')} value={stats?.total_contents ?? 0} color="blue" />
           <AdminStatCard icon="📢" label={t('system.publishedContents')} value={stats?.published_contents ?? 0} color="green" subtitle={`${contentPublishRate}%`} />
@@ -146,12 +146,12 @@ export function AdminSystemPage() {
       </div>
 
       {/* Study Logs */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">{t('system.studyActivity')}</h3>
+      <div className="bg-card rounded-xl border border-border p-4">
+        <h3 className="text-sm font-medium text-foreground mb-4">{t('system.studyActivity')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <AdminStatCard icon="📊" label={t('system.totalStudyLogs')} value={stats?.total_study_logs ?? 0} color="blue" size="lg" />
-          <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-center">
-            <p className="text-xs text-gray-500 text-center">
+          <div className="bg-muted rounded-xl p-4 flex items-center justify-center">
+            <p className="text-xs text-muted-foreground text-center">
               {t('system.studyLogsNote')}
             </p>
           </div>

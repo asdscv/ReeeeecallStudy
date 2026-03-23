@@ -23,9 +23,9 @@ interface IconConfig {
 // Category-level defaults
 const CATEGORY_ICONS: Record<string, IconConfig> = {
   streak:    { icon: Flame,     bg: 'bg-orange-100 dark:bg-orange-900/30', color: 'text-orange-500' },
-  study:     { icon: BookOpen,  bg: 'bg-blue-100 dark:bg-blue-900/30',     color: 'text-blue-500' },
+  study:     { icon: BookOpen,  bg: 'bg-brand/15 dark:bg-blue-900/30',     color: 'text-brand' },
   social:    { icon: HandHeart, bg: 'bg-pink-100 dark:bg-pink-900/30',     color: 'text-pink-500' },
-  milestone: { icon: Trophy,    bg: 'bg-yellow-100 dark:bg-yellow-900/30', color: 'text-yellow-500' },
+  milestone: { icon: Trophy,    bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
 }
 
 // Special achievement overrides (by prefix or exact ID)
@@ -35,14 +35,14 @@ const SPECIAL_ICONS: Record<string, IconConfig> = {
   streak_crown:   { icon: Crown,   bg: 'bg-purple-100 dark:bg-purple-900/30', color: 'text-purple-500' },
 
   // Study subtypes
-  sessions:  { icon: Zap,      bg: 'bg-amber-100 dark:bg-amber-900/30',  color: 'text-amber-500' },
+  sessions:  { icon: Zap,      bg: 'bg-warning/15 dark:bg-amber-900/30',  color: 'text-warning' },
   time:      { icon: Clock,    bg: 'bg-teal-100 dark:bg-teal-900/30',    color: 'text-teal-500' },
   mastery:   { icon: Star,     bg: 'bg-indigo-100 dark:bg-indigo-900/30', color: 'text-indigo-500' },
-  cards:     { icon: BookOpen,  bg: 'bg-blue-100 dark:bg-blue-900/30',    color: 'text-blue-500' },
+  cards:     { icon: BookOpen,  bg: 'bg-brand/15 dark:bg-blue-900/30',    color: 'text-brand' },
 
   // Milestones
-  decks:           { icon: Package, bg: 'bg-green-100 dark:bg-green-900/30', color: 'text-green-500' },
-  first_deck:      { icon: Package, bg: 'bg-green-100 dark:bg-green-900/30', color: 'text-green-500' },
+  decks:           { icon: Package, bg: 'bg-success/15 dark:bg-green-900/30', color: 'text-success' },
+  first_deck:      { icon: Package, bg: 'bg-success/15 dark:bg-green-900/30', color: 'text-success' },
   perfect_session: { icon: Target,  bg: 'bg-emerald-100 dark:bg-emerald-900/30', color: 'text-emerald-500' },
   night_owl:       { icon: Moon,    bg: 'bg-violet-100 dark:bg-violet-900/30', color: 'text-violet-500' },
   early_bird:      { icon: Sun,     bg: 'bg-orange-100 dark:bg-orange-900/30', color: 'text-orange-400' },
@@ -51,17 +51,17 @@ const SPECIAL_ICONS: Record<string, IconConfig> = {
   // Social
   shares:          { icon: HandHeart, bg: 'bg-pink-100 dark:bg-pink-900/30', color: 'text-pink-500' },
   first_share:     { icon: HandHeart, bg: 'bg-pink-100 dark:bg-pink-900/30', color: 'text-pink-500' },
-  reviews:         { icon: Star,     bg: 'bg-yellow-100 dark:bg-yellow-900/30', color: 'text-yellow-500' },
-  first_review:    { icon: Star,     bg: 'bg-yellow-100 dark:bg-yellow-900/30', color: 'text-yellow-500' },
-  market_acquire:  { icon: Award,    bg: 'bg-blue-100 dark:bg-blue-900/30', color: 'text-blue-500' },
+  reviews:         { icon: Star,     bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
+  first_review:    { icon: Star,     bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
+  market_acquire:  { icon: Award,    bg: 'bg-brand/15 dark:bg-blue-900/30', color: 'text-brand' },
 }
 
 // Tier icons based on DB icon field (💎, 👑, 🏆)
 const TIER_ICONS: Record<string, IconConfig> = {
   '💎': { icon: Diamond, bg: 'bg-cyan-100 dark:bg-cyan-900/30', color: 'text-cyan-500' },
   '👑': { icon: Crown,   bg: 'bg-purple-100 dark:bg-purple-900/30', color: 'text-purple-500' },
-  '🏆': { icon: Trophy,  bg: 'bg-yellow-100 dark:bg-yellow-900/30', color: 'text-yellow-600' },
-  '🏅': { icon: Medal,   bg: 'bg-amber-100 dark:bg-amber-900/30', color: 'text-amber-500' },
+  '🏆': { icon: Trophy,  bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
+  '🏅': { icon: Medal,   bg: 'bg-warning/15 dark:bg-amber-900/30', color: 'text-warning' },
   '🛡️': { icon: Shield,  bg: 'bg-slate-100 dark:bg-slate-900/30', color: 'text-slate-500' },
 }
 
@@ -128,9 +128,9 @@ export function AchievementIcon({
 
   return (
     <div className={`${sizeClasses[size]} rounded-full flex items-center justify-center ${
-      earned ? config.bg : 'bg-gray-100 dark:bg-gray-700'
+      earned ? config.bg : 'bg-accent'
     } ${!earned ? 'opacity-40' : ''} transition-all`}>
-      <Icon className={`${iconSizes[size]} ${earned ? config.color : 'text-gray-400'}`} />
+      <Icon className={`${iconSizes[size]} ${earned ? config.color : 'text-content-tertiary'}`} />
     </div>
   )
 }

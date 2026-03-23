@@ -8,13 +8,13 @@ import { computeEngagementMetrics, formatTotalStudyTime, formatStatNumber, compu
 import type { TrendChange } from '../../lib/admin-stats'
 
 function TrendBadge({ trend, label }: { trend: TrendChange; label?: string }) {
-  if (trend.direction === 'flat') return <span className="text-xs text-gray-400">-</span>
-  const color = trend.direction === 'up' ? 'text-green-600' : 'text-red-500'
+  if (trend.direction === 'flat') return <span className="text-xs text-content-tertiary">-</span>
+  const color = trend.direction === 'up' ? 'text-success' : 'text-destructive'
   const arrow = trend.direction === 'up' ? '\u2191' : '\u2193'
   return (
     <span className={`text-xs font-medium ${color}`}>
       {arrow} {Math.abs(trend.change)}%
-      {label && <span className="text-gray-400 font-normal ml-1">{label}</span>}
+      {label && <span className="text-content-tertiary font-normal ml-1">{label}</span>}
     </span>
   )
 }
@@ -76,7 +76,7 @@ export function AdminOverviewPage() {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+          <div key={i} className="h-32 bg-accent rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -92,25 +92,25 @@ export function AdminOverviewPage() {
     <div className="space-y-6">
       {/* Health Score + Key Metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col items-center justify-center">
+        <div className="bg-card rounded-xl border border-border p-4 flex flex-col items-center justify-center">
           <HealthScoreRing score={healthScore} />
-          <p className="text-xs text-gray-500 mt-1">{t('overview.healthScore')}</p>
+          <p className="text-xs text-muted-foreground mt-1">{t('overview.healthScore')}</p>
         </div>
 
         {/* WoW Trend Indicators */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('overview.weekOverWeek')}</h3>
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('overview.weekOverWeek')}</h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">{t('study.sessions')}</p>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">{t('study.sessions')}</p>
               <TrendBadge trend={wow.sessions} />
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">{t('overview.activeUsers')}</p>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">{t('overview.activeUsers')}</p>
               <TrendBadge trend={wow.activeUsers} />
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">{t('study.cards')}</p>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">{t('study.cards')}</p>
               <TrendBadge trend={wow.cards} />
             </div>
           </div>
@@ -156,7 +156,7 @@ export function AdminOverviewPage() {
       {/* Engagement */}
       {activeUsers && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">{t('overview.engagement')}</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-3">{t('overview.engagement')}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <AdminStatCard icon="📊" label={t('overview.dau')} value={activeUsers.dau} color="blue" />
             <AdminStatCard icon="📈" label={t('overview.wau')} value={activeUsers.wau} color="green" />

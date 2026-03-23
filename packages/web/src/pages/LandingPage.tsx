@@ -59,7 +59,7 @@ export function LandingPage() {
   ].filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <SEOHead
         title={t('seo.title')}
         description={t('seo.description')}

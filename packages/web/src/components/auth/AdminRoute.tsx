@@ -7,7 +7,7 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
   // Show loading while auth or role is still resolving
   if (loading || (user && role === null)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <img src="/favicon.png" alt="" className="w-12 h-12 animate-pulse" />
       </div>
     )

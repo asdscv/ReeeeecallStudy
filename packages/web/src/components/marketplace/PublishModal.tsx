@@ -50,42 +50,42 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{t('sharing:publish.title')}</h3>
-          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer">
+      <div className="bg-card rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h3 className="text-lg font-semibold text-foreground">{t('sharing:publish.title')}</h3>
+          <button onClick={onClose} className="p-1 text-content-tertiary hover:text-muted-foreground cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sharing:publish.titleLabel')}</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('sharing:publish.titleLabel')}</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sharing:publish.description')}</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('sharing:publish.description')}</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none resize-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sharing:publish.category')}</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('sharing:publish.category')}</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm outline-none"
             >
               {MARKETPLACE_CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>{t(c.labelKey)}</option>
@@ -94,26 +94,26 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sharing:publish.tags')}</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('sharing:publish.tags')}</label>
             <input
               type="text"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
               placeholder={t('sharing:publish.tagsPlaceholder')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sharing:publish.shareMode')}</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('sharing:publish.shareMode')}</label>
             <div className="space-y-2">
               {PUBLISH_SHARE_MODES.map((m) => (
                 <label
                   key={m.value}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${
                     shareMode === m.value
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-brand bg-brand/10'
+                      : 'border-border hover:border-border'
                   }`}
                 >
                   <input
@@ -125,21 +125,21 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
                     className="mt-0.5"
                   />
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{t(m.label)}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{t(m.desc)}</div>
-                    <div className="text-xs text-gray-400 mt-1 leading-relaxed">{t(m.detail)}</div>
+                    <div className="text-sm font-medium text-foreground">{t(m.label)}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{t(m.desc)}</div>
+                    <div className="text-xs text-content-tertiary mt-1 leading-relaxed">{t(m.detail)}</div>
                   </div>
                 </label>
               ))}
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-600">{t(error)}</p>}
+          {error && <p className="text-sm text-destructive">{t(error)}</p>}
 
           <button
             type="submit"
             disabled={loading || !title.trim()}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+            className="w-full py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
           >
             {loading ? t('sharing:publish.publishing') : t('sharing:publish.submit')}
           </button>

@@ -16,13 +16,13 @@ export function CtaBlock({ props }: { props: CtaBlockType['props'] }) {
   }
 
   return (
-    <div className="bg-gray-900 text-white rounded-2xl p-8 sm:p-12 text-center my-10">
+    <div className="bg-foreground text-white rounded-2xl p-8 sm:p-12 text-center my-10">
       <h3 className="text-2xl sm:text-3xl font-bold mb-3">{stripMarkdownText(props.title)}</h3>
-      <p className="text-gray-400 mb-6">{stripMarkdownText(props.description)}</p>
+      <p className="text-content-tertiary mb-6">{stripMarkdownText(props.description)}</p>
       <Link
         to={props.buttonUrl}
         onClick={handleClick}
-        className="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition no-underline"
+        className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand text-white font-semibold rounded-xl hover:bg-brand transition no-underline"
       >
         {stripMarkdownText(props.buttonText)}
         <ArrowRight className="w-5 h-5" />

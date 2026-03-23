@@ -9,10 +9,10 @@ interface SrsRatingButtonsProps {
 }
 
 const buttons: { rating: SrsRating; key: string; color: string }[] = [
-  { rating: 'again', key: '1', color: 'bg-red-500 hover:bg-red-600 active:bg-red-700 active:scale-95' },
-  { rating: 'hard', key: '2', color: 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 active:scale-95' },
-  { rating: 'good', key: '3', color: 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 active:scale-95' },
-  { rating: 'easy', key: '4', color: 'bg-green-500 hover:bg-green-600 active:bg-green-700 active:scale-95' },
+  { rating: 'again', key: '1', color: 'bg-destructive hover:bg-destructive active:bg-destructive active:scale-95' },
+  { rating: 'hard', key: '2', color: 'bg-warning hover:bg-amber-600 active:bg-amber-700 active:scale-95' },
+  { rating: 'good', key: '3', color: 'bg-brand hover:bg-brand active:bg-brand active:scale-95' },
+  { rating: 'easy', key: '4', color: 'bg-success hover:bg-success active:bg-green-700 active:scale-95' },
 ]
 
 export function SrsRatingButtons({ card, srsSettings, onRate }: SrsRatingButtonsProps) {

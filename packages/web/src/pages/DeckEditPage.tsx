@@ -153,17 +153,17 @@ export function DeckEditPage() {
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer"
+            className="p-2 text-content-tertiary hover:text-muted-foreground rounded-lg hover:bg-accent cursor-pointer"
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('edit.title')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('edit.title')}</h1>
           <GuideHelpLink section="decks" />
         </div>
         <div className="flex items-center gap-2 sm:gap-3 pl-10 sm:pl-0">
           <button
             onClick={() => navigate(`/decks/${deckId}`)}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 cursor-pointer transition"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted cursor-pointer transition"
           >
             <Layers size={16} />
             <span className="hidden sm:inline">{t('edit.cardManagement')}</span>
@@ -172,7 +172,7 @@ export function DeckEditPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer transition"
+            className="flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand disabled:opacity-50 cursor-pointer transition"
           >
             <Save size={16} />
             {saving ? `${t('edit.save')}...` : t('edit.save')}
@@ -182,8 +182,8 @@ export function DeckEditPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left: Deck Settings */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('edit.deckSettings')}</h2>
+        <div className="bg-card rounded-xl border border-border p-4 sm:p-5">
+          <h2 className="text-lg font-semibold text-foreground mb-4">{t('edit.deckSettings')}</h2>
           <DeckSettingsForm
             values={formValues}
             onChange={setFormValues}
@@ -195,7 +195,7 @@ export function DeckEditPage() {
         <div className="space-y-4 sm:space-y-6">
           {/* Period tabs */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold text-gray-900">{t('edit.deckStats')}</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t('edit.deckStats')}</h2>
             <TimePeriodTabs value={period} onChange={setPeriod} />
           </div>
 
@@ -208,10 +208,10 @@ export function DeckEditPage() {
           </div>
 
           {/* Pie chart */}
-          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">{t('edit.statusDistribution')}</h3>
+          <div className="bg-card rounded-xl border border-border p-3 sm:p-5">
+            <h3 className="text-sm font-medium text-foreground mb-2 sm:mb-3">{t('edit.statusDistribution')}</h3>
             {deckStats.totalCards === 0 ? (
-              <p className="text-sm text-gray-400 py-8 text-center">{t('edit.noCards')}</p>
+              <p className="text-sm text-content-tertiary py-8 text-center">{t('edit.noCards')}</p>
             ) : (
               <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                 <ResponsiveContainer width={140} height={140}>
@@ -239,8 +239,8 @@ export function DeckEditPage() {
                         className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: d.color }}
                       />
-                      <span className="text-gray-700">{d.name}</span>
-                      <span className="text-gray-400">{t('edit.cardsValue', { count: d.value })}</span>
+                      <span className="text-foreground">{d.name}</span>
+                      <span className="text-content-tertiary">{t('edit.cardsValue', { count: d.value })}</span>
                     </div>
                   ))}
                 </div>
@@ -261,9 +261,9 @@ export function DeckEditPage() {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
-      <p className="text-xs text-gray-500 mb-0.5 sm:mb-1">{label}</p>
-      <p className="text-lg sm:text-xl font-bold text-gray-900">{value}</p>
+    <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+      <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">{label}</p>
+      <p className="text-lg sm:text-xl font-bold text-foreground">{value}</p>
     </div>
   )
 }

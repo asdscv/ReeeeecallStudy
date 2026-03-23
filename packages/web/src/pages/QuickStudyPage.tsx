@@ -152,7 +152,7 @@ export function QuickStudyPage() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">
           <>⚡{t('quickStudy.title')}</>
         </h1>
         <GuideHelpLink section="study" />
@@ -166,9 +166,9 @@ export function QuickStudyPage() {
           <div className="text-4xl animate-pulse">📚</div>
         </div>
       ) : decks.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl border border-border p-12 text-center">
           <div className="text-5xl mb-4">📚</div>
-          <p className="text-gray-500">{t('quickStudy.noDecks')}</p>
+          <p className="text-muted-foreground">{t('quickStudy.noDecks')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
@@ -178,7 +178,7 @@ export function QuickStudyPage() {
               <button
                 key={deck.id}
                 onClick={() => setSelectedDeck(deck)}
-                className="bg-white rounded-xl border border-gray-200 overflow-hidden text-left hover:shadow-md transition cursor-pointer"
+                className="bg-card rounded-xl border border-border overflow-hidden text-left hover:shadow-md transition cursor-pointer"
               >
                 <div
                   className="h-1.5 sm:h-2"
@@ -187,16 +187,16 @@ export function QuickStudyPage() {
                 <div className="p-3 sm:p-4">
                   <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                     <span className="text-xl sm:text-2xl shrink-0">{deck.icon || '📚'}</span>
-                    <span className="text-sm sm:text-base font-semibold text-gray-900 truncate">
+                    <span className="text-sm sm:text-base font-semibold text-foreground truncate">
                       {deck.name}
                     </span>
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-500 mb-1.5 sm:mb-2">
+                  <div className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">
                     {t('quickStudy.cardCount', { count: deckStats?.total_cards ?? 0 })}
                   </div>
                   <div className="flex flex-wrap gap-1 sm:gap-2">
                     {(deckStats?.new_cards ?? 0) > 0 && (
-                      <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-blue-100 text-blue-700">
+                      <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-brand/15 text-brand">
                         {t('quickStudy.newCards', { count: deckStats!.new_cards })}
                       </span>
                     )}
@@ -220,14 +220,14 @@ export function QuickStudyPage() {
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-sm sm:max-w-md shadow-xl"
+            className="bg-card rounded-2xl w-full max-w-sm sm:max-w-md shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 sm:p-5 border-b border-gray-100">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">
+            <div className="p-4 sm:p-5 border-b border-border">
+              <h2 className="text-base sm:text-lg font-bold text-foreground">
                 {selectedDeck.icon} {selectedDeck.name}
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {selectedMode === 'by_date'
                   ? t('quickStudy.selectDate')
                   : selectedMode === 'cramming'
@@ -245,12 +245,12 @@ export function QuickStudyPage() {
                   <button
                     key={opt.value}
                     onClick={() => handleModeSelect(opt.value)}
-                    className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 transition flex items-start gap-3 cursor-pointer"
+                    className="w-full text-left px-4 py-3 rounded-xl hover:bg-muted transition flex items-start gap-3 cursor-pointer"
                   >
                     <span className="text-xl">{opt.emoji}</span>
                     <div>
-                      <div className="font-medium text-gray-900 text-sm">{t(opt.label)}</div>
-                      <div className="text-xs text-gray-500">{t(opt.desc)}</div>
+                      <div className="font-medium text-foreground text-sm">{t(opt.label)}</div>
+                      <div className="text-xs text-muted-foreground">{t(opt.desc)}</div>
                     </div>
                   </button>
                 ))}
@@ -258,7 +258,7 @@ export function QuickStudyPage() {
             ) : selectedMode === 'by_date' ? (
               /* Step 2a: Date picker for by_date mode */
               <div className="p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
                   <span className="text-lg">
                     {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.emoji}
                   </span>
@@ -269,7 +269,7 @@ export function QuickStudyPage() {
                   onSelectDate={setSelectedDate}
                   datesWithCards={datesWithCards}
                 />
-                <div className="mt-2 text-sm font-medium text-blue-600">
+                <div className="mt-2 text-sm font-medium text-brand">
                   {selectedDate && (() => {
                     const [year, month, day] = selectedDate.split('-').map(Number)
                     return t('quickStudy.uploadDate', { year, month, day, count: dateCardCount })
@@ -278,7 +278,7 @@ export function QuickStudyPage() {
                 <button
                   onClick={handleStartStudy}
                   disabled={dateCardCount === 0}
-                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
+                  className="w-full mt-4 py-3 bg-brand hover:bg-brand disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   {t('quickStudy.startStudy')}
                 </button>
@@ -286,7 +286,7 @@ export function QuickStudyPage() {
             ) : selectedMode === 'cramming' ? (
               /* Step 2b: Cramming setup panel */
               <div className="p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
                   <span className="text-lg">
                     {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.emoji}
                   </span>
@@ -310,13 +310,13 @@ export function QuickStudyPage() {
             ) : (
               /* Step 2b: Batch size configuration */
               <div className="p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
                   <span className="text-lg">
                     {STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.emoji}
                   </span>
                   {t(STUDY_MODE_OPTIONS.find(o => o.value === selectedMode)?.label ?? '')}
                 </div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {t('quickStudy.batchSize')}
                 </label>
                 <input
@@ -346,26 +346,26 @@ export function QuickStudyPage() {
                       setBatchSizeInput(String(clamped))
                     }
                   }}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
+                  className="w-full px-4 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-content-tertiary mt-1">
                   {selectedMode === 'sequential_review'
                     ? t('quickStudy.batchSizeDescReview', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })
                     : t('quickStudy.batchSizeDesc', { min: MIN_BATCH_SIZE, max: MAX_BATCH_SIZE })}
                 </p>
                 <button
                   onClick={handleStartStudy}
-                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition cursor-pointer"
+                  className="w-full mt-4 py-3 bg-brand hover:bg-brand text-white font-medium rounded-xl transition cursor-pointer"
                 >
                   {t('quickStudy.startStudy')}
                 </button>
               </div>
             )}
 
-            <div className="p-3 border-t border-gray-100">
+            <div className="p-3 border-t border-border">
               <button
                 onClick={selectedMode ? () => setSelectedMode(null) : closeModal}
-                className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
+                className="w-full py-2 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 {selectedMode ? t('quickStudy.backToModeSelect') : t('common:actions.cancel')}
               </button>
