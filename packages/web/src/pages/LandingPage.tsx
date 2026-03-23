@@ -28,6 +28,15 @@ import { FinalCTASection } from '../components/landing/FinalCTASection'
 import { FooterSection } from '../components/landing/FooterSection'
 import { FloatingCTA } from '../components/landing/FloatingCTA'
 
+/* Thin gradient divider — used between sections for visual rhythm */
+function Divider() {
+  return (
+    <div className="max-w-5xl mx-auto px-4">
+      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+    </div>
+  )
+}
+
 export function LandingPage() {
   const { t } = useTranslation('landing')
   const { fetchContents } = useContentStore()
@@ -74,12 +83,17 @@ export function LandingPage() {
       <HeroSection />
       <TrustBadgesSection />
       <AppPreviewSection />
+      <Divider />
       <FeaturesSection />
+      <Divider />
       <ScienceSection />
+      <Divider />
       <StatsSection />
+      <Divider />
       <SocialProofSection />
       <HowItWorksSection />
       <InsightsSection />
+      <Divider />
       <FAQSection />
       <FinalCTASection />
       <FooterSection />

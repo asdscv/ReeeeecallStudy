@@ -10,41 +10,28 @@ export function FinalCTASection() {
   const prefersReduced = useReducedMotion()
 
   return (
-    <section id="cta" className="py-12 sm:py-16 md:py-24 px-4">
-      <ScrollReveal>
-        <div className="max-w-4xl mx-auto relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-5 sm:px-10 md:px-12 py-10 sm:py-14 md:py-20 text-center">
-          {/* Floating decorative circles */}
-          {!prefersReduced && (
-            <>
-              <motion.div
-                className="absolute -top-10 -left-10 w-40 h-40 bg-card/5 rounded-full blur-2xl"
-                animate={{ y: [0, -20, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              />
-              <motion.div
-                className="absolute -bottom-10 -right-10 w-56 h-56 bg-card/5 rounded-full blur-2xl"
-                animate={{ y: [0, 20, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            </>
-          )}
+    <section id="cta" className="py-16 sm:py-20 md:py-28 px-4 relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand/[0.06] rounded-full blur-[120px]" />
+      </div>
 
-          <div className="relative z-10">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 sm:mb-4">
-              {t('cta.title')}
-            </h2>
-            <p className="text-blue-100 text-base sm:text-lg mb-8 max-w-xl mx-auto">
-              {t('cta.subtitle')}
-            </p>
-            <motion.button
-              onClick={() => navigate('/auth/login')}
-              className="inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-4 bg-card text-brand text-base sm:text-lg font-semibold rounded-xl hover:bg-brand/10 transition shadow-lg cursor-pointer"
-              whileHover={prefersReduced ? undefined : { scale: 1.05 }}
-              whileTap={prefersReduced ? undefined : { scale: 0.98 }}
-            >
-              {t('cta.button')} <ArrowRight className="w-5 h-5" />
-            </motion.button>
-          </div>
+      <ScrollReveal>
+        <div className="max-w-2xl mx-auto text-center relative z-10">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tight mb-4 sm:mb-5">
+            {t('cta.title')}
+          </h2>
+          <p className="text-muted-foreground text-base sm:text-lg mb-8 sm:mb-10 max-w-lg mx-auto leading-relaxed">
+            {t('cta.subtitle')}
+          </p>
+          <motion.button
+            onClick={() => navigate('/auth/login')}
+            className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 bg-brand text-white text-base sm:text-lg font-semibold rounded-xl hover:brightness-110 transition shadow-lg shadow-blue-600/25 cursor-pointer"
+            whileHover={prefersReduced ? undefined : { scale: 1.04, boxShadow: '0 20px 40px rgba(37,99,235,0.3)' }}
+            whileTap={prefersReduced ? undefined : { scale: 0.98 }}
+          >
+            {t('cta.button')} <ArrowRight className="w-5 h-5" />
+          </motion.button>
         </div>
       </ScrollReveal>
     </section>

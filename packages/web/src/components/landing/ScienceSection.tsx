@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Brain, Zap, Moon, Shuffle, TrendingDown, TrendingUp, FlaskConical, GraduationCap, BookOpen } from 'lucide-react'
+import { Brain, Zap, Moon, Shuffle, TrendingDown, TrendingUp, FlaskConical, GraduationCap } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ScrollReveal } from './ScrollReveal'
 
@@ -114,26 +114,23 @@ interface PrincipleCardProps {
   delay: number
 }
 
-function PrincipleCard({ icon: Icon, iconGradient, iconBg, title, description, source, delay }: PrincipleCardProps) {
+function PrincipleCard({ icon: Icon, iconGradient, title, description, source, delay }: PrincipleCardProps) {
   const prefersReduced = useReducedMotion()
 
   return (
     <motion.div
-      className="bg-card rounded-2xl border border-border p-5 sm:p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
-      initial={prefersReduced ? undefined : { opacity: 0, y: 30 }}
+      className="bg-card rounded-2xl border border-border p-5 sm:p-6 hover:border-border/80 hover:shadow-sm transition-all duration-300"
+      initial={prefersReduced ? undefined : { opacity: 0, y: 20 }}
       whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br ${iconGradient} text-white shadow-lg shadow-${iconBg}/20`}>
-        <Icon className="w-6 h-6" />
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-gradient-to-br ${iconGradient} text-white`}>
+        <Icon className="w-5 h-5" />
       </div>
-      <h3 className="text-base sm:text-lg font-bold text-foreground mb-2">{title}</h3>
+      <h3 className="text-base font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed mb-3">{description}</p>
-      <div className="flex items-center gap-1.5">
-        <BookOpen className="w-3.5 h-3.5 text-content-tertiary" />
-        <span className="text-xs text-content-tertiary italic">{source}</span>
-      </div>
+      <p className="text-xs text-content-tertiary italic">{source}</p>
     </motion.div>
   )
 }
