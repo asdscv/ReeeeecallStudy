@@ -1,49 +1,54 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronRight } from 'lucide-react'
+import { Plus, Minus } from 'lucide-react'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { ScrollReveal } from './ScrollReveal'
 
-interface FAQItemProps {
-  question: string
-  answer: string
-}
-
-function FAQItem({ question, answer }: FAQItemProps) {
+function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
   const [isOpen, setIsOpen] = useState(false)
   const prefersReduced = useReducedMotion()
 
   return (
-    <div className="bg-card rounded-xl border border-border overflow-hidden">
+    <motion.div
+      initial={prefersReduced ? undefined : { opacity: 0, y: 12 }}
+      whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.06 }}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between cursor-pointer p-5 text-left font-semibold text-foreground hover:bg-muted transition bg-transparent border-none"
+        className="w-full flex items-start justify-between gap-4 py-5 text-left cursor-pointer bg-transparent border-none group"
       >
-        <span>{question}</span>
-        <motion.div
-          animate={{ rotate: isOpen ? 90 : 0 }}
-          transition={prefersReduced ? { duration: 0 } : { duration: 0.2 }}
-          className="shrink-0 ml-4"
-        >
-          <ChevronRight className="w-4 h-4 text-content-tertiary" />
-        </motion.div>
+        <span className="text-base sm:text-lg font-medium text-foreground group-hover:text-brand transition-colors leading-snug">
+          {question}
+        </span>
+        <span className="shrink-0 mt-0.5 w-6 h-6 rounded-full border border-border flex items-center justify-center group-hover:border-brand/40 transition-colors">
+          {isOpen ? (
+            <Minus className="w-3.5 h-3.5 text-muted-foreground" />
+          ) : (
+            <Plus className="w-3.5 h-3.5 text-muted-foreground" />
+          )}
+        </span>
       </button>
+
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
             initial={prefersReduced ? { height: 'auto' } : { height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={prefersReduced ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 text-muted-foreground leading-relaxed">
+            <p className="pb-5 text-sm sm:text-base text-muted-foreground leading-relaxed pr-10">
               {answer}
-            </div>
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+
+      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+    </motion.div>
   )
 }
 
@@ -58,18 +63,19 @@ export function FAQSection() {
   ]
 
   return (
-    <section id="faq" className="py-16 sm:py-24 px-4">
-      <div className="max-w-3xl mx-auto">
+    <section id="faq" className="py-16 sm:py-20 md:py-28 px-4">
+      <div className="max-w-2xl mx-auto">
         <ScrollReveal>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-10 text-center">
-            {t('faq.title', 'Frequently Asked Questions')}
-          </h2>
+          <div className="text-center mb-10 sm:mb-14">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
+              {t('faq.title', 'Frequently Asked Questions')}
+            </h2>
+          </div>
         </ScrollReveal>
-        <div className="space-y-4">
+
+        <div>
           {faqItems.map((item, i) => (
-            <ScrollReveal key={i} delay={i * 0.08}>
-              <FAQItem question={item.question} answer={item.answer} />
-            </ScrollReveal>
+            <FAQItem key={i} question={item.question} answer={item.answer} index={i} />
           ))}
         </div>
       </div>
