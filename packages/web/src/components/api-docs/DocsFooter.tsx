@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 export function DocsFooter() {
   const { t } = useTranslation(['api-docs', 'landing'])
   return (
-    <footer className="border-t border-border bg-muted mt-12 sm:mt-16">
+    <footer className="border-t border-border bg-background mt-12 sm:mt-16">
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">

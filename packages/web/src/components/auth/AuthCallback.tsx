@@ -81,7 +81,7 @@ export function AuthCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center max-w-sm">
           <div className="text-4xl mb-4">⚠️</div>
           <p className="text-foreground font-medium mb-2">{error}</p>
@@ -97,7 +97,7 @@ export function AuthCallback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
         <div className="text-4xl mb-4 animate-spin">⏳</div>
         <p className="text-muted-foreground">{t('callback.processing')}</p>

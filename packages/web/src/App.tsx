@@ -103,7 +103,7 @@ const AdminAuditPage = lazy(() =>
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand border-t-transparent" />
     </div>
   )
@@ -153,7 +153,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <img src="/favicon.png" alt="" className="w-12 h-12 animate-pulse" />
       </div>
     )
