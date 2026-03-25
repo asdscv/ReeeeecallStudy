@@ -557,12 +557,29 @@ export function SettingsScreen() {
                   const isConfigured = !!aiKeys[provider.id]
                   return (
                     <View key={provider.id} style={[styles.aiProviderCard, { borderColor: theme.colors.border }]}>
-                      <View style={styles.aiProviderHeader}>
+                      {/* Toggle header */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (isEditing) {
+                            setAiEditingProvider(null)
+                            setAiApiKey('')
+                            setAiEditModel('')
+                          } else {
+                            const existing = aiKeys[provider.id]
+                            setAiEditingProvider(provider.id)
+                            setAiApiKey(existing?.apiKey ?? '')
+                            setAiEditModel(existing?.model ?? provider.models[0])
+                          }
+                        }}
+                        testID={`settings-ai-${provider.id}-toggle`}
+                        style={styles.aiProviderHeader}
+                        activeOpacity={0.6}
+                      >
                         <View style={styles.aiProviderLeft}>
                           <View style={[styles.aiIcon, { backgroundColor: provider.bg }]}>
                             <Text style={[styles.aiIconText, { color: provider.color }]}>AI</Text>
                           </View>
-                          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{provider.label}</Text>
+                          <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]}>{provider.label}</Text>
                           {isConfigured ? (
                             <View style={[styles.aiBadge, { backgroundColor: palette.green[50] }]}>
                               <Text style={[theme.typography.caption, { color: palette.green[600], fontWeight: '500' }]}>Configured</Text>
@@ -573,40 +590,12 @@ export function SettingsScreen() {
                             </View>
                           )}
                         </View>
-                        <View style={{ flexDirection: 'row', gap: 6 }}>
-                          {!isEditing && (
-                            <TouchableOpacity
-                              onPress={() => {
-                                const existing = aiKeys[provider.id]
-                                setAiEditingProvider(provider.id)
-                                setAiApiKey(existing?.apiKey ?? '')
-                                setAiEditModel(existing?.model ?? provider.models[0])
-                              }}
-                              testID={`settings-ai-${provider.id}-toggle`}
-                              style={[styles.configBtn, { backgroundColor: palette.blue[50] }]}
-                            >
-                              <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '500' }]}>
-                                {isConfigured ? 'Edit' : 'Configure'}
-                              </Text>
-                            </TouchableOpacity>
-                          )}
-                          {!isEditing && isConfigured && (
-                            <TouchableOpacity
-                              onPress={async () => {
-                                if (!user) return
-                                await mobileAiKeyVault.removeProvider(user.id, provider.id)
-                                const keys = await mobileAiKeyVault.loadAll(user.id)
-                                setAiKeys(keys)
-                                Alert.alert('Deleted', `${provider.label} API key removed.`)
-                              }}
-                              testID={`settings-ai-${provider.id}-delete`}
-                              style={[styles.configBtn, { backgroundColor: palette.red[50] }]}
-                            >
-                              <Text style={[theme.typography.caption, { color: palette.red[600], fontWeight: '500' }]}>Delete</Text>
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
+                        <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>
+                          {isEditing ? '∧' : '∨'}
+                        </Text>
+                      </TouchableOpacity>
+
+                      {/* Expanded edit form */}
                       {isEditing && (
                         <View style={styles.aiEditForm}>
                           <TextInput
@@ -663,18 +652,34 @@ export function SettingsScreen() {
                                 testID={`settings-ai-${provider.id}-save`}
                               />
                             </View>
-                            <View style={{ flex: 1 }}>
-                              <Button
-                                title="Cancel"
-                                size="sm"
-                                variant="outline"
-                                onPress={() => {
+                            {isConfigured && (
+                              <TouchableOpacity
+                                onPress={async () => {
+                                  if (!user) return
+                                  await mobileAiKeyVault.removeProvider(user.id, provider.id)
+                                  const keys = await mobileAiKeyVault.loadAll(user.id)
+                                  setAiKeys(keys)
                                   setAiEditingProvider(null)
                                   setAiApiKey('')
                                   setAiEditModel('')
+                                  Alert.alert('Deleted', `${provider.label} API key removed.`)
                                 }}
-                              />
-                            </View>
+                                testID={`settings-ai-${provider.id}-delete`}
+                                style={[styles.configBtn, { backgroundColor: palette.red[50] }]}
+                              >
+                                <Text style={[theme.typography.caption, { color: palette.red[600], fontWeight: '500' }]}>Delete</Text>
+                              </TouchableOpacity>
+                            )}
+                            <TouchableOpacity
+                              onPress={() => {
+                                setAiEditingProvider(null)
+                                setAiApiKey('')
+                                setAiEditModel('')
+                              }}
+                              style={[styles.configBtn, { backgroundColor: palette.gray[100] }]}
+                            >
+                              <Text style={[theme.typography.caption, { color: palette.gray[600], fontWeight: '500' }]}>Cancel</Text>
+                            </TouchableOpacity>
                           </View>
                         </View>
                       )}
