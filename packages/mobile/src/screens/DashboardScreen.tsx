@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Platform } from 'react-native'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { Screen, ListCard, Badge, DrawerHeader } from '../components/ui'
-import { StatCard, TimePeriodSelector, MiniHeatmap, BarChart } from '../components/charts'
+import { Screen, DrawerHeader } from '../components/ui'
+import { TimePeriodSelector, MiniHeatmap, BarChart } from '../components/charts'
+import { LevelCard, StreakFreezeCard, DailyQuestsCard, NextGoalsCard, LevelUpCelebration } from '../components/dashboard'
 import { useDashboardData } from '../hooks/useDashboardData'
+import { useGamification } from '../hooks/useGamification'
 import { useTheme, palette } from '../theme'
 import type { HomeStackParamList, MainTabParamList } from '../navigation/types'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
@@ -15,43 +17,69 @@ import { getMobileSupabase } from '../adapters'
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>
 
-/**
- * Matches web DashboardPage exactly:
- * - Header: title + TimePeriodTabs
- * - StatsSummaryCards (2x2 grid)
- * - StudyHeatmap (conditional)
- * - ForecastWidget + DailyStudyChart (stacked on mobile)
- * - RecentDecks
- */
 export function DashboardScreen() {
   const theme = useTheme()
   const { t } = useTranslation('dashboard')
   const navigation = useNavigation<Nav>()
   const tabNav = navigation.getParent<NavigationProp<MainTabParamList>>()
+
   const [period, setPeriod] = useState<TimePeriod>('1m')
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showLevelUp, setShowLevelUp] = useState(false)
 
+  // Data hooks
+  const { decks, stats, totalCards, totalDue, streak, mastery, heatmap, dailyCounts, forecastData, loading, refresh } =
+    useDashboardData(period)
+  const { freezeInfo, quests, goals, levelInfo, achievements, checkAchievements, refresh: refreshGamification } = useGamification()
+
+  // Onboarding check + achievement check on mount
   useEffect(() => {
-    getMobileSupabase().rpc('get_onboarding_status').then(({ data }) => {
+    const supabase = getMobileSupabase()
+    Promise.resolve(supabase.rpc('get_onboarding_status')).then(({ data }) => {
       const result = data as { completed: boolean } | null
       if (result && !result.completed) setShowOnboarding(true)
     }).catch(() => {})
   }, [])
-  const { decks, stats, totalCards, totalDue, streak, mastery, heatmap, dailyCounts, forecastData, loading, refresh } =
-    useDashboardData(period)
+
+  // Show level-up celebration when gamification data loads
+  useEffect(() => {
+    if (levelInfo && levelInfo.level > 1) {
+      setShowLevelUp(true)
+    }
+  }, [levelInfo?.level])
+
+  const handleRefresh = useCallback(async () => {
+    refreshGamification()
+    await refresh()
+  }, [refresh, refreshGamification])
 
   return (
     <Screen safeArea padding={false} testID="dashboard-screen">
       <OnboardingModal visible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
+      {levelInfo && (
+        <LevelUpCelebration
+          level={levelInfo.level}
+          visible={showLevelUp}
+          onDismiss={() => setShowLevelUp(false)}
+        />
+      )}
       <DrawerHeader title={t('title')} />
+
       <FlatList
         data={decks}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        extraData={{ levelInfo, freezeInfo, quests, goals, heatmap, dailyCounts, forecastData, streak, mastery }}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Quick Study card — prominent entry point */}
+            {/* Title + Period selector */}
+            <View style={styles.titleSection}>
+              <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('title')}</Text>
+              <TimePeriodSelector value={period} onChange={setPeriod} testID="dashboard-period" />
+            </View>
+
+            {/* Quick Study CTA */}
             <TouchableOpacity
               onPress={() => tabNav?.navigate('StudyTab', { screen: 'StudySetup' } as any)}
               activeOpacity={0.8}
@@ -59,70 +87,79 @@ export function DashboardScreen() {
               testID="dashboard-quick-study"
             >
               <View style={styles.quickStudyContent}>
-                <Text style={styles.quickStudyIcon}>⚡</Text>
+                <Text style={styles.quickStudyIcon}>{'\u26A1'}</Text>
                 <View style={styles.quickStudyText}>
                   <Text style={styles.quickStudyTitle}>Quick Study</Text>
                   <Text style={styles.quickStudyDesc}>
                     {totalDue > 0 ? `${totalDue} cards due today` : 'Start a study session'}
                   </Text>
                 </View>
-                <Text style={styles.quickStudyArrow}>→</Text>
+                <Text style={styles.quickStudyArrow}>{'\u2192'}</Text>
               </View>
             </TouchableOpacity>
 
-            {/* TimePeriodTabs — matches web */}
-            <View style={styles.titleRow}>
-              <View />
-              <TimePeriodSelector value={period} onChange={setPeriod} testID="dashboard-period" />
-            </View>
-
-            {/* StatsSummaryCards — matches web: 2x2 grid with label on top, big value */}
-            <View style={styles.statsGrid}>
+            {/* Stats Summary — 2x2 grid */}
+            <View style={[styles.sectionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <View style={styles.statsRow}>
-                <StatCard label={t('stats.totalCards')} value={totalCards} valueColor={theme.colors.text} testID="dashboard-stat-total" />
-                <StatCard label={t('stats.todayReview')} value={totalDue} valueColor={palette.yellow[600]} testID="dashboard-stat-due" />
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.totalCards')}</Text>
+                  <Text style={[styles.statValue, { color: theme.colors.text }]}>{totalCards}</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.todayReview')}</Text>
+                  <Text style={[styles.statValue, { color: palette.yellow[600] }]}>{totalDue}</Text>
+                </View>
               </View>
               <View style={styles.statsRow}>
-                <StatCard label={t('stats.streak')} value={t('streakDays', { count: streak })} valueColor={palette.green[600]} testID="dashboard-stat-streak" />
-                <StatCard label={t('stats.masteryRate')} value={`${mastery}%`} valueColor={palette.blue[600]} testID="dashboard-stat-mastery" />
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.streak')}</Text>
+                  <Text style={[styles.statValue, { color: palette.green[600] }]}>{t('streakDays', { count: streak })}</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.masteryRate')}</Text>
+                  <Text style={[styles.statValue, { color: palette.blue[600] }]}>{mastery}%</Text>
+                </View>
               </View>
             </View>
 
-            {/* Heatmap — matches web: conditional on period */}
+            {/* Gamification widgets — modular components */}
+            {levelInfo && (
+              <LevelCard
+                levelInfo={levelInfo}
+                achievements={achievements}
+                onPressAchievements={() => tabNav?.navigate('SettingsTab', { screen: 'Achievements' } as any)}
+              />
+            )}
+
+            {freezeInfo && <StreakFreezeCard freezeInfo={freezeInfo} totalXp={levelInfo?.total_xp} />}
+
+            <DailyQuestsCard quests={quests} />
+
+            <NextGoalsCard goals={goals} />
+
+            {/* Heatmap */}
             {shouldShowHeatmap(period) && heatmap.length > 0 && (
               <MiniHeatmap data={heatmap} testID="dashboard-heatmap" />
             )}
 
-            {/* ForecastWidget — amber bars */}
+            {/* Forecast — amber bars */}
             {forecastData.length > 0 && forecastData.some((d) => d.count > 0) && (
-              <BarChart data={forecastData} title={t('forecast.title')} barColor="#f59e0b" maxBars={7} testID="dashboard-forecast" />
+              <BarChart data={forecastData} title={t('forecast.title')} barColor={palette.yellow[500]} maxBars={7} testID="dashboard-forecast" />
             )}
 
-            {/* DailyStudyChart — blue bars */}
+            {/* Daily Study Volume — show all days in period */}
             {dailyCounts.length > 0 && (
-              <BarChart data={dailyCounts} title={t('dailyChart.title')} testID="dashboard-barchart" />
+              <BarChart
+                data={dailyCounts}
+                title={t('dailyChart.title')}
+                maxBars={dailyCounts.length}
+                noDataMessage={t('dailyChart.noData')}
+                testID="dashboard-barchart"
+              />
             )}
 
-            {/* Study History link — matches web sidebar item */}
-            <TouchableOpacity
-              onPress={() => navigation.navigate('StudyHistory')}
-              style={[styles.historyLink, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              testID="dashboard-history-link"
-            >
-              <Text style={{ fontSize: 18 }}>📝</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('studyHistory')}</Text>
-                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {t('studyHistoryDesc')}
-                </Text>
-              </View>
-              <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-            </TouchableOpacity>
-
-            {/* Recent Decks header — matches web RecentDecks */}
-            <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-              {t('recentDecks.title')}
-            </Text>
+            {/* Deck Status header */}
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('recentDecks.title')}</Text>
           </View>
         }
         renderItem={({ item }) => {
@@ -138,36 +175,35 @@ export function DashboardScreen() {
               style={[styles.deckCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
               testID={`dashboard-deck-${item.id}`}
             >
-              {/* Matches web RecentDecks: icon + name + card count */}
-              <View style={styles.deckTopRow}>
+              <View style={[styles.deckColorBar, { backgroundColor: item.color || palette.blue[500] }]} />
+              <View style={styles.deckBody}>
                 <View style={styles.deckNameRow}>
                   <Text style={styles.deckEmoji}>{item.icon}</Text>
                   <View style={styles.deckNameCol}>
                     <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>{item.name}</Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('recentDecks.cardCount', { count: total })}</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{total} cards</Text>
                   </View>
                 </View>
-              </View>
-              {/* Badges + Study button row */}
-              <View style={styles.deckBottomRow}>
-                <View style={styles.deckBadges}>
-                  {newCards > 0 && (
-                    <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
-                      <Text style={[styles.badgeText, { color: palette.blue[700] }]}>{t('recentDecks.newCards', { count: newCards })}</Text>
-                    </View>
-                  )}
-                  {review > 0 && (
-                    <View style={[styles.badge, { backgroundColor: '#FFFBEB' }]}>
-                      <Text style={[styles.badgeText, { color: palette.yellow[600] }]}>{t('recentDecks.reviewCards', { count: review })}</Text>
-                    </View>
-                  )}
+                <View style={styles.deckBottomRow}>
+                  <View style={styles.deckBadges}>
+                    {newCards > 0 && (
+                      <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
+                        <Text style={[styles.badgeText, { color: palette.blue[700] }]}>New {newCards}</Text>
+                      </View>
+                    )}
+                    {review > 0 && (
+                      <View style={[styles.badge, { backgroundColor: palette.yellow[50] }]}>
+                        <Text style={[styles.badgeText, { color: palette.yellow[700] }]}>Review {review}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => tabNav?.navigate('StudyTab')}
+                    style={[styles.studyBtn, { backgroundColor: theme.colors.primary }]}
+                  >
+                    <Text style={[theme.typography.caption, { color: theme.colors.primaryText, fontWeight: '600' }]}>Study</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  onPress={() => tabNav?.navigate('StudyTab')}
-                  style={[styles.studyBtn, { backgroundColor: theme.colors.primary }]}
-                >
-                  <Text style={[theme.typography.caption, { color: theme.colors.primaryText, fontWeight: '500' }]}>{t('recentDecks.study')}</Text>
-                </TouchableOpacity>
               </View>
             </TouchableOpacity>
           )
@@ -175,7 +211,7 @@ export function DashboardScreen() {
         ListEmptyComponent={
           !loading ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={styles.emptyEmoji}>📚</Text>
+              <Text style={styles.emptyEmoji}>{'\uD83D\uDCDA'}</Text>
               <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
                 {t('recentDecks.noDecks')}
               </Text>
@@ -189,28 +225,14 @@ export function DashboardScreen() {
 
 const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingBottom: 24 },
-  header: { gap: 16, paddingTop: 16, paddingBottom: 12 },
-  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  statsGrid: { gap: 8 },
-  statsRow: { flexDirection: 'row', gap: 8 },
-  // Recent deck cards — matches web: rounded-xl border p-3
-  deckCard: { borderRadius: 12, borderWidth: 1, padding: 12, marginBottom: 10 },
-  deckTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  deckNameRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  deckEmoji: { fontSize: 24 },
-  deckNameCol: { flex: 1, gap: 1 },
-  deckBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  deckBadges: { flexDirection: 'row', gap: 6, flex: 1 },
-  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
-  badgeText: { fontSize: 11, fontWeight: '500' },
-  studyBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  emptyCard: { borderRadius: 12, borderWidth: 1, padding: 32, alignItems: 'center', gap: 12 },
-  emptyEmoji: { fontSize: 40 },
-  historyLink: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    borderRadius: 12, borderWidth: 1, padding: 14,
-  },
-  // Quick Study card — gradient-like primary color card
+  header: { gap: 14, paddingTop: 8, paddingBottom: 12 },
+  titleSection: { gap: 8 },
+  // Stats
+  sectionCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
+  statsRow: { flexDirection: 'row' },
+  statItem: { flex: 1, paddingVertical: 8, paddingHorizontal: 4, alignItems: 'center', gap: 2 },
+  statValue: { fontSize: 28, fontWeight: '700' },
+  // Quick Study
   quickStudyCard: {
     borderRadius: 14,
     backgroundColor: palette.blue[600],
@@ -220,14 +242,25 @@ const styles = StyleSheet.create({
       android: { elevation: 6 },
     }),
   },
-  quickStudyContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  quickStudyContent: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   quickStudyIcon: { fontSize: 28 },
   quickStudyText: { flex: 1, gap: 2 },
   quickStudyTitle: { fontSize: 17, fontWeight: '700', color: '#FFFFFF' },
   quickStudyDesc: { fontSize: 13, color: 'rgba(255,255,255,0.85)' },
   quickStudyArrow: { fontSize: 20, fontWeight: '600', color: 'rgba(255,255,255,0.9)' },
+  // Deck cards
+  deckCard: { borderRadius: 12, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', marginBottom: 10 },
+  deckColorBar: { width: 4 },
+  deckBody: { flex: 1, padding: 12, gap: 8 },
+  deckNameRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  deckEmoji: { fontSize: 24 },
+  deckNameCol: { flex: 1, gap: 1 },
+  deckBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  deckBadges: { flexDirection: 'row', gap: 6, flex: 1 },
+  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
+  badgeText: { fontSize: 11, fontWeight: '500' },
+  studyBtn: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8 },
+  // Empty
+  emptyCard: { borderRadius: 12, borderWidth: 1, padding: 32, alignItems: 'center', gap: 12 },
+  emptyEmoji: { fontSize: 40 },
 })

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useTheme } from '../../theme'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
 
@@ -20,14 +20,19 @@ interface TimePeriodSelectorProps {
 }
 
 /**
- * Matches web TimePeriodTabs — rounded pill tabs in a row.
+ * Matches web TimePeriodTabs — rounded pill tabs in a scrollable row.
  * Active: bg-blue-600 + white text. Inactive: white bg + gray text.
  */
 export function TimePeriodSelector({ value, onChange, testID }: TimePeriodSelectorProps) {
   const theme = useTheme()
 
   return (
-    <View style={[styles.row, { borderColor: theme.colors.border }]} testID={testID}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={[styles.row, { borderColor: theme.colors.border }]}
+      testID={testID}
+    >
       {CHIPS.map((chip) => {
         const active = chip.value === value
         return (
@@ -51,11 +56,11 @@ export function TimePeriodSelector({ value, onChange, testID }: TimePeriodSelect
           </TouchableOpacity>
         )
       })}
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', borderRadius: 8, borderWidth: 1, overflow: 'hidden', alignSelf: 'flex-start' },
-  chip: { paddingHorizontal: 12, paddingVertical: 6 },
+  chip: { paddingHorizontal: 10, paddingVertical: 6 },
 })

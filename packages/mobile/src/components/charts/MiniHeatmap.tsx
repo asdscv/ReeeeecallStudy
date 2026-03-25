@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 
 interface MiniHeatmapProps {
@@ -7,21 +8,17 @@ interface MiniHeatmapProps {
 }
 
 /**
- * Matches web StudyHeatmap — color-coded activity grid.
- * Rows = 7 columns (weeks). Green scale based on intensity.
+ * GitHub-style study heatmap — horizontal scroll, week columns, day rows.
+ * Works with any data length (30 days, 180 days, etc).
  */
 export function MiniHeatmap({ data, testID }: MiniHeatmapProps) {
   const theme = useTheme()
+  const { t } = useTranslation('dashboard')
 
   if (data.length === 0) return null
 
-  const maxCount = Math.max(...data.map((d) => d.count), 1)
-
-  // Group into rows of 7
-  const rows: { date: string; count: number }[][] = []
-  for (let i = 0; i < data.length; i += 7) {
-    rows.push(data.slice(i, i + 7))
-  }
+  const sorted = [...data].sort((a, b) => a.date.localeCompare(b.date))
+  const maxCount = Math.max(...sorted.map((d) => d.count), 1)
 
   const getColor = (count: number): string => {
     if (count === 0) return theme.isDark ? 'rgba(255,255,255,0.06)' : '#ebedf0'
@@ -32,37 +29,106 @@ export function MiniHeatmap({ data, testID }: MiniHeatmapProps) {
     return '#216e39'
   }
 
+  // Build week-based columns (GitHub style): each column = 1 week, rows = Mon-Sun
+  const firstDate = new Date(sorted[0].date + 'T00:00:00')
+  const firstDow = firstDate.getDay() // 0=Sun
+
+  // Prepend nulls so first column starts on Sunday
+  const cells: ({ date: string; count: number } | null)[] = []
+  for (let i = 0; i < firstDow; i++) cells.push(null)
+  for (const d of sorted) cells.push(d)
+
+  // Split into columns of 7 (each column = 1 week)
+  const weeks: (typeof cells)[] = []
+  for (let i = 0; i < cells.length; i += 7) {
+    weeks.push(cells.slice(i, i + 7))
+  }
+
+  // Month labels
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const monthLabels: { label: string; weekIdx: number }[] = []
+  let lastMonth = -1
+  weeks.forEach((week, wi) => {
+    const firstCell = week.find((c) => c !== null)
+    if (firstCell) {
+      const m = new Date(firstCell.date + 'T00:00:00').getMonth()
+      if (m !== lastMonth) {
+        monthLabels.push({ label: MONTHS[m], weekIdx: wi })
+        lastMonth = m
+      }
+    }
+  })
+
+  const CELL = 11
+  const GAP = 2
+  const DAY_W = 20
+  const COL_W = CELL + GAP
+  const DOW = ['', 'M', '', 'W', '', 'F', '']
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
       testID={testID}
     >
-      <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-        Study Heatmap
+      <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
+        {t('heatmap.title')}
       </Text>
-      <View style={styles.grid}>
-        {rows.map((row, ri) => (
-          <View key={ri} style={styles.row}>
-            {row.map((cell) => (
-              <View
-                key={cell.date}
-                style={[styles.cell, { backgroundColor: getColor(cell.count) }]}
-              />
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View>
+          {/* Month labels */}
+          <View style={{ flexDirection: 'row', height: 14, marginLeft: DAY_W }}>
+            {monthLabels.map((ml, i) => (
+              <Text
+                key={i}
+                style={[styles.monthLabel, { color: theme.colors.textTertiary, position: 'absolute', left: ml.weekIdx * COL_W }]}
+              >
+                {ml.label}
+              </Text>
             ))}
-            {row.length < 7 &&
-              Array.from({ length: 7 - row.length }).map((_, i) => (
-                <View key={`pad-${i}`} style={[styles.cell, { backgroundColor: 'transparent' }]} />
-              ))}
           </View>
-        ))}
-      </View>
+
+          {/* Grid */}
+          <View style={{ flexDirection: 'row' }}>
+            {/* Day-of-week labels */}
+            <View style={{ width: DAY_W, gap: GAP }}>
+              {DOW.map((label, i) => (
+                <View key={i} style={{ height: CELL, justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 8, color: theme.colors.textTertiary }}>{label}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Week columns */}
+            <View style={{ flexDirection: 'row', gap: GAP }}>
+              {weeks.map((week, wi) => (
+                <View key={wi} style={{ gap: GAP }}>
+                  {week.map((cell, di) => (
+                    <View
+                      key={di}
+                      style={{
+                        width: CELL,
+                        height: CELL,
+                        borderRadius: 2,
+                        backgroundColor: cell ? getColor(cell.count) : 'transparent',
+                      }}
+                    />
+                  ))}
+                  {week.length < 7 &&
+                    Array.from({ length: 7 - week.length }).map((_, i) => (
+                      <View key={`p${i}`} style={{ width: CELL, height: CELL }} />
+                    ))}
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+      </ScrollView>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: { borderRadius: 12, borderWidth: 1, padding: 14 },
-  grid: { gap: 3 },
-  row: { flexDirection: 'row', gap: 3 },
-  cell: { flex: 1, aspectRatio: 1, borderRadius: 2, minHeight: 12, maxHeight: 18 },
+  monthLabel: { fontSize: 9 },
 })

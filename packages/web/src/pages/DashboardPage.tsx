@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
@@ -111,6 +112,27 @@ export function DashboardPage() {
         <TimePeriodTabs value={period} onChange={setPeriod} />
       </div>
 
+      {/* Quick Study CTA — matches mobile: prominent blue card */}
+      {decks.length > 0 && (
+        <Link
+          to="/study/setup"
+          className="block rounded-xl bg-brand p-4 sm:p-5 text-white shadow-lg shadow-brand/20 hover:brightness-110 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl sm:text-3xl">{'\u26A1'}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-base sm:text-lg font-bold">{t('common:nav.quickStudy')}</p>
+              <p className="text-sm text-white/80">
+                {dueToday > 0
+                  ? t('quickStudy.dueCount', { count: dueToday })
+                  : t('quickStudy.startSession')}
+              </p>
+            </div>
+            <span className="text-xl font-semibold text-white/90">{'\u2192'}</span>
+          </div>
+        </Link>
+      )}
+
       <StatsSummaryCards
         totalCards={totalCards}
         dueToday={dueToday}
@@ -128,7 +150,7 @@ export function DashboardPage() {
         <NextGoalsWidget />
       </div>
 
-      {shouldShowHeatmap(period) && <StudyHeatmap data={heatmapData} />}
+      {shouldShowHeatmap(period) && <StudyHeatmap data={getHeatmapData(studyLogs)} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <ForecastWidget data={forecastData} />

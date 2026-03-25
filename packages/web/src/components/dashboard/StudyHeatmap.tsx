@@ -12,7 +12,6 @@ export function StudyHeatmap({ data }: StudyHeatmapProps) {
   const startDate = new Date(today)
   startDate.setFullYear(startDate.getFullYear() - 1)
 
-  // Determine max count for color scaling
   const maxCount = Math.max(1, ...data.map((d) => d.count))
 
   const getClassForValue = (value: { date: string; count?: number } | undefined) => {

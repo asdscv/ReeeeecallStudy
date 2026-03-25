@@ -218,7 +218,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           .eq('user_id', user.id)
           .eq('study_mode', 'srs')
           .gte('studied_at', todayStart.toISOString())
-          .eq('prev_srs_status', 'new')
+
 
         // Remaining new cards for today
         const remainingNewToday = Math.max(0, newCardLimit - (todayNewCount ?? 0))
@@ -702,7 +702,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
     }
 
-    // Study log
+    // Study log — prev_srs_status omitted (PostgREST schema cache PGRST204)
     dbWrites.push(
       supabase
         .from('study_logs')
@@ -717,7 +717,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           prev_ease: card.ease_factor,
           new_ease: newEase,
           review_duration_ms: durationMs,
-          prev_srs_status: card.srs_status,
         } as Record<string, unknown>)
     )
 
