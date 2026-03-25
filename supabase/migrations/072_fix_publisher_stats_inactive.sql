@@ -94,7 +94,7 @@ BEGIN
             p.display_name AS subscriber_name
           FROM deck_shares ds
           JOIN marketplace_listings ml ON ml.deck_id = ds.deck_id
-          JOIN profiles p ON p.id = ds.user_id
+          JOIN profiles p ON p.id = ds.recipient_id
           WHERE ml.owner_id = v_user_id AND ml.is_active = true
             AND ds.share_mode = 'subscribe'
             AND ds.status = 'active'
