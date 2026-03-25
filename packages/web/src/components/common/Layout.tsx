@@ -8,6 +8,29 @@ type NavLink = { kind: 'link'; path: string; label: string; icon: string }
 type NavGroup = { kind: 'group'; label: string; icon: string; children: { path: string; label: string; icon: string }[] }
 type NavItem = NavLink | NavGroup
 
+// ── Quick Tips — extensible: just add items to TIPS array ──
+const TIPS = [
+  { icon: '👆', text: 'Tap card to flip, swipe or click buttons to rate' },
+  { icon: '📊', text: 'Dashboard shows your study stats & streaks' },
+  { icon: '⚡', text: 'Quick Study starts a session instantly' },
+  { icon: '🎯', text: 'Set daily goals in Settings to stay motivated' },
+]
+
+function QuickTip() {
+  const [idx, setIdx] = useState(0)
+  const tip = TIPS[idx]
+  return (
+    <button
+      onClick={() => setIdx((i) => (i + 1) % TIPS.length)}
+      className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs text-muted-foreground hover:bg-accent transition cursor-pointer border-none bg-transparent text-left"
+    >
+      <span>{tip.icon}</span>
+      <span className="flex-1">{tip.text}</span>
+      <span className="text-[10px] opacity-60">{idx + 1}/{TIPS.length}</span>
+    </button>
+  )
+}
+
 export function Layout() {
   const { t } = useTranslation('common')
   const { role } = useAuthStore()
@@ -209,7 +232,7 @@ export function Layout() {
                   </div>
                 )
               })}
-              <div className="border-t border-border mt-2 pt-3 px-3">
+              <div className="border-t border-border mt-2 pt-3 px-3 space-y-2">
                 <Link
                   to="/guide"
                   onClick={() => setMobileMenuOpen(false)}
@@ -218,6 +241,7 @@ export function Layout() {
                   <BookOpen className="w-4 h-4" />
                   {t('nav.guide')}
                 </Link>
+                <QuickTip />
               </div>
             </nav>
           </div>

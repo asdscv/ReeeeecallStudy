@@ -163,8 +163,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         />
       </ScrollView>
 
-      {/* Footer spacer */}
-      <View style={{ height: 16 }} />
+      {/* Quick Tips — always visible at bottom */}
+      <QuickTips theme={theme} />
     </SafeAreaView>
   )
 }
@@ -192,6 +192,35 @@ function MenuItem({ icon, label, active, theme, onPress, indent, testID }: {
         active && { fontWeight: '600' },
       ]}>
         {label}
+      </Text>
+    </TouchableOpacity>
+  )
+}
+
+// ── Quick Tips — extensible: just add items to TIPS array ──
+const TIPS = [
+  { icon: '👆', text: 'Tap card to flip, swipe left/right to rate' },
+  { icon: '☰', text: 'Tap hamburger menu (☰) to navigate' },
+  { icon: '📊', text: 'Dashboard shows your study stats & streaks' },
+  { icon: '⚡', text: 'Quick Study starts a session instantly' },
+]
+
+function QuickTips({ theme }: { theme: ReturnType<typeof useTheme> }) {
+  const [tipIndex, setTipIndex] = useState(0)
+  const tip = TIPS[tipIndex]
+
+  return (
+    <TouchableOpacity
+      onPress={() => setTipIndex((i) => (i + 1) % TIPS.length)}
+      activeOpacity={0.7}
+      style={[styles.tipContainer, { borderTopColor: theme.colors.border }]}
+    >
+      <Text style={styles.tipIcon}>{tip.icon}</Text>
+      <Text style={[styles.tipText, { color: theme.colors.textSecondary }]} numberOfLines={2}>
+        {tip.text}
+      </Text>
+      <Text style={[styles.tipCounter, { color: theme.colors.textTertiary }]}>
+        {tipIndex + 1}/{TIPS.length}
       </Text>
     </TouchableOpacity>
   )
@@ -238,4 +267,12 @@ const styles = StyleSheet.create({
   menuLabel: { fontSize: 15 },
   chevron: { fontSize: 14 },
   divider: { borderTopWidth: 1, marginVertical: 8, marginHorizontal: 16 },
+  tipContainer: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 16, paddingVertical: 12,
+    borderTopWidth: 1,
+  },
+  tipIcon: { fontSize: 16 },
+  tipText: { flex: 1, fontSize: 12, lineHeight: 16 },
+  tipCounter: { fontSize: 10 },
 })
