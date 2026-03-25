@@ -1,10 +1,16 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
-import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
-import { useDecks } from '../hooks'
+import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
+import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
+import { AIKeyVault, NullCrypto } from '@reeeeecall/shared/lib/ai/secure-storage'
+import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
+import { RNStorage } from '../adapters/rn-storage'
+import { getProvider } from '@reeeeecall/shared/lib/ai/provider-registry'
+
+const mobileAiKeyVault = new AIKeyVault({ crypto: new NullCrypto(), backend: new RNStorage() })
 
 const CONTENT_LANGS = [
   { code: 'en-US', label: 'English' },
@@ -106,8 +112,12 @@ export function AIGenerateScreen() {
   const navigation = useNavigation()
   const store = useAIGenerateStore()
   const { decks, templates } = useDecks()
+  const { user } = useAuthState()
 
   const [step, setStep] = useState<WizardStep>('config')
+  const [aiKeys, setAiKeys] = useState<ProviderKeyMap>({})
+  const [selectedProvider, setSelectedProvider] = useState('')
+  const [selectedModel, setSelectedModel] = useState('')
 
   // Config state
   const [topic, setTopic] = useState('')
@@ -115,11 +125,41 @@ export function AIGenerateScreen() {
   const [contentLang, setContentLang] = useState('en-US')
   const [selectedDeckId, setSelectedDeckId] = useState('')
 
+  // Load configured AI keys
+  useEffect(() => {
+    if (!user) return
+    mobileAiKeyVault.loadAll(user.id).then((keys) => {
+      setAiKeys(keys)
+      const firstProviderId = Object.keys(keys)[0]
+      if (firstProviderId) {
+        setSelectedProvider(firstProviderId)
+        setSelectedModel(keys[firstProviderId].model)
+      }
+    }).catch(() => {})
+  }, [user])
+
+  const configuredProviders = Object.keys(aiKeys)
+  const hasProvider = configuredProviders.length > 0
+
   const handleGenerate = async () => {
     if (!topic.trim()) {
       Alert.alert('Error', 'Please enter a topic')
       return
     }
+    if (!hasProvider || !selectedProvider) {
+      Alert.alert('Error', 'Please configure an AI provider in Settings first.')
+      return
+    }
+
+    // Set AI config cache so the store can use it
+    const entry = aiKeys[selectedProvider]
+    const provider = getProvider(selectedProvider)
+    setAIConfigCache({
+      providerId: selectedProvider,
+      apiKey: entry.apiKey,
+      model: selectedModel || entry.model,
+      baseUrl: entry.baseUrl || provider?.baseUrl,
+    })
 
     setStep('generating')
     try {
@@ -228,19 +268,51 @@ export function AIGenerateScreen() {
           <View style={styles.sectionLabelRow}>
             <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>AI PROVIDER</Text>
           </View>
-          <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-              No AI providers configured
-            </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Settings' as never)}
-              style={[styles.settingsLink, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-            >
-              <Text style={[theme.typography.bodySmall, { color: palette.blue[600], fontWeight: '500' }]}>
-                {'\u2699\uFE0F'} Add in Settings
+          {hasProvider ? (
+            <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
+              {configuredProviders.map((pid) => {
+                const providerInfo = getProvider(pid)
+                const isSelected = selectedProvider === pid
+                return (
+                  <TouchableOpacity
+                    key={pid}
+                    onPress={() => {
+                      setSelectedProvider(pid)
+                      setSelectedModel(aiKeys[pid].model)
+                    }}
+                    style={[styles.providerOption, {
+                      borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: isSelected ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                    }]}
+                  >
+                    <Text style={[theme.typography.bodySmall, {
+                      color: isSelected ? theme.colors.primary : theme.colors.text,
+                      fontWeight: isSelected ? '600' : '400',
+                    }]}>
+                      {providerInfo?.name ?? pid}
+                    </Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                      {aiKeys[pid].model}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+            </View>
+          ) : (
+            <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
+              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+                No AI providers configured
               </Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('SettingsHome' as never)}
+                style={[styles.settingsLink, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+              >
+                <Text style={[theme.typography.bodySmall, { color: palette.blue[600], fontWeight: '500' }]}>
+                  {'\u2699\uFE0F'} Add in Settings
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* CONTENT SETTINGS — matches web: labeled bordered section */}
           <View style={styles.sectionLabelRow}>
@@ -586,7 +658,8 @@ const styles = StyleSheet.create({
   modeRow: { flexDirection: 'row', gap: 10 },
   modeCard: { flex: 1, borderRadius: 10, borderWidth: 1.5, paddingVertical: 14, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center' },
   // AI Provider
-  providerCard: { borderRadius: 12, padding: 24, alignItems: 'center', gap: 12 },
+  providerCard: { borderRadius: 12, padding: 16, alignItems: 'center', gap: 10 },
+  providerOption: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1 } as const,
   settingsLink: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1 },
   // Dropdown
   dropdown: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5 },

@@ -682,32 +682,34 @@ export function SettingsPage() {
 
                   return (
                     <div key={provider.id} className="border border-border rounded-xl p-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <div className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${iconClasses}`}>
                           <Sparkles className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-foreground">
-                            {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-semibold text-foreground truncate">
+                              {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
+                            </div>
+                            {isConfigured ? (
+                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-success/10 text-success whitespace-nowrap">
+                                {t('aiProvider.configured')}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-accent text-muted-foreground whitespace-nowrap">
+                                {t('aiProvider.notSet')}
+                              </span>
+                            )}
                           </div>
                           {provider.id === 'custom' && (
                             <div className="text-xs text-content-tertiary">{t('aiProvider.customDesc')}</div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
-                          {isConfigured ? (
-                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-success/10 text-success">
-                              {t('aiProvider.configured')}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-accent text-muted-foreground">
-                              {t('aiProvider.notSet')}
-                            </span>
-                          )}
+                        <div className="flex items-center gap-2 shrink-0">
                           {!isEditing && (
                             <button
                               onClick={() => handleAiEdit(provider.id)}
-                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer"
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer whitespace-nowrap"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                               {t('aiProvider.edit')}
@@ -716,7 +718,7 @@ export function SettingsPage() {
                           {!isEditing && isConfigured && (
                             <button
                               onClick={() => handleAiDelete(provider.id)}
-                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer"
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer whitespace-nowrap"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                               {t('aiProvider.delete')}
