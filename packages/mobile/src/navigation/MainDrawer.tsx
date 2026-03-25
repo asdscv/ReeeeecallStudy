@@ -37,6 +37,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
   const { user } = useAuthState()
   const [studyGroupOpen, setStudyGroupOpen] = useState(false)
   const [role, setRole] = useState<string>('user')
+  // Track which drawer item is active (not just the tab)
+  const [activeItem, setActiveItem] = useState<string>('Dashboard')
 
   const activeRoute = state.routeNames[state.index]
 
@@ -50,14 +52,15 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
       })
   }, [user])
 
-  const isActive = (name: string) => activeRoute === name
+  const isActive = (item: string) => activeItem === item
 
-  const go = (name: keyof MainTabParamList, screen?: string) => {
+  const go = (name: keyof MainTabParamList, screen?: string, item?: string) => {
     if (screen) {
       navigation.navigate(name, { screen } as any)
     } else {
       navigation.navigate(name)
     }
+    setActiveItem(item ?? screen ?? name)
     navigation.closeDrawer()
   }
 
@@ -72,16 +75,16 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         {/* Quick Study */}
         <MenuItem
           icon="⚡" label={t('nav.quickStudy')}
-          active={isActive('StudyTab')}
+          active={isActive('QuickStudy')}
           theme={theme}
-          onPress={() => go('StudyTab')}
+          onPress={() => go('StudyTab', undefined, 'QuickStudy')}
           testID="drawer-quick-study"
         />
 
         {/* Dashboard */}
         <MenuItem
           icon="📊" label={t('nav.dashboard')}
-          active={isActive('HomeTab')}
+          active={isActive('Dashboard')}
           theme={theme}
           onPress={() => go('HomeTab', 'Dashboard')}
           testID="drawer-dashboard"
@@ -104,25 +107,25 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {studyGroupOpen && (
           <View>
-            <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={false} theme={theme}
+            <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={isActive('AIGenerate')} theme={theme}
               onPress={() => go('SettingsTab', 'AIGenerate')} testID="drawer-ai-generate" />
             <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
-              onPress={() => go('DecksTab')} testID="drawer-decks" />
-            <MenuItem icon="📋" label={t('nav.cards')} indent active={false} theme={theme}
+              onPress={() => go('DecksTab', undefined, 'DecksTab')} testID="drawer-decks" />
+            <MenuItem icon="📋" label={t('nav.cards')} indent active={isActive('TemplatesList')} theme={theme}
               onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
             <MenuItem icon="🏪" label={t('nav.marketplace')} indent active={isActive('MarketplaceTab')} theme={theme}
-              onPress={() => go('MarketplaceTab')} testID="drawer-marketplace" />
-            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent active={false} theme={theme}
+              onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
+            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent active={isActive('PublisherStats')} theme={theme}
               onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
-            <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={false} theme={theme}
+            <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={isActive('StudyHistory')} theme={theme}
               onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
           </View>
         )}
 
-        {/* Achievements — matches web */}
+        {/* Achievements */}
         <MenuItem
           icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })}
-          active={false}
+          active={isActive('Achievements')}
           theme={theme}
           onPress={() => go('SettingsTab', 'Achievements')}
           testID="drawer-achievements"
@@ -131,7 +134,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         {/* Settings */}
         <MenuItem
           icon="⚙️" label={t('nav.settings')}
-          active={isActive('SettingsTab')}
+          active={isActive('SettingsHome')}
           theme={theme}
           onPress={() => go('SettingsTab', 'SettingsHome')}
           testID="drawer-settings"
@@ -141,9 +144,9 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         {role === 'admin' && (
           <MenuItem
             icon="🛡️" label={t('nav.admin')}
-            active={false}
+            active={isActive('Admin')}
             theme={theme}
-            onPress={() => navigation.closeDrawer()}
+            onPress={() => { setActiveItem('Admin'); navigation.closeDrawer() }}
           />
         )}
 
@@ -153,7 +156,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         {/* Guide */}
         <MenuItem
           icon="📖" label={t('nav.guide')}
-          active={false}
+          active={isActive('Guide')}
           theme={theme}
           onPress={() => go('SettingsTab', 'Guide')}
           testID="drawer-guide"
