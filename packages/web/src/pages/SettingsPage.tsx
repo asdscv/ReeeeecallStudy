@@ -723,17 +723,18 @@ export function SettingsPage() {
                               className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-sm font-mono"
                             />
                           </div>
-                          <div>
+                          <div className="relative">
                             <label className="block text-sm font-medium text-foreground mb-1">{t('aiProvider.model')}</label>
                             <select
                               value={aiEditModel}
                               onChange={(e) => setAiEditModel(e.target.value)}
-                              className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-sm bg-card"
+                              className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-base bg-card appearance-none"
                             >
                               {models.map((m) => (
                                 <option key={m.id} value={m.id}>{m.name}</option>
                               ))}
                             </select>
+                            <ChevronDown className="absolute right-3 top-[38px] w-4 h-4 text-content-tertiary pointer-events-none" />
                           </div>
                           {provider.id === 'custom' && (
                             <div>
