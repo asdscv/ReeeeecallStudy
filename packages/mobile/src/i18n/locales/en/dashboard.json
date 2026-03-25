@@ -26,6 +26,30 @@
   "heatmap": {
     "title": "Study Heatmap"
   },
+  "gamification": {
+    "freezes": "{{count}} freezes left",
+    "dailyGoal": "Daily Goal"
+  },
+  "level": {
+    "title": "Level {{level}}",
+    "xpLabel": "XP",
+    "allAchievements": "All Achievements"
+  },
+  "goals": {
+    "title": "Next Goals"
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "cards": "Study {{count}} cards",
+    "sessions": "Complete {{count}} sessions",
+    "time": "Study for {{count}} minutes",
+    "perfect": "Get {{count}} perfect scores"
+  },
+  "streakFreeze": {
+    "title": "Streak Freeze",
+    "available": "{{count}} available",
+    "motivational": "Keep going! You're doing great!"
+  },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
   "streakDays": "{{count}}days"

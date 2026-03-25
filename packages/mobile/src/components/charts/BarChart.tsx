@@ -7,6 +7,7 @@ interface BarChartProps {
   barColor?: string
   maxBars?: number
   height?: number
+  noDataMessage?: string
   testID?: string
 }
 
@@ -14,7 +15,7 @@ interface BarChartProps {
  * Matches web DailyStudyChart / ForecastWidget — View-based bar chart.
  * Wrapped in white card with border (same as web).
  */
-export function BarChart({ data, title, barColor, maxBars = 14, height = 120, testID }: BarChartProps) {
+export function BarChart({ data, title, barColor, maxBars = 14, height = 120, noDataMessage, testID }: BarChartProps) {
   const theme = useTheme()
 
   const displayData = data.slice(-maxBars)
@@ -23,6 +24,25 @@ export function BarChart({ data, title, barColor, maxBars = 14, height = 120, te
   const maxCount = Math.max(...displayData.map((d) => d.count), 1)
   const totalCount = displayData.reduce((s, d) => s + d.count, 0)
   const fillColor = barColor ?? theme.colors.primary
+
+  // Show no-data message if all counts are 0
+  if (totalCount === 0 && noDataMessage) {
+    return (
+      <View
+        style={[styles.container, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+        testID={testID}
+      >
+        <View style={styles.headerRow}>
+          <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
+            {title ?? 'Daily Study'}
+          </Text>
+        </View>
+        <View style={[styles.chartArea, { height: 60, justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.textTertiary }]}>{noDataMessage}</Text>
+        </View>
+      </View>
+    )
+  }
 
   const formatLabel = (dateStr: string): string => {
     const parts = dateStr.split('-')

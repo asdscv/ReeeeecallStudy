@@ -26,6 +26,30 @@
   "heatmap": {
     "title": "학습 잔디"
   },
+  "gamification": {
+    "freezes": "프리즈 {{count}}개 남음",
+    "dailyGoal": "일일 목표"
+  },
+  "level": {
+    "title": "레벨 {{level}}",
+    "xpLabel": "경험치",
+    "allAchievements": "전체 업적"
+  },
+  "goals": {
+    "title": "다음 목표"
+  },
+  "quests": {
+    "title": "일일 퀘스트",
+    "cards": "카드 {{count}}장 학습",
+    "sessions": "{{count}}회 세션 완료",
+    "time": "{{count}}분 학습",
+    "perfect": "만점 {{count}}회 달성"
+  },
+  "streakFreeze": {
+    "title": "연속 학습 보호",
+    "available": "{{count}}개 보유",
+    "motivational": "잘하고 있어요! 계속 화이팅!"
+  },
   "studyHistory": "학습 기록",
   "studyHistoryDesc": "세션, 통계, 진도 보기",
   "streakDays": "{{count}}일"
