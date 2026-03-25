@@ -100,8 +100,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         >
           <Text style={styles.menuIcon}>📚</Text>
           <Text style={[styles.menuLabel, { color: theme.colors.text, flex: 1 }]}>{t('nav.study')}</Text>
-          <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>
-            {studyGroupOpen ? '▾' : '▸'}
+          <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
+            {studyGroupOpen ? '∧' : '∨'}
           </Text>
         </TouchableOpacity>
 
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   menuItemIndent: { paddingLeft: 48, paddingVertical: 10 },
   menuIcon: { fontSize: 18 },
   menuLabel: { fontSize: 15 },
-  chevron: { fontSize: 14 },
+  chevron: { fontSize: 18, fontWeight: '300' },
   divider: { borderTopWidth: 1, marginVertical: 8, marginHorizontal: 16 },
   tipContainer: {
     flexDirection: 'row', alignItems: 'center', gap: 10,

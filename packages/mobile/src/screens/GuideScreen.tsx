@@ -152,8 +152,8 @@ export function GuideScreen() {
               >
                 <Text style={styles.sectionIcon}>{section.icon}</Text>
                 <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{section.title}</Text>
-                <Text style={[styles.sectionChevron, { color: theme.colors.textTertiary }]}>
-                  {isExpanded ? '▾' : '▸'}
+                <Text style={[styles.sectionChevron, { color: theme.colors.textSecondary }]}>
+                  {isExpanded ? '∧' : '∨'}
                 </Text>
               </TouchableOpacity>
 
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 },
   sectionIcon: { fontSize: 20 },
   sectionTitle: { flex: 1, fontSize: 16, fontWeight: '600' },
-  sectionChevron: { fontSize: 16 },
+  sectionChevron: { fontSize: 18, fontWeight: '300' },
   itemsContainer: { paddingHorizontal: 14, paddingBottom: 14 },
   item: { paddingVertical: 12 },
   itemTitle: { fontSize: 14, fontWeight: '600', marginBottom: 6 },

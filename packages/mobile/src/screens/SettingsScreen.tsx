@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList, Share, Appearance } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -34,19 +34,21 @@ const TTS_PROVIDERS = [
 ]
 
 const AI_PROVIDERS = [
-  { id: 'openai', label: 'OpenAI', color: palette.green[600], bg: '#F0FDF4', models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'o4-mini'] },
+  { id: 'openai', label: 'OpenAI', color: palette.green[600], bg: palette.green[50], models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'o4-mini'] },
   { id: 'google', label: 'Google Gemini', color: palette.blue[600], bg: palette.blue[50], models: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'] },
-  { id: 'anthropic', label: 'Anthropic', color: '#C2410C', bg: '#FFF7ED', models: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'] },
+  { id: 'anthropic', label: 'Anthropic', color: palette.yellow[700], bg: palette.yellow[50], models: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'] },
   { id: 'xai', label: 'xAI (Grok)', color: palette.gray[900], bg: palette.gray[100], models: ['grok-3-mini', 'grok-3'] },
 ]
 
 interface ProfileData {
   display_name: string
   daily_new_limit: number
+  daily_study_goal: number | null
   tts_enabled: boolean
   tts_speed: number
   tts_provider: 'web_speech' | 'edge_tts'
   answer_mode: 'button' | 'swipe'
+  answer_timing: 'before' | 'same' | 'after'
 }
 
 type Nav = NativeStackNavigationProp<SettingsStackParamList, 'SettingsHome'>
@@ -62,12 +64,15 @@ export function SettingsScreen() {
   const [profile, setProfile] = useState<ProfileData>({
     display_name: '',
     daily_new_limit: 20,
+    daily_study_goal: null,
     tts_enabled: false,
     tts_speed: 0.9,
     tts_provider: 'web_speech',
     answer_mode: 'button',
+    answer_timing: 'after',
   })
   const [language, setLanguage] = useState(i18n.language || 'en')
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system')
   const [langDropdownOpen, setLangDropdownOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
@@ -89,7 +94,7 @@ export function SettingsScreen() {
     const supabase = getMobileSupabase()
     supabase
       .from('profiles')
-      .select('display_name, daily_new_limit, tts_enabled, tts_speed, tts_provider, answer_mode, language')
+      .select('display_name, daily_new_limit, daily_study_goal, tts_enabled, tts_speed, tts_provider, answer_mode, language')
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
@@ -97,10 +102,12 @@ export function SettingsScreen() {
           setProfile({
             display_name: data.display_name ?? '',
             daily_new_limit: data.daily_new_limit ?? 20,
+            daily_study_goal: (data as Record<string, unknown>).daily_study_goal as number | null,
             tts_enabled: data.tts_enabled ?? false,
             tts_speed: data.tts_speed ?? 0.9,
             tts_provider: data.tts_provider ?? 'web_speech',
             answer_mode: data.answer_mode ?? 'button',
+            answer_timing: (data as Record<string, unknown>).answer_timing as ProfileData['answer_timing'] ?? 'after',
           })
           if (data.language) {
             setLanguage(data.language)
@@ -200,64 +207,63 @@ export function SettingsScreen() {
       <DrawerHeader title={t('title')} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
-        {/* ── a) Profile Section ── */}
+        {/* ── a) Profile — centered avatar like web ── */}
         <SectionCard theme={theme}>
-          <View style={styles.profileRow}>
+          <View style={styles.profileCentered}>
             <View style={[styles.avatarCircle, { backgroundColor: theme.colors.primary }]}>
               <Text style={styles.avatarText}>{userInitial}</Text>
             </View>
-            <View style={styles.profileInfo}>
-              <TextInput
-                testID="settings-display-name"
-                label="Display Name"
-                value={profile.display_name}
-                onChangeText={(v) => setProfile((p) => ({ ...p, display_name: v }))}
-                onBlur={() => saveProfile({ display_name: profile.display_name })}
-                placeholder="2-12 characters"
-              />
-              <Text style={[styles.emailText, { color: theme.colors.textSecondary }]}>{user?.email}</Text>
-              <View style={[styles.planBadge, {
-                backgroundColor: isPro ? theme.colors.successLight : palette.gray[100],
-                borderColor: isPro ? theme.colors.success : palette.gray[300],
-              }]}>
-                <Text style={[styles.planBadgeText, {
-                  color: isPro ? theme.colors.success : palette.gray[600],
-                }]}>
-                  {isPro ? 'Pro' : 'Free'}
-                </Text>
-              </View>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{user?.email}</Text>
+            <View style={[styles.planBadge, {
+              backgroundColor: isPro ? theme.colors.successLight : palette.gray[100],
+              borderColor: isPro ? theme.colors.success : palette.gray[300],
+            }]}>
+              <Text style={[styles.planBadgeText, { color: isPro ? theme.colors.success : palette.gray[600] }]}>
+                {isPro ? 'Pro' : 'Free'}
+              </Text>
             </View>
           </View>
+          <TextInput
+            testID="settings-display-name"
+            label="Display name"
+            value={profile.display_name}
+            onChangeText={(v) => setProfile((p) => ({ ...p, display_name: v }))}
+            onBlur={() => saveProfile({ display_name: profile.display_name })}
+            placeholder="2-12 characters"
+          />
         </SectionCard>
 
-        {/* ── b) Quick Actions ── */}
+        {/* ── b) Quick Actions — circles like web ── */}
         <View style={styles.quickActionsRow}>
           <TouchableOpacity
             testID="settings-quick-study"
-            onPress={() => {
-              const nav = navigation.getParent() as any
-              nav?.navigate('StudyTab')
-            }}
-            style={[styles.quickActionCard, { backgroundColor: '#FFF7ED', borderColor: '#FED7AA' }]}
+            onPress={() => { const nav = navigation.getParent() as any; nav?.navigate('StudyTab') }}
+            style={styles.quickActionItem}
           >
-            <Text style={styles.quickActionEmoji}>⚡</Text>
-            <Text style={[styles.quickActionLabel, { color: '#C2410C' }]}>Quick Study</Text>
+            <View style={[styles.quickActionCircle, { backgroundColor: palette.yellow[50], borderColor: palette.yellow[100] }]}>
+              <Text style={{ fontSize: 22 }}>{'\u26A1'}</Text>
+            </View>
+            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>Quick{'\n'}Study</Text>
           </TouchableOpacity>
           <TouchableOpacity
             testID="settings-ai-generate"
             onPress={() => navigation.navigate('AIGenerate')}
-            style={[styles.quickActionCard, { backgroundColor: '#F5F3FF', borderColor: '#DDD6FE' }]}
+            style={styles.quickActionItem}
           >
-            <Text style={styles.quickActionEmoji}>🤖</Text>
-            <Text style={[styles.quickActionLabel, { color: '#7C3AED' }]}>AI Generate</Text>
+            <View style={[styles.quickActionCircle, { backgroundColor: palette.purple[50], borderColor: palette.purple[200] }]}>
+              <Text style={{ fontSize: 22 }}>{'\uD83E\uDD16'}</Text>
+            </View>
+            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>AI{'\n'}Generate</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            testID="settings-guide-link"
-            onPress={() => navigation.navigate('Guide')}
-            style={[styles.quickActionCard, { backgroundColor: palette.blue[50], borderColor: palette.blue[200] }]}
+            testID="settings-invite-link"
+            onPress={() => Share.share({ message: 'Check out ReeeeecallStudy — the smartest flashcard app! https://reeeeecall.com' })}
+            style={styles.quickActionItem}
           >
-            <Text style={styles.quickActionEmoji}>📖</Text>
-            <Text style={[styles.quickActionLabel, { color: palette.blue[700] }]}>Guide</Text>
+            <View style={[styles.quickActionCircle, { backgroundColor: palette.green[50], borderColor: palette.green[100] }]}>
+              <Text style={{ fontSize: 22 }}>{'\uD83D\uDCE7'}</Text>
+            </View>
+            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>Invite</Text>
           </TouchableOpacity>
         </View>
 
@@ -312,12 +318,41 @@ export function SettingsScreen() {
           </TouchableOpacity>
         </SectionCard>
 
-        {/* ── c) Study Settings ── */}
+        {/* ── Answer Mode — matches web: standalone card ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Study Settings</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Answer Mode</Text>
+          <View style={styles.segmentRow}>
+            {(['before', 'same', 'after'] as const).map((timing) => {
+              const isActive = profile.answer_timing === timing
+              const labels = { before: 'Before', same: 'Same', after: 'After' }
+              return (
+                <TouchableOpacity
+                  key={timing}
+                  testID={`settings-timing-${timing}`}
+                  onPress={() => saveProfile({ answer_timing: timing })}
+                  style={[
+                    styles.segmentButton,
+                    {
+                      backgroundColor: isActive ? palette.blue[500] : theme.colors.surface,
+                      borderColor: isActive ? palette.blue[500] : theme.colors.border,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.segmentLabel, { color: isActive ? '#FFFFFF' : theme.colors.text }]}>
+                    {labels[timing]}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            Rate directly on the front card (tap answer before flipping) or see answer first.
+          </Text>
+        </SectionCard>
 
-          {/* Answer Mode */}
-          <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>Answer Mode</Text>
+        {/* ── New Card Limit — standalone card ── */}
+        <SectionCard theme={theme}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>New Card Limit</Text>
           <View style={styles.modeGrid}>
             {(['button', 'swipe'] as const).map((mode) => {
               const isActive = profile.answer_mode === mode
@@ -344,27 +379,26 @@ export function SettingsScreen() {
             })}
           </View>
 
-          {/* Daily New Card Limit */}
-          <View style={styles.settingRow}>
-            <TextInput
-              testID="settings-daily-limit"
-              label="Daily New Card Limit"
-              value={String(profile.daily_new_limit)}
-              onChangeText={(v) => {
-                const num = parseInt(v) || 0
-                setProfile((p) => ({ ...p, daily_new_limit: num }))
-              }}
-              onBlur={() => saveProfile({ daily_new_limit: profile.daily_new_limit })}
-              keyboardType="number-pad"
-            />
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-              Maximum new cards shown per day per deck.
-            </Text>
-          </View>
+          <TextInput
+            testID="settings-daily-limit"
+            value={String(profile.daily_new_limit)}
+            onChangeText={(v) => {
+              const num = parseInt(v) || 0
+              setProfile((p) => ({ ...p, daily_new_limit: num }))
+            }}
+            onBlur={() => saveProfile({ daily_new_limit: profile.daily_new_limit })}
+            keyboardType="number-pad"
+          />
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            The number of new cards automatically added to your daily review queue per deck.
+          </Text>
+        </SectionCard>
 
-          {/* TTS */}
+        {/* ── Auto TTS Reading — standalone card ── */}
+        <SectionCard theme={theme}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Auto TTS Reading</Text>
           <View style={styles.switchRow}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Auto TTS Reading</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Enable auto reading</Text>
             <Switch
               testID="settings-tts-toggle"
               value={profile.tts_enabled}
@@ -394,7 +428,7 @@ export function SettingsScreen() {
                     >
                       <Text style={[styles.modeLabel, { color: theme.colors.text }]}>{prov.label}</Text>
                       <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{prov.desc}</Text>
-                      {prov.noteKey ? <Text style={{ fontSize: 11, color: '#F59E0B', marginTop: 2 }}>{t(prov.noteKey, { ns: 'settings' })}</Text> : null}
+                      {prov.noteKey ? <Text style={{ fontSize: 11, color: palette.yellow[500], marginTop: 2 }}>{t(prov.noteKey, { ns: 'settings' })}</Text> : null}
                     </TouchableOpacity>
                   )
                 })}
@@ -422,6 +456,29 @@ export function SettingsScreen() {
               </View>
             </View>
           )}
+        </SectionCard>
+
+        {/* ── Daily Study Goal — standalone like web ── */}
+        <SectionCard theme={theme}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Daily Study Goal</Text>
+          <TextInput
+            testID="settings-daily-goal"
+            value={profile.daily_study_goal != null ? String(profile.daily_study_goal) : ''}
+            onChangeText={(v) => {
+              const num = v ? parseInt(v) || 0 : null
+              setProfile((p) => ({ ...p, daily_study_goal: num }))
+            }}
+            onBlur={() => {
+              const goal = profile.daily_study_goal
+              if (goal !== null && (goal < 1 || goal > 480)) return
+              saveProfile({ daily_study_goal: goal })
+            }}
+            keyboardType="number-pad"
+            placeholder="e.g. 30"
+          />
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            Set a daily study target in minutes. Leave empty for no goal.
+          </Text>
         </SectionCard>
 
         {/* ── d) SRS Configuration ── */}
@@ -470,8 +527,8 @@ export function SettingsScreen() {
             activeOpacity={0.7}
           >
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>AI Providers</Text>
-            <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>
-              {aiCollapsed ? '▸' : '▾'}
+            <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
+              {aiCollapsed ? '∨' : '∧'}
             </Text>
           </TouchableOpacity>
           {!aiCollapsed && (
@@ -553,7 +610,7 @@ export function SettingsScreen() {
             <Text style={[styles.dropdownText, { color: theme.colors.text }]}>
               {LANGUAGES.find((l) => l.code === language)?.label ?? 'English'}
             </Text>
-            <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>▾</Text>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 18, fontWeight: '300' }}>∨</Text>
           </TouchableOpacity>
 
           <Modal visible={langDropdownOpen} transparent animationType="fade" onRequestClose={() => setLangDropdownOpen(false)}>
@@ -584,6 +641,39 @@ export function SettingsScreen() {
               </View>
             </TouchableOpacity>
           </Modal>
+        </SectionCard>
+
+        {/* ── Theme ── */}
+        <SectionCard theme={theme}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Theme</Text>
+          <View style={styles.segmentRow}>
+            {(['light', 'dark', 'system'] as const).map((mode) => {
+              const isActive = themeMode === mode
+              const labels = { light: 'Light', dark: 'Dark', system: 'System' }
+              return (
+                <TouchableOpacity
+                  key={mode}
+                  testID={`settings-theme-${mode}`}
+                  onPress={() => {
+                    setThemeMode(mode)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    Appearance.setColorScheme(mode === 'system' ? null as any : mode)
+                  }}
+                  style={[
+                    styles.segmentButton,
+                    {
+                      backgroundColor: isActive ? palette.blue[500] : theme.colors.surface,
+                      borderColor: isActive ? palette.blue[500] : theme.colors.border,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.segmentLabel, { color: isActive ? '#FFFFFF' : theme.colors.text }]}>
+                    {labels[mode]}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
         </SectionCard>
 
         {/* ── g) Notifications ── */}
@@ -636,7 +726,31 @@ export function SettingsScreen() {
           )}
         </SectionCard>
 
-        {/* ── i) Legal (compact inline links) ── */}
+        {/* ── i) Export My Data — matches web ── */}
+        <SectionCard theme={theme}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Export My Data</Text>
+          {[
+            { key: 'stats', icon: '📊', label: 'Study Statistics' },
+            { key: 'sessions', icon: '📅', label: 'Study Sessions' },
+            { key: 'decks', icon: '📚', label: 'Decks' },
+            { key: 'cards', icon: '🃏', label: 'Cards' },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.key}
+              testID={`settings-export-${item.key}`}
+              onPress={() => navigation.navigate('ImportExport' as never)}
+              style={[styles.exportRow, { borderColor: theme.colors.border }]}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <Text style={{ fontSize: 18 }}>{item.icon}</Text>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{item.label}</Text>
+              </View>
+              <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
+            </TouchableOpacity>
+          ))}
+        </SectionCard>
+
+        {/* ── j) Legal (compact inline links) ── */}
         <View style={styles.legalRow}>
           <TouchableOpacity
             testID="settings-privacy-policy"
@@ -700,34 +814,30 @@ function SectionCard({ children, theme }: {
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 16, paddingBottom: 40 },
 
-  // Profile
-  profileRow: { gap: 16 },
+  // Profile — centered like web
+  profileCentered: { alignItems: 'center', gap: 8 },
   avatarCircle: {
     width: 56, height: 56, borderRadius: 28,
     alignItems: 'center', justifyContent: 'center',
-    alignSelf: 'center',
   },
   avatarText: { fontSize: 24, fontWeight: '700', color: '#FFFFFF' },
-  profileInfo: { gap: 8 },
-  emailText: { fontSize: 13, textAlign: 'center' },
   planBadge: {
-    alignSelf: 'center',
     paddingHorizontal: 12, paddingVertical: 4,
     borderRadius: 12, borderWidth: 1,
   },
   planBadgeText: { fontSize: 12, fontWeight: '600' },
 
-  // Quick Actions
+  // Quick Actions — circles like web
   quickActionsRow: {
-    flexDirection: 'row', gap: 10, marginBottom: 12,
+    flexDirection: 'row', justifyContent: 'center', gap: 24, marginBottom: 12,
   },
-  quickActionCard: {
-    flex: 1, alignItems: 'center', gap: 6,
-    paddingVertical: 16, paddingHorizontal: 8,
-    borderRadius: 12, borderWidth: 1,
+  quickActionItem: { alignItems: 'center', gap: 6 },
+  quickActionCircle: {
+    width: 52, height: 52, borderRadius: 26,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1,
   },
-  quickActionEmoji: { fontSize: 24 },
-  quickActionLabel: { fontSize: 12, fontWeight: '600' },
+  quickActionLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
 
   // Section card
   card: { borderRadius: 12, borderWidth: 1, padding: 16, marginBottom: 12, gap: 12 },
@@ -786,7 +896,7 @@ const styles = StyleSheet.create({
   collapsibleHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
-  chevron: { fontSize: 16 },
+  chevron: { fontSize: 18, fontWeight: '300' },
 
   // AI Providers
   aiProviderCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
@@ -822,4 +932,18 @@ const styles = StyleSheet.create({
   versionText: { fontSize: 11, textAlign: 'center', marginTop: 12 },
 
   bottomSpacer: { height: 20 },
+
+  // Segment buttons (Answer Timing, Theme)
+  segmentRow: { flexDirection: 'row', gap: 8 },
+  segmentButton: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 10, borderRadius: 10, borderWidth: 1,
+  },
+  segmentLabel: { fontSize: 14, fontWeight: '600' },
+
+  // Export
+  exportRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1,
+  },
 })
