@@ -671,7 +671,7 @@ export function SettingsPage() {
             <>
               <p className="text-sm text-muted-foreground mt-2 mb-5">{t('aiProvider.description')}</p>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {allAiProviders.map((provider) => {
                   const isConfigured = !!aiKeys[provider.id]
                   const isEditing = aiEditingId === provider.id
@@ -681,55 +681,39 @@ export function SettingsPage() {
                     : (getProvider(provider.id)?.models ?? provider.models)
 
                   return (
-                    <div key={provider.id} className="border border-border rounded-xl p-4">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${iconClasses}`}>
-                          <Sparkles className="w-4 h-4" />
+                    <div key={provider.id} className="border border-border rounded-xl overflow-hidden">
+                      {/* Toggle header */}
+                      <button
+                        onClick={() => isEditing ? handleAiCancel() : handleAiEdit(provider.id)}
+                        className="w-full flex items-center gap-3 p-3.5 bg-transparent border-none cursor-pointer hover:bg-accent/50 transition"
+                      >
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 ${iconClasses}`}>
+                          <Sparkles className="w-3.5 h-3.5" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-semibold text-foreground truncate">
-                              {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
-                            </div>
-                            {isConfigured ? (
-                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-success/10 text-success whitespace-nowrap">
-                                {t('aiProvider.configured')}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-accent text-muted-foreground whitespace-nowrap">
-                                {t('aiProvider.notSet')}
-                              </span>
-                            )}
+                        <div className="flex-1 min-w-0 text-left">
+                          <div className="text-sm font-semibold text-foreground">
+                            {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
                           </div>
                           {provider.id === 'custom' && (
                             <div className="text-xs text-content-tertiary">{t('aiProvider.customDesc')}</div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {!isEditing && (
-                            <button
-                              onClick={() => handleAiEdit(provider.id)}
-                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer whitespace-nowrap"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                              {t('aiProvider.edit')}
-                            </button>
-                          )}
-                          {!isEditing && isConfigured && (
-                            <button
-                              onClick={() => handleAiDelete(provider.id)}
-                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer whitespace-nowrap"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              {t('aiProvider.delete')}
-                            </button>
-                          )}
-                        </div>
-                      </div>
+                        {isConfigured ? (
+                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-success/10 text-success whitespace-nowrap">
+                            {t('aiProvider.configured')}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-accent text-muted-foreground whitespace-nowrap">
+                            {t('aiProvider.notSet')}
+                          </span>
+                        )}
+                        <ChevronDown className={`w-4 h-4 text-content-tertiary transition-transform shrink-0 ${isEditing ? 'rotate-180' : ''}`} />
+                      </button>
 
+                      {/* Expanded edit form */}
                       {isEditing && (
-                        <div className="mt-4 pt-4 border-t border-border space-y-3">
-                          <div>
+                        <div className="px-3.5 pb-3.5 pt-0 space-y-3 border-t border-border">
+                          <div className="pt-3">
                             <label className="block text-sm font-medium text-foreground mb-1">{t('aiProvider.apiKey')}</label>
                             <input
                               type="password"
@@ -767,10 +751,18 @@ export function SettingsPage() {
                             <button
                               onClick={handleAiSave}
                               disabled={aiSaving || !aiEditKey.trim()}
-                              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 transition cursor-pointer font-medium"
+                              className="flex-1 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 transition cursor-pointer font-medium"
                             >
                               {aiSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('aiProvider.save')}
                             </button>
+                            {isConfigured && (
+                              <button
+                                onClick={() => handleAiDelete(provider.id)}
+                                className="px-4 py-2 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                             <button
                               onClick={handleAiCancel}
                               className="px-4 py-2 text-sm text-muted-foreground bg-accent rounded-lg hover:bg-accent transition cursor-pointer"
