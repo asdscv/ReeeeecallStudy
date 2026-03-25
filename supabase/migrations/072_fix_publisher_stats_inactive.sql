@@ -108,7 +108,7 @@ BEGIN
         FROM (
           SELECT
             mr.rating,
-            mr.comment,
+            mr.body,
             mr.created_at,
             ml.title AS deck_title,
             p.display_name AS reviewer_name
