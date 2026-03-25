@@ -8,10 +8,10 @@ export function StudyProgressBar({ current, total }: StudyProgressBarProps) {
 
   return (
     <div className="flex items-center gap-3 sm:gap-4 flex-1">
-      <div className="flex-1 h-1 bg-accent rounded-full overflow-hidden">
+      <div className="flex-1 h-1 bg-accent rounded-full overflow-hidden relative">
         <div
-          className="h-full bg-gradient-to-r from-red-500 via-amber-500 to-green-500 transition-all duration-300"
-          style={{ width: `${pct}%` }}
+          className="absolute inset-0 bg-gradient-to-r from-red-500 via-amber-500 to-green-500 transition-all duration-300"
+          style={{ clipPath: `inset(0 ${100 - pct}% 0 0)` }}
         />
       </div>
       <span className="text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">

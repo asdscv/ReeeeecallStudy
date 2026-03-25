@@ -178,7 +178,7 @@ export function QuickStudyPage() {
               <button
                 key={deck.id}
                 onClick={() => setSelectedDeck(deck)}
-                className="bg-card rounded-xl border border-border overflow-hidden text-left hover:shadow-md transition cursor-pointer"
+                className="bg-card rounded-xl border border-border overflow-hidden text-left hover:shadow-md transition cursor-pointer flex flex-col"
               >
                 <div
                   className="h-1.5 sm:h-2"
