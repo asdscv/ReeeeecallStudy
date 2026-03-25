@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen } from '../components/ui'
+import { Screen, DrawerHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
 import {
@@ -63,13 +63,8 @@ export function AchievementsScreen() {
 
   return (
     <Screen safeArea padding={false} testID="achievements-screen">
+      <DrawerHeader title="Achievements" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Back + Title */}
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>{'\u2190'} Back</Text>
-        </TouchableOpacity>
-
-        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>Achievements</Text>
 
         {/* Level + XP bar — matches web */}
         <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
