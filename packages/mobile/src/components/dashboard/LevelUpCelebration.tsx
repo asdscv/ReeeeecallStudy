@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, Animated, StyleSheet, Dimensions } from 'react-native'
+import { useEffect, useRef } from 'react'
+import { View, Text, Animated, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { palette } from '../../theme'
 
 interface LevelUpCelebrationProps {
@@ -8,13 +9,12 @@ interface LevelUpCelebrationProps {
   onDismiss: () => void
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window')
-
 /**
- * Matches web level-up celebration — star animation + "레벨 업!" overlay.
- * Auto-dismisses after 2.5 seconds.
+ * Level-up celebration overlay — matches web level-up animation.
+ * Auto-dismisses after 2.5 seconds. Uses i18n for localization.
  */
 export function LevelUpCelebration({ level, visible, onDismiss }: LevelUpCelebrationProps) {
+  const { t } = useTranslation('dashboard')
   const scaleAnim = useRef(new Animated.Value(0)).current
   const opacityAnim = useRef(new Animated.Value(0)).current
   const starRotate = useRef(new Animated.Value(0)).current
@@ -22,7 +22,6 @@ export function LevelUpCelebration({ level, visible, onDismiss }: LevelUpCelebra
   useEffect(() => {
     if (!visible) return
 
-    // Entrance animation
     Animated.parallel([
       Animated.spring(scaleAnim, {
         toValue: 1,
@@ -44,7 +43,6 @@ export function LevelUpCelebration({ level, visible, onDismiss }: LevelUpCelebra
       ),
     ]).start()
 
-    // Auto-dismiss
     const timer = setTimeout(() => {
       Animated.timing(opacityAnim, {
         toValue: 0,
@@ -73,8 +71,8 @@ export function LevelUpCelebration({ level, visible, onDismiss }: LevelUpCelebra
         <Animated.Text style={[styles.star, { transform: [{ rotate: spin }] }]}>
           {'\u2B50'}
         </Animated.Text>
-        <Text style={styles.labelText}>레벨 업!</Text>
-        <Text style={styles.levelText}>레벨 {level}</Text>
+        <Text style={styles.labelText}>{t('level.levelUp', { defaultValue: 'Level Up!' })}</Text>
+        <Text style={styles.levelText}>{t('level.title', { level })}</Text>
       </Animated.View>
     </Animated.View>
   )
