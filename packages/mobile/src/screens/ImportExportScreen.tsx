@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, Alert, StyleSheet } from 'react-native'
+import { View, Text, Alert, StyleSheet, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Button, Divider } from '../components/ui'
 import { useCards } from '../hooks/useCards'
@@ -13,7 +13,7 @@ type Route = RouteProp<DecksStackParamList, 'ImportExport'>
 
 export function ImportExportScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('import-export')
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { deckId } = route.params
@@ -24,6 +24,7 @@ export function ImportExportScreen() {
 
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json')
 
   const handleImportCSV = async () => {
     setImporting(true)
@@ -180,8 +181,64 @@ export function ImportExportScreen() {
         {/* Export */}
         <View style={styles.section}>
           <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('exportCards')}</Text>
-          <Button testID="export-csv" title={t('exportCSV')} variant="outline" onPress={handleExportCSV} loading={exporting} />
-          <Button testID="export-json" title={t('exportJSON')} variant="outline" onPress={handleExportJSON} loading={exporting} />
+
+          {/* Format selection pill toggles */}
+          <View style={styles.formatRow}>
+            <TouchableOpacity
+              testID="export-format-json"
+              style={[
+                styles.formatPill,
+                {
+                  backgroundColor: exportFormat === 'json' ? theme.colors.primaryLight : theme.colors.surface,
+                  borderColor: exportFormat === 'json' ? theme.colors.primary : theme.colors.border,
+                },
+              ]}
+              onPress={() => setExportFormat('json')}
+            >
+              <Text
+                style={[
+                  theme.typography.body,
+                  {
+                    color: exportFormat === 'json' ? theme.colors.primary : theme.colors.textSecondary,
+                    fontWeight: exportFormat === 'json' ? '600' : '400',
+                  },
+                ]}
+              >
+                JSON
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="export-format-csv"
+              style={[
+                styles.formatPill,
+                {
+                  backgroundColor: exportFormat === 'csv' ? theme.colors.primaryLight : theme.colors.surface,
+                  borderColor: exportFormat === 'csv' ? theme.colors.primary : theme.colors.border,
+                },
+              ]}
+              onPress={() => setExportFormat('csv')}
+            >
+              <Text
+                style={[
+                  theme.typography.body,
+                  {
+                    color: exportFormat === 'csv' ? theme.colors.primary : theme.colors.textSecondary,
+                    fontWeight: exportFormat === 'csv' ? '600' : '400',
+                  },
+                ]}
+              >
+                CSV
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Button
+            testID="export-btn"
+            title={exportFormat === 'json' ? t('exportJSON') : t('exportCSV')}
+            variant="outline"
+            onPress={exportFormat === 'json' ? handleExportJSON : handleExportCSV}
+            loading={exporting}
+          />
         </View>
       </View>
     </Screen>
@@ -191,4 +248,13 @@ export function ImportExportScreen() {
 const styles = StyleSheet.create({
   content: { gap: 16, paddingVertical: 16 },
   section: { gap: 10 },
+  formatRow: { flexDirection: 'row', gap: 8 },
+  formatPill: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 })

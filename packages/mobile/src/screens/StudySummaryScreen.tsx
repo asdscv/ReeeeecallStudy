@@ -6,24 +6,25 @@ import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
+import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import type { StudyStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySummary'>
 
 const RATING_COLORS: Record<string, string> = {
-  again: '#EF4444',
-  hard: '#F59E0B',
-  good: '#22C55E',
-  easy: '#3B82F6',
-  missed: '#EF4444',
-  got_it: '#22C55E',
-  unknown: '#EF4444',
-  known: '#22C55E',
+  again: ratingColors.again,
+  hard: ratingColors.hard,
+  good: ratingColors.good,
+  easy: ratingColors.easy,
+  missed: ratingColors.again,
+  got_it: ratingColors.good,
+  unknown: ratingColors.again,
+  known: ratingColors.good,
 }
 
 export function StudySummaryScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('study')
   const navigation = useNavigation<Nav>()
   const { sessionStats, config, reset } = useStudy()
 
@@ -141,7 +142,7 @@ function SummaryRow({ label, value, theme, testID, highlight }: {
   return (
     <View style={styles.summaryRow} {...testProps(testID)}>
       <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>{label}</Text>
-      <Text style={[theme.typography.label, { color: highlight ? '#22C55E' : theme.colors.text }]}>{value}</Text>
+      <Text style={[theme.typography.label, { color: highlight ? ratingColors.good : theme.colors.text }]}>{value}</Text>
     </View>
   )
 }

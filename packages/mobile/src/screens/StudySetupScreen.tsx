@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet, Modal, FlatList } from 'react-native'
 import { useNavigation, useRoute, useFocusEffect, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, TextInput, DrawerHeader } from '../components/ui'
@@ -44,7 +44,7 @@ const TIME_LIMITS = [
 
 export function StudySetupScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('study')
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const preselectedDeckId = route.params?.deckId
@@ -143,181 +143,207 @@ export function StudySetupScreen() {
     }
   }
 
+  const closeModal = () => {
+    setSelectedDeckId('')
+    setSelectedMode('srs')
+  }
+
+  const handleModeSelect = (mode: StudyMode) => {
+    setSelectedMode(mode)
+    // SRS starts immediately (no config needed)
+    if (mode === 'srs') {
+      handleStartWithMode(mode)
+    }
+  }
+
+  const handleStartWithMode = async (mode?: StudyMode) => {
+    const m = mode ?? selectedMode
+    if (!selectedDeckId) return
+    if (m === 'by_date' && dateCardCount === 0) {
+      Alert.alert('No Cards', 'No cards found for the selected date')
+      return
+    }
+    const size = parseInt(batchSize) || 20
+    try {
+      let uploadDateStart: string | undefined
+      let uploadDateEnd: string | undefined
+      if (m === 'by_date' && selectedDate) {
+        const range = localDateToUTCRange(selectedDate)
+        uploadDateStart = range.start
+        uploadDateEnd = range.end
+      }
+      await startSession(selectedDeckId, m, size, uploadDateStart, uploadDateEnd)
+      closeModal()
+      navigation.navigate('StudySession')
+    } catch {
+      Alert.alert('Error', 'Failed to start study session')
+    }
+  }
+
+  // Whether the modal should show config options (not just mode list)
+  const showModeConfig = selectedMode === 'cramming' || selectedMode === 'by_date' || showBatchSize
+
   return (
-    <Screen scroll testID="study-setup-screen">
+    <Screen safeArea padding={false} testID="study-setup-screen">
       <DrawerHeader title={t('setup.title')} />
-      <View style={styles.content}>
-        {/* Back button — matches web */}
-        {selectedDeck && (
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>← {selectedDeck.name}</Text>
-          </TouchableOpacity>
-        )}
 
-        {selectedDeck && (
-          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-            {selectedDeck.icon} {selectedDeck.name} · {cardCount} cards
-          </Text>
-        )}
-
-        {/* Deck Selection */}
-        <View style={styles.section}>
-          <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>{t('setup.deck')}</Text>
-          <View style={styles.deckList}>
-            {decks.map((deck) => {
-              const ds = stats.find((s) => s.deck_id === deck.id)
-              const isSelected = selectedDeckId === deck.id
-              return (
-                <TouchableOpacity
-                  key={deck.id}
-                  {...testProps(`study-deck-${deck.id}`)}
-                  onPress={() => setSelectedDeckId(deck.id)}
-                  style={[
-                    styles.deckChip,
-                    {
-                      backgroundColor: isSelected ? palette.blue[50] : theme.colors.surfaceElevated,
-                      borderColor: isSelected ? palette.blue[500] : theme.colors.border,
-                      borderWidth: isSelected ? 2 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.deckEmoji}>{deck.icon}</Text>
-                  <View style={styles.deckChipInfo}>
-                    <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>
-                      {deck.name}
-                    </Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                      {ds?.total_cards ?? 0} cards · {(ds?.review_cards ?? 0) + (ds?.learning_cards ?? 0)} due
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-        </View>
-
-        {/* Mode Selection — matches web: vertical list of p-3 rounded-xl border-2 cards */}
-        <View style={styles.section}>
-          <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>{t('setup.studyMode')}</Text>
-          <View style={styles.modeList}>
-            {MODES.map((m) => {
-              const isSelected = selectedMode === m.mode
-              return (
-                <TouchableOpacity
-                  key={m.mode}
-                  {...testProps(`study-mode-${m.mode}`)}
-                  onPress={() => setSelectedMode(m.mode)}
-                  style={[
-                    styles.modeCard,
-                    {
-                      backgroundColor: isSelected ? palette.blue[50] : theme.colors.surfaceElevated,
-                      borderColor: isSelected ? palette.blue[500] : theme.colors.border,
-                      borderWidth: isSelected ? 2 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.modeEmoji}>{m.emoji}</Text>
-                  <View style={styles.modeInfo}>
-                    <Text style={[theme.typography.label, { color: theme.colors.text }]}>{m.label}</Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{m.desc}</Text>
-                    {isSelected && (
-                      <Text style={[theme.typography.caption, { color: palette.blue[600], marginTop: 2 }]}>{m.detail}</Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-        </View>
-
-        {/* Batch Size — matches web: number input */}
-        {showBatchSize && (
-          <View style={styles.section}>
-            <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>{t('setup.cardsPerSession')}</Text>
-            <TextInput
-              testID="study-batch-input"
-              value={batchSize}
-              onChangeText={setBatchSize}
-              keyboardType="number-pad"
-              placeholder="20"
-            />
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-              Between 5 and 500 cards
+      {/* Deck Grid — matches web: 2-column grid of deck cards */}
+      <FlatList
+        data={decks}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.gridRow}
+        contentContainerStyle={styles.gridContent}
+        renderItem={({ item: deck }) => {
+          const ds = stats.find((s) => s.deck_id === deck.id)
+          const newCards = ds?.new_cards ?? 0
+          const reviewCards = (ds?.review_cards ?? 0) + (ds?.learning_cards ?? 0)
+          return (
+            <TouchableOpacity
+              {...testProps(`study-deck-${deck.id}`)}
+              onPress={() => { setSelectedDeckId(deck.id); setSelectedMode('srs') }}
+              activeOpacity={0.7}
+              style={[styles.deckCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+            >
+              <View style={[styles.deckColorBar, { backgroundColor: deck.color || palette.blue[500] }]} />
+              <View style={styles.deckCardBody}>
+                <View style={styles.deckNameRow}>
+                  <Text style={styles.deckEmoji}>{deck.icon || '\uD83D\uDCDA'}</Text>
+                  <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
+                    {deck.name}
+                  </Text>
+                </View>
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {ds?.total_cards ?? 0} cards
+                </Text>
+                <View style={styles.deckBadges}>
+                  {newCards > 0 && (
+                    <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
+                      <Text style={[styles.badgeText, { color: palette.blue[700] }]}>New {newCards}</Text>
+                    </View>
+                  )}
+                  {reviewCards > 0 && (
+                    <View style={[styles.badge, { backgroundColor: palette.yellow[50] }]}>
+                      <Text style={[styles.badgeText, { color: palette.yellow[700] }]}>Review {reviewCards}</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
+        ListEmptyComponent={
+          <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            <Text style={{ fontSize: 40 }}>{'\uD83D\uDCDA'}</Text>
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+              No decks yet. Create a deck first!
             </Text>
           </View>
-        )}
+        }
+      />
 
-        {/* Cramming Setup — matches web CrammingSetupPanel */}
-        {selectedMode === 'cramming' && (
-          <View style={[styles.section, styles.panelCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('cramming.options')}</Text>
+      {/* Study Mode Modal — matches web: modal with steps */}
+      <Modal visible={!!selectedDeckId} transparent animationType="fade" onRequestClose={closeModal}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeModal}>
+          <View
+            style={[styles.modalCard, { backgroundColor: theme.colors.surfaceElevated }]}
+            onStartShouldSetResponder={() => true}
+          >
+            {/* Modal header */}
+            <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+                {selectedDeck?.icon} {selectedDeck?.name}
+              </Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                {!showModeConfig ? 'Select study mode' : selectedMode === 'by_date' ? 'Select date' : selectedMode === 'cramming' ? 'Cramming options' : 'Set batch size'}
+              </Text>
+            </View>
 
-            {/* Filter */}
-            <View style={styles.subsection}>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cramming.filter.title')}</Text>
-              <View style={styles.chipRow}>
-                {CRAMMING_FILTERS.map((f) => {
-                  const active = crammingFilter === f.value
-                  return (
-                    <TouchableOpacity
-                      key={f.value}
-                      testID={`study-cram-filter-${f.value}`}
-                      onPress={() => setCrammingFilter(f.value)}
-                      style={[styles.filterChip, {
-                        backgroundColor: active ? theme.colors.primary : 'transparent',
-                        borderColor: active ? theme.colors.primary : theme.colors.border,
-                      }]}
-                    >
-                      <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>
-                        {f.label}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
+            {/* Step 1: Mode list (when no config needed) OR Step 2: Config */}
+            {!showModeConfig ? (
+              <View style={styles.modalBody}>
+                {MODES.map((m) => (
+                  <TouchableOpacity
+                    key={m.mode}
+                    {...testProps(`study-mode-${m.mode}`)}
+                    onPress={() => handleModeSelect(m.mode)}
+                    style={[styles.modeRow, { borderRadius: 12 }]}
+                    activeOpacity={0.6}
+                  >
+                    <Text style={styles.modeEmoji}>{m.emoji}</Text>
+                    <View style={styles.modeInfo}>
+                      <Text style={[theme.typography.label, { color: theme.colors.text }]}>{m.label}</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{m.desc}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
               </View>
-            </View>
+            ) : (
+              <View style={styles.modalBody}>
+                {/* Mode indicator */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Text style={{ fontSize: 18 }}>{MODES.find(m => m.mode === selectedMode)?.emoji}</Text>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                    {MODES.find(m => m.mode === selectedMode)?.label}
+                  </Text>
+                </View>
 
-            {/* Time Limit */}
-            <View style={styles.subsection}>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cramming.timeLimit.title')}</Text>
-              <View style={styles.chipRow}>
-                {TIME_LIMITS.map((t) => {
-                  const active = crammingTimeLimit === t.value
-                  return (
-                    <TouchableOpacity
-                      key={String(t.value)}
-                      testID={`study-cram-time-${t.value ?? 'none'}`}
-                      onPress={() => setCrammingTimeLimit(t.value)}
-                      style={[styles.filterChip, {
-                        backgroundColor: active ? theme.colors.primary : 'transparent',
-                        borderColor: active ? theme.colors.primary : theme.colors.border,
-                      }]}
-                    >
-                      <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>
-                        {t.label}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
-              </View>
-            </View>
+                {/* Batch Size */}
+                {showBatchSize && (
+                  <View style={styles.section}>
+                    <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('setup.cardsPerSession')}</Text>
+                    <TextInput
+                      testID="study-batch-input"
+                      value={batchSize}
+                      onChangeText={setBatchSize}
+                      keyboardType="number-pad"
+                      placeholder="20"
+                    />
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>5–500 cards</Text>
+                  </View>
+                )}
 
-            {/* Shuffle */}
-            <View style={styles.toggleRow}>
-              <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t('cramming.shuffle.title')}</Text>
-              <Switch
-                testID="study-cram-shuffle"
-                value={crammingShuffle}
-                onValueChange={setCrammingShuffle}
-                trackColor={{ true: theme.colors.primary }}
-              />
-            </View>
-          </View>
-        )}
+                {/* Cramming */}
+                {selectedMode === 'cramming' && (
+                  <View style={styles.section}>
+                    <View style={styles.subsection}>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>Filter</Text>
+                      <View style={styles.chipRow}>
+                        {CRAMMING_FILTERS.map((f) => {
+                          const active = crammingFilter === f.value
+                          return (
+                            <TouchableOpacity key={f.value} testID={`study-cram-filter-${f.value}`} onPress={() => setCrammingFilter(f.value)}
+                              style={[styles.filterChip, { backgroundColor: active ? theme.colors.primary : 'transparent', borderColor: active ? theme.colors.primary : theme.colors.border }]}>
+                              <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>{f.label}</Text>
+                            </TouchableOpacity>
+                          )
+                        })}
+                      </View>
+                    </View>
+                    <View style={styles.subsection}>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>Time Limit</Text>
+                      <View style={styles.chipRow}>
+                        {TIME_LIMITS.map((tl) => {
+                          const active = crammingTimeLimit === tl.value
+                          return (
+                            <TouchableOpacity key={String(tl.value)} testID={`study-cram-time-${tl.value ?? 'none'}`} onPress={() => setCrammingTimeLimit(tl.value)}
+                              style={[styles.filterChip, { backgroundColor: active ? theme.colors.primary : 'transparent', borderColor: active ? theme.colors.primary : theme.colors.border }]}>
+                              <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>{tl.label}</Text>
+                            </TouchableOpacity>
+                          )
+                        })}
+                      </View>
+                    </View>
+                    <View style={styles.toggleRow}>
+                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>Shuffle</Text>
+                      <Switch testID="study-cram-shuffle" value={crammingShuffle} onValueChange={setCrammingShuffle} trackColor={{ true: theme.colors.primary }} />
+                    </View>
+                  </View>
+                )}
 
-        {/* By Date — calendar date picker */}
-        {selectedMode === 'by_date' && (
-          <View style={[styles.section, styles.panelCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+                {/* By Date */}
+                {selectedMode === 'by_date' && (
+          <View style={[styles.section, { gap: 12 }]}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>Select Upload Date</Text>
 
             {/* Month navigation */}
@@ -415,38 +441,66 @@ export function StudySetupScreen() {
               </Text>
             )}
           </View>
-        )}
+                )}
 
-        {/* Start Button — matches web: w-full py-3 rounded-xl */}
-        <Button
-          testID="study-start-button"
-          title={isLoading ? t('session.loading') : t('setup.startStudy')}
-          onPress={handleStart}
-          loading={isLoading}
-          disabled={!selectedDeckId}
-        />
-      </View>
+                {/* Start button inside modal */}
+                <Button
+                  testID="study-start-button"
+                  title={isLoading ? 'Loading...' : t('setup.startStudy')}
+                  onPress={() => handleStartWithMode()}
+                  loading={isLoading}
+                  disabled={selectedMode === 'by_date' && dateCardCount === 0}
+                />
+              </View>
+            )}
+
+            {/* Modal footer — Cancel/Back */}
+            <TouchableOpacity
+              onPress={showModeConfig ? () => setSelectedMode('srs') : closeModal}
+              style={[styles.modalFooter, { borderTopColor: theme.colors.border }]}
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                {showModeConfig ? 'Back to mode select' : 'Cancel'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </Screen>
   )
 }
 
 const styles = StyleSheet.create({
-  content: { gap: 20, paddingVertical: 16 },
-  backBtn: { paddingVertical: 4 },
+  // Grid
+  gridContent: { paddingHorizontal: 16, paddingBottom: 24, paddingTop: 8 },
+  gridRow: { gap: 10, marginBottom: 10 },
+  // Deck card — matches web: rounded-xl border overflow-hidden
+  deckCard: { flex: 1, borderRadius: 12, borderWidth: 1, overflow: 'hidden' },
+  deckColorBar: { height: 6 },
+  deckCardBody: { padding: 12, gap: 6 },
+  deckNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  deckEmoji: { fontSize: 22 },
+  deckBadges: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  badge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10 },
+  badgeText: { fontSize: 10, fontWeight: '500' },
+  emptyCard: { borderRadius: 12, borderWidth: 1, padding: 32, alignItems: 'center', gap: 12, marginTop: 40 },
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalCard: { width: '100%', maxWidth: 400, borderRadius: 16, maxHeight: '80%' },
+  modalHeader: { padding: 16, borderBottomWidth: 1, gap: 4 },
+  modalBody: { padding: 12, gap: 6 },
+  modalFooter: { padding: 12, borderTopWidth: 1, alignItems: 'center' },
+  // Mode rows inside modal
+  modeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: 12 },
+  modeEmoji: { fontSize: 22, marginTop: 2 },
+  modeInfo: { flex: 1, gap: 2 },
+  // Config sections
   section: { gap: 8 },
   subsection: { gap: 6 },
-  deckList: { gap: 8 },
-  deckChip: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12 },
-  deckEmoji: { fontSize: 24 },
-  deckChipInfo: { flex: 1, gap: 2 },
-  modeList: { gap: 8 },
-  modeCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: 12, borderRadius: 12 },
-  modeEmoji: { fontSize: 24, marginTop: 2 },
-  modeInfo: { flex: 1, gap: 2 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
   toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  panelCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 12 },
+  // Calendar
   calendarNav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   calendarNavBtn: { padding: 8 },
   calendarRow: { flexDirection: 'row' },

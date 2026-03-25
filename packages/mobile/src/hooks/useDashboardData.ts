@@ -93,9 +93,7 @@ export function useDashboardData(period: TimePeriod) {
         }[]
 
         const filteredLogs = filterLogsByPeriod(allLogs, days)
-        const dailyResult = getDailyStudyCounts(filteredLogs, Math.min(days, 30))
-        const dailyTotal = dailyResult.reduce((s, d) => s + d.count, 0)
-        console.log('[dashboard] logs:', allLogs.length, 'filtered:', filteredLogs.length, 'daily:', dailyTotal)
+        console.log('[dashboard] logs:', allLogs.length, 'filtered:', filteredLogs.length)
 
         // Check if today's logs exist directly
         const today = new Date().toISOString().slice(0, 10)
@@ -111,7 +109,7 @@ export function useDashboardData(period: TimePeriod) {
           streak: getStreakDays(allLogs),
           mastery: getMasteryRate(cards),
           heatmap: shouldShowHeatmap(period) ? getDailyStudyCounts(allLogs, 180) : [],
-          dailyCounts: dailyResult,
+          dailyCounts: getDailyStudyCounts(filteredLogs, days),
           forecastData: getForecastReviews(cards),
           loading: false,
         })

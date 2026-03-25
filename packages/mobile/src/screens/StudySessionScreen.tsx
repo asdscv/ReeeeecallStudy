@@ -18,11 +18,22 @@ import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
+import { RNTTS } from '../adapters/rn-tts'
+import { useAuthState } from '../hooks/useAuthState'
+import { getMobileSupabase } from '../adapters'
 import type { StudyStackParamList } from '../navigation/types'
+
+const tts = new RNTTS()
+
+interface StudyProfile {
+  tts_enabled: boolean
+  tts_speed: number
+  answer_mode: 'button' | 'swipe'
+}
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySession'>
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window')
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25
 const VELOCITY_THRESHOLD = 500
 
@@ -31,6 +42,15 @@ const RATING_COLORS: Record<string, string> = {
   hard: ratingColors.hard,
   good: ratingColors.good,
   easy: ratingColors.easy,
+}
+
+// Default font sizes per layout style — matches web layout-styles.ts
+const DEFAULT_FONT_SIZES: Record<string, number> = {
+  primary: 40,
+  secondary: 24,
+  hint: 16,
+  detail: 16,
+  media: 16,
 }
 
 export function StudySessionScreen() {
@@ -42,6 +62,21 @@ export function StudySessionScreen() {
     sessionStats, progress, flipCard, rateCard, exitSession,
     undoLastRating, lastRatedCard,
   } = useStudy()
+
+  // Profile settings (TTS + answer mode)
+  const { user } = useAuthState()
+  const [profile, setProfile] = useState<StudyProfile>({ tts_enabled: true, tts_speed: 0.9, answer_mode: 'swipe' })
+  useEffect(() => {
+    if (!user?.id) return
+    const supabase = getMobileSupabase()
+    Promise.resolve(
+      supabase.from('profiles').select('tts_enabled, tts_speed, answer_mode').eq('id', user.id).single()
+    ).then(({ data }) => {
+      if (data) setProfile(data as StudyProfile)
+    }).catch(() => {})
+  }, [user?.id])
+
+  const isSwipeMode = profile.answer_mode === 'swipe'
 
   // Undo button visibility — auto-dismiss after 5 seconds
   const [showUndo, setShowUndo] = useState(false)
@@ -63,12 +98,16 @@ export function StudySessionScreen() {
   const translateX = useSharedValue(0)
   const cardScale = useSharedValue(1)
 
-  // Navigate to summary when complete
+  // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
     if (phase === 'completed') {
       navigation.replace('StudySummary')
+    } else if (phase === 'idle' && sessionStats.cardsStudied > 0) {
+      navigation.replace('StudySummary')
+    } else if (phase === 'idle') {
+      navigation.goBack()
     }
-  }, [phase, navigation])
+  }, [phase, navigation, sessionStats.cardsStudied])
 
   // Reset animations on card change
   useEffect(() => {
@@ -133,9 +172,12 @@ export function StudySessionScreen() {
 
   const getFaceContent = (layout: typeof frontFields) => {
     return layout.map((item) => {
-      const field = fields.find((f) => f.key === item.field_key)
+      const field = fields.find((f) => f.key === item.field_key) as { key: string; name?: string; tts_enabled?: boolean; tts_lang?: string; type?: string } | undefined
       const value = currentCard.field_values[item.field_key] ?? ''
-      return { key: item.field_key, value, style: item.style, name: field?.name ?? item.field_key }
+      const fontSize = (item as { font_size?: number }).font_size ?? DEFAULT_FONT_SIZES[item.style] ?? DEFAULT_FONT_SIZES.primary
+      // TTS: only if field has tts_enabled AND profile allows TTS (matches web getTTSFieldsForLayout)
+      const ttsLang = (field?.tts_enabled && profile.tts_enabled) ? (field.tts_lang || undefined) : undefined
+      return { key: item.field_key, value, style: item.style, fontSize, ttsLang, name: field?.name ?? item.field_key }
     }).filter((f) => f.value)
   }
 
@@ -144,8 +186,9 @@ export function StudySessionScreen() {
 
   // Fallback if no template layout
   const fieldEntries = Object.entries(currentCard.field_values)
-  const fallbackFront = frontContent.length > 0 ? frontContent : [{ key: 'f', value: fieldEntries[0]?.[1] ?? '', style: 'primary' as const, name: 'Front' }]
-  const fallbackBack = backContent.length > 0 ? backContent : [{ key: 'b', value: fieldEntries[1]?.[1] ?? '', style: 'primary' as const, name: 'Back' }]
+  const fallbackFront = frontContent.length > 0 ? frontContent : [{ key: 'f', value: fieldEntries[0]?.[1] ?? '', style: 'primary' as const, fontSize: DEFAULT_FONT_SIZES.primary, ttsLang: undefined as string | undefined, name: 'Front' }]
+  const fallbackBack = backContent.length > 0 ? backContent : [{ key: 'b', value: fieldEntries[1]?.[1] ?? '', style: 'primary' as const, fontSize: DEFAULT_FONT_SIZES.primary, ttsLang: undefined as string | undefined, name: 'Back' }]
+
 
 
   const handleFlip = () => {
@@ -166,20 +209,24 @@ export function StudySessionScreen() {
   const handleExit = () => {
     Alert.alert(t('session.endSession'), t('session.endMessage'), [
       { text: t('session.continue'), style: 'cancel' },
-      { text: t('session.end'), style: 'destructive', onPress: () => exitSession() },
+      { text: t('session.end'), style: 'destructive', onPress: async () => {
+        if (sessionStats.cardsStudied > 0) {
+          await exitSession()
+          // exitSession sets phase='completed' → useEffect navigates to Summary
+        } else {
+          // No cards studied — just go back
+          navigation.goBack()
+        }
+      }},
     ])
   }
 
-  // Tap gesture — handles flip (GestureDetector blocks TouchableOpacity taps)
-  const tapGesture = Gesture.Tap()
-    .enabled(!isRating)
-    .onEnd(() => {
-      runOnJS(handleFlip)()
-    })
-
-  // Swipe gesture — left/right only (again/good)
+  // Swipe gesture only — left/right (again/good)
+  // Tap-to-flip is handled by TouchableOpacity (not GestureDetector)
+  // This allows inner TouchableOpacity (TTS buttons) to block flip via RN responder system
   const panGesture = Gesture.Pan()
     .enabled(!isRating)
+    .activeOffsetX([-10, 10])
     .onUpdate((e) => {
       translateX.value = e.translationX
       cardScale.value = interpolate(
@@ -205,7 +252,7 @@ export function StudySessionScreen() {
     })
 
   return (
-    <GestureHandlerRootView style={styles.flex}>
+    <GestureHandlerRootView style={[styles.flex, { backgroundColor: theme.colors.background }]}>
       <Screen safeArea padding={false} testID="study-session-screen">
         {/* Header */}
         <View style={[styles.header, { paddingHorizontal: 20 }]}>
@@ -227,25 +274,26 @@ export function StudySessionScreen() {
 
         {/* Card area */}
         <View style={styles.cardArea} {...testProps('study-card-area', true)}>
-          <GestureDetector gesture={Gesture.Race(tapGesture, panGesture)}>
+          <GestureDetector gesture={panGesture}>
             <Animated.View style={[styles.cardContainer, cardAnimStyle]}>
               {/* Swipe hint overlay */}
               <Animated.View style={[styles.swipeHint, hintStyle]} />
 
-              <View style={styles.flex} {...testProps('study-card-tap')}>
-                {/* Front face — tap to flip, no scroll */}
+              {/* TouchableOpacity handles tap-to-flip; inner TTS buttons block propagation */}
+              <TouchableOpacity activeOpacity={0.95} onPress={handleFlip} style={styles.flex} {...testProps('study-card-tap')}>
+                {/* Front face — tap to flip, TTS inline */}
                 <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
-                  <CardFace content={fallbackFront} theme={theme} />
+                  <CardFace content={fallbackFront} theme={theme} ttsSpeed={profile.tts_speed} />
                   <Text style={[theme.typography.caption, styles.tapHint, { color: theme.colors.textTertiary }]}>
                     {t('session.tapToFlip')}
                   </Text>
                 </Animated.View>
 
-                {/* Back face — scrollable for long content */}
+                {/* Back face — scrollable for long content, TTS inline */}
                 <Animated.View style={[styles.card, styles.cardBack, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, backAnimStyle]}>
-                  <CardFace content={fallbackBack} theme={theme} scrollable />
+                  <CardFace content={fallbackBack} theme={theme} ttsSpeed={profile.tts_speed} scrollable />
                 </Animated.View>
-              </View>
+              </TouchableOpacity>
             </Animated.View>
           </GestureDetector>
         </View>
@@ -266,18 +314,40 @@ export function StudySessionScreen() {
           </View>
         )}
 
-        {/* Swipe hint — left: Again, right: Good */}
-        {isFlipped && (
+        {/* Rating area — button mode: buttons, swipe mode: hints */}
+        {isFlipped && isSwipeMode && (
           <View style={styles.swipeRatingHint}>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('session.swipeHint', { defaultValue: 'Swipe to rate' })}</Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>Swipe</Text>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
           </View>
         )}
+        {isFlipped && !isSwipeMode && (
+          <View style={[styles.ratingRow, { paddingHorizontal: 16 }]}>
+            {config?.mode === 'srs' ? (
+              <>
+                <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} />
+                <RatingButton label={t('srsRating.hard')} color={RATING_COLORS.hard} onPress={() => handleRate('hard')} disabled={isRating} />
+                <RatingButton label={t('srsRating.good')} color={RATING_COLORS.good} onPress={() => handleRate('good')} disabled={isRating} />
+                <RatingButton label={t('srsRating.easy')} color={RATING_COLORS.easy} onPress={() => handleRate('easy')} disabled={isRating} />
+              </>
+            ) : config?.mode === 'cramming' ? (
+              <>
+                <RatingButton label={t('rating.missed')} color={RATING_COLORS.again} onPress={() => handleRate('missed')} disabled={isRating} />
+                <RatingButton label={t('rating.gotIt')} color={RATING_COLORS.good} onPress={() => handleRate('got_it')} disabled={isRating} />
+              </>
+            ) : (
+              <>
+                <RatingButton label={t('rating.unknown')} color={RATING_COLORS.again} onPress={() => handleRate('unknown')} disabled={isRating} />
+                <RatingButton label={t('rating.known')} color={RATING_COLORS.good} onPress={() => handleRate('known')} disabled={isRating} />
+              </>
+            )}
+          </View>
+        )}
 
-        {/* Swipe hints */}
+        {/* Tap hint — front face */}
         {!isFlipped && (
-          <View style={styles.swipeHints}>
+          <View style={styles.bottomHints}>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
               {t('session.swipeHint')}
             </Text>
@@ -288,17 +358,58 @@ export function StudySessionScreen() {
   )
 }
 
-function CardFace({ content, theme, scrollable = false }: { content: Array<{ key: string; value: string; style: string; name: string }>; theme: Theme; scrollable?: boolean }) {
-  const inner = content.map((field) => (
-    <View key={field.key} style={styles.fieldBlock}>
-      <Text style={[
-        field.style === 'primary' ? theme.typography.h2 : theme.typography.body,
-        { color: theme.colors.text, textAlign: 'center' },
-      ]}>
-        {field.value}
-      </Text>
-    </View>
-  ))
+function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false }: {
+  content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
+  theme: Theme
+  ttsSpeed?: number
+  scrollable?: boolean
+}) {
+  const inner = content.map((field) => {
+    const size = field.fontSize ?? DEFAULT_FONT_SIZES[field.style] ?? DEFAULT_FONT_SIZES.primary
+    const isBold = field.style === 'primary' || field.style === 'secondary'
+    const isHint = field.style === 'hint'
+    const isDetail = field.style === 'detail'
+    const color = (isHint || isDetail) ? theme.colors.textSecondary : theme.colors.text
+
+    return (
+      <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
+        {/* TTS button inline — like web: 🔊 icon left of text, blocks card flip */}
+        {field.ttsLang ? (
+          <View style={styles.ttsRow}>
+            <TouchableOpacity
+              onPress={() => tts.speak(field.value, field.ttsLang!, ttsSpeed)}
+              style={styles.ttsInlineBtn}
+              activeOpacity={0.5}
+            >
+              <Text style={{ fontSize: 18, color: theme.colors.primary }}>{'\uD83D\uDD0A'}</Text>
+            </TouchableOpacity>
+            <Text style={{
+              fontSize: size,
+              fontWeight: isBold ? '700' : '400',
+              fontStyle: isHint ? 'italic' : 'normal',
+              color,
+              textAlign: 'center',
+              lineHeight: size >= 32 ? size * 1.2 : size * 1.5,
+              flex: 1,
+            }}>
+              {field.value}
+            </Text>
+          </View>
+        ) : (
+          <Text style={{
+            fontSize: size,
+            fontWeight: isBold ? '700' : '400',
+            fontStyle: isHint ? 'italic' : 'normal',
+            color,
+            textAlign: 'center',
+            lineHeight: size >= 32 ? size * 1.2 : size * 1.5,
+          }}>
+            {field.value}
+          </Text>
+        )}
+      </View>
+    )
+  })
 
   if (scrollable) {
     return (
@@ -317,6 +428,21 @@ function CardFace({ content, theme, scrollable = false }: { content: Array<{ key
 }
 
 
+function RatingButton({ label, color, onPress, disabled }: {
+  label: string; color: string; onPress: () => void; disabled: boolean
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={0.7}
+      style={[styles.ratingBtn, { backgroundColor: color, opacity: disabled ? 0.5 : 1 }]}
+    >
+      <Text style={styles.ratingLabel}>{label}</Text>
+    </TouchableOpacity>
+  )
+}
+
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
@@ -324,7 +450,7 @@ const styles = StyleSheet.create({
   progressBar: { height: 3, marginHorizontal: 20, borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 2 },
   cardArea: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
-  cardContainer: { width: '100%', aspectRatio: 0.7, maxHeight: 480 },
+  cardContainer: { width: '100%', height: SCREEN_HEIGHT * 0.55 },
   card: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     borderRadius: 20, borderWidth: 1, padding: 24, justifyContent: 'center', alignItems: 'center',
@@ -334,13 +460,19 @@ const styles = StyleSheet.create({
   cardContent: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, width: '100%' },
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
+  hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
+  ttsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, width: '100%' },
+  ttsInlineBtn: { padding: 8 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     borderRadius: 20, zIndex: 10,
   },
+  ratingRow: { flexDirection: 'row', gap: 8, paddingBottom: 24 },
+  ratingBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
+  ratingLabel: { color: '#fff', fontWeight: '700', fontSize: 14 },
   swipeRatingHint: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 32, paddingBottom: 20 },
-  swipeHints: { paddingBottom: 24 },
+  bottomHints: { alignItems: 'center', paddingBottom: 20, paddingHorizontal: 20, gap: 8 },
   undoRow: { alignItems: 'center', paddingBottom: 8 },
   undoBtn: {
     paddingHorizontal: 20,

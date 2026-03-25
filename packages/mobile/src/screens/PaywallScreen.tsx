@@ -23,7 +23,7 @@ const FEATURES = [
 
 export function PaywallScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('paywall')
   const navigation = useNavigation()
   const { isPro, offering, loading, purchasing, purchase, restore } = usePurchases()
 

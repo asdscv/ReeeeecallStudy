@@ -32,8 +32,10 @@
   },
   "level": {
     "title": "Level {{level}}",
+    "levelUp": "Level Up!",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements"
+    "allAchievements": "All Achievements",
+    "recent": "Recent:"
   },
   "goals": {
     "title": "Next Goals"

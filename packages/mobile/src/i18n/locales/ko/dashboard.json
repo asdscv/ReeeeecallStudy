@@ -32,8 +32,10 @@
   },
   "level": {
     "title": "레벨 {{level}}",
+    "levelUp": "레벨 업!",
     "xpLabel": "경험치",
-    "allAchievements": "전체 업적"
+    "allAchievements": "전체 업적",
+    "recent": "최근:"
   },
   "goals": {
     "title": "다음 목표"

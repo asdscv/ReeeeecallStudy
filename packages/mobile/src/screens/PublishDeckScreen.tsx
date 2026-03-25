@@ -22,7 +22,7 @@ const SHARE_MODES = [
 
 export function PublishDeckScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('marketplace')
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { deckId } = route.params

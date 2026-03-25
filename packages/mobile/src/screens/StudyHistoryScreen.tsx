@@ -44,7 +44,7 @@ import type { HomeStackParamList } from '../navigation/types'
  */
 export function StudyHistoryScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('history')
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
   const { user } = useAuthState()
   const { decks } = useDecks()
@@ -55,6 +55,7 @@ export function StudyHistoryScreen() {
   const [deckScope, setDeckScope] = useState<DeckScope>('all')
   const [loading, setLoading] = useState(true)
   const [modeFilter, setModeFilter] = useState<string>('all')
+  const [activeTab, setActiveTab] = useState<'history' | 'analytics'>('history')
   const mountedRef = useRef(true)
 
   const loadData = useCallback(async () => {
@@ -102,6 +103,7 @@ export function StudyHistoryScreen() {
   const ratingDist = useMemo(() => computeRatingDistribution(scopedSessions), [scopedSessions])
   const dailyCounts = useMemo(() => computeDailySessionCounts(scopedSessions, days), [scopedSessions, days])
   const dailyData = dailyCounts.map((d) => ({ date: d.date, count: d.cards }))
+  const sessionCountData = dailyCounts.map((d) => ({ date: d.date, count: d.sessions }))
   const modeBreakdown = useMemo(() => computeModeBreakdown(scopedSessions), [scopedSessions])
   const filteredByMode = useMemo(() =>
     modeFilter === 'all' ? scopedSessions : scopedSessions.filter((s) => s.study_mode === modeFilter),
@@ -117,7 +119,7 @@ export function StudyHistoryScreen() {
   return (
     <Screen safeArea padding={false} testID="study-history-screen">
       <FlatList
-        data={grouped}
+        data={activeTab === 'history' ? grouped : []}
         keyExtractor={(item) => item.date}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} />}
         contentContainerStyle={styles.list}
@@ -135,7 +137,49 @@ export function StudyHistoryScreen() {
               <TimePeriodSelector value={period} onChange={setPeriod} testID="history-period" />
             </View>
 
-            {/* Deck scope selector — matches web: horizontal scroll */}
+            {/* Tab Switcher — matches web layout */}
+            <View style={[styles.tabBar, { borderBottomColor: theme.colors.border }]}>
+              <TouchableOpacity
+                onPress={() => setActiveTab('history')}
+                style={[
+                  styles.tabButton,
+                  {
+                    borderBottomWidth: 2,
+                    borderBottomColor: activeTab === 'history' ? theme.colors.primary : 'transparent',
+                  },
+                ]}
+                testID="tab-history"
+              >
+                <Text style={[
+                  theme.typography.body,
+                  {
+                    color: activeTab === 'history' ? theme.colors.primary : theme.colors.textSecondary,
+                    fontWeight: activeTab === 'history' ? '600' : '400',
+                  },
+                ]}>History</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setActiveTab('analytics')}
+                style={[
+                  styles.tabButton,
+                  {
+                    borderBottomWidth: 2,
+                    borderBottomColor: activeTab === 'analytics' ? theme.colors.primary : 'transparent',
+                  },
+                ]}
+                testID="tab-analytics"
+              >
+                <Text style={[
+                  theme.typography.body,
+                  {
+                    color: activeTab === 'analytics' ? theme.colors.primary : theme.colors.textSecondary,
+                    fontWeight: activeTab === 'analytics' ? '600' : '400',
+                  },
+                ]}>Analytics</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Deck scope selector — shared between tabs */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scopeScroll}>
               <View style={styles.scopeRow}>
                 <TouchableOpacity
@@ -174,116 +218,130 @@ export function StudyHistoryScreen() {
               </View>
             </ScrollView>
 
-            {/* Overview Stats */}
-            <OverviewStatsRow stats={overview} streak={streak} testID="history-overview" />
+            {/* Analytics tab content */}
+            {activeTab === 'analytics' && (
+              <>
+                {/* Overview Stats */}
+                <OverviewStatsRow stats={overview} streak={streak} testID="history-overview" />
 
-            {/* Charts: Study volume + Rating distribution */}
-            {dailyData.length > 0 && (
-              <BarChart data={dailyData} title={t('studyVolume')} testID="history-barchart" />
-            )}
+                {/* Charts: Study volume + Rating distribution */}
+                {dailyData.length > 0 && (
+                  <BarChart data={dailyData} title={t('studyVolume')} testID="history-barchart" />
+                )}
 
-            <RatingDistributionBars data={ratingDist} testID="history-ratings" />
+                <RatingDistributionBars data={ratingDist} testID="history-ratings" />
 
-            {/* Mode Breakdown — matches web */}
-            {modeBreakdown.length > 0 && (
-              <View style={styles.modeBreakdownSection}>
-                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-                  Mode Breakdown
-                </Text>
-                <View style={styles.modeBreakdownGrid}>
-                  {modeBreakdown.map((mb) => (
-                    <View
-                      key={mb.mode}
-                      style={[styles.modeBreakdownCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                    >
-                      <Text style={styles.modeBreakdownEmoji}>{getStudyModeEmoji(mb.mode)}</Text>
-                      <Text style={[theme.typography.label, { color: theme.colors.text }]}>{getStudyModeLabel(mb.mode)}</Text>
-                      <View style={styles.modeBreakdownStats}>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                          {mb.sessionCount} sessions
-                        </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                          {mb.totalCards} cards
-                        </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                          {formatDuration(mb.totalTimeMs)}
-                        </Text>
-                        <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '500' }]}>
-                          {mb.avgPerformance}%
-                        </Text>
-                      </View>
+                {/* Session Count Chart — matches web SessionDurationChart */}
+                {sessionCountData.length > 0 && sessionCountData.some(d => d.count > 0) && (
+                  <BarChart data={sessionCountData} title="Sessions per Day" barColor={palette.purple[500]} testID="history-sessions" />
+                )}
+
+                {/* Mode Breakdown */}
+                {modeBreakdown.length > 0 && (
+                  <View style={styles.modeBreakdownSection}>
+                    <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
+                      Mode Breakdown
+                    </Text>
+                    <View style={styles.modeBreakdownGrid}>
+                      {modeBreakdown.map((mb) => (
+                        <View
+                          key={mb.mode}
+                          style={[styles.modeBreakdownCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                        >
+                          <Text style={styles.modeBreakdownEmoji}>{getStudyModeEmoji(mb.mode)}</Text>
+                          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{getStudyModeLabel(mb.mode)}</Text>
+                          <View style={styles.modeBreakdownStats}>
+                            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                              {mb.sessionCount} sessions
+                            </Text>
+                            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                              {mb.totalCards} cards
+                            </Text>
+                            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                              {formatDuration(mb.totalTimeMs)}
+                            </Text>
+                            <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '500' }]}>
+                              {mb.avgPerformance}%
+                            </Text>
+                          </View>
+                        </View>
+                      ))}
                     </View>
-                  ))}
-                </View>
-              </View>
+                  </View>
+                )}
+
+                {/* Deck Progress */}
+                {sessionDecks.length > 0 && deckScope === 'all' && (
+                  <View style={styles.deckProgressSection}>
+                    <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
+                      Deck Progress
+                    </Text>
+                    {sessionDecks.map((deck) => {
+                      const deckSessions = periodSessions.filter((s) => s.deck_id === deck.id)
+                      const totalCards = deckSessions.reduce((sum, s) => sum + s.cards_studied, 0)
+                      const totalTime = deckSessions.reduce((sum, s) => sum + s.total_duration_ms, 0)
+                      return (
+                        <View
+                          key={deck.id}
+                          style={[styles.deckProgressCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                        >
+                          <View style={styles.deckProgressHeader}>
+                            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+                              {deck.icon} {deck.name}
+                            </Text>
+                            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                              {totalCards} cards · {formatDuration(totalTime)}
+                            </Text>
+                          </View>
+                          <View style={[styles.progressBarBg, { backgroundColor: theme.colors.surface }]}>
+                            <View style={[styles.progressBarFill, { width: `${Math.min(100, (deckSessions.length / Math.max(scopedSessions.length, 1)) * 100)}%`, backgroundColor: theme.colors.primary }]} />
+                          </View>
+                        </View>
+                      )
+                    })}
+                  </View>
+                )}
+              </>
             )}
 
-            {/* Deck Progress — matches web */}
-            {sessionDecks.length > 0 && deckScope === 'all' && (
-              <View style={styles.deckProgressSection}>
-                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-                  Deck Progress
+            {/* History tab content — sessions header + mode filter */}
+            {activeTab === 'history' && (
+              <>
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
+                  Session List
                 </Text>
-                {sessionDecks.map((deck) => {
-                  const deckSessions = periodSessions.filter((s) => s.deck_id === deck.id)
-                  const totalCards = deckSessions.reduce((sum, s) => sum + s.cards_studied, 0)
-                  const totalTime = deckSessions.reduce((sum, s) => sum + s.total_duration_ms, 0)
-                  return (
-                    <View
-                      key={deck.id}
-                      style={[styles.deckProgressCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                    >
-                      <View style={styles.deckProgressHeader}>
-                        <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                          {deck.icon} {deck.name}
-                        </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                          {totalCards} cards · {formatDuration(totalTime)}
-                        </Text>
-                      </View>
-                      <View style={[styles.progressBarBg, { backgroundColor: theme.colors.surface }]}>
-                        <View style={[styles.progressBarFill, { width: `${Math.min(100, (deckSessions.length / Math.max(scopedSessions.length, 1)) * 100)}%`, backgroundColor: theme.colors.primary }]} />
-                      </View>
+                {modeBreakdown.length > 1 && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.modeFilterScroll}>
+                    <View style={styles.modeFilterRow}>
+                      <TouchableOpacity
+                        onPress={() => setModeFilter('all')}
+                        style={[styles.modeFilterChip, {
+                          backgroundColor: modeFilter === 'all' ? theme.colors.primary : theme.colors.surfaceElevated,
+                          borderColor: modeFilter === 'all' ? theme.colors.primary : theme.colors.border,
+                        }]}
+                      >
+                        <Text style={[theme.typography.caption, {
+                          color: modeFilter === 'all' ? theme.colors.primaryText : theme.colors.text,
+                        }]}>{t('allModes')}</Text>
+                      </TouchableOpacity>
+                      {modeBreakdown.map((mb) => (
+                        <TouchableOpacity
+                          key={mb.mode}
+                          onPress={() => setModeFilter(mb.mode)}
+                          style={[styles.modeFilterChip, {
+                            backgroundColor: modeFilter === mb.mode ? theme.colors.primary : theme.colors.surfaceElevated,
+                            borderColor: modeFilter === mb.mode ? theme.colors.primary : theme.colors.border,
+                          }]}
+                        >
+                          <Text style={[theme.typography.caption, {
+                            color: modeFilter === mb.mode ? theme.colors.primaryText : theme.colors.text,
+                          }]}>{getStudyModeEmoji(mb.mode)} {getStudyModeLabel(mb.mode)}</Text>
+                        </TouchableOpacity>
+                      ))}
                     </View>
-                  )
-                })}
-              </View>
-            )}
-
-            {/* Sessions header + mode filter — matches web */}
-            <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-              Session List
-            </Text>
-            {modeBreakdown.length > 1 && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.modeFilterScroll}>
-                <View style={styles.modeFilterRow}>
-                  <TouchableOpacity
-                    onPress={() => setModeFilter('all')}
-                    style={[styles.modeFilterChip, {
-                      backgroundColor: modeFilter === 'all' ? theme.colors.primary : theme.colors.surfaceElevated,
-                      borderColor: modeFilter === 'all' ? theme.colors.primary : theme.colors.border,
-                    }]}
-                  >
-                    <Text style={[theme.typography.caption, {
-                      color: modeFilter === 'all' ? theme.colors.primaryText : theme.colors.text,
-                    }]}>{t('allModes')}</Text>
-                  </TouchableOpacity>
-                  {modeBreakdown.map((mb) => (
-                    <TouchableOpacity
-                      key={mb.mode}
-                      onPress={() => setModeFilter(mb.mode)}
-                      style={[styles.modeFilterChip, {
-                        backgroundColor: modeFilter === mb.mode ? theme.colors.primary : theme.colors.surfaceElevated,
-                        borderColor: modeFilter === mb.mode ? theme.colors.primary : theme.colors.border,
-                      }]}
-                    >
-                      <Text style={[theme.typography.caption, {
-                        color: modeFilter === mb.mode ? theme.colors.primaryText : theme.colors.text,
-                      }]}>{getStudyModeEmoji(mb.mode)} {getStudyModeLabel(mb.mode)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
+                  </ScrollView>
+                )}
+              </>
             )}
           </View>
         }
@@ -324,7 +382,7 @@ export function StudyHistoryScreen() {
           </View>
         )}
         ListEmptyComponent={
-          !loading ? (
+          !loading && activeTab === 'history' ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <Text style={styles.emptyEmoji}>📝</Text>
               <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('empty')}</Text>
@@ -353,6 +411,8 @@ function formatDateLabel(dateStr: string): string {
 const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingBottom: 24, gap: 8 },
   header: { gap: 14, paddingTop: 8, paddingBottom: 8 },
+  tabBar: { flexDirection: 'row', borderBottomWidth: 1 },
+  tabButton: { flex: 1, alignItems: 'center', paddingVertical: 10 },
   backBtn: { paddingVertical: 4 },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   scopeScroll: { flexGrow: 0 },
