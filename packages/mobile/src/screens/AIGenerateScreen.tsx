@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
@@ -168,9 +168,9 @@ export function AIGenerateScreen() {
   // ── Config Step ──
   if (step === 'config') {
     return (
-      <Screen scroll keyboard testID="ai-generate-screen">
+      <Screen safeArea padding={false} testID="ai-generate-screen">
         <DrawerHeader title="AI Auto-Generate" />
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
           <StepIndicator step={step} />
 
@@ -338,7 +338,7 @@ export function AIGenerateScreen() {
             onPress={handleGenerate}
             disabled={!topic.trim()}
           />
-        </View>
+        </ScrollView>
       </Screen>
     )
   }
@@ -576,7 +576,7 @@ const stepStyles = StyleSheet.create({
 })
 
 const styles = StyleSheet.create({
-  content: { gap: 16, paddingVertical: 16 },
+  content: { gap: 16, paddingHorizontal: 16, paddingVertical: 16, paddingBottom: 40 },
   topRow: { flexDirection: 'row' },
   // Labeled sections — matches web bordered cards with uppercase label
   sectionLabelRow: { marginBottom: -8 },
