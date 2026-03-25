@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, Alert, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, Button, Badge, ListCard } from '../components/ui'
+import { Screen, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
@@ -83,60 +83,56 @@ export function TemplatesListScreen() {
           )}
         </View>
 
-        {/* Fields summary */}
+        {/* Fields — colored dot pills matching web */}
         <View style={styles.fieldsRow}>
           {item.fields.map((field) => (
             <View
               key={field.key}
               style={[styles.fieldChip, { backgroundColor: theme.colors.surface }]}
             >
+              <View style={[styles.fieldDot, { backgroundColor: theme.colors.textTertiary }]} />
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {field.type === 'image' ? 'img' : field.type === 'audio' ? 'audio' : 'txt'}{' '}
                 {field.name}
               </Text>
             </View>
           ))}
         </View>
 
-        {/* Meta: field count, front/back layout counts */}
-        <View style={styles.metaRow}>
-          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            {item.fields.length} fields
-          </Text>
-          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            Front: {item.front_layout.length}
-          </Text>
-          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            Back: {item.back_layout.length}
-          </Text>
-        </View>
+        {/* Meta — matches web: "Front: X fields  Back: Y fields  Created: date" */}
+        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+          Front: {item.front_layout.length} fields{'   '}Back: {item.back_layout.length} fields{'   '}Created: {new Date(item.created_at).toLocaleDateString()}
+        </Text>
 
-        {/* Action buttons */}
+        {/* Action icons — matches web: edit, duplicate, stats, delete */}
         <View style={[styles.actionsRow, { borderTopColor: theme.colors.border }]}>
           <TouchableOpacity
             testID={`template-edit-${item.id}`}
             onPress={() => handleEdit(item)}
-            style={[styles.actionBtn, { backgroundColor: theme.colors.surface }]}
+            style={styles.iconBtn}
           >
-            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Edit</Text>
+            <Text style={{ fontSize: 18 }}>{'\u270F\uFE0F'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             testID={`template-duplicate-${item.id}`}
             onPress={() => handleDuplicate(item)}
-            style={[styles.actionBtn, { backgroundColor: theme.colors.surface }]}
+            style={styles.iconBtn}
           >
-            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Duplicate</Text>
+            <Text style={{ fontSize: 18 }}>{'\uD83D\uDCCB'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleEdit(item)}
+            style={styles.iconBtn}
+          >
+            <Text style={{ fontSize: 18 }}>{'\uD83D\uDCCA'}</Text>
           </TouchableOpacity>
           {!item.is_default && (
             <TouchableOpacity
               testID={`template-delete-${item.id}`}
               onPress={() => handleDelete(item)}
               disabled={deletingId === item.id}
-              style={[styles.actionBtn, { backgroundColor: palette.red[50], marginLeft: 'auto' }]}
+              style={[styles.iconBtn, { marginLeft: 'auto' }]}
             >
-              <Text style={[theme.typography.caption, { color: palette.red[600] }]}>
-                {deletingId === item.id ? '...' : 'Delete'}
-              </Text>
+              <Text style={{ fontSize: 18 }}>{deletingId === item.id ? '...' : '\uD83D\uDDD1\uFE0F'}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -146,6 +142,7 @@ export function TemplatesListScreen() {
 
   return (
     <Screen safeArea padding={false} testID="templates-list-screen">
+      <DrawerHeader title="Templates" />
       <FlatList
         data={templates}
         keyExtractor={(item) => item.id}
@@ -154,11 +151,6 @@ export function TemplatesListScreen() {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                {'<-'} Back
-              </Text>
-            </TouchableOpacity>
             <View style={styles.titleRow}>
               <View style={{ flex: 1 }}>
                 <Text style={[theme.typography.h2, { color: theme.colors.text }]}>Templates</Text>
@@ -214,10 +206,10 @@ const styles = StyleSheet.create({
   cardContent: { gap: 10 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   fieldsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  fieldChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
-  metaRow: { flexDirection: 'row', gap: 12 },
-  actionsRow: { flexDirection: 'row', gap: 8, paddingTop: 10, borderTopWidth: 1 },
-  actionBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  fieldChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
+  fieldDot: { width: 6, height: 6, borderRadius: 3 },
+  actionsRow: { flexDirection: 'row', gap: 12, paddingTop: 10, borderTopWidth: 1 },
+  iconBtn: { padding: 4 },
   emptyCard: { borderRadius: 12, borderWidth: 1, padding: 32, alignItems: 'center', gap: 12 },
   emptyEmoji: { fontSize: 40 },
 })
