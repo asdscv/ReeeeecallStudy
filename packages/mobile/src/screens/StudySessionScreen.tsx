@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { View, Text, TouchableOpacity, Dimensions, StyleSheet, Alert } from 'react-native'
+import { useEffect, useState, useRef } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Animated, {
@@ -17,6 +17,7 @@ import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
+import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import type { StudyStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySession'>
@@ -26,25 +27,40 @@ const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25
 const VELOCITY_THRESHOLD = 500
 
 const RATING_COLORS: Record<string, string> = {
-  again: '#EF4444',
-  hard: '#F59E0B',
-  good: '#22C55E',
-  easy: '#3B82F6',
+  again: ratingColors.again,
+  hard: ratingColors.hard,
+  good: ratingColors.good,
+  easy: ratingColors.easy,
 }
 
 export function StudySessionScreen() {
   const theme = useTheme()
-  const { t } = useTranslation()
+  const { t } = useTranslation('study')
   const navigation = useNavigation<Nav>()
   const {
     phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
+    undoLastRating, lastRatedCard,
   } = useStudy()
 
-  // Animation values
+  // Undo button visibility — auto-dismiss after 5 seconds
+  const [showUndo, setShowUndo] = useState(false)
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (lastRatedCard) {
+      setShowUndo(true)
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+      undoTimerRef.current = setTimeout(() => setShowUndo(false), 5000)
+    } else {
+      setShowUndo(false)
+    }
+    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current) }
+  }, [lastRatedCard?.timestamp])
+
+  // Animation values — horizontal swipe only (vertical reserved for content scroll)
   const rotateY = useSharedValue(0)
   const translateX = useSharedValue(0)
-  const translateY = useSharedValue(0)
   const cardScale = useSharedValue(1)
 
   // Navigate to summary when complete
@@ -54,11 +70,10 @@ export function StudySessionScreen() {
     }
   }, [phase, navigation])
 
-  // Reset flip on card change
+  // Reset animations on card change
   useEffect(() => {
     rotateY.value = 0
     translateX.value = 0
-    translateY.value = 0
     cardScale.value = 1
   }, [currentCard?.id])
 
@@ -71,32 +86,34 @@ export function StudySessionScreen() {
   const cardAnimStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
-      { translateY: translateY.value },
       { scale: cardScale.value },
     ],
   }))
 
-  const frontAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ perspective: 1000 }, { rotateY: `${rotateY.value}deg` }],
-    backfaceVisibility: 'hidden' as const,
-    opacity: interpolate(rotateY.value, [0, 90, 180], [1, 0, 0]),
-  }))
+  const frontAnimStyle = useAnimatedStyle(() => {
+    const rv = rotateY.value
+    return {
+      transform: [{ perspective: 1000 }, { rotateY: `${rv}deg` }],
+      backfaceVisibility: 'hidden' as const,
+      opacity: rv <= 90 ? 1 : 0,
+    }
+  })
 
-  const backAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ perspective: 1000 }, { rotateY: `${rotateY.value - 180}deg` }],
-    backfaceVisibility: 'hidden' as const,
-    opacity: interpolate(rotateY.value, [0, 90, 180], [0, 0, 1]),
-  }))
+  const backAnimStyle = useAnimatedStyle(() => {
+    const rv = rotateY.value
+    return {
+      transform: [{ perspective: 1000 }, { rotateY: `${rv - 180}deg` }],
+      backfaceVisibility: 'hidden' as const,
+      opacity: rv > 90 ? 1 : 0,
+    }
+  })
 
   const hintStyle = useAnimatedStyle(() => {
     const absX = Math.abs(translateX.value)
-    const absY = Math.abs(translateY.value)
-    const opacity = interpolate(Math.max(absX, absY), [0, SWIPE_THRESHOLD], [0, 0.8], Extrapolation.CLAMP)
+    const opacity = interpolate(absX, [0, SWIPE_THRESHOLD], [0, 0.8], Extrapolation.CLAMP)
     let color = 'transparent'
     if (translateX.value < -30) color = RATING_COLORS.again
     else if (translateX.value > 30) color = RATING_COLORS.good
-    else if (translateY.value < -30) color = RATING_COLORS.easy
-    else if (translateY.value > 30) color = RATING_COLORS.hard
     return { opacity, backgroundColor: color }
   })
 
@@ -110,7 +127,6 @@ export function StudySessionScreen() {
     )
   }
 
-  // Card content
   const fields = template?.fields ?? []
   const frontFields = template?.front_layout ?? []
   const backFields = template?.back_layout ?? []
@@ -131,6 +147,7 @@ export function StudySessionScreen() {
   const fallbackFront = frontContent.length > 0 ? frontContent : [{ key: 'f', value: fieldEntries[0]?.[1] ?? '', style: 'primary' as const, name: 'Front' }]
   const fallbackBack = backContent.length > 0 ? backContent : [{ key: 'b', value: fieldEntries[1]?.[1] ?? '', style: 'primary' as const, name: 'Back' }]
 
+
   const handleFlip = () => {
     if (!isRating) flipCard()
   }
@@ -138,6 +155,12 @@ export function StudySessionScreen() {
   const handleRate = (rating: string) => {
     if (isRating) return
     rateCard(rating)
+  }
+
+  const handleUndo = () => {
+    undoLastRating()
+    setShowUndo(false)
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
   }
 
   const handleExit = () => {
@@ -154,21 +177,20 @@ export function StudySessionScreen() {
       runOnJS(handleFlip)()
     })
 
-  // Swipe gesture
+  // Swipe gesture — left/right only (again/good)
   const panGesture = Gesture.Pan()
     .enabled(!isRating)
     .onUpdate((e) => {
       translateX.value = e.translationX
-      translateY.value = e.translationY
       cardScale.value = interpolate(
-        Math.abs(e.translationX) + Math.abs(e.translationY),
+        Math.abs(e.translationX),
         [0, SCREEN_WIDTH],
         [1, 0.85],
         Extrapolation.CLAMP,
       )
     })
     .onEnd((e) => {
-      const { translationX: tx, translationY: ty, velocityX: vx } = e
+      const { translationX: tx, velocityX: vx } = e
 
       if (tx < -SWIPE_THRESHOLD || vx < -VELOCITY_THRESHOLD) {
         translateX.value = withTiming(-SCREEN_WIDTH)
@@ -176,15 +198,8 @@ export function StudySessionScreen() {
       } else if (tx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD) {
         translateX.value = withTiming(SCREEN_WIDTH)
         runOnJS(handleRate)('good')
-      } else if (ty < -SWIPE_THRESHOLD) {
-        translateY.value = withTiming(-SCREEN_WIDTH)
-        runOnJS(handleRate)('easy')
-      } else if (ty > SWIPE_THRESHOLD) {
-        translateY.value = withTiming(SCREEN_WIDTH)
-        runOnJS(handleRate)('hard')
       } else {
         translateX.value = withSpring(0)
-        translateY.value = withSpring(0)
         cardScale.value = withSpring(1)
       }
     })
@@ -217,45 +232,46 @@ export function StudySessionScreen() {
               {/* Swipe hint overlay */}
               <Animated.View style={[styles.swipeHint, hintStyle]} />
 
-              <TouchableOpacity activeOpacity={0.95} onPress={handleFlip} {...testProps('study-card-tap')}>
-                {/* Front face */}
+              <View style={styles.flex} {...testProps('study-card-tap')}>
+                {/* Front face — tap to flip, no scroll */}
                 <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
                   <CardFace content={fallbackFront} theme={theme} />
                   <Text style={[theme.typography.caption, styles.tapHint, { color: theme.colors.textTertiary }]}>
-                    Tap to flip
+                    {t('session.tapToFlip')}
                   </Text>
                 </Animated.View>
 
-                {/* Back face */}
+                {/* Back face — scrollable for long content */}
                 <Animated.View style={[styles.card, styles.cardBack, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, backAnimStyle]}>
-                  <CardFace content={fallbackBack} theme={theme} />
+                  <CardFace content={fallbackBack} theme={theme} scrollable />
                 </Animated.View>
-              </TouchableOpacity>
+              </View>
             </Animated.View>
           </GestureDetector>
         </View>
 
-        {/* Rating buttons — mode-specific (matches web) */}
+        {/* Undo button — appears after rating, auto-dismisses after 5s */}
+        {showUndo && !isFlipped && phase === 'studying' && (
+          <View style={styles.undoRow}>
+            <TouchableOpacity
+              onPress={handleUndo}
+              style={[styles.undoBtn, { borderColor: theme.colors.border }]}
+              activeOpacity={0.7}
+              {...testProps('study-undo-button')}
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                ↩ {t('session.undo')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Swipe hint — left: Again, right: Good */}
         {isFlipped && (
-          <View style={[styles.ratingRow, { paddingHorizontal: 16 }]}>
-            {config?.mode === 'cramming' ? (
-              <>
-                <RatingButton label={t('rating.missed')} color={RATING_COLORS.again} onPress={() => handleRate('missed')} disabled={isRating} testID="study-rate-missed" />
-                <RatingButton label={t('rating.gotIt')} color={RATING_COLORS.good} onPress={() => handleRate('got_it')} disabled={isRating} testID="study-rate-got-it" />
-              </>
-            ) : config?.mode === 'srs' ? (
-              <>
-                <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} testID="study-rate-again" />
-                <RatingButton label={t('srsRating.hard')} color={RATING_COLORS.hard} onPress={() => handleRate('hard')} disabled={isRating} testID="study-rate-hard" />
-                <RatingButton label={t('srsRating.good')} color={RATING_COLORS.good} onPress={() => handleRate('good')} disabled={isRating} testID="study-rate-good" />
-                <RatingButton label={t('srsRating.easy')} color={RATING_COLORS.easy} onPress={() => handleRate('easy')} disabled={isRating} testID="study-rate-easy" />
-              </>
-            ) : (
-              <>
-                <RatingButton label={t('rating.unknown')} color={RATING_COLORS.again} onPress={() => handleRate('unknown')} disabled={isRating} testID="study-rate-unknown" />
-                <RatingButton label={t('rating.known')} color={RATING_COLORS.good} onPress={() => handleRate('known')} disabled={isRating} testID="study-rate-known" />
-              </>
-            )}
+          <View style={styles.swipeRatingHint}>
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('session.swipeHint', { defaultValue: 'Swipe to rate' })}</Text>
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
           </View>
         )}
 
@@ -263,7 +279,7 @@ export function StudySessionScreen() {
         {!isFlipped && (
           <View style={styles.swipeHints}>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-              Tap card to flip · Swipe to rate
+              {t('session.swipeHint')}
             </Text>
           </View>
         )}
@@ -272,38 +288,34 @@ export function StudySessionScreen() {
   )
 }
 
-function CardFace({ content, theme }: { content: Array<{ key: string; value: string; style: string; name: string }>; theme: Theme }) {
-  return (
-    <View style={styles.cardContent}>
-      {content.map((field) => (
-        <View key={field.key} style={styles.fieldBlock}>
-          <Text style={[
-            field.style === 'primary' ? theme.typography.h2 : theme.typography.body,
-            { color: theme.colors.text, textAlign: 'center' },
-          ]}>
-            {field.value}
-          </Text>
-        </View>
-      ))}
+function CardFace({ content, theme, scrollable = false }: { content: Array<{ key: string; value: string; style: string; name: string }>; theme: Theme; scrollable?: boolean }) {
+  const inner = content.map((field) => (
+    <View key={field.key} style={styles.fieldBlock}>
+      <Text style={[
+        field.style === 'primary' ? theme.typography.h2 : theme.typography.body,
+        { color: theme.colors.text, textAlign: 'center' },
+      ]}>
+        {field.value}
+      </Text>
     </View>
-  )
+  ))
+
+  if (scrollable) {
+    return (
+      <ScrollView
+        contentContainerStyle={styles.cardScrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        nestedScrollEnabled
+      >
+        {inner}
+      </ScrollView>
+    )
+  }
+
+  return <View style={styles.cardContent}>{inner}</View>
 }
 
-function RatingButton({ label, color, onPress, disabled, testID }: {
-  label: string; color: string; onPress: () => void; disabled: boolean; testID: string
-}) {
-  return (
-    <TouchableOpacity
-      {...testProps(testID)}
-      onPress={onPress}
-      disabled={disabled}
-      activeOpacity={0.7}
-      style={[styles.ratingBtn, { backgroundColor: color, opacity: disabled ? 0.5 : 1 }]}
-    >
-      <Text style={styles.ratingLabel}>{label}</Text>
-    </TouchableOpacity>
-  )
-}
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
@@ -320,14 +332,20 @@ const styles = StyleSheet.create({
   },
   cardBack: { },
   cardContent: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, width: '100%' },
+  cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     borderRadius: 20, zIndex: 10,
   },
-  ratingRow: { flexDirection: 'row', gap: 8, paddingBottom: 24 },
-  ratingBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  ratingLabel: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  swipeRatingHint: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 32, paddingBottom: 20 },
   swipeHints: { paddingBottom: 24 },
+  undoRow: { alignItems: 'center', paddingBottom: 8 },
+  undoBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
 })
