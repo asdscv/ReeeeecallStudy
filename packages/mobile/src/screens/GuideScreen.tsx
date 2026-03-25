@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen, TextInput } from '../components/ui'
+import { useTranslation } from 'react-i18next'
+import { Screen, TextInput, DrawerHeader } from '../components/ui'
 
-import { useTheme, palette } from '../theme'
+import { useTheme } from '../theme'
 
-// ── Inline guide data (matches web guide.json EN) ──────────────────
+// ── Types ──────────────────────────────────────────────────────────
 interface GuideItem {
   title: string
   body: string
@@ -18,108 +19,57 @@ interface GuideSection {
   items: GuideItem[]
 }
 
-const SECTIONS: GuideSection[] = [
-  {
-    id: 'getting-started', title: 'Getting Started', icon: '🚀',
-    items: [
-      { title: 'Login', body: 'Log in with your email and password. When you sign up, a verification email is sent — click the link to complete registration.' },
-      { title: 'Home (Dashboard)', body: 'After login, the dashboard appears. See total cards, today\'s review cards, study streak, and mastery rate at a glance.' },
-      { title: 'Navigation', body: 'Use the bottom tab bar to navigate between Home, Decks, Study, Marketplace, and Settings.' },
-    ],
-  },
-  {
-    id: 'decks', title: 'Deck Management', icon: '📚',
-    items: [
-      { title: 'Create a Deck', body: 'On the Decks page, press the + button. Set the name, description, icon, and color.' },
-      { title: 'Deck Detail View', body: 'Click a deck to see its card list. Use the top buttons to add cards, import, export, share, or edit the deck.' },
-      { title: 'Edit Deck', body: 'Change the name, description, icon, color, and default template on the deck edit page.' },
-      { title: 'Delete Deck', body: 'Press the delete button on the deck detail page. Deleting a deck also removes all its cards.' },
-    ],
-  },
-  {
-    id: 'cards', title: 'Card Management', icon: '🃏',
-    items: [
-      { title: 'Add Cards', body: 'Press the + button on the deck detail page. Fill in the fields defined in the template.' },
-      { title: 'Edit & Delete Cards', body: 'Tap a card in the list to edit. Modify field content and tags.' },
-      { title: 'Search & Filter', body: 'Use the search bar to search across all fields. Select a status filter (new, learning, review) to view specific cards.' },
-    ],
-  },
-  {
-    id: 'study', title: 'Study', icon: '📖',
-    items: [
-      { title: 'Study Modes', body: 'SRS: Spaced repetition with 4 buttons (Again/Hard/Good/Easy).\nSequential Review: In order, mixing new + review cards.\nRandom: Randomly drawn cards.\nSequential: Cards in order.\nBy Date: Cards by upload date.\n\nSequential Review, Random, Sequential, By Date use 2 buttons (Unknown/Known).\n\nCramming: Intensive round-based review with 2 buttons (Missed/Got It). Does not affect SRS schedule.' },
-      { title: 'The Science Behind SRS', body: 'SRS is based on the forgetting curve. By reviewing just before you forget, information moves to long-term memory. Cards you know well appear less often; cards you struggle with appear more frequently.' },
-      { title: 'SRS Study Method', body: 'Again (Red): "I didn\'t remember" — card reappears soon.\nHard (Orange): "Barely recalled" — shorter interval.\nGood (Blue): "Remembered well" — normal interval.\nEasy (Green): "Instant recall" — longer interval.\n\nTip: When in doubt, press Good.' },
-      { title: 'Study Session Flow', body: '1. Select deck → Set study mode → Start\n2. See card front → Tap to flip → Choose rating\n3. After all cards, a summary shows study count, time, and rating distribution.' },
-      { title: 'Swipe Mode', body: 'Switch to Swipe mode in Settings to rate by swiping.\nSRS: ← Again / → Good\nOther modes: ← Unknown / → Known\nCramming: ← Missed / → Got It' },
-      { title: 'Cramming Mode', body: 'All cards are presented. Missed cards reappear until mastered. Use card filters (All/Weak/Due Soon) and time limits. Does NOT affect SRS schedule.' },
-    ],
-  },
-  {
-    id: 'import-export', title: 'Import & Export', icon: '📦',
-    items: [
-      { title: 'JSON Import', body: 'On deck detail, tap Import → select a JSON file. Ideal for backup and restore.' },
-      { title: 'CSV Import', body: 'CSV files from Excel can be imported. Column mapping matches fields automatically.' },
-      { title: 'JSON Export', body: 'Deck detail → Export → JSON downloads the full deck as one file.' },
-      { title: 'CSV Export', body: 'CSV format opens directly in Excel/Google Sheets.' },
-    ],
-  },
-  {
-    id: 'sharing', title: 'Deck Sharing', icon: '🔗',
-    items: [
-      { title: 'Copy Mode', body: 'Gives an independent, editable copy. Original and copy don\'t affect each other.' },
-      { title: 'Subscribe Mode', body: 'Recipients get auto-updates when you add cards. Study progress is independent.' },
-      { title: 'Snapshot Mode', body: 'Creates a read-only copy at the current point in time.' },
-    ],
-  },
-  {
-    id: 'marketplace', title: 'Marketplace', icon: '🏪',
-    items: [
-      { title: 'What is the Marketplace?', body: 'Search and get decks shared by other users. Filter by category and tags.' },
-      { title: 'Getting a Deck', body: 'Click a deck to preview cards, then press "Get" to add it to your decks.' },
-      { title: 'Publishing Your Deck', body: 'Deck detail → Publish → Set title, description, category, and share mode.' },
-    ],
-  },
-  {
-    id: 'history', title: 'Study History & Statistics', icon: '📊',
-    items: [
-      { title: 'Viewing Study History', body: 'View all study sessions by date on the History page. Filter by deck or mode.' },
-      { title: 'Dashboard Statistics', body: 'Switch period tabs on the dashboard to view heatmap, daily study chart, and forecast.' },
-    ],
-  },
-  {
-    id: 'settings', title: 'Settings', icon: '⚙️',
-    items: [
-      { title: 'Profile', body: 'Set your display name. Email cannot be changed.' },
-      { title: 'SRS New Card Limit', body: 'Set the maximum number of new cards per SRS session.' },
-      { title: 'Answer Mode', body: 'Button mode: Tap rating buttons. Swipe mode: Swipe cards to rate.' },
-      { title: 'Auto TTS', body: 'Auto-reads TTS-enabled fields when flipping cards. Adjust speed with the slider (0.5x - 2.0x).' },
-    ],
-  },
-  {
-    id: 'ai-generate', title: 'AI Auto-Generate', icon: '🤖',
-    items: [
-      { title: 'What is AI Auto-Generate?', body: 'Create flashcards automatically using AI. Enter a topic and AI generates everything for you.' },
-      { title: 'Setting Up API Key', body: 'Get an API key from OpenAI or xAI. Enter it in AI Generate settings. Keys are stored locally.' },
-      { title: 'Full Generation', body: 'Go to AI Generate → Enter topic → Set card count → Start. AI creates template, deck, and cards.' },
-    ],
-  },
-  {
-    id: 'tips', title: 'Study Tips', icon: '💡',
-    items: [
-      { title: 'Study a Little Every Day', body: 'SRS is most effective with daily consistency. 10-20 minutes a day is enough.' },
-      { title: "Don't Be Afraid of Again", body: "Honestly marking cards you don't remember as 'Again' helps the system. Forcing 'Good' reduces effectiveness." },
-      { title: 'Keep Cards Concise', body: "Put just one concept per card. Short, clear cards are far more effective." },
-      { title: 'Use Tags', body: "Add tags for quick filtering. Examples: 'grammar', 'verbs', 'Chapter1'." },
-    ],
-  },
-]
+// Section keys — order matches the guide JSON structure
+const SECTION_KEYS = [
+  'gettingStarted',
+  'decks',
+  'cards',
+  'study',
+  'importExport',
+  'sharing',
+  'marketplace',
+  'history',
+  'settings',
+  'aiGenerate',
+  'tips',
+] as const
+
+// Item keys per section
+const ITEM_KEYS: Record<string, string[]> = {
+  gettingStarted: ['login', 'dashboard', 'navigation'],
+  decks: ['create', 'detail', 'edit', 'delete'],
+  cards: ['add', 'editDelete', 'searchFilter'],
+  study: ['modes', 'science', 'srsMethod', 'sessionFlow', 'swipeMode', 'cramming'],
+  importExport: ['jsonImport', 'csvImport', 'jsonExport', 'csvExport'],
+  sharing: ['copy', 'subscribe', 'snapshot'],
+  marketplace: ['what', 'getting', 'publishing'],
+  history: ['viewing', 'dashboardStats'],
+  settings: ['profile', 'srsLimit', 'answerMode', 'autoTts'],
+  aiGenerate: ['what', 'apiKey', 'fullGeneration'],
+  tips: ['daily', 'again', 'concise', 'tags'],
+}
 
 export function GuideScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
+  const { t } = useTranslation('guide')
   const [search, setSearch] = useState('')
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+
+  // Build sections from i18n
+  const SECTIONS: GuideSection[] = useMemo(
+    () =>
+      SECTION_KEYS.map((key) => ({
+        id: key,
+        title: t(`sections.${key}.title`),
+        icon: t(`sections.${key}.icon`),
+        items: (ITEM_KEYS[key] ?? []).map((itemKey) => ({
+          title: t(`sections.${key}.items.${itemKey}.title`),
+          body: t(`sections.${key}.items.${itemKey}.body`),
+        })),
+      })),
+    [t],
+  )
 
   const query = search.trim().toLowerCase()
   const filtered = query
@@ -145,15 +95,10 @@ export function GuideScreen() {
 
   return (
     <Screen safeArea padding={false} testID="guide-screen">
+      <DrawerHeader title={t('title')} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Back + title */}
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>{'← Back'}</Text>
-        </TouchableOpacity>
-
-        <Text style={[theme.typography.h2, styles.pageTitle, { color: theme.colors.text }]}>Guide</Text>
         <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginBottom: 12 }]}>
-          Learn all features of ReeeeecallStudy
+          {t('subtitle')}
         </Text>
 
         {/* Search */}
@@ -161,13 +106,13 @@ export function GuideScreen() {
           testID="guide-search"
           value={search}
           onChangeText={setSearch}
-          placeholder={'Search features (e.g., SRS, Import, Share...)'}
+          placeholder={t('searchPlaceholder')}
         />
 
         {/* Table of Contents — matches web */}
         {!query && (
           <View style={[styles.tocCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.tocTitle, { color: theme.colors.text }]}>{'Table of Contents'}</Text>
+            <Text style={[styles.tocTitle, { color: theme.colors.text }]}>{t('tableOfContents')}</Text>
             {SECTIONS.map((s) => (
               <TouchableOpacity
                 key={s.id}
@@ -188,7 +133,7 @@ export function GuideScreen() {
         {filtered.length === 0 && (
           <View style={styles.empty}>
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-              No results for "{search}"
+              {t('noResults', { query: search })}
             </Text>
           </View>
         )}
