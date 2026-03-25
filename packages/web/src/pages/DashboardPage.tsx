@@ -98,7 +98,6 @@ export function DashboardPage() {
   const days = periodToDays(period)
   const filteredLogs = filterLogsByPeriod(studyLogs, days)
 
-  const heatmapData = getHeatmapData(filteredLogs)
   const forecastData = getForecastReviews(allCards)
   const dailyData = getDailyStudyCounts(filteredLogs, days)
 
