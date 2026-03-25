@@ -112,17 +112,20 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
               onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
             <MenuItem icon="🏪" label={t('nav.marketplace')} indent active={isActive('MarketplaceTab')} theme={theme}
               onPress={() => go('MarketplaceTab')} testID="drawer-marketplace" />
+            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent active={false} theme={theme}
+              onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
             <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={false} theme={theme}
               onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
           </View>
         )}
 
-        {/* My Shares */}
+        {/* Achievements — matches web */}
         <MenuItem
-          icon="📤" label={t('nav.marketplace', { defaultValue: 'My Shares' })}
+          icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })}
           active={false}
           theme={theme}
-          onPress={() => go('SettingsTab', 'MyShares')}
+          onPress={() => go('SettingsTab', 'Achievements')}
+          testID="drawer-achievements"
         />
 
         {/* Settings */}
