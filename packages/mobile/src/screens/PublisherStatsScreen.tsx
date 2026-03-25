@@ -58,8 +58,10 @@ export function PublisherStatsScreen() {
     | { type: 'header'; key: string }
     | { type: 'charts'; key: string }
     | { type: 'listing'; key: string; data: NonNullable<typeof stats>['listings'][number] }
-    | { type: 'activity-header'; key: string }
+    | { type: 'section-title'; key: string; title: string }
     | { type: 'acquire'; key: string; data: NonNullable<typeof stats>['recent_acquires'][number] }
+    | { type: 'review'; key: string; data: NonNullable<typeof stats>['recent_reviews'][number] }
+    | { type: 'empty-message'; key: string; message: string }
 
   const items: ListItem[] = []
   items.push({ type: 'header', key: 'header' })
@@ -74,11 +76,24 @@ export function PublisherStatsScreen() {
     }
   }
 
+  // Recent Acquisitions — always show section (matches web)
+  items.push({ type: 'section-title', key: 'acquires-title', title: 'Recent Acquisitions' })
   if (stats?.recent_acquires && stats.recent_acquires.length > 0) {
-    items.push({ type: 'activity-header', key: 'activity-header' })
     for (const acq of stats.recent_acquires) {
       items.push({ type: 'acquire', key: `acquire-${acq.id}`, data: acq })
     }
+  } else {
+    items.push({ type: 'empty-message', key: 'no-acquires', message: 'No acquisitions yet' })
+  }
+
+  // Recent Reviews — always show section (matches web)
+  items.push({ type: 'section-title', key: 'reviews-title', title: 'Recent Reviews' })
+  if (stats?.recent_reviews && stats.recent_reviews.length > 0) {
+    for (const rev of stats.recent_reviews) {
+      items.push({ type: 'review', key: `review-${rev.id}`, data: rev })
+    }
+  } else {
+    items.push({ type: 'empty-message', key: 'no-reviews', message: 'No reviews yet' })
   }
 
   return (
@@ -217,11 +232,45 @@ export function PublisherStatsScreen() {
                 </ListCard>
               )
 
-            case 'activity-header':
+            case 'section-title':
               return (
                 <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 20, marginBottom: 8 }]}>
-                  Recent Acquisitions
+                  {item.title}
                 </Text>
+              )
+
+            case 'empty-message':
+              return (
+                <View style={[styles.emptySection, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
+                    {item.message}
+                  </Text>
+                </View>
+              )
+
+            case 'review':
+              return (
+                <View style={[styles.activityItem, { borderBottomColor: theme.colors.border }]}>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Text style={[theme.typography.bodySmall, { color: theme.colors.text, fontWeight: '600' }]}>
+                        {item.data.user_name || 'Anonymous'}
+                      </Text>
+                      <Text style={{ color: '#f59e0b' }}>{'★'.repeat(item.data.rating)}</Text>
+                    </View>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]} numberOfLines={1}>
+                      {item.data.deck_title}
+                    </Text>
+                    {item.data.body && (
+                      <Text style={[theme.typography.caption, { color: theme.colors.text, marginTop: 2 }]} numberOfLines={2}>
+                        {item.data.body}
+                      </Text>
+                    )}
+                  </View>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                    {timeAgo(item.data.created_at)}
+                  </Text>
+                </View>
               )
 
             case 'acquire':
@@ -295,6 +344,12 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 10,
     borderBottomWidth: 1,
+  },
+  emptySection: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 20,
+    alignItems: 'center',
   },
   empty: {
     flex: 1,
