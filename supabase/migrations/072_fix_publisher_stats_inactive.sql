@@ -24,16 +24,16 @@ BEGIN
 
   SELECT json_build_object(
     'total_listings',
-      (SELECT count(*)::int FROM marketplace_listings WHERE owner_id = v_user_id AND is_active = true),
+      (SELECT count(*)::int FROM marketplace_listings WHERE owner_id = v_user_id AND COALESCE(is_active, true) = true),
     'total_views',
-      (SELECT COALESCE(sum(view_count), 0)::int FROM marketplace_listings WHERE owner_id = v_user_id AND is_active = true),
+      (SELECT COALESCE(sum(view_count), 0)::int FROM marketplace_listings WHERE owner_id = v_user_id AND COALESCE(is_active, true) = true),
     'total_acquires',
-      (SELECT COALESCE(sum(acquire_count), 0)::int FROM marketplace_listings WHERE owner_id = v_user_id AND is_active = true),
+      (SELECT COALESCE(sum(acquire_count), 0)::int FROM marketplace_listings WHERE owner_id = v_user_id AND COALESCE(is_active, true) = true),
     'avg_conversion_rate',
       (SELECT CASE
         WHEN COALESCE(sum(view_count), 0) = 0 THEN 0
         ELSE ROUND((COALESCE(sum(acquire_count), 0)::numeric / sum(view_count) * 100), 2)
-      END FROM marketplace_listings WHERE owner_id = v_user_id AND is_active = true),
+      END FROM marketplace_listings WHERE owner_id = v_user_id AND COALESCE(is_active, true) = true),
     'listings',
       COALESCE((
         SELECT json_agg(row_to_json(t) ORDER BY t.created_at DESC)
@@ -55,7 +55,7 @@ BEGIN
               ELSE ROUND((COALESCE(ml.acquire_count, 0)::numeric / ml.view_count * 100), 2)
             END AS conversion_rate
           FROM marketplace_listings ml
-          WHERE ml.owner_id = v_user_id AND ml.is_active = true
+          WHERE ml.owner_id = v_user_id AND COALESCE(ml.is_active, true) = true
         ) t
       ), '[]'::json),
     'daily_views',
@@ -68,7 +68,7 @@ BEGIN
             count(DISTINCT COALESCE(mv.viewer_id::text, mv.session_id))::int AS unique_viewers
           FROM marketplace_views mv
           JOIN marketplace_listings ml ON ml.id = mv.listing_id
-          WHERE ml.owner_id = v_user_id AND ml.is_active = true
+          WHERE ml.owner_id = v_user_id AND COALESCE(ml.is_active, true) = true
             AND mv.created_at >= (NOW() - INTERVAL '30 days')
           GROUP BY mv.created_at::date
         ) t
@@ -79,7 +79,7 @@ BEGIN
         FROM (
           SELECT ml.title, ml.view_count
           FROM marketplace_listings ml
-          WHERE ml.owner_id = v_user_id AND ml.is_active = true
+          WHERE ml.owner_id = v_user_id AND COALESCE(ml.is_active, true) = true
           ORDER BY ml.view_count DESC
           LIMIT 5
         ) t
@@ -95,7 +95,7 @@ BEGIN
           FROM deck_shares ds
           JOIN marketplace_listings ml ON ml.deck_id = ds.deck_id
           JOIN profiles p ON p.id = ds.recipient_id
-          WHERE ml.owner_id = v_user_id AND ml.is_active = true
+          WHERE ml.owner_id = v_user_id AND COALESCE(ml.is_active, true) = true
             AND ds.share_mode = 'subscribe'
             AND ds.status = 'active'
           ORDER BY ds.created_at DESC
@@ -115,7 +115,7 @@ BEGIN
           FROM marketplace_reviews mr
           JOIN marketplace_listings ml ON ml.id = mr.listing_id
           JOIN profiles p ON p.id = mr.user_id
-          WHERE ml.owner_id = v_user_id AND ml.is_active = true
+          WHERE ml.owner_id = v_user_id AND COALESCE(ml.is_active, true) = true
           ORDER BY mr.created_at DESC
           LIMIT 10
         ) t
