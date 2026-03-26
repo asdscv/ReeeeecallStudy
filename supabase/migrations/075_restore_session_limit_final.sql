@@ -1,19 +1,8 @@
 -- ============================================================
--- 099: [TEMPORARY] E2E 디버깅용 세션 제한 해제
+-- 051: 세션 제한 원래대로 복원 (999번 임시 해제 되돌리기)
 -- ============================================================
--- 병렬 에이전트로 iOS/Android 동시 디버깅 시 세션 킥 방지
--- 디버깅 완료 후 이 파일 삭제하고 원래 함수 복원할 것
---
--- 변경 내용:
---   free: 1 → 99
---   pro:  3 → 99
---   enterprise: 5 → 99
---
--- 복원 방법:
---   이 migration 파일 삭제 후 아래 SQL 실행:
---   (또는 049 migration의 원래 값으로 되돌리기)
---
---   ALTER free → 1, pro → 3, enterprise → 5
+-- 999_e2e_disable_session_limit.sql에서 모든 tier를 99로 풀었던 것을
+-- 원래 값(free=1, pro=3, enterprise=5)으로 복원
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION register_session(
@@ -23,6 +12,7 @@ CREATE OR REPLACE FUNCTION register_session(
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_user_id        uuid := auth.uid();
@@ -62,16 +52,15 @@ BEGIN
   v_tier := COALESCE(v_tier, 'free');
 
   -- 3) Determine max sessions: override > tier default
-  --    [TEMPORARY] 모든 tier 99 세션 허용 (E2E 병렬 디버깅용)
-  --    원래 값: free=1, pro=3, enterprise=5
+  --    원래 값으로 복원: free=1, pro=3, enterprise=5
   IF v_override IS NOT NULL AND v_override > 0 THEN
     v_max_sessions := v_override;
   ELSE
     v_max_sessions := CASE v_tier
-      WHEN 'free' THEN 99        -- 원래: 1
-      WHEN 'pro' THEN 99         -- 원래: 3
-      WHEN 'enterprise' THEN 99  -- 원래: 5
-      ELSE 99                    -- 원래: 1
+      WHEN 'free' THEN 1
+      WHEN 'pro' THEN 3
+      WHEN 'enterprise' THEN 5
+      ELSE 1
     END;
   END IF;
 
