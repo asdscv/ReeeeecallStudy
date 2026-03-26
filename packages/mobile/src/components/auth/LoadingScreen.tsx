@@ -216,9 +216,9 @@ const s = StyleSheet.create({
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, zIndex: 10 },
 
   // Logo
-  logoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16, width: '100%' },
+  logoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 },
   logoIcon: { width: 52, height: 52 },
-  logoText: { height: 46, width: W * 0.58, tintColor: '#e2e8f0' },
+  logoText: { height: Math.round(W * 0.55 / 2.87), width: W * 0.55, tintColor: '#e2e8f0' },
 
   // Pill
   pill: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)', marginBottom: 24 },
