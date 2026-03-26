@@ -28,6 +28,16 @@ export interface SecureEnvelope {
   ttlMs: number | null
 }
 
+// ── Async Key Backend Interface ────────────────────────
+
+import type { ProviderKeyEntry, ProviderKeyMap } from './ai-key-vault'
+
+export interface IAsyncKeyBackend {
+  loadAll(uid: string): Promise<ProviderKeyMap>
+  saveProvider(uid: string, providerId: string, entry: ProviderKeyEntry): Promise<void>
+  removeProvider(uid: string, providerId: string): Promise<void>
+}
+
 // ── Manager Options ────────────────────────────────────
 
 export interface AIConfigManagerOptions {

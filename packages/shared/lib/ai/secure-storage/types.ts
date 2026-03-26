@@ -28,6 +28,19 @@ export interface SecureEnvelope {
   ttlMs: number | null
 }
 
+// ── Async Key Backend Interface ────────────────────────
+// SECURITY: 서버사이드 암호화 저장소용 비동기 인터페이스.
+// IStorageBackend(동기, 로컬)과 달리, Supabase 같은 네트워크 기반 저장소를 지원.
+// 암호화는 서버(pgcrypto)에서 수행되므로 클라이언트 암호화 불필요.
+
+import type { ProviderKeyEntry, ProviderKeyMap } from './ai-key-vault'
+
+export interface IAsyncKeyBackend {
+  loadAll(uid: string): Promise<ProviderKeyMap>
+  saveProvider(uid: string, providerId: string, entry: ProviderKeyEntry): Promise<void>
+  removeProvider(uid: string, providerId: string): Promise<void>
+}
+
 // ── Manager Options ────────────────────────────────────
 
 export interface AIConfigManagerOptions {
