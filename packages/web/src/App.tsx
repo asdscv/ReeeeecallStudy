@@ -129,6 +129,7 @@ function LoginRedirect() {
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
+  const registerSession = useSubscriptionStore((s) => s.registerSession)
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
   const { showOnboarding, initialize: initOnboarding } = useOnboardingStore()
 
@@ -144,12 +145,15 @@ function App() {
     if (user) initOnboarding()
   }, [user, initOnboarding])
 
-  // Start session heartbeat when user is logged in
+  // Register session + start heartbeat when user is logged in
   useEffect(() => {
     if (!user) return
+    registerSession().then(() => {
+      // Session registered — now start heartbeat to keep it alive
+    })
     const cleanup = startHeartbeat()
     return cleanup
-  }, [user, startHeartbeat])
+  }, [user, registerSession, startHeartbeat])
 
   if (loading) {
     return (
