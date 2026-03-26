@@ -130,7 +130,10 @@ export function useAuth(): AuthActions {
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo },
+        options: {
+          redirectTo,
+          queryParams: { prompt: 'select_account' },
+        },
       })
 
       if (error) return { error: localizeAuthError(error.message) }
