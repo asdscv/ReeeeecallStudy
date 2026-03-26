@@ -8,7 +8,7 @@ import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-const MIN_SPLASH_MS = 1800
+const MIN_SPLASH_MS = 10000
 
 export function RootNavigator() {
   const { user, loading } = useAuthState()
