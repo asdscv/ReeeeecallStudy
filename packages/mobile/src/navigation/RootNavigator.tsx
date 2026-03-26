@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
@@ -7,10 +8,18 @@ import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
+const MIN_SPLASH_MS = 1800
+
 export function RootNavigator() {
   const { user, loading } = useAuthState()
+  const [splashDone, setSplashDone] = useState(false)
 
-  if (loading) {
+  useEffect(() => {
+    const timer = setTimeout(() => setSplashDone(true), MIN_SPLASH_MS)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading || !splashDone) {
     return <LoadingScreen />
   }
 
