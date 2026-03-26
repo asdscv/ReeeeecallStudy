@@ -375,7 +375,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false }: {
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
         {/* TTS button inline — like web: 🔊 icon left of text, blocks card flip */}
         {field.ttsLang ? (
-          <View style={styles.ttsRow}>
+          <View style={size >= 32 ? styles.ttsColumn : styles.ttsRow}>
             <TouchableOpacity
               onPress={() => tts.speak(field.value, field.ttsLang!, ttsSpeed)}
               style={styles.ttsInlineBtn}
@@ -390,7 +390,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false }: {
               color,
               textAlign: 'center',
               lineHeight: size >= 32 ? size * 1.2 : size * 1.5,
-              flex: 1,
+              ...(size < 32 ? { flex: 1 } : {}),
             }}>
               {field.value}
             </Text>
@@ -462,6 +462,7 @@ const styles = StyleSheet.create({
   fieldBlock: { width: '100%', alignItems: 'center' },
   hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
   ttsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, width: '100%' },
+  ttsColumn: { flexDirection: 'column', alignItems: 'center', gap: 4, width: '100%' },
   ttsInlineBtn: { padding: 8 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {
