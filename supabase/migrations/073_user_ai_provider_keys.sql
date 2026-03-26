@@ -102,13 +102,13 @@ BEGIN
   VALUES (
     v_uid,
     p_provider_id,
-    pgp_sym_encrypt(p_api_key, v_secret),
+    extensions.pgp_sym_encrypt(p_api_key, v_secret),
     p_model,
     p_base_url
   )
   ON CONFLICT (user_id, provider_id)
   DO UPDATE SET
-    encrypted_api_key = pgp_sym_encrypt(p_api_key, v_secret),
+    encrypted_api_key = extensions.pgp_sym_encrypt(p_api_key, v_secret),
     model   = EXCLUDED.model,
     base_url = EXCLUDED.base_url,
     updated_at = now();
@@ -150,7 +150,7 @@ BEGIN
   RETURN QUERY
   SELECT
     k.provider_id,
-    pgp_sym_decrypt(k.encrypted_api_key, v_secret),
+    extensions.pgp_sym_decrypt(k.encrypted_api_key, v_secret),
     k.model,
     k.base_url,
     k.updated_at::text
