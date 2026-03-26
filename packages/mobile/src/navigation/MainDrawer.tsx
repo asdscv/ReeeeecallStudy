@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { createDrawerNavigator, type DrawerContentComponentProps } from '@react-navigation/drawer'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -66,9 +66,10 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
   return (
     <SafeAreaView style={[styles.drawerContainer, { backgroundColor: theme.colors.surfaceElevated }]}>
-      {/* Logo */}
+      {/* Logo — matches web: icon + text image */}
       <View style={[styles.drawerHeader, { borderBottomColor: theme.colors.border }]}>
-        <Text style={[styles.brandText, { color: theme.colors.text }]}>ReeeeecallStudy</Text>
+        <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
+        <Image source={require('../../assets/logo-text.png')} style={styles.logoText} resizeMode="contain" />
       </View>
 
       <ScrollView style={styles.drawerScroll} showsVerticalScrollIndicator={false}>
@@ -255,8 +256,9 @@ export function MainDrawer() {
 
 const styles = StyleSheet.create({
   drawerContainer: { flex: 1 },
-  drawerHeader: { paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1 },
-  brandText: { fontSize: 18, fontWeight: '700' },
+  drawerHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1 },
+  logoIcon: { width: 36, height: 36 },
+  logoText: { height: 28, width: 140 },
   drawerScroll: { flex: 1, paddingTop: 8 },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', gap: 12,

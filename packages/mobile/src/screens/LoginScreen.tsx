@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput as RNTextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
@@ -61,12 +61,10 @@ export function LoginScreen() {
       <View style={styles.content}>
         {/* Card container — matches web rounded card */}
         <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          {/* Brand header — matches web: logo + brand name */}
+          {/* Brand header — matches web: icon + text logo */}
           <View style={styles.brandHeader}>
-            <Text style={styles.logoEmoji}>{'\uD83E\uDDE0'}</Text>
-            <Text style={[styles.brandText, { color: theme.colors.text }]}>
-              <Text style={{ color: theme.colors.primary }}>reeee</Text>callstudy
-            </Text>
+            <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
+            <Image source={require('../../assets/logo-text.png')} style={styles.logoTextImg} resizeMode="contain" />
           </View>
 
           {/* Title */}
@@ -171,9 +169,9 @@ export function LoginScreen() {
 const styles = StyleSheet.create({
   content: { flex: 1, justifyContent: 'center', paddingVertical: 40 },
   card: { borderRadius: 16, borderWidth: 1, padding: 24, gap: 20 },
-  brandHeader: { alignItems: 'center', gap: 8, marginBottom: 4 },
-  logoEmoji: { fontSize: 48 },
-  brandText: { fontSize: 20, fontWeight: '600', letterSpacing: -0.3 },
+  brandHeader: { alignItems: 'center', gap: 10, marginBottom: 4 },
+  logoIcon: { width: 56, height: 56 },
+  logoTextImg: { height: 32, width: 180 },
   form: { gap: 14 },
   forgotLink: { alignSelf: 'flex-end', paddingVertical: 2 },
   socialSection: { gap: 12 },
