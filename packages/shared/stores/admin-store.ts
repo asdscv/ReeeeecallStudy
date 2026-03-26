@@ -93,6 +93,7 @@ interface AdminState {
   fetchPageViews: () => Promise<void>
   fetchSystem: () => Promise<void>
   setOfficialStatus: (userId: string, isOfficial: boolean) => Promise<{ error: string | null }>
+  setUserRole: (userId: string, role: 'user' | 'admin') => Promise<{ error: string | null }>
   setUserStatus: (userId: string, status: UserStatus) => Promise<{ error: string | null }>
   fetchAuditLogs: (page?: number, pageSize?: number, filters?: AuditFilters) => Promise<void>
   logAction: (action: string, targetType: string, targetId?: string, details?: Record<string, unknown>) => Promise<void>
@@ -364,6 +365,28 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
       // Log audit action
       get().logAction('set_official', 'user', userId, { is_official: isOfficial })
+
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  setUserRole: async (userId: string, role: 'user' | 'admin') => {
+    try {
+      const { error } = await supabase.rpc('admin_set_user_role', {
+        p_user_id: userId,
+        p_role: role,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+
+      set({
+        userList: get().userList.map((u) =>
+          u.id === userId ? { ...u, role } : u,
+        ),
+      })
+
+      get().logAction('set_role', 'user', userId, { role })
 
       return { error: null }
     } catch (e) {

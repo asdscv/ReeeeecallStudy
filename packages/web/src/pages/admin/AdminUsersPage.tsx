@@ -25,10 +25,11 @@ export function AdminUsersPage() {
   const {
     userSignups, userList, userListTotal, retentionMetrics,
     usersLoading, usersError, fetchUsers,
-    activeUsers, fetchOverview, setOfficialStatus, setUserStatus,
+    activeUsers, fetchOverview, setOfficialStatus, setUserRole, setUserStatus,
   } = useAdminStore()
   const [page, setPage] = useState(0)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [roleChangingId, setRoleChangingId] = useState<string | null>(null)
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
@@ -195,11 +196,22 @@ export function AdminUsersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-2">
-                        <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
-                          u.role === 'admin' ? 'bg-destructive/15 text-destructive' : 'bg-accent text-muted-foreground'
-                        }`}>
-                          {t(userRoleLabel(u.role), u.role)}
-                        </span>
+                        <button
+                          type="button"
+                          disabled={roleChangingId === u.id}
+                          onClick={async () => {
+                            const newRole = u.role === 'admin' ? 'user' : 'admin'
+                            if (!confirm(`${u.display_name || u.id}의 역할을 ${newRole}로 변경하시겠습니까?`)) return
+                            setRoleChangingId(u.id)
+                            await setUserRole(u.id, newRole)
+                            setRoleChangingId(null)
+                          }}
+                          className={`inline-block px-2 py-0.5 text-xs rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-default ${
+                            u.role === 'admin' ? 'bg-destructive/15 text-destructive' : 'bg-accent text-muted-foreground'
+                          }`}
+                        >
+                          {roleChangingId === u.id ? '...' : t(userRoleLabel(u.role), u.role)}
+                        </button>
                       </td>
                       <td className="px-4 py-2">
                         <button
