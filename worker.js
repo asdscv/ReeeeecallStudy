@@ -357,7 +357,7 @@ async function handleContentDetailBot(slug, url, env) {
       logo: { '@type': 'ImageObject', url: DEFAULT_OG_IMAGE, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
     },
     inLanguage: article.locale,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}${article.locale !== 'en' ? `?lang=${article.locale}` : ''}` },
   }
 
   const breadcrumbJsonLd = {
@@ -366,7 +366,7 @@ async function handleContentDetailBot(slug, url, env) {
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: BRAND_NAME, item: SITE_URL },
       { '@type': 'ListItem', position: 2, name: LIST_TITLES[article.locale]?.split(' — ')[0] || 'Learning Insights', item: `${SITE_URL}/insight` },
-      { '@type': 'ListItem', position: 3, name: article.title, item: `${SITE_URL}/insight/${slug}` },
+      { '@type': 'ListItem', position: 3, name: article.title, item: `${SITE_URL}/insight/${slug}${article.locale !== 'en' ? `?lang=${article.locale}` : ''}` },
     ],
   }
 
@@ -391,7 +391,7 @@ async function handleContentDetailBot(slug, url, env) {
       url: SITE_URL,
       logo: { '@type': 'ImageObject', url: DEFAULT_OG_IMAGE, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
     },
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}${article.locale !== 'en' ? `?lang=${article.locale}` : ''}` },
     speakable: {
       '@type': 'SpeakableSpecification',
       cssSelector: ['article h1', 'article h2', 'article p', 'article li', 'article blockquote'],
@@ -410,7 +410,7 @@ ${buildCommonHead(article.locale)}
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:type" content="article">
-<meta property="og:url" content="${SITE_URL}/insight/${escapeHtml(slug)}">
+<meta property="og:url" content="${SITE_URL}/insight/${escapeHtml(slug)}${article.locale !== 'en' ? `?lang=${article.locale}` : ''}">
 <meta property="og:image" content="${escapeHtml(ogImage)}">
 <meta property="og:image:width" content="${OG_IMAGE_WIDTH}">
 <meta property="og:image:height" content="${OG_IMAGE_HEIGHT}">
@@ -430,7 +430,7 @@ ${articleTagsMeta}
 <meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="twitter:image" content="${escapeHtml(ogImage)}">
 <meta name="twitter:image:alt" content="${escapeHtml(title)}">
-<link rel="canonical" href="${SITE_URL}/insight/${escapeHtml(slug)}">
+<link rel="canonical" href="${SITE_URL}/insight/${escapeHtml(slug)}${article.locale !== 'en' ? `?lang=${article.locale}` : ''}">
 <link rel="alternate" type="application/rss+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.xml${lang !== 'en' ? `?lang=${lang}` : ''}">
 ${buildHreflangTags(`/insight/${escapeHtml(slug)}`, true)}
 <script type="application/ld+json">${JSON.stringify(articleJsonLd)}</script>
@@ -550,7 +550,7 @@ ${buildCommonHead(lang)}
 <meta property="og:title" content="${escapeHtml(listTitle)}">
 <meta property="og:description" content="${escapeHtml(listDesc)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="${SITE_URL}/insight">
+<meta property="og:url" content="${SITE_URL}/insight${lang !== 'en' ? `?lang=${lang}` : ''}">
 <meta property="og:image" content="${DEFAULT_OG_IMAGE}">
 <meta property="og:image:width" content="${OG_IMAGE_WIDTH}">
 <meta property="og:image:height" content="${OG_IMAGE_HEIGHT}">
@@ -564,7 +564,7 @@ ${buildOgLocaleAlternates(lang)}
 <meta name="twitter:description" content="${escapeHtml(listDesc)}">
 <meta name="twitter:image" content="${DEFAULT_OG_IMAGE}">
 <meta name="twitter:image:alt" content="${escapeHtml(listTitle)}">
-<link rel="canonical" href="${SITE_URL}/insight">
+<link rel="canonical" href="${SITE_URL}/insight${lang !== 'en' ? `?lang=${lang}` : ''}">
 <link rel="alternate" type="application/rss+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.xml${lang !== 'en' ? `?lang=${lang}` : ''}">
 <link rel="alternate" type="application/atom+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.atom${lang !== 'en' ? `?lang=${lang}` : ''}">
 ${buildHreflangTags('/insight', true)}
@@ -697,7 +697,7 @@ ${buildCommonHead(lang)}
 <meta property="og:image:height" content="${OG_IMAGE_HEIGHT}">
 <meta property="og:image:alt" content="${escapeHtml(pageTitle)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="${SITE_URL}/landing">
+<meta property="og:url" content="${SITE_URL}/landing${lang !== 'en' ? `?lang=${lang}` : ''}">
 <meta property="og:site_name" content="${BRAND_NAME}">
 <meta property="og:locale" content="${OG_LOCALE_MAP[lang] || 'en_US'}">
 ${buildOgLocaleAlternates(lang)}
@@ -708,7 +708,7 @@ ${buildOgLocaleAlternates(lang)}
 <meta name="twitter:description" content="${escapeHtml(pageDesc)}">
 <meta name="twitter:image" content="${DEFAULT_OG_IMAGE}">
 <meta name="twitter:image:alt" content="${escapeHtml(pageTitle)}">
-<link rel="canonical" href="${SITE_URL}/landing">
+<link rel="canonical" href="${SITE_URL}/landing${lang !== 'en' ? `?lang=${lang}` : ''}">
 <link rel="alternate" type="application/rss+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.xml${lang !== 'en' ? `?lang=${lang}` : ''}">
 <link rel="alternate" type="application/atom+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.atom${lang !== 'en' ? `?lang=${lang}` : ''}">
 <link rel="search" type="application/opensearchdescription+xml" title="${BRAND_NAME}" href="${SITE_URL}/opensearch.xml">
@@ -879,7 +879,7 @@ ${buildCommonHead(lang)}
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="${SITE_URL}/d/${escapeHtml(listingId)}">
+<meta property="og:url" content="${SITE_URL}/d/${escapeHtml(listingId)}${lang !== 'en' ? `?lang=${lang}` : ''}">
 <meta property="og:image" content="${DEFAULT_OG_IMAGE}">
 <meta property="og:image:width" content="${OG_IMAGE_WIDTH}">
 <meta property="og:image:height" content="${OG_IMAGE_HEIGHT}">
@@ -891,7 +891,7 @@ ${buildOgLocaleAlternates(lang)}
 <meta name="twitter:title" content="${escapeHtml(title)}">
 <meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="twitter:image" content="${DEFAULT_OG_IMAGE}">
-<link rel="canonical" href="${SITE_URL}/d/${escapeHtml(listingId)}">
+<link rel="canonical" href="${SITE_URL}/d/${escapeHtml(listingId)}${lang !== 'en' ? `?lang=${lang}` : ''}">
 ${buildHreflangTags(`/d/${escapeHtml(listingId)}`, true)}
 <script type="application/ld+json">${JSON.stringify(datasetJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
@@ -1120,7 +1120,7 @@ ${entries}
       <pubDate>${pubDate}</pubDate>
       <author>admin@reeeeecallstudy.xyz (${escapeHtml(a.author_name || BRAND_NAME)})</author>
 ${(a.tags || []).map((t) => `      <category>${escapeHtml(t)}</category>`).join('\n')}
-${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type="image/jpeg"/>` : ''}
+${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type="image/jpeg" length="0"/>` : ''}
       <source url="${SITE_URL}/feed.xml">${BRAND_NAME} Learning Insights</source>
     </item>`
   }).join('\n')

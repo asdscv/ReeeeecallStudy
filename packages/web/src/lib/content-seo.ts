@@ -2,6 +2,11 @@ import i18next from 'i18next'
 import type { ContentDetail } from '../types/content-blocks'
 import { SEO } from './seo-config'
 
+function insightUrl(slug: string, locale?: string) {
+  const langSuffix = locale && locale !== 'en' ? `?lang=${locale}` : ''
+  return `${SEO.SITE_URL}/insight/${slug}${langSuffix}`
+}
+
 const LOCALE_TO_LANGUAGE: Record<string, string> = {
   en: 'English',
   ko: 'Korean',
@@ -47,12 +52,12 @@ export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string
         height: SEO.OG_IMAGE_HEIGHT,
       },
     },
-    url: `${SEO.SITE_URL}/insight/${article.slug}`,
+    url: insightUrl(article.slug, article.locale),
     inLanguage: article.locale,
     isAccessibleForFree: true,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/insight/${article.slug}`,
+      '@id': insightUrl(article.slug, article.locale),
     },
   }
 
@@ -84,7 +89,7 @@ export function buildBreadcrumbJsonLd(article: ContentDetail) {
         '@type': 'ListItem',
         position: 3,
         name: article.title,
-        item: `${SEO.SITE_URL}/insight/${article.slug}`,
+        item: insightUrl(article.slug, article.locale),
       },
     ],
   }
@@ -291,7 +296,7 @@ export function buildLearningResourceJsonLd(article: ContentDetail) {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/insight/${article.slug}`,
+      '@id': insightUrl(article.slug, article.locale),
     },
     speakable: {
       '@type': 'SpeakableSpecification',

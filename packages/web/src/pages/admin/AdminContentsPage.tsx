@@ -104,24 +104,30 @@ export function AdminContentsPage() {
         <AdminStatCard icon="⏱" label={t('contents.avgReadingTime')} value={t('contents.minuteShort', { value: data.avg_reading_time_minutes })} color="purple" />
       </div>
 
-      {/* View stats + bounce rate */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <AdminStatCard icon="👁" label={t('contents.totalViews')} value={data.total_views} color="blue" subtitle={t('contents.viewsPerContent', { value: viewsPerContent })} />
-        <AdminStatCard icon="👤" label={t('contents.uniqueViewers')} value={data.unique_viewers} color="green" subtitle={t('contents.viewersPerContent', { value: avgViewersPerContent })} />
-        <AdminStatCard icon="⏳" label={t('contents.avgViewDuration')} value={formatViewDuration(data.avg_view_duration_ms)} color="orange" />
-        {bounceMetrics && (
-          <AdminStatCard icon="↩" label={t('contents.bounceRate')} value={`${bounceMetrics.bounceRate}%`} color={bounceMetrics.bounceRate > 60 ? 'red' : bounceMetrics.bounceRate > 40 ? 'orange' : 'green'} subtitle={`${bounceMetrics.engaged} ${t('contents.engaged')} / ${bounceMetrics.total}`} />
-        )}
+      {/* Content view stats */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.contentViewStats')}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <AdminStatCard icon="👁" label={t('contents.totalViews')} value={data.total_views} color="blue" subtitle={t('contents.viewsPerContent', { value: viewsPerContent })} />
+          <AdminStatCard icon="👤" label={t('contents.uniqueViewers')} value={data.unique_viewers} color="green" subtitle={t('contents.viewersPerContent', { value: avgViewersPerContent })} />
+          <AdminStatCard icon="⏳" label={t('contents.avgViewDuration')} value={formatViewDuration(data.avg_view_duration_ms)} color="orange" />
+          {bounceMetrics && (
+            <AdminStatCard icon="↩" label={t('contents.bounceRate')} value={`${bounceMetrics.bounceRate}%`} color={bounceMetrics.bounceRate > 60 ? 'red' : bounceMetrics.bounceRate > 40 ? 'orange' : 'green'} subtitle={`${bounceMetrics.engaged} ${t('contents.engaged')} / ${bounceMetrics.total}`} />
+          )}
+        </div>
       </div>
 
-      {/* Page views stats */}
+      {/* Site-wide traffic stats */}
       {pv && !pageViewsLoading && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <AdminStatCard icon="📊" label={t('contents.totalPageViews')} value={pv.total_page_views} color="blue" />
-          <AdminStatCard icon="🧑" label={t('contents.uniqueVisitors')} value={pv.unique_visitors} color="green" />
-          {bounceMetrics && (
-            <AdminStatCard icon="✓" label={t('contents.engagedRate')} value={`${bounceMetrics.engagedRate}%`} color="green" />
-          )}
+        <div>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('contents.siteTrafficStats')}</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <AdminStatCard icon="📊" label={t('contents.totalPageViews')} value={pv.total_page_views} color="blue" />
+            <AdminStatCard icon="🧑" label={t('contents.uniqueVisitors')} value={pv.unique_visitors} color="green" />
+            {bounceMetrics && (
+              <AdminStatCard icon="✓" label={t('contents.engagedRate')} value={`${bounceMetrics.engagedRate}%`} color="green" />
+            )}
+          </div>
         </div>
       )}
 
