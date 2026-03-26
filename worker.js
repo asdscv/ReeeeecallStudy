@@ -51,9 +51,27 @@ export default {
       return env.ASSETS.fetch(request)
     }
 
-    // Dynamic sitemap
+    // Dynamic sitemap with edge caching (avoids Supabase latency on every request)
     if (url.pathname === '/sitemap.xml') {
-      return handleSitemap(env)
+      const cacheKey = new Request(new URL('/sitemap.xml', request.url))
+      const cache = caches.default
+      let cached = await cache.match(cacheKey)
+      if (cached) return cached
+      const fresh = await handleSitemap(env)
+      if (fresh.ok) {
+        const resp = new Response(fresh.body, {
+          headers: {
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+          },
+        })
+        // Cache at edge for 1 hour
+        const toCache = resp.clone()
+        toCache.headers.set('Cache-Control', 'public, max-age=3600')
+        cache.put(cacheKey, toCache)
+        return resp
+      }
+      return fresh
     }
 
     // RSS / Atom / JSON feeds (supports ?lang=ko etc.)
