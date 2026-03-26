@@ -217,8 +217,8 @@ const s = StyleSheet.create({
 
   // Logo
   logoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16, width: '100%' },
-  logoIcon: { width: 52, height: 52 },
-  logoText: { height: 52, width: 260, tintColor: '#e2e8f0' },
+  logoIcon: { width: 56, height: 56 },
+  logoText: { height: 56, width: W * 0.6, tintColor: '#e2e8f0' },
 
   // Pill
   pill: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)', marginBottom: 24 },
