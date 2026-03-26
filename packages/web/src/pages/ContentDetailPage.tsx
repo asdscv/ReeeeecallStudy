@@ -11,6 +11,12 @@ import { FooterSection } from '../components/landing/FooterSection'
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates, buildLearningResourceJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 
+function buildCanonicalUrl(slug: string, locale: string, customCanonical?: string | null) {
+  if (customCanonical) return customCanonical
+  const langSuffix = locale !== 'en' ? `?lang=${locale}` : ''
+  return `${SEO.SITE_URL}/insight/${slug}${langSuffix}`
+}
+
 export function ContentDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const { t } = useTranslation('content')
@@ -73,7 +79,7 @@ export function ContentDetailPage() {
         description={currentArticle.meta_description || currentArticle.subtitle || ''}
         ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || SEO.DEFAULT_OG_IMAGE}
         ogType="article"
-        canonicalUrl={currentArticle.canonical_url || `${SEO.SITE_URL}/insight/${currentArticle.slug}`}
+        canonicalUrl={buildCanonicalUrl(currentArticle.slug, currentArticle.locale, currentArticle.canonical_url)}
         jsonLd={[
           buildArticleJsonLd(currentArticle, relatedArticles.map((r) => r.slug)),
           buildBreadcrumbJsonLd(currentArticle),
