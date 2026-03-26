@@ -10,7 +10,9 @@
     "./lib/*": "./lib/*",
     "./stores/*": "./stores/*",
     "./adapters/*": "./adapters/*",
-    "./adapters": "./adapters/index.ts"
+    "./adapters": "./adapters/index.ts",
+    "./design-tokens": "./design-tokens/index.ts",
+    "./design-tokens/*": "./design-tokens/*"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",

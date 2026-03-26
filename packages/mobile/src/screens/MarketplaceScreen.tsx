@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, ScrollView, Modal } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, SearchBar, Badge, ListCard, DrawerHeader } from '../components/ui'
@@ -18,7 +18,7 @@ import {
   DATE_RANGE_OPTIONS,
 } from '@reeeeecall/shared/lib/marketplace'
 import { useTranslation } from 'react-i18next'
-import { useTheme } from '../theme'
+import { useTheme, palette } from '../theme'
 import type { MarketplaceStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<MarketplaceStackParamList, 'MarketplaceHome'>
@@ -71,6 +71,8 @@ export function MarketplaceScreen() {
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all' | undefined>(undefined)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [page, setPage] = useState(1)
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false)
+  const [sortModalOpen, setSortModalOpen] = useState(false)
 
   useEffect(() => { fetchListings(); fetchOfficialListings() }, [fetchListings, fetchOfficialListings])
 
@@ -153,59 +155,30 @@ export function MarketplaceScreen() {
 
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="marketplace-search" />
 
-            {/* Sort chips */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sortRow}>
-              {SORT_OPTIONS.map((opt) => (
-                <TouchableOpacity
-                  key={opt.value}
-                  onPress={() => setSortBy(opt.value)}
-                  testID={`marketplace-sort-${opt.value}`}
-                  style={[
-                    styles.sortChip,
-                    {
-                      backgroundColor: sortBy === opt.value ? theme.colors.primary : theme.colors.surface,
-                      borderColor: sortBy === opt.value ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text style={[
-                    theme.typography.labelSmall,
-                    { color: sortBy === opt.value ? theme.colors.primaryText : theme.colors.text },
-                  ]}>
-                    {opt.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            {/* Category & Sort dropdowns */}
+            <View style={styles.dropdownRow}>
+              <TouchableOpacity
+                onPress={() => setCategoryModalOpen(true)}
+                style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                testID="marketplace-category-dropdown"
+              >
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
+                  {CATEGORIES.find((c) => c.value === category)?.label ?? 'All Categories'}
+                </Text>
+                <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
+              </TouchableOpacity>
 
-            {/* Category filter */}
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={CATEGORIES}
-              keyExtractor={(item) => item.value}
-              contentContainerStyle={styles.categoryRow}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  {...testProps(`marketplace-cat-${item.value || 'all'}`)}
-                  onPress={() => setCategory(item.value)}
-                  style={[
-                    styles.categoryChip,
-                    {
-                      backgroundColor: category === item.value ? theme.colors.primaryLight : theme.colors.surface,
-                      borderColor: category === item.value ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text style={[
-                    theme.typography.labelSmall,
-                    { color: category === item.value ? theme.colors.primary : theme.colors.text },
-                  ]}>
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
+              <TouchableOpacity
+                onPress={() => setSortModalOpen(true)}
+                style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                testID="marketplace-sort-dropdown"
+              >
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
+                  {SORT_OPTIONS.find((s) => s.value === sortBy)?.label ?? 'Popular'}
+                </Text>
+                <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Verified only + Advanced toggle row */}
             <View style={styles.filterButtonRow}>
@@ -335,14 +308,23 @@ export function MarketplaceScreen() {
             testID={`marketplace-listing-${item.id}`}
           >
             <View style={styles.listingContent}>
+              {/* Title row: icon + title (left) | action link (right) */}
               <View style={styles.titleRow}>
-                {trendingIds.has(item.id) && (
-                  <Text style={{ fontSize: 14, marginRight: 4 }}>{'\uD83D\uDD25'}</Text>
+                <View style={styles.titleLeft}>
+                  {trendingIds.has(item.id) && (
+                    <Text style={{ fontSize: 14, marginRight: 4 }}>{'\uD83D\uDD25'}</Text>
+                  )}
+                  <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
+                    {item.title}
+                  </Text>
+                </View>
+                {item.share_mode && (
+                  <Text style={[theme.typography.labelSmall, { color: theme.colors.primary }]}>
+                    {item.share_mode === 'subscribe' ? 'Subscribe' : item.share_mode === 'copy' ? 'Copy' : item.share_mode}
+                  </Text>
                 )}
-                <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
-                  {item.title}
-                </Text>
               </View>
+
               {/* Publisher + verified badge */}
               {(item as any).owner_display_name && (
                 <View style={styles.publisherRow}>
@@ -358,36 +340,41 @@ export function MarketplaceScreen() {
                   )}
                 </View>
               )}
+
+              {/* Description */}
               {item.description && (
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]} numberOfLines={2}>
                   {item.description}
                 </Text>
               )}
-              <View style={styles.metaRow}>
-                <Badge label={`${item.card_count ?? 0} cards`} variant="neutral" />
-                <Badge label={`${(item as any).view_count ?? 0} views`} variant="neutral" />
-                <Badge label={`${item.acquire_count ?? 0} users`} variant="primary" />
-                {item.share_mode && (
-                  <Badge
-                    label={item.share_mode}
-                    variant={item.share_mode === 'copy' ? 'success' : item.share_mode === 'subscribe' ? 'primary' : 'neutral'}
-                  />
-                )}
+
+              {/* Tag pills */}
+              {item.tags && item.tags.length > 0 && (
+                <View style={styles.tagRow}>
+                  {item.tags.slice(0, 4).map((tag: string) => (
+                    <View key={tag} style={[styles.tagPill, { backgroundColor: theme.colors.surface }]}>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                        {tag}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Divider */}
+              <View style={[styles.listingDivider, { backgroundColor: theme.colors.border }]} />
+
+              {/* Bottom stats: "X cards · 👁 Y · Z users" */}
+              <View style={styles.statsRow}>
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {item.card_count ?? 0} cards{' · '}{'\uD83D\uDC41'} {(item as any).view_count ?? 0}{' · '}{item.acquire_count ?? 0} users
+                </Text>
                 {(item as any).review_count > 0 && (
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                     {renderStars((item as any).avg_rating ?? 0)} ({(item as any).review_count})
                   </Text>
                 )}
               </View>
-              {item.tags && item.tags.length > 0 && (
-                <View style={styles.tagRow}>
-                  {item.tags.slice(0, 4).map((tag: string) => (
-                    <Text key={tag} style={[theme.typography.caption, styles.tag, { color: theme.colors.textSecondary, backgroundColor: theme.colors.surface }]}>
-                      #{tag}
-                    </Text>
-                  ))}
-                </View>
-              )}
             </View>
           </ListCard>
         )}
@@ -412,6 +399,64 @@ export function MarketplaceScreen() {
           ) : null
         }
       />
+
+      {/* Category picker modal */}
+      <Modal visible={categoryModalOpen} transparent animationType="fade" onRequestClose={() => setCategoryModalOpen(false)}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setCategoryModalOpen(false)}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Category</Text>
+            <FlatList
+              data={CATEGORIES}
+              keyExtractor={(item) => item.value || '_all'}
+              renderItem={({ item: cat }) => {
+                const isActive = category === cat.value
+                return (
+                  <TouchableOpacity
+                    testID={`marketplace-cat-${cat.value || 'all'}`}
+                    onPress={() => { setCategory(cat.value); setCategoryModalOpen(false) }}
+                    style={[styles.modalItem, isActive && { backgroundColor: palette.blue[50] }]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
+                      {cat.label}
+                    </Text>
+                    {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>{'\u2713'}</Text>}
+                  </TouchableOpacity>
+                )
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Sort picker modal */}
+      <Modal visible={sortModalOpen} transparent animationType="fade" onRequestClose={() => setSortModalOpen(false)}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSortModalOpen(false)}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Sort By</Text>
+            <FlatList
+              data={SORT_OPTIONS}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item: opt }) => {
+                const isActive = sortBy === opt.value
+                return (
+                  <TouchableOpacity
+                    testID={`marketplace-sort-${opt.value}`}
+                    onPress={() => { setSortBy(opt.value); setSortModalOpen(false) }}
+                    style={[styles.modalItem, isActive && { backgroundColor: palette.blue[50] }]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
+                      {opt.label}
+                    </Text>
+                    {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>{'\u2713'}</Text>}
+                  </TouchableOpacity>
+                )
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </Screen>
   )
 }
@@ -420,20 +465,45 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 20, paddingBottom: 24, gap: 10 },
   listEmpty: { flex: 1 },
   header: { gap: 12, paddingTop: 16, paddingBottom: 8 },
-  sortRow: { gap: 8 },
-  sortChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
-  categoryRow: { gap: 8 },
-  categoryChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
+  dropdownRow: { flexDirection: 'row', gap: 10 },
+  dropdownSelector: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center', alignItems: 'center', padding: 40,
+  },
+  modalContent: {
+    width: '100%', maxWidth: 320, borderRadius: 16,
+    paddingVertical: 12, maxHeight: 400,
+  },
+  modalTitle: {
+    fontSize: 16, fontWeight: '600', paddingHorizontal: 20, paddingVertical: 12,
+  },
+  modalItem: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingHorizontal: 20, paddingVertical: 14,
+  },
+  modalItemText: { flex: 1, fontSize: 15, fontWeight: '500' },
   filterButtonRow: { flexDirection: 'row', gap: 8 },
   filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
   chipRow: { gap: 8 },
   advancedPanel: { padding: 12, borderRadius: 12, borderWidth: 1 },
   listingContent: { gap: 6 },
-  titleRow: { flexDirection: 'row', alignItems: 'center' },
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  titleLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 8 },
   publisherRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  metaRow: { flexDirection: 'row', gap: 6, marginTop: 4, flexWrap: 'wrap' },
-  tagRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  tag: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, overflow: 'hidden' },
+  tagRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 2 },
+  tagPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, overflow: 'hidden' },
+  listingDivider: { height: StyleSheet.hairlineWidth, marginTop: 6 },
+  statsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
   loadMore: { paddingVertical: 16, alignItems: 'center' },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 40 },
   emptyIcon: { fontSize: 48 },

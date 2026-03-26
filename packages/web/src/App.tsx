@@ -186,6 +186,11 @@ function App() {
             <Route path="/d/:listingId" element={<PublicListingPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
+            {/* Guide — public, no auth required (with Layout for nav) */}
+            <Route element={<Layout />}>
+              <Route path="/guide" element={<GuidePage />} />
+            </Route>
+
             {/* Study session (outside Layout for fullscreen focus) */}
             <Route
               path="/decks/:deckId/study"
@@ -234,7 +239,6 @@ function App() {
               <Route path="/leaderboard" element={<Navigate to="/achievements" replace />} />
               <Route path="/analytics" element={<Navigate to="/history" replace />} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/guide" element={<GuidePage />} />
               <Route path="/api-docs" element={<ApiDocsPage />} />
             </Route>
 

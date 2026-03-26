@@ -11,6 +11,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen, Button } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme, palette } from '../theme'
+import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
@@ -53,10 +54,10 @@ const SHARE_MODES: { value: ShareMode; label: string; desc: string; detail: stri
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: 'Pending', bg: '#FFFBEB', text: '#B45309' },
-  active: { label: 'Active', bg: '#F0FDF4', text: '#15803D' },
-  revoked: { label: 'Revoked', bg: '#FEF2F2', text: '#DC2626' },
-  declined: { label: 'Declined', bg: '#F3F4F6', text: '#6B7280' },
+  pending: { label: 'Pending', ...statusColors.pending },
+  active: { label: 'Active', ...statusColors.active },
+  revoked: { label: 'Revoked', ...statusColors.revoked },
+  declined: { label: 'Declined', ...statusColors.declined },
 }
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

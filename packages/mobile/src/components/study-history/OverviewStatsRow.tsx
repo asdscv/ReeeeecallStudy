@@ -27,6 +27,12 @@ export function OverviewStatsRow({ stats, streak, testID }: OverviewStatsRowProp
       </View>
       <View style={styles.row}>
         <StatCard label="Streak" value={`${streak}d`} valueColor={palette.yellow[600]} testID="history-streak" />
+        <StatCard
+          label="Avg Duration"
+          value={stats.totalSessions > 0 ? formatDuration(Math.round(stats.totalTimeMs / stats.totalSessions)) : '—'}
+          valueColor="#C2410C"
+          testID="history-avg-duration"
+        />
       </View>
     </View>
   )

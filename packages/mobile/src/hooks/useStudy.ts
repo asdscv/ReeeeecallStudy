@@ -39,6 +39,11 @@ export function useStudy() {
     await store.exitSession()
   }, [store])
 
+  const undoLastRating = useCallback(() => {
+    store.undoLastRating()
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {})
+  }, [store])
+
   const reset = useCallback(() => {
     store.reset()
   }, [store])
@@ -61,10 +66,12 @@ export function useStudy() {
     progress,
     queue: store.queue,
     currentIndex: store.currentIndex,
+    lastRatedCard: store.lastRatedCard,
     // Actions
     startSession,
     flipCard,
     rateCard,
+    undoLastRating,
     exitSession,
     reset,
   }

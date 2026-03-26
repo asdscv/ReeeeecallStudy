@@ -28,6 +28,10 @@
     "reviewCards": "ทบทวน {{count}}",
     "study": "เรียน"
   },
+  "quickStudy": {
+    "dueCount": "{{count}} การ์ดที่ต้องทบทวนวันนี้",
+    "startSession": "เริ่มเรียน"
+  },
   "heatmap": {
     "title": "ฮีทแมปการเรียน",
     "noStudy": "ไม่มีการเรียน",

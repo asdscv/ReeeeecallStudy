@@ -28,6 +28,10 @@
     "reviewCards": "复习 {{count}}",
     "study": "学习"
   },
+  "quickStudy": {
+    "dueCount": "今日待复习 {{count}} 张卡片",
+    "startSession": "开始学习"
+  },
   "heatmap": {
     "title": "学习热力图",
     "noStudy": "未学习",

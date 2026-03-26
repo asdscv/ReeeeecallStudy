@@ -28,6 +28,10 @@
     "reviewCards": "복습 {{count}}",
     "study": "학습"
   },
+  "quickStudy": {
+    "dueCount": "오늘 복습할 카드 {{count}}장",
+    "startSession": "학습 세션 시작하기"
+  },
   "heatmap": {
     "title": "학습 잔디",
     "noStudy": "학습 없음",

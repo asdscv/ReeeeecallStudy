@@ -28,6 +28,10 @@
     "reviewCards": "Ulasan {{count}}",
     "study": "Belajar"
   },
+  "quickStudy": {
+    "dueCount": "{{count}} kartu untuk diulang hari ini",
+    "startSession": "Mulai sesi belajar"
+  },
   "heatmap": {
     "title": "Peta Panas Belajar",
     "noStudy": "Tidak belajar",

@@ -97,13 +97,31 @@ async function getConfig(): Promise<AIConfig> {
   return config
 }
 
+// Fallback strings in case the ai-generate i18n namespace isn't loaded (e.g. mobile)
+const ERROR_FALLBACKS: Record<string, string> = {
+  noApiKey: 'Please set up your AI API key first.',
+  invalidApiKey: 'Invalid API key. Please check your key.',
+  rateLimited: 'Rate limited. Please wait a moment and try again.',
+  invalidResponse: 'AI returned an invalid response. Please try again.',
+  networkError: 'Network error. This might be a CORS issue — try a different provider or check your API key.',
+  serverError: 'AI server error (500). Please try again later.',
+}
+
+function t(key: string): string {
+  const result = i18next.t(`ai-generate:errors.${key}`)
+  // i18next returns the key itself if namespace is missing
+  if (result === `ai-generate:errors.${key}` || !result) return ERROR_FALLBACKS[key] ?? key
+  return result
+}
+
 function mapError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
-  if (msg === 'NO_API_KEY') return i18next.t('ai-generate:errors.noApiKey')
-  if (msg === 'INVALID_API_KEY') return i18next.t('ai-generate:errors.invalidApiKey')
-  if (msg === 'RATE_LIMITED') return i18next.t('ai-generate:errors.rateLimited')
-  if (msg === 'INVALID_RESPONSE' || msg === 'ALL_CARDS_INVALID') return i18next.t('ai-generate:errors.invalidResponse')
-  if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) return i18next.t('ai-generate:errors.networkError')
+  if (msg === 'NO_API_KEY') return t('noApiKey')
+  if (msg === 'INVALID_API_KEY') return t('invalidApiKey')
+  if (msg === 'RATE_LIMITED') return t('rateLimited')
+  if (msg === 'INVALID_RESPONSE' || msg === 'ALL_CARDS_INVALID') return t('invalidResponse')
+  if (msg === 'SERVER_ERROR') return t('serverError')
+  if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) return t('networkError')
   return msg
 }
 
@@ -136,6 +154,8 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       )
       const data = await callAI(config, { systemPrompt, userPrompt })
       const template = validateTemplateResponse(data)
+      // Throttle: wait before next step to avoid rate limits on low-tier APIs
+      await new Promise((r) => setTimeout(r, 3000))
       set({ generatedTemplate: template, currentStep: 'review_template' })
     } catch (err) {
       set({ error: mapError(err), currentStep: 'error' })
@@ -151,6 +171,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       const { systemPrompt, userPrompt } = buildDeckPrompt(topic, uiLang)
       const data = await callAI(config, { systemPrompt, userPrompt })
       const deck = validateDeckResponse(data)
+      await new Promise((r) => setTimeout(r, 3000))
       set({ generatedDeck: deck, currentStep: 'review_deck' })
     } catch (err) {
       set({ error: mapError(err), currentStep: 'error' })
@@ -213,6 +234,9 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
         const combined = existingCards
           ? [...existingCards, ...allCards.map((c) => c.field_values)]
           : allCards.length > 0 ? allCards.map((c) => c.field_values) : undefined
+
+        // Throttle between batches to avoid rate limits (especially low-tier APIs)
+        if (i > 0) await new Promise((r) => setTimeout(r, 3000))
 
         const { systemPrompt, userPrompt } = buildCardsPrompt(topic, fields, count, combined)
         const data = await callAI(config, { systemPrompt, userPrompt })

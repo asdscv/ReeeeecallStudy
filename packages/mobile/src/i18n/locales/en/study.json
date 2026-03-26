@@ -72,7 +72,8 @@
     "continue": "Continue",
     "end": "End",
     "tapToFlip": "Tap to flip",
-    "swipeHint": "Tap card to flip · Swipe to rate"
+    "swipeHint": "Tap card to flip · Swipe to rate",
+    "undo": "Undo"
   },
   "srsRating": {
     "again": "Again",

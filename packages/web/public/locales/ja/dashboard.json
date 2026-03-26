@@ -28,6 +28,10 @@
     "reviewCards": "復習 {{count}}",
     "study": "学習"
   },
+  "quickStudy": {
+    "dueCount": "今日の復習カード {{count}}枚",
+    "startSession": "学習セッションを開始"
+  },
   "heatmap": {
     "title": "学習ヒートマップ",
     "noStudy": "学習なし",

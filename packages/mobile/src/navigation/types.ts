@@ -70,6 +70,7 @@ export type SettingsStackParamList = {
   TemplateEdit: { templateId?: string }
   MyShares: undefined
   PublisherStats: undefined
+  Achievements: undefined
 }
 
 // Type-safe navigation hook을 위한 선언 병합
