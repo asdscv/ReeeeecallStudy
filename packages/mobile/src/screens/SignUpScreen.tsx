@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, TextInput as RNTextInput, Linking } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput as RNTextInput, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, Button, Divider, SocialButton } from '../components/ui'
@@ -85,12 +85,10 @@ export function SignUpScreen() {
       <View style={styles.content}>
         {/* Card container — matches LoginScreen's card design */}
         <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          {/* Brand header — matches web: logo + brand name */}
+          {/* Brand header — matches web: icon + text logo */}
           <View style={styles.brandHeader}>
-            <Text style={styles.logoEmoji}>{'\uD83E\uDDE0'}</Text>
-            <Text style={[styles.brandText, { color: theme.colors.text }]}>
-              <Text style={{ color: theme.colors.primary }}>reeee</Text>callstudy
-            </Text>
+            <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
+            <Image source={require('../../assets/logo-text.png')} style={styles.logoTextImg} resizeMode="contain" />
           </View>
 
           {/* Title */}
@@ -223,9 +221,9 @@ const styles = StyleSheet.create({
   content: { flex: 1, justifyContent: 'center', paddingVertical: 40 },
   successContent: { flex: 1, justifyContent: 'center', gap: 24, paddingHorizontal: 20 },
   card: { borderRadius: 16, borderWidth: 1, padding: 24, gap: 20 },
-  brandHeader: { alignItems: 'center', gap: 8, marginBottom: 4 },
-  logoEmoji: { fontSize: 48 },
-  brandText: { fontSize: 20, fontWeight: '600', letterSpacing: -0.3 },
+  brandHeader: { alignItems: 'center', gap: 10, marginBottom: 4 },
+  logoIcon: { width: 56, height: 56 },
+  logoTextImg: { height: 32, width: 180 },
   socialSection: { gap: 12 },
   form: { gap: 14 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
