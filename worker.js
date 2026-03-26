@@ -954,7 +954,7 @@ async function handleSitemap(env) {
     for (const [slug, info] of Object.entries(slugMap)) {
       const lastmod = Object.values(info.locales).sort().pop()
       const imageTag = info.image
-        ? `\n    <image:image>\n      <image:loc>${info.image}</image:loc>\n      <image:title>${slug.replace(/-/g, ' ')}</image:title>\n    </image:image>`
+        ? `\n    <image:image>\n      <image:loc>${escapeHtml(info.image)}</image:loc>\n      <image:title>${escapeHtml(slug.replace(/-/g, ' '))}</image:title>\n    </image:image>`
         : ''
       contentEntries += `  <url>
     <loc>${SITE_URL}/insight/${slug}</loc>
