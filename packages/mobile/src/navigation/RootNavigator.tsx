@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { Alert } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
 import { useAuthState } from '../hooks/useAuthState'
 import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
+import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
 import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -16,10 +18,47 @@ export function RootNavigator() {
   const [splashDone, setSplashDone] = useState(false)
   const [showAuthGuard, setShowAuthGuard] = useState(false)
 
+  const registerSession = useSubscriptionStore((s) => s.registerSession)
+  const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
+  const sessionValid = useSubscriptionStore((s) => s.sessionValid)
+
   useEffect(() => {
     const timer = setTimeout(() => setSplashDone(true), MIN_SPLASH_MS)
     return () => clearTimeout(timer)
   }, [])
+
+  // Register session + start heartbeat when user is logged in
+  useEffect(() => {
+    if (!user) return
+    registerSession()
+    const cleanup = startHeartbeat()
+    return cleanup
+  }, [user, registerSession, startHeartbeat])
+
+  // Show alert when session is kicked
+  useEffect(() => {
+    if (user && !sessionValid) {
+      Alert.alert(
+        '다른 기기에서 로그인됨',
+        '다른 기기에서 같은 계정으로 로그인하여 현재 세션이 종료되었습니다.',
+        [
+          {
+            text: '이 기기에서 계속하기',
+            onPress: () => registerSession(),
+          },
+          {
+            text: '로그아웃',
+            style: 'destructive',
+            onPress: async () => {
+              const { getMobileSupabase } = await import('../adapters')
+              const supabase = getMobileSupabase()
+              await supabase.auth.signOut()
+            },
+          },
+        ],
+      )
+    }
+  }, [user, sessionValid])
 
   // Show splash while loading or timer not done
   if (loading || !splashDone) {
