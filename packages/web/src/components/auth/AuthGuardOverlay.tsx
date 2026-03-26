@@ -404,19 +404,6 @@ export function AuthGuardOverlay() {
                   {t('authGuard.loginButton')}
                 </motion.button>
 
-                {/* Trust badges */}
-                <motion.div
-                  className="mt-5 flex items-center gap-3 text-emerald-400/70 text-xs"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4, delay: d + 1.3 }}
-                >
-                  <span>{t('authGuard.badges.free')}</span>
-                  <span className="w-1 h-1 rounded-full bg-emerald-400/40" />
-                  <span>{t('authGuard.badges.noCard')}</span>
-                  <span className="w-1 h-1 rounded-full bg-emerald-400/40" />
-                  <span>{t('authGuard.badges.instant')}</span>
-                </motion.div>
               </div>
             </div>
           </motion.div>
