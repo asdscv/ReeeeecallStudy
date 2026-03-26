@@ -6,8 +6,8 @@ const { width: W, height: H } = Dimensions.get('window')
 const CARD_W = W * 0.72
 const CARD_H = CARD_W * 0.62
 
-const FLIP_FIRST = 700
-const FLIP_INTERVAL = 2000
+const FLIP_FIRST = 500
+const FLIP_INTERVAL = 1000
 const RATING_LABELS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = ['#ef4444', '#f97316', '#10b981', '#3b82f6']
 
