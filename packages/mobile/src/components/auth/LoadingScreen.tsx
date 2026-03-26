@@ -139,12 +139,11 @@ export function LoadingScreen() {
       {/* Center content */}
       <View style={styles.content}>
         {/* Logo with glow */}
-        <Animated.View style={[styles.logoWrap, { opacity: logoOpacity, transform: [{ scale: logoScale }] }]}>
+        <Animated.View style={[styles.logoWrap, { transform: [{ scale: logoScale }] }]}>
           <View style={styles.logoGlow} />
           <Image
             source={require('../../../assets/logo-icon.png')}
             style={styles.logoIcon}
-            resizeMode="contain"
           />
         </Animated.View>
 
@@ -206,19 +205,19 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   orb: { position: 'absolute' },
-  content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 32, zIndex: 10 },
-  logoWrap: { alignItems: 'center', justifyContent: 'center', width: 160, height: 160 },
+  content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 36, zIndex: 10 },
+  logoWrap: { alignItems: 'center', justifyContent: 'center' },
   logoGlow: {
     position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: 'rgba(59,130,246,0.2)',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: 'rgba(59,130,246,0.15)',
   },
-  logoIcon: { width: 160, height: 160, zIndex: 1 },
-  textWrap: { alignItems: 'center', gap: 14 },
-  logoText: { height: 52, width: 300, tintColor: '#e2e8f0' },
-  tagline: { fontSize: 18, color: 'rgba(148,163,184,0.9)', letterSpacing: 0.3 },
+  logoIcon: { width: 200, height: 200 },
+  textWrap: { alignItems: 'center', gap: 16 },
+  logoText: { height: 70, width: width * 0.85, tintColor: '#e2e8f0' },
+  tagline: { fontSize: 20, color: 'rgba(148,163,184,0.9)', letterSpacing: 0.3 },
   dotsRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: palette.blue[400] },
 })
