@@ -10,14 +10,14 @@ import { useTheme, palette } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
-import { RNStorage } from '../adapters/rn-storage'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
-import { AIKeyVault, NullCrypto } from '@reeeeecall/shared/lib/ai/secure-storage'
+import { aiKeyVault } from '@reeeeecall/shared/lib/ai/secure-storage'
 import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
 
-// Mobile AIKeyVault: uses SecureStore (already encrypted) + NullCrypto (no double-encrypt)
-const mobileAiKeyVault = new AIKeyVault({ crypto: new NullCrypto(), backend: new RNStorage() })
+// SECURITY: Supabase 서버사이드 암호화 사용 (pgcrypto + Vault)
+// 로컬 SecureStore 대신 서버에 암호화 저장 → 웹/모바일 동기화
+const mobileAiKeyVault = aiKeyVault
 
 const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
 const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'

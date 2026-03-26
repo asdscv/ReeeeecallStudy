@@ -1,4 +1,4 @@
-import type { ICryptoStrategy, IStorageBackend, SecureEnvelope } from './types'
+import type { ICryptoStrategy, IStorageBackend, IAsyncKeyBackend, SecureEnvelope } from './types'
 
 // ── Per-provider key entry ─────────────────────────────
 
@@ -14,9 +14,13 @@ export type ProviderKeyMap = Record<string, ProviderKeyEntry>
 // ── Options ────────────────────────────────────────────
 
 export interface AIKeyVaultOptions {
-  crypto: ICryptoStrategy
-  backend: IStorageBackend
+  // 레거시: 동기 로컬 저장소 + 클라이언트 암호화
+  crypto?: ICryptoStrategy
+  backend?: IStorageBackend
   storageKey?: string
+  // SECURITY: 비동기 서버사이드 백엔드 (설정 시 로컬 백엔드보다 우선)
+  // Supabase pgcrypto 서버 암호화 → 클라이언트에서 암호화 불필요
+  asyncBackend?: IAsyncKeyBackend
 }
 
 // ── Vault ──────────────────────────────────────────────
@@ -25,12 +29,28 @@ const DEFAULT_KEY = 'reeeeecall-ai-keys-v3'
 const LEGACY_V2_KEY = 'reeeeecall-ai-config-v2'
 const LEGACY_V1_KEY = 'reeeeecall-ai-config'
 
+/**
+ * AI 프로바이더 API 키 관리 볼트.
+ *
+ * 두 가지 모드 지원:
+ *   1. asyncBackend (권장): Supabase 서버사이드 암호화
+ *      - pgcrypto + Vault 시크릿으로 서버에서 암호화/복호화
+ *      - XSS 공격에 안전, 디바이스 간 동기화
+ *   2. crypto + backend (레거시): 로컬 저장소 + 클라이언트 암호화
+ *      - localStorage/SecureStore에 AES-GCM으로 암호화
+ *      - 마이그레이션 기간 동안만 사용
+ */
 export class AIKeyVault {
-  private readonly crypto: ICryptoStrategy
-  private readonly backend: IStorageBackend
+  private readonly crypto?: ICryptoStrategy
+  private readonly backend?: IStorageBackend
   private readonly storageKey: string
+  private readonly asyncBackend?: IAsyncKeyBackend
+
+  // asyncBackend 사용 시 hasAnyKey()를 위한 캐시
+  private _hasKeysCache: boolean | null = null
 
   constructor(options: AIKeyVaultOptions) {
+    this.asyncBackend = options.asyncBackend
     this.crypto = options.crypto
     this.backend = options.backend
     this.storageKey = options.storageKey ?? DEFAULT_KEY
@@ -38,6 +58,16 @@ export class AIKeyVault {
 
   /** Load all provider keys */
   async loadAll(uid: string): Promise<ProviderKeyMap> {
+    // SECURITY: asyncBackend가 있으면 서버사이드 암호화 사용 (권장)
+    if (this.asyncBackend) {
+      const keys = await this.asyncBackend.loadAll(uid)
+      this._hasKeysCache = Object.keys(keys).length > 0
+      return keys
+    }
+
+    // 레거시: 로컬 저장소 + 클라이언트 암호화
+    if (!this.backend || !this.crypto) return {}
+
     const raw = this.backend.getItem(this.storageKey)
     if (raw) {
       try {
@@ -49,7 +79,6 @@ export class AIKeyVault {
       }
     }
 
-    // Attempt migration from v2 single-config format
     return this.migrateFromV2(uid)
   }
 
@@ -61,20 +90,41 @@ export class AIKeyVault {
 
   /** Save key for a specific provider (preserves others) */
   async saveProvider(uid: string, providerId: string, entry: ProviderKeyEntry): Promise<void> {
+    if (this.asyncBackend) {
+      await this.asyncBackend.saveProvider(uid, providerId, entry)
+      this._hasKeysCache = true
+      return
+    }
+
+    if (!this.backend || !this.crypto) return
     const all = await this.loadAll(uid)
     all[providerId] = entry
-    await this.saveAll(uid, all)
+    await this.saveAllLocal(uid, all)
   }
 
   /** Remove key for a specific provider */
   async removeProvider(uid: string, providerId: string): Promise<void> {
+    if (this.asyncBackend) {
+      await this.asyncBackend.removeProvider(uid, providerId)
+      // 캐시는 다음 loadAll에서 갱신
+      this._hasKeysCache = null
+      return
+    }
+
+    if (!this.backend || !this.crypto) return
     const all = await this.loadAll(uid)
     delete all[providerId]
-    await this.saveAll(uid, all)
+    await this.saveAllLocal(uid, all)
   }
 
   /** Check if any provider key exists (sync, no decryption) */
   hasAnyKey(): boolean {
+    // asyncBackend: 캐시 기반 (loadAll 후 갱신됨)
+    if (this.asyncBackend) {
+      return this._hasKeysCache ?? false
+    }
+
+    if (!this.backend) return false
     return (
       this.backend.getItem(this.storageKey) !== null ||
       this.backend.getItem(LEGACY_V2_KEY) !== null ||
@@ -84,6 +134,8 @@ export class AIKeyVault {
 
   /** Clear all stored keys */
   clear(): void {
+    this._hasKeysCache = false
+    if (!this.backend) return
     this.backend.removeItem(this.storageKey)
     this.backend.removeItem(LEGACY_V2_KEY)
     this.backend.removeItem(LEGACY_V1_KEY)
@@ -95,9 +147,32 @@ export class AIKeyVault {
     return Object.keys(all)
   }
 
-  // ── Private ──────────────────────────────────────────
+  /**
+   * 로컬 저장소 → Supabase 마이그레이션.
+   * 기존 로컬 키를 서버로 이전 후 로컬 데이터 삭제.
+   * 앱 시작 시 인증 후 1회 호출.
+   */
+  async migrateLocalToAsync(uid: string, localVault: AIKeyVault): Promise<number> {
+    if (!this.asyncBackend) return 0
 
-  private async saveAll(uid: string, keys: ProviderKeyMap): Promise<void> {
+    const localKeys = await localVault.loadAll(uid)
+    const providerIds = Object.keys(localKeys)
+    if (providerIds.length === 0) return 0
+
+    for (const pid of providerIds) {
+      await this.asyncBackend.saveProvider(uid, pid, localKeys[pid])
+    }
+
+    // 마이그레이션 완료 후 로컬 데이터 삭제
+    localVault.clear()
+    this._hasKeysCache = true
+    return providerIds.length
+  }
+
+  // ── Private (레거시 로컬 저장소) ────────────────────────
+
+  private async saveAllLocal(uid: string, keys: ProviderKeyMap): Promise<void> {
+    if (!this.backend || !this.crypto) return
     const plaintext = JSON.stringify(keys)
     const encrypted = await this.crypto.encrypt(plaintext, uid)
 
@@ -112,7 +187,8 @@ export class AIKeyVault {
   }
 
   private async migrateFromV2(uid: string): Promise<ProviderKeyMap> {
-    // Try v2 (single encrypted config)
+    if (!this.backend || !this.crypto) return {}
+
     const v2Raw = this.backend.getItem(LEGACY_V2_KEY)
     if (v2Raw) {
       try {
@@ -133,7 +209,7 @@ export class AIKeyVault {
               savedAt: envelope.storedAt,
             },
           }
-          await this.saveAll(uid, keys)
+          await this.saveAllLocal(uid, keys)
           this.backend.removeItem(LEGACY_V2_KEY)
           return keys
         }
@@ -142,7 +218,6 @@ export class AIKeyVault {
       }
     }
 
-    // Try v1 (plaintext)
     const v1Raw = this.backend.getItem(LEGACY_V1_KEY)
     if (v1Raw) {
       try {
@@ -161,7 +236,7 @@ export class AIKeyVault {
               savedAt: new Date().toISOString(),
             },
           }
-          await this.saveAll(uid, keys)
+          await this.saveAllLocal(uid, keys)
           this.backend.removeItem(LEGACY_V1_KEY)
           return keys
         }

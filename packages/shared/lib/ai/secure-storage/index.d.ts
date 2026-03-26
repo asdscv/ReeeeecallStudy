@@ -1,0 +1,12 @@
+export { AesGcmCrypto } from './crypto/aes-gcm-crypto';
+export { NullCrypto } from './crypto/null-crypto';
+export { LocalStorageBackend } from './backends/local-storage';
+export { SessionStorageBackend } from './backends/session-storage';
+export { AIConfigManager } from './ai-config-manager';
+export { AIKeyVault } from './ai-key-vault';
+export type { ICryptoStrategy, IStorageBackend, IAIConfigManager, AIConfigManagerOptions, SecureEnvelope, } from './types';
+export type { ProviderKeyEntry, ProviderKeyMap } from './ai-key-vault';
+import { AIConfigManager } from './ai-config-manager';
+import { AIKeyVault } from './ai-key-vault';
+export declare const aiConfigManager: AIConfigManager;
+export declare const aiKeyVault: AIKeyVault;

@@ -5,12 +5,12 @@ import { Screen, TextInput, Button, Badge, ListCard, DrawerHeader } from '../com
 import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
 import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
-import { AIKeyVault, NullCrypto } from '@reeeeecall/shared/lib/ai/secure-storage'
+import { aiKeyVault } from '@reeeeecall/shared/lib/ai/secure-storage'
 import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
-import { RNStorage } from '../adapters/rn-storage'
 import { getProvider } from '@reeeeecall/shared/lib/ai/provider-registry'
 
-const mobileAiKeyVault = new AIKeyVault({ crypto: new NullCrypto(), backend: new RNStorage() })
+// SECURITY: Supabase 서버사이드 암호화 사용
+const mobileAiKeyVault = aiKeyVault
 
 const CONTENT_LANGS = [
   { code: 'en-US', label: 'English' },
