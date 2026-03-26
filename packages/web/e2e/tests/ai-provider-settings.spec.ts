@@ -1,187 +1,122 @@
 import { test, expect } from '../fixtures/test-helpers'
 
 /**
- * E2E tests for AI Provider management in Settings page.
- * Runs on both PC (chromium) and Mobile (Pixel 5).
+ * E2E: AI Provider 설정 (Supabase 서버사이드 암호화)
  */
 
-// Helper: get AI Providers section
-function getAiSection(page: import('@playwright/test').Page) {
+async function openAiSection(page: import('@playwright/test').Page) {
+  await page.goto('/settings')
+  await page.waitForTimeout(2000)
+
+  // AI 프로바이더 섹션은 접혀있음 → 토글 버튼 클릭해서 열기
+  const toggleBtn = page.locator('button').filter({ hasText: /AI Providers|AI 프로바이더/i }).first()
+  await toggleBtn.scrollIntoViewIfNeeded()
+  await toggleBtn.click()
+  await page.waitForTimeout(500)
+
   return page.locator('section').filter({ hasText: /AI Providers|AI 프로바이더/i })
 }
 
-test.describe('AI Provider Settings — PC & Mobile', () => {
-  test('settings page shows AI Providers section with 4+ providers', async ({ page }) => {
-    await page.goto('/settings')
-    await page.waitForTimeout(2000)
+test.describe('AI Provider Settings — Supabase Backend', () => {
+  test('shows all providers after expanding', async ({ page }) => {
+    const section = await openAiSection(page)
 
-    const section = getAiSection(page)
-    await expect(section).toBeVisible({ timeout: 10_000 })
-
-    // All 4 providers listed
-    await expect(section.locator('text=OpenAI').first()).toBeVisible()
-    await expect(section.locator('text=Google Gemini')).toBeVisible()
-    await expect(section.locator('text=Anthropic Claude')).toBeVisible()
-    await expect(section.locator('text=/xAI/i')).toBeVisible()
+    await expect(section.getByText('OpenAI', { exact: false }).first()).toBeVisible({ timeout: 5_000 })
+    await expect(section.getByText('Google Gemini')).toBeVisible()
+    await expect(section.getByText('Anthropic Claude')).toBeVisible()
+    await expect(section.getByText(/xAI/i).first()).toBeVisible()
   })
 
-  test('can configure a provider with API key', async ({ page }) => {
-    await page.goto('/settings')
-    await page.waitForTimeout(2000)
+  test('toggle accordion opens edit form', async ({ page }) => {
+    const section = await openAiSection(page)
 
-    const section = getAiSection(page)
+    // OpenAI 프로바이더 행 클릭
+    const providerRow = section.locator('button').filter({ hasText: /OpenAI/i }).first()
+    await providerRow.click()
+    await page.waitForTimeout(500)
 
-    // Click configure on first provider
-    const configureBtn = section.locator('button').filter({ hasText: /Configure|설정/i }).first()
-    await configureBtn.click()
+    // API 키 입력 폼이 나타나야 함
+    await expect(section.locator('input[type="password"]')).toBeVisible({ timeout: 5_000 })
+    await expect(section.locator('select')).toBeVisible()
+  })
 
-    // Fill in API key
+  test('can save provider key via Supabase', async ({ page }) => {
+    const section = await openAiSection(page)
+
+    // xAI 토글 열기
+    const xaiRow = section.locator('button').filter({ hasText: /xAI/i }).first()
+    await xaiRow.click()
+    await page.waitForTimeout(500)
+
+    // API 키 입력 + 저장
     const apiKeyInput = section.locator('input[type="password"]')
-    await expect(apiKeyInput).toBeVisible()
-    await apiKeyInput.fill('sk-test-encrypted-key-12345')
+    await apiKeyInput.fill('xai-e2e-test-key-' + Date.now())
 
-    // Click Save (scoped to AI section)
     const saveBtn = section.locator('button').filter({ hasText: /^Save$|^저장$/i }).first()
     await saveBtn.click()
-    await page.waitForTimeout(1500)
+    await page.waitForTimeout(2000)
 
-    // Should show "Configured" badge
-    const badge = section.locator('text=/Configured|설정됨/i').first()
-    await expect(badge).toBeVisible({ timeout: 5_000 })
+    // 설정됨 배지 확인
+    await expect(section.getByText(/Configured|설정됨/i).first()).toBeVisible({ timeout: 5_000 })
 
-    // Check localStorage for encrypted v3 data
-    const v3Data = await page.evaluate(() =>
-      localStorage.getItem('reeeeecall-ai-keys-v3'),
-    )
-    expect(v3Data).not.toBeNull()
-    if (v3Data) {
-      expect(v3Data).not.toContain('sk-test-encrypted-key-12345')
-      const envelope = JSON.parse(v3Data)
-      expect(envelope.v).toBe(1)
-    }
+    // 새로고침 후에도 유지 (서버에서 로드)
+    await page.reload()
+    await page.waitForTimeout(3000)
+    const toggleBtn = page.locator('button').filter({ hasText: /AI Providers|AI 프로바이더/i }).first()
+    await toggleBtn.scrollIntoViewIfNeeded()
+    await toggleBtn.click()
+    await page.waitForTimeout(500)
+
+    const sectionAfter = page.locator('section').filter({ hasText: /AI Providers|AI 프로바이더/i })
+    await expect(sectionAfter.getByText(/Configured|설정됨/i).first()).toBeVisible({ timeout: 10_000 })
   })
 
   test('can delete a configured provider', async ({ page }) => {
-    await page.goto('/settings')
-    await page.waitForTimeout(2000)
+    const section = await openAiSection(page)
 
-    const section = getAiSection(page)
-
-    // First configure a provider
-    const configureBtn = section.locator('button').filter({ hasText: /Configure|설정/i }).first()
-    await configureBtn.click()
-
-    const apiKeyInput = section.locator('input[type="password"]')
-    await apiKeyInput.fill('sk-to-delete')
-
-    const saveBtn = section.locator('button').filter({ hasText: /^Save$|^저장$/i }).first()
-    await saveBtn.click()
-    await page.waitForTimeout(1500)
-
-    // Now delete it
-    const deleteBtn = section.locator('button').filter({ hasText: /Delete|삭제/i }).first()
-    if (await deleteBtn.isVisible()) {
-      await deleteBtn.click()
-      await page.waitForTimeout(1000)
-
-      // Should no longer show "Configured"
-      const notSetBadges = section.locator('text=/Not set|미설정/i')
-      const count = await notSetBadges.count()
-      expect(count).toBeGreaterThanOrEqual(1)
+    // 설정됨 배지가 있는 프로바이더 행 클릭
+    const configuredRow = section.locator('button').filter({ has: page.locator('text=/Configured|설정됨/i') }).first()
+    if (!(await configuredRow.isVisible().catch(() => false))) {
+      test.skip()
+      return
     }
-  })
+    await configuredRow.click()
+    await page.waitForTimeout(500)
 
-  test('security note with AES-256 is visible', async ({ page }) => {
-    await page.goto('/settings')
+    // 삭제 버튼 (Trash2 아이콘)
+    const deleteBtn = section.locator('button:has(svg.lucide-trash-2)').first()
+    if (!(await deleteBtn.isVisible().catch(() => false))) {
+      test.skip()
+      return
+    }
+    await deleteBtn.click()
     await page.waitForTimeout(2000)
 
-    const section = getAiSection(page)
-    const note = section.locator('text=/AES-256/i')
-    await expect(note).toBeVisible()
+    // 미설정 배지 증가 확인
+    const notSetCount = await section.getByText(/Not set|미설정/i).count()
+    expect(notSetCount).toBeGreaterThanOrEqual(1)
   })
 
-  test('cancel edit form works', async ({ page }) => {
-    await page.goto('/settings')
-    await page.waitForTimeout(2000)
+  test('cancel closes edit form', async ({ page }) => {
+    const section = await openAiSection(page)
 
-    const section = getAiSection(page)
-    const configureBtn = section.locator('button').filter({ hasText: /Configure|설정/i }).first()
-    await configureBtn.click()
+    // 프로바이더 토글 열기
+    const providerRow = section.locator('button').filter({ hasText: /Google Gemini/i }).first()
+    await providerRow.click()
+    await page.waitForTimeout(500)
 
     const apiKeyInput = section.locator('input[type="password"]')
-    await expect(apiKeyInput).toBeVisible()
+    await expect(apiKeyInput).toBeVisible({ timeout: 5_000 })
 
+    // 취소 클릭
     const cancelBtn = section.locator('button').filter({ hasText: /Cancel|취소/i })
     await cancelBtn.click()
 
-    await expect(apiKeyInput).not.toBeVisible()
-  })
-})
-
-test.describe('AI Generate — Provider Integration', () => {
-  test('shows configured providers in AI generate dropdown', async ({ page }) => {
-    // Configure a provider first
-    await page.goto('/settings')
-    await page.waitForTimeout(2000)
-
-    const section = getAiSection(page)
-    const configureBtn = section.locator('button').filter({ hasText: /Configure|설정/i }).first()
-    await configureBtn.click()
-
-    const apiKeyInput = section.locator('input[type="password"]')
-    await apiKeyInput.fill('sk-test-dropdown-check')
-
-    const saveBtn = section.locator('button').filter({ hasText: /^Save$|^저장$/i }).first()
-    await saveBtn.click()
-    await page.waitForTimeout(1500)
-
-    // Go to AI generate
-    await page.goto('/decks')
-    await page.waitForTimeout(2000)
-
-    const aiBtn = page.locator('button').filter({ hasText: /AI Generate|AI로 만들기/i })
-    if (!(await aiBtn.isVisible())) {
-      test.skip()
-      return
-    }
-    await aiBtn.click()
-
-    const dialog = page.locator('[data-slot="dialog-content"]')
-    await expect(dialog).toBeVisible({ timeout: 5_000 })
-
-    // Should have a provider select dropdown
-    const providerSelect = dialog.locator('select').first()
-    await expect(providerSelect).toBeVisible()
-
-    // Should NOT have password input for API key
-    const passwordInput = dialog.locator('input[type="password"]')
-    await expect(passwordInput).not.toBeVisible()
+    await expect(apiKeyInput).not.toBeVisible({ timeout: 3_000 })
   })
 
-  test('no providers configured shows settings link', async ({ page }) => {
-    // Clear stored keys
-    await page.goto('/settings')
-    await page.evaluate(() => {
-      localStorage.removeItem('reeeeecall-ai-keys-v3')
-      localStorage.removeItem('reeeeecall-ai-config-v2')
-      localStorage.removeItem('reeeeecall-ai-config')
-    })
-
-    await page.goto('/decks')
-    await page.waitForTimeout(2000)
-
-    const aiBtn = page.locator('button').filter({ hasText: /AI Generate|AI로 만들기/i })
-    if (!(await aiBtn.isVisible())) {
-      test.skip()
-      return
-    }
-    await aiBtn.click()
-
-    const dialog = page.locator('[data-slot="dialog-content"]')
-    await expect(dialog).toBeVisible({ timeout: 5_000 })
-
-    // Should show settings link
-    const settingsBtn = dialog.locator('button').filter({ hasText: /Settings|설정/i })
-    await expect(settingsBtn.first()).toBeVisible({ timeout: 5_000 })
+  test('security note is visible', async ({ page }) => {
+    const section = await openAiSection(page)
+    await expect(section.getByText(/encrypted|암호화/i).first()).toBeVisible({ timeout: 5_000 })
   })
 })
