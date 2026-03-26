@@ -133,7 +133,7 @@ export function SessionKickedScreen({ onReclaim, onLogout }: Props) {
           activeOpacity={0.8}
         >
           <Text style={s.reclaimText}>
-            {reclaiming ? '⏳ 세션 복구 중...' : '🔄 이 기기에서 계속하기'}
+            {reclaiming ? '세션 복구 중...' : '이 기기에서 계속하기'}
           </Text>
         </TouchableOpacity>
 
