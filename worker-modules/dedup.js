@@ -96,5 +96,9 @@ export function checkSameRunDuplicate(article, runState) {
 export function appendDateSuffix(slug) {
   const d = new Date()
   const suffix = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+  // Avoid double date suffix (e.g., article-20260221-20260221)
+  if (slug.endsWith(`-${suffix}`)) {
+    return `${slug}-2`
+  }
   return `${slug}-${suffix}`
 }
