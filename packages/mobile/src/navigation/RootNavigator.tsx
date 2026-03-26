@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
-import { Alert } from 'react-native'
+import { useState, useEffect, useCallback } from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
 import { useAuthState } from '../hooks/useAuthState'
 import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
+import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
 import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
+import { getMobileSupabase } from '../adapters'
 import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -35,34 +36,23 @@ export function RootNavigator() {
     return cleanup
   }, [user, registerSession, startHeartbeat])
 
-  // Show alert when session is kicked
-  useEffect(() => {
-    if (user && !sessionValid) {
-      Alert.alert(
-        '다른 기기에서 로그인됨',
-        '다른 기기에서 같은 계정으로 로그인하여 현재 세션이 종료되었습니다.',
-        [
-          {
-            text: '이 기기에서 계속하기',
-            onPress: () => registerSession(),
-          },
-          {
-            text: '로그아웃',
-            style: 'destructive',
-            onPress: async () => {
-              const { getMobileSupabase } = await import('../adapters')
-              const supabase = getMobileSupabase()
-              await supabase.auth.signOut()
-            },
-          },
-        ],
-      )
-    }
-  }, [user, sessionValid])
+  const handleReclaim = useCallback(async () => {
+    await registerSession()
+  }, [registerSession])
+
+  const handleLogout = useCallback(async () => {
+    const supabase = getMobileSupabase()
+    await supabase.auth.signOut()
+  }, [])
 
   // Show splash while loading or timer not done
   if (loading || !splashDone) {
     return <LoadingScreen />
+  }
+
+  // Session kicked → full screen overlay (matches web SessionKickedOverlay)
+  if (user && !sessionValid) {
+    return <SessionKickedScreen onReclaim={handleReclaim} onLogout={handleLogout} />
   }
 
   // Not logged in → show AuthGuard (card flip bg + CTA), then navigate to login
