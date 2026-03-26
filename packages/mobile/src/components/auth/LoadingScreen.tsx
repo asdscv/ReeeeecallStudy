@@ -6,8 +6,8 @@ const { width: W, height: H } = Dimensions.get('window')
 const CARD_W = W * 0.72
 const CARD_H = CARD_W * 0.62
 
-const FLIP_FIRST = 1200
-const FLIP_INTERVAL = 3000
+const FLIP_FIRST = 700
+const FLIP_INTERVAL = 2000
 const RATING_LABELS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = ['#ef4444', '#f97316', '#10b981', '#3b82f6']
 
@@ -217,8 +217,8 @@ const s = StyleSheet.create({
 
   // Logo
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  logoIcon: { width: 44, height: 44 },
-  logoText: { height: 30, width: 160, tintColor: '#e2e8f0' },
+  logoIcon: { width: 52, height: 52 },
+  logoText: { height: 40, width: 210, tintColor: '#e2e8f0' },
 
   // Pill
   pill: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)', marginBottom: 24 },
