@@ -1,6 +1,18 @@
 import type { AIRequestOptions, AIResponse } from '../types'
 
-const RETRY_DELAYS = [1000, 3000, 8000]
+const RETRY_DELAYS = [2000, 10000, 30000]
+const MAX_ATTEMPTS = RETRY_DELAYS.length
+
+/** Parse Retry-After header (seconds or HTTP-date) → ms, capped at 60s */
+function parseRetryAfter(res: Response): number | null {
+  const header = res.headers.get('retry-after')
+  if (!header) return null
+  const secs = Number(header)
+  if (!Number.isNaN(secs)) return Math.min(secs * 1000, 60_000)
+  const date = Date.parse(header)
+  if (!Number.isNaN(date)) return Math.min(Math.max(date - Date.now(), 0), 60_000)
+  return null
+}
 
 function stripMarkdownFences(text: string): string {
   let cleaned = text.trim()
@@ -17,7 +29,7 @@ export async function callAnthropic(
 ): Promise<AIResponse> {
   const body = {
     model,
-    max_tokens: options.maxTokens ?? 4096,
+    max_tokens: options.maxTokens ?? 16384,
     system: options.systemPrompt,
     messages: [
       { role: 'user', content: options.userPrompt },
@@ -26,7 +38,7 @@ export async function callAnthropic(
 
   let lastError: Error | null = null
 
-  for (let attempt = 0; attempt < RETRY_DELAYS.length; attempt++) {
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -44,15 +56,16 @@ export async function callAnthropic(
       }
 
       if (res.status === 429) {
-        if (attempt < RETRY_DELAYS.length - 1) {
-          await sleep(RETRY_DELAYS[attempt])
+        if (attempt < MAX_ATTEMPTS - 1) {
+          const wait = parseRetryAfter(res) ?? RETRY_DELAYS[attempt]
+          await sleep(wait)
           continue
         }
         throw new Error('RATE_LIMITED')
       }
 
       if (res.status >= 500) {
-        if (attempt < RETRY_DELAYS.length - 1) {
+        if (attempt < MAX_ATTEMPTS - 1) {
           await sleep(RETRY_DELAYS[attempt])
           continue
         }
@@ -64,7 +77,7 @@ export async function callAnthropic(
         throw new Error(`AI API error ${res.status}: ${errBody}`)
       }
 
-      const data = await res.json()
+      const data = await res.json() as Record<string, any>
       const textBlock = data.content?.find(
         (b: { type: string }) => b.type === 'text',
       )
@@ -91,7 +104,7 @@ export async function callAnthropic(
       if (msg === 'INVALID_API_KEY' || msg.includes('AI API error 4')) {
         throw err
       }
-      if (attempt < RETRY_DELAYS.length - 1) {
+      if (attempt < MAX_ATTEMPTS - 1) {
         await sleep(RETRY_DELAYS[attempt])
       }
     }

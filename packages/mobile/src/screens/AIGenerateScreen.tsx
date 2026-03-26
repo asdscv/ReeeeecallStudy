@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
 import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
@@ -23,7 +23,7 @@ const CONTENT_LANGS = [
 
 type WizardStep = 'config' | 'generating' | 'review' | 'saving' | 'done' | 'error'
 
-const STEPS = [
+const FULL_STEPS = [
   { key: 'setup', label: 'Setup' },
   { key: 'template', label: 'Template' },
   { key: 'deck', label: 'Deck' },
@@ -31,7 +31,13 @@ const STEPS = [
   { key: 'done', label: 'Done' },
 ] as const
 
-function stepIndex(step: WizardStep): number {
+const CARDS_ONLY_STEPS = [
+  { key: 'setup', label: 'Setup' },
+  { key: 'cards', label: 'Cards' },
+  { key: 'done', label: 'Done' },
+] as const
+
+function stepIndexFull(step: WizardStep): number {
   if (step === 'config') return 0
   if (step === 'generating' || step === 'saving') return 2
   if (step === 'review') return 3
@@ -39,12 +45,20 @@ function stepIndex(step: WizardStep): number {
   return 0
 }
 
-function StepIndicator({ step }: { step: WizardStep }) {
-  const current = stepIndex(step)
+function stepIndexCardsOnly(step: WizardStep): number {
+  if (step === 'config') return 0
+  if (step === 'generating' || step === 'saving' || step === 'review') return 1
+  if (step === 'done') return 2
+  return 0
+}
+
+function StepIndicator({ step, isCardsOnly }: { step: WizardStep; isCardsOnly: boolean }) {
+  const steps = isCardsOnly ? CARDS_ONLY_STEPS : FULL_STEPS
+  const current = isCardsOnly ? stepIndexCardsOnly(step) : stepIndexFull(step)
 
   return (
     <View style={stepStyles.container}>
-      {STEPS.map((s, i) => {
+      {steps.map((s, i) => {
         const isCompleted = i < current
         const isActive = i === current
         return (
@@ -80,7 +94,7 @@ function StepIndicator({ step }: { step: WizardStep }) {
             </View>
 
             {/* Connector line after circle (except last) */}
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <View
                 style={[
                   stepStyles.line,
@@ -107,6 +121,52 @@ function StepIndicator({ step }: { step: WizardStep }) {
   )
 }
 
+// ── Dropdown Picker Modal ──
+function DropdownPicker<T extends string>({
+  visible,
+  onClose,
+  options,
+  selectedValue,
+  onSelect,
+}: {
+  visible: boolean
+  onClose: () => void
+  options: { value: T; label: string }[]
+  selectedValue: T
+  onSelect: (value: T) => void
+}) {
+  const theme = useTheme()
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={dropdownStyles.overlay} onPress={onClose}>
+        <View style={[dropdownStyles.sheet, { backgroundColor: theme.colors.surfaceElevated }]}>
+          <ScrollView bounces={false} style={dropdownStyles.scroll}>
+            {options.map((opt) => {
+              const isSelected = opt.value === selectedValue
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  onPress={() => { onSelect(opt.value); onClose() }}
+                  style={[
+                    dropdownStyles.option,
+                    { borderBottomColor: theme.colors.border },
+                    isSelected && { backgroundColor: theme.colors.primaryLight },
+                  ]}
+                >
+                  <Text style={[theme.typography.body, { color: isSelected ? theme.colors.primary : theme.colors.text }]}>
+                    {opt.label}
+                  </Text>
+                  {isSelected && <Text style={{ color: theme.colors.primary }}>{'\u2713'}</Text>}
+                </TouchableOpacity>
+              )
+            })}
+          </ScrollView>
+        </View>
+      </Pressable>
+    </Modal>
+  )
+}
+
 export function AIGenerateScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
@@ -124,6 +184,8 @@ export function AIGenerateScreen() {
   const [cardCount, setCardCount] = useState('10')
   const [contentLang, setContentLang] = useState('en-US')
   const [selectedDeckId, setSelectedDeckId] = useState('')
+  const [showLangPicker, setShowLangPicker] = useState(false)
+  const [showDeckPicker, setShowDeckPicker] = useState(false)
 
   // Load configured AI keys
   useEffect(() => {
@@ -179,9 +241,16 @@ export function AIGenerateScreen() {
 
       if (!selectedDeckId) {
         await store.generateTemplate()
+        if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
         await store.generateDeck()
+        if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
       }
       await store.generateCards()
+      // Check if the store ended in error (it catches internally and doesn't re-throw)
+      if (useAIGenerateStore.getState().currentStep === 'error') {
+        setStep('error')
+        return
+      }
       setStep('review')
     } catch (e) {
       setStep('error')
@@ -212,7 +281,7 @@ export function AIGenerateScreen() {
         <DrawerHeader title="AI Auto-Generate" />
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
-          <StepIndicator step={step} />
+          <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
 
           <Text style={[theme.typography.h1, { color: theme.colors.text }]}>AI Auto-Generate</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
@@ -329,22 +398,25 @@ export function AIGenerateScreen() {
               numberOfLines={3}
             />
 
-            {/* Content Language — dropdown style like web */}
+            {/* Content Language — dropdown */}
             <View style={styles.section}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>Content Language</Text>
               <TouchableOpacity
                 style={[styles.dropdown, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
-                onPress={() => {
-                  const idx = CONTENT_LANGS.findIndex(l => l.code === contentLang)
-                  const next = CONTENT_LANGS[(idx + 1) % CONTENT_LANGS.length]
-                  setContentLang(next.code)
-                }}
+                onPress={() => setShowLangPicker(true)}
               >
                 <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
                   {CONTENT_LANGS.find(l => l.code === contentLang)?.label ?? 'Auto-detect'}
                 </Text>
                 <Text style={{ color: theme.colors.textTertiary }}>{'\u25BE'}</Text>
               </TouchableOpacity>
+              <DropdownPicker
+                visible={showLangPicker}
+                onClose={() => setShowLangPicker(false)}
+                options={CONTENT_LANGS.map(l => ({ value: l.code, label: l.label }))}
+                selectedValue={contentLang}
+                onSelect={setContentLang}
+              />
             </View>
 
             {/* Number of cards — slider-like display */}
@@ -381,25 +453,22 @@ export function AIGenerateScreen() {
                 <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>SELECT DECK</Text>
               </View>
               <View style={[styles.labeledSection, { borderColor: theme.colors.border }]}>
-                <View style={styles.chipRow}>
-                  {decks.map((deck) => (
-                    <TouchableOpacity
-                      key={deck.id}
-                      onPress={() => setSelectedDeckId(deck.id)}
-                      style={[
-                        styles.chip,
-                        {
-                          backgroundColor: selectedDeckId === deck.id ? theme.colors.primaryLight : theme.colors.surface,
-                          borderColor: selectedDeckId === deck.id ? theme.colors.primary : theme.colors.border,
-                        },
-                      ]}
-                    >
-                      <Text style={[theme.typography.bodySmall, { color: selectedDeckId === deck.id ? theme.colors.primary : theme.colors.text }]}>
-                        {deck.icon} {deck.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <TouchableOpacity
+                  style={[styles.dropdown, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                  onPress={() => setShowDeckPicker(true)}
+                >
+                  <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
+                    {(() => { const d = decks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : 'Select a deck' })()}
+                  </Text>
+                  <Text style={{ color: theme.colors.textTertiary }}>{'\u25BE'}</Text>
+                </TouchableOpacity>
+                <DropdownPicker
+                  visible={showDeckPicker}
+                  onClose={() => setShowDeckPicker(false)}
+                  options={decks.map(d => ({ value: d.id, label: `${d.icon} ${d.name}` }))}
+                  selectedValue={selectedDeckId}
+                  onSelect={setSelectedDeckId}
+                />
               </View>
             </>
           )}
@@ -419,7 +488,7 @@ export function AIGenerateScreen() {
   if (step === 'generating' || step === 'saving') {
     return (
       <Screen testID="ai-generating-screen">
-        <StepIndicator step={step} />
+        <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
         <View style={styles.center}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>
@@ -439,7 +508,7 @@ export function AIGenerateScreen() {
     return (
       <Screen safeArea padding={false} testID="ai-review-screen">
         <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
-          <StepIndicator step={step} />
+          <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
         </View>
         <FlatList
           data={cards}
@@ -482,7 +551,7 @@ export function AIGenerateScreen() {
   if (step === 'done') {
     return (
       <Screen testID="ai-done-screen">
-        <StepIndicator step={step} />
+        <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
         <View style={styles.center}>
           <Text style={styles.doneEmoji}>🎉</Text>
           <Text style={[theme.typography.h2, { color: theme.colors.text }]}>Cards Created!</Text>
@@ -501,7 +570,7 @@ export function AIGenerateScreen() {
   // ── Error Step ──
   return (
     <Screen testID="ai-error-screen">
-      <StepIndicator step={step} />
+      <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
       <View style={styles.center}>
         <Text style={styles.doneEmoji}>❌</Text>
         <Text style={[theme.typography.h3, { color: theme.colors.error }]}>Generation Failed</Text>
@@ -591,6 +660,13 @@ function ReviewCard({
     </TouchableOpacity>
   )
 }
+
+const dropdownStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', padding: 32 },
+  sheet: { borderRadius: 14, width: '100%', maxHeight: 360, overflow: 'hidden' },
+  scroll: { flexGrow: 0 },
+  option: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth },
+})
 
 const reviewStyles = StyleSheet.create({
   card: { borderRadius: 10, borderWidth: 1.5, padding: 12, gap: 8 },
