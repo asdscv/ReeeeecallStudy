@@ -28,6 +28,10 @@
     "reviewCards": "Ôn tập {{count}}",
     "study": "Học"
   },
+  "quickStudy": {
+    "dueCount": "{{count}} thẻ cần ôn hôm nay",
+    "startSession": "Bắt đầu học"
+  },
   "heatmap": {
     "title": "Bản đồ nhiệt học tập",
     "noStudy": "Không học",

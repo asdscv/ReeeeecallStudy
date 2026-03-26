@@ -35,19 +35,29 @@ export function ForgotPasswordScreen() {
   if (sent) {
     return (
       <Screen testID="forgot-password-success-screen">
-        <View style={styles.successContent}>
-          <Text style={[theme.typography.h2, { color: theme.colors.text, textAlign: 'center' }]}>
-            {t('resetSentTitle')}
-          </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', marginTop: 12 }]}>
-            {t('resetSentMessage', { email })}
-          </Text>
-          <Button
-            title={t('backToLogin')}
-            variant="secondary"
-            onPress={() => navigation.goBack()}
-            testID="forgot-password-back-button"
-          />
+        <View style={styles.content}>
+          <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            {/* Brand header */}
+            <View style={styles.brandHeader}>
+              <Text style={styles.logoEmoji}>{'\uD83E\uDDE0'}</Text>
+              <Text style={[styles.brandText, { color: theme.colors.text }]}>
+                <Text style={{ color: theme.colors.primary }}>reeee</Text>callstudy
+              </Text>
+            </View>
+
+            <Text style={[theme.typography.h2, { color: theme.colors.text, textAlign: 'center' }]}>
+              {t('resetSentTitle')}
+            </Text>
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+              {t('resetSentMessage', { email })}
+            </Text>
+            <Button
+              title={t('backToLogin')}
+              variant="secondary"
+              onPress={() => navigation.goBack()}
+              testID="forgot-password-back-button"
+            />
+          </View>
         </View>
       </Screen>
     )
@@ -56,59 +66,68 @@ export function ForgotPasswordScreen() {
   return (
     <Screen scroll keyboard testID="forgot-password-screen">
       <View style={styles.content}>
-        {/* Back button */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          testID="forgot-password-back"
-        >
-          <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
-            {'← '}{t('backToLogin', { ns: 'common', defaultValue: 'Back' })}
-          </Text>
-        </TouchableOpacity>
+        {/* Card container — matches LoginScreen rounded card */}
+        <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+          {/* Brand header — matches web: logo + brand name */}
+          <View style={styles.brandHeader}>
+            <Text style={styles.logoEmoji}>{'\uD83E\uDDE0'}</Text>
+            <Text style={[styles.brandText, { color: theme.colors.text }]}>
+              <Text style={{ color: theme.colors.primary }}>reeee</Text>callstudy
+            </Text>
+          </View>
 
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
+          {/* Title */}
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
             {t('resetPassword')}
           </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginTop: theme.spacing.sm }]}>
+          <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
             {t('resetDescription')}
           </Text>
-        </View>
 
-        {/* Form */}
-        <View style={styles.form}>
-          <TextInput
-            testID="forgot-password-email-input"
-            label={t('emailLabel')}
-            placeholder={t('emailPlaceholder')}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoComplete="email"
-            returnKeyType="done"
-            onSubmitEditing={handleReset}
-          />
+          {/* Form */}
+          <View style={styles.form}>
+            <TextInput
+              testID="forgot-password-email-input"
+              placeholder={t('emailPlaceholder')}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              autoComplete="email"
+              returnKeyType="done"
+              onSubmitEditing={handleReset}
+            />
 
-          {error ? (
-            <Text
-              testID="forgot-password-error-text"
-              style={[theme.typography.bodySmall, { color: theme.colors.error }]}
+            {error ? (
+              <Text
+                testID="forgot-password-error-text"
+                style={[theme.typography.bodySmall, { color: theme.colors.error }]}
+              >
+                {error}
+              </Text>
+            ) : null}
+
+            <Button
+              testID="forgot-password-submit-button"
+              title={t('sendResetLink')}
+              onPress={handleReset}
+              loading={loading}
+              disabled={!email.trim()}
+            />
+          </View>
+
+          {/* Back to login link */}
+          <View style={styles.footer}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              testID="forgot-password-back"
             >
-              {error}
-            </Text>
-          ) : null}
-
-          <Button
-            testID="forgot-password-submit-button"
-            title={t('sendResetLink')}
-            onPress={handleReset}
-            loading={loading}
-            disabled={!email.trim()}
-          />
+              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
+                {'← '}{t('backToLogin', { ns: 'common', defaultValue: 'Back to Login' })}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Screen>
@@ -116,9 +135,11 @@ export function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { flex: 1, justifyContent: 'center', gap: 24, paddingVertical: 40 },
-  successContent: { flex: 1, justifyContent: 'center', gap: 24, paddingHorizontal: 20 },
-  backButton: { alignSelf: 'flex-start', padding: 8 },
-  header: { alignItems: 'center' },
-  form: { gap: 16 },
+  content: { flex: 1, justifyContent: 'center', paddingVertical: 40 },
+  card: { borderRadius: 16, borderWidth: 1, padding: 24, gap: 20 },
+  brandHeader: { alignItems: 'center', gap: 8, marginBottom: 4 },
+  logoEmoji: { fontSize: 48 },
+  brandText: { fontSize: 20, fontWeight: '600', letterSpacing: -0.3 },
+  form: { gap: 14 },
+  footer: { alignItems: 'center' },
 })

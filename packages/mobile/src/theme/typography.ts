@@ -1,8 +1,15 @@
 import { Platform, type TextStyle } from 'react-native'
+import {
+  textStyles,
+  fontSize,
+  fontWeight,
+  lineHeight,
+} from '@reeeeecall/shared/design-tokens/typography'
 
 /**
  * Design tokens — Typography
- * iOS: SF Pro, Android: Roboto (system defaults)
+ * Uses shared text styles with platform-specific font families.
+ * iOS: SF Pro (System), Android: Roboto
  */
 const fontFamily = Platform.select({
   ios: 'System',
@@ -11,88 +18,88 @@ const fontFamily = Platform.select({
 })
 
 export const typography = {
-  // Display
+  // Display — h1 uses 32 on mobile (shared uses 30) for larger screens
   h1: {
     fontFamily,
     fontSize: 32,
-    fontWeight: '700',
-    lineHeight: 40,
+    fontWeight: fontWeight.bold,
+    lineHeight: lineHeight['4xl'],
     letterSpacing: -0.5,
   } satisfies TextStyle,
 
   h2: {
     fontFamily,
-    fontSize: 24,
-    fontWeight: '700',
-    lineHeight: 32,
+    fontSize: textStyles.h2.fontSize,
+    fontWeight: fontWeight.bold,
+    lineHeight: textStyles.h2.lineHeight,
     letterSpacing: -0.3,
   } satisfies TextStyle,
 
   h3: {
     fontFamily,
-    fontSize: 20,
-    fontWeight: '600',
-    lineHeight: 28,
+    fontSize: textStyles.h3.fontSize,
+    fontWeight: fontWeight.semibold,
+    lineHeight: textStyles.h3.lineHeight,
   } satisfies TextStyle,
 
-  // Body
+  // Body — uses shared base (16) instead of old 15
   bodyLarge: {
     fontFamily,
-    fontSize: 17,
-    fontWeight: '400',
-    lineHeight: 24,
+    fontSize: textStyles.bodyLarge.fontSize,
+    fontWeight: fontWeight.normal,
+    lineHeight: textStyles.bodyLarge.lineHeight,
   } satisfies TextStyle,
 
   body: {
     fontFamily,
-    fontSize: 15,
-    fontWeight: '400',
-    lineHeight: 22,
+    fontSize: textStyles.body.fontSize,
+    fontWeight: fontWeight.normal,
+    lineHeight: textStyles.body.lineHeight,
   } satisfies TextStyle,
 
   bodySmall: {
     fontFamily,
-    fontSize: 13,
-    fontWeight: '400',
-    lineHeight: 18,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.normal,
+    lineHeight: lineHeight.sm,
   } satisfies TextStyle,
 
-  // Labels
+  // Labels — uses shared medium (500) instead of old semibold (600)
   label: {
     fontFamily,
-    fontSize: 15,
-    fontWeight: '600',
-    lineHeight: 20,
+    fontSize: textStyles.label.fontSize,
+    fontWeight: fontWeight.medium,
+    lineHeight: textStyles.label.lineHeight,
   } satisfies TextStyle,
 
   labelSmall: {
     fontFamily,
-    fontSize: 13,
-    fontWeight: '600',
-    lineHeight: 18,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    lineHeight: lineHeight.xs,
   } satisfies TextStyle,
 
   // Caption
   caption: {
     fontFamily,
-    fontSize: 12,
-    fontWeight: '400',
-    lineHeight: 16,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.normal,
+    lineHeight: lineHeight.xs,
   } satisfies TextStyle,
 
   // Button
   button: {
     fontFamily,
-    fontSize: 16,
-    fontWeight: '600',
-    lineHeight: 22,
+    fontSize: textStyles.button.fontSize,
+    fontWeight: fontWeight.semibold,
+    lineHeight: textStyles.button.lineHeight,
   } satisfies TextStyle,
 
   buttonSmall: {
     fontFamily,
-    fontSize: 14,
-    fontWeight: '600',
-    lineHeight: 20,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    lineHeight: lineHeight.sm,
   } satisfies TextStyle,
 } as const
 

@@ -8,6 +8,7 @@ import { ProgressBar } from '../components/charts/ProgressBar'
 import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
+import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import { calculateDeckStats } from '@reeeeecall/shared/lib/stats'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
@@ -22,10 +23,10 @@ const ICONS = ['📚', '📖', '🇨🇳', '🇺🇸', '🇯🇵', '🧠', '💡
 
 /** SRS field definitions with colored labels matching web */
 const SRS_INTERVAL_FIELDS: { key: keyof SrsSettings; label: string; color: string }[] = [
-  { key: 'again_days', label: 'Again', color: '#EF4444' },  // red
-  { key: 'hard_days', label: 'Hard', color: '#F59E0B' },   // amber
-  { key: 'good_days', label: 'Good', color: '#22C55E' },   // green
-  { key: 'easy_days', label: 'Easy', color: '#3B82F6' },   // blue
+  { key: 'again_days', label: 'Again', color: ratingColors.again },
+  { key: 'hard_days', label: 'Hard', color: ratingColors.hard },
+  { key: 'good_days', label: 'Good', color: ratingColors.good },
+  { key: 'easy_days', label: 'Easy', color: ratingColors.easy },
 ]
 
 export function DeckEditScreen() {
@@ -55,7 +56,6 @@ export function DeckEditScreen() {
 
   // Statistics (edit mode only)
   const [cards, setCards] = useState<Card[]>([])
-  const [statsExpanded, setStatsExpanded] = useState(false)
 
   // Auto-select first template
   useEffect(() => {
@@ -273,59 +273,31 @@ export function DeckEditScreen() {
         {/* ── Statistics Panel (edit mode only) ── */}
         {isEditing && deckStats && (
           <View style={[styles.statsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <TouchableOpacity
-              style={styles.statsHeader}
-              onPress={() => setStatsExpanded(!statsExpanded)}
-              testID="deck-edit-stats-toggle"
-            >
+            <View style={styles.statsBodyAlways}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>Statistics</Text>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-                {statsExpanded ? '−' : '+'}
-              </Text>
-            </TouchableOpacity>
 
-            {statsExpanded && (
-              <View style={styles.statsBody}>
-                {/* Summary row */}
-                <View style={styles.statsRow}>
-                  <StatCard label="Total Cards" value={deckStats.totalCards} testID="deck-edit-stat-total" />
-                  <StatCard label="Mastery" value={`${deckStats.masteryRate}%`} testID="deck-edit-stat-mastery" />
-                </View>
+              {/* Summary row */}
+              <View style={styles.statsRow}>
+                <StatCard label="Total Cards" value={deckStats.totalCards} testID="deck-edit-stat-total" />
+                <StatCard label="Mastery" value={`${deckStats.masteryRate}%`} testID="deck-edit-stat-mastery" />
+              </View>
 
-                {/* Card status badges */}
-                <View style={[styles.statusCard, { backgroundColor: theme.colors.surface }]}>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-                    Card Status Distribution
-                  </Text>
-                  <View style={styles.badgeRow}>
-                    <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
-                      <View style={[styles.badgeDot, { backgroundColor: palette.blue[500] }]} />
-                      <Text style={[theme.typography.caption, { color: palette.blue[700] }]}>
-                        New: {deckStats.newCount}
-                      </Text>
-                    </View>
-                    <View style={[styles.badge, { backgroundColor: '#FFFBEB' }]}>
-                      <View style={[styles.badgeDot, { backgroundColor: '#F59E0B' }]} />
-                      <Text style={[theme.typography.caption, { color: '#92400E' }]}>
-                        Learning: {deckStats.learningCount}
-                      </Text>
-                    </View>
-                    <View style={[styles.badge, { backgroundColor: '#F0FDF4' }]}>
-                      <View style={[styles.badgeDot, { backgroundColor: '#22C55E' }]} />
-                      <Text style={[theme.typography.caption, { color: '#166534' }]}>
-                        Review: {deckStats.reviewCount}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Distribution bar */}
-                  {deckStats.totalCards > 0 && (
+              {/* SRS status distribution bar */}
+              {deckStats.totalCards > 0 && (() => {
+                const masteredCount = deckStats.totalCards - deckStats.newCount - deckStats.learningCount - deckStats.reviewCount
+                const segments = [
+                  { label: 'New', count: deckStats.newCount, color: palette.blue[500] },
+                  { label: 'Learning', count: deckStats.learningCount, color: palette.yellow[500] },
+                  { label: 'Review', count: deckStats.reviewCount, color: palette.green[500] },
+                  { label: 'Mastered', count: masteredCount, color: palette.gray[400] },
+                ]
+                return (
+                  <View style={[styles.statusCard, { backgroundColor: theme.colors.surface }]}>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
+                      Card Status Distribution
+                    </Text>
                     <View style={styles.distributionBar}>
-                      {[
-                        { count: deckStats.newCount, color: palette.blue[500] },
-                        { count: deckStats.learningCount, color: '#F59E0B' },
-                        { count: deckStats.reviewCount, color: '#22C55E' },
-                      ].map((s, idx) => {
+                      {segments.map((s, idx) => {
                         const pct = (s.count / deckStats.totalCards) * 100
                         if (pct === 0) return null
                         return (
@@ -336,19 +308,29 @@ export function DeckEditScreen() {
                         )
                       })}
                     </View>
-                  )}
-                </View>
+                    <View style={styles.badgeRow}>
+                      {segments.map((s, idx) => (
+                        <View key={idx} style={styles.legendItem}>
+                          <View style={[styles.badgeDot, { backgroundColor: s.color }]} />
+                          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                            {s.label}: {s.count}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )
+              })()}
 
-                {/* Additional stats */}
-                <View style={styles.statsRow}>
-                  <StatCard label="Avg Interval" value={`${deckStats.avgInterval.toFixed(1)}d`} testID="deck-edit-stat-interval" />
-                  <StatCard label="Avg Ease" value={deckStats.avgEase.toFixed(2)} testID="deck-edit-stat-ease" />
-                </View>
-
-                {/* Mastery bar */}
-                <ProgressBar percentage={deckStats.masteryRate} label="Mastery Rate" testID="deck-edit-mastery-bar" />
+              {/* Additional stats */}
+              <View style={styles.statsRow}>
+                <StatCard label="Avg Interval" value={`${deckStats.avgInterval.toFixed(1)}d`} testID="deck-edit-stat-interval" />
+                <StatCard label="Avg Ease" value={deckStats.avgEase.toFixed(2)} testID="deck-edit-stat-ease" />
               </View>
-            )}
+
+              {/* Mastery bar */}
+              <ProgressBar percentage={deckStats.masteryRate} label="Mastery Rate" testID="deck-edit-mastery-bar" />
+            </View>
           </View>
         )}
 
@@ -383,12 +365,11 @@ const styles = StyleSheet.create({
   srsLabel: { fontSize: 13, fontWeight: '700', textAlign: 'center' },
   // Statistics card
   statsCard: { borderRadius: 12, borderWidth: 1, overflow: 'hidden' },
-  statsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },
-  statsBody: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
+  statsBodyAlways: { padding: 16, gap: 12 },
   statsRow: { flexDirection: 'row', gap: 8 },
   statusCard: { borderRadius: 10, padding: 12, gap: 8 },
   badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   badgeDot: { width: 8, height: 8, borderRadius: 4 },
   distributionBar: { flexDirection: 'row', height: 10, borderRadius: 5, overflow: 'hidden', marginTop: 4 },
 })

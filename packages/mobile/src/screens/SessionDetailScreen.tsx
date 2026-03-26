@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator }
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Badge } from '../components/ui'
 import { useTheme, palette } from '../theme'
+import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import {
   formatDuration,
@@ -17,21 +18,21 @@ type Route = RouteProp<HomeStackParamList, 'SessionDetail'>
 type LogWithCard = StudyLog & { card?: Card }
 
 const RATING_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  again: { bg: palette.red[50], text: palette.red[600], label: 'Again' },
-  hard: { bg: '#FFF7ED', text: '#EA580C', label: 'Hard' },
-  good: { bg: palette.green[50], text: palette.green[700], label: 'Good' },
-  easy: { bg: palette.blue[50], text: palette.blue[600], label: 'Easy' },
-  got_it: { bg: palette.green[50], text: palette.green[700], label: 'Got it' },
-  missed: { bg: palette.red[50], text: palette.red[600], label: 'Missed' },
-  known: { bg: palette.green[50], text: palette.green[700], label: 'Known' },
-  unknown: { bg: palette.red[50], text: palette.red[600], label: 'Unknown' },
+  again: { bg: ratingColors.againLight, text: palette.red[600], label: 'Again' },
+  hard: { bg: ratingColors.hardLight, text: palette.yellow[700], label: 'Hard' },
+  good: { bg: ratingColors.goodLight, text: palette.green[700], label: 'Good' },
+  easy: { bg: ratingColors.easyLight, text: palette.blue[600], label: 'Easy' },
+  got_it: { bg: ratingColors.goodLight, text: palette.green[700], label: 'Got it' },
+  missed: { bg: ratingColors.againLight, text: palette.red[600], label: 'Missed' },
+  known: { bg: ratingColors.goodLight, text: palette.green[700], label: 'Known' },
+  unknown: { bg: ratingColors.againLight, text: palette.red[600], label: 'Unknown' },
 }
 
 const RATING_BAR_COLORS: Record<string, string> = {
-  again: palette.red[400],
-  hard: '#FB923C',
-  good: palette.green[400],
-  easy: palette.blue[400],
+  again: ratingColors.again,
+  hard: ratingColors.hard,
+  good: ratingColors.good,
+  easy: ratingColors.easy,
 }
 
 export function SessionDetailScreen() {

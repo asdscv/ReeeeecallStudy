@@ -59,104 +59,109 @@ export function LoginScreen() {
   return (
     <Screen scroll keyboard testID="login-screen">
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
-            {t('welcomeBack')}
+        {/* Card container — matches web rounded card */}
+        <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+          {/* Brand header — matches web: logo + brand name */}
+          <View style={styles.brandHeader}>
+            <Text style={styles.logoEmoji}>{'\uD83E\uDDE0'}</Text>
+            <Text style={[styles.brandText, { color: theme.colors.text }]}>
+              <Text style={{ color: theme.colors.primary }}>reeee</Text>callstudy
+            </Text>
+          </View>
+
+          {/* Title */}
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+            Login
           </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary, marginTop: theme.spacing.sm }]}>
-            {t('signInToContinue')}
-          </Text>
-        </View>
 
-        {/* Social Login */}
-        <View style={styles.socialSection}>
-          <SocialButton
-            provider="google"
-            onPress={handleGoogleLogin}
-            loading={loading}
-            testID="login-google-button"
-          />
-          <SocialButton
-            provider="apple"
-            onPress={handleAppleLogin}
-            testID="login-apple-button"
-          />
-        </View>
+          {/* Email/Password form — first, matching web order */}
+          <View style={styles.form}>
+            <TextInput
+              testID="login-email-input"
+              placeholder={t('emailPlaceholder')}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              autoComplete="email"
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+            />
 
-        <Divider text={t('orDivider')} />
+            <TextInput
+              ref={passwordRef}
+              testID="login-password-input"
+              placeholder={t('enterPassword')}
+              value={password}
+              onChangeText={setPassword}
+              isPassword
+              textContentType="password"
+              autoComplete="password"
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+            />
 
-        {/* Email Login */}
-        <View style={styles.form}>
-          <TextInput
-            testID="login-email-input"
-            label={t('emailLabel')}
-            placeholder={t('emailPlaceholder')}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoComplete="email"
-            returnKeyType="next"
-            onSubmitEditing={() => passwordRef.current?.focus()}
-          />
-
-          <TextInput
-            ref={passwordRef}
-            testID="login-password-input"
-            label={t('passwordLabel')}
-            placeholder={t('enterPassword')}
-            value={password}
-            onChangeText={setPassword}
-            isPassword
-            textContentType="password"
-            autoComplete="password"
-            returnKeyType="done"
-            onSubmitEditing={handleLogin}
-          />
-
-          {error ? (
-            <Text
-              testID="login-error-text"
-              style={[theme.typography.bodySmall, { color: theme.colors.error }]}
+            {/* Forgot password — right aligned, matches web */}
+            <TouchableOpacity
+              testID="login-forgot-password"
+              onPress={() => navigation.navigate('ForgotPassword')}
+              style={styles.forgotLink}
             >
-              {error}
-            </Text>
-          ) : null}
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                {t('forgotPasswordLink')}
+              </Text>
+            </TouchableOpacity>
 
-          <Button
-            testID="login-submit-button"
-            title={t('signIn')}
-            onPress={handleLogin}
-            loading={loading}
-            disabled={!email.trim() || !password}
-          />
+            {error ? (
+              <Text
+                testID="login-error-text"
+                style={[theme.typography.bodySmall, { color: theme.colors.error }]}
+              >
+                {error}
+              </Text>
+            ) : null}
 
-          <TouchableOpacity
-            testID="login-forgot-password"
-            onPress={() => navigation.navigate('ForgotPassword')}
-            style={styles.linkButton}
-          >
-            <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
-              {t('forgotPasswordLink')}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <Button
+              testID="login-submit-button"
+              title={t('signIn')}
+              onPress={handleLogin}
+              loading={loading}
+              disabled={!email.trim() || !password}
+            />
+          </View>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-            {t('noAccount')}{' '}
-          </Text>
-          <TouchableOpacity
-            testID="login-signup-link"
-            onPress={() => navigation.navigate('SignUp')}
-          >
-            <Text style={[theme.typography.label, { color: theme.colors.primary }]}>
-              {t('signup')}
+          <Divider text={t('orDivider')} />
+
+          {/* Social Login — below form, matching web */}
+          <View style={styles.socialSection}>
+            <SocialButton
+              provider="google"
+              onPress={handleGoogleLogin}
+              loading={loading}
+              testID="login-google-button"
+            />
+            <SocialButton
+              provider="apple"
+              onPress={handleAppleLogin}
+              testID="login-apple-button"
+            />
+          </View>
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
+              {t('noAccount')}{' '}
             </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              testID="login-signup-link"
+              onPress={() => navigation.navigate('SignUp')}
+            >
+              <Text style={[theme.typography.label, { color: theme.colors.primary }]}>
+                {t('signup')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Screen>
@@ -164,10 +169,13 @@ export function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { flex: 1, justifyContent: 'center', gap: 24, paddingVertical: 40 },
-  header: { alignItems: 'center' },
+  content: { flex: 1, justifyContent: 'center', paddingVertical: 40 },
+  card: { borderRadius: 16, borderWidth: 1, padding: 24, gap: 20 },
+  brandHeader: { alignItems: 'center', gap: 8, marginBottom: 4 },
+  logoEmoji: { fontSize: 48 },
+  brandText: { fontSize: 20, fontWeight: '600', letterSpacing: -0.3 },
+  form: { gap: 14 },
+  forgotLink: { alignSelf: 'flex-end', paddingVertical: 2 },
   socialSection: { gap: 12 },
-  form: { gap: 16 },
-  linkButton: { alignSelf: 'center', padding: 8 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
 })

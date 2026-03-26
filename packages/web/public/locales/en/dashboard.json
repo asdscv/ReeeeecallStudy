@@ -28,6 +28,10 @@
     "reviewCards": "Review {{count}}",
     "study": "Study"
   },
+  "quickStudy": {
+    "dueCount": "{{count}} cards due today",
+    "startSession": "Start a study session"
+  },
   "heatmap": {
     "title": "Study Heatmap",
     "noStudy": "No study",

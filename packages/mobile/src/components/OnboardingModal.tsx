@@ -45,7 +45,7 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
   const handleAction = useCallback(() => {
     const stepKey = current.key
     // Complete step in DB
-    getMobileSupabase().rpc('complete_onboarding_step', { p_step_key: stepKey }).catch(() => {})
+    Promise.resolve(getMobileSupabase().rpc('complete_onboarding_step', { p_step_key: stepKey })).catch(() => {})
 
     switch (stepKey) {
       case 'welcome':
@@ -68,7 +68,7 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
         break
       case 'exploreMarket':
         onDismiss()
-        getMobileSupabase().rpc('skip_onboarding').catch(() => {})
+        Promise.resolve(getMobileSupabase().rpc('skip_onboarding')).catch(() => {})
         navigation.navigate('MarketTab' as never)
         break
     }
@@ -91,32 +91,32 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
       onRequestClose={handleSkip}
     >
       <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
-        <View style={[styles.card, { backgroundColor: theme.bg }]}>
+        <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated }]}>
           {/* Skip button */}
           <TouchableOpacity
             onPress={handleSkip}
             style={styles.skipButton}
             testID="onboarding-skip"
           >
-            <Text style={[styles.skipText, { color: theme.textSecondary }]}>
+            <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>
               {t('onboarding.skip', 'Skip')}
             </Text>
           </TouchableOpacity>
 
           {/* Progress bar */}
           <View style={styles.progressContainer}>
-            <View style={[styles.progressBg, { backgroundColor: theme.border }]}>
+            <View style={[styles.progressBg, { backgroundColor: theme.colors.border }]}>
               <View
                 style={[
                   styles.progressFill,
                   {
-                    backgroundColor: palette.blue500,
+                    backgroundColor: palette.blue[500],
                     width: `${((step + 1) / STEPS.length) * 100}%`,
                   },
                 ]}
               />
             </View>
-            <Text style={[styles.progressText, { color: theme.textSecondary }]}>
+            <Text style={[styles.progressText, { color: theme.colors.textSecondary }]}>
               {t('onboarding.stepOf', '{{current}} / {{total}}', {
                 current: step + 1,
                 total: STEPS.length,
@@ -129,12 +129,12 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
             <Text style={styles.icon}>{current.icon}</Text>
 
             {/* Title */}
-            <Text style={[styles.title, { color: theme.text }]}>
+            <Text style={[styles.title, { color: theme.colors.text}]}>
               {t(`onboarding.${current.key}.title`, current.key)}
             </Text>
 
             {/* Description */}
-            <Text style={[styles.description, { color: theme.textSecondary }]}>
+            <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
               {t(`onboarding.${current.key}.description`, '')}
             </Text>
           </ScrollView>
@@ -144,9 +144,9 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
             {step > 0 && (
               <TouchableOpacity
                 onPress={handleBack}
-                style={[styles.backButton, { borderColor: theme.border }]}
+                style={[styles.backButton, { borderColor: theme.colors.border }]}
               >
-                <Text style={[styles.backButtonText, { color: theme.text }]}>
+                <Text style={[styles.backButtonText, { color: theme.colors.text}]}>
                   {t('onboarding.back', 'Back')}
                 </Text>
               </TouchableOpacity>
@@ -154,7 +154,7 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
 
             <TouchableOpacity
               onPress={isLast ? handleAction : handleAction}
-              style={[styles.actionButton, { backgroundColor: palette.blue500 }, step === 0 && styles.actionButtonFull]}
+              style={[styles.actionButton, { backgroundColor: palette.blue[500] }, step === 0 && styles.actionButtonFull]}
               testID="onboarding-action"
             >
               <Text style={styles.actionButtonText}>
@@ -173,7 +173,7 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
                 style={[
                   styles.dot,
                   {
-                    backgroundColor: i === step ? palette.blue500 : theme.border,
+                    backgroundColor: i === step ? palette.blue[500] : theme.colors.border,
                     width: i === step ? 20 : 8,
                   },
                 ]}

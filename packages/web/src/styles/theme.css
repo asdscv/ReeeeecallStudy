@@ -33,7 +33,7 @@
     --bg-active: #e5e7eb;
 
     /* Semantic: input fields */
-    --input-bg: #f3f3f5;
+    --input-bg: #FFFFFF;
     --input-border: #d1d5db;
     --input-text: #111827;
     --input-placeholder: #9ca3af;
@@ -49,36 +49,36 @@
   }
 
   .dark {
-    /* Backgrounds */
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
-    --bg-card: #1e293b;
+    /* Backgrounds — synced with shared/design-tokens darkTheme (Gray scale) */
+    --bg-primary: #030712;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1F2937;
+    --bg-card: #1F2937;
     --bg-overlay: rgba(0, 0, 0, 0.7);
 
     /* Borders */
-    --border-primary: #334155;
-    --border-secondary: #475569;
+    --border-primary: #1F2937;
+    --border-secondary: #374151;
 
     /* Text */
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-tertiary: #64748b;
-    --text-inverse: #0f172a;
+    --text-primary: #F9FAFB;
+    --text-secondary: #9CA3AF;
+    --text-tertiary: #6B7280;
+    --text-inverse: #111827;
 
     /* Interactive */
-    --bg-hover: #334155;
-    --bg-active: #475569;
+    --bg-hover: #374151;
+    --bg-active: #4B5563;
 
     /* Semantic: input fields */
-    --input-bg: #1e293b;
-    --input-border: #475569;
-    --input-text: #f1f5f9;
-    --input-placeholder: #64748b;
+    --input-bg: #111827;
+    --input-border: #374151;
+    --input-text: #F9FAFB;
+    --input-placeholder: #6B7280;
 
     /* Semantic: badges / tags */
-    --badge-bg: #334155;
-    --badge-text: #cbd5e1;
+    --badge-bg: #1F2937;
+    --badge-text: #D1D5DB;
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);

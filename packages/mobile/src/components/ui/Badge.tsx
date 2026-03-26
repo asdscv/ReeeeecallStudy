@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { useTheme, type Theme } from '../../theme'
+import { useTheme, palette, type Theme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 
 type BadgeVariant = 'primary' | 'success' | 'warning' | 'error' | 'neutral'
@@ -26,7 +26,7 @@ function getVariantColors(theme: Theme, variant: BadgeVariant) {
   const map: Record<BadgeVariant, { bg: string; text: string }> = {
     primary: { bg: colors.primaryLight, text: colors.primary },
     success: { bg: colors.successLight, text: colors.success },
-    warning: { bg: '#FEF9C3', text: colors.warning },
+    warning: { bg: palette.yellow[100], text: colors.warning },
     error: { bg: colors.errorLight, text: colors.error },
     neutral: { bg: colors.surface, text: colors.textSecondary },
   }

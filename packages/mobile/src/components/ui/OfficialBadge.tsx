@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { useTheme } from '../../theme'
+import { useTheme, palette } from '../../theme'
 import type { BadgeType } from '@reeeeecall/shared/types/database'
 
 interface OfficialBadgeProps {
@@ -10,11 +10,11 @@ interface OfficialBadgeProps {
 }
 
 const BADGE_CONFIG: Record<BadgeType, { label: string; defaultColor: string }> = {
-  verified: { label: 'Verified', defaultColor: '#3B82F6' },
-  official: { label: 'Official', defaultColor: '#7C3AED' },
-  educator: { label: 'Educator', defaultColor: '#059669' },
-  publisher: { label: 'Publisher', defaultColor: '#D97706' },
-  partner: { label: 'Partner', defaultColor: '#DC2626' },
+  verified: { label: 'Verified', defaultColor: palette.blue[500] },
+  official: { label: 'Official', defaultColor: palette.purple[700] },
+  educator: { label: 'Educator', defaultColor: palette.green[600] },
+  publisher: { label: 'Publisher', defaultColor: palette.yellow[600] },
+  partner: { label: 'Partner', defaultColor: palette.red[600] },
 }
 
 export function OfficialBadge({

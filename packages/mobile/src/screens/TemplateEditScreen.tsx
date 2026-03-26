@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet, Switch } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import * as Speech from 'expo-speech'
 import { Screen, TextInput, Button } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
@@ -17,6 +18,21 @@ const STYLE_OPTIONS: { value: LayoutItem['style']; label: string }[] = [
   { value: 'hint', label: 'Hint' },
   { value: 'detail', label: 'Detail' },
   { value: 'media', label: 'Media' },
+]
+
+const TTS_LANGUAGES = [
+  { value: 'ko-KR', label: '한국어' },
+  { value: 'en-US', label: 'English (US)' },
+  { value: 'en-GB', label: 'English (UK)' },
+  { value: 'ja-JP', label: '日本語' },
+  { value: 'zh-CN', label: '中文 (简体)' },
+  { value: 'zh-TW', label: '中文 (繁體)' },
+  { value: 'es-ES', label: 'Español' },
+  { value: 'fr-FR', label: 'Français' },
+  { value: 'de-DE', label: 'Deutsch' },
+  { value: 'pt-BR', label: 'Português' },
+  { value: 'vi-VN', label: 'Tiếng Việt' },
+  { value: 'th-TH', label: 'ไทย' },
 ]
 
 function generateKey(): string {
@@ -110,6 +126,26 @@ export function TemplateEditScreen() {
     )
   }
 
+  // ── TTS management ──
+
+  const toggleTts = (index: number) => {
+    const field = fields[index]
+    updateField(index, {
+      tts_enabled: !field.tts_enabled,
+      tts_lang: field.tts_enabled ? undefined : (field.tts_lang || ''),
+    })
+  }
+
+  const handleTtsTest = (index: number) => {
+    const field = fields[index]
+    if (!field.tts_lang) {
+      Alert.alert('TTS', 'Please select a language first')
+      return
+    }
+    Speech.stop()
+    Speech.speak(field.name || 'Test', { language: field.tts_lang, rate: 0.9, pitch: 1.0 })
+  }
+
   const moveField = (index: number, direction: 'up' | 'down') => {
     const newIndex = direction === 'up' ? index - 1 : index + 1
     if (newIndex < 0 || newIndex >= fields.length) return
@@ -167,11 +203,15 @@ export function TemplateEditScreen() {
     }
 
     setSaving(true)
+    // Clean TTS fields: strip tts_lang from disabled fields
+    const cleanedFields = fields.map((f) =>
+      f.tts_enabled ? f : { ...f, tts_enabled: undefined, tts_lang: undefined }
+    )
     try {
       if (isNew) {
         const created = await createTemplate({
           name: name.trim(),
-          fields,
+          fields: cleanedFields,
           front_layout: frontLayout,
           back_layout: backLayout,
         })
@@ -183,7 +223,7 @@ export function TemplateEditScreen() {
       } else {
         const success = await updateTemplate(templateId!, {
           name: name.trim(),
-          fields,
+          fields: cleanedFields,
           front_layout: frontLayout,
           back_layout: backLayout,
         })
@@ -332,6 +372,58 @@ export function TemplateEditScreen() {
                   )}
                 </View>
               </View>
+
+              {/* TTS Settings */}
+              {field.type === 'text' && (
+                <View style={styles.ttsSection}>
+                  <View style={styles.ttsToggleRow}>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>TTS</Text>
+                    <Switch
+                      testID={`template-field-tts-toggle-${i}`}
+                      value={!!field.tts_enabled}
+                      onValueChange={() => toggleTts(i)}
+                      trackColor={{ false: theme.colors.surface, true: theme.colors.primary }}
+                    />
+                  </View>
+                  {field.tts_enabled && (
+                    <View style={styles.ttsLangRow}>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.ttsLangChips}>
+                        {TTS_LANGUAGES.map((lang) => (
+                          <TouchableOpacity
+                            key={lang.value}
+                            testID={`template-field-tts-lang-${i}-${lang.value}`}
+                            onPress={() => updateField(i, { tts_lang: lang.value })}
+                            style={[
+                              styles.ttsLangChip,
+                              {
+                                backgroundColor: field.tts_lang === lang.value ? theme.colors.primary : theme.colors.surface,
+                                borderColor: field.tts_lang === lang.value ? theme.colors.primary : theme.colors.border,
+                              },
+                            ]}
+                          >
+                            <Text style={[
+                              theme.typography.caption,
+                              {
+                                color: field.tts_lang === lang.value ? theme.colors.primaryText : theme.colors.textSecondary,
+                                fontSize: 11,
+                              },
+                            ]}>
+                              {lang.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                      <TouchableOpacity
+                        testID={`template-field-tts-test-${i}`}
+                        onPress={() => handleTtsTest(i)}
+                        style={[styles.ttsTestBtn, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                      >
+                        <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>▶ Test</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              )}
             </View>
           ))}
 
@@ -370,6 +462,15 @@ export function TemplateEditScreen() {
           onRemove={(key) => removeLayoutField('back', key)}
           onStyleChange={(key, style) => updateLayoutStyle('back', key, style)}
           side="back"
+        />
+
+        {/* ── Card Preview ── */}
+        <CardPreview
+          theme={theme}
+          fields={fields}
+          frontLayout={frontLayout}
+          backLayout={backLayout}
+          getFieldName={getFieldName}
         />
 
         {/* Save button (bottom) */}
@@ -536,6 +637,84 @@ function LayoutSection({
   )
 }
 
+// ── Card Preview ──
+
+const STYLE_FONT: Record<string, { size: number; weight: '400' | '500' | '600' | '700'; color: string }> = {
+  primary: { size: 18, weight: '600', color: '' },
+  secondary: { size: 15, weight: '400', color: '' },
+  hint: { size: 13, weight: '400', color: '' },
+  detail: { size: 12, weight: '400', color: '' },
+  media: { size: 13, weight: '500', color: '' },
+}
+
+function CardPreview({
+  theme,
+  fields,
+  frontLayout,
+  backLayout,
+  getFieldName,
+}: {
+  theme: ReturnType<typeof useTheme>
+  fields: TemplateField[]
+  frontLayout: LayoutItem[]
+  backLayout: LayoutItem[]
+  getFieldName: (key: string) => string
+}) {
+  const [showBack, setShowBack] = useState(false)
+  const layout = showBack ? backLayout : frontLayout
+
+  return (
+    <View style={[styles.sectionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Card Preview</Text>
+        <TouchableOpacity onPress={() => setShowBack(!showBack)}>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+            {showBack ? 'Show Front' : 'Show Back'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[previewStyles.card, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+        {layout.length === 0 ? (
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
+            No fields in {showBack ? 'back' : 'front'} layout
+          </Text>
+        ) : (
+          layout.map((item) => {
+            const fieldName = getFieldName(item.field_key)
+            const s = STYLE_FONT[item.style ?? 'primary']
+            const isHint = item.style === 'hint' || item.style === 'detail'
+            return (
+              <Text
+                key={item.field_key}
+                style={{
+                  fontSize: s.size,
+                  fontWeight: s.weight,
+                  color: isHint ? theme.colors.textTertiary : theme.colors.text,
+                  textAlign: item.style === 'primary' ? 'center' : 'left',
+                }}
+              >
+                {fieldName}
+              </Text>
+            )
+          })
+        )}
+      </View>
+    </View>
+  )
+}
+
+const previewStyles = StyleSheet.create({
+  card: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 20,
+    minHeight: 100,
+    justifyContent: 'center',
+    gap: 8,
+  },
+})
+
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 16, paddingBottom: 24, gap: 16, paddingTop: 8 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between' },
@@ -577,4 +756,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
   },
+  // TTS
+  ttsSection: { gap: 8, paddingTop: 4, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB' },
+  ttsToggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  ttsLangRow: { gap: 8 },
+  ttsLangChips: { gap: 4, paddingVertical: 2 },
+  ttsLangChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, borderWidth: 1 },
+  ttsTestBtn: { alignSelf: 'flex-start', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
 })

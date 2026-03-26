@@ -6,7 +6,7 @@ import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { useReviewsStore } from '@reeeeecall/shared/stores/reviews-store'
 import { useTranslation } from 'react-i18next'
-import { useTheme } from '../theme'
+import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import type { MarketplaceStackParamList } from '../navigation/types'
 import type { MarketplaceReview, ReviewSortBy } from '@reeeeecall/shared/types/database'
@@ -42,7 +42,7 @@ function StarSelector({ rating, onChange }: { rating: number; onChange: (r: numb
     <View style={{ flexDirection: 'row', gap: 8 }}>
       {[1, 2, 3, 4, 5].map((star) => (
         <TouchableOpacity key={star} onPress={() => onChange(star)}>
-          <Text style={{ fontSize: 28, color: star <= rating ? '#FBBF24' : '#D1D5DB' }}>
+          <Text style={{ fontSize: 28, color: star <= rating ? palette.yellow[500] : palette.gray[300] }}>
             {'\u2605'}
           </Text>
         </TouchableOpacity>
@@ -71,7 +71,7 @@ function ReviewItem({
         <Text style={[theme.typography.label, { color: theme.colors.text }]}>
           {review.user_display_name || 'Anonymous'}
         </Text>
-        <Text style={{ color: '#FBBF24', fontSize: 14 }}>
+        <Text style={{ color: palette.yellow[500], fontSize: 14 }}>
           {renderStars(review.rating)}
         </Text>
         {review.is_edited && (
@@ -394,7 +394,7 @@ export function MarketplaceDetailScreen() {
                     {listing.share_mode && <Badge label={listing.share_mode} variant="success" />}
                   </View>
                   {(listing as any).review_count > 0 && (
-                    <Text style={[theme.typography.bodySmall, { color: '#FBBF24' }]}>
+                    <Text style={[theme.typography.bodySmall, { color: palette.yellow[500] }]}>
                       {renderStars((listing as any).avg_rating ?? 0)} {((listing as any).avg_rating ?? 0).toFixed(1)} ({(listing as any).review_count} reviews)
                     </Text>
                   )}
@@ -458,7 +458,7 @@ export function MarketplaceDetailScreen() {
                     <Text style={[{ fontSize: 36, fontWeight: '700', color: theme.colors.text }]}>
                       {stats.avg_rating.toFixed(1)}
                     </Text>
-                    <Text style={{ color: '#FBBF24', fontSize: 18 }}>{renderStars(stats.avg_rating)}</Text>
+                    <Text style={{ color: palette.yellow[500], fontSize: 18 }}>{renderStars(stats.avg_rating)}</Text>
                     <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                       {stats.review_count} review{stats.review_count !== 1 ? 's' : ''}
                     </Text>
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
 
 const reportStyles = StyleSheet.create({
   modalContainer: { flex: 1 },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: palette.gray[200] },
   modalBody: { padding: 20 },
   categoryOption: {
     flexDirection: 'row',
@@ -720,14 +720,14 @@ const reviewStyles = StyleSheet.create({
   summaryRight: { flex: 1, gap: 4, justifyContent: 'center' },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   barTrack: { flex: 1, height: 6, borderRadius: 3, overflow: 'hidden' },
-  barFill: { height: '100%', backgroundColor: '#FBBF24', borderRadius: 3 },
+  barFill: { height: '100%', backgroundColor: palette.yellow[500], borderRadius: 3 },
   sortRow: { flexDirection: 'row', gap: 8, marginVertical: 8 },
   sortChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
-  card: { paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  card: { paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: palette.gray[200] },
   reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   helpfulButton: { marginTop: 8, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, borderWidth: 1, alignSelf: 'flex-start' },
   modalContainer: { flex: 1 },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: palette.gray[200] },
   modalBody: { padding: 20 },
   input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
   textArea: { minHeight: 100 },

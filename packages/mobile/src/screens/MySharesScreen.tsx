@@ -11,6 +11,7 @@ import {
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import { Screen, DrawerHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
+import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import type { MainTabParamList } from '../navigation/types'
 
@@ -44,10 +45,10 @@ interface ShareGroup {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: 'Pending', bg: '#FFFBEB', text: '#B45309' },
-  active: { label: 'Active', bg: '#F0FDF4', text: '#15803D' },
-  revoked: { label: 'Revoked', bg: '#FEF2F2', text: '#DC2626' },
-  declined: { label: 'Declined', bg: '#F3F4F6', text: '#6B7280' },
+  pending: { label: 'Pending', bg: statusColors.pending.bg, text: statusColors.pending.text },
+  active: { label: 'Active', bg: statusColors.active.bg, text: statusColors.active.text },
+  revoked: { label: 'Revoked', bg: statusColors.revoked.bg, text: statusColors.revoked.text },
+  declined: { label: 'Declined', bg: statusColors.declined.bg, text: statusColors.declined.text },
 }
 
 const MODE_LABELS: Record<string, string> = {

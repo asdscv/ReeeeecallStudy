@@ -407,40 +407,73 @@ export function DeckDetailScreen() {
       {/* Action buttons — matches web: Study, Edit, Share, Add Card, AI Cards, Import, Export */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.actionScroll}>
         <View style={styles.actionRow}>
-          <Button title={t('detail.startStudy')} onPress={() => {
-            const tabNav = navigation.getParent()
-            if (tabNav) {
-              tabNav.navigate('StudyTab', { screen: 'StudySetup', params: { deckId } })
-            }
-          }} size="sm" fullWidth={false} testID="deck-detail-study" />
-          <Button title={t('detail.edit')} variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('DeckEdit', { deckId })} testID="deck-detail-edit" />
-          <Button title={t('detail.share')} variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('ShareDeck', { deckId })} testID="deck-detail-share" />
-          <Button title="Publish" variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('PublishDeck', { deckId })} testID="deck-detail-publish" />
-          <Button title={t('detail.addCard')} variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('CardEdit', { deckId })} testID="deck-detail-add-card" />
-          <Button title={t('detail.aiCards')} variant="outline" size="sm" fullWidth={false}
+          <TouchableOpacity
+            style={[styles.actionPill, styles.actionPillPrimary]}
+            onPress={() => {
+              const tabNav = navigation.getParent()
+              if (tabNav) {
+                tabNav.navigate('StudyTab', { screen: 'StudySetup', params: { deckId } })
+              }
+            }}
+            testID="deck-detail-study"
+          >
+            <Text style={[theme.typography.caption, styles.actionPillPrimaryText]}>{t('detail.startStudy')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionPill, { borderColor: theme.colors.border }]}
+            onPress={() => navigation.navigate('DeckEdit', { deckId })}
+            testID="deck-detail-edit"
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.edit')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionPill, { borderColor: theme.colors.border }]}
+            onPress={() => navigation.navigate('ShareDeck', { deckId })}
+            testID="deck-detail-share"
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.share')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionPill, { borderColor: theme.colors.border }]}
+            onPress={() => navigation.navigate('CardEdit', { deckId })}
+            testID="deck-detail-add-card"
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.addCard')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionPill, { borderColor: theme.colors.border }]}
             onPress={() => {
               const tabNav = navigation.getParent()
               if (tabNav) {
                 tabNav.navigate('SettingsTab', { screen: 'AIGenerate' })
               }
-            }} testID="deck-detail-ai-cards" />
-          <Button title={t('detail.import')} variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-detail-import" />
-          <Button title={t('detail.export')} variant="outline" size="sm" fullWidth={false}
-            onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-detail-export" />
+            }}
+            testID="deck-detail-ai-cards"
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.aiCards')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionPill, { borderColor: theme.colors.border }]}
+            onPress={() => navigation.navigate('ImportExport', { deckId })}
+            testID="deck-detail-import"
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.import')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionPill, { borderColor: theme.colors.border }]}
+            onPress={() => navigation.navigate('ImportExport', { deckId })}
+            testID="deck-detail-export"
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.export')}</Text>
+          </TouchableOpacity>
           {!selectionMode && filteredCards.length > 0 && (
-            <Button
-              title="Select"
-              variant="outline"
-              size="sm"
-              fullWidth={false}
+            <TouchableOpacity
+              style={[styles.actionPill, { borderColor: theme.colors.border }]}
               onPress={() => setSelectionMode(true)}
               testID="bulk-select-toggle"
-            />
+            >
+              <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Select</Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>
@@ -644,7 +677,23 @@ const styles = StyleSheet.create({
   titleIcon: { fontSize: 24 },
   badgeRow: { flexDirection: 'row', gap: 12 },
   actionScroll: { flexGrow: 0 },
-  actionRow: { flexDirection: 'row', gap: 8 },
+  actionRow: { flexDirection: 'row', gap: 0 },
+  actionPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  actionPillPrimary: {
+    backgroundColor: palette.blue[600],
+    borderColor: palette.blue[600],
+  },
+  actionPillPrimaryText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
   tabBar: { flexDirection: 'row', borderBottomWidth: 1 },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 10 },
   filterRow: { flexDirection: 'row', gap: 8 },

@@ -4,5 +4,229 @@
   "searchPlaceholder": "Search features (e.g., SRS, Import, Share...)",
   "tableOfContents": "Table of Contents",
   "noResults": "No results for \"{{query}}\"",
-  "back": "Back"
+  "back": "Back",
+  "sections": {
+    "gettingStarted": {
+      "title": "Getting Started",
+      "icon": "🚀",
+      "items": {
+        "login": {
+          "title": "Login",
+          "body": "Log in with your email and password. When you sign up, a verification email is sent — click the link to complete registration."
+        },
+        "dashboard": {
+          "title": "Home (Dashboard)",
+          "body": "After login, the dashboard appears. See total cards, today's review cards, study streak, and mastery rate at a glance."
+        },
+        "navigation": {
+          "title": "Navigation",
+          "body": "Use the bottom tab bar to navigate between Home, Decks, Study, Marketplace, and Settings."
+        }
+      }
+    },
+    "decks": {
+      "title": "Deck Management",
+      "icon": "📚",
+      "items": {
+        "create": {
+          "title": "Create a Deck",
+          "body": "On the Decks page, press the + button. Set the name, description, icon, and color."
+        },
+        "detail": {
+          "title": "Deck Detail View",
+          "body": "Click a deck to see its card list. Use the top buttons to add cards, import, export, share, or edit the deck."
+        },
+        "edit": {
+          "title": "Edit Deck",
+          "body": "Change the name, description, icon, color, and default template on the deck edit page."
+        },
+        "delete": {
+          "title": "Delete Deck",
+          "body": "Press the delete button on the deck detail page. Deleting a deck also removes all its cards."
+        }
+      }
+    },
+    "cards": {
+      "title": "Card Management",
+      "icon": "🃏",
+      "items": {
+        "add": {
+          "title": "Add Cards",
+          "body": "Press the + button on the deck detail page. Fill in the fields defined in the template."
+        },
+        "editDelete": {
+          "title": "Edit & Delete Cards",
+          "body": "Tap a card in the list to edit. Modify field content and tags."
+        },
+        "searchFilter": {
+          "title": "Search & Filter",
+          "body": "Use the search bar to search across all fields. Select a status filter (new, learning, review) to view specific cards."
+        }
+      }
+    },
+    "study": {
+      "title": "Study",
+      "icon": "📖",
+      "items": {
+        "modes": {
+          "title": "Study Modes",
+          "body": "SRS: Spaced repetition with 4 buttons (Again/Hard/Good/Easy).\nSequential Review: In order, mixing new + review cards.\nRandom: Randomly drawn cards.\nSequential: Cards in order.\nBy Date: Cards by upload date.\n\nSequential Review, Random, Sequential, By Date use 2 buttons (Unknown/Known).\n\nCramming: Intensive round-based review with 2 buttons (Missed/Got It). Does not affect SRS schedule."
+        },
+        "science": {
+          "title": "The Science Behind SRS",
+          "body": "SRS is based on the forgetting curve. By reviewing just before you forget, information moves to long-term memory. Cards you know well appear less often; cards you struggle with appear more frequently."
+        },
+        "srsMethod": {
+          "title": "SRS Study Method",
+          "body": "Again (Red): \"I didn't remember\" — card reappears soon.\nHard (Orange): \"Barely recalled\" — shorter interval.\nGood (Blue): \"Remembered well\" — normal interval.\nEasy (Green): \"Instant recall\" — longer interval.\n\nTip: When in doubt, press Good."
+        },
+        "sessionFlow": {
+          "title": "Study Session Flow",
+          "body": "1. Select deck → Set study mode → Start\n2. See card front → Tap to flip → Choose rating\n3. After all cards, a summary shows study count, time, and rating distribution."
+        },
+        "swipeMode": {
+          "title": "Swipe Mode",
+          "body": "Switch to Swipe mode in Settings to rate by swiping.\nSRS: ← Again / → Good\nOther modes: ← Unknown / → Known\nCramming: ← Missed / → Got It"
+        },
+        "cramming": {
+          "title": "Cramming Mode",
+          "body": "All cards are presented. Missed cards reappear until mastered. Use card filters (All/Weak/Due Soon) and time limits. Does NOT affect SRS schedule."
+        }
+      }
+    },
+    "importExport": {
+      "title": "Import & Export",
+      "icon": "📦",
+      "items": {
+        "jsonImport": {
+          "title": "JSON Import",
+          "body": "On deck detail, tap Import → select a JSON file. Ideal for backup and restore."
+        },
+        "csvImport": {
+          "title": "CSV Import",
+          "body": "CSV files from Excel can be imported. Column mapping matches fields automatically."
+        },
+        "jsonExport": {
+          "title": "JSON Export",
+          "body": "Deck detail → Export → JSON downloads the full deck as one file."
+        },
+        "csvExport": {
+          "title": "CSV Export",
+          "body": "CSV format opens directly in Excel/Google Sheets."
+        }
+      }
+    },
+    "sharing": {
+      "title": "Deck Sharing",
+      "icon": "🔗",
+      "items": {
+        "copy": {
+          "title": "Copy Mode",
+          "body": "Gives an independent, editable copy. Original and copy don't affect each other."
+        },
+        "subscribe": {
+          "title": "Subscribe Mode",
+          "body": "Recipients get auto-updates when you add cards. Study progress is independent."
+        },
+        "snapshot": {
+          "title": "Snapshot Mode",
+          "body": "Creates a read-only copy at the current point in time."
+        }
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace",
+      "icon": "🏪",
+      "items": {
+        "what": {
+          "title": "What is the Marketplace?",
+          "body": "Search and get decks shared by other users. Filter by category and tags."
+        },
+        "getting": {
+          "title": "Getting a Deck",
+          "body": "Click a deck to preview cards, then press \"Get\" to add it to your decks."
+        },
+        "publishing": {
+          "title": "Publishing Your Deck",
+          "body": "Deck detail → Publish → Set title, description, category, and share mode."
+        }
+      }
+    },
+    "history": {
+      "title": "Study History & Statistics",
+      "icon": "📊",
+      "items": {
+        "viewing": {
+          "title": "Viewing Study History",
+          "body": "View all study sessions by date on the History page. Filter by deck or mode."
+        },
+        "dashboardStats": {
+          "title": "Dashboard Statistics",
+          "body": "Switch period tabs on the dashboard to view heatmap, daily study chart, and forecast."
+        }
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "icon": "⚙️",
+      "items": {
+        "profile": {
+          "title": "Profile",
+          "body": "Set your display name. Email cannot be changed."
+        },
+        "srsLimit": {
+          "title": "SRS New Card Limit",
+          "body": "Set the maximum number of new cards per SRS session."
+        },
+        "answerMode": {
+          "title": "Answer Mode",
+          "body": "Button mode: Tap rating buttons. Swipe mode: Swipe cards to rate."
+        },
+        "autoTts": {
+          "title": "Auto TTS",
+          "body": "Auto-reads TTS-enabled fields when flipping cards. Adjust speed with the slider (0.5x - 2.0x)."
+        }
+      }
+    },
+    "aiGenerate": {
+      "title": "AI Auto-Generate",
+      "icon": "🤖",
+      "items": {
+        "what": {
+          "title": "What is AI Auto-Generate?",
+          "body": "Create flashcards automatically using AI. Enter a topic and AI generates everything for you."
+        },
+        "apiKey": {
+          "title": "Setting Up API Key",
+          "body": "Get an API key from OpenAI or xAI. Enter it in AI Generate settings. Keys are stored locally."
+        },
+        "fullGeneration": {
+          "title": "Full Generation",
+          "body": "Go to AI Generate → Enter topic → Set card count → Start. AI creates template, deck, and cards."
+        }
+      }
+    },
+    "tips": {
+      "title": "Study Tips",
+      "icon": "💡",
+      "items": {
+        "daily": {
+          "title": "Study a Little Every Day",
+          "body": "SRS is most effective with daily consistency. 10-20 minutes a day is enough."
+        },
+        "again": {
+          "title": "Don't Be Afraid of Again",
+          "body": "Honestly marking cards you don't remember as 'Again' helps the system. Forcing 'Good' reduces effectiveness."
+        },
+        "concise": {
+          "title": "Keep Cards Concise",
+          "body": "Put just one concept per card. Short, clear cards are far more effective."
+        },
+        "tags": {
+          "title": "Use Tags",
+          "body": "Add tags for quick filtering. Examples: 'grammar', 'verbs', 'Chapter1'."
+        }
+      }
+    }
+  }
 }

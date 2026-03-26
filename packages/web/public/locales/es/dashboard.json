@@ -28,6 +28,10 @@
     "reviewCards": "Repaso {{count}}",
     "study": "Estudiar"
   },
+  "quickStudy": {
+    "dueCount": "{{count}} tarjetas para hoy",
+    "startSession": "Iniciar sesión de estudio"
+  },
   "heatmap": {
     "title": "Mapa de calor de estudio",
     "noStudy": "Sin estudio",
