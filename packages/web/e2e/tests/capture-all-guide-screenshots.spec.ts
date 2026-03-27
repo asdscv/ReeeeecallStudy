@@ -2,22 +2,56 @@
  * Capture screenshots for ALL guide sections (PC + Mobile).
  * Run: npx playwright test capture-all-guide-screenshots --project=chromium
  */
-import { test } from '@playwright/test'
+import { test, type Page } from '@playwright/test'
 
 const IMG = 'public/images/guide'
+
+/** Fresh login — avoids stale storageState causing AuthGuard screenshots */
+async function freshLogin(page: Page) {
+  const email = process.env.E2E_TEST_EMAIL
+  const password = process.env.E2E_TEST_PASSWORD
+  if (!email || !password) {
+    throw new Error('Missing E2E_TEST_EMAIL / E2E_TEST_PASSWORD')
+  }
+  await page.goto('/auth/login')
+  await page.fill('input[type="email"]', email)
+  await page.fill('input[type="password"]', password)
+  await page.getByRole('button', { name: /Log In|로그인|login/i }).click()
+  await page.waitForURL(
+    (url) => {
+      const path = new URL(url).pathname
+      return !path.includes('/auth') && !path.includes('/landing')
+    },
+    { timeout: 15_000 },
+  )
+  // Dismiss onboarding modal if it appears
+  const dismissBtn = page.locator('button').filter({ hasText: /Skip|건너뛰기|Close|닫기|Got it|확인/i }).first()
+  await dismissBtn.click({ timeout: 3000 }).catch(() => {})
+  await page.waitForTimeout(500)
+}
+
+/** Dismiss session-kicked overlay if visible */
+async function dismissSessionKick(page: Page) {
+  const kickBtn = page.locator('button').filter({ hasText: /Continue on This Device|이 기기에서 계속/i }).first()
+  if (await kickBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
+    await kickBtn.click()
+    await page.waitForTimeout(1000)
+  }
+}
 
 async function pcAndMobile(
   browser: any,
   name: string,
-  fn: (page: any) => Promise<void>,
+  fn: (page: Page) => Promise<void>,
 ) {
   // PC
   const pcCtx = await browser.newContext({
     viewport: { width: 1280, height: 800 },
-    storageState: 'playwright/.auth/user.json',
   })
   const pcPage = await pcCtx.newPage()
+  await freshLogin(pcPage)
   await fn(pcPage)
+  await dismissSessionKick(pcPage)
   await pcPage.waitForTimeout(1000)
   await pcPage.screenshot({ path: `${IMG}/${name}-pc.png` })
   await pcCtx.close()
@@ -25,11 +59,12 @@ async function pcAndMobile(
   // Mobile
   const mCtx = await browser.newContext({
     viewport: { width: 390, height: 844 },
-    storageState: 'playwright/.auth/user.json',
     isMobile: true,
   })
   const mPage = await mCtx.newPage()
+  await freshLogin(mPage)
   await fn(mPage)
+  await dismissSessionKick(mPage)
   await mPage.waitForTimeout(1000)
   await mPage.screenshot({ path: `${IMG}/${name}-mobile.png` })
   await mCtx.close()
@@ -69,9 +104,11 @@ test.describe('Capture All Guide Screenshots', () => {
     await pcAndMobile(browser, 'decks/detail', async (page) => {
       await page.goto('/decks')
       await page.waitForTimeout(2000)
-      const firstDeck = page.locator('a[href*="/decks/"]').first()
+      // Deck cards are <div cursor-pointer onClick> not <a>, click deck title
+      const firstDeck = page.locator('h3').first()
       if (await firstDeck.isVisible()) {
         await firstDeck.click()
+        await page.waitForURL(/\/decks\//, { timeout: 10_000 }).catch(() => {})
         await page.waitForTimeout(2000)
       }
     })
@@ -82,9 +119,10 @@ test.describe('Capture All Guide Screenshots', () => {
     await pcAndMobile(browser, 'cards/table', async (page) => {
       await page.goto('/decks')
       await page.waitForTimeout(1500)
-      const firstDeck = page.locator('a[href*="/decks/"]').first()
+      const firstDeck = page.locator('h3').first()
       if (await firstDeck.isVisible()) {
         await firstDeck.click()
+        await page.waitForURL(/\/decks\//, { timeout: 10_000 }).catch(() => {})
         await page.waitForTimeout(2000)
       }
     })
@@ -120,13 +158,20 @@ test.describe('Capture All Guide Screenshots', () => {
 
   test('study: setup', async ({ browser }) => {
     await pcAndMobile(browser, 'study/setup', async (page) => {
+      // Go to decks, get the first deck's ID from the URL, then navigate to study setup
       await page.goto('/decks')
       await page.waitForTimeout(1500)
-      // Click "Study" on first deck
-      const studyBtn = page.locator('a, button').filter({ hasText: /Study|학습/i }).first()
-      if (await studyBtn.isVisible()) {
-        await studyBtn.click()
-        await page.waitForTimeout(2000)
+      const firstDeck = page.locator('h3').first()
+      if (await firstDeck.isVisible()) {
+        await firstDeck.click()
+        await page.waitForURL(/\/decks\//, { timeout: 10_000 }).catch(() => {})
+        // Extract deck ID from URL and navigate to study setup directly
+        const url = page.url()
+        const deckId = url.match(/\/decks\/([^/]+)/)?.[1]
+        if (deckId) {
+          await page.goto(`/decks/${deckId}/study/setup`)
+          await page.waitForTimeout(2000)
+        }
       }
     })
   })
@@ -136,9 +181,10 @@ test.describe('Capture All Guide Screenshots', () => {
     await pcAndMobile(browser, 'import-export/buttons', async (page) => {
       await page.goto('/decks')
       await page.waitForTimeout(1500)
-      const firstDeck = page.locator('a[href*="/decks/"]').first()
+      const firstDeck = page.locator('h3').first()
       if (await firstDeck.isVisible()) {
         await firstDeck.click()
+        await page.waitForURL(/\/decks\//, { timeout: 10_000 }).catch(() => {})
         await page.waitForTimeout(2000)
       }
     })
@@ -149,9 +195,10 @@ test.describe('Capture All Guide Screenshots', () => {
     await pcAndMobile(browser, 'sharing/share-page', async (page) => {
       await page.goto('/decks')
       await page.waitForTimeout(1500)
-      const firstDeck = page.locator('a[href*="/decks/"]').first()
+      const firstDeck = page.locator('h3').first()
       if (await firstDeck.isVisible()) {
         await firstDeck.click()
+        await page.waitForURL(/\/decks\//, { timeout: 10_000 }).catch(() => {})
         await page.waitForTimeout(1500)
         const shareBtn = page.locator('a, button').filter({ hasText: /Share|공유/i }).first()
         if (await shareBtn.isVisible()) {
