@@ -8,7 +8,7 @@ import { handleContentListBot } from './worker-modules/seo/handlers/content-list
 import { handleLandingBotRequest } from './worker-modules/seo/handlers/landing.js'
 import { handleListingBotRequest } from './worker-modules/seo/handlers/listing.js'
 import { handleBotNotFound } from './worker-modules/seo/handlers/not-found.js'
-import { handleSitemap } from './worker-modules/seo/sitemap.js'
+import { handleSitemap, handleSitemapStatic, handleSitemapArticles, handleSitemapListings } from './worker-modules/seo/sitemap.js'
 import { handleRobots } from './worker-modules/seo/robots.js'
 import { handleRSSFeed } from './worker-modules/seo/feeds.js'
 import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
@@ -51,25 +51,23 @@ export default {
       return env.ASSETS.fetch(request)
     }
 
-    // Dynamic sitemap with edge caching (avoids Supabase latency on every request)
-    if (url.pathname === '/sitemap.xml') {
-      const cacheKey = new Request(new URL('/sitemap.xml', request.url))
+    // Sitemaps — index + sub-sitemaps with edge caching
+    const sitemapHandlers = {
+      '/sitemap.xml': () => handleSitemap(),
+      '/sitemap-static.xml': () => handleSitemapStatic(),
+      '/sitemap-articles.xml': () => handleSitemapArticles(env),
+      '/sitemap-listings.xml': () => handleSitemapListings(env),
+    }
+    const sitemapHandler = sitemapHandlers[url.pathname]
+    if (sitemapHandler) {
       const cache = caches.default
-      let cached = await cache.match(cacheKey)
+      const cacheKey = new Request(new URL(url.pathname, request.url))
+      const cached = await cache.match(cacheKey)
       if (cached) return cached
-      const fresh = await handleSitemap(env)
+      const fresh = await sitemapHandler()
       if (fresh.ok) {
-        const resp = new Response(fresh.body, {
-          headers: {
-            'Content-Type': 'application/xml; charset=utf-8',
-            'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-          },
-        })
-        // Cache at edge for 1 hour
-        const toCache = resp.clone()
-        toCache.headers.set('Cache-Control', 'public, max-age=3600')
+        const toCache = fresh.clone()
         cache.put(cacheKey, toCache)
-        return resp
       }
       return fresh
     }
