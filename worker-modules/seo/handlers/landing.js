@@ -29,7 +29,8 @@ export async function handleLandingBotRequest(url) {
   const faqItems = LANDING_FAQ[lang] || LANDING_FAQ.en
   const faqJsonLd = buildFAQJsonLd(faqItems)
   const howToSteps = LANDING_HOWTO[lang] || LANDING_HOWTO.en
-  const howToJsonLd = buildHowToJsonLd(howToSteps, lang)
+  const howToName = lang === 'ko' ? 'ReeeeecallStudy 시작하기' : 'Get Started with ReeeeecallStudy'
+  const howToJsonLd = buildHowToJsonLd(howToName, howToSteps, 'PT5M')
   const courseJsonLd = buildCourseJsonLd(lang)
   const profilePageJsonLd = buildProfilePageJsonLd(pageDesc, lang)
 
