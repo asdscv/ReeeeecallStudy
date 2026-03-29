@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Platform } from 'react-native'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -41,10 +41,15 @@ export function DashboardScreen() {
     }).catch(() => {})
   }, [])
 
-  // Show level-up celebration when gamification data loads
+  // Show level-up celebration only when level actually increases
+  const prevLevelRef = useRef(0)
   useEffect(() => {
-    if (levelInfo && levelInfo.level > 1) {
-      setShowLevelUp(true)
+    if (levelInfo && levelInfo.level > 0) {
+      const prevLevel = prevLevelRef.current
+      prevLevelRef.current = levelInfo.level
+      if (prevLevel > 0 && levelInfo.level > prevLevel) {
+        setShowLevelUp(true)
+      }
     }
   }, [levelInfo?.level])
 

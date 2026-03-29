@@ -4,6 +4,7 @@ export type KeyAction =
   | { type: 'flip' }
   | { type: 'rate'; rating: string }
   | { type: 'exit' }
+  | { type: 'undo' }
   | null
 
 /**
@@ -14,8 +15,12 @@ export function resolveKeyAction(
   key: string,
   isFlipped: boolean,
   mode: StudyMode,
+  options?: { ctrlKey?: boolean },
 ): KeyAction {
   if (key === 'Escape') return { type: 'exit' }
+
+  // Ctrl+Z / Cmd+Z → undo
+  if (options?.ctrlKey && key === 'z') return { type: 'undo' }
 
   if (!isFlipped) {
     if (key === ' ' || key === 'Enter') return { type: 'flip' }

@@ -6,15 +6,15 @@ import { useAchievementStore } from '../../stores/achievement-store'
 import { AchievementIcon } from '../../lib/achievement-icons'
 
 function xpForLevel(level: number): number {
-  return level * 100
+  return (level - 1) * 150
 }
 
 function xpInCurrentLevel(xp: number, level: number): number {
-  let remaining = xp
-  for (let i = 1; i < level; i++) {
-    remaining -= xpForLevel(i)
-  }
-  return remaining
+  return xp - xpForLevel(level)
+}
+
+function xpToNextLevel(_level: number): number {
+  return 150
 }
 
 export function AchievementsSummary() {
@@ -28,8 +28,8 @@ export function AchievementsSummary() {
   if (loading) return null
 
   const currentLevelXp = xpInCurrentLevel(xp, level)
-  const nextLevelXp = xpForLevel(level)
-  const progressPct = Math.min((currentLevelXp / nextLevelXp) * 100, 100)
+  const nextLevelXp = xpToNextLevel(level)
+  const progressPct = nextLevelXp > 0 ? Math.min((currentLevelXp / nextLevelXp) * 100, 100) : 100
 
   const recentEarned = achievements
     .filter(a => a.earned)

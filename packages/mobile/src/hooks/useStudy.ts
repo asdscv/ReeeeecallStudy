@@ -1,6 +1,7 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
+import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
 import * as Haptics from 'expo-haptics'
 
 /**
@@ -15,6 +16,9 @@ export function useStudy() {
     batchSize = 20,
     uploadDateStart?: string,
     uploadDateEnd?: string,
+    crammingFilter?: CrammingFilter,
+    crammingTimeLimitMinutes?: number | null,
+    crammingShuffle?: boolean,
   ) => {
     await store.initSession({
       deckId,
@@ -22,6 +26,9 @@ export function useStudy() {
       batchSize,
       uploadDateStart,
       uploadDateEnd,
+      crammingFilter,
+      crammingTimeLimitMinutes,
+      crammingShuffle,
     })
   }, [store])
 
@@ -48,7 +55,13 @@ export function useStudy() {
     store.reset()
   }, [store])
 
-  const currentCard = store.queue[store.currentIndex] ?? null
+  const currentCard = useMemo(() => {
+    if (store.config?.mode === 'cramming' && store.crammingManager) {
+      const cardId = store.crammingManager.currentCardId()
+      return cardId ? store.queue.find(c => c.id === cardId) ?? null : null
+    }
+    return store.queue[store.currentIndex] ?? null
+  }, [store.config, store.crammingManager, store.queue, store.currentIndex])
   const progress = store.queue.length > 0
     ? Math.round((store.sessionStats.cardsStudied / store.sessionStats.totalCards) * 100)
     : 0

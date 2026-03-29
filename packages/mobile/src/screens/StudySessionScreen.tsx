@@ -239,12 +239,16 @@ export function StudySessionScreen() {
     .onEnd((e) => {
       const { translationX: tx, velocityX: vx } = e
 
+      // Mode-aware swipe ratings: cramming → missed/got_it, srs → again/good, other → unknown/known
+      const leftRating = config?.mode === 'cramming' ? 'missed' : config?.mode === 'srs' ? 'again' : 'unknown'
+      const rightRating = config?.mode === 'cramming' ? 'got_it' : config?.mode === 'srs' ? 'good' : 'known'
+
       if (tx < -SWIPE_THRESHOLD || vx < -VELOCITY_THRESHOLD) {
         translateX.value = withTiming(-SCREEN_WIDTH)
-        runOnJS(handleRate)('again')
+        runOnJS(handleRate)(leftRating)
       } else if (tx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD) {
         translateX.value = withTiming(SCREEN_WIDTH)
-        runOnJS(handleRate)('good')
+        runOnJS(handleRate)(rightRating)
       } else {
         translateX.value = withSpring(0)
         cardScale.value = withSpring(1)

@@ -53,26 +53,21 @@ export interface NextGoal {
 
 // ── Level computation (matches web achievement-store.ts exactly) ──
 
-export function xpForLevel(level: number): number {
-  return level * 100
+export function computeLevel(xp: number): number {
+  return Math.floor(xp / 150) + 1
 }
 
-export function computeLevel(xp: number): number {
-  let level = 1
-  let remaining = xp
-  while (remaining >= xpForLevel(level)) {
-    remaining -= xpForLevel(level)
-    level++
-  }
-  return level
+export function xpForLevel(level: number): number {
+  // Total XP needed to reach this level (Duolingo-style flat 150 XP per level)
+  return (level - 1) * 150
 }
 
 export function xpInCurrentLevel(totalXp: number, level: number): number {
-  let cumulative = 0
-  for (let i = 1; i < level; i++) {
-    cumulative += xpForLevel(i)
-  }
-  return totalXp - cumulative
+  return totalXp - xpForLevel(level)
+}
+
+export function xpToNextLevel(_level: number): number {
+  return 150
 }
 
 // ── RPC helper (Promise.resolve pattern for RN compatibility) ──

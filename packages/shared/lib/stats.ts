@@ -92,7 +92,8 @@ export function getDailyStudyCounts(
 
 /**
  * Streak: count consecutive days of study up to today.
- * Returns 0 if no study today.
+ * Grace period: if no study today but yesterday was a study day,
+ * return yesterday's streak (streak only breaks after a full day of no study).
  */
 export function getStreakDays(logs: { studied_at: string }[]): number {
   if (logs.length === 0) return 0
@@ -106,11 +107,17 @@ export function getStreakDays(logs: { studied_at: string }[]): number {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // Check today first
-  if (!dates.has(dateToLocalKey(today))) return 0
+  const hasStudiedToday = dates.has(dateToLocalKey(today))
+
+  // Start counting from today if studied today, otherwise from yesterday (grace period)
+  const d = new Date(today)
+  if (!hasStudiedToday) {
+    d.setDate(d.getDate() - 1)
+    // If yesterday also has no study, streak is 0
+    if (!dates.has(dateToLocalKey(d))) return 0
+  }
 
   let streak = 0
-  const d = new Date(today)
   while (dates.has(dateToLocalKey(d))) {
     streak++
     d.setDate(d.getDate() - 1)

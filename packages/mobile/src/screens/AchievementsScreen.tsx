@@ -5,8 +5,8 @@ import { Screen, DrawerHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
 import {
-  xpForLevel,
   xpInCurrentLevel,
+  xpToNextLevel,
   computeLevel,
 } from '../stores/gamification-store'
 import type { Achievement, NextGoal } from '../stores/gamification-store'
@@ -42,8 +42,8 @@ export function AchievementsScreen() {
   const xp = levelInfo?.total_xp ?? 0
   const level = computeLevel(xp)
   const currentLevelXp = xpInCurrentLevel(xp, level)
-  const nextLevelXp = xpForLevel(level)
-  const progressPct = Math.min((currentLevelXp / nextLevelXp) * 100, 100)
+  const nextLevelXp = xpToNextLevel(level)
+  const progressPct = nextLevelXp > 0 ? Math.min((currentLevelXp / nextLevelXp) * 100, 100) : 100
 
   const earned = useMemo(() => achievements.filter(a => a.earned), [achievements])
   const recentEarned = useMemo(() =>

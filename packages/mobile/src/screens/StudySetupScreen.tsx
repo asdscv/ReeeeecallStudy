@@ -12,9 +12,18 @@ import { getMobileSupabase } from '../adapters'
 import { todayDateKey, utcToLocalDateKey, localDateToUTCRange } from '@reeeeecall/shared/lib/date-utils'
 import type { StudyStackParamList } from '../navigation/types'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
+import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySetup'>
 type Route = RouteProp<StudyStackParamList, 'StudySetup'>
+
+function buildCrammingFilter(filterKey: string): CrammingFilter {
+  switch (filterKey) {
+    case 'weak': return { type: 'weak', maxEaseFactor: 2.1 }
+    case 'due_soon': return { type: 'due_soon', withinDays: 3 }
+    default: return { type: 'all' }
+  }
+}
 
 /**
  * Study mode options — matches web STUDY_MODE_OPTIONS.
@@ -136,7 +145,12 @@ export function StudySetupScreen() {
         uploadDateStart = range.start
         uploadDateEnd = range.end
       }
-      await startSession(selectedDeckId, selectedMode, size, uploadDateStart, uploadDateEnd)
+      await startSession(
+        selectedDeckId, selectedMode, size, uploadDateStart, uploadDateEnd,
+        selectedMode === 'cramming' ? buildCrammingFilter(crammingFilter) : undefined,
+        selectedMode === 'cramming' ? crammingTimeLimit : undefined,
+        selectedMode === 'cramming' ? crammingShuffle : undefined,
+      )
       navigation.navigate('StudySession')
     } catch (e) {
       Alert.alert('Error', 'Failed to start study session')
@@ -172,7 +186,12 @@ export function StudySetupScreen() {
         uploadDateStart = range.start
         uploadDateEnd = range.end
       }
-      await startSession(selectedDeckId, m, size, uploadDateStart, uploadDateEnd)
+      await startSession(
+        selectedDeckId, m, size, uploadDateStart, uploadDateEnd,
+        m === 'cramming' ? buildCrammingFilter(crammingFilter) : undefined,
+        m === 'cramming' ? crammingTimeLimit : undefined,
+        m === 'cramming' ? crammingShuffle : undefined,
+      )
       closeModal()
       navigation.navigate('StudySession')
     } catch {

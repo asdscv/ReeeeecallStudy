@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { calculateSRS, getSrsDayStart, type SrsRating } from '../lib/srs'
 import { advanceSequentialReviewPosition, buildSequentialReviewQueue } from '../lib/study-session-utils'
-import { SrsQueueManager, type QueueCard } from '../lib/study-queue'
-import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating } from '../lib/cramming-queue'
+import { SrsQueueManager, type QueueCard, type SrsQueueSnapshot } from '../lib/study-queue'
+import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating, type CrammingQueueSnapshot } from '../lib/cramming-queue'
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
@@ -36,6 +36,8 @@ interface LastRatedCard {
   previousIndex: number
   previousStats: SessionStats
   timestamp: number
+  srsQueueSnapshot: SrsQueueSnapshot | null
+  crammingSnapshot: CrammingQueueSnapshot | null
 }
 
 interface StudyState {
@@ -57,14 +59,13 @@ interface StudyState {
   srsQueueManager: SrsQueueManager | null
   crammingManager: CrammingQueueManager | null
   maxCardPosition: number
+  lastRatedCard: LastRatedCard | null
+  sessionSaved: boolean
 
   // Pause/Resume state
   isPaused: boolean
   pauseStartTime: number | null
   totalPausedMs: number
-
-  // Undo state
-  lastRatedCard: LastRatedCard | null
 
   initSession: (config: StudyConfig) => Promise<void>
   flipCard: () => void
@@ -104,14 +105,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   srsQueueManager: null,
   crammingManager: null,
   maxCardPosition: 0,
+  lastRatedCard: null,
+  sessionSaved: false,
 
   // Pause/Resume
   isPaused: false,
   pauseStartTime: null,
   totalPausedMs: 0,
-
-  // Undo
-  lastRatedCard: null,
 
   initSession: async (config: StudyConfig) => {
     // Prevent double-init (React StrictMode / effect re-runs)
@@ -210,6 +210,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
         // Count new cards already studied today (across all sessions)
         // Uses SRS day boundary (4AM) instead of midnight for consistency
+        // prev_srs_status is written via insert_study_log RPC (bypasses PostgREST schema cache)
         const todayStart = getSrsDayStart()
         const { count: todayNewCount } = await supabase
           .from('study_logs')
@@ -217,8 +218,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           .eq('deck_id', config.deckId)
           .eq('user_id', user.id)
           .eq('study_mode', 'srs')
+          .eq('prev_srs_status', 'new')
           .gte('studied_at', todayStart.toISOString())
-
 
         // Remaining new cards for today
         const remainingNewToday = Math.max(0, newCardLimit - (todayNewCount ?? 0))
@@ -462,6 +463,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       cardStartTime: Date.now(),
       sessionStartedAt: Date.now(),
       sessionStats: { ...initialStats, totalCards: cards.length },
+      sessionSaved: false,
     })
 
     } catch (err) {
@@ -471,44 +473,19 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   flipCard: () => {
+    const { isRating, phase } = get()
+    if (isRating || phase !== 'studying') return
     set((state) => ({ isFlipped: !state.isFlipped }))
   },
 
   rateCard: async (rating: string) => {
     const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isPaused, studyState, maxCardPosition, userId } = get()
     if (!config || isRating || isPaused || !userId) return
-    // Save undo state before rating
-    const undoCard = (() => {
-      let card: Card | undefined
-      if (config.mode === 'cramming' && crammingManager) {
-        const cardId = crammingManager.currentCardId()
-        card = cardId ? queue.find(c => c.id === cardId) : undefined
-      } else if (config.mode === 'srs' && srsQueueManager) {
-        const qc = srsQueueManager.currentCard()
-        card = qc ? queue.find(c => c.id === qc.id) ?? queue[currentIndex] : queue[currentIndex]
-      } else {
-        card = queue[currentIndex]
-      }
-      return card
-    })()
-
-    set({
-      isRating: true,
-      exitDirection: getRatingExitDirection(rating),
-      lastRatedCard: undoCard ? {
-        cardId: undoCard.id,
-        previousCard: { ...undoCard },
-        rating,
-        previousIndex: currentIndex,
-        previousStats: { ...sessionStats, ratings: { ...sessionStats.ratings } },
-        timestamp: Date.now(),
-      } : null,
-    })
 
     const isSrsMode = config.mode === 'srs' && srsQueueManager
     const isCrammingMode = config.mode === 'cramming' && crammingManager
 
-    // Determine current card based on mode
+    // Determine current card based on mode (needed for undo snapshot)
     let card: Card | undefined
     if (isCrammingMode) {
       const cardId = crammingManager!.currentCardId()
@@ -521,6 +498,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     }
 
     if (!card) return
+
+    // Save undo state before rating (including queue manager snapshots)
+    set({
+      isRating: true,
+      exitDirection: getRatingExitDirection(rating),
+      lastRatedCard: {
+        cardId: card.id,
+        previousCard: { ...card },
+        rating,
+        previousIndex: currentIndex,
+        previousStats: { ...sessionStats, ratings: { ...sessionStats.ratings } },
+        timestamp: Date.now(),
+        srsQueueSnapshot: srsQueueManager?.snapshot() ?? null,
+        crammingSnapshot: crammingManager?.snapshot() ?? null,
+      },
+    })
 
     const durationMs = Date.now() - cardStartTime
     let newInterval = card.interval_days
@@ -702,23 +695,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
     }
 
-    // Study log — prev_srs_status omitted (PostgREST schema cache PGRST204)
-    dbWrites.push(
-      supabase
-        .from('study_logs')
-        .insert({
-          user_id: userId,
-          card_id: card.id,
-          deck_id: config.deckId,
-          study_mode: config.mode,
-          rating,
-          prev_interval: card.interval_days,
-          new_interval: newInterval,
-          prev_ease: card.ease_factor,
-          new_ease: newEase,
-          review_duration_ms: durationMs,
-        } as Record<string, unknown>)
-    )
+    // Study log — use RPC to bypass PostgREST schema cache miss (PGRST204) for prev_srs_status
+    const studyLogParams = {
+      p_user_id: userId,
+      p_card_id: card.id,
+      p_deck_id: config.deckId,
+      p_study_mode: config.mode,
+      p_rating: rating,
+      p_prev_interval: card.interval_days,
+      p_new_interval: newInterval,
+      p_prev_ease: card.ease_factor,
+      p_new_ease: newEase,
+      p_review_duration_ms: durationMs,
+      p_prev_srs_status: card.srs_status,
+    }
+    console.log('[study-store] INSERT study_log via RPC:', JSON.stringify(studyLogParams))
+    dbWrites.push(supabase.rpc('insert_study_log', studyLogParams))
 
     // Sequential review position save
     if (posUpdate && studyState) {
@@ -730,7 +722,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       )
     }
 
-    Promise.all(dbWrites).catch(err => console.error('[study-store] DB write failed:', err))
+    Promise.all(dbWrites).then((results) => {
+      // Supabase never rejects — errors come in resolved { error } objects
+      for (const r of results) {
+        const res = r as { error?: { message: string; code?: string } } | undefined
+        if (res?.error) {
+          console.error('[study-store] DB write error:', res.error.message, res.error.code)
+        }
+      }
+    }).catch(err => console.error('[study-store] DB write failed:', err))
 
     // endSession also fire-and-forget
     if (isComplete) {
@@ -739,8 +739,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   endSession: async () => {
-    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId } = get()
+    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved } = get()
     if (!config || !userId) return
+    // Prevent duplicate session recording (race between rateCard completion and crammingTimeUp)
+    if (sessionSaved) return
+    set({ sessionSaved: true })
 
     // Build metadata for cramming sessions
     let metadata: Record<string, unknown> | undefined
@@ -863,8 +866,16 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   undoLastRating: () => {
-    const { lastRatedCard, queue, phase } = get()
-    if (!lastRatedCard || phase !== 'studying') return
+    const { lastRatedCard, queue, phase, srsQueueManager, crammingManager } = get()
+    if (!lastRatedCard || (phase !== 'studying' && phase !== 'completed')) return
+
+    // Restore queue manager internal state from snapshots
+    if (lastRatedCard.srsQueueSnapshot && srsQueueManager) {
+      srsQueueManager.restore(lastRatedCard.srsQueueSnapshot)
+    }
+    if (lastRatedCard.crammingSnapshot && crammingManager) {
+      crammingManager.restore(lastRatedCard.crammingSnapshot)
+    }
 
     // Restore the card's previous state in the queue
     const updatedQueue = queue.map(c =>
@@ -872,6 +883,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     )
 
     set({
+      phase: 'studying',
       queue: updatedQueue,
       currentIndex: lastRatedCard.previousIndex,
       isFlipped: false,
@@ -903,10 +915,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       srsQueueManager: null,
       crammingManager: null,
       maxCardPosition: 0,
+      lastRatedCard: null,
+      sessionSaved: false,
       isPaused: false,
       pauseStartTime: null,
       totalPausedMs: 0,
-      lastRatedCard: null,
     })
   },
 }))

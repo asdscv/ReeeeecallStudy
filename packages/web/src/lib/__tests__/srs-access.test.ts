@@ -52,15 +52,16 @@ describe('mergeCardWithProgress', () => {
     updated_at: '2025-05-20T00:00:00Z',
   }
 
-  it('should use card SRS data when no progress is provided', () => {
+  it('should reset SRS fields to new-card defaults when no progress is provided', () => {
     const merged = mergeCardWithProgress(baseCard)
 
     expect(merged.id).toBe('card-1')
-    expect(merged.srs_status).toBe('review')
+    expect(merged.srs_status).toBe('new')
     expect(merged.ease_factor).toBe(2.5)
-    expect(merged.interval_days).toBe(10)
-    expect(merged.repetitions).toBe(3)
-    expect(merged.next_review_at).toBe('2025-06-01T00:00:00Z')
+    expect(merged.interval_days).toBe(0)
+    expect(merged.repetitions).toBe(0)
+    expect(merged.next_review_at).toBeNull()
+    expect(merged.last_reviewed_at).toBeNull()
     expect(merged.field_values).toEqual({ front: 'hello', back: '안녕' })
   })
 
