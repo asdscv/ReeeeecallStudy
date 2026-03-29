@@ -1,0 +1,106 @@
+{
+  "title": "Ajustes",
+  "profile": {
+    "title": "Perfil",
+    "email": "Correo electrónico",
+    "displayName": "Nombre visible",
+    "displayNamePlaceholder": "Ingresa tu nombre",
+    "namePlaceholder": "Ingresa tu nombre",
+    "saveBtn": "Guardar",
+    "nameSaved": "¡Nombre guardado!",
+    "nameAvailable": "Disponible",
+    "nameTaken": "Este nombre ya está en uso",
+    "nameLength": "El nombre debe tener entre 2 y 12 caracteres"
+  },
+  "language": {
+    "title": "Idioma",
+    "label": "Idioma de visualización",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+  "srs": {
+    "title": "Aprendizaje SRS",
+    "description": "Establece el número de tarjetas nuevas añadidas por sesión en modo SRS (repetición espaciada)",
+    "newCardLimit": "Límite de tarjetas nuevas",
+    "cards": "tarjetas",
+    "cardsUnit": "tarjetas",
+    "help": "Número máximo de tarjetas nuevas además de las de repaso en aprendizaje SRS. Las tarjetas de repaso no se ven afectadas por este límite.",
+    "newCardNote": "Número máximo de tarjetas nuevas además de las de repaso en aprendizaje SRS. Las tarjetas de repaso no se ven afectadas por este límite."
+  },
+  "answerMode": {
+    "title": "Modo de respuesta",
+    "description": "Establece cómo eliges respuestas durante el estudio",
+    "button": "Botón",
+    "buttonDesc": "Selecciona respuesta presionando un botón",
+    "swipe": "Deslizar",
+    "swipeDesc": "Selecciona respuesta deslizando la tarjeta",
+    "swipeAutoNote": "Las direcciones de deslizamiento se configuran automáticamente según el modo de estudio.\n• SRS: ← Otra vez / → Bien\n• Otros modos: ← No sé / → Lo sé"
+  },
+  "tts": {
+    "title": "Lectura TTS automática",
+    "description": "Leer automáticamente campos con TTS al voltear la tarjeta",
+    "enable": "Activar lectura automática",
+    "provider": "Motor de voz",
+    "webSpeech": "Voz del dispositivo",
+    "webSpeechDesc": "Usa la voz integrada del dispositivo",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Voz neural de alta calidad",
+    "edgeTtsNote": "* Actualmente solo compatible con inglés",
+    "speed": "Velocidad de lectura",
+    "help": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
+    "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática."
+  },
+  "srsConfig": {
+    "title": "SRS Configuration",
+    "description": "Default SRS settings for new decks. Each deck can override these.",
+    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "goodInterval": "Good Interval (days)",
+    "easyInterval": "Easy Interval (days)"
+  },
+  "aiProviders": {
+    "title": "AI Providers",
+    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "configure": "Configure",
+    "cancel": "Cancel",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key...",
+    "models": "Models",
+    "save": "Save",
+    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dailyReminder": "Daily Study Reminder",
+    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
+    "permissionRequired": "Enable notifications in device settings."
+  },
+  "subscription": {
+    "title": "Subscription",
+    "pro": "Pro",
+    "freePlan": "Free Plan",
+    "proDesc": "All premium features unlocked",
+    "freeDesc": "Upgrade for unlimited access",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "account": {
+    "title": "Cuenta",
+    "logout": "Cerrar sesión"
+  },
+  "links": {
+    "userGuide": "Guía de usuario",
+    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
+    "apiDocs": "Documentación API",
+    "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+  }
+}

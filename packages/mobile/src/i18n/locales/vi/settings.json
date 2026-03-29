@@ -1,0 +1,106 @@
+{
+  "title": "Cài đặt",
+  "profile": {
+    "title": "Hồ sơ",
+    "email": "Email",
+    "displayName": "Tên hiển thị",
+    "displayNamePlaceholder": "Nhập tên của bạn",
+    "namePlaceholder": "Nhập tên của bạn",
+    "saveBtn": "Lưu",
+    "nameSaved": "Đã lưu tên!",
+    "nameAvailable": "Có thể sử dụng",
+    "nameTaken": "Tên này đã được sử dụng",
+    "nameLength": "Tên phải từ 2-12 ký tự"
+  },
+  "language": {
+    "title": "Ngôn ngữ",
+    "label": "Ngôn ngữ hiển thị",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+  "srs": {
+    "title": "Học SRS",
+    "description": "Đặt số lượng thẻ mới được thêm mỗi phiên trong chế độ SRS (lặp lại ngắt quãng)",
+    "newCardLimit": "Giới hạn thẻ mới",
+    "cards": "thẻ",
+    "cardsUnit": "thẻ",
+    "help": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này.",
+    "newCardNote": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này."
+  },
+  "answerMode": {
+    "title": "Chế độ trả lời",
+    "description": "Đặt cách bạn chọn câu trả lời khi học",
+    "button": "Nút bấm",
+    "buttonDesc": "Chọn câu trả lời bằng cách nhấn nút",
+    "swipe": "Vuốt",
+    "swipeDesc": "Chọn câu trả lời bằng cách vuốt thẻ",
+    "swipeAutoNote": "Hướng vuốt được đặt tự động dựa trên chế độ học.\n• SRS: ← Lại / → Tốt\n• Chế độ khác: ← Chưa biết / → Đã biết"
+  },
+  "tts": {
+    "title": "Đọc TTS tự động",
+    "description": "Tự động đọc các trường có TTS khi lật thẻ",
+    "enable": "Bật đọc tự động",
+    "provider": "Công cụ giọng nói",
+    "webSpeech": "Giọng thiết bị",
+    "webSpeechDesc": "Sử dụng giọng nói tích hợp trên thiết bị",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Giọng nói thần kinh chất lượng cao",
+    "edgeTtsNote": "* Hiện chỉ hỗ trợ tiếng Anh",
+    "speed": "Tốc độ đọc",
+    "help": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
+    "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động."
+  },
+  "srsConfig": {
+    "title": "SRS Configuration",
+    "description": "Default SRS settings for new decks. Each deck can override these.",
+    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "goodInterval": "Good Interval (days)",
+    "easyInterval": "Easy Interval (days)"
+  },
+  "aiProviders": {
+    "title": "AI Providers",
+    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "configure": "Configure",
+    "cancel": "Cancel",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key...",
+    "models": "Models",
+    "save": "Save",
+    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dailyReminder": "Daily Study Reminder",
+    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
+    "permissionRequired": "Enable notifications in device settings."
+  },
+  "subscription": {
+    "title": "Subscription",
+    "pro": "Pro",
+    "freePlan": "Free Plan",
+    "proDesc": "All premium features unlocked",
+    "freeDesc": "Upgrade for unlimited access",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "account": {
+    "title": "Tài khoản",
+    "logout": "Đăng xuất"
+  },
+  "links": {
+    "userGuide": "Hướng dẫn sử dụng",
+    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
+    "apiDocs": "Tài liệu API",
+    "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+  }
+}

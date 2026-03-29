@@ -32,6 +32,7 @@ const LANGUAGES = [
   { code: 'vi', label: 'Tieng Viet', flag: '🇻🇳' },
   { code: 'th', label: 'Thai', flag: '🇹🇭' },
   { code: 'id', label: 'Bahasa', flag: '🇮🇩' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
 ]
 
 const TTS_PROVIDERS = [

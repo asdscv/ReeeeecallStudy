@@ -1,0 +1,67 @@
+{
+  "title": "Marketplace",
+  "searchPlaceholder": "Cari dek...",
+  "noResults": "Tidak ada hasil pencarian.",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "general": "Umum",
+    "language": "Bahasa",
+    "science": "Sains",
+    "math": "Matematika",
+    "history": "Sejarah",
+    "programming": "Pemrograman",
+    "trivia": "Trivia",
+    "exam": "Persiapan Ujian",
+    "other": "Lainnya"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}} kartu",
+    "userCount": "{{count}} pengguna"
+  },
+  "detail": {
+    "back": "← Marketplace",
+    "cardCount": "{{count}} kartu",
+    "userCount": "{{count}} pengguna",
+    "getDeck": "Dapatkan Dek Ini",
+    "importing": "Mengimpor...",
+    "cardPreview": "Pratinjau Kartu (maks 10)",
+    "noCards": "Tidak ada kartu.",
+    "reportContent": "Report"
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

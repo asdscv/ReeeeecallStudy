@@ -1,0 +1,22 @@
+{
+  "title": "Historial de estudio",
+  "back": "Back",
+  "all": "All",
+  "allModes": "All Modes",
+  "empty": "Sin historial de estudio aún. ¡Comienza a aprender!",
+  "emptyDesc": "Start studying to see your progress here",
+  "studyVolume": "Study Volume",
+  "modeBreakdown": "Mode Breakdown",
+  "deckProgress": {
+    "total": "{{count}} tarjetas",
+    "notStudied": "No estudiadas {{count}}",
+    "learning": "Aprendiendo {{count}}",
+    "review": "Repaso {{count}}"
+  },
+  "sessionList": "Session List",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "unknownDeck": "Unknown Deck",
+  "sessions": "sessions",
+  "cards": "cards"
+}

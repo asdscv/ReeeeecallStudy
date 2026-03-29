@@ -1,0 +1,66 @@
+{
+  "title": "Dasbor",
+  "stats": {
+    "totalCards": "Total Kartu",
+    "todayReview": "Ulasan Hari Ini",
+    "streak": "Rentetan Belajar",
+    "masteryRate": "Tingkat Penguasaan"
+  },
+  "dailyChart": {
+    "title": "Volume Belajar Harian",
+    "total": "Total {{count}} kali",
+    "noData": "Belum ada catatan belajar",
+    "tooltipTimes": "{{value}} kali",
+    "tooltipLabel": "Belajar"
+  },
+  "forecast": {
+    "title": "Perkiraan Ulasan (7 hari)",
+    "noData": "Tidak ada ulasan terjadwal",
+    "tooltipCards": "{{value}} kartu",
+    "tooltipLabel": "Perlu diulas"
+  },
+  "recentDecks": {
+    "title": "Status Dek",
+    "noDecks": "Belum ada dek. Buat satu!",
+    "goToDecks": "Ke Manajemen Dek",
+    "cardCount": "{{count}} kartu",
+    "newCards": "Baru {{count}}",
+    "reviewCards": "Ulasan {{count}}",
+    "study": "Belajar"
+  },
+  "heatmap": {
+    "title": "Peta Panas Belajar",
+    "noStudy": "Tidak belajar",
+    "studyCount": "{{date}}: {{count}} kali belajar",
+    "tooltip": "{{date}}: {{count}} kali belajar"
+  },
+  "gamification": {
+    "freezes": "{{count}} freezes left",
+    "dailyGoal": "Daily Goal"
+  },
+  "level": {
+    "title": "Level {{level}}",
+    "levelUp": "Level Up!",
+    "xpLabel": "XP",
+    "allAchievements": "All Achievements",
+    "recent": "Recent:"
+  },
+  "goals": {
+    "title": "Next Goals"
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "cards": "Study {{count}} cards",
+    "sessions": "Complete {{count}} sessions",
+    "time": "Study for {{count}} minutes",
+    "perfect": "Get {{count}} perfect scores"
+  },
+  "streakFreeze": {
+    "title": "Streak Freeze",
+    "available": "{{count}} available",
+    "motivational": "Keep going! You're doing great!"
+  },
+  "studyHistory": "Study History",
+  "studyHistoryDesc": "View sessions, stats, and progress",
+  "streakDays": "{{count}}days"
+}

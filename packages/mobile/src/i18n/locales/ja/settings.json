@@ -1,0 +1,106 @@
+{
+  "title": "設定",
+  "profile": {
+    "title": "プロフィール",
+    "email": "メールアドレス",
+    "displayName": "表示名",
+    "displayNamePlaceholder": "名前を入力",
+    "namePlaceholder": "名前を入力",
+    "saveBtn": "保存",
+    "nameSaved": "名前を保存しました！",
+    "nameAvailable": "使用可能",
+    "nameTaken": "この名前は既に使われています",
+    "nameLength": "名前は2〜12文字で入力してください"
+  },
+  "language": {
+    "title": "言語",
+    "label": "表示言語",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+  "srs": {
+    "title": "SRS学習",
+    "description": "SRS（間隔反復）モードで1セッションあたりに追加する新規カード数を設定します",
+    "newCardLimit": "新規カード上限",
+    "cards": "枚",
+    "cardsUnit": "枚",
+    "help": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。",
+    "newCardNote": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。"
+  },
+  "answerMode": {
+    "title": "回答モード",
+    "description": "学習中の回答方法を設定します",
+    "button": "ボタン",
+    "buttonDesc": "ボタンを押して回答を選択",
+    "swipe": "スワイプ",
+    "swipeDesc": "カードをスワイプして回答を選択",
+    "swipeAutoNote": "スワイプ方向は学習モードに応じて自動設定されます。\n• SRS: ← Again / → Good\n• その他: ← 分からない / → 知っている"
+  },
+  "tts": {
+    "title": "TTS自動読み上げ",
+    "description": "カードを裏返した時にTTS対応フィールドを自動読み上げ",
+    "enable": "自動読み上げを有効にする",
+    "provider": "音声エンジン",
+    "webSpeech": "デバイス音声",
+    "webSpeechDesc": "デバイスの内蔵音声を使用",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "高品質ニューラル音声",
+    "edgeTtsNote": "* 現在英語のみ対応",
+    "speed": "読み上げ速度",
+    "help": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。",
+    "note": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。"
+  },
+  "srsConfig": {
+    "title": "SRS Configuration",
+    "description": "Default SRS settings for new decks. Each deck can override these.",
+    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "goodInterval": "Good Interval (days)",
+    "easyInterval": "Easy Interval (days)"
+  },
+  "aiProviders": {
+    "title": "AI Providers",
+    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "configure": "Configure",
+    "cancel": "Cancel",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key...",
+    "models": "Models",
+    "save": "Save",
+    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dailyReminder": "Daily Study Reminder",
+    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
+    "permissionRequired": "Enable notifications in device settings."
+  },
+  "subscription": {
+    "title": "Subscription",
+    "pro": "Pro",
+    "freePlan": "Free Plan",
+    "proDesc": "All premium features unlocked",
+    "freeDesc": "Upgrade for unlimited access",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "account": {
+    "title": "アカウント",
+    "logout": "ログアウト"
+  },
+  "links": {
+    "userGuide": "ユーザーガイド",
+    "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
+    "apiDocs": "APIドキュメント",
+    "apiDocsDesc": "APIエンドポイント、認証、使用例"
+  }
+}

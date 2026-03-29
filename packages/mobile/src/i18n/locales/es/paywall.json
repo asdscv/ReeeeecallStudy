@@ -1,0 +1,31 @@
+{
+  "title": "Actualizar a Pro",
+  "subtitle": "Desbloquea todo el poder de ReeeeecallStudy",
+  "youArePro": "¡Eres Pro!",
+  "proDesc": "Tienes acceso a todas las funciones premium.",
+  "done": "Listo",
+  "back": "Volver",
+  "features": {
+    "unlimitedDecks": { "title": "Mazos y Tarjetas Ilimitados", "free": "5 mazos, 3K tarjetas", "pro": "Ilimitado" },
+    "allModes": { "title": "Todos los Modos de Estudio", "free": "SRS + Secuencial", "pro": "Los 4 modos" },
+    "aiGeneration": { "title": "Generación de Tarjetas con IA", "free": "5/mes", "pro": "Ilimitado" },
+    "premiumTts": { "title": "TTS Premium", "free": "Básico", "pro": "Edge TTS HD" },
+    "analytics": { "title": "Análisis Avanzado", "free": "Estadísticas básicas", "pro": "Gráficos + Pronóstico" },
+    "marketplace": { "title": "Publicar en Marketplace", "free": "Solo descarga", "pro": "Subir + Reparto de ingresos" }
+  },
+  "free": "Gratis",
+  "pro": "Pro",
+  "monthly": "Mensual",
+  "annual": "Anual",
+  "save40": "Ahorra 40%",
+  "unavailable": "Este producto no está disponible en tu región",
+  "welcomePro": "¡Bienvenido a Pro!",
+  "welcomeProDesc": "Ahora tienes acceso a todas las funciones premium.",
+  "restorePurchase": "Restaurar Compra",
+  "restored": "Tu suscripción Pro ha sido restaurada.",
+  "noRestoreFound": "No se encontró ninguna suscripción anterior.",
+  "productsUnavailable": "Los productos de suscripción no están disponibles actualmente. Inténtalo más tarde.",
+  "privacyPolicy": "Política de Privacidad",
+  "termsOfService": "Términos de Servicio",
+  "manageSubscription": "Gestionar Suscripción"
+}

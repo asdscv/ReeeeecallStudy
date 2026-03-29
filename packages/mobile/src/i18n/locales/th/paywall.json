@@ -1,0 +1,31 @@
+{
+  "title": "อัปเกรดเป็น Pro",
+  "subtitle": "ปลดล็อกฟีเจอร์ทั้งหมดของ ReeeeecallStudy",
+  "youArePro": "คุณเป็น Pro แล้ว!",
+  "proDesc": "คุณสามารถใช้ฟีเจอร์พรีเมียมทั้งหมดได้",
+  "done": "เสร็จ",
+  "back": "กลับ",
+  "features": {
+    "unlimitedDecks": { "title": "สำรับและการ์ดไม่จำกัด", "free": "5 สำรับ, 3K การ์ด", "pro": "ไม่จำกัด" },
+    "allModes": { "title": "โหมดเรียนทั้งหมด", "free": "SRS + ตามลำดับ", "pro": "ทั้ง 4 โหมด" },
+    "aiGeneration": { "title": "AI สร้างการ์ด", "free": "5/เดือน", "pro": "ไม่จำกัด" },
+    "premiumTts": { "title": "TTS พรีเมียม", "free": "พื้นฐาน", "pro": "Edge TTS HD" },
+    "analytics": { "title": "การวิเคราะห์ขั้นสูง", "free": "สถิติพื้นฐาน", "pro": "แผนภูมิ + การคาดการณ์" },
+    "marketplace": { "title": "เผยแพร่ใน Marketplace", "free": "ดาวน์โหลดเท่านั้น", "pro": "อัปโหลด + แบ่งรายได้" }
+  },
+  "free": "ฟรี",
+  "pro": "Pro",
+  "monthly": "รายเดือน",
+  "annual": "รายปี",
+  "save40": "ประหยัด 40%",
+  "unavailable": "ผลิตภัณฑ์นี้ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+  "welcomePro": "ยินดีต้อนรับสู่ Pro!",
+  "welcomeProDesc": "คุณสามารถใช้ฟีเจอร์พรีเมียมทั้งหมดได้แล้ว",
+  "restorePurchase": "กู้คืนการซื้อ",
+  "restored": "กู้คืนการสมัคร Pro แล้ว",
+  "noRestoreFound": "ไม่พบการสมัครก่อนหน้า",
+  "productsUnavailable": "ผลิตภัณฑ์สมัครสมาชิกไม่พร้อมใช้งานขณะนี้ กรุณาลองใหม่ภายหลัง",
+  "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+  "termsOfService": "เงื่อนไขการใช้งาน",
+  "manageSubscription": "จัดการการสมัคร"
+}

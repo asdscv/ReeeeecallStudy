@@ -1,0 +1,67 @@
+{
+  "title": "ตลาด",
+  "searchPlaceholder": "ค้นหาสำรับ...",
+  "noResults": "ไม่พบผลการค้นหา",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "general": "ทั่วไป",
+    "language": "ภาษา",
+    "science": "วิทยาศาสตร์",
+    "math": "คณิตศาสตร์",
+    "history": "ประวัติศาสตร์",
+    "programming": "การเขียนโปรแกรม",
+    "trivia": "ความรู้ทั่วไป",
+    "exam": "เตรียมสอบ",
+    "other": "อื่นๆ"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}} การ์ด",
+    "userCount": "{{count}} ผู้ใช้"
+  },
+  "detail": {
+    "back": "← ตลาด",
+    "cardCount": "{{count}} การ์ด",
+    "userCount": "{{count}} ผู้ใช้",
+    "getDeck": "รับสำรับนี้",
+    "importing": "กำลังนำเข้า...",
+    "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
+    "noCards": "ไม่มีการ์ด",
+    "reportContent": "Report"
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

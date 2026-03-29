@@ -1,0 +1,13 @@
+{
+  "auth": {
+    "invalidCredentials": "El correo o la contraseña son incorrectos.",
+    "emailNotConfirmed": "Correo no verificado. Por favor revisa tu bandeja de entrada.",
+    "userAlreadyRegistered": "Este correo ya está registrado.",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "emailRateLimit": "Demasiadas solicitudes. Inténtalo más tarde.",
+    "securityDelay": "Por seguridad, inténtalo más tarde.",
+    "newPasswordSameAsOld": "La nueva contraseña debe ser diferente a la anterior.",
+    "invalidEmailFormat": "Formato de correo inválido."
+  },
+  "generic": "Something went wrong. Please try again."
+}
