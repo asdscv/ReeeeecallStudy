@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen, DrawerHeader } from '../components/ui'
+import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
 import {
@@ -63,7 +63,7 @@ export function AchievementsScreen() {
 
   return (
     <Screen safeArea padding={false} testID="achievements-screen">
-      <DrawerHeader title="Achievements" />
+      <ScreenHeader title="Achievements" mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* Level + XP bar — matches web */}

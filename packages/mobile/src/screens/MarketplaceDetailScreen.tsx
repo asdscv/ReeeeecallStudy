@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, FlatList, Alert, StyleSheet, TouchableOpacity, TextInput, Modal } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
-import { Screen, Button, Badge, ListCard } from '../components/ui'
+import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { useReviewsStore } from '@reeeeecall/shared/stores/reviews-store'
@@ -303,9 +303,9 @@ export function MarketplaceDetailScreen() {
   if (!listing) {
     return (
       <Screen testID="marketplace-detail-screen">
+        <ScreenHeader title={t('detail.title', { defaultValue: 'Detail' })} mode="back" />
         <View style={styles.center}>
           <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>Not found</Text>
-          <Button title="Go Back" variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -351,6 +351,7 @@ export function MarketplaceDetailScreen() {
 
   return (
     <Screen safeArea padding={false} testID="marketplace-detail-screen">
+      <ScreenHeader title={listing.title} mode="back" />
       <FlatList
         data={sections}
         keyExtractor={(item, index) => {
@@ -364,7 +365,6 @@ export function MarketplaceDetailScreen() {
             case 'header':
               return (
                 <View style={styles.header}>
-                  <Button title={t('detail.back', { defaultValue: '\u2190 Back' })} variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
                   <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{listing.title}</Text>
 
                   {/* Publisher info + verified badge */}

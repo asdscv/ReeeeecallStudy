@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
-import { Screen, TextInput, DrawerHeader } from '../components/ui'
+import { Screen, TextInput, ScreenHeader } from '../components/ui'
 
 import { useTheme } from '../theme'
 
@@ -95,7 +95,7 @@ export function GuideScreen() {
 
   return (
     <Screen safeArea padding={false} testID="guide-screen">
-      <DrawerHeader title={t('title')} />
+      <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginBottom: 12 }]}>
           {t('subtitle')}

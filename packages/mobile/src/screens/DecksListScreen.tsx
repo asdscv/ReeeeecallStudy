@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, FAB, EmptyState, SearchBar, DrawerHeader, Button } from '../components/ui'
+import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
@@ -53,7 +53,7 @@ export function DecksListScreen() {
 
   return (
     <Screen safeArea padding={false} testID="decks-list-screen">
-      <DrawerHeader title={t('title')} />
+      <ScreenHeader title={t('title')} mode="drawer" />
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}

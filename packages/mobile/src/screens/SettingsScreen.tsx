@@ -4,7 +4,7 @@ import Slider from '@react-native-community/slider'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { Screen, TextInput, Button, DrawerHeader } from '../components/ui'
+import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -219,7 +219,7 @@ export function SettingsScreen() {
 
   return (
     <Screen safeArea padding={false} testID="settings-screen">
-      <DrawerHeader title={t('title')} />
+      <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* ── a) Profile — centered avatar like web ── */}

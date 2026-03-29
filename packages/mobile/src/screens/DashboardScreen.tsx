@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Pla
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { Screen, DrawerHeader } from '../components/ui'
+import { Screen, ScreenHeader } from '../components/ui'
 import { TimePeriodSelector, MiniHeatmap, BarChart } from '../components/charts'
 import { LevelCard, StreakFreezeCard, DailyQuestsCard, NextGoalsCard, LevelUpCelebration } from '../components/dashboard'
 import { useDashboardData } from '../hooks/useDashboardData'
@@ -68,7 +68,7 @@ export function DashboardScreen() {
           onDismiss={() => setShowLevelUp(false)}
         />
       )}
-      <DrawerHeader title={t('title')} />
+      <ScreenHeader title={t('title')} mode="drawer" />
 
       <FlatList
         data={decks}

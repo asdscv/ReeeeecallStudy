@@ -256,9 +256,9 @@ export function MainDrawer() {
 
 const styles = StyleSheet.create({
   drawerContainer: { flex: 1 },
-  drawerHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1 },
-  logoIcon: { width: 36, height: 36 },
-  logoText: { height: 28, width: 140 },
+  drawerHeader: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 16, paddingVertical: 16, borderBottomWidth: 1 },
+  logoIcon: { width: 44, height: 44 },
+  logoText: { flex: 1, height: 50 },
   drawerScroll: { flex: 1, paddingTop: 8 },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', gap: 12,

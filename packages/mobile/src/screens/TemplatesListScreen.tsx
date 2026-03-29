@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, Alert, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
+import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
@@ -142,7 +142,7 @@ export function TemplatesListScreen() {
 
   return (
     <Screen safeArea padding={false} testID="templates-list-screen">
-      <DrawerHeader title="Templates" />
+      <ScreenHeader title="Templates" mode="drawer" />
       <FlatList
         data={templates}
         keyExtractor={(item) => item.id}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { View, Text, Alert, StyleSheet, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
-import { Screen, Button, Divider } from '../components/ui'
+import { Screen, Button, Divider, ScreenHeader } from '../components/ui'
 import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
@@ -157,10 +157,8 @@ export function ImportExportScreen() {
 
   return (
     <Screen scroll testID="import-export-screen">
+      <ScreenHeader title={t('title')} mode="back" />
       <View style={styles.content}>
-        <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
-
-        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>{t('title')}</Text>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
           {deck?.name} · {cards.length} cards
         </Text>

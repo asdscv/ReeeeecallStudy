@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
-import { Screen, Button } from '../components/ui'
+import { Screen, Button, ScreenHeader } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme, palette } from '../theme'
 import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
@@ -178,8 +178,8 @@ export function ShareDeckScreen() {
 
   return (
     <Screen scroll keyboard testID="share-deck-screen">
+      <ScreenHeader title={deck?.name ?? 'Share Deck'} mode="back" testID="share-back" />
       <View style={styles.content}>
-        <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} testID="share-back" />
 
         {/* Deck name */}
         <View style={styles.titleRow}>

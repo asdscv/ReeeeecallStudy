@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, Platform } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen, Button } from '../components/ui'
+import { Screen, Button, ScreenHeader } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
@@ -40,13 +40,13 @@ export function PaywallScreen() {
   if (isPro) {
     return (
       <Screen testID="paywall-screen">
+        <ScreenHeader title={t('youArePro')} mode="back" />
         <View style={styles.center}>
           <Text style={styles.emoji}>✅</Text>
           <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('youArePro')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
             You have access to all premium features.
           </Text>
-          <Button title={t('done')} variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -83,10 +83,10 @@ export function PaywallScreen() {
 
   return (
     <Screen safeArea padding={false} testID="paywall-screen">
+      <ScreenHeader title="Upgrade to Pro" mode="back" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
           <Text style={styles.crown}>👑</Text>
           <Text style={[theme.typography.h1, { color: theme.colors.text, textAlign: 'center' }]}>
             Upgrade to Pro

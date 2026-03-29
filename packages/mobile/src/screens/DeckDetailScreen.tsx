@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, Button, FAB, EmptyState, Badge, ListCard, SearchBar } from '../components/ui'
+import { Screen, Button, FAB, EmptyState, Badge, ListCard, SearchBar, ScreenHeader } from '../components/ui'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { VersionHistoryTab } from '../components/deck/VersionHistoryTab'
@@ -205,7 +205,8 @@ export function DeckDetailScreen() {
   if (!deck) {
     return (
       <Screen testID="deck-detail-screen">
-        <EmptyState icon="❓" title={t('detail.deckNotFound')} actionTitle={t('detail.goBack')} onAction={() => navigation.goBack()} />
+        <ScreenHeader title={t('detail.backToList')} mode="back" />
+        <EmptyState icon="❓" title={t('detail.deckNotFound')} />
       </Screen>
     )
   }
@@ -342,11 +343,6 @@ export function DeckDetailScreen() {
 
   const renderHeader = () => (
     <View style={styles.header}>
-      {/* Back button — matches web: text-sm text-gray-500 */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-        <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>← {t('detail.backToList')}</Text>
-      </TouchableOpacity>
-
       {/* Title: icon + name — matches web: flex items-center gap-2 */}
       <View style={styles.titleRow}>
         <Text style={styles.titleIcon}>{deck.icon}</Text>
@@ -546,6 +542,7 @@ export function DeckDetailScreen() {
   if (activeTab === 'dates' || activeTab === 'stats' || activeTab === 'versions') {
     return (
       <Screen safeArea padding={false} testID="deck-detail-screen">
+        <ScreenHeader title={deck.name} mode="back" />
         <ScrollView
           contentContainerStyle={styles.list}
           refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefreshWithSync} />}
@@ -572,6 +569,7 @@ export function DeckDetailScreen() {
   // Cards tab — mobile card-based view (matches web md:hidden view)
   return (
     <Screen safeArea padding={false} testID="deck-detail-screen">
+      <ScreenHeader title={deck.name} mode="back" />
       <FlatList
         data={paginatedCards}
         keyExtractor={(item) => item.id}
