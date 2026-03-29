@@ -9,7 +9,7 @@
 import { useEffect } from 'react'
 import { useGamificationStore } from '../stores/gamification-store'
 import { useAuthState } from './useAuthState'
-import { xpInCurrentLevel, xpForLevel } from '../stores/gamification-store'
+import { xpInCurrentLevel, xpToNextLevel } from '../stores/gamification-store'
 
 // Re-export types so consumers don't need to import from store directly
 export type {
@@ -41,7 +41,7 @@ export function useGamification() {
       ? {
           level: store.level,
           current_xp: xpInCurrentLevel(store.xp, store.level),
-          xp_for_next: xpForLevel(store.level),
+          xp_for_next: xpToNextLevel(store.level),
           total_xp: store.xp,
         }
       : null

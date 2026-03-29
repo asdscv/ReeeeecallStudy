@@ -15,6 +15,13 @@ export interface QueueCard extends SrsCardData {
   id: string
 }
 
+export interface SrsQueueSnapshot {
+  queue: QueueCard[]
+  cursor: number
+  studied: number
+  requeueCount: Map<string, number>
+}
+
 // ─── SrsQueueManager ───────────────────────────────────────
 
 /**
@@ -62,10 +69,13 @@ export class SrsQueueManager {
     if (requeue) {
       const count = this.requeueCount.get(card.id) ?? 0
       if (count < MAX_REQUEUE_PER_CARD) {
-        this.requeueCount.set(card.id, count + 1)
-        // Re-insert after REQUEUE_GAP cards (or at end if fewer cards remain)
-        const insertAt = Math.min(this.cursor + 1 + REQUEUE_GAP, this.queue.length)
-        this.queue.splice(insertAt, 0, card)
+        const remainingAfter = this.queue.length - (this.cursor + 1)
+        // Only requeue if there are other cards to create a meaningful gap
+        if (remainingAfter >= 1) {
+          this.requeueCount.set(card.id, count + 1)
+          const insertAt = Math.min(this.cursor + 1 + REQUEUE_GAP, this.queue.length)
+          this.queue.splice(insertAt, 0, card)
+        }
       }
     }
 
@@ -97,5 +107,26 @@ export class SrsQueueManager {
   /** Original number of unique cards loaded into the queue */
   totalCards(): number {
     return this.originalCount
+  }
+
+  /** Create a snapshot of the current state for undo */
+  snapshot(): SrsQueueSnapshot {
+    return {
+      queue: [...this.queue],
+      cursor: this.cursor,
+      studied: this.studied,
+      requeueCount: new Map(this.requeueCount),
+    }
+  }
+
+  /** Restore from a snapshot */
+  restore(snap: SrsQueueSnapshot): void {
+    this.queue = [...snap.queue]
+    this.cursor = snap.cursor
+    this.studied = snap.studied
+    this.requeueCount.clear()
+    for (const [k, v] of snap.requeueCount) {
+      this.requeueCount.set(k, v)
+    }
   }
 }

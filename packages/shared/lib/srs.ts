@@ -59,6 +59,7 @@ function applyMeanReversion(ease: number): number {
  * Max growth: 3× current interval per single review.
  */
 function capGrowth(newInterval: number, currentInterval: number, maxInterval: number, growthFactor: number = 3): number {
+  if (currentInterval <= 0) return Math.min(newInterval, maxInterval)
   const capped = Math.min(newInterval, currentInterval * growthFactor)
   return Math.min(capped, maxInterval)
 }
@@ -234,7 +235,7 @@ function calculateReview(
         ease_factor: round(ease),
         interval_days: interval,
         repetitions: reps,
-        srs_status: card.srs_status === 'review' ? 'review' : 'learning',
+        srs_status: card.srs_status === 'review' || card.srs_status === 'new' ? 'review' : 'learning',
         next_review_at: nextDayBoundary(now, interval).toISOString(),
       }
 
@@ -245,6 +246,7 @@ function calculateReview(
       ease = Math.min(4.0, ease + 0.05)
       // Phase 0.2: Mean Reversion — extreme values trend toward 2.5
       ease = applyMeanReversion(ease)
+      ease = Math.max(1.3, ease) // Re-clamp after reversion
       reps += 1
       if (card.repetitions === 0) {
         interval = s.good_days
@@ -269,6 +271,7 @@ function calculateReview(
     case 'easy': {
       ease = Math.min(4.0, ease + 0.15)
       ease = applyMeanReversion(ease) // Phase 0.2: Mean Reversion
+      ease = Math.max(1.3, ease) // Re-clamp after reversion
       reps += 1
       if (card.repetitions === 0) {
         interval = s.easy_days

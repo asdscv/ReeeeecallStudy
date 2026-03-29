@@ -10,11 +10,14 @@ import { AchievementIcon, CategoryIcon } from '../lib/achievement-icons'
 
 const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'social', 'milestone']
 
-function xpForLevel(level: number): number { return level * 100 }
+function xpForLevel(level: number): number {
+  return (level - 1) * 150
+}
 function xpInCurrentLevel(xp: number, level: number): number {
-  let r = xp
-  for (let i = 1; i < level; i++) r -= xpForLevel(i)
-  return r
+  return xp - xpForLevel(level)
+}
+function xpToNextLevel(_level: number): number {
+  return 150
 }
 
 interface NextGoal {
@@ -52,8 +55,8 @@ export function AchievementsPage() {
   ).slice(0, 3)
 
   const currentLevelXp = xpInCurrentLevel(xp, level)
-  const nextLevelXp = xpForLevel(level)
-  const progressPct = Math.min((currentLevelXp / nextLevelXp) * 100, 100)
+  const nextLevelXp = xpToNextLevel(level)
+  const progressPct = nextLevelXp > 0 ? Math.min((currentLevelXp / nextLevelXp) * 100, 100) : 100
 
   if (loading) {
     return (

@@ -30,6 +30,14 @@ export interface CrammingHardCard {
   frontText: string
 }
 
+export interface CrammingQueueSnapshot {
+  queue: string[]
+  cursor: number
+  round: number
+  cardStates: Map<string, CrammingCardState>
+  roundUniqueTotal: number
+}
+
 // ─── Constants ──────────────────────────────────────────
 
 /** How many cards to skip before showing a re-inserted "missed" card */
@@ -121,18 +129,14 @@ export class CrammingQueueManager {
     this.roundUniqueTotal = cardIds.length
   }
 
-  /** Get the current card ID without advancing */
+  /** Get the current card ID without side effects */
   currentCardId(): string | null {
     if (this.isSessionComplete()) return null
-    if (this.cursor >= this.queue.length) {
-      // Round ended, transition to next round (single-path: only here)
-      this._advanceRound()
-      if (this.cursor >= this.queue.length) return null
-    }
+    if (this.cursor >= this.queue.length) return null
     return this.queue[this.cursor] ?? null
   }
 
-  /** Rate the current card and advance */
+  /** Rate the current card and advance, auto-advancing round if needed */
   rateCard(rating: CrammingRating): void {
     const cardId = this.queue[this.cursor]
     if (!cardId) return
@@ -154,7 +158,20 @@ export class CrammingQueueManager {
     }
 
     this.cursor++
-    // Round advancement is handled lazily by currentCardId()
+
+    // Auto-advance round if current round is exhausted
+    if (this.cursor >= this.queue.length && !this._isAllMasteredOrTimedOut()) {
+      this._advanceRound()
+    }
+  }
+
+  /** Check if all cards are mastered or time limit reached (without public side effects) */
+  private _isAllMasteredOrTimedOut(): boolean {
+    if (this.timeLimitMs != null) {
+      const elapsed = Date.now() - this.startTime
+      if (elapsed >= this.timeLimitMs) return true
+    }
+    return this.isAllMastered()
   }
 
   /** Advance to the next round with only unmastered cards */
@@ -261,5 +278,32 @@ export class CrammingQueueManager {
       const state = this.cardStates.get(id)!
       return state.masteredInRound !== null
     })
+  }
+
+  /** Create a snapshot of the current state for undo */
+  snapshot(): CrammingQueueSnapshot {
+    const cardStates = new Map<string, CrammingCardState>()
+    for (const [k, v] of this.cardStates) {
+      cardStates.set(k, { ...v })
+    }
+    return {
+      queue: [...this.queue],
+      cursor: this.cursor,
+      round: this.round,
+      cardStates,
+      roundUniqueTotal: this.roundUniqueTotal,
+    }
+  }
+
+  /** Restore from a snapshot */
+  restore(snap: CrammingQueueSnapshot): void {
+    this.queue = [...snap.queue]
+    this.cursor = snap.cursor
+    this.round = snap.round
+    this.roundUniqueTotal = snap.roundUniqueTotal
+    this.cardStates.clear()
+    for (const [k, v] of snap.cardStates) {
+      this.cardStates.set(k, { ...v })
+    }
   }
 }

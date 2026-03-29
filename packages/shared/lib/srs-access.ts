@@ -75,7 +75,16 @@ export function mergeCardWithProgress(
   progress?: UserCardProgress,
 ): CardWithProgress {
   if (!progress) {
-    return { ...card }
+    // No progress record = subscriber has never studied this card = treat as new
+    return {
+      ...card,
+      srs_status: 'new' as const,
+      ease_factor: 2.5,
+      interval_days: 0,
+      repetitions: 0,
+      next_review_at: null,
+      last_reviewed_at: null,
+    }
   }
 
   return {
