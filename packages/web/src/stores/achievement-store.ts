@@ -24,20 +24,19 @@ interface AchievementState {
   clearNewlyEarned: () => void
 }
 
-function computeLevel(xp: number): number {
+export function computeLevel(xp: number): number {
   return Math.floor(xp / 150) + 1
 }
 
-function xpForLevel(level: number): number {
-  // Total XP needed to reach this level (Duolingo-style flat 150 XP per level)
+export function xpForLevel(level: number): number {
   return (level - 1) * 150
 }
 
-function xpInCurrentLevel(totalXp: number, level: number): number {
+export function xpInCurrentLevel(totalXp: number, level: number): number {
   return totalXp - xpForLevel(level)
 }
 
-function xpToNextLevel(_level: number): number {
+export function xpToNextLevel(_level: number): number {
   return 150
 }
 
