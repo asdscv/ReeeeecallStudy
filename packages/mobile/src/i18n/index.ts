@@ -1,37 +1,121 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
-// ── Namespace list (single source of truth) ──
-const NAMESPACES = [
-  'common', 'auth', 'dashboard', 'decks', 'study',
-  'marketplace', 'settings', 'history', 'import-export',
-  'guide', 'errors', 'paywall',
-] as const
+// ── Supported languages: to add a new language, add an entry below + locale folder ──
 
-// ── Load all locale files per language ──
-function loadLang(lang: string) {
-  return {
-    common: require(`./locales/${lang}/common.json`),
-    auth: require(`./locales/${lang}/auth.json`),
-    dashboard: require(`./locales/${lang}/dashboard.json`),
-    decks: require(`./locales/${lang}/decks.json`),
-    study: require(`./locales/${lang}/study.json`),
-    marketplace: require(`./locales/${lang}/marketplace.json`),
-    settings: require(`./locales/${lang}/settings.json`),
-    history: require(`./locales/${lang}/history.json`),
-    'import-export': require(`./locales/${lang}/import-export.json`),
-    guide: require(`./locales/${lang}/guide.json`),
-    errors: require(`./locales/${lang}/errors.json`),
-    paywall: require(`./locales/${lang}/paywall.json`),
-  }
-}
-
-// ── Supported languages (add new languages here) ──
-const SUPPORTED_LANGS = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const
-
-const resources: Record<string, ReturnType<typeof loadLang>> = {}
-for (const lang of SUPPORTED_LANGS) {
-  resources[lang] = loadLang(lang)
+const resources = {
+  en: {
+    common: require('./locales/en/common.json'),
+    auth: require('./locales/en/auth.json'),
+    dashboard: require('./locales/en/dashboard.json'),
+    decks: require('./locales/en/decks.json'),
+    study: require('./locales/en/study.json'),
+    marketplace: require('./locales/en/marketplace.json'),
+    settings: require('./locales/en/settings.json'),
+    history: require('./locales/en/history.json'),
+    'import-export': require('./locales/en/import-export.json'),
+    guide: require('./locales/en/guide.json'),
+    errors: require('./locales/en/errors.json'),
+    paywall: require('./locales/en/paywall.json'),
+  },
+  ko: {
+    common: require('./locales/ko/common.json'),
+    auth: require('./locales/ko/auth.json'),
+    dashboard: require('./locales/ko/dashboard.json'),
+    decks: require('./locales/ko/decks.json'),
+    study: require('./locales/ko/study.json'),
+    marketplace: require('./locales/ko/marketplace.json'),
+    settings: require('./locales/ko/settings.json'),
+    history: require('./locales/ko/history.json'),
+    'import-export': require('./locales/ko/import-export.json'),
+    guide: require('./locales/ko/guide.json'),
+    errors: require('./locales/ko/errors.json'),
+    paywall: require('./locales/ko/paywall.json'),
+  },
+  ja: {
+    common: require('./locales/ja/common.json'),
+    auth: require('./locales/ja/auth.json'),
+    dashboard: require('./locales/ja/dashboard.json'),
+    decks: require('./locales/ja/decks.json'),
+    study: require('./locales/ja/study.json'),
+    marketplace: require('./locales/ja/marketplace.json'),
+    settings: require('./locales/ja/settings.json'),
+    history: require('./locales/ja/history.json'),
+    'import-export': require('./locales/ja/import-export.json'),
+    guide: require('./locales/ja/guide.json'),
+    errors: require('./locales/ja/errors.json'),
+    paywall: require('./locales/ja/paywall.json'),
+  },
+  zh: {
+    common: require('./locales/zh/common.json'),
+    auth: require('./locales/zh/auth.json'),
+    dashboard: require('./locales/zh/dashboard.json'),
+    decks: require('./locales/zh/decks.json'),
+    study: require('./locales/zh/study.json'),
+    marketplace: require('./locales/zh/marketplace.json'),
+    settings: require('./locales/zh/settings.json'),
+    history: require('./locales/zh/history.json'),
+    'import-export': require('./locales/zh/import-export.json'),
+    guide: require('./locales/zh/guide.json'),
+    errors: require('./locales/zh/errors.json'),
+    paywall: require('./locales/zh/paywall.json'),
+  },
+  vi: {
+    common: require('./locales/vi/common.json'),
+    auth: require('./locales/vi/auth.json'),
+    dashboard: require('./locales/vi/dashboard.json'),
+    decks: require('./locales/vi/decks.json'),
+    study: require('./locales/vi/study.json'),
+    marketplace: require('./locales/vi/marketplace.json'),
+    settings: require('./locales/vi/settings.json'),
+    history: require('./locales/vi/history.json'),
+    'import-export': require('./locales/vi/import-export.json'),
+    guide: require('./locales/vi/guide.json'),
+    errors: require('./locales/vi/errors.json'),
+    paywall: require('./locales/vi/paywall.json'),
+  },
+  th: {
+    common: require('./locales/th/common.json'),
+    auth: require('./locales/th/auth.json'),
+    dashboard: require('./locales/th/dashboard.json'),
+    decks: require('./locales/th/decks.json'),
+    study: require('./locales/th/study.json'),
+    marketplace: require('./locales/th/marketplace.json'),
+    settings: require('./locales/th/settings.json'),
+    history: require('./locales/th/history.json'),
+    'import-export': require('./locales/th/import-export.json'),
+    guide: require('./locales/th/guide.json'),
+    errors: require('./locales/th/errors.json'),
+    paywall: require('./locales/th/paywall.json'),
+  },
+  id: {
+    common: require('./locales/id/common.json'),
+    auth: require('./locales/id/auth.json'),
+    dashboard: require('./locales/id/dashboard.json'),
+    decks: require('./locales/id/decks.json'),
+    study: require('./locales/id/study.json'),
+    marketplace: require('./locales/id/marketplace.json'),
+    settings: require('./locales/id/settings.json'),
+    history: require('./locales/id/history.json'),
+    'import-export': require('./locales/id/import-export.json'),
+    guide: require('./locales/id/guide.json'),
+    errors: require('./locales/id/errors.json'),
+    paywall: require('./locales/id/paywall.json'),
+  },
+  es: {
+    common: require('./locales/es/common.json'),
+    auth: require('./locales/es/auth.json'),
+    dashboard: require('./locales/es/dashboard.json'),
+    decks: require('./locales/es/decks.json'),
+    study: require('./locales/es/study.json'),
+    marketplace: require('./locales/es/marketplace.json'),
+    settings: require('./locales/es/settings.json'),
+    history: require('./locales/es/history.json'),
+    'import-export': require('./locales/es/import-export.json'),
+    guide: require('./locales/es/guide.json'),
+    errors: require('./locales/es/errors.json'),
+    paywall: require('./locales/es/paywall.json'),
+  },
 }
 
 i18n
@@ -39,18 +123,13 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
-    supportedLngs: [...SUPPORTED_LANGS],
+    supportedLngs: Object.keys(resources),
 
-    ns: [...NAMESPACES],
+    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall'],
     defaultNS: 'common',
 
-    interpolation: {
-      escapeValue: false,
-    },
-
-    react: {
-      useSuspense: false,
-    },
+    interpolation: { escapeValue: false },
+    react: { useSuspense: false },
   })
 
 export default i18n
