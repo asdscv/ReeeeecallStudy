@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
+import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { TimePeriodSelector, BarChart } from '../components/charts'
 import { OverviewStatsRow, RatingDistributionBars } from '../components/study-history'
 import { useAuthState } from '../hooks'
@@ -118,7 +118,7 @@ export function StudyHistoryScreen() {
 
   return (
     <Screen safeArea padding={false} testID="study-history-screen">
-      <DrawerHeader title={t('title', { defaultValue: 'Study History' })} />
+      <ScreenHeader title={t('title', { defaultValue: 'Study History' })} mode="drawer" />
       <FlatList
         data={activeTab === 'history' ? grouped : []}
         keyExtractor={(item) => item.date}

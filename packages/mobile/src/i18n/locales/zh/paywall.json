@@ -1,0 +1,31 @@
+{
+  "title": "升级到Pro",
+  "subtitle": "解锁ReeeeecallStudy的全部功能",
+  "youArePro": "您已是Pro！",
+  "proDesc": "您可以使用所有高级功能。",
+  "done": "完成",
+  "back": "返回",
+  "features": {
+    "unlimitedDecks": { "title": "无限卡组和卡片", "free": "5个卡组，3千张", "pro": "无限" },
+    "allModes": { "title": "所有学习模式", "free": "SRS + 顺序", "pro": "全部4种模式" },
+    "aiGeneration": { "title": "AI卡片生成", "free": "每月5次", "pro": "无限" },
+    "premiumTts": { "title": "高级TTS", "free": "基础", "pro": "Edge TTS HD" },
+    "analytics": { "title": "高级分析", "free": "基础统计", "pro": "图表 + 预测" },
+    "marketplace": { "title": "市场发布", "free": "仅下载", "pro": "上传 + 收益分成" }
+  },
+  "free": "免费",
+  "pro": "Pro",
+  "monthly": "月付",
+  "annual": "年付",
+  "save40": "省40%",
+  "unavailable": "此产品在您所在地区不可用",
+  "welcomePro": "欢迎使用Pro！",
+  "welcomeProDesc": "您现在可以使用所有高级功能。",
+  "restorePurchase": "恢复购买",
+  "restored": "Pro订阅已恢复。",
+  "noRestoreFound": "未找到可恢复的订阅。",
+  "productsUnavailable": "订阅产品当前不可用，请稍后重试。",
+  "privacyPolicy": "隐私政策",
+  "termsOfService": "服务条款",
+  "manageSubscription": "管理订阅"
+}

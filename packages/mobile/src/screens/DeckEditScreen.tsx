@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, TextInput, Button } from '../components/ui'
+import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { StatCard } from '../components/charts/StatCard'
 import { ProgressBar } from '../components/charts/ProgressBar'
 import { useDecks } from '../hooks/useDecks'
@@ -136,14 +136,8 @@ export function DeckEditScreen() {
 
   return (
     <Screen scroll keyboard testID="deck-edit-screen">
+      <ScreenHeader title={isEditing ? t('edit.title') : t('edit.createTitle')} mode="back" />
       <View style={styles.content}>
-        <View style={styles.topRow}>
-          <Button title={t('edit.cancel', { defaultValue: '← Cancel' })} variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
-        </View>
-
-        <Text style={[theme.typography.h2, { color: theme.colors.text }]}>
-          {isEditing ? t('edit.title') : t('edit.createTitle')}
-        </Text>
 
         {/* Preview */}
         <View style={[styles.preview, { backgroundColor: color + '15', borderColor: color + '40' }]}>
@@ -348,7 +342,7 @@ export function DeckEditScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: 16, paddingVertical: 16 },
-  topRow: { flexDirection: 'row' },
+
   preview: { alignItems: 'center', padding: 20, borderRadius: 16, borderWidth: 1, gap: 8 },
   previewIcon: { fontSize: 40 },
   section: { gap: 8 },

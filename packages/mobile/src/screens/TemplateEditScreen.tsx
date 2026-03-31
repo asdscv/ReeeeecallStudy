@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet, Switch } f
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import * as Speech from 'expo-speech'
-import { Screen, TextInput, Button } from '../components/ui'
+import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
 import type { TemplateField, LayoutItem } from '@reeeeecall/shared/types/database'
@@ -244,11 +244,11 @@ export function TemplateEditScreen() {
   if (!isNew && !template && templates.length > 0) {
     return (
       <Screen scroll keyboard testID="template-edit-screen">
+        <ScreenHeader title="Template" mode="back" />
         <View style={styles.centered}>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
             Template not found
           </Text>
-          <Button title="Back to List" variant="ghost" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -269,36 +269,22 @@ export function TemplateEditScreen() {
 
   return (
     <Screen safeArea padding={false} testID="template-edit-screen">
+      <ScreenHeader
+        title={isNew ? 'New Template' : 'Edit Template'}
+        mode="back"
+        rightAction={{
+          title: saving ? 'Saving...' : 'Save',
+          onPress: handleSave,
+          loading: saving,
+          disabled: !name.trim(),
+          testID: 'template-edit-save',
+        }}
+      />
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.topRow}>
-          <Button
-            title="Cancel"
-            variant="ghost"
-            size="sm"
-            fullWidth={false}
-            onPress={() => navigation.goBack()}
-            testID="template-edit-cancel"
-          />
-          <Button
-            title={saving ? 'Saving...' : 'Save'}
-            variant="primary"
-            size="sm"
-            fullWidth={false}
-            loading={saving}
-            disabled={!name.trim()}
-            onPress={handleSave}
-            testID="template-edit-save"
-          />
-        </View>
-
-        <Text style={[theme.typography.h2, { color: theme.colors.text }]}>
-          {isNew ? 'New Template' : 'Edit Template'}
-        </Text>
 
         {/* Template name */}
         <TextInput
@@ -717,7 +703,7 @@ const previewStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 16, paddingBottom: 24, gap: 16, paddingTop: 8 },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between' },
+
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingVertical: 60 },
   // Section card
   sectionCard: { borderRadius: 12, borderWidth: 1, padding: 16, gap: 12 },

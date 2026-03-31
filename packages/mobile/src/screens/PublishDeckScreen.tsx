@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
-import { Screen, TextInput, Button } from '../components/ui'
+import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useDecks } from '../hooks'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { useTranslation } from 'react-i18next'
@@ -67,10 +67,8 @@ export function PublishDeckScreen() {
 
   return (
     <Screen scroll keyboard testID="publish-deck-screen">
+      <ScreenHeader title={t('publish.title')} mode="back" />
       <View style={styles.content}>
-        <Button title="← Back" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
-
-        <Text style={[theme.typography.h1, { color: theme.colors.text }]}>{t('publish.title')}</Text>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
           Share your deck with the community
         </Text>

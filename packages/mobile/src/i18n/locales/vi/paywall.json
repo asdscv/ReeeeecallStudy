@@ -1,0 +1,31 @@
+{
+  "title": "Nang cap len Pro",
+  "subtitle": "Mo khoa toan bo tinh nang ReeeeecallStudy",
+  "youArePro": "Ban la Pro!",
+  "proDesc": "Ban co quyen truy cap tat ca tinh nang cao cap.",
+  "done": "Xong",
+  "back": "Quay lai",
+  "features": {
+    "unlimitedDecks": { "title": "Khong gioi han Bo & The", "free": "5 bo, 3K the", "pro": "Khong gioi han" },
+    "allModes": { "title": "Tat ca che do hoc", "free": "SRS + Tuan tu", "pro": "Tat ca 4 che do" },
+    "aiGeneration": { "title": "AI Tao the", "free": "5/thang", "pro": "Khong gioi han" },
+    "premiumTts": { "title": "TTS Cao cap", "free": "Co ban", "pro": "Edge TTS HD" },
+    "analytics": { "title": "Phan tich nang cao", "free": "Thong ke co ban", "pro": "Bieu do + Du bao" },
+    "marketplace": { "title": "Xuat ban Marketplace", "free": "Chi tai ve", "pro": "Tai len + Chia se doanh thu" }
+  },
+  "free": "Mien phi",
+  "pro": "Pro",
+  "monthly": "Hang thang",
+  "annual": "Hang nam",
+  "save40": "Tiet kiem 40%",
+  "unavailable": "San pham nay khong kha dung tai khu vuc cua ban",
+  "welcomePro": "Chao mung den Pro!",
+  "welcomeProDesc": "Ban da co quyen truy cap tat ca tinh nang cao cap.",
+  "restorePurchase": "Khoi phuc mua hang",
+  "restored": "Da khoi phuc goi Pro.",
+  "noRestoreFound": "Khong tim thay goi dang ky truoc do.",
+  "productsUnavailable": "San pham dang ky hien khong kha dung. Vui long thu lai sau.",
+  "privacyPolicy": "Chinh sach Bao mat",
+  "termsOfService": "Dieu khoan Dich vu",
+  "manageSubscription": "Quan ly Dang ky"
+}

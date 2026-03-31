@@ -1,0 +1,106 @@
+{
+  "title": "设置",
+  "profile": {
+    "title": "个人信息",
+    "email": "邮箱",
+    "displayName": "显示名称",
+    "displayNamePlaceholder": "请输入您的名称",
+    "namePlaceholder": "请输入您的名称",
+    "saveBtn": "保存",
+    "nameSaved": "名称已保存！",
+    "nameAvailable": "可以使用",
+    "nameTaken": "该名称已被使用",
+    "nameLength": "名称必须为2-12个字符"
+  },
+  "language": {
+    "title": "语言",
+    "label": "显示语言",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+  "srs": {
+    "title": "SRS 学习",
+    "description": "设置 SRS（间隔重复）模式下每次学习添加的新卡数量",
+    "newCardLimit": "新卡限制",
+    "cards": "张",
+    "cardsUnit": "张",
+    "help": "SRS 学习中除复习卡外的最大新卡数量。复习卡不受此限制影响。",
+    "newCardNote": "SRS 学习中除复习卡外的最大新卡数量。复习卡不受此限制影响。"
+  },
+  "answerMode": {
+    "title": "答题模式",
+    "description": "设置学习时的答题方式",
+    "button": "按钮",
+    "buttonDesc": "通过点击按钮选择答案",
+    "swipe": "滑动",
+    "swipeDesc": "通过滑动卡片选择答案",
+    "swipeAutoNote": "滑动方向根据学习模式自动设置。\n• SRS: ← 重来 / → 良好\n• 其他模式: ← 不知道 / → 知道"
+  },
+  "tts": {
+    "title": "自动 TTS 朗读",
+    "description": "翻转卡片时自动朗读启用了 TTS 的字段",
+    "enable": "启用自动朗读",
+    "provider": "语音引擎",
+    "webSpeech": "设备语音",
+    "webSpeechDesc": "使用设备内置语音",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "高质量神经网络语音",
+    "edgeTtsNote": "* 目前仅支持英语",
+    "speed": "朗读速度",
+    "help": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
+    "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。"
+  },
+  "srsConfig": {
+    "title": "SRS Configuration",
+    "description": "Default SRS settings for new decks. Each deck can override these.",
+    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "goodInterval": "Good Interval (days)",
+    "easyInterval": "Easy Interval (days)"
+  },
+  "aiProviders": {
+    "title": "AI Providers",
+    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "configure": "Configure",
+    "cancel": "Cancel",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key...",
+    "models": "Models",
+    "save": "Save",
+    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dailyReminder": "Daily Study Reminder",
+    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
+    "permissionRequired": "Enable notifications in device settings."
+  },
+  "subscription": {
+    "title": "Subscription",
+    "pro": "Pro",
+    "freePlan": "Free Plan",
+    "proDesc": "All premium features unlocked",
+    "freeDesc": "Upgrade for unlimited access",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "account": {
+    "title": "账号",
+    "logout": "退出登录"
+  },
+  "links": {
+    "userGuide": "用户指南",
+    "userGuideDesc": "功能说明、学习技巧、分享方法",
+    "apiDocs": "API 文档",
+    "apiDocsDesc": "API 端点、认证、使用示例"
+  }
+}

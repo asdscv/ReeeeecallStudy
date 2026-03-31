@@ -1,0 +1,265 @@
+{
+  "nav": {
+    "quickStudy": "クイック学習",
+    "dashboard": "ダッシュボード",
+    "study": "学習",
+    "decks": "デッキ",
+    "cards": "カード",
+    "marketplace": "マーケットプレイス",
+    "studyHistory": "履歴",
+    "settings": "設定",
+    "admin": "管理者",
+    "guide": "ガイド",
+    "aiGenerate": "AI Generate",
+    "achievements": "Achievements",
+    "leaderboard": "Leaderboard",
+    "analytics": "Analytics",
+    "publisher": "Publisher Stats"
+  },
+  "actions": {
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "add": "追加",
+    "remove": "削除",
+    "confirm": "確認",
+    "ok": "OK",
+    "back": "戻る",
+    "next": "次へ",
+    "close": "閉じる",
+    "copy": "コピー",
+    "duplicate": "複製",
+    "search": "検索",
+    "selectAll": "すべて選択",
+    "deselect": "選択解除",
+    "show": "表示",
+    "hide": "非表示",
+    "startStudy": "学習開始",
+    "logout": "ログアウト"
+  },
+  "status": {
+    "loading": "読み込み中...",
+    "processing": "処理中...",
+    "new": "新規",
+    "learning": "学習中",
+    "review": "復習",
+    "suspended": "一時停止"
+  },
+  "units": {
+    "cards": "枚",
+    "cardsSuffix": "{{count}}枚",
+    "sessions": "回",
+    "items": "件",
+    "days": "日",
+    "hours": "時間",
+    "minutes": "分",
+    "seconds": "秒",
+    "times": "回",
+    "percent": "{{value}}%"
+  },
+  "pagination": {
+    "rangeOf": "{{start}}~{{end}} / {{total}}",
+    "perPage": "{{count}}件ずつ表示"
+  },
+  "timePeriod": {
+    "1d": "1日",
+    "1w": "1週",
+    "1m": "1ヶ月",
+    "3m": "3ヶ月",
+    "6m": "6ヶ月",
+    "1y": "1年",
+    "2y": "2年",
+    "5y": "5年"
+  },
+  "confirmDialog": {
+    "cancel": "キャンセル",
+    "processing": "処理中...",
+    "confirm": "確認"
+  },
+  "delete": "削除",
+  "deselect": "選択解除",
+  "duplicate": "複製",
+  "selectAllPage": "このページをすべて選択",
+  "edit": "編集",
+  "save": "保存",
+  "saving": "保存中...",
+  "selectAll": "すべて選択",
+  "menu": "メニュー",
+  "copiedToClipboard": "クリップボードにコピーしました",
+  "export": "エクスポート",
+  "officialBadge": {
+    "label": "公式",
+    "tooltip": "公式アカウント"
+  },
+  "guideHelp": "Help",
+  "onboarding": {
+    "skip": "Skip for now",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "getStarted": "Get Started",
+    "stepOf": "Step {{current}} of {{total}}",
+    "restartOnboarding": "Restart Tutorial",
+    "welcome": {
+      "title": "Welcome to Reeeeecall!",
+      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
+      "action": "Get Started"
+    },
+    "createDeck": {
+      "title": "Create Your First Deck",
+      "description": "We've prepared a sample deck for you. Click to create it!",
+      "action": "Create This Deck",
+      "creating": "Creating...",
+      "created": "Deck created!"
+    },
+    "cardTemplate": {
+      "title": "Your Card Templates",
+      "description": "These templates are already set up for you. Pick one for your cards.",
+      "fields": "{{count}} fields",
+      "useTemplate": "Use This Template"
+    },
+    "addCards": {
+      "title": "Sample Cards Ready!",
+      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "action": "Add These Cards",
+      "adding": "Adding...",
+      "added": "Cards added!"
+    },
+    "firstStudy": {
+      "title": "You're Ready to Study!",
+      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "action": "Start Studying"
+    },
+    "exploreMarket": {
+      "title": "Explore the Marketplace",
+      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "action": "Browse Marketplace",
+      "actionFinish": "Finish Setup"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "level": "Level",
+    "xp": "XP",
+    "totalXp": "Total XP",
+    "progress": "Progress",
+    "viewAll": "View All",
+    "recent": "Recent",
+    "empty": "No achievements yet. Start studying to earn badges!",
+    "newUnlocked": "Achievement Unlocked!",
+    "category": {
+      "streak": "Streak",
+      "study": "Study",
+      "social": "Social",
+      "milestone": "Milestone"
+    },
+    "badge": {
+      "streak_3": "3-Day Streak",
+      "streak_7": "7-Day Streak",
+      "streak_30": "30-Day Streak",
+      "streak_100": "100-Day Streak",
+      "cards_100": "100 Cards Studied",
+      "cards_500": "500 Cards Studied",
+      "cards_1000": "1,000 Cards Studied",
+      "cards_5000": "5,000 Cards Studied",
+      "sessions_10": "10 Sessions",
+      "sessions_50": "50 Sessions",
+      "sessions_100": "100 Sessions",
+      "deck_share": "First Deck Shared",
+      "marketplace_pub": "Published to Marketplace",
+      "first_study": "First Study Session",
+      "mastery_50": "50% Mastery",
+      "mastery_90": "90% Mastery"
+    },
+    "badgeDesc": {
+      "streak_3": "Study 3 days in a row",
+      "streak_7": "Study 7 days in a row",
+      "streak_30": "Study 30 days in a row",
+      "streak_100": "Study 100 days in a row",
+      "cards_100": "Study 100 cards total",
+      "cards_500": "Study 500 cards total",
+      "cards_1000": "Study 1,000 cards total",
+      "cards_5000": "Study 5,000 cards total",
+      "sessions_10": "Complete 10 study sessions",
+      "sessions_50": "Complete 50 study sessions",
+      "sessions_100": "Complete 100 study sessions",
+      "deck_share": "Share your first deck",
+      "marketplace_pub": "Publish a deck to the marketplace",
+      "first_study": "Complete your first study session",
+      "mastery_50": "Reach 50% mastery across all cards",
+      "mastery_90": "Reach 90% mastery across all cards"
+    },
+    "tabs": {
+      "badges": "Badges",
+      "leaderboard": "Leaderboard"
+    },
+    "more": "more",
+    "earned": " earned"
+  },
+  "analytics": {
+    "title": "My Analytics",
+    "retentionCurve": "Retention Curve",
+    "weakTopics": "Weak Topics",
+    "studyTime": "Study Time Distribution",
+    "modeEffectiveness": "Mode Effectiveness",
+    "progress": "Progress Over Time"
+  },
+  "pomodoro": {
+    "focus": "Focus",
+    "break": "Break",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "allTime": "All Time",
+    "rank": "Rank",
+    "name": "Name",
+    "level": "Level",
+    "cardsStudied": "Cards Studied",
+    "sessions": "Sessions",
+    "you": "You",
+    "empty": "No leaderboard data yet. Be the first to study!"
+  },
+  "history": {
+    "tabs": {
+      "history": "History",
+      "analytics": "Analytics"
+    }
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "cards": "Study {{target}} cards",
+    "sessions": "Complete {{target}} sessions",
+    "time": "Study for {{target}} minutes",
+    "perfect": "Get a perfect score",
+    "completed": "Completed!",
+    "xpReward": "+{{xp}} XP"
+  },
+  "streakFreeze": {
+    "title": "Streak Freeze",
+    "available": "{{count}} available",
+    "used": "Streak protected today!",
+    "earned": "Earned a streak freeze!"
+  },
+  "levelUp": {
+    "title": "Level Up!",
+    "level": "Level {{level}}",
+    "message": "Keep up the great work!",
+    "xpEarned": "+{{xp}} XP"
+  },
+  "goals": {
+    "title": "Next Goals",
+    "streak": "Streak",
+    "cards": "Cards Studied",
+    "sessions": "Sessions",
+    "time": "Study Time",
+    "mastery": "Cards Mastered"
+  }
+}

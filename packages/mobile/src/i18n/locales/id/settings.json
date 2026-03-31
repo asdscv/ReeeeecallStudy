@@ -1,0 +1,106 @@
+{
+  "title": "Pengaturan",
+  "profile": {
+    "title": "Profil",
+    "email": "Email",
+    "displayName": "Nama tampilan",
+    "displayNamePlaceholder": "Masukkan nama Anda",
+    "namePlaceholder": "Masukkan nama Anda",
+    "saveBtn": "Simpan",
+    "nameSaved": "Nama tersimpan!",
+    "nameAvailable": "Tersedia",
+    "nameTaken": "Nama ini sudah digunakan",
+    "nameLength": "Nama harus 2-12 karakter"
+  },
+  "language": {
+    "title": "Bahasa",
+    "label": "Bahasa tampilan",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
+  },
+  "srs": {
+    "title": "Pembelajaran SRS",
+    "description": "Atur jumlah kartu baru yang ditambahkan per sesi dalam mode SRS (pengulangan berjarak)",
+    "newCardLimit": "Batas Kartu Baru",
+    "cards": "kartu",
+    "cardsUnit": "kartu",
+    "help": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini.",
+    "newCardNote": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini."
+  },
+  "answerMode": {
+    "title": "Mode Jawaban",
+    "description": "Atur cara Anda memilih jawaban saat belajar",
+    "button": "Tombol",
+    "buttonDesc": "Pilih jawaban dengan menekan tombol",
+    "swipe": "Geser",
+    "swipeDesc": "Pilih jawaban dengan menggeser kartu",
+    "swipeAutoNote": "Arah geser diatur secara otomatis berdasarkan mode belajar.\n• SRS: ← Ulangi / → Baik\n• Mode lain: ← Tidak Diketahui / → Diketahui"
+  },
+  "tts": {
+    "title": "Pembacaan TTS Otomatis",
+    "description": "Baca otomatis bidang dengan TTS saat membalik kartu",
+    "enable": "Aktifkan pembacaan otomatis",
+    "provider": "Mesin Suara",
+    "webSpeech": "Suara Perangkat",
+    "webSpeechDesc": "Menggunakan suara bawaan perangkat",
+    "edgeTts": "Edge TTS",
+    "edgeTtsDesc": "Suara neural berkualitas tinggi",
+    "edgeTtsNote": "* Saat ini hanya mendukung bahasa Inggris",
+    "speed": "Kecepatan baca",
+    "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
+    "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
+  },
+  "srsConfig": {
+    "title": "SRS Configuration",
+    "description": "Default SRS settings for new decks. Each deck can override these.",
+    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "goodInterval": "Good Interval (days)",
+    "easyInterval": "Easy Interval (days)"
+  },
+  "aiProviders": {
+    "title": "AI Providers",
+    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "configure": "Configure",
+    "cancel": "Cancel",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "Enter your API key...",
+    "models": "Models",
+    "save": "Save",
+    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dailyReminder": "Daily Study Reminder",
+    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
+    "permissionRequired": "Enable notifications in device settings."
+  },
+  "subscription": {
+    "title": "Subscription",
+    "pro": "Pro",
+    "freePlan": "Free Plan",
+    "proDesc": "All premium features unlocked",
+    "freeDesc": "Upgrade for unlimited access",
+    "upgradeToPro": "Upgrade to Pro",
+    "manageSubscription": "Manage Subscription"
+  },
+  "legal": {
+    "title": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "account": {
+    "title": "Akun",
+    "logout": "Keluar"
+  },
+  "links": {
+    "userGuide": "Panduan Pengguna",
+    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
+    "apiDocs": "Dokumentasi API",
+    "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
+  }
+}

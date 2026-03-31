@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { View, Text, FlatList, RefreshControl, StyleSheet, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen, Badge, ListCard, DrawerHeader } from '../components/ui'
+import { Screen, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { BarChart } from '../components/charts'
 import { usePublisherStore } from '@reeeeecall/shared/stores/publisher-store'
 import { useTheme } from '../theme'
@@ -98,7 +98,7 @@ export function PublisherStatsScreen() {
 
   return (
     <Screen safeArea padding={false} testID="publisher-stats-screen">
-      <DrawerHeader title="Publisher Stats" />
+      <ScreenHeader title="Publisher Stats" mode="drawer" />
       <FlatList
         data={items}
         keyExtractor={(item) => item.key}

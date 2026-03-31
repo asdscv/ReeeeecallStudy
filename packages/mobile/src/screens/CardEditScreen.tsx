@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { View, Text, Alert, StyleSheet } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, TextInput, Button } from '../components/ui'
+import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
@@ -80,14 +80,8 @@ export function CardEditScreen() {
 
   return (
     <Screen scroll keyboard testID="card-edit-screen">
+      <ScreenHeader title={isEditing ? 'Edit Card' : 'New Card'} mode="back" />
       <View style={styles.content}>
-        <View style={styles.topRow}>
-          <Button title="← Cancel" variant="ghost" size="sm" fullWidth={false} onPress={() => navigation.goBack()} />
-        </View>
-
-        <Text style={[theme.typography.h2, { color: theme.colors.text }]}>
-          {isEditing ? 'Edit Card' : 'New Card'}
-        </Text>
 
         {template && (
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
@@ -190,5 +184,5 @@ export function CardEditScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: 16, paddingVertical: 16 },
-  topRow: { flexDirection: 'row' },
+
 })

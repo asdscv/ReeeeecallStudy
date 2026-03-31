@@ -1,0 +1,67 @@
+{
+  "title": "Mercado",
+  "searchPlaceholder": "Buscar mazos...",
+  "noResults": "Sin resultados de búsqueda.",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "general": "General",
+    "language": "Idiomas",
+    "science": "Ciencia",
+    "math": "Matemáticas",
+    "history": "Historia",
+    "programming": "Programación",
+    "trivia": "Trivia",
+    "exam": "Preparación de exámenes",
+    "other": "Otros"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}} tarjetas",
+    "userCount": "{{count}} usuarios"
+  },
+  "detail": {
+    "back": "← Mercado",
+    "cardCount": "{{count}} tarjetas",
+    "userCount": "{{count}} usuarios",
+    "getDeck": "Obtener este mazo",
+    "importing": "Importando...",
+    "cardPreview": "Vista previa de tarjetas (máx 10)",
+    "noCards": "Sin tarjetas.",
+    "reportContent": "Report"
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

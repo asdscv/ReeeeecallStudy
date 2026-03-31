@@ -1,0 +1,67 @@
+{
+  "title": "マーケットプレイス",
+  "searchPlaceholder": "デッキを検索...",
+  "noResults": "検索結果がありません。",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "general": "一般",
+    "language": "語学",
+    "science": "科学",
+    "math": "数学",
+    "history": "歴史",
+    "programming": "プログラミング",
+    "trivia": "雑学",
+    "exam": "試験対策",
+    "other": "その他"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}}枚",
+    "userCount": "{{count}}人"
+  },
+  "detail": {
+    "back": "← マーケットプレイス",
+    "cardCount": "{{count}}枚",
+    "userCount": "{{count}}人",
+    "getDeck": "このデッキを取得",
+    "importing": "インポート中...",
+    "cardPreview": "カードプレビュー（最大10枚）",
+    "noCards": "カードがありません。",
+    "reportContent": "Report"
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

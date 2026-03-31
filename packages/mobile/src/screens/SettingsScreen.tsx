@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList, Share, Appearance } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { Screen, TextInput, Button, DrawerHeader } from '../components/ui'
+import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -32,6 +32,7 @@ const LANGUAGES = [
   { code: 'vi', label: 'Tieng Viet', flag: '🇻🇳' },
   { code: 'th', label: 'Thai', flag: '🇹🇭' },
   { code: 'id', label: 'Bahasa', flag: '🇮🇩' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
 ]
 
 const TTS_PROVIDERS = [
@@ -81,6 +82,14 @@ export function SettingsScreen() {
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system')
   const [langDropdownOpen, setLangDropdownOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  // Display name: debounced duplicate check (matches web SettingsPage.tsx)
+  const [savedDisplayName, setSavedDisplayName] = useState('')
+  const [nameAvailable, setNameAvailable] = useState<boolean | null>(null)
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [nameChecking, setNameChecking] = useState(false)
+  const [nameSaving, setNameSaving] = useState(false)
+  const nameCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [aiCollapsed, setAiCollapsed] = useState(true)
 
@@ -109,28 +118,80 @@ export function SettingsScreen() {
     const supabase = getMobileSupabase()
     supabase
       .from('profiles')
-      .select('display_name, daily_new_limit, daily_study_goal, tts_enabled, tts_speed, tts_provider, answer_mode, language')
+      .select('*')
       .eq('id', user.id)
       .single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('[Settings] profile load error:', error.message)
+          return
+        }
         if (data) {
+          const p = data as Record<string, unknown>
+          console.log('[Settings] profile loaded:', { display_name: p.display_name })
           setProfile({
-            display_name: data.display_name ?? '',
-            daily_new_limit: data.daily_new_limit ?? 20,
-            daily_study_goal: (data as Record<string, unknown>).daily_study_goal as number | null,
-            tts_enabled: data.tts_enabled ?? false,
-            tts_speed: data.tts_speed ?? 0.9,
-            tts_provider: data.tts_provider ?? 'web_speech',
-            answer_mode: data.answer_mode ?? 'button',
-            answer_timing: (data as Record<string, unknown>).answer_timing as ProfileData['answer_timing'] ?? 'after',
+            display_name: (p.display_name as string) ?? '',
+            daily_new_limit: (p.daily_new_limit as number) ?? 20,
+            daily_study_goal: (p.daily_study_goal as number | null) ?? null,
+            tts_enabled: (p.tts_enabled as boolean) ?? false,
+            tts_speed: (p.tts_speed as number) ?? 0.9,
+            tts_provider: (p.tts_provider as ProfileData['tts_provider']) ?? 'web_speech',
+            answer_mode: (p.answer_mode as ProfileData['answer_mode']) ?? 'button',
+            answer_timing: (p.answer_timing as ProfileData['answer_timing']) ?? 'after',
           })
-          if (data.language) {
-            setLanguage(data.language)
-            i18n.changeLanguage(data.language)
+          setSavedDisplayName((p.display_name as string) ?? '')
+          const lang = p.language as string | undefined
+          if (lang) {
+            setLanguage(lang)
+            i18n.changeLanguage(lang)
           }
         }
       })
   }, [user])
+
+  // Display name: debounced availability check
+  const checkNameAvailability = useCallback(async (name: string) => {
+    const trimmed = name.trim()
+    if (!trimmed || trimmed === savedDisplayName) {
+      setNameAvailable(null)
+      setNameError(null)
+      setNameChecking(false)
+      return
+    }
+    if (trimmed.length < 2 || trimmed.length > 12) {
+      setNameAvailable(false)
+      setNameError('2-12 characters required')
+      setNameChecking(false)
+      return
+    }
+    setNameChecking(true)
+    const supabase = getMobileSupabase()
+    const { data } = await supabase.rpc('check_nickname_available', { p_nickname: trimmed })
+    const result = data as { available: boolean; error?: string } | null
+    if (result?.error === 'invalid_length') {
+      setNameAvailable(false)
+      setNameError('2-12 characters required')
+    } else if (result?.available === false) {
+      setNameAvailable(false)
+      setNameError('Name already taken')
+    } else {
+      setNameAvailable(true)
+      setNameError(null)
+    }
+    setNameChecking(false)
+  }, [savedDisplayName])
+
+  const handleNameChange = useCallback((value: string) => {
+    setProfile((p) => ({ ...p, display_name: value }))
+    setNameAvailable(null)
+    setNameError(null)
+    if (nameCheckTimer.current) clearTimeout(nameCheckTimer.current)
+    const trimmed = value.trim()
+    if (!trimmed || trimmed === savedDisplayName) return
+    nameCheckTimer.current = setTimeout(() => checkNameAvailability(value), 500)
+  }, [savedDisplayName, checkNameAvailability])
+
+
 
   // Load notification status
   useEffect(() => {
@@ -161,6 +222,21 @@ export function SettingsScreen() {
     setProfile((prev) => ({ ...prev, ...updates }))
     setSaving(false)
   }, [user])
+
+  const handleSaveName = useCallback(async () => {
+    if (!user) return
+    const trimmed = profile.display_name.trim()
+    if (trimmed === savedDisplayName) return
+    if (trimmed && (trimmed.length < 2 || trimmed.length > 12)) return
+    if (nameAvailable === false) return
+    setNameSaving(true)
+    await saveProfile({ display_name: trimmed || '' })
+    setSavedDisplayName(trimmed)
+    setNameAvailable(null)
+    setNameError(null)
+    setNameSaving(false)
+    Alert.alert('Saved', 'Display name updated.')
+  }, [user, profile.display_name, savedDisplayName, nameAvailable, saveProfile])
 
   const handleLanguageChange = useCallback(async (code: string) => {
     setLanguage(code)
@@ -219,7 +295,7 @@ export function SettingsScreen() {
 
   return (
     <Screen safeArea padding={false} testID="settings-screen">
-      <DrawerHeader title={t('title')} />
+      <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* ── a) Profile — centered avatar like web ── */}
@@ -238,14 +314,49 @@ export function SettingsScreen() {
               </Text>
             </View>
           </View>
-          <TextInput
-            testID="settings-display-name"
-            label="Display name"
-            value={profile.display_name}
-            onChangeText={(v) => setProfile((p) => ({ ...p, display_name: v }))}
-            onBlur={() => saveProfile({ display_name: profile.display_name })}
-            placeholder="2-12 characters"
-          />
+          <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>Display name</Text>
+          <View style={styles.nameRow}>
+            <View style={{ flex: 1 }}>
+              <TextInput
+                testID="settings-display-name"
+                value={profile.display_name}
+                onChangeText={handleNameChange}
+                placeholder="2-12 characters"
+                maxLength={12}
+              />
+            </View>
+            <Button
+              testID="settings-save-name"
+              title={nameSaving ? '...' : 'Save'}
+              variant="primary"
+              size="sm"
+              fullWidth={false}
+              disabled={
+                nameSaving ||
+                nameChecking ||
+                nameAvailable === false ||
+                profile.display_name.trim() === savedDisplayName ||
+                !profile.display_name.trim()
+              }
+              loading={nameSaving}
+              onPress={handleSaveName}
+            />
+          </View>
+          {nameChecking && (
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+              Checking availability...
+            </Text>
+          )}
+          {nameError && (
+            <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 4 }]}>
+              {nameError}
+            </Text>
+          )}
+          {nameAvailable === true && !nameChecking && (
+            <Text style={[theme.typography.caption, { color: theme.colors.success, marginTop: 4 }]}>
+              Name available!
+            </Text>
+          )}
         </SectionCard>
 
         {/* ── b) Quick Actions — circles like web ── */}
@@ -945,6 +1056,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 17, fontWeight: '600' },
   sectionBody: { gap: 12 },
   fieldLabel: { fontSize: 13, fontWeight: '500', marginBottom: 4 },
+  nameRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   settingRow: { gap: 4 },
 
   // Language dropdown

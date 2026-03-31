@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, ScrollView, Modal } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, SearchBar, Badge, ListCard, DrawerHeader } from '../components/ui'
+import { Screen, SearchBar, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { testProps } from '../utils/testProps'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
@@ -102,7 +102,7 @@ export function MarketplaceScreen() {
 
   return (
     <Screen safeArea padding={false} testID="marketplace-screen">
-      <DrawerHeader title={t('title')} />
+      <ScreenHeader title={t('title')} mode="drawer" />
       <FlatList
         data={paginatedData}
         keyExtractor={(item) => item.id}

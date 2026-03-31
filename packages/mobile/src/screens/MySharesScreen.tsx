@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
-import { Screen, DrawerHeader } from '../components/ui'
+import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
@@ -204,7 +204,7 @@ export function MySharesScreen() {
 
   return (
     <Screen safeArea padding={false} testID="my-shares-screen">
-      <DrawerHeader title="My Shares" />
+      <ScreenHeader title="My Shares" mode="drawer" />
       <FlatList
         data={[1]} // single item, we render sections manually
         keyExtractor={() => 'sections'}

@@ -1,0 +1,31 @@
+{
+  "title": "Proにアップグレード",
+  "subtitle": "ReeeeecallStudyの全機能をアンロック",
+  "youArePro": "Proです！",
+  "proDesc": "すべてのプレミアム機能をご利用いただけます。",
+  "done": "完了",
+  "back": "戻る",
+  "features": {
+    "unlimitedDecks": { "title": "無制限のデッキ＆カード", "free": "5デッキ、3千枚", "pro": "無制限" },
+    "allModes": { "title": "全学習モード", "free": "SRS + 順次", "pro": "全4モード" },
+    "aiGeneration": { "title": "AIカード生成", "free": "月5回", "pro": "無制限" },
+    "premiumTts": { "title": "プレミアムTTS", "free": "基本", "pro": "Edge TTS HD" },
+    "analytics": { "title": "高度な分析", "free": "基本統計", "pro": "チャート + 予測" },
+    "marketplace": { "title": "マーケットプレイス公開", "free": "ダウンロードのみ", "pro": "アップロード + 収益分配" }
+  },
+  "free": "無料",
+  "pro": "Pro",
+  "monthly": "月額",
+  "annual": "年額",
+  "save40": "40%お得",
+  "unavailable": "この地域ではご利用いただけません",
+  "welcomePro": "Proへようこそ！",
+  "welcomeProDesc": "すべてのプレミアム機能をご利用いただけます。",
+  "restorePurchase": "購入を復元",
+  "restored": "Proサブスクリプションが復元されました。",
+  "noRestoreFound": "復元可能なサブスクリプションが見つかりません。",
+  "productsUnavailable": "現在サブスクリプション商品をご利用いただけません。後ほどお試しください。",
+  "privacyPolicy": "プライバシーポリシー",
+  "termsOfService": "利用規約",
+  "manageSubscription": "サブスクリプション管理"
+}

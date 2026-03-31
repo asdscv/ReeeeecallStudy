@@ -1,0 +1,137 @@
+{
+  "modes": {
+    "srs": {
+      "label": "SRS（間隔反復）",
+      "description": "復習タイミングに基づいてカードを自動選択",
+      "detail": "記憶曲線に基づいた最適な間隔で復習します。Again/Hard/Good/Easyで評価して間隔を調整します。間違えたカードは同じセッション内で再表示されます。"
+    },
+    "sequential_review": {
+      "label": "順次復習",
+      "description": "すべての新規カード＋復習カードを順番に",
+      "detail": "すべての新規カードが常に含まれます。バッチサイズで既存カードの復習数を制御します。最後まで到達すると最初に戻ります。"
+    },
+    "random": {
+      "label": "ランダム",
+      "description": "カードをランダムにシャッフルして学習",
+      "detail": "デッキからバッチサイズ分のカードをランダムに選択します。SRSステータスに関係なく、一時停止されていないすべてのカードが対象です。"
+    },
+    "sequential": {
+      "label": "順次",
+      "description": "カードを順番に学習",
+      "detail": "ソート順でバッチサイズ分のカードを学習します。前回の位置を記憶して続きから再開します。最後まで到達すると最初に戻ります。"
+    },
+    "by_date": {
+      "label": "日付別",
+      "description": "特定の日にアップロードされたカードを学習",
+      "detail": "選択した日付に追加されたカードのみを集めて学習します。新しく追加したカードを素早く復習するのに便利です。"
+    },
+    "cramming": {
+      "label": "詰め込みモード",
+      "description": "マスターするまで集中復習",
+      "detail": "すべてのカードをラウンドごとに繰り返します。間違えたカードは正解するまで再出題されます。SRSスケジュールに影響なし。"
+    }
+  },
+  "setup": {
+    "title": "学習設定",
+    "deckInfo": "{{icon}} {{name}} · {{count}}枚",
+    "studyMode": "学習モード",
+    "selectUploadDate": "アップロード日を選択",
+    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚"
+  },
+  "cramming": {
+    "gotIt": "わかった！",
+    "missed": "わからない",
+    "round": "ラウンド {{round}}",
+    "mastery": "マスター率: {{percentage}}%",
+    "filter": {
+      "title": "カードフィルター",
+      "all": "すべてのカード",
+      "allDesc": "デッキ内の一時停止されていないすべてのカードを学習",
+      "weak": "苦手なカードのみ",
+      "weakDesc": "難易度が高いカードや新しいカード",
+      "dueSoon": "もうすぐ復習",
+      "dueSoonDesc": "3日以内に復習予定のカード"
+    },
+    "timeLimit": {
+      "title": "制限時間",
+      "none": "制限なし",
+      "minutes": "{{count}}分"
+    },
+    "shuffle": {
+      "title": "カードをシャッフル",
+      "desc": "毎ラウンドカードの順序をシャッフル"
+    },
+    "summary": {
+      "completed": "詰め込み完了！",
+      "timeUp": "時間切れ！",
+      "wellDone": "お疲れ様でした！復習を続けて記憶を強化しましょう。",
+      "totalRounds": "総ラウンド数",
+      "masteryRate": "マスター率",
+      "cardsStudied": "学習カード数",
+      "hardestCards": "最も難しいカード",
+      "missedTimes": "{{count}}回間違い",
+      "noSrsImpact": "このセッションはSRSスケジュールに影響しません。",
+      "sessionEnded": "セッション終了",
+      "crammingAgain": "もう一度詰め込み",
+      "otherMode": "他のモード"
+    }
+  },
+  "session": {
+    "loading": "読み込み中...",
+    "noCards": "学習するカードがありません",
+    "allReviewed": "すべてのカードを復習しました！",
+    "backToDeck": "デッキに戻る",
+    "exitConfirmTitle": "学習を終了しますか？",
+    "exitConfirmMessage": "これまでの学習記録は保存されます。",
+    "exitConfirmButton": "終了",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused",
+    "pressSpaceToResume": "Press Space to resume",
+    "undo": "Undo"
+  },
+  "srsRating": {
+    "again": "もう一度",
+    "hard": "難しい",
+    "good": "良い",
+    "easy": "簡単"
+  },
+  "rating": {
+    "dontKnow": "わからない",
+    "knowIt": "わかる",
+    "known": "既知",
+    "unknown": "未知",
+    "next": "次へ →"
+  },
+  "summary": {
+    "title": "学習完了！",
+    "completed": "学習完了！",
+    "greatJob": "お疲れ様でした！",
+    "wellDone": "お疲れ様でした！この調子で頑張りましょう。",
+    "studyCards": "学習カード",
+    "cardsStudied": "学習したカード",
+    "cardCount": "{{studied}} / {{total}}",
+    "timeSpent": "所要時間",
+    "timeFormat": "{{minutes}}分{{seconds}}秒",
+    "avgPerCard": "1枚あたりの平均",
+    "secondsFormat": "{{seconds}}秒",
+    "ratingDistribution": "評価分布",
+    "backToDeck": "デッキに戻る",
+    "studyAgain": "もう一度学習",
+    "sessionEnded": "セッション終了",
+    "progressSoFar": "ここまでの学習状況です。",
+    "knowIt": "わかる",
+    "dontKnow": "わからない",
+    "next": "次へ"
+  },
+  "ratingLabels": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "missed": "Missed",
+    "got_it": "Got It",
+    "unknown": "Unknown",
+    "known": "Known"
+  }
+}

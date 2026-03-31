@@ -1,0 +1,31 @@
+{
+  "title": "Upgrade ke Pro",
+  "subtitle": "Buka semua fitur ReeeeecallStudy",
+  "youArePro": "Anda Pro!",
+  "proDesc": "Anda memiliki akses ke semua fitur premium.",
+  "done": "Selesai",
+  "back": "Kembali",
+  "features": {
+    "unlimitedDecks": { "title": "Deck & Kartu Tak Terbatas", "free": "5 deck, 3K kartu", "pro": "Tak terbatas" },
+    "allModes": { "title": "Semua Mode Belajar", "free": "SRS + Berurutan", "pro": "Semua 4 mode" },
+    "aiGeneration": { "title": "AI Buat Kartu", "free": "5/bulan", "pro": "Tak terbatas" },
+    "premiumTts": { "title": "TTS Premium", "free": "Dasar", "pro": "Edge TTS HD" },
+    "analytics": { "title": "Analitik Lanjutan", "free": "Statistik dasar", "pro": "Grafik + Prediksi" },
+    "marketplace": { "title": "Publikasi Marketplace", "free": "Unduh saja", "pro": "Unggah + Bagi hasil" }
+  },
+  "free": "Gratis",
+  "pro": "Pro",
+  "monthly": "Bulanan",
+  "annual": "Tahunan",
+  "save40": "Hemat 40%",
+  "unavailable": "Produk ini tidak tersedia di wilayah Anda",
+  "welcomePro": "Selamat datang di Pro!",
+  "welcomeProDesc": "Anda sekarang memiliki akses ke semua fitur premium.",
+  "restorePurchase": "Pulihkan Pembelian",
+  "restored": "Langganan Pro telah dipulihkan.",
+  "noRestoreFound": "Tidak ditemukan langganan sebelumnya.",
+  "productsUnavailable": "Produk langganan saat ini tidak tersedia. Silakan coba lagi nanti.",
+  "privacyPolicy": "Kebijakan Privasi",
+  "termsOfService": "Ketentuan Layanan",
+  "manageSubscription": "Kelola Langganan"
+}

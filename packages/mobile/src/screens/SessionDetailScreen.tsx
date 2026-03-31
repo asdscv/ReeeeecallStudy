@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
-import { Screen, Badge } from '../components/ui'
+import { Screen, Badge, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
@@ -144,6 +144,7 @@ export function SessionDetailScreen() {
 
   return (
     <Screen safeArea padding={false} testID="session-detail-screen">
+      <ScreenHeader title={deckName} mode="back" />
       <FlatList
         data={logs}
         keyExtractor={(item, i) => item.id ?? String(i)}
@@ -151,13 +152,6 @@ export function SessionDetailScreen() {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Back button */}
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} testID="session-detail-back">
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                {'<-'} Back
-              </Text>
-            </TouchableOpacity>
-
             {/* Session info card */}
             <View style={[styles.infoCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <View style={styles.infoHeader}>

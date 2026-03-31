@@ -71,35 +71,44 @@ export async function handleSitemapArticles(env) {
   let contentEntries = ''
 
   if (anonKey) {
-    const contentRes = await fetch(
-      `${restUrl}/contents?is_published=eq.true&select=slug,locale,updated_at,title,thumbnail_url,og_image_url&order=published_at.desc`,
-      { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
-    )
-    const contentData = await contentRes.json()
-    const articles = contentData || []
-
-    const slugMap = {}
-    for (const a of articles) {
-      if (!slugMap[a.slug]) slugMap[a.slug] = { locales: {}, title: a.title, image: a.og_image_url || a.thumbnail_url }
-      slugMap[a.slug].locales[a.locale] = a.updated_at
-      if (!slugMap[a.slug].image && (a.og_image_url || a.thumbnail_url)) {
-        slugMap[a.slug].image = a.og_image_url || a.thumbnail_url
+    try {
+      const contentRes = await fetch(
+        `${restUrl}/contents?is_published=eq.true&select=slug,locale,updated_at,title,thumbnail_url,og_image_url&order=published_at.desc`,
+        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+      )
+      if (!contentRes.ok) {
+        console.error(`Sitemap articles fetch failed: ${contentRes.status}`)
+        return xmlResponse(`${URLSET_HEADER}\n</urlset>`)
       }
-    }
+      const contentData = await contentRes.json()
+      const articles = contentData || []
 
-    for (const [slug, info] of Object.entries(slugMap)) {
-      const lastmod = Object.values(info.locales).sort().pop()
-      const imageTag = info.image
-        ? `\n    <image:image>\n      <image:loc>${escapeHtml(info.image)}</image:loc>\n      <image:title>${escapeHtml(info.title)}</image:title>\n    </image:image>`
-        : ''
-      contentEntries += `  <url>
+      const slugMap = {}
+      for (const a of articles) {
+        if (!slugMap[a.slug]) slugMap[a.slug] = { locales: {}, title: a.title, image: a.og_image_url || a.thumbnail_url }
+        slugMap[a.slug].locales[a.locale] = a.updated_at
+        if (!slugMap[a.slug].image && (a.og_image_url || a.thumbnail_url)) {
+          slugMap[a.slug].image = a.og_image_url || a.thumbnail_url
+        }
+      }
+
+      for (const [slug, info] of Object.entries(slugMap)) {
+        const existingLocales = Object.keys(info.locales)
+        const lastmod = Object.values(info.locales).sort().pop()
+        const imageTag = info.image
+          ? `\n    <image:image>\n      <image:loc>${escapeHtml(info.image)}</image:loc>\n      <image:title>${escapeHtml(info.title)}</image:title>\n    </image:image>`
+          : ''
+        contentEntries += `  <url>
     <loc>${SITE_URL}/insight/${slug}</loc>
     <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>${imageTag}
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
+${existingLocales.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight/${slug}"/>
   </url>\n`
+      }
+    } catch (err) {
+      console.error('Sitemap articles error:', err)
     }
   }
 
@@ -129,7 +138,6 @@ export async function handleSitemapListings(env) {
 ${lastmod ? `    <lastmod>${lastmod}</lastmod>` : ''}
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
-${SUPPORTED_LOCALES.map((ll) => `    <xhtml:link rel="alternate" hreflang="${ll}" href="${SITE_URL}/d/${l.id}?lang=${ll}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/d/${l.id}"/>
   </url>\n`
       }

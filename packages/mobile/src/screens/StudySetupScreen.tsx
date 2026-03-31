@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet, Modal, FlatList } from 'react-native'
 import { useNavigation, useRoute, useFocusEffect, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, Button, TextInput, DrawerHeader } from '../components/ui'
+import { Screen, Button, TextInput, ScreenHeader } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { useDecks } from '../hooks/useDecks'
 import { useStudy } from '../hooks/useStudy'
@@ -204,7 +204,7 @@ export function StudySetupScreen() {
 
   return (
     <Screen safeArea padding={false} testID="study-setup-screen">
-      <DrawerHeader title={t('setup.title')} />
+      <ScreenHeader title={t('setup.title')} mode="drawer" />
 
       {/* Deck Grid — matches web: 2-column grid of deck cards */}
       <FlatList

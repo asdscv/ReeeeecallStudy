@@ -1,0 +1,22 @@
+{
+  "title": "学習履歴",
+  "back": "Back",
+  "all": "All",
+  "allModes": "All Modes",
+  "empty": "学習履歴がまだありません。学習を始めましょう！",
+  "emptyDesc": "Start studying to see your progress here",
+  "studyVolume": "Study Volume",
+  "modeBreakdown": "Mode Breakdown",
+  "deckProgress": {
+    "total": "{{count}}枚",
+    "notStudied": "未学習 {{count}}",
+    "learning": "学習中 {{count}}",
+    "review": "復習 {{count}}"
+  },
+  "sessionList": "Session List",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "unknownDeck": "Unknown Deck",
+  "sessions": "sessions",
+  "cards": "cards"
+}

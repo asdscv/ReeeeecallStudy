@@ -1,0 +1,22 @@
+{
+  "title": "Lịch sử học tập",
+  "back": "Back",
+  "all": "All",
+  "allModes": "All Modes",
+  "empty": "Chưa có lịch sử học tập. Hãy bắt đầu học!",
+  "emptyDesc": "Start studying to see your progress here",
+  "studyVolume": "Study Volume",
+  "modeBreakdown": "Mode Breakdown",
+  "deckProgress": {
+    "total": "{{count}} thẻ",
+    "notStudied": "Chưa học {{count}}",
+    "learning": "Đang học {{count}}",
+    "review": "Ôn tập {{count}}"
+  },
+  "sessionList": "Session List",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "unknownDeck": "Unknown Deck",
+  "sessions": "sessions",
+  "cards": "cards"
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Import / Export",
+  "importCards": "นำเข้าการ์ด",
+  "importCSV": "Import CSV",
+  "importJSON": "Import JSON",
+  "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
+  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importFailed": "Failed to import CSV file",
+  "importJsonFailed": "Failed to parse JSON file",
+  "csvEmpty": "CSV file is empty or has no data rows",
+  "exportCards": "ส่งออกการ์ด",
+  "exportCSV": "Export as CSV",
+  "exportJSON": "Export as JSON",
+  "exportFailed": "ดาวน์โหลดล้มเหลว กรุณาลองอีกครั้ง",
+  "exportJsonFailed": "Failed to export JSON",
+  "noCards": "ไม่มีการ์ดให้ส่งออก",
+  "sharingUnavailable": "Sharing is not available on this device",
+  "back": "ย้อนกลับ"
+}

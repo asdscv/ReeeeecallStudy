@@ -1,0 +1,67 @@
+{
+  "title": "市场",
+  "searchPlaceholder": "搜索牌组...",
+  "noResults": "没有搜索结果。",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "general": "综合",
+    "language": "语言",
+    "science": "科学",
+    "math": "数学",
+    "history": "历史",
+    "programming": "编程",
+    "trivia": "知识问答",
+    "exam": "考试备考",
+    "other": "其他"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}} 张卡片",
+    "userCount": "{{count}} 位用户"
+  },
+  "detail": {
+    "back": "← 市场",
+    "cardCount": "{{count}} 张卡片",
+    "userCount": "{{count}} 位用户",
+    "getDeck": "获取此牌组",
+    "importing": "导入中...",
+    "cardPreview": "卡片预览（最多 10 张）",
+    "noCards": "暂无卡片。",
+    "reportContent": "Report"
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

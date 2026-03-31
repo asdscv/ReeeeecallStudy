@@ -1,0 +1,19 @@
+{
+  "title": "Import / Export",
+  "importCards": "Importar tarjetas",
+  "importCSV": "Import CSV",
+  "importJSON": "Import JSON",
+  "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
+  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importFailed": "Failed to import CSV file",
+  "importJsonFailed": "Failed to parse JSON file",
+  "csvEmpty": "CSV file is empty or has no data rows",
+  "exportCards": "Exportar tarjetas",
+  "exportCSV": "Export as CSV",
+  "exportJSON": "Export as JSON",
+  "exportFailed": "La descarga falló. Inténtelo de nuevo.",
+  "exportJsonFailed": "Failed to export JSON",
+  "noCards": "No hay tarjetas para exportar.",
+  "sharingUnavailable": "Sharing is not available on this device",
+  "back": "Volver"
+}

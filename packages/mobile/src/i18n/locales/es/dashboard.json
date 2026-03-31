@@ -1,0 +1,66 @@
+{
+  "title": "Panel",
+  "stats": {
+    "totalCards": "Total de tarjetas",
+    "todayReview": "Repaso de hoy",
+    "streak": "Racha de estudio",
+    "masteryRate": "Tasa de dominio"
+  },
+  "dailyChart": {
+    "title": "Volumen de estudio diario",
+    "total": "Total {{count}} veces",
+    "noData": "Sin registros de estudio aún",
+    "tooltipTimes": "{{value}} veces",
+    "tooltipLabel": "Estudio"
+  },
+  "forecast": {
+    "title": "Pronóstico de repaso (7 días)",
+    "noData": "Sin repasos programados",
+    "tooltipCards": "{{value}} tarjetas",
+    "tooltipLabel": "Pendientes de repaso"
+  },
+  "recentDecks": {
+    "title": "Estado de mazos",
+    "noDecks": "Sin mazos aún. ¡Crea uno!",
+    "goToDecks": "Ir a gestión de mazos",
+    "cardCount": "{{count}} tarjetas",
+    "newCards": "Nuevas {{count}}",
+    "reviewCards": "Repaso {{count}}",
+    "study": "Estudiar"
+  },
+  "heatmap": {
+    "title": "Mapa de calor de estudio",
+    "noStudy": "Sin estudio",
+    "studyCount": "{{date}}: {{count}} estudios",
+    "tooltip": "{{date}}: {{count}} estudios"
+  },
+  "gamification": {
+    "freezes": "{{count}} freezes left",
+    "dailyGoal": "Daily Goal"
+  },
+  "level": {
+    "title": "Level {{level}}",
+    "levelUp": "Level Up!",
+    "xpLabel": "XP",
+    "allAchievements": "All Achievements",
+    "recent": "Recent:"
+  },
+  "goals": {
+    "title": "Next Goals"
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "cards": "Study {{count}} cards",
+    "sessions": "Complete {{count}} sessions",
+    "time": "Study for {{count}} minutes",
+    "perfect": "Get {{count}} perfect scores"
+  },
+  "streakFreeze": {
+    "title": "Streak Freeze",
+    "available": "{{count}} available",
+    "motivational": "Keep going! You're doing great!"
+  },
+  "studyHistory": "Study History",
+  "studyHistoryDesc": "View sessions, stats, and progress",
+  "streakDays": "{{count}}days"
+}

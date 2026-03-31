@@ -1,0 +1,67 @@
+{
+  "title": "Chợ ứng dụng",
+  "searchPlaceholder": "Tìm kiếm bộ thẻ...",
+  "noResults": "Không có kết quả tìm kiếm.",
+  "noResultsHint": "Try a different search or category",
+  "categories": {
+    "general": "Tổng hợp",
+    "language": "Ngôn ngữ",
+    "science": "Khoa học",
+    "math": "Toán học",
+    "history": "Lịch sử",
+    "programming": "Lập trình",
+    "trivia": "Kiến thức thú vị",
+    "exam": "Luyện thi",
+    "other": "Khác"
+  },
+  "sort": {
+    "popular": "Popular",
+    "newest": "Newest",
+    "cardCount": "Most Cards"
+  },
+  "listing": {
+    "cardCount": "{{count}} thẻ",
+    "userCount": "{{count}} người dùng"
+  },
+  "detail": {
+    "back": "← Chợ ứng dụng",
+    "cardCount": "{{count}} thẻ",
+    "userCount": "{{count}} người dùng",
+    "getDeck": "Lấy bộ thẻ này",
+    "importing": "Đang nhập...",
+    "cardPreview": "Xem trước thẻ (tối đa 10)",
+    "noCards": "Không có thẻ.",
+    "reportContent": "Report"
+  },
+  "publish": {
+    "title": "Publish Deck",
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "description": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tags": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "shareMode": "Share Mode",
+    "shareModes": {
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
+    },
+    "publishButton": "Publish to Marketplace",
+    "titleRequired": "Title is required",
+    "published": "Your deck is now available on the marketplace.",
+    "failed": "Failed to publish deck"
+  }
+}

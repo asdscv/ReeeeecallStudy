@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Screen, TextInput, Button, Badge, ListCard, DrawerHeader } from '../components/ui'
+import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
 import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
@@ -278,7 +278,7 @@ export function AIGenerateScreen() {
   if (step === 'config') {
     return (
       <Screen safeArea padding={false} testID="ai-generate-screen">
-        <DrawerHeader title="AI Auto-Generate" />
+        <ScreenHeader title="AI Auto-Generate" mode="drawer" />
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
           <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />

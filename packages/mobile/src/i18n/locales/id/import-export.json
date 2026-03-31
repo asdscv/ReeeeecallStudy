@@ -1,0 +1,19 @@
+{
+  "title": "Import / Export",
+  "importCards": "Impor Kartu",
+  "importCSV": "Import CSV",
+  "importJSON": "Import JSON",
+  "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
+  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importFailed": "Failed to import CSV file",
+  "importJsonFailed": "Failed to parse JSON file",
+  "csvEmpty": "CSV file is empty or has no data rows",
+  "exportCards": "Ekspor Kartu",
+  "exportCSV": "Export as CSV",
+  "exportJSON": "Export as JSON",
+  "exportFailed": "Unduhan gagal. Silakan coba lagi.",
+  "exportJsonFailed": "Failed to export JSON",
+  "noCards": "Tidak ada kartu untuk diekspor.",
+  "sharingUnavailable": "Sharing is not available on this device",
+  "back": "Kembali"
+}

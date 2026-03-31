@@ -1,0 +1,19 @@
+{
+  "title": "Import / Export",
+  "importCards": "Nhập thẻ",
+  "importCSV": "Import CSV",
+  "importJSON": "Import JSON",
+  "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
+  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importFailed": "Failed to import CSV file",
+  "importJsonFailed": "Failed to parse JSON file",
+  "csvEmpty": "CSV file is empty or has no data rows",
+  "exportCards": "Xuất thẻ",
+  "exportCSV": "Export as CSV",
+  "exportJSON": "Export as JSON",
+  "exportFailed": "Tải xuống thất bại. Vui lòng thử lại.",
+  "exportJsonFailed": "Failed to export JSON",
+  "noCards": "Không có thẻ để xuất.",
+  "sharingUnavailable": "Sharing is not available on this device",
+  "back": "Quay lại"
+}
