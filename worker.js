@@ -51,7 +51,7 @@ export default {
       return env.ASSETS.fetch(request)
     }
 
-    // Sitemaps — index + sub-sitemaps with edge caching
+    // Sitemaps — index + sub-sitemaps (cached via Cache-Control headers)
     const sitemapHandlers = {
       '/sitemap.xml': () => handleSitemap(),
       '/sitemap-static.xml': () => handleSitemapStatic(),
@@ -60,16 +60,7 @@ export default {
     }
     const sitemapHandler = sitemapHandlers[url.pathname]
     if (sitemapHandler) {
-      const cache = caches.default
-      const cacheKey = new Request(new URL(url.pathname, request.url))
-      const cached = await cache.match(cacheKey)
-      if (cached) return cached
-      const fresh = await sitemapHandler()
-      if (fresh.ok) {
-        const toCache = fresh.clone()
-        cache.put(cacheKey, toCache)
-      }
-      return fresh
+      return sitemapHandler()
     }
 
     // RSS / Atom / JSON feeds (supports ?lang=ko etc.)
