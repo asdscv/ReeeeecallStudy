@@ -72,6 +72,42 @@ export const LANDING_FAQ = {
     { q: '어떤 학습 모드가 있나요?', a: 'ReeeeecallStudy는 SRS(간격 반복), 벼락치기, 퀴즈, 매칭, 쓰기의 5가지 학습 모드를 제공합니다. 각 모드는 학습의 다양한 측면을 목표로 합니다.' },
     { q: '플래시카드 덱을 공유할 수 있나요?', a: '물론입니다! 마켓플레이스에 공개 공유하거나 친구에게 비공개 링크를 보낼 수 있습니다. 공유된 덱을 클릭 한 번으로 가져와 바로 학습을 시작하세요.' },
   ],
+  zh: [
+    { q: '什么是间隔重复？', a: '间隔重复是一种经过科学验证的学习技术，以递增的间隔安排复习。它利用间隔效应将信息从短期记忆有效地转移到长期记忆。' },
+    { q: 'ReeeeecallStudy是免费的吗？', a: '是的！ReeeeecallStudy完全免费。创建无限卡组、使用全部5种学习模式、与朋友分享、通过详细分析追踪进度——全部免费。' },
+    { q: '有哪些学习模式？', a: 'ReeeeecallStudy提供5种学习模式：SRS（间隔重复）、突击、测验、配对和书写。每种模式针对学习的不同方面，实现全面掌握。' },
+    { q: '可以分享闪卡卡组吗？', a: '当然可以！您可以在市场上公开分享，或通过私人链接发送给朋友。一键导入共享卡组，立即开始学习。' },
+  ],
+  ja: [
+    { q: '間隔反復学習とは何ですか？', a: '間隔反復学習は科学的に実証された学習技法で、間隔を徐々に広げながら復習をスケジュールします。間隔効果を活用して、情報を短期記憶から長期記憶へ効率的に移動させます。' },
+    { q: 'ReeeeecallStudyは無料ですか？', a: 'はい！ReeeeecallStudyは完全無料です。デッキの無制限作成、全5つの学習モード、友達との共有、詳細な分析での進捗追跡 — すべて無料です。' },
+    { q: 'どんな学習モードがありますか？', a: 'ReeeeecallStudyは5つの学習モードを提供しています：SRS（間隔反復）、詰め込み、クイズ、マッチング、ライティング。各モードは学習の異なる側面をターゲットにしています。' },
+    { q: 'フラッシュカードデッキを共有できますか？', a: 'もちろんです！マーケットプレイスで公開共有するか、友達にプライベートリンクを送ることができます。共有デッキをワンクリックでインポートして、すぐに学習を始めましょう。' },
+  ],
+  vi: [
+    { q: 'Lặp lại ngắt quãng là gì?', a: 'Lặp lại ngắt quãng là kỹ thuật học tập đã được khoa học chứng minh, lên lịch ôn tập theo khoảng cách tăng dần. Nó tận dụng hiệu ứng khoảng cách để chuyển thông tin từ trí nhớ ngắn hạn sang trí nhớ dài hạn hiệu quả.' },
+    { q: 'ReeeeecallStudy có miễn phí không?', a: 'Có! ReeeeecallStudy hoàn toàn miễn phí. Tạo bộ thẻ không giới hạn, sử dụng tất cả 5 chế độ học, chia sẻ với bạn bè, theo dõi tiến độ — tất cả miễn phí.' },
+    { q: 'Có những chế độ học nào?', a: 'ReeeeecallStudy cung cấp 5 chế độ học: SRS (lặp lại ngắt quãng), Nhồi nhét, Trắc nghiệm, Ghép đôi và Viết. Mỗi chế độ nhắm vào các khía cạnh khác nhau của việc học.' },
+    { q: 'Tôi có thể chia sẻ bộ thẻ không?', a: 'Tất nhiên! Bạn có thể chia sẻ công khai trên marketplace hoặc gửi liên kết riêng tư cho bạn bè. Nhập bộ thẻ được chia sẻ chỉ với một cú nhấp chuột.' },
+  ],
+  th: [
+    { q: 'การทบทวนแบบเว้นระยะคืออะไร?', a: 'การทบทวนแบบเว้นระยะเป็นเทคนิคการเรียนรู้ที่พิสูจน์ทางวิทยาศาสตร์แล้ว โดยจัดตารางทบทวนในช่วงเวลาที่เพิ่มขึ้น ใช้ประโยชน์จากเอฟเฟกต์ระยะห่างเพื่อย้ายข้อมูลจากหน่วยความจำระยะสั้นไปยังระยะยาวอย่างมีประสิทธิภาพ' },
+    { q: 'ReeeeecallStudy ฟรีไหม?', a: 'ใช่! ReeeeecallStudy ฟรีทั้งหมด สร้างเด็คไม่จำกัด ใช้ทั้ง 5 โหมดการเรียน แชร์กับเพื่อน ติดตามความก้าวหน้า — ทั้งหมดฟรี' },
+    { q: 'มีโหมดการเรียนอะไรบ้าง?', a: 'ReeeeecallStudy มี 5 โหมดการเรียน: SRS (การทบทวนแบบเว้นระยะ), ท่องจำเร่งด่วน, แบบทดสอบ, จับคู่ และเขียน แต่ละโหมดมุ่งเน้นด้านต่างๆ ของการเรียนรู้' },
+    { q: 'แชร์เด็คแฟลชการ์ดได้ไหม?', a: 'แน่นอน! คุณสามารถแชร์สาธารณะบน marketplace หรือส่งลิงก์ส่วนตัวให้เพื่อน นำเข้าเด็คที่แชร์ด้วยคลิกเดียว' },
+  ],
+  id: [
+    { q: 'Apa itu pengulangan berjarak?', a: 'Pengulangan berjarak adalah teknik belajar yang terbukti secara ilmiah, menjadwalkan ulasan pada interval yang meningkat. Teknik ini memanfaatkan efek jarak untuk memindahkan informasi dari memori jangka pendek ke jangka panjang secara efisien.' },
+    { q: 'Apakah ReeeeecallStudy gratis?', a: 'Ya! ReeeeecallStudy sepenuhnya gratis. Buat deck tanpa batas, gunakan semua 5 mode belajar, berbagi dengan teman, lacak kemajuan — semua gratis.' },
+    { q: 'Mode belajar apa saja yang tersedia?', a: 'ReeeeecallStudy menawarkan 5 mode belajar: SRS (pengulangan berjarak), Cramming, Kuis, Matching, dan Menulis. Setiap mode menargetkan aspek pembelajaran yang berbeda.' },
+    { q: 'Bisakah saya berbagi deck flashcard?', a: 'Tentu saja! Anda bisa berbagi secara publik di marketplace atau mengirim tautan pribadi ke teman. Impor deck yang dibagikan dengan satu klik.' },
+  ],
+  es: [
+    { q: '¿Qué es la repetición espaciada?', a: 'La repetición espaciada es una técnica de aprendizaje científicamente probada que programa revisiones a intervalos crecientes. Aprovecha el efecto de espaciado para mover información de la memoria a corto plazo a la memoria a largo plazo de manera eficiente.' },
+    { q: '¿Es gratuito ReeeeecallStudy?', a: '¡Sí! ReeeeecallStudy es completamente gratuito. Crea mazos ilimitados, usa los 5 modos de estudio, comparte con amigos y sigue tu progreso con análisis detallados — todo sin costo.' },
+    { q: '¿Qué modos de estudio hay disponibles?', a: 'ReeeeecallStudy ofrece 5 modos de estudio: SRS (repetición espaciada), Intensivo, Cuestionario, Emparejamiento y Escritura. Cada modo se enfoca en diferentes aspectos del aprendizaje.' },
+    { q: '¿Puedo compartir mis mazos de tarjetas?', a: '¡Por supuesto! Puedes compartir mazos públicamente en el marketplace o enviar enlaces privados a amigos. Importa mazos compartidos con un solo clic.' },
+  ],
 }
 
 export const LANDING_HOWTO = {
@@ -84,5 +120,35 @@ export const LANDING_HOWTO = {
     { name: '덱 만들기', text: '무료로 가입하고 첫 플래시카드 덱을 만드세요. 앞면과 뒷면 내용이 있는 카드를 추가하고 태그로 정리하세요.' },
     { name: '스마트 모드로 학습', text: 'SRS, 벼락치기, 퀴즈, 매칭, 쓰기 등 5가지 학습 모드 중 선택하세요. SRS 알고리즘이 복습 일정을 최적화합니다.' },
     { name: '진행 상황 추적', text: '상세한 분석으로 학습을 모니터링하세요. 학습 연속일, 기억 유지율, 각 덱의 숙달도를 확인하세요.' },
+  ],
+  zh: [
+    { name: '创建你的卡组', text: '免费注册并创建你的第一个闪卡卡组。添加正反面内容的卡片，用标签整理。' },
+    { name: '使用智能模式学习', text: '从5种学习模式中选择：SRS、突击、测验、配对和书写。SRS算法优化你的复习计划。' },
+    { name: '追踪你的进度', text: '通过详细分析监控你的学习。查看学习连续天数、记忆保持率和每个卡组的掌握程度。' },
+  ],
+  ja: [
+    { name: 'デッキを作成', text: '無料で登録して最初のフラッシュカードデッキを作成。表と裏のコンテンツでカードを追加し、タグで整理しましょう。' },
+    { name: 'スマートモードで学習', text: 'SRS、詰め込み、クイズ、マッチング、ライティングの5つの学習モードから選択。SRSアルゴリズムが復習スケジュールを最適化します。' },
+    { name: '進捗を追跡', text: '詳細な分析で学習を監視。学習連続日数、記憶定着率、各デッキの習熟度を確認しましょう。' },
+  ],
+  vi: [
+    { name: 'Tạo Bộ Thẻ', text: 'Đăng ký miễn phí và tạo bộ thẻ flashcard đầu tiên. Thêm thẻ với nội dung mặt trước và sau, sắp xếp bằng thẻ tag.' },
+    { name: 'Học với Chế Độ Thông Minh', text: 'Chọn từ 5 chế độ học: SRS, Nhồi nhét, Trắc nghiệm, Ghép đôi và Viết. Thuật toán SRS tối ưu hóa lịch ôn tập.' },
+    { name: 'Theo Dõi Tiến Độ', text: 'Giám sát việc học với phân tích chi tiết. Xem chuỗi ngày học, tỷ lệ ghi nhớ và mức độ thành thạo của mỗi bộ thẻ.' },
+  ],
+  th: [
+    { name: 'สร้างเด็คของคุณ', text: 'สมัครฟรีและสร้างเด็คแฟลชการ์ดแรกของคุณ เพิ่มการ์ดพร้อมเนื้อหาด้านหน้าและหลัง จัดระเบียบด้วยแท็ก' },
+    { name: 'เรียนด้วยโหมดอัจฉริยะ', text: 'เลือกจาก 5 โหมดการเรียน: SRS, ท่องจำเร่งด่วน, แบบทดสอบ, จับคู่ และเขียน อัลกอริทึม SRS จะปรับตารางทบทวนให้เหมาะสม' },
+    { name: 'ติดตามความก้าวหน้า', text: 'ตรวจสอบการเรียนรู้ด้วยการวิเคราะห์โดยละเอียด ดูสถิติการเรียนต่อเนื่อง อัตราการจำ และระดับความเชี่ยวชาญของแต่ละเด็ค' },
+  ],
+  id: [
+    { name: 'Buat Deck Anda', text: 'Daftar gratis dan buat deck flashcard pertama Anda. Tambahkan kartu dengan konten depan dan belakang, organisir dengan tag.' },
+    { name: 'Belajar dengan Mode Cerdas', text: 'Pilih dari 5 mode belajar: SRS, Cramming, Kuis, Matching, dan Menulis. Algoritma SRS mengoptimalkan jadwal ulasan Anda.' },
+    { name: 'Lacak Kemajuan Anda', text: 'Pantau pembelajaran Anda dengan analitik detail. Lihat streak belajar, tingkat retensi, dan level penguasaan untuk setiap deck.' },
+  ],
+  es: [
+    { name: 'Crea Tu Mazo', text: 'Regístrate gratis y crea tu primer mazo de tarjetas. Añade tarjetas con contenido frontal y trasero, organiza con etiquetas.' },
+    { name: 'Estudia con Modos Inteligentes', text: 'Elige entre 5 modos de estudio: SRS, Intensivo, Cuestionario, Emparejamiento y Escritura. El algoritmo SRS optimiza tu calendario de repaso.' },
+    { name: 'Sigue Tu Progreso', text: 'Monitorea tu aprendizaje con análisis detallados. Ve tus rachas de estudio, tasas de retención y niveles de dominio para cada mazo.' },
   ],
 }

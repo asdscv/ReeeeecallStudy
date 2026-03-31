@@ -23,21 +23,31 @@ export async function handleContentDetailBot(slug, url, env) {
   const lang = url.searchParams.get('lang') || 'en'
 
   // Try requested locale first, fallback to any locale for this slug
-  let res = await fetch(
-    `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&locale=eq.${lang}&limit=1`,
-    { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
-  )
-  let data = await res.json()
-  let article = data?.[0]
-
-  if (!article) {
-    // Fallback: try without locale filter
+  let res, data, article
+  try {
     res = await fetch(
-      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&limit=1`,
+      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&locale=eq.${lang}&limit=1`,
       { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
     )
-    data = await res.json()
-    article = data?.[0]
+    if (res.ok) {
+      data = await res.json()
+      article = data?.[0]
+    }
+
+    if (!article) {
+      // Fallback: try without locale filter
+      res = await fetch(
+        `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&limit=1`,
+        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+      )
+      if (res.ok) {
+        data = await res.json()
+        article = data?.[0]
+      }
+    }
+  } catch (err) {
+    console.error('Content detail fetch error:', err)
+    return null
   }
 
   if (!article) return null
