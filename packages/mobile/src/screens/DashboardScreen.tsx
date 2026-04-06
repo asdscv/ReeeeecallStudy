@@ -192,13 +192,13 @@ export function DashboardScreen() {
                 <View style={styles.deckBottomRow}>
                   <View style={styles.deckBadges}>
                     {newCards > 0 && (
-                      <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
-                        <Text style={[styles.badgeText, { color: palette.blue[700] }]}>New {newCards}</Text>
+                      <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
+                        <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
                       </View>
                     )}
                     {review > 0 && (
-                      <View style={[styles.badge, { backgroundColor: palette.yellow[50] }]}>
-                        <Text style={[styles.badgeText, { color: palette.yellow[700] }]}>Review {review}</Text>
+                      <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
+                        <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {review}</Text>
                       </View>
                     )}
                   </View>

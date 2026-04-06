@@ -348,8 +348,8 @@ export function DeckDetailScreen() {
         <Text style={styles.titleIcon}>{deck.icon}</Text>
         <Text style={[theme.typography.h2, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>{deck.name}</Text>
         {isSubscribed && (
-          <View style={[styles.subscribedBadge, { backgroundColor: palette.purple[50] }]}>
-            <Text style={[theme.typography.caption, { color: palette.purple[700], fontWeight: '600' }]}>
+          <View style={[styles.subscribedBadge, { backgroundColor: theme.colors.primaryLight }]}>
+            <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
               {t('sync.subscribed')}
             </Text>
           </View>
@@ -362,11 +362,11 @@ export function DeckDetailScreen() {
 
       {/* Sync bar for subscribed decks */}
       {isSubscribed && (
-        <View style={[styles.syncBar, { backgroundColor: palette.purple[50], borderColor: palette.purple[200] }]}>
+        <View style={[styles.syncBar, { backgroundColor: theme.colors.primaryLight, borderColor: theme.colors.border }]}>
           <TouchableOpacity
             onPress={handleSync}
             disabled={isSyncing}
-            style={[styles.syncButton, { backgroundColor: palette.purple[600], opacity: isSyncing ? 0.6 : 1 }]}
+            style={[styles.syncButton, { backgroundColor: theme.colors.primary, opacity: isSyncing ? 0.6 : 1 }]}
             testID="sync-button"
           >
             <Text style={[theme.typography.caption, { color: '#fff', fontWeight: '600' }]}>
@@ -374,19 +374,19 @@ export function DeckDetailScreen() {
             </Text>
           </TouchableOpacity>
           {pendingCount > 0 && (
-            <View style={[styles.pendingBadge, { backgroundColor: palette.red[100] }]}>
-              <Text style={[theme.typography.caption, { color: palette.red[700], fontWeight: '600' }]}>
+            <View style={[styles.pendingBadge, { backgroundColor: theme.colors.errorLight }]}>
+              <Text style={[theme.typography.caption, { color: theme.colors.error, fontWeight: '600' }]}>
                 {t('sync.pendingChanges', { count: pendingCount })}
               </Text>
             </View>
           )}
-          <Text style={[theme.typography.caption, { color: palette.purple[600], flex: 1 }]}>
+          <Text style={[theme.typography.caption, { color: theme.colors.primary, flex: 1 }]}>
             {subscription?.last_synced_at
               ? t('sync.lastSynced', { time: new Date(subscription.last_synced_at).toLocaleDateString() })
               : t('sync.neverSynced')}
           </Text>
           {syncMessage && (
-            <Text style={[theme.typography.caption, { color: palette.purple[700], fontWeight: '600' }]}>
+            <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
               {syncMessage}
             </Text>
           )}

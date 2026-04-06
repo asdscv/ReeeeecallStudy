@@ -169,8 +169,8 @@ export function TemplatesListScreen() {
             </View>
 
             {error && (
-              <View style={[styles.errorBanner, { backgroundColor: palette.red[50] }]}>
-                <Text style={[theme.typography.bodySmall, { color: palette.red[600] }]}>{error}</Text>
+              <View style={[styles.errorBanner, { backgroundColor: theme.colors.errorLight }]}>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>{error}</Text>
               </View>
             )}
           </View>

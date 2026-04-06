@@ -180,10 +180,10 @@ export function DecksListScreen() {
                           tabNav.navigate('StudyTab', { screen: 'StudySetup', params: { deckId: item.id } })
                         }
                       }}
-                      style={[styles.studyBtn, { backgroundColor: palette.blue[50] }]}
+                      style={[styles.studyBtn, { backgroundColor: theme.colors.primaryLight }]}
                       testID={`deck-card-${item.id}-study`}
                     >
-                      <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '600' }]}>
+                      <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
                         Study
                       </Text>
                     </TouchableOpacity>

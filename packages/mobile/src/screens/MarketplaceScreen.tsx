@@ -414,7 +414,7 @@ export function MarketplaceScreen() {
                   <TouchableOpacity
                     testID={`marketplace-cat-${cat.value || 'all'}`}
                     onPress={() => { setCategory(cat.value); setCategoryModalOpen(false) }}
-                    style={[styles.modalItem, isActive && { backgroundColor: palette.blue[50] }]}
+                    style={[styles.modalItem, isActive && { backgroundColor: theme.colors.primaryLight }]}
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
@@ -443,7 +443,7 @@ export function MarketplaceScreen() {
                   <TouchableOpacity
                     testID={`marketplace-sort-${opt.value}`}
                     onPress={() => { setSortBy(opt.value); setSortModalOpen(false) }}
-                    style={[styles.modalItem, isActive && { backgroundColor: palette.blue[50] }]}
+                    style={[styles.modalItem, isActive && { backgroundColor: theme.colors.primaryLight }]}
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>

@@ -7,8 +7,8 @@ import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../theme'
 import { validatePassword } from '@reeeeecall/shared/lib/password-validation'
 
-const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
-const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'
+const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
+const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
 
 export function SignUpScreen() {
   const theme = useTheme()

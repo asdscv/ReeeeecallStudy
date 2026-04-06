@@ -351,9 +351,9 @@ export function TemplateEditScreen() {
                     <TouchableOpacity
                       testID={`template-field-remove-${i}`}
                       onPress={() => removeField(i)}
-                      style={[styles.fieldBtn, { backgroundColor: palette.red[50] }]}
+                      style={[styles.fieldBtn, { backgroundColor: theme.colors.errorLight }]}
                     >
-                      <Text style={[theme.typography.caption, { color: palette.red[600] }]}>Remove</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.error }]}>Remove</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -538,7 +538,7 @@ function LayoutSection({
       {layout.map((item) => (
         <View
           key={item.field_key}
-          style={[styles.layoutItem, { backgroundColor: palette.green[50], borderColor: '#BBF7D0' }]}
+          style={[styles.layoutItem, { backgroundColor: theme.colors.successLight, borderColor: theme.colors.success }]}
         >
           <Text
             style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]}
@@ -576,9 +576,9 @@ function LayoutSection({
           <TouchableOpacity
             testID={`template-layout-${side}-remove-${item.field_key}`}
             onPress={() => onRemove(item.field_key)}
-            style={[styles.fieldBtn, { backgroundColor: palette.red[50] }]}
+            style={[styles.fieldBtn, { backgroundColor: theme.colors.errorLight }]}
           >
-            <Text style={[theme.typography.caption, { color: palette.red[600] }]}>X</Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.error }]}>X</Text>
           </TouchableOpacity>
         </View>
       ))}

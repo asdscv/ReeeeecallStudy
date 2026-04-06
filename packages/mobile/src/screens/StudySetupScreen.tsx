@@ -237,13 +237,13 @@ export function StudySetupScreen() {
                 </Text>
                 <View style={styles.deckBadges}>
                   {newCards > 0 && (
-                    <View style={[styles.badge, { backgroundColor: palette.blue[50] }]}>
-                      <Text style={[styles.badgeText, { color: palette.blue[700] }]}>New {newCards}</Text>
+                    <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
+                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
                     </View>
                   )}
                   {reviewCards > 0 && (
-                    <View style={[styles.badge, { backgroundColor: palette.yellow[50] }]}>
-                      <Text style={[styles.badgeText, { color: palette.yellow[700] }]}>Review {reviewCards}</Text>
+                    <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
+                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {reviewCards}</Text>
                     </View>
                   )}
                 </View>
@@ -430,7 +430,7 @@ export function StudySetupScreen() {
                         styles.calendarCell,
                         styles.calendarDayBtn,
                         isSelected && { backgroundColor: palette.blue[600], borderRadius: 8 },
-                        !isSelected && hasCards && { backgroundColor: palette.gray[100], borderRadius: 8 },
+                        !isSelected && hasCards && { backgroundColor: theme.colors.surface, borderRadius: 8 },
                         isToday && !isSelected && { borderWidth: 2, borderColor: palette.blue[400], borderRadius: 8 },
                       ]}
                       onPress={() => setSelectedDate(dateStr)}
@@ -440,7 +440,7 @@ export function StudySetupScreen() {
                         { textAlign: 'center' },
                         isSelected && { color: '#FFFFFF', fontWeight: '700' },
                         !isSelected && hasCards && { color: theme.colors.text, fontWeight: '600' },
-                        !isSelected && !hasCards && { color: palette.gray[300] },
+                        !isSelected && !hasCards && { color: theme.colors.textSecondary },
                       ]}>
                         {day}
                       </Text>
