@@ -194,19 +194,23 @@
       "items": {
         "what": {
           "title": "AI 자동 생성이란?",
-          "body": "AI를 사용하여 자동으로 플래시카드를 만듭니다. 주제를 입력하면 AI가 모든 것을 생성합니다."
+          "body": "AI를 사용하여 자동으로 플래시카드를 만듭니다. 주제를 입력하면 AI가 모든 것을 생성합니다.\n\n지원 프로바이더: Google Gemini (무료!), OpenAI, xAI/Grok, Anthropic\n\nAPI 키는 기기에만 저장되며, 서버로 전송되지 않습니다.",
+          "images": ["/images/guide/ai-generate/mobile-01-page.png"]
         },
         "apiKey": {
           "title": "API 키 설정",
-          "body": "원하는 프로바이더에서 API 키를 발급받으세요:\n• Google Gemini (무료): aistudio.google.com → API 키 발급\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nAI 생성 설정에 키를 입력하세요. 키는 기기에 로컬 저장됩니다.\n\n💡 Google Gemini 2.5 Flash 추천 — 완전 무료입니다!"
+          "body": "원하는 프로바이더에서 API 키를 발급받으세요:\n• Google Gemini (무료): aistudio.google.com → API 키 발급\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nAI 생성 설정에 키를 입력하세요. 키는 기기에 로컬 저장됩니다.\n\n💡 Google Gemini 2.5 Flash 추천 — 완전 무료입니다!",
+          "images": ["/images/guide/ai-generate/mobile-02-config.png"]
         },
         "geminiSetup": {
           "title": "🎯 무료 Gemini API 키 발급 (추천)",
-          "body": "Gemini 2.5 Flash는 100% 무료 — 신용카드 불필요!\n\n무료 한도: 분당 15회, 일일 1,500회, 분당 100만 토큰\n\nAPI 키 발급 방법:\n1. aistudio.google.com 접속\n2. Google 계정으로 로그인\n3. 사이드바에서 \"Get API Key\" 클릭\n4. \"Create API Key\" 클릭\n5. \"Create API key in new project\" 선택\n6. 키 복사 (\"AIza...\"로 시작)\n\nReeeeecallStudy에서 사용법:\n1. AI 생성 페이지 열기\n2. \"Google Gemini\" 프로바이더 선택\n3. API 키 붙여넣기\n4. \"Gemini 2.5 Flash\" 모델 선택\n5. 주제 입력 후 생성!\n\n왜 Gemini Flash인가?\n• 💰 무료 — 결제 설정 불필요\n• ⚡ 빠름 — 50장을 몇 초 만에\n• 🎯 정확 — 교육용 콘텐츠에 최적\n• 🌍 모든 언어 지원\n• 📚 일일 1,500회 — 수천 장 생성 가능"
+          "body": "Gemini 2.5 Flash는 100% 무료 — 신용카드 불필요!\n\n무료 한도: 분당 15회, 일일 1,500회, 분당 100만 토큰\n\nAPI 키 발급 방법:\n1. aistudio.google.com 접속\n2. Google 계정으로 로그인\n3. 사이드바에서 \"Get API Key\" 클릭\n4. \"Create API Key\" 클릭\n5. \"Create API key in new project\" 선택\n6. 키 복사 (\"AIza...\"로 시작)\n\nReeeeecallStudy에서 사용법:\n1. AI 생성 페이지 열기\n2. \"Google Gemini\" 프로바이더 선택\n3. API 키 붙여넣기\n4. \"Gemini 2.5 Flash\" 모델 선택\n5. 주제 입력 후 생성!\n\n왜 Gemini Flash인가?\n• 💰 무료 — 결제 설정 불필요\n• ⚡ 빠름 — 50장을 몇 초 만에\n• 🎯 정확 — 교육용 콘텐츠에 최적\n• 🌍 모든 언어 지원\n• 📚 일일 1,500회 — 수천 장 생성 가능",
+          "images": ["/images/guide/gemini-api/02-get-api-key.png", "/images/guide/gemini-api/03-create-api-key.png", "/images/guide/gemini-api/05-api-key-created.png"]
         },
         "fullGeneration": {
           "title": "전체 생성",
-          "body": "AI 생성 → 주제 입력 → 카드 수 설정 → 시작. AI가 템플릿, 덱, 카드를 만듭니다."
+          "body": "AI 생성 → 주제 입력 → 카드 수 설정 → 시작. AI가 템플릿, 덱, 카드를 만듭니다.\n\nAI가 생성하는 것:\n• 적절한 필드와 TTS 설정이 있는 카드 템플릿\n• 이름, 설명, 아이콘이 있는 덱\n• 요청한 수의 카드\n\n저장 전에 모든 내용을 검토하고 수정할 수 있습니다.",
+          "images": ["/images/guide/ai-generate/mobile-03-generating.png", "/images/guide/ai-generate/mobile-06-review-cards.png", "/images/guide/ai-generate/mobile-07-done.png"]
         }
       }
     },
