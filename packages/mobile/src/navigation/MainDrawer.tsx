@@ -93,14 +93,14 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {/* Study (group) */}
         <TouchableOpacity
-          onPress={() => setStudyGroupOpen(!studyGroupOpen)}
-          style={[styles.menuItem, studyGroupOpen && { backgroundColor: palette.blue[50] }]}
+          onPress={() => { setStudyGroupOpen(!studyGroupOpen); if (!studyGroupOpen) setActiveItem('StudyGroup') }}
+          style={[styles.menuItem, studyGroupOpen && { backgroundColor: theme.isDark ? 'rgba(59,130,246,0.15)' : palette.blue[50] }]}
           activeOpacity={0.7}
           testID="drawer-study-group"
           accessibilityLabel="drawer-study-group"
         >
           <Text style={styles.menuIcon}>📚</Text>
-          <Text style={[styles.menuLabel, { color: theme.colors.text, flex: 1 }]}>{t('nav.study')}</Text>
+          <Text style={[styles.menuLabel, { color: studyGroupOpen ? (theme.isDark ? palette.blue[400] : palette.blue[700]) : theme.colors.text, flex: 1 }]}>{t('nav.study')}</Text>
           <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
             {studyGroupOpen ? '∧' : '∨'}
           </Text>
@@ -183,13 +183,13 @@ function MenuItem({ icon, label, active, theme, onPress, indent, testID }: {
       style={[
         styles.menuItem,
         indent && styles.menuItemIndent,
-        active && { backgroundColor: palette.blue[50] },
+        active && { backgroundColor: theme.isDark ? 'rgba(59,130,246,0.15)' : palette.blue[50] },
       ]}
     >
       <Text style={styles.menuIcon}>{icon}</Text>
       <Text style={[
         styles.menuLabel,
-        { color: active ? palette.blue[700] : theme.colors.text },
+        { color: active ? (theme.isDark ? palette.blue[400] : palette.blue[700]) : theme.colors.text },
         active && { fontWeight: '600' },
       ]}>
         {label}

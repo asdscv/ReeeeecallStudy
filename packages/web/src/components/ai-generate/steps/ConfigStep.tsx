@@ -354,21 +354,25 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
         <div>
           <label className="block text-xs font-medium text-muted-foreground mb-1">
-            {t('config.cardCount')}: {cardCount}
+            {t('config.cardCount')}
           </label>
           <input
-            type="range"
-            min={10}
-            max={50}
-            step={5}
+            type="number"
+            min={1}
+            max={100}
             value={cardCount}
-            onChange={(e) => setCardCount(Number(e.target.value))}
-            className="w-full"
+            onChange={(e) => {
+              const raw = e.target.value
+              setCardCount(raw === '' ? ('' as any) : (parseInt(raw) || 0))
+            }}
+            onBlur={() => {
+              const n = typeof cardCount === 'number' ? cardCount : parseInt(String(cardCount)) || 1
+              setCardCount(Math.max(1, Math.min(100, n)))
+            }}
+            className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
+            placeholder="1–100"
           />
-          <div className="flex justify-between text-xs text-content-tertiary">
-            <span>10</span>
-            <span>50</span>
-          </div>
+          <p className="text-xs text-content-tertiary mt-1">1–100 cards</p>
         </div>
       </fieldset>
 

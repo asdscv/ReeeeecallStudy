@@ -1,4 +1,5 @@
-import { TouchableOpacity, Text, View, ActivityIndicator, StyleSheet } from 'react-native'
+import { TouchableOpacity, Text, View, Image, ActivityIndicator, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 
@@ -12,9 +13,9 @@ interface SocialButtonProps {
   testID?: string
 }
 
-const providerConfig: Record<SocialProvider, { label: string; icon: string }> = {
-  google: { label: 'Continue with Google', icon: 'G' },
-  apple: { label: 'Continue with Apple', icon: '' },
+const providerIcons: Record<SocialProvider, ReturnType<typeof require>> = {
+  google: require('../../../assets/google-logo.png'),
+  apple: require('../../../assets/apple-logo.png'),
 }
 
 export function SocialButton({
@@ -25,8 +26,9 @@ export function SocialButton({
   testID,
 }: SocialButtonProps) {
   const theme = useTheme()
-  const config = providerConfig[provider]
+  const { t } = useTranslation('auth')
   const styles = getStyles(theme, provider)
+  const label = provider === 'google' ? t('continueWithGoogle') : t('continueWithApple')
 
   return (
     <TouchableOpacity
@@ -41,9 +43,13 @@ export function SocialButton({
       ) : (
         <>
           <View style={styles.iconContainer}>
-            <Text style={styles.icon}>{config.icon}</Text>
+            <Image
+              source={providerIcons[provider]}
+              style={[styles.iconImage, provider === 'apple' && { tintColor: '#FFFFFF' }]}
+              resizeMode="contain"
+            />
           </View>
-          <Text style={styles.text}>{config.label}</Text>
+          <Text style={styles.text}>{label}</Text>
         </>
       )}
     </TouchableOpacity>
@@ -74,10 +80,9 @@ function getStyles(theme: Theme, provider: SocialProvider) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    icon: {
-      fontSize: 18,
-      fontWeight: '700' as const,
-      color: isGoogle ? colors.google : (theme.isDark ? colors.text : colors.primaryText),
+    iconImage: {
+      width: 20,
+      height: 20,
     },
     text: {
       ...typo.button,

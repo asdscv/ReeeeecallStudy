@@ -268,7 +268,7 @@ export function TemplateEditScreen() {
   const availableBackFields = fields.filter((f) => !backLayout.some((l) => l.field_key === f.key))
 
   return (
-    <Screen safeArea padding={false} testID="template-edit-screen">
+    <Screen safeArea padding={false} keyboard testID="template-edit-screen">
       <ScreenHeader
         title={isNew ? 'New Template' : 'Edit Template'}
         mode="back"

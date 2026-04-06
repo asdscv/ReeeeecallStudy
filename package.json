@@ -8,5 +8,10 @@
     "test": "pnpm --filter @reeeeecall/web test",
     "lint": "pnpm --filter @reeeeecall/web lint",
     "dev:mobile": "pnpm --filter @reeeeecall/mobile start"
+  },
+  "dependencies": {
+    "expo": "~55.0.6",
+    "react": "19.2.0",
+    "react-native": "0.83.2"
   }
 }

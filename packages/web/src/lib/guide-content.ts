@@ -392,6 +392,14 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         ],
       },
       {
+        title: 'sections.ai-generate.items.geminiSetup.title',
+        body: 'sections.ai-generate.items.geminiSetup.body',
+        link: {
+          label: 'sections.ai-generate.items.geminiSetup.linkLabel',
+          href: 'https://aistudio.google.com/apikey',
+        },
+      },
+      {
         title: 'sections.ai-generate.items.fullGenerate.title',
         body: 'sections.ai-generate.items.fullGenerate.body',
         images: [

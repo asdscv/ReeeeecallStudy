@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { View, Image, Text, Animated, Easing, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { palette } from '../../theme'
 
 const { width: W, height: H } = Dimensions.get('window')
@@ -16,10 +17,10 @@ const ORBS = [
   { x: 0.5, y: 0.78, size: 200, color: 'rgba(34,211,238,0.10)', dur: 12000 },
 ]
 
-const FEATURES = [
-  { icon: '🧠', label: 'SRS 알고리즘' },
-  { icon: '📊', label: '학습 통계' },
-  { icon: '∞', label: '무제한 덱' },
+const FEATURE_KEYS = [
+  { icon: '🧠', key: 'srs' },
+  { icon: '📊', key: 'stats' },
+  { icon: '∞', key: 'unlimited' },
 ]
 
 interface Props {
@@ -31,6 +32,7 @@ interface Props {
  * Card flip preview blurs, then glass CTA card slides up.
  */
 export function AuthGuardScreen({ onLogin }: Props) {
+  const { t } = useTranslation('auth')
   const [isFlipped, setIsFlipped] = useState(false)
   const [highlightIdx, setHighlightIdx] = useState(-1)
 
@@ -165,26 +167,26 @@ export function AuthGuardScreen({ onLogin }: Props) {
           <Image source={require('../../../assets/logo-text.png')} style={s.ctaLogoText} resizeMode="contain" />
 
           {/* Headline */}
-          <Text style={s.ctaHeadline}>과학적으로 학습하세요</Text>
-          <Text style={s.ctaSubtext}>SRS 알고리즘 기반으로 효율적으로 암기하세요.{'\n'}지금 시작하세요.</Text>
+          <Text style={s.ctaHeadline}>{t('authGuard.headline')}</Text>
+          <Text style={s.ctaSubtext}>{t('authGuard.subtext')}</Text>
 
           {/* Features */}
           <View style={s.featRow}>
-            {FEATURES.map((f) => (
-              <View key={f.label} style={s.featItem}>
+            {FEATURE_KEYS.map((f) => (
+              <View key={f.key} style={s.featItem}>
                 <Text style={s.featIcon}>{f.icon}</Text>
-                <Text style={s.featLabel}>{f.label}</Text>
+                <Text style={s.featLabel}>{t(`authGuard.features.${f.key}`)}</Text>
               </View>
             ))}
           </View>
 
           {/* CTA Buttons */}
           <TouchableOpacity style={s.ctaPrimary} onPress={onLogin} activeOpacity={0.8}>
-            <Text style={s.ctaPrimaryText}>시작하기 →</Text>
+            <Text style={s.ctaPrimaryText}>{t('authGuard.ctaButton')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={s.ctaSecondary} onPress={onLogin} activeOpacity={0.7}>
-            <Text style={s.ctaSecondaryText}>이미 계정이 있어요</Text>
+            <Text style={s.ctaSecondaryText}>{t('authGuard.loginButton')}</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>

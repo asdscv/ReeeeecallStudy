@@ -45,7 +45,7 @@ const ITEM_KEYS: Record<string, string[]> = {
   marketplace: ['what', 'getting', 'publishing'],
   history: ['viewing', 'dashboardStats'],
   settings: ['profile', 'srsLimit', 'answerMode', 'autoTts'],
-  aiGenerate: ['what', 'apiKey', 'fullGeneration'],
+  aiGenerate: ['what', 'apiKey', 'geminiSetup', 'fullGeneration'],
   tips: ['daily', 'again', 'concise', 'tags'],
 }
 
@@ -94,7 +94,7 @@ export function GuideScreen() {
   }
 
   return (
-    <Screen safeArea padding={false} testID="guide-screen">
+    <Screen safeArea padding={false} keyboard testID="guide-screen">
       <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginBottom: 12 }]}>

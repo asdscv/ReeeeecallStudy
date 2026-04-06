@@ -198,7 +198,11 @@
         },
         "apiKey": {
           "title": "Setting Up API Key",
-          "body": "Get an API key from OpenAI or xAI. Enter it in AI Generate settings. Keys are stored locally."
+          "body": "Get an API key from your preferred provider:\n• Google Gemini (FREE): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nEnter the key in AI Generate settings. Keys are stored locally on your device.\n\n💡 We recommend Google Gemini 2.5 Flash — completely free!"
+        },
+        "geminiSetup": {
+          "title": "🎯 Free Gemini API Key (Recommended)",
+          "body": "Gemini 2.5 Flash is 100% FREE — no credit card needed!\n\nFree limits: 15 req/min, 1,500 req/day, 1M tokens/min\n\nHow to get your key:\n1. Go to aistudio.google.com\n2. Sign in with Google account\n3. Click \"Get API Key\" in sidebar\n4. Click \"Create API Key\"\n5. Select \"Create API key in new project\"\n6. Copy the key (starts with \"AIza...\")\n\nHow to use in ReeeeecallStudy:\n1. Open AI Generate page\n2. Select \"Google Gemini\" as provider\n3. Paste your API key\n4. Choose \"Gemini 2.5 Flash\" model\n5. Enter a topic and generate!\n\nWhy Gemini Flash?\n• 💰 Free — no billing setup\n• ⚡ Fast — 50 cards in seconds\n• 🎯 Accurate — great for education\n• 🌍 All languages supported\n• 📚 1,500 daily requests — thousands of cards"
         },
         "fullGeneration": {
           "title": "Full Generation",

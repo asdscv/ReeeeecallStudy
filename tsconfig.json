@@ -10,5 +10,6 @@
     "declaration": true,
     "sourceMap": true,
     "jsx": "react-jsx"
-  }
+  },
+  "extends": "expo/tsconfig.base"
 }

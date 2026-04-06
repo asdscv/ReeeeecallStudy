@@ -1,5 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import { Platform, NativeModules } from 'react-native'
 
 // ── Supported languages: to add a new language, add an entry below + locale folder ──
 
@@ -118,12 +119,41 @@ const resources = {
   },
 }
 
+const supportedLngs = Object.keys(resources)
+
+// Detect device language using RN built-in NativeModules (no extra native dep)
+function getDeviceLanguage(): string {
+  try {
+    let locale = 'en'
+    if (Platform.OS === 'ios') {
+      locale =
+        NativeModules.SettingsManager?.settings?.AppleLocale ??
+        NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] ??
+        'en'
+    } else {
+      // Android: try multiple approaches
+      locale =
+        NativeModules.I18nManager?.localeIdentifier ??
+        NativeModules.I18nManager?.locale ??
+        'en'
+    }
+    console.log('[i18n] Raw device locale:', locale, '| Platform:', Platform.OS)
+    console.log('[i18n] I18nManager:', JSON.stringify(NativeModules.I18nManager))
+    const code = locale.split(/[-_]/)[0]
+    if (supportedLngs.includes(code)) return code
+  } catch (e) {
+    console.log('[i18n] Detection error:', e)
+  }
+  return 'en'
+}
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
+    lng: getDeviceLanguage(),
     fallbackLng: 'en',
-    supportedLngs: Object.keys(resources),
+    supportedLngs,
 
     ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall'],
     defaultNS: 'common',
