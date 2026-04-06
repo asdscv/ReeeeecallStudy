@@ -805,7 +805,7 @@ export function SettingsPage() {
             className="w-full sm:w-64 px-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand appearance-none"
             style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236B7280\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
           >
-            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id'] as const).map((lng) => (
+            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const).map((lng) => (
               <option key={lng} value={lng}>
                 {t(`language.${lng}`)}
               </option>
@@ -937,11 +937,11 @@ export function SettingsPage() {
 
         {/* ── i) Legal (compact inline) ── */}
         <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
-          <a href="https://reeeeecall.com/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+          <a href="https://reeeeecallstudy.xyz/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
             Privacy Policy
           </a>
           <span>·</span>
-          <a href="https://reeeeecall.com/terms" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+          <a href="https://reeeeecallstudy.xyz/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
             Terms of Service
           </a>
         </div>

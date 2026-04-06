@@ -19,8 +19,8 @@ import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
 // 로컬 SecureStore 대신 서버에 암호화 저장 → 웹/모바일 동기화
 const mobileAiKeyVault = aiKeyVault
 
-const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
-const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'
+const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
+const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
 const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
 const APP_VERSION = '1.0.0'
 
@@ -306,10 +306,10 @@ export function SettingsScreen() {
             </View>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{user?.email}</Text>
             <View style={[styles.planBadge, {
-              backgroundColor: isPro ? theme.colors.successLight : palette.gray[100],
-              borderColor: isPro ? theme.colors.success : palette.gray[300],
+              backgroundColor: isPro ? theme.colors.successLight : theme.colors.surface,
+              borderColor: isPro ? theme.colors.success : theme.colors.border,
             }]}>
-              <Text style={[styles.planBadgeText, { color: isPro ? theme.colors.success : palette.gray[600] }]}>
+              <Text style={[styles.planBadgeText, { color: isPro ? theme.colors.success : theme.colors.textSecondary }]}>
                 {isPro ? 'Pro' : 'Free'}
               </Text>
             </View>
@@ -366,7 +366,7 @@ export function SettingsScreen() {
             onPress={() => { const nav = navigation.getParent() as any; nav?.navigate('StudyTab') }}
             style={styles.quickActionItem}
           >
-            <View style={[styles.quickActionCircle, { backgroundColor: palette.yellow[50], borderColor: palette.yellow[100] }]}>
+            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={{ fontSize: 22 }}>{'\u26A1'}</Text>
             </View>
             <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>Quick{'\n'}Study</Text>
@@ -376,7 +376,7 @@ export function SettingsScreen() {
             onPress={() => navigation.navigate('AIGenerate')}
             style={styles.quickActionItem}
           >
-            <View style={[styles.quickActionCircle, { backgroundColor: palette.purple[50], borderColor: palette.purple[200] }]}>
+            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={{ fontSize: 22 }}>{'\uD83E\uDD16'}</Text>
             </View>
             <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>AI{'\n'}Generate</Text>
@@ -386,7 +386,7 @@ export function SettingsScreen() {
             onPress={() => Share.share({ message: 'Check out ReeeeecallStudy — the smartest flashcard app! https://reeeeecall.com' })}
             style={styles.quickActionItem}
           >
-            <View style={[styles.quickActionCircle, { backgroundColor: palette.green[50], borderColor: palette.green[100] }]}>
+            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={{ fontSize: 22 }}>{'\uD83D\uDCE7'}</Text>
             </View>
             <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>Invite</Text>
@@ -490,14 +490,14 @@ export function SettingsScreen() {
                   style={[
                     styles.modeCard,
                     {
-                      backgroundColor: isActive ? palette.blue[50] : theme.colors.surfaceElevated,
-                      borderColor: isActive ? palette.blue[500] : theme.colors.border,
+                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
                       borderWidth: isActive ? 2 : 1,
                     },
                   ]}
                 >
                   <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
-                  <Text style={[styles.modeLabel, { color: theme.colors.text }]}>
+                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
                     {mode === 'button' ? 'Button' : 'Swipe'}
                   </Text>
                 </TouchableOpacity>
@@ -550,13 +550,13 @@ export function SettingsScreen() {
                       style={[
                         styles.modeCard,
                         {
-                          backgroundColor: isActive ? palette.blue[50] : theme.colors.surfaceElevated,
-                          borderColor: isActive ? palette.blue[500] : theme.colors.border,
+                          backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                          borderColor: isActive ? theme.colors.primary : theme.colors.border,
                           borderWidth: isActive ? 2 : 1,
                         },
                       ]}
                     >
-                      <Text style={[styles.modeLabel, { color: theme.colors.text }]}>{prov.label}</Text>
+                      <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>{prov.label}</Text>
                       <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{prov.desc}</Text>
                       {prov.noteKey ? <Text style={{ fontSize: 11, color: palette.yellow[500], marginTop: 2 }}>{t(prov.noteKey, { ns: 'settings' })}</Text> : null}
                     </TouchableOpacity>
@@ -704,17 +704,17 @@ export function SettingsScreen() {
                         activeOpacity={0.6}
                       >
                         <View style={styles.aiProviderLeft}>
-                          <View style={[styles.aiIcon, { backgroundColor: provider.bg }]}>
-                            <Text style={[styles.aiIconText, { color: provider.color }]}>AI</Text>
+                          <View style={[styles.aiIcon, { backgroundColor: theme.colors.primaryLight }]}>
+                            <Text style={[styles.aiIconText, { color: theme.colors.primary }]}>AI</Text>
                           </View>
                           <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]}>{provider.label}</Text>
                           {isConfigured ? (
-                            <View style={[styles.aiBadge, { backgroundColor: palette.green[50] }]}>
-                              <Text style={[theme.typography.caption, { color: palette.green[600], fontWeight: '500' }]}>Configured</Text>
+                            <View style={[styles.aiBadge, { backgroundColor: theme.colors.successLight }]}>
+                              <Text style={[theme.typography.caption, { color: theme.colors.success, fontWeight: '500' }]}>Configured</Text>
                             </View>
                           ) : (
-                            <View style={[styles.aiBadge, { backgroundColor: palette.gray[100] }]}>
-                              <Text style={[theme.typography.caption, { color: palette.gray[500], fontWeight: '500' }]}>Not Set</Text>
+                            <View style={[styles.aiBadge, { backgroundColor: theme.colors.surface }]}>
+                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, fontWeight: '500' }]}>Not Set</Text>
                             </View>
                           )}
                         </View>
@@ -793,9 +793,9 @@ export function SettingsScreen() {
                                   Alert.alert('Deleted', `${provider.label} API key removed.`)
                                 }}
                                 testID={`settings-ai-${provider.id}-delete`}
-                                style={[styles.configBtn, { backgroundColor: palette.red[50] }]}
+                                style={[styles.configBtn, { backgroundColor: theme.colors.errorLight }]}
                               >
-                                <Text style={[theme.typography.caption, { color: palette.red[600], fontWeight: '500' }]}>Delete</Text>
+                                <Text style={[theme.typography.caption, { color: theme.colors.error, fontWeight: '500' }]}>Delete</Text>
                               </TouchableOpacity>
                             )}
                             <TouchableOpacity
@@ -804,9 +804,9 @@ export function SettingsScreen() {
                                 setAiApiKey('')
                                 setAiEditModel('')
                               }}
-                              style={[styles.configBtn, { backgroundColor: palette.gray[100] }]}
+                              style={[styles.configBtn, { backgroundColor: theme.colors.surface }]}
                             >
-                              <Text style={[theme.typography.caption, { color: palette.gray[600], fontWeight: '500' }]}>Cancel</Text>
+                              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '500' }]}>Cancel</Text>
                             </TouchableOpacity>
                           </View>
                         </View>
@@ -855,7 +855,7 @@ export function SettingsScreen() {
                       <TouchableOpacity
                         testID={`settings-lang-${lang.code}`}
                         onPress={() => { handleLanguageChange(lang.code); setLangDropdownOpen(false) }}
-                        style={[styles.modalItem, isActive && { backgroundColor: palette.blue[50] }]}
+                        style={[styles.modalItem, isActive && { backgroundColor: theme.colors.primaryLight }]}
                         activeOpacity={0.7}
                       >
                         <Text style={styles.langFlag}>{lang.flag}</Text>
@@ -1003,10 +1003,10 @@ export function SettingsScreen() {
           testID="settings-logout"
           accessibilityLabel="settings-logout"
           onPress={handleLogout}
-          style={[styles.logoutBtn, { borderColor: palette.gray[300] }]}
+          style={[styles.logoutBtn, { borderColor: theme.colors.border }]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.logoutText, { color: palette.gray[600] }]}>Sign Out</Text>
+          <Text style={[styles.logoutText, { color: theme.colors.textSecondary }]}>Sign Out</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -1014,7 +1014,7 @@ export function SettingsScreen() {
           onPress={handleDeleteAccount}
           style={styles.deleteLink}
         >
-          <Text style={[styles.deleteLinkText, { color: palette.red[500] }]}>Delete Account</Text>
+          <Text style={[styles.deleteLinkText, { color: theme.colors.error }]}>Delete Account</Text>
         </TouchableOpacity>
 
         <Text style={[styles.versionText, { color: theme.colors.textTertiary }]}>

@@ -11,7 +11,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated'
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
+import { Gesture, GestureDetector, GestureHandlerRootView, TouchableOpacity as GHTouchableOpacity } from 'react-native-gesture-handler'
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
@@ -92,6 +92,9 @@ export function StudySessionScreen() {
     }
     return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current) }
   }, [lastRatedCard?.timestamp])
+
+  // Flag to prevent flip when TTS button is pressed
+  const ttsJustPressedRef = useRef(false)
 
   // Animation values — horizontal swipe only (vertical reserved for content scroll)
   const rotateY = useSharedValue(0)
@@ -192,6 +195,10 @@ export function StudySessionScreen() {
 
 
   const handleFlip = () => {
+    if (ttsJustPressedRef.current) {
+      ttsJustPressedRef.current = false
+      return
+    }
     if (!isRating) flipCard()
   }
 
@@ -221,11 +228,16 @@ export function StudySessionScreen() {
     ])
   }
 
-  // Swipe gesture only — left/right (again/good)
-  // Tap-to-flip is handled by TouchableOpacity (not GestureDetector)
-  // This allows inner TouchableOpacity (TTS buttons) to block flip via RN responder system
+  // Tap gesture for flip — uses gesture-handler instead of TouchableOpacity
+  // to avoid Android conflict where GestureDetector swallows tap events
+  const tapGesture = Gesture.Tap()
+    .onEnd(() => {
+      runOnJS(handleFlip)()
+    })
+
+  // Swipe gesture — only enabled AFTER flip (prevents rating from front face)
   const panGesture = Gesture.Pan()
-    .enabled(!isRating)
+    .enabled(isFlipped && !isRating)
     .activeOffsetX([-10, 10])
     .onUpdate((e) => {
       translateX.value = e.translationX
@@ -255,6 +267,9 @@ export function StudySessionScreen() {
       }
     })
 
+  // Compose: pan takes priority when dragging, tap fires on simple touch
+  const composedGesture = Gesture.Race(panGesture, tapGesture)
+
   return (
     <GestureHandlerRootView style={[styles.flex, { backgroundColor: theme.colors.background }]}>
       <Screen safeArea padding={false} testID="study-session-screen">
@@ -278,26 +293,23 @@ export function StudySessionScreen() {
 
         {/* Card area */}
         <View style={styles.cardArea} {...testProps('study-card-area', true)}>
-          <GestureDetector gesture={panGesture}>
-            <Animated.View style={[styles.cardContainer, cardAnimStyle]}>
+          <GestureDetector gesture={composedGesture}>
+            <Animated.View style={[styles.cardContainer, cardAnimStyle]} {...testProps('study-card-tap')}>
               {/* Swipe hint overlay */}
               <Animated.View style={[styles.swipeHint, hintStyle]} />
 
-              {/* TouchableOpacity handles tap-to-flip; inner TTS buttons block propagation */}
-              <TouchableOpacity activeOpacity={0.95} onPress={handleFlip} style={styles.flex} {...testProps('study-card-tap')}>
-                {/* Front face — tap to flip, TTS inline */}
-                <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
-                  <CardFace content={fallbackFront} theme={theme} ttsSpeed={profile.tts_speed} />
-                  <Text style={[theme.typography.caption, styles.tapHint, { color: theme.colors.textTertiary }]}>
-                    {t('session.tapToFlip')}
-                  </Text>
-                </Animated.View>
+              {/* Front face — tap to flip, TTS inline */}
+              <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
+                <CardFace content={fallbackFront} theme={theme} ttsSpeed={profile.tts_speed} onTtsPress={ttsJustPressedRef} />
+                <Text style={[theme.typography.caption, styles.tapHint, { color: theme.colors.textTertiary }]}>
+                  {t('session.tapToFlip')}
+                </Text>
+              </Animated.View>
 
-                {/* Back face — scrollable for long content, TTS inline */}
-                <Animated.View style={[styles.card, styles.cardBack, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, backAnimStyle]}>
-                  <CardFace content={fallbackBack} theme={theme} ttsSpeed={profile.tts_speed} scrollable />
-                </Animated.View>
-              </TouchableOpacity>
+              {/* Back face — scrollable for long content, TTS inline */}
+              <Animated.View style={[styles.card, styles.cardBack, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, backAnimStyle]}>
+                <CardFace content={fallbackBack} theme={theme} ttsSpeed={profile.tts_speed} scrollable onTtsPress={ttsJustPressedRef} />
+              </Animated.View>
             </Animated.View>
           </GestureDetector>
         </View>
@@ -362,11 +374,12 @@ export function StudySessionScreen() {
   )
 }
 
-function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false }: {
+function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPress }: {
   content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
   theme: Theme
   ttsSpeed?: number
   scrollable?: boolean
+  onTtsPress?: React.MutableRefObject<boolean>
 }) {
   const inner = content.map((field) => {
     const size = field.fontSize ?? DEFAULT_FONT_SIZES[field.style] ?? DEFAULT_FONT_SIZES.primary
@@ -377,24 +390,27 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false }: {
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
-        {/* TTS button inline — like web: 🔊 icon left of text, blocks card flip */}
+        {/* TTS button inline — always left of text (matches web/iOS layout) */}
         {field.ttsLang ? (
-          <View style={size >= 32 ? styles.ttsColumn : styles.ttsRow}>
-            <TouchableOpacity
-              onPress={() => tts.speak(field.value, field.ttsLang!, ttsSpeed)}
+          <View style={styles.ttsRow}>
+            <GHTouchableOpacity
+              onPress={() => {
+                if (onTtsPress) onTtsPress.current = true
+                tts.speak(field.value, field.ttsLang!, ttsSpeed)
+              }}
               style={styles.ttsInlineBtn}
               activeOpacity={0.5}
             >
               <Text style={{ fontSize: 18, color: theme.colors.primary }}>{'\uD83D\uDD0A'}</Text>
-            </TouchableOpacity>
+            </GHTouchableOpacity>
             <Text style={{
+              flex: 1,
               fontSize: size,
               fontWeight: isBold ? '700' : '400',
               fontStyle: isHint ? 'italic' : 'normal',
               color,
               textAlign: 'center',
               lineHeight: size >= 32 ? size * 1.2 : size * 1.5,
-              ...(size < 32 ? { flex: 1 } : {}),
             }}>
               {field.value}
             </Text>
@@ -466,7 +482,6 @@ const styles = StyleSheet.create({
   fieldBlock: { width: '100%', alignItems: 'center' },
   hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
   ttsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, width: '100%' },
-  ttsColumn: { flexDirection: 'column', alignItems: 'center', gap: 4, width: '100%' },
   ttsInlineBtn: { padding: 8 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {

@@ -5,8 +5,8 @@ import { usePurchases } from '../hooks/usePurchases'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 
-const PRIVACY_POLICY_URL = 'https://reeeeecall.com/privacy'
-const TERMS_OF_SERVICE_URL = 'https://reeeeecall.com/terms'
+const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
+const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
 const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
   ios: 'https://apps.apple.com/account/subscriptions',
   default: 'https://play.google.com/store/account/subscriptions',
