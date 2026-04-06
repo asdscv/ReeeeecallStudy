@@ -294,7 +294,7 @@ export function SettingsScreen() {
   const userInitial = (profile.display_name || user?.email || '?')[0].toUpperCase()
 
   return (
-    <Screen safeArea padding={false} testID="settings-screen">
+    <Screen safeArea padding={false} keyboard testID="settings-screen">
       <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
@@ -509,10 +509,14 @@ export function SettingsScreen() {
             testID="settings-daily-limit"
             value={String(profile.daily_new_limit)}
             onChangeText={(v) => {
-              const num = parseInt(v) || 0
-              setProfile((p) => ({ ...p, daily_new_limit: num }))
+              const clean = v.replace(/[^0-9]/g, '')
+              setProfile((p) => ({ ...p, daily_new_limit: clean === '' ? 0 : parseInt(clean) }))
             }}
-            onBlur={() => saveProfile({ daily_new_limit: profile.daily_new_limit })}
+            onBlur={() => {
+              const clamped = Math.max(1, Math.min(9999, profile.daily_new_limit || 1))
+              setProfile((p) => ({ ...p, daily_new_limit: clamped }))
+              saveProfile({ daily_new_limit: clamped })
+            }}
             keyboardType="number-pad"
           />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
@@ -591,13 +595,18 @@ export function SettingsScreen() {
             testID="settings-daily-goal"
             value={profile.daily_study_goal != null ? String(profile.daily_study_goal) : ''}
             onChangeText={(v) => {
-              const num = v ? parseInt(v) || 0 : null
-              setProfile((p) => ({ ...p, daily_study_goal: num }))
+              const clean = v.replace(/[^0-9]/g, '')
+              setProfile((p) => ({ ...p, daily_study_goal: clean === '' ? null : parseInt(clean) }))
             }}
             onBlur={() => {
               const goal = profile.daily_study_goal
-              if (goal !== null && (goal < 1 || goal > 480)) return
-              saveProfile({ daily_study_goal: goal })
+              if (goal !== null) {
+                const clamped = Math.max(1, Math.min(480, goal || 1))
+                setProfile((p) => ({ ...p, daily_study_goal: clamped }))
+                saveProfile({ daily_study_goal: clamped })
+              } else {
+                saveProfile({ daily_study_goal: null })
+              }
             }}
             keyboardType="number-pad"
             placeholder="e.g. 30"
@@ -628,7 +637,11 @@ export function SettingsScreen() {
                   testID="settings-srs-good-interval"
                   label="Good Interval (days)"
                   value={String(srsSettings.good_days)}
-                  onChangeText={(v) => setSrsSettings((p) => ({ ...p, good_days: parseInt(v) || 1 }))}
+                  onChangeText={(v) => {
+                    const clean = v.replace(/[^0-9]/g, '')
+                    setSrsSettings((p) => ({ ...p, good_days: clean === '' ? 0 : parseInt(clean) }))
+                  }}
+                  onBlur={() => setSrsSettings((p) => ({ ...p, good_days: Math.max(1, Math.min(365, p.good_days || 1)) }))}
                   keyboardType="number-pad"
                 />
               </View>
@@ -637,7 +650,11 @@ export function SettingsScreen() {
                   testID="settings-srs-easy-interval"
                   label="Easy Interval (days)"
                   value={String(srsSettings.easy_days)}
-                  onChangeText={(v) => setSrsSettings((p) => ({ ...p, easy_days: parseInt(v) || 4 }))}
+                  onChangeText={(v) => {
+                    const clean = v.replace(/[^0-9]/g, '')
+                    setSrsSettings((p) => ({ ...p, easy_days: clean === '' ? 0 : parseInt(clean) }))
+                  }}
+                  onBlur={() => setSrsSettings((p) => ({ ...p, easy_days: Math.max(1, Math.min(365, p.easy_days || 4)) }))}
                   keyboardType="number-pad"
                 />
               </View>

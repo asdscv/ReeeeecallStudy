@@ -192,7 +192,14 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         <input
           type="number"
           value={srsSettings.max_interval_days ?? 365}
-          onChange={(e) => update({ srsSettings: { ...srsSettings, max_interval_days: Math.max(1, Math.min(3650, parseInt(e.target.value) || 365)) } })}
+          onChange={(e) => {
+            const raw = e.target.value
+            update({ srsSettings: { ...srsSettings, max_interval_days: raw === '' ? ('' as any) : (parseInt(raw) || 0) } })
+          }}
+          onBlur={() => {
+            const n = typeof srsSettings.max_interval_days === 'number' ? srsSettings.max_interval_days : 365
+            update({ srsSettings: { ...srsSettings, max_interval_days: Math.max(1, Math.min(3650, n || 365)) } })
+          }}
           min={1}
           max={3650}
           className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"

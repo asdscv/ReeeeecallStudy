@@ -277,7 +277,7 @@ export function AIGenerateScreen() {
   // ── Config Step ──
   if (step === 'config') {
     return (
-      <Screen safeArea padding={false} testID="ai-generate-screen">
+      <Screen safeArea padding={false} keyboard testID="ai-generate-screen">
         <ScreenHeader title="AI Auto-Generate" mode="drawer" />
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
@@ -419,30 +419,25 @@ export function AIGenerateScreen() {
               />
             </View>
 
-            {/* Number of cards — slider-like display */}
+            {/* Number of cards */}
             <View style={styles.section}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                Number of cards: {cardCount}
+                Number of cards:
               </Text>
-              <View style={styles.sliderRow}>
-                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>10</Text>
-                <View style={styles.sliderTrack}>
-                  <View style={[styles.sliderFill, { width: `${Math.min(((parseInt(cardCount) || 10) - 10) / 40 * 100, 100)}%`, backgroundColor: palette.blue[600] }]} />
-                  <TouchableOpacity
-                    style={[styles.sliderThumb, { left: `${Math.min(((parseInt(cardCount) || 10) - 10) / 40 * 100, 100)}%`, backgroundColor: palette.blue[600] }]}
-                  />
-                </View>
-                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>50</Text>
-              </View>
               <TextInput
                 testID="ai-card-count"
                 value={cardCount}
                 onChangeText={(v) => {
-                  const n = parseInt(v) || 0
+                  setCardCount(v.replace(/[^0-9]/g, ''))
+                }}
+                onBlur={() => {
+                  const n = parseInt(cardCount) || 1
                   setCardCount(String(Math.min(Math.max(n, 1), 100)))
                 }}
                 keyboardType="number-pad"
+                placeholder="1–100"
               />
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>1–100 cards</Text>
             </View>
           </View>
 
@@ -506,7 +501,7 @@ export function AIGenerateScreen() {
   if (step === 'review') {
     const cards = store.generatedCards ?? []
     return (
-      <Screen safeArea padding={false} testID="ai-review-screen">
+      <Screen safeArea padding={false} keyboard testID="ai-review-screen">
         <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
           <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
         </View>
@@ -739,11 +734,6 @@ const styles = StyleSheet.create({
   settingsLink: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1 },
   // Dropdown
   dropdown: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5 },
-  // Slider-like
-  sliderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sliderTrack: { flex: 1, height: 6, borderRadius: 3, backgroundColor: '#E5E7EB', position: 'relative' as const },
-  sliderFill: { height: 6, borderRadius: 3, position: 'absolute' as const, left: 0, top: 0 },
-  sliderThumb: { width: 18, height: 18, borderRadius: 9, position: 'absolute' as const, top: -6, marginLeft: -9 },
   section: { gap: 8 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8, borderWidth: 1.5 },

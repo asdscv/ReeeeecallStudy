@@ -203,7 +203,7 @@ export function StudySetupScreen() {
   const showModeConfig = selectedMode === 'cramming' || selectedMode === 'by_date' || showBatchSize
 
   return (
-    <Screen safeArea padding={false} testID="study-setup-screen">
+    <Screen safeArea padding={false} keyboard testID="study-setup-screen">
       <ScreenHeader title={t('setup.title')} mode="drawer" />
 
       {/* Deck Grid — matches web: 2-column grid of deck cards */}
@@ -314,7 +314,11 @@ export function StudySetupScreen() {
                     <TextInput
                       testID="study-batch-input"
                       value={batchSize}
-                      onChangeText={setBatchSize}
+                      onChangeText={(v) => setBatchSize(v.replace(/[^0-9]/g, ''))}
+                      onBlur={() => {
+                        const n = parseInt(batchSize) || 20
+                        setBatchSize(String(Math.max(5, Math.min(500, n))))
+                      }}
                       keyboardType="number-pad"
                       placeholder="20"
                     />

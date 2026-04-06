@@ -567,7 +567,14 @@ export function SettingsPage() {
               <input
                 type="number"
                 value={dailyNewLimit}
-                onChange={(e) => setDailyNewLimit(Math.max(1, Math.min(9999, parseInt(e.target.value) || 1)))}
+                onChange={(e) => {
+                  const raw = e.target.value
+                  setDailyNewLimit(raw === '' ? '' as any : parseInt(raw) || 0)
+                }}
+                onBlur={() => {
+                  const n = typeof dailyNewLimit === 'number' ? dailyNewLimit : parseInt(String(dailyNewLimit)) || 1
+                  setDailyNewLimit(Math.max(1, Math.min(9999, n)))
+                }}
                 min={1}
                 max={9999}
                 className="w-28 px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"

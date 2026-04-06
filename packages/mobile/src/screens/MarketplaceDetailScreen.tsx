@@ -350,7 +350,7 @@ export function MarketplaceDetailScreen() {
   }
 
   return (
-    <Screen safeArea padding={false} testID="marketplace-detail-screen">
+    <Screen safeArea padding={false} keyboard testID="marketplace-detail-screen">
       <ScreenHeader title={listing.title} mode="back" />
       <FlatList
         data={sections}

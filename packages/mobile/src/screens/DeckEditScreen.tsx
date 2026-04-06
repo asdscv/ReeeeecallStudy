@@ -254,7 +254,11 @@ export function DeckEditScreen() {
                 <TextInput
                   testID={`deck-edit-srs-${key}`}
                   value={String(srsSettings[key] as number)}
-                  onChangeText={(v) => updateSrsField(key, parseInt(v) || 0)}
+                  onChangeText={(v) => {
+                    const clean = v.replace(/[^0-9]/g, '')
+                    setSrsSettings((prev) => ({ ...prev, [key]: clean === '' ? 0 : parseInt(clean) }))
+                  }}
+                  onBlur={() => updateSrsField(key, srsSettings[key] as number)}
                   keyboardType="number-pad"
                   placeholder="0"
                 />

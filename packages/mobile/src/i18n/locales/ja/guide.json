@@ -297,6 +297,10 @@
           "title": "Setting Up Your API Key",
           "body": "1. Get an API key from your preferred provider:\n   • OpenAI: Visit platform.openai.com → API Keys\n   • xAI/Grok: Visit console.x.ai → API Keys\n\n2. In the AI Generate dialog:\n   • Select your provider (OpenAI, xAI/Grok, or Custom)\n   • Paste your API key\n   • Choose a model (e.g., GPT-4o Mini, Grok 3 Mini)\n\nYour key is saved in localStorage and auto-filled next time. You can also use any OpenAI-compatible endpoint via 'Custom Endpoint'."
         },
+        "geminiSetup": {
+          "title": "🎯 無料Gemini APIキー取得（推奨）",
+          "body": "Gemini 2.5 Flashは完全無料！クレジットカード不要！\n\n無料枠: 毎分15リクエスト、毎日1,500リクエスト\n\n取得方法:\n1. aistudio.google.com にアクセス\n2. Googleアカウントでログイン\n3. 「Get API Key」をクリック\n4. 「Create API Key」をクリック\n5. 「Create API key in new project」を選択\n6. キーをコピー（「AIza...」で始まります）\n\n使い方:\n1. AI生成ページを開く\n2. 「Google Gemini」を選択\n3. APIキーを貼り付け\n4. 「Gemini 2.5 Flash」モデルを選択\n5. トピックを入力して生成！"
+        },
         "fullGenerate": {
           "title": "Full Generation (Template + Deck + Cards)",
           "body": "The easiest way to get started:\n\n1. Go to Decks page → Click 'AI Generate'\n2. Enter your API key and select a model\n3. Type a topic (e.g., 'Basic Korean greetings')\n4. Set the number of cards (10-50)\n5. Click 'Start Generating'\n\nAI will create:\n• A card template with appropriate fields and TTS settings\n• A deck with name, description, icon, and color\n• The requested number of cards\n\nYou can review and edit everything before saving."

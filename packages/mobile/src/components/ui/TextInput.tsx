@@ -56,6 +56,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
             style={styles.input}
             placeholderTextColor={theme.colors.inputPlaceholder}
             secureTextEntry={isPassword && !secureVisible}
+            {...rest}
             onFocus={(e) => {
               setFocused(true)
               rest.onFocus?.(e)
@@ -64,7 +65,6 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
               setFocused(false)
               rest.onBlur?.(e)
             }}
-            {...rest}
           />
           {isPassword && (
             <TouchableOpacity

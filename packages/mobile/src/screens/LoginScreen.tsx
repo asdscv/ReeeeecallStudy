@@ -69,7 +69,7 @@ export function LoginScreen() {
 
           {/* Title */}
           <Text style={[theme.typography.h3, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-            Login
+            {t('loginTitle')}
           </Text>
 
           {/* Email/Password form — first, matching web order */}
