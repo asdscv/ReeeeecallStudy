@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Linking } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, Linking, Dimensions } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, ScreenHeader } from '../components/ui'
 
 import { useTheme } from '../theme'
 
+const BASE_URL = 'https://reeeeecallstudy.xyz'
+
 // ── Types ──────────────────────────────────────────────────────────
 interface GuideItem {
   title: string
   body: string
   link?: { label: string; href: string }
+  images?: string[]
 }
 interface GuideSection {
   id: string
@@ -21,6 +24,7 @@ interface GuideSection {
 
 // Section keys — order matches the guide JSON structure
 const SECTION_KEYS = [
+  'aiGenerate',
   'gettingStarted',
   'decks',
   'cards',
@@ -30,7 +34,6 @@ const SECTION_KEYS = [
   'marketplace',
   'history',
   'settings',
-  'aiGenerate',
   'tips',
 ] as const
 
@@ -63,10 +66,14 @@ export function GuideScreen() {
         id: key,
         title: t(`sections.${key}.title`),
         icon: t(`sections.${key}.icon`),
-        items: (ITEM_KEYS[key] ?? []).map((itemKey) => ({
-          title: t(`sections.${key}.items.${itemKey}.title`),
-          body: t(`sections.${key}.items.${itemKey}.body`),
-        })),
+        items: (ITEM_KEYS[key] ?? []).map((itemKey) => {
+          const imagesRaw = t(`sections.${key}.items.${itemKey}.images`, { returnObjects: true })
+          return {
+            title: t(`sections.${key}.items.${itemKey}.title`),
+            body: t(`sections.${key}.items.${itemKey}.body`),
+            images: Array.isArray(imagesRaw) ? imagesRaw as string[] : undefined,
+          }
+        }),
       })),
     [t],
   )
@@ -166,6 +173,18 @@ export function GuideScreen() {
                     >
                       <Text style={[styles.itemTitle, { color: theme.colors.text }]}>{item.title}</Text>
                       <Text style={[styles.itemBody, { color: theme.colors.textSecondary }]}>{item.body}</Text>
+                      {item.images && item.images.length > 0 && (
+                        <View style={styles.imagesContainer}>
+                          {item.images.map((imgPath, imgIdx) => (
+                            <Image
+                              key={imgIdx}
+                              source={{ uri: `${BASE_URL}${imgPath}` }}
+                              style={styles.guideImage}
+                              resizeMode="contain"
+                            />
+                          ))}
+                        </View>
+                      )}
                       {item.link && (
                         <TouchableOpacity onPress={() => Linking.openURL(item.link!.href)} style={styles.linkBtn}>
                           <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>{item.link.label}</Text>
@@ -206,5 +225,7 @@ const styles = StyleSheet.create({
   itemTitle: { fontSize: 14, fontWeight: '600', marginBottom: 6 },
   itemBody: { fontSize: 13, lineHeight: 20 },
   linkBtn: { marginTop: 8 },
+  imagesContainer: { marginTop: 12, gap: 10 },
+  guideImage: { width: Dimensions.get('window').width - 64, height: 200, borderRadius: 8, backgroundColor: '#f0f0f0' },
   bottomSpacer: { height: 20 },
 })

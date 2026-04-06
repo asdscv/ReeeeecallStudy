@@ -35,6 +35,65 @@ const img = (section: string, name: string) => ({
 export const GUIDE_SECTIONS: GuideSection[] = [
   // ───────────────────────────────────────────────────
   {
+    id: 'ai-generate',
+    title: 'sections.ai-generate.title',
+    icon: '🤖',
+    items: [
+      {
+        title: 'sections.ai-generate.items.what.title',
+        body: 'sections.ai-generate.items.what.body',
+        images: [
+          { pc: '/images/guide/ai-generate/pc-01-page.png', mobile: '/images/guide/ai-generate/mobile-01-page.png', alt: 'AI Generate page' },
+        ],
+      },
+      {
+        title: 'sections.ai-generate.items.apiKeySetup.title',
+        body: 'sections.ai-generate.items.apiKeySetup.body',
+        images: [
+          { pc: '/images/guide/ai-generate/pc-02-config.png', mobile: '/images/guide/ai-generate/mobile-02-config.png', alt: 'Config step' },
+        ],
+      },
+      {
+        title: 'sections.ai-generate.items.geminiSetup.title',
+        body: 'sections.ai-generate.items.geminiSetup.body',
+        link: {
+          label: 'sections.ai-generate.items.geminiSetup.linkLabel',
+          href: 'https://aistudio.google.com/apikey',
+        },
+        images: [
+          { pc: '/images/guide/gemini-api/01-ai-studio-home.png', mobile: '/images/guide/gemini-api/01-ai-studio-home.png', alt: 'Google AI Studio home' },
+          { pc: '/images/guide/gemini-api/02-get-api-key.png', mobile: '/images/guide/gemini-api/02-get-api-key.png', alt: 'Get API key button' },
+          { pc: '/images/guide/gemini-api/03-create-api-key.png', mobile: '/images/guide/gemini-api/03-create-api-key.png', alt: 'Create API key' },
+          { pc: '/images/guide/gemini-api/04-create-new-project.png', mobile: '/images/guide/gemini-api/04-create-new-project.png', alt: 'Create new project' },
+          { pc: '/images/guide/gemini-api/05-api-key-created.png', mobile: '/images/guide/gemini-api/05-api-key-created.png', alt: 'API key created' },
+        ],
+      },
+      {
+        title: 'sections.ai-generate.items.fullGenerate.title',
+        body: 'sections.ai-generate.items.fullGenerate.body',
+        images: [
+          { pc: '/images/guide/ai-generate/pc-03-generating.png', mobile: '/images/guide/ai-generate/mobile-03-generating.png', alt: 'Generating' },
+          { pc: '/images/guide/ai-generate/pc-04-review-template.png', mobile: '/images/guide/ai-generate/mobile-04-review-template.png', alt: 'Template review' },
+          { pc: '/images/guide/ai-generate/pc-05-review-deck.png', mobile: '/images/guide/ai-generate/mobile-05-review-deck.png', alt: 'Deck review' },
+          { pc: '/images/guide/ai-generate/pc-06-review-cards.png', mobile: '/images/guide/ai-generate/mobile-06-review-cards.png', alt: 'Cards review' },
+        ],
+      },
+      {
+        title: 'sections.ai-generate.items.addCards.title',
+        body: 'sections.ai-generate.items.addCards.body',
+      },
+      {
+        title: 'sections.ai-generate.items.editResults.title',
+        body: 'sections.ai-generate.items.editResults.body',
+        images: [
+          { pc: '/images/guide/ai-generate/pc-07-done.png', mobile: '/images/guide/ai-generate/mobile-07-done.png', alt: 'Done' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
+  {
     id: 'getting-started',
     title: 'sections.getting-started.title',
     icon: '🚀',
@@ -370,55 +429,6 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.api.items.rateLimits.title',
         body: 'sections.api.items.rateLimits.body',
-      },
-    ],
-  },
-
-  // ───────────────────────────────────────────────────
-  {
-    id: 'ai-generate',
-    title: 'sections.ai-generate.title',
-    icon: '🤖',
-    items: [
-      {
-        title: 'sections.ai-generate.items.what.title',
-        body: 'sections.ai-generate.items.what.body',
-      },
-      {
-        title: 'sections.ai-generate.items.apiKeySetup.title',
-        body: 'sections.ai-generate.items.apiKeySetup.body',
-        images: [
-          { pc: '/images/guide/ai-generate/pc-02-config.png', mobile: '/images/guide/ai-generate/mobile-02-config.png', alt: 'Config step' },
-        ],
-      },
-      {
-        title: 'sections.ai-generate.items.geminiSetup.title',
-        body: 'sections.ai-generate.items.geminiSetup.body',
-        link: {
-          label: 'sections.ai-generate.items.geminiSetup.linkLabel',
-          href: 'https://aistudio.google.com/apikey',
-        },
-      },
-      {
-        title: 'sections.ai-generate.items.fullGenerate.title',
-        body: 'sections.ai-generate.items.fullGenerate.body',
-        images: [
-          { pc: '/images/guide/ai-generate/pc-03-generating.png', mobile: '/images/guide/ai-generate/mobile-03-generating.png', alt: 'Generating' },
-          { pc: '/images/guide/ai-generate/pc-04-review-template.png', mobile: '/images/guide/ai-generate/mobile-04-review-template.png', alt: 'Template review' },
-          { pc: '/images/guide/ai-generate/pc-05-review-deck.png', mobile: '/images/guide/ai-generate/mobile-05-review-deck.png', alt: 'Deck review' },
-          { pc: '/images/guide/ai-generate/pc-06-review-cards.png', mobile: '/images/guide/ai-generate/mobile-06-review-cards.png', alt: 'Cards review' },
-        ],
-      },
-      {
-        title: 'sections.ai-generate.items.addCards.title',
-        body: 'sections.ai-generate.items.addCards.body',
-      },
-      {
-        title: 'sections.ai-generate.items.editResults.title',
-        body: 'sections.ai-generate.items.editResults.body',
-        images: [
-          { pc: '/images/guide/ai-generate/pc-07-done.png', mobile: '/images/guide/ai-generate/mobile-07-done.png', alt: 'Done' },
-        ],
       },
     ],
   },

@@ -194,19 +194,23 @@
       "items": {
         "what": {
           "title": "What is AI Auto-Generate?",
-          "body": "Create flashcards automatically using AI. Enter a topic and AI generates everything for you."
+          "body": "Create flashcards automatically using AI. Enter a topic and AI generates everything for you.\n\nSupported providers: Google Gemini (free!), OpenAI, xAI/Grok, Anthropic.\n\nYour API key is stored only on your device — never sent to our servers.",
+          "images": ["/images/guide/ai-generate/mobile-01-page.png"]
         },
         "apiKey": {
           "title": "Setting Up API Key",
-          "body": "Get an API key from your preferred provider:\n• Google Gemini (FREE): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nEnter the key in AI Generate settings. Keys are stored locally on your device.\n\n💡 We recommend Google Gemini 2.5 Flash — completely free!"
+          "body": "Get an API key from your preferred provider:\n• Google Gemini (FREE): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nEnter the key in AI Generate settings. Keys are stored locally on your device.\n\n💡 We recommend Google Gemini 2.5 Flash — completely free!",
+          "images": ["/images/guide/ai-generate/mobile-02-config.png"]
         },
         "geminiSetup": {
           "title": "🎯 Free Gemini API Key (Recommended)",
-          "body": "Gemini 2.5 Flash is 100% FREE — no credit card needed!\n\nFree limits: 15 req/min, 1,500 req/day, 1M tokens/min\n\nHow to get your key:\n1. Go to aistudio.google.com\n2. Sign in with Google account\n3. Click \"Get API Key\" in sidebar\n4. Click \"Create API Key\"\n5. Select \"Create API key in new project\"\n6. Copy the key (starts with \"AIza...\")\n\nHow to use in ReeeeecallStudy:\n1. Open AI Generate page\n2. Select \"Google Gemini\" as provider\n3. Paste your API key\n4. Choose \"Gemini 2.5 Flash\" model\n5. Enter a topic and generate!\n\nWhy Gemini Flash?\n• 💰 Free — no billing setup\n• ⚡ Fast — 50 cards in seconds\n• 🎯 Accurate — great for education\n• 🌍 All languages supported\n• 📚 1,500 daily requests — thousands of cards"
+          "body": "Gemini 2.5 Flash is 100% FREE — no credit card needed!\n\nFree limits: 15 req/min, 1,500 req/day, 1M tokens/min\n\nHow to get your key:\n1. Go to aistudio.google.com\n2. Sign in with Google account\n3. Click \"Get API Key\" in sidebar\n4. Click \"Create API Key\"\n5. Select \"Create API key in new project\"\n6. Copy the key (starts with \"AIza...\")\n\nHow to use in ReeeeecallStudy:\n1. Open AI Generate page\n2. Select \"Google Gemini\" as provider\n3. Paste your API key\n4. Choose \"Gemini 2.5 Flash\" model\n5. Enter a topic and generate!\n\nWhy Gemini Flash?\n• 💰 Free — no billing setup\n• ⚡ Fast — 50 cards in seconds\n• 🎯 Accurate — great for education\n• 🌍 All languages supported\n• 📚 1,500 daily requests — thousands of cards",
+          "images": ["/images/guide/gemini-api/02-get-api-key.png", "/images/guide/gemini-api/03-create-api-key.png", "/images/guide/gemini-api/05-api-key-created.png"]
         },
         "fullGeneration": {
           "title": "Full Generation",
-          "body": "Go to AI Generate → Enter topic → Set card count → Start. AI creates template, deck, and cards."
+          "body": "Go to AI Generate → Enter topic → Set card count → Start. AI creates template, deck, and cards.\n\nAI will generate:\n• A card template with appropriate fields and TTS\n• A deck with name, description, icon\n• The requested number of cards\n\nYou can review and edit everything before saving.",
+          "images": ["/images/guide/ai-generate/mobile-03-generating.png", "/images/guide/ai-generate/mobile-06-review-cards.png", "/images/guide/ai-generate/mobile-07-done.png"]
         }
       }
     },
