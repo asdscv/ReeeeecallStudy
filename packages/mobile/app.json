@@ -39,6 +39,10 @@
       }
     },
     "owner": "asdscv",
-    "plugins": []
+    "plugins": [
+      "expo-secure-store",
+      "expo-notifications",
+      "expo-apple-authentication"
+    ]
   }
 }
