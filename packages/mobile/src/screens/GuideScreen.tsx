@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, Linking, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, Linking, Dimensions, Modal, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, ScreenHeader } from '../components/ui'
@@ -58,6 +58,7 @@ export function GuideScreen() {
   const { t } = useTranslation('guide')
   const [search, setSearch] = useState('')
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null)
 
   // Build sections from i18n
   const SECTIONS: GuideSection[] = useMemo(
@@ -176,12 +177,17 @@ export function GuideScreen() {
                       {item.images && item.images.length > 0 && (
                         <View style={styles.imagesContainer}>
                           {item.images.map((imgPath, imgIdx) => (
-                            <Image
+                            <TouchableOpacity
                               key={imgIdx}
-                              source={{ uri: `${BASE_URL}${imgPath}` }}
-                              style={styles.guideImage}
-                              resizeMode="contain"
-                            />
+                              onPress={() => setZoomedImage(`${BASE_URL}${imgPath}`)}
+                              activeOpacity={0.8}
+                            >
+                              <Image
+                                source={{ uri: `${BASE_URL}${imgPath}` }}
+                                style={styles.guideImage}
+                                resizeMode="contain"
+                              />
+                            </TouchableOpacity>
                           ))}
                         </View>
                       )}
@@ -200,6 +206,18 @@ export function GuideScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      {/* Fullscreen image zoom modal */}
+      <Modal visible={!!zoomedImage} transparent animationType="fade" onRequestClose={() => setZoomedImage(null)}>
+        <Pressable style={styles.zoomOverlay} onPress={() => setZoomedImage(null)}>
+          <Image
+            source={{ uri: zoomedImage ?? '' }}
+            style={styles.zoomImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.zoomClose}>✕</Text>
+        </Pressable>
+      </Modal>
     </Screen>
   )
 }
@@ -228,4 +246,7 @@ const styles = StyleSheet.create({
   imagesContainer: { marginTop: 12, gap: 10 },
   guideImage: { width: Dimensions.get('window').width - 64, height: 200, borderRadius: 8, backgroundColor: '#f0f0f0' },
   bottomSpacer: { height: 20 },
+  zoomOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' },
+  zoomImage: { width: Dimensions.get('window').width, height: Dimensions.get('window').height * 0.8 },
+  zoomClose: { position: 'absolute', top: 60, right: 20, color: '#fff', fontSize: 24, fontWeight: '600' },
 })
