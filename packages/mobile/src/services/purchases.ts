@@ -1,10 +1,20 @@
-import Purchases, {
-  type PurchasesPackage,
-  type CustomerInfo,
-  type PurchasesOffering,
-  LOG_LEVEL,
+import type {
+  PurchasesPackage,
+  CustomerInfo,
+  PurchasesOffering,
 } from 'react-native-purchases'
 import { Platform } from 'react-native'
+
+// Lazy-load react-native-purchases to prevent crash if native module is missing
+let Purchases: typeof import('react-native-purchases').default | null = null
+let LOG_LEVEL: typeof import('react-native-purchases').LOG_LEVEL | null = null
+try {
+  const mod = require('react-native-purchases')
+  Purchases = mod.default ?? mod.Purchases
+  LOG_LEVEL = mod.LOG_LEVEL
+} catch {
+  console.warn('[PurchaseService] react-native-purchases native module not available')
+}
 
 // RevenueCat API keys — set via environment or constants
 const REVENUECAT_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? ''
@@ -26,7 +36,7 @@ class PurchaseService {
    * Must be called once on app startup, after user auth is established.
    */
   async init(userId?: string): Promise<void> {
-    if (this.initialized) return
+    if (this.initialized || !Purchases) return
 
     const apiKey = Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY
 
@@ -35,7 +45,7 @@ class PurchaseService {
       return
     }
 
-    if (__DEV__) {
+    if (__DEV__ && LOG_LEVEL) {
       Purchases.setLogLevel(LOG_LEVEL.DEBUG)
     }
 
@@ -47,7 +57,7 @@ class PurchaseService {
    * Identify user with RevenueCat (call on login).
    */
   async login(userId: string): Promise<CustomerInfo> {
-    const { customerInfo } = await Purchases.logIn(userId)
+    const { customerInfo } = await Purchases!.logIn(userId)
     return customerInfo
   }
 
@@ -55,13 +65,14 @@ class PurchaseService {
    * Clear user identity (call on logout).
    */
   async logout(): Promise<void> {
-    await Purchases.logOut()
+    await Purchases!.logOut()
   }
 
   /**
    * Check if user has Pro entitlement.
    */
   async isPro(): Promise<boolean> {
+    if (!Purchases) return false
     try {
       const info = await Purchases.getCustomerInfo()
       return info.entitlements.active[PRO_ENTITLEMENT] !== undefined
@@ -74,6 +85,7 @@ class PurchaseService {
    * Get available subscription offerings.
    */
   async getOfferings(): Promise<PurchasesOffering | null> {
+    if (!Purchases) return null
     try {
       const offerings = await Purchases.getOfferings()
       return offerings.current
@@ -90,6 +102,7 @@ class PurchaseService {
     customerInfo?: CustomerInfo
     error?: string
   }> {
+    if (!Purchases) return { success: false, error: 'Purchases not available' }
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg)
       const isPro = customerInfo.entitlements.active[PRO_ENTITLEMENT] !== undefined
@@ -110,6 +123,7 @@ class PurchaseService {
     customerInfo?: CustomerInfo
     error?: string
   }> {
+    if (!Purchases) return { success: false, error: 'Purchases not available' }
     try {
       const info = await Purchases.restorePurchases()
       const isPro = info.entitlements.active[PRO_ENTITLEMENT] !== undefined
@@ -123,6 +137,7 @@ class PurchaseService {
    * Get current customer info.
    */
   async getCustomerInfo(): Promise<CustomerInfo | null> {
+    if (!Purchases) return null
     try {
       return await Purchases.getCustomerInfo()
     } catch {
