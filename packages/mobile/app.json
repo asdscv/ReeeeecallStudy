@@ -48,7 +48,8 @@
     "plugins": [
       "expo-secure-store",
       "expo-notifications",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-updates"
     ]
   }
 }
