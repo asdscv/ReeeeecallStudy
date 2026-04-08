@@ -94,7 +94,7 @@ export function StudySessionScreen() {
   }, [lastRatedCard?.timestamp])
 
   // Flag to prevent flip when TTS button is pressed
-  const ttsJustPressedRef = useRef(false)
+  const ttsJustPressedRef = useRef(0)
 
   // Animation values — horizontal swipe only (vertical reserved for content scroll)
   const rotateY = useSharedValue(0)
@@ -179,7 +179,7 @@ export function StudySessionScreen() {
       const value = currentCard.field_values[item.field_key] ?? ''
       const fontSize = (item as { font_size?: number }).font_size ?? DEFAULT_FONT_SIZES[item.style] ?? DEFAULT_FONT_SIZES.primary
       // TTS: only if field has tts_enabled AND profile allows TTS (matches web getTTSFieldsForLayout)
-      const ttsLang = (field?.tts_enabled && profile.tts_enabled) ? (field.tts_lang || undefined) : undefined
+      const ttsLang = (field?.tts_enabled && profile.tts_enabled) ? (field.tts_lang || 'en-US') : undefined
       return { key: item.field_key, value, style: item.style, fontSize, ttsLang, name: field?.name ?? item.field_key }
     }).filter((f) => f.value)
   }
@@ -195,8 +195,8 @@ export function StudySessionScreen() {
 
 
   const handleFlip = () => {
-    if (ttsJustPressedRef.current) {
-      ttsJustPressedRef.current = false
+    // Use timestamp to prevent flip when TTS button was just pressed (avoids gesture race timing issues)
+    if (Date.now() - ttsJustPressedRef.current < 500) {
       return
     }
     if (!isRating) flipCard()
@@ -379,7 +379,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPre
   theme: Theme
   ttsSpeed?: number
   scrollable?: boolean
-  onTtsPress?: React.MutableRefObject<boolean>
+  onTtsPress?: React.MutableRefObject<number>
 }) {
   const inner = content.map((field) => {
     const size = field.fontSize ?? DEFAULT_FONT_SIZES[field.style] ?? DEFAULT_FONT_SIZES.primary
@@ -395,7 +395,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPre
           <View style={styles.ttsRow}>
             <GHTouchableOpacity
               onPress={() => {
-                if (onTtsPress) onTtsPress.current = true
+                if (onTtsPress) onTtsPress.current = Date.now()
                 tts.speak(field.value, field.ttsLang!, ttsSpeed)
               }}
               style={styles.ttsInlineBtn}
