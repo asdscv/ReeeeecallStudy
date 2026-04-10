@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Appearance } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
@@ -35,6 +36,20 @@ export function RootNavigator() {
     const cleanup = startHeartbeat()
     return cleanup
   }, [user, registerSession, startHeartbeat])
+
+  // Load saved theme preference on login (so it applies before visiting Settings)
+  useEffect(() => {
+    if (!user) return
+    const supabase = getMobileSupabase()
+    Promise.resolve(
+      supabase.from('profiles').select('theme').eq('id', user.id).single()
+    ).then(({ data }) => {
+      const saved = (data as Record<string, unknown> | null)?.theme as 'light' | 'dark' | 'system' | undefined
+      if (saved && saved !== 'system') {
+        Appearance.setColorScheme(saved)
+      }
+    }).catch(() => {})
+  }, [user])
 
   const handleReclaim = useCallback(async () => {
     await registerSession()

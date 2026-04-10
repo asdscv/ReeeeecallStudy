@@ -38,11 +38,18 @@
         "projectId": "31c2c126-f26c-4b75-aa03-6255e68a6032"
       }
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/31c2c126-f26c-4b75-aa03-6255e68a6032"
+    },
     "owner": "asdscv",
     "plugins": [
       "expo-secure-store",
       "expo-notifications",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-updates"
     ]
   }
 }
