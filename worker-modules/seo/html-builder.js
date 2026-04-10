@@ -99,11 +99,8 @@ export function buildMetaTags({
     parts.push(`<link rel="canonical" href="${escapeHtml(canonical)}">`)
   }
 
-  // Hreflang
-  if (ogUrl) {
-    const urlObj = new URL(ogUrl)
-    parts.push(buildHreflangTags(urlObj.pathname, true))
-  }
+  // NOTE: hreflang tags are added by each handler directly, not here
+  // to avoid duplicate hreflang output
 
   return parts.join('\n')
 }
