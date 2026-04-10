@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -11,7 +11,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated'
-import { Gesture, GestureDetector, GestureHandlerRootView, TouchableOpacity as GHTouchableOpacity } from 'react-native-gesture-handler'
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
@@ -295,8 +295,8 @@ export function StudySessionScreen() {
         <View style={styles.cardArea} {...testProps('study-card-area', true)}>
           <GestureDetector gesture={composedGesture}>
             <Animated.View style={[styles.cardContainer, cardAnimStyle]} {...testProps('study-card-tap')}>
-              {/* Swipe hint overlay */}
-              <Animated.View style={[styles.swipeHint, hintStyle]} />
+              {/* Swipe hint overlay — pointerEvents='none' so it never steals touches from TTS buttons */}
+              <Animated.View style={[styles.swipeHint, hintStyle]} pointerEvents="none" />
 
               {/* Front face — tap to flip, TTS inline */}
               <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
@@ -374,6 +374,32 @@ export function StudySessionScreen() {
   )
 }
 
+/** Standalone TTS button — uses its own GestureDetector so the tap is consumed
+ *  and does NOT propagate to the parent card-flip GestureDetector. */
+function TTSButton({ text, lang, speed, onTtsPress, color }: {
+  text: string; lang: string; speed: number
+  onTtsPress?: React.MutableRefObject<number>
+  color: string
+}) {
+  const handlePress = useCallback(() => {
+    if (onTtsPress) onTtsPress.current = Date.now()
+    tts.speak(text, lang, speed)
+  }, [text, lang, speed, onTtsPress])
+
+  const gesture = useMemo(
+    () => Gesture.Tap().onEnd(() => { runOnJS(handlePress)() }),
+    [handlePress],
+  )
+
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View style={styles.ttsInlineBtn}>
+        <Text style={{ fontSize: 18, color }}>{'\uD83D\uDD0A'}</Text>
+      </Animated.View>
+    </GestureDetector>
+  )
+}
+
 function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPress }: {
   content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
   theme: Theme
@@ -390,19 +416,10 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPre
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
-        {/* TTS button inline — always left of text (matches web/iOS layout) */}
+        {/* TTS button inline — own GestureDetector blocks parent card-flip tap */}
         {field.ttsLang ? (
           <View style={styles.ttsRow}>
-            <GHTouchableOpacity
-              onPress={() => {
-                if (onTtsPress) onTtsPress.current = Date.now()
-                tts.speak(field.value, field.ttsLang!, ttsSpeed)
-              }}
-              style={styles.ttsInlineBtn}
-              activeOpacity={0.5}
-            >
-              <Text style={{ fontSize: 18, color: theme.colors.primary }}>{'\uD83D\uDD0A'}</Text>
-            </GHTouchableOpacity>
+            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} onTtsPress={onTtsPress} color={theme.colors.primary} />
             <Text style={{
               flex: 1,
               fontSize: size,

@@ -145,6 +145,11 @@ export function SettingsScreen() {
             setLanguage(lang)
             i18n.changeLanguage(lang)
           }
+          const savedTheme = p.theme as 'light' | 'dark' | 'system' | undefined
+          if (savedTheme) {
+            setThemeMode(savedTheme)
+            Appearance.setColorScheme(savedTheme === 'system' ? null as any : savedTheme)
+          }
         }
       })
   }, [user])
@@ -883,10 +888,14 @@ export function SettingsScreen() {
                 <TouchableOpacity
                   key={mode}
                   testID={`settings-theme-${mode}`}
-                  onPress={() => {
+                  onPress={async () => {
                     setThemeMode(mode)
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     Appearance.setColorScheme(mode === 'system' ? null as any : mode)
+                    if (user) {
+                      const supabase = getMobileSupabase()
+                      await supabase.from('profiles').update({ theme: mode }).eq('id', user.id)
+                    }
                   }}
                   style={[
                     styles.segmentButton,
