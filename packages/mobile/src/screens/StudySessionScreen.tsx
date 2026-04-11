@@ -93,6 +93,10 @@ export function StudySessionScreen() {
     return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current) }
   }, [lastRatedCard?.timestamp])
 
+  // Ref for the card-flip tap gesture — passed to TTSButton so it can
+  // call blocksExternalGesture() and prevent flip when TTS is tapped
+  const cardTapRef = useRef<any>(null)
+
   // Animation values — horizontal swipe only (vertical reserved for content scroll)
   const rotateY = useSharedValue(0)
   const translateX = useSharedValue(0)
@@ -220,10 +224,6 @@ export function StudySessionScreen() {
       }},
     ])
   }
-
-  // Ref for the card-flip tap gesture — passed to TTSButton so it can
-  // call blocksExternalGesture() and prevent flip when TTS is tapped
-  const cardTapRef = useRef<any>(null)
 
   const tapGesture = Gesture.Tap()
     .withRef(cardTapRef)
