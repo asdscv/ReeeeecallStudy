@@ -93,9 +93,6 @@ export function StudySessionScreen() {
     return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current) }
   }, [lastRatedCard?.timestamp])
 
-  // Flag to prevent flip when TTS button is pressed
-  const ttsJustPressedRef = useRef(0)
-
   // Animation values — horizontal swipe only (vertical reserved for content scroll)
   const rotateY = useSharedValue(0)
   const translateX = useSharedValue(0)
@@ -195,10 +192,6 @@ export function StudySessionScreen() {
 
 
   const handleFlip = () => {
-    // Use timestamp to prevent flip when TTS button was just pressed (avoids gesture race timing issues)
-    if (Date.now() - ttsJustPressedRef.current < 500) {
-      return
-    }
     if (!isRating) flipCard()
   }
 
@@ -228,9 +221,12 @@ export function StudySessionScreen() {
     ])
   }
 
-  // Tap gesture for flip — uses gesture-handler instead of TouchableOpacity
-  // to avoid Android conflict where GestureDetector swallows tap events
+  // Ref for the card-flip tap gesture — passed to TTSButton so it can
+  // call blocksExternalGesture() and prevent flip when TTS is tapped
+  const cardTapRef = useRef<any>(null)
+
   const tapGesture = Gesture.Tap()
+    .withRef(cardTapRef)
     .onEnd(() => {
       runOnJS(handleFlip)()
     })
@@ -300,7 +296,7 @@ export function StudySessionScreen() {
 
               {/* Front face — tap to flip, TTS inline */}
               <Animated.View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, frontAnimStyle]}>
-                <CardFace content={fallbackFront} theme={theme} ttsSpeed={profile.tts_speed} onTtsPress={ttsJustPressedRef} />
+                <CardFace content={fallbackFront} theme={theme} ttsSpeed={profile.tts_speed} cardTapRef={cardTapRef} />
                 <Text style={[theme.typography.caption, styles.tapHint, { color: theme.colors.textTertiary }]}>
                   {t('session.tapToFlip')}
                 </Text>
@@ -308,7 +304,7 @@ export function StudySessionScreen() {
 
               {/* Back face — scrollable for long content, TTS inline */}
               <Animated.View style={[styles.card, styles.cardBack, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }, backAnimStyle]}>
-                <CardFace content={fallbackBack} theme={theme} ttsSpeed={profile.tts_speed} scrollable onTtsPress={ttsJustPressedRef} />
+                <CardFace content={fallbackBack} theme={theme} ttsSpeed={profile.tts_speed} scrollable cardTapRef={cardTapRef} />
               </Animated.View>
             </Animated.View>
           </GestureDetector>
@@ -374,38 +370,40 @@ export function StudySessionScreen() {
   )
 }
 
-/** Standalone TTS button — uses its own GestureDetector so the tap is consumed
- *  and does NOT propagate to the parent card-flip GestureDetector. */
-function TTSButton({ text, lang, speed, onTtsPress, color }: {
+/** TTS button — uses its own GestureDetector with Gesture.Tap() that calls
+ *  blocksExternalGesture(cardTapRef) to explicitly prevent the parent card-flip
+ *  tap from activating when this button is tapped. This is the RNGH v2 way
+ *  to resolve nested gesture conflicts at the native level. */
+function TTSButton({ text, lang, speed, color, cardTapRef }: {
   text: string; lang: string; speed: number
-  onTtsPress?: React.MutableRefObject<number>
   color: string
+  cardTapRef: React.RefObject<any>
 }) {
   const handlePress = useCallback(() => {
-    if (onTtsPress) onTtsPress.current = Date.now()
     tts.speak(text, lang, speed)
-  }, [text, lang, speed, onTtsPress])
+  }, [text, lang, speed])
 
-  const gesture = useMemo(
-    () => Gesture.Tap().onEnd(() => { runOnJS(handlePress)() }),
-    [handlePress],
-  )
+  const ttsTap = Gesture.Tap()
+    .blocksExternalGesture(cardTapRef)
+    .onEnd(() => {
+      runOnJS(handlePress)()
+    })
 
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={styles.ttsInlineBtn}>
+    <GestureDetector gesture={ttsTap}>
+      <Animated.View style={styles.ttsInlineBtn} hitSlop={8}>
         <Text style={{ fontSize: 18, color }}>{'\uD83D\uDD0A'}</Text>
       </Animated.View>
     </GestureDetector>
   )
 }
 
-function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPress }: {
+function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapRef }: {
   content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
   theme: Theme
   ttsSpeed?: number
   scrollable?: boolean
-  onTtsPress?: React.MutableRefObject<number>
+  cardTapRef: React.RefObject<any>
 }) {
   const inner = content.map((field) => {
     const size = field.fontSize ?? DEFAULT_FONT_SIZES[field.style] ?? DEFAULT_FONT_SIZES.primary
@@ -419,7 +417,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, onTtsPre
         {/* TTS button inline — own GestureDetector blocks parent card-flip tap */}
         {field.ttsLang ? (
           <View style={styles.ttsRow}>
-            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} onTtsPress={onTtsPress} color={theme.colors.primary} />
+            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
             <Text style={{
               flex: 1,
               fontSize: size,
