@@ -1,5 +1,5 @@
 import * as Speech from 'expo-speech'
-import { Audio } from 'expo-av'
+import { setAudioModeAsync } from 'expo-audio'
 import { Platform } from 'react-native'
 import type { ITTSAdapter } from '@reeeeecall/shared/adapters/tts'
 
@@ -12,9 +12,8 @@ export class RNTTS implements ITTSAdapter {
     // even when the silent mode switch is on
     if (Platform.OS === 'ios' && !audioSessionReady) {
       try {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: false,
+        await setAudioModeAsync({
+          playsInSilentMode: true,
         })
         audioSessionReady = true
       } catch {}
