@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput as RNTextInput, Linking } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, Platform, TextInput as RNTextInput, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
+import * as AppleAuthentication from 'expo-apple-authentication'
 import { Screen, TextInput, Button, Divider, SocialButton } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../theme'
@@ -190,11 +191,27 @@ export function SignUpScreen() {
               loading={loading}
               testID="signup-google-button"
             />
-            <SocialButton
-              provider="apple"
-              onPress={handleAppleSignUp}
-              testID="signup-apple-button"
-            />
+            {/* Apple 공식 버튼 — Guideline 4.8 준수 (iOS) / Android는 OAuth 웹 플로우 */}
+            {Platform.OS === 'ios' ? (
+              <View testID="signup-apple-button" style={styles.appleButtonWrapper}>
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+                  buttonStyle={theme.isDark
+                    ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                    : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                  }
+                  cornerRadius={12}
+                  style={styles.appleButton}
+                  onPress={handleAppleSignUp}
+                />
+              </View>
+            ) : (
+              <SocialButton
+                provider="apple"
+                onPress={handleAppleSignUp}
+                testID="signup-apple-button"
+              />
+            )}
           </View>
 
           {/* Footer */}
@@ -225,6 +242,8 @@ const styles = StyleSheet.create({
   logoIcon: { width: 56, height: 56 },
   logoTextImg: { height: 32, width: 180 },
   socialSection: { gap: 12 },
+  appleButtonWrapper: { width: '100%' },
+  appleButton: { width: '100%', height: 48 },
   form: { gap: 14 },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
 })

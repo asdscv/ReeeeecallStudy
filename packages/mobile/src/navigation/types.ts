@@ -64,7 +64,8 @@ export type MarketplaceStackParamList = {
 export type SettingsStackParamList = {
   SettingsHome: undefined
   AIGenerate: undefined
-  Paywall: undefined
+  // [SUBSCRIPTION-HIDDEN] 구독 기능 심사 보류 — 복원 시 주석 해제
+  // Paywall: undefined
   Guide: undefined
   TemplatesList: undefined
   TemplateEdit: { templateId?: string }

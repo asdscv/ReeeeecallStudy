@@ -1,3 +1,14 @@
+// ─────────────────────────────────────────────────────────────────────────
+// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응 (Guideline 2.1(b))
+// 이 화면은 현재 네비게이션 스택에서 제거됨 (SettingsStack.tsx 참조).
+// 접근 경로 없음 → 코드는 유지하되 리뷰어가 UI로 도달할 수 없음.
+// 복원 단계:
+//   1) App Store Connect에 IAP products 등록 + review 제출
+//   2) RevenueCat 대시보드 세팅 + API 키 .env/EAS Secrets 등록
+//   3) SettingsStack.tsx 및 navigation/types.ts의 Paywall 라우트 주석 해제
+//   4) SettingsScreen.tsx의 Subscription 섹션 + plan 배지 주석 해제
+//   5) 이 파일은 추가 수정 불필요 (자체는 정상 동작)
+// ─────────────────────────────────────────────────────────────────────────
 import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, Platform } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, Button, ScreenHeader } from '../components/ui'

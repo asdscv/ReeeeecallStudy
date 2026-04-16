@@ -1,3 +1,11 @@
+// ─────────────────────────────────────────────────────────────────────────
+// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응
+// 이 서비스는 현재 호출되지 않음 (usePurchases 훅도 미사용).
+// 코드는 유지하되 UI 진입점 차단만으로 구독 기능 비활성화.
+// 복원 시 추가 설정 필요:
+//   - EXPO_PUBLIC_REVENUECAT_IOS_KEY / EXPO_PUBLIC_REVENUECAT_ANDROID_KEY
+//   - RevenueCat 대시보드 entitlement "pro" + App Store Connect 상품 매핑
+// ─────────────────────────────────────────────────────────────────────────
 import type {
   PurchasesPackage,
   CustomerInfo,

@@ -1,3 +1,9 @@
+// ─────────────────────────────────────────────────────────────────────────
+// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응
+// 이 훅은 현재 어떤 화면에서도 호출되지 않음 (PaywallScreen, SettingsScreen에서 제거).
+// 코드는 유지하되 호출 진입점만 차단된 상태.
+// 구독 기능 복원 시: SettingsScreen에서 usePurchases import + isPro 사용 복구.
+// ─────────────────────────────────────────────────────────────────────────
 import { useState, useEffect, useCallback } from 'react'
 import type { PurchasesPackage, PurchasesOffering } from 'react-native-purchases'
 import { purchaseService, PRO_ENTITLEMENT } from '../services/purchases'

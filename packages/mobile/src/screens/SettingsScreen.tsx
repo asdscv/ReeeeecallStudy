@@ -5,7 +5,11 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
-import { useAuth, useAuthState, usePurchases } from '../hooks'
+// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
+// IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
+// 복원 시: usePurchases import 복구, isPro stub 제거, planBadge + Subscription 섹션 복원.
+import { useAuth, useAuthState } from '../hooks'
+// import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
@@ -21,7 +25,8 @@ const mobileAiKeyVault = aiKeyVault
 
 const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
 const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
-const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
+// [SUBSCRIPTION-HIDDEN] 구독 관리 URL — 복원 시 주석 해제
+// const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
 const APP_VERSION = '1.0.0'
 
 const LANGUAGES = [
@@ -66,7 +71,8 @@ export function SettingsScreen() {
   const navigation = useNavigation<Nav>()
   const { user } = useAuthState()
   const { signOut } = useAuth()
-  const { isPro } = usePurchases()
+  // [SUBSCRIPTION-HIDDEN] usePurchases 훅 호출 보류 — 복원 시 아래 stub 제거하고 원래 줄 복구
+  // const { isPro } = usePurchases()
 
   const [profile, setProfile] = useState<ProfileData>({
     display_name: '',
@@ -310,14 +316,18 @@ export function SettingsScreen() {
               <Text style={styles.avatarText}>{userInitial}</Text>
             </View>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{user?.email}</Text>
-            <View style={[styles.planBadge, {
+            {/* ──────────────────────────────────────────────────────────────────── */}
+            {/* [SUBSCRIPTION-HIDDEN] Plan 배지 (Free/Pro) — 2026-04-15 심사 리젝 대응 */}
+            {/* 복원 시 아래 블록 주석 해제 */}
+            {/* <View style={[styles.planBadge, {
               backgroundColor: isPro ? theme.colors.successLight : theme.colors.surface,
               borderColor: isPro ? theme.colors.success : theme.colors.border,
             }]}>
               <Text style={[styles.planBadgeText, { color: isPro ? theme.colors.success : theme.colors.textSecondary }]}>
                 {isPro ? 'Pro' : 'Free'}
               </Text>
-            </View>
+            </View> */}
+            {/* ──────────────────────────────────────────────────────────────────── */}
           </View>
           <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>Display name</Text>
           <View style={styles.nameRow}>
@@ -933,7 +943,12 @@ export function SettingsScreen() {
           )}
         </SectionCard>
 
-        {/* ── h) Subscription ── */}
+        {/* ──────────────────────────────────────────────────────────────────── */}
+        {/* [SUBSCRIPTION-HIDDEN] h) Subscription 섹션 — 2026-04-15 심사 리젝 대응  */}
+        {/* Apple Guideline 2.1(b): IAP products 미제출 상태에서 구독 UI 노출 금지. */}
+        {/* IAP 제출 완료 후 복원 시 전체 블록 주석 해제 + usePurchases 훅 복구.     */}
+        {/* ──────────────────────────────────────────────────────────────────── */}
+        {/*
         <SectionCard theme={theme}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Subscription</Text>
           <View style={[styles.subCard, {
@@ -963,6 +978,7 @@ export function SettingsScreen() {
             />
           )}
         </SectionCard>
+        */}
 
         {/* ── i) Export My Data — matches web ── */}
         <SectionCard theme={theme}>
