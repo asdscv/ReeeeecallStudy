@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar'
 import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { I18nextProvider } from 'react-i18next'
-import * as Linking from 'expo-linking'
+import Constants from 'expo-constants'
 import { initMobilePlatform } from './src/adapters'
 import i18n from './src/i18n'
 import { RootNavigator } from './src/navigation'
@@ -13,9 +13,12 @@ import { ThemeProvider, useAppTheme } from './src/theme'
 // Initialize platform adapters (must be before any shared code)
 initMobilePlatform()
 
-// Deep linking config for auth callbacks
+// Deep linking config — Constants.expoConfig.scheme은 빌드 시점에 앱 바이너리에 임베드되므로
+// 어떤 빌드 방식(eas remote, eas local, expo run)이든 항상 사용 가능.
+// Linking.createURL()은 eas build --local에서 "no custom scheme" 에러를 던지므로 사용 금지.
+const APP_SCHEME = Constants.expoConfig?.scheme ?? 'reeeeecall'
 const linking = {
-  prefixes: [Linking.createURL('/'), 'reeeeecall://'],
+  prefixes: [`${APP_SCHEME}://`],
   config: {
     screens: {
       Auth: 'auth',

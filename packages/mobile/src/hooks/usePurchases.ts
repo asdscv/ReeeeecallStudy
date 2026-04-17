@@ -5,7 +5,9 @@
 // 구독 기능 복원 시: SettingsScreen에서 usePurchases import + isPro 사용 복구.
 // ─────────────────────────────────────────────────────────────────────────
 import { useState, useEffect, useCallback } from 'react'
-import type { PurchasesPackage, PurchasesOffering } from 'react-native-purchases'
+// [SUBSCRIPTION-HIDDEN] react-native-purchases 제거됨 — 타입 any로 대체
+type PurchasesPackage = any
+type PurchasesOffering = any
 import { purchaseService, PRO_ENTITLEMENT } from '../services/purchases'
 import { useAuthState } from './useAuthState'
 

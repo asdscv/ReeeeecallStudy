@@ -6,22 +6,22 @@
 //   - EXPO_PUBLIC_REVENUECAT_IOS_KEY / EXPO_PUBLIC_REVENUECAT_ANDROID_KEY
 //   - RevenueCat 대시보드 entitlement "pro" + App Store Connect 상품 매핑
 // ─────────────────────────────────────────────────────────────────────────
-import type {
-  PurchasesPackage,
-  CustomerInfo,
-  PurchasesOffering,
-} from 'react-native-purchases'
+// [SUBSCRIPTION-HIDDEN] react-native-purchases 제거됨 (네이티브 모듈 크래시 원인).
+// 복원 시: pnpm add react-native-purchases --filter mobile 후 아래 타입/import 복구.
+type PurchasesPackage = any
+type CustomerInfo = any
+type PurchasesOffering = any
 import { Platform } from 'react-native'
 
-// Lazy-load react-native-purchases to prevent crash if native module is missing
-let Purchases: typeof import('react-native-purchases').default | null = null
-let LOG_LEVEL: typeof import('react-native-purchases').LOG_LEVEL | null = null
+// Lazy-load react-native-purchases — 현재 패키지 제거 상태, require는 항상 실패
+let Purchases: any = null
+let LOG_LEVEL: any = null
 try {
   const mod = require('react-native-purchases')
   Purchases = mod.default ?? mod.Purchases
   LOG_LEVEL = mod.LOG_LEVEL
 } catch {
-  console.warn('[PurchaseService] react-native-purchases native module not available')
+  // react-native-purchases 제거 상태 — 정상 동작
 }
 
 // RevenueCat API keys — set via environment or constants
