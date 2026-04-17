@@ -8,26 +8,66 @@ import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
 import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
 import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
-import { getMobileSupabase } from '../adapters'
+import { prefetch, profileCache } from '../services/prefetch'
 import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-const MIN_SPLASH_MS = 2000
+// 프리로드 최대 대기 — 이 시간 지나면 불완전해도 메인 화면 진입
+const MAX_SPLASH_MS = 5000
 
 export function RootNavigator() {
   const { user, loading } = useAuthState()
-  const [splashDone, setSplashDone] = useState(false)
+  const [appReady, setAppReady] = useState(false)
+  const [prefetchProgress, setPrefetchProgress] = useState(0)
   const [showAuthGuard, setShowAuthGuard] = useState(false)
 
   const registerSession = useSubscriptionStore((s) => s.registerSession)
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
   const sessionValid = useSubscriptionStore((s) => s.sessionValid)
 
+  // 최대 대기 타임아웃 — 네트워크 느려도 앱은 반드시 열림
   useEffect(() => {
-    const timer = setTimeout(() => setSplashDone(true), MIN_SPLASH_MS)
+    const timer = setTimeout(() => setAppReady(true), MAX_SPLASH_MS)
     return () => clearTimeout(timer)
   }, [])
+
+  // Auth 확인 후 프리로드 시작
+  useEffect(() => {
+    if (!user) return
+
+    // Progress 구독
+    const unsub = prefetch.subscribe((state) => {
+      setPrefetchProgress(state.progress)
+      if (state.status === 'ready') setAppReady(true)
+    })
+
+    // 프리로드 실행 — decks, stats, templates, profile 병렬 로드
+    prefetch.run(user.id)
+
+    return unsub
+  }, [user])
+
+  // 프로필에서 테마 적용 (prefetch가 이미 로드했으면 캐시에서 즉시 적용)
+  useEffect(() => {
+    if (!user) return
+    const applyTheme = () => {
+      const saved = profileCache.data?.theme as 'light' | 'dark' | 'system' | undefined
+      if (saved && saved !== 'system') {
+        Appearance.setColorScheme(saved)
+      }
+    }
+
+    // prefetch 완료됐으면 즉시, 아니면 구독
+    if (profileCache.data) {
+      applyTheme()
+    } else {
+      const unsub = prefetch.subscribe((state) => {
+        if (state.status === 'ready') { applyTheme(); unsub() }
+      })
+      return unsub
+    }
+  }, [user])
 
   // Register session + start heartbeat when user is logged in
   useEffect(() => {
@@ -37,40 +77,27 @@ export function RootNavigator() {
     return cleanup
   }, [user, registerSession, startHeartbeat])
 
-  // Load saved theme preference on login (so it applies before visiting Settings)
-  useEffect(() => {
-    if (!user) return
-    const supabase = getMobileSupabase()
-    Promise.resolve(
-      supabase.from('profiles').select('theme').eq('id', user.id).single()
-    ).then(({ data }) => {
-      const saved = (data as Record<string, unknown> | null)?.theme as 'light' | 'dark' | 'system' | undefined
-      if (saved && saved !== 'system') {
-        Appearance.setColorScheme(saved)
-      }
-    }).catch(() => {})
-  }, [user])
-
   const handleReclaim = useCallback(async () => {
     await registerSession()
   }, [registerSession])
 
   const handleLogout = useCallback(async () => {
-    const supabase = getMobileSupabase()
-    await supabase.auth.signOut()
+    prefetch.reset()
+    const { getSupabase } = await import('@reeeeecall/shared/lib/supabase')
+    await getSupabase().auth.signOut()
   }, [])
 
-  // Show splash while loading or timer not done
-  if (loading || !splashDone) {
-    return <LoadingScreen />
+  // 스플래시: auth 로딩 중이거나 prefetch 미완료
+  if (loading || !appReady) {
+    return <LoadingScreen progress={prefetchProgress} />
   }
 
-  // Session kicked → full screen overlay (matches web SessionKickedOverlay)
+  // Session kicked → full screen overlay
   if (user && !sessionValid) {
     return <SessionKickedScreen onReclaim={handleReclaim} onLogout={handleLogout} />
   }
 
-  // Not logged in → show AuthGuard (card flip bg + CTA), then navigate to login
+  // Not logged in → show AuthGuard
   if (!user && !showAuthGuard) {
     return <AuthGuardScreen onLogin={() => setShowAuthGuard(true)} />
   }
