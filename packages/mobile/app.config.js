@@ -17,12 +17,17 @@
 
 const baseConfig = require('./app.json')
 
+// EXPO_PUBLIC_* 키는 클라이언트 공개용(publishable)이므로 하드코딩 fallback 안전.
+// .env 파일이 eas build 아카이브에서 제외되어도 앱이 동작하도록 보장.
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ixdapelfikaneexnskfm.supabase.co'
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_4F7XKb_Cifh2rujOiyP9RQ_ZU3HjQsV'
+
 module.exports = ({ config }) => ({
   ...config,
   ...baseConfig.expo,
   extra: {
     ...baseConfig.expo.extra,
-    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
-    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
+    supabaseUrl: SUPABASE_URL,
+    supabaseAnonKey: SUPABASE_ANON_KEY,
   },
 })

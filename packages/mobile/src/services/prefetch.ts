@@ -123,8 +123,8 @@ class PrefetchService {
 // Singleton + 태스크 등록
 // 새 프리로드 대상 추가 시 여기에 .register() 한 줄 추가.
 // ─────────────────────────────────────────────────────────────────────────
-import { Appearance } from 'react-native'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useThemeStore } from '../stores/theme-store'
 import { getMobileSupabase } from '../adapters'
 
 export const prefetch = new PrefetchService()
@@ -148,13 +148,14 @@ export const prefetch = new PrefetchService()
       profileCache.data = data
       profileCache.fetchedAt = Date.now()
 
-      // 테마 즉시 적용 — 스플래시 화면 중에 실행되어 메인 화면 진입 전 반영.
-      // React useEffect보다 선행하므로 첫 렌더부터 올바른 테마 적용.
-      const theme = data.theme as string | undefined
-      if (theme === 'system') {
-        Appearance.setColorScheme(null as 'light' | 'dark' | null)
-      } else if (theme === 'light' || theme === 'dark') {
-        Appearance.setColorScheme(theme)
+      // 테마 Zustand store에 반영 → useAppTheme() 구독 컴포넌트 자동 재렌더.
+      const theme = data.theme as 'light' | 'dark' | 'system' | undefined
+      console.log('[Prefetch] profile loaded, theme:', theme, 'full data keys:', Object.keys(data))
+      if (theme) {
+        useThemeStore.getState().setUserTheme(theme)
+        console.log('[Prefetch] setUserTheme called with:', theme)
+      } else {
+        console.log('[Prefetch] theme is null/undefined, skipping setUserTheme')
       }
     }
   })

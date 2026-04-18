@@ -2,6 +2,8 @@ import { initAdapters } from '@reeeeecall/shared/adapters'
 import { initSupabase, getSupabase } from '@reeeeecall/shared/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Constants from 'expo-constants'
+import * as SecureStore from 'expo-secure-store'
+import { Appearance } from 'react-native'
 import { RNStorage, RNSessionStorage, supabaseSecureStorage } from './rn-storage'
 import { RNCrypto } from './rn-crypto'
 import { RNDevice } from './rn-device'
@@ -53,6 +55,22 @@ export function initMobilePlatform(): void {
       detectSessionInUrl: false,
     },
   })
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 테마 즉시 적용 — React 렌더 전, 동기적으로 실행.
+  // SecureStore.getItem()은 동기 API. 이전에 저장된 테마를 즉시 읽어서
+  // Appearance.setColorScheme()으로 OS 레벨에 적용.
+  // → useColorScheme() 훅이 첫 렌더부터 올바른 값 반환.
+  // DB 테마와의 동기화는 prefetch 'profile' 태스크가 처리.
+  // ─────────────────────────────────────────────────────────────────────
+  try {
+    const cachedTheme = SecureStore.getItem('reeeeecall-user-theme')
+    if (cachedTheme === 'light' || cachedTheme === 'dark') {
+      Appearance.setColorScheme(cachedTheme)
+    }
+  } catch {
+    // SecureStore 접근 실패 시 OS 기본 테마 사용
+  }
 }
 
 /**

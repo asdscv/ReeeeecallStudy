@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList, Share, Appearance } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList, Share } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -11,6 +11,7 @@ import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useAuth, useAuthState } from '../hooks'
 // import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
+import { useThemeStore } from '../stores/theme-store'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
@@ -71,6 +72,7 @@ export function SettingsScreen() {
   const navigation = useNavigation<Nav>()
   const { user } = useAuthState()
   const { signOut } = useAuth()
+  const setUserTheme = useThemeStore((s) => s.setUserTheme)
   // [SUBSCRIPTION-HIDDEN] usePurchases 훅 호출 보류 — 복원 시 아래 stub 제거하고 원래 줄 복구
   // const { isPro } = usePurchases()
 
@@ -154,7 +156,7 @@ export function SettingsScreen() {
           const savedTheme = p.theme as 'light' | 'dark' | 'system' | undefined
           if (savedTheme) {
             setThemeMode(savedTheme)
-            Appearance.setColorScheme(savedTheme === 'system' ? null as any : savedTheme)
+            setUserTheme(savedTheme)
           }
         }
       })
@@ -900,8 +902,7 @@ export function SettingsScreen() {
                   testID={`settings-theme-${mode}`}
                   onPress={async () => {
                     setThemeMode(mode)
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    Appearance.setColorScheme(mode === 'system' ? null as any : mode)
+                    setUserTheme(mode)
                     if (user) {
                       const supabase = getMobileSupabase()
                       await supabase.from('profiles').update({ theme: mode }).eq('id', user.id)
