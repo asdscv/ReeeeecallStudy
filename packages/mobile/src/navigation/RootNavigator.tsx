@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Appearance } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
@@ -8,7 +7,7 @@ import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
 import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
 import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
-import { prefetch, profileCache } from '../services/prefetch'
+import { prefetch } from '../services/prefetch'
 import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -48,26 +47,8 @@ export function RootNavigator() {
     return unsub
   }, [user])
 
-  // 프로필에서 테마 적용 (prefetch가 이미 로드했으면 캐시에서 즉시 적용)
-  useEffect(() => {
-    if (!user) return
-    const applyTheme = () => {
-      const saved = profileCache.data?.theme as 'light' | 'dark' | 'system' | undefined
-      if (saved && saved !== 'system') {
-        Appearance.setColorScheme(saved)
-      }
-    }
-
-    // prefetch 완료됐으면 즉시, 아니면 구독
-    if (profileCache.data) {
-      applyTheme()
-    } else {
-      const unsub = prefetch.subscribe((state) => {
-        if (state.status === 'ready') { applyTheme(); unsub() }
-      })
-      return unsub
-    }
-  }, [user])
+  // 테마는 prefetch 'profile' 태스크에서 Appearance.setColorScheme() 직접 호출.
+  // 스플래시 중에 적용되므로 메인 화면 진입 전 반영 완료.
 
   // Register session + start heartbeat when user is logged in
   useEffect(() => {
