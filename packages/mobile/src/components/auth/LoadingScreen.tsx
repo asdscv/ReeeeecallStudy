@@ -22,7 +22,7 @@ const ORBS = [
  * Premium loading screen — card flip animation like web AuthGuard.
  * Dark bg, floating orbs, 3D card flip, rating buttons, then fade to app.
  */
-export function LoadingScreen() {
+export function LoadingScreen({ progress = 0 }: { progress?: number }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const [highlightIdx, setHighlightIdx] = useState(-1)
 
@@ -169,14 +169,14 @@ export function LoadingScreen() {
           ))}
         </Animated.View>
 
-        {/* Progress bar */}
+        {/* Progress bar — 실제 프리로드 진행률 반영 */}
         <Animated.View style={[s.progressWrap, { opacity: ratingOpacity }]}>
           <View style={s.progressRow}>
-            <Text style={s.progressLabel}>12/30 cards</Text>
-            <Text style={s.progressPct}>40%</Text>
+            <Text style={s.progressLabel}>{progress > 0 ? 'Loading data...' : 'Starting...'}</Text>
+            <Text style={s.progressPct}>{Math.round(progress * 100)}%</Text>
           </View>
           <View style={s.progressTrack}>
-            <View style={s.progressFill} />
+            <View style={[s.progressFill, { width: `${Math.max(progress * 100, 5)}%` }]} />
           </View>
         </Animated.View>
 
@@ -258,7 +258,7 @@ const s = StyleSheet.create({
   progressLabel: { fontSize: 11, color: 'rgba(255,255,255,0.35)' },
   progressPct: { fontSize: 11, color: 'rgba(59,130,246,0.6)' },
   progressTrack: { width: '100%', height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.05)' },
-  progressFill: { width: '40%', height: 5, borderRadius: 3, backgroundColor: palette.blue[500] },
+  progressFill: { height: 5, borderRadius: 3, backgroundColor: palette.blue[500] },
 
   // Dots
   dotsRow: { flexDirection: 'row', gap: 8 },

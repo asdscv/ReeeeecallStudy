@@ -3,6 +3,7 @@ import { Platform } from 'react-native'
 import * as WebBrowser from 'expo-web-browser'
 import * as AuthSession from 'expo-auth-session'
 import * as AppleAuthentication from 'expo-apple-authentication'
+import * as Crypto from 'expo-crypto'
 import { getMobileSupabase } from '../adapters'
 import { validatePassword } from '@reeeeecall/shared/lib/password-validation'
 import { localizeAuthError } from '@reeeeecall/shared/lib/auth-errors'
@@ -164,6 +165,24 @@ export function useAuth(): AuthActions {
     setLoading(true)
     try {
       if (Platform.OS === 'ios') {
+        // ─────────────────────────────────────────────────────────────────
+        // Nonce 기반 Apple Sign-In (Supabase OIDC 검증 요건)
+        // Apple Guideline 2.1(a) 리젝 대응 — 2026-04-15
+        //
+        // 흐름:
+        //   1) rawNonce 생성 (랜덤 UUID)
+        //   2) SHA256(rawNonce) → hashedNonce
+        //   3) Apple에 hashedNonce 전달 → id_token의 `nonce` 클레임에 그대로 임베드
+        //   4) Supabase에 rawNonce 전달 → SDK가 SHA256(rawNonce) === token.nonce 검증
+        // Nonce가 빠지면 Supabase가 id_token 재생/리플레이 공격 방어 못 해서
+        // 프로젝트 설정에 따라 검증 실패 → 리뷰어가 에러 메시지 목격.
+        // ─────────────────────────────────────────────────────────────────
+        const rawNonce = Crypto.randomUUID()
+        const hashedNonce = await Crypto.digestStringAsync(
+          Crypto.CryptoDigestAlgorithm.SHA256,
+          rawNonce,
+        )
+
         // Native Apple Sign-In on iOS
         // Apple only provides name/email on FIRST sign-in.
         // If user chose "Hide My Email", Apple provides a relay address.
@@ -173,6 +192,7 @@ export function useAuth(): AuthActions {
             AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
             AppleAuthentication.AppleAuthenticationScope.EMAIL,
           ],
+          nonce: hashedNonce,
         })
 
         if (!credential.identityToken) {
@@ -189,6 +209,7 @@ export function useAuth(): AuthActions {
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: credential.identityToken,
+          nonce: rawNonce,
         })
 
         if (error) return { error: localizeAuthError(error.message) }
@@ -236,7 +257,10 @@ export function useAuth(): AuthActions {
       if (e?.code === 'ERR_REQUEST_CANCELED') {
         return { error: 'Login was cancelled' }
       }
-      return { error: 'Apple login failed' }
+      // Apple Sign-In 실패 시 원인을 유저에게 노출 (리뷰어/디버깅용)
+      const detail = e?.message || e?.code || 'unknown'
+      if (__DEV__) console.error('[Apple Sign-In]', e)
+      return { error: `Apple login failed: ${detail}` }
     } finally {
       setLoading(false)
     }

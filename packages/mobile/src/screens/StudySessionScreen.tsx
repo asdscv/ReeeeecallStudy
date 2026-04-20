@@ -125,6 +125,23 @@ export function StudySessionScreen() {
     rotateY.value = withTiming(isFlipped ? 180 : 0, { duration: 300 })
   }, [isFlipped])
 
+  // Auto-TTS on flip — reads first tts_enabled text field on back face.
+  // Mirrors web StudySessionPage behavior; only fires when profile.tts_enabled.
+  useEffect(() => {
+    if (!isFlipped || !currentCard || !template) return
+    if (!profile.tts_enabled) return
+    const backLayout = template.back_layout ?? []
+    for (const item of backLayout) {
+      const field = template.fields.find((f) => f.key === item.field_key) as
+        { key: string; type?: string; tts_enabled?: boolean; tts_lang?: string } | undefined
+      if (!field || field.type !== 'text' || !field.tts_enabled) continue
+      const value = currentCard.field_values[field.key]
+      if (!value) continue
+      tts.speak(value, field.tts_lang || 'en-US', profile.tts_speed)
+      break
+    }
+  }, [isFlipped, currentCard, template, profile.tts_enabled, profile.tts_speed])
+
   // ── Animated styles (must be BEFORE early return — React hooks rule) ──
   const cardAnimStyle = useAnimatedStyle(() => ({
     transform: [
@@ -425,7 +442,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
               fontStyle: isHint ? 'italic' : 'normal',
               color,
               textAlign: 'center',
-              lineHeight: size >= 32 ? size * 1.2 : size * 1.5,
+              lineHeight: size * 1.5,
             }}>
               {field.value}
             </Text>
@@ -437,7 +454,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
             fontStyle: isHint ? 'italic' : 'normal',
             color,
             textAlign: 'center',
-            lineHeight: size >= 32 ? size * 1.2 : size * 1.5,
+            lineHeight: size * 1.5,
           }}>
             {field.value}
           </Text>

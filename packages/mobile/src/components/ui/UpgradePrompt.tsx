@@ -3,6 +3,13 @@ import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
 import { Button } from './Button'
 
+// ─────────────────────────────────────────────────────────────────────────
+// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응
+// 이 컴포넌트는 현재 어디서도 호출되지 않음 (export만 유지, 미사용).
+// Paywall 라우트가 주석 처리된 상태라 호출 시 네비게이션 에러 발생함.
+// 구독 기능 복원 시 Paywall 라우트 부활과 함께 사용 가능.
+// ─────────────────────────────────────────────────────────────────────────
+
 interface UpgradePromptProps {
   feature: string
   description?: string

@@ -3,7 +3,12 @@ import PaywallScreen from '../screens/PaywallScreen'
 import { navigateToTab } from '../helpers/navigation'
 import { scrollDown } from '../helpers/scroll'
 
-describe('Monetization Flow', () => {
+// ─────────────────────────────────────────────────────────────────────────
+// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응
+// 구독 UI가 네비게이션에서 제거된 상태이므로 전체 스위트를 스킵.
+// 복원 시 describe → describe 로 변경.
+// ─────────────────────────────────────────────────────────────────────────
+describe.skip('Monetization Flow', () => {
   describe('Settings — Subscription Section', () => {
     it('should show subscription section in settings', async () => {
       await navigateToTab('Settings')

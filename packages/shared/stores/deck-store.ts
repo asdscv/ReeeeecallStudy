@@ -13,6 +13,9 @@ interface DeckStats {
   last_studied: string | null
 }
 
+// 데이터 신선도 — 이 시간 이내면 네트워크 재요청 스킵
+const STALE_AFTER_MS = 5 * 60 * 1000 // 5분
+
 interface DeckState {
   decks: Deck[]
   stats: DeckStats[]
@@ -20,9 +23,14 @@ interface DeckState {
   loading: boolean
   error: string | null
 
-  fetchDecks: () => Promise<void>
-  fetchStats: (userId: string) => Promise<void>
-  fetchTemplates: () => Promise<void>
+  // staleness tracking
+  decksFetchedAt: number | null
+  statsFetchedAt: number | null
+  templatesFetchedAt: number | null
+
+  fetchDecks: (opts?: { force?: boolean }) => Promise<void>
+  fetchStats: (userId: string, opts?: { force?: boolean }) => Promise<void>
+  fetchTemplates: (opts?: { force?: boolean }) => Promise<void>
   createDeck: (data: {
     name: string
     description?: string
@@ -41,8 +49,13 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   templates: [],
   loading: false,
   error: null,
+  decksFetchedAt: null,
+  statsFetchedAt: null,
+  templatesFetchedAt: null,
 
-  fetchDecks: async () => {
+  fetchDecks: async (opts) => {
+    const { decksFetchedAt } = get()
+    if (!opts?.force && decksFetchedAt && Date.now() - decksFetchedAt < STALE_AFTER_MS) return
     set({ loading: true, error: null })
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -89,20 +102,24 @@ export const useDeckStore = create<DeckState>((set, get) => ({
       }
     }
 
-    set({ decks: allDecks, loading: false })
+    set({ decks: allDecks, loading: false, decksFetchedAt: Date.now() })
   },
 
-  fetchStats: async (userId: string) => {
+  fetchStats: async (userId: string, opts?) => {
+    const { statsFetchedAt } = get()
+    if (!opts?.force && statsFetchedAt && Date.now() - statsFetchedAt < STALE_AFTER_MS) return
     const { data, error } = await supabase.rpc('get_deck_stats', {
       p_user_id: userId,
     } as Record<string, unknown>)
 
     if (!error && data) {
-      set({ stats: data as DeckStats[] })
+      set({ stats: data as DeckStats[], statsFetchedAt: Date.now() })
     }
   },
 
-  fetchTemplates: async () => {
+  fetchTemplates: async (opts?) => {
+    const { templatesFetchedAt } = get()
+    if (!opts?.force && templatesFetchedAt && Date.now() - templatesFetchedAt < STALE_AFTER_MS) return
     const { data } = await supabase
       .from('card_templates')
       .select('*')
@@ -110,7 +127,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
       .order('name')
 
     if (data) {
-      set({ templates: data as CardTemplate[] })
+      set({ templates: data as CardTemplate[], templatesFetchedAt: Date.now() })
     }
   },
 

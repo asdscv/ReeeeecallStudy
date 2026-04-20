@@ -1,0 +1,54 @@
+# EAS Build archive ignore — .gitignore 기반이되 .env는 포함
+# .env가 빌드 바이너리에 EXPO_PUBLIC_* 환경변수를 주입하는 데 필수.
+# .gitignore에 .env가 있어서 eas build에서 제외되는 문제 해결.
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+dist-ssr
+*.local
+
+# Do NOT exclude .env — needed for EXPO_PUBLIC_* env vars in JS bundle
+# .env
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Test artifacts
+api test
+playwright-report/
+playwright/.auth/
+test-results/
+blob-report/
+.env.test
+
+# Study data
+STUDY_DATA/
+
+# Apple private keys
+AuthKey_*.p8
+
+# Editor
+.vscode/*
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# E2E test outputs
+e2e-debug-*.png
+
+# Previous build artifacts
+build-*.ipa
+build-*.aab
