@@ -54,6 +54,17 @@ Use these exact field names (as the "name" value). Generate field keys as "field
     contentLangInstruction = `\n- The learning content language is ${contentLang}. Set tts_lang to "${contentLang}" for the primary content field(s) and enable tts_enabled for them.`
   }
 
+  // Chinese-specific template guidance
+  let chineseTemplateInstruction = ''
+  if (contentLang === 'zh-CN' || contentLang === 'zh-TW') {
+    const charType = contentLang === 'zh-CN' ? 'Simplified Chinese (简体字)' : 'Traditional Chinese (繁體字)'
+    chineseTemplateInstruction = `
+- This is a Chinese language deck. You MUST include a dedicated field for Chinese characters (汉字/漢字) as the primary front field with large font_size (40-48).
+- Use ${charType} for all Chinese character fields.
+- Include a separate pinyin field (style: "secondary") — do NOT combine characters and pinyin in one field.
+- The Chinese character field must use tts_lang "${contentLang}" with tts_enabled true.`
+  }
+
   const systemPrompt = `You are a flashcard template designer. Generate a card template for the given topic.
 Respond with a single JSON object (no markdown, no explanation).
 
@@ -83,7 +94,7 @@ Rules:
 - Generate 2-6 fields, put front fields in front_layout, back fields in back_layout
 - Each field must appear in exactly one layout (front or back)
 - ${langInstruction}
-- ${htmlInstruction}${fieldSpec}${contentLangInstruction}`
+- ${htmlInstruction}${fieldSpec}${contentLangInstruction}${chineseTemplateInstruction}`
 
   const userPrompt = `Topic: ${topic}`
 
@@ -130,6 +141,21 @@ export function buildCardsPrompt(
     ? `\n\nEXISTING CARDS (do NOT generate duplicates of these):\n${JSON.stringify(existingCards.slice(0, 50))}`
     : ''
 
+  // Detect Chinese language from field tts_lang
+  const chineseLang = fields.find((f) => f.tts_lang === 'zh-CN' || f.tts_lang === 'zh-TW')?.tts_lang
+  let chineseCardInstruction = ''
+  if (chineseLang) {
+    const charType = chineseLang === 'zh-CN'
+      ? 'Simplified Chinese characters (简体字)'
+      : 'Traditional Chinese characters (繁體字)'
+    chineseCardInstruction = `
+- CRITICAL: This is a Chinese language deck. Use ONLY ${charType} — do NOT mix simplified and traditional.
+- Every card MUST have actual Chinese characters (汉字/漢字) in the character field. NEVER leave the character field empty.
+- Pinyin must include proper tone marks (e.g., "shíyòng" not "shiyong").
+- Do NOT generate cards with only pinyin and no characters.
+- For single-character words like 的(de), 了(le), 是(shì): the character field MUST still contain the Chinese character, not just pinyin.`
+  }
+
   const systemPrompt = `You are a flashcard content creator. Generate exactly ${cardCount} flashcards for the given topic.
 Respond with a single JSON object.
 
@@ -143,9 +169,10 @@ JSON schema:
 Rules:
 - Each card's field_values must have these exact keys: ${fieldDesc}
 - Fill values appropriate to each field's purpose and language
+- Every field_values key must have a non-empty value — do NOT leave any field blank
 - tags: 1-3 short tags per card
 - Generate exactly ${cardCount} cards
-- Each card should be unique and educational${dupeInstruction}`
+- Each card should be unique and educational${chineseCardInstruction}${dupeInstruction}`
 
   const userPrompt = `Topic: ${topic}`
 
