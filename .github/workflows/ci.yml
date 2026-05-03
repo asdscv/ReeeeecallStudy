@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 9.15.0
+  NODE_VERSION: 20
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────
+  # Job 1: Lint + Typecheck (fast feedback)
+  # ─────────────────────────────────────────────────────────────────────
+  lint-typecheck:
+    name: Lint + Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Web lint
+        run: pnpm --filter @reeeeecall/web lint
+      - name: Web typecheck
+        run: pnpm --filter @reeeeecall/web exec tsc --noEmit
+      - name: Mobile typecheck (regression guard for marketplace scope)
+        run: |
+          set +e
+          pnpm --filter @reeeeecall/mobile exec tsc --noEmit 2>&1 | tee /tmp/mobile-tsc.log
+          # Pre-existing baseline errors are tolerated; new marketplace/acquire scope errors are not.
+          if grep -E "(MarketplaceDetail|marketplace-store|acquireDeck|deck-store)" /tmp/mobile-tsc.log; then
+            echo "::error::TypeScript error introduced in marketplace/acquire scope"
+            exit 1
+          fi
+          exit 0
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Job 2: Unit tests (vitest)
+  # ─────────────────────────────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Vitest (web + shared via web)
+        run: pnpm --filter @reeeeecall/web exec vitest run --reporter=verbose
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-coverage
+          path: packages/web/coverage
+          if-no-files-found: ignore
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Job 3: Real Supabase integration tests (atomic acquire flow, etc.)
+  # ─────────────────────────────────────────────────────────────────────
+  integration-tests:
+    name: Integration (Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: pnpm install --frozen-lockfile
+
+      - name: Start Supabase (local stack via Docker)
+        run: |
+          supabase start
+          # Apply all migrations to fresh DB (init schema → all RPCs)
+          supabase db reset --no-seed
+
+      - name: Capture Supabase keys
+        id: keys
+        run: |
+          ANON=$(supabase status -o json | jq -r .ANON_KEY)
+          SVC=$(supabase status -o json | jq -r .SERVICE_ROLE_KEY)
+          echo "anon=$ANON" >> $GITHUB_OUTPUT
+          echo "svc=$SVC" >> $GITHUB_OUTPUT
+
+      - name: Run integration suite
+        env:
+          SUPABASE_LOCAL_URL: http://127.0.0.1:54321
+          SUPABASE_ANON_KEY: ${{ steps.keys.outputs.anon }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ steps.keys.outputs.svc }}
+        run: |
+          pnpm --filter @reeeeecall/web exec vitest run \
+            --config ../../tests/integration/vitest.config.ts \
+            ../../tests/integration
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop || true
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Job 4: Architecture guard — domain layer must not import supabase
+  # ─────────────────────────────────────────────────────────────────────
+  arch-guard:
+    name: Architecture Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Run arch checks
+        # tsx is a transitive devDep of @reeeeecall/web; resolve via the web package
+        run: pnpm --filter @reeeeecall/web exec tsx ../../tools/check-arch.ts
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Job 5: Migration safety — every migration must apply against fresh DB
+  # ─────────────────────────────────────────────────────────────────────
+  migration-safety:
+    name: Migration Safety
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Reset DB with all migrations
+        run: |
+          supabase start
+          supabase db reset --no-seed
+      - name: Idempotency check — running reset twice should pass
+        run: supabase db reset --no-seed
+      - name: Stop
+        if: always()
+        run: supabase stop || true

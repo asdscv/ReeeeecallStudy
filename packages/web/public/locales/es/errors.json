@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "Publicación no encontrada.",
-    "cannotImportOwn": "No puedes importar tu propio mazo."
+    "cannotImportOwn": "No puedes importar tu propio mazo.",
+    "acquireFailed": "Error al obtener el mazo. Inténtalo de nuevo."
   },
   "sharing": {
     "invalidOrExpired": "Código de invitación inválido o expirado.",

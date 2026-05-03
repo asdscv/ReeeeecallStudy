@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "리스팅을 찾을 수 없습니다.",
-    "cannotImportOwn": "자신의 덱은 가져올 수 없습니다."
+    "cannotImportOwn": "자신의 덱은 가져올 수 없습니다.",
+    "acquireFailed": "덱을 가져오지 못했습니다. 다시 시도해 주세요."
   },
   "sharing": {
     "invalidOrExpired": "유효하지 않거나 만료된 초대 코드입니다.",

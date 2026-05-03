@@ -128,13 +128,19 @@ export function MarketplaceDetailPage() {
   }, [listingId])
 
   const handleAcquire = async () => {
-    if (!listingId) return
+    if (!listingId || hasAcquired || acquiring) return
     setAcquiring(true)
-    const result = await acquireDeck(listingId)
-    setAcquiring(false)
-
-    if (result) {
+    try {
+      const result = await acquireDeck(listingId)
+      if (!result) return
+      setHasAcquired(true)
+      if (result.wasNew) {
+        const { useDeckStore } = await import('../stores/deck-store')
+        await useDeckStore.getState().fetchDecks({ force: true })
+      }
       navigate(`/decks/${result.deckId}`)
+    } finally {
+      setAcquiring(false)
     }
   }
 
@@ -213,10 +219,14 @@ export function MarketplaceDetailPage() {
         {!isOwner && (
           <button
             onClick={handleAcquire}
-            disabled={acquiring}
+            disabled={acquiring || hasAcquired}
             className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
           >
-            {acquiring ? t('marketplace:detail.importing') : t('marketplace:detail.getDeck')}
+            {hasAcquired
+              ? t('marketplace:detail.alreadyAcquired', { defaultValue: 'Already in your collection' })
+              : acquiring
+                ? t('marketplace:detail.importing')
+                : t('marketplace:detail.getDeck')}
           </button>
         )}
 

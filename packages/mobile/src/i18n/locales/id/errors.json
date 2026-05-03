@@ -9,5 +9,8 @@
     "newPasswordSameAsOld": "Kata sandi baru harus berbeda dari kata sandi lama.",
     "invalidEmailFormat": "Format email tidak valid."
   },
-  "generic": "Something went wrong. Please try again."
+  "generic": "Something went wrong. Please try again.",
+  "marketplace": {
+    "acquireFailed": "Gagal mendapatkan dek. Silakan coba lagi."
+  }
 }

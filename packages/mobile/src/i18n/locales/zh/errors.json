@@ -9,5 +9,8 @@
     "newPasswordSameAsOld": "新密码不能与旧密码相同。",
     "invalidEmailFormat": "邮箱格式无效。"
   },
-  "generic": "Something went wrong. Please try again."
+  "generic": "Something went wrong. Please try again.",
+  "marketplace": {
+    "acquireFailed": "获取牌组失败，请重试。"
+  }
 }

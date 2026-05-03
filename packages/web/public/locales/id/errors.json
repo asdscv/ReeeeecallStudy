@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "Daftar tidak ditemukan.",
-    "cannotImportOwn": "Anda tidak dapat mengimpor dek Anda sendiri."
+    "cannotImportOwn": "Anda tidak dapat mengimpor dek Anda sendiri.",
+    "acquireFailed": "Gagal mendapatkan dek. Silakan coba lagi."
   },
   "sharing": {
     "invalidOrExpired": "Kode undangan tidak valid atau telah kedaluwarsa.",

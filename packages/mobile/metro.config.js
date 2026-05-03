@@ -17,4 +17,14 @@ config.resolver.nodeModulesPaths = [
 // Ensure @reeeeecall/shared sources are resolved
 config.resolver.disableHierarchicalLookup = false;
 
+// CRITICAL: TypeScript sources must take precedence over any stale compiled
+// .js artifacts that may exist alongside in the shared package. Without this,
+// `.js` is resolved before `.ts` and code changes won't reach the runtime.
+// See DOCS/DESIGN/MARKETPLACE_ACQUIRE/DESIGN.md §7.5 (FU6).
+config.resolver.sourceExts = [
+  'ts',
+  'tsx',
+  ...config.resolver.sourceExts.filter((ext) => !['ts', 'tsx'].includes(ext)),
+];
+
 module.exports = config;
