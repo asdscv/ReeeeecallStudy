@@ -30,7 +30,18 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       mode: ${{ steps.choose.outputs.mode }}
+      has_expo_token: ${{ steps.token.outputs.has_token }}
     steps:
+      - id: token
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -n "$EXPO_TOKEN" ]; then
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=false" >> $GITHUB_OUTPUT
+            echo "::warning::EXPO_TOKEN secret not configured — mobile deploy will be skipped."
+          fi
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
@@ -50,7 +61,7 @@ jobs:
   ota:
     name: EAS Update (OTA)
     needs: decide
-    if: needs.decide.outputs.mode == 'ota'
+    if: needs.decide.outputs.mode == 'ota' && needs.decide.outputs.has_expo_token == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -66,12 +77,22 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Publish OTA update
         working-directory: packages/mobile
-        run: eas update --branch production --message "${{ github.event.head_commit.message }}" --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          MSG="${{ github.event.head_commit.message }}"
+          # Truncate to first line to avoid CLI parser issues with multi-line.
+          MSG=$(echo "$MSG" | head -1)
+          eas update \
+            --branch production \
+            --environment production \
+            --message "$MSG" \
+            --non-interactive
 
   native-build:
     name: EAS Build + Submit
     needs: decide
-    if: needs.decide.outputs.mode == 'native'
+    if: needs.decide.outputs.mode == 'native' && needs.decide.outputs.has_expo_token == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -87,6 +108,8 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       - name: EAS build (production, no-wait)
         working-directory: packages/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform all --profile production --non-interactive --no-wait
       # Submission is gated on a separate manual approval workflow:
       #   `.github/workflows/submit-mobile.yml`
