@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "未找到该条目。",
-    "cannotImportOwn": "无法导入自己的牌组。"
+    "cannotImportOwn": "无法导入自己的牌组。",
+    "acquireFailed": "获取牌组失败，请重试。"
   },
   "sharing": {
     "invalidOrExpired": "邀请码无效或已过期。",

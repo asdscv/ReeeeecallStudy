@@ -9,5 +9,8 @@
     "newPasswordSameAsOld": "รหัสผ่านใหม่ต้องแตกต่างจากรหัสผ่านเดิม",
     "invalidEmailFormat": "รูปแบบอีเมลไม่ถูกต้อง"
   },
-  "generic": "Something went wrong. Please try again."
+  "generic": "Something went wrong. Please try again.",
+  "marketplace": {
+    "acquireFailed": "ไม่สามารถรับสำรับได้ กรุณาลองอีกครั้ง"
+  }
 }

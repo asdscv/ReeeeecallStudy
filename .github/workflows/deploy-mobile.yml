@@ -1,0 +1,92 @@
+name: Deploy Mobile (EAS Update / Build)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/mobile/**'
+      - 'packages/shared/**'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Deploy mode'
+        required: true
+        default: 'auto'
+        type: choice
+        options: [auto, ota, native]
+
+concurrency:
+  group: deploy-mobile-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────
+  # Decide: OTA (eas update) vs full native build
+  # Heuristic: native build required if android/ios/app.json/app.config.js
+  # changed. Otherwise OTA is safe.
+  # ─────────────────────────────────────────────────────────────────────
+  decide:
+    name: Decide deploy mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.choose.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: choose
+        run: |
+          MANUAL="${{ github.event.inputs.mode }}"
+          if [ "$MANUAL" = "ota" ] || [ "$MANUAL" = "native" ]; then
+            echo "mode=$MANUAL" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if git diff --name-only HEAD^ HEAD | grep -E '^packages/mobile/(android|ios|app\.json|app\.config\.js)' >/dev/null; then
+            echo "mode=native" >> $GITHUB_OUTPUT
+          else
+            echo "mode=ota" >> $GITHUB_OUTPUT
+          fi
+
+  ota:
+    name: EAS Update (OTA)
+    needs: decide
+    if: needs.decide.outputs.mode == 'ota'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Publish OTA update
+        working-directory: packages/mobile
+        run: eas update --branch production --message "${{ github.event.head_commit.message }}" --non-interactive
+
+  native-build:
+    name: EAS Build + Submit
+    needs: decide
+    if: needs.decide.outputs.mode == 'native'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: EAS build (production, no-wait)
+        working-directory: packages/mobile
+        run: eas build --platform all --profile production --non-interactive --no-wait
+      # Submission is gated on a separate manual approval workflow:
+      #   `.github/workflows/submit-mobile.yml`

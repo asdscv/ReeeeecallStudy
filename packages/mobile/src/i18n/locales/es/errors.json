@@ -9,5 +9,8 @@
     "newPasswordSameAsOld": "La nueva contraseña debe ser diferente a la anterior.",
     "invalidEmailFormat": "Formato de correo inválido."
   },
-  "generic": "Something went wrong. Please try again."
+  "generic": "Something went wrong. Please try again.",
+  "marketplace": {
+    "acquireFailed": "Error al obtener el mazo. Inténtalo de nuevo."
+  }
 }

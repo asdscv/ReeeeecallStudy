@@ -4,6 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useReviewsStore } from '@reeeeecall/shared/stores/reviews-store'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
@@ -223,15 +224,24 @@ export function MarketplaceDetailScreen() {
   }, [userReview])
 
   const handleAcquire = async () => {
+    if (hasAcquired || acquiring) return // double-tap guard
     setAcquiring(true)
     try {
-      await acquireDeck(listingId)
+      const result = await acquireDeck(listingId)
+      if (!result) {
+        const err = useMarketplaceStore.getState().error
+        Alert.alert('Error', err ?? 'Failed to download deck')
+        return
+      }
       setHasAcquired(true)
-      Alert.alert('Success', 'Deck added to your collection!', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ])
-    } catch (e) {
-      Alert.alert('Error', 'Failed to download deck')
+      if (result.wasNew) {
+        await useDeckStore.getState().fetchDecks({ force: true })
+      }
+      Alert.alert(
+        'Success',
+        result.wasNew ? 'Deck added to your collection!' : 'You already have this deck.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }],
+      )
     } finally {
       setAcquiring(false)
     }
@@ -405,7 +415,19 @@ export function MarketplaceDetailScreen() {
                       ))}
                     </View>
                   )}
-                  <Button testID="marketplace-acquire-button" title={acquiring ? t('detail.downloading') : t('detail.getDeck')} onPress={handleAcquire} loading={acquiring} />
+                  <Button
+                    testID="marketplace-acquire-button"
+                    title={
+                      hasAcquired
+                        ? t('detail.alreadyAcquired', { defaultValue: 'Already in your collection' })
+                        : acquiring
+                          ? t('detail.downloading')
+                          : t('detail.getDeck')
+                    }
+                    onPress={handleAcquire}
+                    loading={acquiring}
+                    disabled={hasAcquired || acquiring}
+                  />
                   <Button testID="marketplace-report-button" title={t('detail.reportContent', { defaultValue: 'Report' })} variant="ghost" size="sm" onPress={() => setShowReportModal(true)} />
                   {previewCards.length > 0 && (
                     <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>Preview Cards</Text>

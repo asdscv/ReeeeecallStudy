@@ -9,5 +9,8 @@
     "newPasswordSameAsOld": "Mật khẩu mới phải khác mật khẩu cũ.",
     "invalidEmailFormat": "Định dạng email không hợp lệ."
   },
-  "generic": "Something went wrong. Please try again."
+  "generic": "Something went wrong. Please try again.",
+  "marketplace": {
+    "acquireFailed": "Không thể lấy bộ thẻ. Vui lòng thử lại."
+  }
 }

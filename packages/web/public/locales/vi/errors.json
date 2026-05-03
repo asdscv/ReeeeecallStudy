@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "Không tìm thấy danh sách.",
-    "cannotImportOwn": "Bạn không thể nhập bộ thẻ của chính mình."
+    "cannotImportOwn": "Bạn không thể nhập bộ thẻ của chính mình.",
+    "acquireFailed": "Không thể lấy bộ thẻ. Vui lòng thử lại."
   },
   "sharing": {
     "invalidOrExpired": "Mã mời không hợp lệ hoặc đã hết hạn.",

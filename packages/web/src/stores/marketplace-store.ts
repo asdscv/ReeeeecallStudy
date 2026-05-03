@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { filterListings, sortListings, type SortBy, type ListingFilters, type MarketplaceListingData } from '../lib/marketplace'
+import { useDeckStore } from './deck-store'
 import type { MarketplaceListing, ShareMode } from '../types/database'
 
 interface MarketplaceState {
@@ -21,7 +22,7 @@ interface MarketplaceState {
     shareMode: ShareMode
   }) => Promise<MarketplaceListing | null>
   unpublishDeck: (listingId: string) => Promise<void>
-  acquireDeck: (listingId: string) => Promise<{ deckId: string } | null>
+  acquireDeck: (listingId: string) => Promise<{ deckId: string; wasNew: boolean } | null>
   setFilters: (filters: Partial<ListingFilters & { sortBy: SortBy }>) => void
   resetFilters: () => void
   getFilteredListings: () => MarketplaceListing[]
@@ -141,96 +142,36 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
   },
 
   acquireDeck: async (listingId: string) => {
+    // Single atomic RPC call — see DOCS/DESIGN/MARKETPLACE_ACQUIRE/DESIGN.md
     set({ error: null })
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
 
-    // Get listing details
-    const { data: listing, error: listingError } = await supabase
-      .from('marketplace_listings')
-      .select('*')
-      .eq('id', listingId)
-      .single()
+    const { data, error } = await supabase.rpc('acquire_listing', {
+      p_listing_id: listingId,
+    } as Record<string, unknown>)
 
-    if (listingError || !listing) {
-      set({ error: 'errors:marketplace.listingNotFound' })
+    if (error) {
+      const hint = (error as { hint?: string }).hint
+      const code = (error as { code?: string }).code
+      let key = 'errors:marketplace.acquireFailed'
+      if (hint === 'cannot_acquire_own' || code === 'P0001') key = 'errors:marketplace.cannotImportOwn'
+      else if (hint === 'listing_not_found' || code === 'P0002') key = 'errors:marketplace.listingNotFound'
+      set({ error: key })
       return null
     }
 
-    const typedListing = listing as MarketplaceListing
-
-    if (typedListing.owner_id === user.id) {
-      set({ error: 'errors:marketplace.cannotImportOwn' })
+    const row = Array.isArray(data)
+      ? (data[0] as { acquired_deck_id?: string; is_new_acquisition?: boolean } | undefined)
+      : null
+    if (!row?.acquired_deck_id) {
+      set({ error: 'errors:marketplace.acquireFailed' })
       return null
     }
 
-    if (typedListing.share_mode === 'subscribe') {
-      // Create a subscription share
-      const { error: shareError } = await supabase
-        .from('deck_shares')
-        .insert({
-          deck_id: typedListing.deck_id,
-          owner_id: typedListing.owner_id,
-          recipient_id: user.id,
-          share_mode: 'subscribe',
-          status: 'active',
-          accepted_at: new Date().toISOString(),
-        } as Record<string, unknown>)
-        .select()
-        .single()
-
-      if (shareError) {
-        set({ error: shareError.message })
-        return null
-      }
-
-      // Initialize progress
-      await supabase.rpc('init_subscriber_progress', {
-        p_user_id: user.id,
-        p_deck_id: typedListing.deck_id,
-      } as Record<string, unknown>)
-
-      // Increment acquire count
-      await supabase.rpc('increment_acquire_count', {
-        p_listing_id: listingId,
-      } as Record<string, unknown>)
-
-      return { deckId: typedListing.deck_id }
-    } else {
-      // Copy or snapshot
-      const isReadonly = typedListing.share_mode === 'snapshot'
-      const { data: newDeckId, error: rpcError } = await supabase.rpc('copy_deck_for_user', {
-        p_source_deck_id: typedListing.deck_id,
-        p_recipient_id: user.id,
-        p_is_readonly: isReadonly,
-        p_share_mode: typedListing.share_mode,
-      } as Record<string, unknown>)
-
-      if (rpcError) {
-        set({ error: rpcError.message })
-        return null
-      }
-
-      // Create share record for tracking
-      await supabase
-        .from('deck_shares')
-        .insert({
-          deck_id: typedListing.deck_id,
-          owner_id: typedListing.owner_id,
-          recipient_id: user.id,
-          share_mode: typedListing.share_mode,
-          status: 'active',
-          accepted_at: new Date().toISOString(),
-          copied_deck_id: newDeckId,
-        } as Record<string, unknown>)
-
-      // Increment acquire count
-      await supabase.rpc('increment_acquire_count', {
-        p_listing_id: listingId,
-      } as Record<string, unknown>)
-
-      return { deckId: newDeckId as string }
+    if (row.is_new_acquisition) {
+      useDeckStore.setState({ decksFetchedAt: null })
     }
+
+    return { deckId: row.acquired_deck_id, wasNew: !!row.is_new_acquisition }
   },
 
   setFilters: (filters) => {

@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "Listing not found.",
-    "cannotImportOwn": "You cannot import your own deck."
+    "cannotImportOwn": "You cannot import your own deck.",
+    "acquireFailed": "Failed to acquire deck. Please try again."
   },
   "sharing": {
     "invalidOrExpired": "Invalid or expired invite code.",

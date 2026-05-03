@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "リスティングが見つかりません。",
-    "cannotImportOwn": "自分のデッキはインポートできません。"
+    "cannotImportOwn": "自分のデッキはインポートできません。",
+    "acquireFailed": "デッキの取得に失敗しました。再試行してください。"
   },
   "sharing": {
     "invalidOrExpired": "無効または期限切れの招待コードです。",

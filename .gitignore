@@ -21,6 +21,16 @@ supabase/.temp/
 # Test artifacts
 api test
 
+# Compiled artifacts that leak into source dirs (TypeScript build output)
+# These must NEVER be committed — Metro/Vite resolve from source.
+packages/shared/**/*.js
+packages/shared/**/*.js.map
+packages/shared/**/*.d.ts
+packages/shared/**/*.d.ts.map
+!packages/shared/index.ts
+packages/mobile/shared/
+packages/mobile/mobile/
+
 # Playwright
 playwright-report/
 playwright/.auth/

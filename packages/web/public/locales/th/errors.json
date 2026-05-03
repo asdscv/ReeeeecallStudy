@@ -53,7 +53,8 @@
   },
   "marketplace": {
     "listingNotFound": "ไม่พบรายการ",
-    "cannotImportOwn": "คุณไม่สามารถนำเข้าสำรับของคุณเอง"
+    "cannotImportOwn": "คุณไม่สามารถนำเข้าสำรับของคุณเอง",
+    "acquireFailed": "ไม่สามารถรับสำรับได้ กรุณาลองอีกครั้ง"
   },
   "sharing": {
     "invalidOrExpired": "รหัสเชิญไม่ถูกต้องหรือหมดอายุ",
