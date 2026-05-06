@@ -415,6 +415,11 @@ function TTSButton({ text, lang, speed, color, cardTapRef }: {
   )
 }
 
+// CJK Han / Hiragana / Katakana need extra lineHeight on iOS (PingFang/HiraKaku
+// glyph ascent exceeds 1.5x at large sizes, clipping the top stroke). Hangul
+// (U+AC00–U+D7AF) is intentionally excluded — it renders fine at 1.5x.
+const CJK_RE = /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/
+
 function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapRef }: {
   content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
   theme: Theme
@@ -428,6 +433,11 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
     const isHint = field.style === 'hint'
     const isDetail = field.style === 'detail'
     const color = (isHint || isDetail) ? theme.colors.textSecondary : theme.colors.text
+    const isCJK = CJK_RE.test(field.value)
+    const lineHeight = size * (isCJK ? 1.8 : 1.5)
+    // CJK text wraps per-character (no word boundaries), so a slightly narrow row
+    // forces a break between every glyph. Keep it single-line and shrink to fit.
+    const singleLineProps = isCJK ? { numberOfLines: 1, adjustsFontSizeToFit: true, minimumFontScale: 0.5 } : {}
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
@@ -435,27 +445,37 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
         {field.ttsLang ? (
           <View style={styles.ttsRow}>
             <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
-            <Text style={{
-              flex: 1,
+            <Text
+              {...singleLineProps}
+              style={{
+                flex: 1,
+                // iOS RN measures flex:1 Text width too narrow inside a row when
+                // the text has no word boundaries (CJK), causing per-glyph wrap.
+                // minWidth: 0 unlocks the flexbox shrink calc.
+                minWidth: 0,
+                fontSize: size,
+                fontWeight: isBold ? '700' : '400',
+                fontStyle: isHint ? 'italic' : 'normal',
+                color,
+                textAlign: 'center',
+                lineHeight,
+              }}
+            >
+              {field.value}
+            </Text>
+          </View>
+        ) : (
+          <Text
+            {...singleLineProps}
+            style={{
               fontSize: size,
               fontWeight: isBold ? '700' : '400',
               fontStyle: isHint ? 'italic' : 'normal',
               color,
               textAlign: 'center',
-              lineHeight: size * 1.5,
-            }}>
-              {field.value}
-            </Text>
-          </View>
-        ) : (
-          <Text style={{
-            fontSize: size,
-            fontWeight: isBold ? '700' : '400',
-            fontStyle: isHint ? 'italic' : 'normal',
-            color,
-            textAlign: 'center',
-            lineHeight: size * 1.5,
-          }}>
+              lineHeight,
+            }}
+          >
             {field.value}
           </Text>
         )}
