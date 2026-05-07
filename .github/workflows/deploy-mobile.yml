@@ -75,25 +75,6 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-      - name: Diagnose shared package layout
-        working-directory: packages/mobile
-        run: |
-          echo "::group::node_modules/@reeeeecall layout"
-          ls -la node_modules/@reeeeecall/ 2>&1 || echo "no @reeeeecall in mobile node_modules"
-          ls -la ../../node_modules/@reeeeecall/ 2>&1 || echo "no @reeeeecall in root node_modules"
-          echo "::endgroup::"
-          echo "::group::shared package contents (whichever resolves)"
-          for p in node_modules/@reeeeecall/shared ../../node_modules/@reeeeecall/shared; do
-            if [ -e "$p" ]; then
-              echo "[$p] exists. Type: $(file "$p" | head -1)"
-              if [ -L "$p" ]; then echo "  symlink → $(readlink $p)"; fi
-              ls -la "$p/design-tokens" 2>&1 | head -10
-            fi
-          done
-          echo "::endgroup::"
-          echo "::group::metro version + resolver flag"
-          node -e "const c = require('./metro.config.js'); console.log('unstable_enablePackageExports =', c.resolver.unstable_enablePackageExports); console.log('sourceExts =', c.resolver.sourceExts);"
-          echo "::endgroup::"
       - name: Publish OTA update
         working-directory: packages/mobile
         env:
