@@ -6,13 +6,13 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "exports": {
-    "./types/*":         ["./types/*.ts",         "./types/*/index.ts"],
-    "./lib/*":           ["./lib/*.ts",           "./lib/*/index.ts"],
-    "./stores/*":        ["./stores/*.ts",        "./stores/*/index.ts"],
-    "./adapters/*":      ["./adapters/*.ts",      "./adapters/*/index.ts"],
-    "./adapters":        "./adapters/index.ts",
-    "./design-tokens":   "./design-tokens/index.ts",
-    "./design-tokens/*": ["./design-tokens/*.ts", "./design-tokens/*/index.ts"]
+    "./types/*": "./types/*",
+    "./lib/*": "./lib/*",
+    "./stores/*": "./stores/*",
+    "./adapters/*": "./adapters/*",
+    "./adapters": "./adapters/index.ts",
+    "./design-tokens": "./design-tokens/index.ts",
+    "./design-tokens/*": "./design-tokens/*"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
