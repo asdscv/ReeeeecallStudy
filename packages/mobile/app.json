@@ -42,7 +42,10 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/31c2c126-f26c-4b75-aa03-6255e68a6032"
+      "url": "https://u.expo.dev/31c2c126-f26c-4b75-aa03-6255e68a6032",
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
     },
     "owner": "asdscv",
     "plugins": [
