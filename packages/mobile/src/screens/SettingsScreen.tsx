@@ -29,7 +29,7 @@ const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
 const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
 // [SUBSCRIPTION-HIDDEN] 구독 관리 URL — 복원 시 주석 해제
 // const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
-const APP_VERSION = '1.0.0'
+const APP_VERSION = '1.0.1'
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
