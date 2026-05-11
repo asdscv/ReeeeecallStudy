@@ -436,8 +436,10 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
     const isCJK = CJK_RE.test(field.value)
     const lineHeight = size * (isCJK ? 1.8 : 1.5)
     // CJK text wraps per-character (no word boundaries), so a slightly narrow row
-    // forces a break between every glyph. Keep it single-line and shrink to fit.
-    const singleLineProps = isCJK ? { numberOfLines: 1, adjustsFontSizeToFit: true, minimumFontScale: 0.5 } : {}
+    // forces a break between every glyph. Keep it single-line; truncate if too long.
+    // (adjustsFontSizeToFit was removed — iOS measures flex:1+row width too narrow
+    //  for CJK and shrinks aggressively even when there's plenty of horizontal room.)
+    const singleLineProps = isCJK ? { numberOfLines: 1, ellipsizeMode: 'tail' as const } : {}
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
