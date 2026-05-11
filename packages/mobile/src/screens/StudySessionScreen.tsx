@@ -435,51 +435,32 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
     const color = (isHint || isDetail) ? theme.colors.textSecondary : theme.colors.text
     const isCJK = CJK_RE.test(field.value)
     const lineHeight = size * (isCJK ? 1.8 : 1.5)
-    // CJK text wraps per-character (no word boundaries), so a slightly narrow row
-    // forces a break between every glyph. Keep it single-line; truncate if too long.
-    // (adjustsFontSizeToFit was removed — iOS measures flex:1+row width too narrow
-    //  for CJK and shrinks aggressively even when there's plenty of horizontal room.)
-    const singleLineProps = isCJK ? { numberOfLines: 1, ellipsizeMode: 'tail' as const } : {}
+
+    const textStyle = {
+      fontSize: size,
+      fontWeight: (isBold ? '700' : '400') as '700' | '400',
+      fontStyle: (isHint ? 'italic' : 'normal') as 'italic' | 'normal',
+      color,
+      textAlign: 'center' as const,
+      lineHeight,
+    }
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
-        {/* TTS button inline — own GestureDetector blocks parent card-flip tap */}
+        {/* TTS button: absolute-positioned overlay so it doesn't constrain Text
+            width via flex measurement. iOS RN's flex:1 + row + sibling combo
+            measures CJK text width incorrectly, causing per-glyph wrap or
+            premature truncation. With Text taking full container width and the
+            button overlaying on the left, measurement is unambiguous. */}
         {field.ttsLang ? (
           <View style={styles.ttsRow}>
-            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
-            <Text
-              {...singleLineProps}
-              style={{
-                flex: 1,
-                // iOS RN measures flex:1 Text width too narrow inside a row when
-                // the text has no word boundaries (CJK), causing per-glyph wrap.
-                // minWidth: 0 unlocks the flexbox shrink calc.
-                minWidth: 0,
-                fontSize: size,
-                fontWeight: isBold ? '700' : '400',
-                fontStyle: isHint ? 'italic' : 'normal',
-                color,
-                textAlign: 'center',
-                lineHeight,
-              }}
-            >
-              {field.value}
-            </Text>
+            <View style={styles.ttsAbsButton} pointerEvents="box-none">
+              <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
+            </View>
+            <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
           </View>
         ) : (
-          <Text
-            {...singleLineProps}
-            style={{
-              fontSize: size,
-              fontWeight: isBold ? '700' : '400',
-              fontStyle: isHint ? 'italic' : 'normal',
-              color,
-              textAlign: 'center',
-              lineHeight,
-            }}
-          >
-            {field.value}
-          </Text>
+          <Text style={textStyle}>{field.value}</Text>
         )}
       </View>
     )
@@ -535,7 +516,23 @@ const styles = StyleSheet.create({
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
   hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
-  ttsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, width: '100%' },
+  ttsRow: { width: '100%', position: 'relative', justifyContent: 'center' },
+  ttsAbsButton: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  ttsText: {
+    width: '100%',
+    // Reserve horizontal room for the absolute-positioned speaker icon on
+    // the left so centered text never collides with it. Symmetric padding
+    // keeps textAlign:'center' visually centered within the card.
+    paddingLeft: 44,
+    paddingRight: 44,
+  },
   ttsInlineBtn: { padding: 8 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {
