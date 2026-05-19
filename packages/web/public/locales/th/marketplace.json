@@ -35,7 +35,14 @@
     "importing": "กำลังนำเข้า...",
     "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
     "noCards": "ไม่มีการ์ด",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "โดย",
+    "alreadyAcquired": "อยู่ในคอลเลกชันของคุณแล้ว",
+    "unsubscribe": "ยกเลิกการสมัครสมาชิก",
+    "unsubscribing": "กำลังยกเลิก...",
+    "unsubscribed": "ยกเลิกการสมัครสมาชิกแล้ว",
+    "unsubscribeConfirm": "ยกเลิกการสมัครสมาชิกชุดการ์ดนี้? ความคืบหน้าการเรียนรู้ส่วนตัวของคุณจะยังคงอยู่ในบัญชี",
+    "unsubscribeError": "ยกเลิกการสมัครสมาชิกล้มเหลว กรุณาลองอีกครั้ง"
   },
   "preview": {
     "title": "\"{{title}}\" - สำรับแฟลชการ์ด | ReeeeecallStudy",

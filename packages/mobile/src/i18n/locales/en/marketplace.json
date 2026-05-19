@@ -38,7 +38,14 @@
     "inappropriateContent": "Inappropriate Content",
     "copyrightViolation": "Copyright Violation",
     "spam": "Spam / Misleading",
-    "reportThanks": "Your report has been submitted. We will review this content promptly."
+    "reportThanks": "Your report has been submitted. We will review this content promptly.",
+    "publishedBy": "by",
+    "alreadyAcquired": "Already in your collection",
+    "unsubscribe": "Unsubscribe",
+    "unsubscribing": "Unsubscribing...",
+    "unsubscribed": "Unsubscribed",
+    "unsubscribeConfirm": "Unsubscribe from this deck? Your personal study progress for it will remain in your account.",
+    "unsubscribeError": "Failed to unsubscribe. Please try again."
   },
   "publish": {
     "title": "Publish Deck",
@@ -53,9 +60,18 @@
     "category": "Category",
     "shareMode": "Share Mode",
     "shareModes": {
-      "copy": { "label": "Copy", "description": "Users get an editable copy" },
-      "subscribe": { "label": "Subscribe", "description": "Users get read-only, auto-updated" },
-      "snapshot": { "label": "Snapshot", "description": "Users get read-only copy, no updates" }
+      "copy": {
+        "label": "Copy",
+        "description": "Users get an editable copy"
+      },
+      "subscribe": {
+        "label": "Subscribe",
+        "description": "Users get read-only, auto-updated"
+      },
+      "snapshot": {
+        "label": "Snapshot",
+        "description": "Users get read-only copy, no updates"
+      }
     },
     "publishButton": "Publish to Marketplace",
     "titleRequired": "Title is required",
