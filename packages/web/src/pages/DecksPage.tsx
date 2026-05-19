@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
+import { useSharingStore } from '../stores/sharing-store'
+import { supabase } from '../lib/supabase'
 import { DeckCard } from '../components/deck/DeckCard'
 import { DeckFormModal } from '../components/deck/DeckFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
@@ -10,7 +12,7 @@ import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck } from '../types/database'
 
 export function DecksPage() {
-  const { t } = useTranslation(['decks', 'common'])
+  const { t } = useTranslation(['decks', 'common', 'marketplace', 'sharing'])
   const { user } = useAuthStore()
   const { decks, stats, templates, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
 
@@ -18,6 +20,9 @@ export function DecksPage() {
   const [showAIGenerate, setShowAIGenerate] = useState(false)
   const [deletingDeck, setDeletingDeck] = useState<Deck | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [unsubscribingDeck, setUnsubscribingDeck] = useState<Deck | null>(null)
+  const [unsubscribeLoading, setUnsubscribeLoading] = useState(false)
+  const [unsubscribeError, setUnsubscribeError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchDecks()
@@ -31,6 +36,44 @@ export function DecksPage() {
     await deleteDeck(deletingDeck.id)
     setDeleteLoading(false)
     setDeletingDeck(null)
+  }
+
+  const handleUnsubscribeConfirm = async () => {
+    if (!unsubscribingDeck || !user) return
+    setUnsubscribeLoading(true)
+    setUnsubscribeError(null)
+    try {
+      // Look up the active subscribe share for this deck so we can revoke it.
+      const { data: shareRow, error: shareErr } = await supabase
+        .from('deck_shares')
+        .select('id')
+        .eq('deck_id', unsubscribingDeck.id)
+        .eq('recipient_id', user.id)
+        .eq('share_mode', 'subscribe')
+        .eq('status', 'active')
+        .limit(1)
+        .maybeSingle()
+
+      if (shareErr || !shareRow) {
+        setUnsubscribeError(
+          shareErr?.message ??
+            t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }),
+        )
+        return
+      }
+
+      await useSharingStore.getState().unsubscribe((shareRow as { id: string }).id)
+      const storeError = useSharingStore.getState().error
+      if (storeError) {
+        setUnsubscribeError(storeError)
+        return
+      }
+
+      await fetchDecks({ force: true })
+      setUnsubscribingDeck(null)
+    } finally {
+      setUnsubscribeLoading(false)
+    }
   }
 
   const getStatsForDeck = (deckId: string) => {
@@ -89,6 +132,7 @@ export function DecksPage() {
               stats={getStatsForDeck(deck.id)}
               templateName={getTemplateName(deck.default_template_id)}
               onDelete={setDeletingDeck}
+              onUnsubscribe={setUnsubscribingDeck}
             />
           ))}
         </div>
@@ -117,6 +161,25 @@ export function DecksPage() {
         confirmLabel={t('common:actions.delete')}
         danger
         loading={deleteLoading}
+      />
+
+      {/* Unsubscribe Confirm */}
+      <ConfirmDialog
+        open={!!unsubscribingDeck}
+        onClose={() => { setUnsubscribingDeck(null); setUnsubscribeError(null) }}
+        onConfirm={handleUnsubscribeConfirm}
+        title={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
+        message={
+          unsubscribeError
+            ? `${t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' })} (${unsubscribeError})`
+            : t('marketplace:detail.unsubscribeConfirm', {
+                defaultValue:
+                  'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
+              })
+        }
+        confirmLabel={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
+        danger
+        loading={unsubscribeLoading}
       />
     </div>
   )
