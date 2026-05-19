@@ -34,8 +34,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # Strict gate — typecheck must pass for the whole web package.
+      # Use `tsc -b` so project references (tsconfig.app.json, tsconfig.node.json)
+      # are actually checked; plain `tsc --noEmit` on the root config is a no-op
+      # because the root has `files: []` and only `references`.
       - name: Web typecheck
-        run: pnpm --filter @reeeeecall/web exec tsc --noEmit
+        run: pnpm --filter @reeeeecall/web exec tsc -b --noEmit
 
       # Lint is currently informational — develop has pre-existing eslint
       # debt (no-explicit-any, no-unused-vars, react-hooks/rules-of-hooks).

@@ -12,7 +12,7 @@
  *   T6) RPC network error       — result null, cache 유지
  *   T7) 동시 더블탭 (Promise.all 2회) — 둘 다 동일 deckId
  */
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act } from '@testing-library/react'
 
 const { mockRpc, mockGetUser } = vi.hoisted(() => ({
