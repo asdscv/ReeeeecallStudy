@@ -34,7 +34,7 @@ const CARDS_PER_PAGE_OPTIONS = [10, 20, 50] as const
 
 export function DeckDetailScreen() {
   const theme = useTheme()
-  const { t } = useTranslation('decks')
+  const { t } = useTranslation(['decks', 'marketplace', 'sharing'])
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const { deckId } = route.params
@@ -137,6 +137,54 @@ export function DeckDetailScreen() {
     }
     refresh()
   }, [isSubscribed, handleSync, refresh])
+
+  const handleUnsubscribe = useCallback(() => {
+    Alert.alert(
+      t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' }),
+      t('marketplace:detail.unsubscribeConfirm', {
+        defaultValue:
+          'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
+      }),
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' }),
+          style: 'destructive',
+          onPress: async () => {
+            const supabase = getMobileSupabase()
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+            const { data: shareRow } = await supabase
+              .from('deck_shares')
+              .select('id')
+              .eq('deck_id', deckId)
+              .eq('recipient_id', user.id)
+              .eq('share_mode', 'subscribe')
+              .eq('status', 'active')
+              .limit(1)
+              .maybeSingle()
+            const id = (shareRow as { id?: string } | null)?.id
+            if (!id) {
+              Alert.alert(
+                'Error',
+                t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }),
+              )
+              return
+            }
+            const { error } = await supabase
+              .from('deck_shares')
+              .update({ status: 'revoked' })
+              .eq('id', id)
+            if (error) {
+              Alert.alert('Error', error.message)
+              return
+            }
+            navigation.goBack()
+          },
+        },
+      ],
+    )
+  }, [deckId, navigation, t])
 
   // Exit selection mode clears selections
   const exitSelectionMode = useCallback(() => {
@@ -469,6 +517,18 @@ export function DeckDetailScreen() {
               testID="bulk-select-toggle"
             >
               <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Select</Text>
+            </TouchableOpacity>
+          )}
+          {isSubscribed && (
+            <TouchableOpacity
+              style={[styles.actionPill, { borderColor: theme.colors.error }]}
+              onPress={handleUnsubscribe}
+              testID="deck-detail-unsubscribe"
+              accessibilityLabel={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
+            >
+              <Text style={[theme.typography.caption, { color: theme.colors.error }]}>
+                {t('marketplace:detail.unsubscribe', { defaultValue: 'Unsubscribe' })}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
