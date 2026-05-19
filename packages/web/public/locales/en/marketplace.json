@@ -35,7 +35,13 @@
     "importing": "Importing...",
     "cardPreview": "Card Preview (max 10)",
     "noCards": "No cards.",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "by",
+    "alreadyAcquired": "Already in your collection",
+    "unsubscribe": "Unsubscribe",
+    "unsubscribing": "Unsubscribing...",
+    "unsubscribeConfirm": "Unsubscribe from this deck? Your personal study progress for it will remain in your account.",
+    "unsubscribeError": "Failed to unsubscribe. Please try again."
   },
   "report": {
     "title": "Report Content",

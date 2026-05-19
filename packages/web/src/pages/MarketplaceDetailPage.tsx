@@ -4,12 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { useAuthStore } from '../stores/auth-store'
+import { useSharingStore } from '../stores/sharing-store'
 import { ReportModal } from '../components/marketplace/ReportModal'
 import { ReviewsSection } from '../components/marketplace/ReviewsSection'
 import { StarRatingInline } from '../components/marketplace/StarRating'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
 import { VerifiedBadge } from '../components/marketplace/ListingCard'
-import type { MarketplaceListing, Card, CardTemplate } from '../types/database'
+import type {
+  MarketplaceListing,
+  Card,
+  CardTemplate,
+  PublicListingPreview,
+} from '../types/database'
 
 export function MarketplaceDetailPage() {
   const { t } = useTranslation(['marketplace', 'common'])
@@ -20,11 +26,17 @@ export function MarketplaceDetailPage() {
 
   const [listing, setListing] = useState<MarketplaceListing | null>(null)
   const [previewCards, setPreviewCards] = useState<Card[]>([])
+  const [previewSampleFields, setPreviewSampleFields] = useState<
+    PublicListingPreview['sample_fields']
+  >([])
   const [template, setTemplate] = useState<CardTemplate | null>(null)
   const [loading, setLoading] = useState(true)
   const [acquiring, setAcquiring] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [hasAcquired, setHasAcquired] = useState(false)
+  const [shareId, setShareId] = useState<string | null>(null)
+  const [unsubscribing, setUnsubscribing] = useState(false)
+  const [unsubscribeError, setUnsubscribeError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!listingId) return
@@ -67,15 +79,28 @@ export function MarketplaceDetailPage() {
 
       setListing(typedListing)
 
-      // Fetch preview cards (first 10)
-      const { data: cards } = await supabase
-        .from('cards')
-        .select('*')
-        .eq('deck_id', typedListing.deck_id)
-        .order('sort_position', { ascending: true })
-        .limit(10)
+      // Card preview — try public RPC first (works for everyone via SECURITY
+      // DEFINER), then fall back to direct `cards` query (only succeeds for the
+      // owner or an already-subscribed user, per RLS).
+      const { data: previewRpc } = await supabase.rpc(
+        'get_public_listing_preview',
+        { p_listing_id: listingId },
+      )
+      const previewTyped = previewRpc as unknown as PublicListingPreview | null
+      const previewFields = previewTyped?.sample_fields ?? []
+      setPreviewSampleFields(previewFields)
 
-      setPreviewCards((cards ?? []) as Card[])
+      if (previewFields.length === 0) {
+        const { data: cards } = await supabase
+          .from('cards')
+          .select('*')
+          .eq('deck_id', typedListing.deck_id)
+          .order('sort_position', { ascending: true })
+          .limit(10)
+        setPreviewCards((cards ?? []) as Card[])
+      } else {
+        setPreviewCards([])
+      }
 
       // Fetch template
       const { data: deck } = await supabase
@@ -93,7 +118,8 @@ export function MarketplaceDetailPage() {
         setTemplate(tmpl as CardTemplate | null)
       }
 
-      // Check if user has acquired this deck
+      // Check if user has an active subscribe-mode share for this deck and
+      // capture its id so we can offer "Unsubscribe".
       if (user) {
         const { data: shareData } = await supabase
           .from('deck_shares')
@@ -102,7 +128,12 @@ export function MarketplaceDetailPage() {
           .eq('recipient_id', user.id)
           .eq('status', 'active')
           .limit(1)
-        setHasAcquired((shareData ?? []).length > 0)
+        const firstShare = (shareData ?? [])[0] as { id: string } | undefined
+        setHasAcquired(!!firstShare)
+        setShareId(firstShare?.id ?? null)
+      } else {
+        setHasAcquired(false)
+        setShareId(null)
       }
 
       setLoading(false)
@@ -141,6 +172,33 @@ export function MarketplaceDetailPage() {
       navigate(`/decks/${result.deckId}`)
     } finally {
       setAcquiring(false)
+    }
+  }
+
+  const handleUnsubscribe = async () => {
+    if (!shareId || unsubscribing) return
+    const confirmMsg = t('marketplace:detail.unsubscribeConfirm', {
+      defaultValue:
+        'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
+    })
+    if (!window.confirm(confirmMsg)) return
+    setUnsubscribing(true)
+    setUnsubscribeError(null)
+    try {
+      await useSharingStore.getState().unsubscribe(shareId)
+      const storeError = useSharingStore.getState().error
+      if (storeError) {
+        setUnsubscribeError(storeError)
+        return
+      }
+      setHasAcquired(false)
+      setShareId(null)
+      // Drop the now-unshared deck from the user's local deck cache so it
+      // disappears from /decks immediately.
+      const { useDeckStore } = await import('../stores/deck-store')
+      await useDeckStore.getState().fetchDecks({ force: true })
+    } finally {
+      setUnsubscribing(false)
     }
   }
 
@@ -230,6 +288,18 @@ export function MarketplaceDetailPage() {
           </button>
         )}
 
+        {!isOwner && hasAcquired && shareId && (
+          <button
+            onClick={handleUnsubscribe}
+            disabled={unsubscribing}
+            className="ml-3 px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition disabled:opacity-50 cursor-pointer"
+          >
+            {unsubscribing
+              ? t('marketplace:detail.unsubscribing', { defaultValue: 'Unsubscribing...' })
+              : t('marketplace:detail.unsubscribe', { defaultValue: 'Unsubscribe' })}
+          </button>
+        )}
+
         {!isOwner && (
           <button
             onClick={() => setShowReportModal(true)}
@@ -240,6 +310,13 @@ export function MarketplaceDetailPage() {
         )}
 
         {error && <p className="text-sm text-destructive mt-2">{t(error)}</p>}
+        {unsubscribeError && (
+          <p className="text-sm text-destructive mt-2">
+            {t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe. Please try again.' })}
+            {' '}
+            <span className="opacity-75">({unsubscribeError})</span>
+          </p>
+        )}
       </div>
 
       {/* Card preview */}
@@ -248,26 +325,64 @@ export function MarketplaceDetailPage() {
           <h2 className="text-sm font-medium text-foreground">{t('marketplace:detail.cardPreview')}</h2>
         </div>
 
-        {previewCards.length === 0 ? (
+        {previewSampleFields.length === 0 && previewCards.length === 0 ? (
           <div className="p-6 text-center text-muted-foreground text-sm">{t('marketplace:detail.noCards')}</div>
         ) : (
           <div className="divide-y divide-border">
-            {previewCards.map((card, i) => (
-              <div key={card.id} className="px-4 py-3">
-                <span className="text-xs text-content-tertiary mr-2">#{i + 1}</span>
-                {displayFields.slice(0, 3).map((field) => (
-                  <span key={field.key} className="text-sm text-foreground mr-4">
-                    <span className="text-xs text-content-tertiary">{field.name}: </span>
-                    {card.field_values[field.key] || '-'}
-                  </span>
-                ))}
-                {displayFields.length === 0 && (
-                  <span className="text-sm text-foreground">
-                    {Object.values(card.field_values).slice(0, 2).join(' / ') || '-'}
-                  </span>
-                )}
-              </div>
-            ))}
+            {/* RPC-sourced samples (public, works for non-subscribers too) */}
+            {previewSampleFields.map((sample, i) => {
+              const fv = sample.field_values
+              const front = typeof fv.front === 'string' ? fv.front : ''
+              const back = typeof fv.back === 'string' ? fv.back : ''
+              const exampleFront =
+                typeof fv.example_front === 'string' ? fv.example_front : ''
+              const exampleBack =
+                typeof fv.example_back === 'string' ? fv.example_back : ''
+              const alt = typeof fv.alt === 'string' ? fv.alt : ''
+              const situation = typeof fv.situation === 'string' ? fv.situation : ''
+              const note = typeof fv.note === 'string' ? fv.note : ''
+              return (
+                <div key={`s-${i}`} className="px-4 py-3 space-y-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs text-content-tertiary">#{i + 1}</span>
+                    <span className="text-base font-medium text-foreground">{front || '-'}</span>
+                    <span className="text-sm text-muted-foreground">— {back || '-'}</span>
+                  </div>
+                  {(exampleFront || exampleBack) && (
+                    <div className="text-xs text-muted-foreground pl-6 space-y-0.5">
+                      {exampleFront && <div>{exampleFront}</div>}
+                      {exampleBack && <div className="text-content-tertiary">{exampleBack}</div>}
+                    </div>
+                  )}
+                  {(alt || situation || note) && (
+                    <div className="text-xs text-muted-foreground pl-6 space-y-0.5">
+                      {alt && <div>{alt}</div>}
+                      {situation && <div className="text-content-tertiary">{situation}</div>}
+                      {note && <div className="text-content-tertiary italic">{note}</div>}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            {/* Owner/subscriber fallback rendering — template-driven (preserves
+                pre-existing behaviour for users who already have access). */}
+            {previewSampleFields.length === 0 &&
+              previewCards.map((card, i) => (
+                <div key={card.id} className="px-4 py-3">
+                  <span className="text-xs text-content-tertiary mr-2">#{i + 1}</span>
+                  {displayFields.slice(0, 3).map((field) => (
+                    <span key={field.key} className="text-sm text-foreground mr-4">
+                      <span className="text-xs text-content-tertiary">{field.name}: </span>
+                      {card.field_values[field.key] || '-'}
+                    </span>
+                  ))}
+                  {displayFields.length === 0 && (
+                    <span className="text-sm text-foreground">
+                      {Object.values(card.field_values).slice(0, 2).join(' / ') || '-'}
+                    </span>
+                  )}
+                </div>
+              ))}
           </div>
         )}
       </div>
