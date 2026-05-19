@@ -38,9 +38,6 @@ test-results/
 blob-report/
 .env.test
 
-# Study data (CSV bulk upload sources)
-STUDY_DATA/
-
 # Apple private keys
 AuthKey_*.p8
 
@@ -54,3 +51,7 @@ AuthKey_*.p8
 *.njsproj
 *.sln
 *.sw?
+
+# CSV import sidecars (transient process state)
+STUDY_DATA/*.checkpoint
+STUDY_DATA/*.tmp
