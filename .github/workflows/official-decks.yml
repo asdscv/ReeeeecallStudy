@@ -1,0 +1,314 @@
+name: Official Decks Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "packages/official-decks/**"
+      - "supabase/migrations/082_*.sql"
+      - "STUDY_DATA/**"
+      - ".github/workflows/official-decks.yml"
+  push:
+    branches: [main, develop]
+    paths:
+      - "packages/official-decks/**"
+      - "supabase/migrations/082_*.sql"
+      - "STUDY_DATA/**"
+      - ".github/workflows/official-decks.yml"
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: "Target environment for apply (staging|production)"
+        required: true
+        default: "staging"
+
+concurrency:
+  group: official-decks-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 10.32.1
+  NODE_VERSION: 20
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────
+  # 1. Lint + Typecheck (fast gate)
+  # ────────────────────────────────────────────────────────────────────
+  lint-typecheck:
+    name: Lint + Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (strict, --noEmit)
+        working-directory: packages/official-decks
+        run: pnpm typecheck
+
+  # ────────────────────────────────────────────────────────────────────
+  # 2. Unit tests — domain + application, zero infra
+  # ────────────────────────────────────────────────────────────────────
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint-typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+
+      - name: Unit suite
+        working-directory: packages/official-decks
+        env:
+          STUDY_DATA_DIR: ${{ github.workspace }}/STUDY_DATA
+        run: pnpm test:unit
+
+  # ────────────────────────────────────────────────────────────────────
+  # 3. Plan validation — exactly 327 plans, zero parse failures
+  # ────────────────────────────────────────────────────────────────────
+  plan-validation:
+    name: Plan Validation (exact count == 327)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [unit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate plan JSON
+        working-directory: packages/official-decks
+        env:
+          STUDY_DATA_DIR: ${{ github.workspace }}/STUDY_DATA
+        run: pnpm cli plan --dir ${STUDY_DATA_DIR} --json > /tmp/plan.json
+
+      - name: Assert plan count is exactly 327
+        run: |
+          count=$(jq 'length' /tmp/plan.json)
+          echo "plan count = $count"
+          test "$count" = "327"
+
+      - name: Assert all required language pairs present
+        run: |
+          for src in en; do
+            for tgt in ko ja zh es vi th id; do
+              n=$(jq --arg s "$src" --arg t "$tgt" '[.[] | select(.source==$s and .target==$t)] | length' /tmp/plan.json)
+              echo "$src-$tgt: $n decks"
+              test "$n" -gt 0
+            done
+          done
+          # Korean → English
+          n=$(jq '[.[] | select(.source=="ko" and .target=="en")] | length' /tmp/plan.json)
+          echo "ko-en: $n decks"
+          test "$n" = "5"
+
+      - name: Snapshot total card count to summary
+        run: |
+          total=$(jq '[.[].card_count] | add' /tmp/plan.json)
+          echo "## Plan summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Decks: $(jq 'length' /tmp/plan.json)" >> $GITHUB_STEP_SUMMARY
+          echo "- Cards: $total" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan-${{ github.sha }}
+          path: /tmp/plan.json
+
+  # ────────────────────────────────────────────────────────────────────
+  # 4. Migration smoke test — apply all migrations on a clean Postgres
+  # ────────────────────────────────────────────────────────────────────
+  migration-smoke:
+    name: Migration Smoke (postgres-15)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint-typecheck]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bootstrap auth schema + extensions
+        env:
+          PGPASSWORD: postgres
+        run: |
+          # Supabase migrations assume `auth.users`, `extensions` schema, and a
+          # few helper functions exist. We seed enough of that for the migration
+          # itself to apply without errors.
+          psql -h localhost -U postgres -d postgres <<'SQL'
+          CREATE SCHEMA IF NOT EXISTS auth;
+          CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+          CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+          CREATE TABLE IF NOT EXISTS auth.users (
+            instance_id UUID,
+            id UUID PRIMARY KEY,
+            aud VARCHAR,
+            role VARCHAR,
+            email VARCHAR,
+            encrypted_password VARCHAR,
+            email_confirmed_at TIMESTAMPTZ,
+            raw_app_meta_data JSONB,
+            raw_user_meta_data JSONB,
+            created_at TIMESTAMPTZ DEFAULT now(),
+            updated_at TIMESTAMPTZ DEFAULT now()
+          );
+          CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID
+            LANGUAGE sql STABLE AS $$ SELECT NULL::UUID $$;
+          CREATE OR REPLACE FUNCTION auth.role() RETURNS TEXT
+            LANGUAGE sql STABLE AS $$ SELECT NULL::TEXT $$;
+          CREATE ROLE service_role NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE ROLE anon NOLOGIN;
+          SQL
+
+      - name: Apply migrations in order
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for f in supabase/migrations/*.sql; do
+            # Skip down migrations
+            if [[ "$f" == *.down.sql ]]; then continue; fi
+            echo "==> $f"
+            psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Smoke-test import_official_deck RPC
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          SELECT import_official_deck(
+            'csv:test_smoke:en-ko',
+            'abc123',
+            jsonb_build_object(
+              'name', 'Smoke Test',
+              'description', 'CI smoke',
+              'color', '#10b981',
+              'icon', '🌱',
+              'template_id', '11111111-1111-1111-1111-111111111111',
+              'category', 'beginner',
+              'tags', '["smoke"]'::jsonb,
+              'source_file', 'test_smoke.csv',
+              'source_language', 'en',
+              'target_language', 'ko'
+            ),
+            '[]'::jsonb
+          ) AS result;
+          SQL
+
+  # ────────────────────────────────────────────────────────────────────
+  # 5. Integration tests via real Supabase (postgres-15 service)
+  # ────────────────────────────────────────────────────────────────────
+  integration:
+    name: Integration (Docker Postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [migration-smoke, plan-validation]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+
+      - name: Bootstrap & apply migrations
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d postgres < .github/scripts/bootstrap-auth.sql
+          for f in supabase/migrations/*.sql; do
+            if [[ "$f" == *.down.sql ]]; then continue; fi
+            psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Run integration suite
+        working-directory: packages/official-decks
+        env:
+          PG_URL: postgres://postgres:postgres@localhost:5432/postgres
+        run: pnpm test:integration
+
+  # ────────────────────────────────────────────────────────────────────
+  # 6. Deploy (manual only)
+  # ────────────────────────────────────────────────────────────────────
+  apply-staging:
+    name: Apply (workflow_dispatch only)
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [integration]
+    environment: ${{ github.event.inputs.target_env }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+
+      - name: Apply against ${{ github.event.inputs.target_env }}
+        working-directory: packages/official-decks
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STUDY_DATA_DIR: ${{ github.workspace }}/STUDY_DATA
+        run: pnpm cli apply --dir $STUDY_DATA_DIR
+
+      - name: Post-apply validation
+        working-directory: packages/official-decks
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STUDY_DATA_DIR: ${{ github.workspace }}/STUDY_DATA
+        run: pnpm cli validate --dir $STUDY_DATA_DIR
