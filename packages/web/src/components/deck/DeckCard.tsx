@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Pencil, Trash2 } from 'lucide-react'
+import { LogOut, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { formatRelativeTime } from '../../lib/date-utils'
@@ -20,13 +20,23 @@ interface DeckCardProps {
   stats?: DeckStats
   templateName?: string
   onDelete: (deck: Deck) => void
+  /**
+   * Called when the user clicks "Unsubscribe" on a deck they don't own
+   * (i.e. one they acquired via marketplace `share_mode='subscribe'`).
+   * Optional — when omitted the unsubscribe button hides.
+   */
+  onUnsubscribe?: (deck: Deck) => void
 }
 
-export function DeckCard({ deck, stats, templateName, onDelete }: DeckCardProps) {
+export function DeckCard({ deck, stats, templateName, onDelete, onUnsubscribe }: DeckCardProps) {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const { t, i18n } = useTranslation('decks')
+  const { t, i18n } = useTranslation(['decks', 'sharing'])
   const dateLocale = toIntlLocale(i18n.language)
+
+  // Subscribed decks: the user is consuming someone else's deck via deck_shares
+  // RLS. They cannot edit/delete it. They can unsubscribe.
+  const isSubscribed = !!user && deck.user_id !== user.id
 
   const totalCards = stats?.total_cards ?? 0
   const dueCards = (stats?.review_cards ?? 0) + (stats?.learning_cards ?? 0)
@@ -98,20 +108,35 @@ export function DeckCard({ deck, stats, templateName, onDelete }: DeckCardProps)
             {formatLastStudied(stats?.last_studied ?? null)}
           </span>
           <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => navigate(`/decks/${deck.id}/edit`)}
-              className="p-1.5 text-content-tertiary hover:text-muted-foreground hover:bg-accent rounded-lg transition cursor-pointer"
-              title={t('card.edit')}
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onDelete(deck)}
-              className="p-1.5 text-content-tertiary hover:text-destructive hover:bg-destructive/10 rounded-lg transition cursor-pointer"
-              title={t('card.delete')}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            {isSubscribed ? (
+              onUnsubscribe && (
+                <button
+                  onClick={() => onUnsubscribe(deck)}
+                  className="p-1.5 text-content-tertiary hover:text-destructive hover:bg-destructive/10 rounded-lg transition cursor-pointer"
+                  title={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
+                  aria-label={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              )
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate(`/decks/${deck.id}/edit`)}
+                  className="p-1.5 text-content-tertiary hover:text-muted-foreground hover:bg-accent rounded-lg transition cursor-pointer"
+                  title={t('card.edit')}
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(deck)}
+                  className="p-1.5 text-content-tertiary hover:text-destructive hover:bg-destructive/10 rounded-lg transition cursor-pointer"
+                  title={t('card.delete')}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </>
+            )}
             <button
               onClick={() => navigate(`/decks/${deck.id}/study/setup`)}
               className="px-3 sm:px-4 py-1.5 text-sm font-medium text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer"
