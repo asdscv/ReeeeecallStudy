@@ -13,6 +13,7 @@ import {
   buildOrganizationJsonLd,
 } from '../json-ld.js'
 import { buildHtmlDocument, buildMetaTags, buildSeoResponse } from '../html-builder.js'
+import { renderSampleCardsHtml, buildSampleCardLearningResources } from '../card-preview.js'
 
 export async function handleListingBotRequest(listingId, url, env) {
   const restUrl = getSupabaseRestUrl(env)
@@ -42,8 +43,16 @@ export async function handleListingBotRequest(listingId, url, env) {
   const tags = listing.tags || []
   const canonicalUrl = localizedUrl(`/d/${listingId}`, lang)
 
-  // JSON-LD schemas
+  // JSON-LD schemas — Dataset enriched with sample-card LearningResource items
+  const sampleResources = buildSampleCardLearningResources(
+    listing.sample_fields,
+    listingId,
+    lang,
+  )
   const datasetJsonLd = buildDatasetJsonLd(listing, description, tags, listingId, lang)
+  if (sampleResources.length > 0) {
+    datasetJsonLd.hasPart = sampleResources
+  }
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: BRAND_NAME, url: SITE_URL },
     { name: lang === 'ko' ? '마켓플레이스' : 'Marketplace', url: `${SITE_URL}/landing` },
@@ -71,6 +80,8 @@ export async function handleListingBotRequest(listingId, url, env) {
 ${hreflangTags}
 ${jsonLdScripts}`
 
+  const sampleCardsHtml = renderSampleCardsHtml(listing.sample_fields, lang, listing.title)
+
   const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${SITE_URL}/landing">${lang === 'ko' ? '마켓플레이스' : 'Marketplace'}</a></li><li>${escapeHtml(listing.title)}</li></ol></nav>
 <main>
 <h1>${escapeHtml(listing.title)}</h1>
@@ -78,6 +89,7 @@ ${jsonLdScripts}`
 ${listing.card_count ? `<p><strong>${listing.card_count}</strong> ${lang === 'ko' ? '장의 카드' : 'cards'}</p>` : ''}
 ${listing.owner_name ? `<p>${lang === 'ko' ? '만든이' : 'Created by'}: ${escapeHtml(listing.owner_name)}</p>` : ''}
 ${tags.length > 0 ? `<p>${lang === 'ko' ? '태그' : 'Tags'}: ${tags.map((t) => escapeHtml(t)).join(', ')}</p>` : ''}
+${sampleCardsHtml}
 <p><a href="${SITE_URL}/auth/login">${lang === 'ko' ? '이 덱으로 학습 시작하기' : 'Start studying this deck'}</a></p>
 </main>
 <footer>
