@@ -35,7 +35,13 @@
     "importing": "\uac00\uc838\uc624\ub294 \uc911...",
     "cardPreview": "\uce74\ub4dc \ubbf8\ub9ac\ubcf4\uae30 (\ucd5c\ub300 10\uc7a5)",
     "noCards": "\uce74\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
-    "reportContent": "\uc2e0\uace0"
+    "reportContent": "\uc2e0\uace0",
+    "publishedBy": "by",
+    "alreadyAcquired": "\uc774\ubbf8 \ucd94\uac00\ub428",
+    "unsubscribe": "\uad6c\ub3c5 \ud574\uc9c0",
+    "unsubscribing": "\uad6c\ub3c5 \ud574\uc81c \uc911...",
+    "unsubscribeConfirm": "\uc774 \ub371 \uad6c\ub3c5\uc744 \ud574\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c? \uac1c\uc778 \ud559\uc2b5 \uc9c4\ub3c4\ub294 \uacc4\uc815\uc5d0 \uadf8\ub300\ub85c \ub0a8\uc2b5\ub2c8\ub2e4.",
+    "unsubscribeError": "\uad6c\ub3c5 \ud574\uc81c\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud574\uc8fc\uc138\uc694."
   },
   "report": {
     "title": "\ucf58\ud150\uce20 \uc2e0\uace0",
