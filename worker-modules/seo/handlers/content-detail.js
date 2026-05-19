@@ -79,13 +79,13 @@ export async function handleContentDetailBot(slug, url, env) {
   const canonicalUrl = localizedUrl(`/insight/${slug}`, article.locale)
 
   // Build JSON-LD schemas
-  const articleJsonLd = buildArticleJsonLd(article, title, description, ogImage, tags, slug)
+  const articleJsonLd = buildArticleJsonLd(article, slug)
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: BRAND_NAME, url: SITE_URL },
     { name: LIST_TITLES[article.locale]?.split(' — ')[0] || 'Learning Insights', url: `${SITE_URL}/insight` },
     { name: article.title, url: canonicalUrl },
   ])
-  const learningResourceJsonLd = buildLearningResourceJsonLd(article, title, description, ogImage, tags, slug)
+  const learningResourceJsonLd = buildLearningResourceJsonLd(article, slug)
 
   const metaTags = buildMetaTags({
     title,
