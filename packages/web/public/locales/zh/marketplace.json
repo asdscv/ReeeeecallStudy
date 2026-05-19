@@ -35,7 +35,14 @@
     "importing": "导入中...",
     "cardPreview": "卡片预览（最多 10 张）",
     "noCards": "暂无卡片。",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "作者",
+    "alreadyAcquired": "已添加到收藏",
+    "unsubscribe": "取消订阅",
+    "unsubscribing": "取消订阅中...",
+    "unsubscribed": "已取消订阅",
+    "unsubscribeConfirm": "取消订阅此牌组？您的个人学习进度将保留在账户中。",
+    "unsubscribeError": "取消订阅失败，请重试。"
   },
   "preview": {
     "title": "\"{{title}}\" - 闪卡牌组 | ReeeeecallStudy",

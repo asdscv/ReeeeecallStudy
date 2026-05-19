@@ -35,7 +35,14 @@
     "importing": "Đang nhập...",
     "cardPreview": "Xem trước thẻ (tối đa 10)",
     "noCards": "Không có thẻ.",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "bởi",
+    "alreadyAcquired": "Đã có trong bộ sưu tập",
+    "unsubscribe": "Hủy đăng ký",
+    "unsubscribing": "Đang hủy...",
+    "unsubscribed": "Đã hủy đăng ký",
+    "unsubscribeConfirm": "Hủy đăng ký bộ thẻ này? Tiến độ học tập cá nhân của bạn sẽ được giữ lại trong tài khoản.",
+    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại."
   },
   "preview": {
     "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | ReeeeecallStudy",

@@ -35,7 +35,14 @@
     "importing": "Mengimpor...",
     "cardPreview": "Pratinjau Kartu (maks 10)",
     "noCards": "Tidak ada kartu.",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "oleh",
+    "alreadyAcquired": "Sudah di koleksi Anda",
+    "unsubscribe": "Berhenti berlangganan",
+    "unsubscribing": "Berhenti...",
+    "unsubscribed": "Berhasil berhenti berlangganan",
+    "unsubscribeConfirm": "Berhenti berlangganan dari dek ini? Kemajuan belajar pribadi Anda akan tetap ada di akun.",
+    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi."
   },
   "preview": {
     "title": "\"{{title}}\" - Dek Kartu Kilat | ReeeeecallStudy",
