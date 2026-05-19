@@ -31,7 +31,14 @@
     "importing": "インポート中...",
     "cardPreview": "カードプレビュー（最大10枚）",
     "noCards": "カードがありません。",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "作成",
+    "alreadyAcquired": "コレクションに追加済み",
+    "unsubscribe": "配信解除",
+    "unsubscribing": "配信解除中...",
+    "unsubscribed": "配信解除しました",
+    "unsubscribeConfirm": "このデッキの配信を解除しますか？個人の学習進捗はアカウントに残ります。",
+    "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。"
   },
   "publish": {
     "title": "Publish Deck",

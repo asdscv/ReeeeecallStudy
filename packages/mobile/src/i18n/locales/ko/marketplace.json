@@ -38,7 +38,14 @@
     "inappropriateContent": "부적절한 콘텐츠",
     "copyrightViolation": "저작권 침해",
     "spam": "스팸 / 오해의 소지",
-    "reportThanks": "신고가 접수되었습니다. 빠르게 검토하겠습니다."
+    "reportThanks": "신고가 접수되었습니다. 빠르게 검토하겠습니다.",
+    "publishedBy": "by",
+    "alreadyAcquired": "이미 추가됨",
+    "unsubscribe": "구독 해지",
+    "unsubscribing": "구독 해제 중...",
+    "unsubscribed": "구독 해지됨",
+    "unsubscribeConfirm": "이 덱 구독을 해제하시겠습니까? 개인 학습 진도는 계정에 그대로 남습니다.",
+    "unsubscribeError": "구독 해제에 실패했습니다. 다시 시도해주세요."
   },
   "publish": {
     "title": "덱 게시",
@@ -53,9 +60,18 @@
     "category": "카테고리",
     "shareMode": "공유 모드",
     "shareModes": {
-      "copy": { "label": "복사", "description": "사용자가 편집 가능한 복사본을 받습니다" },
-      "subscribe": { "label": "구독", "description": "읽기 전용, 자동 업데이트" },
-      "snapshot": { "label": "스냅샷", "description": "읽기 전용 복사본, 업데이트 없음" }
+      "copy": {
+        "label": "복사",
+        "description": "사용자가 편집 가능한 복사본을 받습니다"
+      },
+      "subscribe": {
+        "label": "구독",
+        "description": "읽기 전용, 자동 업데이트"
+      },
+      "snapshot": {
+        "label": "스냅샷",
+        "description": "읽기 전용 복사본, 업데이트 없음"
+      }
     },
     "publishButton": "마켓플레이스에 게시",
     "titleRequired": "제목을 입력해주세요",

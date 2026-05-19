@@ -31,7 +31,14 @@
     "importing": "Importando...",
     "cardPreview": "Vista previa de tarjetas (máx 10)",
     "noCards": "Sin tarjetas.",
-    "reportContent": "Report"
+    "reportContent": "Report",
+    "publishedBy": "por",
+    "alreadyAcquired": "Ya está en tu colección",
+    "unsubscribe": "Cancelar suscripción",
+    "unsubscribing": "Cancelando...",
+    "unsubscribed": "Suscripción cancelada",
+    "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
+    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo."
   },
   "publish": {
     "title": "Publish Deck",

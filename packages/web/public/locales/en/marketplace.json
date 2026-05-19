@@ -28,7 +28,7 @@
     "userCount": "{{count}} users"
   },
   "detail": {
-    "back": "\u2190 Marketplace",
+    "back": "← Marketplace",
     "cardCount": "{{count}} cards",
     "userCount": "{{count}} users",
     "getDeck": "Get This Deck",
@@ -41,7 +41,8 @@
     "unsubscribe": "Unsubscribe",
     "unsubscribing": "Unsubscribing...",
     "unsubscribeConfirm": "Unsubscribe from this deck? Your personal study progress for it will remain in your account.",
-    "unsubscribeError": "Failed to unsubscribe. Please try again."
+    "unsubscribeError": "Failed to unsubscribe. Please try again.",
+    "unsubscribed": "Unsubscribed"
   },
   "report": {
     "title": "Report Content",
