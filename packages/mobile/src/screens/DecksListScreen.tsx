@@ -4,8 +4,10 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
+import { useAuthState } from '../hooks/useAuthState'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
+import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DecksList'>
@@ -30,10 +32,59 @@ function formatRelativeDate(iso: string): string {
  */
 export function DecksListScreen() {
   const theme = useTheme()
-  const { t } = useTranslation('decks')
+  const { t } = useTranslation(['decks', 'marketplace', 'sharing'])
   const navigation = useNavigation<Nav>()
   const { decks, stats, templates, loading, refresh, deleteDeck } = useDecks()
+  const { user } = useAuthState()
   const [search, setSearch] = useState('')
+
+  const handleUnsubscribe = (deck: { id: string; name: string }) => {
+    if (!user) return
+    Alert.alert(
+      t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' }),
+      t('marketplace:detail.unsubscribeConfirm', {
+        defaultValue:
+          'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
+      }),
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' }),
+          style: 'destructive',
+          onPress: async () => {
+            const supabase = getMobileSupabase()
+            // Look up the active subscribe share
+            const { data: shareRow } = await supabase
+              .from('deck_shares')
+              .select('id')
+              .eq('deck_id', deck.id)
+              .eq('recipient_id', user.id)
+              .eq('share_mode', 'subscribe')
+              .eq('status', 'active')
+              .limit(1)
+              .maybeSingle()
+            const id = (shareRow as { id?: string } | null)?.id
+            if (!id) {
+              Alert.alert(
+                'Error',
+                t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }),
+              )
+              return
+            }
+            const { error } = await supabase
+              .from('deck_shares')
+              .update({ status: 'revoked' })
+              .eq('id', id)
+            if (error) {
+              Alert.alert('Error', error.message)
+              return
+            }
+            await refresh()
+          },
+        },
+      ],
+    )
+  }
 
   const filtered = useMemo(() => {
     if (!search.trim()) return decks
@@ -159,20 +210,33 @@ export function DecksListScreen() {
                     {updatedAgo ?? 'No study record'}
                   </Text>
                   <View style={styles.footerActions}>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('DeckEdit', { deckId: item.id })}
-                      style={styles.iconBtn}
-                      testID={`deck-card-${item.id}-edit`}
-                    >
-                      <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\u270F\uFE0F'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleDelete(item.id, item.name)}
-                      style={styles.iconBtn}
-                      testID={`deck-card-${item.id}-delete`}
-                    >
-                      <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\uD83D\uDDD1\uFE0F'}</Text>
-                    </TouchableOpacity>
+                    {user && (item as { user_id?: string }).user_id && (item as { user_id: string }).user_id !== user.id ? (
+                      <TouchableOpacity
+                        onPress={() => handleUnsubscribe(item)}
+                        style={styles.iconBtn}
+                        testID={`deck-card-${item.id}-unsubscribe`}
+                        accessibilityLabel={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
+                      >
+                        <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\u{1F6AA}'}</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <>
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('DeckEdit', { deckId: item.id })}
+                          style={styles.iconBtn}
+                          testID={`deck-card-${item.id}-edit`}
+                        >
+                          <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\u270F\uFE0F'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => handleDelete(item.id, item.name)}
+                          style={styles.iconBtn}
+                          testID={`deck-card-${item.id}-delete`}
+                        >
+                          <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\uD83D\uDDD1\uFE0F'}</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
                     <TouchableOpacity
                       onPress={() => {
                         const tabNav = navigation.getParent()
