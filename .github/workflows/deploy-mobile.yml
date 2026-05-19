@@ -83,6 +83,13 @@ jobs:
           MSG="${{ github.event.head_commit.message }}"
           # Truncate to first line to avoid CLI parser issues with multi-line.
           MSG=$(echo "$MSG" | head -1)
+          # Fallback for workflow_dispatch (no head_commit) or empty message.
+          if [ -z "$MSG" ]; then
+            MSG=$(git log -1 --pretty=%s)
+          fi
+          if [ -z "$MSG" ]; then
+            MSG="OTA update ${GITHUB_SHA::7}"
+          fi
           eas update \
             --branch production \
             --environment production \

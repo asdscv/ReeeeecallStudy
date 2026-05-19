@@ -415,6 +415,11 @@ function TTSButton({ text, lang, speed, color, cardTapRef }: {
   )
 }
 
+// CJK Han / Hiragana / Katakana need extra lineHeight on iOS (PingFang/HiraKaku
+// glyph ascent exceeds 1.5x at large sizes, clipping the top stroke). Hangul
+// (U+AC00–U+D7AF) is intentionally excluded — it renders fine at 1.5x.
+const CJK_RE = /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/
+
 function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapRef }: {
   content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
   theme: Theme
@@ -428,36 +433,34 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
     const isHint = field.style === 'hint'
     const isDetail = field.style === 'detail'
     const color = (isHint || isDetail) ? theme.colors.textSecondary : theme.colors.text
+    const isCJK = CJK_RE.test(field.value)
+    const lineHeight = size * (isCJK ? 1.8 : 1.5)
+
+    const textStyle = {
+      fontSize: size,
+      fontWeight: (isBold ? '700' : '400') as '700' | '400',
+      fontStyle: (isHint ? 'italic' : 'normal') as 'italic' | 'normal',
+      color,
+      textAlign: 'center' as const,
+      lineHeight,
+    }
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
-        {/* TTS button inline — own GestureDetector blocks parent card-flip tap */}
+        {/* TTS button: absolute-positioned overlay so it doesn't constrain Text
+            width via flex measurement. iOS RN's flex:1 + row + sibling combo
+            measures CJK text width incorrectly, causing per-glyph wrap or
+            premature truncation. With Text taking full container width and the
+            button overlaying on the left, measurement is unambiguous. */}
         {field.ttsLang ? (
           <View style={styles.ttsRow}>
-            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
-            <Text style={{
-              flex: 1,
-              fontSize: size,
-              fontWeight: isBold ? '700' : '400',
-              fontStyle: isHint ? 'italic' : 'normal',
-              color,
-              textAlign: 'center',
-              lineHeight: size * 1.5,
-            }}>
-              {field.value}
-            </Text>
+            <View style={styles.ttsAbsButton} pointerEvents="box-none">
+              <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
+            </View>
+            <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
           </View>
         ) : (
-          <Text style={{
-            fontSize: size,
-            fontWeight: isBold ? '700' : '400',
-            fontStyle: isHint ? 'italic' : 'normal',
-            color,
-            textAlign: 'center',
-            lineHeight: size * 1.5,
-          }}>
-            {field.value}
-          </Text>
+          <Text style={textStyle}>{field.value}</Text>
         )}
       </View>
     )
@@ -513,7 +516,23 @@ const styles = StyleSheet.create({
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
   hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
-  ttsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, width: '100%' },
+  ttsRow: { width: '100%', position: 'relative', justifyContent: 'center' },
+  ttsAbsButton: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  ttsText: {
+    width: '100%',
+    // Reserve horizontal room for the absolute-positioned speaker icon on
+    // the left so centered text never collides with it. Symmetric padding
+    // keeps textAlign:'center' visually centered within the card.
+    paddingLeft: 44,
+    paddingRight: 44,
+  },
   ttsInlineBtn: { padding: 8 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {

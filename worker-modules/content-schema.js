@@ -17,6 +17,18 @@ const HIGHLIGHT_VARIANTS = ['blue', 'green', 'amber']
 
 const BRAND_SUFFIX = ' | ReeeeecallStudy'
 
+// Truncate to `max` chars without splitting a latin word.
+// For CJK (no spaces in head), falls back to a hard cut since CJK has no word boundaries.
+export function truncateAtWordBoundary(str, max) {
+  if (typeof str !== 'string' || str.length <= max) return str
+  const head = str.slice(0, max)
+  const lastSpace = head.lastIndexOf(' ')
+  // Only trim at space if it's reasonably close to the budget (>=75%).
+  // Otherwise (CJK, or one giant word) hard-cut to preserve length.
+  if (lastSpace >= max * 0.75) return head.slice(0, lastSpace).trimEnd()
+  return head
+}
+
 // Strip markdown formatting from plain text fields
 export function stripMarkdown(str) {
   if (typeof str !== 'string') return str
@@ -190,13 +202,13 @@ export function validateArticle(article) {
   if (article.meta_title && !article.meta_title.endsWith(BRAND_SUFFIX)) {
     article.meta_title = article.meta_title + BRAND_SUFFIX
   }
-  // Truncate meta_title to 60 chars
+  // Truncate meta_title to 60 chars at word boundary (preserves brand suffix)
   if (article.meta_title && article.meta_title.length > 60) {
-    article.meta_title = article.meta_title.slice(0, 60 - BRAND_SUFFIX.length) + BRAND_SUFFIX
+    article.meta_title = truncateAtWordBoundary(article.meta_title, 60 - BRAND_SUFFIX.length) + BRAND_SUFFIX
   }
-  // Truncate meta_description to 155 chars
+  // Truncate meta_description to 155 chars at word boundary, append ellipsis
   if (article.meta_description && article.meta_description.length > 155) {
-    article.meta_description = article.meta_description.slice(0, 152) + '...'
+    article.meta_description = truncateAtWordBoundary(article.meta_description, 152) + '...'
   }
   if (!Array.isArray(article.tags) || article.tags.length === 0) errors.push('tags array required')
   if (typeof article.reading_time_minutes !== 'number') errors.push('reading_time_minutes must be a number')

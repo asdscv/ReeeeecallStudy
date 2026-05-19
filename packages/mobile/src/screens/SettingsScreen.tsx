@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, TouchableOpacity, Switch, ScrollView, Alert, StyleSheet, Linking, Modal, FlatList, Share } from 'react-native'
+import * as Updates from 'expo-updates'
 import Slider from '@react-native-community/slider'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -28,7 +29,7 @@ const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
 const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
 // [SUBSCRIPTION-HIDDEN] 구독 관리 URL — 복원 시 주석 해제
 // const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
-const APP_VERSION = '1.0.0'
+const APP_VERSION = '1.0.1'
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
@@ -1046,6 +1047,39 @@ export function SettingsScreen() {
         <Text style={[styles.versionText, { color: theme.colors.textTertiary }]}>
           ReeeeecallStudy v{APP_VERSION}
         </Text>
+        <TouchableOpacity
+          onPress={() => {
+            const info = [
+              `Update ID: ${Updates.updateId ?? 'embedded (no OTA applied)'}`,
+              `Channel: ${Updates.channel || 'n/a'}`,
+              `Runtime: ${Updates.runtimeVersion || 'n/a'}`,
+              `Created: ${Updates.createdAt?.toISOString() ?? 'n/a'}`,
+              `isEmbeddedLaunch: ${Updates.isEmbeddedLaunch}`,
+              `isEmergencyLaunch: ${Updates.isEmergencyLaunch}`,
+            ].join('\n')
+            Alert.alert('Build / OTA Info', info, [
+              { text: 'Check for update now', onPress: async () => {
+                try {
+                  const r = await Updates.checkForUpdateAsync()
+                  if (r.isAvailable) {
+                    await Updates.fetchUpdateAsync()
+                    Alert.alert('Downloaded', 'Restart app to apply.')
+                  } else {
+                    Alert.alert('Up to date', 'No newer update available.')
+                  }
+                } catch (e: any) {
+                  Alert.alert('Check failed', String(e?.message ?? e))
+                }
+              }},
+              { text: 'Reload now', onPress: () => Updates.reloadAsync().catch(() => {}) },
+              { text: 'Close', style: 'cancel' },
+            ])
+          }}
+        >
+          <Text style={[styles.versionText, { color: theme.colors.textTertiary }]}>
+            OTA: {Updates.updateId ? Updates.updateId.slice(0, 8) : 'embedded'} · {Updates.channel || 'n/a'}
+          </Text>
+        </TouchableOpacity>
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
