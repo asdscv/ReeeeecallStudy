@@ -147,6 +147,8 @@ export function MarketplaceDetailScreen() {
   const [previewCards, setPreviewCards] = useState<Array<{ id: string; field_values: Record<string, string> }>>([])
   const [acquiring, setAcquiring] = useState(false)
   const [hasAcquired, setHasAcquired] = useState(false)
+  const [shareId, setShareId] = useState<string | null>(null)
+  const [unsubscribing, setUnsubscribing] = useState(false)
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [reviewRating, setReviewRating] = useState(0)
   const [reviewTitle, setReviewTitle] = useState('')
@@ -162,17 +164,29 @@ export function MarketplaceDetailScreen() {
     if (!listing) return
     const supabase = getMobileSupabase()
 
-    // Preview cards
+    // Preview cards — try public RPC first (works for everyone via
+    // SECURITY DEFINER, returns up to 10 sample cards). Fall back to direct
+    // `cards` query for owners / subscribers who have RLS access.
     supabase
-      .from('cards')
-      .select('id, field_values')
-      .eq('deck_id', listing.deck_id)
-      .limit(10)
-      .then(({ data }) => {
-        if (data) setPreviewCards(data)
+      .rpc('get_public_listing_preview', { p_listing_id: listingId })
+      .then(({ data: previewData }) => {
+        const preview = previewData as { sample_fields?: Array<{ field_values: Record<string, string> }> } | null
+        const samples = preview?.sample_fields
+        if (samples && samples.length > 0) {
+          setPreviewCards(samples.map((s, i) => ({ id: `s-${i}`, field_values: s.field_values })))
+          return
+        }
+        supabase
+          .from('cards')
+          .select('id, field_values')
+          .eq('deck_id', listing.deck_id)
+          .limit(10)
+          .then(({ data }) => {
+            if (data) setPreviewCards(data)
+          })
       })
 
-    // Check acquisition + user
+    // Check acquisition + user; also capture share_id for "Unsubscribe".
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
       setCurrentUserId(user.id)
@@ -181,10 +195,13 @@ export function MarketplaceDetailScreen() {
         .select('id')
         .eq('deck_id', listing.deck_id)
         .eq('recipient_id', user.id)
+        .eq('share_mode', 'subscribe')
         .eq('status', 'active')
         .limit(1)
         .then(({ data }) => {
-          setHasAcquired((data ?? []).length > 0)
+          const first = (data ?? [])[0] as { id: string } | undefined
+          setHasAcquired(!!first)
+          setShareId(first?.id ?? null)
         })
     })
 
@@ -245,6 +262,48 @@ export function MarketplaceDetailScreen() {
     } finally {
       setAcquiring(false)
     }
+  }
+
+  const handleUnsubscribe = async () => {
+    if (!shareId || unsubscribing) return
+    Alert.alert(
+      t('detail.unsubscribe', { defaultValue: 'Unsubscribe' }),
+      t('detail.unsubscribeConfirm', {
+        defaultValue:
+          'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
+      }),
+      [
+        { text: t('common:cancel', { defaultValue: 'Cancel' }), style: 'cancel' },
+        {
+          text: t('detail.unsubscribe', { defaultValue: 'Unsubscribe' }),
+          style: 'destructive',
+          onPress: async () => {
+            setUnsubscribing(true)
+            try {
+              const supabase = getMobileSupabase()
+              const { error } = await supabase
+                .from('deck_shares')
+                .update({ status: 'revoked' })
+                .eq('id', shareId)
+              if (error) {
+                Alert.alert('Error', error.message)
+                return
+              }
+              setHasAcquired(false)
+              setShareId(null)
+              await useDeckStore.getState().fetchDecks({ force: true })
+              Alert.alert(
+                t('detail.unsubscribed', { defaultValue: 'Unsubscribed' }),
+                undefined,
+                [{ text: 'OK', onPress: () => navigation.goBack() }],
+              )
+            } finally {
+              setUnsubscribing(false)
+            }
+          },
+        },
+      ],
+    )
   }
 
   const handleSubmitReview = async () => {
@@ -428,6 +487,20 @@ export function MarketplaceDetailScreen() {
                     loading={acquiring}
                     disabled={hasAcquired || acquiring}
                   />
+                  {hasAcquired && shareId && (
+                    <Button
+                      testID="marketplace-unsubscribe-button"
+                      title={
+                        unsubscribing
+                          ? t('detail.unsubscribing', { defaultValue: 'Unsubscribing...' })
+                          : t('detail.unsubscribe', { defaultValue: 'Unsubscribe' })
+                      }
+                      variant="ghost"
+                      size="sm"
+                      onPress={handleUnsubscribe}
+                      disabled={unsubscribing}
+                    />
+                  )}
                   <Button testID="marketplace-report-button" title={t('detail.reportContent', { defaultValue: 'Report' })} variant="ghost" size="sm" onPress={() => setShowReportModal(true)} />
                   {previewCards.length > 0 && (
                     <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>Preview Cards</Text>
