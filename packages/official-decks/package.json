@@ -1,0 +1,40 @@
+{
+  "name": "@reeeeecall/official-decks",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/presentation/cli.js",
+  "bin": {
+    "official-decks": "./dist/presentation/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src __tests__",
+    "test": "vitest run",
+    "test:unit": "vitest run __tests__/unit",
+    "test:integration": "vitest run __tests__/integration",
+    "test:e2e": "vitest run __tests__/e2e",
+    "test:watch": "vitest",
+    "cli": "tsx src/presentation/cli.ts",
+    "plan": "tsx src/presentation/cli.ts plan",
+    "apply": "tsx src/presentation/cli.ts apply",
+    "status": "tsx src/presentation/cli.ts status",
+    "validate": "tsx src/presentation/cli.ts validate"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.95.3",
+    "papaparse": "^5.5.3",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.20.0",
+    "@types/uuid": "^10.0.0",
+    "pg": "^8.21.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.9.3",
+    "vitest": "^3.0.0"
+  }
+}
