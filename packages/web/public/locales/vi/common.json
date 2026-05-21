@@ -261,5 +261,13 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "appDownload": {
+    "heading": "Tải ứng dụng",
+    "appStorePrefix": "Tải về trên",
+    "appStore": "App Store",
+    "playStorePrefix": "TẢI XUỐNG TỪ",
+    "playStore": "Google Play",
+    "qrHint": "Quét mã QR bằng camera điện thoại để tải xuống"
   }
 }

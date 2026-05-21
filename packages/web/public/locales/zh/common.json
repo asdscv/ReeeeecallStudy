@@ -261,5 +261,13 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "appDownload": {
+    "heading": "获取应用",
+    "appStorePrefix": "下载于",
+    "appStore": "App Store",
+    "playStorePrefix": "下载",
+    "playStore": "Google Play",
+    "qrHint": "用手机相机扫描二维码即可下载"
   }
 }

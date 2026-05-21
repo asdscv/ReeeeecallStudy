@@ -156,12 +156,11 @@
     "xp": "XP",
     "totalXp": "Total XP",
     "progress": "Progress",
-    "viewAll": "View All",
+    "viewAll": "All Achievements",
     "recent": "Recent",
     "empty": "No achievements yet. Start studying to earn badges!",
     "more": "more",
     "earned": " earned",
-    "viewAll": "All Achievements",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -262,5 +261,13 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "appDownload": {
+    "heading": "Get the app",
+    "appStorePrefix": "Download on the",
+    "appStore": "App Store",
+    "playStorePrefix": "GET IT ON",
+    "playStore": "Google Play",
+    "qrHint": "Scan a QR code with your phone camera to download"
   }
 }

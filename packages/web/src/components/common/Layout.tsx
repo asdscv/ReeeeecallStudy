@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronDown, BookOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../stores/auth-store'
+import { AppDownload } from './AppDownload'
 
 type NavLink = { kind: 'link'; path: string; label: string; icon: string }
 type NavGroup = { kind: 'group'; label: string; icon: string; children: { path: string; label: string; icon: string }[] }
@@ -256,11 +257,14 @@ export function Layout() {
       {/* Footer */}
       <footer className="border-t border-border bg-background pb-20 sm:pb-0">
         <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-2">
               <img src="/favicon.png" alt="" className="w-7 h-7" />
               <span className="font-bold text-foreground">ReeeeecallStudy</span>
             </div>
+            <AppDownload />
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border">
             <p className="text-sm text-content-tertiary">
               {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
             </p>

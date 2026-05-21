@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ScrollReveal } from './ScrollReveal'
 import { LanguageSelector } from '../common/LanguageSelector'
+import { AppDownload } from '../common/AppDownload'
 
 export function FooterSection() {
   const { t } = useTranslation('landing')
@@ -77,6 +78,11 @@ export function FooterSection() {
                 </li>
               </ul>
             </div>
+          </div>
+
+          {/* App download */}
+          <div className="mt-10 pt-8 border-t border-border">
+            <AppDownload showQr />
           </div>
 
           {/* Bottom bar */}

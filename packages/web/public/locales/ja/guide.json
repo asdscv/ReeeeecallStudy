@@ -300,6 +300,7 @@
         },
         "geminiSetup": {
           "title": "🎯 無料Gemini APIキー取得（推奨）",
+          "linkLabel": "Google AI Studio を開く",
           "body": "Gemini 2.5 Flashは完全無料！クレジットカード不要！\n\n無料枠: 毎分15リクエスト、毎日1,500リクエスト\n\n取得方法:\n1. aistudio.google.com にアクセス\n2. Googleアカウントでログイン\n3. 「Get API Key」をクリック\n4. 「Create API Key」をクリック\n5. 「Create API key in new project」を選択\n6. キーをコピー（「AIza...」で始まります）\n\n使い方:\n1. AI生成ページを開く\n2. 「Google Gemini」を選択\n3. APIキーを貼り付け\n4. 「Gemini 2.5 Flash」モデルを選択\n5. トピックを入力して生成！"
         },
         "fullGenerate": {
