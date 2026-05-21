@@ -300,6 +300,7 @@
         },
         "geminiSetup": {
           "title": "🎯 API Key Gemini Gratis (Direkomendasikan)",
+          "linkLabel": "Buka Google AI Studio",
           "body": "Gemini 2.5 Flash 100% gratis — tanpa kartu kredit!\n\nBatas gratis: 15 permintaan/menit, 1.500 permintaan/hari\n\nCara mendapatkan key:\n1. Buka aistudio.google.com\n2. Masuk dengan akun Google\n3. Klik \"Get API Key\"\n4. Klik \"Create API Key\"\n5. Pilih \"Create API key in new project\"\n6. Salin key (dimulai dengan \"AIza...\")\n\nCara menggunakan:\n1. Buka halaman AI Generate\n2. Pilih \"Google Gemini\"\n3. Tempel API key\n4. Pilih model \"Gemini 2.5 Flash\"\n5. Masukkan topik dan buat!"
         },
         "fullGenerate": {

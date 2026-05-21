@@ -300,6 +300,7 @@
         },
         "geminiSetup": {
           "title": "🎯 API Key Gemini miễn phí (Khuyến nghị)",
+          "linkLabel": "Mở Google AI Studio",
           "body": "Gemini 2.5 Flash hoàn toàn miễn phí — không cần thẻ tín dụng!\n\nGiới hạn miễn phí: 15 yêu cầu/phút, 1.500 yêu cầu/ngày\n\nCách lấy key:\n1. Truy cập aistudio.google.com\n2. Đăng nhập bằng tài khoản Google\n3. Nhấp \"Get API Key\"\n4. Nhấp \"Create API Key\"\n5. Chọn \"Create API key in new project\"\n6. Sao chép key (bắt đầu bằng \"AIza...\")\n\nCách sử dụng:\n1. Mở trang AI Generate\n2. Chọn \"Google Gemini\"\n3. Dán API key\n4. Chọn model \"Gemini 2.5 Flash\"\n5. Nhập chủ đề và tạo thẻ!"
         },
         "fullGenerate": {

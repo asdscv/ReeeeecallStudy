@@ -261,5 +261,13 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "appDownload": {
+    "heading": "アプリを入手",
+    "appStorePrefix": "ダウンロード",
+    "appStore": "App Store",
+    "playStorePrefix": "手に入れよう",
+    "playStore": "Google Play",
+    "qrHint": "スマホのカメラでQRコードを読み取ってダウンロード"
   }
 }
