@@ -50,12 +50,22 @@ export function RootNavigator() {
   // 테마는 prefetch 'profile' 태스크에서 Appearance.setColorScheme() 직접 호출.
   // 스플래시 중에 적용되므로 메인 화면 진입 전 반영 완료.
 
-  // Register session + start heartbeat when user is logged in
+  // Register session + start heartbeat when user is logged in.
+  // register가 행을 INSERT하기 전에 heartbeat가 UPDATE를 실행하면 0행 → 오인 킥.
+  // → 반드시 register 완료를 await한 뒤 heartbeat 시작.
   useEffect(() => {
     if (!user) return
-    registerSession()
-    const cleanup = startHeartbeat()
-    return cleanup
+    let cleanup: (() => void) | undefined
+    let cancelled = false
+    ;(async () => {
+      await registerSession()
+      if (cancelled) return
+      cleanup = startHeartbeat()
+    })()
+    return () => {
+      cancelled = true
+      cleanup?.()
+    }
   }, [user, registerSession, startHeartbeat])
 
   const handleReclaim = useCallback(async () => {
