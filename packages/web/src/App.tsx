@@ -145,14 +145,21 @@ function App() {
     if (user) initOnboarding()
   }, [user, initOnboarding])
 
-  // Register session + start heartbeat when user is logged in
+  // Register session + start heartbeat when user is logged in.
+  // register 완료를 await한 뒤 heartbeat를 시작해 INSERT↔UPDATE race로 인한
+  // 오인 킥(session_expired)을 방지한다.
   useEffect(() => {
     if (!user) return
-    registerSession().then(() => {
-      // Session registered — now start heartbeat to keep it alive
+    let cleanup: (() => void) | undefined
+    let cancelled = false
+    void registerSession().then(() => {
+      if (cancelled) return
+      cleanup = startHeartbeat()
     })
-    const cleanup = startHeartbeat()
-    return cleanup
+    return () => {
+      cancelled = true
+      cleanup?.()
+    }
   }, [user, registerSession, startHeartbeat])
 
   if (loading) {

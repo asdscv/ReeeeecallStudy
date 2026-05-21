@@ -139,17 +139,21 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   startHeartbeat: () => {
-    const intervalId = setInterval(async () => {
+    const tick = async () => {
       const valid = await get().sendHeartbeat()
-      if (!valid) {
-        // Session was kicked — could trigger a forced logout or warning
+      if (valid) return
+      // 행이 없어 실패한 경우(서버측 정리/콜드스타트 등)는 즉시 끊지 말고
+      // 한 번 재등록을 시도한다. 재등록 후에도 무효일 때만 킥으로 판정.
+      const { allowed } = await get().registerSession()
+      if (!allowed) {
         set({ sessionValid: false })
+        return
       }
-    }, HEARTBEAT_INTERVAL)
+      const revalidated = await get().sendHeartbeat()
+      set({ sessionValid: revalidated })
+    }
 
-    // Immediate first heartbeat
-    get().sendHeartbeat()
-
+    const intervalId = setInterval(tick, HEARTBEAT_INTERVAL)
     return () => clearInterval(intervalId)
   },
 }))
