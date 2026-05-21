@@ -300,6 +300,7 @@
         },
         "geminiSetup": {
           "title": "🎯 免费Gemini API密钥（推荐）",
+          "linkLabel": "前往 Google AI Studio",
           "body": "Gemini 2.5 Flash完全免费——无需信用卡！\n\n免费额度：每分钟15次请求，每天1,500次请求\n\n获取方法：\n1. 访问 aistudio.google.com\n2. 用Google账号登录\n3. 点击「Get API Key」\n4. 点击「Create API Key」\n5. 选择「Create API key in new project」\n6. 复制密钥（以「AIza...」开头）\n\n使用方法：\n1. 打开AI生成页面\n2. 选择「Google Gemini」\n3. 粘贴API密钥\n4. 选择「Gemini 2.5 Flash」模型\n5. 输入主题并生成！"
         },
         "fullGenerate": {

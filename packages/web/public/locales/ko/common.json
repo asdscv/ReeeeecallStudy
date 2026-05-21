@@ -156,12 +156,11 @@
     "xp": "경험치",
     "totalXp": "총 경험치",
     "progress": "진행",
-    "viewAll": "전체 보기",
+    "viewAll": "전체 업적",
     "recent": "최근",
     "empty": "아직 업적이 없습니다. 학습을 시작해서 배지를 획득하세요!",
     "more": "개 더",
     "earned": "개 달성",
-    "viewAll": "전체 업적",
     "newUnlocked": "업적 달성!",
     "category": {
       "streak": "연속 학습",
@@ -262,5 +261,13 @@
     "sessions": "학습 세션",
     "time": "학습 시간",
     "mastery": "마스터한 카드"
+  },
+  "appDownload": {
+    "heading": "앱 다운로드",
+    "appStorePrefix": "다운로드하기",
+    "appStore": "App Store",
+    "playStorePrefix": "다운로드",
+    "playStore": "Google Play",
+    "qrHint": "휴대폰 카메라로 QR 코드를 스캔하여 다운로드하세요"
   }
 }
