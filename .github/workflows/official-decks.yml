@@ -79,10 +79,11 @@ jobs:
         run: pnpm test:unit
 
   # ────────────────────────────────────────────────────────────────────
-  # 3. Plan validation — exactly 327 plans, zero parse failures
+  # 3. Plan validation — exactly 649 plans, zero parse failures
+  #    (322 forward word + 322 reverse word + 5 conversation)
   # ────────────────────────────────────────────────────────────────────
   plan-validation:
-    name: Plan Validation (exact count == 327)
+    name: Plan Validation (exact count == 649)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [unit]
@@ -106,14 +107,15 @@ jobs:
           STUDY_DATA_DIR: /tmp/study_data_fixtures
         run: pnpm --silent cli plan --dir ${STUDY_DATA_DIR} --json > /tmp/plan.json
 
-      - name: Assert plan count is exactly 327
+      - name: Assert plan count is exactly 649
         run: |
           count=$(jq 'length' /tmp/plan.json)
           echo "plan count = $count"
-          test "$count" = "327"
+          test "$count" = "649"
 
       - name: Assert all required language pairs present
         run: |
+          # Forward word decks: en → each target.
           for src in en; do
             for tgt in ko ja zh es vi th id; do
               n=$(jq --arg s "$src" --arg t "$tgt" '[.[] | select(.source==$s and .target==$t)] | length' /tmp/plan.json)
@@ -121,10 +123,16 @@ jobs:
               test "$n" -gt 0
             done
           done
-          # Korean → English
+          # Reverse word decks: each source → en (one per word CSV).
+          for src in ko ja zh es vi th id; do
+            n=$(jq --arg s "$src" '[.[] | select(.source==$s and .target=="en")] | length' /tmp/plan.json)
+            echo "$src-en: $n decks"
+            test "$n" -gt 0
+          done
+          # Korean → English total = 5 conversation + 46 reverse word = 51.
           n=$(jq '[.[] | select(.source=="ko" and .target=="en")] | length' /tmp/plan.json)
-          echo "ko-en: $n decks"
-          test "$n" = "5"
+          echo "ko-en total: $n decks"
+          test "$n" = "51"
 
       - name: Snapshot total card count to summary
         run: |

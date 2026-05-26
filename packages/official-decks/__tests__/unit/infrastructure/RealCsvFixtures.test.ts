@@ -36,20 +36,20 @@ describe.skipIf(!STUDY_DATA)("Real STUDY_DATA fixtures", () => {
     }
   });
 
-  it("total plan count across all CSVs equals 327 (322 + 5)", async () => {
+  it("total plan count across all CSVs equals 649 (322 forward + 322 reverse word + 5 conversation)", async () => {
     let total = 0;
     for (const name of csvList) {
       const csv = await source.read(name);
       const plans = buildPlansForCsv(csv, { skipMalformedRows: true });
       total += plans.length;
     }
-    expect(total).toBe(327);
+    expect(total).toBe(649);
   });
 
-  it("beginner_batch1.csv produces 7 plans, each with cards", async () => {
+  it("beginner_batch1.csv produces 14 plans (forward + reverse), each with cards", async () => {
     const csv = await source.read("beginner_batch1.csv");
     const plans = buildPlansForCsv(csv, { skipMalformedRows: true });
-    expect(plans).toHaveLength(7);
+    expect(plans).toHaveLength(14);
     for (const plan of plans) {
       expect(plan.deck.cards.length).toBeGreaterThan(0);
     }

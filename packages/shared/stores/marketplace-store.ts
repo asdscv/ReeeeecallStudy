@@ -20,6 +20,7 @@ interface MarketplaceState {
     tags?: string[]
     category?: string
     shareMode: ShareMode
+    learningLanguage?: string
   }) => Promise<MarketplaceListing | null>
   unpublishDeck: (listingId: string) => Promise<void>
   acquireDeck: (listingId: string) => Promise<{ deckId: string; wasNew: boolean } | null>
@@ -90,6 +91,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         category: input.category || 'general',
         share_mode: input.shareMode,
         card_count: count ?? 0,
+        learning_language: input.learningLanguage ?? null,
         is_active: true,
       } as Record<string, unknown>)
       .select()

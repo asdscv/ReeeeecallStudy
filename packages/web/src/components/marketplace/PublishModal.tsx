@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { useMarketplaceStore } from '../../stores/marketplace-store'
-import { MARKETPLACE_CATEGORIES } from '../../lib/marketplace'
+import { MARKETPLACE_CATEGORIES, LEARNING_LANGUAGES } from '../../lib/marketplace'
 import type { ShareMode } from '../../types/database'
 
 const PUBLISH_SHARE_MODES: { value: ShareMode; label: string; desc: string; detail: string }[] = [
@@ -25,6 +25,7 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
   const [description, setDescription] = useState('')
   const [tagsInput, setTagsInput] = useState('')
   const [category, setCategory] = useState('general')
+  const [learningLanguage, setLearningLanguage] = useState<string>('')
   const [shareMode, setShareMode] = useState<ShareMode>('copy')
   const [loading, setLoading] = useState(false)
 
@@ -42,6 +43,7 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
       description: description.trim() || undefined,
       tags,
       category,
+      learningLanguage: learningLanguage || undefined,
       shareMode,
     })
     setLoading(false)
@@ -89,6 +91,20 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
             >
               {MARKETPLACE_CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>{t(c.labelKey)}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">{t('marketplace:learningLanguage.label')}</label>
+            <select
+              value={learningLanguage}
+              onChange={(e) => setLearningLanguage(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm outline-none"
+            >
+              <option value="">{t('marketplace:learningLanguage.all')}</option>
+              {LEARNING_LANGUAGES.map((l) => (
+                <option key={l.value} value={l.value}>{t(l.labelKey)}</option>
               ))}
             </select>
           </div>

@@ -46,15 +46,31 @@ export function buildPlansForCsv(
   for (const targetStr of detection.availableTargets) {
     if (targetStr === detection.source) continue;
     const target = parseLanguageCode(targetStr);
-    const pair = LanguagePair.of(source, target);
-    const plan = buildSinglePlan(
-      csv,
-      pair,
-      detection.schema,
-      opts.skipMalformedRows ?? false,
-      warn,
+    // Forward direction (e.g. word: en→X, conversation: ko→en).
+    plans.push(
+      buildSinglePlan(
+        csv,
+        LanguagePair.of(source, target),
+        detection.schema,
+        opts.skipMalformedRows ?? false,
+        warn,
+      ),
     );
-    plans.push(plan);
+    // Reverse direction for word schemas only (A/B): X→en. This yields a
+    // native-first, English-voiced deck (template 3333) that pairs with the
+    // forward en→X deck so both study directions exist. Conversation decks
+    // (schema C) are already native-first and are not reversed.
+    if (detection.schema === "A" || detection.schema === "B") {
+      plans.push(
+        buildSinglePlan(
+          csv,
+          LanguagePair.of(target, source),
+          detection.schema,
+          opts.skipMalformedRows ?? false,
+          warn,
+        ),
+      );
+    }
   }
   return plans;
 }
@@ -115,6 +131,7 @@ function buildSinglePlan(
     category: meta.category,
     tags: meta.tags,
     languagePair: pair,
+    learningLanguage: meta.learningLanguage,
     sourceFile: csv.filename,
     templateId: meta.templateId,
     cards,

@@ -70,5 +70,17 @@
     "titleRequired": "Title is required",
     "published": "Your deck is now available on the marketplace.",
     "failed": "Failed to publish deck"
+  },
+  "learningLanguage": {
+    "label": "学習言語",
+    "all": "すべて",
+    "en": "English",
+    "ko": "한국어",
+    "zh": "中文（简体）",
+    "ja": "日本語",
+    "es": "Español",
+    "vi": "Tiếng Việt",
+    "th": "ภาษาไทย",
+    "id": "Bahasa Indonesia"
   }
 }

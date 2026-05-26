@@ -4,6 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useDecks } from '../hooks'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { LEARNING_LANGUAGES } from '@reeeeecall/shared/lib/marketplace'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import type { DecksStackParamList } from '../navigation/types'
@@ -35,6 +36,7 @@ export function PublishDeckScreen() {
   const [description, setDescription] = useState(deck?.description ?? '')
   const [tags, setTags] = useState('')
   const [category, setCategory] = useState('general')
+  const [learningLanguage, setLearningLanguage] = useState<string | undefined>(deck?.learning_language ?? undefined)
   const [shareMode, setShareMode] = useState<'copy' | 'subscribe' | 'snapshot'>('copy')
   const [publishing, setPublishing] = useState(false)
 
@@ -53,6 +55,7 @@ export function PublishDeckScreen() {
         description: description.trim() || undefined,
         tags: parsedTags,
         category,
+        learningLanguage,
         shareMode,
       })
       Alert.alert('Published!', 'Your deck is now available on the marketplace.', [
@@ -93,6 +96,40 @@ export function PublishDeckScreen() {
               >
                 <Text style={[theme.typography.bodySmall, { color: category === cat ? theme.colors.primary : theme.colors.text, textTransform: 'capitalize' }]}>
                   {cat}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Learning Language */}
+        <View style={styles.section}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('learningLanguage.label')}</Text>
+          <View style={styles.chipRow}>
+            <TouchableOpacity
+              testID="publish-lang-all"
+              onPress={() => setLearningLanguage(undefined)}
+              style={[styles.chip, {
+                backgroundColor: !learningLanguage ? theme.colors.primaryLight : theme.colors.surface,
+                borderColor: !learningLanguage ? theme.colors.primary : theme.colors.border,
+              }]}
+            >
+              <Text style={[theme.typography.bodySmall, { color: !learningLanguage ? theme.colors.primary : theme.colors.text }]}>
+                {t('learningLanguage.all')}
+              </Text>
+            </TouchableOpacity>
+            {LEARNING_LANGUAGES.map((lang) => (
+              <TouchableOpacity
+                key={lang.value}
+                testID={`publish-lang-${lang.value}`}
+                onPress={() => setLearningLanguage(lang.value)}
+                style={[styles.chip, {
+                  backgroundColor: learningLanguage === lang.value ? theme.colors.primaryLight : theme.colors.surface,
+                  borderColor: learningLanguage === lang.value ? theme.colors.primary : theme.colors.border,
+                }]}
+              >
+                <Text style={[theme.typography.bodySmall, { color: learningLanguage === lang.value ? theme.colors.primary : theme.colors.text }]}>
+                  {t(lang.labelKey)}
                 </Text>
               </TouchableOpacity>
             ))}

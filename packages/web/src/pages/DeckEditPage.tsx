@@ -50,6 +50,7 @@ export function DeckEditPage() {
     color: COLORS[0],
     icon: ICONS[0],
     templateId: '',
+    learningLanguage: '',
     srsSettings: { ...DEFAULT_SRS_SETTINGS },
   })
 
@@ -93,6 +94,7 @@ export function DeckEditPage() {
         color: deckData.color,
         icon: deckData.icon,
         templateId: deckData.default_template_id || '',
+        learningLanguage: deckData.learning_language || '',
         srsSettings: deckData.srs_settings ?? { ...DEFAULT_SRS_SETTINGS },
       })
 
@@ -116,6 +118,7 @@ export function DeckEditPage() {
       color: formValues.color,
       icon: formValues.icon,
       default_template_id: formValues.templateId || null,
+      learning_language: formValues.learningLanguage || null,
       srs_settings: formValues.srsSettings,
     })
     setSaving(false)

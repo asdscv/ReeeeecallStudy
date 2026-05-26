@@ -18,18 +18,35 @@ function makeSchemaARow(): { cells: string[] } {
 }
 
 describe("ImportPlanBuilder.buildPlansForCsv", () => {
-  it("schema A CSV → 7 plans (en → ko/ja/zh/es/vi/th/id)", () => {
+  it("schema A CSV → 14 plans (7 forward en→X + 7 reverse X→en)", () => {
     const csv: RawCsv = {
       filename: "beginner_batch1.csv",
       header: null,
       rows: [makeSchemaARow()],
     };
     const plans = buildPlansForCsv(csv);
-    expect(plans).toHaveLength(7);
-    const targets = plans.map((p) => p.deck.languagePair.target).sort();
-    expect(targets).toEqual(["es", "id", "ja", "ko", "th", "vi", "zh"]);
+    expect(plans).toHaveLength(14);
+
+    const forward = plans.filter((p) => p.deck.languagePair.source === "en");
+    const reverse = plans.filter((p) => p.deck.languagePair.target === "en");
+    expect(forward.map((p) => p.deck.languagePair.target).sort()).toEqual([
+      "es", "id", "ja", "ko", "th", "vi", "zh",
+    ]);
+    expect(reverse.map((p) => p.deck.languagePair.source).sort()).toEqual([
+      "es", "id", "ja", "ko", "th", "vi", "zh",
+    ]);
+
+    // Forward decks teach English with the English-first word template; reverse
+    // decks use the native-first reverse template. Both teach English.
+    for (const plan of forward) {
+      expect(plan.deck.templateId).toBe("11111111-1111-1111-1111-111111111111");
+      expect(plan.deck.learningLanguage).toBe("en");
+    }
+    for (const plan of reverse) {
+      expect(plan.deck.templateId).toBe("33333333-3333-3333-3333-333333333333");
+      expect(plan.deck.learningLanguage).toBe("en");
+    }
     for (const plan of plans) {
-      expect(plan.deck.languagePair.source).toBe("en");
       expect(plan.deck.cards).toHaveLength(1);
       expect(plan.deck.id).toMatch(/^[0-9a-f-]+$/);
       expect(plan.checksum).toMatch(/^[0-9a-f]{64}$/);

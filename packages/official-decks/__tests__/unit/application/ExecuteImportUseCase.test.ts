@@ -48,26 +48,26 @@ function makeGateway(behavior: (i: number) => Partial<ImportSummary> | Error) {
 
 describe("ExecuteImportUseCase", () => {
   it("returns counts that add up to total plans", async () => {
-    const plans = makePlans(2); // 2 CSVs × 7 langs = 14 plans
+    const plans = makePlans(2); // 2 CSVs × 14 (7 fwd + 7 rev) = 28 plans
     const gateway = makeGateway(() => ({ status: "applied" }));
     const useCase = new ExecuteImportUseCase(gateway);
     const report = await useCase.execute(plans);
-    expect(report.totalPlans).toBe(14);
-    expect(report.applied).toBe(14);
+    expect(report.totalPlans).toBe(28);
+    expect(report.applied).toBe(28);
     expect(report.noop).toBe(0);
     expect(report.failed).toBe(0);
-    expect(report.summaries).toHaveLength(14);
+    expect(report.summaries).toHaveLength(28);
   });
 
   it("marks failed plans and calls markFailed", async () => {
-    const plans = makePlans(1); // 7 plans
+    const plans = makePlans(1); // 14 plans (7 fwd + 7 rev)
     const gateway = makeGateway((i) =>
       i === 3 ? new Error("boom") : { status: "applied" },
     );
     const useCase = new ExecuteImportUseCase(gateway);
     const report = await useCase.execute(plans, { concurrency: 1 });
     expect(report.failed).toBe(1);
-    expect(report.applied).toBe(6);
+    expect(report.applied).toBe(13);
     expect((gateway.markFailed as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
   });
 
@@ -96,11 +96,11 @@ describe("ExecuteImportUseCase", () => {
   });
 
   it("onProgress is called once per plan", async () => {
-    const plans = makePlans(1); // 7 plans
+    const plans = makePlans(1); // 14 plans (7 fwd + 7 rev)
     const gateway = makeGateway(() => ({ status: "applied" }));
     const useCase = new ExecuteImportUseCase(gateway);
     const progress = vi.fn();
     await useCase.execute(plans, { onProgress: progress });
-    expect(progress).toHaveBeenCalledTimes(7);
+    expect(progress).toHaveBeenCalledTimes(14);
   });
 });
