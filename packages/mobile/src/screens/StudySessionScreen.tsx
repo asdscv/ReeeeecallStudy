@@ -14,6 +14,7 @@ import Animated, {
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
+import { computeCardTextAttrs } from '../utils/card-text-style'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
@@ -415,11 +416,9 @@ function TTSButton({ text, lang, speed, color, cardTapRef }: {
   )
 }
 
-// CJK Han / Hiragana / Katakana need extra lineHeight on iOS (PingFang/HiraKaku
-// glyph ascent exceeds 1.5x at large sizes, clipping the top stroke). Hangul
-// (U+AC00–U+D7AF) is intentionally excluded — it renders fine at 1.5x.
-const CJK_RE = /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/
-
+// Card-face renderer. Typography (CJK lineHeight, weight, style) is computed by
+// the pure `computeCardTextAttrs` helper; this component applies theme color and
+// the width-constrained layout that keeps long text wrapping inside the card.
 function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapRef }: {
   content: Array<{ key: string; value: string; style: string; fontSize?: number; ttsLang?: string; name: string }>
   theme: Theme
@@ -429,20 +428,17 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
 }) {
   const inner = content.map((field) => {
     const size = field.fontSize ?? DEFAULT_FONT_SIZES[field.style] ?? DEFAULT_FONT_SIZES.primary
-    const isBold = field.style === 'primary' || field.style === 'secondary'
+    const attrs = computeCardTextAttrs(field.value, field.style, size)
     const isHint = field.style === 'hint'
-    const isDetail = field.style === 'detail'
-    const color = (isHint || isDetail) ? theme.colors.textSecondary : theme.colors.text
-    const isCJK = CJK_RE.test(field.value)
-    const lineHeight = size * (isCJK ? 1.8 : 1.5)
+    const color = attrs.isSecondaryColor ? theme.colors.textSecondary : theme.colors.text
 
     const textStyle = {
-      fontSize: size,
-      fontWeight: (isBold ? '700' : '400') as '700' | '400',
-      fontStyle: (isHint ? 'italic' : 'normal') as 'italic' | 'normal',
+      fontSize: attrs.fontSize,
+      fontWeight: attrs.fontWeight,
+      fontStyle: attrs.fontStyle,
       color,
       textAlign: 'center' as const,
-      lineHeight,
+      lineHeight: attrs.lineHeight,
     }
 
     return (
@@ -512,8 +508,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 5,
   },
   cardBack: { },
-  cardContent: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, width: '100%' },
-  cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: 16, padding: 8 },
+  // alignItems:'stretch' (not 'center') is required so children resolve a
+  // DEFINITE width from the container. With 'center', iOS sizes the (scroll)
+  // content cross-axis to the longest line, so child width:'100%' expands to
+  // that over-wide value and text overflows horizontally instead of wrapping.
+  cardContent: { flex: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, width: '100%' },
+  cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
   hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
   ttsRow: { width: '100%', position: 'relative', justifyContent: 'center' },

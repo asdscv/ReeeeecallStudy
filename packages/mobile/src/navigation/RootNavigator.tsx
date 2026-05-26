@@ -8,6 +8,7 @@ import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
 import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
 import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
 import { prefetch } from '../services/prefetch'
+import { clearNavState } from '../utils/nav-persistence'
 import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -74,6 +75,7 @@ export function RootNavigator() {
 
   const handleLogout = useCallback(async () => {
     prefetch.reset()
+    await clearNavState()
     const { getSupabase } = await import('@reeeeecall/shared/lib/supabase')
     await getSupabase().auth.signOut()
   }, [])
