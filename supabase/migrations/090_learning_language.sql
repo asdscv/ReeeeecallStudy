@@ -156,9 +156,11 @@ BEGIN
     RAISE EXCEPTION 'deck.category required';
   END IF;
 
-  -- Fully-qualified call works regardless of search_path; the SET above also
-  -- helps when planner caches the function lookup.
-  v_deck_id := extensions.uuid_generate_v5(v_deck_namespace, p_manifest_key);
+  -- Unqualified call resolves via the SET search_path above: `extensions` on
+  -- Supabase prod (uuid-ossp lives there), `public` in CI/local (installed
+  -- there). Hard-qualifying `extensions.` breaks CI where uuid-ossp is in
+  -- public; the search_path fix from 083 is what actually matters on prod.
+  v_deck_id := uuid_generate_v5(v_deck_namespace, p_manifest_key);
 
   SELECT last_applied_checksum INTO v_existing_check
   FROM official_deck_manifest
