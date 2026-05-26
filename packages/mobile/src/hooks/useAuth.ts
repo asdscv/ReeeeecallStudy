@@ -5,6 +5,7 @@ import * as AuthSession from 'expo-auth-session'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import * as Crypto from 'expo-crypto'
 import { getMobileSupabase } from '../adapters'
+import { clearNavState } from '../utils/nav-persistence'
 import { validatePassword } from '@reeeeecall/shared/lib/password-validation'
 import { localizeAuthError } from '@reeeeecall/shared/lib/auth-errors'
 
@@ -119,6 +120,9 @@ export function useAuth(): AuthActions {
   }, [])
 
   const signOut = useCallback(async () => {
+    // Drop the persisted navigation state so the next user (or next login)
+    // starts fresh instead of restoring the previous session's last screen.
+    await clearNavState()
     const supabase = getMobileSupabase()
     await supabase.auth.signOut()
   }, [])

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View, Image, StyleSheet } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer, type InitialState } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { I18nextProvider } from 'react-i18next'
 import Constants from 'expo-constants'
@@ -9,6 +9,7 @@ import { initMobilePlatform } from './src/adapters'
 import i18n from './src/i18n'
 import { RootNavigator } from './src/navigation'
 import { ThemeProvider, useAppTheme } from './src/theme'
+import { loadNavState, saveNavState } from './src/utils/nav-persistence'
 
 // Initialize platform adapters (must be before any shared code)
 initMobilePlatform()
@@ -30,9 +31,25 @@ const linking = {
 function AppContent() {
   const theme = useAppTheme()
   const [ready, setReady] = useState(false)
+  const [initialNavState, setInitialNavState] = useState<InitialState | undefined>(undefined)
 
+  // Restore persisted navigation state so a cold-start after backgrounding
+  // (iOS reclaiming a memory-heavy study screen) returns the user to where
+  // they were instead of resetting to the dashboard. Best-effort: any failure
+  // resolves to `undefined` → default initial route.
   useEffect(() => {
-    setReady(true)
+    let mounted = true
+    loadNavState()
+      .then((state) => {
+        if (!mounted) return
+        setInitialNavState(state as InitialState | undefined)
+      })
+      .finally(() => {
+        if (mounted) setReady(true)
+      })
+    return () => {
+      mounted = false
+    }
   }, [])
 
   if (!ready) {
@@ -46,7 +63,13 @@ function AppContent() {
 
   return (
     <ThemeProvider value={theme}>
-      <NavigationContainer linking={linking}>
+      <NavigationContainer
+        linking={linking}
+        initialState={initialNavState}
+        onStateChange={(state) => {
+          if (state) void saveNavState(state)
+        }}
+      >
         <RootNavigator />
       </NavigationContainer>
       <StatusBar style={theme.isDark ? 'light' : 'dark'} />
@@ -56,7 +79,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <I18nextProvider i18n={i18n}>
+    // node_modules carries two copies of i18next types (root vs react-i18next's
+    // nested dep); the runtime instance is the same one used everywhere, so we
+    // assert compatibility rather than fail the build on a type-dedup artifact.
+    <I18nextProvider i18n={i18n as never}>
       <SafeAreaProvider>
         <AppContent />
       </SafeAreaProvider>
