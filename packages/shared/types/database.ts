@@ -86,6 +86,7 @@ export interface Database {
           source_deck_id: string | null
           source_owner_id: string | null
           is_readonly: boolean
+          learning_language: string | null
           created_at: string
           updated_at: string
         }
@@ -105,6 +106,7 @@ export interface Database {
           source_deck_id?: string | null
           source_owner_id?: string | null
           is_readonly?: boolean
+          learning_language?: string | null
         }
         Update: Partial<Database['public']['Tables']['decks']['Insert']>
       }
@@ -375,6 +377,7 @@ export type MarketplaceListing = {
   is_paid: boolean
   created_at: string
   updated_at: string
+  learning_language: string | null
   owner_display_name?: string | null
   owner_is_official?: boolean
 }

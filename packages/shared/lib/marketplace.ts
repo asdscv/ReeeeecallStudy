@@ -17,6 +17,7 @@ export interface MarketplaceListingData {
   owner_display_name?: string | null
   owner_is_official?: boolean
   difficulty_level?: string | null
+  learning_language?: string | null
 }
 
 export interface ListingFilters {
@@ -29,6 +30,7 @@ export interface ListingFilters {
   dateRange?: '7d' | '30d' | '90d' | 'all'
   verifiedOnly?: boolean
   difficulty?: string
+  learningLanguage?: string
 }
 
 export const DIFFICULTY_LEVELS = [
@@ -36,6 +38,17 @@ export const DIFFICULTY_LEVELS = [
   { value: 'intermediate', labelKey: 'marketplace:difficulty.intermediate' },
   { value: 'advanced', labelKey: 'marketplace:difficulty.advanced' },
   { value: 'expert', labelKey: 'marketplace:difficulty.expert' },
+] as const
+
+export const LEARNING_LANGUAGES = [
+  { value: 'en', labelKey: 'marketplace:learningLanguage.en' },
+  { value: 'ko', labelKey: 'marketplace:learningLanguage.ko' },
+  { value: 'zh', labelKey: 'marketplace:learningLanguage.zh' },
+  { value: 'ja', labelKey: 'marketplace:learningLanguage.ja' },
+  { value: 'es', labelKey: 'marketplace:learningLanguage.es' },
+  { value: 'vi', labelKey: 'marketplace:learningLanguage.vi' },
+  { value: 'th', labelKey: 'marketplace:learningLanguage.th' },
+  { value: 'id', labelKey: 'marketplace:learningLanguage.id' },
 ] as const
 
 export type SortBy = 'newest' | 'popular' | 'card_count' | 'top_rated' | 'trending'
@@ -81,6 +94,7 @@ export function countActiveFilters(filters: ListingFilters): number {
   if (filters.minRating && filters.minRating > 0) count++
   if (filters.tags && filters.tags.length > 0) count++
   if (filters.difficulty) count++
+  if (filters.learningLanguage) count++
   return count
 }
 
@@ -151,6 +165,8 @@ export function filterListings(
     if (filters.difficulty) {
       if (listing.difficulty_level !== filters.difficulty) return false
     }
+
+    if (filters.learningLanguage && listing.learning_language !== filters.learningLanguage) return false
 
     if (filters.dateRange && filters.dateRange !== 'all') {
       const ms = DATE_RANGE_MS[filters.dateRange]

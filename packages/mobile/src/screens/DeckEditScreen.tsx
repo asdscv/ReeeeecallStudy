@@ -11,6 +11,7 @@ import { useTheme, palette } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import { calculateDeckStats } from '@reeeeecall/shared/lib/stats'
+import { LEARNING_LANGUAGES } from '@reeeeecall/shared/lib/marketplace'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 import type { SrsSettings, Card } from '@reeeeecall/shared/types/database'
 import type { DecksStackParamList } from '../navigation/types'
@@ -32,6 +33,7 @@ const SRS_INTERVAL_FIELDS: { key: keyof SrsSettings; label: string; color: strin
 export function DeckEditScreen() {
   const theme = useTheme()
   const { t } = useTranslation('decks')
+  const { t: tm } = useTranslation('marketplace')
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const deckId = route.params?.deckId
@@ -45,6 +47,7 @@ export function DeckEditScreen() {
   const [color, setColor] = useState(existingDeck?.color ?? COLORS[0])
   const [icon, setIcon] = useState(existingDeck?.icon ?? ICONS[0])
   const [templateId, setTemplateId] = useState(existingDeck?.default_template_id ?? '')
+  const [learningLanguage, setLearningLanguage] = useState<string | undefined>(existingDeck?.learning_language ?? undefined)
   const [saving, setSaving] = useState(false)
 
   // SRS Settings
@@ -111,6 +114,7 @@ export function DeckEditScreen() {
           color,
           icon,
           default_template_id: templateId || null,
+          learning_language: learningLanguage ?? null,
           srs_settings: finalSrs,
         })
       } else {
@@ -120,6 +124,7 @@ export function DeckEditScreen() {
           color,
           icon,
           default_template_id: templateId || undefined,
+          learning_language: learningLanguage,
           srs_settings: finalSrs,
         })
       }
@@ -226,6 +231,50 @@ export function DeckEditScreen() {
             </ScrollView>
           </View>
         )}
+
+        {/* Learning Language selector */}
+        <View style={styles.section}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{tm('learningLanguage.label')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.optionRow}>
+              <TouchableOpacity
+                onPress={() => setLearningLanguage(undefined)}
+                style={[
+                  styles.templateChip,
+                  { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                  !learningLanguage && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                ]}
+                testID="deck-edit-lang-all"
+              >
+                <Text style={[
+                  theme.typography.bodySmall,
+                  { color: !learningLanguage ? theme.colors.primary : theme.colors.text },
+                ]}>
+                  {tm('learningLanguage.all')}
+                </Text>
+              </TouchableOpacity>
+              {LEARNING_LANGUAGES.map((lang) => (
+                <TouchableOpacity
+                  key={lang.value}
+                  onPress={() => setLearningLanguage(lang.value)}
+                  style={[
+                    styles.templateChip,
+                    { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                    learningLanguage === lang.value && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                  ]}
+                  testID={`deck-edit-lang-${lang.value}`}
+                >
+                  <Text style={[
+                    theme.typography.bodySmall,
+                    { color: learningLanguage === lang.value ? theme.colors.primary : theme.colors.text },
+                  ]}>
+                    {tm(lang.labelKey)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
 
         {/* ── SRS Settings ── */}
         <View style={[styles.srsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>

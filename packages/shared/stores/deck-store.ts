@@ -38,6 +38,7 @@ interface DeckState {
     icon?: string
     default_template_id?: string
     srs_settings?: SrsSettings
+    learning_language?: string
   }) => Promise<Deck | null>
   updateDeck: (id: string, data: Partial<Deck>) => Promise<void>
   deleteDeck: (id: string) => Promise<void>
@@ -156,6 +157,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
         icon: input.icon || '📚',
         default_template_id: templateId || null,
         srs_settings: input.srs_settings,
+        learning_language: input.learning_language ?? null,
       } as Record<string, unknown>)
       .select()
       .single()
