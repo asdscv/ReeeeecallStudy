@@ -93,5 +93,9 @@
     "vi": "Tiếng Việt",
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
+  },
+  "nativeLanguage": {
+    "label": "母语",
+    "all": "全部"
   }
 }
