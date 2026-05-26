@@ -323,6 +323,10 @@ GRANT EXECUTE ON FUNCTION import_official_deck(TEXT, TEXT, JSONB, JSONB)
   TO service_role;
 
 -- ─── 5. get_official_listings (reproduced from 061 + learning_language) ─────
+-- Adding learning_language changes the RETURNS TABLE row type, so CREATE OR
+-- REPLACE alone fails ("cannot change return type of existing function").
+-- Drop the old signature first.
+DROP FUNCTION IF EXISTS get_official_listings(integer);
 CREATE OR REPLACE FUNCTION get_official_listings(
   p_limit INTEGER DEFAULT 20
 )
