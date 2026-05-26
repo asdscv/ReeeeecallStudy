@@ -32,6 +32,7 @@ function makeDeck(overrides?: Partial<Deck>): Deck {
     source_deck_id: null,
     source_owner_id: null,
     is_readonly: false,
+    learning_language: null,
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
     ...overrides,

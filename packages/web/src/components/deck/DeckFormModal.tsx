@@ -29,6 +29,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
     color: COLORS[0],
     icon: ICONS[0],
     templateId: '',
+    learningLanguage: '',
     srsSettings: { ...DEFAULT_SRS_SETTINGS },
   })
   const [loading, setLoading] = useState(false)
@@ -41,6 +42,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         color: editDeck.color,
         icon: editDeck.icon,
         templateId: editDeck.default_template_id || '',
+        learningLanguage: editDeck.learning_language || '',
         srsSettings: editDeck.srs_settings ?? { ...DEFAULT_SRS_SETTINGS },
       })
     } else {
@@ -50,6 +52,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         color: COLORS[0],
         icon: ICONS[0],
         templateId: templates.find((t) => t.is_default)?.id || '',
+        learningLanguage: '',
         srsSettings: { ...DEFAULT_SRS_SETTINGS },
       })
     }
@@ -68,6 +71,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         color: formValues.color,
         icon: formValues.icon,
         default_template_id: formValues.templateId || null,
+        learning_language: formValues.learningLanguage || null,
         srs_settings: formValues.srsSettings,
       })
     } else {
@@ -77,6 +81,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         color: formValues.color,
         icon: formValues.icon,
         default_template_id: formValues.templateId || undefined,
+        learning_language: formValues.learningLanguage || undefined,
         srs_settings: formValues.srsSettings,
       })
     }

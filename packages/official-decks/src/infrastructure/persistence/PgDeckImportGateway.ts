@@ -31,6 +31,7 @@ export class PgDeckImportGateway implements DeckImportGateway {
       source_file: deck.sourceFile,
       source_language: deck.languagePair.source,
       target_language: deck.languagePair.target,
+      learning_language: deck.learningLanguage,
     };
     const cardsPayload = deck.cards.map(toCardPayload);
     const result = await this.db.query<

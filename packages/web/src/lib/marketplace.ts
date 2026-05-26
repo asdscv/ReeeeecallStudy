@@ -5,6 +5,7 @@ export {
   type SortBy,
   MARKETPLACE_CATEGORIES,
   DIFFICULTY_LEVELS,
+  LEARNING_LANGUAGES,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   calculateTrendingScore,

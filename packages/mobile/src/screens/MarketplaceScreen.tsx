@@ -16,6 +16,7 @@ import {
   type SortBy,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
+  LEARNING_LANGUAGES,
 } from '@reeeeecall/shared/lib/marketplace'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
@@ -69,6 +70,7 @@ export function MarketplaceScreen() {
   const [verifiedOnly, setVerifiedOnly] = useState(false)
   const [shareMode, setShareMode] = useState<string | undefined>(undefined)
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all' | undefined>(undefined)
+  const [learningLanguage, setLearningLanguage] = useState<string | undefined>(undefined)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [page, setPage] = useState(1)
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
@@ -77,7 +79,7 @@ export function MarketplaceScreen() {
   useEffect(() => { fetchListings(); fetchOfficialListings() }, [fetchListings, fetchOfficialListings])
 
   // Reset page on filter change
-  useEffect(() => { setPage(1) }, [search, category, sortBy, verifiedOnly, shareMode, dateRange])
+  useEffect(() => { setPage(1) }, [search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage])
 
   const filtered = useMemo(() => {
     const result = filterListings(listings as MarketplaceListingData[], {
@@ -86,15 +88,16 @@ export function MarketplaceScreen() {
       verifiedOnly: verifiedOnly || undefined,
       shareMode,
       dateRange: dateRange === 'all' ? undefined : dateRange,
+      learningLanguage,
     })
     return sortListings(result, sortBy) as typeof listings
-  }, [listings, search, category, sortBy, verifiedOnly, shareMode, dateRange])
+  }, [listings, search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage])
 
   const trendingIds = useMemo(() => getTrendingListingIds(listings as MarketplaceListingData[]), [listings])
 
   const paginatedData = filtered.slice(0, page * PAGE_SIZE)
   const hasMore = paginatedData.length < filtered.length
-  const activeFilterCount = (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0)
+  const activeFilterCount = (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0)
 
   const loadMore = () => {
     if (hasMore && !loading) setPage((p) => p + 1)
@@ -293,6 +296,53 @@ export function MarketplaceScreen() {
                           { color: isActive ? theme.colors.primaryText : theme.colors.text },
                         ]}>
                           {mode}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+
+                {/* Learning language */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('learningLanguage.label')}
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                  <TouchableOpacity
+                    onPress={() => setLearningLanguage(undefined)}
+                    style={[
+                      styles.filterChip,
+                      {
+                        backgroundColor: !learningLanguage ? theme.colors.primary : theme.colors.surface,
+                        borderColor: !learningLanguage ? theme.colors.primary : theme.colors.border,
+                      },
+                    ]}
+                  >
+                    <Text style={[
+                      theme.typography.labelSmall,
+                      { color: !learningLanguage ? theme.colors.primaryText : theme.colors.text },
+                    ]}>
+                      {t('learningLanguage.all')}
+                    </Text>
+                  </TouchableOpacity>
+                  {LEARNING_LANGUAGES.map((lang) => {
+                    const isActive = learningLanguage === lang.value
+                    return (
+                      <TouchableOpacity
+                        key={lang.value}
+                        onPress={() => setLearningLanguage(isActive ? undefined : lang.value)}
+                        style={[
+                          styles.filterChip,
+                          {
+                            backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
+                            borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                          },
+                        ]}
+                      >
+                        <Text style={[
+                          theme.typography.labelSmall,
+                          { color: isActive ? theme.colors.primaryText : theme.colors.text },
+                        ]}>
+                          {t(lang.labelKey)}
                         </Text>
                       </TouchableOpacity>
                     )

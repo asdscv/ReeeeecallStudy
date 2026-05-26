@@ -8,6 +8,7 @@ import type { LanguagePair } from "@/domain/value-objects/LanguagePair";
 import {
   type CardTemplateId,
   PHRASE_TEMPLATE_ID,
+  REVERSE_WORD_TEMPLATE_ID,
   WORD_TEMPLATE_ID,
 } from "@/domain/entities/OfficialDeck";
 
@@ -20,6 +21,7 @@ export interface DeckMetadata {
   readonly tags: readonly string[];
   readonly templateKind: "word" | "phrase";
   readonly templateId: CardTemplateId;
+  readonly learningLanguage: LanguageCode;
 }
 
 const CATEGORY_COLOR: Record<DeckCategory, string> = {
@@ -63,11 +65,21 @@ export function buildDeckMetadata(
   const level = inferLevelFromFilename(filename);
   const isConversation = category === "conversation";
   const templateKind = isConversation ? "phrase" : "word";
+  // Reverse-direction word deck: a word deck whose answer (back/target) is
+  // English (e.g. ko→en). These are generated native-first and voice English,
+  // pairing with the forward en→X decks so both study directions exist.
+  const isReverseWord = !isConversation && pair.target === "en";
   const templateId: CardTemplateId = isConversation
     ? PHRASE_TEMPLATE_ID
-    : WORD_TEMPLATE_ID;
+    : isReverseWord
+      ? REVERSE_WORD_TEMPLATE_ID
+      : WORD_TEMPLATE_ID;
 
   const direction = `${pair.source.toUpperCase()} → ${pair.target.toUpperCase()}`;
+
+  // Every official deck teaches English, regardless of study direction.
+  const learningLanguage: LanguageCode =
+    pair.source === "en" || pair.target === "en" ? "en" : pair.target;
 
   const tags: string[] = [
     "official",
@@ -75,6 +87,7 @@ export function buildDeckMetadata(
     `lang:${pair.source}-${pair.target}`,
     `source:${pair.source}`,
     `target:${pair.target}`,
+    `learning_language:${learningLanguage}`,
   ];
   if (level !== null) {
     tags.push(`level:${level}`);
@@ -92,6 +105,7 @@ export function buildDeckMetadata(
     tags,
     templateKind,
     templateId,
+    learningLanguage,
   };
 }
 

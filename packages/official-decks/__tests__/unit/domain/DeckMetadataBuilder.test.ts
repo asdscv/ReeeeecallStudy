@@ -24,6 +24,9 @@ describe("DeckMetadataBuilder", () => {
     expect(meta.tags).toContain("source:en");
     expect(meta.tags).toContain("target:ko");
     expect(meta.tags).toContain("official");
+    // Word deck: learning language is the source (the headword being learned).
+    expect(meta.learningLanguage).toBe("en");
+    expect(meta.tags).toContain("learning_language:en");
     expect(meta.color).toMatch(/^#[0-9a-f]{6}$/i);
     expect(meta.icon.length).toBeGreaterThan(0);
   });
@@ -53,6 +56,10 @@ describe("DeckMetadataBuilder", () => {
     expect(meta.tags).toContain("level:시사");
     expect(meta.name).toContain("시사");
     expect(meta.name).toContain("KO → EN");
+    // Conversation deck: learning language is the target (the English
+    // expression being learned), even though source is ko.
+    expect(meta.learningLanguage).toBe("en");
+    expect(meta.tags).toContain("learning_language:en");
   });
 
   it("english-beginner-1000.csv en→ko → beginner category, level tag absent", () => {

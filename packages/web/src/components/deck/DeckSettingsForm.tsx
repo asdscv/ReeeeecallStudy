@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { SrsSettings, CardTemplate } from '../../types/database'
+import { LEARNING_LANGUAGES } from '../../lib/marketplace'
 
 export const COLORS = [
   '#3B82F6', '#EF4444', '#22C55E', '#F59E0B',
@@ -21,6 +22,7 @@ export interface DeckSettingsFormValues {
   color: string
   icon: string
   templateId: string
+  learningLanguage: string
   srsSettings: SrsSettings
 }
 
@@ -31,8 +33,8 @@ interface DeckSettingsFormProps {
 }
 
 export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFormProps) {
-  const { t } = useTranslation('decks')
-  const { name, description, color, icon, templateId, srsSettings } = values
+  const { t } = useTranslation(['decks', 'marketplace'])
+  const { name, description, color, icon, templateId, learningLanguage, srsSettings } = values
 
   const update = (patch: Partial<DeckSettingsFormValues>) => {
     onChange({ ...values, ...patch })
@@ -135,6 +137,25 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           {templates.map((tmpl) => (
             <option key={tmpl.id} value={tmpl.id}>
               {tmpl.name} {tmpl.is_default ? t('settings.defaultLabel') : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 학습 언어 */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-1">
+          {t('learningLanguage.label', { ns: 'marketplace' })}
+        </label>
+        <select
+          value={learningLanguage}
+          onChange={(e) => update({ learningLanguage: e.target.value })}
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
+        >
+          <option value="">{t('learningLanguage.all', { ns: 'marketplace' })}</option>
+          {LEARNING_LANGUAGES.map((l) => (
+            <option key={l.value} value={l.value}>
+              {t(l.labelKey, { ns: 'marketplace' })}
             </option>
           ))}
         </select>

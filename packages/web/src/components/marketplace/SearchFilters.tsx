@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import {
   MARKETPLACE_CATEGORIES,
   DIFFICULTY_LEVELS,
+  LEARNING_LANGUAGES,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   countActiveFilters,
@@ -239,6 +240,41 @@ export function SearchFilters({
                   <button
                     key={value}
                     onClick={() => onFilterChange({ difficulty: isActive ? undefined : value })}
+                    className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                      isActive
+                        ? 'bg-brand/15 text-brand border-brand/30'
+                        : 'bg-card text-muted-foreground border-border hover:border-brand/30'
+                    }`}
+                  >
+                    {t(labelKey, value)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Learning language */}
+          <div>
+            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              {t('learningLanguage.label', { defaultValue: 'Learning language' })}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => onFilterChange({ learningLanguage: undefined })}
+                className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                  !filters.learningLanguage
+                    ? 'bg-brand/15 text-brand border-brand/30'
+                    : 'bg-card text-muted-foreground border-border hover:border-brand/30'
+                }`}
+              >
+                {t('learningLanguage.all', { defaultValue: 'All' })}
+              </button>
+              {LEARNING_LANGUAGES.map(({ value, labelKey }) => {
+                const isActive = filters.learningLanguage === value
+                return (
+                  <button
+                    key={value}
+                    onClick={() => onFilterChange({ learningLanguage: isActive ? undefined : value })}
                     className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
                       isActive
                         ? 'bg-brand/15 text-brand border-brand/30'

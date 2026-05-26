@@ -1,14 +1,23 @@
 import type { DeckCategory } from "@/domain/value-objects/DeckCategory";
+import type { LanguageCode } from "@/domain/value-objects/LanguageCode";
 import type { LanguagePair } from "@/domain/value-objects/LanguagePair";
 import type { ManifestKey } from "@/domain/value-objects/ManifestKey";
 import type { OfficialCard } from "@/domain/entities/OfficialCard";
 
 export const WORD_TEMPLATE_ID = "11111111-1111-1111-1111-111111111111" as const;
 export const PHRASE_TEMPLATE_ID = "22222222-2222-2222-2222-222222222222" as const;
+/**
+ * Reverse-direction word template: cards are generated native-first
+ * (front = native, back = English), English voiced. Used by the X→en word
+ * decks that pair with the forward en→X decks so both study directions exist.
+ */
+export const REVERSE_WORD_TEMPLATE_ID =
+  "33333333-3333-3333-3333-333333333333" as const;
 
 export type CardTemplateId =
   | typeof WORD_TEMPLATE_ID
-  | typeof PHRASE_TEMPLATE_ID;
+  | typeof PHRASE_TEMPLATE_ID
+  | typeof REVERSE_WORD_TEMPLATE_ID;
 
 export interface OfficialDeck {
   readonly id: string;
@@ -20,6 +29,7 @@ export interface OfficialDeck {
   readonly category: DeckCategory;
   readonly tags: readonly string[];
   readonly languagePair: LanguagePair;
+  readonly learningLanguage: LanguageCode;
   readonly sourceFile: string;
   readonly templateId: CardTemplateId;
   readonly cards: readonly OfficialCard[];
