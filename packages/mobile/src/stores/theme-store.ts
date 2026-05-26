@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { Appearance } from 'react-native'
 import * as SecureStore from 'expo-secure-store'
-
-type ThemeMode = 'light' | 'dark' | 'system'
+import { toAppearanceColorScheme, type ThemeMode } from '../utils/color-scheme'
 
 const THEME_CACHE_KEY = 'reeeeecall-user-theme'
 
@@ -27,7 +26,9 @@ export const useThemeStore = create<ThemeState>((set) => ({
     set({ userTheme: theme })
     // SecureStore 캐시 — 다음 앱 시작 시 initMobilePlatform()에서 즉시 읽음
     try { SecureStore.setItem(THEME_CACHE_KEY, theme) } catch {}
-    // Appearance API — 네이티브 컴포넌트 동기화
-    Appearance.setColorScheme(theme === 'system' ? null : theme)
+    // Appearance API — 네이티브 컴포넌트 동기화.
+    // system은 'unspecified'로 전달해야 OS 설정을 따름 (이 RN 버전의 ColorSchemeName은
+    // 'light'|'dark'|'unspecified' — null 아님). null은 타입·런타임 모두 부정확.
+    Appearance.setColorScheme(toAppearanceColorScheme(theme))
   },
 }))
