@@ -150,8 +150,10 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
 
     // Only invalidate cache when something actually changed.
     // Idempotent re-acquire keeps cache warm.
+    // Invalidate stats too so the newly acquired deck shows its real card count
+    // (get_deck_stats now covers subscribed decks) instead of 0 on next focus.
     if (row.is_new_acquisition) {
-      useDeckStore.setState({ decksFetchedAt: null })
+      useDeckStore.setState({ decksFetchedAt: null, statsFetchedAt: null })
     }
 
     return { deckId: row.acquired_deck_id, wasNew: !!row.is_new_acquisition }

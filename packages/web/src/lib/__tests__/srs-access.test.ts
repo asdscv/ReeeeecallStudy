@@ -17,8 +17,17 @@ describe('getSrsSource', () => {
     expect(getSrsSource(deck, 'user-1')).toBe('embedded')
   })
 
-  it('should return "progress_table" for a subscribe deck where user is not owner', () => {
-    const deck = { share_mode: 'subscribe' as const, user_id: 'subscriber', source_owner_id: 'original-owner' }
+  it('should return "progress_table" when studying a subscribe deck owned by someone else', () => {
+    // Current model: the subscriber studies the publisher-owned deck directly
+    // (deck.user_id = publisher); per-user SRS lives in user_card_progress.
+    const deck = { share_mode: 'subscribe' as const, user_id: 'original-owner', source_owner_id: null }
+    expect(getSrsSource(deck, 'subscriber')).toBe('progress_table')
+  })
+
+  it('should return "progress_table" for a non-owned deck even when share_mode is null', () => {
+    // Subscribe decks published by regular users keep share_mode NULL on the
+    // deck row; ownership is what tells us the viewer is a subscriber.
+    const deck = { share_mode: null, user_id: 'original-owner', source_owner_id: null }
     expect(getSrsSource(deck, 'subscriber')).toBe('progress_table')
   })
 
@@ -27,7 +36,7 @@ describe('getSrsSource', () => {
     expect(getSrsSource(deck, 'owner')).toBe('embedded')
   })
 
-  it('should return "embedded" when share_mode is subscribe but source_owner_id is null', () => {
+  it('should return "embedded" when share_mode is subscribe but the user owns the deck', () => {
     const deck = { share_mode: 'subscribe' as const, user_id: 'user-1', source_owner_id: null }
     expect(getSrsSource(deck, 'user-1')).toBe('embedded')
   })
