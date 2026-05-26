@@ -5,6 +5,7 @@ import {
   MARKETPLACE_CATEGORIES,
   DIFFICULTY_LEVELS,
   LEARNING_LANGUAGES,
+  NATIVE_LANGUAGES,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   countActiveFilters,
@@ -35,6 +36,14 @@ export function SearchFilters({
       ? current.filter((t) => t !== tag)
       : [...current, tag]
     onFilterChange({ tags: next.length > 0 ? next : undefined })
+  }
+
+  const handleNativeToggle = (lang: string) => {
+    const current = filters.nativeLanguages ?? []
+    const next = current.includes(lang)
+      ? current.filter((l) => l !== lang)
+      : [...current, lang]
+    onFilterChange({ nativeLanguages: next.length > 0 ? next : undefined })
   }
 
   return (
@@ -275,6 +284,31 @@ export function SearchFilters({
                   <button
                     key={value}
                     onClick={() => onFilterChange({ learningLanguage: isActive ? undefined : value })}
+                    className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                      isActive
+                        ? 'bg-brand/15 text-brand border-brand/30'
+                        : 'bg-card text-muted-foreground border-border hover:border-brand/30'
+                    }`}
+                  >
+                    {t(labelKey, value)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Native (explanation) language — multi-select */}
+          <div>
+            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              {t('nativeLanguage.label', { defaultValue: 'Native language' })}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {NATIVE_LANGUAGES.map(({ value, labelKey }) => {
+                const isActive = (filters.nativeLanguages ?? []).includes(value)
+                return (
+                  <button
+                    key={value}
+                    onClick={() => handleNativeToggle(value)}
                     className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
                       isActive
                         ? 'bg-brand/15 text-brand border-brand/30'

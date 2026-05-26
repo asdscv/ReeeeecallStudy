@@ -82,5 +82,9 @@
     "vi": "Tiếng Việt",
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
+  },
+  "nativeLanguage": {
+    "label": "ภาษาแม่",
+    "all": "ทั้งหมด"
   }
 }
