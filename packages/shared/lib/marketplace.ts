@@ -18,6 +18,9 @@ export interface MarketplaceListingData {
   owner_is_official?: boolean
   difficulty_level?: string | null
   learning_language?: string | null
+  /** Optional explicit native-language column (future-proof). When absent it is
+   *  derived from the `source:<lang>` tag the official pipeline emits. */
+  native_language?: string | null
 }
 
 export interface ListingFilters {
@@ -31,6 +34,9 @@ export interface ListingFilters {
   verifiedOnly?: boolean
   difficulty?: string
   learningLanguage?: string
+  /** Native (explanation) language(s) — multi-select. A listing matches if its
+   *  native language is any of these. Empty/undefined means no native filter. */
+  nativeLanguages?: string[]
 }
 
 export const DIFFICULTY_LEVELS = [
@@ -50,6 +56,38 @@ export const LEARNING_LANGUAGES = [
   { value: 'th', labelKey: 'marketplace:learningLanguage.th' },
   { value: 'id', labelKey: 'marketplace:learningLanguage.id' },
 ] as const
+
+// Native (explanation) language = the language a learner already speaks, i.e.
+// the `source` side of a bilingual deck (e.g. "(KO → EN)" → native ko). Same
+// value set as learning languages; we reuse the per-language labels and only
+// add nativeLanguage.label / nativeLanguage.all in i18n.
+export const NATIVE_LANGUAGES = LEARNING_LANGUAGES
+
+// "Language" is a study TOPIC. Decks are tagged by level/exam (toeic, beginner,
+// …) rather than the topic, so selecting the Language category must match the
+// whole language-learning family — not just the literal category 'language'.
+const LANGUAGE_CATEGORY_FAMILY = new Set([
+  'language', 'toeic', 'ielts', 'toefl',
+  'beginner', 'intermediate', 'advanced', 'conversation',
+])
+
+/** Native (explanation) language of a listing: explicit column if present,
+ *  else parsed from the `source:<lang>` tag emitted by the official pipeline. */
+export function getNativeLanguage(listing: MarketplaceListingData): string | null {
+  if (listing.native_language) return listing.native_language
+  const tag = listing.tags?.find((t) => t.startsWith('source:'))
+  return tag ? tag.slice('source:'.length) : null
+}
+
+/** Whether a listing is a language-learning deck (for the Language topic filter). */
+export function isLanguageListing(listing: MarketplaceListingData): boolean {
+  return (
+    listing.category === 'language' ||
+    !!listing.learning_language ||
+    LANGUAGE_CATEGORY_FAMILY.has(listing.category) ||
+    getNativeLanguage(listing) !== null
+  )
+}
 
 export type SortBy = 'newest' | 'popular' | 'card_count' | 'top_rated' | 'trending'
 
@@ -95,6 +133,7 @@ export function countActiveFilters(filters: ListingFilters): number {
   if (filters.tags && filters.tags.length > 0) count++
   if (filters.difficulty) count++
   if (filters.learningLanguage) count++
+  if (filters.nativeLanguages && filters.nativeLanguages.length > 0) count++
   return count
 }
 
@@ -133,7 +172,20 @@ export function filterListings(
   filters: ListingFilters,
 ): MarketplaceListingData[] {
   return listings.filter((listing) => {
-    if (filters.category && listing.category !== filters.category) return false
+    if (filters.category) {
+      // The Language topic spans the whole language-learning family; every other
+      // category matches exactly.
+      if (filters.category === 'language') {
+        if (!isLanguageListing(listing)) return false
+      } else if (listing.category !== filters.category) {
+        return false
+      }
+    }
+
+    if (filters.nativeLanguages && filters.nativeLanguages.length > 0) {
+      const native = getNativeLanguage(listing)
+      if (!native || !filters.nativeLanguages.includes(native)) return false
+    }
 
     if (filters.query) {
       const q = filters.query.toLowerCase()

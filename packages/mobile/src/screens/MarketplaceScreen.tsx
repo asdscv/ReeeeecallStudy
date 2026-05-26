@@ -2,11 +2,10 @@ import { useState, useEffect, useMemo } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, ScrollView, Modal } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, SearchBar, Badge, ListCard, ScreenHeader } from '../components/ui'
+import { Screen, SearchBar, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { testProps } from '../utils/testProps'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
-import { useOfficialStore } from '@reeeeecall/shared/stores/official-store'
 import {
   filterListings,
   sortListings,
@@ -17,6 +16,7 @@ import {
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   LEARNING_LANGUAGES,
+  NATIVE_LANGUAGES,
 } from '@reeeeecall/shared/lib/marketplace'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
@@ -62,7 +62,6 @@ export function MarketplaceScreen() {
   const theme = useTheme()
   const navigation = useNavigation<Nav>()
   const { listings, loading, fetchListings } = useMarketplaceStore()
-  const { officialListings, listingsLoading: officialLoading, fetchOfficialListings } = useOfficialStore()
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -71,15 +70,16 @@ export function MarketplaceScreen() {
   const [shareMode, setShareMode] = useState<string | undefined>(undefined)
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all' | undefined>(undefined)
   const [learningLanguage, setLearningLanguage] = useState<string | undefined>(undefined)
+  const [nativeLanguages, setNativeLanguages] = useState<string[]>([])
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [page, setPage] = useState(1)
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
   const [sortModalOpen, setSortModalOpen] = useState(false)
 
-  useEffect(() => { fetchListings(); fetchOfficialListings() }, [fetchListings, fetchOfficialListings])
+  useEffect(() => { fetchListings() }, [fetchListings])
 
   // Reset page on filter change
-  useEffect(() => { setPage(1) }, [search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage])
+  useEffect(() => { setPage(1) }, [search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage, nativeLanguages])
 
   const filtered = useMemo(() => {
     const result = filterListings(listings as MarketplaceListingData[], {
@@ -89,9 +89,16 @@ export function MarketplaceScreen() {
       shareMode,
       dateRange: dateRange === 'all' ? undefined : dateRange,
       learningLanguage,
+      nativeLanguages,
     })
     return sortListings(result, sortBy) as typeof listings
-  }, [listings, search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage])
+  }, [listings, search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage, nativeLanguages])
+
+  const toggleNativeLanguage = (lang: string) => {
+    setNativeLanguages((prev) =>
+      prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang],
+    )
+  }
 
   const trendingIds = useMemo(() => getTrendingListingIds(listings as MarketplaceListingData[]), [listings])
 
@@ -115,47 +122,6 @@ export function MarketplaceScreen() {
         onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Official Decks Featured Section */}
-            {officialListings.length > 0 && (
-              <View style={styles.officialSection} testID="official-decks-section">
-                <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>
-                  {'\u2B50'} Official Decks
-                </Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.officialScroll}>
-                  {officialListings.map((item) => (
-                    <TouchableOpacity
-                      key={item.id}
-                      onPress={() => navigation.navigate('MarketplaceDetail', { listingId: item.id })}
-                      style={[styles.officialCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                      testID={`official-listing-${item.id}`}
-                    >
-                      <View style={styles.officialCardHeader}>
-                        <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
-                          {item.title}
-                        </Text>
-                      </View>
-                      {(item as any).owner_display_name && (
-                        <View style={styles.officialPublisherRow}>
-                          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]} numberOfLines={1}>
-                            {(item as any).owner_display_name}
-                          </Text>
-                          <OfficialBadge
-                            badgeType={(item as any).badge_type || 'verified'}
-                            badgeColor={(item as any).badge_color}
-                            size="sm"
-                          />
-                        </View>
-                      )}
-                      <View style={styles.officialCardMeta}>
-                        <Badge label={`${item.card_count ?? 0} cards`} variant="neutral" />
-                        <Badge label={`${item.acquire_count ?? 0} users`} variant="primary" />
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="marketplace-search" />
 
             {/* Category & Sort dropdowns */}
@@ -220,6 +186,40 @@ export function MarketplaceScreen() {
                   Advanced{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Native language — multi-select, always visible. Lets e.g. a
+                Korean learner narrow to decks explained in their language. */}
+            <View>
+              <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
+                {t('nativeLanguage.label')}
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                {NATIVE_LANGUAGES.map((lang) => {
+                  const isActive = nativeLanguages.includes(lang.value)
+                  return (
+                    <TouchableOpacity
+                      key={lang.value}
+                      testID={`marketplace-native-${lang.value}`}
+                      onPress={() => toggleNativeLanguage(lang.value)}
+                      style={[
+                        styles.filterChip,
+                        {
+                          backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
+                          borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                        },
+                      ]}
+                    >
+                      <Text style={[
+                        theme.typography.labelSmall,
+                        { color: isActive ? theme.colors.primaryText : theme.colors.text },
+                      ]}>
+                        {t(lang.labelKey)}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              </ScrollView>
             </View>
 
             {/* Advanced filters panel */}
@@ -557,17 +557,4 @@ const styles = StyleSheet.create({
   loadMore: { paddingVertical: 16, alignItems: 'center' },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 40 },
   emptyIcon: { fontSize: 48 },
-  // Official Decks section
-  officialSection: { marginBottom: 4 },
-  officialScroll: { gap: 10, paddingRight: 4 },
-  officialCard: {
-    width: 200,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 6,
-  },
-  officialCardHeader: { flexDirection: 'row', alignItems: 'center' },
-  officialPublisherRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  officialCardMeta: { flexDirection: 'row', gap: 6, marginTop: 2 },
 })

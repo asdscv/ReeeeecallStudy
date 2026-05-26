@@ -89,5 +89,9 @@
     "vi": "Tiếng Việt",
     "th": "ภาษาไทย",
     "id": "Bahasa Indonesia"
+  },
+  "nativeLanguage": {
+    "label": "Native language",
+    "all": "All"
   }
 }
