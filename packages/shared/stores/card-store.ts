@@ -1,7 +1,19 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
+import { useDeckStore } from './deck-store'
 import type { Card } from '../types/database'
+
+/**
+ * Card mutations change the per-deck card/SRS counts surfaced by
+ * get_deck_stats (deck list + Quick Study). The deck store caches stats for
+ * STALE_AFTER_MS, and consumers fetch on focus without `force`, so we must
+ * invalidate that cache here or the deck list keeps showing stale counts
+ * until the cache expires. (deck-store does not import card-store → no cycle.)
+ */
+function invalidateDeckStats(): void {
+  useDeckStore.setState({ statsFetchedAt: null })
+}
 
 interface CardState {
   cards: Card[]
@@ -101,6 +113,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       .eq('id', input.deck_id)
 
     guard.recordSuccess('cards_total')
+    invalidateDeckStats()
     await get().fetchCards(input.deck_id)
     return card as Card
   },
@@ -158,6 +171,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     guard.recordSuccess('cards_total', totalInserted)
     if (!get().error) {
+      invalidateDeckStats()
       await get().fetchCards(deck_id)
     }
     return totalInserted
@@ -189,6 +203,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     // 현재 카드 목록에서 해당 카드의 deck_id를 찾아 갱신
+    invalidateDeckStats()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
       await get().fetchCards(card.deck_id)
@@ -207,6 +222,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       return
     }
 
+    invalidateDeckStats()
     if (card) {
       await get().fetchCards(card.deck_id)
     }
@@ -226,6 +242,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       return
     }
 
+    invalidateDeckStats()
     if (deckId) {
       await get().fetchCards(deckId)
     }
@@ -249,6 +266,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       return
     }
 
+    invalidateDeckStats()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
       await get().fetchCards(card.deck_id)

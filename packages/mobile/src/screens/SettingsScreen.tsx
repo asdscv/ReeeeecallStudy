@@ -695,7 +695,7 @@ export function SettingsScreen() {
           {!aiCollapsed && (
             <>
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                Configure AI providers for card generation. Keys are encrypted locally.
+                Configure AI providers for card generation. Keys are encrypted on our servers and synced across your devices.
               </Text>
               <View style={styles.sectionBody}>
                 {AI_PROVIDERS.map((provider) => {
@@ -834,7 +834,7 @@ export function SettingsScreen() {
                 })}
                 <View style={[styles.securityNote, { backgroundColor: theme.colors.surface }]}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    API keys are stored locally on your device using encrypted storage and never sent to our servers.
+                    API keys are encrypted on our servers (pgcrypto + Vault, never stored in plain text) and synced across your web and mobile devices.
                   </Text>
                 </View>
               </View>

@@ -60,11 +60,19 @@ export interface CardData {
 }
 
 export function getSrsSource(deck: SrsDeckMeta, currentUserId: string): SrsSource {
-  if (
-    deck.share_mode === 'subscribe' &&
-    deck.source_owner_id !== null &&
-    deck.source_owner_id !== currentUserId
-  ) {
+  // A deck the current user does not own can only be in their library via a
+  // subscribe share — copy/snapshot acquisitions produce a deck owned by the
+  // recipient. Subscribers study the publisher-owned cards but keep their own
+  // SRS progress in user_card_progress (seeded by acquire_listing), so reads
+  // and writes must go through the progress table rather than the shared
+  // cards row.
+  //
+  // NOTE: ownership is the reliable discriminator. We intentionally do NOT key
+  // off share_mode/source_owner_id here: subscribe decks published by regular
+  // users keep share_mode=NULL/source_owner_id=NULL on the deck row, and the
+  // official decks have source_owner_id=NULL too. Comparing owner vs. viewer
+  // covers every subscribe case while leaving owned decks on embedded SRS.
+  if (deck.user_id !== currentUserId) {
     return 'progress_table'
   }
   return 'embedded'

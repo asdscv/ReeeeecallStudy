@@ -1,4 +1,5 @@
-import { useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useAuthState } from './useAuthState'
 
@@ -6,8 +7,11 @@ import { useAuthState } from './useAuthState'
  * Hook for deck data — wraps shared deck store for mobile.
  *
  * Staleness 정책:
- *   - 마운트 시 fetchDecks()/fetchStats()/fetchTemplates() 호출하지만
+ *   - 화면 포커스 시 fetchDecks()/fetchStats()/fetchTemplates() 호출하지만
  *     store 내부에서 5분 이내 데이터는 스킵 (STALE_AFTER_MS).
+ *   - 덱/카드 mutation이 store 캐시를 무효화하므로, 다른 화면에서 수정 후
+ *     목록으로 돌아오면 (focus) 최신 데이터로 갱신된다. (마운트 전용
+ *     useEffect였을 때는 이미 마운트된 목록이 재요청하지 않아 stale 했음.)
  *   - Pull-to-refresh 시 force: true로 강제 갱신.
  *   - Prefetch service가 스플래시 때 이미 로드했으면 여기서 네트워크 안 탐.
  */
@@ -27,12 +31,14 @@ export function useDecks() {
     deleteDeck,
   } = useDeckStore()
 
-  // 마운트 시 데이터 확인 (store가 fresh면 네트워크 스킵)
-  useEffect(() => {
-    fetchDecks()
-    fetchTemplates()
-    if (user?.id) fetchStats(user.id)
-  }, [fetchDecks, fetchStats, fetchTemplates, user?.id])
+  // 화면 포커스 시 데이터 확인 (store가 fresh면 네트워크 스킵)
+  useFocusEffect(
+    useCallback(() => {
+      fetchDecks()
+      fetchTemplates()
+      if (user?.id) fetchStats(user.id)
+    }, [fetchDecks, fetchStats, fetchTemplates, user?.id]),
+  )
 
   // Pull-to-refresh용 — 강제 갱신
   const refresh = useCallback(async () => {
