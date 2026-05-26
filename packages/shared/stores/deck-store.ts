@@ -166,8 +166,11 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     }
 
     guard.recordSuccess('decks_total')
-    await get().fetchDecks()
-    await get().fetchStats(user.id)
+    // force: the store was just populated (decksFetchedAt is fresh), so a plain
+    // fetch would short-circuit on the staleness cache and the new deck would
+    // not appear until the cache expired or the user pull-to-refreshed.
+    await get().fetchDecks({ force: true })
+    await get().fetchStats(user.id, { force: true })
     return deck as Deck
   },
 
@@ -183,8 +186,9 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     }
 
     const { data: { user } } = await supabase.auth.getUser()
-    await get().fetchDecks()
-    if (user) await get().fetchStats(user.id)
+    // force past the staleness cache so the edit is reflected immediately.
+    await get().fetchDecks({ force: true })
+    if (user) await get().fetchStats(user.id, { force: true })
   },
 
   deleteDeck: async (id) => {
@@ -199,7 +203,8 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     }
 
     const { data: { user } } = await supabase.auth.getUser()
-    await get().fetchDecks()
-    if (user) await get().fetchStats(user.id)
+    // force past the staleness cache so the deletion is reflected immediately.
+    await get().fetchDecks({ force: true })
+    if (user) await get().fetchStats(user.id, { force: true })
   },
 }))

@@ -1,6 +1,7 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { Platform, NativeModules } from 'react-native'
+import { localPrefs } from '../utils/local-prefs'
 
 // ── Supported languages: to add a new language, add an entry below + locale folder ──
 
@@ -147,11 +148,21 @@ function getDeviceLanguage(): string {
   return 'en'
 }
 
+// Initial language priority: saved choice → device locale → 'en'.
+//   - Saved choice wins so "set language → close app → reopen" sticks.
+//   - First launch (no saved value) follows the phone's system language via
+//     getDeviceLanguage(), falling back to English if it isn't supported.
+function getInitialLanguage(): string {
+  const saved = localPrefs.getLanguage()
+  if (saved && supportedLngs.includes(saved)) return saved
+  return getDeviceLanguage()
+}
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: getDeviceLanguage(),
+    lng: getInitialLanguage(),
     fallbackLng: 'en',
     supportedLngs,
 
@@ -161,5 +172,12 @@ i18n
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   })
+
+// Persist every language change so the choice survives an app restart. This
+// fires for the Settings picker AND for the profile-load sync (DB value from
+// another device), keeping local + server in agreement. Best-effort.
+i18n.on('languageChanged', (lng) => {
+  if (supportedLngs.includes(lng)) localPrefs.setLanguage(lng)
+})
 
 export default i18n
