@@ -502,7 +502,7 @@ function RatingButton({ label, color, onPress, disabled }: {
       activeOpacity={0.7}
       style={[styles.ratingBtn, { backgroundColor: color, opacity: disabled ? 0.5 : 1 }]}
     >
-      <Text style={styles.ratingLabel}>{label}</Text>
+      <Text style={styles.ratingLabel} maxFontSizeMultiplier={1.3} numberOfLines={1}>{label}</Text>
     </TouchableOpacity>
   )
 }
