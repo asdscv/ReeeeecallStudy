@@ -182,7 +182,7 @@ export function MarketplaceDetailPage() {
       defaultValue:
         'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
     })
-    if (!(await confirm({ message: confirmMsg, danger: true }))) return
+    if (!(await confirm({ title: t('marketplace:detail.unsubscribe', { defaultValue: 'Unsubscribe' }), message: confirmMsg, danger: true }))) return
     setUnsubscribing(true)
     setUnsubscribeError(null)
     try {

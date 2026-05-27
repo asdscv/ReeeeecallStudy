@@ -22,6 +22,7 @@ const KEYS = {
   // Legacy key — predates this module; keep the string so existing installs
   // don't lose their saved theme.
   theme: 'reeeeecall-user-theme',
+  haptics: 'app-haptics-enabled',
 } as const
 
 function read(key: string): string | null {
@@ -57,5 +58,13 @@ export const localPrefs = {
   },
   setThemeMode(mode: ThemeMode): void {
     write(KEYS.theme, mode)
+  },
+
+  /** Whether tactile haptics are enabled. Defaults to true (opt-out). */
+  getHapticsEnabled(): boolean {
+    return read(KEYS.haptics) !== 'false'
+  },
+  setHapticsEnabled(enabled: boolean): void {
+    write(KEYS.haptics, enabled ? 'true' : 'false')
   },
 }

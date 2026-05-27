@@ -25,23 +25,25 @@ import type { MarketplaceStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<MarketplaceStackParamList, 'MarketplaceHome'>
 
-const CATEGORIES = [
-  { value: '', label: 'All' },
-  { value: 'language', label: 'Language' },
-  { value: 'science', label: 'Science' },
-  { value: 'math', label: 'Math' },
-  { value: 'history', label: 'History' },
-  { value: 'programming', label: 'Code' },
-  { value: 'exam', label: 'Exam' },
-  { value: 'other', label: 'Other' },
+// Labels resolved via i18n (`marketplace.categories.*` / `marketplace.sort.*`)
+// at render time; only value + key live here. (Previously hardcoded English.)
+const CATEGORIES: { value: string; labelKey: string }[] = [
+  { value: '', labelKey: 'categories.all' },
+  { value: 'language', labelKey: 'categories.language' },
+  { value: 'science', labelKey: 'categories.science' },
+  { value: 'math', labelKey: 'categories.math' },
+  { value: 'history', labelKey: 'categories.history' },
+  { value: 'programming', labelKey: 'categories.programming' },
+  { value: 'exam', labelKey: 'categories.exam' },
+  { value: 'other', labelKey: 'categories.other' },
 ]
 
-const SORT_OPTIONS: { value: SortBy; label: string }[] = [
-  { value: 'popular', label: 'Popular' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'trending', label: 'Trending' },
-  { value: 'card_count', label: 'Most Cards' },
-  { value: 'top_rated', label: 'Top Rated' },
+const SORT_OPTIONS: { value: SortBy; labelKey: string }[] = [
+  { value: 'popular', labelKey: 'sort.popular' },
+  { value: 'newest', labelKey: 'sort.newest' },
+  { value: 'trending', labelKey: 'sort.trending' },
+  { value: 'card_count', labelKey: 'sort.cardCount' },
+  { value: 'top_rated', labelKey: 'sort.topRated' },
 ]
 
 const DATE_LABELS: Record<string, string> = {
@@ -142,7 +144,7 @@ export function MarketplaceScreen() {
                 testID="marketplace-category-dropdown"
               >
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
-                  {CATEGORIES.find((c) => c.value === category)?.label ?? 'All Categories'}
+                  {(() => { const c = CATEGORIES.find((c) => c.value === category); return c ? t(c.labelKey) : t('categories.all') })()}
                 </Text>
                 <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
               </TouchableOpacity>
@@ -153,7 +155,7 @@ export function MarketplaceScreen() {
                 testID="marketplace-sort-dropdown"
               >
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
-                  {SORT_OPTIONS.find((s) => s.value === sortBy)?.label ?? 'Popular'}
+                  {(() => { const s = SORT_OPTIONS.find((s) => s.value === sortBy); return s ? t(s.labelKey) : t('sort.popular') })()}
                 </Text>
                 <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
               </TouchableOpacity>
@@ -519,7 +521,7 @@ export function MarketplaceScreen() {
       <Modal visible={categoryModalOpen} transparent animationType="fade" onRequestClose={() => setCategoryModalOpen(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setCategoryModalOpen(false)}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Category</Text>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('categoryTitle', { defaultValue: 'Category' })}</Text>
             <FlatList
               data={CATEGORIES}
               keyExtractor={(item) => item.value || '_all'}
@@ -533,7 +535,7 @@ export function MarketplaceScreen() {
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                      {cat.label}
+                      {t(cat.labelKey)}
                     </Text>
                     {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>{'\u2713'}</Text>}
                   </TouchableOpacity>
@@ -548,7 +550,7 @@ export function MarketplaceScreen() {
       <Modal visible={sortModalOpen} transparent animationType="fade" onRequestClose={() => setSortModalOpen(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSortModalOpen(false)}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Sort By</Text>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('sortTitle', { defaultValue: 'Sort By' })}</Text>
             <FlatList
               data={SORT_OPTIONS}
               keyExtractor={(item) => item.value}
@@ -562,7 +564,7 @@ export function MarketplaceScreen() {
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </Text>
                     {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>{'\u2713'}</Text>}
                   </TouchableOpacity>

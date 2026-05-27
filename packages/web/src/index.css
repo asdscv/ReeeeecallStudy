@@ -75,7 +75,8 @@
   --accent-foreground: #F9FAFB;
   --destructive: #F87171;
   --destructive-foreground: #FFFFFF;
-  --border: #1F2937;
+  /* Lighter than --card (#1E293B)/surfaces so borders are visible in dark mode */
+  --border: #374151;
   --input: #374151;
   --ring: #3B82F6;
   --brand: #60A5FA;
@@ -102,7 +103,7 @@
   --sidebar-primary-foreground: #F9FAFB;
   --sidebar-accent: #1F2937;
   --sidebar-accent-foreground: #F9FAFB;
-  --sidebar-border: #1F2937;
+  --sidebar-border: #374151;
   --sidebar-ring: #3B82F6;
 }
 
