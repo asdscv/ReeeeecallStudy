@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
 import { useDeckStore } from './deck-store'
+import { createStaleCache } from '../lib/cache/stale-cache'
 import type { Card } from '../types/database'
 
 /**
@@ -15,12 +16,44 @@ function invalidateDeckStats(): void {
   useDeckStore.getState().invalidate('stats')
 }
 
+// ── Per-deck card-list cache ─────────────────────────────────────────────────
+// fetchCards re-hit the network on every deck open; cache each deck's list so
+// re-opening within the TTL is instant. Two safeguards make this safe despite
+// card lists being edit-heavy + large:
+//   1) Bounded LRU data cache (MAX_DECKS) → memory stays small.
+//   2) Invalidated on EVERY write path: card-store mutations + study-store SRS
+//      writes (study bypasses card-store) → DeckDetail's srs_status filter never
+//      goes stale. useCards refetches on focus to pick up invalidations.
+const MAX_DECKS = 6
+const cardListCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
+const cardsByDeck = new Map<string, Card[]>()
+
+function cacheDeckCards(deckId: string, cards: Card[]): void {
+  cardsByDeck.delete(deckId) // re-insert at end → most-recently-used
+  cardsByDeck.set(deckId, cards)
+  cardListCache.markFetched(deckId)
+  while (cardsByDeck.size > MAX_DECKS) {
+    const oldest = cardsByDeck.keys().next().value as string | undefined
+    if (oldest === undefined) break
+    cardsByDeck.delete(oldest)
+    cardListCache.invalidate(oldest)
+  }
+}
+
+function dropDeckCards(deckId?: string): void {
+  if (deckId === undefined) cardsByDeck.clear()
+  else cardsByDeck.delete(deckId)
+  cardListCache.invalidate(deckId)
+}
+
 interface CardState {
   cards: Card[]
   loading: boolean
   error: string | null
 
-  fetchCards: (deckId: string) => Promise<void>
+  fetchCards: (deckId: string, opts?: { force?: boolean }) => Promise<void>
+  /** Drop cached card list(s) so the next fetch hits the network. Omit → all. */
+  invalidateCards: (deckId?: string) => void
   createCard: (data: {
     deck_id: string
     template_id: string
@@ -48,7 +81,15 @@ export const useCardStore = create<CardState>((set, get) => ({
   loading: false,
   error: null,
 
-  fetchCards: async (deckId: string) => {
+  invalidateCards: (deckId) => dropDeckCards(deckId),
+
+  fetchCards: async (deckId: string, opts) => {
+    // Cache hit: serve the cached list for this deck without a network round-trip.
+    if (!opts?.force && cardListCache.isFresh(deckId) && cardsByDeck.has(deckId)) {
+      cacheDeckCards(deckId, cardsByDeck.get(deckId)!) // bump LRU recency
+      set({ cards: cardsByDeck.get(deckId)!, loading: false, error: null })
+      return
+    }
     set({ loading: true, error: null })
     const { data, error } = await supabase
       .from('cards')
@@ -59,7 +100,9 @@ export const useCardStore = create<CardState>((set, get) => ({
     if (error) {
       set({ error: error.message, loading: false })
     } else {
-      set({ cards: (data ?? []) as Card[], loading: false })
+      const cards = (data ?? []) as Card[]
+      cacheDeckCards(deckId, cards)
+      set({ cards, loading: false })
     }
   },
 
@@ -114,6 +157,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     guard.recordSuccess('cards_total')
     invalidateDeckStats()
+    dropDeckCards(input.deck_id)
     await get().fetchCards(input.deck_id)
     return card as Card
   },
@@ -172,6 +216,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     guard.recordSuccess('cards_total', totalInserted)
     if (!get().error) {
       invalidateDeckStats()
+      dropDeckCards(deck_id)
       await get().fetchCards(deck_id)
     }
     return totalInserted
@@ -206,6 +251,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     invalidateDeckStats()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
+      dropDeckCards(card.deck_id)
       await get().fetchCards(card.deck_id)
     }
   },
@@ -224,6 +270,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     invalidateDeckStats()
     if (card) {
+      dropDeckCards(card.deck_id)
       await get().fetchCards(card.deck_id)
     }
   },
@@ -244,6 +291,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     invalidateDeckStats()
     if (deckId) {
+      dropDeckCards(deckId)
       await get().fetchCards(deckId)
     }
   },
@@ -269,6 +317,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     invalidateDeckStats()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
+      dropDeckCards(card.deck_id)
       await get().fetchCards(card.deck_id)
     }
   },

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { validateAdminDays, extractErrorMessage } from '../lib/admin-stats'
+import { createStaleCache } from '../lib/cache/stale-cache'
 import type {
   AdminOverviewStats,
   AdminActiveUsers,
@@ -18,7 +19,9 @@ import type {
   AdminAuditLog,
 } from '../types/database'
 
-const CACHE_TTL = 5 * 60_000 // 5 minutes
+// Per-section TTL cache (unified on the shared util — replaces the former private
+// `_fetchedAt` map + `isFresh`). Freshness is not render state → lives outside the store.
+const adminCache = createStaleCache({ ttlMs: 5 * 60_000 })
 
 type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'pageViews' | 'system' | 'audit'
 
@@ -81,9 +84,6 @@ interface AdminState {
   auditLoading: boolean
   auditError: string | null
 
-  // Cache timestamps
-  _fetchedAt: Record<SectionKey, number>
-
   // Actions
   fetchOverview: () => Promise<void>
   fetchUsers: (page?: number, pageSize?: number, filters?: { search?: string; role?: string; official?: boolean }) => Promise<void>
@@ -100,9 +100,6 @@ interface AdminState {
   forceRefresh: (section: SectionKey) => void
 }
 
-function isFresh(fetchedAt: Record<SectionKey, number>, key: SectionKey): boolean {
-  return Date.now() - fetchedAt[key] < CACHE_TTL
-}
 
 export const useAdminStore = create<AdminState>((set, get) => ({
   overviewStats: null,
@@ -146,11 +143,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   auditLoading: false,
   auditError: null,
 
-  _fetchedAt: { overview: 0, users: 0, study: 0, market: 0, contents: 0, pageViews: 0, system: 0, audit: 0 },
 
   fetchOverview: async () => {
     if (get().overviewLoading) return
-    if (isFresh(get()._fetchedAt, 'overview') && get().overviewStats) return
+    if (!adminCache.shouldFetch('overview') && get().overviewStats) return
     set({ overviewLoading: true, overviewError: null })
     try {
       const [overviewRes, activeRes, recentRes] = await Promise.all([
@@ -167,8 +163,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         overviewStats: overviewRes.data as AdminOverviewStats | null,
         activeUsers: activeRes.data as AdminActiveUsers | null,
         recentActivity: (recentRes.data as AdminRecentActivity[] | null) ?? [],
-        _fetchedAt: { ...get()._fetchedAt, overview: Date.now() },
       })
+      adminCache.markFetched('overview')
     } catch (e) {
       set({ overviewError: extractErrorMessage(e) })
     } finally {
@@ -179,7 +175,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   fetchUsers: async (page = 0, pageSize = 20, filters?: { search?: string; role?: string; official?: boolean }) => {
     if (get().usersLoading) return
     // Users page always fetches for pagination, but skip chart data if fresh
-    const chartsFresh = isFresh(get()._fetchedAt, 'users') && get().userSignups.length > 0
+    const chartsFresh = !adminCache.shouldFetch('users') && get().userSignups.length > 0
     set({ usersLoading: true, usersError: null })
     try {
       let listQuery = supabase
@@ -235,10 +231,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         if (retentionRes.error) throw retentionRes.error
         updates.userSignups = (signupsRes.data as AdminUserSignup[] | null) ?? []
         updates.retentionMetrics = retentionRes.data as AdminRetentionMetrics | null
-        updates._fetchedAt = { ...get()._fetchedAt, users: Date.now() } as AdminState['_fetchedAt']
       }
 
       set(updates)
+      if (!chartsFresh) adminCache.markFetched('users')
     } catch (e) {
       set({ usersError: extractErrorMessage(e) })
     } finally {
@@ -268,8 +264,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         modeBreakdown: (modeRes.data as AdminModeBreakdown[] | null) ?? [],
         ratingDistribution: (ratingRes.data as AdminRatingDistribution[] | null) ?? [],
         srsBreakdown: (srsRes.data as AdminSrsStatusBreakdown[] | null) ?? [],
-        _fetchedAt: { ...get()._fetchedAt, study: Date.now() },
       })
+      adminCache.markFetched('study')
     } catch (e) {
       set({ studyError: extractErrorMessage(e) })
     } finally {
@@ -279,15 +275,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   fetchMarket: async () => {
     if (get().marketLoading) return
-    if (isFresh(get()._fetchedAt, 'market') && get().marketStats) return
+    if (!adminCache.shouldFetch('market') && get().marketStats) return
     set({ marketLoading: true, marketError: null })
     try {
       const { data, error } = await supabase.rpc('admin_content_stats')
       if (error) throw error
       set({
         marketStats: data as AdminContentStats | null,
-        _fetchedAt: { ...get()._fetchedAt, market: Date.now() },
       })
+      adminCache.markFetched('market')
     } catch (e) {
       set({ marketError: extractErrorMessage(e) })
     } finally {
@@ -297,15 +293,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   fetchContents: async () => {
     if (get().contentsLoading) return
-    if (isFresh(get()._fetchedAt, 'contents') && get().contentsAnalytics) return
+    if (!adminCache.shouldFetch('contents') && get().contentsAnalytics) return
     set({ contentsLoading: true, contentsError: null })
     try {
       const { data, error } = await supabase.rpc('admin_content_analytics')
       if (error) throw error
       set({
         contentsAnalytics: data as AdminContentsAnalytics | null,
-        _fetchedAt: { ...get()._fetchedAt, contents: Date.now() },
       })
+      adminCache.markFetched('contents')
     } catch (e) {
       set({ contentsError: extractErrorMessage(e) })
     } finally {
@@ -315,15 +311,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   fetchPageViews: async () => {
     if (get().pageViewsLoading) return
-    if (isFresh(get()._fetchedAt, 'pageViews') && get().pageViewsAnalytics) return
+    if (!adminCache.shouldFetch('pageViews') && get().pageViewsAnalytics) return
     set({ pageViewsLoading: true, pageViewsError: null })
     try {
       const { data, error } = await supabase.rpc('admin_page_views_analytics')
       if (error) throw error
       set({
         pageViewsAnalytics: data as AdminPageViewsAnalytics | null,
-        _fetchedAt: { ...get()._fetchedAt, pageViews: Date.now() },
       })
+      adminCache.markFetched('pageViews')
     } catch (e) {
       set({ pageViewsError: extractErrorMessage(e) })
     } finally {
@@ -333,15 +329,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   fetchSystem: async () => {
     if (get().systemLoading) return
-    if (isFresh(get()._fetchedAt, 'system') && get().systemStats) return
+    if (!adminCache.shouldFetch('system') && get().systemStats) return
     set({ systemLoading: true, systemError: null })
     try {
       const { data, error } = await supabase.rpc('admin_system_stats')
       if (error) throw error
       set({
         systemStats: data as AdminSystemStats | null,
-        _fetchedAt: { ...get()._fetchedAt, system: Date.now() },
       })
+      adminCache.markFetched('system')
     } catch (e) {
       set({ systemError: extractErrorMessage(e) })
     } finally {
@@ -434,8 +430,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       set({
         auditLogs: result?.data ?? [],
         auditTotal: result?.total ?? 0,
-        _fetchedAt: { ...get()._fetchedAt, audit: Date.now() },
       })
+      adminCache.markFetched('audit')
     } catch (e) {
       set({ auditError: extractErrorMessage(e) })
     } finally {
@@ -457,8 +453,6 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   },
 
   forceRefresh: (section: SectionKey) => {
-    set({
-      _fetchedAt: { ...get()._fetchedAt, [section]: 0 },
-    })
+    adminCache.invalidate(section)
   },
 }))

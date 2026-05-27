@@ -1,6 +1,6 @@
 # Cache Optimization — Phase 2 (read-heavy fetch reduction)
 
-> Status: in progress · Builds on Phase 1 (`DOCS/DONE/cache-optimization.md` —
+> Status: ✅ SHIPPED (PR #116→#117). Builds on Phase 1 (`DOCS/DONE/cache-optimization.md` —
 > shipped `shared/lib/cache/stale-cache.ts`). Same utility, same rigor.
 
 ## Goal
