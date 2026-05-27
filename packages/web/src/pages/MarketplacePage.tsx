@@ -8,6 +8,7 @@ import { ListingCard } from '../components/marketplace/ListingCard'
 import { SearchFilters } from '../components/marketplace/SearchFilters'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { CardGridSkeleton } from '../components/common/Skeleton'
+import { EmptyState } from '../components/common/EmptyState'
 import { OfficialBadge } from '../components/common/OfficialBadge'
 import { extractPopularTags, getTrendingListingIds, countActiveFilters } from '../lib/marketplace'
 import type { MarketplaceListing } from '../types/database'
@@ -103,14 +104,15 @@ export function MarketplacePage() {
       {loading ? (
         <CardGridSkeleton />
       ) : filteredListings.length === 0 ? (
-        <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
-          <div className="text-4xl sm:text-5xl mb-4">{'\uD83C\uDFEA'}</div>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            {hasActiveFilters
-              ? t('marketplace:noResults')
-              : t('marketplace:noListings')}
-          </p>
-        </div>
+        <EmptyState
+          icon={'\uD83C\uDFEA'}
+          title={hasActiveFilters ? t('marketplace:noResults') : t('marketplace:noListings')}
+          action={
+            hasActiveFilters
+              ? { label: t('marketplace:filters.reset', { defaultValue: 'Clear filters' }), onClick: resetFilters }
+              : undefined
+          }
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">

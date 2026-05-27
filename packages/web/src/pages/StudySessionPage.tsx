@@ -410,12 +410,15 @@ export function StudySessionPage() {
               onClick={handleToggleShortcuts}
               className="hidden sm:block p-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               title={t('shortcuts.title')}
+              aria-label={t('shortcuts.title')}
             >
               <Keyboard className="w-5 h-5" />
             </button>
             <button
               onClick={handleExit}
               className="p-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              title={t('session.exit', { defaultValue: 'Exit' })}
+              aria-label={t('session.exit', { defaultValue: 'Exit' })}
             >
               <X className="w-5 h-5" />
             </button>

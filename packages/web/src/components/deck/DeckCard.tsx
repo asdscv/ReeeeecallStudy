@@ -125,6 +125,7 @@ export function DeckCard({ deck, stats, templateName, onDelete, onUnsubscribe }:
                   onClick={() => navigate(`/decks/${deck.id}/edit`)}
                   className="p-1.5 text-content-tertiary hover:text-muted-foreground hover:bg-accent rounded-lg transition cursor-pointer"
                   title={t('card.edit')}
+                  aria-label={t('card.edit')}
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
@@ -132,6 +133,7 @@ export function DeckCard({ deck, stats, templateName, onDelete, onUnsubscribe }:
                   onClick={() => onDelete(deck)}
                   className="p-1.5 text-content-tertiary hover:text-destructive hover:bg-destructive/10 rounded-lg transition cursor-pointer"
                   title={t('card.delete')}
+                  aria-label={t('card.delete')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
