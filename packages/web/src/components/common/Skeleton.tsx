@@ -14,9 +14,9 @@ interface SkeletonProps {
   className?: string
 }
 
-/** Base pulse block. Uses `bg-muted` so it adapts to light/dark automatically. */
+/** Base pulse block. `bg-foreground/10` stays visible on cards in light AND dark. */
 export function Skeleton({ className = '' }: SkeletonProps) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-md bg-muted ${className}`} />
+  return <div aria-hidden="true" className={`animate-pulse rounded-md bg-foreground/10 ${className}`} />
 }
 
 /** Card grid — matches `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` deck/listing grids. */

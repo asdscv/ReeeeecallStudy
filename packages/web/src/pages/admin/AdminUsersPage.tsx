@@ -203,6 +203,7 @@ export function AdminUsersPage() {
                           onClick={async () => {
                             const newRole = u.role === 'admin' ? 'user' : 'admin'
                             if (!(await confirm({
+                              title: t('users.changeRoleTitle', { defaultValue: 'Change role' }),
                               message: t('users.confirmRoleChange', {
                                 defaultValue: "Change {{name}}'s role to {{role}}?",
                                 name: u.display_name || u.id,
@@ -247,8 +248,8 @@ export function AdminUsersPage() {
                           disabled={statusChangingId === u.id}
                           onChange={async (e) => {
                             const newStatus = e.target.value as 'active' | 'suspended' | 'banned'
-                            if (newStatus === 'banned' && !(await confirm({ message: t('users.confirmBan', 'Ban this user?'), danger: true }))) return
-                            if (newStatus === 'suspended' && !(await confirm({ message: t('users.confirmSuspend', 'Suspend this user?'), danger: true }))) return
+                            if (newStatus === 'banned' && !(await confirm({ title: t('users.banTitle', { defaultValue: 'Ban user' }), message: t('users.confirmBan', 'Ban this user?'), danger: true }))) return
+                            if (newStatus === 'suspended' && !(await confirm({ title: t('users.suspendTitle', { defaultValue: 'Suspend user' }), message: t('users.confirmSuspend', 'Suspend this user?'), danger: true }))) return
                             setStatusChangingId(u.id)
                             await setUserStatus(u.id, newStatus)
                             setStatusChangingId(null)

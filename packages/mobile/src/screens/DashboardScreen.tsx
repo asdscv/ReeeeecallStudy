@@ -118,21 +118,21 @@ export function DashboardScreen() {
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.totalCards')}</Text>
-                  <Text style={[styles.statValue, { color: theme.colors.text }]}>{totalCards}</Text>
+                  <Text style={[styles.statValue, { color: theme.colors.text }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{totalCards}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.todayReview')}</Text>
-                  <Text style={[styles.statValue, { color: palette.yellow[600] }]}>{totalDue}</Text>
+                  <Text style={[styles.statValue, { color: palette.yellow[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{totalDue}</Text>
                 </View>
               </View>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.streak')}</Text>
-                  <Text style={[styles.statValue, { color: palette.green[600] }]}>{t('streakDays', { count: streak })}</Text>
+                  <Text style={[styles.statValue, { color: palette.green[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{t('streakDays', { count: streak })}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.masteryRate')}</Text>
-                  <Text style={[styles.statValue, { color: palette.blue[600] }]}>{mastery}%</Text>
+                  <Text style={[styles.statValue, { color: palette.blue[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{mastery}%</Text>
                 </View>
               </View>
             </View>

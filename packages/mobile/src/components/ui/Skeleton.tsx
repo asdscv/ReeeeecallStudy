@@ -6,14 +6,15 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated'
-import { useTheme } from '../../theme'
+import { useTheme, palette } from '../../theme'
 
 /**
  * Skeleton — content-shaped loading placeholders (Reanimated opacity pulse).
  *
  * Replaces blank screens on cold load so data swaps in without the list
- * popping into existence. Color is token-driven (theme.colors.border) so it
- * adapts to light/dark. Compose <Skeleton> blocks for new shapes.
+ * popping into existence. Uses an explicit mode-aware fill (gray700 dark /
+ * gray200 light) so it stays visible on elevated surfaces in BOTH themes,
+ * independent of the border token. Compose <Skeleton> blocks for new shapes.
  */
 interface SkeletonProps {
   width?: DimensionValue
@@ -31,11 +32,12 @@ export function Skeleton({ width = '100%', height = 16, radius = 8, style }: Ske
   }, [opacity])
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
+  const fill = theme.isDark ? palette.gray[700] : palette.gray[200]
 
   return (
     <Animated.View
       style={[
-        { width, height, borderRadius: radius, backgroundColor: theme.colors.border },
+        { width, height, borderRadius: radius, backgroundColor: fill },
         animatedStyle,
         style,
       ]}

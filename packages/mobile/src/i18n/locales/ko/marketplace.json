@@ -16,7 +16,9 @@
   "sort": {
     "popular": "인기순",
     "newest": "최신순",
-    "cardCount": "카드 수"
+    "trending": "급상승",
+    "cardCount": "카드 수",
+    "topRated": "평점순"
   },
   "listing": {
     "cardCount": "{{count}}장",

@@ -16,7 +16,9 @@
   "sort": {
     "popular": "Popular",
     "newest": "Newest",
-    "cardCount": "Most Cards"
+    "trending": "Trending",
+    "cardCount": "Most Cards",
+    "topRated": "Top Rated"
   },
   "listing": {
     "cardCount": "{{count}} cards",

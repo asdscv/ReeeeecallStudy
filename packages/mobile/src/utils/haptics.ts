@@ -1,15 +1,20 @@
 import * as Haptics from 'expo-haptics'
+import { localPrefs } from './local-prefs'
 
 /**
  * Centralized, semantic haptics.
  *
  * Call sites express *intent* (tap / success / error …), not the underlying
  * Expo primitive — so the feel can be retuned, or haptics globally disabled
- * (future Settings toggle / reduced-haptics a11y), in this one file without
- * touching screens. All calls are fire-and-forget and swallow errors on
- * devices/simulators without a haptic engine.
+ * (Settings toggle), in this one file without touching screens. All calls are
+ * fire-and-forget and swallow errors on devices/simulators without a haptic
+ * engine.
+ *
+ * Initial enabled state is read synchronously from the persisted pref at module
+ * load (SecureStore is sync), so a user who disabled haptics never feels one on
+ * cold start. Settings updates both this runtime flag and the persisted pref.
  */
-let enabled = true
+let enabled = localPrefs.getHapticsEnabled()
 
 export function setHapticsEnabled(value: boolean): void {
   enabled = value
