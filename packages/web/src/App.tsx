@@ -163,6 +163,18 @@ function App() {
     }
   }, [user, registerSession, startHeartbeat])
 
+  // When the tab becomes visible again, re-register immediately so a backgrounded
+  // tab whose session row/token went stale is revalidated right away rather than
+  // waiting for the next heartbeat. (registerSession never kicks on transient.)
+  useEffect(() => {
+    if (!user) return
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void registerSession()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [user, registerSession])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
