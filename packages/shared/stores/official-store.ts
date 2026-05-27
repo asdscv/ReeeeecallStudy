@@ -1,6 +1,12 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { createStaleCache } from '../lib/cache/stale-cache'
 import type { OfficialAccount, OfficialListing, BadgeType } from '../types/database'
+
+// Official accounts/listings are admin-curated, read-only for normal viewers and
+// benign to serve slightly stale → TTL-cache the reads so MarketplacePage /
+// AdminOfficialPage don't refetch on every mount. Admin mutations invalidate.
+const officialCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
 interface OfficialState {
   officialAccounts: OfficialAccount[]
@@ -9,8 +15,8 @@ interface OfficialState {
   listingsLoading: boolean
   error: string | null
 
-  fetchOfficialAccounts: () => Promise<void>
-  fetchOfficialListings: (limit?: number) => Promise<void>
+  fetchOfficialAccounts: (opts?: { force?: boolean }) => Promise<void>
+  fetchOfficialListings: (limit?: number, opts?: { force?: boolean }) => Promise<void>
   setOfficialStatus: (
     userId: string,
     isOfficial: boolean,
@@ -39,21 +45,24 @@ export const useOfficialStore = create<OfficialState>((set, get) => ({
   listingsLoading: false,
   error: null,
 
-  fetchOfficialAccounts: async () => {
+  fetchOfficialAccounts: async (opts) => {
     if (get().loading) return
+    if (!officialCache.shouldFetch('accounts', opts)) return
     set({ loading: true, error: null })
     try {
       const { data, error } = await supabase.rpc('get_official_accounts')
       if (error) throw error
       set({ officialAccounts: (data ?? []) as OfficialAccount[], loading: false })
+      officialCache.markFetched('accounts')
     } catch (e) {
       const msg = (e && typeof e === 'object' && 'message' in e) ? String((e as { message: string }).message) : 'Failed to fetch official accounts'
       set({ error: msg, loading: false })
     }
   },
 
-  fetchOfficialListings: async (limit = 20) => {
+  fetchOfficialListings: async (limit = 20, opts) => {
     if (get().listingsLoading) return
+    if (!officialCache.shouldFetch('listings', opts)) return
     set({ listingsLoading: true, error: null })
     try {
       const { data, error } = await supabase.rpc('get_official_listings', {
@@ -61,6 +70,7 @@ export const useOfficialStore = create<OfficialState>((set, get) => ({
       } as Record<string, unknown>)
       if (error) throw error
       set({ officialListings: (data ?? []) as OfficialListing[], listingsLoading: false })
+      officialCache.markFetched('listings')
     } catch (e) {
       const msg = (e && typeof e === 'object' && 'message' in e) ? String((e as { message: string }).message) : 'Failed to fetch official listings'
       set({ error: msg, listingsLoading: false })
@@ -81,7 +91,10 @@ export const useOfficialStore = create<OfficialState>((set, get) => ({
         return { error: msg }
       }
 
-      // Refresh the list
+      // Admin change → invalidate cached reads so the refresh actually hits the
+      // network and the marketplace's official badges/listings reflect it.
+      officialCache.invalidate('accounts')
+      officialCache.invalidate('listings')
       await get().fetchOfficialAccounts()
       return { error: null }
     } catch (e) {
@@ -108,6 +121,8 @@ export const useOfficialStore = create<OfficialState>((set, get) => ({
         return { error: msg }
       }
 
+      officialCache.invalidate('accounts')
+      officialCache.invalidate('listings')
       await get().fetchOfficialAccounts()
       return { error: null }
     } catch (e) {
@@ -116,12 +131,14 @@ export const useOfficialStore = create<OfficialState>((set, get) => ({
     }
   },
 
-  reset: () =>
+  reset: () => {
+    officialCache.invalidate()
     set({
       officialAccounts: [],
       officialListings: [],
       loading: false,
       listingsLoading: false,
       error: null,
-    }),
+    })
+  },
 }))
