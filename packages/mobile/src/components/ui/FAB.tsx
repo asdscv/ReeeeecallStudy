@@ -1,6 +1,7 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
+import { haptics } from '../../utils/haptics'
 
 interface FABProps {
   onPress: () => void
@@ -11,10 +12,15 @@ interface FABProps {
 export function FAB({ onPress, icon = '+', testID }: FABProps) {
   const theme = useTheme()
 
+  const handlePress = () => {
+    haptics.tap()
+    onPress()
+  }
+
   return (
     <TouchableOpacity
       {...testProps(testID)}
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.8}
       style={[styles.fab, { backgroundColor: theme.colors.primary }]}
     >

@@ -15,6 +15,7 @@ import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-g
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { computeCardTextAttrs } from '../utils/card-text-style'
+import { haptics } from '../utils/haptics'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
@@ -102,6 +103,9 @@ export function StudySessionScreen() {
   const rotateY = useSharedValue(0)
   const translateX = useSharedValue(0)
   const cardScale = useSharedValue(1)
+  // Tracks whether the drag is currently past the commit threshold, so we tick
+  // a selection haptic exactly once each time it crosses (like Mail/Tinder).
+  const pastThreshold = useSharedValue(false)
 
   // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
@@ -261,9 +265,16 @@ export function StudySessionScreen() {
         [1, 0.85],
         Extrapolation.CLAMP,
       )
+      // Tick once on each threshold crossing (in either direction).
+      const past = Math.abs(e.translationX) >= SWIPE_THRESHOLD
+      if (past !== pastThreshold.value) {
+        pastThreshold.value = past
+        if (past) runOnJS(haptics.selection)()
+      }
     })
     .onEnd((e) => {
       const { translationX: tx, velocityX: vx } = e
+      pastThreshold.value = false
 
       // Mode-aware swipe ratings: cramming → missed/got_it, srs → again/good, other → unknown/known
       const leftRating = config?.mode === 'cramming' ? 'missed' : config?.mode === 'srs' ? 'again' : 'unknown'
