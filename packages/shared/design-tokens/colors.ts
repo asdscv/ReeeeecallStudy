@@ -144,9 +144,10 @@ export const darkTheme = {
   textTertiary: palette.gray[500],
   textInverse: palette.gray[900],
 
-  // Border
-  border: palette.gray[800],
-  borderSecondary: palette.gray[700],
+  // Border — must be LIGHTER than surface (gray800) to be visible on cards.
+  // gray800 borders were invisible against gray800 surfaces in dark mode.
+  border: palette.gray[700],
+  borderSecondary: palette.gray[600],
   borderFocus: palette.blue[500],
 
   // Semantic
