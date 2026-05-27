@@ -87,7 +87,7 @@ export function LandingNav() {
           {user ? (
             <Link
               to="/dashboard"
-              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline ml-1"
+              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline ml-1"
             >
               {t('nav.dashboard', 'Dashboard')}
             </Link>
@@ -98,7 +98,7 @@ export function LandingNav() {
               </Link>
               <Link
                 to="/auth/login"
-                className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline ml-1"
+                className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline ml-1"
               >
                 {t('nav.start', 'Get Started')}
               </Link>
@@ -114,7 +114,7 @@ export function LandingNav() {
           {user ? (
             <Link
               to="/dashboard"
-              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline"
+              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
             >
               {t('nav.dashboard', 'Dashboard')}
             </Link>
@@ -125,7 +125,7 @@ export function LandingNav() {
               </Link>
               <Link
                 to="/auth/login"
-                className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline"
+                className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
               >
                 {t('nav.start', 'Get Started')}
               </Link>
@@ -172,7 +172,7 @@ export function LandingNav() {
               <Link
                 to="/dashboard"
                 onClick={() => setMenuOpen(false)}
-                className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline text-center"
+                className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline text-center"
               >
                 {t('nav.dashboard', 'Dashboard')}
               </Link>
@@ -188,7 +188,7 @@ export function LandingNav() {
                 <Link
                   to="/auth/login"
                   onClick={() => setMenuOpen(false)}
-                  className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline text-center"
+                  className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline text-center"
                 >
                   {t('nav.start', 'Get Started')}
                 </Link>

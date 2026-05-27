@@ -122,7 +122,7 @@ export function ReportModal({ open, onClose, listingId }: ReportModalProps) {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="px-4 py-2 bg-destructive text-white rounded-lg text-sm font-medium hover:bg-destructive transition disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 bg-destructive text-white rounded-lg text-sm font-medium hover:bg-destructive-hover transition disabled:opacity-50 cursor-pointer"
               >
                 {submitting
                   ? t('marketplace:report.submitting', { defaultValue: 'Submitting...' })

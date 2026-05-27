@@ -39,7 +39,7 @@ export function ErrorStep({ error, onRetry, onBack }: ErrorStepProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand transition cursor-pointer"
+          className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
         >
           <RotateCcw className="w-4 h-4" />
           {t('errors.retry')}

@@ -250,7 +250,7 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
                 data-testid="export-submit"
                 onClick={handleExport}
                 disabled={(mode === 'cards' && !hasCards) || isExporting}
-                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px]"
+                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px]"
               >
                 {isExporting ? t('exporting') : t('export')}
               </button>

@@ -282,7 +282,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 cursor-pointer"
             >
               {loading ? t('form.saving') : editTemplate ? t('form.save') : t('form.create')}
             </button>

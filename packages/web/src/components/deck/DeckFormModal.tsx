@@ -124,7 +124,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
             <button
               type="submit"
               disabled={loading || !formValues.name.trim()}
-              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 cursor-pointer"
             >
               {loading ? t('form.saving') : editDeck ? t('form.save') : t('form.create')}
             </button>

@@ -356,7 +356,7 @@ export function AdminOfficialPage() {
                   type="button"
                   onClick={handleAddOfficial}
                   disabled={adding || !selectedUser}
-                  className="px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand cursor-pointer disabled:opacity-50 disabled:cursor-default"
+                  className="px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover cursor-pointer disabled:opacity-50 disabled:cursor-default"
                   data-testid="add-official-submit"
                 >
                   {adding ? t('loading', 'Loading...') : t('official.addSubmit', 'Add Official')}
@@ -490,7 +490,7 @@ export function AdminOfficialPage() {
                             type="button"
                             onClick={handleSaveEdit}
                             disabled={saving}
-                            className="px-2 py-1 text-xs bg-brand text-white rounded cursor-pointer hover:bg-brand disabled:opacity-50"
+                            className="px-2 py-1 text-xs bg-brand text-white rounded cursor-pointer hover:bg-brand-hover disabled:opacity-50"
                             data-testid={`official-save-${account.user_id}`}
                           >
                             {saving ? '...' : t('official.save', 'Save')}

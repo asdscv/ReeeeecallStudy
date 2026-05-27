@@ -181,7 +181,7 @@ export function DeckEditPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand disabled:opacity-50 cursor-pointer transition"
+            className="flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover disabled:opacity-50 cursor-pointer transition"
           >
             <Save size={16} />
             {saving ? `${t('edit.save')}...` : t('edit.save')}

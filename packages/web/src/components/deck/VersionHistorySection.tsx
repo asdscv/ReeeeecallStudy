@@ -78,7 +78,7 @@ export function VersionHistorySection({ deckId, isOwner }: VersionHistorySection
           <button
             onClick={handleCreate}
             disabled={creating}
-            className="px-4 py-1.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
+            className="px-4 py-1.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 cursor-pointer"
           >
             {creating
               ? t('decks:detail.creatingVersion', { defaultValue: 'Creating...' })

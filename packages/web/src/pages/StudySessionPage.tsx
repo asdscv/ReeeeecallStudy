@@ -357,7 +357,7 @@ export function StudySessionPage() {
           <p className="text-muted-foreground mb-6">{t('session.allReviewed')}</p>
           <button
             onClick={handleExit}
-            className="px-6 py-3 bg-brand text-white rounded-lg hover:bg-brand cursor-pointer"
+            className="px-6 py-3 bg-brand text-white rounded-lg hover:bg-brand-hover cursor-pointer"
           >
             {t('session.backToDeck')}
           </button>

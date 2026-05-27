@@ -363,7 +363,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
               <button
                 type="submit"
                 disabled={loading || uploadingField !== null}
-                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 cursor-pointer"
               >
                 {loading ? t('saving') : editCard ? t('edit') : t('add')}
               </button>

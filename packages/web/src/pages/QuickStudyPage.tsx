@@ -278,7 +278,7 @@ export function QuickStudyPage() {
                 <button
                   onClick={handleStartStudy}
                   disabled={dateCardCount === 0}
-                  className="w-full mt-4 py-3 bg-brand hover:bg-brand disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
+                  className="w-full mt-4 py-3 bg-brand hover:bg-brand-hover disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   {t('quickStudy.startStudy')}
                 </button>
@@ -355,7 +355,7 @@ export function QuickStudyPage() {
                 </p>
                 <button
                   onClick={handleStartStudy}
-                  className="w-full mt-4 py-3 bg-brand hover:bg-brand text-white font-medium rounded-xl transition cursor-pointer"
+                  className="w-full mt-4 py-3 bg-brand hover:bg-brand-hover text-white font-medium rounded-xl transition cursor-pointer"
                 >
                   {t('quickStudy.startStudy')}
                 </button>

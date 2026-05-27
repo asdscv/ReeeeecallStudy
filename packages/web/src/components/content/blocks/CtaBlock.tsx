@@ -22,7 +22,7 @@ export function CtaBlock({ props }: { props: CtaBlockType['props'] }) {
       <Link
         to={props.buttonUrl}
         onClick={handleClick}
-        className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand text-white font-semibold rounded-xl hover:bg-brand transition no-underline"
+        className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand text-white font-semibold rounded-xl hover:bg-brand-hover transition no-underline"
       >
         {stripMarkdownText(props.buttonText)}
         <ArrowRight className="w-5 h-5" />
