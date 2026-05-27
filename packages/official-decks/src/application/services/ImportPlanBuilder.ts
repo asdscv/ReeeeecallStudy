@@ -132,6 +132,7 @@ function buildSinglePlan(
     tags: meta.tags,
     languagePair: pair,
     learningLanguage: meta.learningLanguage,
+    nativeLanguages: meta.nativeLanguages,
     sourceFile: csv.filename,
     templateId: meta.templateId,
     cards,

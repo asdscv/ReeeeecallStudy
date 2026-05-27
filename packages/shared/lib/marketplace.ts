@@ -19,8 +19,12 @@ export interface MarketplaceListingData {
   difficulty_level?: string | null
   learning_language?: string | null
   /** Optional explicit native-language column (future-proof). When absent it is
-   *  derived from the `source:<lang>` tag the official pipeline emits. */
+   *  derived from the `source:<lang>` tag the official pipeline emits. Kept as
+   *  the primary (first) of `native_languages` for backward compatibility. */
   native_language?: string | null
+  /** Multi-select native (explanation) languages — a deck can serve several
+   *  language communities. Preferred over `native_language` when present. */
+  native_languages?: string[] | null
   study_level?: string | null
 }
 
@@ -81,12 +85,22 @@ const LANGUAGE_CATEGORY_FAMILY = new Set([
   'beginner', 'intermediate', 'advanced', 'conversation',
 ])
 
-/** Native (explanation) language of a listing: explicit column if present,
- *  else parsed from the `source:<lang>` tag emitted by the official pipeline. */
-export function getNativeLanguage(listing: MarketplaceListingData): string | null {
-  if (listing.native_language) return listing.native_language
+/** Native (explanation) language(s) of a listing, as an array. Priority:
+ *  the `native_languages[]` column → the legacy scalar `native_language` →
+ *  the `source:<lang>` tag emitted by the official pipeline. Encapsulates the
+ *  source precedence so call sites depend only on "the deck's native languages". */
+export function getNativeLanguages(listing: MarketplaceListingData): string[] {
+  if (listing.native_languages && listing.native_languages.length > 0) {
+    return listing.native_languages
+  }
+  if (listing.native_language) return [listing.native_language]
   const tag = listing.tags?.find((t) => t.startsWith('source:'))
-  return tag ? tag.slice('source:'.length) : null
+  return tag ? [tag.slice('source:'.length)] : []
+}
+
+/** Primary native language (first of {@link getNativeLanguages}) or null. */
+export function getNativeLanguage(listing: MarketplaceListingData): string | null {
+  return getNativeLanguages(listing)[0] ?? null
 }
 
 /** Whether a listing is a language-learning deck (for the Language topic filter). */
@@ -194,8 +208,9 @@ export function filterListings(
     }
 
     if (filters.nativeLanguages && filters.nativeLanguages.length > 0) {
-      const native = getNativeLanguage(listing)
-      if (!native || !filters.nativeLanguages.includes(native)) return false
+      // Match if ANY of the deck's native languages is among the selected ones.
+      const deckNatives = getNativeLanguages(listing)
+      if (!deckNatives.some((n) => filters.nativeLanguages!.includes(n))) return false
     }
 
     if (filters.query) {

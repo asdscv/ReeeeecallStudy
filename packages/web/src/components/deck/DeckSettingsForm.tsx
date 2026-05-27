@@ -23,7 +23,7 @@ export interface DeckSettingsFormValues {
   icon: string
   templateId: string
   learningLanguage: string
-  nativeLanguage: string
+  nativeLanguages: string[]
   studyLevel: string
   srsSettings: SrsSettings
 }
@@ -36,11 +36,18 @@ interface DeckSettingsFormProps {
 
 export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFormProps) {
   const { t } = useTranslation(['decks', 'marketplace'])
-  const { name, description, color, icon, templateId, learningLanguage, nativeLanguage, studyLevel, srsSettings } = values
+  const { name, description, color, icon, templateId, learningLanguage, nativeLanguages, studyLevel, srsSettings } = values
 
   const update = (patch: Partial<DeckSettingsFormValues>) => {
     onChange({ ...values, ...patch })
   }
+
+  const toggleNative = (lang: string) =>
+    update({
+      nativeLanguages: nativeLanguages.includes(lang)
+        ? nativeLanguages.filter((l) => l !== lang)
+        : [...nativeLanguages, lang],
+    })
 
   const updateSrsField = (key: keyof SrsSettings, value: number) => {
     update({ srsSettings: { ...srsSettings, [key]: Math.max(0, Math.min(365, value)) } })
@@ -163,23 +170,34 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         </select>
       </div>
 
-      {/* 모국어 */}
+      {/* 모국어 (다중 선택) */}
       <div>
         <label className="block text-sm font-medium text-foreground mb-1">
           {t('nativeLanguage.label', { ns: 'marketplace' })}
+          <span className="ml-2 text-xs font-normal text-muted-foreground">
+            {t('nativeLanguage.multiHint', { ns: 'marketplace', defaultValue: 'Select all that apply' })}
+          </span>
         </label>
-        <select
-          value={nativeLanguage}
-          onChange={(e) => update({ nativeLanguage: e.target.value })}
-          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
-        >
-          <option value="">{t('nativeLanguage.none', { ns: 'marketplace' })}</option>
-          {NATIVE_LANGUAGES.map((l) => (
-            <option key={l.value} value={l.value}>
-              {t(l.labelKey, { ns: 'marketplace' })}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap gap-2">
+          {NATIVE_LANGUAGES.map((l) => {
+            const active = nativeLanguages.includes(l.value)
+            return (
+              <button
+                key={l.value}
+                type="button"
+                onClick={() => toggleNative(l.value)}
+                aria-pressed={active}
+                className={`px-3 py-1.5 rounded-full text-sm border transition cursor-pointer ${
+                  active
+                    ? 'bg-brand text-brand-foreground border-brand'
+                    : 'bg-card text-foreground border-border hover:bg-accent'
+                }`}
+              >
+                {active ? '✓ ' : ''}{t(l.labelKey, { ns: 'marketplace' })}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* 학습 수준 */}

@@ -23,6 +23,7 @@ export class SupabaseDeckImportGateway implements DeckImportGateway {
         source_language: deck.languagePair.source,
         target_language: deck.languagePair.target,
         learning_language: deck.learningLanguage,
+        native_languages: deck.nativeLanguages,
       },
       p_cards: deck.cards.map(toCardPayload),
     };

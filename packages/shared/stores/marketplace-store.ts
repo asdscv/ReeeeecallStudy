@@ -93,7 +93,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
     // listings are filterable in the marketplace.
     const { data: deckRow } = await supabase
       .from('decks')
-      .select('native_language, study_level')
+      .select('native_language, native_languages, study_level')
       .eq('id', input.deckId)
       .single()
 
@@ -110,6 +110,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         card_count: count ?? 0,
         learning_language: input.learningLanguage ?? null,
         native_language: (deckRow as { native_language?: string | null } | null)?.native_language ?? null,
+        native_languages: (deckRow as { native_languages?: string[] | null } | null)?.native_languages ?? null,
         study_level: (deckRow as { study_level?: string | null } | null)?.study_level ?? null,
         is_active: true,
       } as Record<string, unknown>)
