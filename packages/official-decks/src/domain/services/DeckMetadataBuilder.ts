@@ -22,6 +22,11 @@ export interface DeckMetadata {
   readonly templateKind: "word" | "phrase";
   readonly templateId: CardTemplateId;
   readonly learningLanguage: LanguageCode;
+  /** Native (explanation / back-side) language(s). Rule: front=learning, back=
+   *  native. Forward EN→X ⇒ [X]; reverse vocab X→EN ⇒ ['en'] (explanation is
+   *  English, for English natives); reverse conversation ⇒ [source] (native-
+   *  production deck, e.g. a Korean speaker practising English). */
+  readonly nativeLanguages: readonly LanguageCode[];
 }
 
 const CATEGORY_COLOR: Record<DeckCategory, string> = {
@@ -81,6 +86,18 @@ export function buildDeckMetadata(
   const learningLanguage: LanguageCode =
     pair.source === "en" || pair.target === "en" ? "en" : pair.target;
 
+  // Native (back) language(s). Forward EN→X: back is X. Reverse X→EN: back is
+  // English — vocab decks are then for English natives (['en']); conversation
+  // decks stay native-side (the learner's own language → production practice).
+  const nativeLanguages: readonly LanguageCode[] =
+    pair.source === "en"
+      ? [pair.target]
+      : pair.target === "en"
+        ? isConversation
+          ? [pair.source]
+          : ["en"]
+        : [pair.source];
+
   const tags: string[] = [
     "official",
     `category:${category}`,
@@ -106,6 +123,7 @@ export function buildDeckMetadata(
     templateKind,
     templateId,
     learningLanguage,
+    nativeLanguages,
   };
 }
 
