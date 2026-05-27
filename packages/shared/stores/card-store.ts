@@ -6,13 +6,13 @@ import type { Card } from '../types/database'
 
 /**
  * Card mutations change the per-deck card/SRS counts surfaced by
- * get_deck_stats (deck list + Quick Study). The deck store caches stats for
- * STALE_AFTER_MS, and consumers fetch on focus without `force`, so we must
- * invalidate that cache here or the deck list keeps showing stale counts
- * until the cache expires. (deck-store does not import card-store → no cycle.)
+ * get_deck_stats (deck list + Quick Study). The deck store caches stats with a
+ * TTL, and consumers fetch on focus without `force`, so we must invalidate that
+ * cache here or the deck list keeps showing stale counts until the TTL expires.
+ * (deck-store does not import card-store → no cycle.)
  */
 function invalidateDeckStats(): void {
-  useDeckStore.setState({ statsFetchedAt: null })
+  useDeckStore.getState().invalidate('stats')
 }
 
 interface CardState {

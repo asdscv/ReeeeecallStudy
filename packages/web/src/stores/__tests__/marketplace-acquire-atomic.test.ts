@@ -62,15 +62,15 @@ beforeEach(() => {
     templates: [],
     loading: false,
     error: null,
-    decksFetchedAt: null,
-    statsFetchedAt: null,
-    templatesFetchedAt: null,
   })
+  // NOTE: these tests never call fetchDecks, so the deck TTL cache is irrelevant
+  // here; we assert acquire's invalidation by spying on the `invalidate` action.
+  vi.restoreAllMocks()
 })
 
 describe('acquireDeck — atomic single-RPC contract', () => {
   it('T1: subscribe — calls acquire_listing once, wasNew=true, invalidates cache', async () => {
-    useDeckStore.setState({ decksFetchedAt: Date.now() - 60_000 })
+    const invalidateSpy = vi.spyOn(useDeckStore.getState(), 'invalidate')
 
     mockRpc.mockResolvedValue({
       data: [{ acquired_deck_id: DECK_ID, is_new_acquisition: true }],
@@ -85,7 +85,9 @@ describe('acquireDeck — atomic single-RPC contract', () => {
     expect(result).toEqual({ deckId: DECK_ID, wasNew: true })
     expect(mockRpc).toHaveBeenCalledTimes(1)
     expect(mockRpc).toHaveBeenCalledWith('acquire_listing', { p_listing_id: LISTING_ID })
-    expect(useDeckStore.getState().decksFetchedAt).toBeNull()
+    // New acquisition must invalidate the deck cache so the new deck + its stats refetch.
+    expect(invalidateSpy).toHaveBeenCalledWith('decks')
+    expect(invalidateSpy).toHaveBeenCalledWith('stats')
   })
 
   it('T2: copy — RPC returns new copied deck id', async () => {
@@ -105,8 +107,7 @@ describe('acquireDeck — atomic single-RPC contract', () => {
   })
 
   it('T3: idempotent — already acquired returns wasNew=false, does NOT invalidate cache', async () => {
-    const cachedAt = Date.now() - 60_000
-    useDeckStore.setState({ decksFetchedAt: cachedAt })
+    const invalidateSpy = vi.spyOn(useDeckStore.getState(), 'invalidate')
 
     mockRpc.mockResolvedValue({
       data: [{ acquired_deck_id: DECK_ID, is_new_acquisition: false }],
@@ -119,12 +120,11 @@ describe('acquireDeck — atomic single-RPC contract', () => {
     })
 
     expect(result).toEqual({ deckId: DECK_ID, wasNew: false })
-    expect(useDeckStore.getState().decksFetchedAt).toBe(cachedAt)
+    expect(invalidateSpy).not.toHaveBeenCalled()
   })
 
   it('T4: P0001 own-listing — result null, cache unchanged, error set', async () => {
-    const cachedAt = Date.now() - 60_000
-    useDeckStore.setState({ decksFetchedAt: cachedAt })
+    const invalidateSpy = vi.spyOn(useDeckStore.getState(), 'invalidate')
 
     mockRpc.mockResolvedValue({
       data: null,
@@ -137,13 +137,12 @@ describe('acquireDeck — atomic single-RPC contract', () => {
     })
 
     expect(result).toBeNull()
-    expect(useDeckStore.getState().decksFetchedAt).toBe(cachedAt)
+    expect(invalidateSpy).not.toHaveBeenCalled()
     expect(useMarketplaceStore.getState().error).toBeTruthy()
   })
 
   it('T5: P0002 not-found — result null, cache unchanged', async () => {
-    const cachedAt = Date.now() - 60_000
-    useDeckStore.setState({ decksFetchedAt: cachedAt })
+    const invalidateSpy = vi.spyOn(useDeckStore.getState(), 'invalidate')
 
     mockRpc.mockResolvedValue({
       data: null,
@@ -156,12 +155,11 @@ describe('acquireDeck — atomic single-RPC contract', () => {
     })
 
     expect(result).toBeNull()
-    expect(useDeckStore.getState().decksFetchedAt).toBe(cachedAt)
+    expect(invalidateSpy).not.toHaveBeenCalled()
   })
 
   it('T6: network/unknown error — result null, cache unchanged', async () => {
-    const cachedAt = Date.now() - 60_000
-    useDeckStore.setState({ decksFetchedAt: cachedAt })
+    const invalidateSpy = vi.spyOn(useDeckStore.getState(), 'invalidate')
 
     mockRpc.mockResolvedValue({
       data: null,
@@ -174,7 +172,7 @@ describe('acquireDeck — atomic single-RPC contract', () => {
     })
 
     expect(result).toBeNull()
-    expect(useDeckStore.getState().decksFetchedAt).toBe(cachedAt)
+    expect(invalidateSpy).not.toHaveBeenCalled()
   })
 
   it('T7: concurrent double-tap — both calls resolve with same deck_id', async () => {
