@@ -2,8 +2,9 @@
   "title": "ตลาด",
   "searchPlaceholder": "ค้นหาสำรับ...",
   "noResults": "ไม่พบผลการค้นหา",
-  "noResultsHint": "Try a different search or category",
+  "noResultsHint": "ลองค้นหาหรือเลือกหมวดอื่น",
   "categories": {
+    "all": "ทั้งหมด",
     "general": "ทั่วไป",
     "language": "ภาษา",
     "science": "วิทยาศาสตร์",
@@ -15,9 +16,11 @@
     "other": "อื่นๆ"
   },
   "sort": {
-    "popular": "Popular",
-    "newest": "Newest",
-    "cardCount": "Most Cards"
+    "popular": "ยอดนิยม",
+    "newest": "ใหม่ล่าสุด",
+    "cardCount": "การ์ดมากสุด",
+    "trending": "มาแรง",
+    "topRated": "คะแนนสูงสุด"
   },
   "listing": {
     "cardCount": "{{count}} การ์ด",
