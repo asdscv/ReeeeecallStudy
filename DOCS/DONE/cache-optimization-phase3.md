@@ -1,6 +1,6 @@
 # Cache Optimization — Phase 3 (official-store read caching)
 
-> Builds on Phase 1 utility (`DOCS/DONE/cache-optimization.md`). Same util, same rigor.
+> Status: ✅ SHIPPED (PR #119→#120). Builds on Phase 1 utility (`DOCS/DONE/cache-optimization.md`). Same util, same rigor.
 
 ## Target: official-store reads (web)
 `official-store` (shared; consumed by **web** MarketplacePage + AdminOfficialPage —
