@@ -2,8 +2,9 @@
   "title": "市场",
   "searchPlaceholder": "搜索牌组...",
   "noResults": "没有搜索结果。",
-  "noResultsHint": "Try a different search or category",
+  "noResultsHint": "尝试其他搜索词或分类",
   "categories": {
+    "all": "全部",
     "general": "综合",
     "language": "语言",
     "science": "科学",
@@ -15,9 +16,11 @@
     "other": "其他"
   },
   "sort": {
-    "popular": "Popular",
-    "newest": "Newest",
-    "cardCount": "Most Cards"
+    "popular": "热门",
+    "newest": "最新",
+    "cardCount": "卡片最多",
+    "trending": "趋势",
+    "topRated": "评分最高"
   },
   "listing": {
     "cardCount": "{{count}} 张卡片",
