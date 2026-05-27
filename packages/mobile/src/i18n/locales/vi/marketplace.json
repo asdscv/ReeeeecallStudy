@@ -127,5 +127,21 @@
     "intermediate": "Trung cấp",
     "upper_intermediate": "Trung cao cấp",
     "advanced": "Cao cấp"
+  },
+  "verifiedOnly": "Đã xác minh",
+  "advancedFilters": "Nâng cao",
+  "dateRange": {
+    "label": "Đăng trong",
+    "7d": "7 ngày qua",
+    "30d": "30 ngày qua",
+    "90d": "90 ngày qua",
+    "all": "Mọi lúc"
+  },
+  "shareMode": {
+    "label": "Chế độ chia sẻ",
+    "all": "Tất cả",
+    "copy": "Sao chép",
+    "subscribe": "Đăng ký",
+    "snapshot": "Ảnh chụp"
   }
 }

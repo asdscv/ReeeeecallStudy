@@ -127,5 +127,21 @@
     "intermediate": "ระดับกลาง",
     "upper_intermediate": "ระดับกลาง-สูง",
     "advanced": "ระดับสูง"
+  },
+  "verifiedOnly": "ยืนยันแล้ว",
+  "advancedFilters": "ขั้นสูง",
+  "dateRange": {
+    "label": "เผยแพร่ใน",
+    "7d": "7 วันล่าสุด",
+    "30d": "30 วันล่าสุด",
+    "90d": "90 วันล่าสุด",
+    "all": "ทุกช่วงเวลา"
+  },
+  "shareMode": {
+    "label": "โหมดแชร์",
+    "all": "ทั้งหมด",
+    "copy": "คัดลอก",
+    "subscribe": "ติดตาม",
+    "snapshot": "สแน็ปช็อต"
   }
 }

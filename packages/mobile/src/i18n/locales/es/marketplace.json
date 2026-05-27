@@ -127,5 +127,21 @@
     "intermediate": "Intermedio",
     "upper_intermediate": "Intermedio alto",
     "advanced": "Avanzado"
+  },
+  "verifiedOnly": "Verificado",
+  "advancedFilters": "Avanzado",
+  "dateRange": {
+    "label": "Publicado en",
+    "7d": "Últimos 7 d",
+    "30d": "Últimos 30 d",
+    "90d": "Últimos 90 d",
+    "all": "Todo el tiempo"
+  },
+  "shareMode": {
+    "label": "Modo de compartir",
+    "all": "Todo",
+    "copy": "Copiar",
+    "subscribe": "Suscribir",
+    "snapshot": "Instantánea"
   }
 }

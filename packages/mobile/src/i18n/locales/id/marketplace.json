@@ -127,5 +127,21 @@
     "intermediate": "Menengah",
     "upper_intermediate": "Menengah Atas",
     "advanced": "Lanjutan"
+  },
+  "verifiedOnly": "Terverifikasi",
+  "advancedFilters": "Lanjutan",
+  "dateRange": {
+    "label": "Diterbitkan dalam",
+    "7d": "7 hari terakhir",
+    "30d": "30 hari terakhir",
+    "90d": "90 hari terakhir",
+    "all": "Sepanjang waktu"
+  },
+  "shareMode": {
+    "label": "Mode berbagi",
+    "all": "Semua",
+    "copy": "Salin",
+    "subscribe": "Langganan",
+    "snapshot": "Snapshot"
   }
 }
