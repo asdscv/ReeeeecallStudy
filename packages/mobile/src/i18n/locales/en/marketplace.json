@@ -93,5 +93,32 @@
   "nativeLanguage": {
     "label": "Native language",
     "all": "All"
+  },
+  "publisherStats": {
+    "title": "Publisher Stats",
+    "dashboard": "Publisher Dashboard",
+    "listings": "Listings",
+    "views": "Views",
+    "acquires": "Acquires",
+    "conversion": "Conv.",
+    "yourListings": "Your Listings",
+    "dailyViews": "Daily Views (30 days)",
+    "topListings": "Top Listings by Views",
+    "recentAcquisitions": "Recent Acquisitions",
+    "noAcquisitions": "No acquisitions yet",
+    "recentReviews": "Recent Reviews",
+    "noReviews": "No reviews yet",
+    "active": "Active",
+    "inactive": "Inactive",
+    "viewsCount": "{{value}} views",
+    "acquiresCount": "{{value}} acquires",
+    "convCount": "{{value}}% conv",
+    "anonymous": "Anonymous",
+    "acquiredActivity": "{{user}} acquired {{deck}}",
+    "emptyTitle": "No Published Listings",
+    "emptyDesc": "Publish a deck to start tracking stats.",
+    "minutesAgo": "{{n}}m ago",
+    "hoursAgo": "{{n}}h ago",
+    "daysAgo": "{{n}}d ago"
   }
 }

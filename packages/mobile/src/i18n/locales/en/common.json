@@ -100,5 +100,10 @@
       "description": "Discover shared decks from other users. Find study materials for any subject and start learning instantly.",
       "action": "Browse Marketplace"
     }
+  },
+  "drawerTips": {
+    "hamburger": "Tap the menu (☰) to navigate",
+    "dashboard": "Dashboard shows your study stats & streaks",
+    "quickStudy": "Quick Study starts a session instantly"
   }
 }

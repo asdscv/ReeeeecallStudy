@@ -86,5 +86,32 @@
   "nativeLanguage": {
     "label": "ภาษาแม่",
     "all": "ทั้งหมด"
+  },
+  "publisherStats": {
+    "title": "สถิติผู้เผยแพร่",
+    "dashboard": "แดชบอร์ดผู้เผยแพร่",
+    "listings": "รายการ",
+    "views": "การดู",
+    "acquires": "การรับ",
+    "conversion": "แปลง",
+    "yourListings": "รายการของคุณ",
+    "dailyViews": "การดูรายวัน (30 วัน)",
+    "topListings": "รายการยอดดูสูงสุด",
+    "recentAcquisitions": "การรับล่าสุด",
+    "noAcquisitions": "ยังไม่มีการรับ",
+    "recentReviews": "รีวิวล่าสุด",
+    "noReviews": "ยังไม่มีรีวิว",
+    "active": "ใช้งาน",
+    "inactive": "ไม่ใช้งาน",
+    "viewsCount": "{{value}} การดู",
+    "acquiresCount": "{{value}} การรับ",
+    "convCount": "แปลง {{value}}%",
+    "anonymous": "ไม่ระบุชื่อ",
+    "acquiredActivity": "{{user}} ได้รับ {{deck}}",
+    "emptyTitle": "ยังไม่มีรายการที่เผยแพร่",
+    "emptyDesc": "เผยแพร่เด็คเพื่อเริ่มเก็บสถิติ",
+    "minutesAgo": "{{n}} นาทีที่แล้ว",
+    "hoursAgo": "{{n}} ชม.ที่แล้ว",
+    "daysAgo": "{{n}} วันที่แล้ว"
   }
 }
