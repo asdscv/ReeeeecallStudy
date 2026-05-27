@@ -82,13 +82,10 @@ const MOCK_OFFICIAL_LISTING = {
 
 describe('useOfficialStore', () => {
   beforeEach(() => {
-    useOfficialStore.setState({
-      officialAccounts: [],
-      officialListings: [],
-      loading: false,
-      listingsLoading: false,
-      error: null,
-    })
+    // reset() clears store state AND the module-level TTL cache → test isolation
+    // (otherwise a fetch in one test marks the key fresh and the next test's
+    // fetch would be skipped).
+    useOfficialStore.getState().reset()
     vi.clearAllMocks()
   })
 
@@ -164,6 +161,43 @@ describe('useOfficialStore', () => {
 
       expect(useOfficialStore.getState().error).toBe('Network error')
       expect(useOfficialStore.getState().officialListings).toHaveLength(0)
+    })
+  })
+
+  // ── TTL cache ─────────────────────────────────────────────
+  describe('read caching', () => {
+    it('does not re-fetch accounts within the TTL', async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null })
+      await act(async () => { await useOfficialStore.getState().fetchOfficialAccounts() })
+      mockRpc.mockClear()
+      await act(async () => { await useOfficialStore.getState().fetchOfficialAccounts() })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it('re-fetches accounts when forced', async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null })
+      await act(async () => { await useOfficialStore.getState().fetchOfficialAccounts() })
+      mockRpc.mockClear()
+      await act(async () => { await useOfficialStore.getState().fetchOfficialAccounts({ force: true }) })
+      expect(mockRpc).toHaveBeenCalledWith('get_official_accounts')
+    })
+
+    it('does not re-fetch listings within the TTL', async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null })
+      await act(async () => { await useOfficialStore.getState().fetchOfficialListings() })
+      mockRpc.mockClear()
+      await act(async () => { await useOfficialStore.getState().fetchOfficialListings() })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it('admin mutation invalidates the accounts cache (refresh hits network)', async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null })
+      // prime the cache
+      await act(async () => { await useOfficialStore.getState().fetchOfficialAccounts() })
+      mockRpc.mockClear()
+      // setOfficialStatus: admin_set_official + invalidate + refresh fetch
+      await act(async () => { await useOfficialStore.getState().setOfficialStatus(TEST_USER_ID, true) })
+      expect(mockRpc).toHaveBeenCalledWith('get_official_accounts')
     })
   })
 
