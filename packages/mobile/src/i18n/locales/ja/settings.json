@@ -8,9 +8,14 @@
     "namePlaceholder": "名前を入力",
     "saveBtn": "保存",
     "nameSaved": "名前を保存しました！",
-    "nameAvailable": "使用可能",
-    "nameTaken": "この名前は既に使われています",
-    "nameLength": "名前は2〜12文字で入力してください"
+    "nameAvailable": "使用可能な名前です！",
+    "nameTaken": "この名前は使用されています",
+    "nameLength": "名前は2〜12文字で入力してください",
+    "save": "保存",
+    "checkingName": "利用可能か確認中...",
+    "nameLengthError": "2〜12文字で入力してください",
+    "savedTitle": "保存しました",
+    "savedMessage": "表示名を更新しました。"
   },
   "language": {
     "title": "言語",
@@ -39,7 +44,11 @@
     "buttonDesc": "ボタンを押して回答を選択",
     "swipe": "スワイプ",
     "swipeDesc": "カードをスワイプして回答を選択",
-    "swipeAutoNote": "スワイプ方向は学習モードに応じて自動設定されます。\n• SRS: ← Again / → Good\n• その他: ← 分からない / → 知っている"
+    "swipeAutoNote": "スワイプ方向は学習モードに応じて自動設定されます。\n• SRS: ← Again / → Good\n• その他: ← 分からない / → 知っている",
+    "before": "先に",
+    "same": "同時",
+    "after": "後で",
+    "timingDesc": "表面で直接評価（めくる前に解答）するか、先に解答を見ます。"
   },
   "tts": {
     "title": "TTS自動読み上げ",
@@ -64,20 +73,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "カード生成用のAIプロバイダーを設定します。キーはサーバーで暗号化され、デバイス間で同期されます。",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "APIキーはサーバーで暗号化（pgcrypto + Vault、平文保存なし）され、Web・モバイル間で同期されます。",
+    "configured": "設定済み",
+    "notSet": "未設定",
+    "model": "モデル",
+    "saving": "保存中...",
+    "delete": "削除",
+    "deletedTitle": "削除しました",
+    "saveSuccess": "{{provider}} APIキーを保存しました。",
+    "saveError": "APIキーの保存に失敗しました。",
+    "removed": "{{provider}} APIキーを削除しました。"
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "権限が必要です"
   },
   "subscription": {
     "title": "Subscription",
@@ -102,5 +121,47 @@
     "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
     "apiDocs": "APIドキュメント",
     "apiDocsDesc": "APIエンドポイント、認証、使用例"
+  },
+  "quickActions": {
+    "quickStudy": "クイック学習",
+    "aiGenerate": "AI生成",
+    "invite": "招待"
+  },
+  "templates": {
+    "title": "カードテンプレート",
+    "description": "カードテンプレート・項目・レイアウトを管理"
+  },
+  "shares": {
+    "title": "共有",
+    "description": "共有デッキと招待を管理"
+  },
+  "publisher": {
+    "title": "パブリッシャーダッシュボード",
+    "description": "公開デッキの統計を表示"
+  },
+  "newCardLimit": {
+    "title": "新規カード上限",
+    "hint": "デッキごとに毎日の復習キューへ自動追加される新規カード数。"
+  },
+  "dailyGoal": {
+    "title": "1日の学習目標",
+    "placeholder": "例: 30",
+    "hint": "1日の学習目標（分）を設定。空欄で目標なし。"
+  },
+  "theme": {
+    "title": "テーマ",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
+  },
+  "export": {
+    "title": "データをエクスポート",
+    "stats": "学習統計",
+    "sessions": "学習セッション",
+    "decks": "デッキ",
+    "cards": "カード"
+  },
+  "alerts": {
+    "error": "エラー"
   }
 }
