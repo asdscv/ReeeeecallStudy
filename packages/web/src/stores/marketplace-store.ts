@@ -170,7 +170,11 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
     }
 
     if (row.is_new_acquisition) {
-      useDeckStore.setState({ decksFetchedAt: null })
+      // Invalidate decks + stats so the newly acquired deck appears with its real
+      // card count (get_deck_stats covers subscribed decks) on next focus fetch.
+      const deckStore = useDeckStore.getState()
+      deckStore.invalidate('decks')
+      deckStore.invalidate('stats')
     }
 
     return { deckId: row.acquired_deck_id, wasNew: !!row.is_new_acquisition }

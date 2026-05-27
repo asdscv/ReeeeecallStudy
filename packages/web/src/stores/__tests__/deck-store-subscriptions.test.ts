@@ -55,10 +55,10 @@ beforeEach(() => {
     templates: [],
     loading: false,
     error: null,
-    decksFetchedAt: null,
-    statsFetchedAt: null,
-    templatesFetchedAt: null,
   })
+  // Freshness now lives in the store's TTL cache (not Zustand state); clear it so
+  // each test's fetchDecks() actually hits the (mocked) network.
+  useDeckStore.getState().invalidate()
 })
 
 describe('useDeckStore.fetchDecks — subscription merge', () => {
