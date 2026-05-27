@@ -21,6 +21,7 @@ export interface MarketplaceListingData {
   /** Optional explicit native-language column (future-proof). When absent it is
    *  derived from the `source:<lang>` tag the official pipeline emits. */
   native_language?: string | null
+  study_level?: string | null
 }
 
 export interface ListingFilters {
@@ -33,6 +34,7 @@ export interface ListingFilters {
   dateRange?: '7d' | '30d' | '90d' | 'all'
   verifiedOnly?: boolean
   difficulty?: string
+  studyLevel?: string
   learningLanguage?: string
   /** Native (explanation) language(s) — multi-select. A listing matches if its
    *  native language is any of these. Empty/undefined means no native filter. */
@@ -62,6 +64,14 @@ export const LEARNING_LANGUAGES = [
 // value set as learning languages; we reuse the per-language labels and only
 // add nativeLanguage.label / nativeLanguage.all in i18n.
 export const NATIVE_LANGUAGES = LEARNING_LANGUAGES
+
+export const STUDY_LEVELS = [
+  { value: 'beginner', labelKey: 'marketplace:studyLevel.beginner' },
+  { value: 'upper_beginner', labelKey: 'marketplace:studyLevel.upper_beginner' },
+  { value: 'intermediate', labelKey: 'marketplace:studyLevel.intermediate' },
+  { value: 'upper_intermediate', labelKey: 'marketplace:studyLevel.upper_intermediate' },
+  { value: 'advanced', labelKey: 'marketplace:studyLevel.advanced' },
+] as const
 
 // "Language" is a study TOPIC. Decks are tagged by level/exam (toeic, beginner,
 // …) rather than the topic, so selecting the Language category must match the
@@ -132,6 +142,7 @@ export function countActiveFilters(filters: ListingFilters): number {
   if (filters.minRating && filters.minRating > 0) count++
   if (filters.tags && filters.tags.length > 0) count++
   if (filters.difficulty) count++
+  if (filters.studyLevel) count++
   if (filters.learningLanguage) count++
   if (filters.nativeLanguages && filters.nativeLanguages.length > 0) count++
   return count
@@ -217,6 +228,8 @@ export function filterListings(
     if (filters.difficulty) {
       if (listing.difficulty_level !== filters.difficulty) return false
     }
+
+    if (filters.studyLevel && listing.study_level !== filters.studyLevel) return false
 
     if (filters.learningLanguage && listing.learning_language !== filters.learningLanguage) return false
 

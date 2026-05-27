@@ -85,7 +85,8 @@
   },
   "nativeLanguage": {
     "label": "Idioma nativo",
-    "all": "Todos"
+    "all": "Todos",
+    "none": "Sin especificar"
   },
   "publisherStats": {
     "title": "Estadísticas de publicador",
@@ -113,5 +114,15 @@
     "minutesAgo": "hace {{n}} m",
     "hoursAgo": "hace {{n}} h",
     "daysAgo": "hace {{n}} d"
+  },
+  "studyLevel": {
+    "label": "Nivel de estudio",
+    "all": "Todos",
+    "none": "Sin especificar",
+    "beginner": "Principiante",
+    "upper_beginner": "Principiante alto",
+    "intermediate": "Intermedio",
+    "upper_intermediate": "Intermedio alto",
+    "advanced": "Avanzado"
   }
 }

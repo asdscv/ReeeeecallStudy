@@ -85,7 +85,8 @@
   },
   "nativeLanguage": {
     "label": "母語",
-    "all": "すべて"
+    "all": "すべて",
+    "none": "未指定"
   },
   "publisherStats": {
     "title": "パブリッシャー統計",
@@ -113,5 +114,15 @@
     "minutesAgo": "{{n}}分前",
     "hoursAgo": "{{n}}時間前",
     "daysAgo": "{{n}}日前"
+  },
+  "studyLevel": {
+    "label": "学習レベル",
+    "all": "すべて",
+    "none": "未指定",
+    "beginner": "初級",
+    "upper_beginner": "初中級",
+    "intermediate": "中級",
+    "upper_intermediate": "中上級",
+    "advanced": "上級"
   }
 }

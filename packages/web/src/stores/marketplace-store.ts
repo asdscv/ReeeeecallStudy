@@ -102,6 +102,13 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       .select('*', { count: 'exact', head: true })
       .eq('deck_id', input.deckId)
 
+    // Fetch deck's native language + study level to mirror onto the listing
+    const { data: deckRow } = await supabase
+      .from('decks')
+      .select('native_language, study_level')
+      .eq('id', input.deckId)
+      .single()
+
     const { data, error } = await supabase
       .from('marketplace_listings')
       .insert({
@@ -113,6 +120,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         category: input.category || 'general',
         share_mode: input.shareMode,
         learning_language: input.learningLanguage ?? null,
+        native_language: (deckRow as { native_language?: string | null } | null)?.native_language ?? null,
+        study_level: (deckRow as { study_level?: string | null } | null)?.study_level ?? null,
         card_count: count ?? 0,
         is_active: true,
       } as Record<string, unknown>)

@@ -96,6 +96,17 @@
   },
   "nativeLanguage": {
     "label": "모국어",
-    "all": "전체"
+    "all": "전체",
+    "none": "미지정"
+  },
+  "studyLevel": {
+    "label": "학습 수준",
+    "all": "전체",
+    "none": "미지정",
+    "beginner": "초급",
+    "upper_beginner": "초중급",
+    "intermediate": "중급",
+    "upper_intermediate": "중고급",
+    "advanced": "고급"
   }
 }

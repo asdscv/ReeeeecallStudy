@@ -17,6 +17,7 @@ import {
   DATE_RANGE_OPTIONS,
   LEARNING_LANGUAGES,
   NATIVE_LANGUAGES,
+  STUDY_LEVELS,
 } from '@reeeeecall/shared/lib/marketplace'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
@@ -70,6 +71,7 @@ export function MarketplaceScreen() {
   const [shareMode, setShareMode] = useState<string | undefined>(undefined)
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all' | undefined>(undefined)
   const [learningLanguage, setLearningLanguage] = useState<string | undefined>(undefined)
+  const [studyLevel, setStudyLevel] = useState<string | undefined>(undefined)
   const [nativeLanguages, setNativeLanguages] = useState<string[]>([])
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [page, setPage] = useState(1)
@@ -79,7 +81,7 @@ export function MarketplaceScreen() {
   useEffect(() => { fetchListings() }, [fetchListings])
 
   // Reset page on filter change
-  useEffect(() => { setPage(1) }, [search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage, nativeLanguages])
+  useEffect(() => { setPage(1) }, [search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage, studyLevel, nativeLanguages])
 
   const filtered = useMemo(() => {
     const result = filterListings(listings as MarketplaceListingData[], {
@@ -89,10 +91,11 @@ export function MarketplaceScreen() {
       shareMode,
       dateRange: dateRange === 'all' ? undefined : dateRange,
       learningLanguage,
+      studyLevel,
       nativeLanguages,
     })
     return sortListings(result, sortBy) as typeof listings
-  }, [listings, search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage, nativeLanguages])
+  }, [listings, search, category, sortBy, verifiedOnly, shareMode, dateRange, learningLanguage, studyLevel, nativeLanguages])
 
   const toggleNativeLanguage = (lang: string) => {
     setNativeLanguages((prev) =>
@@ -104,7 +107,7 @@ export function MarketplaceScreen() {
 
   const paginatedData = filtered.slice(0, page * PAGE_SIZE)
   const hasMore = paginatedData.length < filtered.length
-  const activeFilterCount = (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0)
+  const activeFilterCount = (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0) + (studyLevel ? 1 : 0)
 
   const loadMore = () => {
     if (hasMore && !loading) setPage((p) => p + 1)
@@ -343,6 +346,55 @@ export function MarketplaceScreen() {
                           { color: isActive ? theme.colors.primaryText : theme.colors.text },
                         ]}>
                           {t(lang.labelKey)}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+
+                {/* Study level */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('studyLevel.label')}
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                  <TouchableOpacity
+                    onPress={() => setStudyLevel(undefined)}
+                    testID="marketplace-level-all"
+                    style={[
+                      styles.filterChip,
+                      {
+                        backgroundColor: !studyLevel ? theme.colors.primary : theme.colors.surface,
+                        borderColor: !studyLevel ? theme.colors.primary : theme.colors.border,
+                      },
+                    ]}
+                  >
+                    <Text style={[
+                      theme.typography.labelSmall,
+                      { color: !studyLevel ? theme.colors.primaryText : theme.colors.text },
+                    ]}>
+                      {t('studyLevel.all')}
+                    </Text>
+                  </TouchableOpacity>
+                  {STUDY_LEVELS.map((lvl) => {
+                    const isActive = studyLevel === lvl.value
+                    return (
+                      <TouchableOpacity
+                        key={lvl.value}
+                        testID={`marketplace-level-${lvl.value}`}
+                        onPress={() => setStudyLevel(isActive ? undefined : lvl.value)}
+                        style={[
+                          styles.filterChip,
+                          {
+                            backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
+                            borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                          },
+                        ]}
+                      >
+                        <Text style={[
+                          theme.typography.labelSmall,
+                          { color: isActive ? theme.colors.primaryText : theme.colors.text },
+                        ]}>
+                          {t(lvl.labelKey)}
                         </Text>
                       </TouchableOpacity>
                     )

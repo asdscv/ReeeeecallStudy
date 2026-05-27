@@ -30,6 +30,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
     icon: ICONS[0],
     templateId: '',
     learningLanguage: '',
+    nativeLanguage: '',
+    studyLevel: '',
     srsSettings: { ...DEFAULT_SRS_SETTINGS },
   })
   const [loading, setLoading] = useState(false)
@@ -43,6 +45,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: editDeck.icon,
         templateId: editDeck.default_template_id || '',
         learningLanguage: editDeck.learning_language || '',
+        nativeLanguage: editDeck.native_language || '',
+        studyLevel: editDeck.study_level || '',
         srsSettings: editDeck.srs_settings ?? { ...DEFAULT_SRS_SETTINGS },
       })
     } else {
@@ -53,6 +57,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: ICONS[0],
         templateId: templates.find((t) => t.is_default)?.id || '',
         learningLanguage: '',
+        nativeLanguage: '',
+        studyLevel: '',
         srsSettings: { ...DEFAULT_SRS_SETTINGS },
       })
     }
@@ -72,6 +78,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: formValues.icon,
         default_template_id: formValues.templateId || null,
         learning_language: formValues.learningLanguage || null,
+        native_language: formValues.nativeLanguage || null,
+        study_level: formValues.studyLevel || null,
         srs_settings: formValues.srsSettings,
       })
     } else {
@@ -82,6 +90,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: formValues.icon,
         default_template_id: formValues.templateId || undefined,
         learning_language: formValues.learningLanguage || undefined,
+        native_language: formValues.nativeLanguage || undefined,
+        study_level: formValues.studyLevel || undefined,
         srs_settings: formValues.srsSettings,
       })
     }

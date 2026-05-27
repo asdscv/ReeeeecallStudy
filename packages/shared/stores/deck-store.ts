@@ -41,6 +41,8 @@ interface DeckState {
     default_template_id?: string
     srs_settings?: SrsSettings
     learning_language?: string
+    native_language?: string
+    study_level?: string
   }) => Promise<Deck | null>
   updateDeck: (id: string, data: Partial<Deck>) => Promise<void>
   deleteDeck: (id: string) => Promise<void>
@@ -159,6 +161,8 @@ export const useDeckStore = create<DeckState>((set, get) => ({
         default_template_id: templateId || null,
         srs_settings: input.srs_settings,
         learning_language: input.learning_language ?? null,
+        native_language: input.native_language ?? null,
+        study_level: input.study_level ?? null,
       } as Record<string, unknown>)
       .select()
       .single()

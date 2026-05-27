@@ -85,7 +85,8 @@
   },
   "nativeLanguage": {
     "label": "母语",
-    "all": "全部"
+    "all": "全部",
+    "none": "未指定"
   },
   "publisherStats": {
     "title": "发布者统计",
@@ -113,5 +114,15 @@
     "minutesAgo": "{{n}}分钟前",
     "hoursAgo": "{{n}}小时前",
     "daysAgo": "{{n}}天前"
+  },
+  "studyLevel": {
+    "label": "学习水平",
+    "all": "全部",
+    "none": "未指定",
+    "beginner": "初级",
+    "upper_beginner": "初中级",
+    "intermediate": "中级",
+    "upper_intermediate": "中高级",
+    "advanced": "高级"
   }
 }
