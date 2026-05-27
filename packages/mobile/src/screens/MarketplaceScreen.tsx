@@ -119,7 +119,7 @@ export function MarketplaceScreen() {
       <FlatList
         data={paginatedData}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchListings} />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchListings({ force: true })} />}
         contentContainerStyle={[styles.list, paginatedData.length === 0 && styles.listEmpty]}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
