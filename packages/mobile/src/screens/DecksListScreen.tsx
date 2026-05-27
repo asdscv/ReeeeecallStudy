@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button } from '../components/ui'
+import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button, ListSkeleton } from '../components/ui'
+import { toast } from '../stores/toast-store'
 import { useDecks } from '../hooks/useDecks'
 import { useAuthState } from '../hooks/useAuthState'
 import { useTranslation } from 'react-i18next'
@@ -65,10 +66,7 @@ export function DecksListScreen() {
               .maybeSingle()
             const id = (shareRow as { id?: string } | null)?.id
             if (!id) {
-              Alert.alert(
-                'Error',
-                t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }),
-              )
+              toast.error(t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
               return
             }
             const { error } = await supabase
@@ -76,9 +74,11 @@ export function DecksListScreen() {
               .update({ status: 'revoked' })
               .eq('id', id)
             if (error) {
-              Alert.alert('Error', error.message)
+              // Never surface the raw DB message to the user.
+              toast.error(t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
               return
             }
+            toast.success(t('sharing:unsubscribed', { defaultValue: 'Unsubscribed' }))
             await refresh()
           },
         },
@@ -108,7 +108,14 @@ export function DecksListScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading && decks.length > 0}
+            onRefresh={refresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
         contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -258,7 +265,9 @@ export function DecksListScreen() {
           )
         }}
         ListEmptyComponent={
-          !loading ? (
+          loading ? (
+            <ListSkeleton count={5} />
+          ) : (
             <EmptyState
               icon="📚"
               title={t('empty')}
@@ -267,7 +276,7 @@ export function DecksListScreen() {
               onAction={() => navigation.navigate('DeckEdit', {})}
               testID="decks-empty"
             />
-          ) : null
+          )
         }
       />
       <FAB

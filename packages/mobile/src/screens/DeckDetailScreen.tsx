@@ -2,7 +2,8 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, Button, FAB, EmptyState, Badge, ListCard, SearchBar, ScreenHeader } from '../components/ui'
+import { Screen, Button, FAB, EmptyState, Badge, ListCard, SearchBar, ScreenHeader, ListSkeleton } from '../components/ui'
+import { toast } from '../stores/toast-store'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { VersionHistoryTab } from '../components/deck/VersionHistoryTab'
@@ -165,10 +166,7 @@ export function DeckDetailScreen() {
               .maybeSingle()
             const id = (shareRow as { id?: string } | null)?.id
             if (!id) {
-              Alert.alert(
-                'Error',
-                t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }),
-              )
+              toast.error(t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
               return
             }
             const { error } = await supabase
@@ -176,9 +174,11 @@ export function DeckDetailScreen() {
               .update({ status: 'revoked' })
               .eq('id', id)
             if (error) {
-              Alert.alert('Error', error.message)
+              // Never surface the raw DB message to the user.
+              toast.error(t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
               return
             }
+            toast.success(t('sharing:unsubscribed', { defaultValue: 'Unsubscribed' }))
             navigation.goBack()
           },
         },
@@ -605,7 +605,14 @@ export function DeckDetailScreen() {
         <ScreenHeader title={deck.name} mode="back" />
         <ScrollView
           contentContainerStyle={styles.list}
-          refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefreshWithSync} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading && cards.length > 0}
+              onRefresh={handleRefreshWithSync}
+              tintColor={theme.colors.primary}
+              colors={[theme.colors.primary]}
+            />
+          }
         >
           {renderHeader()}
           <View style={styles.tabContent}>
@@ -700,7 +707,9 @@ export function DeckDetailScreen() {
           )
         }}
         ListEmptyComponent={
-          !loading ? (
+          loading ? (
+            <ListSkeleton count={6} />
+          ) : (
             <View style={styles.emptyContainer}>
               <EmptyState
                 icon="🃏"
@@ -716,7 +725,7 @@ export function DeckDetailScreen() {
                   onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-empty-template" />
               </View>
             </View>
-          ) : null
+          )
         }
       />
       {!selectionMode && (
