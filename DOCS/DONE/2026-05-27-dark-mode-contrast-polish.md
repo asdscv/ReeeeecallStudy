@@ -29,3 +29,14 @@ SSOT(`shared/design-tokens/`) 단일 출처에서 다크 경계 대비를 수정
 - translation-keys(web 8 locale) 파리티 유지
 - 다크 경계 가시성: 카드/구분선/입력/로그인/스켈레톤 모두 가시
 - 라이트 모드 무회귀(border gray200 불변)
+
+---
+## 구현 결과 (2026-05-27 완료)
+- C1 다크 경계 토큰(border gray700) · C2 스켈레톤 가시성 · C3 진행바트랙/잔여경계
+  · C4 햅틱 Settings 토글 · C5 웹 confirm title · C6 StudySetup/Marketplace 라벨 i18n
+  · C7 큰글씨 방어(maxFontSizeMultiplier)
+- **게이트**: web tsc -b 0 / vite build 0 / vitest 111fail·1985pass(회귀 0) / 변경파일 lint 0
+  · mobile tsc 0 · Phase2 스윕(다크 하드코딩0·영어라벨0) · Phase3 사이드이펙트 클린
+- **보류**: fontSize 202곳 일괄 typography-토큰 스프레드 — 토큰이 weight/lineHeight
+  묶고 값 간접참조라 순수 안전치환 아님, 디바이스 시각검증 없는 대량변경은 회귀위험.
+  실제 폰트 위험은 maxFontSizeMultiplier로 해소(근거 기록).
