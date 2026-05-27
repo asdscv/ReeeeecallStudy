@@ -361,7 +361,7 @@ export function TemplateEditScreen() {
 
               {/* TTS Settings */}
               {field.type === 'text' && (
-                <View style={styles.ttsSection}>
+                <View style={[styles.ttsSection, { borderTopColor: theme.colors.border }]}>
                   <View style={styles.ttsToggleRow}>
                     <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>TTS</Text>
                     <Switch
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   // TTS
-  ttsSection: { gap: 8, paddingTop: 4, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E5E7EB' },
+  ttsSection: { gap: 8, paddingTop: 4, borderTopWidth: StyleSheet.hairlineWidth },
   ttsToggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   ttsLangRow: { gap: 8 },
   ttsLangChips: { gap: 4, paddingVertical: 2 },

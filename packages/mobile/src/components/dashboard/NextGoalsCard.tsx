@@ -33,7 +33,7 @@ export function NextGoalsCard({ goals }: NextGoalsCardProps) {
                 {g.current} / {g.target}
               </Text>
             </View>
-            <View style={styles.barBg}>
+            <View style={[styles.barBg, { backgroundColor: theme.colors.border }]}>
               <View style={[styles.barFill, { width: `${pct}%`, backgroundColor: palette.blue[500] }]} />
             </View>
             <View style={styles.bottomRow}>
@@ -59,6 +59,6 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   bottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   xpBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
-  barBg: { height: 6, borderRadius: 3, backgroundColor: '#e5e7eb', overflow: 'hidden' as const },
+  barBg: { height: 6, borderRadius: 3, overflow: 'hidden' as const },
   barFill: { height: 6, borderRadius: 3 },
 })

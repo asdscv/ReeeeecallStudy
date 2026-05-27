@@ -455,7 +455,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
     }
 
     return (
-      <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
+      <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock, isHint && { borderLeftColor: theme.colors.border }]}>
         {/* TTS button: absolute-positioned overlay so it doesn't constrain Text
             width via flex measurement. iOS RN's flex:1 + row + sibling combo
             measures CJK text width incorrectly, causing per-glyph wrap or
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
   cardContent: { flex: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, width: '100%' },
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
-  hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
+  hintBlock: { borderLeftWidth: 2, paddingLeft: 12, alignItems: 'flex-start' },
   ttsRow: { width: '100%', position: 'relative', justifyContent: 'center' },
   ttsAbsButton: {
     position: 'absolute',

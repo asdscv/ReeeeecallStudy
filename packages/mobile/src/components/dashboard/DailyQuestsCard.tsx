@@ -40,7 +40,7 @@ export function DailyQuestsCard({ quests }: DailyQuestsCardProps) {
                 </Text>
               </View>
             </View>
-            <View style={styles.barBg}>
+            <View style={[styles.barBg, { backgroundColor: theme.colors.border }]}>
               <View
                 style={[
                   styles.barFill,
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
   item: { gap: 4, borderRadius: 10, padding: 10 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   xpBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
-  barBg: { height: 6, borderRadius: 3, backgroundColor: '#e5e7eb', overflow: 'hidden' as const },
+  barBg: { height: 6, borderRadius: 3, overflow: 'hidden' as const },
   barFill: { height: 6, borderRadius: 3 },
 })

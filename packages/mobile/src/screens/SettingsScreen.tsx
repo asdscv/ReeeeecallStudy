@@ -743,7 +743,7 @@ export function SettingsScreen() {
 
                       {/* Expanded edit form */}
                       {isEditing && (
-                        <View style={styles.aiEditForm}>
+                        <View style={[styles.aiEditForm, { borderTopColor: theme.colors.border }]}>
                           <TextInput
                             testID={`settings-ai-${provider.id}-key`}
                             label={t('aiProviders.apiKey')}
@@ -1195,7 +1195,7 @@ const styles = StyleSheet.create({
   aiIcon: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   aiIconText: { fontSize: 12, fontWeight: '700' },
   configBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  aiEditForm: { gap: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F3F4F6' },
+  aiEditForm: { gap: 10, paddingTop: 10, borderTopWidth: 1 },
   aiBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
   modelOption: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1 },
   securityNote: { padding: 12, borderRadius: 8 },
