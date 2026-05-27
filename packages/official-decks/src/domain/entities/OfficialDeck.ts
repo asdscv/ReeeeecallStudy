@@ -30,6 +30,7 @@ export interface OfficialDeck {
   readonly tags: readonly string[];
   readonly languagePair: LanguagePair;
   readonly learningLanguage: LanguageCode;
+  readonly nativeLanguages: readonly LanguageCode[];
   readonly sourceFile: string;
   readonly templateId: CardTemplateId;
   readonly cards: readonly OfficialCard[];
