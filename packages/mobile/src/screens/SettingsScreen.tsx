@@ -43,8 +43,8 @@ const LANGUAGES = [
 ]
 
 const TTS_PROVIDERS = [
-  { value: 'web_speech' as const, label: 'Device Voice', desc: "Uses your device's built-in voice", noteKey: '' },
-  { value: 'edge_tts' as const, label: 'Edge TTS', desc: 'Higher quality neural voice', noteKey: 'tts.edgeTtsNote' },
+  { value: 'web_speech' as const, labelKey: 'tts.deviceVoice', descKey: 'tts.deviceVoiceDesc', noteKey: '' },
+  { value: 'edge_tts' as const, labelKey: 'tts.edgeTts', descKey: 'tts.edgeTtsDesc', noteKey: 'tts.edgeTtsNote' },
 ]
 
 const AI_PROVIDERS = [
@@ -174,7 +174,7 @@ export function SettingsScreen() {
     }
     if (trimmed.length < 2 || trimmed.length > 12) {
       setNameAvailable(false)
-      setNameError('2-12 characters required')
+      setNameError(t('profile.nameLengthError'))
       setNameChecking(false)
       return
     }
@@ -184,10 +184,10 @@ export function SettingsScreen() {
     const result = data as { available: boolean; error?: string } | null
     if (result?.error === 'invalid_length') {
       setNameAvailable(false)
-      setNameError('2-12 characters required')
+      setNameError(t('profile.nameLengthError'))
     } else if (result?.available === false) {
       setNameAvailable(false)
-      setNameError('Name already taken')
+      setNameError(t('profile.nameTaken'))
     } else {
       setNameAvailable(true)
       setNameError(null)
@@ -220,7 +220,7 @@ export function SettingsScreen() {
         await notificationService.scheduleDailyReminder(9, 0)
         setNotificationsEnabled(true)
       } else {
-        Alert.alert('Permission Required', 'Enable notifications in device settings.')
+        Alert.alert(t('notifications.permissionTitle'), t('notifications.permissionRequired'))
       }
     } else {
       await notificationService.cancelDailyReminder()
@@ -249,7 +249,7 @@ export function SettingsScreen() {
     setNameAvailable(null)
     setNameError(null)
     setNameSaving(false)
-    Alert.alert('Saved', 'Display name updated.')
+    Alert.alert(t('profile.savedTitle'), t('profile.savedMessage'))
   }, [user, profile.display_name, savedDisplayName, nameAvailable, saveProfile])
 
   const handleLanguageChange = useCallback(async (code: string) => {
@@ -269,24 +269,24 @@ export function SettingsScreen() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete Account',
-      'This will permanently delete your account and all associated data. This action cannot be undone.',
+      t('account.deleteAccount'),
+      t('account.deleteConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('actions.cancel', { ns: 'common' }), style: 'cancel' },
         {
-          text: 'Delete Account',
+          text: t('account.deleteAccount'),
           style: 'destructive',
           onPress: async () => {
             try {
               const supabase = getMobileSupabase()
               const { error } = await supabase.rpc('delete_user_account')
               if (error) {
-                Alert.alert('Error', 'Failed to delete account. Please contact support.')
+                Alert.alert(t('alerts.error'), t('account.deleteFailed'))
                 return
               }
               await signOut()
             } catch {
-              Alert.alert('Error', 'Failed to delete account. Please contact support.')
+              Alert.alert(t('alerts.error'), t('account.deleteFailed'))
             }
           },
         },
@@ -332,20 +332,20 @@ export function SettingsScreen() {
             </View> */}
             {/* ──────────────────────────────────────────────────────────────────── */}
           </View>
-          <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>Display name</Text>
+          <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>{t('profile.displayName')}</Text>
           <View style={styles.nameRow}>
             <View style={{ flex: 1 }}>
               <TextInput
                 testID="settings-display-name"
                 value={profile.display_name}
                 onChangeText={handleNameChange}
-                placeholder="2-12 characters"
+                placeholder={t('profile.displayNamePlaceholder')}
                 maxLength={12}
               />
             </View>
             <Button
               testID="settings-save-name"
-              title={nameSaving ? '...' : 'Save'}
+              title={nameSaving ? '...' : t('profile.save')}
               variant="primary"
               size="sm"
               fullWidth={false}
@@ -362,7 +362,7 @@ export function SettingsScreen() {
           </View>
           {nameChecking && (
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
-              Checking availability...
+              {t('profile.checkingName')}
             </Text>
           )}
           {nameError && (
@@ -372,7 +372,7 @@ export function SettingsScreen() {
           )}
           {nameAvailable === true && !nameChecking && (
             <Text style={[theme.typography.caption, { color: theme.colors.success, marginTop: 4 }]}>
-              Name available!
+              {t('profile.nameAvailable')}
             </Text>
           )}
         </SectionCard>
@@ -387,7 +387,7 @@ export function SettingsScreen() {
             <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={{ fontSize: 22 }}>{'\u26A1'}</Text>
             </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>Quick{'\n'}Study</Text>
+            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.quickStudy')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             testID="settings-ai-generate"
@@ -397,7 +397,7 @@ export function SettingsScreen() {
             <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={{ fontSize: 22 }}>{'\uD83E\uDD16'}</Text>
             </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>AI{'\n'}Generate</Text>
+            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.aiGenerate')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             testID="settings-invite-link"
@@ -407,7 +407,7 @@ export function SettingsScreen() {
             <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={{ fontSize: 22 }}>{'\uD83D\uDCE7'}</Text>
             </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>Invite</Text>
+            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.invite')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -419,9 +419,9 @@ export function SettingsScreen() {
             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
           >
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Card Templates</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('templates.title')}</Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                Manage card templates, fields, and layouts
+                {t('templates.description')}
               </Text>
             </View>
             <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
@@ -436,9 +436,9 @@ export function SettingsScreen() {
             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
           >
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>My Shares</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('shares.title')}</Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                Manage shared decks and invites
+                {t('shares.description')}
               </Text>
             </View>
             <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
@@ -453,9 +453,9 @@ export function SettingsScreen() {
             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
           >
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Publisher Dashboard</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('publisher.title')}</Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                View stats for your published decks
+                {t('publisher.description')}
               </Text>
             </View>
             <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
@@ -464,11 +464,11 @@ export function SettingsScreen() {
 
         {/* ── Answer Mode — matches web: standalone card ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Answer Mode</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('answerMode.title')}</Text>
           <View style={styles.segmentRow}>
             {(['before', 'same', 'after'] as const).map((timing) => {
               const isActive = profile.answer_timing === timing
-              const labels = { before: 'Before', same: 'Same', after: 'After' }
+              const labels = { before: t('answerMode.before'), same: t('answerMode.same'), after: t('answerMode.after') }
               return (
                 <TouchableOpacity
                   key={timing}
@@ -490,13 +490,13 @@ export function SettingsScreen() {
             })}
           </View>
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            Rate directly on the front card (tap answer before flipping) or see answer first.
+            {t('answerMode.timingDesc')}
           </Text>
         </SectionCard>
 
         {/* ── New Card Limit — standalone card ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>New Card Limit</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('newCardLimit.title')}</Text>
           <View style={styles.modeGrid}>
             {(['button', 'swipe'] as const).map((mode) => {
               const isActive = profile.answer_mode === mode
@@ -516,7 +516,7 @@ export function SettingsScreen() {
                 >
                   <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
                   <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                    {mode === 'button' ? 'Button' : 'Swipe'}
+                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
                   </Text>
                 </TouchableOpacity>
               )
@@ -538,15 +538,15 @@ export function SettingsScreen() {
             keyboardType="number-pad"
           />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            The number of new cards automatically added to your daily review queue per deck.
+            {t('newCardLimit.hint')}
           </Text>
         </SectionCard>
 
         {/* ── Auto TTS Reading — standalone card ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Auto TTS Reading</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('tts.title')}</Text>
           <View style={styles.switchRow}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Enable auto reading</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('tts.enable')}</Text>
             <Switch
               testID="settings-tts-toggle"
               value={profile.tts_enabled}
@@ -556,7 +556,7 @@ export function SettingsScreen() {
           </View>
           {profile.tts_enabled && (
             <View style={styles.ttsSettings}>
-              <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>Voice Engine</Text>
+              <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>{t('tts.voiceEngine')}</Text>
               <View style={styles.modeGrid}>
                 {TTS_PROVIDERS.map((prov) => {
                   const isActive = profile.tts_provider === prov.value
@@ -574,14 +574,14 @@ export function SettingsScreen() {
                         },
                       ]}
                     >
-                      <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>{prov.label}</Text>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{prov.desc}</Text>
+                      <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>{t(prov.labelKey)}</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t(prov.descKey)}</Text>
                       {prov.noteKey ? <Text style={{ fontSize: 11, color: palette.yellow[500], marginTop: 2 }}>{t(prov.noteKey, { ns: 'settings' })}</Text> : null}
                     </TouchableOpacity>
                   )
                 })}
               </View>
-              <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>Reading Speed</Text>
+              <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>{t('tts.readingSpeed')}</Text>
               <View style={styles.sliderRow}>
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, width: 28 }]}>0.5x</Text>
                 <Slider
@@ -608,7 +608,7 @@ export function SettingsScreen() {
 
         {/* ── Daily Study Goal — standalone like web ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Daily Study Goal</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('dailyGoal.title')}</Text>
           <TextInput
             testID="settings-daily-goal"
             value={profile.daily_study_goal != null ? String(profile.daily_study_goal) : ''}
@@ -627,23 +627,23 @@ export function SettingsScreen() {
               }
             }}
             keyboardType="number-pad"
-            placeholder="e.g. 30"
+            placeholder={t('dailyGoal.placeholder')}
           />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            Set a daily study target in minutes. Leave empty for no goal.
+            {t('dailyGoal.hint')}
           </Text>
         </SectionCard>
 
         {/* ── d) SRS Configuration ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>SRS Configuration</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('srsConfig.title')}</Text>
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-            Default SRS settings for new decks. Each deck can override these.
+            {t('srsConfig.description')}
           </Text>
           <View style={styles.sectionBody}>
             <TextInput
               testID="settings-srs-learning-steps"
-              label="Learning Steps (minutes, comma-separated)"
+              label={t('srsConfig.learningSteps')}
               value={learningStepsText}
               onChangeText={setLearningStepsText}
               onBlur={handleSaveLearningSteps}
@@ -653,7 +653,7 @@ export function SettingsScreen() {
               <View style={styles.srsField}>
                 <TextInput
                   testID="settings-srs-good-interval"
-                  label="Good Interval (days)"
+                  label={t('srsConfig.goodInterval')}
                   value={String(srsSettings.good_days)}
                   onChangeText={(v) => {
                     const clean = v.replace(/[^0-9]/g, '')
@@ -666,7 +666,7 @@ export function SettingsScreen() {
               <View style={styles.srsField}>
                 <TextInput
                   testID="settings-srs-easy-interval"
-                  label="Easy Interval (days)"
+                  label={t('srsConfig.easyInterval')}
                   value={String(srsSettings.easy_days)}
                   onChangeText={(v) => {
                     const clean = v.replace(/[^0-9]/g, '')
@@ -687,7 +687,7 @@ export function SettingsScreen() {
             style={styles.collapsibleHeader}
             activeOpacity={0.7}
           >
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>AI Providers</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('aiProviders.title')}</Text>
             <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
               {aiCollapsed ? '∨' : '∧'}
             </Text>
@@ -695,7 +695,7 @@ export function SettingsScreen() {
           {!aiCollapsed && (
             <>
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                Configure AI providers for card generation. Keys are encrypted on our servers and synced across your devices.
+                {t('aiProviders.description')}
               </Text>
               <View style={styles.sectionBody}>
                 {AI_PROVIDERS.map((provider) => {
@@ -728,11 +728,11 @@ export function SettingsScreen() {
                           <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]}>{provider.label}</Text>
                           {isConfigured ? (
                             <View style={[styles.aiBadge, { backgroundColor: theme.colors.successLight }]}>
-                              <Text style={[theme.typography.caption, { color: theme.colors.success, fontWeight: '500' }]}>Configured</Text>
+                              <Text style={[theme.typography.caption, { color: theme.colors.success, fontWeight: '500' }]}>{t('aiProviders.configured')}</Text>
                             </View>
                           ) : (
                             <View style={[styles.aiBadge, { backgroundColor: theme.colors.surface }]}>
-                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, fontWeight: '500' }]}>Not Set</Text>
+                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, fontWeight: '500' }]}>{t('aiProviders.notSet')}</Text>
                             </View>
                           )}
                         </View>
@@ -746,13 +746,13 @@ export function SettingsScreen() {
                         <View style={styles.aiEditForm}>
                           <TextInput
                             testID={`settings-ai-${provider.id}-key`}
-                            label="API Key"
+                            label={t('aiProviders.apiKey')}
                             value={aiApiKey}
                             onChangeText={setAiApiKey}
                             secureTextEntry
-                            placeholder="Enter your API key..."
+                            placeholder={t('aiProviders.apiKeyPlaceholder')}
                           />
-                          <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 4 }]}>Model</Text>
+                          <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 4 }]}>{t('aiProviders.model')}</Text>
                           {provider.models.map((model) => (
                             <TouchableOpacity
                               key={model}
@@ -771,7 +771,7 @@ export function SettingsScreen() {
                           <View style={{ flexDirection: 'row', gap: 8, paddingTop: 4 }}>
                             <View style={{ flex: 1 }}>
                               <Button
-                                title={aiSaving ? 'Saving...' : 'Save'}
+                                title={aiSaving ? t('aiProviders.saving') : t('aiProviders.save')}
                                 size="sm"
                                 disabled={aiSaving || !aiApiKey.trim()}
                                 onPress={async () => {
@@ -788,9 +788,9 @@ export function SettingsScreen() {
                                     setAiEditingProvider(null)
                                     setAiApiKey('')
                                     setAiEditModel('')
-                                    Alert.alert('Saved', `${provider.label} API key saved successfully.`)
+                                    Alert.alert(t('profile.savedTitle'), t('aiProviders.saveSuccess', { provider: provider.label }))
                                   } catch {
-                                    Alert.alert('Error', 'Failed to save API key.')
+                                    Alert.alert(t('alerts.error'), t('aiProviders.saveError'))
                                   } finally {
                                     setAiSaving(false)
                                   }
@@ -808,12 +808,12 @@ export function SettingsScreen() {
                                   setAiEditingProvider(null)
                                   setAiApiKey('')
                                   setAiEditModel('')
-                                  Alert.alert('Deleted', `${provider.label} API key removed.`)
+                                  Alert.alert(t('aiProviders.deletedTitle'), t('aiProviders.removed', { provider: provider.label }))
                                 }}
                                 testID={`settings-ai-${provider.id}-delete`}
                                 style={[styles.configBtn, { backgroundColor: theme.colors.errorLight }]}
                               >
-                                <Text style={[theme.typography.caption, { color: theme.colors.error, fontWeight: '500' }]}>Delete</Text>
+                                <Text style={[theme.typography.caption, { color: theme.colors.error, fontWeight: '500' }]}>{t('aiProviders.delete')}</Text>
                               </TouchableOpacity>
                             )}
                             <TouchableOpacity
@@ -824,7 +824,7 @@ export function SettingsScreen() {
                               }}
                               style={[styles.configBtn, { backgroundColor: theme.colors.surface }]}
                             >
-                              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '500' }]}>Cancel</Text>
+                              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '500' }]}>{t('aiProviders.cancel')}</Text>
                             </TouchableOpacity>
                           </View>
                         </View>
@@ -834,7 +834,7 @@ export function SettingsScreen() {
                 })}
                 <View style={[styles.securityNote, { backgroundColor: theme.colors.surface }]}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    API keys are encrypted on our servers (pgcrypto + Vault, never stored in plain text) and synced across your web and mobile devices.
+                    {t('aiProviders.securityNote')}
                   </Text>
                 </View>
               </View>
@@ -844,7 +844,7 @@ export function SettingsScreen() {
 
         {/* ── f) Language ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Language</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('language.title')}</Text>
           <TouchableOpacity
             testID="settings-lang-dropdown"
             onPress={() => setLangDropdownOpen(true)}
@@ -863,7 +863,7 @@ export function SettingsScreen() {
           <Modal visible={langDropdownOpen} transparent animationType="fade" onRequestClose={() => setLangDropdownOpen(false)}>
             <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setLangDropdownOpen(false)}>
               <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
-                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Language</Text>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('language.title')}</Text>
                 <FlatList
                   data={LANGUAGES}
                   keyExtractor={(item) => item.code}
@@ -892,11 +892,11 @@ export function SettingsScreen() {
 
         {/* ── Theme ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Theme</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('theme.title')}</Text>
           <View style={styles.segmentRow}>
             {(['light', 'dark', 'system'] as const).map((mode) => {
               const isActive = themeMode === mode
-              const labels = { light: 'Light', dark: 'Dark', system: 'System' }
+              const labels = { light: t('theme.light'), dark: t('theme.dark'), system: t('theme.system') }
               return (
                 <TouchableOpacity
                   key={mode}
@@ -928,9 +928,9 @@ export function SettingsScreen() {
 
         {/* ── g) Notifications ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Notifications</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('notifications.title')}</Text>
           <View style={styles.switchRow}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Daily Study Reminder</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('notifications.dailyReminder')}</Text>
             <Switch
               testID="settings-notification-toggle"
               value={notificationsEnabled}
@@ -940,7 +940,7 @@ export function SettingsScreen() {
           </View>
           {notificationsEnabled && (
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-              You'll be reminded daily at 9:00 AM to review your cards.
+              {t('notifications.reminderDesc')}
             </Text>
           )}
         </SectionCard>
@@ -984,12 +984,12 @@ export function SettingsScreen() {
 
         {/* ── i) Export My Data — matches web ── */}
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Export My Data</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('export.title')}</Text>
           {[
-            { key: 'stats', icon: '📊', label: 'Study Statistics' },
-            { key: 'sessions', icon: '📅', label: 'Study Sessions' },
-            { key: 'decks', icon: '📚', label: 'Decks' },
-            { key: 'cards', icon: '🃏', label: 'Cards' },
+            { key: 'stats', icon: '📊', labelKey: 'export.stats' },
+            { key: 'sessions', icon: '📅', labelKey: 'export.sessions' },
+            { key: 'decks', icon: '📚', labelKey: 'export.decks' },
+            { key: 'cards', icon: '🃏', labelKey: 'export.cards' },
           ].map((item) => (
             <TouchableOpacity
               key={item.key}
@@ -999,7 +999,7 @@ export function SettingsScreen() {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <Text style={{ fontSize: 18 }}>{item.icon}</Text>
-                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{item.label}</Text>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{t(item.labelKey)}</Text>
               </View>
               <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
             </TouchableOpacity>
@@ -1012,14 +1012,14 @@ export function SettingsScreen() {
             testID="settings-privacy-policy"
             onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
           >
-            <Text style={[styles.legalLink, { color: theme.colors.textSecondary }]}>Privacy Policy</Text>
+            <Text style={[styles.legalLink, { color: theme.colors.textSecondary }]}>{t('legal.privacyPolicy')}</Text>
           </TouchableOpacity>
           <Text style={[styles.legalDot, { color: theme.colors.textTertiary }]}>·</Text>
           <TouchableOpacity
             testID="settings-terms-of-service"
             onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
           >
-            <Text style={[styles.legalLink, { color: theme.colors.textSecondary }]}>Terms of Service</Text>
+            <Text style={[styles.legalLink, { color: theme.colors.textSecondary }]}>{t('legal.termsOfService')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -1033,7 +1033,7 @@ export function SettingsScreen() {
           style={[styles.logoutBtn, { borderColor: theme.colors.border }]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.logoutText, { color: theme.colors.textSecondary }]}>Sign Out</Text>
+          <Text style={[styles.logoutText, { color: theme.colors.textSecondary }]}>{t('account.logout')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -1041,7 +1041,7 @@ export function SettingsScreen() {
           onPress={handleDeleteAccount}
           style={styles.deleteLink}
         >
-          <Text style={[styles.deleteLinkText, { color: theme.colors.error }]}>Delete Account</Text>
+          <Text style={[styles.deleteLinkText, { color: theme.colors.error }]}>{t('account.deleteAccount')}</Text>
         </TouchableOpacity>
 
         <Text style={[styles.versionText, { color: theme.colors.textTertiary }]}>

@@ -8,9 +8,14 @@
     "namePlaceholder": "Nhập tên của bạn",
     "saveBtn": "Lưu",
     "nameSaved": "Đã lưu tên!",
-    "nameAvailable": "Có thể sử dụng",
-    "nameTaken": "Tên này đã được sử dụng",
-    "nameLength": "Tên phải từ 2-12 ký tự"
+    "nameAvailable": "Tên khả dụng!",
+    "nameTaken": "Tên đã được sử dụng",
+    "nameLength": "Tên phải từ 2-12 ký tự",
+    "save": "Lưu",
+    "checkingName": "Đang kiểm tra...",
+    "nameLengthError": "Yêu cầu 2-12 ký tự",
+    "savedTitle": "Đã lưu",
+    "savedMessage": "Đã cập nhật tên hiển thị."
   },
   "language": {
     "title": "Ngôn ngữ",
@@ -39,7 +44,11 @@
     "buttonDesc": "Chọn câu trả lời bằng cách nhấn nút",
     "swipe": "Vuốt",
     "swipeDesc": "Chọn câu trả lời bằng cách vuốt thẻ",
-    "swipeAutoNote": "Hướng vuốt được đặt tự động dựa trên chế độ học.\n• SRS: ← Lại / → Tốt\n• Chế độ khác: ← Chưa biết / → Đã biết"
+    "swipeAutoNote": "Hướng vuốt được đặt tự động dựa trên chế độ học.\n• SRS: ← Lại / → Tốt\n• Chế độ khác: ← Chưa biết / → Đã biết",
+    "before": "Trước",
+    "same": "Cùng lúc",
+    "after": "Sau",
+    "timingDesc": "Đánh giá ngay ở mặt trước (chọn đáp án trước khi lật) hoặc xem đáp án trước."
   },
   "tts": {
     "title": "Đọc TTS tự động",
@@ -64,20 +73,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "Cấu hình nhà cung cấp AI để tạo thẻ. Khóa được mã hóa trên máy chủ và đồng bộ giữa các thiết bị.",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "Khóa API được mã hóa trên máy chủ (pgcrypto + Vault, không lưu dạng thô) và đồng bộ giữa web và di động.",
+    "configured": "Đã cấu hình",
+    "notSet": "Chưa đặt",
+    "model": "Mô hình",
+    "saving": "Đang lưu...",
+    "delete": "Xóa",
+    "deletedTitle": "Đã xóa",
+    "saveSuccess": "Đã lưu khóa API {{provider}}.",
+    "saveError": "Không lưu được khóa API.",
+    "removed": "Đã xóa khóa API {{provider}}."
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "Cần quyền"
   },
   "subscription": {
     "title": "Subscription",
@@ -102,5 +121,47 @@
     "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
     "apiDocs": "Tài liệu API",
     "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+  },
+  "quickActions": {
+    "quickStudy": "Học nhanh",
+    "aiGenerate": "Tạo bằng AI",
+    "invite": "Mời"
+  },
+  "templates": {
+    "title": "Mẫu thẻ",
+    "description": "Quản lý mẫu thẻ, trường và bố cục"
+  },
+  "shares": {
+    "title": "Chia sẻ của tôi",
+    "description": "Quản lý bộ thẻ chia sẻ và lời mời"
+  },
+  "publisher": {
+    "title": "Bảng điều khiển NXB",
+    "description": "Xem thống kê bộ thẻ đã đăng"
+  },
+  "newCardLimit": {
+    "title": "Giới hạn thẻ mới",
+    "hint": "Số thẻ mới tự động thêm vào hàng ôn mỗi ngày cho mỗi bộ thẻ."
+  },
+  "dailyGoal": {
+    "title": "Mục tiêu học mỗi ngày",
+    "placeholder": "vd: 30",
+    "hint": "Đặt mục tiêu học mỗi ngày (phút). Để trống nếu không có."
+  },
+  "theme": {
+    "title": "Giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
+  },
+  "export": {
+    "title": "Xuất dữ liệu",
+    "stats": "Thống kê học",
+    "sessions": "Phiên học",
+    "decks": "Bộ thẻ",
+    "cards": "Thẻ"
+  },
+  "alerts": {
+    "error": "Lỗi"
   }
 }

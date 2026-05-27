@@ -4,7 +4,14 @@
     "title": "Profile",
     "email": "Email",
     "displayName": "Display Name",
-    "displayNamePlaceholder": "2-12 characters"
+    "displayNamePlaceholder": "2-12 characters",
+    "save": "Save",
+    "checkingName": "Checking availability...",
+    "nameTaken": "Name already taken",
+    "nameLengthError": "2-12 characters required",
+    "nameAvailable": "Name available!",
+    "savedTitle": "Saved",
+    "savedMessage": "Display name updated."
   },
   "language": {
     "title": "Language"
@@ -21,7 +28,11 @@
     "button": "Button",
     "buttonDesc": "Select answer by pressing button",
     "swipe": "Swipe",
-    "swipeDesc": "Select answer by swiping card"
+    "swipeDesc": "Select answer by swiping card",
+    "before": "Before",
+    "same": "Same",
+    "after": "After",
+    "timingDesc": "Rate directly on the front card (tap answer before flipping) or see answer first."
   },
   "tts": {
     "title": "Auto TTS Reading",
@@ -45,20 +56,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "Configure AI providers for card generation. Keys are encrypted on our servers and synced across your devices.",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "API keys are encrypted on our servers (pgcrypto + Vault, never stored in plain text) and synced across your web and mobile devices.",
+    "configured": "Configured",
+    "notSet": "Not Set",
+    "model": "Model",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deletedTitle": "Deleted",
+    "saveSuccess": "{{provider}} API key saved successfully.",
+    "saveError": "Failed to save API key.",
+    "removed": "{{provider}} API key removed."
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "Permission Required"
   },
   "subscription": {
     "title": "Subscription",
@@ -76,7 +97,7 @@
   },
   "account": {
     "title": "Account",
-    "logout": "Logout",
+    "logout": "Sign Out",
     "logoutConfirm": "Are you sure you want to sign out?",
     "deleteAccount": "Delete Account",
     "deleteConfirm": "This will permanently delete your account and all associated data. This action cannot be undone.",
@@ -87,5 +108,47 @@
     "userGuideDesc": "Feature guide, learning tips, sharing methods",
     "apiDocs": "API Documentation",
     "apiDocsDesc": "API endpoints, authentication, usage examples"
+  },
+  "quickActions": {
+    "quickStudy": "Quick Study",
+    "aiGenerate": "AI Generate",
+    "invite": "Invite"
+  },
+  "templates": {
+    "title": "Card Templates",
+    "description": "Manage card templates, fields, and layouts"
+  },
+  "shares": {
+    "title": "My Shares",
+    "description": "Manage shared decks and invites"
+  },
+  "publisher": {
+    "title": "Publisher Dashboard",
+    "description": "View stats for your published decks"
+  },
+  "newCardLimit": {
+    "title": "New Card Limit",
+    "hint": "The number of new cards automatically added to your daily review queue per deck."
+  },
+  "dailyGoal": {
+    "title": "Daily Study Goal",
+    "placeholder": "e.g. 30",
+    "hint": "Set a daily study target in minutes. Leave empty for no goal."
+  },
+  "theme": {
+    "title": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "export": {
+    "title": "Export My Data",
+    "stats": "Study Statistics",
+    "sessions": "Study Sessions",
+    "decks": "Decks",
+    "cards": "Cards"
+  },
+  "alerts": {
+    "error": "Error"
   }
 }

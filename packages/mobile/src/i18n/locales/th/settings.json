@@ -8,9 +8,14 @@
     "namePlaceholder": "กรอกชื่อของคุณ",
     "saveBtn": "บันทึก",
     "nameSaved": "บันทึกชื่อแล้ว!",
-    "nameAvailable": "ใช้ได้",
+    "nameAvailable": "ใช้ชื่อนี้ได้!",
     "nameTaken": "ชื่อนี้ถูกใช้แล้ว",
-    "nameLength": "ชื่อต้องมี 2-12 ตัวอักษร"
+    "nameLength": "ชื่อต้องมี 2-12 ตัวอักษร",
+    "save": "บันทึก",
+    "checkingName": "กำลังตรวจสอบ...",
+    "nameLengthError": "ต้องมี 2-12 ตัวอักษร",
+    "savedTitle": "บันทึกแล้ว",
+    "savedMessage": "อัปเดตชื่อแล้ว"
   },
   "language": {
     "title": "ภาษา",
@@ -39,7 +44,11 @@
     "buttonDesc": "เลือกคำตอบโดยกดปุ่ม",
     "swipe": "ปัด",
     "swipeDesc": "เลือกคำตอบโดยปัดการ์ด",
-    "swipeAutoNote": "ทิศทางการปัดจะถูกตั้งค่าอัตโนมัติตามโหมดการเรียน\n• SRS: ← Again / → Good\n• โหมดอื่น: ← ไม่รู้ / → รู้แล้ว"
+    "swipeAutoNote": "ทิศทางการปัดจะถูกตั้งค่าอัตโนมัติตามโหมดการเรียน\n• SRS: ← Again / → Good\n• โหมดอื่น: ← ไม่รู้ / → รู้แล้ว",
+    "before": "ก่อน",
+    "same": "พร้อมกัน",
+    "after": "หลัง",
+    "timingDesc": "ให้คะแนนที่ด้านหน้า (ตอบก่อนพลิก) หรือดูคำตอบก่อน"
   },
   "tts": {
     "title": "อ่านออกเสียง TTS อัตโนมัติ",
@@ -64,20 +73,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "ตั้งค่าผู้ให้บริการ AI สำหรับสร้างการ์ด คีย์ถูกเข้ารหัสบนเซิร์ฟเวอร์และซิงก์ข้ามอุปกรณ์",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "คีย์ API ถูกเข้ารหัสบนเซิร์ฟเวอร์ (pgcrypto + Vault ไม่เก็บแบบข้อความธรรมดา) และซิงก์ระหว่างเว็บและมือถือ",
+    "configured": "ตั้งค่าแล้ว",
+    "notSet": "ยังไม่ตั้ง",
+    "model": "โมเดล",
+    "saving": "กำลังบันทึก...",
+    "delete": "ลบ",
+    "deletedTitle": "ลบแล้ว",
+    "saveSuccess": "บันทึกคีย์ API {{provider}} แล้ว",
+    "saveError": "บันทึกคีย์ API ไม่สำเร็จ",
+    "removed": "ลบคีย์ API {{provider}} แล้ว"
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "ต้องการสิทธิ์"
   },
   "subscription": {
     "title": "Subscription",
@@ -102,5 +121,47 @@
     "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์",
     "apiDocs": "เอกสาร API",
     "apiDocsDesc": "API endpoints การยืนยันตัวตน ตัวอย่างการใช้งาน"
+  },
+  "quickActions": {
+    "quickStudy": "เรียนด่วน",
+    "aiGenerate": "สร้างด้วย AI",
+    "invite": "เชิญ"
+  },
+  "templates": {
+    "title": "เทมเพลตการ์ด",
+    "description": "จัดการเทมเพลต ฟิลด์ และเลย์เอาต์"
+  },
+  "shares": {
+    "title": "การแชร์ของฉัน",
+    "description": "จัดการเด็คที่แชร์และคำเชิญ"
+  },
+  "publisher": {
+    "title": "แดชบอร์ดผู้เผยแพร่",
+    "description": "ดูสถิติเด็คที่เผยแพร่"
+  },
+  "newCardLimit": {
+    "title": "จำกัดการ์ดใหม่",
+    "hint": "จำนวนการ์ดใหม่ที่เพิ่มในคิวทบทวนต่อวันต่อเด็ค"
+  },
+  "dailyGoal": {
+    "title": "เป้าหมายเรียนรายวัน",
+    "placeholder": "เช่น 30",
+    "hint": "ตั้งเป้าเรียนต่อวัน (นาที) เว้นว่างถ้าไม่มีเป้า"
+  },
+  "theme": {
+    "title": "ธีม",
+    "light": "สว่าง",
+    "dark": "มืด",
+    "system": "ระบบ"
+  },
+  "export": {
+    "title": "ส่งออกข้อมูล",
+    "stats": "สถิติการเรียน",
+    "sessions": "เซสชันเรียน",
+    "decks": "เด็ค",
+    "cards": "การ์ด"
+  },
+  "alerts": {
+    "error": "ผิดพลาด"
   }
 }

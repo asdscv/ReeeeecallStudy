@@ -8,9 +8,14 @@
     "namePlaceholder": "请输入您的名称",
     "saveBtn": "保存",
     "nameSaved": "名称已保存！",
-    "nameAvailable": "可以使用",
+    "nameAvailable": "名称可用！",
     "nameTaken": "该名称已被使用",
-    "nameLength": "名称必须为2-12个字符"
+    "nameLength": "名称必须为2-12个字符",
+    "save": "保存",
+    "checkingName": "正在检查可用性...",
+    "nameLengthError": "需要2-12个字符",
+    "savedTitle": "已保存",
+    "savedMessage": "显示名称已更新。"
   },
   "language": {
     "title": "语言",
@@ -39,7 +44,11 @@
     "buttonDesc": "通过点击按钮选择答案",
     "swipe": "滑动",
     "swipeDesc": "通过滑动卡片选择答案",
-    "swipeAutoNote": "滑动方向根据学习模式自动设置。\n• SRS: ← 重来 / → 良好\n• 其他模式: ← 不知道 / → 知道"
+    "swipeAutoNote": "滑动方向根据学习模式自动设置。\n• SRS: ← 重来 / → 良好\n• 其他模式: ← 不知道 / → 知道",
+    "before": "之前",
+    "same": "同时",
+    "after": "之后",
+    "timingDesc": "在正面直接评分（翻面前选择答案）或先看答案。"
   },
   "tts": {
     "title": "自动 TTS 朗读",
@@ -64,20 +73,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "配置用于卡片生成的AI提供商。密钥在服务器端加密并跨设备同步。",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "API密钥在服务器端加密（pgcrypto + Vault，绝不明文存储），并在网页和移动设备间同步。",
+    "configured": "已配置",
+    "notSet": "未设置",
+    "model": "模型",
+    "saving": "正在保存...",
+    "delete": "删除",
+    "deletedTitle": "已删除",
+    "saveSuccess": "{{provider}} API密钥已保存。",
+    "saveError": "保存API密钥失败。",
+    "removed": "{{provider}} API密钥已删除。"
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "需要权限"
   },
   "subscription": {
     "title": "Subscription",
@@ -102,5 +121,47 @@
     "userGuideDesc": "功能说明、学习技巧、分享方法",
     "apiDocs": "API 文档",
     "apiDocsDesc": "API 端点、认证、使用示例"
+  },
+  "quickActions": {
+    "quickStudy": "快速学习",
+    "aiGenerate": "AI生成",
+    "invite": "邀请"
+  },
+  "templates": {
+    "title": "卡片模板",
+    "description": "管理卡片模板、字段和布局"
+  },
+  "shares": {
+    "title": "我的共享",
+    "description": "管理共享卡组和邀请"
+  },
+  "publisher": {
+    "title": "发布者面板",
+    "description": "查看已发布卡组的统计"
+  },
+  "newCardLimit": {
+    "title": "新卡上限",
+    "hint": "每个卡组每天自动加入复习队列的新卡数量。"
+  },
+  "dailyGoal": {
+    "title": "每日学习目标",
+    "placeholder": "例如 30",
+    "hint": "设置每日学习目标（分钟）。留空表示无目标。"
+  },
+  "theme": {
+    "title": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "系统"
+  },
+  "export": {
+    "title": "导出我的数据",
+    "stats": "学习统计",
+    "sessions": "学习记录",
+    "decks": "卡组",
+    "cards": "卡片"
+  },
+  "alerts": {
+    "error": "错误"
   }
 }
