@@ -140,7 +140,6 @@ export function SettingsScreen() {
         }
         if (data) {
           const p = data as Record<string, unknown>
-          console.log('[Settings] profile loaded:', { display_name: p.display_name })
           setProfile({
             display_name: (p.display_name as string) ?? '',
             daily_new_limit: (p.daily_new_limit as number) ?? 20,
