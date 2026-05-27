@@ -8,7 +8,7 @@ import { useAuthState } from './useAuthState'
  *
  * Staleness 정책:
  *   - 화면 포커스 시 fetchDecks()/fetchStats()/fetchTemplates() 호출하지만
- *     store 내부에서 5분 이내 데이터는 스킵 (STALE_AFTER_MS).
+ *     store 내부 TTL 캐시(5분, createStaleCache)로 그 이내 데이터는 스킵.
  *   - 덱/카드 mutation이 store 캐시를 무효화하므로, 다른 화면에서 수정 후
  *     목록으로 돌아오면 (focus) 최신 데이터로 갱신된다. (마운트 전용
  *     useEffect였을 때는 이미 마운트된 목록이 재요청하지 않아 stale 했음.)

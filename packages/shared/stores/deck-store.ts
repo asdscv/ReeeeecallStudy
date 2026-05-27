@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
+import { createStaleCache } from '../lib/cache/stale-cache'
 import type { Deck, CardTemplate, SrsSettings } from '../types/database'
 
 interface DeckStats {
@@ -13,8 +14,12 @@ interface DeckStats {
   last_studied: string | null
 }
 
-// 데이터 신선도 — 이 시간 이내면 네트워크 재요청 스킵
-const STALE_AFTER_MS = 5 * 60 * 1000 // 5분
+// 데이터 신선도 — 이 시간 이내면 네트워크 재요청 스킵 (5분).
+// Freshness is tracked outside Zustand state via a shared TTL cache: it is not
+// render state (no component reads it), so it must not live in the store or
+// trigger re-renders. Keys: 'decks' | 'stats' | 'templates'.
+export type DeckCacheKey = 'decks' | 'stats' | 'templates'
+const deckCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
 interface DeckState {
   decks: Deck[]
@@ -23,14 +28,11 @@ interface DeckState {
   loading: boolean
   error: string | null
 
-  // staleness tracking
-  decksFetchedAt: number | null
-  statsFetchedAt: number | null
-  templatesFetchedAt: number | null
-
   fetchDecks: (opts?: { force?: boolean }) => Promise<void>
   fetchStats: (userId: string, opts?: { force?: boolean }) => Promise<void>
   fetchTemplates: (opts?: { force?: boolean }) => Promise<void>
+  /** Drop cached freshness so the next fetch hits the network. Omit key → all. */
+  invalidate: (key?: DeckCacheKey) => void
   createDeck: (data: {
     name: string
     description?: string
@@ -50,13 +52,11 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   templates: [],
   loading: false,
   error: null,
-  decksFetchedAt: null,
-  statsFetchedAt: null,
-  templatesFetchedAt: null,
+
+  invalidate: (key) => deckCache.invalidate(key),
 
   fetchDecks: async (opts) => {
-    const { decksFetchedAt } = get()
-    if (!opts?.force && decksFetchedAt && Date.now() - decksFetchedAt < STALE_AFTER_MS) return
+    if (!deckCache.shouldFetch('decks', opts)) return
     set({ loading: true, error: null })
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -103,24 +103,24 @@ export const useDeckStore = create<DeckState>((set, get) => ({
       }
     }
 
-    set({ decks: allDecks, loading: false, decksFetchedAt: Date.now() })
+    set({ decks: allDecks, loading: false })
+    deckCache.markFetched('decks')
   },
 
   fetchStats: async (userId: string, opts?) => {
-    const { statsFetchedAt } = get()
-    if (!opts?.force && statsFetchedAt && Date.now() - statsFetchedAt < STALE_AFTER_MS) return
+    if (!deckCache.shouldFetch('stats', opts)) return
     const { data, error } = await supabase.rpc('get_deck_stats', {
       p_user_id: userId,
     } as Record<string, unknown>)
 
     if (!error && data) {
-      set({ stats: data as DeckStats[], statsFetchedAt: Date.now() })
+      set({ stats: data as DeckStats[] })
+      deckCache.markFetched('stats')
     }
   },
 
   fetchTemplates: async (opts?) => {
-    const { templatesFetchedAt } = get()
-    if (!opts?.force && templatesFetchedAt && Date.now() - templatesFetchedAt < STALE_AFTER_MS) return
+    if (!deckCache.shouldFetch('templates', opts)) return
     const { data } = await supabase
       .from('card_templates')
       .select('*')
@@ -128,7 +128,8 @@ export const useDeckStore = create<DeckState>((set, get) => ({
       .order('name')
 
     if (data) {
-      set({ templates: data as CardTemplate[], templatesFetchedAt: Date.now() })
+      set({ templates: data as CardTemplate[] })
+      deckCache.markFetched('templates')
     }
   },
 
@@ -168,9 +169,9 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     }
 
     guard.recordSuccess('decks_total')
-    // force: the store was just populated (decksFetchedAt is fresh), so a plain
-    // fetch would short-circuit on the staleness cache and the new deck would
-    // not appear until the cache expired or the user pull-to-refreshed.
+    // force: the 'decks'/'stats' cache entries were just marked fresh, so a plain
+    // fetch would short-circuit on the TTL cache and the new deck would not appear
+    // until the cache expired or the user pull-to-refreshed.
     await get().fetchDecks({ force: true })
     await get().fetchStats(user.id, { force: true })
     return deck as Deck
