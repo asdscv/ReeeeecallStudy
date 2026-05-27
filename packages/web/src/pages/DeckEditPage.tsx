@@ -51,7 +51,7 @@ export function DeckEditPage() {
     icon: ICONS[0],
     templateId: '',
     learningLanguage: '',
-    nativeLanguage: '',
+    nativeLanguages: [],
     studyLevel: '',
     srsSettings: { ...DEFAULT_SRS_SETTINGS },
   })
@@ -97,7 +97,7 @@ export function DeckEditPage() {
         icon: deckData.icon,
         templateId: deckData.default_template_id || '',
         learningLanguage: deckData.learning_language || '',
-        nativeLanguage: deckData.native_language || '',
+        nativeLanguages: deckData.native_languages ?? (deckData.native_language ? [deckData.native_language] : []),
         studyLevel: deckData.study_level || '',
         srsSettings: deckData.srs_settings ?? { ...DEFAULT_SRS_SETTINGS },
       })
@@ -123,7 +123,8 @@ export function DeckEditPage() {
       icon: formValues.icon,
       default_template_id: formValues.templateId || null,
       learning_language: formValues.learningLanguage || null,
-      native_language: formValues.nativeLanguage || null,
+      native_language: formValues.nativeLanguages[0] || null,
+      native_languages: formValues.nativeLanguages.length ? formValues.nativeLanguages : null,
       study_level: formValues.studyLevel || null,
       srs_settings: formValues.srsSettings,
     })

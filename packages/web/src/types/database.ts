@@ -88,6 +88,7 @@ export interface Database {
           is_readonly: boolean
           learning_language: string | null
           native_language: string | null
+          native_languages?: string[] | null
           study_level: string | null
           created_at: string
           updated_at: string
@@ -110,6 +111,7 @@ export interface Database {
           is_readonly?: boolean
           learning_language?: string | null
           native_language?: string | null
+          native_languages?: string[] | null
           study_level?: string | null
         }
         Update: Partial<Database['public']['Tables']['decks']['Insert']>
@@ -376,6 +378,7 @@ export type MarketplaceListing = {
   acquire_count: number
   learning_language?: string | null
   native_language?: string | null
+  native_languages?: string[] | null
   study_level?: string | null
   view_count?: number
   avg_rating?: number
