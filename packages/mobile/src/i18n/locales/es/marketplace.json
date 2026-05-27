@@ -86,5 +86,32 @@
   "nativeLanguage": {
     "label": "Idioma nativo",
     "all": "Todos"
+  },
+  "publisherStats": {
+    "title": "Estadísticas de publicador",
+    "dashboard": "Panel de publicador",
+    "listings": "Publicaciones",
+    "views": "Vistas",
+    "acquires": "Adquisiciones",
+    "conversion": "Conv.",
+    "yourListings": "Tus publicaciones",
+    "dailyViews": "Vistas diarias (30 días)",
+    "topListings": "Publicaciones más vistas",
+    "recentAcquisitions": "Adquisiciones recientes",
+    "noAcquisitions": "Aún no hay adquisiciones",
+    "recentReviews": "Reseñas recientes",
+    "noReviews": "Aún no hay reseñas",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "viewsCount": "{{value}} vistas",
+    "acquiresCount": "{{value}} adquis.",
+    "convCount": "{{value}}% conv",
+    "anonymous": "Anónimo",
+    "acquiredActivity": "{{user}} adquirió {{deck}}",
+    "emptyTitle": "Sin publicaciones",
+    "emptyDesc": "Publica un mazo para ver estadísticas.",
+    "minutesAgo": "hace {{n}} m",
+    "hoursAgo": "hace {{n}} h",
+    "daysAgo": "hace {{n}} d"
   }
 }

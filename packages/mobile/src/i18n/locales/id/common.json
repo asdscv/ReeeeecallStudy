@@ -261,5 +261,10 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "drawerTips": {
+    "hamburger": "Ketuk menu (☰) untuk navigasi",
+    "dashboard": "Dasbor menampilkan statistik & streak belajar",
+    "quickStudy": "Belajar cepat memulai sesi seketika"
   }
 }

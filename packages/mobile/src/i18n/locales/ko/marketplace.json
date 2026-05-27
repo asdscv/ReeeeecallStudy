@@ -93,5 +93,32 @@
   "nativeLanguage": {
     "label": "모국어",
     "all": "전체"
+  },
+  "publisherStats": {
+    "title": "퍼블리셔 통계",
+    "dashboard": "퍼블리셔 대시보드",
+    "listings": "리스팅",
+    "views": "조회수",
+    "acquires": "획득",
+    "conversion": "전환율",
+    "yourListings": "내 리스팅",
+    "dailyViews": "일별 조회수 (30일)",
+    "topListings": "조회수 상위 리스팅",
+    "recentAcquisitions": "최근 획득",
+    "noAcquisitions": "아직 획득이 없습니다",
+    "recentReviews": "최근 리뷰",
+    "noReviews": "아직 리뷰가 없습니다",
+    "active": "활성",
+    "inactive": "비활성",
+    "viewsCount": "조회 {{value}}",
+    "acquiresCount": "획득 {{value}}",
+    "convCount": "전환 {{value}}%",
+    "anonymous": "익명",
+    "acquiredActivity": "{{user}}님이 {{deck}}을(를) 받았습니다",
+    "emptyTitle": "게시된 리스팅 없음",
+    "emptyDesc": "덱을 게시하면 통계가 집계됩니다.",
+    "minutesAgo": "{{n}}분 전",
+    "hoursAgo": "{{n}}시간 전",
+    "daysAgo": "{{n}}일 전"
   }
 }

@@ -261,5 +261,10 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "drawerTips": {
+    "hamburger": "Nhấn menu (☰) để điều hướng",
+    "dashboard": "Bảng điều khiển hiển thị thống kê và chuỗi học",
+    "quickStudy": "Học nhanh bắt đầu phiên ngay lập tức"
   }
 }
