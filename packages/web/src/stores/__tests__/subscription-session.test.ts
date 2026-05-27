@@ -61,11 +61,14 @@ describe('sendHeartbeat — transient never kicks', () => {
 })
 
 describe('registerSession — only a genuine block kicks', () => {
-  it('allowed → sessionValid true', async () => {
+  it('allowed → sessionValid true, registers with platform "web"', async () => {
     mockRpc.mockResolvedValue({ data: { allowed: true }, error: null })
     const r = await useSubscriptionStore.getState().registerSession()
     expect(r.allowed).toBe(true)
     expect(useSubscriptionStore.getState().sessionValid).toBe(true)
+    // web store must register as the 'web' platform (app + web coexist)
+    const call = mockRpc.mock.calls.find((c) => c[0] === 'register_session')
+    expect((call?.[1] as { p_platform?: string })?.p_platform).toBe('web')
   })
 
   it('network error → sessionValid NOT flipped', async () => {
@@ -90,18 +93,34 @@ describe('registerSession — only a genuine block kicks', () => {
   })
 })
 
-describe('startHeartbeat tick — expired recovers via re-register', () => {
-  it('expired heartbeat → re-register succeeds → sessionValid stays true', async () => {
+describe('startHeartbeat tick — single-session policy', () => {
+  it('expired → sessionValid false and does NOT auto re-register (no ping-pong)', async () => {
     vi.useFakeTimers()
     try {
-      // heartbeat says expired; register_session (mock) returns allowed:true
+      // Another device of this platform took over → row gone → session_expired.
       setHeartbeat({ data: { valid: false, reason: 'session_expired' }, error: null })
+      useSubscriptionStore.setState({ sessionValid: true })
       const stop = useSubscriptionStore.getState().startHeartbeat()
       await vi.advanceTimersByTimeAsync(60 * 1000) // fire one tick
       stop()
+      expect(useSubscriptionStore.getState().sessionValid).toBe(false)
+      // Must NOT auto re-register — that would kick the device that took over and
+      // ping-pong. The user reclaims manually via the SessionKicked screen.
+      expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('transient (network) → sessionValid stays true, no kick', async () => {
+    vi.useFakeTimers()
+    try {
+      setHeartbeat({ data: null, error: { message: 'net' } })
+      useSubscriptionStore.setState({ sessionValid: true })
+      const stop = useSubscriptionStore.getState().startHeartbeat()
+      await vi.advanceTimersByTimeAsync(60 * 1000)
+      stop()
       expect(useSubscriptionStore.getState().sessionValid).toBe(true)
-      // register_session was called as part of recovery
-      expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(true)
     } finally {
       vi.useRealTimers()
     }
