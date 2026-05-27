@@ -2,8 +2,9 @@
   "title": "Chợ ứng dụng",
   "searchPlaceholder": "Tìm kiếm bộ thẻ...",
   "noResults": "Không có kết quả tìm kiếm.",
-  "noResultsHint": "Try a different search or category",
+  "noResultsHint": "Thử tìm kiếm hoặc danh mục khác",
   "categories": {
+    "all": "Tất cả",
     "general": "Tổng hợp",
     "language": "Ngôn ngữ",
     "science": "Khoa học",
@@ -15,9 +16,11 @@
     "other": "Khác"
   },
   "sort": {
-    "popular": "Popular",
-    "newest": "Newest",
-    "cardCount": "Most Cards"
+    "popular": "Phổ biến",
+    "newest": "Mới nhất",
+    "cardCount": "Nhiều thẻ nhất",
+    "trending": "Xu hướng",
+    "topRated": "Đánh giá cao"
   },
   "listing": {
     "cardCount": "{{count}} thẻ",
