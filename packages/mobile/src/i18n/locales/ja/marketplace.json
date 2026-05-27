@@ -127,5 +127,21 @@
     "intermediate": "中級",
     "upper_intermediate": "中上級",
     "advanced": "上級"
+  },
+  "verifiedOnly": "認証済み",
+  "advancedFilters": "詳細",
+  "dateRange": {
+    "label": "公開時期",
+    "7d": "過去7日",
+    "30d": "過去30日",
+    "90d": "過去90日",
+    "all": "全期間"
+  },
+  "shareMode": {
+    "label": "共有モード",
+    "all": "すべて",
+    "copy": "コピー",
+    "subscribe": "購読",
+    "snapshot": "スナップショット"
   }
 }

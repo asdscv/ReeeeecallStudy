@@ -133,5 +133,21 @@
     "intermediate": "Intermediate",
     "upper_intermediate": "Upper Intermediate",
     "advanced": "Advanced"
+  },
+  "verifiedOnly": "Verified",
+  "advancedFilters": "Advanced",
+  "dateRange": {
+    "label": "Published in",
+    "7d": "Last 7d",
+    "30d": "Last 30d",
+    "90d": "Last 90d",
+    "all": "All time"
+  },
+  "shareMode": {
+    "label": "Share mode",
+    "all": "All",
+    "copy": "Copy",
+    "subscribe": "Subscribe",
+    "snapshot": "Snapshot"
   }
 }

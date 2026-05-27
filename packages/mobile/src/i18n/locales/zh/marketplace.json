@@ -127,5 +127,21 @@
     "intermediate": "中级",
     "upper_intermediate": "中高级",
     "advanced": "高级"
+  },
+  "verifiedOnly": "已认证",
+  "advancedFilters": "高级",
+  "dateRange": {
+    "label": "发布时间",
+    "7d": "近7天",
+    "30d": "近30天",
+    "90d": "近90天",
+    "all": "全部时间"
+  },
+  "shareMode": {
+    "label": "共享模式",
+    "all": "全部",
+    "copy": "复制",
+    "subscribe": "订阅",
+    "snapshot": "快照"
   }
 }

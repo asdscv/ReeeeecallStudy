@@ -133,5 +133,21 @@
     "intermediate": "중급",
     "upper_intermediate": "중고급",
     "advanced": "고급"
+  },
+  "verifiedOnly": "인증됨",
+  "advancedFilters": "고급",
+  "dateRange": {
+    "label": "게시 기간",
+    "7d": "최근 7일",
+    "30d": "최근 30일",
+    "90d": "최근 90일",
+    "all": "전체 기간"
+  },
+  "shareMode": {
+    "label": "공유 방식",
+    "all": "전체",
+    "copy": "복사",
+    "subscribe": "구독",
+    "snapshot": "스냅샷"
   }
 }

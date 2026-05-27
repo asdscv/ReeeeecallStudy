@@ -46,13 +46,6 @@ const SORT_OPTIONS: { value: SortBy; labelKey: string }[] = [
   { value: 'top_rated', labelKey: 'sort.topRated' },
 ]
 
-const DATE_LABELS: Record<string, string> = {
-  '7d': 'Last 7d',
-  '30d': 'Last 30d',
-  '90d': 'Last 90d',
-  'all': 'All time',
-}
-
 const PAGE_SIZE = 20
 
 function renderStars(rating: number, max = 5): string {
@@ -177,7 +170,7 @@ export function MarketplaceScreen() {
                   theme.typography.labelSmall,
                   { color: verifiedOnly ? theme.colors.primary : theme.colors.text },
                 ]}>
-                  {'\u2713'} Verified
+                  {'\u2713'} {t('verifiedOnly')}
                 </Text>
               </TouchableOpacity>
 
@@ -195,7 +188,7 @@ export function MarketplaceScreen() {
                   theme.typography.labelSmall,
                   { color: showAdvanced ? theme.colors.primary : theme.colors.text },
                 ]}>
-                  Advanced{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                  {t('advancedFilters')}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -239,7 +232,7 @@ export function MarketplaceScreen() {
               <View style={[styles.advancedPanel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
                 {/* Date range */}
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-                  Published in
+                  {t('dateRange.label')}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
                   {DATE_RANGE_OPTIONS.map((range) => {
@@ -260,7 +253,7 @@ export function MarketplaceScreen() {
                           theme.typography.labelSmall,
                           { color: isActive ? theme.colors.primaryText : theme.colors.text },
                         ]}>
-                          {DATE_LABELS[range] ?? range}
+                          {t(`dateRange.${range}`)}
                         </Text>
                       </TouchableOpacity>
                     )
@@ -269,7 +262,7 @@ export function MarketplaceScreen() {
 
                 {/* Share mode */}
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
-                  Share mode
+                  {t('shareMode.label')}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
                   <TouchableOpacity
@@ -286,7 +279,7 @@ export function MarketplaceScreen() {
                       theme.typography.labelSmall,
                       { color: !shareMode ? theme.colors.primaryText : theme.colors.text },
                     ]}>
-                      All
+                      {t('shareMode.all')}
                     </Text>
                   </TouchableOpacity>
                   {SHARE_MODES.map((mode) => {
@@ -307,7 +300,7 @@ export function MarketplaceScreen() {
                           theme.typography.labelSmall,
                           { color: isActive ? theme.colors.primaryText : theme.colors.text },
                         ]}>
-                          {mode}
+                          {t(`shareMode.${mode}`)}
                         </Text>
                       </TouchableOpacity>
                     )
@@ -431,7 +424,7 @@ export function MarketplaceScreen() {
                 </View>
                 {item.share_mode && (
                   <Text style={[theme.typography.labelSmall, { color: theme.colors.primary }]}>
-                    {item.share_mode === 'subscribe' ? 'Subscribe' : item.share_mode === 'copy' ? 'Copy' : item.share_mode}
+                    {t(`shareMode.${item.share_mode}`, { defaultValue: item.share_mode })}
                   </Text>
                 )}
               </View>
