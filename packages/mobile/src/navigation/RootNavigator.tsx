@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { AppState } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
@@ -68,6 +69,23 @@ export function RootNavigator() {
       cleanup?.()
     }
   }, [user, registerSession, startHeartbeat])
+
+  // On return to foreground, re-register immediately. While backgrounded the JS
+  // runtime/heartbeat is suspended and the auth token may have refreshed; a clean
+  // re-register revalidates + recreates the session row right away instead of
+  // waiting up to 60s for the next heartbeat tick. (registerSession never kicks on
+  // a transient failure, so a slow resume can't trigger the false "another device".)
+  useEffect(() => {
+    if (!user) return
+    let prev = AppState.currentState
+    const sub = AppState.addEventListener('change', (next) => {
+      if (prev.match(/inactive|background/) && next === 'active') {
+        void registerSession()
+      }
+      prev = next
+    })
+    return () => sub.remove()
+  }, [user, registerSession])
 
   const handleReclaim = useCallback(async () => {
     await registerSession()

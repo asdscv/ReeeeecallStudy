@@ -26,13 +26,20 @@ interface SubscriptionState {
   // Actions
   fetchSubscription: () => Promise<void>
   registerSession: () => Promise<{ allowed: boolean; reason?: string }>
-  sendHeartbeat: () => Promise<boolean>
+  sendHeartbeat: () => Promise<'ok' | 'expired' | 'transient'>
   fetchSessions: () => Promise<void>
   revokeSession: (sessionId: string) => Promise<void>
   startHeartbeat: () => () => void  // returns cleanup function
 }
 
 const HEARTBEAT_INTERVAL = 60 * 1000  // 1 minute
+
+// Reasons that are NOT a genuine session kick: the network/auth wasn't ready
+// (classic on background→foreground, before the token refreshes). These must
+// never flip sessionValid=false, or the user sees a false "another device" kick.
+function isTransientReason(reason?: string): boolean {
+  return reason === 'not_authenticated' || reason === 'network_error'
+}
 
 export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   tier: 'free',
@@ -79,14 +86,22 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
         p_device_name: deviceName,
       })
       if (error) {
-        return { allowed: false, reason: error.message }
+        // RPC/network error → transient; do not touch sessionValid.
+        return { allowed: false, reason: 'network_error' }
       }
       const result = data as { allowed: boolean; tier?: PlanName; reason?: string }
       if (result.tier) {
         set({ tier: result.tier })
         setCurrentTier(result.tier)
       }
-      set({ sessionValid: result.allowed })
+      // Only flip sessionValid on a DEFINITIVE answer: allowed → valid; a genuine
+      // block (e.g. session_limit_exceeded once limits are re-enabled) → invalid.
+      // Transient reasons (token not refreshed yet) must NOT kick.
+      if (result.allowed) {
+        set({ sessionValid: true })
+      } else if (!isTransientReason(result.reason)) {
+        set({ sessionValid: false })
+      }
       return { allowed: result.allowed, reason: result.reason }
     } catch {
       return { allowed: false, reason: 'network_error' }
@@ -103,15 +118,20 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
       const { data, error } = await supabase.rpc('session_heartbeat', {
         p_device_id: deviceId,
       })
-      if (error) {
-        set({ sessionValid: false })
-        return false
-      }
+      // Network/RPC error → transient. A blip on background→foreground must
+      // never look like a kick, so leave sessionValid untouched.
+      if (error) return 'transient'
       const result = data as { valid: boolean; reason?: string }
-      set({ sessionValid: result.valid })
-      return result.valid
+      if (result.valid) {
+        set({ sessionValid: true })
+        return 'ok'
+      }
+      // valid=false: only a real expiry if the row is gone (session_expired).
+      // not_authenticated = token not refreshed yet (transient on resume).
+      if (isTransientReason(result.reason)) return 'transient'
+      return 'expired'
     } catch {
-      return false
+      return 'transient'
     }
   },
 
@@ -140,17 +160,15 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
 
   startHeartbeat: () => {
     const tick = async () => {
-      const valid = await get().sendHeartbeat()
-      if (valid) return
-      // 행이 없어 실패한 경우(서버측 정리/콜드스타트 등)는 즉시 끊지 말고
-      // 한 번 재등록을 시도한다. 재등록 후에도 무효일 때만 킥으로 판정.
-      const { allowed } = await get().registerSession()
-      if (!allowed) {
-        set({ sessionValid: false })
-        return
-      }
-      const revalidated = await get().sendHeartbeat()
-      set({ sessionValid: revalidated })
+      const result = await get().sendHeartbeat()
+      // 'ok' → sessionValid already true. 'transient' (network/auth not ready) →
+      // leave sessionValid as-is; never kick on a blip (the resume-race bug).
+      if (result !== 'expired') return
+      // 'expired' → the session row is gone (server-side 30d cleanup / cold start).
+      // Re-register to recreate it. registerSession sets sessionValid: true on
+      // success, false only on a genuine block; a transient failure leaves it
+      // untouched (we retry on the next tick rather than falsely kicking).
+      await get().registerSession()
     }
 
     const intervalId = setInterval(tick, HEARTBEAT_INTERVAL)
