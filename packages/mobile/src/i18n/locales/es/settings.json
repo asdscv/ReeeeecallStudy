@@ -8,9 +8,14 @@
     "namePlaceholder": "Ingresa tu nombre",
     "saveBtn": "Guardar",
     "nameSaved": "¡Nombre guardado!",
-    "nameAvailable": "Disponible",
-    "nameTaken": "Este nombre ya está en uso",
-    "nameLength": "El nombre debe tener entre 2 y 12 caracteres"
+    "nameAvailable": "¡Nombre disponible!",
+    "nameTaken": "Nombre ya en uso",
+    "nameLength": "El nombre debe tener entre 2 y 12 caracteres",
+    "save": "Guardar",
+    "checkingName": "Comprobando disponibilidad...",
+    "nameLengthError": "Se requieren 2-12 caracteres",
+    "savedTitle": "Guardado",
+    "savedMessage": "Nombre actualizado."
   },
   "language": {
     "title": "Idioma",
@@ -39,7 +44,11 @@
     "buttonDesc": "Selecciona respuesta presionando un botón",
     "swipe": "Deslizar",
     "swipeDesc": "Selecciona respuesta deslizando la tarjeta",
-    "swipeAutoNote": "Las direcciones de deslizamiento se configuran automáticamente según el modo de estudio.\n• SRS: ← Otra vez / → Bien\n• Otros modos: ← No sé / → Lo sé"
+    "swipeAutoNote": "Las direcciones de deslizamiento se configuran automáticamente según el modo de estudio.\n• SRS: ← Otra vez / → Bien\n• Otros modos: ← No sé / → Lo sé",
+    "before": "Antes",
+    "same": "Igual",
+    "after": "Después",
+    "timingDesc": "Califica en el frente (responde antes de voltear) o ve la respuesta primero."
   },
   "tts": {
     "title": "Lectura TTS automática",
@@ -64,20 +73,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "Configura proveedores de IA para generar tarjetas. Las claves se cifran en el servidor y se sincronizan entre dispositivos.",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "Las claves API se cifran en el servidor (pgcrypto + Vault, nunca en texto plano) y se sincronizan entre web y móvil.",
+    "configured": "Configurado",
+    "notSet": "Sin configurar",
+    "model": "Modelo",
+    "saving": "Guardando...",
+    "delete": "Eliminar",
+    "deletedTitle": "Eliminado",
+    "saveSuccess": "Clave API de {{provider}} guardada.",
+    "saveError": "No se pudo guardar la clave API.",
+    "removed": "Clave API de {{provider}} eliminada."
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "Permiso requerido"
   },
   "subscription": {
     "title": "Subscription",
@@ -102,5 +121,47 @@
     "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
     "apiDocs": "Documentación API",
     "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+  },
+  "quickActions": {
+    "quickStudy": "Estudio rápido",
+    "aiGenerate": "Generar IA",
+    "invite": "Invitar"
+  },
+  "templates": {
+    "title": "Plantillas de tarjetas",
+    "description": "Gestiona plantillas, campos y diseños"
+  },
+  "shares": {
+    "title": "Mis compartidos",
+    "description": "Gestiona mazos compartidos e invitaciones"
+  },
+  "publisher": {
+    "title": "Panel de publicador",
+    "description": "Estadísticas de tus mazos publicados"
+  },
+  "newCardLimit": {
+    "title": "Límite de tarjetas nuevas",
+    "hint": "Número de tarjetas nuevas añadidas a diario por mazo."
+  },
+  "dailyGoal": {
+    "title": "Meta diaria de estudio",
+    "placeholder": "p. ej. 30",
+    "hint": "Define una meta diaria en minutos. Vacío = sin meta."
+  },
+  "theme": {
+    "title": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "export": {
+    "title": "Exportar mis datos",
+    "stats": "Estadísticas",
+    "sessions": "Sesiones de estudio",
+    "decks": "Mazos",
+    "cards": "Tarjetas"
+  },
+  "alerts": {
+    "error": "Error"
   }
 }

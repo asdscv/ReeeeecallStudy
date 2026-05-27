@@ -8,9 +8,14 @@
     "namePlaceholder": "Masukkan nama Anda",
     "saveBtn": "Simpan",
     "nameSaved": "Nama tersimpan!",
-    "nameAvailable": "Tersedia",
-    "nameTaken": "Nama ini sudah digunakan",
-    "nameLength": "Nama harus 2-12 karakter"
+    "nameAvailable": "Nama tersedia!",
+    "nameTaken": "Nama sudah dipakai",
+    "nameLength": "Nama harus 2-12 karakter",
+    "save": "Simpan",
+    "checkingName": "Memeriksa ketersediaan...",
+    "nameLengthError": "Perlu 2-12 karakter",
+    "savedTitle": "Tersimpan",
+    "savedMessage": "Nama tampilan diperbarui."
   },
   "language": {
     "title": "Bahasa",
@@ -39,7 +44,11 @@
     "buttonDesc": "Pilih jawaban dengan menekan tombol",
     "swipe": "Geser",
     "swipeDesc": "Pilih jawaban dengan menggeser kartu",
-    "swipeAutoNote": "Arah geser diatur secara otomatis berdasarkan mode belajar.\n• SRS: ← Ulangi / → Baik\n• Mode lain: ← Tidak Diketahui / → Diketahui"
+    "swipeAutoNote": "Arah geser diatur secara otomatis berdasarkan mode belajar.\n• SRS: ← Ulangi / → Baik\n• Mode lain: ← Tidak Diketahui / → Diketahui",
+    "before": "Sebelum",
+    "same": "Bersamaan",
+    "after": "Sesudah",
+    "timingDesc": "Nilai langsung di depan (jawab sebelum membalik) atau lihat jawaban dulu."
   },
   "tts": {
     "title": "Pembacaan TTS Otomatis",
@@ -64,20 +73,30 @@
   },
   "aiProviders": {
     "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted locally.",
+    "description": "Atur penyedia AI untuk membuat kartu. Kunci dienkripsi di server dan disinkronkan antar perangkat.",
     "configure": "Configure",
     "cancel": "Cancel",
     "apiKey": "API Key",
     "apiKeyPlaceholder": "Enter your API key...",
     "models": "Models",
     "save": "Save",
-    "securityNote": "API keys are stored locally on your device using encrypted storage and never sent to our servers."
+    "securityNote": "Kunci API dienkripsi di server (pgcrypto + Vault, tidak pernah teks biasa) dan disinkronkan antara web dan seluler.",
+    "configured": "Terkonfigurasi",
+    "notSet": "Belum diatur",
+    "model": "Model",
+    "saving": "Menyimpan...",
+    "delete": "Hapus",
+    "deletedTitle": "Terhapus",
+    "saveSuccess": "Kunci API {{provider}} tersimpan.",
+    "saveError": "Gagal menyimpan kunci API.",
+    "removed": "Kunci API {{provider}} dihapus."
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
     "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings."
+    "permissionRequired": "Enable notifications in device settings.",
+    "permissionTitle": "Izin diperlukan"
   },
   "subscription": {
     "title": "Subscription",
@@ -102,5 +121,47 @@
     "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
     "apiDocs": "Dokumentasi API",
     "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
+  },
+  "quickActions": {
+    "quickStudy": "Belajar cepat",
+    "aiGenerate": "Buat dgn AI",
+    "invite": "Undang"
+  },
+  "templates": {
+    "title": "Templat kartu",
+    "description": "Kelola templat, kolom, dan tata letak"
+  },
+  "shares": {
+    "title": "Bagikan saya",
+    "description": "Kelola dek berbagi dan undangan"
+  },
+  "publisher": {
+    "title": "Dasbor penerbit",
+    "description": "Lihat statistik dek terbit"
+  },
+  "newCardLimit": {
+    "title": "Batas kartu baru",
+    "hint": "Jumlah kartu baru yang ditambahkan ke antrean harian per dek."
+  },
+  "dailyGoal": {
+    "title": "Target belajar harian",
+    "placeholder": "mis. 30",
+    "hint": "Tetapkan target harian (menit). Kosongkan jika tanpa target."
+  },
+  "theme": {
+    "title": "Tema",
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem"
+  },
+  "export": {
+    "title": "Ekspor data saya",
+    "stats": "Statistik belajar",
+    "sessions": "Sesi belajar",
+    "decks": "Dek",
+    "cards": "Kartu"
+  },
+  "alerts": {
+    "error": "Galat"
   }
 }

@@ -4,7 +4,14 @@
     "title": "프로필",
     "email": "이메일",
     "displayName": "표시 이름",
-    "displayNamePlaceholder": "2-12자"
+    "displayNamePlaceholder": "2-12자",
+    "save": "저장",
+    "checkingName": "사용 가능 여부 확인 중...",
+    "nameTaken": "이미 사용 중인 이름입니다",
+    "nameLengthError": "2-12자여야 합니다",
+    "nameAvailable": "사용 가능한 이름입니다!",
+    "savedTitle": "저장됨",
+    "savedMessage": "표시 이름이 변경되었습니다."
   },
   "language": {
     "title": "언어"
@@ -21,7 +28,11 @@
     "button": "버튼",
     "buttonDesc": "버튼을 눌러 답변 선택",
     "swipe": "스와이프",
-    "swipeDesc": "카드를 밀어서 답변 선택"
+    "swipeDesc": "카드를 밀어서 답변 선택",
+    "before": "먼저",
+    "same": "동시",
+    "after": "나중",
+    "timingDesc": "앞면에서 바로 평가(뒤집기 전 정답 선택)하거나 정답을 먼저 봅니다."
   },
   "tts": {
     "title": "자동 TTS 읽기",
@@ -45,20 +56,30 @@
   },
   "aiProviders": {
     "title": "AI 프로바이더",
-    "description": "카드 생성용 AI 프로바이더를 설정합니다. 키는 로컬에 암호화되어 저장됩니다.",
+    "description": "카드 생성을 위한 AI 프로바이더를 설정합니다. 키는 서버에서 암호화되어 기기 간 동기화됩니다.",
     "configure": "설정",
     "cancel": "취소",
     "apiKey": "API 키",
     "apiKeyPlaceholder": "API 키를 입력하세요...",
     "models": "모델",
     "save": "저장",
-    "securityNote": "API 키는 기기에 암호화되어 저장되며 서버로 전송되지 않습니다."
+    "securityNote": "API 키는 서버에서 암호화(pgcrypto + Vault, 평문 저장 안 함)되어 웹/모바일 기기 간 동기화됩니다.",
+    "configured": "설정됨",
+    "notSet": "미설정",
+    "model": "모델",
+    "saving": "저장 중...",
+    "delete": "삭제",
+    "deletedTitle": "삭제됨",
+    "saveSuccess": "{{provider}} API 키가 저장되었습니다.",
+    "saveError": "API 키 저장에 실패했습니다.",
+    "removed": "{{provider}} API 키가 삭제되었습니다."
   },
   "notifications": {
     "title": "알림",
     "dailyReminder": "일일 학습 알림",
     "reminderDesc": "매일 오전 9시에 카드 복습을 알려드립니다.",
-    "permissionRequired": "기기 설정에서 알림을 활성화해주세요."
+    "permissionRequired": "기기 설정에서 알림을 활성화해주세요.",
+    "permissionTitle": "권한 필요"
   },
   "subscription": {
     "title": "구독",
@@ -87,5 +108,47 @@
     "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
     "apiDocs": "API 문서",
     "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+  },
+  "quickActions": {
+    "quickStudy": "빠른 학습",
+    "aiGenerate": "AI 생성",
+    "invite": "초대"
+  },
+  "templates": {
+    "title": "카드 템플릿",
+    "description": "카드 템플릿, 필드, 레이아웃 관리"
+  },
+  "shares": {
+    "title": "내 공유",
+    "description": "공유한 덱과 초대 관리"
+  },
+  "publisher": {
+    "title": "퍼블리셔 대시보드",
+    "description": "게시한 덱의 통계 보기"
+  },
+  "newCardLimit": {
+    "title": "새 카드 한도",
+    "hint": "덱별로 매일 복습 큐에 자동 추가되는 새 카드 수입니다."
+  },
+  "dailyGoal": {
+    "title": "일일 학습 목표",
+    "placeholder": "예: 30",
+    "hint": "하루 학습 목표(분)를 설정하세요. 비워두면 목표 없음."
+  },
+  "theme": {
+    "title": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  },
+  "export": {
+    "title": "내 데이터 내보내기",
+    "stats": "학습 통계",
+    "sessions": "학습 세션",
+    "decks": "덱",
+    "cards": "카드"
+  },
+  "alerts": {
+    "error": "오류"
   }
 }
