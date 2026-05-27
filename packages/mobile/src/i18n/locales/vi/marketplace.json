@@ -85,7 +85,8 @@
   },
   "nativeLanguage": {
     "label": "Tiếng mẹ đẻ",
-    "all": "Tất cả"
+    "all": "Tất cả",
+    "none": "Không xác định"
   },
   "publisherStats": {
     "title": "Thống kê nhà xuất bản",
@@ -113,5 +114,15 @@
     "minutesAgo": "{{n}} phút trước",
     "hoursAgo": "{{n}} giờ trước",
     "daysAgo": "{{n}} ngày trước"
+  },
+  "studyLevel": {
+    "label": "Trình độ học",
+    "all": "Tất cả",
+    "none": "Không xác định",
+    "beginner": "Sơ cấp",
+    "upper_beginner": "Sơ trung cấp",
+    "intermediate": "Trung cấp",
+    "upper_intermediate": "Trung cao cấp",
+    "advanced": "Cao cấp"
   }
 }

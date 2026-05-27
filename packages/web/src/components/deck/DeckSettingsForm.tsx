@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { SrsSettings, CardTemplate } from '../../types/database'
-import { LEARNING_LANGUAGES } from '../../lib/marketplace'
+import { LEARNING_LANGUAGES, NATIVE_LANGUAGES, STUDY_LEVELS } from '../../lib/marketplace'
 
 export const COLORS = [
   '#3B82F6', '#EF4444', '#22C55E', '#F59E0B',
@@ -23,6 +23,8 @@ export interface DeckSettingsFormValues {
   icon: string
   templateId: string
   learningLanguage: string
+  nativeLanguage: string
+  studyLevel: string
   srsSettings: SrsSettings
 }
 
@@ -34,7 +36,7 @@ interface DeckSettingsFormProps {
 
 export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFormProps) {
   const { t } = useTranslation(['decks', 'marketplace'])
-  const { name, description, color, icon, templateId, learningLanguage, srsSettings } = values
+  const { name, description, color, icon, templateId, learningLanguage, nativeLanguage, studyLevel, srsSettings } = values
 
   const update = (patch: Partial<DeckSettingsFormValues>) => {
     onChange({ ...values, ...patch })
@@ -154,6 +156,44 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         >
           <option value="">{t('learningLanguage.all', { ns: 'marketplace' })}</option>
           {LEARNING_LANGUAGES.map((l) => (
+            <option key={l.value} value={l.value}>
+              {t(l.labelKey, { ns: 'marketplace' })}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 모국어 */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-1">
+          {t('nativeLanguage.label', { ns: 'marketplace' })}
+        </label>
+        <select
+          value={nativeLanguage}
+          onChange={(e) => update({ nativeLanguage: e.target.value })}
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
+        >
+          <option value="">{t('nativeLanguage.none', { ns: 'marketplace' })}</option>
+          {NATIVE_LANGUAGES.map((l) => (
+            <option key={l.value} value={l.value}>
+              {t(l.labelKey, { ns: 'marketplace' })}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 학습 수준 */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-1">
+          {t('studyLevel.label', { ns: 'marketplace' })}
+        </label>
+        <select
+          value={studyLevel}
+          onChange={(e) => update({ studyLevel: e.target.value })}
+          className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
+        >
+          <option value="">{t('studyLevel.none', { ns: 'marketplace' })}</option>
+          {STUDY_LEVELS.map((l) => (
             <option key={l.value} value={l.value}>
               {t(l.labelKey, { ns: 'marketplace' })}
             </option>

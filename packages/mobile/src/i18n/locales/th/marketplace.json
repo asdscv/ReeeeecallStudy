@@ -85,7 +85,8 @@
   },
   "nativeLanguage": {
     "label": "ภาษาแม่",
-    "all": "ทั้งหมด"
+    "all": "ทั้งหมด",
+    "none": "ไม่ระบุ"
   },
   "publisherStats": {
     "title": "สถิติผู้เผยแพร่",
@@ -113,5 +114,15 @@
     "minutesAgo": "{{n}} นาทีที่แล้ว",
     "hoursAgo": "{{n}} ชม.ที่แล้ว",
     "daysAgo": "{{n}} วันที่แล้ว"
+  },
+  "studyLevel": {
+    "label": "ระดับการเรียน",
+    "all": "ทั้งหมด",
+    "none": "ไม่ระบุ",
+    "beginner": "ระดับต้น",
+    "upper_beginner": "ระดับต้น-กลาง",
+    "intermediate": "ระดับกลาง",
+    "upper_intermediate": "ระดับกลาง-สูง",
+    "advanced": "ระดับสูง"
   }
 }

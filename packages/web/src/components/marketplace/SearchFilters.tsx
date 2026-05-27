@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import {
   MARKETPLACE_CATEGORIES,
   DIFFICULTY_LEVELS,
+  STUDY_LEVELS,
   LEARNING_LANGUAGES,
   NATIVE_LANGUAGES,
   SHARE_MODES,
@@ -249,6 +250,41 @@ export function SearchFilters({
                   <button
                     key={value}
                     onClick={() => onFilterChange({ difficulty: isActive ? undefined : value })}
+                    className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                      isActive
+                        ? 'bg-brand/15 text-brand border-brand/30'
+                        : 'bg-card text-muted-foreground border-border hover:border-brand/30'
+                    }`}
+                  >
+                    {t(labelKey, value)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Study level */}
+          <div>
+            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              {t('studyLevel.label', { defaultValue: 'Study level' })}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => onFilterChange({ studyLevel: undefined })}
+                className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
+                  !filters.studyLevel
+                    ? 'bg-brand/15 text-brand border-brand/30'
+                    : 'bg-card text-muted-foreground border-border hover:border-brand/30'
+                }`}
+              >
+                {t('studyLevel.all', { defaultValue: 'All' })}
+              </button>
+              {STUDY_LEVELS.map(({ value, labelKey }) => {
+                const isActive = filters.studyLevel === value
+                return (
+                  <button
+                    key={value}
+                    onClick={() => onFilterChange({ studyLevel: isActive ? undefined : value })}
                     className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
                       isActive
                         ? 'bg-brand/15 text-brand border-brand/30'
