@@ -199,14 +199,15 @@ function MenuItem({ icon, label, active, theme, onPress, indent, testID }: {
 }
 
 // ── Quick Tips — extensible: just add items to TIPS array ──
+// Navigation-oriented tips only; study-gesture hints belong in the study screen.
 const TIPS = [
-  { icon: '👆', text: 'Tap card to flip, swipe left/right to rate' },
-  { icon: '☰', text: 'Tap hamburger menu (☰) to navigate' },
-  { icon: '📊', text: 'Dashboard shows your study stats & streaks' },
-  { icon: '⚡', text: 'Quick Study starts a session instantly' },
+  { icon: '☰', textKey: 'drawerTips.hamburger' },
+  { icon: '📊', textKey: 'drawerTips.dashboard' },
+  { icon: '⚡', textKey: 'drawerTips.quickStudy' },
 ]
 
 function QuickTips({ theme }: { theme: ReturnType<typeof useTheme> }) {
+  const { t } = useTranslation('common')
   const [tipIndex, setTipIndex] = useState(0)
   const tip = TIPS[tipIndex]
 
@@ -218,7 +219,7 @@ function QuickTips({ theme }: { theme: ReturnType<typeof useTheme> }) {
     >
       <Text style={styles.tipIcon}>{tip.icon}</Text>
       <Text style={[styles.tipText, { color: theme.colors.textSecondary }]} numberOfLines={2}>
-        {tip.text}
+        {t(tip.textKey)}
       </Text>
       <Text style={[styles.tipCounter, { color: theme.colors.textTertiary }]}>
         {tipIndex + 1}/{TIPS.length}

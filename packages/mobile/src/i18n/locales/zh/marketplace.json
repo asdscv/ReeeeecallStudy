@@ -86,5 +86,32 @@
   "nativeLanguage": {
     "label": "母语",
     "all": "全部"
+  },
+  "publisherStats": {
+    "title": "发布者统计",
+    "dashboard": "发布者面板",
+    "listings": "发布",
+    "views": "浏览",
+    "acquires": "获取",
+    "conversion": "转化",
+    "yourListings": "你的发布",
+    "dailyViews": "每日浏览（30天）",
+    "topListings": "浏览量最高的发布",
+    "recentAcquisitions": "最近获取",
+    "noAcquisitions": "暂无获取",
+    "recentReviews": "最近评价",
+    "noReviews": "暂无评价",
+    "active": "活跃",
+    "inactive": "未激活",
+    "viewsCount": "{{value}} 浏览",
+    "acquiresCount": "{{value}} 获取",
+    "convCount": "转化 {{value}}%",
+    "anonymous": "匿名",
+    "acquiredActivity": "{{user}} 获取了 {{deck}}",
+    "emptyTitle": "暂无已发布内容",
+    "emptyDesc": "发布卡组即可开始统计。",
+    "minutesAgo": "{{n}}分钟前",
+    "hoursAgo": "{{n}}小时前",
+    "daysAgo": "{{n}}天前"
   }
 }

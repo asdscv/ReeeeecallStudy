@@ -86,5 +86,32 @@
   "nativeLanguage": {
     "label": "Tiếng mẹ đẻ",
     "all": "Tất cả"
+  },
+  "publisherStats": {
+    "title": "Thống kê nhà xuất bản",
+    "dashboard": "Bảng điều khiển NXB",
+    "listings": "Bài đăng",
+    "views": "Lượt xem",
+    "acquires": "Lượt nhận",
+    "conversion": "Chuyển đổi",
+    "yourListings": "Bài đăng của bạn",
+    "dailyViews": "Lượt xem hằng ngày (30 ngày)",
+    "topListings": "Bài đăng xem nhiều nhất",
+    "recentAcquisitions": "Lượt nhận gần đây",
+    "noAcquisitions": "Chưa có lượt nhận",
+    "recentReviews": "Đánh giá gần đây",
+    "noReviews": "Chưa có đánh giá",
+    "active": "Hoạt động",
+    "inactive": "Ngừng",
+    "viewsCount": "{{value}} lượt xem",
+    "acquiresCount": "{{value}} lượt nhận",
+    "convCount": "{{value}}% chuyển đổi",
+    "anonymous": "Ẩn danh",
+    "acquiredActivity": "{{user}} đã nhận {{deck}}",
+    "emptyTitle": "Chưa có bài đăng",
+    "emptyDesc": "Đăng một bộ thẻ để theo dõi thống kê.",
+    "minutesAgo": "{{n}} phút trước",
+    "hoursAgo": "{{n}} giờ trước",
+    "daysAgo": "{{n}} ngày trước"
   }
 }

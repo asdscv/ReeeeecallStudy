@@ -86,5 +86,32 @@
   "nativeLanguage": {
     "label": "母語",
     "all": "すべて"
+  },
+  "publisherStats": {
+    "title": "パブリッシャー統計",
+    "dashboard": "パブリッシャーダッシュボード",
+    "listings": "出品",
+    "views": "閲覧数",
+    "acquires": "取得",
+    "conversion": "転換率",
+    "yourListings": "あなたの出品",
+    "dailyViews": "日別閲覧数（30日）",
+    "topListings": "閲覧数トップの出品",
+    "recentAcquisitions": "最近の取得",
+    "noAcquisitions": "まだ取得がありません",
+    "recentReviews": "最近のレビュー",
+    "noReviews": "まだレビューがありません",
+    "active": "公開中",
+    "inactive": "非公開",
+    "viewsCount": "{{value}} 閲覧",
+    "acquiresCount": "{{value}} 取得",
+    "convCount": "転換 {{value}}%",
+    "anonymous": "匿名",
+    "acquiredActivity": "{{user}} さんが {{deck}} を取得しました",
+    "emptyTitle": "公開された出品がありません",
+    "emptyDesc": "デッキを公開すると統計が記録されます。",
+    "minutesAgo": "{{n}}分前",
+    "hoursAgo": "{{n}}時間前",
+    "daysAgo": "{{n}}日前"
   }
 }

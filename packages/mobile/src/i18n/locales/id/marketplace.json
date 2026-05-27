@@ -86,5 +86,32 @@
   "nativeLanguage": {
     "label": "Bahasa ibu",
     "all": "Semua"
+  },
+  "publisherStats": {
+    "title": "Statistik penerbit",
+    "dashboard": "Dasbor penerbit",
+    "listings": "Daftar",
+    "views": "Dilihat",
+    "acquires": "Diperoleh",
+    "conversion": "Konv.",
+    "yourListings": "Daftar Anda",
+    "dailyViews": "Dilihat harian (30 hari)",
+    "topListings": "Daftar terpopuler",
+    "recentAcquisitions": "Akuisisi terbaru",
+    "noAcquisitions": "Belum ada akuisisi",
+    "recentReviews": "Ulasan terbaru",
+    "noReviews": "Belum ada ulasan",
+    "active": "Aktif",
+    "inactive": "Nonaktif",
+    "viewsCount": "{{value}} dilihat",
+    "acquiresCount": "{{value}} diperoleh",
+    "convCount": "{{value}}% konv",
+    "anonymous": "Anonim",
+    "acquiredActivity": "{{user}} memperoleh {{deck}}",
+    "emptyTitle": "Belum ada daftar terbit",
+    "emptyDesc": "Terbitkan dek untuk mulai melacak statistik.",
+    "minutesAgo": "{{n}} mnt lalu",
+    "hoursAgo": "{{n}} jam lalu",
+    "daysAgo": "{{n}} hari lalu"
   }
 }

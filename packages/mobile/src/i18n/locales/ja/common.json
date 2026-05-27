@@ -261,5 +261,10 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "drawerTips": {
+    "hamburger": "メニュー（☰）をタップして移動",
+    "dashboard": "ダッシュボードで学習統計と連続記録を確認",
+    "quickStudy": "クイック学習ですぐにセッション開始"
   }
 }

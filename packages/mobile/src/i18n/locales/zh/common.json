@@ -261,5 +261,10 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
+  },
+  "drawerTips": {
+    "hamburger": "点击菜单（☰）进行导航",
+    "dashboard": "仪表盘显示学习统计和连续天数",
+    "quickStudy": "快速学习立即开始学习"
   }
 }
