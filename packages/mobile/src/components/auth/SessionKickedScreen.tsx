@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, TouchableOpacity, Animated, Easing, StyleSheet, Dimensions } from 'react-native'
-import { palette } from '../../theme'
+import { useTranslation } from 'react-i18next'
 
 const { width: W, height: H } = Dimensions.get('window')
 
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export function SessionKickedScreen({ onReclaim, onLogout }: Props) {
+  const { t } = useTranslation('common')
   const [reclaiming, setReclaiming] = useState(false)
 
   // Animations
@@ -104,24 +105,22 @@ export function SessionKickedScreen({ onReclaim, onLogout }: Props) {
 
         {/* Badge */}
         <View style={s.badge}>
-          <Text style={s.badgeText}>📡 세션 만료됨</Text>
+          <Text style={s.badgeText}>📡 {t('sessionKicked.badge')}</Text>
         </View>
 
         {/* Headline */}
-        <Text style={s.headline}>다른 기기에서 로그인됨</Text>
-        <Text style={s.description}>
-          다른 기기에서 계정에 로그인하여 현재 세션이 종료되었습니다. 이 기기에서 계속 사용하려면 세션을 되찾으세요.
-        </Text>
+        <Text style={s.headline}>{t('sessionKicked.headline')}</Text>
+        <Text style={s.description}>{t('sessionKicked.description')}</Text>
 
         {/* Info cards */}
         <View style={s.infoRow}>
           <View style={s.infoCard}>
             <Text style={s.infoIcon}>🖥️</Text>
-            <Text style={s.infoText}>다른 기기에서 활성 세션이 감지되었습니다</Text>
+            <Text style={s.infoText}>{t('sessionKicked.info1')}</Text>
           </View>
           <View style={s.infoCard}>
             <Text style={s.infoIcon}>🛡️</Text>
-            <Text style={s.infoText}>계정 보안을 위한 자동 제한입니다</Text>
+            <Text style={s.infoText}>{t('sessionKicked.info2')}</Text>
           </View>
         </View>
 
@@ -131,19 +130,22 @@ export function SessionKickedScreen({ onReclaim, onLogout }: Props) {
           onPress={handleReclaim}
           disabled={reclaiming}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={t('sessionKicked.reclaim')}
+          accessibilityState={{ disabled: reclaiming, busy: reclaiming }}
         >
           <Text style={s.reclaimText}>
-            {reclaiming ? '세션 복구 중...' : '이 기기에서 계속하기'}
+            {reclaiming ? t('sessionKicked.reclaiming') : t('sessionKicked.reclaim')}
           </Text>
         </TouchableOpacity>
 
         {/* Logout button */}
-        <TouchableOpacity style={s.logoutBtn} onPress={onLogout} activeOpacity={0.7}>
-          <Text style={s.logoutText}>→ 로그아웃</Text>
+        <TouchableOpacity style={s.logoutBtn} onPress={onLogout} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('sessionKicked.logout')}>
+          <Text style={s.logoutText}>→ {t('sessionKicked.logout')}</Text>
         </TouchableOpacity>
 
         {/* Hint */}
-        <Text style={s.hint}>한 번에 하나의 기기에서만 사용할 수 있습니다</Text>
+        <Text style={s.hint}>{t('sessionKicked.hint')}</Text>
       </Animated.View>
     </View>
   )

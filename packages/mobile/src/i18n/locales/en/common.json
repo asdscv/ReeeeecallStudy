@@ -105,5 +105,21 @@
     "hamburger": "Tap the menu (☰) to navigate",
     "dashboard": "Dashboard shows your study stats & streaks",
     "quickStudy": "Quick Study starts a session instantly"
+  },
+  "sessionKicked": {
+    "badge": "Session expired",
+    "headline": "Signed in on another device",
+    "description": "You've been signed out because your account was used on another device. Reclaim this session to keep using it here.",
+    "info1": "An active session was detected on another device",
+    "info2": "An automatic limit to keep your account secure",
+    "reclaiming": "Restoring session…",
+    "reclaim": "Continue on this device",
+    "logout": "Log out",
+    "hint": "Only one device can be used at a time"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "The screen ran into an unexpected error. Please try again.",
+    "retry": "Try again"
   }
 }

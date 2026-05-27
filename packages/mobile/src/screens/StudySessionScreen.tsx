@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Animated, {
@@ -57,6 +58,7 @@ const DEFAULT_FONT_SIZES: Record<string, number> = {
 
 export function StudySessionScreen() {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { t } = useTranslation('study')
   const navigation = useNavigation<Nav>()
   const {
@@ -357,14 +359,14 @@ export function StudySessionScreen() {
 
         {/* Rating area — button mode: buttons, swipe mode: hints */}
         {isFlipped && isSwipeMode && (
-          <View style={styles.swipeRatingHint}>
+          <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>Swipe</Text>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
           </View>
         )}
         {isFlipped && !isSwipeMode && (
-          <View style={[styles.ratingRow, { paddingHorizontal: 16 }]}>
+          <View style={[styles.ratingRow, { paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 24) }]}>
             {config?.mode === 'srs' ? (
               <>
                 <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} />

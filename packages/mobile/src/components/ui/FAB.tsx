@@ -1,4 +1,5 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 import { haptics } from '../../utils/haptics'
@@ -6,11 +7,13 @@ import { haptics } from '../../utils/haptics'
 interface FABProps {
   onPress: () => void
   icon?: string
+  label?: string
   testID?: string
 }
 
-export function FAB({ onPress, icon = '+', testID }: FABProps) {
+export function FAB({ onPress, icon = '+', label, testID }: FABProps) {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
 
   const handlePress = () => {
     haptics.tap()
@@ -22,7 +25,11 @@ export function FAB({ onPress, icon = '+', testID }: FABProps) {
       {...testProps(testID)}
       onPress={handlePress}
       activeOpacity={0.8}
-      style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+      accessibilityRole="button"
+      accessibilityLabel={label ?? 'Add'}
+      // Lift above the home indicator on full-screen usage; floor of 24 keeps
+      // the original spacing when no inset is consuming the bottom.
+      style={[styles.fab, { bottom: Math.max(insets.bottom, 24), backgroundColor: theme.colors.primary }]}
     >
       <Text style={[styles.icon, { color: theme.colors.primaryText }]}>{icon}</Text>
     </TouchableOpacity>
@@ -32,7 +39,6 @@ export function FAB({ onPress, icon = '+', testID }: FABProps) {
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    bottom: 24,
     right: 24,
     width: 56,
     height: 56,

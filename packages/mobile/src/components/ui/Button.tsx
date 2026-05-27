@@ -56,6 +56,9 @@ export function Button({
       onPress={handlePress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[styles.container, fullWidth && styles.fullWidth, style]}
     >
       {loading ? (
@@ -63,7 +66,7 @@ export function Button({
       ) : (
         <>
           {icon}
-          <Text style={[styles.text, textStyle]}>{title}</Text>
+          <Text style={[styles.text, textStyle]} maxFontSizeMultiplier={1.5}>{title}</Text>
         </>
       )}
     </TouchableOpacity>
