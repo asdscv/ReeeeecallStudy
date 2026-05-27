@@ -8,6 +8,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { formatLocalDate } from '../lib/date-utils'
 import { generateTemplateExportJSON, generateTemplateExportCSV } from '../lib/import-export'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { ListSkeleton } from '../components/common/Skeleton'
 import type { CardTemplate } from '../types/database'
 
 export function TemplatesPage() {
@@ -76,9 +77,7 @@ export function TemplatesPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📋</div>
-      </div>
+      <ListSkeleton />
     )
   }
 

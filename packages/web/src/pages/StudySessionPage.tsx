@@ -7,6 +7,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { useAchievementStore } from '../stores/achievement-store'
 import { supabase } from '../lib/supabase'
 import { StudyCard } from '../components/study/StudyCard'
+import { Skeleton } from '../components/common/Skeleton'
 import { StudyProgressBar } from '../components/study/StudyProgressBar'
 import { CrammingProgressBar } from '../components/study/CrammingProgressBar'
 import { SrsRatingButtons } from '../components/study/SrsRatingButtons'
@@ -267,11 +268,19 @@ export function StudySessionPage() {
     onHelp: handleToggleShortcuts,
   })
 
-  // Loading state
+  // Loading state — card-shaped skeleton so the first card swaps in seamlessly
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">{t('session.loading')}</div>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl" aria-busy="true" aria-live="polite">
+          <Skeleton className="h-2 w-full mb-6 rounded-full" />
+          <div className="bg-card rounded-2xl border border-border p-8 sm:p-12 min-h-[20rem] flex flex-col items-center justify-center gap-4">
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-4 w-1/3" />
+          </div>
+          <span className="sr-only">{t('session.loading')}</span>
+        </div>
       </div>
     )
   }

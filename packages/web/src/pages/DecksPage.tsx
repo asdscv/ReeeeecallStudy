@@ -9,6 +9,7 @@ import { DeckFormModal } from '../components/deck/DeckFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { CardGridSkeleton } from '../components/common/Skeleton'
 import type { Deck } from '../types/database'
 
 export function DecksPage() {
@@ -109,9 +110,7 @@ export function DecksPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-4xl animate-pulse">📚</div>
-        </div>
+        <CardGridSkeleton />
       ) : decks.length === 0 ? (
         <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📚</div>

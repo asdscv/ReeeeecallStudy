@@ -17,6 +17,7 @@ import {
   clampBatchSize,
 } from '../lib/study-session-utils'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { CardGridSkeleton } from '../components/common/Skeleton'
 import { MultiDeckSelector } from '../components/study/MultiDeckSelector'
 import type { Deck, StudyMode } from '../types/database'
 
@@ -162,9 +163,7 @@ export function QuickStudyPage() {
       {decks.length > 1 && <MultiDeckSelector />}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-4xl animate-pulse">📚</div>
-        </div>
+        <CardGridSkeleton />
       ) : decks.length === 0 ? (
         <div className="bg-card rounded-xl border border-border p-12 text-center">
           <div className="text-5xl mb-4">📚</div>

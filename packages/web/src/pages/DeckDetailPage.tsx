@@ -17,6 +17,7 @@ import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { DetailSkeleton } from '../components/common/Skeleton'
 import { VersionHistorySection } from '../components/deck/VersionHistorySection'
 import type { Deck, Card, CardTemplate, DeckShare } from '../types/database'
 
@@ -179,9 +180,7 @@ export function DeckDetailPage() {
   // --- Early returns (all hooks above, safe) ---
   if (loading || cardsLoading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📚</div>
-      </div>
+      <DetailSkeleton />
     )
   }
 
