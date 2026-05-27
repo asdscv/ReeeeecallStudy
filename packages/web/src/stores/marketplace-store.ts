@@ -2,7 +2,12 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { filterListings, sortListings, type SortBy, type ListingFilters, type MarketplaceListingData } from '../lib/marketplace'
 import { useDeckStore } from './deck-store'
+import { createStaleCache } from '@reeeeecall/shared/lib/cache/stale-cache'
 import type { MarketplaceListing, ShareMode } from '../types/database'
+
+// Public catalog read cache — see DOCS/TODO/cache-optimization-phase2.md.
+// Read-heavy + benign staleness; invalidated on publish/unpublish, forced on demand.
+const listingsCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
 interface MarketplaceState {
   listings: MarketplaceListing[]
@@ -11,7 +16,7 @@ interface MarketplaceState {
   error: string | null
   filters: ListingFilters & { sortBy: SortBy }
 
-  fetchListings: () => Promise<void>
+  fetchListings: (opts?: { force?: boolean }) => Promise<void>
   fetchMyListings: () => Promise<void>
   publishDeck: (data: {
     deckId: string
@@ -36,7 +41,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
   error: null,
   filters: { sortBy: 'newest' },
 
-  fetchListings: async () => {
+  fetchListings: async (opts) => {
+    if (!listingsCache.shouldFetch('listings', opts)) return
     set({ loading: true, error: null })
 
     // Fetch listings with owner profile info via join
@@ -58,6 +64,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         set({ error: fallbackError.message, loading: false })
       } else {
         set({ listings: (fallbackData ?? []) as MarketplaceListing[], loading: false })
+        listingsCache.markFetched('listings')
       }
     } else {
       // Flatten the joined profile data
@@ -71,6 +78,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         }
       }) as unknown as MarketplaceListing[]
       set({ listings, loading: false })
+      listingsCache.markFetched('listings')
     }
   },
 
@@ -102,6 +110,13 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       .select('*', { count: 'exact', head: true })
       .eq('deck_id', input.deckId)
 
+    // Fetch deck's native language + study level to mirror onto the listing
+    const { data: deckRow } = await supabase
+      .from('decks')
+      .select('native_language, study_level')
+      .eq('id', input.deckId)
+      .single()
+
     const { data, error } = await supabase
       .from('marketplace_listings')
       .insert({
@@ -113,6 +128,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         category: input.category || 'general',
         share_mode: input.shareMode,
         learning_language: input.learningLanguage ?? null,
+        native_language: (deckRow as { native_language?: string | null } | null)?.native_language ?? null,
+        study_level: (deckRow as { study_level?: string | null } | null)?.study_level ?? null,
         card_count: count ?? 0,
         is_active: true,
       } as Record<string, unknown>)
@@ -124,6 +141,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       return null
     }
 
+    listingsCache.invalidate('listings')
     await get().fetchMyListings()
     return data as MarketplaceListing
   },
@@ -139,8 +157,9 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       return
     }
 
+    listingsCache.invalidate('listings')
     await get().fetchMyListings()
-    await get().fetchListings()
+    await get().fetchListings({ force: true })
   },
 
   acquireDeck: async (listingId: string) => {

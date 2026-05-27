@@ -11,7 +11,7 @@ import { useTheme, palette } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import { calculateDeckStats } from '@reeeeecall/shared/lib/stats'
-import { LEARNING_LANGUAGES } from '@reeeeecall/shared/lib/marketplace'
+import { LEARNING_LANGUAGES, NATIVE_LANGUAGES, STUDY_LEVELS } from '@reeeeecall/shared/lib/marketplace'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 import type { SrsSettings, Card } from '@reeeeecall/shared/types/database'
 import type { DecksStackParamList } from '../navigation/types'
@@ -48,6 +48,8 @@ export function DeckEditScreen() {
   const [icon, setIcon] = useState(existingDeck?.icon ?? ICONS[0])
   const [templateId, setTemplateId] = useState(existingDeck?.default_template_id ?? '')
   const [learningLanguage, setLearningLanguage] = useState<string | undefined>(existingDeck?.learning_language ?? undefined)
+  const [nativeLanguage, setNativeLanguage] = useState<string | undefined>(existingDeck?.native_language ?? undefined)
+  const [studyLevel, setStudyLevel] = useState<string | undefined>(existingDeck?.study_level ?? undefined)
   const [saving, setSaving] = useState(false)
 
   // SRS Settings
@@ -115,6 +117,8 @@ export function DeckEditScreen() {
           icon,
           default_template_id: templateId || null,
           learning_language: learningLanguage ?? null,
+          native_language: nativeLanguage ?? null,
+          study_level: studyLevel ?? null,
           srs_settings: finalSrs,
         })
       } else {
@@ -125,6 +129,8 @@ export function DeckEditScreen() {
           icon,
           default_template_id: templateId || undefined,
           learning_language: learningLanguage,
+          native_language: nativeLanguage,
+          study_level: studyLevel,
           srs_settings: finalSrs,
         })
       }
@@ -269,6 +275,94 @@ export function DeckEditScreen() {
                     { color: learningLanguage === lang.value ? theme.colors.primary : theme.colors.text },
                   ]}>
                     {tm(lang.labelKey)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Native Language selector */}
+        <View style={styles.section}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{tm('nativeLanguage.label')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.optionRow}>
+              <TouchableOpacity
+                onPress={() => setNativeLanguage(undefined)}
+                style={[
+                  styles.templateChip,
+                  { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                  !nativeLanguage && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                ]}
+                testID="deck-edit-native-none"
+              >
+                <Text style={[
+                  theme.typography.bodySmall,
+                  { color: !nativeLanguage ? theme.colors.primary : theme.colors.text },
+                ]}>
+                  {tm('nativeLanguage.none')}
+                </Text>
+              </TouchableOpacity>
+              {NATIVE_LANGUAGES.map((lang) => (
+                <TouchableOpacity
+                  key={lang.value}
+                  onPress={() => setNativeLanguage(lang.value)}
+                  style={[
+                    styles.templateChip,
+                    { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                    nativeLanguage === lang.value && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                  ]}
+                  testID={`deck-edit-native-${lang.value}`}
+                >
+                  <Text style={[
+                    theme.typography.bodySmall,
+                    { color: nativeLanguage === lang.value ? theme.colors.primary : theme.colors.text },
+                  ]}>
+                    {tm(lang.labelKey)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Study Level selector */}
+        <View style={styles.section}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{tm('studyLevel.label')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.optionRow}>
+              <TouchableOpacity
+                onPress={() => setStudyLevel(undefined)}
+                style={[
+                  styles.templateChip,
+                  { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                  !studyLevel && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                ]}
+                testID="deck-edit-level-none"
+              >
+                <Text style={[
+                  theme.typography.bodySmall,
+                  { color: !studyLevel ? theme.colors.primary : theme.colors.text },
+                ]}>
+                  {tm('studyLevel.none')}
+                </Text>
+              </TouchableOpacity>
+              {STUDY_LEVELS.map((lvl) => (
+                <TouchableOpacity
+                  key={lvl.value}
+                  onPress={() => setStudyLevel(lvl.value)}
+                  style={[
+                    styles.templateChip,
+                    { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                    studyLevel === lvl.value && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                  ]}
+                  testID={`deck-edit-level-${lvl.value}`}
+                >
+                  <Text style={[
+                    theme.typography.bodySmall,
+                    { color: studyLevel === lvl.value ? theme.colors.primary : theme.colors.text },
+                  ]}>
+                    {tm(lvl.labelKey)}
                   </Text>
                 </TouchableOpacity>
               ))}

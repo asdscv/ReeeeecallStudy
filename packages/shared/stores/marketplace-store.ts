@@ -2,7 +2,14 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { filterListings, sortListings, type SortBy, type ListingFilters, type MarketplaceListingData } from '../lib/marketplace'
 import { useDeckStore } from './deck-store'
+import { createStaleCache } from '../lib/cache/stale-cache'
 import type { MarketplaceListing, ShareMode } from '../types/database'
+
+// The public catalog (fetchListings) is read-heavy and benign to serve slightly
+// stale (the viewer doesn't own/edit it). TTL-cache it so re-opening Marketplace
+// doesn't refetch every active listing. Invalidated on publish/unpublish; pull-to-
+// refresh forces. Freshness is not render state → kept outside the store.
+const listingsCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
 interface MarketplaceState {
   listings: MarketplaceListing[]
@@ -11,7 +18,7 @@ interface MarketplaceState {
   error: string | null
   filters: ListingFilters & { sortBy: SortBy }
 
-  fetchListings: () => Promise<void>
+  fetchListings: (opts?: { force?: boolean }) => Promise<void>
   fetchMyListings: () => Promise<void>
   publishDeck: (data: {
     deckId: string
@@ -36,7 +43,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
   error: null,
   filters: { sortBy: 'newest' },
 
-  fetchListings: async () => {
+  fetchListings: async (opts) => {
+    if (!listingsCache.shouldFetch('listings', opts)) return
     set({ loading: true, error: null })
 
     const { data, error } = await supabase
@@ -49,6 +57,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       set({ error: error.message, loading: false })
     } else {
       set({ listings: (data ?? []) as MarketplaceListing[], loading: false })
+      listingsCache.markFetched('listings')
     }
   },
 
@@ -80,6 +89,14 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       .select('*', { count: 'exact', head: true })
       .eq('deck_id', input.deckId)
 
+    // Carry over the deck's native_language / study_level so user-published
+    // listings are filterable in the marketplace.
+    const { data: deckRow } = await supabase
+      .from('decks')
+      .select('native_language, study_level')
+      .eq('id', input.deckId)
+      .single()
+
     const { data, error } = await supabase
       .from('marketplace_listings')
       .insert({
@@ -92,6 +109,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         share_mode: input.shareMode,
         card_count: count ?? 0,
         learning_language: input.learningLanguage ?? null,
+        native_language: (deckRow as { native_language?: string | null } | null)?.native_language ?? null,
+        study_level: (deckRow as { study_level?: string | null } | null)?.study_level ?? null,
         is_active: true,
       } as Record<string, unknown>)
       .select()
@@ -102,6 +121,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       return null
     }
 
+    // New listing changes the public catalog → drop its cache so it refetches.
+    listingsCache.invalidate('listings')
     await get().fetchMyListings()
     return data as MarketplaceListing
   },
@@ -117,8 +138,9 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       return
     }
 
+    listingsCache.invalidate('listings')
     await get().fetchMyListings()
-    await get().fetchListings()
+    await get().fetchListings({ force: true })
   },
 
   acquireDeck: async (listingId: string) => {

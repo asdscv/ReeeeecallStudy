@@ -92,7 +92,8 @@
   },
   "nativeLanguage": {
     "label": "모국어",
-    "all": "전체"
+    "all": "전체",
+    "none": "미지정"
   },
   "publisherStats": {
     "title": "퍼블리셔 통계",
@@ -120,5 +121,15 @@
     "minutesAgo": "{{n}}분 전",
     "hoursAgo": "{{n}}시간 전",
     "daysAgo": "{{n}}일 전"
+  },
+  "studyLevel": {
+    "label": "학습 수준",
+    "all": "전체",
+    "none": "미지정",
+    "beginner": "초급",
+    "upper_beginner": "초중급",
+    "intermediate": "중급",
+    "upper_intermediate": "중고급",
+    "advanced": "고급"
   }
 }

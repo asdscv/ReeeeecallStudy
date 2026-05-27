@@ -92,7 +92,8 @@
   },
   "nativeLanguage": {
     "label": "Native language",
-    "all": "All"
+    "all": "All",
+    "none": "Not specified"
   },
   "publisherStats": {
     "title": "Publisher Stats",
@@ -120,5 +121,15 @@
     "minutesAgo": "{{n}}m ago",
     "hoursAgo": "{{n}}h ago",
     "daysAgo": "{{n}}d ago"
+  },
+  "studyLevel": {
+    "label": "Study level",
+    "all": "All",
+    "none": "Not specified",
+    "beginner": "Beginner",
+    "upper_beginner": "Upper Beginner",
+    "intermediate": "Intermediate",
+    "upper_intermediate": "Upper Intermediate",
+    "advanced": "Advanced"
   }
 }

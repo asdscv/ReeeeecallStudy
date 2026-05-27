@@ -96,6 +96,17 @@
   },
   "nativeLanguage": {
     "label": "Bahasa ibu",
-    "all": "Semua"
+    "all": "Semua",
+    "none": "Tidak ditentukan"
+  },
+  "studyLevel": {
+    "label": "Tingkat belajar",
+    "all": "Semua",
+    "none": "Tidak ditentukan",
+    "beginner": "Pemula",
+    "upper_beginner": "Pemula Atas",
+    "intermediate": "Menengah",
+    "upper_intermediate": "Menengah Atas",
+    "advanced": "Lanjutan"
   }
 }

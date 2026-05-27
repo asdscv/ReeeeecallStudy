@@ -96,6 +96,17 @@
   },
   "nativeLanguage": {
     "label": "Tiếng mẹ đẻ",
-    "all": "Tất cả"
+    "all": "Tất cả",
+    "none": "Không xác định"
+  },
+  "studyLevel": {
+    "label": "Trình độ học",
+    "all": "Tất cả",
+    "none": "Không xác định",
+    "beginner": "Sơ cấp",
+    "upper_beginner": "Sơ trung cấp",
+    "intermediate": "Trung cấp",
+    "upper_intermediate": "Trung cao cấp",
+    "advanced": "Cao cấp"
   }
 }

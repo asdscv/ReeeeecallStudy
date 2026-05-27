@@ -96,6 +96,17 @@
   },
   "nativeLanguage": {
     "label": "Idioma nativo",
-    "all": "Todos"
+    "all": "Todos",
+    "none": "Sin especificar"
+  },
+  "studyLevel": {
+    "label": "Nivel de estudio",
+    "all": "Todos",
+    "none": "Sin especificar",
+    "beginner": "Principiante",
+    "upper_beginner": "Principiante alto",
+    "intermediate": "Intermedio",
+    "upper_intermediate": "Intermedio alto",
+    "advanced": "Avanzado"
   }
 }
