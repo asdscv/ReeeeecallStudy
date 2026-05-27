@@ -337,7 +337,7 @@ export function TemplateEditPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand disabled:opacity-50 cursor-pointer transition shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition shrink-0"
         >
           <Save size={16} />
           <span className="hidden sm:inline">{saving ? `${t('common:saving')}...` : t('common:save')}</span>
@@ -415,7 +415,7 @@ export function TemplateEditPage() {
                     type="button"
                     onClick={() => removeField(i)}
                     disabled={fields.length <= 1}
-                    className="p-1.5 text-destructive/70 hover:text-destructive disabled:opacity-30 cursor-pointer rounded-lg hover:bg-destructive/10 transition"
+                    className="p-1.5 text-destructive/70 hover:text-destructive disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-lg hover:bg-destructive/10 transition"
                   >
                     <Trash2 size={14} />
                   </button>

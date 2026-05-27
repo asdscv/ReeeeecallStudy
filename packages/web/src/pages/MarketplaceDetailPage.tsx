@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useMarketplaceStore } from '../stores/marketplace-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useSharingStore } from '../stores/sharing-store'
+import { confirm } from '../stores/confirm-store'
 import { ReportModal } from '../components/marketplace/ReportModal'
 import { ReviewsSection } from '../components/marketplace/ReviewsSection'
 import { StarRatingInline } from '../components/marketplace/StarRating'
@@ -181,7 +182,7 @@ export function MarketplaceDetailPage() {
       defaultValue:
         'Unsubscribe from this deck? Your personal study progress for it will remain in your account.',
     })
-    if (!window.confirm(confirmMsg)) return
+    if (!(await confirm({ message: confirmMsg, danger: true }))) return
     setUnsubscribing(true)
     setUnsubscribeError(null)
     try {
@@ -278,7 +279,7 @@ export function MarketplaceDetailPage() {
           <button
             onClick={handleAcquire}
             disabled={acquiring || hasAcquired}
-            className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
+            className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {hasAcquired
               ? t('marketplace:detail.alreadyAcquired', { defaultValue: 'Already in your collection' })
@@ -292,7 +293,7 @@ export function MarketplaceDetailPage() {
           <button
             onClick={handleUnsubscribe}
             disabled={unsubscribing}
-            className="ml-3 px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition disabled:opacity-50 cursor-pointer"
+            className="ml-3 px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {unsubscribing
               ? t('marketplace:detail.unsubscribing', { defaultValue: 'Unsubscribing...' })

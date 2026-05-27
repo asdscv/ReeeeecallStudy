@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSharingStore } from '../stores/sharing-store'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { ListSkeleton } from '../components/common/Skeleton'
 import type { DeckShare } from '../types/database'
 
 const STATUS_BADGE: Record<string, { labelKey: string; className: string }> = {
@@ -56,9 +57,7 @@ export function MySharesPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📤</div>
-      </div>
+      <ListSkeleton />
     )
   }
 

@@ -80,7 +80,7 @@ export function DeckSharePage() {
           <h2 className="text-base font-semibold text-foreground">{t('deckShare.directSharing')}</h2>
           <button
             onClick={() => setShowShareModal(true)}
-            className="px-3 py-1.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="px-3 py-1.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             + {t('deckShare.createShareLink')}
           </button>
@@ -120,7 +120,7 @@ export function DeckSharePage() {
             <p className="text-sm text-muted-foreground mb-3">{t('deckShare.publishDescription')}</p>
             <button
               onClick={() => setShowPublishModal(true)}
-              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
             >
               {t('deckShare.publish')}
             </button>

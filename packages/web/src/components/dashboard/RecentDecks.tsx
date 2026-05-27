@@ -26,7 +26,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
         <p className="text-muted-foreground mb-4">{t('recentDecks.noDecks')}</p>
         <button
           onClick={() => navigate('/decks')}
-          className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+          className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
         >
           {t('recentDecks.goToDecks')}
         </button>
@@ -74,7 +74,7 @@ export function RecentDecks({ decks, stats }: RecentDecksProps) {
                       e.stopPropagation()
                       navigate(`/decks/${deck.id}/study/setup`)
                     }}
-                    className="ml-auto sm:ml-2 px-3 py-1 bg-brand text-white rounded-lg text-xs font-medium hover:bg-brand transition cursor-pointer"
+                    className="ml-auto sm:ml-2 px-3 py-1 bg-brand text-white rounded-lg text-xs font-medium hover:bg-brand-hover transition cursor-pointer"
                   >
                     {t('recentDecks.study')}
                   </button>

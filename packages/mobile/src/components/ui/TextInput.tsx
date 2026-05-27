@@ -52,7 +52,9 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
           <RNTextInput
             ref={ref}
             testID={testID}
-            accessibilityLabel={testID}
+            // Human-readable a11y label from the visible label/placeholder —
+            // NOT the testID. An explicit accessibilityLabel via props wins.
+            accessibilityLabel={label ?? (typeof rest.placeholder === 'string' ? rest.placeholder : undefined)}
             style={styles.input}
             placeholderTextColor={theme.colors.inputPlaceholder}
             secureTextEntry={isPassword && !secureVisible}

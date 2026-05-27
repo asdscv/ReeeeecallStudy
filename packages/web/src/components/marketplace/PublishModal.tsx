@@ -155,7 +155,7 @@ export function PublishModal({ open, onClose, deckId, deckName }: PublishModalPr
           <button
             type="submit"
             disabled={loading || !title.trim()}
-            className="w-full py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition disabled:opacity-50 cursor-pointer"
+            className="w-full py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? t('sharing:publish.publishing') : t('sharing:publish.submit')}
           </button>

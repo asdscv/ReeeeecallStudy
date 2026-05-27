@@ -492,7 +492,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       <button
         type="submit"
         disabled={!canSubmit}
-        className="w-full px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {t('config.startGenerate')}
       </button>

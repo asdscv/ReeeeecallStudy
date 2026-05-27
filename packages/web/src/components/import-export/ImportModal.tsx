@@ -223,7 +223,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             <p className="text-muted-foreground mb-2">{t('dragFile')}</p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
             >
               {t('selectFile')}
             </button>
@@ -286,7 +286,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
               <button
                 onClick={handleMappingConfirm}
                 disabled={Object.values(fieldMapping).filter(Boolean).length === 0}
-                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {t('next')}
               </button>
@@ -387,7 +387,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
               <button
                 onClick={handleImport}
                 disabled={parsedCards.length === 0}
-                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {t('import', { count: parsedCards.length })}
               </button>
@@ -413,7 +413,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             )}
             <button
               onClick={handleDone}
-              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover cursor-pointer"
             >
               {t('confirm')}
             </button>

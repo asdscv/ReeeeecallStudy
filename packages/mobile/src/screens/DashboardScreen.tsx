@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Pla
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { Screen, ScreenHeader } from '../components/ui'
+import { Screen, ScreenHeader, EmptyState, StatGridSkeleton } from '../components/ui'
 import { TimePeriodSelector, MiniHeatmap, BarChart } from '../components/charts'
 import { LevelCard, StreakFreezeCard, DailyQuestsCard, NextGoalsCard, LevelUpCelebration } from '../components/dashboard'
 import { useDashboardData } from '../hooks/useDashboardData'
@@ -70,11 +70,21 @@ export function DashboardScreen() {
       )}
       <ScreenHeader title={t('title')} mode="drawer" />
 
+      {loading && decks.length === 0 ? (
+        <StatGridSkeleton />
+      ) : (
       <FlatList
         data={decks}
         keyExtractor={(item) => item.id}
         extraData={{ levelInfo, freezeInfo, quests, goals, heatmap, dailyCounts, forecastData, streak, mastery }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading && decks.length > 0}
+            onRefresh={handleRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -215,15 +225,16 @@ export function DashboardScreen() {
         }}
         ListEmptyComponent={
           !loading ? (
-            <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={styles.emptyEmoji}>{'\uD83D\uDCDA'}</Text>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                {t('recentDecks.noDecks')}
-              </Text>
-            </View>
+            <EmptyState
+              icon="\uD83D\uDCDA"
+              title={t('recentDecks.noDecks')}
+              actionTitle={t('decks:createFirst', { defaultValue: 'Create your first deck' })}
+              onAction={() => tabNav?.navigate('DecksTab')}
+            />
           ) : null
         }
       />
+      )}
     </Screen>
   )
 }
