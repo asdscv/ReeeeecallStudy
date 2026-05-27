@@ -9,6 +9,7 @@ import { useReviewsStore } from '@reeeeecall/shared/stores/reviews-store'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
+import { toast } from '../stores/toast-store'
 import type { MarketplaceStackParamList } from '../navigation/types'
 import type { MarketplaceReview, ReviewSortBy } from '@reeeeecall/shared/types/database'
 
@@ -286,17 +287,15 @@ export function MarketplaceDetailScreen() {
                 .update({ status: 'revoked' })
                 .eq('id', shareId)
               if (error) {
-                Alert.alert('Error', error.message)
+                // Never surface the raw DB message to the user.
+                toast.error(t('detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
                 return
               }
               setHasAcquired(false)
               setShareId(null)
               await useDeckStore.getState().fetchDecks({ force: true })
-              Alert.alert(
-                t('detail.unsubscribed', { defaultValue: 'Unsubscribed' }),
-                undefined,
-                [{ text: 'OK', onPress: () => navigation.goBack() }],
-              )
+              toast.success(t('detail.unsubscribed', { defaultValue: 'Unsubscribed' }))
+              navigation.goBack()
             } finally {
               setUnsubscribing(false)
             }
@@ -352,9 +351,13 @@ export function MarketplaceDetailScreen() {
 
       if (error) {
         if (error.message?.includes('duplicate') || error.code === '23505') {
-          Alert.alert('Already Reported', 'You have already reported this listing.')
+          Alert.alert(
+            t('detail.alreadyReported', { defaultValue: 'Already reported' }),
+            t('detail.alreadyReportedBody', { defaultValue: 'You have already reported this listing.' }),
+          )
         } else {
-          Alert.alert('Error', error.message || 'Failed to submit report')
+          // Never surface the raw DB message to the user.
+          toast.error(t('detail.reportError', { defaultValue: 'Failed to submit report' }))
         }
       } else {
         Alert.alert('Thank you', 'Your report has been submitted. We will review this content promptly.')

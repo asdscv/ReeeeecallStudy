@@ -50,6 +50,27 @@
 
 ---
 
+## 구현 결과 (2026-05-27 완료)
+
+| 커밋 | 내용 | 검증 |
+|------|------|------|
+| C1 | tokens: brand/destructive hover·active (SSOT) | shared 기반 |
+| C2 | web theme: hover sweep(79)·focus-visible·skip-link·reduced-motion | tsc 0 |
+| C3 | web skeleton: 8 페이지 이모지로더 교체 + StudySession | tsc 0 |
+| C4/5 | web 피드백: 전역 confirm(5)·Button 프리미티브·disabled 커서 | button 6 tests |
+| C6 | web a11y: EmptyState·aria-label | tsc 0 |
+| C7 | mobile haptics: 유틸 + 전 인터랙션 | tsc 0 |
+| C8a/b | mobile skeleton·toast·ErrorBoundary·에러복구 | tsc 0 |
+| C9 | mobile safe-area·a11y·SessionKicked i18n | tsc 0 |
+
+**최종 게이트**: web `tsc -b` 0 / `vite build` 0 / `vitest` 회귀 0(111 사전실패 동일, +6 신규통과) / 신규 린트 0. mobile `tsc --noEmit` 0.
+
+### 의도적 보류 (근거 있는 scope-out — 무작정 누락 아님)
+
+1. **모바일 typography fontSize 리터럴(202) → theme.typography 일괄 마이그레이션**: 사용자 비가시 내부 일관성. 시각 회귀 테스트 없이 202곳 기계적 치환은 레이아웃 깨짐 위험 ↑ vs ROI ↓. Zero-Defect 원칙상 별도 포커스 작업으로 분리 권장. 대신 핵심 텍스트(Button)에 `maxFontSizeMultiplier`로 **실제 위험(큰 글씨 오버플로)**을 방어함.
+2. **auth 화면 하드코딩 hex(AuthGuard/LoadingScreen)**: 전수 확인 결과 이들은 **항상-다크 브랜드 스플래시/오버레이**로 라이트모드 적응 대상이 아님 → theme 토큰화는 오히려 오답. 토큰화하지 않는 것이 정답(감사 오탐).
+3. **StudySetup MODES / Marketplace CATEGORIES·SORT 라벨 i18n**: 모듈레벨 상수 배열의 영어 라벨. 실제 i18n 누수이나 core 학습 흐름 상수를 t() 구동형으로 바꾸는 중간 규모 리팩토링 → 별도 작업으로 분리(8 locale 키 추가 포함).
+
 ## 검증 체크리스트
 
 - [ ] web `tsc -b` 0 errors / `vitest run` 회귀 0(베이스라인 카운트 대비) / `vite build` 성공
