@@ -1,6 +1,9 @@
 # Cache / Fetch-Efficiency Optimization — Design & Work Plan
 
-> Status: in progress · Owner: platform · Scope: client-side data cache (web + mobile)
+> Status: ✅ Phase 1 SHIPPED (PR #114). Owner: platform.
+> Shipped: single TTL cache utility (`shared/lib/cache/stale-cache.ts`) + shared
+> deck-store migration + clean `invalidate()` API replacing brittle setState hacks.
+> Follow-ups (§6) continue under `DOCS/TODO/cache-optimization-phase2.md`.
 > Aligns with `DOCS/SERVICE_IMPROVEMENT_PLAN.md` → Phase 1 (Foundation: 성능 + 안정성).
 
 ## 0. Honest environment notes (no fabrication)
