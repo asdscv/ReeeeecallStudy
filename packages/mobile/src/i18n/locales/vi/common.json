@@ -11,10 +11,11 @@
     "admin": "Quản trị",
     "guide": "Hướng dẫn",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "Thành tích",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "Publisher Stats",
+    "publisherStats": "Thống kê nhà xuất bản"
   },
   "actions": {
     "save": "Lưu",
