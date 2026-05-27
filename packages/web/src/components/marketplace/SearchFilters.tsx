@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import {
   MARKETPLACE_CATEGORIES,
-  DIFFICULTY_LEVELS,
   STUDY_LEVELS,
   LEARNING_LANGUAGES,
   NATIVE_LANGUAGES,
@@ -228,40 +227,7 @@ export function SearchFilters({
             </div>
           </div>
 
-          {/* Difficulty level */}
-          <div>
-            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
-              {t('difficultyFilter', { defaultValue: 'Difficulty' })}
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                onClick={() => onFilterChange({ difficulty: undefined })}
-                className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
-                  !filters.difficulty
-                    ? 'bg-brand/15 text-brand border-brand/30'
-                    : 'bg-card text-muted-foreground border-border hover:border-brand/30'
-                }`}
-              >
-                {t('allDifficulty', { defaultValue: 'All' })}
-              </button>
-              {DIFFICULTY_LEVELS.map(({ value, labelKey }) => {
-                const isActive = filters.difficulty === value
-                return (
-                  <button
-                    key={value}
-                    onClick={() => onFilterChange({ difficulty: isActive ? undefined : value })}
-                    className={`px-2.5 py-1 text-xs rounded-full border cursor-pointer transition ${
-                      isActive
-                        ? 'bg-brand/15 text-brand border-brand/30'
-                        : 'bg-card text-muted-foreground border-border hover:border-brand/30'
-                    }`}
-                  >
-                    {t(labelKey, value)}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          {/* Difficulty filter retired in favour of the 5-level Study level filter below. */}
 
           {/* Study level */}
           <div>

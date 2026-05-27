@@ -88,9 +88,9 @@ WHERE m.deck_id = ml.deck_id
   AND ml.owner_id = '00000000-0000-0000-0000-000000000001'
   AND ml.native_language IS NULL;
 
--- ─── 5. Backfill official decks: study_level from vocab category ───────────
--- Only the three vocab tiers map cleanly. Exam (ielts/toefl/toeic) and
--- conversation decks have no clean 5-level mapping → left NULL (optional).
+-- ─── 5. Backfill official decks: study_level ───────────────────────────────
+-- Vocab tiers map directly; exam decks map by score tier (section 5b).
+-- Conversation decks have no clean level → left NULL (optional).
 UPDATE decks d
 SET study_level = CASE m.category
   WHEN 'beginner'     THEN 'beginner'
@@ -114,5 +114,44 @@ WHERE m.deck_id = ml.deck_id
   AND ml.owner_id = '00000000-0000-0000-0000-000000000001'
   AND ml.study_level IS NULL
   AND m.category IN ('beginner','intermediate','advanced');
+
+-- ─── 5b. Backfill exam decks: study_level by score tier (per source_file) ──
+-- IELTS 5.x→중급, 6.x→중고급, 7.x→고급. TOEFL 60/80→중급, 100/110→중고급,
+-- 120→고급. TOEIC 600/700→중급, 800→중고급, 900/990→고급.
+UPDATE decks d
+SET study_level = CASE
+  WHEN m.source_file LIKE 'ielts-5.%'  THEN 'intermediate'
+  WHEN m.source_file LIKE 'ielts-6.%'  THEN 'upper_intermediate'
+  WHEN m.source_file LIKE 'ielts-7.%'  THEN 'advanced'
+  WHEN m.source_file LIKE 'toefl-60-%'  OR m.source_file LIKE 'toefl-80-%'  THEN 'intermediate'
+  WHEN m.source_file LIKE 'toefl-100-%' OR m.source_file LIKE 'toefl-110-%' THEN 'upper_intermediate'
+  WHEN m.source_file LIKE 'toefl-120-%' THEN 'advanced'
+  WHEN m.source_file LIKE 'toeic-600-%' OR m.source_file LIKE 'toeic-700-%' THEN 'intermediate'
+  WHEN m.source_file LIKE 'toeic-800-%' THEN 'upper_intermediate'
+  WHEN m.source_file LIKE 'toeic-900-%' OR m.source_file LIKE 'toeic-990-%' THEN 'advanced'
+END
+FROM official_deck_manifest m
+WHERE m.deck_id = d.id
+  AND d.user_id = '00000000-0000-0000-0000-000000000001'
+  AND d.study_level IS NULL
+  AND m.category IN ('ielts','toefl','toeic');
+
+UPDATE marketplace_listings ml
+SET study_level = CASE
+  WHEN m.source_file LIKE 'ielts-5.%'  THEN 'intermediate'
+  WHEN m.source_file LIKE 'ielts-6.%'  THEN 'upper_intermediate'
+  WHEN m.source_file LIKE 'ielts-7.%'  THEN 'advanced'
+  WHEN m.source_file LIKE 'toefl-60-%'  OR m.source_file LIKE 'toefl-80-%'  THEN 'intermediate'
+  WHEN m.source_file LIKE 'toefl-100-%' OR m.source_file LIKE 'toefl-110-%' THEN 'upper_intermediate'
+  WHEN m.source_file LIKE 'toefl-120-%' THEN 'advanced'
+  WHEN m.source_file LIKE 'toeic-600-%' OR m.source_file LIKE 'toeic-700-%' THEN 'intermediate'
+  WHEN m.source_file LIKE 'toeic-800-%' THEN 'upper_intermediate'
+  WHEN m.source_file LIKE 'toeic-900-%' OR m.source_file LIKE 'toeic-990-%' THEN 'advanced'
+END
+FROM official_deck_manifest m
+WHERE m.deck_id = ml.deck_id
+  AND ml.owner_id = '00000000-0000-0000-0000-000000000001'
+  AND ml.study_level IS NULL
+  AND m.category IN ('ielts','toefl','toeic');
 
 COMMIT;
