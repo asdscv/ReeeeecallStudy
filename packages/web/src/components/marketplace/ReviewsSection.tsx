@@ -73,6 +73,7 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
   const handleDelete = useCallback(async () => {
     if (!userReview) return
     const confirmed = await confirm({
+      title: t('reviews.deleteTitle', { defaultValue: 'Delete review' }),
       message: t('reviews.deleteConfirm', { defaultValue: 'Delete your review? This cannot be undone.' }),
       danger: true,
     })

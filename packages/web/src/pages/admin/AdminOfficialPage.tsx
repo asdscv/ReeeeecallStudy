@@ -200,7 +200,7 @@ export function AdminOfficialPage() {
   }
 
   const handleRevoke = async (userId: string, displayName: string | null) => {
-    if (!(await confirm({ message: t('official.confirmRevoke', { name: displayName || userId }), danger: true }))) return
+    if (!(await confirm({ title: t('official.revokeTitle', { defaultValue: 'Revoke official status' }), message: t('official.confirmRevoke', { name: displayName || userId }), danger: true }))) return
     await setOfficialStatus(userId, false)
   }
 
