@@ -38,3 +38,14 @@
 - backfill dry-run: 322/322/5 분포 일치, native_languages 요소 전부 허용집합
 - 구버전 클라이언트 안전(단일 컬럼 유지·보정), 신버전 배열 우선
 - 마켓 native 필터: reverse 단어덱이 en으로 필터됨(#3), ko 필터 시 뒷면-한국어 덱만(#2)
+
+---
+## 구현 결과 (2026-05-27 완료)
+- C1 mig092(additive+backfill+scalar보정+rollback) · C2 prod dry-run(649덱: forward[X]/reverse vocab 322['en']/conv 5['ko'], 유효성0위반)
+- C3 shared(types optional·getNativeLanguages·filterListings 교집합·stores) · C4 official-decks builder+gateway+테스트4 · C5 web/mobile deck-edit 다중선택 UI(+dual database.ts·marketplace-store 미러)
+- **게이트**: web tsc -b 0 / web vitest 111fail·1985pass(회귀0) / mobile tsc 0 / official-decks tsc 0·103+4 tests / 3-Phase 감사 클린
+- **무중단**: additive 컬럼 + scalar 유지·보정 → 배포된 구버전 클라이언트 안전(scalar로 reverse vocab도 en 분류). 신버전은 array 우선.
+
+## 배포 주의 (프로덕션 마이그레이션)
+mig092는 **DB 스키마 변경**(OTA 아님). main 머지 후 `supabase db push`(또는 배포 파이프라인의 마이그레이션 적용 단계)로 prod 적용 필요. 적용 시 backfill이 기존 649덱 native_languages를 채움.
+follow-up: import_official_deck RPC가 p_meta.native_languages를 소비하도록(신규 공식덱 자동 태깅; 현재는 mig backfill 재실행으로 커버).
