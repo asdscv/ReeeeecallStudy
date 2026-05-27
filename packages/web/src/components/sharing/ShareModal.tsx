@@ -120,7 +120,7 @@ export function ShareModal({ open, onClose, deckId, deckName }: ShareModalProps)
               <button
                 onClick={handleCreate}
                 disabled={loading}
-                className="w-full py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 cursor-pointer"
+                className="w-full py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? t('creating') : t('createInviteLink')}
               </button>

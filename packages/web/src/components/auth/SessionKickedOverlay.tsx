@@ -238,7 +238,7 @@ export function SessionKickedOverlay() {
               <motion.button
                 onClick={handleReclaim}
                 disabled={reclaiming}
-                className="relative w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white font-semibold text-base shadow-lg shadow-amber-500/25 overflow-hidden disabled:opacity-60 mb-3"
+                className="relative w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white font-semibold text-base shadow-lg shadow-amber-500/25 overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed mb-3"
                 initial={prefersReduced ? {} : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={prefersReduced ? {} : { scale: 1.03 }}

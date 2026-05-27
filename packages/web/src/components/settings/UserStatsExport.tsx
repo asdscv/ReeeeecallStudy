@@ -99,7 +99,7 @@ export function UserStatsExport() {
             type="button"
             onClick={() => handleExport(type)}
             disabled={!!exporting}
-            className="flex items-center gap-3 p-3 text-left bg-muted dark:bg-slate-800 rounded-lg border border-border dark:border-slate-700 hover:bg-accent dark:hover:bg-slate-700 transition cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-3 p-3 text-left bg-muted dark:bg-slate-800 rounded-lg border border-border dark:border-slate-700 hover:bg-accent dark:hover:bg-slate-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {exporting === type ? (
               <Loader2 className="w-5 h-5 text-brand animate-spin shrink-0" />

@@ -87,7 +87,7 @@ export function ReviewForm({
         <button
           type="submit"
           disabled={submitting || rating === 0}
-          className="px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 cursor-pointer"
+          className="px-5 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {submitting
             ? t('reviews.submitting', { defaultValue: 'Submitting...' })

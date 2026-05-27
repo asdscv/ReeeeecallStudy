@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { useOfficialStore } from '@reeeeecall/shared/stores/official-store'
+import { confirm } from '../../stores/confirm-store'
 import { OfficialBadge } from '../../components/common/OfficialBadge'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
@@ -199,7 +200,7 @@ export function AdminOfficialPage() {
   }
 
   const handleRevoke = async (userId: string, displayName: string | null) => {
-    if (!confirm(t('official.confirmRevoke', { name: displayName || userId }))) return
+    if (!(await confirm({ message: t('official.confirmRevoke', { name: displayName || userId }), danger: true }))) return
     await setOfficialStatus(userId, false)
   }
 
@@ -490,7 +491,7 @@ export function AdminOfficialPage() {
                             type="button"
                             onClick={handleSaveEdit}
                             disabled={saving}
-                            className="px-2 py-1 text-xs bg-brand text-white rounded cursor-pointer hover:bg-brand-hover disabled:opacity-50"
+                            className="px-2 py-1 text-xs bg-brand text-white rounded cursor-pointer hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed"
                             data-testid={`official-save-${account.user_id}`}
                           >
                             {saving ? '...' : t('official.save', 'Save')}

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useReviewsStore } from '../../stores/reviews-store'
 import { useAuthStore } from '../../stores/auth-store'
+import { confirm } from '../../stores/confirm-store'
 import { RatingDistribution } from './RatingDistribution'
 import { ReviewForm } from './ReviewForm'
 import { ReviewCard } from './ReviewCard'
@@ -71,7 +72,10 @@ export function ReviewsSection({ listingId, isOwner, hasAcquired }: ReviewsSecti
 
   const handleDelete = useCallback(async () => {
     if (!userReview) return
-    const confirmed = window.confirm(t('reviews.deleteConfirm', { defaultValue: 'Delete your review? This cannot be undone.' }))
+    const confirmed = await confirm({
+      message: t('reviews.deleteConfirm', { defaultValue: 'Delete your review? This cannot be undone.' }),
+      danger: true,
+    })
     if (!confirmed) return
     await deleteReview(userReview.id)
     setShowForm(false)
