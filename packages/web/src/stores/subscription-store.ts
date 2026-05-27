@@ -34,6 +34,11 @@ interface SubscriptionState {
 
 const HEARTBEAT_INTERVAL = 60 * 1000  // 1 minute
 
+// This (web) store registers sessions as the 'web' platform; the shared/mobile
+// copy uses 'app'. register_session enforces one session per platform, so app +
+// web may be logged in at the same time.
+const SESSION_PLATFORM = 'web'
+
 // Reasons that are NOT a genuine session kick: the network/auth wasn't ready
 // (classic on background→foreground, before the token refreshes). These must
 // never flip sessionValid=false, or the user sees a false "another device" kick.
@@ -80,6 +85,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
       const { data, error } = await supabase.rpc('register_session', {
         p_device_id: deviceId,
         p_device_name: deviceName,
+        p_platform: SESSION_PLATFORM,
       })
       if (error) {
         // RPC/network error → transient; do not touch sessionValid.
@@ -155,12 +161,12 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
       const result = await get().sendHeartbeat()
       // 'ok' → sessionValid already true. 'transient' (network/auth not ready) →
       // leave sessionValid as-is; never kick on a blip (the resume-race bug).
-      if (result !== 'expired') return
-      // 'expired' → the session row is gone (server-side 30d cleanup / cold start).
-      // Re-register to recreate it. registerSession sets sessionValid: true on
-      // success, false only on a genuine block; a transient failure leaves it
-      // untouched (we retry on the next tick rather than falsely kicking).
-      await get().registerSession()
+      // 'expired' → the session row is gone: another device of this platform took
+      // over (one-session-per-platform), or the row was cleaned after 30 days.
+      // Show the kick screen. Do NOT auto re-register — that would ping-pong with
+      // the device that took over; the user reclaims via the SessionKicked screen
+      // (or simply returning to this tab re-registers and reclaims it).
+      if (result === 'expired') set({ sessionValid: false })
     }
 
     const intervalId = setInterval(tick, HEARTBEAT_INTERVAL)
