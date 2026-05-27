@@ -13,6 +13,8 @@ import { useAuth, useAuthState } from '../hooks'
 // import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import { useThemeStore } from '../stores/theme-store'
+import { localPrefs } from '../utils/local-prefs'
+import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
@@ -89,6 +91,7 @@ export function SettingsScreen() {
   })
   const [language, setLanguage] = useState(i18n.language || 'en')
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system')
+  const [hapticsOn, setHapticsOn] = useState(localPrefs.getHapticsEnabled())
   const [langDropdownOpen, setLangDropdownOpen] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -539,6 +542,29 @@ export function SettingsScreen() {
           />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
             {t('newCardLimit.hint')}
+          </Text>
+        </SectionCard>
+
+        {/* ── Haptic feedback — standalone card ── */}
+        <SectionCard theme={theme}>
+          <View style={styles.switchRow}>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+              {t('haptics.enable', { defaultValue: 'Haptic feedback' })}
+            </Text>
+            <Switch
+              testID="settings-haptics-toggle"
+              value={hapticsOn}
+              onValueChange={(v) => {
+                setHapticsOn(v)
+                setHapticsEnabled(v)
+                localPrefs.setHapticsEnabled(v)
+                if (v) haptics.success() // immediate confirmation when turning on
+              }}
+              trackColor={{ true: theme.colors.primary }}
+            />
+          </View>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            {t('haptics.hint', { defaultValue: 'Vibration feedback on taps, ratings, and actions.' })}
           </Text>
         </SectionCard>
 
