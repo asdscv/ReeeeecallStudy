@@ -15,7 +15,7 @@ export function AdminErrorState({ error, onRetry }: AdminErrorStateProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="px-4 py-2 text-sm bg-destructive text-white rounded-lg hover:bg-destructive transition cursor-pointer"
+          className="px-4 py-2 text-sm bg-destructive text-white rounded-lg hover:bg-destructive-hover transition cursor-pointer"
         >
           {t('retry', 'Retry')}
         </button>

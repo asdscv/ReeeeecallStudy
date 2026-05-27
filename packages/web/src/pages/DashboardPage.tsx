@@ -27,6 +27,7 @@ import { StreakFreezeWidget } from '../components/dashboard/StreakFreezeWidget'
 import { NextGoalsWidget } from '../components/dashboard/NextGoalsWidget'
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { DashboardSkeleton } from '../components/common/Skeleton'
 
 export function DashboardPage() {
   const { t } = useTranslation('dashboard')
@@ -82,9 +83,7 @@ export function DashboardPage() {
 
   if (loading || dataLoading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📊</div>
-      </div>
+      <DashboardSkeleton />
     )
   }
 

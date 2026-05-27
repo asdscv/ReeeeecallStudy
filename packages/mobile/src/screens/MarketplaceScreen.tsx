@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, ScrollView, Modal } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, SearchBar, ListCard, ScreenHeader } from '../components/ui'
+import { Screen, SearchBar, ListCard, ScreenHeader, EmptyState, ListSkeleton } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { testProps } from '../utils/testProps'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
@@ -62,7 +62,7 @@ export function MarketplaceScreen() {
   const { t } = useTranslation('marketplace')
   const theme = useTheme()
   const navigation = useNavigation<Nav>()
-  const { listings, loading, fetchListings } = useMarketplaceStore()
+  const { listings, loading, error, fetchListings } = useMarketplaceStore()
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -119,7 +119,14 @@ export function MarketplaceScreen() {
       <FlatList
         data={paginatedData}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchListings({ force: true })} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading && listings.length > 0}
+            onRefresh={() => fetchListings({ force: true })}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
         contentContainerStyle={[styles.list, paginatedData.length === 0 && styles.listEmpty]}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -488,17 +495,23 @@ export function MarketplaceScreen() {
           ) : null
         }
         ListEmptyComponent={
-          !loading ? (
-            <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>{'\uD83C\uDFEA'}</Text>
-              <Text style={[theme.typography.h3, { color: theme.colors.text, textAlign: 'center' }]}>
-                No decks found
-              </Text>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                Try a different search or category
-              </Text>
-            </View>
-          ) : null
+          loading ? (
+            <ListSkeleton count={5} />
+          ) : error ? (
+            <EmptyState
+              icon="\u26A0\uFE0F"
+              title={t('loadError', { defaultValue: "Couldn't load decks" })}
+              description={t('loadErrorHint', { defaultValue: 'Check your connection and try again.' })}
+              actionTitle={t('common:actions.retry', { defaultValue: 'Retry' })}
+              onAction={() => fetchListings({ force: true })}
+            />
+          ) : (
+            <EmptyState
+              icon="\uD83C\uDFEA"
+              title={t('noResults', { defaultValue: 'No decks found' })}
+              description={t('noResultsHint', { defaultValue: 'Try a different search or category' })}
+            />
+          )
         }
       />
 

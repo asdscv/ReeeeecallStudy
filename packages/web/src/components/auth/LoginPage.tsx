@@ -306,7 +306,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitDisabled}
-              className="w-full py-3 px-4 bg-brand text-white rounded-lg font-medium hover:bg-brand disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+              className="w-full py-3 px-4 bg-brand text-white rounded-lg font-medium hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               {loading ? loadingLabel : submitLabel}
             </button>

@@ -38,7 +38,7 @@ export function BenefitsSection() {
           <div className="text-center">
             <button
               onClick={() => navigate('/auth/login')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-white text-sm font-semibold rounded-xl hover:bg-brand transition shadow-lg shadow-blue-600/20 cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-white text-sm font-semibold rounded-xl hover:bg-brand-hover transition shadow-lg shadow-blue-600/20 cursor-pointer"
             >
               {t('benefitsSection.cta')} <ArrowRight className="w-4 h-4" />
             </button>

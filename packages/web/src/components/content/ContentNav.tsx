@@ -38,7 +38,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
           {user ? (
             <Link
               to="/dashboard"
-              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline"
+              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
             >
               {t('nav.dashboard', 'Dashboard')}
             </Link>
@@ -52,7 +52,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
               </Link>
               <Link
                 to="/auth/login"
-                className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline"
+                className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
               >
                 {t('hero.cta.start', 'Get Started')}
               </Link>
@@ -78,7 +78,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
               <Link
                 to="/dashboard"
                 onClick={() => setMenuOpen(false)}
-                className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline text-center"
+                className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline text-center"
               >
                 {t('nav.dashboard', 'Dashboard')}
               </Link>
@@ -94,7 +94,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
                 <Link
                   to="/auth/login"
                   onClick={() => setMenuOpen(false)}
-                  className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline text-center"
+                  className="mx-3 mt-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline text-center"
                 >
                   {t('hero.cta.start', 'Get Started')}
                 </Link>

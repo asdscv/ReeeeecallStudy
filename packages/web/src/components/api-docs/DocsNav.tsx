@@ -21,14 +21,14 @@ export function DocsNav() {
         {user ? (
           <Link
             to="/dashboard"
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition no-underline"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
           >
             {t('dashboard', 'Dashboard')}
           </Link>
         ) : (
           <button
             onClick={() => navigate('/auth/login')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand transition cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition cursor-pointer"
           >
             {t('getStarted')} <ArrowRight className="w-4 h-4" />
           </button>

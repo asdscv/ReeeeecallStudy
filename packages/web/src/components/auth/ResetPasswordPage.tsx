@@ -90,7 +90,7 @@ export function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading || !password || !confirmPassword}
-              className="w-full py-3 px-4 bg-brand text-white rounded-lg font-medium hover:bg-brand disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+              className="w-full py-3 px-4 bg-brand text-white rounded-lg font-medium hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
               {loading ? t('resetPassword.changing') : t('resetPassword.changeButton')}
             </button>

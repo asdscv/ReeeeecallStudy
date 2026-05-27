@@ -38,6 +38,7 @@ import { useTheme } from './hooks/useTheme'
 import { useOnboardingStore } from './stores/onboarding-store'
 import { OnboardingOverlay } from './components/onboarding/OnboardingOverlay'
 import { LevelUpCelebration } from './components/common/LevelUpCelebration'
+import { GlobalConfirmDialog } from './components/common/GlobalConfirmDialog'
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded heavy pages                                           */
@@ -175,6 +176,7 @@ function App() {
       <PageTracker />
       <SessionKickedOverlay />
       <Toaster richColors position="top-right" />
+      <GlobalConfirmDialog />
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>

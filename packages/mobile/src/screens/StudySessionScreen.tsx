@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Animated, {
@@ -15,6 +16,7 @@ import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-g
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { computeCardTextAttrs } from '../utils/card-text-style'
+import { haptics } from '../utils/haptics'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
@@ -56,6 +58,7 @@ const DEFAULT_FONT_SIZES: Record<string, number> = {
 
 export function StudySessionScreen() {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { t } = useTranslation('study')
   const navigation = useNavigation<Nav>()
   const {
@@ -102,6 +105,9 @@ export function StudySessionScreen() {
   const rotateY = useSharedValue(0)
   const translateX = useSharedValue(0)
   const cardScale = useSharedValue(1)
+  // Tracks whether the drag is currently past the commit threshold, so we tick
+  // a selection haptic exactly once each time it crosses (like Mail/Tinder).
+  const pastThreshold = useSharedValue(false)
 
   // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
@@ -261,9 +267,16 @@ export function StudySessionScreen() {
         [1, 0.85],
         Extrapolation.CLAMP,
       )
+      // Tick once on each threshold crossing (in either direction).
+      const past = Math.abs(e.translationX) >= SWIPE_THRESHOLD
+      if (past !== pastThreshold.value) {
+        pastThreshold.value = past
+        if (past) runOnJS(haptics.selection)()
+      }
     })
     .onEnd((e) => {
       const { translationX: tx, velocityX: vx } = e
+      pastThreshold.value = false
 
       // Mode-aware swipe ratings: cramming → missed/got_it, srs → again/good, other → unknown/known
       const leftRating = config?.mode === 'cramming' ? 'missed' : config?.mode === 'srs' ? 'again' : 'unknown'
@@ -346,14 +359,14 @@ export function StudySessionScreen() {
 
         {/* Rating area — button mode: buttons, swipe mode: hints */}
         {isFlipped && isSwipeMode && (
-          <View style={styles.swipeRatingHint}>
+          <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>Swipe</Text>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
           </View>
         )}
         {isFlipped && !isSwipeMode && (
-          <View style={[styles.ratingRow, { paddingHorizontal: 16 }]}>
+          <View style={[styles.ratingRow, { paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 24) }]}>
             {config?.mode === 'srs' ? (
               <>
                 <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} />

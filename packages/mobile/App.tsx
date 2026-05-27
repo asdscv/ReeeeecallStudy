@@ -10,6 +10,8 @@ import i18n from './src/i18n'
 import { RootNavigator } from './src/navigation'
 import { ThemeProvider, useAppTheme } from './src/theme'
 import { loadNavState, saveNavState } from './src/utils/nav-persistence'
+import { ErrorBoundary } from './src/components/ErrorBoundary'
+import { ToastContainer } from './src/components/ui'
 
 // Initialize platform adapters (must be before any shared code)
 initMobilePlatform()
@@ -70,8 +72,11 @@ function AppContent() {
           if (state) void saveNavState(state)
         }}
       >
-        <RootNavigator />
+        <ErrorBoundary>
+          <RootNavigator />
+        </ErrorBoundary>
       </NavigationContainer>
+      <ToastContainer />
       <StatusBar style={theme.isDark ? 'light' : 'dark'} />
     </ThemeProvider>
   )

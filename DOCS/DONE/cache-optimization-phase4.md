@@ -1,6 +1,6 @@
 # Cache Optimization — Phase 4 (card-list LRU cache + admin-store unification)
 
-> Builds on Phase 1 utility (`DOCS/DONE/cache-optimization.md`). Same util, same rigor.
+> Status: ✅ SHIPPED (PR #122→#123). Builds on Phase 1 utility (`DOCS/DONE/cache-optimization.md`). Same util, same rigor.
 > Closes the two items deferred in Phase 2/3 — now with their required safeguards.
 
 ## A. Per-deck card-LIST cache (the previously-deferred risky one)

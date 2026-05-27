@@ -2,6 +2,7 @@ import { TouchableOpacity, Text, View, Image, ActivityIndicator, StyleSheet } fr
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../../theme'
 import { testProps } from '../../utils/testProps'
+import { haptics } from '../../utils/haptics'
 
 type SocialProvider = 'google' | 'apple'
 
@@ -30,10 +31,15 @@ export function SocialButton({
   const styles = getStyles(theme, provider)
   const label = provider === 'google' ? t('continueWithGoogle') : t('continueWithApple')
 
+  const handlePress = () => {
+    haptics.tap()
+    onPress()
+  }
+
   return (
     <TouchableOpacity
       {...testProps(testID)}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || loading}
       activeOpacity={0.7}
       style={[styles.container, (disabled || loading) && styles.disabled]}

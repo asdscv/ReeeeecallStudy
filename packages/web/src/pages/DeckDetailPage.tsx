@@ -17,6 +17,7 @@ import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { DetailSkeleton } from '../components/common/Skeleton'
 import { VersionHistorySection } from '../components/deck/VersionHistorySection'
 import type { Deck, Card, CardTemplate, DeckShare } from '../types/database'
 
@@ -179,9 +180,7 @@ export function DeckDetailPage() {
   // --- Early returns (all hooks above, safe) ---
   if (loading || cardsLoading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📚</div>
-      </div>
+      <DetailSkeleton />
     )
   }
 
@@ -302,7 +301,7 @@ export function DeckDetailPage() {
             <button
               onClick={handleSync}
               disabled={isSyncing}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
               {isSyncing ? t('decks:sync.syncing') : t('decks:sync.button')}
@@ -344,7 +343,7 @@ export function DeckDetailPage() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
           <button
             onClick={() => navigate(`/decks/${deckId}/study/setup`)}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('decks:detail.startStudy')}
           </button>
@@ -485,7 +484,7 @@ export function DeckDetailPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-                  className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+                  className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
                 >
                   {t('decks:detail.addFirstCard')}
                 </button>
