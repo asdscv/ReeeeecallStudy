@@ -11,10 +11,11 @@
     "admin": "管理",
     "guide": "指南",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "成就",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "Publisher Stats",
+    "publisherStats": "发布者统计"
   },
   "actions": {
     "save": "保存",

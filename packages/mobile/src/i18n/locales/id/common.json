@@ -11,10 +11,11 @@
     "admin": "Admin",
     "guide": "Panduan",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "Pencapaian",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "Publisher Stats",
+    "publisherStats": "Statistik Penerbit"
   },
   "actions": {
     "save": "Simpan",
