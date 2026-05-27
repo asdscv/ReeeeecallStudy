@@ -38,8 +38,16 @@ function makeListing(overrides?: Partial<MarketplaceListingData>): MarketplaceLi
   }
 }
 
+// Fixed reference instant shared by the fixtures AND the Date.now() mock below.
+// Fixtures are built in `describe` bodies (collected before any beforeEach runs,
+// so the mock isn't active yet). Basing daysAgo() on the real clock there while
+// filterListings() reads the mocked clock made every fixture look "in the
+// future" once real time drifted past 2026-03-19 — silently disabling the
+// dateRange filter. Anchoring both to MOCK_NOW makes these tests time-independent.
+const MOCK_NOW = new Date('2026-03-19T00:00:00Z').getTime()
+
 function daysAgo(days: number): string {
-  return new Date(Date.now() - days * 86400000).toISOString()
+  return new Date(MOCK_NOW - days * 86400000).toISOString()
 }
 
 // ─── Trending Score ────────────────────────────────────────────
@@ -49,7 +57,7 @@ describe('calculateTrendingScore', () => {
 
   beforeEach(() => {
     // Fix time to 2026-03-19T00:00:00Z
-    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(new Date('2026-03-19T00:00:00Z').getTime())
+    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(MOCK_NOW)
   })
 
   afterEach(() => {
@@ -114,7 +122,7 @@ describe('sortListings - trending', () => {
   let nowSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(new Date('2026-03-19T00:00:00Z').getTime())
+    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(MOCK_NOW)
   })
 
   afterEach(() => {
@@ -176,7 +184,7 @@ describe('filterListings - dateRange', () => {
   let nowSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(new Date('2026-03-19T00:00:00Z').getTime())
+    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(MOCK_NOW)
   })
 
   afterEach(() => {
@@ -313,7 +321,7 @@ describe('filterListings - combined filters', () => {
   let nowSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(new Date('2026-03-19T00:00:00Z').getTime())
+    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(MOCK_NOW)
   })
 
   afterEach(() => {
@@ -512,7 +520,7 @@ describe('getTrendingListingIds', () => {
   let nowSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(new Date('2026-03-19T00:00:00Z').getTime())
+    nowSpy = vi.spyOn(Date, 'now').mockReturnValue(MOCK_NOW)
   })
 
   afterEach(() => {
