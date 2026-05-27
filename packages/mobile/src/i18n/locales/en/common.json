@@ -10,7 +10,9 @@
     "settings": "Settings",
     "admin": "Admin",
     "guide": "Guide",
-    "aiGenerate": "AI Generate"
+    "aiGenerate": "AI Generate",
+    "publisherStats": "Publisher Stats",
+    "achievements": "Achievements"
   },
   "guideHelp": "Help",
   "actions": {

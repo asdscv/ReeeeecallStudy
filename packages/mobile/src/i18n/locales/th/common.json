@@ -11,10 +11,11 @@
     "admin": "ผู้ดูแล",
     "guide": "คู่มือ",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "ความสำเร็จ",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "Publisher Stats",
+    "publisherStats": "สถิติผู้เผยแพร่"
   },
   "actions": {
     "save": "บันทึก",

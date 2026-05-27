@@ -11,10 +11,11 @@
     "admin": "Admin",
     "guide": "Guía",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "Logros",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "Publisher Stats",
+    "publisherStats": "Estadísticas del editor"
   },
   "actions": {
     "save": "Guardar",
