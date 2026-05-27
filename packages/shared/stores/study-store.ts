@@ -7,6 +7,7 @@ import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
+import { useCardStore } from './card-store'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
 
 type Phase = 'idle' | 'loading' | 'studying' | 'completed'
@@ -732,6 +733,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // Prevent duplicate session recording (race between rateCard completion and crammingTimeUp)
     if (sessionSaved) return
     set({ sessionSaved: true })
+
+    // SRS for this deck just changed via study (which writes cards/user_card_progress
+    // directly, bypassing card-store) → drop the cached card list so DeckDetail's
+    // srs_status filter reflects it on next open. Cramming doesn't change SRS.
+    if (config.mode !== 'cramming') {
+      useCardStore.getState().invalidateCards(config.deckId)
+    }
 
     // Build metadata for cramming sessions
     let metadata: Record<string, unknown> | undefined
