@@ -2,7 +2,12 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { filterListings, sortListings, type SortBy, type ListingFilters, type MarketplaceListingData } from '../lib/marketplace'
 import { useDeckStore } from './deck-store'
+import { createStaleCache } from '@reeeeecall/shared/lib/cache/stale-cache'
 import type { MarketplaceListing, ShareMode } from '../types/database'
+
+// Public catalog read cache — see DOCS/TODO/cache-optimization-phase2.md.
+// Read-heavy + benign staleness; invalidated on publish/unpublish, forced on demand.
+const listingsCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
 interface MarketplaceState {
   listings: MarketplaceListing[]
@@ -11,7 +16,7 @@ interface MarketplaceState {
   error: string | null
   filters: ListingFilters & { sortBy: SortBy }
 
-  fetchListings: () => Promise<void>
+  fetchListings: (opts?: { force?: boolean }) => Promise<void>
   fetchMyListings: () => Promise<void>
   publishDeck: (data: {
     deckId: string
@@ -36,7 +41,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
   error: null,
   filters: { sortBy: 'newest' },
 
-  fetchListings: async () => {
+  fetchListings: async (opts) => {
+    if (!listingsCache.shouldFetch('listings', opts)) return
     set({ loading: true, error: null })
 
     // Fetch listings with owner profile info via join
@@ -58,6 +64,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         set({ error: fallbackError.message, loading: false })
       } else {
         set({ listings: (fallbackData ?? []) as MarketplaceListing[], loading: false })
+        listingsCache.markFetched('listings')
       }
     } else {
       // Flatten the joined profile data
@@ -71,6 +78,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
         }
       }) as unknown as MarketplaceListing[]
       set({ listings, loading: false })
+      listingsCache.markFetched('listings')
     }
   },
 
@@ -124,6 +132,7 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       return null
     }
 
+    listingsCache.invalidate('listings')
     await get().fetchMyListings()
     return data as MarketplaceListing
   },
@@ -139,8 +148,9 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       return
     }
 
+    listingsCache.invalidate('listings')
     await get().fetchMyListings()
-    await get().fetchListings()
+    await get().fetchListings({ force: true })
   },
 
   acquireDeck: async (listingId: string) => {
