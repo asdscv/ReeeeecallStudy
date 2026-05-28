@@ -41,3 +41,29 @@
 - mobile `tsc` 0
 - official-decks `tsc` 0 / vitest green / 신규 i18n 테스트 green
 - prod: `SELECT count(*) WHERE name ~ '[(]EN'` = 0 (영어 제목 잔존 0), 샘플 8언어 육안 확인
+
+---
+## 구현 결과 (2026-05-28 완료)
+
+### Task 1 — 공식덱 모국어 메타 (완료 + prod 반영)
+- `DeckMetadataI18n` SSOT(8언어 × LANG_NAMES 8×8 + 카테고리/방향/설명 템플릿). audienceLanguage = 비영어 측.
+- `DeckMetadataBuilder` 영어 고정 buildName/Description 제거 → 로컬라이즈 모듈 사용. 색·아이콘·태그·카드·체크섬 불변(필터/매니페스트 무영향).
+- `DeckImportGateway.updateMetadata` + Supabase/Pg 구현 + `relocalize` CLI 커맨드(`--dry-run` 지원). 카드/체크섬 불변, name/description + listing title 인플레이스 갱신 → 체크섬 noop 우회.
+- **prod 적용**: service-role로 649덱 전부 갱신(updated 649 / missing 0 / failed 0). 영어 제목 0(SELECT 검증), listing/deck name parity 0 mismatch.
+- 테스트: DeckMetadataI18n 7건 + 영어 방향 회귀 가드, builder 10건, executeUseCase 4건 — 모두 통과(110 pass).
+
+### Task 2 — 마켓 필터 토글 통합 (완료 web + mobile)
+- 'Advanced/고급' → 'Filter/필터' 리네임. 카테고리·인증됨(verified)·모국어를 상단에서 패널 안으로 이동(상단은 검색 + 정렬 + Filter 토글만).
+- `countActiveFilters` 갱신: category 포함(패널로 이동했으므로 뱃지 반영). 마켓플레이스 discovery 테스트 198건 통과(parity 포함).
+- 모바일도 동일 구조 + activeFilterCount에 category·native 포함, 카드 통계 행 i18n('00장 · 👁 N · 사용자 N명').
+
+### Task 3 — 8개 로케일 자연스러운 번역 (web + mobile)
+- web `marketplace.json` 8로케일: filters/categoryLabel/verifiedOnly/resetFilters/sortTrending/sortTopRated/minCardCount/minRating/dateRange*/shareModeFilter/allModes/popularTags 신설(기존 defaultValue 영어 폴백 제거).
+- mobile 로케일: common.achievements/goals(웹에서 포팅 → 16 badge 맵·5 goal 카테고리), dashboard.quickStudy, decks.template.{title,subtitle,newBtn,empty,emptyDesc,summary,card.noStudyRecord}, study.setup.noDecks, history.tabs+sessionsPerDay, marketplace.filters/categoryLabel 추가.
+- 모바일 컴포넌트 i18n 와이어업: Dashboard(Quick Study CTA + 덱 카드 stats), DecksList(Help/AI Generate/New Deck + 카드 stats + No study record), StudySetup(카드 stats + No decks yet), Achievements(전체 — useTranslation 신규), TemplatesList(Front/Back/Created summary + 헤더), StudyHistory(tabs + Session List + Today/Yesterday + sessionsPerDay + Unknown Deck).
+- formatDateLabel은 i18next.t 사용 + toLocaleDateString 로케일도 i18n 언어에 맞춤.
+
+### Zero-Defect 3-Phase 감사
+- Phase 1: tsc/vitest/parity green, prod 적용 후 영어 제목 0 검증.
+- Phase 2: countActiveFilters 변경 사이드 이펙트(테스트 갱신 후 198 pass), 마켓 필터 UX 동일 흐름 유지(검색 + 정렬은 상단, 필터만 패널 — 사이드 이펙트 0).
+- Phase 3: 보안/메모리 — relocalize는 멱등·재실행 안전, service-role 직접 UPDATE는 기존 import_official_deck와 동일 권한, RLS 우회. 빈 listings 매칭은 무에러 no-op.
