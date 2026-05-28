@@ -143,5 +143,7 @@
     "copy": "Copiar",
     "subscribe": "Suscribir",
     "snapshot": "Instantánea"
-  }
+  },
+  "filters": "Filtrar",
+  "categoryLabel": "Categoría"
 }

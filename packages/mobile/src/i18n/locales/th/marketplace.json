@@ -143,5 +143,7 @@
     "copy": "คัดลอก",
     "subscribe": "ติดตาม",
     "snapshot": "สแน็ปช็อต"
-  }
+  },
+  "filters": "ตัวกรอง",
+  "categoryLabel": "หมวดหมู่"
 }

@@ -143,5 +143,7 @@
     "copy": "Salin",
     "subscribe": "Langganan",
     "snapshot": "Snapshot"
-  }
+  },
+  "filters": "Filter",
+  "categoryLabel": "Kategori"
 }

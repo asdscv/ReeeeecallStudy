@@ -108,5 +108,21 @@
     "intermediate": "중급",
     "upper_intermediate": "중고급",
     "advanced": "고급"
-  }
+  },
+  "filters": "필터",
+  "categoryLabel": "카테고리",
+  "verifiedOnly": "인증됨",
+  "resetFilters": "초기화",
+  "sortTrending": "인기 급상승",
+  "sortTopRated": "평점순",
+  "minCardCount": "최소 카드 수",
+  "minRating": "최소 평점",
+  "dateRange": "게시 기간",
+  "dateRangeAll": "전체 기간",
+  "dateRange_7d": "최근 7일",
+  "dateRange_30d": "최근 30일",
+  "dateRange_90d": "최근 90일",
+  "shareModeFilter": "공유 방식",
+  "allModes": "전체",
+  "popularTags": "인기 태그"
 }

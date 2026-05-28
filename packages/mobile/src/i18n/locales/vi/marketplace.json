@@ -143,5 +143,7 @@
     "copy": "Sao chép",
     "subscribe": "Đăng ký",
     "snapshot": "Ảnh chụp"
-  }
+  },
+  "filters": "Bộ lọc",
+  "categoryLabel": "Danh mục"
 }
