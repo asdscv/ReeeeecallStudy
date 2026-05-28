@@ -32,7 +32,8 @@
     "copy": "Copy",
     "search": "Search",
     "startStudy": "Start Study",
-    "logout": "Logout"
+    "logout": "Logout",
+    "retry": "Retry"
   },
   "status": {
     "loading": "Loading...",
@@ -190,5 +191,6 @@
     "sessions": "Sessions",
     "time": "Study Time",
     "mastery": "Cards Mastered"
-  }
+  },
+  "cancel": "Cancel"
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet, Switch } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import * as Speech from 'expo-speech'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
@@ -41,6 +42,7 @@ function generateKey(): string {
 
 export function TemplateEditScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const templateId = route.params?.templateId
@@ -70,8 +72,8 @@ export function TemplateEditScreen() {
     if (isNew) {
       setName('')
       setFields([
-        { key: 'front', name: 'Front', type: 'text', order: 0 },
-        { key: 'back', name: 'Back', type: 'text', order: 1 },
+        { key: 'front', name: t('template.fieldFront'), type: 'text', order: 0 },
+        { key: 'back', name: t('template.fieldBack'), type: 'text', order: 1 },
       ])
       setFrontLayout([{ field_key: 'front', style: 'primary' }])
       setBackLayout([{ field_key: 'back', style: 'primary' }])
@@ -91,7 +93,7 @@ export function TemplateEditScreen() {
     if (fields.length >= 10) return
     const newField: TemplateField = {
       key: generateKey(),
-      name: `Field ${fields.length + 1}`,
+      name: t('template.fieldDefault', { n: fields.length + 1 }),
       type: 'text',
       order: fields.length,
     }
@@ -108,12 +110,12 @@ export function TemplateEditScreen() {
     if (fields.length <= 1) return
     const removed = fields[index]
     Alert.alert(
-      'Remove Field',
-      `Remove "${removed.name}"? This will also remove it from front/back layouts.`,
+      t('template.removeFieldTitle'),
+      t('template.removeFieldMsg', { name: removed.name }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('template.cancel'), style: 'cancel' },
         {
-          text: 'Remove',
+          text: t('template.remove'),
           style: 'destructive',
           onPress: () => {
             const next = fields.filter((_, i) => i !== index).map((f, i) => ({ ...f, order: i }))
@@ -139,7 +141,7 @@ export function TemplateEditScreen() {
   const handleTtsTest = (index: number) => {
     const field = fields[index]
     if (!field.tts_lang) {
-      Alert.alert('TTS', 'Please select a language first')
+      Alert.alert(t('template.ttsTitle'), t('template.ttsSelectLang'))
       return
     }
     Speech.stop()
@@ -194,11 +196,11 @@ export function TemplateEditScreen() {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Error', 'Template name is required')
+      Alert.alert(t('template.errorTitle'), t('template.nameRequired'))
       return
     }
     if (fields.length === 0) {
-      Alert.alert('Error', 'At least one field is required')
+      Alert.alert(t('template.errorTitle'), t('template.fieldRequired'))
       return
     }
 
@@ -218,7 +220,7 @@ export function TemplateEditScreen() {
         if (created) {
           navigation.goBack()
         } else {
-          Alert.alert('Error', 'Failed to create template')
+          Alert.alert(t('template.errorTitle'), t('template.createFailed'))
         }
       } else {
         const success = await updateTemplate(templateId!, {
@@ -230,11 +232,11 @@ export function TemplateEditScreen() {
         if (success) {
           navigation.goBack()
         } else {
-          Alert.alert('Error', 'Failed to save template')
+          Alert.alert(t('template.errorTitle'), t('template.saveFailed'))
         }
       }
     } catch {
-      Alert.alert('Error', 'An unexpected error occurred')
+      Alert.alert(t('template.errorTitle'), t('template.unexpectedError'))
     } finally {
       setSaving(false)
     }
@@ -244,10 +246,10 @@ export function TemplateEditScreen() {
   if (!isNew && !template && templates.length > 0) {
     return (
       <Screen scroll keyboard testID="template-edit-screen">
-        <ScreenHeader title="Template" mode="back" />
+        <ScreenHeader title={t('template.headerTitle')} mode="back" />
         <View style={styles.centered}>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-            Template not found
+            {t('template.notFound')}
           </Text>
         </View>
       </Screen>
@@ -258,7 +260,7 @@ export function TemplateEditScreen() {
     return (
       <Screen testID="template-edit-screen">
         <View style={styles.centered}>
-          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>Loading...</Text>
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>{t('common:status.loading')}</Text>
         </View>
       </Screen>
     )
@@ -270,10 +272,10 @@ export function TemplateEditScreen() {
   return (
     <Screen safeArea padding={false} keyboard testID="template-edit-screen">
       <ScreenHeader
-        title={isNew ? 'New Template' : 'Edit Template'}
+        title={isNew ? t('template.newTemplateTitle') : t('template.editTitle')}
         mode="back"
         rightAction={{
-          title: saving ? 'Saving...' : 'Save',
+          title: saving ? t('template.saving') : t('template.save'),
           onPress: handleSave,
           loading: saving,
           disabled: !name.trim(),
@@ -289,15 +291,15 @@ export function TemplateEditScreen() {
         {/* Template name */}
         <TextInput
           testID="template-edit-name"
-          label="Template Name"
-          placeholder="e.g. Language Card"
+          label={t('template.nameLabel')}
+          placeholder={t('template.namePlaceholder')}
           value={name}
           onChangeText={setName}
           autoFocus={isNew}
         />
 
         {/* ── Field Management ── */}
-        <SectionCard theme={theme} title="Fields" subtitle={`${fields.length} / 10`}>
+        <SectionCard theme={theme} title={t('template.fieldsTitle')} subtitle={`${fields.length} / 10`}>
           {fields.map((field, i) => (
             <View
               key={field.key}
@@ -310,7 +312,7 @@ export function TemplateEditScreen() {
                     testID={`template-field-name-${i}`}
                     value={field.name}
                     onChangeText={(v) => updateField(i, { name: v })}
-                    placeholder="Field name"
+                    placeholder={t('template.fieldName')}
                   />
                 </View>
               </View>
@@ -320,13 +322,13 @@ export function TemplateEditScreen() {
                 testID={`template-field-detail-${i}`}
                 value={field.detail || ''}
                 onChangeText={(v) => updateField(i, { detail: v || undefined })}
-                placeholder="Field description (optional)"
+                placeholder={t('template.fieldDesc')}
               />
 
               {/* Field actions */}
               <View style={styles.fieldActions}>
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                  Type: {field.type}
+                  {t('template.typeLabel', { type: field.type })}
                 </Text>
                 <View style={styles.fieldBtnGroup}>
                   {i > 0 && (
@@ -335,7 +337,7 @@ export function TemplateEditScreen() {
                       onPress={() => moveField(i, 'up')}
                       style={[styles.fieldBtn, { backgroundColor: theme.colors.surface }]}
                     >
-                      <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Up</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('template.up')}</Text>
                     </TouchableOpacity>
                   )}
                   {i < fields.length - 1 && (
@@ -344,7 +346,7 @@ export function TemplateEditScreen() {
                       onPress={() => moveField(i, 'down')}
                       style={[styles.fieldBtn, { backgroundColor: theme.colors.surface }]}
                     >
-                      <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Down</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('template.down')}</Text>
                     </TouchableOpacity>
                   )}
                   {fields.length > 1 && (
@@ -353,7 +355,7 @@ export function TemplateEditScreen() {
                       onPress={() => removeField(i)}
                       style={[styles.fieldBtn, { backgroundColor: theme.colors.errorLight }]}
                     >
-                      <Text style={[theme.typography.caption, { color: theme.colors.error }]}>Remove</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.error }]}>{t('template.remove')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -363,7 +365,7 @@ export function TemplateEditScreen() {
               {field.type === 'text' && (
                 <View style={[styles.ttsSection, { borderTopColor: theme.colors.border }]}>
                   <View style={styles.ttsToggleRow}>
-                    <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>TTS</Text>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{t('template.tts')}</Text>
                     <Switch
                       testID={`template-field-tts-toggle-${i}`}
                       value={!!field.tts_enabled}
@@ -404,7 +406,7 @@ export function TemplateEditScreen() {
                         onPress={() => handleTtsTest(i)}
                         style={[styles.ttsTestBtn, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
                       >
-                        <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>▶ Test</Text>
+                        <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>{'▶'} {t('template.test')}</Text>
                       </TouchableOpacity>
                     </View>
                   )}
@@ -419,7 +421,7 @@ export function TemplateEditScreen() {
               onPress={addField}
               style={[styles.addFieldBtn, { borderColor: theme.colors.border }]}
             >
-              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>+ Add Field</Text>
+              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>{t('template.addField')}</Text>
             </TouchableOpacity>
           )}
         </SectionCard>
@@ -427,7 +429,7 @@ export function TemplateEditScreen() {
         {/* ── Front Layout ── */}
         <LayoutSection
           theme={theme}
-          title="Front Layout"
+          title={t('template.frontLayout')}
           layout={frontLayout}
           availableFields={availableFrontFields}
           getFieldName={getFieldName}
@@ -440,7 +442,7 @@ export function TemplateEditScreen() {
         {/* ── Back Layout ── */}
         <LayoutSection
           theme={theme}
-          title="Back Layout"
+          title={t('template.backLayout')}
           layout={backLayout}
           availableFields={availableBackFields}
           getFieldName={getFieldName}
@@ -462,7 +464,7 @@ export function TemplateEditScreen() {
         {/* Save button (bottom) */}
         <Button
           testID="template-edit-save-bottom"
-          title={saving ? 'Saving...' : (isNew ? 'Create Template' : 'Save Changes')}
+          title={saving ? t('template.saving') : (isNew ? t('template.create') : t('template.saveChanges'))}
           onPress={handleSave}
           loading={saving}
           disabled={!name.trim()}
@@ -523,6 +525,7 @@ function LayoutSection({
   onStyleChange: (fieldKey: string, style: LayoutItem['style']) => void
   side: 'front' | 'back'
 }) {
+  const { t } = useTranslation('decks')
   const [showFieldPicker, setShowFieldPicker] = useState(false)
 
   return (
@@ -531,7 +534,7 @@ function LayoutSection({
 
       {layout.length === 0 && (
         <Text style={[theme.typography.bodySmall, { color: theme.colors.textTertiary }]}>
-          No fields assigned. Add fields to this layout.
+          {t('template.noFieldsLayout')}
         </Text>
       )}
 
@@ -567,7 +570,7 @@ function LayoutSection({
                     { color: item.style === opt.value ? theme.colors.primaryText : theme.colors.textSecondary, fontSize: 10 },
                   ]}
                 >
-                  {opt.label}
+                  {t(`template.style.${opt.value}`)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -592,7 +595,7 @@ function LayoutSection({
             style={styles.addLayoutBtn}
           >
             <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
-              + Add Field
+              {t('template.addField')}
             </Text>
           </TouchableOpacity>
           {showFieldPicker && (
@@ -646,16 +649,17 @@ function CardPreview({
   backLayout: LayoutItem[]
   getFieldName: (key: string) => string
 }) {
+  const { t } = useTranslation('decks')
   const [showBack, setShowBack] = useState(false)
   const layout = showBack ? backLayout : frontLayout
 
   return (
     <View style={[styles.sectionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
       <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Card Preview</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('template.cardPreview')}</Text>
         <TouchableOpacity onPress={() => setShowBack(!showBack)}>
           <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
-            {showBack ? 'Show Front' : 'Show Back'}
+            {showBack ? t('template.showFront') : t('template.showBack')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -663,7 +667,7 @@ function CardPreview({
       <View style={[previewStyles.card, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
         {layout.length === 0 ? (
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-            No fields in {showBack ? 'back' : 'front'} layout
+            {t('template.noFieldsIn', { side: showBack ? t('template.sideBack') : t('template.sideFront') })}
           </Text>
         ) : (
           layout.map((item) => {

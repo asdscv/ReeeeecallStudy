@@ -67,15 +67,16 @@
     "resume": "계속하기",
     "paused": "일시정지됨",
     "pressSpaceToResume": "Space를 눌러 계속하기",
-    "undo": "되돌리기"
+    "undo": "되돌리기",
+    "exit": "나가기"
   },
   "card": {
     "tapToFlip": "탭하여 뒤집기",
     "tapToSeeAnswer": "카드를 탭하여 답을 확인하세요",
     "tapToReveal": "카드를 탭하여 답을 확인하세요",
-    "ttsPlay": "TTS \uc7ac\uc0dd",
-    "front": "\uc55e\uba74",
-    "back": "\ub4b7\uba74"
+    "ttsPlay": "TTS 재생",
+    "front": "앞면",
+    "back": "뒷면"
   },
   "rating": {
     "dontKnow": "모름",
@@ -118,7 +119,15 @@
     "of": "{{current}} / {{total}}"
   },
   "datePicker": {
-    "weekdays": ["일", "월", "화", "수", "목", "금", "토"]
+    "weekdays": [
+      "일",
+      "월",
+      "화",
+      "수",
+      "목",
+      "금",
+      "토"
+    ]
   },
   "interval": {
     "lessThanTenMin": "< 10분",
@@ -194,10 +203,9 @@
     "title": "키보드 단축키",
     "description": "학습 중 사용 가능한 단축키",
     "rateCards": "Again / Hard / Good / Easy 평가",
-    "flipCard": "카드 뒤집기",
+    "flipCard": "카드 뒤집기 (양방향)",
     "undoRating": "마지막 평가 되돌리기",
     "exitStudy": "학습 종료",
-    "flipCard": "카드 뒤집기 (양방향)",
     "gotIt": "알겠음",
     "missed": "모르겠음",
     "known": "알고 있음",

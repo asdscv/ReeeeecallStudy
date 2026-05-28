@@ -47,7 +47,11 @@
     "unsubscribing": "Unsubscribing...",
     "unsubscribed": "Unsubscribed",
     "unsubscribeConfirm": "Unsubscribe from this deck? Your personal study progress for it will remain in your account.",
-    "unsubscribeError": "Failed to unsubscribe. Please try again."
+    "unsubscribeError": "Failed to unsubscribe. Please try again.",
+    "title": "Detail",
+    "alreadyReported": "Already reported",
+    "alreadyReportedBody": "You have already reported this listing.",
+    "reportError": "Failed to submit report"
   },
   "publish": {
     "title": "Publish Deck",
@@ -150,6 +154,12 @@
     "subscribe": "Subscribe",
     "snapshot": "Snapshot"
   },
-  "filters": "Filter",
-  "categoryLabel": "Category"
+  "filters": {
+    "label": "Filter"
+  },
+  "categoryLabel": "Category",
+  "categoryTitle": "Category",
+  "sortTitle": "Sort By",
+  "loadError": "Couldn't load decks",
+  "loadErrorHint": "Check your connection and try again."
 }

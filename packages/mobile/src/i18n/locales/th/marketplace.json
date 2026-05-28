@@ -41,7 +41,11 @@
     "unsubscribing": "กำลังยกเลิก...",
     "unsubscribed": "ยกเลิกการสมัครสมาชิกแล้ว",
     "unsubscribeConfirm": "ยกเลิกการสมัครสมาชิกชุดการ์ดนี้? ความคืบหน้าการเรียนรู้ส่วนตัวของคุณจะยังคงอยู่ในบัญชี",
-    "unsubscribeError": "ยกเลิกการสมัครสมาชิกล้มเหลว กรุณาลองอีกครั้ง"
+    "unsubscribeError": "ยกเลิกการสมัครสมาชิกล้มเหลว กรุณาลองอีกครั้ง",
+    "title": "รายละเอียด",
+    "alreadyReported": "รายงานแล้ว",
+    "alreadyReportedBody": "คุณรายงานรายการนี้ไปแล้ว",
+    "reportError": "ส่งรายงานไม่สำเร็จ"
   },
   "publish": {
     "title": "Publish Deck",
@@ -144,6 +148,12 @@
     "subscribe": "ติดตาม",
     "snapshot": "สแน็ปช็อต"
   },
-  "filters": "ตัวกรอง",
-  "categoryLabel": "หมวดหมู่"
+  "filters": {
+    "label": "ตัวกรอง"
+  },
+  "categoryLabel": "หมวดหมู่",
+  "categoryTitle": "หมวดหมู่",
+  "sortTitle": "เรียงลำดับ",
+  "loadError": "โหลดเด็คไม่สำเร็จ",
+  "loadErrorHint": "ตรวจสอบการเชื่อมต่อแล้วลองใหม่"
 }

@@ -37,7 +37,13 @@
     "studyMode": "โหมดการเรียน",
     "selectUploadDate": "เลือกวันที่อัปโหลด",
     "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count}} การ์ด",
-    "noDecks": "ยังไม่มีเด็ค กรุณาสร้างเด็คก่อน!"
+    "noDecks": "ยังไม่มีเด็ค กรุณาสร้างเด็คก่อน!",
+    "alertSelectDeckTitle": "เลือกเด็ค",
+    "alertSelectDeckMsg": "กรุณาเลือกเด็คที่จะเรียน",
+    "alertNoCardsTitle": "ไม่มีการ์ด",
+    "alertNoCardsMsg": "ไม่พบการ์ดสำหรับวันที่เลือก",
+    "alertErrorTitle": "ข้อผิดพลาด",
+    "shuffle": "สุ่ม"
   },
   "cramming": {
     "gotIt": "จำได้!",

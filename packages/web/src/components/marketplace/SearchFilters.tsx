@@ -77,7 +77,7 @@ export function SearchFilters({
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted cursor-pointer whitespace-nowrap"
         >
-          {t('filters', { defaultValue: 'Filter' })}
+          {t('filters.label', { defaultValue: 'Filter' })}
           {activeCount > 0 && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-brand text-white rounded-full">
               {activeCount}

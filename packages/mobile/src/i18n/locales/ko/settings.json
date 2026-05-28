@@ -154,5 +154,8 @@
   },
   "alerts": {
     "error": "오류"
+  },
+  "actions": {
+    "cancel": "취소"
   }
 }

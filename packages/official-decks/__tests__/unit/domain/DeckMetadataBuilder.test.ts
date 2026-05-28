@@ -75,16 +75,16 @@ describe("DeckMetadataBuilder", () => {
     expect(meta.tags.some((t) => t.startsWith("level:"))).toBe(false);
   });
 
-  describe("nativeLanguages (back-side / explanation language)", () => {
+  describe("nativeLanguages (learner's mother tongue = non-English side)", () => {
     it("forward EN→KO word → native is the target [ko]", () => {
       const meta = buildDeckMetadata("beginner_batch3.csv", LanguagePair.of(en, ko));
       expect(meta.nativeLanguages).toEqual(["ko"]);
     });
 
-    it("reverse KO→EN word (vocab) → native is English ['en'] (for English natives)", () => {
+    it("reverse KO→EN word (vocab) → native is the mother tongue [ko] (aligns with title + marketplace filter)", () => {
       const meta = buildDeckMetadata("beginner_batch3.csv", LanguagePair.of(ko, en));
       expect(meta.templateKind).toBe("word");
-      expect(meta.nativeLanguages).toEqual(["en"]);
+      expect(meta.nativeLanguages).toEqual(["ko"]);
     });
 
     it("reverse KO→EN conversation → native stays [ko] (Korean-native production deck)", () => {

@@ -37,7 +37,13 @@
     "studyMode": "学習モード",
     "selectUploadDate": "アップロード日を選択",
     "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚",
-    "noDecks": "まだデッキがありません。先にデッキを作成してください！"
+    "noDecks": "まだデッキがありません。先にデッキを作成してください！",
+    "alertSelectDeckTitle": "デッキを選択",
+    "alertSelectDeckMsg": "学習するデッキを選んでください",
+    "alertNoCardsTitle": "カードなし",
+    "alertNoCardsMsg": "選択した日付のカードがありません",
+    "alertErrorTitle": "エラー",
+    "shuffle": "シャッフル"
   },
   "cramming": {
     "gotIt": "わかった！",

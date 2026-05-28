@@ -9,7 +9,6 @@
   "unpublish": "Gỡ đăng tải",
   "publishNote": "Đăng tải lên chợ cho phép mọi người tìm thấy bộ thẻ này.",
   "publishButton": "Đăng lên chợ",
-
   "noSubscribers": "Chưa chia sẻ với ai.",
   "inviteLink": "Liên kết mời",
   "cancel": "Thu hồi",
@@ -18,7 +17,6 @@
   "creating": "Đang tạo...",
   "createInviteLink": "Tạo liên kết mời",
   "linkShareInfo": "Chia sẻ liên kết này để cấp quyền truy cập bộ thẻ.",
-
   "shareMode": {
     "label": "Chế độ chia sẻ",
     "copy": {
@@ -37,7 +35,6 @@
       "detail": "Sao chép chính xác các thẻ hiện tại, nhưng không được phép chỉnh sửa. Một bản chụp duy nhất của bộ thẻ."
     }
   },
-
   "shareModes": {
     "copy": {
       "label": "Sao chép",
@@ -55,13 +52,11 @@
       "detail": "Sao chép chính xác các thẻ hiện tại, nhưng không được phép chỉnh sửa. Một bản chụp duy nhất của bộ thẻ."
     }
   },
-
   "mode": {
     "subscribe": "Đã đăng ký",
     "snapshot": "Bản chụp",
     "copy": "Bản sao"
   },
-
   "modal": {
     "title": "Chia sẻ bộ thẻ",
     "description": "Đang chia sẻ bộ thẻ \"{{name}}\".",
@@ -169,5 +164,6 @@
     "subscribed": "Đã đăng ký",
     "snapshot": "Bản chụp",
     "copy": "Bản sao"
-  }
+  },
+  "unsubscribe": "Hủy đăng ký"
 }

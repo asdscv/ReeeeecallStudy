@@ -41,7 +41,11 @@
     "unsubscribing": "配信解除中...",
     "unsubscribed": "配信解除しました",
     "unsubscribeConfirm": "このデッキの配信を解除しますか？個人の学習進捗はアカウントに残ります。",
-    "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。"
+    "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。",
+    "title": "詳細",
+    "alreadyReported": "報告済み",
+    "alreadyReportedBody": "この出品はすでに報告済みです。",
+    "reportError": "報告の送信に失敗しました"
   },
   "publish": {
     "title": "Publish Deck",
@@ -144,6 +148,12 @@
     "subscribe": "購読",
     "snapshot": "スナップショット"
   },
-  "filters": "フィルター",
-  "categoryLabel": "カテゴリー"
+  "filters": {
+    "label": "フィルター"
+  },
+  "categoryLabel": "カテゴリー",
+  "categoryTitle": "カテゴリー",
+  "sortTitle": "並び替え",
+  "loadError": "デッキを読み込めませんでした",
+  "loadErrorHint": "接続を確認してもう一度お試しください。"
 }

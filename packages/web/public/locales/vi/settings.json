@@ -152,5 +152,31 @@
     "fri": "Fri",
     "sat": "Sat",
     "sun": "Sun"
+  },
+  "export": {
+    "title": "Xuất dữ liệu của tôi",
+    "description": "Tải dữ liệu của bạn dưới dạng tệp CSV.",
+    "noData": "Không có dữ liệu để xuất",
+    "success": "Đã xuất xong",
+    "error": "Xuất thất bại",
+    "stats": "Thống kê học tập",
+    "statsDesc": "Tóm tắt hiệu suất học tập tổng thể",
+    "sessions": "Phiên học",
+    "sessionsDesc": "Toàn bộ lịch sử phiên học (tối đa 5.000)",
+    "decks": "Bộ thẻ",
+    "decksDesc": "Toàn bộ siêu dữ liệu bộ thẻ",
+    "cards": "Thẻ",
+    "cardsDesc": "Toàn bộ dữ liệu thẻ kèm trạng thái SRS (tối đa 10.000)"
+  },
+  "quickActions": {
+    "quickStudy": "Học nhanh",
+    "aiGenerate": "Tạo bằng AI",
+    "guide": "Hướng dẫn"
+  },
+  "goal": {
+    "title": "Mục tiêu học hằng ngày",
+    "description": "Đặt mục tiêu học hằng ngày (phút). Để trống nếu không có mục tiêu.",
+    "placeholder": "vd. 30",
+    "unit": "phút / ngày"
   }
 }

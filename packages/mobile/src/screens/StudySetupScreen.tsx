@@ -129,11 +129,11 @@ export function StudySetupScreen() {
 
   const handleStart = async () => {
     if (!selectedDeckId) {
-      Alert.alert('Select a Deck', 'Please choose a deck to study')
+      Alert.alert(t('setup.alertSelectDeckTitle'), t('setup.alertSelectDeckMsg'))
       return
     }
     if (selectedMode === 'by_date' && dateCardCount === 0) {
-      Alert.alert('No Cards', 'No cards found for the selected date')
+      Alert.alert(t('setup.alertNoCardsTitle'), t('setup.alertNoCardsMsg'))
       return
     }
     const size = parseInt(batchSize) || 20
@@ -154,7 +154,7 @@ export function StudySetupScreen() {
       )
       navigation.navigate('StudySession')
     } catch (e) {
-      Alert.alert('Error', 'Failed to start study session')
+      Alert.alert(t('setup.alertErrorTitle'), t('setup.startFailed'))
     }
   }
 
@@ -175,7 +175,7 @@ export function StudySetupScreen() {
     const m = mode ?? selectedMode
     if (!selectedDeckId) return
     if (m === 'by_date' && dateCardCount === 0) {
-      Alert.alert('No Cards', 'No cards found for the selected date')
+      Alert.alert(t('setup.alertNoCardsTitle'), t('setup.alertNoCardsMsg'))
       return
     }
     const size = parseInt(batchSize) || 20
@@ -196,7 +196,7 @@ export function StudySetupScreen() {
       closeModal()
       navigation.navigate('StudySession')
     } catch {
-      Alert.alert('Error', 'Failed to start study session')
+      Alert.alert(t('setup.alertErrorTitle'), t('setup.startFailed'))
     }
   }
 
@@ -359,7 +359,7 @@ export function StudySetupScreen() {
                       </View>
                     </View>
                     <View style={styles.toggleRow}>
-                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>Shuffle</Text>
+                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t('setup.shuffle')}</Text>
                       <Switch testID="study-cram-shuffle" value={crammingShuffle} onValueChange={setCrammingShuffle} trackColor={{ true: theme.colors.primary }} />
                     </View>
                   </View>

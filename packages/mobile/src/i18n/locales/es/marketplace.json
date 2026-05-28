@@ -41,7 +41,11 @@
     "unsubscribing": "Cancelando...",
     "unsubscribed": "Suscripción cancelada",
     "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
-    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo."
+    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo.",
+    "title": "Detalle",
+    "alreadyReported": "Ya reportado",
+    "alreadyReportedBody": "Ya has reportado este elemento.",
+    "reportError": "No se pudo enviar el reporte"
   },
   "publish": {
     "title": "Publish Deck",
@@ -144,6 +148,12 @@
     "subscribe": "Suscribir",
     "snapshot": "Instantánea"
   },
-  "filters": "Filtrar",
-  "categoryLabel": "Categoría"
+  "filters": {
+    "label": "Filtrar"
+  },
+  "categoryLabel": "Categoría",
+  "categoryTitle": "Categoría",
+  "sortTitle": "Ordenar por",
+  "loadError": "No se pudieron cargar las barajas",
+  "loadErrorHint": "Revisa tu conexión e inténtalo de nuevo."
 }

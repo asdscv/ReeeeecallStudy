@@ -37,7 +37,13 @@
     "studyMode": "Chế độ học",
     "selectUploadDate": "Chọn ngày tải lên",
     "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ",
-    "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ thẻ trước!"
+    "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ thẻ trước!",
+    "alertSelectDeckTitle": "Chọn bộ thẻ",
+    "alertSelectDeckMsg": "Hãy chọn một bộ thẻ để học",
+    "alertNoCardsTitle": "Không có thẻ",
+    "alertNoCardsMsg": "Không có thẻ nào cho ngày đã chọn",
+    "alertErrorTitle": "Lỗi",
+    "shuffle": "Xáo trộn"
   },
   "cramming": {
     "gotIt": "Đúng rồi!",

@@ -53,7 +53,8 @@
     "cards": "Study {{count}} cards",
     "sessions": "Complete {{count}} sessions",
     "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores"
+    "perfect": "Get {{count}} perfect scores",
+    "completed": "完了"
   },
   "streakFreeze": {
     "title": "Streak Freeze",

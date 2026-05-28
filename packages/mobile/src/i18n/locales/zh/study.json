@@ -37,7 +37,13 @@
     "studyMode": "学习模式",
     "selectUploadDate": "选择上传日期",
     "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片",
-    "noDecks": "还没有卡组，请先创建一个卡组！"
+    "noDecks": "还没有卡组，请先创建一个卡组！",
+    "alertSelectDeckTitle": "选择卡组",
+    "alertSelectDeckMsg": "请选择要学习的卡组",
+    "alertNoCardsTitle": "没有卡片",
+    "alertNoCardsMsg": "所选日期没有卡片",
+    "alertErrorTitle": "错误",
+    "shuffle": "随机"
   },
   "cramming": {
     "gotIt": "会了！",
