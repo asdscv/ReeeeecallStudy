@@ -77,17 +77,16 @@ export function buildDeckMetadata(
   const learningLanguage: LanguageCode =
     pair.source === "en" || pair.target === "en" ? "en" : pair.target;
 
-  // Native (back) language(s). Forward EN→X: back is X. Reverse X→EN: back is
-  // English — vocab decks are then for English natives (['en']); conversation
-  // decks stay native-side (the learner's own language → production practice).
+  // Native (mother-tongue) language = the non-English side of the pair (the
+  // language the learner already speaks). Every official deck teaches English,
+  // so the pair is always en↔X. Forward EN→X ⇒ [X]; reverse X→EN and
+  // conversation X→EN ⇒ [X]. This keeps native_languages aligned with the
+  // deck's display title (rendered in that same mother tongue) and the
+  // marketplace native filter — a learner filtering by their own language sees
+  // both study directions (recognition en→X and production X→en) of the same
+  // English content, instead of the reverse decks being hidden under 'en'.
   const nativeLanguages: readonly LanguageCode[] =
-    pair.source === "en"
-      ? [pair.target]
-      : pair.target === "en"
-        ? isConversation
-          ? [pair.source]
-          : ["en"]
-        : [pair.source];
+    pair.source === "en" ? [pair.target] : [pair.source];
 
   const tags: string[] = [
     "official",
