@@ -32,3 +32,25 @@
 ## 검증 게이트
 - mobile `tsc` 0 / official-decks `tsc`+vitest green / web `tsc -b`+vitest green(신규 가드 포함)
 - prod: 공식 reverse vocab 덱 native_language = 비영어 측, 마켓 native 필터 정합 육안 확인
+
+---
+## 구현 결과 (2026-05-28 완료)
+
+### A — 모바일 잔여 하드코딩 (완료)
+- `CardEditScreen`(i18n 전무)·`TemplateEditScreen`(i18n 전무, 메인+LayoutSection+CardPreview)·`StudySetupScreen` i18n 와이어업. decks.cardEdit(17키)·decks.template 확장(~58키, style 칩·Alert 8종·기본 필드명 포함)·study.setup 확장 — 8로케일 자연어. mobile tsc 0, 세 화면 잔여 0.
+
+### D — native_languages 표시언어 정합 (완료 + prod)
+- `DeckMetadataBuilder`: nativeLanguages = 비영어 측 통일(reverse vocab `['en']`→`[source]`). 테스트 갱신. migration 094(idempotent) 작성 + prod 적용: reverse vocab 322덱 native 'en'→모국어, 분포 ko=97/그외 92(합 649), native='en' 잔존 0. import RPC는 native_languages 미소비(2026-05-27 결정대로 backfill migration이 SSOT).
+
+### B/C — 사용키 커버리지 가드 + 누락키 보강 (완료)
+- `i18n-key-usage.test.ts`(web vitest): 정적 t() 키 존재 검증 ratchet(web=en, mobile=en+ko). 동적/모호 skip → false positive 0.
+- 측정: 초기 web 131 / mobile 20 누락(defaultValue로 영어 노출). **web 75 / mobile 20 보강(8로케일)** 후 가드 통과. admin·api-docs(~56, 내부 도구)는 allowlist(ratchet 유지).
+- `filters` 키 충돌(PR1의 string vs `filters.reset`) → `{label,reset}` 객체로 재구성 + 컴포넌트 `t('filters.label')`.
+- 게이트: web tsc -b 0 / mobile tsc 0 / web vitest(i18n-key-usage·translation-keys parity·marketplace-discovery) green / official-decks 110 pass.
+
+### B 범위 결정 (strict parity 대신 used-key 가드)
+- 모바일 로케일은 구조적 드리프트(en↔비-en 키셋 상이, dead key) — 총 missing 768 / extra 1908(ko만 en 일치). strict full-parity 강제는 ~2676키 정리(품질 저하 없는 번역) 필요 → 별도 프로젝트. 본 PR은 "코드가 실제 쓰는 키" 커버리지로 회귀를 차단(더 직접적인 버그 클래스 방어).
+
+### 잔여 추적 (allowlist, 후속)
+- web `admin:*`(~55)·`api-docs:*`(1): 내부 도구 화면. defaultValue 영어 노출. 별도 i18n 패스 권장.
+- 모바일 로케일 구조적 드리프트(dead key/extra 1908): 코드-참조 키 추출 후 dead key prune + 비-ko 로케일 정렬 별도 작업.
