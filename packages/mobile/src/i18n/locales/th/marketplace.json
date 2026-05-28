@@ -45,7 +45,8 @@
     "title": "รายละเอียด",
     "alreadyReported": "รายงานแล้ว",
     "alreadyReportedBody": "คุณรายงานรายการนี้ไปแล้ว",
-    "reportError": "ส่งรายงานไม่สำเร็จ"
+    "reportError": "ส่งรายงานไม่สำเร็จ",
+    "downloading": "กำลังดาวน์โหลด..."
   },
   "publish": {
     "title": "Publish Deck",

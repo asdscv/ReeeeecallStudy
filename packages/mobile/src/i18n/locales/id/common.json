@@ -269,5 +269,21 @@
     "dashboard": "Dasbor menampilkan statistik & streak belajar",
     "quickStudy": "Belajar cepat memulai sesi seketika"
   },
-  "cancel": "Batal"
+  "cancel": "Batal",
+  "errorBoundary": {
+    "title": "Terjadi kesalahan",
+    "message": "Layar mengalami kesalahan tak terduga. Silakan coba lagi.",
+    "retry": "Coba lagi"
+  },
+  "sessionKicked": {
+    "badge": "Sesi kedaluwarsa",
+    "headline": "Masuk di perangkat lain",
+    "description": "Anda keluar karena akun digunakan di perangkat lain. Pulihkan sesi ini untuk tetap memakainya di sini.",
+    "info1": "Terdeteksi sesi aktif di perangkat lain",
+    "info2": "Batas otomatis untuk menjaga keamanan akun Anda",
+    "reclaim": "Lanjutkan di perangkat ini",
+    "reclaiming": "Memulihkan sesi…",
+    "logout": "Keluar",
+    "hint": "Hanya satu perangkat dapat digunakan dalam satu waktu"
+  }
 }

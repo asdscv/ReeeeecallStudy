@@ -45,7 +45,8 @@
     "title": "Chi tiết",
     "alreadyReported": "Đã báo cáo",
     "alreadyReportedBody": "Bạn đã báo cáo mục này rồi.",
-    "reportError": "Gửi báo cáo thất bại"
+    "reportError": "Gửi báo cáo thất bại",
+    "downloading": "Đang tải xuống..."
   },
   "publish": {
     "title": "Publish Deck",

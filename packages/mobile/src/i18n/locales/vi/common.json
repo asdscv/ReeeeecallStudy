@@ -269,5 +269,21 @@
     "dashboard": "Bảng điều khiển hiển thị thống kê và chuỗi học",
     "quickStudy": "Học nhanh bắt đầu phiên ngay lập tức"
   },
-  "cancel": "Hủy"
+  "cancel": "Hủy",
+  "errorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "message": "Màn hình gặp lỗi không mong muốn. Vui lòng thử lại.",
+    "retry": "Thử lại"
+  },
+  "sessionKicked": {
+    "badge": "Phiên đã hết hạn",
+    "headline": "Đã đăng nhập trên thiết bị khác",
+    "description": "Bạn đã bị đăng xuất vì tài khoản được dùng trên thiết bị khác. Khôi phục phiên này để tiếp tục dùng tại đây.",
+    "info1": "Phát hiện phiên đang hoạt động trên thiết bị khác",
+    "info2": "Giới hạn tự động để bảo vệ tài khoản của bạn",
+    "reclaim": "Tiếp tục trên thiết bị này",
+    "reclaiming": "Đang khôi phục phiên…",
+    "logout": "Đăng xuất",
+    "hint": "Chỉ có thể dùng một thiết bị tại một thời điểm"
+  }
 }

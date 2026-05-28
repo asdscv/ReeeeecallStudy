@@ -43,7 +43,12 @@
     "alertNoCardsTitle": "Tidak Ada Kartu",
     "alertNoCardsMsg": "Tidak ada kartu untuk tanggal yang dipilih",
     "alertErrorTitle": "Kesalahan",
-    "shuffle": "Acak"
+    "shuffle": "Acak",
+    "startFailed": "Gagal memulai sesi belajar",
+    "cardsPerSession": "Kartu per sesi",
+    "batchHint": "Antara 5 dan 500 kartu",
+    "dateSelection": "Pemilihan Tanggal",
+    "startStudy": "Mulai Belajar"
   },
   "cramming": {
     "gotIt": "Mengerti!",
@@ -95,7 +100,14 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "Akhiri Sesi?",
+    "endMessage": "Progres Anda sejauh ini akan disimpan.",
+    "continue": "Lanjutkan",
+    "end": "Akhiri",
+    "exit": "Keluar",
+    "tapToFlip": "Ketuk untuk membalik",
+    "swipeHint": "Ketuk kartu untuk membalik · Geser untuk menilai"
   },
   "srsRating": {
     "again": "Ulangi",
@@ -108,7 +120,9 @@
     "knowIt": "Tahu",
     "known": "Diketahui",
     "unknown": "Tidak Diketahui",
-    "next": "Berikutnya →"
+    "next": "Berikutnya →",
+    "missed": "Terlewat",
+    "gotIt": "Paham"
   },
   "summary": {
     "title": "Belajar Selesai!",
@@ -129,7 +143,10 @@
     "progressSoFar": "Berikut progres Anda sejauh ini.",
     "knowIt": "Tahu",
     "dontKnow": "Tidak Tahu",
-    "next": "Berikutnya"
+    "next": "Berikutnya",
+    "crammingTitle": "Kebut Selesai!",
+    "mastery": "Penguasaan",
+    "crammingAgain": "Kebut Lagi"
   },
   "ratingLabels": {
     "again": "Again",

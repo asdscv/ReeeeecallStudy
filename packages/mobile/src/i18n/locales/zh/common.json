@@ -269,5 +269,21 @@
     "dashboard": "仪表盘显示学习统计和连续天数",
     "quickStudy": "快速学习立即开始学习"
   },
-  "cancel": "取消"
+  "cancel": "取消",
+  "errorBoundary": {
+    "title": "出现错误",
+    "message": "页面发生了意外错误，请重试。",
+    "retry": "重试"
+  },
+  "sessionKicked": {
+    "badge": "会话已过期",
+    "headline": "已在另一台设备登录",
+    "description": "由于您的账户在另一台设备上使用，您已被登出。恢复此会话即可在此继续使用。",
+    "info1": "检测到另一台设备上有活动会话",
+    "info2": "为保护账户安全的自动限制",
+    "reclaim": "在此设备上继续",
+    "reclaiming": "正在恢复会话…",
+    "logout": "退出登录",
+    "hint": "同一时间只能使用一台设备"
+  }
 }

@@ -45,7 +45,8 @@
     "title": "详情",
     "alreadyReported": "已举报",
     "alreadyReportedBody": "你已经举报过此条目。",
-    "reportError": "举报提交失败"
+    "reportError": "举报提交失败",
+    "downloading": "下载中..."
   },
   "publish": {
     "title": "Publish Deck",

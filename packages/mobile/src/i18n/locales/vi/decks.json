@@ -52,7 +52,8 @@
     "saveVersion": "Lưu phiên bản",
     "noVersions": "Chưa có phiên bản nào được ghi lại.",
     "versionLabel": "Phiên bản {{num}}",
-    "versionCards": "thẻ"
+    "versionCards": "thẻ",
+    "deckNotFound": "Không tìm thấy bộ thẻ"
   },
   "edit": {
     "title": "Sửa bộ thẻ",

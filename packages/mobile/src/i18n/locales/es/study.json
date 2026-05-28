@@ -43,7 +43,12 @@
     "alertNoCardsTitle": "Sin tarjetas",
     "alertNoCardsMsg": "No hay tarjetas para la fecha seleccionada",
     "alertErrorTitle": "Error",
-    "shuffle": "Mezclar"
+    "shuffle": "Mezclar",
+    "startFailed": "No se pudo iniciar la sesión de estudio",
+    "cardsPerSession": "Tarjetas por sesión",
+    "batchHint": "Entre 5 y 500 tarjetas",
+    "dateSelection": "Selección de fecha",
+    "startStudy": "Empezar a estudiar"
   },
   "cramming": {
     "gotIt": "¡Lo sé!",
@@ -95,7 +100,14 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "¿Terminar sesión?",
+    "endMessage": "Tu progreso hasta ahora se guardará.",
+    "continue": "Continuar",
+    "end": "Terminar",
+    "exit": "Salir",
+    "tapToFlip": "Toca para voltear",
+    "swipeHint": "Toca la tarjeta para voltear · Desliza para calificar"
   },
   "srsRating": {
     "again": "Otra vez",
@@ -108,7 +120,9 @@
     "knowIt": "Lo sé",
     "known": "Conocida",
     "unknown": "Desconocida",
-    "next": "Siguiente →"
+    "next": "Siguiente →",
+    "missed": "Fallé",
+    "gotIt": "Lo sé"
   },
   "summary": {
     "title": "¡Estudio completado!",
@@ -129,7 +143,10 @@
     "progressSoFar": "Aquí está tu progreso hasta ahora.",
     "knowIt": "Lo sé",
     "dontKnow": "No lo sé",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "crammingTitle": "¡Repaso intensivo completado!",
+    "mastery": "Dominio",
+    "crammingAgain": "Repasar de nuevo"
   },
   "ratingLabels": {
     "again": "Again",

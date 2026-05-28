@@ -77,7 +77,11 @@
     },
     "setStatus": "Set Status",
     "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "confirmSuspend": "Are you sure you want to suspend this user?",
+    "changeRoleTitle": "Đổi vai trò",
+    "confirmRoleChange": "Đổi vai trò của người dùng này?",
+    "banTitle": "Cấm người dùng",
+    "suspendTitle": "Tạm ngưng người dùng"
   },
   "study": {
     "title": "Hoạt động học tập",
@@ -267,7 +271,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "Thu hồi trạng thái chính thức"
   },
   "audit": {
     "title": "Audit Log",
@@ -301,7 +306,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
+    },
+    "description": "Theo dõi mọi hành động quản trị trên toàn hệ thống",
+    "exportCSV": "Xuất CSV",
+    "actionAll": "Tất cả hành động",
+    "filterTarget": "Loại đối tượng",
+    "targetAll": "Tất cả đối tượng",
+    "dateFrom": "Từ",
+    "dateTo": "Đến",
+    "searching": "Đang tìm...",
+    "emptyTitle": "Không tìm thấy nhật ký kiểm tra",
+    "emptyDescription": "Không có nhật ký nào khớp với bộ lọc hiện tại. Hãy điều chỉnh tiêu chí tìm kiếm.",
+    "refreshing": "Đang làm mới...",
+    "colTime": "Thời gian",
+    "colAdmin": "Quản trị viên",
+    "colAction": "Hành động",
+    "colTarget": "Đối tượng",
+    "colDetails": "Chi tiết",
+    "colIP": "IP",
+    "pageInfo": "Trang {{page}}",
+    "showing": "hiển thị {{count}} mục",
+    "prevPage": "Trước",
+    "nextPage": "Tiếp",
+    "unknownAdmin": "Không rõ",
+    "fullDetails": "Chi tiết đầy đủ"
   },
   "common": {
     "refresh": "Refresh",

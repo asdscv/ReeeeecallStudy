@@ -253,5 +253,6 @@
       "409": "Xung đột tài nguyên (mẫu đang được sử dụng)",
       "429": "Vượt giới hạn tốc độ"
     }
-  }
+  },
+  "dashboard": "Bảng điều khiển"
 }

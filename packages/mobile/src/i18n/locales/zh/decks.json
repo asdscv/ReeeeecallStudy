@@ -52,7 +52,8 @@
     "saveVersion": "保存版本",
     "noVersions": "尚未记录任何版本。",
     "versionLabel": "版本 {{num}}",
-    "versionCards": "张"
+    "versionCards": "张",
+    "deckNotFound": "未找到卡组"
   },
   "edit": {
     "title": "编辑牌组",
