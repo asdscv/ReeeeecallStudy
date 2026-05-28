@@ -18,9 +18,7 @@
   },
   "srs": {
     "title": "SRS Settings",
-    "description": "Configure spaced repetition parameters for optimal learning.",
-    "dailyNewLimit": "Daily New Card Limit",
-    "dailyNewLimitHint": "Maximum number of new cards shown per day per deck."
+    "description": "Configure spaced repetition parameters for optimal learning."
   },
   "answerMode": {
     "title": "Answer Mode",

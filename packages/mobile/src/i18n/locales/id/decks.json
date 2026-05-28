@@ -44,7 +44,17 @@
   "edit": {
     "title": "Edit Dek",
     "save": "Simpan",
-    "nameRequired": "Silakan masukkan nama dek."
+    "nameRequired": "Silakan masukkan nama dek.",
+    "createTitle": "Dek Baru",
+    "create": "Buat Dek",
+    "deckName": "Nama",
+    "namePlaceholder": "mis. Kosakata Bahasa Spanyol",
+    "description": "Deskripsi",
+    "descriptionPlaceholder": "Apa yang akan Anda pelajari?",
+    "color": "Warna",
+    "icon": "Ikon",
+    "template": "Templat",
+    "saveFailed": "Gagal menyimpan dek"
   },
   "card": {
     "noStudyRecord": "Belum ada riwayat belajar",

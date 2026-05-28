@@ -44,7 +44,17 @@
   "edit": {
     "title": "デッキを編集",
     "save": "保存",
-    "nameRequired": "デッキ名を入力してください。"
+    "nameRequired": "デッキ名を入力してください。",
+    "createTitle": "新しいデッキ",
+    "create": "デッキを作成",
+    "deckName": "名前",
+    "namePlaceholder": "例: スペイン語の語彙",
+    "description": "説明",
+    "descriptionPlaceholder": "何を学びますか？",
+    "color": "色",
+    "icon": "アイコン",
+    "template": "テンプレート",
+    "saveFailed": "デッキの保存に失敗しました"
   },
   "card": {
     "noStudyRecord": "学習記録なし",

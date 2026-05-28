@@ -41,7 +41,9 @@
     "edgeTtsNote": "* Saat ini hanya mendukung bahasa Inggris",
     "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
     "voiceEngine": "Mesin Suara",
-    "readingSpeed": "Kecepatan Baca"
+    "readingSpeed": "Kecepatan Baca",
+    "deviceVoice": "Suara Perangkat",
+    "deviceVoiceDesc": "Menggunakan suara bawaan perangkat Anda"
   },
   "srsConfig": {
     "title": "SRS Configuration",

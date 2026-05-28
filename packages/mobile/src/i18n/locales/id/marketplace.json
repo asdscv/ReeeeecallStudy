@@ -87,7 +87,8 @@
   "nativeLanguage": {
     "label": "Bahasa ibu",
     "all": "Semua",
-    "none": "Tidak ditentukan"
+    "none": "Tidak ditentukan",
+    "multiHint": "Pilih semua yang sesuai"
   },
   "publisherStats": {
     "title": "Statistik penerbit",

@@ -44,7 +44,17 @@
   "edit": {
     "title": "Editar mazo",
     "save": "Guardar",
-    "nameRequired": "Por favor ingresa un nombre para el mazo."
+    "nameRequired": "Por favor ingresa un nombre para el mazo.",
+    "createTitle": "Nueva baraja",
+    "create": "Crear baraja",
+    "deckName": "Nombre",
+    "namePlaceholder": "p. ej. Vocabulario de español",
+    "description": "Descripción",
+    "descriptionPlaceholder": "¿Qué vas a aprender?",
+    "color": "Color",
+    "icon": "Icono",
+    "template": "Plantilla",
+    "saveFailed": "No se pudo guardar la baraja"
   },
   "card": {
     "noStudyRecord": "Sin registro de estudio",

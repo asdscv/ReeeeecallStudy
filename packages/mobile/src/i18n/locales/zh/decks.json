@@ -44,7 +44,17 @@
   "edit": {
     "title": "编辑牌组",
     "save": "保存",
-    "nameRequired": "请输入牌组名称。"
+    "nameRequired": "请输入牌组名称。",
+    "createTitle": "新建卡组",
+    "create": "创建卡组",
+    "deckName": "名称",
+    "namePlaceholder": "例如：西班牙语词汇",
+    "description": "描述",
+    "descriptionPlaceholder": "你要学什么？",
+    "color": "颜色",
+    "icon": "图标",
+    "template": "模板",
+    "saveFailed": "保存卡组失败"
   },
   "card": {
     "noStudyRecord": "暂无学习记录",

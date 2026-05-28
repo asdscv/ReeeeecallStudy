@@ -41,7 +41,9 @@
     "edgeTtsNote": "* 現在英語のみ対応",
     "note": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。",
     "voiceEngine": "音声エンジン",
-    "readingSpeed": "読み上げ速度"
+    "readingSpeed": "読み上げ速度",
+    "deviceVoice": "デバイスの音声",
+    "deviceVoiceDesc": "デバイス内蔵の音声を使用します"
   },
   "srsConfig": {
     "title": "SRS Configuration",

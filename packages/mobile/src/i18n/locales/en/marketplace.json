@@ -26,21 +26,9 @@
   },
   "detail": {
     "back": "Back to Marketplace",
-    "notFound": "Listing not found",
-    "goBack": "Go Back",
     "getDeck": "Add to My Decks",
     "downloading": "Downloading...",
-    "previewCards": "Preview Cards",
-    "noPreview": "No preview available",
-    "success": "Deck added to your collection!",
-    "failed": "Failed to download deck",
     "reportContent": "Report Content",
-    "reportTitle": "Report Content",
-    "reportQuestion": "Why are you reporting this deck?",
-    "inappropriateContent": "Inappropriate Content",
-    "copyrightViolation": "Copyright Violation",
-    "spam": "Spam / Misleading",
-    "reportThanks": "Your report has been submitted. We will review this content promptly.",
     "publishedBy": "by",
     "alreadyAcquired": "Already in your collection",
     "unsubscribe": "Unsubscribe",
@@ -99,7 +87,8 @@
   "nativeLanguage": {
     "label": "Native language",
     "all": "All",
-    "none": "Not specified"
+    "none": "Not specified",
+    "multiHint": "Select all that apply"
   },
   "publisherStats": {
     "title": "Publisher Stats",

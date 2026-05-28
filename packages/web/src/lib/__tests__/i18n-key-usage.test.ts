@@ -67,14 +67,6 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
     const text = readFileSync(file, 'utf8')
     const rel = file.replace(REPO_ROOT + '/', '')
 
-    const nsCandidates = new Set<string>()
-    for (const m of text.matchAll(/useTranslation\(\s*['"]([^'"]+)['"]/g)) nsCandidates.add(m[1])
-    for (const m of text.matchAll(/useTranslation\(\s*\[\s*['"]([^'"]+)['"]/g)) nsCandidates.add(m[1])
-    const fileNs =
-      nsCandidates.size === 1 ? [...nsCandidates][0]
-      : nsCandidates.size === 0 && /useTranslation\(\s*\)/.test(text) ? defaultNs
-      : null // >1 → ambiguous → bare keys skipped
-
     const check = (ns: string, key: string) => {
       if (!knownNs.has(ns)) return // not an i18n namespace
       if (!exists(ns, key)) {
@@ -83,14 +75,36 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
       }
     }
 
-    // t('key' ...) / t("key" ...) — static literal first arg only
-    for (const m of text.matchAll(/\bt\(\s*(['"])([^'"$\n]+?)\1/g)) {
-      const raw = m[2]
-      // Skip dynamic/concat artifacts: `t('categories.' + value)` captures the
-      // literal prefix "categories." which is not a real key.
-      if (!raw || raw.includes('${') || raw.endsWith('.')) continue
-      if (raw.includes(':')) { const [ns, ...rest] = raw.split(':'); check(ns, rest.join(':')) }
-      else if (fileNs) check(fileNs, raw)
+    // Map each t-alias to its namespace. Handles aliased + multiple
+    // useTranslation calls in one file (e.g. `const { t } = useTranslation('decks')`
+    // alongside `const { t: tm } = useTranslation('marketplace')`), which the old
+    // single-namespace heuristic skipped — that blind spot let aliased usages drift.
+    const aliasSets: Record<string, Set<string>> = {}
+    for (const m of text.matchAll(
+      /const\s*\{\s*t(?:\s*:\s*(\w+))?\s*(?:,[^}]*)?\}\s*=\s*useTranslation\(\s*(\[[^\]]*\]|['"][^'"]+['"])\s*\)/g,
+    )) {
+      const alias = m[1] || 't'
+      const first = m[2].match(/['"]([^'"]+)['"]/) // string arg, or first element of array (= default ns)
+      if (first) (aliasSets[alias] ??= new Set()).add(first[1])
+    }
+    if (Object.keys(aliasSets).length === 0 && /useTranslation\(\s*\)/.test(text)) aliasSets['t'] = new Set([defaultNs])
+    // An alias rebound to >1 namespace in one file (e.g. `const { t } = useTranslation('landing')`
+    // in one scope and `useTranslation('auth')` in another) is ambiguous → resolve only its
+    // explicit `ns:key` calls, skip bare keys, to avoid false attribution.
+    const aliasNs: Record<string, string | null> = {}
+    for (const [a, set] of Object.entries(aliasSets)) aliasNs[a] = set.size === 1 ? [...set][0] : null
+    const aliasGroup = Object.keys(aliasNs).map((a) => a.replace(/\$/g, '\\$')).join('|')
+
+    // ALIAS('key' ...) — the alias resolves the namespace; 'ns:key' overrides.
+    if (aliasGroup) {
+      for (const m of text.matchAll(new RegExp(`\\b(${aliasGroup})\\(\\s*(['"])([^'"$\\n]+?)\\2`, 'g'))) {
+        const raw = m[3]
+        // Skip dynamic/concat artifacts: `t('categories.' + value)` captures the
+        // literal prefix "categories." which is not a real key.
+        if (!raw || raw.includes('${') || raw.endsWith('.')) continue
+        if (raw.includes(':')) { const [ns, ...rest] = raw.split(':'); check(ns, rest.join(':')) }
+        else { const ns = aliasNs[m[1]]; if (ns) check(ns, raw) } // null = ambiguous alias → skip bare key
+      }
     }
     // standalone 'ns:dotted.key' literals (e.g. labelKey constants)
     for (const m of text.matchAll(/(['"])([a-z-]+):([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*)\1/g)) {
@@ -139,33 +153,23 @@ describe('i18n used-key coverage', () => {
     ).toEqual([])
   })
 
-  it('mobile: no locale has orphan keys absent from en (locks structural drift)', () => {
+  it('mobile: every locale has full key parity with en (no drift, no fallback in any language)', () => {
     const dirs = mobileLocaleDirs(REPO_ROOT)
     if (!dirs) return
     const base = join(REPO_ROOT, 'packages/mobile/src/i18n/locales')
     const en = loadLocale(join(base, 'en'))
-    const orphans: string[] = []
+    const diffs: string[] = []
     for (const loc of dirs.filter((d) => d !== 'en')) {
       const locKeys = loadLocale(join(base, loc))
+      for (const ns of Object.keys(en)) {
+        for (const key of en[ns]) if (!locKeys[ns]?.has(key)) diffs.push(`${loc}/${ns}: MISSING ${key}`)
+      }
       for (const ns of Object.keys(locKeys)) {
-        for (const key of locKeys[ns]) {
-          if (!en[ns]?.has(key)) orphans.push(`${loc}/${ns}:${key}`)
-        }
+        for (const key of locKeys[ns]) if (!en[ns]?.has(key)) diffs.push(`${loc}/${ns}: ORPHAN ${key}`)
       }
     }
-    expect(orphans.sort(), 'Mobile locale keys absent from en (prune them or add to en):').toEqual([])
-  })
-
-  it('mobile: guide namespace has full key parity across all locales (dynamic-rendered content)', () => {
-    const dirs = mobileLocaleDirs(REPO_ROOT)
-    if (!dirs) return
-    const base = join(REPO_ROOT, 'packages/mobile/src/i18n/locales')
-    const en = loadLocale(join(base, 'en')).guide
-    const gaps: string[] = []
-    for (const loc of dirs.filter((d) => d !== 'en')) {
-      const g = loadLocale(join(base, loc)).guide ?? new Set<string>()
-      for (const key of en) if (!g.has(key)) gaps.push(`${loc}:guide.${key}`)
-    }
-    expect(gaps.sort(), 'guide keys missing per locale (Guide screen renders these dynamically):').toEqual([])
+    // Mirrors web's translation-keys parity, now feasible after the structural
+    // drift cleanup. en is the source of truth: every locale must match it exactly.
+    expect(diffs.sort(), 'Mobile locale key drift vs en (fill missing / prune orphans):').toEqual([])
   })
 })

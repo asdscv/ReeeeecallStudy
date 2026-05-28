@@ -87,7 +87,8 @@
   "nativeLanguage": {
     "label": "ภาษาแม่",
     "all": "ทั้งหมด",
-    "none": "ไม่ระบุ"
+    "none": "ไม่ระบุ",
+    "multiHint": "เลือกทั้งหมดที่เกี่ยวข้อง"
   },
   "publisherStats": {
     "title": "สถิติผู้เผยแพร่",

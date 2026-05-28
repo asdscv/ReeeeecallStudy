@@ -44,7 +44,17 @@
   "edit": {
     "title": "แก้ไขสำรับ",
     "save": "บันทึก",
-    "nameRequired": "กรุณากรอกชื่อสำรับ"
+    "nameRequired": "กรุณากรอกชื่อสำรับ",
+    "createTitle": "เด็คใหม่",
+    "create": "สร้างเด็ค",
+    "deckName": "ชื่อ",
+    "namePlaceholder": "เช่น คำศัพท์ภาษาสเปน",
+    "description": "คำอธิบาย",
+    "descriptionPlaceholder": "คุณจะเรียนอะไร?",
+    "color": "สี",
+    "icon": "ไอคอน",
+    "template": "เทมเพลต",
+    "saveFailed": "บันทึกเด็คไม่สำเร็จ"
   },
   "card": {
     "noStudyRecord": "ยังไม่มีบันทึกการเรียน",

@@ -33,15 +33,12 @@
   },
   "setup": {
     "title": "Study Setup",
-    "deck": "Deck",
     "studyMode": "Study Mode",
     "cardsPerSession": "Cards per session",
     "batchHint": "Between 5 and 500 cards",
-    "selectDeck": "Please choose a deck to study",
     "startStudy": "Start Study",
     "startFailed": "Failed to start study session",
     "dateSelection": "Date Selection",
-    "dateSelectionDesc": "Select a date to study cards added on that day. Date picker will show after starting.",
     "noDecks": "No decks yet. Create a deck first!",
     "alertSelectDeckTitle": "Select a Deck",
     "alertSelectDeckMsg": "Please choose a deck to study",
@@ -51,7 +48,6 @@
     "shuffle": "Shuffle"
   },
   "cramming": {
-    "options": "Cramming Options",
     "filter": {
       "title": "Card Filter",
       "all": "All Cards",

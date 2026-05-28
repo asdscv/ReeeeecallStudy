@@ -87,7 +87,8 @@
   "nativeLanguage": {
     "label": "Idioma nativo",
     "all": "Todos",
-    "none": "Sin especificar"
+    "none": "Sin especificar",
+    "multiHint": "Selecciona todas las que correspondan"
   },
   "publisherStats": {
     "title": "Estadísticas de publicador",
