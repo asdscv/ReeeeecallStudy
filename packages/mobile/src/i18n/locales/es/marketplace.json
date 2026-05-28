@@ -5,13 +5,11 @@
   "noResultsHint": "Prueba otra búsqueda o categoría",
   "categories": {
     "all": "Todo",
-    "general": "General",
     "language": "Idiomas",
     "science": "Ciencia",
     "math": "Matemáticas",
     "history": "Historia",
     "programming": "Programación",
-    "trivia": "Trivia",
     "exam": "Preparación de exámenes",
     "other": "Otros"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← Mercado",
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios",
     "getDeck": "Obtener este mazo",
-    "importing": "Importando...",
-    "cardPreview": "Vista previa de tarjetas (máx 10)",
-    "noCards": "Sin tarjetas.",
     "reportContent": "Report",
     "publishedBy": "por",
     "alreadyAcquired": "Ya está en tu colección",
@@ -41,7 +34,12 @@
     "unsubscribing": "Cancelando...",
     "unsubscribed": "Suscripción cancelada",
     "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
-    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo."
+    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo.",
+    "title": "Detalle",
+    "alreadyReported": "Ya reportado",
+    "alreadyReportedBody": "Ya has reportado este elemento.",
+    "reportError": "No se pudo enviar el reporte",
+    "downloading": "Descargando..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -89,7 +87,8 @@
   "nativeLanguage": {
     "label": "Idioma nativo",
     "all": "Todos",
-    "none": "Sin especificar"
+    "none": "Sin especificar",
+    "multiHint": "Selecciona todas las que correspondan"
   },
   "publisherStats": {
     "title": "Estadísticas de publicador",
@@ -143,5 +142,13 @@
     "copy": "Copiar",
     "subscribe": "Suscribir",
     "snapshot": "Instantánea"
-  }
+  },
+  "filters": {
+    "label": "Filtrar"
+  },
+  "categoryLabel": "Categoría",
+  "categoryTitle": "Categoría",
+  "sortTitle": "Ordenar por",
+  "loadError": "No se pudieron cargar las barajas",
+  "loadErrorHint": "Revisa tu conexión e inténtalo de nuevo."
 }

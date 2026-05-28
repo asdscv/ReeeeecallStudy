@@ -51,10 +51,12 @@ function printHelp(): void {
       "official-decks <command> [--options]",
       "",
       "commands:",
-      "  plan      Read CSVs and print the import plan summary (no DB writes).",
-      "  apply     Read CSVs and apply the plan against Supabase.",
-      "  status    Read manifest from DB and print status of every deck.",
-      "  validate  Cross-check DB manifest checksums against CSV state.",
+      "  plan       Read CSVs and print the import plan summary (no DB writes).",
+      "  apply      Read CSVs and apply the plan against Supabase.",
+      "  relocalize Rewrite deck name/description (mother-tongue metadata) in",
+      "             place — no card or checksum changes. Use --dry-run to preview.",
+      "  status     Read manifest from DB and print status of every deck.",
+      "  validate   Cross-check DB manifest checksums against CSV state.",
       "",
       "options:",
       "  --dir <path>            CSV directory (default: ./STUDY_DATA or $STUDY_DATA_DIR)",
@@ -201,6 +203,69 @@ async function runApply(args: ParsedArgs): Promise<void> {
   }
 }
 
+async function runRelocalize(args: ParsedArgs): Promise<void> {
+  const plans = await loadAllPlans(args);
+  const dryRun = args.flags.has("dry-run");
+
+  if (dryRun) {
+    if (args.flags.has("json")) {
+      console.log(
+        JSON.stringify(
+          plans.map((p) => ({
+            deck_id: p.deck.id,
+            name: p.deck.name,
+            description: p.deck.description,
+          })),
+          null,
+          2,
+        ),
+      );
+      return;
+    }
+    console.log(`# Relocalize dry-run — ${plans.length} decks`);
+    for (const p of plans.slice(0, 30)) {
+      console.log(`  ${p.deck.name}`);
+    }
+    if (plans.length > 30) console.log(`  … and ${plans.length - 30} more`);
+    return;
+  }
+
+  const bundle = await makeGateway();
+  let updated = 0;
+  let missing = 0;
+  let failed = 0;
+  const total = plans.length;
+  let done = 0;
+  for (const plan of plans) {
+    done++;
+    try {
+      const existed = await bundle.gateway.updateMetadata(
+        plan.deck.id,
+        plan.deck.name,
+        plan.deck.description,
+      );
+      if (existed) updated++;
+      else missing++;
+      const tag = existed ? "updated" : "missing";
+      process.stdout.write(
+        `[${done.toString().padStart(3)}/${total}] ${tag.padEnd(8)} ${plan.deck.name}\n`,
+      );
+    } catch (e) {
+      failed++;
+      process.stderr.write(
+        `[${done.toString().padStart(3)}/${total}] failed   ${plan.deck.manifestKey.toString()}  ⛔ ${(e as Error).message}\n`,
+      );
+    }
+  }
+  if (bundle.cleanup) await bundle.cleanup();
+  console.log("");
+  console.log(`updated: ${updated}`);
+  console.log(`missing: ${missing}`);
+  console.log(`failed:  ${failed}`);
+  console.log(`total:   ${total}`);
+  if (failed > 0) process.exitCode = 1;
+}
+
 interface ManifestRow {
   manifest_key: string;
   last_status: string;
@@ -300,6 +365,8 @@ async function main(): Promise<void> {
       return runPlan(args);
     case "apply":
       return runApply(args);
+    case "relocalize":
+      return runRelocalize(args);
     case "status":
       return runStatus(args);
     case "validate":

@@ -5,13 +5,11 @@
   "noResultsHint": "尝试其他搜索词或分类",
   "categories": {
     "all": "全部",
-    "general": "综合",
     "language": "语言",
     "science": "科学",
     "math": "数学",
     "history": "历史",
     "programming": "编程",
-    "trivia": "知识问答",
     "exam": "考试备考",
     "other": "其他"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← 市场",
-    "cardCount": "{{count}} 张卡片",
-    "userCount": "{{count}} 位用户",
     "getDeck": "获取此牌组",
-    "importing": "导入中...",
-    "cardPreview": "卡片预览（最多 10 张）",
-    "noCards": "暂无卡片。",
     "reportContent": "Report",
     "publishedBy": "作者",
     "alreadyAcquired": "已添加到收藏",
@@ -41,7 +34,12 @@
     "unsubscribing": "取消订阅中...",
     "unsubscribed": "已取消订阅",
     "unsubscribeConfirm": "取消订阅此牌组？您的个人学习进度将保留在账户中。",
-    "unsubscribeError": "取消订阅失败，请重试。"
+    "unsubscribeError": "取消订阅失败，请重试。",
+    "title": "详情",
+    "alreadyReported": "已举报",
+    "alreadyReportedBody": "你已经举报过此条目。",
+    "reportError": "举报提交失败",
+    "downloading": "下载中..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -89,7 +87,8 @@
   "nativeLanguage": {
     "label": "母语",
     "all": "全部",
-    "none": "未指定"
+    "none": "未指定",
+    "multiHint": "选择所有适用项"
   },
   "publisherStats": {
     "title": "发布者统计",
@@ -143,5 +142,13 @@
     "copy": "复制",
     "subscribe": "订阅",
     "snapshot": "快照"
-  }
+  },
+  "filters": {
+    "label": "筛选"
+  },
+  "categoryLabel": "分类",
+  "categoryTitle": "分类",
+  "sortTitle": "排序",
+  "loadError": "无法加载卡组",
+  "loadErrorHint": "请检查网络连接后重试。"
 }

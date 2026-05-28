@@ -77,7 +77,11 @@
     },
     "setStatus": "Set Status",
     "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "confirmSuspend": "Are you sure you want to suspend this user?",
+    "changeRoleTitle": "Cambiar rol",
+    "confirmRoleChange": "¿Cambiar el rol de este usuario?",
+    "banTitle": "Bloquear usuario",
+    "suspendTitle": "Suspender usuario"
   },
   "study": {
     "title": "Actividad de estudio",
@@ -267,7 +271,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "Revocar estado oficial"
   },
   "audit": {
     "title": "Audit Log",
@@ -301,7 +306,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
+    },
+    "description": "Rastrea todas las acciones administrativas del sistema",
+    "exportCSV": "Exportar CSV",
+    "actionAll": "Todas las acciones",
+    "filterTarget": "Tipo de objetivo",
+    "targetAll": "Todos los objetivos",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "searching": "Buscando...",
+    "emptyTitle": "No se encontraron registros de auditoría",
+    "emptyDescription": "No hay registros que coincidan con los filtros actuales. Ajusta los criterios de búsqueda.",
+    "refreshing": "Actualizando...",
+    "colTime": "Hora",
+    "colAdmin": "Administrador",
+    "colAction": "Acción",
+    "colTarget": "Objetivo",
+    "colDetails": "Detalles",
+    "colIP": "IP",
+    "pageInfo": "Página {{page}}",
+    "showing": "mostrando {{count}} entradas",
+    "prevPage": "Anterior",
+    "nextPage": "Siguiente",
+    "unknownAdmin": "Desconocido",
+    "fullDetails": "Detalles completos"
   },
   "common": {
     "refresh": "Refresh",

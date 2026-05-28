@@ -12,9 +12,6 @@
     "guide": "Guía",
     "aiGenerate": "AI Generate",
     "achievements": "Logros",
-    "leaderboard": "Leaderboard",
-    "analytics": "Analytics",
-    "publisher": "Publisher Stats",
     "publisherStats": "Estadísticas del editor"
   },
   "actions": {
@@ -32,14 +29,10 @@
     "next": "Siguiente",
     "close": "Cerrar",
     "copy": "Copiar",
-    "duplicate": "Duplicar",
     "search": "Buscar",
-    "selectAll": "Seleccionar todo",
-    "deselect": "Deseleccionar",
-    "show": "Mostrar",
-    "hide": "Ocultar",
     "startStudy": "Comenzar estudio",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "retry": "Reintentar"
   },
   "status": {
     "loading": "Cargando...",
@@ -53,17 +46,10 @@
     "cards": "tarjetas",
     "cardsSuffix": "{{count}} tarjetas",
     "sessions": "sesiones",
-    "items": "elementos",
     "days": "días",
     "hours": "h",
     "minutes": "min",
-    "seconds": "seg",
-    "times": "veces",
-    "percent": "{{value}}%"
-  },
-  "pagination": {
-    "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} por página"
+    "seconds": "seg"
   },
   "timePeriod": {
     "1d": "1D",
@@ -80,30 +66,13 @@
     "processing": "Procesando...",
     "confirm": "Confirmar"
   },
-  "delete": "Eliminar",
-  "deselect": "Deseleccionar",
-  "duplicate": "Duplicar",
-  "selectAllPage": "Seleccionar todo en esta página",
-  "edit": "Editar",
-  "save": "Guardar",
-  "saving": "Guardando...",
-  "selectAll": "Seleccionar todo",
-  "menu": "Menú",
-  "copiedToClipboard": "Copiado al portapapeles",
-  "export": "Exportar",
-  "officialBadge": {
-    "label": "Oficial",
-    "tooltip": "Cuenta oficial"
-  },
   "guideHelp": "Help",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
     "back": "Back",
     "finish": "Finish",
-    "getStarted": "Get Started",
     "stepOf": "Step {{current}} of {{total}}",
-    "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
@@ -112,22 +81,17 @@
     "createDeck": {
       "title": "Create Your First Deck",
       "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "action": "Create This Deck"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
-      "useTemplate": "Use This Template"
+      "action": "Siguiente"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
       "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "action": "Add These Cards"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
@@ -137,8 +101,7 @@
     "exploreMarket": {
       "title": "Explore the Marketplace",
       "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "action": "Browse Marketplace"
     }
   },
   "achievements": {
@@ -200,61 +163,6 @@
     "more": "more",
     "earned": " earned"
   },
-  "analytics": {
-    "title": "My Analytics",
-    "retentionCurve": "Retention Curve",
-    "weakTopics": "Weak Topics",
-    "studyTime": "Study Time Distribution",
-    "modeEffectiveness": "Mode Effectiveness",
-    "progress": "Progress Over Time"
-  },
-  "pomodoro": {
-    "focus": "Focus",
-    "break": "Break",
-    "start": "Start",
-    "pause": "Pause",
-    "reset": "Reset"
-  },
-  "leaderboard": {
-    "title": "Leaderboard",
-    "weekly": "Weekly",
-    "monthly": "Monthly",
-    "allTime": "All Time",
-    "rank": "Rank",
-    "name": "Name",
-    "level": "Level",
-    "cardsStudied": "Cards Studied",
-    "sessions": "Sessions",
-    "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
-  },
-  "history": {
-    "tabs": {
-      "history": "History",
-      "analytics": "Analytics"
-    }
-  },
-  "quests": {
-    "title": "Daily Quests",
-    "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
-    "perfect": "Get a perfect score",
-    "completed": "Completed!",
-    "xpReward": "+{{xp}} XP"
-  },
-  "streakFreeze": {
-    "title": "Streak Freeze",
-    "available": "{{count}} available",
-    "used": "Streak protected today!",
-    "earned": "Earned a streak freeze!"
-  },
-  "levelUp": {
-    "title": "Level Up!",
-    "level": "Level {{level}}",
-    "message": "Keep up the great work!",
-    "xpEarned": "+{{xp}} XP"
-  },
   "goals": {
     "title": "Next Goals",
     "streak": "Streak",
@@ -267,5 +175,22 @@
     "hamburger": "Toca el menú (☰) para navegar",
     "dashboard": "El panel muestra tus estadísticas y rachas",
     "quickStudy": "Estudio rápido inicia una sesión al instante"
+  },
+  "cancel": "Cancelar",
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "message": "La pantalla tuvo un error inesperado. Inténtalo de nuevo.",
+    "retry": "Reintentar"
+  },
+  "sessionKicked": {
+    "badge": "Sesión expirada",
+    "headline": "Sesión iniciada en otro dispositivo",
+    "description": "Se cerró tu sesión porque tu cuenta se usó en otro dispositivo. Recupera esta sesión para seguir usándola aquí.",
+    "info1": "Se detectó una sesión activa en otro dispositivo",
+    "info2": "Un límite automático para mantener tu cuenta segura",
+    "reclaim": "Continuar en este dispositivo",
+    "reclaiming": "Restaurando sesión…",
+    "logout": "Cerrar sesión",
+    "hint": "Solo se puede usar un dispositivo a la vez"
   }
 }

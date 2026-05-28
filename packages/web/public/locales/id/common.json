@@ -58,7 +58,8 @@
     "minutes": "mnt",
     "seconds": "dtk",
     "times": "kali",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "decksCount": "{{count}} dek"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
@@ -269,5 +270,21 @@
     "playStorePrefix": "DAPATKAN DI",
     "playStore": "Google Play",
     "qrHint": "Pindai kode QR dengan kamera ponsel untuk mengunduh"
-  }
+  },
+  "error": {
+    "boundary": {
+      "title": "Terjadi kesalahan",
+      "description": "Terjadi kesalahan tak terduga. Silakan coba lagi.",
+      "studyTitle": "Sesi belajar terhenti",
+      "studyDescription": "Terjadi kesalahan saat sesi belajar. Progres Anda telah disimpan.",
+      "details": "Detail kesalahan",
+      "tryAgain": "Coba Lagi",
+      "goToDashboard": "Ke Dasbor"
+    }
+  },
+  "skipToContent": "Lewati ke konten",
+  "footer": {
+    "copyright": "© 2026 ReeeeecallStudy. Hak cipta dilindungi."
+  },
+  "cancel": "Batal"
 }

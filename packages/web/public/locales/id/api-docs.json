@@ -253,5 +253,6 @@
       "409": "Konflik sumber daya (templat sedang digunakan)",
       "429": "Batas permintaan terlampaui"
     }
-  }
+  },
+  "dashboard": "Dasbor"
 }

@@ -253,5 +253,6 @@
       "409": "Resource conflict (template in use)",
       "429": "Rate limit exceeded"
     }
-  }
+  },
+  "dashboard": "Dashboard"
 }

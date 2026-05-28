@@ -67,7 +67,8 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "exit": "Exit"
   },
   "card": {
     "tapToFlip": "Tap to flip",
@@ -118,7 +119,15 @@
     "of": "{{current}} / {{total}}"
   },
   "datePicker": {
-    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ]
   },
   "interval": {
     "lessThanTenMin": "< 10min",
@@ -194,10 +203,9 @@
     "title": "Keyboard Shortcuts",
     "description": "Available shortcuts during study sessions",
     "rateCards": "Rate Again / Hard / Good / Easy",
-    "flipCard": "Flip card",
+    "flipCard": "Flip card (both directions)",
     "undoRating": "Undo last rating",
     "exitStudy": "Exit study",
-    "flipCard": "Flip card (both directions)",
     "gotIt": "Got It",
     "missed": "Missed",
     "known": "Known",

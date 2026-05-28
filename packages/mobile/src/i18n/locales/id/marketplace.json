@@ -5,13 +5,11 @@
   "noResultsHint": "Coba pencarian atau kategori lain",
   "categories": {
     "all": "Semua",
-    "general": "Umum",
     "language": "Bahasa",
     "science": "Sains",
     "math": "Matematika",
     "history": "Sejarah",
     "programming": "Pemrograman",
-    "trivia": "Trivia",
     "exam": "Persiapan Ujian",
     "other": "Lainnya"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← Marketplace",
-    "cardCount": "{{count}} kartu",
-    "userCount": "{{count}} pengguna",
     "getDeck": "Dapatkan Dek Ini",
-    "importing": "Mengimpor...",
-    "cardPreview": "Pratinjau Kartu (maks 10)",
-    "noCards": "Tidak ada kartu.",
     "reportContent": "Report",
     "publishedBy": "oleh",
     "alreadyAcquired": "Sudah di koleksi Anda",
@@ -41,7 +34,12 @@
     "unsubscribing": "Berhenti...",
     "unsubscribed": "Berhasil berhenti berlangganan",
     "unsubscribeConfirm": "Berhenti berlangganan dari dek ini? Kemajuan belajar pribadi Anda akan tetap ada di akun.",
-    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi."
+    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi.",
+    "title": "Detail",
+    "alreadyReported": "Sudah dilaporkan",
+    "alreadyReportedBody": "Anda sudah melaporkan item ini.",
+    "reportError": "Gagal mengirim laporan",
+    "downloading": "Mengunduh..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -89,7 +87,8 @@
   "nativeLanguage": {
     "label": "Bahasa ibu",
     "all": "Semua",
-    "none": "Tidak ditentukan"
+    "none": "Tidak ditentukan",
+    "multiHint": "Pilih semua yang sesuai"
   },
   "publisherStats": {
     "title": "Statistik penerbit",
@@ -143,5 +142,13 @@
     "copy": "Salin",
     "subscribe": "Langganan",
     "snapshot": "Snapshot"
-  }
+  },
+  "filters": {
+    "label": "Filter"
+  },
+  "categoryLabel": "Kategori",
+  "categoryTitle": "Kategori",
+  "sortTitle": "Urutkan",
+  "loadError": "Tidak dapat memuat dek",
+  "loadErrorHint": "Periksa koneksi Anda dan coba lagi."
 }

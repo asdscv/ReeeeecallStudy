@@ -32,7 +32,8 @@
     "copy": "Copy",
     "search": "Search",
     "startStudy": "Start Study",
-    "logout": "Logout"
+    "logout": "Logout",
+    "retry": "Retry"
   },
   "status": {
     "loading": "Loading...",
@@ -123,5 +124,73 @@
     "title": "Something went wrong",
     "message": "The screen ran into an unexpected error. Please try again.",
     "retry": "Try again"
-  }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "tabs": {
+      "badges": "Badges",
+      "leaderboard": "Leaderboard"
+    },
+    "level": "Level",
+    "xp": "XP",
+    "totalXp": "Total XP",
+    "progress": "Progress",
+    "viewAll": "All Achievements",
+    "recent": "Recent",
+    "empty": "No achievements yet. Start studying to earn badges!",
+    "more": "more",
+    "earned": " earned",
+    "newUnlocked": "Achievement Unlocked!",
+    "category": {
+      "streak": "Streak",
+      "study": "Study",
+      "social": "Social",
+      "milestone": "Milestone"
+    },
+    "badge": {
+      "streak_3": "3-Day Streak",
+      "streak_7": "7-Day Streak",
+      "streak_30": "30-Day Streak",
+      "streak_100": "100-Day Streak",
+      "cards_100": "100 Cards Studied",
+      "cards_500": "500 Cards Studied",
+      "cards_1000": "1,000 Cards Studied",
+      "cards_5000": "5,000 Cards Studied",
+      "sessions_10": "10 Sessions",
+      "sessions_50": "50 Sessions",
+      "sessions_100": "100 Sessions",
+      "deck_share": "First Deck Shared",
+      "marketplace_pub": "Published to Marketplace",
+      "first_study": "First Study Session",
+      "mastery_50": "50% Mastery",
+      "mastery_90": "90% Mastery"
+    },
+    "badgeDesc": {
+      "streak_3": "Study 3 days in a row",
+      "streak_7": "Study 7 days in a row",
+      "streak_30": "Study 30 days in a row",
+      "streak_100": "Study 100 days in a row",
+      "cards_100": "Study 100 cards total",
+      "cards_500": "Study 500 cards total",
+      "cards_1000": "Study 1,000 cards total",
+      "cards_5000": "Study 5,000 cards total",
+      "sessions_10": "Complete 10 study sessions",
+      "sessions_50": "Complete 50 study sessions",
+      "sessions_100": "Complete 100 study sessions",
+      "deck_share": "Share your first deck",
+      "marketplace_pub": "Publish a deck to the marketplace",
+      "first_study": "Complete your first study session",
+      "mastery_50": "Reach 50% mastery across all cards",
+      "mastery_90": "Reach 90% mastery across all cards"
+    }
+  },
+  "goals": {
+    "title": "Next Goals",
+    "streak": "Streak",
+    "cards": "Cards Studied",
+    "sessions": "Sessions",
+    "time": "Study Time",
+    "mastery": "Cards Mastered"
+  },
+  "cancel": "Cancel"
 }

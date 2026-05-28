@@ -5,13 +5,11 @@
   "noResultsHint": "Thử tìm kiếm hoặc danh mục khác",
   "categories": {
     "all": "Tất cả",
-    "general": "Tổng hợp",
     "language": "Ngôn ngữ",
     "science": "Khoa học",
     "math": "Toán học",
     "history": "Lịch sử",
     "programming": "Lập trình",
-    "trivia": "Kiến thức thú vị",
     "exam": "Luyện thi",
     "other": "Khác"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← Chợ ứng dụng",
-    "cardCount": "{{count}} thẻ",
-    "userCount": "{{count}} người dùng",
     "getDeck": "Lấy bộ thẻ này",
-    "importing": "Đang nhập...",
-    "cardPreview": "Xem trước thẻ (tối đa 10)",
-    "noCards": "Không có thẻ.",
     "reportContent": "Report",
     "publishedBy": "bởi",
     "alreadyAcquired": "Đã có trong bộ sưu tập",
@@ -41,7 +34,12 @@
     "unsubscribing": "Đang hủy...",
     "unsubscribed": "Đã hủy đăng ký",
     "unsubscribeConfirm": "Hủy đăng ký bộ thẻ này? Tiến độ học tập cá nhân của bạn sẽ được giữ lại trong tài khoản.",
-    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại."
+    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại.",
+    "title": "Chi tiết",
+    "alreadyReported": "Đã báo cáo",
+    "alreadyReportedBody": "Bạn đã báo cáo mục này rồi.",
+    "reportError": "Gửi báo cáo thất bại",
+    "downloading": "Đang tải xuống..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -89,7 +87,8 @@
   "nativeLanguage": {
     "label": "Tiếng mẹ đẻ",
     "all": "Tất cả",
-    "none": "Không xác định"
+    "none": "Không xác định",
+    "multiHint": "Chọn tất cả những mục phù hợp"
   },
   "publisherStats": {
     "title": "Thống kê nhà xuất bản",
@@ -143,5 +142,13 @@
     "copy": "Sao chép",
     "subscribe": "Đăng ký",
     "snapshot": "Ảnh chụp"
-  }
+  },
+  "filters": {
+    "label": "Bộ lọc"
+  },
+  "categoryLabel": "Danh mục",
+  "categoryTitle": "Danh mục",
+  "sortTitle": "Sắp xếp theo",
+  "loadError": "Không thể tải bộ thẻ",
+  "loadErrorHint": "Kiểm tra kết nối và thử lại."
 }

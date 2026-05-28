@@ -146,9 +146,12 @@ export function calculateTrendingScore(listing: MarketplaceListingData): number 
   return listing.acquire_count / Math.pow(daysSinceCreated + 2, 1.5)
 }
 
-/** Number of active advanced filters (excluding query, category, sortBy) */
+/** Number of active filters shown in the Filter panel (excluding the
+ *  always-visible free-text query and the sort selector). Category now lives in
+ *  the panel, so it counts. */
 export function countActiveFilters(filters: ListingFilters): number {
   let count = 0
+  if (filters.category) count++
   if (filters.minCardCount && filters.minCardCount > 0) count++
   if (filters.shareMode) count++
   if (filters.dateRange && filters.dateRange !== 'all') count++

@@ -152,5 +152,31 @@
     "fri": "Fri",
     "sat": "Sat",
     "sun": "Sun"
+  },
+  "export": {
+    "title": "Ekspor Data Saya",
+    "description": "Unduh data Anda sebagai file CSV.",
+    "noData": "Tidak ada data untuk diekspor",
+    "success": "Ekspor selesai",
+    "error": "Ekspor gagal",
+    "stats": "Statistik Belajar",
+    "statsDesc": "Ringkasan performa belajar keseluruhan",
+    "sessions": "Sesi Belajar",
+    "sessionsDesc": "Semua riwayat sesi belajar (hingga 5.000)",
+    "decks": "Dek",
+    "decksDesc": "Semua metadata dek",
+    "cards": "Kartu",
+    "cardsDesc": "Semua data kartu dengan status SRS (hingga 10.000)"
+  },
+  "quickActions": {
+    "quickStudy": "Belajar Cepat",
+    "aiGenerate": "Buat dengan AI",
+    "guide": "Panduan"
+  },
+  "goal": {
+    "title": "Target Belajar Harian",
+    "description": "Tetapkan target belajar harian dalam menit. Kosongkan jika tanpa target.",
+    "placeholder": "mis. 30",
+    "unit": "menit / hari"
   }
 }

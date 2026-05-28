@@ -33,18 +33,21 @@
   },
   "setup": {
     "title": "Study Setup",
-    "deck": "Deck",
     "studyMode": "Study Mode",
     "cardsPerSession": "Cards per session",
     "batchHint": "Between 5 and 500 cards",
-    "selectDeck": "Please choose a deck to study",
     "startStudy": "Start Study",
     "startFailed": "Failed to start study session",
     "dateSelection": "Date Selection",
-    "dateSelectionDesc": "Select a date to study cards added on that day. Date picker will show after starting."
+    "noDecks": "No decks yet. Create a deck first!",
+    "alertSelectDeckTitle": "Select a Deck",
+    "alertSelectDeckMsg": "Please choose a deck to study",
+    "alertNoCardsTitle": "No Cards",
+    "alertNoCardsMsg": "No cards found for the selected date",
+    "alertErrorTitle": "Error",
+    "shuffle": "Shuffle"
   },
   "cramming": {
-    "options": "Cramming Options",
     "filter": {
       "title": "Card Filter",
       "all": "All Cards",
@@ -73,7 +76,9 @@
     "end": "End",
     "tapToFlip": "Tap to flip",
     "swipeHint": "Tap card to flip · Swipe to rate",
-    "undo": "Undo"
+    "undo": "Undo",
+    "noActiveSession": "No active study session",
+    "backToSetup": "Back to study setup"
   },
   "srsRating": {
     "again": "Again",

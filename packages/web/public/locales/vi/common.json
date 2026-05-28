@@ -58,7 +58,8 @@
     "minutes": "phút",
     "seconds": "giây",
     "times": "lần",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "decksCount": "{{count}} bộ thẻ"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
@@ -269,5 +270,21 @@
     "playStorePrefix": "TẢI XUỐNG TỪ",
     "playStore": "Google Play",
     "qrHint": "Quét mã QR bằng camera điện thoại để tải xuống"
-  }
+  },
+  "error": {
+    "boundary": {
+      "title": "Đã xảy ra lỗi",
+      "description": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+      "studyTitle": "Phiên học bị gián đoạn",
+      "studyDescription": "Đã xảy ra lỗi không mong muốn trong phiên học. Tiến trình của bạn đã được lưu.",
+      "details": "Chi tiết lỗi",
+      "tryAgain": "Thử lại",
+      "goToDashboard": "Đến bảng điều khiển"
+    }
+  },
+  "skipToContent": "Bỏ qua đến nội dung",
+  "footer": {
+    "copyright": "© 2026 ReeeeecallStudy. Bảo lưu mọi quyền."
+  },
+  "cancel": "Hủy"
 }

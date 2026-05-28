@@ -7,16 +7,15 @@
   "emptyDesc": "Start studying to see your progress here",
   "studyVolume": "Study Volume",
   "modeBreakdown": "Mode Breakdown",
-  "deckProgress": {
-    "total": "{{count}} tarjetas",
-    "notStudied": "No estudiadas {{count}}",
-    "learning": "Aprendiendo {{count}}",
-    "review": "Repaso {{count}}"
-  },
   "sessionList": "Session List",
   "today": "Today",
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "Historial",
+    "analytics": "Análisis"
+  },
+  "sessionsPerDay": "Sesiones por día"
 }

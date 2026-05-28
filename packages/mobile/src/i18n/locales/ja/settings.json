@@ -5,12 +5,8 @@
     "email": "メールアドレス",
     "displayName": "表示名",
     "displayNamePlaceholder": "名前を入力",
-    "namePlaceholder": "名前を入力",
-    "saveBtn": "保存",
-    "nameSaved": "名前を保存しました！",
     "nameAvailable": "使用可能な名前です！",
     "nameTaken": "この名前は使用されています",
-    "nameLength": "名前は2〜12文字で入力してください",
     "save": "保存",
     "checkingName": "利用可能か確認中...",
     "nameLengthError": "2〜12文字で入力してください",
@@ -18,24 +14,11 @@
     "savedMessage": "表示名を更新しました。"
   },
   "language": {
-    "title": "言語",
-    "label": "表示言語",
-    "en": "English",
-    "ko": "한국어",
-    "zh": "中文（简体）",
-    "ja": "日本語",
-    "vi": "Tiếng Việt",
-    "th": "ภาษาไทย",
-    "id": "Bahasa Indonesia"
+    "title": "言語"
   },
   "srs": {
     "title": "SRS学習",
-    "description": "SRS（間隔反復）モードで1セッションあたりに追加する新規カード数を設定します",
-    "newCardLimit": "新規カード上限",
-    "cards": "枚",
-    "cardsUnit": "枚",
-    "help": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。",
-    "newCardNote": "SRS学習で復習カードに加えて出題される新規カードの最大数です。復習カードはこの制限の影響を受けません。"
+    "description": "SRS（間隔反復）モードで1セッションあたりに追加する新規カード数を設定します"
   },
   "answerMode": {
     "title": "回答モード",
@@ -44,7 +27,6 @@
     "buttonDesc": "ボタンを押して回答を選択",
     "swipe": "スワイプ",
     "swipeDesc": "カードをスワイプして回答を選択",
-    "swipeAutoNote": "スワイプ方向は学習モードに応じて自動設定されます。\n• SRS: ← Again / → Good\n• その他: ← 分からない / → 知っている",
     "before": "先に",
     "same": "同時",
     "after": "後で",
@@ -54,15 +36,14 @@
     "title": "TTS自動読み上げ",
     "description": "カードを裏返した時にTTS対応フィールドを自動読み上げ",
     "enable": "自動読み上げを有効にする",
-    "provider": "音声エンジン",
-    "webSpeech": "デバイス音声",
-    "webSpeechDesc": "デバイスの内蔵音声を使用",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "高品質ニューラル音声",
     "edgeTtsNote": "* 現在英語のみ対応",
-    "speed": "読み上げ速度",
-    "help": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。",
-    "note": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。"
+    "note": "TTS言語はカードテンプレートのフィールド設定に従います。自動読み上げの設定に関わらず、再生ボタンは常に表示されます。",
+    "voiceEngine": "音声エンジン",
+    "readingSpeed": "読み上げ速度",
+    "deviceVoice": "デバイスの音声",
+    "deviceVoiceDesc": "デバイス内蔵の音声を使用します"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +95,11 @@
   },
   "account": {
     "title": "アカウント",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "logoutConfirm": "本当にログアウトしますか？",
+    "deleteAccount": "アカウントを削除",
+    "deleteConfirm": "アカウントと関連するすべてのデータが完全に削除されます。この操作は取り消せません。",
+    "deleteFailed": "アカウントの削除に失敗しました。サポートにお問い合わせください。"
   },
   "links": {
     "userGuide": "ユーザーガイド",
@@ -163,5 +148,12 @@
   },
   "alerts": {
     "error": "エラー"
+  },
+  "actions": {
+    "cancel": "キャンセル"
+  },
+  "haptics": {
+    "enable": "触覚フィードバック",
+    "hint": "タップ・評価・操作時の振動フィードバック。"
   }
 }

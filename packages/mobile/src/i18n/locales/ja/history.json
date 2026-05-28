@@ -7,16 +7,15 @@
   "emptyDesc": "Start studying to see your progress here",
   "studyVolume": "Study Volume",
   "modeBreakdown": "Mode Breakdown",
-  "deckProgress": {
-    "total": "{{count}}枚",
-    "notStudied": "未学習 {{count}}",
-    "learning": "学習中 {{count}}",
-    "review": "復習 {{count}}"
-  },
   "sessionList": "Session List",
   "today": "Today",
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "履歴",
+    "analytics": "分析"
+  },
+  "sessionsPerDay": "日別セッション数"
 }

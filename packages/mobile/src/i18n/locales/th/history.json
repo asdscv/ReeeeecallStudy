@@ -7,16 +7,15 @@
   "emptyDesc": "Start studying to see your progress here",
   "studyVolume": "Study Volume",
   "modeBreakdown": "Mode Breakdown",
-  "deckProgress": {
-    "total": "{{count}} การ์ด",
-    "notStudied": "ยังไม่เรียน {{count}}",
-    "learning": "กำลังเรียน {{count}}",
-    "review": "ทบทวน {{count}}"
-  },
   "sessionList": "Session List",
   "today": "Today",
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "ประวัติ",
+    "analytics": "วิเคราะห์"
+  },
+  "sessionsPerDay": "เซสชันต่อวัน"
 }

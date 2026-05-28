@@ -45,7 +45,8 @@
     "cards": "Study {{count}} cards",
     "sessions": "Complete {{count}} sessions",
     "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores"
+    "perfect": "Get {{count}} perfect scores",
+    "completed": "Completed"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
@@ -54,5 +55,10 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days"
+  "streakDays": "{{count}}days",
+  "quickStudy": {
+    "title": "Quick Study",
+    "dueToday": "{{count}} cards due today",
+    "startSession": "Start a study session"
+  }
 }

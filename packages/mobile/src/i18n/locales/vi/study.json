@@ -33,24 +33,26 @@
   },
   "setup": {
     "title": "Thiết lập học tập",
-    "deckInfo": "{{icon}} {{name}} · {{count}} thẻ",
     "studyMode": "Chế độ học",
-    "selectUploadDate": "Chọn ngày tải lên",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ"
+    "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ thẻ trước!",
+    "alertSelectDeckTitle": "Chọn bộ thẻ",
+    "alertSelectDeckMsg": "Hãy chọn một bộ thẻ để học",
+    "alertNoCardsTitle": "Không có thẻ",
+    "alertNoCardsMsg": "Không có thẻ nào cho ngày đã chọn",
+    "alertErrorTitle": "Lỗi",
+    "shuffle": "Xáo trộn",
+    "startFailed": "Không thể bắt đầu phiên học",
+    "cardsPerSession": "Số thẻ mỗi phiên",
+    "batchHint": "Từ 5 đến 500 thẻ",
+    "dateSelection": "Chọn ngày",
+    "startStudy": "Bắt đầu học"
   },
   "cramming": {
-    "gotIt": "Đúng rồi!",
-    "missed": "Chưa đúng",
-    "round": "Vòng {{round}}",
-    "mastery": "Thành thạo: {{percentage}}%",
     "filter": {
       "title": "Bộ lọc thẻ",
       "all": "Tất cả thẻ",
-      "allDesc": "Học tất cả thẻ không bị tạm dừng trong bộ thẻ",
       "weak": "Chỉ thẻ yếu",
-      "weakDesc": "Thẻ khó (hệ số dễ thấp) hoặc thẻ mới",
-      "dueSoon": "Sắp đến hạn",
-      "dueSoonDesc": "Thẻ cần ôn tập trong vòng 3 ngày"
+      "dueSoon": "Sắp đến hạn"
     },
     "timeLimit": {
       "title": "Giới hạn thời gian",
@@ -58,37 +60,25 @@
       "minutes": "{{count}} phút"
     },
     "shuffle": {
-      "title": "Xáo trộn thẻ",
-      "desc": "Xáo trộn thứ tự thẻ mỗi vòng"
+      "title": "Xáo trộn thẻ"
     },
     "summary": {
       "completed": "Hoàn thành nhồi nhét!",
-      "timeUp": "Hết thời gian!",
-      "wellDone": "Nỗ lực tuyệt vời! Hãy tiếp tục ôn tập để củng cố trí nhớ.",
-      "totalRounds": "Tổng số vòng",
-      "masteryRate": "Tỷ lệ thành thạo",
-      "cardsStudied": "Thẻ đã học",
-      "hardestCards": "Thẻ khó nhất",
-      "missedTimes": "sai {{count}} lần",
-      "noSrsImpact": "Phiên này không ảnh hưởng đến lịch SRS của bạn.",
-      "sessionEnded": "Phiên đã kết thúc",
-      "crammingAgain": "Nhồi nhét lại",
-      "otherMode": "Chế độ khác"
+      "crammingAgain": "Nhồi nhét lại"
     }
   },
   "session": {
     "loading": "Đang tải...",
-    "noCards": "Không có thẻ để học",
-    "allReviewed": "Đã ôn tập tất cả thẻ!",
-    "backToDeck": "Quay lại bộ thẻ",
-    "exitConfirmTitle": "Kết thúc phiên học?",
-    "exitConfirmMessage": "Tiến trình của bạn sẽ được lưu.",
-    "exitConfirmButton": "Kết thúc",
-    "pause": "Pause",
-    "resume": "Resume",
-    "paused": "Paused",
-    "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "Kết thúc phiên?",
+    "endMessage": "Tiến trình của bạn cho đến giờ sẽ được lưu.",
+    "continue": "Tiếp tục",
+    "end": "Kết thúc",
+    "exit": "Thoát",
+    "tapToFlip": "Chạm để lật",
+    "swipeHint": "Chạm thẻ để lật · Vuốt để đánh giá",
+    "noActiveSession": "Không có phiên học nào đang diễn ra",
+    "backToSetup": "Quay lại thiết lập học"
   },
   "srsRating": {
     "again": "Lại",
@@ -97,32 +87,22 @@
     "easy": "Dễ"
   },
   "rating": {
-    "dontKnow": "Không biết",
-    "knowIt": "Biết rồi",
     "known": "Đã biết",
     "unknown": "Chưa biết",
-    "next": "Tiếp →"
+    "missed": "Chưa nhớ",
+    "gotIt": "Đã nhớ"
   },
   "summary": {
     "title": "Hoàn thành học tập!",
-    "completed": "Hoàn thành học tập!",
-    "greatJob": "Tuyệt vời!",
-    "wellDone": "Tuyệt vời! Hãy tiếp tục phát huy.",
-    "studyCards": "Thẻ đã học",
     "cardsStudied": "Thẻ đã học",
-    "cardCount": "{{studied}} / {{total}}",
     "timeSpent": "Thời gian học",
-    "timeFormat": "{{minutes}}p {{seconds}}s",
     "avgPerCard": "Trung bình mỗi thẻ",
-    "secondsFormat": "{{seconds}}s",
     "ratingDistribution": "Phân bố đánh giá",
     "backToDeck": "Quay lại bộ thẻ",
     "studyAgain": "Học lại",
-    "sessionEnded": "Phiên đã kết thúc",
-    "progressSoFar": "Đây là tiến trình của bạn.",
-    "knowIt": "Biết rồi",
-    "dontKnow": "Không biết",
-    "next": "Tiếp"
+    "crammingTitle": "Hoàn thành ôn cấp tốc!",
+    "mastery": "Độ thành thạo",
+    "crammingAgain": "Ôn cấp tốc lại"
   },
   "ratingLabels": {
     "again": "Again",

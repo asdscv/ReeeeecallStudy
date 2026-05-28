@@ -41,7 +41,15 @@
     "bulkDelete": "批量删除卡片",
     "bulkDeleteConfirm": "确定删除 {{count}} 张选中的卡片？此操作不可撤销。",
     "noStudyRecords": "暂无学习记录",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "版本历史",
+    "createVersion": "+ 新版本",
+    "versionSummaryPlaceholder": "有什么变化？（可选）",
+    "creatingVersion": "创建中...",
+    "saveVersion": "保存版本",
+    "noVersions": "尚未记录任何版本。",
+    "versionLabel": "版本 {{num}}",
+    "versionCards": "张"
   },
   "settings": {
     "deckName": "牌组名称",
@@ -151,5 +159,17 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "learningLanguage": {
+    "label": "学习语言",
+    "all": "全部"
+  },
+  "nativeLanguage": {
+    "label": "母语",
+    "multiHint": "选择所有适用项"
+  },
+  "studyLevel": {
+    "label": "学习水平",
+    "none": "未指定"
   }
 }

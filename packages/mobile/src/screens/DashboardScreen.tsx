@@ -104,9 +104,9 @@ export function DashboardScreen() {
               <View style={styles.quickStudyContent}>
                 <Text style={styles.quickStudyIcon}>{'\u26A1'}</Text>
                 <View style={styles.quickStudyText}>
-                  <Text style={styles.quickStudyTitle}>Quick Study</Text>
+                  <Text style={styles.quickStudyTitle}>{t('quickStudy.title')}</Text>
                   <Text style={styles.quickStudyDesc}>
-                    {totalDue > 0 ? `${totalDue} cards due today` : 'Start a study session'}
+                    {totalDue > 0 ? t('quickStudy.dueToday', { count: totalDue }) : t('quickStudy.startSession')}
                   </Text>
                 </View>
                 <Text style={styles.quickStudyArrow}>{'\u2192'}</Text>
@@ -196,19 +196,19 @@ export function DashboardScreen() {
                   <Text style={styles.deckEmoji}>{item.icon}</Text>
                   <View style={styles.deckNameCol}>
                     <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>{item.name}</Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{total} cards</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('recentDecks.cardCount', { count: total })}</Text>
                   </View>
                 </View>
                 <View style={styles.deckBottomRow}>
                   <View style={styles.deckBadges}>
                     {newCards > 0 && (
                       <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
-                        <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
+                        <Text style={[styles.badgeText, { color: theme.colors.primary }]}>{t('recentDecks.newCards', { count: newCards })}</Text>
                       </View>
                     )}
                     {review > 0 && (
                       <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
-                        <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {review}</Text>
+                        <Text style={[styles.badgeText, { color: theme.colors.warning }]}>{t('recentDecks.reviewCards', { count: review })}</Text>
                       </View>
                     )}
                   </View>
@@ -216,7 +216,7 @@ export function DashboardScreen() {
                     onPress={() => tabNav?.navigate('StudyTab')}
                     style={[styles.studyBtn, { backgroundColor: theme.colors.primary }]}
                   >
-                    <Text style={[theme.typography.caption, { color: theme.colors.primaryText, fontWeight: '600' }]}>Study</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.primaryText, fontWeight: '600' }]}>{t('recentDecks.study')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>

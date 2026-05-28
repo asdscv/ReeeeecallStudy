@@ -8,6 +8,7 @@ import { OverviewStatsRow, RatingDistributionBars } from '../components/study-hi
 import { useAuthState } from '../hooks'
 import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
+import i18next from 'i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
@@ -152,7 +153,7 @@ export function StudyHistoryScreen() {
                     color: activeTab === 'history' ? theme.colors.primary : theme.colors.textSecondary,
                     fontWeight: activeTab === 'history' ? '600' : '400',
                   },
-                ]}>History</Text>
+                ]}>{t('tabs.history')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setActiveTab('analytics')}
@@ -171,7 +172,7 @@ export function StudyHistoryScreen() {
                     color: activeTab === 'analytics' ? theme.colors.primary : theme.colors.textSecondary,
                     fontWeight: activeTab === 'analytics' ? '600' : '400',
                   },
-                ]}>Analytics</Text>
+                ]}>{t('tabs.analytics')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -229,7 +230,7 @@ export function StudyHistoryScreen() {
 
                 {/* Session Count Chart — matches web SessionDurationChart */}
                 {sessionCountData.length > 0 && sessionCountData.some(d => d.count > 0) && (
-                  <BarChart data={sessionCountData} title="Sessions per Day" barColor={palette.purple[500]} testID="history-sessions" />
+                  <BarChart data={sessionCountData} title={t('sessionsPerDay')} barColor={palette.purple[500]} testID="history-sessions" />
                 )}
 
                 {/* Mode Breakdown */}
@@ -304,7 +305,7 @@ export function StudyHistoryScreen() {
             {activeTab === 'history' && (
               <>
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-                  Session List
+                  {t('sessionList')}
                 </Text>
                 {modeBreakdown.length > 1 && (
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.modeFilterScroll}>
@@ -355,7 +356,7 @@ export function StudyHistoryScreen() {
                   activeOpacity={0.7}
                   onPress={() => navigation.navigate('SessionDetail', {
                     session,
-                    deckName: deck?.name ?? 'Unknown Deck',
+                    deckName: deck?.name ?? t('unknownDeck'),
                     deckIcon: deck?.icon ?? '📚',
                   })}
                   testID={`session-card-${session.id}`}
@@ -398,10 +399,11 @@ function formatDateLabel(dateStr: string): string {
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
   const yesterdayStr = yesterday.toISOString().split('T')[0]
+  const lang = i18next.language || 'en'
 
-  if (dateStr === today) return 'Today'
-  if (dateStr === yesterdayStr) return 'Yesterday'
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  if (dateStr === today) return i18next.t('history:today', { defaultValue: 'Today' })
+  if (dateStr === yesterdayStr) return i18next.t('history:yesterday', { defaultValue: 'Yesterday' })
+  return new Date(dateStr).toLocaleDateString(lang, { month: 'short', day: 'numeric' })
 }
 
 const styles = StyleSheet.create({

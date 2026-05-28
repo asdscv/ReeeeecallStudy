@@ -7,16 +7,15 @@
   "emptyDesc": "Start studying to see your progress here",
   "studyVolume": "Study Volume",
   "modeBreakdown": "Mode Breakdown",
-  "deckProgress": {
-    "total": "{{count}} thẻ",
-    "notStudied": "Chưa học {{count}}",
-    "learning": "Đang học {{count}}",
-    "review": "Ôn tập {{count}}"
-  },
   "sessionList": "Session List",
   "today": "Today",
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "Lịch sử",
+    "analytics": "Phân tích"
+  },
+  "sessionsPerDay": "Số phiên mỗi ngày"
 }

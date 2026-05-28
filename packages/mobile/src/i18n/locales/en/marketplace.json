@@ -26,28 +26,20 @@
   },
   "detail": {
     "back": "Back to Marketplace",
-    "notFound": "Listing not found",
-    "goBack": "Go Back",
     "getDeck": "Add to My Decks",
     "downloading": "Downloading...",
-    "previewCards": "Preview Cards",
-    "noPreview": "No preview available",
-    "success": "Deck added to your collection!",
-    "failed": "Failed to download deck",
     "reportContent": "Report Content",
-    "reportTitle": "Report Content",
-    "reportQuestion": "Why are you reporting this deck?",
-    "inappropriateContent": "Inappropriate Content",
-    "copyrightViolation": "Copyright Violation",
-    "spam": "Spam / Misleading",
-    "reportThanks": "Your report has been submitted. We will review this content promptly.",
     "publishedBy": "by",
     "alreadyAcquired": "Already in your collection",
     "unsubscribe": "Unsubscribe",
     "unsubscribing": "Unsubscribing...",
     "unsubscribed": "Unsubscribed",
     "unsubscribeConfirm": "Unsubscribe from this deck? Your personal study progress for it will remain in your account.",
-    "unsubscribeError": "Failed to unsubscribe. Please try again."
+    "unsubscribeError": "Failed to unsubscribe. Please try again.",
+    "title": "Detail",
+    "alreadyReported": "Already reported",
+    "alreadyReportedBody": "You have already reported this listing.",
+    "reportError": "Failed to submit report"
   },
   "publish": {
     "title": "Publish Deck",
@@ -95,7 +87,8 @@
   "nativeLanguage": {
     "label": "Native language",
     "all": "All",
-    "none": "Not specified"
+    "none": "Not specified",
+    "multiHint": "Select all that apply"
   },
   "publisherStats": {
     "title": "Publisher Stats",
@@ -149,5 +142,13 @@
     "copy": "Copy",
     "subscribe": "Subscribe",
     "snapshot": "Snapshot"
-  }
+  },
+  "filters": {
+    "label": "Filter"
+  },
+  "categoryLabel": "Category",
+  "categoryTitle": "Category",
+  "sortTitle": "Sort By",
+  "loadError": "Couldn't load decks",
+  "loadErrorHint": "Check your connection and try again."
 }

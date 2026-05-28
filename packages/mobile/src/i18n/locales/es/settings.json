@@ -5,12 +5,8 @@
     "email": "Correo electrónico",
     "displayName": "Nombre visible",
     "displayNamePlaceholder": "Ingresa tu nombre",
-    "namePlaceholder": "Ingresa tu nombre",
-    "saveBtn": "Guardar",
-    "nameSaved": "¡Nombre guardado!",
     "nameAvailable": "¡Nombre disponible!",
     "nameTaken": "Nombre ya en uso",
-    "nameLength": "El nombre debe tener entre 2 y 12 caracteres",
     "save": "Guardar",
     "checkingName": "Comprobando disponibilidad...",
     "nameLengthError": "Se requieren 2-12 caracteres",
@@ -18,24 +14,11 @@
     "savedMessage": "Nombre actualizado."
   },
   "language": {
-    "title": "Idioma",
-    "label": "Idioma de visualización",
-    "en": "English",
-    "ko": "한국어",
-    "zh": "中文（简体）",
-    "ja": "日本語",
-    "vi": "Tiếng Việt",
-    "th": "ภาษาไทย",
-    "id": "Bahasa Indonesia"
+    "title": "Idioma"
   },
   "srs": {
     "title": "Aprendizaje SRS",
-    "description": "Establece el número de tarjetas nuevas añadidas por sesión en modo SRS (repetición espaciada)",
-    "newCardLimit": "Límite de tarjetas nuevas",
-    "cards": "tarjetas",
-    "cardsUnit": "tarjetas",
-    "help": "Número máximo de tarjetas nuevas además de las de repaso en aprendizaje SRS. Las tarjetas de repaso no se ven afectadas por este límite.",
-    "newCardNote": "Número máximo de tarjetas nuevas además de las de repaso en aprendizaje SRS. Las tarjetas de repaso no se ven afectadas por este límite."
+    "description": "Establece el número de tarjetas nuevas añadidas por sesión en modo SRS (repetición espaciada)"
   },
   "answerMode": {
     "title": "Modo de respuesta",
@@ -44,7 +27,6 @@
     "buttonDesc": "Selecciona respuesta presionando un botón",
     "swipe": "Deslizar",
     "swipeDesc": "Selecciona respuesta deslizando la tarjeta",
-    "swipeAutoNote": "Las direcciones de deslizamiento se configuran automáticamente según el modo de estudio.\n• SRS: ← Otra vez / → Bien\n• Otros modos: ← No sé / → Lo sé",
     "before": "Antes",
     "same": "Igual",
     "after": "Después",
@@ -54,15 +36,14 @@
     "title": "Lectura TTS automática",
     "description": "Leer automáticamente campos con TTS al voltear la tarjeta",
     "enable": "Activar lectura automática",
-    "provider": "Motor de voz",
-    "webSpeech": "Voz del dispositivo",
-    "webSpeechDesc": "Usa la voz integrada del dispositivo",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Voz neural de alta calidad",
     "edgeTtsNote": "* Actualmente solo compatible con inglés",
-    "speed": "Velocidad de lectura",
-    "help": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
-    "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática."
+    "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
+    "voiceEngine": "Motor de voz",
+    "readingSpeed": "Velocidad de lectura",
+    "deviceVoice": "Voz del dispositivo",
+    "deviceVoiceDesc": "Usa la voz integrada de tu dispositivo"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +95,11 @@
   },
   "account": {
     "title": "Cuenta",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "logoutConfirm": "¿Seguro que quieres cerrar sesión?",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteConfirm": "Esto eliminará permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.",
+    "deleteFailed": "No se pudo eliminar la cuenta. Contacta con soporte."
   },
   "links": {
     "userGuide": "Guía de usuario",
@@ -163,5 +148,12 @@
   },
   "alerts": {
     "error": "Error"
+  },
+  "actions": {
+    "cancel": "Cancelar"
+  },
+  "haptics": {
+    "enable": "Respuesta háptica",
+    "hint": "Vibración al tocar, calificar y realizar acciones."
   }
 }

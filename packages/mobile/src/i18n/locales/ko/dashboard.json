@@ -45,7 +45,8 @@
     "cards": "카드 {{count}}장 학습",
     "sessions": "{{count}}회 세션 완료",
     "time": "{{count}}분 학습",
-    "perfect": "만점 {{count}}회 달성"
+    "perfect": "만점 {{count}}회 달성",
+    "completed": "완료"
   },
   "streakFreeze": {
     "title": "연속 학습 보호",
@@ -54,5 +55,10 @@
   },
   "studyHistory": "학습 기록",
   "studyHistoryDesc": "세션, 통계, 진도 보기",
-  "streakDays": "{{count}}일"
+  "streakDays": "{{count}}일",
+  "quickStudy": {
+    "title": "빠른 학습",
+    "dueToday": "오늘 복습할 카드 {{count}}장",
+    "startSession": "학습을 시작해 보세요"
+  }
 }

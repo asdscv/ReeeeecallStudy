@@ -33,24 +33,26 @@
   },
   "setup": {
     "title": "学習設定",
-    "deckInfo": "{{icon}} {{name}} · {{count}}枚",
     "studyMode": "学習モード",
-    "selectUploadDate": "アップロード日を選択",
-    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚"
+    "noDecks": "まだデッキがありません。先にデッキを作成してください！",
+    "alertSelectDeckTitle": "デッキを選択",
+    "alertSelectDeckMsg": "学習するデッキを選んでください",
+    "alertNoCardsTitle": "カードなし",
+    "alertNoCardsMsg": "選択した日付のカードがありません",
+    "alertErrorTitle": "エラー",
+    "shuffle": "シャッフル",
+    "startFailed": "学習セッションを開始できませんでした",
+    "cardsPerSession": "1セッションあたりのカード数",
+    "batchHint": "5〜500枚の範囲",
+    "dateSelection": "日付選択",
+    "startStudy": "学習を開始"
   },
   "cramming": {
-    "gotIt": "わかった！",
-    "missed": "わからない",
-    "round": "ラウンド {{round}}",
-    "mastery": "マスター率: {{percentage}}%",
     "filter": {
       "title": "カードフィルター",
       "all": "すべてのカード",
-      "allDesc": "デッキ内の一時停止されていないすべてのカードを学習",
       "weak": "苦手なカードのみ",
-      "weakDesc": "難易度が高いカードや新しいカード",
-      "dueSoon": "もうすぐ復習",
-      "dueSoonDesc": "3日以内に復習予定のカード"
+      "dueSoon": "もうすぐ復習"
     },
     "timeLimit": {
       "title": "制限時間",
@@ -58,37 +60,25 @@
       "minutes": "{{count}}分"
     },
     "shuffle": {
-      "title": "カードをシャッフル",
-      "desc": "毎ラウンドカードの順序をシャッフル"
+      "title": "カードをシャッフル"
     },
     "summary": {
       "completed": "詰め込み完了！",
-      "timeUp": "時間切れ！",
-      "wellDone": "お疲れ様でした！復習を続けて記憶を強化しましょう。",
-      "totalRounds": "総ラウンド数",
-      "masteryRate": "マスター率",
-      "cardsStudied": "学習カード数",
-      "hardestCards": "最も難しいカード",
-      "missedTimes": "{{count}}回間違い",
-      "noSrsImpact": "このセッションはSRSスケジュールに影響しません。",
-      "sessionEnded": "セッション終了",
-      "crammingAgain": "もう一度詰め込み",
-      "otherMode": "他のモード"
+      "crammingAgain": "もう一度詰め込み"
     }
   },
   "session": {
     "loading": "読み込み中...",
-    "noCards": "学習するカードがありません",
-    "allReviewed": "すべてのカードを復習しました！",
-    "backToDeck": "デッキに戻る",
-    "exitConfirmTitle": "学習を終了しますか？",
-    "exitConfirmMessage": "これまでの学習記録は保存されます。",
-    "exitConfirmButton": "終了",
-    "pause": "Pause",
-    "resume": "Resume",
-    "paused": "Paused",
-    "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "セッションを終了しますか？",
+    "endMessage": "これまでの進捗は保存されます。",
+    "continue": "続ける",
+    "end": "終了",
+    "exit": "終了",
+    "tapToFlip": "タップして裏返す",
+    "swipeHint": "カードをタップで裏返し・スワイプで評価",
+    "noActiveSession": "進行中の学習セッションがありません",
+    "backToSetup": "学習設定に戻る"
   },
   "srsRating": {
     "again": "もう一度",
@@ -97,32 +87,22 @@
     "easy": "簡単"
   },
   "rating": {
-    "dontKnow": "わからない",
-    "knowIt": "わかる",
     "known": "既知",
     "unknown": "未知",
-    "next": "次へ →"
+    "missed": "できなかった",
+    "gotIt": "できた"
   },
   "summary": {
     "title": "学習完了！",
-    "completed": "学習完了！",
-    "greatJob": "お疲れ様でした！",
-    "wellDone": "お疲れ様でした！この調子で頑張りましょう。",
-    "studyCards": "学習カード",
     "cardsStudied": "学習したカード",
-    "cardCount": "{{studied}} / {{total}}",
     "timeSpent": "所要時間",
-    "timeFormat": "{{minutes}}分{{seconds}}秒",
     "avgPerCard": "1枚あたりの平均",
-    "secondsFormat": "{{seconds}}秒",
     "ratingDistribution": "評価分布",
     "backToDeck": "デッキに戻る",
     "studyAgain": "もう一度学習",
-    "sessionEnded": "セッション終了",
-    "progressSoFar": "ここまでの学習状況です。",
-    "knowIt": "わかる",
-    "dontKnow": "わからない",
-    "next": "次へ"
+    "crammingTitle": "一気学習が完了しました！",
+    "mastery": "習得度",
+    "crammingAgain": "もう一度一気学習"
   },
   "ratingLabels": {
     "again": "Again",

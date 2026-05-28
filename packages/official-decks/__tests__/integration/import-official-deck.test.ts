@@ -185,14 +185,28 @@ describe.skipIf(process.env.SKIP_INTEGRATION === "1")("import_official_deck RPC"
 
       const { data, error } = await client
         .from("marketplace_listings")
-        .select("id, title, share_mode, is_active, card_count")
+        .select("id, title, share_mode, is_active, card_count, native_languages, native_language")
         .eq("deck_id", plan.deck.id)
         .single();
       expect(error).toBeNull();
       expect(data!.share_mode).toBe("subscribe");
       expect(data!.is_active).toBe(true);
       expect(data!.card_count).toBe(1);
-      expect(data!.title).toContain("EN → TH");
+      // Title is the deck name (mother-tongue Thai with a localized direction).
+      expect(data!.title).toBe(plan.deck.name);
+      expect(data!.title).toContain("(อังกฤษ → ไทย)");
+      // import_official_deck (mig 095) writes native_languages from the payload =
+      // the non-English/mother-tongue side (en→th ⇒ ['th']) + scalar = [1].
+      expect(data!.native_languages).toEqual(["th"]);
+      expect(data!.native_language).toBe("th");
+
+      const { data: deckRow } = await client
+        .from("decks")
+        .select("native_languages, native_language")
+        .eq("id", plan.deck.id)
+        .single();
+      expect(deckRow!.native_languages).toEqual(["th"]);
+      expect(deckRow!.native_language).toBe("th");
     },
   );
 

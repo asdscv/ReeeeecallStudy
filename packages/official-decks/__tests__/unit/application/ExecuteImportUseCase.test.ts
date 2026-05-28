@@ -42,6 +42,7 @@ function makeGateway(behavior: (i: number) => Partial<ImportSummary> | Error) {
       };
     }),
     markFailed: vi.fn(async () => {}),
+    updateMetadata: vi.fn(async () => true),
   };
   return gateway;
 }
@@ -89,6 +90,7 @@ describe("ExecuteImportUseCase", () => {
         };
       }),
       markFailed: vi.fn(async () => {}),
+      updateMetadata: vi.fn(async () => true),
     };
     const useCase = new ExecuteImportUseCase(gateway);
     await useCase.execute(plans, { concurrency: 1 });

@@ -64,6 +64,22 @@ export class PgDeckImportGateway implements DeckImportGateway {
     };
   }
 
+  async updateMetadata(
+    deckId: string,
+    name: string,
+    description: string,
+  ): Promise<boolean> {
+    const deckResult = await this.db.query(
+      `UPDATE decks SET name = $2, description = $3, updated_at = now() WHERE id = $1`,
+      [deckId, name, description],
+    );
+    await this.db.query(
+      `UPDATE marketplace_listings SET title = $2, description = $3, updated_at = now() WHERE deck_id = $1`,
+      [deckId, name, description],
+    );
+    return (deckResult.rowCount ?? 0) > 0;
+  }
+
   async markFailed(plan: ImportPlan, error: Error): Promise<void> {
     const { deck } = plan;
     await this.db.query(

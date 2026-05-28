@@ -77,7 +77,11 @@
     },
     "setStatus": "Set Status",
     "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "confirmSuspend": "Are you sure you want to suspend this user?",
+    "changeRoleTitle": "Ubah peran",
+    "confirmRoleChange": "Ubah peran pengguna ini?",
+    "banTitle": "Blokir pengguna",
+    "suspendTitle": "Tangguhkan pengguna"
   },
   "study": {
     "title": "Aktivitas Belajar",
@@ -267,7 +271,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "Cabut status resmi"
   },
   "audit": {
     "title": "Audit Log",
@@ -301,7 +306,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
+    },
+    "description": "Lacak semua tindakan administratif di seluruh sistem",
+    "exportCSV": "Ekspor CSV",
+    "actionAll": "Semua Tindakan",
+    "filterTarget": "Jenis Target",
+    "targetAll": "Semua Target",
+    "dateFrom": "Dari",
+    "dateTo": "Sampai",
+    "searching": "Mencari...",
+    "emptyTitle": "Tidak ada log audit",
+    "emptyDescription": "Tidak ada log yang cocok dengan filter saat ini. Coba sesuaikan kriteria pencarian.",
+    "refreshing": "Menyegarkan...",
+    "colTime": "Waktu",
+    "colAdmin": "Admin",
+    "colAction": "Tindakan",
+    "colTarget": "Target",
+    "colDetails": "Detail",
+    "colIP": "IP",
+    "pageInfo": "Halaman {{page}}",
+    "showing": "menampilkan {{count}} entri",
+    "prevPage": "Sebelumnya",
+    "nextPage": "Berikutnya",
+    "unknownAdmin": "Tidak diketahui",
+    "fullDetails": "Detail Lengkap"
   },
   "common": {
     "refresh": "Refresh",

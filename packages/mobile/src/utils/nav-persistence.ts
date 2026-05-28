@@ -12,6 +12,7 @@ import * as FileSystem from 'expo-file-system/legacy'
 import {
   isFreshNavState,
   parsePersistedNavState,
+  sanitizeNavState,
   serializeNavState,
 } from './nav-persistence-core'
 
@@ -29,7 +30,11 @@ export async function loadNavState(now: number = Date.now()): Promise<object | u
     const raw = await FileSystem.readAsStringAsync(NAV_STATE_FILE)
     const saved = parsePersistedNavState(raw)
     if (saved && isFreshNavState(saved, now)) {
-      return saved.state as object
+      // Strip volatile screens (e.g. StudySession) whose required in-memory
+      // state was lost across the cold start. Without this, restoring straight
+      // into StudySession traps the user on a "Loading…" fallback forever
+      // because the zustand study store starts empty after a process restart.
+      return sanitizeNavState(saved.state) as object | undefined
     }
     return undefined
   } catch {

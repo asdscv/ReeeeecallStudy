@@ -253,5 +253,6 @@
       "409": "Conflicto de recurso (plantilla en uso)",
       "429": "Limite de frecuencia excedido"
     }
-  }
+  },
+  "dashboard": "Panel"
 }

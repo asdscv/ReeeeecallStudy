@@ -129,11 +129,11 @@ export function StudySetupScreen() {
 
   const handleStart = async () => {
     if (!selectedDeckId) {
-      Alert.alert('Select a Deck', 'Please choose a deck to study')
+      Alert.alert(t('setup.alertSelectDeckTitle'), t('setup.alertSelectDeckMsg'))
       return
     }
     if (selectedMode === 'by_date' && dateCardCount === 0) {
-      Alert.alert('No Cards', 'No cards found for the selected date')
+      Alert.alert(t('setup.alertNoCardsTitle'), t('setup.alertNoCardsMsg'))
       return
     }
     const size = parseInt(batchSize) || 20
@@ -154,7 +154,7 @@ export function StudySetupScreen() {
       )
       navigation.navigate('StudySession')
     } catch (e) {
-      Alert.alert('Error', 'Failed to start study session')
+      Alert.alert(t('setup.alertErrorTitle'), t('setup.startFailed'))
     }
   }
 
@@ -175,7 +175,7 @@ export function StudySetupScreen() {
     const m = mode ?? selectedMode
     if (!selectedDeckId) return
     if (m === 'by_date' && dateCardCount === 0) {
-      Alert.alert('No Cards', 'No cards found for the selected date')
+      Alert.alert(t('setup.alertNoCardsTitle'), t('setup.alertNoCardsMsg'))
       return
     }
     const size = parseInt(batchSize) || 20
@@ -196,7 +196,7 @@ export function StudySetupScreen() {
       closeModal()
       navigation.navigate('StudySession')
     } catch {
-      Alert.alert('Error', 'Failed to start study session')
+      Alert.alert(t('setup.alertErrorTitle'), t('setup.startFailed'))
     }
   }
 
@@ -234,17 +234,17 @@ export function StudySetupScreen() {
                   </Text>
                 </View>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {ds?.total_cards ?? 0} cards
+                  {t('dashboard:recentDecks.cardCount', { count: ds?.total_cards ?? 0 })}
                 </Text>
                 <View style={styles.deckBadges}>
                   {newCards > 0 && (
                     <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
-                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
+                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>{t('dashboard:recentDecks.newCards', { count: newCards })}</Text>
                     </View>
                   )}
                   {reviewCards > 0 && (
                     <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
-                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {reviewCards}</Text>
+                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>{t('dashboard:recentDecks.reviewCards', { count: reviewCards })}</Text>
                     </View>
                   )}
                 </View>
@@ -256,7 +256,7 @@ export function StudySetupScreen() {
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Text style={{ fontSize: 40 }}>{'\uD83D\uDCDA'}</Text>
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-              No decks yet. Create a deck first!
+              {t('setup.noDecks')}
             </Text>
           </View>
         }
@@ -359,7 +359,7 @@ export function StudySetupScreen() {
                       </View>
                     </View>
                     <View style={styles.toggleRow}>
-                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>Shuffle</Text>
+                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t('setup.shuffle')}</Text>
                       <Switch testID="study-cram-shuffle" value={crammingShuffle} onValueChange={setCrammingShuffle} trackColor={{ true: theme.colors.primary }} />
                     </View>
                   </View>

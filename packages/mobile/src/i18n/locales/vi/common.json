@@ -12,9 +12,6 @@
     "guide": "Hướng dẫn",
     "aiGenerate": "AI Generate",
     "achievements": "Thành tích",
-    "leaderboard": "Leaderboard",
-    "analytics": "Analytics",
-    "publisher": "Publisher Stats",
     "publisherStats": "Thống kê nhà xuất bản"
   },
   "actions": {
@@ -32,14 +29,10 @@
     "next": "Tiếp theo",
     "close": "Đóng",
     "copy": "Sao chép",
-    "duplicate": "Nhân bản",
     "search": "Tìm kiếm",
-    "selectAll": "Chọn tất cả",
-    "deselect": "Bỏ chọn",
-    "show": "Hiện",
-    "hide": "Ẩn",
     "startStudy": "Bắt đầu học",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "retry": "Thử lại"
   },
   "status": {
     "loading": "Đang tải...",
@@ -53,17 +46,10 @@
     "cards": "thẻ",
     "cardsSuffix": "{{count}} thẻ",
     "sessions": "phiên",
-    "items": "mục",
     "days": "ngày",
     "hours": "giờ",
     "minutes": "phút",
-    "seconds": "giây",
-    "times": "lần",
-    "percent": "{{value}}%"
-  },
-  "pagination": {
-    "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} mỗi trang"
+    "seconds": "giây"
   },
   "timePeriod": {
     "1d": "1N",
@@ -80,30 +66,13 @@
     "processing": "Đang xử lý...",
     "confirm": "Xác nhận"
   },
-  "delete": "Xóa",
-  "deselect": "Bỏ chọn",
-  "duplicate": "Nhân bản",
-  "selectAllPage": "Chọn tất cả trên trang này",
-  "edit": "Sửa",
-  "save": "Lưu",
-  "saving": "Đang lưu...",
-  "selectAll": "Chọn tất cả",
-  "menu": "Menu",
-  "copiedToClipboard": "Đã sao chép vào bộ nhớ tạm",
-  "export": "Xuất",
-  "officialBadge": {
-    "label": "Chính thức",
-    "tooltip": "Tài khoản chính thức"
-  },
   "guideHelp": "Help",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
     "back": "Back",
     "finish": "Finish",
-    "getStarted": "Get Started",
     "stepOf": "Step {{current}} of {{total}}",
-    "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
@@ -112,22 +81,17 @@
     "createDeck": {
       "title": "Create Your First Deck",
       "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "action": "Create This Deck"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
-      "useTemplate": "Use This Template"
+      "action": "Tiếp theo"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
       "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "action": "Add These Cards"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
@@ -137,8 +101,7 @@
     "exploreMarket": {
       "title": "Explore the Marketplace",
       "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "action": "Browse Marketplace"
     }
   },
   "achievements": {
@@ -200,61 +163,6 @@
     "more": "more",
     "earned": " earned"
   },
-  "analytics": {
-    "title": "My Analytics",
-    "retentionCurve": "Retention Curve",
-    "weakTopics": "Weak Topics",
-    "studyTime": "Study Time Distribution",
-    "modeEffectiveness": "Mode Effectiveness",
-    "progress": "Progress Over Time"
-  },
-  "pomodoro": {
-    "focus": "Focus",
-    "break": "Break",
-    "start": "Start",
-    "pause": "Pause",
-    "reset": "Reset"
-  },
-  "leaderboard": {
-    "title": "Leaderboard",
-    "weekly": "Weekly",
-    "monthly": "Monthly",
-    "allTime": "All Time",
-    "rank": "Rank",
-    "name": "Name",
-    "level": "Level",
-    "cardsStudied": "Cards Studied",
-    "sessions": "Sessions",
-    "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
-  },
-  "history": {
-    "tabs": {
-      "history": "History",
-      "analytics": "Analytics"
-    }
-  },
-  "quests": {
-    "title": "Daily Quests",
-    "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
-    "perfect": "Get a perfect score",
-    "completed": "Completed!",
-    "xpReward": "+{{xp}} XP"
-  },
-  "streakFreeze": {
-    "title": "Streak Freeze",
-    "available": "{{count}} available",
-    "used": "Streak protected today!",
-    "earned": "Earned a streak freeze!"
-  },
-  "levelUp": {
-    "title": "Level Up!",
-    "level": "Level {{level}}",
-    "message": "Keep up the great work!",
-    "xpEarned": "+{{xp}} XP"
-  },
   "goals": {
     "title": "Next Goals",
     "streak": "Streak",
@@ -267,5 +175,22 @@
     "hamburger": "Nhấn menu (☰) để điều hướng",
     "dashboard": "Bảng điều khiển hiển thị thống kê và chuỗi học",
     "quickStudy": "Học nhanh bắt đầu phiên ngay lập tức"
+  },
+  "cancel": "Hủy",
+  "errorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "message": "Màn hình gặp lỗi không mong muốn. Vui lòng thử lại.",
+    "retry": "Thử lại"
+  },
+  "sessionKicked": {
+    "badge": "Phiên đã hết hạn",
+    "headline": "Đã đăng nhập trên thiết bị khác",
+    "description": "Bạn đã bị đăng xuất vì tài khoản được dùng trên thiết bị khác. Khôi phục phiên này để tiếp tục dùng tại đây.",
+    "info1": "Phát hiện phiên đang hoạt động trên thiết bị khác",
+    "info2": "Giới hạn tự động để bảo vệ tài khoản của bạn",
+    "reclaim": "Tiếp tục trên thiết bị này",
+    "reclaiming": "Đang khôi phục phiên…",
+    "logout": "Đăng xuất",
+    "hint": "Chỉ có thể dùng một thiết bị tại một thời điểm"
   }
 }
