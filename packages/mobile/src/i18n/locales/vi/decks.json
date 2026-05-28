@@ -66,7 +66,7 @@
     "saved": "Đã lưu bộ thẻ."
   },
   "card": {
-    "noStudyRecord": "Không có hồ sơ học tập",
+    "noStudyRecord": "Chưa có lịch sử học",
     "totalCards": "{{count}} thẻ",
     "newCards": "Mới {{count}}",
     "review": "Ôn tập {{count}}",
@@ -114,5 +114,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "template": {
+    "title": "Mẫu thẻ",
+    "subtitle": "Quản lý các mẫu thẻ cho bộ thẻ của bạn",
+    "newBtn": "+ Tạo mới",
+    "empty": "Chưa có mẫu thẻ nào",
+    "emptyDesc": "Tạo một mẫu để định nghĩa cấu trúc thẻ của bạn",
+    "summary": "Mặt trước: {{front}} trường · Mặt sau: {{back}} trường · Tạo: {{date}}"
   }
 }

@@ -54,5 +54,10 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days"
+  "streakDays": "{{count}}days",
+  "quickStudy": {
+    "title": "Quick Study",
+    "dueToday": "{{count}} cards due today",
+    "startSession": "Start a study session"
+  }
 }

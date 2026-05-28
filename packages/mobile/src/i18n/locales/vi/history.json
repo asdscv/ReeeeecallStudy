@@ -18,5 +18,10 @@
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "Lịch sử",
+    "analytics": "Phân tích"
+  },
+  "sessionsPerDay": "Số phiên mỗi ngày"
 }

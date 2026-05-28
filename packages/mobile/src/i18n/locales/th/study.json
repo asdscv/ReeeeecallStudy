@@ -36,7 +36,8 @@
     "deckInfo": "{{icon}} {{name}} · {{count}} การ์ด",
     "studyMode": "โหมดการเรียน",
     "selectUploadDate": "เลือกวันที่อัปโหลด",
-    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count}} การ์ด"
+    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count}} การ์ด",
+    "noDecks": "ยังไม่มีเด็ค กรุณาสร้างเด็คก่อน!"
   },
   "cramming": {
     "gotIt": "จำได้!",

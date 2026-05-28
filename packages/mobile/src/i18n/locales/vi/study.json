@@ -36,7 +36,8 @@
     "deckInfo": "{{icon}} {{name}} · {{count}} thẻ",
     "studyMode": "Chế độ học",
     "selectUploadDate": "Chọn ngày tải lên",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ"
+    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ",
+    "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ thẻ trước!"
   },
   "cramming": {
     "gotIt": "Đúng rồi!",

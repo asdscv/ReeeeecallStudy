@@ -62,5 +62,10 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days"
+  "streakDays": "{{count}}days",
+  "quickStudy": {
+    "title": "Học nhanh",
+    "dueToday": "{{count}} thẻ cần học hôm nay",
+    "startSession": "Bắt đầu một phiên học"
+  }
 }

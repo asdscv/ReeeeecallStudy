@@ -114,5 +114,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "template": {
+    "title": "模板",
+    "subtitle": "管理用于卡组的卡片模板",
+    "newBtn": "+ 新建",
+    "empty": "还没有模板",
+    "emptyDesc": "创建一个模板来定义卡片结构",
+    "summary": "正面 {{front}} 项 · 背面 {{back}} 项 · 创建于 {{date}}"
   }
 }

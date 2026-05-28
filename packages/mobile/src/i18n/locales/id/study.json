@@ -36,7 +36,8 @@
     "deckInfo": "{{icon}} {{name}} · {{count}} kartu",
     "studyMode": "Mode Belajar",
     "selectUploadDate": "Pilih Tanggal Unggahan",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu"
+    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu",
+    "noDecks": "Belum ada dek. Buat dek dulu!"
   },
   "cramming": {
     "gotIt": "Mengerti!",

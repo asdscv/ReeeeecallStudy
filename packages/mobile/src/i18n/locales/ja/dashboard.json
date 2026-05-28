@@ -62,5 +62,10 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days"
+  "streakDays": "{{count}}days",
+  "quickStudy": {
+    "title": "クイック学習",
+    "dueToday": "今日の復習カード {{count}}枚",
+    "startSession": "学習を始めましょう"
+  }
 }

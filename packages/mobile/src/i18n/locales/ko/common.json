@@ -123,5 +123,72 @@
     "title": "문제가 발생했습니다",
     "message": "화면에서 예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
     "retry": "다시 시도"
+  },
+  "achievements": {
+    "title": "업적",
+    "tabs": {
+      "badges": "배지",
+      "leaderboard": "리더보드"
+    },
+    "level": "레벨",
+    "xp": "경험치",
+    "totalXp": "총 경험치",
+    "progress": "진행",
+    "viewAll": "전체 업적",
+    "recent": "최근",
+    "empty": "아직 업적이 없습니다. 학습을 시작해서 배지를 획득하세요!",
+    "more": "개 더",
+    "earned": "개 달성",
+    "newUnlocked": "업적 달성!",
+    "category": {
+      "streak": "연속 학습",
+      "study": "학습",
+      "social": "소셜",
+      "milestone": "마일스톤"
+    },
+    "badge": {
+      "streak_3": "3일 연속 학습",
+      "streak_7": "7일 연속 학습",
+      "streak_30": "30일 연속 학습",
+      "streak_100": "100일 연속 학습",
+      "cards_100": "100장 학습",
+      "cards_500": "500장 학습",
+      "cards_1000": "1,000장 학습",
+      "cards_5000": "5,000장 학습",
+      "sessions_10": "10회 학습",
+      "sessions_50": "50회 학습",
+      "sessions_100": "100회 학습",
+      "deck_share": "첫 덱 공유",
+      "marketplace_pub": "마켓에 출판",
+      "first_study": "첫 학습 완료",
+      "mastery_50": "50% 숙달",
+      "mastery_90": "90% 숙달"
+    },
+    "badgeDesc": {
+      "streak_3": "3일 연속으로 학습하기",
+      "streak_7": "7일 연속으로 학습하기",
+      "streak_30": "30일 연속으로 학습하기",
+      "streak_100": "100일 연속으로 학습하기",
+      "cards_100": "총 100장의 카드 학습하기",
+      "cards_500": "총 500장의 카드 학습하기",
+      "cards_1000": "총 1,000장의 카드 학습하기",
+      "cards_5000": "총 5,000장의 카드 학습하기",
+      "sessions_10": "10회 학습 세션 완료하기",
+      "sessions_50": "50회 학습 세션 완료하기",
+      "sessions_100": "100회 학습 세션 완료하기",
+      "deck_share": "첫 번째 덱 공유하기",
+      "marketplace_pub": "마켓플레이스에 덱 출판하기",
+      "first_study": "첫 학습 세션 완료하기",
+      "mastery_50": "전체 카드의 50% 숙달하기",
+      "mastery_90": "전체 카드의 90% 숙달하기"
+    }
+  },
+  "goals": {
+    "title": "다음 목표",
+    "streak": "연속 학습",
+    "cards": "학습한 카드",
+    "sessions": "학습 세션",
+    "time": "학습 시간",
+    "mastery": "마스터한 카드"
   }
 }

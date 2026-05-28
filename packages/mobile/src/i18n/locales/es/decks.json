@@ -114,5 +114,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "template": {
+    "title": "Plantillas",
+    "subtitle": "Gestiona las plantillas de tarjeta para tus barajas",
+    "newBtn": "+ Nueva",
+    "empty": "Aún no hay plantillas",
+    "emptyDesc": "Crea una plantilla para definir la estructura de las tarjetas",
+    "summary": "Frente: {{front}} campos · Atrás: {{back}} campos · Creada: {{date}}"
   }
 }

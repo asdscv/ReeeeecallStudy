@@ -55,7 +55,8 @@
   "card": {
     "edit": "Edit",
     "delete": "Delete",
-    "startStudy": "Study"
+    "startStudy": "Study",
+    "noStudyRecord": "No study record"
   },
   "stats": {
     "totalCards": "Total Cards",
@@ -74,5 +75,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed"
+  },
+  "template": {
+    "title": "Templates",
+    "subtitle": "Manage card templates for your decks",
+    "newBtn": "+ New",
+    "empty": "No templates yet",
+    "emptyDesc": "Create a template to define your card structure",
+    "summary": "Front: {{front}} fields   Back: {{back}} fields   Created: {{date}}"
   }
 }

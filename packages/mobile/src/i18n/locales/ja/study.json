@@ -36,7 +36,8 @@
     "deckInfo": "{{icon}} {{name}} · {{count}}枚",
     "studyMode": "学習モード",
     "selectUploadDate": "アップロード日を選択",
-    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚"
+    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚",
+    "noDecks": "まだデッキがありません。先にデッキを作成してください！"
   },
   "cramming": {
     "gotIt": "わかった！",

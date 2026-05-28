@@ -36,7 +36,8 @@
     "deckInfo": "{{icon}} {{name}} · {{count}} 张卡片",
     "studyMode": "学习模式",
     "selectUploadDate": "选择上传日期",
-    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片"
+    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片",
+    "noDecks": "还没有卡组，请先创建一个卡组！"
   },
   "cramming": {
     "gotIt": "会了！",

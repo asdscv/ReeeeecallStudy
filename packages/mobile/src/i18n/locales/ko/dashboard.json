@@ -54,5 +54,10 @@
   },
   "studyHistory": "학습 기록",
   "studyHistoryDesc": "세션, 통계, 진도 보기",
-  "streakDays": "{{count}}일"
+  "streakDays": "{{count}}일",
+  "quickStudy": {
+    "title": "빠른 학습",
+    "dueToday": "오늘 복습할 카드 {{count}}장",
+    "startSession": "학습을 시작해 보세요"
+  }
 }

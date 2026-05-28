@@ -18,5 +18,10 @@
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "Historial",
+    "analytics": "Análisis"
+  },
+  "sessionsPerDay": "Sesiones por día"
 }

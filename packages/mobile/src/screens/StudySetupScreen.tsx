@@ -234,17 +234,17 @@ export function StudySetupScreen() {
                   </Text>
                 </View>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {ds?.total_cards ?? 0} cards
+                  {t('dashboard:recentDecks.cardCount', { count: ds?.total_cards ?? 0 })}
                 </Text>
                 <View style={styles.deckBadges}>
                   {newCards > 0 && (
                     <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
-                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
+                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>{t('dashboard:recentDecks.newCards', { count: newCards })}</Text>
                     </View>
                   )}
                   {reviewCards > 0 && (
                     <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
-                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {reviewCards}</Text>
+                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>{t('dashboard:recentDecks.reviewCards', { count: reviewCards })}</Text>
                     </View>
                   )}
                 </View>
@@ -256,7 +256,7 @@ export function StudySetupScreen() {
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Text style={{ fontSize: 40 }}>{'\uD83D\uDCDA'}</Text>
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-              No decks yet. Create a deck first!
+              {t('setup.noDecks')}
             </Text>
           </View>
         }
