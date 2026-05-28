@@ -13,6 +13,7 @@ import Animated, {
   Extrapolation,
 } from 'react-native-reanimated'
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
+import { Feather } from '@expo/vector-icons'
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { computeCardTextAttrs } from '../utils/card-text-style'
@@ -423,7 +424,9 @@ function TTSButton({ text, lang, speed, color, cardTapRef }: {
   return (
     <GestureDetector gesture={ttsTap}>
       <Animated.View style={styles.ttsInlineBtn} hitSlop={8}>
-        <Text style={{ fontSize: 18, color }}>{'\uD83D\uDD0A'}</Text>
+        {/* Vector speaker (Feather volume-2 \u2248 web's lucide Volume2). A fixed-size
+            box means the glyph is never clipped, unlike the previous raw emoji. */}
+        <Feather name="volume-2" size={18} color={color} />
       </Animated.View>
     </GestureDetector>
   )
@@ -456,16 +459,16 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
 
     return (
       <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock, isHint && { borderLeftColor: theme.colors.border }]}>
-        {/* TTS button: absolute-positioned overlay so it doesn't constrain Text
-            width via flex measurement. iOS RN's flex:1 + row + sibling combo
-            measures CJK text width incorrectly, causing per-glyph wrap or
-            premature truncation. With Text taking full container width and the
-            button overlaying on the left, measurement is unambiguous. */}
+        {/* TTS field: web-parity flex row — speaker icon (fixed width, never
+            shrinks) + text that flex-shrinks so it WRAPS inside the card instead
+            of overflowing horizontally. The previous absolute-overlay + Text
+            width:'100%' approach did not wrap on iOS (a percentage width is not
+            applied during text measurement), so text laid out on one line →
+            horizontal overflow + horizontal scroll + clipping. Worst for
+            space-less CJK (Chinese), which became one very long line. */}
         {field.ttsLang ? (
-          <View style={styles.ttsRow}>
-            <View style={styles.ttsAbsButton} pointerEvents="box-none">
-              <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
-            </View>
+          <View style={[styles.ttsRow, isHint && styles.ttsRowHint]}>
+            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
             <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
           </View>
         ) : (
@@ -529,24 +532,18 @@ const styles = StyleSheet.create({
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, padding: 8 },
   fieldBlock: { width: '100%', alignItems: 'center' },
   hintBlock: { borderLeftWidth: 2, paddingLeft: 12, alignItems: 'flex-start' },
-  ttsRow: { width: '100%', position: 'relative', justifyContent: 'center' },
-  ttsAbsButton: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    zIndex: 2,
-  },
-  ttsText: {
-    width: '100%',
-    // Reserve horizontal room for the absolute-positioned speaker icon on
-    // the left so centered text never collides with it. Symmetric padding
-    // keeps textAlign:'center' visually centered within the card.
-    paddingLeft: 44,
-    paddingRight: 44,
-  },
-  ttsInlineBtn: { padding: 8 },
+  // Web-parity row: icon + text, centered as a group. The row has a DEFINITE
+  // width (100% of the card-inner width), so the flex-shrinking text below gets
+  // a definite available width and wraps correctly (incl. CJK) instead of
+  // overflowing on one line.
+  ttsRow: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  ttsRowHint: { justifyContent: 'flex-start' },
+  // flexShrink:1 lets the text shrink to the remaining row width and wrap;
+  // textAlign:'center' (from textStyle) centers each line. No width:'100%' —
+  // that percentage is what broke wrapping on iOS.
+  ttsText: { flexShrink: 1 },
+  // Fixed-size touch target so the vector icon is never clipped.
+  ttsInlineBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
