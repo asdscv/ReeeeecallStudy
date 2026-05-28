@@ -76,7 +76,9 @@
     "end": "終了",
     "exit": "終了",
     "tapToFlip": "タップして裏返す",
-    "swipeHint": "カードをタップで裏返し・スワイプで評価"
+    "swipeHint": "カードをタップで裏返し・スワイプで評価",
+    "noActiveSession": "進行中の学習セッションがありません",
+    "backToSetup": "学習設定に戻る"
   },
   "srsRating": {
     "again": "もう一度",

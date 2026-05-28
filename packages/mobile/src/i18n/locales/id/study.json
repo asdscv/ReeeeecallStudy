@@ -76,7 +76,9 @@
     "end": "Akhiri",
     "exit": "Keluar",
     "tapToFlip": "Ketuk untuk membalik",
-    "swipeHint": "Ketuk kartu untuk membalik · Geser untuk menilai"
+    "swipeHint": "Ketuk kartu untuk membalik · Geser untuk menilai",
+    "noActiveSession": "Tidak ada sesi belajar yang aktif",
+    "backToSetup": "Kembali ke pengaturan belajar"
   },
   "srsRating": {
     "again": "Ulangi",

@@ -76,7 +76,9 @@
     "end": "종료",
     "tapToFlip": "탭하여 뒤집기",
     "swipeHint": "카드를 탭하여 뒤집기 · 스와이프하여 평가",
-    "undo": "되돌리기"
+    "undo": "되돌리기",
+    "noActiveSession": "진행 중인 학습 세션이 없습니다",
+    "backToSetup": "학습 설정으로 돌아가기"
   },
   "srsRating": {
     "again": "다시",

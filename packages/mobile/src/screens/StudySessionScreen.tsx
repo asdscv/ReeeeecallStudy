@@ -186,10 +186,29 @@ export function StudySessionScreen() {
   })
 
   if (!currentCard || phase !== 'studying') {
+    // The study store is in-memory only. If the user lands here without an
+    // active session (cold restart after a crash / a stale nav-state restore
+    // that sneaks past sanitization / a race where data hasn't loaded yet),
+    // give them an explicit way out so they aren't trapped on a permanent
+    // "Loading…" screen with no exit affordance.
+    const stuck = phase === 'idle' || phase === 'completed'
     return (
       <Screen testID="study-session-screen">
         <View style={styles.center}>
-          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>{t('session.loading')}</Text>
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary, marginBottom: 16 }]}>
+            {stuck ? t('session.noActiveSession') : t('session.loading')}
+          </Text>
+          {stuck && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('StudySetup', {})}
+              style={[styles.bailoutBtn, { backgroundColor: theme.colors.primary }]}
+              {...testProps('study-session-bailout')}
+            >
+              <Text style={[theme.typography.body, { color: theme.colors.primaryText, fontWeight: '600' }]}>
+                {t('session.backToSetup')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Screen>
     )
@@ -521,6 +540,10 @@ const styles = StyleSheet.create({
   card: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     borderRadius: 20, borderWidth: 1, padding: 24, justifyContent: 'center', alignItems: 'center',
+    // Safety net: clip any rare horizontal overflow (e.g. a hyphen-less URL
+    // token longer than the card) to the rounded card bounds instead of
+    // leaking past the card edge — defense in depth for the wrap fix.
+    overflow: 'hidden',
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 5,
   },
   cardBack: { },
@@ -551,6 +574,7 @@ const styles = StyleSheet.create({
   },
   ratingRow: { flexDirection: 'row', gap: 8, paddingBottom: 24 },
   ratingBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
+  bailoutBtn: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
   ratingLabel: { color: '#fff', fontWeight: '700', fontSize: 14 },
   swipeRatingHint: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 32, paddingBottom: 20 },
   bottomHints: { alignItems: 'center', paddingBottom: 20, paddingHorizontal: 20, gap: 8 },
