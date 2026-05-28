@@ -76,7 +76,9 @@
     "end": "Kết thúc",
     "exit": "Thoát",
     "tapToFlip": "Chạm để lật",
-    "swipeHint": "Chạm thẻ để lật · Vuốt để đánh giá"
+    "swipeHint": "Chạm thẻ để lật · Vuốt để đánh giá",
+    "noActiveSession": "Không có phiên học nào đang diễn ra",
+    "backToSetup": "Quay lại thiết lập học"
   },
   "srsRating": {
     "again": "Lại",

@@ -76,7 +76,9 @@
     "end": "End",
     "tapToFlip": "Tap to flip",
     "swipeHint": "Tap card to flip · Swipe to rate",
-    "undo": "Undo"
+    "undo": "Undo",
+    "noActiveSession": "No active study session",
+    "backToSetup": "Back to study setup"
   },
   "srsRating": {
     "again": "Again",

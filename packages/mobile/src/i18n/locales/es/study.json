@@ -76,7 +76,9 @@
     "end": "Terminar",
     "exit": "Salir",
     "tapToFlip": "Toca para voltear",
-    "swipeHint": "Toca la tarjeta para voltear · Desliza para calificar"
+    "swipeHint": "Toca la tarjeta para voltear · Desliza para calificar",
+    "noActiveSession": "No hay sesión de estudio activa",
+    "backToSetup": "Volver a la configuración de estudio"
   },
   "srsRating": {
     "again": "Otra vez",

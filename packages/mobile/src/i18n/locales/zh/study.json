@@ -76,7 +76,9 @@
     "end": "结束",
     "exit": "退出",
     "tapToFlip": "点击翻面",
-    "swipeHint": "点击卡片翻面 · 滑动评分"
+    "swipeHint": "点击卡片翻面 · 滑动评分",
+    "noActiveSession": "没有进行中的学习",
+    "backToSetup": "返回学习设置"
   },
   "srsRating": {
     "again": "重来",

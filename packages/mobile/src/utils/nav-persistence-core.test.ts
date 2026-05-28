@@ -8,8 +8,10 @@
 import {
   isFreshNavState,
   parsePersistedNavState,
+  sanitizeNavState,
   serializeNavState,
   NAV_STATE_MAX_AGE_MS,
+  VOLATILE_ROUTE_NAMES,
   type PersistedNavState,
 } from './nav-persistence-core'
 
@@ -67,6 +69,129 @@ check('round-trip: state preserved',
   JSON.stringify(roundTrip?.state) === JSON.stringify(original))
 check('round-trip: savedAt set', roundTrip?.savedAt === NOW)
 check('round-trip: result is fresh', isFreshNavState(roundTrip, NOW))
+
+// ── sanitizeNavState ─────────────────────────────────────────────────────
+// Guards against the "trapped in Loading…" bug: restoring straight into
+// StudySession leaves the user on a permanent loading fallback because the
+// study store is in-memory only and starts empty on cold restart.
+
+check('sanitize: VOLATILE_ROUTE_NAMES includes StudySession',
+  VOLATILE_ROUTE_NAMES.includes('StudySession'))
+
+check('sanitize: leaves a clean stack untouched (no volatile routes)', (() => {
+  const tree = { index: 0, routes: [{ name: 'Dashboard' }, { name: 'Decks' }] }
+  const out = sanitizeNavState(tree) as typeof tree
+  return out.routes.length === 2 && out.routes[0].name === 'Dashboard' && out.index === 0
+})())
+
+check('sanitize: prunes StudySession nested deep inside a tab stack', (() => {
+  // Mirrors the real production tree: Drawer (StudyTab) → Stack (StudySetup → StudySession)
+  const tree = {
+    index: 0,
+    routes: [{
+      name: 'Main',
+      state: {
+        index: 1,
+        routes: [
+          { name: 'HomeTab' },
+          { name: 'StudyTab', state: {
+            index: 1,
+            routes: [
+              { name: 'StudySetup' },
+              { name: 'StudySession', params: undefined },
+            ],
+          }},
+        ],
+      },
+    }],
+  }
+  const out = sanitizeNavState(tree) as typeof tree
+  const studyTab = (out.routes[0]!.state!.routes as Array<{name:string;state?:{routes:Array<{name:string}>;index:number}}>)[1]
+  return (
+    studyTab.name === 'StudyTab' &&
+    studyTab.state!.routes.length === 1 &&
+    studyTab.state!.routes[0]!.name === 'StudySetup' &&
+    studyTab.state!.index === 0
+  )
+})())
+
+check('sanitize: empties nested state to undefined when all routes were volatile', (() => {
+  // If StudySession was the ONLY route under StudyTab, clear that nested state
+  // so React Navigation falls back to the stack's initial route (StudySetup).
+  const tree = {
+    index: 0,
+    routes: [{
+      name: 'StudyTab',
+      state: { index: 0, routes: [{ name: 'StudySession' }] },
+    }],
+  }
+  const out = sanitizeNavState(tree) as typeof tree
+  return out.routes.length === 1 && out.routes[0].name === 'StudyTab' && out.routes[0].state === undefined
+})())
+
+check('sanitize: returns undefined when EVERY top-level route is volatile', (() => {
+  // Nothing left to restore → boot fresh.
+  const tree = { index: 0, routes: [{ name: 'StudySession' }] }
+  return sanitizeNavState(tree) === undefined
+})())
+
+check('sanitize: clamps parent index when removed route was selected', (() => {
+  // index=2 pointed at the now-pruned route → must clamp to a valid index, not crash.
+  const tree = {
+    index: 2,
+    routes: [
+      { name: 'A' }, { name: 'B' }, { name: 'StudySession' }, { name: 'C' },
+    ],
+  }
+  const out = sanitizeNavState(tree) as { index: number; routes: Array<{name:string}> }
+  return out.routes.length === 3 && out.index >= 0 && out.index <= 2
+})())
+
+check('sanitize: strips history (drawer/tab focus log) so stale keys cannot crash navigator', (() => {
+  const tree = {
+    index: 0,
+    routes: [{ name: 'A' }],
+    history: [{ type: 'route', key: 'old-pruned-key' }],
+  }
+  const out = sanitizeNavState(tree) as { history?: unknown[] }
+  return out.history === undefined
+})())
+
+check('sanitize: does NOT mutate the input', (() => {
+  const tree = { index: 0, routes: [{ name: 'StudySession' }, { name: 'Keep' }] }
+  const snapshot = JSON.stringify(tree)
+  sanitizeNavState(tree)
+  return JSON.stringify(tree) === snapshot
+})())
+
+check('sanitize: idempotent (re-running yields the same result)', (() => {
+  const tree = {
+    index: 0,
+    routes: [{ name: 'Main', state: {
+      index: 0,
+      routes: [{ name: 'StudyTab', state: {
+        index: 1, routes: [{ name: 'StudySetup' }, { name: 'StudySession' }],
+      }}],
+    }}],
+  }
+  const once = sanitizeNavState(tree)
+  const twice = sanitizeNavState(once)
+  return JSON.stringify(once) === JSON.stringify(twice)
+})())
+
+check('sanitize: handles malformed input without throwing (no routes field)', (() => {
+  // A persisted blob without `routes` is returned as-is (it has nothing to prune).
+  const out = sanitizeNavState({ index: 0 }) as { index: number }
+  return out !== undefined && out.index === 0
+})())
+
+check('sanitize: drops routes with missing name', (() => {
+  // Defensive: a corrupt route entry must not crash the pruner, and is removed
+  // (we cannot decide whether it is volatile, so the safe default is to drop it).
+  const tree = { index: 0, routes: [{ /* no name */ }, { name: 'Keep' }] }
+  const out = sanitizeNavState(tree) as { routes: Array<{name:string}> }
+  return out.routes.length === 1 && out.routes[0]!.name === 'Keep'
+})())
 
 console.log(`\nnav-persistence-core: ${passed} passed, ${failed} failed`)
 process.exit(failed > 0 ? 1 : 0)
