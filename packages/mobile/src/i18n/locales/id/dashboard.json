@@ -8,16 +8,11 @@
   },
   "dailyChart": {
     "title": "Volume Belajar Harian",
-    "total": "Total {{count}} kali",
-    "noData": "Belum ada catatan belajar",
-    "tooltipTimes": "{{value}} kali",
-    "tooltipLabel": "Belajar"
+    "noData": "Belum ada catatan belajar"
   },
   "forecast": {
     "title": "Perkiraan Ulasan (7 hari)",
-    "noData": "Tidak ada ulasan terjadwal",
-    "tooltipCards": "{{value}} kartu",
-    "tooltipLabel": "Perlu diulas"
+    "noData": "Tidak ada ulasan terjadwal"
   },
   "recentDecks": {
     "title": "Status Dek",
@@ -29,10 +24,7 @@
     "study": "Belajar"
   },
   "heatmap": {
-    "title": "Peta Panas Belajar",
-    "noStudy": "Tidak belajar",
-    "studyCount": "{{date}}: {{count}} kali belajar",
-    "tooltip": "{{date}}: {{count}} kali belajar"
+    "title": "Peta Panas Belajar"
   },
   "gamification": {
     "freezes": "{{count}} freezes left",

@@ -5,8 +5,6 @@
     "userAlreadyRegistered": "อีเมลนี้ลงทะเบียนไว้แล้ว",
     "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
     "emailRateLimit": "มีคำขอมากเกินไป กรุณาลองใหม่ภายหลัง",
-    "securityDelay": "เพื่อความปลอดภัย กรุณาลองใหม่ภายหลัง",
-    "newPasswordSameAsOld": "รหัสผ่านใหม่ต้องแตกต่างจากรหัสผ่านเดิม",
     "invalidEmailFormat": "รูปแบบอีเมลไม่ถูกต้อง"
   },
   "generic": "Something went wrong. Please try again.",

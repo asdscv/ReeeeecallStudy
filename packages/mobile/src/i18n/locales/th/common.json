@@ -12,9 +12,6 @@
     "guide": "คู่มือ",
     "aiGenerate": "AI Generate",
     "achievements": "ความสำเร็จ",
-    "leaderboard": "Leaderboard",
-    "analytics": "Analytics",
-    "publisher": "Publisher Stats",
     "publisherStats": "สถิติผู้เผยแพร่"
   },
   "actions": {
@@ -32,12 +29,7 @@
     "next": "ถัดไป",
     "close": "ปิด",
     "copy": "คัดลอก",
-    "duplicate": "ทำสำเนา",
     "search": "ค้นหา",
-    "selectAll": "เลือกทั้งหมด",
-    "deselect": "ยกเลิกการเลือก",
-    "show": "แสดง",
-    "hide": "ซ่อน",
     "startStudy": "เริ่มเรียน",
     "logout": "ออกจากระบบ",
     "retry": "ลองอีกครั้ง"
@@ -54,17 +46,10 @@
     "cards": "การ์ด",
     "cardsSuffix": "{{count}} การ์ด",
     "sessions": "เซสชัน",
-    "items": "รายการ",
     "days": "วัน",
     "hours": "ชม.",
     "minutes": "นาที",
-    "seconds": "วินาที",
-    "times": "ครั้ง",
-    "percent": "{{value}}%"
-  },
-  "pagination": {
-    "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} ต่อหน้า"
+    "seconds": "วินาที"
   },
   "timePeriod": {
     "1d": "1 วัน",
@@ -81,30 +66,13 @@
     "processing": "กำลังดำเนินการ...",
     "confirm": "ยืนยัน"
   },
-  "delete": "ลบ",
-  "deselect": "ยกเลิกการเลือก",
-  "duplicate": "ทำสำเนา",
-  "selectAllPage": "เลือกทั้งหมดในหน้านี้",
-  "edit": "แก้ไข",
-  "save": "บันทึก",
-  "saving": "กำลังบันทึก...",
-  "selectAll": "เลือกทั้งหมด",
-  "menu": "เมนู",
-  "copiedToClipboard": "คัดลอกไปยังคลิปบอร์ดแล้ว",
-  "export": "ส่งออก",
-  "officialBadge": {
-    "label": "ทางการ",
-    "tooltip": "บัญชีทางการ"
-  },
   "guideHelp": "Help",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
     "back": "Back",
     "finish": "Finish",
-    "getStarted": "Get Started",
     "stepOf": "Step {{current}} of {{total}}",
-    "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
@@ -113,22 +81,17 @@
     "createDeck": {
       "title": "Create Your First Deck",
       "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "action": "Create This Deck"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
-      "useTemplate": "Use This Template"
+      "action": "ถัดไป"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
       "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "action": "Add These Cards"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
@@ -138,8 +101,7 @@
     "exploreMarket": {
       "title": "Explore the Marketplace",
       "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "action": "Browse Marketplace"
     }
   },
   "achievements": {
@@ -200,61 +162,6 @@
     },
     "more": "more",
     "earned": " earned"
-  },
-  "analytics": {
-    "title": "My Analytics",
-    "retentionCurve": "Retention Curve",
-    "weakTopics": "Weak Topics",
-    "studyTime": "Study Time Distribution",
-    "modeEffectiveness": "Mode Effectiveness",
-    "progress": "Progress Over Time"
-  },
-  "pomodoro": {
-    "focus": "Focus",
-    "break": "Break",
-    "start": "Start",
-    "pause": "Pause",
-    "reset": "Reset"
-  },
-  "leaderboard": {
-    "title": "Leaderboard",
-    "weekly": "Weekly",
-    "monthly": "Monthly",
-    "allTime": "All Time",
-    "rank": "Rank",
-    "name": "Name",
-    "level": "Level",
-    "cardsStudied": "Cards Studied",
-    "sessions": "Sessions",
-    "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
-  },
-  "history": {
-    "tabs": {
-      "history": "History",
-      "analytics": "Analytics"
-    }
-  },
-  "quests": {
-    "title": "Daily Quests",
-    "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
-    "perfect": "Get a perfect score",
-    "completed": "Completed!",
-    "xpReward": "+{{xp}} XP"
-  },
-  "streakFreeze": {
-    "title": "Streak Freeze",
-    "available": "{{count}} available",
-    "used": "Streak protected today!",
-    "earned": "Earned a streak freeze!"
-  },
-  "levelUp": {
-    "title": "Level Up!",
-    "level": "Level {{level}}",
-    "message": "Keep up the great work!",
-    "xpEarned": "+{{xp}} XP"
   },
   "goals": {
     "title": "Next Goals",

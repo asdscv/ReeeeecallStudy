@@ -33,10 +33,7 @@
   },
   "setup": {
     "title": "Configuración de estudio",
-    "deckInfo": "{{icon}} {{name}} · {{count}} tarjetas",
     "studyMode": "Modo de estudio",
-    "selectUploadDate": "Seleccionar fecha de subida",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count}} tarjetas",
     "noDecks": "Aún no tienes barajas. ¡Crea una primero!",
     "alertSelectDeckTitle": "Selecciona una baraja",
     "alertSelectDeckMsg": "Elige una baraja para estudiar",
@@ -51,18 +48,11 @@
     "startStudy": "Empezar a estudiar"
   },
   "cramming": {
-    "gotIt": "¡Lo sé!",
-    "missed": "No lo sé",
-    "round": "Ronda {{round}}",
-    "mastery": "Dominio: {{percentage}}%",
     "filter": {
       "title": "Filtro de tarjetas",
       "all": "Todas las tarjetas",
-      "allDesc": "Estudiar todas las tarjetas no suspendidas del mazo",
       "weak": "Solo tarjetas débiles",
-      "weakDesc": "Tarjetas difíciles (factor de facilidad bajo) o nuevas",
-      "dueSoon": "Pendientes pronto",
-      "dueSoonDesc": "Tarjetas pendientes de repaso en 3 días"
+      "dueSoon": "Pendientes pronto"
     },
     "timeLimit": {
       "title": "Límite de tiempo",
@@ -70,36 +60,15 @@
       "minutes": "{{count}} min"
     },
     "shuffle": {
-      "title": "Mezclar tarjetas",
-      "desc": "Mezclar el orden de tarjetas cada ronda"
+      "title": "Mezclar tarjetas"
     },
     "summary": {
       "completed": "¡Estudio intensivo completado!",
-      "timeUp": "¡Se acabó el tiempo!",
-      "wellDone": "¡Gran esfuerzo! Sigue repasando para fortalecer tu memoria.",
-      "totalRounds": "Total de rondas",
-      "masteryRate": "Tasa de dominio",
-      "cardsStudied": "Tarjetas estudiadas",
-      "hardestCards": "Tarjetas más difíciles",
-      "missedTimes": "fallada {{count}}x",
-      "noSrsImpact": "Esta sesión no afectó tu horario SRS.",
-      "sessionEnded": "Sesión finalizada",
-      "crammingAgain": "Estudiar intensivo de nuevo",
-      "otherMode": "Otros modos"
+      "crammingAgain": "Estudiar intensivo de nuevo"
     }
   },
   "session": {
     "loading": "Cargando...",
-    "noCards": "No hay tarjetas para estudiar",
-    "allReviewed": "¡Todas las tarjetas repasadas!",
-    "backToDeck": "Volver al mazo",
-    "exitConfirmTitle": "¿Terminar la sesión?",
-    "exitConfirmMessage": "Tu progreso se guardará.",
-    "exitConfirmButton": "Terminar",
-    "pause": "Pause",
-    "resume": "Resume",
-    "paused": "Paused",
-    "pressSpaceToResume": "Press Space to resume",
     "undo": "Undo",
     "endSession": "¿Terminar sesión?",
     "endMessage": "Tu progreso hasta ahora se guardará.",
@@ -116,34 +85,19 @@
     "easy": "Fácil"
   },
   "rating": {
-    "dontKnow": "No lo sé",
-    "knowIt": "Lo sé",
     "known": "Conocida",
     "unknown": "Desconocida",
-    "next": "Siguiente →",
     "missed": "Fallé",
     "gotIt": "Lo sé"
   },
   "summary": {
     "title": "¡Estudio completado!",
-    "completed": "¡Estudio completado!",
-    "greatJob": "¡Buen trabajo!",
-    "wellDone": "¡Buen trabajo! Sigue así.",
-    "studyCards": "Tarjetas estudiadas",
     "cardsStudied": "Tarjetas estudiadas",
-    "cardCount": "{{studied}} / {{total}}",
     "timeSpent": "Tiempo invertido",
-    "timeFormat": "{{minutes}}m {{seconds}}s",
     "avgPerCard": "Promedio por tarjeta",
-    "secondsFormat": "{{seconds}}s",
     "ratingDistribution": "Distribución de calificaciones",
     "backToDeck": "Volver al mazo",
     "studyAgain": "Estudiar de nuevo",
-    "sessionEnded": "Sesión finalizada",
-    "progressSoFar": "Aquí está tu progreso hasta ahora.",
-    "knowIt": "Lo sé",
-    "dontKnow": "No lo sé",
-    "next": "Siguiente",
     "crammingTitle": "¡Repaso intensivo completado!",
     "mastery": "Dominio",
     "crammingAgain": "Repasar de nuevo"

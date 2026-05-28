@@ -8,16 +8,11 @@
   },
   "dailyChart": {
     "title": "ปริมาณการเรียนรายวัน",
-    "total": "ทั้งหมด {{count}} ครั้ง",
-    "noData": "ยังไม่มีบันทึกการเรียน",
-    "tooltipTimes": "{{value}} ครั้ง",
-    "tooltipLabel": "เรียน"
+    "noData": "ยังไม่มีบันทึกการเรียน"
   },
   "forecast": {
     "title": "พยากรณ์การทบทวน (7 วัน)",
-    "noData": "ไม่มีการทบทวนที่กำหนดไว้",
-    "tooltipCards": "{{value}} การ์ด",
-    "tooltipLabel": "ครบกำหนดทบทวน"
+    "noData": "ไม่มีการทบทวนที่กำหนดไว้"
   },
   "recentDecks": {
     "title": "สถานะสำรับ",
@@ -29,10 +24,7 @@
     "study": "เรียน"
   },
   "heatmap": {
-    "title": "ฮีทแมปการเรียน",
-    "noStudy": "ไม่มีการเรียน",
-    "studyCount": "{{date}}: {{count}} ครั้ง",
-    "tooltip": "{{date}}: {{count}} ครั้ง"
+    "title": "ฮีทแมปการเรียน"
   },
   "gamification": {
     "freezes": "{{count}} freezes left",

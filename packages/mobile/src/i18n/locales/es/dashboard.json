@@ -8,16 +8,11 @@
   },
   "dailyChart": {
     "title": "Volumen de estudio diario",
-    "total": "Total {{count}} veces",
-    "noData": "Sin registros de estudio aún",
-    "tooltipTimes": "{{value}} veces",
-    "tooltipLabel": "Estudio"
+    "noData": "Sin registros de estudio aún"
   },
   "forecast": {
     "title": "Pronóstico de repaso (7 días)",
-    "noData": "Sin repasos programados",
-    "tooltipCards": "{{value}} tarjetas",
-    "tooltipLabel": "Pendientes de repaso"
+    "noData": "Sin repasos programados"
   },
   "recentDecks": {
     "title": "Estado de mazos",
@@ -29,10 +24,7 @@
     "study": "Estudiar"
   },
   "heatmap": {
-    "title": "Mapa de calor de estudio",
-    "noStudy": "Sin estudio",
-    "studyCount": "{{date}}: {{count}} estudios",
-    "tooltip": "{{date}}: {{count}} estudios"
+    "title": "Mapa de calor de estudio"
   },
   "gamification": {
     "freezes": "{{count}} freezes left",

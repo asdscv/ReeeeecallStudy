@@ -8,16 +8,11 @@
   },
   "dailyChart": {
     "title": "每日学习量",
-    "total": "共 {{count}} 次",
-    "noData": "暂无学习记录",
-    "tooltipTimes": "{{value}} 次",
-    "tooltipLabel": "学习"
+    "noData": "暂无学习记录"
   },
   "forecast": {
     "title": "复习预测（7天）",
-    "noData": "暂无待复习内容",
-    "tooltipCards": "{{value}} 张卡片",
-    "tooltipLabel": "待复习"
+    "noData": "暂无待复习内容"
   },
   "recentDecks": {
     "title": "牌组状态",
@@ -29,10 +24,7 @@
     "study": "学习"
   },
   "heatmap": {
-    "title": "学习热力图",
-    "noStudy": "未学习",
-    "studyCount": "{{date}}：{{count}} 次学习",
-    "tooltip": "{{date}}：{{count}} 次学习"
+    "title": "学习热力图"
   },
   "gamification": {
     "freezes": "{{count}} freezes left",

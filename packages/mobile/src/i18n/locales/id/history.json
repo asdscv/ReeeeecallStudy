@@ -7,12 +7,6 @@
   "emptyDesc": "Start studying to see your progress here",
   "studyVolume": "Study Volume",
   "modeBreakdown": "Mode Breakdown",
-  "deckProgress": {
-    "total": "{{count}} kartu",
-    "notStudied": "Belum Dipelajari {{count}}",
-    "learning": "Sedang Dipelajari {{count}}",
-    "review": "Ulasan {{count}}"
-  },
   "sessionList": "Session List",
   "today": "Today",
   "yesterday": "Yesterday",

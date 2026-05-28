@@ -5,13 +5,11 @@
   "noResultsHint": "尝试其他搜索词或分类",
   "categories": {
     "all": "全部",
-    "general": "综合",
     "language": "语言",
     "science": "科学",
     "math": "数学",
     "history": "历史",
     "programming": "编程",
-    "trivia": "知识问答",
     "exam": "考试备考",
     "other": "其他"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← 市场",
-    "cardCount": "{{count}} 张卡片",
-    "userCount": "{{count}} 位用户",
     "getDeck": "获取此牌组",
-    "importing": "导入中...",
-    "cardPreview": "卡片预览（最多 10 张）",
-    "noCards": "暂无卡片。",
     "reportContent": "Report",
     "publishedBy": "作者",
     "alreadyAcquired": "已添加到收藏",

@@ -5,13 +5,11 @@
   "noResultsHint": "ลองค้นหาหรือเลือกหมวดอื่น",
   "categories": {
     "all": "ทั้งหมด",
-    "general": "ทั่วไป",
     "language": "ภาษา",
     "science": "วิทยาศาสตร์",
     "math": "คณิตศาสตร์",
     "history": "ประวัติศาสตร์",
     "programming": "การเขียนโปรแกรม",
-    "trivia": "ความรู้ทั่วไป",
     "exam": "เตรียมสอบ",
     "other": "อื่นๆ"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← ตลาด",
-    "cardCount": "{{count}} การ์ด",
-    "userCount": "{{count}} ผู้ใช้",
     "getDeck": "รับสำรับนี้",
-    "importing": "กำลังนำเข้า...",
-    "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
-    "noCards": "ไม่มีการ์ด",
     "reportContent": "Report",
     "publishedBy": "โดย",
     "alreadyAcquired": "อยู่ในคอลเลกชันของคุณแล้ว",

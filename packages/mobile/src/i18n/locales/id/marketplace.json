@@ -5,13 +5,11 @@
   "noResultsHint": "Coba pencarian atau kategori lain",
   "categories": {
     "all": "Semua",
-    "general": "Umum",
     "language": "Bahasa",
     "science": "Sains",
     "math": "Matematika",
     "history": "Sejarah",
     "programming": "Pemrograman",
-    "trivia": "Trivia",
     "exam": "Persiapan Ujian",
     "other": "Lainnya"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← Marketplace",
-    "cardCount": "{{count}} kartu",
-    "userCount": "{{count}} pengguna",
     "getDeck": "Dapatkan Dek Ini",
-    "importing": "Mengimpor...",
-    "cardPreview": "Pratinjau Kartu (maks 10)",
-    "noCards": "Tidak ada kartu.",
     "reportContent": "Report",
     "publishedBy": "oleh",
     "alreadyAcquired": "Sudah di koleksi Anda",
