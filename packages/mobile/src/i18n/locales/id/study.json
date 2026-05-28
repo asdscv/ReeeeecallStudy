@@ -37,7 +37,13 @@
     "studyMode": "Mode Belajar",
     "selectUploadDate": "Pilih Tanggal Unggahan",
     "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu",
-    "noDecks": "Belum ada dek. Buat dek dulu!"
+    "noDecks": "Belum ada dek. Buat dek dulu!",
+    "alertSelectDeckTitle": "Pilih Dek",
+    "alertSelectDeckMsg": "Silakan pilih dek untuk dipelajari",
+    "alertNoCardsTitle": "Tidak Ada Kartu",
+    "alertNoCardsMsg": "Tidak ada kartu untuk tanggal yang dipilih",
+    "alertErrorTitle": "Kesalahan",
+    "shuffle": "Acak"
   },
   "cramming": {
     "gotIt": "Mengerti!",

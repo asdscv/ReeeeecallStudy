@@ -37,7 +37,13 @@
     "studyMode": "Modo de estudio",
     "selectUploadDate": "Seleccionar fecha de subida",
     "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count}} tarjetas",
-    "noDecks": "Aún no tienes barajas. ¡Crea una primero!"
+    "noDecks": "Aún no tienes barajas. ¡Crea una primero!",
+    "alertSelectDeckTitle": "Selecciona una baraja",
+    "alertSelectDeckMsg": "Elige una baraja para estudiar",
+    "alertNoCardsTitle": "Sin tarjetas",
+    "alertNoCardsMsg": "No hay tarjetas para la fecha seleccionada",
+    "alertErrorTitle": "Error",
+    "shuffle": "Mezclar"
   },
   "cramming": {
     "gotIt": "¡Lo sé!",
