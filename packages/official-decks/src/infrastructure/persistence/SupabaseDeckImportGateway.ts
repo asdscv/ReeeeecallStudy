@@ -66,6 +66,33 @@ export class SupabaseDeckImportGateway implements DeckImportGateway {
     };
   }
 
+  async updateMetadata(
+    deckId: string,
+    name: string,
+    description: string,
+  ): Promise<boolean> {
+    const { data, error } = await this.client
+      .from("decks")
+      .update({ name, description })
+      .eq("id", deckId)
+      .select("id");
+    if (error) {
+      throw new Error(`update decks failed for ${deckId}: ${error.message}`);
+    }
+    // Mirror to the marketplace listing (title = deck name). A missing listing
+    // is a no-op (some official decks may not be listed).
+    const { error: listingError } = await this.client
+      .from("marketplace_listings")
+      .update({ title: name, description })
+      .eq("deck_id", deckId);
+    if (listingError) {
+      throw new Error(
+        `update marketplace_listings failed for ${deckId}: ${listingError.message}`,
+      );
+    }
+    return Array.isArray(data) && data.length > 0;
+  }
+
   async markFailed(plan: ImportPlan, error: Error): Promise<void> {
     const { deck } = plan;
     const { error: rpcError } = await this.client.rpc(
