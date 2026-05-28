@@ -55,7 +55,8 @@
   "card": {
     "edit": "편집",
     "delete": "삭제",
-    "startStudy": "학습"
+    "startStudy": "학습",
+    "noStudyRecord": "학습 기록 없음"
   },
   "stats": {
     "totalCards": "전체 카드",
@@ -74,5 +75,13 @@
     "noChanges": "이미 최신 상태입니다",
     "syncFailed": "동기화 실패",
     "subscribed": "구독 중"
+  },
+  "template": {
+    "title": "템플릿",
+    "subtitle": "덱에 사용할 카드 템플릿을 관리하세요",
+    "newBtn": "+ 새 템플릿",
+    "empty": "아직 템플릿이 없습니다",
+    "emptyDesc": "카드 구조를 정의할 템플릿을 만들어 보세요",
+    "summary": "앞면 {{front}}개 · 뒷면 {{back}}개 · 생성일 {{date}}"
   }
 }

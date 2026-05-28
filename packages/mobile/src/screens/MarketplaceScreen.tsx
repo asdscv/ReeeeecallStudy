@@ -102,7 +102,7 @@ export function MarketplaceScreen() {
 
   const paginatedData = filtered.slice(0, page * PAGE_SIZE)
   const hasMore = paginatedData.length < filtered.length
-  const activeFilterCount = (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0) + (studyLevel ? 1 : 0)
+  const activeFilterCount = (category ? 1 : 0) + (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0) + (studyLevel ? 1 : 0) + (nativeLanguages.length > 0 ? 1 : 0)
 
   const loadMore = () => {
     if (hasMore && !loading) setPage((p) => p + 1)
@@ -129,19 +129,9 @@ export function MarketplaceScreen() {
           <View style={styles.header}>
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="marketplace-search" />
 
-            {/* Category & Sort dropdowns */}
+            {/* Sort dropdown + Filter panel toggle. Category / Verified /
+                Native language and the rest live inside the Filter panel. */}
             <View style={styles.dropdownRow}>
-              <TouchableOpacity
-                onPress={() => setCategoryModalOpen(true)}
-                style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
-                testID="marketplace-category-dropdown"
-              >
-                <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
-                  {(() => { const c = CATEGORIES.find((c) => c.value === category); return c ? t(c.labelKey) : t('categories.all') })()}
-                </Text>
-                <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
-              </TouchableOpacity>
-
               <TouchableOpacity
                 onPress={() => setSortModalOpen(true)}
                 style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
@@ -152,34 +142,15 @@ export function MarketplaceScreen() {
                 </Text>
                 <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
               </TouchableOpacity>
-            </View>
-
-            {/* Verified only + Advanced toggle row */}
-            <View style={styles.filterButtonRow}>
-              <TouchableOpacity
-                onPress={() => setVerifiedOnly(!verifiedOnly)}
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: verifiedOnly ? theme.colors.primaryLight : theme.colors.surface,
-                    borderColor: verifiedOnly ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-              >
-                <Text style={[
-                  theme.typography.labelSmall,
-                  { color: verifiedOnly ? theme.colors.primary : theme.colors.text },
-                ]}>
-                  {'\u2713'} {t('verifiedOnly')}
-                </Text>
-              </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => setShowAdvanced(!showAdvanced)}
+                testID="marketplace-filter-toggle"
                 style={[
-                  styles.filterChip,
+                  styles.dropdownSelector,
+                  styles.filterToggle,
                   {
-                    backgroundColor: showAdvanced ? theme.colors.primaryLight : theme.colors.surface,
+                    backgroundColor: showAdvanced ? theme.colors.primaryLight : theme.colors.surfaceElevated,
                     borderColor: showAdvanced ? theme.colors.primary : theme.colors.border,
                   },
                 ]}
@@ -188,50 +159,88 @@ export function MarketplaceScreen() {
                   theme.typography.labelSmall,
                   { color: showAdvanced ? theme.colors.primary : theme.colors.text },
                 ]}>
-                  {t('advancedFilters')}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                  {t('filters')}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </Text>
               </TouchableOpacity>
             </View>
 
-            {/* Native language — multi-select, always visible. Lets e.g. a
-                Korean learner narrow to decks explained in their language. */}
-            <View>
-              <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-                {t('nativeLanguage.label')}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                {NATIVE_LANGUAGES.map((lang) => {
-                  const isActive = nativeLanguages.includes(lang.value)
-                  return (
-                    <TouchableOpacity
-                      key={lang.value}
-                      testID={`marketplace-native-${lang.value}`}
-                      onPress={() => toggleNativeLanguage(lang.value)}
-                      style={[
-                        styles.filterChip,
-                        {
-                          backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
-                          borderColor: isActive ? theme.colors.primary : theme.colors.border,
-                        },
-                      ]}
-                    >
-                      <Text style={[
-                        theme.typography.labelSmall,
-                        { color: isActive ? theme.colors.primaryText : theme.colors.text },
-                      ]}>
-                        {t(lang.labelKey)}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
-              </ScrollView>
-            </View>
-
-            {/* Advanced filters panel */}
+            {/* Filter panel */}
             {showAdvanced && (
               <View style={[styles.advancedPanel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-                {/* Date range */}
+                {/* Category */}
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
+                  {t('categoryLabel')}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setCategoryModalOpen(true)}
+                  style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                  testID="marketplace-category-dropdown"
+                >
+                  <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
+                    {(() => { const c = CATEGORIES.find((c) => c.value === category); return c ? t(c.labelKey) : t('categories.all') })()}
+                  </Text>
+                  <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'▾'}</Text>
+                </TouchableOpacity>
+
+                {/* Verified (certified) only */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('verifiedOnly')}
+                </Text>
+                <View style={styles.chipRow}>
+                  <TouchableOpacity
+                    onPress={() => setVerifiedOnly(!verifiedOnly)}
+                    testID="marketplace-verified-toggle"
+                    style={[
+                      styles.filterChip,
+                      {
+                        backgroundColor: verifiedOnly ? theme.colors.primary : theme.colors.surface,
+                        borderColor: verifiedOnly ? theme.colors.primary : theme.colors.border,
+                      },
+                    ]}
+                  >
+                    <Text style={[
+                      theme.typography.labelSmall,
+                      { color: verifiedOnly ? theme.colors.primaryText : theme.colors.text },
+                    ]}>
+                      {'✓'} {t('verifiedOnly')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Native language — multi-select. Lets e.g. a Korean learner
+                    narrow to decks explained in their language. */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('nativeLanguage.label')}
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                  {NATIVE_LANGUAGES.map((lang) => {
+                    const isActive = nativeLanguages.includes(lang.value)
+                    return (
+                      <TouchableOpacity
+                        key={lang.value}
+                        testID={`marketplace-native-${lang.value}`}
+                        onPress={() => toggleNativeLanguage(lang.value)}
+                        style={[
+                          styles.filterChip,
+                          {
+                            backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
+                            borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                          },
+                        ]}
+                      >
+                        <Text style={[
+                          theme.typography.labelSmall,
+                          { color: isActive ? theme.colors.primaryText : theme.colors.text },
+                        ]}>
+                          {t(lang.labelKey)}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+
+                {/* Date range */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
                   {t('dateRange.label')}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
@@ -471,7 +480,7 @@ export function MarketplaceScreen() {
               {/* Bottom stats: "X cards · 👁 Y · Z users" */}
               <View style={styles.statsRow}>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {item.card_count ?? 0} cards{' · '}{'\uD83D\uDC41'} {(item as any).view_count ?? 0}{' · '}{item.acquire_count ?? 0} users
+                  {t('listing.cardCount', { count: item.card_count ?? 0 })}{' · '}{'\uD83D\uDC41'} {(item as any).view_count ?? 0}{' · '}{t('listing.userCount', { count: item.acquire_count ?? 0 })}
                 </Text>
                 {(item as any).review_count > 0 && (
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
@@ -602,7 +611,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 14,
   },
   modalItemText: { flex: 1, fontSize: 15, fontWeight: '500' },
-  filterButtonRow: { flexDirection: 'row', gap: 8 },
+  filterToggle: { flex: 0, minWidth: 96, justifyContent: 'center' },
   filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
   chipRow: { gap: 8 },
   advancedPanel: { padding: 12, borderRadius: 12, borderWidth: 1 },

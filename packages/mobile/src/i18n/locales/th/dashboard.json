@@ -62,5 +62,10 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days"
+  "streakDays": "{{count}}days",
+  "quickStudy": {
+    "title": "เรียนแบบเร็ว",
+    "dueToday": "มีการ์ดต้องทบทวนวันนี้ {{count}} ใบ",
+    "startSession": "เริ่มเซสชันการเรียน"
+  }
 }

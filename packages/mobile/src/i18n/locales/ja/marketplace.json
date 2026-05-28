@@ -143,5 +143,7 @@
     "copy": "コピー",
     "subscribe": "購読",
     "snapshot": "スナップショット"
-  }
+  },
+  "filters": "フィルター",
+  "categoryLabel": "カテゴリー"
 }

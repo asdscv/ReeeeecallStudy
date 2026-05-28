@@ -15,9 +15,10 @@ describe("DeckMetadataBuilder", () => {
       LanguagePair.of(en, ko),
     );
     expect(meta.category).toBe("beginner");
-    expect(meta.name).toContain("Beginner");
-    expect(meta.name).toContain("Batch 3");
-    expect(meta.name).toContain("EN → KO");
+    // Mother-tongue (Korean) title with a localized direction suffix — no English.
+    expect(meta.name).toContain("초급");
+    expect(meta.name).toContain("3탄");
+    expect(meta.name).toContain("(영어 → 한국어)");
     expect(meta.tags).toContain("lang:en-ko");
     expect(meta.tags).toContain("category:beginner");
     expect(meta.tags).toContain("level:batch-3");
@@ -55,7 +56,8 @@ describe("DeckMetadataBuilder", () => {
     expect(meta.templateKind).toBe("phrase");
     expect(meta.tags).toContain("level:시사");
     expect(meta.name).toContain("시사");
-    expect(meta.name).toContain("KO → EN");
+    // Korean audience, reverse direction rendered in Korean.
+    expect(meta.name).toContain("(한국어 → 영어)");
     // Conversation deck: learning language is the target (the English
     // expression being learned), even though source is ko.
     expect(meta.learningLanguage).toBe("en");

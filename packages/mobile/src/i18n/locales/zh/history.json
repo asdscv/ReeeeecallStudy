@@ -18,5 +18,10 @@
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "记录",
+    "analytics": "分析"
+  },
+  "sessionsPerDay": "每日学习次数"
 }

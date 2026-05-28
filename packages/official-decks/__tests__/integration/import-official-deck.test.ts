@@ -192,7 +192,9 @@ describe.skipIf(process.env.SKIP_INTEGRATION === "1")("import_official_deck RPC"
       expect(data!.share_mode).toBe("subscribe");
       expect(data!.is_active).toBe(true);
       expect(data!.card_count).toBe(1);
-      expect(data!.title).toContain("EN → TH");
+      // Title is the deck name (mother-tongue Thai with a localized direction).
+      expect(data!.title).toBe(plan.deck.name);
+      expect(data!.title).toContain("(อังกฤษ → ไทย)");
     },
   );
 

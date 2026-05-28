@@ -149,5 +149,7 @@
     "copy": "복사",
     "subscribe": "구독",
     "snapshot": "스냅샷"
-  }
+  },
+  "filters": "필터",
+  "categoryLabel": "카테고리"
 }

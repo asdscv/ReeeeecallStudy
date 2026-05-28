@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
@@ -33,6 +34,7 @@ function formatValue(category: string, value: number): string {
 export function AchievementsScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
+  const { t } = useTranslation('common')
 
   // All data from shared Zustand store — no duplicate fetches
   const { achievements, levelInfo, goals: nextGoals, loading } = useGamification()
@@ -63,7 +65,7 @@ export function AchievementsScreen() {
 
   return (
     <Screen safeArea padding={false} testID="achievements-screen">
-      <ScreenHeader title="Achievements" mode="drawer" />
+      <ScreenHeader title={t('nav.achievements')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* Level + XP bar — matches web */}
@@ -73,14 +75,14 @@ export function AchievementsScreen() {
               <Text style={[styles.levelNum, { color: palette.yellow[600] }]}>{level}</Text>
             </View>
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Level {level}</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('achievements.level')} {level}</Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
                 {currentLevelXp} / {nextLevelXp} XP
               </Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
               <Text style={[{ fontSize: 22, fontWeight: '700', color: theme.colors.text }]}>{xp.toLocaleString()}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>Total XP</Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('achievements.totalXp')}</Text>
             </View>
           </View>
           <View style={[styles.progressBg, { backgroundColor: theme.colors.surface }]}>
@@ -91,14 +93,14 @@ export function AchievementsScreen() {
         {/* Next Goals — matches web */}
         {nextGoals.length > 0 && (
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Next Goals</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('goals.title')}</Text>
             {nextGoals.map((goal) => (
               <View key={goal.category} style={[styles.goalCard, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
                 <Text style={{ fontSize: 20 }}>{goal.icon || CATEGORY_EMOJI[goal.category] || '\uD83C\uDFAF'}</Text>
                 <View style={{ flex: 1, gap: 4 }}>
                   <View style={styles.goalTopRow}>
                     <Text style={[theme.typography.caption, { color: theme.colors.text, fontWeight: '500' }]}>
-                      {goal.category.charAt(0).toUpperCase() + goal.category.slice(1)}
+                      {t(`goals.${goal.category}`, { defaultValue: goal.category })}
                     </Text>
                     <Text style={[{ fontSize: 11, fontWeight: '600', color: palette.blue[600] }]}>+{goal.xp} XP</Text>
                   </View>
@@ -117,13 +119,13 @@ export function AchievementsScreen() {
         {/* Recent Earned — horizontal scroll */}
         {recentEarned.length > 0 && (
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Recent</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('achievements.recent')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentRow}>
               {recentEarned.map((ach) => (
                 <View key={ach.id} style={[styles.recentCard, { backgroundColor: 'rgba(234,179,8,0.1)', borderColor: 'rgba(234,179,8,0.3)' }]}>
                   <Text style={{ fontSize: 28 }}>{ach.icon || '\uD83C\uDFC5'}</Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.text, fontWeight: '500', textAlign: 'center' }]} numberOfLines={1}>
-                    {ach.id.replace(/_/g, ' ')}
+                    {t(`achievements.badge.${ach.id}`, { defaultValue: ach.id.replace(/_/g, ' ') })}
                   </Text>
                   <Text style={[{ fontSize: 10, color: theme.colors.textTertiary }]}>
                     {ach.earned_at ? new Date(ach.earned_at).toLocaleDateString() : ''}
@@ -137,7 +139,7 @@ export function AchievementsScreen() {
         {/* All Achievements — collapsible by category */}
         <View style={styles.allSection}>
           <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-            All Achievements <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{earned.length} earned</Text>
+            {t('achievements.viewAll')} <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{earned.length}{t('achievements.earned')}</Text>
           </Text>
 
           {CATEGORY_ORDER.map((cat) => {
@@ -159,10 +161,10 @@ export function AchievementsScreen() {
                   <View style={styles.categoryLeft}>
                     <Text style={{ fontSize: 16 }}>{CATEGORY_EMOJI[cat]}</Text>
                     <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      {t(`achievements.category.${cat}`, { defaultValue: cat })}
                     </Text>
                     <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                      {earnedInCat.length} earned
+                      {earnedInCat.length}{t('achievements.earned')}
                     </Text>
                   </View>
                   <Text style={{ color: theme.colors.textTertiary }}>{isExpanded ? '\u25B4' : '\u25BE'}</Text>
@@ -175,7 +177,7 @@ export function AchievementsScreen() {
                       <View key={ach.id} style={[styles.badgeCard, { borderColor: 'rgba(234,179,8,0.5)', backgroundColor: theme.colors.surfaceElevated }]}>
                         <Text style={{ fontSize: 24 }}>{ach.icon || '\uD83C\uDFC5'}</Text>
                         <Text style={[theme.typography.caption, { color: theme.colors.text, fontWeight: '500', textAlign: 'center' }]} numberOfLines={1}>
-                          {ach.id.replace(/_/g, ' ')}
+                          {t(`achievements.badge.${ach.id}`, { defaultValue: ach.id.replace(/_/g, ' ') })}
                         </Text>
                         <Text style={[{ fontSize: 10, color: palette.yellow[600] }]}>+{ach.xp_reward} XP</Text>
                       </View>
@@ -186,7 +188,7 @@ export function AchievementsScreen() {
                       <View style={[styles.badgeCard, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface, opacity: 0.7 }]}>
                         <Text style={{ fontSize: 24 }}>{nextLocked.icon || '\uD83D\uDD12'}</Text>
                         <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]} numberOfLines={1}>
-                          {nextLocked.id.replace(/_/g, ' ')}
+                          {t(`achievements.badge.${nextLocked.id}`, { defaultValue: nextLocked.id.replace(/_/g, ' ') })}
                         </Text>
                         <Text style={[{ fontSize: 10, color: theme.colors.textTertiary }]}>{'\uD83D\uDD12'} +{nextLocked.xp_reward} XP</Text>
                       </View>
@@ -210,7 +212,7 @@ export function AchievementsScreen() {
           <View style={styles.emptyState}>
             <Text style={{ fontSize: 48 }}>{'\uD83C\uDFC6'}</Text>
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-              Start studying to earn achievements!
+              {t('achievements.empty')}
             </Text>
           </View>
         )}

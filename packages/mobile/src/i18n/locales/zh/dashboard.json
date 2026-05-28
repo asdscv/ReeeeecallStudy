@@ -62,5 +62,10 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days"
+  "streakDays": "{{count}}days",
+  "quickStudy": {
+    "title": "快速学习",
+    "dueToday": "今天有 {{count}} 张待复习",
+    "startSession": "开始一次学习吧"
+  }
 }

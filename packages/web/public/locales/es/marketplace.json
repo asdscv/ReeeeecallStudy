@@ -108,5 +108,21 @@
     "intermediate": "Intermedio",
     "upper_intermediate": "Intermedio alto",
     "advanced": "Avanzado"
-  }
+  },
+  "filters": "Filtrar",
+  "categoryLabel": "Categoría",
+  "verifiedOnly": "Verificado",
+  "resetFilters": "Restablecer",
+  "sortTrending": "Tendencia",
+  "sortTopRated": "Mejor valorados",
+  "minCardCount": "Tarjetas mínimas",
+  "minRating": "Valoración mínima",
+  "dateRange": "Publicado en",
+  "dateRangeAll": "Todo el tiempo",
+  "dateRange_7d": "Últimos 7 d",
+  "dateRange_30d": "Últimos 30 d",
+  "dateRange_90d": "Últimos 90 d",
+  "shareModeFilter": "Modo de uso compartido",
+  "allModes": "Todos",
+  "popularTags": "Etiquetas populares"
 }

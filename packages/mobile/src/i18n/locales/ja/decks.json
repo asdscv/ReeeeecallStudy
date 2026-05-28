@@ -114,5 +114,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "template": {
+    "title": "テンプレート",
+    "subtitle": "デッキで使うカードテンプレートを管理します",
+    "newBtn": "+ 新規",
+    "empty": "まだテンプレートがありません",
+    "emptyDesc": "カード構成を定義するテンプレートを作成しましょう",
+    "summary": "表 {{front}}項目 ・ 裏 {{back}}項目 ・ 作成 {{date}}"
   }
 }

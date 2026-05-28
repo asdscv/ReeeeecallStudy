@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, Alert, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
@@ -12,6 +13,7 @@ type Nav = NativeStackNavigationProp<SettingsStackParamList, 'TemplatesList'>
 
 export function TemplatesListScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
   const navigation = useNavigation<Nav>()
   const { templates, loading, error, fetchTemplates, deleteTemplate, duplicateTemplate } = useTemplateStore()
 
@@ -100,7 +102,7 @@ export function TemplatesListScreen() {
 
         {/* Meta — matches web: "Front: X fields  Back: Y fields  Created: date" */}
         <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-          Front: {item.front_layout.length} fields{'   '}Back: {item.back_layout.length} fields{'   '}Created: {new Date(item.created_at).toLocaleDateString()}
+          {t('template.summary', { front: item.front_layout.length, back: item.back_layout.length, date: new Date(item.created_at).toLocaleDateString() })}
         </Text>
 
         {/* Action icons — matches web: edit, duplicate, stats, delete */}
@@ -153,14 +155,14 @@ export function TemplatesListScreen() {
           <View style={styles.header}>
             <View style={styles.titleRow}>
               <View style={{ flex: 1 }}>
-                <Text style={[theme.typography.h2, { color: theme.colors.text }]}>Templates</Text>
+                <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('template.title')}</Text>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  Manage card templates for your decks
+                  {t('template.subtitle')}
                 </Text>
               </View>
               <Button
                 testID="templates-create-new"
-                title="+ New"
+                title={t('template.newBtn')}
                 variant="primary"
                 size="sm"
                 fullWidth={false}
@@ -179,9 +181,9 @@ export function TemplatesListScreen() {
           !loading ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <Text style={styles.emptyEmoji}>📋</Text>
-              <Text style={[theme.typography.h3, { color: theme.colors.text }]}>No templates yet</Text>
+              <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('template.empty')}</Text>
               <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                Create a template to define your card structure
+                {t('template.emptyDesc')}
               </Text>
               <Button
                 testID="templates-create-first"

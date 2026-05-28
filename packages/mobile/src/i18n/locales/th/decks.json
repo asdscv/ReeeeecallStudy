@@ -66,7 +66,7 @@
     "saved": "บันทึกสำรับแล้ว"
   },
   "card": {
-    "noStudyRecord": "ไม่มีบันทึกการเรียน",
+    "noStudyRecord": "ยังไม่มีบันทึกการเรียน",
     "totalCards": "{{count}} การ์ด",
     "newCards": "ใหม่ {{count}}",
     "review": "ทบทวน {{count}}",
@@ -114,5 +114,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "template": {
+    "title": "เทมเพลต",
+    "subtitle": "จัดการเทมเพลตการ์ดสำหรับเด็คของคุณ",
+    "newBtn": "+ ใหม่",
+    "empty": "ยังไม่มีเทมเพลต",
+    "emptyDesc": "สร้างเทมเพลตเพื่อกำหนดโครงสร้างการ์ด",
+    "summary": "ด้านหน้า {{front}} ฟิลด์ · ด้านหลัง {{back}} ฟิลด์ · สร้างเมื่อ {{date}}"
   }
 }

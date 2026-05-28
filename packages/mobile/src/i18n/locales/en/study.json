@@ -41,7 +41,8 @@
     "startStudy": "Start Study",
     "startFailed": "Failed to start study session",
     "dateSelection": "Date Selection",
-    "dateSelectionDesc": "Select a date to study cards added on that day. Date picker will show after starting."
+    "dateSelectionDesc": "Select a date to study cards added on that day. Date picker will show after starting.",
+    "noDecks": "No decks yet. Create a deck first!"
   },
   "cramming": {
     "options": "Cramming Options",

@@ -66,7 +66,7 @@
     "saved": "Dek disimpan."
   },
   "card": {
-    "noStudyRecord": "Tidak ada catatan belajar",
+    "noStudyRecord": "Belum ada riwayat belajar",
     "totalCards": "{{count}} kartu",
     "newCards": "Baru {{count}}",
     "review": "Ulasan {{count}}",
@@ -114,5 +114,13 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "template": {
+    "title": "Templat",
+    "subtitle": "Kelola templat kartu untuk dek Anda",
+    "newBtn": "+ Baru",
+    "empty": "Belum ada templat",
+    "emptyDesc": "Buat templat untuk menentukan struktur kartu Anda",
+    "summary": "Depan: {{front}} bidang · Belakang: {{back}} bidang · Dibuat: {{date}}"
   }
 }
