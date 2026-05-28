@@ -62,7 +62,9 @@
     "edgeTtsNote": "* Hiện chỉ hỗ trợ tiếng Anh",
     "speed": "Tốc độ đọc",
     "help": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
-    "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động."
+    "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
+    "voiceEngine": "Bộ máy giọng nói",
+    "readingSpeed": "Tốc độ đọc"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +116,11 @@
   },
   "account": {
     "title": "Tài khoản",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "logoutConfirm": "Bạn có chắc muốn đăng xuất?",
+    "deleteAccount": "Xóa tài khoản",
+    "deleteConfirm": "Thao tác này sẽ xóa vĩnh viễn tài khoản và mọi dữ liệu liên quan. Không thể hoàn tác.",
+    "deleteFailed": "Xóa tài khoản thất bại. Vui lòng liên hệ hỗ trợ."
   },
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
@@ -166,5 +172,9 @@
   },
   "actions": {
     "cancel": "Hủy"
+  },
+  "haptics": {
+    "enable": "Phản hồi rung",
+    "hint": "Rung phản hồi khi chạm, đánh giá và thao tác."
   }
 }

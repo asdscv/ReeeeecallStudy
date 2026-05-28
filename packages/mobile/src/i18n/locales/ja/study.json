@@ -43,7 +43,12 @@
     "alertNoCardsTitle": "カードなし",
     "alertNoCardsMsg": "選択した日付のカードがありません",
     "alertErrorTitle": "エラー",
-    "shuffle": "シャッフル"
+    "shuffle": "シャッフル",
+    "startFailed": "学習セッションを開始できませんでした",
+    "cardsPerSession": "1セッションあたりのカード数",
+    "batchHint": "5〜500枚の範囲",
+    "dateSelection": "日付選択",
+    "startStudy": "学習を開始"
   },
   "cramming": {
     "gotIt": "わかった！",
@@ -95,7 +100,14 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "セッションを終了しますか？",
+    "endMessage": "これまでの進捗は保存されます。",
+    "continue": "続ける",
+    "end": "終了",
+    "exit": "終了",
+    "tapToFlip": "タップして裏返す",
+    "swipeHint": "カードをタップで裏返し・スワイプで評価"
   },
   "srsRating": {
     "again": "もう一度",
@@ -108,7 +120,9 @@
     "knowIt": "わかる",
     "known": "既知",
     "unknown": "未知",
-    "next": "次へ →"
+    "next": "次へ →",
+    "missed": "できなかった",
+    "gotIt": "できた"
   },
   "summary": {
     "title": "学習完了！",
@@ -129,7 +143,10 @@
     "progressSoFar": "ここまでの学習状況です。",
     "knowIt": "わかる",
     "dontKnow": "わからない",
-    "next": "次へ"
+    "next": "次へ",
+    "crammingTitle": "一気学習が完了しました！",
+    "mastery": "習得度",
+    "crammingAgain": "もう一度一気学習"
   },
   "ratingLabels": {
     "again": "Again",

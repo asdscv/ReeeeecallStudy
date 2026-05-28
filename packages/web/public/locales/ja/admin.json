@@ -77,7 +77,11 @@
     },
     "setStatus": "Set Status",
     "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "confirmSuspend": "Are you sure you want to suspend this user?",
+    "changeRoleTitle": "役割を変更",
+    "confirmRoleChange": "このユーザーの役割を変更しますか？",
+    "banTitle": "ユーザーをBAN",
+    "suspendTitle": "ユーザーを停止"
   },
   "study": {
     "title": "学習アクティビティ",
@@ -267,7 +271,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "公式ステータスを取り消す"
   },
   "audit": {
     "title": "Audit Log",
@@ -301,7 +306,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
+    },
+    "description": "システム全体の管理操作をすべて記録します",
+    "exportCSV": "CSV エクスポート",
+    "actionAll": "すべての操作",
+    "filterTarget": "対象タイプ",
+    "targetAll": "すべての対象",
+    "dateFrom": "開始",
+    "dateTo": "終了",
+    "searching": "検索中...",
+    "emptyTitle": "監査ログが見つかりません",
+    "emptyDescription": "現在のフィルターに一致するログはありません。検索条件を調整してください。",
+    "refreshing": "更新中...",
+    "colTime": "時刻",
+    "colAdmin": "管理者",
+    "colAction": "操作",
+    "colTarget": "対象",
+    "colDetails": "詳細",
+    "colIP": "IP",
+    "pageInfo": "{{page}} ページ",
+    "showing": "{{count}} 件表示",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "unknownAdmin": "不明",
+    "fullDetails": "詳細を表示"
   },
   "common": {
     "refresh": "Refresh",

@@ -62,7 +62,9 @@
     "edgeTtsNote": "* 目前仅支持英语",
     "speed": "朗读速度",
     "help": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
-    "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。"
+    "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
+    "voiceEngine": "语音引擎",
+    "readingSpeed": "朗读速度"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +116,11 @@
   },
   "account": {
     "title": "账号",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "logoutConfirm": "确定要退出登录吗？",
+    "deleteAccount": "删除账户",
+    "deleteConfirm": "这将永久删除您的账户和所有相关数据。此操作无法撤销。",
+    "deleteFailed": "删除账户失败，请联系客服。"
   },
   "links": {
     "userGuide": "用户指南",
@@ -166,5 +172,9 @@
   },
   "actions": {
     "cancel": "取消"
+  },
+  "haptics": {
+    "enable": "触觉反馈",
+    "hint": "点按、评分和操作时的振动反馈。"
   }
 }

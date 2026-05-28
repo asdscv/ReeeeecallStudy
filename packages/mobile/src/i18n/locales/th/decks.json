@@ -52,7 +52,8 @@
     "saveVersion": "บันทึกเวอร์ชัน",
     "noVersions": "ยังไม่มีเวอร์ชันที่บันทึกไว้",
     "versionLabel": "เวอร์ชัน {{num}}",
-    "versionCards": "การ์ด"
+    "versionCards": "การ์ด",
+    "deckNotFound": "ไม่พบเด็ค"
   },
   "edit": {
     "title": "แก้ไขสำรับ",

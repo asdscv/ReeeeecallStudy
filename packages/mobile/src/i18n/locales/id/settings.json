@@ -62,7 +62,9 @@
     "edgeTtsNote": "* Saat ini hanya mendukung bahasa Inggris",
     "speed": "Kecepatan baca",
     "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
-    "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
+    "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
+    "voiceEngine": "Mesin Suara",
+    "readingSpeed": "Kecepatan Baca"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +116,11 @@
   },
   "account": {
     "title": "Akun",
-    "logout": "Keluar"
+    "logout": "Keluar",
+    "logoutConfirm": "Yakin ingin keluar?",
+    "deleteAccount": "Hapus Akun",
+    "deleteConfirm": "Ini akan menghapus permanen akun Anda dan semua data terkait. Tindakan ini tidak dapat dibatalkan.",
+    "deleteFailed": "Gagal menghapus akun. Silakan hubungi dukungan."
   },
   "links": {
     "userGuide": "Panduan Pengguna",
@@ -166,5 +172,9 @@
   },
   "actions": {
     "cancel": "Batal"
+  },
+  "haptics": {
+    "enable": "Umpan balik haptik",
+    "hint": "Getaran umpan balik saat mengetuk, menilai, dan beraksi."
   }
 }

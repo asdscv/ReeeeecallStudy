@@ -36,40 +36,51 @@
     "healthScore": "Health Score"
   },
   "users": {
-    "title": "Users",
-    "userGrowth": "User Growth",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "setStatus": "Set Status",
+    "confirmBan": "Are you sure you want to ban this user?",
+    "confirmSuspend": "Are you sure you want to suspend this user?",
     "dailySignups": "Daily Signups",
-    "activeVsInactive": "Active vs Inactive (30d)",
+    "userGrowth": "User Growth",
+    "activeVsInactive": "Active vs Inactive",
     "active": "Active",
     "inactive": "Inactive",
+    "retention": "Retention",
+    "prevMonthActive": "Active Last Month",
+    "retained": "Retained",
+    "retentionRate": "Retention Rate",
+    "churned": "Churned",
+    "churnRate": "Churn Rate",
+    "newUsersThisMonth": "New Users This Month",
     "userList": "User List",
-    "displayName": "Display Name",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "noName": "(no name)",
+    "searchPlaceholder": "Search by name or email...",
+    "allRoles": "All Roles",
     "roles": {
       "admin": "Admin",
       "user": "User"
     },
-    "prevPage": "Previous page",
-    "nextPage": "Next page",
-    "retention": "Monthly Retention",
-    "retentionRate": "Retention Rate",
-    "churnRate": "Churn Rate",
-    "retained": "Retained Users",
-    "churned": "Churned Users",
-    "newUsersThisMonth": "New This Month",
-    "prevMonthActive": "Last Month Active",
-    "official": "Official",
-    "setOfficial": "Set Official",
+    "allStatus": "All Status",
     "officialStatus": {
       "on": "Official",
-      "off": "Set Official"
+      "off": "Not Official"
     },
-    "searchPlaceholder": "Search by name...",
-    "allRoles": "All Roles",
-    "allStatus": "All Status",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "displayName": "Name",
+    "role": "Role",
+    "official": "Official",
+    "joinedAt": "Joined",
+    "changeRoleTitle": "Change role",
+    "confirmRoleChange": "Change this user's role?",
+    "setOfficial": "Set as Official",
+    "banTitle": "Ban user",
+    "suspendTitle": "Suspend user",
+    "noName": "(no name)",
+    "prevPage": "Previous",
+    "nextPage": "Next"
   },
   "study": {
     "title": "Study Activity",
@@ -259,7 +270,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "Revoke official status"
   },
   "audit": {
     "title": "Audit Log",
@@ -293,17 +305,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
-  },
-  "users": {
-    "status": {
-      "active": "Active",
-      "suspended": "Suspended",
-      "banned": "Banned"
     },
-    "setStatus": "Set Status",
-    "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "description": "Track all administrative actions across the system",
+    "exportCSV": "Export CSV",
+    "actionAll": "All Actions",
+    "filterTarget": "Target Type",
+    "targetAll": "All Targets",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "searching": "Searching...",
+    "emptyTitle": "No audit logs found",
+    "emptyDescription": "There are no logs matching your current filters. Try adjusting your search criteria.",
+    "refreshing": "Refreshing...",
+    "colTime": "Time",
+    "colAdmin": "Admin",
+    "colAction": "Action",
+    "colTarget": "Target",
+    "colDetails": "Details",
+    "colIP": "IP",
+    "pageInfo": "Page {{page}}",
+    "showing": "showing {{count}} entries",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "unknownAdmin": "Unknown",
+    "fullDetails": "Full Details"
   },
   "common": {
     "refresh": "Refresh",

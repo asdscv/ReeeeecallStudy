@@ -43,7 +43,12 @@
     "alertNoCardsTitle": "ไม่มีการ์ด",
     "alertNoCardsMsg": "ไม่พบการ์ดสำหรับวันที่เลือก",
     "alertErrorTitle": "ข้อผิดพลาด",
-    "shuffle": "สุ่ม"
+    "shuffle": "สุ่ม",
+    "startFailed": "เริ่มเซสชันการเรียนไม่สำเร็จ",
+    "cardsPerSession": "จำนวนการ์ดต่อเซสชัน",
+    "batchHint": "ระหว่าง 5 ถึง 500 การ์ด",
+    "dateSelection": "เลือกวันที่",
+    "startStudy": "เริ่มเรียน"
   },
   "cramming": {
     "gotIt": "จำได้!",
@@ -95,7 +100,14 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "จบเซสชันหรือไม่?",
+    "endMessage": "ความคืบหน้าจนถึงตอนนี้จะถูกบันทึก",
+    "continue": "ดำเนินต่อ",
+    "end": "จบ",
+    "exit": "ออก",
+    "tapToFlip": "แตะเพื่อพลิก",
+    "swipeHint": "แตะการ์ดเพื่อพลิก · ปัดเพื่อให้คะแนน"
   },
   "srsRating": {
     "again": "อีกครั้ง",
@@ -108,7 +120,9 @@
     "knowIt": "รู้แล้ว",
     "known": "รู้แล้ว",
     "unknown": "ไม่รู้",
-    "next": "ถัดไป →"
+    "next": "ถัดไป →",
+    "missed": "ยังไม่ได้",
+    "gotIt": "จำได้"
   },
   "summary": {
     "title": "เรียนจบแล้ว!",
@@ -129,7 +143,10 @@
     "progressSoFar": "นี่คือความก้าวหน้าของคุณจนถึงตอนนี้",
     "knowIt": "รู้แล้ว",
     "dontKnow": "ไม่รู้",
-    "next": "ถัดไป"
+    "next": "ถัดไป",
+    "crammingTitle": "ติวเข้มเสร็จสิ้น!",
+    "mastery": "ความเชี่ยวชาญ",
+    "crammingAgain": "ติวอีกครั้ง"
   },
   "ratingLabels": {
     "again": "Again",

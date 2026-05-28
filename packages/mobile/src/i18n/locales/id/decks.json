@@ -52,7 +52,8 @@
     "saveVersion": "Simpan Versi",
     "noVersions": "Belum ada versi yang tercatat.",
     "versionLabel": "Versi {{num}}",
-    "versionCards": "kartu"
+    "versionCards": "kartu",
+    "deckNotFound": "Dek tidak ditemukan"
   },
   "edit": {
     "title": "Edit Dek",

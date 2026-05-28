@@ -269,5 +269,21 @@
     "dashboard": "El panel muestra tus estadísticas y rachas",
     "quickStudy": "Estudio rápido inicia una sesión al instante"
   },
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "message": "La pantalla tuvo un error inesperado. Inténtalo de nuevo.",
+    "retry": "Reintentar"
+  },
+  "sessionKicked": {
+    "badge": "Sesión expirada",
+    "headline": "Sesión iniciada en otro dispositivo",
+    "description": "Se cerró tu sesión porque tu cuenta se usó en otro dispositivo. Recupera esta sesión para seguir usándola aquí.",
+    "info1": "Se detectó una sesión activa en otro dispositivo",
+    "info2": "Un límite automático para mantener tu cuenta segura",
+    "reclaim": "Continuar en este dispositivo",
+    "reclaiming": "Restaurando sesión…",
+    "logout": "Cerrar sesión",
+    "hint": "Solo se puede usar un dispositivo a la vez"
+  }
 }

@@ -52,7 +52,8 @@
     "saveVersion": "Guardar versión",
     "noVersions": "Aún no hay versiones registradas.",
     "versionLabel": "Versión {{num}}",
-    "versionCards": "tarjetas"
+    "versionCards": "tarjetas",
+    "deckNotFound": "Baraja no encontrada"
   },
   "edit": {
     "title": "Editar mazo",

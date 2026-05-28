@@ -43,7 +43,12 @@
     "alertNoCardsTitle": "Không có thẻ",
     "alertNoCardsMsg": "Không có thẻ nào cho ngày đã chọn",
     "alertErrorTitle": "Lỗi",
-    "shuffle": "Xáo trộn"
+    "shuffle": "Xáo trộn",
+    "startFailed": "Không thể bắt đầu phiên học",
+    "cardsPerSession": "Số thẻ mỗi phiên",
+    "batchHint": "Từ 5 đến 500 thẻ",
+    "dateSelection": "Chọn ngày",
+    "startStudy": "Bắt đầu học"
   },
   "cramming": {
     "gotIt": "Đúng rồi!",
@@ -95,7 +100,14 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "Kết thúc phiên?",
+    "endMessage": "Tiến trình của bạn cho đến giờ sẽ được lưu.",
+    "continue": "Tiếp tục",
+    "end": "Kết thúc",
+    "exit": "Thoát",
+    "tapToFlip": "Chạm để lật",
+    "swipeHint": "Chạm thẻ để lật · Vuốt để đánh giá"
   },
   "srsRating": {
     "again": "Lại",
@@ -108,7 +120,9 @@
     "knowIt": "Biết rồi",
     "known": "Đã biết",
     "unknown": "Chưa biết",
-    "next": "Tiếp →"
+    "next": "Tiếp →",
+    "missed": "Chưa nhớ",
+    "gotIt": "Đã nhớ"
   },
   "summary": {
     "title": "Hoàn thành học tập!",
@@ -129,7 +143,10 @@
     "progressSoFar": "Đây là tiến trình của bạn.",
     "knowIt": "Biết rồi",
     "dontKnow": "Không biết",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "crammingTitle": "Hoàn thành ôn cấp tốc!",
+    "mastery": "Độ thành thạo",
+    "crammingAgain": "Ôn cấp tốc lại"
   },
   "ratingLabels": {
     "again": "Again",

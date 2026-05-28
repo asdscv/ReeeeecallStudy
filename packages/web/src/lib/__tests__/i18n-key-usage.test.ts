@@ -98,11 +98,9 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
   return { missing }
 }
 
-/** Legacy/out-of-scope gaps. Predicate over "ns:key". Keep this shrinking. */
+/** Out-of-scope gaps. Predicate over "ns:key". Keep this shrinking. */
 const WEB_ALLOW = (id: string) =>
-  id.startsWith('admin:') || // internal admin dashboard (English-acceptable)
-  id.startsWith('api-docs:') || // developer API docs
-  id === 'marketplace:categories.' // dynamic key: t('categories.' + value)
+  id === 'marketplace:categories.' // false positive: dynamic key t('categories.' + value)
 
 const MOBILE_ALLOW = (_id: string) => false
 
@@ -120,18 +118,17 @@ describe('i18n used-key coverage', () => {
     ).toEqual([])
   })
 
-  it('mobile: every static t() key exists in the en + ko locales', () => {
+  it('mobile: every static t() key exists in ALL locales (no fallback for any language)', () => {
     const mobileLocales = join(REPO_ROOT, 'packages/mobile/src/i18n/locales')
     if (!existsSync(mobileLocales)) return // web-only checkout
-    const { missing } = scan(
-      join(REPO_ROOT, 'packages/mobile/src'),
-      [join(mobileLocales, 'en'), join(mobileLocales, 'ko')],
-      'common',
-    )
+    const localeDirs = readdirSync(mobileLocales)
+      .filter((d) => statSync(join(mobileLocales, d)).isDirectory())
+      .map((d) => join(mobileLocales, d))
+    const { missing } = scan(join(REPO_ROOT, 'packages/mobile/src'), localeDirs, 'common')
     const offenders = [...missing.entries()].filter(([id]) => !MOBILE_ALLOW(id))
     expect(
       offenders.map(([id, f]) => `${id}  (${f})`).sort(),
-      'Static t() keys missing from mobile en/ko locale:',
+      'Static t() keys missing from one or more mobile locales:',
     ).toEqual([])
   })
 })

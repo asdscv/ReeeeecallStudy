@@ -45,7 +45,8 @@
     "title": "Detail",
     "alreadyReported": "Sudah dilaporkan",
     "alreadyReportedBody": "Anda sudah melaporkan item ini.",
-    "reportError": "Gagal mengirim laporan"
+    "reportError": "Gagal mengirim laporan",
+    "downloading": "Mengunduh..."
   },
   "publish": {
     "title": "Publish Deck",

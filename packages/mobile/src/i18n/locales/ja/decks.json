@@ -52,7 +52,8 @@
     "saveVersion": "バージョンを保存",
     "noVersions": "まだバージョンが記録されていません。",
     "versionLabel": "バージョン {{num}}",
-    "versionCards": "枚"
+    "versionCards": "枚",
+    "deckNotFound": "デッキが見つかりません"
   },
   "edit": {
     "title": "デッキを編集",

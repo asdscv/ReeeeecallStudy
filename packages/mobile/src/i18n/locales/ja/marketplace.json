@@ -45,7 +45,8 @@
     "title": "詳細",
     "alreadyReported": "報告済み",
     "alreadyReportedBody": "この出品はすでに報告済みです。",
-    "reportError": "報告の送信に失敗しました"
+    "reportError": "報告の送信に失敗しました",
+    "downloading": "ダウンロード中..."
   },
   "publish": {
     "title": "Publish Deck",

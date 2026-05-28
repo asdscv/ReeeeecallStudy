@@ -62,7 +62,9 @@
     "edgeTtsNote": "* Actualmente solo compatible con inglés",
     "speed": "Velocidad de lectura",
     "help": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
-    "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática."
+    "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
+    "voiceEngine": "Motor de voz",
+    "readingSpeed": "Velocidad de lectura"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +116,11 @@
   },
   "account": {
     "title": "Cuenta",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "logoutConfirm": "¿Seguro que quieres cerrar sesión?",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteConfirm": "Esto eliminará permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.",
+    "deleteFailed": "No se pudo eliminar la cuenta. Contacta con soporte."
   },
   "links": {
     "userGuide": "Guía de usuario",
@@ -166,5 +172,9 @@
   },
   "actions": {
     "cancel": "Cancelar"
+  },
+  "haptics": {
+    "enable": "Respuesta háptica",
+    "hint": "Vibración al tocar, calificar y realizar acciones."
   }
 }

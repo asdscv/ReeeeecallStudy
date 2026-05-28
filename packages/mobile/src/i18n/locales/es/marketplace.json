@@ -45,7 +45,8 @@
     "title": "Detalle",
     "alreadyReported": "Ya reportado",
     "alreadyReportedBody": "Ya has reportado este elemento.",
-    "reportError": "No se pudo enviar el reporte"
+    "reportError": "No se pudo enviar el reporte",
+    "downloading": "Descargando..."
   },
   "publish": {
     "title": "Publish Deck",
