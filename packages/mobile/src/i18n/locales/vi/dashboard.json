@@ -8,16 +8,11 @@
   },
   "dailyChart": {
     "title": "Lượng học hàng ngày",
-    "total": "Tổng cộng {{count}} lần",
-    "noData": "Chưa có hồ sơ học tập",
-    "tooltipTimes": "{{value}} lần",
-    "tooltipLabel": "Học tập"
+    "noData": "Chưa có hồ sơ học tập"
   },
   "forecast": {
     "title": "Dự báo ôn tập (7 ngày)",
-    "noData": "Không có lịch ôn tập",
-    "tooltipCards": "{{value}} thẻ",
-    "tooltipLabel": "Cần ôn tập"
+    "noData": "Không có lịch ôn tập"
   },
   "recentDecks": {
     "title": "Trạng thái bộ thẻ",
@@ -29,10 +24,7 @@
     "study": "Học"
   },
   "heatmap": {
-    "title": "Bản đồ nhiệt học tập",
-    "noStudy": "Không học",
-    "studyCount": "{{date}}: {{count}} lần học",
-    "tooltip": "{{date}}: {{count}} lần học"
+    "title": "Bản đồ nhiệt học tập"
   },
   "gamification": {
     "freezes": "{{count}} freezes left",

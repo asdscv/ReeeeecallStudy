@@ -5,13 +5,11 @@
   "noResultsHint": "別のキーワードやカテゴリーをお試しください",
   "categories": {
     "all": "すべて",
-    "general": "一般",
     "language": "語学",
     "science": "科学",
     "math": "数学",
     "history": "歴史",
     "programming": "プログラミング",
-    "trivia": "雑学",
     "exam": "試験対策",
     "other": "その他"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← マーケットプレイス",
-    "cardCount": "{{count}}枚",
-    "userCount": "{{count}}人",
     "getDeck": "このデッキを取得",
-    "importing": "インポート中...",
-    "cardPreview": "カードプレビュー（最大10枚）",
-    "noCards": "カードがありません。",
     "reportContent": "Report",
     "publishedBy": "作成",
     "alreadyAcquired": "コレクションに追加済み",

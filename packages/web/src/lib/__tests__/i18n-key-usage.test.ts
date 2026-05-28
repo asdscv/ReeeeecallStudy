@@ -86,7 +86,9 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
     // t('key' ...) / t("key" ...) — static literal first arg only
     for (const m of text.matchAll(/\bt\(\s*(['"])([^'"$\n]+?)\1/g)) {
       const raw = m[2]
-      if (!raw || raw.includes('${')) continue
+      // Skip dynamic/concat artifacts: `t('categories.' + value)` captures the
+      // literal prefix "categories." which is not a real key.
+      if (!raw || raw.includes('${') || raw.endsWith('.')) continue
       if (raw.includes(':')) { const [ns, ...rest] = raw.split(':'); check(ns, rest.join(':')) }
       else if (fileNs) check(fileNs, raw)
     }
@@ -98,11 +100,16 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
   return { missing }
 }
 
-/** Out-of-scope gaps. Predicate over "ns:key". Keep this shrinking. */
-const WEB_ALLOW = (id: string) =>
-  id === 'marketplace:categories.' // false positive: dynamic key t('categories.' + value)
+/** Out-of-scope gaps. Predicate over "ns:key". Empty — no allowlisted misses. */
+const WEB_ALLOW = (_id: string) => false
 
 const MOBILE_ALLOW = (_id: string) => false
+
+function mobileLocaleDirs(root: string): string[] | null {
+  const base = join(root, 'packages/mobile/src/i18n/locales')
+  if (!existsSync(base)) return null
+  return readdirSync(base).filter((d) => statSync(join(base, d)).isDirectory())
+}
 
 describe('i18n used-key coverage', () => {
   it('web: every static t() key exists in the en locale', () => {
@@ -130,5 +137,35 @@ describe('i18n used-key coverage', () => {
       offenders.map(([id, f]) => `${id}  (${f})`).sort(),
       'Static t() keys missing from one or more mobile locales:',
     ).toEqual([])
+  })
+
+  it('mobile: no locale has orphan keys absent from en (locks structural drift)', () => {
+    const dirs = mobileLocaleDirs(REPO_ROOT)
+    if (!dirs) return
+    const base = join(REPO_ROOT, 'packages/mobile/src/i18n/locales')
+    const en = loadLocale(join(base, 'en'))
+    const orphans: string[] = []
+    for (const loc of dirs.filter((d) => d !== 'en')) {
+      const locKeys = loadLocale(join(base, loc))
+      for (const ns of Object.keys(locKeys)) {
+        for (const key of locKeys[ns]) {
+          if (!en[ns]?.has(key)) orphans.push(`${loc}/${ns}:${key}`)
+        }
+      }
+    }
+    expect(orphans.sort(), 'Mobile locale keys absent from en (prune them or add to en):').toEqual([])
+  })
+
+  it('mobile: guide namespace has full key parity across all locales (dynamic-rendered content)', () => {
+    const dirs = mobileLocaleDirs(REPO_ROOT)
+    if (!dirs) return
+    const base = join(REPO_ROOT, 'packages/mobile/src/i18n/locales')
+    const en = loadLocale(join(base, 'en')).guide
+    const gaps: string[] = []
+    for (const loc of dirs.filter((d) => d !== 'en')) {
+      const g = loadLocale(join(base, loc)).guide ?? new Set<string>()
+      for (const key of en) if (!g.has(key)) gaps.push(`${loc}:guide.${key}`)
+    }
+    expect(gaps.sort(), 'guide keys missing per locale (Guide screen renders these dynamically):').toEqual([])
   })
 })

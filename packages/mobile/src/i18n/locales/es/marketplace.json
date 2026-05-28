@@ -5,13 +5,11 @@
   "noResultsHint": "Prueba otra búsqueda o categoría",
   "categories": {
     "all": "Todo",
-    "general": "General",
     "language": "Idiomas",
     "science": "Ciencia",
     "math": "Matemáticas",
     "history": "Historia",
     "programming": "Programación",
-    "trivia": "Trivia",
     "exam": "Preparación de exámenes",
     "other": "Otros"
   },
@@ -28,12 +26,7 @@
   },
   "detail": {
     "back": "← Mercado",
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios",
     "getDeck": "Obtener este mazo",
-    "importing": "Importando...",
-    "cardPreview": "Vista previa de tarjetas (máx 10)",
-    "noCards": "Sin tarjetas.",
     "reportContent": "Report",
     "publishedBy": "por",
     "alreadyAcquired": "Ya está en tu colección",

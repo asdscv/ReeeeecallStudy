@@ -33,10 +33,7 @@
   },
   "setup": {
     "title": "ตั้งค่าการเรียน",
-    "deckInfo": "{{icon}} {{name}} · {{count}} การ์ด",
     "studyMode": "โหมดการเรียน",
-    "selectUploadDate": "เลือกวันที่อัปโหลด",
-    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count}} การ์ด",
     "noDecks": "ยังไม่มีเด็ค กรุณาสร้างเด็คก่อน!",
     "alertSelectDeckTitle": "เลือกเด็ค",
     "alertSelectDeckMsg": "กรุณาเลือกเด็คที่จะเรียน",
@@ -51,18 +48,11 @@
     "startStudy": "เริ่มเรียน"
   },
   "cramming": {
-    "gotIt": "จำได้!",
-    "missed": "จำไม่ได้",
-    "round": "รอบที่ {{round}}",
-    "mastery": "ความชำนาญ: {{percentage}}%",
     "filter": {
       "title": "ตัวกรองการ์ด",
       "all": "การ์ดทั้งหมด",
-      "allDesc": "เรียนการ์ดทั้งหมดที่ไม่ถูกระงับในสำรับ",
       "weak": "เฉพาะการ์ดที่อ่อน",
-      "weakDesc": "การ์ดที่ยาก (ค่าความง่ายต่ำ) หรือการ์ดใหม่",
-      "dueSoon": "ครบกำหนดเร็วๆ นี้",
-      "dueSoonDesc": "การ์ดที่ครบกำหนดทบทวนภายใน 3 วัน"
+      "dueSoon": "ครบกำหนดเร็วๆ นี้"
     },
     "timeLimit": {
       "title": "จำกัดเวลา",
@@ -70,36 +60,15 @@
       "minutes": "{{count}} นาที"
     },
     "shuffle": {
-      "title": "สลับการ์ด",
-      "desc": "สลับลำดับการ์ดในแต่ละรอบ"
+      "title": "สลับการ์ด"
     },
     "summary": {
       "completed": "อัดเข้าหัวเสร็จแล้ว!",
-      "timeUp": "หมดเวลา!",
-      "wellDone": "พยายามดีมาก! ทบทวนต่อเพื่อเสริมสร้างความจำ",
-      "totalRounds": "จำนวนรอบทั้งหมด",
-      "masteryRate": "อัตราความชำนาญ",
-      "cardsStudied": "จำนวนการ์ดที่เรียน",
-      "hardestCards": "การ์ดที่ยากที่สุด",
-      "missedTimes": "พลาด {{count}} ครั้ง",
-      "noSrsImpact": "เซสชันนี้ไม่ส่งผลต่อตารางเวลา SRS ของคุณ",
-      "sessionEnded": "เซสชันสิ้นสุดแล้ว",
-      "crammingAgain": "อัดเข้าหัวอีกครั้ง",
-      "otherMode": "โหมดอื่น"
+      "crammingAgain": "อัดเข้าหัวอีกครั้ง"
     }
   },
   "session": {
     "loading": "กำลังโหลด...",
-    "noCards": "ไม่มีการ์ดให้เรียน",
-    "allReviewed": "ทบทวนการ์ดทั้งหมดแล้ว!",
-    "backToDeck": "กลับไปยังสำรับ",
-    "exitConfirmTitle": "ต้องการจบการเรียนหรือไม่?",
-    "exitConfirmMessage": "ความก้าวหน้าของคุณจะถูกบันทึก",
-    "exitConfirmButton": "จบ",
-    "pause": "Pause",
-    "resume": "Resume",
-    "paused": "Paused",
-    "pressSpaceToResume": "Press Space to resume",
     "undo": "Undo",
     "endSession": "จบเซสชันหรือไม่?",
     "endMessage": "ความคืบหน้าจนถึงตอนนี้จะถูกบันทึก",
@@ -116,34 +85,19 @@
     "easy": "ง่าย"
   },
   "rating": {
-    "dontKnow": "ไม่รู้",
-    "knowIt": "รู้แล้ว",
     "known": "รู้แล้ว",
     "unknown": "ไม่รู้",
-    "next": "ถัดไป →",
     "missed": "ยังไม่ได้",
     "gotIt": "จำได้"
   },
   "summary": {
     "title": "เรียนจบแล้ว!",
-    "completed": "เรียนจบแล้ว!",
-    "greatJob": "เก่งมาก!",
-    "wellDone": "เก่งมาก! เรียนต่อไปนะ",
-    "studyCards": "การ์ดที่เรียน",
     "cardsStudied": "จำนวนการ์ดที่เรียน",
-    "cardCount": "{{studied}} / {{total}}",
     "timeSpent": "เวลาที่ใช้",
-    "timeFormat": "{{minutes}} นาที {{seconds}} วินาที",
     "avgPerCard": "เฉลี่ยต่อการ์ด",
-    "secondsFormat": "{{seconds}} วินาที",
     "ratingDistribution": "การกระจายคะแนน",
     "backToDeck": "กลับไปยังสำรับ",
     "studyAgain": "เรียนอีกครั้ง",
-    "sessionEnded": "เซสชันสิ้นสุดแล้ว",
-    "progressSoFar": "นี่คือความก้าวหน้าของคุณจนถึงตอนนี้",
-    "knowIt": "รู้แล้ว",
-    "dontKnow": "ไม่รู้",
-    "next": "ถัดไป",
     "crammingTitle": "ติวเข้มเสร็จสิ้น!",
     "mastery": "ความเชี่ยวชาญ",
     "crammingAgain": "ติวอีกครั้ง"
