@@ -159,7 +159,7 @@ export function MarketplaceScreen() {
                   theme.typography.labelSmall,
                   { color: showAdvanced ? theme.colors.primary : theme.colors.text },
                 ]}>
-                  {t('filters')}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                  {t('filters.label')}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </Text>
               </TouchableOpacity>
             </View>

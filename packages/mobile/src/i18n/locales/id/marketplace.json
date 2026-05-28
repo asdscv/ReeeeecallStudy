@@ -41,7 +41,11 @@
     "unsubscribing": "Berhenti...",
     "unsubscribed": "Berhasil berhenti berlangganan",
     "unsubscribeConfirm": "Berhenti berlangganan dari dek ini? Kemajuan belajar pribadi Anda akan tetap ada di akun.",
-    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi."
+    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi.",
+    "title": "Detail",
+    "alreadyReported": "Sudah dilaporkan",
+    "alreadyReportedBody": "Anda sudah melaporkan item ini.",
+    "reportError": "Gagal mengirim laporan"
   },
   "publish": {
     "title": "Publish Deck",
@@ -144,6 +148,12 @@
     "subscribe": "Langganan",
     "snapshot": "Snapshot"
   },
-  "filters": "Filter",
-  "categoryLabel": "Kategori"
+  "filters": {
+    "label": "Filter"
+  },
+  "categoryLabel": "Kategori",
+  "categoryTitle": "Kategori",
+  "sortTitle": "Urutkan",
+  "loadError": "Tidak dapat memuat dek",
+  "loadErrorHint": "Periksa koneksi Anda dan coba lagi."
 }

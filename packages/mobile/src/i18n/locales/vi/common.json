@@ -39,7 +39,8 @@
     "show": "Hiện",
     "hide": "Ẩn",
     "startStudy": "Bắt đầu học",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "retry": "Thử lại"
   },
   "status": {
     "loading": "Đang tải...",
@@ -267,5 +268,6 @@
     "hamburger": "Nhấn menu (☰) để điều hướng",
     "dashboard": "Bảng điều khiển hiển thị thống kê và chuỗi học",
     "quickStudy": "Học nhanh bắt đầu phiên ngay lập tức"
-  }
+  },
+  "cancel": "Hủy"
 }

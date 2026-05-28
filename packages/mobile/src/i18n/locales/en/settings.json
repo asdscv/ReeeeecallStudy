@@ -154,5 +154,8 @@
   },
   "alerts": {
     "error": "Error"
+  },
+  "actions": {
+    "cancel": "Cancel"
   }
 }

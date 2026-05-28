@@ -41,7 +41,11 @@
     "unsubscribing": "Đang hủy...",
     "unsubscribed": "Đã hủy đăng ký",
     "unsubscribeConfirm": "Hủy đăng ký bộ thẻ này? Tiến độ học tập cá nhân của bạn sẽ được giữ lại trong tài khoản.",
-    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại."
+    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại.",
+    "title": "Chi tiết",
+    "alreadyReported": "Đã báo cáo",
+    "alreadyReportedBody": "Bạn đã báo cáo mục này rồi.",
+    "reportError": "Gửi báo cáo thất bại"
   },
   "publish": {
     "title": "Publish Deck",
@@ -144,6 +148,12 @@
     "subscribe": "Đăng ký",
     "snapshot": "Ảnh chụp"
   },
-  "filters": "Bộ lọc",
-  "categoryLabel": "Danh mục"
+  "filters": {
+    "label": "Bộ lọc"
+  },
+  "categoryLabel": "Danh mục",
+  "categoryTitle": "Danh mục",
+  "sortTitle": "Sắp xếp theo",
+  "loadError": "Không thể tải bộ thẻ",
+  "loadErrorHint": "Kiểm tra kết nối và thử lại."
 }

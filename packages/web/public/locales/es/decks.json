@@ -41,7 +41,15 @@
     "bulkDelete": "Eliminar tarjetas en lote",
     "bulkDeleteConfirm": "¿Eliminar {{count}} tarjetas seleccionadas? Esto no se puede deshacer.",
     "noStudyRecords": "Sin registros de estudio",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "Historial de versiones",
+    "createVersion": "+ Nueva versión",
+    "versionSummaryPlaceholder": "¿Qué cambió? (opcional)",
+    "creatingVersion": "Creando...",
+    "saveVersion": "Guardar versión",
+    "noVersions": "Aún no hay versiones registradas.",
+    "versionLabel": "Versión {{num}}",
+    "versionCards": "tarjetas"
   },
   "settings": {
     "deckName": "Nombre del mazo",
@@ -151,5 +159,17 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "learningLanguage": {
+    "label": "Idioma de aprendizaje",
+    "all": "Todos"
+  },
+  "nativeLanguage": {
+    "label": "Idioma nativo",
+    "multiHint": "Selecciona todas las que correspondan"
+  },
+  "studyLevel": {
+    "label": "Nivel de estudio",
+    "none": "Sin especificar"
   }
 }

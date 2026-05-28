@@ -163,5 +163,8 @@
   },
   "alerts": {
     "error": "Error"
+  },
+  "actions": {
+    "cancel": "Cancelar"
   }
 }

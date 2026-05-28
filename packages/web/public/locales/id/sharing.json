@@ -9,7 +9,6 @@
   "unpublish": "Batalkan Publikasi",
   "publishNote": "Mempublikasikan ke marketplace memungkinkan siapa saja menemukan dek ini.",
   "publishButton": "Publikasikan ke Marketplace",
-
   "noSubscribers": "Belum ada pengguna yang berbagi.",
   "inviteLink": "Tautan undangan",
   "cancel": "Cabut",
@@ -18,7 +17,6 @@
   "creating": "Membuat...",
   "createInviteLink": "Buat Tautan Undangan",
   "linkShareInfo": "Bagikan tautan ini untuk memberikan akses ke dek.",
-
   "shareMode": {
     "label": "Mode Berbagi",
     "copy": {
@@ -37,7 +35,6 @@
       "detail": "Menyalin kartu saat ini dengan tepat, tetapi pengeditan tidak diizinkan. Snapshot satu kali dari dek."
     }
   },
-
   "shareModes": {
     "copy": {
       "label": "Salin",
@@ -55,13 +52,11 @@
       "detail": "Menyalin kartu saat ini dengan tepat, tetapi pengeditan tidak diizinkan. Snapshot satu kali dari dek."
     }
   },
-
   "mode": {
     "subscribe": "Berlangganan",
     "snapshot": "Snapshot",
     "copy": "Salin"
   },
-
   "modal": {
     "title": "Bagikan Dek",
     "description": "Membagikan dek \"{{name}}\".",
@@ -169,5 +164,6 @@
     "subscribed": "Berlangganan",
     "snapshot": "Snapshot",
     "copy": "Salin"
-  }
+  },
+  "unsubscribe": "Berhenti berlangganan"
 }

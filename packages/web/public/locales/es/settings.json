@@ -152,5 +152,31 @@
     "fri": "Fri",
     "sat": "Sat",
     "sun": "Sun"
+  },
+  "export": {
+    "title": "Exportar mis datos",
+    "description": "Descarga tus datos en archivos CSV.",
+    "noData": "No hay datos para exportar",
+    "success": "Exportación completada",
+    "error": "Error al exportar",
+    "stats": "Estadísticas de estudio",
+    "statsDesc": "Resumen del rendimiento de estudio",
+    "sessions": "Sesiones de estudio",
+    "sessionsDesc": "Todo el historial de sesiones (hasta 5000)",
+    "decks": "Barajas",
+    "decksDesc": "Todos los metadatos de barajas",
+    "cards": "Tarjetas",
+    "cardsDesc": "Todos los datos de tarjetas con estado SRS (hasta 10000)"
+  },
+  "quickActions": {
+    "quickStudy": "Estudio rápido",
+    "aiGenerate": "Generar con IA",
+    "guide": "Guía"
+  },
+  "goal": {
+    "title": "Meta de estudio diaria",
+    "description": "Establece una meta diaria en minutos. Déjalo vacío para no tener meta.",
+    "placeholder": "p. ej. 30",
+    "unit": "minutos / día"
   }
 }

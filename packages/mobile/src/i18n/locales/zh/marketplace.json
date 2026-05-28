@@ -41,7 +41,11 @@
     "unsubscribing": "取消订阅中...",
     "unsubscribed": "已取消订阅",
     "unsubscribeConfirm": "取消订阅此牌组？您的个人学习进度将保留在账户中。",
-    "unsubscribeError": "取消订阅失败，请重试。"
+    "unsubscribeError": "取消订阅失败，请重试。",
+    "title": "详情",
+    "alreadyReported": "已举报",
+    "alreadyReportedBody": "你已经举报过此条目。",
+    "reportError": "举报提交失败"
   },
   "publish": {
     "title": "Publish Deck",
@@ -144,6 +148,12 @@
     "subscribe": "订阅",
     "snapshot": "快照"
   },
-  "filters": "筛选",
-  "categoryLabel": "分类"
+  "filters": {
+    "label": "筛选"
+  },
+  "categoryLabel": "分类",
+  "categoryTitle": "分类",
+  "sortTitle": "排序",
+  "loadError": "无法加载卡组",
+  "loadErrorHint": "请检查网络连接后重试。"
 }

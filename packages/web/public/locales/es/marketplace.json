@@ -109,7 +109,10 @@
     "upper_intermediate": "Intermedio alto",
     "advanced": "Avanzado"
   },
-  "filters": "Filtrar",
+  "filters": {
+    "label": "Filtrar",
+    "reset": "Borrar filtros"
+  },
   "categoryLabel": "Categoría",
   "verifiedOnly": "Verificado",
   "resetFilters": "Restablecer",
@@ -124,5 +127,31 @@
   "dateRange_90d": "Últimos 90 d",
   "shareModeFilter": "Modo de uso compartido",
   "allModes": "Todos",
-  "popularTags": "Etiquetas populares"
+  "popularTags": "Etiquetas populares",
+  "trending": "Tendencia",
+  "verifiedPublisher": "Editor verificado",
+  "officialDecks": "Barajas oficiales",
+  "reviews": {
+    "title": "Valoraciones y reseñas",
+    "anonymous": "Anónimo",
+    "edited": "editado",
+    "helpful": "Útil",
+    "yourRating": "Tu valoración",
+    "ratingRequired": "Selecciona una valoración",
+    "titleLabel": "Título (opcional)",
+    "titlePlaceholder": "Resume tu experiencia",
+    "bodyLabel": "Reseña (opcional)",
+    "bodyPlaceholder": "¿Qué te gustó o no de esta baraja?",
+    "submitting": "Enviando...",
+    "updateReview": "Actualizar reseña",
+    "submitReview": "Enviar reseña",
+    "deleteReview": "Eliminar reseña",
+    "deleteTitle": "Eliminar reseña",
+    "deleteConfirm": "¿Eliminar tu reseña? Esto no se puede deshacer.",
+    "noReviews": "Aún no hay reseñas. ¡Sé el primero!",
+    "writeReview": "Escribir una reseña",
+    "sortLabel": "Ordenar por:",
+    "loading": "Cargando...",
+    "loadMore": "Cargar más reseñas"
+  }
 }

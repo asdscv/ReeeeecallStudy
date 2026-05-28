@@ -109,7 +109,10 @@
     "upper_intermediate": "Upper Intermediate",
     "advanced": "Advanced"
   },
-  "filters": "Filter",
+  "filters": {
+    "label": "Filter",
+    "reset": "Clear filters"
+  },
   "categoryLabel": "Category",
   "verifiedOnly": "Verified",
   "resetFilters": "Reset",
@@ -124,5 +127,31 @@
   "dateRange_90d": "Last 90d",
   "shareModeFilter": "Share mode",
   "allModes": "All",
-  "popularTags": "Popular tags"
+  "popularTags": "Popular tags",
+  "trending": "Trending",
+  "verifiedPublisher": "Verified Publisher",
+  "officialDecks": "Official Decks",
+  "reviews": {
+    "title": "Ratings & Reviews",
+    "anonymous": "Anonymous",
+    "edited": "edited",
+    "helpful": "Helpful",
+    "yourRating": "Your Rating",
+    "ratingRequired": "Please select a rating",
+    "titleLabel": "Title (optional)",
+    "titlePlaceholder": "Summarize your experience",
+    "bodyLabel": "Review (optional)",
+    "bodyPlaceholder": "What did you like or dislike about this deck?",
+    "submitting": "Submitting...",
+    "updateReview": "Update Review",
+    "submitReview": "Submit Review",
+    "deleteReview": "Delete Review",
+    "deleteTitle": "Delete review",
+    "deleteConfirm": "Delete your review? This cannot be undone.",
+    "noReviews": "No reviews yet. Be the first to review!",
+    "writeReview": "Write a Review",
+    "sortLabel": "Sort by:",
+    "loading": "Loading...",
+    "loadMore": "Load more reviews"
+  }
 }

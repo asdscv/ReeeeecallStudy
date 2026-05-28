@@ -39,7 +39,8 @@
     "show": "Tampilkan",
     "hide": "Sembunyikan",
     "startStudy": "Mulai Belajar",
-    "logout": "Keluar"
+    "logout": "Keluar",
+    "retry": "Coba lagi"
   },
   "status": {
     "loading": "Memuat...",
@@ -267,5 +268,6 @@
     "hamburger": "Ketuk menu (☰) untuk navigasi",
     "dashboard": "Dasbor menampilkan statistik & streak belajar",
     "quickStudy": "Belajar cepat memulai sesi seketika"
-  }
+  },
+  "cancel": "Batal"
 }

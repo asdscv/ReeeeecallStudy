@@ -44,7 +44,15 @@
     "bulkDelete": "ลบการ์ดหลายรายการ",
     "bulkDeleteConfirm": "ลบ {{count}} การ์ดที่เลือก? ไม่สามารถเลิกทำได้",
     "noStudyRecords": "ไม่มีบันทึกการเรียน",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "ประวัติเวอร์ชัน",
+    "createVersion": "+ เวอร์ชันใหม่",
+    "versionSummaryPlaceholder": "เปลี่ยนอะไรบ้าง? (ไม่บังคับ)",
+    "creatingVersion": "กำลังสร้าง...",
+    "saveVersion": "บันทึกเวอร์ชัน",
+    "noVersions": "ยังไม่มีเวอร์ชันที่บันทึกไว้",
+    "versionLabel": "เวอร์ชัน {{num}}",
+    "versionCards": "การ์ด"
   },
   "edit": {
     "title": "แก้ไขสำรับ",

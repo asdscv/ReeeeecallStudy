@@ -39,7 +39,8 @@
     "show": "显示",
     "hide": "隐藏",
     "startStudy": "开始学习",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "retry": "重试"
   },
   "status": {
     "loading": "加载中...",
@@ -267,5 +268,6 @@
     "hamburger": "点击菜单（☰）进行导航",
     "dashboard": "仪表盘显示学习统计和连续天数",
     "quickStudy": "快速学习立即开始学习"
-  }
+  },
+  "cancel": "取消"
 }

@@ -9,7 +9,6 @@
   "unpublish": "Unpublish",
   "publishNote": "Publishing to market allows anyone to find this deck.",
   "publishButton": "Publish to Market",
-
   "noSubscribers": "No users shared with yet.",
   "inviteLink": "Invite link",
   "cancel": "Revoke",
@@ -18,7 +17,6 @@
   "creating": "Creating...",
   "createInviteLink": "Generate Invite Link",
   "linkShareInfo": "Share this link to give access to the deck.",
-
   "shareMode": {
     "label": "Share Mode",
     "copy": {
@@ -37,7 +35,6 @@
       "detail": "Copy current cards exactly, but editing is not allowed. A one-time snapshot of the deck."
     }
   },
-
   "shareModes": {
     "copy": {
       "label": "Copy",
@@ -55,13 +52,11 @@
       "detail": "Copy current cards exactly, but editing is not allowed. A one-time snapshot of the deck."
     }
   },
-
   "mode": {
     "subscribe": "Subscribed",
     "snapshot": "Snapshot",
     "copy": "Copy"
   },
-
   "modal": {
     "title": "Share Deck",
     "description": "Sharing \"{{name}}\" deck.",
@@ -169,5 +164,6 @@
     "subscribed": "Subscribed",
     "snapshot": "Snapshot",
     "copy": "Copy"
-  }
+  },
+  "unsubscribe": "Unsubscribe"
 }

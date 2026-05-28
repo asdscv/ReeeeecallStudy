@@ -45,7 +45,8 @@
     "cards": "카드 {{count}}장 학습",
     "sessions": "{{count}}회 세션 완료",
     "time": "{{count}}분 학습",
-    "perfect": "만점 {{count}}회 달성"
+    "perfect": "만점 {{count}}회 달성",
+    "completed": "완료"
   },
   "streakFreeze": {
     "title": "연속 학습 보호",

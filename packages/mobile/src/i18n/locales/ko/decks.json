@@ -33,7 +33,15 @@
     "downloadTemplate": "CSV 양식",
     "deckNotFound": "덱을 찾을 수 없습니다",
     "goBack": "뒤로 가기",
-    "empty": "(비어 있음)"
+    "empty": "(비어 있음)",
+    "versionHistory": "버전 기록",
+    "createVersion": "+ 새 버전",
+    "versionSummaryPlaceholder": "무엇이 바뀌었나요? (선택)",
+    "creatingVersion": "생성 중...",
+    "saveVersion": "버전 저장",
+    "noVersions": "아직 기록된 버전이 없습니다.",
+    "versionLabel": "버전 {{num}}",
+    "versionCards": "장"
   },
   "edit": {
     "title": "덱 편집",

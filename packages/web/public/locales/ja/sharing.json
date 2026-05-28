@@ -9,7 +9,6 @@
   "unpublish": "公開を取り消す",
   "publishNote": "マーケットに公開すると、誰でもこのデッキを検索できるようになります。",
   "publishButton": "マーケットに公開",
-
   "noSubscribers": "まだ共有されたユーザーはいません。",
   "inviteLink": "招待リンク",
   "cancel": "取り消す",
@@ -18,7 +17,6 @@
   "creating": "作成中...",
   "createInviteLink": "招待リンクを生成",
   "linkShareInfo": "このリンクを共有してデッキへのアクセスを提供します。",
-
   "shareMode": {
     "label": "共有モード",
     "copy": {
@@ -37,7 +35,6 @@
       "detail": "現在のカードをそのままコピーしますが、編集はできません。デッキの一時点のスナップショットです。"
     }
   },
-
   "shareModes": {
     "copy": {
       "label": "コピー",
@@ -55,13 +52,11 @@
       "detail": "現在のカードをそのままコピーしますが、編集はできません。デッキの一時点のスナップショットです。"
     }
   },
-
   "mode": {
     "subscribe": "購読中",
     "snapshot": "スナップショット",
     "copy": "コピー"
   },
-
   "modal": {
     "title": "デッキを共有",
     "description": "「{{name}}」デッキを共有します。",
@@ -169,5 +164,6 @@
     "subscribed": "購読中",
     "snapshot": "スナップショット",
     "copy": "コピー"
-  }
+  },
+  "unsubscribe": "購読解除"
 }

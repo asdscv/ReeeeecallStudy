@@ -33,7 +33,15 @@
     "downloadTemplate": "CSV Template",
     "deckNotFound": "Deck not found",
     "goBack": "Go Back",
-    "empty": "(empty)"
+    "empty": "(empty)",
+    "versionHistory": "Version History",
+    "createVersion": "+ New Version",
+    "versionSummaryPlaceholder": "What changed? (optional)",
+    "creatingVersion": "Creating...",
+    "saveVersion": "Save Version",
+    "noVersions": "No versions recorded yet.",
+    "versionLabel": "Version {{num}}",
+    "versionCards": "cards"
   },
   "edit": {
     "title": "Edit Deck",

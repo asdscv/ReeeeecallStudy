@@ -67,7 +67,8 @@
     "resume": "Resume",
     "paused": "Paused",
     "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "exit": "退出"
   },
   "card": {
     "tapToFlip": "点击翻转",

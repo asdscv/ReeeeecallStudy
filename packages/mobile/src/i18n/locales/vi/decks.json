@@ -44,7 +44,15 @@
     "bulkDelete": "Xóa hàng loạt thẻ",
     "bulkDeleteConfirm": "Xóa {{count}} thẻ đã chọn? Không thể hoàn tác.",
     "noStudyRecords": "Không có hồ sơ học tập",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "Lịch sử phiên bản",
+    "createVersion": "+ Phiên bản mới",
+    "versionSummaryPlaceholder": "Đã thay đổi gì? (tùy chọn)",
+    "creatingVersion": "Đang tạo...",
+    "saveVersion": "Lưu phiên bản",
+    "noVersions": "Chưa có phiên bản nào được ghi lại.",
+    "versionLabel": "Phiên bản {{num}}",
+    "versionCards": "thẻ"
   },
   "edit": {
     "title": "Sửa bộ thẻ",

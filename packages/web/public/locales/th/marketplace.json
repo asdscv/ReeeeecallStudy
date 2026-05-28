@@ -109,7 +109,10 @@
     "upper_intermediate": "ระดับกลาง-สูง",
     "advanced": "ระดับสูง"
   },
-  "filters": "ตัวกรอง",
+  "filters": {
+    "label": "ตัวกรอง",
+    "reset": "ล้างตัวกรอง"
+  },
   "categoryLabel": "หมวดหมู่",
   "verifiedOnly": "ยืนยันแล้ว",
   "resetFilters": "รีเซ็ต",
@@ -124,5 +127,31 @@
   "dateRange_90d": "90 วันล่าสุด",
   "shareModeFilter": "โหมดการแชร์",
   "allModes": "ทั้งหมด",
-  "popularTags": "แท็กยอดนิยม"
+  "popularTags": "แท็กยอดนิยม",
+  "trending": "กำลังมาแรง",
+  "verifiedPublisher": "ผู้เผยแพร่ที่ยืนยันแล้ว",
+  "officialDecks": "เด็คทางการ",
+  "reviews": {
+    "title": "คะแนนและรีวิว",
+    "anonymous": "ไม่ระบุชื่อ",
+    "edited": "แก้ไขแล้ว",
+    "helpful": "มีประโยชน์",
+    "yourRating": "คะแนนของคุณ",
+    "ratingRequired": "กรุณาเลือกคะแนน",
+    "titleLabel": "หัวข้อ (ไม่บังคับ)",
+    "titlePlaceholder": "สรุปประสบการณ์ของคุณ",
+    "bodyLabel": "รีวิว (ไม่บังคับ)",
+    "bodyPlaceholder": "คุณชอบหรือไม่ชอบอะไรเกี่ยวกับเด็คนี้?",
+    "submitting": "กำลังส่ง...",
+    "updateReview": "อัปเดตรีวิว",
+    "submitReview": "ส่งรีวิว",
+    "deleteReview": "ลบรีวิว",
+    "deleteTitle": "ลบรีวิว",
+    "deleteConfirm": "ลบรีวิวของคุณหรือไม่? ไม่สามารถย้อนกลับได้",
+    "noReviews": "ยังไม่มีรีวิว มาเป็นคนแรกกัน!",
+    "writeReview": "เขียนรีวิว",
+    "sortLabel": "เรียงตาม:",
+    "loading": "กำลังโหลด...",
+    "loadMore": "โหลดรีวิวเพิ่ม"
+  }
 }

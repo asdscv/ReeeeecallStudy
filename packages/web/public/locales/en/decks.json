@@ -6,7 +6,7 @@
   "deleteDeck": "Delete Deck",
   "deleteConfirm": "The deck \"{{name}}\" and all cards will be deleted. This cannot be undone.",
   "detail": {
-    "backToList": "\u2190 Deck List",
+    "backToList": "← Deck List",
     "totalCards": "Total {{count}} cards",
     "newCards": "New {{count}}",
     "reviewCards": "Review {{count}}",
@@ -41,7 +41,15 @@
     "bulkDelete": "Bulk Delete Cards",
     "bulkDeleteConfirm": "Delete {{count}} selected cards? This cannot be undone.",
     "noStudyRecords": "No study records",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "Version History",
+    "createVersion": "+ New Version",
+    "versionSummaryPlaceholder": "What changed? (optional)",
+    "creatingVersion": "Creating...",
+    "saveVersion": "Save Version",
+    "noVersions": "No versions recorded yet.",
+    "versionLabel": "Version {{num}}",
+    "versionCards": "cards"
   },
   "sync": {
     "button": "Sync",
@@ -150,6 +158,18 @@
     "tags": "Tags",
     "tagsPlaceholder": "Enter tag then press Enter",
     "templateNotSet": "Please set a template",
-    "goToSettings": "Go to settings \u2192"
+    "goToSettings": "Go to settings →"
+  },
+  "learningLanguage": {
+    "label": "Learning language",
+    "all": "All"
+  },
+  "nativeLanguage": {
+    "label": "Native language",
+    "multiHint": "Select all that apply"
+  },
+  "studyLevel": {
+    "label": "Study level",
+    "none": "Not specified"
   }
 }

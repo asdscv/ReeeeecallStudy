@@ -44,7 +44,15 @@
     "bulkDelete": "カードの一括削除",
     "bulkDeleteConfirm": "選択した{{count}}枚のカードを削除しますか？この操作は元に戻せません。",
     "noStudyRecords": "学習記録がありません",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "バージョン履歴",
+    "createVersion": "+ 新しいバージョン",
+    "versionSummaryPlaceholder": "変更点は？（任意）",
+    "creatingVersion": "作成中...",
+    "saveVersion": "バージョンを保存",
+    "noVersions": "まだバージョンが記録されていません。",
+    "versionLabel": "バージョン {{num}}",
+    "versionCards": "枚"
   },
   "edit": {
     "title": "デッキを編集",

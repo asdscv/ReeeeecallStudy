@@ -39,7 +39,8 @@
     "show": "Mostrar",
     "hide": "Ocultar",
     "startStudy": "Comenzar estudio",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "retry": "Reintentar"
   },
   "status": {
     "loading": "Cargando...",
@@ -267,5 +268,6 @@
     "hamburger": "Toca el menú (☰) para navegar",
     "dashboard": "El panel muestra tus estadísticas y rachas",
     "quickStudy": "Estudio rápido inicia una sesión al instante"
-  }
+  },
+  "cancel": "Cancelar"
 }
