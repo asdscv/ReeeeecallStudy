@@ -87,7 +87,8 @@
   "nativeLanguage": {
     "label": "Tiếng mẹ đẻ",
     "all": "Tất cả",
-    "none": "Không xác định"
+    "none": "Không xác định",
+    "multiHint": "Chọn tất cả những mục phù hợp"
   },
   "publisherStats": {
     "title": "Thống kê nhà xuất bản",

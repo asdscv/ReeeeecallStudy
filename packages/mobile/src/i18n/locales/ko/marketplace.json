@@ -26,21 +26,9 @@
   },
   "detail": {
     "back": "마켓플레이스로 돌아가기",
-    "notFound": "리스팅을 찾을 수 없습니다",
-    "goBack": "뒤로 가기",
     "getDeck": "내 덱에 추가",
     "downloading": "다운로드 중...",
-    "previewCards": "미리보기 카드",
-    "noPreview": "미리보기 불가",
-    "success": "덱이 컬렉션에 추가되었습니다!",
-    "failed": "덱 다운로드에 실패했습니다",
     "reportContent": "콘텐츠 신고",
-    "reportTitle": "콘텐츠 신고",
-    "reportQuestion": "이 덱을 신고하는 이유는?",
-    "inappropriateContent": "부적절한 콘텐츠",
-    "copyrightViolation": "저작권 침해",
-    "spam": "스팸 / 오해의 소지",
-    "reportThanks": "신고가 접수되었습니다. 빠르게 검토하겠습니다.",
     "publishedBy": "by",
     "alreadyAcquired": "이미 추가됨",
     "unsubscribe": "구독 해지",
@@ -99,7 +87,8 @@
   "nativeLanguage": {
     "label": "모국어",
     "all": "전체",
-    "none": "미지정"
+    "none": "미지정",
+    "multiHint": "해당하는 항목을 모두 선택하세요"
   },
   "publisherStats": {
     "title": "퍼블리셔 통계",

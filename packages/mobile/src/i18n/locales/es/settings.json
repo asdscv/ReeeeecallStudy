@@ -41,7 +41,9 @@
     "edgeTtsNote": "* Actualmente solo compatible con inglés",
     "note": "El idioma TTS sigue la configuración de campo en la plantilla de tarjeta. El botón de reproducción siempre se muestra sin importar la lectura automática.",
     "voiceEngine": "Motor de voz",
-    "readingSpeed": "Velocidad de lectura"
+    "readingSpeed": "Velocidad de lectura",
+    "deviceVoice": "Voz del dispositivo",
+    "deviceVoiceDesc": "Usa la voz integrada de tu dispositivo"
   },
   "srsConfig": {
     "title": "SRS Configuration",

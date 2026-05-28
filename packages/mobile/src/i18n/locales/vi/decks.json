@@ -44,7 +44,17 @@
   "edit": {
     "title": "Sửa bộ thẻ",
     "save": "Lưu",
-    "nameRequired": "Vui lòng nhập tên bộ thẻ."
+    "nameRequired": "Vui lòng nhập tên bộ thẻ.",
+    "createTitle": "Bộ thẻ mới",
+    "create": "Tạo bộ thẻ",
+    "deckName": "Tên",
+    "namePlaceholder": "vd. Từ vựng tiếng Tây Ban Nha",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Bạn sẽ học gì?",
+    "color": "Màu",
+    "icon": "Biểu tượng",
+    "template": "Mẫu",
+    "saveFailed": "Không thể lưu bộ thẻ"
   },
   "card": {
     "noStudyRecord": "Chưa có lịch sử học",

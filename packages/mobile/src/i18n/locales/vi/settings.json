@@ -41,7 +41,9 @@
     "edgeTtsNote": "* Hiện chỉ hỗ trợ tiếng Anh",
     "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
     "voiceEngine": "Bộ máy giọng nói",
-    "readingSpeed": "Tốc độ đọc"
+    "readingSpeed": "Tốc độ đọc",
+    "deviceVoice": "Giọng thiết bị",
+    "deviceVoiceDesc": "Dùng giọng tích hợp của thiết bị"
   },
   "srsConfig": {
     "title": "SRS Configuration",

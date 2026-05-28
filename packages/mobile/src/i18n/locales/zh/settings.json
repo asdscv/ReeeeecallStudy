@@ -41,7 +41,9 @@
     "edgeTtsNote": "* 目前仅支持英语",
     "note": "TTS 语言跟随卡片模板中的字段设置。无论是否启用自动朗读，播放按钮始终显示。",
     "voiceEngine": "语音引擎",
-    "readingSpeed": "朗读速度"
+    "readingSpeed": "朗读速度",
+    "deviceVoice": "设备语音",
+    "deviceVoiceDesc": "使用设备内置语音"
   },
   "srsConfig": {
     "title": "SRS Configuration",

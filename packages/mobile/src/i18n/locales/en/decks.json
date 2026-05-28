@@ -32,8 +32,6 @@
     "importCards": "Import CSV/JSON",
     "downloadTemplate": "CSV Template",
     "deckNotFound": "Deck not found",
-    "goBack": "Go Back",
-    "empty": "(empty)",
     "versionHistory": "Version History",
     "createVersion": "+ New Version",
     "versionSummaryPlaceholder": "What changed? (optional)",
@@ -46,7 +44,6 @@
   "edit": {
     "title": "Edit Deck",
     "createTitle": "New Deck",
-    "cancel": "Cancel",
     "save": "Save Changes",
     "create": "Create Deck",
     "deckName": "Name",
@@ -56,7 +53,6 @@
     "color": "Color",
     "icon": "Icon",
     "template": "Template",
-    "deckNamePreview": "Deck Name",
     "nameRequired": "Deck name is required",
     "saveFailed": "Failed to save deck"
   },
@@ -67,11 +63,7 @@
     "noStudyRecord": "No study record"
   },
   "stats": {
-    "totalCards": "Total Cards",
-    "new": "New",
-    "learning": "Learning",
-    "review": "Review",
-    "suspended": "Suspended"
+    "totalCards": "Total Cards"
   },
   "sync": {
     "button": "Sync",
