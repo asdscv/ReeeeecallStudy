@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "Actualización requerida",
+  "blockedMessage": "Esta versión ya no es compatible. Actualiza a la última versión para continuar.",
+  "optionalTitle": "Actualización disponible",
+  "optionalMessage": "Hay una nueva versión disponible con mejoras y correcciones de errores.",
+  "updateButton": "Actualizar ahora",
+  "laterButton": "Más tarde"
+}
