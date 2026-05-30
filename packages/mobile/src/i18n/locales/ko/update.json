@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "업데이트 필요",
+  "blockedMessage": "현재 버전은 더 이상 지원되지 않습니다. 계속하려면 최신 버전으로 업데이트해 주세요.",
+  "optionalTitle": "업데이트 알림",
+  "optionalMessage": "개선 사항과 버그 수정이 포함된 새 버전이 출시되었습니다.",
+  "updateButton": "지금 업데이트",
+  "laterButton": "나중에"
+}

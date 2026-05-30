@@ -19,6 +19,7 @@ const resources = {
     guide: require('./locales/en/guide.json'),
     errors: require('./locales/en/errors.json'),
     paywall: require('./locales/en/paywall.json'),
+    update: require('./locales/en/update.json'),
   },
   ko: {
     common: require('./locales/ko/common.json'),
@@ -33,6 +34,7 @@ const resources = {
     guide: require('./locales/ko/guide.json'),
     errors: require('./locales/ko/errors.json'),
     paywall: require('./locales/ko/paywall.json'),
+    update: require('./locales/ko/update.json'),
   },
   ja: {
     common: require('./locales/ja/common.json'),
@@ -47,6 +49,7 @@ const resources = {
     guide: require('./locales/ja/guide.json'),
     errors: require('./locales/ja/errors.json'),
     paywall: require('./locales/ja/paywall.json'),
+    update: require('./locales/ja/update.json'),
   },
   zh: {
     common: require('./locales/zh/common.json'),
@@ -61,6 +64,7 @@ const resources = {
     guide: require('./locales/zh/guide.json'),
     errors: require('./locales/zh/errors.json'),
     paywall: require('./locales/zh/paywall.json'),
+    update: require('./locales/zh/update.json'),
   },
   vi: {
     common: require('./locales/vi/common.json'),
@@ -75,6 +79,7 @@ const resources = {
     guide: require('./locales/vi/guide.json'),
     errors: require('./locales/vi/errors.json'),
     paywall: require('./locales/vi/paywall.json'),
+    update: require('./locales/vi/update.json'),
   },
   th: {
     common: require('./locales/th/common.json'),
@@ -89,6 +94,7 @@ const resources = {
     guide: require('./locales/th/guide.json'),
     errors: require('./locales/th/errors.json'),
     paywall: require('./locales/th/paywall.json'),
+    update: require('./locales/th/update.json'),
   },
   id: {
     common: require('./locales/id/common.json'),
@@ -103,6 +109,7 @@ const resources = {
     guide: require('./locales/id/guide.json'),
     errors: require('./locales/id/errors.json'),
     paywall: require('./locales/id/paywall.json'),
+    update: require('./locales/id/update.json'),
   },
   es: {
     common: require('./locales/es/common.json'),
@@ -117,6 +124,7 @@ const resources = {
     guide: require('./locales/es/guide.json'),
     errors: require('./locales/es/errors.json'),
     paywall: require('./locales/es/paywall.json'),
+    update: require('./locales/es/update.json'),
   },
 }
 
@@ -166,7 +174,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs,
 
-    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall'],
+    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update'],
     defaultNS: 'common',
 
     interpolation: { escapeValue: false },

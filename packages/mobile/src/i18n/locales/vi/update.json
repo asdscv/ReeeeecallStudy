@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "Cần cập nhật",
+  "blockedMessage": "Phiên bản này không còn được hỗ trợ. Vui lòng cập nhật lên phiên bản mới nhất để tiếp tục.",
+  "optionalTitle": "Đã có bản cập nhật",
+  "optionalMessage": "Phiên bản mới đã có với các cải tiến và sửa lỗi.",
+  "updateButton": "Cập nhật ngay",
+  "laterButton": "Để sau"
+}

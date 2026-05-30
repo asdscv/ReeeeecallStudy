@@ -502,6 +502,7 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
       <ScrollView
         contentContainerStyle={styles.cardScrollContent}
         showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         bounces={false}
         nestedScrollEnabled
       >
@@ -553,7 +554,14 @@ const styles = StyleSheet.create({
   // that over-wide value and text overflows horizontally instead of wrapping.
   cardContent: { flex: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, width: '100%' },
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, padding: 8 },
-  fieldBlock: { width: '100%', alignItems: 'center' },
+  // alignItems:'stretch' (not 'center') gives each field — including a bare
+  // non-TTS <Text> with no explicit width — a DEFINITE width from the card, so
+  // it wraps at the card edge instead of being sized to its intrinsic one-line
+  // width and overflowing horizontally. Same iOS gotcha as cardContent above;
+  // TTS fields already wrap via the flexShrink row. Centered look is preserved
+  // by textStyle.textAlign:'center'. (Completes the #146 wrap fix, which left
+  // the non-TTS explanation text still overflowing.)
+  fieldBlock: { width: '100%', alignItems: 'stretch' },
   hintBlock: { borderLeftWidth: 2, paddingLeft: 12, alignItems: 'flex-start' },
   // Web-parity row: icon + text, centered as a group. The row has a DEFINITE
   // width (100% of the card-inner width), so the flex-shrinking text below gets

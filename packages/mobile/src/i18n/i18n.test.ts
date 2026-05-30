@@ -17,7 +17,7 @@ const SUPPORTED_LANGS = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as cons
 const NAMESPACES = [
   'common', 'auth', 'dashboard', 'decks', 'study',
   'marketplace', 'settings', 'history', 'import-export',
-  'guide', 'errors', 'paywall',
+  'guide', 'errors', 'paywall', 'update',
 ] as const
 
 let passed = 0
