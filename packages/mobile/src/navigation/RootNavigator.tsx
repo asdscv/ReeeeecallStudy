@@ -8,6 +8,9 @@ import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
 import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
 import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
+import { useAppUpdateStore } from '../services/app-update'
+import { ForceUpdateScreen } from '../components/update/ForceUpdateScreen'
+import { OptionalUpdateModal } from '../components/update/OptionalUpdateModal'
 import { prefetch } from '../services/prefetch'
 import { clearNavState } from '../utils/nav-persistence'
 import type { RootStackParamList } from './types'
@@ -26,6 +29,15 @@ export function RootNavigator() {
   const registerSession = useSubscriptionStore((s) => s.registerSession)
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
   const sessionValid = useSubscriptionStore((s) => s.sessionValid)
+
+  // Backend-driven version gate. Runs once on mount, independent of auth so a
+  // hard block applies even before login. Fail-open: status stays 'ok' until
+  // (and unless) the check resolves to 'blocked', so the app never stalls here.
+  const updateStatus = useAppUpdateStore((s) => s.status)
+  const checkAppUpdate = useAppUpdateStore((s) => s.check)
+  useEffect(() => {
+    void checkAppUpdate()
+  }, [checkAppUpdate])
 
   // 최대 대기 타임아웃 — 네트워크 느려도 앱은 반드시 열림
   useEffect(() => {
@@ -98,6 +110,12 @@ export function RootNavigator() {
     await getSupabase().auth.signOut()
   }, [])
 
+  // Hard version gate takes priority over everything — a build below the
+  // minimum supported version is unusable regardless of auth/session/splash.
+  if (updateStatus === 'blocked') {
+    return <ForceUpdateScreen />
+  }
+
   // 스플래시: auth 로딩 중이거나 prefetch 미완료
   if (loading || !appReady) {
     return <LoadingScreen progress={prefetchProgress} />
@@ -114,12 +132,16 @@ export function RootNavigator() {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
-      {user ? (
-        <Stack.Screen name="Main" component={MainDrawer} />
-      ) : (
-        <Stack.Screen name="Auth" component={AuthStack} />
-      )}
-    </Stack.Navigator>
+    <>
+      <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+        {user ? (
+          <Stack.Screen name="Main" component={MainDrawer} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthStack} />
+        )}
+      </Stack.Navigator>
+      {/* Soft update nudge (dismissable) — only renders when status==='optional' */}
+      <OptionalUpdateModal />
+    </>
   )
 }

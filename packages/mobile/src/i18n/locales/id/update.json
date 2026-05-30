@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "Pembaruan Diperlukan",
+  "blockedMessage": "Versi ini tidak lagi didukung. Silakan perbarui ke versi terbaru untuk melanjutkan.",
+  "optionalTitle": "Pembaruan Tersedia",
+  "optionalMessage": "Versi baru tersedia dengan peningkatan dan perbaikan bug.",
+  "updateButton": "Perbarui Sekarang",
+  "laterButton": "Nanti"
+}

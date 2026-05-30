@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "Update Required",
+  "blockedMessage": "This version of the app is no longer supported. Please update to the latest version to continue.",
+  "optionalTitle": "Update Available",
+  "optionalMessage": "A new version is available with improvements and bug fixes.",
+  "updateButton": "Update Now",
+  "laterButton": "Later"
+}
