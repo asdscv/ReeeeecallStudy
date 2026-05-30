@@ -491,7 +491,13 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
             <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
           </View>
         ) : (
-          <Text style={textStyle}>{field.value}</Text>
+          // Non-TTS text uses the SAME proven flex-shrink row (just no icon) so
+          // it wraps on iOS too. A bare <Text> relying on a stretch/percentage
+          // width does NOT wrap during iOS text measurement (see comment above);
+          // flexShrink inside a definite-width row is the mechanism that works.
+          <View style={[styles.ttsRow, isHint && styles.ttsRowHint]}>
+            <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
+          </View>
         )}
       </View>
     )
@@ -500,6 +506,12 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
   if (scrollable) {
     return (
       <ScrollView
+        // Pin the scroll-view FRAME to the card width. Without an explicit width
+        // the view has no definite cross-size and, under the card's flex
+        // alignment, sizes itself to its (unwrapped) content — which is why the
+        // back face stayed horizontally scrollable even after the field/text
+        // wrap fixes. Mirrors cardContent's width:'100%' on the front face.
+        style={styles.cardScroll}
         contentContainerStyle={styles.cardScrollContent}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
@@ -553,6 +565,7 @@ const styles = StyleSheet.create({
   // content cross-axis to the longest line, so child width:'100%' expands to
   // that over-wide value and text overflows horizontally instead of wrapping.
   cardContent: { flex: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, width: '100%' },
+  cardScroll: { width: '100%' },
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, padding: 8 },
   // alignItems:'stretch' (not 'center') gives each field — including a bare
   // non-TTS <Text> with no explicit width — a DEFINITE width from the card, so
