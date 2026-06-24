@@ -144,10 +144,11 @@ export const useDeckStore = create<DeckState>((set, get) => ({
 
   ensureDefaultTemplates: async () => {
     // ensure_default_templates() (migration 092) is idempotent and seeds the
-    // canonical defaults only when the user has none. Refetch regardless of the
-    // RPC result so the picker still shows whatever templates already exist.
-    const { error } = await supabase.rpc('ensure_default_templates')
-    if (error) set({ error: error.message })
+    // canonical defaults only when the user has none. Best-effort: swallow the
+    // RPC error instead of writing to the shared store.error (it has no reliable
+    // clear path and would surface a stale error elsewhere); the picker falls
+    // back to whatever templates already exist. Refetch regardless.
+    await supabase.rpc('ensure_default_templates')
     await get().fetchTemplates({ force: true })
   },
 

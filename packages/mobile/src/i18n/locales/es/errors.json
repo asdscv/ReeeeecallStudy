@@ -12,5 +12,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "Error al obtener el mazo. Inténtalo de nuevo."
+  },
+  "rateLimit": {
+    "tooFast": "Demasiadas solicitudes. Intenta de nuevo en {{seconds}}s."
+  },
+  "quota": {
+    "limitReached": "Límite de {{resource}} alcanzado ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Solicitudes API diarias",
+      "storage_bytes": "Almacenamiento",
+      "cards_total": "Total de tarjetas",
+      "decks_total": "Total de mazos",
+      "templates_total": "Total de plantillas",
+      "study_sessions_daily": "Sesiones de estudio diarias",
+      "file_uploads_daily": "Subidas de archivos diarias"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "No se pueden añadir tarjetas a un mazo de solo lectura.",
+    "readonlyDeckNoEdit": "No se pueden modificar tarjetas en un mazo de solo lectura.",
+    "rateLimitReached": "Límite de solicitudes alcanzado."
+  },
+  "deck": {
+    "rateLimitReached": "Límite de solicitudes alcanzado."
   }
 }

@@ -7,6 +7,7 @@ import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import type { CardTemplate } from '@reeeeecall/shared/types/database'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'CardEdit'>
@@ -26,7 +27,15 @@ export function CardEditScreen() {
   const card = cardId ? cards.find((c) => c.id === cardId) : null
   const isEditing = !!card
 
-  const template = templates.find((t) => t.id === (card?.template_id ?? deck?.default_template_id))
+  // Template resolved from the loaded list (card's own, then deck's default).
+  const listTemplate = templates.find((t) => t.id === (card?.template_id ?? deck?.default_template_id))
+  // A template adopted up-front when the deck has none (heal-before-render). This
+  // ensures the entry form renders the REAL field keys (field_1/field_2/…) the
+  // values get persisted under — otherwise a positional front/back fallback form
+  // would write to keys that don't match the adopted template, and the card would
+  // re-open blank.
+  const [healedTemplate, setHealedTemplate] = useState<CardTemplate | null>(null)
+  const template = listTemplate ?? healedTemplate
   const fields = template?.fields ?? []
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(
@@ -43,6 +52,32 @@ export function CardEditScreen() {
     }
   }, [card])
 
+  // Heal-before-render: in create mode, if the deck has no resolvable template,
+  // seed defaults + adopt the first default + persist it on the deck up front,
+  // then set it into state so the form renders the real template fields (and the
+  // user types into the correct field keys). Save-time resolveTemplateId() stays
+  // as a fallback but is no longer the primary path.
+  useEffect(() => {
+    if (isEditing) return // editing an existing card always has its own template
+    if (listTemplate || healedTemplate) return // already resolved
+    let active = true
+    ;(async () => {
+      await ensureDefaultTemplates()
+      const seeded = useDeckStore.getState().templates
+      const fallback = seeded.find((t) => t.is_default) ?? seeded[0]
+      if (!fallback || !active) return
+      // Persist on the deck so future cards resolve a template without re-healing.
+      if (deck && !deck.default_template_id) {
+        await updateDeck(deckId, { default_template_id: fallback.id })
+      }
+      if (active) setHealedTemplate(fallback)
+    })()
+    return () => {
+      active = false
+    }
+    // deckId keys the heal; deck/listTemplate update as the stores load.
+  }, [isEditing, listTemplate, healedTemplate, deck, deckId, ensureDefaultTemplates, updateDeck])
+
   const setField = (key: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [key]: value }))
   }
@@ -50,13 +85,15 @@ export function CardEditScreen() {
   const hasContent = Object.values(fieldValues).some((v) => v.trim())
 
   /**
-   * Resolve a non-empty template id for new cards.
+   * Resolve a non-empty template id for new cards (save-time fallback).
    *
-   * cards.template_id is NOT NULL, so submitting '' (which happened when a deck
-   * had no default template — e.g. pre-036 signup bug, or a deck created with
-   * default_template_id null) FK-violated and dead-ended card creation. Guard it:
-   * if no template resolves, self-heal the account's default templates, adopt the
-   * first one, and persist it as this deck's default so it sticks for next time.
+   * The mount-time heal effect normally resolves the template before render, so
+   * this is a backstop for the rare case it hasn't completed yet. cards.template_id
+   * is NOT NULL, so submitting '' (which happened when a deck had no default
+   * template — e.g. pre-036 signup bug, or a deck created with default_template_id
+   * null) FK-violated and dead-ended card creation. Guard it: if no template
+   * resolves, self-heal the account's default templates, adopt the first one, and
+   * persist it as this deck's default so it sticks for next time.
    */
   const resolveTemplateId = async (): Promise<string | null> => {
     if (template?.id) return template.id

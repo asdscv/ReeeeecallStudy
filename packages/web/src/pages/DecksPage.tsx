@@ -162,10 +162,12 @@ export function DecksPage() {
         onClose={() => setShowCreate(false)}
       />
 
-      {/* Quick Create Modal (deck + preset template + cards in one go) */}
+      {/* Quick Create Modal (deck + preset template + cards in one go).
+          createDeck already force-refreshes decks+stats, and onCreated navigates
+          away — so onClose just needs to dismiss. */}
       <QuickCreateModal
         open={showQuickCreate}
-        onClose={() => { setShowQuickCreate(false); fetchDecks({ force: true }); if (user) fetchStats(user.id, { force: true }) }}
+        onClose={() => setShowQuickCreate(false)}
         onCreated={(deckId) => navigate(`/decks/${deckId}`)}
       />
 

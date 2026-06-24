@@ -12,5 +12,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "Không thể lấy bộ thẻ. Vui lòng thử lại."
+  },
+  "rateLimit": {
+    "tooFast": "Quá nhiều yêu cầu. Thử lại sau {{seconds}} giây."
+  },
+  "quota": {
+    "limitReached": "Đã đạt giới hạn {{resource}} ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Yêu cầu API hàng ngày",
+      "storage_bytes": "Dung lượng lưu trữ",
+      "cards_total": "Tổng số thẻ",
+      "decks_total": "Tổng số bộ thẻ",
+      "templates_total": "Tổng số mẫu",
+      "study_sessions_daily": "Phiên học hàng ngày",
+      "file_uploads_daily": "Tải tệp lên hàng ngày"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "Không thể thêm thẻ vào bộ thẻ chỉ đọc.",
+    "readonlyDeckNoEdit": "Không thể chỉnh sửa thẻ trong bộ thẻ chỉ đọc.",
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
+  },
+  "deck": {
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
   }
 }

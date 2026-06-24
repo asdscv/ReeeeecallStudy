@@ -12,5 +12,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "デッキの取得に失敗しました。再試行してください。"
+  },
+  "rateLimit": {
+    "tooFast": "リクエストが多すぎます。{{seconds}}秒後にお試しください。"
+  },
+  "quota": {
+    "limitReached": "{{resource}}の上限に達しました（{{current}}/{{limit}}）",
+    "resources": {
+      "api_requests_daily": "1日のAPIリクエスト数",
+      "storage_bytes": "ストレージ",
+      "cards_total": "カード総数",
+      "decks_total": "デッキ総数",
+      "templates_total": "テンプレート総数",
+      "study_sessions_daily": "1日の学習セッション数",
+      "file_uploads_daily": "1日のファイルアップロード数"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "読み取り専用デッキにカードを追加できません。",
+    "readonlyDeckNoEdit": "読み取り専用デッキのカードを編集できません。",
+    "rateLimitReached": "リクエスト上限に達しました。"
+  },
+  "deck": {
+    "rateLimitReached": "リクエスト上限に達しました。"
   }
 }

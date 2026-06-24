@@ -37,6 +37,10 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
   const [loading, setLoading] = useState(false)
   const [preparing, setPreparing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // If deck creation succeeded but card insert failed, we keep the modal open
+  // and remember the deck id so a retry only re-runs createCards — never a
+  // second createDeck (which would create a duplicate deck).
+  const [createdDeckId, setCreatedDeckId] = useState<string | null>(null)
 
   // On open: reset + make sure the user actually has default templates to pick
   // from (self-heals zero-template accounts via the ensure_default_templates RPC).
@@ -45,19 +49,26 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
     setDeckName('')
     setTemplateId('')
     setError(null)
+    setCreatedDeckId(null)
     setRows(Array.from({ length: INITIAL_ROWS }, () => ({})))
     setPreparing(true)
     ensureDefaultTemplates().finally(() => setPreparing(false))
   }, [open, ensureDefaultTemplates])
 
-  // Default-select the simplest preset once templates are loaded.
+  // Only text-enterable presets are usable in this quick flow (a media-only
+  // default template would render zero inputs → unsubmittable dead-end).
+  const presets = templates.filter(
+    (tpl) => tpl.is_default && (tpl.fields ?? []).some((f) => f.type === 'text'),
+  )
+
+  // Default-select the simplest usable preset once templates are loaded.
   useEffect(() => {
     if (!open || templateId) return
-    const first = templates.find((tpl) => tpl.is_default)
+    const first = presets[0]
     if (first) setTemplateId(first.id)
-  }, [open, templates, templateId])
+    // presets is derived from templates; depend on templates to re-run on load.
+  }, [open, templates, templateId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const defaultTemplates = templates.filter((tpl) => tpl.is_default)
   const selectedTemplate: CardTemplate | undefined = templates.find((tpl) => tpl.id === templateId)
   const textFields: TemplateField[] = (selectedTemplate?.fields ?? []).filter((f) => f.type === 'text')
 
@@ -75,6 +86,13 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
       .map((f) => fieldLabel(f))
       .join(' · ')
 
+  const emptyRows = () => Array.from({ length: INITIAL_ROWS }, () => ({}))
+  const selectPreset = (id: string) => {
+    // Presets reuse field_1/field_2/... with different meanings, so switching
+    // would mislabel/drop already-typed values — clear the rows on switch.
+    setTemplateId(id)
+    setRows(emptyRows())
+  }
   const setCell = (rowIdx: number, key: string, value: string) =>
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)))
   const addRow = () => setRows((prev) => [...prev, {}])
@@ -82,6 +100,7 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (loading) return // guard against double-submit creating a duplicate deck
     setError(null)
 
     const name = deckName.trim()
@@ -113,26 +132,36 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
     }
 
     setLoading(true)
-    const deck = await createDeck({ name, default_template_id: selectedTemplate.id })
-    if (!deck) {
-      setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
-      setLoading(false)
-      return
+
+    // Create the deck only once; a retry after a card failure reuses it.
+    let deckId = createdDeckId
+    if (!deckId) {
+      const deck = await createDeck({ name, default_template_id: selectedTemplate.id })
+      if (!deck) {
+        setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+        setLoading(false)
+        return
+      }
+      deckId = deck.id
+      setCreatedDeckId(deck.id)
     }
 
     const inserted = await createCards({
-      deck_id: deck.id,
+      deck_id: deckId,
       template_id: selectedTemplate.id,
       cards,
     })
     setLoading(false)
 
-    // Deck exists regardless; surface a card error but still hand off to the deck.
+    // Cards failed: keep the modal open with the error so the user doesn't lose
+    // what they typed. The deck already exists (createdDeckId retained), so
+    // resubmitting retries only the card insert — no duplicate deck.
     if (inserted < cards.length) {
-      const cardErr = useCardStore.getState().error
-      if (cardErr) setError(cardErr)
+      setError(useCardStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+      return
     }
-    onCreated?.(deck.id)
+
+    onCreated?.(deckId)
     onClose()
   }
 
@@ -144,7 +173,9 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">{error}</div>
+            <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
+              {t(error, { defaultValue: error })}
+            </div>
           )}
 
           {/* Deck name */}
@@ -168,19 +199,19 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
             <label className="block text-sm font-medium text-foreground mb-1">
               {t('decks:quickCreate.template')}
             </label>
-            {preparing && defaultTemplates.length === 0 ? (
+            {preparing && presets.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {t('common:loading', { defaultValue: 'Loading...' })}
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {defaultTemplates.map((tpl) => {
+                {presets.map((tpl) => {
                   const selected = tpl.id === templateId
                   return (
                     <button
                       type="button"
                       key={tpl.id}
-                      onClick={() => setTemplateId(tpl.id)}
+                      onClick={() => selectPreset(tpl.id)}
                       className={`text-left p-3 rounded-lg border transition cursor-pointer ${
                         selected
                           ? 'border-brand ring-2 ring-brand/20 bg-brand/5'

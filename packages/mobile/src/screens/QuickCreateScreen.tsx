@@ -41,12 +41,17 @@ export function QuickCreateScreen() {
   const [loading, setLoading] = useState(false)
   const [preparing, setPreparing] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // If deck creation succeeded but card insert failed, we keep the screen open
+  // and remember the deck id so a retry only re-runs createCards — never a
+  // second createDeck (which would create a duplicate deck).
+  const [createdDeckId, setCreatedDeckId] = useState<string | null>(null)
 
   // On mount: make sure the user actually has default templates to pick from
   // (self-heals zero-template accounts via the ensure_default_templates RPC).
   useEffect(() => {
     let active = true
     setPreparing(true)
+    setCreatedDeckId(null)
     ensureDefaultTemplates().finally(() => {
       if (active) setPreparing(false)
     })
@@ -86,6 +91,7 @@ export function QuickCreateScreen() {
   const removeRow = (idx: number) => setRows((prev) => prev.filter((_, i) => i !== idx))
 
   const handleSubmit = async () => {
+    if (loading) return // guard against double-submit creating a duplicate deck
     setError(null)
 
     const name = deckName.trim()
@@ -117,31 +123,37 @@ export function QuickCreateScreen() {
     }
 
     setLoading(true)
-    const deck = await createDeck({ name, default_template_id: selectedTemplate.id })
-    if (!deck) {
-      setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
-      setLoading(false)
-      return
+
+    // Create the deck only once; a retry after a card failure reuses it.
+    let deckId = createdDeckId
+    if (!deckId) {
+      const deck = await createDeck({ name, default_template_id: selectedTemplate.id })
+      if (!deck) {
+        setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+        setLoading(false)
+        return
+      }
+      deckId = deck.id
+      setCreatedDeckId(deck.id)
     }
 
     const inserted = await createCards({
-      deck_id: deck.id,
+      deck_id: deckId,
       template_id: selectedTemplate.id,
       cards,
     })
     setLoading(false)
 
-    // Deck exists regardless; surface a card error but still hand off to the deck.
+    // Cards failed: keep the screen open with the error so the user doesn't lose
+    // what they typed. The deck already exists (createdDeckId retained), so
+    // resubmitting retries only the card insert — no duplicate deck.
     if (inserted < cards.length) {
-      const cardErr = useCardStore.getState().error
-      if (cardErr) {
-        setError(cardErr)
-        return
-      }
+      setError(useCardStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+      return
     }
 
     // Replace this screen with the new deck so Back goes to the deck list.
-    navigation.replace('DeckDetail', { deckId: deck.id })
+    navigation.replace('DeckDetail', { deckId })
   }
 
   return (
@@ -150,7 +162,9 @@ export function QuickCreateScreen() {
       <View style={styles.content}>
         {error && (
           <View style={[styles.errorBox, { backgroundColor: theme.colors.errorLight }]}>
-            <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>{error}</Text>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
+              {t(error, { defaultValue: error })}
+            </Text>
           </View>
         )}
 
