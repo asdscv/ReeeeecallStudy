@@ -6,6 +6,7 @@ import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
+import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'CardEdit'>
@@ -17,7 +18,8 @@ export function CardEditScreen() {
   const route = useRoute<Route>()
   const { deckId, cardId } = route.params
 
-  const { decks, templates } = useDecks()
+  const { decks, templates, updateDeck } = useDecks()
+  const { ensureDefaultTemplates } = useDeckStore()
   const { cards, createCard, updateCard } = useCards(deckId)
 
   const deck = decks.find((d) => d.id === deckId)
@@ -47,6 +49,29 @@ export function CardEditScreen() {
 
   const hasContent = Object.values(fieldValues).some((v) => v.trim())
 
+  /**
+   * Resolve a non-empty template id for new cards.
+   *
+   * cards.template_id is NOT NULL, so submitting '' (which happened when a deck
+   * had no default template — e.g. pre-036 signup bug, or a deck created with
+   * default_template_id null) FK-violated and dead-ended card creation. Guard it:
+   * if no template resolves, self-heal the account's default templates, adopt the
+   * first one, and persist it as this deck's default so it sticks for next time.
+   */
+  const resolveTemplateId = async (): Promise<string | null> => {
+    if (template?.id) return template.id
+    // No template on the card/deck — seed defaults and pick the first one.
+    await ensureDefaultTemplates()
+    const seeded = useDeckStore.getState().templates
+    const fallback = seeded.find((t) => t.is_default) ?? seeded[0]
+    if (!fallback) return null
+    // Persist on the deck so future cards resolve a template without re-healing.
+    if (deck && !deck.default_template_id) {
+      await updateDeck(deckId, { default_template_id: fallback.id })
+    }
+    return fallback.id
+  }
+
   const handleSave = async () => {
     if (!hasContent) {
       Alert.alert('Error', 'At least one field must have content')
@@ -63,9 +88,14 @@ export function CardEditScreen() {
           tags: parsedTags,
         })
       } else {
+        const resolvedTemplateId = await resolveTemplateId()
+        if (!resolvedTemplateId) {
+          Alert.alert('Error', 'No card template available')
+          return
+        }
         await createCard({
           deck_id: deckId,
-          template_id: template?.id ?? '',
+          template_id: resolvedTemplateId,
           field_values: fieldValues,
           tags: parsedTags.length > 0 ? parsedTags : undefined,
         })
@@ -158,9 +188,14 @@ export function CardEditScreen() {
               setSaving(true)
               try {
                 const parsedTags = tags.split(',').map((t) => t.trim()).filter(Boolean)
+                const resolvedTemplateId = await resolveTemplateId()
+                if (!resolvedTemplateId) {
+                  Alert.alert('Error', 'No card template available')
+                  return
+                }
                 await createCard({
                   deck_id: deckId,
-                  template_id: template?.id ?? '',
+                  template_id: resolvedTemplateId,
                   field_values: fieldValues,
                   tags: parsedTags.length > 0 ? parsedTags : undefined,
                 })

@@ -130,6 +130,27 @@ export function DeckDetailPage() {
           .eq('id', typedDeck.default_template_id)
           .single()
         setTemplate(tmpl as CardTemplate | null)
+      } else if (!typedDeck.is_readonly) {
+        // Self-heal legacy decks left without a default template (accounts whose
+        // signup trigger failed pre-036). Guarantee defaults exist, adopt the
+        // first, and persist it so "Add Card" never dead-ends with no fields.
+        await supabase.rpc('ensure_default_templates')
+        const { data: tmpl } = await supabase
+          .from('card_templates')
+          .select('*')
+          .eq('is_default', true)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+        if (tmpl) {
+          const healedId = (tmpl as CardTemplate).id
+          await supabase
+            .from('decks')
+            .update({ default_template_id: healedId } as Record<string, unknown>)
+            .eq('id', typedDeck.id)
+          setTemplate(tmpl as CardTemplate)
+          setDeck({ ...typedDeck, default_template_id: healedId })
+        }
       }
 
       await fetchCards(deckId)

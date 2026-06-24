@@ -135,6 +135,13 @@ export function DecksListScreen() {
                 <Text style={styles.headerBtnText}>🤖 AI Generate</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                testID="decks-quick-create"
+                onPress={() => navigation.navigate('QuickCreate')}
+                style={[styles.headerBtn, { backgroundColor: palette.green[600] }]}
+              >
+                <Text style={styles.headerBtnText}>⚡ {t('quickCreate.button')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 testID="decks-create-new"
                 onPress={() => navigation.navigate('DeckEdit', {})}
                 style={[styles.headerBtn, { backgroundColor: palette.blue[600] }]}
@@ -263,8 +270,8 @@ export function DecksListScreen() {
               icon="📚"
               title={t('empty')}
               description={t('emptyDescription')}
-              actionTitle={t('createFirst')}
-              onAction={() => navigation.navigate('DeckEdit', {})}
+              actionTitle={t('quickCreate.button')}
+              onAction={() => navigation.navigate('QuickCreate')}
               testID="decks-empty"
             />
           ) : null

@@ -114,5 +114,40 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "quickCreate": {
+    "button": "Creación rápida",
+    "title": "Creación rápida",
+    "deckName": "Nombre del mazo",
+    "deckNamePlaceholder": "p. ej., HSK Nivel 5",
+    "template": "Tipo de tarjeta",
+    "cards": "Tarjetas",
+    "addRow": "+ Añadir tarjeta",
+    "removeRow": "Eliminar",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "creating": "Creando...",
+    "presets": {
+      "basic": "Básico (Anverso / Reverso)",
+      "english": "Palabra en inglés",
+      "chinese": "Palabra en chino"
+    },
+    "fields": {
+      "front": "Anverso",
+      "back": "Reverso",
+      "word": "Palabra",
+      "meaning": "Significado",
+      "pronunciation": "Pronunciación",
+      "example": "Ejemplo",
+      "hanzi": "Hanzi",
+      "pinyin": "Pinyin",
+      "audio": "Audio"
+    },
+    "errors": {
+      "nameRequired": "Introduce un nombre para el mazo.",
+      "templateRequired": "Elige un tipo de tarjeta.",
+      "cardsRequired": "Añade al menos una tarjeta.",
+      "createFailed": "No se pudo crear el mazo. Inténtalo de nuevo."
+    }
   }
 }

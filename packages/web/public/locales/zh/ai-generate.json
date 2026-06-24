@@ -48,7 +48,9 @@
     "layoutDefault": "Default",
     "layoutDefaultDesc": "Style + font size based",
     "layoutCustom": "Custom HTML",
-    "layoutCustomDesc": "AI generates styled HTML"
+    "layoutCustomDesc": "AI generates styled HTML",
+    "cardCountPlaceholder": "{{min}}–{{max}}",
+    "cardCountHint": "{{min}}–{{max}} 张卡片"
   },
   "wizard": {
     "setup": "Setup",
@@ -85,7 +87,31 @@
     "next": "Next",
     "save": "Save {{count}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
-    "removeCard": "Remove"
+    "removeCard": "Remove",
+    "tts": {
+      "off": "关闭 TTS",
+      "langs": {
+        "ko-KR": "韩语",
+        "en-US": "英语（美国）",
+        "ja-JP": "日语",
+        "zh-CN": "中文（简体）",
+        "zh-TW": "中文（繁体）",
+        "es-ES": "西班牙语",
+        "fr-FR": "法语",
+        "de-DE": "德语",
+        "vi-VN": "越南语",
+        "th-TH": "泰语"
+      }
+    },
+    "layout": {
+      "auto": "自动",
+      "styles": {
+        "primary": "主要",
+        "secondary": "次要",
+        "hint": "提示",
+        "detail": "详情"
+      }
+    }
   },
   "done": {
     "title": "Generation Complete!",
@@ -106,7 +132,8 @@
     "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "serverError": "AI 服务器错误，请稍后再试。"
   },
   "button": {
     "aiGenerate": "AI Generate",

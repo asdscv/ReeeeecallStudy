@@ -114,5 +114,40 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "quickCreate": {
+    "button": "สร้างด่วน",
+    "title": "สร้างด่วน",
+    "deckName": "ชื่อชุดการ์ด",
+    "deckNamePlaceholder": "เช่น HSK ระดับ 5",
+    "template": "ประเภทการ์ด",
+    "cards": "การ์ด",
+    "addRow": "+ เพิ่มการ์ด",
+    "removeRow": "ลบ",
+    "cancel": "ยกเลิก",
+    "create": "สร้าง",
+    "creating": "กำลังสร้าง...",
+    "presets": {
+      "basic": "พื้นฐาน (หน้า / หลัง)",
+      "english": "คำศัพท์อังกฤษ",
+      "chinese": "คำศัพท์จีน"
+    },
+    "fields": {
+      "front": "ด้านหน้า",
+      "back": "ด้านหลัง",
+      "word": "คำ",
+      "meaning": "ความหมาย",
+      "pronunciation": "การออกเสียง",
+      "example": "ตัวอย่าง",
+      "hanzi": "อักษรจีน",
+      "pinyin": "พินอิน",
+      "audio": "เสียง"
+    },
+    "errors": {
+      "nameRequired": "กรุณาใส่ชื่อชุดการ์ด",
+      "templateRequired": "กรุณาเลือกประเภทการ์ด",
+      "cardsRequired": "กรุณาเพิ่มการ์ดอย่างน้อยหนึ่งใบ",
+      "createFailed": "สร้างชุดการ์ดไม่สำเร็จ กรุณาลองอีกครั้ง"
+    }
   }
 }

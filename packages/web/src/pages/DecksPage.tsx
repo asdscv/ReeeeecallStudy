@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
@@ -6,6 +7,7 @@ import { useSharingStore } from '../stores/sharing-store'
 import { supabase } from '../lib/supabase'
 import { DeckCard } from '../components/deck/DeckCard'
 import { DeckFormModal } from '../components/deck/DeckFormModal'
+import { QuickCreateModal } from '../components/deck/QuickCreateModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
@@ -13,10 +15,12 @@ import type { Deck } from '../types/database'
 
 export function DecksPage() {
   const { t } = useTranslation(['decks', 'common', 'marketplace', 'sharing'])
+  const navigate = useNavigate()
   const { user } = useAuthStore()
   const { decks, stats, templates, loading, fetchDecks, fetchStats, fetchTemplates, deleteDeck } = useDeckStore()
 
   const [showCreate, setShowCreate] = useState(false)
+  const [showQuickCreate, setShowQuickCreate] = useState(false)
   const [showAIGenerate, setShowAIGenerate] = useState(false)
   const [deletingDeck, setDeletingDeck] = useState<Deck | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -101,9 +105,16 @@ export function DecksPage() {
           </button>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-card text-foreground border border-border rounded-lg text-xs sm:text-sm font-medium hover:bg-muted transition cursor-pointer"
           >
             {t('decks:createNew')}
+          </button>
+          <button
+            data-testid="quick-create-button"
+            onClick={() => setShowQuickCreate(true)}
+            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand transition cursor-pointer"
+          >
+            {t('decks:quickCreate.button')}
           </button>
         </div>
       </div>
@@ -117,7 +128,7 @@ export function DecksPage() {
           <div className="text-4xl sm:text-5xl mb-4">📚</div>
           <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('decks:empty')}</p>
           <button
-            onClick={() => setShowCreate(true)}
+            onClick={() => setShowQuickCreate(true)}
             className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
           >
             {t('decks:createFirst')}
@@ -145,10 +156,17 @@ export function DecksPage() {
         initialMode="full"
       />
 
-      {/* Create Modal */}
+      {/* Create Modal (advanced) */}
       <DeckFormModal
         open={showCreate}
         onClose={() => setShowCreate(false)}
+      />
+
+      {/* Quick Create Modal (deck + preset template + cards in one go) */}
+      <QuickCreateModal
+        open={showQuickCreate}
+        onClose={() => { setShowQuickCreate(false); fetchDecks({ force: true }); if (user) fetchStats(user.id, { force: true }) }}
+        onCreated={(deckId) => navigate(`/decks/${deckId}`)}
       />
 
       {/* Delete Confirm */}

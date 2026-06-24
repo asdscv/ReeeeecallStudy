@@ -151,5 +151,40 @@
     "tagsPlaceholder": "\ud0dc\uadf8 \uc785\ub825 \ud6c4 Enter",
     "templateNotSet": "\ud15c\ud50c\ub9bf\uc744 \uc124\uc815\ud574\uc8fc\uc138\uc694",
     "goToSettings": "\uc124\uc815\ud558\ub7ec \uac00\uae30 \u2192"
+  },
+  "quickCreate": {
+    "button": "\uac04\ud3b8 \ub9cc\ub4e4\uae30",
+    "title": "\uac04\ud3b8 \ub9cc\ub4e4\uae30",
+    "deckName": "\ub371 \uc774\ub984",
+    "deckNamePlaceholder": "\uc608: HSK 5\uae09",
+    "template": "\uce74\ub4dc \uc720\ud615",
+    "cards": "\uce74\ub4dc",
+    "addRow": "+ \uce74\ub4dc \ucd94\uac00",
+    "removeRow": "\uc0ad\uc81c",
+    "cancel": "\ucde8\uc18c",
+    "create": "\ub9cc\ub4e4\uae30",
+    "creating": "\ub9cc\ub4dc\ub294 \uc911...",
+    "presets": {
+      "basic": "\uae30\ubcf8 (\uc55e/\ub4a4)",
+      "english": "\uc601\uc5b4 \ub2e8\uc5b4",
+      "chinese": "\uc911\uad6d\uc5b4 \ub2e8\uc5b4"
+    },
+    "fields": {
+      "front": "\uc55e\uba74",
+      "back": "\ub4b7\uba74",
+      "word": "\ub2e8\uc5b4",
+      "meaning": "\ub73b",
+      "pronunciation": "\ubc1c\uc74c",
+      "example": "\uc608\ubb38",
+      "hanzi": "\ud55c\uc790",
+      "pinyin": "\ubcd1\uc74c",
+      "audio": "\uc624\ub514\uc624"
+    },
+    "errors": {
+      "nameRequired": "\ub371 \uc774\ub984\uc744 \uc785\ub825\ud574\uc8fc\uc138\uc694.",
+      "templateRequired": "\uce74\ub4dc \uc720\ud615\uc744 \uc120\ud0dd\ud574\uc8fc\uc138\uc694.",
+      "cardsRequired": "\uce74\ub4dc\ub97c \ucd5c\uc18c 1\uac1c \uc774\uc0c1 \ucd94\uac00\ud574\uc8fc\uc138\uc694.",
+      "createFailed": "\ub371 \uc0dd\uc131\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud574\uc8fc\uc138\uc694."
+    }
   }
 }

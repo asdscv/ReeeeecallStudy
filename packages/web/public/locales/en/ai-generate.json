@@ -48,7 +48,9 @@
     "layoutDefault": "Default",
     "layoutDefaultDesc": "Style + font size based",
     "layoutCustom": "Custom HTML",
-    "layoutCustomDesc": "AI generates styled HTML"
+    "layoutCustomDesc": "AI generates styled HTML",
+    "cardCountPlaceholder": "{{min}}–{{max}}",
+    "cardCountHint": "{{min}}–{{max}} cards"
   },
   "wizard": {
     "setup": "Setup",
@@ -85,7 +87,31 @@
     "next": "Next",
     "save": "Save {{count}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
-    "removeCard": "Remove"
+    "removeCard": "Remove",
+    "tts": {
+      "off": "TTS off",
+      "langs": {
+        "ko-KR": "Korean",
+        "en-US": "English (US)",
+        "ja-JP": "Japanese",
+        "zh-CN": "Chinese (CN)",
+        "zh-TW": "Chinese (TW)",
+        "es-ES": "Spanish",
+        "fr-FR": "French",
+        "de-DE": "German",
+        "vi-VN": "Vietnamese",
+        "th-TH": "Thai"
+      }
+    },
+    "layout": {
+      "auto": "auto",
+      "styles": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "hint": "Hint",
+        "detail": "Detail"
+      }
+    }
   },
   "done": {
     "title": "Generation Complete!",
@@ -106,7 +132,8 @@
     "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "serverError": "AI server error. Please try again later."
   },
   "button": {
     "aiGenerate": "AI Generate",

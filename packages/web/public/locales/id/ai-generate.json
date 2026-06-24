@@ -48,7 +48,9 @@
     "layoutDefault": "Default",
     "layoutDefaultDesc": "Style + font size based",
     "layoutCustom": "Custom HTML",
-    "layoutCustomDesc": "AI generates styled HTML"
+    "layoutCustomDesc": "AI generates styled HTML",
+    "cardCountPlaceholder": "{{min}}–{{max}}",
+    "cardCountHint": "{{min}}–{{max}} kartu"
   },
   "wizard": {
     "setup": "Setup",
@@ -85,7 +87,31 @@
     "next": "Next",
     "save": "Save {{count}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
-    "removeCard": "Remove"
+    "removeCard": "Remove",
+    "tts": {
+      "off": "TTS nonaktif",
+      "langs": {
+        "ko-KR": "Korea",
+        "en-US": "Inggris (AS)",
+        "ja-JP": "Jepang",
+        "zh-CN": "Tionghoa (Sederhana)",
+        "zh-TW": "Tionghoa (Tradisional)",
+        "es-ES": "Spanyol",
+        "fr-FR": "Prancis",
+        "de-DE": "Jerman",
+        "vi-VN": "Vietnam",
+        "th-TH": "Thai"
+      }
+    },
+    "layout": {
+      "auto": "otomatis",
+      "styles": {
+        "primary": "Utama",
+        "secondary": "Sekunder",
+        "hint": "Petunjuk",
+        "detail": "Detail"
+      }
+    }
   },
   "done": {
     "title": "Generation Complete!",
@@ -106,7 +132,8 @@
     "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "serverError": "Kesalahan server AI. Silakan coba lagi nanti."
   },
   "button": {
     "aiGenerate": "AI Generate",

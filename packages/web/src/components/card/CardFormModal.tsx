@@ -129,8 +129,15 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     handleFieldChange(field.key, '')
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const resetForm = () => {
+    setFieldValues(reconcileFieldValues(fields, {}))
+    setTags([])
+    setTagInput('')
+    setFileError(null)
+    pendingFilesRef.current = {}
+  }
+
+  const submitCard = async (keepOpen: boolean) => {
     if (!template || !user) return
 
     // Minimum 1 field must have a value (excluding blob URLs)
@@ -192,7 +199,19 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     }
 
     setLoading(false)
-    onClose()
+
+    // "Add & create another" keeps the modal open and clears the form so the
+    // user can rapidly enter many cards without reopening the dialog.
+    if (keepOpen && !editCard) {
+      resetForm()
+    } else {
+      onClose()
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await submitCard(false)
   }
 
   return (
@@ -360,6 +379,16 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
               >
                 {t('cancel')}
               </button>
+              {!editCard && (
+                <button
+                  type="button"
+                  onClick={() => submitCard(true)}
+                  disabled={loading || uploadingField !== null}
+                  className="px-4 py-2 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/20 disabled:opacity-50 cursor-pointer"
+                >
+                  {t('addAnother')}
+                </button>
+              )}
               <button
                 type="submit"
                 disabled={loading || uploadingField !== null}

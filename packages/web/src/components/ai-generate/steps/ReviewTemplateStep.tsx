@@ -75,17 +75,17 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
                 })}
                 className="px-2 py-1 text-xs border border-border rounded outline-none"
               >
-                <option value="">TTS off</option>
-                <option value="ko-KR">Korean</option>
-                <option value="en-US">English (US)</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="zh-CN">Chinese (CN)</option>
-                <option value="zh-TW">Chinese (TW)</option>
-                <option value="es-ES">Spanish</option>
-                <option value="fr-FR">French</option>
-                <option value="de-DE">German</option>
-                <option value="vi-VN">Vietnamese</option>
-                <option value="th-TH">Thai</option>
+                <option value="">{t('review.tts.off')}</option>
+                <option value="ko-KR">{t('review.tts.langs.ko-KR')}</option>
+                <option value="en-US">{t('review.tts.langs.en-US')}</option>
+                <option value="ja-JP">{t('review.tts.langs.ja-JP')}</option>
+                <option value="zh-CN">{t('review.tts.langs.zh-CN')}</option>
+                <option value="zh-TW">{t('review.tts.langs.zh-TW')}</option>
+                <option value="es-ES">{t('review.tts.langs.es-ES')}</option>
+                <option value="fr-FR">{t('review.tts.langs.fr-FR')}</option>
+                <option value="de-DE">{t('review.tts.langs.de-DE')}</option>
+                <option value="vi-VN">{t('review.tts.langs.vi-VN')}</option>
+                <option value="th-TH">{t('review.tts.langs.th-TH')}</option>
               </select>
               {template.fields.length > 2 && (
                 <button
@@ -179,6 +179,7 @@ function LayoutEditor({
   fields: GeneratedTemplateField[]
   onChange: (index: number, updates: Partial<GeneratedLayoutItem>) => void
 }) {
+  const { t } = useTranslation('ai-generate')
   if (items.length === 0) return null
 
   return (
@@ -196,7 +197,7 @@ function LayoutEditor({
                 className="px-2 py-1 text-xs border border-border rounded outline-none"
               >
                 {STYLE_OPTIONS.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>{t(`review.layout.styles.${s}`)}</option>
                 ))}
               </select>
               <select
@@ -204,7 +205,7 @@ function LayoutEditor({
                 onChange={(e) => onChange(i, { font_size: e.target.value ? Number(e.target.value) : undefined })}
                 className="px-2 py-1 text-xs border border-border rounded outline-none"
               >
-                <option value="">auto</option>
+                <option value="">{t('review.layout.auto')}</option>
                 {FONT_SIZE_OPTIONS.map((s) => (
                   <option key={s} value={s}>{s}px</option>
                 ))}

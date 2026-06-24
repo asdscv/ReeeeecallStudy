@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { DecksListScreen } from '../screens/DecksListScreen'
 import { DeckDetailScreen } from '../screens/DeckDetailScreen'
 import { DeckEditScreen } from '../screens/DeckEditScreen'
+import { QuickCreateScreen } from '../screens/QuickCreateScreen'
 import { CardEditScreen } from '../screens/CardEditScreen'
 import { ImportExportScreen } from '../screens/ImportExportScreen'
 import { PublishDeckScreen } from '../screens/PublishDeckScreen'
@@ -21,6 +22,7 @@ export function DecksStack() {
       <Stack.Screen name="DecksList" component={DecksListScreen} />
       <Stack.Screen name="DeckDetail" component={DeckDetailScreen} />
       <Stack.Screen name="DeckEdit" component={DeckEditScreen} />
+      <Stack.Screen name="QuickCreate" component={QuickCreateScreen} />
       <Stack.Screen name="CardEdit" component={CardEditScreen} />
       <Stack.Screen name="ImportExport" component={ImportExportScreen} />
       <Stack.Screen name="PublishDeck" component={PublishDeckScreen} />
