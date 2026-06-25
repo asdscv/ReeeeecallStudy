@@ -179,13 +179,19 @@
       "example": "Example",
       "hanzi": "Hanzi",
       "pinyin": "Pinyin",
-      "audio": "Audio"
+      "audio": "Audio",
+      "frontN": "Front {{n}}",
+      "backN": "Back {{n}}"
     },
     "errors": {
       "nameRequired": "Please enter a deck name.",
       "templateRequired": "Please choose a card type.",
       "cardsRequired": "Please add at least one card.",
       "createFailed": "Failed to create deck. Please try again."
-    }
+    },
+    "deckDescription": "Description (optional)",
+    "deckDescriptionPlaceholder": "A short note about this deck",
+    "presetSummary": "Front {{front}} · Back {{back}}",
+    "basicLabel": "Basic"
   }
 }

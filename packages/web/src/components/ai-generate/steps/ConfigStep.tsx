@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Settings } from 'lucide-react'
+import { Settings, Info } from 'lucide-react'
 import { aiKeyVault } from '../../../lib/ai/secure-storage'
 import type { ProviderKeyMap } from '../../../lib/ai/secure-storage'
 import { useAuthStore } from '../../../stores/auth-store'
@@ -210,6 +210,12 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Personal API key notice — generation uses the user's own provider keys */}
+      <div className="flex items-start gap-2 p-3 rounded-lg bg-brand/5 border border-brand/20 text-sm text-muted-foreground">
+        <Info className="w-4 h-4 mt-0.5 shrink-0 text-brand" />
+        <span>{t('config.apiKeyNotice')}</span>
+      </div>
+
       {/* Mode select */}
       {showModeSelect && onModeChange && (
         <div>

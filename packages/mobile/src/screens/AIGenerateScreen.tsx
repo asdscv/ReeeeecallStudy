@@ -337,6 +337,10 @@ export function AIGenerateScreen() {
           <View style={styles.sectionLabelRow}>
             <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>AI PROVIDER</Text>
           </View>
+          {/* Personal API key notice — generation uses the user's own provider keys */}
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
+            AI generation uses your own API key for each provider. Add or manage keys in Settings.
+          </Text>
           {hasProvider ? (
             <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
               {configuredProviders.map((pid) => {

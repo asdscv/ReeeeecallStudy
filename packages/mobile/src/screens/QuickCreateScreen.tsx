@@ -3,14 +3,17 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
-import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useCardStore } from '@reeeeecall/shared/stores/card-store'
-import { presetIdForTemplate, fieldLabelId } from '@reeeeecall/shared/lib/default-templates'
-import type { CardTemplate, TemplateField } from '@reeeeecall/shared/types/database'
-import { getMobileSupabase } from '../adapters'
+import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
+import {
+  QUICK_PRESETS,
+  presetFieldSpecs,
+  type QuickPreset,
+  type QuickFieldSpec,
+} from '@reeeeecall/shared/lib/default-templates'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'QuickCreate'>
@@ -19,90 +22,71 @@ const INITIAL_ROWS = 3
 
 /**
  * Mobile mirror of web's QuickCreateModal — a dead-simple "just add stuff" flow:
- * name the deck, pick one of the built-in default templates (simplest =
- * Front/Back), type a few cards, done. The full DeckEdit + CardEdit flow is
- * untouched; this sits alongside it for users who find the advanced path heavy.
+ * name the deck (optional description), pick a card shape by FIELD COUNT
+ * (front/back — simplest = 1 front / 1 back), type a few cards, done. The
+ * matching card_template is found-or-created on submit, so the user never deals
+ * with templates. The full DeckEdit + CardEdit flow is untouched.
  */
 export function QuickCreateScreen() {
   const theme = useTheme()
   const { t } = useTranslation(['decks', 'common'])
   const navigation = useNavigation<Nav>()
 
-  // Templates come from the shared deck store (via the mobile hook so they fetch
-  // on focus); mutations + ensureDefaultTemplates are called on the store directly.
-  const { templates } = useDecks()
-  const { ensureDefaultTemplates, createDeck } = useDeckStore()
+  const { createDeck } = useDeckStore()
   const { createCards } = useCardStore()
+  const { findOrCreatePresetTemplate } = useTemplateStore()
 
   const [deckName, setDeckName] = useState('')
-  const [templateId, setTemplateId] = useState('')
+  const [deckDescription, setDeckDescription] = useState('')
+  const [presetId, setPresetId] = useState(QUICK_PRESETS[0].id)
   const [rows, setRows] = useState<Record<string, string>[]>(
     Array.from({ length: INITIAL_ROWS }, () => ({})),
   )
   const [loading, setLoading] = useState(false)
-  const [preparing, setPreparing] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // If deck creation succeeded but card insert failed, we keep the screen open
-  // and remember the deck id so a retry only re-runs createCards — never a
-  // second createDeck (which would create a duplicate deck).
+  // If deck/template creation succeeded but a later step failed, keep the screen
+  // open and remember the ids so a retry never re-creates them (no duplicates).
   const [createdDeckId, setCreatedDeckId] = useState<string | null>(null)
-  // Current user id — used to scope the default-template picker to the user's OWN
-  // templates. card_templates RLS also returns a subscribed publisher's
-  // is_default templates; adopting one as this deck's default breaks if the
-  // share is later revoked, so we filter those out.
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [createdTemplateId, setCreatedTemplateId] = useState<string | null>(null)
+
   useEffect(() => {
-    getMobileSupabase().auth.getUser().then(({ data: { user } }) => {
-      if (user) setCurrentUserId(user.id)
-    })
+    setCreatedDeckId(null)
+    setCreatedTemplateId(null)
   }, [])
 
-  // On mount: make sure the user actually has default templates to pick from
-  // (self-heals zero-template accounts via the ensure_default_templates RPC).
-  useEffect(() => {
-    let active = true
-    setPreparing(true)
-    setCreatedDeckId(null)
-    ensureDefaultTemplates().finally(() => {
-      if (active) setPreparing(false)
-    })
-    return () => {
-      active = false
+  const preset: QuickPreset = QUICK_PRESETS.find((p) => p.id === presetId) ?? QUICK_PRESETS[0]
+  const specs: QuickFieldSpec[] = presetFieldSpecs(preset)
+
+  const presetSummary = (p: QuickPreset) =>
+    t('decks:quickCreate.presetSummary', { front: p.front, back: p.back })
+  const fieldLabel = (spec: QuickFieldSpec) => {
+    if (spec.side === 'front') {
+      return spec.index === 1
+        ? t('decks:quickCreate.fields.front')
+        : t('decks:quickCreate.fields.frontN', { n: spec.index })
     }
-  }, [ensureDefaultTemplates])
-
-  // Default-select the simplest preset once templates are loaded.
-  useEffect(() => {
-    if (templateId) return
-    const first = templates.find((tpl) => tpl.is_default && tpl.user_id === currentUserId)
-    if (first) setTemplateId(first.id)
-  }, [templates, templateId, currentUserId])
-
-  const defaultTemplates = templates.filter((tpl) => tpl.is_default && tpl.user_id === currentUserId)
-  const selectedTemplate: CardTemplate | undefined = templates.find((tpl) => tpl.id === templateId)
-  const textFields: TemplateField[] = (selectedTemplate?.fields ?? []).filter((f) => f.type === 'text')
-
-  const presetLabel = (tpl: CardTemplate) => {
-    const id = presetIdForTemplate(tpl.name)
-    return id ? t(`decks:quickCreate.presets.${id}`, { defaultValue: tpl.name }) : tpl.name
+    return spec.index === 1
+      ? t('decks:quickCreate.fields.back')
+      : t('decks:quickCreate.fields.backN', { n: spec.index })
   }
-  const fieldLabel = (f: TemplateField) => {
-    const id = fieldLabelId(f.name)
-    return id ? t(`decks:quickCreate.fields.${id}`, { defaultValue: f.name }) : f.name
-  }
-  const fieldPreview = (tpl: CardTemplate) =>
-    (tpl.fields ?? [])
-      .filter((f) => f.type === 'text')
-      .map((f) => fieldLabel(f))
-      .join(' · ')
 
+  const emptyRows = () => Array.from({ length: INITIAL_ROWS }, () => ({}))
+  const selectPreset = (id: string) => {
+    // Clear rows (field keys are reused with different meaning) AND reset the
+    // created template + deck ids: a deck created with the old shape before a
+    // later step failed must not be reused with the new shape's cards.
+    setPresetId(id)
+    setRows(emptyRows())
+    setCreatedTemplateId(null)
+    setCreatedDeckId(null)
+  }
   const setCell = (rowIdx: number, key: string, value: string) =>
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)))
   const addRow = () => setRows((prev) => [...prev, {}])
   const removeRow = (idx: number) => setRows((prev) => prev.filter((_, i) => i !== idx))
 
   const handleSubmit = async () => {
-    if (loading) return // guard against double-submit creating a duplicate deck
+    if (loading) return
     setError(null)
 
     const name = deckName.trim()
@@ -110,18 +94,13 @@ export function QuickCreateScreen() {
       setError(t('decks:quickCreate.errors.nameRequired'))
       return
     }
-    if (!selectedTemplate) {
-      setError(t('decks:quickCreate.errors.templateRequired'))
-      return
-    }
 
-    // Keep only rows with at least one non-empty text field.
     const cards = rows
       .map((row) => {
         const fv: Record<string, string> = {}
-        for (const f of textFields) {
-          const v = (row[f.key] ?? '').trim()
-          if (v) fv[f.key] = v
+        for (const spec of specs) {
+          const v = (row[spec.key] ?? '').trim()
+          if (v) fv[spec.key] = v
         }
         return fv
       })
@@ -135,10 +114,27 @@ export function QuickCreateScreen() {
 
     setLoading(true)
 
-    // Create the deck only once; a retry after a card failure reuses it.
+    // 1. find-or-create the template for this field shape (reused on retry).
+    let templateId = createdTemplateId
+    if (!templateId) {
+      const tpl = await findOrCreatePresetTemplate(preset)
+      if (!tpl) {
+        setError(useTemplateStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+        setLoading(false)
+        return
+      }
+      templateId = tpl.id
+      setCreatedTemplateId(tpl.id)
+    }
+
+    // 2. create the deck only once; a retry after a later failure reuses it.
     let deckId = createdDeckId
     if (!deckId) {
-      const deck = await createDeck({ name, default_template_id: selectedTemplate.id })
+      const deck = await createDeck({
+        name,
+        description: deckDescription.trim() || undefined,
+        default_template_id: templateId,
+      })
       if (!deck) {
         setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
         setLoading(false)
@@ -148,22 +144,20 @@ export function QuickCreateScreen() {
       setCreatedDeckId(deck.id)
     }
 
-    const inserted = await createCards({
-      deck_id: deckId,
-      template_id: selectedTemplate.id,
-      cards,
-    })
+    // 3. insert the cards.
+    const inserted = await createCards({ deck_id: deckId, template_id: templateId, cards })
     setLoading(false)
 
-    // Cards failed: keep the screen open with the error so the user doesn't lose
-    // what they typed. The deck already exists (createdDeckId retained), so
-    // resubmitting retries only the card insert — no duplicate deck.
     if (inserted < cards.length) {
       setError(useCardStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
       return
     }
 
-    // Replace this screen with the new deck so Back goes to the deck list.
+    // The template was written via template-store; invalidate deck-store's
+    // separate templates cache so DeckDetail / CardEdit (which resolve the
+    // template from deck-store, TTL-gated) refetch and see the new one instead
+    // of falling back to a default-template shape.
+    useDeckStore.getState().invalidate('templates')
     navigation.replace('DeckDetail', { deckId })
   }
 
@@ -189,102 +183,98 @@ export function QuickCreateScreen() {
           autoFocus
         />
 
-        {/* Template preset picker */}
+        {/* Deck description (optional) */}
+        <TextInput
+          testID="quick-create-description"
+          label={t('decks:quickCreate.deckDescription')}
+          placeholder={t('decks:quickCreate.deckDescriptionPlaceholder')}
+          value={deckDescription}
+          onChangeText={setDeckDescription}
+        />
+
+        {/* Card shape picker (by field count) */}
         <View style={styles.section}>
           <Text style={[theme.typography.label, { color: theme.colors.text }]}>
             {t('decks:quickCreate.template')}
           </Text>
-          {preparing && defaultTemplates.length === 0 ? (
-            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-              {t('common:loading', { defaultValue: 'Loading...' })}
-            </Text>
-          ) : (
-            <View style={styles.presetGrid}>
-              {defaultTemplates.map((tpl) => {
-                const selected = tpl.id === templateId
-                return (
-                  <TouchableOpacity
-                    key={tpl.id}
-                    onPress={() => setTemplateId(tpl.id)}
-                    activeOpacity={0.7}
+          <View style={styles.presetGrid}>
+            {QUICK_PRESETS.map((p) => {
+              const selected = p.id === presetId
+              return (
+                <TouchableOpacity
+                  key={p.id}
+                  onPress={() => selectPreset(p.id)}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.presetCard,
+                    { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                    selected && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                  ]}
+                  testID={`quick-create-preset-${p.id}`}
+                >
+                  <Text
                     style={[
-                      styles.presetCard,
-                      { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-                      selected && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                      theme.typography.label,
+                      { color: selected ? theme.colors.primary : theme.colors.text },
                     ]}
-                    testID={`quick-create-preset-${tpl.id}`}
+                    numberOfLines={1}
                   >
-                    <Text
-                      style={[
-                        theme.typography.label,
-                        { color: selected ? theme.colors.primary : theme.colors.text },
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {presetLabel(tpl)}
-                    </Text>
-                    <Text
-                      style={[theme.typography.caption, { color: theme.colors.textSecondary }]}
-                      numberOfLines={1}
-                    >
-                      {fieldPreview(tpl)}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              })}
-            </View>
-          )}
+                    {presetSummary(p)}
+                    {p.id === QUICK_PRESETS[0].id ? `  · ${t('decks:quickCreate.basicLabel')}` : ''}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
         </View>
 
         {/* Card entry rows */}
-        {textFields.length > 0 && (
-          <View style={styles.section}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-              {t('decks:quickCreate.cards')}
-            </Text>
-            {rows.map((row, idx) => (
-              <View
-                key={idx}
-                style={[styles.rowCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-              >
-                <View style={styles.rowFields}>
-                  {textFields.map((f) => (
-                    <TextInput
-                      key={f.key}
-                      testID={`quick-create-row-${idx}-${f.key}`}
-                      placeholder={fieldLabel(f)}
-                      value={row[f.key] ?? ''}
-                      onChangeText={(v) => setCell(idx, f.key, v)}
-                    />
-                  ))}
-                </View>
-                {rows.length > 1 && (
-                  <TouchableOpacity
-                    onPress={() => removeRow(idx)}
-                    style={styles.removeBtn}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                    accessibilityLabel={t('decks:quickCreate.removeRow')}
-                    testID={`quick-create-row-${idx}-remove`}
-                  >
-                    <Text style={[styles.removeIcon, { color: theme.colors.textTertiary }]}>{'×'}</Text>
-                  </TouchableOpacity>
-                )}
+        <View style={styles.section}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+            {t('decks:quickCreate.cards')}
+          </Text>
+          {rows.map((row, idx) => (
+            <View
+              key={idx}
+              style={[styles.rowCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            >
+              <View style={styles.rowFields}>
+                {specs.map((spec) => (
+                  <TextInput
+                    key={spec.key}
+                    testID={`quick-create-row-${idx}-${spec.key}`}
+                    placeholder={fieldLabel(spec)}
+                    value={row[spec.key] ?? ''}
+                    onChangeText={(v) => setCell(idx, spec.key, v)}
+                  />
+                ))}
               </View>
-            ))}
-            <TouchableOpacity onPress={addRow} style={styles.addRowBtn} testID="quick-create-add-row">
-              <Text style={[theme.typography.label, { color: theme.colors.primary }]}>
-                {t('decks:quickCreate.addRow')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              {rows.length > 1 && (
+                <TouchableOpacity
+                  onPress={() => removeRow(idx)}
+                  style={styles.removeBtn}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityLabel={t('decks:quickCreate.removeRow')}
+                  testID={`quick-create-row-${idx}-remove`}
+                >
+                  <Text style={[styles.removeIcon, { color: theme.colors.textTertiary }]}>{'×'}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
+          <TouchableOpacity onPress={addRow} style={styles.addRowBtn} testID="quick-create-add-row">
+            <Text style={[theme.typography.label, { color: theme.colors.primary }]}>
+              {t('decks:quickCreate.addRow')}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <Button
           testID="quick-create-submit"
           title={loading ? t('decks:quickCreate.creating') : t('decks:quickCreate.create')}
           onPress={handleSubmit}
           loading={loading}
-          disabled={loading || preparing || !deckName.trim()}
+          disabled={loading || !deckName.trim()}
         />
         <Button
           testID="quick-create-cancel"

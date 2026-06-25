@@ -179,13 +179,19 @@
       "example": "例文",
       "hanzi": "漢字",
       "pinyin": "ピンイン",
-      "audio": "音声"
+      "audio": "音声",
+      "frontN": "表 {{n}}",
+      "backN": "裏 {{n}}"
     },
     "errors": {
       "nameRequired": "デッキ名を入力してください。",
       "templateRequired": "カードタイプを選択してください。",
       "cardsRequired": "カードを1つ以上追加してください。",
       "createFailed": "デッキの作成に失敗しました。もう一度お試しください。"
-    }
+    },
+    "deckDescription": "説明（任意）",
+    "deckDescriptionPlaceholder": "このデッキの簡単な説明",
+    "presetSummary": "表 {{front}} · 裏 {{back}}",
+    "basicLabel": "基本"
   }
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import i18next from 'i18next'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
+import { buildPresetTemplate, type QuickPreset } from '../lib/default-templates'
 import type { CardTemplate, TemplateField, LayoutItem, LayoutMode } from '../types/database'
 
 interface TemplateState {
@@ -30,6 +31,13 @@ interface TemplateState {
   }) => Promise<boolean>
   deleteTemplate: (id: string) => Promise<boolean>
   duplicateTemplate: (id: string) => Promise<CardTemplate | null>
+  /**
+   * Quick-Create: reuse (or create once) the user's card_template for a
+   * field-count preset. Keyed on the preset's stable name + the
+   * card_templates(user_id,name) UNIQUE index, so repeated quick decks of the
+   * same shape share one template instead of spawning duplicates.
+   */
+  findOrCreatePresetTemplate: (preset: QuickPreset) => Promise<CardTemplate | null>
 }
 
 export const useTemplateStore = create<TemplateState>((set, get) => ({
@@ -83,6 +91,32 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
     guard.recordSuccess('templates_total')
     await get().fetchTemplates()
     return tmpl as CardTemplate
+  },
+
+  findOrCreatePresetTemplate: async (preset) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    const find = async (): Promise<CardTemplate | null> => {
+      const { data } = await supabase
+        .from('card_templates')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('name', preset.templateName)
+        .maybeSingle()
+      return (data as CardTemplate | null) ?? null
+    }
+
+    const existing = await find()
+    if (existing) return existing
+
+    const shape = buildPresetTemplate(preset)
+    const created = await get().createTemplate({ name: preset.templateName, ...shape })
+    if (created) return created
+
+    // A concurrent quick-create of the same preset may have won the
+    // UNIQUE(user_id,name) race — re-read instead of failing.
+    return await find()
   },
 
   updateTemplate: async (id, data) => {
