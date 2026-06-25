@@ -179,13 +179,19 @@
       "example": "Ví dụ",
       "hanzi": "Chữ Hán",
       "pinyin": "Phiên âm",
-      "audio": "Âm thanh"
+      "audio": "Âm thanh",
+      "frontN": "Mặt trước {{n}}",
+      "backN": "Mặt sau {{n}}"
     },
     "errors": {
       "nameRequired": "Vui lòng nhập tên bộ thẻ.",
       "templateRequired": "Vui lòng chọn loại thẻ.",
       "cardsRequired": "Vui lòng thêm ít nhất một thẻ.",
       "createFailed": "Tạo bộ thẻ thất bại. Vui lòng thử lại."
-    }
+    },
+    "deckDescription": "Mô tả (tùy chọn)",
+    "deckDescriptionPlaceholder": "Ghi chú ngắn về bộ thẻ này",
+    "presetSummary": "Mặt trước {{front}} · Mặt sau {{back}}",
+    "basicLabel": "Cơ bản"
   }
 }

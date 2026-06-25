@@ -50,7 +50,8 @@
     "layoutCustom": "Custom HTML",
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
-    "cardCountHint": "{{min}}–{{max}} 张卡片"
+    "cardCountHint": "{{min}}–{{max}} 张卡片",
+    "apiKeyNotice": "AI 生成需要您为每个提供商提供自己的 API 密钥。请在设置中添加或管理密钥。"
   },
   "wizard": {
     "setup": "Setup",

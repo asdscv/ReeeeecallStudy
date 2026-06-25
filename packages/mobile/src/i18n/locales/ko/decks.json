@@ -179,13 +179,19 @@
       "example": "예문",
       "hanzi": "한자",
       "pinyin": "병음",
-      "audio": "오디오"
+      "audio": "오디오",
+      "frontN": "앞면 {{n}}",
+      "backN": "뒷면 {{n}}"
     },
     "errors": {
       "nameRequired": "덱 이름을 입력하세요.",
       "templateRequired": "카드 유형을 선택하세요.",
       "cardsRequired": "카드를 하나 이상 추가하세요.",
       "createFailed": "덱 생성에 실패했습니다. 다시 시도하세요."
-    }
+    },
+    "deckDescription": "설명 (선택)",
+    "deckDescriptionPlaceholder": "이 덱에 대한 간단한 설명",
+    "presetSummary": "앞면 {{front}} · 뒷면 {{back}}",
+    "basicLabel": "기본"
   }
 }

@@ -1,8 +1,9 @@
 import { test, expect } from '../fixtures/test-helpers'
 
-// Smoke test for the new Quick Create (간편 만들기) flow: name a deck, pick a
-// default template preset, type a card, create — and land on the new deck with
-// the card visible. Uses fresh-login-per-test (Supabase single-session).
+// Smoke test for the Quick Create (간편 만들기) flow: name a deck, pick a card
+// shape by field count (default = 1 front / 1 back), type a card, create — and
+// land on the new deck with the card visible. The matching template is
+// found-or-created on submit. Uses fresh-login-per-test (Supabase single-session).
 // Creates real data under the E2E test account; each created deck is deleted in
 // afterEach via the Supabase REST API (cards cascade-delete with the deck).
 
@@ -56,8 +57,8 @@ test.describe('Quick Create flow', () => {
     // Open the Quick Create modal.
     await page.getByTestId('quick-create-button').click()
 
-    // Deck name field appears immediately; card fields appear once the default
-    // template (seeded via ensure_default_templates) loads and is preselected.
+    // Deck name + card fields render immediately (the default 1·1 shape is
+    // preselected; no server round-trip to load a template first).
     await page.getByTestId('qc-deck-name').fill(deckName)
     await expect(page.getByTestId('qc-card-0-0')).toBeVisible({ timeout: 15_000 })
 

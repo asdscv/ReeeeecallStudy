@@ -50,7 +50,8 @@
     "layoutCustom": "Custom HTML",
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
-    "cardCountHint": "{{min}}–{{max}} tarjetas"
+    "cardCountHint": "{{min}}–{{max}} tarjetas",
+    "apiKeyNotice": "La generación con IA requiere tu propia clave API para cada proveedor. Añade o gestiona las claves en Ajustes."
   },
   "wizard": {
     "setup": "Setup",
