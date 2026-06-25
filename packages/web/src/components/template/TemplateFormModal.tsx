@@ -196,7 +196,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                       type="button"
                       onClick={() => moveField(i, -1)}
                       disabled={i === 0}
-                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 cursor-pointer"
+                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     >
                       ▲
                     </button>
@@ -204,7 +204,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                       type="button"
                       onClick={() => moveField(i, 1)}
                       disabled={i === fields.length - 1}
-                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 cursor-pointer"
+                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     >
                       ▼
                     </button>
@@ -229,7 +229,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     type="button"
                     onClick={() => removeField(i)}
                     disabled={fields.length <= 1}
-                    className="text-content-tertiary hover:text-destructive disabled:opacity-30 cursor-pointer text-sm px-1"
+                    className="text-content-tertiary hover:text-destructive disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-sm px-1"
                   >
                     ✕
                   </button>
@@ -282,7 +282,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? t('form.saving') : editTemplate ? t('form.save') : t('form.create')}
             </button>

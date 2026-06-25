@@ -57,19 +57,9 @@ export function SearchFilters({
         className="w-full px-3 sm:px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm text-foreground"
       />
 
-      {/* Row 1: Category + Sort + Verified toggle + Advanced button */}
+      {/* Row 1: Sort + Filter toggle + Reset. Category / Verified / Native /
+          Study level etc. all live inside the collapsible Filter panel below. */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-        <select
-          value={filters.category ?? ''}
-          onChange={(e) => onFilterChange({ category: e.target.value || undefined })}
-          className="px-3 py-2 rounded-lg border border-border text-sm text-foreground outline-none"
-        >
-          <option value="">{t('allCategories')}</option>
-          {MARKETPLACE_CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>{t(c.labelKey as string)}</option>
-          ))}
-        </select>
-
         <select
           value={filters.sortBy}
           onChange={(e) => onFilterChange({ sortBy: e.target.value as SortBy })}
@@ -82,28 +72,12 @@ export function SearchFilters({
           <option value="top_rated">{t('sortTopRated', { defaultValue: 'Top Rated' })}</option>
         </select>
 
-        {/* Verified toggle */}
-        <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm text-foreground cursor-pointer hover:bg-muted select-none whitespace-nowrap">
-          <input
-            type="checkbox"
-            checked={filters.verifiedOnly ?? false}
-            onChange={(e) => onFilterChange({ verifiedOnly: e.target.checked || undefined })}
-            className="rounded border-border text-brand focus:ring-brand"
-          />
-          <span className="inline-flex items-center gap-1">
-            <svg className="w-3.5 h-3.5 text-brand" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            {t('verifiedOnly', { defaultValue: 'Verified' })}
-          </span>
-        </label>
-
-        {/* Advanced filters toggle */}
+        {/* Filter panel toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted cursor-pointer whitespace-nowrap"
         >
-          {t('advancedFilters', { defaultValue: 'Advanced' })}
+          {t('filters.label', { defaultValue: 'Filter' })}
           {activeCount > 0 && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-brand text-white rounded-full">
               {activeCount}
@@ -124,9 +98,44 @@ export function SearchFilters({
         )}
       </div>
 
-      {/* Advanced filters panel (collapsible) */}
+      {/* Filter panel (collapsible) */}
       {showAdvanced && (
         <div className="p-4 bg-muted rounded-lg border border-border space-y-4">
+          {/* Category */}
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              {t('categoryLabel', { defaultValue: 'Category' })}
+            </label>
+            <select
+              value={filters.category ?? ''}
+              onChange={(e) => onFilterChange({ category: e.target.value || undefined })}
+              className="w-full sm:w-64 px-3 py-2 rounded-lg border border-border text-sm text-foreground outline-none bg-card"
+            >
+              <option value="">{t('allCategories')}</option>
+              {MARKETPLACE_CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>{t(c.labelKey as string)}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Verified (certified) only */}
+          <div>
+            <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer select-none w-fit">
+              <input
+                type="checkbox"
+                checked={filters.verifiedOnly ?? false}
+                onChange={(e) => onFilterChange({ verifiedOnly: e.target.checked || undefined })}
+                className="rounded border-border text-brand focus:ring-brand"
+              />
+              <span className="inline-flex items-center gap-1">
+                <svg className="w-3.5 h-3.5 text-brand" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                {t('verifiedOnly', { defaultValue: 'Verified' })}
+              </span>
+            </label>
+          </div>
+
           {/* Card count slider */}
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">

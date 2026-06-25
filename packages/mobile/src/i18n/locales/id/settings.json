@@ -5,12 +5,8 @@
     "email": "Email",
     "displayName": "Nama tampilan",
     "displayNamePlaceholder": "Masukkan nama Anda",
-    "namePlaceholder": "Masukkan nama Anda",
-    "saveBtn": "Simpan",
-    "nameSaved": "Nama tersimpan!",
     "nameAvailable": "Nama tersedia!",
     "nameTaken": "Nama sudah dipakai",
-    "nameLength": "Nama harus 2-12 karakter",
     "save": "Simpan",
     "checkingName": "Memeriksa ketersediaan...",
     "nameLengthError": "Perlu 2-12 karakter",
@@ -18,24 +14,11 @@
     "savedMessage": "Nama tampilan diperbarui."
   },
   "language": {
-    "title": "Bahasa",
-    "label": "Bahasa tampilan",
-    "en": "English",
-    "ko": "한국어",
-    "zh": "中文（简体）",
-    "ja": "日本語",
-    "vi": "Tiếng Việt",
-    "th": "ภาษาไทย",
-    "id": "Bahasa Indonesia"
+    "title": "Bahasa"
   },
   "srs": {
     "title": "Pembelajaran SRS",
-    "description": "Atur jumlah kartu baru yang ditambahkan per sesi dalam mode SRS (pengulangan berjarak)",
-    "newCardLimit": "Batas Kartu Baru",
-    "cards": "kartu",
-    "cardsUnit": "kartu",
-    "help": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini.",
-    "newCardNote": "Jumlah maksimal kartu baru selain kartu ulasan dalam pembelajaran SRS. Kartu ulasan tidak terpengaruh oleh batas ini."
+    "description": "Atur jumlah kartu baru yang ditambahkan per sesi dalam mode SRS (pengulangan berjarak)"
   },
   "answerMode": {
     "title": "Mode Jawaban",
@@ -44,7 +27,6 @@
     "buttonDesc": "Pilih jawaban dengan menekan tombol",
     "swipe": "Geser",
     "swipeDesc": "Pilih jawaban dengan menggeser kartu",
-    "swipeAutoNote": "Arah geser diatur secara otomatis berdasarkan mode belajar.\n• SRS: ← Ulangi / → Baik\n• Mode lain: ← Tidak Diketahui / → Diketahui",
     "before": "Sebelum",
     "same": "Bersamaan",
     "after": "Sesudah",
@@ -54,15 +36,14 @@
     "title": "Pembacaan TTS Otomatis",
     "description": "Baca otomatis bidang dengan TTS saat membalik kartu",
     "enable": "Aktifkan pembacaan otomatis",
-    "provider": "Mesin Suara",
-    "webSpeech": "Suara Perangkat",
-    "webSpeechDesc": "Menggunakan suara bawaan perangkat",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Suara neural berkualitas tinggi",
     "edgeTtsNote": "* Saat ini hanya mendukung bahasa Inggris",
-    "speed": "Kecepatan baca",
-    "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
-    "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
+    "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
+    "voiceEngine": "Mesin Suara",
+    "readingSpeed": "Kecepatan Baca",
+    "deviceVoice": "Suara Perangkat",
+    "deviceVoiceDesc": "Menggunakan suara bawaan perangkat Anda"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +95,11 @@
   },
   "account": {
     "title": "Akun",
-    "logout": "Keluar"
+    "logout": "Keluar",
+    "logoutConfirm": "Yakin ingin keluar?",
+    "deleteAccount": "Hapus Akun",
+    "deleteConfirm": "Ini akan menghapus permanen akun Anda dan semua data terkait. Tindakan ini tidak dapat dibatalkan.",
+    "deleteFailed": "Gagal menghapus akun. Silakan hubungi dukungan."
   },
   "links": {
     "userGuide": "Panduan Pengguna",
@@ -163,5 +148,12 @@
   },
   "alerts": {
     "error": "Galat"
+  },
+  "actions": {
+    "cancel": "Batal"
+  },
+  "haptics": {
+    "enable": "Umpan balik haptik",
+    "hint": "Getaran umpan balik saat mengetuk, menilai, dan beraksi."
   }
 }

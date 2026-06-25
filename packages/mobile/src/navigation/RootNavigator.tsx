@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { AppState } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthStack } from './AuthStack'
 import { MainDrawer } from './MainDrawer'
@@ -7,6 +8,9 @@ import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
 import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
 import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
+import { useAppUpdateStore } from '../services/app-update'
+import { ForceUpdateScreen } from '../components/update/ForceUpdateScreen'
+import { OptionalUpdateModal } from '../components/update/OptionalUpdateModal'
 import { prefetch } from '../services/prefetch'
 import { clearNavState } from '../utils/nav-persistence'
 import type { RootStackParamList } from './types'
@@ -25,6 +29,15 @@ export function RootNavigator() {
   const registerSession = useSubscriptionStore((s) => s.registerSession)
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
   const sessionValid = useSubscriptionStore((s) => s.sessionValid)
+
+  // Backend-driven version gate. Runs once on mount, independent of auth so a
+  // hard block applies even before login. Fail-open: status stays 'ok' until
+  // (and unless) the check resolves to 'blocked', so the app never stalls here.
+  const updateStatus = useAppUpdateStore((s) => s.status)
+  const checkAppUpdate = useAppUpdateStore((s) => s.check)
+  useEffect(() => {
+    void checkAppUpdate()
+  }, [checkAppUpdate])
 
   // 최대 대기 타임아웃 — 네트워크 느려도 앱은 반드시 열림
   useEffect(() => {
@@ -69,6 +82,23 @@ export function RootNavigator() {
     }
   }, [user, registerSession, startHeartbeat])
 
+  // On return to foreground, re-register immediately. While backgrounded the JS
+  // runtime/heartbeat is suspended and the auth token may have refreshed; a clean
+  // re-register revalidates + recreates the session row right away instead of
+  // waiting up to 60s for the next heartbeat tick. (registerSession never kicks on
+  // a transient failure, so a slow resume can't trigger the false "another device".)
+  useEffect(() => {
+    if (!user) return
+    let prev = AppState.currentState
+    const sub = AppState.addEventListener('change', (next) => {
+      if (prev.match(/inactive|background/) && next === 'active') {
+        void registerSession()
+      }
+      prev = next
+    })
+    return () => sub.remove()
+  }, [user, registerSession])
+
   const handleReclaim = useCallback(async () => {
     await registerSession()
   }, [registerSession])
@@ -79,6 +109,12 @@ export function RootNavigator() {
     const { getSupabase } = await import('@reeeeecall/shared/lib/supabase')
     await getSupabase().auth.signOut()
   }, [])
+
+  // Hard version gate takes priority over everything — a build below the
+  // minimum supported version is unusable regardless of auth/session/splash.
+  if (updateStatus === 'blocked') {
+    return <ForceUpdateScreen />
+  }
 
   // 스플래시: auth 로딩 중이거나 prefetch 미완료
   if (loading || !appReady) {
@@ -96,12 +132,16 @@ export function RootNavigator() {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
-      {user ? (
-        <Stack.Screen name="Main" component={MainDrawer} />
-      ) : (
-        <Stack.Screen name="Auth" component={AuthStack} />
-      )}
-    </Stack.Navigator>
+    <>
+      <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+        {user ? (
+          <Stack.Screen name="Main" component={MainDrawer} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthStack} />
+        )}
+      </Stack.Navigator>
+      {/* Soft update nudge (dismissable) — only renders when status==='optional' */}
+      <OptionalUpdateModal />
+    </>
   )
 }

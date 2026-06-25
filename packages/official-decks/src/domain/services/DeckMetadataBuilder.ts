@@ -6,6 +6,10 @@ import {
 import type { LanguageCode } from "@/domain/value-objects/LanguageCode";
 import type { LanguagePair } from "@/domain/value-objects/LanguagePair";
 import {
+  localizedDeckDescription,
+  localizedDeckName,
+} from "@/domain/services/DeckMetadataI18n";
+import {
   type CardTemplateId,
   PHRASE_TEMPLATE_ID,
   REVERSE_WORD_TEMPLATE_ID,
@@ -22,6 +26,11 @@ export interface DeckMetadata {
   readonly templateKind: "word" | "phrase";
   readonly templateId: CardTemplateId;
   readonly learningLanguage: LanguageCode;
+  /** Native (explanation / back-side) language(s). Rule: front=learning, back=
+   *  native. Forward EN→X ⇒ [X]; reverse vocab X→EN ⇒ ['en'] (explanation is
+   *  English, for English natives); reverse conversation ⇒ [source] (native-
+   *  production deck, e.g. a Korean speaker practising English). */
+  readonly nativeLanguages: readonly LanguageCode[];
 }
 
 const CATEGORY_COLOR: Record<DeckCategory, string> = {
@@ -46,17 +55,6 @@ const CATEGORY_ICON: Record<DeckCategory, string> = {
   general: "📚",
 };
 
-const LANG_NAME_EN: Record<LanguageCode, string> = {
-  en: "English",
-  ko: "Korean",
-  ja: "Japanese",
-  zh: "Chinese",
-  es: "Spanish",
-  vi: "Vietnamese",
-  th: "Thai",
-  id: "Indonesian",
-};
-
 export function buildDeckMetadata(
   filename: string,
   pair: LanguagePair,
@@ -75,11 +73,20 @@ export function buildDeckMetadata(
       ? REVERSE_WORD_TEMPLATE_ID
       : WORD_TEMPLATE_ID;
 
-  const direction = `${pair.source.toUpperCase()} → ${pair.target.toUpperCase()}`;
-
   // Every official deck teaches English, regardless of study direction.
   const learningLanguage: LanguageCode =
     pair.source === "en" || pair.target === "en" ? "en" : pair.target;
+
+  // Native (mother-tongue) language = the non-English side of the pair (the
+  // language the learner already speaks). Every official deck teaches English,
+  // so the pair is always en↔X. Forward EN→X ⇒ [X]; reverse X→EN and
+  // conversation X→EN ⇒ [X]. This keeps native_languages aligned with the
+  // deck's display title (rendered in that same mother tongue) and the
+  // marketplace native filter — a learner filtering by their own language sees
+  // both study directions (recognition en→X and production X→en) of the same
+  // English content, instead of the reverse decks being hidden under 'en'.
+  const nativeLanguages: readonly LanguageCode[] =
+    pair.source === "en" ? [pair.target] : [pair.source];
 
   const tags: string[] = [
     "official",
@@ -93,8 +100,13 @@ export function buildDeckMetadata(
     tags.push(`level:${level}`);
   }
 
-  const name = buildName(category, level, direction);
-  const description = buildDescription(category, level, pair);
+  const name = localizedDeckName(category, level, pair.source, pair.target);
+  const description = localizedDeckDescription(
+    category,
+    level,
+    pair.source,
+    pair.target,
+  );
 
   return {
     name,
@@ -106,66 +118,7 @@ export function buildDeckMetadata(
     templateKind,
     templateId,
     learningLanguage,
+    nativeLanguages,
   };
 }
 
-function buildName(
-  category: DeckCategory,
-  level: string | null,
-  direction: string,
-): string {
-  const base = (() => {
-    switch (category) {
-      case "beginner":
-        return level && level.startsWith("batch-")
-          ? `Beginner Vocabulary — ${formatBatchLevel(level)}`
-          : "Beginner Vocabulary";
-      case "intermediate":
-        return `Intermediate Vocabulary — ${formatBatchLevel(level)}`;
-      case "advanced":
-        return `Advanced Vocabulary — ${formatBatchLevel(level)}`;
-      case "ielts":
-        return level ? `IELTS ${level}` : "IELTS Vocabulary";
-      case "toefl":
-        return level ? `TOEFL ${level}` : "TOEFL Vocabulary";
-      case "toeic":
-        return level ? `TOEIC ${level}` : "TOEIC Vocabulary";
-      case "conversation":
-        return level ? `Real Conversation — ${level}` : "Real Conversation";
-      case "general":
-        return "Vocabulary";
-    }
-  })();
-  return `${base} (${direction})`;
-}
-
-function formatBatchLevel(level: string | null): string {
-  if (level === null) return "";
-  const match = /^batch-(\d+)$/.exec(level);
-  if (match) return `Batch ${match[1]}`;
-  return level;
-}
-
-function buildDescription(
-  category: DeckCategory,
-  level: string | null,
-  pair: LanguagePair,
-): string {
-  const src = LANG_NAME_EN[pair.source];
-  const tgt = LANG_NAME_EN[pair.target];
-  const levelClause = level ? ` (level ${level})` : "";
-  switch (category) {
-    case "conversation":
-      return `Curated ${src} conversational expressions${levelClause} with ${tgt} translations and notes.`;
-    case "ielts":
-    case "toefl":
-    case "toeic":
-      return `${category.toUpperCase()} exam vocabulary${levelClause}: ${src} word and example, with ${tgt} meaning and example.`;
-    default:
-      return `${capitalize(category)} ${src} vocabulary${levelClause} with ${tgt} meanings and examples.`;
-  }
-}
-
-function capitalize(s: string): string {
-  return s.length === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1);
-}

@@ -15,9 +15,10 @@ describe("DeckMetadataBuilder", () => {
       LanguagePair.of(en, ko),
     );
     expect(meta.category).toBe("beginner");
-    expect(meta.name).toContain("Beginner");
-    expect(meta.name).toContain("Batch 3");
-    expect(meta.name).toContain("EN → KO");
+    // Mother-tongue (Korean) title with a localized direction suffix — no English.
+    expect(meta.name).toContain("초급");
+    expect(meta.name).toContain("3탄");
+    expect(meta.name).toContain("(영어 → 한국어)");
     expect(meta.tags).toContain("lang:en-ko");
     expect(meta.tags).toContain("category:beginner");
     expect(meta.tags).toContain("level:batch-3");
@@ -55,7 +56,8 @@ describe("DeckMetadataBuilder", () => {
     expect(meta.templateKind).toBe("phrase");
     expect(meta.tags).toContain("level:시사");
     expect(meta.name).toContain("시사");
-    expect(meta.name).toContain("KO → EN");
+    // Korean audience, reverse direction rendered in Korean.
+    expect(meta.name).toContain("(한국어 → 영어)");
     // Conversation deck: learning language is the target (the English
     // expression being learned), even though source is ko.
     expect(meta.learningLanguage).toBe("en");
@@ -71,6 +73,30 @@ describe("DeckMetadataBuilder", () => {
     expect(meta.templateKind).toBe("word");
     // No level tag because english-beginner-1000 has no inferable level
     expect(meta.tags.some((t) => t.startsWith("level:"))).toBe(false);
+  });
+
+  describe("nativeLanguages (learner's mother tongue = non-English side)", () => {
+    it("forward EN→KO word → native is the target [ko]", () => {
+      const meta = buildDeckMetadata("beginner_batch3.csv", LanguagePair.of(en, ko));
+      expect(meta.nativeLanguages).toEqual(["ko"]);
+    });
+
+    it("reverse KO→EN word (vocab) → native is the mother tongue [ko] (aligns with title + marketplace filter)", () => {
+      const meta = buildDeckMetadata("beginner_batch3.csv", LanguagePair.of(ko, en));
+      expect(meta.templateKind).toBe("word");
+      expect(meta.nativeLanguages).toEqual(["ko"]);
+    });
+
+    it("reverse KO→EN conversation → native stays [ko] (Korean-native production deck)", () => {
+      const meta = buildDeckMetadata("real-conversation-시사.csv", LanguagePair.of(ko, en));
+      expect(meta.templateKind).toBe("phrase");
+      expect(meta.nativeLanguages).toEqual(["ko"]);
+    });
+
+    it("forward EN→JA word → native is [ja]", () => {
+      const meta = buildDeckMetadata("ielts-7.0-1500.csv", LanguagePair.of(en, ja));
+      expect(meta.nativeLanguages).toEqual(["ja"]);
+    });
   });
 
   it("description is non-empty and mentions language direction", () => {

@@ -5,8 +5,6 @@
     "userAlreadyRegistered": "Email ini sudah terdaftar.",
     "passwordTooShort": "Kata sandi minimal 6 karakter.",
     "emailRateLimit": "Terlalu banyak permintaan. Silakan coba lagi nanti.",
-    "securityDelay": "Untuk keamanan, silakan coba lagi nanti.",
-    "newPasswordSameAsOld": "Kata sandi baru harus berbeda dari kata sandi lama.",
     "invalidEmailFormat": "Format email tidak valid."
   },
   "generic": "Something went wrong. Please try again.",

@@ -59,7 +59,8 @@
     "minutes": "min",
     "seconds": "sec",
     "times": "times",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "decksCount": "{{count}} decks"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
@@ -269,5 +270,21 @@
     "playStorePrefix": "GET IT ON",
     "playStore": "Google Play",
     "qrHint": "Scan a QR code with your phone camera to download"
-  }
+  },
+  "error": {
+    "boundary": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "studyTitle": "Study session interrupted",
+      "studyDescription": "An unexpected error occurred during the study session. Your progress has been saved.",
+      "details": "Error details",
+      "tryAgain": "Try Again",
+      "goToDashboard": "Go to Dashboard"
+    }
+  },
+  "skipToContent": "Skip to content",
+  "footer": {
+    "copyright": "© 2026 ReeeeecallStudy. All rights reserved."
+  },
+  "cancel": "Cancel"
 }

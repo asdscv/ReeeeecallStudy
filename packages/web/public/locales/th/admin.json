@@ -77,7 +77,11 @@
     },
     "setStatus": "Set Status",
     "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "confirmSuspend": "Are you sure you want to suspend this user?",
+    "changeRoleTitle": "เปลี่ยนบทบาท",
+    "confirmRoleChange": "เปลี่ยนบทบาทของผู้ใช้นี้หรือไม่?",
+    "banTitle": "แบนผู้ใช้",
+    "suspendTitle": "ระงับผู้ใช้"
   },
   "study": {
     "title": "กิจกรรมการเรียน",
@@ -267,7 +271,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "เพิกถอนสถานะทางการ"
   },
   "audit": {
     "title": "Audit Log",
@@ -301,7 +306,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
+    },
+    "description": "ติดตามการดำเนินการของผู้ดูแลทั้งหมดในระบบ",
+    "exportCSV": "ส่งออก CSV",
+    "actionAll": "การดำเนินการทั้งหมด",
+    "filterTarget": "ประเภทเป้าหมาย",
+    "targetAll": "เป้าหมายทั้งหมด",
+    "dateFrom": "จาก",
+    "dateTo": "ถึง",
+    "searching": "กำลังค้นหา...",
+    "emptyTitle": "ไม่พบบันทึกการตรวจสอบ",
+    "emptyDescription": "ไม่มีบันทึกที่ตรงกับตัวกรองปัจจุบัน ลองปรับเงื่อนไขการค้นหา",
+    "refreshing": "กำลังรีเฟรช...",
+    "colTime": "เวลา",
+    "colAdmin": "ผู้ดูแล",
+    "colAction": "การดำเนินการ",
+    "colTarget": "เป้าหมาย",
+    "colDetails": "รายละเอียด",
+    "colIP": "IP",
+    "pageInfo": "หน้า {{page}}",
+    "showing": "แสดง {{count}} รายการ",
+    "prevPage": "ก่อนหน้า",
+    "nextPage": "ถัดไป",
+    "unknownAdmin": "ไม่ทราบ",
+    "fullDetails": "รายละเอียดทั้งหมด"
   },
   "common": {
     "refresh": "Refresh",

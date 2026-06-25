@@ -77,7 +77,11 @@
     },
     "setStatus": "Set Status",
     "confirmBan": "Are you sure you want to ban this user?",
-    "confirmSuspend": "Are you sure you want to suspend this user?"
+    "confirmSuspend": "Are you sure you want to suspend this user?",
+    "changeRoleTitle": "更改角色",
+    "confirmRoleChange": "更改该用户的角色？",
+    "banTitle": "封禁用户",
+    "suspendTitle": "暂停用户"
   },
   "study": {
     "title": "学习活动",
@@ -267,7 +271,8 @@
       "educator": "Educator",
       "publisher": "Publisher",
       "partner": "Partner"
-    }
+    },
+    "revokeTitle": "撤销官方身份"
   },
   "audit": {
     "title": "Audit Log",
@@ -301,7 +306,30 @@
       "listing": "Listing",
       "report": "Report",
       "system": "System"
-    }
+    },
+    "description": "追踪系统中的所有管理操作",
+    "exportCSV": "导出 CSV",
+    "actionAll": "全部操作",
+    "filterTarget": "目标类型",
+    "targetAll": "全部目标",
+    "dateFrom": "起始",
+    "dateTo": "结束",
+    "searching": "搜索中...",
+    "emptyTitle": "未找到审计日志",
+    "emptyDescription": "没有符合当前筛选条件的日志。请调整搜索条件。",
+    "refreshing": "刷新中...",
+    "colTime": "时间",
+    "colAdmin": "管理员",
+    "colAction": "操作",
+    "colTarget": "目标",
+    "colDetails": "详情",
+    "colIP": "IP",
+    "pageInfo": "第 {{page}} 页",
+    "showing": "显示 {{count}} 条",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
+    "unknownAdmin": "未知",
+    "fullDetails": "完整详情"
   },
   "common": {
     "refresh": "Refresh",

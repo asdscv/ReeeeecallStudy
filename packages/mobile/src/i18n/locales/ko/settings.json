@@ -18,9 +18,7 @@
   },
   "srs": {
     "title": "SRS 설정",
-    "description": "최적의 학습을 위한 간격 반복 매개변수를 설정합니다.",
-    "dailyNewLimit": "일일 새 카드 한도",
-    "dailyNewLimitHint": "덱별 하루에 표시되는 새 카드의 최대 수."
+    "description": "최적의 학습을 위한 간격 반복 매개변수를 설정합니다."
   },
   "answerMode": {
     "title": "답변 방식",
@@ -33,6 +31,10 @@
     "same": "동시",
     "after": "나중",
     "timingDesc": "앞면에서 바로 평가(뒤집기 전 정답 선택)하거나 정답을 먼저 봅니다."
+  },
+  "haptics": {
+    "enable": "햅틱 피드백",
+    "hint": "탭·평가·동작 시 진동 피드백."
   },
   "tts": {
     "title": "자동 TTS 읽기",
@@ -150,5 +152,8 @@
   },
   "alerts": {
     "error": "오류"
+  },
+  "actions": {
+    "cancel": "취소"
   }
 }

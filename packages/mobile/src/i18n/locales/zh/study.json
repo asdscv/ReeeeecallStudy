@@ -33,24 +33,26 @@
   },
   "setup": {
     "title": "学习设置",
-    "deckInfo": "{{icon}} {{name}} · {{count}} 张卡片",
     "studyMode": "学习模式",
-    "selectUploadDate": "选择上传日期",
-    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片"
+    "noDecks": "还没有卡组，请先创建一个卡组！",
+    "alertSelectDeckTitle": "选择卡组",
+    "alertSelectDeckMsg": "请选择要学习的卡组",
+    "alertNoCardsTitle": "没有卡片",
+    "alertNoCardsMsg": "所选日期没有卡片",
+    "alertErrorTitle": "错误",
+    "shuffle": "随机",
+    "startFailed": "无法开始学习",
+    "cardsPerSession": "每次学习卡片数",
+    "batchHint": "5 到 500 张之间",
+    "dateSelection": "日期选择",
+    "startStudy": "开始学习"
   },
   "cramming": {
-    "gotIt": "会了！",
-    "missed": "不会",
-    "round": "第 {{round}} 轮",
-    "mastery": "掌握率: {{percentage}}%",
     "filter": {
       "title": "卡片筛选",
       "all": "全部卡片",
-      "allDesc": "学习牌组中所有未暂停的卡片",
       "weak": "薄弱卡片",
-      "weakDesc": "难度较高或新卡片",
-      "dueSoon": "即将到期",
-      "dueSoonDesc": "3天内需要复习的卡片"
+      "dueSoon": "即将到期"
     },
     "timeLimit": {
       "title": "时间限制",
@@ -58,37 +60,25 @@
       "minutes": "{{count}} 分钟"
     },
     "shuffle": {
-      "title": "打乱卡片",
-      "desc": "每轮打乱卡片顺序"
+      "title": "打乱卡片"
     },
     "summary": {
       "completed": "突击完成！",
-      "timeUp": "时间到！",
-      "wellDone": "辛苦了！坚持复习来巩固记忆。",
-      "totalRounds": "总轮数",
-      "masteryRate": "掌握率",
-      "cardsStudied": "学习卡片数",
-      "hardestCards": "最难的卡片",
-      "missedTimes": "错误 {{count}} 次",
-      "noSrsImpact": "此次学习不影响 SRS 复习计划。",
-      "sessionEnded": "学习结束",
-      "crammingAgain": "再次突击",
-      "otherMode": "其他模式"
+      "crammingAgain": "再次突击"
     }
   },
   "session": {
     "loading": "加载中...",
-    "noCards": "没有可学习的卡片",
-    "allReviewed": "所有卡片已复习完毕！",
-    "backToDeck": "返回牌组",
-    "exitConfirmTitle": "结束学习？",
-    "exitConfirmMessage": "已学习的内容将被保存。",
-    "exitConfirmButton": "结束",
-    "pause": "Pause",
-    "resume": "Resume",
-    "paused": "Paused",
-    "pressSpaceToResume": "Press Space to resume",
-    "undo": "Undo"
+    "undo": "Undo",
+    "endSession": "结束学习？",
+    "endMessage": "当前进度将被保存。",
+    "continue": "继续",
+    "end": "结束",
+    "exit": "退出",
+    "tapToFlip": "点击翻面",
+    "swipeHint": "点击卡片翻面 · 滑动评分",
+    "noActiveSession": "没有进行中的学习",
+    "backToSetup": "返回学习设置"
   },
   "srsRating": {
     "again": "重来",
@@ -97,32 +87,22 @@
     "easy": "简单"
   },
   "rating": {
-    "dontKnow": "不认识",
-    "knowIt": "认识",
     "known": "认识",
     "unknown": "不认识",
-    "next": "下一张 →"
+    "missed": "没记住",
+    "gotIt": "记住了"
   },
   "summary": {
     "title": "学习完成！",
-    "completed": "学习完成！",
-    "greatJob": "做得好！",
-    "wellDone": "做得好！继续加油。",
-    "studyCards": "学习卡片",
     "cardsStudied": "已学卡片",
-    "cardCount": "{{studied}} / {{total}}",
     "timeSpent": "用时",
-    "timeFormat": "{{minutes}}分 {{seconds}}秒",
     "avgPerCard": "每卡平均",
-    "secondsFormat": "{{seconds}}秒",
     "ratingDistribution": "评分分布",
     "backToDeck": "返回牌组",
     "studyAgain": "再学一次",
-    "sessionEnded": "学习结束",
-    "progressSoFar": "以下是您目前的学习进度。",
-    "knowIt": "认识",
-    "dontKnow": "不认识",
-    "next": "下一张"
+    "crammingTitle": "突击复习完成！",
+    "mastery": "掌握度",
+    "crammingAgain": "再次突击"
   },
   "ratingLabels": {
     "again": "Again",

@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 import { useTheme, type Theme } from '../../theme'
 import { testProps } from '../../utils/testProps'
+import { haptics } from '../../utils/haptics'
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -42,12 +43,22 @@ export function Button({
   const theme = useTheme()
   const styles = getStyles(theme, variant, size, disabled || loading)
 
+  const handlePress = () => {
+    // Tactile confirmation on every CTA — danger taps feel weightier.
+    if (variant === 'danger') haptics.impact()
+    else haptics.tap()
+    onPress()
+  }
+
   return (
     <TouchableOpacity
       {...testProps(testID)}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[styles.container, fullWidth && styles.fullWidth, style]}
     >
       {loading ? (
@@ -55,7 +66,7 @@ export function Button({
       ) : (
         <>
           {icon}
-          <Text style={[styles.text, textStyle]}>{title}</Text>
+          <Text style={[styles.text, textStyle]} maxFontSizeMultiplier={1.5}>{title}</Text>
         </>
       )}
     </TouchableOpacity>

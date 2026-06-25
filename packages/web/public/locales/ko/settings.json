@@ -6,24 +6,20 @@
   "saved": "설정이 저장되었습니다!",
   "saveButton": "설정 저장",
   "autoSaved": "저장됨",
-
   "links": {
     "userGuide": "사용법 가이드",
     "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
     "apiDocs": "API 문서",
     "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
   },
-
   "guide": {
     "title": "사용법 가이드",
     "desc": "기능 설명, 학습 팁, 공유 방법"
   },
-
   "apiDocs": {
     "title": "API 문서",
     "desc": "API 엔드포인트, 인증, 사용 예시"
   },
-
   "profile": {
     "title": "프로필",
     "email": "이메일",
@@ -36,7 +32,6 @@
     "nameTaken": "이미 사용 중인 이름입니다",
     "nameLength": "이름은 2~12자여야 합니다"
   },
-
   "language": {
     "title": "언어",
     "label": "표시 언어",
@@ -49,7 +44,6 @@
     "id": "Bahasa Indonesia",
     "es": "Español"
   },
-
   "theme": {
     "title": "테마",
     "description": "원하는 외관을 선택하세요. 시스템은 기기 설정을 따릅니다.",
@@ -57,7 +51,6 @@
     "dark": "다크",
     "system": "시스템"
   },
-
   "srs": {
     "title": "SRS 학습",
     "description": "SRS (간격 반복) 모드에서 한 세션에 추가되는 새 카드 수를 설정합니다",
@@ -67,7 +60,6 @@
     "help": "SRS 학습 시 복습 카드 외에 추가로 나오는 새 카드의 최대 수입니다. 복습 카드는 이 한도에 영향을 받지 않습니다.",
     "newCardNote": "SRS 학습 시 복습 카드 외에 추가로 나오는 새 카드의 최대 수입니다. 복습 카드는 이 한도에 영향을 받지 않습니다."
   },
-
   "answerMode": {
     "title": "답변 방식",
     "description": "학습 중 답변을 선택하는 방식을 설정합니다",
@@ -77,7 +69,6 @@
     "swipeDesc": "카드를 밀어서 답변 선택",
     "swipeAutoNote": "스와이프 방향은 학습 모드에 따라 자동 설정됩니다.\n• SRS: ← Again / → Good\n• 기타 모드: ← 모름 / → 알고 있음"
   },
-
   "tts": {
     "title": "자동 TTS 읽기",
     "description": "카드 뒤집기 시 TTS 설정된 필드를 자동으로 읽어줍니다",
@@ -92,7 +83,6 @@
     "help": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다.",
     "note": "TTS 언어는 카드 템플릿의 필드별 설정을 따릅니다. 재생 버튼은 자동 읽기와 관계없이 항상 표시됩니다."
   },
-
   "apiKey": {
     "title": "API 키 관리",
     "limit": "최대 1개의 API 키를 생성할 수 있습니다",
@@ -123,7 +113,6 @@
     "noKey": "생성된 API 키가 없습니다.",
     "securityNote": "보안상 다시 볼 수 없습니다"
   },
-
   "aiProvider": {
     "title": "AI 프로바이더",
     "description": "AI 자동 생성에 사용할 프로바이더와 API 키를 관리합니다",
@@ -144,7 +133,6 @@
     "customDesc": "OpenAI 호환 API",
     "noProviders": "설정된 프로바이더가 없습니다. 위에서 설정하세요."
   },
-
   "reminders": {
     "title": "학습 리마인더",
     "description": "듀오링고처럼 매일 학습 알림을 받아보세요.",
@@ -160,11 +148,35 @@
     "sat": "토",
     "sun": "일"
   },
-
   "account": {
     "title": "계정",
     "logout": "로그아웃"
   },
-
-  "settings": {}
+  "settings": {},
+  "export": {
+    "title": "내 데이터 내보내기",
+    "description": "데이터를 CSV 파일로 내려받습니다.",
+    "noData": "내보낼 데이터가 없습니다",
+    "success": "내보내기 완료",
+    "error": "내보내기 실패",
+    "stats": "학습 통계",
+    "statsDesc": "전체 학습 성과 요약",
+    "sessions": "학습 세션",
+    "sessionsDesc": "전체 학습 세션 기록 (최대 5,000개)",
+    "decks": "덱",
+    "decksDesc": "전체 덱 메타데이터",
+    "cards": "카드",
+    "cardsDesc": "SRS 상태를 포함한 전체 카드 데이터 (최대 10,000개)"
+  },
+  "quickActions": {
+    "quickStudy": "빠른 학습",
+    "aiGenerate": "AI 생성",
+    "guide": "가이드"
+  },
+  "goal": {
+    "title": "일일 학습 목표",
+    "description": "하루 학습 목표를 분 단위로 설정하세요. 비워두면 목표 없음입니다.",
+    "placeholder": "예: 30",
+    "unit": "분 / 일"
+  }
 }

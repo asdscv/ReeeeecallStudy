@@ -47,10 +47,10 @@ export function ConfirmDialog({
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`px-4 py-2 text-sm text-white rounded-lg cursor-pointer disabled:opacity-50 ${
+            className={`px-4 py-2 text-sm text-white rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
               danger
-                ? 'bg-destructive hover:bg-destructive'
-                : 'bg-brand hover:bg-brand'
+                ? 'bg-destructive hover:bg-destructive-hover'
+                : 'bg-brand hover:bg-brand-hover'
             }`}
           >
             {loading ? t('confirmDialog.processing') : (confirmLabel || t('confirmDialog.confirm'))}

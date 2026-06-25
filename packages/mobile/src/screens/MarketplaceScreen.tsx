@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, ScrollView, Modal } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, SearchBar, ListCard, ScreenHeader } from '../components/ui'
+import { Screen, SearchBar, ListCard, ScreenHeader, EmptyState, ListSkeleton } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { testProps } from '../utils/testProps'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
@@ -25,31 +25,26 @@ import type { MarketplaceStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<MarketplaceStackParamList, 'MarketplaceHome'>
 
-const CATEGORIES = [
-  { value: '', label: 'All' },
-  { value: 'language', label: 'Language' },
-  { value: 'science', label: 'Science' },
-  { value: 'math', label: 'Math' },
-  { value: 'history', label: 'History' },
-  { value: 'programming', label: 'Code' },
-  { value: 'exam', label: 'Exam' },
-  { value: 'other', label: 'Other' },
+// Labels resolved via i18n (`marketplace.categories.*` / `marketplace.sort.*`)
+// at render time; only value + key live here. (Previously hardcoded English.)
+const CATEGORIES: { value: string; labelKey: string }[] = [
+  { value: '', labelKey: 'categories.all' },
+  { value: 'language', labelKey: 'categories.language' },
+  { value: 'science', labelKey: 'categories.science' },
+  { value: 'math', labelKey: 'categories.math' },
+  { value: 'history', labelKey: 'categories.history' },
+  { value: 'programming', labelKey: 'categories.programming' },
+  { value: 'exam', labelKey: 'categories.exam' },
+  { value: 'other', labelKey: 'categories.other' },
 ]
 
-const SORT_OPTIONS: { value: SortBy; label: string }[] = [
-  { value: 'popular', label: 'Popular' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'trending', label: 'Trending' },
-  { value: 'card_count', label: 'Most Cards' },
-  { value: 'top_rated', label: 'Top Rated' },
+const SORT_OPTIONS: { value: SortBy; labelKey: string }[] = [
+  { value: 'popular', labelKey: 'sort.popular' },
+  { value: 'newest', labelKey: 'sort.newest' },
+  { value: 'trending', labelKey: 'sort.trending' },
+  { value: 'card_count', labelKey: 'sort.cardCount' },
+  { value: 'top_rated', labelKey: 'sort.topRated' },
 ]
-
-const DATE_LABELS: Record<string, string> = {
-  '7d': 'Last 7d',
-  '30d': 'Last 30d',
-  '90d': 'Last 90d',
-  'all': 'All time',
-}
 
 const PAGE_SIZE = 20
 
@@ -62,7 +57,7 @@ export function MarketplaceScreen() {
   const { t } = useTranslation('marketplace')
   const theme = useTheme()
   const navigation = useNavigation<Nav>()
-  const { listings, loading, fetchListings } = useMarketplaceStore()
+  const { listings, loading, error, fetchListings } = useMarketplaceStore()
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -107,7 +102,7 @@ export function MarketplaceScreen() {
 
   const paginatedData = filtered.slice(0, page * PAGE_SIZE)
   const hasMore = paginatedData.length < filtered.length
-  const activeFilterCount = (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0) + (studyLevel ? 1 : 0)
+  const activeFilterCount = (category ? 1 : 0) + (verifiedOnly ? 1 : 0) + (shareMode ? 1 : 0) + (dateRange && dateRange !== 'all' ? 1 : 0) + (learningLanguage ? 1 : 0) + (studyLevel ? 1 : 0) + (nativeLanguages.length > 0 ? 1 : 0)
 
   const loadMore = () => {
     if (hasMore && !loading) setPage((p) => p + 1)
@@ -119,7 +114,14 @@ export function MarketplaceScreen() {
       <FlatList
         data={paginatedData}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchListings({ force: true })} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading && listings.length > 0}
+            onRefresh={() => fetchListings({ force: true })}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
         contentContainerStyle={[styles.list, paginatedData.length === 0 && styles.listEmpty]}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -127,57 +129,28 @@ export function MarketplaceScreen() {
           <View style={styles.header}>
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="marketplace-search" />
 
-            {/* Category & Sort dropdowns */}
+            {/* Sort dropdown + Filter panel toggle. Category / Verified /
+                Native language and the rest live inside the Filter panel. */}
             <View style={styles.dropdownRow}>
-              <TouchableOpacity
-                onPress={() => setCategoryModalOpen(true)}
-                style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
-                testID="marketplace-category-dropdown"
-              >
-                <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
-                  {CATEGORIES.find((c) => c.value === category)?.label ?? 'All Categories'}
-                </Text>
-                <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
-              </TouchableOpacity>
-
               <TouchableOpacity
                 onPress={() => setSortModalOpen(true)}
                 style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
                 testID="marketplace-sort-dropdown"
               >
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
-                  {SORT_OPTIONS.find((s) => s.value === sortBy)?.label ?? 'Popular'}
+                  {(() => { const s = SORT_OPTIONS.find((s) => s.value === sortBy); return s ? t(s.labelKey) : t('sort.popular') })()}
                 </Text>
                 <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'\u25BE'}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Verified only + Advanced toggle row */}
-            <View style={styles.filterButtonRow}>
-              <TouchableOpacity
-                onPress={() => setVerifiedOnly(!verifiedOnly)}
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: verifiedOnly ? theme.colors.primaryLight : theme.colors.surface,
-                    borderColor: verifiedOnly ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-              >
-                <Text style={[
-                  theme.typography.labelSmall,
-                  { color: verifiedOnly ? theme.colors.primary : theme.colors.text },
-                ]}>
-                  {'\u2713'} Verified
-                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => setShowAdvanced(!showAdvanced)}
+                testID="marketplace-filter-toggle"
                 style={[
-                  styles.filterChip,
+                  styles.dropdownSelector,
+                  styles.filterToggle,
                   {
-                    backgroundColor: showAdvanced ? theme.colors.primaryLight : theme.colors.surface,
+                    backgroundColor: showAdvanced ? theme.colors.primaryLight : theme.colors.surfaceElevated,
                     borderColor: showAdvanced ? theme.colors.primary : theme.colors.border,
                   },
                 ]}
@@ -186,51 +159,89 @@ export function MarketplaceScreen() {
                   theme.typography.labelSmall,
                   { color: showAdvanced ? theme.colors.primary : theme.colors.text },
                 ]}>
-                  Advanced{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                  {t('filters.label')}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </Text>
               </TouchableOpacity>
             </View>
 
-            {/* Native language — multi-select, always visible. Lets e.g. a
-                Korean learner narrow to decks explained in their language. */}
-            <View>
-              <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-                {t('nativeLanguage.label')}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                {NATIVE_LANGUAGES.map((lang) => {
-                  const isActive = nativeLanguages.includes(lang.value)
-                  return (
-                    <TouchableOpacity
-                      key={lang.value}
-                      testID={`marketplace-native-${lang.value}`}
-                      onPress={() => toggleNativeLanguage(lang.value)}
-                      style={[
-                        styles.filterChip,
-                        {
-                          backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
-                          borderColor: isActive ? theme.colors.primary : theme.colors.border,
-                        },
-                      ]}
-                    >
-                      <Text style={[
-                        theme.typography.labelSmall,
-                        { color: isActive ? theme.colors.primaryText : theme.colors.text },
-                      ]}>
-                        {t(lang.labelKey)}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
-              </ScrollView>
-            </View>
-
-            {/* Advanced filters panel */}
+            {/* Filter panel */}
             {showAdvanced && (
               <View style={[styles.advancedPanel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-                {/* Date range */}
+                {/* Category */}
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-                  Published in
+                  {t('categoryLabel')}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setCategoryModalOpen(true)}
+                  style={[styles.dropdownSelector, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                  testID="marketplace-category-dropdown"
+                >
+                  <Text style={[theme.typography.labelSmall, { color: theme.colors.text, flex: 1 }]}>
+                    {(() => { const c = CATEGORIES.find((c) => c.value === category); return c ? t(c.labelKey) : t('categories.all') })()}
+                  </Text>
+                  <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'▾'}</Text>
+                </TouchableOpacity>
+
+                {/* Verified (certified) only */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('verifiedOnly')}
+                </Text>
+                <View style={styles.chipRow}>
+                  <TouchableOpacity
+                    onPress={() => setVerifiedOnly(!verifiedOnly)}
+                    testID="marketplace-verified-toggle"
+                    style={[
+                      styles.filterChip,
+                      {
+                        backgroundColor: verifiedOnly ? theme.colors.primary : theme.colors.surface,
+                        borderColor: verifiedOnly ? theme.colors.primary : theme.colors.border,
+                      },
+                    ]}
+                  >
+                    <Text style={[
+                      theme.typography.labelSmall,
+                      { color: verifiedOnly ? theme.colors.primaryText : theme.colors.text },
+                    ]}>
+                      {'✓'} {t('verifiedOnly')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Native language — multi-select. Lets e.g. a Korean learner
+                    narrow to decks explained in their language. */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('nativeLanguage.label')}
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                  {NATIVE_LANGUAGES.map((lang) => {
+                    const isActive = nativeLanguages.includes(lang.value)
+                    return (
+                      <TouchableOpacity
+                        key={lang.value}
+                        testID={`marketplace-native-${lang.value}`}
+                        onPress={() => toggleNativeLanguage(lang.value)}
+                        style={[
+                          styles.filterChip,
+                          {
+                            backgroundColor: isActive ? theme.colors.primary : theme.colors.surface,
+                            borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                          },
+                        ]}
+                      >
+                        <Text style={[
+                          theme.typography.labelSmall,
+                          { color: isActive ? theme.colors.primaryText : theme.colors.text },
+                        ]}>
+                          {t(lang.labelKey)}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+
+                {/* Date range */}
+                <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
+                  {t('dateRange.label')}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
                   {DATE_RANGE_OPTIONS.map((range) => {
@@ -251,7 +262,7 @@ export function MarketplaceScreen() {
                           theme.typography.labelSmall,
                           { color: isActive ? theme.colors.primaryText : theme.colors.text },
                         ]}>
-                          {DATE_LABELS[range] ?? range}
+                          {t(`dateRange.${range}`)}
                         </Text>
                       </TouchableOpacity>
                     )
@@ -260,7 +271,7 @@ export function MarketplaceScreen() {
 
                 {/* Share mode */}
                 <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginTop: 10, marginBottom: 6 }]}>
-                  Share mode
+                  {t('shareMode.label')}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
                   <TouchableOpacity
@@ -277,7 +288,7 @@ export function MarketplaceScreen() {
                       theme.typography.labelSmall,
                       { color: !shareMode ? theme.colors.primaryText : theme.colors.text },
                     ]}>
-                      All
+                      {t('shareMode.all')}
                     </Text>
                   </TouchableOpacity>
                   {SHARE_MODES.map((mode) => {
@@ -298,7 +309,7 @@ export function MarketplaceScreen() {
                           theme.typography.labelSmall,
                           { color: isActive ? theme.colors.primaryText : theme.colors.text },
                         ]}>
-                          {mode}
+                          {t(`shareMode.${mode}`)}
                         </Text>
                       </TouchableOpacity>
                     )
@@ -422,7 +433,7 @@ export function MarketplaceScreen() {
                 </View>
                 {item.share_mode && (
                   <Text style={[theme.typography.labelSmall, { color: theme.colors.primary }]}>
-                    {item.share_mode === 'subscribe' ? 'Subscribe' : item.share_mode === 'copy' ? 'Copy' : item.share_mode}
+                    {t(`shareMode.${item.share_mode}`, { defaultValue: item.share_mode })}
                   </Text>
                 )}
               </View>
@@ -469,7 +480,7 @@ export function MarketplaceScreen() {
               {/* Bottom stats: "X cards · 👁 Y · Z users" */}
               <View style={styles.statsRow}>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {item.card_count ?? 0} cards{' · '}{'\uD83D\uDC41'} {(item as any).view_count ?? 0}{' · '}{item.acquire_count ?? 0} users
+                  {t('listing.cardCount', { count: item.card_count ?? 0 })}{' · '}{'\uD83D\uDC41'} {(item as any).view_count ?? 0}{' · '}{t('listing.userCount', { count: item.acquire_count ?? 0 })}
                 </Text>
                 {(item as any).review_count > 0 && (
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
@@ -488,17 +499,23 @@ export function MarketplaceScreen() {
           ) : null
         }
         ListEmptyComponent={
-          !loading ? (
-            <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>{'\uD83C\uDFEA'}</Text>
-              <Text style={[theme.typography.h3, { color: theme.colors.text, textAlign: 'center' }]}>
-                No decks found
-              </Text>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                Try a different search or category
-              </Text>
-            </View>
-          ) : null
+          loading ? (
+            <ListSkeleton count={5} />
+          ) : error ? (
+            <EmptyState
+              icon="\u26A0\uFE0F"
+              title={t('loadError', { defaultValue: "Couldn't load decks" })}
+              description={t('loadErrorHint', { defaultValue: 'Check your connection and try again.' })}
+              actionTitle={t('common:actions.retry', { defaultValue: 'Retry' })}
+              onAction={() => fetchListings({ force: true })}
+            />
+          ) : (
+            <EmptyState
+              icon="\uD83C\uDFEA"
+              title={t('noResults', { defaultValue: 'No decks found' })}
+              description={t('noResultsHint', { defaultValue: 'Try a different search or category' })}
+            />
+          )
         }
       />
 
@@ -506,7 +523,7 @@ export function MarketplaceScreen() {
       <Modal visible={categoryModalOpen} transparent animationType="fade" onRequestClose={() => setCategoryModalOpen(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setCategoryModalOpen(false)}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Category</Text>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('categoryTitle', { defaultValue: 'Category' })}</Text>
             <FlatList
               data={CATEGORIES}
               keyExtractor={(item) => item.value || '_all'}
@@ -520,7 +537,7 @@ export function MarketplaceScreen() {
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                      {cat.label}
+                      {t(cat.labelKey)}
                     </Text>
                     {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>{'\u2713'}</Text>}
                   </TouchableOpacity>
@@ -535,7 +552,7 @@ export function MarketplaceScreen() {
       <Modal visible={sortModalOpen} transparent animationType="fade" onRequestClose={() => setSortModalOpen(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSortModalOpen(false)}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Sort By</Text>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('sortTitle', { defaultValue: 'Sort By' })}</Text>
             <FlatList
               data={SORT_OPTIONS}
               keyExtractor={(item) => item.value}
@@ -549,7 +566,7 @@ export function MarketplaceScreen() {
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.modalItemText, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </Text>
                     {isActive && <Text style={{ color: theme.colors.primary, fontSize: 16 }}>{'\u2713'}</Text>}
                   </TouchableOpacity>
@@ -594,7 +611,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 14,
   },
   modalItemText: { flex: 1, fontSize: 15, fontWeight: '500' },
-  filterButtonRow: { flexDirection: 'row', gap: 8 },
+  filterToggle: { flex: 0, minWidth: 96, justifyContent: 'center' },
   filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
   chipRow: { gap: 8 },
   advancedPanel: { padding: 12, borderRadius: 12, borderWidth: 1 },

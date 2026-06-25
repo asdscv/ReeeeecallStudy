@@ -152,5 +152,31 @@
     "fri": "Fri",
     "sat": "Sat",
     "sun": "Sun"
+  },
+  "export": {
+    "title": "データをエクスポート",
+    "description": "データを CSV ファイルでダウンロードします。",
+    "noData": "エクスポートするデータがありません",
+    "success": "エクスポート完了",
+    "error": "エクスポート失敗",
+    "stats": "学習統計",
+    "statsDesc": "学習成果の全体サマリー",
+    "sessions": "学習セッション",
+    "sessionsDesc": "すべての学習セッション履歴（最大5,000件）",
+    "decks": "デッキ",
+    "decksDesc": "すべてのデッキのメタデータ",
+    "cards": "カード",
+    "cardsDesc": "SRSステータスを含む全カードデータ（最大10,000件）"
+  },
+  "quickActions": {
+    "quickStudy": "クイック学習",
+    "aiGenerate": "AI 生成",
+    "guide": "ガイド"
+  },
+  "goal": {
+    "title": "毎日の学習目標",
+    "description": "1日の学習目標を分単位で設定します。空欄なら目標なし。",
+    "placeholder": "例: 30",
+    "unit": "分 / 日"
   }
 }

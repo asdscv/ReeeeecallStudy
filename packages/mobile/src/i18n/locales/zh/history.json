@@ -7,16 +7,15 @@
   "emptyDesc": "Start studying to see your progress here",
   "studyVolume": "Study Volume",
   "modeBreakdown": "Mode Breakdown",
-  "deckProgress": {
-    "total": "{{count}} 张卡片",
-    "notStudied": "未学习 {{count}}",
-    "learning": "学习中 {{count}}",
-    "review": "复习 {{count}}"
-  },
   "sessionList": "Session List",
   "today": "Today",
   "yesterday": "Yesterday",
   "unknownDeck": "Unknown Deck",
   "sessions": "sessions",
-  "cards": "cards"
+  "cards": "cards",
+  "tabs": {
+    "history": "记录",
+    "analytics": "分析"
+  },
+  "sessionsPerDay": "每日学习次数"
 }

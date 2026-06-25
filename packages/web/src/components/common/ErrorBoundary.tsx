@@ -66,7 +66,7 @@ function ErrorFallback({ error, resetError, variant = 'generic' }: FallbackProps
           <button
             type="button"
             onClick={resetError}
-            className="px-5 py-2.5 text-sm font-medium bg-destructive text-white rounded-lg hover:bg-destructive transition cursor-pointer"
+            className="px-5 py-2.5 text-sm font-medium bg-destructive text-white rounded-lg hover:bg-destructive-hover transition cursor-pointer"
           >
             {t('error.boundary.tryAgain', 'Try Again')}
           </button>

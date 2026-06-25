@@ -5,12 +5,8 @@
     "email": "Email",
     "displayName": "Tên hiển thị",
     "displayNamePlaceholder": "Nhập tên của bạn",
-    "namePlaceholder": "Nhập tên của bạn",
-    "saveBtn": "Lưu",
-    "nameSaved": "Đã lưu tên!",
     "nameAvailable": "Tên khả dụng!",
     "nameTaken": "Tên đã được sử dụng",
-    "nameLength": "Tên phải từ 2-12 ký tự",
     "save": "Lưu",
     "checkingName": "Đang kiểm tra...",
     "nameLengthError": "Yêu cầu 2-12 ký tự",
@@ -18,24 +14,11 @@
     "savedMessage": "Đã cập nhật tên hiển thị."
   },
   "language": {
-    "title": "Ngôn ngữ",
-    "label": "Ngôn ngữ hiển thị",
-    "en": "English",
-    "ko": "한국어",
-    "zh": "中文（简体）",
-    "ja": "日本語",
-    "vi": "Tiếng Việt",
-    "th": "ภาษาไทย",
-    "id": "Bahasa Indonesia"
+    "title": "Ngôn ngữ"
   },
   "srs": {
     "title": "Học SRS",
-    "description": "Đặt số lượng thẻ mới được thêm mỗi phiên trong chế độ SRS (lặp lại ngắt quãng)",
-    "newCardLimit": "Giới hạn thẻ mới",
-    "cards": "thẻ",
-    "cardsUnit": "thẻ",
-    "help": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này.",
-    "newCardNote": "Số lượng thẻ mới tối đa bên cạnh thẻ ôn tập trong phiên SRS. Thẻ ôn tập không bị ảnh hưởng bởi giới hạn này."
+    "description": "Đặt số lượng thẻ mới được thêm mỗi phiên trong chế độ SRS (lặp lại ngắt quãng)"
   },
   "answerMode": {
     "title": "Chế độ trả lời",
@@ -44,7 +27,6 @@
     "buttonDesc": "Chọn câu trả lời bằng cách nhấn nút",
     "swipe": "Vuốt",
     "swipeDesc": "Chọn câu trả lời bằng cách vuốt thẻ",
-    "swipeAutoNote": "Hướng vuốt được đặt tự động dựa trên chế độ học.\n• SRS: ← Lại / → Tốt\n• Chế độ khác: ← Chưa biết / → Đã biết",
     "before": "Trước",
     "same": "Cùng lúc",
     "after": "Sau",
@@ -54,15 +36,14 @@
     "title": "Đọc TTS tự động",
     "description": "Tự động đọc các trường có TTS khi lật thẻ",
     "enable": "Bật đọc tự động",
-    "provider": "Công cụ giọng nói",
-    "webSpeech": "Giọng thiết bị",
-    "webSpeechDesc": "Sử dụng giọng nói tích hợp trên thiết bị",
     "edgeTts": "Edge TTS",
     "edgeTtsDesc": "Giọng nói thần kinh chất lượng cao",
     "edgeTtsNote": "* Hiện chỉ hỗ trợ tiếng Anh",
-    "speed": "Tốc độ đọc",
-    "help": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
-    "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động."
+    "note": "Ngôn ngữ TTS theo cài đặt trường trong mẫu thẻ. Nút phát luôn hiển thị bất kể cài đặt đọc tự động.",
+    "voiceEngine": "Bộ máy giọng nói",
+    "readingSpeed": "Tốc độ đọc",
+    "deviceVoice": "Giọng thiết bị",
+    "deviceVoiceDesc": "Dùng giọng tích hợp của thiết bị"
   },
   "srsConfig": {
     "title": "SRS Configuration",
@@ -114,7 +95,11 @@
   },
   "account": {
     "title": "Tài khoản",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "logoutConfirm": "Bạn có chắc muốn đăng xuất?",
+    "deleteAccount": "Xóa tài khoản",
+    "deleteConfirm": "Thao tác này sẽ xóa vĩnh viễn tài khoản và mọi dữ liệu liên quan. Không thể hoàn tác.",
+    "deleteFailed": "Xóa tài khoản thất bại. Vui lòng liên hệ hỗ trợ."
   },
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
@@ -163,5 +148,12 @@
   },
   "alerts": {
     "error": "Lỗi"
+  },
+  "actions": {
+    "cancel": "Hủy"
+  },
+  "haptics": {
+    "enable": "Phản hồi rung",
+    "hint": "Rung phản hồi khi chạm, đánh giá và thao tác."
   }
 }

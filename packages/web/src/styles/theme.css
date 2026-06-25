@@ -56,9 +56,9 @@
     --bg-card: #1F2937;
     --bg-overlay: rgba(0, 0, 0, 0.7);
 
-    /* Borders */
-    --border-primary: #1F2937;
-    --border-secondary: #374151;
+    /* Borders — lighter than surfaces so they're visible in dark mode */
+    --border-primary: #374151;
+    --border-secondary: #4B5563;
 
     /* Text */
     --text-primary: #F9FAFB;

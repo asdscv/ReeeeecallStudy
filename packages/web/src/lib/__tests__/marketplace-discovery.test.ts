@@ -431,8 +431,13 @@ describe('countActiveFilters', () => {
     expect(countActiveFilters({})).toBe(0)
   })
 
-  it('should not count query or category', () => {
-    expect(countActiveFilters({ query: 'test', category: 'language' })).toBe(0)
+  it('should not count the free-text query', () => {
+    expect(countActiveFilters({ query: 'test' })).toBe(0)
+  })
+
+  it('should count category (now in the Filter panel)', () => {
+    expect(countActiveFilters({ category: 'language' })).toBe(1)
+    expect(countActiveFilters({ query: 'test', category: 'language' })).toBe(1)
   })
 
   it('should count minCardCount', () => {

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Animated, {
@@ -12,9 +13,11 @@ import Animated, {
   Extrapolation,
 } from 'react-native-reanimated'
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
+import { Feather } from '@expo/vector-icons'
 import { Screen } from '../components/ui'
 import { testProps } from '../utils/testProps'
 import { computeCardTextAttrs } from '../utils/card-text-style'
+import { haptics } from '../utils/haptics'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../theme'
@@ -56,6 +59,7 @@ const DEFAULT_FONT_SIZES: Record<string, number> = {
 
 export function StudySessionScreen() {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { t } = useTranslation('study')
   const navigation = useNavigation<Nav>()
   const {
@@ -102,6 +106,9 @@ export function StudySessionScreen() {
   const rotateY = useSharedValue(0)
   const translateX = useSharedValue(0)
   const cardScale = useSharedValue(1)
+  // Tracks whether the drag is currently past the commit threshold, so we tick
+  // a selection haptic exactly once each time it crosses (like Mail/Tinder).
+  const pastThreshold = useSharedValue(false)
 
   // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
@@ -179,10 +186,29 @@ export function StudySessionScreen() {
   })
 
   if (!currentCard || phase !== 'studying') {
+    // The study store is in-memory only. If the user lands here without an
+    // active session (cold restart after a crash / a stale nav-state restore
+    // that sneaks past sanitization / a race where data hasn't loaded yet),
+    // give them an explicit way out so they aren't trapped on a permanent
+    // "Loading…" screen with no exit affordance.
+    const stuck = phase === 'idle' || phase === 'completed'
     return (
       <Screen testID="study-session-screen">
         <View style={styles.center}>
-          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>{t('session.loading')}</Text>
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary, marginBottom: 16 }]}>
+            {stuck ? t('session.noActiveSession') : t('session.loading')}
+          </Text>
+          {stuck && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('StudySetup', {})}
+              style={[styles.bailoutBtn, { backgroundColor: theme.colors.primary }]}
+              {...testProps('study-session-bailout')}
+            >
+              <Text style={[theme.typography.body, { color: theme.colors.primaryText, fontWeight: '600' }]}>
+                {t('session.backToSetup')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Screen>
     )
@@ -261,9 +287,16 @@ export function StudySessionScreen() {
         [1, 0.85],
         Extrapolation.CLAMP,
       )
+      // Tick once on each threshold crossing (in either direction).
+      const past = Math.abs(e.translationX) >= SWIPE_THRESHOLD
+      if (past !== pastThreshold.value) {
+        pastThreshold.value = past
+        if (past) runOnJS(haptics.selection)()
+      }
     })
     .onEnd((e) => {
       const { translationX: tx, velocityX: vx } = e
+      pastThreshold.value = false
 
       // Mode-aware swipe ratings: cramming → missed/got_it, srs → again/good, other → unknown/known
       const leftRating = config?.mode === 'cramming' ? 'missed' : config?.mode === 'srs' ? 'again' : 'unknown'
@@ -346,14 +379,14 @@ export function StudySessionScreen() {
 
         {/* Rating area — button mode: buttons, swipe mode: hints */}
         {isFlipped && isSwipeMode && (
-          <View style={styles.swipeRatingHint}>
+          <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>Swipe</Text>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
           </View>
         )}
         {isFlipped && !isSwipeMode && (
-          <View style={[styles.ratingRow, { paddingHorizontal: 16 }]}>
+          <View style={[styles.ratingRow, { paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 24) }]}>
             {config?.mode === 'srs' ? (
               <>
                 <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} />
@@ -410,7 +443,9 @@ function TTSButton({ text, lang, speed, color, cardTapRef }: {
   return (
     <GestureDetector gesture={ttsTap}>
       <Animated.View style={styles.ttsInlineBtn} hitSlop={8}>
-        <Text style={{ fontSize: 18, color }}>{'\uD83D\uDD0A'}</Text>
+        {/* Vector speaker (Feather volume-2 \u2248 web's lucide Volume2). A fixed-size
+            box means the glyph is never clipped, unlike the previous raw emoji. */}
+        <Feather name="volume-2" size={18} color={color} />
       </Animated.View>
     </GestureDetector>
   )
@@ -442,21 +477,27 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
     }
 
     return (
-      <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock]}>
-        {/* TTS button: absolute-positioned overlay so it doesn't constrain Text
-            width via flex measurement. iOS RN's flex:1 + row + sibling combo
-            measures CJK text width incorrectly, causing per-glyph wrap or
-            premature truncation. With Text taking full container width and the
-            button overlaying on the left, measurement is unambiguous. */}
+      <View key={field.key} style={[styles.fieldBlock, isHint && styles.hintBlock, isHint && { borderLeftColor: theme.colors.border }]}>
+        {/* TTS field: web-parity flex row — speaker icon (fixed width, never
+            shrinks) + text that flex-shrinks so it WRAPS inside the card instead
+            of overflowing horizontally. The previous absolute-overlay + Text
+            width:'100%' approach did not wrap on iOS (a percentage width is not
+            applied during text measurement), so text laid out on one line →
+            horizontal overflow + horizontal scroll + clipping. Worst for
+            space-less CJK (Chinese), which became one very long line. */}
         {field.ttsLang ? (
-          <View style={styles.ttsRow}>
-            <View style={styles.ttsAbsButton} pointerEvents="box-none">
-              <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
-            </View>
+          <View style={[styles.ttsRow, isHint && styles.ttsRowHint]}>
+            <TTSButton text={field.value} lang={field.ttsLang} speed={ttsSpeed} color={theme.colors.primary} cardTapRef={cardTapRef} />
             <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
           </View>
         ) : (
-          <Text style={textStyle}>{field.value}</Text>
+          // Non-TTS text uses the SAME proven flex-shrink row (just no icon) so
+          // it wraps on iOS too. A bare <Text> relying on a stretch/percentage
+          // width does NOT wrap during iOS text measurement (see comment above);
+          // flexShrink inside a definite-width row is the mechanism that works.
+          <View style={[styles.ttsRow, isHint && styles.ttsRowHint]}>
+            <Text style={[textStyle, styles.ttsText]}>{field.value}</Text>
+          </View>
         )}
       </View>
     )
@@ -465,8 +506,15 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
   if (scrollable) {
     return (
       <ScrollView
+        // Pin the scroll-view FRAME to the card width. Without an explicit width
+        // the view has no definite cross-size and, under the card's flex
+        // alignment, sizes itself to its (unwrapped) content — which is why the
+        // back face stayed horizontally scrollable even after the field/text
+        // wrap fixes. Mirrors cardContent's width:'100%' on the front face.
+        style={styles.cardScroll}
         contentContainerStyle={styles.cardScrollContent}
         showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         bounces={false}
         nestedScrollEnabled
       >
@@ -489,7 +537,7 @@ function RatingButton({ label, color, onPress, disabled }: {
       activeOpacity={0.7}
       style={[styles.ratingBtn, { backgroundColor: color, opacity: disabled ? 0.5 : 1 }]}
     >
-      <Text style={styles.ratingLabel}>{label}</Text>
+      <Text style={styles.ratingLabel} maxFontSizeMultiplier={1.3} numberOfLines={1}>{label}</Text>
     </TouchableOpacity>
   )
 }
@@ -505,6 +553,10 @@ const styles = StyleSheet.create({
   card: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     borderRadius: 20, borderWidth: 1, padding: 24, justifyContent: 'center', alignItems: 'center',
+    // Safety net: clip any rare horizontal overflow (e.g. a hyphen-less URL
+    // token longer than the card) to the rounded card bounds instead of
+    // leaking past the card edge — defense in depth for the wrap fix.
+    overflow: 'hidden',
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 5,
   },
   cardBack: { },
@@ -513,27 +565,29 @@ const styles = StyleSheet.create({
   // content cross-axis to the longest line, so child width:'100%' expands to
   // that over-wide value and text overflows horizontally instead of wrapping.
   cardContent: { flex: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, width: '100%' },
+  cardScroll: { width: '100%' },
   cardScrollContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'stretch', gap: 16, padding: 8 },
-  fieldBlock: { width: '100%', alignItems: 'center' },
-  hintBlock: { borderLeftWidth: 2, borderLeftColor: '#e5e7eb', paddingLeft: 12, alignItems: 'flex-start' },
-  ttsRow: { width: '100%', position: 'relative', justifyContent: 'center' },
-  ttsAbsButton: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    zIndex: 2,
-  },
-  ttsText: {
-    width: '100%',
-    // Reserve horizontal room for the absolute-positioned speaker icon on
-    // the left so centered text never collides with it. Symmetric padding
-    // keeps textAlign:'center' visually centered within the card.
-    paddingLeft: 44,
-    paddingRight: 44,
-  },
-  ttsInlineBtn: { padding: 8 },
+  // alignItems:'stretch' (not 'center') gives each field — including a bare
+  // non-TTS <Text> with no explicit width — a DEFINITE width from the card, so
+  // it wraps at the card edge instead of being sized to its intrinsic one-line
+  // width and overflowing horizontally. Same iOS gotcha as cardContent above;
+  // TTS fields already wrap via the flexShrink row. Centered look is preserved
+  // by textStyle.textAlign:'center'. (Completes the #146 wrap fix, which left
+  // the non-TTS explanation text still overflowing.)
+  fieldBlock: { width: '100%', alignItems: 'stretch' },
+  hintBlock: { borderLeftWidth: 2, paddingLeft: 12, alignItems: 'flex-start' },
+  // Web-parity row: icon + text, centered as a group. The row has a DEFINITE
+  // width (100% of the card-inner width), so the flex-shrinking text below gets
+  // a definite available width and wraps correctly (incl. CJK) instead of
+  // overflowing on one line.
+  ttsRow: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  ttsRowHint: { justifyContent: 'flex-start' },
+  // flexShrink:1 lets the text shrink to the remaining row width and wrap;
+  // textAlign:'center' (from textStyle) centers each line. No width:'100%' —
+  // that percentage is what broke wrapping on iOS.
+  ttsText: { flexShrink: 1 },
+  // Fixed-size touch target so the vector icon is never clipped.
+  ttsInlineBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   tapHint: { position: 'absolute', bottom: 16 },
   swipeHint: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -541,6 +595,7 @@ const styles = StyleSheet.create({
   },
   ratingRow: { flexDirection: 'row', gap: 8, paddingBottom: 24 },
   ratingBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
+  bailoutBtn: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
   ratingLabel: { color: '#fff', fontWeight: '700', fontSize: 14 },
   swipeRatingHint: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 32, paddingBottom: 20 },
   bottomHints: { alignItems: 'center', paddingBottom: 20, paddingHorizontal: 20, gap: 8 },

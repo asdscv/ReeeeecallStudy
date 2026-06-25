@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { View, Text, Alert, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
@@ -16,6 +17,7 @@ type Route = RouteProp<DecksStackParamList, 'CardEdit'>
 
 export function CardEditScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
   const navigation = useNavigation<Nav>()
   const route = useRoute<Route>()
   const { deckId, cardId } = route.params
@@ -133,7 +135,7 @@ export function CardEditScreen() {
 
   const handleSave = async () => {
     if (!hasContent) {
-      Alert.alert('Error', 'At least one field must have content')
+      Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.emptyError'))
       return
     }
 
@@ -161,7 +163,7 @@ export function CardEditScreen() {
       }
       navigation.goBack()
     } catch (e) {
-      Alert.alert('Error', 'Failed to save card')
+      Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.saveError'))
     } finally {
       setSaving(false)
     }
@@ -169,12 +171,12 @@ export function CardEditScreen() {
 
   return (
     <Screen scroll keyboard testID="card-edit-screen">
-      <ScreenHeader title={isEditing ? 'Edit Card' : 'New Card'} mode="back" />
+      <ScreenHeader title={isEditing ? t('cardEdit.editTitle') : t('cardEdit.newTitle')} mode="back" />
       <View style={styles.content}>
 
         {template && (
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-            Template: {template.name}
+            {t('cardEdit.templateLabel', { name: template.name })}
           </Text>
         )}
 
@@ -187,7 +189,7 @@ export function CardEditScreen() {
                 key={field.key}
                 testID={`card-edit-field-${field.key}`}
                 label={field.name}
-                placeholder={field.detail || `Enter ${field.name.toLowerCase()}`}
+                placeholder={field.detail || t('cardEdit.enterField', { field: field.name })}
                 value={fieldValues[field.key] ?? ''}
                 onChangeText={(v) => setField(field.key, v)}
                 multiline={field.type === 'text'}
@@ -199,8 +201,8 @@ export function CardEditScreen() {
           <>
             <TextInput
               testID="card-edit-field-front"
-              label="Front"
-              placeholder="Question or term"
+              label={t('cardEdit.front')}
+              placeholder={t('cardEdit.frontPlaceholder')}
               value={fieldValues.front ?? ''}
               onChangeText={(v) => setField('front', v)}
               multiline
@@ -208,8 +210,8 @@ export function CardEditScreen() {
             />
             <TextInput
               testID="card-edit-field-back"
-              label="Back"
-              placeholder="Answer or definition"
+              label={t('cardEdit.back')}
+              placeholder={t('cardEdit.backPlaceholder')}
               value={fieldValues.back ?? ''}
               onChangeText={(v) => setField('back', v)}
               multiline
@@ -221,16 +223,16 @@ export function CardEditScreen() {
         {/* Tags */}
         <TextInput
           testID="card-edit-tags"
-          label="Tags"
-          placeholder="comma, separated, tags"
+          label={t('cardEdit.tags')}
+          placeholder={t('cardEdit.tagsPlaceholder')}
           value={tags}
           onChangeText={setTags}
-          hint="Separate tags with commas"
+          hint={t('cardEdit.tagsHint')}
         />
 
         <Button
           testID="card-edit-save"
-          title={isEditing ? 'Save Changes' : 'Add Card'}
+          title={isEditing ? t('cardEdit.save') : t('cardEdit.add')}
           onPress={handleSave}
           loading={saving}
           disabled={!hasContent}
@@ -240,7 +242,7 @@ export function CardEditScreen() {
         {!isEditing && (
           <Button
             testID="card-edit-save-another"
-            title="Add & Create Another"
+            title={t('cardEdit.addAnother')}
             variant="outline"
             onPress={async () => {
               if (!hasContent) return
@@ -262,7 +264,7 @@ export function CardEditScreen() {
                 setFieldValues({})
                 setTags('')
               } catch {
-                Alert.alert('Error', 'Failed to save card')
+                Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.saveError'))
               } finally {
                 setSaving(false)
               }

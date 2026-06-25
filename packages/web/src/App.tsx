@@ -38,6 +38,7 @@ import { useTheme } from './hooks/useTheme'
 import { useOnboardingStore } from './stores/onboarding-store'
 import { OnboardingOverlay } from './components/onboarding/OnboardingOverlay'
 import { LevelUpCelebration } from './components/common/LevelUpCelebration'
+import { GlobalConfirmDialog } from './components/common/GlobalConfirmDialog'
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded heavy pages                                           */
@@ -162,6 +163,18 @@ function App() {
     }
   }, [user, registerSession, startHeartbeat])
 
+  // When the tab becomes visible again, re-register immediately so a backgrounded
+  // tab whose session row/token went stale is revalidated right away rather than
+  // waiting for the next heartbeat. (registerSession never kicks on transient.)
+  useEffect(() => {
+    if (!user) return
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void registerSession()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [user, registerSession])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -175,6 +188,7 @@ function App() {
       <PageTracker />
       <SessionKickedOverlay />
       <Toaster richColors position="top-right" />
+      <GlobalConfirmDialog />
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>

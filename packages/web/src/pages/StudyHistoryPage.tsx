@@ -36,6 +36,7 @@ import { RatingDistributionChart } from '../components/study-history/RatingDistr
 import { SessionDurationChart } from '../components/study-history/SessionDurationChart'
 import { ModeBreakdownCards } from '../components/study-history/ModeBreakdownCards'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { ListSkeleton } from '../components/common/Skeleton'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
 
 const PersonalAnalyticsContent = lazy(() =>
@@ -217,9 +218,7 @@ export function StudyHistoryPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📝</div>
-      </div>
+      <ListSkeleton />
     )
   }
 

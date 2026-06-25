@@ -65,7 +65,7 @@ export function StudySummary({ stats, summaryType = 'complete', onBackToDeck, on
           </button>
           <button
             onClick={onStudyAgain}
-            className="flex-1 px-4 py-3 bg-brand hover:bg-brand text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            className="flex-1 px-4 py-3 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
           >
             {t('summary.studyAgain')}
           </button>

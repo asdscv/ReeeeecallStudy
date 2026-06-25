@@ -8,6 +8,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { formatLocalDate } from '../lib/date-utils'
 import { generateTemplateExportJSON, generateTemplateExportCSV } from '../lib/import-export'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { ListSkeleton } from '../components/common/Skeleton'
 import type { CardTemplate } from '../types/database'
 
 export function TemplatesPage() {
@@ -76,9 +77,7 @@ export function TemplatesPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="text-4xl animate-pulse">📋</div>
-      </div>
+      <ListSkeleton />
     )
   }
 
@@ -96,7 +95,7 @@ export function TemplatesPage() {
         </div>
         <button
           onClick={handleNew}
-          className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand transition cursor-pointer shrink-0"
+          className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer shrink-0"
         >
           {t('createNew')}
         </button>
@@ -114,7 +113,7 @@ export function TemplatesPage() {
           <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('empty')}</p>
           <button
             onClick={handleNew}
-            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('createFirst')}
           </button>

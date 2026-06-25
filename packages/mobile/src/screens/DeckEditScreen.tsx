@@ -48,7 +48,11 @@ export function DeckEditScreen() {
   const [icon, setIcon] = useState(existingDeck?.icon ?? ICONS[0])
   const [templateId, setTemplateId] = useState(existingDeck?.default_template_id ?? '')
   const [learningLanguage, setLearningLanguage] = useState<string | undefined>(existingDeck?.learning_language ?? undefined)
-  const [nativeLanguage, setNativeLanguage] = useState<string | undefined>(existingDeck?.native_language ?? undefined)
+  const [nativeLanguages, setNativeLanguages] = useState<string[]>(
+    existingDeck?.native_languages ?? (existingDeck?.native_language ? [existingDeck.native_language] : []),
+  )
+  const toggleNativeLanguage = (lang: string) =>
+    setNativeLanguages((prev) => (prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang]))
   const [studyLevel, setStudyLevel] = useState<string | undefined>(existingDeck?.study_level ?? undefined)
   const [saving, setSaving] = useState(false)
 
@@ -117,7 +121,8 @@ export function DeckEditScreen() {
           icon,
           default_template_id: templateId || null,
           learning_language: learningLanguage ?? null,
-          native_language: nativeLanguage ?? null,
+          native_language: nativeLanguages[0] ?? null,
+          native_languages: nativeLanguages.length ? nativeLanguages : null,
           study_level: studyLevel ?? null,
           srs_settings: finalSrs,
         })
@@ -129,7 +134,8 @@ export function DeckEditScreen() {
           icon,
           default_template_id: templateId || undefined,
           learning_language: learningLanguage,
-          native_language: nativeLanguage,
+          native_language: nativeLanguages[0],
+          native_languages: nativeLanguages.length ? nativeLanguages : undefined,
           study_level: studyLevel,
           srs_settings: finalSrs,
         })
@@ -285,43 +291,35 @@ export function DeckEditScreen() {
         {/* Native Language selector */}
         <View style={styles.section}>
           <Text style={[theme.typography.label, { color: theme.colors.text }]}>{tm('nativeLanguage.label')}</Text>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+            {tm('nativeLanguage.multiHint', { defaultValue: 'Select all that apply' })}
+          </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.optionRow}>
-              <TouchableOpacity
-                onPress={() => setNativeLanguage(undefined)}
-                style={[
-                  styles.templateChip,
-                  { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-                  !nativeLanguage && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
-                ]}
-                testID="deck-edit-native-none"
-              >
-                <Text style={[
-                  theme.typography.bodySmall,
-                  { color: !nativeLanguage ? theme.colors.primary : theme.colors.text },
-                ]}>
-                  {tm('nativeLanguage.none')}
-                </Text>
-              </TouchableOpacity>
-              {NATIVE_LANGUAGES.map((lang) => (
+              {NATIVE_LANGUAGES.map((lang) => {
+                const isActive = nativeLanguages.includes(lang.value)
+                return (
                 <TouchableOpacity
                   key={lang.value}
-                  onPress={() => setNativeLanguage(lang.value)}
+                  onPress={() => toggleNativeLanguage(lang.value)}
                   style={[
                     styles.templateChip,
                     { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-                    nativeLanguage === lang.value && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+                    isActive && { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
                   ]}
                   testID={`deck-edit-native-${lang.value}`}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: isActive }}
                 >
                   <Text style={[
                     theme.typography.bodySmall,
-                    { color: nativeLanguage === lang.value ? theme.colors.primary : theme.colors.text },
+                    { color: isActive ? theme.colors.primary : theme.colors.text },
                   ]}>
-                    {tm(lang.labelKey)}
+                    {isActive ? '✓ ' : ''}{tm(lang.labelKey)}
                   </Text>
                 </TouchableOpacity>
-              ))}
+                )
+              })}
             </View>
           </ScrollView>
         </View>

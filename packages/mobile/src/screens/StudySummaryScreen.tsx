@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -6,6 +7,7 @@ import { testProps } from '../utils/testProps'
 import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
+import { haptics } from '../utils/haptics'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import type { StudyStackParamList } from '../navigation/types'
 
@@ -31,6 +33,11 @@ export function StudySummaryScreen() {
   const { cardsStudied, totalCards, ratings, totalDurationMs } = sessionStats
   const totalRatings = Object.values(ratings).reduce((a, b) => a + b, 0)
   const isCramming = config?.mode === 'cramming'
+
+  // Celebrate session completion with a success haptic (the rewarding moment).
+  useEffect(() => {
+    haptics.success()
+  }, [])
 
   // Accuracy for normal modes
   const accuracy = totalRatings > 0

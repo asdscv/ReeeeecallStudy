@@ -30,7 +30,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
     icon: ICONS[0],
     templateId: '',
     learningLanguage: '',
-    nativeLanguage: '',
+    nativeLanguages: [],
     studyLevel: '',
     srsSettings: { ...DEFAULT_SRS_SETTINGS },
   })
@@ -45,7 +45,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: editDeck.icon,
         templateId: editDeck.default_template_id || '',
         learningLanguage: editDeck.learning_language || '',
-        nativeLanguage: editDeck.native_language || '',
+        nativeLanguages: editDeck.native_languages ?? (editDeck.native_language ? [editDeck.native_language] : []),
         studyLevel: editDeck.study_level || '',
         srsSettings: editDeck.srs_settings ?? { ...DEFAULT_SRS_SETTINGS },
       })
@@ -57,7 +57,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: ICONS[0],
         templateId: templates.find((t) => t.is_default)?.id || '',
         learningLanguage: '',
-        nativeLanguage: '',
+        nativeLanguages: [],
         studyLevel: '',
         srsSettings: { ...DEFAULT_SRS_SETTINGS },
       })
@@ -78,7 +78,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: formValues.icon,
         default_template_id: formValues.templateId || null,
         learning_language: formValues.learningLanguage || null,
-        native_language: formValues.nativeLanguage || null,
+        native_language: formValues.nativeLanguages[0] || null,
+        native_languages: formValues.nativeLanguages.length ? formValues.nativeLanguages : null,
         study_level: formValues.studyLevel || null,
         srs_settings: formValues.srsSettings,
       })
@@ -90,7 +91,8 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         icon: formValues.icon,
         default_template_id: formValues.templateId || undefined,
         learning_language: formValues.learningLanguage || undefined,
-        native_language: formValues.nativeLanguage || undefined,
+        native_language: formValues.nativeLanguages[0] || undefined,
+        native_languages: formValues.nativeLanguages.length ? formValues.nativeLanguages : undefined,
         study_level: formValues.studyLevel || undefined,
         srs_settings: formValues.srsSettings,
       })
@@ -124,7 +126,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
             <button
               type="submit"
               disabled={loading || !formValues.name.trim()}
-              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? t('form.saving') : editDeck ? t('form.save') : t('form.create')}
             </button>

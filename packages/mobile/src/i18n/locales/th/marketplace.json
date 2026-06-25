@@ -2,22 +2,23 @@
   "title": "ตลาด",
   "searchPlaceholder": "ค้นหาสำรับ...",
   "noResults": "ไม่พบผลการค้นหา",
-  "noResultsHint": "Try a different search or category",
+  "noResultsHint": "ลองค้นหาหรือเลือกหมวดอื่น",
   "categories": {
-    "general": "ทั่วไป",
+    "all": "ทั้งหมด",
     "language": "ภาษา",
     "science": "วิทยาศาสตร์",
     "math": "คณิตศาสตร์",
     "history": "ประวัติศาสตร์",
     "programming": "การเขียนโปรแกรม",
-    "trivia": "ความรู้ทั่วไป",
     "exam": "เตรียมสอบ",
     "other": "อื่นๆ"
   },
   "sort": {
-    "popular": "Popular",
-    "newest": "Newest",
-    "cardCount": "Most Cards"
+    "popular": "ยอดนิยม",
+    "newest": "ใหม่ล่าสุด",
+    "cardCount": "การ์ดมากสุด",
+    "trending": "มาแรง",
+    "topRated": "คะแนนสูงสุด"
   },
   "listing": {
     "cardCount": "{{count}} การ์ด",
@@ -25,12 +26,7 @@
   },
   "detail": {
     "back": "← ตลาด",
-    "cardCount": "{{count}} การ์ด",
-    "userCount": "{{count}} ผู้ใช้",
     "getDeck": "รับสำรับนี้",
-    "importing": "กำลังนำเข้า...",
-    "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
-    "noCards": "ไม่มีการ์ด",
     "reportContent": "Report",
     "publishedBy": "โดย",
     "alreadyAcquired": "อยู่ในคอลเลกชันของคุณแล้ว",
@@ -38,7 +34,12 @@
     "unsubscribing": "กำลังยกเลิก...",
     "unsubscribed": "ยกเลิกการสมัครสมาชิกแล้ว",
     "unsubscribeConfirm": "ยกเลิกการสมัครสมาชิกชุดการ์ดนี้? ความคืบหน้าการเรียนรู้ส่วนตัวของคุณจะยังคงอยู่ในบัญชี",
-    "unsubscribeError": "ยกเลิกการสมัครสมาชิกล้มเหลว กรุณาลองอีกครั้ง"
+    "unsubscribeError": "ยกเลิกการสมัครสมาชิกล้มเหลว กรุณาลองอีกครั้ง",
+    "title": "รายละเอียด",
+    "alreadyReported": "รายงานแล้ว",
+    "alreadyReportedBody": "คุณรายงานรายการนี้ไปแล้ว",
+    "reportError": "ส่งรายงานไม่สำเร็จ",
+    "downloading": "กำลังดาวน์โหลด..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -86,7 +87,8 @@
   "nativeLanguage": {
     "label": "ภาษาแม่",
     "all": "ทั้งหมด",
-    "none": "ไม่ระบุ"
+    "none": "ไม่ระบุ",
+    "multiHint": "เลือกทั้งหมดที่เกี่ยวข้อง"
   },
   "publisherStats": {
     "title": "สถิติผู้เผยแพร่",
@@ -124,5 +126,29 @@
     "intermediate": "ระดับกลาง",
     "upper_intermediate": "ระดับกลาง-สูง",
     "advanced": "ระดับสูง"
-  }
+  },
+  "verifiedOnly": "ยืนยันแล้ว",
+  "advancedFilters": "ขั้นสูง",
+  "dateRange": {
+    "label": "เผยแพร่ใน",
+    "7d": "7 วันล่าสุด",
+    "30d": "30 วันล่าสุด",
+    "90d": "90 วันล่าสุด",
+    "all": "ทุกช่วงเวลา"
+  },
+  "shareMode": {
+    "label": "โหมดแชร์",
+    "all": "ทั้งหมด",
+    "copy": "คัดลอก",
+    "subscribe": "ติดตาม",
+    "snapshot": "สแน็ปช็อต"
+  },
+  "filters": {
+    "label": "ตัวกรอง"
+  },
+  "categoryLabel": "หมวดหมู่",
+  "categoryTitle": "หมวดหมู่",
+  "sortTitle": "เรียงลำดับ",
+  "loadError": "โหลดเด็คไม่สำเร็จ",
+  "loadErrorHint": "ตรวจสอบการเชื่อมต่อแล้วลองใหม่"
 }

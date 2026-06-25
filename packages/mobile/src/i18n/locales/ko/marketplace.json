@@ -16,7 +16,9 @@
   "sort": {
     "popular": "인기순",
     "newest": "최신순",
-    "cardCount": "카드 수"
+    "trending": "급상승",
+    "cardCount": "카드 수",
+    "topRated": "평점순"
   },
   "listing": {
     "cardCount": "{{count}}장",
@@ -24,28 +26,20 @@
   },
   "detail": {
     "back": "마켓플레이스로 돌아가기",
-    "notFound": "리스팅을 찾을 수 없습니다",
-    "goBack": "뒤로 가기",
     "getDeck": "내 덱에 추가",
     "downloading": "다운로드 중...",
-    "previewCards": "미리보기 카드",
-    "noPreview": "미리보기 불가",
-    "success": "덱이 컬렉션에 추가되었습니다!",
-    "failed": "덱 다운로드에 실패했습니다",
     "reportContent": "콘텐츠 신고",
-    "reportTitle": "콘텐츠 신고",
-    "reportQuestion": "이 덱을 신고하는 이유는?",
-    "inappropriateContent": "부적절한 콘텐츠",
-    "copyrightViolation": "저작권 침해",
-    "spam": "스팸 / 오해의 소지",
-    "reportThanks": "신고가 접수되었습니다. 빠르게 검토하겠습니다.",
     "publishedBy": "by",
     "alreadyAcquired": "이미 추가됨",
     "unsubscribe": "구독 해지",
     "unsubscribing": "구독 해제 중...",
     "unsubscribed": "구독 해지됨",
     "unsubscribeConfirm": "이 덱 구독을 해제하시겠습니까? 개인 학습 진도는 계정에 그대로 남습니다.",
-    "unsubscribeError": "구독 해제에 실패했습니다. 다시 시도해주세요."
+    "unsubscribeError": "구독 해제에 실패했습니다. 다시 시도해주세요.",
+    "title": "상세",
+    "alreadyReported": "이미 신고함",
+    "alreadyReportedBody": "이미 이 항목을 신고했습니다.",
+    "reportError": "신고 제출에 실패했습니다"
   },
   "publish": {
     "title": "덱 게시",
@@ -93,7 +87,8 @@
   "nativeLanguage": {
     "label": "모국어",
     "all": "전체",
-    "none": "미지정"
+    "none": "미지정",
+    "multiHint": "해당하는 항목을 모두 선택하세요"
   },
   "publisherStats": {
     "title": "퍼블리셔 통계",
@@ -131,5 +126,29 @@
     "intermediate": "중급",
     "upper_intermediate": "중고급",
     "advanced": "고급"
-  }
+  },
+  "verifiedOnly": "인증됨",
+  "advancedFilters": "고급",
+  "dateRange": {
+    "label": "게시 기간",
+    "7d": "최근 7일",
+    "30d": "최근 30일",
+    "90d": "최근 90일",
+    "all": "전체 기간"
+  },
+  "shareMode": {
+    "label": "공유 방식",
+    "all": "전체",
+    "copy": "복사",
+    "subscribe": "구독",
+    "snapshot": "스냅샷"
+  },
+  "filters": {
+    "label": "필터"
+  },
+  "categoryLabel": "카테고리",
+  "categoryTitle": "카테고리",
+  "sortTitle": "정렬",
+  "loadError": "덱을 불러오지 못했습니다",
+  "loadErrorHint": "연결 상태를 확인하고 다시 시도해 주세요."
 }

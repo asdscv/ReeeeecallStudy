@@ -64,7 +64,7 @@ export function DoneStep({
           <button
             type="button"
             onClick={() => { onClose(); navigate(`/decks/${deckId}`) }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('done.viewDeck')}
             <ArrowRight className="w-4 h-4" />

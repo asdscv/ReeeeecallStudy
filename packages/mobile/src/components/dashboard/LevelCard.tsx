@@ -53,7 +53,7 @@ export function LevelCard({ levelInfo, achievements = [], onPressAchievements }:
       </View>
 
       {/* XP progress bar */}
-      <View style={styles.barBg}>
+      <View style={[styles.barBg, { backgroundColor: theme.colors.border }]}>
         <View style={[styles.barFill, { width: `${progressPct}%`, backgroundColor: palette.yellow[500] }]} />
       </View>
 
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   circleText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   info: { flex: 1, gap: 2 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  barBg: { height: 6, borderRadius: 3, backgroundColor: '#e5e7eb', overflow: 'hidden' as const },
+  barBg: { height: 6, borderRadius: 3, overflow: 'hidden' as const },
   barFill: { height: 6, borderRadius: 3 },
   badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
   badgeCircle: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },

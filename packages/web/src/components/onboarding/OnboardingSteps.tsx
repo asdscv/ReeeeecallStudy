@@ -128,7 +128,7 @@ export function CreateDeckStep({ onNext }: StepProps) {
       <button
         onClick={handleCreate}
         disabled={status !== 'idle'}
-        className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+        className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
       >
         {status === 'creating' && <Loader2 className="w-4 h-4 animate-spin" />}
         {status === 'created' && <Check className="w-4 h-4" />}
@@ -281,7 +281,7 @@ export function AddCardsStep({ onNext }: StepProps) {
         <button
           onClick={handleAddCards}
           disabled={status !== 'idle'}
-          className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
           {status === 'adding' && <Loader2 className="w-4 h-4 animate-spin" />}
           {status === 'added' && <Check className="w-4 h-4" />}

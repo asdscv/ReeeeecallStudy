@@ -41,7 +41,15 @@
     "bulkDelete": "Xóa hàng loạt thẻ",
     "bulkDeleteConfirm": "Xóa {{count}} thẻ đã chọn? Không thể hoàn tác.",
     "noStudyRecords": "Không có hồ sơ học tập",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "Lịch sử phiên bản",
+    "createVersion": "+ Phiên bản mới",
+    "versionSummaryPlaceholder": "Đã thay đổi gì? (tùy chọn)",
+    "creatingVersion": "Đang tạo...",
+    "saveVersion": "Lưu phiên bản",
+    "noVersions": "Chưa có phiên bản nào được ghi lại.",
+    "versionLabel": "Phiên bản {{num}}",
+    "versionCards": "thẻ"
   },
   "settings": {
     "deckName": "Tên bộ thẻ",
@@ -151,6 +159,18 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "learningLanguage": {
+    "label": "Ngôn ngữ học",
+    "all": "Tất cả"
+  },
+  "nativeLanguage": {
+    "label": "Tiếng mẹ đẻ",
+    "multiHint": "Chọn tất cả những mục phù hợp"
+  },
+  "studyLevel": {
+    "label": "Trình độ học",
+    "none": "Không xác định"
   },
   "quickCreate": {
     "button": "Tạo nhanh",

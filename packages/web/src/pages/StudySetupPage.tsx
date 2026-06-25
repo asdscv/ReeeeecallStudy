@@ -258,7 +258,7 @@ export function StudySetupPage() {
       <button
         onClick={handleStart}
         disabled={isStartDisabled}
-        className="w-full py-3 bg-brand hover:bg-brand disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
+        className="w-full py-3 bg-brand hover:bg-brand-hover disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
       >
         {t('quickStudy.startStudy')}
       </button>

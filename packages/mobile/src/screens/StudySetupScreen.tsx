@@ -27,28 +27,29 @@ function buildCrammingFilter(filterKey: string): CrammingFilter {
 
 /**
  * Study mode options — matches web STUDY_MODE_OPTIONS.
- * Each option is a full-width card with emoji, label, description.
+ * Labels/descriptions come from i18n (`study.modes.*`); only mode + emoji live
+ * here. (Previously these duplicated the English strings, bypassing i18n.)
  */
-const MODES: { mode: StudyMode; emoji: string; label: string; desc: string; detail: string }[] = [
-  { mode: 'srs', emoji: '🧠', label: 'SRS Review', desc: 'Spaced repetition for long-term memory', detail: 'Cards are scheduled based on your performance' },
-  { mode: 'sequential_review', emoji: '🔄', label: 'Sequential Review', desc: 'In order, mixing new + review cards', detail: 'Go through cards sequentially from where you left off' },
-  { mode: 'random', emoji: '🎲', label: 'Random', desc: 'Shuffled cards', detail: 'Cards are randomly selected from the deck' },
-  { mode: 'sequential', emoji: '➡️', label: 'Sequential', desc: 'Cards in order, one by one', detail: 'Go through cards in the order they were added' },
-  { mode: 'by_date', emoji: '📅', label: 'By Date', desc: 'Study cards by upload date', detail: 'Select a date to study cards added on that day' },
-  { mode: 'cramming', emoji: '⚡', label: 'Cramming', desc: 'Rapid-fire until mastered', detail: 'Missed cards return until you get them all right' },
+const MODES: { mode: StudyMode; emoji: string }[] = [
+  { mode: 'srs', emoji: '🧠' },
+  { mode: 'sequential_review', emoji: '🔄' },
+  { mode: 'random', emoji: '🎲' },
+  { mode: 'sequential', emoji: '➡️' },
+  { mode: 'by_date', emoji: '📅' },
+  { mode: 'cramming', emoji: '⚡' },
 ]
 
 const CRAMMING_FILTERS = [
-  { value: 'all', label: 'All Cards' },
-  { value: 'weak', label: 'Weak Cards' },
-  { value: 'due_soon', label: 'Due Soon' },
+  { value: 'all', labelKey: 'cramming.filter.all' },
+  { value: 'weak', labelKey: 'cramming.filter.weak' },
+  { value: 'due_soon', labelKey: 'cramming.filter.dueSoon' },
 ] as const
 
 const TIME_LIMITS = [
-  { value: null, label: 'No Limit' },
-  { value: 15, label: '15 min' },
-  { value: 30, label: '30 min' },
-  { value: 60, label: '60 min' },
+  { value: null },
+  { value: 15 },
+  { value: 30 },
+  { value: 60 },
 ] as const
 
 export function StudySetupScreen() {
@@ -128,11 +129,11 @@ export function StudySetupScreen() {
 
   const handleStart = async () => {
     if (!selectedDeckId) {
-      Alert.alert('Select a Deck', 'Please choose a deck to study')
+      Alert.alert(t('setup.alertSelectDeckTitle'), t('setup.alertSelectDeckMsg'))
       return
     }
     if (selectedMode === 'by_date' && dateCardCount === 0) {
-      Alert.alert('No Cards', 'No cards found for the selected date')
+      Alert.alert(t('setup.alertNoCardsTitle'), t('setup.alertNoCardsMsg'))
       return
     }
     const size = parseInt(batchSize) || 20
@@ -153,7 +154,7 @@ export function StudySetupScreen() {
       )
       navigation.navigate('StudySession')
     } catch (e) {
-      Alert.alert('Error', 'Failed to start study session')
+      Alert.alert(t('setup.alertErrorTitle'), t('setup.startFailed'))
     }
   }
 
@@ -174,7 +175,7 @@ export function StudySetupScreen() {
     const m = mode ?? selectedMode
     if (!selectedDeckId) return
     if (m === 'by_date' && dateCardCount === 0) {
-      Alert.alert('No Cards', 'No cards found for the selected date')
+      Alert.alert(t('setup.alertNoCardsTitle'), t('setup.alertNoCardsMsg'))
       return
     }
     const size = parseInt(batchSize) || 20
@@ -195,7 +196,7 @@ export function StudySetupScreen() {
       closeModal()
       navigation.navigate('StudySession')
     } catch {
-      Alert.alert('Error', 'Failed to start study session')
+      Alert.alert(t('setup.alertErrorTitle'), t('setup.startFailed'))
     }
   }
 
@@ -233,17 +234,17 @@ export function StudySetupScreen() {
                   </Text>
                 </View>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {ds?.total_cards ?? 0} cards
+                  {t('dashboard:recentDecks.cardCount', { count: ds?.total_cards ?? 0 })}
                 </Text>
                 <View style={styles.deckBadges}>
                   {newCards > 0 && (
                     <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
-                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
+                      <Text style={[styles.badgeText, { color: theme.colors.primary }]}>{t('dashboard:recentDecks.newCards', { count: newCards })}</Text>
                     </View>
                   )}
                   {reviewCards > 0 && (
                     <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
-                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {reviewCards}</Text>
+                      <Text style={[styles.badgeText, { color: theme.colors.warning }]}>{t('dashboard:recentDecks.reviewCards', { count: reviewCards })}</Text>
                     </View>
                   )}
                 </View>
@@ -255,7 +256,7 @@ export function StudySetupScreen() {
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Text style={{ fontSize: 40 }}>{'\uD83D\uDCDA'}</Text>
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-              No decks yet. Create a deck first!
+              {t('setup.noDecks')}
             </Text>
           </View>
         }
@@ -291,8 +292,8 @@ export function StudySetupScreen() {
                   >
                     <Text style={styles.modeEmoji}>{m.emoji}</Text>
                     <View style={styles.modeInfo}>
-                      <Text style={[theme.typography.label, { color: theme.colors.text }]}>{m.label}</Text>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{m.desc}</Text>
+                      <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t(`modes.${m.mode}.label`)}</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t(`modes.${m.mode}.description`)}</Text>
                     </View>
                   </TouchableOpacity>
                 ))}
@@ -303,7 +304,7 @@ export function StudySetupScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Text style={{ fontSize: 18 }}>{MODES.find(m => m.mode === selectedMode)?.emoji}</Text>
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                    {MODES.find(m => m.mode === selectedMode)?.label}
+                    {t(`modes.${selectedMode}.label`)}
                   </Text>
                 </View>
 
@@ -322,7 +323,7 @@ export function StudySetupScreen() {
                       keyboardType="number-pad"
                       placeholder="20"
                     />
-                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>5–500 cards</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('setup.batchHint', { defaultValue: '5–500 cards' })}</Text>
                   </View>
                 )}
 
@@ -330,35 +331,35 @@ export function StudySetupScreen() {
                 {selectedMode === 'cramming' && (
                   <View style={styles.section}>
                     <View style={styles.subsection}>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>Filter</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cramming.filter.title')}</Text>
                       <View style={styles.chipRow}>
                         {CRAMMING_FILTERS.map((f) => {
                           const active = crammingFilter === f.value
                           return (
                             <TouchableOpacity key={f.value} testID={`study-cram-filter-${f.value}`} onPress={() => setCrammingFilter(f.value)}
                               style={[styles.filterChip, { backgroundColor: active ? theme.colors.primary : 'transparent', borderColor: active ? theme.colors.primary : theme.colors.border }]}>
-                              <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>{f.label}</Text>
+                              <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>{t(f.labelKey)}</Text>
                             </TouchableOpacity>
                           )
                         })}
                       </View>
                     </View>
                     <View style={styles.subsection}>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>Time Limit</Text>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cramming.timeLimit.title')}</Text>
                       <View style={styles.chipRow}>
                         {TIME_LIMITS.map((tl) => {
                           const active = crammingTimeLimit === tl.value
                           return (
                             <TouchableOpacity key={String(tl.value)} testID={`study-cram-time-${tl.value ?? 'none'}`} onPress={() => setCrammingTimeLimit(tl.value)}
                               style={[styles.filterChip, { backgroundColor: active ? theme.colors.primary : 'transparent', borderColor: active ? theme.colors.primary : theme.colors.border }]}>
-                              <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>{tl.label}</Text>
+                              <Text style={[theme.typography.caption, { color: active ? theme.colors.primaryText : theme.colors.text }]}>{tl.value === null ? t('cramming.timeLimit.none') : t('cramming.timeLimit.minutes', { count: tl.value })}</Text>
                             </TouchableOpacity>
                           )
                         })}
                       </View>
                     </View>
                     <View style={styles.toggleRow}>
-                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>Shuffle</Text>
+                      <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t('setup.shuffle')}</Text>
                       <Switch testID="study-cram-shuffle" value={crammingShuffle} onValueChange={setCrammingShuffle} trackColor={{ true: theme.colors.primary }} />
                     </View>
                   </View>
@@ -367,7 +368,7 @@ export function StudySetupScreen() {
                 {/* By Date */}
                 {selectedMode === 'by_date' && (
           <View style={[styles.section, { gap: 12 }]}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Select Upload Date</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('setup.dateSelection')}</Text>
 
             {/* Month navigation */}
             <View style={styles.calendarNav}>
@@ -388,10 +389,11 @@ export function StudySetupScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Day headers */}
+            {/* Day headers — locale-aware short weekday names (Sun-first), matching
+                the locale used by the month label above */}
             <View style={styles.calendarRow}>
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                <View key={d} style={styles.calendarCell}>
+              {Array.from({ length: 7 }, (_, i) => new Date(2023, 0, 1 + i).toLocaleDateString(undefined, { weekday: 'short' })).map((d, i) => (
+                <View key={i} style={styles.calendarCell}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>{d}</Text>
                 </View>
               ))}

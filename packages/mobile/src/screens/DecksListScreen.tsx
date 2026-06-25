@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react'
 import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button } from '../components/ui'
+import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button, ListSkeleton } from '../components/ui'
+import { toast } from '../stores/toast-store'
 import { useDecks } from '../hooks/useDecks'
 import { useAuthState } from '../hooks/useAuthState'
 import { useTranslation } from 'react-i18next'
@@ -65,10 +66,7 @@ export function DecksListScreen() {
               .maybeSingle()
             const id = (shareRow as { id?: string } | null)?.id
             if (!id) {
-              Alert.alert(
-                'Error',
-                t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }),
-              )
+              toast.error(t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
               return
             }
             const { error } = await supabase
@@ -76,9 +74,11 @@ export function DecksListScreen() {
               .update({ status: 'revoked' })
               .eq('id', id)
             if (error) {
-              Alert.alert('Error', error.message)
+              // Never surface the raw DB message to the user.
+              toast.error(t('marketplace:detail.unsubscribeError', { defaultValue: 'Failed to unsubscribe.' }))
               return
             }
+            toast.success(t('sharing:unsubscribed', { defaultValue: 'Unsubscribed' }))
             await refresh()
           },
         },
@@ -108,7 +108,14 @@ export function DecksListScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading && decks.length > 0}
+            onRefresh={refresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
         contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -122,7 +129,7 @@ export function DecksListScreen() {
                 }}
                 style={[styles.helpBadge, { borderColor: theme.colors.border }]}
               >
-                <Text style={[styles.helpBadgeText, { color: theme.colors.textSecondary }]}>📖 Help</Text>
+                <Text style={[styles.helpBadgeText, { color: theme.colors.textSecondary }]}>{'📖'} {t('common:guideHelp')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 testID="decks-ai-generate"
@@ -132,7 +139,7 @@ export function DecksListScreen() {
                 }}
                 style={[styles.headerBtn, { backgroundColor: palette.purple[700] }]}
               >
-                <Text style={styles.headerBtnText}>🤖 AI Generate</Text>
+                <Text style={styles.headerBtnText}>{'🤖'} {t('aiGenerate')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 testID="decks-quick-create"
@@ -146,7 +153,7 @@ export function DecksListScreen() {
                 onPress={() => navigation.navigate('DeckEdit', {})}
                 style={[styles.headerBtn, { backgroundColor: palette.blue[600] }]}
               >
-                <Text style={styles.headerBtnText}>+ New Deck</Text>
+                <Text style={styles.headerBtnText}>{t('createNew')}</Text>
               </TouchableOpacity>
             </View>
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="decks-search" />
@@ -197,16 +204,16 @@ export function DecksListScreen() {
                 {/* Stats row — matches web: total, New (blue), Review (amber) */}
                 <View style={styles.statsRow}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    {totalCards} cards
+                    {t('dashboard:recentDecks.cardCount', { count: totalCards })}
                   </Text>
                   {newCards > 0 && (
                     <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '500' }]}>
-                      New {newCards}
+                      {t('dashboard:recentDecks.newCards', { count: newCards })}
                     </Text>
                   )}
                   {reviewCards > 0 && (
                     <Text style={[theme.typography.caption, { color: palette.yellow[700], fontWeight: '500' }]}>
-                      Review {reviewCards}
+                      {t('dashboard:recentDecks.reviewCards', { count: reviewCards })}
                     </Text>
                   )}
                 </View>
@@ -214,7 +221,7 @@ export function DecksListScreen() {
                 {/* Footer — matches web: date left, edit/delete/study right */}
                 <View style={[styles.footer, { borderTopColor: theme.colors.border }]}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, flex: 1 }]}>
-                    {updatedAgo ?? 'No study record'}
+                    {updatedAgo ?? t('card.noStudyRecord')}
                   </Text>
                   <View style={styles.footerActions}>
                     {user && (item as { user_id?: string }).user_id && (item as { user_id: string }).user_id !== user.id ? (
@@ -265,7 +272,9 @@ export function DecksListScreen() {
           )
         }}
         ListEmptyComponent={
-          !loading ? (
+          loading ? (
+            <ListSkeleton count={5} />
+          ) : (
             <EmptyState
               icon="📚"
               title={t('empty')}
@@ -274,7 +283,7 @@ export function DecksListScreen() {
               onAction={() => navigation.navigate('QuickCreate')}
               testID="decks-empty"
             />
-          ) : null
+          )
         }
       />
       <FAB

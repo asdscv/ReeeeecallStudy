@@ -132,7 +132,7 @@ export function PomodoroTimer({ onBreakStart, onBreakEnd, compact = false }: Pom
         {!isRunning ? (
           <button
             onClick={start}
-            className="px-3 py-1 text-sm bg-brand text-white rounded-lg hover:bg-brand transition-colors"
+            className="px-3 py-1 text-sm bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors"
           >
             {t('pomodoro.start')}
           </button>

@@ -13,6 +13,8 @@ import { useAuth, useAuthState } from '../hooks'
 // import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import { useThemeStore } from '../stores/theme-store'
+import { localPrefs } from '../utils/local-prefs'
+import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
@@ -89,6 +91,7 @@ export function SettingsScreen() {
   })
   const [language, setLanguage] = useState(i18n.language || 'en')
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system')
+  const [hapticsOn, setHapticsOn] = useState(localPrefs.getHapticsEnabled())
   const [langDropdownOpen, setLangDropdownOpen] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -137,7 +140,6 @@ export function SettingsScreen() {
         }
         if (data) {
           const p = data as Record<string, unknown>
-          console.log('[Settings] profile loaded:', { display_name: p.display_name })
           setProfile({
             display_name: (p.display_name as string) ?? '',
             daily_new_limit: (p.daily_new_limit as number) ?? 20,
@@ -542,6 +544,29 @@ export function SettingsScreen() {
           </Text>
         </SectionCard>
 
+        {/* ── Haptic feedback — standalone card ── */}
+        <SectionCard theme={theme}>
+          <View style={styles.switchRow}>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+              {t('haptics.enable', { defaultValue: 'Haptic feedback' })}
+            </Text>
+            <Switch
+              testID="settings-haptics-toggle"
+              value={hapticsOn}
+              onValueChange={(v) => {
+                setHapticsOn(v)
+                setHapticsEnabled(v)
+                localPrefs.setHapticsEnabled(v)
+                if (v) haptics.success() // immediate confirmation when turning on
+              }}
+              trackColor={{ true: theme.colors.primary }}
+            />
+          </View>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            {t('haptics.hint', { defaultValue: 'Vibration feedback on taps, ratings, and actions.' })}
+          </Text>
+        </SectionCard>
+
         {/* ── Auto TTS Reading — standalone card ── */}
         <SectionCard theme={theme}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('tts.title')}</Text>
@@ -743,7 +768,7 @@ export function SettingsScreen() {
 
                       {/* Expanded edit form */}
                       {isEditing && (
-                        <View style={styles.aiEditForm}>
+                        <View style={[styles.aiEditForm, { borderTopColor: theme.colors.border }]}>
                           <TextInput
                             testID={`settings-ai-${provider.id}-key`}
                             label={t('aiProviders.apiKey')}
@@ -1195,7 +1220,7 @@ const styles = StyleSheet.create({
   aiIcon: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   aiIconText: { fontSize: 12, fontWeight: '700' },
   configBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  aiEditForm: { gap: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F3F4F6' },
+  aiEditForm: { gap: 10, paddingTop: 10, borderTopWidth: 1 },
   aiBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
   modelOption: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1 },
   securityNote: { padding: 12, borderRadius: 8 },

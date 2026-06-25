@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
 import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
-import * as Haptics from 'expo-haptics'
+import { haptics } from '../utils/haptics'
 
 /**
  * Hook for study session — wraps shared study store + mobile-specific features (haptics).
@@ -34,11 +34,18 @@ export function useStudy() {
 
   const flipCard = useCallback(() => {
     store.flipCard()
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})
+    haptics.tap()
   }, [store])
 
   const rateCard = useCallback(async (rating: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {})
+    // Distinct feedback by outcome — a failed recall should not feel like a win.
+    if (rating === 'again' || rating === 'missed' || rating === 'unknown') {
+      haptics.error()
+    } else if (rating === 'hard') {
+      haptics.warning()
+    } else {
+      haptics.success()
+    }
     await store.rateCard(rating)
   }, [store])
 
@@ -48,7 +55,7 @@ export function useStudy() {
 
   const undoLastRating = useCallback(() => {
     store.undoLastRating()
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {})
+    haptics.warning()
   }, [store])
 
   const reset = useCallback(() => {

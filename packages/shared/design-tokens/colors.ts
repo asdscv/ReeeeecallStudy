@@ -72,6 +72,12 @@ export const lightTheme = {
   primary: palette.blue[600],
   primaryLight: palette.blue[50],
   primaryText: palette.white,
+  // Interactive feedback — hover/active shades for filled brand & destructive
+  // surfaces. Light mode darkens on hover. (Web --brand-hover, mobile pressed.)
+  brandHover: palette.blue[700],
+  brandActive: palette.blue[800],
+  destructiveHover: palette.red[600],
+  destructiveActive: palette.red[700],
 
   // Background
   background: palette.white,
@@ -120,6 +126,11 @@ export const darkTheme = {
   primary: palette.blue[400],
   primaryLight: 'rgba(59, 130, 246, 0.15)',
   primaryText: palette.white,
+  // Interactive feedback — dark mode lightens brand on hover for contrast.
+  brandHover: palette.blue[300],
+  brandActive: palette.blue[200],
+  destructiveHover: palette.red[500],
+  destructiveActive: palette.red[600],
 
   // Background
   background: palette.gray[950],
@@ -133,9 +144,10 @@ export const darkTheme = {
   textTertiary: palette.gray[500],
   textInverse: palette.gray[900],
 
-  // Border
-  border: palette.gray[800],
-  borderSecondary: palette.gray[700],
+  // Border — must be LIGHTER than surface (gray800) to be visible on cards.
+  // gray800 borders were invisible against gray800 surfaces in dark mode.
+  border: palette.gray[700],
+  borderSecondary: palette.gray[600],
   borderFocus: palette.blue[500],
 
   // Semantic

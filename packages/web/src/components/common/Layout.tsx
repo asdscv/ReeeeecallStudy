@@ -97,6 +97,10 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip-to-content — first tab stop for keyboard/screen-reader users */}
+      <a href="#main-content" className="skip-link no-underline">
+        {t('skipToContent', 'Skip to content')}
+      </a>
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -250,7 +254,7 @@ export function Layout() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-4 sm:py-6">
+      <main id="main-content" tabIndex={-1} className="max-w-6xl mx-auto px-4 py-4 sm:py-6 outline-none">
         <Outlet />
       </main>
 

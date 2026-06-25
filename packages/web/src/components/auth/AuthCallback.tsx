@@ -87,7 +87,7 @@ export function AuthCallback() {
           <p className="text-foreground font-medium mb-2">{error}</p>
           <button
             onClick={() => navigate('/auth/login', { replace: true })}
-            className="mt-4 px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="mt-4 px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('callback.backToLogin')}
           </button>

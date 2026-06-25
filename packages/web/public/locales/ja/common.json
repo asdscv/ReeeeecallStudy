@@ -11,10 +11,10 @@
     "admin": "管理者",
     "guide": "ガイド",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "実績",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "パブリッシャー統計"
   },
   "actions": {
     "save": "保存",
@@ -58,7 +58,8 @@
     "minutes": "分",
     "seconds": "秒",
     "times": "回",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "decksCount": "{{count}}個"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
@@ -269,5 +270,21 @@
     "playStorePrefix": "手に入れよう",
     "playStore": "Google Play",
     "qrHint": "スマホのカメラでQRコードを読み取ってダウンロード"
-  }
+  },
+  "error": {
+    "boundary": {
+      "title": "問題が発生しました",
+      "description": "予期しないエラーが発生しました。もう一度お試しください。",
+      "studyTitle": "学習セッションが中断されました",
+      "studyDescription": "学習中に予期しないエラーが発生しました。進捗は保存されています。",
+      "details": "エラーの詳細",
+      "tryAgain": "もう一度",
+      "goToDashboard": "ダッシュボードへ"
+    }
+  },
+  "skipToContent": "本文へスキップ",
+  "footer": {
+    "copyright": "© 2026 ReeeeecallStudy. All rights reserved."
+  },
+  "cancel": "キャンセル"
 }

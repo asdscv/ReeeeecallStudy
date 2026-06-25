@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useAdminStore } from '../../stores/admin-store'
+import { confirm } from '../../stores/confirm-store'
 import { OfficialBadge } from '../../components/common/OfficialBadge'
 import { UserGrowthChart } from '../../components/admin/UserGrowthChart'
 import { SignupsChart } from '../../components/admin/SignupsChart'
@@ -201,7 +202,15 @@ export function AdminUsersPage() {
                           disabled={roleChangingId === u.id}
                           onClick={async () => {
                             const newRole = u.role === 'admin' ? 'user' : 'admin'
-                            if (!confirm(`${u.display_name || u.id}의 역할을 ${newRole}로 변경하시겠습니까?`)) return
+                            if (!(await confirm({
+                              title: t('users.changeRoleTitle', { defaultValue: 'Change role' }),
+                              message: t('users.confirmRoleChange', {
+                                defaultValue: "Change {{name}}'s role to {{role}}?",
+                                name: u.display_name || u.id,
+                                role: newRole,
+                              }),
+                              danger: true,
+                            }))) return
                             setRoleChangingId(u.id)
                             await setUserRole(u.id, newRole)
                             setRoleChangingId(null)
@@ -239,13 +248,13 @@ export function AdminUsersPage() {
                           disabled={statusChangingId === u.id}
                           onChange={async (e) => {
                             const newStatus = e.target.value as 'active' | 'suspended' | 'banned'
-                            if (newStatus === 'banned' && !confirm(t('users.confirmBan', 'Ban this user?'))) return
-                            if (newStatus === 'suspended' && !confirm(t('users.confirmSuspend', 'Suspend this user?'))) return
+                            if (newStatus === 'banned' && !(await confirm({ title: t('users.banTitle', { defaultValue: 'Ban user' }), message: t('users.confirmBan', 'Ban this user?'), danger: true }))) return
+                            if (newStatus === 'suspended' && !(await confirm({ title: t('users.suspendTitle', { defaultValue: 'Suspend user' }), message: t('users.confirmSuspend', 'Suspend this user?'), danger: true }))) return
                             setStatusChangingId(u.id)
                             await setUserStatus(u.id, newStatus)
                             setStatusChangingId(null)
                           }}
-                          className={`text-xs px-2 py-0.5 rounded-full cursor-pointer disabled:opacity-50 border-0 ${STATUS_STYLES[u.user_status || 'active'] ?? STATUS_STYLES.active}`}
+                          className={`text-xs px-2 py-0.5 rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-0 ${STATUS_STYLES[u.user_status || 'active'] ?? STATUS_STYLES.active}`}
                         >
                           <option value="active">{t('users.status.active', 'Active')}</option>
                           <option value="suspended">{t('users.status.suspended', 'Suspended')}</option>

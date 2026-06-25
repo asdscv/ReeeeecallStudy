@@ -226,7 +226,7 @@ export function AdminContentPage() {
                         <button
                           onClick={() => handleResolve(report.id, 'reviewing')}
                           disabled={resolvingId === report.id}
-                          className="px-3 py-1 text-xs text-brand bg-brand/10 rounded hover:bg-brand/15 cursor-pointer disabled:opacity-50"
+                          className="px-3 py-1 text-xs text-brand bg-brand/10 rounded hover:bg-brand/15 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Review
                         </button>
@@ -234,14 +234,14 @@ export function AdminContentPage() {
                       <button
                         onClick={() => handleResolve(report.id, 'resolved')}
                         disabled={resolvingId === report.id}
-                        className="px-3 py-1 text-xs text-success bg-success/10 rounded hover:bg-success/15 cursor-pointer disabled:opacity-50"
+                        className="px-3 py-1 text-xs text-success bg-success/10 rounded hover:bg-success/15 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Resolve
                       </button>
                       <button
                         onClick={() => handleResolve(report.id, 'dismissed')}
                         disabled={resolvingId === report.id}
-                        className="px-3 py-1 text-xs text-muted-foreground bg-muted rounded hover:bg-accent cursor-pointer disabled:opacity-50"
+                        className="px-3 py-1 text-xs text-muted-foreground bg-muted rounded hover:bg-accent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Dismiss
                       </button>

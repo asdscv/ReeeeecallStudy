@@ -11,10 +11,10 @@
     "admin": "ผู้ดูแล",
     "guide": "คู่มือ",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "ความสำเร็จ",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "สถิติผู้เผยแพร่"
   },
   "actions": {
     "save": "บันทึก",
@@ -58,7 +58,8 @@
     "minutes": "นาที",
     "seconds": "วินาที",
     "times": "ครั้ง",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "decksCount": "{{count}} เด็ค"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
@@ -269,5 +270,21 @@
     "playStorePrefix": "ดาวน์โหลดได้ที่",
     "playStore": "Google Play",
     "qrHint": "สแกน QR โค้ดด้วยกล้องมือถือเพื่อดาวน์โหลด"
-  }
+  },
+  "error": {
+    "boundary": {
+      "title": "เกิดข้อผิดพลาด",
+      "description": "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่",
+      "studyTitle": "เซสชันการเรียนถูกขัดจังหวะ",
+      "studyDescription": "เกิดข้อผิดพลาดระหว่างการเรียน ความคืบหน้าของคุณถูกบันทึกแล้ว",
+      "details": "รายละเอียดข้อผิดพลาด",
+      "tryAgain": "ลองอีกครั้ง",
+      "goToDashboard": "ไปที่แดชบอร์ด"
+    }
+  },
+  "skipToContent": "ข้ามไปยังเนื้อหา",
+  "footer": {
+    "copyright": "© 2026 ReeeeecallStudy สงวนลิขสิทธิ์"
+  },
+  "cancel": "ยกเลิก"
 }

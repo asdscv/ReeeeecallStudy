@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Pla
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { Screen, ScreenHeader } from '../components/ui'
+import { Screen, ScreenHeader, EmptyState, StatGridSkeleton } from '../components/ui'
 import { TimePeriodSelector, MiniHeatmap, BarChart } from '../components/charts'
 import { LevelCard, StreakFreezeCard, DailyQuestsCard, NextGoalsCard, LevelUpCelebration } from '../components/dashboard'
 import { useDashboardData } from '../hooks/useDashboardData'
@@ -70,11 +70,21 @@ export function DashboardScreen() {
       )}
       <ScreenHeader title={t('title')} mode="drawer" />
 
+      {loading && decks.length === 0 ? (
+        <StatGridSkeleton />
+      ) : (
       <FlatList
         data={decks}
         keyExtractor={(item) => item.id}
         extraData={{ levelInfo, freezeInfo, quests, goals, heatmap, dailyCounts, forecastData, streak, mastery }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading && decks.length > 0}
+            onRefresh={handleRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -94,9 +104,9 @@ export function DashboardScreen() {
               <View style={styles.quickStudyContent}>
                 <Text style={styles.quickStudyIcon}>{'\u26A1'}</Text>
                 <View style={styles.quickStudyText}>
-                  <Text style={styles.quickStudyTitle}>Quick Study</Text>
+                  <Text style={styles.quickStudyTitle}>{t('quickStudy.title')}</Text>
                   <Text style={styles.quickStudyDesc}>
-                    {totalDue > 0 ? `${totalDue} cards due today` : 'Start a study session'}
+                    {totalDue > 0 ? t('quickStudy.dueToday', { count: totalDue }) : t('quickStudy.startSession')}
                   </Text>
                 </View>
                 <Text style={styles.quickStudyArrow}>{'\u2192'}</Text>
@@ -108,21 +118,21 @@ export function DashboardScreen() {
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.totalCards')}</Text>
-                  <Text style={[styles.statValue, { color: theme.colors.text }]}>{totalCards}</Text>
+                  <Text style={[styles.statValue, { color: theme.colors.text }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{totalCards}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.todayReview')}</Text>
-                  <Text style={[styles.statValue, { color: palette.yellow[600] }]}>{totalDue}</Text>
+                  <Text style={[styles.statValue, { color: palette.yellow[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{totalDue}</Text>
                 </View>
               </View>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.streak')}</Text>
-                  <Text style={[styles.statValue, { color: palette.green[600] }]}>{t('streakDays', { count: streak })}</Text>
+                  <Text style={[styles.statValue, { color: palette.green[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{t('streakDays', { count: streak })}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.masteryRate')}</Text>
-                  <Text style={[styles.statValue, { color: palette.blue[600] }]}>{mastery}%</Text>
+                  <Text style={[styles.statValue, { color: palette.blue[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{mastery}%</Text>
                 </View>
               </View>
             </View>
@@ -186,19 +196,19 @@ export function DashboardScreen() {
                   <Text style={styles.deckEmoji}>{item.icon}</Text>
                   <View style={styles.deckNameCol}>
                     <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>{item.name}</Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{total} cards</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('recentDecks.cardCount', { count: total })}</Text>
                   </View>
                 </View>
                 <View style={styles.deckBottomRow}>
                   <View style={styles.deckBadges}>
                     {newCards > 0 && (
                       <View style={[styles.badge, { backgroundColor: theme.colors.primaryLight }]}>
-                        <Text style={[styles.badgeText, { color: theme.colors.primary }]}>New {newCards}</Text>
+                        <Text style={[styles.badgeText, { color: theme.colors.primary }]}>{t('recentDecks.newCards', { count: newCards })}</Text>
                       </View>
                     )}
                     {review > 0 && (
                       <View style={[styles.badge, { backgroundColor: theme.colors.surface }]}>
-                        <Text style={[styles.badgeText, { color: theme.colors.warning }]}>Review {review}</Text>
+                        <Text style={[styles.badgeText, { color: theme.colors.warning }]}>{t('recentDecks.reviewCards', { count: review })}</Text>
                       </View>
                     )}
                   </View>
@@ -206,7 +216,7 @@ export function DashboardScreen() {
                     onPress={() => tabNav?.navigate('StudyTab')}
                     style={[styles.studyBtn, { backgroundColor: theme.colors.primary }]}
                   >
-                    <Text style={[theme.typography.caption, { color: theme.colors.primaryText, fontWeight: '600' }]}>Study</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.primaryText, fontWeight: '600' }]}>{t('recentDecks.study')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -215,15 +225,16 @@ export function DashboardScreen() {
         }}
         ListEmptyComponent={
           !loading ? (
-            <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={styles.emptyEmoji}>{'\uD83D\uDCDA'}</Text>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                {t('recentDecks.noDecks')}
-              </Text>
-            </View>
+            <EmptyState
+              icon="\uD83D\uDCDA"
+              title={t('recentDecks.noDecks')}
+              actionTitle={t('decks:createFirst', { defaultValue: 'Create your first deck' })}
+              onAction={() => tabNav?.navigate('DecksTab')}
+            />
           ) : null
         }
       />
+      )}
     </Screen>
   )
 }

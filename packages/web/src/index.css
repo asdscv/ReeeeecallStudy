@@ -31,7 +31,11 @@
   --font-weight-normal: 400;
   --ring: #3B82F6;
   --brand: #2563EB;
+  --brand-hover: #1D4ED8;
+  --brand-active: #1E40AF;
   --brand-foreground: #FFFFFF;
+  --destructive-hover: #DC2626;
+  --destructive-active: #B91C1C;
   --success: #22C55E;
   --success-foreground: #FFFFFF;
   --warning: #EAB308;
@@ -71,11 +75,16 @@
   --accent-foreground: #F9FAFB;
   --destructive: #F87171;
   --destructive-foreground: #FFFFFF;
-  --border: #1F2937;
+  /* Lighter than --card (#1E293B)/surfaces so borders are visible in dark mode */
+  --border: #374151;
   --input: #374151;
   --ring: #3B82F6;
   --brand: #60A5FA;
+  --brand-hover: #93C5FD;
+  --brand-active: #BFDBFE;
   --brand-foreground: #1E3A8A;
+  --destructive-hover: #EF4444;
+  --destructive-active: #DC2626;
   --success: #4ADE80;
   --success-foreground: #052E16;
   --warning: #FACC15;
@@ -94,7 +103,7 @@
   --sidebar-primary-foreground: #F9FAFB;
   --sidebar-accent: #1F2937;
   --sidebar-accent-foreground: #F9FAFB;
-  --sidebar-border: #1F2937;
+  --sidebar-border: #374151;
   --sidebar-ring: #3B82F6;
 }
 
@@ -121,7 +130,11 @@
   --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
   --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-active: var(--brand-active);
   --color-brand-foreground: var(--brand-foreground);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-active: var(--destructive-active);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -156,6 +169,39 @@
     margin: 0;
     min-height: 100vh;
   }
+
+  /* Keyboard-only focus ring — visible for tab navigation, hidden for mouse.
+     Applies to every interactive element that doesn't opt out. */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Skip-to-content link — first tab stop, off-screen until focused (WCAG 2.4.1) */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--brand);
+  color: var(--brand-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transform: translateY(-150%);
+  transition: transform 0.15s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 @keyframes shimmer {
@@ -197,4 +243,20 @@ footer,
 aside {
   content-visibility: auto;
   contain-intrinsic-size: auto 500px;
+}
+
+/* Respect OS "reduce motion" — neutralize decorative animation/transition while
+   keeping opacity changes perceivable. (WCAG 2.3.3 / Apple-Google baseline) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .marquee-container > div {
+    animation: none !important;
+  }
 }

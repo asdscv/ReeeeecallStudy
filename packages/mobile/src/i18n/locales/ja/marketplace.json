@@ -2,22 +2,23 @@
   "title": "マーケットプレイス",
   "searchPlaceholder": "デッキを検索...",
   "noResults": "検索結果がありません。",
-  "noResultsHint": "Try a different search or category",
+  "noResultsHint": "別のキーワードやカテゴリーをお試しください",
   "categories": {
-    "general": "一般",
+    "all": "すべて",
     "language": "語学",
     "science": "科学",
     "math": "数学",
     "history": "歴史",
     "programming": "プログラミング",
-    "trivia": "雑学",
     "exam": "試験対策",
     "other": "その他"
   },
   "sort": {
-    "popular": "Popular",
-    "newest": "Newest",
-    "cardCount": "Most Cards"
+    "popular": "人気",
+    "newest": "新着",
+    "cardCount": "カード数",
+    "trending": "急上昇",
+    "topRated": "高評価"
   },
   "listing": {
     "cardCount": "{{count}}枚",
@@ -25,12 +26,7 @@
   },
   "detail": {
     "back": "← マーケットプレイス",
-    "cardCount": "{{count}}枚",
-    "userCount": "{{count}}人",
     "getDeck": "このデッキを取得",
-    "importing": "インポート中...",
-    "cardPreview": "カードプレビュー（最大10枚）",
-    "noCards": "カードがありません。",
     "reportContent": "Report",
     "publishedBy": "作成",
     "alreadyAcquired": "コレクションに追加済み",
@@ -38,7 +34,12 @@
     "unsubscribing": "配信解除中...",
     "unsubscribed": "配信解除しました",
     "unsubscribeConfirm": "このデッキの配信を解除しますか？個人の学習進捗はアカウントに残ります。",
-    "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。"
+    "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。",
+    "title": "詳細",
+    "alreadyReported": "報告済み",
+    "alreadyReportedBody": "この出品はすでに報告済みです。",
+    "reportError": "報告の送信に失敗しました",
+    "downloading": "ダウンロード中..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -86,7 +87,8 @@
   "nativeLanguage": {
     "label": "母語",
     "all": "すべて",
-    "none": "未指定"
+    "none": "未指定",
+    "multiHint": "当てはまるものをすべて選択"
   },
   "publisherStats": {
     "title": "パブリッシャー統計",
@@ -124,5 +126,29 @@
     "intermediate": "中級",
     "upper_intermediate": "中上級",
     "advanced": "上級"
-  }
+  },
+  "verifiedOnly": "認証済み",
+  "advancedFilters": "詳細",
+  "dateRange": {
+    "label": "公開時期",
+    "7d": "過去7日",
+    "30d": "過去30日",
+    "90d": "過去90日",
+    "all": "全期間"
+  },
+  "shareMode": {
+    "label": "共有モード",
+    "all": "すべて",
+    "copy": "コピー",
+    "subscribe": "購読",
+    "snapshot": "スナップショット"
+  },
+  "filters": {
+    "label": "フィルター"
+  },
+  "categoryLabel": "カテゴリー",
+  "categoryTitle": "カテゴリー",
+  "sortTitle": "並び替え",
+  "loadError": "デッキを読み込めませんでした",
+  "loadErrorHint": "接続を確認してもう一度お試しください。"
 }

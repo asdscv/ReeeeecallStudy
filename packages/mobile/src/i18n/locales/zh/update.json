@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "需要更新",
+  "blockedMessage": "当前版本已不再受支持。请更新到最新版本以继续使用。",
+  "optionalTitle": "有可用更新",
+  "optionalMessage": "新版本已发布，包含改进和错误修复。",
+  "updateButton": "立即更新",
+  "laterButton": "稍后"
+}

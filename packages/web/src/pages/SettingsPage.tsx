@@ -479,7 +479,7 @@ export function SettingsPage() {
               <button
                 onClick={handleSaveName}
                 disabled={nameSaving || !nameChanged || nameChecking || nameAvailable === false}
-                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 transition cursor-pointer font-medium whitespace-nowrap"
+                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium whitespace-nowrap"
               >
                 {nameSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
               </button>
@@ -583,7 +583,7 @@ export function SettingsPage() {
               <button
                 onClick={handleSaveSrs}
                 disabled={srsSaving || !srsChanged}
-                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 transition cursor-pointer font-medium"
+                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium"
               >
                 {srsSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
               </button>
@@ -759,7 +759,7 @@ export function SettingsPage() {
                             <button
                               onClick={handleAiSave}
                               disabled={aiSaving || !aiEditKey.trim()}
-                              className="flex-1 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 transition cursor-pointer font-medium"
+                              className="flex-1 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium"
                             >
                               {aiSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('aiProvider.save')}
                             </button>
@@ -830,7 +830,7 @@ export function SettingsPage() {
             {!apiKeyData && !showKeyForm && (
               <button
                 onClick={() => setShowKeyForm(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand transition cursor-pointer font-medium"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover transition cursor-pointer font-medium"
               >
                 <Plus size={16} />
                 {t('apiKey.generate')}
@@ -855,7 +855,7 @@ export function SettingsPage() {
                   <button
                     onClick={handleGenerateApiKey}
                     disabled={generating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand disabled:opacity-50 transition cursor-pointer font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium"
                   >
                     {generating ? t('apiKey.generating') : t('apiKey.create')}
                   </button>

@@ -41,7 +41,15 @@
     "bulkDelete": "Hapus Kartu Massal",
     "bulkDeleteConfirm": "Hapus {{count}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
     "noStudyRecords": "Tidak ada catatan belajar",
-    "aiCards": "AI Cards"
+    "aiCards": "AI Cards",
+    "versionHistory": "Riwayat Versi",
+    "createVersion": "+ Versi Baru",
+    "versionSummaryPlaceholder": "Apa yang berubah? (opsional)",
+    "creatingVersion": "Membuat...",
+    "saveVersion": "Simpan Versi",
+    "noVersions": "Belum ada versi yang tercatat.",
+    "versionLabel": "Versi {{num}}",
+    "versionCards": "kartu"
   },
   "settings": {
     "deckName": "Nama Dek",
@@ -151,6 +159,18 @@
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
+  },
+  "learningLanguage": {
+    "label": "Bahasa yang dipelajari",
+    "all": "Semua"
+  },
+  "nativeLanguage": {
+    "label": "Bahasa ibu",
+    "multiHint": "Pilih semua yang sesuai"
+  },
+  "studyLevel": {
+    "label": "Tingkat belajar",
+    "none": "Tidak ditentukan"
   },
   "quickCreate": {
     "button": "Buat Cepat",

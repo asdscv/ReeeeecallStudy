@@ -11,6 +11,8 @@ import { QuickCreateModal } from '../components/deck/QuickCreateModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { CardGridSkeleton } from '../components/common/Skeleton'
+import { Button } from '../components/ui/button'
 import type { Deck } from '../types/database'
 
 export function DecksPage() {
@@ -99,40 +101,32 @@ export function DecksPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowAIGenerate(true)}
-            className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 active:scale-[0.98] transition cursor-pointer"
           >
             {t('ai-generate:button.aiGenerate')}
           </button>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="px-3 sm:px-4 py-2 bg-card text-foreground border border-border rounded-lg text-xs sm:text-sm font-medium hover:bg-muted transition cursor-pointer"
-          >
+          <Button variant="outline" onClick={() => setShowCreate(true)} className="text-xs sm:text-sm">
             {t('decks:createNew')}
-          </button>
-          <button
+          </Button>
+          <Button
             data-testid="quick-create-button"
             onClick={() => setShowQuickCreate(true)}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand transition cursor-pointer"
+            className="text-xs sm:text-sm"
           >
             {t('decks:quickCreate.button')}
-          </button>
+          </Button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-4xl animate-pulse">📚</div>
-        </div>
+        <CardGridSkeleton />
       ) : decks.length === 0 ? (
         <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📚</div>
           <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('decks:empty')}</p>
-          <button
-            onClick={() => setShowQuickCreate(true)}
-            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand transition cursor-pointer"
-          >
+          <Button onClick={() => setShowQuickCreate(true)}>
             {t('decks:createFirst')}
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">

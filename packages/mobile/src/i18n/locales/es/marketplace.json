@@ -2,22 +2,23 @@
   "title": "Mercado",
   "searchPlaceholder": "Buscar mazos...",
   "noResults": "Sin resultados de búsqueda.",
-  "noResultsHint": "Try a different search or category",
+  "noResultsHint": "Prueba otra búsqueda o categoría",
   "categories": {
-    "general": "General",
+    "all": "Todo",
     "language": "Idiomas",
     "science": "Ciencia",
     "math": "Matemáticas",
     "history": "Historia",
     "programming": "Programación",
-    "trivia": "Trivia",
     "exam": "Preparación de exámenes",
     "other": "Otros"
   },
   "sort": {
     "popular": "Popular",
-    "newest": "Newest",
-    "cardCount": "Most Cards"
+    "newest": "Más reciente",
+    "cardCount": "Más tarjetas",
+    "trending": "Tendencia",
+    "topRated": "Mejor valorado"
   },
   "listing": {
     "cardCount": "{{count}} tarjetas",
@@ -25,12 +26,7 @@
   },
   "detail": {
     "back": "← Mercado",
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios",
     "getDeck": "Obtener este mazo",
-    "importing": "Importando...",
-    "cardPreview": "Vista previa de tarjetas (máx 10)",
-    "noCards": "Sin tarjetas.",
     "reportContent": "Report",
     "publishedBy": "por",
     "alreadyAcquired": "Ya está en tu colección",
@@ -38,7 +34,12 @@
     "unsubscribing": "Cancelando...",
     "unsubscribed": "Suscripción cancelada",
     "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
-    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo."
+    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo.",
+    "title": "Detalle",
+    "alreadyReported": "Ya reportado",
+    "alreadyReportedBody": "Ya has reportado este elemento.",
+    "reportError": "No se pudo enviar el reporte",
+    "downloading": "Descargando..."
   },
   "publish": {
     "title": "Publish Deck",
@@ -86,7 +87,8 @@
   "nativeLanguage": {
     "label": "Idioma nativo",
     "all": "Todos",
-    "none": "Sin especificar"
+    "none": "Sin especificar",
+    "multiHint": "Selecciona todas las que correspondan"
   },
   "publisherStats": {
     "title": "Estadísticas de publicador",
@@ -124,5 +126,29 @@
     "intermediate": "Intermedio",
     "upper_intermediate": "Intermedio alto",
     "advanced": "Avanzado"
-  }
+  },
+  "verifiedOnly": "Verificado",
+  "advancedFilters": "Avanzado",
+  "dateRange": {
+    "label": "Publicado en",
+    "7d": "Últimos 7 d",
+    "30d": "Últimos 30 d",
+    "90d": "Últimos 90 d",
+    "all": "Todo el tiempo"
+  },
+  "shareMode": {
+    "label": "Modo de compartir",
+    "all": "Todo",
+    "copy": "Copiar",
+    "subscribe": "Suscribir",
+    "snapshot": "Instantánea"
+  },
+  "filters": {
+    "label": "Filtrar"
+  },
+  "categoryLabel": "Categoría",
+  "categoryTitle": "Categoría",
+  "sortTitle": "Ordenar por",
+  "loadError": "No se pudieron cargar las barajas",
+  "loadErrorHint": "Revisa tu conexión e inténtalo de nuevo."
 }

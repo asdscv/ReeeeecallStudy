@@ -1,0 +1,8 @@
+{
+  "blockedTitle": "アップデートが必要です",
+  "blockedMessage": "このバージョンはサポートが終了しました。続行するには最新バージョンにアップデートしてください。",
+  "optionalTitle": "アップデートのお知らせ",
+  "optionalMessage": "改善とバグ修正を含む新しいバージョンが利用可能です。",
+  "updateButton": "今すぐアップデート",
+  "laterButton": "後で"
+}

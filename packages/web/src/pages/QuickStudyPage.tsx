@@ -17,6 +17,7 @@ import {
   clampBatchSize,
 } from '../lib/study-session-utils'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { CardGridSkeleton } from '../components/common/Skeleton'
 import { MultiDeckSelector } from '../components/study/MultiDeckSelector'
 import type { Deck, StudyMode } from '../types/database'
 
@@ -162,9 +163,7 @@ export function QuickStudyPage() {
       {decks.length > 1 && <MultiDeckSelector />}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="text-4xl animate-pulse">📚</div>
-        </div>
+        <CardGridSkeleton />
       ) : decks.length === 0 ? (
         <div className="bg-card rounded-xl border border-border p-12 text-center">
           <div className="text-5xl mb-4">📚</div>
@@ -278,7 +277,7 @@ export function QuickStudyPage() {
                 <button
                   onClick={handleStartStudy}
                   disabled={dateCardCount === 0}
-                  className="w-full mt-4 py-3 bg-brand hover:bg-brand disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
+                  className="w-full mt-4 py-3 bg-brand hover:bg-brand-hover disabled:bg-gray-300 text-white font-medium rounded-xl transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   {t('quickStudy.startStudy')}
                 </button>
@@ -355,7 +354,7 @@ export function QuickStudyPage() {
                 </p>
                 <button
                   onClick={handleStartStudy}
-                  className="w-full mt-4 py-3 bg-brand hover:bg-brand text-white font-medium rounded-xl transition cursor-pointer"
+                  className="w-full mt-4 py-3 bg-brand hover:bg-brand-hover text-white font-medium rounded-xl transition cursor-pointer"
                 >
                   {t('quickStudy.startStudy')}
                 </button>

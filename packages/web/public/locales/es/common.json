@@ -11,10 +11,10 @@
     "admin": "Admin",
     "guide": "Guía",
     "aiGenerate": "AI Generate",
-    "achievements": "Achievements",
+    "achievements": "Logros",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Publisher Stats"
+    "publisher": "Estadísticas del editor"
   },
   "actions": {
     "save": "Guardar",
@@ -58,7 +58,8 @@
     "minutes": "min",
     "seconds": "seg",
     "times": "veces",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "decksCount": "{{count}} barajas"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
@@ -269,5 +270,21 @@
     "playStorePrefix": "DISPONIBLE EN",
     "playStore": "Google Play",
     "qrHint": "Escanea un código QR con la cámara de tu teléfono para descargar"
-  }
+  },
+  "error": {
+    "boundary": {
+      "title": "Algo salió mal",
+      "description": "Ocurrió un error inesperado. Inténtalo de nuevo.",
+      "studyTitle": "Sesión de estudio interrumpida",
+      "studyDescription": "Ocurrió un error inesperado durante la sesión. Tu progreso se ha guardado.",
+      "details": "Detalles del error",
+      "tryAgain": "Reintentar",
+      "goToDashboard": "Ir al panel"
+    }
+  },
+  "skipToContent": "Saltar al contenido",
+  "footer": {
+    "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados."
+  },
+  "cancel": "Cancelar"
 }
