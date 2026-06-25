@@ -192,5 +192,6 @@
     "reclaiming": "Restaurando sesión…",
     "logout": "Cerrar sesión",
     "hint": "Solo se puede usar un dispositivo a la vez"
-  }
+  },
+  "loading": "Cargando..."
 }

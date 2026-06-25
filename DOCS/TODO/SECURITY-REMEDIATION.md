@@ -39,15 +39,15 @@
 
 **현재 사용처**: `get_ai_provider_keys()`, `upsert_ai_provider_key()` (SECURITY DEFINER)가 `SELECT secret FROM _ai_encryption_config WHERE id=1` 후 `pgp_sym_decrypt/encrypt`.
 
-**안전 설계(로테이션 X — 재암호화 불필요)**:
-1. 현재 `_ai_encryption_config.secret` 값을 읽어 **동일 값**을 `vault.secrets`에 저장(`vault.create_secret(<value>, 'ai_key_passphrase')`). 같은 패스프레이즈 → 기존 `user_ai_provider_keys.encrypted_api_key` 그대로 복호화됨.
-2. `get_ai_provider_keys`/`upsert_ai_provider_key`를 CREATE OR REPLACE: 시크릿을 `SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name='ai_key_passphrase'`에서 읽도록 변경(본문 나머지 동일). SECURITY DEFINER + search_path에 `vault` 포함 필요.
-3. **검증**: AI키가 있는 계정으로 `get_ai_provider_keys()` 호출 → 정상 복호화 확인. (실패 시 절대 다음 단계 진행 금지.)
-4. 검증 후에만 `DROP TABLE _ai_encryption_config`.
-5. (선택, 별도 follow-up) 패스프레이즈 **로테이션**: 신규 패스프레이즈 생성 → 전 행 재암호화(decrypt-old→encrypt-new) → Vault 갱신. 운영 윈도우 필요. 본 페이즈에서는 제외.
+**⚠️ "단순 Vault relocate"는 불가 (확인됨)**: mig 074 주석 — **`vault.decrypted_secrets`를 참조하는 함수는 PostgREST 인트로스펙션에서 제외 → `/rest/v1/rpc` 404**. 즉 `get_ai_provider_keys`/`upsert`를 Vault 읽기로 바꾸면 클라의 `supabase.rpc()`가 404 → AI키 기능 전면 중단(074가 평문으로 되돌린 바로 그 이유). 로테이션 유무와 무관하게 RPC-in-Vault는 막힘.
 
-**리스크**: 전 유저 AI키가 걸림. 074의 404 이유 확인(엣지: SECURITY DEFINER RPC 내부 vault 읽기는 PostgREST introspection과 무관할 가능성 큼). **drop 전 복호화 검증이 게이트**.
-**롤백**: RPC를 평문 테이블 읽기로 되돌리고 테이블 복구(drop 전이면 단순 RPC revert). drop 후엔 Vault가 단일 소스.
+**올바른 설계 = Edge 함수로 암복호화 이전(감사 권장안)**:
+1. 패스프레이즈를 **Supabase Edge 시크릿**(`supabase secrets set AI_KEY_PASSPHRASE=…`, 현재 `_ai_encryption_config.secret`과 **동일 값** → 재암호화 불필요)으로 저장.
+2. AI키 get/set을 **Edge 함수**로 구현(예: `functions/ai-keys`): Deno에서 패스프레이즈를 env로 읽어 암복호화(또는 패스프레이즈를 파라미터로 받는 DB 함수 호출). PostgREST RPC가 아니므로 404 무관.
+3. web/mobile 클라를 RPC(`supabase.rpc('get_ai_provider_keys')`) → Edge 함수 호출로 전환.
+4. **검증** 후에만 DB RPC + `_ai_encryption_config` DROP.
+
+**상태 = 보류(deploy/ops 게이트 + 대형/고위험)**: Edge 시크릿 설정 + Edge 배포 + 클라 변경 + 조정 배포가 필요(Management API 범위 밖, 무단 prod 배포 부적절). 전 유저 AI키 blast radius. **deploy 권한과 함께 집중 실행** 권장. 현 평문 테이블은 RLS deny-all이라 anon 미도달 — 잔여 리스크는 at-rest(DB 덤프/service-role 유출)뿐이라 Edge 리팩터 시점까지 수용 가능.
 
 ---
 
@@ -71,7 +71,7 @@
 - **M1**: api 인메모리 레이트리밋(isolate별 Map → fan-out 우회) → Postgres 원자 카운터 RPC(`user_id+window`)나 Upstash로 공유. createCards 배치 100 캡은 이미 있음.
 - **L6**: prod `uri_allow_list`에서 `http://localhost:5173/auth/callback` 제거(로컬→prod OAuth 개발 깨짐 주의 — 별도 dev 프로젝트 권장).
 - **L4/L5**: api+tts CORS `*` → GoTrue allow-list 기준 origin 화이트리스트(정당 origin 집합 확인 필요).
-- **common:loading**: 모바일 `QuickCreateScreen`이 `common:loading` 사용하나 mobile common.json에 키 없음 → i18n-key-usage 테스트 2건 실패(런타임은 defaultValue로 안전). mobile common.json 8로케일에 `loading` 추가 또는 사용 제거.
+- ~~**common:loading**: web/mobile QuickCreate가 `common:loading` 사용하나 common.json에 키 없음 → i18n-key-usage 실패.~~ ✅ **완료**(이 PR): web 8 + mobile 8 common.json에 `loading` 추가. i18n-key-usage 3/3 + 파리티 135 통과.
 
 ---
 
