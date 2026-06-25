@@ -113,10 +113,10 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
-    // 현재 덱의 next_position + readonly 체크
+    // readonly 체크
     const { data: deck } = await supabase
       .from('decks')
-      .select('next_position, is_readonly')
+      .select('is_readonly')
       .eq('id', input.deck_id)
       .single()
 
@@ -125,7 +125,13 @@ export const useCardStore = create<CardState>((set, get) => ({
       return null
     }
 
-    const position = (deck as { next_position: number } | null)?.next_position ?? 0
+    // 원자적 sort_position 예약 (mig 105) — next_position read-modify-write 레이스 제거
+    const { data: position, error: posError } = await supabase
+      .rpc('reserve_card_positions', { p_deck_id: input.deck_id, p_count: 1 })
+    if (posError || position === null) {
+      set({ error: posError?.message ?? 'Failed to create card' })
+      return null
+    }
 
     const { data: card, error } = await supabase
       .from('cards')
@@ -135,7 +141,7 @@ export const useCardStore = create<CardState>((set, get) => ({
         template_id: input.template_id,
         field_values: input.field_values,
         tags: input.tags || [],
-        sort_position: position,
+        sort_position: position as number,
         srs_status: 'new',
         ease_factor: 2.5,
         interval_days: 0,
@@ -149,11 +155,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       return null
     }
 
-    // next_position 증가
-    await supabase
-      .from('decks')
-      .update({ next_position: position + 1 } as Record<string, unknown>)
-      .eq('id', input.deck_id)
+    // (next_position 증가는 reserve_card_positions가 원자적으로 처리)
 
     guard.recordSuccess('cards_total')
     invalidateDeckStats()
@@ -169,13 +171,14 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { set({ error: 'Not authenticated' }); return 0 }
 
-    // Get current deck position
-    const { data: deck } = await supabase
-      .from('decks')
-      .select('next_position')
-      .eq('id', deck_id)
-      .single()
-    let position = (deck as { next_position: number } | null)?.next_position ?? 0
+    // 원자적으로 cards.length 칸 예약 (mig 105) — read-modify-write 레이스 제거.
+    // basePos부터 연속 블록을 받으며, next_position 증가도 RPC가 처리.
+    const { data: basePos, error: posError } = await supabase
+      .rpc('reserve_card_positions', { p_deck_id: deck_id, p_count: cards.length })
+    if (posError || basePos === null) {
+      set({ error: posError?.message ?? 'Failed to create cards' })
+      return 0
+    }
 
     const CHUNK_SIZE = 200
     let totalInserted = 0
@@ -188,7 +191,7 @@ export const useCardStore = create<CardState>((set, get) => ({
         template_id,
         field_values: c.field_values,
         tags: c.tags ?? [],
-        sort_position: position + idx,
+        sort_position: (basePos as number) + i + idx,
         srs_status: 'new',
         ease_factor: 2.5,
         interval_days: 0,
@@ -202,16 +205,11 @@ export const useCardStore = create<CardState>((set, get) => ({
         break
       }
 
-      position += chunk.length
       totalInserted += chunk.length
       onProgress?.(totalInserted, cards.length)
     }
 
-    // Update deck next_position
-    await supabase
-      .from('decks')
-      .update({ next_position: position, updated_at: new Date().toISOString() } as Record<string, unknown>)
-      .eq('id', deck_id)
+    // (next_position 증가는 reserve_card_positions가 원자적으로 처리)
 
     guard.recordSuccess('cards_total', totalInserted)
     if (!get().error) {

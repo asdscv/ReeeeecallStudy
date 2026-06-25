@@ -808,10 +808,10 @@ app.openapi(createCardsRoute, async (c) => {
   const { deckId } = c.req.valid('param')
   const body = c.req.valid('json')
 
-  // Verify deck ownership and get next_position
+  // Verify deck ownership
   const { data: deck } = await sb
     .from('decks')
-    .select('id, next_position')
+    .select('id')
     .eq('id', deckId)
     .eq('user_id', userId)
     .single()
@@ -832,15 +832,21 @@ app.openapi(createCardsRoute, async (c) => {
     return c.json({ error: { code: 'NOT_FOUND', message: 'Template not found' } }, 404)
   }
 
+  // Atomically reserve sort_positions (mig 105) — removes the next_position
+  // read-modify-write race; the RPC also bumps deck.next_position.
+  const { data: startPos, error: posErr } = await sb
+    .rpc('reserve_card_positions', { p_deck_id: deckId, p_count: items.length })
+  if (posErr || startPos === null) return c.json(dbError('createCards', posErr), 500)
+
   // Build insert rows
-  let pos = deck.next_position as number
-  const rows = items.map((item: any) => ({
+  const base = startPos as number
+  const rows = items.map((item: any, idx: number) => ({
     deck_id: deckId,
     user_id: userId,
     template_id: item.template_id,
     field_values: item.field_values,
     tags: item.tags ?? [],
-    sort_position: pos++,
+    sort_position: base + idx,
   }))
 
   const { data: created, error } = await sb
@@ -849,12 +855,6 @@ app.openapi(createCardsRoute, async (c) => {
     .select()
 
   if (error) return c.json(dbError('createCards', error), 500)
-
-  // Update deck.next_position
-  await sb
-    .from('decks')
-    .update({ next_position: pos })
-    .eq('id', deckId)
 
   return c.json({ data: created }, 201)
 })
