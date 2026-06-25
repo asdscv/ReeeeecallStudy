@@ -1,12 +1,12 @@
 // Display metadata for the canonical default ("preset") card templates that are
-// seeded server-side by the signup trigger and migration 092
+// seeded server-side by the signup trigger and migration 097
 // (_seed_default_templates). These rows have Korean names/field names baked in,
 // so the quick-create UI maps them to stable, translatable ids and each app
 // resolves its own i18n label. Falls back to the raw template/field name when a
 // row is not one of the known presets.
 //
 // Keep PRESET_ID_BY_TEMPLATE_NAME / FIELD_LABEL_ID_BY_NAME in sync with the
-// seeded template names in supabase/migrations/092_ensure_default_templates.sql.
+// seeded template names in supabase/migrations/097_ensure_default_templates.sql.
 
 export type PresetId = 'basic' | 'english' | 'chinese'
 

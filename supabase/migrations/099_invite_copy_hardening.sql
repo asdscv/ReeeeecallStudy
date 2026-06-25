@@ -1,5 +1,5 @@
 -- ============================================================================
--- 094: Close the two critical sharing holes found in the security audit.
+-- 099: Close the two critical sharing holes found in the security audit.
 --
 --   (A) copy_deck_for_user had ZERO authorization — any caller could copy ANY
 --       deck's full card content into their account (exfiltration) or plant

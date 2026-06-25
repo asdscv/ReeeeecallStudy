@@ -143,7 +143,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   },
 
   ensureDefaultTemplates: async () => {
-    // ensure_default_templates() (migration 092) is idempotent and seeds the
+    // ensure_default_templates() (migration 097) is idempotent and seeds the
     // canonical defaults only when the user has none. Best-effort: swallow the
     // RPC error instead of writing to the shared store.error (it has no reliable
     // clear path and would surface a stale error elsewhere); the picker falls

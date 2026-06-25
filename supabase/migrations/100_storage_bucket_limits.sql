@@ -1,5 +1,5 @@
 -- ============================================================================
--- 095: Storage bucket upload hardening (security audit round 2).
+-- 100: Storage bucket upload hardening (security audit round 2).
 --
 -- card-audio / card-images had NO file_size_limit and NO allowed_mime_types, so
 -- a client bypassing the app could upload arbitrary-size / arbitrary-type files

@@ -99,7 +99,7 @@ export const useSharingStore = create<SharingState>((set, get) => ({
     // validates the code, claims the pending share for the caller, and copies /
     // subscribes — so the client no longer needs blanket SELECT on pending
     // deck_shares (that over-broad anon policy leaked every invite token and was
-    // dropped in migration 094).
+    // dropped in migration 099).
     const { data, error } = await supabase.rpc('accept_invite', {
       p_code: inviteCode,
     } as Record<string, unknown>)

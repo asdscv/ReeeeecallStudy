@@ -1,5 +1,5 @@
 -- ============================================================================
--- 092: Guarantee default card templates always exist + repair legacy accounts.
+-- 097: Guarantee default card templates always exist + repair legacy accounts.
 --
 -- Background: create_default_templates() (AFTER INSERT trigger on profiles)
 -- historically failed for accounts created before migration 036, because
