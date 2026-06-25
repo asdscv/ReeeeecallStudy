@@ -207,6 +207,21 @@ Deno.serve(async (req) => {
       })
     }
 
+    // Per-user daily quota (cost-abuse protection — migration 101). Runs as the
+    // authenticated user (RPC keys on auth.uid()); raises → 429 when over budget.
+    const sbUser = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } },
+    )
+    const { error: quotaErr } = await sbUser.rpc('record_tts_usage', { p_chars: text.length })
+    if (quotaErr) {
+      return new Response(JSON.stringify({ error: 'TTS daily quota exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     const resolvedLang = lang || 'en-US'
     const resolvedVoice = voice || DEFAULT_VOICES[resolvedLang] || DEFAULT_VOICES['en-US']
     const resolvedRate = Math.max(0.5, Math.min(2.0, rate ?? 1.0))
