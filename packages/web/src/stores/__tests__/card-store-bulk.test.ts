@@ -84,6 +84,25 @@ describe('createCards (bulk)', () => {
     })
 
     expect(result).toBe(3)
+    // reserve_card_positions called atomically with the full batch count (N1)
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('reserve_card_positions', {
+      p_deck_id: 'deck-1',
+      p_count: 3,
+    })
+  })
+
+  it('should return 0 and set error when reserve_card_positions fails', async () => {
+    setupMocks()
+    mockSupabase.rpc.mockResolvedValue({ data: null, error: { message: 'deck not found or not owned' } })
+
+    const result = await useCardStore.getState().createCards({
+      deck_id: 'deck-1',
+      template_id: 'tmpl-1',
+      cards: makeCards(3),
+    })
+
+    expect(result).toBe(0)
+    expect(useCardStore.getState().error).toBe('deck not found or not owned')
   })
 
   it('should return total inserted count', async () => {

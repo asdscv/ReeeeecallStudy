@@ -22,7 +22,9 @@ AS $$
 DECLARE
   v_start integer;
 BEGIN
-  IF p_count IS NULL OR p_count <= 0 THEN
+  -- 상한: next_position(INTEGER) 오버플로 방지 + 단일 호출 남용 차단.
+  -- 정상 임포트(대형 덱도 수천 장)보다 훨씬 큰 여유값.
+  IF p_count IS NULL OR p_count <= 0 OR p_count > 100000 THEN
     RAISE EXCEPTION 'invalid count';
   END IF;
 
