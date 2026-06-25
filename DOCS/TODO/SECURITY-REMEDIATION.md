@@ -15,7 +15,7 @@
 | — | Quick Create + 1차 감사수정 | — | ✅ 완료 | #157 / 097-100 |
 | 1 | H3 TTS 유저별 일일 쿼터 | High | ✅ 완료 | #158 / 101 |
 | 2 | H2 평문 API키 제거(show-once) | High | ✅ 완료 | #159 / 102 |
-| **3** | **H1 AI키 암호화 시크릿 → Vault** | High | 🔲 다음 | — |
+| **3** | **H1 AI키 암호화 시크릿 → Edge** | High | 🔄 H1a/H1b 완료·검증, H1c(구 RPC/테이블 drop) 배포후 | 104 + `ai-keys` edge |
 | 4 | H4 REST API service-role → user-JWT | High | 🔲 대기 | — |
 | 5 | 작은 항목(N1/M1/L4-L6 + common:loading) | Low~Med | 🔲 대기 | — |
 | — | Auth 하드닝(M3/M4/M5) | Med | ⏸ 보류(제품결정) | — |
@@ -47,7 +47,10 @@
 3. web/mobile 클라를 RPC(`supabase.rpc('get_ai_provider_keys')`) → Edge 함수 호출로 전환.
 4. **검증** 후에만 DB RPC + `_ai_encryption_config` DROP.
 
-**상태 = 보류(deploy/ops 게이트 + 대형/고위험)**: Edge 시크릿 설정 + Edge 배포 + 클라 변경 + 조정 배포가 필요(Management API 범위 밖, 무단 prod 배포 부적절). 전 유저 AI키 blast radius. **deploy 권한과 함께 집중 실행** 권장. 현 평문 테이블은 RLS deny-all이라 anon 미도달 — 잔여 리스크는 at-rest(DB 덤프/service-role 유출)뿐이라 Edge 리팩터 시점까지 수용 가능.
+**진행 상태 (2026-06-25)**:
+- **H1a (완료·prod 반영)**: mig **104** — 패스프레이즈를 **파라미터로 받는** service-role 전용 함수 3개(`get/upsert/delete_ai_provider_key_secure`) 추가. pgcrypto는 DB에 잔류 → 기존 암호문 **동일 패스프레이즈로 그대로 복호화**(재암호화·로테이션 불필요). Edge 시크릿 `AI_KEY_PASSPHRASE`=현 `_ai_encryption_config.secret` 값으로 설정. `supabase/functions/ai-keys`(JWT 검증→service-role로 *_secure 호출) 작성·배포. **검증**: 기존 암호문 2건 param-패스프레이즈 복호화 OK, 권한 service_role 전용(anon/auth=false), 실유저 JWT로 upsert→list(복호화 확인)→delete→gone 라운드트립 OK.
+- **H1b (완료·이 PR)**: 공유 `supabase-backend.ts`를 `supabase.rpc()` 3종 → `functions.invoke('ai-keys')`로 전환(web+mobile 동시). 타입체크 0에러(web/mobile), secure-storage 29/29, `.js` emit 없음. **머지→main 배포 시 클라가 신규 경로 사용**. 구 RPC(`get/upsert/delete_ai_provider_key`)·`_ai_encryption_config`는 폴백으로 잔류.
+- **H1c (보류 — 배포 후)**: web(Cloudflare) + mobile(OTA/스토어) 클라가 모두 신규 경로로 전환·배포·검증된 **뒤에만** 구 RPC 3종 + `_ai_encryption_config` 테이블 DROP(하위호환 불가 → 배포 순서 규칙 적용). 모바일 OTA runtimeVersion 게이팅상 구 빌드 잔존 가능 → 충분한 마진 후 drop.
 
 ---
 
