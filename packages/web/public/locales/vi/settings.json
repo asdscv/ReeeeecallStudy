@@ -111,7 +111,9 @@
     "created": "Đã tạo: {{date}}",
     "noKeys": "Chưa tạo khóa API nào.",
     "noKey": "Chưa tạo khóa API nào.",
-    "securityNote": "Không thể xem lại vì lý do bảo mật"
+    "securityNote": "Không thể xem lại vì lý do bảo mật",
+    "showOnceWarning": "Khóa này sẽ không hiển thị lại — hãy sao chép ngay và lưu giữ an toàn.",
+    "unrecoverable": "Không thể khôi phục khóa này trên thiết bị này. Nếu bị mất, hãy xóa khóa này và tạo khóa mới."
   },
   "aiProvider": {
     "title": "Nhà cung cấp AI",
