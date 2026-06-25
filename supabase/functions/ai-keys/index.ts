@@ -17,6 +17,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
 }
 
+// Input bounds for the (now public, JWT-gated) HTTP surface — guard the DB from
+// oversized blobs / unbounded distinct rows and the NOT NULL columns from nulls.
+const MAX_PROVIDER_ID = 64
+const MAX_API_KEY = 8192
+const MAX_MODEL = 256
+const MAX_BASE_URL = 2048
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -71,23 +78,34 @@ Deno.serve(async (req) => {
         return json({ keys: data ?? [] })
       }
       case 'upsert': {
-        if (!body.providerId || !body.apiKey) return json({ error: 'providerId and apiKey required' }, 400)
+        // providerId + apiKey required (NOT NULL); model is NOT NULL → coerce ''
+        // (never null); baseUrl is nullable → null when empty. All length-capped.
+        const providerId = typeof body.providerId === 'string' ? body.providerId.trim() : ''
+        const apiKey = typeof body.apiKey === 'string' ? body.apiKey : ''
+        const model = typeof body.model === 'string' ? body.model : ''
+        const baseUrl = typeof body.baseUrl === 'string' ? body.baseUrl.trim() : ''
+        if (!providerId || providerId.length > MAX_PROVIDER_ID) return json({ error: 'invalid providerId' }, 400)
+        if (!apiKey || apiKey.length > MAX_API_KEY) return json({ error: 'invalid apiKey' }, 400)
+        if (model.length > MAX_MODEL) return json({ error: 'invalid model' }, 400)
+        if (baseUrl.length > MAX_BASE_URL) return json({ error: 'invalid baseUrl' }, 400)
+
         const { error } = await admin.rpc('upsert_ai_provider_key_secure', {
           p_user_id: userId,
-          p_provider_id: body.providerId,
-          p_api_key: body.apiKey,
-          p_model: body.model ?? null,
-          p_base_url: body.baseUrl ?? null,
+          p_provider_id: providerId,
+          p_api_key: apiKey,
+          p_model: model,
+          p_base_url: baseUrl || null,
           p_passphrase: passphrase,
         })
         if (error) { console.error('[ai-keys] upsert:', error.message); return json({ error: 'upsert failed' }, 500) }
         return json({ ok: true })
       }
       case 'delete': {
-        if (!body.providerId) return json({ error: 'providerId required' }, 400)
+        const providerId = typeof body.providerId === 'string' ? body.providerId.trim() : ''
+        if (!providerId || providerId.length > MAX_PROVIDER_ID) return json({ error: 'invalid providerId' }, 400)
         const { error } = await admin.rpc('delete_ai_provider_key_secure', {
           p_user_id: userId,
-          p_provider_id: body.providerId,
+          p_provider_id: providerId,
         })
         if (error) { console.error('[ai-keys] delete:', error.message); return json({ error: 'delete failed' }, 500) }
         return json({ ok: true })
