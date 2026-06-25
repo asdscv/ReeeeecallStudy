@@ -111,7 +111,9 @@
     "created": "Created: {{date}}",
     "noKeys": "No API key generated.",
     "noKey": "No API key generated.",
-    "securityNote": "Cannot be viewed again for security"
+    "securityNote": "Cannot be viewed again for security",
+    "showOnceWarning": "This key won't be shown again — copy it now and store it safely.",
+    "unrecoverable": "This key can't be retrieved on this device. If you lost it, delete this key and generate a new one."
   },
   "aiProvider": {
     "title": "AI Providers",
