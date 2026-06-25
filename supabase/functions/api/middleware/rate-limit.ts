@@ -1,18 +1,15 @@
 import type { Context, Next } from 'hono'
 
-interface RateLimitEntry {
-  timestamps: number[]
-}
+// Shared rate limit (M1): a Postgres atomic fixed-window counter, so all edge
+// isolates share one limit per user (the old in-memory Map was per-isolate, so
+// fan-out across isolates multiplied the effective limit). The check runs via
+// the service-role client already set on the context by the auth middleware.
+//
+// Fail-OPEN: if the DB check errors, allow the request. Rate limiting is an
+// abuse guard, not a correctness gate — a transient DB blip must not 500 the API.
 
 const MAX_REQUESTS = 60
-const WINDOW_MS = 60_000
-
-const store = new Map<string, RateLimitEntry>()
-
-function cleanupExpired(entry: RateLimitEntry, now: number): number[] {
-  const cutoff = now - WINDOW_MS
-  return entry.timestamps.filter((t) => t > cutoff)
-}
+const WINDOW_SECONDS = 60
 
 export async function rateLimitMiddleware(c: Context, next: Next) {
   const userId = c.get('userId') as string | undefined
@@ -21,32 +18,36 @@ export async function rateLimitMiddleware(c: Context, next: Next) {
     return
   }
 
-  const now = Date.now()
-  let entry = store.get(userId)
+  const sb = c.get('supabase')
+  try {
+    const { data, error } = await sb.rpc('check_rate_limit', {
+      p_key: userId,
+      p_limit: MAX_REQUESTS,
+      p_window_seconds: WINDOW_SECONDS,
+    })
 
-  if (!entry) {
-    entry = { timestamps: [] }
-    store.set(userId, entry)
-  }
+    if (error) {
+      console.error('[rate-limit] check failed, failing open:', error.message)
+      await next()
+      return
+    }
 
-  entry.timestamps = cleanupExpired(entry, now)
-
-  if (entry.timestamps.length >= MAX_REQUESTS) {
-    const oldest = entry.timestamps[0]
-    const retryAfterSec = Math.ceil((oldest + WINDOW_MS - now) / 1000)
-
-    c.header('Retry-After', String(retryAfterSec))
-    return c.json(
-      {
-        error: {
-          code: 'RATE_LIMITED',
-          message: `Too many requests. Please retry after ${retryAfterSec} seconds.`,
+    if (data && data.allowed === false) {
+      const retryAfter = Number(data.retry_after) || WINDOW_SECONDS
+      c.header('Retry-After', String(retryAfter))
+      return c.json(
+        {
+          error: {
+            code: 'RATE_LIMITED',
+            message: `Too many requests. Please retry after ${retryAfter} seconds.`,
+          },
         },
-      },
-      429,
-    )
+        429,
+      )
+    }
+  } catch (e) {
+    console.error('[rate-limit] error, failing open:', e)
   }
 
-  entry.timestamps.push(now)
   await next()
 }
