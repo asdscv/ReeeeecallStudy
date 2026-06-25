@@ -7,6 +7,10 @@ const mockSupabase = vi.hoisted(() => ({
   rpc: vi.fn(),
 }))
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
+// useCardStore re-exports the SHARED store, which imports from the shared
+// package paths — mock those too, else the real (uninitialized) shared
+// supabase/guard run. (alias @reeeeecall/shared → ../shared in vitest.config)
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({ supabase: mockSupabase }))
 
 // ─── Rate limit guard mock ──────────────────────────────────
 const mockGuard = vi.hoisted(() => ({
@@ -14,6 +18,7 @@ const mockGuard = vi.hoisted(() => ({
   recordSuccess: vi.fn(),
 }))
 vi.mock('../../lib/rate-limit-instance', () => ({ guard: mockGuard }))
+vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({ guard: mockGuard }))
 
 import { useCardStore } from '../card-store'
 
@@ -32,6 +37,9 @@ function setupMocks(insertError: { message: string } | null = null) {
     data: { user: { id: 'user-1' } },
     error: null,
   })
+
+  // reserve_card_positions RPC (mig 105) — returns the starting sort_position.
+  mockSupabase.rpc.mockResolvedValue({ data: 0, error: null })
 
   mockSupabase.from.mockImplementation((table: string) => {
     if (table === 'decks') {
