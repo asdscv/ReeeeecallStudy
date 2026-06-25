@@ -1,0 +1,26 @@
+-- ============================================================================
+-- Migration 102: Drop api_keys.key_plain (Security Audit H2)
+-- ----------------------------------------------------------------------------
+-- Audit finding H2: user API keys were stored in PLAINTEXT.
+--
+-- public.api_keys had two columns:
+--   * key_hash  — SHA-256 of the raw `rc_...` key; used for authentication
+--                 via resolve_api_key(). REQUIRED and untouched here.
+--   * key_plain — the raw, cleartext key. Existed ONLY to power the web
+--                 Settings "reveal key" feature.
+--
+-- Storing plaintext keys means a DB dump/leak exposes every user's live API
+-- key. Authentication does NOT need key_plain (it verifies against key_hash),
+-- so the column is pure attack surface.
+--
+-- The web client now follows a SHOW-ONCE model: the generated key is shown
+-- exactly once at creation time and cached client-side (localStorage) for
+-- same-device convenience only. It is never sent to the server.
+--
+-- Effect of dropping key_plain:
+--   * Existing keys KEEP WORKING — auth uses key_hash, which is unchanged.
+--   * Users lose server-side re-reveal of a previously created key. If they
+--     lose a key, they regenerate it. This is the intended, expected tradeoff.
+-- ============================================================================
+
+ALTER TABLE public.api_keys DROP COLUMN IF EXISTS key_plain;

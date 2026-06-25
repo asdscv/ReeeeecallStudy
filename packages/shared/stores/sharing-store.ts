@@ -95,82 +95,23 @@ export const useSharingStore = create<SharingState>((set, get) => ({
 
   acceptInvite: async (inviteCode: string) => {
     set({ error: null })
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
+    // Whole accept runs server-side in accept_invite() (SECURITY DEFINER): it
+    // validates the code, claims the pending share for the caller, and copies /
+    // subscribes — so the client no longer needs blanket SELECT on pending
+    // deck_shares (that over-broad anon policy leaked every invite token and was
+    // dropped in migration 099).
+    const { data, error } = await supabase.rpc('accept_invite', {
+      p_code: inviteCode,
+    } as Record<string, unknown>)
 
-    // Find the pending share by invite_code
-    const { data: share, error: findError } = await supabase
-      .from('deck_shares')
-      .select('*')
-      .eq('invite_code', inviteCode)
-      .eq('status', 'pending')
-      .single()
-
-    if (findError || !share) {
-      set({ error: 'errors:sharing.invalidOrExpired' })
+    if (error) {
+      set({ error: error.message })
       return null
     }
 
-    const typedShare = share as DeckShare
-
-    if (typedShare.owner_id === user.id) {
-      set({ error: 'errors:sharing.cannotAcceptOwn' })
-      return null
-    }
-
-    if (typedShare.share_mode === 'subscribe') {
-      // Create subscription: just update the share status + add recipient
-      const { error: updateError } = await supabase
-        .from('deck_shares')
-        .update({
-          recipient_id: user.id,
-          status: 'active',
-          accepted_at: new Date().toISOString(),
-        } as Record<string, unknown>)
-        .eq('id', typedShare.id)
-
-      if (updateError) {
-        set({ error: updateError.message })
-        return null
-      }
-
-      // Initialize subscriber progress
-      await supabase.rpc('init_subscriber_progress', {
-        p_user_id: user.id,
-        p_deck_id: typedShare.deck_id,
-      } as Record<string, unknown>)
-
-      await get().fetchSharedWithMe()
-      return { deckId: typedShare.deck_id }
-    } else {
-      // Copy or snapshot: use RPC to copy deck
-      const isReadonly = typedShare.share_mode === 'snapshot'
-      const { data: newDeckId, error: rpcError } = await supabase.rpc('copy_deck_for_user', {
-        p_source_deck_id: typedShare.deck_id,
-        p_recipient_id: user.id,
-        p_is_readonly: isReadonly,
-        p_share_mode: typedShare.share_mode,
-      } as Record<string, unknown>)
-
-      if (rpcError) {
-        set({ error: rpcError.message })
-        return null
-      }
-
-      // Update share status
-      await supabase
-        .from('deck_shares')
-        .update({
-          recipient_id: user.id,
-          status: 'active',
-          accepted_at: new Date().toISOString(),
-          copied_deck_id: newDeckId,
-        } as Record<string, unknown>)
-        .eq('id', typedShare.id)
-
-      await get().fetchSharedWithMe()
-      return { deckId: newDeckId as string }
-    }
+    await get().fetchSharedWithMe()
+    const deckId = (data as { deck_id?: string } | null)?.deck_id
+    return deckId ? { deckId } : null
   },
 
   revokeShare: async (shareId: string) => {

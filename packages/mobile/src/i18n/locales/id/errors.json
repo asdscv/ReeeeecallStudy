@@ -10,5 +10,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "Gagal mendapatkan dek. Silakan coba lagi."
+  },
+  "rateLimit": {
+    "tooFast": "Terlalu banyak permintaan. Coba lagi dalam {{seconds}} detik."
+  },
+  "quota": {
+    "limitReached": "Batas {{resource}} tercapai ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Permintaan API harian",
+      "storage_bytes": "Penyimpanan",
+      "cards_total": "Total kartu",
+      "decks_total": "Total dek",
+      "templates_total": "Total templat",
+      "study_sessions_daily": "Sesi belajar harian",
+      "file_uploads_daily": "Unggahan file harian"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "Tidak dapat menambahkan kartu ke dek hanya-baca.",
+    "readonlyDeckNoEdit": "Tidak dapat mengubah kartu di dek hanya-baca.",
+    "rateLimitReached": "Batas permintaan tercapai."
+  },
+  "deck": {
+    "rateLimitReached": "Batas permintaan tercapai."
   }
 }

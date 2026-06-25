@@ -16,5 +16,6 @@
   "cancel": "取消",
   "saving": "保存中...",
   "edit": "编辑",
-  "add": "添加"
+  "add": "添加",
+  "addAnother": "保存并继续添加"
 }

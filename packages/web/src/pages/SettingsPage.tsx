@@ -93,6 +93,9 @@ export function SettingsPage() {
   const [keyDisplayMode, setKeyDisplayMode] = useState<'hidden' | 'partial' | 'full'>('hidden')
   const [newKeyName, setNewKeyName] = useState('')
   const [showKeyForm, setShowKeyForm] = useState(false)
+  // True only right after generating a key — surfaces the show-once warning,
+  // since the plaintext is no longer retrievable from the server.
+  const [justCreatedKey, setJustCreatedKey] = useState(false)
 
   // Study input settings (localStorage)
   const [inputSettings, setInputSettingsRaw] = useState<StudyInputSettings>(() => loadSettings())
@@ -251,21 +254,21 @@ export function SettingsPage() {
 
     fetchProfile()
 
-    // Load API key from DB
+    // Load API key metadata from DB. The plaintext key is NEVER stored
+    // server-side (security audit H2 — see migration 102). Reveal relies
+    // only on the show-once localStorage fallback from this device/browser.
     const fetchApiKey = async () => {
       const { data: keyRow } = await supabase
         .from('api_keys')
-        .select('name, created_at, key_plain')
+        .select('name, created_at')
         .eq('user_id', user.id)
         .single()
       if (keyRow) {
-        const row = keyRow as { name: string; created_at: string; key_plain: string | null }
-        let plainKey = row.key_plain ?? ''
-        if (!plainKey) {
-          const saved = localStorage.getItem('reeeeecall-api-key-data')
-          if (saved) {
-            try { plainKey = JSON.parse(saved).key ?? '' } catch { /* ignore */ }
-          }
+        const row = keyRow as { name: string; created_at: string }
+        let plainKey = ''
+        const saved = localStorage.getItem('reeeeecall-api-key-data')
+        if (saved) {
+          try { plainKey = JSON.parse(saved).key ?? '' } catch { /* ignore */ }
         }
         setApiKeyData({ key: plainKey, name: row.name, createdAt: row.created_at })
       }
@@ -302,12 +305,15 @@ export function SettingsPage() {
 
       await supabase.from('api_keys').delete().eq('user_id', user.id)
 
+      // Only the SHA-256 hash is persisted server-side (auth via
+      // resolve_api_key). The plaintext key is shown once here and cached
+      // in localStorage for same-device convenience — never sent to the DB
+      // (security audit H2 — see migration 102).
       const { error } = await supabase
         .from('api_keys')
         .insert({
           user_id: user.id,
           key_hash: keyHash,
-          key_plain: key,
           name,
         } as Record<string, unknown>)
 
@@ -320,6 +326,7 @@ export function SettingsPage() {
       setApiKeyData(data)
       localStorage.setItem('reeeeecall-api-key-data', JSON.stringify(data))
       setKeyDisplayMode('full')
+      setJustCreatedKey(true)
       setShowKeyForm(false)
       setNewKeyName('')
       toast.success(t('apiKey.generated'))
@@ -341,6 +348,7 @@ export function SettingsPage() {
 
     setApiKeyData(null)
     setKeyDisplayMode('hidden')
+    setJustCreatedKey(false)
     localStorage.removeItem('reeeeecall-api-key-data')
     toast.success(t('apiKey.deleted'))
   }
@@ -887,6 +895,12 @@ export function SettingsPage() {
                 </button>
               </div>
 
+              {justCreatedKey && (
+                <div className="mb-3 px-4 py-3 rounded-lg border border-amber-300 bg-amber-50 text-sm text-amber-800 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
+                  {t('apiKey.showOnceWarning')}
+                </div>
+              )}
+
               {apiKeyData.key ? (
                 <div className="flex items-center gap-2 mb-3">
                   <code className="flex-1 px-4 py-2.5 bg-muted border border-border rounded-lg text-sm text-muted-foreground font-mono truncate">
@@ -914,9 +928,12 @@ export function SettingsPage() {
                   <CopyButton text={apiKeyData.key} />
                 </div>
               ) : (
-                <div className="px-4 py-2.5 bg-muted border border-border rounded-lg text-sm text-content-tertiary font-mono mb-3">
-                  rc_{'\u2022'.repeat(32)}
-                  <span className="ml-2 text-xs text-content-tertiary font-sans">({t('apiKey.masked')})</span>
+                <div className="mb-3">
+                  <div className="px-4 py-2.5 bg-muted border border-border rounded-lg text-sm text-content-tertiary font-mono">
+                    rc_{'\u2022'.repeat(32)}
+                    <span className="ml-2 text-xs text-content-tertiary font-sans">({t('apiKey.masked')})</span>
+                  </div>
+                  <p className="mt-2 text-xs text-content-tertiary">{t('apiKey.unrecoverable')}</p>
                 </div>
               )}
 

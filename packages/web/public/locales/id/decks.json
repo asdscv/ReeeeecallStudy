@@ -171,5 +171,40 @@
   "studyLevel": {
     "label": "Tingkat belajar",
     "none": "Tidak ditentukan"
+  },
+  "quickCreate": {
+    "button": "Buat Cepat",
+    "title": "Buat Cepat",
+    "deckName": "Nama Dek",
+    "deckNamePlaceholder": "mis., HSK Level 5",
+    "template": "Jenis Kartu",
+    "cards": "Kartu",
+    "addRow": "+ Tambah kartu",
+    "removeRow": "Hapus",
+    "cancel": "Batal",
+    "create": "Buat",
+    "creating": "Membuat...",
+    "presets": {
+      "basic": "Dasar (Depan / Belakang)",
+      "english": "Kata Bahasa Inggris",
+      "chinese": "Kata Bahasa Mandarin"
+    },
+    "fields": {
+      "front": "Depan",
+      "back": "Belakang",
+      "word": "Kata",
+      "meaning": "Arti",
+      "pronunciation": "Pelafalan",
+      "example": "Contoh",
+      "hanzi": "Hanzi",
+      "pinyin": "Pinyin",
+      "audio": "Audio"
+    },
+    "errors": {
+      "nameRequired": "Silakan masukkan nama dek.",
+      "templateRequired": "Silakan pilih jenis kartu.",
+      "cardsRequired": "Silakan tambahkan setidaknya satu kartu.",
+      "createFailed": "Gagal membuat dek. Silakan coba lagi."
+    }
   }
 }

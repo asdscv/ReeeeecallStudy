@@ -286,5 +286,6 @@
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados."
   },
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "loading": "Cargando..."
 }

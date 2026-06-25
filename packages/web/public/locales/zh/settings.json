@@ -111,7 +111,9 @@
     "created": "创建时间：{{date}}",
     "noKeys": "尚未生成 API 密钥。",
     "noKey": "尚未生成 API 密钥。",
-    "securityNote": "出于安全考虑，无法再次查看"
+    "securityNote": "出于安全考虑，无法再次查看",
+    "showOnceWarning": "此密钥不会再次显示，请立即复制并妥善保管。",
+    "unrecoverable": "此密钥无法在本设备上找回。如果丢失，请删除此密钥并重新生成。"
   },
   "aiProvider": {
     "title": "AI 提供商",

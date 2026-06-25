@@ -48,7 +48,9 @@
     "layoutDefault": "Default",
     "layoutDefaultDesc": "Style + font size based",
     "layoutCustom": "Custom HTML",
-    "layoutCustomDesc": "AI generates styled HTML"
+    "layoutCustomDesc": "AI generates styled HTML",
+    "cardCountPlaceholder": "{{min}}–{{max}}",
+    "cardCountHint": "{{min}}–{{max}} thẻ"
   },
   "wizard": {
     "setup": "Setup",
@@ -85,7 +87,31 @@
     "next": "Next",
     "save": "Save {{count}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
-    "removeCard": "Remove"
+    "removeCard": "Remove",
+    "tts": {
+      "off": "Tắt TTS",
+      "langs": {
+        "ko-KR": "Tiếng Hàn",
+        "en-US": "Tiếng Anh (Mỹ)",
+        "ja-JP": "Tiếng Nhật",
+        "zh-CN": "Tiếng Trung (giản thể)",
+        "zh-TW": "Tiếng Trung (phồn thể)",
+        "es-ES": "Tiếng Tây Ban Nha",
+        "fr-FR": "Tiếng Pháp",
+        "de-DE": "Tiếng Đức",
+        "vi-VN": "Tiếng Việt",
+        "th-TH": "Tiếng Thái"
+      }
+    },
+    "layout": {
+      "auto": "tự động",
+      "styles": {
+        "primary": "Chính",
+        "secondary": "Phụ",
+        "hint": "Gợi ý",
+        "detail": "Chi tiết"
+      }
+    }
   },
   "done": {
     "title": "Generation Complete!",
@@ -106,7 +132,8 @@
     "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "serverError": "Lỗi máy chủ AI. Vui lòng thử lại sau."
   },
   "button": {
     "aiGenerate": "AI Generate",

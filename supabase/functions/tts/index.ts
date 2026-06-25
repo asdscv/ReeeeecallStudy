@@ -53,7 +53,7 @@ function buildSSML(text: string, voice: string, rate: number, pitch: number): st
   const pitchStr = pitch >= 1 ? `+${Math.round((pitch - 1) * 50)}Hz` : `-${Math.round((1 - pitch) * 50)}Hz`
 
   return `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>
-    <voice name='${voice}'>
+    <voice name='${escapeSSML(voice)}'>
       <prosody rate='${rateStr}' pitch='${pitchStr}'>
         ${escapeSSML(text)}
       </prosody>
@@ -203,6 +203,21 @@ Deno.serve(async (req) => {
     if (text.length > MAX_TEXT_LENGTH) {
       return new Response(JSON.stringify({ error: `text too long (max ${MAX_TEXT_LENGTH})` }), {
         status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Per-user daily quota (cost-abuse protection — migration 101). Runs as the
+    // authenticated user (RPC keys on auth.uid()); raises → 429 when over budget.
+    const sbUser = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } },
+    )
+    const { error: quotaErr } = await sbUser.rpc('record_tts_usage', { p_chars: text.length })
+    if (quotaErr) {
+      return new Response(JSON.stringify({ error: 'TTS daily quota exceeded' }), {
+        status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

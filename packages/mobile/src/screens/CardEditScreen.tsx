@@ -7,6 +7,9 @@ import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
+import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import type { CardTemplate } from '@reeeeecall/shared/types/database'
+import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'CardEdit'>
@@ -19,14 +22,23 @@ export function CardEditScreen() {
   const route = useRoute<Route>()
   const { deckId, cardId } = route.params
 
-  const { decks, templates } = useDecks()
+  const { decks, templates, updateDeck } = useDecks()
+  const { ensureDefaultTemplates } = useDeckStore()
   const { cards, createCard, updateCard } = useCards(deckId)
 
   const deck = decks.find((d) => d.id === deckId)
   const card = cardId ? cards.find((c) => c.id === cardId) : null
   const isEditing = !!card
 
-  const template = templates.find((t) => t.id === (card?.template_id ?? deck?.default_template_id))
+  // Template resolved from the loaded list (card's own, then deck's default).
+  const listTemplate = templates.find((t) => t.id === (card?.template_id ?? deck?.default_template_id))
+  // A template adopted up-front when the deck has none (heal-before-render). This
+  // ensures the entry form renders the REAL field keys (field_1/field_2/…) the
+  // values get persisted under — otherwise a positional front/back fallback form
+  // would write to keys that don't match the adopted template, and the card would
+  // re-open blank.
+  const [healedTemplate, setHealedTemplate] = useState<CardTemplate | null>(null)
+  const template = listTemplate ?? healedTemplate
   const fields = template?.fields ?? []
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(
@@ -34,6 +46,17 @@ export function CardEditScreen() {
   )
   const [tags, setTags] = useState(card?.tags?.join(', ') ?? '')
   const [saving, setSaving] = useState(false)
+
+  // Current user id — used to scope the default-template fallback to the user's
+  // OWN templates. card_templates RLS also returns a subscribed publisher's
+  // is_default templates; adopting one as this deck's default breaks if the
+  // share is later revoked, so we never fall back to a non-owned template.
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  useEffect(() => {
+    getMobileSupabase().auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id)
+    })
+  }, [])
 
   // Reset form when card changes
   useEffect(() => {
@@ -43,11 +66,72 @@ export function CardEditScreen() {
     }
   }, [card])
 
+  // Heal-before-render: in create mode, if the deck has no resolvable template,
+  // seed defaults + adopt the first default + persist it on the deck up front,
+  // then set it into state so the form renders the real template fields (and the
+  // user types into the correct field keys). Save-time resolveTemplateId() stays
+  // as a fallback but is no longer the primary path.
+  useEffect(() => {
+    if (isEditing) return // editing an existing card always has its own template
+    if (listTemplate || healedTemplate) return // already resolved
+    let active = true
+    ;(async () => {
+      await ensureDefaultTemplates()
+      const seeded = useDeckStore.getState().templates
+      // Scope the fallback to the user's OWN templates: a subscribed publisher's
+      // is_default template (also visible via RLS) must never become this deck's
+      // default — it vanishes if the share is revoked.
+      const fallback =
+        seeded.find((t) => t.is_default && t.user_id === currentUserId) ??
+        seeded.find((t) => t.user_id === currentUserId)
+      if (!fallback || !active) return
+      // Persist on the deck so future cards resolve a template without re-healing.
+      if (deck && !deck.default_template_id) {
+        await updateDeck(deckId, { default_template_id: fallback.id })
+      }
+      if (active) setHealedTemplate(fallback)
+    })()
+    return () => {
+      active = false
+    }
+    // deckId keys the heal; deck/listTemplate update as the stores load.
+  }, [isEditing, listTemplate, healedTemplate, deck, deckId, ensureDefaultTemplates, updateDeck, currentUserId])
+
   const setField = (key: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [key]: value }))
   }
 
   const hasContent = Object.values(fieldValues).some((v) => v.trim())
+
+  /**
+   * Resolve a non-empty template id for new cards (save-time fallback).
+   *
+   * The mount-time heal effect normally resolves the template before render, so
+   * this is a backstop for the rare case it hasn't completed yet. cards.template_id
+   * is NOT NULL, so submitting '' (which happened when a deck had no default
+   * template — e.g. pre-036 signup bug, or a deck created with default_template_id
+   * null) FK-violated and dead-ended card creation. Guard it: if no template
+   * resolves, self-heal the account's default templates, adopt the first one, and
+   * persist it as this deck's default so it sticks for next time.
+   */
+  const resolveTemplateId = async (): Promise<string | null> => {
+    if (template?.id) return template.id
+    // No template on the card/deck — seed defaults and pick the first one.
+    await ensureDefaultTemplates()
+    const seeded = useDeckStore.getState().templates
+    // Scope the fallback to the user's OWN templates (see heal effect above): a
+    // subscribed publisher's is_default template must never become this deck's
+    // default — it would FK-dangle if the share is later revoked.
+    const fallback =
+      seeded.find((t) => t.is_default && t.user_id === currentUserId) ??
+      seeded.find((t) => t.user_id === currentUserId)
+    if (!fallback) return null
+    // Persist on the deck so future cards resolve a template without re-healing.
+    if (deck && !deck.default_template_id) {
+      await updateDeck(deckId, { default_template_id: fallback.id })
+    }
+    return fallback.id
+  }
 
   const handleSave = async () => {
     if (!hasContent) {
@@ -65,9 +149,14 @@ export function CardEditScreen() {
           tags: parsedTags,
         })
       } else {
+        const resolvedTemplateId = await resolveTemplateId()
+        if (!resolvedTemplateId) {
+          Alert.alert('Error', 'No card template available')
+          return
+        }
         await createCard({
           deck_id: deckId,
-          template_id: template?.id ?? '',
+          template_id: resolvedTemplateId,
           field_values: fieldValues,
           tags: parsedTags.length > 0 ? parsedTags : undefined,
         })
@@ -160,9 +249,14 @@ export function CardEditScreen() {
               setSaving(true)
               try {
                 const parsedTags = tags.split(',').map((t) => t.trim()).filter(Boolean)
+                const resolvedTemplateId = await resolveTemplateId()
+                if (!resolvedTemplateId) {
+                  Alert.alert('Error', 'No card template available')
+                  return
+                }
                 await createCard({
                   deck_id: deckId,
-                  template_id: template?.id ?? '',
+                  template_id: resolvedTemplateId,
                   field_values: fieldValues,
                   tags: parsedTags.length > 0 ? parsedTags : undefined,
                 })

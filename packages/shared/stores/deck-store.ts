@@ -31,6 +31,13 @@ interface DeckState {
   fetchDecks: (opts?: { force?: boolean }) => Promise<void>
   fetchStats: (userId: string, opts?: { force?: boolean }) => Promise<void>
   fetchTemplates: (opts?: { force?: boolean }) => Promise<void>
+  /**
+   * Guarantee the current user has the default card templates, then refetch.
+   * Self-heals accounts created before migration 036 whose signup trigger
+   * silently failed and left them with zero templates (the "must create a
+   * template before adding a card" dead-end). Idempotent; safe to call often.
+   */
+  ensureDefaultTemplates: () => Promise<void>
   /** Drop cached freshness so the next fetch hits the network. Omit key → all. */
   invalidate: (key?: DeckCacheKey) => void
   createDeck: (data: {
@@ -136,6 +143,16 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     }
   },
 
+  ensureDefaultTemplates: async () => {
+    // ensure_default_templates() (migration 097) is idempotent and seeds the
+    // canonical defaults only when the user has none. Best-effort: swallow the
+    // RPC error instead of writing to the shared store.error (it has no reliable
+    // clear path and would surface a stale error elsewhere); the picker falls
+    // back to whatever templates already exist. Refetch regardless.
+    await supabase.rpc('ensure_default_templates')
+    await get().fetchTemplates({ force: true })
+  },
+
   createDeck: async (input) => {
     const check = guard.check('deck_create', 'decks_total')
     if (!check.allowed) { set({ error: check.message ?? 'errors:deck.rateLimitReached' }); return null }
@@ -146,8 +163,14 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     // 템플릿 미지정 시 첫 번째 기본 템플릿 사용
     let templateId = input.default_template_id
     if (!templateId) {
-      const { templates } = get()
-      const defaultTemplate = templates.find((t) => t.is_default)
+      let defaultTemplate = get().templates.find((t) => t.is_default && t.user_id === user.id)
+      if (!defaultTemplate) {
+        // Account may be missing its default templates (pre-036 signup bug).
+        // Seed them and retry so the new deck never ends up template-less —
+        // otherwise adding a card would dead-end with "no template set".
+        await get().ensureDefaultTemplates()
+        defaultTemplate = get().templates.find((t) => t.is_default && t.user_id === user.id)
+      }
       templateId = defaultTemplate?.id
     }
 

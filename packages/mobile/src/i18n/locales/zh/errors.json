@@ -10,5 +10,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "获取牌组失败，请重试。"
+  },
+  "rateLimit": {
+    "tooFast": "请求过于频繁，请在 {{seconds}} 秒后重试。"
+  },
+  "quota": {
+    "limitReached": "{{resource}} 已达上限 ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "每日 API 请求",
+      "storage_bytes": "存储空间",
+      "cards_total": "卡片总数",
+      "decks_total": "牌组总数",
+      "templates_total": "模板总数",
+      "study_sessions_daily": "每日学习次数",
+      "file_uploads_daily": "每日文件上传"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "无法向只读牌组添加卡片。",
+    "readonlyDeckNoEdit": "无法修改只读牌组中的卡片。",
+    "rateLimitReached": "已达请求限制。"
+  },
+  "deck": {
+    "rateLimitReached": "已达请求限制。"
   }
 }

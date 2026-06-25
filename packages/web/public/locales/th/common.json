@@ -286,5 +286,6 @@
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy สงวนลิขสิทธิ์"
   },
-  "cancel": "ยกเลิก"
+  "cancel": "ยกเลิก",
+  "loading": "กำลังโหลด..."
 }

@@ -152,5 +152,40 @@
     "errorTitle": "오류",
     "emptyError": "최소 한 개의 필드를 입력해 주세요",
     "saveError": "카드 저장에 실패했습니다"
+  },
+  "quickCreate": {
+    "button": "간편 만들기",
+    "title": "간편 만들기",
+    "deckName": "덱 이름",
+    "deckNamePlaceholder": "예: HSK 5급",
+    "template": "카드 유형",
+    "cards": "카드",
+    "addRow": "+ 카드 추가",
+    "removeRow": "삭제",
+    "cancel": "취소",
+    "create": "만들기",
+    "creating": "만드는 중...",
+    "presets": {
+      "basic": "기본 (앞 / 뒤)",
+      "english": "영어 단어",
+      "chinese": "중국어 단어"
+    },
+    "fields": {
+      "front": "앞면",
+      "back": "뒷면",
+      "word": "단어",
+      "meaning": "뜻",
+      "pronunciation": "발음",
+      "example": "예문",
+      "hanzi": "한자",
+      "pinyin": "병음",
+      "audio": "오디오"
+    },
+    "errors": {
+      "nameRequired": "덱 이름을 입력하세요.",
+      "templateRequired": "카드 유형을 선택하세요.",
+      "cardsRequired": "카드를 하나 이상 추가하세요.",
+      "createFailed": "덱 생성에 실패했습니다. 다시 시도하세요."
+    }
   }
 }

@@ -111,7 +111,9 @@
     "created": "Creada: {{date}}",
     "noKeys": "No se ha generado clave API.",
     "noKey": "No se ha generado clave API.",
-    "securityNote": "No se puede ver de nuevo por seguridad"
+    "securityNote": "No se puede ver de nuevo por seguridad",
+    "showOnceWarning": "Esta clave no se volverá a mostrar: cópiala ahora y guárdala de forma segura.",
+    "unrecoverable": "Esta clave no se puede recuperar en este dispositivo. Si la perdiste, elimínala y genera una nueva."
   },
   "aiProvider": {
     "title": "Proveedores de IA",

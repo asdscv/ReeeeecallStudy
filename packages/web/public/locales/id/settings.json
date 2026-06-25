@@ -111,7 +111,9 @@
     "created": "Dibuat: {{date}}",
     "noKeys": "Belum ada kunci API yang dibuat.",
     "noKey": "Belum ada kunci API yang dibuat.",
-    "securityNote": "Tidak dapat dilihat lagi demi keamanan"
+    "securityNote": "Tidak dapat dilihat lagi demi keamanan",
+    "showOnceWarning": "Kunci ini tidak akan ditampilkan lagi — salin sekarang dan simpan dengan aman.",
+    "unrecoverable": "Kunci ini tidak dapat dipulihkan di perangkat ini. Jika hilang, hapus kunci ini dan buat yang baru."
   },
   "aiProvider": {
     "title": "Penyedia AI",

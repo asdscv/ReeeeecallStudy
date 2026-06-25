@@ -192,5 +192,6 @@
     "reclaiming": "Đang khôi phục phiên…",
     "logout": "Đăng xuất",
     "hint": "Chỉ có thể dùng một thiết bị tại một thời điểm"
-  }
+  },
+  "loading": "Đang tải..."
 }

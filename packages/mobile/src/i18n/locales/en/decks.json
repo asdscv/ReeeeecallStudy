@@ -152,5 +152,40 @@
     "errorTitle": "Error",
     "emptyError": "At least one field must have content",
     "saveError": "Failed to save card"
+  },
+  "quickCreate": {
+    "button": "Quick Create",
+    "title": "Quick Create",
+    "deckName": "Deck Name",
+    "deckNamePlaceholder": "e.g., HSK Level 5",
+    "template": "Card Type",
+    "cards": "Cards",
+    "addRow": "+ Add card",
+    "removeRow": "Remove",
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating...",
+    "presets": {
+      "basic": "Basic (Front / Back)",
+      "english": "English Word",
+      "chinese": "Chinese Word"
+    },
+    "fields": {
+      "front": "Front",
+      "back": "Back",
+      "word": "Word",
+      "meaning": "Meaning",
+      "pronunciation": "Pronunciation",
+      "example": "Example",
+      "hanzi": "Hanzi",
+      "pinyin": "Pinyin",
+      "audio": "Audio"
+    },
+    "errors": {
+      "nameRequired": "Please enter a deck name.",
+      "templateRequired": "Please choose a card type.",
+      "cardsRequired": "Please add at least one card.",
+      "createFailed": "Failed to create deck. Please try again."
+    }
   }
 }

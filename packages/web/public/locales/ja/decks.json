@@ -171,5 +171,40 @@
   "studyLevel": {
     "label": "学習レベル",
     "none": "未指定"
+  },
+  "quickCreate": {
+    "button": "かんたん作成",
+    "title": "かんたん作成",
+    "deckName": "デッキ名",
+    "deckNamePlaceholder": "例：HSK 5級",
+    "template": "カードタイプ",
+    "cards": "カード",
+    "addRow": "+ カードを追加",
+    "removeRow": "削除",
+    "cancel": "キャンセル",
+    "create": "作成",
+    "creating": "作成中...",
+    "presets": {
+      "basic": "基本（表 / 裏）",
+      "english": "英単語",
+      "chinese": "中国語単語"
+    },
+    "fields": {
+      "front": "表",
+      "back": "裏",
+      "word": "単語",
+      "meaning": "意味",
+      "pronunciation": "発音",
+      "example": "例文",
+      "hanzi": "漢字",
+      "pinyin": "ピンイン",
+      "audio": "音声"
+    },
+    "errors": {
+      "nameRequired": "デッキ名を入力してください。",
+      "templateRequired": "カードタイプを選択してください。",
+      "cardsRequired": "カードを1枚以上追加してください。",
+      "createFailed": "デッキの作成に失敗しました。もう一度お試しください。"
+    }
   }
 }

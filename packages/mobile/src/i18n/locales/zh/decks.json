@@ -152,5 +152,40 @@
     "errorTitle": "错误",
     "emptyError": "至少需要填写一个字段",
     "saveError": "保存卡片失败"
+  },
+  "quickCreate": {
+    "button": "快速创建",
+    "title": "快速创建",
+    "deckName": "卡组名称",
+    "deckNamePlaceholder": "例如：HSK 5级",
+    "template": "卡片类型",
+    "cards": "卡片",
+    "addRow": "+ 添加卡片",
+    "removeRow": "删除",
+    "cancel": "取消",
+    "create": "创建",
+    "creating": "创建中...",
+    "presets": {
+      "basic": "基础 (正面 / 背面)",
+      "english": "英语单词",
+      "chinese": "中文单词"
+    },
+    "fields": {
+      "front": "正面",
+      "back": "背面",
+      "word": "单词",
+      "meaning": "释义",
+      "pronunciation": "发音",
+      "example": "例句",
+      "hanzi": "汉字",
+      "pinyin": "拼音",
+      "audio": "音频"
+    },
+    "errors": {
+      "nameRequired": "请输入卡组名称。",
+      "templateRequired": "请选择卡片类型。",
+      "cardsRequired": "请至少添加一张卡片。",
+      "createFailed": "创建卡组失败，请重试。"
+    }
   }
 }
