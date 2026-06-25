@@ -117,7 +117,12 @@ jobs:
           cache: 'pnpm'
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned: CLI 2.107.0 stopped granting default DML (SELECT/INSERT/UPDATE/
+          # DELETE) to anon/authenticated on `db reset`, breaking integration grants
+          # (e.g. acquire_listing → "permission denied for table deck_shares").
+          # Prod + the migrations themselves are unaffected (verified); this keeps
+          # the local test DB's role grants correct.
+          version: 2.95.4
       - run: pnpm install --frozen-lockfile
 
       - name: Start Supabase (local stack via Docker)
@@ -185,7 +190,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned: CLI 2.107.0 stopped granting default DML (SELECT/INSERT/UPDATE/
+          # DELETE) to anon/authenticated on `db reset`, breaking integration grants
+          # (e.g. acquire_listing → "permission denied for table deck_shares").
+          # Prod + the migrations themselves are unaffected (verified); this keeps
+          # the local test DB's role grants correct.
+          version: 2.95.4
       - name: Reset DB with all migrations
         run: |
           supabase start
