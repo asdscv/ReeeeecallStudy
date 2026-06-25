@@ -124,6 +124,8 @@ export function DeckDetailPage() {
       }
       setDeck(typedDeck)
 
+      const { data: { user } } = await supabase.auth.getUser()
+
       if (typedDeck.default_template_id) {
         const { data: tmpl } = await supabase
           .from('card_templates')
@@ -131,12 +133,40 @@ export function DeckDetailPage() {
           .eq('id', typedDeck.default_template_id)
           .single()
         setTemplate(tmpl as CardTemplate | null)
+      } else if (user && typedDeck.user_id === user.id && !typedDeck.is_readonly) {
+        // Self-heal legacy OWNED decks left without a default template (accounts
+        // whose signup trigger failed pre-036). Guarantee defaults exist, adopt
+        // the first, and persist it so "Add Card" never dead-ends with no fields.
+        // Guarded to the deck OWNER (not just !is_readonly): a subscribed deck is
+        // the publisher's row (user_id = publisher), so a write here would be
+        // silently rejected by RLS and the state would never converge.
+        await supabase.rpc('ensure_default_templates')
+        const { data: tmpl } = await supabase
+          .from('card_templates')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_default', true)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+        if (tmpl) {
+          const healedId = (tmpl as CardTemplate).id
+          const { error: healErr } = await supabase
+            .from('decks')
+            .update({ default_template_id: healedId } as Record<string, unknown>)
+            .eq('id', typedDeck.id)
+          // Only adopt locally once the write actually persisted, so UI state
+          // never diverges from the DB.
+          if (!healErr) {
+            setTemplate(tmpl as CardTemplate)
+            setDeck({ ...typedDeck, default_template_id: healedId })
+          }
+        }
       }
 
       await fetchCards(deckId)
 
-      // Check if this is a subscribed deck
-      const { data: { user } } = await supabase.auth.getUser()
+      // Check if this is a subscribed deck (reuse the user fetched above)
       if (user) {
         const { data: shareData } = await supabase
           .from('deck_shares')

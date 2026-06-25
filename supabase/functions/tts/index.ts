@@ -53,7 +53,7 @@ function buildSSML(text: string, voice: string, rate: number, pitch: number): st
   const pitchStr = pitch >= 1 ? `+${Math.round((pitch - 1) * 50)}Hz` : `-${Math.round((1 - pitch) * 50)}Hz`
 
   return `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>
-    <voice name='${voice}'>
+    <voice name='${escapeSSML(voice)}'>
       <prosody rate='${rateStr}' pitch='${pitchStr}'>
         ${escapeSSML(text)}
       </prosody>

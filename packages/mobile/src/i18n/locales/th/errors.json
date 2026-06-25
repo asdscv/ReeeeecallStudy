@@ -10,5 +10,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "ไม่สามารถรับสำรับได้ กรุณาลองอีกครั้ง"
+  },
+  "rateLimit": {
+    "tooFast": "มีคำขอมากเกินไป ลองอีกครั้งใน {{seconds}} วินาที"
+  },
+  "quota": {
+    "limitReached": "{{resource}} ถึงขีดจำกัดแล้ว ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "คำขอ API รายวัน",
+      "storage_bytes": "พื้นที่จัดเก็บ",
+      "cards_total": "การ์ดทั้งหมด",
+      "decks_total": "สำรับทั้งหมด",
+      "templates_total": "เทมเพลตทั้งหมด",
+      "study_sessions_daily": "เซสชันการเรียนรายวัน",
+      "file_uploads_daily": "การอัปโหลดไฟล์รายวัน"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "ไม่สามารถเพิ่มการ์ดในสำรับแบบอ่านอย่างเดียว",
+    "readonlyDeckNoEdit": "ไม่สามารถแก้ไขการ์ดในสำรับแบบอ่านอย่างเดียว",
+    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว"
+  },
+  "deck": {
+    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว"
   }
 }

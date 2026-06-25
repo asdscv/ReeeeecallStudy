@@ -41,6 +41,7 @@ export type DecksStackParamList = {
   DecksList: undefined
   DeckDetail: { deckId: string }
   DeckEdit: { deckId?: string }              // undefined = 새 덱 생성
+  QuickCreate: undefined                      // 간편 만들기 (이름+프리셋+카드 한 화면)
   CardEdit: { deckId: string; cardId?: string } // undefined = 새 카드 생성
   ImportExport: { deckId: string }
   PublishDeck: { deckId: string }

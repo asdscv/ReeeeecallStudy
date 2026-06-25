@@ -48,7 +48,9 @@
     "layoutDefault": "기본",
     "layoutDefaultDesc": "스타일 + 폰트 크기 기반",
     "layoutCustom": "커스텀 HTML",
-    "layoutCustomDesc": "AI가 스타일된 HTML 생성"
+    "layoutCustomDesc": "AI가 스타일된 HTML 생성",
+    "cardCountPlaceholder": "{{min}}–{{max}}",
+    "cardCountHint": "{{min}}–{{max}}장"
   },
   "wizard": {
     "setup": "설정",
@@ -85,7 +87,31 @@
     "next": "다음",
     "save": "{{count}}장 저장",
     "editTip": "저장 후 템플릿 편집 페이지에서 더 자세히 수정할 수 있습니다.",
-    "removeCard": "삭제"
+    "removeCard": "삭제",
+    "tts": {
+      "off": "TTS 끔",
+      "langs": {
+        "ko-KR": "한국어",
+        "en-US": "영어 (미국)",
+        "ja-JP": "일본어",
+        "zh-CN": "중국어 (간체)",
+        "zh-TW": "중국어 (번체)",
+        "es-ES": "스페인어",
+        "fr-FR": "프랑스어",
+        "de-DE": "독일어",
+        "vi-VN": "베트남어",
+        "th-TH": "태국어"
+      }
+    },
+    "layout": {
+      "auto": "자동",
+      "styles": {
+        "primary": "주요",
+        "secondary": "보조",
+        "hint": "힌트",
+        "detail": "상세"
+      }
+    }
   },
   "done": {
     "title": "생성 완료!",
@@ -106,7 +132,8 @@
     "networkError": "네트워크 오류입니다. CORS 문제일 수 있습니다 — 다른 프로바이더를 시도하거나 API 키를 확인해주세요.",
     "description": "생성 중 문제가 발생했습니다. 다시 시도해주세요.",
     "back": "돌아가기",
-    "retry": "다시 시도"
+    "retry": "다시 시도",
+    "serverError": "AI 서버 오류입니다. 잠시 후 다시 시도해주세요."
   },
   "button": {
     "aiGenerate": "AI로 만들기",

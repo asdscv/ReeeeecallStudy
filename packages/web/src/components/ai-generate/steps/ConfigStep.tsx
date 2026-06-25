@@ -371,9 +371,9 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               setCardCount(Math.max(1, Math.min(100, n)))
             }}
             className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
-            placeholder="1–100"
+            placeholder={t('config.cardCountPlaceholder', { min: 1, max: 100 })}
           />
-          <p className="text-xs text-content-tertiary mt-1">1–100 cards</p>
+          <p className="text-xs text-content-tertiary mt-1">{t('config.cardCountHint', { min: 1, max: 100 })}</p>
         </div>
       </fieldset>
 

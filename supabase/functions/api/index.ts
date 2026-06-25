@@ -19,6 +19,15 @@ async function hashKey(key: string): Promise<string> {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+// Logs the real DB error server-side and returns a generic client-facing payload.
+// Avoids leaking raw Postgres error.message to API consumers (keeps `code` for branching).
+function dbError(context: string, err: { message?: string } | null): {
+  error: { code: string; message: string }
+} {
+  console.error(`[api] DB error (${context}):`, err?.message ?? err)
+  return { error: { code: 'DB_ERROR', message: 'Database error' } }
+}
+
 // ─── Zod Schemas ──────────────────────────────────────────────
 
 // Common
@@ -621,7 +630,7 @@ app.openapi(listDecksRoute, async (c) => {
     .eq('is_archived', false)
     .order('sort_order', { ascending: true })
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('listDecks', error), 500)
   return c.json({ data: data ?? [] }, 200)
 })
 
@@ -630,6 +639,18 @@ app.openapi(createDeckRoute, async (c) => {
   const userId = c.get('userId')
   const sb = c.get('supabase')
   const body = c.req.valid('json')
+
+  // Verify referenced template (if any) belongs to the caller — service-role
+  // insert bypasses RLS, and the FK only checks existence, not ownership.
+  if (body.default_template_id) {
+    const { data: tmpl } = await sb
+      .from('card_templates')
+      .select('id')
+      .eq('id', body.default_template_id)
+      .eq('user_id', userId)
+      .single()
+    if (!tmpl) return c.json({ error: { code: 'NOT_FOUND', message: 'Template not found' } }, 404)
+  }
 
   const { data: deck, error } = await sb
     .from('decks')
@@ -645,7 +666,7 @@ app.openapi(createDeckRoute, async (c) => {
     .select('id, name, description, color, icon, is_archived, srs_settings, created_at, updated_at')
     .single()
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('createDeck', error), 500)
   return c.json({ data: deck }, 201)
 })
 
@@ -726,7 +747,7 @@ app.openapi(listCardsRoute, async (c) => {
     .order('sort_position', { ascending: true })
     .range(from, to)
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('listCards', error), 500)
 
   return c.json({
     data: cards ?? [],
@@ -776,7 +797,7 @@ app.openapi(deleteCardRoute, async (c) => {
     .eq('id', cardId)
     .eq('user_id', userId)
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('deleteCard', error), 500)
   return c.json({ data: { deleted: true } }, 200)
 })
 
@@ -799,6 +820,18 @@ app.openapi(createCardsRoute, async (c) => {
   // Normalize to array
   const items: any[] = Array.isArray(body) ? body : [body]
 
+  // Verify every referenced template belongs to the caller — service-role
+  // insert bypasses RLS, and the FK only checks existence, not ownership.
+  const templateIds = [...new Set(items.map((item: any) => item.template_id))]
+  const { data: ownedTemplates } = await sb
+    .from('card_templates')
+    .select('id')
+    .in('id', templateIds)
+    .eq('user_id', userId)
+  if (!ownedTemplates || ownedTemplates.length !== templateIds.length) {
+    return c.json({ error: { code: 'NOT_FOUND', message: 'Template not found' } }, 404)
+  }
+
   // Build insert rows
   let pos = deck.next_position as number
   const rows = items.map((item: any) => ({
@@ -815,7 +848,7 @@ app.openapi(createCardsRoute, async (c) => {
     .insert(rows)
     .select()
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('createCards', error), 500)
 
   // Update deck.next_position
   await sb
@@ -837,7 +870,7 @@ app.openapi(listTemplatesRoute, async (c) => {
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('listTemplates', error), 500)
   return c.json({ data: data ?? [] }, 200)
 })
 
@@ -876,7 +909,7 @@ app.openapi(createTemplateRoute, async (c) => {
     .select()
     .single()
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('createTemplate', error), 500)
   return c.json({ data }, 201)
 })
 
@@ -915,7 +948,7 @@ app.openapi(updateTemplateRoute, async (c) => {
     .select()
     .single()
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('updateTemplate', error), 500)
   return c.json({ data }, 200)
 })
 
@@ -950,7 +983,7 @@ app.openapi(deleteTemplateRoute, async (c) => {
     .eq('id', templateId)
     .eq('user_id', userId)
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('deleteTemplate', error), 500)
   return c.json({ data: { deleted: true } }, 200)
 })
 
@@ -1153,7 +1186,7 @@ app.openapi(listMarketplaceRoute, async (c) => {
     .eq('is_active', true)
     .order('created_at', { ascending: false })
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('listMarketplace', error), 500)
   return c.json({ data: data ?? [] }, 200)
 })
 
@@ -1166,6 +1199,7 @@ app.openapi(getMarketplaceRoute, async (c) => {
     .from('marketplace_listings')
     .select('*')
     .eq('id', listingId)
+    .eq('is_active', true)
     .single()
 
   if (error || !data) return c.json({ error: { code: 'NOT_FOUND', message: 'Listing not found' } }, 404)
@@ -1201,7 +1235,7 @@ app.openapi(createMarketplaceRoute, async (c) => {
     .select()
     .single()
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('createMarketplace', error), 500)
   return c.json({ data }, 201)
 })
 
@@ -1215,7 +1249,7 @@ app.openapi(deleteMarketplaceRoute, async (c) => {
   if (!listing) return c.json({ error: { code: 'NOT_FOUND', message: 'Listing not found' } }, 404)
 
   const { error } = await sb.from('marketplace_listings').update({ is_active: false }).eq('id', listingId)
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('deleteMarketplace', error), 500)
   return c.json({ data: { deleted: true } }, 200)
 })
 
@@ -1252,7 +1286,7 @@ app.openapi(createShareRoute, async (c) => {
     .select()
     .single()
 
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('createShare', error), 500)
   return c.json({ data }, 201)
 })
 
@@ -1285,7 +1319,7 @@ app.openapi(acceptShareRoute, async (c) => {
     const { data: newDeckId, error: rpcError } = await sb.rpc('copy_deck_for_user', {
       p_source_deck_id: share.deck_id, p_recipient_id: userId, p_is_readonly: isReadonly, p_share_mode: share.share_mode,
     })
-    if (rpcError) return c.json({ error: { code: 'DB_ERROR', message: rpcError.message } }, 500)
+    if (rpcError) return c.json(dbError('acceptShare', rpcError), 500)
     deckId = newDeckId
     await sb.from('deck_shares').update({ recipient_id: userId, status: 'active', accepted_at: new Date().toISOString(), copied_deck_id: newDeckId }).eq('id', share.id)
   }
@@ -1322,7 +1356,7 @@ app.openapi(deleteShareRoute, async (c) => {
   }
 
   const { error } = await sb.from('deck_shares').update({ status: 'revoked' }).eq('id', shareId)
-  if (error) return c.json({ error: { code: 'DB_ERROR', message: error.message } }, 500)
+  if (error) return c.json(dbError('deleteShare', error), 500)
   return c.json({ data: { deleted: true } }, 200)
 })
 

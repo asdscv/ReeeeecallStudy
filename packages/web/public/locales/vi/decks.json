@@ -171,5 +171,40 @@
   "studyLevel": {
     "label": "Trình độ học",
     "none": "Không xác định"
+  },
+  "quickCreate": {
+    "button": "Tạo nhanh",
+    "title": "Tạo nhanh",
+    "deckName": "Tên bộ thẻ",
+    "deckNamePlaceholder": "ví dụ: HSK Cấp 5",
+    "template": "Loại thẻ",
+    "cards": "Thẻ",
+    "addRow": "+ Thêm thẻ",
+    "removeRow": "Xóa",
+    "cancel": "Hủy",
+    "create": "Tạo",
+    "creating": "Đang tạo...",
+    "presets": {
+      "basic": "Cơ bản (Mặt trước / Mặt sau)",
+      "english": "Từ tiếng Anh",
+      "chinese": "Từ tiếng Trung"
+    },
+    "fields": {
+      "front": "Mặt trước",
+      "back": "Mặt sau",
+      "word": "Từ",
+      "meaning": "Nghĩa",
+      "pronunciation": "Phát âm",
+      "example": "Ví dụ",
+      "hanzi": "Chữ Hán",
+      "pinyin": "Bính âm",
+      "audio": "Âm thanh"
+    },
+    "errors": {
+      "nameRequired": "Vui lòng nhập tên bộ thẻ.",
+      "templateRequired": "Vui lòng chọn loại thẻ.",
+      "cardsRequired": "Vui lòng thêm ít nhất một thẻ.",
+      "createFailed": "Tạo bộ thẻ thất bại. Vui lòng thử lại."
+    }
   }
 }

@@ -171,5 +171,40 @@
   "studyLevel": {
     "label": "ระดับการเรียน",
     "none": "ไม่ระบุ"
+  },
+  "quickCreate": {
+    "button": "สร้างด่วน",
+    "title": "สร้างด่วน",
+    "deckName": "ชื่อสำรับ",
+    "deckNamePlaceholder": "เช่น HSK ระดับ 5",
+    "template": "ประเภทการ์ด",
+    "cards": "การ์ด",
+    "addRow": "+ เพิ่มการ์ด",
+    "removeRow": "ลบ",
+    "cancel": "ยกเลิก",
+    "create": "สร้าง",
+    "creating": "กำลังสร้าง...",
+    "presets": {
+      "basic": "พื้นฐาน (ด้านหน้า / ด้านหลัง)",
+      "english": "คำศัพท์ภาษาอังกฤษ",
+      "chinese": "คำศัพท์ภาษาจีน"
+    },
+    "fields": {
+      "front": "ด้านหน้า",
+      "back": "ด้านหลัง",
+      "word": "คำศัพท์",
+      "meaning": "ความหมาย",
+      "pronunciation": "การออกเสียง",
+      "example": "ตัวอย่างประโยค",
+      "hanzi": "อักษรจีน",
+      "pinyin": "พินอิน",
+      "audio": "เสียง"
+    },
+    "errors": {
+      "nameRequired": "กรุณากรอกชื่อสำรับ",
+      "templateRequired": "กรุณาเลือกประเภทการ์ด",
+      "cardsRequired": "กรุณาเพิ่มการ์ดอย่างน้อยหนึ่งใบ",
+      "createFailed": "สร้างสำรับไม่สำเร็จ กรุณาลองอีกครั้ง"
+    }
   }
 }

@@ -10,5 +10,28 @@
   "generic": "Something went wrong. Please try again.",
   "marketplace": {
     "acquireFailed": "Failed to acquire deck. Please try again."
+  },
+  "rateLimit": {
+    "tooFast": "Too many requests. Try again in {{seconds}}s."
+  },
+  "quota": {
+    "limitReached": "{{resource}} limit reached ({{current}}/{{limit}})",
+    "resources": {
+      "api_requests_daily": "Daily API requests",
+      "storage_bytes": "Storage",
+      "cards_total": "Total cards",
+      "decks_total": "Total decks",
+      "templates_total": "Total templates",
+      "study_sessions_daily": "Daily study sessions",
+      "file_uploads_daily": "Daily file uploads"
+    }
+  },
+  "card": {
+    "readonlyDeckNoAdd": "Cannot add cards to a read-only deck.",
+    "readonlyDeckNoEdit": "Cannot modify cards in a read-only deck.",
+    "rateLimitReached": "Request limit reached."
+  },
+  "deck": {
+    "rateLimitReached": "Request limit reached."
   }
 }
