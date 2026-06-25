@@ -50,7 +50,8 @@
     "layoutCustom": "Custom HTML",
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
-    "cardCountHint": "{{min}}–{{max}} การ์ด"
+    "cardCountHint": "{{min}}–{{max}} การ์ด",
+    "apiKeyNotice": "การสร้างด้วย AI ต้องใช้คีย์ API ของคุณเองสำหรับผู้ให้บริการแต่ละราย เพิ่มหรือจัดการคีย์ได้ในการตั้งค่า"
   },
   "wizard": {
     "setup": "Setup",

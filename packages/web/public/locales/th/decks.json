@@ -198,13 +198,19 @@
       "example": "ตัวอย่างประโยค",
       "hanzi": "อักษรจีน",
       "pinyin": "พินอิน",
-      "audio": "เสียง"
+      "audio": "เสียง",
+      "frontN": "หน้า {{n}}",
+      "backN": "หลัง {{n}}"
     },
     "errors": {
       "nameRequired": "กรุณากรอกชื่อสำรับ",
       "templateRequired": "กรุณาเลือกประเภทการ์ด",
       "cardsRequired": "กรุณาเพิ่มการ์ดอย่างน้อยหนึ่งใบ",
       "createFailed": "สร้างสำรับไม่สำเร็จ กรุณาลองอีกครั้ง"
-    }
+    },
+    "deckDescription": "คำอธิบาย (ไม่บังคับ)",
+    "deckDescriptionPlaceholder": "บันทึกสั้น ๆ เกี่ยวกับเด็คนี้",
+    "presetSummary": "หน้า {{front}} · หลัง {{back}}",
+    "basicLabel": "พื้นฐาน"
   }
 }

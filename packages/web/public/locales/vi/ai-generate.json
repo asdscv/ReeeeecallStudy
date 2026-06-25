@@ -50,7 +50,8 @@
     "layoutCustom": "Custom HTML",
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
-    "cardCountHint": "{{min}}–{{max}} thẻ"
+    "cardCountHint": "{{min}}–{{max}} thẻ",
+    "apiKeyNotice": "Tạo bằng AI yêu cầu khóa API riêng của bạn cho mỗi nhà cung cấp. Thêm hoặc quản lý khóa trong Cài đặt."
   },
   "wizard": {
     "setup": "Setup",

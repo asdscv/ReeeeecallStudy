@@ -50,7 +50,8 @@
     "layoutCustom": "커스텀 HTML",
     "layoutCustomDesc": "AI가 스타일된 HTML 생성",
     "cardCountPlaceholder": "{{min}}–{{max}}",
-    "cardCountHint": "{{min}}–{{max}}장"
+    "cardCountHint": "{{min}}–{{max}}장",
+    "apiKeyNotice": "AI 생성에는 프로바이더별 본인 API 키가 필요합니다. 설정에서 키를 추가·관리하세요."
   },
   "wizard": {
     "setup": "설정",

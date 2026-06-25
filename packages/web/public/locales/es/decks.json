@@ -198,13 +198,19 @@
       "example": "Ejemplo",
       "hanzi": "Hanzi",
       "pinyin": "Pinyin",
-      "audio": "Audio"
+      "audio": "Audio",
+      "frontN": "Anverso {{n}}",
+      "backN": "Reverso {{n}}"
     },
     "errors": {
       "nameRequired": "Por favor, introduce un nombre para el mazo.",
       "templateRequired": "Por favor, elige un tipo de tarjeta.",
       "cardsRequired": "Por favor, añade al menos una tarjeta.",
       "createFailed": "No se pudo crear el mazo. Inténtalo de nuevo."
-    }
+    },
+    "deckDescription": "Descripción (opcional)",
+    "deckDescriptionPlaceholder": "Una breve nota sobre este mazo",
+    "presetSummary": "Anverso {{front}} · Reverso {{back}}",
+    "basicLabel": "Básico"
   }
 }
