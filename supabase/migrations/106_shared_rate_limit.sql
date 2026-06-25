@@ -43,19 +43,22 @@ BEGIN
   v_window_start := to_timestamp(
     floor(extract(epoch FROM v_now) / p_window_seconds) * p_window_seconds);
 
-  -- 원자 증가 (행 잠금)
+  -- 원자 증가 (행 잠금). count는 limit+1에서 상한 → INTEGER 오버플로(→ fail-open)
+  -- 와 무한 증가 방지. limit+1 > limit 이므로 거부 판정은 그대로 유지.
   INSERT INTO api_rate_limits (key, window_start, count)
   VALUES (p_key, v_window_start, 1)
   ON CONFLICT (key, window_start)
-  DO UPDATE SET count = api_rate_limits.count + 1
+  DO UPDATE SET count = LEAST(api_rate_limits.count + 1, p_limit + 1)
   RETURNING count INTO v_count;
 
-  -- 이 키의 지난 윈도 정리(테이블 바운드 유지)
-  DELETE FROM api_rate_limits WHERE key = p_key AND window_start < v_window_start;
-  -- 가끔 전역 정리(비활성 키의 잔존 행 제거)
-  IF random() < 0.01 THEN
-    DELETE FROM api_rate_limits
-     WHERE window_start < v_window_start - make_interval(secs => p_window_seconds * 10);
+  -- 정리는 새 윈도의 첫 요청에서만(요청당 쓰기증폭/락경합 방지 — 키·윈도당 1회).
+  IF v_count = 1 THEN
+    DELETE FROM api_rate_limits WHERE key = p_key AND window_start < v_window_start;
+    -- 가끔 전역 정리(비활성 키 잔존 행 제거; pg_cron 미설치 환경 대비).
+    IF random() < 0.05 THEN
+      DELETE FROM api_rate_limits
+       WHERE window_start < v_window_start - make_interval(secs => p_window_seconds * 10);
+    END IF;
   END IF;
 
   IF v_count > p_limit THEN
