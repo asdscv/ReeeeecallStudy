@@ -72,9 +72,13 @@ export function QuickCreateScreen() {
 
   const emptyRows = () => Array.from({ length: INITIAL_ROWS }, () => ({}))
   const selectPreset = (id: string) => {
+    // Clear rows (field keys are reused with different meaning) AND reset the
+    // created template + deck ids: a deck created with the old shape before a
+    // later step failed must not be reused with the new shape's cards.
     setPresetId(id)
     setRows(emptyRows())
     setCreatedTemplateId(null)
+    setCreatedDeckId(null)
   }
   const setCell = (rowIdx: number, key: string, value: string) =>
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)))
@@ -149,6 +153,11 @@ export function QuickCreateScreen() {
       return
     }
 
+    // The template was written via template-store; invalidate deck-store's
+    // separate templates cache so DeckDetail / CardEdit (which resolve the
+    // template from deck-store, TTL-gated) refetch and see the new one instead
+    // of falling back to a default-template shape.
+    useDeckStore.getState().invalidate('templates')
     navigation.replace('DeckDetail', { deckId })
   }
 

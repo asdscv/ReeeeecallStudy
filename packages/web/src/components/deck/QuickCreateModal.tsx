@@ -80,10 +80,14 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
   const selectPreset = (id: string) => {
     // Field keys (field_1/2/…) carry different meanings per shape, so switching
     // would mislabel already-typed values — clear the rows on switch. Also reset
-    // any created template id so the new shape gets its own template.
+    // the created template AND deck ids: if a previous submit created the deck
+    // (with the old shape's template) before a later step failed, reusing it
+    // would leave deck.default_template_id pointing at the old shape while cards
+    // get the new one. Start fresh so the new shape is consistent end-to-end.
     setPresetId(id)
     setRows(emptyRows())
     setCreatedTemplateId(null)
+    setCreatedDeckId(null)
   }
   const setCell = (rowIdx: number, key: string, value: string) =>
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)))
@@ -160,6 +164,9 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
       return
     }
 
+    // The template was written via template-store; invalidate deck-store's
+    // separate templates cache so DeckDetail / card forms refetch and see it.
+    useDeckStore.getState().invalidate('templates')
     onCreated?.(deckId)
     onClose()
   }
