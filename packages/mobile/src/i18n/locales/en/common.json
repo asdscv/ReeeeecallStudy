@@ -192,5 +192,6 @@
     "time": "Study Time",
     "mastery": "Cards Mastered"
   },
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "loading": "Loading..."
 }

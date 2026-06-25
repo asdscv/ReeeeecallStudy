@@ -192,5 +192,6 @@
     "reclaiming": "Memulihkan sesi…",
     "logout": "Keluar",
     "hint": "Hanya satu perangkat dapat digunakan dalam satu waktu"
-  }
+  },
+  "loading": "Memuat..."
 }
