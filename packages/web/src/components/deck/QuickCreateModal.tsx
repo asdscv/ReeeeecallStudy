@@ -9,6 +9,7 @@ import {
 } from '../ui/dialog'
 import { useDeckStore } from '../../stores/deck-store'
 import { useCardStore } from '../../stores/card-store'
+import { useAuthStore } from '../../stores/auth-store'
 import { presetIdForTemplate, fieldLabelId } from '@reeeeecall/shared/lib/default-templates'
 import type { CardTemplate, TemplateField } from '../../types/database'
 
@@ -30,6 +31,7 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
   const { t } = useTranslation(['decks', 'common'])
   const { templates, ensureDefaultTemplates, createDeck } = useDeckStore()
   const { createCards } = useCardStore()
+  const user = useAuthStore((s) => s.user)
 
   const [deckName, setDeckName] = useState('')
   const [templateId, setTemplateId] = useState('')
@@ -55,10 +57,16 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
     ensureDefaultTemplates().finally(() => setPreparing(false))
   }, [open, ensureDefaultTemplates])
 
-  // Only text-enterable presets are usable in this quick flow (a media-only
-  // default template would render zero inputs → unsubmittable dead-end).
+  // Only the user's OWN text-enterable default templates are usable here.
+  // Filtering by user_id matters: card_templates RLS also exposes a subscribed
+  // publisher's is_default templates, which must NOT be adoptable as the deck's
+  // default (they'd vanish if the share is revoked).  A media-only default would
+  // render zero inputs (unsubmittable), so require ≥1 text field too.
   const presets = templates.filter(
-    (tpl) => tpl.is_default && (tpl.fields ?? []).some((f) => f.type === 'text'),
+    (tpl) =>
+      tpl.is_default &&
+      tpl.user_id === user?.id &&
+      (tpl.fields ?? []).some((f) => f.type === 'text'),
   )
 
   // Default-select the simplest usable preset once templates are loaded.

@@ -162,13 +162,13 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     // 템플릿 미지정 시 첫 번째 기본 템플릿 사용
     let templateId = input.default_template_id
     if (!templateId) {
-      let defaultTemplate = get().templates.find((t) => t.is_default)
+      let defaultTemplate = get().templates.find((t) => t.is_default && t.user_id === user.id)
       if (!defaultTemplate) {
         // Account may be missing its default templates (pre-036 signup bug).
         // Seed them and retry so the new deck never ends up template-less —
         // otherwise adding a card would dead-end with "no template set".
         await get().ensureDefaultTemplates()
-        defaultTemplate = get().templates.find((t) => t.is_default)
+        defaultTemplate = get().templates.find((t) => t.is_default && t.user_id === user.id)
       }
       templateId = defaultTemplate?.id
     }

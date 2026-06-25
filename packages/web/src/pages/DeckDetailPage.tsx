@@ -143,6 +143,7 @@ export function DeckDetailPage() {
         const { data: tmpl } = await supabase
           .from('card_templates')
           .select('*')
+          .eq('user_id', user.id)
           .eq('is_default', true)
           .order('created_at', { ascending: true })
           .limit(1)

@@ -10,6 +10,7 @@ import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { presetIdForTemplate, fieldLabelId } from '@reeeeecall/shared/lib/default-templates'
 import type { CardTemplate, TemplateField } from '@reeeeecall/shared/types/database'
+import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'QuickCreate'>
@@ -45,6 +46,16 @@ export function QuickCreateScreen() {
   // and remember the deck id so a retry only re-runs createCards — never a
   // second createDeck (which would create a duplicate deck).
   const [createdDeckId, setCreatedDeckId] = useState<string | null>(null)
+  // Current user id — used to scope the default-template picker to the user's OWN
+  // templates. card_templates RLS also returns a subscribed publisher's
+  // is_default templates; adopting one as this deck's default breaks if the
+  // share is later revoked, so we filter those out.
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  useEffect(() => {
+    getMobileSupabase().auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id)
+    })
+  }, [])
 
   // On mount: make sure the user actually has default templates to pick from
   // (self-heals zero-template accounts via the ensure_default_templates RPC).
@@ -63,11 +74,11 @@ export function QuickCreateScreen() {
   // Default-select the simplest preset once templates are loaded.
   useEffect(() => {
     if (templateId) return
-    const first = templates.find((tpl) => tpl.is_default)
+    const first = templates.find((tpl) => tpl.is_default && tpl.user_id === currentUserId)
     if (first) setTemplateId(first.id)
-  }, [templates, templateId])
+  }, [templates, templateId, currentUserId])
 
-  const defaultTemplates = templates.filter((tpl) => tpl.is_default)
+  const defaultTemplates = templates.filter((tpl) => tpl.is_default && tpl.user_id === currentUserId)
   const selectedTemplate: CardTemplate | undefined = templates.find((tpl) => tpl.id === templateId)
   const textFields: TemplateField[] = (selectedTemplate?.fields ?? []).filter((f) => f.type === 'text')
 

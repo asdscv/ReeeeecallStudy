@@ -8,6 +8,7 @@ import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
+import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'CardEdit'>
@@ -44,6 +45,17 @@ export function CardEditScreen() {
   const [tags, setTags] = useState(card?.tags?.join(', ') ?? '')
   const [saving, setSaving] = useState(false)
 
+  // Current user id — used to scope the default-template fallback to the user's
+  // OWN templates. card_templates RLS also returns a subscribed publisher's
+  // is_default templates; adopting one as this deck's default breaks if the
+  // share is later revoked, so we never fall back to a non-owned template.
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  useEffect(() => {
+    getMobileSupabase().auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id)
+    })
+  }, [])
+
   // Reset form when card changes
   useEffect(() => {
     if (card) {
@@ -64,7 +76,12 @@ export function CardEditScreen() {
     ;(async () => {
       await ensureDefaultTemplates()
       const seeded = useDeckStore.getState().templates
-      const fallback = seeded.find((t) => t.is_default) ?? seeded[0]
+      // Scope the fallback to the user's OWN templates: a subscribed publisher's
+      // is_default template (also visible via RLS) must never become this deck's
+      // default — it vanishes if the share is revoked.
+      const fallback =
+        seeded.find((t) => t.is_default && t.user_id === currentUserId) ??
+        seeded.find((t) => t.user_id === currentUserId)
       if (!fallback || !active) return
       // Persist on the deck so future cards resolve a template without re-healing.
       if (deck && !deck.default_template_id) {
@@ -76,7 +93,7 @@ export function CardEditScreen() {
       active = false
     }
     // deckId keys the heal; deck/listTemplate update as the stores load.
-  }, [isEditing, listTemplate, healedTemplate, deck, deckId, ensureDefaultTemplates, updateDeck])
+  }, [isEditing, listTemplate, healedTemplate, deck, deckId, ensureDefaultTemplates, updateDeck, currentUserId])
 
   const setField = (key: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [key]: value }))
@@ -100,7 +117,12 @@ export function CardEditScreen() {
     // No template on the card/deck — seed defaults and pick the first one.
     await ensureDefaultTemplates()
     const seeded = useDeckStore.getState().templates
-    const fallback = seeded.find((t) => t.is_default) ?? seeded[0]
+    // Scope the fallback to the user's OWN templates (see heal effect above): a
+    // subscribed publisher's is_default template must never become this deck's
+    // default — it would FK-dangle if the share is later revoked.
+    const fallback =
+      seeded.find((t) => t.is_default && t.user_id === currentUserId) ??
+      seeded.find((t) => t.user_id === currentUserId)
     if (!fallback) return null
     // Persist on the deck so future cards resolve a template without re-healing.
     if (deck && !deck.default_template_id) {

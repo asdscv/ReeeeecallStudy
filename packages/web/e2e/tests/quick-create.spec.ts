@@ -88,4 +88,43 @@ test.describe('Quick Create flow', () => {
     await expect(body).not.toContainText('page.title')
     await expect(body).not.toContainText('config.cardCountHint')
   })
+
+  test('hardened RPCs reject cross-user abuse (copy_deck_for_user / accept_invite)', async ({ page }) => {
+    await page.goto('/decks')
+    // Wait until the REST auth headers are captured from a live request.
+    await expect
+      .poll(() => (restUrl !== '' && !!restHeaders.authorization), { timeout: 15_000 })
+      .toBe(true)
+
+    const res = await page.evaluate(
+      async ({ url, headers }) => {
+        const call = async (fn: string, body: unknown) => {
+          const r = await fetch(`${url}/rest/v1/rpc/${fn}`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+          })
+          return { status: r.status, text: await r.text() }
+        }
+        // Attempt to copy an arbitrary deck INTO someone else's account.
+        const copy = await call('copy_deck_for_user', {
+          p_source_deck_id: crypto.randomUUID(),
+          p_recipient_id: crypto.randomUUID(), // != caller → must be rejected
+          p_is_readonly: false,
+          p_share_mode: 'copy',
+        })
+        // Attempt to accept a bogus invite code.
+        const accept = await call('accept_invite', { p_code: `bogus-${crypto.randomUUID()}` })
+        return { copy, accept }
+      },
+      { url: restUrl, headers: restHeaders },
+    )
+
+    // Migration 094: copy_deck_for_user now rejects a recipient != caller.
+    expect(res.copy.status).toBeGreaterThanOrEqual(400)
+    expect(res.copy.text).toMatch(/Unauthorized recipient|Access denied/i)
+    // accept_invite is reachable by an authenticated user and guards bad codes.
+    expect(res.accept.status).toBeGreaterThanOrEqual(400)
+    expect(res.accept.text).toMatch(/invalidOrExpired/i)
+  })
 })
