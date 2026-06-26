@@ -97,8 +97,11 @@ beforeAll(async () => {
     if (!ready && !skipReason) await new Promise((r) => setTimeout(r, 1000))
   }
   if (!ready) {
-    if (!skipReason) skipReason = `api edge function not reachable at ${API_BASE}`
-    return
+    // haveLocal is true here (we returned early above otherwise): a local stack
+    // exists but the function isn't reachable for rc_ keys. Do NOT silently skip
+    // — that would be a false-green safety net. Fail loudly: CI must serve the
+    // function with `supabase functions serve api --no-verify-jwt`.
+    throw new Error(skipReason || `api edge function not reachable at ${API_BASE} (serve with --no-verify-jwt)`)
   }
 
   A = await createUserWithKey('a')
@@ -122,34 +125,32 @@ beforeAll(async () => {
   aCardId = cards.json.data[0].id
 
   const listing = await api(A.key, 'POST', '/marketplace', { deck_id: aDeckId, title: `L-${randomUUID().slice(0, 6)}`, description: 'x', share_mode: 'copy' })
-  if (listing.status === 201) aListingId = listing.json.data.id
+  if (listing.status !== 201) throw new Error('seed listing failed: ' + JSON.stringify(listing.json))
+  aListingId = listing.json.data.id
 
-  const share = await api(A.key, 'POST', '/shares', { deck_id: aDeckId, share_mode: 'copy', is_readonly: false })
-  if (share.status === 201) aShareId = share.json.data.id
+  const share = await api(A.key, 'POST', '/shares', { deck_id: aDeckId, share_mode: 'copy' })
+  if (share.status !== 201) throw new Error('seed share failed: ' + JSON.stringify(share.json))
+  aShareId = share.json.data.id
 }, 90_000)
 
 describe('REST API cross-tenant authorization (H4)', () => {
-  itLocal('positive control: A reads its own deck + card', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('positive control: A reads its own deck + card', async () => {
     expect((await api(A.key, 'GET', `/decks/${aDeckId}`)).status).toBe(200)
     expect((await api(A.key, 'GET', `/cards/${aCardId}`)).status).toBe(200)
   })
 
-  itLocal('B cannot read A\'s deck / cards / card', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('B cannot read A\'s deck / cards / card', async () => {
     expect((await api(B.key, 'GET', `/decks/${aDeckId}`)).status).toBe(404)
     expect((await api(B.key, 'GET', `/decks/${aDeckId}/cards`)).status).toBe(404)
     expect((await api(B.key, 'GET', `/cards/${aCardId}`)).status).toBe(404)
   })
 
-  itLocal('B cannot delete A\'s card (and it survives)', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('B cannot delete A\'s card (and it survives)', async () => {
     expect((await api(B.key, 'DELETE', `/cards/${aCardId}`)).status).toBe(404)
     expect((await api(A.key, 'GET', `/cards/${aCardId}`)).status).toBe(200)
   })
 
-  itLocal('B cannot read / modify / delete A\'s template', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('B cannot read / modify / delete A\'s template', async () => {
     expect((await api(B.key, 'GET', `/templates/${aTemplateId}`)).status).toBe(404)
     expect((await api(B.key, 'PATCH', `/templates/${aTemplateId}`, { name: 'hacked' })).status).toBe(404)
     expect((await api(B.key, 'DELETE', `/templates/${aTemplateId}`)).status).toBe(404)
@@ -158,32 +159,25 @@ describe('REST API cross-tenant authorization (H4)', () => {
     expect(t.json.data.name).not.toBe('hacked')
   })
 
-  itLocal('B cannot reference A\'s template or deck in writes', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('B cannot reference A\'s template or deck in writes', async () => {
     expect((await api(B.key, 'POST', '/decks', { name: 'x', default_template_id: aTemplateId })).status).toBe(404)
     expect((await api(B.key, 'POST', `/decks/${aDeckId}/cards`, [{ template_id: aTemplateId, field_values: { field_1: 'x' } }])).status).toBe(404)
   })
 
-  itLocal('B cannot publish A\'s deck to marketplace', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('B cannot publish A\'s deck to marketplace', async () => {
     expect((await api(B.key, 'POST', '/marketplace', { deck_id: aDeckId, title: 'steal', description: 'x', share_mode: 'copy' })).status).toBe(404)
   })
 
-  itLocal('B cannot delete A\'s marketplace listing', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
-    if (!aListingId) return
+  itLocal('B cannot delete A\'s marketplace listing', async () => {
     expect((await api(B.key, 'DELETE', `/marketplace/${aListingId}`)).status).toBe(404)
     expect((await api(A.key, 'GET', `/marketplace/${aListingId}`)).status).toBe(200)
   })
 
-  itLocal('B cannot revoke A\'s share', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
-    if (!aShareId) return
+  itLocal('B cannot revoke A\'s share', async () => {
     expect((await api(B.key, 'DELETE', `/shares/${aShareId}`)).status).toBe(404)
   })
 
-  itLocal('B sees none of A\'s resources in its own lists', async (ctx) => {
-    if (!ready) return ctx.skip(skipReason || 'api edge function not reachable')
+  itLocal('B sees none of A\'s resources in its own lists', async () => {
     const decks = await api(B.key, 'GET', '/decks')
     expect(decks.status).toBe(200)
     expect((decks.json.data as any[]).some((d) => d.id === aDeckId)).toBe(false)

@@ -139,6 +139,16 @@ jobs:
           echo "anon=$ANON" >> $GITHUB_OUTPUT
           echo "svc=$SVC" >> $GITHUB_OUTPUT
 
+      # The REST API (`api`) authenticates raw `rc_` keys itself, so the platform
+      # JWT gateway (verify_jwt) must be off for the cross-tenant suite to reach
+      # the handlers. Serve it in the background WITHOUT the gateway. (Prod keeps
+      # verify_jwt on — this is test-only.) The suite's beforeAll waits for it and
+      # FAILS (not skips) if it never becomes reachable, so this can't false-green.
+      - name: Serve api function without JWT gateway (cross-tenant tests)
+        run: |
+          nohup supabase functions serve api --no-verify-jwt > /tmp/fnserve.log 2>&1 &
+          echo "started api serve (pid $!)"
+
       - name: Run integration suite
         env:
           SUPABASE_LOCAL_URL: http://127.0.0.1:54321
