@@ -567,7 +567,19 @@ const app = new OpenAPIHono<Env>({ defaultHook: (result, c) => {
 
 // ─── Middleware ────────────────────────────────────────────────
 
-app.use('*', cors())
+// L4/L5: restrict CORS to our app origins (env-driven) instead of wildcard.
+// API auth is bearer (rc_ keys) so legitimate third-party use is server-side
+// and unaffected by CORS; this only removes the wildcard for browser callers.
+// For a disallowed browser origin we return our canonical origin (≠ caller's),
+// so the browser's own CORS check blocks it — robust regardless of the cors
+// middleware's empty-string handling. Non-browser callers ignore CORS.
+const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
+  'https://reeeeecallstudy.xyz,http://localhost:5173')
+  .split(',').map((s) => s.trim()).filter(Boolean)
+
+app.use('*', cors({
+  origin: (origin) => (origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]),
+}))
 
 app.use('/v1/*', async (c, next) => {
   const header = c.req.header('Authorization') ?? ''
