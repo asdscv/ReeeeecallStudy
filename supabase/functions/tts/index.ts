@@ -29,11 +29,25 @@ const DEFAULT_VOICES: Record<string, string> = {
 const MAX_TEXT_LENGTH = 2000
 const WS_TIMEOUT_MS = 10_000
 
-// ── CORS ────────────────────────────────────────────────────
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
+// ── CORS (L4/L5: origin allowlist instead of wildcard) ──────
+// Browser cross-origin calls only come from our own web app. Mobile (native
+// fetch) and server-side callers send no Origin and ignore CORS, so they are
+// unaffected. Allowlist is env-driven (ALLOWED_ORIGINS) with a safe default.
+const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
+  'https://reeeeecallstudy.xyz,http://localhost:5173')
+  .split(',').map((s) => s.trim()).filter(Boolean)
+
+function corsHeadersFor(origin: string | null): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
+    'Vary': 'Origin',
+  }
+  // Echo only allowlisted origins; otherwise omit ACAO so the browser blocks it.
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin
+  }
+  return headers
 }
 
 // ── Edge TTS synthesis via WebSocket ────────────────────────
@@ -162,6 +176,10 @@ async function verifyUser(authHeader: string | null): Promise<string | null> {
 
 // ── Main handler ────────────────────────────────────────────
 Deno.serve(async (req) => {
+  // Per-request CORS headers (origin echoed only if allowlisted). Shadows any
+  // module name so every `...corsHeaders` below uses the allowlisted set.
+  const corsHeaders = corsHeadersFor(req.headers.get('Origin'))
+
   // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders })
