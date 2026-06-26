@@ -697,15 +697,20 @@ app.openapi(getDeckRoute, async (c) => {
 
   if (error || !deck) return c.json({ error: { code: 'NOT_FOUND', message: 'Deck not found' } }, 404)
 
+  // Self-scope by user_id (H4 defense-in-depth): these run after the deck
+  // ownership gate above, but filtering on user_id too means a future
+  // gate removal/reorder can't leak another tenant's card counts.
   const { count: totalCards } = await sb
     .from('cards')
     .select('*', { count: 'exact', head: true })
     .eq('deck_id', deckId)
+    .eq('user_id', userId)
 
   const { count: newCards } = await sb
     .from('cards')
     .select('*', { count: 'exact', head: true })
     .eq('deck_id', deckId)
+    .eq('user_id', userId)
     .eq('srs_status', 'new')
 
   const now = new Date().toISOString()
@@ -713,6 +718,7 @@ app.openapi(getDeckRoute, async (c) => {
     .from('cards')
     .select('*', { count: 'exact', head: true })
     .eq('deck_id', deckId)
+    .eq('user_id', userId)
     .in('srs_status', ['learning', 'review'])
     .lte('next_review_at', now)
 
@@ -756,6 +762,7 @@ app.openapi(listCardsRoute, async (c) => {
     .from('cards')
     .select('*', { count: 'exact' })
     .eq('deck_id', deckId)
+    .eq('user_id', userId) // self-scope (H4): don't rely on the deck gate alone
     .order('sort_position', { ascending: true })
     .range(from, to)
 
@@ -969,6 +976,17 @@ app.openapi(deleteTemplateRoute, async (c) => {
   const userId = c.get('userId')
   const sb = c.get('supabase')
   const { templateId } = c.req.valid('param')
+
+  // Ownership gate (H4): 404 if the template isn't the caller's. Without this the
+  // scoped DELETE below would no-op on a foreign id yet still return 200
+  // {deleted:true} — misleading and inconsistent with get/update (which 404).
+  const { data: owned } = await sb
+    .from('card_templates')
+    .select('id')
+    .eq('id', templateId)
+    .eq('user_id', userId)
+    .single()
+  if (!owned) return c.json({ error: { code: 'NOT_FOUND', message: 'Template not found' } }, 404)
 
   // Check if any cards use this template
   const { count } = await sb
@@ -1260,7 +1278,7 @@ app.openapi(deleteMarketplaceRoute, async (c) => {
   const { data: listing } = await sb.from('marketplace_listings').select('id').eq('id', listingId).eq('owner_id', userId).single()
   if (!listing) return c.json({ error: { code: 'NOT_FOUND', message: 'Listing not found' } }, 404)
 
-  const { error } = await sb.from('marketplace_listings').update({ is_active: false }).eq('id', listingId)
+  const { error } = await sb.from('marketplace_listings').update({ is_active: false }).eq('id', listingId).eq('owner_id', userId)
   if (error) return c.json(dbError('deleteMarketplace', error), 500)
   return c.json({ data: { deleted: true } }, 200)
 })
@@ -1367,7 +1385,11 @@ app.openapi(deleteShareRoute, async (c) => {
     return c.json({ error: { code: 'NOT_FOUND', message: 'Share not found' } }, 404)
   }
 
-  const { error } = await sb.from('deck_shares').update({ status: 'revoked' }).eq('id', shareId)
+  // Self-scope (H4): restrict the UPDATE to rows the caller owns or received,
+  // not just .eq('id') — keeps it safe even if the in-memory guard above changes.
+  const { error } = await sb.from('deck_shares').update({ status: 'revoked' })
+    .eq('id', shareId)
+    .or(`owner_id.eq.${userId},recipient_id.eq.${userId}`)
   if (error) return c.json(dbError('deleteShare', error), 500)
   return c.json({ data: { deleted: true } }, 200)
 })
