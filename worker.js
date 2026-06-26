@@ -15,6 +15,17 @@ import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
 
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
 
+// L4/L5: the worker fronts /api/* for browsers, so it (not the edge function) is
+// the real CORS boundary. Echo only allowlisted origins; for anything else
+// return our canonical origin (≠ caller → the browser blocks). Non-browser
+// callers (server-side rc_ consumers) ignore CORS. Keep in sync with the
+// ALLOWED_ORIGINS default in supabase/functions/{api,tts}/index.ts.
+const ALLOWED_ORIGINS = ['https://reeeeecallstudy.xyz', 'http://localhost:5173']
+function corsAllowOrigin(request) {
+  const origin = request.headers.get('Origin')
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+}
+
 // ─── Bot handler dispatch ────────────────────────────────────────────────────
 
 const BOT_HANDLERS = {
@@ -123,10 +134,11 @@ export default {
       if (request.method === 'OPTIONS') {
         return new Response(null, {
           headers: {
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': corsAllowOrigin(request),
             'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Authorization, Content-Type',
             'Access-Control-Max-Age': '86400',
+            'Vary': 'Origin',
           },
         })
       }
@@ -146,7 +158,8 @@ export default {
       })
 
       const responseHeaders = new Headers(res.headers)
-      responseHeaders.set('Access-Control-Allow-Origin', '*')
+      responseHeaders.set('Access-Control-Allow-Origin', corsAllowOrigin(request))
+      responseHeaders.append('Vary', 'Origin')
 
       return new Response(res.body, {
         status: res.status,
