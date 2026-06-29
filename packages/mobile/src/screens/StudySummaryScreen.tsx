@@ -27,6 +27,7 @@ const RATING_COLORS: Record<string, string> = {
 export function StudySummaryScreen() {
   const theme = useTheme()
   const { t } = useTranslation('study')
+  const { t: th } = useTranslation('history')
   const navigation = useNavigation<Nav>()
   const { sessionStats, config, reset } = useStudy()
 
@@ -66,8 +67,8 @@ export function StudySummaryScreen() {
       : ['unknown', 'known'] as const
 
   const ratingLabels: Record<string, string> = {
-    again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy',
-    missed: 'Missed', got_it: 'Got It', unknown: 'Unknown', known: 'Known',
+    again: th('ratings.again'), hard: th('ratings.hard'), good: th('ratings.good'), easy: th('ratings.easy'),
+    missed: th('ratings.missed'), got_it: th('ratings.got_it'), unknown: th('ratings.unknown'), known: th('ratings.known'),
   }
 
   return (

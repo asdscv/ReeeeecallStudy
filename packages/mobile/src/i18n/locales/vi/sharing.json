@@ -1,0 +1,82 @@
+{
+  "shareMode": "Chế độ chia sẻ",
+  "inviteLink": "Liên kết mời",
+  "modes": {
+    "copy": {
+      "label": "Sao chép",
+      "desc": "Người dùng nhận bản sao có thể chỉnh sửa",
+      "detail": "Người nhận có bản sao đầy đủ và có thể chỉnh sửa tự do. Không đồng bộ với thay đổi của bạn."
+    },
+    "subscribe": {
+      "label": "Đăng ký",
+      "desc": "Người dùng nhận bản chỉ đọc, tự động cập nhật",
+      "detail": "Người nhận luôn đồng bộ với bộ thẻ của bạn. Họ không thể chỉnh sửa nhưng luôn có bản mới nhất."
+    },
+    "snapshot": {
+      "label": "Ảnh chụp nhanh",
+      "desc": "Người dùng nhận bản chỉ đọc, không cập nhật",
+      "detail": "Bản chỉ đọc được cố định tại thời điểm hiện tại. Không có cập nhật sau này."
+    }
+  },
+  "status": {
+    "pending": "Đang chờ",
+    "active": "Đang hoạt động",
+    "revoked": "Đã thu hồi",
+    "declined": "Đã từ chối"
+  },
+  "actions": {
+    "cancel": "Hủy",
+    "revoke": "Thu hồi",
+    "unsubscribe": "Hủy đăng ký"
+  },
+  "shareDeck": {
+    "title": "Chia sẻ bộ thẻ",
+    "subtitle": "Chia sẻ riêng tư bộ thẻ này qua liên kết mời",
+    "generateLink": "Tạo liên kết mời",
+    "creating": "Đang tạo...",
+    "copied": "Đã sao chép!",
+    "copyLink": "Sao chép liên kết",
+    "newLink": "Liên kết mới",
+    "linkHint": "Bất kỳ ai có liên kết này đều có thể chấp nhận lời mời và truy cập bộ thẻ.",
+    "existingShares": "Lượt chia sẻ hiện có ({{count}})",
+    "noShares": "Chưa có lượt chia sẻ nào. Hãy tạo liên kết mời ở trên."
+  },
+  "revokeAlert": {
+    "title": "Thu hồi quyền truy cập",
+    "message": "Bạn có chắc muốn thu hồi lượt chia sẻ này không?"
+  },
+  "unsubscribeAlert": {
+    "title": "Hủy đăng ký",
+    "message": "Bạn có chắc muốn hủy đăng ký bộ thẻ này không?"
+  },
+  "myShares": {
+    "title": "Chia sẻ của tôi",
+    "sharedByYou": "Bạn đã chia sẻ",
+    "sharedWithYou": "Được chia sẻ với bạn",
+    "emptySentTitle": "Bạn chưa chia sẻ bộ thẻ nào.",
+    "emptySentHint": "Mở một bộ thẻ và nhấn \"Chia sẻ\" để tạo liên kết mời.",
+    "emptyReceived": "Chưa có ai chia sẻ bộ thẻ với bạn.",
+    "activePending": "{{activeCount}} đang hoạt động · {{pendingCount}} đang chờ",
+    "viewAll": "Xem tất cả {{count}} lượt chia sẻ",
+    "unknownDeck": "Bộ thẻ không xác định"
+  },
+  "publish": {
+    "subtitle": "Chia sẻ bộ thẻ của bạn với cộng đồng",
+    "titleLabel": "Tiêu đề",
+    "titlePlaceholder": "Tiêu đề bộ thẻ trên chợ",
+    "descriptionLabel": "Mô tả",
+    "descriptionPlaceholder": "Người học sẽ học gì?",
+    "tagsLabel": "Thẻ",
+    "tagsPlaceholder": "thẻ, phân cách, bằng dấu phẩy",
+    "tagsHint": "Giúp người khác tìm thấy bộ thẻ của bạn",
+    "category": "Danh mục",
+    "titleRequired": "Tiêu đề là bắt buộc",
+    "errorTitle": "Lỗi",
+    "publishFailed": "Không thể đăng bộ thẻ",
+    "publishedTitle": "Đã đăng!",
+    "publishedMessage": "Bộ thẻ của bạn hiện đã có trên chợ.",
+    "ok": "OK"
+  },
+  "unsubscribe": "Hủy đăng ký",
+  "unsubscribed": "Đã hủy đăng ký"
+}

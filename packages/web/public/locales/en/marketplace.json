@@ -153,5 +153,49 @@
     "sortLabel": "Sort by:",
     "loading": "Loading...",
     "loadMore": "Load more reviews"
-  }
+  },
+  "publisher": {
+    "title": "Publisher Dashboard",
+    "emptyTitle": "No Published Listings Yet",
+    "emptyDescription": "Publish a deck on the marketplace to start tracking views and acquisitions.",
+    "goToDecks": "Go to Decks",
+    "retry": "Retry",
+    "activeListings": "Active Listings",
+    "totalViews": "Total Views",
+    "totalAcquisitions": "Total Acquisitions",
+    "avgConversion": "Avg Conversion",
+    "dailyViews": "Daily Views (Last 30 Days)",
+    "noDataYet": "No data yet",
+    "topListings": "Top Listings by Views",
+    "acquisitionTrend": "Acquisition Trend (Last 30 Days)",
+    "yourListings": "Your Listings",
+    "recentAcquisitions": "Recent Acquisitions",
+    "noAcquisitionsYet": "No acquisitions yet",
+    "recentReviews": "Recent Reviews",
+    "noReviewsYet": "No reviews yet",
+    "anonymous": "Anonymous",
+    "acquired": "acquired",
+    "active": "Active",
+    "inactive": "Inactive",
+    "viewListing": "View listing",
+    "table": {
+      "title": "Title",
+      "views": "Views",
+      "acquires": "Acquires",
+      "conv": "Conv %",
+      "rating": "Rating",
+      "created": "Created",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    }
+  },
+  "reviewCount_one": "{{count}} review",
+  "reviewCount_other": "{{count}} reviews",
+  "rateStar_one": "Rate {{count}} star",
+  "rateStar_other": "Rate {{count}} stars"
 }

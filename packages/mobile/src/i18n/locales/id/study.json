@@ -45,7 +45,14 @@
     "cardsPerSession": "Kartu per sesi",
     "batchHint": "Antara 5 dan 500 kartu",
     "dateSelection": "Pemilihan Tanggal",
-    "startStudy": "Mulai Belajar"
+    "startStudy": "Mulai Belajar",
+    "modalSubtitleMode": "Pilih mode belajar",
+    "modalSubtitleDate": "Pilih tanggal",
+    "modalSubtitleCramming": "Opsi menjejalkan",
+    "modalSubtitleBatch": "Atur ukuran batch",
+    "dateCardCount": "{{date}} — {{count}} kartu",
+    "backToModeSelect": "Kembali ke pilihan mode",
+    "cancel": "Batal"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "Memuat...",
+    "swipe": "Geser",
     "undo": "Undo",
     "endSession": "Akhiri Sesi?",
     "endMessage": "Progres Anda sejauh ini akan disimpan.",

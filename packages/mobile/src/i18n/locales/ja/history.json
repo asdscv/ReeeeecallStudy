@@ -17,5 +17,39 @@
     "history": "履歴",
     "analytics": "分析"
   },
-  "sessionsPerDay": "日別セッション数"
+  "sessionsPerDay": "日別セッション数",
+  "ratings": {
+    "again": "もう一度",
+    "hard": "難しい",
+    "good": "普通",
+    "easy": "簡単",
+    "got_it": "正解",
+    "missed": "不正解",
+    "known": "知ってる",
+    "unknown": "知らない"
+  },
+  "stats": {
+    "cards": "カード",
+    "duration": "時間",
+    "performance": "成績"
+  },
+  "cardDetails": "カード詳細",
+  "logsCount": "{{count}}件の記録",
+  "loadingDetails": "詳細を読み込み中...",
+  "noLogs": "このセッションの詳細な記録はありません",
+  "deletedCard": "(削除されたカード)",
+  "noContent": "(内容なし)",
+  "deckProgress": "デッキの進捗",
+  "sessionsCount": "{{count}}セッション",
+  "cardsCount": "{{count}}枚",
+  "cardsFraction": "{{studied}}/{{total}}枚",
+  "ratingDistribution": "評価の分布",
+  "overview": {
+    "sessions": "セッション",
+    "cardsStudied": "学習したカード",
+    "totalTime": "合計時間",
+    "performance": "成績",
+    "streak": "連続記録",
+    "avgDuration": "平均時間"
+  }
 }

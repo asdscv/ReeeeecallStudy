@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { View, StyleSheet, type ViewStyle, type DimensionValue } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -67,8 +68,9 @@ function CardSkeleton() {
 
 /** Vertical list of card-shaped rows — decks / marketplace / detail lists. */
 export function ListSkeleton({ count = 5 }: { count?: number }) {
+  const { t } = useTranslation('common')
   return (
-    <View style={styles.list} accessibilityLabel="Loading" accessibilityRole="progressbar">
+    <View style={styles.list} accessibilityLabel={t('a11y.loading')} accessibilityRole="progressbar">
       {Array.from({ length: count }).map((_, i) => (
         <CardSkeleton key={i} />
       ))}
@@ -79,12 +81,13 @@ export function ListSkeleton({ count = 5 }: { count?: number }) {
 /** Dashboard — 2×2 stat cards + a wide panel. */
 export function StatGridSkeleton() {
   const theme = useTheme()
+  const { t } = useTranslation('common')
   const cell = {
     backgroundColor: theme.colors.surfaceElevated,
     borderColor: theme.colors.border,
   }
   return (
-    <View style={styles.dash} accessibilityLabel="Loading" accessibilityRole="progressbar">
+    <View style={styles.dash} accessibilityLabel={t('a11y.loading')} accessibilityRole="progressbar">
       <View style={styles.grid}>
         {Array.from({ length: 4 }).map((_, i) => (
           <View key={i} style={[styles.statCard, cell]}>

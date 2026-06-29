@@ -17,5 +17,39 @@
     "history": "Historial",
     "analytics": "Análisis"
   },
-  "sessionsPerDay": "Sesiones por día"
+  "sessionsPerDay": "Sesiones por día",
+  "ratings": {
+    "again": "Otra vez",
+    "hard": "Difícil",
+    "good": "Bien",
+    "easy": "Fácil",
+    "got_it": "Acerté",
+    "missed": "Fallé",
+    "known": "Conocida",
+    "unknown": "Desconocida"
+  },
+  "stats": {
+    "cards": "Tarjetas",
+    "duration": "Duración",
+    "performance": "Rendimiento"
+  },
+  "cardDetails": "Detalles de la tarjeta",
+  "logsCount": "{{count}} registros",
+  "loadingDetails": "Cargando detalles...",
+  "noLogs": "No hay registros detallados para esta sesión",
+  "deletedCard": "(Tarjeta eliminada)",
+  "noContent": "(Sin contenido)",
+  "deckProgress": "Progreso del mazo",
+  "sessionsCount": "{{count}} sesiones",
+  "cardsCount": "{{count}} tarjetas",
+  "cardsFraction": "{{studied}}/{{total}} tarjetas",
+  "ratingDistribution": "Distribución de valoraciones",
+  "overview": {
+    "sessions": "Sesiones",
+    "cardsStudied": "Tarjetas estudiadas",
+    "totalTime": "Tiempo total",
+    "performance": "Rendimiento",
+    "streak": "Racha",
+    "avgDuration": "Duración media"
+  }
 }

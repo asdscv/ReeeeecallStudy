@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface StarRatingProps {
   rating: number
   max?: number
@@ -19,6 +21,7 @@ export function StarRating({
   interactive = false,
   onChange,
 }: StarRatingProps) {
+  const { t } = useTranslation('marketplace')
   const sizeClass = SIZE_CLASSES[size]
 
   return (
@@ -33,7 +36,7 @@ export function StarRating({
             className={`${sizeClass} ${filled ? 'text-yellow-400' : 'text-content-tertiary'} ${interactive ? 'hover:text-yellow-300 transition-colors' : ''}`}
             onClick={interactive && onChange ? () => onChange(starValue) : undefined}
             role={interactive ? 'button' : undefined}
-            aria-label={interactive ? `Rate ${starValue} star${starValue !== 1 ? 's' : ''}` : undefined}
+            aria-label={interactive ? t('rateStar', { count: starValue }) : undefined}
           >
             {'\u2605'}
           </span>

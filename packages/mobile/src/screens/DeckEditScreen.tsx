@@ -23,11 +23,11 @@ const COLORS = ['#3B82F6', '#EF4444', '#22C55E', '#F59E0B', '#8B5CF6', '#EC4899'
 const ICONS = ['📚', '📖', '🇨🇳', '🇺🇸', '🇯🇵', '🧠', '💡', '📝']
 
 /** SRS field definitions with colored labels matching web */
-const SRS_INTERVAL_FIELDS: { key: keyof SrsSettings; label: string; color: string }[] = [
-  { key: 'again_days', label: 'Again', color: ratingColors.again },
-  { key: 'hard_days', label: 'Hard', color: ratingColors.hard },
-  { key: 'good_days', label: 'Good', color: ratingColors.good },
-  { key: 'easy_days', label: 'Easy', color: ratingColors.easy },
+const SRS_INTERVAL_FIELDS: { key: keyof SrsSettings; labelKey: string; color: string }[] = [
+  { key: 'again_days', labelKey: 'srsRating.again', color: ratingColors.again },
+  { key: 'hard_days', labelKey: 'srsRating.hard', color: ratingColors.hard },
+  { key: 'good_days', labelKey: 'srsRating.good', color: ratingColors.good },
+  { key: 'easy_days', labelKey: 'srsRating.easy', color: ratingColors.easy },
 ]
 
 export function DeckEditScreen() {
@@ -159,7 +159,7 @@ export function DeckEditScreen() {
         {/* Preview */}
         <View style={[styles.preview, { backgroundColor: color + '15', borderColor: color + '40' }]}>
           <Text style={styles.previewIcon}>{icon}</Text>
-          <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{name || 'Deck Name'}</Text>
+          <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{name || t('deckEdit.previewName')}</Text>
         </View>
 
         {/* Form */}
@@ -370,28 +370,28 @@ export function DeckEditScreen() {
 
         {/* ── SRS Settings ── */}
         <View style={[styles.srsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>SRS Settings</Text>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('deckEdit.srsSettings')}</Text>
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            Configure spaced repetition intervals for this deck.
+            {t('deckEdit.srsDescription')}
           </Text>
 
           {/* Learning Steps */}
           <TextInput
             testID="deck-edit-srs-learning-steps"
-            label="Learning Steps (minutes)"
+            label={t('deckEdit.learningSteps')}
             value={learningStepsText}
             onChangeText={setLearningStepsText}
             placeholder="1, 10"
           />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            Comma-separated minutes, e.g. "1, 10" for 1min then 10min steps.
+            {t('deckEdit.learningStepsHint')}
           </Text>
 
           {/* Interval fields — 2x2 grid with colored labels */}
           <View style={styles.srsGrid}>
-            {SRS_INTERVAL_FIELDS.map(({ key, label, color: labelColor }) => (
+            {SRS_INTERVAL_FIELDS.map(({ key, labelKey, color: labelColor }) => (
               <View key={key} style={styles.srsGridItem}>
-                <Text style={[styles.srsLabel, { color: labelColor }]}>{label}</Text>
+                <Text style={[styles.srsLabel, { color: labelColor }]}>{t(labelKey)}</Text>
                 <TextInput
                   testID={`deck-edit-srs-${key}`}
                   value={String(srsSettings[key] as number)}
@@ -403,7 +403,7 @@ export function DeckEditScreen() {
                   keyboardType="number-pad"
                   placeholder="0"
                 />
-                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>days</Text>
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>{t('deckEdit.days')}</Text>
               </View>
             ))}
           </View>
@@ -413,27 +413,27 @@ export function DeckEditScreen() {
         {isEditing && deckStats && (
           <View style={[styles.statsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <View style={styles.statsBodyAlways}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Statistics</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('deckEdit.statistics')}</Text>
 
               {/* Summary row */}
               <View style={styles.statsRow}>
-                <StatCard label="Total Cards" value={deckStats.totalCards} testID="deck-edit-stat-total" />
-                <StatCard label="Mastery" value={`${deckStats.masteryRate}%`} testID="deck-edit-stat-mastery" />
+                <StatCard label={t('stats.totalCards')} value={deckStats.totalCards} testID="deck-edit-stat-total" />
+                <StatCard label={t('deckEdit.mastery')} value={`${deckStats.masteryRate}%`} testID="deck-edit-stat-mastery" />
               </View>
 
               {/* SRS status distribution bar */}
               {deckStats.totalCards > 0 && (() => {
                 const masteredCount = deckStats.totalCards - deckStats.newCount - deckStats.learningCount - deckStats.reviewCount
                 const segments = [
-                  { label: 'New', count: deckStats.newCount, color: palette.blue[500] },
-                  { label: 'Learning', count: deckStats.learningCount, color: palette.yellow[500] },
-                  { label: 'Review', count: deckStats.reviewCount, color: palette.green[500] },
-                  { label: 'Mastered', count: masteredCount, color: palette.gray[400] },
+                  { label: t('status.new'), count: deckStats.newCount, color: palette.blue[500] },
+                  { label: t('status.learning'), count: deckStats.learningCount, color: palette.yellow[500] },
+                  { label: t('status.review'), count: deckStats.reviewCount, color: palette.green[500] },
+                  { label: t('status.mastered'), count: masteredCount, color: palette.gray[400] },
                 ]
                 return (
                   <View style={[styles.statusCard, { backgroundColor: theme.colors.surface }]}>
                     <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-                      Card Status Distribution
+                      {t('deckEdit.cardStatusDistribution')}
                     </Text>
                     <View style={styles.distributionBar}>
                       {segments.map((s, idx) => {
@@ -463,12 +463,12 @@ export function DeckEditScreen() {
 
               {/* Additional stats */}
               <View style={styles.statsRow}>
-                <StatCard label="Avg Interval" value={`${deckStats.avgInterval.toFixed(1)}d`} testID="deck-edit-stat-interval" />
-                <StatCard label="Avg Ease" value={deckStats.avgEase.toFixed(2)} testID="deck-edit-stat-ease" />
+                <StatCard label={t('statsTab.avgInterval')} value={`${deckStats.avgInterval.toFixed(1)}d`} testID="deck-edit-stat-interval" />
+                <StatCard label={t('deckEdit.avgEase')} value={deckStats.avgEase.toFixed(2)} testID="deck-edit-stat-ease" />
               </View>
 
               {/* Mastery bar */}
-              <ProgressBar percentage={deckStats.masteryRate} label="Mastery Rate" testID="deck-edit-mastery-bar" />
+              <ProgressBar percentage={deckStats.masteryRate} label={t('statsTab.masteryRate')} testID="deck-edit-mastery-bar" />
             </View>
           </View>
         )}

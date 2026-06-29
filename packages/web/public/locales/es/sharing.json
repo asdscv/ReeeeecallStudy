@@ -129,7 +129,8 @@
       "copy": "Copiar",
       "subscribe": "Suscribirse",
       "snapshot": "Instantánea"
-    }
+    },
+    "unknownRecipient": "N/D"
   },
   "acceptInvite": {
     "title": "Invitación de mazo",

@@ -195,5 +195,78 @@
     "deckDescriptionPlaceholder": "Catatan singkat tentang dek ini",
     "presetSummary": "Depan {{front}} · Belakang {{back}}",
     "basicLabel": "Dasar"
+  },
+  "cancel": "Batal",
+  "delete": "Hapus",
+  "emptyField": "(kosong)",
+  "status": {
+    "all": "Semua",
+    "new": "Baru",
+    "learning": "Sedang dipelajari",
+    "review": "Ulasan",
+    "suspended": "Ditangguhkan",
+    "mastered": "Dikuasai"
+  },
+  "srsRating": {
+    "again": "Lagi",
+    "hard": "Sulit",
+    "good": "Bagus",
+    "easy": "Mudah"
+  },
+  "deckDetail": {
+    "tabVersions": "Versi",
+    "selectMode": "Pilih",
+    "selectAll": "Pilih Semua",
+    "deselectAll": "Batal Pilih Semua",
+    "selectedCount": "{{count}} dipilih",
+    "deleteSelected": "Hapus yang Dipilih",
+    "deleteCardsTitle": "Hapus Kartu",
+    "deleteCardsConfirm": "Hapus {{count}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
+    "perPage": "Per halaman:",
+    "prevPage": "← Sebelumnya",
+    "nextPage": "Berikutnya →",
+    "pageOf": "Halaman {{current}} dari {{total}}",
+    "showingRange": "Menampilkan {{from}}–{{to}} dari {{total}} kartu"
+  },
+  "deckEdit": {
+    "previewName": "Nama Dek",
+    "srsSettings": "Pengaturan SRS",
+    "srsDescription": "Atur interval pengulangan berjarak untuk dek ini.",
+    "learningSteps": "Langkah Belajar (menit)",
+    "learningStepsHint": "Menit dipisah koma, mis. \"1, 10\" untuk langkah 1mnt lalu 10mnt.",
+    "days": "hari",
+    "statistics": "Statistik",
+    "mastery": "Penguasaan",
+    "cardStatusDistribution": "Distribusi Status Kartu",
+    "avgEase": "Rata-rata Kemudahan"
+  },
+  "statsTab": {
+    "total": "Total",
+    "statusDistribution": "Distribusi Status",
+    "masteryRate": "Tingkat Penguasaan",
+    "avgEaseFactor": "Rata-rata Faktor Kemudahan",
+    "avgInterval": "Rata-rata Interval",
+    "days": "hari"
+  },
+  "relativeDate": {
+    "today": "Hari ini",
+    "yesterday": "Kemarin",
+    "daysAgo": "{{count}} hari lalu",
+    "monthAgo": "1 bulan lalu",
+    "monthsAgo": "{{count}} bulan lalu"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "Tidak Dapat Dihapus",
+    "cannotDeleteMsg": "Templat default tidak dapat dihapus.",
+    "deleteTitle": "Hapus Templat",
+    "deleteFailed": "Gagal menghapus templat",
+    "defaultBadge": "Default"
+  },
+  "versionHistory": {
+    "loading": "Memuat versi...",
+    "createHint": "Buat versi untuk menyimpan snapshot keadaan dek saat ini."
+  },
+  "uploadDate": {
+    "noCards": "Belum ada kartu"
   }
 }

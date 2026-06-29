@@ -195,5 +195,78 @@
     "deckDescriptionPlaceholder": "บันทึกสั้น ๆ เกี่ยวกับเด็คนี้",
     "presetSummary": "หน้า {{front}} · หลัง {{back}}",
     "basicLabel": "พื้นฐาน"
+  },
+  "cancel": "ยกเลิก",
+  "delete": "ลบ",
+  "emptyField": "(ว่าง)",
+  "status": {
+    "all": "ทั้งหมด",
+    "new": "ใหม่",
+    "learning": "กำลังเรียน",
+    "review": "ทบทวน",
+    "suspended": "ระงับ",
+    "mastered": "เชี่ยวชาญแล้ว"
+  },
+  "srsRating": {
+    "again": "อีกครั้ง",
+    "hard": "ยาก",
+    "good": "ดี",
+    "easy": "ง่าย"
+  },
+  "deckDetail": {
+    "tabVersions": "เวอร์ชัน",
+    "selectMode": "เลือก",
+    "selectAll": "เลือกทั้งหมด",
+    "deselectAll": "ยกเลิกการเลือกทั้งหมด",
+    "selectedCount": "เลือกแล้ว {{count}}",
+    "deleteSelected": "ลบรายการที่เลือก",
+    "deleteCardsTitle": "ลบการ์ด",
+    "deleteCardsConfirm": "ลบการ์ดที่เลือก {{count}} ใบ? ไม่สามารถเลิกทำได้",
+    "perPage": "ต่อหน้า:",
+    "prevPage": "← ก่อนหน้า",
+    "nextPage": "ถัดไป →",
+    "pageOf": "หน้า {{current}} จาก {{total}}",
+    "showingRange": "แสดง {{from}}–{{to}} จาก {{total}} การ์ด"
+  },
+  "deckEdit": {
+    "previewName": "ชื่อสำรับ",
+    "srsSettings": "ตั้งค่า SRS",
+    "srsDescription": "กำหนดช่วงการทบทวนแบบเว้นระยะสำหรับสำรับนี้",
+    "learningSteps": "ขั้นการเรียน (นาที)",
+    "learningStepsHint": "นาทีคั่นด้วยจุลภาค เช่น \"1, 10\" สำหรับ 1 นาทีแล้ว 10 นาที",
+    "days": "วัน",
+    "statistics": "สถิติ",
+    "mastery": "ความเชี่ยวชาญ",
+    "cardStatusDistribution": "การกระจายสถานะการ์ด",
+    "avgEase": "ค่าความง่ายเฉลี่ย"
+  },
+  "statsTab": {
+    "total": "ทั้งหมด",
+    "statusDistribution": "การกระจายสถานะ",
+    "masteryRate": "อัตราความเชี่ยวชาญ",
+    "avgEaseFactor": "ค่าสัมประสิทธิ์ความง่ายเฉลี่ย",
+    "avgInterval": "ช่วงเฉลี่ย",
+    "days": "วัน"
+  },
+  "relativeDate": {
+    "today": "วันนี้",
+    "yesterday": "เมื่อวาน",
+    "daysAgo": "{{count}} วันที่แล้ว",
+    "monthAgo": "1 เดือนที่แล้ว",
+    "monthsAgo": "{{count}} เดือนที่แล้ว"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "ลบไม่ได้",
+    "cannotDeleteMsg": "ไม่สามารถลบเทมเพลตเริ่มต้นได้",
+    "deleteTitle": "ลบเทมเพลต",
+    "deleteFailed": "ลบเทมเพลตไม่สำเร็จ",
+    "defaultBadge": "เริ่มต้น"
+  },
+  "versionHistory": {
+    "loading": "กำลังโหลดเวอร์ชัน...",
+    "createHint": "สร้างเวอร์ชันเพื่อบันทึกสถานะปัจจุบันของสำรับ"
+  },
+  "uploadDate": {
+    "noCards": "ยังไม่มีการ์ด"
   }
 }

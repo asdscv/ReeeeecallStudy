@@ -254,5 +254,13 @@
       "429": "요청 제한 초과"
     }
   },
-  "dashboard": "대시보드"
+  "dashboard": "대시보드",
+  "labels": {
+    "headers": "헤더",
+    "pathParams": "경로 매개변수",
+    "queryParams": "쿼리 매개변수",
+    "requestBody": "요청 본문",
+    "response": "응답",
+    "statusCodes": "상태 코드"
+  }
 }

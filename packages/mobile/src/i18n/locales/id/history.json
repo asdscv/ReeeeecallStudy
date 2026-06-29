@@ -17,5 +17,39 @@
     "history": "Riwayat",
     "analytics": "Analitik"
   },
-  "sessionsPerDay": "Sesi per hari"
+  "sessionsPerDay": "Sesi per hari",
+  "ratings": {
+    "again": "Ulangi",
+    "hard": "Sulit",
+    "good": "Bagus",
+    "easy": "Mudah",
+    "got_it": "Benar",
+    "missed": "Salah",
+    "known": "Tahu",
+    "unknown": "Belum tahu"
+  },
+  "stats": {
+    "cards": "Kartu",
+    "duration": "Durasi",
+    "performance": "Performa"
+  },
+  "cardDetails": "Detail Kartu",
+  "logsCount": "{{count}} catatan",
+  "loadingDetails": "Memuat detail...",
+  "noLogs": "Tidak ada catatan detail untuk sesi ini",
+  "deletedCard": "(Kartu dihapus)",
+  "noContent": "(Tidak ada konten)",
+  "deckProgress": "Progres Dek",
+  "sessionsCount": "{{count}} sesi",
+  "cardsCount": "{{count}} kartu",
+  "cardsFraction": "{{studied}}/{{total}} kartu",
+  "ratingDistribution": "Distribusi Penilaian",
+  "overview": {
+    "sessions": "Sesi",
+    "cardsStudied": "Kartu Dipelajari",
+    "totalTime": "Total Waktu",
+    "performance": "Performa",
+    "streak": "Rangkaian",
+    "avgDuration": "Durasi Rata-rata"
+  }
 }

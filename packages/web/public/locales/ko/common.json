@@ -132,7 +132,9 @@
     "firstStudy": {
       "title": "학습 준비 완료!",
       "description": "\"{{deckName}}\" 덱에 {{cardCount}}장의 카드가 준비되었습니다. 학습 모드를 선택하고 공부를 시작하세요.",
-      "action": "학습 시작하기"
+      "action": "학습 시작하기",
+      "randomReview": "랜덤 복습",
+      "sequential": "순차 학습"
     },
     "exploreMarket": {
       "title": "마켓플레이스 탐색",
@@ -287,5 +289,6 @@
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved."
   },
   "cancel": "취소",
-  "loading": "로딩 중..."
+  "loading": "로딩 중...",
+  "tagline": "AI로 더 똑똑해지는 플래시카드"
 }

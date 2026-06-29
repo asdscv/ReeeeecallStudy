@@ -129,7 +129,8 @@
       "copy": "Copy",
       "subscribe": "Subscribe",
       "snapshot": "Snapshot"
-    }
+    },
+    "unknownRecipient": "N/A"
   },
   "acceptInvite": {
     "title": "Deck Invitation",

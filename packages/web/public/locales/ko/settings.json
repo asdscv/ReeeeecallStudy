@@ -133,7 +133,8 @@
     "securityNote": "API 키는 AES-256 암호화되어 브라우저에 저장됩니다. 서버로 전송되지 않습니다.",
     "custom": "커스텀",
     "customDesc": "OpenAI 호환 API",
-    "noProviders": "설정된 프로바이더가 없습니다. 위에서 설정하세요."
+    "noProviders": "설정된 프로바이더가 없습니다. 위에서 설정하세요.",
+    "customModel": "사용자 지정 모델"
   },
   "reminders": {
     "title": "학습 리마인더",
@@ -180,5 +181,13 @@
     "description": "하루 학습 목표를 분 단위로 설정하세요. 비워두면 목표 없음입니다.",
     "placeholder": "예: 30",
     "unit": "분 / 일"
+  },
+  "plan": {
+    "free": "무료"
+  },
+  "saveFailed": "저장 실패",
+  "legal": {
+    "privacy": "개인정보 처리방침",
+    "terms": "서비스 약관"
   }
 }

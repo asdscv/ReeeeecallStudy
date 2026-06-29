@@ -1,0 +1,82 @@
+{
+  "shareMode": "Modo de uso compartido",
+  "inviteLink": "Enlace de invitación",
+  "modes": {
+    "copy": {
+      "label": "Copiar",
+      "desc": "Los usuarios obtienen una copia editable",
+      "detail": "El destinatario obtiene una copia completa que puede editar libremente. No se sincroniza con tus cambios."
+    },
+    "subscribe": {
+      "label": "Suscribirse",
+      "desc": "Los usuarios obtienen una copia de solo lectura con actualización automática",
+      "detail": "Los destinatarios se mantienen sincronizados con tu mazo. No pueden editar, pero siempre tienen lo más reciente."
+    },
+    "snapshot": {
+      "label": "Instantánea",
+      "desc": "Los usuarios obtienen una copia de solo lectura, sin actualizaciones",
+      "detail": "Una copia de solo lectura congelada en el momento actual. Sin actualizaciones futuras."
+    }
+  },
+  "status": {
+    "pending": "Pendiente",
+    "active": "Activo",
+    "revoked": "Revocado",
+    "declined": "Rechazado"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "revoke": "Revocar",
+    "unsubscribe": "Cancelar suscripción"
+  },
+  "shareDeck": {
+    "title": "Compartir mazo",
+    "subtitle": "Comparte este mazo de forma privada mediante un enlace de invitación",
+    "generateLink": "Generar enlace de invitación",
+    "creating": "Creando...",
+    "copied": "¡Copiado!",
+    "copyLink": "Copiar enlace",
+    "newLink": "Nuevo enlace",
+    "linkHint": "Cualquier persona con este enlace puede aceptar la invitación y acceder al mazo.",
+    "existingShares": "Comparticiones existentes ({{count}})",
+    "noShares": "Aún no hay comparticiones. Genera un enlace de invitación arriba."
+  },
+  "revokeAlert": {
+    "title": "Revocar acceso",
+    "message": "¿Seguro que quieres revocar esta compartición?"
+  },
+  "unsubscribeAlert": {
+    "title": "Cancelar suscripción",
+    "message": "¿Seguro que quieres cancelar la suscripción a este mazo?"
+  },
+  "myShares": {
+    "title": "Mis comparticiones",
+    "sharedByYou": "Compartido por ti",
+    "sharedWithYou": "Compartido contigo",
+    "emptySentTitle": "Aún no has compartido ningún mazo.",
+    "emptySentHint": "Ve a un mazo y toca \"Compartir\" para crear un enlace de invitación.",
+    "emptyReceived": "Nadie ha compartido un mazo contigo todavía.",
+    "activePending": "{{activeCount}} activos · {{pendingCount}} pendientes",
+    "viewAll": "Ver las {{count}} comparticiones",
+    "unknownDeck": "Mazo desconocido"
+  },
+  "publish": {
+    "subtitle": "Comparte tu mazo con la comunidad",
+    "titleLabel": "Título",
+    "titlePlaceholder": "Título del mazo en el mercado",
+    "descriptionLabel": "Descripción",
+    "descriptionPlaceholder": "¿Qué estudiarán los alumnos?",
+    "tagsLabel": "Etiquetas",
+    "tagsPlaceholder": "etiquetas, separadas, por comas",
+    "tagsHint": "Ayuda a otros a encontrar tu mazo",
+    "category": "Categoría",
+    "titleRequired": "El título es obligatorio",
+    "errorTitle": "Error",
+    "publishFailed": "No se pudo publicar el mazo",
+    "publishedTitle": "¡Publicado!",
+    "publishedMessage": "Tu mazo ya está disponible en el mercado.",
+    "ok": "Aceptar"
+  },
+  "unsubscribe": "Cancelar suscripción",
+  "unsubscribed": "Suscripción cancelada"
+}

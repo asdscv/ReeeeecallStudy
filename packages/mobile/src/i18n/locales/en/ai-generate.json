@@ -1,0 +1,67 @@
+{
+  "title": "AI Auto-Generate",
+  "subtitle": "Create flashcards automatically with AI — just enter a topic",
+  "steps": {
+    "setup": "Setup",
+    "template": "Template",
+    "deck": "Deck",
+    "cards": "Cards",
+    "done": "Done"
+  },
+  "mode": {
+    "label": "Generation Mode",
+    "full": "Full (Template + Deck + Cards)",
+    "cardsOnly": "Add Cards to Existing Deck"
+  },
+  "provider": {
+    "section": "AI PROVIDER",
+    "notice": "AI generation uses your own API key for each provider. Add or manage keys in Settings.",
+    "none": "No AI providers configured",
+    "addInSettings": "Add in Settings"
+  },
+  "content": {
+    "section": "CONTENT SETTINGS",
+    "topicLabel": "Topic",
+    "topicPlaceholder": "e.g., JLPT N3 Japanese vocabulary, Korean grammar...",
+    "contentLang": "Content Language",
+    "autoDetect": "Auto-detect",
+    "cardCountLabel": "Number of cards:",
+    "cardCountPlaceholder": "1–100",
+    "cardCountHint": "1–100 cards"
+  },
+  "deck": {
+    "section": "SELECT DECK",
+    "select": "Select a deck"
+  },
+  "generateButton": "Generate Cards",
+  "progress": {
+    "generating": "Generating cards...",
+    "saving": "Saving cards..."
+  },
+  "review": {
+    "title": "Review Cards",
+    "generatedCount": "{{count}} cards generated",
+    "save": "Save {{count}} Cards",
+    "regenerate": "Regenerate",
+    "cardDone": "Done",
+    "remove": "Remove"
+  },
+  "doneStep": {
+    "title": "Cards Created!",
+    "subtitle": "Your AI-generated flashcards are ready to study.",
+    "generateMore": "Generate More",
+    "done": "Done"
+  },
+  "errorStep": {
+    "title": "Generation Failed",
+    "default": "An error occurred during generation",
+    "retry": "Try Again",
+    "back": "Go Back"
+  },
+  "alert": {
+    "errorTitle": "Error",
+    "enterTopic": "Please enter a topic",
+    "configureProvider": "Please configure an AI provider in Settings first.",
+    "saveFailed": "Failed to save generated cards"
+  }
+}

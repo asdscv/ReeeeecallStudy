@@ -45,7 +45,14 @@
     "cardsPerSession": "Tarjetas por sesión",
     "batchHint": "Entre 5 y 500 tarjetas",
     "dateSelection": "Selección de fecha",
-    "startStudy": "Empezar a estudiar"
+    "startStudy": "Empezar a estudiar",
+    "modalSubtitleMode": "Selecciona el modo de estudio",
+    "modalSubtitleDate": "Selecciona la fecha",
+    "modalSubtitleCramming": "Opciones de estudio intensivo",
+    "modalSubtitleBatch": "Configura el tamaño del lote",
+    "dateCardCount": "{{date}} — {{count}} tarjetas",
+    "backToModeSelect": "Volver a la selección de modo",
+    "cancel": "Cancelar"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "Cargando...",
+    "swipe": "Desliza",
     "undo": "Undo",
     "endSession": "¿Terminar sesión?",
     "endMessage": "Tu progreso hasta ahora se guardará.",

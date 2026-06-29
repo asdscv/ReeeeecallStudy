@@ -15,5 +15,9 @@
   "exportJsonFailed": "Failed to export JSON",
   "noCards": "エクスポートするカードがありません。",
   "sharingUnavailable": "Sharing is not available on this device",
+  "errorTitle": "エラー",
+  "successTitle": "完了",
+  "noCardsTitle": "カードがありません",
+  "deckCardCount": "{{deck}} · {{count}}枚のカード",
   "back": "戻る"
 }

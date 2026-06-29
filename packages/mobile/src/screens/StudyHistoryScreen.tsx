@@ -237,7 +237,7 @@ export function StudyHistoryScreen() {
                 {modeBreakdown.length > 0 && (
                   <View style={styles.modeBreakdownSection}>
                     <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-                      Mode Breakdown
+                      {t('modeBreakdown')}
                     </Text>
                     <View style={styles.modeBreakdownGrid}>
                       {modeBreakdown.map((mb) => (
@@ -249,10 +249,10 @@ export function StudyHistoryScreen() {
                           <Text style={[theme.typography.label, { color: theme.colors.text }]}>{getStudyModeLabel(mb.mode)}</Text>
                           <View style={styles.modeBreakdownStats}>
                             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                              {mb.sessionCount} sessions
+                              {t('sessionsCount', { count: mb.sessionCount })}
                             </Text>
                             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                              {mb.totalCards} cards
+                              {t('cardsCount', { count: mb.totalCards })}
                             </Text>
                             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                               {formatDuration(mb.totalTimeMs)}
@@ -271,7 +271,7 @@ export function StudyHistoryScreen() {
                 {sessionDecks.length > 0 && deckScope === 'all' && (
                   <View style={styles.deckProgressSection}>
                     <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-                      Deck Progress
+                      {t('deckProgress')}
                     </Text>
                     {sessionDecks.map((deck) => {
                       const deckSessions = periodSessions.filter((s) => s.deck_id === deck.id)
@@ -287,7 +287,7 @@ export function StudyHistoryScreen() {
                               {deck.icon} {deck.name}
                             </Text>
                             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                              {totalCards} cards · {formatDuration(totalTime)}
+                              {t('cardsCount', { count: totalCards })} · {formatDuration(totalTime)}
                             </Text>
                           </View>
                           <View style={[styles.progressBarBg, { backgroundColor: theme.colors.surface }]}>
@@ -365,10 +365,10 @@ export function StudyHistoryScreen() {
                     <Text style={styles.modeEmoji}>{getStudyModeEmoji(session.study_mode)}</Text>
                     <View style={styles.sessionInfo}>
                       <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>
-                        {deck?.name ?? 'Unknown Deck'}
+                        {deck?.name ?? t('unknownDeck')}
                       </Text>
                       <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                        {getStudyModeLabel(session.study_mode)} · {session.cards_studied} cards · {formatDuration(session.total_duration_ms)}
+                        {getStudyModeLabel(session.study_mode)} · {t('cardsCount', { count: session.cards_studied })} · {formatDuration(session.total_duration_ms)}
                       </Text>
                     </View>
                     <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>{'>'}</Text>
@@ -384,7 +384,7 @@ export function StudyHistoryScreen() {
               <Text style={styles.emptyEmoji}>📝</Text>
               <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('empty')}</Text>
               <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                Start studying to see your progress here
+                {t('emptyDesc')}
               </Text>
             </View>
           ) : null

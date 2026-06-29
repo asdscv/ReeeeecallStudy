@@ -153,5 +153,49 @@
     "sortLabel": "排序：",
     "loading": "加载中...",
     "loadMore": "加载更多评论"
-  }
+  },
+  "publisher": {
+    "title": "发布者仪表板",
+    "emptyTitle": "尚无已发布的项目",
+    "emptyDescription": "在市场发布卡组即可开始跟踪浏览量和获取量。",
+    "goToDecks": "前往卡组",
+    "retry": "重试",
+    "activeListings": "活跃项目",
+    "totalViews": "总浏览量",
+    "totalAcquisitions": "总获取量",
+    "avgConversion": "平均转化率",
+    "dailyViews": "每日浏览量（最近30天）",
+    "noDataYet": "暂无数据",
+    "topListings": "浏览量最高的项目",
+    "acquisitionTrend": "获取趋势（最近30天）",
+    "yourListings": "您的项目",
+    "recentAcquisitions": "最近获取",
+    "noAcquisitionsYet": "暂无获取",
+    "recentReviews": "最近评价",
+    "noReviewsYet": "暂无评价",
+    "anonymous": "匿名",
+    "acquired": "获取了",
+    "active": "活跃",
+    "inactive": "未活跃",
+    "viewListing": "查看项目",
+    "table": {
+      "title": "标题",
+      "views": "浏览量",
+      "acquires": "获取",
+      "conv": "转化率 %",
+      "rating": "评分",
+      "created": "创建时间",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}}分钟前",
+      "hoursAgo": "{{count}}小时前",
+      "daysAgo": "{{count}}天前"
+    }
+  },
+  "reviewCount_one": "{{count}} 条评价",
+  "reviewCount_other": "{{count}} 条评价",
+  "rateStar_one": "评 {{count}} 星",
+  "rateStar_other": "评 {{count}} 星"
 }

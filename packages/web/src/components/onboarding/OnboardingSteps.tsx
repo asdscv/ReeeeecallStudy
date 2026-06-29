@@ -327,11 +327,11 @@ export function FirstStudyStep({ onAction }: StepProps) {
         </div>
         <div className="flex items-center gap-2 text-sm text-foreground">
           <span className="text-content-tertiary">&#8226;</span>
-          <span>Random Review</span>
+          <span>{t('onboarding.firstStudy.randomReview')}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-foreground">
           <span className="text-content-tertiary">&#8226;</span>
-          <span>Sequential</span>
+          <span>{t('onboarding.firstStudy.sequential')}</span>
         </div>
       </div>
 

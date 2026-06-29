@@ -133,7 +133,8 @@
     "securityNote": "API keys are AES-256 encrypted and stored in your browser. Never sent to our servers.",
     "custom": "Custom",
     "customDesc": "OpenAI-compatible API",
-    "noProviders": "No providers configured. Set up above."
+    "noProviders": "No providers configured. Set up above.",
+    "customModel": "Custom Model"
   },
   "reminders": {
     "title": "Study Reminders",
@@ -180,5 +181,13 @@
     "description": "Set a daily study target in minutes. Leave empty for no goal.",
     "placeholder": "e.g. 30",
     "unit": "minutes / day"
+  },
+  "plan": {
+    "free": "Free"
+  },
+  "saveFailed": "Failed to save",
+  "legal": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   }
 }

@@ -45,7 +45,14 @@
     "cardsPerSession": "Số thẻ mỗi phiên",
     "batchHint": "Từ 5 đến 500 thẻ",
     "dateSelection": "Chọn ngày",
-    "startStudy": "Bắt đầu học"
+    "startStudy": "Bắt đầu học",
+    "modalSubtitleMode": "Chọn chế độ học",
+    "modalSubtitleDate": "Chọn ngày",
+    "modalSubtitleCramming": "Tùy chọn nhồi nhét",
+    "modalSubtitleBatch": "Đặt kích thước lô",
+    "dateCardCount": "{{date}} — {{count}} thẻ",
+    "backToModeSelect": "Quay lại chọn chế độ",
+    "cancel": "Hủy"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "Đang tải...",
+    "swipe": "Vuốt",
     "undo": "Undo",
     "endSession": "Kết thúc phiên?",
     "endMessage": "Tiến trình của bạn cho đến giờ sẽ được lưu.",

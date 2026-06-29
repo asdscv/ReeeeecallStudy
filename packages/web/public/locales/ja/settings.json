@@ -133,7 +133,8 @@
     "securityNote": "API キーは AES-256 暗号化されてブラウザに保存されます。サーバーには送信されません。",
     "custom": "カスタム",
     "customDesc": "OpenAI 互換 API",
-    "noProviders": "プロバイダーが設定されていません。上で設定してください。"
+    "noProviders": "プロバイダーが設定されていません。上で設定してください。",
+    "customModel": "カスタムモデル"
   },
   "account": {
     "title": "アカウント",
@@ -180,5 +181,13 @@
     "description": "1日の学習目標を分単位で設定します。空欄なら目標なし。",
     "placeholder": "例: 30",
     "unit": "分 / 日"
+  },
+  "plan": {
+    "free": "無料"
+  },
+  "saveFailed": "保存に失敗しました",
+  "legal": {
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約"
   }
 }

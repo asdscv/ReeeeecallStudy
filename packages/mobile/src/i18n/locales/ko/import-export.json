@@ -15,5 +15,9 @@
   "exportJsonFailed": "JSON 내보내기에 실패했습니다",
   "noCards": "내보낼 카드가 없습니다",
   "sharingUnavailable": "이 기기에서 공유를 사용할 수 없습니다",
+  "errorTitle": "오류",
+  "successTitle": "완료",
+  "noCardsTitle": "카드 없음",
+  "deckCardCount": "{{deck}} · 카드 {{count}}장",
   "back": "뒤로"
 }

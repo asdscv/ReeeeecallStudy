@@ -20,6 +20,8 @@ const resources = {
     errors: require('./locales/en/errors.json'),
     paywall: require('./locales/en/paywall.json'),
     update: require('./locales/en/update.json'),
+    sharing: require('./locales/en/sharing.json'),
+    'ai-generate': require('./locales/en/ai-generate.json'),
   },
   ko: {
     common: require('./locales/ko/common.json'),
@@ -35,6 +37,8 @@ const resources = {
     errors: require('./locales/ko/errors.json'),
     paywall: require('./locales/ko/paywall.json'),
     update: require('./locales/ko/update.json'),
+    sharing: require('./locales/ko/sharing.json'),
+    'ai-generate': require('./locales/ko/ai-generate.json'),
   },
   ja: {
     common: require('./locales/ja/common.json'),
@@ -50,6 +54,8 @@ const resources = {
     errors: require('./locales/ja/errors.json'),
     paywall: require('./locales/ja/paywall.json'),
     update: require('./locales/ja/update.json'),
+    sharing: require('./locales/ja/sharing.json'),
+    'ai-generate': require('./locales/ja/ai-generate.json'),
   },
   zh: {
     common: require('./locales/zh/common.json'),
@@ -65,6 +71,8 @@ const resources = {
     errors: require('./locales/zh/errors.json'),
     paywall: require('./locales/zh/paywall.json'),
     update: require('./locales/zh/update.json'),
+    sharing: require('./locales/zh/sharing.json'),
+    'ai-generate': require('./locales/zh/ai-generate.json'),
   },
   vi: {
     common: require('./locales/vi/common.json'),
@@ -80,6 +88,8 @@ const resources = {
     errors: require('./locales/vi/errors.json'),
     paywall: require('./locales/vi/paywall.json'),
     update: require('./locales/vi/update.json'),
+    sharing: require('./locales/vi/sharing.json'),
+    'ai-generate': require('./locales/vi/ai-generate.json'),
   },
   th: {
     common: require('./locales/th/common.json'),
@@ -95,6 +105,8 @@ const resources = {
     errors: require('./locales/th/errors.json'),
     paywall: require('./locales/th/paywall.json'),
     update: require('./locales/th/update.json'),
+    sharing: require('./locales/th/sharing.json'),
+    'ai-generate': require('./locales/th/ai-generate.json'),
   },
   id: {
     common: require('./locales/id/common.json'),
@@ -110,6 +122,8 @@ const resources = {
     errors: require('./locales/id/errors.json'),
     paywall: require('./locales/id/paywall.json'),
     update: require('./locales/id/update.json'),
+    sharing: require('./locales/id/sharing.json'),
+    'ai-generate': require('./locales/id/ai-generate.json'),
   },
   es: {
     common: require('./locales/es/common.json'),
@@ -125,6 +139,8 @@ const resources = {
     errors: require('./locales/es/errors.json'),
     paywall: require('./locales/es/paywall.json'),
     update: require('./locales/es/update.json'),
+    sharing: require('./locales/es/sharing.json'),
+    'ai-generate': require('./locales/es/ai-generate.json'),
   },
 }
 
@@ -174,7 +190,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs,
 
-    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update'],
+    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate'],
     defaultNS: 'common',
 
     interpolation: { escapeValue: false },

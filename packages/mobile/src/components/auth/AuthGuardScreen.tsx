@@ -8,7 +8,7 @@ const CARD_W = W * 0.68
 const CARD_H = CARD_W * 0.58
 
 const FLIP_INTERVAL = 1200
-const RATING_LABELS = ['Again', 'Hard', 'Good', 'Easy']
+const RATING_KEYS = ['again', 'hard', 'good', 'easy'] as const
 const RATING_COLORS = ['#ef4444', '#f97316', '#10b981', '#3b82f6']
 
 const ORBS = [
@@ -32,7 +32,7 @@ interface Props {
  * Card flip preview blurs, then glass CTA card slides up.
  */
 export function AuthGuardScreen({ onLogin }: Props) {
-  const { t } = useTranslation('auth')
+  const { t } = useTranslation(['auth', 'common'])
   const [isFlipped, setIsFlipped] = useState(false)
   const [highlightIdx, setHighlightIdx] = useState(-1)
 
@@ -89,7 +89,7 @@ export function AuthGuardScreen({ onLogin }: Props) {
     const sweep = setInterval(() => {
       setHighlightIdx(idx)
       idx++
-      if (idx >= RATING_LABELS.length) clearInterval(sweep)
+      if (idx >= RATING_KEYS.length) clearInterval(sweep)
     }, 200)
     return () => clearInterval(sweep)
   }, [isFlipped])
@@ -128,21 +128,21 @@ export function AuthGuardScreen({ onLogin }: Props) {
           <Animated.View style={[s.card, { transform: [{ perspective: 1200 }, { rotateY: frontRotate }], opacity: frontOpacity }]}>
             <View style={s.cardBadge}><Text style={s.cardBadgeText}>Q</Text></View>
             <Text style={s.cardMainText}>Hello</Text>
-            <Text style={s.cardSubText}>Tap to reveal</Text>
+            <Text style={s.cardSubText}>{t('common:demoCard.tapToReveal')}</Text>
           </Animated.View>
           <Animated.View style={[s.card, s.cardBack, { transform: [{ perspective: 1200 }, { rotateY: backRotate }], opacity: backOpacity }]}>
             <View style={s.cardBadge}><Text style={s.cardBadgeText}>A</Text></View>
             <Text style={s.cardMainText}>Bonjour</Text>
-            <Text style={s.cardMeaningText}>Hello (French)</Text>
+            <Text style={s.cardMeaningText}>{t('common:demoCard.helloFrench')}</Text>
             <Text style={s.cardExampleText}>"Bonjour, comment allez-vous?"</Text>
           </Animated.View>
         </View>
 
         {/* Rating */}
         <View style={s.ratingRow}>
-          {RATING_LABELS.map((label, i) => (
+          {RATING_KEYS.map((rkey, i) => (
             <View
-              key={label}
+              key={rkey}
               style={[
                 s.ratingBtn,
                 highlightIdx === i
@@ -150,7 +150,7 @@ export function AuthGuardScreen({ onLogin }: Props) {
                   : { backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
               ]}
             >
-              <Text style={[s.ratingText, highlightIdx === i && { color: '#fff', fontWeight: '700' }]}>{label}</Text>
+              <Text style={[s.ratingText, highlightIdx === i && { color: '#fff', fontWeight: '700' }]}>{t(`common:rating.${rkey}`)}</Text>
             </View>
           ))}
         </View>

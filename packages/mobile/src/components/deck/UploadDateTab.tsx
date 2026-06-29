@@ -1,4 +1,5 @@
 import { View, Text, SectionList, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import { ListCard, Badge } from '../ui'
 import { groupCardsByDate } from '@reeeeecall/shared/lib/stats'
@@ -20,6 +21,7 @@ interface DateSection {
 
 export function UploadDateTab({ cards, onCardPress, testID }: UploadDateTabProps) {
   const theme = useTheme()
+  const { t } = useTranslation('decks')
 
   const grouped = groupCardsByDate(cards)
 
@@ -39,7 +41,7 @@ export function UploadDateTab({ cards, onCardPress, testID }: UploadDateTabProps
   if (sections.length === 0) {
     return (
       <View style={styles.empty}>
-        <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>No cards yet</Text>
+        <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>{t('uploadDate.noCards')}</Text>
       </View>
     )
   }
@@ -54,7 +56,7 @@ export function UploadDateTab({ cards, onCardPress, testID }: UploadDateTabProps
       renderSectionHeader={({ section }) => (
         <View style={[styles.sectionHeader, { borderBottomColor: theme.colors.border }]}>
           <Text style={[theme.typography.label, { color: theme.colors.text }]}>{section.title}</Text>
-          <Badge label={`${section.count} cards`} variant="neutral" />
+          <Badge label={t('detail.totalCards', { count: section.count })} variant="neutral" />
         </View>
       )}
       renderItem={({ item }) => {
@@ -63,7 +65,7 @@ export function UploadDateTab({ cards, onCardPress, testID }: UploadDateTabProps
           <ListCard onPress={() => onCardPress(item.id)} testID={`upload-card-${item.id}`}>
             <View style={styles.cardRow}>
               <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
-                {front || '(empty)'}
+                {front || t('emptyField')}
               </Text>
               <Badge
                 label={item.srs_status}

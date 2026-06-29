@@ -45,7 +45,14 @@
     "cardsPerSession": "每次学习卡片数",
     "batchHint": "5 到 500 张之间",
     "dateSelection": "日期选择",
-    "startStudy": "开始学习"
+    "startStudy": "开始学习",
+    "modalSubtitleMode": "选择学习模式",
+    "modalSubtitleDate": "选择日期",
+    "modalSubtitleCramming": "突击选项",
+    "modalSubtitleBatch": "设置批次大小",
+    "dateCardCount": "{{date}} — {{count}} 张卡片",
+    "backToModeSelect": "返回模式选择",
+    "cancel": "取消"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "加载中...",
+    "swipe": "滑动",
     "undo": "Undo",
     "endSession": "结束学习？",
     "endMessage": "当前进度将被保存。",

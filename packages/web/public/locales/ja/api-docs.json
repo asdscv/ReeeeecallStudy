@@ -254,5 +254,13 @@
       "429": "レート制限超過"
     }
   },
-  "dashboard": "ダッシュボード"
+  "dashboard": "ダッシュボード",
+  "labels": {
+    "headers": "ヘッダー",
+    "pathParams": "パスパラメータ",
+    "queryParams": "クエリパラメータ",
+    "requestBody": "リクエストボディ",
+    "response": "レスポンス",
+    "statusCodes": "ステータスコード"
+  }
 }

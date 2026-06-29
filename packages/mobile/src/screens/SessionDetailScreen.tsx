@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import { Screen, Badge, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
@@ -17,15 +18,15 @@ import type { HomeStackParamList } from '../navigation/types'
 type Route = RouteProp<HomeStackParamList, 'SessionDetail'>
 type LogWithCard = StudyLog & { card?: Card }
 
-const RATING_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  again: { bg: ratingColors.againLight, text: palette.red[600], label: 'Again' },
-  hard: { bg: ratingColors.hardLight, text: palette.yellow[700], label: 'Hard' },
-  good: { bg: ratingColors.goodLight, text: palette.green[700], label: 'Good' },
-  easy: { bg: ratingColors.easyLight, text: palette.blue[600], label: 'Easy' },
-  got_it: { bg: ratingColors.goodLight, text: palette.green[700], label: 'Got it' },
-  missed: { bg: ratingColors.againLight, text: palette.red[600], label: 'Missed' },
-  known: { bg: ratingColors.goodLight, text: palette.green[700], label: 'Known' },
-  unknown: { bg: ratingColors.againLight, text: palette.red[600], label: 'Unknown' },
+const RATING_COLORS: Record<string, { bg: string; text: string; labelKey: string }> = {
+  again: { bg: ratingColors.againLight, text: palette.red[600], labelKey: 'ratings.again' },
+  hard: { bg: ratingColors.hardLight, text: palette.yellow[700], labelKey: 'ratings.hard' },
+  good: { bg: ratingColors.goodLight, text: palette.green[700], labelKey: 'ratings.good' },
+  easy: { bg: ratingColors.easyLight, text: palette.blue[600], labelKey: 'ratings.easy' },
+  got_it: { bg: ratingColors.goodLight, text: palette.green[700], labelKey: 'ratings.got_it' },
+  missed: { bg: ratingColors.againLight, text: palette.red[600], labelKey: 'ratings.missed' },
+  known: { bg: ratingColors.goodLight, text: palette.green[700], labelKey: 'ratings.known' },
+  unknown: { bg: ratingColors.againLight, text: palette.red[600], labelKey: 'ratings.unknown' },
 }
 
 const RATING_BAR_COLORS: Record<string, string> = {
@@ -37,6 +38,7 @@ const RATING_BAR_COLORS: Record<string, string> = {
 
 export function SessionDetailScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('history')
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { session, deckName, deckIcon } = route.params
@@ -106,8 +108,11 @@ export function SessionDetailScreen() {
   })
 
   const renderLog = ({ item, index }: { item: LogWithCard; index: number }) => {
-    const ratingInfo = RATING_COLORS[item.rating] ?? { bg: theme.colors.surface, text: theme.colors.textSecondary, label: item.rating }
-    const cardPreview = getCardPreview(item.card)
+    const ratingInfo = RATING_COLORS[item.rating]
+    const ratingLabel = ratingInfo ? t(ratingInfo.labelKey) : item.rating
+    const ratingBg = ratingInfo?.bg ?? theme.colors.surface
+    const ratingTextColor = ratingInfo?.text ?? theme.colors.textSecondary
+    const cardPreview = getCardPreview(item.card, t)
 
     return (
       <View
@@ -135,8 +140,8 @@ export function SessionDetailScreen() {
             )}
           </View>
         </View>
-        <View style={[styles.ratingBadge, { backgroundColor: ratingInfo.bg }]}>
-          <Text style={[styles.ratingText, { color: ratingInfo.text }]}>{ratingInfo.label}</Text>
+        <View style={[styles.ratingBadge, { backgroundColor: ratingBg }]}>
+          <Text style={[styles.ratingText, { color: ratingTextColor }]}>{ratingLabel}</Text>
         </View>
       </View>
     )
@@ -176,18 +181,18 @@ export function SessionDetailScreen() {
               <View style={styles.statsRow}>
                 <StatPill
                   theme={theme}
-                  label="Cards"
+                  label={t('stats.cards')}
                   value={String(session.cards_studied)}
                 />
                 <StatPill
                   theme={theme}
-                  label="Duration"
+                  label={t('stats.duration')}
                   value={formatDuration(session.total_duration_ms)}
                 />
                 {totalRatings > 0 && (
                   <StatPill
                     theme={theme}
-                    label="Performance"
+                    label={t('stats.performance')}
                     value={`${performance}%`}
                   />
                 )}
@@ -215,7 +220,7 @@ export function SessionDetailScreen() {
                         <View key={rating} style={styles.legendItem}>
                           <View style={[styles.legendDot, { backgroundColor: RATING_BAR_COLORS[rating] ?? palette.gray[300] }]} />
                           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                            {info?.label ?? rating} {count}
+                            {info ? t(info.labelKey) : rating} {count}
                           </Text>
                         </View>
                       )
@@ -227,9 +232,9 @@ export function SessionDetailScreen() {
 
             {/* Card details header */}
             <View style={styles.detailHeader}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Card Details</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('cardDetails')}</Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                {logs.length} logs
+                {t('logsCount', { count: logs.length })}
               </Text>
             </View>
 
@@ -237,7 +242,7 @@ export function SessionDetailScreen() {
               <View style={styles.loadingRow}>
                 <ActivityIndicator size="small" color={theme.colors.primary} />
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                  Loading details...
+                  {t('loadingDetails')}
                 </Text>
               </View>
             )}
@@ -247,7 +252,7 @@ export function SessionDetailScreen() {
           !loading ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                No detailed logs available for this session
+                {t('noLogs')}
               </Text>
             </View>
           ) : null
@@ -268,10 +273,10 @@ function StatPill({ theme, label, value }: { theme: ReturnType<typeof useTheme>;
   )
 }
 
-function getCardPreview(card?: Card): string {
-  if (!card) return '(Deleted card)'
+function getCardPreview(card: Card | undefined, t: (key: string) => string): string {
+  if (!card) return t('deletedCard')
   const values = Object.values(card.field_values)
-  if (values.length === 0) return '(No content)'
+  if (values.length === 0) return t('noContent')
   const front = String(values[0] ?? '').slice(0, 40)
   const back = values[1] ? String(values[1]).slice(0, 30) : ''
   if (back) return `${front} -> ${back}`

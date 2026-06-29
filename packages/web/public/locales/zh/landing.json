@@ -183,7 +183,8 @@
     "reviews": "评价",
     "howItWorks": "使用方法",
     "faq": "FAQ",
-    "dashboard": "控制台"
+    "dashboard": "控制台",
+    "menu": "菜单"
   },
   "trustBadges": {
     "srs": "智能SRS",
@@ -193,7 +194,7 @@
     "import": "CSV & API导入"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
+    "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API 文档",
     "tagline": "基于间隔重复的智能闪卡学习平台",
     "product": "产品",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "已学卡片",
     "decksCreatedLabel": "已创建牌组",
     "testimonials": {
-      "0": { "quote": "多亏了 ReeeeecallStudy，我通过了 JLPT N2。SRS 算法非常有效！", "author": "王小明", "role": "语言学习者" },
-      "1": { "quote": "界面很干净直观，学习变得更有趣了。", "author": "李小红", "role": "医学生" },
-      "2": { "quote": "牌组分享功能太棒了。几乎找到了所有科目的牌组。", "author": "张三", "role": "大学生" }
+      "0": {
+        "quote": "多亏了 ReeeeecallStudy，我通过了 JLPT N2。SRS 算法非常有效！",
+        "author": "王小明",
+        "role": "语言学习者"
+      },
+      "1": {
+        "quote": "界面很干净直观，学习变得更有趣了。",
+        "author": "李小红",
+        "role": "医学生"
+      },
+      "2": {
+        "quote": "牌组分享功能太棒了。几乎找到了所有科目的牌组。",
+        "author": "张三",
+        "role": "大学生"
+      }
     }
   },
   "science": {

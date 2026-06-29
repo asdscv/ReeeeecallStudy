@@ -129,7 +129,8 @@
       "copy": "복사",
       "subscribe": "구독",
       "snapshot": "스냅샷"
-    }
+    },
+    "unknownRecipient": "해당 없음"
   },
   "acceptInvite": {
     "title": "덱 초대",

@@ -133,7 +133,8 @@
     "securityNote": "API 密钥经过 AES-256 加密存储在浏览器中，不会发送到我们的服务器。",
     "custom": "自定义",
     "customDesc": "OpenAI 兼容 API",
-    "noProviders": "未配置提供商，请在上方设置。"
+    "noProviders": "未配置提供商，请在上方设置。",
+    "customModel": "自定义模型"
   },
   "account": {
     "title": "账号",
@@ -180,5 +181,13 @@
     "description": "设置每日学习目标（分钟）。留空表示无目标。",
     "placeholder": "例如 30",
     "unit": "分钟 / 天"
+  },
+  "plan": {
+    "free": "免费"
+  },
+  "saveFailed": "保存失败",
+  "legal": {
+    "privacy": "隐私政策",
+    "terms": "服务条款"
   }
 }

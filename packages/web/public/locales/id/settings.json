@@ -133,7 +133,8 @@
     "securityNote": "Kunci API dienkripsi AES-256 dan disimpan di browser. Tidak pernah dikirim ke server kami.",
     "custom": "Kustom",
     "customDesc": "API kompatibel OpenAI",
-    "noProviders": "Belum ada penyedia yang dikonfigurasi. Atur di atas."
+    "noProviders": "Belum ada penyedia yang dikonfigurasi. Atur di atas.",
+    "customModel": "Model Kustom"
   },
   "account": {
     "title": "Akun",
@@ -180,5 +181,13 @@
     "description": "Tetapkan target belajar harian dalam menit. Kosongkan jika tanpa target.",
     "placeholder": "mis. 30",
     "unit": "menit / hari"
+  },
+  "plan": {
+    "free": "Gratis"
+  },
+  "saveFailed": "Gagal menyimpan",
+  "legal": {
+    "privacy": "Kebijakan Privasi",
+    "terms": "Ketentuan Layanan"
   }
 }

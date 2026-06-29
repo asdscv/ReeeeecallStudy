@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import { ProgressBar } from '../charts/ProgressBar'
 import { Badge } from '../ui'
@@ -16,6 +17,7 @@ interface DeckProgressCardProps {
 
 export function DeckProgressCard({ deckName, deckIcon, deckColor, totalCards, studiedCards, modes, testID }: DeckProgressCardProps) {
   const theme = useTheme()
+  const { t } = useTranslation('history')
   const pct = totalCards > 0 ? Math.round((studiedCards / totalCards) * 100) : 0
 
   return (
@@ -27,7 +29,7 @@ export function DeckProgressCard({ deckName, deckIcon, deckColor, totalCards, st
         <View style={styles.titleText}>
           <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>{deckName}</Text>
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            {studiedCards}/{totalCards} cards
+            {t('cardsFraction', { studied: studiedCards, total: totalCards })}
           </Text>
         </View>
       </View>

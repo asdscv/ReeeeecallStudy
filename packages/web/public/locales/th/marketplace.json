@@ -153,5 +153,49 @@
     "sortLabel": "เรียงตาม:",
     "loading": "กำลังโหลด...",
     "loadMore": "โหลดรีวิวเพิ่ม"
-  }
+  },
+  "publisher": {
+    "title": "แดชบอร์ดผู้เผยแพร่",
+    "emptyTitle": "ยังไม่มีรายการที่เผยแพร่",
+    "emptyDescription": "เผยแพร่เด็คบนมาร์เก็ตเพลสเพื่อเริ่มติดตามยอดดูและยอดรับ",
+    "goToDecks": "ไปที่เด็ค",
+    "retry": "ลองใหม่",
+    "activeListings": "รายการที่ใช้งาน",
+    "totalViews": "ยอดดูทั้งหมด",
+    "totalAcquisitions": "ยอดรับทั้งหมด",
+    "avgConversion": "คอนเวอร์ชันเฉลี่ย",
+    "dailyViews": "ยอดดูรายวัน (30 วันล่าสุด)",
+    "noDataYet": "ยังไม่มีข้อมูล",
+    "topListings": "รายการยอดดูสูงสุด",
+    "acquisitionTrend": "แนวโน้มการรับ (30 วันล่าสุด)",
+    "yourListings": "รายการของคุณ",
+    "recentAcquisitions": "การรับล่าสุด",
+    "noAcquisitionsYet": "ยังไม่มีการรับ",
+    "recentReviews": "รีวิวล่าสุด",
+    "noReviewsYet": "ยังไม่มีรีวิว",
+    "anonymous": "ไม่ระบุชื่อ",
+    "acquired": "ได้รับ",
+    "active": "ใช้งาน",
+    "inactive": "ไม่ใช้งาน",
+    "viewListing": "ดูรายการ",
+    "table": {
+      "title": "ชื่อ",
+      "views": "ยอดดู",
+      "acquires": "การรับ",
+      "conv": "คอนเวอร์ชัน %",
+      "rating": "คะแนน",
+      "created": "วันที่สร้าง",
+      "status": "สถานะ",
+      "actions": "การดำเนินการ"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}} นาทีที่แล้ว",
+      "hoursAgo": "{{count}} ชม.ที่แล้ว",
+      "daysAgo": "{{count}} วันที่แล้ว"
+    }
+  },
+  "reviewCount_one": "{{count}} รีวิว",
+  "reviewCount_other": "{{count}} รีวิว",
+  "rateStar_one": "ให้คะแนน {{count}} ดาว",
+  "rateStar_other": "ให้คะแนน {{count}} ดาว"
 }

@@ -254,5 +254,13 @@
       "429": "Rate limit exceeded"
     }
   },
-  "dashboard": "Dashboard"
+  "dashboard": "Dashboard",
+  "labels": {
+    "headers": "Headers",
+    "pathParams": "Path Parameters",
+    "queryParams": "Query Parameters",
+    "requestBody": "Request Body",
+    "response": "Response",
+    "statusCodes": "Status Codes"
+  }
 }

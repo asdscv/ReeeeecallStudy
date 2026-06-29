@@ -1,0 +1,82 @@
+{
+  "shareMode": "공유 방식",
+  "inviteLink": "초대 링크",
+  "modes": {
+    "copy": {
+      "label": "복사",
+      "desc": "사용자가 편집 가능한 사본을 받습니다",
+      "detail": "받는 사람이 자유롭게 편집할 수 있는 전체 사본을 받습니다. 내 변경 사항과 동기화되지 않습니다."
+    },
+    "subscribe": {
+      "label": "구독",
+      "desc": "사용자가 읽기 전용으로 자동 업데이트되는 사본을 받습니다",
+      "detail": "받는 사람이 내 덱과 동기화됩니다. 편집할 수 없지만 항상 최신 상태를 유지합니다."
+    },
+    "snapshot": {
+      "label": "스냅샷",
+      "desc": "사용자가 읽기 전용 사본을 받으며 업데이트되지 않습니다",
+      "detail": "현재 시점의 고정된 읽기 전용 사본입니다. 이후 업데이트가 없습니다."
+    }
+  },
+  "status": {
+    "pending": "대기 중",
+    "active": "활성",
+    "revoked": "철회됨",
+    "declined": "거절됨"
+  },
+  "actions": {
+    "cancel": "취소",
+    "revoke": "철회",
+    "unsubscribe": "구독 해지"
+  },
+  "shareDeck": {
+    "title": "덱 공유",
+    "subtitle": "초대 링크로 이 덱을 비공개로 공유하세요",
+    "generateLink": "초대 링크 생성",
+    "creating": "생성 중...",
+    "copied": "복사됨!",
+    "copyLink": "링크 복사",
+    "newLink": "새 링크",
+    "linkHint": "이 링크가 있는 사람은 누구나 초대를 수락하고 덱에 접근할 수 있습니다.",
+    "existingShares": "기존 공유 ({{count}})",
+    "noShares": "아직 공유가 없습니다. 위에서 초대 링크를 생성하세요."
+  },
+  "revokeAlert": {
+    "title": "접근 권한 철회",
+    "message": "이 공유를 철회하시겠습니까?"
+  },
+  "unsubscribeAlert": {
+    "title": "구독 해지",
+    "message": "이 덱 구독을 해지하시겠습니까?"
+  },
+  "myShares": {
+    "title": "내 공유",
+    "sharedByYou": "내가 공유함",
+    "sharedWithYou": "나와 공유됨",
+    "emptySentTitle": "아직 공유한 덱이 없습니다.",
+    "emptySentHint": "덱으로 이동해 \"공유\"를 눌러 초대 링크를 만드세요.",
+    "emptyReceived": "아직 나와 덱을 공유한 사람이 없습니다.",
+    "activePending": "활성 {{activeCount}}개 · 대기 {{pendingCount}}개",
+    "viewAll": "전체 {{count}}개 공유 보기",
+    "unknownDeck": "알 수 없는 덱"
+  },
+  "publish": {
+    "subtitle": "커뮤니티에 덱을 공유하세요",
+    "titleLabel": "제목",
+    "titlePlaceholder": "마켓플레이스에 표시될 덱 제목",
+    "descriptionLabel": "설명",
+    "descriptionPlaceholder": "학습자가 무엇을 배우게 되나요?",
+    "tagsLabel": "태그",
+    "tagsPlaceholder": "쉼표, 로, 구분된, 태그",
+    "tagsHint": "다른 사람이 덱을 찾는 데 도움이 됩니다",
+    "category": "카테고리",
+    "titleRequired": "제목을 입력하세요",
+    "errorTitle": "오류",
+    "publishFailed": "덱 게시에 실패했습니다",
+    "publishedTitle": "게시됨!",
+    "publishedMessage": "이제 덱이 마켓플레이스에서 이용 가능합니다.",
+    "ok": "확인"
+  },
+  "unsubscribe": "구독 해지",
+  "unsubscribed": "구독을 취소했습니다"
+}

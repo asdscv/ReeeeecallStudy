@@ -17,5 +17,39 @@
     "history": "ประวัติ",
     "analytics": "วิเคราะห์"
   },
-  "sessionsPerDay": "เซสชันต่อวัน"
+  "sessionsPerDay": "เซสชันต่อวัน",
+  "ratings": {
+    "again": "อีกครั้ง",
+    "hard": "ยาก",
+    "good": "ดี",
+    "easy": "ง่าย",
+    "got_it": "ตอบถูก",
+    "missed": "ตอบผิด",
+    "known": "รู้",
+    "unknown": "ไม่รู้"
+  },
+  "stats": {
+    "cards": "การ์ด",
+    "duration": "ระยะเวลา",
+    "performance": "ประสิทธิภาพ"
+  },
+  "cardDetails": "รายละเอียดการ์ด",
+  "logsCount": "{{count}} รายการ",
+  "loadingDetails": "กำลังโหลดรายละเอียด...",
+  "noLogs": "ไม่มีบันทึกรายละเอียดสำหรับเซสชันนี้",
+  "deletedCard": "(การ์ดที่ถูกลบ)",
+  "noContent": "(ไม่มีเนื้อหา)",
+  "deckProgress": "ความคืบหน้าชุดการ์ด",
+  "sessionsCount": "{{count}} เซสชัน",
+  "cardsCount": "{{count}} การ์ด",
+  "cardsFraction": "{{studied}}/{{total}} การ์ด",
+  "ratingDistribution": "การกระจายคะแนน",
+  "overview": {
+    "sessions": "เซสชัน",
+    "cardsStudied": "การ์ดที่เรียน",
+    "totalTime": "เวลารวม",
+    "performance": "ประสิทธิภาพ",
+    "streak": "สถิติต่อเนื่อง",
+    "avgDuration": "เวลาเฉลี่ย"
+  }
 }

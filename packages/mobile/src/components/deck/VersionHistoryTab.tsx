@@ -48,7 +48,7 @@ export function VersionHistoryTab({ deckId, isOwner, testID }: VersionHistoryTab
       <View style={styles.loadingContainer} testID={testID}>
         <ActivityIndicator size="small" color={theme.colors.primary} />
         <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginTop: 8 }]}>
-          Loading versions...
+          {t('versionHistory.loading')}
         </Text>
       </View>
     )
@@ -121,7 +121,7 @@ export function VersionHistoryTab({ deckId, isOwner, testID }: VersionHistoryTab
           </Text>
           {isOwner && (
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center', marginTop: 4 }]}>
-              Create a version to snapshot your deck's current state.
+              {t('versionHistory.createHint')}
             </Text>
           )}
         </View>

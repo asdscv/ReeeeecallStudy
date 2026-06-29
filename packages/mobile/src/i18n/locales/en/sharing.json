@@ -1,0 +1,82 @@
+{
+  "shareMode": "Share Mode",
+  "inviteLink": "Invite Link",
+  "modes": {
+    "copy": {
+      "label": "Copy",
+      "desc": "Users get an editable copy",
+      "detail": "The recipient gets a full copy they can edit freely. No sync with your changes."
+    },
+    "subscribe": {
+      "label": "Subscribe",
+      "desc": "Users get read-only, auto-updated",
+      "detail": "Recipients stay in sync with your deck. They cannot edit but always have the latest."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "desc": "Users get read-only copy, no updates",
+      "detail": "A frozen read-only copy at the current moment. No future updates."
+    }
+  },
+  "status": {
+    "pending": "Pending",
+    "active": "Active",
+    "revoked": "Revoked",
+    "declined": "Declined"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "revoke": "Revoke",
+    "unsubscribe": "Unsubscribe"
+  },
+  "shareDeck": {
+    "title": "Share Deck",
+    "subtitle": "Share this deck privately via an invite link",
+    "generateLink": "Generate Invite Link",
+    "creating": "Creating...",
+    "copied": "Copied!",
+    "copyLink": "Copy Link",
+    "newLink": "New Link",
+    "linkHint": "Anyone with this link can accept the invite and get access to the deck.",
+    "existingShares": "Existing Shares ({{count}})",
+    "noShares": "No shares yet. Generate an invite link above."
+  },
+  "revokeAlert": {
+    "title": "Revoke Access",
+    "message": "Are you sure you want to revoke this share?"
+  },
+  "unsubscribeAlert": {
+    "title": "Unsubscribe",
+    "message": "Are you sure you want to unsubscribe from this deck?"
+  },
+  "myShares": {
+    "title": "My Shares",
+    "sharedByYou": "Shared by You",
+    "sharedWithYou": "Shared with You",
+    "emptySentTitle": "You haven't shared any decks yet.",
+    "emptySentHint": "Go to a deck and tap \"Share\" to create an invite link.",
+    "emptyReceived": "No one has shared a deck with you yet.",
+    "activePending": "{{activeCount}} active · {{pendingCount}} pending",
+    "viewAll": "View all {{count}} shares",
+    "unknownDeck": "Unknown Deck"
+  },
+  "publish": {
+    "subtitle": "Share your deck with the community",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Deck title on marketplace",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What will learners study?",
+    "tagsLabel": "Tags",
+    "tagsPlaceholder": "comma, separated, tags",
+    "tagsHint": "Help others find your deck",
+    "category": "Category",
+    "titleRequired": "Title is required",
+    "errorTitle": "Error",
+    "publishFailed": "Failed to publish deck",
+    "publishedTitle": "Published!",
+    "publishedMessage": "Your deck is now available on the marketplace.",
+    "ok": "OK"
+  },
+  "unsubscribe": "Unsubscribe",
+  "unsubscribed": "Unsubscribed"
+}

@@ -129,7 +129,8 @@
       "copy": "Salin",
       "subscribe": "Berlangganan",
       "snapshot": "Snapshot"
-    }
+    },
+    "unknownRecipient": "Tidak ada"
   },
   "acceptInvite": {
     "title": "Undangan Dek",

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
@@ -23,18 +24,19 @@ const CONTENT_LANGS = [
 
 type WizardStep = 'config' | 'generating' | 'review' | 'saving' | 'done' | 'error'
 
+// Step keys map to i18n keys under `steps.*` (rendered via t(`steps.${key}`))
 const FULL_STEPS = [
-  { key: 'setup', label: 'Setup' },
-  { key: 'template', label: 'Template' },
-  { key: 'deck', label: 'Deck' },
-  { key: 'cards', label: 'Cards' },
-  { key: 'done', label: 'Done' },
+  { key: 'setup' },
+  { key: 'template' },
+  { key: 'deck' },
+  { key: 'cards' },
+  { key: 'done' },
 ] as const
 
 const CARDS_ONLY_STEPS = [
-  { key: 'setup', label: 'Setup' },
-  { key: 'cards', label: 'Cards' },
-  { key: 'done', label: 'Done' },
+  { key: 'setup' },
+  { key: 'cards' },
+  { key: 'done' },
 ] as const
 
 function stepIndexFull(step: WizardStep): number {
@@ -53,6 +55,7 @@ function stepIndexCardsOnly(step: WizardStep): number {
 }
 
 function StepIndicator({ step, isCardsOnly }: { step: WizardStep; isCardsOnly: boolean }) {
+  const { t } = useTranslation('ai-generate')
   const steps = isCardsOnly ? CARDS_ONLY_STEPS : FULL_STEPS
   const current = isCardsOnly ? stepIndexCardsOnly(step) : stepIndexFull(step)
 
@@ -112,7 +115,7 @@ function StepIndicator({ step, isCardsOnly }: { step: WizardStep; isCardsOnly: b
                 isActive && { fontWeight: '600' },
               ]}
             >
-              {s.label}
+              {t(`steps.${s.key}`)}
             </Text>
           </View>
         )
@@ -168,6 +171,7 @@ function DropdownPicker<T extends string>({
 }
 
 export function AIGenerateScreen() {
+  const { t } = useTranslation('ai-generate')
   const theme = useTheme()
   const navigation = useNavigation()
   const store = useAIGenerateStore()
@@ -205,11 +209,11 @@ export function AIGenerateScreen() {
 
   const handleGenerate = async () => {
     if (!topic.trim()) {
-      Alert.alert('Error', 'Please enter a topic')
+      Alert.alert(t('alert.errorTitle'), t('alert.enterTopic'))
       return
     }
     if (!hasProvider || !selectedProvider) {
-      Alert.alert('Error', 'Please configure an AI provider in Settings first.')
+      Alert.alert(t('alert.errorTitle'), t('alert.configureProvider'))
       return
     }
 
@@ -263,7 +267,7 @@ export function AIGenerateScreen() {
       await store.saveAll()
       setStep('done')
     } catch {
-      Alert.alert('Error', 'Failed to save generated cards')
+      Alert.alert(t('alert.errorTitle'), t('alert.saveFailed'))
       setStep('review')
     }
   }
@@ -278,19 +282,19 @@ export function AIGenerateScreen() {
   if (step === 'config') {
     return (
       <Screen safeArea padding={false} keyboard testID="ai-generate-screen">
-        <ScreenHeader title="AI Auto-Generate" mode="drawer" />
+        <ScreenHeader title={t('title')} mode="drawer" />
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
           <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
 
-          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>AI Auto-Generate</Text>
+          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>{t('title')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-            Create flashcards automatically with AI {'\u2014'} just enter a topic
+            {t('subtitle')}
           </Text>
 
           {/* Generation Mode — matches web exactly */}
           <View style={[styles.labeledSection, { borderColor: theme.colors.border }]}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Generation Mode</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('mode.label')}</Text>
             <View style={styles.modeRow}>
               <TouchableOpacity
                 testID="ai-mode-full"
@@ -308,7 +312,7 @@ export function AIGenerateScreen() {
                   fontWeight: !selectedDeckId ? '600' : '400',
                   textAlign: 'center',
                 }]}>
-                  Full (Template + Deck + Cards)
+                  {t('mode.full')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -327,7 +331,7 @@ export function AIGenerateScreen() {
                   fontWeight: selectedDeckId ? '600' : '400',
                   textAlign: 'center',
                 }]}>
-                  Add Cards to Existing Deck
+                  {t('mode.cardsOnly')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -335,11 +339,11 @@ export function AIGenerateScreen() {
 
           {/* AI PROVIDER — matches web: labeled section */}
           <View style={styles.sectionLabelRow}>
-            <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>AI PROVIDER</Text>
+            <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('provider.section')}</Text>
           </View>
           {/* Personal API key notice — generation uses the user's own provider keys */}
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-            AI generation uses your own API key for each provider. Add or manage keys in Settings.
+            {t('provider.notice')}
           </Text>
           {hasProvider ? (
             <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
@@ -374,14 +378,14 @@ export function AIGenerateScreen() {
           ) : (
             <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
               <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                No AI providers configured
+                {t('provider.none')}
               </Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate('SettingsHome' as never)}
                 style={[styles.settingsLink, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
               >
                 <Text style={[theme.typography.bodySmall, { color: palette.blue[600], fontWeight: '500' }]}>
-                  {'\u2699\uFE0F'} Add in Settings
+                  {'\u2699\uFE0F'} {t('provider.addInSettings')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -389,13 +393,13 @@ export function AIGenerateScreen() {
 
           {/* CONTENT SETTINGS — matches web: labeled bordered section */}
           <View style={styles.sectionLabelRow}>
-            <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>CONTENT SETTINGS</Text>
+            <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('content.section')}</Text>
           </View>
           <View style={[styles.labeledSection, { borderColor: theme.colors.border }]}>
             <TextInput
               testID="ai-topic-input"
-              label="Topic"
-              placeholder="e.g., JLPT N3 Japanese vocabulary, Korean grammar..."
+              label={t('content.topicLabel')}
+              placeholder={t('content.topicPlaceholder')}
               value={topic}
               onChangeText={setTopic}
               multiline
@@ -404,13 +408,13 @@ export function AIGenerateScreen() {
 
             {/* Content Language — dropdown */}
             <View style={styles.section}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Content Language</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('content.contentLang')}</Text>
               <TouchableOpacity
                 style={[styles.dropdown, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
                 onPress={() => setShowLangPicker(true)}
               >
                 <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
-                  {CONTENT_LANGS.find(l => l.code === contentLang)?.label ?? 'Auto-detect'}
+                  {CONTENT_LANGS.find(l => l.code === contentLang)?.label ?? t('content.autoDetect')}
                 </Text>
                 <Text style={{ color: theme.colors.textTertiary }}>{'\u25BE'}</Text>
               </TouchableOpacity>
@@ -426,7 +430,7 @@ export function AIGenerateScreen() {
             {/* Number of cards */}
             <View style={styles.section}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                Number of cards:
+                {t('content.cardCountLabel')}
               </Text>
               <TextInput
                 testID="ai-card-count"
@@ -439,9 +443,9 @@ export function AIGenerateScreen() {
                   setCardCount(String(Math.min(Math.max(n, 1), 100)))
                 }}
                 keyboardType="number-pad"
-                placeholder="1–100"
+                placeholder={t('content.cardCountPlaceholder')}
               />
-              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>1–100 cards</Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('content.cardCountHint')}</Text>
             </View>
           </View>
 
@@ -449,7 +453,7 @@ export function AIGenerateScreen() {
           {selectedDeckId && decks.length > 0 && (
             <>
               <View style={styles.sectionLabelRow}>
-                <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>SELECT DECK</Text>
+                <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('deck.section')}</Text>
               </View>
               <View style={[styles.labeledSection, { borderColor: theme.colors.border }]}>
                 <TouchableOpacity
@@ -457,7 +461,7 @@ export function AIGenerateScreen() {
                   onPress={() => setShowDeckPicker(true)}
                 >
                   <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
-                    {(() => { const d = decks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : 'Select a deck' })()}
+                    {(() => { const d = decks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : t('deck.select') })()}
                   </Text>
                   <Text style={{ color: theme.colors.textTertiary }}>{'\u25BE'}</Text>
                 </TouchableOpacity>
@@ -474,7 +478,7 @@ export function AIGenerateScreen() {
 
           <Button
             testID="ai-generate-button"
-            title="Generate Cards"
+            title={t('generateButton')}
             onPress={handleGenerate}
             disabled={!topic.trim()}
           />
@@ -491,7 +495,7 @@ export function AIGenerateScreen() {
         <View style={styles.center}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>
-            {step === 'generating' ? 'Generating cards...' : 'Saving cards...'}
+            {step === 'generating' ? t('progress.generating') : t('progress.saving')}
           </Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
             {store.progress.done}/{store.progress.total}
@@ -515,8 +519,8 @@ export function AIGenerateScreen() {
           contentContainerStyle={styles.list}
           ListHeaderComponent={
             <View style={styles.header}>
-              <Text style={[theme.typography.h2, { color: theme.colors.text }]}>Review Cards</Text>
-              <Badge label={`${cards.length} cards generated`} variant="success" />
+              <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('review.title')}</Text>
+              <Badge label={t('review.generatedCount', { count: cards.length })} variant="success" />
             </View>
           }
           renderItem={({ item, index }) => (
@@ -537,8 +541,8 @@ export function AIGenerateScreen() {
           )}
           ListFooterComponent={
             <View style={styles.footer}>
-              <Button testID="ai-save-button" title={`Save ${cards.length} Cards`} onPress={handleSave} />
-              <Button title="Regenerate" variant="outline" onPress={() => { handleReset(); }} />
+              <Button testID="ai-save-button" title={t('review.save', { count: cards.length })} onPress={handleSave} />
+              <Button title={t('review.regenerate')} variant="outline" onPress={() => { handleReset(); }} />
             </View>
           }
         />
@@ -553,13 +557,13 @@ export function AIGenerateScreen() {
         <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
         <View style={styles.center}>
           <Text style={styles.doneEmoji}>🎉</Text>
-          <Text style={[theme.typography.h2, { color: theme.colors.text }]}>Cards Created!</Text>
+          <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('doneStep.title')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-            Your AI-generated flashcards are ready to study.
+            {t('doneStep.subtitle')}
           </Text>
           <View style={styles.doneActions}>
-            <Button title="Generate More" onPress={handleReset} />
-            <Button title="Done" variant="secondary" onPress={() => navigation.goBack()} />
+            <Button title={t('doneStep.generateMore')} onPress={handleReset} />
+            <Button title={t('doneStep.done')} variant="secondary" onPress={() => navigation.goBack()} />
           </View>
         </View>
       </Screen>
@@ -572,13 +576,13 @@ export function AIGenerateScreen() {
       <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />
       <View style={styles.center}>
         <Text style={styles.doneEmoji}>❌</Text>
-        <Text style={[theme.typography.h3, { color: theme.colors.error }]}>Generation Failed</Text>
+        <Text style={[theme.typography.h3, { color: theme.colors.error }]}>{t('errorStep.title')}</Text>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-          {store.error ?? 'An error occurred during generation'}
+          {store.error ?? t('errorStep.default')}
         </Text>
         <View style={styles.doneActions}>
-          <Button title="Try Again" onPress={handleReset} />
-          <Button title="Go Back" variant="secondary" onPress={() => navigation.goBack()} />
+          <Button title={t('errorStep.retry')} onPress={handleReset} />
+          <Button title={t('errorStep.back')} variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </View>
     </Screen>
@@ -600,6 +604,7 @@ function ReviewCard({
   onUpdate: (fieldKey: string, value: string) => void
   onRemove: () => void
 }) {
+  const { t } = useTranslation('ai-generate')
   const [editing, setEditing] = useState(false)
   const entries = Object.entries(item.field_values)
 
@@ -625,7 +630,7 @@ function ReviewCard({
           </View>
         ))}
         <TouchableOpacity onPress={() => setEditing(false)} style={reviewStyles.doneBtn}>
-          <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>Done</Text>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>{t('review.cardDone')}</Text>
         </TouchableOpacity>
       </View>
     )
@@ -653,7 +658,7 @@ function ReviewCard({
           onPress={onRemove}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={[theme.typography.caption, { color: palette.red[500] }]}>Remove</Text>
+          <Text style={[theme.typography.caption, { color: palette.red[500] }]}>{t('review.remove')}</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>

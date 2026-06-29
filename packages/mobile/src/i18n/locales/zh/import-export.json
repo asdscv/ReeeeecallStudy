@@ -15,5 +15,9 @@
   "exportJsonFailed": "Failed to export JSON",
   "noCards": "没有可导出的卡片。",
   "sharingUnavailable": "Sharing is not available on this device",
+  "errorTitle": "错误",
+  "successTitle": "成功",
+  "noCardsTitle": "没有卡片",
+  "deckCardCount": "{{deck}} · {{count}} 张卡片",
   "back": "返回"
 }

@@ -16,14 +16,15 @@ const CATEGORIES = [
 ]
 
 const SHARE_MODES = [
-  { value: 'copy', label: 'Copy', description: 'Users get an editable copy' },
-  { value: 'subscribe', label: 'Subscribe', description: 'Users get read-only, auto-updated' },
-  { value: 'snapshot', label: 'Snapshot', description: 'Users get read-only copy, no updates' },
+  { value: 'copy', labelKey: 'modes.copy.label', descriptionKey: 'modes.copy.desc' },
+  { value: 'subscribe', labelKey: 'modes.subscribe.label', descriptionKey: 'modes.subscribe.desc' },
+  { value: 'snapshot', labelKey: 'modes.snapshot.label', descriptionKey: 'modes.snapshot.desc' },
 ] as const
 
 export function PublishDeckScreen() {
   const theme = useTheme()
   const { t } = useTranslation('marketplace')
+  const { t: ts } = useTranslation('sharing')
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { deckId } = route.params
@@ -42,7 +43,7 @@ export function PublishDeckScreen() {
 
   const handlePublish = async () => {
     if (!title.trim()) {
-      Alert.alert('Error', 'Title is required')
+      Alert.alert(ts('publish.errorTitle'), ts('publish.titleRequired'))
       return
     }
 
@@ -58,11 +59,11 @@ export function PublishDeckScreen() {
         learningLanguage,
         shareMode,
       })
-      Alert.alert('Published!', 'Your deck is now available on the marketplace.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
+      Alert.alert(ts('publish.publishedTitle'), ts('publish.publishedMessage'), [
+        { text: ts('publish.ok'), onPress: () => navigation.goBack() },
       ])
     } catch {
-      Alert.alert('Error', 'Failed to publish deck')
+      Alert.alert(ts('publish.errorTitle'), ts('publish.publishFailed'))
     } finally {
       setPublishing(false)
     }
@@ -73,16 +74,16 @@ export function PublishDeckScreen() {
       <ScreenHeader title={t('publish.title')} mode="back" />
       <View style={styles.content}>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-          Share your deck with the community
+          {ts('publish.subtitle')}
         </Text>
 
-        <TextInput testID="publish-title" label="Title" value={title} onChangeText={setTitle} placeholder="Deck title on marketplace" />
-        <TextInput testID="publish-description" label="Description" value={description} onChangeText={setDescription} placeholder="What will learners study?" multiline numberOfLines={3} />
-        <TextInput testID="publish-tags" label="Tags" value={tags} onChangeText={setTags} placeholder="comma, separated, tags" hint="Help others find your deck" />
+        <TextInput testID="publish-title" label={ts('publish.titleLabel')} value={title} onChangeText={setTitle} placeholder={ts('publish.titlePlaceholder')} />
+        <TextInput testID="publish-description" label={ts('publish.descriptionLabel')} value={description} onChangeText={setDescription} placeholder={ts('publish.descriptionPlaceholder')} multiline numberOfLines={3} />
+        <TextInput testID="publish-tags" label={ts('publish.tagsLabel')} value={tags} onChangeText={setTags} placeholder={ts('publish.tagsPlaceholder')} hint={ts('publish.tagsHint')} />
 
         {/* Category */}
         <View style={styles.section}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>Category</Text>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{ts('publish.category')}</Text>
           <View style={styles.chipRow}>
             {CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -138,7 +139,7 @@ export function PublishDeckScreen() {
 
         {/* Share Mode */}
         <View style={styles.section}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>Share Mode</Text>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{ts('shareMode')}</Text>
           {SHARE_MODES.map((mode) => (
             <TouchableOpacity
               key={mode.value}
@@ -150,10 +151,10 @@ export function PublishDeckScreen() {
               }]}
             >
               <Text style={[theme.typography.label, { color: shareMode === mode.value ? theme.colors.primary : theme.colors.text }]}>
-                {mode.label}
+                {ts(mode.labelKey)}
               </Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {mode.description}
+                {ts(mode.descriptionKey)}
               </Text>
             </TouchableOpacity>
           ))}

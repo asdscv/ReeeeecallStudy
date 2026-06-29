@@ -153,5 +153,49 @@
     "sortLabel": "Ordenar por:",
     "loading": "Cargando...",
     "loadMore": "Cargar más reseñas"
-  }
+  },
+  "publisher": {
+    "title": "Panel del editor",
+    "emptyTitle": "Aún no hay publicaciones",
+    "emptyDescription": "Publica un mazo en el marketplace para empezar a registrar vistas y adquisiciones.",
+    "goToDecks": "Ir a los mazos",
+    "retry": "Reintentar",
+    "activeListings": "Publicaciones activas",
+    "totalViews": "Vistas totales",
+    "totalAcquisitions": "Adquisiciones totales",
+    "avgConversion": "Conversión media",
+    "dailyViews": "Vistas diarias (últimos 30 días)",
+    "noDataYet": "Aún no hay datos",
+    "topListings": "Publicaciones más vistas",
+    "acquisitionTrend": "Tendencia de adquisiciones (últimos 30 días)",
+    "yourListings": "Tus publicaciones",
+    "recentAcquisitions": "Adquisiciones recientes",
+    "noAcquisitionsYet": "Aún no hay adquisiciones",
+    "recentReviews": "Reseñas recientes",
+    "noReviewsYet": "Aún no hay reseñas",
+    "anonymous": "Anónimo",
+    "acquired": "adquirió",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "viewListing": "Ver publicación",
+    "table": {
+      "title": "Título",
+      "views": "Vistas",
+      "acquires": "Adquisiciones",
+      "conv": "Conv. %",
+      "rating": "Valoración",
+      "created": "Creado",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "timeAgo": {
+      "minutesAgo": "hace {{count}} min",
+      "hoursAgo": "hace {{count}} h",
+      "daysAgo": "hace {{count}} d"
+    }
+  },
+  "reviewCount_one": "{{count}} reseña",
+  "reviewCount_other": "{{count}} reseñas",
+  "rateStar_one": "Calificar {{count}} estrella",
+  "rateStar_other": "Calificar {{count}} estrellas"
 }

@@ -195,5 +195,78 @@
     "deckDescriptionPlaceholder": "Una breve nota sobre este mazo",
     "presetSummary": "Anverso {{front}} · Reverso {{back}}",
     "basicLabel": "Básico"
+  },
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "emptyField": "(vacío)",
+  "status": {
+    "all": "Todos",
+    "new": "Nuevas",
+    "learning": "Aprendiendo",
+    "review": "Repaso",
+    "suspended": "Suspendidas",
+    "mastered": "Dominadas"
+  },
+  "srsRating": {
+    "again": "Otra vez",
+    "hard": "Difícil",
+    "good": "Bien",
+    "easy": "Fácil"
+  },
+  "deckDetail": {
+    "tabVersions": "Versiones",
+    "selectMode": "Seleccionar",
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo",
+    "selectedCount": "{{count}} seleccionadas",
+    "deleteSelected": "Eliminar seleccionadas",
+    "deleteCardsTitle": "Eliminar tarjetas",
+    "deleteCardsConfirm": "¿Eliminar {{count}} tarjetas seleccionadas? Esto no se puede deshacer.",
+    "perPage": "Por página:",
+    "prevPage": "← Anterior",
+    "nextPage": "Siguiente →",
+    "pageOf": "Página {{current}} de {{total}}",
+    "showingRange": "Mostrando {{from}}–{{to}} de {{total}} tarjetas"
+  },
+  "deckEdit": {
+    "previewName": "Nombre del mazo",
+    "srsSettings": "Configuración SRS",
+    "srsDescription": "Configura los intervalos de repetición espaciada para este mazo.",
+    "learningSteps": "Pasos de aprendizaje (minutos)",
+    "learningStepsHint": "Minutos separados por comas, p. ej. \"1, 10\" para pasos de 1min y luego 10min.",
+    "days": "días",
+    "statistics": "Estadísticas",
+    "mastery": "Dominio",
+    "cardStatusDistribution": "Distribución de estado de tarjetas",
+    "avgEase": "Facilidad media"
+  },
+  "statsTab": {
+    "total": "Total",
+    "statusDistribution": "Distribución de estado",
+    "masteryRate": "Tasa de dominio",
+    "avgEaseFactor": "Factor de facilidad medio",
+    "avgInterval": "Intervalo medio",
+    "days": "días"
+  },
+  "relativeDate": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "Hace {{count}} días",
+    "monthAgo": "Hace 1 mes",
+    "monthsAgo": "Hace {{count}} meses"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "No se puede eliminar",
+    "cannotDeleteMsg": "Las plantillas predeterminadas no se pueden eliminar.",
+    "deleteTitle": "Eliminar plantilla",
+    "deleteFailed": "No se pudo eliminar la plantilla",
+    "defaultBadge": "Predeterminada"
+  },
+  "versionHistory": {
+    "loading": "Cargando versiones...",
+    "createHint": "Crea una versión para capturar el estado actual de tu mazo."
+  },
+  "uploadDate": {
+    "noCards": "Aún no hay tarjetas"
   }
 }

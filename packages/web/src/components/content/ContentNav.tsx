@@ -64,7 +64,7 @@ export function ContentNav({ backTo, backLabel }: ContentNavProps) {
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="sm:hidden p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer"
-          aria-label="Menu"
+          aria-label={t('nav.menu')}
         >
           {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
