@@ -151,7 +151,8 @@
     "addAnother": "Tambah & Buat Lagi",
     "errorTitle": "Kesalahan",
     "emptyError": "Setidaknya satu bidang harus diisi",
-    "saveError": "Gagal menyimpan kartu"
+    "saveError": "Gagal menyimpan kartu",
+    "noTemplateError": "Tidak ada templat kartu yang tersedia."
   },
   "quickCreate": {
     "button": "Buat Cepat",
@@ -187,7 +188,8 @@
       "nameRequired": "Silakan masukkan nama dek.",
       "templateRequired": "Silakan pilih jenis kartu.",
       "cardsRequired": "Silakan tambahkan setidaknya satu kartu.",
-      "createFailed": "Gagal membuat dek. Silakan coba lagi."
+      "createFailed": "Gagal membuat dek. Silakan coba lagi.",
+      "frontRequired": "Isi bagian depan setiap kartu."
     },
     "deckDescription": "Deskripsi (opsional)",
     "deckDescriptionPlaceholder": "Catatan singkat tentang dek ini",

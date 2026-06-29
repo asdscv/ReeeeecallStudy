@@ -151,7 +151,8 @@
     "addAnother": "Thêm và tạo tiếp",
     "errorTitle": "Lỗi",
     "emptyError": "Cần điền ít nhất một trường",
-    "saveError": "Không thể lưu thẻ"
+    "saveError": "Không thể lưu thẻ",
+    "noTemplateError": "Không có mẫu thẻ nào khả dụng."
   },
   "quickCreate": {
     "button": "Tạo nhanh",
@@ -187,7 +188,8 @@
       "nameRequired": "Vui lòng nhập tên bộ thẻ.",
       "templateRequired": "Vui lòng chọn loại thẻ.",
       "cardsRequired": "Vui lòng thêm ít nhất một thẻ.",
-      "createFailed": "Tạo bộ thẻ thất bại. Vui lòng thử lại."
+      "createFailed": "Tạo bộ thẻ thất bại. Vui lòng thử lại.",
+      "frontRequired": "Vui lòng điền mặt trước của mỗi thẻ."
     },
     "deckDescription": "Mô tả (tùy chọn)",
     "deckDescriptionPlaceholder": "Ghi chú ngắn về bộ thẻ này",
