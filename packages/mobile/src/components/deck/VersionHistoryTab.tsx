@@ -64,6 +64,7 @@ export function VersionHistoryTab({ deckId, isOwner, testID }: VersionHistoryTab
         {isOwner && (
           <TouchableOpacity
             onPress={() => setShowCreateForm(!showCreateForm)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             testID="version-create-toggle"
           >
             <Text style={[theme.typography.bodySmall, { color: theme.colors.primary, fontWeight: '600' }]}>

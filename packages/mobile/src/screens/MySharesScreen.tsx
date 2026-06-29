@@ -193,6 +193,7 @@ export function MySharesScreen() {
           <TouchableOpacity
             onPress={() => type === 'sent' ? handleRevoke(share.id) : handleUnsubscribe(share.id)}
             style={styles.actionBtn}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             testID={`my-share-action-${share.id}`}
           >
             <Text style={[theme.typography.caption, { color: palette.red[500] }]}>
@@ -316,7 +317,7 @@ const styles = StyleSheet.create({
   shareMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
   statusText: { fontSize: 10, fontWeight: '500' },
-  actionBtn: { paddingHorizontal: 8, paddingVertical: 4 },
+  actionBtn: { paddingHorizontal: 10, paddingVertical: 8, minHeight: 40, justifyContent: 'center' },
   viewAllBtn: { alignItems: 'center', paddingVertical: 10 },
   receivedDeckRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingTop: 8, paddingBottom: 4 },
 })

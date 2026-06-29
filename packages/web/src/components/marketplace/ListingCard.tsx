@@ -10,9 +10,9 @@ interface ListingCardProps {
 }
 
 const MODE_CLASSES: Record<string, string> = {
-  copy: 'bg-teal-50 text-teal-700',
-  subscribe: 'bg-purple-50 text-purple-700',
-  snapshot: 'bg-orange-50 text-orange-700',
+  copy: 'bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300',
+  subscribe: 'bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300',
+  snapshot: 'bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300',
 }
 
 export function VerifiedBadge({ className }: { className?: string }) {

@@ -39,6 +39,7 @@ export function TimePeriodSelector({ value, onChange, testID }: TimePeriodSelect
           <TouchableOpacity
             key={chip.value}
             onPress={() => onChange(chip.value)}
+            hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
             style={[
               styles.chip,
               { backgroundColor: active ? theme.colors.primary : 'transparent' },
@@ -62,5 +63,5 @@ export function TimePeriodSelector({ value, onChange, testID }: TimePeriodSelect
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', borderRadius: 8, borderWidth: 1, overflow: 'hidden', alignSelf: 'flex-start' },
-  chip: { paddingHorizontal: 10, paddingVertical: 6 },
+  chip: { paddingHorizontal: 12, paddingVertical: 10, minHeight: 36 },
 })

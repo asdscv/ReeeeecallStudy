@@ -12,9 +12,9 @@ export function ShareBadge({ deck }: ShareBadgeProps) {
   if (!deck.share_mode || !deck.source_owner_id) return null
 
   const config: Record<string, { labelKey: string; className: string }> = {
-    subscribe: { labelKey: 'mode.subscribe', className: 'bg-purple-50 text-purple-700' },
-    snapshot: { labelKey: 'mode.snapshot', className: 'bg-orange-50 text-orange-700' },
-    copy: { labelKey: 'mode.copy', className: 'bg-teal-50 text-teal-700' },
+    subscribe: { labelKey: 'mode.subscribe', className: 'bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300' },
+    snapshot: { labelKey: 'mode.snapshot', className: 'bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300' },
+    copy: { labelKey: 'mode.copy', className: 'bg-teal-50 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300' },
   }
 
   const c = config[deck.share_mode]

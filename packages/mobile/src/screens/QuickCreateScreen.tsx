@@ -18,7 +18,7 @@ import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'QuickCreate'>
 
-const INITIAL_ROWS = 3
+const INITIAL_ROWS = 1
 
 /**
  * Mobile mirror of web's QuickCreateModal — a dead-simple "just add stuff" flow:
@@ -282,6 +282,8 @@ export function QuickCreateScreen() {
                     placeholder={fieldLabel(spec)}
                     value={row[spec.key] ?? ''}
                     onChangeText={(v) => setCell(idx, spec.key, v)}
+                    // Distinguish front (accent border) from back (default) at a glance.
+                    borderColor={spec.side === 'front' ? theme.colors.primary : theme.colors.border}
                   />
                 ))}
               </View>

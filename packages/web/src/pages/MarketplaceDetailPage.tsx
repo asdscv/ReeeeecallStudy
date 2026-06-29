@@ -262,7 +262,7 @@ export function MarketplaceDetailPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+        <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap text-sm text-muted-foreground mb-4">
           <span>{t('marketplace:detail.cardCount', { count: listing.card_count })}</span>
           <span className="inline-flex items-center gap-1">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -275,6 +275,7 @@ export function MarketplaceDetailPage() {
           )}
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 mt-1">
         {!isOwner && (
           <button
             onClick={handleAcquire}
@@ -293,7 +294,7 @@ export function MarketplaceDetailPage() {
           <button
             onClick={handleUnsubscribe}
             disabled={unsubscribing}
-            className="ml-3 px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {unsubscribing
               ? t('marketplace:detail.unsubscribing', { defaultValue: 'Unsubscribing...' })
@@ -304,11 +305,12 @@ export function MarketplaceDetailPage() {
         {!isOwner && (
           <button
             onClick={() => setShowReportModal(true)}
-            className="ml-3 px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition cursor-pointer"
+            className="px-4 py-2 text-sm text-muted-foreground hover:text-destructive transition cursor-pointer"
           >
             {t('marketplace:detail.reportContent', { defaultValue: 'Report' })}
           </button>
         )}
+        </div>
 
         {error && <p className="text-sm text-destructive mt-2">{t(error)}</p>}
         {unsubscribeError && (

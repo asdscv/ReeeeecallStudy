@@ -812,6 +812,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     gap: 8,
+    flexWrap: 'wrap',
+    rowGap: 8,
   },
   selectionBarLeft: {
     flexDirection: 'row',

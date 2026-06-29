@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button, ListSkeleton } from '../components/ui'
@@ -120,8 +120,13 @@ export function DecksListScreen() {
         contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Action buttons — matches web: Help (outline) + AI Generate (purple) + New Deck (blue) */}
-            <View style={styles.headerButtons}>
+            {/* Action buttons — matches web: Help (outline) + AI Generate (purple) + New Deck (blue).
+                Horizontally scrollable so all buttons are reachable on narrow screens. */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.headerButtons}
+            >
               <TouchableOpacity
                 testID="decks-help"
                 onPress={() => {
@@ -156,7 +161,7 @@ export function DecksListScreen() {
               >
                 <Text style={styles.headerBtnText}>{t('createNew')}</Text>
               </TouchableOpacity>
-            </View>
+            </ScrollView>
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="decks-search" />
           </View>
         }
@@ -229,6 +234,7 @@ export function DecksListScreen() {
                       <TouchableOpacity
                         onPress={() => handleUnsubscribe(item)}
                         style={styles.iconBtn}
+                        hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                         testID={`deck-card-${item.id}-unsubscribe`}
                         accessibilityLabel={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
                       >
@@ -239,6 +245,7 @@ export function DecksListScreen() {
                         <TouchableOpacity
                           onPress={() => navigation.navigate('DeckEdit', { deckId: item.id })}
                           style={styles.iconBtn}
+                          hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                           testID={`deck-card-${item.id}-edit`}
                         >
                           <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\u270F\uFE0F'}</Text>
@@ -246,6 +253,7 @@ export function DecksListScreen() {
                         <TouchableOpacity
                           onPress={() => handleDelete(item.id, item.name)}
                           style={styles.iconBtn}
+                          hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                           testID={`deck-card-${item.id}-delete`}
                         >
                           <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\uD83D\uDDD1\uFE0F'}</Text>
@@ -313,6 +321,6 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 2 },
   footer: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingTop: 10, marginTop: 6, borderTopWidth: 1 },
   footerActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  iconBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  iconBtn: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 6 },
   studyBtn: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8 },
 })
