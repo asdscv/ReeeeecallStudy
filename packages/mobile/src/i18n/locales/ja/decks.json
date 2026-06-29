@@ -195,5 +195,78 @@
     "deckDescriptionPlaceholder": "このデッキの簡単な説明",
     "presetSummary": "表 {{front}} · 裏 {{back}}",
     "basicLabel": "基本"
+  },
+  "cancel": "キャンセル",
+  "delete": "削除",
+  "emptyField": "(空)",
+  "status": {
+    "all": "すべて",
+    "new": "新規",
+    "learning": "学習中",
+    "review": "復習",
+    "suspended": "保留",
+    "mastered": "習得済み"
+  },
+  "srsRating": {
+    "again": "もう一度",
+    "hard": "難しい",
+    "good": "普通",
+    "easy": "簡単"
+  },
+  "deckDetail": {
+    "tabVersions": "バージョン",
+    "selectMode": "選択",
+    "selectAll": "すべて選択",
+    "deselectAll": "選択解除",
+    "selectedCount": "{{count}}件選択中",
+    "deleteSelected": "選択した項目を削除",
+    "deleteCardsTitle": "カードを削除",
+    "deleteCardsConfirm": "選択した{{count}}枚のカードを削除しますか？元に戻せません。",
+    "perPage": "1ページあたり:",
+    "prevPage": "← 前へ",
+    "nextPage": "次へ →",
+    "pageOf": "{{total}}ページ中{{current}}ページ",
+    "showingRange": "{{total}}枚中{{from}}–{{to}}を表示"
+  },
+  "deckEdit": {
+    "previewName": "デッキ名",
+    "srsSettings": "SRS設定",
+    "srsDescription": "このデッキの間隔反復の間隔を設定します。",
+    "learningSteps": "学習ステップ（分）",
+    "learningStepsHint": "カンマ区切りの分、例: \"1, 10\" で1分後に10分のステップ。",
+    "days": "日",
+    "statistics": "統計",
+    "mastery": "習得度",
+    "cardStatusDistribution": "カードステータス分布",
+    "avgEase": "平均易しさ"
+  },
+  "statsTab": {
+    "total": "合計",
+    "statusDistribution": "ステータス分布",
+    "masteryRate": "習得率",
+    "avgEaseFactor": "平均易しさ係数",
+    "avgInterval": "平均間隔",
+    "days": "日"
+  },
+  "relativeDate": {
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{{count}}日前",
+    "monthAgo": "1か月前",
+    "monthsAgo": "{{count}}か月前"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "削除できません",
+    "cannotDeleteMsg": "デフォルトテンプレートは削除できません。",
+    "deleteTitle": "テンプレートを削除",
+    "deleteFailed": "テンプレートの削除に失敗しました",
+    "defaultBadge": "デフォルト"
+  },
+  "versionHistory": {
+    "loading": "バージョンを読み込み中...",
+    "createHint": "バージョンを作成してデッキの現在の状態をスナップショットします。"
+  },
+  "uploadDate": {
+    "noCards": "まだカードがありません"
   }
 }

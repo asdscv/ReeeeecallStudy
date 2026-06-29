@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
@@ -44,21 +45,22 @@ interface ShareGroup {
   pendingCount: number
 }
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: 'Pending', bg: statusColors.pending.bg, text: statusColors.pending.text },
-  active: { label: 'Active', bg: statusColors.active.bg, text: statusColors.active.text },
-  revoked: { label: 'Revoked', bg: statusColors.revoked.bg, text: statusColors.revoked.text },
-  declined: { label: 'Declined', bg: statusColors.declined.bg, text: statusColors.declined.text },
+const STATUS_CONFIG: Record<string, { labelKey: string; bg: string; text: string }> = {
+  pending: { labelKey: 'status.pending', bg: statusColors.pending.bg, text: statusColors.pending.text },
+  active: { labelKey: 'status.active', bg: statusColors.active.bg, text: statusColors.active.text },
+  revoked: { labelKey: 'status.revoked', bg: statusColors.revoked.bg, text: statusColors.revoked.text },
+  declined: { labelKey: 'status.declined', bg: statusColors.declined.bg, text: statusColors.declined.text },
 }
 
-const MODE_LABELS: Record<string, string> = {
-  copy: 'Copy',
-  subscribe: 'Subscribe',
-  snapshot: 'Snapshot',
+const MODE_LABEL_KEYS: Record<string, string> = {
+  copy: 'modes.copy.label',
+  subscribe: 'modes.subscribe.label',
+  snapshot: 'modes.snapshot.label',
 }
 
 export function MySharesScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('sharing')
   const navigation = useNavigation<NavigationProp<MainTabParamList>>()
 
   const [sentShares, setSentShares] = useState<DeckShare[]>([])
@@ -110,10 +112,10 @@ export function MySharesScreen() {
   useEffect(() => { fetchAll() }, [fetchAll])
 
   const handleRevoke = (shareId: string) => {
-    Alert.alert('Revoke Access', 'Are you sure you want to revoke this share?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('revokeAlert.title'), t('revokeAlert.message'), [
+      { text: t('actions.cancel'), style: 'cancel' },
       {
-        text: 'Revoke',
+        text: t('actions.revoke'),
         style: 'destructive',
         onPress: async () => {
           const supabase = getMobileSupabase()
@@ -128,10 +130,10 @@ export function MySharesScreen() {
   }
 
   const handleUnsubscribe = (shareId: string) => {
-    Alert.alert('Unsubscribe', 'Are you sure you want to unsubscribe from this deck?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('unsubscribeAlert.title'), t('unsubscribeAlert.message'), [
+      { text: t('actions.cancel'), style: 'cancel' },
       {
-        text: 'Unsubscribe',
+        text: t('actions.unsubscribe'),
         style: 'destructive',
         onPress: async () => {
           const supabase = getMobileSupabase()
@@ -157,7 +159,7 @@ export function MySharesScreen() {
     groupedByDeck[share.deck_id].push(share)
   }
   for (const [deckId, shares] of Object.entries(groupedByDeck)) {
-    const deck = deckMap[deckId] ?? { id: deckId, name: 'Unknown Deck', icon: '📚' }
+    const deck = deckMap[deckId] ?? { id: deckId, name: t('myShares.unknownDeck'), icon: '📚' }
     sentGroups.push({
       deck,
       shares,
@@ -176,14 +178,14 @@ export function MySharesScreen() {
       >
         <View style={styles.shareInfo}>
           <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]} numberOfLines={1}>
-            {share.invite_email || share.invite_code || 'Invite Link'}
+            {share.invite_email || share.invite_code || t('inviteLink')}
           </Text>
           <View style={styles.shareMeta}>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-              {MODE_LABELS[share.share_mode] ?? share.share_mode}
+              {MODE_LABEL_KEYS[share.share_mode] ? t(MODE_LABEL_KEYS[share.share_mode]) : share.share_mode}
             </Text>
             <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
-              <Text style={[styles.statusText, { color: status.text }]}>{status.label}</Text>
+              <Text style={[styles.statusText, { color: status.text }]}>{t(status.labelKey)}</Text>
             </View>
           </View>
         </View>
@@ -194,7 +196,7 @@ export function MySharesScreen() {
             testID={`my-share-action-${share.id}`}
           >
             <Text style={[theme.typography.caption, { color: palette.red[500] }]}>
-              {type === 'sent' ? 'Revoke' : 'Unsubscribe'}
+              {type === 'sent' ? t('actions.revoke') : t('actions.unsubscribe')}
             </Text>
           </TouchableOpacity>
         )}
@@ -204,7 +206,7 @@ export function MySharesScreen() {
 
   return (
     <Screen safeArea padding={false} testID="my-shares-screen">
-      <ScreenHeader title="My Shares" mode="drawer" />
+      <ScreenHeader title={t('myShares.title')} mode="drawer" />
       <FlatList
         data={[1]} // single item, we render sections manually
         keyExtractor={() => 'sections'}
@@ -214,16 +216,16 @@ export function MySharesScreen() {
           <View style={styles.sections}>
             {/* Sent Shares */}
             <View style={styles.section}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Shared by You</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('myShares.sharedByYou')}</Text>
 
               {sentGroups.length === 0 ? (
                 <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
                   <Text style={{ fontSize: 32, textAlign: 'center' }}>📤</Text>
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                    You haven't shared any decks yet.
+                    {t('myShares.emptySentTitle')}
                   </Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-                    Go to a deck and tap "Share" to create an invite link.
+                    {t('myShares.emptySentHint')}
                   </Text>
                 </View>
               ) : (
@@ -240,7 +242,7 @@ export function MySharesScreen() {
                           {group.deck.name}
                         </Text>
                         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                          {group.activeCount} active · {group.pendingCount} pending
+                          {t('myShares.activePending', { activeCount: group.activeCount, pendingCount: group.pendingCount })}
                         </Text>
                       </View>
                       <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
@@ -253,7 +255,7 @@ export function MySharesScreen() {
                         style={styles.viewAllBtn}
                       >
                         <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                          View all {group.shares.length} shares
+                          {t('myShares.viewAll', { count: group.shares.length })}
                         </Text>
                       </TouchableOpacity>
                     )}
@@ -264,13 +266,13 @@ export function MySharesScreen() {
 
             {/* Received Shares */}
             <View style={styles.section}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Shared with You</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('myShares.sharedWithYou')}</Text>
 
               {receivedShares.length === 0 ? (
                 <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
                   <Text style={{ fontSize: 32, textAlign: 'center' }}>📥</Text>
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                    No one has shared a deck with you yet.
+                    {t('myShares.emptyReceived')}
                   </Text>
                 </View>
               ) : (

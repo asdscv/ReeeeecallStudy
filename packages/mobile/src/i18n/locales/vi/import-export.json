@@ -15,5 +15,9 @@
   "exportJsonFailed": "Failed to export JSON",
   "noCards": "Không có thẻ để xuất.",
   "sharingUnavailable": "Sharing is not available on this device",
+  "errorTitle": "Lỗi",
+  "successTitle": "Thành công",
+  "noCardsTitle": "Không có thẻ",
+  "deckCardCount": "{{deck}} · {{count}} thẻ",
   "back": "Quay lại"
 }

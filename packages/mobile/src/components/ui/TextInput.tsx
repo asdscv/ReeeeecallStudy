@@ -9,6 +9,7 @@ import {
   type TextInputProps as RNTextInputProps,
   type ViewStyle,
 } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 
@@ -39,6 +40,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
     ref,
   ) {
     const theme = useTheme()
+    const { t } = useTranslation('common')
     const [focused, setFocused] = useState(false)
     const [secureVisible, setSecureVisible] = useState(!isPassword)
 
@@ -74,7 +76,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
               style={styles.icon}
               {...testProps(testID ? `${testID}-toggle` : undefined)}
             >
-              <Text style={styles.toggleText}>{secureVisible ? 'Hide' : 'Show'}</Text>
+              <Text style={styles.toggleText}>{secureVisible ? t('passwordToggle.hide') : t('passwordToggle.show')}</Text>
             </TouchableOpacity>
           )}
           {rightIcon && <View style={styles.icon}>{rightIcon}</View>}

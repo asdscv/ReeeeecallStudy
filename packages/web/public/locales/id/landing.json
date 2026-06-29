@@ -183,7 +183,8 @@
     "reviews": "Ulasan",
     "howItWorks": "Cara Kerja",
     "faq": "FAQ",
-    "dashboard": "Dasbor"
+    "dashboard": "Dasbor",
+    "menu": "Menu"
   },
   "trustBadges": {
     "srs": "SRS Cerdas",
@@ -193,7 +194,7 @@
     "import": "Impor CSV & API"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. Hak cipta dilindungi.",
+    "copyright": "© 2026 ReeeeecallStudy. Hak cipta dilindungi.",
     "apiDocs": "Dokumentasi API",
     "tagline": "Platform pembelajaran kartu kilat cerdas dengan pengulangan berjarak",
     "product": "Produk",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "Kartu Dipelajari",
     "decksCreatedLabel": "Dek Dibuat",
     "testimonials": {
-      "0": { "quote": "ReeeeecallStudy membantu saya lulus JLPT N2. Algoritma SRS sangat efektif!", "author": "Budi Santoso", "role": "Pelajar Bahasa" },
-      "1": { "quote": "Antarmukanya sangat bersih dan intuitif. Belajar terasa menyenangkan sekarang.", "author": "Siti Nurhaliza", "role": "Mahasiswa Kedokteran" },
-      "2": { "quote": "Fitur berbagi dek luar biasa. Saya menemukan dek untuk hampir setiap mata pelajaran.", "author": "Ravi Wijaya", "role": "Mahasiswa Universitas" }
+      "0": {
+        "quote": "ReeeeecallStudy membantu saya lulus JLPT N2. Algoritma SRS sangat efektif!",
+        "author": "Budi Santoso",
+        "role": "Pelajar Bahasa"
+      },
+      "1": {
+        "quote": "Antarmukanya sangat bersih dan intuitif. Belajar terasa menyenangkan sekarang.",
+        "author": "Siti Nurhaliza",
+        "role": "Mahasiswa Kedokteran"
+      },
+      "2": {
+        "quote": "Fitur berbagi dek luar biasa. Saya menemukan dek untuk hampir setiap mata pelajaran.",
+        "author": "Ravi Wijaya",
+        "role": "Mahasiswa Universitas"
+      }
     }
   },
   "science": {

@@ -132,7 +132,9 @@
     "firstStudy": {
       "title": "You're Ready to Study!",
       "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
-      "action": "Start Studying"
+      "action": "Start Studying",
+      "randomReview": "ทบทวนแบบสุ่ม",
+      "sequential": "ตามลำดับ"
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
@@ -287,5 +289,6 @@
     "copyright": "© 2026 ReeeeecallStudy สงวนลิขสิทธิ์"
   },
   "cancel": "ยกเลิก",
-  "loading": "กำลังโหลด..."
+  "loading": "กำลังโหลด...",
+  "tagline": "แฟลชการ์ดอัจฉริยะ ขับเคลื่อนด้วย AI"
 }

@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import { Screen, Button, ScreenHeader } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme, palette } from '../theme'
@@ -32,32 +33,32 @@ interface DeckShare {
   created_at: string
 }
 
-const SHARE_MODES: { value: ShareMode; label: string; desc: string; detail: string }[] = [
+const SHARE_MODES: { value: ShareMode; labelKey: string; descKey: string; detailKey: string }[] = [
   {
     value: 'copy',
-    label: 'Copy',
-    desc: 'Users get an editable copy',
-    detail: 'The recipient gets a full copy they can edit freely. No sync with your changes.',
+    labelKey: 'modes.copy.label',
+    descKey: 'modes.copy.desc',
+    detailKey: 'modes.copy.detail',
   },
   {
     value: 'subscribe',
-    label: 'Subscribe',
-    desc: 'Users get read-only, auto-updated',
-    detail: 'Recipients stay in sync with your deck. They cannot edit but always have the latest.',
+    labelKey: 'modes.subscribe.label',
+    descKey: 'modes.subscribe.desc',
+    detailKey: 'modes.subscribe.detail',
   },
   {
     value: 'snapshot',
-    label: 'Snapshot',
-    desc: 'Users get read-only copy, no updates',
-    detail: 'A frozen read-only copy at the current moment. No future updates.',
+    labelKey: 'modes.snapshot.label',
+    descKey: 'modes.snapshot.desc',
+    detailKey: 'modes.snapshot.detail',
   },
 ]
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: 'Pending', ...statusColors.pending },
-  active: { label: 'Active', ...statusColors.active },
-  revoked: { label: 'Revoked', ...statusColors.revoked },
-  declined: { label: 'Declined', ...statusColors.declined },
+const STATUS_CONFIG: Record<string, { labelKey: string; bg: string; text: string }> = {
+  pending: { labelKey: 'status.pending', ...statusColors.pending },
+  active: { labelKey: 'status.active', ...statusColors.active },
+  revoked: { labelKey: 'status.revoked', ...statusColors.revoked },
+  declined: { labelKey: 'status.declined', ...statusColors.declined },
 }
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -71,6 +72,7 @@ function generateInviteCode(): string {
 
 export function ShareDeckScreen() {
   const theme = useTheme()
+  const { t } = useTranslation('sharing')
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { deckId } = route.params
@@ -154,10 +156,10 @@ export function ShareDeckScreen() {
   }
 
   const handleRevoke = (shareId: string) => {
-    Alert.alert('Revoke Access', 'Are you sure you want to revoke this share?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('revokeAlert.title'), t('revokeAlert.message'), [
+      { text: t('actions.cancel'), style: 'cancel' },
       {
-        text: 'Revoke',
+        text: t('actions.revoke'),
         style: 'destructive',
         onPress: async () => {
           const supabase = getMobileSupabase()
@@ -178,19 +180,19 @@ export function ShareDeckScreen() {
 
   return (
     <Screen scroll keyboard testID="share-deck-screen">
-      <ScreenHeader title={deck?.name ?? 'Share Deck'} mode="back" testID="share-back" />
+      <ScreenHeader title={deck?.name ?? t('shareDeck.title')} mode="back" testID="share-back" />
       <View style={styles.content}>
 
         {/* Deck name */}
         <View style={styles.titleRow}>
           <Text style={styles.titleIcon}>{deck?.icon ?? '📚'}</Text>
           <Text style={[theme.typography.h2, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
-            {deck?.name ?? 'Share Deck'}
+            {deck?.name ?? t('shareDeck.title')}
           </Text>
         </View>
 
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-          Share this deck privately via an invite link
+          {t('shareDeck.subtitle')}
         </Text>
 
         {error && (
@@ -203,7 +205,7 @@ export function ShareDeckScreen() {
           <>
             {/* Share Mode Selection */}
             <View style={styles.section}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>Share Mode</Text>
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('shareMode')}</Text>
               {SHARE_MODES.map((m) => {
                 const isSelected = mode === m.value
                 return (
@@ -228,16 +230,16 @@ export function ShareDeckScreen() {
                       </View>
                       <View style={styles.modeInfo}>
                         <Text style={[theme.typography.label, { color: isSelected ? theme.colors.primary : theme.colors.text }]}>
-                          {m.label}
+                          {t(m.labelKey)}
                         </Text>
                         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                          {m.desc}
+                          {t(m.descKey)}
                         </Text>
                       </View>
                     </View>
                     {isSelected && (
                       <Text style={[theme.typography.caption, { color: palette.blue[600], marginTop: 6 }]}>
-                        {m.detail}
+                        {t(m.detailKey)}
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -247,14 +249,14 @@ export function ShareDeckScreen() {
 
             <Button
               testID="share-create-link"
-              title={creating ? 'Creating...' : 'Generate Invite Link'}
+              title={creating ? t('shareDeck.creating') : t('shareDeck.generateLink')}
               onPress={handleCreate}
               loading={creating}
             />
           </>
         ) : (
           <View style={[styles.linkCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>Invite Link</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('inviteLink')}</Text>
             <View style={[styles.linkBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
               <Text style={[theme.typography.bodySmall, { color: theme.colors.text, flex: 1 }]} numberOfLines={1}>
                 {inviteLink}
@@ -263,20 +265,20 @@ export function ShareDeckScreen() {
             <View style={styles.linkActions}>
               <Button
                 testID="share-copy-link"
-                title={copied ? 'Copied!' : 'Copy Link'}
+                title={copied ? t('shareDeck.copied') : t('shareDeck.copyLink')}
                 onPress={handleCopyLink}
                 size="sm"
               />
               <Button
                 testID="share-new-link"
-                title="New Link"
+                title={t('shareDeck.newLink')}
                 variant="outline"
                 size="sm"
                 onPress={handleNewLink}
               />
             </View>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-              Anyone with this link can accept the invite and get access to the deck.
+              {t('shareDeck.linkHint')}
             </Text>
           </View>
         )}
@@ -284,13 +286,13 @@ export function ShareDeckScreen() {
         {/* Existing Shares */}
         <View style={styles.section}>
           <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-            Existing Shares ({shares.length})
+            {t('shareDeck.existingShares', { count: shares.length })}
           </Text>
 
           {shares.length === 0 ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                No shares yet. Generate an invite link above.
+                {t('shareDeck.noShares')}
               </Text>
             </View>
           ) : (
@@ -304,15 +306,15 @@ export function ShareDeckScreen() {
                 >
                   <View style={styles.shareInfo}>
                     <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]} numberOfLines={1}>
-                      {share.invite_email || share.invite_code || 'Invite Link'}
+                      {share.invite_email || share.invite_code || t('inviteLink')}
                     </Text>
                     <View style={styles.shareMeta}>
                       <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                        {share.share_mode}
+                        {t(`modes.${share.share_mode}.label`)}
                       </Text>
                       <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
                         <Text style={[styles.statusText, { color: status.text }]}>
-                          {status.label}
+                          {t(status.labelKey)}
                         </Text>
                       </View>
                     </View>
@@ -323,7 +325,7 @@ export function ShareDeckScreen() {
                       style={styles.revokeBtn}
                       testID={`share-revoke-${share.id}`}
                     >
-                      <Text style={[theme.typography.caption, { color: palette.red[500] }]}>Revoke</Text>
+                      <Text style={[theme.typography.caption, { color: palette.red[500] }]}>{t('actions.revoke')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>

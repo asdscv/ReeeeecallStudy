@@ -193,5 +193,68 @@
     "logout": "Keluar",
     "hint": "Hanya satu perangkat dapat digunakan dalam satu waktu"
   },
-  "loading": "Memuat..."
+  "loading": "Memuat...",
+  "rating": {
+    "again": "Ulang",
+    "hard": "Sulit",
+    "good": "Bagus",
+    "easy": "Mudah"
+  },
+  "demoCard": {
+    "tagline": "Platform Belajar Kartu Flash Cerdas",
+    "tapToReveal": "Ketuk untuk melihat jawaban",
+    "helloFrench": "Hello (bahasa Prancis)"
+  },
+  "loadingState": {
+    "loadingData": "Memuat data...",
+    "starting": "Memulai..."
+  },
+  "badge": {
+    "verified": "Terverifikasi",
+    "official": "Resmi",
+    "educator": "Pendidik",
+    "publisher": "Penerbit",
+    "partner": "Mitra",
+    "accountA11y": "Akun {{label}}"
+  },
+  "a11y": {
+    "add": "Tambah",
+    "openMenu": "Buka menu",
+    "goBack": "Kembali",
+    "loading": "Memuat"
+  },
+  "searchPlaceholder": "Cari...",
+  "passwordToggle": {
+    "show": "Tampilkan",
+    "hide": "Sembunyikan"
+  },
+  "chart": {
+    "dailyStudy": "Belajar Harian",
+    "total": "total"
+  },
+  "calendar": {
+    "monthsShort": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mei",
+      "Jun",
+      "Jul",
+      "Agu",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Des"
+    ],
+    "dowMWF": [
+      "",
+      "S",
+      "",
+      "R",
+      "",
+      "J",
+      ""
+    ]
+  }
 }

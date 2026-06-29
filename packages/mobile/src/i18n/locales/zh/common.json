@@ -193,5 +193,68 @@
     "logout": "退出登录",
     "hint": "同一时间只能使用一台设备"
   },
-  "loading": "加载中..."
+  "loading": "加载中...",
+  "rating": {
+    "again": "重来",
+    "hard": "困难",
+    "good": "良好",
+    "easy": "简单"
+  },
+  "demoCard": {
+    "tagline": "智能闪卡学习平台",
+    "tapToReveal": "点击查看答案",
+    "helloFrench": "Hello（法语）"
+  },
+  "loadingState": {
+    "loadingData": "正在加载数据...",
+    "starting": "正在启动..."
+  },
+  "badge": {
+    "verified": "已认证",
+    "official": "官方",
+    "educator": "教育者",
+    "publisher": "出版方",
+    "partner": "合作伙伴",
+    "accountA11y": "{{label}}账户"
+  },
+  "a11y": {
+    "add": "添加",
+    "openMenu": "打开菜单",
+    "goBack": "返回",
+    "loading": "加载中"
+  },
+  "searchPlaceholder": "搜索...",
+  "passwordToggle": {
+    "show": "显示",
+    "hide": "隐藏"
+  },
+  "chart": {
+    "dailyStudy": "每日学习",
+    "total": "总计"
+  },
+  "calendar": {
+    "monthsShort": [
+      "1月",
+      "2月",
+      "3月",
+      "4月",
+      "5月",
+      "6月",
+      "7月",
+      "8月",
+      "9月",
+      "10月",
+      "11月",
+      "12月"
+    ],
+    "dowMWF": [
+      "",
+      "一",
+      "",
+      "三",
+      "",
+      "五",
+      ""
+    ]
+  }
 }

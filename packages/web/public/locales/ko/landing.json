@@ -183,7 +183,8 @@
     "reviews": "리뷰",
     "howItWorks": "사용 방법",
     "faq": "FAQ",
-    "dashboard": "대시보드"
+    "dashboard": "대시보드",
+    "menu": "메뉴"
   },
   "trustBadges": {
     "srs": "스마트 SRS",
@@ -193,7 +194,7 @@
     "import": "CSV & API 업로드"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
+    "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API 문서",
     "tagline": "간격 반복 기반 스마트 플래시카드 학습 플랫폼",
     "product": "제품",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "학습한 카드",
     "decksCreatedLabel": "생성된 덱",
     "testimonials": {
-      "0": { "quote": "ReeeeecallStudy 덕분에 JLPT N2에 합격했습니다. SRS 알고리즘이 정말 효과적이에요!", "author": "김민준", "role": "어학 학습자" },
-      "1": { "quote": "인터페이스가 깔끔하고 직관적이에요. 학습이 정말 즐거워졌어요.", "author": "이서윤", "role": "의대생" },
-      "2": { "quote": "덱 공유 기능이 대단해요. 거의 모든 과목의 덱을 찾을 수 있었습니다.", "author": "박유키", "role": "대학생" }
+      "0": {
+        "quote": "ReeeeecallStudy 덕분에 JLPT N2에 합격했습니다. SRS 알고리즘이 정말 효과적이에요!",
+        "author": "김민준",
+        "role": "어학 학습자"
+      },
+      "1": {
+        "quote": "인터페이스가 깔끔하고 직관적이에요. 학습이 정말 즐거워졌어요.",
+        "author": "이서윤",
+        "role": "의대생"
+      },
+      "2": {
+        "quote": "덱 공유 기능이 대단해요. 거의 모든 과목의 덱을 찾을 수 있었습니다.",
+        "author": "박유키",
+        "role": "대학생"
+      }
     }
   },
   "science": {

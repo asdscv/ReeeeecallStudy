@@ -92,8 +92,8 @@ export function MarketplacePage() {
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-xs text-content-tertiary">
-                  <span>{listing.card_count} cards</span>
-                  <span>{listing.acquire_count} users</span>
+                  <span>{t('marketplace:listing.cardCount', { count: listing.card_count })}</span>
+                  <span>{t('marketplace:listing.userCount', { count: listing.acquire_count })}</span>
                 </div>
               </div>
             ))}

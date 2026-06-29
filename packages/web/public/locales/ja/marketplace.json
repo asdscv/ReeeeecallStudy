@@ -153,5 +153,49 @@
     "sortLabel": "並び替え：",
     "loading": "読み込み中...",
     "loadMore": "レビューをもっと見る"
-  }
+  },
+  "publisher": {
+    "title": "パブリッシャーダッシュボード",
+    "emptyTitle": "まだ公開された出品はありません",
+    "emptyDescription": "マーケットプレイスにデッキを公開すると、表示回数や取得数を追跡できます。",
+    "goToDecks": "デッキへ移動",
+    "retry": "再試行",
+    "activeListings": "有効な出品",
+    "totalViews": "総表示回数",
+    "totalAcquisitions": "総取得数",
+    "avgConversion": "平均コンバージョン",
+    "dailyViews": "日別表示回数（過去30日間）",
+    "noDataYet": "まだデータがありません",
+    "topListings": "表示回数の多い出品",
+    "acquisitionTrend": "取得の推移（過去30日間）",
+    "yourListings": "あなたの出品",
+    "recentAcquisitions": "最近の取得",
+    "noAcquisitionsYet": "まだ取得がありません",
+    "recentReviews": "最近のレビュー",
+    "noReviewsYet": "まだレビューがありません",
+    "anonymous": "匿名",
+    "acquired": "が取得しました",
+    "active": "有効",
+    "inactive": "無効",
+    "viewListing": "出品を表示",
+    "table": {
+      "title": "タイトル",
+      "views": "表示回数",
+      "acquires": "取得",
+      "conv": "コンバージョン%",
+      "rating": "評価",
+      "created": "作成日",
+      "status": "ステータス",
+      "actions": "操作"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}}分前",
+      "hoursAgo": "{{count}}時間前",
+      "daysAgo": "{{count}}日前"
+    }
+  },
+  "reviewCount_one": "{{count}}件のレビュー",
+  "reviewCount_other": "{{count}}件のレビュー",
+  "rateStar_one": "{{count}}つ星で評価",
+  "rateStar_other": "{{count}}つ星で評価"
 }

@@ -137,7 +137,7 @@ export function LandingNav() {
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="md:hidden p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer"
-          aria-label="Menu"
+          aria-label={t('nav.menu')}
         >
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>

@@ -254,5 +254,13 @@
       "429": "Limite de frecuencia excedido"
     }
   },
-  "dashboard": "Panel"
+  "dashboard": "Panel",
+  "labels": {
+    "headers": "Encabezados",
+    "pathParams": "Parámetros de ruta",
+    "queryParams": "Parámetros de consulta",
+    "requestBody": "Cuerpo de la solicitud",
+    "response": "Respuesta",
+    "statusCodes": "Códigos de estado"
+  }
 }

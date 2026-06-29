@@ -15,5 +15,9 @@
   "exportJsonFailed": "Failed to export JSON",
   "noCards": "ไม่มีการ์ดให้ส่งออก",
   "sharingUnavailable": "Sharing is not available on this device",
+  "errorTitle": "ข้อผิดพลาด",
+  "successTitle": "สำเร็จ",
+  "noCardsTitle": "ไม่มีการ์ด",
+  "deckCardCount": "{{deck}} · {{count}} การ์ด",
   "back": "ย้อนกลับ"
 }

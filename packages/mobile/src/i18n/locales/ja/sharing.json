@@ -1,0 +1,82 @@
+{
+  "shareMode": "共有モード",
+  "inviteLink": "招待リンク",
+  "modes": {
+    "copy": {
+      "label": "コピー",
+      "desc": "編集可能なコピーを取得します",
+      "detail": "受け取った人が自由に編集できる完全なコピーを取得します。あなたの変更とは同期されません。"
+    },
+    "subscribe": {
+      "label": "購読",
+      "desc": "読み取り専用で自動更新されるコピーを取得します",
+      "detail": "受け取った人があなたのデッキと同期します。編集はできませんが、常に最新の状態を保ちます。"
+    },
+    "snapshot": {
+      "label": "スナップショット",
+      "desc": "読み取り専用のコピーを取得し、更新はありません",
+      "detail": "現時点で固定された読み取り専用のコピーです。今後の更新はありません。"
+    }
+  },
+  "status": {
+    "pending": "保留中",
+    "active": "有効",
+    "revoked": "取り消し済み",
+    "declined": "拒否済み"
+  },
+  "actions": {
+    "cancel": "キャンセル",
+    "revoke": "取り消す",
+    "unsubscribe": "購読解除"
+  },
+  "shareDeck": {
+    "title": "デッキを共有",
+    "subtitle": "招待リンクでこのデッキを非公開で共有します",
+    "generateLink": "招待リンクを生成",
+    "creating": "作成中...",
+    "copied": "コピーしました!",
+    "copyLink": "リンクをコピー",
+    "newLink": "新しいリンク",
+    "linkHint": "このリンクを持っている人は誰でも招待を受け入れてデッキにアクセスできます。",
+    "existingShares": "既存の共有 ({{count}})",
+    "noShares": "まだ共有はありません。上から招待リンクを生成してください。"
+  },
+  "revokeAlert": {
+    "title": "アクセスを取り消す",
+    "message": "この共有を取り消してもよろしいですか?"
+  },
+  "unsubscribeAlert": {
+    "title": "購読解除",
+    "message": "このデッキの購読を解除してもよろしいですか?"
+  },
+  "myShares": {
+    "title": "マイ共有",
+    "sharedByYou": "あなたが共有",
+    "sharedWithYou": "あなたに共有",
+    "emptySentTitle": "まだデッキを共有していません。",
+    "emptySentHint": "デッキを開いて「共有」をタップすると招待リンクを作成できます。",
+    "emptyReceived": "まだ誰もあなたにデッキを共有していません。",
+    "activePending": "有効 {{activeCount}} · 保留中 {{pendingCount}}",
+    "viewAll": "{{count}}件の共有をすべて表示",
+    "unknownDeck": "不明なデッキ"
+  },
+  "publish": {
+    "subtitle": "コミュニティにデッキを共有しましょう",
+    "titleLabel": "タイトル",
+    "titlePlaceholder": "マーケットプレイスでのデッキタイトル",
+    "descriptionLabel": "説明",
+    "descriptionPlaceholder": "学習者は何を学べますか?",
+    "tagsLabel": "タグ",
+    "tagsPlaceholder": "カンマ, 区切りの, タグ",
+    "tagsHint": "他の人がデッキを見つけやすくなります",
+    "category": "カテゴリ",
+    "titleRequired": "タイトルは必須です",
+    "errorTitle": "エラー",
+    "publishFailed": "デッキの公開に失敗しました",
+    "publishedTitle": "公開しました!",
+    "publishedMessage": "デッキがマーケットプレイスで利用可能になりました。",
+    "ok": "OK"
+  },
+  "unsubscribe": "購読解除",
+  "unsubscribed": "登録を解除しました"
+}

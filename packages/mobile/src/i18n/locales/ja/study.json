@@ -45,7 +45,14 @@
     "cardsPerSession": "1セッションあたりのカード数",
     "batchHint": "5〜500枚の範囲",
     "dateSelection": "日付選択",
-    "startStudy": "学習を開始"
+    "startStudy": "学習を開始",
+    "modalSubtitleMode": "学習モードを選択",
+    "modalSubtitleDate": "日付を選択",
+    "modalSubtitleCramming": "詰め込みオプション",
+    "modalSubtitleBatch": "バッチサイズを設定",
+    "dateCardCount": "{{date}} — カード{{count}}枚",
+    "backToModeSelect": "モード選択に戻る",
+    "cancel": "キャンセル"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "読み込み中...",
+    "swipe": "スワイプ",
     "undo": "Undo",
     "endSession": "セッションを終了しますか？",
     "endMessage": "これまでの進捗は保存されます。",

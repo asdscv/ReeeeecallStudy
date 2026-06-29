@@ -17,5 +17,39 @@
     "history": "记录",
     "analytics": "分析"
   },
-  "sessionsPerDay": "每日学习次数"
+  "sessionsPerDay": "每日学习次数",
+  "ratings": {
+    "again": "重来",
+    "hard": "困难",
+    "good": "良好",
+    "easy": "容易",
+    "got_it": "答对",
+    "missed": "答错",
+    "known": "认识",
+    "unknown": "不认识"
+  },
+  "stats": {
+    "cards": "卡片",
+    "duration": "时长",
+    "performance": "表现"
+  },
+  "cardDetails": "卡片详情",
+  "logsCount": "{{count}} 条记录",
+  "loadingDetails": "正在加载详情...",
+  "noLogs": "该学习记录没有详细日志",
+  "deletedCard": "(已删除的卡片)",
+  "noContent": "(无内容)",
+  "deckProgress": "卡组进度",
+  "sessionsCount": "{{count}} 次学习",
+  "cardsCount": "{{count}} 张",
+  "cardsFraction": "{{studied}}/{{total}} 张",
+  "ratingDistribution": "评分分布",
+  "overview": {
+    "sessions": "学习次数",
+    "cardsStudied": "已学卡片",
+    "totalTime": "总时长",
+    "performance": "表现",
+    "streak": "连续天数",
+    "avgDuration": "平均时长"
+  }
 }

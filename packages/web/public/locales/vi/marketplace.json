@@ -153,5 +153,49 @@
     "sortLabel": "Sắp xếp theo:",
     "loading": "Đang tải...",
     "loadMore": "Tải thêm nhận xét"
-  }
+  },
+  "publisher": {
+    "title": "Bảng điều khiển nhà xuất bản",
+    "emptyTitle": "Chưa có mục nào được đăng",
+    "emptyDescription": "Đăng một bộ thẻ lên chợ để bắt đầu theo dõi lượt xem và lượt nhận.",
+    "goToDecks": "Đến bộ thẻ",
+    "retry": "Thử lại",
+    "activeListings": "Mục đang hoạt động",
+    "totalViews": "Tổng lượt xem",
+    "totalAcquisitions": "Tổng lượt nhận",
+    "avgConversion": "Chuyển đổi TB",
+    "dailyViews": "Lượt xem hằng ngày (30 ngày qua)",
+    "noDataYet": "Chưa có dữ liệu",
+    "topListings": "Mục có lượt xem cao nhất",
+    "acquisitionTrend": "Xu hướng nhận (30 ngày qua)",
+    "yourListings": "Mục của bạn",
+    "recentAcquisitions": "Lượt nhận gần đây",
+    "noAcquisitionsYet": "Chưa có lượt nhận",
+    "recentReviews": "Đánh giá gần đây",
+    "noReviewsYet": "Chưa có đánh giá",
+    "anonymous": "Ẩn danh",
+    "acquired": "đã nhận",
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "viewListing": "Xem mục",
+    "table": {
+      "title": "Tiêu đề",
+      "views": "Lượt xem",
+      "acquires": "Lượt nhận",
+      "conv": "Chuyển đổi %",
+      "rating": "Đánh giá",
+      "created": "Ngày tạo",
+      "status": "Trạng thái",
+      "actions": "Hành động"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}} phút trước",
+      "hoursAgo": "{{count}} giờ trước",
+      "daysAgo": "{{count}} ngày trước"
+    }
+  },
+  "reviewCount_one": "{{count}} đánh giá",
+  "reviewCount_other": "{{count}} đánh giá",
+  "rateStar_one": "Đánh giá {{count}} sao",
+  "rateStar_other": "Đánh giá {{count}} sao"
 }

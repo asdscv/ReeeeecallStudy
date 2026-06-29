@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { View, Image, Text, Animated, Easing, StyleSheet, Dimensions } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { palette } from '../../theme'
 
 const { width: W, height: H } = Dimensions.get('window')
@@ -8,7 +9,7 @@ const CARD_H = CARD_W * 0.62
 
 const FLIP_FIRST = 500
 const FLIP_INTERVAL = 1000
-const RATING_LABELS = ['Again', 'Hard', 'Good', 'Easy']
+const RATING_KEYS = ['again', 'hard', 'good', 'easy'] as const
 const RATING_COLORS = ['#ef4444', '#f97316', '#10b981', '#3b82f6']
 
 // Floating orbs
@@ -23,6 +24,7 @@ const ORBS = [
  * Dark bg, floating orbs, 3D card flip, rating buttons, then fade to app.
  */
 export function LoadingScreen({ progress = 0 }: { progress?: number }) {
+  const { t } = useTranslation('common')
   const [isFlipped, setIsFlipped] = useState(false)
   const [highlightIdx, setHighlightIdx] = useState(-1)
 
@@ -86,7 +88,7 @@ export function LoadingScreen({ progress = 0 }: { progress?: number }) {
     const sweep = setInterval(() => {
       setHighlightIdx(idx)
       idx++
-      if (idx >= RATING_LABELS.length) clearInterval(sweep)
+      if (idx >= RATING_KEYS.length) clearInterval(sweep)
     }, 250)
     return () => clearInterval(sweep)
   }, [isFlipped])
@@ -126,7 +128,7 @@ export function LoadingScreen({ progress = 0 }: { progress?: number }) {
 
         {/* Tagline pill */}
         <Animated.View style={[s.pill, { opacity: logoOpacity }]}>
-          <Text style={s.pillText}>Smart Flashcard Learning Platform</Text>
+          <Text style={s.pillText}>{t('demoCard.tagline')}</Text>
         </Animated.View>
 
         {/* Card flip area */}
@@ -138,23 +140,23 @@ export function LoadingScreen({ progress = 0 }: { progress?: number }) {
           <Animated.View style={[s.card, { transform: [{ perspective: 1200 }, { rotateY: frontRotate }], opacity: frontOpacity }]}>
             <View style={s.cardBadge}><Text style={s.cardBadgeText}>Q</Text></View>
             <Text style={s.cardMainText}>Hello</Text>
-            <Text style={s.cardSubText}>Tap to reveal</Text>
+            <Text style={s.cardSubText}>{t('demoCard.tapToReveal')}</Text>
           </Animated.View>
 
           {/* Back */}
           <Animated.View style={[s.card, s.cardBack, { transform: [{ perspective: 1200 }, { rotateY: backRotate }], opacity: backOpacity }]}>
             <View style={s.cardBadge}><Text style={s.cardBadgeText}>A</Text></View>
             <Text style={s.cardMainText}>Bonjour</Text>
-            <Text style={s.cardMeaningText}>Hello (French)</Text>
+            <Text style={s.cardMeaningText}>{t('demoCard.helloFrench')}</Text>
             <Text style={s.cardExampleText}>"Bonjour, comment allez-vous?"</Text>
           </Animated.View>
         </Animated.View>
 
         {/* Rating buttons */}
         <Animated.View style={[s.ratingRow, { opacity: ratingOpacity }]}>
-          {RATING_LABELS.map((label, i) => (
+          {RATING_KEYS.map((rkey, i) => (
             <View
-              key={label}
+              key={rkey}
               style={[
                 s.ratingBtn,
                 highlightIdx === i
@@ -163,7 +165,7 @@ export function LoadingScreen({ progress = 0 }: { progress?: number }) {
               ]}
             >
               <Text style={[s.ratingText, highlightIdx === i && { color: '#fff', fontWeight: '700' }]}>
-                {label}
+                {t(`rating.${rkey}`)}
               </Text>
             </View>
           ))}
@@ -172,7 +174,7 @@ export function LoadingScreen({ progress = 0 }: { progress?: number }) {
         {/* Progress bar — 실제 프리로드 진행률 반영 */}
         <Animated.View style={[s.progressWrap, { opacity: ratingOpacity }]}>
           <View style={s.progressRow}>
-            <Text style={s.progressLabel}>{progress > 0 ? 'Loading data...' : 'Starting...'}</Text>
+            <Text style={s.progressLabel}>{progress > 0 ? t('loadingState.loadingData') : t('loadingState.starting')}</Text>
             <Text style={s.progressPct}>{Math.round(progress * 100)}%</Text>
           </View>
           <View style={s.progressTrack}>

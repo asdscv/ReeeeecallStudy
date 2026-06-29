@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { ReviewStats } from '../../types/database'
 import { StarRating } from './StarRating'
 
@@ -6,6 +7,7 @@ interface RatingDistributionProps {
 }
 
 export function RatingDistribution({ stats }: RatingDistributionProps) {
+  const { t } = useTranslation('marketplace')
   const { avg_rating, review_count, rating_1, rating_2, rating_3, rating_4, rating_5 } = stats
   const distribution = [
     { stars: 5, count: rating_5 },
@@ -22,7 +24,7 @@ export function RatingDistribution({ stats }: RatingDistributionProps) {
         <div className="text-4xl font-bold text-foreground">{avg_rating.toFixed(1)}</div>
         <StarRating rating={avg_rating} size="md" />
         <div className="text-sm text-muted-foreground mt-1">
-          {review_count} review{review_count !== 1 ? 's' : ''}
+          {t('reviewCount', { count: review_count })}
         </div>
       </div>
 

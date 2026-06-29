@@ -1,0 +1,67 @@
+{
+  "title": "AI自动生成",
+  "subtitle": "只需输入主题，AI即可自动创建抽认卡",
+  "steps": {
+    "setup": "设置",
+    "template": "模板",
+    "deck": "卡组",
+    "cards": "卡片",
+    "done": "完成"
+  },
+  "mode": {
+    "label": "生成模式",
+    "full": "完整（模板 + 卡组 + 卡片）",
+    "cardsOnly": "向现有卡组添加卡片"
+  },
+  "provider": {
+    "section": "AI提供商",
+    "notice": "AI生成需要您为每个提供商提供自己的API密钥。请在设置中添加或管理密钥。",
+    "none": "未配置AI提供商",
+    "addInSettings": "在设置中添加"
+  },
+  "content": {
+    "section": "内容设置",
+    "topicLabel": "主题",
+    "topicPlaceholder": "例如：JLPT N3日语词汇、韩语语法……",
+    "contentLang": "内容语言",
+    "autoDetect": "自动检测",
+    "cardCountLabel": "卡片数量：",
+    "cardCountPlaceholder": "1–100",
+    "cardCountHint": "1–100张卡片"
+  },
+  "deck": {
+    "section": "选择卡组",
+    "select": "选择一个卡组"
+  },
+  "generateButton": "生成卡片",
+  "progress": {
+    "generating": "正在生成卡片……",
+    "saving": "正在保存卡片……"
+  },
+  "review": {
+    "title": "检查卡片",
+    "generatedCount": "已生成{{count}}张卡片",
+    "save": "保存{{count}}张卡片",
+    "regenerate": "重新生成",
+    "cardDone": "完成",
+    "remove": "删除"
+  },
+  "doneStep": {
+    "title": "卡片已创建！",
+    "subtitle": "AI生成的抽认卡已可用于学习。",
+    "generateMore": "继续生成",
+    "done": "完成"
+  },
+  "errorStep": {
+    "title": "生成失败",
+    "default": "生成过程中发生错误",
+    "retry": "重试",
+    "back": "返回"
+  },
+  "alert": {
+    "errorTitle": "错误",
+    "enterTopic": "请输入主题",
+    "configureProvider": "请先在设置中配置AI提供商。",
+    "saveFailed": "保存生成的卡片失败"
+  }
+}

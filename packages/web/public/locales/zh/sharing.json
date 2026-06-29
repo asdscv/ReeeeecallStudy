@@ -129,7 +129,8 @@
       "copy": "复制",
       "subscribe": "订阅",
       "snapshot": "快照"
-    }
+    },
+    "unknownRecipient": "不适用"
   },
   "acceptInvite": {
     "title": "牌组邀请",

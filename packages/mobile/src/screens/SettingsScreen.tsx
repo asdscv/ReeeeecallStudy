@@ -403,7 +403,7 @@ export function SettingsScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             testID="settings-invite-link"
-            onPress={() => Share.share({ message: 'Check out ReeeeecallStudy — the smartest flashcard app! https://reeeeecall.com' })}
+            onPress={() => Share.share({ message: t('quickActions.shareMessage') })}
             style={styles.quickActionItem}
           >
             <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>

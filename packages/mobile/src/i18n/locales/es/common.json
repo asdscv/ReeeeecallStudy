@@ -193,5 +193,68 @@
     "logout": "Cerrar sesión",
     "hint": "Solo se puede usar un dispositivo a la vez"
   },
-  "loading": "Cargando..."
+  "loading": "Cargando...",
+  "rating": {
+    "again": "Otra vez",
+    "hard": "Difícil",
+    "good": "Bien",
+    "easy": "Fácil"
+  },
+  "demoCard": {
+    "tagline": "Plataforma inteligente de aprendizaje con tarjetas",
+    "tapToReveal": "Toca para ver la respuesta",
+    "helloFrench": "Hello (francés)"
+  },
+  "loadingState": {
+    "loadingData": "Cargando datos...",
+    "starting": "Iniciando..."
+  },
+  "badge": {
+    "verified": "Verificado",
+    "official": "Oficial",
+    "educator": "Educador",
+    "publisher": "Editorial",
+    "partner": "Socio",
+    "accountA11y": "Cuenta {{label}}"
+  },
+  "a11y": {
+    "add": "Añadir",
+    "openMenu": "Abrir menú",
+    "goBack": "Volver",
+    "loading": "Cargando"
+  },
+  "searchPlaceholder": "Buscar...",
+  "passwordToggle": {
+    "show": "Mostrar",
+    "hide": "Ocultar"
+  },
+  "chart": {
+    "dailyStudy": "Estudio diario",
+    "total": "total"
+  },
+  "calendar": {
+    "monthsShort": [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dic"
+    ],
+    "dowMWF": [
+      "",
+      "L",
+      "",
+      "X",
+      "",
+      "V",
+      ""
+    ]
+  }
 }

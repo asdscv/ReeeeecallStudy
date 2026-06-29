@@ -45,7 +45,14 @@
     "alertNoCardsTitle": "카드 없음",
     "alertNoCardsMsg": "선택한 날짜에 카드가 없습니다",
     "alertErrorTitle": "오류",
-    "shuffle": "섞기"
+    "shuffle": "섞기",
+    "modalSubtitleMode": "학습 모드 선택",
+    "modalSubtitleDate": "날짜 선택",
+    "modalSubtitleCramming": "벼락치기 옵션",
+    "modalSubtitleBatch": "묶음 크기 설정",
+    "dateCardCount": "{{date}} — 카드 {{count}}장",
+    "backToModeSelect": "모드 선택으로 돌아가기",
+    "cancel": "취소"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "로딩 중...",
+    "swipe": "스와이프",
     "exit": "종료",
     "endSession": "학습을 종료하시겠습니까?",
     "endMessage": "현재까지의 학습 기록은 저장됩니다.",

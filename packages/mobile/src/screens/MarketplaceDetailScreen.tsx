@@ -15,12 +15,12 @@ import type { MarketplaceReview, ReviewSortBy } from '@reeeeecall/shared/types/d
 
 type ReportCategory = 'inappropriate' | 'copyright' | 'spam' | 'misleading' | 'other'
 
-const REPORT_CATEGORIES: { value: ReportCategory; label: string }[] = [
-  { value: 'inappropriate', label: 'Inappropriate Content' },
-  { value: 'copyright', label: 'Copyright Violation' },
-  { value: 'spam', label: 'Spam' },
-  { value: 'misleading', label: 'Misleading' },
-  { value: 'other', label: 'Other' },
+const REPORT_CATEGORIES: { value: ReportCategory; labelKey: string }[] = [
+  { value: 'inappropriate', labelKey: 'detail.reportCategories.inappropriate' },
+  { value: 'copyright', labelKey: 'detail.reportCategories.copyright' },
+  { value: 'spam', labelKey: 'detail.reportCategories.spam' },
+  { value: 'misleading', labelKey: 'detail.reportCategories.misleading' },
+  { value: 'other', labelKey: 'detail.reportCategories.other' },
 ]
 
 type Route = RouteProp<MarketplaceStackParamList, 'MarketplaceDetail'>
@@ -67,18 +67,19 @@ function ReviewItem({
   onMarkHelpful: (id: string) => void
   theme: ReturnType<typeof useTheme>
 }) {
+  const { t } = useTranslation('marketplace')
   return (
     <View style={reviewStyles.card}>
       <View style={reviewStyles.reviewHeader}>
         <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-          {review.user_display_name || 'Anonymous'}
+          {review.user_display_name || t('detail.anonymous')}
         </Text>
         <Text style={{ color: palette.yellow[500], fontSize: 14 }}>
           {renderStars(review.rating)}
         </Text>
         {review.is_edited && (
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            (edited)
+            {t('detail.edited')}
           </Text>
         )}
       </View>
@@ -108,7 +109,7 @@ function ReviewItem({
         ]}
       >
         <Text style={{ fontSize: 12, color: isHelpful ? '#2563EB' : theme.colors.textSecondary }}>
-          {'\u{1F44D}'} Helpful{review.helpful_count > 0 ? ` (${review.helpful_count})` : ''}
+          {'\u{1F44D}'} {t('detail.helpful')}{review.helpful_count > 0 ? ` (${review.helpful_count})` : ''}
         </Text>
       </TouchableOpacity>
     </View>
@@ -248,7 +249,7 @@ export function MarketplaceDetailScreen() {
       const result = await acquireDeck(listingId)
       if (!result) {
         const err = useMarketplaceStore.getState().error
-        Alert.alert('Error', err ?? 'Failed to download deck')
+        Alert.alert(t('detail.errorTitle'), err ?? t('detail.downloadFailed'))
         return
       }
       setHasAcquired(true)
@@ -256,9 +257,9 @@ export function MarketplaceDetailScreen() {
         await useDeckStore.getState().fetchDecks({ force: true })
       }
       Alert.alert(
-        'Success',
-        result.wasNew ? 'Deck added to your collection!' : 'You already have this deck.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }],
+        t('detail.successTitle'),
+        result.wasNew ? t('detail.deckAdded') : t('detail.alreadyHaveDeck'),
+        [{ text: t('detail.ok'), onPress: () => navigation.goBack() }],
       )
     } finally {
       setAcquiring(false)
@@ -307,7 +308,7 @@ export function MarketplaceDetailScreen() {
 
   const handleSubmitReview = async () => {
     if (reviewRating === 0) {
-      Alert.alert('Error', 'Please select a rating')
+      Alert.alert(t('detail.errorTitle'), t('detail.selectRating'))
       return
     }
     const success = await submitReview(
@@ -323,10 +324,10 @@ export function MarketplaceDetailScreen() {
 
   const handleDeleteReview = () => {
     if (!userReview) return
-    Alert.alert('Delete Review', 'Are you sure you want to delete your review?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('detail.deleteReview'), t('detail.deleteReviewConfirm'), [
+      { text: t('common:cancel', { defaultValue: 'Cancel' }), style: 'cancel' },
       {
-        text: 'Delete',
+        text: t('detail.delete'),
         style: 'destructive',
         onPress: async () => {
           await deleteReview(userReview.id)
@@ -360,13 +361,13 @@ export function MarketplaceDetailScreen() {
           toast.error(t('detail.reportError', { defaultValue: 'Failed to submit report' }))
         }
       } else {
-        Alert.alert('Thank you', 'Your report has been submitted. We will review this content promptly.')
+        Alert.alert(t('detail.reportThankYou'), t('detail.reportSubmitted'))
         setShowReportModal(false)
         setReportDescription('')
         setReportCategory('inappropriate')
       }
     } catch (e) {
-      Alert.alert('Error', 'Failed to submit report')
+      Alert.alert(t('detail.errorTitle'), t('detail.reportError'))
     } finally {
       setReportSubmitting(false)
     }
@@ -377,7 +378,7 @@ export function MarketplaceDetailScreen() {
       <Screen testID="marketplace-detail-screen">
         <ScreenHeader title={t('detail.title', { defaultValue: 'Detail' })} mode="back" />
         <View style={styles.center}>
-          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>Not found</Text>
+          <Text style={[theme.typography.h3, { color: theme.colors.textSecondary }]}>{t('detail.notFound')}</Text>
         </View>
       </Screen>
     )
@@ -387,10 +388,10 @@ export function MarketplaceDetailScreen() {
   const canReview = !!currentUserId && !isOwner && hasAcquired
 
   const SORT_OPTIONS: { value: ReviewSortBy; label: string }[] = [
-    { value: 'newest', label: 'Newest' },
-    { value: 'highest', label: 'Highest' },
-    { value: 'lowest', label: 'Lowest' },
-    { value: 'most_helpful', label: 'Helpful' },
+    { value: 'newest', label: t('detail.sortOptions.newest') },
+    { value: 'highest', label: t('detail.sortOptions.highest') },
+    { value: 'lowest', label: t('detail.sortOptions.lowest') },
+    { value: 'most_helpful', label: t('detail.sortOptions.most_helpful') },
   ]
 
   // Combine preview cards and reviews into sections
@@ -443,7 +444,7 @@ export function MarketplaceDetailScreen() {
                   {(listing as any).owner_display_name && (
                     <View style={styles.publisherRow}>
                       <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                        by {(listing as any).owner_display_name}
+                        {t('detail.byAuthor', { name: (listing as any).owner_display_name })}
                       </Text>
                       {(listing as any).owner_is_official && (
                         <OfficialBadge
@@ -459,15 +460,15 @@ export function MarketplaceDetailScreen() {
                     <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>{listing.description}</Text>
                   )}
                   <View style={styles.metaRow}>
-                    <Badge label={`${listing.card_count ?? 0} cards`} variant="neutral" />
-                    <Badge label={`${(listing as any).view_count ?? 0} views`} variant="neutral" />
-                    <Badge label={`${listing.acquire_count ?? 0} users`} variant="primary" />
+                    <Badge label={t('detail.cardsBadge', { count: listing.card_count ?? 0 })} variant="neutral" />
+                    <Badge label={t('detail.viewsBadge', { count: (listing as any).view_count ?? 0 })} variant="neutral" />
+                    <Badge label={t('detail.usersBadge', { count: listing.acquire_count ?? 0 })} variant="primary" />
                     {(listing as any).category && <Badge label={(listing as any).category} variant="neutral" />}
                     {listing.share_mode && <Badge label={listing.share_mode} variant="success" />}
                   </View>
                   {(listing as any).review_count > 0 && (
                     <Text style={[theme.typography.bodySmall, { color: palette.yellow[500] }]}>
-                      {renderStars((listing as any).avg_rating ?? 0)} {((listing as any).avg_rating ?? 0).toFixed(1)} ({(listing as any).review_count} reviews)
+                      {renderStars((listing as any).avg_rating ?? 0)} {((listing as any).avg_rating ?? 0).toFixed(1)} {t('detail.reviewsCount', { count: (listing as any).review_count })}
                     </Text>
                   )}
                   {listing.tags && listing.tags.length > 0 && (
@@ -506,7 +507,7 @@ export function MarketplaceDetailScreen() {
                   )}
                   <Button testID="marketplace-report-button" title={t('detail.reportContent', { defaultValue: 'Report' })} variant="ghost" size="sm" onPress={() => setShowReportModal(true)} />
                   {previewCards.length > 0 && (
-                    <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>Preview Cards</Text>
+                    <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>{t('detail.previewCards')}</Text>
                   )}
                 </View>
               )
@@ -526,10 +527,10 @@ export function MarketplaceDetailScreen() {
             case 'reviews_header':
               return (
                 <View style={reviewStyles.sectionHeader}>
-                  <Text style={[theme.typography.h3, { color: theme.colors.text }]}>Ratings & Reviews</Text>
+                  <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('detail.ratingsReviews')}</Text>
                   {canReview && (
                     <Button
-                      title={userReview ? 'Edit Review' : 'Write Review'}
+                      title={userReview ? t('detail.editReview') : t('detail.writeReview')}
                       variant="secondary"
                       size="sm"
                       onPress={() => setShowReviewModal(true)}
@@ -537,12 +538,12 @@ export function MarketplaceDetailScreen() {
                   )}
                   {!canReview && !isOwner && currentUserId && !hasAcquired && (
                     <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                      Acquire this deck to leave a review
+                      {t('detail.acquireToReview')}
                     </Text>
                   )}
                   {stats && stats.review_count === 0 && (
                     <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                      No reviews yet
+                      {t('detail.noReviewsYet')}
                     </Text>
                   )}
                 </View>
@@ -558,7 +559,7 @@ export function MarketplaceDetailScreen() {
                     </Text>
                     <Text style={{ color: palette.yellow[500], fontSize: 18 }}>{renderStars(stats.avg_rating)}</Text>
                     <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                      {stats.review_count} review{stats.review_count !== 1 ? 's' : ''}
+                      {t('detail.reviewCountLabel', { count: stats.review_count })}
                     </Text>
                   </View>
                   <View style={reviewStyles.summaryRight}>
@@ -618,7 +619,7 @@ export function MarketplaceDetailScreen() {
             case 'load_more':
               return (
                 <Button
-                  title={reviewsLoading ? 'Loading...' : 'Load more reviews'}
+                  title={reviewsLoading ? t('detail.loading') : t('detail.loadMoreReviews')}
                   variant="ghost"
                   size="sm"
                   onPress={() => loadMore(listingId)}
@@ -641,13 +642,13 @@ export function MarketplaceDetailScreen() {
       >
         <View style={[reportStyles.modalContainer, { backgroundColor: theme.colors.background }]}>
           <View style={reportStyles.modalHeader}>
-            <Text style={[theme.typography.h3, { color: theme.colors.text }]}>Report Content</Text>
+            <Text style={[theme.typography.h3, { color: theme.colors.text }]}>{t('detail.reportContent')}</Text>
             <TouchableOpacity onPress={() => setShowReportModal(false)}>
-              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>Cancel</Text>
+              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>{t('common:cancel', { defaultValue: 'Cancel' })}</Text>
             </TouchableOpacity>
           </View>
           <View style={reportStyles.modalBody}>
-            <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>Reason</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>{t('detail.reportReason')}</Text>
             {REPORT_CATEGORIES.map((cat) => (
               <TouchableOpacity
                 key={cat.value}
@@ -669,15 +670,15 @@ export function MarketplaceDetailScreen() {
                     <View style={[reportStyles.radioInner, { backgroundColor: theme.colors.primary }]} />
                   )}
                 </View>
-                <Text style={[theme.typography.body, { color: theme.colors.text }]}>{cat.label}</Text>
+                <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t(cat.labelKey)}</Text>
               </TouchableOpacity>
             ))}
 
-            <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 16, marginBottom: 8 }]}>Details (optional)</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 16, marginBottom: 8 }]}>{t('detail.reportDetails')}</Text>
             <TextInput
               value={reportDescription}
               onChangeText={setReportDescription}
-              placeholder="Describe the issue..."
+              placeholder={t('detail.reportDescriptionPlaceholder')}
               placeholderTextColor={theme.colors.textTertiary}
               multiline
               numberOfLines={3}
@@ -690,7 +691,7 @@ export function MarketplaceDetailScreen() {
 
             <View style={{ marginTop: 20 }}>
               <Button
-                title={reportSubmitting ? 'Submitting...' : 'Submit Report'}
+                title={reportSubmitting ? t('detail.submitting') : t('detail.submitReport')}
                 onPress={handleReport}
                 loading={reportSubmitting}
                 testID="report-submit-button"
@@ -710,32 +711,32 @@ export function MarketplaceDetailScreen() {
         <View style={[reviewStyles.modalContainer, { backgroundColor: theme.colors.background }]}>
           <View style={reviewStyles.modalHeader}>
             <Text style={[theme.typography.h3, { color: theme.colors.text }]}>
-              {userReview ? 'Edit Review' : 'Write a Review'}
+              {userReview ? t('detail.editReview') : t('detail.writeAReview')}
             </Text>
             <TouchableOpacity onPress={() => setShowReviewModal(false)}>
-              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>Cancel</Text>
+              <Text style={[theme.typography.body, { color: theme.colors.primary }]}>{t('common:cancel', { defaultValue: 'Cancel' })}</Text>
             </TouchableOpacity>
           </View>
 
           <View style={reviewStyles.modalBody}>
-            <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>Your Rating</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>{t('detail.yourRating')}</Text>
             <StarSelector rating={reviewRating} onChange={setReviewRating} />
 
-            <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 20, marginBottom: 8 }]}>Title (optional)</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 20, marginBottom: 8 }]}>{t('detail.reviewTitleLabel')}</Text>
             <TextInput
               value={reviewTitle}
               onChangeText={setReviewTitle}
-              placeholder="Summarize your experience"
+              placeholder={t('detail.reviewTitlePlaceholder')}
               placeholderTextColor={theme.colors.textSecondary}
               maxLength={100}
               style={[reviewStyles.input, { color: theme.colors.text, borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}
             />
 
-            <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 16, marginBottom: 8 }]}>Review (optional)</Text>
+            <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 16, marginBottom: 8 }]}>{t('detail.reviewBodyLabel')}</Text>
             <TextInput
               value={reviewBody}
               onChangeText={setReviewBody}
-              placeholder="What did you like or dislike?"
+              placeholder={t('detail.reviewBodyPlaceholder')}
               placeholderTextColor={theme.colors.textSecondary}
               maxLength={2000}
               multiline
@@ -746,13 +747,13 @@ export function MarketplaceDetailScreen() {
 
             <View style={{ marginTop: 24, gap: 12 }}>
               <Button
-                title={submitting ? 'Submitting...' : userReview ? 'Update Review' : 'Submit Review'}
+                title={submitting ? t('detail.submitting') : userReview ? t('detail.updateReview') : t('detail.submitReview')}
                 onPress={handleSubmitReview}
                 loading={submitting}
               />
               {userReview && (
                 <Button
-                  title="Delete Review"
+                  title={t('detail.deleteReview')}
                   variant="ghost"
                   onPress={handleDeleteReview}
                 />

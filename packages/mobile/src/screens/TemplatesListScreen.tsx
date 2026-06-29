@@ -40,23 +40,23 @@ export function TemplatesListScreen() {
 
   const handleDelete = (template: CardTemplate) => {
     if (template.is_default) {
-      Alert.alert('Cannot Delete', 'Default templates cannot be deleted.')
+      Alert.alert(t('templatesList.cannotDeleteTitle'), t('templatesList.cannotDeleteMsg'))
       return
     }
     Alert.alert(
-      'Delete Template',
-      `Are you sure you want to delete "${template.name}"?`,
+      t('templatesList.deleteTitle'),
+      t('deleteConfirm', { name: template.name }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             setDeletingId(template.id)
             const success = await deleteTemplate(template.id)
             if (!success) {
               const storeError = useTemplateStore.getState().error
-              Alert.alert('Error', storeError ?? 'Failed to delete template')
+              Alert.alert(t('template.errorTitle'), storeError ?? t('templatesList.deleteFailed'))
             }
             setDeletingId(null)
           },
@@ -81,7 +81,7 @@ export function TemplatesListScreen() {
             {item.name}
           </Text>
           {item.is_default && (
-            <Badge label="Default" variant="primary" testID={`template-default-badge-${item.id}`} />
+            <Badge label={t('templatesList.defaultBadge')} variant="primary" testID={`template-default-badge-${item.id}`} />
           )}
         </View>
 
@@ -144,7 +144,7 @@ export function TemplatesListScreen() {
 
   return (
     <Screen safeArea padding={false} testID="templates-list-screen">
-      <ScreenHeader title="Templates" mode="drawer" />
+      <ScreenHeader title={t('template.title')} mode="drawer" />
       <FlatList
         data={templates}
         keyExtractor={(item) => item.id}
@@ -187,7 +187,7 @@ export function TemplatesListScreen() {
               </Text>
               <Button
                 testID="templates-create-first"
-                title="Create Template"
+                title={t('template.create')}
                 onPress={handleNew}
               />
             </View>

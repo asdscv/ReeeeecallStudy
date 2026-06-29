@@ -254,5 +254,13 @@
       "429": "Vượt giới hạn tốc độ"
     }
   },
-  "dashboard": "Bảng điều khiển"
+  "dashboard": "Bảng điều khiển",
+  "labels": {
+    "headers": "Tiêu đề (Headers)",
+    "pathParams": "Tham số đường dẫn",
+    "queryParams": "Tham số truy vấn",
+    "requestBody": "Nội dung yêu cầu",
+    "response": "Phản hồi",
+    "statusCodes": "Mã trạng thái"
+  }
 }

@@ -45,7 +45,14 @@
     "cardsPerSession": "จำนวนการ์ดต่อเซสชัน",
     "batchHint": "ระหว่าง 5 ถึง 500 การ์ด",
     "dateSelection": "เลือกวันที่",
-    "startStudy": "เริ่มเรียน"
+    "startStudy": "เริ่มเรียน",
+    "modalSubtitleMode": "เลือกโหมดการเรียน",
+    "modalSubtitleDate": "เลือกวันที่",
+    "modalSubtitleCramming": "ตัวเลือกอัดเข้าหัว",
+    "modalSubtitleBatch": "ตั้งค่าขนาดชุด",
+    "dateCardCount": "{{date}} — {{count}} การ์ด",
+    "backToModeSelect": "กลับไปเลือกโหมด",
+    "cancel": "ยกเลิก"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "กำลังโหลด...",
+    "swipe": "ปัด",
     "undo": "Undo",
     "endSession": "จบเซสชันหรือไม่?",
     "endMessage": "ความคืบหน้าจนถึงตอนนี้จะถูกบันทึก",

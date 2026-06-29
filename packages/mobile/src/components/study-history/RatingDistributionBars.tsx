@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
 import type { RatingDistribution } from '@reeeeecall/shared/lib/study-history-stats'
@@ -26,6 +27,7 @@ interface RatingDistributionBarsProps {
  */
 export function RatingDistributionBars({ data, testID }: RatingDistributionBarsProps) {
   const theme = useTheme()
+  const { t } = useTranslation('history')
 
   if (data.length === 0) return null
 
@@ -37,7 +39,7 @@ export function RatingDistributionBars({ data, testID }: RatingDistributionBarsP
       testID={testID}
     >
       <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 10 }]}>
-        Rating Distribution
+        {t('ratingDistribution')}
       </Text>
       <View style={styles.bars}>
         {data.map((item) => {

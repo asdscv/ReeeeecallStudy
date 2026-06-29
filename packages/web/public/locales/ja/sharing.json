@@ -129,7 +129,8 @@
       "copy": "コピー",
       "subscribe": "購読",
       "snapshot": "スナップショット"
-    }
+    },
+    "unknownRecipient": "該当なし"
   },
   "acceptInvite": {
     "title": "デッキ招待",

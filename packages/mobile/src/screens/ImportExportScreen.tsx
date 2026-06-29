@@ -35,7 +35,7 @@ export function ImportExportScreen() {
       // Parse CSV: expect header row, then data rows
       const lines = file.content.split('\n').filter((l) => l.trim())
       if (lines.length < 2) {
-        Alert.alert('Error', 'CSV file is empty or has no data rows')
+        Alert.alert(t('errorTitle'), t('csvEmpty'))
         setImporting(false)
         return
       }
@@ -60,9 +60,9 @@ export function ImportExportScreen() {
         }
       }
 
-      Alert.alert('Success', `Imported ${imported} cards from "${file.name}"`)
+      Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
     } catch (e) {
-      Alert.alert('Error', 'Failed to import CSV file')
+      Alert.alert(t('errorTitle'), t('importFailed'))
     } finally {
       setImporting(false)
     }
@@ -90,9 +90,9 @@ export function ImportExportScreen() {
         }
       }
 
-      Alert.alert('Success', `Imported ${imported} cards from "${file.name}"`)
+      Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
     } catch {
-      Alert.alert('Error', 'Failed to parse JSON file')
+      Alert.alert(t('errorTitle'), t('importJsonFailed'))
     } finally {
       setImporting(false)
     }
@@ -100,7 +100,7 @@ export function ImportExportScreen() {
 
   const handleExportCSV = async () => {
     if (cards.length === 0) {
-      Alert.alert('No Cards', 'This deck has no cards to export')
+      Alert.alert(t('noCardsTitle'), t('noCards'))
       return
     }
 
@@ -120,9 +120,9 @@ export function ImportExportScreen() {
 
       const filename = `${deck?.name ?? 'deck'}-export.csv`
       const success = await fileTransferService.shareCSV(filename, csv)
-      if (!success) Alert.alert('Error', 'Sharing is not available on this device')
+      if (!success) Alert.alert(t('errorTitle'), t('sharingUnavailable'))
     } catch {
-      Alert.alert('Error', 'Failed to export CSV')
+      Alert.alert(t('errorTitle'), t('exportFailed'))
     } finally {
       setExporting(false)
     }
@@ -130,7 +130,7 @@ export function ImportExportScreen() {
 
   const handleExportJSON = async () => {
     if (cards.length === 0) {
-      Alert.alert('No Cards', 'This deck has no cards to export')
+      Alert.alert(t('noCardsTitle'), t('noCards'))
       return
     }
 
@@ -147,9 +147,9 @@ export function ImportExportScreen() {
 
       const filename = `${deck?.name ?? 'deck'}-export.json`
       const success = await fileTransferService.shareJSON(filename, JSON.stringify(data, null, 2))
-      if (!success) Alert.alert('Error', 'Sharing is not available on this device')
+      if (!success) Alert.alert(t('errorTitle'), t('sharingUnavailable'))
     } catch {
-      Alert.alert('Error', 'Failed to export JSON')
+      Alert.alert(t('errorTitle'), t('exportJsonFailed'))
     } finally {
       setExporting(false)
     }
@@ -160,7 +160,7 @@ export function ImportExportScreen() {
       <ScreenHeader title={t('title')} mode="back" />
       <View style={styles.content}>
         <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-          {deck?.name} · {cards.length} cards
+          {t('deckCardCount', { deck: deck?.name ?? '', count: cards.length })}
         </Text>
 
         {/* Import */}
@@ -169,8 +169,7 @@ export function ImportExportScreen() {
           <Button testID="import-csv" title={t('importCSV')} variant="outline" onPress={handleImportCSV} loading={importing} />
           <Button testID="import-json" title={t('importJSON')} variant="outline" onPress={handleImportJSON} loading={importing} />
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            CSV: first row = field names, each row = one card{'\n'}
-            JSON: array of objects or {'{'} cards: [...] {'}'}
+            {t('importHint')}
           </Text>
         </View>
 

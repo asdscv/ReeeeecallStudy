@@ -7,20 +7,21 @@ import { toast } from '../stores/toast-store'
 import { useDecks } from '../hooks/useDecks'
 import { useAuthState } from '../hooks/useAuthState'
 import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DecksList'>
 
-function formatRelativeDate(iso: string): string {
+function formatRelativeDate(iso: string, t: TFunction): string {
   const diff = Date.now() - new Date(iso).getTime()
   const days = Math.floor(diff / 86400000)
-  if (days === 0) return 'Today'
-  if (days === 1) return 'Yesterday'
-  if (days < 30) return `${days} days ago`
+  if (days === 0) return t('relativeDate.today')
+  if (days === 1) return t('relativeDate.yesterday')
+  if (days < 30) return t('relativeDate.daysAgo', { count: days })
   const months = Math.floor(days / 30)
-  return months === 1 ? '1 month ago' : `${months} months ago`
+  return months === 1 ? t('relativeDate.monthAgo') : t('relativeDate.monthsAgo', { count: months })
 }
 
 /**
@@ -97,8 +98,8 @@ export function DecksListScreen() {
 
   const handleDelete = (deckId: string, name: string) => {
     Alert.alert(t('deleteDeck'), t('deleteConfirm', { name }), [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteDeck(deckId) },
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('delete'), style: 'destructive', onPress: () => deleteDeck(deckId) },
     ])
   }
 
@@ -165,7 +166,7 @@ export function DecksListScreen() {
           const reviewCards = (ds?.review_cards ?? 0) + (ds?.learning_cards ?? 0)
           const newCards = ds?.new_cards ?? 0
           const tpl = templates.find((t) => t.id === item.default_template_id)
-          const updatedAgo = item.updated_at ? formatRelativeDate(item.updated_at) : null
+          const updatedAgo = item.updated_at ? formatRelativeDate(item.updated_at, t) : null
 
           return (
             <TouchableOpacity
@@ -262,7 +263,7 @@ export function DecksListScreen() {
                       testID={`deck-card-${item.id}-study`}
                     >
                       <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
-                        Study
+                        {t('card.startStudy')}
                       </Text>
                     </TouchableOpacity>
                   </View>

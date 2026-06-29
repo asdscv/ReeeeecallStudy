@@ -129,7 +129,8 @@
       "copy": "Sao chép",
       "subscribe": "Đăng ký theo dõi",
       "snapshot": "Bản chụp"
-    }
+    },
+    "unknownRecipient": "Không có"
   },
   "acceptInvite": {
     "title": "Lời mời bộ thẻ",

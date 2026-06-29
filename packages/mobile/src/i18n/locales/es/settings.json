@@ -110,7 +110,8 @@
   "quickActions": {
     "quickStudy": "Estudio rápido",
     "aiGenerate": "Generar IA",
-    "invite": "Invitar"
+    "invite": "Invitar",
+    "shareMessage": "¡Descubre ReeeeecallStudy, la app de tarjetas más inteligente! https://reeeeecall.com"
   },
   "templates": {
     "title": "Plantillas de tarjetas",

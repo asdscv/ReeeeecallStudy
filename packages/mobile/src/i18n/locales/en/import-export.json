@@ -15,5 +15,9 @@
   "exportJsonFailed": "Failed to export JSON",
   "noCards": "This deck has no cards to export",
   "sharingUnavailable": "Sharing is not available on this device",
+  "errorTitle": "Error",
+  "successTitle": "Success",
+  "noCardsTitle": "No Cards",
+  "deckCardCount": "{{deck}} · {{count}} cards",
   "back": "Back"
 }

@@ -254,5 +254,13 @@
       "429": "Batas permintaan terlampaui"
     }
   },
-  "dashboard": "Dasbor"
+  "dashboard": "Dasbor",
+  "labels": {
+    "headers": "Header",
+    "pathParams": "Parameter Path",
+    "queryParams": "Parameter Kueri",
+    "requestBody": "Body Permintaan",
+    "response": "Respons",
+    "statusCodes": "Kode Status"
+  }
 }

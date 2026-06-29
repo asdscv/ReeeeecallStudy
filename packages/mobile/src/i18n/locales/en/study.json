@@ -45,7 +45,14 @@
     "alertNoCardsTitle": "No Cards",
     "alertNoCardsMsg": "No cards found for the selected date",
     "alertErrorTitle": "Error",
-    "shuffle": "Shuffle"
+    "shuffle": "Shuffle",
+    "modalSubtitleMode": "Select study mode",
+    "modalSubtitleDate": "Select date",
+    "modalSubtitleCramming": "Cramming options",
+    "modalSubtitleBatch": "Set batch size",
+    "dateCardCount": "{{date}} — {{count}} cards",
+    "backToModeSelect": "Back to mode select",
+    "cancel": "Cancel"
   },
   "cramming": {
     "filter": {
@@ -69,6 +76,7 @@
   },
   "session": {
     "loading": "Loading...",
+    "swipe": "Swipe",
     "exit": "Exit",
     "endSession": "End Session?",
     "endMessage": "Your progress so far will be saved.",

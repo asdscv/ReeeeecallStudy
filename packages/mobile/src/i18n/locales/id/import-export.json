@@ -15,5 +15,9 @@
   "exportJsonFailed": "Failed to export JSON",
   "noCards": "Tidak ada kartu untuk diekspor.",
   "sharingUnavailable": "Sharing is not available on this device",
+  "errorTitle": "Kesalahan",
+  "successTitle": "Berhasil",
+  "noCardsTitle": "Tidak ada kartu",
+  "deckCardCount": "{{deck}} · {{count}} kartu",
   "back": "Kembali"
 }
