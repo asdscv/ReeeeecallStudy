@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 093: Security Hardening
+-- Migration 098: Security Hardening
 -- ----------------------------------------------------------------------------
 -- Following the SECURITY DEFINER audit (db-audit dumps), this migration closes
 -- a set of security holes WITHOUT changing any business logic:

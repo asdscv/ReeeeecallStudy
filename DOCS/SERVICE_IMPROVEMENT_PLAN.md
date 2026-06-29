@@ -27,9 +27,9 @@
 
 | # | 항목 | 파일 | 상태 |
 |---|------|------|------|
-| 3.1 | 온보딩 플로우 (3단계 위저드) | OnboardingWizard | ⬜ 인프라 필요 |
+| 3.1 | 온보딩 플로우 (3단계 위저드) | OnboardingOverlay/onboarding-store | ✅ 완료 (App.tsx 렌더, web+mobile) |
 | 3.2 | 일일 목표 + 스트릭 보상 | 064_goals_streaks_difficulty.sql | ✅ DB 완료 |
-| 3.3 | 학습 리마인더 (이메일) | worker-modules | ⬜ 이메일 인프라 필요 |
+| 3.3 | 학습 리마인더 (이메일) | worker-modules/reminder-sender.js | 🟡 스캐폴드 (DB/RPC/스케줄러/설정UI 완료, 이메일 전송은 placeholder — SendGrid/Resend 미연동) |
 | 3.4 | 마켓 검색 개선 — 난이도 필터 | difficulty_level 컬럼 | ✅ DB 완료 |
 
 ## Phase 4: Enterprise (이후) — 확장성
