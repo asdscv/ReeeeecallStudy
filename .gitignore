@@ -55,3 +55,9 @@ AuthKey_*.p8
 # CSV import sidecars (transient process state)
 STUDY_DATA/*.checkpoint
 STUDY_DATA/*.tmp
+
+# Stray Expo prebuild output at repo root (real native projects live in
+# packages/mobile/{android,ios}, already ignored there). Prevents accidental
+# commit of ~2GB of regenerable build artifacts.
+/android/
+/ios/
