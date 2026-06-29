@@ -79,6 +79,8 @@ export function ContentDetailPage() {
         description={currentArticle.meta_description || currentArticle.subtitle || ''}
         ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || SEO.DEFAULT_OG_IMAGE}
         ogType="article"
+        // Minor-language articles are served to users but not indexed (mirrors the worker).
+        noIndex={!(SEO.INDEXABLE_LOCALES as readonly string[]).includes(currentArticle.locale)}
         canonicalUrl={buildCanonicalUrl(currentArticle.slug, currentArticle.locale, currentArticle.canonical_url)}
         jsonLd={[
           buildArticleJsonLd(currentArticle, relatedArticles.map((r) => r.slug)),

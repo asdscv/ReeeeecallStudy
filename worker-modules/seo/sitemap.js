@@ -1,6 +1,7 @@
 // Dynamic sitemap handler — sitemap index + sub-sitemaps
-import { SITE_URL, SUPPORTED_LOCALES } from './constants.js'
+import { SITE_URL, INDEXABLE_LOCALES } from './constants.js'
 import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey } from './helpers.js'
+import { isIndexable } from '../locale-policy.js'
 
 const URLSET_HEADER = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -44,14 +45,14 @@ export async function handleSitemapStatic() {
     <loc>${SITE_URL}/landing</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/landing?lang=${l}"/>`).join('\n')}
+${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/landing?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/landing"/>
   </url>
   <url>
     <loc>${SITE_URL}/insight</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-${SUPPORTED_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
+${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight"/>
   </url>
   <url>
@@ -94,6 +95,10 @@ export async function handleSitemapArticles(env) {
 
       for (const [slug, info] of Object.entries(slugMap)) {
         const existingLocales = Object.keys(info.locales)
+        // Only sitemap articles with ≥1 indexable locale, and advertise hreflang
+        // for indexable locales only (minor languages are noindex now).
+        const indexableLocales = existingLocales.filter(isIndexable)
+        if (indexableLocales.length === 0) continue
         const lastmod = Object.values(info.locales).sort().pop()
         const imageTag = info.image
           ? `\n    <image:image>\n      <image:loc>${escapeHtml(info.image)}</image:loc>\n      <image:title>${escapeHtml(info.title)}</image:title>\n    </image:image>`
@@ -103,7 +108,7 @@ export async function handleSitemapArticles(env) {
     <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>${imageTag}
-${existingLocales.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
+${indexableLocales.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight/${slug}"/>
   </url>\n`
       }

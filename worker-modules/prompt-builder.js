@@ -57,14 +57,14 @@ Each block has "type" and "props":
 
 ## Rules
 
-- Generate 7 to 13 blocks total
+- Generate 9 to 13 blocks total (aim high — thin articles do not rank)
 - First block MUST be "hero", last block MUST be "cta"
 - Do NOT use "image", "blockquote", or "statistics" block types
 - **bold** and *italic* markdown is ONLY allowed inside "paragraph" blocks. All other block types must use plain text without any markdown formatting.
 - Mix different block types for visual variety
 - Use at least 3 different block types (besides hero and cta)
-- Content should be 800-1500 words equivalent
-- Include practical, actionable advice
+- DEPTH REQUIREMENT (critical for ranking): the article MUST total at least 900 words of substantive body text. Every "paragraph" block must be 60-120 words of real explanation — never a single thin sentence. Every "numbered_list" / "feature_cards" item description must be a complete, specific sentence of 20+ words. Shallow, padded, or one-line content fails.
+- Include practical, actionable advice with CONCRETE specifics: a worked example, a step-by-step mini-scenario, a sample, or a do/don't comparison the reader can apply immediately. Generic advice that could apply to any topic is not acceptable.
 
 ## Content Reliability
 
@@ -85,7 +85,7 @@ These techniques are proven by research (Princeton/Georgia Tech, KDD 2024) to in
 
 3. **Cite well-known research concepts**: Reference widely known research frameworks by name (e.g., "Ebbinghaus's forgetting curve," "Leitner system," "testing effect," "spacing effect," "interleaving principle," "Bloom's taxonomy"). Do NOT invent citations, but DO name real, well-established concepts.
 
-4. **Include qualitative evidence references**: Use phrases like "Research in cognitive psychology shows that…", "According to learning science principles…", "Studies in educational psychology demonstrate…" to frame claims with authority.
+4. **Frame claims with authority — but VARY the framing**: When citing a learning-science principle, name the specific concept (e.g., "the testing effect," "Ebbinghaus's forgetting curve") and explain HOW it applies to THIS topic concretely. Do NOT reuse stock opener phrases like "Research in cognitive psychology shows that…" — repeating the same boilerplate across articles reads as mass-produced AI content and is penalized. Each article's evidence framing must be unique to its subject.
 
 5. **Entity-centric writing**: Consistently name key concepts (e.g., always say "spaced repetition" not "this technique," always say "active recall" not "this method"). AI engines build knowledge graphs from consistent entity mentions.
 
@@ -118,6 +118,7 @@ const LOCALE_INSTRUCTIONS = {
   vi: 'Write the entire article in Vietnamese (Tiếng Việt). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Vietnamese. For SEO: use Vietnamese keywords that Vietnamese users would search on Google Vietnam. meta_title and meta_description must be in Vietnamese. Ensure correct diacritics/tone marks throughout.',
   th: 'Write the entire article in Thai (ภาษาไทย). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Thai. For SEO: use Thai keywords that Thai users would search on Google Thailand. meta_title and meta_description must be in Thai. Note: Thai has no word boundaries — ensure natural, fluent Thai text.',
   id: 'Write the entire article in Indonesian (Bahasa Indonesia). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Indonesian. For SEO: use Indonesian keywords that Indonesian users would search on Google Indonesia. meta_title and meta_description must be in Indonesian.',
+  es: 'Write the entire article in Spanish (Español). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Spanish. For SEO: use Spanish keywords that Spanish-speaking users would search on Google. meta_title and meta_description must be in Spanish.',
 }
 
 export function buildPrompt(topic, locale, options = {}) {
@@ -138,7 +139,13 @@ Write a unique, insightful article about "${topic.titleHint}" within the "${topi
     titleAvoidance = `\n\n## Previously Generated Titles (DO NOT use similar titles or styles)\n${previousTitles.map(t => `- "${t}"`).join('\n')}\n\nYour title MUST be stylistically different from all of the above.`
   }
 
-  const localeInstruction = LOCALE_INSTRUCTIONS[locale] || LOCALE_INSTRUCTIONS.en
+  // Fail-fast on the CRON path only (not module load → a generation-config typo
+  // cannot brick request serving): a generated locale lacking instructions would
+  // otherwise silently produce English stored under the wrong locale.
+  const localeInstruction = LOCALE_INSTRUCTIONS[locale]
+  if (!localeInstruction) {
+    throw new Error(`prompt-builder: no LOCALE_INSTRUCTIONS for locale "${locale}" — add one before generating it`)
+  }
 
   return {
     system: SYSTEM_PROMPT,

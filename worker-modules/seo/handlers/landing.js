@@ -2,11 +2,13 @@
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
   LANDING_TITLES, LANDING_DESCS, LANDING_FAQ, LANDING_HOWTO,
+  ROBOTS_INDEX, ROBOTS_NOINDEX,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
   localizedUrl,
 } from '../helpers.js'
+import { isUiLocale, isIndexable } from '../../locale-policy.js'
 import {
   buildWebAppJsonLd,
   buildFAQJsonLd,
@@ -16,10 +18,14 @@ import {
   buildCourseJsonLd,
   buildProfilePageJsonLd,
 } from '../json-ld.js'
-import { buildHtmlDocument, buildMetaTags, buildSeoResponse } from '../html-builder.js'
+import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
 
 export async function handleLandingBotRequest(url) {
-  const lang = url.searchParams.get('lang') || 'en'
+  // Normalize untrusted ?lang; non-indexable locales (minor langs) → noindex,
+  // consistent with insight pages and the en/ko-only landing sitemap entry.
+  const rawLang = url.searchParams.get('lang')
+  const lang = isUiLocale(rawLang) ? rawLang : 'en'
+  const robots = isIndexable(lang) ? ROBOTS_INDEX : ROBOTS_NOINDEX
   const pageTitle = LANDING_TITLES[lang] || LANDING_TITLES.en
   const pageDesc = LANDING_DESCS[lang] || LANDING_DESCS.en
   const canonicalUrl = localizedUrl('/landing', lang)
@@ -58,9 +64,7 @@ export async function handleLandingBotRequest(url) {
 <link rel="search" type="application/opensearchdescription+xml" title="${BRAND_NAME}" href="${SITE_URL}/opensearch.xml">`
   const hreflangTags = buildHreflangTags('/landing', true)
 
-  const jsonLdScripts = [webAppJsonLd, faqJsonLd, howToJsonLd, buildOrganizationJsonLd(), buildWebSiteJsonLd(), courseJsonLd, profilePageJsonLd]
-    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
-    .join('\n')
+  const jsonLdScripts = renderJsonLd([webAppJsonLd, faqJsonLd, howToJsonLd, buildOrganizationJsonLd(), buildWebSiteJsonLd(), courseJsonLd, profilePageJsonLd])
 
   const head = `${metaTags}
 ${feedLinks}
@@ -111,11 +115,11 @@ ${faqHtml}
 </nav>
 </footer>`
 
-  const html = buildHtmlDocument({ lang, head, body })
+  const html = buildHtmlDocument({ lang, head, body, robots })
 
   return buildSeoResponse(html, {
     lang,
     cacheSeconds: 3600,
-    robots: 'index, follow, max-image-preview:large',
+    robots,
   })
 }

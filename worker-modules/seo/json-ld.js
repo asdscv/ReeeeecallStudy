@@ -4,7 +4,7 @@ import {
   DEFAULT_OG_IMAGE,
   OG_IMAGE_WIDTH,
   OG_IMAGE_HEIGHT,
-  SUPPORTED_LOCALES,
+  INDEXABLE_LOCALES,
 } from './constants.js'
 import { buildPublisherJsonLd } from './helpers.js'
 
@@ -34,7 +34,7 @@ export function buildWebSiteJsonLd() {
     '@type': 'WebSite',
     name: BRAND_NAME,
     url: SITE_URL,
-    inLanguage: SUPPORTED_LOCALES,
+    inLanguage: INDEXABLE_LOCALES,
     potentialAction: {
       '@type': 'SearchAction',
       target: `${SITE_URL}/insight?q={search_term_string}`,
@@ -202,7 +202,7 @@ export function buildCourseJsonLd(lang) {
     provider: { '@type': 'Organization', name: BRAND_NAME, url: SITE_URL },
     isAccessibleForFree: true,
     courseMode: 'online',
-    inLanguage: SUPPORTED_LOCALES,
+    inLanguage: INDEXABLE_LOCALES,
     educationalLevel: 'beginner',
     hasCourseInstance: {
       '@type': 'CourseInstance',
