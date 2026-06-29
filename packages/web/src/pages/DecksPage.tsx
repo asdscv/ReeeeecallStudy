@@ -93,12 +93,12 @@ export function DecksPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('decks:title')}</h1>
           <GuideHelpLink section="decks" />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setShowAIGenerate(true)}
             className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 active:scale-[0.98] transition cursor-pointer"

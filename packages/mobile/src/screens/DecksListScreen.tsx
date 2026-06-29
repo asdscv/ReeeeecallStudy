@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, FlatList, RefreshControl, Alert, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, FAB, EmptyState, SearchBar, ScreenHeader, Button, ListSkeleton } from '../components/ui'
@@ -120,8 +120,13 @@ export function DecksListScreen() {
         contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
         ListHeaderComponent={
           <View style={styles.header}>
-            {/* Action buttons — matches web: Help (outline) + AI Generate (purple) + New Deck (blue) */}
-            <View style={styles.headerButtons}>
+            {/* Action buttons — matches web: Help (outline) + AI Generate (purple) + New Deck (blue).
+                Horizontally scrollable so all buttons are reachable on narrow screens. */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.headerButtons}
+            >
               <TouchableOpacity
                 testID="decks-help"
                 onPress={() => {
@@ -156,7 +161,7 @@ export function DecksListScreen() {
               >
                 <Text style={styles.headerBtnText}>{t('createNew')}</Text>
               </TouchableOpacity>
-            </View>
+            </ScrollView>
             <SearchBar value={search} onChangeText={setSearch} placeholder={t('searchPlaceholder')} testID="decks-search" />
           </View>
         }

@@ -21,6 +21,8 @@ interface TextInputProps extends Omit<RNTextInputProps, 'style'> {
   rightIcon?: React.ReactNode
   isPassword?: boolean
   containerStyle?: ViewStyle
+  /** Overrides the resting border color (focus/error states still take precedence). */
+  borderColor?: string
   testID?: string
 }
 
@@ -34,6 +36,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
       rightIcon,
       isPassword = false,
       containerStyle,
+      borderColor,
       testID,
       ...rest
     },
@@ -44,7 +47,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
     const [focused, setFocused] = useState(false)
     const [secureVisible, setSecureVisible] = useState(!isPassword)
 
-    const styles = getStyles(theme, !!error, focused)
+    const styles = getStyles(theme, !!error, focused, borderColor)
 
     return (
       <View style={[styles.wrapper, containerStyle]} {...(Platform.OS === 'android' ? testProps(testID, true) : {})}>
@@ -88,14 +91,14 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
   },
 )
 
-function getStyles(theme: Theme, hasError: boolean, focused: boolean) {
+function getStyles(theme: Theme, hasError: boolean, focused: boolean, accentBorder?: string) {
   const { colors, spacing: sp, borderRadius: br, typography: typo } = theme
 
   const borderColor = hasError
     ? colors.error
     : focused
       ? colors.borderFocused
-      : colors.inputBorder
+      : (accentBorder ?? colors.inputBorder)
 
   return StyleSheet.create({
     wrapper: { gap: sp.xs },
