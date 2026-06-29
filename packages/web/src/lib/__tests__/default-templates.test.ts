@@ -35,13 +35,15 @@ describe('quick-create field-count presets', () => {
     ])
   })
 
-  it('basic preset (1·1) names its two fields 앞면 / 뒷면', () => {
+  it('basic preset (1·1) names its two fields language-neutrally (Front / Back)', () => {
+    // Field names are persisted and shown to ALL users regardless of locale, so
+    // they are language-neutral English, not the creator's UI language.
     const { fields } = buildPresetTemplate(QUICK_PRESETS[0])
-    expect(fields.map((f) => f.name)).toEqual(['앞면', '뒷면'])
+    expect(fields.map((f) => f.name)).toEqual(['Front', 'Back'])
   })
 
-  it('multi-back preset numbers extra back fields (뒷면 / 뒷면 2 …)', () => {
+  it('multi-back preset numbers extra back fields (Back / Back 2 …)', () => {
     const { fields } = buildPresetTemplate(QUICK_PRESETS.find((x) => x.id === 'f1b3')!)
-    expect(fields.map((f) => f.name)).toEqual(['앞면', '뒷면', '뒷면 2', '뒷면 3'])
+    expect(fields.map((f) => f.name)).toEqual(['Front', 'Back', 'Back 2', 'Back 3'])
   })
 })

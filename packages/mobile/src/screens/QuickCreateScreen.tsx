@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -32,7 +32,7 @@ export function QuickCreateScreen() {
   const { t } = useTranslation(['decks', 'common'])
   const navigation = useNavigation<Nav>()
 
-  const { createDeck } = useDeckStore()
+  const { createDeck, deleteDeck } = useDeckStore()
   const { createCards } = useCardStore()
   const { findOrCreatePresetTemplate } = useTemplateStore()
 
@@ -48,10 +48,17 @@ export function QuickCreateScreen() {
   // open and remember the ids so a retry never re-creates them (no duplicates).
   const [createdDeckId, setCreatedDeckId] = useState<string | null>(null)
   const [createdTemplateId, setCreatedTemplateId] = useState<string | null>(null)
+  // How many of the current cards already landed — a retry after a partial insert
+  // only sends the remainder (no duplicate cards).
+  const [createdCardCount, setCreatedCardCount] = useState(0)
+  // Synchronous in-flight guard (`loading` state commits asynchronously, so a
+  // fast double-tap could enter handleSubmit twice and create two decks).
+  const submitting = useRef(false)
 
   useEffect(() => {
     setCreatedDeckId(null)
     setCreatedTemplateId(null)
+    setCreatedCardCount(0)
   }, [])
 
   const preset: QuickPreset = QUICK_PRESETS.find((p) => p.id === presetId) ?? QUICK_PRESETS[0]
@@ -71,14 +78,26 @@ export function QuickCreateScreen() {
   }
 
   const emptyRows = () => Array.from({ length: INITIAL_ROWS }, () => ({}))
+  const cleanupOrphanDeck = () => {
+    // Deck is created before its cards; if creation succeeded but no card ever
+    // landed (createdCardCount === 0), abandoning the flow (cancel / preset
+    // switch) would leave an empty orphan deck. Delete it; decks with cards stay.
+    if (createdDeckId && createdCardCount === 0) void deleteDeck(createdDeckId)
+  }
+  const handleCancel = () => {
+    cleanupOrphanDeck()
+    navigation.goBack()
+  }
   const selectPreset = (id: string) => {
-    // Clear rows (field keys are reused with different meaning) AND reset the
-    // created template + deck ids: a deck created with the old shape before a
-    // later step failed must not be reused with the new shape's cards.
+    // Clear rows (field keys are reused with different meaning), drop any empty
+    // deck created under the old shape, and reset the created ids so the new
+    // shape is consistent end-to-end.
+    cleanupOrphanDeck()
     setPresetId(id)
     setRows(emptyRows())
     setCreatedTemplateId(null)
     setCreatedDeckId(null)
+    setCreatedCardCount(0)
   }
   const setCell = (rowIdx: number, key: string, value: string) =>
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)))
@@ -86,79 +105,96 @@ export function QuickCreateScreen() {
   const removeRow = (idx: number) => setRows((prev) => prev.filter((_, i) => i !== idx))
 
   const handleSubmit = async () => {
-    if (loading) return
-    setError(null)
+    if (loading || submitting.current) return
+    submitting.current = true
+    try {
+      setError(null)
 
-    const name = deckName.trim()
-    if (!name) {
-      setError(t('decks:quickCreate.errors.nameRequired'))
-      return
-    }
+      const name = deckName.trim()
+      if (!name) {
+        setError(t('decks:quickCreate.errors.nameRequired'))
+        return
+      }
 
-    const cards = rows
-      .map((row) => {
+      // Build cards. A non-empty row missing its front field blocks submit (an
+      // empty front = a blank study prompt) instead of creating a broken card.
+      const frontKeys = specs.filter((s) => s.side === 'front').map((s) => s.key)
+      let incompleteFront = false
+      const cards: { field_values: Record<string, string> }[] = []
+      for (const row of rows) {
         const fv: Record<string, string> = {}
         for (const spec of specs) {
           const v = (row[spec.key] ?? '').trim()
           if (v) fv[spec.key] = v
         }
-        return fv
-      })
-      .filter((fv) => Object.keys(fv).length > 0)
-      .map((fv) => ({ field_values: fv }))
+        if (Object.keys(fv).length === 0) continue
+        if (frontKeys.some((k) => !fv[k])) { incompleteFront = true; continue }
+        cards.push({ field_values: fv })
+      }
 
-    if (cards.length === 0) {
-      setError(t('decks:quickCreate.errors.cardsRequired'))
-      return
-    }
-
-    setLoading(true)
-
-    // 1. find-or-create the template for this field shape (reused on retry).
-    let templateId = createdTemplateId
-    if (!templateId) {
-      const tpl = await findOrCreatePresetTemplate(preset)
-      if (!tpl) {
-        setError(useTemplateStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
-        setLoading(false)
+      if (incompleteFront) {
+        setError(t('decks:quickCreate.errors.frontRequired'))
         return
       }
-      templateId = tpl.id
-      setCreatedTemplateId(tpl.id)
-    }
-
-    // 2. create the deck only once; a retry after a later failure reuses it.
-    let deckId = createdDeckId
-    if (!deckId) {
-      const deck = await createDeck({
-        name,
-        description: deckDescription.trim() || undefined,
-        default_template_id: templateId,
-      })
-      if (!deck) {
-        setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
-        setLoading(false)
+      if (cards.length === 0) {
+        setError(t('decks:quickCreate.errors.cardsRequired'))
         return
       }
-      deckId = deck.id
-      setCreatedDeckId(deck.id)
+
+      setLoading(true)
+
+      // 1. find-or-create the template for this field shape (reused on retry).
+      let templateId = createdTemplateId
+      if (!templateId) {
+        const tpl = await findOrCreatePresetTemplate(preset)
+        if (!tpl) {
+          setError(useTemplateStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+          return
+        }
+        templateId = tpl.id
+        setCreatedTemplateId(tpl.id)
+      }
+
+      // 2. create the deck only once; a retry after a later failure reuses it.
+      let deckId = createdDeckId
+      if (!deckId) {
+        const deck = await createDeck({
+          name,
+          description: deckDescription.trim() || undefined,
+          default_template_id: templateId,
+        })
+        if (!deck) {
+          setError(useDeckStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+          return
+        }
+        deckId = deck.id
+        setCreatedDeckId(deck.id)
+      }
+
+      // 3. insert ONLY the cards not already saved by a previous attempt, so a
+      // retry after a partial insert never duplicates the already-saved cards.
+      const remaining = cards.slice(createdCardCount)
+      const inserted = remaining.length
+        ? await createCards({ deck_id: deckId, template_id: templateId, cards: remaining })
+        : 0
+      const total = createdCardCount + inserted
+      setCreatedCardCount(total)
+
+      if (total < cards.length) {
+        setError(useCardStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
+        return
+      }
+
+      // The template was written via template-store; invalidate deck-store's
+      // separate templates cache so DeckDetail / CardEdit (which resolve the
+      // template from deck-store, TTL-gated) refetch and see the new one instead
+      // of falling back to a default-template shape.
+      useDeckStore.getState().invalidate('templates')
+      navigation.replace('DeckDetail', { deckId })
+    } finally {
+      setLoading(false)
+      submitting.current = false
     }
-
-    // 3. insert the cards.
-    const inserted = await createCards({ deck_id: deckId, template_id: templateId, cards })
-    setLoading(false)
-
-    if (inserted < cards.length) {
-      setError(useCardStore.getState().error ?? t('decks:quickCreate.errors.createFailed'))
-      return
-    }
-
-    // The template was written via template-store; invalidate deck-store's
-    // separate templates cache so DeckDetail / CardEdit (which resolve the
-    // template from deck-store, TTL-gated) refetch and see the new one instead
-    // of falling back to a default-template shape.
-    useDeckStore.getState().invalidate('templates')
-    navigation.replace('DeckDetail', { deckId })
   }
 
   return (
@@ -280,7 +316,7 @@ export function QuickCreateScreen() {
           testID="quick-create-cancel"
           title={t('decks:quickCreate.cancel')}
           variant="outline"
-          onPress={() => navigation.goBack()}
+          onPress={handleCancel}
         />
       </View>
     </Screen>

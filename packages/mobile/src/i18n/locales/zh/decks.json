@@ -151,7 +151,8 @@
     "addAnother": "添加并继续创建",
     "errorTitle": "错误",
     "emptyError": "至少需要填写一个字段",
-    "saveError": "保存卡片失败"
+    "saveError": "保存卡片失败",
+    "noTemplateError": "没有可用的卡片模板。"
   },
   "quickCreate": {
     "button": "快速创建",
@@ -187,7 +188,8 @@
       "nameRequired": "请输入卡组名称。",
       "templateRequired": "请选择卡片类型。",
       "cardsRequired": "请至少添加一张卡片。",
-      "createFailed": "创建卡组失败，请重试。"
+      "createFailed": "创建卡组失败，请重试。",
+      "frontRequired": "请填写每张卡片的正面。"
     },
     "deckDescription": "说明（可选）",
     "deckDescriptionPlaceholder": "关于此卡组的简短说明",

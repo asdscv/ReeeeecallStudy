@@ -206,7 +206,8 @@
       "nameRequired": "Please enter a deck name.",
       "templateRequired": "Please choose a card type.",
       "cardsRequired": "Please add at least one card.",
-      "createFailed": "Failed to create deck. Please try again."
+      "createFailed": "Failed to create deck. Please try again.",
+      "frontRequired": "Please fill in the front of each card."
     },
     "deckDescription": "Description (optional)",
     "deckDescriptionPlaceholder": "A short note about this deck",

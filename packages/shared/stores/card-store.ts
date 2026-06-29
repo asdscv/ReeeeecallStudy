@@ -165,6 +165,12 @@ export const useCardStore = create<CardState>((set, get) => ({
   },
 
   createCards: async ({ deck_id, template_id, cards, onProgress }) => {
+    // Clear any stale error from a previous op so the success-gated cache
+    // invalidation below (`if (!get().error)`) reflects THIS call's outcome.
+    // Without this, a leftover error (e.g. a prior failed attempt) would make a
+    // fully-successful retry skip invalidateDeckStats/dropDeckCards, leaving the
+    // deck list showing a stale card count (a freshly-created deck stuck at 0).
+    set({ error: null })
     const check = guard.check('bulk_card_create', 'cards_total')
     if (!check.allowed) { set({ error: check.message ?? 'errors:card.rateLimitReached' }); return 0 }
 

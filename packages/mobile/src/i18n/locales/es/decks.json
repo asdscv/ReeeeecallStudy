@@ -151,7 +151,8 @@
     "addAnother": "Agregar y crear otra",
     "errorTitle": "Error",
     "emptyError": "Al menos un campo debe tener contenido",
-    "saveError": "No se pudo guardar la tarjeta"
+    "saveError": "No se pudo guardar la tarjeta",
+    "noTemplateError": "No hay ninguna plantilla de tarjeta disponible."
   },
   "quickCreate": {
     "button": "Creación rápida",
@@ -187,7 +188,8 @@
       "nameRequired": "Introduce un nombre para el mazo.",
       "templateRequired": "Elige un tipo de tarjeta.",
       "cardsRequired": "Añade al menos una tarjeta.",
-      "createFailed": "No se pudo crear el mazo. Inténtalo de nuevo."
+      "createFailed": "No se pudo crear el mazo. Inténtalo de nuevo.",
+      "frontRequired": "Completa el anverso de cada tarjeta."
     },
     "deckDescription": "Descripción (opcional)",
     "deckDescriptionPlaceholder": "Una breve nota sobre este mazo",

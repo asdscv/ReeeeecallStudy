@@ -206,7 +206,8 @@
       "nameRequired": "덱 이름을 입력해주세요.",
       "templateRequired": "카드 유형을 선택해주세요.",
       "cardsRequired": "카드를 최소 1개 이상 추가해주세요.",
-      "createFailed": "덱 생성에 실패했습니다. 다시 시도해주세요."
+      "createFailed": "덱 생성에 실패했습니다. 다시 시도해주세요.",
+      "frontRequired": "각 카드의 앞면을 입력하세요."
     },
     "deckDescription": "설명 (선택)",
     "deckDescriptionPlaceholder": "이 덱에 대한 간단한 설명",

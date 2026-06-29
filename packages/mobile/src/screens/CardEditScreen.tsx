@@ -151,7 +151,7 @@ export function CardEditScreen() {
       } else {
         const resolvedTemplateId = await resolveTemplateId()
         if (!resolvedTemplateId) {
-          Alert.alert('Error', 'No card template available')
+          Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.noTemplateError'))
           return
         }
         await createCard({
@@ -251,7 +251,7 @@ export function CardEditScreen() {
                 const parsedTags = tags.split(',').map((t) => t.trim()).filter(Boolean)
                 const resolvedTemplateId = await resolveTemplateId()
                 if (!resolvedTemplateId) {
-                  Alert.alert('Error', 'No card template available')
+                  Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.noTemplateError'))
                   return
                 }
                 await createCard({
