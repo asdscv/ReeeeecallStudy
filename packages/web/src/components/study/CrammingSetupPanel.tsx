@@ -64,7 +64,7 @@ export function CrammingSetupPanel({
               onClick={() => onTimeLimitChange(preset)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
                 timeLimitMinutes === preset
-                  ? 'bg-purple-100 text-purple-700 border-2 border-purple-500'
+                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300 border-2 border-purple-500'
                   : 'bg-accent text-foreground border-2 border-transparent hover:border-border'
               }`}
             >
@@ -86,7 +86,7 @@ export function CrammingSetupPanel({
           type="button"
           onClick={() => onShuffleChange(!shuffle)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-            shuffle ? 'bg-purple-600' : 'bg-gray-300'
+            shuffle ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
           }`}
         >
           <span
@@ -117,7 +117,7 @@ function FilterOption({
       onClick={onClick}
       className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${
         selected
-          ? 'border-purple-500 bg-purple-50'
+          ? 'border-purple-500 bg-purple-50 dark:bg-purple-500/15'
           : 'border-border hover:border-border'
       }`}
     >

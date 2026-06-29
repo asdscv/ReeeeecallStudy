@@ -23,7 +23,7 @@ interface QuickCreateModalProps {
   onCreated?: (deckId: string) => void
 }
 
-const INITIAL_ROWS = 3
+const INITIAL_ROWS = 1
 
 /**
  * Dead-simple "just add stuff" flow: name the deck (optional description), pick a
@@ -303,7 +303,8 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
                         value={row[spec.key] ?? ''}
                         onChange={(e) => setCell(idx, spec.key, e.target.value)}
                         placeholder={fieldLabel(spec)}
-                        className="w-full px-3 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm text-foreground"
+                        /* Distinguish front (accent border + tint) from back (default) at a glance. */
+                        className={`w-full px-3 py-2 rounded-lg border ${spec.side === 'front' ? 'border-brand/60 bg-brand/5' : 'border-border'} focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm text-foreground`}
                       />
                     ))}
                   </div>

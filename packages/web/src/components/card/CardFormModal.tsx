@@ -302,8 +302,8 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                         <span>{t('uploading')}</span>
                       </div>
                     ) : fieldValues[field.key] ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <audio controls src={fieldValues[field.key]} className="h-8" />
+                      <div className="flex items-center gap-2">
+                        <audio controls src={fieldValues[field.key]} className="h-8 flex-1 min-w-0" />
                         <button
                           type="button"
                           onClick={() => handleRemoveFile(field)}

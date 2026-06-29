@@ -704,7 +704,7 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
                       disabled={safePage <= 1}
-                      className="p-2.5 rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      className="w-10 h-10 flex items-center justify-center rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -736,7 +736,7 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
                       disabled={safePage >= totalPages}
-                      className="p-2.5 rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      className="w-10 h-10 flex items-center justify-center rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>

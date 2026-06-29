@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
   distributionBar: { flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden' },
   distributionSegment: { height: '100%' },
-  legendRow: { flexDirection: 'row', gap: 16, marginTop: 4 },
+  legendRow: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 6, gap: 16, marginTop: 4 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

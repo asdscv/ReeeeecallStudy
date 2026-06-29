@@ -323,6 +323,7 @@ export function ShareDeckScreen() {
                     <TouchableOpacity
                       onPress={() => handleRevoke(share.id)}
                       style={styles.revokeBtn}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       testID={`share-revoke-${share.id}`}
                     >
                       <Text style={[theme.typography.caption, { color: palette.red[500] }]}>{t('actions.revoke')}</Text>
@@ -358,5 +359,5 @@ const styles = StyleSheet.create({
   shareMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
   statusText: { fontSize: 10, fontWeight: '500' },
-  revokeBtn: { paddingHorizontal: 8, paddingVertical: 4 },
+  revokeBtn: { paddingHorizontal: 10, paddingVertical: 8, minHeight: 40, justifyContent: 'center' },
 })
