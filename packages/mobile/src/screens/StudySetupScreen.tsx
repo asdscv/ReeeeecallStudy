@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet, Modal, FlatList } from 'react-native'
+import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet, Modal, FlatList, ScrollView } from 'react-native'
 import { useNavigation, useRoute, useFocusEffect, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, TextInput, ScreenHeader } from '../components/ui'
@@ -299,7 +299,12 @@ export function StudySetupScreen() {
                 ))}
               </View>
             ) : (
-              <View style={styles.modalBody}>
+              <ScrollView
+                style={styles.modalBody}
+                contentContainerStyle={{ gap: 6, paddingBottom: 4 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
                 {/* Mode indicator */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Text style={{ fontSize: 18 }}>{MODES.find(m => m.mode === selectedMode)?.emoji}</Text>
@@ -476,7 +481,7 @@ export function StudySetupScreen() {
                   loading={isLoading}
                   disabled={selectedMode === 'by_date' && dateCardCount === 0}
                 />
-              </View>
+              </ScrollView>
             )}
 
             {/* Modal footer — Cancel/Back */}

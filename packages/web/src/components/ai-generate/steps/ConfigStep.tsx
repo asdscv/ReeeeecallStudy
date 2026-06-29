@@ -306,7 +306,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       </fieldset>
 
       {/* ── Content Section ── */}
-      <fieldset className="space-y-3 p-3 bg-brand/10/50 rounded-lg border border-blue-100">
+      <fieldset className="space-y-3 p-3 bg-brand/5 rounded-lg border border-brand/20">
         <legend className="text-xs font-semibold text-brand uppercase px-1">{t('config.contentSection')}</legend>
 
         {/* Deck selector (cards_only mode) */}

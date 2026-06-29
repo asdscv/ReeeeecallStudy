@@ -39,7 +39,10 @@ export function LevelCard({ levelInfo, achievements = [], onPressAchievements }:
               {t('level.title', { level: levelInfo.level })}
             </Text>
             {onPressAchievements && (
-              <TouchableOpacity onPress={onPressAchievements}>
+              <TouchableOpacity
+                onPress={onPressAchievements}
+                hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
+              >
                 <Text style={[theme.typography.caption, { color: palette.blue[600] }]}>
                   {t('level.allAchievements')} {'>'}
                 </Text>

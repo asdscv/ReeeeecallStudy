@@ -234,6 +234,7 @@ export function DecksListScreen() {
                       <TouchableOpacity
                         onPress={() => handleUnsubscribe(item)}
                         style={styles.iconBtn}
+                        hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                         testID={`deck-card-${item.id}-unsubscribe`}
                         accessibilityLabel={t('sharing:unsubscribe', { defaultValue: 'Unsubscribe' })}
                       >
@@ -244,6 +245,7 @@ export function DecksListScreen() {
                         <TouchableOpacity
                           onPress={() => navigation.navigate('DeckEdit', { deckId: item.id })}
                           style={styles.iconBtn}
+                          hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                           testID={`deck-card-${item.id}-edit`}
                         >
                           <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\u270F\uFE0F'}</Text>
@@ -251,6 +253,7 @@ export function DecksListScreen() {
                         <TouchableOpacity
                           onPress={() => handleDelete(item.id, item.name)}
                           style={styles.iconBtn}
+                          hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                           testID={`deck-card-${item.id}-delete`}
                         >
                           <Text style={{ fontSize: 18, color: theme.colors.textTertiary }}>{'\uD83D\uDDD1\uFE0F'}</Text>
@@ -318,6 +321,6 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 2 },
   footer: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingTop: 10, marginTop: 6, borderTopWidth: 1 },
   footerActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  iconBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  iconBtn: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 6 },
   studyBtn: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8 },
 })

@@ -479,11 +479,11 @@ export function MarketplaceScreen() {
 
               {/* Bottom stats: "X cards · 👁 Y · Z users" */}
               <View style={styles.statsRow}>
-                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, flex: 1 }]} numberOfLines={1}>
                   {t('listing.cardCount', { count: item.card_count ?? 0 })}{' · '}{'\uD83D\uDC41'} {(item as any).view_count ?? 0}{' · '}{t('listing.userCount', { count: item.acquire_count ?? 0 })}
                 </Text>
                 {(item as any).review_count > 0 && (
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginLeft: 8 }]}>
                     {renderStars((item as any).avg_rating ?? 0)} ({(item as any).review_count})
                   </Text>
                 )}

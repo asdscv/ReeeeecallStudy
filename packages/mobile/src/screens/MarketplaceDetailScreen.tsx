@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { View, Text, FlatList, Alert, StyleSheet, TouchableOpacity, TextInput, Modal } from 'react-native'
+import { View, Text, FlatList, Alert, StyleSheet, TouchableOpacity, TextInput, Modal, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
@@ -647,7 +647,8 @@ export function MarketplaceDetailScreen() {
               <Text style={[theme.typography.body, { color: theme.colors.primary }]}>{t('common:cancel', { defaultValue: 'Cancel' })}</Text>
             </TouchableOpacity>
           </View>
-          <View style={reportStyles.modalBody}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={reportStyles.modalBody} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>{t('detail.reportReason')}</Text>
             {REPORT_CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -697,7 +698,8 @@ export function MarketplaceDetailScreen() {
                 testID="report-submit-button"
               />
             </View>
-          </View>
+          </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
@@ -718,7 +720,8 @@ export function MarketplaceDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={reviewStyles.modalBody}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={reviewStyles.modalBody} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <Text style={[theme.typography.label, { color: theme.colors.text, marginBottom: 8 }]}>{t('detail.yourRating')}</Text>
             <StarSelector rating={reviewRating} onChange={setReviewRating} />
 
@@ -759,7 +762,8 @@ export function MarketplaceDetailScreen() {
                 />
               )}
             </View>
-          </View>
+          </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
     </Screen>
@@ -820,7 +824,7 @@ const reviewStyles = StyleSheet.create({
   barRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   barTrack: { flex: 1, height: 6, borderRadius: 3, overflow: 'hidden' },
   barFill: { height: '100%', backgroundColor: palette.yellow[500], borderRadius: 3 },
-  sortRow: { flexDirection: 'row', gap: 8, marginVertical: 8 },
+  sortRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 8 },
   sortChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
   card: { paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: palette.gray[200] },
   reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },

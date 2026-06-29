@@ -196,7 +196,8 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                       type="button"
                       onClick={() => moveField(i, -1)}
                       disabled={i === 0}
-                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                      aria-label="Move field up"
+                      className="flex items-center justify-center w-7 h-7 text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     >
                       ▲
                     </button>
@@ -204,7 +205,8 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                       type="button"
                       onClick={() => moveField(i, 1)}
                       disabled={i === fields.length - 1}
-                      className="text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                      aria-label="Move field down"
+                      className="flex items-center justify-center w-7 h-7 text-xs text-content-tertiary hover:text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     >
                       ▼
                     </button>
@@ -229,7 +231,8 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
                     type="button"
                     onClick={() => removeField(i)}
                     disabled={fields.length <= 1}
-                    className="text-content-tertiary hover:text-destructive disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-sm px-1"
+                    aria-label="Remove field"
+                    className="flex items-center justify-center w-7 h-7 text-content-tertiary hover:text-destructive disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-sm"
                   >
                     ✕
                   </button>
