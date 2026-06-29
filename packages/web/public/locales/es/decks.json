@@ -206,7 +206,8 @@
       "nameRequired": "Por favor, introduce un nombre para el mazo.",
       "templateRequired": "Por favor, elige un tipo de tarjeta.",
       "cardsRequired": "Por favor, añade al menos una tarjeta.",
-      "createFailed": "No se pudo crear el mazo. Inténtalo de nuevo."
+      "createFailed": "No se pudo crear el mazo. Inténtalo de nuevo.",
+      "frontRequired": "Completa el anverso de cada tarjeta."
     },
     "deckDescription": "Descripción (opcional)",
     "deckDescriptionPlaceholder": "Una breve nota sobre este mazo",

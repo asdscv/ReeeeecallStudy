@@ -1,4 +1,5 @@
 import { View, TextInput, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 
@@ -9,8 +10,9 @@ interface SearchBarProps {
   testID?: string
 }
 
-export function SearchBar({ value, onChangeText, placeholder = 'Search...', testID }: SearchBarProps) {
+export function SearchBar({ value, onChangeText, placeholder, testID }: SearchBarProps) {
   const theme = useTheme()
+  const { t } = useTranslation('common')
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
@@ -20,7 +22,7 @@ export function SearchBar({ value, onChangeText, placeholder = 'Search...', test
         style={[theme.typography.body, styles.input, { color: theme.colors.text }]}
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('searchPlaceholder')}
         placeholderTextColor={theme.colors.inputPlaceholder}
         autoCapitalize="none"
         autoCorrect={false}

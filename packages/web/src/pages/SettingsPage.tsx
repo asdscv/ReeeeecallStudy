@@ -360,7 +360,7 @@ export function SettingsPage() {
     id: 'custom',
     name: t('aiProvider.custom'),
     baseUrl: '',
-    models: [{ id: 'custom', name: 'Custom Model' }],
+    models: [{ id: 'custom', name: t('aiProvider.customModel') }],
   }
 
   const allAiProviders = [...aiProviders, CUSTOM_PROVIDER]
@@ -399,7 +399,7 @@ export function SettingsPage() {
       setAiEditBaseUrl('')
       toast.success(t('aiProvider.saved'))
     } catch {
-      toast.error('Failed to save')
+      toast.error(t('saveFailed'))
     } finally {
       setAiSaving(false)
     }
@@ -455,7 +455,7 @@ export function SettingsPage() {
                   ? 'bg-success/10 text-success border border-success/30'
                   : 'bg-accent text-muted-foreground border border-border'
               }`}>
-                Free
+                {t('plan.free')}
               </span>
             </div>
           </div>
@@ -692,7 +692,7 @@ export function SettingsPage() {
                   const isEditing = aiEditingId === provider.id
                   const iconClasses = getProviderIcon(provider.id)
                   const models = provider.id === 'custom'
-                    ? [{ id: 'custom', name: 'Custom Model' }]
+                    ? [{ id: 'custom', name: t('aiProvider.customModel') }]
                     : (getProvider(provider.id)?.models ?? provider.models)
 
                   return (
@@ -955,11 +955,11 @@ export function SettingsPage() {
         {/* ── i) Legal (compact inline) ── */}
         <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
           <a href="https://reeeeecallstudy.xyz/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
-            Privacy Policy
+            {t('legal.privacy')}
           </a>
           <span>·</span>
           <a href="https://reeeeecallstudy.xyz/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
-            Terms of Service
+            {t('legal.terms')}
           </a>
         </div>
 

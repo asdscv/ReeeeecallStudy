@@ -1,0 +1,67 @@
+{
+  "title": "Generación automática con IA",
+  "subtitle": "Crea tarjetas automáticamente con IA: solo escribe un tema",
+  "steps": {
+    "setup": "Configuración",
+    "template": "Plantilla",
+    "deck": "Mazo",
+    "cards": "Tarjetas",
+    "done": "Listo"
+  },
+  "mode": {
+    "label": "Modo de generación",
+    "full": "Completo (Plantilla + Mazo + Tarjetas)",
+    "cardsOnly": "Añadir tarjetas a un mazo existente"
+  },
+  "provider": {
+    "section": "PROVEEDOR DE IA",
+    "notice": "La generación con IA usa tu propia clave API para cada proveedor. Añade o gestiona claves en Ajustes.",
+    "none": "No hay proveedores de IA configurados",
+    "addInSettings": "Añadir en Ajustes"
+  },
+  "content": {
+    "section": "AJUSTES DE CONTENIDO",
+    "topicLabel": "Tema",
+    "topicPlaceholder": "p. ej., vocabulario japonés JLPT N3, gramática coreana...",
+    "contentLang": "Idioma del contenido",
+    "autoDetect": "Detección automática",
+    "cardCountLabel": "Número de tarjetas:",
+    "cardCountPlaceholder": "1–100",
+    "cardCountHint": "1–100 tarjetas"
+  },
+  "deck": {
+    "section": "SELECCIONAR MAZO",
+    "select": "Selecciona un mazo"
+  },
+  "generateButton": "Generar tarjetas",
+  "progress": {
+    "generating": "Generando tarjetas...",
+    "saving": "Guardando tarjetas..."
+  },
+  "review": {
+    "title": "Revisar tarjetas",
+    "generatedCount": "{{count}} tarjetas generadas",
+    "save": "Guardar {{count}} tarjetas",
+    "regenerate": "Regenerar",
+    "cardDone": "Listo",
+    "remove": "Quitar"
+  },
+  "doneStep": {
+    "title": "¡Tarjetas creadas!",
+    "subtitle": "Tus tarjetas generadas con IA están listas para estudiar.",
+    "generateMore": "Generar más",
+    "done": "Listo"
+  },
+  "errorStep": {
+    "title": "Error en la generación",
+    "default": "Ocurrió un error durante la generación",
+    "retry": "Reintentar",
+    "back": "Volver"
+  },
+  "alert": {
+    "errorTitle": "Error",
+    "enterTopic": "Por favor, introduce un tema",
+    "configureProvider": "Por favor, configura primero un proveedor de IA en Ajustes.",
+    "saveFailed": "No se pudieron guardar las tarjetas generadas"
+  }
+}

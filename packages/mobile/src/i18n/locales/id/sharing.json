@@ -1,0 +1,82 @@
+{
+  "shareMode": "Mode Berbagi",
+  "inviteLink": "Tautan Undangan",
+  "modes": {
+    "copy": {
+      "label": "Salin",
+      "desc": "Pengguna mendapat salinan yang dapat diedit",
+      "detail": "Penerima mendapat salinan lengkap yang dapat diedit secara bebas. Tidak disinkronkan dengan perubahan Anda."
+    },
+    "subscribe": {
+      "label": "Berlangganan",
+      "desc": "Pengguna mendapat salinan hanya-baca yang diperbarui otomatis",
+      "detail": "Penerima tetap tersinkron dengan dek Anda. Mereka tidak dapat mengedit tetapi selalu memiliki versi terbaru."
+    },
+    "snapshot": {
+      "label": "Snapshot",
+      "desc": "Pengguna mendapat salinan hanya-baca, tanpa pembaruan",
+      "detail": "Salinan hanya-baca yang dibekukan pada saat ini. Tidak ada pembaruan di masa depan."
+    }
+  },
+  "status": {
+    "pending": "Menunggu",
+    "active": "Aktif",
+    "revoked": "Dicabut",
+    "declined": "Ditolak"
+  },
+  "actions": {
+    "cancel": "Batal",
+    "revoke": "Cabut",
+    "unsubscribe": "Berhenti berlangganan"
+  },
+  "shareDeck": {
+    "title": "Bagikan Dek",
+    "subtitle": "Bagikan dek ini secara pribadi melalui tautan undangan",
+    "generateLink": "Buat Tautan Undangan",
+    "creating": "Membuat...",
+    "copied": "Disalin!",
+    "copyLink": "Salin Tautan",
+    "newLink": "Tautan Baru",
+    "linkHint": "Siapa pun yang memiliki tautan ini dapat menerima undangan dan mengakses dek.",
+    "existingShares": "Berbagi yang Ada ({{count}})",
+    "noShares": "Belum ada berbagi. Buat tautan undangan di atas."
+  },
+  "revokeAlert": {
+    "title": "Cabut Akses",
+    "message": "Apakah Anda yakin ingin mencabut berbagi ini?"
+  },
+  "unsubscribeAlert": {
+    "title": "Berhenti Berlangganan",
+    "message": "Apakah Anda yakin ingin berhenti berlangganan dek ini?"
+  },
+  "myShares": {
+    "title": "Berbagi Saya",
+    "sharedByYou": "Dibagikan oleh Anda",
+    "sharedWithYou": "Dibagikan dengan Anda",
+    "emptySentTitle": "Anda belum membagikan dek apa pun.",
+    "emptySentHint": "Buka dek dan ketuk \"Bagikan\" untuk membuat tautan undangan.",
+    "emptyReceived": "Belum ada yang membagikan dek dengan Anda.",
+    "activePending": "{{activeCount}} aktif · {{pendingCount}} menunggu",
+    "viewAll": "Lihat semua {{count}} berbagi",
+    "unknownDeck": "Dek Tidak Dikenal"
+  },
+  "publish": {
+    "subtitle": "Bagikan dek Anda dengan komunitas",
+    "titleLabel": "Judul",
+    "titlePlaceholder": "Judul dek di marketplace",
+    "descriptionLabel": "Deskripsi",
+    "descriptionPlaceholder": "Apa yang akan dipelajari?",
+    "tagsLabel": "Tag",
+    "tagsPlaceholder": "tag, dipisahkan, koma",
+    "tagsHint": "Bantu orang lain menemukan dek Anda",
+    "category": "Kategori",
+    "titleRequired": "Judul wajib diisi",
+    "errorTitle": "Kesalahan",
+    "publishFailed": "Gagal memublikasikan dek",
+    "publishedTitle": "Dipublikasikan!",
+    "publishedMessage": "Dek Anda kini tersedia di marketplace.",
+    "ok": "OK"
+  },
+  "unsubscribe": "Berhenti berlangganan",
+  "unsubscribed": "Berhasil berhenti berlangganan"
+}

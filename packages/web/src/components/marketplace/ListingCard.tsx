@@ -16,12 +16,13 @@ const MODE_CLASSES: Record<string, string> = {
 }
 
 export function VerifiedBadge({ className }: { className?: string }) {
+  const { t } = useTranslation('marketplace')
   return (
     <svg
       className={`w-4 h-4 text-brand shrink-0 ${className ?? ''}`}
       viewBox="0 0 20 20"
       fill="currentColor"
-      aria-label="Verified publisher"
+      aria-label={t('verifiedPublisher')}
     >
       <path
         fillRule="evenodd"

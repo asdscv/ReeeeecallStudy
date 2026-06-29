@@ -151,7 +151,8 @@
     "addAnother": "添加并继续创建",
     "errorTitle": "错误",
     "emptyError": "至少需要填写一个字段",
-    "saveError": "保存卡片失败"
+    "saveError": "保存卡片失败",
+    "noTemplateError": "没有可用的卡片模板。"
   },
   "quickCreate": {
     "button": "快速创建",
@@ -187,11 +188,85 @@
       "nameRequired": "请输入卡组名称。",
       "templateRequired": "请选择卡片类型。",
       "cardsRequired": "请至少添加一张卡片。",
-      "createFailed": "创建卡组失败，请重试。"
+      "createFailed": "创建卡组失败，请重试。",
+      "frontRequired": "请填写每张卡片的正面。"
     },
     "deckDescription": "说明（可选）",
     "deckDescriptionPlaceholder": "关于此卡组的简短说明",
     "presetSummary": "正面 {{front}} · 背面 {{back}}",
     "basicLabel": "基础"
+  },
+  "cancel": "取消",
+  "delete": "删除",
+  "emptyField": "(空)",
+  "status": {
+    "all": "全部",
+    "new": "新卡",
+    "learning": "学习中",
+    "review": "复习",
+    "suspended": "暂停",
+    "mastered": "已掌握"
+  },
+  "srsRating": {
+    "again": "重来",
+    "hard": "困难",
+    "good": "良好",
+    "easy": "简单"
+  },
+  "deckDetail": {
+    "tabVersions": "版本",
+    "selectMode": "选择",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "selectedCount": "已选 {{count}} 张",
+    "deleteSelected": "删除所选",
+    "deleteCardsTitle": "删除卡片",
+    "deleteCardsConfirm": "删除所选的 {{count}} 张卡片？此操作不可撤销。",
+    "perPage": "每页:",
+    "prevPage": "← 上一页",
+    "nextPage": "下一页 →",
+    "pageOf": "第 {{current}} 页 / 共 {{total}} 页",
+    "showingRange": "显示第 {{from}}–{{to}} 张，共 {{total}} 张卡片"
+  },
+  "deckEdit": {
+    "previewName": "牌组名称",
+    "srsSettings": "SRS 设置",
+    "srsDescription": "为此牌组配置间隔重复的间隔。",
+    "learningSteps": "学习步骤（分钟）",
+    "learningStepsHint": "以逗号分隔的分钟数，例如 \"1, 10\" 表示先 1 分钟再 10 分钟。",
+    "days": "天",
+    "statistics": "统计",
+    "mastery": "掌握度",
+    "cardStatusDistribution": "卡片状态分布",
+    "avgEase": "平均易度"
+  },
+  "statsTab": {
+    "total": "总计",
+    "statusDistribution": "状态分布",
+    "masteryRate": "掌握率",
+    "avgEaseFactor": "平均易度系数",
+    "avgInterval": "平均间隔",
+    "days": "天"
+  },
+  "relativeDate": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "daysAgo": "{{count}} 天前",
+    "monthAgo": "1 个月前",
+    "monthsAgo": "{{count}} 个月前"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "无法删除",
+    "cannotDeleteMsg": "默认模板无法删除。",
+    "deleteTitle": "删除模板",
+    "deleteFailed": "删除模板失败",
+    "defaultBadge": "默认"
+  },
+  "versionHistory": {
+    "loading": "正在加载版本...",
+    "createHint": "创建一个版本以快照牌组的当前状态。"
+  },
+  "uploadDate": {
+    "noCards": "还没有卡片"
   }
 }

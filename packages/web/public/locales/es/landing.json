@@ -183,7 +183,8 @@
     "reviews": "Reseñas",
     "howItWorks": "Cómo Funciona",
     "faq": "Preguntas Frecuentes",
-    "dashboard": "Panel"
+    "dashboard": "Panel",
+    "menu": "Menú"
   },
   "trustBadges": {
     "srs": "SRS Inteligente",
@@ -193,7 +194,7 @@
     "import": "Importar CSV y API"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. Todos los derechos reservados.",
+    "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados.",
     "apiDocs": "Documentación API",
     "tagline": "Plataforma inteligente de aprendizaje con tarjetas y repetición espaciada",
     "product": "Producto",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "Tarjetas Estudiadas",
     "decksCreatedLabel": "Mazos Creados",
     "testimonials": {
-      "0": { "quote": "ReeeeecallStudy me ayudó a aprobar el JLPT N2. ¡El algoritmo SRS es increíblemente efectivo!", "author": "Min-Jun Kim", "role": "Estudiante de Idiomas" },
-      "1": { "quote": "La interfaz es muy limpia e intuitiva. Estudiar ahora es realmente agradable.", "author": "Seo-Yun Lee", "role": "Estudiante de Medicina" },
-      "2": { "quote": "La función de compartir mazos es increíble. Encontré mazos para casi todos los temas.", "author": "Yuki Park", "role": "Estudiante Universitario" }
+      "0": {
+        "quote": "ReeeeecallStudy me ayudó a aprobar el JLPT N2. ¡El algoritmo SRS es increíblemente efectivo!",
+        "author": "Min-Jun Kim",
+        "role": "Estudiante de Idiomas"
+      },
+      "1": {
+        "quote": "La interfaz es muy limpia e intuitiva. Estudiar ahora es realmente agradable.",
+        "author": "Seo-Yun Lee",
+        "role": "Estudiante de Medicina"
+      },
+      "2": {
+        "quote": "La función de compartir mazos es increíble. Encontré mazos para casi todos los temas.",
+        "author": "Yuki Park",
+        "role": "Estudiante Universitario"
+      }
     }
   },
   "science": {

@@ -60,8 +60,15 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
   const knownNs = new Set(Object.keys(locales[0]))
   const missing = new Map<string, string>()
 
+  // A key is satisfied if it exists literally OR as an i18next CLDR plural set:
+  // t('x', { count }) resolves to x_one / x_other / x_zero / … so the base key
+  // 'x' is correctly defined when those variants exist.
+  const PLURAL_SUFFIXES = ['', '_zero', '_one', '_two', '_few', '_many', '_other']
   const exists = (ns: string, key: string) =>
-    locales.every((loc) => loc[ns]?.has(key))
+    locales.every((loc) => {
+      const set = loc[ns]
+      return !!set && PLURAL_SUFFIXES.some((s) => set.has(key + s))
+    })
 
   for (const file of walk(srcDir)) {
     const text = readFileSync(file, 'utf8')

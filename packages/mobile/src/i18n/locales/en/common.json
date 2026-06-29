@@ -193,5 +193,68 @@
     "mastery": "Cards Mastered"
   },
   "cancel": "Cancel",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "rating": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
+  "demoCard": {
+    "tagline": "Smart Flashcard Learning Platform",
+    "tapToReveal": "Tap to reveal",
+    "helloFrench": "Hello (French)"
+  },
+  "loadingState": {
+    "loadingData": "Loading data...",
+    "starting": "Starting..."
+  },
+  "badge": {
+    "verified": "Verified",
+    "official": "Official",
+    "educator": "Educator",
+    "publisher": "Publisher",
+    "partner": "Partner",
+    "accountA11y": "{{label}} account"
+  },
+  "a11y": {
+    "add": "Add",
+    "openMenu": "Open menu",
+    "goBack": "Go back",
+    "loading": "Loading"
+  },
+  "searchPlaceholder": "Search...",
+  "passwordToggle": {
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "chart": {
+    "dailyStudy": "Daily Study",
+    "total": "total"
+  },
+  "calendar": {
+    "monthsShort": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "dowMWF": [
+      "",
+      "M",
+      "",
+      "W",
+      "",
+      "F",
+      ""
+    ]
+  }
 }

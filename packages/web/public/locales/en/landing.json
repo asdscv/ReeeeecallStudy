@@ -183,7 +183,8 @@
     "reviews": "Reviews",
     "howItWorks": "How It Works",
     "faq": "FAQ",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "menu": "Menu"
   },
   "trustBadges": {
     "srs": "Smart SRS",
@@ -193,7 +194,7 @@
     "import": "CSV & API Import"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
+    "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "API Docs",
     "tagline": "Smart flashcard learning platform with spaced repetition",
     "product": "Product",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "Cards Studied",
     "decksCreatedLabel": "Decks Created",
     "testimonials": {
-      "0": { "quote": "ReeeeecallStudy helped me pass JLPT N2. The SRS algorithm is incredibly effective!", "author": "Min-Jun Kim", "role": "Language Learner" },
-      "1": { "quote": "The interface is so clean and intuitive. Studying is actually enjoyable now.", "author": "Seo-Yun Lee", "role": "Medical Student" },
-      "2": { "quote": "The deck sharing feature is amazing. I found decks for almost every subject.", "author": "Yuki Park", "role": "University Student" }
+      "0": {
+        "quote": "ReeeeecallStudy helped me pass JLPT N2. The SRS algorithm is incredibly effective!",
+        "author": "Min-Jun Kim",
+        "role": "Language Learner"
+      },
+      "1": {
+        "quote": "The interface is so clean and intuitive. Studying is actually enjoyable now.",
+        "author": "Seo-Yun Lee",
+        "role": "Medical Student"
+      },
+      "2": {
+        "quote": "The deck sharing feature is amazing. I found decks for almost every subject.",
+        "author": "Yuki Park",
+        "role": "University Student"
+      }
     }
   },
   "science": {

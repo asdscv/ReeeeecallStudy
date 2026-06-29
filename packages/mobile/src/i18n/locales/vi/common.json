@@ -193,5 +193,68 @@
     "logout": "Đăng xuất",
     "hint": "Chỉ có thể dùng một thiết bị tại một thời điểm"
   },
-  "loading": "Đang tải..."
+  "loading": "Đang tải...",
+  "rating": {
+    "again": "Lại",
+    "hard": "Khó",
+    "good": "Tốt",
+    "easy": "Dễ"
+  },
+  "demoCard": {
+    "tagline": "Nền tảng học bằng thẻ ghi nhớ thông minh",
+    "tapToReveal": "Chạm để xem đáp án",
+    "helloFrench": "Hello (tiếng Pháp)"
+  },
+  "loadingState": {
+    "loadingData": "Đang tải dữ liệu...",
+    "starting": "Đang khởi động..."
+  },
+  "badge": {
+    "verified": "Đã xác minh",
+    "official": "Chính thức",
+    "educator": "Nhà giáo dục",
+    "publisher": "Nhà xuất bản",
+    "partner": "Đối tác",
+    "accountA11y": "Tài khoản {{label}}"
+  },
+  "a11y": {
+    "add": "Thêm",
+    "openMenu": "Mở menu",
+    "goBack": "Quay lại",
+    "loading": "Đang tải"
+  },
+  "searchPlaceholder": "Tìm kiếm...",
+  "passwordToggle": {
+    "show": "Hiện",
+    "hide": "Ẩn"
+  },
+  "chart": {
+    "dailyStudy": "Học hằng ngày",
+    "total": "tổng"
+  },
+  "calendar": {
+    "monthsShort": [
+      "Th1",
+      "Th2",
+      "Th3",
+      "Th4",
+      "Th5",
+      "Th6",
+      "Th7",
+      "Th8",
+      "Th9",
+      "Th10",
+      "Th11",
+      "Th12"
+    ],
+    "dowMWF": [
+      "",
+      "2",
+      "",
+      "4",
+      "",
+      "6",
+      ""
+    ]
+  }
 }

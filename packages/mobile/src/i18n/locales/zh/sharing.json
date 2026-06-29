@@ -1,0 +1,82 @@
+{
+  "shareMode": "共享方式",
+  "inviteLink": "邀请链接",
+  "modes": {
+    "copy": {
+      "label": "复制",
+      "desc": "用户获得可编辑的副本",
+      "detail": "接收者获得可自由编辑的完整副本。不会与您的更改同步。"
+    },
+    "subscribe": {
+      "label": "订阅",
+      "desc": "用户获得只读、自动更新的副本",
+      "detail": "接收者与您的卡组保持同步。他们无法编辑，但始终拥有最新内容。"
+    },
+    "snapshot": {
+      "label": "快照",
+      "desc": "用户获得只读副本，不会更新",
+      "detail": "当前时刻冻结的只读副本。没有后续更新。"
+    }
+  },
+  "status": {
+    "pending": "待处理",
+    "active": "已激活",
+    "revoked": "已撤销",
+    "declined": "已拒绝"
+  },
+  "actions": {
+    "cancel": "取消",
+    "revoke": "撤销",
+    "unsubscribe": "取消订阅"
+  },
+  "shareDeck": {
+    "title": "共享卡组",
+    "subtitle": "通过邀请链接私密分享此卡组",
+    "generateLink": "生成邀请链接",
+    "creating": "创建中...",
+    "copied": "已复制!",
+    "copyLink": "复制链接",
+    "newLink": "新建链接",
+    "linkHint": "任何拥有此链接的人都可以接受邀请并访问该卡组。",
+    "existingShares": "现有共享 ({{count}})",
+    "noShares": "暂无共享。请在上方生成邀请链接。"
+  },
+  "revokeAlert": {
+    "title": "撤销访问权限",
+    "message": "确定要撤销此共享吗？"
+  },
+  "unsubscribeAlert": {
+    "title": "取消订阅",
+    "message": "确定要取消订阅此卡组吗？"
+  },
+  "myShares": {
+    "title": "我的共享",
+    "sharedByYou": "由您共享",
+    "sharedWithYou": "与您共享",
+    "emptySentTitle": "您还没有共享任何卡组。",
+    "emptySentHint": "进入卡组并点按“共享”以创建邀请链接。",
+    "emptyReceived": "还没有人与您共享卡组。",
+    "activePending": "{{activeCount}} 已激活 · {{pendingCount}} 待处理",
+    "viewAll": "查看全部 {{count}} 个共享",
+    "unknownDeck": "未知卡组"
+  },
+  "publish": {
+    "subtitle": "与社区分享您的卡组",
+    "titleLabel": "标题",
+    "titlePlaceholder": "在市场上显示的卡组标题",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "学习者将学习什么？",
+    "tagsLabel": "标签",
+    "tagsPlaceholder": "逗号, 分隔的, 标签",
+    "tagsHint": "帮助他人找到您的卡组",
+    "category": "分类",
+    "titleRequired": "标题为必填项",
+    "errorTitle": "错误",
+    "publishFailed": "发布卡组失败",
+    "publishedTitle": "已发布！",
+    "publishedMessage": "您的卡组现已在市场上可用。",
+    "ok": "确定"
+  },
+  "unsubscribe": "取消订阅",
+  "unsubscribed": "已取消订阅"
+}

@@ -5,6 +5,7 @@ import { Eye, Download, TrendingUp, BarChart3, ArrowUpDown, Star, ExternalLink }
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { usePublisherStore } from '@reeeeecall/shared/stores/publisher-store'
 import type { PublisherListingStats } from '@reeeeecall/shared/stores/publisher-store'
+import type { TFunction } from 'i18next'
 
 type SortKey = 'title' | 'view_count' | 'acquire_count' | 'conversion_rate' | 'avg_rating' | 'created_at'
 type SortDir = 'asc' | 'desc'
@@ -15,18 +16,18 @@ function formatNumber(n: number): string {
   return String(n)
 }
 
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: TFunction): string {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60_000)
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 60) return t('publisher.timeAgo.minutesAgo', { count: mins })
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
+  if (hrs < 24) return t('publisher.timeAgo.hoursAgo', { count: hrs })
   const days = Math.floor(hrs / 24)
-  return `${days}d ago`
+  return t('publisher.timeAgo.daysAgo', { count: days })
 }
 
 export function PublisherDashboardPage() {
-  const { t: _t } = useTranslation(['marketplace', 'common'])
+  const { t } = useTranslation(['marketplace', 'common'])
   const navigate = useNavigate()
   const { stats, loading, error, fetchPublisherStats } = usePublisherStore()
 
@@ -77,7 +78,7 @@ export function PublisherDashboardPage() {
       <div className="bg-card rounded-xl border border-border p-8 text-center">
         <p className="text-destructive mb-2">{error}</p>
         <button onClick={fetchPublisherStats} className="text-brand text-sm hover:underline cursor-pointer">
-          Retry
+          {t('publisher.retry')}
         </button>
       </div>
     )
@@ -87,18 +88,18 @@ export function PublisherDashboardPage() {
   if (!stats || (stats.total_listings === 0 && stats.listings.length === 0)) {
     return (
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-6">Publisher Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-6">{t('publisher.title')}</h1>
         <div className="bg-card rounded-xl border border-border p-8 sm:p-12 text-center">
           <div className="text-4xl sm:text-5xl mb-4">📊</div>
-          <h2 className="text-lg font-semibold text-foreground mb-2">No Published Listings Yet</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-2">{t('publisher.emptyTitle')}</h2>
           <p className="text-muted-foreground text-sm mb-4">
-            Publish a deck on the marketplace to start tracking views and acquisitions.
+            {t('publisher.emptyDescription')}
           </p>
           <button
             onClick={() => navigate('/decks')}
             className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover cursor-pointer"
           >
-            Go to Decks
+            {t('publisher.goToDecks')}
           </button>
         </div>
       </div>
@@ -107,31 +108,31 @@ export function PublisherDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-6">Publisher Dashboard</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-6">{t('publisher.title')}</h1>
 
       {/* ── Overview Cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <StatCard
           icon={<BarChart3 className="w-5 h-5" />}
-          label="Active Listings"
+          label={t('publisher.activeListings')}
           value={formatNumber(stats.total_listings)}
           color="blue"
         />
         <StatCard
           icon={<Eye className="w-5 h-5" />}
-          label="Total Views"
+          label={t('publisher.totalViews')}
           value={formatNumber(stats.total_views)}
           color="green"
         />
         <StatCard
           icon={<Download className="w-5 h-5" />}
-          label="Total Acquisitions"
+          label={t('publisher.totalAcquisitions')}
           value={formatNumber(stats.total_acquires)}
           color="purple"
         />
         <StatCard
           icon={<TrendingUp className="w-5 h-5" />}
-          label="Avg Conversion"
+          label={t('publisher.avgConversion')}
           value={`${stats.avg_conversion_rate}%`}
           color="orange"
         />
@@ -141,9 +142,9 @@ export function PublisherDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {/* Daily Views Chart */}
         <div className="bg-card rounded-xl border border-border p-4">
-          <h3 className="text-sm font-medium text-foreground mb-3">Daily Views (Last 30 Days)</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('publisher.dailyViews')}</h3>
           {stats.daily_views.length === 0 ? (
-            <p className="text-sm text-content-tertiary py-8 text-center">No data yet</p>
+            <p className="text-sm text-content-tertiary py-8 text-center">{t('publisher.noDataYet')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={stats.daily_views}>
@@ -164,9 +165,9 @@ export function PublisherDashboardPage() {
 
         {/* Top Listings by Views */}
         <div className="bg-card rounded-xl border border-border p-4">
-          <h3 className="text-sm font-medium text-foreground mb-3">Top Listings by Views</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('publisher.topListings')}</h3>
           {stats.top_listings.length === 0 ? (
-            <p className="text-sm text-content-tertiary py-8 text-center">No data yet</p>
+            <p className="text-sm text-content-tertiary py-8 text-center">{t('publisher.noDataYet')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={stats.top_listings} layout="vertical">
@@ -190,7 +191,7 @@ export function PublisherDashboardPage() {
       {/* Acquisition Trend */}
       {stats.daily_acquires.length > 0 && (
         <div className="bg-card rounded-xl border border-border p-4 mb-6">
-          <h3 className="text-sm font-medium text-foreground mb-3">Acquisition Trend (Last 30 Days)</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('publisher.acquisitionTrend')}</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={stats.daily_acquires}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -210,20 +211,20 @@ export function PublisherDashboardPage() {
       {/* ── Listings Table ── */}
       <div className="bg-card rounded-xl border border-border overflow-hidden mb-6">
         <div className="px-4 py-3 border-b border-border">
-          <h3 className="text-sm font-medium text-foreground">Your Listings</h3>
+          <h3 className="text-sm font-medium text-foreground">{t('publisher.yourListings')}</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted">
-                <SortHeader label="Title" sortKey="title" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <SortHeader label="Views" sortKey="view_count" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <SortHeader label="Acquires" sortKey="acquire_count" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <SortHeader label="Conv %" sortKey="conversion_rate" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <SortHeader label="Rating" sortKey="avg_rating" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <SortHeader label="Created" sortKey="created_at" current={sortKey} dir={sortDir} onSort={handleSort} />
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Status</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Actions</th>
+                <SortHeader label={t('publisher.table.title')} sortKey="title" current={sortKey} dir={sortDir} onSort={handleSort} />
+                <SortHeader label={t('publisher.table.views')} sortKey="view_count" current={sortKey} dir={sortDir} onSort={handleSort} />
+                <SortHeader label={t('publisher.table.acquires')} sortKey="acquire_count" current={sortKey} dir={sortDir} onSort={handleSort} />
+                <SortHeader label={t('publisher.table.conv')} sortKey="conversion_rate" current={sortKey} dir={sortDir} onSort={handleSort} />
+                <SortHeader label={t('publisher.table.rating')} sortKey="avg_rating" current={sortKey} dir={sortDir} onSort={handleSort} />
+                <SortHeader label={t('publisher.table.created')} sortKey="created_at" current={sortKey} dir={sortDir} onSort={handleSort} />
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">{t('publisher.table.status')}</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">{t('publisher.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -239,20 +240,20 @@ export function PublisherDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Acquisitions */}
         <div className="bg-card rounded-xl border border-border p-4">
-          <h3 className="text-sm font-medium text-foreground mb-3">Recent Acquisitions</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('publisher.recentAcquisitions')}</h3>
           {stats.recent_acquires.length === 0 ? (
-            <p className="text-sm text-content-tertiary text-center py-4">No acquisitions yet</p>
+            <p className="text-sm text-content-tertiary text-center py-4">{t('publisher.noAcquisitionsYet')}</p>
           ) : (
             <div className="space-y-2">
               {stats.recent_acquires.map((acq) => (
                 <div key={acq.id} className="flex items-center gap-2 text-sm">
                   <Download className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                   <span className="text-foreground truncate">
-                    <span className="font-medium">{acq.user_name || 'Anonymous'}</span>
-                    {' acquired '}
+                    <span className="font-medium">{acq.user_name || t('publisher.anonymous')}</span>
+                    {` ${t('publisher.acquired')} `}
                     <span className="font-medium">{acq.deck_title}</span>
                   </span>
-                  <span className="text-xs text-content-tertiary shrink-0 ml-auto">{timeAgo(acq.accepted_at)}</span>
+                  <span className="text-xs text-content-tertiary shrink-0 ml-auto">{timeAgo(acq.accepted_at, t)}</span>
                 </div>
               ))}
             </div>
@@ -261,9 +262,9 @@ export function PublisherDashboardPage() {
 
         {/* Recent Reviews */}
         <div className="bg-card rounded-xl border border-border p-4">
-          <h3 className="text-sm font-medium text-foreground mb-3">Recent Reviews</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('publisher.recentReviews')}</h3>
           {stats.recent_reviews.length === 0 ? (
-            <p className="text-sm text-content-tertiary text-center py-4">No reviews yet</p>
+            <p className="text-sm text-content-tertiary text-center py-4">{t('publisher.noReviewsYet')}</p>
           ) : (
             <div className="space-y-2">
               {stats.recent_reviews.map((review) => (
@@ -278,7 +279,7 @@ export function PublisherDashboardPage() {
                       ))}
                     </div>
                     <span className="text-muted-foreground truncate">{review.deck_title}</span>
-                    <span className="text-xs text-content-tertiary ml-auto shrink-0">{timeAgo(review.created_at)}</span>
+                    <span className="text-xs text-content-tertiary ml-auto shrink-0">{timeAgo(review.created_at, t)}</span>
                   </div>
                   {review.body && (
                     <p className="text-muted-foreground text-xs mt-1 line-clamp-1">{review.body}</p>
@@ -346,6 +347,7 @@ function SortHeader({ label, sortKey: sk, current, dir, onSort }: {
 }
 
 function ListingRow({ listing, navigate }: { listing: PublisherListingStats; navigate: (path: string) => void }) {
+  const { t } = useTranslation('marketplace')
   return (
     <tr className="border-b border-gray-50 hover:bg-muted">
       <td className="px-3 py-2.5 font-medium text-foreground max-w-[200px] truncate">{listing.title}</td>
@@ -366,14 +368,14 @@ function ListingRow({ listing, navigate }: { listing: PublisherListingStats; nav
         <span className={`px-2 py-0.5 text-xs rounded-full ${
           listing.is_active ? 'bg-success/10 text-success' : 'bg-accent text-muted-foreground'
         }`}>
-          {listing.is_active ? 'Active' : 'Inactive'}
+          {listing.is_active ? t('publisher.active') : t('publisher.inactive')}
         </span>
       </td>
       <td className="px-3 py-2.5">
         <button
           onClick={() => navigate(`/marketplace/${listing.id}`)}
           className="text-brand hover:text-brand cursor-pointer"
-          title="View listing"
+          title={t('publisher.viewListing')}
         >
           <ExternalLink className="w-4 h-4" />
         </button>

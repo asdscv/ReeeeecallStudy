@@ -58,10 +58,14 @@ export function buildPresetTemplate(p: QuickPreset): {
 
   for (const spec of presetFieldSpecs(p)) {
     const order = fields.length
-    // First field of each side is unnumbered (앞면 / 뒷면); extras are numbered
-    // (뒷면 2, 뒷면 3 …) — matches the position-based labels the quick-create UI
-    // renders, so the stored template name and the input label agree.
-    const base = spec.side === 'front' ? '앞면' : '뒷면'
+    // Field display names are language-NEUTRAL (English "Front"/"Back"), not
+    // localized to whoever happens to create the deck — these names are persisted
+    // in card_templates.fields[].name and later shown verbatim in the card editor
+    // to ALL users regardless of their UI language. Storing the creator's locale
+    // (e.g. Korean 앞면/뒷면) would leak that language to every other viewer.
+    // The semantic role is carried by the stable field key (field_1 = front), and
+    // the quick-create input placeholders are localized separately via i18n.
+    const base = spec.side === 'front' ? 'Front' : 'Back'
     const name = spec.index === 1 ? base : `${base} ${spec.index}`
     fields.push({ key: spec.key, name, type: 'text', order })
     if (spec.side === 'front') {

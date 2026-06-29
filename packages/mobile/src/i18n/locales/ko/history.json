@@ -17,5 +17,39 @@
     "history": "기록",
     "analytics": "분석"
   },
-  "sessionsPerDay": "일별 세션 수"
+  "sessionsPerDay": "일별 세션 수",
+  "ratings": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "알맞음",
+    "easy": "쉬움",
+    "got_it": "맞힘",
+    "missed": "놓침",
+    "known": "앎",
+    "unknown": "모름"
+  },
+  "stats": {
+    "cards": "카드",
+    "duration": "시간",
+    "performance": "성과"
+  },
+  "cardDetails": "카드 상세",
+  "logsCount": "기록 {{count}}개",
+  "loadingDetails": "상세 정보를 불러오는 중...",
+  "noLogs": "이 세션에 대한 상세 기록이 없습니다",
+  "deletedCard": "(삭제된 카드)",
+  "noContent": "(내용 없음)",
+  "deckProgress": "덱 진도",
+  "sessionsCount": "세션 {{count}}회",
+  "cardsCount": "{{count}}장",
+  "cardsFraction": "{{studied}}/{{total}}장",
+  "ratingDistribution": "평가 분포",
+  "overview": {
+    "sessions": "세션",
+    "cardsStudied": "학습한 카드",
+    "totalTime": "총 시간",
+    "performance": "성과",
+    "streak": "연속 학습",
+    "avgDuration": "평균 시간"
+  }
 }

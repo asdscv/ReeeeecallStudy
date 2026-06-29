@@ -381,7 +381,7 @@ export function StudySessionScreen() {
         {isFlipped && isSwipeMode && (
           <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>Swipe</Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('session.swipe')}</Text>
             <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
           </View>
         )}

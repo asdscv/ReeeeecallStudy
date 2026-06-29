@@ -193,5 +193,68 @@
     "logout": "ログアウト",
     "hint": "同時に使用できるデバイスは1台のみです"
   },
-  "loading": "読み込み中..."
+  "loading": "読み込み中...",
+  "rating": {
+    "again": "もう一度",
+    "hard": "難しい",
+    "good": "普通",
+    "easy": "簡単"
+  },
+  "demoCard": {
+    "tagline": "スマートな単語カード学習プラットフォーム",
+    "tapToReveal": "タップして答えを表示",
+    "helloFrench": "Hello（フランス語）"
+  },
+  "loadingState": {
+    "loadingData": "データを読み込み中...",
+    "starting": "開始しています..."
+  },
+  "badge": {
+    "verified": "認証済み",
+    "official": "公式",
+    "educator": "教育者",
+    "publisher": "パブリッシャー",
+    "partner": "パートナー",
+    "accountA11y": "{{label}}アカウント"
+  },
+  "a11y": {
+    "add": "追加",
+    "openMenu": "メニューを開く",
+    "goBack": "戻る",
+    "loading": "読み込み中"
+  },
+  "searchPlaceholder": "検索...",
+  "passwordToggle": {
+    "show": "表示",
+    "hide": "非表示"
+  },
+  "chart": {
+    "dailyStudy": "日々の学習",
+    "total": "合計"
+  },
+  "calendar": {
+    "monthsShort": [
+      "1月",
+      "2月",
+      "3月",
+      "4月",
+      "5月",
+      "6月",
+      "7月",
+      "8月",
+      "9月",
+      "10月",
+      "11月",
+      "12月"
+    ],
+    "dowMWF": [
+      "",
+      "月",
+      "",
+      "水",
+      "",
+      "金",
+      ""
+    ]
+  }
 }

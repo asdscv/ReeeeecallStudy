@@ -254,5 +254,13 @@
       "429": "超过速率限制"
     }
   },
-  "dashboard": "仪表盘"
+  "dashboard": "仪表盘",
+  "labels": {
+    "headers": "请求头",
+    "pathParams": "路径参数",
+    "queryParams": "查询参数",
+    "requestBody": "请求体",
+    "response": "响应",
+    "statusCodes": "状态码"
+  }
 }

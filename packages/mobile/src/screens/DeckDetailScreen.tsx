@@ -21,11 +21,11 @@ type Route = RouteProp<DecksStackParamList, 'DeckDetail'>
 
 type TabKey = 'cards' | 'dates' | 'stats' | 'versions'
 
-const TABS: { key: TabKey; label: string }[] = [
-  { key: 'cards', label: 'Card List' },
-  { key: 'dates', label: 'Upload Date' },
-  { key: 'stats', label: 'Statistics' },
-  { key: 'versions', label: 'Versions' },
+const TABS: { key: TabKey; labelKey: string }[] = [
+  { key: 'cards', labelKey: 'detail.tabs.cardList' },
+  { key: 'dates', labelKey: 'detail.tabs.uploadDate' },
+  { key: 'stats', labelKey: 'detail.tabs.statistics' },
+  { key: 'versions', labelKey: 'deckDetail.tabVersions' },
 ]
 
 const STATUS_FILTERS = ['all', 'new', 'learning', 'review', 'suspended'] as const
@@ -233,12 +233,12 @@ export function DeckDetailScreen() {
     const count = selectedIds.size
     if (count === 0) return
     Alert.alert(
-      'Delete Cards',
-      `Delete ${count} selected card${count > 1 ? 's' : ''}? This cannot be undone.`,
+      t('deckDetail.deleteCardsTitle'),
+      t('deckDetail.deleteCardsConfirm', { count }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             await deleteCards(Array.from(selectedIds))
@@ -248,7 +248,7 @@ export function DeckDetailScreen() {
         },
       ],
     )
-  }, [selectedIds, deleteCards, exitSelectionMode, refresh])
+  }, [selectedIds, deleteCards, exitSelectionMode, refresh, t])
 
   if (!deck) {
     return (
@@ -264,9 +264,9 @@ export function DeckDetailScreen() {
   const newCards = deckStats?.new_cards ?? 0
 
   const handleDeleteDeck = () => {
-    Alert.alert('Delete Deck', `Delete "${deck.name}"? This cannot be undone.`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => { await deleteDeck(deckId); navigation.goBack() } },
+    Alert.alert(t('deleteDeck'), t('deleteConfirm', { name: deck.name }), [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('delete'), style: 'destructive', onPress: async () => { await deleteDeck(deckId); navigation.goBack() } },
     ])
   }
 
@@ -284,17 +284,17 @@ export function DeckDetailScreen() {
               {allSelected && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-              {allSelected ? 'Deselect All' : 'Select All'}
+              {allSelected ? t('deckDetail.deselectAll') : t('deckDetail.selectAll')}
             </Text>
           </TouchableOpacity>
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]} testID="bulk-selection-count">
-            {selectedIds.size} selected
+            {t('deckDetail.selectedCount', { count: selectedIds.size })}
           </Text>
         </View>
         <View style={styles.selectionBarRight}>
           {selectedIds.size > 0 && (
             <Button
-              title="Delete Selected"
+              title={t('deckDetail.deleteSelected')}
               variant="danger"
               size="sm"
               fullWidth={false}
@@ -303,7 +303,7 @@ export function DeckDetailScreen() {
             />
           )}
           <Button
-            title="Cancel"
+            title={t('cancel')}
             variant="ghost"
             size="sm"
             fullWidth={false}
@@ -321,7 +321,7 @@ export function DeckDetailScreen() {
       <View style={[styles.paginationContainer, { borderTopColor: theme.colors.border }]}>
         {/* Cards per page selector */}
         <View style={styles.perPageRow}>
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>Per page:</Text>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('deckDetail.perPage')}</Text>
           {CARDS_PER_PAGE_OPTIONS.map((opt) => {
             const active = cardsPerPage === opt
             return (
@@ -360,11 +360,11 @@ export function DeckDetailScreen() {
               ]}
               testID="pagination-prev"
             >
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>← Prev</Text>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{t('deckDetail.prevPage')}</Text>
             </TouchableOpacity>
 
             <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]} testID="pagination-info">
-              Page {safePage} of {totalPages}
+              {t('deckDetail.pageOf', { current: safePage, total: totalPages })}
             </Text>
 
             <TouchableOpacity
@@ -376,14 +376,18 @@ export function DeckDetailScreen() {
               ]}
               testID="pagination-next"
             >
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>Next →</Text>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{t('deckDetail.nextPage')}</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {/* Summary */}
         <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-          Showing {Math.min((safePage - 1) * cardsPerPage + 1, filteredCards.length)}–{Math.min(safePage * cardsPerPage, filteredCards.length)} of {filteredCards.length} cards
+          {t('deckDetail.showingRange', {
+            from: Math.min((safePage - 1) * cardsPerPage + 1, filteredCards.length),
+            to: Math.min(safePage * cardsPerPage, filteredCards.length),
+            total: filteredCards.length,
+          })}
         </Text>
       </View>
     )
@@ -443,9 +447,9 @@ export function DeckDetailScreen() {
 
       {/* Stats badges — matches web: flex-wrap gap-2 */}
       <View style={styles.badgeRow}>
-        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{totalCards} cards</Text>
-        {newCards > 0 && <Text style={[theme.typography.caption, { color: palette.blue[600] }]}>{newCards} new</Text>}
-        {dueCards > 0 && <Text style={[theme.typography.caption, { color: palette.yellow[600] }]}>{dueCards} due</Text>}
+        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('detail.totalCards', { count: totalCards })}</Text>
+        {newCards > 0 && <Text style={[theme.typography.caption, { color: palette.blue[600] }]}>{t('detail.newCards', { count: newCards })}</Text>}
+        {dueCards > 0 && <Text style={[theme.typography.caption, { color: palette.yellow[600] }]}>{t('detail.reviewCards', { count: dueCards })}</Text>}
       </View>
 
       {/* Action buttons — matches web: Study, Edit, Share, Add Card, AI Cards, Import, Export */}
@@ -516,7 +520,7 @@ export function DeckDetailScreen() {
               onPress={() => setSelectionMode(true)}
               testID="bulk-select-toggle"
             >
-              <Text style={[theme.typography.caption, { color: theme.colors.text }]}>Select</Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('deckDetail.selectMode')}</Text>
             </TouchableOpacity>
           )}
           {isSubscribed && (
@@ -552,7 +556,7 @@ export function DeckDetailScreen() {
                 theme.typography.bodySmall,
                 { color: active ? theme.colors.primary : theme.colors.textSecondary, fontWeight: active ? '600' : '400' },
               ]}>
-                {tab.label}
+                {t(tab.labelKey)}
               </Text>
             </TouchableOpacity>
           )
@@ -583,7 +587,7 @@ export function DeckDetailScreen() {
                     theme.typography.caption,
                     { color: active ? theme.colors.primaryText : theme.colors.textSecondary },
                   ]}>
-                    {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+                    {t(`status.${f}`)}
                   </Text>
                 </TouchableOpacity>
               )
@@ -694,7 +698,7 @@ export function DeckDetailScreen() {
                     ]}
                     numberOfLines={1}
                   >
-                    {val || '(empty)'}
+                    {val || t('emptyField')}
                   </Text>
                 ))}
               </View>

@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 
 interface BarChartProps {
@@ -17,6 +18,7 @@ interface BarChartProps {
  */
 export function BarChart({ data, title, barColor, maxBars = 14, height = 120, noDataMessage, testID }: BarChartProps) {
   const theme = useTheme()
+  const { t } = useTranslation('common')
 
   const displayData = data.slice(-maxBars)
   if (displayData.length === 0) return null
@@ -34,7 +36,7 @@ export function BarChart({ data, title, barColor, maxBars = 14, height = 120, no
       >
         <View style={styles.headerRow}>
           <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-            {title ?? 'Daily Study'}
+            {title ?? t('chart.dailyStudy')}
           </Text>
         </View>
         <View style={[styles.chartArea, { height: 60, justifyContent: 'center', alignItems: 'center' }]}>
@@ -58,10 +60,10 @@ export function BarChart({ data, title, barColor, maxBars = 14, height = 120, no
     >
       <View style={styles.headerRow}>
         <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-          {title ?? 'Daily Study'}
+          {title ?? t('chart.dailyStudy')}
         </Text>
         <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-          {totalCount} total
+          {totalCount} {t('chart.total')}
         </Text>
       </View>
       <View style={[styles.chartArea, { height }]}>

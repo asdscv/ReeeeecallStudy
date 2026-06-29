@@ -275,7 +275,7 @@ export function StudySetupScreen() {
                 {selectedDeck?.icon} {selectedDeck?.name}
               </Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {!showModeConfig ? 'Select study mode' : selectedMode === 'by_date' ? 'Select date' : selectedMode === 'cramming' ? 'Cramming options' : 'Set batch size'}
+                {!showModeConfig ? t('setup.modalSubtitleMode') : selectedMode === 'by_date' ? t('setup.modalSubtitleDate') : selectedMode === 'cramming' ? t('setup.modalSubtitleCramming') : t('setup.modalSubtitleBatch')}
               </Text>
             </View>
 
@@ -461,7 +461,7 @@ export function StudySetupScreen() {
               <Text style={[theme.typography.bodySmall, { color: palette.blue[600], fontWeight: '500' }]}>
                 {(() => {
                   const [y, m, d] = selectedDate.split('-').map(Number)
-                  return `${y}/${m}/${d} — ${dateCardCount} card${dateCardCount !== 1 ? 's' : ''}`
+                  return t('setup.dateCardCount', { date: `${y}/${m}/${d}`, count: dateCardCount })
                 })()}
               </Text>
             )}
@@ -471,7 +471,7 @@ export function StudySetupScreen() {
                 {/* Start button inside modal */}
                 <Button
                   testID="study-start-button"
-                  title={isLoading ? 'Loading...' : t('setup.startStudy')}
+                  title={isLoading ? t('session.loading') : t('setup.startStudy')}
                   onPress={() => handleStartWithMode()}
                   loading={isLoading}
                   disabled={selectedMode === 'by_date' && dateCardCount === 0}
@@ -485,7 +485,7 @@ export function StudySetupScreen() {
               style={[styles.modalFooter, { borderTopColor: theme.colors.border }]}
             >
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                {showModeConfig ? 'Back to mode select' : 'Cancel'}
+                {showModeConfig ? t('setup.backToModeSelect') : t('setup.cancel')}
               </Text>
             </TouchableOpacity>
           </View>

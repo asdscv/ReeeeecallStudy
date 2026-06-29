@@ -129,7 +129,8 @@
       "copy": "คัดลอก",
       "subscribe": "ติดตาม",
       "snapshot": "สแนปช็อต"
-    }
+    },
+    "unknownRecipient": "ไม่มีข้อมูล"
   },
   "acceptInvite": {
     "title": "คำเชิญสำรับ",

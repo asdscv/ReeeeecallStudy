@@ -133,7 +133,8 @@
     "securityNote": "Las claves API se cifran con AES-256 y se almacenan en su navegador. Nunca se envían a nuestros servidores.",
     "custom": "Personalizado",
     "customDesc": "API compatible con OpenAI",
-    "noProviders": "No hay proveedores configurados. Configure uno arriba."
+    "noProviders": "No hay proveedores configurados. Configure uno arriba.",
+    "customModel": "Modelo personalizado"
   },
   "account": {
     "title": "Cuenta",
@@ -180,5 +181,13 @@
     "description": "Establece una meta diaria en minutos. Déjalo vacío para no tener meta.",
     "placeholder": "p. ej. 30",
     "unit": "minutos / día"
+  },
+  "plan": {
+    "free": "Gratis"
+  },
+  "saveFailed": "Error al guardar",
+  "legal": {
+    "privacy": "Política de privacidad",
+    "terms": "Términos del servicio"
   }
 }

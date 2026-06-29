@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 
 interface RightAction {
@@ -36,6 +37,7 @@ export function ScreenHeader({
 }: ScreenHeaderProps) {
   const theme = useTheme()
   const navigation = useNavigation()
+  const { t } = useTranslation('common')
 
   const handleLeftPress = () => {
     if (mode === 'drawer') {
@@ -46,7 +48,7 @@ export function ScreenHeader({
   }
 
   const leftIcon = mode === 'drawer' ? '\u2630' : '\u2190'
-  const leftLabel = mode === 'drawer' ? 'Open menu' : 'Go back'
+  const leftLabel = mode === 'drawer' ? t('a11y.openMenu') : t('a11y.goBack')
 
   const renderRight = () => {
     if (rightAction) {

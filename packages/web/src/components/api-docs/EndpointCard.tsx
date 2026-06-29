@@ -32,7 +32,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
 
           {endpoint.headers && endpoint.headers.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Headers</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t('labels.headers')}</h4>
               <div className="space-y-1">
                 {endpoint.headers.map((h) => (
                   <div key={h.name} className="flex items-center gap-2 text-xs">
@@ -48,7 +48,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
 
           {endpoint.pathParams && endpoint.pathParams.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Path Parameters</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t('labels.pathParams')}</h4>
               <div className="space-y-1.5">
                 {endpoint.pathParams.map((p) => (
                   <div key={p.name} className="text-xs">
@@ -63,7 +63,7 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
 
           {endpoint.queryParams && endpoint.queryParams.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Query Parameters</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t('labels.queryParams')}</h4>
               <div className="bg-card rounded-lg border border-border overflow-x-auto">
                 <table className="w-full text-xs whitespace-nowrap">
                   <thead className="bg-muted">
@@ -91,21 +91,21 @@ export function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
 
           {endpoint.requestBody && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Request Body</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('labels.requestBody')}</h4>
               <CodeBlock code={endpoint.requestBody} language="json" />
             </div>
           )}
 
           {endpoint.responseBody && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Response</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('labels.response')}</h4>
               <CodeBlock code={endpoint.responseBody} language="json" />
             </div>
           )}
 
           {endpoint.statusCodes && endpoint.statusCodes.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Status Codes</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t('labels.statusCodes')}</h4>
               <div className="flex flex-wrap gap-2">
                 {endpoint.statusCodes.map((sc) => (
                   <span

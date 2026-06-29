@@ -13,7 +13,7 @@ interface MiniHeatmapProps {
  */
 export function MiniHeatmap({ data, testID }: MiniHeatmapProps) {
   const theme = useTheme()
-  const { t } = useTranslation('dashboard')
+  const { t } = useTranslation(['dashboard', 'common'])
 
   if (data.length === 0) return null
 
@@ -45,7 +45,7 @@ export function MiniHeatmap({ data, testID }: MiniHeatmapProps) {
   }
 
   // Month labels
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const MONTHS = t('common:calendar.monthsShort', { returnObjects: true }) as string[]
   const monthLabels: { label: string; weekIdx: number }[] = []
   let lastMonth = -1
   weeks.forEach((week, wi) => {
@@ -63,7 +63,7 @@ export function MiniHeatmap({ data, testID }: MiniHeatmapProps) {
   const GAP = 2
   const DAY_W = 20
   const COL_W = CELL + GAP
-  const DOW = ['', 'M', '', 'W', '', 'F', '']
+  const DOW = t('common:calendar.dowMWF', { returnObjects: true }) as string[]
 
   return (
     <View

@@ -151,7 +151,8 @@
     "addAnother": "Thêm và tạo tiếp",
     "errorTitle": "Lỗi",
     "emptyError": "Cần điền ít nhất một trường",
-    "saveError": "Không thể lưu thẻ"
+    "saveError": "Không thể lưu thẻ",
+    "noTemplateError": "Không có mẫu thẻ nào khả dụng."
   },
   "quickCreate": {
     "button": "Tạo nhanh",
@@ -187,11 +188,85 @@
       "nameRequired": "Vui lòng nhập tên bộ thẻ.",
       "templateRequired": "Vui lòng chọn loại thẻ.",
       "cardsRequired": "Vui lòng thêm ít nhất một thẻ.",
-      "createFailed": "Tạo bộ thẻ thất bại. Vui lòng thử lại."
+      "createFailed": "Tạo bộ thẻ thất bại. Vui lòng thử lại.",
+      "frontRequired": "Vui lòng điền mặt trước của mỗi thẻ."
     },
     "deckDescription": "Mô tả (tùy chọn)",
     "deckDescriptionPlaceholder": "Ghi chú ngắn về bộ thẻ này",
     "presetSummary": "Mặt trước {{front}} · Mặt sau {{back}}",
     "basicLabel": "Cơ bản"
+  },
+  "cancel": "Hủy",
+  "delete": "Xóa",
+  "emptyField": "(trống)",
+  "status": {
+    "all": "Tất cả",
+    "new": "Mới",
+    "learning": "Đang học",
+    "review": "Ôn tập",
+    "suspended": "Tạm dừng",
+    "mastered": "Đã thành thạo"
+  },
+  "srsRating": {
+    "again": "Lại",
+    "hard": "Khó",
+    "good": "Tốt",
+    "easy": "Dễ"
+  },
+  "deckDetail": {
+    "tabVersions": "Phiên bản",
+    "selectMode": "Chọn",
+    "selectAll": "Chọn tất cả",
+    "deselectAll": "Bỏ chọn tất cả",
+    "selectedCount": "Đã chọn {{count}}",
+    "deleteSelected": "Xóa mục đã chọn",
+    "deleteCardsTitle": "Xóa thẻ",
+    "deleteCardsConfirm": "Xóa {{count}} thẻ đã chọn? Không thể hoàn tác.",
+    "perPage": "Mỗi trang:",
+    "prevPage": "← Trước",
+    "nextPage": "Sau →",
+    "pageOf": "Trang {{current}} / {{total}}",
+    "showingRange": "Hiển thị {{from}}–{{to}} trong {{total}} thẻ"
+  },
+  "deckEdit": {
+    "previewName": "Tên bộ thẻ",
+    "srsSettings": "Cài đặt SRS",
+    "srsDescription": "Cấu hình khoảng lặp lại ngắt quãng cho bộ thẻ này.",
+    "learningSteps": "Bước học (phút)",
+    "learningStepsHint": "Số phút cách nhau bởi dấu phẩy, vd. \"1, 10\" cho bước 1 phút rồi 10 phút.",
+    "days": "ngày",
+    "statistics": "Thống kê",
+    "mastery": "Thành thạo",
+    "cardStatusDistribution": "Phân bố trạng thái thẻ",
+    "avgEase": "Độ dễ TB"
+  },
+  "statsTab": {
+    "total": "Tổng",
+    "statusDistribution": "Phân bố trạng thái",
+    "masteryRate": "Tỷ lệ thành thạo",
+    "avgEaseFactor": "Hệ số dễ TB",
+    "avgInterval": "Khoảng cách TB",
+    "days": "ngày"
+  },
+  "relativeDate": {
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "daysAgo": "{{count}} ngày trước",
+    "monthAgo": "1 tháng trước",
+    "monthsAgo": "{{count}} tháng trước"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "Không thể xóa",
+    "cannotDeleteMsg": "Không thể xóa mẫu mặc định.",
+    "deleteTitle": "Xóa mẫu",
+    "deleteFailed": "Không thể xóa mẫu",
+    "defaultBadge": "Mặc định"
+  },
+  "versionHistory": {
+    "loading": "Đang tải phiên bản...",
+    "createHint": "Tạo một phiên bản để chụp nhanh trạng thái hiện tại của bộ thẻ."
+  },
+  "uploadDate": {
+    "noCards": "Chưa có thẻ nào"
   }
 }

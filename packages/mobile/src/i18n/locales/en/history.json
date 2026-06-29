@@ -17,5 +17,39 @@
     "history": "History",
     "analytics": "Analytics"
   },
-  "sessionsPerDay": "Sessions per Day"
+  "sessionsPerDay": "Sessions per Day",
+  "ratings": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "got_it": "Got it",
+    "missed": "Missed",
+    "known": "Known",
+    "unknown": "Unknown"
+  },
+  "stats": {
+    "cards": "Cards",
+    "duration": "Duration",
+    "performance": "Performance"
+  },
+  "cardDetails": "Card Details",
+  "logsCount": "{{count}} logs",
+  "loadingDetails": "Loading details...",
+  "noLogs": "No detailed logs available for this session",
+  "deletedCard": "(Deleted card)",
+  "noContent": "(No content)",
+  "deckProgress": "Deck Progress",
+  "sessionsCount": "{{count}} sessions",
+  "cardsCount": "{{count}} cards",
+  "cardsFraction": "{{studied}}/{{total}} cards",
+  "ratingDistribution": "Rating Distribution",
+  "overview": {
+    "sessions": "Sessions",
+    "cardsStudied": "Cards Studied",
+    "totalTime": "Total Time",
+    "performance": "Performance",
+    "streak": "Streak",
+    "avgDuration": "Avg Duration"
+  }
 }

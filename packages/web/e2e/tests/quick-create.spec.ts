@@ -62,6 +62,11 @@ test.describe('Quick Create flow', () => {
     await page.getByTestId('qc-deck-name').fill(deckName)
     await expect(page.getByTestId('qc-card-0-0')).toBeVisible({ timeout: 15_000 })
 
+    // i18n safety net: this flow is driven entirely by testIDs, so a missing
+    // 'decks:quickCreate.*' key would otherwise pass unnoticed. Assert no raw
+    // dot-path keys leak into the open modal.
+    await expect(page.getByRole('dialog')).not.toContainText('quickCreate.')
+
     // Fill the first two fields of the first card row (works for any preset).
     await page.getByTestId('qc-card-0-0').fill(frontText)
     const back = page.getByTestId('qc-card-0-1')
@@ -76,6 +81,25 @@ test.describe('Quick Create flow', () => {
 
     // The card we typed should be visible on the deck detail.
     await expect(page.getByText(frontText).first()).toBeVisible({ timeout: 15_000 })
+  })
+
+  test('blocks a card whose front is empty (validation, no deck created)', async ({ page }) => {
+    await page.goto('/decks')
+    await page.getByTestId('quick-create-button').click()
+
+    // Switch to the 1·2 shape so there is a separate back field, then fill ONLY
+    // the back, leaving the front empty.
+    await page.getByTestId('qc-preset-f1b2').click()
+    await page.getByTestId('qc-deck-name').fill(`${MARKER}-noFront-${Date.now()}`)
+    await expect(page.getByTestId('qc-card-0-1')).toBeVisible({ timeout: 15_000 })
+    await page.getByTestId('qc-card-0-1').fill(`${MARKER}-back-only`)
+
+    await page.getByTestId('qc-submit').click()
+
+    // Submission is blocked client-side: the modal stays open (submit still
+    // visible) and we never navigate to a deck detail page → no deck created.
+    await expect(page.getByTestId('qc-submit')).toBeVisible()
+    await expect(page).toHaveURL(/\/decks\/?$/)
   })
 
   test('AI generate page renders translated (namespace loads)', async ({ page }) => {

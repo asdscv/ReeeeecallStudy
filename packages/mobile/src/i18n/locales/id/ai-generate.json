@@ -1,0 +1,67 @@
+{
+  "title": "Buat Otomatis dengan AI",
+  "subtitle": "Buat kartu flash secara otomatis dengan AI — cukup masukkan topik",
+  "steps": {
+    "setup": "Penyiapan",
+    "template": "Templat",
+    "deck": "Dek",
+    "cards": "Kartu",
+    "done": "Selesai"
+  },
+  "mode": {
+    "label": "Mode Pembuatan",
+    "full": "Lengkap (Templat + Dek + Kartu)",
+    "cardsOnly": "Tambah Kartu ke Dek yang Ada"
+  },
+  "provider": {
+    "section": "PENYEDIA AI",
+    "notice": "Pembuatan dengan AI menggunakan kunci API Anda sendiri untuk setiap penyedia. Tambah atau kelola kunci di Pengaturan.",
+    "none": "Belum ada penyedia AI yang dikonfigurasi",
+    "addInSettings": "Tambah di Pengaturan"
+  },
+  "content": {
+    "section": "PENGATURAN KONTEN",
+    "topicLabel": "Topik",
+    "topicPlaceholder": "mis. kosakata Jepang JLPT N3, tata bahasa Korea...",
+    "contentLang": "Bahasa Konten",
+    "autoDetect": "Deteksi otomatis",
+    "cardCountLabel": "Jumlah kartu:",
+    "cardCountPlaceholder": "1–100",
+    "cardCountHint": "1–100 kartu"
+  },
+  "deck": {
+    "section": "PILIH DEK",
+    "select": "Pilih dek"
+  },
+  "generateButton": "Buat Kartu",
+  "progress": {
+    "generating": "Membuat kartu...",
+    "saving": "Menyimpan kartu..."
+  },
+  "review": {
+    "title": "Tinjau Kartu",
+    "generatedCount": "{{count}} kartu dibuat",
+    "save": "Simpan {{count}} Kartu",
+    "regenerate": "Buat Ulang",
+    "cardDone": "Selesai",
+    "remove": "Hapus"
+  },
+  "doneStep": {
+    "title": "Kartu Dibuat!",
+    "subtitle": "Kartu flash buatan AI siap untuk dipelajari.",
+    "generateMore": "Buat Lagi",
+    "done": "Selesai"
+  },
+  "errorStep": {
+    "title": "Pembuatan Gagal",
+    "default": "Terjadi kesalahan saat pembuatan",
+    "retry": "Coba Lagi",
+    "back": "Kembali"
+  },
+  "alert": {
+    "errorTitle": "Kesalahan",
+    "enterTopic": "Silakan masukkan topik",
+    "configureProvider": "Silakan konfigurasikan penyedia AI di Pengaturan terlebih dahulu.",
+    "saveFailed": "Gagal menyimpan kartu yang dibuat"
+  }
+}

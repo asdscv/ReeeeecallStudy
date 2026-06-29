@@ -151,7 +151,8 @@
     "addAnother": "Add & Create Another",
     "errorTitle": "Error",
     "emptyError": "At least one field must have content",
-    "saveError": "Failed to save card"
+    "saveError": "Failed to save card",
+    "noTemplateError": "No card template available."
   },
   "quickCreate": {
     "button": "Quick Create",
@@ -187,11 +188,85 @@
       "nameRequired": "Please enter a deck name.",
       "templateRequired": "Please choose a card type.",
       "cardsRequired": "Please add at least one card.",
-      "createFailed": "Failed to create deck. Please try again."
+      "createFailed": "Failed to create deck. Please try again.",
+      "frontRequired": "Please fill in the front of each card."
     },
     "deckDescription": "Description (optional)",
     "deckDescriptionPlaceholder": "A short note about this deck",
     "presetSummary": "Front {{front}} · Back {{back}}",
     "basicLabel": "Basic"
+  },
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "emptyField": "(empty)",
+  "status": {
+    "all": "All",
+    "new": "New",
+    "learning": "Learning",
+    "review": "Review",
+    "suspended": "Suspended",
+    "mastered": "Mastered"
+  },
+  "srsRating": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
+  "deckDetail": {
+    "tabVersions": "Versions",
+    "selectMode": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectedCount": "{{count}} selected",
+    "deleteSelected": "Delete Selected",
+    "deleteCardsTitle": "Delete Cards",
+    "deleteCardsConfirm": "Delete {{count}} selected cards? This cannot be undone.",
+    "perPage": "Per page:",
+    "prevPage": "← Prev",
+    "nextPage": "Next →",
+    "pageOf": "Page {{current}} of {{total}}",
+    "showingRange": "Showing {{from}}–{{to}} of {{total}} cards"
+  },
+  "deckEdit": {
+    "previewName": "Deck Name",
+    "srsSettings": "SRS Settings",
+    "srsDescription": "Configure spaced repetition intervals for this deck.",
+    "learningSteps": "Learning Steps (minutes)",
+    "learningStepsHint": "Comma-separated minutes, e.g. \"1, 10\" for 1min then 10min steps.",
+    "days": "days",
+    "statistics": "Statistics",
+    "mastery": "Mastery",
+    "cardStatusDistribution": "Card Status Distribution",
+    "avgEase": "Avg Ease"
+  },
+  "statsTab": {
+    "total": "Total",
+    "statusDistribution": "Status Distribution",
+    "masteryRate": "Mastery Rate",
+    "avgEaseFactor": "Avg Ease Factor",
+    "avgInterval": "Avg Interval",
+    "days": "days"
+  },
+  "relativeDate": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "monthAgo": "1 month ago",
+    "monthsAgo": "{{count}} months ago"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "Cannot Delete",
+    "cannotDeleteMsg": "Default templates cannot be deleted.",
+    "deleteTitle": "Delete Template",
+    "deleteFailed": "Failed to delete template",
+    "defaultBadge": "Default"
+  },
+  "versionHistory": {
+    "loading": "Loading versions...",
+    "createHint": "Create a version to snapshot your deck's current state."
+  },
+  "uploadDate": {
+    "noCards": "No cards yet"
   }
 }

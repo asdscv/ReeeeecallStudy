@@ -193,5 +193,68 @@
     "mastery": "마스터한 카드"
   },
   "cancel": "취소",
-  "loading": "로딩 중..."
+  "loading": "로딩 중...",
+  "rating": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "보통",
+    "easy": "쉬움"
+  },
+  "demoCard": {
+    "tagline": "스마트 플래시카드 학습 플랫폼",
+    "tapToReveal": "탭하여 정답 보기",
+    "helloFrench": "Hello (프랑스어)"
+  },
+  "loadingState": {
+    "loadingData": "데이터 불러오는 중...",
+    "starting": "시작하는 중..."
+  },
+  "badge": {
+    "verified": "인증됨",
+    "official": "공식",
+    "educator": "교육자",
+    "publisher": "퍼블리셔",
+    "partner": "파트너",
+    "accountA11y": "{{label}} 계정"
+  },
+  "a11y": {
+    "add": "추가",
+    "openMenu": "메뉴 열기",
+    "goBack": "뒤로 가기",
+    "loading": "로딩 중"
+  },
+  "searchPlaceholder": "검색...",
+  "passwordToggle": {
+    "show": "표시",
+    "hide": "숨김"
+  },
+  "chart": {
+    "dailyStudy": "일일 학습",
+    "total": "합계"
+  },
+  "calendar": {
+    "monthsShort": [
+      "1월",
+      "2월",
+      "3월",
+      "4월",
+      "5월",
+      "6월",
+      "7월",
+      "8월",
+      "9월",
+      "10월",
+      "11월",
+      "12월"
+    ],
+    "dowMWF": [
+      "",
+      "월",
+      "",
+      "수",
+      "",
+      "금",
+      ""
+    ]
+  }
 }

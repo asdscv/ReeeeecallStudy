@@ -1,0 +1,67 @@
+{
+  "title": "Tạo tự động bằng AI",
+  "subtitle": "Tạo thẻ ghi nhớ tự động bằng AI — chỉ cần nhập chủ đề",
+  "steps": {
+    "setup": "Thiết lập",
+    "template": "Mẫu",
+    "deck": "Bộ thẻ",
+    "cards": "Thẻ",
+    "done": "Hoàn tất"
+  },
+  "mode": {
+    "label": "Chế độ tạo",
+    "full": "Đầy đủ (Mẫu + Bộ thẻ + Thẻ)",
+    "cardsOnly": "Thêm thẻ vào bộ thẻ hiện có"
+  },
+  "provider": {
+    "section": "NHÀ CUNG CẤP AI",
+    "notice": "Tính năng tạo bằng AI sử dụng khóa API của riêng bạn cho từng nhà cung cấp. Thêm hoặc quản lý khóa trong Cài đặt.",
+    "none": "Chưa cấu hình nhà cung cấp AI nào",
+    "addInSettings": "Thêm trong Cài đặt"
+  },
+  "content": {
+    "section": "CÀI ĐẶT NỘI DUNG",
+    "topicLabel": "Chủ đề",
+    "topicPlaceholder": "ví dụ: từ vựng tiếng Nhật JLPT N3, ngữ pháp tiếng Hàn...",
+    "contentLang": "Ngôn ngữ nội dung",
+    "autoDetect": "Tự động phát hiện",
+    "cardCountLabel": "Số lượng thẻ:",
+    "cardCountPlaceholder": "1–100",
+    "cardCountHint": "1–100 thẻ"
+  },
+  "deck": {
+    "section": "CHỌN BỘ THẺ",
+    "select": "Chọn một bộ thẻ"
+  },
+  "generateButton": "Tạo thẻ",
+  "progress": {
+    "generating": "Đang tạo thẻ...",
+    "saving": "Đang lưu thẻ..."
+  },
+  "review": {
+    "title": "Xem lại thẻ",
+    "generatedCount": "Đã tạo {{count}} thẻ",
+    "save": "Lưu {{count}} thẻ",
+    "regenerate": "Tạo lại",
+    "cardDone": "Xong",
+    "remove": "Xóa"
+  },
+  "doneStep": {
+    "title": "Đã tạo thẻ!",
+    "subtitle": "Các thẻ ghi nhớ do AI tạo đã sẵn sàng để học.",
+    "generateMore": "Tạo thêm",
+    "done": "Xong"
+  },
+  "errorStep": {
+    "title": "Tạo thất bại",
+    "default": "Đã xảy ra lỗi trong quá trình tạo",
+    "retry": "Thử lại",
+    "back": "Quay lại"
+  },
+  "alert": {
+    "errorTitle": "Lỗi",
+    "enterTopic": "Vui lòng nhập chủ đề",
+    "configureProvider": "Vui lòng cấu hình nhà cung cấp AI trong Cài đặt trước.",
+    "saveFailed": "Không thể lưu các thẻ đã tạo"
+  }
+}

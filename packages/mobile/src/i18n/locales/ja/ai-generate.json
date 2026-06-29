@@ -1,0 +1,67 @@
+{
+  "title": "AI自動生成",
+  "subtitle": "トピックを入力するだけで、AIがフラッシュカードを自動作成します",
+  "steps": {
+    "setup": "設定",
+    "template": "テンプレート",
+    "deck": "デッキ",
+    "cards": "カード",
+    "done": "完了"
+  },
+  "mode": {
+    "label": "生成モード",
+    "full": "フル（テンプレート + デッキ + カード）",
+    "cardsOnly": "既存デッキにカードを追加"
+  },
+  "provider": {
+    "section": "AIプロバイダー",
+    "notice": "AI生成にはプロバイダーごとにご自身のAPIキーが必要です。設定でキーを追加・管理してください。",
+    "none": "設定済みのAIプロバイダーがありません",
+    "addInSettings": "設定で追加"
+  },
+  "content": {
+    "section": "コンテンツ設定",
+    "topicLabel": "トピック",
+    "topicPlaceholder": "例: JLPT N3の日本語単語、韓国語の文法...",
+    "contentLang": "コンテンツの言語",
+    "autoDetect": "自動検出",
+    "cardCountLabel": "カード枚数:",
+    "cardCountPlaceholder": "1–100",
+    "cardCountHint": "1–100枚"
+  },
+  "deck": {
+    "section": "デッキを選択",
+    "select": "デッキを選択"
+  },
+  "generateButton": "カードを生成",
+  "progress": {
+    "generating": "カードを生成中...",
+    "saving": "カードを保存中..."
+  },
+  "review": {
+    "title": "カードを確認",
+    "generatedCount": "{{count}}枚のカードを生成しました",
+    "save": "{{count}}枚を保存",
+    "regenerate": "再生成",
+    "cardDone": "完了",
+    "remove": "削除"
+  },
+  "doneStep": {
+    "title": "カードを作成しました！",
+    "subtitle": "AIが生成したフラッシュカードで学習できます。",
+    "generateMore": "さらに生成",
+    "done": "完了"
+  },
+  "errorStep": {
+    "title": "生成に失敗しました",
+    "default": "生成中にエラーが発生しました",
+    "retry": "再試行",
+    "back": "戻る"
+  },
+  "alert": {
+    "errorTitle": "エラー",
+    "enterTopic": "トピックを入力してください",
+    "configureProvider": "先に設定でAIプロバイダーを設定してください。",
+    "saveFailed": "生成したカードの保存に失敗しました"
+  }
+}

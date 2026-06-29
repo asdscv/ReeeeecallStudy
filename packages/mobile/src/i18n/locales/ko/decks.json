@@ -151,7 +151,8 @@
     "addAnother": "추가하고 계속 만들기",
     "errorTitle": "오류",
     "emptyError": "최소 한 개의 필드를 입력해 주세요",
-    "saveError": "카드 저장에 실패했습니다"
+    "saveError": "카드 저장에 실패했습니다",
+    "noTemplateError": "사용 가능한 카드 템플릿이 없습니다."
   },
   "quickCreate": {
     "button": "간편 만들기",
@@ -187,11 +188,85 @@
       "nameRequired": "덱 이름을 입력하세요.",
       "templateRequired": "카드 유형을 선택하세요.",
       "cardsRequired": "카드를 하나 이상 추가하세요.",
-      "createFailed": "덱 생성에 실패했습니다. 다시 시도하세요."
+      "createFailed": "덱 생성에 실패했습니다. 다시 시도하세요.",
+      "frontRequired": "각 카드의 앞면을 입력하세요."
     },
     "deckDescription": "설명 (선택)",
     "deckDescriptionPlaceholder": "이 덱에 대한 간단한 설명",
     "presetSummary": "앞면 {{front}} · 뒷면 {{back}}",
     "basicLabel": "기본"
+  },
+  "cancel": "취소",
+  "delete": "삭제",
+  "emptyField": "(비어 있음)",
+  "status": {
+    "all": "전체",
+    "new": "신규",
+    "learning": "학습 중",
+    "review": "복습",
+    "suspended": "보류",
+    "mastered": "마스터"
+  },
+  "srsRating": {
+    "again": "다시",
+    "hard": "어려움",
+    "good": "보통",
+    "easy": "쉬움"
+  },
+  "deckDetail": {
+    "tabVersions": "버전",
+    "selectMode": "선택",
+    "selectAll": "전체 선택",
+    "deselectAll": "선택 해제",
+    "selectedCount": "{{count}}개 선택됨",
+    "deleteSelected": "선택 항목 삭제",
+    "deleteCardsTitle": "카드 삭제",
+    "deleteCardsConfirm": "선택한 카드 {{count}}장을 삭제할까요? 되돌릴 수 없습니다.",
+    "perPage": "페이지당:",
+    "prevPage": "← 이전",
+    "nextPage": "다음 →",
+    "pageOf": "{{total}} 중 {{current}} 페이지",
+    "showingRange": "{{total}}장 중 {{from}}–{{to}} 표시"
+  },
+  "deckEdit": {
+    "previewName": "덱 이름",
+    "srsSettings": "SRS 설정",
+    "srsDescription": "이 덱의 간격 반복 주기를 설정하세요.",
+    "learningSteps": "학습 단계 (분)",
+    "learningStepsHint": "쉼표로 구분한 분 단위, 예: \"1, 10\" → 1분 후 10분 단계.",
+    "days": "일",
+    "statistics": "통계",
+    "mastery": "숙련도",
+    "cardStatusDistribution": "카드 상태 분포",
+    "avgEase": "평균 용이도"
+  },
+  "statsTab": {
+    "total": "전체",
+    "statusDistribution": "상태 분포",
+    "masteryRate": "숙련도",
+    "avgEaseFactor": "평균 용이도 계수",
+    "avgInterval": "평균 간격",
+    "days": "일"
+  },
+  "relativeDate": {
+    "today": "오늘",
+    "yesterday": "어제",
+    "daysAgo": "{{count}}일 전",
+    "monthAgo": "1개월 전",
+    "monthsAgo": "{{count}}개월 전"
+  },
+  "templatesList": {
+    "cannotDeleteTitle": "삭제할 수 없음",
+    "cannotDeleteMsg": "기본 템플릿은 삭제할 수 없습니다.",
+    "deleteTitle": "템플릿 삭제",
+    "deleteFailed": "템플릿 삭제에 실패했습니다",
+    "defaultBadge": "기본"
+  },
+  "versionHistory": {
+    "loading": "버전 불러오는 중...",
+    "createHint": "버전을 만들어 덱의 현재 상태를 스냅샷으로 저장하세요."
+  },
+  "uploadDate": {
+    "noCards": "아직 카드가 없습니다"
   }
 }

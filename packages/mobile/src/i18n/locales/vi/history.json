@@ -17,5 +17,39 @@
     "history": "Lịch sử",
     "analytics": "Phân tích"
   },
-  "sessionsPerDay": "Số phiên mỗi ngày"
+  "sessionsPerDay": "Số phiên mỗi ngày",
+  "ratings": {
+    "again": "Lại",
+    "hard": "Khó",
+    "good": "Tốt",
+    "easy": "Dễ",
+    "got_it": "Đúng",
+    "missed": "Sai",
+    "known": "Đã biết",
+    "unknown": "Chưa biết"
+  },
+  "stats": {
+    "cards": "Thẻ",
+    "duration": "Thời lượng",
+    "performance": "Hiệu suất"
+  },
+  "cardDetails": "Chi tiết thẻ",
+  "logsCount": "{{count}} bản ghi",
+  "loadingDetails": "Đang tải chi tiết...",
+  "noLogs": "Không có nhật ký chi tiết cho phiên này",
+  "deletedCard": "(Thẻ đã xóa)",
+  "noContent": "(Không có nội dung)",
+  "deckProgress": "Tiến độ bộ thẻ",
+  "sessionsCount": "{{count}} phiên",
+  "cardsCount": "{{count}} thẻ",
+  "cardsFraction": "{{studied}}/{{total}} thẻ",
+  "ratingDistribution": "Phân bố đánh giá",
+  "overview": {
+    "sessions": "Phiên",
+    "cardsStudied": "Thẻ đã học",
+    "totalTime": "Tổng thời gian",
+    "performance": "Hiệu suất",
+    "streak": "Chuỗi ngày",
+    "avgDuration": "Thời lượng TB"
+  }
 }

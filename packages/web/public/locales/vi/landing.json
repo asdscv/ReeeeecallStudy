@@ -183,7 +183,8 @@
     "reviews": "Đánh giá",
     "howItWorks": "Cách hoạt động",
     "faq": "Câu hỏi thường gặp",
-    "dashboard": "Bảng điều khiển"
+    "dashboard": "Bảng điều khiển",
+    "menu": "Menu"
   },
   "trustBadges": {
     "srs": "SRS thông minh",
@@ -193,7 +194,7 @@
     "import": "Nhập CSV & API"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
+    "copyright": "© 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
     "apiDocs": "Tài liệu API",
     "tagline": "Nền tảng học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
     "product": "Sản phẩm",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "Thẻ đã học",
     "decksCreatedLabel": "Bộ thẻ đã tạo",
     "testimonials": {
-      "0": { "quote": "ReeeeecallStudy đã giúp tôi đỗ JLPT N2. Thuật toán SRS cực kỳ hiệu quả!", "author": "Nguyễn Minh Tuấn", "role": "Người học ngôn ngữ" },
-      "1": { "quote": "Giao diện rất sạch sẽ và trực quan. Việc học bây giờ thực sự thú vị.", "author": "Trần Thị Mai", "role": "Sinh viên y khoa" },
-      "2": { "quote": "Tính năng chia sẻ bộ thẻ tuyệt vời. Tôi tìm được bộ thẻ cho hầu hết mọi môn.", "author": "Lê Hoàng Nam", "role": "Sinh viên đại học" }
+      "0": {
+        "quote": "ReeeeecallStudy đã giúp tôi đỗ JLPT N2. Thuật toán SRS cực kỳ hiệu quả!",
+        "author": "Nguyễn Minh Tuấn",
+        "role": "Người học ngôn ngữ"
+      },
+      "1": {
+        "quote": "Giao diện rất sạch sẽ và trực quan. Việc học bây giờ thực sự thú vị.",
+        "author": "Trần Thị Mai",
+        "role": "Sinh viên y khoa"
+      },
+      "2": {
+        "quote": "Tính năng chia sẻ bộ thẻ tuyệt vời. Tôi tìm được bộ thẻ cho hầu hết mọi môn.",
+        "author": "Lê Hoàng Nam",
+        "role": "Sinh viên đại học"
+      }
     }
   },
   "science": {

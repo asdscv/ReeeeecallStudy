@@ -206,7 +206,8 @@
       "nameRequired": "请输入卡组名称。",
       "templateRequired": "请选择卡片类型。",
       "cardsRequired": "请至少添加一张卡片。",
-      "createFailed": "创建卡组失败，请重试。"
+      "createFailed": "创建卡组失败，请重试。",
+      "frontRequired": "请填写每张卡片的正面。"
     },
     "deckDescription": "说明（可选）",
     "deckDescriptionPlaceholder": "关于此卡组的简短说明",

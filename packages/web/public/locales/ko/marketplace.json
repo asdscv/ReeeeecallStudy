@@ -153,5 +153,49 @@
     "sortLabel": "정렬:",
     "loading": "불러오는 중...",
     "loadMore": "리뷰 더 보기"
-  }
+  },
+  "publisher": {
+    "title": "퍼블리셔 대시보드",
+    "emptyTitle": "아직 게시된 항목이 없습니다",
+    "emptyDescription": "마켓플레이스에 덱을 게시하면 조회수와 획득 수를 추적할 수 있습니다.",
+    "goToDecks": "덱으로 이동",
+    "retry": "다시 시도",
+    "activeListings": "활성 항목",
+    "totalViews": "총 조회수",
+    "totalAcquisitions": "총 획득 수",
+    "avgConversion": "평균 전환율",
+    "dailyViews": "일일 조회수 (최근 30일)",
+    "noDataYet": "아직 데이터가 없습니다",
+    "topListings": "조회수 상위 항목",
+    "acquisitionTrend": "획득 추이 (최근 30일)",
+    "yourListings": "내 항목",
+    "recentAcquisitions": "최근 획득",
+    "noAcquisitionsYet": "아직 획득이 없습니다",
+    "recentReviews": "최근 리뷰",
+    "noReviewsYet": "아직 리뷰가 없습니다",
+    "anonymous": "익명",
+    "acquired": "획득함",
+    "active": "활성",
+    "inactive": "비활성",
+    "viewListing": "항목 보기",
+    "table": {
+      "title": "제목",
+      "views": "조회수",
+      "acquires": "획득",
+      "conv": "전환율 %",
+      "rating": "평점",
+      "created": "생성일",
+      "status": "상태",
+      "actions": "작업"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}}분 전",
+      "hoursAgo": "{{count}}시간 전",
+      "daysAgo": "{{count}}일 전"
+    }
+  },
+  "reviewCount_one": "{{count}}개 리뷰",
+  "reviewCount_other": "{{count}}개 리뷰",
+  "rateStar_one": "{{count}}점 평가",
+  "rateStar_other": "{{count}}점 평가"
 }

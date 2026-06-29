@@ -153,5 +153,49 @@
     "sortLabel": "Urutkan:",
     "loading": "Memuat...",
     "loadMore": "Muat ulasan lainnya"
-  }
+  },
+  "publisher": {
+    "title": "Dasbor Penerbit",
+    "emptyTitle": "Belum Ada Daftar yang Diterbitkan",
+    "emptyDescription": "Terbitkan deck di marketplace untuk mulai melacak tampilan dan perolehan.",
+    "goToDecks": "Ke Deck",
+    "retry": "Coba lagi",
+    "activeListings": "Daftar Aktif",
+    "totalViews": "Total Tampilan",
+    "totalAcquisitions": "Total Perolehan",
+    "avgConversion": "Konversi Rata-rata",
+    "dailyViews": "Tampilan Harian (30 Hari Terakhir)",
+    "noDataYet": "Belum ada data",
+    "topListings": "Daftar Teratas berdasarkan Tampilan",
+    "acquisitionTrend": "Tren Perolehan (30 Hari Terakhir)",
+    "yourListings": "Daftar Anda",
+    "recentAcquisitions": "Perolehan Terbaru",
+    "noAcquisitionsYet": "Belum ada perolehan",
+    "recentReviews": "Ulasan Terbaru",
+    "noReviewsYet": "Belum ada ulasan",
+    "anonymous": "Anonim",
+    "acquired": "memperoleh",
+    "active": "Aktif",
+    "inactive": "Nonaktif",
+    "viewListing": "Lihat daftar",
+    "table": {
+      "title": "Judul",
+      "views": "Tampilan",
+      "acquires": "Perolehan",
+      "conv": "Konversi %",
+      "rating": "Peringkat",
+      "created": "Dibuat",
+      "status": "Status",
+      "actions": "Tindakan"
+    },
+    "timeAgo": {
+      "minutesAgo": "{{count}} mnt lalu",
+      "hoursAgo": "{{count}} jam lalu",
+      "daysAgo": "{{count}} hr lalu"
+    }
+  },
+  "reviewCount_one": "{{count}} ulasan",
+  "reviewCount_other": "{{count}} ulasan",
+  "rateStar_one": "Beri {{count}} bintang",
+  "rateStar_other": "Beri {{count}} bintang"
 }

@@ -183,7 +183,8 @@
     "reviews": "レビュー",
     "howItWorks": "使い方",
     "faq": "FAQ",
-    "dashboard": "ダッシュボード"
+    "dashboard": "ダッシュボード",
+    "menu": "メニュー"
   },
   "trustBadges": {
     "srs": "スマートSRS",
@@ -193,7 +194,7 @@
     "import": "CSV & APIインポート"
   },
   "footer": {
-    "copyright": "\u00a9 2026 ReeeeecallStudy. All rights reserved.",
+    "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
     "apiDocs": "APIドキュメント",
     "tagline": "間隔反復によるスマートフラッシュカード学習プラットフォーム",
     "product": "製品",
@@ -251,9 +252,21 @@
     "cardsStudiedLabel": "学習済みカード",
     "decksCreatedLabel": "作成されたデッキ",
     "testimonials": {
-      "0": { "quote": "ReeeeecallStudyのおかげでJLPT N2に合格しました。SRSアルゴリズムが本当に効果的です！", "author": "田中太郎", "role": "語学学習者" },
-      "1": { "quote": "インターフェースがとてもクリーンで直感的です。学習が楽しくなりました。", "author": "佐藤花子", "role": "医学生" },
-      "2": { "quote": "デッキ共有機能がすごいです。ほぼすべての科目のデッキが見つかりました。", "author": "鈴木一郎", "role": "大学生" }
+      "0": {
+        "quote": "ReeeeecallStudyのおかげでJLPT N2に合格しました。SRSアルゴリズムが本当に効果的です！",
+        "author": "田中太郎",
+        "role": "語学学習者"
+      },
+      "1": {
+        "quote": "インターフェースがとてもクリーンで直感的です。学習が楽しくなりました。",
+        "author": "佐藤花子",
+        "role": "医学生"
+      },
+      "2": {
+        "quote": "デッキ共有機能がすごいです。ほぼすべての科目のデッキが見つかりました。",
+        "author": "鈴木一郎",
+        "role": "大学生"
+      }
     }
   },
   "science": {

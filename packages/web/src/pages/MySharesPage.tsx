@@ -26,7 +26,7 @@ function ShareRow({ share, type, onAction }: { share: DeckShare; type: 'sent' | 
     <div className="flex items-center justify-between p-3 bg-card rounded-lg border border-border">
       <div className="min-w-0">
         <p className="text-sm text-foreground truncate">
-          {share.invite_email || share.recipient_id || share.invite_code || 'N/A'}
+          {share.invite_email || share.recipient_id || share.invite_code || t('myShares.unknownRecipient')}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs text-content-tertiary">{t(MODE_KEY[share.share_mode] ?? share.share_mode)}</span>
