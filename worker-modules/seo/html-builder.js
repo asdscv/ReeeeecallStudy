@@ -6,6 +6,7 @@ import {
   OG_IMAGE_WIDTH,
   OG_IMAGE_HEIGHT,
   OG_LOCALE_MAP,
+  ROBOTS_INDEX,
 } from './constants.js'
 import {
   escapeHtml,
@@ -14,11 +15,11 @@ import {
   buildCommonHead,
 } from './helpers.js'
 
-export function buildHtmlDocument({ lang, head, body }) {
+export function buildHtmlDocument({ lang, head, body, robots = ROBOTS_INDEX }) {
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(lang)}">
 <head>
-${buildCommonHead(lang)}
+${buildCommonHead(lang, robots)}
 ${head}
 </head>
 <body>
@@ -105,7 +106,20 @@ export function buildMetaTags({
   return parts.join('\n')
 }
 
-export function buildSeoResponse(html, { lang = 'en', cacheSeconds = 3600, robots = 'index, follow, max-image-preview:large' } = {}) {
+/**
+ * Serialize JSON-LD schema objects into <script> blocks, escaping '<' so a field
+ * containing '</script>' or '<!--' cannot break out of the script element
+ * (defense for user-controlled fields, e.g. marketplace listing titles). ALL bot
+ * handlers MUST render JSON-LD through this — never inline JSON.stringify.
+ */
+export function renderJsonLd(schemas) {
+  return schemas
+    .filter(Boolean)
+    .map((s) => `<script type="application/ld+json">${JSON.stringify(s).replace(/</g, '\\u003c')}</script>`)
+    .join('\n')
+}
+
+export function buildSeoResponse(html, { lang = 'en', cacheSeconds = 3600, robots = ROBOTS_INDEX } = {}) {
   const headers = {
     'Content-Type': 'text/html; charset=utf-8',
     'Content-Language': lang,

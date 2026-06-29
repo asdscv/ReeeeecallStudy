@@ -1,7 +1,7 @@
 // Content list page bot handler — extracted from worker.js handleContentListBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
-  LIST_TITLES, LIST_DESCS,
+  LIST_TITLES, LIST_DESCS, ROBOTS_INDEX, ROBOTS_NOINDEX,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -14,12 +14,18 @@ import {
   buildOrganizationJsonLd,
   buildWebSiteJsonLd,
 } from '../json-ld.js'
-import { buildHtmlDocument, buildMetaTags, buildSeoResponse } from '../html-builder.js'
+import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
+import { isIndexable, isUiLocale } from '../../locale-policy.js'
 
 export async function handleContentListBot(url, env) {
   const restUrl = getSupabaseRestUrl(env)
   const anonKey = getSupabaseAnonKey(env)
-  const lang = url.searchParams.get('lang') || 'en'
+  // Normalize untrusted ?lang against the registry before it reaches the
+  // PostgREST query, Content-Language header, and reflected feed hrefs.
+  const rawLang = url.searchParams.get('lang')
+  const lang = isUiLocale(rawLang) ? rawLang : 'en'
+  // Non-indexable locale list pages (legacy minor languages) → noindex.
+  const robots = isIndexable(lang) ? ROBOTS_INDEX : ROBOTS_NOINDEX
 
   const res = await fetch(
     `${restUrl}/contents?is_published=eq.true&locale=eq.${lang}&select=slug,title,subtitle,locale,published_at,tags,reading_time_minutes,thumbnail_url&order=published_at.desc&limit=100`,
@@ -50,9 +56,7 @@ export async function handleContentListBot(url, env) {
 <link rel="alternate" type="application/atom+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.atom${lang !== 'en' ? `?lang=${lang}` : ''}">`
   const hreflangTags = buildHreflangTags('/insight', true)
 
-  const jsonLdScripts = [collectionJsonLd, itemListJsonLd, buildOrganizationJsonLd(), buildWebSiteJsonLd()]
-    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
-    .join('\n')
+  const jsonLdScripts = renderJsonLd([collectionJsonLd, itemListJsonLd, buildOrganizationJsonLd(), buildWebSiteJsonLd()])
 
   const articlesHtml = articles.map((a) => {
     const dateStr = a.published_at ? new Date(a.published_at).toISOString().split('T')[0] : ''
@@ -86,11 +90,11 @@ ${articlesHtml}
 <p><a href="${SITE_URL}/landing">Start Learning with ${BRAND_NAME}</a></p>
 </footer>`
 
-  const html = buildHtmlDocument({ lang, head, body })
+  const html = buildHtmlDocument({ lang, head, body, robots })
 
   return buildSeoResponse(html, {
     lang,
     cacheSeconds: 3600,
-    robots: 'index, follow, max-image-preview:large',
+    robots,
   })
 }

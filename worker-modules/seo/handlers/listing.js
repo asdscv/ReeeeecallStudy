@@ -1,6 +1,7 @@
 // Marketplace listing bot handler — extracted from worker.js handleListingBotRequest
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
+  ROBOTS_INDEX, UI_LOCALES,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -12,8 +13,9 @@ import {
   buildBreadcrumbJsonLd,
   buildOrganizationJsonLd,
 } from '../json-ld.js'
-import { buildHtmlDocument, buildMetaTags, buildSeoResponse } from '../html-builder.js'
+import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
 import { renderSampleCardsHtml, buildSampleCardLearningResources } from '../card-preview.js'
+import { isUiLocale } from '../../locale-policy.js'
 
 export async function handleListingBotRequest(listingId, url, env) {
   const restUrl = getSupabaseRestUrl(env)
@@ -37,7 +39,8 @@ export async function handleListingBotRequest(listingId, url, env) {
   const listing = await res.json()
   if (!listing || !listing.title) return null
 
-  const lang = url.searchParams.get('lang') || 'en'
+  const rawLang = url.searchParams.get('lang')
+  const lang = isUiLocale(rawLang) ? rawLang : 'en'
   const title = `${listing.title} — ${lang === 'ko' ? '플래시카드 덱' : 'Flashcard Deck'} | ${BRAND_NAME}`
   const description = listing.description || `${listing.title} — ${listing.card_count || 0} ${lang === 'ko' ? '장의 카드가 포함된 플래시카드 덱' : 'cards flashcard deck on'} ${BRAND_NAME}`
   const tags = listing.tags || []
@@ -49,7 +52,7 @@ export async function handleListingBotRequest(listingId, url, env) {
     listingId,
     lang,
   )
-  const datasetJsonLd = buildDatasetJsonLd(listing, description, tags, listingId, lang)
+  const datasetJsonLd = buildDatasetJsonLd(listing, listingId, lang)
   if (sampleResources.length > 0) {
     datasetJsonLd.hasPart = sampleResources
   }
@@ -70,11 +73,11 @@ export async function handleListingBotRequest(listingId, url, env) {
     keywords: tags.join(', '),
   })
 
-  const hreflangTags = buildHreflangTags(`/d/${escapeHtml(listingId)}`, true)
+  // Listings are real product pages served in all UI languages (outside the
+  // insight noindex policy) — advertise hreflang for every UI locale.
+  const hreflangTags = buildHreflangTags(`/d/${escapeHtml(listingId)}`, true, UI_LOCALES)
 
-  const jsonLdScripts = [datasetJsonLd, breadcrumbJsonLd, buildOrganizationJsonLd()]
-    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
-    .join('\n')
+  const jsonLdScripts = renderJsonLd([datasetJsonLd, breadcrumbJsonLd, buildOrganizationJsonLd()])
 
   const head = `${metaTags}
 ${hreflangTags}
@@ -96,11 +99,11 @@ ${sampleCardsHtml}
 <p><a href="${SITE_URL}/landing">← ${BRAND_NAME}</a></p>
 </footer>`
 
-  const html = buildHtmlDocument({ lang, head, body })
+  const html = buildHtmlDocument({ lang, head, body, robots: ROBOTS_INDEX })
 
   return buildSeoResponse(html, {
     lang,
     cacheSeconds: 3600,
-    robots: 'index, follow',
+    robots: ROBOTS_INDEX,
   })
 }

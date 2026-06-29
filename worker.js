@@ -12,6 +12,7 @@ import { handleSitemap, handleSitemapStatic, handleSitemapArticles, handleSitema
 import { handleRobots } from './worker-modules/seo/robots.js'
 import { handleRSSFeed } from './worker-modules/seo/feeds.js'
 import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
+import { isUiLocale } from './worker-modules/locale-policy.js'
 
 const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
 
@@ -25,6 +26,12 @@ function corsAllowOrigin(request) {
   const origin = request.headers.get('Origin')
   return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
 }
+
+// Extensionless legal pages. Cloudflare Assets serves the real
+// /privacy-policy.html and /terms-of-service.html at these clean URLs (verified:
+// 200 with the real page body), but the bot 404 branch below would otherwise
+// reject the extensionless form. Let bots fall through to ASSETS for the real page.
+const SPA_BOT_PASSTHROUGH = new Set(['/privacy-policy', '/terms-of-service'])
 
 // ─── Bot handler dispatch ────────────────────────────────────────────────────
 
@@ -74,8 +81,10 @@ export default {
       return sitemapHandler()
     }
 
-    // RSS / Atom / JSON feeds (supports ?lang=ko etc.)
-    const feedLang = url.searchParams.get('lang') || 'en'
+    // RSS / Atom / JSON feeds (supports ?lang=ko etc.) — normalize ?lang against
+    // the registry so it can't inject into the feed's PostgREST locale filter.
+    const rawFeedLang = url.searchParams.get('lang')
+    const feedLang = isUiLocale(rawFeedLang) ? rawFeedLang : 'en'
     if (url.pathname === '/feed.xml' || url.pathname === '/rss.xml' || url.pathname === '/feed') {
       return handleRSSFeed(env, 'rss', feedLang)
     }
@@ -123,8 +132,9 @@ export default {
         }
         // docs-api and other types fall through to SPA
       }
-      // Bot accessing non-public routes → 404
-      else if (!url.pathname.match(/\.\w+$/)) {
+      // Known clean-URL static pages → fall through to ASSETS for the real
+      // .html (served at the clean URL by Cloudflare), not a 404
+      else if (!url.pathname.match(/\.\w+$/) && !SPA_BOT_PASSTHROUGH.has(url.pathname)) {
         return handleBotNotFound()
       }
     }

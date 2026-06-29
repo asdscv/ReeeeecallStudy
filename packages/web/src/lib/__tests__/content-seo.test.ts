@@ -233,13 +233,14 @@ describe('buildWebApplicationJsonLd', () => {
 })
 
 describe('buildHreflangAlternates', () => {
-  it('should return one entry per supported locale plus x-default', () => {
+  it('should return one entry per INDEXABLE locale plus x-default', () => {
     const result = buildHreflangAlternates('test-slug')
-    expect(result).toHaveLength(SEO.SUPPORTED_LOCALES.length + 1)
+    expect(result).toHaveLength(SEO.INDEXABLE_LOCALES.length + 1)
     const langs = result.map((r) => r.lang)
-    for (const locale of SEO.SUPPORTED_LOCALES) {
+    for (const locale of SEO.INDEXABLE_LOCALES) {
       expect(langs).toContain(locale)
     }
+    expect(langs).not.toContain('ja') // minor (non-indexable) locales excluded
     expect(langs).toContain('x-default')
   })
 
@@ -333,9 +334,9 @@ describe('buildWebSiteJsonLd', () => {
     expect(result.potentialAction['query-input']).toBe('required name=search_term_string')
   })
 
-  it('should derive inLanguage from SEO.SUPPORTED_LOCALES', () => {
+  it('should derive inLanguage from SEO.INDEXABLE_LOCALES', () => {
     const result = buildWebSiteJsonLd()
-    expect(result.inLanguage).toEqual([...SEO.SUPPORTED_LOCALES])
+    expect(result.inLanguage).toEqual([...SEO.INDEXABLE_LOCALES])
   })
 })
 
@@ -472,13 +473,14 @@ describe('buildLearningResourceJsonLd', () => {
 })
 
 describe('buildStaticHreflangAlternates', () => {
-  it('should include all supported locales plus x-default', () => {
+  it('should include all INDEXABLE locales plus x-default', () => {
     const result = buildStaticHreflangAlternates('/insight')
-    expect(result).toHaveLength(SEO.SUPPORTED_LOCALES.length + 1)
+    expect(result).toHaveLength(SEO.INDEXABLE_LOCALES.length + 1)
     const langs = result.map((r) => r.lang)
-    for (const locale of SEO.SUPPORTED_LOCALES) {
+    for (const locale of SEO.INDEXABLE_LOCALES) {
       expect(langs).toContain(locale)
     }
+    expect(langs).not.toContain('ja') // minor (non-indexable) locales excluded
     expect(langs).toContain('x-default')
   })
 
