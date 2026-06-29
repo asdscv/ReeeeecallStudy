@@ -1,4 +1,11 @@
 // Keep in sync with packages/web/src/lib/seo-config.ts
+// (web INDEXABLE_LOCALES / SUPPORTED_LOCALES mirror these two policy views).
+//
+// INDEXABLE_LOCALES = locales we emit indexing signals for (hreflang, JSON-LD
+//   inLanguage, robots index). UI_LOCALES = all served languages (og:locale:alternate,
+//   marketplace listing hreflang). Edit locale-policy.js to change either. The
+//   per-locale content dicts below (LIST_TITLES, LANDING_*) keep ALL ui locales.
+import { INDEXABLE_LOCALES, UI_LOCALES } from '../locale-policy.js'
 
 export const SITE_URL = 'https://reeeeecallstudy.xyz'
 export const BRAND_NAME = 'ReeeeecallStudy'
@@ -8,7 +15,14 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`
 export const OG_IMAGE_WIDTH = 1200
 export const OG_IMAGE_HEIGHT = 630
 
-export const SUPPORTED_LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es']
+// Re-exported so SEO modules read locale views from one place (not the policy
+// directly). Use INDEXABLE_LOCALES for indexing signals, UI_LOCALES for served.
+export { INDEXABLE_LOCALES, UI_LOCALES }
+
+// Robots directives — emitted on BOTH <meta name="robots"> and the X-Robots-Tag
+// header so the two channels never disagree. Non-indexable locales use NOINDEX.
+export const ROBOTS_INDEX = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+export const ROBOTS_NOINDEX = 'noindex, follow'
 
 export const OG_LOCALE_MAP = {
   en: 'en_US', ko: 'ko_KR', zh: 'zh_CN', ja: 'ja_JP',

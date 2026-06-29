@@ -10,7 +10,12 @@ export const SEO = {
   AUTHOR_NAME: 'ReeeeecallStudy',
   CONTACT_EMAIL: 'admin@reeeeecallstudy.xyz',
   DEFAULT_LOCALE: 'en',
+  // SUPPORTED_LOCALES = every UI/served language. INDEXABLE_LOCALES = the subset
+  // we emit SEO indexing signals for (hreflang, JSON-LD inLanguage). This MIRRORS
+  // the worker's worker-modules/locale-policy.js (LOCALE_REGISTRY index flag) —
+  // keep the two in sync; minor languages stay served but are not indexed.
   SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const,
+  INDEXABLE_LOCALES: ['en', 'ko'] as const,
 } as const
 
 const OG_LOCALE_MAP: Record<string, string> = {

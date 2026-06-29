@@ -1,7 +1,12 @@
 // Configuration constants and environment variable helpers
 
-export const LOCALES = ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es']
-export const DEFAULT_LOCALE = 'en'
+// Locale generation policy lives in locale-policy.js (single source of truth).
+// LOCALES = the locales the daily pipeline GENERATES. To change which locales
+// are generated, edit locale-policy.js — not this file.
+import { GENERATED_LOCALES, DEFAULT_LOCALE as POLICY_DEFAULT_LOCALE } from './locale-policy.js'
+
+export const LOCALES = GENERATED_LOCALES
+export const DEFAULT_LOCALE = POLICY_DEFAULT_LOCALE
 
 export const PIPELINE_DEFAULTS = {
   topicsPerRun: 5,

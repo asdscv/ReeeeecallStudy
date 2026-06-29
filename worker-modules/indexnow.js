@@ -50,29 +50,6 @@ export async function submitToIndexNow(env, urls) {
   }
 }
 
-/**
- * Ping Google and Bing about sitemap updates.
- */
-export async function pingSitemapUpdate() {
-  const sitemapUrl = `${SITE_URL}/sitemap.xml`
-
-  const pings = [
-    `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
-    `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
-  ]
-
-  const results = await Promise.allSettled(
-    pings.map(async (url) => {
-      const res = await fetch(url)
-      return { url, status: res.status }
-    }),
-  )
-
-  for (const r of results) {
-    if (r.status === 'fulfilled') {
-      info('Sitemap ping sent', r.value)
-    } else {
-      warn('Sitemap ping failed', { error: r.reason?.message })
-    }
-  }
-}
+// NOTE: Google (June 2023) and Bing both retired their `/ping?sitemap=`
+// endpoints, so there is no push path to Google for new content — discovery
+// relies on crawl + sitemap. IndexNow above still notifies Bing/Yandex/Naver.

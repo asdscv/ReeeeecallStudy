@@ -1,7 +1,7 @@
 // Content detail page bot handler — extracted from worker.js handleContentDetailBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
-  LIST_TITLES,
+  LIST_TITLES, ROBOTS_INDEX, ROBOTS_NOINDEX,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -15,42 +15,52 @@ import {
   buildOrganizationJsonLd,
 } from '../json-ld.js'
 import { renderBlocksToHtml } from '../content-renderer.js'
-import { buildHtmlDocument, buildMetaTags, buildSeoResponse } from '../html-builder.js'
+import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
+import { INDEXABLE_LOCALES, isIndexable, isUiLocale, DEFAULT_LOCALE } from '../../locale-policy.js'
 
 export async function handleContentDetailBot(slug, url, env) {
   const restUrl = getSupabaseRestUrl(env)
   const anonKey = getSupabaseAnonKey(env)
-  const lang = url.searchParams.get('lang') || 'en'
+  // Normalize untrusted ?lang against the registry: only a real UI locale is
+  // allowed through to fetches, headers and reflected hrefs (closes injection/XSS).
+  const rawLang = url.searchParams.get('lang')
+  const lang = isUiLocale(rawLang) ? rawLang : 'en'
 
-  // Try requested locale first, fallback to any locale for this slug
-  let res, data, article
+  // Two queries: (1) cheap select=locale to learn which locales exist for this
+  // slug (drives hreflang), (2) fetch ONLY the chosen article's full row (avoids
+  // pulling every locale's content_blocks). Chosen = requested → default(en) → any.
+  let present = []
+  let article = null
   try {
-    res = await fetch(
-      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&locale=eq.${lang}&limit=1`,
-      { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+    const hdr = { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+    const localesRes = await fetch(
+      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=locale`,
+      { headers: hdr },
     )
-    if (res.ok) {
-      data = await res.json()
-      article = data?.[0]
-    }
-
-    if (!article) {
-      // Fallback: try without locale filter
-      res = await fetch(
-        `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&limit=1`,
-        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+    if (localesRes.ok) present = ((await localesRes.json()) || []).map((r) => r.locale)
+    const chosen = present.includes(lang)
+      ? lang
+      : (present.includes(DEFAULT_LOCALE) ? DEFAULT_LOCALE : present[0])
+    if (chosen) {
+      const artRes = await fetch(
+        `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&locale=eq.${chosen}&limit=1`,
+        { headers: hdr },
       )
-      if (res.ok) {
-        data = await res.json()
-        article = data?.[0]
-      }
+      if (artRes.ok) article = (await artRes.json())?.[0]
     }
   } catch (err) {
     console.error('Content detail fetch error:', err)
     return null
   }
-
   if (!article) return null
+
+  // hreflang: only locales that BOTH exist for this slug AND are indexable, in
+  // canonical (registry) order. Robots: non-indexable locales (legacy minor-language
+  // pages we no longer index) get noindex so they stop diluting site-wide quality,
+  // while staying live for users.
+  const presentSet = new Set(present)
+  const availableLocales = INDEXABLE_LOCALES.filter((l) => presentSet.has(l))
+  const robots = isIndexable(article.locale) ? ROBOTS_INDEX : ROBOTS_NOINDEX
 
   // Fetch related articles (same locale, different slug, preferring shared tags)
   let relatedArticles = []
@@ -105,12 +115,10 @@ export async function handleContentDetailBot(slug, url, env) {
     },
   })
 
-  const feedLinks = `<link rel="alternate" type="application/rss+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.xml${lang !== 'en' ? `?lang=${lang}` : ''}">`
-  const hreflangTags = buildHreflangTags(`/insight/${escapeHtml(slug)}`, true)
+  const feedLinks = `<link rel="alternate" type="application/rss+xml" title="${BRAND_NAME} Learning Insights" href="${SITE_URL}/feed.xml${article.locale !== 'en' ? `?lang=${article.locale}` : ''}">`
+  const hreflangTags = buildHreflangTags(`/insight/${escapeHtml(slug)}`, true, availableLocales)
 
-  const jsonLdScripts = [articleJsonLd, breadcrumbJsonLd, learningResourceJsonLd, buildOrganizationJsonLd()]
-    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`)
-    .join('\n')
+  const jsonLdScripts = renderJsonLd([articleJsonLd, breadcrumbJsonLd, learningResourceJsonLd, buildOrganizationJsonLd()])
 
   const head = `${metaTags}
 ${feedLinks}
@@ -147,11 +155,11 @@ ${relatedArticles.map((r) => {
 <p><a href="${SITE_URL}/landing">${article.locale === 'ko' ? `${BRAND_NAME}에서 학습 시작하기` : `Start Learning with ${BRAND_NAME}`}</a></p>
 </footer>`
 
-  const html = buildHtmlDocument({ lang: article.locale, head, body })
+  const html = buildHtmlDocument({ lang: article.locale, head, body, robots })
 
   return buildSeoResponse(html, {
     lang: article.locale,
     cacheSeconds: 3600,
-    robots: 'index, follow, max-image-preview:large',
+    robots,
   })
 }

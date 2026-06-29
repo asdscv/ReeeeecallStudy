@@ -163,7 +163,8 @@ export function buildWebApplicationJsonLd() {
 }
 
 export function buildStaticHreflangAlternates(path: string) {
-  const alternates: { lang: string; href: string }[] = SEO.SUPPORTED_LOCALES.map((locale) => ({
+  // Only indexable locales get hreflang — minor languages are noindex now.
+  const alternates: { lang: string; href: string }[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
     lang: locale as string,
     href: `${SEO.SITE_URL}${path}?lang=${locale}`,
   }))
@@ -172,7 +173,8 @@ export function buildStaticHreflangAlternates(path: string) {
 }
 
 export function buildHreflangAlternates(slug: string) {
-  const alternates: { lang: string; href: string }[] = SEO.SUPPORTED_LOCALES.map((locale) => ({
+  // Only indexable locales get hreflang — minor languages are noindex now.
+  const alternates: { lang: string; href: string }[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
     lang: locale as string,
     href: `${SEO.SITE_URL}/insight/${slug}?lang=${locale}`,
   }))
@@ -200,6 +202,8 @@ export function buildOrganizationJsonLd() {
       '@type': 'ContactPoint',
       contactType: 'customer service',
       email: SEO.CONTACT_EMAIL,
+      // Support languages (all UI/SUPPORTED_LOCALES) — intentionally broader than
+      // the indexable set, since the app is served in all 8 languages.
       availableLanguage: SEO.SUPPORTED_LOCALES.map((l) => LOCALE_TO_LANGUAGE[l] ?? l),
     },
   }
@@ -211,7 +215,8 @@ export function buildWebSiteJsonLd() {
     '@type': 'WebSite',
     name: SEO.BRAND_NAME,
     url: SEO.SITE_URL,
-    inLanguage: [...SEO.SUPPORTED_LOCALES],
+    // inLanguage = indexable content languages only (mirrors the worker).
+    inLanguage: [...SEO.INDEXABLE_LOCALES],
     potentialAction: {
       '@type': 'SearchAction',
       target: `${SEO.SITE_URL}/insight?q={search_term_string}`,

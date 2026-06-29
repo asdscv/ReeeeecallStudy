@@ -9,7 +9,7 @@ import { callAI, generateImage } from './ai-client.js'
 import { validateArticle, enrichCtaUrls } from './content-schema.js'
 import { createSupabaseClient } from './supabase-client.js'
 import { checkDuplicate, checkSameRunDuplicate, appendDateSuffix } from './dedup.js'
-import { submitToIndexNow, pingSitemapUpdate } from './indexnow.js'
+import { submitToIndexNow } from './indexnow.js'
 
 function generateRunId() {
   return `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
@@ -130,31 +130,34 @@ export async function runContentPipeline(env, cron) {
 
     info('Pipeline completed', { topicsAttempted, successCount, target: topicCount })
 
-    // Submit newly published URLs to search engines
-    const publishedSlugs = [...runState.slugs].map((s) => s.split('__')[0])
-    const uniqueSlugs = [...new Set(publishedSlugs)]
-    if (uniqueSlugs.length > 0) {
+    // Submit only the locale URLs we actually published. runState.slugs holds
+    // `slug__locale` keys, so we emit the canonical /insight/<slug> once plus a
+    // ?lang= URL only for translations that exist — no phantom variants.
+    const publishedKeys = [...runState.slugs]
+    if (publishedKeys.length > 0) {
       const SITE_URL = 'https://reeeeecallstudy.xyz'
-      const newUrls = uniqueSlugs.flatMap((slug) => [
-        `${SITE_URL}/insight/${slug}`,
-        ...LOCALES.map((l) => `${SITE_URL}/insight/${slug}?lang=${l}`),
-      ])
-      // Also include the list page since it has new content
+      const seenSlug = new Set()
+      const newUrls = []
+      for (const key of publishedKeys) {
+        const [slug, locale] = key.split('__')
+        if (!seenSlug.has(slug)) {
+          newUrls.push(`${SITE_URL}/insight/${slug}`)
+          seenSlug.add(slug)
+        }
+        if (locale && locale !== DEFAULT_LOCALE) {
+          newUrls.push(`${SITE_URL}/insight/${slug}?lang=${locale}`)
+        }
+      }
+      // Also notify about the list page since it has new content
       newUrls.push(`${SITE_URL}/insight`)
-      newUrls.push(`${SITE_URL}/sitemap.xml`)
 
+      // IndexNow reaches Bing/Yandex/Naver instantly. Google retired its sitemap
+      // ping endpoint in 2023, so there is no equivalent push path for Google.
       try {
         await submitToIndexNow(env, newUrls)
         info('IndexNow: submitted URLs', { count: newUrls.length })
       } catch (err) {
         warn('IndexNow submission failed', { error: err.message })
-      }
-
-      try {
-        await pingSitemapUpdate()
-        info('Sitemap ping: sent to Google & Bing')
-      } catch (err) {
-        warn('Sitemap ping failed', { error: err.message })
       }
     }
   } catch (err) {

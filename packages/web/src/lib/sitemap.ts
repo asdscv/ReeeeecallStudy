@@ -22,6 +22,8 @@ function buildUrlEntry(entry: SitemapEntry, includeHreflang = false): string {
 
   if (includeHreflang) {
     const basePath = entry.loc.replace(SEO.SITE_URL, '')
+    // NOTE: this build-time generator is latent — production /sitemap.xml is served
+    // dynamically by the worker (which filters to indexable locales). Left as-is.
     for (const lang of SEO.SUPPORTED_LOCALES) {
       lines.push(`    <xhtml:link rel="alternate" hreflang="${lang}" href="${SEO.SITE_URL}${basePath}?lang=${lang}" />`)
     }
