@@ -71,6 +71,25 @@ function sbServiceRole() {
   )
 }
 
+// Best-effort privileged refund when generation fails AFTER we metered. NOTE:
+// supabase-js's rpc() returns a PostgrestFilterBuilder that is thenable but has
+// NO `.catch` — `.rpc(...).catch(...)` throws "catch is not a function" and the
+// refund never fires (the whole point of the job-ref hardening). So await it and
+// inspect the RETURNED error (PostgREST errors don't throw), wrapped for the
+// network-throw case. Must not mask the caller's provider-failure response.
+async function refundJob(userId: string, jobRef: string | undefined): Promise<void> {
+  if (!jobRef) return
+  try {
+    const { error } = await sbServiceRole().rpc('refund_ai_job', {
+      p_user_id: userId,
+      p_job_ref: jobRef,
+    })
+    if (error) console.error('[ai-generate] refund failed (job', jobRef, '):', error.message)
+  } catch (re) {
+    console.error('[ai-generate] refund threw (job', jobRef, '):', re)
+  }
+}
+
 // ── Auth (mirror tts) ───────────────────────────────────────
 async function verifyUser(authHeader: string | null): Promise<string | null> {
   if (!authHeader) return null
@@ -285,10 +304,7 @@ Deno.serve(async (req) => {
       } catch (e) {
         const msg = (e as Error).message
         console.error('[ai-generate] vision failure:', msg)
-        if (imgMeter.job_ref) {
-          await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: imgMeter.job_ref })
-            .catch((re) => console.error('[ai-generate] image refund failed (job', imgMeter.job_ref, ')', re))
-        }
+        await refundJob(userId, imgMeter.job_ref)
         const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
         return json({ error: 'Generation failed', code }, 502, cors)
       }
@@ -359,10 +375,7 @@ Deno.serve(async (req) => {
       // Metering committed before generation — refund the recorded job so a
       // provider failure burns nothing. The RPC derives the amount from the job
       // row (service_role only). Best-effort (don't mask the 502).
-      if (meter.job_ref) {
-        await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: meter.job_ref })
-          .catch((re) => console.error('[ai-generate] refund failed (job', meter.job_ref, ')', re))
-      }
+      await refundJob(userId, meter.job_ref)
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)
     }
