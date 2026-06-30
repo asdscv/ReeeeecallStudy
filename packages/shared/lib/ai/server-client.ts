@@ -80,3 +80,27 @@ export async function getAiGenerationQuota(): Promise<AiGenerationQuota> {
     remaining: Number(row.remaining ?? 10),
   }
 }
+
+export interface AiWallet {
+  balance: number
+  creditsPerCard: number
+}
+
+// Caller's prepaid credit wallet (Phase 1). Fails open to {0,1} — the server is
+// authoritative (debits atomically, 402s when short).
+export async function getAiWallet(): Promise<AiWallet> {
+  const { data, error } = await supabase.rpc('get_ai_wallet')
+  const row = Array.isArray(data) ? data[0] : data
+  if (error || !row) return { balance: 0, creditsPerCard: 1 }
+  return {
+    balance: Number(row.balance ?? 0),
+    creditsPerCard: Number(row.credits_per_card ?? 1),
+  }
+}
+
+// Cards the user can generate right now = free remaining + what credits can buy.
+export async function getAffordableCards(): Promise<{ free: number; paid: number; total: number }> {
+  const [q, w] = await Promise.all([getAiGenerationQuota(), getAiWallet()])
+  const paid = w.creditsPerCard > 0 ? Math.floor(w.balance / w.creditsPerCard) : 0
+  return { free: q.remaining, paid, total: q.remaining + paid }
+}

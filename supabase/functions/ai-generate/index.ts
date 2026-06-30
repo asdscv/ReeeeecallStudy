@@ -270,8 +270,13 @@ Deno.serve(async (req) => {
       p_cards: pCards,
     })
     if (quotaErr) {
+      // P0002 = over free allowance AND not enough credits → needs top-up.
+      if (quotaErr.code === 'P0002') {
+        return json({ error: 'Insufficient AI credits', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+      }
+      // 23514 = daily request cap (abuse guard).
       if (quotaErr.code === '23514') {
-        return json({ error: 'Daily free quota exceeded', code: 'AI_QUOTA_EXCEEDED' }, 429, cors)
+        return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
       }
       console.error('[ai-generate] metering error:', quotaErr.message)
       return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
