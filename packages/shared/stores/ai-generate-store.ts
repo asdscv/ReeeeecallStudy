@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import i18next from 'i18next'
-import { callServerAI, getAiGenerationQuota } from '../lib/ai/server-client'
+import { callServerAI, getAffordableCards } from '../lib/ai/server-client'
 import type { FieldHint } from '../lib/ai/prompts'
 import { validateTemplateResponse, validateDeckResponse, validateCardsResponse } from '../lib/ai/validators'
 import { supabase } from '../lib/supabase'
@@ -75,6 +75,7 @@ const initialState = {
 
 // Fallback strings in case the ai-generate i18n namespace isn't loaded (e.g. mobile)
 const ERROR_FALLBACKS: Record<string, string> = {
+  insufficientCredits: "You've used today's free AI cards and have no credits left. Top up to keep generating.",
   quotaExceeded: "You've reached today's free AI generation limit. Please try again tomorrow.",
   rateLimited: 'Rate limited. Please wait a moment and try again.',
   invalidResponse: 'AI returned an invalid response. Please try again.',
@@ -91,8 +92,8 @@ function t(key: string): string {
 
 function mapError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
-  if (msg === 'AI_QUOTA_EXCEEDED') return t('quotaExceeded')
-  if (msg === 'RATE_LIMITED') return t('rateLimited')
+  if (msg === 'AI_INSUFFICIENT_CREDITS' || msg === 'AI_QUOTA_EXCEEDED') return t('insufficientCredits')
+  if (msg === 'AI_RATE_CAP' || msg === 'RATE_LIMITED') return t('rateLimited')
   if (msg === 'INVALID_RESPONSE' || msg === 'ALL_CARDS_INVALID') return t('invalidResponse')
   if (msg === 'AI_PROVIDER_ERROR' || msg === 'AI_PROVIDER_AUTH' || msg === 'AI_NOT_CONFIGURED' || msg === 'AI_METER_ERROR' || msg === 'SERVER_ERROR') {
     return t('serverError')
@@ -120,10 +121,11 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateTemplate: async () => {
     set({ currentStep: 'generating_template', error: null })
     try {
-      // M3: fail fast before any paid call if the daily free quota is exhausted
-      // (full-mode entry — avoids wasting template + deck provider calls).
-      const { remaining } = await getAiGenerationQuota()
-      if (remaining <= 0) throw new Error('AI_QUOTA_EXCEEDED')
+      // Fail fast before any paid call if the user can't afford a single card
+      // (no free left AND no credits) — avoids wasting template + deck calls.
+      // Only hard-block when the wallet is KNOWN (L1: don't block on a read blip).
+      const aff = await getAffordableCards()
+      if (aff.walletKnown && aff.total <= 0) throw new Error('AI_QUOTA_EXCEEDED')
       const uiLang = i18next.language
       const { topic, useCustomHtml, contentLang, fieldHints } = get()
       const { content } = await callServerAI({
@@ -188,11 +190,12 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       }
       if (!fields || fields.length === 0) throw new Error('INVALID_RESPONSE')
 
-      // Phase 0: cap the request to the remaining daily free quota. The server
-      // is authoritative (meters + 429s), this just avoids requesting over-free.
-      const { remaining } = await getAiGenerationQuota()
-      if (remaining <= 0) throw new Error('AI_QUOTA_EXCEEDED')
-      const effectiveCount = Math.min(cardCount, remaining)
+      // Phase 1: cap to what the user can afford = free remaining + credits.
+      // The server is authoritative (debits atomically, 402s when short). If the
+      // wallet read failed (walletKnown=false), don't cap/block — defer to server.
+      const aff = await getAffordableCards()
+      if (aff.walletKnown && aff.total <= 0) throw new Error('AI_QUOTA_EXCEEDED')
+      const effectiveCount = aff.walletKnown ? Math.min(cardCount, aff.total) : cardCount
 
       // Get existing cards for dedup in cards_only mode
       let existingCards: Record<string, string>[] | undefined

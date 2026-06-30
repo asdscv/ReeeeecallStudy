@@ -143,3 +143,26 @@ local-supabase end-to-end (`supabase start` + `functions serve`) is the one unte
 - Phase-1 vision/image-recognition already has its model seam (`AI_VISION_MODEL` / `resolveModel('vision')`).
 - Future option (not built): a DB `ai_generation_config` table for per-tier/A-B model routing
   without touching secrets.
+
+## 13. Phase 1a — prepaid credit wallet + pay-as-you-go overage (SHIPPED to develop)
+Cards beyond the daily free 10 now spend prepaid credits instead of hard-failing.
+- **mig 109**: `ai_credit_balance` (deny-all, CHECK balance>=0) + `ai_credit_ledger`
+  (append-only audit) + `add_ai_credits` (**service_role / admin only** — for payment
+  webhooks & IAP validation; never a plain user) + `get_ai_wallet` + `_ai_credits_per_card`
+  (config seam, 1 credit/card default).
+- `record_ai_generation` redesigned: splits each call free-vs-paid; the paid portion
+  debits credits **atomically** (`UPDATE … WHERE balance>=need`, row-locked via
+  `SELECT … FOR UPDATE`); insufficient → `P0002` RAISE (rolls back, consumes nothing).
+- edge fn: `P0002`→402 `AI_INSUFFICIENT_CREDITS`, `23514`→429 `AI_RATE_CAP`.
+- shared: `getAiWallet` + `getAffordableCards` (free remaining + credits/card); store
+  caps generation to affordable (was free-only), maps the insufficient-credits error.
+- Verified: wallet/overage on real Postgres (`ALL_109_TESTS_PASSED`, T1–T9), web+mobile
+  `tsc` exit 0, AI suite 67/67. (Visible balance widget deferred to the payment-UI phase.)
+
+## 14. Remaining Phase 1
+- **1b** image upload → vision recognition → cards (paid via `image_jobs`/credits;
+  `resolveModel('vision')` seam ready; needs a vision-capable provider key + storage + UI).
+- **1c** payment rails — web PortOne + mobile Apple IAP / Google Play Billing (RevenueCat),
+  crediting the wallet via `add_ai_credits` (service_role). Strategy A; Korea bans out-links.
+  **External: merchant/store credentials + product setup + Apple-review (RevenueCat was rejected).**
+- Pricing: set ₩/credit + credits-per-image at the payment layer (`_ai_credits_per_card` is the card seam).
