@@ -29,8 +29,11 @@
 | 항목 | 값/위치 |
 |---|---|
 | ASC App ID | `6761741123` (`eas.json` → `submit.production.ios.ascAppId`) |
-| ASC API Key | EAS 서버 보관 (`[Expo] EAS Submit ePMykaounl`, Key ID `3WP682B9A8`, issuer `d27e6eb1-13fa-49f1-b93d-03aadcdae8f0`) |
-| Apple Team issuer | `d27e6eb1-…` (이 팀의 모든 ASC 키가 공유하는 issuer) |
+| Apple Team issuer | `d27e6eb1-13fa-49f1-b93d-03aadcdae8f0` (이 팀의 모든 ASC 키가 공유) |
+| ASC API Key (EAS 서버) | `[Expo] EAS Submit ePMykaounl`, Key ID `3WP682B9A8`, Admin — `eas submit`이 기본 사용(.p8 추출 불가) |
+| **ASC API Key (로컬, 프로젝트 보관)** | **`packages/mobile/AuthKey_LS8N7G3T8V.p8`** (Key ID `LS8N7G3T8V`, App Manager) — **gitignore(`AuthKey_*.p8`)**. `eas.json` `submit.production.ios.ascApiKeyPath/Id/IssuerId`에 연결됨 → 이후 `eas submit ios`는 이 로컬 키 사용. **fastlane `deliver`(App Store 심사 제출)에도 이 키 사용.** |
+
+> 🔑 **자격증명 파일 위치(둘 다 gitignore, 절대 커밋 안 됨)**: iOS=`packages/mobile/AuthKey_LS8N7G3T8V.p8`, Android=`packages/mobile/google-service-account.json`. 분실 시 ASC/GCP에서 재발급 필요(.p8는 1회만 다운로드).
 
 제출 명령:
 ```bash
