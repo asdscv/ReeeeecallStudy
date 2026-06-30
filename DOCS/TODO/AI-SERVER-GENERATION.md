@@ -129,3 +129,17 @@ edge secret (Gemini key — none found in env; verified live via Grok since the 
 provider-agnostic), apply mig 108 to prod, `supabase functions deploy ai-generate`. A full
 local-supabase end-to-end (`supabase start` + `functions serve`) is the one untested seam
 (components individually verified).
+
+## 12. Provider/model extensibility (registry)
+`supabase/functions/_shared/ai-providers.ts` = the seam that makes provider/model
+"easily extensible anytime":
+- **Add a provider** = one entry in `PROVIDERS` (id → baseUrl + default text/vision models).
+  Ships with gemini · xai · openai · deepseek · openrouter (all OpenAI-compatible).
+- **Switch at runtime, no redeploy** — all knobs are Supabase edge secrets:
+  `AI_GENERATION_PROVIDER` (id, default gemini) · `AI_GENERATION_PROVIDER_KEY` · `AI_GENERATION_MODEL`
+  · `AI_VISION_MODEL` (Phase-1 image path) · `AI_GENERATION_BASE_URL` (custom endpoint override).
+- `resolveModel(purpose, env)` is pure + unit-tested (`server-providers.test.ts`, 7 cases):
+  per-purpose (text vs vision) model selection, defaults, overrides, null→503.
+- Phase-1 vision/image-recognition already has its model seam (`AI_VISION_MODEL` / `resolveModel('vision')`).
+- Future option (not built): a DB `ai_generation_config` table for per-tier/A-B model routing
+  without touching secrets.

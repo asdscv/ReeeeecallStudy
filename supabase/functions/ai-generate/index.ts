@@ -20,12 +20,11 @@ import {
   type FieldHint,
   type GeneratedTemplateField,
 } from '../_shared/ai-prompts.ts'
+import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
 
-// ── Provider config (server-only secrets) ───────────────────
-const PROVIDER_KEY = Deno.env.get('AI_GENERATION_PROVIDER_KEY') ?? ''
-const MODEL = Deno.env.get('AI_GENERATION_MODEL') ?? 'gemini-2.5-flash-lite'
-const BASE_URL = Deno.env.get('AI_GENERATION_BASE_URL') ??
-  'https://generativelanguage.googleapis.com/v1beta/openai'
+// Provider + model are resolved per request from the registry (env-driven) —
+// see _shared/ai-providers.ts. Switching provider/model needs no code change.
+const ENV = (k: string) => Deno.env.get(k)
 
 // ── Limits ──────────────────────────────────────────────────
 const MAX_TOPIC_LEN = 2000
@@ -84,9 +83,9 @@ function stripMarkdownFences(text: string): string {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-async function providerRequest(systemPrompt: string, userPrompt: string): Promise<string> {
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string): Promise<string> {
   const body = {
-    model: MODEL,
+    model: m.model,
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
@@ -101,9 +100,9 @@ async function providerRequest(systemPrompt: string, userPrompt: string): Promis
     const timer = setTimeout(() => ctrl.abort(), PROVIDER_TIMEOUT_MS)
     let res: Response
     try {
-      res = await fetch(`${BASE_URL}/chat/completions`, {
+      res = await fetch(`${m.baseUrl}/chat/completions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${PROVIDER_KEY}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${m.apiKey}` },
         body: JSON.stringify(body),
         signal: ctrl.signal,
       })
@@ -135,14 +134,14 @@ async function providerRequest(systemPrompt: string, userPrompt: string): Promis
 }
 
 // Returns parsed JSON; one stricter-prompt retry on unparseable output (mirrors callAI).
-async function generate(systemPrompt: string, userPrompt: string): Promise<Record<string, unknown>> {
-  const first = stripMarkdownFences(await providerRequest(systemPrompt, userPrompt))
+async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string): Promise<Record<string, unknown>> {
+  const first = stripMarkdownFences(await providerRequest(m, systemPrompt, userPrompt))
   try {
     return JSON.parse(first)
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const retry = stripMarkdownFences(await providerRequest(strict, userPrompt))
+    const retry = stripMarkdownFences(await providerRequest(m, strict, userPrompt))
     return JSON.parse(retry)
   }
 }
@@ -215,8 +214,9 @@ Deno.serve(async (req) => {
     const userId = await verifyUser(authHeader)
     if (!userId) return json({ error: 'Unauthorized' }, 401, cors)
 
-    if (!PROVIDER_KEY) {
-      console.error('[ai-generate] AI_GENERATION_PROVIDER_KEY not set')
+    const model = resolveModel('text', ENV)
+    if (!model) {
+      console.error('[ai-generate] no provider configured (set AI_GENERATION_PROVIDER_KEY)')
       return json({ error: 'Server not configured', code: 'AI_NOT_CONFIGURED' }, 503, cors)
     }
 
@@ -280,7 +280,7 @@ Deno.serve(async (req) => {
     // Generate.
     let content: Record<string, unknown>
     try {
-      content = await generate(systemPrompt, userPrompt)
+      content = await generate(model, systemPrompt, userPrompt)
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
