@@ -77,7 +77,8 @@
     "saveFailed": "保存生成的卡片失败",
     "imageRequired": "请先选择一张图片。",
     "selectImageError": "该图片过大或无法读取。请尝试较小的照片。",
-    "permissionDenied": "需要照片访问权限才能上传图片。"
+    "permissionDenied": "需要照片访问权限才能上传图片。",
+    "deckNoTemplate": "此卡组还没有卡片模板——请打开它并添加一张卡片以完成设置。"
   },
   "errors": {
     "insufficientCredits": "您今天的免费AI卡片已用完，且没有剩余点数。请充值以继续生成。",

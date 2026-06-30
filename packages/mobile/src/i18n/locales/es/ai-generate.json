@@ -77,7 +77,8 @@
     "saveFailed": "No se pudieron guardar las tarjetas generadas",
     "imageRequired": "Por favor, selecciona primero una imagen.",
     "selectImageError": "Esa imagen es demasiado grande o no se pudo leer. Prueba con una foto más pequeña.",
-    "permissionDenied": "Se necesita acceso a las fotos para subir una imagen."
+    "permissionDenied": "Se necesita acceso a las fotos para subir una imagen.",
+    "deckNoTemplate": "Este mazo aún no tiene plantilla de tarjeta: ábrelo y añade una tarjeta una vez para configurarla."
   },
   "errors": {
     "insufficientCredits": "Has usado tus tarjetas de IA gratuitas de hoy y no te quedan créditos. Recarga para seguir generando.",
