@@ -27,7 +27,13 @@
     "autoDetect": "Detección automática",
     "cardCountLabel": "Número de tarjetas:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100 tarjetas"
+    "cardCountHint": "1–100 tarjetas",
+    "inputModeTopic": "Tema",
+    "inputModeImage": "Imagen",
+    "imageUpload": "Subir imagen",
+    "imageChange": "Cambiar imagen",
+    "imageHint": "Elige una foto: la IA la convierte en tarjetas.",
+    "imagePaidNotice": "La generación con imágenes usa créditos."
   },
   "deck": {
     "section": "SELECCIONAR MAZO",
@@ -58,10 +64,28 @@
     "retry": "Reintentar",
     "back": "Volver"
   },
+  "wallet": {
+    "summary": "{{free}} gratis + {{credits}} tarjetas de pago hoy",
+    "creditsOnly": "{{credits}} tarjetas de pago disponibles",
+    "empty": "No quedan tarjetas gratuitas ni créditos",
+    "unknown": "Saldo no disponible"
+  },
   "alert": {
     "errorTitle": "Error",
     "enterTopic": "Por favor, introduce un tema",
     "configureProvider": "Por favor, configura primero un proveedor de IA en Ajustes.",
-    "saveFailed": "No se pudieron guardar las tarjetas generadas"
+    "saveFailed": "No se pudieron guardar las tarjetas generadas",
+    "imageRequired": "Por favor, selecciona primero una imagen.",
+    "selectImageError": "Esa imagen es demasiado grande o no se pudo leer. Prueba con una foto más pequeña.",
+    "permissionDenied": "Se necesita acceso a las fotos para subir una imagen."
+  },
+  "errors": {
+    "insufficientCredits": "Has usado tus tarjetas de IA gratuitas de hoy y no te quedan créditos. Recarga para seguir generando.",
+    "invalidImage": "No se pudo leer esa imagen. Prueba con una foto más pequeña o más nítida.",
+    "quotaExceeded": "Has alcanzado el límite gratuito de generación con IA de hoy. Inténtalo de nuevo mañana.",
+    "rateLimited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+    "invalidResponse": "La IA devolvió una respuesta no válida. Inténtalo de nuevo.",
+    "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
+    "serverError": "La generación con IA no está disponible temporalmente. Inténtalo de nuevo más tarde."
   }
 }

@@ -27,7 +27,19 @@
     "autoDetect": "Auto-detect",
     "cardCountLabel": "Number of cards:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100 cards"
+    "cardCountHint": "1–100 cards",
+    "inputModeTopic": "Topic",
+    "inputModeImage": "Image",
+    "imageUpload": "Upload image",
+    "imageChange": "Change image",
+    "imageHint": "Pick a photo — AI turns it into cards.",
+    "imagePaidNotice": "Image generation uses credits."
+  },
+  "wallet": {
+    "summary": "{{free}} free + {{credits}} paid cards today",
+    "creditsOnly": "{{credits}} paid cards available",
+    "empty": "No free cards or credits left",
+    "unknown": "Balance unavailable"
   },
   "deck": {
     "section": "SELECT DECK",
@@ -62,6 +74,18 @@
     "errorTitle": "Error",
     "enterTopic": "Please enter a topic",
     "configureProvider": "Please configure an AI provider in Settings first.",
-    "saveFailed": "Failed to save generated cards"
+    "saveFailed": "Failed to save generated cards",
+    "imageRequired": "Please select an image first.",
+    "selectImageError": "That image is too large or couldn't be read. Try a smaller photo.",
+    "permissionDenied": "Photo access is needed to upload an image."
+  },
+  "errors": {
+    "insufficientCredits": "You've used today's free AI cards and have no credits left. Top up to keep generating.",
+    "invalidImage": "Couldn't read that image. Please try a smaller or clearer photo.",
+    "quotaExceeded": "You've reached today's free AI generation limit. Please try again tomorrow.",
+    "rateLimited": "Rate limited. Please wait a moment and try again.",
+    "invalidResponse": "AI returned an invalid response. Please try again.",
+    "networkError": "Network error. Please check your connection and try again.",
+    "serverError": "AI generation is temporarily unavailable. Please try again later."
   }
 }

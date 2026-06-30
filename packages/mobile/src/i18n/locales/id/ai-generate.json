@@ -27,7 +27,13 @@
     "autoDetect": "Deteksi otomatis",
     "cardCountLabel": "Jumlah kartu:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100 kartu"
+    "cardCountHint": "1–100 kartu",
+    "inputModeTopic": "Topik",
+    "inputModeImage": "Gambar",
+    "imageUpload": "Unggah gambar",
+    "imageChange": "Ganti gambar",
+    "imageHint": "Pilih foto — AI mengubahnya menjadi kartu.",
+    "imagePaidNotice": "Pembuatan gambar menggunakan kredit."
   },
   "deck": {
     "section": "PILIH DEK",
@@ -58,10 +64,28 @@
     "retry": "Coba Lagi",
     "back": "Kembali"
   },
+  "wallet": {
+    "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar hari ini",
+    "creditsOnly": "{{credits}} kartu berbayar tersedia",
+    "empty": "Tidak ada kartu gratis atau kredit tersisa",
+    "unknown": "Saldo tidak tersedia"
+  },
   "alert": {
     "errorTitle": "Kesalahan",
     "enterTopic": "Silakan masukkan topik",
     "configureProvider": "Silakan konfigurasikan penyedia AI di Pengaturan terlebih dahulu.",
-    "saveFailed": "Gagal menyimpan kartu yang dibuat"
+    "saveFailed": "Gagal menyimpan kartu yang dibuat",
+    "imageRequired": "Silakan pilih gambar terlebih dahulu.",
+    "selectImageError": "Gambar tersebut terlalu besar atau tidak dapat dibaca. Coba foto yang lebih kecil.",
+    "permissionDenied": "Akses foto diperlukan untuk mengunggah gambar."
+  },
+  "errors": {
+    "insufficientCredits": "Anda telah menggunakan kartu AI gratis hari ini dan tidak memiliki kredit tersisa. Isi ulang untuk terus membuat kartu.",
+    "invalidImage": "Tidak dapat membaca gambar tersebut. Silakan coba foto yang lebih kecil atau lebih jelas.",
+    "quotaExceeded": "Anda telah mencapai batas pembuatan AI gratis hari ini. Silakan coba lagi besok.",
+    "rateLimited": "Terlalu banyak permintaan. Silakan tunggu sebentar dan coba lagi.",
+    "invalidResponse": "AI mengembalikan respons yang tidak valid. Silakan coba lagi.",
+    "networkError": "Kesalahan jaringan. Silakan periksa koneksi Anda dan coba lagi.",
+    "serverError": "Pembuatan dengan AI untuk sementara tidak tersedia. Silakan coba lagi nanti."
   }
 }

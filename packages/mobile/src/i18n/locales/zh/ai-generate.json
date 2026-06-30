@@ -27,7 +27,13 @@
     "autoDetect": "自动检测",
     "cardCountLabel": "卡片数量：",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100张卡片"
+    "cardCountHint": "1–100张卡片",
+    "inputModeTopic": "主题",
+    "inputModeImage": "图片",
+    "imageUpload": "上传图片",
+    "imageChange": "更换图片",
+    "imageHint": "选择一张照片，AI会将其转换为卡片。",
+    "imagePaidNotice": "图片生成需要消耗点数。"
   },
   "deck": {
     "section": "选择卡组",
@@ -58,10 +64,28 @@
     "retry": "重试",
     "back": "返回"
   },
+  "wallet": {
+    "summary": "今日可用 {{free}} 张免费 + {{credits}} 张付费卡片",
+    "creditsOnly": "可用 {{credits}} 张付费卡片",
+    "empty": "没有剩余的免费卡片或点数",
+    "unknown": "余额不可用"
+  },
   "alert": {
     "errorTitle": "错误",
     "enterTopic": "请输入主题",
     "configureProvider": "请先在设置中配置AI提供商。",
-    "saveFailed": "保存生成的卡片失败"
+    "saveFailed": "保存生成的卡片失败",
+    "imageRequired": "请先选择一张图片。",
+    "selectImageError": "该图片过大或无法读取。请尝试较小的照片。",
+    "permissionDenied": "需要照片访问权限才能上传图片。"
+  },
+  "errors": {
+    "insufficientCredits": "您今天的免费AI卡片已用完，且没有剩余点数。请充值以继续生成。",
+    "invalidImage": "无法读取该图片。请尝试更小或更清晰的照片。",
+    "quotaExceeded": "您已达到今日免费AI生成上限。请明天再试。",
+    "rateLimited": "请求过于频繁。请稍候片刻后重试。",
+    "invalidResponse": "AI返回了无效的响应。请重试。",
+    "networkError": "网络错误。请检查您的网络连接后重试。",
+    "serverError": "AI生成暂时不可用。请稍后再试。"
   }
 }
