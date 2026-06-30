@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator'
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
@@ -174,7 +175,7 @@ export function AIGenerateScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
   const store = useAIGenerateStore()
-  const { decks, templates } = useDecks()
+  const { decks } = useDecks()
 
   const [step, setStep] = useState<WizardStep>('config')
 
@@ -193,6 +194,12 @@ export function AIGenerateScreen() {
 
   const useImage = !!selectedDeckId && imageMode === 'image'
 
+  // cards_only adds cards INTO an existing deck, so they must use that deck's
+  // own template — never an arbitrary global templates[0], whose fields wouldn't
+  // match the deck. A deck with no default_template_id can't accept AI cards yet.
+  const selectedDeck = decks.find((d) => d.id === selectedDeckId)
+  const cardsOnlyNeedsTemplate = !!selectedDeckId && !selectedDeck?.default_template_id
+
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
@@ -207,18 +214,44 @@ export function AIGenerateScreen() {
       Alert.alert(t('alert.errorTitle'), t('alert.permissionDenied'))
       return
     }
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], base64: true, quality: 0.5 })
-    if (res.canceled || !res.assets?.[0]?.base64) return
+    // Pick the raw asset (no base64 yet) — we downscale dimensions + recompress
+    // ourselves so a multi-MP phone photo becomes a small JPEG instead of being
+    // rejected by the size cap. Mirrors the web canvas ≤1600px downscale.
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 })
+    if (res.canceled || !res.assets?.[0]?.uri) return
     const asset = res.assets[0]
-    const dataUrl = `data:${asset.mimeType || 'image/jpeg'};base64,${asset.base64}`
-    if (dataUrl.length > 6_500_000) {
+    try {
+      const MAX_DIM = 1600
+      const w = asset.width || 0
+      const h = asset.height || 0
+      const longer = Math.max(w, h)
+      // Resize the longer side to MAX_DIM (ratio preserved); never upscale.
+      const actions: ImageManipulator.Action[] =
+        longer > MAX_DIM ? [{ resize: w >= h ? { width: MAX_DIM } : { height: MAX_DIM } }] : []
+      const out = await ImageManipulator.manipulateAsync(asset.uri, actions, {
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true,
+      })
+      if (!out.base64) { Alert.alert(t('alert.errorTitle'), t('alert.selectImageError')); return }
+      const dataUrl = `data:image/jpeg;base64,${out.base64}`
+      if (dataUrl.length > 6_500_000) {
+        Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
+        return
+      }
+      setImageDataUrl(dataUrl)
+    } catch {
       Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
-      return
     }
-    setImageDataUrl(dataUrl)
   }
 
   const handleGenerate = async () => {
+    // A cards_only deck with no template can't accept generated cards — block
+    // before spending anything (the generate button is also disabled for this).
+    if (cardsOnlyNeedsTemplate) {
+      Alert.alert(t('alert.errorTitle'), t('alert.deckNoTemplate'))
+      return
+    }
     if (useImage) {
       if (!imageDataUrl) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
     } else if (!topic.trim()) {
@@ -228,9 +261,9 @@ export function AIGenerateScreen() {
 
     setStep('generating')
     try {
-      // Use the shared store's generation flow
-      const deck = decks.find((d) => d.id === selectedDeckId)
-      const templateId = deck?.default_template_id ?? templates[0]?.id ?? ''
+      // cards_only: use the deck's OWN template (guaranteed present by the guard
+      // above). No templates[0] fallback — its fields wouldn't match the deck.
+      const templateId = selectedDeck?.default_template_id ?? null
 
       store.setConfig({
         mode: selectedDeckId ? 'cards_only' : 'full',
@@ -468,6 +501,11 @@ export function AIGenerateScreen() {
                   selectedValue={selectedDeckId}
                   onSelect={setSelectedDeckId}
                 />
+                {cardsOnlyNeedsTemplate && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 6 }]}>
+                    {t('alert.deckNoTemplate')}
+                  </Text>
+                )}
               </View>
             </>
           )}
@@ -489,7 +527,7 @@ export function AIGenerateScreen() {
             testID="ai-generate-button"
             title={t('generateButton')}
             onPress={handleGenerate}
-            disabled={useImage ? !imageDataUrl : !topic.trim()}
+            disabled={cardsOnlyNeedsTemplate || (useImage ? !imageDataUrl : !topic.trim())}
           />
         </ScrollView>
       </Screen>

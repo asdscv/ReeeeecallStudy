@@ -77,7 +77,8 @@
     "saveFailed": "Gagal menyimpan kartu yang dibuat",
     "imageRequired": "Silakan pilih gambar terlebih dahulu.",
     "selectImageError": "Gambar tersebut terlalu besar atau tidak dapat dibaca. Coba foto yang lebih kecil.",
-    "permissionDenied": "Akses foto diperlukan untuk mengunggah gambar."
+    "permissionDenied": "Akses foto diperlukan untuk mengunggah gambar.",
+    "deckNoTemplate": "Deck ini belum memiliki templat kartu — buka deck dan tambahkan satu kartu untuk menyiapkannya."
   },
   "errors": {
     "insufficientCredits": "Anda telah menggunakan kartu AI gratis hari ini dan tidak memiliki kredit tersisa. Isi ulang untuk terus membuat kartu.",
