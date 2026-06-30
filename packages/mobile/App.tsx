@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import { View, Image, StyleSheet } from 'react-native'
+import { useCallback, useEffect, useState } from 'react'
+import { View, StyleSheet } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
+import * as SplashScreen from 'expo-splash-screen'
 import { NavigationContainer, type InitialState } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { I18nextProvider } from 'react-i18next'
@@ -17,6 +18,13 @@ import { ToastContainer } from './src/components/ui'
 
 // Initialize platform adapters (must be before any shared code)
 initMobilePlatform()
+
+// Hold the native splash through the JS boot (OTA cold-start swap + nav-state
+// restore) so there's no logo flash between the native splash and the first
+// screen. `AppContent` hides it once the first screen has laid out. Without
+// this the native splash auto-hides on the first RN frame, exposing a blank/
+// mismatched gap — the old 80×80 in-JS splash existed only to paper over it.
+void SplashScreen.preventAutoHideAsync().catch(() => {})
 
 // Cold-start OTA budget. Long enough to actually receive a small JS bundle on
 // 4G, short enough that nobody ever stares at the splash. Tuned for the median
@@ -89,30 +97,32 @@ function AppContent() {
     }
   }, [])
 
-  if (!ready) {
-    return (
-      <View style={[styles.splash, { backgroundColor: theme.colors.background }]}>
-        {/* eslint-disable-next-line @typescript-eslint/no-require-imports */}
-        <Image source={require('./assets/splash-icon.png')} style={styles.logo} resizeMode="contain" />
-      </View>
-    )
-  }
+  // Hide the native splash once the first real screen has laid out, so the
+  // hand-off goes native-splash → app with no blank frame in between.
+  const onLayoutRootView = useCallback(() => {
+    if (ready) void SplashScreen.hideAsync().catch(() => {})
+  }, [ready])
+
+  // While booting, render nothing — the held native splash stays on screen.
+  if (!ready) return null
 
   return (
     <ThemeProvider value={theme}>
-      <NavigationContainer
-        linking={linking}
-        initialState={initialNavState}
-        onStateChange={(state) => {
-          if (state) void saveNavState(state)
-        }}
-      >
-        <ErrorBoundary>
-          <RootNavigator />
-        </ErrorBoundary>
-      </NavigationContainer>
-      <ToastContainer />
-      <StatusBar style={theme.isDark ? 'light' : 'dark'} />
+      <View style={styles.root} onLayout={onLayoutRootView}>
+        <NavigationContainer
+          linking={linking}
+          initialState={initialNavState}
+          onStateChange={(state) => {
+            if (state) void saveNavState(state)
+          }}
+        >
+          <ErrorBoundary>
+            <RootNavigator />
+          </ErrorBoundary>
+        </NavigationContainer>
+        <ToastContainer />
+        <StatusBar style={theme.isDark ? 'light' : 'dark'} />
+      </View>
     </ThemeProvider>
   )
 }
@@ -131,6 +141,5 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  splash: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  logo: { width: 80, height: 80 },
+  root: { flex: 1 },
 })
