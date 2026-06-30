@@ -1,7 +1,7 @@
 # AI Server-Side Generation + Monetization
 
-**Branch:** `feat/ai-server-gen-phase0` · **Standard:** [DOCS/STANDARD/ARCHITECTURE.md](../STANDARD/ARCHITECTURE.md)
-**Status:** Phase 0 in progress.
+**Standard:** [DOCS/STANDARD/ARCHITECTURE.md](../STANDARD/ARCHITECTURE.md)
+**Status:** ✅ COMPLETE (engineering) — Phase 0 + 1a + 1b + image UI + hardening/tests/e2e all SHIPPED to `develop`. Remaining work tracked in [AI-MONETIZATION-REMAINING.md](../TODO/AI-MONETIZATION-REMAINING.md) (payment 1c + cost/margin/pricing layer + prod deploy — none are blockers in this doc's scope). See §16 for the final record.
 
 ## 1. Goal
 Replace **BYOK** (each user enters their own AI API key — kills conversion) with
@@ -181,3 +181,26 @@ Upload an image → vision model extracts content → flashcards. **Always paid*
   crediting the wallet via `add_ai_credits` (service_role). Strategy A; Korea bans out-links.
   **External: merchant/store credentials + product setup + Apple-review (RevenueCat was rejected).**
 - Pricing: set ₩/credit + credits-per-image at the payment layer (`_ai_credits_per_card` is the card seam).
+- **Cost/margin/pricing extensibility** — capture real provider cost per call + configurable margin
+  per provider/model (NEW requirement; see [AI-MONETIZATION-REMAINING.md](../TODO/AI-MONETIZATION-REMAINING.md)).
+
+## 16. Final record (2026-07-01) — engineering COMPLETE, all merged to `develop` (NOT prod)
+Phase 0/1a/1b + image UI shipped earlier (PRs #198–#203). The closing "everything except payment" pass:
+- **DB money-logic tests → CI** (PR #204): `supabase/tests/ai_credit_metering_test.sql` (single-session
+  psql ASSERT suite over the final 108→111 schema) wired as ci.yml job `ai-credit-tests` (plain
+  postgres-15 + bootstrap-auth + full migration chain). Green on the real runner.
+- **Mobile fast-follows** (PR #205): `expo-image-manipulator` dimension downscale (≤1600px longer side)
+  + deck-own `default_template_id` only (no `templates[0]` fallback; `cardsOnlyNeedsTemplate` guard +
+  `alert.deckNoTemplate` ×8 locales).
+- **⚠️ CRITICAL money-bug fix** (PR #206): refund-on-provider-failure was DEAD —
+  `sbServiceRole().rpc(...).catch(...)` threw "catch is not a function" (the supabase-js builder is
+  thenable but has no `.catch`), so a failed generation never refunded the user. Fixed via a `refundJob()`
+  helper (await + inspect `{error}`). **Rule: never `.rpc(...).catch(...)` on a supabase-js builder.**
+  Caught by a new local e2e: `supabase/tests/ai_generate_edge_e2e.sh` (manual — needs a live provider key
+  + `supabase start`; 14/14 PASS: auth/validation/happy-metered-as-user/over-free-402/paid-debit/refund).
+- Settings BYOK removal (§5/§6) + remaining-free/wallet affordance line (§14c) — both done.
+
+**Before prod can SERVE** (external/owner ops, unchanged): set `AI_GENERATION_PROVIDER_KEY` edge secret,
+apply migs 108–111 to prod, `supabase functions deploy ai-generate`. Until then → graceful 503.
+
+**Still open (own trackers):** payment 1c + the cost/margin/pricing layer → [AI-MONETIZATION-REMAINING.md](../TODO/AI-MONETIZATION-REMAINING.md).
