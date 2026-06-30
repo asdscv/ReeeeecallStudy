@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "เด็คนี้ยังไม่มีเทมเพลตการ์ด — เปิดเด็คแล้วเพิ่มการ์ดสักหนึ่งใบเพื่อตั้งค่าเทมเพลต",
+    "targetDeck": "เด็คปลายทาง",
+    "selectDeck": "เลือกเด็ค...",
+    "selectDeckRequired": "โปรดเลือกเด็คที่จะเพิ่มการ์ด",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
@@ -51,7 +52,20 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} การ์ด",
-    "apiKeyNotice": "การสร้างด้วย AI ต้องใช้คีย์ API ของคุณเองสำหรับผู้ให้บริการแต่ละราย เพิ่มหรือจัดการคีย์ได้ในการตั้งค่า"
+    "apiKeyNotice": "การสร้างด้วย AI ต้องใช้คีย์ API ของคุณเองสำหรับผู้ให้บริการแต่ละราย เพิ่มหรือจัดการคีย์ได้ในการตั้งค่า",
+    "inputModeTopic": "หัวข้อ",
+    "inputModeImage": "รูปภาพ",
+    "imageUpload": "อัปโหลดรูปภาพ",
+    "imageChange": "เปลี่ยนรูปภาพ",
+    "imageUploadHint": "เลือกรูปภาพของรายการคำศัพท์ หน้าหนังสือเรียน หรือโน้ต — AI จะแปลงเป็นการ์ดให้",
+    "imagePaidNotice": "การสร้างจากรูปภาพใช้เครดิต (ไม่มีระดับฟรี)"
+  },
+  "wallet": {
+    "summary": "วันนี้มีการ์ดฟรี {{free}} ใบ + การ์ดแบบชำระเงิน {{credits}} ใบ",
+    "freeOnly": "วันนี้เหลือการ์ดฟรี {{free}} ใบ",
+    "creditsOnly": "มีการ์ดแบบชำระเงิน {{credits}} ใบ",
+    "empty": "ไม่มีการ์ดฟรีหรือเครดิตเหลือ — เติมเครดิตเพื่อสร้างต่อ",
+    "unknown": "ไม่สามารถดูยอดคงเหลือได้ในขณะนี้"
   },
   "wizard": {
     "setup": "Setup",

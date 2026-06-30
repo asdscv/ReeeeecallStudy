@@ -58,6 +58,8 @@ export function AIGenerateModal({
 
     if (currentMode === 'full') {
       store.generateTemplate()
+    } else if (cfg.imageMode === 'image' && cfg.imageDataUrl) {
+      store.generateCardsFromImage(cfg.imageDataUrl)
     } else {
       // cards_only — go straight to cards
       store.generateCards()
