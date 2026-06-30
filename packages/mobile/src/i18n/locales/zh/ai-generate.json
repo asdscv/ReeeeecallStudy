@@ -78,5 +78,14 @@
     "imageRequired": "请先选择一张图片。",
     "selectImageError": "该图片过大或无法读取。请尝试较小的照片。",
     "permissionDenied": "需要照片访问权限才能上传图片。"
+  },
+  "errors": {
+    "insufficientCredits": "您今天的免费AI卡片已用完，且没有剩余点数。请充值以继续生成。",
+    "invalidImage": "无法读取该图片。请尝试更小或更清晰的照片。",
+    "quotaExceeded": "您已达到今日免费AI生成上限。请明天再试。",
+    "rateLimited": "请求过于频繁。请稍候片刻后重试。",
+    "invalidResponse": "AI返回了无效的响应。请重试。",
+    "networkError": "网络错误。请检查您的网络连接后重试。",
+    "serverError": "AI生成暂时不可用。请稍后再试。"
   }
 }

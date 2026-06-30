@@ -78,5 +78,14 @@
     "imageRequired": "Please select an image first.",
     "selectImageError": "That image is too large or couldn't be read. Try a smaller photo.",
     "permissionDenied": "Photo access is needed to upload an image."
+  },
+  "errors": {
+    "insufficientCredits": "You've used today's free AI cards and have no credits left. Top up to keep generating.",
+    "invalidImage": "Couldn't read that image. Please try a smaller or clearer photo.",
+    "quotaExceeded": "You've reached today's free AI generation limit. Please try again tomorrow.",
+    "rateLimited": "Rate limited. Please wait a moment and try again.",
+    "invalidResponse": "AI returned an invalid response. Please try again.",
+    "networkError": "Network error. Please check your connection and try again.",
+    "serverError": "AI generation is temporarily unavailable. Please try again later."
   }
 }

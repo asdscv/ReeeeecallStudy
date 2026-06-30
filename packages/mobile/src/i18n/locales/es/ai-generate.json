@@ -78,5 +78,14 @@
     "imageRequired": "Por favor, selecciona primero una imagen.",
     "selectImageError": "Esa imagen es demasiado grande o no se pudo leer. Prueba con una foto más pequeña.",
     "permissionDenied": "Se necesita acceso a las fotos para subir una imagen."
+  },
+  "errors": {
+    "insufficientCredits": "Has usado tus tarjetas de IA gratuitas de hoy y no te quedan créditos. Recarga para seguir generando.",
+    "invalidImage": "No se pudo leer esa imagen. Prueba con una foto más pequeña o más nítida.",
+    "quotaExceeded": "Has alcanzado el límite gratuito de generación con IA de hoy. Inténtalo de nuevo mañana.",
+    "rateLimited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+    "invalidResponse": "La IA devolvió una respuesta no válida. Inténtalo de nuevo.",
+    "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
+    "serverError": "La generación con IA no está disponible temporalmente. Inténtalo de nuevo más tarde."
   }
 }

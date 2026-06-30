@@ -78,5 +78,14 @@
     "imageRequired": "Vui lòng chọn một hình ảnh trước.",
     "selectImageError": "Hình ảnh quá lớn hoặc không thể đọc được. Hãy thử một ảnh nhỏ hơn.",
     "permissionDenied": "Cần quyền truy cập ảnh để tải hình ảnh lên."
+  },
+  "errors": {
+    "insufficientCredits": "Bạn đã dùng hết số thẻ AI miễn phí hôm nay và không còn tín dụng nào. Hãy nạp thêm để tiếp tục tạo thẻ.",
+    "invalidImage": "Không thể đọc được hình ảnh đó. Vui lòng thử một ảnh nhỏ hơn hoặc rõ hơn.",
+    "quotaExceeded": "Bạn đã đạt đến giới hạn tạo bằng AI miễn phí của hôm nay. Vui lòng thử lại vào ngày mai.",
+    "rateLimited": "Đã bị giới hạn tần suất. Vui lòng đợi một lát rồi thử lại.",
+    "invalidResponse": "AI đã trả về phản hồi không hợp lệ. Vui lòng thử lại.",
+    "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn và thử lại.",
+    "serverError": "Tính năng tạo bằng AI tạm thời không khả dụng. Vui lòng thử lại sau."
   }
 }

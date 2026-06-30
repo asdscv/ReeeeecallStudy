@@ -197,6 +197,10 @@ export function AIGenerateScreen() {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
 
+  // Clear a stale uploaded image when the deck changes (prevents an accidental
+  // paid re-generation with a previously-picked photo).
+  useEffect(() => { setImageDataUrl(null) }, [selectedDeckId])
+
   const pickImage = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (!perm.granted) {
@@ -275,6 +279,8 @@ export function AIGenerateScreen() {
     store.reset()
     setStep('config')
     setTopic('')
+    setImageDataUrl(null)
+    setImageMode('topic')
   }
 
   // ── Config Step ──
