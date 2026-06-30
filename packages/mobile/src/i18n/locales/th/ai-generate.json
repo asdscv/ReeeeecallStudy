@@ -27,7 +27,19 @@
     "autoDetect": "ตรวจจับอัตโนมัติ",
     "cardCountLabel": "จำนวนบัตรคำ:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100 ใบ"
+    "cardCountHint": "1–100 ใบ",
+    "inputModeTopic": "หัวข้อ",
+    "inputModeImage": "รูปภาพ",
+    "imageUpload": "อัปโหลดรูปภาพ",
+    "imageChange": "เปลี่ยนรูปภาพ",
+    "imageHint": "เลือกรูปภาพ — AI จะแปลงเป็นบัตรคำให้",
+    "imagePaidNotice": "การสร้างจากรูปภาพใช้เครดิต"
+  },
+  "wallet": {
+    "summary": "บัตรคำฟรี {{free}} ใบ + แบบเสียเครดิต {{credits}} ใบในวันนี้",
+    "creditsOnly": "บัตรคำแบบเสียเครดิตที่ใช้ได้ {{credits}} ใบ",
+    "empty": "ไม่มีบัตรคำฟรีหรือเครดิตเหลืออยู่",
+    "unknown": "ไม่สามารถดูยอดคงเหลือได้"
   },
   "deck": {
     "section": "เลือกชุดบัตร",
@@ -62,6 +74,9 @@
     "errorTitle": "ข้อผิดพลาด",
     "enterTopic": "กรุณาใส่หัวข้อ",
     "configureProvider": "กรุณาตั้งค่าผู้ให้บริการ AI ในการตั้งค่าก่อน",
-    "saveFailed": "ไม่สามารถบันทึกบัตรคำที่สร้างได้"
+    "saveFailed": "ไม่สามารถบันทึกบัตรคำที่สร้างได้",
+    "imageRequired": "กรุณาเลือกรูปภาพก่อน",
+    "selectImageError": "รูปภาพนี้ใหญ่เกินไปหรืออ่านไม่ได้ ลองใช้รูปที่เล็กลง",
+    "permissionDenied": "จำเป็นต้องเข้าถึงรูปภาพเพื่ออัปโหลดรูปภาพ"
   }
 }

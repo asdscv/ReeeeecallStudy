@@ -27,7 +27,13 @@
     "autoDetect": "Tự động phát hiện",
     "cardCountLabel": "Số lượng thẻ:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100 thẻ"
+    "cardCountHint": "1–100 thẻ",
+    "inputModeTopic": "Chủ đề",
+    "inputModeImage": "Hình ảnh",
+    "imageUpload": "Tải ảnh lên",
+    "imageChange": "Đổi ảnh",
+    "imageHint": "Chọn một ảnh — AI sẽ biến nó thành các thẻ.",
+    "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng."
   },
   "deck": {
     "section": "CHỌN BỘ THẺ",
@@ -58,10 +64,19 @@
     "retry": "Thử lại",
     "back": "Quay lại"
   },
+  "wallet": {
+    "summary": "Hôm nay: {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
+    "creditsOnly": "Còn {{credits}} thẻ trả phí",
+    "empty": "Đã hết thẻ miễn phí và tín dụng",
+    "unknown": "Không thể hiển thị số dư"
+  },
   "alert": {
     "errorTitle": "Lỗi",
     "enterTopic": "Vui lòng nhập chủ đề",
     "configureProvider": "Vui lòng cấu hình nhà cung cấp AI trong Cài đặt trước.",
-    "saveFailed": "Không thể lưu các thẻ đã tạo"
+    "saveFailed": "Không thể lưu các thẻ đã tạo",
+    "imageRequired": "Vui lòng chọn một hình ảnh trước.",
+    "selectImageError": "Hình ảnh quá lớn hoặc không thể đọc được. Hãy thử một ảnh nhỏ hơn.",
+    "permissionDenied": "Cần quyền truy cập ảnh để tải hình ảnh lên."
   }
 }

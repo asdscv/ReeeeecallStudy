@@ -27,7 +27,19 @@
     "autoDetect": "자동 감지",
     "cardCountLabel": "카드 수:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100장"
+    "cardCountHint": "1–100장",
+    "inputModeTopic": "주제",
+    "inputModeImage": "이미지",
+    "imageUpload": "이미지 업로드",
+    "imageChange": "이미지 변경",
+    "imageHint": "사진을 선택하면 AI가 카드로 만들어드립니다.",
+    "imagePaidNotice": "이미지 생성은 크레딧을 사용합니다."
+  },
+  "wallet": {
+    "summary": "오늘 무료 {{free}}장 + 유료 {{credits}}장",
+    "creditsOnly": "유료 카드 {{credits}}장 사용 가능",
+    "empty": "남은 무료 카드나 크레딧이 없습니다",
+    "unknown": "잔액을 확인할 수 없습니다"
   },
   "deck": {
     "section": "덱 선택",
@@ -62,6 +74,9 @@
     "errorTitle": "오류",
     "enterTopic": "주제를 입력해주세요",
     "configureProvider": "먼저 설정에서 AI 프로바이더를 설정해주세요.",
-    "saveFailed": "생성된 카드 저장에 실패했습니다"
+    "saveFailed": "생성된 카드 저장에 실패했습니다",
+    "imageRequired": "먼저 이미지를 선택해주세요.",
+    "selectImageError": "이미지가 너무 크거나 읽을 수 없습니다. 더 작은 사진으로 시도해주세요.",
+    "permissionDenied": "이미지를 업로드하려면 사진 접근 권한이 필요합니다."
   }
 }
