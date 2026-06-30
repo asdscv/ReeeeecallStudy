@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "Deck ini belum memiliki templat kartu — buka deck dan tambahkan satu kartu untuk menyiapkannya.",
+    "targetDeck": "Deck Tujuan",
+    "selectDeck": "Pilih deck...",
+    "selectDeckRequired": "Silakan pilih deck untuk menambahkan kartu.",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",

@@ -77,6 +77,7 @@ const initialState = {
 // Fallback strings in case the ai-generate i18n namespace isn't loaded (e.g. mobile)
 const ERROR_FALLBACKS: Record<string, string> = {
   insufficientCredits: "You've used today's free AI cards and have no credits left. Top up to keep generating.",
+  invalidImage: "Couldn't read that image. Please try a smaller or clearer photo.",
   quotaExceeded: "You've reached today's free AI generation limit. Please try again tomorrow.",
   rateLimited: 'Rate limited. Please wait a moment and try again.',
   invalidResponse: 'AI returned an invalid response. Please try again.',
@@ -93,6 +94,7 @@ function t(key: string): string {
 
 function mapError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
+  if (msg === 'BAD_REQUEST') return t('invalidImage')
   if (msg === 'AI_INSUFFICIENT_CREDITS' || msg === 'AI_QUOTA_EXCEEDED') return t('insufficientCredits')
   if (msg === 'AI_RATE_CAP' || msg === 'RATE_LIMITED') return t('rateLimited')
   if (msg === 'INVALID_RESPONSE' || msg === 'ALL_CARDS_INVALID') return t('invalidResponse')

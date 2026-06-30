@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "Bộ thẻ này chưa có mẫu thẻ — hãy mở bộ thẻ và thêm một thẻ để thiết lập.",
+    "targetDeck": "Bộ thẻ đích",
+    "selectDeck": "Chọn một bộ thẻ...",
+    "selectDeckRequired": "Vui lòng chọn một bộ thẻ để thêm thẻ vào.",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",

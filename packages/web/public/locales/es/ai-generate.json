@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "Este mazo aún no tiene plantilla de tarjeta: ábrelo y añade una tarjeta una vez para configurarla.",
+    "targetDeck": "Mazo de destino",
+    "selectDeck": "Selecciona un mazo...",
+    "selectDeckRequired": "Selecciona un mazo al que añadir tarjetas.",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",

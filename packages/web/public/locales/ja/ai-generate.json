@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "このデッキにはまだカードテンプレートがありません。デッキを開いてカードを1枚追加すると設定されます。",
+    "targetDeck": "対象デッキ",
+    "selectDeck": "デッキを選択...",
+    "selectDeckRequired": "カードを追加するデッキを選択してください。",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",

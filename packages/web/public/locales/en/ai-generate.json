@@ -57,7 +57,8 @@
     "imageUpload": "Upload image",
     "imageChange": "Change image",
     "imageUploadHint": "Pick a photo of a word list, textbook page, or notes — AI turns it into cards.",
-    "imagePaidNotice": "Image generation uses credits (no free tier)."
+    "imagePaidNotice": "Image generation uses credits (no free tier).",
+    "deckNoTemplate": "This deck has no card template yet — open it and add a card once to set one up."
   },
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards available today",

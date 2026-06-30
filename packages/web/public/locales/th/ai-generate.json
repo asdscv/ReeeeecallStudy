@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "เด็คนี้ยังไม่มีเทมเพลตการ์ด — เปิดเด็คแล้วเพิ่มการ์ดสักหนึ่งใบเพื่อตั้งค่าเทมเพลต",
+    "targetDeck": "เด็คปลายทาง",
+    "selectDeck": "เลือกเด็ค...",
+    "selectDeckRequired": "โปรดเลือกเด็คที่จะเพิ่มการ์ด",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",

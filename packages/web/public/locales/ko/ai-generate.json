@@ -24,6 +24,7 @@
       "full": "전체 생성 (템플릿 + 덱 + 카드)",
       "cards_only": "기존 덱에 카드 추가"
     },
+    "deckNoTemplate": "이 덱에는 아직 카드 템플릿이 없습니다 — 덱을 열고 카드를 한 번 추가하면 템플릿이 설정됩니다.",
     "targetDeck": "대상 덱",
     "selectDeck": "덱을 선택하세요...",
     "selectDeckRequired": "카드를 추가할 덱을 선택해주세요.",

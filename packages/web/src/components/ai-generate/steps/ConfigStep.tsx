@@ -130,9 +130,24 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => setImageDataUrl(typeof reader.result === 'string' ? reader.result : null)
-    reader.readAsDataURL(file)
+    // Downscale large photos client-side so the data URL stays well under the
+    // server's image cap (a phone photo is often 4–12MB).
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const MAX_EDGE = 1600
+      const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.max(1, Math.round(img.width * scale))
+      canvas.height = Math.max(1, Math.round(img.height * scale))
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { setImageDataUrl(null); return }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      setImageDataUrl(canvas.toDataURL('image/jpeg', 0.82))
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); setImageDataUrl(null) }
+    img.src = url
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -162,22 +177,29 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     })
   }
 
-  const canSubmit = useImage
-    ? !!imageDataUrl && !!selectedDeckId
-    : topic.trim() && (isFullMode || selectedDeckId)
+  // cards_only generation (topic OR image) needs the deck's template fields.
+  const cardsOnlyNeedsTemplate = !isFullMode && !!selectedDeckId && !selectedDeck?.default_template_id
 
-  // Remaining-free / credit affordance line.
+  const canSubmit = cardsOnlyNeedsTemplate
+    ? false
+    : useImage
+      ? !!imageDataUrl && !!selectedDeckId
+      : topic.trim() && (isFullMode || selectedDeckId)
+
+  // Remaining-free / credit affordance line. Image mode is credits-only (no free tier).
   const walletText = !affordable
     ? null
     : !affordable.walletKnown
       ? t('wallet.unknown')
-      : affordable.free > 0 && affordable.paid > 0
-        ? t('wallet.summary', { free: affordable.free, credits: affordable.paid })
-        : affordable.free > 0
-          ? t('wallet.freeOnly', { free: affordable.free })
-          : affordable.paid > 0
-            ? t('wallet.creditsOnly', { credits: affordable.paid })
-            : t('wallet.empty')
+      : useImage
+        ? (affordable.paid > 0 ? t('wallet.creditsOnly', { credits: affordable.paid }) : t('wallet.empty'))
+        : affordable.free > 0 && affordable.paid > 0
+          ? t('wallet.summary', { free: affordable.free, credits: affordable.paid })
+          : affordable.free > 0
+            ? t('wallet.freeOnly', { free: affordable.free })
+            : affordable.paid > 0
+              ? t('wallet.creditsOnly', { credits: affordable.paid })
+              : t('wallet.empty')
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -230,6 +252,9 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             </select>
             {!selectedDeckId && (
               <p className="text-xs text-destructive mt-0.5">{t('config.selectDeckRequired')}</p>
+            )}
+            {cardsOnlyNeedsTemplate && (
+              <p className="text-xs text-destructive mt-0.5">{t('config.deckNoTemplate')}</p>
             )}
           </div>
         )}

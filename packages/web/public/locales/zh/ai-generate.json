@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "targetDeck": "目标卡组",
+    "selectDeck": "选择一个卡组...",
+    "selectDeckRequired": "请选择要添加卡片的卡组。",
+    "deckNoTemplate": "此卡组还没有卡片模板——请打开它并添加一张卡片以完成设置。",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
