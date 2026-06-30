@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import i18next from 'i18next'
-import { callAI } from '../lib/ai/ai-client'
-import { aiConfigManager } from '../lib/ai/secure-storage'
-import { useAuthStore } from './auth-store'
-import { buildTemplatePrompt, buildDeckPrompt, buildCardsPrompt, type FieldHint } from '../lib/ai/prompts'
+import { callServerAI, getAiGenerationQuota } from '../lib/ai/server-client'
+import type { FieldHint } from '../lib/ai/prompts'
 import { validateTemplateResponse, validateDeckResponse, validateCardsResponse } from '../lib/ai/validators'
 import { supabase } from '../lib/supabase'
 import { useTemplateStore } from './template-store'
@@ -15,7 +13,6 @@ import type {
   GeneratedTemplate,
   GeneratedDeck,
   GeneratedCard,
-  AIConfig,
 } from '../lib/ai/types'
 
 interface AIGenerateState {
@@ -76,35 +73,13 @@ const initialState = {
   error: null as string | null,
 }
 
-// In-memory cache: set by ConfigStep on submit, used by generate actions.
-// This avoids a storage round-trip race between save and the first load.
-let _cachedAIConfig: AIConfig | null = null
-
-export function setAIConfigCache(config: AIConfig): void {
-  _cachedAIConfig = config
-}
-
-async function getConfig(): Promise<AIConfig> {
-  // 1. Use in-memory cache first (set right before generation starts)
-  if (_cachedAIConfig?.apiKey) return _cachedAIConfig
-
-  // 2. Fallback to encrypted storage
-  const uid = useAuthStore.getState().user?.id
-  if (!uid) throw new Error('NO_API_KEY')
-  const config = await aiConfigManager.load(uid)
-  if (!config || !config.apiKey) throw new Error('NO_API_KEY')
-  _cachedAIConfig = config
-  return config
-}
-
 // Fallback strings in case the ai-generate i18n namespace isn't loaded (e.g. mobile)
 const ERROR_FALLBACKS: Record<string, string> = {
-  noApiKey: 'Please set up your AI API key first.',
-  invalidApiKey: 'Invalid API key. Please check your key.',
+  quotaExceeded: "You've reached today's free AI generation limit. Please try again tomorrow.",
   rateLimited: 'Rate limited. Please wait a moment and try again.',
   invalidResponse: 'AI returned an invalid response. Please try again.',
-  networkError: 'Network error. This might be a CORS issue — try a different provider or check your API key.',
-  serverError: 'AI server error (500). Please try again later.',
+  networkError: 'Network error. Please check your connection and try again.',
+  serverError: 'AI generation is temporarily unavailable. Please try again later.',
 }
 
 function t(key: string): string {
@@ -116,13 +91,14 @@ function t(key: string): string {
 
 function mapError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
-  if (msg === 'NO_API_KEY') return t('noApiKey')
-  if (msg === 'INVALID_API_KEY') return t('invalidApiKey')
+  if (msg === 'AI_QUOTA_EXCEEDED') return t('quotaExceeded')
   if (msg === 'RATE_LIMITED') return t('rateLimited')
   if (msg === 'INVALID_RESPONSE' || msg === 'ALL_CARDS_INVALID') return t('invalidResponse')
-  if (msg === 'SERVER_ERROR') return t('serverError')
+  if (msg === 'AI_PROVIDER_ERROR' || msg === 'AI_PROVIDER_AUTH' || msg === 'AI_NOT_CONFIGURED' || msg === 'AI_METER_ERROR' || msg === 'SERVER_ERROR') {
+    return t('serverError')
+  }
   if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) return t('networkError')
-  return msg
+  return t('serverError')
 }
 
 export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
@@ -144,17 +120,18 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateTemplate: async () => {
     set({ currentStep: 'generating_template', error: null })
     try {
-      const config = await getConfig()
       const uiLang = i18next.language
       const { topic, useCustomHtml, contentLang, fieldHints } = get()
-      const { systemPrompt, userPrompt } = buildTemplatePrompt(
-        topic, uiLang, useCustomHtml,
-        contentLang || undefined,
-        fieldHints.length > 0 ? fieldHints : undefined,
-      )
-      const data = await callAI(config, { systemPrompt, userPrompt })
-      const template = validateTemplateResponse(data)
-      // Throttle: wait before next step to avoid rate limits on low-tier APIs
+      const { content } = await callServerAI({
+        kind: 'template',
+        topic,
+        uiLang,
+        useCustomHtml,
+        contentLang: contentLang || undefined,
+        fieldHints: fieldHints.length > 0 ? fieldHints : undefined,
+      })
+      const template = validateTemplateResponse(content)
+      // Throttle: small pause before the next step keeps the multi-call flow gentle.
       await new Promise((r) => setTimeout(r, 3000))
       set({ generatedTemplate: template, currentStep: 'review_template' })
     } catch (err) {
@@ -165,12 +142,10 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateDeck: async () => {
     set({ currentStep: 'generating_deck', error: null })
     try {
-      const config = await getConfig()
       const uiLang = i18next.language
       const { topic } = get()
-      const { systemPrompt, userPrompt } = buildDeckPrompt(topic, uiLang)
-      const data = await callAI(config, { systemPrompt, userPrompt })
-      const deck = validateDeckResponse(data)
+      const { content } = await callServerAI({ kind: 'deck', topic, uiLang })
+      const deck = validateDeckResponse(content)
       await new Promise((r) => setTimeout(r, 3000))
       set({ generatedDeck: deck, currentStep: 'review_deck' })
     } catch (err) {
@@ -181,7 +156,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateCards: async () => {
     set({ currentStep: 'generating_cards', error: null })
     try {
-      const config = await getConfig()
+      const uiLang = i18next.language
       const { topic, cardCount, mode, existingDeckId, generatedTemplate, existingTemplateId } = get()
 
       // Get field definitions
@@ -209,10 +184,15 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       }
       if (!fields || fields.length === 0) throw new Error('INVALID_RESPONSE')
 
+      // Phase 0: cap the request to the remaining daily free quota. The server
+      // is authoritative (meters + 429s), this just avoids requesting over-free.
+      const { remaining } = await getAiGenerationQuota()
+      if (remaining <= 0) throw new Error('AI_QUOTA_EXCEEDED')
+      const effectiveCount = Math.min(cardCount, remaining)
+
       // Get existing cards for dedup in cards_only mode
       let existingCards: Record<string, string>[] | undefined
       if (mode === 'cards_only' && existingDeckId) {
-        // Fetch existing cards from DB to get accurate dedup
         await useCardStore.getState().fetchCards(existingDeckId)
         const cards = useCardStore.getState().cards
         if (cards.length > 0) {
@@ -224,28 +204,34 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       const allCards: GeneratedCard[] = []
       let totalFiltered = 0
       const batchSize = 25
-      const batches = Math.ceil(cardCount / batchSize)
+      const batches = Math.ceil(effectiveCount / batchSize)
+      const fieldKeys = fields.map((f) => f.key)
 
       for (let i = 0; i < batches; i++) {
-        const remaining = cardCount - allCards.length
-        const count = Math.min(batchSize, remaining)
+        const remainingCount = effectiveCount - allCards.length
+        const count = Math.min(batchSize, remainingCount)
         if (count <= 0) break
 
         const combined = existingCards
           ? [...existingCards, ...allCards.map((c) => c.field_values)]
           : allCards.length > 0 ? allCards.map((c) => c.field_values) : undefined
 
-        // Throttle between batches to avoid rate limits (especially low-tier APIs)
+        // Throttle between batches to keep the multi-call flow gentle.
         if (i > 0) await new Promise((r) => setTimeout(r, 3000))
 
-        const { systemPrompt, userPrompt } = buildCardsPrompt(topic, fields, count, combined)
-        const data = await callAI(config, { systemPrompt, userPrompt })
-        const fieldKeys = fields.map((f) => f.key)
-        const result = validateCardsResponse(data, fieldKeys)
+        const { content } = await callServerAI({
+          kind: 'cards',
+          topic,
+          uiLang,
+          fields,
+          cardCount: count,
+          existingCards: combined,
+        })
+        const result = validateCardsResponse(content, fieldKeys)
         allCards.push(...result.valid)
         totalFiltered += result.filtered
 
-        set({ progress: { done: allCards.length, total: cardCount } })
+        set({ progress: { done: allCards.length, total: effectiveCount } })
       }
 
       set({
@@ -344,7 +330,6 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   },
 
   reset: () => {
-    _cachedAIConfig = null
     set({ ...initialState })
   },
 }))
