@@ -97,7 +97,7 @@ function mapError(err: unknown): string {
   if (msg === 'AI_PROVIDER_ERROR' || msg === 'AI_PROVIDER_AUTH' || msg === 'AI_NOT_CONFIGURED' || msg === 'AI_METER_ERROR' || msg === 'SERVER_ERROR') {
     return t('serverError')
   }
-  if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) return t('networkError')
+  if (msg === 'NETWORK_ERROR' || msg.includes('Failed to fetch') || msg.includes('NetworkError')) return t('networkError')
   return t('serverError')
 }
 
@@ -120,6 +120,10 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   generateTemplate: async () => {
     set({ currentStep: 'generating_template', error: null })
     try {
+      // M3: fail fast before any paid call if the daily free quota is exhausted
+      // (full-mode entry — avoids wasting template + deck provider calls).
+      const { remaining } = await getAiGenerationQuota()
+      if (remaining <= 0) throw new Error('AI_QUOTA_EXCEEDED')
       const uiLang = i18next.language
       const { topic, useCustomHtml, contentLang, fieldHints } = get()
       const { content } = await callServerAI({
@@ -219,21 +223,29 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
         // Throttle between batches to keep the multi-call flow gentle.
         if (i > 0) await new Promise((r) => setTimeout(r, 3000))
 
-        const { content } = await callServerAI({
-          kind: 'cards',
-          topic,
-          uiLang,
-          fields,
-          cardCount: count,
-          existingCards: combined,
-        })
-        const result = validateCardsResponse(content, fieldKeys)
-        allCards.push(...result.valid)
-        totalFiltered += result.filtered
+        try {
+          const { content } = await callServerAI({
+            kind: 'cards',
+            topic,
+            uiLang,
+            fields,
+            cardCount: count,
+            existingCards: combined,
+          })
+          const result = validateCardsResponse(content, fieldKeys)
+          allCards.push(...result.valid)
+          totalFiltered += result.filtered
+        } catch (batchErr) {
+          // M2: keep earlier successful batches; only fail outright if nothing
+          // has been generated yet.
+          if (allCards.length > 0) break
+          throw batchErr
+        }
 
         set({ progress: { done: allCards.length, total: effectiveCount } })
       }
 
+      if (allCards.length === 0) throw new Error('INVALID_RESPONSE')
       set({
         generatedCards: allCards,
         filteredCardCount: totalFiltered,

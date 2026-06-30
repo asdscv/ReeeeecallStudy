@@ -109,3 +109,23 @@ Wallet `ai_credit_balance` + append-only `ai_credit_ledger`; top-up via PortOne
 (web) + IAP/RevenueCat (mobile) crediting the wallet; `record_ai_generation`
 over-free branch deducts from balance; image-recognition edge route (vision model)
 metered as `image_jobs`, always paid.
+
+## 10. Zero-Defect audit (2026-06-30) — 19 raw → 13 confirmed (0 crit / 0 high / 3 med / 8 low)
+Multi-agent adversarial audit (DB/security · edge-fn · shared/store · client/dead-code),
+each finding verified to drop false positives. **No merge blockers.** Fixed:
+- **M1** quota burned on provider failure → `refund_ai_generation` RPC (mig 108) + edge catch refund.
+- **M2** multi-batch (>25) lost earlier cards on a later-batch error → store keeps partial results (`review_cards`), only errors if 0 generated.
+- **M3** full-mode 0-quota user wasted template+deck calls → `generateTemplate` quota pre-check (fail fast).
+- **L1** no provider timeout → `AbortController` (30s) in `providerRequest`.
+- **L2** unbounded input → caps on field key/name + `existingCards` size (`asExistingCards`).
+- **L3** unvalidated `fieldHints` (→500) → `asFieldHints` validator (→400).
+- **L5** network failure misclassified → `FunctionsFetchError` → `NETWORK_ERROR` mapping.
+- Deferred (cosmetic/UX, noted): **L4** dup SQLSTATE for cap vs quota (both 429, message only); **M3 part-1** visible remaining-quota number in ConfigStep/AIGenerateScreen (needs 8-locale i18n) — server enforces + English fallback covers; a few additional lows.
+Re-verified after fixes: metering **+ refund** on real Postgres (`ALL_108_TESTS_PASSED`, T1–T7), web+mobile `tsc` exit 0, prompt parity 6/6 + AI suite 60/60.
+
+## 11. Phase 0 STATUS = implementation complete + audited + verified
+Remaining before it can SERVE in prod (external / owner): set `AI_GENERATION_PROVIDER_KEY`
+edge secret (Gemini key — none found in env; verified live via Grok since the edge fn is
+provider-agnostic), apply mig 108 to prod, `supabase functions deploy ai-generate`. A full
+local-supabase end-to-end (`supabase start` + `functions serve`) is the one untested seam
+(components individually verified).

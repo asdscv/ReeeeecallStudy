@@ -32,7 +32,10 @@ const MAX_TOPIC_LEN = 2000
 const MAX_FIELDS = 12
 const MAX_CARDS_PER_CALL = 25 // matches the client batch size
 const MAX_EXISTING_CARDS = 50
+const MAX_FIELD_STR = 200                  // cap field key/name/hint length (L2)
+const MAX_EXISTING_CARDS_BYTES = 8000      // cap dedup payload size (L2)
 const PROVIDER_RETRY_DELAYS = [2000, 8000] // ms; per-minute provider rate limits
+const PROVIDER_TIMEOUT_MS = 30000          // abort a hung provider call (L1)
 
 // ── CORS (origin allowlist; mirror tts) ─────────────────────
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
@@ -94,11 +97,23 @@ async function providerRequest(systemPrompt: string, userPrompt: string): Promis
   }
 
   for (let attempt = 0; attempt <= PROVIDER_RETRY_DELAYS.length; attempt++) {
-    const res = await fetch(`${BASE_URL}/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${PROVIDER_KEY}` },
-      body: JSON.stringify(body),
-    })
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), PROVIDER_TIMEOUT_MS)
+    let res: Response
+    try {
+      res = await fetch(`${BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${PROVIDER_KEY}` },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
+      })
+    } catch {
+      // network error or timeout(abort) — retry within budget, then fail.
+      if (attempt < PROVIDER_RETRY_DELAYS.length) { await sleep(PROVIDER_RETRY_DELAYS[attempt]); continue }
+      throw new Error('PROVIDER_ERROR')
+    } finally {
+      clearTimeout(timer)
+    }
 
     if (res.status === 401 || res.status === 403) throw new Error('PROVIDER_AUTH')
     if ((res.status === 429 || res.status >= 500) && attempt < PROVIDER_RETRY_DELAYS.length) {
@@ -145,6 +160,7 @@ function asFields(v: unknown): GeneratedTemplateField[] | null {
   const out: GeneratedTemplateField[] = []
   for (const f of v) {
     if (!f || typeof f.key !== 'string' || typeof f.name !== 'string') return null
+    if (f.key.length > MAX_FIELD_STR || f.name.length > MAX_FIELD_STR) return null
     out.push({
       key: f.key,
       name: f.name,
@@ -155,6 +171,36 @@ function asFields(v: unknown): GeneratedTemplateField[] | null {
     })
   }
   return out
+}
+
+// Validate field hints (L3) — reject malformed instead of casting (→ 500).
+// Returns undefined when absent, null when invalid.
+function asFieldHints(v: unknown): FieldHint[] | null | undefined {
+  if (v === undefined || v === null) return undefined
+  if (!Array.isArray(v) || v.length > MAX_FIELDS) return null
+  const out: FieldHint[] = []
+  for (const h of v) {
+    if (!h || typeof h.name !== 'string' || h.name.length > MAX_FIELD_STR) return null
+    if (h.side !== 'front' && h.side !== 'back') return null
+    out.push({ name: h.name, side: h.side, ttsLang: typeof h.ttsLang === 'string' ? h.ttsLang : undefined })
+  }
+  return out
+}
+
+// Validate the existing-cards dedup payload (L2) — flat string maps, size-capped.
+function asExistingCards(v: unknown): Record<string, string>[] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const out: Record<string, string>[] = []
+  for (const c of v.slice(0, MAX_EXISTING_CARDS)) {
+    if (!c || typeof c !== 'object') continue
+    const rec: Record<string, string> = {}
+    for (const [k, val] of Object.entries(c as Record<string, unknown>)) {
+      if (typeof val === 'string') rec[k] = val
+    }
+    out.push(rec)
+  }
+  if (JSON.stringify(out).length > MAX_EXISTING_CARDS_BYTES) return undefined
+  return out.length > 0 ? out : undefined
 }
 
 // ── Handler ─────────────────────────────────────────────────
@@ -191,9 +237,8 @@ Deno.serve(async (req) => {
     let pCards = 0
 
     if (kind === 'template') {
-      const hints = Array.isArray(body.fieldHints) && body.fieldHints.length > 0
-        ? (body.fieldHints as FieldHint[])
-        : undefined
+      const hints = asFieldHints(body.fieldHints)
+      if (hints === null) return json({ error: 'Invalid fieldHints', code: 'BAD_REQUEST' }, 400, cors)
       ;({ systemPrompt, userPrompt } = buildTemplatePrompt(
         topic, uiLang, !!body.useCustomHtml,
         typeof body.contentLang === 'string' && body.contentLang ? body.contentLang : undefined,
@@ -209,9 +254,7 @@ Deno.serve(async (req) => {
         return json({ error: 'Invalid cardCount', code: 'BAD_REQUEST' }, 400, cors)
       }
       pCards = Math.min(MAX_CARDS_PER_CALL, Math.floor(reqCount))
-      const existing = Array.isArray(body.existingCards)
-        ? (body.existingCards as Record<string, string>[]).slice(0, MAX_EXISTING_CARDS)
-        : undefined
+      const existing = asExistingCards(body.existingCards)
       ;({ systemPrompt, userPrompt } = buildCardsPrompt(topic, fields, pCards, existing))
     }
 
@@ -241,6 +284,11 @@ Deno.serve(async (req) => {
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
+      // M1: metering already committed — refund the cards so a provider failure
+      // doesn't burn the user's free quota. Best-effort (don't mask the 502).
+      if (pCards > 0) {
+        await sbUser.rpc('refund_ai_generation', { p_cards: pCards }).catch(() => {})
+      }
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)
     }

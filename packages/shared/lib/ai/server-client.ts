@@ -34,6 +34,8 @@ export interface ServerGenerateResult {
 // supabase-js FunctionsHttpError carries the raw Response in `.context`; read our
 // `{ code }` body off it so the store can map to a localized message.
 async function extractErrorCode(error: unknown): Promise<string> {
+  // A network/transport failure surfaces as FunctionsFetchError (no Response).
+  if ((error as { name?: string }).name === 'FunctionsFetchError') return 'NETWORK_ERROR'
   const ctx = (error as { context?: unknown }).context
   if (ctx && typeof (ctx as Response).json === 'function') {
     try {

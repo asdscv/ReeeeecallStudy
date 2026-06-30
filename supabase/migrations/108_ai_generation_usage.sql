@@ -99,6 +99,31 @@ $$;
 REVOKE EXECUTE ON FUNCTION public.record_ai_generation(text, integer) FROM PUBLIC, anon;
 GRANT  EXECUTE ON FUNCTION public.record_ai_generation(text, integer) TO authenticated;
 
+-- Compensating decrement: the edge function calls this when generation FAILS
+-- *after* metering (provider error/empty/parse failure), so a failed request
+-- does not burn the caller's free quota. Floors at 0; no-op if there's no row.
+CREATE OR REPLACE FUNCTION public.refund_ai_generation(p_cards integer)
+  RETURNS void
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = public
+AS $$
+DECLARE
+  v_uid   uuid := auth.uid();
+  v_today date := (now() AT TIME ZONE 'UTC')::date;
+BEGIN
+  IF v_uid IS NULL OR p_cards IS NULL OR p_cards <= 0 THEN
+    RETURN;
+  END IF;
+  UPDATE ai_generation_usage
+     SET free_cards_used = GREATEST(0, free_cards_used - p_cards)
+   WHERE user_id = v_uid AND usage_date = v_today;
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.refund_ai_generation(integer) FROM PUBLIC, anon;
+GRANT  EXECUTE ON FUNCTION public.refund_ai_generation(integer) TO authenticated;
+
 -- Read-only quota snapshot for the client (cap the card-count selector + show
 -- "N free left today"). No side effects.
 CREATE OR REPLACE FUNCTION public.get_ai_generation_quota()
