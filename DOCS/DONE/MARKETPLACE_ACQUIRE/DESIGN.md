@@ -1,5 +1,12 @@
 # Marketplace Acquire Flow — Hardening Design
 
+> ✅ **SHIPPED** — `acquire_listing` SECURITY DEFINER RPC + `deck_shares` partial UNIQUE
+> (recipient_id, deck_id, share_mode) WHERE active 가 **migration 081**
+> (`081_marketplace_acquire_atomic.sql`)에 구현됨. atomic acquire + 멱등성 보장.
+> 회귀 테스트 `marketplace-acquire-atomic.test.ts` green. 이후 087(get_deck_stats
+> subscribed decks) / 099(invite·copy IDOR 하드닝) / 103(explicit grants)에서 추가 강화.
+> D1~D5 결함 모두 폐쇄. → 2026-06-30 DESIGN→DONE 이동.
+
 브랜치: `fix/marketplace-acquire-hardening`
 작성일: 2026-05-03
 표준 준거: `/DOCS/STANDARD/01_ARCHITECTURE`, `/04_DATABASE`, `/06_RESILIENCE`, `/07_TESTING` (rictax repo)
@@ -210,10 +217,10 @@ UI: hasAcquired=true, navigate back, Toast/Alert
 
 ## 8. Definition of Done (Gap Closure Criteria)
 
-- [ ] D1~D5 결함 모두 코드/스키마/UI에서 폐쇄
-- [ ] T1~T7 unit 테스트 green
-- [ ] I1~I6 integration 테스트 green (실 docker supabase)
-- [ ] Architecture guard green
-- [ ] CI 워크플로 green
-- [ ] 표준 문서 cross-ref 완비
-- [ ] 갭 검증 루프에서 새로운 갭 0건
+- [x] D1~D5 결함 모두 코드/스키마/UI에서 폐쇄 (mig 081)
+- [x] T1~T7 unit 테스트 green (`marketplace-acquire-atomic.test.ts`)
+- [x] I1~I6 integration 테스트 green (실 docker supabase)
+- [x] Architecture guard green
+- [x] CI 워크플로 green
+- [x] 표준 문서 cross-ref 완비
+- [x] 갭 검증 루프에서 새로운 갭 0건
