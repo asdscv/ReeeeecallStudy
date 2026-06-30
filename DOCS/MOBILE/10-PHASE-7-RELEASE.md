@@ -1,6 +1,8 @@
 # 10. Phase 7 — Store Release
 
-> **Status**: Draft
+> **Status**: Draft (계획 원안)
+> ➡️ **실제 운영 배포 절차는 [`/DOCS/DEPLOYMENT/`](../DEPLOYMENT/README.md) 가 권위 문서.**
+> 스토어 제출 자격증명/계정 게이트는 [`/DOCS/DEPLOYMENT/STORE_SUBMISSION.md`](../DEPLOYMENT/STORE_SUBMISSION.md).
 > **Duration**: ~1 week
 
 ---
