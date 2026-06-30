@@ -286,7 +286,8 @@ Deno.serve(async (req) => {
         const msg = (e as Error).message
         console.error('[ai-generate] vision failure:', msg)
         if (imgMeter.job_ref) {
-          await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: imgMeter.job_ref }).catch(() => {})
+          await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: imgMeter.job_ref })
+            .catch((re) => console.error('[ai-generate] image refund failed (job', imgMeter.job_ref, ')', re))
         }
         const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
         return json({ error: 'Generation failed', code }, 502, cors)
@@ -359,7 +360,8 @@ Deno.serve(async (req) => {
       // provider failure burns nothing. The RPC derives the amount from the job
       // row (service_role only). Best-effort (don't mask the 502).
       if (meter.job_ref) {
-        await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: meter.job_ref }).catch(() => {})
+        await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: meter.job_ref })
+          .catch((re) => console.error('[ai-generate] refund failed (job', meter.job_ref, ')', re))
       }
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)

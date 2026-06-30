@@ -135,8 +135,11 @@ $$;
 REVOKE EXECUTE ON FUNCTION public.record_ai_image() FROM PUBLIC, anon;
 GRANT  EXECUTE ON FUNCTION public.record_ai_image() TO authenticated;
 
--- Drop the client-callable refund holes from 109/110.
+-- Drop the client-callable refund holes from 109/110. Idempotent DROPs so this
+-- ALSO closes the function on any dev/preview DB that applied an earlier form of
+-- 110 (which created refund_ai_image GRANTed to authenticated).
 DROP FUNCTION IF EXISTS public.refund_ai_generation(integer, integer, integer);
+DROP FUNCTION IF EXISTS public.refund_ai_image(integer);
 
 -- Safe refund: keyed on a recorded job, amount DERIVED from the row (never the
 -- client), idempotent, service_role/admin only. The edge fn calls this with a
