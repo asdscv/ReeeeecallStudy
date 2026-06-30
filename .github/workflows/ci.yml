@@ -215,3 +215,52 @@ jobs:
       - name: Stop
         if: always()
         run: supabase stop || true
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Job 6: AI credit / metering money-logic regression suite
+  #   The server-side AI generation wallet moves real money (free-tier
+  #   accounting, atomic credit debit, idempotent grants/refunds), so it gets
+  #   assertion coverage on every PR. Uses the lightweight plain-postgres
+  #   pattern (bootstrap-auth shim → full migration chain → assertion SQL),
+  #   the same one official-decks' migration-smoke proves out on the runner —
+  #   no Docker supabase stack needed. ON_ERROR_STOP + ASSERT means any failed
+  #   invariant aborts the job non-zero.
+  # ─────────────────────────────────────────────────────────────────────
+  ai-credit-tests:
+    name: AI Credit Metering (postgres-15)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bootstrap auth/storage/extensions schema
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f .github/scripts/bootstrap-auth.sql
+
+      - name: Apply migrations in order
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "==> $f"
+            psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Run AI credit / metering assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/ai_credit_metering_test.sql
