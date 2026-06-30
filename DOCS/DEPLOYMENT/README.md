@@ -124,7 +124,11 @@ eas submit --platform ios --profile production --id <BUILD_ID> --non-interactive
 - **Android**: `eas.json`에 서비스계정 키 연결돼 있음 → 바로 Play **internal** 트랙 draft 업로드. (키/권한 셋업은 STORE_SUBMISSION.md) — ✅ 2026-06-30 통과(빌드 35).
 - **iOS**: EAS 서버 저장 ASC API 키 사용 → ASC/TestFlight 업로드. — ✅ 2026-06-30 통과(빌드 44). **단 Apple 계정 게이트(특히 업데이트된 License Agreement 미동의)가 있으면 `"Something went wrong"`으로 조용히 실패**하니, 새로 막히면 STORE_SUBMISSION.md §2-2부터 확인.
 
-> 제출 성공 ≠ 사용자 배포. iOS는 TestFlight, Android는 Play **internal draft** 까지만 자동. 실제 출시는 각 콘솔에서 트랙 롤아웃 + 심사(수 시간~수일)가 추가로 필요.
+> 제출 성공 ≠ 사용자 배포. `eas submit` 자동 범위는 iOS=TestFlight, Android=Play **internal draft** 까지.
+> 그 다음 단계도 **콘솔 전용이 아니라 코드/API로 가능**하다:
+> - **Android 프로덕션 롤아웃**: Play Developer API (`edits → tracks/production → release status=completed → commit`). 콘솔 없이 빌드 35를 100% promote한 전례 있음.
+> - **iOS 심사 제출(Submit for Review)**: ASC `.p8` 키로 `fastlane deliver` / ASC API.
+> 외부에 의존하는 **단 하나는 Apple/Google의 심사 통과 그 자체**(수 시간~수일) — 이것만 우리가 대신 못 한다. ("콘솔에서만 가능"이 아님에 주의.)
 
 ---
 
