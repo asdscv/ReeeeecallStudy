@@ -326,8 +326,13 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Local dev only — maps edge-function secrets to host env vars. In production set
+# these in Supabase dashboard → Edge Functions → Secrets (never committed).
+# `ai-generate` reads AI_GENERATION_PROVIDER_KEY (Gemini key by default).
+[edge_runtime.secrets]
+AI_GENERATION_PROVIDER_KEY = "env(GEMINI_API_KEY)"
+# AI_GENERATION_MODEL    = "env(AI_GENERATION_MODEL)"     # default gemini-2.5-flash-lite
+# AI_GENERATION_BASE_URL = "env(AI_GENERATION_BASE_URL)"  # default Gemini OpenAI-compat base
 
 [analytics]
 enabled = true

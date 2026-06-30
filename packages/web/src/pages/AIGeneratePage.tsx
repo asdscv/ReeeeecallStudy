@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { useAIGenerateStore } from '../stores/ai-generate-store'
 import { useTemplateStore } from '../stores/template-store'
-import { aiKeyVault } from '../lib/ai/secure-storage'
 import { ConfigStep } from '../components/ai-generate/steps/ConfigStep'
 import { GeneratingStep } from '../components/ai-generate/steps/GeneratingStep'
 import { ReviewTemplateStep } from '../components/ai-generate/steps/ReviewTemplateStep'
@@ -57,8 +56,6 @@ export function AIGeneratePage() {
   const paramDeckId = searchParams.get('deckId')
   const paramTemplateId = searchParams.get('templateId')
   const initialMode: GenerateMode = paramMode === 'cards_only' ? 'cards_only' : 'full'
-
-  const hasApiKey = aiKeyVault.hasAnyKey()
 
   // Reset store on mount
   useEffect(() => {
@@ -212,13 +209,6 @@ export function AIGeneratePage() {
         {/* Config Step */}
         {store.currentStep === 'config' && (
           <div className="p-5 sm:p-6">
-            {/* Quick start hint if API key exists */}
-            {hasApiKey && (
-              <div className="mb-4 px-3 py-2 bg-success/10 border border-success/30 rounded-lg text-xs text-success flex items-center gap-2">
-                <span>✓</span>
-                {t('page.apiKeySaved')}
-              </div>
-            )}
             <ConfigStep
               mode={currentMode}
               initialTopic={store.topic}

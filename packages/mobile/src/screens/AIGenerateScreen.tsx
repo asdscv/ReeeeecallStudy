@@ -1,17 +1,14 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
-import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
-import { useDecks, useAuthState } from '../hooks'
+import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
+import { useDecks } from '../hooks'
 import { useTheme, palette } from '../theme'
-import { aiKeyVault } from '@reeeeecall/shared/lib/ai/secure-storage'
-import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
-import { getProvider } from '@reeeeecall/shared/lib/ai/provider-registry'
 
-// SECURITY: Supabase 서버사이드 암호화 사용
-const mobileAiKeyVault = aiKeyVault
+// AI generation runs on our server key (metered free tier) — no provider/API
+// key selection on the client.
 
 const CONTENT_LANGS = [
   { code: 'en-US', label: 'English' },
@@ -176,12 +173,8 @@ export function AIGenerateScreen() {
   const navigation = useNavigation()
   const store = useAIGenerateStore()
   const { decks, templates } = useDecks()
-  const { user } = useAuthState()
 
   const [step, setStep] = useState<WizardStep>('config')
-  const [aiKeys, setAiKeys] = useState<ProviderKeyMap>({})
-  const [selectedProvider, setSelectedProvider] = useState('')
-  const [selectedModel, setSelectedModel] = useState('')
 
   // Config state
   const [topic, setTopic] = useState('')
@@ -191,41 +184,11 @@ export function AIGenerateScreen() {
   const [showLangPicker, setShowLangPicker] = useState(false)
   const [showDeckPicker, setShowDeckPicker] = useState(false)
 
-  // Load configured AI keys
-  useEffect(() => {
-    if (!user) return
-    mobileAiKeyVault.loadAll(user.id).then((keys) => {
-      setAiKeys(keys)
-      const firstProviderId = Object.keys(keys)[0]
-      if (firstProviderId) {
-        setSelectedProvider(firstProviderId)
-        setSelectedModel(keys[firstProviderId].model)
-      }
-    }).catch(() => {})
-  }, [user])
-
-  const configuredProviders = Object.keys(aiKeys)
-  const hasProvider = configuredProviders.length > 0
-
   const handleGenerate = async () => {
     if (!topic.trim()) {
       Alert.alert(t('alert.errorTitle'), t('alert.enterTopic'))
       return
     }
-    if (!hasProvider || !selectedProvider) {
-      Alert.alert(t('alert.errorTitle'), t('alert.configureProvider'))
-      return
-    }
-
-    // Set AI config cache so the store can use it
-    const entry = aiKeys[selectedProvider]
-    const provider = getProvider(selectedProvider)
-    setAIConfigCache({
-      providerId: selectedProvider,
-      apiKey: entry.apiKey,
-      model: selectedModel || entry.model,
-      baseUrl: entry.baseUrl || provider?.baseUrl,
-    })
 
     setStep('generating')
     try {
@@ -336,60 +299,6 @@ export function AIGenerateScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* AI PROVIDER — matches web: labeled section */}
-          <View style={styles.sectionLabelRow}>
-            <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('provider.section')}</Text>
-          </View>
-          {/* Personal API key notice — generation uses the user's own provider keys */}
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-            {t('provider.notice')}
-          </Text>
-          {hasProvider ? (
-            <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
-              {configuredProviders.map((pid) => {
-                const providerInfo = getProvider(pid)
-                const isSelected = selectedProvider === pid
-                return (
-                  <TouchableOpacity
-                    key={pid}
-                    onPress={() => {
-                      setSelectedProvider(pid)
-                      setSelectedModel(aiKeys[pid].model)
-                    }}
-                    style={[styles.providerOption, {
-                      borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                      backgroundColor: isSelected ? theme.colors.primaryLight : theme.colors.surfaceElevated,
-                    }]}
-                  >
-                    <Text style={[theme.typography.bodySmall, {
-                      color: isSelected ? theme.colors.primary : theme.colors.text,
-                      fontWeight: isSelected ? '600' : '400',
-                    }]}>
-                      {providerInfo?.name ?? pid}
-                    </Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                      {aiKeys[pid].model}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              })}
-            </View>
-          ) : (
-            <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                {t('provider.none')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SettingsHome' as never)}
-                style={[styles.settingsLink, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              >
-                <Text style={[theme.typography.bodySmall, { color: palette.blue[600], fontWeight: '500' }]}>
-                  {'\u2699\uFE0F'} {t('provider.addInSettings')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
 
           {/* CONTENT SETTINGS — matches web: labeled bordered section */}
           <View style={styles.sectionLabelRow}>

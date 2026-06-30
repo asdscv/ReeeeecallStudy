@@ -1,2 +1,2 @@
 // Re-export from shared — single source of truth
-export { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
+export { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'

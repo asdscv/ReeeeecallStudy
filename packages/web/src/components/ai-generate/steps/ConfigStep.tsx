@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { Settings, Info } from 'lucide-react'
-import { aiKeyVault } from '../../../lib/ai/secure-storage'
-import type { ProviderKeyMap } from '../../../lib/ai/secure-storage'
-import { useAuthStore } from '../../../stores/auth-store'
-import { setAIConfigCache } from '../../../stores/ai-generate-store'
-import { getProviders, getProvider } from '../../../lib/ai/provider-registry'
 import { useDeckStore } from '../../../stores/deck-store'
 import type { GenerateMode } from '../../../lib/ai/types'
 import type { Deck } from '../../../types/database'
@@ -57,20 +50,12 @@ interface ConfigStepProps {
 }
 
 // ─── Component ─────────────────────────────────────────────
+// AI generation runs on our server key (metered free tier), so no provider/API
+// key selection is needed here — this step only gathers generation parameters.
 
 export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showModeSelect, onModeChange }: ConfigStepProps) {
   const { t } = useTranslation('ai-generate')
-  const navigate = useNavigate()
-  const providers = getProviders()
   const { decks, fetchDecks } = useDeckStore()
-
-  // Stored provider keys
-  const [storedKeys, setStoredKeys] = useState<ProviderKeyMap>({})
-  const [keysLoaded, setKeysLoaded] = useState(false)
-
-  // Selected provider + model
-  const [providerId, setProviderId] = useState('')
-  const [model, setModel] = useState('')
 
   // Generation config state
   const [topic, setTopic] = useState(initialTopic || '')
@@ -90,26 +75,6 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
   const isFullMode = mode === 'full'
 
-  // Load stored provider keys
-  useEffect(() => {
-    const uid = useAuthStore.getState().user?.id
-    if (!uid) {
-      setKeysLoaded(true)
-      return
-    }
-    aiKeyVault.loadAll(uid).then((keys) => {
-      setStoredKeys(keys)
-      // Auto-select first configured provider
-      const configuredIds = Object.keys(keys)
-      if (configuredIds.length > 0 && !providerId) {
-        setProviderId(configuredIds[0])
-        const entry = keys[configuredIds[0]]
-        if (entry.model) setModel(entry.model)
-      }
-      setKeysLoaded(true)
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   // Fetch decks for selector (cards_only mode)
   useEffect(() => {
     if (!isFullMode && decks.length === 0) {
@@ -124,25 +89,6 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   useEffect(() => {
     if (existingDeckId) setSelectedDeckId(existingDeckId)
   }, [existingDeckId])
-
-  // Auto-select model when provider changes
-  useEffect(() => {
-    if (!providerId) return
-    const entry = storedKeys[providerId]
-    if (entry?.model) {
-      setModel(entry.model)
-    } else {
-      const provider = getProvider(providerId)
-      if (provider && provider.models.length > 0) {
-        setModel(provider.models[0].id)
-      }
-    }
-  }, [providerId, storedKeys])
-
-  const configuredProviders = providers.filter((p) => storedKeys[p.id])
-  const hasCustom = !!storedKeys['custom']
-  const currentProvider = getProvider(providerId)
-  const models = currentProvider?.models ?? []
 
   // Selected deck info
   const selectedDeck: Deck | undefined = decks.find((d) => d.id === selectedDeckId)
@@ -165,23 +111,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!providerId || !topic.trim()) return
+    if (!topic.trim()) return
     if (!isFullMode && !selectedDeckId) return
-
-    const entry = storedKeys[providerId]
-    if (!entry?.apiKey) return
-
-    const provider = getProvider(providerId)
-
-    const aiConfig = {
-      providerId,
-      apiKey: entry.apiKey,
-      model,
-      baseUrl: entry.baseUrl || provider?.baseUrl,
-    }
-
-    // Set in-memory cache immediately
-    setAIConfigCache(aiConfig)
 
     onStart({
       topic,
@@ -199,23 +130,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     })
   }
 
-  const hasConfiguredProvider = providerId && storedKeys[providerId]?.apiKey
-  const canSubmit =
-    hasConfiguredProvider &&
-    topic.trim() &&
-    model &&
-    (isFullMode || selectedDeckId)
-
-  const noProvidersConfigured = keysLoaded && configuredProviders.length === 0 && !hasCustom
+  const canSubmit = topic.trim() && (isFullMode || selectedDeckId)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Personal API key notice — generation uses the user's own provider keys */}
-      <div className="flex items-start gap-2 p-3 rounded-lg bg-brand/5 border border-brand/20 text-sm text-muted-foreground">
-        <Info className="w-4 h-4 mt-0.5 shrink-0 text-brand" />
-        <span>{t('config.apiKeyNotice')}</span>
-      </div>
-
       {/* Mode select */}
       {showModeSelect && onModeChange && (
         <div>
@@ -240,70 +158,6 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
           </div>
         </div>
       )}
-
-      {/* ── AI Provider Section ── */}
-      <fieldset className="space-y-3 p-3 bg-muted rounded-lg">
-        <legend className="text-xs font-semibold text-muted-foreground uppercase px-1">{t('config.providerSection')}</legend>
-
-        {noProvidersConfigured ? (
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-3">{t('config.noProvidersConfigured')}</p>
-            <button
-              type="button"
-              onClick={() => navigate('/settings')}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/15 transition cursor-pointer font-medium"
-            >
-              <Settings className="w-4 h-4" />
-              {t('config.goToSettings')}
-            </button>
-          </div>
-        ) : (
-          <>
-            <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.provider')}</label>
-              <select
-                value={providerId}
-                onChange={(e) => setProviderId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
-              >
-                <option value="">{t('config.selectProvider')}</option>
-                {configuredProviders.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-                {hasCustom && (
-                  <option value="custom">{t('config.customEndpoint')}</option>
-                )}
-              </select>
-            </div>
-
-            {providerId && providerId !== 'custom' && models.length > 0 && (
-              <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.model')}</label>
-                <select
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
-                >
-                  {models.map((m) => (
-                    <option key={m.id} value={m.id}>{m.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <p className="text-xs text-content-tertiary">
-              {t('config.manageInSettings')}{' '}
-              <button
-                type="button"
-                onClick={() => navigate('/settings')}
-                className="text-brand hover:text-brand underline cursor-pointer"
-              >
-                {t('config.settings')}
-              </button>
-            </p>
-          </>
-        )}
-      </fieldset>
 
       {/* ── Content Section ── */}
       <fieldset className="space-y-3 p-3 bg-brand/5 rounded-lg border border-brand/20">
