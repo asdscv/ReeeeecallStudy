@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, ChevronDown, Globe, Loader2, Sparkles, Shield, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
+import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -19,9 +19,6 @@ import {
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
 import { maskApiKeyPartial } from '../lib/api-key'
-import { aiKeyVault } from '../lib/ai/secure-storage'
-import { getProviders, getProvider } from '../lib/ai/provider-registry'
-import type { ProviderKeyMap } from '../lib/ai/secure-storage'
 
 function CopyButton({ text }: { text: string }) {
   const { t } = useTranslation('settings')
@@ -99,15 +96,6 @@ export function SettingsPage() {
 
   // Study input settings (localStorage)
   const [inputSettings, setInputSettingsRaw] = useState<StudyInputSettings>(() => loadSettings())
-
-  // AI Provider state
-  const [aiKeys, setAiKeys] = useState<ProviderKeyMap>({})
-  const [aiEditingId, setAiEditingId] = useState<string | null>(null)
-  const [aiEditKey, setAiEditKey] = useState('')
-  const [aiEditModel, setAiEditModel] = useState('')
-  const [aiEditBaseUrl, setAiEditBaseUrl] = useState('')
-  const [aiSaving, setAiSaving] = useState(false)
-  const [aiCollapsed, setAiCollapsed] = useState(true)
 
   // Auto-save helper
   const autoSave = useCallback(async (field: string, value: unknown) => {
@@ -274,15 +262,6 @@ export function SettingsPage() {
       }
     }
     fetchApiKey()
-
-    // Load AI provider keys
-    const fetchAiKeys = async () => {
-      try {
-        const keys = await aiKeyVault.loadAll(user.id)
-        setAiKeys(keys)
-      } catch { /* ignore decrypt failures */ }
-    }
-    fetchAiKeys()
   }, [user])
 
   const [generating, setGenerating] = useState(false)
@@ -353,76 +332,6 @@ export function SettingsPage() {
     toast.success(t('apiKey.deleted'))
   }
 
-  // AI Provider handlers
-  const aiProviders = getProviders()
-
-  const CUSTOM_PROVIDER = {
-    id: 'custom',
-    name: t('aiProvider.custom'),
-    baseUrl: '',
-    models: [{ id: 'custom', name: t('aiProvider.customModel') }],
-  }
-
-  const allAiProviders = [...aiProviders, CUSTOM_PROVIDER]
-
-  const handleAiEdit = (providerId: string) => {
-    const existing = aiKeys[providerId]
-    const provider = getProvider(providerId) ?? CUSTOM_PROVIDER
-    setAiEditingId(providerId)
-    setAiEditKey(existing?.apiKey ?? '')
-    setAiEditModel(existing?.model ?? provider.models[0]?.id ?? '')
-    setAiEditBaseUrl(existing?.baseUrl ?? '')
-  }
-
-  const handleAiCancel = () => {
-    setAiEditingId(null)
-    setAiEditKey('')
-    setAiEditModel('')
-    setAiEditBaseUrl('')
-  }
-
-  const handleAiSave = async () => {
-    if (!user || !aiEditingId || !aiEditKey.trim()) return
-    setAiSaving(true)
-    try {
-      await aiKeyVault.saveProvider(user.id, aiEditingId, {
-        apiKey: aiEditKey.trim(),
-        model: aiEditModel,
-        baseUrl: aiEditingId === 'custom' ? aiEditBaseUrl.trim() : undefined,
-        savedAt: new Date().toISOString(),
-      })
-      const keys = await aiKeyVault.loadAll(user.id)
-      setAiKeys(keys)
-      setAiEditingId(null)
-      setAiEditKey('')
-      setAiEditModel('')
-      setAiEditBaseUrl('')
-      toast.success(t('aiProvider.saved'))
-    } catch {
-      toast.error(t('saveFailed'))
-    } finally {
-      setAiSaving(false)
-    }
-  }
-
-  const handleAiDelete = async (providerId: string) => {
-    if (!user) return
-    await aiKeyVault.removeProvider(user.id, providerId)
-    const keys = await aiKeyVault.loadAll(user.id)
-    setAiKeys(keys)
-    toast.success(t('aiProvider.deleted'))
-  }
-
-  const getProviderIcon = (providerId: string) => {
-    switch (providerId) {
-      case 'openai': return 'text-success bg-success/10'
-      case 'google': return 'text-brand bg-brand/10'
-      case 'anthropic': return 'text-orange-700 bg-orange-50'
-      case 'xai': return 'text-foreground bg-accent'
-      case 'custom': return 'text-purple-600 bg-purple-50'
-      default: return 'text-muted-foreground bg-muted'
-    }
-  }
 
   if (loading) {
     return (
@@ -667,138 +576,6 @@ export function SettingsPage() {
             )}
             <p className="text-xs text-content-tertiary mt-3">{t('tts.help')}</p>
           </div>
-        </section>
-
-        {/* ── e) AI Providers (collapsible) ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <button
-            onClick={() => setAiCollapsed(!aiCollapsed)}
-            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-violet-500" />
-              <h2 className="text-lg font-semibold text-foreground">{t('aiProvider.title')}</h2>
-            </div>
-            <ChevronDown className={`w-5 h-5 text-content-tertiary transition-transform ${aiCollapsed ? '' : 'rotate-180'}`} />
-          </button>
-
-          {!aiCollapsed && (
-            <>
-              <p className="text-sm text-muted-foreground mt-2 mb-5">{t('aiProvider.description')}</p>
-
-              <div className="space-y-2">
-                {allAiProviders.map((provider) => {
-                  const isConfigured = !!aiKeys[provider.id]
-                  const isEditing = aiEditingId === provider.id
-                  const iconClasses = getProviderIcon(provider.id)
-                  const models = provider.id === 'custom'
-                    ? [{ id: 'custom', name: t('aiProvider.customModel') }]
-                    : (getProvider(provider.id)?.models ?? provider.models)
-
-                  return (
-                    <div key={provider.id} className="border border-border rounded-xl overflow-hidden">
-                      {/* Toggle header */}
-                      <button
-                        onClick={() => isEditing ? handleAiCancel() : handleAiEdit(provider.id)}
-                        className="w-full flex items-center gap-3 p-3.5 bg-transparent border-none cursor-pointer hover:bg-accent/50 transition"
-                      >
-                        <div className={`flex items-center justify-center w-8 h-8 rounded-lg shrink-0 ${iconClasses}`}>
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </div>
-                        <div className="flex-1 min-w-0 text-left">
-                          <div className="text-sm font-semibold text-foreground">
-                            {provider.id === 'custom' ? t('aiProvider.custom') : provider.name}
-                          </div>
-                          {provider.id === 'custom' && (
-                            <div className="text-xs text-content-tertiary">{t('aiProvider.customDesc')}</div>
-                          )}
-                        </div>
-                        {isConfigured ? (
-                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-success/10 text-success whitespace-nowrap">
-                            {t('aiProvider.configured')}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-accent text-muted-foreground whitespace-nowrap">
-                            {t('aiProvider.notSet')}
-                          </span>
-                        )}
-                        <ChevronDown className={`w-4 h-4 text-content-tertiary transition-transform shrink-0 ${isEditing ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {/* Expanded edit form */}
-                      {isEditing && (
-                        <div className="px-3.5 pb-3.5 pt-0 space-y-3 border-t border-border">
-                          <div className="pt-3">
-                            <label className="block text-sm font-medium text-foreground mb-1">{t('aiProvider.apiKey')}</label>
-                            <input
-                              type="password"
-                              value={aiEditKey}
-                              onChange={(e) => setAiEditKey(e.target.value)}
-                              placeholder={t('aiProvider.apiKeyPlaceholder')}
-                              className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-sm font-mono"
-                            />
-                          </div>
-                          <div className="relative">
-                            <label className="block text-sm font-medium text-foreground mb-1">{t('aiProvider.model')}</label>
-                            <select
-                              value={aiEditModel}
-                              onChange={(e) => setAiEditModel(e.target.value)}
-                              className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-base bg-card appearance-none"
-                            >
-                              {models.map((m) => (
-                                <option key={m.id} value={m.id}>{m.name}</option>
-                              ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-[38px] w-4 h-4 text-content-tertiary pointer-events-none" />
-                          </div>
-                          {provider.id === 'custom' && (
-                            <div>
-                              <label className="block text-sm font-medium text-foreground mb-1">{t('aiProvider.baseUrl')}</label>
-                              <input
-                                type="url"
-                                value={aiEditBaseUrl}
-                                onChange={(e) => setAiEditBaseUrl(e.target.value)}
-                                placeholder="https://api.example.com/v1"
-                                className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-sm font-mono"
-                              />
-                            </div>
-                          )}
-                          <div className="flex gap-2 pt-1">
-                            <button
-                              onClick={handleAiSave}
-                              disabled={aiSaving || !aiEditKey.trim()}
-                              className="flex-1 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium"
-                            >
-                              {aiSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('aiProvider.save')}
-                            </button>
-                            {isConfigured && (
-                              <button
-                                onClick={() => handleAiDelete(provider.id)}
-                                className="px-4 py-2 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            )}
-                            <button
-                              onClick={handleAiCancel}
-                              className="px-4 py-2 text-sm text-muted-foreground bg-accent rounded-lg hover:bg-accent transition cursor-pointer"
-                            >
-                              {t('aiProvider.cancel')}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className="flex items-start gap-2 mt-4 p-3 bg-muted rounded-lg">
-                <Shield className="w-4 h-4 text-content-tertiary mt-0.5 shrink-0" />
-                <p className="text-xs text-muted-foreground">{t('aiProvider.securityNote')}</p>
-              </div>
-            </>
-          )}
         </section>
 
         {/* ── f) Language ── */}

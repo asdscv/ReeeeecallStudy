@@ -22,8 +22,9 @@ const fields = [
 
 describe('server ai-prompts parity with the canonical client builder', () => {
   it('template prompt matches (ko UI, ja content, field hints)', () => {
-    const args = ['기초 일본어', 'ko', false, 'ja-JP', [{ name: '단어', side: 'front' as const }]] as const
-    expect(serverTemplate(...args)).toEqual(oracleTemplate(...args))
+    const hints = [{ name: '단어', side: 'front' as const }]
+    expect(serverTemplate('기초 일본어', 'ko', false, 'ja-JP', hints))
+      .toEqual(oracleTemplate('기초 일본어', 'ko', false, 'ja-JP', hints))
   })
 
   it('template prompt matches (en UI, custom HTML, no hints)', () => {
