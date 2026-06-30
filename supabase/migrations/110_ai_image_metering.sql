@@ -57,32 +57,8 @@ $$;
 REVOKE EXECUTE ON FUNCTION public.record_ai_image() FROM PUBLIC, anon;
 GRANT  EXECUTE ON FUNCTION public.record_ai_image() TO authenticated;
 
--- Refund an image job (vision call failed): restore credits + decrement image_jobs.
-CREATE OR REPLACE FUNCTION public.refund_ai_image(p_credits integer)
-  RETURNS void
-  LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
-AS $$
-DECLARE
-  v_uid   uuid    := auth.uid();
-  v_today date    := (now() AT TIME ZONE 'UTC')::date;
-  v_bal   integer;
-  v_c     integer := GREATEST(0, COALESCE(p_credits, 0));
-BEGIN
-  IF v_uid IS NULL THEN RETURN; END IF;
-  UPDATE ai_generation_usage SET image_jobs = GREATEST(0, image_jobs - 1)
-   WHERE user_id = v_uid AND usage_date = v_today;
-  IF v_c > 0 THEN
-    UPDATE ai_credit_balance SET balance = balance + v_c, updated_at = now()
-      WHERE user_id = v_uid RETURNING balance INTO v_bal;
-    IF FOUND THEN
-      INSERT INTO ai_credit_ledger (user_id, delta, reason, ref, balance_after)
-        VALUES (v_uid, v_c, 'refund', NULL, v_bal);
-    END IF;
-  END IF;
-END;
-$$;
-REVOKE EXECUTE ON FUNCTION public.refund_ai_image(integer) FROM PUBLIC, anon;
-GRANT  EXECUTE ON FUNCTION public.refund_ai_image(integer) TO authenticated;
+-- Refund for image jobs is handled by refund_ai_job (mig 111) — service_role
+-- only, derives the amount from a recorded job row (no client-supplied amount).
 
 -- Extend the wallet snapshot with the image price (was: balance, credits_per_card).
 DROP FUNCTION IF EXISTS public.get_ai_wallet();

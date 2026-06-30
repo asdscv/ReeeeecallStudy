@@ -62,6 +62,15 @@ function json(body: unknown, status: number, cors: Record<string, string>): Resp
   })
 }
 
+// Service-role client — used ONLY for the privileged refund (refund_ai_job),
+// which derives the amount from the recorded job and is service_role-gated.
+function sbServiceRole() {
+  return createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
+}
+
 // ── Auth (mirror tts) ───────────────────────────────────────
 async function verifyUser(authHeader: string | null): Promise<string | null> {
   if (!authHeader) return null
@@ -267,7 +276,7 @@ Deno.serve(async (req) => {
         console.error('[ai-generate] image metering error:', imgErr.message)
         return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
       }
-      const imgMeter = (imgRaw ?? {}) as { credits_spent?: number; balance?: number }
+      const imgMeter = (imgRaw ?? {}) as { credits_spent?: number; balance?: number; job_ref?: string }
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
@@ -276,8 +285,8 @@ Deno.serve(async (req) => {
       } catch (e) {
         const msg = (e as Error).message
         console.error('[ai-generate] vision failure:', msg)
-        if ((imgMeter.credits_spent ?? 0) > 0) {
-          await sbUser.rpc('refund_ai_image', { p_credits: imgMeter.credits_spent ?? 0 }).catch(() => {})
+        if (imgMeter.job_ref) {
+          await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: imgMeter.job_ref }).catch(() => {})
         }
         const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
         return json({ error: 'Generation failed', code }, 502, cors)
@@ -333,9 +342,9 @@ Deno.serve(async (req) => {
       console.error('[ai-generate] metering error:', quotaErr.message)
       return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
     }
-    // record_ai_generation returns the free/paid split so a failure refunds exactly.
+    // record_ai_generation returns the split + a job_ref so a failure refunds the job.
     const meter = (meterRaw ?? {}) as {
-      remaining_free?: number; free_now?: number; paid_now?: number; credits_spent?: number
+      remaining_free?: number; free_now?: number; paid_now?: number; credits_spent?: number; job_ref?: string
     }
     const remainingFree = typeof meter.remaining_free === 'number' ? meter.remaining_free : 0
 
@@ -346,15 +355,11 @@ Deno.serve(async (req) => {
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
-      // M1/H1: metering already committed — refund the EXACT split (free counter,
-      // paid counter, and debited credits) so a provider failure burns nothing.
-      // Best-effort (don't mask the 502).
-      if ((meter.free_now ?? 0) > 0 || (meter.paid_now ?? 0) > 0 || (meter.credits_spent ?? 0) > 0) {
-        await sbUser.rpc('refund_ai_generation', {
-          p_free: meter.free_now ?? 0,
-          p_paid: meter.paid_now ?? 0,
-          p_credits: meter.credits_spent ?? 0,
-        }).catch(() => {})
+      // Metering committed before generation — refund the recorded job so a
+      // provider failure burns nothing. The RPC derives the amount from the job
+      // row (service_role only). Best-effort (don't mask the 502).
+      if (meter.job_ref) {
+        await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: meter.job_ref }).catch(() => {})
       }
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)
