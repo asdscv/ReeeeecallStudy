@@ -8,8 +8,8 @@
 // provider call → respond).
 //
 // POST /ai-generate
-//   body: { kind: 'template'|'deck'|'cards', topic, uiLang, ...kind-specific }
-//   200 : { content: <parsed JSON>, remainingFree: number }
+//   body: { kind: 'template'|'deck'|'cards'|'image', topic|image, uiLang, ...kind-specific }
+//   200 : { content: <parsed JSON>, remainingFree?: number, balance?: number }
 //   401 unauth · 400 bad request · 429 quota · 502 provider · 503 not configured
 
 import { createClient } from '@supabase/supabase-js'
@@ -17,6 +17,7 @@ import {
   buildTemplatePrompt,
   buildDeckPrompt,
   buildCardsPrompt,
+  buildImageCardsPrompt,
   type FieldHint,
   type GeneratedTemplateField,
 } from '../_shared/ai-prompts.ts'
@@ -35,6 +36,7 @@ const MAX_FIELD_STR = 200                  // cap field key/name/hint length (L2
 const MAX_EXISTING_CARDS_BYTES = 8000      // cap dedup payload size (L2)
 const PROVIDER_RETRY_DELAYS = [2000, 8000] // ms; per-minute provider rate limits
 const PROVIDER_TIMEOUT_MS = 30000          // abort a hung provider call (L1)
+const MAX_IMAGE_BYTES = 7_000_000          // ~5MB image as a base64 data URL (vision)
 
 // ── CORS (origin allowlist; mirror tts) ─────────────────────
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
@@ -60,6 +62,15 @@ function json(body: unknown, status: number, cors: Record<string, string>): Resp
   })
 }
 
+// Service-role client — used ONLY for the privileged refund (refund_ai_job),
+// which derives the amount from the recorded job and is service_role-gated.
+function sbServiceRole() {
+  return createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
+}
+
 // ── Auth (mirror tts) ───────────────────────────────────────
 async function verifyUser(authHeader: string | null): Promise<string | null> {
   if (!authHeader) return null
@@ -83,12 +94,17 @@ function stripMarkdownFences(text: string): string {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string): Promise<string> {
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<string> {
+  // Vision: the OpenAI-compatible shape carries the image in the user message
+  // as a content array. Plain text uses a string.
+  const userContent = imageUrl
+    ? [{ type: 'text', text: userPrompt }, { type: 'image_url', image_url: { url: imageUrl } }]
+    : userPrompt
   const body = {
     model: m.model,
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
+      { role: 'user', content: userContent },
     ],
     response_format: { type: 'json_object' },
     temperature: 0.8,
@@ -134,14 +150,14 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 }
 
 // Returns parsed JSON; one stricter-prompt retry on unparseable output (mirrors callAI).
-async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string): Promise<Record<string, unknown>> {
-  const first = stripMarkdownFences(await providerRequest(m, systemPrompt, userPrompt))
+async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<Record<string, unknown>> {
+  const first = stripMarkdownFences(await providerRequest(m, systemPrompt, userPrompt, imageUrl))
   try {
     return JSON.parse(first)
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const retry = stripMarkdownFences(await providerRequest(m, strict, userPrompt))
+    const retry = stripMarkdownFences(await providerRequest(m, strict, userPrompt, imageUrl))
     return JSON.parse(retry)
   }
 }
@@ -202,6 +218,14 @@ function asExistingCards(v: unknown): Record<string, string>[] | undefined {
   return out.length > 0 ? out : undefined
 }
 
+// Validate an uploaded image as a base64 data URL, size-capped (vision).
+function asImage(v: unknown): string | null {
+  if (typeof v !== 'string') return null
+  if (!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(v)) return null
+  if (v.length > MAX_IMAGE_BYTES) return null
+  return v
+}
+
 // ── Handler ─────────────────────────────────────────────────
 Deno.serve(async (req) => {
   const cors = corsHeadersFor(req.headers.get('Origin'))
@@ -214,22 +238,65 @@ Deno.serve(async (req) => {
     const userId = await verifyUser(authHeader)
     if (!userId) return json({ error: 'Unauthorized' }, 401, cors)
 
-    const model = resolveModel('text', ENV)
+    const body = await req.json().catch(() => null) as Record<string, any> | null
+    if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
+
+    const kind = body.kind
+    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image') {
+      return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
+    }
+    const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
+
+    // Resolve provider+model by purpose (vision for image, text otherwise).
+    const model = resolveModel(kind === 'image' ? 'vision' : 'text', ENV)
     if (!model) {
       console.error('[ai-generate] no provider configured (set AI_GENERATION_PROVIDER_KEY)')
       return json({ error: 'Server not configured', code: 'AI_NOT_CONFIGURED' }, 503, cors)
     }
 
-    const body = await req.json().catch(() => null) as Record<string, any> | null
-    if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
+    // Meter as the caller (auth.uid() resolves; a RAISE rolls back).
+    const sbUser = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader! } } },
+    )
 
-    const kind = body.kind
-    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards') {
-      return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
+    // ── Image recognition (vision) — ALWAYS paid, separate metering ──
+    if (kind === 'image') {
+      const image = asImage(body.image)
+      if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
+      const fields = asFields(body.fields)
+      if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
+      const cardCount = Math.min(MAX_CARDS_PER_CALL, Math.max(1, Math.floor(Number(body.cardCount) || 10)))
+
+      const { data: imgRaw, error: imgErr } = await sbUser.rpc('record_ai_image')
+      if (imgErr) {
+        if (imgErr.code === 'P0002') return json({ error: 'Insufficient AI credits', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+        if (imgErr.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+        console.error('[ai-generate] image metering error:', imgErr.message)
+        return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const imgMeter = (imgRaw ?? {}) as { credits_spent?: number; balance?: number; job_ref?: string }
+
+      const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
+      try {
+        const content = await generate(model, iSys, iUser, image)
+        return json({ content, balance: imgMeter.balance ?? null }, 200, cors)
+      } catch (e) {
+        const msg = (e as Error).message
+        console.error('[ai-generate] vision failure:', msg)
+        if (imgMeter.job_ref) {
+          await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: imgMeter.job_ref })
+            .catch((re) => console.error('[ai-generate] image refund failed (job', imgMeter.job_ref, ')', re))
+        }
+        const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
+        return json({ error: 'Generation failed', code }, 502, cors)
+      }
     }
+
+    // ── Text flow (template/deck/cards) ──
     const topic = asTopic(body.topic)
     if (!topic) return json({ error: 'Invalid topic', code: 'BAD_REQUEST' }, 400, cors)
-    const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
 
     // Build the prompt server-side from structured params; compute card count.
     let systemPrompt: string
@@ -258,13 +325,8 @@ Deno.serve(async (req) => {
       ;({ systemPrompt, userPrompt } = buildCardsPrompt(topic, fields, pCards, existing))
     }
 
-    // Meter BEFORE generation (gate cost). Runs as the caller so auth.uid()
-    // resolves; RAISE → error, rolled back so a rejected call consumes nothing.
-    const sbUser = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader! } } },
-    )
+    // Meter BEFORE generation (gate cost). RAISE → error, rolled back so a
+    // rejected call consumes nothing.
     const { data: meterRaw, error: quotaErr } = await sbUser.rpc('record_ai_generation', {
       p_kind: kind,
       p_cards: pCards,
@@ -281,9 +343,9 @@ Deno.serve(async (req) => {
       console.error('[ai-generate] metering error:', quotaErr.message)
       return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
     }
-    // record_ai_generation returns the free/paid split so a failure refunds exactly.
+    // record_ai_generation returns the split + a job_ref so a failure refunds the job.
     const meter = (meterRaw ?? {}) as {
-      remaining_free?: number; free_now?: number; paid_now?: number; credits_spent?: number
+      remaining_free?: number; free_now?: number; paid_now?: number; credits_spent?: number; job_ref?: string
     }
     const remainingFree = typeof meter.remaining_free === 'number' ? meter.remaining_free : 0
 
@@ -294,15 +356,12 @@ Deno.serve(async (req) => {
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
-      // M1/H1: metering already committed — refund the EXACT split (free counter,
-      // paid counter, and debited credits) so a provider failure burns nothing.
-      // Best-effort (don't mask the 502).
-      if ((meter.free_now ?? 0) > 0 || (meter.paid_now ?? 0) > 0 || (meter.credits_spent ?? 0) > 0) {
-        await sbUser.rpc('refund_ai_generation', {
-          p_free: meter.free_now ?? 0,
-          p_paid: meter.paid_now ?? 0,
-          p_credits: meter.credits_spent ?? 0,
-        }).catch(() => {})
+      // Metering committed before generation — refund the recorded job so a
+      // provider failure burns nothing. The RPC derives the amount from the job
+      // row (service_role only). Best-effort (don't mask the 502).
+      if (meter.job_ref) {
+        await sbServiceRole().rpc('refund_ai_job', { p_user_id: userId, p_job_ref: meter.job_ref })
+          .catch((re) => console.error('[ai-generate] refund failed (job', meter.job_ref, ')', re))
       }
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)

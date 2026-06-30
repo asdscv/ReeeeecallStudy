@@ -159,9 +159,24 @@ Cards beyond the daily free 10 now spend prepaid credits instead of hard-failing
 - Verified: wallet/overage on real Postgres (`ALL_109_TESTS_PASSED`, T1–T9), web+mobile
   `tsc` exit 0, AI suite 67/67. (Visible balance widget deferred to the payment-UI phase.)
 
-## 14. Remaining Phase 1
-- **1b** image upload → vision recognition → cards (paid via `image_jobs`/credits;
-  `resolveModel('vision')` seam ready; needs a vision-capable provider key + storage + UI).
+## 14b. Phase 1b — image recognition → cards (backend SHIPPED to develop)
+Upload an image → vision model extracts content → flashcards. **Always paid** (no free).
+- **mig 110**: `_ai_credits_per_image` (5) + `record_ai_image` (debit credits, bump
+  `image_jobs`, `spend_image` ledger, insufficient → P0002) + `refund_ai_image` +
+  `get_ai_wallet` extended with `credits_per_image`.
+- edge fn `kind:'image'`: `resolveModel('vision')`, validate data-URL image (size cap)
+  + fields, meter, OpenAI-compat `image_url` message, refund on failure.
+- `buildImageCardsPrompt`; shared `callServerAI` image kind + `store.generateCardsFromImage`.
+- Verified: `ALL_110_TESTS_PASSED` (real PG) + **LIVE Grok vision e2e** (real vocab image
+  → 5 correct cards) + web+mobile tsc. **Remaining: image-upload UI (web wizard step +
+  mobile expo-image-picker)** — backend + client API done, UI is a focused follow-up.
+
+## 14c. Deferred UI (consolidated follow-up)
+- Visible remaining-free-cards + wallet balance widget (ConfigStep / AIGenerateScreen) — 8-locale i18n.
+- Image-upload entry + picker (web + mobile) wiring `store.generateCardsFromImage`.
+- Credit top-up button (lands with payment 1c).
+
+## 15. Remaining Phase 1
 - **1c** payment rails — web PortOne + mobile Apple IAP / Google Play Billing (RevenueCat),
   crediting the wallet via `add_ai_credits` (service_role). Strategy A; Korea bans out-links.
   **External: merchant/store credentials + product setup + Apple-review (RevenueCat was rejected).**
