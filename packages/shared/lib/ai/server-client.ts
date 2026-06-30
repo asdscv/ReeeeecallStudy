@@ -88,19 +88,31 @@ export interface AiWallet {
 
 // Caller's prepaid credit wallet (Phase 1). Fails open to {0,1} — the server is
 // authoritative (debits atomically, 402s when short).
-export async function getAiWallet(): Promise<AiWallet> {
+// Returns null when the wallet is UNKNOWN due to a transient error — distinct
+// from a known 0 balance, so the client doesn't wrongly hard-block a paying user.
+export async function getAiWallet(): Promise<AiWallet | null> {
   const { data, error } = await supabase.rpc('get_ai_wallet')
   const row = Array.isArray(data) ? data[0] : data
-  if (error || !row) return { balance: 0, creditsPerCard: 1 }
+  if (error || !row) return null
   return {
     balance: Number(row.balance ?? 0),
     creditsPerCard: Number(row.credits_per_card ?? 1),
   }
 }
 
+export interface Affordable {
+  free: number
+  paid: number
+  total: number
+  walletKnown: boolean
+}
+
 // Cards the user can generate right now = free remaining + what credits can buy.
-export async function getAffordableCards(): Promise<{ free: number; paid: number; total: number }> {
+// walletKnown=false → wallet read failed; caller should defer to the authoritative
+// server gate instead of hard-blocking (L1).
+export async function getAffordableCards(): Promise<Affordable> {
   const [q, w] = await Promise.all([getAiGenerationQuota(), getAiWallet()])
+  if (!w) return { free: q.remaining, paid: 0, total: q.remaining, walletKnown: false }
   const paid = w.creditsPerCard > 0 ? Math.floor(w.balance / w.creditsPerCard) : 0
-  return { free: q.remaining, paid, total: q.remaining + paid }
+  return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true }
 }

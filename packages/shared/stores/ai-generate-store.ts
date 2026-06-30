@@ -123,8 +123,9 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
     try {
       // Fail fast before any paid call if the user can't afford a single card
       // (no free left AND no credits) — avoids wasting template + deck calls.
-      const { total } = await getAffordableCards()
-      if (total <= 0) throw new Error('AI_QUOTA_EXCEEDED')
+      // Only hard-block when the wallet is KNOWN (L1: don't block on a read blip).
+      const aff = await getAffordableCards()
+      if (aff.walletKnown && aff.total <= 0) throw new Error('AI_QUOTA_EXCEEDED')
       const uiLang = i18next.language
       const { topic, useCustomHtml, contentLang, fieldHints } = get()
       const { content } = await callServerAI({
@@ -190,10 +191,11 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       if (!fields || fields.length === 0) throw new Error('INVALID_RESPONSE')
 
       // Phase 1: cap to what the user can afford = free remaining + credits.
-      // The server is authoritative (debits atomically, 402s when short).
-      const { total } = await getAffordableCards()
-      if (total <= 0) throw new Error('AI_QUOTA_EXCEEDED')
-      const effectiveCount = Math.min(cardCount, total)
+      // The server is authoritative (debits atomically, 402s when short). If the
+      // wallet read failed (walletKnown=false), don't cap/block — defer to server.
+      const aff = await getAffordableCards()
+      if (aff.walletKnown && aff.total <= 0) throw new Error('AI_QUOTA_EXCEEDED')
+      const effectiveCount = aff.walletKnown ? Math.min(cardCount, aff.total) : cardCount
 
       // Get existing cards for dedup in cards_only mode
       let existingCards: Record<string, string>[] | undefined

@@ -265,7 +265,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { Authorization: authHeader! } } },
     )
-    const { data: remainingFree, error: quotaErr } = await sbUser.rpc('record_ai_generation', {
+    const { data: meterRaw, error: quotaErr } = await sbUser.rpc('record_ai_generation', {
       p_kind: kind,
       p_cards: pCards,
     })
@@ -281,6 +281,11 @@ Deno.serve(async (req) => {
       console.error('[ai-generate] metering error:', quotaErr.message)
       return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
     }
+    // record_ai_generation returns the free/paid split so a failure refunds exactly.
+    const meter = (meterRaw ?? {}) as {
+      remaining_free?: number; free_now?: number; paid_now?: number; credits_spent?: number
+    }
+    const remainingFree = typeof meter.remaining_free === 'number' ? meter.remaining_free : 0
 
     // Generate.
     let content: Record<string, unknown>
@@ -289,10 +294,15 @@ Deno.serve(async (req) => {
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
-      // M1: metering already committed — refund the cards so a provider failure
-      // doesn't burn the user's free quota. Best-effort (don't mask the 502).
-      if (pCards > 0) {
-        await sbUser.rpc('refund_ai_generation', { p_cards: pCards }).catch(() => {})
+      // M1/H1: metering already committed — refund the EXACT split (free counter,
+      // paid counter, and debited credits) so a provider failure burns nothing.
+      // Best-effort (don't mask the 502).
+      if ((meter.free_now ?? 0) > 0 || (meter.paid_now ?? 0) > 0 || (meter.credits_spent ?? 0) > 0) {
+        await sbUser.rpc('refund_ai_generation', {
+          p_free: meter.free_now ?? 0,
+          p_paid: meter.paid_now ?? 0,
+          p_credits: meter.credits_spent ?? 0,
+        }).catch(() => {})
       }
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)
