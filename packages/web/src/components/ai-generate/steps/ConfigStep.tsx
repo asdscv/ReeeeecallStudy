@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ImageUp } from 'lucide-react'
+import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '../../../stores/deck-store'
 import type { GenerateMode } from '../../../lib/ai/types'
 import type { Deck } from '../../../types/database'
@@ -22,6 +24,8 @@ export interface GenerateConfig {
   customFields: FieldPresetItem[]
   selectedDeckId?: string
   selectedTemplateId?: string
+  imageMode?: 'topic' | 'image'
+  imageDataUrl?: string
 }
 
 const CONTENT_LANGUAGES = [
@@ -66,6 +70,14 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   // Deck selector (cards_only mode)
   const [selectedDeckId, setSelectedDeckId] = useState(existingDeckId || '')
 
+  // Input mode (cards_only): type a topic, or upload an image to recognize.
+  const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  // Remaining free cards + credit-affordable cards (cost transparency).
+  const [affordable, setAffordable] = useState<Affordable | null>(null)
+
   // Field config
   const [fieldMode, setFieldMode] = useState<FieldMode>('auto')
   const [customFields, setCustomFields] = useState<FieldPresetItem[]>([
@@ -74,6 +86,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   ])
 
   const isFullMode = mode === 'full'
+  const useImage = !isFullMode && imageMode === 'image'
 
   // Fetch decks for selector (cards_only mode)
   useEffect(() => {
@@ -89,6 +102,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   useEffect(() => {
     if (existingDeckId) setSelectedDeckId(existingDeckId)
   }, [existingDeckId])
+
+  // Load the remaining-free + credit affordance once (server is authoritative).
+  useEffect(() => {
+    getAffordableCards().then(setAffordable).catch(() => {})
+  }, [])
 
   // Selected deck info
   const selectedDeck: Deck | undefined = decks.find((d) => d.id === selectedDeckId)
@@ -109,10 +127,22 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     setCustomFields(updated)
   }
 
+  const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => setImageDataUrl(typeof reader.result === 'string' ? reader.result : null)
+    reader.readAsDataURL(file)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!topic.trim()) return
-    if (!isFullMode && !selectedDeckId) return
+    if (useImage) {
+      if (!imageDataUrl || !selectedDeckId) return
+    } else {
+      if (!topic.trim()) return
+      if (!isFullMode && !selectedDeckId) return
+    }
 
     onStart({
       topic,
@@ -127,10 +157,27 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       selectedTemplateId: !isFullMode && selectedDeck?.default_template_id
         ? selectedDeck.default_template_id
         : undefined,
+      imageMode: useImage ? 'image' : 'topic',
+      imageDataUrl: useImage ? imageDataUrl ?? undefined : undefined,
     })
   }
 
-  const canSubmit = topic.trim() && (isFullMode || selectedDeckId)
+  const canSubmit = useImage
+    ? !!imageDataUrl && !!selectedDeckId
+    : topic.trim() && (isFullMode || selectedDeckId)
+
+  // Remaining-free / credit affordance line.
+  const walletText = !affordable
+    ? null
+    : !affordable.walletKnown
+      ? t('wallet.unknown')
+      : affordable.free > 0 && affordable.paid > 0
+        ? t('wallet.summary', { free: affordable.free, credits: affordable.paid })
+        : affordable.free > 0
+          ? t('wallet.freeOnly', { free: affordable.free })
+          : affordable.paid > 0
+            ? t('wallet.creditsOnly', { credits: affordable.paid })
+            : t('wallet.empty')
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -187,31 +234,84 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
           </div>
         )}
 
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.topic')}</label>
-          <input
-            type="text"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder={t('config.topicPlaceholder')}
-            className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.contentLang')}</label>
-          <select
-            value={contentLang}
-            onChange={(e) => setContentLang(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
-          >
-            {CONTENT_LANGUAGES.map((l) => (
-              <option key={l.value} value={l.value}>
-                {l.label ?? t(l.labelKey!)}
-              </option>
+        {/* Input mode toggle (cards_only): topic vs image */}
+        {!isFullMode && (
+          <div className="grid grid-cols-2 gap-1.5">
+            {(['topic', 'image'] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setImageMode(m)}
+                className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer ${
+                  imageMode === m
+                    ? 'border-brand bg-brand/10 text-brand'
+                    : 'border-border text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {t(m === 'topic' ? 'config.inputModeTopic' : 'config.inputModeImage')}
+              </button>
             ))}
-          </select>
-        </div>
+          </div>
+        )}
+
+        {/* Topic input (topic mode, or full mode) */}
+        {!useImage && (
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.topic')}</label>
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder={t('config.topicPlaceholder')}
+              className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand"
+            />
+          </div>
+        )}
+
+        {/* Image upload (cards_only + image mode) — always paid (no free tier) */}
+        {useImage && (
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.imageUpload')}</label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={onPickImage}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-dashed border-brand/40 text-sm text-brand hover:bg-brand/5 transition cursor-pointer"
+            >
+              <ImageUp className="w-4 h-4" />
+              {imageDataUrl ? t('config.imageChange') : t('config.imageUpload')}
+            </button>
+            {imageDataUrl && (
+              <img src={imageDataUrl} alt="" className="mt-2 max-h-44 rounded-lg border border-border mx-auto" />
+            )}
+            <p className="text-[11px] text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
+            <p className="text-[11px] text-amber-600 mt-0.5">{t('config.imagePaidNotice')}</p>
+          </div>
+        )}
+
+        {/* Content language (topic mode — image takes its language from the image) */}
+        {!useImage && (
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">{t('config.contentLang')}</label>
+            <select
+              value={contentLang}
+              onChange={(e) => setContentLang(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
+            >
+              {CONTENT_LANGUAGES.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.label ?? t(l.labelKey!)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="block text-xs font-medium text-muted-foreground mb-1">
@@ -347,6 +447,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             </div>
           </div>
         </fieldset>
+      )}
+
+      {walletText && (
+        <p className="text-xs text-center text-muted-foreground">{walletText}</p>
       )}
 
       <button

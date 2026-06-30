@@ -51,7 +51,20 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} thẻ",
-    "apiKeyNotice": "Tạo bằng AI yêu cầu khóa API riêng của bạn cho mỗi nhà cung cấp. Thêm hoặc quản lý khóa trong Cài đặt."
+    "apiKeyNotice": "Tạo bằng AI yêu cầu khóa API riêng của bạn cho mỗi nhà cung cấp. Thêm hoặc quản lý khóa trong Cài đặt.",
+    "inputModeTopic": "Chủ đề",
+    "inputModeImage": "Hình ảnh",
+    "imageUpload": "Tải hình ảnh lên",
+    "imageChange": "Đổi hình ảnh",
+    "imageUploadHint": "Chọn ảnh chụp danh sách từ vựng, trang sách giáo khoa hoặc ghi chú — AI sẽ chuyển thành thẻ.",
+    "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng (không có gói miễn phí)."
+  },
+  "wallet": {
+    "summary": "Hôm nay còn {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
+    "freeOnly": "Hôm nay còn {{free}} thẻ miễn phí",
+    "creditsOnly": "Còn {{credits}} thẻ trả phí",
+    "empty": "Đã hết thẻ miễn phí và tín dụng — nạp thêm để tiếp tục tạo",
+    "unknown": "Hiện không thể xem số dư"
   },
   "wizard": {
     "setup": "Setup",

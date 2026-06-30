@@ -51,7 +51,20 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} cards",
-    "apiKeyNotice": "AI generation requires your own API key for each provider. Add or manage keys in Settings."
+    "apiKeyNotice": "AI generation requires your own API key for each provider. Add or manage keys in Settings.",
+    "inputModeTopic": "Topic",
+    "inputModeImage": "Image",
+    "imageUpload": "Upload image",
+    "imageChange": "Change image",
+    "imageUploadHint": "Pick a photo of a word list, textbook page, or notes — AI turns it into cards.",
+    "imagePaidNotice": "Image generation uses credits (no free tier)."
+  },
+  "wallet": {
+    "summary": "{{free}} free + {{credits}} paid cards available today",
+    "freeOnly": "{{free}} free cards left today",
+    "creditsOnly": "{{credits}} paid cards available",
+    "empty": "No free cards or credits left — top up to keep generating",
+    "unknown": "Balance unavailable right now"
   },
   "wizard": {
     "setup": "Setup",

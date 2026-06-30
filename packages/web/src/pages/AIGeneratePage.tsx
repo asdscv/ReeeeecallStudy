@@ -87,6 +87,8 @@ export function AIGeneratePage() {
 
     if (mode === 'full') {
       store.generateTemplate()
+    } else if (cfg.imageMode === 'image' && cfg.imageDataUrl) {
+      store.generateCardsFromImage(cfg.imageDataUrl)
     } else {
       store.generateCards()
     }

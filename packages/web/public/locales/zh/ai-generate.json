@@ -51,7 +51,20 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} 张卡片",
-    "apiKeyNotice": "AI 生成需要您为每个提供商提供自己的 API 密钥。请在设置中添加或管理密钥。"
+    "apiKeyNotice": "AI 生成需要您为每个提供商提供自己的 API 密钥。请在设置中添加或管理密钥。",
+    "inputModeTopic": "主题",
+    "inputModeImage": "图片",
+    "imageUpload": "上传图片",
+    "imageChange": "更换图片",
+    "imageUploadHint": "选择一张单词列表、教科书页面或笔记的照片——AI 会将其转化为卡片。",
+    "imagePaidNotice": "图片生成需要消耗点数（无免费额度）。"
+  },
+  "wallet": {
+    "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",
+    "freeOnly": "今日剩余 {{free}} 张免费卡片",
+    "creditsOnly": "可用 {{credits}} 张付费卡片",
+    "empty": "免费卡片和点数均已用完——充值即可继续生成",
+    "unknown": "暂时无法获取余额"
   },
   "wizard": {
     "setup": "Setup",

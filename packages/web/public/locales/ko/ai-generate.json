@@ -51,7 +51,20 @@
     "layoutCustomDesc": "AI가 스타일된 HTML 생성",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}}장",
-    "apiKeyNotice": "AI 생성에는 프로바이더별 본인 API 키가 필요합니다. 설정에서 키를 추가·관리하세요."
+    "apiKeyNotice": "AI 생성에는 프로바이더별 본인 API 키가 필요합니다. 설정에서 키를 추가·관리하세요.",
+    "inputModeTopic": "주제",
+    "inputModeImage": "이미지",
+    "imageUpload": "이미지 업로드",
+    "imageChange": "이미지 변경",
+    "imageUploadHint": "단어 목록, 교과서 페이지, 필기 사진을 올리면 AI가 카드로 만들어드립니다.",
+    "imagePaidNotice": "이미지 생성은 크레딧을 사용합니다 (무료 제공 없음)."
+  },
+  "wallet": {
+    "summary": "오늘 사용 가능: 무료 {{free}}장 + 유료 {{credits}}장",
+    "freeOnly": "오늘 남은 무료 카드 {{free}}장",
+    "creditsOnly": "사용 가능한 유료 카드 {{credits}}장",
+    "empty": "남은 무료 카드와 크레딧이 없습니다 — 충전하면 계속 생성할 수 있습니다",
+    "unknown": "현재 잔액을 확인할 수 없습니다"
   },
   "wizard": {
     "setup": "설정",

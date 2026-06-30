@@ -51,7 +51,20 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} kartu",
-    "apiKeyNotice": "Pembuatan AI memerlukan kunci API Anda sendiri untuk setiap penyedia. Tambah atau kelola kunci di Pengaturan."
+    "apiKeyNotice": "Pembuatan AI memerlukan kunci API Anda sendiri untuk setiap penyedia. Tambah atau kelola kunci di Pengaturan.",
+    "inputModeTopic": "Topik",
+    "inputModeImage": "Gambar",
+    "imageUpload": "Unggah gambar",
+    "imageChange": "Ganti gambar",
+    "imageUploadHint": "Pilih foto daftar kata, halaman buku teks, atau catatan — AI akan mengubahnya menjadi kartu.",
+    "imagePaidNotice": "Pembuatan dari gambar menggunakan kredit (tidak ada tingkat gratis)."
+  },
+  "wallet": {
+    "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",
+    "freeOnly": "{{free}} kartu gratis tersisa hari ini",
+    "creditsOnly": "{{credits}} kartu berbayar tersedia",
+    "empty": "Tidak ada kartu gratis atau kredit tersisa — isi ulang untuk terus membuat",
+    "unknown": "Saldo tidak tersedia saat ini"
   },
   "wizard": {
     "setup": "Setup",

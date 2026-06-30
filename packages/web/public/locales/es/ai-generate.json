@@ -51,7 +51,20 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} tarjetas",
-    "apiKeyNotice": "La generación con IA requiere tu propia clave API para cada proveedor. Añade o gestiona las claves en Ajustes."
+    "apiKeyNotice": "La generación con IA requiere tu propia clave API para cada proveedor. Añade o gestiona las claves en Ajustes.",
+    "inputModeTopic": "Tema",
+    "inputModeImage": "Imagen",
+    "imageUpload": "Subir imagen",
+    "imageChange": "Cambiar imagen",
+    "imageUploadHint": "Elige una foto de una lista de palabras, una página de libro de texto o apuntes: la IA la convierte en tarjetas.",
+    "imagePaidNotice": "La generación con imágenes usa créditos (sin nivel gratuito)."
+  },
+  "wallet": {
+    "summary": "{{free}} tarjetas gratuitas + {{credits}} de pago disponibles hoy",
+    "freeOnly": "Quedan {{free}} tarjetas gratuitas hoy",
+    "creditsOnly": "{{credits}} tarjetas de pago disponibles",
+    "empty": "No quedan tarjetas gratuitas ni créditos: recarga para seguir generando",
+    "unknown": "Saldo no disponible en este momento"
   },
   "wizard": {
     "setup": "Setup",
