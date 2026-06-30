@@ -197,3 +197,41 @@ Rules:
 
   return { systemPrompt, userPrompt }
 }
+
+// Vision: generate cards FROM an uploaded image (textbook page, vocab list,
+// notes, slides). The image rides in the user message; this builds the
+// instruction + schema. Mirrors buildCardsPrompt's schema/rules.
+export function buildImageCardsPrompt(
+  fields: GeneratedTemplateField[],
+  cardCount: number,
+  uiLang: string,
+) {
+  const fieldDesc = fields
+    .map((f) => `"${f.key}" (${f.name}${f.tts_lang ? `, lang: ${f.tts_lang}` : ''})`)
+    .join(', ')
+  const langNote = uiLang.startsWith('ko')
+    ? '내용은 이미지에 보이는 언어를 따르세요.'
+    : 'Use the language shown in the image for the content.'
+
+  const systemPrompt = `You are a flashcard content creator. You are given an IMAGE (a textbook page, vocabulary list, handwritten notes, or slides). Extract the study material that is ACTUALLY in the image and turn it into flashcards.
+Respond with a single JSON object.
+
+JSON schema:
+{
+  "cards": [
+    { "field_values": { "field_key": "value", ... }, "tags": ["tag1"] }
+  ]
+}
+
+Rules:
+- Each card's field_values must have these exact keys: ${fieldDesc}
+- Base every card ONLY on content visible in the image — do NOT invent unrelated material.
+- Generate up to ${cardCount} cards; if the image has fewer items, generate fewer.
+- Every field_values key must have a non-empty value.
+- tags: 1-3 short tags per card
+- ${langNote}`
+
+  const userPrompt = 'Create flashcards from the attached image.'
+
+  return { systemPrompt, userPrompt }
+}

@@ -25,10 +25,18 @@ export type ServerGenerateRequest =
       cardCount: number
       existingCards?: Record<string, string>[]
     }
+  | {
+      kind: 'image'
+      image: string // base64 data URL of the uploaded image
+      uiLang: string
+      fields: GeneratedTemplateField[]
+      cardCount: number
+    }
 
 export interface ServerGenerateResult {
   content: Record<string, unknown>
-  remainingFree: number
+  remainingFree?: number // text generation
+  balance?: number       // image generation (credits left after the charge)
 }
 
 // supabase-js FunctionsHttpError carries the raw Response in `.context`; read our
@@ -57,7 +65,8 @@ export async function callServerAI(req: ServerGenerateRequest): Promise<ServerGe
   }
   return {
     content: result.content,
-    remainingFree: typeof result.remainingFree === 'number' ? result.remainingFree : 0,
+    remainingFree: typeof result.remainingFree === 'number' ? result.remainingFree : undefined,
+    balance: typeof result.balance === 'number' ? result.balance : undefined,
   }
 }
 

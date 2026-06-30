@@ -43,6 +43,7 @@ interface AIGenerateState {
   generateTemplate: () => Promise<void>
   generateDeck: () => Promise<void>
   generateCards: () => Promise<void>
+  generateCardsFromImage: (image: string) => Promise<void>
   saveAll: () => Promise<void>
 
   editGeneratedTemplate: (t: GeneratedTemplate) => void
@@ -252,6 +253,44 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       set({
         generatedCards: allCards,
         filteredCardCount: totalFiltered,
+        currentStep: 'review_cards',
+      })
+    } catch (err) {
+      set({ error: mapError(err), currentStep: 'error' })
+    }
+  },
+
+  // Image recognition (vision): one uploaded image → cards (always paid, Phase 1b).
+  generateCardsFromImage: async (image: string) => {
+    set({ currentStep: 'generating_cards', error: null })
+    try {
+      const uiLang = i18next.language
+      const { cardCount, generatedTemplate, existingTemplateId } = get()
+
+      let fields: { key: string; name: string; type: 'text'; order: number; tts_enabled?: boolean; tts_lang?: string }[] | undefined = generatedTemplate?.fields
+      if (!fields && existingTemplateId) {
+        let templates = useTemplateStore.getState().templates
+        if (templates.length === 0) {
+          await useTemplateStore.getState().fetchTemplates()
+          templates = useTemplateStore.getState().templates
+        }
+        let tmpl = templates.find((t) => t.id === existingTemplateId)
+        if (!tmpl) {
+          const { data } = await supabase.from('card_templates').select('*').eq('id', existingTemplateId).single()
+          if (data) tmpl = data as typeof tmpl
+        }
+        fields = tmpl?.fields
+          .filter((f) => f.type === 'text')
+          .map((f) => ({ ...f, type: 'text' as const }))
+      }
+      if (!fields || fields.length === 0) throw new Error('INVALID_RESPONSE')
+
+      const { content } = await callServerAI({ kind: 'image', image, uiLang, fields, cardCount })
+      const result = validateCardsResponse(content, fields.map((f) => f.key))
+      if (result.valid.length === 0) throw new Error('ALL_CARDS_INVALID')
+      set({
+        generatedCards: result.valid,
+        filteredCardCount: result.filtered,
         currentStep: 'review_cards',
       })
     } catch (err) {
