@@ -3,6 +3,10 @@
 > `eas submit` 로 iOS(App Store/TestFlight) · Android(Google Play)에 빌드를 올리는 **1회성 자격증명 셋업**과, 실제로 막혔던 **계정 게이트/권한 함정**을 정리한 문서.
 > 일상 명령은 [`README.md` §3](./README.md#3-모바일-네이티브-eas-build--스토어-제출).
 > 작성: 2026-06-30 (실제 제출을 뚫으며 기록).
+>
+> ✅ **2026-06-30 양쪽 제출 성공 확정** — iOS 빌드 44 → App Store Connect/TestFlight,
+> Android 빌드 35 → Play internal(draft). 아래 §2-2(iOS)·§3-3(Android)에 **무엇이 막혔고
+> 무엇이 풀었는지** 확정 기록.
 
 ---
 
@@ -36,6 +40,16 @@ eas submit --platform ios --profile production --latest --non-interactive
 
 ### 2-2. ⚠️ Apple 계정 게이트 — "Something went wrong" 의 진짜 원인
 `eas submit`이 **바이너리 업로드 전 단계에서 `"Something went wrong when submitting your app to Apple App Store Connect"`** 로 실패하고 **EAS가 상세 로그를 안 남기면**, 거의 항상 **계정 레벨 게이트**다. (4~5월엔 정상이던 제출이 6월에 갑자기 조용히 실패 → 게이트가 새로 생긴 것.)
+
+> ✅ **2026-06-30 확정된 실제 원인 = License Agreement 미동의.** 5번 연속 동일 실패
+> (`error:null`, 로그 없음)였는데, **Account Holder(jiyong park)가 업데이트된 Apple
+> Developer Program License Agreement를 Accept** + DSA trader 선언 완료 후
+> `eas submit --platform ios --profile production --latest` 가 **한 번에 통과**:
+> `"✔ Submitted your app to Apple App Store Connect! Your binary has been successfully
+> uploaded"` → 빌드 44가 TestFlight 처리 큐로. **새 자격증명 0개** — EAS 저장 ASC 키는
+> 멀쩡했고, 계정 게이트만 풀면 됐다. 즉 아래 1번이 1순위인 이유가 실증됨.
+
+App Store Connect → **Business** / developer.apple.com/account 에서 아래를 **전부** 해소:
 
 App Store Connect → **Business** / developer.apple.com/account 에서 아래를 **전부** 해소:
 
@@ -146,6 +160,28 @@ query($a:String!){ account{ byName(accountName:$a){ appStoreConnectApiKeys{ keyI
 ---
 
 ## 요약 체크리스트
-- [ ] iOS: License Agreement 동의 → (EU면) DSA trader → 현지법 compliance → `eas submit ios`
-- [ ] Android: SA 키 생성(GCP) → **Play Console에서 SA 이메일 권한 부여** → `eas submit android`
-- [ ] 제출 성공 후: 각 콘솔에서 트랙 롤아웃 + 심사 (사용자 도달은 별도)
+- [x] iOS: License Agreement 동의 → (EU면) DSA trader → 현지법 compliance → `eas submit ios` — **2026-06-30 통과(빌드 44→TestFlight)**
+- [x] Android: SA 키 생성(GCP) → **Play Console에서 SA 이메일 권한 부여** → `eas submit android` — **2026-06-30 통과(빌드 35→internal draft)**
+- [ ] 제출 성공 후: 각 콘솔에서 트랙 롤아웃 + 심사 (사용자 도달은 별도) ← **여기 남음**
+  - iOS: TestFlight 처리 완료 후 테스터 추가 / App Store 정식출시는 스토어 등록정보+심사
+  - Android: internal 트랙 **draft → rollout** (Play Console "출시 시작" 또는 Play API로 release status를 `completed`로 commit)
+
+---
+
+## 부록 B: Google Play API 로 상태 확인 / 롤아웃 (서비스계정 키)
+
+서비스계정 키(`google-service-account.json`)로 Play Developer API 직접 호출. **읽기/롤아웃 모두 코드로** 가능.
+```python
+# RS256 JWT(iss=client_email, scope=androidpublisher, aud=oauth2.googleapis.com/token)
+#   → POST oauth2.googleapis.com/token (grant_type=jwt-bearer) → access_token
+# 그 토큰으로 androidpublisher v3:
+#   POST   /androidpublisher/v3/applications/{pkg}/edits                → editId
+#   GET    .../edits/{editId}/tracks/internal                          → releases[].status / versionCodes
+#   GET    .../edits/{editId}/bundles                                  → 업로드된 versionCode 목록
+#   (롤아웃) PATCH/PUT track 으로 release status "draft"→"completed" 후
+#   POST   .../edits/{editId}:commit                                   → 내부 테스터에 출시
+#   (읽기만) DELETE .../edits/{editId}                                 → edit 폐기
+# pkg = com.reeeeecall.study
+```
+> 확인 예(2026-06-30): internal 트랙 release `1.0.2` status=`draft` versionCodes=`[35]`,
+> 업로드 번들 `[9,15,16,22,23,27,31,33,34,35]` (신규 앱 아님 → API 업로드 정상).
