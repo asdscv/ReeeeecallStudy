@@ -81,34 +81,51 @@ cards/day uncapped? daily budget?) + FX update cadence.
 
 ---
 
-## 2. Payment rails — Phase 1c  (EXTERNAL blocker)
+## 2. Payment rails — Phase 1c  (server seam READY / provider integration = EXTERNAL)
 
 - **Strategy A (store-compliant):** web = **PortOne** (카드/카카오/네이버/토스); mobile = **Apple IAP +
-  Google Play Billing via RevenueCat**, consumable credit top-ups. One server wallet unifies web+app.
-- Top-up credits the wallet via **`add_ai_credits(p_user_id, p_credits, p_reason, p_ref)`** (service_role,
-  **idempotent on `p_ref`** — already built + tested). The webhook/receipt-validation handler is the
-  new piece (verify → `add_ai_credits` with the payment ref).
-- **External dependencies (not engineering):** merchant/store credentials + product (SKU) setup +
-  **Apple review** (RevenueCat was previously rejected — investigate the rejection cause first).
-- Korea law bans in-app out-links → mobile **must** use IAP (~15–30%, small-biz 15%); margin is high
-  enough to absorb the store cut.
+  Google Play Billing via RevenueCat**, consumable **₩ packs**. One micro-WON wallet unifies web+app.
+- **Server seam is DONE + tested:** a verified payment top-up = **`add_ai_credits(p_user_id, p_micro_won,
+  'purchase', p_ref)`** (service_role, **idempotent on `p_ref`** = the payment id → webhook retries can't
+  double-credit; `p_micro_won` = **pack ₩ × 1_000_000**). Metered billing then deducts real cost from that
+  balance. So 1c's only new server piece is the **verify→grant webhook**.
+- **The webhook (per provider) — NOT built (security-sensitive, provider not chosen):** it mints wallet
+  balance = money, so it MUST be **fail-closed**: reject unless the provider's verification is configured +
+  passes. Contract per provider:
+  - **PortOne (web):** on the client `onSuccess`, POST `{imp_uid, merchant_uid}` → server calls PortOne
+    `GET /payments/{imp_uid}` (with the PortOne API secret) → confirm `status=paid` + amount matches the SKU →
+    `add_ai_credits(uid, sku_won×1e6, 'purchase', imp_uid)`.
+  - **RevenueCat (mobile IAP):** RevenueCat **webhook** (INITIAL_PURCHASE / NON_RENEWING_PURCHASE) with the
+    `Authorization` shared-secret header → map product_id→₩ → `add_ai_credits(uid, won×1e6, 'purchase', event.id)`.
+    (⚠️ RevenueCat currently DISABLED after a prior Apple reject — investigate the rejection cause first.)
+- **External deps (not engineering):** PortOne merchant + API secret; App Store / Play product (SKU) setup +
+  **Apple review**; the pack tiers/₩ prices (owner). Korea bans in-app out-links → mobile **must** use IAP
+  (~15–30%, small-biz 15%); metered margin (~80%) absorbs the store cut.
+- **When ready:** add a `payment-webhook` edge fn (fail-closed, service-role `add_ai_credits`), one per
+  provider verification path above. The wallet, idempotency, and metered deduction are already in place.
 
-## 3. Production deployment  (owner / ops — one-time)
+## 3. Production deployment — GO-LIVE CHECKLIST  ⚠️ OWNER-GATED (outward-facing, real money)
 
-Before prod can SERVE generation (until done → graceful `503 AI_NOT_CONFIGURED`):
-1. `supabase secrets set AI_GENERATION_PROVIDER_KEY=…` (+ optionally `AI_GENERATION_PROVIDER`/`_MODEL`/
-   `AI_VISION_MODEL` — registry defaults to **gemini**, ~6× cheaper than Grok).
-   **A Gemini key is now available** (owner-provided; stored locally in the gitignored `.env.local` for
-   dev/e2e — NOT in the repo). For prod, set it as the edge secret above. **Usage measurement verified
-   end-to-end for BOTH providers**: Grok + Gemini return OpenAI-compat `usage{prompt_tokens,completion_tokens}`
-   (text + vision), so `ai_cost_ledger` records real per-generation tokens+cost for whichever is active —
-   the basis for future usage-based limiting/billing. Proven: `E2E_AI_PROVIDER=gemini bash
-   supabase/tests/ai_generate_edge_e2e.sh` → 16/16, cost row `gemini|tokens>0|cost|not-estimated`
-   (seeded rate); same for xai (fallback rate).
-2. Apply migrations **108–111** to prod.
+**Everything is code-ready; this is the one high-stakes step an agent must NOT run unattended** — it
+changes the prod DB schema (DROPs the old charging RPCs), deploys the edge fn, and promotes `develop`→`main`
+which **auto-deploys the web app to real users**. Do it deliberately, ideally behind a launch flag. Until
+done, prod generation returns a graceful `503 AI_NOT_CONFIGURED`.
+
+**Order (do NOT reorder — set the key + apply migs BEFORE promoting to main):**
+1. `supabase secrets set AI_GENERATION_PROVIDER_KEY=<gemini key>` (registry defaults to **gemini**, ~6× cheaper
+   than Grok; the owner-provided Gemini key is in the gitignored `.env.local` — never in the repo).
+   Verified usage-measurement works for BOTH providers (text + vision) so `ai_cost_ledger` prices either.
+2. **Apply migrations 108–115 to prod** ⚠️ **mig 114 has `TRUNCATE ai_credit_balance, ai_credit_ledger`** —
+   safe now (prod has NO AI-wallet data, feature never served), but **confirm prod wallets are empty first**
+   and NEVER re-run 114 after real balances exist. (Metered charging: 114; est-price calibration: 115.)
 3. `supabase functions deploy ai-generate`.
-4. Then promote `develop` → `main` (web auto-deploys on main push). Mobile image features need a new
-   **native build** (expo-image-picker + expo-image-manipulator are native) — not OTA.
+4. **Then** promote `develop`→`main` (web auto-deploys on main push). Mobile image features need a new
+   **native EAS build** (expo-image-picker + expo-image-manipulator are native) — not OTA.
+5. Post-deploy: run one real paid gen (top up a test wallet via `add_ai_credits`, generate, confirm the
+   micro-WON deduction + a `spend` ledger row); wire the nightly Cloudflare-cron to    `refresh_ai_est_price()` (pg_cron not installed). A blind reconcile sweep was intentionally NOT built (would wrong-charge failed-but-unreleased gens without a delivery marker); the edge fn does an inline charge retry instead, and a rare lost charge is eaten as under-charge.
+
+**Recommend a staged launch:** keep the free 10/day live first (wallet empty → paid path 402s cleanly),
+turn on paid only once the payment webhook (§2) + pack SKUs exist. The free tier alone is safe to ship now.
 
 ## 4. Deferred UI + cleanup  (low)
 
