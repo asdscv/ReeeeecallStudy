@@ -6,6 +6,7 @@ import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { fileTransferService } from '../services/file-transfer'
 import type { DecksStackParamList } from '../navigation/types'
 
@@ -14,7 +15,9 @@ type Route = RouteProp<DecksStackParamList, 'ImportExport'>
 export function ImportExportScreen() {
   const theme = useTheme()
   const { t } = useTranslation('import-export')
+  const { t: tLimit } = useTranslation(['errors', 'settings'])
   const navigation = useNavigation()
+  const limit = useCardLimit()
   const route = useRoute<Route>()
   const { deckId } = route.params
 
@@ -27,6 +30,10 @@ export function ImportExportScreen() {
   const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json')
 
   const handleImportCSV = async () => {
+    if (limit.reached) {
+      Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+      return
+    }
     setImporting(true)
     try {
       const file = await fileTransferService.pickCSV()
@@ -69,6 +76,10 @@ export function ImportExportScreen() {
   }
 
   const handleImportJSON = async () => {
+    if (limit.reached) {
+      Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+      return
+    }
     setImporting(true)
     try {
       const file = await fileTransferService.pickJSON()
