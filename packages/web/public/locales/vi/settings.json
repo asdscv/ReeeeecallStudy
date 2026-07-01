@@ -193,6 +193,7 @@
   "cardUsage": {
     "title": "Dung lượng thẻ",
     "count": "{{owned}} / {{limit}} thẻ",
-    "reached": "Bạn đã đạt giới hạn thẻ. Đăng ký để thêm."
+    "reached": "Bạn đã đạt giới hạn thẻ. Đăng ký để thêm.",
+    "subscribe": "Đăng ký (sắp ra mắt)"
   }
 }

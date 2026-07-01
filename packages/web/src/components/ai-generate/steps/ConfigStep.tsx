@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ImageUp } from 'lucide-react'
 import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDeckStore } from '../../../stores/deck-store'
+import { CardLimitBlock } from '../../card/CardLimitBlock'
 import type { GenerateMode } from '../../../lib/ai/types'
 import type { Deck } from '../../../types/database'
 
@@ -60,6 +62,7 @@ interface ConfigStepProps {
 export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showModeSelect, onModeChange }: ConfigStepProps) {
   const { t } = useTranslation('ai-generate')
   const { decks, fetchDecks } = useDeckStore()
+  const limit = useCardLimit()
 
   // Generation config state
   const [topic, setTopic] = useState(initialTopic || '')
@@ -158,6 +161,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       if (!topic.trim()) return
       if (!isFullMode && !selectedDeckId) return
     }
+
+    // Owned-card limit pre-flight (mig 116): don't spend AI cost/quota generating
+    // cards that can't be saved. Server still enforces at save.
+    if (limit.exceeds(cardCount)) return
 
     onStart({
       topic,
@@ -480,9 +487,11 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         <p className="text-xs text-center text-muted-foreground">{walletText}</p>
       )}
 
+      {limit.exceeds(cardCount) && <CardLimitBlock />}
+
       <button
         type="submit"
-        disabled={!canSubmit}
+        disabled={!canSubmit || limit.exceeds(cardCount)}
         className="w-full px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {t('config.startGenerate')}

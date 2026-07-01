@@ -8,6 +8,8 @@ import {
   DialogFooter,
 } from '../ui/dialog'
 import { useCardStore } from '../../stores/card-store'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { CardLimitBlock } from '../card/CardLimitBlock'
 import {
   parseImportJSON,
   parseImportCSV,
@@ -37,6 +39,7 @@ type DuplicateMode = 'skip' | 'overwrite' | 'add'
 export function ImportModal({ open, onClose, deckId, templateId, template, onComplete }: ImportModalProps) {
   const { t } = useTranslation('import-export')
   const { cards: existingCards, createCards, error: storeError } = useCardStore()
+  const limit = useCardLimit()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState<ImportStep>('upload')
@@ -160,7 +163,6 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
 
   const handleImport = async () => {
     if (!template) return
-    setStep('importing')
 
     let cardsToImport = parsedCards
     if (duplicateMode === 'skip') {
@@ -168,6 +170,13 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
       cardsToImport = unique
     }
 
+    // Owned-card limit pre-flight (mig 116). Server also enforces at createCards.
+    if (limit.exceeds(cardsToImport.length)) {
+      setError('errors:card.limitReached')
+      return
+    }
+
+    setStep('importing')
     setProgress({ done: 0, total: cardsToImport.length })
 
     const inserted = await createCards({
@@ -203,6 +212,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
           <DialogTitle>{t('importCards')}</DialogTitle>
         </DialogHeader>
 
+        {limit.reached && <CardLimitBlock />}
         {error && (
           <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
             {t(error)}

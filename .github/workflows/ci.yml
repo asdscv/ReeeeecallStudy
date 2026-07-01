@@ -279,3 +279,8 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_test.sql
+
+      - name: Run owned-card limit smoke + net-zero + dry-run assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_smoke_test.sql
