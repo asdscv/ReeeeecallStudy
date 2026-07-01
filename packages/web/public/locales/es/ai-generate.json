@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "Error del servidor de IA. Vuelva a intentarlo más tarde."
+    "serverError": "Error del servidor de IA. Vuelva a intentarlo más tarde.",
+    "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más."
   },
   "button": {
     "aiGenerate": "AI Generate",

@@ -21,6 +21,12 @@ interface DeckStats {
 export type DeckCacheKey = 'decks' | 'stats' | 'templates'
 const deckCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
+// Owned-card usage refresh dedupe. A per-row import loop calls createCard (→
+// refreshCardUsage) many times in a burst; without this it would fire one
+// get_owned_card_usage RPC per row. A FORCED refresh (delete / limit-rejection)
+// always runs so a user who frees space is never left wrongly blocked.
+let cardUsageFetchedAt = 0
+
 export interface CardUsage {
   owned: number
   limit: number
@@ -39,8 +45,9 @@ interface DeckState {
   fetchDecks: (opts?: { force?: boolean }) => Promise<void>
   fetchStats: (userId: string, opts?: { force?: boolean }) => Promise<void>
   fetchTemplates: (opts?: { force?: boolean }) => Promise<void>
-  /** Refresh owned-card usage (get_owned_card_usage RPC). */
-  fetchCardUsage: () => Promise<void>
+  /** Refresh owned-card usage (get_owned_card_usage RPC). `force` bypasses the
+   *  rapid-call dedupe (use after a delete / limit-rejection). */
+  fetchCardUsage: (opts?: { force?: boolean }) => Promise<void>
   /**
    * Guarantee the current user has the default card templates, then refetch.
    * Self-heals accounts created before migration 036 whose signup trigger
@@ -76,7 +83,10 @@ export const useDeckStore = create<DeckState>((set, get) => ({
 
   invalidate: (key) => deckCache.invalidate(key),
 
-  fetchCardUsage: async () => {
+  fetchCardUsage: async (opts) => {
+    const now = Date.now()
+    if (!opts?.force && now - cardUsageFetchedAt < 2000) return  // dedupe rapid calls
+    cardUsageFetchedAt = now
     const { data, error } = await supabase.rpc('get_owned_card_usage').maybeSingle()
     if (error || !data) return
     const row = data as { owned: number; card_limit: number; available: number }

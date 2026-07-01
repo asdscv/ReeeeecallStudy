@@ -8,6 +8,7 @@ import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
 import { getMobileSupabase } from '../adapters'
@@ -136,6 +137,14 @@ export function CardEditScreen() {
     return fallback.id
   }
 
+  // createCard returns null (does NOT throw) for MANY reasons — card limit, the
+  // 30/min rate limit, readonly, transient. Surface the REAL error, not a hardcoded
+  // "subscribe" prompt that would push a wrong purchase for a mere rate-limit.
+  const alertCreateError = () => {
+    const err = useCardStore.getState().error
+    Alert.alert(t('cardEdit.errorTitle'), tLimit(err ?? 'errors:card.limitReached', { defaultValue: t('cardEdit.saveError') }))
+  }
+
   const handleSave = async () => {
     if (!hasContent) {
       Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.emptyError'))
@@ -171,10 +180,7 @@ export function CardEditScreen() {
           field_values: fieldValues,
           tags: parsedTags.length > 0 ? parsedTags : undefined,
         })
-        if (!created) {
-          Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
-          return
-        }
+        if (!created) { alertCreateError(); return }
       }
       navigation.goBack()
     } catch (e) {
@@ -261,6 +267,11 @@ export function CardEditScreen() {
             variant="outline"
             onPress={async () => {
               if (!hasContent) return
+              // Owned-card limit pre-flight (mig 116) — this "Add another" path had none.
+              if (limit.reached) {
+                Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+                return
+              }
               setSaving(true)
               try {
                 const parsedTags = tags.split(',').map((t) => t.trim()).filter(Boolean)
@@ -269,12 +280,15 @@ export function CardEditScreen() {
                   Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.noTemplateError'))
                   return
                 }
-                await createCard({
+                // createCard returns null (no throw) on failure — don't clear the form
+                // as if it saved (was the "silent false-success" the earlier pass missed).
+                const created = await createCard({
                   deck_id: deckId,
                   template_id: resolvedTemplateId,
                   field_values: fieldValues,
                   tags: parsedTags.length > 0 ? parsedTags : undefined,
                 })
+                if (!created) { alertCreateError(); return }
                 // Reset form
                 setFieldValues({})
                 setTags('')

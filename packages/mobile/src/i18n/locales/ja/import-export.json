@@ -19,5 +19,6 @@
   "successTitle": "完了",
   "noCardsTitle": "カードがありません",
   "deckCardCount": "{{deck}} · {{count}}枚のカード",
-  "back": "戻る"
+  "back": "戻る",
+  "importPartial": "{{count}} 枚保存後に停止しました。"
 }

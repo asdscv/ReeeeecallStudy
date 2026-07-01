@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "AI server error. Please try again later."
+    "serverError": "AI server error. Please try again later.",
+    "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more."
   },
   "button": {
     "aiGenerate": "AI Generate",

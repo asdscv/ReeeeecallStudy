@@ -19,5 +19,6 @@
   "successTitle": "Berhasil",
   "noCardsTitle": "Tidak ada kartu",
   "deckCardCount": "{{deck}} · {{count}} kartu",
-  "back": "Kembali"
+  "back": "Kembali",
+  "importPartial": "{{count}} kartu tersimpan sebelum berhenti."
 }

@@ -19,5 +19,6 @@
   "successTitle": "Success",
   "noCardsTitle": "No Cards",
   "deckCardCount": "{{deck}} · {{count}} cards",
-  "back": "Back"
+  "back": "Back",
+  "importPartial": "{{count}} card(s) saved before stopping."
 }

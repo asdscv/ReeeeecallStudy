@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์ AI โปรดลองอีกครั้งในภายหลัง"
+    "serverError": "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์ AI โปรดลองอีกครั้งในภายหลัง",
+    "cardLimitReached": "คุณถึงขีดจำกัดการ์ดแล้ว ลบการ์ดหรือสมัครสมาชิกเพื่อบันทึกเพิ่ม"
   },
   "button": {
     "aiGenerate": "AI Generate",
