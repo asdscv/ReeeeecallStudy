@@ -101,8 +101,19 @@ cards/day uncapped? daily budget?) + FX update cadence.
 - **External deps (not engineering):** PortOne merchant + API secret; App Store / Play product (SKU) setup +
   **Apple review**; the pack tiers/₩ prices (owner). Korea bans in-app out-links → mobile **must** use IAP
   (~15–30%, small-biz 15%); metered margin (~80%) absorbs the store cut.
-- **When ready:** add a `payment-webhook` edge fn (fail-closed, service-role `add_ai_credits`), one per
-  provider verification path above. The wallet, idempotency, and metered deduction are already in place.
+- **✅ Server webhook BUILT + tested + audited:** `supabase/functions/payment-webhook/index.ts` —
+  **fail-closed** (503 until `PAYMENT_WEBHOOK_SECRET` set), **HMAC-SHA256-gated** (constant-time verify over
+  the raw body → 401 on bad/missing sig), grants `add_ai_credits(user, ₩×1e6, 'purchase', payment_id)`
+  (**idempotent** on the payment id), amount-capped (₩1M) + strict-integer + UUID-validated. `verify_jwt=false`
+  (a provider, not a user, calls it — the HMAC is the auth). Local e2e `payment_webhook_e2e.sh` **11/11**
+  (fail-closed / bad-sig 401 / valid→grant / idempotent redelivery / stacking / bad-payload 400). Adversarial
+  audit → **airtight core, no attacker bypass** (can't forge/replay-mint without the secret).
+- **⚠️ Remaining for a real provider (the `verifySignature` seam):** the default is hex-HMAC over the raw body
+  with header `x-webhook-signature`. PortOne v2 is **svix** (`webhook-signature`, base64, over `${id}.${ts}.${body}`)
+  and RevenueCat uses an **`Authorization` shared-secret** — both currently **fail-closed (reject), not open**, so
+  swapping in the real scheme is safe + required. When the provider's signature does NOT cover the amount
+  (RevenueCat), replace the trusted body amount with server-side re-verification (PortOne `GET /payments/{id}`
+  or a `product_id`→₩ SKU table) + a timestamp/nonce freshness window.
 
 ## 3. Production deployment — GO-LIVE CHECKLIST  ⚠️ OWNER-GATED (outward-facing, real money)
 
