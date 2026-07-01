@@ -88,7 +88,14 @@ cards/day uncapped? daily budget?) + FX update cadence.
 
 Before prod can SERVE generation (until done → graceful `503 AI_NOT_CONFIGURED`):
 1. `supabase secrets set AI_GENERATION_PROVIDER_KEY=…` (+ optionally `AI_GENERATION_PROVIDER`/`_MODEL`/
-   `AI_VISION_MODEL` — registry defaults to gemini).
+   `AI_VISION_MODEL` — registry defaults to **gemini**, ~6× cheaper than Grok).
+   **A Gemini key is now available** (owner-provided; stored locally in the gitignored `.env.local` for
+   dev/e2e — NOT in the repo). For prod, set it as the edge secret above. **Usage measurement verified
+   end-to-end for BOTH providers**: Grok + Gemini return OpenAI-compat `usage{prompt_tokens,completion_tokens}`
+   (text + vision), so `ai_cost_ledger` records real per-generation tokens+cost for whichever is active —
+   the basis for future usage-based limiting/billing. Proven: `E2E_AI_PROVIDER=gemini bash
+   supabase/tests/ai_generate_edge_e2e.sh` → 16/16, cost row `gemini|tokens>0|cost|not-estimated`
+   (seeded rate); same for xai (fallback rate).
 2. Apply migrations **108–111** to prod.
 3. `supabase functions deploy ai-generate`.
 4. Then promote `develop` → `main` (web auto-deploys on main push). Mobile image features need a new
