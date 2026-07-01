@@ -44,11 +44,21 @@ DBURL=$(echo "$ST" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end'
 echo "API=$API"
 psql() { command psql "$DBURL" -tAc "$1"; }
 
-# ── provider key + a model the key can actually serve ──
-GROK=$(grep -hoE 'E2E_GROK_API_KEY=.*' .env.test 2>/dev/null | head -1 | cut -d= -f2- | tr -d "\"' ")
-[ -z "$GROK" ] && GROK=$(grep -hoE 'XAI_API_KEY=.*' .env.local 2>/dev/null | head -1 | cut -d= -f2- | tr -d "\"' ")
-[ -z "$GROK" ] && { echo "FATAL: no provider key (E2E_GROK_API_KEY / XAI_API_KEY)"; exit 1; }
-MODEL="grok-4.20-0309-non-reasoning"
+# ── provider + key + a model the key can actually serve ──
+# Dual-provider: default xai/grok; set E2E_AI_PROVIDER=gemini to run the same
+# suite against Gemini (proves usage/cost capture is provider-agnostic). Keys are
+# read from the gitignored .env.test / .env.local (never committed).
+PROVIDER="${E2E_AI_PROVIDER:-xai}"
+readkey() { grep -hoE "$1=.*" .env.test .env.local 2>/dev/null | head -1 | cut -d= -f2- | tr -d "\"' "; }
+if [ "$PROVIDER" = "gemini" ]; then
+  AIKEY="${E2E_GEMINI_API_KEY:-$(readkey GEMINI_API_KEY)}"
+  MODEL="${E2E_AI_MODEL:-gemini-2.5-flash-lite}"
+else
+  AIKEY="${E2E_GROK_API_KEY:-$(readkey E2E_GROK_API_KEY)}"; [ -z "$AIKEY" ] && AIKEY="$(readkey XAI_API_KEY)"
+  MODEL="${E2E_AI_MODEL:-grok-4.20-0309-non-reasoning}"
+fi
+[ -z "$AIKEY" ] && { echo "FATAL: no provider key for '$PROVIDER' (.env.test/.env.local)"; exit 1; }
+echo "provider=$PROVIDER model=$MODEL"
 
 # ── create a confirmed user + sign in for an access token ──
 EMAIL="e2e_$(psql "select floor(extract(epoch from now()))::bigint")@example.com"
@@ -94,10 +104,10 @@ start_serve() { # $1 = env file
 }
 
 # ════════════════ PHASE A — real provider ════════════════
-echo "── PHASE A: real provider (Grok) ──"
+echo "── PHASE A: real provider ($PROVIDER / $MODEL) ──"
 cat > /tmp/e2e_envA <<EOF
-AI_GENERATION_PROVIDER=xai
-AI_GENERATION_PROVIDER_KEY=$GROK
+AI_GENERATION_PROVIDER=$PROVIDER
+AI_GENERATION_PROVIDER_KEY=$AIKEY
 AI_GENERATION_MODEL=$MODEL
 AI_VISION_MODEL=$MODEL
 SUPABASE_SERVICE_ROLE_KEY=$SVC
@@ -140,7 +150,7 @@ chk "A3 metered as user (free_cards_used)" "${USED:-X}" "3"
 sleep 1  # finalizeCost is awaited before the 200, but give PostgREST a beat
 COST=$(psql "select provider||'|'||(tokens_in>0)::text||'|'||(cost_won_micros is not null)::text||'|'||estimated::text from ai_cost_ledger where user_id='$USERID' order by created_at desc limit 1")
 echo "    -> cost row: ${COST:-<none>}"
-chk "A3 cost captured (provider|tokens_in>0|cost_set|estimated)" "${COST:-X}" "xai|true|true|false"
+chk "A3 cost captured (provider|tokens_in>0|cost_set|estimated)" "${COST:-X}" "$PROVIDER|true|true|false"
 
 # A4: exhaust free, no credits → 402 AI_INSUFFICIENT_CREDITS
 psql "update ai_generation_usage set free_cards_used=10 where user_id='$USERID'" >/dev/null
@@ -161,7 +171,7 @@ chk "A5 paid_cards_used" "${PAID:-X}" "2"
 echo "── PHASE B: bogus provider → refund-on-failure ──"
 psql "delete from ai_generation_usage where user_id='$USERID'; delete from ai_generation_jobs where user_id='$USERID';" >/dev/null
 cat > /tmp/e2e_envB <<EOF
-AI_GENERATION_PROVIDER=xai
+AI_GENERATION_PROVIDER=$PROVIDER
 AI_GENERATION_PROVIDER_KEY=bogus-key
 AI_GENERATION_BASE_URL=http://127.0.0.1:9
 AI_GENERATION_MODEL=$MODEL
