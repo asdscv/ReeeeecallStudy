@@ -25,6 +25,17 @@ function invalidateDeckStats(): void {
   useDeckStore.getState().invalidate('stats')
 }
 
+/**
+ * Owned-card usage (mig 116) drives the usage meter + create pre-flights. It is
+ * fetched once on mount, but the create modals stay mounted, so without an explicit
+ * refresh after a mutation the meter/pre-flight go stale — most seriously, a user at
+ * the cap who DELETES cards would stay blocked. Refresh it after every create/delete
+ * (mirrors invalidateDeckStats). Fire-and-forget; fetchCardUsage is fail-safe.
+ */
+function refreshCardUsage(): void {
+  void useDeckStore.getState().fetchCardUsage()
+}
+
 // ── Per-deck card-list cache ─────────────────────────────────────────────────
 // fetchCards re-hit the network on every deck open; cache each deck's list so
 // re-opening within the TTL is instant. Two safeguards make this safe despite
@@ -138,6 +149,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: position, error: posError } = await supabase
       .rpc('reserve_card_positions', { p_deck_id: input.deck_id, p_count: 1 })
     if (posError || position === null) {
+      if (isCardLimitError(posError)) refreshCardUsage()  // sync UI to the real at-cap state
       set({ error: isCardLimitError(posError) ? 'errors:card.limitReached' : (posError?.message ?? 'Failed to create card') })
       return null
     }
@@ -168,6 +180,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     guard.recordSuccess('cards_total')
     invalidateDeckStats()
+    refreshCardUsage()
     dropDeckCards(input.deck_id)
     await get().fetchCards(input.deck_id)
     return card as Card
@@ -191,6 +204,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: basePos, error: posError } = await supabase
       .rpc('reserve_card_positions', { p_deck_id: deck_id, p_count: cards.length })
     if (posError || basePos === null) {
+      if (isCardLimitError(posError)) refreshCardUsage()  // sync UI to the real at-cap state
       set({ error: isCardLimitError(posError) ? 'errors:card.limitReached' : (posError?.message ?? 'Failed to create cards') })
       return 0
     }
@@ -229,6 +243,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     guard.recordSuccess('cards_total', totalInserted)
     if (!get().error) {
       invalidateDeckStats()
+      refreshCardUsage()
       dropDeckCards(deck_id)
       await get().fetchCards(deck_id)
     }
@@ -262,6 +277,7 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     // 현재 카드 목록에서 해당 카드의 deck_id를 찾아 갱신
     invalidateDeckStats()
+    refreshCardUsage()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
       dropDeckCards(card.deck_id)
@@ -282,6 +298,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     invalidateDeckStats()
+    refreshCardUsage()
     if (card) {
       dropDeckCards(card.deck_id)
       await get().fetchCards(card.deck_id)
@@ -303,6 +320,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     invalidateDeckStats()
+    refreshCardUsage()
     if (deckId) {
       dropDeckCards(deckId)
       await get().fetchCards(deckId)
@@ -328,6 +346,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     invalidateDeckStats()
+    refreshCardUsage()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
       dropDeckCards(card.deck_id)

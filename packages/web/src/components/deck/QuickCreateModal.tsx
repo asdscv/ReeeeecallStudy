@@ -124,12 +124,6 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
     try {
       setError(null)
 
-      // Owned-card limit pre-flight (mig 116). Server also enforces at createCards.
-      if (limit.reached) {
-        setError('errors:card.limitReached')
-        return
-      }
-
       const name = deckName.trim()
       if (!name) {
         setError(t('decks:quickCreate.errors.nameRequired'))
@@ -159,6 +153,12 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
       }
       if (cards.length === 0) {
         setError(t('decks:quickCreate.errors.cardsRequired'))
+        return
+      }
+      // Owned-card limit pre-flight (mig 116): block if these N cards would exceed the
+      // cap (not just when already full). Server also enforces at createCards.
+      if (limit.exceeds(cards.length)) {
+        setError('errors:card.limitReached')
         return
       }
 
