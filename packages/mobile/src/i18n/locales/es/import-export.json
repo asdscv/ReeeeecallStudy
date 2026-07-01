@@ -19,5 +19,6 @@
   "successTitle": "Éxito",
   "noCardsTitle": "Sin tarjetas",
   "deckCardCount": "{{deck}} · {{count}} tarjetas",
-  "back": "Volver"
+  "back": "Volver",
+  "importPartial": "{{count}} tarjeta(s) guardada(s) antes de detenerse."
 }

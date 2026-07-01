@@ -94,6 +94,9 @@ function t(key: string): string {
 
 function mapError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
+  // Card-limit rejection at save time (saveAll throws the card-store error key) — tell
+  // the user to delete/subscribe, not "try again later" (retry would keep failing).
+  if (msg === 'errors:card.limitReached' || msg === 'CARD_LIMIT_REACHED') return t('cardLimitReached')
   if (msg === 'BAD_REQUEST') return t('invalidImage')
   if (msg === 'AI_INSUFFICIENT_CREDITS' || msg === 'AI_QUOTA_EXCEEDED') return t('insufficientCredits')
   if (msg === 'AI_RATE_CAP' || msg === 'RATE_LIMITED') return t('rateLimited')

@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "Kesalahan server AI. Silakan coba lagi nanti."
+    "serverError": "Kesalahan server AI. Silakan coba lagi nanti.",
+    "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
   },
   "button": {
     "aiGenerate": "AI Generate",

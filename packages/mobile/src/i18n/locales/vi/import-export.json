@@ -19,5 +19,6 @@
   "successTitle": "Thành công",
   "noCardsTitle": "Không có thẻ",
   "deckCardCount": "{{deck}} · {{count}} thẻ",
-  "back": "Quay lại"
+  "back": "Quay lại",
+  "importPartial": "Đã lưu {{count}} thẻ trước khi dừng."
 }
