@@ -315,6 +315,12 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# payment-webhook is called by the payment PROVIDER (not a user), authenticated by
+# its HMAC signature (PAYMENT_WEBHOOK_SECRET) — not a Supabase JWT. It is fail-closed
+# (503 until the secret is set), so the platform JWT gate must be OFF for it.
+[functions.payment-webhook]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
@@ -326,8 +332,20 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Local dev only — maps edge-function secrets to host env vars. In production set
+# these in Supabase dashboard → Edge Functions → Secrets (never committed).
+# `ai-generate` reads AI_GENERATION_PROVIDER_KEY (Gemini key by default).
+[edge_runtime.secrets]
+# ai-generate resolves provider+model via the registry in
+# supabase/functions/_shared/ai-providers.ts — switch with NO code change
+# (registry knows gemini|xai|openai|deepseek|openrouter base URLs).
+AI_GENERATION_PROVIDER_KEY = "env(GEMINI_API_KEY)"  # required
+# payment-webhook: set PAYMENT_WEBHOOK_SECRET as an edge secret in prod (dashboard);
+# for local dev pass it via `supabase functions serve payment-webhook --env-file`.
+# AI_GENERATION_PROVIDER = "env(AI_GENERATION_PROVIDER)"  # default 'gemini' — selects baseUrl
+# AI_GENERATION_MODEL    = "env(AI_GENERATION_MODEL)"     # text model (default per provider)
+# AI_VISION_MODEL        = "env(AI_VISION_MODEL)"         # Phase 1 image-recognition model
+# AI_GENERATION_BASE_URL = "env(AI_GENERATION_BASE_URL)"  # override baseUrl (custom endpoint)
 
 [analytics]
 enabled = true

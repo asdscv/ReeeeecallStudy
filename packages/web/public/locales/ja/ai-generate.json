@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "このデッキにはまだカードテンプレートがありません。デッキを開いてカードを1枚追加すると設定されます。",
+    "targetDeck": "対象デッキ",
+    "selectDeck": "デッキを選択...",
+    "selectDeckRequired": "カードを追加するデッキを選択してください。",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
@@ -51,7 +52,21 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}～{{max}}枚",
-    "apiKeyNotice": "AI生成にはプロバイダーごとにご自身のAPIキーが必要です。設定でキーを追加・管理してください。"
+    "apiKeyNotice": "AI生成にはプロバイダーごとにご自身のAPIキーが必要です。設定でキーを追加・管理してください。",
+    "inputModeTopic": "トピック",
+    "inputModeImage": "画像",
+    "imageUpload": "画像をアップロード",
+    "imageChange": "画像を変更",
+    "imageUploadHint": "単語リスト・教科書のページ・ノートの写真を選ぶと、AIがカードに変換します。",
+    "imagePaidNotice": "画像生成にはクレジットを使用します（無料枠はありません）。"
+  },
+  "wallet": {
+    "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカードを生成できます",
+    "freeOnly": "本日の無料カードは残り{{free}}枚です",
+    "creditsOnly": "有料カードを{{credits}}枚生成できます",
+    "empty": "本日の無料カードを使い切りました",
+    "unknown": "現在、残高を取得できません",
+    "balance": "残高 ₩{{won}}（約{{cards}}枚）"
   },
   "wizard": {
     "setup": "Setup",

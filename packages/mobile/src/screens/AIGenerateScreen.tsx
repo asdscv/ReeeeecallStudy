@@ -1,17 +1,17 @@
-import { useState, useCallback, useEffect } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable } from 'react-native'
+import { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable, Image } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator'
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
-import { useAIGenerateStore, setAIConfigCache } from '@reeeeecall/shared/stores/ai-generate-store'
-import { useDecks, useAuthState } from '../hooks'
+import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
+import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { useDecks } from '../hooks'
 import { useTheme, palette } from '../theme'
-import { aiKeyVault } from '@reeeeecall/shared/lib/ai/secure-storage'
-import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
-import { getProvider } from '@reeeeecall/shared/lib/ai/provider-registry'
 
-// SECURITY: Supabase 서버사이드 암호화 사용
-const mobileAiKeyVault = aiKeyVault
+// AI generation runs on our server key (metered free tier) — no provider/API
+// key selection on the client.
 
 const CONTENT_LANGS = [
   { code: 'en-US', label: 'English' },
@@ -175,13 +175,9 @@ export function AIGenerateScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
   const store = useAIGenerateStore()
-  const { decks, templates } = useDecks()
-  const { user } = useAuthState()
+  const { decks } = useDecks()
 
   const [step, setStep] = useState<WizardStep>('config')
-  const [aiKeys, setAiKeys] = useState<ProviderKeyMap>({})
-  const [selectedProvider, setSelectedProvider] = useState('')
-  const [selectedModel, setSelectedModel] = useState('')
 
   // Config state
   const [topic, setTopic] = useState('')
@@ -191,47 +187,83 @@ export function AIGenerateScreen() {
   const [showLangPicker, setShowLangPicker] = useState(false)
   const [showDeckPicker, setShowDeckPicker] = useState(false)
 
-  // Load configured AI keys
-  useEffect(() => {
-    if (!user) return
-    mobileAiKeyVault.loadAll(user.id).then((keys) => {
-      setAiKeys(keys)
-      const firstProviderId = Object.keys(keys)[0]
-      if (firstProviderId) {
-        setSelectedProvider(firstProviderId)
-        setSelectedModel(keys[firstProviderId].model)
-      }
-    }).catch(() => {})
-  }, [user])
+  // Image-recognition mode — cards_only only (needs the deck's template fields).
+  const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
+  const [affordable, setAffordable] = useState<Affordable | null>(null)
 
-  const configuredProviders = Object.keys(aiKeys)
-  const hasProvider = configuredProviders.length > 0
+  const useImage = !!selectedDeckId && imageMode === 'image'
+
+  // cards_only adds cards INTO an existing deck, so they must use that deck's
+  // own template — never an arbitrary global templates[0], whose fields wouldn't
+  // match the deck. A deck with no default_template_id can't accept AI cards yet.
+  const selectedDeck = decks.find((d) => d.id === selectedDeckId)
+  const cardsOnlyNeedsTemplate = !!selectedDeckId && !selectedDeck?.default_template_id
+
+  useEffect(() => {
+    getAffordableCards().then(setAffordable).catch(() => {})
+  }, [])
+
+  // Clear a stale uploaded image when the deck changes (prevents an accidental
+  // paid re-generation with a previously-picked photo).
+  useEffect(() => { setImageDataUrl(null) }, [selectedDeckId])
+
+  const pickImage = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!perm.granted) {
+      Alert.alert(t('alert.errorTitle'), t('alert.permissionDenied'))
+      return
+    }
+    // Pick the raw asset (no base64 yet) — we downscale dimensions + recompress
+    // ourselves so a multi-MP phone photo becomes a small JPEG instead of being
+    // rejected by the size cap. Mirrors the web canvas ≤1600px downscale.
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 })
+    if (res.canceled || !res.assets?.[0]?.uri) return
+    const asset = res.assets[0]
+    try {
+      const MAX_DIM = 1600
+      const w = asset.width || 0
+      const h = asset.height || 0
+      const longer = Math.max(w, h)
+      // Resize the longer side to MAX_DIM (ratio preserved); never upscale.
+      const actions: ImageManipulator.Action[] =
+        longer > MAX_DIM ? [{ resize: w >= h ? { width: MAX_DIM } : { height: MAX_DIM } }] : []
+      const out = await ImageManipulator.manipulateAsync(asset.uri, actions, {
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true,
+      })
+      if (!out.base64) { Alert.alert(t('alert.errorTitle'), t('alert.selectImageError')); return }
+      const dataUrl = `data:image/jpeg;base64,${out.base64}`
+      if (dataUrl.length > 6_500_000) {
+        Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
+        return
+      }
+      setImageDataUrl(dataUrl)
+    } catch {
+      Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
+    }
+  }
 
   const handleGenerate = async () => {
-    if (!topic.trim()) {
+    // A cards_only deck with no template can't accept generated cards — block
+    // before spending anything (the generate button is also disabled for this).
+    if (cardsOnlyNeedsTemplate) {
+      Alert.alert(t('alert.errorTitle'), t('alert.deckNoTemplate'))
+      return
+    }
+    if (useImage) {
+      if (!imageDataUrl) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
+    } else if (!topic.trim()) {
       Alert.alert(t('alert.errorTitle'), t('alert.enterTopic'))
       return
     }
-    if (!hasProvider || !selectedProvider) {
-      Alert.alert(t('alert.errorTitle'), t('alert.configureProvider'))
-      return
-    }
-
-    // Set AI config cache so the store can use it
-    const entry = aiKeys[selectedProvider]
-    const provider = getProvider(selectedProvider)
-    setAIConfigCache({
-      providerId: selectedProvider,
-      apiKey: entry.apiKey,
-      model: selectedModel || entry.model,
-      baseUrl: entry.baseUrl || provider?.baseUrl,
-    })
 
     setStep('generating')
     try {
-      // Use the shared store's generation flow
-      const deck = decks.find((d) => d.id === selectedDeckId)
-      const templateId = deck?.default_template_id ?? templates[0]?.id ?? ''
+      // cards_only: use the deck's OWN template (guaranteed present by the guard
+      // above). No templates[0] fallback — its fields wouldn't match the deck.
+      const templateId = selectedDeck?.default_template_id ?? null
 
       store.setConfig({
         mode: selectedDeckId ? 'cards_only' : 'full',
@@ -243,13 +275,17 @@ export function AIGenerateScreen() {
         existingTemplateId: selectedDeckId ? templateId : null,
       })
 
-      if (!selectedDeckId) {
-        await store.generateTemplate()
-        if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
-        await store.generateDeck()
-        if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
+      if (useImage) {
+        await store.generateCardsFromImage(imageDataUrl!)
+      } else {
+        if (!selectedDeckId) {
+          await store.generateTemplate()
+          if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
+          await store.generateDeck()
+          if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
+        }
+        await store.generateCards()
       }
-      await store.generateCards()
       // Check if the store ended in error (it catches internally and doesn't re-throw)
       if (useAIGenerateStore.getState().currentStep === 'error') {
         setStep('error')
@@ -276,6 +312,8 @@ export function AIGenerateScreen() {
     store.reset()
     setStep('config')
     setTopic('')
+    setImageDataUrl(null)
+    setImageMode('topic')
   }
 
   // ── Config Step ──
@@ -337,74 +375,65 @@ export function AIGenerateScreen() {
             </View>
           </View>
 
-          {/* AI PROVIDER — matches web: labeled section */}
-          <View style={styles.sectionLabelRow}>
-            <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('provider.section')}</Text>
-          </View>
-          {/* Personal API key notice — generation uses the user's own provider keys */}
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginBottom: 8 }]}>
-            {t('provider.notice')}
-          </Text>
-          {hasProvider ? (
-            <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
-              {configuredProviders.map((pid) => {
-                const providerInfo = getProvider(pid)
-                const isSelected = selectedProvider === pid
-                return (
-                  <TouchableOpacity
-                    key={pid}
-                    onPress={() => {
-                      setSelectedProvider(pid)
-                      setSelectedModel(aiKeys[pid].model)
-                    }}
-                    style={[styles.providerOption, {
-                      borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                      backgroundColor: isSelected ? theme.colors.primaryLight : theme.colors.surfaceElevated,
-                    }]}
-                  >
-                    <Text style={[theme.typography.bodySmall, {
-                      color: isSelected ? theme.colors.primary : theme.colors.text,
-                      fontWeight: isSelected ? '600' : '400',
-                    }]}>
-                      {providerInfo?.name ?? pid}
-                    </Text>
-                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                      {aiKeys[pid].model}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              })}
-            </View>
-          ) : (
-            <View style={[styles.providerCard, { backgroundColor: theme.colors.surface }]}>
-              <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-                {t('provider.none')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SettingsHome' as never)}
-                style={[styles.settingsLink, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              >
-                <Text style={[theme.typography.bodySmall, { color: palette.blue[600], fontWeight: '500' }]}>
-                  {'\u2699\uFE0F'} {t('provider.addInSettings')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
           {/* CONTENT SETTINGS — matches web: labeled bordered section */}
           <View style={styles.sectionLabelRow}>
             <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('content.section')}</Text>
           </View>
           <View style={[styles.labeledSection, { borderColor: theme.colors.border }]}>
-            <TextInput
-              testID="ai-topic-input"
-              label={t('content.topicLabel')}
-              placeholder={t('content.topicPlaceholder')}
-              value={topic}
-              onChangeText={setTopic}
-              multiline
-              numberOfLines={3}
-            />
+            {/* Input mode (cards_only): topic vs image recognition */}
+            {!!selectedDeckId && (
+              <View style={styles.modeRow}>
+                {(['topic', 'image'] as const).map((m) => (
+                  <TouchableOpacity
+                    key={m}
+                    testID={`ai-input-${m}`}
+                    onPress={() => setImageMode(m)}
+                    style={[styles.modeCard, {
+                      borderColor: imageMode === m ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: imageMode === m ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                    }]}
+                  >
+                    <Text style={[theme.typography.bodySmall, {
+                      color: imageMode === m ? theme.colors.primary : theme.colors.text,
+                      fontWeight: imageMode === m ? '600' : '400',
+                      textAlign: 'center',
+                    }]}>
+                      {t(m === 'topic' ? 'content.inputModeTopic' : 'content.inputModeImage')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {!useImage ? (
+              <TextInput
+                testID="ai-topic-input"
+                label={t('content.topicLabel')}
+                placeholder={t('content.topicPlaceholder')}
+                value={topic}
+                onChangeText={setTopic}
+                multiline
+                numberOfLines={3}
+              />
+            ) : (
+              <View style={styles.section}>
+                <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('content.imageUpload')}</Text>
+                <TouchableOpacity
+                  testID="ai-image-pick"
+                  onPress={pickImage}
+                  style={[styles.dropdown, { borderColor: theme.colors.primary, backgroundColor: theme.colors.surfaceElevated, justifyContent: 'center' }]}
+                >
+                  <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
+                    {imageDataUrl ? t('content.imageChange') : t('content.imageUpload')}
+                  </Text>
+                </TouchableOpacity>
+                {imageDataUrl && (
+                  <Image source={{ uri: imageDataUrl }} style={{ width: '100%', height: 170, borderRadius: 10, marginTop: 8 }} resizeMode="contain" />
+                )}
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>{t('content.imageHint')}</Text>
+                <Text style={[theme.typography.caption, { color: palette.yellow[700] }]}>{t('content.imagePaidNotice')}</Text>
+              </View>
+            )}
 
             {/* Content Language — dropdown */}
             <View style={styles.section}>
@@ -472,15 +501,40 @@ export function AIGenerateScreen() {
                   selectedValue={selectedDeckId}
                   onSelect={setSelectedDeckId}
                 />
+                {cardsOnlyNeedsTemplate && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 6 }]}>
+                    {t('alert.deckNoTemplate')}
+                  </Text>
+                )}
               </View>
             </>
           )}
 
+          {affordable && (() => {
+            const balanceWon = affordable.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1000000) : 0
+            const bal = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable.paid })
+            const text = !affordable.walletKnown
+              ? t('wallet.unknown')
+              : useImage
+                ? (balanceWon > 0 ? bal() : t('wallet.empty'))
+                : affordable.free > 0 && balanceWon > 0
+                  ? `${t('wallet.freeOnly', { free: affordable.free })} · ${bal()}`
+                  : affordable.free > 0
+                    ? t('wallet.freeOnly', { free: affordable.free })
+                    : balanceWon > 0
+                      ? bal()
+                      : t('wallet.empty')
+            return (
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+                {text}
+              </Text>
+            )
+          })()}
           <Button
             testID="ai-generate-button"
             title={t('generateButton')}
             onPress={handleGenerate}
-            disabled={!topic.trim()}
+            disabled={cardsOnlyNeedsTemplate || (useImage ? !imageDataUrl : !topic.trim())}
           />
         </ScrollView>
       </Screen>

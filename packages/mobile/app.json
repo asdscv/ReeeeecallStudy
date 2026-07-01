@@ -57,6 +57,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#0f172a"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to create flashcards from an image."
+        }
       ]
     ]
   }

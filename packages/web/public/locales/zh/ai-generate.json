@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "targetDeck": "目标卡组",
+    "selectDeck": "选择一个卡组...",
+    "selectDeckRequired": "请选择要添加卡片的卡组。",
+    "deckNoTemplate": "此卡组还没有卡片模板——请打开它并添加一张卡片以完成设置。",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
@@ -51,7 +52,21 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} 张卡片",
-    "apiKeyNotice": "AI 生成需要您为每个提供商提供自己的 API 密钥。请在设置中添加或管理密钥。"
+    "apiKeyNotice": "AI 生成需要您为每个提供商提供自己的 API 密钥。请在设置中添加或管理密钥。",
+    "inputModeTopic": "主题",
+    "inputModeImage": "图片",
+    "imageUpload": "上传图片",
+    "imageChange": "更换图片",
+    "imageUploadHint": "选择一张单词列表、教科书页面或笔记的照片——AI 会将其转化为卡片。",
+    "imagePaidNotice": "图片生成需要消耗点数（无免费额度）。"
+  },
+  "wallet": {
+    "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",
+    "freeOnly": "今日剩余 {{free}} 张免费卡片",
+    "creditsOnly": "可用 {{credits}} 张付费卡片",
+    "empty": "今天的免费卡片已用完",
+    "unknown": "暂时无法获取余额",
+    "balance": "余额 ₩{{won}}（约{{cards}}张）"
   },
   "wizard": {
     "setup": "Setup",

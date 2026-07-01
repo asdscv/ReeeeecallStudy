@@ -20,12 +20,6 @@ import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
-import { aiKeyVault } from '@reeeeecall/shared/lib/ai/secure-storage'
-import type { ProviderKeyMap } from '@reeeeecall/shared/lib/ai/secure-storage'
-
-// SECURITY: Supabase 서버사이드 암호화 사용 (pgcrypto + Vault)
-// 로컬 SecureStore 대신 서버에 암호화 저장 → 웹/모바일 동기화
-const mobileAiKeyVault = aiKeyVault
 
 const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
 const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
@@ -47,13 +41,6 @@ const LANGUAGES = [
 const TTS_PROVIDERS = [
   { value: 'web_speech' as const, labelKey: 'tts.deviceVoice', descKey: 'tts.deviceVoiceDesc', noteKey: '' },
   { value: 'edge_tts' as const, labelKey: 'tts.edgeTts', descKey: 'tts.edgeTtsDesc', noteKey: 'tts.edgeTtsNote' },
-]
-
-const AI_PROVIDERS = [
-  { id: 'openai', label: 'OpenAI', color: palette.green[600], bg: palette.green[50], models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'o4-mini'] },
-  { id: 'google', label: 'Google Gemini', color: palette.blue[600], bg: palette.blue[50], models: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'] },
-  { id: 'anthropic', label: 'Anthropic', color: palette.yellow[700], bg: palette.yellow[50], models: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'] },
-  { id: 'xai', label: 'xAI (Grok)', color: palette.gray[900], bg: palette.gray[100], models: ['grok-3-mini', 'grok-3'] },
 ]
 
 interface ProfileData {
@@ -103,26 +90,12 @@ export function SettingsScreen() {
   const [nameSaving, setNameSaving] = useState(false)
   const nameCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
-  const [aiCollapsed, setAiCollapsed] = useState(true)
 
   // SRS Settings (per-deck default)
   const [srsSettings, setSrsSettings] = useState<SrsSettings>(DEFAULT_SRS_SETTINGS)
   const [learningStepsText, setLearningStepsText] = useState(
     DEFAULT_SRS_SETTINGS.learning_steps?.join(', ') ?? '1, 10',
   )
-
-  // AI Provider
-  const [aiEditingProvider, setAiEditingProvider] = useState<string | null>(null)
-  const [aiApiKey, setAiApiKey] = useState('')
-  const [aiEditModel, setAiEditModel] = useState('')
-  const [aiKeys, setAiKeys] = useState<ProviderKeyMap>({})
-  const [aiSaving, setAiSaving] = useState(false)
-
-  // Load AI keys
-  useEffect(() => {
-    if (!user) return
-    mobileAiKeyVault.loadAll(user.id).then(setAiKeys).catch(() => {})
-  }, [user])
 
   // Load profile
   useEffect(() => {
@@ -705,168 +678,6 @@ export function SettingsScreen() {
           </View>
         </SectionCard>
 
-        {/* ── e) AI Providers (collapsible) ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            onPress={() => setAiCollapsed(!aiCollapsed)}
-            style={styles.collapsibleHeader}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('aiProviders.title')}</Text>
-            <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
-              {aiCollapsed ? '∨' : '∧'}
-            </Text>
-          </TouchableOpacity>
-          {!aiCollapsed && (
-            <>
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                {t('aiProviders.description')}
-              </Text>
-              <View style={styles.sectionBody}>
-                {AI_PROVIDERS.map((provider) => {
-                  const isEditing = aiEditingProvider === provider.id
-                  const isConfigured = !!aiKeys[provider.id]
-                  return (
-                    <View key={provider.id} style={[styles.aiProviderCard, { borderColor: theme.colors.border }]}>
-                      {/* Toggle header */}
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (isEditing) {
-                            setAiEditingProvider(null)
-                            setAiApiKey('')
-                            setAiEditModel('')
-                          } else {
-                            const existing = aiKeys[provider.id]
-                            setAiEditingProvider(provider.id)
-                            setAiApiKey(existing?.apiKey ?? '')
-                            setAiEditModel(existing?.model ?? provider.models[0])
-                          }
-                        }}
-                        testID={`settings-ai-${provider.id}-toggle`}
-                        style={styles.aiProviderHeader}
-                        activeOpacity={0.6}
-                      >
-                        <View style={styles.aiProviderLeft}>
-                          <View style={[styles.aiIcon, { backgroundColor: theme.colors.primaryLight }]}>
-                            <Text style={[styles.aiIconText, { color: theme.colors.primary }]}>AI</Text>
-                          </View>
-                          <Text style={[theme.typography.label, { color: theme.colors.text, flex: 1 }]}>{provider.label}</Text>
-                          {isConfigured ? (
-                            <View style={[styles.aiBadge, { backgroundColor: theme.colors.successLight }]}>
-                              <Text style={[theme.typography.caption, { color: theme.colors.success, fontWeight: '500' }]}>{t('aiProviders.configured')}</Text>
-                            </View>
-                          ) : (
-                            <View style={[styles.aiBadge, { backgroundColor: theme.colors.surface }]}>
-                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, fontWeight: '500' }]}>{t('aiProviders.notSet')}</Text>
-                            </View>
-                          )}
-                        </View>
-                        <Text style={{ color: theme.colors.textTertiary, fontSize: 14 }}>
-                          {isEditing ? '∧' : '∨'}
-                        </Text>
-                      </TouchableOpacity>
-
-                      {/* Expanded edit form */}
-                      {isEditing && (
-                        <View style={[styles.aiEditForm, { borderTopColor: theme.colors.border }]}>
-                          <TextInput
-                            testID={`settings-ai-${provider.id}-key`}
-                            label={t('aiProviders.apiKey')}
-                            value={aiApiKey}
-                            onChangeText={setAiApiKey}
-                            secureTextEntry
-                            placeholder={t('aiProviders.apiKeyPlaceholder')}
-                          />
-                          <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 4 }]}>{t('aiProviders.model')}</Text>
-                          {provider.models.map((model) => (
-                            <TouchableOpacity
-                              key={model}
-                              onPress={() => setAiEditModel(model)}
-                              style={[styles.modelOption, {
-                                borderColor: aiEditModel === model ? theme.colors.primary : theme.colors.border,
-                                backgroundColor: aiEditModel === model ? theme.colors.primaryLight : theme.colors.surfaceElevated,
-                              }]}
-                            >
-                              <Text style={[theme.typography.bodySmall, {
-                                color: aiEditModel === model ? theme.colors.primary : theme.colors.text,
-                                fontWeight: aiEditModel === model ? '600' : '400',
-                              }]}>{model}</Text>
-                            </TouchableOpacity>
-                          ))}
-                          <View style={{ flexDirection: 'row', gap: 8, paddingTop: 4 }}>
-                            <View style={{ flex: 1 }}>
-                              <Button
-                                title={aiSaving ? t('aiProviders.saving') : t('aiProviders.save')}
-                                size="sm"
-                                disabled={aiSaving || !aiApiKey.trim()}
-                                onPress={async () => {
-                                  if (!user || !aiApiKey.trim()) return
-                                  setAiSaving(true)
-                                  try {
-                                    await mobileAiKeyVault.saveProvider(user.id, provider.id, {
-                                      apiKey: aiApiKey.trim(),
-                                      model: aiEditModel || provider.models[0],
-                                      savedAt: new Date().toISOString(),
-                                    })
-                                    const keys = await mobileAiKeyVault.loadAll(user.id)
-                                    setAiKeys(keys)
-                                    setAiEditingProvider(null)
-                                    setAiApiKey('')
-                                    setAiEditModel('')
-                                    Alert.alert(t('profile.savedTitle'), t('aiProviders.saveSuccess', { provider: provider.label }))
-                                  } catch {
-                                    Alert.alert(t('alerts.error'), t('aiProviders.saveError'))
-                                  } finally {
-                                    setAiSaving(false)
-                                  }
-                                }}
-                                testID={`settings-ai-${provider.id}-save`}
-                              />
-                            </View>
-                            {isConfigured && (
-                              <TouchableOpacity
-                                onPress={async () => {
-                                  if (!user) return
-                                  await mobileAiKeyVault.removeProvider(user.id, provider.id)
-                                  const keys = await mobileAiKeyVault.loadAll(user.id)
-                                  setAiKeys(keys)
-                                  setAiEditingProvider(null)
-                                  setAiApiKey('')
-                                  setAiEditModel('')
-                                  Alert.alert(t('aiProviders.deletedTitle'), t('aiProviders.removed', { provider: provider.label }))
-                                }}
-                                testID={`settings-ai-${provider.id}-delete`}
-                                style={[styles.configBtn, { backgroundColor: theme.colors.errorLight }]}
-                              >
-                                <Text style={[theme.typography.caption, { color: theme.colors.error, fontWeight: '500' }]}>{t('aiProviders.delete')}</Text>
-                              </TouchableOpacity>
-                            )}
-                            <TouchableOpacity
-                              onPress={() => {
-                                setAiEditingProvider(null)
-                                setAiApiKey('')
-                                setAiEditModel('')
-                              }}
-                              style={[styles.configBtn, { backgroundColor: theme.colors.surface }]}
-                            >
-                              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '500' }]}>{t('aiProviders.cancel')}</Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      )}
-                    </View>
-                  )
-                })}
-                <View style={[styles.securityNote, { backgroundColor: theme.colors.surface }]}>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    {t('aiProviders.securityNote')}
-                  </Text>
-                </View>
-              </View>
-            </>
-          )}
-        </SectionCard>
-
         {/* ── f) Language ── */}
         <SectionCard theme={theme}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('language.title')}</Text>
@@ -1212,13 +1023,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
   chevron: { fontSize: 18, fontWeight: '300' },
-
-  // AI Providers
-  aiProviderCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
-  aiProviderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  aiProviderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  aiIcon: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  aiIconText: { fontSize: 12, fontWeight: '700' },
   configBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   aiEditForm: { gap: 10, paddingTop: 10, borderTopWidth: 1 },
   aiBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },

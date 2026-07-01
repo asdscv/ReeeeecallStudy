@@ -27,7 +27,13 @@
     "autoDetect": "自動検出",
     "cardCountLabel": "カード枚数:",
     "cardCountPlaceholder": "1–100",
-    "cardCountHint": "1–100枚"
+    "cardCountHint": "1–100枚",
+    "inputModeTopic": "トピック",
+    "inputModeImage": "画像",
+    "imageUpload": "画像をアップロード",
+    "imageChange": "画像を変更",
+    "imageHint": "写真を選ぶだけで、AIがカードに変換します。",
+    "imagePaidNotice": "画像生成にはクレジットを使用します。"
   },
   "deck": {
     "section": "デッキを選択",
@@ -58,10 +64,31 @@
     "retry": "再試行",
     "back": "戻る"
   },
+  "wallet": {
+    "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカード",
+    "creditsOnly": "有料カード{{credits}}枚が利用可能",
+    "empty": "本日の無料カードを使い切りました",
+    "unknown": "残高を取得できません",
+    "balance": "残高 ₩{{won}}（約{{cards}}枚）",
+    "freeOnly": "本日の無料カードは残り{{free}}枚です"
+  },
   "alert": {
     "errorTitle": "エラー",
     "enterTopic": "トピックを入力してください",
     "configureProvider": "先に設定でAIプロバイダーを設定してください。",
-    "saveFailed": "生成したカードの保存に失敗しました"
+    "saveFailed": "生成したカードの保存に失敗しました",
+    "imageRequired": "先に画像を選択してください。",
+    "selectImageError": "この画像は大きすぎるか、読み込めませんでした。小さい写真でお試しください。",
+    "permissionDenied": "画像をアップロードするには写真へのアクセスが必要です。",
+    "deckNoTemplate": "このデッキにはまだカードテンプレートがありません。デッキを開いてカードを1枚追加すると設定されます。"
+  },
+  "errors": {
+    "insufficientCredits": "本日の無料AIカードを使い切り、クレジットも残っていません。チャージして生成を続けましょう。",
+    "invalidImage": "この画像を読み込めませんでした。より小さく、鮮明な写真でお試しください。",
+    "quotaExceeded": "本日の無料AI生成の上限に達しました。明日またお試しください。",
+    "rateLimited": "リクエストが制限されています。しばらく待ってから再度お試しください。",
+    "invalidResponse": "AIから無効な応答が返されました。もう一度お試しください。",
+    "networkError": "ネットワークエラーです。接続を確認して再度お試しください。",
+    "serverError": "AI生成は一時的にご利用いただけません。後ほど再度お試しください。"
   }
 }

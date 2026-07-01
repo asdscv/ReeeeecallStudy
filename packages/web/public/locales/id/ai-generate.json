@@ -24,9 +24,10 @@
       "full": "Full (Template + Deck + Cards)",
       "cards_only": "Add Cards to Existing Deck"
     },
-    "targetDeck": "Target Deck",
-    "selectDeck": "Select a deck...",
-    "selectDeckRequired": "Please select a deck to add cards to.",
+    "deckNoTemplate": "Deck ini belum memiliki templat kartu — buka deck dan tambahkan satu kartu untuk menyiapkannya.",
+    "targetDeck": "Deck Tujuan",
+    "selectDeck": "Pilih deck...",
+    "selectDeckRequired": "Silakan pilih deck untuk menambahkan kartu.",
     "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
@@ -51,7 +52,21 @@
     "layoutCustomDesc": "AI generates styled HTML",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}} kartu",
-    "apiKeyNotice": "Pembuatan AI memerlukan kunci API Anda sendiri untuk setiap penyedia. Tambah atau kelola kunci di Pengaturan."
+    "apiKeyNotice": "Pembuatan AI memerlukan kunci API Anda sendiri untuk setiap penyedia. Tambah atau kelola kunci di Pengaturan.",
+    "inputModeTopic": "Topik",
+    "inputModeImage": "Gambar",
+    "imageUpload": "Unggah gambar",
+    "imageChange": "Ganti gambar",
+    "imageUploadHint": "Pilih foto daftar kata, halaman buku teks, atau catatan — AI akan mengubahnya menjadi kartu.",
+    "imagePaidNotice": "Pembuatan dari gambar menggunakan kredit (tidak ada tingkat gratis)."
+  },
+  "wallet": {
+    "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",
+    "freeOnly": "{{free}} kartu gratis tersisa hari ini",
+    "creditsOnly": "{{credits}} kartu berbayar tersedia",
+    "empty": "Kartu gratis hari ini sudah habis",
+    "unknown": "Saldo tidak tersedia saat ini",
+    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)"
   },
   "wizard": {
     "setup": "Setup",

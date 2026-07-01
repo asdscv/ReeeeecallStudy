@@ -24,6 +24,7 @@
       "full": "전체 생성 (템플릿 + 덱 + 카드)",
       "cards_only": "기존 덱에 카드 추가"
     },
+    "deckNoTemplate": "이 덱에는 아직 카드 템플릿이 없습니다 — 덱을 열고 카드를 한 번 추가하면 템플릿이 설정됩니다.",
     "targetDeck": "대상 덱",
     "selectDeck": "덱을 선택하세요...",
     "selectDeckRequired": "카드를 추가할 덱을 선택해주세요.",
@@ -51,7 +52,21 @@
     "layoutCustomDesc": "AI가 스타일된 HTML 생성",
     "cardCountPlaceholder": "{{min}}–{{max}}",
     "cardCountHint": "{{min}}–{{max}}장",
-    "apiKeyNotice": "AI 생성에는 프로바이더별 본인 API 키가 필요합니다. 설정에서 키를 추가·관리하세요."
+    "apiKeyNotice": "AI 생성에는 프로바이더별 본인 API 키가 필요합니다. 설정에서 키를 추가·관리하세요.",
+    "inputModeTopic": "주제",
+    "inputModeImage": "이미지",
+    "imageUpload": "이미지 업로드",
+    "imageChange": "이미지 변경",
+    "imageUploadHint": "단어 목록, 교과서 페이지, 필기 사진을 올리면 AI가 카드로 만들어드립니다.",
+    "imagePaidNotice": "이미지 생성은 크레딧을 사용합니다 (무료 제공 없음)."
+  },
+  "wallet": {
+    "summary": "오늘 사용 가능: 무료 {{free}}장 + 유료 {{credits}}장",
+    "freeOnly": "오늘 남은 무료 카드 {{free}}장",
+    "creditsOnly": "사용 가능한 유료 카드 {{credits}}장",
+    "empty": "오늘 무료 카드를 다 썼어요",
+    "unknown": "현재 잔액을 확인할 수 없습니다",
+    "balance": "충전잔액 ₩{{won}} (약 {{cards}}장)"
   },
   "wizard": {
     "setup": "설정",
