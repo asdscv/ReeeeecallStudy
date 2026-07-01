@@ -1,11 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, Eye, EyeOff, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
-import { toIntlLocale } from '../lib/locale-utils'
+import { Check, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
-import { formatLocalDateTime } from '../lib/date-utils'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
@@ -35,7 +33,6 @@ async function autoSaveProfile(
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation('settings')
-  const dateLocale = toIntlLocale(i18n.language)
   const { changeLanguage } = useLocale()
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
