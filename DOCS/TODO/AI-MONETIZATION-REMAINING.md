@@ -15,6 +15,13 @@ business/economic layer + external rails + ops + minor cleanup.
 `set_ai_pricing_settings` / `get_ai_margin_daily`) + the edge-fn token-usage threading + `finalizeCost()`;
 DB-tested (`supabase/tests/ai_cost_margin_test.sql`, wired into the CI `ai-credit-tests` job) +
 adversarially audited (MERGE-READY). Purely additive — the charging path is untouched.
+**mig 113** set the **margin target to 80%** (`target_margin_bps=8000`) + added a **net-zero floor**
+monitor (`get_ai_margin_daily.net_negative_jobs` = PAID rows priced below cost; free-tier CAC excluded)
++ **`preview_ai_cost(provider,model,tin,tout,credits)`** — a read-only **dry-run** of the cost math (no
+ledger write) so the owner can preview margins before setting a rate/₩. Dry-run @ ₩100/credit shows the
+default gemini-flash-lite at **~99% margin** (grok-3 / gemini-pro dip under 80% at 1 credit → flagged, still
+net-positive; below-cost never breached). Live e2e (16/16) confirmed real-provider cost capture + net-zero-on-failure.
+
 **⏳ Phase 1 (turn margin ON)** waits on the owner's business numbers (below) + verifying the seeded
 INDICATIVE rates vs real provider invoices. Prod deploy ships with §3.
 

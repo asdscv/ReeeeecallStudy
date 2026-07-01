@@ -176,6 +176,11 @@ USEDB=$(psql "select coalesce(free_cards_used,0) from ai_generation_usage where 
 chk "B1 usage refunded to 0 (service-role refund)" "${USEDB:-0}" "0"
 REFUNDED=$(psql "select bool_and(refunded) from ai_generation_jobs where user_id='$USERID'")
 chk "B1 job marked refunded" "${REFUNDED:-f}" "t"
+# NET-ZERO on failure (mig 112/113): a failed generation records NO cost — finalizeCost
+# runs only on success, so the failed job has no ai_cost_ledger row (prior rows were
+# cascade-cleared with the phase-B job reset). Refunded credit + zero cost = net zero.
+NZCOST=$(psql "select count(*) from ai_cost_ledger where user_id='$USERID'")
+chk "B1 net-zero on failure (no cost row for the failed gen)" "${NZCOST:-X}" "0"
 
 echo ""
 echo "════════════ RESULT: PASS=$PASS FAIL=$FAIL ════════════"

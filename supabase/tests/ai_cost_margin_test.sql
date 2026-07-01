@@ -105,8 +105,10 @@ DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM finalize_ai_cost('c0000000-0000-0000-0000-000000000001'::uuid, 'job_under', 'xai', 'grok-3', 100000, 100000);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref = 'job_under';
   ASSERT r.cost_won_micros = 2430000000, format('C6 cost_won %s', r.cost_won_micros);
-  ASSERT r.margin_bps < 7000, format('C6 bps under target %s', r.margin_bps);
+  ASSERT r.margin_bps < 8000, format('C6 bps under 80%% target %s', r.margin_bps);
   ASSERT r.under_target = true, 'C6 under_target flag';
+  -- net-zero floor breach: a PAID row priced below its real cost
+  ASSERT r.price_won_micros > 0 AND r.margin_won_micros < 0, 'C6 net-negative (paid below cost)';
 END $$;
 
 -- C7: unknown / foreign job → no-op (no row written, no raise)
@@ -208,8 +210,58 @@ DO $$ DECLARE row record; found_grp boolean := false; BEGIN
     -- cost sum (non-estimated — refunded cost is REAL and still counts):
     --   job_known 405000 + job_free 405000 + job_refunded 405000 = 1,215,000
     ASSERT row.cost_won_micros = 1215000, format('F3 cost sum %s', row.cost_won_micros);
+    -- mig 113 columns: this group is all healthy — no <80% and no PAID-below-cost
+    ASSERT row.under_target_jobs = 0, format('F3 under_target %s', row.under_target_jobs);
+    ASSERT row.net_negative_jobs = 0, format('F3 net_negative %s', row.net_negative_jobs);
   END LOOP;
   ASSERT found_grp, 'F3 group present';
+END $$;
+
+-- F4: the xai/grok-3 group has job_under (1 credit, huge cost) → under_target AND
+--     net_negative (PAID below cost) both count it. This is the net-zero floor breach.
+DO $$ DECLARE row record; found_grp boolean := false; BEGIN
+  FOR row IN SELECT * FROM get_ai_margin_daily() WHERE provider='xai' AND model='grok-3' LOOP
+    found_grp := true;
+    ASSERT row.under_target_jobs = 1, format('F4 under_target %s', row.under_target_jobs);
+    ASSERT row.net_negative_jobs = 1, format('F4 net_negative %s', row.net_negative_jobs);
+  END LOOP;
+  ASSERT found_grp, 'F4 grok-3 group present';
+END $$;
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- G. preview_ai_cost — DRY RUN of the cost math (no ledger write) + net-zero floor
+-- ════════════════════════════════════════════════════════════════════════════
+
+-- G1: preview matches finalize math (same as C1 inputs) AND writes NO row
+DO $$ DECLARE p record; n_before int; n_after int; BEGIN
+  SELECT count(*) INTO n_before FROM ai_cost_ledger;
+  SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500, 3);
+  ASSERT p.cost_won_micros = 405000 AND p.price_won_micros = 300000000 AND p.margin_bps = 9986,
+    format('G1 preview math %s', p);
+  ASSERT p.under_target = false AND p.net_negative = false, 'G1 healthy';
+  SELECT count(*) INTO n_after FROM ai_cost_ledger;
+  ASSERT n_before = n_after, 'G1 dry-run must NOT write a ledger row';
+END $$;
+
+-- G2: preview a net-negative PAID scenario (expensive grok, 1 credit) → under_target + net_negative
+DO $$ DECLARE p record; BEGIN
+  SELECT * INTO p FROM preview_ai_cost('xai','grok-3', 100000, 100000, 1);
+  ASSERT p.margin_won_micros < 0, format('G2 margin %s', p.margin_won_micros);
+  ASSERT p.under_target = true AND p.net_negative = true, 'G2 net-zero floor breach flagged';
+END $$;
+
+-- G3: preview (0,0) → estimated (no faked 0-cost even in dry-run)
+DO $$ DECLARE p record; BEGIN
+  SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 0, 0, 3);
+  ASSERT p.estimated = true AND p.cost_won_micros IS NULL, 'G3 (0,0) estimated';
+END $$;
+
+-- G4: preview is admin/service_role only
+SELECT set_config('request.jwt.claim.role', 'authenticated', false);
+DO $$ BEGIN
+  BEGIN PERFORM * FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 10, 10, 1);
+    RAISE EXCEPTION 'G4 expected not-authorized';
+  EXCEPTION WHEN sqlstate '42501' THEN NULL; END;
 END $$;
 
 SELECT 'ALL_AI_COST_MARGIN_TESTS_PASSED' AS result;
