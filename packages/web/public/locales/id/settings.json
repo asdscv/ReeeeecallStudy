@@ -189,5 +189,11 @@
   "legal": {
     "privacy": "Kebijakan Privasi",
     "terms": "Ketentuan Layanan"
+  },
+  "cardUsage": {
+    "title": "Penyimpanan kartu",
+    "count": "{{owned}} / {{limit}} kartu",
+    "reached": "Anda telah mencapai batas kartu. Berlangganan untuk menambah.",
+    "subscribe": "Berlangganan (segera hadir)"
   }
 }

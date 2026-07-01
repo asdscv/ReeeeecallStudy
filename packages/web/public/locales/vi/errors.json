@@ -41,7 +41,8 @@
   "card": {
     "readonlyDeckNoAdd": "Không thể thêm thẻ vào bộ thẻ chỉ đọc.",
     "readonlyDeckNoEdit": "Không thể chỉnh sửa thẻ trong bộ thẻ chỉ đọc.",
-    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu.",
+    "limitReached": "Đã đạt giới hạn thẻ — đăng ký để thêm."
   },
   "deck": {
     "rateLimitReached": "Đã đạt giới hạn yêu cầu."

@@ -21,16 +21,26 @@ interface DeckStats {
 export type DeckCacheKey = 'decks' | 'stats' | 'templates'
 const deckCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 
+export interface CardUsage {
+  owned: number
+  limit: number
+  available: number
+}
+
 interface DeckState {
   decks: Deck[]
   stats: DeckStats[]
   templates: CardTemplate[]
   loading: boolean
   error: string | null
+  /** Owned-card usage vs the account cap (mig 116). null until fetched. */
+  cardUsage: CardUsage | null
 
   fetchDecks: (opts?: { force?: boolean }) => Promise<void>
   fetchStats: (userId: string, opts?: { force?: boolean }) => Promise<void>
   fetchTemplates: (opts?: { force?: boolean }) => Promise<void>
+  /** Refresh owned-card usage (get_owned_card_usage RPC). */
+  fetchCardUsage: () => Promise<void>
   /**
    * Guarantee the current user has the default card templates, then refetch.
    * Self-heals accounts created before migration 036 whose signup trigger
@@ -62,8 +72,16 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   templates: [],
   loading: false,
   error: null,
+  cardUsage: null,
 
   invalidate: (key) => deckCache.invalidate(key),
+
+  fetchCardUsage: async () => {
+    const { data, error } = await supabase.rpc('get_owned_card_usage').maybeSingle()
+    if (error || !data) return
+    const row = data as { owned: number; card_limit: number; available: number }
+    set({ cardUsage: { owned: row.owned, limit: row.card_limit, available: row.available } })
+  },
 
   fetchDecks: async (opts) => {
     if (!deckCache.shouldFetch('decks', opts)) return

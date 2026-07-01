@@ -10,6 +10,8 @@ import {
 import { useDeckStore } from '../../stores/deck-store'
 import { useCardStore } from '../../stores/card-store'
 import { useTemplateStore } from '../../stores/template-store'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { CardLimitBlock } from '../card/CardLimitBlock'
 import {
   QUICK_PRESETS,
   presetFieldSpecs,
@@ -36,6 +38,7 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
   const { t } = useTranslation(['decks', 'common'])
   const { createDeck, deleteDeck } = useDeckStore()
   const { createCards } = useCardStore()
+  const limit = useCardLimit()
   const { findOrCreatePresetTemplate } = useTemplateStore()
 
   const [deckName, setDeckName] = useState('')
@@ -120,6 +123,12 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
     submitting.current = true
     try {
       setError(null)
+
+      // Owned-card limit pre-flight (mig 116). Server also enforces at createCards.
+      if (limit.reached) {
+        setError('errors:card.limitReached')
+        return
+      }
 
       const name = deckName.trim()
       if (!name) {
@@ -215,6 +224,7 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
           <DialogTitle>{t('decks:quickCreate.title')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {limit.reached && <CardLimitBlock />}
           {error && (
             <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
               {t(error, { defaultValue: error })}

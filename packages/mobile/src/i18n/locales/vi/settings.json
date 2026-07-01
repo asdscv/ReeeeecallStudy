@@ -156,5 +156,11 @@
   "haptics": {
     "enable": "Phản hồi rung",
     "hint": "Rung phản hồi khi chạm, đánh giá và thao tác."
+  },
+  "cardUsage": {
+    "title": "Dung lượng thẻ",
+    "count": "{{owned}} / {{limit}} thẻ",
+    "reached": "Bạn đã đạt giới hạn thẻ. Đăng ký để thêm.",
+    "subscribe": "Đăng ký (sắp ra mắt)"
   }
 }

@@ -156,5 +156,11 @@
   "haptics": {
     "enable": "Umpan balik haptik",
     "hint": "Getaran umpan balik saat mengetuk, menilai, dan beraksi."
+  },
+  "cardUsage": {
+    "title": "Penyimpanan kartu",
+    "count": "{{owned}} / {{limit}} kartu",
+    "reached": "Anda telah mencapai batas kartu. Berlangganan untuk menambah.",
+    "subscribe": "Berlangganan (segera hadir)"
   }
 }

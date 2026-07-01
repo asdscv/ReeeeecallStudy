@@ -6,6 +6,15 @@ import { createStaleCache } from '../lib/cache/stale-cache'
 import type { Card } from '../types/database'
 
 /**
+ * The owned-card limit guard (mig 116) raises SQLSTATE PT402 with hint
+ * CARD_LIMIT_REACHED from reserve_card_positions. Detect on code/hint (robust to
+ * whether PostgREST maps PT402→HTTP 402) so we can show the subscribe message.
+ */
+function isCardLimitError(err: { code?: string; hint?: string } | null): boolean {
+  return err?.code === 'PT402' || err?.hint === 'CARD_LIMIT_REACHED'
+}
+
+/**
  * Card mutations change the per-deck card/SRS counts surfaced by
  * get_deck_stats (deck list + Quick Study). The deck store caches stats with a
  * TTL, and consumers fetch on focus without `force`, so we must invalidate that
@@ -129,7 +138,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: position, error: posError } = await supabase
       .rpc('reserve_card_positions', { p_deck_id: input.deck_id, p_count: 1 })
     if (posError || position === null) {
-      set({ error: posError?.message ?? 'Failed to create card' })
+      set({ error: isCardLimitError(posError) ? 'errors:card.limitReached' : (posError?.message ?? 'Failed to create card') })
       return null
     }
 
@@ -182,7 +191,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: basePos, error: posError } = await supabase
       .rpc('reserve_card_positions', { p_deck_id: deck_id, p_count: cards.length })
     if (posError || basePos === null) {
-      set({ error: posError?.message ?? 'Failed to create cards' })
+      set({ error: isCardLimitError(posError) ? 'errors:card.limitReached' : (posError?.message ?? 'Failed to create cards') })
       return 0
     }
 

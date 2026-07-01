@@ -156,5 +156,11 @@
   "haptics": {
     "enable": "Respuesta háptica",
     "hint": "Vibración al tocar, calificar y realizar acciones."
+  },
+  "cardUsage": {
+    "title": "Almacenamiento de tarjetas",
+    "count": "{{owned}} / {{limit}} tarjetas",
+    "reached": "Has alcanzado tu límite de tarjetas. Suscríbete para añadir más.",
+    "subscribe": "Suscribirse (próximamente)"
   }
 }

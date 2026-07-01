@@ -156,5 +156,11 @@
   },
   "actions": {
     "cancel": "취소"
+  },
+  "cardUsage": {
+    "title": "카드 저장 용량",
+    "count": "{{owned}} / {{limit}}장",
+    "reached": "카드 한도에 도달했어요. 더 만들려면 구독하세요.",
+    "subscribe": "구독하기 (곧 오픈)"
   }
 }

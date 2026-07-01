@@ -41,7 +41,8 @@
   "card": {
     "readonlyDeckNoAdd": "No se pueden añadir tarjetas a un mazo de solo lectura.",
     "readonlyDeckNoEdit": "No se pueden modificar tarjetas en un mazo de solo lectura.",
-    "rateLimitReached": "Límite de solicitudes alcanzado."
+    "rateLimitReached": "Límite de solicitudes alcanzado.",
+    "limitReached": "Límite de tarjetas alcanzado: suscríbete para añadir más."
   },
   "deck": {
     "rateLimitReached": "Límite de solicitudes alcanzado."

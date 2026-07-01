@@ -29,7 +29,8 @@
   "card": {
     "readonlyDeckNoAdd": "Cannot add cards to a read-only deck.",
     "readonlyDeckNoEdit": "Cannot modify cards in a read-only deck.",
-    "rateLimitReached": "Request limit reached."
+    "rateLimitReached": "Request limit reached.",
+    "limitReached": "Card limit reached — subscribe to add more."
   },
   "deck": {
     "rateLimitReached": "Request limit reached."

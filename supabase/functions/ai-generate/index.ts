@@ -341,6 +341,16 @@ Deno.serve(async (req) => {
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
       const cardCount = Math.min(MAX_CARDS_PER_CALL, Math.max(1, Math.floor(Number(body.cardCount) || 10)))
 
+      // Owned-card limit (mig 116): block before spending credits.
+      const { error: imgCardLimitErr } = await sbUser.rpc('check_card_limit_self', { p_adding: cardCount })
+      if (imgCardLimitErr) {
+        if (imgCardLimitErr.code === 'PT402' || (imgCardLimitErr as { hint?: string }).hint === 'CARD_LIMIT_REACHED') {
+          return json({ error: 'Card limit reached', code: 'CARD_LIMIT_REACHED' }, 402, cors)
+        }
+        console.error('[ai-generate] image card-limit check error:', imgCardLimitErr.message)
+        return json({ error: 'Card limit check failed', code: 'CARD_LIMIT_ERROR' }, 500, cors)
+      }
+
       // Pre-gen GATE (reserve): rejects 402 if the wallet is empty (image is paid).
       const { data: imgRaw, error: imgErr } = await sbUser.rpc('reserve_ai_image')
       if (imgErr) {
@@ -395,6 +405,17 @@ Deno.serve(async (req) => {
       pCards = Math.min(MAX_CARDS_PER_CALL, Math.floor(reqCount))
       const existing = asExistingCards(body.existingCards)
       ;({ systemPrompt, userPrompt } = buildCardsPrompt(topic, fields, pCards, existing))
+    }
+
+    // Owned-card limit (mig 116): block BEFORE spending AI credits/free quota if
+    // saving these cards would exceed the account's card cap.
+    const { error: cardLimitErr } = await sbUser.rpc('check_card_limit_self', { p_adding: pCards })
+    if (cardLimitErr) {
+      if (cardLimitErr.code === 'PT402' || (cardLimitErr as { hint?: string }).hint === 'CARD_LIMIT_REACHED') {
+        return json({ error: 'Card limit reached', code: 'CARD_LIMIT_REACHED' }, 402, cors)
+      }
+      console.error('[ai-generate] card-limit check error:', cardLimitErr.message)
+      return json({ error: 'Card limit check failed', code: 'CARD_LIMIT_ERROR' }, 500, cors)
     }
 
     // Pre-gen GATE (reserve): compute free/paid split + reject 402 if the paid
