@@ -83,6 +83,7 @@ const ERROR_FALLBACKS: Record<string, string> = {
   invalidResponse: 'AI returned an invalid response. Please try again.',
   networkError: 'Network error. Please check your connection and try again.',
   serverError: 'AI generation is temporarily unavailable. Please try again later.',
+  cardLimitReached: "You've reached your card limit. Delete cards or subscribe to save more.",
 }
 
 function t(key: string): string {

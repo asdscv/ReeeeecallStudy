@@ -248,8 +248,10 @@ export function MarketplaceDetailScreen() {
     try {
       const result = await acquireDeck(listingId)
       if (!result) {
+        // store.error is an i18n KEY (e.g. errors:card.limitReached at the cap) —
+        // translate it, don't show the raw key.
         const err = useMarketplaceStore.getState().error
-        Alert.alert(t('detail.errorTitle'), err ?? t('detail.downloadFailed'))
+        Alert.alert(t('detail.errorTitle'), err ? t(err) : t('detail.downloadFailed'))
         return
       }
       setHasAcquired(true)
