@@ -145,27 +145,38 @@ echo "    -> content keys: $(node -e "const j=require('/tmp/e2e_body.json');cons
 # metered AS THE USER → free_cards_used attributed to this user
 USED=$(psql "select free_cards_used from ai_generation_usage where user_id='$USERID'")
 chk "A3 metered as user (free_cards_used)" "${USED:-X}" "3"
-# COST CAPTURE (mig 112): the discarded provider token usage is now threaded into
-# finalize_ai_cost → a cost-ledger row lands with real tokens + computed cost.
-sleep 1  # finalizeCost is awaited before the 200, but give PostgREST a beat
+# COST CAPTURE + CHARGE (mig 114): the provider token usage is threaded into
+# charge_ai_generation → a cost-ledger row lands with real tokens + computed cost.
+# (These 3 free cards charge 0 — free tier — but still record cost.)
+sleep 1  # chargeGeneration is awaited before the 200, but give PostgREST a beat
 COST=$(psql "select provider||'|'||(tokens_in>0)::text||'|'||(cost_won_micros is not null)::text||'|'||estimated::text from ai_cost_ledger where user_id='$USERID' order by created_at desc limit 1")
 echo "    -> cost row: ${COST:-<none>}"
 chk "A3 cost captured (provider|tokens_in>0|cost_set|estimated)" "${COST:-X}" "$PROVIDER|true|true|false"
 
-# A4: exhaust free, no credits → 402 AI_INSUFFICIENT_CREDITS
+# A4: exhaust free, EMPTY wallet, request a paid card → 402 (pre-gen gate)
 psql "update ai_generation_usage set free_cards_used=10 where user_id='$USERID'" >/dev/null
 s=$(call "{\"kind\":\"cards\",\"topic\":\"x\",\"fields\":$FIELDS,\"cardCount\":1}")
-chk "A4 over-free no-credits status" "$s" "402"; chk "A4 code" "$(code_of)" "AI_INSUFFICIENT_CREDITS"
+chk "A4 over-free empty-wallet status" "$s" "402"; chk "A4 code" "$(code_of)" "AI_INSUFFICIENT_CREDITS"
 
-# A5: grant credits (service-role add_ai_credits) → paid success debits
+# A5: top up the micro-WON wallet (service-role, ₩100 = 100,000,000 micro-WON) →
+# a PAID gen succeeds and the wallet is DEBITED by the real token cost × markup.
 curl -s "$API/rest/v1/rpc/add_ai_credits" -H "apikey: $SVC" -H "Authorization: Bearer $SVC" -H 'Content-Type: application/json' \
-  -d "{\"p_user_id\":\"$USERID\",\"p_credits\":5,\"p_reason\":\"purchase\",\"p_ref\":\"e2e_pay_$USERID\"}" >/dev/null
+  -d "{\"p_user_id\":\"$USERID\",\"p_micro_won\":100000000,\"p_reason\":\"purchase\",\"p_ref\":\"e2e_pay_$USERID\"}" >/dev/null
+BAL0=$(psql "select balance from ai_credit_balance where user_id='$USERID'")
 s=$(call "{\"kind\":\"cards\",\"topic\":\"Spanish numbers\",\"contentLang\":\"es-ES\",\"fields\":$FIELDS,\"cardCount\":2}")
+if [ "$s" = "502" ]; then   # transient live-provider hiccup — release ran, wallet intact; retry once
+  echo "    (A5 got transient provider 502 — retrying once)"; sleep 3
+  s=$(call "{\"kind\":\"cards\",\"topic\":\"Common English numbers\",\"contentLang\":\"en-US\",\"fields\":$FIELDS,\"cardCount\":2}")
+fi
 chk "A5 paid success status" "$s" "200"
-BAL=$(psql "select balance from ai_credit_balance where user_id='$USERID'")
-PAID=$(psql "select paid_cards_used from ai_generation_usage where user_id='$USERID'")
-chk "A5 credits debited (balance)" "${BAL:-X}" "3"
-chk "A5 paid_cards_used" "${PAID:-X}" "2"
+sleep 1
+BAL1=$(psql "select balance from ai_credit_balance where user_id='$USERID'")
+SPENT=$(psql "select count(*) from ai_credit_ledger where user_id='$USERID' and reason='spend' and delta<0")
+PRICE=$(psql "select coalesce(price_micro_won,0) from ai_generation_jobs where user_id='$USERID' and charged and price_micro_won>0 order by created_at desc limit 1")
+echo "    -> wallet ${BAL0} → ${BAL1}, charged price ${PRICE} micro-WON, spend rows ${SPENT}"
+[ "${BAL1:-0}" -lt "${BAL0:-0}" ] 2>/dev/null && ok "A5 wallet debited by real cost×markup (${BAL0}→${BAL1})" || bad "A5 wallet not debited"
+chk "A5 spend ledger row written" "${SPENT:-0}" "1"
+[ "${PRICE:-0}" -gt 0 ] 2>/dev/null && ok "A5 charged price > 0 (${PRICE} micro-WON)" || bad "A5 no charge price"
 
 # ════════════════ PHASE B — bogus provider (refund seam) ════════════════
 echo "── PHASE B: bogus provider → refund-on-failure ──"

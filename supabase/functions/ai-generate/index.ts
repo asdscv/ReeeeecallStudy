@@ -62,8 +62,8 @@ function json(body: unknown, status: number, cors: Record<string, string>): Resp
   })
 }
 
-// Service-role client — used ONLY for the privileged refund (refund_ai_job),
-// which derives the amount from the recorded job and is service_role-gated.
+// Service-role client — used ONLY for the privileged post-gen charge
+// (charge_ai_generation) and failure release (release_ai_job), both service_role-gated.
 function sbServiceRole() {
   return createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -71,34 +71,34 @@ function sbServiceRole() {
   )
 }
 
-// Best-effort privileged refund when generation fails AFTER we metered. NOTE:
-// supabase-js's rpc() returns a PostgrestFilterBuilder that is thenable but has
-// NO `.catch` — `.rpc(...).catch(...)` throws "catch is not a function" and the
-// refund never fires (the whole point of the job-ref hardening). So await it and
-// inspect the RETURNED error (PostgREST errors don't throw), wrapped for the
-// network-throw case. Must not mask the caller's provider-failure response.
-async function refundJob(userId: string, jobRef: string | undefined): Promise<void> {
+// Release a RESERVED job when generation FAILS (metered billing, mig 114). Nothing
+// was deducted pre-gen (charge is post-gen only), so this only reverses the
+// free/paid/image day counters — no wallet touch → the failure is net-zero. NOTE:
+// supabase-js's rpc() is a thenable with NO `.catch` (`.rpc().catch()` throws
+// "catch is not a function"), so await it and inspect the RETURNED error, wrapped
+// for the network throw. Best-effort — must never mask the caller's 502.
+async function releaseJob(userId: string, jobRef: string | undefined): Promise<void> {
   if (!jobRef) return
   try {
-    const { error } = await sbServiceRole().rpc('refund_ai_job', {
+    const { error } = await sbServiceRole().rpc('release_ai_job', {
       p_user_id: userId,
       p_job_ref: jobRef,
     })
-    if (error) console.error('[ai-generate] refund failed (job', jobRef, '):', error.message)
+    if (error) console.error('[ai-generate] release failed (job', jobRef, '):', error.message)
   } catch (re) {
-    console.error('[ai-generate] refund threw (job', jobRef, '):', re)
+    console.error('[ai-generate] release threw (job', jobRef, '):', re)
   }
 }
 
-// Record the REAL provider cost of a successful generation (mig 112). Best-effort
-// + service_role (finalize_ai_cost derives price from the job row, computes cost
-// from the token usage, is idempotent on job_ref). PURELY observational — it must
-// NEVER mask the 200 or affect what the user was charged. Same await-and-inspect
-// pattern as refundJob (no `.catch` on the thenable).
-async function finalizeCost(userId: string, jobRef: string | undefined, m: ResolvedModel, usage: TokenUsage | null): Promise<void> {
-  if (!jobRef) return
+// CHARGE a SUCCESSFUL generation (mig 114): price = real token cost × markup (the
+// paid share), deducted from the micro-WON wallet. service_role; idempotent on
+// job_ref; records the cost too (folds in the old finalize_ai_cost). PURELY
+// post-hoc — it must NEVER mask the earned 200 or block it. Same await-and-inspect
+// pattern (no `.catch` on the thenable). Returns the charge result (or null).
+async function chargeGeneration(userId: string, jobRef: string | undefined, m: ResolvedModel, usage: TokenUsage | null): Promise<{ price_micro_won?: number; balance?: number; estimated?: boolean } | null> {
+  if (!jobRef) return null
   try {
-    const { error } = await sbServiceRole().rpc('finalize_ai_cost', {
+    const { data, error } = await sbServiceRole().rpc('charge_ai_generation', {
       p_user_id: userId,
       p_job_ref: jobRef,
       p_provider: m.provider,
@@ -106,9 +106,11 @@ async function finalizeCost(userId: string, jobRef: string | undefined, m: Resol
       p_tokens_in: usage?.prompt_tokens ?? null,
       p_tokens_out: usage?.completion_tokens ?? null,
     })
-    if (error) console.error('[ai-generate] cost finalize failed (job', jobRef, '):', error.message)
+    if (error) { console.error('[ai-generate] charge failed (job', jobRef, '):', error.message); return null }
+    return (data ?? null) as { price_micro_won?: number; balance?: number; estimated?: boolean } | null
   } catch (ce) {
-    console.error('[ai-generate] cost finalize threw (job', jobRef, '):', ce)
+    console.error('[ai-generate] charge threw (job', jobRef, '):', ce)
+    return null
   }
 }
 
@@ -333,24 +335,26 @@ Deno.serve(async (req) => {
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
       const cardCount = Math.min(MAX_CARDS_PER_CALL, Math.max(1, Math.floor(Number(body.cardCount) || 10)))
 
-      const { data: imgRaw, error: imgErr } = await sbUser.rpc('record_ai_image')
+      // Pre-gen GATE (reserve): rejects 402 if the wallet is empty (image is paid).
+      const { data: imgRaw, error: imgErr } = await sbUser.rpc('reserve_ai_image')
       if (imgErr) {
-        if (imgErr.code === 'P0002') return json({ error: 'Insufficient AI credits', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+        if (imgErr.code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
         if (imgErr.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
-        console.error('[ai-generate] image metering error:', imgErr.message)
+        console.error('[ai-generate] image reserve error:', imgErr.message)
         return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
       }
-      const imgMeter = (imgRaw ?? {}) as { credits_spent?: number; balance?: number; job_ref?: string }
+      const imgMeter = (imgRaw ?? {}) as { job_ref?: string }
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
         const { json: content, usage } = await generate(model, iSys, iUser, image)
-        await finalizeCost(userId, imgMeter.job_ref, model, usage)  // best-effort, never throws/masks the 200
-        return json({ content, balance: imgMeter.balance ?? null }, 200, cors)
+        // Post-gen CHARGE: deduct real token cost × markup from the wallet.
+        const charge = await chargeGeneration(userId, imgMeter.job_ref, model, usage)  // best-effort, never masks the 200
+        return json({ content, balance: charge?.balance ?? null }, 200, cors)
       } catch (e) {
         const msg = (e as Error).message
         console.error('[ai-generate] vision failure:', msg)
-        await refundJob(userId, imgMeter.job_ref)
+        await releaseJob(userId, imgMeter.job_ref)  // nothing charged pre-gen → net-zero
         const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
         return json({ error: 'Generation failed', code }, 502, cors)
       }
@@ -387,27 +391,27 @@ Deno.serve(async (req) => {
       ;({ systemPrompt, userPrompt } = buildCardsPrompt(topic, fields, pCards, existing))
     }
 
-    // Meter BEFORE generation (gate cost). RAISE → error, rolled back so a
-    // rejected call consumes nothing.
-    const { data: meterRaw, error: quotaErr } = await sbUser.rpc('record_ai_generation', {
+    // Pre-gen GATE (reserve): compute free/paid split + reject 402 if the paid
+    // portion has no wallet. NO money moved here (tokens unknown until post-gen).
+    const { data: meterRaw, error: quotaErr } = await sbUser.rpc('reserve_ai_generation', {
       p_kind: kind,
       p_cards: pCards,
     })
     if (quotaErr) {
-      // P0002 = over free allowance AND not enough credits → needs top-up.
+      // P0002 = paid cards requested but the wallet is empty → needs top-up.
       if (quotaErr.code === 'P0002') {
-        return json({ error: 'Insufficient AI credits', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+        return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
       }
       // 23514 = daily request cap (abuse guard).
       if (quotaErr.code === '23514') {
         return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
       }
-      console.error('[ai-generate] metering error:', quotaErr.message)
+      console.error('[ai-generate] reserve error:', quotaErr.message)
       return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
     }
-    // record_ai_generation returns the split + a job_ref so a failure refunds the job.
+    // reserve returns the free/paid split + a job_ref (release on failure, charge on success).
     const meter = (meterRaw ?? {}) as {
-      remaining_free?: number; free_now?: number; paid_now?: number; credits_spent?: number; job_ref?: string
+      remaining_free?: number; free_now?: number; paid_now?: number; job_ref?: string
     }
     const remainingFree = typeof meter.remaining_free === 'number' ? meter.remaining_free : 0
 
@@ -421,16 +425,16 @@ Deno.serve(async (req) => {
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
-      // Metering committed before generation — refund the recorded job so a
-      // provider failure burns nothing. The RPC derives the amount from the job
-      // row (service_role only). Best-effort (don't mask the 502).
-      await refundJob(userId, meter.job_ref)
+      // Nothing was charged pre-gen (charge is post-gen) — just release the
+      // reservation so the failed gen doesn't burn the daily free allowance.
+      // Best-effort (don't mask the 502). Net-zero.
+      await releaseJob(userId, meter.job_ref)
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)
     }
 
-    // Record the real provider cost (best-effort; never masks the 200).
-    await finalizeCost(userId, meter.job_ref, model, usage)
+    // Post-gen CHARGE: deduct real token cost × markup (paid share) from the wallet.
+    await chargeGeneration(userId, meter.job_ref, model, usage)  // best-effort; never masks the 200
     return json({ content, remainingFree }, 200, cors)
   } catch (err) {
     console.error('[ai-generate] Error:', err)
