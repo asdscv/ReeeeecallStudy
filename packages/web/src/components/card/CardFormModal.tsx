@@ -8,6 +8,8 @@ import {
   DialogFooter,
 } from '../ui/dialog'
 import { useCardStore } from '../../stores/card-store'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { CardLimitBlock } from './CardLimitBlock'
 import { useAuthStore } from '../../stores/auth-store'
 import { uploadFile, deleteFile, validateFile } from '../../lib/storage'
 import { reconcileFieldValues } from '../../lib/card-utils'
@@ -24,6 +26,7 @@ interface CardFormModalProps {
 export function CardFormModal({ open, onClose, deckId, template, editCard }: CardFormModalProps) {
   const { t } = useTranslation('cards')
   const { createCard, updateCard } = useCardStore()
+  const limit = useCardLimit()
   const user = useAuthStore((s) => s.user)
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
@@ -157,6 +160,10 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
 
     if (!hasValue && !hasPendingFiles && !hasTextValue) return
 
+    // Owned-card limit pre-flight (mig 116) — only for NEW cards; editing is exempt.
+    // Server also enforces at createCard.
+    if (!editCard && limit.reached) return
+
     setLoading(true)
 
     if (editCard) {
@@ -224,6 +231,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
           <p className="text-muted-foreground">{t('noTemplateSet')}</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {!editCard && limit.reached && <CardLimitBlock />}
             {fileError && (
               <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-lg">
                 {t(fileError)}

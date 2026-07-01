@@ -8,6 +8,7 @@ import { useCards } from '../hooks/useCards'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
@@ -18,7 +19,9 @@ type Route = RouteProp<DecksStackParamList, 'CardEdit'>
 export function CardEditScreen() {
   const theme = useTheme()
   const { t } = useTranslation('decks')
+  const { t: tLimit } = useTranslation(['errors', 'settings'])
   const navigation = useNavigation<Nav>()
+  const limit = useCardLimit()
   const route = useRoute<Route>()
   const { deckId, cardId } = route.params
 
@@ -136,6 +139,12 @@ export function CardEditScreen() {
   const handleSave = async () => {
     if (!hasContent) {
       Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.emptyError'))
+      return
+    }
+
+    // Owned-card limit pre-flight (mig 116) — only for NEW cards. Server also enforces.
+    if (!isEditing && limit.reached) {
+      Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
       return
     }
 
