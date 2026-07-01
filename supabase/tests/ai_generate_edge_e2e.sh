@@ -135,6 +135,12 @@ echo "    -> content keys: $(node -e "const j=require('/tmp/e2e_body.json');cons
 # metered AS THE USER → free_cards_used attributed to this user
 USED=$(psql "select free_cards_used from ai_generation_usage where user_id='$USERID'")
 chk "A3 metered as user (free_cards_used)" "${USED:-X}" "3"
+# COST CAPTURE (mig 112): the discarded provider token usage is now threaded into
+# finalize_ai_cost → a cost-ledger row lands with real tokens + computed cost.
+sleep 1  # finalizeCost is awaited before the 200, but give PostgREST a beat
+COST=$(psql "select provider||'|'||(tokens_in>0)::text||'|'||(cost_won_micros is not null)::text||'|'||estimated::text from ai_cost_ledger where user_id='$USERID' order by created_at desc limit 1")
+echo "    -> cost row: ${COST:-<none>}"
+chk "A3 cost captured (provider|tokens_in>0|cost_set|estimated)" "${COST:-X}" "xai|true|true|false"
 
 # A4: exhaust free, no credits → 402 AI_INSUFFICIENT_CREDITS
 psql "update ai_generation_usage set free_cards_used=10 where user_id='$USERID'" >/dev/null
