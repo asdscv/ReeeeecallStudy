@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Key, Eye, EyeOff, Trash2, Plus, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
+import { Check, Eye, EyeOff, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
@@ -19,29 +19,6 @@ import {
   type StudyInputSettings,
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
-import { maskApiKeyPartial } from '../lib/api-key'
-
-function CopyButton({ text }: { text: string }) {
-  const { t } = useTranslation('settings')
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    toast.success(t('apiKey.copied'))
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="p-1.5 text-content-tertiary hover:text-muted-foreground transition cursor-pointer"
-      title={t('apiKey.copy')}
-    >
-      {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-    </button>
-  )
-}
 
 /** Auto-save a single profile field to DB */
 async function autoSaveProfile(
@@ -90,14 +67,6 @@ export function SettingsPage() {
   // SRS save state
   const [srsSaving, setSrsSaving] = useState(false)
 
-  // API key state
-  const [apiKeyData, setApiKeyData] = useState<{ key: string; name: string; createdAt: string } | null>(null)
-  const [keyDisplayMode, setKeyDisplayMode] = useState<'hidden' | 'partial' | 'full'>('hidden')
-  const [newKeyName, setNewKeyName] = useState('')
-  const [showKeyForm, setShowKeyForm] = useState(false)
-  // True only right after generating a key — surfaces the show-once warning,
-  // since the plaintext is no longer retrievable from the server.
-  const [justCreatedKey, setJustCreatedKey] = useState(false)
 
   // Study input settings (localStorage)
   const [inputSettings, setInputSettingsRaw] = useState<StudyInputSettings>(() => loadSettings())
@@ -247,95 +216,7 @@ export function SettingsPage() {
 
     fetchProfile()
 
-    // Load API key metadata from DB. The plaintext key is NEVER stored
-    // server-side (security audit H2 — see migration 102). Reveal relies
-    // only on the show-once localStorage fallback from this device/browser.
-    const fetchApiKey = async () => {
-      const { data: keyRow } = await supabase
-        .from('api_keys')
-        .select('name, created_at')
-        .eq('user_id', user.id)
-        .single()
-      if (keyRow) {
-        const row = keyRow as { name: string; created_at: string }
-        let plainKey = ''
-        const saved = localStorage.getItem('reeeeecall-api-key-data')
-        if (saved) {
-          try { plainKey = JSON.parse(saved).key ?? '' } catch { /* ignore */ }
-        }
-        setApiKeyData({ key: plainKey, name: row.name, createdAt: row.created_at })
-      }
-    }
-    fetchApiKey()
   }, [user])
-
-  const [generating, setGenerating] = useState(false)
-
-  const handleGenerateApiKey = async () => {
-    if (!user || generating) return
-
-    const { validateKeyName, generateApiKey: genKey, hashApiKey } = await import('../lib/api-key')
-    const nameResult = validateKeyName(newKeyName)
-    if (!nameResult.valid) {
-      toast.error(t(nameResult.error!))
-      return
-    }
-    const name = newKeyName.trim()
-
-    setGenerating(true)
-    try {
-      const key = genKey()
-      const keyHash = await hashApiKey(key)
-
-      await supabase.from('api_keys').delete().eq('user_id', user.id)
-
-      // Only the SHA-256 hash is persisted server-side (auth via
-      // resolve_api_key). The plaintext key is shown once here and cached
-      // in localStorage for same-device convenience — never sent to the DB
-      // (security audit H2 — see migration 102).
-      const { error } = await supabase
-        .from('api_keys')
-        .insert({
-          user_id: user.id,
-          key_hash: keyHash,
-          name,
-        } as Record<string, unknown>)
-
-      if (error) {
-        toast.error(t('apiKey.generateError'))
-        return
-      }
-
-      const data = { key, name, createdAt: new Date().toISOString() }
-      setApiKeyData(data)
-      localStorage.setItem('reeeeecall-api-key-data', JSON.stringify(data))
-      setKeyDisplayMode('full')
-      setJustCreatedKey(true)
-      setShowKeyForm(false)
-      setNewKeyName('')
-      toast.success(t('apiKey.generated'))
-    } catch (err) {
-      toast.error(t('apiKey.generateError'))
-      console.error('[API Key]', err)
-    } finally {
-      setGenerating(false)
-    }
-  }
-
-  const revokeApiKey = async () => {
-    if (!user) return
-
-    await supabase
-      .from('api_keys')
-      .delete()
-      .eq('user_id', user.id)
-
-    setApiKeyData(null)
-    setKeyDisplayMode('hidden')
-    setJustCreatedKey(false)
-    localStorage.removeItem('reeeeecall-api-key-data')
-    toast.success(t('apiKey.deleted'))
-  }
 
 
   if (loading) {
@@ -634,126 +515,6 @@ export function SettingsPage() {
           <ThemeToggle theme={theme} onChange={setTheme} />
         </section>
 
-        {/* ── API Key Management ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-lg font-semibold text-foreground">{t('apiKey.title')}</h2>
-            {!apiKeyData && !showKeyForm && (
-              <button
-                onClick={() => setShowKeyForm(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover transition cursor-pointer font-medium"
-              >
-                <Plus size={16} />
-                {t('apiKey.generate')}
-              </button>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground mb-5">{t('apiKey.limit')}</p>
-
-          {showKeyForm && !apiKeyData && (
-            <div className="border border-border rounded-xl p-4 sm:p-5 mb-4">
-              <label className="block text-sm font-medium text-foreground mb-2">{t('apiKey.keyName')}</label>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <input
-                  type="text"
-                  value={newKeyName}
-                  onChange={(e) => setNewKeyName(e.target.value)}
-                  placeholder={t('apiKey.keyNamePlaceholder')}
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground text-sm"
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleGenerateApiKey() }}
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleGenerateApiKey}
-                    disabled={generating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium"
-                  >
-                    {generating ? t('apiKey.generating') : t('apiKey.create')}
-                  </button>
-                  <button
-                    onClick={() => { setShowKeyForm(false); setNewKeyName('') }}
-                    className="flex-1 sm:flex-none px-4 py-2.5 text-sm text-muted-foreground bg-accent rounded-lg hover:bg-accent transition cursor-pointer"
-                  >
-                    {t('apiKey.cancel')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {apiKeyData && (
-            <div className="border border-border rounded-xl p-5 mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Key size={18} className="text-muted-foreground" />
-                  <span className="text-base font-semibold text-foreground">{apiKeyData.name}</span>
-                </div>
-                <button
-                  onClick={revokeApiKey}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/15 transition cursor-pointer"
-                  title={t('apiKey.delete')}
-                >
-                  <Trash2 size={14} />
-                  {t('apiKey.delete')}
-                </button>
-              </div>
-
-              {justCreatedKey && (
-                <div className="mb-3 px-4 py-3 rounded-lg border border-amber-300 bg-amber-50 text-sm text-amber-800 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
-                  {t('apiKey.showOnceWarning')}
-                </div>
-              )}
-
-              {apiKeyData.key ? (
-                <div className="flex items-center gap-2 mb-3">
-                  <code className="flex-1 px-4 py-2.5 bg-muted border border-border rounded-lg text-sm text-muted-foreground font-mono truncate">
-                    {keyDisplayMode === 'full'
-                      ? apiKeyData.key
-                      : keyDisplayMode === 'partial'
-                        ? maskApiKeyPartial(apiKeyData.key)
-                        : 'rc_' + '\u2022'.repeat(32)}
-                  </code>
-                  <button
-                    onClick={() => setKeyDisplayMode((prev) =>
-                      prev === 'hidden' ? 'partial' : prev === 'partial' ? 'full' : 'hidden'
-                    )}
-                    className={`p-2 transition cursor-pointer ${
-                      keyDisplayMode === 'full' ? 'text-brand hover:text-brand' : 'text-content-tertiary hover:text-muted-foreground'
-                    }`}
-                    title={
-                      keyDisplayMode === 'hidden' ? t('apiKey.showPartial')
-                        : keyDisplayMode === 'partial' ? t('apiKey.showFull')
-                          : t('apiKey.hide')
-                    }
-                  >
-                    {keyDisplayMode === 'hidden' ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                  <CopyButton text={apiKeyData.key} />
-                </div>
-              ) : (
-                <div className="mb-3">
-                  <div className="px-4 py-2.5 bg-muted border border-border rounded-lg text-sm text-content-tertiary font-mono">
-                    rc_{'\u2022'.repeat(32)}
-                    <span className="ml-2 text-xs text-content-tertiary font-sans">({t('apiKey.masked')})</span>
-                  </div>
-                  <p className="mt-2 text-xs text-content-tertiary">{t('apiKey.unrecoverable')}</p>
-                </div>
-              )}
-
-              <div className="space-y-0.5">
-                <p className="text-sm text-content-tertiary">
-                  {t('apiKey.createdAt')}: {formatLocalDateTime(apiKeyData.createdAt, dateLocale)}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {!apiKeyData && !showKeyForm && (
-            <div className="text-center py-6 text-sm text-content-tertiary">
-              {t('apiKey.noKeys')}
-            </div>
-          )}
-        </section>
 
         {/* ── i) Legal (compact inline) ── */}
         <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
