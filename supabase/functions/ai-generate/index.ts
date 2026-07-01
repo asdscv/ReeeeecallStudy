@@ -97,21 +97,27 @@ async function releaseJob(userId: string, jobRef: string | undefined): Promise<v
 // pattern (no `.catch` on the thenable). Returns the charge result (or null).
 async function chargeGeneration(userId: string, jobRef: string | undefined, m: ResolvedModel, usage: TokenUsage | null): Promise<{ price_micro_won?: number; balance?: number; estimated?: boolean } | null> {
   if (!jobRef) return null
-  try {
-    const { data, error } = await sbServiceRole().rpc('charge_ai_generation', {
-      p_user_id: userId,
-      p_job_ref: jobRef,
-      p_provider: m.provider,
-      p_model: m.model,
-      p_tokens_in: usage?.prompt_tokens ?? null,
-      p_tokens_out: usage?.completion_tokens ?? null,
-    })
-    if (error) { console.error('[ai-generate] charge failed (job', jobRef, '):', error.message); return null }
-    return (data ?? null) as { price_micro_won?: number; balance?: number; estimated?: boolean } | null
-  } catch (ce) {
-    console.error('[ai-generate] charge threw (job', jobRef, '):', ce)
-    return null
+  // charge_ai_generation is idempotent (charged latch under FOR UPDATE) → safe to
+  // retry. One inline retry shrinks the "charge lost after a delivered 200" window
+  // (there is NO blind reconcile sweep — a lost charge is eaten as under-charge,
+  // never wrong-charged). Best-effort throughout — must never mask the earned 200.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { data, error } = await sbServiceRole().rpc('charge_ai_generation', {
+        p_user_id: userId,
+        p_job_ref: jobRef,
+        p_provider: m.provider,
+        p_model: m.model,
+        p_tokens_in: usage?.prompt_tokens ?? null,
+        p_tokens_out: usage?.completion_tokens ?? null,
+      })
+      if (!error) return (data ?? null) as { price_micro_won?: number; balance?: number; estimated?: boolean } | null
+      console.error('[ai-generate] charge failed (job', jobRef, 'attempt', attempt, '):', error.message)
+    } catch (ce) {
+      console.error('[ai-generate] charge threw (job', jobRef, 'attempt', attempt, '):', ce)
+    }
   }
+  return null
 }
 
 // ── Auth (mirror tts) ───────────────────────────────────────
