@@ -88,6 +88,13 @@ export function QuickCreateScreen() {
     // switch) would leave an empty orphan deck. Delete it; decks with cards stay.
     if (createdDeckId && createdCardCount === 0) void deleteDeck(createdDeckId)
   }
+  // The Cancel button calls cleanupOrphanDeck, but the header back arrow AND the
+  // Android hardware back button pop the screen without it — clean up on any leave.
+  // (no-op when the deck has cards, so a successful create is never deleted.)
+  useEffect(() => {
+    const unsub = navigation.addListener('beforeRemove', () => { cleanupOrphanDeck() })
+    return unsub
+  }, [navigation, createdDeckId, createdCardCount])
   const handleCancel = () => {
     cleanupOrphanDeck()
     navigation.goBack()

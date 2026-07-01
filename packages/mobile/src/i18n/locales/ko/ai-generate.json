@@ -80,7 +80,11 @@
     "imageRequired": "먼저 이미지를 선택해주세요.",
     "selectImageError": "이미지가 너무 크거나 읽을 수 없습니다. 더 작은 사진으로 시도해주세요.",
     "permissionDenied": "이미지를 업로드하려면 사진 접근 권한이 필요합니다.",
-    "deckNoTemplate": "이 덱에는 아직 카드 템플릿이 없습니다 — 덱을 열고 카드를 한 번 추가하면 템플릿이 설정됩니다."
+    "deckNoTemplate": "이 덱에는 아직 카드 템플릿이 없습니다 — 덱을 열고 카드를 한 번 추가하면 템플릿이 설정됩니다.",
+    "discardTitle": "생성된 카드를 버릴까요?",
+    "discardMessage": "뒤로 가면 생성한 카드가 사라져요.",
+    "discardConfirm": "버리기",
+    "cancel": "취소"
   },
   "errors": {
     "insufficientCredits": "오늘의 무료 AI 카드를 모두 사용했고 남은 크레딧이 없습니다. 계속 생성하려면 크레딧을 충전하세요.",

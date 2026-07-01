@@ -80,7 +80,11 @@
     "imageRequired": "Silakan pilih gambar terlebih dahulu.",
     "selectImageError": "Gambar tersebut terlalu besar atau tidak dapat dibaca. Coba foto yang lebih kecil.",
     "permissionDenied": "Akses foto diperlukan untuk mengunggah gambar.",
-    "deckNoTemplate": "Deck ini belum memiliki templat kartu — buka deck dan tambahkan satu kartu untuk menyiapkannya."
+    "deckNoTemplate": "Deck ini belum memiliki templat kartu — buka deck dan tambahkan satu kartu untuk menyiapkannya.",
+    "discardTitle": "Buang kartu yang dibuat?",
+    "discardMessage": "Kembali akan menghapus kartu yang dibuat.",
+    "discardConfirm": "Buang",
+    "cancel": "Batal"
   },
   "errors": {
     "insufficientCredits": "Anda telah menggunakan kartu AI gratis hari ini dan tidak memiliki kredit tersisa. Isi ulang untuk terus membuat kartu.",

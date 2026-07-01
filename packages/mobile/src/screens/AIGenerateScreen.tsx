@@ -207,6 +207,21 @@ export function AIGenerateScreen() {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
 
+  // Guard leaving mid-flow — the Android HARDWARE back button (and iOS swipe / any
+  // goBack) would otherwise pop the whole wizard and silently discard the generated
+  // cards, which cost real money in image mode. beforeRemove covers all back sources.
+  useEffect(() => {
+    const unsub = navigation.addListener('beforeRemove', (e) => {
+      if (step !== 'generating' && step !== 'review' && step !== 'saving') return
+      e.preventDefault()
+      Alert.alert(t('alert.discardTitle'), t('alert.discardMessage'), [
+        { text: t('alert.cancel'), style: 'cancel' },
+        { text: t('alert.discardConfirm'), style: 'destructive', onPress: () => navigation.dispatch(e.data.action) },
+      ])
+    })
+    return unsub
+  }, [navigation, step, t])
+
   // Clear a stale uploaded image when the deck changes (prevents an accidental
   // paid re-generation with a previously-picked photo).
   useEffect(() => { setImageDataUrl(null) }, [selectedDeckId])

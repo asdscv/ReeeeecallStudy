@@ -80,7 +80,11 @@
     "imageRequired": "Vui lòng chọn một hình ảnh trước.",
     "selectImageError": "Hình ảnh quá lớn hoặc không thể đọc được. Hãy thử một ảnh nhỏ hơn.",
     "permissionDenied": "Cần quyền truy cập ảnh để tải hình ảnh lên.",
-    "deckNoTemplate": "Bộ thẻ này chưa có mẫu thẻ — hãy mở bộ thẻ và thêm một thẻ để thiết lập."
+    "deckNoTemplate": "Bộ thẻ này chưa có mẫu thẻ — hãy mở bộ thẻ và thêm một thẻ để thiết lập.",
+    "discardTitle": "Bỏ các thẻ đã tạo?",
+    "discardMessage": "Quay lại sẽ mất các thẻ bạn đã tạo.",
+    "discardConfirm": "Bỏ",
+    "cancel": "Hủy"
   },
   "errors": {
     "insufficientCredits": "Bạn đã dùng hết số thẻ AI miễn phí hôm nay và không còn tín dụng nào. Hãy nạp thêm để tiếp tục tạo thẻ.",
