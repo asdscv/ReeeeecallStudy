@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { filterListings, sortListings, type SortBy, type ListingFilters, type MarketplaceListingData } from '../lib/marketplace'
 import { useDeckStore } from './deck-store'
+import { isCardLimitError } from './card-store'
 import { createStaleCache } from '../lib/cache/stale-cache'
 import type { MarketplaceListing, ShareMode } from '../types/database'
 
@@ -159,6 +160,8 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
       let key = 'errors:marketplace.acquireFailed'
       if (hint === 'cannot_acquire_own' || code === 'P0001') key = 'errors:marketplace.cannotImportOwn'
       else if (hint === 'listing_not_found' || code === 'P0002') key = 'errors:marketplace.listingNotFound'
+      // copy/snapshot acquire routes through copy_deck_for_user → owned-card limit.
+      else if (isCardLimitError(error)) key = 'errors:card.limitReached'
       set({ error: key })
       return null
     }
