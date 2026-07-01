@@ -64,8 +64,9 @@
     "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",
     "freeOnly": "今日剩余 {{free}} 张免费卡片",
     "creditsOnly": "可用 {{credits}} 张付费卡片",
-    "empty": "免费卡片和点数均已用完——充值即可继续生成",
-    "unknown": "暂时无法获取余额"
+    "empty": "今天的免费卡片已用完",
+    "unknown": "暂时无法获取余额",
+    "balance": "余额 ₩{{won}}（约{{cards}}张）"
   },
   "wizard": {
     "setup": "Setup",

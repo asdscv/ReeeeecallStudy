@@ -510,19 +510,26 @@ export function AIGenerateScreen() {
             </>
           )}
 
-          {affordable && (
-            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-              {!affordable.walletKnown
-                ? t('wallet.unknown')
-                : useImage
-                  ? (affordable.paid > 0 ? t('wallet.creditsOnly', { credits: affordable.paid }) : t('wallet.empty'))
+          {affordable && (() => {
+            const balanceWon = affordable.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1000000) : 0
+            const bal = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable.paid })
+            const text = !affordable.walletKnown
+              ? t('wallet.unknown')
+              : useImage
+                ? (balanceWon > 0 ? bal() : t('wallet.empty'))
+                : affordable.free > 0 && balanceWon > 0
+                  ? `${t('wallet.freeOnly', { free: affordable.free })} · ${bal()}`
                   : affordable.free > 0
-                    ? t('wallet.summary', { free: affordable.free, credits: affordable.paid })
-                    : affordable.paid > 0
-                      ? t('wallet.creditsOnly', { credits: affordable.paid })
-                      : t('wallet.empty')}
-            </Text>
-          )}
+                    ? t('wallet.freeOnly', { free: affordable.free })
+                    : balanceWon > 0
+                      ? bal()
+                      : t('wallet.empty')
+            return (
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+                {text}
+              </Text>
+            )
+          })()}
           <Button
             testID="ai-generate-button"
             title={t('generateButton')}

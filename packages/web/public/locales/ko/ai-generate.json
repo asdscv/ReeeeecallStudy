@@ -64,8 +64,9 @@
     "summary": "오늘 사용 가능: 무료 {{free}}장 + 유료 {{credits}}장",
     "freeOnly": "오늘 남은 무료 카드 {{free}}장",
     "creditsOnly": "사용 가능한 유료 카드 {{credits}}장",
-    "empty": "남은 무료 카드와 크레딧이 없습니다 — 충전하면 계속 생성할 수 있습니다",
-    "unknown": "현재 잔액을 확인할 수 없습니다"
+    "empty": "오늘 무료 카드를 다 썼어요",
+    "unknown": "현재 잔액을 확인할 수 없습니다",
+    "balance": "충전잔액 ₩{{won}} (약 {{cards}}장)"
   },
   "wizard": {
     "setup": "설정",

@@ -64,8 +64,9 @@
     "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",
     "freeOnly": "{{free}} kartu gratis tersisa hari ini",
     "creditsOnly": "{{credits}} kartu berbayar tersedia",
-    "empty": "Tidak ada kartu gratis atau kredit tersisa — isi ulang untuk terus membuat",
-    "unknown": "Saldo tidak tersedia saat ini"
+    "empty": "Kartu gratis hari ini sudah habis",
+    "unknown": "Saldo tidak tersedia saat ini",
+    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)"
   },
   "wizard": {
     "setup": "Setup",

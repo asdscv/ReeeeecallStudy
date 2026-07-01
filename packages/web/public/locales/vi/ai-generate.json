@@ -64,8 +64,9 @@
     "summary": "Hôm nay còn {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
     "freeOnly": "Hôm nay còn {{free}} thẻ miễn phí",
     "creditsOnly": "Còn {{credits}} thẻ trả phí",
-    "empty": "Đã hết thẻ miễn phí và tín dụng — nạp thêm để tiếp tục tạo",
-    "unknown": "Hiện không thể xem số dư"
+    "empty": "Bạn đã dùng hết thẻ miễn phí hôm nay",
+    "unknown": "Hiện không thể xem số dư",
+    "balance": "Số dư ₩{{won}} (~{{cards}} thẻ)"
   },
   "wizard": {
     "setup": "Setup",

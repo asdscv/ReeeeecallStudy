@@ -186,19 +186,21 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       ? !!imageDataUrl && !!selectedDeckId
       : topic.trim() && (isFullMode || selectedDeckId)
 
-  // Remaining-free / credit affordance line. Image mode is credits-only (no free tier).
+  // Free-remaining + prepaid ₩ wallet line (metered billing). Image mode is paid-only.
+  const balanceWon = affordable?.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1_000_000) : 0
+  const balanceText = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable!.paid })
   const walletText = !affordable
     ? null
     : !affordable.walletKnown
       ? t('wallet.unknown')
       : useImage
-        ? (affordable.paid > 0 ? t('wallet.creditsOnly', { credits: affordable.paid }) : t('wallet.empty'))
-        : affordable.free > 0 && affordable.paid > 0
-          ? t('wallet.summary', { free: affordable.free, credits: affordable.paid })
+        ? (balanceWon > 0 ? balanceText() : t('wallet.empty'))
+        : affordable.free > 0 && balanceWon > 0
+          ? `${t('wallet.freeOnly', { free: affordable.free })} · ${balanceText()}`
           : affordable.free > 0
             ? t('wallet.freeOnly', { free: affordable.free })
-            : affordable.paid > 0
-              ? t('wallet.creditsOnly', { credits: affordable.paid })
+            : balanceWon > 0
+              ? balanceText()
               : t('wallet.empty')
 
   return (

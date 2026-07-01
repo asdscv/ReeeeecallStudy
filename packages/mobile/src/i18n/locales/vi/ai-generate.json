@@ -67,8 +67,10 @@
   "wallet": {
     "summary": "Hôm nay: {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
     "creditsOnly": "Còn {{credits}} thẻ trả phí",
-    "empty": "Đã hết thẻ miễn phí và tín dụng",
-    "unknown": "Không thể hiển thị số dư"
+    "empty": "Bạn đã dùng hết thẻ miễn phí hôm nay",
+    "unknown": "Không thể hiển thị số dư",
+    "balance": "Số dư ₩{{won}} (~{{cards}} thẻ)",
+    "freeOnly": "Hôm nay còn {{free}} thẻ miễn phí"
   },
   "alert": {
     "errorTitle": "Lỗi",

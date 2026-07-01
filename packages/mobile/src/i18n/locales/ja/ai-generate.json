@@ -67,8 +67,10 @@
   "wallet": {
     "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカード",
     "creditsOnly": "有料カード{{credits}}枚が利用可能",
-    "empty": "無料カードもクレジットも残っていません",
-    "unknown": "残高を取得できません"
+    "empty": "本日の無料カードを使い切りました",
+    "unknown": "残高を取得できません",
+    "balance": "残高 ₩{{won}}（約{{cards}}枚）",
+    "freeOnly": "本日の無料カードは残り{{free}}枚です"
   },
   "alert": {
     "errorTitle": "エラー",

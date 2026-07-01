@@ -64,8 +64,9 @@
     "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカードを生成できます",
     "freeOnly": "本日の無料カードは残り{{free}}枚です",
     "creditsOnly": "有料カードを{{credits}}枚生成できます",
-    "empty": "無料カードもクレジットも残っていません。生成を続けるにはチャージしてください",
-    "unknown": "現在、残高を取得できません"
+    "empty": "本日の無料カードを使い切りました",
+    "unknown": "現在、残高を取得できません",
+    "balance": "残高 ₩{{won}}（約{{cards}}枚）"
   },
   "wizard": {
     "setup": "Setup",

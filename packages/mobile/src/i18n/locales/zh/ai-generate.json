@@ -67,8 +67,10 @@
   "wallet": {
     "summary": "今日可用 {{free}} 张免费 + {{credits}} 张付费卡片",
     "creditsOnly": "可用 {{credits}} 张付费卡片",
-    "empty": "没有剩余的免费卡片或点数",
-    "unknown": "余额不可用"
+    "empty": "今天的免费卡片已用完",
+    "unknown": "余额不可用",
+    "balance": "余额 ₩{{won}}（约{{cards}}张）",
+    "freeOnly": "今日剩余 {{free}} 张免费卡片"
   },
   "alert": {
     "errorTitle": "错误",

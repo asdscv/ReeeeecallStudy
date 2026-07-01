@@ -38,8 +38,10 @@
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards today",
     "creditsOnly": "{{credits}} paid cards available",
-    "empty": "No free cards or credits left",
-    "unknown": "Balance unavailable"
+    "empty": "You’ve used today’s free cards",
+    "unknown": "Balance unavailable",
+    "balance": "₩{{won}} balance (~{{cards}} cards)",
+    "freeOnly": "{{free}} free cards left today"
   },
   "deck": {
     "section": "SELECT DECK",
