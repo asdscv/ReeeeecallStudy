@@ -1,6 +1,15 @@
 <!-- Design of record. Produced by the `ai-cost-margin-design` multi-agent workflow
 (4 independent approaches → synthesis), grounded in the live code (migs 108-111, edge fn,
-ai-providers.ts). Tracked from DOCS/TODO/AI-MONETIZATION-REMAINING.md §1. NOT YET BUILT. -->
+ai-providers.ts). Tracked from DOCS/TODO/AI-MONETIZATION-REMAINING.md §1.
+
+STATUS: **Phase 0 BUILT + merged to develop** — mig 112 (ai_pricing_settings / ai_pricing_config /
+ai_cost_ledger + finalize_ai_cost / set_ai_pricing_* / get_ai_margin_daily), the edge-fn token-usage
+threading + finalizeCost(), DB tests (supabase/tests/ai_cost_margin_test.sql, wired into CI) + an
+extended e2e cost-capture assertion. Adversarially audited → MERGE-READY (0 blockers; the (0,0)-token,
+retry-partial-usage, rate-tie, and settings-cap findings were fixed pre-merge). Phase 1 (turn margin
+ON) still pending the OWNER's business numbers (§8-9). Seeded ai_pricing_config rates are INDICATIVE —
+verify vs real provider invoices before trusting margin. NOT applied to prod (ships with the AI-gen
+prod-deploy step). -->
 
 # AI-generation cost + margin + pricing layer — design of record (mig 112)
 

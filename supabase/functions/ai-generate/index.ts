@@ -90,6 +90,28 @@ async function refundJob(userId: string, jobRef: string | undefined): Promise<vo
   }
 }
 
+// Record the REAL provider cost of a successful generation (mig 112). Best-effort
+// + service_role (finalize_ai_cost derives price from the job row, computes cost
+// from the token usage, is idempotent on job_ref). PURELY observational — it must
+// NEVER mask the 200 or affect what the user was charged. Same await-and-inspect
+// pattern as refundJob (no `.catch` on the thenable).
+async function finalizeCost(userId: string, jobRef: string | undefined, m: ResolvedModel, usage: TokenUsage | null): Promise<void> {
+  if (!jobRef) return
+  try {
+    const { error } = await sbServiceRole().rpc('finalize_ai_cost', {
+      p_user_id: userId,
+      p_job_ref: jobRef,
+      p_provider: m.provider,
+      p_model: m.model,
+      p_tokens_in: usage?.prompt_tokens ?? null,
+      p_tokens_out: usage?.completion_tokens ?? null,
+    })
+    if (error) console.error('[ai-generate] cost finalize failed (job', jobRef, '):', error.message)
+  } catch (ce) {
+    console.error('[ai-generate] cost finalize threw (job', jobRef, '):', ce)
+  }
+}
+
 // ── Auth (mirror tts) ───────────────────────────────────────
 async function verifyUser(authHeader: string | null): Promise<string | null> {
   if (!authHeader) return null
@@ -113,7 +135,19 @@ function stripMarkdownFences(text: string): string {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<string> {
+// Provider token usage (OpenAI-compatible `usage` object) — captured for the
+// cost/margin layer (mig 112). null when a provider omits it.
+interface TokenUsage { prompt_tokens: number; completion_tokens: number }
+interface ProviderResult { content: string; usage: TokenUsage | null }
+// Only sum when BOTH legs reported usage. If one leg omitted it, we billed both
+// calls but can't know the missing leg's tokens → return null so the cost is
+// recorded as `estimated` (honest unknown), never a confident undercount.
+const sumUsage = (a: TokenUsage | null, b: TokenUsage | null): TokenUsage | null =>
+  (a && b)
+    ? { prompt_tokens: a.prompt_tokens + b.prompt_tokens, completion_tokens: a.completion_tokens + b.completion_tokens }
+    : null
+
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<ProviderResult> {
   // Vision: the OpenAI-compatible shape carries the image in the user message
   // as a content array. Plain text uses a string.
   const userContent = imageUrl
@@ -163,21 +197,32 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
     const data = await res.json() as Record<string, any>
     const content = data.choices?.[0]?.message?.content
     if (!content) throw new Error('PROVIDER_EMPTY')
-    return content as string
+    // Capture token usage STRICTLY — only real, finite, non-negative numbers.
+    // Reject null/''/strings (Number(null)===0 would forge a fake 0-cost row);
+    // a missing/garbage usage → null → recorded as `estimated` downstream.
+    const pin = data.usage?.prompt_tokens
+    const pout = data.usage?.completion_tokens
+    const usage: TokenUsage | null =
+      (typeof pin === 'number' && Number.isFinite(pin) && pin >= 0 &&
+       typeof pout === 'number' && Number.isFinite(pout) && pout >= 0)
+        ? { prompt_tokens: pin, completion_tokens: pout }
+        : null
+    return { content: content as string, usage }
   }
   throw new Error('PROVIDER_ERROR')
 }
 
-// Returns parsed JSON; one stricter-prompt retry on unparseable output (mirrors callAI).
-async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<Record<string, unknown>> {
-  const first = stripMarkdownFences(await providerRequest(m, systemPrompt, userPrompt, imageUrl))
+// Returns parsed JSON + token usage; one stricter-prompt retry on unparseable
+// output (mirrors callAI). On retry we paid for BOTH calls → SUM the usage.
+async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
+  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrl)
   try {
-    return JSON.parse(first)
+    return { json: JSON.parse(stripMarkdownFences(a.content)), usage: a.usage }
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const retry = stripMarkdownFences(await providerRequest(m, strict, userPrompt, imageUrl))
-    return JSON.parse(retry)
+    const b = await providerRequest(m, strict, userPrompt, imageUrl)
+    return { json: JSON.parse(stripMarkdownFences(b.content)), usage: sumUsage(a.usage, b.usage) }
   }
 }
 
@@ -299,7 +344,8 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
-        const content = await generate(model, iSys, iUser, image)
+        const { json: content, usage } = await generate(model, iSys, iUser, image)
+        await finalizeCost(userId, imgMeter.job_ref, model, usage)  // best-effort, never throws/masks the 200
         return json({ content, balance: imgMeter.balance ?? null }, 200, cors)
       } catch (e) {
         const msg = (e as Error).message
@@ -367,8 +413,11 @@ Deno.serve(async (req) => {
 
     // Generate.
     let content: Record<string, unknown>
+    let usage: TokenUsage | null
     try {
-      content = await generate(model, systemPrompt, userPrompt)
+      const gen = await generate(model, systemPrompt, userPrompt)
+      content = gen.json
+      usage = gen.usage
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
@@ -380,6 +429,8 @@ Deno.serve(async (req) => {
       return json({ error: 'Generation failed', code }, 502, cors)
     }
 
+    // Record the real provider cost (best-effort; never masks the 200).
+    await finalizeCost(userId, meter.job_ref, model, usage)
     return json({ content, remainingFree }, 200, cors)
   } catch (err) {
     console.error('[ai-generate] Error:', err)

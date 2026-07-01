@@ -8,14 +8,21 @@ business/economic layer + external rails + ops + minor cleanup.
 
 ---
 
-## 1. Cost / margin / pricing layer  ⭐ (active design)
+## 1. Cost / margin / pricing layer  ✅ Phase 0 SHIPPED to develop / ⏳ Phase 1 pending owner
 
-**Why:** today the wallet charges **flat credits** (`_ai_credits_per_card()=1`, `_ai_credits_per_image()=5`)
-and **never records what a generation actually COST us** — the provider's token usage
-(`prompt_tokens`/`completion_tokens`) is returned but ignored in `ai-generate/index.ts`. So we can't
-see real cost, can't compute margin, and can't price per provider/model. The owner's requirement:
-*deduct the right amount on real use, track how much was spent + how much margin we keep, all
-**extensible** per provider/model without code edits.*
+**Phase 0 (cost capture + config seams) is BUILT + merged** — mig **112** (`ai_pricing_settings` /
+`ai_pricing_config` / `ai_cost_ledger` + `finalize_ai_cost` / `set_ai_pricing_rate` /
+`set_ai_pricing_settings` / `get_ai_margin_daily`) + the edge-fn token-usage threading + `finalizeCost()`;
+DB-tested (`supabase/tests/ai_cost_margin_test.sql`, wired into the CI `ai-credit-tests` job) +
+adversarially audited (MERGE-READY). Purely additive — the charging path is untouched.
+**⏳ Phase 1 (turn margin ON)** waits on the owner's business numbers (below) + verifying the seeded
+INDICATIVE rates vs real provider invoices. Prod deploy ships with §3.
+
+**Why (recap):** the wallet charged **flat credits** (`_ai_credits_per_card()=1`, `_ai_credits_per_image()=5`)
+and **discarded** the provider's token usage — so real cost / margin / per-model pricing weren't modeled.
+The owner's requirement: *deduct the right amount on real use, track spend + margin, all **extensible**
+per provider/model without code edits.* Phase 0 delivers the observability + the config seams; the
+numbers below flip it from observation to enforced pricing.
 
 > **Design of record:** [AI-COST-MARGIN-DESIGN.md](./AI-COST-MARGIN-DESIGN.md) — full schema + migration sketch +
 > edge-fn integration points (produced by the `ai-cost-margin-design` multi-agent workflow, grounded in live code).
