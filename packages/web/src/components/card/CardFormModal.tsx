@@ -184,7 +184,15 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
         tags,
       })
 
-      if (card && Object.keys(pendingFilesRef.current).length > 0) {
+      // createCard returns null (does NOT throw) on failure — incl. a card-limit
+      // (mig 116) rejection at the boundary. Keep the modal open + show the store
+      // error instead of silently closing as if the card was saved.
+      if (!card) {
+        setLoading(false)
+        return
+      }
+
+      if (Object.keys(pendingFilesRef.current).length > 0) {
         const updatedValues = { ...textValues }
 
         for (const [fieldKey, file] of Object.entries(pendingFilesRef.current)) {

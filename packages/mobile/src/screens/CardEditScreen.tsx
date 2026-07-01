@@ -163,12 +163,18 @@ export function CardEditScreen() {
           Alert.alert(t('cardEdit.errorTitle'), t('cardEdit.noTemplateError'))
           return
         }
-        await createCard({
+        // createCard returns null (does NOT throw) on failure — incl. a card-limit
+        // (mig 116) rejection at the boundary. Don't goBack as if it saved.
+        const created = await createCard({
           deck_id: deckId,
           template_id: resolvedTemplateId,
           field_values: fieldValues,
           tags: parsedTags.length > 0 ? parsedTags : undefined,
         })
+        if (!created) {
+          Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+          return
+        }
       }
       navigation.goBack()
     } catch (e) {

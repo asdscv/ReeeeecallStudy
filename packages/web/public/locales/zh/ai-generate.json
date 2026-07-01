@@ -58,7 +58,8 @@
     "imageUpload": "上传图片",
     "imageChange": "更换图片",
     "imageUploadHint": "选择一张单词列表、教科书页面或笔记的照片——AI 会将其转化为卡片。",
-    "imagePaidNotice": "图片生成需要消耗点数（无免费额度）。"
+    "imagePaidNotice": "图片生成需要消耗点数（无免费额度）。",
+    "cardLimitExceeds": "最多还能添加 {{available}} 张 — 减少数量或订阅。"
   },
   "wallet": {
     "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",

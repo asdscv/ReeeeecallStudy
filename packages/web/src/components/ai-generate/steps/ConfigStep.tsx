@@ -487,7 +487,13 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         <p className="text-xs text-center text-muted-foreground">{walletText}</p>
       )}
 
-      {limit.exceeds(cardCount) && <CardLimitBlock />}
+      {limit.reached ? (
+        <CardLimitBlock />
+      ) : limit.exceeds(cardCount) ? (
+        <p className="text-xs text-center text-destructive">
+          {t('config.cardLimitExceeds', { available: limit.available })}
+        </p>
+      ) : null}
 
       <button
         type="submit"
