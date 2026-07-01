@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase'
 import { formatLocalDateTime } from '../lib/date-utils'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
+import { useDeckStore } from '../stores/deck-store'
 import { useTheme } from '../hooks/useTheme'
 import { ThemeToggle } from '../components/common/ThemeToggle'
 import { UserStatsExport } from '../components/settings/UserStatsExport'
@@ -62,6 +63,10 @@ export function SettingsPage() {
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
   const { theme, setTheme } = useTheme()
+  const cardUsage = useDeckStore((s) => s.cardUsage)
+  const fetchCardUsage = useDeckStore((s) => s.fetchCardUsage)
+
+  useEffect(() => { void fetchCardUsage() }, [fetchCardUsage])
 
   const [loading, setLoading] = useState(true)
 
@@ -350,6 +355,27 @@ export function SettingsPage() {
       <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">{t('title')}</h1>
 
       <div className="space-y-4 sm:space-y-6">
+
+        {/* ── Card storage usage (owned-card limit, mig 116) ── */}
+        {cardUsage && (
+          <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-semibold text-foreground">{t('cardUsage.title')}</h2>
+              <span className="text-sm text-muted-foreground tabular-nums">
+                {t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-accent overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
+                style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
+              />
+            </div>
+            {cardUsage.available <= 0 && (
+              <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
+            )}
+          </section>
+        )}
 
         {/* ── a) Profile Section ── */}
         <section className="bg-card rounded-xl border border-border p-4 sm:p-6">

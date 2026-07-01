@@ -41,7 +41,8 @@
   "card": {
     "readonlyDeckNoAdd": "Tidak dapat menambahkan kartu ke dek hanya-baca.",
     "readonlyDeckNoEdit": "Tidak dapat mengubah kartu di dek hanya-baca.",
-    "rateLimitReached": "Batas permintaan tercapai."
+    "rateLimitReached": "Batas permintaan tercapai.",
+    "limitReached": "Batas kartu tercapai — berlangganan untuk menambah lagi."
   },
   "deck": {
     "rateLimitReached": "Batas permintaan tercapai."

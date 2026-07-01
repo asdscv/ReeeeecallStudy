@@ -189,5 +189,10 @@
   "legal": {
     "privacy": "Política de privacidad",
     "terms": "Términos del servicio"
+  },
+  "cardUsage": {
+    "title": "Almacenamiento de tarjetas",
+    "count": "{{owned}} / {{limit}} tarjetas",
+    "reached": "Has alcanzado tu límite de tarjetas. Suscríbete para añadir más."
   }
 }

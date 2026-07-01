@@ -29,7 +29,8 @@
   "card": {
     "readonlyDeckNoAdd": "无法向只读牌组添加卡片。",
     "readonlyDeckNoEdit": "无法修改只读牌组中的卡片。",
-    "rateLimitReached": "已达请求限制。"
+    "rateLimitReached": "已达请求限制。",
+    "limitReached": "已达卡片上限 — 订阅以添加更多。"
   },
   "deck": {
     "rateLimitReached": "已达请求限制。"

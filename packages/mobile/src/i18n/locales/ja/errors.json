@@ -29,7 +29,8 @@
   "card": {
     "readonlyDeckNoAdd": "読み取り専用デッキにカードを追加できません。",
     "readonlyDeckNoEdit": "読み取り専用デッキのカードを編集できません。",
-    "rateLimitReached": "リクエスト上限に達しました。"
+    "rateLimitReached": "リクエスト上限に達しました。",
+    "limitReached": "カード上限に達しました — さらに追加するには購読してください。"
   },
   "deck": {
     "rateLimitReached": "リクエスト上限に達しました。"

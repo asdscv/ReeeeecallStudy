@@ -189,5 +189,10 @@
   "legal": {
     "privacy": "隐私政策",
     "terms": "服务条款"
+  },
+  "cardUsage": {
+    "title": "卡片存储",
+    "count": "{{owned}} / {{limit}} 张",
+    "reached": "已达卡片上限。订阅以添加更多。"
   }
 }
