@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { generateInviteCode } from '../lib/invite'
+import { isCardLimitError } from './card-store'
 import type { DeckShare, ShareMode } from '../types/database'
 
 interface SharingState {
@@ -105,7 +106,10 @@ export const useSharingStore = create<SharingState>((set, get) => ({
     } as Record<string, unknown>)
 
     if (error) {
-      set({ error: error.message })
+      // A copy/snapshot invite routes through copy_deck_for_user, which raises the
+      // owned-card limit (PT402/CARD_LIMIT_REACHED) as a PLAIN token, not an i18n key —
+      // map it so the accept page shows the real message, not "card_limit_reached".
+      set({ error: isCardLimitError(error) ? 'errors:card.limitReached' : error.message })
       return null
     }
 

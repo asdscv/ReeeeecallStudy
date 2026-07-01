@@ -419,7 +419,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
               {t('importSummary', { total: result.total, added: result.added, skipped: result.skipped })}
             </p>
             {storeError && (
-              <p className="text-sm text-destructive">{storeError}</p>
+              <p className="text-sm text-destructive">{t(storeError, { defaultValue: storeError })}</p>
             )}
             <button
               onClick={handleDone}

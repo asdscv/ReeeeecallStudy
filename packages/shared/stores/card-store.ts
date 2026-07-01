@@ -9,8 +9,10 @@ import type { Card } from '../types/database'
  * The owned-card limit guard (mig 116) raises SQLSTATE PT402 with hint
  * CARD_LIMIT_REACHED from reserve_card_positions. Detect on code/hint (robust to
  * whether PostgREST maps PT402→HTTP 402) so we can show the subscribe message.
+ * Exported for reuse by the deck-COPY paths (accept_invite / acquire_listing also
+ * route through copy_deck_for_user, which raises the same PT402/CARD_LIMIT_REACHED).
  */
-function isCardLimitError(err: { code?: string; hint?: string } | null): boolean {
+export function isCardLimitError(err: { code?: string; hint?: string } | null | undefined): boolean {
   return err?.code === 'PT402' || err?.hint === 'CARD_LIMIT_REACHED'
 }
 
