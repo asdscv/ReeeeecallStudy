@@ -1023,13 +1023,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
   chevron: { fontSize: 18, fontWeight: '300' },
-
-  // AI Providers
-  aiProviderCard: { borderRadius: 12, borderWidth: 1, padding: 14, gap: 10 },
-  aiProviderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  aiProviderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  aiIcon: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  aiIconText: { fontSize: 12, fontWeight: '700' },
   configBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   aiEditForm: { gap: 10, paddingTop: 10, borderTopWidth: 1 },
   aiBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },

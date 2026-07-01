@@ -64,8 +64,9 @@
     "summary": "{{free}} tarjetas gratuitas + {{credits}} de pago disponibles hoy",
     "freeOnly": "Quedan {{free}} tarjetas gratuitas hoy",
     "creditsOnly": "{{credits}} tarjetas de pago disponibles",
-    "empty": "No quedan tarjetas gratuitas ni créditos: recarga para seguir generando",
-    "unknown": "Saldo no disponible en este momento"
+    "empty": "Has usado tus tarjetas gratis de hoy",
+    "unknown": "Saldo no disponible en este momento",
+    "balance": "Saldo ₩{{won}} (~{{cards}} tarjetas)"
   },
   "wizard": {
     "setup": "Setup",

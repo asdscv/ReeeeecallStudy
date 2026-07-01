@@ -67,8 +67,10 @@
   "wallet": {
     "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar hari ini",
     "creditsOnly": "{{credits}} kartu berbayar tersedia",
-    "empty": "Tidak ada kartu gratis atau kredit tersisa",
-    "unknown": "Saldo tidak tersedia"
+    "empty": "Kartu gratis hari ini sudah habis",
+    "unknown": "Saldo tidak tersedia",
+    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)",
+    "freeOnly": "{{free}} kartu gratis tersisa hari ini"
   },
   "alert": {
     "errorTitle": "Kesalahan",
