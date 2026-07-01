@@ -189,5 +189,10 @@
   "legal": {
     "privacy": "プライバシーポリシー",
     "terms": "利用規約"
+  },
+  "cardUsage": {
+    "title": "カード保存容量",
+    "count": "{{owned}} / {{limit}} 枚",
+    "reached": "カード上限に達しました。追加するには購読してください。"
   }
 }

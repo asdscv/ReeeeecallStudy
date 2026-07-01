@@ -156,5 +156,10 @@
   "haptics": {
     "enable": "触觉反馈",
     "hint": "点按、评分和操作时的振动反馈。"
+  },
+  "cardUsage": {
+    "title": "卡片存储",
+    "count": "{{owned}} / {{limit}} 张",
+    "reached": "已达卡片上限。订阅以添加更多。"
   }
 }

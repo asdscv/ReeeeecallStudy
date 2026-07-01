@@ -13,6 +13,7 @@ import { useAuth, useAuthState } from '../hooks'
 // import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import { useThemeStore } from '../stores/theme-store'
+import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { localPrefs } from '../utils/local-prefs'
 import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -63,6 +64,9 @@ export function SettingsScreen() {
   const { user } = useAuthState()
   const { signOut } = useAuth()
   const setUserTheme = useThemeStore((s) => s.setUserTheme)
+  const cardUsage = useDeckStore((s) => s.cardUsage)
+  const fetchCardUsage = useDeckStore((s) => s.fetchCardUsage)
+  useEffect(() => { void fetchCardUsage() }, [fetchCardUsage])
   // [SUBSCRIPTION-HIDDEN] usePurchases 훅 호출 보류 — 복원 시 아래 stub 제거하고 원래 줄 복구
   // const { isPro } = usePurchases()
 
@@ -286,6 +290,28 @@ export function SettingsScreen() {
     <Screen safeArea padding={false} keyboard testID="settings-screen">
       <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+
+        {/* Card storage usage (owned-card limit, mig 116) */}
+        {cardUsage && (
+          <SectionCard theme={theme}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('cardUsage.title')}</Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                {t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
+              </Text>
+            </View>
+            <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
+              <View style={{
+                height: '100%', borderRadius: 4,
+                width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%`,
+                backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
+              }} />
+            </View>
+            {cardUsage.available <= 0 && (
+              <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
+            )}
+          </SectionCard>
+        )}
 
         {/* ── a) Profile — centered avatar like web ── */}
         <SectionCard theme={theme}>
