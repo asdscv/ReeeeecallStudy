@@ -89,6 +89,7 @@
     "rateLimited": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
     "invalidResponse": "La IA devolvió una respuesta no válida. Inténtalo de nuevo.",
     "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
-    "serverError": "La generación con IA no está disponible temporalmente. Inténtalo de nuevo más tarde."
+    "serverError": "La generación con IA no está disponible temporalmente. Inténtalo de nuevo más tarde.",
+    "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más."
   }
 }

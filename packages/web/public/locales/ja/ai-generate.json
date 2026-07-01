@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "AIサーバーエラーです。しばらくしてから再度お試しください。"
+    "serverError": "AIサーバーエラーです。しばらくしてから再度お試しください。",
+    "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。"
   },
   "button": {
     "aiGenerate": "AI Generate",

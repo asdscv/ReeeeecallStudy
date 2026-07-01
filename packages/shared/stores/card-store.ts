@@ -32,8 +32,8 @@ function invalidateDeckStats(): void {
  * the cap who DELETES cards would stay blocked. Refresh it after every create/delete
  * (mirrors invalidateDeckStats). Fire-and-forget; fetchCardUsage is fail-safe.
  */
-function refreshCardUsage(): void {
-  void useDeckStore.getState().fetchCardUsage()
+function refreshCardUsage(force = false): void {
+  void useDeckStore.getState().fetchCardUsage({ force })
 }
 
 // ── Per-deck card-list cache ─────────────────────────────────────────────────
@@ -149,7 +149,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: position, error: posError } = await supabase
       .rpc('reserve_card_positions', { p_deck_id: input.deck_id, p_count: 1 })
     if (posError || position === null) {
-      if (isCardLimitError(posError)) refreshCardUsage()  // sync UI to the real at-cap state
+      if (isCardLimitError(posError)) refreshCardUsage(true)  // force: show the at-cap block now
       set({ error: isCardLimitError(posError) ? 'errors:card.limitReached' : (posError?.message ?? 'Failed to create card') })
       return null
     }
@@ -204,7 +204,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     const { data: basePos, error: posError } = await supabase
       .rpc('reserve_card_positions', { p_deck_id: deck_id, p_count: cards.length })
     if (posError || basePos === null) {
-      if (isCardLimitError(posError)) refreshCardUsage()  // sync UI to the real at-cap state
+      if (isCardLimitError(posError)) refreshCardUsage(true)  // force: show the at-cap block now
       set({ error: isCardLimitError(posError) ? 'errors:card.limitReached' : (posError?.message ?? 'Failed to create cards') })
       return 0
     }
@@ -277,7 +277,6 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     // 현재 카드 목록에서 해당 카드의 deck_id를 찾아 갱신
     invalidateDeckStats()
-    refreshCardUsage()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
       dropDeckCards(card.deck_id)
@@ -298,7 +297,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     invalidateDeckStats()
-    refreshCardUsage()
+    refreshCardUsage(true)  // force: a delete must clear a wrongly-persisting at-cap block
     if (card) {
       dropDeckCards(card.deck_id)
       await get().fetchCards(card.deck_id)
@@ -320,7 +319,7 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     invalidateDeckStats()
-    refreshCardUsage()
+    refreshCardUsage(true)  // force: a delete must clear a wrongly-persisting at-cap block
     if (deckId) {
       dropDeckCards(deckId)
       await get().fetchCards(deckId)
@@ -346,7 +345,6 @@ export const useCardStore = create<CardState>((set, get) => ({
     }
 
     invalidateDeckStats()
-    refreshCardUsage()
     const card = get().cards.find((c) => c.id === id)
     if (card) {
       dropDeckCards(card.deck_id)

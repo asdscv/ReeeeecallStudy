@@ -89,6 +89,7 @@
     "rateLimited": "Terlalu banyak permintaan. Silakan tunggu sebentar dan coba lagi.",
     "invalidResponse": "AI mengembalikan respons yang tidak valid. Silakan coba lagi.",
     "networkError": "Kesalahan jaringan. Silakan periksa koneksi Anda dan coba lagi.",
-    "serverError": "Pembuatan dengan AI untuk sementara tidak tersedia. Silakan coba lagi nanti."
+    "serverError": "Pembuatan dengan AI untuk sementara tidak tersedia. Silakan coba lagi nanti.",
+    "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
   }
 }

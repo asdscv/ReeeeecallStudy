@@ -19,5 +19,6 @@
   "successTitle": "สำเร็จ",
   "noCardsTitle": "ไม่มีการ์ด",
   "deckCardCount": "{{deck}} · {{count}} การ์ด",
-  "back": "ย้อนกลับ"
+  "back": "ย้อนกลับ",
+  "importPartial": "บันทึก {{count}} การ์ดก่อนหยุด"
 }

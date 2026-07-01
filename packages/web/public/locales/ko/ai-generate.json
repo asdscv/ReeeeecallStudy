@@ -150,7 +150,8 @@
     "description": "생성 중 문제가 발생했습니다. 다시 시도해주세요.",
     "back": "돌아가기",
     "retry": "다시 시도",
-    "serverError": "AI 서버 오류입니다. 잠시 후 다시 시도해주세요."
+    "serverError": "AI 서버 오류입니다. 잠시 후 다시 시도해주세요.",
+    "cardLimitReached": "카드 한도에 도달했어요. 카드를 지우거나 구독하면 더 저장할 수 있어요."
   },
   "button": {
     "aiGenerate": "AI로 만들기",

@@ -89,6 +89,7 @@
     "rateLimited": "请求过于频繁。请稍候片刻后重试。",
     "invalidResponse": "AI返回了无效的响应。请重试。",
     "networkError": "网络错误。请检查您的网络连接后重试。",
-    "serverError": "AI生成暂时不可用。请稍后再试。"
+    "serverError": "AI生成暂时不可用。请稍后再试。",
+    "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。"
   }
 }

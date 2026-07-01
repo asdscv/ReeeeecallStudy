@@ -3,6 +3,7 @@ import { View, Text, Alert, StyleSheet, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Button, Divider, ScreenHeader } from '../components/ui'
 import { useCards } from '../hooks/useCards'
+import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
@@ -72,7 +73,12 @@ export function ImportExportScreen() {
       }
 
       if (limitHit) {
-        Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+        // createCard returns null for MANY reasons (card limit, the 30/min rate limit,
+        // readonly, ...). Show the REAL error — NOT a hardcoded "subscribe" prompt — plus
+        // how many rows DID save before stopping.
+        const err = useCardStore.getState().error
+        const reason = tLimit(err ?? 'errors:card.limitReached', { defaultValue: t('importFailed') })
+        Alert.alert(t('errorTitle'), imported > 0 ? `${reason}\n${t('importPartial', { count: imported })}` : reason)
       } else {
         Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
       }
@@ -112,7 +118,12 @@ export function ImportExportScreen() {
       }
 
       if (limitHit) {
-        Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+        // createCard returns null for MANY reasons (card limit, the 30/min rate limit,
+        // readonly, ...). Show the REAL error — NOT a hardcoded "subscribe" prompt — plus
+        // how many rows DID save before stopping.
+        const err = useCardStore.getState().error
+        const reason = tLimit(err ?? 'errors:card.limitReached', { defaultValue: t('importFailed') })
+        Alert.alert(t('errorTitle'), imported > 0 ? `${reason}\n${t('importPartial', { count: imported })}` : reason)
       } else {
         Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
       }

@@ -89,6 +89,7 @@
     "rateLimited": "Đã bị giới hạn tần suất. Vui lòng đợi một lát rồi thử lại.",
     "invalidResponse": "AI đã trả về phản hồi không hợp lệ. Vui lòng thử lại.",
     "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn và thử lại.",
-    "serverError": "Tính năng tạo bằng AI tạm thời không khả dụng. Vui lòng thử lại sau."
+    "serverError": "Tính năng tạo bằng AI tạm thời không khả dụng. Vui lòng thử lại sau.",
+    "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm."
   }
 }

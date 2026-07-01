@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "AI 服务器错误，请稍后再试。"
+    "serverError": "AI 服务器错误，请稍后再试。",
+    "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。"
   },
   "button": {
     "aiGenerate": "AI Generate",

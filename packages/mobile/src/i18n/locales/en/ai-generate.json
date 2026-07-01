@@ -89,6 +89,7 @@
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
     "networkError": "Network error. Please check your connection and try again.",
-    "serverError": "AI generation is temporarily unavailable. Please try again later."
+    "serverError": "AI generation is temporarily unavailable. Please try again later.",
+    "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more."
   }
 }

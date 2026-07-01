@@ -150,7 +150,8 @@
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
-    "serverError": "Lỗi máy chủ AI. Vui lòng thử lại sau."
+    "serverError": "Lỗi máy chủ AI. Vui lòng thử lại sau.",
+    "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm."
   },
   "button": {
     "aiGenerate": "AI Generate",

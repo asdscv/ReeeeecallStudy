@@ -19,5 +19,6 @@
   "successTitle": "成功",
   "noCardsTitle": "没有卡片",
   "deckCardCount": "{{deck}} · {{count}} 张卡片",
-  "back": "返回"
+  "back": "返回",
+  "importPartial": "已保存 {{count}} 张后停止。"
 }
