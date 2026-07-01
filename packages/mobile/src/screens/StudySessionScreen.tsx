@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert, BackHandler } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -268,6 +268,17 @@ export function StudySessionScreen() {
       }},
     ])
   }
+
+  // The screen disables the iOS back-swipe (StudyStack gestureEnabled:false), but that
+  // does NOT stop the Android hardware back button — without this it would pop the
+  // session with no "end session?" confirm. Route it through handleExit instead.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleExit()
+      return true // handled — don't pop
+    })
+    return () => sub.remove()
+  }, [handleExit])
 
   const tapGesture = Gesture.Tap()
     .withRef(cardTapRef)
