@@ -58,7 +58,8 @@
     "imageUpload": "画像をアップロード",
     "imageChange": "画像を変更",
     "imageUploadHint": "単語リスト・教科書のページ・ノートの写真を選ぶと、AIがカードに変換します。",
-    "imagePaidNotice": "画像生成にはクレジットを使用します（無料枠はありません）。"
+    "imagePaidNotice": "画像生成にはクレジットを使用します（無料枠はありません）。",
+    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。"
   },
   "wallet": {
     "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカードを生成できます",

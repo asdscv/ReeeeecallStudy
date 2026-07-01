@@ -49,6 +49,7 @@ export function ImportExportScreen() {
 
       const headers = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''))
       let imported = 0
+      let limitHit = false
 
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map((v) => v.trim().replace(/^"|"$/g, ''))
@@ -58,16 +59,23 @@ export function ImportExportScreen() {
         })
 
         if (Object.values(fieldValues).some((v) => v)) {
-          await createCard({
+          // createCard returns null (does NOT throw) on failure — incl. a card-limit
+          // (mig 116) rejection. Stop + report the real count instead of a false success.
+          const created = await createCard({
             deck_id: deckId,
             template_id: deck?.default_template_id ?? '',
             field_values: fieldValues,
           })
+          if (!created) { limitHit = true; break }
           imported++
         }
       }
 
-      Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
+      if (limitHit) {
+        Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+      } else {
+        Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
+      }
     } catch (e) {
       Alert.alert(t('errorTitle'), t('importFailed'))
     } finally {
@@ -88,20 +96,26 @@ export function ImportExportScreen() {
       const data = JSON.parse(file.content)
       const cardList = Array.isArray(data) ? data : data.cards ?? []
       let imported = 0
+      let limitHit = false
 
       for (const card of cardList) {
         const fieldValues = card.field_values ?? card
         if (typeof fieldValues === 'object' && Object.values(fieldValues).some((v: any) => v)) {
-          await createCard({
+          const created = await createCard({
             deck_id: deckId,
             template_id: deck?.default_template_id ?? '',
             field_values: fieldValues,
           })
+          if (!created) { limitHit = true; break }
           imported++
         }
       }
 
-      Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
+      if (limitHit) {
+        Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
+      } else {
+        Alert.alert(t('successTitle'), t('importSuccess', { count: imported, name: file.name }))
+      }
     } catch {
       Alert.alert(t('errorTitle'), t('importJsonFailed'))
     } finally {

@@ -311,6 +311,9 @@ export function AIGenerateScreen() {
     setStep('saving')
     try {
       await store.saveAll()
+      // saveAll catches internally + sets currentStep:'error' (it does NOT throw),
+      // e.g. a card-limit (mig 116) rejection at save time — don't show "done 🎉".
+      if (useAIGenerateStore.getState().currentStep === 'error') { setStep('error'); return }
       setStep('done')
     } catch {
       Alert.alert(t('alert.errorTitle'), t('alert.saveFailed'))
