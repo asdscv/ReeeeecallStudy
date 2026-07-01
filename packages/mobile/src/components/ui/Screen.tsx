@@ -53,7 +53,10 @@ export function Screen({
   if (keyboard) {
     content = (
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        // iOS: 'padding'. Android: undefined — the window already resizes
+        // (windowSoftInputMode=adjustResize), so 'height' would shrink the content a
+        // SECOND time and cause jank.
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}
       >
         {content}

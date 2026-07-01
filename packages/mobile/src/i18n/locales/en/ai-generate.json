@@ -80,7 +80,11 @@
     "imageRequired": "Please select an image first.",
     "selectImageError": "That image is too large or couldn't be read. Try a smaller photo.",
     "permissionDenied": "Photo access is needed to upload an image.",
-    "deckNoTemplate": "This deck has no card template yet — open it and add a card once to set one up."
+    "deckNoTemplate": "This deck has no card template yet — open it and add a card once to set one up.",
+    "discardTitle": "Discard generated cards?",
+    "discardMessage": "Going back will lose the cards you generated.",
+    "discardConfirm": "Discard",
+    "cancel": "Cancel"
   },
   "errors": {
     "insufficientCredits": "You've used today's free AI cards and have no credits left. Top up to keep generating.",
