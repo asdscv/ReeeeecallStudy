@@ -160,6 +160,7 @@
   "cardUsage": {
     "title": "Card storage",
     "count": "{{owned}} / {{limit}} cards",
-    "reached": "You’ve reached your card limit. Subscribe to add more."
+    "reached": "You’ve reached your card limit. Subscribe to add more.",
+    "subscribe": "Subscribe (coming soon)"
   }
 }

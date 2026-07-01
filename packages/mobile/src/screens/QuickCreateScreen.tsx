@@ -8,6 +8,8 @@ import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { CardLimitNotice } from '../components/CardLimitNotice'
 import {
   QUICK_PRESETS,
   presetFieldSpecs,
@@ -30,10 +32,12 @@ const INITIAL_ROWS = 1
 export function QuickCreateScreen() {
   const theme = useTheme()
   const { t } = useTranslation(['decks', 'common'])
+  const { t: tLimit } = useTranslation(['errors', 'settings'])
   const navigation = useNavigation<Nav>()
 
   const { createDeck, deleteDeck } = useDeckStore()
   const { createCards } = useCardStore()
+  const limit = useCardLimit()
   const { findOrCreatePresetTemplate } = useTemplateStore()
 
   const [deckName, setDeckName] = useState('')
@@ -141,6 +145,12 @@ export function QuickCreateScreen() {
         return
       }
 
+      // Owned-card limit pre-flight (mig 116). Server also enforces at createCards.
+      if (limit.exceeds(cards.length)) {
+        setError(tLimit('errors:card.limitReached'))
+        return
+      }
+
       setLoading(true)
 
       // 1. find-or-create the template for this field shape (reused on retry).
@@ -201,6 +211,7 @@ export function QuickCreateScreen() {
     <Screen scroll keyboard testID="quick-create-screen">
       <ScreenHeader title={t('decks:quickCreate.title')} mode="back" />
       <View style={styles.content}>
+        {limit.reached && <CardLimitNotice />}
         {error && (
           <View style={[styles.errorBox, { backgroundColor: theme.colors.errorLight }]}>
             <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>

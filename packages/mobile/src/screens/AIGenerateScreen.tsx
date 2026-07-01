@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
 import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDecks } from '../hooks'
 import { useTheme, palette } from '../theme'
 
@@ -172,10 +173,12 @@ function DropdownPicker<T extends string>({
 
 export function AIGenerateScreen() {
   const { t } = useTranslation('ai-generate')
+  const { t: tLimit } = useTranslation(['errors', 'settings'])
   const theme = useTheme()
   const navigation = useNavigation()
   const store = useAIGenerateStore()
   const { decks } = useDecks()
+  const limit = useCardLimit()
 
   const [step, setStep] = useState<WizardStep>('config')
 
@@ -256,6 +259,13 @@ export function AIGenerateScreen() {
       if (!imageDataUrl) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
     } else if (!topic.trim()) {
       Alert.alert(t('alert.errorTitle'), t('alert.enterTopic'))
+      return
+    }
+
+    // Owned-card limit pre-flight (mig 116): don't spend AI cost/quota generating
+    // cards that can't be saved. Server also enforces.
+    if (limit.exceeds(parseInt(cardCount) || 10)) {
+      Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
       return
     }
 

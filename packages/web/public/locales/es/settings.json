@@ -193,6 +193,7 @@
   "cardUsage": {
     "title": "Almacenamiento de tarjetas",
     "count": "{{owned}} / {{limit}} tarjetas",
-    "reached": "Has alcanzado tu límite de tarjetas. Suscríbete para añadir más."
+    "reached": "Has alcanzado tu límite de tarjetas. Suscríbete para añadir más.",
+    "subscribe": "Suscribirse (próximamente)"
   }
 }
