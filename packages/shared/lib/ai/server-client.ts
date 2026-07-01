@@ -91,37 +91,41 @@ export async function getAiGenerationQuota(): Promise<AiGenerationQuota> {
 }
 
 export interface AiWallet {
-  balance: number
-  creditsPerCard: number
+  balanceMicroWon: number      // prepaid balance in micro-WON (1e-6 KRW)
+  estPricePerCardMicro: number // approximate ₩ (micro) charged per PAID card (for the UI quote)
 }
 
-// Caller's prepaid credit wallet (Phase 1). Fails open to {0,1} — the server is
-// authoritative (debits atomically, 402s when short).
-// Returns null when the wallet is UNKNOWN due to a transient error — distinct
-// from a known 0 balance, so the client doesn't wrongly hard-block a paying user.
+// Caller's prepaid micro-WON wallet (metered billing, mig 114). The server is
+// authoritative — it charges the real token cost × markup POST-generation and
+// 402s at the pre-gen gate when the wallet is empty. Returns null when UNKNOWN
+// due to a transient error (distinct from a known 0), so a read blip doesn't
+// wrongly hard-block a paying user.
 export async function getAiWallet(): Promise<AiWallet | null> {
   const { data, error } = await supabase.rpc('get_ai_wallet')
   const row = Array.isArray(data) ? data[0] : data
   if (error || !row) return null
   return {
-    balance: Number(row.balance ?? 0),
-    creditsPerCard: Number(row.credits_per_card ?? 1),
+    balanceMicroWon: Number(row.balance_micro_won ?? 0),
+    estPricePerCardMicro: Number(row.est_price_per_card_micro ?? 0),
   }
 }
 
 export interface Affordable {
   free: number
-  paid: number
+  paid: number       // ESTIMATED paid cards the balance can buy (metered → approximate)
   total: number
   walletKnown: boolean
+  balanceMicroWon?: number
 }
 
-// Cards the user can generate right now = free remaining + what credits can buy.
-// walletKnown=false → wallet read failed; caller should defer to the authoritative
-// server gate instead of hard-blocking (L1).
+// Cards the user can generate right now = free remaining + an ESTIMATE of what the
+// balance buys (balance / est-price-per-card). Metered pricing means the real
+// per-gen price varies with tokens, so `paid` is an approximate UX hint — the
+// server gate is authoritative. walletKnown=false → wallet read failed; caller
+// should defer to the server gate instead of hard-blocking (L1).
 export async function getAffordableCards(): Promise<Affordable> {
   const [q, w] = await Promise.all([getAiGenerationQuota(), getAiWallet()])
   if (!w) return { free: q.remaining, paid: 0, total: q.remaining, walletKnown: false }
-  const paid = w.creditsPerCard > 0 ? Math.floor(w.balance / w.creditsPerCard) : 0
-  return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true }
+  const paid = w.estPricePerCardMicro > 0 ? Math.floor(w.balanceMicroWon / w.estPricePerCardMicro) : 0
+  return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true, balanceMicroWon: w.balanceMicroWon }
 }

@@ -8,7 +8,16 @@ business/economic layer + external rails + ops + minor cleanup.
 
 ---
 
-## 1. Cost / margin / pricing layer  ✅ Phase 0 SHIPPED to develop / ⏳ Phase 1 pending owner
+## 1. Cost / margin / pricing layer  ✅ Phase 0 + METERED BILLING SHIPPED to develop / ⏳ payment pending
+
+> **⚡ Charging model is now METERED (mig 114)** — fixed credits (1/card, 5/image) were **replaced** by a
+> **micro-WON wallet + post-generation actual-cost deduction**: FREE 10 cards/day, then PAID = real token
+> cost × markup (80% margin → ×5), deducted after the gen; failure = no charge (net-zero); pre-gen gate 402
+> on empty wallet. `reserve_ai_generation` / `charge_ai_generation` / `release_ai_job` replace
+> record/finalize/refund. Design of record: [AI-METERED-BILLING-DESIGN.md](./AI-METERED-BILLING-DESIGN.md).
+> Live e2e 17/17 (Gemini): ₩0.39 charged for 2 cards. **Payment 1c just wires `add_ai_credits(₩pack × 1e6)`
+> to top up the wallet.** The cost-capture / margin-monitoring layer (below) feeds this as the pricing engine.
+
 
 **Phase 0 (cost capture + config seams) is BUILT + merged** — mig **112** (`ai_pricing_settings` /
 `ai_pricing_config` / `ai_cost_ledger` + `finalize_ai_cost` / `set_ai_pricing_rate` /
