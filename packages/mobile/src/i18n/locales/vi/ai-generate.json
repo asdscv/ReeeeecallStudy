@@ -70,7 +70,8 @@
     "empty": "Bạn đã dùng hết thẻ miễn phí hôm nay",
     "unknown": "Không thể hiển thị số dư",
     "balance": "Số dư ₩{{won}} (~{{cards}} thẻ)",
-    "freeOnly": "Hôm nay còn {{free}} thẻ miễn phí"
+    "freeOnly": "Hôm nay còn {{free}} thẻ miễn phí",
+    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục."
   },
   "alert": {
     "errorTitle": "Lỗi",
@@ -95,5 +96,11 @@
     "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn và thử lại.",
     "serverError": "Tính năng tạo bằng AI tạm thời không khả dụng. Vui lòng thử lại sau.",
     "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm."
+  },
+  "config": {
+    "mode": {
+      "full": "Bộ thẻ mới",
+      "cards_only": "Thêm vào bộ thẻ"
+    }
   }
 }

@@ -340,10 +340,14 @@ Deno.serve(async (req) => {
       if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
       const fields = asFields(body.fields)
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
-      const cardCount = Math.min(MAX_CARDS_PER_CALL, Math.max(1, Math.floor(Number(body.cardCount) || 10)))
+      // Image mode: the MODEL decides how many cards to make from what's actually in
+      // the image (one per item), capped at MAX_CARDS_PER_CALL — the user does NOT set
+      // a count. So we pass the cap as the max, not a target.
+      const cardCount = MAX_CARDS_PER_CALL
 
-      // Owned-card limit (mig 116): block before spending credits.
-      const { error: imgCardLimitErr } = await sbUser.rpc('check_card_limit_self', { p_adding: cardCount })
+      // Owned-card limit (mig 116): fail fast only if the account is fully at the cap
+      // (the real count is model-decided; the save path enforces the exact limit).
+      const { error: imgCardLimitErr } = await sbUser.rpc('check_card_limit_self', { p_adding: 1 })
       if (imgCardLimitErr) {
         if (imgCardLimitErr.code === 'PT402' || (imgCardLimitErr as { hint?: string }).hint === 'CARD_LIMIT_REACHED') {
           return json({ error: 'Card limit reached', code: 'CARD_LIMIT_REACHED' }, 402, cors)

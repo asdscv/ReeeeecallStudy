@@ -7,8 +7,8 @@
     "apiKeyHint": "Kunci Anda dienkripsi AES-256 dan disimpan di browser. Tidak pernah dikirim ke server kami.",
     "model": "Model",
     "topic": "Topic",
-    "topicPlaceholder": "e.g., JLPT N3 Japanese vocabulary, Korean history timeline",
-    "cardCount": "Number of cards",
+    "topicPlaceholder": "mis., kosakata Jepang JLPT N3, garis waktu sejarah Korea",
+    "cardCount": "Jumlah kartu",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
     "customEndpoint": "Custom Endpoint",
@@ -21,8 +21,8 @@
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
-      "full": "Full (Template + Deck + Cards)",
-      "cards_only": "Add Cards to Existing Deck"
+      "full": "Dek baru",
+      "cards_only": "Tambah ke dek"
     },
     "deckNoTemplate": "Deck ini belum memiliki templat kartu — buka deck dan tambahkan satu kartu untuk menyiapkannya.",
     "targetDeck": "Deck Tujuan",
@@ -67,7 +67,8 @@
     "creditsOnly": "{{credits}} kartu berbayar tersedia",
     "empty": "Kartu gratis hari ini sudah habis",
     "unknown": "Saldo tidak tersedia saat ini",
-    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)"
+    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)",
+    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan."
   },
   "wizard": {
     "setup": "Setup",
