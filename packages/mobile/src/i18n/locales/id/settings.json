@@ -166,5 +166,13 @@
     "planNote": "Paket gratis mencakup hingga {{limit}} kartu milik Anda. Berlangganan untuk menaikkan batas.",
     "upgrade": "Tingkatkan (segera hadir)",
     "upgradeSoon": "Langganan akan segera hadir."
-  }
+  },
+  "groups": {
+    "account": "Akun",
+    "billing": "Kredit & Penggunaan",
+    "study": "Belajar",
+    "preferences": "Preferensi",
+    "data": "Data"
+  },
+  "subtitle": "Kelola akun, kredit, dan preferensi belajar Anda."
 }

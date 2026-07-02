@@ -293,35 +293,9 @@ export function SettingsScreen() {
     <Screen safeArea padding={false} keyboard testID="settings-screen">
       <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Text style={{ fontSize: 13, color: theme.colors.textSecondary, marginBottom: 12, marginTop: -4, marginLeft: 4 }}>{t('subtitle')}</Text>
 
-        {/* Card storage usage (owned-card limit, mig 116) */}
-        {cardUsage && (
-          <CollapsibleSection
-            title={t('cardUsage.title')}
-            icon="📇"
-            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
-          >
-            <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
-              <View style={{
-                height: '100%', borderRadius: 4,
-                width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%`,
-                backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
-              }} />
-            </View>
-            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
-            <View style={{ marginTop: 8, alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: theme.colors.border, opacity: 0.7 }}>
-              <Text style={{ color: theme.colors.textSecondary, fontWeight: '600', fontSize: 13 }}>{t('cardUsage.upgrade')}</Text>
-            </View>
-            {cardUsage.available <= 0 && (
-              <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
-            )}
-          </CollapsibleSection>
-        )}
-
-        {/* AI wallet / usage (충전금·사용량) */}
-        <CollapsibleSection title={tWallet('title')} icon="💳">
-          <WalletSummary />
-        </CollapsibleSection>
+        <GroupLabel theme={theme}>{t('groups.account')}</GroupLabel>
 
         {/* ── a) Profile — centered avatar like web ── */}
         <CollapsibleSection title={t('profile.title')} icon="👤">
@@ -422,6 +396,37 @@ export function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        <GroupLabel theme={theme}>{t('groups.billing')}</GroupLabel>
+
+        {/* AI wallet / usage (충전금·사용량) */}
+        <CollapsibleSection title={tWallet('title')} icon="💳">
+          <WalletSummary />
+        </CollapsibleSection>
+
+        {/* Card storage usage (owned-card limit, mig 116) */}
+        {cardUsage && (
+          <CollapsibleSection
+            title={t('cardUsage.title')}
+            icon="📇"
+            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
+          >
+            <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
+              <View style={{
+                height: '100%', borderRadius: 4,
+                width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%`,
+                backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
+              }} />
+            </View>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
+            <View style={{ marginTop: 8, alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: theme.colors.border, opacity: 0.7 }}>
+              <Text style={{ color: theme.colors.textSecondary, fontWeight: '600', fontSize: 13 }}>{t('cardUsage.upgrade')}</Text>
+            </View>
+            {cardUsage.available <= 0 && (
+              <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
+            )}
+          </CollapsibleSection>
+        )}
+
         {/* ── Templates ── */}
         <SectionCard theme={theme}>
           <TouchableOpacity
@@ -472,6 +477,8 @@ export function SettingsScreen() {
             <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
           </TouchableOpacity>
         </SectionCard>
+
+        <GroupLabel theme={theme}>{t('groups.study')}</GroupLabel>
 
         {/* ── Answer Mode — matches web: standalone card ── */}
         <CollapsibleSection title={t('answerMode.title')} icon="📝">
@@ -550,29 +557,6 @@ export function SettingsScreen() {
             {t('newCardLimit.hint')}
           </Text>
         </CollapsibleSection>
-
-        {/* ── Haptic feedback — standalone card ── */}
-        <SectionCard theme={theme}>
-          <View style={styles.switchRow}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-              {t('haptics.enable', { defaultValue: 'Haptic feedback' })}
-            </Text>
-            <Switch
-              testID="settings-haptics-toggle"
-              value={hapticsOn}
-              onValueChange={(v) => {
-                setHapticsOn(v)
-                setHapticsEnabled(v)
-                localPrefs.setHapticsEnabled(v)
-                if (v) haptics.success() // immediate confirmation when turning on
-              }}
-              trackColor={{ true: theme.colors.primary }}
-            />
-          </View>
-          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            {t('haptics.hint', { defaultValue: 'Vibration feedback on taps, ratings, and actions.' })}
-          </Text>
-        </SectionCard>
 
         {/* ── Auto TTS Reading — standalone card ── */}
         <CollapsibleSection title={t('tts.title')} icon="🔊">
@@ -708,6 +692,31 @@ export function SettingsScreen() {
             </View>
           </View>
         </CollapsibleSection>
+
+        {/* ── Haptic feedback — standalone card ── */}
+        <SectionCard theme={theme}>
+          <View style={styles.switchRow}>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+              {t('haptics.enable', { defaultValue: 'Haptic feedback' })}
+            </Text>
+            <Switch
+              testID="settings-haptics-toggle"
+              value={hapticsOn}
+              onValueChange={(v) => {
+                setHapticsOn(v)
+                setHapticsEnabled(v)
+                localPrefs.setHapticsEnabled(v)
+                if (v) haptics.success() // immediate confirmation when turning on
+              }}
+              trackColor={{ true: theme.colors.primary }}
+            />
+          </View>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            {t('haptics.hint', { defaultValue: 'Vibration feedback on taps, ratings, and actions.' })}
+          </Text>
+        </SectionCard>
+
+        <GroupLabel theme={theme}>{t('groups.preferences')}</GroupLabel>
 
         {/* ── f) Language ── */}
         <CollapsibleSection title={t('language.title')} icon="🌐">
@@ -846,6 +855,8 @@ export function SettingsScreen() {
         </SectionCard>
         */}
 
+        <GroupLabel theme={theme}>{t('groups.data')}</GroupLabel>
+
         {/* ── i) Export My Data — matches web ── */}
         <CollapsibleSection title={t('export.title')} icon="📥">
           {[
@@ -948,6 +959,13 @@ export function SettingsScreen() {
       </ScrollView>
     </Screen>
   )
+}
+
+/**
+ * Category group label — small uppercase heading above a group of sections
+ */
+function GroupLabel({ children, theme }: { children: React.ReactNode; theme: ReturnType<typeof useTheme> }) {
+  return <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: theme.colors.textSecondary, marginTop: 20, marginBottom: 8, marginLeft: 4 }}>{children}</Text>
 }
 
 /**

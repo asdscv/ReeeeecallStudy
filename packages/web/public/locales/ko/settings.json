@@ -167,5 +167,13 @@
     "planNote": "무료 플랜은 소유 카드를 최대 {{limit}}장까지 지원해요. 한도를 늘리려면 구독하세요.",
     "upgrade": "업그레이드 (준비 중)",
     "upgradeSoon": "구독은 준비 중이에요."
-  }
+  },
+  "groups": {
+    "account": "계정",
+    "billing": "충전금 · 사용량",
+    "study": "학습",
+    "preferences": "환경설정",
+    "data": "데이터"
+  },
+  "subtitle": "계정, 충전금, 학습 환경설정을 관리하세요."
 }

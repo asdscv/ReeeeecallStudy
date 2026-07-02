@@ -167,5 +167,13 @@
     "planNote": "免费方案最多可拥有 {{limit}} 张卡片。订阅可提高上限。",
     "upgrade": "升级（即将推出）",
     "upgradeSoon": "订阅即将推出。"
-  }
+  },
+  "groups": {
+    "account": "账户",
+    "billing": "额度与用量",
+    "study": "学习",
+    "preferences": "偏好设置",
+    "data": "数据"
+  },
+  "subtitle": "管理你的账户、额度和学习偏好。"
 }

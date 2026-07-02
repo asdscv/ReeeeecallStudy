@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Check, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download, CreditCard, User } from 'lucide-react'
 import { useLocale } from '../hooks/useLocale'
@@ -31,6 +32,10 @@ async function autoSaveProfile(
     .update({ [field]: value } as Record<string, unknown>)
     .eq('id', userId)
   return !error
+}
+
+function GroupLabel({ children }: { children: ReactNode }) {
+  return <h2 className="text-xs font-semibold uppercase tracking-wider text-content-tertiary px-1 pt-2 first:pt-0">{children}</h2>
 }
 
 export function SettingsPage() {
@@ -233,122 +238,135 @@ export function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">{t('title')}</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-1">{t('title')}</h1>
+      <p className="text-sm text-muted-foreground mb-6 sm:mb-8">{t('subtitle', 'Manage your account, credits, and study preferences.')}</p>
 
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-7">
 
-        {/* ── Card storage usage (owned-card limit, mig 116) ── */}
-        {cardUsage && (
-          <CollapsibleSection
-            title={t('cardUsage.title')}
-            icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
-            badge={<span className="text-sm text-muted-foreground tabular-nums">{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</span>}
-          >
-            <div className="h-2 rounded-full bg-accent overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
-                style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-3">{t('cardUsage.planNote', { limit: cardUsage.limit })}</p>
-            <button disabled title={t('cardUsage.upgradeSoon')} className="mt-2 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground cursor-not-allowed font-medium">{t('cardUsage.upgrade')}</button>
-            {cardUsage.available <= 0 && (
-              <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
-            )}
-          </CollapsibleSection>
-        )}
-
-        {/* ── Wallet ── */}
-        <CollapsibleSection title={tWallet('title')} icon={<span className="text-base">💳</span>}>
-          <WalletSummary />
-        </CollapsibleSection>
-
-        {/* ── a) Profile Section ── */}
-        <CollapsibleSection title={t('profile.title')} icon={<User className="w-5 h-5 text-muted-foreground" />}>
-          <div className="flex items-start gap-4 mb-4">
-            <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center shrink-0">
-              <span className="text-2xl font-bold text-white">{userInitial}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-muted-foreground mb-1">{user?.email}</p>
-              <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                false /* isPro -- add when available */
-                  ? 'bg-success/10 text-success border border-success/30'
-                  : 'bg-accent text-muted-foreground border border-border'
-              }`}>
-                {t('plan.free')}
-              </span>
-            </div>
+        {/* ── Quick Actions (nav strip, no label) ── */}
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => navigate('/quick-study')}
+              className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 transition cursor-pointer text-center"
+            >
+              <Zap className="w-6 h-6 text-orange-600" />
+              <span className="text-sm font-semibold text-orange-700">{t('quickActions.quickStudy', 'Quick Study')}</span>
+            </button>
+            <button
+              onClick={() => navigate('/ai-generate')}
+              className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 transition cursor-pointer text-center"
+            >
+              <Bot className="w-6 h-6 text-purple-600" />
+              <span className="text-sm font-semibold text-purple-700">{t('quickActions.aiGenerate', 'AI Generate')}</span>
+            </button>
+            <button
+              onClick={() => navigate('/guide')}
+              className="bg-brand/10 border border-brand/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-brand/15 transition cursor-pointer text-center"
+            >
+              <BookOpen className="w-6 h-6 text-brand" />
+              <span className="text-sm font-semibold text-brand">{t('quickActions.guide', 'Guide')}</span>
+            </button>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">{t('profile.displayName')}</label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder={t('profile.displayNamePlaceholder')}
-                  maxLength={12}
-                  className={`w-full px-4 py-2.5 rounded-lg border outline-none text-foreground ${
-                    nameError
-                      ? 'border-destructive/50 focus:border-destructive focus:ring-2 focus:ring-destructive/20'
-                      : nameAvailable
-                        ? 'border-success/50 focus:border-success focus:ring-2 focus:ring-success/20'
-                        : 'border-border focus:border-brand focus:ring-2 focus:ring-brand/20'
-                  }`}
-                />
-                {nameChecking && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-tertiary animate-spin" />
-                )}
-                {!nameChecking && nameAvailable && (
-                  <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-success" />
-                )}
-              </div>
-              <button
-                onClick={handleSaveName}
-                disabled={nameSaving || !nameChanged || nameChecking || nameAvailable === false}
-                className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium whitespace-nowrap"
-              >
-                {nameSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
-              </button>
-            </div>
-            {nameError && (
-              <p className="text-xs text-destructive mt-1">{nameError}</p>
-            )}
-            {nameAvailable && (
-              <p className="text-xs text-success mt-1">{t('profile.nameAvailable')}</p>
-            )}
-          </div>
-        </CollapsibleSection>
-
-        {/* ── b) Quick Actions ── */}
-        <div className="grid grid-cols-3 gap-3">
-          <button
-            onClick={() => navigate('/quick-study')}
-            className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 transition cursor-pointer text-center"
-          >
-            <Zap className="w-6 h-6 text-orange-600" />
-            <span className="text-sm font-semibold text-orange-700">{t('quickActions.quickStudy', 'Quick Study')}</span>
-          </button>
-          <button
-            onClick={() => navigate('/ai-generate')}
-            className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 transition cursor-pointer text-center"
-          >
-            <Bot className="w-6 h-6 text-purple-600" />
-            <span className="text-sm font-semibold text-purple-700">{t('quickActions.aiGenerate', 'AI Generate')}</span>
-          </button>
-          <button
-            onClick={() => navigate('/guide')}
-            className="bg-brand/10 border border-brand/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-brand/15 transition cursor-pointer text-center"
-          >
-            <BookOpen className="w-6 h-6 text-brand" />
-            <span className="text-sm font-semibold text-brand">{t('quickActions.guide', 'Guide')}</span>
-          </button>
         </div>
 
-        {/* ── c) Study Settings ── */}
-        <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-base">📝</span>}>
+        {/* ── Account ── */}
+        <div className="space-y-3">
+          <GroupLabel>{t('groups.account', 'Account')}</GroupLabel>
+          <CollapsibleSection title={t('profile.title')} icon={<User className="w-5 h-5 text-muted-foreground" />}>
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center shrink-0">
+                <span className="text-2xl font-bold text-white">{userInitial}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-muted-foreground mb-1">{user?.email}</p>
+                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${
+                  false /* isPro -- add when available */
+                    ? 'bg-success/10 text-success border border-success/30'
+                    : 'bg-accent text-muted-foreground border border-border'
+                }`}>
+                  {t('plan.free')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">{t('profile.displayName')}</label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    placeholder={t('profile.displayNamePlaceholder')}
+                    maxLength={12}
+                    className={`w-full px-4 py-2.5 rounded-lg border outline-none text-foreground ${
+                      nameError
+                        ? 'border-destructive/50 focus:border-destructive focus:ring-2 focus:ring-destructive/20'
+                        : nameAvailable
+                          ? 'border-success/50 focus:border-success focus:ring-2 focus:ring-success/20'
+                          : 'border-border focus:border-brand focus:ring-2 focus:ring-brand/20'
+                    }`}
+                  />
+                  {nameChecking && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-tertiary animate-spin" />
+                  )}
+                  {!nameChecking && nameAvailable && (
+                    <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-success" />
+                  )}
+                </div>
+                <button
+                  onClick={handleSaveName}
+                  disabled={nameSaving || !nameChanged || nameChecking || nameAvailable === false}
+                  className="px-4 py-2.5 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer font-medium whitespace-nowrap"
+                >
+                  {nameSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('profile.saveBtn')}
+                </button>
+              </div>
+              {nameError && (
+                <p className="text-xs text-destructive mt-1">{nameError}</p>
+              )}
+              {nameAvailable && (
+                <p className="text-xs text-success mt-1">{t('profile.nameAvailable')}</p>
+              )}
+            </div>
+          </CollapsibleSection>
+        </div>
+
+        {/* ── Credits & Usage ── */}
+        <div className="space-y-3">
+          <GroupLabel>{t('groups.billing', 'Credits & Usage')}</GroupLabel>
+          {/* ── Wallet ── */}
+          <CollapsibleSection title={tWallet('title')} icon={<span className="text-base">💳</span>}>
+            <WalletSummary />
+          </CollapsibleSection>
+
+          {/* ── Card storage usage (owned-card limit, mig 116) ── */}
+          {cardUsage && (
+            <CollapsibleSection
+              title={t('cardUsage.title')}
+              icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
+              badge={<span className="text-sm text-muted-foreground tabular-nums">{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</span>}
+            >
+              <div className="h-2 rounded-full bg-accent overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
+                  style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">{t('cardUsage.planNote', { limit: cardUsage.limit })}</p>
+              <button disabled title={t('cardUsage.upgradeSoon')} className="mt-2 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground cursor-not-allowed font-medium">{t('cardUsage.upgrade')}</button>
+              {cardUsage.available <= 0 && (
+                <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
+              )}
+            </CollapsibleSection>
+          )}
+        </div>
+
+        {/* ── Study ── */}
+        <div className="space-y-3">
+          <GroupLabel>{t('groups.study', 'Study')}</GroupLabel>
+          {/* ── Study Settings ── */}
+          <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-base">📝</span>}>
 
           {/* Answer Mode cards */}
           <div className="grid grid-cols-2 gap-3 mb-5">
@@ -489,73 +507,70 @@ export function SettingsPage() {
           </div>
         </CollapsibleSection>
 
-        {/* ── f) Language ── */}
-        <CollapsibleSection title={t('language.title')} icon={<Globe className="w-5 h-5 text-muted-foreground" />}>
-          <select
-            value={i18n.language}
-            onChange={(e) => changeLanguage(e.target.value)}
-            className="w-full sm:w-64 px-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand appearance-none"
-            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236B7280\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
-          >
-            {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const).map((lng) => (
-              <option key={lng} value={lng}>
-                {t(`language.${lng}`)}
-              </option>
-            ))}
-          </select>
-        </CollapsibleSection>
+          {/* ── Daily Study Goal ── */}
+          <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-5 h-5 text-muted-foreground" />}>
+            <p className="text-sm text-muted-foreground mb-3">{t('goal.description', 'Set a daily study target in minutes. Leave empty for no goal.')}</p>
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                min={1}
+                max={480}
+                placeholder={t('goal.placeholder', 'e.g. 30')}
+                value={dailyGoal ?? ''}
+                onChange={(e) => setDailyGoal(e.target.value ? parseInt(e.target.value, 10) : null)}
+                onBlur={async () => {
+                  if (dailyGoal !== null && (dailyGoal < 1 || dailyGoal > 480)) return
+                  if (user) {
+                    const ok = await autoSaveProfile(user.id, 'daily_study_goal', dailyGoal)
+                    if (ok) toast.success(t('autoSaved', 'Saved'))
+                  }
+                }}
+                className="w-24 px-3 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm text-foreground"
+              />
+              <span className="text-sm text-muted-foreground">{t('goal.unit', 'minutes / day')}</span>
+            </div>
+          </CollapsibleSection>
 
-        {/* ── f2) Theme ── */}
-        <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-5 h-5 text-muted-foreground" />}>
-          <p className="text-sm text-muted-foreground mb-3">{t('theme.description')}</p>
-          <ThemeToggle theme={theme} onChange={setTheme} />
-        </CollapsibleSection>
-
-
-        {/* ── i) Legal (compact inline) ── */}
-        <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
-          <a href="https://reeeeecallstudy.xyz/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
-            {t('legal.privacy')}
-          </a>
-          <span>·</span>
-          <a href="https://reeeeecallstudy.xyz/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
-            {t('legal.terms')}
-          </a>
+          {/* ── Study Reminders ── */}
+          <ReminderSettings />
         </div>
 
-        {/* ── Daily Study Goal ── */}
-        <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-5 h-5 text-muted-foreground" />}>
-          <p className="text-sm text-muted-foreground mb-3">{t('goal.description', 'Set a daily study target in minutes. Leave empty for no goal.')}</p>
-          <div className="flex items-center gap-3">
-            <input
-              type="number"
-              min={1}
-              max={480}
-              placeholder={t('goal.placeholder', 'e.g. 30')}
-              value={dailyGoal ?? ''}
-              onChange={(e) => setDailyGoal(e.target.value ? parseInt(e.target.value, 10) : null)}
-              onBlur={async () => {
-                if (dailyGoal !== null && (dailyGoal < 1 || dailyGoal > 480)) return
-                if (user) {
-                  const ok = await autoSaveProfile(user.id, 'daily_study_goal', dailyGoal)
-                  if (ok) toast.success(t('autoSaved', 'Saved'))
-                }
-              }}
-              className="w-24 px-3 py-2 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm text-foreground"
-            />
-            <span className="text-sm text-muted-foreground">{t('goal.unit', 'minutes / day')}</span>
-          </div>
-        </CollapsibleSection>
+        {/* ── Preferences ── */}
+        <div className="space-y-3">
+          <GroupLabel>{t('groups.preferences', 'Preferences')}</GroupLabel>
+          {/* ── Language ── */}
+          <CollapsibleSection title={t('language.title')} icon={<Globe className="w-5 h-5 text-muted-foreground" />}>
+            <select
+              value={i18n.language}
+              onChange={(e) => changeLanguage(e.target.value)}
+              className="w-full sm:w-64 px-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand appearance-none"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236B7280\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
+            >
+              {(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const).map((lng) => (
+                <option key={lng} value={lng}>
+                  {t(`language.${lng}`)}
+                </option>
+              ))}
+            </select>
+          </CollapsibleSection>
 
-        {/* ── Study Reminders ── */}
-        <ReminderSettings />
+          {/* ── Theme ── */}
+          <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-5 h-5 text-muted-foreground" />}>
+            <p className="text-sm text-muted-foreground mb-3">{t('theme.description')}</p>
+            <ThemeToggle theme={theme} onChange={setTheme} />
+          </CollapsibleSection>
+        </div>
 
-        {/* ── Data Export ── */}
-        <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-5 h-5 text-muted-foreground" />}>
-          <UserStatsExport />
-        </CollapsibleSection>
+        {/* ── Data ── */}
+        <div className="space-y-3">
+          <GroupLabel>{t('groups.data', 'Data')}</GroupLabel>
+          {/* ── Data Export ── */}
+          <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-5 h-5 text-muted-foreground" />}>
+            <UserStatsExport />
+          </CollapsibleSection>
+        </div>
 
-        {/* ── j) Account (bottom, clear separation) ── */}
+        {/* ── Account (bottom, clear separation, no label) ── */}
         <div className="border-t border-border pt-6">
           <button
             onClick={signOut}
@@ -566,6 +581,17 @@ export function SettingsPage() {
               {t('account.logout')}
             </span>
           </button>
+        </div>
+
+        {/* ── Legal (compact inline, very bottom) ── */}
+        <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
+          <a href="https://reeeeecallstudy.xyz/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+            {t('legal.privacy')}
+          </a>
+          <span>·</span>
+          <a href="https://reeeeecallstudy.xyz/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+            {t('legal.terms')}
+          </a>
         </div>
       </div>
     </div>
