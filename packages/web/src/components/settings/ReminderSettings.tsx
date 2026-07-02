@@ -100,7 +100,7 @@ export function ReminderSettings() {
         </h2>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
-        {t('reminders.description', 'Get reminded to study daily, just like Duolingo.')}
+        {t('reminders.description', 'Get a daily reminder to keep your study streak going.')}
       </p>
 
       {/* Toggle */}

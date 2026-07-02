@@ -111,7 +111,7 @@
   "settings": {},
   "reminders": {
     "title": "Study Reminders",
-    "description": "Get reminded to study daily, just like Duolingo.",
+    "description": "每天收到学习提醒，保持连续学习。",
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",
