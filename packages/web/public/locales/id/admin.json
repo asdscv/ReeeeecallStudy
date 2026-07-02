@@ -8,7 +8,8 @@
     "official": "Official",
     "contents": "Konten",
     "system": "Sistem",
-    "audit": "Audit Log"
+    "audit": "Audit Log",
+    "billing": "Penagihan"
   },
   "overview": {
     "title": "Ikhtisar",
@@ -233,6 +234,110 @@
     "activeWallets": "Pengguna dengan Kredit",
     "aiCardsToday": "Kartu AI Hari Ini",
     "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} berbayar"
+  },
+  "billing": {
+    "title": "Manajemen Penagihan",
+    "overview": {
+      "activeSubscriptions": "Langganan Aktif",
+      "canceling": "Akan Dibatalkan",
+      "pastDue": "Jatuh Tempo",
+      "mrr": "MRR",
+      "walletTotal": "Total Dompet",
+      "revenue30d": "Pendapatan (30 hr)",
+      "refunds30d": "Pengembalian (30 hr)"
+    },
+    "status": {
+      "active": "Aktif",
+      "canceled": "Akan Dibatalkan",
+      "grace": "Tenggang",
+      "past_due": "Jatuh Tempo",
+      "expired": "Kedaluwarsa",
+      "refunded": "Dikembalikan"
+    },
+    "payStatus": {
+      "paid": "Dibayar",
+      "pending": "Tertunda",
+      "failed": "Gagal",
+      "refunded": "Dikembalikan",
+      "canceled": "Dibatalkan"
+    },
+    "kind": {
+      "subscription": "Langganan",
+      "credit_pack": "Paket Kredit"
+    },
+    "reason": {
+      "purchase": "Pembelian",
+      "spend": "Pengeluaran",
+      "refund": "Pengembalian",
+      "admin_grant": "Pemberian Admin",
+      "admin_adjustment": "Penyesuaian Admin",
+      "spend_cards": "Pembuatan Kartu",
+      "spend_image": "Pembuatan Gambar"
+    },
+    "subscriptions": {
+      "title": "Langganan",
+      "email": "Akun",
+      "tier": "Tingkat",
+      "status": "Status",
+      "cardLimit": "Batas Kartu",
+      "periodEnd": "Akhir Periode",
+      "provider": "Penyedia",
+      "actions": "Tindakan",
+      "cancelImmediate": "Batalkan sekarang",
+      "cancelAtPeriodEnd": "Batalkan di akhir periode",
+      "canceling": "Akan Dibatalkan",
+      "allStatuses": "Semua Status",
+      "noProviderSub": "Langganan ini tidak memiliki ID penyedia dan tidak dapat dibatalkan di sini.",
+      "empty": "Tidak ada langganan ditemukan.",
+      "confirmImmediateTitle": "Batalkan langganan sekarang",
+      "confirmImmediate": "Kedaluwarsakan langganan {{email}} sekarang? Akses langsung dicabut.",
+      "confirmPeriodEndTitle": "Batalkan di akhir periode",
+      "confirmPeriodEnd": "Batalkan langganan {{email}} di akhir periode saat ini? Mereka tetap memiliki akses hingga saat itu.",
+      "refundNote": "Ini hanya menimpa akses di sisi aplikasi. Pengembalian uang asli untuk LemonSqueezy diterbitkan di dasbor LemonSqueezy, yang tersinkron kembali ke sini melalui webhook."
+    },
+    "payments": {
+      "title": "Pembayaran",
+      "email": "Akun",
+      "product": "Produk",
+      "kind": "Jenis",
+      "amount": "Jumlah",
+      "status": "Status",
+      "paidAt": "Dibayar Pada",
+      "empty": "Tidak ada pembayaran ditemukan."
+    },
+    "user": {
+      "title": "Cari Pengguna",
+      "searchPlaceholder": "Masukkan ID pengguna (UUID)",
+      "lookup": "Cari",
+      "clear": "Bersihkan",
+      "invalidId": "Masukkan ID pengguna yang valid (UUID).",
+      "invalidAmount": "Masukkan jumlah selain nol.",
+      "notFound": "Tidak ada data penagihan untuk pengguna ini.",
+      "subscription": "Langganan",
+      "noSubscription": "Tidak ada langganan",
+      "wallet": "Saldo Dompet",
+      "ledger": "Buku Kredit",
+      "payments": "Pembayaran",
+      "empty": "Tidak ada",
+      "grant": "Beri Langganan",
+      "grantProduct": "Pilih paket",
+      "grantPeriodEnd": "Akhir periode (opsional)",
+      "grantSubmit": "Beri",
+      "confirmGrantTitle": "Beri langganan",
+      "confirmGrant": "Beri \"{{product}}\" ke pengguna ini?",
+      "adjustWallet": "Sesuaikan Dompet",
+      "adjustAmount": "Jumlah (₩, + kredit / − tarik kembali)",
+      "adjustReason": "Alasan",
+      "adjustSubmit": "Terapkan",
+      "confirmAdjustTitle": "Sesuaikan dompet",
+      "confirmAdjust": "Sesuaikan dompet pengguna ini sebesar ₩{{amount}}?"
+    },
+    "pagination": {
+      "page": "Halaman {{page}}",
+      "prev": "Sebelumnya",
+      "next": "Berikutnya"
+    },
+    "actionError": "Tindakan gagal: {{error}}"
   },
   "official": {
     "title": "Official Accounts",

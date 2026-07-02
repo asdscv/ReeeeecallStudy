@@ -8,7 +8,8 @@
     "official": "Official",
     "contents": "เนื้อหา",
     "system": "ระบบ",
-    "audit": "Audit Log"
+    "audit": "Audit Log",
+    "billing": "การเรียกเก็บเงิน"
   },
   "overview": {
     "title": "ภาพรวม",
@@ -233,6 +234,110 @@
     "activeWallets": "ผู้ใช้ที่มีเครดิต",
     "aiCardsToday": "การ์ด AI วันนี้",
     "aiCardsTodayBreakdown": "ฟรี {{free}} · จ่าย {{paid}}"
+  },
+  "billing": {
+    "title": "การจัดการการเรียกเก็บเงิน",
+    "overview": {
+      "activeSubscriptions": "การสมัครที่ใช้งาน",
+      "canceling": "กำลังจะยกเลิก",
+      "pastDue": "ค้างชำระ",
+      "mrr": "MRR",
+      "walletTotal": "ยอดกระเป๋ารวม",
+      "revenue30d": "รายได้ (30 วัน)",
+      "refunds30d": "คืนเงิน (30 วัน)"
+    },
+    "status": {
+      "active": "ใช้งาน",
+      "canceled": "กำลังจะยกเลิก",
+      "grace": "ผ่อนผัน",
+      "past_due": "ค้างชำระ",
+      "expired": "หมดอายุ",
+      "refunded": "คืนเงินแล้ว"
+    },
+    "payStatus": {
+      "paid": "ชำระแล้ว",
+      "pending": "รอดำเนินการ",
+      "failed": "ล้มเหลว",
+      "refunded": "คืนเงินแล้ว",
+      "canceled": "ยกเลิกแล้ว"
+    },
+    "kind": {
+      "subscription": "การสมัครสมาชิก",
+      "credit_pack": "แพ็กเครดิต"
+    },
+    "reason": {
+      "purchase": "การซื้อ",
+      "spend": "การใช้จ่าย",
+      "refund": "คืนเงิน",
+      "admin_grant": "ผู้ดูแลมอบให้",
+      "admin_adjustment": "ผู้ดูแลปรับ",
+      "spend_cards": "การสร้างการ์ด",
+      "spend_image": "การสร้างรูปภาพ"
+    },
+    "subscriptions": {
+      "title": "การสมัครสมาชิก",
+      "email": "บัญชี",
+      "tier": "ระดับ",
+      "status": "สถานะ",
+      "cardLimit": "ขีดจำกัดการ์ด",
+      "periodEnd": "สิ้นสุดรอบ",
+      "provider": "ผู้ให้บริการ",
+      "actions": "การดำเนินการ",
+      "cancelImmediate": "ยกเลิกทันที",
+      "cancelAtPeriodEnd": "ยกเลิกเมื่อสิ้นรอบ",
+      "canceling": "กำลังจะยกเลิก",
+      "allStatuses": "ทุกสถานะ",
+      "noProviderSub": "การสมัครนี้ไม่มีรหัสผู้ให้บริการ จึงยกเลิกที่นี่ไม่ได้",
+      "empty": "ไม่พบการสมัครสมาชิก",
+      "confirmImmediateTitle": "ยกเลิกการสมัครทันที",
+      "confirmImmediate": "ให้การสมัครของ {{email}} หมดอายุทันทีหรือไม่ สิทธิ์เข้าถึงจะถูกถอนทันที",
+      "confirmPeriodEndTitle": "ยกเลิกเมื่อสิ้นรอบ",
+      "confirmPeriodEnd": "ยกเลิกการสมัครของ {{email}} เมื่อสิ้นสุดรอบปัจจุบันหรือไม่ พวกเขายังใช้งานได้จนถึงตอนนั้น",
+      "refundNote": "การดำเนินการนี้แทนที่เฉพาะสิทธิ์เข้าถึงในแอปเท่านั้น การคืนเงินจริงของ LemonSqueezy ทำในแดชบอร์ด LemonSqueezy ซึ่งจะซิงก์กลับมาที่นี่ผ่าน webhook"
+    },
+    "payments": {
+      "title": "การชำระเงิน",
+      "email": "บัญชี",
+      "product": "สินค้า",
+      "kind": "ประเภท",
+      "amount": "จำนวนเงิน",
+      "status": "สถานะ",
+      "paidAt": "ชำระเมื่อ",
+      "empty": "ไม่พบการชำระเงิน"
+    },
+    "user": {
+      "title": "ค้นหาผู้ใช้",
+      "searchPlaceholder": "กรอกรหัสผู้ใช้ (UUID)",
+      "lookup": "ค้นหา",
+      "clear": "ล้าง",
+      "invalidId": "กรอกรหัสผู้ใช้ (UUID) ที่ถูกต้อง",
+      "invalidAmount": "กรอกจำนวนเงินที่ไม่ใช่ศูนย์",
+      "notFound": "ไม่มีข้อมูลการเรียกเก็บเงินสำหรับผู้ใช้นี้",
+      "subscription": "การสมัครสมาชิก",
+      "noSubscription": "ไม่มีการสมัคร",
+      "wallet": "ยอดกระเป๋าเงิน",
+      "ledger": "บัญชีเครดิต",
+      "payments": "การชำระเงิน",
+      "empty": "ไม่มี",
+      "grant": "มอบการสมัครสมาชิก",
+      "grantProduct": "เลือกแพ็ก",
+      "grantPeriodEnd": "สิ้นสุดรอบ (ไม่บังคับ)",
+      "grantSubmit": "มอบให้",
+      "confirmGrantTitle": "มอบการสมัครสมาชิก",
+      "confirmGrant": "มอบ \"{{product}}\" ให้ผู้ใช้นี้หรือไม่",
+      "adjustWallet": "ปรับกระเป๋าเงิน",
+      "adjustAmount": "จำนวนเงิน (₩, + เพิ่ม / − เรียกคืน)",
+      "adjustReason": "เหตุผล",
+      "adjustSubmit": "ใช้",
+      "confirmAdjustTitle": "ปรับกระเป๋าเงิน",
+      "confirmAdjust": "ปรับกระเป๋าเงินของผู้ใช้นี้ ₩{{amount}} หรือไม่"
+    },
+    "pagination": {
+      "page": "หน้า {{page}}",
+      "prev": "ก่อนหน้า",
+      "next": "ถัดไป"
+    },
+    "actionError": "การดำเนินการล้มเหลว: {{error}}"
   },
   "official": {
     "title": "Official Accounts",

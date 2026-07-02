@@ -23,7 +23,87 @@ import type {
 // `_fetchedAt` map + `isFresh`). Freshness is not render state → lives outside the store.
 const adminCache = createStaleCache({ ttlMs: 5 * 60_000 })
 
-type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'pageViews' | 'system' | 'audit'
+type SectionKey = 'overview' | 'users' | 'study' | 'market' | 'contents' | 'pageViews' | 'system' | 'audit' | 'billing'
+
+// ── Billing (mig 122 admin_* RPCs) — snake_case JSON shapes ─────────────────
+export interface AdminBillingOverview {
+  active_subscriptions: number
+  canceling: number
+  past_due: number
+  mrr_micro_won: number
+  wallet_total_micro: number
+  paid_revenue_30d_micro: number
+  refunds_30d: number
+}
+
+export interface AdminSubscriptionRow {
+  id: string
+  user_id: string
+  email: string | null
+  tier: string
+  status: string
+  card_limit: number | null
+  provider: string | null
+  provider_subscription_id: string | null
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminPaymentRow {
+  merchant_uid: string
+  user_id: string
+  email: string | null
+  product_id: string | null
+  kind: string
+  amount_krw: number
+  status: string
+  provider: string | null
+  provider_payment_id: string | null
+  paid_at: string | null
+  created_at: string
+}
+
+export interface AdminUserBillingSubscription {
+  id: string
+  user_id: string
+  product_id: string | null
+  tier: string
+  status: string
+  card_limit: number | null
+  provider: string | null
+  provider_ref: string | null
+  provider_subscription_id: string | null
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminUserBillingLedgerEntry {
+  delta: number
+  reason: string
+  balance_after: number
+  created_at: string
+}
+
+export interface AdminUserBillingPayment {
+  merchant_uid: string
+  product_id: string | null
+  kind: string
+  amount_krw: number
+  status: string
+  paid_at: string | null
+  created_at: string
+}
+
+export interface AdminUserBilling {
+  subscription: AdminUserBillingSubscription | null
+  wallet_micro: number
+  ledger: AdminUserBillingLedgerEntry[]
+  payments: AdminUserBillingPayment[]
+}
 
 type UserStatus = 'active' | 'suspended' | 'banned'
 
@@ -84,6 +164,18 @@ interface AdminState {
   auditLoading: boolean
   auditError: string | null
 
+  // Billing
+  billingOverview: AdminBillingOverview | null
+  billingSubscriptions: AdminSubscriptionRow[]
+  billingPayments: AdminPaymentRow[]
+  billingUser: AdminUserBilling | null
+  billingOverviewLoading: boolean
+  billingSubsLoading: boolean
+  billingPaymentsLoading: boolean
+  billingUserLoading: boolean
+  billingError: string | null
+  billingUserError: string | null
+
   // Actions
   fetchOverview: () => Promise<void>
   fetchUsers: (page?: number, pageSize?: number, filters?: { search?: string; role?: string; official?: boolean }) => Promise<void>
@@ -97,6 +189,15 @@ interface AdminState {
   setUserStatus: (userId: string, status: UserStatus) => Promise<{ error: string | null }>
   fetchAuditLogs: (page?: number, pageSize?: number, filters?: AuditFilters) => Promise<void>
   logAction: (action: string, targetType: string, targetId?: string, details?: Record<string, unknown>) => Promise<void>
+  // Billing
+  fetchBillingOverview: () => Promise<void>
+  fetchBillingSubscriptions: (status?: string, page?: number, pageSize?: number) => Promise<void>
+  fetchBillingPayments: (page?: number, pageSize?: number) => Promise<void>
+  fetchUserBilling: (userId: string) => Promise<void>
+  clearUserBilling: () => void
+  cancelSubscription: (provider: string, providerSubscriptionId: string, immediate: boolean) => Promise<{ error: string | null }>
+  grantSubscription: (userId: string, productId: string, periodEnd: string | null) => Promise<{ error: string | null }>
+  adjustWallet: (userId: string, deltaMicro: number, reason: string) => Promise<{ error: string | null }>
   forceRefresh: (section: SectionKey) => void
 }
 
@@ -142,6 +243,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   auditTotal: 0,
   auditLoading: false,
   auditError: null,
+
+  billingOverview: null,
+  billingSubscriptions: [],
+  billingPayments: [],
+  billingUser: null,
+  billingOverviewLoading: false,
+  billingSubsLoading: false,
+  billingPaymentsLoading: false,
+  billingUserLoading: false,
+  billingError: null,
+  billingUserError: null,
 
 
   fetchOverview: async () => {
@@ -449,6 +561,126 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       })
     } catch {
       // Silent fail — audit logging should not block UI
+    }
+  },
+
+  fetchBillingOverview: async () => {
+    if (get().billingOverviewLoading) return
+    if (!adminCache.shouldFetch('billing') && get().billingOverview) return
+    set({ billingOverviewLoading: true, billingError: null })
+    try {
+      const { data, error } = await supabase.rpc('admin_billing_overview')
+      if (error) throw error
+      set({ billingOverview: data as AdminBillingOverview | null })
+      adminCache.markFetched('billing')
+    } catch (e) {
+      set({ billingError: extractErrorMessage(e) })
+    } finally {
+      set({ billingOverviewLoading: false })
+    }
+  },
+
+  fetchBillingSubscriptions: async (status?: string, page = 0, pageSize = 50) => {
+    if (get().billingSubsLoading) return
+    set({ billingSubsLoading: true, billingError: null })
+    try {
+      const { data, error } = await supabase.rpc('admin_list_subscriptions', {
+        p_status: status ?? null,
+        p_limit: pageSize,
+        p_offset: page * pageSize,
+      })
+      if (error) throw error
+      set({ billingSubscriptions: (data as AdminSubscriptionRow[] | null) ?? [] })
+    } catch (e) {
+      set({ billingError: extractErrorMessage(e) })
+    } finally {
+      set({ billingSubsLoading: false })
+    }
+  },
+
+  fetchBillingPayments: async (page = 0, pageSize = 50) => {
+    if (get().billingPaymentsLoading) return
+    set({ billingPaymentsLoading: true, billingError: null })
+    try {
+      const { data, error } = await supabase.rpc('admin_list_payments', {
+        p_limit: pageSize,
+        p_offset: page * pageSize,
+      })
+      if (error) throw error
+      set({ billingPayments: (data as AdminPaymentRow[] | null) ?? [] })
+    } catch (e) {
+      set({ billingError: extractErrorMessage(e) })
+    } finally {
+      set({ billingPaymentsLoading: false })
+    }
+  },
+
+  fetchUserBilling: async (userId: string) => {
+    if (get().billingUserLoading) return
+    set({ billingUserLoading: true, billingUserError: null })
+    try {
+      const { data, error } = await supabase.rpc('admin_get_user_billing', { p_user: userId })
+      if (error) throw error
+      set({ billingUser: (data as AdminUserBilling | null) ?? null })
+    } catch (e) {
+      set({ billingUserError: extractErrorMessage(e), billingUser: null })
+    } finally {
+      set({ billingUserLoading: false })
+    }
+  },
+
+  clearUserBilling: () => set({ billingUser: null, billingUserError: null }),
+
+  cancelSubscription: async (provider: string, providerSubscriptionId: string, immediate: boolean) => {
+    try {
+      const { data, error } = await supabase.rpc('admin_cancel_subscription', {
+        p_provider: provider,
+        p_provider_subscription_id: providerSubscriptionId,
+        p_immediate: immediate,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      const res = data as { ok?: boolean; reason?: string } | null
+      if (!res?.ok) return { error: res?.reason ?? 'not_found' }
+      // Entitlement moved → the overview counts are stale.
+      adminCache.invalidate('billing')
+      get().logAction('cancel_subscription', 'subscription', providerSubscriptionId, { provider, immediate })
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  grantSubscription: async (userId: string, productId: string, periodEnd: string | null) => {
+    try {
+      const { error } = await supabase.rpc('admin_grant_subscription', {
+        p_user: userId,
+        p_product_id: productId,
+        p_period_end: periodEnd,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      adminCache.invalidate('billing')
+      get().logAction('grant_subscription', 'subscription', userId, { product_id: productId, period_end: periodEnd })
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  adjustWallet: async (userId: string, deltaMicro: number, reason: string) => {
+    try {
+      const { data, error } = await supabase.rpc('admin_adjust_wallet', {
+        p_user: userId,
+        p_delta_micro: deltaMicro,
+        p_reason: reason,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      const res = data as { ok?: boolean } | null
+      if (!res?.ok) return { error: 'adjust_failed' }
+      adminCache.invalidate('billing')
+      get().logAction('adjust_wallet', 'user', userId, { delta_micro: deltaMicro, reason })
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
     }
   },
 
