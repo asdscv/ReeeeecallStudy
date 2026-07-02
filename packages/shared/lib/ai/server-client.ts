@@ -32,6 +32,11 @@ export type ServerGenerateRequest =
       fields: GeneratedTemplateField[]
       cardCount: number
     }
+  | {
+      kind: 'image_deck' // image → a whole new deck (metadata + template + cards) in one vision call
+      image: string // base64 data URL of the uploaded image
+      uiLang: string
+    }
 
 export interface ServerGenerateResult {
   content: Record<string, unknown>
