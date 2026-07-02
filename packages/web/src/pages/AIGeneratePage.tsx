@@ -299,7 +299,7 @@ export function AIGeneratePage() {
       {/* ── Bottom info (only on config step) ── */}
       {store.currentStep === 'config' && (
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <InfoCard icon="🔒" title={t('page.securityTitle')} desc={t('page.securityDesc')} />
+          <InfoCard icon="✨" title={t('page.securityTitle')} desc={t('page.securityDesc')} />
           <InfoCard icon="🌍" title={t('page.languageTitle')} desc={t('page.languageDesc')} />
           <InfoCard icon="⚡" title={t('page.speedTitle')} desc={t('page.speedDesc')} />
         </div>
