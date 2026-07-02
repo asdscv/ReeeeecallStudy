@@ -456,9 +456,10 @@ export function AIGenerateScreen() {
                 <TouchableOpacity
                   testID="ai-image-pick"
                   onPress={pickImage}
-                  style={[styles.dropdown, { borderColor: theme.colors.primary, backgroundColor: theme.colors.surfaceElevated, justifyContent: 'center' }]}
+                  style={[styles.dropZone, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
                 >
-                  <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
+                  <Text style={{ fontSize: 30, marginBottom: 6 }}>🖼️</Text>
+                  <Text style={[theme.typography.body, { color: theme.colors.primary, fontWeight: '600' }]}>
                     {imageDataUrl ? t('content.imageChange') : t('content.imageUpload')}
                   </Text>
                 </TouchableOpacity>
@@ -825,7 +826,8 @@ const styles = StyleSheet.create({
   labeledSection: { borderRadius: 12, borderWidth: 1, padding: 16, gap: 14 },
   // Mode
   modeRow: { flexDirection: 'row', gap: 10 },
-  modeCard: { flex: 1, borderRadius: 10, borderWidth: 1.5, paddingVertical: 14, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center' },
+  modeCard: { flex: 1, borderRadius: 12, borderWidth: 1.5, paddingVertical: 14, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center' },
+  dropZone: { borderRadius: 14, borderWidth: 2, borderStyle: 'dashed', paddingVertical: 28, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
   // AI Provider
   providerCard: { borderRadius: 12, padding: 16, alignItems: 'center', gap: 10 },
   providerOption: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1 } as const,
