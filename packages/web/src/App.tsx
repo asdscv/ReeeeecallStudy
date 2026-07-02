@@ -27,8 +27,6 @@ import { AcceptInvitePage } from './pages/AcceptInvitePage'
 import { MySharesPage } from './pages/MySharesPage'
 import { PublisherDashboardPage } from './pages/PublisherDashboardPage'
 import { GuidePage } from './pages/GuidePage'
-import { ApiDocsPage } from './pages/ApiDocsPage'
-import { PublicApiDocsPage } from './pages/PublicApiDocsPage'
 import { ContentListPage } from './pages/ContentListPage'
 import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
@@ -205,7 +203,6 @@ function App() {
             <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Public routes (no auth required) */}
-            <Route path="/docs/api" element={<PublicApiDocsPage />} />
             <Route path="/insight" element={<ContentListPage />} />
             <Route path="/insight/:slug" element={<ContentDetailPage />} />
             <Route path="/d/:listingId" element={<PublicListingPage />} />
@@ -264,7 +261,6 @@ function App() {
               <Route path="/leaderboard" element={<Navigate to="/achievements" replace />} />
               <Route path="/analytics" element={<Navigate to="/history" replace />} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/api-docs" element={<ApiDocsPage />} />
             </Route>
 
             {/* Admin routes */}

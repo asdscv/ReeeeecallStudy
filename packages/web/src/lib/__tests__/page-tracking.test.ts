@@ -80,10 +80,6 @@ describe('shouldTrackPage', () => {
     expect(shouldTrackPage('/guide')).toBe(true)
   })
 
-  it('tracks docs/api page', () => {
-    expect(shouldTrackPage('/docs/api')).toBe(true)
-  })
-
   it('handles trailing slash in excluded paths', () => {
     expect(shouldTrackPage('/admin/')).toBe(false)
     expect(shouldTrackPage('/auth/login/')).toBe(false)

@@ -56,16 +56,6 @@ describe('getSection', () => {
 })
 
 describe('GuideItem link support', () => {
-  it('api section docsPage item should have a link field', () => {
-    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
-    expect(apiSection).toBeDefined()
-    const docsItem = apiSection!.items.find((i) => i.title.includes('docsPage'))
-    expect(docsItem).toBeDefined()
-    expect(docsItem!.link).toBeDefined()
-    expect(docsItem!.link!.label).toBeTruthy()
-    expect(docsItem!.link!.href).toBe('https://reeeeecallstudy.xyz/docs/api')
-  })
-
   it('link field is optional — most items should not have it', () => {
     const gettingStarted = GUIDE_SECTIONS.find((s) => s.id === 'getting-started')
     for (const item of gettingStarted!.items) {
