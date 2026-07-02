@@ -24,5 +24,13 @@
     "title": "Pembayaran segera hadir",
     "body": "Kami sedang menyiapkan pembayaran. Fitur ini akan segera tersedia."
   },
-  "retry": "Coba lagi"
+  "retry": "Coba lagi",
+  "plans": {
+    "title": "Pilih paket",
+    "cardLimit": "Hingga {{limit}} kartu",
+    "unlimited": "Kartu tanpa batas",
+    "perMonth": "/bln",
+    "select": "Pilih",
+    "current": "Paket saat ini"
+  }
 }

@@ -25,5 +25,6 @@
     "admin_grant": "Pemberian kredit",
     "spend_cards": "Kartu AI",
     "spend_image": "Gambar AI"
-  }
+  },
+  "cardPlanHint": "Paket batas kartu dikelola di Penyimpanan kartu."
 }

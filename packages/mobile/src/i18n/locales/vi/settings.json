@@ -166,7 +166,9 @@
     "planNote": "Gói miễn phí bao gồm tối đa {{limit}} thẻ sở hữu. Đăng ký để tăng giới hạn.",
     "upgrade": "Nâng cấp (sắp có)",
     "upgradeSoon": "Đăng ký sắp ra mắt.",
-    "cancelPending": "Sắp hủy đăng ký — dùng đến {{date}}"
+    "cancelPending": "Sắp hủy đăng ký — dùng đến {{date}}",
+    "countUnlimited": "{{owned}} / Không giới hạn",
+    "planNoteUnlimited": "Giới hạn thẻ sở hữu của bạn là không giới hạn."
   },
   "groups": {
     "account": "Tài khoản",
@@ -175,5 +177,16 @@
     "preferences": "Tùy chọn",
     "data": "Dữ liệu"
   },
-  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn."
+  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn.",
+  "plans": {
+    "title": "Gói đăng ký",
+    "unlimited": "Không giới hạn",
+    "cardLimit": "{{limit}} thẻ",
+    "perMonth": "/tháng",
+    "select": "Chọn",
+    "current": "Gói hiện tại",
+    "comingSoon": "Sắp ra mắt",
+    "empty": "Chưa có gói nào.",
+    "loadError": "Không tải được gói."
+  }
 }

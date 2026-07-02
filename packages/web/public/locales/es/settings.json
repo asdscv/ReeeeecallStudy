@@ -143,9 +143,12 @@
     "reached": "Has alcanzado tu límite de tarjetas. Suscríbete para añadir más.",
     "subscribe": "Suscribirse (próximamente)",
     "plan": "Plan gratis",
-    "planNote": "El plan gratis incluye hasta {{limit}} tarjetas propias. Suscríbete para ampliar el límite.",
+    "planNote": "Tu plan incluye hasta {{limit}} tarjetas propias. Elige un plan para aumentar el límite.",
     "upgrade": "Mejorar (próximamente)",
-    "upgradeSoon": "La suscripción estará disponible pronto."
+    "upgradeSoon": "La suscripción estará disponible pronto.",
+    "unlimited": "Ilimitado",
+    "countUnlimited": "{{owned}} / Ilimitado",
+    "planNoteUnlimited": "Tu plan incluye tarjetas ilimitadas."
   },
   "groups": {
     "account": "Cuenta",

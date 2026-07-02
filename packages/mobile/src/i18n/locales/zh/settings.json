@@ -166,7 +166,9 @@
     "planNote": "免费方案最多可拥有 {{limit}} 张卡片。订阅可提高上限。",
     "upgrade": "升级（即将推出）",
     "upgradeSoon": "订阅即将推出。",
-    "cancelPending": "订阅将取消 — 可使用至 {{date}}"
+    "cancelPending": "订阅将取消 — 可使用至 {{date}}",
+    "countUnlimited": "{{owned}} / 无限制",
+    "planNoteUnlimited": "你的持有卡片上限为无限制。"
   },
   "groups": {
     "account": "账户",
@@ -175,5 +177,16 @@
     "preferences": "偏好设置",
     "data": "数据"
   },
-  "subtitle": "管理你的账户、额度和学习偏好。"
+  "subtitle": "管理你的账户、额度和学习偏好。",
+  "plans": {
+    "title": "订阅方案",
+    "unlimited": "无限制",
+    "cardLimit": "{{limit}} 张",
+    "perMonth": "/月",
+    "select": "选择",
+    "current": "当前方案",
+    "comingSoon": "即将推出",
+    "empty": "暂无可用方案。",
+    "loadError": "无法加载方案。"
+  }
 }

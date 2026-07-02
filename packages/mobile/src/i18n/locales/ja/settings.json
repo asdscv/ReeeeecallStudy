@@ -166,7 +166,9 @@
     "planNote": "無料プランは所有カード最大{{limit}}枚まで。上限を増やすには購読してください。",
     "upgrade": "アップグレード（近日公開）",
     "upgradeSoon": "購読は近日公開予定です。",
-    "cancelPending": "解約予定 — {{date}}まで利用できます"
+    "cancelPending": "解約予定 — {{date}}まで利用できます",
+    "countUnlimited": "{{owned}} / 無制限",
+    "planNoteUnlimited": "所有カードの上限は無制限です。"
   },
   "groups": {
     "account": "アカウント",
@@ -175,5 +177,16 @@
     "preferences": "環境設定",
     "data": "データ"
   },
-  "subtitle": "アカウント・クレジット・学習設定を管理します。"
+  "subtitle": "アカウント・クレジット・学習設定を管理します。",
+  "plans": {
+    "title": "サブスクリプションプラン",
+    "unlimited": "無制限",
+    "cardLimit": "{{limit}}枚",
+    "perMonth": "/月",
+    "select": "選択",
+    "current": "現在のプラン",
+    "comingSoon": "準備中",
+    "empty": "利用できるプランがありません。",
+    "loadError": "プランを読み込めませんでした。"
+  }
 }

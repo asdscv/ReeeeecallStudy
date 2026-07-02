@@ -24,5 +24,13 @@
     "title": "Los pagos llegarán pronto",
     "body": "Estamos preparando los pagos. Estará disponible en breve."
   },
-  "retry": "Reintentar"
+  "retry": "Reintentar",
+  "plans": {
+    "title": "Elige un plan",
+    "cardLimit": "Hasta {{limit}} tarjetas",
+    "unlimited": "Tarjetas ilimitadas",
+    "perMonth": "/mes",
+    "select": "Elegir",
+    "current": "Plan actual"
+  }
 }

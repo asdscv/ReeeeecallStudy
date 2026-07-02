@@ -25,5 +25,6 @@
     "admin_grant": "Cấp tín dụng",
     "spend_cards": "Thẻ AI",
     "spend_image": "Ảnh AI"
-  }
+  },
+  "cardPlanHint": "Các gói giới hạn thẻ được quản lý trong Lưu trữ thẻ."
 }

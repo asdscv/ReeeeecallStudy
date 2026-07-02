@@ -24,5 +24,13 @@
     "title": "결제 기능 준비 중",
     "body": "결제 기능을 준비하고 있어요. 곧 만나보실 수 있어요."
   },
-  "retry": "다시 시도"
+  "retry": "다시 시도",
+  "plans": {
+    "title": "플랜 선택",
+    "cardLimit": "카드 최대 {{limit}}장",
+    "unlimited": "무제한 카드",
+    "perMonth": "/월",
+    "select": "선택",
+    "current": "현재 플랜"
+  }
 }

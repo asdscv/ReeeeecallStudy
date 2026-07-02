@@ -143,9 +143,12 @@
     "reached": "Bạn đã đạt giới hạn thẻ. Đăng ký để thêm.",
     "subscribe": "Đăng ký (sắp ra mắt)",
     "plan": "Gói miễn phí",
-    "planNote": "Gói miễn phí bao gồm tối đa {{limit}} thẻ sở hữu. Đăng ký để tăng giới hạn.",
+    "planNote": "Gói của bạn cho phép tối đa {{limit}} thẻ sở hữu. Chọn một gói để nâng giới hạn.",
     "upgrade": "Nâng cấp (sắp có)",
-    "upgradeSoon": "Đăng ký sắp ra mắt."
+    "upgradeSoon": "Đăng ký sắp ra mắt.",
+    "unlimited": "Không giới hạn",
+    "countUnlimited": "{{owned}} / Không giới hạn",
+    "planNoteUnlimited": "Gói của bạn cho phép lưu thẻ không giới hạn."
   },
   "groups": {
     "account": "Tài khoản",

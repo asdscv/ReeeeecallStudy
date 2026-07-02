@@ -25,5 +25,6 @@
     "admin_grant": "Crédito otorgado",
     "spend_cards": "Tarjetas de IA",
     "spend_image": "Imagen de IA"
-  }
+  },
+  "cardPlanHint": "Los planes de límite de tarjetas se gestionan en Almacenamiento de tarjetas."
 }

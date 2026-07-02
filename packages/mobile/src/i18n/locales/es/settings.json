@@ -166,7 +166,9 @@
     "planNote": "El plan gratis incluye hasta {{limit}} tarjetas propias. Suscríbete para ampliar el límite.",
     "upgrade": "Mejorar (próximamente)",
     "upgradeSoon": "La suscripción estará disponible pronto.",
-    "cancelPending": "Suscripción por cancelar — acceso hasta {{date}}"
+    "cancelPending": "Suscripción por cancelar — acceso hasta {{date}}",
+    "countUnlimited": "{{owned}} / Ilimitado",
+    "planNoteUnlimited": "Tu límite de tarjetas es ilimitado."
   },
   "groups": {
     "account": "Cuenta",
@@ -175,5 +177,16 @@
     "preferences": "Preferencias",
     "data": "Datos"
   },
-  "subtitle": "Gestiona tu cuenta, créditos y preferencias de estudio."
+  "subtitle": "Gestiona tu cuenta, créditos y preferencias de estudio.",
+  "plans": {
+    "title": "Planes de suscripción",
+    "unlimited": "Ilimitado",
+    "cardLimit": "{{limit}} tarjetas",
+    "perMonth": "/mes",
+    "select": "Seleccionar",
+    "current": "Plan actual",
+    "comingSoon": "Próximamente",
+    "empty": "No hay planes disponibles.",
+    "loadError": "No se pudieron cargar los planes."
+  }
 }
