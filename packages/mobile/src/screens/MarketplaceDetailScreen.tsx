@@ -31,6 +31,35 @@ function renderStars(rating: number, max = 5): string {
   return Array.from({ length: max }, (_, i) => (i < filled ? '\u2605' : '\u2606')).join('')
 }
 
+// Map a listing's share_mode \u2192 the i18n key for the acquire button label.
+// share_mode is a fixed publisher-set property (subscribe | copy | snapshot).
+function acquireLabelKey(mode: string | null | undefined): string {
+  switch (mode) {
+    case 'subscribe':
+      return 'detail.acquireByMode.subscribe'
+    case 'copy':
+      return 'detail.acquireByMode.copy'
+    case 'snapshot':
+      return 'detail.acquireByMode.snapshot'
+    default:
+      return 'detail.getDeck'
+  }
+}
+
+// Map a listing's share_mode \u2192 the i18n key for the one-line mode description.
+function modeDescKey(mode: string | null | undefined): string | null {
+  switch (mode) {
+    case 'subscribe':
+      return 'detail.modeDesc.subscribe'
+    case 'copy':
+      return 'detail.modeDesc.copy'
+    case 'snapshot':
+      return 'detail.modeDesc.snapshot'
+    default:
+      return null
+  }
+}
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString(undefined, {
     year: 'numeric',
@@ -496,12 +525,17 @@ export function MarketplaceDetailScreen() {
                         ? t('detail.alreadyAcquired', { defaultValue: 'Already in your collection' })
                         : acquiring
                           ? t('detail.downloading')
-                          : t('detail.getDeck')
+                          : t(acquireLabelKey(listing.share_mode))
                     }
                     onPress={handleAcquire}
                     loading={acquiring}
                     disabled={hasAcquired || acquiring || wouldExceed}
                   />
+                  {!isOwner && !hasAcquired && modeDescKey(listing.share_mode) && (
+                    <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginTop: 8 }}>
+                      {t(modeDescKey(listing.share_mode)!)}
+                    </Text>
+                  )}
                   {!isOwner && !hasAcquired && (
                     !countsTowardLimit ? (
                       <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginTop: 8 }}>

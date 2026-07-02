@@ -98,7 +98,17 @@
     "downloading": "Mengunduh...",
     "limitUsage": "Menambah {{count}} kartu ke batas Anda · sisa {{available}}",
     "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Hapus kartu atau berlangganan.",
-    "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu."
+    "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu.",
+    "acquireByMode": {
+      "subscribe": "Berlangganan",
+      "copy": "Salin ke dek saya",
+      "snapshot": "Ambil salinan snapshot"
+    },
+    "modeDesc": {
+      "subscribe": "Pelajari dek penerbit melalui langganan (dengan progres Anda sendiri)",
+      "copy": "Membuat salinan yang bisa Anda edit",
+      "snapshot": "Mengambil salinan snapshot hanya-baca"
+    }
   },
   "publish": {
     "title": "Publish Deck",
