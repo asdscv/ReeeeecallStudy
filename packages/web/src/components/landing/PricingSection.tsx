@@ -63,7 +63,7 @@ export function PricingSection() {
   const limitLine = (cardLimit: number) =>
     isUnlimited(cardLimit)
       ? t('pricing.unlimitedCards')
-      : t('pricing.upToCards', { count: fmt(cardLimit) })
+      : t('pricing.upToCards', { count: cardLimit })
 
   // Free tier is static; paid tiers are fetched (data-driven — a new catalog row
   // appears here automatically). Plan NAME + blurb derive from the card_limit so
