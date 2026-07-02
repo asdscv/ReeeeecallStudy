@@ -12,7 +12,8 @@
     "guide": "指南",
     "aiGenerate": "AI Generate",
     "achievements": "成就",
-    "publisherStats": "发布者统计"
+    "publisherStats": "发布者统计",
+    "wallet": "钱包"
   },
   "actions": {
     "save": "保存",

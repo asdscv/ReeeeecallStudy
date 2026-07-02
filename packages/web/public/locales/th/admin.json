@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "ระบบ",
-    "totalApiKeys": "API Key ทั้งหมด",
-    "activeApiKeys": "API Key ที่ใช้งาน",
-    "expiredApiKeys": "API Key ที่หมดอายุ",
-    "recentlyUsedKeys": "ใช้ล่าสุด (7 วัน)",
     "totalContents": "เนื้อหาทั้งหมด",
     "publishedContents": "เนื้อหาที่เผยแพร่",
     "draftContents": "เนื้อหาฉบับร่าง",
     "totalStudyLogs": "บันทึกการเรียนทั้งหมด",
     "healthStatus": "สถานะระบบ",
-    "apiKeysSection": "จัดการ API Key",
     "contentPipeline": "ไปป์ไลน์เนื้อหา",
     "studyActivity": "ข้อมูลกิจกรรมการเรียน",
     "studyLogsNote": "บันทึกการเรียนติดตามเซสชันการเรียนการ์ดและประวัติการทบทวนของผู้ใช้",
     "health": {
-      "apiKeys": "API Key",
       "content": "ไปป์ไลน์เนื้อหา",
       "study": "กิจกรรมการเรียน"
-    }
+    },
+    "aiCreditWallet": "กระเป๋าเครดิต AI",
+    "totalWalletBalance": "ยอดรวม",
+    "totalAiSpent": "ใช้ไปทั้งหมด",
+    "activeWallets": "ผู้ใช้ที่มีเครดิต",
+    "aiCardsToday": "การ์ด AI วันนี้",
+    "aiCardsTodayBreakdown": "ฟรี {{free}} · จ่าย {{paid}}"
   },
   "official": {
     "title": "Official Accounts",

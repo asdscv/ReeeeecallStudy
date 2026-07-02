@@ -12,7 +12,8 @@
     "guide": "Panduan",
     "aiGenerate": "AI Generate",
     "achievements": "Pencapaian",
-    "publisherStats": "Statistik Penerbit"
+    "publisherStats": "Statistik Penerbit",
+    "wallet": "Dompet"
   },
   "actions": {
     "save": "Simpan",

@@ -33,7 +33,7 @@ i18n.use(initReactI18next).init({
   lng: DEFAULT_LOCALE,
   fallbackLng: DEFAULT_LOCALE,
   supportedLngs: [...SUPPORTED_LOCALES],
-  ns: ['common', 'auth', 'errors', 'dashboard', 'study', 'decks', 'cards', 'templates', 'settings', 'marketplace', 'sharing', 'import-export', 'history', 'guide', 'landing'],
+  ns: ['common', 'auth', 'errors', 'dashboard', 'study', 'decks', 'cards', 'templates', 'settings', 'marketplace', 'sharing', 'import-export', 'history', 'guide', 'landing', 'wallet'],
   defaultNS: 'common',
   resources: { [DEFAULT_LOCALE]: {} },
   interpolation: { escapeValue: false },

@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "시스템",
-    "totalApiKeys": "전체 API 키",
-    "activeApiKeys": "활성 API 키",
-    "expiredApiKeys": "만료된 API 키",
-    "recentlyUsedKeys": "최근 사용 (7일)",
     "totalContents": "전체 콘텐츠",
     "publishedContents": "발행된 콘텐츠",
     "draftContents": "초안 콘텐츠",
     "totalStudyLogs": "전체 학습 로그",
     "healthStatus": "시스템 상태",
-    "apiKeysSection": "API 키 관리",
     "contentPipeline": "콘텐츠 파이프라인",
     "studyActivity": "학습 활동 데이터",
     "studyLogsNote": "학습 로그는 사용자의 카드 학습 세션 기록입니다",
     "health": {
-      "apiKeys": "API 키",
       "content": "콘텐츠",
       "study": "학습 활동"
-    }
+    },
+    "aiCreditWallet": "AI 크레딧 지갑",
+    "totalWalletBalance": "총 잔액",
+    "totalAiSpent": "총 사용액",
+    "activeWallets": "크레딧 보유 사용자",
+    "aiCardsToday": "오늘 AI 카드",
+    "aiCardsTodayBreakdown": "무료 {{free}} · 유료 {{paid}}"
   },
   "official": {
     "title": "공식 계정",

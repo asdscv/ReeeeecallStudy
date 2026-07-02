@@ -14,6 +14,7 @@ import { TemplateEditScreen } from '../screens/TemplateEditScreen'
 import { MySharesScreen } from '../screens/MySharesScreen'
 import { PublisherStatsScreen } from '../screens/PublisherStatsScreen'
 import { AchievementsScreen } from '../screens/AchievementsScreen'
+import { WalletScreen } from '../screens/WalletScreen'
 import type { SettingsStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>()
@@ -31,6 +32,7 @@ export function SettingsStack() {
       <Stack.Screen name="MyShares" component={MySharesScreen} />
       <Stack.Screen name="PublisherStats" component={PublisherStatsScreen} />
       <Stack.Screen name="Achievements" component={AchievementsScreen} />
+      <Stack.Screen name="Wallet" component={WalletScreen} />
     </Stack.Navigator>
   )
 }

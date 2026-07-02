@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "Hệ thống",
-    "totalApiKeys": "Tổng khóa API",
-    "activeApiKeys": "Khóa API hoạt động",
-    "expiredApiKeys": "Khóa API hết hạn",
-    "recentlyUsedKeys": "Sử dụng gần đây (7 ngày)",
     "totalContents": "Tổng nội dung",
     "publishedContents": "Nội dung đã đăng",
     "draftContents": "Nội dung nháp",
     "totalStudyLogs": "Tổng nhật ký học tập",
     "healthStatus": "Tình trạng hệ thống",
-    "apiKeysSection": "Quản lý khóa API",
     "contentPipeline": "Quy trình nội dung",
     "studyActivity": "Dữ liệu hoạt động học tập",
     "studyLogsNote": "Nhật ký học tập theo dõi phiên học thẻ và lịch sử ôn tập của người dùng",
     "health": {
-      "apiKeys": "Khóa API",
       "content": "Quy trình nội dung",
       "study": "Hoạt động học tập"
-    }
+    },
+    "aiCreditWallet": "Ví tín dụng AI",
+    "totalWalletBalance": "Tổng số dư",
+    "totalAiSpent": "Tổng đã dùng",
+    "activeWallets": "Người dùng có tín dụng",
+    "aiCardsToday": "Thẻ AI hôm nay",
+    "aiCardsTodayBreakdown": "{{free}} miễn phí · {{paid}} trả phí"
   },
   "official": {
     "title": "Official Accounts",

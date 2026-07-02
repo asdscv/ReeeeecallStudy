@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "システム",
-    "totalApiKeys": "APIキー総数",
-    "activeApiKeys": "有効なAPIキー",
-    "expiredApiKeys": "期限切れAPIキー",
-    "recentlyUsedKeys": "最近使用（7日）",
     "totalContents": "コンテンツ総数",
     "publishedContents": "公開済みコンテンツ",
     "draftContents": "下書きコンテンツ",
     "totalStudyLogs": "学習ログ総数",
     "healthStatus": "システムヘルス",
-    "apiKeysSection": "APIキー管理",
     "contentPipeline": "コンテンツパイプライン",
     "studyActivity": "学習アクティビティデータ",
     "studyLogsNote": "学習ログはユーザーのカード学習セッションと復習履歴を記録します",
     "health": {
-      "apiKeys": "APIキー",
       "content": "コンテンツパイプライン",
       "study": "学習アクティビティ"
-    }
+    },
+    "aiCreditWallet": "AIクレジット",
+    "totalWalletBalance": "合計残高",
+    "totalAiSpent": "合計利用額",
+    "activeWallets": "クレジット保有ユーザー",
+    "aiCardsToday": "本日のAIカード",
+    "aiCardsTodayBreakdown": "無料 {{free}} · 有料 {{paid}}"
   },
   "official": {
     "title": "Official Accounts",
