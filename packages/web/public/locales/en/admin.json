@@ -8,6 +8,7 @@
     "official": "Official",
     "contents": "Contents",
     "system": "System",
+    "billing": "Billing",
     "audit": "Audit Log"
   },
   "overview": {
@@ -80,7 +81,8 @@
     "suspendTitle": "Suspend user",
     "noName": "(no name)",
     "prevPage": "Previous",
-    "nextPage": "Next"
+    "nextPage": "Next",
+    "title": "Users"
   },
   "study": {
     "title": "Study Activity",
@@ -232,6 +234,110 @@
     "activeWallets": "Users with Credits",
     "aiCardsToday": "AI Cards Today",
     "aiCardsTodayBreakdown": "{{free}} free · {{paid}} paid"
+  },
+  "billing": {
+    "title": "Billing",
+    "overview": {
+      "activeSubscriptions": "Active Subscriptions",
+      "canceling": "Canceling",
+      "pastDue": "Past Due",
+      "mrr": "MRR",
+      "walletTotal": "Wallet Total",
+      "revenue30d": "Revenue (30d)",
+      "refunds30d": "Refunds (30d)"
+    },
+    "status": {
+      "active": "Active",
+      "canceled": "Canceled",
+      "grace": "Grace",
+      "past_due": "Past Due",
+      "expired": "Expired",
+      "refunded": "Refunded"
+    },
+    "payStatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "canceled": "Canceled"
+    },
+    "kind": {
+      "subscription": "Subscription",
+      "credit_pack": "Credit Pack"
+    },
+    "reason": {
+      "purchase": "Purchase",
+      "spend": "Spend",
+      "refund": "Refund",
+      "admin_grant": "Admin Grant",
+      "admin_adjustment": "Admin Adjustment",
+      "spend_cards": "Card Generation",
+      "spend_image": "Image Generation"
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "email": "Account",
+      "tier": "Tier",
+      "status": "Status",
+      "cardLimit": "Card Limit",
+      "periodEnd": "Period End",
+      "provider": "Provider",
+      "actions": "Actions",
+      "cancelImmediate": "Cancel now",
+      "cancelAtPeriodEnd": "Cancel at period end",
+      "canceling": "Canceling",
+      "allStatuses": "All Statuses",
+      "noProviderSub": "This subscription has no provider ID and cannot be canceled here.",
+      "empty": "No subscriptions found.",
+      "confirmImmediateTitle": "Cancel subscription now",
+      "confirmImmediate": "Immediately expire {{email}}'s subscription? Access is dropped right away.",
+      "confirmPeriodEndTitle": "Cancel at period end",
+      "confirmPeriodEnd": "Cancel {{email}}'s subscription at the end of the current period? They keep access until then.",
+      "refundNote": "This only overrides app-side access. Real money refunds for LemonSqueezy are issued in the LemonSqueezy dashboard, which syncs back here via webhook."
+    },
+    "payments": {
+      "title": "Payments",
+      "email": "Account",
+      "product": "Product",
+      "kind": "Kind",
+      "amount": "Amount",
+      "status": "Status",
+      "paidAt": "Paid At",
+      "empty": "No payments found."
+    },
+    "user": {
+      "title": "User Lookup",
+      "searchPlaceholder": "Enter user ID (UUID)",
+      "lookup": "Look up",
+      "clear": "Clear",
+      "invalidId": "Enter a valid user ID (UUID).",
+      "invalidAmount": "Enter a non-zero amount.",
+      "notFound": "No billing data for this user.",
+      "subscription": "Subscription",
+      "noSubscription": "No subscription",
+      "wallet": "Wallet Balance",
+      "ledger": "Credit Ledger",
+      "payments": "Payments",
+      "empty": "None",
+      "grant": "Grant Subscription",
+      "grantProduct": "Select a plan",
+      "grantPeriodEnd": "Period end (optional)",
+      "grantSubmit": "Grant",
+      "confirmGrantTitle": "Grant subscription",
+      "confirmGrant": "Grant \"{{product}}\" to this user?",
+      "adjustWallet": "Adjust Wallet",
+      "adjustAmount": "Amount (₩, + credit / − claw-back)",
+      "adjustReason": "Reason",
+      "adjustSubmit": "Apply",
+      "confirmAdjustTitle": "Adjust wallet",
+      "confirmAdjust": "Adjust this user's wallet by ₩{{amount}}?"
+    },
+    "pagination": {
+      "page": "Page {{page}}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "actionError": "Action failed: {{error}}"
   },
   "official": {
     "title": "Official Accounts",
