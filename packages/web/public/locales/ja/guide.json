@@ -241,52 +241,6 @@
         }
       }
     },
-    "api": {
-      "title": "APIガイド（AIでカードを自動生成）",
-      "items": {
-        "whatSimple": {
-          "title": "APIとは？（簡単な説明）",
-          "body": "APIとは「プログラム同士が通信する方法」です。\n\nアプリでボタンをクリックしてカードを作成するのと同じように、APIではテキストコマンドで同じことができます。\n\nレストランに例えると：\n・メニュー = APIドキュメント（どんなリクエストができるかの説明）\n・注文 = APIリクエスト（「デッキを見せて」「100枚のカードを追加して」）\n・料理を受け取る = APIレスポンス（リクエストしたデータや結果）\n\n最大の利点は？ChatGPT、Gemini、ClaudeなどのAIツールにこれらのコマンドを送らせることができます！\nAIがカードの内容を作成し、APIで自動登録します。"
-        },
-        "whyApi": {
-          "title": "なぜAPIを使うのか？",
-          "body": "1枚ずつカードを作る場合とAPIを使う場合を比較：\n\n手動：1枚30秒 x 100枚 = 約50分\nAPI + AI：100枚を一括 = 約3〜5分\n\nAPIでできること：\n・AIに「TOEIC単語カードを100枚作って」と伝えるだけで即座に生成\n・「JLPT N3の漢字カードを50枚作って」— 1回のリクエストで完了\n・ExcelやテキストファイルのデータをCSVで一括アップロード\n・プログラミング不要 — AIとチャットするだけ！\n\nこのガイドに従えば、誰でも5分で100枚のカードを作成できます。"
-        },
-        "getKey": {
-          "title": "APIキーの取得方法",
-          "body": "APIを使うには、まずAPIキーが必要です。APIキーはアカウントからAPIにアクセスするためのパスワードのようなものです。\n\n取得方法：\n1. ReeeeecallStudyアプリにログイン\n2. 右上のメニューから「設定」へ\n3. 「APIキー」セクションまでスクロール\n4. 「新しいキーを生成」をクリック\n5. キーの名前を入力（例：「My AI Integration」）\n6. rc_で始まるキーが表示されます\n\n重要：キーはこの画面で一度だけ表示されます！\n必ずコピーして安全な場所に保存してください。\n\nAPIキーはパスワードと同じです。他の人と共有しないでください。"
-        },
-        "step1Prepare": {
-          "title": "ステップ1：デッキとカードテンプレートを準備する",
-          "body": "APIでカードを追加する前に、まずアプリでデッキとカードテンプレートを作成します。\n\n1. デッキの作成\n・アプリで「デッキ」→「新しいデッキを作成」\n・名前を入力（例：「TOEIC単語」）\n・説明を入力（例：「必須TOEIC単語」）\n\n2. カードテンプレートの作成\n・「テンプレート」→「新しいテンプレート」\n・名前を入力（例：「単語詳細」）\n・フィールドを追加：\n  - word：テキストタイプ\n  - meaning：テキストタイプ\n  - example：テキストタイプ\n・表面レイアウトに「word」を配置\n・裏面レイアウトに「meaning」と「example」を配置\n\n3. デッキにデフォルトテンプレートを設定\n・デッキ編集で作成したテンプレートをデフォルトに選択\n\nヒント：フィールドのキー名（word、meaning、example）を覚えておきましょう！\nAPIでカードを作成する際にこれらのキーをそのまま使用します。"
-        },
-        "step2Query": {
-          "title": "ステップ2：AIでデッキ/テンプレートIDを調べる",
-          "body": "カードを追加するには、デッキIDとテンプレートIDが必要です。\nAIに調べてもらいましょう！\n\nChatGPT、Gemini、またはClaudeを開いて以下を貼り付けてください：\n\n─────────────────────────────\nReeeeecallStudyというフラッシュカードアプリを使っています。\nAPI情報は以下の通りです：\n・API URL：https://reeeeecallstudy.xyz/api/v1\n・APIキー：rc_ここにAPIキーを貼り付け\n\n以下の2つのリクエストをお願いします：\n1. デッキ一覧：GET https://reeeeecallstudy.xyz/api/v1/decks\n2. テンプレート一覧：GET https://reeeeecallstudy.xyz/api/v1/templates\n\nヘッダーに含める：Authorization: Bearer rc_ここにAPIキーを貼り付け\n各デッキのidと名前、各テンプレートのid、名前、フィールドを表示してください。\n─────────────────────────────\n\n「rc_ここにAPIキーを貼り付け」を実際のAPIキーに置き換えてください！\n\nAIが以下のような情報を表示します：\n・デッキID：a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n・デッキ名：TOEIC単語\n・テンプレートID：e5f6g7h8-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n・テンプレートフィールド：word、meaning、example\n\nこれらのIDをコピーしてください — 次のステップで必要になります！"
-        },
-        "step3AiGenerate": {
-          "title": "ステップ3：AIにカードの作成と登録を依頼する",
-          "body": "これが重要なステップです！AIにカードを作成してそのまま登録してもらいます。\n\n以下のプロンプトをコピーし、記載箇所をあなたの情報に置き換えてAIに送信してください：\n\n─────────────────────────────\nReeeeecallStudy APIを使ってフラッシュカードを作成してください。\n\nAPI情報：\n・ベースURL：https://reeeeecallstudy.xyz/api/v1\n・APIキー：（ここにAPIキーを貼り付け）\n・デッキID：（ステップ2のデッキIDを貼り付け）\n・テンプレートID：（ステップ2のテンプレートIDを貼り付け）\n\nカード作成エンドポイント：\nPOST https://reeeeecallstudy.xyz/api/v1/decks/(デッキID)/cards\nヘッダー：\n  Authorization: Bearer (APIキー)\n  Content-Type: application/json\nボディ（JSON配列、最大100）：\n[\n  {\n    \"template_id\": \"(テンプレートID)\",\n    \"field_values\": {\n      \"word\": \"英単語\",\n      \"meaning\": \"定義\",\n      \"example\": \"例文\"\n    },\n    \"tags\": [\"タグ\"]\n  }\n]\n\nリクエスト：\n必須TOEIC単語カードを50枚作成し、上記のAPIで登録してください。\n各カードには以下を含めてください：\n・word：英単語\n・meaning：簡潔な定義\n・example：その単語を使った例文1つ\n・tags：難易度（beginner / intermediate / advanced）\n─────────────────────────────\n\n「50枚の必須TOEIC単語カード」を好きなトピックに変更できます！\n例：\n・「JLPT N3の漢字カード30枚」\n・「基本的なスペイン語旅行フレーズ40枚」\n・「世界史年表イベント50枚」\n・「Pythonプログラミング用語30枚」\n・「医学解剖学用語50枚」\n\nもっとカードが必要？「重複なしでさらに50枚作って！」と言うだけです。"
-        },
-        "aiExamples": {
-          "title": "各AIのコツ（ChatGPT / Gemini / Claude）",
-          "body": "各AIにはそれぞれの強みがあります。用途に合ったものを使いましょう！\n\nChatGPT（chat.openai.com）\n・Code InterpreterでAPIを直接呼び出すコードを実行可能\n・コツ：「Pythonコードを実行してAPIを直接呼び出して」と言えば、実際のコードでカードを登録します\n・最適な用途：直接API呼び出し\n\nGoogle Gemini（gemini.google.com）\n・Google検索と連携して最新情報を取得\n・コツ：「2025年時事用語」など最新情報が必要なカードに最適\n・最適な用途：最新トレンドが必要なカード\n\nClaude（claude.ai）\n・長文の処理と正確なJSON生成に優れている\n・コツ：100枚を一度に作成してもJSONフォーマットが崩れない\n・最適な用途：一括生成、複雑なカード構造\n\n共通のコツ：\n・AIがAPIを呼び出せない場合 →「JSONデータだけ表示して」と依頼。コピーして手動登録方法（次のセクション参照）を使います\n・「前のカードと重複しないようにさらに50枚作って」で追加生成\n・1リクエストあたり最大100枚。それ以上は複数リクエストに分割してください"
-        },
-        "step4Manual": {
-          "title": "AIがAPIを直接呼び出せない場合（手動方法）",
-          "body": "AIがAPIを直接呼び出せなくても心配ありません！\nAIが作成したJSONデータをコピーして自分で送信するだけです。\n\n方法1：Swagger UI（最も簡単、おすすめ）\n1. ブラウザで https://reeeeecallstudy.xyz/api/ui を開く\n2. 上部の「Authorize」→ APIキーを入力 → 確認\n3. POST /v1/decks/{deckId}/cards を見つけて展開\n4. 「Try it out」をクリック\n5. deckIdフィールドにデッキIDを入力\n6. リクエストボディにAIからのJSON配列を貼り付け\n7. 「Execute」→ 完了！\n\n方法2：ターミナル / コマンドプロンプト\nターミナル（Mac）またはPowerShell（Windows）を開いて実行：\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"丸い果物\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\nJSONが長い場合はファイルに保存してから：\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\n1リクエストあたり最大100枚。"
-        },
-        "docsPage": {
-          "linkLabel": "APIドキュメントを見る",
-          "title": "完全なAPIドキュメント",
-          "body": "より詳細なAPI情報：\n\n・アプリ内APIドキュメント：トップメニューの「API」または /api-docs\n・Swagger UI（インタラクティブテスト）：https://reeeeecallstudy.xyz/api/ui\n・公開APIドキュメント：https://reeeeecallstudy.xyz/docs/api\n\n利用可能なエンドポイント：\n・デッキAPI：一覧、詳細、作成\n・カードAPI：一覧、詳細、作成（一括対応）、更新、削除\n・テンプレートAPI：一覧、詳細、作成、更新、削除\n・学習API：復習予定カード、学習履歴、統計\n・マーケットプレイスAPI：一覧、公開、削除\n・共有API：共有作成、招待受け入れ、一覧、取り消し"
-        },
-        "rateLimits": {
-          "title": "レート制限（知っておくと便利）",
-          "body": "APIの安定性のためリクエスト数に制限があります。\n\n無料プラン：\n・1日のAPIリクエスト数：1,000\n・1分あたりのAPI呼び出し数：60\n・1分あたりのカード作成数：30\n\n制限を超えると 429 Too Many Requests が返されます。\nしばらく待ってから再試行してください。\n\n注意：100枚のカードでもたった1回のAPI呼び出し（一括作成）です。\n1日1,000回の呼び出しで、理論上は1日最大100,000枚のカードを作成できます！"
-        }
-      }
-    },
     "ai-generate": {
       "title": "AI Auto-Generate",
       "items": {

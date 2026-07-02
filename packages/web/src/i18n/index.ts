@@ -26,7 +26,6 @@ i18n
       'import-export',
       'history',
       'guide',
-      'api-docs',
       'landing',
       'content',
       'admin',

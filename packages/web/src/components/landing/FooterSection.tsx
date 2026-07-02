@@ -67,11 +67,6 @@ export function FooterSection() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/api" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
-                    {t('footer.apiDocs', 'API Docs')}
-                  </Link>
-                </li>
-                <li>
                   <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.help', 'Help')}
                   </a>

@@ -382,59 +382,6 @@ export const GUIDE_SECTIONS: GuideSection[] = [
 
   // ───────────────────────────────────────────────────
   {
-    id: 'api',
-    title: 'sections.api.title',
-    icon: '📡',
-    items: [
-      {
-        title: 'sections.api.items.whatSimple.title',
-        body: 'sections.api.items.whatSimple.body',
-      },
-      {
-        title: 'sections.api.items.whyApi.title',
-        body: 'sections.api.items.whyApi.body',
-      },
-      {
-        title: 'sections.api.items.getKey.title',
-        body: 'sections.api.items.getKey.body',
-      },
-      {
-        title: 'sections.api.items.step1Prepare.title',
-        body: 'sections.api.items.step1Prepare.body',
-      },
-      {
-        title: 'sections.api.items.step2Query.title',
-        body: 'sections.api.items.step2Query.body',
-      },
-      {
-        title: 'sections.api.items.step3AiGenerate.title',
-        body: 'sections.api.items.step3AiGenerate.body',
-      },
-      {
-        title: 'sections.api.items.aiExamples.title',
-        body: 'sections.api.items.aiExamples.body',
-      },
-      {
-        title: 'sections.api.items.step4Manual.title',
-        body: 'sections.api.items.step4Manual.body',
-      },
-      {
-        title: 'sections.api.items.docsPage.title',
-        body: 'sections.api.items.docsPage.body',
-        link: {
-          label: 'sections.api.items.docsPage.linkLabel',
-          href: 'https://reeeeecallstudy.xyz/docs/api',
-        },
-      },
-      {
-        title: 'sections.api.items.rateLimits.title',
-        body: 'sections.api.items.rateLimits.body',
-      },
-    ],
-  },
-
-  // ───────────────────────────────────────────────────
-  {
     id: 'tips',
     title: 'sections.tips.title',
     icon: '💡',
