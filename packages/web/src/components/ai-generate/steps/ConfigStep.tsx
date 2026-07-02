@@ -166,8 +166,9 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     }
 
     // Owned-card limit pre-flight (mig 116): don't spend AI cost/quota generating
-    // cards that can't be saved. Server still enforces at save.
-    if (limit.exceeds(cardCount)) return
+    // cards that can't be saved. In image mode the count is model-decided, so only
+    // block when there's NO room at all. Server still enforces at save.
+    if (useImage ? limit.reached : limit.exceeds(cardCount)) return
 
     onStart({
       topic,
@@ -204,7 +205,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     : !affordable.walletKnown
       ? t('wallet.unknown')
       : useImage
-        ? (balanceWon > 0 ? balanceText() : t('wallet.empty'))
+        ? (balanceWon > 0 ? balanceText() : t('wallet.imagePaid'))
         : affordable.free > 0 && balanceWon > 0
           ? `${t('wallet.freeOnly', { free: affordable.free })} · ${balanceText()}`
           : affordable.free > 0
@@ -495,7 +496,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       {limit.reached ? (
         <CardLimitBlock />
-      ) : limit.exceeds(cardCount) ? (
+      ) : !useImage && limit.exceeds(cardCount) ? (
         <p className="text-xs text-center text-destructive">
           {t('config.cardLimitExceeds', { available: limit.available })}
         </p>
@@ -503,7 +504,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       <button
         type="submit"
-        disabled={!canSubmit || limit.exceeds(cardCount)}
+        disabled={!canSubmit || (!useImage && limit.exceeds(cardCount))}
         className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}

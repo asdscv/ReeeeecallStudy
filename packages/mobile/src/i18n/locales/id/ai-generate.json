@@ -70,7 +70,8 @@
     "empty": "Kartu gratis hari ini sudah habis",
     "unknown": "Saldo tidak tersedia",
     "balance": "Saldo ₩{{won}} (~{{cards}} kartu)",
-    "freeOnly": "{{free}} kartu gratis tersisa hari ini"
+    "freeOnly": "{{free}} kartu gratis tersisa hari ini",
+    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan."
   },
   "alert": {
     "errorTitle": "Kesalahan",
@@ -95,5 +96,11 @@
     "networkError": "Kesalahan jaringan. Silakan periksa koneksi Anda dan coba lagi.",
     "serverError": "Pembuatan dengan AI untuk sementara tidak tersedia. Silakan coba lagi nanti.",
     "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
+  },
+  "config": {
+    "mode": {
+      "full": "Dek baru",
+      "cards_only": "Tambah ke dek"
+    }
   }
 }

@@ -280,8 +280,9 @@ export function AIGenerateScreen() {
     }
 
     // Owned-card limit pre-flight (mig 116): don't spend AI cost/quota generating
-    // cards that can't be saved. Server also enforces.
-    if (limit.exceeds(parseInt(cardCount) || 10)) {
+    // cards that can't be saved. In image mode the count is model-decided, so only
+    // block when there's NO room at all. Server also enforces at save.
+    if (useImage ? limit.reached : limit.exceeds(parseInt(cardCount) || 10)) {
       Alert.alert(tLimit('errors:card.limitReached'), tLimit('settings:cardUsage.reached'))
       return
     }
@@ -492,7 +493,8 @@ export function AIGenerateScreen() {
               />
             </View>
 
-            {/* Number of cards */}
+            {/* Number of cards — hidden in image mode (the model decides the count) */}
+            {!useImage && (
             <View style={styles.section}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>
                 {t('content.cardCountLabel')}
@@ -512,6 +514,7 @@ export function AIGenerateScreen() {
               />
               <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('content.cardCountHint')}</Text>
             </View>
+            )}
           </View>
 
           {/* Deck selector — only when "Cards Only" mode */}
@@ -552,7 +555,7 @@ export function AIGenerateScreen() {
             const text = !affordable.walletKnown
               ? t('wallet.unknown')
               : useImage
-                ? (balanceWon > 0 ? bal() : t('wallet.empty'))
+                ? (balanceWon > 0 ? bal() : t('wallet.imagePaid'))
                 : affordable.free > 0 && balanceWon > 0
                   ? `${t('wallet.freeOnly', { free: affordable.free })} · ${bal()}`
                   : affordable.free > 0

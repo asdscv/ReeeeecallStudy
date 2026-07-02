@@ -70,7 +70,8 @@
     "empty": "今天的免费卡片已用完",
     "unknown": "余额不可用",
     "balance": "余额 ₩{{won}}（约{{cards}}张）",
-    "freeOnly": "今日剩余 {{free}} 张免费卡片"
+    "freeOnly": "今日剩余 {{free}} 张免费卡片",
+    "imagePaid": "图片生成为付费功能 — 请充值后继续。"
   },
   "alert": {
     "errorTitle": "错误",
@@ -95,5 +96,11 @@
     "networkError": "网络错误。请检查您的网络连接后重试。",
     "serverError": "AI生成暂时不可用。请稍后再试。",
     "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。"
+  },
+  "config": {
+    "mode": {
+      "full": "新建牌组",
+      "cards_only": "添加到牌组"
+    }
   }
 }

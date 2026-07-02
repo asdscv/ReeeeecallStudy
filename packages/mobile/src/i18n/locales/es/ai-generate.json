@@ -70,7 +70,8 @@
     "empty": "Has usado tus tarjetas gratis de hoy",
     "unknown": "Saldo no disponible",
     "balance": "Saldo ₩{{won}} (~{{cards}} tarjetas)",
-    "freeOnly": "Quedan {{free}} tarjetas gratuitas hoy"
+    "freeOnly": "Quedan {{free}} tarjetas gratuitas hoy",
+    "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar."
   },
   "alert": {
     "errorTitle": "Error",
@@ -95,5 +96,11 @@
     "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
     "serverError": "La generación con IA no está disponible temporalmente. Inténtalo de nuevo más tarde.",
     "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más."
+  },
+  "config": {
+    "mode": {
+      "full": "Mazo nuevo",
+      "cards_only": "Añadir a un mazo"
+    }
   }
 }
