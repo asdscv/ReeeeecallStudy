@@ -31,6 +31,16 @@ const REVENUECAT_ANDROID_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ??
 // Entitlement ID configured in RevenueCat dashboard
 export const PRO_ENTITLEMENT = 'pro'
 
+// ─────────────────────────────────────────────────────────────────────────
+// [SUBSCRIPTION-HIDDEN] Master gate for the whole purchase/subscription UI.
+// Keep FALSE until App Store Connect IAP products are submitted+approved and
+// RevenueCat is wired (Apple Guideline 2.1(b)). Everything downstream —
+// usePurchases catalog fetch + PaywallScreen rendering — checks this flag, so
+// flipping it to true (after the restore steps in PaywallScreen's header) is
+// the single switch that un-hides the flow. Nothing renders while false.
+// ─────────────────────────────────────────────────────────────────────────
+export const SUBSCRIPTION_UI_ENABLED = false
+
 /**
  * RevenueCat service — single entry point for all purchase operations.
  * Enterprise pattern: isolate third-party SDK behind a service layer
@@ -62,10 +72,24 @@ class PurchaseService {
   }
 
   /**
-   * Identify user with RevenueCat (call on login).
+   * Identify the RevenueCat subscriber with OUR Supabase user id (call on login).
+   *
+   * This aliases RevenueCat's `appUserID` to supabase `auth.uid()`, which is the
+   * ONLY thing that lets the server-side revenuecat-webhook map an incoming
+   * `app_user_id` back to OUR user row. The client does NOT grant anything here:
+   * the actual entitlement / card-limit grant is done SERVER-SIDE by the
+   * revenuecat-webhook edge fn (which calls sync_subscription_by_user /
+   * activate_subscription_from_intent via the service role — mig 121). This call
+   * is pure identity aliasing so the webhook can find the right user.
    */
-  async login(userId: string): Promise<CustomerInfo> {
-    const { customerInfo } = await Purchases!.logIn(userId)
+  async login(userId: string): Promise<CustomerInfo | null> {
+    // TODO(react-native-purchases): the SDK is currently NOT installed (removed —
+    // it was the native-module crash source). Once restored (`pnpm add
+    // react-native-purchases --filter mobile`) this call aliases the RC subscriber
+    // to our supabase id. Until then `Purchases` is null, so we no-op — nothing
+    // throws while the whole flow is gated off (SUBSCRIPTION_UI_ENABLED=false).
+    if (!Purchases) return null
+    const { customerInfo } = await Purchases.logIn(userId)
     return customerInfo
   }
 
@@ -73,7 +97,8 @@ class PurchaseService {
    * Clear user identity (call on logout).
    */
   async logout(): Promise<void> {
-    await Purchases!.logOut()
+    if (!Purchases) return
+    await Purchases.logOut()
   }
 
   /**
@@ -103,7 +128,36 @@ class PurchaseService {
   }
 
   /**
+   * Find the RevenueCat package that corresponds to a backend product id
+   * (billing_products.id, e.g. 'sub_pro_monthly' / 'credits_1000'). Match is
+   * by store product identifier or package identifier — configure these to
+   * equal the backend id in the RevenueCat dashboard so the server catalog
+   * (get_billing_products) stays the single source of truth for what exists.
+   */
+  findPackageForProduct(offering: PurchasesOffering | null, productId: string): PurchasesPackage | null {
+    const pkgs: any[] = offering?.availablePackages ?? []
+    return (
+      pkgs.find((p) => p?.product?.identifier === productId || p?.identifier === productId) ?? null
+    )
+  }
+
+  /**
    * Purchase a package (subscription product).
+   *
+   * TODO(payment-webhook): entitlement/credit grants MUST happen server-side.
+   * Do NOT grant here. The real flow is:
+   *   1) RevenueCat processes the store purchase (this call).
+   *   2) RevenueCat's server->server webhook (or App Store Server Notifications)
+   *      hits our edge fn POST /functions/v1/payment-webhook with an
+   *      x-webhook-signature: hex(HMAC-SHA256(rawBody, PAYMENT_WEBHOOK_SECRET)).
+   *   3) The webhook maps the store product -> billing_products.id and calls
+   *      grant_subscription(...) (kind:'subscription') or add_ai_credits(...)
+   *      (kind:'credit', via product_id) — both idempotent on payment_id /
+   *      (provider,provider_ref). See mig 119 webhookPayload contract.
+   *   4) The client just RE-FETCHES getMySubscription()/get_owned_card_usage
+   *      to reflect the granted state (usePurchases.refreshSubscription()).
+   * The `success` returned here only means the store charge + RevenueCat
+   * entitlement went through — it is NOT proof our DB was updated.
    */
   async purchase(pkg: PurchasesPackage): Promise<{
     success: boolean

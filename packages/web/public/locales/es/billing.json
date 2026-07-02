@@ -1,0 +1,28 @@
+{
+  "topUp": {
+    "title": "Añadir saldo",
+    "subtitle": "Recarga saldo para generar tarjetas con IA más allá de las gratuitas diarias.",
+    "credits": "Recibe ₩{{won}} en saldo",
+    "buy": "Comprar",
+    "success": "Saldo añadido.",
+    "empty": "No hay paquetes disponibles.",
+    "loadError": "No se pudieron cargar los productos. Inténtalo de nuevo."
+  },
+  "subscribe": {
+    "cta": "Mejorar plan",
+    "success": "Suscripción activada.",
+    "cancelPending": "Cancelación pendiente · acceso hasta el {{date}}",
+    "cancelPendingNoDate": "Se cancelará al final del periodo actual."
+  },
+  "checkout": {
+    "success": "Pago completado.",
+    "canceled": "Pago cancelado.",
+    "failed": "El pago falló. Inténtalo de nuevo."
+  },
+  "comingSoon": {
+    "badge": "Próximamente",
+    "title": "Los pagos llegarán pronto",
+    "body": "Estamos preparando los pagos. Estará disponible en breve."
+  },
+  "retry": "Reintentar"
+}

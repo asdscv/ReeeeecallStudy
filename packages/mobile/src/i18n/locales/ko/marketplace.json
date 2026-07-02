@@ -98,7 +98,17 @@
     },
     "limitUsage": "카드 {{count}}장이 한도에 추가돼요 · 남은 {{available}}장",
     "limitExceeds": "카드 한도를 초과해요 (남은 {{available}}장). 카드를 지우거나 구독하세요.",
-    "limitOfficialFree": "공인 인증 덱 · 카드 한도에 포함되지 않아요."
+    "limitOfficialFree": "공인 인증 덱 · 카드 한도에 포함되지 않아요.",
+    "acquireByMode": {
+      "subscribe": "구독하기",
+      "copy": "내 덱으로 복사",
+      "snapshot": "복제본 가져오기"
+    },
+    "modeDesc": {
+      "subscribe": "게시자 덱을 구독해 학습해요 (내 진도로)",
+      "copy": "내가 편집할 수 있는 복사본을 만들어요",
+      "snapshot": "읽기 전용 복제본을 가져와요"
+    }
   },
   "publish": {
     "title": "덱 게시",

@@ -165,7 +165,8 @@
     "plan": "Plan gratis",
     "planNote": "El plan gratis incluye hasta {{limit}} tarjetas propias. Suscríbete para ampliar el límite.",
     "upgrade": "Mejorar (próximamente)",
-    "upgradeSoon": "La suscripción estará disponible pronto."
+    "upgradeSoon": "La suscripción estará disponible pronto.",
+    "cancelPending": "Suscripción por cancelar — acceso hasta {{date}}"
   },
   "groups": {
     "account": "Cuenta",

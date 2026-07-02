@@ -21,6 +21,7 @@ import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
+import { getMySubscription, type MySubscription } from '../services/billing'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 
@@ -70,6 +71,16 @@ export function SettingsScreen() {
   const cardUsage = useDeckStore((s) => s.cardUsage)
   const fetchCardUsage = useDeckStore((s) => s.fetchCardUsage)
   useEffect(() => { void fetchCardUsage() }, [fetchCardUsage])
+  // Surface subscription state on the plan / card-limit section. Auth-scoped RPC
+  // (get_my_subscription) — returns null for free users. NOT gated behind the
+  // mobile paywall: a sub can be granted by the WEB paywall too, so a user who
+  // subscribed (and then canceled) on web should see the "canceling on <date>"
+  // note here. This only INFORMS — the client never grants (grant is server-side).
+  const [subscription, setSubscription] = useState<MySubscription | null>(null)
+  useEffect(() => {
+    if (!user) { setSubscription(null); return }
+    getMySubscription().then(setSubscription)
+  }, [user?.id])
   // [SUBSCRIPTION-HIDDEN] usePurchases 훅 호출 보류 — 복원 시 아래 stub 제거하고 원래 줄 복구
   // const { isPro } = usePurchases()
 
@@ -418,6 +429,13 @@ export function SettingsScreen() {
               }} />
             </View>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
+            {subscription?.cancelAtPeriodEnd && subscription.currentPeriodEnd && (
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>
+                {t('cardUsage.cancelPending', {
+                  date: new Date(subscription.currentPeriodEnd).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric' }),
+                })}
+              </Text>
+            )}
             <View style={{ marginTop: 8, alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: theme.colors.border, opacity: 0.7 }}>
               <Text style={{ color: theme.colors.textSecondary, fontWeight: '600', fontSize: 13 }}>{t('cardUsage.upgrade')}</Text>
             </View>

@@ -321,6 +321,18 @@ allow_dynamic_registration = false
 [functions.payment-webhook]
 verify_jwt = false
 
+# lemonsqueezy-webhook is called by Lemon Squeezy (a Merchant of Record), not a user,
+# authenticated by its X-Signature HMAC (LEMONSQUEEZY_WEBHOOK_SECRET) — not a Supabase
+# JWT. Fail-closed (503 until the secret is set), so the platform JWT gate must be OFF.
+[functions.lemonsqueezy-webhook]
+verify_jwt = false
+
+# revenuecat-webhook is called by RevenueCat (mobile IAP), not a user, authenticated by
+# a shared Authorization: Bearer token (REVENUECAT_WEBHOOK_AUTH) — RevenueCat uses no
+# HMAC. Fail-closed (503 until the token is set), so the platform JWT gate must be OFF.
+[functions.revenuecat-webhook]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

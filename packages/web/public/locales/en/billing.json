@@ -1,0 +1,28 @@
+{
+  "topUp": {
+    "title": "Add credits",
+    "subtitle": "Top up credits for AI card generation beyond the daily free cards.",
+    "credits": "Get ₩{{won}} in credits",
+    "buy": "Buy",
+    "success": "Credits added.",
+    "empty": "No credit packs available.",
+    "loadError": "Couldn't load products. Please try again."
+  },
+  "subscribe": {
+    "cta": "Upgrade plan",
+    "success": "Subscription active.",
+    "cancelPending": "Canceling · access until {{date}}",
+    "cancelPendingNoDate": "Canceling at the end of the current period."
+  },
+  "checkout": {
+    "success": "Payment complete.",
+    "canceled": "Payment canceled.",
+    "failed": "Payment failed. Please try again."
+  },
+  "comingSoon": {
+    "badge": "Coming soon",
+    "title": "Payments are coming soon",
+    "body": "We're getting payments ready. This will be available shortly."
+  },
+  "retry": "Retry"
+}

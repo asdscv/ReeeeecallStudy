@@ -1,0 +1,28 @@
+{
+  "topUp": {
+    "title": "Nạp thêm số dư",
+    "subtitle": "Nạp số dư để tạo thẻ bằng AI vượt quá số thẻ miễn phí mỗi ngày.",
+    "credits": "Nhận ₩{{won}} số dư",
+    "buy": "Mua",
+    "success": "Đã nạp số dư.",
+    "empty": "Không có gói nào khả dụng.",
+    "loadError": "Không thể tải sản phẩm. Vui lòng thử lại."
+  },
+  "subscribe": {
+    "cta": "Nâng cấp gói",
+    "success": "Đã kích hoạt gói đăng ký.",
+    "cancelPending": "Sẽ hủy · dùng được đến {{date}}",
+    "cancelPendingNoDate": "Sẽ hủy vào cuối kỳ hiện tại."
+  },
+  "checkout": {
+    "success": "Thanh toán hoàn tất.",
+    "canceled": "Đã hủy thanh toán.",
+    "failed": "Thanh toán thất bại. Vui lòng thử lại."
+  },
+  "comingSoon": {
+    "badge": "Sắp ra mắt",
+    "title": "Thanh toán sắp ra mắt",
+    "body": "Chúng tôi đang chuẩn bị tính năng thanh toán. Sẽ sớm khả dụng."
+  },
+  "retry": "Thử lại"
+}

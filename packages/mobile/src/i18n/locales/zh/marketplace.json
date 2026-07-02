@@ -98,7 +98,17 @@
     "downloading": "下载中...",
     "limitUsage": "将占用 {{count}} 张卡片额度 · 剩余 {{available}} 张",
     "limitExceeds": "将超出卡片额度（剩余 {{available}} 张）。请先删除卡片或订阅。",
-    "limitOfficialFree": "官方认证牌组 · 不占用卡片额度。"
+    "limitOfficialFree": "官方认证牌组 · 不占用卡片额度。",
+    "acquireByMode": {
+      "subscribe": "订阅",
+      "copy": "复制到我的卡组",
+      "snapshot": "获取快照副本"
+    },
+    "modeDesc": {
+      "subscribe": "订阅并学习发布者的卡组（使用你自己的进度）",
+      "copy": "创建一份你可以编辑的副本",
+      "snapshot": "获取一份只读的快照副本"
+    }
   },
   "publish": {
     "title": "Publish Deck",

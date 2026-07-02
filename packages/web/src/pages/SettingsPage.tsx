@@ -14,6 +14,7 @@ import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
+import { SubscribeButton } from '../components/billing/SubscribeButton'
 import {
   loadSettings,
   saveSettings,
@@ -354,7 +355,7 @@ export function SettingsPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-3">{t('cardUsage.planNote', { limit: cardUsage.limit })}</p>
-              <button disabled title={t('cardUsage.upgradeSoon')} className="mt-2 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground cursor-not-allowed font-medium">{t('cardUsage.upgrade')}</button>
+              <SubscribeButton />
               {cardUsage.available <= 0 && (
                 <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
               )}

@@ -8,53 +8,129 @@ import { useState, useEffect, useCallback } from 'react'
 // [SUBSCRIPTION-HIDDEN] react-native-purchases 제거됨 — 타입 any로 대체
 type PurchasesPackage = any
 type PurchasesOffering = any
-import { purchaseService, PRO_ENTITLEMENT } from '../services/purchases'
+import { purchaseService, PRO_ENTITLEMENT, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
+import { getBillingProducts, getMySubscription, createPaymentIntent, type BillingProduct, type MySubscription } from '../services/billing'
 import { useAuthState } from './useAuthState'
 
 /**
  * Hook for in-app purchases.
  * Wraps PurchaseService with React state management.
+ *
+ * The product catalog + entitlement come from OUR backend (get_billing_products
+ * / get_my_subscription) — the server is the source of truth for what exists.
+ * The store IAP layer (offering) is only used to actually charge. Everything
+ * here is gated behind SUBSCRIPTION_UI_ENABLED (currently false), so while the
+ * subscription UI is hidden we make no network calls and expose empty state.
  */
 export function usePurchases() {
   const { user } = useAuthState()
   const [isPro, setIsPro] = useState(false)
   const [offering, setOffering] = useState<PurchasesOffering | null>(null)
+  const [products, setProducts] = useState<BillingProduct[]>([])
+  const [subscription, setSubscription] = useState<MySubscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [purchasing, setPurchasing] = useState(false)
 
+  // Re-read the caller's active subscription from the backend. Call this after
+  // a purchase settles — the actual grant happens server-side via the
+  // payment-webhook, so the client just polls the authoritative row.
+  const refreshSubscription = useCallback(async () => {
+    if (!SUBSCRIPTION_UI_ENABLED) return
+    const sub = await getMySubscription()
+    setSubscription(sub)
+  }, [])
+
   // Initialize and check status
   useEffect(() => {
+    let cancelled = false
     async function init() {
+      // [SUBSCRIPTION-HIDDEN] short-circuit while the flow is gated off.
+      if (!SUBSCRIPTION_UI_ENABLED) {
+        if (!cancelled) setLoading(false)
+        return
+      }
       try {
         await purchaseService.init(user?.id)
         if (user?.id) {
+          // Alias the RevenueCat subscriber to OUR supabase user id (appUserID).
+          // This is what lets the server-side revenuecat-webhook map its incoming
+          // `app_user_id` back to our user and grant the subscription. The client
+          // NEVER grants here — the grant is server-side only (mig 121). Gated
+          // behind SUBSCRIPTION_UI_ENABLED (this whole init short-circuits above).
           await purchaseService.login(user.id)
         }
-        const pro = await purchaseService.isPro()
-        setIsPro(pro)
-        const off = await purchaseService.getOfferings()
+        // Server catalog + subscription are the source of truth.
+        const [cat, sub, pro, off] = await Promise.all([
+          getBillingProducts(),
+          getMySubscription(),
+          purchaseService.isPro(),
+          purchaseService.getOfferings(),
+        ])
+        if (cancelled) return
+        setProducts(cat)
+        setSubscription(sub)
+        setIsPro(pro || sub?.status === 'active')
         setOffering(off)
       } catch {
         // RevenueCat not configured or unavailable
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     init()
+    return () => { cancelled = true }
   }, [user?.id])
 
-  const purchase = useCallback(async (pkg: PurchasesPackage) => {
+  // `product` is the backend billing_products row (server catalog) being bought.
+  // We need it to open a server-side payment intent BEFORE charging, so the
+  // server owns the price/kind snapshot and hands us a merchantUid to reconcile
+  // the eventual grant against. Optional so legacy callers still type-check, but
+  // real purchases MUST pass it (otherwise we skip the intent and can't be
+  // confirmed server-side). Returns the created merchantUid on success.
+  const purchase = useCallback(async (pkg: PurchasesPackage, product?: BillingProduct) => {
+    // [SUBSCRIPTION-HIDDEN] no-op while the whole flow is gated off.
+    if (!SUBSCRIPTION_UI_ENABLED) return { success: false, error: 'disabled' as const }
     setPurchasing(true)
     try {
+      // ── Step 1: open a server-side payment intent (mig 120). The server
+      // snapshots price + kind and returns a merchantUid. Do NOT charge the
+      // store without one — there'd be no way to reconcile/confirm the grant.
+      const intent = product ? await createPaymentIntent(product.id) : null
+      if (product && !intent) {
+        return { success: false, error: 'intent_failed' as const }
+      }
+
+      // ── Step 2: charge via the store (RevenueCat).
+      // TODO(payment-webhook / IAP): BEFORE purchasing, attach
+      // intent.merchantUid to the store transaction so RevenueCat's
+      // server->server webhook can forward it to our payment-webhook — e.g.
+      //   await Purchases.setAttributes({ merchant_uid: intent!.merchantUid })
+      // (or pass it as purchase metadata). Without it the webhook can't map the
+      // store event back to this pending intent.
       const result = await purchaseService.purchase(pkg)
+
       if (result.success) {
         setIsPro(true)
+        // ── Step 3: the DB entitlement is granted SERVER-SIDE only.
+        // TODO(payment-webhook / IAP): the successful store transaction must be
+        // mapped to `intent.merchantUid` and drive the confirm path:
+        //   store IAP receipt -> RevenueCat (receipt validation) -> RevenueCat
+        //   webhook -> our payment-webhook edge fn -> confirm_payment(
+        //     merchant_uid, provider, provider_payment_id) via SERVICE ROLE.
+        // The client MUST NOT call confirm_payment itself — it is REVOKE'd from
+        // anon+authenticated (service_role only), so self-grant is impossible by
+        // design. If RevenueCat's webhook isn't wired yet, the server-side
+        // fallback is admin_confirm_payment(merchant_uid) (is_admin only, for
+        // testing/comp/support) — never expose that to the client.
+        // Until confirm lands the grant is async, so just re-poll the
+        // authoritative row (optionally retry/backoff if the webhook is slow).
+        await refreshSubscription()
       }
-      return result
+      return { ...result, merchantUid: intent?.merchantUid }
     } finally {
       setPurchasing(false)
     }
-  }, [])
+  }, [refreshSubscription])
 
   const restore = useCallback(async () => {
     setPurchasing(true)
@@ -72,9 +148,12 @@ export function usePurchases() {
   return {
     isPro,
     offering,
+    products,          // server catalog (get_billing_products) — source of truth
+    subscription,      // caller's active sub (get_my_subscription) or null
     loading,
     purchasing,
     purchase,
     restore,
+    refreshSubscription,
   }
 }

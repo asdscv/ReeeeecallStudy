@@ -1,0 +1,28 @@
+{
+  "topUp": {
+    "title": "충전금 추가",
+    "subtitle": "매일 무료 카드를 넘어서는 AI 카드 생성에 쓸 크레딧을 충전하세요.",
+    "credits": "₩{{won}} 크레딧 지급",
+    "buy": "구매",
+    "success": "충전이 완료되었어요.",
+    "empty": "구매 가능한 상품이 없어요.",
+    "loadError": "상품을 불러오지 못했어요. 다시 시도해 주세요."
+  },
+  "subscribe": {
+    "cta": "플랜 업그레이드",
+    "success": "구독이 시작되었어요.",
+    "cancelPending": "구독 취소 예정 · {{date}}까지 이용",
+    "cancelPendingNoDate": "현재 기간이 끝나면 구독이 취소돼요."
+  },
+  "checkout": {
+    "success": "결제가 완료되었어요.",
+    "canceled": "결제가 취소되었어요.",
+    "failed": "결제에 실패했어요. 다시 시도해 주세요."
+  },
+  "comingSoon": {
+    "badge": "준비 중",
+    "title": "결제 기능 준비 중",
+    "body": "결제 기능을 준비하고 있어요. 곧 만나보실 수 있어요."
+  },
+  "retry": "다시 시도"
+}

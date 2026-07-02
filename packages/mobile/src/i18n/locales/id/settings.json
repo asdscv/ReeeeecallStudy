@@ -165,7 +165,8 @@
     "plan": "Paket gratis",
     "planNote": "Paket gratis mencakup hingga {{limit}} kartu milik Anda. Berlangganan untuk menaikkan batas.",
     "upgrade": "Tingkatkan (segera hadir)",
-    "upgradeSoon": "Langganan akan segera hadir."
+    "upgradeSoon": "Langganan akan segera hadir.",
+    "cancelPending": "Langganan akan berakhir — akses hingga {{date}}"
   },
   "groups": {
     "account": "Akun",

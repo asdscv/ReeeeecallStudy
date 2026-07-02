@@ -17,9 +17,10 @@
     "test:e2e:chromium": "npx playwright test --project=chromium"
   },
   "dependencies": {
-    "@reeeeecall/shared": "workspace:*",
+    "@portone/browser-sdk": "^0.1.9",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
+    "@reeeeecall/shared": "workspace:*",
     "@supabase/supabase-js": "^2.95.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
