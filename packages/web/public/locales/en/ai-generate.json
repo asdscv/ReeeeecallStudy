@@ -21,8 +21,8 @@
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
-      "full": "Full (Template + Deck + Cards)",
-      "cards_only": "Add Cards to Existing Deck"
+      "full": "New deck",
+      "cards_only": "Add to a deck"
     },
     "targetDeck": "Target Deck",
     "selectDeck": "Select a deck...",
@@ -67,7 +67,8 @@
     "creditsOnly": "{{credits}} paid cards available",
     "empty": "You’ve used today’s free cards",
     "unknown": "Balance unavailable right now",
-    "balance": "₩{{won}} balance (~{{cards}} cards)"
+    "balance": "₩{{won}} balance (~{{cards}} cards)",
+    "imagePaid": "Image generation is paid — top up your balance to continue."
   },
   "wizard": {
     "setup": "Setup",

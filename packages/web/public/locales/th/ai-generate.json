@@ -7,8 +7,8 @@
     "apiKeyHint": "คีย์ของคุณถูกเข้ารหัส AES-256 และจัดเก็บในเบราว์เซอร์ ไม่มีการส่งไปยังเซิร์ฟเวอร์",
     "model": "Model",
     "topic": "Topic",
-    "topicPlaceholder": "e.g., JLPT N3 Japanese vocabulary, Korean history timeline",
-    "cardCount": "Number of cards",
+    "topicPlaceholder": "เช่น คำศัพท์ภาษาญี่ปุ่น JLPT N3, เส้นเวลาประวัติศาสตร์เกาหลี",
+    "cardCount": "จำนวนการ์ด",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
     "customEndpoint": "Custom Endpoint",
@@ -21,8 +21,8 @@
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
-      "full": "Full (Template + Deck + Cards)",
-      "cards_only": "Add Cards to Existing Deck"
+      "full": "เด็คใหม่",
+      "cards_only": "เพิ่มลงเด็ค"
     },
     "deckNoTemplate": "เด็คนี้ยังไม่มีเทมเพลตการ์ด — เปิดเด็คแล้วเพิ่มการ์ดสักหนึ่งใบเพื่อตั้งค่าเทมเพลต",
     "targetDeck": "เด็คปลายทาง",
@@ -67,7 +67,8 @@
     "creditsOnly": "มีการ์ดแบบชำระเงิน {{credits}} ใบ",
     "empty": "ใช้การ์ดฟรีของวันนี้หมดแล้ว",
     "unknown": "ไม่สามารถดูยอดคงเหลือได้ในขณะนี้",
-    "balance": "ยอดคงเหลือ ₩{{won}} (~{{cards}} การ์ด)"
+    "balance": "ยอดคงเหลือ ₩{{won}} (~{{cards}} การ์ด)",
+    "imagePaid": "การสร้างจากรูปภาพเป็นแบบเสียเงิน — เติมเงินเพื่อดำเนินการต่อ"
   },
   "wizard": {
     "setup": "Setup",

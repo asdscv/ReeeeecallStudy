@@ -226,7 +226,7 @@ JSON schema:
 Rules:
 - Each card's field_values must have these exact keys: ${fieldDesc}
 - Base every card ONLY on content visible in the image — do NOT invent unrelated material.
-- Generate up to ${cardCount} cards; if the image has fewer items, generate fewer.
+- Create ONE card per distinct study item ACTUALLY in the image (maximum ${cardCount}). Do NOT pad to a fixed number — if the image has 5 items make 5 cards, if it has 18 make 18. Let the image decide the count.
 - Every field_values key must have a non-empty value.
 - tags: 1-3 short tags per card
 - ${langNote}`

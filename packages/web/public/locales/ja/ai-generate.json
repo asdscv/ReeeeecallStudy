@@ -7,8 +7,8 @@
     "apiKeyHint": "キーはAES-256暗号化されてブラウザに保存されます。サーバーには送信されません。",
     "model": "Model",
     "topic": "Topic",
-    "topicPlaceholder": "e.g., JLPT N3 Japanese vocabulary, Korean history timeline",
-    "cardCount": "Number of cards",
+    "topicPlaceholder": "例：JLPT N3の日本語語彙、韓国史の年表",
+    "cardCount": "カード枚数",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
     "customEndpoint": "Custom Endpoint",
@@ -21,8 +21,8 @@
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
-      "full": "Full (Template + Deck + Cards)",
-      "cards_only": "Add Cards to Existing Deck"
+      "full": "新しいデッキ",
+      "cards_only": "デッキに追加"
     },
     "deckNoTemplate": "このデッキにはまだカードテンプレートがありません。デッキを開いてカードを1枚追加すると設定されます。",
     "targetDeck": "対象デッキ",
@@ -67,7 +67,8 @@
     "creditsOnly": "有料カードを{{credits}}枚生成できます",
     "empty": "本日の無料カードを使い切りました",
     "unknown": "現在、残高を取得できません",
-    "balance": "残高 ₩{{won}}（約{{cards}}枚）"
+    "balance": "残高 ₩{{won}}（約{{cards}}枚）",
+    "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。"
   },
   "wizard": {
     "setup": "Setup",

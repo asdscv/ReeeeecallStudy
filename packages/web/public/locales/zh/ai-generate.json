@@ -7,8 +7,8 @@
     "apiKeyHint": "您的密钥经过AES-256加密后存储在浏览器中，不会发送到我们的服务器。",
     "model": "Model",
     "topic": "Topic",
-    "topicPlaceholder": "e.g., JLPT N3 Japanese vocabulary, Korean history timeline",
-    "cardCount": "Number of cards",
+    "topicPlaceholder": "例如：JLPT N3 日语词汇、韩国历史年表",
+    "cardCount": "卡片数量",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
     "customEndpoint": "Custom Endpoint",
@@ -21,8 +21,8 @@
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
-      "full": "Full (Template + Deck + Cards)",
-      "cards_only": "Add Cards to Existing Deck"
+      "full": "新建牌组",
+      "cards_only": "添加到牌组"
     },
     "targetDeck": "目标卡组",
     "selectDeck": "选择一个卡组...",
@@ -67,7 +67,8 @@
     "creditsOnly": "可用 {{credits}} 张付费卡片",
     "empty": "今天的免费卡片已用完",
     "unknown": "暂时无法获取余额",
-    "balance": "余额 ₩{{won}}（约{{cards}}张）"
+    "balance": "余额 ₩{{won}}（约{{cards}}张）",
+    "imagePaid": "图片生成为付费功能 — 请充值后继续。"
   },
   "wizard": {
     "setup": "Setup",

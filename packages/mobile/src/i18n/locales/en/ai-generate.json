@@ -41,7 +41,8 @@
     "empty": "You’ve used today’s free cards",
     "unknown": "Balance unavailable",
     "balance": "₩{{won}} balance (~{{cards}} cards)",
-    "freeOnly": "{{free}} free cards left today"
+    "freeOnly": "{{free}} free cards left today",
+    "imagePaid": "Image generation is paid — top up your balance to continue."
   },
   "deck": {
     "section": "SELECT DECK",
@@ -95,5 +96,11 @@
     "networkError": "Network error. Please check your connection and try again.",
     "serverError": "AI generation is temporarily unavailable. Please try again later.",
     "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more."
+  },
+  "config": {
+    "mode": {
+      "full": "New deck",
+      "cards_only": "Add to a deck"
+    }
   }
 }
