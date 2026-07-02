@@ -85,7 +85,9 @@ export function AIGeneratePage() {
       existingDeckId: deckId,
     })
 
-    if (mode === 'full') {
+    if (mode === 'full' && cfg.imageMode === 'image' && cfg.imageDataUrl) {
+      store.generateDeckFromImage(cfg.imageDataUrl)  // image → a whole new deck (one vision call)
+    } else if (mode === 'full') {
       store.generateTemplate()
     } else if (cfg.imageMode === 'image' && cfg.imageDataUrl) {
       store.generateCardsFromImage(cfg.imageDataUrl)

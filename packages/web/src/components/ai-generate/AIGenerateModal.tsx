@@ -56,7 +56,9 @@ export function AIGenerateModal({
       existingDeckId: deckId,
     })
 
-    if (currentMode === 'full') {
+    if (currentMode === 'full' && cfg.imageMode === 'image' && cfg.imageDataUrl) {
+      store.generateDeckFromImage(cfg.imageDataUrl)  // image → a whole new deck (one vision call)
+    } else if (currentMode === 'full') {
       store.generateTemplate()
     } else if (cfg.imageMode === 'image' && cfg.imageDataUrl) {
       store.generateCardsFromImage(cfg.imageDataUrl)

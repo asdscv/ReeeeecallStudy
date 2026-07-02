@@ -89,7 +89,9 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   ])
 
   const isFullMode = mode === 'full'
-  const useImage = !isFullMode && imageMode === 'image'
+  // Image recognition works in BOTH modes: cards_only → add cards to a deck; full →
+  // recognize the image into a whole new deck (kind='image_deck').
+  const useImage = imageMode === 'image'
 
   // Fetch decks for selector (cards_only mode)
   useEffect(() => {
@@ -156,7 +158,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (useImage) {
-      if (!imageDataUrl || !selectedDeckId) return
+      if (!imageDataUrl) return
+      if (!isFullMode && !selectedDeckId) return  // cards_only needs a target deck
     } else {
       if (!topic.trim()) return
       if (!isFullMode && !selectedDeckId) return
@@ -190,7 +193,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const canSubmit = cardsOnlyNeedsTemplate
     ? false
     : useImage
-      ? !!imageDataUrl && !!selectedDeckId
+      ? !!imageDataUrl && (isFullMode || !!selectedDeckId)
       : topic.trim() && (isFullMode || selectedDeckId)
 
   // Free-remaining + prepaid ₩ wallet line (metered billing). Image mode is paid-only.
@@ -268,25 +271,24 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
           </div>
         )}
 
-        {/* Input mode toggle (cards_only): topic vs image */}
-        {!isFullMode && (
-          <div className="grid grid-cols-2 gap-1.5">
-            {(['topic', 'image'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setImageMode(m)}
-                className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer ${
-                  imageMode === m
-                    ? 'border-brand bg-brand/10 text-brand'
-                    : 'border-border text-muted-foreground hover:bg-muted'
-                }`}
-              >
-                {t(m === 'topic' ? 'config.inputModeTopic' : 'config.inputModeImage')}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Input mode toggle: type a topic, or recognize an image (both modes —
+            in full mode 'image' creates a whole new deck from the image) */}
+        <div className="grid grid-cols-2 gap-1.5">
+          {(['topic', 'image'] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setImageMode(m)}
+              className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer ${
+                imageMode === m
+                  ? 'border-brand bg-brand/10 text-brand'
+                  : 'border-border text-muted-foreground hover:bg-muted'
+              }`}
+            >
+              {t(m === 'topic' ? 'config.inputModeTopic' : 'config.inputModeImage')}
+            </button>
+          ))}
+        </div>
 
         {/* Topic input (topic mode, or full mode) */}
         {!useImage && (
@@ -371,8 +373,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         </div>
       </fieldset>
 
-      {/* ── Template Config (full mode only) ── */}
-      {isFullMode && (
+      {/* ── Template Config (full mode, topic input only — image builds its own template) ── */}
+      {isFullMode && !useImage && (
         <fieldset className="space-y-3 p-3 bg-purple-50/50 rounded-lg border border-purple-100">
           <legend className="text-xs font-semibold text-purple-600 uppercase px-1">{t('config.templateSection')}</legend>
 

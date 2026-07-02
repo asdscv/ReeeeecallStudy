@@ -44,6 +44,7 @@ interface AIGenerateState {
   generateDeck: () => Promise<void>
   generateCards: () => Promise<void>
   generateCardsFromImage: (image: string) => Promise<void>
+  generateDeckFromImage: (image: string) => Promise<void>
   saveAll: () => Promise<void>
 
   editGeneratedTemplate: (t: GeneratedTemplate) => void
@@ -295,6 +296,46 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       const result = validateCardsResponse(content, fields.map((f) => f.key))
       if (result.valid.length === 0) throw new Error('ALL_CARDS_INVALID')
       set({
+        generatedCards: result.valid,
+        filteredCardCount: result.filtered,
+        currentStep: 'review_cards',
+      })
+    } catch (err) {
+      set({ error: mapError(err), currentStep: 'error' })
+    }
+  },
+
+  // Image → a COMPLETE new deck in one vision call (kind='image_deck', always paid):
+  // recognizes the image and returns deck metadata + template + cards. We set all
+  // three generated states (mode='full') and route to card review; saveAll then
+  // creates the deck + template + cards. Default front/back layouts are injected when
+  // the model omits them (front = first field, back = the rest).
+  generateDeckFromImage: async (image: string) => {
+    set({ currentStep: 'generating_deck', error: null })
+    try {
+      const uiLang = i18next.language
+      const { content } = await callServerAI({ kind: 'image_deck', image, uiLang })
+      const deck = validateDeckResponse(content)
+
+      const rawTmpl = ((content as Record<string, unknown>)?.template ?? {}) as Record<string, unknown>
+      const tmplFields = Array.isArray(rawTmpl.fields) ? rawTmpl.fields : []
+      const keys = (tmplFields as Array<Record<string, unknown>>)
+        .map((f) => f?.key)
+        .filter((k): k is string => typeof k === 'string')
+      const template = validateTemplateResponse({
+        name: typeof rawTmpl.name === 'string' && rawTmpl.name ? rawTmpl.name : deck.name,
+        fields: tmplFields,
+        front_layout: Array.isArray(rawTmpl.front_layout) && rawTmpl.front_layout.length ? rawTmpl.front_layout : keys.slice(0, 1),
+        back_layout: Array.isArray(rawTmpl.back_layout) && rawTmpl.back_layout.length ? rawTmpl.back_layout : keys.slice(1),
+      })
+
+      const result = validateCardsResponse(content, template.fields.map((f) => f.key))
+      if (result.valid.length === 0) throw new Error('ALL_CARDS_INVALID')
+
+      set({
+        mode: 'full',
+        generatedDeck: deck,
+        generatedTemplate: template,
         generatedCards: result.valid,
         filteredCardCount: result.filtered,
         currentStep: 'review_cards',
