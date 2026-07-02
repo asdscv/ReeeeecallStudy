@@ -95,7 +95,10 @@
       "highest": "Highest",
       "lowest": "Lowest",
       "most_helpful": "Helpful"
-    }
+    },
+    "limitUsage": "Adds {{count}} cards toward your limit · {{available}} left",
+    "limitExceeds": "This would exceed your card limit ({{available}} left). Delete cards or subscribe first.",
+    "limitOfficialFree": "Official deck — doesn't count toward your card limit."
   },
   "publish": {
     "title": "Publish Deck",

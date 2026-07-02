@@ -95,7 +95,10 @@
       "highest": "높은 평점순",
       "lowest": "낮은 평점순",
       "most_helpful": "도움순"
-    }
+    },
+    "limitUsage": "카드 {{count}}장이 한도에 추가돼요 · 남은 {{available}}장",
+    "limitExceeds": "카드 한도를 초과해요 (남은 {{available}}장). 카드를 지우거나 구독하세요.",
+    "limitOfficialFree": "공인 인증 덱 · 카드 한도에 포함되지 않아요."
   },
   "publish": {
     "title": "덱 게시",

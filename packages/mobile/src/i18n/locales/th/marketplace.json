@@ -95,7 +95,10 @@
       "lowest": "ต่ำสุด",
       "most_helpful": "มีประโยชน์"
     },
-    "downloading": "กำลังดาวน์โหลด..."
+    "downloading": "กำลังดาวน์โหลด...",
+    "limitUsage": "เพิ่ม {{count}} การ์ดในขีดจำกัด · เหลือ {{available}}",
+    "limitExceeds": "จะเกินขีดจำกัดการ์ด (เหลือ {{available}}) ลบการ์ดหรือสมัครสมาชิกก่อน",
+    "limitOfficialFree": "เด็คทางการ · ไม่นับรวมในขีดจำกัดการ์ด"
   },
   "publish": {
     "title": "Publish Deck",
