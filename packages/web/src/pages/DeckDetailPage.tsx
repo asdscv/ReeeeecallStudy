@@ -3,12 +3,14 @@ import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { toIntlLocale } from '../lib/locale-utils'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus, Sparkles, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil, Trash2, Settings, Share2, Upload, Download, Plus, Sparkles, RefreshCw, Lock, Archive } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { isPast, formatLocalDate } from '../lib/date-utils'
 import { getPageSelectAllState, togglePageSelectAll } from '../lib/card-selection'
 import { useCardStore } from '../stores/card-store'
 import { useSyncStore } from '../stores/sync-store'
+import { useArchiveThreshold } from '../hooks/useArchiveThreshold'
+import { SubscribeButton } from '../components/billing/SubscribeButton'
 import { CardFormModal } from '../components/card/CardFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { ImportModal } from '../components/import-export/ImportModal'
@@ -105,6 +107,15 @@ export function DeckDetailPage() {
   const selectAllState = getPageSelectAllState(selectedIds, pageCardIds)
   const validCardIdSet = new Set(cards.map((c) => c.id))
   const validSelectedCount = Array.from(selectedIds).filter((id) => validCardIdSet.has(id)).length
+
+  // Archived-over-limit affordance (mig 123): view-only. Only owned decks can hold
+  // the user's own cards past the study boundary — skip for subscribed/read-only
+  // decks (their cards belong to the publisher, never archived here). refreshKey =
+  // cards.length so a create/delete re-checks the boundary + per-deck count.
+  const archive = useArchiveThreshold(deckId, {
+    enabled: !!deck && !deck.is_readonly,
+    refreshKey: cards.length,
+  })
 
   // --- All useEffects (must be before early returns) ---
   useEffect(() => {
@@ -430,6 +441,21 @@ export function DeckDetailPage() {
         </div>
       </div>
 
+      {/* Archived-over-limit note (view-only) — cards stay visible/editable */}
+      {archive.archivedCount > 0 && (
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-warning/10 border border-warning/30 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Archive className="w-4 h-4 text-warning mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm text-foreground">
+                {t('decks:detail.archived.note', { count: archive.archivedCount })}
+              </p>
+              <SubscribeButton />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab bar */}
       <div className="flex border-b border-border mb-4 overflow-x-auto">
         {tabs.map((tab) => (
@@ -603,7 +629,10 @@ export function DeckDetailPage() {
                           </td>
                         ))}
                         <td className="px-4 py-3">
-                          <StatusBadge status={card.srs_status} />
+                          <div className="flex flex-col items-start gap-1">
+                            <StatusBadge status={card.srs_status} />
+                            {archive.isArchived(card.created_at) && <ArchivedBadge />}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-content-tertiary">
                           {formatLocalDate(card.created_at, dateLocale)}
@@ -661,9 +690,10 @@ export function DeckDetailPage() {
                         className="flex-1 min-w-0 cursor-pointer"
                         onClick={() => handleEditCard(card)}
                       >
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center flex-wrap gap-2 mb-1">
                           <span className="text-xs text-content-tertiary">#{startIdx + i + 1}</span>
                           <StatusBadge status={card.srs_status} />
+                          {archive.isArchived(card.created_at) && <ArchivedBadge />}
                         </div>
                         {displayFields.slice(0, 3).map((field) => (
                           <p key={field.key} className="text-sm text-foreground truncate">
@@ -846,6 +876,20 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${className}`}>
       {label}
+    </span>
+  )
+}
+
+/**
+ * Subtle "archived — study locked" badge (mig 123). Purely informational: the card
+ * is over the account's study boundary so it's excluded from study, but it stays
+ * fully visible/editable/deletable. Never hides or disables the card.
+ */
+function ArchivedBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-warning/10 text-warning">
+      <Lock className="w-3 h-3" />
+      {i18next.t('decks:detail.archived.badge')}
     </span>
   )
 }

@@ -49,7 +49,11 @@
     "saveVersion": "버전 저장",
     "noVersions": "아직 기록된 버전이 없습니다.",
     "versionLabel": "버전 {{num}}",
-    "versionCards": "장"
+    "versionCards": "장",
+    "archived": {
+      "badge": "보관됨 · 학습 잠김",
+      "note": "{{count}}장이 한도 초과로 보관됨 — 카드는 그대로 볼 수 있어요. 구독하면 다시 학습할 수 있어요."
+    }
   },
   "sync": {
     "button": "동기화",

@@ -226,7 +226,10 @@
     "prevPage": "← Sebelumnya",
     "nextPage": "Berikutnya →",
     "pageOf": "Halaman {{current}} dari {{total}}",
-    "showingRange": "Menampilkan {{from}}–{{to}} dari {{total}} kartu"
+    "showingRange": "Menampilkan {{from}}–{{to}} dari {{total}} kartu",
+    "archivedBadge": "Diarsipkan · Belajar terkunci",
+    "archivedNote": "{{count}} kartu diarsipkan karena melebihi batas — kamu tetap bisa melihatnya. Berlangganan untuk belajar lagi.",
+    "archivedSubscribe": "Berlangganan (segera hadir)"
   },
   "deckEdit": {
     "previewName": "Nama Dek",

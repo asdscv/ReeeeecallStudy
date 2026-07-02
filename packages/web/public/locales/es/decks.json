@@ -49,7 +49,11 @@
     "saveVersion": "Guardar versión",
     "noVersions": "Aún no hay versiones registradas.",
     "versionLabel": "Versión {{num}}",
-    "versionCards": "tarjetas"
+    "versionCards": "tarjetas",
+    "archived": {
+      "badge": "Archivada · estudio bloqueado",
+      "note": "{{count}} tarjetas están archivadas por superar tu límite: aún puedes verlas. Suscríbete para volver a estudiarlas."
+    }
   },
   "settings": {
     "deckName": "Nombre del mazo",

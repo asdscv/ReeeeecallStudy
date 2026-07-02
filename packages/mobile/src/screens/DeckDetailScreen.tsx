@@ -68,6 +68,15 @@ export function DeckDetailScreen() {
   const [subscription, setSubscription] = useState<DeckShare | null>(null)
   const [syncMessage, setSyncMessage] = useState<string | null>(null)
 
+  // Card-limit archive state (mig 123). `activeThreshold` is the account-wide
+  // boundary created_at: a card is ARCHIVED-from-study iff it's owned,
+  // non-official, and created_at > threshold (NULL threshold = not over limit →
+  // nothing archived). `archivedCount` is this deck's archived count (server is
+  // the authority; both are auth.uid()-scoped SECURITY DEFINER RPCs). We only
+  // BADGE archived cards — they stay fully viewable/editable/deletable.
+  const [activeThreshold, setActiveThreshold] = useState<string | null>(null)
+  const [archivedCount, setArchivedCount] = useState(0)
+
   const deck = decks.find((d) => d.id === deckId)
   const deckStats = getStatsForDeck(deckId)
   const isSubscribed = !!subscription
@@ -115,6 +124,25 @@ export function DeckDetailScreen() {
     }
     checkSubscription()
   }, [deckId, fetchPendingCount])
+
+  // Fetch the account-wide archive boundary + this deck's archived count. The
+  // boundary shifts when the card set changes (adding cards past the limit, or
+  // deleting/subscribing to free some up), so re-run on card-count changes to
+  // keep the badge + note in sync. Errors fail closed (null threshold / 0
+  // count) → nothing shown, which is the safe "not over limit" state.
+  const fetchArchiveState = useCallback(async () => {
+    const sb = getMobileSupabase()
+    const [thresholdRes, countRes] = await Promise.all([
+      sb.rpc('get_active_card_threshold'),
+      sb.rpc('get_deck_archived_count', { p_deck_id: deckId }),
+    ])
+    setActiveThreshold((thresholdRes.data as string | null) ?? null)
+    setArchivedCount((countRes.data as number | null) ?? 0)
+  }, [deckId])
+
+  useEffect(() => {
+    void fetchArchiveState()
+  }, [fetchArchiveState, cards.length])
 
   const handleSync = useCallback(async () => {
     setSyncMessage(null)
@@ -249,6 +277,16 @@ export function DeckDetailScreen() {
       ],
     )
   }, [selectedIds, deleteCards, exitSelectionMode, refresh, t])
+
+  // A card is archived-from-study iff it's past the account boundary (strict >,
+  // matching the server: boundary ties stay ACTIVE). NULL threshold = not over
+  // limit → nothing archived. Compared as epoch ms to be timezone/format-safe.
+  const isCardArchived = useCallback(
+    (createdAt: string) =>
+      activeThreshold != null &&
+      new Date(createdAt).getTime() > new Date(activeThreshold).getTime(),
+    [activeThreshold],
+  )
 
   if (!deck) {
     return (
@@ -451,6 +489,29 @@ export function DeckDetailScreen() {
         {newCards > 0 && <Text style={[theme.typography.caption, { color: palette.blue[600] }]}>{t('detail.newCards', { count: newCards })}</Text>}
         {dueCards > 0 && <Text style={[theme.typography.caption, { color: palette.yellow[600] }]}>{t('detail.reviewCards', { count: dueCards })}</Text>}
       </View>
+
+      {/* Archived-over-limit note — cards stay viewable; study is gated behind a
+          subscription. Subscribe CTA is a disabled placeholder until payment
+          (mirrors CardLimitNotice / settings card-usage). */}
+      {archivedCount > 0 && (
+        <View
+          style={[styles.archivedNote, { backgroundColor: palette.yellow[100], borderColor: theme.colors.warning }]}
+          testID="deck-archived-note"
+        >
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+            {t('deckDetail.archivedNote', { count: archivedCount })}
+          </Text>
+          <Button
+            title={t('deckDetail.archivedSubscribe')}
+            onPress={() => {}}
+            disabled
+            variant="outline"
+            size="sm"
+            fullWidth={false}
+            testID="deck-archived-subscribe"
+          />
+        </View>
+      )}
 
       {/* Action buttons — matches web: Study, Edit, Share, Add Card, AI Cards, Import, Export */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.actionScroll}>
@@ -702,11 +763,15 @@ export function DeckDetailScreen() {
                   </Text>
                 ))}
               </View>
-              <Badge label={item.srs_status} variant={
-                item.srs_status === 'new' ? 'primary' :
-                item.srs_status === 'review' ? 'success' :
-                item.srs_status === 'learning' ? 'warning' : 'neutral'
-              } />
+              {isOwner && isCardArchived(item.created_at) ? (
+                <Badge label={t('deckDetail.archivedBadge')} variant="warning" testID={`card-archived-${item.id}`} />
+              ) : (
+                <Badge label={item.srs_status} variant={
+                  item.srs_status === 'new' ? 'primary' :
+                  item.srs_status === 'review' ? 'success' :
+                  item.srs_status === 'learning' ? 'warning' : 'neutral'
+                } />
+              )}
             </TouchableOpacity>
           )
         }}
@@ -775,6 +840,15 @@ const styles = StyleSheet.create({
   cardContent: { flex: 1, gap: 2 },
   emptyContainer: { gap: 12 },
   emptyButtons: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
+
+  // Archived-over-limit note
+  archivedNote: {
+    gap: 8,
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'flex-start',
+  },
 
   // Subscription sync
   subscribedBadge: {
