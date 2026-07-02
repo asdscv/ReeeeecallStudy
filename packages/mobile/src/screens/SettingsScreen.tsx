@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
+import { CollapsibleSection } from '../components/settings/CollapsibleSection'
+import { WalletSummary } from '../components/settings/WalletSummary'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
 // 복원 시: usePurchases import 복구, isPro stub 제거, planBadge + Subscription 섹션 복원.
@@ -60,6 +62,7 @@ type Nav = NativeStackNavigationProp<SettingsStackParamList, 'SettingsHome'>
 export function SettingsScreen() {
   const theme = useTheme()
   const { t, i18n } = useTranslation('settings')
+  const { t: tWallet } = useTranslation('wallet')
   const navigation = useNavigation<Nav>()
   const { user } = useAuthState()
   const { signOut } = useAuth()
@@ -290,31 +293,12 @@ export function SettingsScreen() {
     <Screen safeArea padding={false} keyboard testID="settings-screen">
       <ScreenHeader title={t('title')} mode="drawer" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Text style={{ fontSize: 13, color: theme.colors.textSecondary, marginBottom: 12, marginTop: -4, marginLeft: 4 }}>{t('subtitle')}</Text>
 
-        {/* Card storage usage (owned-card limit, mig 116) */}
-        {cardUsage && (
-          <SectionCard theme={theme}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('cardUsage.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
-              </Text>
-            </View>
-            <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
-              <View style={{
-                height: '100%', borderRadius: 4,
-                width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%`,
-                backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
-              }} />
-            </View>
-            {cardUsage.available <= 0 && (
-              <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
-            )}
-          </SectionCard>
-        )}
+        <GroupLabel theme={theme}>{t('groups.account')}</GroupLabel>
 
         {/* ── a) Profile — centered avatar like web ── */}
-        <SectionCard theme={theme}>
+        <CollapsibleSection title={t('profile.title')} icon="👤">
           <View style={styles.profileCentered}>
             <View style={[styles.avatarCircle, { backgroundColor: theme.colors.primary }]}>
               <Text style={styles.avatarText}>{userInitial}</Text>
@@ -376,7 +360,7 @@ export function SettingsScreen() {
               {t('profile.nameAvailable')}
             </Text>
           )}
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── b) Quick Actions — circles like web ── */}
         <View style={styles.quickActionsRow}>
@@ -411,6 +395,37 @@ export function SettingsScreen() {
             <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.invite')}</Text>
           </TouchableOpacity>
         </View>
+
+        <GroupLabel theme={theme}>{t('groups.billing')}</GroupLabel>
+
+        {/* AI wallet / usage (충전금·사용량) */}
+        <CollapsibleSection title={tWallet('title')} icon="💳">
+          <WalletSummary />
+        </CollapsibleSection>
+
+        {/* Card storage usage (owned-card limit, mig 116) */}
+        {cardUsage && (
+          <CollapsibleSection
+            title={t('cardUsage.title')}
+            icon="📇"
+            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
+          >
+            <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
+              <View style={{
+                height: '100%', borderRadius: 4,
+                width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%`,
+                backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
+              }} />
+            </View>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
+            <View style={{ marginTop: 8, alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: theme.colors.border, opacity: 0.7 }}>
+              <Text style={{ color: theme.colors.textSecondary, fontWeight: '600', fontSize: 13 }}>{t('cardUsage.upgrade')}</Text>
+            </View>
+            {cardUsage.available <= 0 && (
+              <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
+            )}
+          </CollapsibleSection>
+        )}
 
         {/* ── Templates ── */}
         <SectionCard theme={theme}>
@@ -463,9 +478,10 @@ export function SettingsScreen() {
           </TouchableOpacity>
         </SectionCard>
 
+        <GroupLabel theme={theme}>{t('groups.study')}</GroupLabel>
+
         {/* ── Answer Mode — matches web: standalone card ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('answerMode.title')}</Text>
+        <CollapsibleSection title={t('answerMode.title')} icon="📝">
           <View style={styles.segmentRow}>
             {(['before', 'same', 'after'] as const).map((timing) => {
               const isActive = profile.answer_timing === timing
@@ -493,11 +509,10 @@ export function SettingsScreen() {
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
             {t('answerMode.timingDesc')}
           </Text>
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── New Card Limit — standalone card ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('newCardLimit.title')}</Text>
+        <CollapsibleSection title={t('newCardLimit.title')} icon="🔢">
           <View style={styles.modeGrid}>
             {(['button', 'swipe'] as const).map((mode) => {
               const isActive = profile.answer_mode === mode
@@ -541,34 +556,10 @@ export function SettingsScreen() {
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
             {t('newCardLimit.hint')}
           </Text>
-        </SectionCard>
-
-        {/* ── Haptic feedback — standalone card ── */}
-        <SectionCard theme={theme}>
-          <View style={styles.switchRow}>
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-              {t('haptics.enable', { defaultValue: 'Haptic feedback' })}
-            </Text>
-            <Switch
-              testID="settings-haptics-toggle"
-              value={hapticsOn}
-              onValueChange={(v) => {
-                setHapticsOn(v)
-                setHapticsEnabled(v)
-                localPrefs.setHapticsEnabled(v)
-                if (v) haptics.success() // immediate confirmation when turning on
-              }}
-              trackColor={{ true: theme.colors.primary }}
-            />
-          </View>
-          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            {t('haptics.hint', { defaultValue: 'Vibration feedback on taps, ratings, and actions.' })}
-          </Text>
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── Auto TTS Reading — standalone card ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('tts.title')}</Text>
+        <CollapsibleSection title={t('tts.title')} icon="🔊">
           <View style={styles.switchRow}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('tts.enable')}</Text>
             <Switch
@@ -628,11 +619,10 @@ export function SettingsScreen() {
               </View>
             </View>
           )}
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── Daily Study Goal — standalone like web ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('dailyGoal.title')}</Text>
+        <CollapsibleSection title={t('dailyGoal.title')} icon="🎯">
           <TextInput
             testID="settings-daily-goal"
             value={profile.daily_study_goal != null ? String(profile.daily_study_goal) : ''}
@@ -656,11 +646,10 @@ export function SettingsScreen() {
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
             {t('dailyGoal.hint')}
           </Text>
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── d) SRS Configuration ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('srsConfig.title')}</Text>
+        <CollapsibleSection title={t('srsConfig.title')} icon="🧠">
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
             {t('srsConfig.description')}
           </Text>
@@ -702,11 +691,35 @@ export function SettingsScreen() {
               </View>
             </View>
           </View>
+        </CollapsibleSection>
+
+        {/* ── Haptic feedback — standalone card ── */}
+        <SectionCard theme={theme}>
+          <View style={styles.switchRow}>
+            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+              {t('haptics.enable', { defaultValue: 'Haptic feedback' })}
+            </Text>
+            <Switch
+              testID="settings-haptics-toggle"
+              value={hapticsOn}
+              onValueChange={(v) => {
+                setHapticsOn(v)
+                setHapticsEnabled(v)
+                localPrefs.setHapticsEnabled(v)
+                if (v) haptics.success() // immediate confirmation when turning on
+              }}
+              trackColor={{ true: theme.colors.primary }}
+            />
+          </View>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            {t('haptics.hint', { defaultValue: 'Vibration feedback on taps, ratings, and actions.' })}
+          </Text>
         </SectionCard>
 
+        <GroupLabel theme={theme}>{t('groups.preferences')}</GroupLabel>
+
         {/* ── f) Language ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('language.title')}</Text>
+        <CollapsibleSection title={t('language.title')} icon="🌐">
           <TouchableOpacity
             testID="settings-lang-dropdown"
             onPress={() => setLangDropdownOpen(true)}
@@ -750,11 +763,10 @@ export function SettingsScreen() {
               </View>
             </TouchableOpacity>
           </Modal>
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── Theme ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('theme.title')}</Text>
+        <CollapsibleSection title={t('theme.title')} icon="🎨">
           <View style={styles.segmentRow}>
             {(['light', 'dark', 'system'] as const).map((mode) => {
               const isActive = themeMode === mode
@@ -786,11 +798,10 @@ export function SettingsScreen() {
               )
             })}
           </View>
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── g) Notifications ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('notifications.title')}</Text>
+        <CollapsibleSection title={t('notifications.title')} icon="🔔">
           <View style={styles.switchRow}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('notifications.dailyReminder')}</Text>
             <Switch
@@ -805,7 +816,7 @@ export function SettingsScreen() {
               {t('notifications.reminderDesc')}
             </Text>
           )}
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ──────────────────────────────────────────────────────────────────── */}
         {/* [SUBSCRIPTION-HIDDEN] h) Subscription 섹션 — 2026-04-15 심사 리젝 대응  */}
@@ -844,9 +855,10 @@ export function SettingsScreen() {
         </SectionCard>
         */}
 
+        <GroupLabel theme={theme}>{t('groups.data')}</GroupLabel>
+
         {/* ── i) Export My Data — matches web ── */}
-        <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('export.title')}</Text>
+        <CollapsibleSection title={t('export.title')} icon="📥">
           {[
             { key: 'stats', icon: '📊', labelKey: 'export.stats' },
             { key: 'sessions', icon: '📅', labelKey: 'export.sessions' },
@@ -866,7 +878,7 @@ export function SettingsScreen() {
               <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
             </TouchableOpacity>
           ))}
-        </SectionCard>
+        </CollapsibleSection>
 
         {/* ── j) Legal (compact inline links) ── */}
         <View style={styles.legalRow}>
@@ -947,6 +959,13 @@ export function SettingsScreen() {
       </ScrollView>
     </Screen>
   )
+}
+
+/**
+ * Category group label — small uppercase heading above a group of sections
+ */
+function GroupLabel({ children, theme }: { children: React.ReactNode; theme: ReturnType<typeof useTheme> }) {
+  return <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: theme.colors.textSecondary, marginTop: 20, marginBottom: 8, marginLeft: 4 }}>{children}</Text>
 }
 
 /**

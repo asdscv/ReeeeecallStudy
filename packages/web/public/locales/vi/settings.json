@@ -162,6 +162,18 @@
     "title": "Dung lượng thẻ",
     "count": "{{owned}} / {{limit}} thẻ",
     "reached": "Bạn đã đạt giới hạn thẻ. Đăng ký để thêm.",
-    "subscribe": "Đăng ký (sắp ra mắt)"
-  }
+    "subscribe": "Đăng ký (sắp ra mắt)",
+    "plan": "Gói miễn phí",
+    "planNote": "Gói miễn phí bao gồm tối đa {{limit}} thẻ sở hữu. Đăng ký để tăng giới hạn.",
+    "upgrade": "Nâng cấp (sắp có)",
+    "upgradeSoon": "Đăng ký sắp ra mắt."
+  },
+  "groups": {
+    "account": "Tài khoản",
+    "billing": "Tín dụng & Sử dụng",
+    "study": "Học tập",
+    "preferences": "Tùy chọn",
+    "data": "Dữ liệu"
+  },
+  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn."
 }
