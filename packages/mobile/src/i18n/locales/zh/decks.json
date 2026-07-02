@@ -226,7 +226,10 @@
     "prevPage": "← 上一页",
     "nextPage": "下一页 →",
     "pageOf": "第 {{current}} 页 / 共 {{total}} 页",
-    "showingRange": "显示第 {{from}}–{{to}} 张，共 {{total}} 张卡片"
+    "showingRange": "显示第 {{from}}–{{to}} 张，共 {{total}} 张卡片",
+    "archivedBadge": "已归档 · 学习已锁定",
+    "archivedNote": "{{count}} 张卡片因超出上限被归档 — 仍可查看。订阅后即可重新学习。",
+    "archivedSubscribe": "订阅（即将推出）"
   },
   "deckEdit": {
     "previewName": "牌组名称",

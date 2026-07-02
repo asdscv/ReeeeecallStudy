@@ -49,7 +49,11 @@
     "saveVersion": "Simpan Versi",
     "noVersions": "Belum ada versi yang tercatat.",
     "versionLabel": "Versi {{num}}",
-    "versionCards": "kartu"
+    "versionCards": "kartu",
+    "archived": {
+      "badge": "Diarsipkan · belajar terkunci",
+      "note": "{{count}} kartu diarsipkan karena melebihi batas — kamu masih bisa melihatnya. Berlangganan untuk mempelajarinya lagi."
+    }
   },
   "settings": {
     "deckName": "Nama Dek",

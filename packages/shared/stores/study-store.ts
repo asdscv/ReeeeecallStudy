@@ -179,6 +179,25 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       .single()
     const maxCardPosition = (maxPosData as { sort_position: number } | null)?.sort_position ?? 0
 
+    // ── Archive-the-excess boundary (mig 123) ──────────────────────────────
+    // Owned NON-OFFICIAL cards created AFTER the (limit)-th oldest are ARCHIVED
+    // FROM STUDY once the account is over its card cap — they stay fully
+    // viewable / editable / deletable, just not studyable.
+    // get_active_card_threshold() returns ONE boundary value: the created_at of
+    // the (limit)-th oldest owned non-official card (NULL when at/under the cap
+    // → nothing archived). For OWNED decks (embedded SRS source) we range-filter
+    // the queue to created_at <= threshold — an INDEXED range — so archived
+    // cards never enter the session and the payload stays O(active), independent
+    // of library size. Subscribed / publisher-owned / official decks
+    // (progress_table source, user_card_progress) are ALWAYS active and never
+    // filtered. Fetched ONCE per session here and cached in `activeThreshold`
+    // for reuse across every owned-deck queue query below.
+    let activeThreshold: string | null = null
+    if (srsSource === 'embedded') {
+      const { data: thresholdData } = await supabase.rpc('get_active_card_threshold')
+      activeThreshold = (thresholdData as string | null) ?? null
+    }
+
     // Build card queue based on mode
     let cards: Card[] = []
     let srsQueueManager: SrsQueueManager | null = null
@@ -247,29 +266,34 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           cards = [...learning, ...review, ...newC]
         } else {
           // Embedded: original path
-          const { data: learning } = await supabase
-            .from('cards')
-            .select('*')
-            .eq('deck_id', config.deckId)
-            .eq('srs_status', 'learning')
-            .lte('next_review_at', now)
-            .order('next_review_at', { ascending: true })
+          const { data: learning } = await withArchiveBoundary(
+            supabase
+              .from('cards')
+              .select('*')
+              .eq('deck_id', config.deckId)
+              .eq('srs_status', 'learning')
+              .lte('next_review_at', now),
+            activeThreshold,
+          ).order('next_review_at', { ascending: true })
 
-          const { data: review } = await supabase
-            .from('cards')
-            .select('*')
-            .eq('deck_id', config.deckId)
-            .eq('srs_status', 'review')
-            .lte('next_review_at', now)
-            .order('next_review_at', { ascending: true })
+          const { data: review } = await withArchiveBoundary(
+            supabase
+              .from('cards')
+              .select('*')
+              .eq('deck_id', config.deckId)
+              .eq('srs_status', 'review')
+              .lte('next_review_at', now),
+            activeThreshold,
+          ).order('next_review_at', { ascending: true })
 
-          const { data: newCards } = await supabase
-            .from('cards')
-            .select('*')
-            .eq('deck_id', config.deckId)
-            .eq('srs_status', 'new')
-            .order('sort_position', { ascending: true })
-            .limit(remainingNewToday)
+          const { data: newCards } = await withArchiveBoundary(
+            supabase
+              .from('cards')
+              .select('*')
+              .eq('deck_id', config.deckId)
+              .eq('srs_status', 'new'),
+            activeThreshold,
+          ).order('sort_position', { ascending: true }).limit(remainingNewToday)
 
           cards = [
             ...((learning ?? []) as Card[]),
@@ -296,11 +320,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         if (!typedStudyState) break
 
         // Fetch all cards for this deck
-        const { data: allDeckCards } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .order('sort_position', { ascending: true })
+        const { data: allDeckCards } = await withArchiveBoundary(
+          supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId),
+          activeThreshold,
+        ).order('sort_position', { ascending: true })
 
         const allCards = (allDeckCards ?? []) as Card[]
 
@@ -334,6 +360,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           query = query.lte('created_at', config.uploadDateEnd)
         }
 
+        query = withArchiveBoundary(query, activeThreshold)
+
         const { data: allCards } = await query
         const shuffled = shuffleArray((allCards ?? []) as Card[])
         cards = shuffled.slice(0, config.batchSize)
@@ -344,14 +372,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         if (!typedStudyState) break
 
         // Try from current position
-        const { data: seqCards } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .neq('srs_status', 'suspended')
-          .gte('sort_position', typedStudyState.sequential_pos)
-          .order('sort_position', { ascending: true })
-          .limit(config.batchSize)
+        const { data: seqCards } = await withArchiveBoundary(
+          supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .neq('srs_status', 'suspended')
+            .gte('sort_position', typedStudyState.sequential_pos),
+          activeThreshold,
+        ).order('sort_position', { ascending: true }).limit(config.batchSize)
 
         cards = (seqCards ?? []) as Card[]
 
@@ -359,13 +388,14 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         if (cards.length < config.batchSize) {
           const remaining = config.batchSize - cards.length
           const existingIds = new Set(cards.map(c => c.id))
-          const { data: wrapCards } = await supabase
-            .from('cards')
-            .select('*')
-            .eq('deck_id', config.deckId)
-            .neq('srs_status', 'suspended')
-            .order('sort_position', { ascending: true })
-            .limit(remaining)
+          const { data: wrapCards } = await withArchiveBoundary(
+            supabase
+              .from('cards')
+              .select('*')
+              .eq('deck_id', config.deckId)
+              .neq('srs_status', 'suspended'),
+            activeThreshold,
+          ).order('sort_position', { ascending: true }).limit(remaining)
 
           const uniqueWrapCards = ((wrapCards ?? []) as Card[]).filter(c => !existingIds.has(c.id))
           cards = [...cards, ...uniqueWrapCards]
@@ -387,6 +417,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           query = query.lte('created_at', config.uploadDateEnd)
         }
 
+        query = withArchiveBoundary(query, activeThreshold)
+
         const { data: dateCards } = await query.order('sort_position', { ascending: true })
         cards = (dateCards ?? []) as Card[]
         break
@@ -394,12 +426,14 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
       case 'cramming': {
         // Fetch all non-suspended cards
-        const { data: allCrammingCards } = await supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .neq('srs_status', 'suspended')
-          .order('sort_position', { ascending: true })
+        const { data: allCrammingCards } = await withArchiveBoundary(
+          supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .neq('srs_status', 'suspended'),
+          activeThreshold,
+        ).order('sort_position', { ascending: true })
 
         const crammingFilter = config.crammingFilter ?? { type: 'all' as const }
         cards = filterCardsForCramming((allCrammingCards ?? []) as Card[], crammingFilter)
@@ -897,6 +931,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     })
   },
 }))
+
+/**
+ * Range-filter an OWNED-deck (`cards` table) query to the ACTIVE side of the
+ * archive boundary (mig 123). When `threshold` is non-null, only cards with
+ * created_at <= threshold (the un-archived ones, under the card cap) stay in the
+ * query — an INDEXED range, so archived cards never enter the study queue and
+ * the payload stays O(active). When null the account is at/under its limit → no
+ * filter (every owned card is active). MUST be applied while the query is still
+ * a filter builder (before .order()/.limit()). Only ever used on OWNED (embedded
+ * SRS) decks — subscribed / publisher-owned / official cards are always active
+ * and are never passed here.
+ */
+function withArchiveBoundary<Q>(query: Q, threshold: string | null): Q {
+  if (!threshold) return query
+  return (query as unknown as { lte(column: string, value: string): Q }).lte('created_at', threshold)
+}
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array]

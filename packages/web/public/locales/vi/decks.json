@@ -49,7 +49,11 @@
     "saveVersion": "Lưu phiên bản",
     "noVersions": "Chưa có phiên bản nào được ghi lại.",
     "versionLabel": "Phiên bản {{num}}",
-    "versionCards": "thẻ"
+    "versionCards": "thẻ",
+    "archived": {
+      "badge": "Đã lưu trữ · khóa học tập",
+      "note": "{{count}} thẻ bị lưu trữ do vượt giới hạn — bạn vẫn có thể xem. Đăng ký để học lại."
+    }
   },
   "settings": {
     "deckName": "Tên bộ thẻ",

@@ -226,7 +226,10 @@
     "prevPage": "← ก่อนหน้า",
     "nextPage": "ถัดไป →",
     "pageOf": "หน้า {{current}} จาก {{total}}",
-    "showingRange": "แสดง {{from}}–{{to}} จาก {{total}} การ์ด"
+    "showingRange": "แสดง {{from}}–{{to}} จาก {{total}} การ์ด",
+    "archivedBadge": "เก็บถาวรแล้ว · ล็อกการเรียน",
+    "archivedNote": "มี {{count}} ใบถูกเก็บถาวรเพราะเกินขีดจำกัด — ยังดูได้ตามปกติ สมัครสมาชิกเพื่อกลับมาเรียนอีกครั้ง",
+    "archivedSubscribe": "สมัครสมาชิก (เร็ว ๆ นี้)"
   },
   "deckEdit": {
     "previewName": "ชื่อสำรับ",
