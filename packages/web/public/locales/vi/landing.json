@@ -323,6 +323,26 @@
       }
     }
   },
+  "pricing": {
+    "title": "Bảng giá",
+    "subtitle": "Chọn gói phù hợp với mức độ học của bạn",
+    "recommended": "Đề xuất",
+    "freePrice": "Miễn phí",
+    "pricePerMonth": "₩{{price}}/tháng",
+    "unlimitedCards": "Thẻ không giới hạn",
+    "upToCards": "Tối đa {{count}} thẻ",
+    "ctaFree": "Bắt đầu miễn phí",
+    "ctaPaid": "Bắt đầu ngay",
+    "note": "Thanh toán được thực hiện sau khi đăng ký, trong phần Cài đặt.",
+    "plans": {
+      "free": "Miễn phí",
+      "standard": "Tiêu chuẩn",
+      "unlimited": "Không giới hạn",
+      "freeBlurb": "Gói miễn phí lý tưởng để bắt đầu",
+      "standardBlurb": "Mở rộng việc học với nhiều thẻ hơn",
+      "unlimitedBlurb": "Lưu trữ và học tập không giới hạn"
+    }
+  },
   "seo": {
     "title": "ReeeeecallStudy — Học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
     "description": "Nền tảng học thẻ ghi nhớ thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn."

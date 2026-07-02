@@ -323,6 +323,26 @@
       }
     }
   },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Choose the plan that fits how much you study",
+    "recommended": "Recommended",
+    "freePrice": "Free",
+    "pricePerMonth": "₩{{price}}/mo",
+    "unlimitedCards": "Unlimited cards",
+    "upToCards": "Up to {{count}} cards",
+    "ctaFree": "Start free",
+    "ctaPaid": "Get started",
+    "note": "Checkout happens after sign-up, in Settings.",
+    "plans": {
+      "free": "Free",
+      "standard": "Standard",
+      "unlimited": "Unlimited",
+      "freeBlurb": "A free plan that's perfect to get started",
+      "standardBlurb": "Expand your learning with more cards",
+      "unlimitedBlurb": "Store and study without any limits"
+    }
+  },
   "seo": {
     "title": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
     "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."

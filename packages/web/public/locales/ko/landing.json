@@ -323,6 +323,26 @@
       }
     }
   },
+  "pricing": {
+    "title": "요금제",
+    "subtitle": "학습 규모에 맞는 플랜을 선택하세요",
+    "recommended": "추천",
+    "freePrice": "무료",
+    "pricePerMonth": "₩{{price}}/월",
+    "unlimitedCards": "무제한 카드",
+    "upToCards": "카드 {{count}}장",
+    "ctaFree": "무료로 시작하기",
+    "ctaPaid": "시작하기",
+    "note": "결제는 가입 후 설정에서 진행됩니다.",
+    "plans": {
+      "free": "무료",
+      "standard": "스탠다드",
+      "unlimited": "무제한",
+      "freeBlurb": "부담 없이 시작하기 좋은 기본 플랜",
+      "standardBlurb": "더 많은 카드로 학습을 확장하세요",
+      "unlimitedBlurb": "한도 없이 마음껏 저장하고 학습하세요"
+    }
+  },
   "seo": {
     "title": "ReeeeecallStudy — 간격 반복으로 스마트한 플래시카드 학습",
     "description": "과학적으로 검증된 간격 반복(SRS) 알고리즘으로 더 빠르고 오래 기억하는 플래시카드 학습 플랫폼."

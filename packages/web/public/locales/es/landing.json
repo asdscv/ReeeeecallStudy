@@ -323,6 +323,26 @@
       }
     }
   },
+  "pricing": {
+    "title": "Precios",
+    "subtitle": "Elige el plan que se adapte a cuánto estudias",
+    "recommended": "Recomendado",
+    "freePrice": "Gratis",
+    "pricePerMonth": "₩{{price}}/mes",
+    "unlimitedCards": "Tarjetas ilimitadas",
+    "upToCards": "Hasta {{count}} tarjetas",
+    "ctaFree": "Empezar gratis",
+    "ctaPaid": "Comenzar",
+    "note": "El pago se realiza tras registrarte, en Ajustes.",
+    "plans": {
+      "free": "Gratis",
+      "standard": "Estándar",
+      "unlimited": "Ilimitado",
+      "freeBlurb": "Un plan gratuito perfecto para empezar",
+      "standardBlurb": "Amplía tu aprendizaje con más tarjetas",
+      "unlimitedBlurb": "Guarda y estudia sin límites"
+    }
+  },
   "seo": {
     "title": "ReeeeecallStudy — Aprendizaje Inteligente con Tarjetas y Repetición Espaciada",
     "description": "Plataforma inteligente de aprendizaje con tarjetas y algoritmo de repetición espaciada (SRS) científicamente comprobado. Recuerda más rápido y por más tiempo."
