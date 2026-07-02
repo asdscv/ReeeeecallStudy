@@ -45,7 +45,17 @@
     "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。",
     "limitUsage": "カード{{count}}枚が上限に加算されます · 残り{{available}}枚",
     "limitExceeds": "カード上限を超えます（残り{{available}}枚）。カードを削除するか購読してください。",
-    "limitOfficialFree": "公式デッキ · カード上限に含まれません。"
+    "limitOfficialFree": "公式デッキ · カード上限に含まれません。",
+    "acquireByMode": {
+      "subscribe": "購読する",
+      "copy": "マイデッキにコピー",
+      "snapshot": "スナップショットを取得"
+    },
+    "modeDesc": {
+      "subscribe": "公開者のデッキを購読して学習します（進捗は自分専用）",
+      "copy": "編集できる自分専用のコピーを作成します",
+      "snapshot": "読み取り専用のスナップショットコピーを取得します"
+    }
   },
   "preview": {
     "title": "\"{{title}}\" - フラッシュカードデッキ | ReeeeecallStudy",

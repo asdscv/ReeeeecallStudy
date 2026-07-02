@@ -25,6 +25,14 @@
   "restored": "Da khoi phuc goi Pro.",
   "noRestoreFound": "Khong tim thay goi dang ky truoc do.",
   "productsUnavailable": "San pham dang ky hien khong kha dung. Vui long thu lai sau.",
+  "checkout": {
+    "startFailed": "Khong the bat dau thanh toan. Vui long thu lai.",
+    "confirming": "Da nhan thanh toan — tai khoan cua ban se cap nhat sau khi xac nhan."
+  },
+  "catalog": {
+    "perMonth": "/thang",
+    "purchaseUnavailable": "San pham nay chua the mua duoc."
+  },
   "privacyPolicy": "Chinh sach Bao mat",
   "termsOfService": "Dieu khoan Dich vu",
   "manageSubscription": "Quan ly Dang ky"

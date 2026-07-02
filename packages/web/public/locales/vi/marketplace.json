@@ -45,7 +45,17 @@
     "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại.",
     "limitUsage": "Thêm {{count}} thẻ vào giới hạn · còn {{available}}",
     "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available}}). Xóa thẻ hoặc đăng ký trước.",
-    "limitOfficialFree": "Bộ thẻ chính thức · không tính vào giới hạn thẻ."
+    "limitOfficialFree": "Bộ thẻ chính thức · không tính vào giới hạn thẻ.",
+    "acquireByMode": {
+      "subscribe": "Đăng ký theo dõi",
+      "copy": "Sao chép vào bộ thẻ của tôi",
+      "snapshot": "Lấy bản chụp nhanh"
+    },
+    "modeDesc": {
+      "subscribe": "Học bộ thẻ của người đăng qua đăng ký theo dõi (với tiến độ của riêng bạn)",
+      "copy": "Tạo bản sao của riêng bạn có thể chỉnh sửa",
+      "snapshot": "Lấy bản sao chụp nhanh chỉ đọc"
+    }
   },
   "preview": {
     "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | ReeeeecallStudy",

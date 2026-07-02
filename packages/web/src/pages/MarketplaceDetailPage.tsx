@@ -18,7 +18,37 @@ import type {
   Card,
   CardTemplate,
   PublicListingPreview,
+  ShareMode,
 } from '../types/database'
+
+// Map a listing's share_mode → the i18n key for the acquire button label.
+// share_mode is a fixed property set by the publisher (subscribe | copy | snapshot).
+function acquireLabelKey(mode: ShareMode | null | undefined): string {
+  switch (mode) {
+    case 'subscribe':
+      return 'marketplace:detail.acquireByMode.subscribe'
+    case 'copy':
+      return 'marketplace:detail.acquireByMode.copy'
+    case 'snapshot':
+      return 'marketplace:detail.acquireByMode.snapshot'
+    default:
+      return 'marketplace:detail.getDeck'
+  }
+}
+
+// Map a listing's share_mode → the i18n key for the one-line mode description.
+function modeDescKey(mode: ShareMode | null | undefined): string | null {
+  switch (mode) {
+    case 'subscribe':
+      return 'marketplace:detail.modeDesc.subscribe'
+    case 'copy':
+      return 'marketplace:detail.modeDesc.copy'
+    case 'snapshot':
+      return 'marketplace:detail.modeDesc.snapshot'
+    default:
+      return null
+  }
+}
 
 export function MarketplaceDetailPage() {
   const { t } = useTranslation(['marketplace', 'common'])
@@ -296,7 +326,7 @@ export function MarketplaceDetailPage() {
               ? t('marketplace:detail.alreadyAcquired', { defaultValue: 'Already in your collection' })
               : acquiring
                 ? t('marketplace:detail.importing')
-                : t('marketplace:detail.getDeck')}
+                : t(acquireLabelKey(listing.share_mode))}
           </button>
         )}
 
@@ -321,6 +351,13 @@ export function MarketplaceDetailPage() {
           </button>
         )}
         </div>
+
+        {/* Mode-aware one-liner: what acquiring does depends on the listing's share_mode */}
+        {!isOwner && !hasAcquired && modeDescKey(listing.share_mode) && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {t(modeDescKey(listing.share_mode)!)}
+          </p>
+        )}
 
         {/* Owned-card limit impact (mig 118): non-official acquisitions count toward the cap */}
         {!isOwner && !hasAcquired && (

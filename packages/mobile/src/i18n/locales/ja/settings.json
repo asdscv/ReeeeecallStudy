@@ -165,7 +165,8 @@
     "plan": "無料プラン",
     "planNote": "無料プランは所有カード最大{{limit}}枚まで。上限を増やすには購読してください。",
     "upgrade": "アップグレード（近日公開）",
-    "upgradeSoon": "購読は近日公開予定です。"
+    "upgradeSoon": "購読は近日公開予定です。",
+    "cancelPending": "解約予定 — {{date}}まで利用できます"
   },
   "groups": {
     "account": "アカウント",

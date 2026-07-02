@@ -45,7 +45,17 @@
     "unsubscribed": "Unsubscribed",
     "limitUsage": "Adds {{count}} cards toward your limit · {{available}} left",
     "limitExceeds": "This would exceed your card limit ({{available}} left). Delete cards or subscribe first.",
-    "limitOfficialFree": "Official deck — doesn't count toward your card limit."
+    "limitOfficialFree": "Official deck — doesn't count toward your card limit.",
+    "acquireByMode": {
+      "subscribe": "Subscribe",
+      "copy": "Copy to my decks",
+      "snapshot": "Get a snapshot"
+    },
+    "modeDesc": {
+      "subscribe": "Study the publisher's deck via a subscription (your own progress)",
+      "copy": "Creates your own editable copy",
+      "snapshot": "Gets a read-only snapshot copy"
+    }
   },
   "report": {
     "title": "Report Content",

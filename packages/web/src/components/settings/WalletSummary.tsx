@@ -1,43 +1,40 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
-import {
-  getAiWalletSummary,
-  microWonToWon,
-  type AiWalletSummary,
-} from '@reeeeecall/shared/lib/ai/server-client'
+import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
 import { toIntlLocale } from '../../lib/locale-utils'
+import { useBillingStore } from '../../stores/billing-store'
+import { TopUpModal } from '../billing/TopUpModal'
 
 // AI wallet / usage content for the Settings accordion section (충전금·사용량):
 // prepaid ₩ balance, today's free-tier usage, and recent spend/top-up history
 // (get_ai_wallet_summary, mig 117). Fetches on mount — the parent CollapsibleSection
-// only mounts this when expanded. Top-up disabled (payment Phase 2 on hold).
+// only mounts this when expanded. Top-up opens TopUpModal (payment gated OFF until a
+// provider is wired — the modal shows a coming-soon state).
 export function WalletSummary() {
   const { t, i18n } = useTranslation('wallet')
-  const [summary, setSummary] = useState<AiWalletSummary | null>(null)
-  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
+  // Read from the billing store so a successful top-up (which calls fetchWallet)
+  // reflects here without a manual reload.
+  const summary = useBillingStore((s) => s.wallet)
+  const walletState = useBillingStore((s) => s.walletState)
+  const fetchWallet = useBillingStore((s) => s.fetchWallet)
+  const [topUpOpen, setTopUpOpen] = useState(false)
 
-  const load = () => {
-    setState('loading')
-    getAiWalletSummary().then((s) => {
-      if (s) { setSummary(s); setState('ready') } else { setState('error') }
-    })
-  }
-  useEffect(load, [])
+  useEffect(() => { void fetchWallet() }, [fetchWallet])
 
   const dateLocale = toIntlLocale(i18n.language)
   const fmtWon = (won: number) => `₩${won.toLocaleString(dateLocale)}`
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-  if (state === 'loading') {
+  if (!summary && (walletState === 'loading' || walletState === 'idle')) {
     return <div className="flex items-center justify-center py-8 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /></div>
   }
-  if (state === 'error' || !summary) {
+  if (walletState === 'error' || !summary) {
     return (
       <div className="text-center py-4">
         <p className="text-sm text-muted-foreground mb-3">{t('error')}</p>
-        <button onClick={load} className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover transition cursor-pointer font-medium">{t('retry')}</button>
+        <button onClick={() => void fetchWallet()} className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover transition cursor-pointer font-medium">{t('retry')}</button>
       </div>
     )
   }
@@ -53,12 +50,13 @@ export function WalletSummary() {
         <div className="text-3xl font-bold text-foreground tabular-nums">{fmtWon(balanceWon)}</div>
         <p className="text-xs text-muted-foreground mt-1">{t('balance.hint')}</p>
         <button
-          disabled
+          onClick={() => setTopUpOpen(true)}
           title={t('balance.topUpSoon')}
-          className="mt-3 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground cursor-not-allowed font-medium"
+          className="mt-3 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground hover:bg-accent/70 cursor-pointer font-medium transition"
         >
           {t('balance.topUp')}
         </button>
+        <TopUpModal open={topUpOpen} onClose={() => setTopUpOpen(false)} />
       </div>
 
       {/* Free today */}

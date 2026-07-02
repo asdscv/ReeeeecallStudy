@@ -1,0 +1,28 @@
+{
+  "topUp": {
+    "title": "Tambah saldo",
+    "subtitle": "Isi saldo untuk membuat kartu AI melebihi kartu gratis harian.",
+    "credits": "Dapatkan saldo ₩{{won}}",
+    "buy": "Beli",
+    "success": "Saldo ditambahkan.",
+    "empty": "Tidak ada paket yang tersedia.",
+    "loadError": "Tidak dapat memuat produk. Silakan coba lagi."
+  },
+  "subscribe": {
+    "cta": "Tingkatkan paket",
+    "success": "Langganan aktif.",
+    "cancelPending": "Akan dibatalkan · akses hingga {{date}}",
+    "cancelPendingNoDate": "Akan dibatalkan di akhir periode saat ini."
+  },
+  "checkout": {
+    "success": "Pembayaran selesai.",
+    "canceled": "Pembayaran dibatalkan.",
+    "failed": "Pembayaran gagal. Silakan coba lagi."
+  },
+  "comingSoon": {
+    "badge": "Segera hadir",
+    "title": "Pembayaran segera hadir",
+    "body": "Kami sedang menyiapkan pembayaran. Fitur ini akan segera tersedia."
+  },
+  "retry": "Coba lagi"
+}

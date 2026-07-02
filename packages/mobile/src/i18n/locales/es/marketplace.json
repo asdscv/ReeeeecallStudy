@@ -98,7 +98,17 @@
     "downloading": "Descargando...",
     "limitUsage": "Añade {{count}} tarjetas a tu límite · quedan {{available}}",
     "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Elimina tarjetas o suscríbete.",
-    "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas."
+    "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas.",
+    "acquireByMode": {
+      "subscribe": "Suscribirse",
+      "copy": "Copiar a mis mazos",
+      "snapshot": "Obtener una instantánea"
+    },
+    "modeDesc": {
+      "subscribe": "Estudia el mazo del editor mediante una suscripción (con tu propio progreso)",
+      "copy": "Crea tu propia copia editable",
+      "snapshot": "Obtiene una copia instantánea de solo lectura"
+    }
   },
   "publish": {
     "title": "Publish Deck",
