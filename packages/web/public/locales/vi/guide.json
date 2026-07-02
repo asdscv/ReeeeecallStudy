@@ -241,52 +241,6 @@
         }
       }
     },
-    "api": {
-      "title": "Hướng dẫn API (Tự động tạo thẻ với AI)",
-      "items": {
-        "whatSimple": {
-          "title": "API là gì? (Giải thích đơn giản)",
-          "body": "API là \"cách để các chương trình giao tiếp với nhau.\"\n\nGiống như bạn nhấp nút trong ứng dụng để tạo thẻ, API cho phép bạn làm điều tương tự bằng lệnh văn bản.\n\nHãy nghĩ nó như một nhà hàng:\n• Thực đơn = Tài liệu API (mô tả những yêu cầu bạn có thể gửi)\n• Gọi món = Yêu cầu API (\"Hiển thị bộ thẻ của tôi\", \"Thêm 100 thẻ\")\n• Nhận món = Phản hồi API (dữ liệu hoặc kết quả bạn yêu cầu)\n\nĐiều tuyệt vời nhất? Bạn có thể nhờ các công cụ AI như ChatGPT, Gemini hoặc Claude gửi những lệnh này cho bạn!\nAI tạo nội dung thẻ VÀ đăng ký chúng qua API tự động."
-        },
-        "whyApi": {
-          "title": "Tại sao sử dụng API?",
-          "body": "So sánh tạo thẻ từng cái vs. sử dụng API:\n\nThủ công: 30 giây mỗi thẻ x 100 thẻ = ~50 phút\nAPI + AI: 100 thẻ cùng lúc = ~3-5 phút\n\nBạn có thể làm gì với API:\n• Bảo AI \"Tạo 100 thẻ từ vựng TOEIC\" và chúng được tạo ngay lập tức\n• \"Tạo 50 thẻ kanji JLPT N3\" — xong trong một yêu cầu\n• Tải dữ liệu từ Excel hoặc tệp văn bản hàng loạt\n• Không cần lập trình — chỉ cần trò chuyện với AI!\n\nLàm theo hướng dẫn này và bất kỳ ai cũng có thể tạo 100 thẻ trong 5 phút."
-        },
-        "getKey": {
-          "title": "Lấy khóa API",
-          "body": "Để sử dụng API, trước tiên bạn cần một khóa API. Nó giống như mật khẩu cho phép bạn truy cập API từ tài khoản.\n\nCách lấy:\n1. Đăng nhập vào ứng dụng ReeeeecallStudy\n2. Vào \"Cài đặt\" từ menu phía trên bên phải\n3. Cuộn xuống phần \"Khóa API\"\n4. Nhấp \"Tạo khóa API mới\"\n5. Nhập tên cho khóa (VD: \"Tích hợp AI của tôi\")\n6. Một khóa bắt đầu bằng rc_ sẽ được hiển thị\n\nQUAN TRỌNG: Khóa chỉ hiển thị một lần trên màn hình này!\nHãy chắc chắn sao chép và lưu ở nơi an toàn.\n\nKhóa API giống như mật khẩu. Đừng bao giờ chia sẻ với người khác."
-        },
-        "step1Prepare": {
-          "title": "Bước 1: Chuẩn bị bộ thẻ và mẫu thẻ",
-          "body": "Trước khi thêm thẻ qua API, hãy tạo bộ thẻ và mẫu thẻ trong ứng dụng trước.\n\n1. Tạo bộ thẻ\n• Trong ứng dụng, vào \"Bộ thẻ\" → \"Tạo bộ thẻ mới\"\n• Nhập tên (VD: \"Từ vựng TOEIC\")\n• Nhập mô tả (VD: \"Từ vựng TOEIC thiết yếu\")\n\n2. Tạo mẫu thẻ\n• Vào \"Mẫu\" → \"Mẫu mới\"\n• Nhập tên (VD: \"Chi tiết từ vựng\")\n• Thêm trường:\n  - word: loại văn bản\n  - meaning: loại văn bản\n  - example: loại văn bản\n• Đặt \"word\" ở bố cục mặt trước\n• Đặt \"meaning\" và \"example\" ở bố cục mặt sau\n\n3. Đặt mẫu mặc định cho bộ thẻ\n• Trong chỉnh sửa bộ thẻ, chọn mẫu vừa tạo làm mặc định\n\nMẹo: Nhớ tên khóa trường (word, meaning, example)!\nBạn sẽ dùng chính xác các khóa này khi tạo thẻ qua API."
-        },
-        "step2Query": {
-          "title": "Bước 2: Tìm ID bộ thẻ/mẫu với AI",
-          "body": "Để thêm thẻ, bạn cần ID bộ thẻ và ID mẫu.\nHãy nhờ AI tra cứu!\n\nMở ChatGPT, Gemini hoặc Claude và dán đoạn sau:\n\n─────────────────────────────\nTôi đang sử dụng ứng dụng thẻ ghi nhớ ReeeeecallStudy.\nĐây là thông tin API:\n• URL API: https://reeeeecallstudy.xyz/api/v1\n• Khóa API: rc_DÁN_KHÓA_API_CỦA_BẠN_VÀO_ĐÂY\n\nVui lòng gửi hai yêu cầu này:\n1. Liệt kê bộ thẻ: GET https://reeeeecallstudy.xyz/api/v1/decks\n2. Liệt kê mẫu: GET https://reeeeecallstudy.xyz/api/v1/templates\n\nThêm header: Authorization: Bearer rc_DÁN_KHÓA_API_CỦA_BẠN_VÀO_ĐÂY\nHiển thị id và tên từng bộ thẻ, và id, tên, trường của từng mẫu.\n─────────────────────────────\n\nThay \"rc_DÁN_KHÓA_API_CỦA_BẠN_VÀO_ĐÂY\" bằng khóa API thực!\n\nAI sẽ hiển thị thông tin như:\n• ID bộ thẻ: a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• Tên bộ thẻ: Từ vựng TOEIC\n• ID mẫu: e5f6g7h8-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n• Trường mẫu: word, meaning, example\n\nSao chép các ID này — bạn sẽ cần chúng ở bước tiếp theo!"
-        },
-        "step3AiGenerate": {
-          "title": "Bước 3: Nhờ AI tạo và đăng ký thẻ",
-          "body": "Đây là bước quan trọng! Nhờ AI tạo thẻ và đăng ký trực tiếp.\n\nSao chép prompt bên dưới, thay các phần được đánh dấu bằng thông tin của bạn, và gửi cho AI:\n\n─────────────────────────────\nTạo thẻ ghi nhớ sử dụng API ReeeeecallStudy.\n\nThông tin API:\n• URL gốc: https://reeeeecallstudy.xyz/api/v1\n• Khóa API: (dán khóa API vào đây)\n• ID bộ thẻ: (dán ID bộ thẻ từ Bước 2)\n• ID mẫu: (dán ID mẫu từ Bước 2)\n\nĐiểm cuối tạo thẻ:\nPOST https://reeeeecallstudy.xyz/api/v1/decks/(ID bộ thẻ)/cards\nHeaders:\n  Authorization: Bearer (khóa API)\n  Content-Type: application/json\nBody (mảng JSON, tối đa 100):\n[\n  {\n    \"template_id\": \"(ID mẫu)\",\n    \"field_values\": {\n      \"word\": \"Từ tiếng Anh\",\n      \"meaning\": \"định nghĩa\",\n      \"example\": \"câu ví dụ\"\n    },\n    \"tags\": [\"thẻ gắn\"]\n  }\n]\n\nYêu cầu:\nTạo 50 thẻ từ vựng TOEIC thiết yếu và đăng ký qua API trên.\nMỗi thẻ phải có:\n• word: Từ tiếng Anh\n• meaning: định nghĩa ngắn gọn\n• example: một câu ví dụ sử dụng từ\n• tags: mức độ khó (beginner / intermediate / advanced)\n─────────────────────────────\n\nĐổi \"50 thẻ từ vựng TOEIC thiết yếu\" thành bất kỳ chủ đề nào bạn muốn!\nVí dụ:\n• \"30 thẻ kanji JLPT N3\"\n• \"40 cụm từ du lịch tiếng Tây Ban Nha cơ bản\"\n• \"50 sự kiện lịch sử thế giới\"\n• \"30 thuật ngữ lập trình Python\"\n• \"50 thuật ngữ giải phẫu y học\"\n\nCần thêm thẻ? Chỉ cần nói \"Tạo thêm 50 thẻ không trùng lặp!\""
-        },
-        "aiExamples": {
-          "title": "Mẹo cho từng AI (ChatGPT / Gemini / Claude)",
-          "body": "Mỗi AI có điểm mạnh hơi khác nhau. Sử dụng cái tốt nhất cho nhu cầu!\n\nChatGPT (chat.openai.com)\n• Có thể chạy code để gọi API trực tiếp qua Code Interpreter\n• Mẹo: Nói \"Chạy code Python để gọi API trực tiếp\" và nó sẽ thực thi code thực để đăng ký thẻ\n• Tốt nhất cho: Gọi API trực tiếp\n\nGoogle Gemini (gemini.google.com)\n• Tích hợp với Google Search cho thông tin cập nhật\n• Mẹo: Tuyệt vời cho thẻ cần thông tin mới nhất như \"từ vựng thời sự 2025\"\n• Tốt nhất cho: Thẻ cần xu hướng mới nhất\n\nClaude (claude.ai)\n• Xuất sắc trong xử lý văn bản dài và tạo JSON chính xác\n• Mẹo: Có thể tạo 100 thẻ cùng lúc mà không làm hỏng định dạng JSON\n• Tốt nhất cho: Tạo hàng loạt, cấu trúc thẻ phức tạp\n\nMẹo chung:\n• Nếu AI không gọi được API → Nói \"Chỉ hiển thị dữ liệu JSON.\" Rồi sao chép và dùng phương pháp đăng ký thủ công (xem phần tiếp)\n• Nói \"Tạo thêm 50 thẻ không trùng với thẻ trước\" để bổ sung liên tục\n• Tối đa 100 thẻ mỗi yêu cầu. Nếu cần nhiều hơn, chia thành nhiều yêu cầu"
-        },
-        "step4Manual": {
-          "title": "Khi AI không thể gọi API trực tiếp (Phương pháp thủ công)",
-          "body": "Nếu AI không thể gọi API trực tiếp, đừng lo!\nChỉ cần sao chép dữ liệu JSON mà AI tạo và tự gửi.\n\nPhương pháp 1: Swagger UI (Dễ nhất, Khuyến nghị)\n1. Mở https://reeeeecallstudy.xyz/api/ui trong trình duyệt\n2. Nhấp \"Authorize\" ở trên → Nhập khóa API → Xác nhận\n3. Tìm và mở rộng POST /v1/decks/{deckId}/cards\n4. Nhấp \"Try it out\"\n5. Nhập ID bộ thẻ vào trường deckId\n6. Dán mảng JSON từ AI vào Request body\n7. Nhấp \"Execute\" → Xong!\n\nPhương pháp 2: Terminal / Command Prompt\nMở Terminal (Mac) hoặc PowerShell (Windows) và chạy:\n\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '[{\"template_id\":\"YOUR_TEMPLATE_ID\",\"field_values\":{\"word\":\"apple\",\"meaning\":\"a round fruit\",\"example\":\"I eat an apple every day.\"},\"tags\":[\"beginner\"]}]'\n\nVới JSON dài, lưu vào tệp trước:\ncurl -X POST \"https://reeeeecallstudy.xyz/api/v1/decks/YOUR_DECK_ID/cards\" \\\n  -H \"Authorization: Bearer rc_YOUR_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d @cards.json\n\nTối đa 100 thẻ mỗi yêu cầu."
-        },
-        "docsPage": {
-          "linkLabel": "Xem tài liệu API",
-          "title": "Tài liệu API đầy đủ",
-          "body": "Để biết thêm thông tin API chi tiết:\n\n• Tài liệu API trong ứng dụng: \"API\" trong menu trên hoặc /api-docs\n• Swagger UI (kiểm tra tương tác): https://reeeeecallstudy.xyz/api/ui\n• Tài liệu API công khai: https://reeeeecallstudy.xyz/docs/api\n\nTất cả điểm cuối có sẵn:\n• API bộ thẻ: Danh sách, chi tiết, tạo\n• API thẻ: Danh sách, chi tiết, tạo (hỗ trợ hàng loạt), cập nhật, xóa\n• API mẫu: Danh sách, chi tiết, tạo, cập nhật, xóa\n• API học tập: Thẻ đến hạn, lịch sử học, thống kê\n• API chợ: Danh sách, đăng tải, xóa\n• API chia sẻ: Tạo chia sẻ, chấp nhận mời, danh sách, thu hồi"
-        },
-        "rateLimits": {
-          "title": "Giới hạn tốc độ (Nên biết)",
-          "body": "Số lượng yêu cầu bị giới hạn để đảm bảo ổn định API.\n\nGói miễn phí:\n• Yêu cầu API hàng ngày: 1.000\n• Cuộc gọi API mỗi phút: 60\n• Tạo thẻ mỗi phút: 30\n\nVượt giới hạn sẽ trả về 429 Too Many Requests.\nĐợi một chút và thử lại.\n\nLưu ý: 100 thẻ chỉ tính là 1 cuộc gọi API (tạo hàng loạt).\nVới 1.000 cuộc gọi hàng ngày, lý thuyết bạn có thể tạo đến 100.000 thẻ mỗi ngày!"
-        }
-      }
-    },
     "ai-generate": {
       "title": "AI Auto-Generate",
       "items": {
