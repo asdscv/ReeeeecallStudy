@@ -5,7 +5,7 @@
   "retry": "重试",
   "balance": {
     "title": "余额",
-    "hint": "用于超出每日免费卡片的 AI 生成的预付额度。",
+    "hint": "用于超出每日免费卡片的 AI 卡片生成的预付额度。",
     "topUp": "充值（即将推出）",
     "topUpSoon": "充值功能即将推出。"
   },
@@ -20,7 +20,7 @@
   },
   "reason": {
     "purchase": "充值",
-    "spend": "AI 生成",
+    "spend": "AI 卡片生成",
     "refund": "退款",
     "admin_grant": "额度发放",
     "spend_cards": "AI 卡片",

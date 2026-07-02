@@ -106,7 +106,7 @@
   },
   "reminders": {
     "title": "Study Reminders",
-    "description": "Get reminded to study daily, just like Duolingo.",
+    "description": "Get a daily reminder to keep your study streak going.",
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",

@@ -5,7 +5,7 @@
   "retry": "Coba lagi",
   "balance": {
     "title": "Saldo",
-    "hint": "Kredit prabayar untuk pembuatan AI di luar kartu gratis harian.",
+    "hint": "Kredit prabayar untuk pembuatan kartu AI di luar kartu gratis harian.",
     "topUp": "Isi ulang (segera hadir)",
     "topUpSoon": "Isi ulang akan segera hadir."
   },
@@ -20,7 +20,7 @@
   },
   "reason": {
     "purchase": "Isi ulang",
-    "spend": "Pembuatan AI",
+    "spend": "Pembuatan kartu AI",
     "refund": "Pengembalian dana",
     "admin_grant": "Pemberian kredit",
     "spend_cards": "Kartu AI",
