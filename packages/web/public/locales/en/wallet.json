@@ -25,5 +25,6 @@
     "admin_grant": "Credit grant",
     "spend_cards": "AI cards",
     "spend_image": "AI image"
-  }
+  },
+  "cardPlanHint": "Card-limit plans are managed in Card storage."
 }

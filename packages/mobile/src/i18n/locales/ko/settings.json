@@ -166,7 +166,9 @@
     "planNote": "무료 플랜은 소유 카드를 최대 {{limit}}장까지 지원해요. 한도를 늘리려면 구독하세요.",
     "upgrade": "업그레이드 (준비 중)",
     "upgradeSoon": "구독은 준비 중이에요.",
-    "cancelPending": "구독 취소 예정 ({{date}}까지 이용)"
+    "cancelPending": "구독 취소 예정 ({{date}}까지 이용)",
+    "countUnlimited": "{{owned}} / 무제한",
+    "planNoteUnlimited": "소유 카드 한도가 무제한이에요."
   },
   "groups": {
     "account": "계정",
@@ -175,5 +177,16 @@
     "preferences": "환경설정",
     "data": "데이터"
   },
-  "subtitle": "계정, 충전금, 학습 환경설정을 관리하세요."
+  "subtitle": "계정, 충전금, 학습 환경설정을 관리하세요.",
+  "plans": {
+    "title": "구독 플랜",
+    "unlimited": "무제한",
+    "cardLimit": "{{limit}}장",
+    "perMonth": "/월",
+    "select": "선택",
+    "current": "현재 플랜",
+    "comingSoon": "준비 중",
+    "empty": "이용 가능한 플랜이 없어요.",
+    "loadError": "플랜을 불러오지 못했어요."
+  }
 }

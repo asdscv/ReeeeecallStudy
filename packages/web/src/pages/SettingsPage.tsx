@@ -14,7 +14,7 @@ import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
-import { SubscribeButton } from '../components/billing/SubscribeButton'
+import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
 import {
   loadSettings,
   saveSettings,
@@ -342,25 +342,46 @@ export function SettingsPage() {
           </CollapsibleSection>
 
           {/* ── Card storage usage (owned-card limit, mig 116) ── */}
-          {cardUsage && (
-            <CollapsibleSection
-              title={t('cardUsage.title')}
-              icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
-              badge={<span className="text-sm text-muted-foreground tabular-nums">{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</span>}
-            >
-              <div className="h-2 rounded-full bg-accent overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
-                  style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-3">{t('cardUsage.planNote', { limit: cardUsage.limit })}</p>
-              <SubscribeButton />
-              {cardUsage.available <= 0 && (
-                <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
-              )}
-            </CollapsibleSection>
-          )}
+          {cardUsage && (() => {
+            // A card_limit >= 1e9 is the "unlimited" sentinel (mig 124's 2e9 plan). It
+            // is a normal integer cap in the DB; here we only collapse it to a word and
+            // skip the progress bar so an Unlimited plan never renders a broken/near-
+            // empty meter.
+            const unlimited = isUnlimitedCardLimit(cardUsage.limit)
+            return (
+              <CollapsibleSection
+                title={t('cardUsage.title')}
+                icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
+                badge={
+                  <span className="text-sm text-muted-foreground tabular-nums">
+                    {unlimited
+                      ? t('cardUsage.countUnlimited', { owned: cardUsage.owned.toLocaleString() })
+                      : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
+                  </span>
+                }
+              >
+                {unlimited ? (
+                  <p className="text-sm font-semibold text-brand">{t('cardUsage.unlimited')}</p>
+                ) : (
+                  <div className="h-2 rounded-full bg-accent overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
+                      style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
+                    />
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-3">
+                  {unlimited
+                    ? t('cardUsage.planNoteUnlimited')
+                    : t('cardUsage.planNote', { limit: cardUsage.limit })}
+                </p>
+                <PlanSelector />
+                {!unlimited && cardUsage.available <= 0 && (
+                  <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
+                )}
+              </CollapsibleSection>
+            )
+          })()}
         </div>
 
         {/* ── Study ── */}

@@ -166,7 +166,9 @@
     "planNote": "The Free plan includes up to {{limit}} owned cards. Subscribe to raise the limit.",
     "upgrade": "Upgrade (coming soon)",
     "upgradeSoon": "Subscription is coming soon.",
-    "cancelPending": "Subscription ending — access until {{date}}."
+    "cancelPending": "Subscription ending — access until {{date}}.",
+    "countUnlimited": "{{owned}} / Unlimited",
+    "planNoteUnlimited": "Your owned-card limit is unlimited."
   },
   "groups": {
     "account": "Account",
@@ -175,5 +177,16 @@
     "preferences": "Preferences",
     "data": "Data"
   },
-  "subtitle": "Manage your account, credits, and study preferences."
+  "subtitle": "Manage your account, credits, and study preferences.",
+  "plans": {
+    "title": "Subscription plans",
+    "unlimited": "Unlimited",
+    "cardLimit": "{{limit}} cards",
+    "perMonth": "/mo",
+    "select": "Select",
+    "current": "Current plan",
+    "comingSoon": "Coming soon",
+    "empty": "No plans available.",
+    "loadError": "Couldn’t load plans."
+  }
 }

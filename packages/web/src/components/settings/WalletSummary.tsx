@@ -49,6 +49,7 @@ export function WalletSummary() {
         <p className="text-xs text-muted-foreground mb-1">{t('balance.title')}</p>
         <div className="text-3xl font-bold text-foreground tabular-nums">{fmtWon(balanceWon)}</div>
         <p className="text-xs text-muted-foreground mt-1">{t('balance.hint')}</p>
+        <p className="text-xs text-content-tertiary mt-1">{t('cardPlanHint')}</p>
         <button
           onClick={() => setTopUpOpen(true)}
           title={t('balance.topUpSoon')}

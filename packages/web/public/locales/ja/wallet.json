@@ -25,5 +25,6 @@
     "admin_grant": "クレジット付与",
     "spend_cards": "AIカード",
     "spend_image": "AI画像"
-  }
+  },
+  "cardPlanHint": "カード上限プランは「カードストレージ」で管理します。"
 }

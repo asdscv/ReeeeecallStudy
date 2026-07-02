@@ -143,9 +143,12 @@
     "reached": "You’ve reached your card limit. Subscribe to add more.",
     "subscribe": "Subscribe (coming soon)",
     "plan": "Free plan",
-    "planNote": "The Free plan includes up to {{limit}} owned cards. Subscribe to raise the limit.",
+    "planNote": "Your plan includes up to {{limit}} owned cards. Choose a plan to raise the limit.",
     "upgrade": "Upgrade (coming soon)",
-    "upgradeSoon": "Subscription is coming soon."
+    "upgradeSoon": "Subscription is coming soon.",
+    "unlimited": "Unlimited",
+    "countUnlimited": "{{owned}} / Unlimited",
+    "planNoteUnlimited": "Your plan includes unlimited owned cards."
   },
   "groups": {
     "account": "Account",
