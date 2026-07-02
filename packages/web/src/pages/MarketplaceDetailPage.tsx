@@ -11,6 +11,8 @@ import { ReviewsSection } from '../components/marketplace/ReviewsSection'
 import { StarRatingInline } from '../components/marketplace/StarRating'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
 import { VerifiedBadge } from '../components/marketplace/ListingCard'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { useDeckStore } from '../stores/deck-store'
 import type {
   MarketplaceListing,
   Card,
@@ -24,6 +26,11 @@ export function MarketplaceDetailPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { acquireDeck, error } = useMarketplaceStore()
+  const limit = useCardLimit()
+
+  // Owned-card limit usage: acquiring a NON-official deck adds its cards toward the
+  // 1000 cap (mig 118). Fetch the usage so we can show the impact before acquiring.
+  useEffect(() => { void useDeckStore.getState().fetchCardUsage() }, [])
 
   const [listing, setListing] = useState<MarketplaceListing | null>(null)
   const [previewCards, setPreviewCards] = useState<Card[]>([])
@@ -214,6 +221,9 @@ export function MarketplaceDetailPage() {
   if (!listing) return null
 
   const isOwner = user?.id === listing.owner_id
+  // Non-official acquisitions count toward the 1000-card cap (mig 118); official decks don't.
+  const countsTowardLimit = !listing.owner_is_official
+  const wouldExceed = countsTowardLimit && limit.exceeds(listing.card_count)
   const displayFields = template?.fields ?? []
 
   return (
@@ -279,7 +289,7 @@ export function MarketplaceDetailPage() {
         {!isOwner && (
           <button
             onClick={handleAcquire}
-            disabled={acquiring || hasAcquired}
+            disabled={acquiring || hasAcquired || wouldExceed}
             className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {hasAcquired
@@ -311,6 +321,23 @@ export function MarketplaceDetailPage() {
           </button>
         )}
         </div>
+
+        {/* Owned-card limit impact (mig 118): non-official acquisitions count toward the cap */}
+        {!isOwner && !hasAcquired && (
+          !countsTowardLimit ? (
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('marketplace:detail.limitOfficialFree', { defaultValue: "Official deck — doesn't count toward your card limit." })}
+            </p>
+          ) : wouldExceed ? (
+            <p className="text-xs text-destructive mt-2">
+              {t('marketplace:detail.limitExceeds', { count: listing.card_count, available: limit.available, defaultValue: 'This would exceed your card limit ({{available}} left). Delete cards or subscribe first.' })}
+            </p>
+          ) : Number.isFinite(limit.available) ? (
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('marketplace:detail.limitUsage', { count: listing.card_count, available: limit.available, defaultValue: 'Adds {{count}} cards toward your limit · {{available}} left' })}
+            </p>
+          ) : null
+        )}
 
         {error && <p className="text-sm text-destructive mt-2">{t(error)}</p>}
         {unsubscribeError && (
