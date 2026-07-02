@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "Mejorar plan",
-    "success": "Suscripción activada."
+    "success": "Suscripción activada.",
+    "cancelPending": "Cancelación pendiente · acceso hasta el {{date}}",
+    "cancelPendingNoDate": "Se cancelará al final del periodo actual."
   },
   "checkout": {
+    "success": "Pago completado.",
     "canceled": "Pago cancelado.",
     "failed": "El pago falló. Inténtalo de nuevo."
   },

@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "プランをアップグレード",
-    "success": "サブスクリプションを開始しました。"
+    "success": "サブスクリプションを開始しました。",
+    "cancelPending": "解約予定 · {{date}}まで利用可能",
+    "cancelPendingNoDate": "現在の期間が終了すると解約されます。"
   },
   "checkout": {
+    "success": "決済が完了しました。",
     "canceled": "決済がキャンセルされました。",
     "failed": "決済に失敗しました。もう一度お試しください。"
   },

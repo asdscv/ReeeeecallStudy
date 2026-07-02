@@ -165,7 +165,8 @@
     "plan": "Gói miễn phí",
     "planNote": "Gói miễn phí bao gồm tối đa {{limit}} thẻ sở hữu. Đăng ký để tăng giới hạn.",
     "upgrade": "Nâng cấp (sắp có)",
-    "upgradeSoon": "Đăng ký sắp ra mắt."
+    "upgradeSoon": "Đăng ký sắp ra mắt.",
+    "cancelPending": "Sắp hủy đăng ký — dùng đến {{date}}"
   },
   "groups": {
     "account": "Tài khoản",

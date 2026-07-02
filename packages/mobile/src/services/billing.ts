@@ -58,11 +58,19 @@ export interface MySubscription {
   userId: string
   productId: string | null
   tier: string
-  status: 'active' | 'canceled' | 'expired' | 'grace'
+  status: 'active' | 'canceled' | 'expired' | 'grace' | 'past_due'
   cardLimit: number | null
   provider: string | null
   providerRef: string | null
+  /** LS subscription id / RevenueCat original_transaction_id, matched by lifecycle events (mig 121). */
+  providerSubscriptionId: string | null
   currentPeriodEnd: string | null
+  /**
+   * true once the subscription is set to end at the current period boundary
+   * (canceled but still paid through currentPeriodEnd) — drives the
+   * "canceling on <date>" note in the UI (mig 121).
+   */
+  cancelAtPeriodEnd: boolean
   createdAt: string
   updatedAt: string
 }
@@ -127,7 +135,10 @@ export async function getMySubscription(): Promise<MySubscription | null> {
     card_limit: number | null
     provider: string | null
     provider_ref: string | null
+    provider_subscription_id: string | null
     current_period_end: string | null
+    // mig-121 field; absent (undefined) on a DB still on the mig-119 shape → false.
+    cancel_at_period_end: boolean | null
     created_at: string
     updated_at: string
   }
@@ -140,7 +151,9 @@ export async function getMySubscription(): Promise<MySubscription | null> {
     cardLimit: r.card_limit == null ? null : Number(r.card_limit),
     provider: r.provider ?? null,
     providerRef: r.provider_ref ?? null,
+    providerSubscriptionId: r.provider_subscription_id ?? null,
     currentPeriodEnd: r.current_period_end ?? null,
+    cancelAtPeriodEnd: r.cancel_at_period_end === true,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   }

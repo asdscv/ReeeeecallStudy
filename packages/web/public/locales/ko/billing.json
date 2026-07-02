@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "플랜 업그레이드",
-    "success": "구독이 시작되었어요."
+    "success": "구독이 시작되었어요.",
+    "cancelPending": "구독 취소 예정 · {{date}}까지 이용",
+    "cancelPendingNoDate": "현재 기간이 끝나면 구독이 취소돼요."
   },
   "checkout": {
+    "success": "결제가 완료되었어요.",
     "canceled": "결제가 취소되었어요.",
     "failed": "결제에 실패했어요. 다시 시도해 주세요."
   },

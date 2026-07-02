@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "Nâng cấp gói",
-    "success": "Đã kích hoạt gói đăng ký."
+    "success": "Đã kích hoạt gói đăng ký.",
+    "cancelPending": "Sẽ hủy · dùng được đến {{date}}",
+    "cancelPendingNoDate": "Sẽ hủy vào cuối kỳ hiện tại."
   },
   "checkout": {
+    "success": "Thanh toán hoàn tất.",
     "canceled": "Đã hủy thanh toán.",
     "failed": "Thanh toán thất bại. Vui lòng thử lại."
   },

@@ -72,10 +72,24 @@ class PurchaseService {
   }
 
   /**
-   * Identify user with RevenueCat (call on login).
+   * Identify the RevenueCat subscriber with OUR Supabase user id (call on login).
+   *
+   * This aliases RevenueCat's `appUserID` to supabase `auth.uid()`, which is the
+   * ONLY thing that lets the server-side revenuecat-webhook map an incoming
+   * `app_user_id` back to OUR user row. The client does NOT grant anything here:
+   * the actual entitlement / card-limit grant is done SERVER-SIDE by the
+   * revenuecat-webhook edge fn (which calls sync_subscription_by_user /
+   * activate_subscription_from_intent via the service role — mig 121). This call
+   * is pure identity aliasing so the webhook can find the right user.
    */
-  async login(userId: string): Promise<CustomerInfo> {
-    const { customerInfo } = await Purchases!.logIn(userId)
+  async login(userId: string): Promise<CustomerInfo | null> {
+    // TODO(react-native-purchases): the SDK is currently NOT installed (removed —
+    // it was the native-module crash source). Once restored (`pnpm add
+    // react-native-purchases --filter mobile`) this call aliases the RC subscriber
+    // to our supabase id. Until then `Purchases` is null, so we no-op — nothing
+    // throws while the whole flow is gated off (SUBSCRIPTION_UI_ENABLED=false).
+    if (!Purchases) return null
+    const { customerInfo } = await Purchases.logIn(userId)
     return customerInfo
   }
 
@@ -83,7 +97,8 @@ class PurchaseService {
    * Clear user identity (call on logout).
    */
   async logout(): Promise<void> {
-    await Purchases!.logOut()
+    if (!Purchases) return
+    await Purchases.logOut()
   }
 
   /**

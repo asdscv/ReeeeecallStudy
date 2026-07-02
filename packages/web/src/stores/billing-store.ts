@@ -47,7 +47,9 @@ export interface MySubscription {
   cardLimit: number | null
   provider: string | null
   providerRef: string | null
+  providerSubscriptionId: string | null
   currentPeriodEnd: string | null
+  cancelAtPeriodEnd: boolean
   createdAt: string
   updatedAt: string
 }
@@ -73,7 +75,9 @@ interface RawSubscription {
   card_limit: number | null
   provider: string | null
   provider_ref: string | null
+  provider_subscription_id: string | null
   current_period_end: string | null
+  cancel_at_period_end: boolean | null
   created_at: string
   updated_at: string
 }
@@ -102,7 +106,9 @@ function mapSubscription(r: RawSubscription): MySubscription {
     cardLimit: r.card_limit == null ? null : Number(r.card_limit),
     provider: r.provider,
     providerRef: r.provider_ref,
+    providerSubscriptionId: r.provider_subscription_id ?? null,
     currentPeriodEnd: r.current_period_end,
+    cancelAtPeriodEnd: !!r.cancel_at_period_end,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   }
@@ -131,6 +137,12 @@ interface BillingState {
   fetchSubscription: () => Promise<void>
   fetchWallet: () => Promise<void>
   startCheckout: (productId: string) => Promise<void>
+  // Consumes a redirect-provider return (?pay=success|cancel&mu=…) on the
+  // /settings landing: on success refreshes every entitlement surface and flips
+  // checkoutStatus to 'success'; on cancel flips to 'canceled'. Strips the params
+  // from the URL so a reload doesn't re-trigger. No-op (returns null) when there's
+  // no `pay` param. Returns the outcome so the caller can surface a toast.
+  handlePaymentReturn: () => Promise<'success' | 'canceled' | null>
   clearComingSoon: () => void
 }
 
@@ -219,10 +231,17 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     try {
       result = await provider.checkout(intent)
     } catch {
-      // e.g. PortOne NOT_CONFIGURED, or SDK/network failure.
+      // e.g. PortOne NOT_CONFIGURED, Stripe create-stripe-checkout 503, or a
+      // SDK/network failure.
       set({ checkoutStatus: 'idle', error: 'checkout_failed' })
       return
     }
+
+    // Redirect flow (e.g. Stripe hosted checkout): the browser is navigating away.
+    // Leave the UI in 'processing' and do NOT treat it as canceled/failed — the
+    // outcome resolves when the provider redirects back to /settings?pay=… and
+    // handlePaymentReturn runs. (checkoutStatus is already 'processing' here.)
+    if (result.redirecting) return
 
     if (result.canceled) {
       set({ checkoutStatus: 'canceled', error: null })
@@ -243,6 +262,42 @@ export const useBillingStore = create<BillingState>((set, get) => ({
       useDeckStore.getState().fetchCardUsage({ force: true }),
     ])
     set({ checkoutStatus: 'success', error: null })
+  },
+
+  handlePaymentReturn: async () => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    const pay = params.get('pay')
+    if (pay !== 'success' && pay !== 'cancel') return null
+
+    // Strip pay/mu FIRST (synchronously, before any await) so a reload — or a
+    // React StrictMode double-invoke — doesn't re-trigger the grant refresh. mu is
+    // informational only; confirm_payment (server) is authoritative for the grant.
+    params.delete('pay')
+    params.delete('mu')
+    const qs = params.toString()
+    window.history.replaceState(
+      window.history.state,
+      '',
+      window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash,
+    )
+
+    if (pay === 'cancel') {
+      set({ checkoutStatus: 'canceled', error: null })
+      return 'canceled'
+    }
+
+    // Success — the server webhook (stripe-webhook → confirm_payment) is the
+    // authority on the grant; here we just re-pull every entitlement surface it
+    // could have moved: wallet balance (credit_pack), subscription (subscription),
+    // and the owned-card usage meter (a subscription raises the card limit).
+    await Promise.all([
+      get().fetchWallet(),
+      get().fetchSubscription(),
+      useDeckStore.getState().fetchCardUsage({ force: true }),
+    ])
+    set({ checkoutStatus: 'success', error: null })
+    return 'success'
   },
 
   clearComingSoon: () =>

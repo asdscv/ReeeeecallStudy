@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "Tingkatkan paket",
-    "success": "Langganan aktif."
+    "success": "Langganan aktif.",
+    "cancelPending": "Akan dibatalkan · akses hingga {{date}}",
+    "cancelPendingNoDate": "Akan dibatalkan di akhir periode saat ini."
   },
   "checkout": {
+    "success": "Pembayaran selesai.",
     "canceled": "Pembayaran dibatalkan.",
     "failed": "Pembayaran gagal. Silakan coba lagi."
   },

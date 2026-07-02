@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "Upgrade plan",
-    "success": "Subscription active."
+    "success": "Subscription active.",
+    "cancelPending": "Canceling · access until {{date}}",
+    "cancelPendingNoDate": "Canceling at the end of the current period."
   },
   "checkout": {
+    "success": "Payment complete.",
     "canceled": "Payment canceled.",
     "failed": "Payment failed. Please try again."
   },

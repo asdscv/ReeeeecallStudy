@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
+import { toIntlLocale } from '../../lib/locale-utils'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 
 const PRO_PRODUCT_ID = 'sub_pro_monthly'
@@ -10,14 +12,25 @@ const PRO_PRODUCT_ID = 'sub_pro_monthly'
  * (no provider call) and we reveal a short coming-soon note. With a provider live
  * it runs the real create_payment_intent → provider.checkout flow and reflects
  * processing / success / canceled state.
+ *
+ * Also reads get_my_subscription (via the billing store) so that when the current
+ * plan is set to cancel at period end (cancel_at_period_end from mig 121), we show
+ * a "canceling on <date>" note instead of implying the plan just vanished — access
+ * is retained through current_period_end.
  */
 export function SubscribeButton() {
-  const { t } = useTranslation('billing')
+  const { t, i18n } = useTranslation('billing')
   const startCheckout = useBillingStore((s) => s.startCheckout)
   const comingSoon = useBillingStore((s) => s.comingSoon)
   const checkoutProductId = useBillingStore((s) => s.checkoutProductId)
   const checkoutStatus = useBillingStore((s) => s.checkoutStatus)
   const error = useBillingStore((s) => s.error)
+  const subscription = useBillingStore((s) => s.subscription)
+  const fetchSubscription = useBillingStore((s) => s.fetchSubscription)
+
+  useEffect(() => {
+    void fetchSubscription()
+  }, [fetchSubscription])
 
   const isThis = checkoutProductId === PRO_PRODUCT_ID
   const showSoon = comingSoon && isThis
@@ -25,6 +38,18 @@ export function SubscribeButton() {
   const succeeded = isThis && checkoutStatus === 'success'
   const canceled = isThis && checkoutStatus === 'canceled'
   const failed = isThis && error === 'checkout_failed'
+
+  // Plan set to cancel at the end of the paid period: keep access until then, but
+  // tell the user. current_period_end can be null (perpetual/unknown) → no date.
+  const cancelPending = !!subscription?.cancelAtPeriodEnd
+  const periodEndLabel =
+    subscription?.currentPeriodEnd
+      ? new Date(subscription.currentPeriodEnd).toLocaleDateString(toIntlLocale(i18n.language), {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : null
 
   return (
     <div>
@@ -42,6 +67,13 @@ export function SubscribeButton() {
         {processing && <Loader2 className="h-4 w-4 animate-spin" />}
         {t('subscribe.cta')}
       </button>
+      {cancelPending && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          {periodEndLabel
+            ? t('subscribe.cancelPending', { date: periodEndLabel })
+            : t('subscribe.cancelPendingNoDate')}
+        </p>
+      )}
       {showSoon && <p className="mt-2 text-xs text-muted-foreground">{t('comingSoon.body')}</p>}
       {succeeded && <p className="mt-2 text-xs text-success">{t('subscribe.success')}</p>}
       {canceled && <p className="mt-2 text-xs text-muted-foreground">{t('checkout.canceled')}</p>}

@@ -52,6 +52,11 @@ export function usePurchases() {
       try {
         await purchaseService.init(user?.id)
         if (user?.id) {
+          // Alias the RevenueCat subscriber to OUR supabase user id (appUserID).
+          // This is what lets the server-side revenuecat-webhook map its incoming
+          // `app_user_id` back to our user and grant the subscription. The client
+          // NEVER grants here — the grant is server-side only (mig 121). Gated
+          // behind SUBSCRIPTION_UI_ENABLED (this whole init short-circuits above).
           await purchaseService.login(user.id)
         }
         // Server catalog + subscription are the source of truth.

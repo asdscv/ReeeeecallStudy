@@ -32,6 +32,14 @@ export interface CheckoutResult {
   providerPaymentId?: string
   /** true = the user dismissed/canceled the checkout (not an error). */
   canceled?: boolean
+  /**
+   * true = the checkout navigates the page away (a redirect flow, e.g. Stripe's
+   * hosted checkout) rather than resolving in-page. The browser is unloading, so
+   * `ok`/`canceled` are NOT meaningful — the outcome is resolved after the provider
+   * redirects back (see the billing store's handlePaymentReturn). The returned
+   * value is only a fallback if the navigation does not unload the page in time.
+   */
+  redirecting?: boolean
 }
 
 export interface PaymentProvider {

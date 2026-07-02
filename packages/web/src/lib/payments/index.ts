@@ -1,6 +1,7 @@
 import type { PaymentProvider } from './provider'
 import { MockProvider } from './mock-provider'
 import { PortOneProvider } from './portone-provider'
+import { LemonsqueezyProvider } from './lemonsqueezy-provider'
 
 export type {
   PaymentProvider,
@@ -10,12 +11,12 @@ export type {
 } from './provider'
 export { mapPaymentIntent } from './provider'
 
-export type PaymentProviderId = 'mock' | 'portone' | 'none'
+export type PaymentProviderId = 'mock' | 'portone' | 'lemonsqueezy' | 'none'
 
 /** Configured provider id from Vite env; defaults to 'none' (payments have no adapter). */
 export function paymentProviderId(): PaymentProviderId {
   const raw = String(import.meta.env.VITE_PAYMENT_PROVIDER ?? 'none')
-  if (raw === 'mock' || raw === 'portone') return raw
+  if (raw === 'mock' || raw === 'portone' || raw === 'lemonsqueezy') return raw
   return 'none'
 }
 
@@ -30,6 +31,8 @@ export function resolveProvider(): PaymentProvider | null {
       return new MockProvider()
     case 'portone':
       return new PortOneProvider()
+    case 'lemonsqueezy':
+      return new LemonsqueezyProvider()
     default:
       return null
   }

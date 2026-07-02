@@ -10,9 +10,12 @@
   },
   "subscribe": {
     "cta": "升级方案",
-    "success": "订阅已开通。"
+    "success": "订阅已开通。",
+    "cancelPending": "将取消 · 可使用至 {{date}}",
+    "cancelPendingNoDate": "将在当前周期结束时取消。"
   },
   "checkout": {
+    "success": "支付已完成。",
     "canceled": "支付已取消。",
     "failed": "支付失败，请重试。"
   },
