@@ -4,11 +4,17 @@
     "subtitle": "为超出每日免费卡片的 AI 卡片生成充值余额。",
     "credits": "赠送 ₩{{won}} 余额",
     "buy": "购买",
+    "success": "充值完成。",
     "empty": "暂无可购买的套餐。",
     "loadError": "无法加载商品，请重试。"
   },
   "subscribe": {
-    "cta": "升级方案"
+    "cta": "升级方案",
+    "success": "订阅已开通。"
+  },
+  "checkout": {
+    "canceled": "支付已取消。",
+    "failed": "支付失败，请重试。"
   },
   "comingSoon": {
     "badge": "即将推出",

@@ -1,13 +1,28 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { useDeckStore } from './deck-store'
+import { getAiWalletSummary, type AiWalletSummary } from '@reeeeecall/shared/lib/ai/server-client'
+import {
+  resolveProvider,
+  mapPaymentIntent,
+  type CheckoutResult,
+  type RawPaymentIntent,
+} from '../lib/payments'
 
 // ── Payment gate ────────────────────────────────────────────────────────────
 // Real payment stays INACTIVE until a provider is configured. `startCheckout`
-// only reaches the (stubbed) provider call site when this is true; otherwise it
-// flips a `comingSoon` flag and the UI shows a "준비 중" state. Vite exposes env
-// vars as strings, so compare against 'true'. Defaults false (unset → false).
+// only reaches a provider when this is true; otherwise it flips a `comingSoon`
+// flag and the UI shows a "준비 중" state. Vite exposes env vars as strings, so
+// compare against 'true'. Defaults false (unset → false).
 export const PAYMENTS_ENABLED =
   String(import.meta.env.VITE_PAYMENTS_ENABLED ?? '') === 'true'
+
+// The checkout is only truly live when the gate is ON *and* a provider adapter is
+// wired (VITE_PAYMENT_PROVIDER=mock|portone). With no provider the UI shows the
+// coming-soon state. Components should gate on this, not on PAYMENTS_ENABLED alone.
+export const PAYMENTS_ACTIVE = PAYMENTS_ENABLED && resolveProvider() !== null
+
+export type CheckoutStatus = 'idle' | 'processing' | 'success' | 'canceled'
 
 export type BillingProductKind = 'credit_pack' | 'subscription'
 
@@ -96,16 +111,25 @@ function mapSubscription(r: RawSubscription): MySubscription {
 interface BillingState {
   products: BillingProduct[]
   subscription: MySubscription | null
+  // AI wallet snapshot (get_ai_wallet_summary). Refreshed after a successful
+  // checkout so the top-up sheet reflects the new balance without a reload.
+  wallet: AiWalletSummary | null
+  walletState: 'idle' | 'loading' | 'ready' | 'error'
   loading: boolean
   error: 'load_failed' | 'checkout_failed' | null
-  // Set true when a checkout is attempted while payments are gated OFF, so the UI
-  // can render a coming-soon banner near the button that was pressed.
+  // Set true when a checkout is attempted while payments have no provider, so the
+  // UI can render a coming-soon banner near the button that was pressed.
   comingSoon: boolean
   checkoutProductId: string | null
+  // Reflects an in-flight / resolved provider checkout for the UI (spinner,
+  // success/canceled note). Scoped to `checkoutProductId`.
+  checkoutStatus: CheckoutStatus
   paymentsEnabled: boolean
+  paymentsActive: boolean
 
   fetchProducts: () => Promise<void>
   fetchSubscription: () => Promise<void>
+  fetchWallet: () => Promise<void>
   startCheckout: (productId: string) => Promise<void>
   clearComingSoon: () => void
 }
@@ -113,11 +137,15 @@ interface BillingState {
 export const useBillingStore = create<BillingState>((set, get) => ({
   products: [],
   subscription: null,
+  wallet: null,
+  walletState: 'idle',
   loading: false,
   error: null,
   comingSoon: false,
   checkoutProductId: null,
+  checkoutStatus: 'idle',
   paymentsEnabled: PAYMENTS_ENABLED,
+  paymentsActive: PAYMENTS_ACTIVE,
 
   fetchProducts: async () => {
     set({ loading: true, error: null })
@@ -141,36 +169,82 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     set({ subscription: mapSubscription(data as RawSubscription) })
   },
 
+  fetchWallet: async () => {
+    set({ walletState: 'loading' })
+    const summary = await getAiWalletSummary()
+    if (!summary) {
+      set({ walletState: 'error' })
+      return
+    }
+    set({ wallet: summary, walletState: 'ready' })
+  },
+
   startCheckout: async (productId: string) => {
-    // GATE: no provider is wired yet. Never call a provider while off.
-    if (!PAYMENTS_ENABLED) {
-      set({ comingSoon: true, checkoutProductId: productId, error: null })
+    const provider = resolveProvider()
+
+    // GATE: payments off or no provider adapter wired → coming soon. Never call a
+    // provider while off. (Equivalent to !PAYMENTS_ACTIVE.)
+    if (!PAYMENTS_ENABLED || provider === null) {
+      set({
+        comingSoon: true,
+        checkoutProductId: productId,
+        checkoutStatus: 'idle',
+        error: null,
+      })
       return
     }
 
-    const product = get().products.find((p) => p.id === productId) ?? null
-    set({ comingSoon: false, checkoutProductId: productId, error: null })
+    set({
+      comingSoon: false,
+      checkoutProductId: productId,
+      checkoutStatus: 'processing',
+      error: null,
+    })
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // STUBBED PROVIDER CHECKOUT — PortOne (아임포트).
-    //
-    // TODO(payment): when a provider is configured, integrate PortOne here:
-    //   1. Dynamically load the PortOne browser SDK — do NOT add the dependency
-    //      to package.json until the provider is live + tested.
-    //   2. Request a payment for `product` (id=`product.id`, amount=priceKrw).
-    //   3. On success the PortOne server webhook hits
-    //        POST /functions/v1/payment-webhook
-    //      which calls add_ai_credits (credit_pack) or grant_subscription
-    //      (subscription) — mig 119, idempotent on payment_id / (provider,ref).
-    //   4. After the callback resolves, re-run fetchProducts()/fetchSubscription()
-    //      and refresh the wallet + card-usage meters.
-    //
-    // Until then there is deliberately no client-side provider. This branch is
-    // unreachable in prod (VITE_PAYMENTS_ENABLED defaults false).
-    // ─────────────────────────────────────────────────────────────────────────
-    void product
-    set({ error: 'checkout_failed' })
+    // 1) Server snapshots price + kind into a 'pending' intent and returns a fresh
+    //    merchant_uid. The client can neither pick the price nor self-grant.
+    const { data, error } = await supabase.rpc('create_payment_intent', {
+      p_product_id: productId,
+    })
+    if (error || !data) {
+      set({ checkoutStatus: 'idle', error: 'checkout_failed' })
+      return
+    }
+    const intent = mapPaymentIntent(data as RawPaymentIntent)
+
+    // 2) Open the provider checkout with THAT merchant_uid + amount. The provider's
+    //    server webhook (→ payment-webhook → confirm_payment) is what actually
+    //    grants; this only tells us how the client-side flow resolved.
+    let result: CheckoutResult
+    try {
+      result = await provider.checkout(intent)
+    } catch {
+      // e.g. PortOne NOT_CONFIGURED, or SDK/network failure.
+      set({ checkoutStatus: 'idle', error: 'checkout_failed' })
+      return
+    }
+
+    if (result.canceled) {
+      set({ checkoutStatus: 'canceled', error: null })
+      return
+    }
+    if (!result.ok) {
+      set({ checkoutStatus: 'idle', error: 'checkout_failed' })
+      return
+    }
+
+    // 3) Success — refresh every entitlement surface the grant could have moved:
+    //    wallet balance (credit_pack), subscription (subscription), and the
+    //    owned-card usage meter (a subscription raises the card limit). The mock
+    //    admin path grants synchronously; a real webhook is usually near-instant.
+    await Promise.all([
+      get().fetchWallet(),
+      get().fetchSubscription(),
+      useDeckStore.getState().fetchCardUsage({ force: true }),
+    ])
+    set({ checkoutStatus: 'success', error: null })
   },
 
-  clearComingSoon: () => set({ comingSoon: false, checkoutProductId: null }),
+  clearComingSoon: () =>
+    set({ comingSoon: false, checkoutProductId: null, checkoutStatus: 'idle' }),
 }))

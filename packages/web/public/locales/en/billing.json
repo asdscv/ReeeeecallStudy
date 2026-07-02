@@ -4,11 +4,17 @@
     "subtitle": "Top up credits for AI card generation beyond the daily free cards.",
     "credits": "Get ₩{{won}} in credits",
     "buy": "Buy",
+    "success": "Credits added.",
     "empty": "No credit packs available.",
     "loadError": "Couldn't load products. Please try again."
   },
   "subscribe": {
-    "cta": "Upgrade plan"
+    "cta": "Upgrade plan",
+    "success": "Subscription active."
+  },
+  "checkout": {
+    "canceled": "Payment canceled.",
+    "failed": "Payment failed. Please try again."
   },
   "comingSoon": {
     "badge": "Coming soon",

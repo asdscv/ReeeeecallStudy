@@ -35,6 +35,23 @@ export interface BillingProduct {
   isActive: boolean
 }
 
+/**
+ * A server-created 'pending' payment_intents row, as returned by
+ * create_payment_intent() (mig 120). The server SNAPSHOTS price + kind here so
+ * the client can never pick its own price or self-grant — `merchantUid` is the
+ * only handle the client needs, and the actual entitlement is granted later,
+ * server-side, when the payment-webhook calls confirm_payment(merchantUid).
+ */
+export interface PaymentIntent {
+  merchantUid: string
+  productId: string
+  kind: BillingProductKind
+  amountKrw: number
+  /** credit_pack only — micro-WON to be granted on confirm (null for subscriptions). */
+  amountMicroWon: number | null
+  title: string
+}
+
 /** The caller's active subscription, as returned by get_my_subscription() (or null). */
 export interface MySubscription {
   id: string
@@ -126,6 +143,64 @@ export async function getMySubscription(): Promise<MySubscription | null> {
     currentPeriodEnd: r.current_period_end ?? null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Payment intent — the FIRST step of any real purchase (mig 120).
+//
+// Flow (see mig 120 + payment-webhook contract):
+//   1) client calls createPaymentIntent(productId) -> server snapshots
+//      price(amount_krw) + kind + amount_micro_won into a 'pending'
+//      payment_intents row and returns a fresh `merchantUid`.
+//   2) client opens the provider checkout carrying that `merchantUid`.
+//   3) the PROVIDER'S server POSTs the signed payment-webhook, which
+//      HMAC-verifies then calls confirm_payment(merchantUid, provider,
+//      providerPaymentId) with the SERVICE-ROLE client — locking the intent,
+//      marking it paid idempotently, and granting credits (add_ai_credits) or
+//      a subscription (grant_subscription) from the *server-snapshotted* amount.
+//
+// PROVIDER SEAM (iOS/Android IAP) — the client NEVER grants and NEVER calls
+// confirm_payment (it is REVOKE'd from anon+authenticated; service_role only).
+// On mobile the "provider" is the App Store / Play Store via RevenueCat:
+//   store IAP receipt -> RevenueCat (validates the receipt) -> RevenueCat's
+//   server->server webhook -> our payment-webhook edge fn -> confirm_payment.
+// For that webhook to reconcile the right intent, the store transaction must
+// carry `merchantUid` (attach it as a RevenueCat subscriber attribute /
+// purchase metadata BEFORE calling purchasePackage — see usePurchases). The
+// admin_confirm_payment() RPC exists only for testing/comp/support (is_admin).
+// ─────────────────────────────────────────────────────────────────────────
+
+/** Raw snake_case shape returned by create_payment_intent() over PostgREST. */
+interface RawPaymentIntent {
+  merchant_uid: string
+  product_id: string
+  kind: string
+  amount_krw: number
+  amount_micro_won: number | null
+  title: string
+}
+
+/**
+ * Create a 'pending' payment intent for the given billing_products.id and
+ * return its server-snapshotted details (incl. `merchantUid`). Returns null if
+ * the caller is unauthenticated, the product is inactive/unknown, or on any
+ * transient error — callers must treat null as "can't start checkout" and must
+ * NOT open the provider checkout without a merchantUid to reconcile against.
+ */
+export async function createPaymentIntent(productId: string): Promise<PaymentIntent | null> {
+  const supabase = getMobileSupabase()
+  const { data, error } = await supabase.rpc('create_payment_intent', { p_product_id: productId })
+  if (error || !data) return null
+  const r = data as RawPaymentIntent
+  if (!r.merchant_uid) return null
+  return {
+    merchantUid: String(r.merchant_uid),
+    productId: String(r.product_id),
+    kind: r.kind as BillingProductKind,
+    amountKrw: Number(r.amount_krw ?? 0),
+    amountMicroWon: r.amount_micro_won == null ? null : Number(r.amount_micro_won),
+    title: String(r.title ?? ''),
   }
 }
 

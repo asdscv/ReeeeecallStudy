@@ -4,11 +4,17 @@
     "subtitle": "Recarga saldo para generar tarjetas con IA más allá de las gratuitas diarias.",
     "credits": "Recibe ₩{{won}} en saldo",
     "buy": "Comprar",
+    "success": "Saldo añadido.",
     "empty": "No hay paquetes disponibles.",
     "loadError": "No se pudieron cargar los productos. Inténtalo de nuevo."
   },
   "subscribe": {
-    "cta": "Mejorar plan"
+    "cta": "Mejorar plan",
+    "success": "Suscripción activada."
+  },
+  "checkout": {
+    "canceled": "Pago cancelado.",
+    "failed": "El pago falló. Inténtalo de nuevo."
   },
   "comingSoon": {
     "badge": "Próximamente",

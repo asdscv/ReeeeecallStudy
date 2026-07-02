@@ -25,6 +25,10 @@
   "restored": "Langganan Pro telah dipulihkan.",
   "noRestoreFound": "Tidak ditemukan langganan sebelumnya.",
   "productsUnavailable": "Produk langganan saat ini tidak tersedia. Silakan coba lagi nanti.",
+  "checkout": {
+    "startFailed": "Tidak dapat memulai pembayaran. Silakan coba lagi.",
+    "confirming": "Pembayaran diterima — akun Anda akan diperbarui setelah dikonfirmasi."
+  },
   "catalog": {
     "perMonth": "/bulan",
     "purchaseUnavailable": "Produk ini belum tersedia untuk dibeli."

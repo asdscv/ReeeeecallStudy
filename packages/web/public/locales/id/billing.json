@@ -4,11 +4,17 @@
     "subtitle": "Isi saldo untuk membuat kartu AI melebihi kartu gratis harian.",
     "credits": "Dapatkan saldo ₩{{won}}",
     "buy": "Beli",
+    "success": "Saldo ditambahkan.",
     "empty": "Tidak ada paket yang tersedia.",
     "loadError": "Tidak dapat memuat produk. Silakan coba lagi."
   },
   "subscribe": {
-    "cta": "Tingkatkan paket"
+    "cta": "Tingkatkan paket",
+    "success": "Langganan aktif."
+  },
+  "checkout": {
+    "canceled": "Pembayaran dibatalkan.",
+    "failed": "Pembayaran gagal. Silakan coba lagi."
   },
   "comingSoon": {
     "badge": "Segera hadir",

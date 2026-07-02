@@ -91,15 +91,21 @@ export function PaywallScreen() {
       Alert.alert(t('title'), t('catalog.purchaseUnavailable'))
       return
     }
-    const result = await purchase(pkg)
+    // Pass the backend product so usePurchases opens a server-side payment
+    // intent (create_payment_intent) before charging — the merchantUid it
+    // returns is what the payment-webhook later reconciles the grant against.
+    const result = await purchase(pkg, product)
     if (result.success) {
       // NOTE: the DB entitlement is granted server-side by the payment-webhook
-      // (RevenueCat -> grant_subscription). usePurchases already re-fetches
-      // getMySubscription() after a successful charge.
-      Alert.alert(t('welcomePro'), t('welcomeProDesc'), [
+      // (store receipt -> RevenueCat -> confirm_payment(merchantUid)). The
+      // grant is async, so tell the user it's confirming; usePurchases already
+      // re-fetches getMySubscription() and will reflect it once it lands.
+      Alert.alert(t('welcomePro'), t('checkout.confirming'), [
         { text: t('done'), onPress: () => navigation.goBack() },
       ])
-    } else if (result.error && result.error !== 'cancelled') {
+    } else if (result.error === 'intent_failed') {
+      Alert.alert(t('title'), t('checkout.startFailed'))
+    } else if (result.error && result.error !== 'cancelled' && result.error !== 'disabled') {
       Alert.alert(t('back'), result.error)
     }
   }

@@ -25,6 +25,10 @@
   "restored": "Proサブスクリプションが復元されました。",
   "noRestoreFound": "復元可能なサブスクリプションが見つかりません。",
   "productsUnavailable": "現在サブスクリプション商品をご利用いただけません。後ほどお試しください。",
+  "checkout": {
+    "startFailed": "決済を開始できませんでした。もう一度お試しください。",
+    "confirming": "お支払いを受け付けました。確認が完了するとアカウントに反映されます。"
+  },
   "catalog": {
     "perMonth": "/月",
     "purchaseUnavailable": "この商品はまだ購入できません。"
