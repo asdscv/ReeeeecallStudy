@@ -48,6 +48,7 @@ export function Layout() {
       { path: '/history', label: t('nav.studyHistory'), icon: '📝' },
     ]},
     { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: '🏆' },
+    { kind: 'link', path: '/wallet', label: t('nav.wallet'), icon: '💳' },
     { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
     ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: '🛡️' }] : []),
   ]

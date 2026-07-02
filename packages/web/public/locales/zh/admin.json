@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "系统",
-    "totalApiKeys": "API 密钥总数",
-    "activeApiKeys": "活跃 API 密钥",
-    "expiredApiKeys": "已过期 API 密钥",
-    "recentlyUsedKeys": "近期使用（7天）",
     "totalContents": "总内容",
     "publishedContents": "已发布内容",
     "draftContents": "草稿内容",
     "totalStudyLogs": "学习日志总数",
     "healthStatus": "系统健康",
-    "apiKeysSection": "API 密钥管理",
     "contentPipeline": "内容管道",
     "studyActivity": "学习活动数据",
     "studyLogsNote": "学习日志记录用户卡片学习会话和复习历史",
     "health": {
-      "apiKeys": "API 密钥",
       "content": "内容管道",
       "study": "学习活动"
-    }
+    },
+    "aiCreditWallet": "AI 额度钱包",
+    "totalWalletBalance": "总余额",
+    "totalAiSpent": "总消耗",
+    "activeWallets": "有额度的用户",
+    "aiCardsToday": "今日 AI 卡片",
+    "aiCardsTodayBreakdown": "免费 {{free}} · 付费 {{paid}}"
   },
   "official": {
     "title": "Official Accounts",

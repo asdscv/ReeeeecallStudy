@@ -12,7 +12,8 @@
     "guide": "Guía",
     "aiGenerate": "AI Generate",
     "achievements": "Logros",
-    "publisherStats": "Estadísticas del editor"
+    "publisherStats": "Estadísticas del editor",
+    "wallet": "Cartera"
   },
   "actions": {
     "save": "Guardar",

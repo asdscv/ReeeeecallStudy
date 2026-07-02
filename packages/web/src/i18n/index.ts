@@ -30,6 +30,7 @@ i18n
       'content',
       'admin',
       'ai-generate',
+      'wallet',
     ],
     defaultNS: 'common',
 

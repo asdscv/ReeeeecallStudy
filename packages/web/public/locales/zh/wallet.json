@@ -1,0 +1,29 @@
+{
+  "title": "钱包 · 用量",
+  "subtitle": "查看你的 AI 额度余额与生成用量。",
+  "error": "无法加载钱包，请重试。",
+  "retry": "重试",
+  "balance": {
+    "title": "余额",
+    "hint": "用于超出每日免费卡片的 AI 生成的预付额度。",
+    "topUp": "充值（即将推出）",
+    "topUpSoon": "充值功能即将推出。"
+  },
+  "free": {
+    "title": "今日免费",
+    "count": "{{used}} / {{limit}} 张",
+    "note": "免费 AI 卡片每天重置。"
+  },
+  "history": {
+    "title": "使用记录",
+    "empty": "暂无使用记录。"
+  },
+  "reason": {
+    "purchase": "充值",
+    "spend": "AI 生成",
+    "refund": "退款",
+    "admin_grant": "额度发放",
+    "spend_cards": "AI 卡片",
+    "spend_image": "AI 图片"
+  }
+}

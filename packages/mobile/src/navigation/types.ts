@@ -73,6 +73,7 @@ export type SettingsStackParamList = {
   MyShares: undefined
   PublisherStats: undefined
   Achievements: undefined
+  Wallet: undefined
 }
 
 // Type-safe navigation hook을 위한 선언 병합

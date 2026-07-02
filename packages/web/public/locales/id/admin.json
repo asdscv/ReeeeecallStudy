@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "Sistem",
-    "totalApiKeys": "Total Kunci API",
-    "activeApiKeys": "Kunci API Aktif",
-    "expiredApiKeys": "Kunci API Kedaluwarsa",
-    "recentlyUsedKeys": "Baru Digunakan (7 hari)",
     "totalContents": "Total Konten",
     "publishedContents": "Konten Dipublikasikan",
     "draftContents": "Konten Draf",
     "totalStudyLogs": "Total Log Belajar",
     "healthStatus": "Kesehatan Sistem",
-    "apiKeysSection": "Manajemen Kunci API",
     "contentPipeline": "Pipeline Konten",
     "studyActivity": "Data Aktivitas Belajar",
     "studyLogsNote": "Log belajar melacak sesi belajar kartu dan riwayat ulasan pengguna",
     "health": {
-      "apiKeys": "Kunci API",
       "content": "Pipeline Konten",
       "study": "Aktivitas Belajar"
-    }
+    },
+    "aiCreditWallet": "Dompet Kredit AI",
+    "totalWalletBalance": "Total Saldo",
+    "totalAiSpent": "Total Terpakai",
+    "activeWallets": "Pengguna dengan Kredit",
+    "aiCardsToday": "Kartu AI Hari Ini",
+    "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} berbayar"
   },
   "official": {
     "title": "Official Accounts",

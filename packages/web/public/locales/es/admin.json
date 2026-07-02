@@ -215,24 +215,24 @@
   },
   "system": {
     "title": "Sistema",
-    "totalApiKeys": "Total de claves API",
-    "activeApiKeys": "Claves API activas",
-    "expiredApiKeys": "Claves API expiradas",
-    "recentlyUsedKeys": "Usadas recientemente (7d)",
     "totalContents": "Total de contenidos",
     "publishedContents": "Contenidos publicados",
     "draftContents": "Contenidos en borrador",
     "totalStudyLogs": "Total de registros de estudio",
     "healthStatus": "Estado del sistema",
-    "apiKeysSection": "Gestión de claves API",
     "contentPipeline": "Pipeline de contenidos",
     "studyActivity": "Datos de actividad de estudio",
     "studyLogsNote": "Los registros de estudio rastrean las sesiones de estudio de tarjetas",
     "health": {
-      "apiKeys": "Claves API",
       "content": "Pipeline de contenidos",
       "study": "Actividad de estudio"
-    }
+    },
+    "aiCreditWallet": "Cartera de créditos IA",
+    "totalWalletBalance": "Saldo total",
+    "totalAiSpent": "Gasto total",
+    "activeWallets": "Usuarios con créditos",
+    "aiCardsToday": "Tarjetas IA hoy",
+    "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} de pago"
   },
   "official": {
     "title": "Official Accounts",

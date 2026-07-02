@@ -55,14 +55,6 @@ export function AdminSystemPage() {
     const s = systemStats
     const checks: { key: string; status: 'healthy' | 'warning' | 'critical'; label: string }[] = []
 
-    // API key health
-    const expiredRatio = s.total_api_keys > 0 ? s.expired_api_keys / s.total_api_keys : 0
-    checks.push({
-      key: 'api_keys',
-      status: expiredRatio > 0.5 ? 'critical' : expiredRatio > 0.2 ? 'warning' : 'healthy',
-      label: t('system.health.apiKeys'),
-    })
-
     // Content pipeline health
     const publishRate = s.total_contents > 0 ? s.published_contents / s.total_contents : 0
     checks.push({
@@ -97,8 +89,11 @@ export function AdminSystemPage() {
 
   const stats = systemStats
 
-  const apiKeyActiveRate = stats ? computeConversionRate(stats.active_api_keys, stats.total_api_keys) : 0
   const contentPublishRate = stats ? computeConversionRate(stats.published_contents, stats.total_contents) : 0
+  // AI credit wallet (balances are micro-WON, 1e-6 KRW → whole ₩ for display)
+  const walletBalanceWon = Math.floor((stats?.total_wallet_balance ?? 0) / 1_000_000)
+  const aiSpentWon = Math.floor((stats?.total_ai_spent ?? 0) / 1_000_000)
+  const aiCardsToday = (stats?.ai_cards_free_today ?? 0) + (stats?.ai_cards_paid_today ?? 0)
 
   return (
     <div className="space-y-6">
@@ -114,22 +109,21 @@ export function AdminSystemPage() {
         </div>
       )}
 
-      {/* API Keys */}
+      {/* AI Credit Wallet */}
       <div className="bg-card rounded-xl border border-border p-4">
-        <h3 className="text-sm font-medium text-foreground mb-4">{t('system.apiKeysSection')}</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <AdminStatCard icon="🔑" label={t('system.totalApiKeys')} value={stats?.total_api_keys ?? 0} color="blue" />
-          <AdminStatCard icon="✅" label={t('system.activeApiKeys')} value={stats?.active_api_keys ?? 0} color="green" subtitle={`${apiKeyActiveRate}%`} />
-          <AdminStatCard icon="⏰" label={t('system.expiredApiKeys')} value={stats?.expired_api_keys ?? 0} color={stats && stats.expired_api_keys > 0 ? 'orange' : 'gray'} />
-          <AdminStatCard icon="📡" label={t('system.recentlyUsedKeys')} value={stats?.recently_used_keys ?? 0} color="purple" />
+        <h3 className="text-sm font-medium text-foreground mb-4">{t('system.aiCreditWallet')}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <AdminStatCard icon="💰" label={t('system.totalWalletBalance')} value={`₩${walletBalanceWon.toLocaleString()}`} color="green" />
+          <AdminStatCard icon="💸" label={t('system.totalAiSpent')} value={`₩${aiSpentWon.toLocaleString()}`} color="orange" />
+          <AdminStatCard icon="👛" label={t('system.activeWallets')} value={stats?.active_wallets ?? 0} color="blue" />
+          <AdminStatCard
+            icon="🤖"
+            label={t('system.aiCardsToday')}
+            value={aiCardsToday}
+            color="purple"
+            subtitle={t('system.aiCardsTodayBreakdown', { free: stats?.ai_cards_free_today ?? 0, paid: stats?.ai_cards_paid_today ?? 0 })}
+          />
         </div>
-        {stats && stats.total_api_keys > 0 && (
-          <div className="space-y-3">
-            <ProgressBar label={t('system.activeApiKeys')} value={stats.active_api_keys} max={stats.total_api_keys} color="green" />
-            <ProgressBar label={t('system.expiredApiKeys')} value={stats.expired_api_keys} max={stats.total_api_keys} color="orange" />
-            <ProgressBar label={t('system.recentlyUsedKeys')} value={stats.recently_used_keys} max={stats.total_api_keys} color="purple" />
-          </div>
-        )}
       </div>
 
       {/* Content Pipeline */}

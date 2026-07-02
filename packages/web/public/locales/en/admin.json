@@ -214,24 +214,24 @@
   },
   "system": {
     "title": "System",
-    "totalApiKeys": "Total API Keys",
-    "activeApiKeys": "Active API Keys",
-    "expiredApiKeys": "Expired API Keys",
-    "recentlyUsedKeys": "Recently Used (7d)",
     "totalContents": "Total Contents",
     "publishedContents": "Published Contents",
     "draftContents": "Draft Contents",
     "totalStudyLogs": "Total Study Logs",
     "healthStatus": "System Health",
-    "apiKeysSection": "API Key Management",
     "contentPipeline": "Content Pipeline",
     "studyActivity": "Study Activity Data",
     "studyLogsNote": "Study logs track user card study sessions and review history",
     "health": {
-      "apiKeys": "API Keys",
       "content": "Content Pipeline",
       "study": "Study Activity"
-    }
+    },
+    "aiCreditWallet": "AI Credit Wallet",
+    "totalWalletBalance": "Total Balance",
+    "totalAiSpent": "Total Spent",
+    "activeWallets": "Users with Credits",
+    "aiCardsToday": "AI Cards Today",
+    "aiCardsTodayBreakdown": "{{free}} free · {{paid}} paid"
   },
   "official": {
     "title": "Official Accounts",

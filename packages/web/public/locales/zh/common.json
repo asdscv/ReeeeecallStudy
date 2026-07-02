@@ -14,7 +14,8 @@
     "achievements": "成就",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "发布者统计"
+    "publisher": "发布者统计",
+    "wallet": "钱包"
   },
   "actions": {
     "save": "保存",
