@@ -95,6 +95,9 @@ const AdminOfficialPage = lazy(() =>
 const AdminAuditPage = lazy(() =>
   import('./pages/admin/AdminAuditPage').then(m => ({ default: m.AdminAuditPage }))
 )
+const AdminBillingPage = lazy(() =>
+  import('./pages/admin/AdminBillingPage').then(m => ({ default: m.AdminBillingPage }))
+)
 
 /* ------------------------------------------------------------------ */
 /*  Loading fallback                                                  */
@@ -280,6 +283,7 @@ function App() {
                 <Route path="official" element={<AdminOfficialPage />} />
                 <Route path="contents" element={<AdminContentsPage />} />
                 <Route path="system" element={<AdminSystemPage />} />
+                <Route path="billing" element={<AdminBillingPage />} />
                 <Route path="audit" element={<AdminAuditPage />} />
               </Route>
             </Route>

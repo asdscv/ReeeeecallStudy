@@ -8,7 +8,8 @@
     "official": "Official",
     "contents": "Nội dung",
     "system": "Hệ thống",
-    "audit": "Audit Log"
+    "audit": "Audit Log",
+    "billing": "Thanh toán"
   },
   "overview": {
     "title": "Tổng quan",
@@ -233,6 +234,110 @@
     "activeWallets": "Người dùng có tín dụng",
     "aiCardsToday": "Thẻ AI hôm nay",
     "aiCardsTodayBreakdown": "{{free}} miễn phí · {{paid}} trả phí"
+  },
+  "billing": {
+    "title": "Quản lý thanh toán",
+    "overview": {
+      "activeSubscriptions": "Gói đang hoạt động",
+      "canceling": "Sắp hủy",
+      "pastDue": "Quá hạn",
+      "mrr": "MRR",
+      "walletTotal": "Tổng số dư",
+      "revenue30d": "Doanh thu (30 ngày)",
+      "refunds30d": "Hoàn tiền (30 ngày)"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "canceled": "Sắp hủy",
+      "grace": "Gia hạn",
+      "past_due": "Quá hạn",
+      "expired": "Hết hạn",
+      "refunded": "Đã hoàn tiền"
+    },
+    "payStatus": {
+      "paid": "Đã thanh toán",
+      "pending": "Đang chờ",
+      "failed": "Thất bại",
+      "refunded": "Đã hoàn tiền",
+      "canceled": "Đã hủy"
+    },
+    "kind": {
+      "subscription": "Gói đăng ký",
+      "credit_pack": "Gói tín dụng"
+    },
+    "reason": {
+      "purchase": "Mua",
+      "spend": "Chi tiêu",
+      "refund": "Hoàn tiền",
+      "admin_grant": "Quản trị cấp",
+      "admin_adjustment": "Quản trị điều chỉnh",
+      "spend_cards": "Tạo thẻ",
+      "spend_image": "Tạo ảnh"
+    },
+    "subscriptions": {
+      "title": "Gói đăng ký",
+      "email": "Tài khoản",
+      "tier": "Hạng",
+      "status": "Trạng thái",
+      "cardLimit": "Giới hạn thẻ",
+      "periodEnd": "Kết thúc kỳ",
+      "provider": "Nhà cung cấp",
+      "actions": "Thao tác",
+      "cancelImmediate": "Hủy ngay",
+      "cancelAtPeriodEnd": "Hủy khi hết kỳ",
+      "canceling": "Sắp hủy",
+      "allStatuses": "Tất cả trạng thái",
+      "noProviderSub": "Gói này không có ID nhà cung cấp nên không thể hủy tại đây.",
+      "empty": "Không tìm thấy gói đăng ký.",
+      "confirmImmediateTitle": "Hủy gói ngay",
+      "confirmImmediate": "Cho gói của {{email}} hết hạn ngay? Quyền truy cập bị thu hồi lập tức.",
+      "confirmPeriodEndTitle": "Hủy khi hết kỳ",
+      "confirmPeriodEnd": "Hủy gói của {{email}} khi kết thúc kỳ hiện tại? Họ vẫn truy cập được đến lúc đó.",
+      "refundNote": "Thao tác này chỉ ghi đè quyền truy cập trong ứng dụng. Hoàn tiền thật của LemonSqueezy được thực hiện trong bảng điều khiển LemonSqueezy và đồng bộ lại đây qua webhook."
+    },
+    "payments": {
+      "title": "Thanh toán",
+      "email": "Tài khoản",
+      "product": "Sản phẩm",
+      "kind": "Loại",
+      "amount": "Số tiền",
+      "status": "Trạng thái",
+      "paidAt": "Thanh toán lúc",
+      "empty": "Không tìm thấy thanh toán."
+    },
+    "user": {
+      "title": "Tra cứu người dùng",
+      "searchPlaceholder": "Nhập ID người dùng (UUID)",
+      "lookup": "Tra cứu",
+      "clear": "Xóa",
+      "invalidId": "Nhập ID người dùng hợp lệ (UUID).",
+      "invalidAmount": "Nhập số tiền khác 0.",
+      "notFound": "Không có dữ liệu thanh toán cho người dùng này.",
+      "subscription": "Gói đăng ký",
+      "noSubscription": "Không có gói",
+      "wallet": "Số dư ví",
+      "ledger": "Sổ tín dụng",
+      "payments": "Thanh toán",
+      "empty": "Không có",
+      "grant": "Cấp gói đăng ký",
+      "grantProduct": "Chọn gói",
+      "grantPeriodEnd": "Kết thúc kỳ (tùy chọn)",
+      "grantSubmit": "Cấp",
+      "confirmGrantTitle": "Cấp gói đăng ký",
+      "confirmGrant": "Cấp \"{{product}}\" cho người dùng này?",
+      "adjustWallet": "Điều chỉnh ví",
+      "adjustAmount": "Số tiền (₩, + cấp / − thu hồi)",
+      "adjustReason": "Lý do",
+      "adjustSubmit": "Áp dụng",
+      "confirmAdjustTitle": "Điều chỉnh ví",
+      "confirmAdjust": "Điều chỉnh ví của người dùng này ₩{{amount}}?"
+    },
+    "pagination": {
+      "page": "Trang {{page}}",
+      "prev": "Trước",
+      "next": "Sau"
+    },
+    "actionError": "Thao tác thất bại: {{error}}"
   },
   "official": {
     "title": "Official Accounts",

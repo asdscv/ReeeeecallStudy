@@ -8,7 +8,8 @@
     "official": "Official",
     "contents": "Contenidos",
     "system": "Sistema",
-    "audit": "Audit Log"
+    "audit": "Audit Log",
+    "billing": "Facturación"
   },
   "overview": {
     "title": "Resumen",
@@ -233,6 +234,110 @@
     "activeWallets": "Usuarios con créditos",
     "aiCardsToday": "Tarjetas IA hoy",
     "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} de pago"
+  },
+  "billing": {
+    "title": "Facturación",
+    "overview": {
+      "activeSubscriptions": "Suscripciones activas",
+      "canceling": "Por cancelar",
+      "pastDue": "Vencidas",
+      "mrr": "MRR",
+      "walletTotal": "Saldo total",
+      "revenue30d": "Ingresos (30 d)",
+      "refunds30d": "Reembolsos (30 d)"
+    },
+    "status": {
+      "active": "Activa",
+      "canceled": "Cancelada",
+      "grace": "Gracia",
+      "past_due": "Vencida",
+      "expired": "Expirada",
+      "refunded": "Reembolsada"
+    },
+    "payStatus": {
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "failed": "Fallido",
+      "refunded": "Reembolsado",
+      "canceled": "Cancelado"
+    },
+    "kind": {
+      "subscription": "Suscripción",
+      "credit_pack": "Paquete de créditos"
+    },
+    "reason": {
+      "purchase": "Compra",
+      "spend": "Gasto",
+      "refund": "Reembolso",
+      "admin_grant": "Concesión admin",
+      "admin_adjustment": "Ajuste admin",
+      "spend_cards": "Generación de tarjetas",
+      "spend_image": "Generación de imagen"
+    },
+    "subscriptions": {
+      "title": "Suscripciones",
+      "email": "Cuenta",
+      "tier": "Plan",
+      "status": "Estado",
+      "cardLimit": "Límite de tarjetas",
+      "periodEnd": "Fin del período",
+      "provider": "Proveedor",
+      "actions": "Acciones",
+      "cancelImmediate": "Cancelar ahora",
+      "cancelAtPeriodEnd": "Cancelar al final del período",
+      "canceling": "Por cancelar",
+      "allStatuses": "Todos los estados",
+      "noProviderSub": "Esta suscripción no tiene ID de proveedor y no se puede cancelar aquí.",
+      "empty": "No se encontraron suscripciones.",
+      "confirmImmediateTitle": "Cancelar suscripción ahora",
+      "confirmImmediate": "¿Expirar de inmediato la suscripción de {{email}}? El acceso se retira al instante.",
+      "confirmPeriodEndTitle": "Cancelar al final del período",
+      "confirmPeriodEnd": "¿Cancelar la suscripción de {{email}} al final del período actual? Conservará el acceso hasta entonces.",
+      "refundNote": "Esto solo anula el acceso en la app. Los reembolsos de dinero de LemonSqueezy se emiten en el panel de LemonSqueezy, que se sincroniza aquí mediante webhook."
+    },
+    "payments": {
+      "title": "Pagos",
+      "email": "Cuenta",
+      "product": "Producto",
+      "kind": "Tipo",
+      "amount": "Importe",
+      "status": "Estado",
+      "paidAt": "Pagado el",
+      "empty": "No se encontraron pagos."
+    },
+    "user": {
+      "title": "Buscar usuario",
+      "searchPlaceholder": "Introduce el ID de usuario (UUID)",
+      "lookup": "Buscar",
+      "clear": "Limpiar",
+      "invalidId": "Introduce un ID de usuario válido (UUID).",
+      "invalidAmount": "Introduce un importe distinto de cero.",
+      "notFound": "No hay datos de facturación para este usuario.",
+      "subscription": "Suscripción",
+      "noSubscription": "Sin suscripción",
+      "wallet": "Saldo de la cartera",
+      "ledger": "Libro de créditos",
+      "payments": "Pagos",
+      "empty": "Ninguno",
+      "grant": "Conceder suscripción",
+      "grantProduct": "Selecciona un plan",
+      "grantPeriodEnd": "Fin del período (opcional)",
+      "grantSubmit": "Conceder",
+      "confirmGrantTitle": "Conceder suscripción",
+      "confirmGrant": "¿Conceder \"{{product}}\" a este usuario?",
+      "adjustWallet": "Ajustar cartera",
+      "adjustAmount": "Importe (₩, + crédito / − recuperación)",
+      "adjustReason": "Motivo",
+      "adjustSubmit": "Aplicar",
+      "confirmAdjustTitle": "Ajustar cartera",
+      "confirmAdjust": "¿Ajustar la cartera de este usuario en ₩{{amount}}?"
+    },
+    "pagination": {
+      "page": "Página {{page}}",
+      "prev": "Anterior",
+      "next": "Siguiente"
+    },
+    "actionError": "Acción fallida: {{error}}"
   },
   "official": {
     "title": "Official Accounts",

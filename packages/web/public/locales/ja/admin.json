@@ -8,7 +8,8 @@
     "official": "Official",
     "contents": "コンテンツ",
     "system": "システム",
-    "audit": "Audit Log"
+    "audit": "Audit Log",
+    "billing": "課金"
   },
   "overview": {
     "title": "概要",
@@ -233,6 +234,110 @@
     "activeWallets": "クレジット保有ユーザー",
     "aiCardsToday": "本日のAIカード",
     "aiCardsTodayBreakdown": "無料 {{free}} · 有料 {{paid}}"
+  },
+  "billing": {
+    "title": "課金管理",
+    "overview": {
+      "activeSubscriptions": "有効なサブスク",
+      "canceling": "解約予定",
+      "pastDue": "延滞",
+      "mrr": "MRR",
+      "walletTotal": "ウォレット合計",
+      "revenue30d": "売上 (30日)",
+      "refunds30d": "返金 (30日)"
+    },
+    "status": {
+      "active": "有効",
+      "canceled": "解約予定",
+      "grace": "猶予",
+      "past_due": "延滞",
+      "expired": "期限切れ",
+      "refunded": "返金済み"
+    },
+    "payStatus": {
+      "paid": "支払済み",
+      "pending": "保留",
+      "failed": "失敗",
+      "refunded": "返金済み",
+      "canceled": "キャンセル"
+    },
+    "kind": {
+      "subscription": "サブスク",
+      "credit_pack": "クレジットパック"
+    },
+    "reason": {
+      "purchase": "購入",
+      "spend": "使用",
+      "refund": "返金",
+      "admin_grant": "管理者付与",
+      "admin_adjustment": "管理者調整",
+      "spend_cards": "カード生成",
+      "spend_image": "画像生成"
+    },
+    "subscriptions": {
+      "title": "サブスクリプション",
+      "email": "アカウント",
+      "tier": "プラン",
+      "status": "ステータス",
+      "cardLimit": "カード上限",
+      "periodEnd": "期間終了",
+      "provider": "プロバイダー",
+      "actions": "操作",
+      "cancelImmediate": "今すぐ解約",
+      "cancelAtPeriodEnd": "期間終了時に解約",
+      "canceling": "解約予定",
+      "allStatuses": "すべてのステータス",
+      "noProviderSub": "このサブスクにはプロバイダーIDがなく、ここでは解約できません。",
+      "empty": "サブスクリプションが見つかりません。",
+      "confirmImmediateTitle": "サブスクを今すぐ解約",
+      "confirmImmediate": "{{email}} のサブスクを今すぐ失効させますか？アクセスはすぐに解除されます。",
+      "confirmPeriodEndTitle": "期間終了時に解約",
+      "confirmPeriodEnd": "{{email}} のサブスクを現在の期間終了時に解約しますか？それまではアクセスできます。",
+      "refundNote": "これはアプリ側のアクセスのみを上書きします。LemonSqueezy の実際の返金は LemonSqueezy のダッシュボードで行われ、Webhook 経由でここに同期されます。"
+    },
+    "payments": {
+      "title": "支払い",
+      "email": "アカウント",
+      "product": "商品",
+      "kind": "種類",
+      "amount": "金額",
+      "status": "ステータス",
+      "paidAt": "支払日時",
+      "empty": "支払いが見つかりません。"
+    },
+    "user": {
+      "title": "ユーザー検索",
+      "searchPlaceholder": "ユーザーID（UUID）を入力",
+      "lookup": "検索",
+      "clear": "クリア",
+      "invalidId": "有効なユーザーID（UUID）を入力してください。",
+      "invalidAmount": "0 以外の金額を入力してください。",
+      "notFound": "このユーザーの課金データがありません。",
+      "subscription": "サブスクリプション",
+      "noSubscription": "サブスクなし",
+      "wallet": "ウォレット残高",
+      "ledger": "クレジット履歴",
+      "payments": "支払い",
+      "empty": "なし",
+      "grant": "サブスク付与",
+      "grantProduct": "プランを選択",
+      "grantPeriodEnd": "期間終了（任意）",
+      "grantSubmit": "付与",
+      "confirmGrantTitle": "サブスク付与",
+      "confirmGrant": "このユーザーに「{{product}}」を付与しますか？",
+      "adjustWallet": "ウォレット調整",
+      "adjustAmount": "金額（₩、+ 付与 / − 回収）",
+      "adjustReason": "理由",
+      "adjustSubmit": "適用",
+      "confirmAdjustTitle": "ウォレット調整",
+      "confirmAdjust": "このユーザーのウォレットを ₩{{amount}} 調整しますか？"
+    },
+    "pagination": {
+      "page": "{{page}} ページ",
+      "prev": "前へ",
+      "next": "次へ"
+    },
+    "actionError": "操作に失敗しました: {{error}}"
   },
   "official": {
     "title": "Official Accounts",
