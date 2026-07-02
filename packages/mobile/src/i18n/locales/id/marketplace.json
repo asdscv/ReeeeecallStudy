@@ -95,7 +95,10 @@
       "lowest": "Terendah",
       "most_helpful": "Membantu"
     },
-    "downloading": "Mengunduh..."
+    "downloading": "Mengunduh...",
+    "limitUsage": "Menambah {{count}} kartu ke batas Anda · sisa {{available}}",
+    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Hapus kartu atau berlangganan.",
+    "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu."
   },
   "publish": {
     "title": "Publish Deck",
