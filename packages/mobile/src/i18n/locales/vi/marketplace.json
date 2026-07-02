@@ -95,7 +95,10 @@
       "lowest": "Thấp nhất",
       "most_helpful": "Hữu ích"
     },
-    "downloading": "Đang tải xuống..."
+    "downloading": "Đang tải xuống...",
+    "limitUsage": "Thêm {{count}} thẻ vào giới hạn · còn {{available}}",
+    "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available}}). Xóa thẻ hoặc đăng ký trước.",
+    "limitOfficialFree": "Bộ thẻ chính thức · không tính vào giới hạn thẻ."
   },
   "publish": {
     "title": "Publish Deck",

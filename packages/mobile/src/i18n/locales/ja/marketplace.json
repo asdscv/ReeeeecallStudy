@@ -95,7 +95,10 @@
       "lowest": "評価が低い順",
       "most_helpful": "参考になった順"
     },
-    "downloading": "ダウンロード中..."
+    "downloading": "ダウンロード中...",
+    "limitUsage": "カード{{count}}枚が上限に加算されます · 残り{{available}}枚",
+    "limitExceeds": "カード上限を超えます（残り{{available}}枚）。カードを削除するか購読してください。",
+    "limitOfficialFree": "公式デッキ · カード上限に含まれません。"
   },
   "publish": {
     "title": "Publish Deck",

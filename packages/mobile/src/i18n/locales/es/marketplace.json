@@ -95,7 +95,10 @@
       "lowest": "Más bajas",
       "most_helpful": "Útiles"
     },
-    "downloading": "Descargando..."
+    "downloading": "Descargando...",
+    "limitUsage": "Añade {{count}} tarjetas a tu límite · quedan {{available}}",
+    "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Elimina tarjetas o suscríbete.",
+    "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas."
   },
   "publish": {
     "title": "Publish Deck",

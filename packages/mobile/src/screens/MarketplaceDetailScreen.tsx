@@ -5,6 +5,7 @@ import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useReviewsStore } from '@reeeeecall/shared/stores/reviews-store'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
@@ -125,6 +126,11 @@ export function MarketplaceDetailScreen() {
 
   const { listings, acquireDeck } = useMarketplaceStore()
   const listing = listings.find((l) => l.id === listingId)
+  const limit = useCardLimit()
+
+  // Owned-card limit impact (mig 118): a non-official acquisition adds its cards
+  // toward the 1000 cap. Fetch usage so we can warn before acquiring.
+  useEffect(() => { void useDeckStore.getState().fetchCardUsage() }, [])
 
   const {
     reviews,
@@ -387,6 +393,9 @@ export function MarketplaceDetailScreen() {
   }
 
   const isOwner = currentUserId === listing.owner_id
+  // Non-official acquisitions count toward the 1000-card cap (mig 118); official don't.
+  const countsTowardLimit = !(listing as any).owner_is_official
+  const wouldExceed = countsTowardLimit && limit.exceeds(listing.card_count ?? 0)
   const canReview = !!currentUserId && !isOwner && hasAcquired
 
   const SORT_OPTIONS: { value: ReviewSortBy; label: string }[] = [
@@ -491,8 +500,23 @@ export function MarketplaceDetailScreen() {
                     }
                     onPress={handleAcquire}
                     loading={acquiring}
-                    disabled={hasAcquired || acquiring}
+                    disabled={hasAcquired || acquiring || wouldExceed}
                   />
+                  {!isOwner && !hasAcquired && (
+                    !countsTowardLimit ? (
+                      <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginTop: 8 }}>
+                        {t('detail.limitOfficialFree', { defaultValue: "Official deck — doesn't count toward your card limit." })}
+                      </Text>
+                    ) : wouldExceed ? (
+                      <Text style={{ fontSize: 12, color: theme.colors.error, marginTop: 8 }}>
+                        {t('detail.limitExceeds', { count: listing.card_count ?? 0, available: limit.available, defaultValue: 'This would exceed your card limit ({{available}} left). Delete cards or subscribe first.' })}
+                      </Text>
+                    ) : Number.isFinite(limit.available) ? (
+                      <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginTop: 8 }}>
+                        {t('detail.limitUsage', { count: listing.card_count ?? 0, available: limit.available, defaultValue: 'Adds {{count}} cards toward your limit · {{available}} left' })}
+                      </Text>
+                    ) : null
+                  )}
                   {hasAcquired && shareId && (
                     <Button
                       testID="marketplace-unsubscribe-button"
