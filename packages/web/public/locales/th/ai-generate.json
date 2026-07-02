@@ -1,9 +1,6 @@
 {
   "title": "AI Generate",
   "config": {
-    "provider": "AI Provider",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key",
     "apiKeyHint": "คีย์ของคุณถูกเข้ารหัส AES-256 และจัดเก็บในเบราว์เซอร์ ไม่มีการส่งไปยังเซิร์ฟเวอร์",
     "model": "Model",
     "topic": "Topic",
@@ -17,7 +14,6 @@
     "goToSettings": "เพิ่มในการตั้งค่า",
     "manageInSettings": "จัดการผู้ให้บริการ:",
     "settings": "การตั้งค่า",
-    "customUrl": "API Base URL",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {

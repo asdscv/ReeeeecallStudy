@@ -83,27 +83,6 @@
     "help": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis.",
     "note": "Bahasa TTS mengikuti pengaturan bidang di templat kartu. Tombol putar selalu tampil tanpa memandang pembacaan otomatis."
   },
-  "aiProvider": {
-    "title": "Penyedia AI",
-    "description": "Kelola penyedia dan kunci API untuk pembuatan otomatis AI",
-    "configured": "Terkonfigurasi",
-    "notSet": "Belum diatur",
-    "edit": "Konfigurasi",
-    "delete": "Hapus",
-    "apiKey": "Kunci API",
-    "apiKeyPlaceholder": "Masukkan kunci API Anda",
-    "model": "Model Default",
-    "baseUrl": "API Base URL",
-    "save": "Simpan",
-    "cancel": "Batal",
-    "saved": "Penyedia AI disimpan",
-    "deleted": "Penyedia AI dihapus",
-    "securityNote": "Kunci API dienkripsi AES-256 dan disimpan di browser. Tidak pernah dikirim ke server kami.",
-    "custom": "Kustom",
-    "customDesc": "API kompatibel OpenAI",
-    "noProviders": "Belum ada penyedia yang dikonfigurasi. Atur di atas.",
-    "customModel": "Model Kustom"
-  },
   "account": {
     "title": "Akun",
     "logout": "Keluar"

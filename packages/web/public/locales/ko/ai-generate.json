@@ -1,9 +1,6 @@
 {
   "title": "AI 자동 생성",
   "config": {
-    "provider": "AI 프로바이더",
-    "apiKey": "API 키",
-    "apiKeyPlaceholder": "API 키를 입력하세요",
     "apiKeyHint": "키는 AES-256 암호화되어 브라우저에 저장됩니다. 서버로 전송되지 않습니다.",
     "model": "모델",
     "topic": "주제",
@@ -17,7 +14,6 @@
     "goToSettings": "설정에서 추가하기",
     "manageInSettings": "프로바이더 관리:",
     "settings": "설정",
-    "customUrl": "API Base URL",
     "startGenerate": "생성 시작",
     "modeLabel": "생성 모드",
     "mode": {

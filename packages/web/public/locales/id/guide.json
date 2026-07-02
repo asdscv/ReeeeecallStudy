@@ -234,10 +234,6 @@
         "autoTts": {
           "title": "TTS Otomatis",
           "body": "Membaca otomatis bidang dengan TTS saat membalik kartu. Bahkan saat nonaktif, tombol speaker untuk pemutaran manual selalu tersedia."
-        },
-        "apiKey": {
-          "title": "Kunci API",
-          "body": "Buat kunci API untuk mengakses data ReeeeecallStudy dari alat eksternal (skrip, aplikasi). Kunci hanya ditampilkan sekali — pastikan untuk menyalinnya. Maksimal 1 kunci diizinkan."
         }
       }
     },
@@ -247,15 +243,6 @@
         "what": {
           "title": "What is AI Auto-Generate?",
           "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nYou'll need an API key from an AI provider (OpenAI or xAI/Grok). Your API key is stored only in your browser — it's never sent to our servers."
-        },
-        "apiKeySetup": {
-          "title": "Setting Up Your API Key",
-          "body": "1. Get an API key from your preferred provider:\n   • OpenAI: Visit platform.openai.com → API Keys\n   • xAI/Grok: Visit console.x.ai → API Keys\n\n2. In the AI Generate dialog:\n   • Select your provider (OpenAI, xAI/Grok, or Custom)\n   • Paste your API key\n   • Choose a model (e.g., GPT-4o Mini, Grok 3 Mini)\n\nYour key is saved in localStorage and auto-filled next time. You can also use any OpenAI-compatible endpoint via 'Custom Endpoint'."
-        },
-        "geminiSetup": {
-          "title": "🎯 API Key Gemini Gratis (Direkomendasikan)",
-          "linkLabel": "Buka Google AI Studio",
-          "body": "Gemini 2.5 Flash 100% gratis — tanpa kartu kredit!\n\nBatas gratis: 15 permintaan/menit, 1.500 permintaan/hari\n\nCara mendapatkan key:\n1. Buka aistudio.google.com\n2. Masuk dengan akun Google\n3. Klik \"Get API Key\"\n4. Klik \"Create API Key\"\n5. Pilih \"Create API key in new project\"\n6. Salin key (dimulai dengan \"AIza...\")\n\nCara menggunakan:\n1. Buka halaman AI Generate\n2. Pilih \"Google Gemini\"\n3. Tempel API key\n4. Pilih model \"Gemini 2.5 Flash\"\n5. Masukkan topik dan buat!"
         },
         "fullGenerate": {
           "title": "Full Generation (Template + Deck + Cards)",
