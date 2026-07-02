@@ -1,9 +1,6 @@
 {
   "title": "AI Generate",
   "config": {
-    "provider": "AI Provider",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key",
     "apiKeyHint": "キーはAES-256暗号化されてブラウザに保存されます。サーバーには送信されません。",
     "model": "Model",
     "topic": "Topic",
@@ -17,7 +14,6 @@
     "goToSettings": "設定で追加する",
     "manageInSettings": "プロバイダー管理：",
     "settings": "設定",
-    "customUrl": "API Base URL",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {

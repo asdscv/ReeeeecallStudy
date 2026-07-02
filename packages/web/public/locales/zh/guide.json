@@ -234,10 +234,6 @@
         "autoTts": {
           "title": "自动 TTS",
           "body": "翻转卡片时自动朗读启用了 TTS 的字段。即使关闭此选项，手动播放的扬声器按钮始终可用。"
-        },
-        "apiKey": {
-          "title": "API 密钥",
-          "body": "生成 API 密钥以便从外部工具（脚本、应用）访问 ReeeeecallStudy 数据。密钥仅显示一次 — 请务必复制保存。最多允许 1 个密钥。"
         }
       }
     },
@@ -247,15 +243,6 @@
         "what": {
           "title": "What is AI Auto-Generate?",
           "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nYou'll need an API key from an AI provider (OpenAI or xAI/Grok). Your API key is stored only in your browser — it's never sent to our servers."
-        },
-        "apiKeySetup": {
-          "title": "Setting Up Your API Key",
-          "body": "1. Get an API key from your preferred provider:\n   • OpenAI: Visit platform.openai.com → API Keys\n   • xAI/Grok: Visit console.x.ai → API Keys\n\n2. In the AI Generate dialog:\n   • Select your provider (OpenAI, xAI/Grok, or Custom)\n   • Paste your API key\n   • Choose a model (e.g., GPT-4o Mini, Grok 3 Mini)\n\nYour key is saved in localStorage and auto-filled next time. You can also use any OpenAI-compatible endpoint via 'Custom Endpoint'."
-        },
-        "geminiSetup": {
-          "title": "🎯 免费Gemini API密钥（推荐）",
-          "linkLabel": "前往 Google AI Studio",
-          "body": "Gemini 2.5 Flash完全免费——无需信用卡！\n\n免费额度：每分钟15次请求，每天1,500次请求\n\n获取方法：\n1. 访问 aistudio.google.com\n2. 用Google账号登录\n3. 点击「Get API Key」\n4. 点击「Create API Key」\n5. 选择「Create API key in new project」\n6. 复制密钥（以「AIza...」开头）\n\n使用方法：\n1. 打开AI生成页面\n2. 选择「Google Gemini」\n3. 粘贴API密钥\n4. 选择「Gemini 2.5 Flash」模型\n5. 输入主题并生成！"
         },
         "fullGenerate": {
           "title": "Full Generation (Template + Deck + Cards)",

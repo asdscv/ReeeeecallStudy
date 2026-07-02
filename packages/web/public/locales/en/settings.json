@@ -83,27 +83,6 @@
     "help": "TTS language follows field settings in card template. Play button always shows regardless of auto reading.",
     "note": "TTS language follows field settings in card template. Play button always shows regardless of auto reading."
   },
-  "aiProvider": {
-    "title": "AI Providers",
-    "description": "Manage providers and API keys for AI auto-generation",
-    "configured": "Configured",
-    "notSet": "Not set",
-    "edit": "Configure",
-    "delete": "Delete",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key",
-    "model": "Default Model",
-    "baseUrl": "API Base URL",
-    "save": "Save",
-    "cancel": "Cancel",
-    "saved": "AI provider saved",
-    "deleted": "AI provider deleted",
-    "securityNote": "API keys are AES-256 encrypted and stored in your browser. Never sent to our servers.",
-    "custom": "Custom",
-    "customDesc": "OpenAI-compatible API",
-    "noProviders": "No providers configured. Set up above.",
-    "customModel": "Custom Model"
-  },
   "reminders": {
     "title": "Study Reminders",
     "description": "Get a daily reminder to keep your study streak going.",

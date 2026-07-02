@@ -47,28 +47,6 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         ],
       },
       {
-        title: 'sections.ai-generate.items.apiKeySetup.title',
-        body: 'sections.ai-generate.items.apiKeySetup.body',
-        images: [
-          { pc: '/images/guide/ai-generate/pc-02-config.png', mobile: '/images/guide/ai-generate/mobile-02-config.png', alt: 'Config step' },
-        ],
-      },
-      {
-        title: 'sections.ai-generate.items.geminiSetup.title',
-        body: 'sections.ai-generate.items.geminiSetup.body',
-        link: {
-          label: 'sections.ai-generate.items.geminiSetup.linkLabel',
-          href: 'https://aistudio.google.com/apikey',
-        },
-        images: [
-          { pc: '/images/guide/gemini-api/01-ai-studio-home.png', mobile: '/images/guide/gemini-api/01-ai-studio-home.png', alt: 'Google AI Studio home' },
-          { pc: '/images/guide/gemini-api/02-get-api-key.png', mobile: '/images/guide/gemini-api/02-get-api-key.png', alt: 'Get API key button' },
-          { pc: '/images/guide/gemini-api/03-create-api-key.png', mobile: '/images/guide/gemini-api/03-create-api-key.png', alt: 'Create API key' },
-          { pc: '/images/guide/gemini-api/04-create-new-project.png', mobile: '/images/guide/gemini-api/04-create-new-project.png', alt: 'Create new project' },
-          { pc: '/images/guide/gemini-api/05-api-key-created.png', mobile: '/images/guide/gemini-api/05-api-key-created.png', alt: 'API key created' },
-        ],
-      },
-      {
         title: 'sections.ai-generate.items.fullGenerate.title',
         body: 'sections.ai-generate.items.fullGenerate.body',
         images: [
@@ -372,10 +350,6 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         title: 'sections.settings.items.autoTts.title',
         body: 'sections.settings.items.autoTts.body',
-      },
-      {
-        title: 'sections.settings.items.apiKey.title',
-        body: 'sections.settings.items.apiKey.body',
       },
     ],
   },
