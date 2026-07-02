@@ -42,7 +42,10 @@
     "unsubscribing": "Đang hủy...",
     "unsubscribed": "Đã hủy đăng ký",
     "unsubscribeConfirm": "Hủy đăng ký bộ thẻ này? Tiến độ học tập cá nhân của bạn sẽ được giữ lại trong tài khoản.",
-    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại."
+    "unsubscribeError": "Hủy đăng ký thất bại. Vui lòng thử lại.",
+    "limitUsage": "Thêm {{count}} thẻ vào giới hạn · còn {{available}}",
+    "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available}}). Xóa thẻ hoặc đăng ký trước.",
+    "limitOfficialFree": "Bộ thẻ chính thức · không tính vào giới hạn thẻ."
   },
   "preview": {
     "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | ReeeeecallStudy",
