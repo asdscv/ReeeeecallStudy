@@ -23,10 +23,14 @@ import { StatsSection } from '../components/landing/StatsSection'
 import { SocialProofSection } from '../components/landing/SocialProofSection'
 import { HowItWorksSection } from '../components/landing/HowItWorksSection'
 import { InsightsSection } from '../components/landing/InsightsSection'
+import { PricingSection } from '../components/landing/PricingSection'
 import { FAQSection } from '../components/landing/FAQSection'
 import { FinalCTASection } from '../components/landing/FinalCTASection'
 import { FooterSection } from '../components/landing/FooterSection'
 import { FloatingCTA } from '../components/landing/FloatingCTA'
+// Same flag that enables payment — when 'true' it lights up BOTH checkout and the
+// landing pricing section. When off, the pricing block is not rendered at all.
+import { PAYMENTS_ENABLED } from '../stores/billing-store'
 
 /* Thin gradient divider — used between sections for visual rhythm */
 function Divider() {
@@ -93,6 +97,13 @@ export function LandingPage() {
       <SocialProofSection />
       <HowItWorksSection />
       <InsightsSection />
+      {/* Pricing — gated: hidden until launch, appears when VITE_PAYMENTS_ENABLED === 'true' */}
+      {PAYMENTS_ENABLED && (
+        <>
+          <Divider />
+          <PricingSection />
+        </>
+      )}
       <Divider />
       <FAQSection />
       <FinalCTASection />
