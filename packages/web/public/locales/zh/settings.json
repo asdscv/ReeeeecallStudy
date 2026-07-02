@@ -21,7 +21,7 @@
     "desc": "API 端点、认证、使用示例"
   },
   "profile": {
-    "title": "个人信息",
+    "title": "个人资料",
     "email": "邮箱",
     "displayName": "显示名称",
     "displayNamePlaceholder": "请输入您的名称",
@@ -162,6 +162,10 @@
     "title": "卡片存储",
     "count": "{{owned}} / {{limit}} 张",
     "reached": "已达卡片上限。订阅以添加更多。",
-    "subscribe": "订阅（即将推出）"
+    "subscribe": "订阅（即将推出）",
+    "plan": "免费方案",
+    "planNote": "免费方案最多可拥有 {{limit}} 张卡片。订阅可提高上限。",
+    "upgrade": "升级（即将推出）",
+    "upgradeSoon": "订阅即将推出。"
   }
 }

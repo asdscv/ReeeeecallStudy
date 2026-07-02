@@ -161,6 +161,10 @@
     "title": "Penyimpanan kartu",
     "count": "{{owned}} / {{limit}} kartu",
     "reached": "Anda telah mencapai batas kartu. Berlangganan untuk menambah.",
-    "subscribe": "Berlangganan (segera hadir)"
+    "subscribe": "Berlangganan (segera hadir)",
+    "plan": "Paket gratis",
+    "planNote": "Paket gratis mencakup hingga {{limit}} kartu milik Anda. Berlangganan untuk menaikkan batas.",
+    "upgrade": "Tingkatkan (segera hadir)",
+    "upgradeSoon": "Langganan akan segera hadir."
   }
 }

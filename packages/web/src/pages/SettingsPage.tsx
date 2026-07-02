@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download } from 'lucide-react'
+import { Check, BookOpen, Globe, Loader2, LogOut, Zap, Bot, Palette, Target, Download, CreditCard, User } from 'lucide-react'
 import { useLocale } from '../hooks/useLocale'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -11,6 +11,8 @@ import { useTheme } from '../hooks/useTheme'
 import { ThemeToggle } from '../components/common/ThemeToggle'
 import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
+import { CollapsibleSection } from '../components/settings/CollapsibleSection'
+import { WalletSummary } from '../components/settings/WalletSummary'
 import {
   loadSettings,
   saveSettings,
@@ -33,6 +35,7 @@ async function autoSaveProfile(
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation('settings')
+  const { t: tWallet } = useTranslation('wallet')
   const { changeLanguage } = useLocale()
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
@@ -236,27 +239,32 @@ export function SettingsPage() {
 
         {/* ── Card storage usage (owned-card limit, mig 116) ── */}
         {cardUsage && (
-          <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-foreground">{t('cardUsage.title')}</h2>
-              <span className="text-sm text-muted-foreground tabular-nums">
-                {t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
-              </span>
-            </div>
+          <CollapsibleSection
+            title={t('cardUsage.title')}
+            icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
+            badge={<span className="text-sm text-muted-foreground tabular-nums">{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</span>}
+          >
             <div className="h-2 rounded-full bg-accent overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
                 style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
               />
             </div>
+            <p className="text-xs text-muted-foreground mt-3">{t('cardUsage.planNote', { limit: cardUsage.limit })}</p>
+            <button disabled title={t('cardUsage.upgradeSoon')} className="mt-2 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground cursor-not-allowed font-medium">{t('cardUsage.upgrade')}</button>
             {cardUsage.available <= 0 && (
               <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
             )}
-          </section>
+          </CollapsibleSection>
         )}
 
+        {/* ── Wallet ── */}
+        <CollapsibleSection title={tWallet('title')} icon={<span className="text-base">💳</span>}>
+          <WalletSummary />
+        </CollapsibleSection>
+
         {/* ── a) Profile Section ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
+        <CollapsibleSection title={t('profile.title')} icon={<User className="w-5 h-5 text-muted-foreground" />}>
           <div className="flex items-start gap-4 mb-4">
             <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center shrink-0">
               <span className="text-2xl font-bold text-white">{userInitial}</span>
@@ -312,7 +320,7 @@ export function SettingsPage() {
               <p className="text-xs text-success mt-1">{t('profile.nameAvailable')}</p>
             )}
           </div>
-        </section>
+        </CollapsibleSection>
 
         {/* ── b) Quick Actions ── */}
         <div className="grid grid-cols-3 gap-3">
@@ -340,8 +348,7 @@ export function SettingsPage() {
         </div>
 
         {/* ── c) Study Settings ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">{t('answerMode.title')}</h2>
+        <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-base">📝</span>}>
 
           {/* Answer Mode cards */}
           <div className="grid grid-cols-2 gap-3 mb-5">
@@ -480,14 +487,10 @@ export function SettingsPage() {
             )}
             <p className="text-xs text-content-tertiary mt-3">{t('tts.help')}</p>
           </div>
-        </section>
+        </CollapsibleSection>
 
         {/* ── f) Language ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">{t('language.title')}</h2>
-          </div>
+        <CollapsibleSection title={t('language.title')} icon={<Globe className="w-5 h-5 text-muted-foreground" />}>
           <select
             value={i18n.language}
             onChange={(e) => changeLanguage(e.target.value)}
@@ -500,17 +503,13 @@ export function SettingsPage() {
               </option>
             ))}
           </select>
-        </section>
+        </CollapsibleSection>
 
         {/* ── f2) Theme ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Palette className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">{t('theme.title')}</h2>
-          </div>
+        <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-5 h-5 text-muted-foreground" />}>
           <p className="text-sm text-muted-foreground mb-3">{t('theme.description')}</p>
           <ThemeToggle theme={theme} onChange={setTheme} />
-        </section>
+        </CollapsibleSection>
 
 
         {/* ── i) Legal (compact inline) ── */}
@@ -525,11 +524,7 @@ export function SettingsPage() {
         </div>
 
         {/* ── Daily Study Goal ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">{t('goal.title', 'Daily Study Goal')}</h2>
-          </div>
+        <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-5 h-5 text-muted-foreground" />}>
           <p className="text-sm text-muted-foreground mb-3">{t('goal.description', 'Set a daily study target in minutes. Leave empty for no goal.')}</p>
           <div className="flex items-center gap-3">
             <input
@@ -550,19 +545,15 @@ export function SettingsPage() {
             />
             <span className="text-sm text-muted-foreground">{t('goal.unit', 'minutes / day')}</span>
           </div>
-        </section>
+        </CollapsibleSection>
 
         {/* ── Study Reminders ── */}
         <ReminderSettings />
 
         {/* ── Data Export ── */}
-        <section className="bg-card rounded-xl border border-border p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Download className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">{t('export.title', 'Export My Data')}</h2>
-          </div>
+        <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-5 h-5 text-muted-foreground" />}>
           <UserStatsExport />
-        </section>
+        </CollapsibleSection>
 
         {/* ── j) Account (bottom, clear separation) ── */}
         <div className="border-t border-border pt-6">

@@ -132,15 +132,6 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           testID="drawer-achievements"
         />
 
-        {/* Wallet (₩ balance + usage) */}
-        <MenuItem
-          icon="💳" label={t('nav.wallet', { defaultValue: 'Wallet' })}
-          active={isActive('Wallet')}
-          theme={theme}
-          onPress={() => go('SettingsTab', 'Wallet')}
-          testID="drawer-wallet"
-        />
-
         {/* Settings */}
         <MenuItem
           icon="⚙️" label={t('nav.settings')}
