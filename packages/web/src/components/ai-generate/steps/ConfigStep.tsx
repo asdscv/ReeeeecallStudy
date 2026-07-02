@@ -214,7 +214,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               : t('wallet.empty')
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Mode select */}
       {showModeSelect && onModeChange && (
         <div>
@@ -227,12 +227,13 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 key={m}
                 type="button"
                 onClick={() => onModeChange(m)}
-                className={`px-3 py-2 text-xs rounded-lg border transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-left text-sm font-medium transition cursor-pointer ${
                   mode === m
-                    ? 'border-brand bg-brand/10 text-brand'
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    ? 'border-brand bg-brand/10 text-brand ring-1 ring-brand/30'
+                    : 'border-border text-muted-foreground hover:bg-accent/40'
                 }`}
               >
+                <span className="text-base leading-none">{m === 'full' ? '🆕' : '➕'}</span>
                 {t(`config.mode.${m}`)}
               </button>
             ))}
@@ -241,8 +242,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       )}
 
       {/* ── Content Section ── */}
-      <fieldset className="space-y-3 p-3 bg-brand/5 rounded-lg border border-brand/20">
-        <legend className="text-xs font-semibold text-brand uppercase px-1">{t('config.contentSection')}</legend>
+      <fieldset className="bg-card rounded-xl border border-border p-4 sm:p-5 space-y-4">
+        <legend className="text-sm font-semibold text-foreground px-1">{t('config.contentSection')}</legend>
 
         {/* Deck selector (cards_only mode) */}
         {!isFullMode && (
@@ -251,7 +252,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             <select
               value={selectedDeckId}
               onChange={(e) => setSelectedDeckId(e.target.value)}
-              className={`w-full px-3 py-2 rounded-lg border text-sm outline-none focus:border-brand bg-card ${
+              className={`w-full px-3 py-2 rounded-xl border text-sm outline-none focus:border-brand bg-card ${
                 !selectedDeckId ? 'border-destructive/30' : 'border-border'
               }`}
             >
@@ -273,18 +274,19 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
         {/* Input mode toggle: type a topic, or recognize an image (both modes —
             in full mode 'image' creates a whole new deck from the image) */}
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-2 gap-2">
           {(['topic', 'image'] as const).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setImageMode(m)}
-              className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer ${
+              className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-left text-sm font-medium transition cursor-pointer ${
                 imageMode === m
-                  ? 'border-brand bg-brand/10 text-brand'
-                  : 'border-border text-muted-foreground hover:bg-muted'
+                  ? 'border-brand bg-brand/10 text-brand ring-1 ring-brand/30'
+                  : 'border-border text-muted-foreground hover:bg-accent/40'
               }`}
             >
+              <span className="text-base leading-none">{m === 'topic' ? '📝' : '🖼️'}</span>
               {t(m === 'topic' ? 'config.inputModeTopic' : 'config.inputModeImage')}
             </button>
           ))}
@@ -299,7 +301,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder={t('config.topicPlaceholder')}
-              className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand"
+              className="w-full px-3 py-2 rounded-xl border border-border text-sm outline-none focus:border-brand"
             />
           </div>
         )}
@@ -318,13 +320,13 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-dashed border-brand/40 text-sm text-brand hover:bg-brand/5 transition cursor-pointer"
+              className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-border hover:border-brand/50 hover:bg-accent/30 transition cursor-pointer text-muted-foreground text-sm"
             >
-              <ImageUp className="w-4 h-4" />
+              <ImageUp size={28} />
               {imageDataUrl ? t('config.imageChange') : t('config.imageUpload')}
             </button>
             {imageDataUrl && (
-              <img src={imageDataUrl} alt="" className="mt-2 max-h-44 rounded-lg border border-border mx-auto" />
+              <img src={imageDataUrl} alt="" className="mt-2 max-h-44 rounded-xl border border-border mx-auto" />
             )}
             <p className="text-[11px] text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
             <p className="text-[11px] text-amber-600 mt-0.5">{t('config.imagePaidNotice')}</p>
@@ -338,7 +340,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             <select
               value={contentLang}
               onChange={(e) => setContentLang(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
+              className="w-full px-3 py-2 rounded-xl border border-border text-sm outline-none focus:border-brand bg-card"
             >
               {CONTENT_LANGUAGES.map((l) => (
                 <option key={l.value} value={l.value}>
@@ -366,7 +368,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               const n = typeof cardCount === 'number' ? cardCount : parseInt(String(cardCount)) || 1
               setCardCount(Math.max(1, Math.min(100, n)))
             }}
-            className="w-full px-3 py-2 rounded-lg border border-border text-sm outline-none focus:border-brand bg-card"
+            className="w-full px-3 py-2 rounded-xl border border-border text-sm outline-none focus:border-brand bg-card"
             placeholder={t('config.cardCountPlaceholder', { min: 1, max: 100 })}
           />
           <p className="text-xs text-content-tertiary mt-1">{t('config.cardCountHint', { min: 1, max: 100 })}</p>
@@ -375,8 +377,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       {/* ── Template Config (full mode, topic input only — image builds its own template) ── */}
       {isFullMode && !useImage && (
-        <fieldset className="space-y-3 p-3 bg-purple-50/50 rounded-lg border border-purple-100">
-          <legend className="text-xs font-semibold text-purple-600 uppercase px-1">{t('config.templateSection')}</legend>
+        <fieldset className="bg-card rounded-xl border border-border p-4 sm:p-5 space-y-4">
+          <legend className="text-sm font-semibold text-foreground px-1">{t('config.templateSection')}</legend>
 
           {/* Field mode: auto vs manual */}
           <div>
@@ -385,10 +387,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               <button
                 type="button"
                 onClick={() => setFieldMode('auto')}
-                className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
+                className={`px-3 py-2.5 text-xs rounded-xl border transition cursor-pointer text-left ${
                   fieldMode === 'auto'
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    ? 'border-brand bg-brand/10 text-brand ring-1 ring-brand/30'
+                    : 'border-border text-muted-foreground hover:bg-accent/40'
                 }`}
               >
                 <span className="font-medium">{t('config.fieldAuto')}</span>
@@ -397,10 +399,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               <button
                 type="button"
                 onClick={() => setFieldMode('manual')}
-                className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
+                className={`px-3 py-2.5 text-xs rounded-xl border transition cursor-pointer text-left ${
                   fieldMode === 'manual'
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    ? 'border-brand bg-brand/10 text-brand ring-1 ring-brand/30'
+                    : 'border-border text-muted-foreground hover:bg-accent/40'
                 }`}
               >
                 <span className="font-medium">{t('config.fieldManual')}</span>
@@ -419,12 +421,12 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                     value={field.name}
                     onChange={(e) => updateCustomField(i, { name: e.target.value })}
                     placeholder={`${t('config.fieldName')} ${i + 1}`}
-                    className="flex-1 px-2 py-1.5 text-xs border border-border rounded outline-none focus:border-purple-500"
+                    className="flex-1 px-2.5 py-2 text-xs border border-border rounded-lg outline-none focus:border-brand"
                   />
                   <select
                     value={field.side}
                     onChange={(e) => updateCustomField(i, { side: e.target.value as 'front' | 'back' })}
-                    className="px-2 py-1.5 text-xs border border-border rounded outline-none bg-card"
+                    className="px-2.5 py-2 text-xs border border-border rounded-lg outline-none bg-card"
                   >
                     <option value="front">{t('config.front')}</option>
                     <option value="back">{t('config.back')}</option>
@@ -444,7 +446,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 <button
                   type="button"
                   onClick={addCustomField}
-                  className="text-xs text-purple-600 hover:text-purple-800 cursor-pointer"
+                  className="text-xs font-medium text-brand hover:text-brand-hover cursor-pointer"
                 >
                   + {t('config.addField')}
                 </button>
@@ -459,10 +461,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               <button
                 type="button"
                 onClick={() => setUseCustomHtml(false)}
-                className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
+                className={`px-3 py-2.5 text-xs rounded-xl border transition cursor-pointer text-left ${
                   !useCustomHtml
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    ? 'border-brand bg-brand/10 text-brand ring-1 ring-brand/30'
+                    : 'border-border text-muted-foreground hover:bg-accent/40'
                 }`}
               >
                 <span className="font-medium">{t('config.layoutDefault')}</span>
@@ -471,10 +473,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               <button
                 type="button"
                 onClick={() => setUseCustomHtml(true)}
-                className={`px-2.5 py-2 text-xs rounded-lg border transition cursor-pointer text-left ${
+                className={`px-3 py-2.5 text-xs rounded-xl border transition cursor-pointer text-left ${
                   useCustomHtml
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    ? 'border-brand bg-brand/10 text-brand ring-1 ring-brand/30'
+                    : 'border-border text-muted-foreground hover:bg-accent/40'
                 }`}
               >
                 <span className="font-medium">{t('config.layoutCustom')}</span>
@@ -486,7 +488,9 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       )}
 
       {walletText && (
-        <p className="text-xs text-center text-muted-foreground">{walletText}</p>
+        <div className="flex justify-center">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{walletText}</span>
+        </div>
       )}
 
       {limit.reached ? (
@@ -500,7 +504,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       <button
         type="submit"
         disabled={!canSubmit || limit.exceeds(cardCount)}
-        className="w-full px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}
       </button>
