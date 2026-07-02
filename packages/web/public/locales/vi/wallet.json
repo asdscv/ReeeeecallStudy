@@ -5,7 +5,7 @@
   "retry": "Thử lại",
   "balance": {
     "title": "Số dư",
-    "hint": "Tín dụng trả trước để tạo bằng AI vượt quá số thẻ miễn phí hằng ngày.",
+    "hint": "Tín dụng trả trước để tạo thẻ bằng AI vượt quá số thẻ miễn phí hằng ngày.",
     "topUp": "Nạp thêm (sắp có)",
     "topUpSoon": "Tính năng nạp thêm sắp ra mắt."
   },
@@ -20,7 +20,7 @@
   },
   "reason": {
     "purchase": "Nạp thêm",
-    "spend": "Tạo bằng AI",
+    "spend": "Tạo thẻ bằng AI",
     "refund": "Hoàn tiền",
     "admin_grant": "Cấp tín dụng",
     "spend_cards": "Thẻ AI",

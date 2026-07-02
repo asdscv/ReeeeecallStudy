@@ -5,7 +5,7 @@
   "retry": "다시 시도",
   "balance": {
     "title": "충전금",
-    "hint": "매일 무료 카드를 초과하는 AI 생성에 사용되는 선불 크레딧이에요.",
+    "hint": "매일 무료 카드를 초과하는 AI 카드 생성에 사용되는 선불 크레딧이에요.",
     "topUp": "충전하기 (준비 중)",
     "topUpSoon": "충전 기능은 준비 중이에요."
   },
@@ -20,7 +20,7 @@
   },
   "reason": {
     "purchase": "충전",
-    "spend": "AI 생성",
+    "spend": "AI 카드 생성",
     "refund": "환불",
     "admin_grant": "크레딧 지급",
     "spend_cards": "AI 카드",

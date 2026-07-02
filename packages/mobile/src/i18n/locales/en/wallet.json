@@ -5,7 +5,7 @@
   "retry": "Retry",
   "balance": {
     "title": "Balance",
-    "hint": "Prepaid credit for AI generation beyond the daily free cards.",
+    "hint": "Prepaid credit for AI card generation beyond the daily free cards.",
     "topUp": "Top up (coming soon)",
     "topUpSoon": "Top-up is coming soon."
   },
@@ -20,7 +20,7 @@
   },
   "reason": {
     "purchase": "Top-up",
-    "spend": "AI generation",
+    "spend": "AI card generation",
     "refund": "Refund",
     "admin_grant": "Credit grant",
     "spend_cards": "AI cards",

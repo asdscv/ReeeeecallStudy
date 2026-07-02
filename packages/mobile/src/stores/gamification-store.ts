@@ -58,7 +58,7 @@ export function computeLevel(xp: number): number {
 }
 
 export function xpForLevel(level: number): number {
-  // Total XP needed to reach this level (Duolingo-style flat 150 XP per level)
+  // Total XP needed to reach this level (flat 150 XP per level)
   return (level - 1) * 150
 }
 

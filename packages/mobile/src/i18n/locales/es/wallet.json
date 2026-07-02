@@ -5,7 +5,7 @@
   "retry": "Reintentar",
   "balance": {
     "title": "Saldo",
-    "hint": "Crédito prepago para generar con IA más allá de las tarjetas gratis diarias.",
+    "hint": "Crédito prepago para la generación de tarjetas IA más allá de las tarjetas gratis diarias.",
     "topUp": "Recargar (próximamente)",
     "topUpSoon": "La recarga estará disponible pronto."
   },
@@ -20,7 +20,7 @@
   },
   "reason": {
     "purchase": "Recarga",
-    "spend": "Generación de IA",
+    "spend": "Generación de tarjetas IA",
     "refund": "Reembolso",
     "admin_grant": "Crédito otorgado",
     "spend_cards": "Tarjetas de IA",
