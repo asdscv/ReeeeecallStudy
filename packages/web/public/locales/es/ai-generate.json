@@ -160,11 +160,11 @@
     "fullDesc": "Create a template, deck, and cards all at once from a topic.",
     "cardsOnlyTitle": "Add Cards",
     "cardsOnlyDesc": "Add AI-generated cards to an existing deck.",
-    "securityTitle": "Sin configuración",
-    "securityDesc": "Se genera en nuestros servidores — sin claves API que añadir o gestionar.",
     "languageTitle": "Multi-language",
     "languageDesc": "Generate cards in any language with automatic TTS setup.",
     "speedTitle": "Fast generation",
-    "speedDesc": "Create 10-50 high-quality cards in under a minute."
+    "speedDesc": "Create 10-50 high-quality cards in under a minute.",
+    "freeTitle": "Empieza gratis",
+    "freeDesc": "Tarjetas gratis cada día — empieza ya."
   }
 }
