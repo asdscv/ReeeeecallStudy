@@ -323,6 +323,26 @@
       }
     }
   },
+  "pricing": {
+    "title": "价格方案",
+    "subtitle": "选择适合你学习规模的方案",
+    "recommended": "推荐",
+    "freePrice": "免费",
+    "pricePerMonth": "₩{{price}}/月",
+    "unlimitedCards": "无限卡片",
+    "upToCards": "最多 {{count}} 张卡片",
+    "ctaFree": "免费开始",
+    "ctaPaid": "立即开始",
+    "note": "注册并登录后可在设置中完成付款。",
+    "plans": {
+      "free": "免费",
+      "standard": "标准版",
+      "unlimited": "无限版",
+      "freeBlurb": "轻松上手的免费方案",
+      "standardBlurb": "用更多卡片扩展你的学习",
+      "unlimitedBlurb": "不受限制，尽情存储与学习"
+    }
+  },
   "seo": {
     "title": "ReeeeecallStudy — 基于间隔重复的智能闪卡学习",
     "description": "基于科学验证的间隔重复（SRS）算法的智能闪卡学习平台。记得更快，记得更久。"

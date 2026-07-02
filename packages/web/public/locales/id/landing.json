@@ -323,6 +323,26 @@
       }
     }
   },
+  "pricing": {
+    "title": "Harga",
+    "subtitle": "Pilih paket yang sesuai dengan intensitas belajarmu",
+    "recommended": "Direkomendasikan",
+    "freePrice": "Gratis",
+    "pricePerMonth": "₩{{price}}/bln",
+    "unlimitedCards": "Kartu tanpa batas",
+    "upToCards": "Hingga {{count}} kartu",
+    "ctaFree": "Mulai gratis",
+    "ctaPaid": "Mulai sekarang",
+    "note": "Pembayaran dilakukan setelah mendaftar, di Pengaturan.",
+    "plans": {
+      "free": "Gratis",
+      "standard": "Standar",
+      "unlimited": "Tanpa Batas",
+      "freeBlurb": "Paket gratis yang cocok untuk memulai",
+      "standardBlurb": "Perluas pembelajaran dengan lebih banyak kartu",
+      "unlimitedBlurb": "Simpan dan belajar tanpa batas"
+    }
+  },
   "seo": {
     "title": "ReeeeecallStudy — Pembelajaran Kartu Kilat Cerdas dengan Pengulangan Berjarak",
     "description": "Platform pembelajaran kartu kilat cerdas dengan algoritma pengulangan berjarak (SRS) yang terbukti secara ilmiah. Ingat lebih cepat dan lebih lama."
