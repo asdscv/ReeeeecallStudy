@@ -235,3 +235,44 @@ Rules:
 
   return { systemPrompt, userPrompt }
 }
+
+// Image → a COMPLETE new deck (metadata + template + cards) in one vision call.
+// Used by kind='image_deck' (always paid). The model both recognizes the image and
+// designs a fitting template, so no fields are supplied by the caller.
+export function buildImageDeckPrompt(uiLang: string) {
+  const langNote = uiLang.startsWith('ko')
+    ? '덱 이름과 설명은 한국어로 작성하고, 카드 내용은 이미지에 보이는 언어를 따르세요.'
+    : 'Write the deck name and description in English; use the language shown in the image for card content.'
+
+  const systemPrompt = `You are a flashcard deck creator with vision. You are given an IMAGE (a textbook page, vocabulary list, handwritten notes, or slides). Recognize the study material that is ACTUALLY in the image and turn it into a COMPLETE flashcard deck: deck metadata, a card template, and cards.
+Respond with a single JSON object.
+
+JSON schema:
+{
+  "name": "deck name that reflects the image content",
+  "description": "brief description",
+  "color": "#hex",
+  "icon": "emoji",
+  "template": {
+    "name": "template name",
+    "fields": [
+      { "key": "front", "name": "Front", "type": "text" },
+      { "key": "back", "name": "Back", "type": "text" }
+    ]
+  },
+  "cards": [
+    { "field_values": { "front": "value", "back": "value" }, "tags": ["tag"] }
+  ]
+}
+
+Rules:
+- Choose 2-3 template fields that fit the material (e.g. term/definition, word/meaning/example, question/answer). Each field "key" must be lowercase snake_case; every card's field_values keys MUST match the template field keys EXACTLY.
+- Field "type" is always "text".
+- Only include content that is ACTUALLY visible in the image — do not invent facts.
+- Create one card per distinct item in the image, up to 30 cards.
+- ${langNote}`
+
+  const userPrompt = 'Recognize this image and create a complete flashcard deck (metadata + template + cards) from its content.'
+
+  return { systemPrompt, userPrompt }
+}

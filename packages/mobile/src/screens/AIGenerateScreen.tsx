@@ -195,7 +195,9 @@ export function AIGenerateScreen() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
   const [affordable, setAffordable] = useState<Affordable | null>(null)
 
-  const useImage = !!selectedDeckId && imageMode === 'image'
+  // Image recognition works with OR without a deck: with a deck → add cards; without
+  // a deck (new deck) → recognize the image into a whole new deck (kind='image_deck').
+  const useImage = imageMode === 'image'
 
   // cards_only adds cards INTO an existing deck, so they must use that deck's
   // own template — never an arbitrary global templates[0], whose fields wouldn't
@@ -301,7 +303,11 @@ export function AIGenerateScreen() {
       })
 
       if (useImage) {
-        await store.generateCardsFromImage(imageDataUrl!)
+        if (selectedDeckId) {
+          await store.generateCardsFromImage(imageDataUrl!)  // add cards to the deck
+        } else {
+          await store.generateDeckFromImage(imageDataUrl!)   // image → a whole new deck
+        }
       } else {
         if (!selectedDeckId) {
           await store.generateTemplate()
@@ -408,8 +414,9 @@ export function AIGenerateScreen() {
             <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('content.section')}</Text>
           </View>
           <View style={[styles.labeledSection, { borderColor: theme.colors.border }]}>
-            {/* Input mode (cards_only): topic vs image recognition */}
-            {!!selectedDeckId && (
+            {/* Input mode: topic vs image recognition (both flows — with a deck it
+                adds cards, without a deck it builds a whole new deck from the image) */}
+            {(
               <View style={styles.modeRow}>
                 {(['topic', 'image'] as const).map((m) => (
                   <TouchableOpacity
