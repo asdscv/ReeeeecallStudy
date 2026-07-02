@@ -42,7 +42,10 @@
     "unsubscribing": "Berhenti...",
     "unsubscribed": "Berhasil berhenti berlangganan",
     "unsubscribeConfirm": "Berhenti berlangganan dari dek ini? Kemajuan belajar pribadi Anda akan tetap ada di akun.",
-    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi."
+    "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi.",
+    "limitUsage": "Menambah {{count}} kartu ke batas Anda · sisa {{available}}",
+    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Hapus kartu atau berlangganan.",
+    "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu."
   },
   "preview": {
     "title": "\"{{title}}\" - Dek Kartu Kilat | ReeeeecallStudy",

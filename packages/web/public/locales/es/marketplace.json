@@ -42,7 +42,10 @@
     "unsubscribing": "Cancelando...",
     "unsubscribed": "Suscripción cancelada",
     "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
-    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo."
+    "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo.",
+    "limitUsage": "Añade {{count}} tarjetas a tu límite · quedan {{available}}",
+    "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Elimina tarjetas o suscríbete.",
+    "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas."
   },
   "preview": {
     "title": "\"{{title}}\" - Mazo de tarjetas | ReeeeecallStudy",
