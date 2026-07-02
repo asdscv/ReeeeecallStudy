@@ -1,9 +1,6 @@
 {
   "title": "AI Generate",
   "config": {
-    "provider": "AI Provider",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key",
     "apiKeyHint": "Kunci Anda dienkripsi AES-256 dan disimpan di browser. Tidak pernah dikirim ke server kami.",
     "model": "Model",
     "topic": "Topic",
@@ -17,7 +14,6 @@
     "goToSettings": "Tambahkan di Pengaturan",
     "manageInSettings": "Kelola penyedia:",
     "settings": "Pengaturan",
-    "customUrl": "API Base URL",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {

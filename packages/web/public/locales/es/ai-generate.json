@@ -1,9 +1,6 @@
 {
   "title": "AI Generate",
   "config": {
-    "provider": "AI Provider",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key",
     "apiKeyHint": "Su clave se cifra con AES-256 y se almacena en su navegador. Nunca se envía a nuestros servidores.",
     "model": "Model",
     "topic": "Topic",
@@ -17,7 +14,6 @@
     "goToSettings": "Agregar en Configuración",
     "manageInSettings": "Gestionar proveedores:",
     "settings": "Configuración",
-    "customUrl": "API Base URL",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {

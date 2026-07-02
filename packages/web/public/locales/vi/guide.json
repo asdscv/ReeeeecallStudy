@@ -234,10 +234,6 @@
         "autoTts": {
           "title": "TTS tự động",
           "body": "Tự động đọc các trường có TTS khi lật thẻ. Ngay cả khi tắt, nút loa để phát thủ công luôn có sẵn."
-        },
-        "apiKey": {
-          "title": "Khóa API",
-          "body": "Tạo khóa API để truy cập dữ liệu ReeeeecallStudy từ công cụ bên ngoài (script, ứng dụng). Khóa chỉ hiển thị một lần — hãy chắc chắn sao chép. Tối đa 1 khóa."
         }
       }
     },
@@ -247,15 +243,6 @@
         "what": {
           "title": "What is AI Auto-Generate?",
           "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nYou'll need an API key from an AI provider (OpenAI or xAI/Grok). Your API key is stored only in your browser — it's never sent to our servers."
-        },
-        "apiKeySetup": {
-          "title": "Setting Up Your API Key",
-          "body": "1. Get an API key from your preferred provider:\n   • OpenAI: Visit platform.openai.com → API Keys\n   • xAI/Grok: Visit console.x.ai → API Keys\n\n2. In the AI Generate dialog:\n   • Select your provider (OpenAI, xAI/Grok, or Custom)\n   • Paste your API key\n   • Choose a model (e.g., GPT-4o Mini, Grok 3 Mini)\n\nYour key is saved in localStorage and auto-filled next time. You can also use any OpenAI-compatible endpoint via 'Custom Endpoint'."
-        },
-        "geminiSetup": {
-          "title": "🎯 API Key Gemini miễn phí (Khuyến nghị)",
-          "linkLabel": "Mở Google AI Studio",
-          "body": "Gemini 2.5 Flash hoàn toàn miễn phí — không cần thẻ tín dụng!\n\nGiới hạn miễn phí: 15 yêu cầu/phút, 1.500 yêu cầu/ngày\n\nCách lấy key:\n1. Truy cập aistudio.google.com\n2. Đăng nhập bằng tài khoản Google\n3. Nhấp \"Get API Key\"\n4. Nhấp \"Create API Key\"\n5. Chọn \"Create API key in new project\"\n6. Sao chép key (bắt đầu bằng \"AIza...\")\n\nCách sử dụng:\n1. Mở trang AI Generate\n2. Chọn \"Google Gemini\"\n3. Dán API key\n4. Chọn model \"Gemini 2.5 Flash\"\n5. Nhập chủ đề và tạo thẻ!"
         },
         "fullGenerate": {
           "title": "Full Generation (Template + Deck + Cards)",

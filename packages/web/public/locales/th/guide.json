@@ -234,10 +234,6 @@
         "autoTts": {
           "title": "TTS อัตโนมัติ",
           "body": "อ่านออกเสียงฟิลด์ที่เปิด TTS อัตโนมัติเมื่อพลิกการ์ด แม้ปิดอยู่ ปุ่มลำโพงสำหรับเล่นด้วยตนเองจะพร้อมใช้เสมอ"
-        },
-        "apiKey": {
-          "title": "API Key",
-          "body": "สร้าง API key เพื่อเข้าถึงข้อมูล ReeeeecallStudy จากเครื่องมือภายนอก (สคริปต์ แอป) คีย์จะแสดงเพียงครั้งเดียว — อย่าลืมคัดลอก อนุญาตสูงสุด 1 คีย์"
         }
       }
     },
@@ -247,15 +243,6 @@
         "what": {
           "title": "What is AI Auto-Generate?",
           "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nYou'll need an API key from an AI provider (OpenAI or xAI/Grok). Your API key is stored only in your browser — it's never sent to our servers."
-        },
-        "apiKeySetup": {
-          "title": "Setting Up Your API Key",
-          "body": "1. Get an API key from your preferred provider:\n   • OpenAI: Visit platform.openai.com → API Keys\n   • xAI/Grok: Visit console.x.ai → API Keys\n\n2. In the AI Generate dialog:\n   • Select your provider (OpenAI, xAI/Grok, or Custom)\n   • Paste your API key\n   • Choose a model (e.g., GPT-4o Mini, Grok 3 Mini)\n\nYour key is saved in localStorage and auto-filled next time. You can also use any OpenAI-compatible endpoint via 'Custom Endpoint'."
-        },
-        "geminiSetup": {
-          "title": "🎯 API Key Gemini ฟรี (แนะนำ)",
-          "linkLabel": "ไปที่ Google AI Studio",
-          "body": "Gemini 2.5 Flash ฟรี 100% — ไม่ต้องใช้บัตรเครดิต!\n\nโควต้าฟรี: 15 คำขอ/นาที, 1,500 คำขอ/วัน\n\nวิธีรับ key:\n1. เข้า aistudio.google.com\n2. ล็อกอินด้วยบัญชี Google\n3. คลิก \"Get API Key\"\n4. คลิก \"Create API Key\"\n5. เลือก \"Create API key in new project\"\n6. คัดลอก key (เริ่มต้นด้วย \"AIza...\")\n\nวิธีใช้:\n1. เปิดหน้า AI Generate\n2. เลือก \"Google Gemini\"\n3. วาง API key\n4. เลือกโมเดล \"Gemini 2.5 Flash\"\n5. ใส่หัวข้อแล้วสร้าง!"
         },
         "fullGenerate": {
           "title": "Full Generation (Template + Deck + Cards)",
