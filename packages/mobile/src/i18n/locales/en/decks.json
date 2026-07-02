@@ -226,7 +226,10 @@
     "prevPage": "← Prev",
     "nextPage": "Next →",
     "pageOf": "Page {{current}} of {{total}}",
-    "showingRange": "Showing {{from}}–{{to}} of {{total}} cards"
+    "showingRange": "Showing {{from}}–{{to}} of {{total}} cards",
+    "archivedBadge": "Archived · Study locked",
+    "archivedNote": "{{count}} cards archived over your limit — you can still view them. Subscribe to study them again.",
+    "archivedSubscribe": "Subscribe (coming soon)"
   },
   "deckEdit": {
     "previewName": "Deck Name",

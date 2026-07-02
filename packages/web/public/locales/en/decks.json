@@ -49,7 +49,11 @@
     "saveVersion": "Save Version",
     "noVersions": "No versions recorded yet.",
     "versionLabel": "Version {{num}}",
-    "versionCards": "cards"
+    "versionCards": "cards",
+    "archived": {
+      "badge": "Archived · study locked",
+      "note": "{{count}} cards are archived for going over your limit — you can still view them. Subscribe to study them again."
+    }
   },
   "sync": {
     "button": "Sync",

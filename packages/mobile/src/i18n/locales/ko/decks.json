@@ -226,7 +226,10 @@
     "prevPage": "← 이전",
     "nextPage": "다음 →",
     "pageOf": "{{total}} 중 {{current}} 페이지",
-    "showingRange": "{{total}}장 중 {{from}}–{{to}} 표시"
+    "showingRange": "{{total}}장 중 {{from}}–{{to}} 표시",
+    "archivedBadge": "보관됨 · 학습 잠김",
+    "archivedNote": "{{count}}장이 한도 초과로 보관됨 — 카드는 그대로 볼 수 있어요. 구독하면 다시 학습할 수 있어요.",
+    "archivedSubscribe": "구독하기 (곧 오픈)"
   },
   "deckEdit": {
     "previewName": "덱 이름",

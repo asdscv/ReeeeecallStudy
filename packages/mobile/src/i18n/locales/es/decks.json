@@ -226,7 +226,10 @@
     "prevPage": "← Anterior",
     "nextPage": "Siguiente →",
     "pageOf": "Página {{current}} de {{total}}",
-    "showingRange": "Mostrando {{from}}–{{to}} de {{total}} tarjetas"
+    "showingRange": "Mostrando {{from}}–{{to}} de {{total}} tarjetas",
+    "archivedBadge": "Archivadas · Estudio bloqueado",
+    "archivedNote": "{{count}} tarjetas archivadas por superar tu límite — aún puedes verlas. Suscríbete para volver a estudiarlas.",
+    "archivedSubscribe": "Suscribirse (próximamente)"
   },
   "deckEdit": {
     "previewName": "Nombre del mazo",

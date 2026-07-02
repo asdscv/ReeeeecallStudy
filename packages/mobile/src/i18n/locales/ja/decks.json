@@ -226,7 +226,10 @@
     "prevPage": "← 前へ",
     "nextPage": "次へ →",
     "pageOf": "{{total}}ページ中{{current}}ページ",
-    "showingRange": "{{total}}枚中{{from}}–{{to}}を表示"
+    "showingRange": "{{total}}枚中{{from}}–{{to}}を表示",
+    "archivedBadge": "アーカイブ済み · 学習ロック",
+    "archivedNote": "上限を超えた{{count}}枚がアーカイブされました — カードはそのまま閲覧できます。購読すると再び学習できます。",
+    "archivedSubscribe": "購読する（近日公開）"
   },
   "deckEdit": {
     "previewName": "デッキ名",

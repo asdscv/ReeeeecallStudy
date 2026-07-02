@@ -226,7 +226,10 @@
     "prevPage": "← Trước",
     "nextPage": "Sau →",
     "pageOf": "Trang {{current}} / {{total}}",
-    "showingRange": "Hiển thị {{from}}–{{to}} trong {{total}} thẻ"
+    "showingRange": "Hiển thị {{from}}–{{to}} trong {{total}} thẻ",
+    "archivedBadge": "Đã lưu trữ · Khóa học tập",
+    "archivedNote": "{{count}} thẻ bị lưu trữ do vượt giới hạn — bạn vẫn xem được. Đăng ký để học lại.",
+    "archivedSubscribe": "Đăng ký (sắp ra mắt)"
   },
   "deckEdit": {
     "previewName": "Tên bộ thẻ",
