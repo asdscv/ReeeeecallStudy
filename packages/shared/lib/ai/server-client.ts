@@ -129,3 +129,55 @@ export async function getAffordableCards(): Promise<Affordable> {
   const paid = w.estPricePerCardMicro > 0 ? Math.floor(w.balanceMicroWon / w.estPricePerCardMicro) : 0
   return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true, balanceMicroWon: w.balanceMicroWon }
 }
+
+// micro-WON (1 unit = 1e-6 KRW) → whole ₩. All wallet money is stored in micro-WON.
+export function microWonToWon(micro: number): number {
+  return Math.floor((micro || 0) / 1_000_000)
+}
+
+export interface WalletLedgerEntry {
+  delta: number         // micro-WON; +grant/+refund, -spend
+  reason: string        // 'purchase'|'spend'|'refund'|'admin_grant'|'spend_cards'|'spend_image'
+  balanceAfter: number  // micro-WON balance after this entry
+  createdAt: string     // ISO timestamp
+}
+
+export interface AiWalletSummary {
+  balanceMicroWon: number
+  estPricePerCardMicro: number
+  freeLimit: number
+  freeUsedToday: number
+  freeRemainingToday: number
+  ledger: WalletLedgerEntry[]
+}
+
+// Full wallet snapshot for the user-facing Wallet/Usage screen: prepaid ₩ balance,
+// today's free-tier usage, and recent ledger rows. The ledger + balance tables are
+// deny-all RLS, so this SECURITY DEFINER RPC (mig 117, auth.uid()-scoped) is the
+// only read path. Returns null on a transient error so the screen shows a retry
+// rather than misleading zeros.
+export async function getAiWalletSummary(): Promise<AiWalletSummary | null> {
+  const { data, error } = await supabase.rpc('get_ai_wallet_summary')
+  if (error || !data) return null
+  const d = data as {
+    balance_micro_won?: number
+    est_price_per_card_micro?: number
+    free_limit?: number
+    free_used_today?: number
+    free_remaining_today?: number
+    ledger?: Array<{ delta: number; reason: string; balance_after: number; created_at: string }>
+  }
+  return {
+    balanceMicroWon: Number(d.balance_micro_won ?? 0),
+    estPricePerCardMicro: Number(d.est_price_per_card_micro ?? 0),
+    freeLimit: Number(d.free_limit ?? 10),
+    freeUsedToday: Number(d.free_used_today ?? 0),
+    freeRemainingToday: Number(d.free_remaining_today ?? 0),
+    ledger: (d.ledger ?? []).map((r) => ({
+      delta: Number(r.delta),
+      reason: String(r.reason),
+      balanceAfter: Number(r.balance_after),
+      createdAt: String(r.created_at),
+    })),
+  }
+}

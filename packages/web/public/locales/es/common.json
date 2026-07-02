@@ -14,7 +14,8 @@
     "achievements": "Logros",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
-    "publisher": "Estadísticas del editor"
+    "publisher": "Estadísticas del editor",
+    "wallet": "Cartera"
   },
   "actions": {
     "save": "Guardar",

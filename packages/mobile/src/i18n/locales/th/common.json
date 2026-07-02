@@ -12,7 +12,8 @@
     "guide": "คู่มือ",
     "aiGenerate": "AI Generate",
     "achievements": "ความสำเร็จ",
-    "publisherStats": "สถิติผู้เผยแพร่"
+    "publisherStats": "สถิติผู้เผยแพร่",
+    "wallet": "กระเป๋าเงิน"
   },
   "actions": {
     "save": "บันทึก",

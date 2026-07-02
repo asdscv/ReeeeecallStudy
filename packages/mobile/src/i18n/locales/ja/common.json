@@ -12,7 +12,8 @@
     "guide": "ガイド",
     "aiGenerate": "AI Generate",
     "achievements": "実績",
-    "publisherStats": "パブリッシャー統計"
+    "publisherStats": "パブリッシャー統計",
+    "wallet": "ウォレット"
   },
   "actions": {
     "save": "保存",

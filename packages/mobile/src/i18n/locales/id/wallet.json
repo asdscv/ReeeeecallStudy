@@ -1,0 +1,29 @@
+{
+  "title": "Dompet & Penggunaan",
+  "subtitle": "Saldo kredit AI dan penggunaan pembuatan Anda.",
+  "error": "Tidak dapat memuat dompet. Silakan coba lagi.",
+  "retry": "Coba lagi",
+  "balance": {
+    "title": "Saldo",
+    "hint": "Kredit prabayar untuk pembuatan AI di luar kartu gratis harian.",
+    "topUp": "Isi ulang (segera hadir)",
+    "topUpSoon": "Isi ulang akan segera hadir."
+  },
+  "free": {
+    "title": "Gratis hari ini",
+    "count": "{{used}} / {{limit}} kartu",
+    "note": "Kartu AI gratis diatur ulang setiap hari."
+  },
+  "history": {
+    "title": "Riwayat penggunaan",
+    "empty": "Belum ada penggunaan."
+  },
+  "reason": {
+    "purchase": "Isi ulang",
+    "spend": "Pembuatan AI",
+    "refund": "Pengembalian dana",
+    "admin_grant": "Pemberian kredit",
+    "spend_cards": "Kartu AI",
+    "spend_image": "Gambar AI"
+  }
+}

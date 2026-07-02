@@ -1,0 +1,29 @@
+{
+  "title": "Wallet & Usage",
+  "subtitle": "Your AI credit balance and generation usage.",
+  "error": "Couldn't load your wallet. Please try again.",
+  "retry": "Retry",
+  "balance": {
+    "title": "Balance",
+    "hint": "Prepaid credit for AI generation beyond the daily free cards.",
+    "topUp": "Top up (coming soon)",
+    "topUpSoon": "Top-up is coming soon."
+  },
+  "free": {
+    "title": "Free today",
+    "count": "{{used}} / {{limit}} cards",
+    "note": "Free AI cards reset every day."
+  },
+  "history": {
+    "title": "Usage history",
+    "empty": "No usage yet."
+  },
+  "reason": {
+    "purchase": "Top-up",
+    "spend": "AI generation",
+    "refund": "Refund",
+    "admin_grant": "Credit grant",
+    "spend_cards": "AI cards",
+    "spend_image": "AI image"
+  }
+}

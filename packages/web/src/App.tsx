@@ -70,6 +70,11 @@ const AchievementsPage = lazy(() =>
   import('./pages/AchievementsPage').then(m => ({ default: m.AchievementsPage }))
 )
 
+// AI wallet / usage (₩ balance + free-tier usage + spend history)
+const WalletPage = lazy(() =>
+  import('./pages/WalletPage').then(m => ({ default: m.WalletPage }))
+)
+
 // Admin pages
 const AdminOverviewPage = lazy(() =>
   import('./pages/admin/AdminOverviewPage').then(m => ({ default: m.AdminOverviewPage }))
@@ -260,6 +265,7 @@ function App() {
               <Route path="/achievements" element={<AchievementsPage />} />
               <Route path="/leaderboard" element={<Navigate to="/achievements" replace />} />
               <Route path="/analytics" element={<Navigate to="/history" replace />} />
+              <Route path="/wallet" element={<WalletPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 

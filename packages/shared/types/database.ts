@@ -610,10 +610,12 @@ export type AdminRecentActivity = {
 }
 
 export type AdminSystemStats = {
-  total_api_keys: number
-  active_api_keys: number
-  expired_api_keys: number
-  recently_used_keys: number
+  // AI credit wallet (micro-WON, 1e-6 KRW; see mig 117 admin_system_stats)
+  total_wallet_balance: number
+  total_ai_spent: number
+  active_wallets: number
+  ai_cards_paid_today: number
+  ai_cards_free_today: number
   total_contents: number
   published_contents: number
   total_study_logs: number

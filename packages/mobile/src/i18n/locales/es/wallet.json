@@ -1,0 +1,29 @@
+{
+  "title": "Cartera y uso",
+  "subtitle": "Tu saldo de créditos de IA y el uso de generación.",
+  "error": "No se pudo cargar tu cartera. Inténtalo de nuevo.",
+  "retry": "Reintentar",
+  "balance": {
+    "title": "Saldo",
+    "hint": "Crédito prepago para generar con IA más allá de las tarjetas gratis diarias.",
+    "topUp": "Recargar (próximamente)",
+    "topUpSoon": "La recarga estará disponible pronto."
+  },
+  "free": {
+    "title": "Gratis hoy",
+    "count": "{{used}} / {{limit}} tarjetas",
+    "note": "Las tarjetas de IA gratis se reinician cada día."
+  },
+  "history": {
+    "title": "Historial de uso",
+    "empty": "Aún no hay uso."
+  },
+  "reason": {
+    "purchase": "Recarga",
+    "spend": "Generación de IA",
+    "refund": "Reembolso",
+    "admin_grant": "Crédito otorgado",
+    "spend_cards": "Tarjetas de IA",
+    "spend_image": "Imagen de IA"
+  }
+}
