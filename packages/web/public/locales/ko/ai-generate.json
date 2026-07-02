@@ -160,11 +160,11 @@
     "fullDesc": "주제 하나로 템플릿, 덱, 카드를 한 번에 만듭니다.",
     "cardsOnlyTitle": "카드 추가",
     "cardsOnlyDesc": "기존 덱에 AI가 만든 카드를 추가합니다.",
-    "securityTitle": "키 입력 불필요",
-    "securityDesc": "우리 서버에서 바로 생성돼요. API 키를 추가하거나 설정할 필요가 없어요.",
     "languageTitle": "다국어 지원",
     "languageDesc": "어떤 언어든 카드를 생성하고 자동 TTS를 설정합니다.",
     "speedTitle": "빠른 생성",
-    "speedDesc": "1분 내에 10~50장의 고품질 카드를 만듭니다."
+    "speedDesc": "1분 내에 10~50장의 고품질 카드를 만듭니다.",
+    "freeTitle": "무료로 시작",
+    "freeDesc": "매일 무료 카드를 제공해요. 바로 시작하세요."
   }
 }
