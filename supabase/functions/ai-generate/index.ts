@@ -18,6 +18,7 @@ import {
   buildDeckPrompt,
   buildCardsPrompt,
   buildImageCardsPrompt,
+  buildImageDeckPrompt,
   type FieldHint,
   type GeneratedTemplateField,
 } from '../_shared/ai-prompts.ts'
@@ -314,13 +315,13 @@ Deno.serve(async (req) => {
     if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
 
     const kind = body.kind
-    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image') {
+    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck') {
       return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
     }
     const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
 
-    // Resolve provider+model by purpose (vision for image, text otherwise).
-    const model = resolveModel(kind === 'image' ? 'vision' : 'text', ENV)
+    // Resolve provider+model by purpose (vision for image kinds, text otherwise).
+    const model = resolveModel((kind === 'image' || kind === 'image_deck') ? 'vision' : 'text', ENV)
     if (!model) {
       console.error('[ai-generate] no provider configured (set AI_GENERATION_PROVIDER_KEY)')
       return json({ error: 'Server not configured', code: 'AI_NOT_CONFIGURED' }, 503, cors)
@@ -371,6 +372,48 @@ Deno.serve(async (req) => {
         const msg = (e as Error).message
         console.error('[ai-generate] vision failure:', msg)
         await releaseJob(userId, imgMeter.job_ref)  // nothing charged pre-gen → net-zero
+        const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
+        return json({ error: 'Generation failed', code }, 502, cors)
+      }
+    }
+
+    // ── Image recognition → a COMPLETE new deck (metadata + template + cards) ──
+    // ALWAYS paid (same metering as image cards). One vision call returns the whole
+    // deck; the client reviews + saves it (createDeck + template + cards).
+    if (kind === 'image_deck') {
+      const image = asImage(body.image)
+      if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
+
+      // Owned-card limit (mig 116): fail fast if the account is already at the cap
+      // (there's no room for even one generated card).
+      const { error: idCardLimitErr } = await sbUser.rpc('check_card_limit_self', { p_adding: 1 })
+      if (idCardLimitErr) {
+        if (idCardLimitErr.code === 'PT402' || (idCardLimitErr as { hint?: string }).hint === 'CARD_LIMIT_REACHED') {
+          return json({ error: 'Card limit reached', code: 'CARD_LIMIT_REACHED' }, 402, cors)
+        }
+        console.error('[ai-generate] image_deck card-limit check error:', idCardLimitErr.message)
+        return json({ error: 'Card limit check failed', code: 'CARD_LIMIT_ERROR' }, 500, cors)
+      }
+
+      // Pre-gen GATE (reserve): rejects 402 if the wallet is empty (image is paid).
+      const { data: idRaw, error: idErr } = await sbUser.rpc('reserve_ai_image')
+      if (idErr) {
+        if (idErr.code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+        if (idErr.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+        console.error('[ai-generate] image_deck reserve error:', idErr.message)
+        return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const idMeter = (idRaw ?? {}) as { job_ref?: string }
+
+      const { systemPrompt: dSys, userPrompt: dUser } = buildImageDeckPrompt(uiLang)
+      try {
+        const { json: content, usage } = await generate(model, dSys, dUser, image)
+        const charge = await chargeGeneration(userId, idMeter.job_ref, model, usage)
+        return json({ content, balance: charge?.balance ?? null }, 200, cors)
+      } catch (e) {
+        const msg = (e as Error).message
+        console.error('[ai-generate] image_deck vision failure:', msg)
+        await releaseJob(userId, idMeter.job_ref)
         const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
         return json({ error: 'Generation failed', code }, 502, cors)
       }
