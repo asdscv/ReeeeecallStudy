@@ -1,0 +1,19 @@
+{
+  "topUp": {
+    "title": "Add credits",
+    "subtitle": "Top up credits for AI card generation beyond the daily free cards.",
+    "credits": "Get ₩{{won}} in credits",
+    "buy": "Buy",
+    "empty": "No credit packs available.",
+    "loadError": "Couldn't load products. Please try again."
+  },
+  "subscribe": {
+    "cta": "Upgrade plan"
+  },
+  "comingSoon": {
+    "badge": "Coming soon",
+    "title": "Payments are coming soon",
+    "body": "We're getting payments ready. This will be available shortly."
+  },
+  "retry": "Retry"
+}

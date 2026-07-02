@@ -25,6 +25,10 @@
   "restored": "Proサブスクリプションが復元されました。",
   "noRestoreFound": "復元可能なサブスクリプションが見つかりません。",
   "productsUnavailable": "現在サブスクリプション商品をご利用いただけません。後ほどお試しください。",
+  "catalog": {
+    "perMonth": "/月",
+    "purchaseUnavailable": "この商品はまだ購入できません。"
+  },
   "privacyPolicy": "プライバシーポリシー",
   "termsOfService": "利用規約",
   "manageSubscription": "サブスクリプション管理"

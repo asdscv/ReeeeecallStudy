@@ -25,6 +25,10 @@
   "restored": "Langganan Pro telah dipulihkan.",
   "noRestoreFound": "Tidak ditemukan langganan sebelumnya.",
   "productsUnavailable": "Produk langganan saat ini tidak tersedia. Silakan coba lagi nanti.",
+  "catalog": {
+    "perMonth": "/bulan",
+    "purchaseUnavailable": "Produk ini belum tersedia untuk dibeli."
+  },
   "privacyPolicy": "Kebijakan Privasi",
   "termsOfService": "Ketentuan Layanan",
   "manageSubscription": "Kelola Langganan"

@@ -25,6 +25,10 @@
   "restored": "กู้คืนการสมัคร Pro แล้ว",
   "noRestoreFound": "ไม่พบการสมัครก่อนหน้า",
   "productsUnavailable": "ผลิตภัณฑ์สมัครสมาชิกไม่พร้อมใช้งานขณะนี้ กรุณาลองใหม่ภายหลัง",
+  "catalog": {
+    "perMonth": "/เดือน",
+    "purchaseUnavailable": "สินค้านี้ยังไม่พร้อมจำหน่าย"
+  },
   "privacyPolicy": "นโยบายความเป็นส่วนตัว",
   "termsOfService": "เงื่อนไขการใช้งาน",
   "manageSubscription": "จัดการการสมัคร"

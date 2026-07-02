@@ -25,6 +25,10 @@
   "restored": "Pro订阅已恢复。",
   "noRestoreFound": "未找到可恢复的订阅。",
   "productsUnavailable": "订阅产品当前不可用，请稍后重试。",
+  "catalog": {
+    "perMonth": "/月",
+    "purchaseUnavailable": "该商品暂时无法购买。"
+  },
   "privacyPolicy": "隐私政策",
   "termsOfService": "服务条款",
   "manageSubscription": "管理订阅"

@@ -31,6 +31,7 @@ i18n
       'admin',
       'ai-generate',
       'wallet',
+      'billing',
     ],
     defaultNS: 'common',
 

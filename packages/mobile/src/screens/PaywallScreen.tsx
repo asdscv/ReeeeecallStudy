@@ -13,6 +13,8 @@ import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, 
 import { useNavigation } from '@react-navigation/native'
 import { Screen, Button, ScreenHeader } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
+import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
+import type { BillingProduct } from '../services/billing'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 
@@ -36,7 +38,13 @@ export function PaywallScreen() {
   const theme = useTheme()
   const { t } = useTranslation('paywall')
   const navigation = useNavigation()
-  const { isPro, offering, loading, purchasing, purchase, restore } = usePurchases()
+  const { isPro, offering, products, loading, purchasing, purchase, restore } = usePurchases()
+
+  // [SUBSCRIPTION-HIDDEN] belt-and-suspenders: the Paywall route is also removed
+  // from the navigation stack, but if ever reached while gated, render nothing.
+  if (!SUBSCRIPTION_UI_ENABLED) {
+    return <Screen testID="paywall-screen"><View style={styles.center} /></Screen>
+  }
 
   if (loading) {
     return (
@@ -63,21 +71,36 @@ export function PaywallScreen() {
     )
   }
 
-  const monthlyPkg = offering?.monthly
-  const annualPkg = offering?.annual
+  // Server catalog (get_billing_products) is the source of truth for what
+  // products exist + their display metadata. Subscriptions render as pricing
+  // buttons; the actual store charge is matched to a RevenueCat package by id.
+  const subscriptionProducts = products.filter((p) => p.kind === 'subscription')
 
-  const handlePurchase = async (pkg: typeof monthlyPkg) => {
+  const formatPrice = (product: BillingProduct, pkg: any): string => {
+    // Prefer the store-localized price string when the IAP package is loaded
+    // (Apple/Google want the store price shown); fall back to the catalog KRW.
+    if (pkg?.product?.priceString) return pkg.product.priceString
+    const price = `₩${product.priceKrw.toLocaleString()}`
+    return product.period === 'month' ? `${price}${t('catalog.perMonth')}` : price
+  }
+
+  const handlePurchaseProduct = async (product: BillingProduct) => {
+    // Map the backend product id -> the store package to actually charge.
+    const pkg = purchaseService.findPackageForProduct(offering, product.id)
     if (!pkg) {
-      Alert.alert('Unavailable', 'This product is not available in your region')
+      Alert.alert(t('title'), t('catalog.purchaseUnavailable'))
       return
     }
     const result = await purchase(pkg)
     if (result.success) {
-      Alert.alert('Welcome to Pro!', 'You now have access to all premium features.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
+      // NOTE: the DB entitlement is granted server-side by the payment-webhook
+      // (RevenueCat -> grant_subscription). usePurchases already re-fetches
+      // getMySubscription() after a successful charge.
+      Alert.alert(t('welcomePro'), t('welcomeProDesc'), [
+        { text: t('done'), onPress: () => navigation.goBack() },
       ])
     } else if (result.error && result.error !== 'cancelled') {
-      Alert.alert('Error', result.error)
+      Alert.alert(t('back'), result.error)
     }
   }
 
@@ -127,28 +150,24 @@ export function PaywallScreen() {
           ))}
         </View>
 
-        {/* Pricing */}
+        {/* Pricing — driven by the server catalog (get_billing_products) */}
         <View style={styles.pricing}>
-          {monthlyPkg && (
-            <Button
-              testID="paywall-monthly"
-              title={`Monthly — ${monthlyPkg.product.priceString}`}
-              onPress={() => handlePurchase(monthlyPkg)}
-              loading={purchasing}
-            />
-          )}
-          {annualPkg && (
-            <Button
-              testID="paywall-annual"
-              title={`Annual — ${annualPkg.product.priceString} (Save 40%)`}
-              variant="outline"
-              onPress={() => handlePurchase(annualPkg)}
-              loading={purchasing}
-            />
-          )}
-          {!monthlyPkg && !annualPkg && (
+          {subscriptionProducts.map((product, i) => {
+            const pkg = purchaseService.findPackageForProduct(offering, product.id)
+            return (
+              <Button
+                key={product.id}
+                testID={`paywall-product-${product.id}`}
+                title={`${product.title} — ${formatPrice(product, pkg)}`}
+                variant={i === 0 ? 'primary' : 'outline'}
+                onPress={() => handlePurchaseProduct(product)}
+                loading={purchasing}
+              />
+            )
+          })}
+          {subscriptionProducts.length === 0 && (
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 16 }]}>
-              Subscription products are currently unavailable. Please try again later.
+              {t('productsUnavailable')}
             </Text>
           )}
         </View>

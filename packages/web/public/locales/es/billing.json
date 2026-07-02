@@ -1,0 +1,19 @@
+{
+  "topUp": {
+    "title": "Añadir saldo",
+    "subtitle": "Recarga saldo para generar tarjetas con IA más allá de las gratuitas diarias.",
+    "credits": "Recibe ₩{{won}} en saldo",
+    "buy": "Comprar",
+    "empty": "No hay paquetes disponibles.",
+    "loadError": "No se pudieron cargar los productos. Inténtalo de nuevo."
+  },
+  "subscribe": {
+    "cta": "Mejorar plan"
+  },
+  "comingSoon": {
+    "badge": "Próximamente",
+    "title": "Los pagos llegarán pronto",
+    "body": "Estamos preparando los pagos. Estará disponible en breve."
+  },
+  "retry": "Reintentar"
+}

@@ -1,0 +1,19 @@
+{
+  "topUp": {
+    "title": "Tambah saldo",
+    "subtitle": "Isi saldo untuk membuat kartu AI melebihi kartu gratis harian.",
+    "credits": "Dapatkan saldo ₩{{won}}",
+    "buy": "Beli",
+    "empty": "Tidak ada paket yang tersedia.",
+    "loadError": "Tidak dapat memuat produk. Silakan coba lagi."
+  },
+  "subscribe": {
+    "cta": "Tingkatkan paket"
+  },
+  "comingSoon": {
+    "badge": "Segera hadir",
+    "title": "Pembayaran segera hadir",
+    "body": "Kami sedang menyiapkan pembayaran. Fitur ini akan segera tersedia."
+  },
+  "retry": "Coba lagi"
+}

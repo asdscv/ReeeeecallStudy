@@ -7,15 +7,18 @@ import {
   type AiWalletSummary,
 } from '@reeeeecall/shared/lib/ai/server-client'
 import { toIntlLocale } from '../../lib/locale-utils'
+import { TopUpModal } from '../billing/TopUpModal'
 
 // AI wallet / usage content for the Settings accordion section (충전금·사용량):
 // prepaid ₩ balance, today's free-tier usage, and recent spend/top-up history
 // (get_ai_wallet_summary, mig 117). Fetches on mount — the parent CollapsibleSection
-// only mounts this when expanded. Top-up disabled (payment Phase 2 on hold).
+// only mounts this when expanded. Top-up opens TopUpModal (payment gated OFF until a
+// provider is wired — the modal shows a coming-soon state).
 export function WalletSummary() {
   const { t, i18n } = useTranslation('wallet')
   const [summary, setSummary] = useState<AiWalletSummary | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [topUpOpen, setTopUpOpen] = useState(false)
 
   const load = () => {
     setState('loading')
@@ -53,12 +56,13 @@ export function WalletSummary() {
         <div className="text-3xl font-bold text-foreground tabular-nums">{fmtWon(balanceWon)}</div>
         <p className="text-xs text-muted-foreground mt-1">{t('balance.hint')}</p>
         <button
-          disabled
+          onClick={() => setTopUpOpen(true)}
           title={t('balance.topUpSoon')}
-          className="mt-3 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground cursor-not-allowed font-medium"
+          className="mt-3 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground hover:bg-accent/70 cursor-pointer font-medium transition"
         >
           {t('balance.topUp')}
         </button>
+        <TopUpModal open={topUpOpen} onClose={() => setTopUpOpen(false)} />
       </div>
 
       {/* Free today */}

@@ -25,6 +25,10 @@
   "restored": "Tu suscripción Pro ha sido restaurada.",
   "noRestoreFound": "No se encontró ninguna suscripción anterior.",
   "productsUnavailable": "Los productos de suscripción no están disponibles actualmente. Inténtalo más tarde.",
+  "catalog": {
+    "perMonth": "/mes",
+    "purchaseUnavailable": "Este producto aún no está disponible para comprar."
+  },
   "privacyPolicy": "Política de Privacidad",
   "termsOfService": "Términos de Servicio",
   "manageSubscription": "Gestionar Suscripción"
