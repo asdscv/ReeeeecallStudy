@@ -24,5 +24,13 @@
     "title": "決済機能は近日公開",
     "body": "決済機能を準備しています。まもなくご利用いただけます。"
   },
-  "retry": "再試行"
+  "retry": "再試行",
+  "plans": {
+    "title": "プランを選択",
+    "cardLimit": "カード最大 {{limit}} 枚",
+    "unlimited": "無制限のカード",
+    "perMonth": "/月",
+    "select": "選択",
+    "current": "現在のプラン"
+  }
 }

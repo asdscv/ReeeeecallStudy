@@ -24,5 +24,13 @@
     "title": "支付功能即将推出",
     "body": "我们正在准备支付功能，很快就能使用。"
   },
-  "retry": "重试"
+  "retry": "重试",
+  "plans": {
+    "title": "选择方案",
+    "cardLimit": "最多 {{limit}} 张卡片",
+    "unlimited": "无限卡片",
+    "perMonth": "/月",
+    "select": "选择",
+    "current": "当前方案"
+  }
 }

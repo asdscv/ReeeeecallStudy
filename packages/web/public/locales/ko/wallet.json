@@ -25,5 +25,6 @@
     "admin_grant": "크레딧 지급",
     "spend_cards": "AI 카드",
     "spend_image": "AI 이미지"
-  }
+  },
+  "cardPlanHint": "카드 한도 플랜은 ‘카드 저장 용량’에서 관리해요."
 }

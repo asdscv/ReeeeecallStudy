@@ -143,9 +143,12 @@
     "reached": "カード上限に達しました。追加するには購読してください。",
     "subscribe": "購読する（近日公開）",
     "plan": "無料プラン",
-    "planNote": "無料プランは所有カード最大{{limit}}枚まで。上限を増やすには購読してください。",
+    "planNote": "現在のプランでは所有カードを最大 {{limit}} 枚まで利用できます。上限を増やすにはプランを選択してください。",
     "upgrade": "アップグレード（近日公開）",
-    "upgradeSoon": "購読は近日公開予定です。"
+    "upgradeSoon": "購読は近日公開予定です。",
+    "unlimited": "無制限",
+    "countUnlimited": "{{owned}} / 無制限",
+    "planNoteUnlimited": "現在のプランではカードを無制限に保存できます。"
   },
   "groups": {
     "account": "アカウント",

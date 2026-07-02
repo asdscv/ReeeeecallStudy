@@ -143,9 +143,12 @@
     "reached": "카드 한도에 도달했어요. 더 만들려면 구독하세요.",
     "subscribe": "구독하기 (곧 오픈)",
     "plan": "무료 플랜",
-    "planNote": "무료 플랜은 소유 카드를 최대 {{limit}}장까지 지원해요. 한도를 늘리려면 구독하세요.",
+    "planNote": "현재 플랜은 소유 카드를 최대 {{limit}}장까지 지원해요. 한도를 늘리려면 플랜을 선택하세요.",
     "upgrade": "업그레이드 (준비 중)",
-    "upgradeSoon": "구독은 준비 중이에요."
+    "upgradeSoon": "구독은 준비 중이에요.",
+    "unlimited": "무제한",
+    "countUnlimited": "{{owned}}장 / 무제한",
+    "planNoteUnlimited": "현재 플랜은 카드를 무제한으로 저장할 수 있어요."
   },
   "groups": {
     "account": "계정",

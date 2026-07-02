@@ -143,9 +143,12 @@
     "reached": "Anda telah mencapai batas kartu. Berlangganan untuk menambah.",
     "subscribe": "Berlangganan (segera hadir)",
     "plan": "Paket gratis",
-    "planNote": "Paket gratis mencakup hingga {{limit}} kartu milik Anda. Berlangganan untuk menaikkan batas.",
+    "planNote": "Paket Anda mencakup hingga {{limit}} kartu milik sendiri. Pilih paket untuk menaikkan batas.",
     "upgrade": "Tingkatkan (segera hadir)",
-    "upgradeSoon": "Langganan akan segera hadir."
+    "upgradeSoon": "Langganan akan segera hadir.",
+    "unlimited": "Tanpa batas",
+    "countUnlimited": "{{owned}} / Tanpa batas",
+    "planNoteUnlimited": "Paket Anda mencakup kartu tanpa batas."
   },
   "groups": {
     "account": "Akun",

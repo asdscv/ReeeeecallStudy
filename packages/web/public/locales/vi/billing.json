@@ -24,5 +24,13 @@
     "title": "Thanh toán sắp ra mắt",
     "body": "Chúng tôi đang chuẩn bị tính năng thanh toán. Sẽ sớm khả dụng."
   },
-  "retry": "Thử lại"
+  "retry": "Thử lại",
+  "plans": {
+    "title": "Chọn gói",
+    "cardLimit": "Tối đa {{limit}} thẻ",
+    "unlimited": "Thẻ không giới hạn",
+    "perMonth": "/tháng",
+    "select": "Chọn",
+    "current": "Gói hiện tại"
+  }
 }

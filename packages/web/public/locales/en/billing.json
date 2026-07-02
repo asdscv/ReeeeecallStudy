@@ -24,5 +24,13 @@
     "title": "Payments are coming soon",
     "body": "We're getting payments ready. This will be available shortly."
   },
-  "retry": "Retry"
+  "retry": "Retry",
+  "plans": {
+    "title": "Choose a plan",
+    "cardLimit": "Up to {{limit}} cards",
+    "unlimited": "Unlimited cards",
+    "perMonth": "/mo",
+    "select": "Select",
+    "current": "Current plan"
+  }
 }

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
+import { PlanSelector, UNLIMITED_CARD_LIMIT } from '../components/settings/PlanSelector'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
 // 복원 시: usePurchases import 복구, isPro stub 제거, planBadge + Subscription 섹션 복원.
@@ -419,7 +420,7 @@ export function SettingsScreen() {
           <CollapsibleSection
             title={t('cardUsage.title')}
             icon="📇"
-            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
+            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned }) : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
           >
             <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
               <View style={{
@@ -428,7 +429,7 @@ export function SettingsScreen() {
                 backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
               }} />
             </View>
-            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.planNoteUnlimited') : t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
             {subscription?.cancelAtPeriodEnd && subscription.currentPeriodEnd && (
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>
                 {t('cardUsage.cancelPending', {
@@ -436,8 +437,10 @@ export function SettingsScreen() {
                 })}
               </Text>
             )}
-            <View style={{ marginTop: 8, alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: theme.colors.border, opacity: 0.7 }}>
-              <Text style={{ color: theme.colors.textSecondary, fontWeight: '600', fontSize: 13 }}>{t('cardUsage.upgrade')}</Text>
+            {/* Data-driven subscription plan selector (mirrors web). Gated behind the
+                mobile IAP flag — shows plans with a "준비 중" state until IAP ships. */}
+            <View style={{ marginTop: 12 }}>
+              <PlanSelector subscription={subscription} />
             </View>
             {cardUsage.available <= 0 && (
               <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>

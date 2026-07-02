@@ -143,9 +143,12 @@
     "reached": "已达卡片上限。订阅以添加更多。",
     "subscribe": "订阅（即将推出）",
     "plan": "免费方案",
-    "planNote": "免费方案最多可拥有 {{limit}} 张卡片。订阅可提高上限。",
+    "planNote": "您的方案最多可拥有 {{limit}} 张卡片。选择方案可提升上限。",
     "upgrade": "升级（即将推出）",
-    "upgradeSoon": "订阅即将推出。"
+    "upgradeSoon": "订阅即将推出。",
+    "unlimited": "无限",
+    "countUnlimited": "{{owned}} / 无限",
+    "planNoteUnlimited": "您的方案可无限存储卡片。"
   },
   "groups": {
     "account": "账户",

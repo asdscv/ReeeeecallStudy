@@ -166,7 +166,9 @@
     "planNote": "Paket gratis mencakup hingga {{limit}} kartu milik Anda. Berlangganan untuk menaikkan batas.",
     "upgrade": "Tingkatkan (segera hadir)",
     "upgradeSoon": "Langganan akan segera hadir.",
-    "cancelPending": "Langganan akan berakhir — akses hingga {{date}}"
+    "cancelPending": "Langganan akan berakhir — akses hingga {{date}}",
+    "countUnlimited": "{{owned}} / Tak terbatas",
+    "planNoteUnlimited": "Batas kartu milikmu tak terbatas."
   },
   "groups": {
     "account": "Akun",
@@ -175,5 +177,16 @@
     "preferences": "Preferensi",
     "data": "Data"
   },
-  "subtitle": "Kelola akun, kredit, dan preferensi belajar Anda."
+  "subtitle": "Kelola akun, kredit, dan preferensi belajar Anda.",
+  "plans": {
+    "title": "Paket langganan",
+    "unlimited": "Tak terbatas",
+    "cardLimit": "{{limit}} kartu",
+    "perMonth": "/bln",
+    "select": "Pilih",
+    "current": "Paket saat ini",
+    "comingSoon": "Segera hadir",
+    "empty": "Belum ada paket.",
+    "loadError": "Gagal memuat paket."
+  }
 }
