@@ -55,7 +55,8 @@
 //   subscription_payment_recovered→ sync_subscription('active',  renews_at, cancel=false) [invoice]
 //   subscription_payment_refunded → revoke_subscription  → status='refunded'              [invoice]
 //   order_refunded                → revoke_subscription if a sub id is present, else
-//                                    log + ACK 200 (one-time credit clawback is a TODO)
+//                                    clawback_credits(merchant_uid) — reverse the credit
+//                                    grant (mig 127, idempotent on ref='refund:<uid>')
 //   anything else                 → ACK 200 {received:true}
 //
 //   NOTE on the subscription id LOCATION: the subscription lifecycle events above put
@@ -466,8 +467,9 @@ Deno.serve(async (req) => {
     }
 
     case 'order_refunded': {
-      // A one-time credit-pack order OR a subscription's order. Only subscriptions can
-      // be revoked here; a bare credit refund has no sub id.
+      // A one-time credit-pack order OR a subscription's order. A subscription refund is
+      // matched by its sub id → revoke_subscription (unchanged). A bare credit-pack refund
+      // has no sub id → claw the granted credits back via clawback_credits(merchant_uid).
       const orderSubId =
         asStr(attrs.subscription_id) ??
         asStr((attrs.first_order_item as Record<string, unknown> | undefined)?.subscription_id)
@@ -478,11 +480,24 @@ Deno.serve(async (req) => {
         }) as unknown as RpcResult
         return lifecycleResult(res, event)
       }
-      // TODO(payments): one-time credit-pack refund clawback (deduct add_ai_credits) is
-      // not implemented in this draft — we only log it. If clawback is added, reverse
-      // the ledger entry keyed on this order/merchant_uid.
-      console.warn('[lemonsqueezy-webhook] order_refunded with no subscription id — credit clawback not implemented (TODO):', dataId)
-      return json({ received: true, event, note: 'credit refund acknowledged; no auto clawback (TODO)' }, 200)
+      // One-time credit-pack refund → reverse the credit grant (mig 127 clawback_credits,
+      // idempotent on ref='refund:<merchant_uid>'). Keyed on the merchant_uid LS echoes
+      // back in custom_data; without it we can't identify the intent, so log + ACK 200.
+      if (!merchantUid) {
+        console.warn('[lemonsqueezy-webhook] order_refunded with no subscription id AND no merchant_uid — nothing to claw back:', dataId)
+        return json({ received: true, event, note: 'refund acknowledged; no merchant_uid to claw back' }, 200)
+      }
+      // ACK 200 on success / already / benign no-op (not_found/not_credit_pack/not_paid);
+      // a THROWN RPC error → 500 so LS retries (clawback is idempotent). lifecycleResult
+      // encodes exactly that error→500 / else→200 mapping.
+      const res = await sb.rpc('clawback_credits', {
+        p_merchant_uid: merchantUid,
+      }) as unknown as RpcResult
+      if (!res.error) {
+        console.log('[lemonsqueezy-webhook] order_refunded credit clawback for', merchantUid, '→',
+          JSON.stringify(typeof res.data === 'object' && res.data ? res.data : {}))
+      }
+      return lifecycleResult(res, event)
     }
 
     // Unknown / unhandled events (license events, subscription_plan_changed, etc.)

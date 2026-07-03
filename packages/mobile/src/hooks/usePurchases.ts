@@ -100,18 +100,25 @@ export function usePurchases() {
         return { success: false, error: 'intent_failed' as const }
       }
 
-      // ── Step 2: charge via the store (RevenueCat).
-      // TODO(payment-webhook / IAP): BEFORE purchasing, attach
-      // intent.merchantUid to the store transaction so RevenueCat's
-      // server->server webhook can forward it to our payment-webhook — e.g.
-      //   await Purchases.setAttributes({ merchant_uid: intent!.merchantUid })
-      // (or pass it as purchase metadata). Without it the webhook can't map the
-      // store event back to this pending intent.
+      // ── Step 2: tag the store transaction with the intent handle. This sets
+      // subscriber_attributes.merchant_uid on the RevenueCat subscriber BEFORE
+      // charging, so the INITIAL_PURCHASE event RevenueCat forwards to our
+      // revenuecat-webhook carries merchant_uid back — the piece that lets the
+      // webhook reconcile the settled store transaction against THIS pending
+      // intent. Fail-soft: no-op while the SDK is absent / the flow is gated off
+      // (the app_user_id path still attributes the grant), so we don't gate the
+      // purchase on its result. See purchaseService.setMerchantUid + the OWNER
+      // GO-LIVE CHECKLIST in services/purchases.ts.
+      if (intent) {
+        await purchaseService.setMerchantUid(intent.merchantUid)
+      }
+
+      // ── Step 3: charge via the store (RevenueCat).
       const result = await purchaseService.purchase(pkg)
 
       if (result.success) {
         setIsPro(true)
-        // ── Step 3: the DB entitlement is granted SERVER-SIDE only.
+        // ── Step 4: the DB entitlement is granted SERVER-SIDE only.
         // TODO(payment-webhook / IAP): the successful store transaction must be
         // mapped to `intent.merchantUid` and drive the confirm path:
         //   store IAP receipt -> RevenueCat (receipt validation) -> RevenueCat
