@@ -14,25 +14,44 @@ Catalog (already seeded in `billing_products`): `credits_1000` (₩1,000), `cred
 
 1. Create a LemonSqueezy account + **Store**. Complete payout/tax onboarding (LS is the
    merchant of record — it collects & remits VAT/sales tax for you).
-2. Create **Products/Variants** whose prices EXACTLY match the catalog:
-   - one-time products: ₩1,000 / ₩5,000 / ₩10,000 (map to credits_1000/5000/10000)
-   - subscription: ₩4,900/mo (map to sub_pro_monthly)
-   Note each **variant id**.
-3. Set the Vite build env (Cloudflare Pages → project → Settings → Env vars, or `.env`):
+2. Create **Products** (currency = **USD** for a global store), one product per catalog row:
+   - one-time (Single payment): $0.99 / $4.99 / $9.99 → credits_1000/5000/10000
+   - subscription (monthly): $1.99 → sub_5k_monthly, $9.99 → sub_unlimited_monthly
+   Prices need NOT numerically equal the catalog (grants key off the variant→product
+   map, never the amount). For each variant note **BOTH** identifiers — they are DIFFERENT
+   and used in DIFFERENT places:
+   - the **numeric variant id** (LS API `id`, e.g. `1864772`) — used by the WEBHOOK.
+   - the **variant `slug`** (a UUID, e.g. `a98e3678-…`) — used by the CHECKOUT URL.
+   Get both from LS API `GET /v1/variants/<id>` → `data.attributes.slug`, or read the
+   slug off the product's **Share → checkout link** (`…/checkout/buy/<SLUG>`).
+   > ⚠️ **The checkout URL needs the SLUG (UUID), NOT the numeric id.** `…/checkout/buy/1864772`
+   > returns **404**; `…/checkout/buy/<slug-uuid>` works. Putting numeric ids in
+   > VITE_LEMONSQUEEZY_VARIANTS makes every checkout 404.
+   > ⚠️ **Test vs live are SEPARATE.** Products created before store activation are
+   > `test_mode=true` with their own ids+slugs. When you go LIVE, the live products get
+   > DIFFERENT numeric ids AND slugs → you must re-capture both and update BOTH env values.
+3. Set the Vite BUILD env (Cloudflare → Worker → **Settings → Build → Build variables**,
+   NOT the runtime "Variables and secrets"; VITE_ is inlined at `vite build`):
    ```
    VITE_PAYMENT_PROVIDER=lemonsqueezy
    VITE_PAYMENTS_ENABLED=true
-   VITE_LEMONSQUEEZY_STORE=<your-store-subdomain>          # e.g. reeeeecall  → reeeeecall.lemonsqueezy.com
-   VITE_LEMONSQUEEZY_VARIANTS={"credits_1000":"<id>","credits_5000":"<id>","credits_10000":"<id>","sub_pro_monthly":"<id>"}
+   VITE_LEMONSQUEEZY_STORE=<store-subdomain>               # e.g. sapiotrix → sapiotrix.lemonsqueezy.com
+   # value = product_id → variant SLUG (UUID), the /checkout/buy/<SLUG> path — NOT numeric id
+   VITE_LEMONSQUEEZY_VARIANTS={"credits_1000":"<slug>","credits_5000":"<slug>","credits_10000":"<slug>","sub_5k_monthly":"<slug>","sub_unlimited_monthly":"<slug>"}
    ```
 4. LemonSqueezy → Settings → **Webhooks** → add:
    - URL: `https://<project-ref>.functions.supabase.co/lemonsqueezy-webhook`
    - Events: `order_created`, `subscription_created`, `subscription_updated`,
      `subscription_cancelled`, `subscription_resumed`, `subscription_expired`,
      `subscription_paused`, `subscription_payment_failed`, `subscription_payment_success`,
-     `subscription_payment_refunded`, `order_refunded`
-   - Copy the **signing secret** → set the Supabase edge secret:
-     `supabase secrets set LEMONSQUEEZY_WEBHOOK_SECRET=<secret>`
+     `subscription_payment_refunded`, `order_refunded` (checking ALL events is fine too)
+   - Copy the **signing secret** → set BOTH Supabase edge secrets:
+     ```
+     supabase secrets set LEMONSQUEEZY_WEBHOOK_SECRET=<secret>
+     # value = NUMERIC variant_id → product_id (inverse of VITE_LEMONSQUEEZY_VARIANTS keys);
+     # the webhook receives the NUMERIC variant_id in the payload, so this map is numeric.
+     supabase secrets set LEMONSQUEEZY_VARIANT_MAP='{"1864772":"credits_1000",...}'
+     ```
 5. Each subscription/product → set the post-purchase **Redirect URL** to
    `https://<app>/settings?pay=success` (so the app refreshes the wallet on return).
 

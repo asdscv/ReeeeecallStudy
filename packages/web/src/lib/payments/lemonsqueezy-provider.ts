@@ -31,9 +31,11 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 //      any `VITE_`-prefixed var to the client bundle at build time):
 //        VITE_LEMONSQUEEZY_STORE    = reeeeecall            (the store SUBDOMAIN only,
 //                                                            i.e. <store>.lemonsqueezy.com)
-//        VITE_LEMONSQUEEZY_VARIANTS = {"credits_1000":"111","credits_5000":"222",
-//                                      "credits_10000":"333","sub_pro_monthly":"444"}
-//                                                           (product_id → LS variant id JSON)
+//        VITE_LEMONSQUEEZY_VARIANTS = {"credits_1000":"<slug>","credits_5000":"<slug>",
+//                                      "credits_10000":"<slug>","sub_5k_monthly":"<slug>",
+//                                      "sub_unlimited_monthly":"<slug>"}
+//                                      (product_id → variant SLUG/UUID — the /checkout/buy/<slug>
+//                                       path; NOT the numeric variant id, which 404s)
 //        VITE_PAYMENT_PROVIDER      = lemonsqueezy          (selects THIS adapter)
 //        VITE_PAYMENTS_ENABLED      = true                  (flips the checkout gate on)
 //   3. Deploy the `lemonsqueezy-webhook` edge fn and set its
@@ -55,10 +57,15 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 const NOT_CONFIGURED =
   'NOT_CONFIGURED: set VITE_LEMONSQUEEZY_STORE and VITE_LEMONSQUEEZY_VARIANTS'
 
-// Parse VITE_LEMONSQUEEZY_VARIANTS (a JSON string mapping our product_id → LS
-// variant id) defensively: any malformed/non-object/empty value yields {} so a bad
-// env can only ever produce NOT_CONFIGURED, never a wrong-variant charge. Numeric
-// variant ids are coerced to strings (LS variant ids are numeric).
+// Parse VITE_LEMONSQUEEZY_VARIANTS (a JSON string mapping our product_id → the LS
+// variant's SLUG) defensively: any malformed/non-object/empty value yields {} so a bad
+// env can only ever produce NOT_CONFIGURED, never a wrong-variant charge.
+//
+// ⚠️ The value MUST be each variant's `slug` (a UUID, e.g. "a98e3678-…"), NOT its
+// numeric variant id. The hosted checkout lives at /checkout/buy/<SLUG>; the numeric
+// id (e.g. 1864772) 404s there. The numeric id is only used server-side by the
+// webhook's LEMONSQUEEZY_VARIANT_MAP. (String values pass through; numbers are coerced
+// to strings only as a lenient fallback — real slugs are always strings.)
 function parseVariants(raw: string): Record<string, string> {
   if (!raw) return {}
   let parsed: unknown
@@ -102,8 +109,9 @@ export class LemonsqueezyProvider implements PaymentProvider {
       throw new Error(NOT_CONFIGURED)
     }
 
-    // Build the hosted-checkout URL:
-    //   https://<store>.lemonsqueezy.com/checkout/buy/<variantId>
+    // Build the hosted-checkout URL (variantId here is the variant SLUG/UUID, not the
+    // numeric id — the numeric id 404s on this path):
+    //   https://<store>.lemonsqueezy.com/checkout/buy/<variant-slug>
     //     ?checkout[custom][merchant_uid]=<merchant_uid>   ← returns as meta.custom_data.merchant_uid
     //     &checkout[email]=<email>                          ← optional prefill (UX only)
     // URLSearchParams percent-encodes the bracket keys; Lemon Squeezy decodes them.
