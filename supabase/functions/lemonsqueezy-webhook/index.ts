@@ -14,13 +14,24 @@
 //      variant, passing checkout[custom][merchant_uid]=<merchant_uid>.
 //   3. buyer pays; Lemon Squeezy (as Merchant of Record) charges + remits tax, then
 //      its server POSTs this SIGNED webhook.
-//   4a. order_created (credit pack)   → confirm_payment(merchant_uid,'lemonsqueezy',
-//       order_id): locks the intent, marks it 'paid' (idempotently), and grants from
-//       the SNAPSHOT — credit_pack → add_ai_credits (mig 114, idempotent on merchant_uid).
+//   4a. order_created: look up the intent for merchant_uid. A SUBSCRIPTION purchase
+//       ALSO fires order_created — if intent.kind='subscription' this is that duplicate
+//       and we NO-OP (ack 200): subscription_created is the SOLE first-grant path for
+//       subscriptions. (Routing a subscription order through confirm_payment here too
+//       would create a base grant_subscription row that then COLLIDES with
+//       subscription_created's (provider,provider_ref) unique index → a perpetual 500
+//       retry loop + an unrevokable, sub-id-less active grant.) Only a credit_pack intent
+//       proceeds → confirm_payment(merchant_uid,'lemonsqueezy',order_id): locks the
+//       intent, marks it 'paid' (idempotently), grants from the SNAPSHOT —
+//       add_ai_credits (mig 114, idempotent on merchant_uid).
 //   4b. subscription_created          → activate_subscription_from_intent(merchant_uid,
 //       'lemonsqueezy', <LS subscription id>, renews_at): reconciles the paid intent
 //       into a lifecycle-trackable billing_subscriptions row that RECORDS the LS
 //       subscription id, so every later lifecycle event can be matched back to it.
+//   BEFORE either grant, the purchased LS variant id (first_order_item.variant_id /
+//   first_subscription_item.variant_id) is mapped back to OUR product via the
+//   LEMONSQUEEZY_VARIANT_MAP secret and asserted === the intent's product_id, so a
+//   cheap-variant checkout can't claim an expensive plan via injected custom_data.
 //   Because price + kind live on the server intent, the webhook body only names WHICH
 //   order/subscription settled — it can neither pick a price nor self-grant.
 //
@@ -30,7 +41,8 @@
 //   row → the RPC returns {ok:false, reason:'not_found'} and we ACK 200 (never create).
 //
 //   ── HANDLED LS EVENTS (meta.event_name) → RPC ──────────────────────────────────
-//   order_created                 → confirm_payment(3-arg)               (credit pack)
+//   order_created (credit_pack)   → confirm_payment(3-arg)      (credit_pack intent only)
+//   order_created (subscription)  → NO-OP ack 200               (subscription_created grants)
 //   subscription_created          → activate_subscription_from_intent    (records sub id)
 //   subscription_updated          → sync_subscription(map(status), renews_at, cancelled)
 //   subscription_cancelled        → sync_subscription('canceled', ends_at, cancel=true)
@@ -64,6 +76,14 @@
 //
 // ── OWNER GO-LIVE SETUP ──
 //   env secret: LEMONSQUEEZY_WEBHOOK_SECRET  (the webhook's signing secret)
+//   env secret: LEMONSQUEEZY_VARIANT_MAP     (JSON {"<LS variant id>":"<our product id>"} —
+//               the server-side INVERSE of the client's VITE_LEMONSQUEEZY_VARIANTS
+//               {product_id→variant_id}). Used to assert the purchased LS variant maps to
+//               the intent's product BEFORE granting. If UNSET, the assertion is SKIPPED
+//               with a logged warning (the intent is still server-authoritative on price +
+//               product); if SET-but-malformed we FAIL CLOSED (never grant). SET it to
+//               close the injected-custom_data plan-swap hole. Example (variant→product,
+//               the inverse of the VITE map): {"111":"credits_1000","444":"sub_pro_monthly"}.
 //   In the Lemon Squeezy dashboard: Settings → Webhooks → add a webhook with
 //     URL    https://<project-ref>.functions.supabase.co/lemonsqueezy-webhook
 //     Events order_created, order_refunded, subscription_created, subscription_updated,
@@ -174,6 +194,80 @@ function badMissing(field: string, event: string): Response {
   return json({ error: `Missing ${field}`, code: 'BAD_REQUEST' }, 400)
 }
 
+// ── variant↔product verification (AUDIT FIX #2) ───────────────────────────────────
+// A Lemon Squeezy checkout price lives on the LS VARIANT, not on our intent. The intent is
+// already server-authoritative on price + product (snapshotted by create_payment_intent,
+// grants key off it), BUT the merchant_uid→product binding rides in checkout custom data
+// the buyer's browser passes; a tampered checkout could pay for a CHEAP variant while
+// pointing custom_data at an EXPENSIVE product's intent. To close that, we re-derive WHICH
+// product the buyer actually bought from the SIGNED payload's variant id and assert it
+// equals the intent's product_id. LEMONSQUEEZY_VARIANT_MAP holds the variant_id→product_id
+// map (the inverse of the client's VITE_LEMONSQUEEZY_VARIANTS product_id→variant_id).
+type VariantMapState =
+  | { kind: 'unset' }             // secret not configured → assertion SKIPPED (logged warn)
+  | { kind: 'invalid' }           // configured but unparseable → FAIL CLOSED (never grant)
+  | { kind: 'map'; map: Record<string, string> }
+
+function loadVariantMap(): VariantMapState {
+  const raw = ENV('LEMONSQUEEZY_VARIANT_MAP')
+  if (!raw) return { kind: 'unset' }
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const map: Record<string, string> = {}
+      for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+        if (v != null && v !== '') map[String(k)] = String(v)
+      }
+      return { kind: 'map', map }
+    }
+  } catch { /* fall through to invalid */ }
+  return { kind: 'invalid' }
+}
+
+// The LS variant id the buyer actually purchased, per event shape:
+//   order_created         → data.attributes.first_order_item.variant_id
+//   subscription_created  → data.attributes.first_subscription_item.variant_id
+function purchasedVariantId(event: string, attrs: Record<string, unknown>): string | null {
+  const item = (event === 'subscription_created'
+    ? attrs.first_subscription_item
+    : attrs.first_order_item) as Record<string, unknown> | undefined
+  const vid = item?.variant_id
+  return vid == null || vid === '' ? null : String(vid)
+}
+
+// Returns null when the purchased variant is verified to match the intent's product (or
+// when verification is deliberately SKIPPED because the map is UNSET), else a 400 Response
+// that REFUSES the grant. SAFE DEFAULT: skip-on-unset (fail open) but fail CLOSED on a
+// set-but-malformed map and on any concrete mismatch.
+function verifyVariant(
+  event: string,
+  attrs: Record<string, unknown>,
+  intentProductId: string,
+  vm: VariantMapState,
+): Response | null {
+  if (vm.kind === 'unset') {
+    // Documented fail-OPEN-only-on-UNSET (the safe default): with no map we can't re-derive
+    // the product from the payload, but the intent is still server-authoritative on price +
+    // product, so the base posture holds. Warn loudly so this isn't left unset in prod.
+    console.warn('[lemonsqueezy-webhook] LEMONSQUEEZY_VARIANT_MAP unset — skipping variant/product assertion for', event, '(intent product:', intentProductId, ')')
+    return null
+  }
+  if (vm.kind === 'invalid') {
+    // Set but unparseable = operator INTENDED verification but mis-typed it → fail closed.
+    console.error('[lemonsqueezy-webhook] LEMONSQUEEZY_VARIANT_MAP set but not a valid JSON object — refusing to grant', event)
+    return json({ error: 'Variant map misconfigured', code: 'VARIANT_MAP_INVALID' }, 400)
+  }
+  const variantId = purchasedVariantId(event, attrs)
+  const mapped = variantId ? vm.map[variantId] : undefined
+  if (!mapped || mapped !== intentProductId) {
+    console.error(
+      `[lemonsqueezy-webhook] variant/product MISMATCH on ${event}: payload variant=${variantId ?? 'none'} → ${mapped ?? 'unmapped'}, intent product=${intentProductId} — refusing to grant`,
+    )
+    return json({ error: 'Variant does not match intent product', code: 'VARIANT_MISMATCH' }, 400)
+  }
+  return null
+}
+
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
@@ -216,6 +310,31 @@ Deno.serve(async (req) => {
 
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
+  // Server-side variant→product map (AUDIT FIX #2), parsed once per request.
+  const variantMap = loadVariantMap()
+
+  // Look up the server-authoritative intent (kind + product_id) for a merchant_uid.
+  // Distinguishes a real DB error (retryable → 500) from an absent intent (bad payload
+  // → 400). Reads via service_role, bypassing RLS.
+  const lookupIntent = async (
+    merchantUid: string,
+  ): Promise<
+    | { ok: true; intent: { kind: string; product_id: string } }
+    | { ok: false; retryable: boolean }
+  > => {
+    const { data, error } = await sb
+      .from('payment_intents')
+      .select('kind, product_id')
+      .eq('merchant_uid', merchantUid)
+      .maybeSingle()
+    if (error) {
+      console.error('[lemonsqueezy-webhook] payment_intents lookup failed for', merchantUid, ':', error.message)
+      return { ok: false, retryable: true }
+    }
+    if (!data) return { ok: false, retryable: false }
+    return { ok: true, intent: data as { kind: string; product_id: string } }
+  }
+
   // Small helper so lifecycle branches read cleanly.
   const syncSub = (subId: string, status: string, periodEnd: string | null, cancel: boolean | null) =>
     sb.rpc('sync_subscription', {
@@ -228,13 +347,30 @@ Deno.serve(async (req) => {
 
   switch (event) {
     // ── FIRST GRANT ────────────────────────────────────────────────────────────────
-    // Credit pack (one-time order). NOTE: a SUBSCRIPTION purchase also fires
-    // order_created, but subscription_created is the authoritative sub-recording path;
-    // routing a subscription order through the 3-arg confirm_payment just marks the
-    // intent paid + grant_subscription (base row), which subscription_created then
-    // upgrades in place (records the sub id, retiring the base row). Idempotent.
+    // Credit pack (one-time order). A SUBSCRIPTION purchase ALSO fires order_created, but
+    // subscription_created is the SOLE first-grant path for subscriptions (AUDIT FIX #1):
+    // if we ALSO granted here, confirm_payment→grant_subscription would insert a base row
+    // (provider_ref=merchant_uid, sub id NULL) that then COLLIDES with
+    // _upsert_subscription's (provider,provider_ref) unique index on subscription_created
+    // → a perpetual 500 retry loop + an unrevokable sub-id-less active grant. So we
+    // resolve the intent first and NO-OP subscription orders here.
     case 'order_created': {
       if (!merchantUid) return badMissing('merchant_uid', event)
+      const look = await lookupIntent(merchantUid)
+      if (!look.ok) {
+        return look.retryable
+          ? json({ error: 'Intent lookup failed', code: 'LOOKUP_ERROR' }, 500) // LS retries
+          : json({ error: 'Unknown or invalid intent', code: 'BAD_REQUEST' }, 400)
+      }
+      // Subscription order → NO-OP; subscription_created is authoritative (see above).
+      if (look.intent.kind === 'subscription') {
+        console.log('[lemonsqueezy-webhook] order_created for subscription intent', merchantUid,
+          '— no-op (subscription_created is the first-grant path)')
+        return json({ received: true, event, note: 'subscription order acknowledged; granted via subscription_created' }, 200)
+      }
+      // credit_pack: assert the purchased variant maps to the intent's product, then grant.
+      const bad = verifyVariant(event, attrs, look.intent.product_id, variantMap)
+      if (bad) return bad
       const res = await sb.rpc('confirm_payment', {
         p_merchant_uid: merchantUid,
         p_provider: 'lemonsqueezy',
@@ -247,6 +383,17 @@ Deno.serve(async (req) => {
     case 'subscription_created': {
       if (!merchantUid) return badMissing('merchant_uid', event)
       if (!dataId) return badMissing('subscription id', event) // data.id = LS subscription id
+      // Resolve the intent's product for the variant assertion (activate_… re-validates
+      // kind='subscription' + locks the intent itself; this pre-read is only to verify the
+      // purchased variant maps to the SAME product the server snapshotted).
+      const look = await lookupIntent(merchantUid)
+      if (!look.ok) {
+        return look.retryable
+          ? json({ error: 'Intent lookup failed', code: 'LOOKUP_ERROR' }, 500) // LS retries
+          : json({ error: 'Unknown or invalid intent', code: 'BAD_REQUEST' }, 400)
+      }
+      const bad = verifyVariant(event, attrs, look.intent.product_id, variantMap)
+      if (bad) return bad
       const res = await sb.rpc('activate_subscription_from_intent', {
         p_merchant_uid: merchantUid,
         p_provider: 'lemonsqueezy',
