@@ -50,7 +50,8 @@ export function PlanSelector() {
   }, [products.length, fetchProducts, fetchSubscription])
 
   const locale = toIntlLocale(i18n.language)
-  const fmtWon = (won: number) => `₩${won.toLocaleString(locale)}`
+  // Display currency is USD (the LemonSqueezy store charges USD).
+  const fmtUsd = (cents: number | null) => `$${((cents ?? 0) / 100).toFixed(2)}`
 
   const plans = products
     .filter((p) => p.kind === 'subscription' && p.isActive)
@@ -95,8 +96,8 @@ export function PlanSelector() {
             : t('plans.cardLimit', { limit: (p.cardLimit ?? 0).toLocaleString(locale) })
           const priceLabel =
             p.period === 'monthly'
-              ? `${fmtWon(p.priceKrw)} ${t('plans.perMonth')}`
-              : fmtWon(p.priceKrw)
+              ? `${fmtUsd(p.priceUsdCents)} ${t('plans.perMonth')}`
+              : fmtUsd(p.priceUsdCents)
           const processing = checkoutStatus === 'processing' && checkoutProductId === p.id
 
           return (

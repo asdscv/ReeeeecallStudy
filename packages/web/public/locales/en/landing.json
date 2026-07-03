@@ -328,7 +328,7 @@
     "subtitle": "Choose the plan that fits how much you study",
     "recommended": "Recommended",
     "freePrice": "Free",
-    "pricePerMonth": "₩{{price}}/mo",
+    "pricePerMonth": "{{price}}/mo",
     "unlimitedCards": "Unlimited cards",
     "upToCards": "Up to {{count}} cards",
     "ctaFree": "Start free",

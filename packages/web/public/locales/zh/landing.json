@@ -328,7 +328,7 @@
     "subtitle": "选择适合你学习规模的方案",
     "recommended": "推荐",
     "freePrice": "免费",
-    "pricePerMonth": "₩{{price}}/月",
+    "pricePerMonth": "{{price}}/月",
     "unlimitedCards": "无限卡片",
     "upToCards": "最多 {{count}} 张卡片",
     "ctaFree": "免费开始",

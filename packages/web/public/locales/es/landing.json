@@ -328,7 +328,7 @@
     "subtitle": "Elige el plan que se adapte a cuánto estudias",
     "recommended": "Recomendado",
     "freePrice": "Gratis",
-    "pricePerMonth": "₩{{price}}/mes",
+    "pricePerMonth": "{{price}}/mes",
     "unlimitedCards": "Tarjetas ilimitadas",
     "upToCards": "Hasta {{count}} tarjetas",
     "ctaFree": "Empezar gratis",
