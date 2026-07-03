@@ -31,6 +31,7 @@ export interface BillingProduct {
   kind: BillingProductKind
   title: string
   priceKrw: number
+  priceUsdCents: number | null // USD minor unit (display currency)
   creditsMicroWon: number | null // credit_pack only
   tier: string | null // subscription only
   cardLimit: number | null // subscription only
@@ -60,6 +61,7 @@ interface RawBillingProduct {
   kind: BillingProductKind
   title: string
   price_krw: number
+  price_usd_cents: number | null
   credits_micro_won: number | null
   tier: string | null
   card_limit: number | null
@@ -88,6 +90,7 @@ function mapProduct(r: RawBillingProduct): BillingProduct {
     kind: r.kind,
     title: r.title,
     priceKrw: Number(r.price_krw ?? 0),
+    priceUsdCents: r.price_usd_cents == null ? null : Number(r.price_usd_cents),
     creditsMicroWon: r.credits_micro_won == null ? null : Number(r.credits_micro_won),
     tier: r.tier,
     cardLimit: r.card_limit == null ? null : Number(r.card_limit),

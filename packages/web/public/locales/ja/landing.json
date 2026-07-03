@@ -328,7 +328,7 @@
     "subtitle": "学習量に合ったプランを選びましょう",
     "recommended": "おすすめ",
     "freePrice": "無料",
-    "pricePerMonth": "₩{{price}}/月",
+    "pricePerMonth": "{{price}}/月",
     "unlimitedCards": "無制限のカード",
     "upToCards": "カード {{count}}枚まで",
     "ctaFree": "無料で始める",

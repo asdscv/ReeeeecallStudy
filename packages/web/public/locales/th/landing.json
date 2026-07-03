@@ -328,7 +328,7 @@
     "subtitle": "เลือกแพ็กเกจที่เหมาะกับการเรียนของคุณ",
     "recommended": "แนะนำ",
     "freePrice": "ฟรี",
-    "pricePerMonth": "₩{{price}}/เดือน",
+    "pricePerMonth": "{{price}}/เดือน",
     "unlimitedCards": "การ์ดไม่จำกัด",
     "upToCards": "สูงสุด {{count}} การ์ด",
     "ctaFree": "เริ่มใช้งานฟรี",

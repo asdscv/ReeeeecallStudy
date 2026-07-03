@@ -328,7 +328,7 @@
     "subtitle": "Chọn gói phù hợp với mức độ học của bạn",
     "recommended": "Đề xuất",
     "freePrice": "Miễn phí",
-    "pricePerMonth": "₩{{price}}/tháng",
+    "pricePerMonth": "{{price}}/tháng",
     "unlimitedCards": "Thẻ không giới hạn",
     "upToCards": "Tối đa {{count}} thẻ",
     "ctaFree": "Bắt đầu miễn phí",

@@ -328,7 +328,7 @@
     "subtitle": "Pilih paket yang sesuai dengan intensitas belajarmu",
     "recommended": "Direkomendasikan",
     "freePrice": "Gratis",
-    "pricePerMonth": "₩{{price}}/bln",
+    "pricePerMonth": "{{price}}/bln",
     "unlimitedCards": "Kartu tanpa batas",
     "upToCards": "Hingga {{count}} kartu",
     "ctaFree": "Mulai gratis",
