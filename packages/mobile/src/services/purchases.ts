@@ -32,6 +32,57 @@ const REVENUECAT_ANDROID_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ??
 export const PRO_ENTITLEMENT = 'pro'
 
 // ─────────────────────────────────────────────────────────────────────────
+// Custom RevenueCat *subscriber attribute* key that carries our server-created
+// payment_intents.merchant_uid (mig 120) into every RevenueCat webhook delivery.
+//
+// RevenueCat surfaces custom subscriber attributes on each event under
+//   event.subscriber_attributes[MERCHANT_UID_ATTRIBUTE].value
+// so tagging it BEFORE calling purchasePackage (see setMerchantUid + usePurchases)
+// makes the intent handle available server-side without any store-receipt
+// plumbing — letting the revenuecat-webhook reconcile the settled store
+// transaction against the exact pending intent.
+//
+// Keep this string identical to whatever key the webhook reads. NOTE: the
+// currently-deployed revenuecat-webhook reconciles via the app_user_id +
+// REVENUECAT_PRODUCT_MAP path and does NOT yet read subscriber_attributes —
+// tagging merchant_uid here is forward-looking/belt-and-suspenders. See the
+// OWNER GO-LIVE CHECKLIST below for the webhook-side change needed to consume it.
+// ─────────────────────────────────────────────────────────────────────────
+export const MERCHANT_UID_ATTRIBUTE = 'merchant_uid'
+
+// ─────────────────────────────────────────────────────────────────────────
+// OWNER GO-LIVE CHECKLIST (finishes the mobile IAP → grant wiring)
+// Everything in this file is inert until BOTH of these are done AND the master
+// gate SUBSCRIPTION_UI_ENABLED is flipped to true. Steps:
+//
+//   1. Install the SDK:  pnpm add react-native-purchases --filter mobile
+//      then `expo prebuild` + a fresh native build (native module → NOT OTA).
+//      Restore the real types/imports at the top of this file (drop the
+//      `type … = any` shims and the try/catch require guard).
+//   2. Store products: create the IAP products in App Store Connect (auto-
+//      renewing subscription + any consumable credit packs) and in Google Play
+//      Console, then add them to a RevenueCat "Offering" whose package/product
+//      identifiers EQUAL our billing_products.id (so findPackageForProduct maps
+//      the server catalog to the store package).
+//   3. RevenueCat API keys: set EXPO_PUBLIC_REVENUECAT_IOS_KEY and
+//      EXPO_PUBLIC_REVENUECAT_ANDROID_KEY (public SDK keys) in the app env.
+//   4. Configure the RevenueCat "pro" entitlement (PRO_ENTITLEMENT) and attach
+//      the subscription products to it.
+//   5. Server secrets (Supabase → Edge Functions → Secrets — owner's job, NOT
+//      touched here): REVENUECAT_WEBHOOK_AUTH (shared bearer token) and
+//      REVENUECAT_PRODUCT_MAP (JSON: store product id → our billing_products.id).
+//      Point the RevenueCat dashboard webhook at .../revenuecat-webhook with
+//      that Authorization token. (See supabase/functions/revenuecat-webhook.)
+//   6. OPTIONAL — intent reconciliation via merchant_uid: this file already
+//      tags each purchase with subscriber_attributes.merchant_uid (step below).
+//      To have the webhook USE it (instead of only the app_user_id+product map),
+//      the owner must adapt revenuecat-webhook to read
+//      event.subscriber_attributes.merchant_uid?.value and call
+//      confirm_payment(merchant_uid, 'revenuecat', event.id). Until then the
+//      attribute is carried but unused; the app_user_id path still grants.
+// ─────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────
 // [SUBSCRIPTION-HIDDEN] Master gate for the whole purchase/subscription UI.
 // Keep FALSE until App Store Connect IAP products are submitted+approved and
 // RevenueCat is wired (Apple Guideline 2.1(b)). Everything downstream —
@@ -139,6 +190,41 @@ class PurchaseService {
     return (
       pkgs.find((p) => p?.product?.identifier === productId || p?.identifier === productId) ?? null
     )
+  }
+
+  /**
+   * Tag a server-created payment intent (mig 120) onto the RevenueCat subscriber
+   * BEFORE calling purchasePackage, so the store event RevenueCat forwards to our
+   * revenuecat-webhook carries the intent handle back in
+   *   event.subscriber_attributes[MERCHANT_UID_ATTRIBUTE].value
+   * — letting the webhook reconcile the settled transaction against the exact
+   * pending intent (in addition to / instead of the app_user_id + product-map
+   * path). This is the mobile analogue of the web providers threading
+   * merchant_uid through checkout custom data.
+   *
+   * Fail-soft by design: returns false (never throws) when the SDK is absent or
+   * the flow is gated off, so a purchase is never blocked on attribute tagging.
+   *
+   * @returns true only if the attribute was actually set on the SDK.
+   */
+  async setMerchantUid(merchantUid: string): Promise<boolean> {
+    // Gate + SDK guards: no-op while SUBSCRIPTION_UI_ENABLED is false or the
+    // native module isn't installed (removed — crash source; see header).
+    if (!SUBSCRIPTION_UI_ENABLED || !Purchases || !merchantUid) return false
+    try {
+      // TODO(react-native-purchases): once the SDK is restored this attaches the
+      // intent handle to the RC subscriber. `setAttributes` MERGES custom
+      // attributes (does not clear others), keyed by the string keys we choose,
+      // and is flushed to RevenueCat's servers with the next SDK network call —
+      // i.e. purchasePackage() below — so the value is present on the resulting
+      // INITIAL_PURCHASE webhook. Equivalent: Purchases.setAttributes({ merchant_uid }).
+      await Purchases.setAttributes({ [MERCHANT_UID_ATTRIBUTE]: merchantUid })
+      return true
+    } catch {
+      // Never block a purchase on attribute tagging — the app_user_id path still
+      // lets the webhook attribute the grant even if this fails.
+      return false
+    }
   }
 
   /**
