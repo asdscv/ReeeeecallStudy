@@ -19,6 +19,12 @@
 //   body — the body only names WHICH product/subscription changed; it can't pick a
 //   price or self-grant. All writes go through the service-role client below.
 //
+// SUBSCRIPTION KEY = original_transaction_id, and it is REQUIRED for EVERY subscription
+//   write (grant/renew, sync, revoke). It is the only per-user-safe key; the store
+//   product_id is SHARED across all buyers of a plan, so keying a write on it could
+//   match/sync/revoke a DIFFERENT user's row. An event that carries no
+//   original_transaction_id is ACKed 200 without writing (never falls back to product_id).
+//
 // EVENT → RPC (event.type):
 //   INITIAL_PURCHASE / NON_RENEWING_PURCHASE (subscription product)
 //                                → sync_subscription_by_user(active,  expiry, cancel=false)
@@ -112,6 +118,18 @@ interface RCEvent {
 
 const PROVIDER = 'revenuecat'
 
+// Ack 200 WITHOUT writing when a subscription event lacks original_transaction_id. We
+// refuse to key a subscription write on the SHARED store product id (it could match/revoke
+// OTHER users' rows), but we still 200 so RevenueCat stops retrying an event we cannot
+// safely apply.
+function ackNoSubKey(type: string): Response {
+  console.warn(
+    '[revenuecat-webhook]', type,
+    'missing original_transaction_id — acking without writing (won\'t use shared product id)',
+  )
+  return json({ received: true, type, ignored: 'missing_subscription_id' }, 200)
+}
+
 // RPC error → HTTP status. A bad/unknown reference (product/id) is a provider-payload
 // problem → 400 (RC stops retrying). Anything else → 500 so RC retries (all RPCs are
 // idempotent, so a retry is safe).
@@ -147,18 +165,20 @@ Deno.serve(async (req) => {
   const type = event.type
   const appUserId = typeof event.app_user_id === 'string' ? event.app_user_id : ''
   const storeProductId = typeof event.product_id === 'string' ? event.product_id : ''
-  // Stable subscription key across the lifecycle: prefer original_transaction_id
-  // (constant across renewals), fall back to the store product id.
+  // Stable subscription key across the lifecycle: the store's original_transaction_id
+  // (constant across renewals). It is REQUIRED for any subscription write — it is the only
+  // PER-USER-SAFE key. We must NOT fall back to the store product_id: that id is SHARED by
+  // every buyer of the plan, so keying a write on it could match/sync/revoke OTHER users'
+  // subscription rows. Absent → we ack 200 without writing (see ackNoSubKey guards below).
   const subKey =
-    (typeof event.original_transaction_id === 'string' && event.original_transaction_id) ||
-    storeProductId
+    typeof event.original_transaction_id === 'string' ? event.original_transaction_id : ''
   const periodEnd = msToIso(event.expiration_at_ms)
 
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
   // ── LIFECYCLE (UPDATE-only, matched by provider + subKey; no product/user needed) ──
   const syncStatus = async (status: string, cancelAtPeriodEnd: boolean | null) => {
-    if (!subKey) return json({ error: 'Missing subscription id', code: 'BAD_REQUEST' }, 400)
+    if (!subKey) return ackNoSubKey(type)
     const { data, error } = await sb.rpc('sync_subscription', {
       p_provider: PROVIDER,
       p_provider_subscription_id: subKey,
@@ -172,7 +192,7 @@ Deno.serve(async (req) => {
   }
 
   const revoke = async () => {
-    if (!subKey) return json({ error: 'Missing subscription id', code: 'BAD_REQUEST' }, 400)
+    if (!subKey) return ackNoSubKey(type)
     const { data, error } = await sb.rpc('revoke_subscription', {
       p_provider: PROVIDER,
       p_provider_subscription_id: subKey,
@@ -212,17 +232,28 @@ Deno.serve(async (req) => {
       if (!Number.isFinite(microWon) || microWon <= 0) {
         return json({ error: 'Invalid product', code: 'BAD_REQUEST' }, 400)
       }
+      // Idempotency key: the RC event id (unique per delivery), falling back to the
+      // original_transaction_id. subKey is no longer a shared product id, so if both are
+      // absent we refuse rather than grant without any dedupe key (a retry would double-credit).
+      const creditRef = event.id || subKey
+      if (!creditRef) {
+        console.error('[revenuecat-webhook]', type, 'credit_pack missing idempotency ref — refusing')
+        return json({ error: 'Missing idempotency ref', code: 'BAD_REQUEST' }, 400)
+      }
       const { data, error } = await sb.rpc('add_ai_credits', {
         p_user_id: appUserId,
         p_micro_won: microWon,
         p_reason: 'purchase',
-        p_ref: event.id ?? subKey,
+        p_ref: creditRef,
       })
       if (error) return rpcErrorResponse(`add_ai_credits ${type}`, error.message)
       return json({ received: true, type, kind: 'credit_pack', balance_micro_won: data ?? null }, 200)
     }
 
-    // SUBSCRIPTION product → UPSERT the sub as active for this user/product.
+    // SUBSCRIPTION product → UPSERT the sub as active for this user/product, keyed by the
+    // per-user original_transaction_id. Without it we refuse to write (never key on the
+    // shared store product id) and ack so RevenueCat stops retrying.
+    if (!subKey) return ackNoSubKey(type)
     const { data, error } = await sb.rpc('sync_subscription_by_user', {
       p_user: appUserId,
       p_product_id: ourProductId,
