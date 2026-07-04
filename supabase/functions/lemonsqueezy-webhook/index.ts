@@ -226,13 +226,19 @@ function loadVariantMap(): VariantMapState {
 }
 
 // The LS variant id the buyer actually purchased, per event shape:
-//   order_created         → data.attributes.first_order_item.variant_id
-//   subscription_created  → data.attributes.first_subscription_item.variant_id
+//   order_created         → data.attributes.first_order_item.variant_id (Order object)
+//   subscription_created  → data.attributes.variant_id (Subscription object, TOP-LEVEL)
+// NOTE: the Subscription object carries variant_id at the TOP LEVEL of attributes; its
+// `first_subscription_item` holds only { id, subscription_id, price_id, quantity, … } —
+// there is NO variant_id inside it. Reading first_subscription_item.variant_id yields
+// undefined → null → a spurious VARIANT_MISMATCH that refuses EVERY subscription grant
+// once LEMONSQUEEZY_VARIANT_MAP is set. So read the top-level id first, then fall back to
+// the order item (Order objects expose variant_id only under first_order_item).
 function purchasedVariantId(event: string, attrs: Record<string, unknown>): string | null {
   const item = (event === 'subscription_created'
     ? attrs.first_subscription_item
     : attrs.first_order_item) as Record<string, unknown> | undefined
-  const vid = item?.variant_id
+  const vid = attrs.variant_id ?? item?.variant_id
   return vid == null || vid === '' ? null : String(vid)
 }
 
