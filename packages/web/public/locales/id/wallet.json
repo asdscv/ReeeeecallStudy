@@ -6,7 +6,7 @@
   "balance": {
     "title": "Saldo",
     "hint": "Kredit prabayar untuk pembuatan kartu AI di luar kartu gratis harian.",
-    "topUp": "Isi ulang (segera hadir)",
+    "topUp": "Isi ulang",
     "topUpSoon": "Isi ulang akan segera hadir."
   },
   "free": {

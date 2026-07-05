@@ -6,7 +6,7 @@
   "balance": {
     "title": "Balance",
     "hint": "Prepaid credit for AI card generation beyond the daily free cards.",
-    "topUp": "Top up (coming soon)",
+    "topUp": "Top up",
     "topUpSoon": "Top-up is coming soon."
   },
   "free": {

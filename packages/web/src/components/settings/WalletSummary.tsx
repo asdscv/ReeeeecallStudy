@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
 import { toIntlLocale } from '../../lib/locale-utils'
-import { useBillingStore } from '../../stores/billing-store'
+import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { TopUpModal } from '../billing/TopUpModal'
 
 // AI wallet / usage content for the Settings accordion section (충전금·사용량):
@@ -52,8 +52,12 @@ export function WalletSummary() {
         <p className="text-xs text-content-tertiary mt-1">{t('cardPlanHint')}</p>
         <button
           onClick={() => setTopUpOpen(true)}
-          title={t('balance.topUpSoon')}
-          className="mt-3 px-4 py-2 text-sm rounded-lg bg-accent text-muted-foreground hover:bg-accent/70 cursor-pointer font-medium transition"
+          title={PAYMENTS_ACTIVE ? undefined : t('balance.topUpSoon')}
+          className={`mt-3 px-4 py-2 text-sm rounded-lg cursor-pointer font-medium transition ${
+            PAYMENTS_ACTIVE
+              ? 'bg-brand text-white hover:bg-brand-hover'
+              : 'bg-accent text-muted-foreground hover:bg-accent/70'
+          }`}
         >
           {t('balance.topUp')}
         </button>

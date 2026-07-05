@@ -6,7 +6,7 @@
   "balance": {
     "title": "Số dư",
     "hint": "Tín dụng trả trước để tạo thẻ bằng AI vượt quá số thẻ miễn phí hằng ngày.",
-    "topUp": "Nạp thêm (sắp có)",
+    "topUp": "Nạp thêm",
     "topUpSoon": "Tính năng nạp thêm sắp ra mắt."
   },
   "free": {
