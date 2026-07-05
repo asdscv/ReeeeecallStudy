@@ -49,6 +49,33 @@
   "manageSubscription": {
     "button": "Kelola langganan",
     "hint": "Batalkan, ganti paket, atau perbarui metode pembayaran.",
-    "error": "Tidak dapat membuka halaman pengelolaan. Coba lagi."
+    "error": "Tidak dapat membuka halaman pengelolaan. Coba lagi.",
+    "cancel": "Batalkan langganan",
+    "resume": "Lanjutkan langganan"
+  },
+  "methods": {
+    "title": "Pilih metode pembayaran",
+    "cancel": "Batal",
+    "toss": "TossPayments (Korea)",
+    "lemonsqueezy": "Kartu internasional / PayPal",
+    "mock": "Uji admin",
+    "portone": "PortOne"
+  },
+  "toss": {
+    "opening": "Membuka pembayaran…",
+    "confirming": "Mengonfirmasi pembayaran…",
+    "close": "Tutup",
+    "success": {
+      "title": "Pembayaran selesai!",
+      "body": "Pembayaran berhasil. Anda bisa menutup jendela ini."
+    },
+    "error": {
+      "title": "Pembayaran gagal",
+      "body": "Silakan coba lagi.",
+      "failed": "Tidak dapat memproses pembayaran.",
+      "not_configured": "Pembayaran belum disiapkan.",
+      "unknown_order": "Pesanan ini tidak ditemukan.",
+      "already_processed": "Pesanan ini sudah diproses."
+    }
   }
 }

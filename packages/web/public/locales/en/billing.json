@@ -49,6 +49,33 @@
   "manageSubscription": {
     "button": "Manage subscription",
     "hint": "Cancel, change plan, or update your payment method.",
-    "error": "Couldn't open the management page. Please try again."
+    "error": "Couldn't open the management page. Please try again.",
+    "cancel": "Cancel subscription",
+    "resume": "Resume subscription"
+  },
+  "methods": {
+    "title": "Choose a payment method",
+    "cancel": "Cancel",
+    "toss": "TossPayments (Korea)",
+    "lemonsqueezy": "International card / PayPal",
+    "mock": "Admin test",
+    "portone": "PortOne"
+  },
+  "toss": {
+    "opening": "Opening checkout…",
+    "confirming": "Confirming your payment…",
+    "close": "Close",
+    "success": {
+      "title": "Payment complete!",
+      "body": "Your payment went through. You can close this window."
+    },
+    "error": {
+      "title": "Payment failed",
+      "body": "Please try again.",
+      "failed": "Couldn't process the payment.",
+      "not_configured": "Payments are not set up yet.",
+      "unknown_order": "Couldn't find this order.",
+      "already_processed": "This order was already processed."
+    }
   }
 }

@@ -49,6 +49,33 @@
   "manageSubscription": {
     "button": "サブスク管理",
     "hint": "解約・プラン変更・支払い方法の更新はこちら。",
-    "error": "管理ページを開けませんでした。もう一度お試しください。"
+    "error": "管理ページを開けませんでした。もう一度お試しください。",
+    "cancel": "サブスクを解約",
+    "resume": "サブスクを再開"
+  },
+  "methods": {
+    "title": "決済手段を選択",
+    "cancel": "キャンセル",
+    "toss": "トスペイメンツ（韓国）",
+    "lemonsqueezy": "海外カード / PayPal",
+    "mock": "管理者テスト",
+    "portone": "PortOne"
+  },
+  "toss": {
+    "opening": "決済画面を開いています…",
+    "confirming": "決済を確認しています…",
+    "close": "閉じる",
+    "success": {
+      "title": "決済完了！",
+      "body": "決済が完了しました。このウィンドウを閉じてかまいません。"
+    },
+    "error": {
+      "title": "決済に失敗しました",
+      "body": "もう一度お試しください。",
+      "failed": "決済を処理できませんでした。",
+      "not_configured": "決済がまだ設定されていません。",
+      "unknown_order": "この注文が見つかりません。",
+      "already_processed": "この注文はすでに処理済みです。"
+    }
   }
 }

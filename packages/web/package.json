@@ -22,6 +22,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@reeeeecall/shared": "workspace:*",
     "@supabase/supabase-js": "^2.95.3",
+    "@tosspayments/tosspayments-sdk": "^2.7.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "i18next": "^25.8.10",

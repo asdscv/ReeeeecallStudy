@@ -4,6 +4,8 @@ import { Loader2, Check, ExternalLink } from 'lucide-react'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { supabase } from '../../lib/supabase'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
+import { providersForKind } from '../../lib/payments'
+import { PaymentMethodModal } from './PaymentMethodModal'
 
 // A card_limit at or above this sentinel means "unlimited" for DISPLAY only. The DB
 // stores/uses card_limit as a normal integer cap (e.g. sub_unlimited_monthly = 2e9,
@@ -84,7 +86,8 @@ export function PlanSelector() {
   }, [products.length, fetchProducts, fetchSubscription])
 
   const locale = toIntlLocale(i18n.language)
-  // Display currency is USD (the LemonSqueezy store charges USD).
+  // Display currency is USD (the LemonSqueezy store charges USD; Toss shows the KRW
+  // amount at its own checkout).
   const fmtUsd = (cents: number | null) => `$${((cents ?? 0) / 100).toFixed(2)}`
 
   const plans = products
@@ -93,6 +96,26 @@ export function PlanSelector() {
 
   // The current plan is whichever active-subscription product the user holds.
   const currentProductId = subscription?.productId ?? null
+  const currentProvider = subscription?.provider ?? null
+
+  // With one provider, subscribe directly; with 2+ (Toss + LemonSqueezy), pick a method.
+  const [pickerProduct, setPickerProduct] = useState<string | null>(null)
+  const beginCheckout = (productId: string) => {
+    if (providersForKind('subscription').length > 1) setPickerProduct(productId)
+    else void startCheckout(productId)
+  }
+
+  // Toss subscriptions have no hosted portal — we run the recurring charge, so cancel /
+  // resume is an in-app RPC (flips cancel_at_period_end; the renewal scheduler obeys it).
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const setCancel = async (cancel: boolean) => {
+    if (cancelLoading) return
+    setCancelLoading(true)
+    const rpc = cancel ? 'request_cancel_my_subscription' : 'request_resume_my_subscription'
+    const { data, error } = await supabase.rpc(rpc)
+    if (!error && (data as { ok?: boolean } | null)?.ok) await fetchSubscription()
+    setCancelLoading(false)
+  }
 
   // Cancel-at-period-end (mig 121): access is retained until current_period_end.
   const cancelPending = !!subscription?.cancelAtPeriodEnd
@@ -158,7 +181,7 @@ export function PlanSelector() {
               </div>
               <button
                 type="button"
-                onClick={() => void startCheckout(p.id)}
+                onClick={() => beginCheckout(p.id)}
                 disabled={isCurrent || processing}
                 title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
                 className={
@@ -181,9 +204,10 @@ export function PlanSelector() {
         })}
       </ul>
 
-      {/* Manage (cancel / downgrade / change card) via the LS customer portal — only
-          when the user actually holds a subscription. */}
-      {PAYMENTS_ACTIVE && currentProductId != null && (
+      {/* Manage the current subscription. LemonSqueezy (Merchant of Record) → its hosted
+          customer portal (cancel / change plan / update card). Toss → in-app cancel /
+          resume (we run the recurring charge ourselves). */}
+      {PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'lemonsqueezy' && (
         <div className="mt-3">
           <button
             type="button"
@@ -205,6 +229,20 @@ export function PlanSelector() {
         </div>
       )}
 
+      {PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'toss' && (
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => void setCancel(!cancelPending)}
+            disabled={cancelLoading}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60"
+          >
+            {cancelLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {cancelPending ? t('manageSubscription.resume') : t('manageSubscription.cancel')}
+          </button>
+        </div>
+      )}
+
       {cancelPending && (
         <p className="mt-2 text-xs text-muted-foreground">
           {periodEndLabel
@@ -221,6 +259,13 @@ export function PlanSelector() {
       {PAYMENTS_ACTIVE && checkoutIsPlan && error === 'checkout_failed' && (
         <p className="mt-2 text-xs text-destructive">{t('checkout.failed')}</p>
       )}
+
+      <PaymentMethodModal
+        open={pickerProduct !== null}
+        productId={pickerProduct}
+        kind="subscription"
+        onClose={() => setPickerProduct(null)}
+      />
     </div>
   )
 }

@@ -1,0 +1,36 @@
+name: Toss subscription renewals
+
+# TossPayments does NOT auto-charge subscriptions — we run the recurring charge. This
+# fires the toss-renew edge function daily; it finds Toss subs whose paid period ended,
+# charges the stored billing key (Idempotency-Key keyed on the period → never double-
+# charges), extends the period, and records the renewal invoice.
+#
+# Required repo secrets:
+#   SUPABASE_FUNCTIONS_URL  e.g. https://ixdapelfikaneexnskfm.functions.supabase.co
+#   TOSS_RENEW_SECRET       must equal the edge secret of the same name
+on:
+  schedule:
+    - cron: '17 3 * * *' # daily 03:17 UTC (~12:17 KST) — off the top of the hour
+  workflow_dispatch: {} # manual trigger for testing
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Charge due Toss subscriptions
+        env:
+          FUNCTIONS_URL: ${{ secrets.SUPABASE_FUNCTIONS_URL }}
+          RENEW_SECRET: ${{ secrets.TOSS_RENEW_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FUNCTIONS_URL:-}" ] || [ -z "${RENEW_SECRET:-}" ]; then
+            echo "SUPABASE_FUNCTIONS_URL / TOSS_RENEW_SECRET not set — skipping."
+            exit 0
+          fi
+          resp=$(curl -sS -w '\n%{http_code}' -X POST "$FUNCTIONS_URL/toss-renew" \
+            -H "Authorization: Bearer $RENEW_SECRET" \
+            -H "Content-Type: application/json" -d '{}')
+          body=$(echo "$resp" | head -n -1)
+          code=$(echo "$resp" | tail -n1)
+          echo "toss-renew → HTTP $code: $body"
+          [ "$code" = "200" ] || { echo "renewal call failed"; exit 1; }

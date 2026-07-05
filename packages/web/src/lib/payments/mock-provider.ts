@@ -14,6 +14,9 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 export class MockProvider implements PaymentProvider {
   readonly id = 'mock'
   readonly redirects = false // in-page admin grant; no external tab
+  readonly labelKey = 'methods.mock'
+  isAvailable(): boolean { return true } // always usable (admin-gated at the RPC)
+  supports(): boolean { return true }
 
   async checkout(intent: PaymentIntent, _target?: Window | null): Promise<CheckoutResult> {
     const { error } = await supabase.rpc('admin_confirm_payment', {

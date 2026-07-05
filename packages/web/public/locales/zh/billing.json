@@ -49,6 +49,33 @@
   "manageSubscription": {
     "button": "管理订阅",
     "hint": "在此取消、更换套餐或更新支付方式。",
-    "error": "无法打开管理页面，请重试。"
+    "error": "无法打开管理页面，请重试。",
+    "cancel": "取消订阅",
+    "resume": "恢复订阅"
+  },
+  "methods": {
+    "title": "选择支付方式",
+    "cancel": "取消",
+    "toss": "TossPayments（韩国）",
+    "lemonsqueezy": "国际卡 / PayPal",
+    "mock": "管理员测试",
+    "portone": "PortOne"
+  },
+  "toss": {
+    "opening": "正在打开结账…",
+    "confirming": "正在确认支付…",
+    "close": "关闭",
+    "success": {
+      "title": "支付完成！",
+      "body": "支付已完成，可以关闭此窗口。"
+    },
+    "error": {
+      "title": "支付失败",
+      "body": "请重试。",
+      "failed": "无法处理支付。",
+      "not_configured": "支付尚未配置。",
+      "unknown_order": "找不到此订单。",
+      "already_processed": "此订单已处理。"
+    }
   }
 }

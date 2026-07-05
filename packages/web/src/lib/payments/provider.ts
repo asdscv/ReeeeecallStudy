@@ -52,6 +52,15 @@ export interface PaymentProvider {
    * resolves in-page (mock admin grant, PortOne SDK modal) and ignores `target`.
    */
   readonly redirects: boolean
+  /** i18n key (billing namespace) for the payment-method picker label, e.g. 'methods.toss'. */
+  readonly labelKey: string
+  /**
+   * True when THIS adapter's own build config is present (keys/store). An enabled-but-
+   * unconfigured provider is dropped from the registry so it never shows in the picker.
+   */
+  isAvailable(): boolean
+  /** Whether this provider can sell the given product kind (some PGs are one-time only). */
+  supports(kind: 'credit_pack' | 'subscription'): boolean
   checkout(intent: PaymentIntent, target?: Window | null): Promise<CheckoutResult>
 }
 

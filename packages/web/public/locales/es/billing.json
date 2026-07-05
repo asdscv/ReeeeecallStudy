@@ -49,6 +49,33 @@
   "manageSubscription": {
     "button": "Gestionar suscripción",
     "hint": "Cancela, cambia de plan o actualiza tu método de pago.",
-    "error": "No se pudo abrir la página de gestión. Inténtalo de nuevo."
+    "error": "No se pudo abrir la página de gestión. Inténtalo de nuevo.",
+    "cancel": "Cancelar suscripción",
+    "resume": "Reanudar suscripción"
+  },
+  "methods": {
+    "title": "Elige un método de pago",
+    "cancel": "Cancelar",
+    "toss": "TossPayments (Corea)",
+    "lemonsqueezy": "Tarjeta internacional / PayPal",
+    "mock": "Prueba de admin",
+    "portone": "PortOne"
+  },
+  "toss": {
+    "opening": "Abriendo el pago…",
+    "confirming": "Confirmando tu pago…",
+    "close": "Cerrar",
+    "success": {
+      "title": "¡Pago completado!",
+      "body": "Tu pago se realizó. Puedes cerrar esta ventana."
+    },
+    "error": {
+      "title": "El pago falló",
+      "body": "Inténtalo de nuevo.",
+      "failed": "No se pudo procesar el pago.",
+      "not_configured": "Los pagos aún no están configurados.",
+      "unknown_order": "No se encontró este pedido.",
+      "already_processed": "Este pedido ya fue procesado."
+    }
   }
 }

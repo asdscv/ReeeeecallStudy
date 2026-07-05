@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import {
@@ -9,6 +9,8 @@ import {
   DialogDescription,
 } from '../ui/dialog'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
+import { providersForKind } from '../../lib/payments'
+import { PaymentMethodModal } from './PaymentMethodModal'
 import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
 import { toIntlLocale } from '../../lib/locale-utils'
 
@@ -52,6 +54,13 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
     .sort((a, b) => a.sortOrder - b.sortOrder)
 
   const showComingSoon = !PAYMENTS_ACTIVE || comingSoon
+
+  // With one provider, buy directly; with 2+ (e.g. Toss + LemonSqueezy), pick a method.
+  const [pickerProduct, setPickerProduct] = useState<string | null>(null)
+  const beginCheckout = (productId: string) => {
+    if (providersForKind('credit_pack').length > 1) setPickerProduct(productId)
+    else void startCheckout(productId)
+  }
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -128,7 +137,7 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
                     return (
                       <button
                         type="button"
-                        onClick={() => void startCheckout(p.id)}
+                        onClick={() => beginCheckout(p.id)}
                         disabled={processing}
                         title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
                         className={
@@ -147,6 +156,12 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
             })}
           </ul>
         )}
+        <PaymentMethodModal
+          open={pickerProduct !== null}
+          productId={pickerProduct}
+          kind="credit_pack"
+          onClose={() => setPickerProduct(null)}
+        />
       </DialogContent>
     </Dialog>
   )
