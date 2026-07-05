@@ -41,5 +41,10 @@
       "credit_pack": "充值",
       "subscription": "订阅"
     }
+  },
+  "manageSubscription": {
+    "button": "管理订阅",
+    "hint": "在此取消、更换套餐或更新支付方式。",
+    "error": "无法打开管理页面，请重试。"
   }
 }

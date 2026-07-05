@@ -41,5 +41,10 @@
       "credit_pack": "クレジット",
       "subscription": "サブスク"
     }
+  },
+  "manageSubscription": {
+    "button": "サブスク管理",
+    "hint": "解約・プラン変更・支払い方法の更新はこちら。",
+    "error": "管理ページを開けませんでした。もう一度お試しください。"
   }
 }
