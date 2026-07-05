@@ -13,8 +13,9 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 // grant anything to a non-admin account.
 export class MockProvider implements PaymentProvider {
   readonly id = 'mock'
+  readonly redirects = false // in-page admin grant; no external tab
 
-  async checkout(intent: PaymentIntent): Promise<CheckoutResult> {
+  async checkout(intent: PaymentIntent, _target?: Window | null): Promise<CheckoutResult> {
     const { error } = await supabase.rpc('admin_confirm_payment', {
       p_merchant_uid: intent.merchantUid,
     })

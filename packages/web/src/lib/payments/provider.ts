@@ -44,7 +44,15 @@ export interface CheckoutResult {
 
 export interface PaymentProvider {
   readonly id: string
-  checkout(intent: PaymentIntent): Promise<CheckoutResult>
+  /**
+   * true = checkout leaves the page for an external hosted URL (redirect flow, e.g.
+   * LemonSqueezy). The billing store pre-opens a blank tab INSIDE the click gesture
+   * and passes it as `target` so the hosted checkout opens in a NEW tab (the app tab
+   * stays put); the store then polls the intent until the webhook grants. false =
+   * resolves in-page (mock admin grant, PortOne SDK modal) and ignores `target`.
+   */
+  readonly redirects: boolean
+  checkout(intent: PaymentIntent, target?: Window | null): Promise<CheckoutResult>
 }
 
 // Raw json exactly as create_payment_intent returns it (snake_case).

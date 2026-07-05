@@ -68,8 +68,9 @@ function isUserCancel(r: PortOnePaymentResponse): boolean {
 
 export class PortOneProvider implements PaymentProvider {
   readonly id = 'portone'
+  readonly redirects = false // in-page SDK modal (requestPayment); no external tab
 
-  async checkout(intent: PaymentIntent): Promise<CheckoutResult> {
+  async checkout(intent: PaymentIntent, _target?: Window | null): Promise<CheckoutResult> {
     const storeId = String(import.meta.env.VITE_PORTONE_STORE_ID ?? '')
     const channelKey = String(import.meta.env.VITE_PORTONE_CHANNEL_KEY ?? '')
     if (!storeId || !channelKey) {

@@ -97,8 +97,9 @@ async function currentUserEmail(): Promise<string | null> {
 
 export class LemonsqueezyProvider implements PaymentProvider {
   readonly id = 'lemonsqueezy'
+  readonly redirects = true // hosted checkout on <store>.lemonsqueezy.com
 
-  async checkout(intent: PaymentIntent): Promise<CheckoutResult> {
+  async checkout(intent: PaymentIntent, target?: Window | null): Promise<CheckoutResult> {
     const store = String(import.meta.env.VITE_LEMONSQUEEZY_STORE ?? '').trim()
     const variants = parseVariants(String(import.meta.env.VITE_LEMONSQUEEZY_VARIANTS ?? ''))
     const variantId = variants[intent.productId]
@@ -122,10 +123,16 @@ export class LemonsqueezyProvider implements PaymentProvider {
 
     const url = `https://${store}.lemonsqueezy.com/checkout/buy/${variantId}?${params.toString()}`
 
-    // Redirect the browser to the hosted checkout. The outcome resolves AFTER Lemon
-    // Squeezy redirects back to /settings?pay=success (handlePaymentReturn) and the
-    // signed webhook grants; so we report a redirect, not ok/canceled.
-    window.location.href = url
+    // Open the hosted checkout in the blank tab the billing store pre-opened within the
+    // click gesture, so the app tab stays put and the store can poll the intent for the
+    // grant. If the popup was blocked (target null/closed) fall back to same-tab
+    // navigation — the ?pay=success redirect + handlePaymentReturn still resolves it.
+    // Either way this is a redirect flow: ok/canceled are not meaningful in-page.
+    if (target && !target.closed) {
+      target.location.href = url
+    } else {
+      window.location.href = url
+    }
     return { ok: false, redirecting: true }
   }
 }

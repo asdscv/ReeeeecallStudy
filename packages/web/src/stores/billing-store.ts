@@ -149,6 +149,58 @@ interface BillingState {
   clearComingSoon: () => void
 }
 
+// Poll the server payment_intent (RLS: user reads own) after a NEW-TAB redirect
+// checkout, until the signed webhook flips it to 'paid' — then run onPaid() and mark
+// success. The checkout runs in a SEPARATE tab, so handlePaymentReturn (which fires in
+// that tab) can't update this one; this poll is how the app tab reconciles. Bounded so
+// an abandoned checkout never spins forever.
+async function pollCheckoutIntent(
+  merchantUid: string,
+  checkoutTab: Window,
+  onPaid: () => Promise<void>,
+  set: (partial: Partial<BillingState>) => void,
+): Promise<void> {
+  const started = Date.now()
+  const TIMEOUT_MS = 5 * 60 * 1000
+  const POLL_MS = 2500
+  const readStatus = async (): Promise<string | null> => {
+    const { data } = await supabase
+      .from('payment_intents')
+      .select('status')
+      .eq('merchant_uid', merchantUid)
+      .maybeSingle()
+    return (data as { status?: string } | null)?.status ?? null
+  }
+  while (Date.now() - started < TIMEOUT_MS) {
+    await new Promise((r) => setTimeout(r, POLL_MS))
+    const status = await readStatus()
+    if (status === 'paid') {
+      await onPaid()
+      set({ checkoutStatus: 'success', error: null })
+      return
+    }
+    if (status === 'failed' || status === 'canceled') {
+      set({ checkoutStatus: 'canceled', error: null })
+      return
+    }
+    // Checkout tab closed without a terminal status: give the webhook a brief grace,
+    // re-check once, then stop (a later /settings revisit still reconciles via
+    // handlePaymentReturn / a manual refresh).
+    if (checkoutTab.closed) {
+      await new Promise((r) => setTimeout(r, 3000))
+      if ((await readStatus()) === 'paid') {
+        await onPaid()
+        set({ checkoutStatus: 'success', error: null })
+      } else {
+        set({ checkoutStatus: 'idle', error: null })
+      }
+      return
+    }
+  }
+  // Left open a long time → drop the spinner to a neutral state.
+  set({ checkoutStatus: 'idle', error: null })
+}
+
 export const useBillingStore = create<BillingState>((set, get) => ({
   products: [],
   subscription: null,
@@ -216,12 +268,23 @@ export const useBillingStore = create<BillingState>((set, get) => ({
       error: null,
     })
 
+    // Pre-open a blank tab INSIDE the click gesture for redirect providers so the
+    // hosted checkout opens in a NEW tab and the app tab stays put. Popup blockers
+    // only allow window.open synchronously in a user gesture — the create_payment_intent
+    // await below would disqualify a later open. null when blocked → the provider falls
+    // back to same-tab navigation (unchanged old behavior).
+    const checkoutTab =
+      provider.redirects && typeof window !== 'undefined'
+        ? window.open('about:blank', '_blank')
+        : null
+
     // 1) Server snapshots price + kind into a 'pending' intent and returns a fresh
     //    merchant_uid. The client can neither pick the price nor self-grant.
     const { data, error } = await supabase.rpc('create_payment_intent', {
       p_product_id: productId,
     })
     if (error || !data) {
+      checkoutTab?.close()
       set({ checkoutStatus: 'idle', error: 'checkout_failed' })
       return
     }
@@ -232,19 +295,34 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     //    grants; this only tells us how the client-side flow resolved.
     let result: CheckoutResult
     try {
-      result = await provider.checkout(intent)
+      result = await provider.checkout(intent, checkoutTab)
     } catch {
       // e.g. PortOne NOT_CONFIGURED, Stripe create-stripe-checkout 503, or a
       // SDK/network failure.
+      checkoutTab?.close()
       set({ checkoutStatus: 'idle', error: 'checkout_failed' })
       return
     }
 
-    // Redirect flow (e.g. Stripe hosted checkout): the browser is navigating away.
-    // Leave the UI in 'processing' and do NOT treat it as canceled/failed — the
-    // outcome resolves when the provider redirects back to /settings?pay=… and
-    // handlePaymentReturn runs. (checkoutStatus is already 'processing' here.)
-    if (result.redirecting) return
+    // Redirect flow (LemonSqueezy hosted checkout).
+    if (result.redirecting) {
+      // Same-tab fallback (popup blocked → we navigated away): nothing to do; the
+      // ?pay=success redirect + handlePaymentReturn resolves it after the round trip.
+      if (!checkoutTab || checkoutTab.closed) return
+      // New-tab flow: the app tab stays here, so handlePaymentReturn (which runs in the
+      // checkout tab) won't fire in this tab. Poll the server intent until the signed
+      // webhook marks it paid, then refresh every entitlement surface — so the balance /
+      // plan updates without the user reloading. Stops early if the checkout tab is
+      // closed (with a short grace for a just-in-time webhook) or on failed/canceled.
+      await pollCheckoutIntent(intent.merchantUid, checkoutTab, async () => {
+        await Promise.all([
+          get().fetchWallet(),
+          get().fetchSubscription(),
+          useDeckStore.getState().fetchCardUsage({ force: true }),
+        ])
+      }, set)
+      return
+    }
 
     if (result.canceled) {
       set({ checkoutStatus: 'canceled', error: null })
