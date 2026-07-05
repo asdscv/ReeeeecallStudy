@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -13,8 +13,17 @@ import { supabase } from '../../lib/supabase'
 export function TossReturnPage() {
   const { t } = useTranslation('billing')
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const [state, setState] = useState<'processing' | 'success' | 'error'>('processing')
   const ranRef = useRef(false)
+
+  // New-tab flow (opened by the billing store) → close this tab. Same-tab fallback
+  // (popup blocked → we navigated here in place) has no opener → return into the app
+  // instead of a dead close button.
+  const closeOrReturn = () => {
+    if (window.opener) window.close()
+    else navigate('/settings', { replace: true })
+  }
 
   useEffect(() => {
     if (ranRef.current) return
@@ -62,7 +71,7 @@ export function TossReturnPage() {
           <p className="text-base font-semibold text-foreground">{t('toss.success.title')}</p>
           <p className="text-sm text-muted-foreground">{t('toss.success.body')}</p>
           <button
-            onClick={() => window.close()}
+            onClick={closeOrReturn}
             className="mt-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover"
           >
             {t('toss.close')}
@@ -75,7 +84,7 @@ export function TossReturnPage() {
           <p className="text-base font-semibold text-foreground">{t('toss.error.title')}</p>
           <p className="text-sm text-muted-foreground">{t('toss.error.body')}</p>
           <button
-            onClick={() => window.close()}
+            onClick={closeOrReturn}
             className="mt-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
           >
             {t('toss.close')}

@@ -56,6 +56,10 @@ Deno.serve(async (req) => {
   const secretKey = ENV('TOSS_SECRET_KEY')
   if (!secretKey) return json({ error: 'Not configured', code: 'NOT_CONFIGURED' }, 503, cors)
 
+  // Server-side kill-switch: Toss stays OFF (no grant) until TOSS_ENABLED='true' — a
+  // true gate, not just the client VITE_PAYMENT_PROVIDERS UI flag.
+  if (ENV('TOSS_ENABLED') !== 'true') return json({ error: 'Toss disabled', code: 'DISABLED' }, 503, cors)
+
   let body: { paymentKey?: string; orderId?: string; amount?: number } | null = null
   try { body = await req.json() } catch { body = null }
   const paymentKey = body?.paymentKey

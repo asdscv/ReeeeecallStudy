@@ -62,6 +62,9 @@ Deno.serve(async (req) => {
   const secretKey = ENV('TOSS_SECRET_KEY')
   if (!secretKey) return json({ error: 'Not configured', code: 'NOT_CONFIGURED' }, 503, cors)
 
+  // Server-side kill-switch: Toss stays OFF (no charge/grant) until TOSS_ENABLED='true'.
+  if (ENV('TOSS_ENABLED') !== 'true') return json({ error: 'Toss disabled', code: 'DISABLED' }, 503, cors)
+
   let body: { authKey?: string; customerKey?: string; merchantUid?: string } | null = null
   try { body = await req.json() } catch { body = null }
   const authKey = body?.authKey
@@ -76,14 +79,16 @@ Deno.serve(async (req) => {
   // Intent (SERVER-authoritative): must be the caller's own subscription intent.
   const { data: intent, error: intErr } = await svc
     .from('payment_intents')
-    .select('user_id, kind, amount_krw, status')
+    .select('user_id, kind, amount_krw, status, product_id')
     .eq('merchant_uid', merchantUid)
     .maybeSingle()
   if (intErr) {
     console.error('[toss-billing] intent lookup failed:', intErr.message)
     return json({ error: 'Lookup failed' }, 500, cors)
   }
-  const it = intent as { user_id: string; kind: string; amount_krw: number; status: string } | null
+  const it = intent as
+    | { user_id: string; kind: string; amount_krw: number; status: string; product_id: string }
+    | null
   if (!it) return json({ error: 'Unknown order', code: 'UNKNOWN_ORDER' }, 404, cors)
   if (it.user_id !== userId) return json({ error: 'Forbidden', code: 'NOT_OWNER' }, 403, cors)
   if (it.status === 'paid') return json({ ok: true, already: true }, 200, cors) // already activated
@@ -100,6 +105,21 @@ Deno.serve(async (req) => {
   if (!stored || stored.customer_key !== customerKey) {
     return json({ error: 'Customer key mismatch', code: 'CUSTOMER_MISMATCH' }, 403, cors)
   }
+
+  // Stale-tab / race guard — BEFORE issuing/charging: if the user is already entitled to
+  // THIS plan, do not register a card or charge again. (create_payment_intent blocks
+  // minting a same-plan intent once a sub exists; this catches a checkout that began just
+  // before the sub was activated.)
+  const { data: dup } = await svc
+    .from('billing_subscriptions')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('product_id', it.product_id)
+    .in('status', ['active', 'grace', 'past_due', 'canceled'])
+    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
+    .limit(1)
+    .maybeSingle()
+  if (dup) return json({ ok: true, already: true }, 200, cors)
 
   // Get a billingKey: exchange the one-time authKey; on failure fall back to a stored
   // key (retry after a mid-flight failure — authKey is single-use).

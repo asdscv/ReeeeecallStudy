@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -15,9 +15,14 @@ const TOSS_CLIENT_KEY = String(import.meta.env.VITE_TOSS_CLIENT_KEY ?? '').trim(
 export function TossCheckoutPage() {
   const { t } = useTranslation('billing')
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const mu = params.get('mu') ?? ''
   const [error, setError] = useState<string | null>(null)
   const startedRef = useRef(false)
+  const closeOrReturn = () => {
+    if (window.opener) window.close()
+    else navigate('/settings', { replace: true })
+  }
 
   useEffect(() => {
     if (startedRef.current) return
@@ -94,7 +99,7 @@ export function TossCheckoutPage() {
             {t(`toss.error.${error}`, { defaultValue: t('toss.error.failed') })}
           </p>
           <button
-            onClick={() => window.close()}
+            onClick={closeOrReturn}
             className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
           >
             {t('toss.close')}
