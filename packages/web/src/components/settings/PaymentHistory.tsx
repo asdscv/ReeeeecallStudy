@@ -12,6 +12,8 @@ interface HistoryRow {
   title: string
   kind: string
   amountUsdCents: number | null
+  amountKrw: number | null
+  currency: string
   billingReason: string | null
   status: string
   createdAt: string
@@ -24,6 +26,8 @@ interface RawHistoryRow {
   title: string
   kind: string
   amount_usd_cents: number | null
+  amount_krw: number | null
+  currency: string
   billing_reason: string | null
   status: string
   created_at: string
@@ -51,7 +55,11 @@ export function PaymentHistory() {
       hour: '2-digit',
       minute: '2-digit',
     })
-  const fmtUsd = (cents: number | null | undefined) => `$${((cents ?? 0) / 100).toFixed(2)}`
+  // Each row renders in the currency it was CHARGED — Toss=KRW (₩), LemonSqueezy=USD ($).
+  const fmtAmount = (r: HistoryRow) =>
+    r.currency === 'krw'
+      ? `₩${(r.amountKrw ?? 0).toLocaleString(dateLocale)}`
+      : `$${((r.amountUsdCents ?? 0) / 100).toFixed(2)}`
 
   const loadMore = useCallback(async () => {
     if (busyRef.current || !hasMore) return
@@ -65,6 +73,8 @@ export function PaymentHistory() {
       title: r.title,
       kind: r.kind,
       amountUsdCents: r.amount_usd_cents,
+      amountKrw: r.amount_krw,
+      currency: r.currency ?? 'usd',
       billingReason: r.billing_reason,
       status: r.status,
       createdAt: r.created_at,
@@ -135,7 +145,7 @@ export function PaymentHistory() {
                 <p className="text-xs text-muted-foreground">{fmtDate(r.createdAt)}</p>
               </div>
               <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-                {fmtUsd(r.amountUsdCents)}
+                {fmtAmount(r)}
               </span>
             </li>
           )

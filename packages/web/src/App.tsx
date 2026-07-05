@@ -31,6 +31,8 @@ import { ContentListPage } from './pages/ContentListPage'
 import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
 import { PublicListingPage } from './pages/PublicListingPage'
+import { TossCheckoutPage } from './pages/checkout/TossCheckoutPage'
+import { TossReturnPage } from './pages/checkout/TossReturnPage'
 import { usePageTracking } from './hooks/usePageTracking'
 import { useTheme } from './hooks/useTheme'
 import { useOnboardingStore } from './stores/onboarding-store'
@@ -215,6 +217,26 @@ function App() {
             <Route element={<Layout />}>
               <Route path="/guide" element={<GuidePage />} />
             </Route>
+
+            {/* TossPayments checkout host + redirect landing (outside Layout — these
+                run in the popup tab the billing store opened). Auth-gated: the confirm
+                edge fns need the buyer's JWT. */}
+            <Route
+              path="/checkout/toss"
+              element={
+                <ProtectedRoute>
+                  <TossCheckoutPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout/toss/return"
+              element={
+                <ProtectedRoute>
+                  <TossReturnPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Study session (outside Layout for fullscreen focus) */}
             <Route

@@ -49,6 +49,33 @@
   "manageSubscription": {
     "button": "Quản lý đăng ký",
     "hint": "Hủy, đổi gói hoặc cập nhật phương thức thanh toán.",
-    "error": "Không thể mở trang quản lý. Vui lòng thử lại."
+    "error": "Không thể mở trang quản lý. Vui lòng thử lại.",
+    "cancel": "Hủy đăng ký",
+    "resume": "Tiếp tục đăng ký"
+  },
+  "methods": {
+    "title": "Chọn phương thức thanh toán",
+    "cancel": "Hủy",
+    "toss": "TossPayments (Hàn Quốc)",
+    "lemonsqueezy": "Thẻ quốc tế / PayPal",
+    "mock": "Kiểm thử admin",
+    "portone": "PortOne"
+  },
+  "toss": {
+    "opening": "Đang mở trang thanh toán…",
+    "confirming": "Đang xác nhận thanh toán…",
+    "close": "Đóng",
+    "success": {
+      "title": "Thanh toán hoàn tất!",
+      "body": "Thanh toán đã thành công. Bạn có thể đóng cửa sổ này."
+    },
+    "error": {
+      "title": "Thanh toán thất bại",
+      "body": "Vui lòng thử lại.",
+      "failed": "Không thể xử lý thanh toán.",
+      "not_configured": "Thanh toán chưa được thiết lập.",
+      "unknown_order": "Không tìm thấy đơn hàng này.",
+      "already_processed": "Đơn hàng này đã được xử lý."
+    }
   }
 }

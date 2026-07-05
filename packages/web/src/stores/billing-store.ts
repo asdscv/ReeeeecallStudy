@@ -4,9 +4,11 @@ import { useDeckStore } from './deck-store'
 import { getAiWalletSummary, type AiWalletSummary } from '@reeeeecall/shared/lib/ai/server-client'
 import {
   resolveProvider,
+  resolveProviders,
   mapPaymentIntent,
   type CheckoutResult,
   type RawPaymentIntent,
+  type PaymentProviderId,
 } from '../lib/payments'
 
 // ── Payment gate ────────────────────────────────────────────────────────────
@@ -17,10 +19,11 @@ import {
 export const PAYMENTS_ENABLED =
   String(import.meta.env.VITE_PAYMENTS_ENABLED ?? '') === 'true'
 
-// The checkout is only truly live when the gate is ON *and* a provider adapter is
-// wired (VITE_PAYMENT_PROVIDER=mock|portone). With no provider the UI shows the
-// coming-soon state. Components should gate on this, not on PAYMENTS_ENABLED alone.
-export const PAYMENTS_ACTIVE = PAYMENTS_ENABLED && resolveProvider() !== null
+// The checkout is only truly live when the gate is ON *and* at least one provider
+// adapter is configured (VITE_PAYMENT_PROVIDERS='toss,lemonsqueezy', each with its keys).
+// With no provider the UI shows the coming-soon state. Components gate on this, not on
+// PAYMENTS_ENABLED alone.
+export const PAYMENTS_ACTIVE = PAYMENTS_ENABLED && resolveProviders().size > 0
 
 export type CheckoutStatus = 'idle' | 'processing' | 'success' | 'canceled'
 
@@ -130,6 +133,9 @@ interface BillingState {
   // UI can render a coming-soon banner near the button that was pressed.
   comingSoon: boolean
   checkoutProductId: string | null
+  // The provider id the in-flight checkout was started with, so the spinner/status can
+  // scope to the exact button pressed when a product is buyable via multiple providers.
+  checkoutProviderId: PaymentProviderId | null
   // Reflects an in-flight / resolved provider checkout for the UI (spinner,
   // success/canceled note). Scoped to `checkoutProductId`.
   checkoutStatus: CheckoutStatus
@@ -139,7 +145,7 @@ interface BillingState {
   fetchProducts: () => Promise<void>
   fetchSubscription: () => Promise<void>
   fetchWallet: () => Promise<void>
-  startCheckout: (productId: string) => Promise<void>
+  startCheckout: (productId: string, providerId?: PaymentProviderId) => Promise<void>
   // Consumes a redirect-provider return (?pay=success|cancel&mu=…) on the
   // /settings landing: on success refreshes every entitlement surface and flips
   // checkoutStatus to 'success'; on cancel flips to 'canceled'. Strips the params
@@ -210,6 +216,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
   error: null,
   comingSoon: false,
   checkoutProductId: null,
+  checkoutProviderId: null,
   checkoutStatus: 'idle',
   paymentsEnabled: PAYMENTS_ENABLED,
   paymentsActive: PAYMENTS_ACTIVE,
@@ -246,15 +253,17 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     set({ wallet: summary, walletState: 'ready' })
   },
 
-  startCheckout: async (productId: string) => {
-    const provider = resolveProvider()
+  startCheckout: async (productId: string, providerId?: PaymentProviderId) => {
+    // Resolve the user's chosen provider (or the default/first enabled when omitted).
+    const provider = resolveProvider(providerId)
 
-    // GATE: payments off or no provider adapter wired → coming soon. Never call a
-    // provider while off. (Equivalent to !PAYMENTS_ACTIVE.)
+    // GATE: payments off or the chosen provider isn't configured → coming soon. Never
+    // call a provider while off. (Equivalent to !PAYMENTS_ACTIVE for that provider.)
     if (!PAYMENTS_ENABLED || provider === null) {
       set({
         comingSoon: true,
         checkoutProductId: productId,
+        checkoutProviderId: providerId ?? null,
         checkoutStatus: 'idle',
         error: null,
       })
@@ -264,6 +273,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     set({
       comingSoon: false,
       checkoutProductId: productId,
+      checkoutProviderId: (provider.id as PaymentProviderId) ?? providerId ?? null,
       checkoutStatus: 'processing',
       error: null,
     })
@@ -382,5 +392,5 @@ export const useBillingStore = create<BillingState>((set, get) => ({
   },
 
   clearComingSoon: () =>
-    set({ comingSoon: false, checkoutProductId: null, checkoutStatus: 'idle' }),
+    set({ comingSoon: false, checkoutProductId: null, checkoutProviderId: null, checkoutStatus: 'idle' }),
 }))

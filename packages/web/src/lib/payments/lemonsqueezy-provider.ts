@@ -98,6 +98,13 @@ async function currentUserEmail(): Promise<string | null> {
 export class LemonsqueezyProvider implements PaymentProvider {
   readonly id = 'lemonsqueezy'
   readonly redirects = true // hosted checkout on <store>.lemonsqueezy.com
+  readonly labelKey = 'methods.lemonsqueezy'
+  isAvailable(): boolean {
+    const store = String(import.meta.env.VITE_LEMONSQUEEZY_STORE ?? '').trim()
+    const variants = parseVariants(String(import.meta.env.VITE_LEMONSQUEEZY_VARIANTS ?? ''))
+    return !!store && Object.keys(variants).length > 0
+  }
+  supports(): boolean { return true }
 
   async checkout(intent: PaymentIntent, target?: Window | null): Promise<CheckoutResult> {
     const store = String(import.meta.env.VITE_LEMONSQUEEZY_STORE ?? '').trim()
