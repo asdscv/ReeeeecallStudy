@@ -5,6 +5,7 @@ import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { TopUpModal } from '../billing/TopUpModal'
+import { CreditLedgerList } from './CreditLedgerList'
 
 // AI wallet / usage content for the Settings accordion section (충전금·사용량):
 // prepaid ₩ balance, today's free-tier usage, and recent spend/top-up history
@@ -24,8 +25,6 @@ export function WalletSummary() {
 
   const dateLocale = toIntlLocale(i18n.language)
   const fmtWon = (won: number) => `₩${won.toLocaleString(dateLocale)}`
-  const fmtDate = (iso: string) =>
-    new Date(iso).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   if (!summary && (walletState === 'loading' || walletState === 'idle')) {
     return <div className="flex items-center justify-center py-8 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /></div>
@@ -81,30 +80,9 @@ export function WalletSummary() {
         <p className="text-xs text-muted-foreground mt-2">{t('free.note')}</p>
       </div>
 
-      {/* History */}
-      <div className="pt-4 border-t border-border">
-        <p className="text-sm font-semibold text-foreground mb-2">{t('history.title')}</p>
-        {summary.ledger.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-2 text-center">{t('history.empty')}</p>
-        ) : (
-          <ul className="divide-y divide-border">
-            {summary.ledger.map((e, i) => {
-              const positive = e.delta >= 0
-              return (
-                <li key={i} className="flex items-center justify-between py-2.5">
-                  <div>
-                    <p className="text-sm text-foreground">{t(`reason.${e.reason}`, { defaultValue: e.reason })}</p>
-                    <p className="text-xs text-muted-foreground">{fmtDate(e.createdAt)}</p>
-                  </div>
-                  <span className={`text-sm font-semibold tabular-nums ${positive ? 'text-success' : 'text-destructive'}`}>
-                    {positive ? '+' : '−'}{fmtWon(microWonToWon(Math.abs(e.delta)))}
-                  </span>
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </div>
+      {/* History — infinite scroll via get_ai_credit_ledger (mig 130); reloads page 1
+          when the balance moves (a top-up/spend) so a new entry appears live. */}
+      <CreditLedgerList refreshKey={summary.balanceMicroWon} />
     </div>
   )
 }

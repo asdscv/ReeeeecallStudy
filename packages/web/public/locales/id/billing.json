@@ -32,5 +32,14 @@
     "perMonth": "/bln",
     "select": "Pilih",
     "current": "Paket saat ini"
+  },
+  "paymentHistory": {
+    "title": "Riwayat pembayaran",
+    "empty": "Belum ada pembayaran.",
+    "refunded": "Dikembalikan",
+    "kind": {
+      "credit_pack": "Kredit",
+      "subscription": "Langganan"
+    }
   }
 }

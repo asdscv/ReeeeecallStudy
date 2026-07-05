@@ -186,3 +186,32 @@ export async function getAiWalletSummary(): Promise<AiWalletSummary | null> {
     })),
   }
 }
+
+// A ledger row WITH its identity id, for keyset pagination. The summary's inline
+// ledger (above) omits id; this paginated path — get_ai_credit_ledger (mig 130) —
+// includes it so the wallet "usage history" (사용 내역) can infinite-scroll. Pass the
+// smallest id you've seen as `beforeId` to fetch the next older page; omit for page 1.
+// A short page (< limit) means the end. Fails open to [] on a transient error.
+export interface WalletLedgerRow extends WalletLedgerEntry {
+  id: number
+}
+
+export async function getAiCreditLedger(
+  beforeId?: number,
+  limit = 30,
+): Promise<WalletLedgerRow[]> {
+  const { data, error } = await supabase.rpc('get_ai_credit_ledger', {
+    p_limit: limit,
+    p_before_id: beforeId ?? null,
+  })
+  if (error || !data) return []
+  return (
+    data as Array<{ id: number; delta: number; reason: string; balance_after: number; created_at: string }>
+  ).map((r) => ({
+    id: Number(r.id),
+    delta: Number(r.delta),
+    reason: String(r.reason),
+    balanceAfter: Number(r.balance_after),
+    createdAt: String(r.created_at),
+  }))
+}

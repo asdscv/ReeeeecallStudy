@@ -32,5 +32,14 @@
     "perMonth": "/월",
     "select": "선택",
     "current": "현재 플랜"
+  },
+  "paymentHistory": {
+    "title": "결제 내역",
+    "empty": "결제 내역이 없어요.",
+    "refunded": "환불됨",
+    "kind": {
+      "credit_pack": "충전",
+      "subscription": "구독"
+    }
   }
 }

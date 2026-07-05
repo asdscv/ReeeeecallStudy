@@ -32,5 +32,14 @@
     "perMonth": "/tháng",
     "select": "Chọn",
     "current": "Gói hiện tại"
+  },
+  "paymentHistory": {
+    "title": "Lịch sử thanh toán",
+    "empty": "Chưa có thanh toán nào.",
+    "refunded": "Đã hoàn tiền",
+    "kind": {
+      "credit_pack": "Tín dụng",
+      "subscription": "Đăng ký"
+    }
   }
 }
