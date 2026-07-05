@@ -32,5 +32,14 @@
     "perMonth": "/เดือน",
     "select": "เลือก",
     "current": "แพ็กเกจปัจจุบัน"
+  },
+  "paymentHistory": {
+    "title": "ประวัติการชำระเงิน",
+    "empty": "ยังไม่มีการชำระเงิน",
+    "refunded": "คืนเงินแล้ว",
+    "kind": {
+      "credit_pack": "เครดิต",
+      "subscription": "การสมัครสมาชิก"
+    }
   }
 }

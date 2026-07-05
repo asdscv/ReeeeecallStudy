@@ -14,6 +14,7 @@ import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
+import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
 import {
   loadSettings,
@@ -42,6 +43,7 @@ function GroupLabel({ children }: { children: ReactNode }) {
 export function SettingsPage() {
   const { t, i18n } = useTranslation('settings')
   const { t: tWallet } = useTranslation('wallet')
+  const { t: tBilling } = useTranslation('billing')
   const { changeLanguage } = useLocale()
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
@@ -382,6 +384,14 @@ export function SettingsPage() {
               </CollapsibleSection>
             )
           })()}
+
+          {/* ── Payment history (orders + subscriptions) ── */}
+          <CollapsibleSection
+            title={tBilling('paymentHistory.title')}
+            icon={<span className="text-base">🧾</span>}
+          >
+            <PaymentHistory />
+          </CollapsibleSection>
         </div>
 
         {/* ── Study ── */}

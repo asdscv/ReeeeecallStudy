@@ -32,5 +32,14 @@
     "perMonth": "/mo",
     "select": "Select",
     "current": "Current plan"
+  },
+  "paymentHistory": {
+    "title": "Payment history",
+    "empty": "No payments yet.",
+    "refunded": "Refunded",
+    "kind": {
+      "credit_pack": "Credits",
+      "subscription": "Subscription"
+    }
   }
 }

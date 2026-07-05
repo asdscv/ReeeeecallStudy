@@ -32,5 +32,14 @@
     "perMonth": "/月",
     "select": "选择",
     "current": "当前方案"
+  },
+  "paymentHistory": {
+    "title": "支付记录",
+    "empty": "暂无支付记录。",
+    "refunded": "已退款",
+    "kind": {
+      "credit_pack": "充值",
+      "subscription": "订阅"
+    }
   }
 }
