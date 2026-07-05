@@ -41,5 +41,10 @@
       "credit_pack": "Créditos",
       "subscription": "Suscripción"
     }
+  },
+  "manageSubscription": {
+    "button": "Gestionar suscripción",
+    "hint": "Cancela, cambia de plan o actualiza tu método de pago.",
+    "error": "No se pudo abrir la página de gestión. Inténtalo de nuevo."
   }
 }

@@ -41,5 +41,10 @@
       "credit_pack": "Tín dụng",
       "subscription": "Đăng ký"
     }
+  },
+  "manageSubscription": {
+    "button": "Quản lý đăng ký",
+    "hint": "Hủy, đổi gói hoặc cập nhật phương thức thanh toán.",
+    "error": "Không thể mở trang quản lý. Vui lòng thử lại."
   }
 }

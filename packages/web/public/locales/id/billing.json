@@ -41,5 +41,10 @@
       "credit_pack": "Kredit",
       "subscription": "Langganan"
     }
+  },
+  "manageSubscription": {
+    "button": "Kelola langganan",
+    "hint": "Batalkan, ganti paket, atau perbarui metode pembayaran.",
+    "error": "Tidak dapat membuka halaman pengelolaan. Coba lagi."
   }
 }

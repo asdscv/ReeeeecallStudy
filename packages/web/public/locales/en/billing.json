@@ -41,5 +41,10 @@
       "credit_pack": "Credits",
       "subscription": "Subscription"
     }
+  },
+  "manageSubscription": {
+    "button": "Manage subscription",
+    "hint": "Cancel, change plan, or update your payment method.",
+    "error": "Couldn't open the management page. Please try again."
   }
 }

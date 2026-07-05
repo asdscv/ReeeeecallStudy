@@ -41,5 +41,10 @@
       "credit_pack": "충전",
       "subscription": "구독"
     }
+  },
+  "manageSubscription": {
+    "button": "구독 관리",
+    "hint": "해지 · 플랜 변경 · 결제수단을 여기서 관리해요.",
+    "error": "관리 페이지를 열 수 없어요. 잠시 후 다시 시도해 주세요."
   }
 }

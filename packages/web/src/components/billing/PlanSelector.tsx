@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Loader2, Check } from 'lucide-react'
+import { Loader2, Check, ExternalLink } from 'lucide-react'
 import { toIntlLocale } from '../../lib/locale-utils'
+import { supabase } from '../../lib/supabase'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 
 // A card_limit at or above this sentinel means "unlimited" for DISPLAY only. The DB
@@ -40,6 +41,39 @@ export function PlanSelector() {
   const fetchProducts = useBillingStore((s) => s.fetchProducts)
   const fetchSubscription = useBillingStore((s) => s.fetchSubscription)
   const startCheckout = useBillingStore((s) => s.startCheckout)
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState(false)
+
+  // Open LemonSqueezy's hosted customer portal (cancel / change plan / update card).
+  // LS is Merchant of Record, so we never mutate the subscription ourselves — the
+  // portal does, and the resulting subscription_updated/cancelled webhook syncs it
+  // back. The signed URL is fetched per click (subscription-portal edge fn). A blank
+  // tab is pre-opened INSIDE the click gesture so the popup isn't blocked after the
+  // async call; null (blocked) → same-tab fallback.
+  const openPortal = async () => {
+    if (portalLoading) return
+    setPortalError(false)
+    const tab = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null
+    setPortalLoading(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('subscription-portal', {
+        method: 'POST',
+      })
+      const url = (data as { url?: string } | null)?.url
+      if (error || !url) {
+        tab?.close()
+        setPortalError(true)
+        return
+      }
+      if (tab && !tab.closed) tab.location.href = url
+      else window.location.href = url
+    } catch {
+      tab?.close()
+      setPortalError(true)
+    } finally {
+      setPortalLoading(false)
+    }
+  }
 
   // Load on mount, reusing the store's cache: only fetch the catalog if it's empty
   // (TopUpModal / SubscribeButton may already have populated it). Subscription is a
@@ -146,6 +180,30 @@ export function PlanSelector() {
           )
         })}
       </ul>
+
+      {/* Manage (cancel / downgrade / change card) via the LS customer portal — only
+          when the user actually holds a subscription. */}
+      {PAYMENTS_ACTIVE && currentProductId != null && (
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => void openPortal()}
+            disabled={portalLoading}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60"
+          >
+            {portalLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ExternalLink className="h-4 w-4" />
+            )}
+            {t('manageSubscription.button')}
+          </button>
+          <p className="mt-1.5 text-xs text-muted-foreground">{t('manageSubscription.hint')}</p>
+          {portalError && (
+            <p className="mt-1 text-xs text-destructive">{t('manageSubscription.error')}</p>
+          )}
+        </div>
+      )}
 
       {cancelPending && (
         <p className="mt-2 text-xs text-muted-foreground">
