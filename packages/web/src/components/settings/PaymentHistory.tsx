@@ -44,7 +44,13 @@ export function PaymentHistory() {
 
   const dateLocale = toIntlLocale(i18n.language)
   const fmtDate = (iso: string) =>
-    new Date(iso).toLocaleDateString(dateLocale, { year: 'numeric', month: 'short', day: 'numeric' })
+    new Date(iso).toLocaleString(dateLocale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
   const fmtUsd = (cents: number | null | undefined) => `$${((cents ?? 0) / 100).toFixed(2)}`
 
   const loadMore = useCallback(async () => {
