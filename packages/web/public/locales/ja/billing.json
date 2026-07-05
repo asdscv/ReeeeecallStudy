@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "クレジット",
       "subscription": "サブスク"
+    },
+    "reason": {
+      "renewal": "更新",
+      "updated": "プラン変更"
     }
   },
   "manageSubscription": {

@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "เครดิต",
       "subscription": "การสมัครสมาชิก"
+    },
+    "reason": {
+      "renewal": "ต่ออายุ",
+      "updated": "เปลี่ยนแพ็กเกจ"
     }
   },
   "manageSubscription": {

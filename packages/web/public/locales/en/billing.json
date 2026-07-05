@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "Credits",
       "subscription": "Subscription"
+    },
+    "reason": {
+      "renewal": "Renewal",
+      "updated": "Plan change"
     }
   },
   "manageSubscription": {
