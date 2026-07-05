@@ -6,7 +6,7 @@
   "balance": {
     "title": "Saldo",
     "hint": "Crédito prepago para la generación de tarjetas IA más allá de las tarjetas gratis diarias.",
-    "topUp": "Recargar (próximamente)",
+    "topUp": "Recargar",
     "topUpSoon": "La recarga estará disponible pronto."
   },
   "free": {
