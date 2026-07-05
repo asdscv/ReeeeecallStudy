@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "충전",
       "subscription": "구독"
+    },
+    "reason": {
+      "renewal": "갱신",
+      "updated": "변경"
     }
   },
   "manageSubscription": {

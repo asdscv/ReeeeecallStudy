@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "Kredit",
       "subscription": "Langganan"
+    },
+    "reason": {
+      "renewal": "Perpanjangan",
+      "updated": "Perubahan paket"
     }
   },
   "manageSubscription": {

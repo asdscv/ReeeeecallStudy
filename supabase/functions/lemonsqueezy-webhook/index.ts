@@ -352,6 +352,35 @@ Deno.serve(async (req) => {
       p_cancel_at_period_end: cancel,
     }) as unknown as Promise<RpcResult>
 
+  // Best-effort: record a subscription INVOICE (initial/renewal/refund) so the payment
+  // history can show recurring charges. NEVER affects the response — the entitlement
+  // grant already happened via syncSub/revoke; a record miss just omits a history row
+  // (LS retries the whole delivery anyway, and the RPC is idempotent on the invoice id).
+  // The invoice's data.id is the invoice id; the sub id is attrs.subscription_id.
+  const recordInvoice = async (status: string): Promise<void> => {
+    if (!dataId || !invoiceSubId) return
+    const urls = (attrs.urls ?? {}) as Record<string, unknown>
+    const rawAmt = attrs.total_usd
+    const amount = rawAmt == null || rawAmt === '' || !Number.isFinite(Number(rawAmt))
+      ? null
+      : Number(rawAmt)
+    try {
+      const { error } = await sb.rpc('record_subscription_invoice', {
+        p_provider: 'lemonsqueezy',
+        p_provider_invoice_id: dataId,
+        p_provider_subscription_id: invoiceSubId,
+        p_amount_usd_cents: amount,
+        p_billing_reason: asStr(attrs.billing_reason),
+        p_status: status,
+        p_invoice_url: asStr(urls.invoice_url),
+        p_created_at: asStr(attrs.created_at),
+      })
+      if (error) console.error('[lemonsqueezy-webhook] record_subscription_invoice failed:', error.message)
+    } catch (e) {
+      console.error('[lemonsqueezy-webhook] record_subscription_invoice threw:', e)
+    }
+  }
+
   switch (event) {
     // ── FIRST GRANT ────────────────────────────────────────────────────────────────
     // Credit pack (one-time order). A SUBSCRIPTION purchase ALSO fires order_created, but
@@ -459,7 +488,9 @@ Deno.serve(async (req) => {
       // the invoice payload, so period_end stays whatever subscription_updated set on
       // this same renewal (COALESCE keeps it) — see the ASSUMPTIONS note in the header.
       if (!invoiceSubId) return badMissing('subscription id', event)
-      return lifecycleResult(await syncSub(invoiceSubId, 'active', renewsAt, false), event)
+      const r = await syncSub(invoiceSubId, 'active', renewsAt, false)
+      await recordInvoice(asStr(attrs.status) ?? 'paid') // history row (renewal charge)
+      return lifecycleResult(r, event)
     }
 
     // ── REFUND / CHARGEBACK — hard kill now (drop the card-limit grant immediately) ──
@@ -469,6 +500,7 @@ Deno.serve(async (req) => {
         p_provider: 'lemonsqueezy',
         p_provider_subscription_id: invoiceSubId,
       }) as unknown as RpcResult
+      await recordInvoice('refunded') // mark the invoice refunded in history (idempotent)
       return lifecycleResult(res, event)
     }
 

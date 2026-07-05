@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "充值",
       "subscription": "订阅"
+    },
+    "reason": {
+      "renewal": "续订",
+      "updated": "套餐变更"
     }
   },
   "manageSubscription": {

@@ -40,6 +40,10 @@
     "kind": {
       "credit_pack": "Tín dụng",
       "subscription": "Đăng ký"
+    },
+    "reason": {
+      "renewal": "Gia hạn",
+      "updated": "Đổi gói"
     }
   },
   "manageSubscription": {
