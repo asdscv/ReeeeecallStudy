@@ -56,8 +56,8 @@
   "methods": {
     "title": "选择支付方式",
     "cancel": "取消",
-    "toss": "TossPayments（韩国）",
-    "lemonsqueezy": "国际卡 / PayPal",
+    "toss": "TossPayments",
+    "lemonsqueezy": "LemonSqueezy",
     "mock": "管理员测试",
     "portone": "PortOne"
   },

@@ -56,8 +56,8 @@
   "methods": {
     "title": "Elige un método de pago",
     "cancel": "Cancelar",
-    "toss": "TossPayments (Corea)",
-    "lemonsqueezy": "Tarjeta internacional / PayPal",
+    "toss": "TossPayments",
+    "lemonsqueezy": "LemonSqueezy",
     "mock": "Prueba de admin",
     "portone": "PortOne"
   },
