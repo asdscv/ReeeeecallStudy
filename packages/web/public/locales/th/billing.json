@@ -56,8 +56,8 @@
   "methods": {
     "title": "เลือกวิธีชำระเงิน",
     "cancel": "ยกเลิก",
-    "toss": "TossPayments (เกาหลี)",
-    "lemonsqueezy": "บัตรต่างประเทศ / PayPal",
+    "toss": "TossPayments",
+    "lemonsqueezy": "LemonSqueezy",
     "mock": "ทดสอบผู้ดูแล",
     "portone": "PortOne"
   },

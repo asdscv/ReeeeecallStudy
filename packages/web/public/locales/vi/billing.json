@@ -56,8 +56,8 @@
   "methods": {
     "title": "Chọn phương thức thanh toán",
     "cancel": "Hủy",
-    "toss": "TossPayments (Hàn Quốc)",
-    "lemonsqueezy": "Thẻ quốc tế / PayPal",
+    "toss": "TossPayments",
+    "lemonsqueezy": "LemonSqueezy",
     "mock": "Kiểm thử admin",
     "portone": "PortOne"
   },

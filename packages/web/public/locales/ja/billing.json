@@ -56,8 +56,8 @@
   "methods": {
     "title": "決済手段を選択",
     "cancel": "キャンセル",
-    "toss": "トスペイメンツ（韓国）",
-    "lemonsqueezy": "海外カード / PayPal",
+    "toss": "TossPayments",
+    "lemonsqueezy": "LemonSqueezy",
     "mock": "管理者テスト",
     "portone": "PortOne"
   },

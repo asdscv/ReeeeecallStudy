@@ -56,8 +56,8 @@
   "methods": {
     "title": "결제 수단 선택",
     "cancel": "취소",
-    "toss": "토스페이먼츠 (국내 카드)",
-    "lemonsqueezy": "해외 결제 (카드·페이팔)",
+    "toss": "토스페이먼츠",
+    "lemonsqueezy": "LemonSqueezy",
     "mock": "관리자 테스트",
     "portone": "포트원"
   },
