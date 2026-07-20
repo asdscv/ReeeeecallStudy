@@ -58,7 +58,7 @@ interface AIGenerateState {
 const initialState = {
   mode: 'full' as GenerateMode,
   topic: '',
-  cardCount: 20,
+  cardCount: 10,   // matches the free daily cap (10/day); ConfigStep further defaults to today's remaining free
   useCustomHtml: false,
   contentLang: '',
   fieldHints: [] as FieldHint[],
@@ -103,6 +103,9 @@ function mapError(err: unknown): string {
   if (msg === 'AI_INSUFFICIENT_CREDITS' || msg === 'AI_QUOTA_EXCEEDED') return t('insufficientCredits')
   if (msg === 'AI_RATE_CAP' || msg === 'RATE_LIMITED') return t('rateLimited')
   if (msg === 'INVALID_RESPONSE' || msg === 'ALL_CARDS_INVALID') return t('invalidResponse')
+  // AI_EMPTY_RESULT: the server produced no cards → it RELEASED the reservation (no quota /
+  // wallet was spent). Tell the user to retry, and reassure them nothing was charged.
+  if (msg === 'AI_EMPTY_RESULT') return t('emptyResult')
   if (msg === 'AI_PROVIDER_ERROR' || msg === 'AI_PROVIDER_AUTH' || msg === 'AI_NOT_CONFIGURED' || msg === 'AI_METER_ERROR' || msg === 'SERVER_ERROR') {
     return t('serverError')
   }

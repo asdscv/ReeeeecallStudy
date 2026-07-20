@@ -146,6 +146,7 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "Error del servidor de IA. Vuelva a intentarlo más tarde.",
+    "emptyResult": "La IA no generó tarjetas. Inténtalo de nuevo: no se te ha cobrado.",
     "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más."
   },
   "button": {

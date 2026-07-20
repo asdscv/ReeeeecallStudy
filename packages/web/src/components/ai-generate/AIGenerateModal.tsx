@@ -87,7 +87,7 @@ export function AIGenerateModal({
     store.setConfig({
       mode: 'cards_only',
       topic: prevTopic,
-      cardCount: 20,
+      cardCount: 10,
       useCustomHtml: false,
       existingTemplateId: templateId,
       existingDeckId: deckId,
