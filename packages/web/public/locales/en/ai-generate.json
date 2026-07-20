@@ -146,6 +146,7 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AI server error. Please try again later.",
+    "emptyResult": "The AI generated no cards. Please try again — you weren't charged.",
     "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more."
   },
   "button": {

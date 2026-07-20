@@ -146,6 +146,7 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "Kesalahan server AI. Silakan coba lagi nanti.",
+    "emptyResult": "AI tidak menghasilkan kartu. Silakan coba lagi — Anda tidak dikenai biaya.",
     "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
   },
   "button": {

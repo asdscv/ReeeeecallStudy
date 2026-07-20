@@ -146,6 +146,7 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AIサーバーエラーです。しばらくしてから再度お試しください。",
+    "emptyResult": "AIがカードを生成できませんでした。もう一度お試しください（料金は発生していません）。",
     "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。"
   },
   "button": {
