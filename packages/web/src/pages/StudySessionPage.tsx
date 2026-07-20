@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { X, Undo2, Keyboard } from 'lucide-react'
+import { X, Undo2, Keyboard, Lock } from 'lucide-react'
 import { useStudyStore } from '../stores/study-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useAchievementStore } from '../stores/achievement-store'
@@ -38,6 +38,7 @@ export function StudySessionPage() {
     config,
     template,
     srsSettings,
+    subscriptionLocked,
     queue,
     currentIndex,
     isFlipped,
@@ -280,6 +281,26 @@ export function StudySessionPage() {
             <Skeleton className="h-4 w-1/3" />
           </div>
           <span className="sr-only">{t('session.loading')}</span>
+        </div>
+      </div>
+    )
+  }
+
+  // Over-cap subscribed deck → study-locked (mig 138). Cards stay viewable; studying
+  // requires raising the card limit (subscribe / upgrade). Distinct from "no cards due".
+  if (subscriptionLocked) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-2xl border border-warning/30 bg-warning/10 p-6 text-center">
+          <Lock className="mx-auto mb-3 h-8 w-8 text-warning" />
+          <h2 className="text-lg font-semibold text-foreground">{t('subscriptionLocked.title')}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{t('subscriptionLocked.desc')}</p>
+          <button
+            onClick={() => { reset(); navigate(`/decks/${deckId}`) }}
+            className="mt-5 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground"
+          >
+            {t('subscriptionLocked.back')}
+          </button>
         </div>
       </div>
     )

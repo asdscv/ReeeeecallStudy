@@ -121,5 +121,10 @@
     "got_it": "Got It",
     "unknown": "Unknown",
     "known": "Known"
+  },
+  "subscriptionLocked": {
+    "title": "学习锁定",
+    "desc": "此订阅的牌组已超出你的卡片上限。订阅或提高上限即可学习 — 你的卡片仍会保存。",
+    "back": "返回牌组"
   }
 }

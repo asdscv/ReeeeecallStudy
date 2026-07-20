@@ -16,6 +16,8 @@ import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
+import { CardUsagePanel } from '../components/billing/CardUsagePanel'
+import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
 import {
   loadSettings,
   saveSettings,
@@ -50,8 +52,15 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const cardUsage = useDeckStore((s) => s.cardUsage)
   const fetchCardUsage = useDeckStore((s) => s.fetchCardUsage)
+  const cardUsageDetail = useDeckStore((s) => s.cardUsageDetail)
+  const fetchCardUsageDetail = useDeckStore((s) => s.fetchCardUsageDetail)
 
-  useEffect(() => { void fetchCardUsage() }, [fetchCardUsage])
+  useEffect(() => {
+    registerCardUsageDetailInterest()
+    void fetchCardUsage()
+    void fetchCardUsageDetail()
+    return () => releaseCardUsageDetailInterest()
+  }, [fetchCardUsage, fetchCardUsageDetail])
 
   const [loading, setLoading] = useState(true)
 
@@ -362,25 +371,14 @@ export function SettingsPage() {
                   </span>
                 }
               >
-                {unlimited ? (
-                  <p className="text-sm font-semibold text-brand">{t('cardUsage.unlimited')}</p>
+                {cardUsageDetail ? (
+                  <CardUsagePanel detail={cardUsageDetail} />
                 ) : (
-                  <div className="h-2 rounded-full bg-accent overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
-                      style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
-                    />
-                  </div>
+                  <div className="h-24 animate-pulse rounded-xl bg-accent" aria-hidden />
                 )}
-                <p className="text-xs text-muted-foreground mt-3">
-                  {unlimited
-                    ? t('cardUsage.planNoteUnlimited')
-                    : t('cardUsage.planNote', { limit: cardUsage.limit })}
-                </p>
-                <PlanSelector />
-                {!unlimited && cardUsage.available <= 0 && (
-                  <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
-                )}
+                <div className="mt-5 border-t border-border pt-4">
+                  <PlanSelector />
+                </div>
               </CollapsibleSection>
             )
           })()}

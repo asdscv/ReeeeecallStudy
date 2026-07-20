@@ -9,6 +9,7 @@ import { isPast, formatLocalDate } from '../lib/date-utils'
 import { getPageSelectAllState, togglePageSelectAll } from '../lib/card-selection'
 import { useCardStore } from '../stores/card-store'
 import { useSyncStore } from '../stores/sync-store'
+import { useAuthStore } from '../stores/auth-store'
 import { useArchiveThreshold } from '../hooks/useArchiveThreshold'
 import { SubscribeButton } from '../components/billing/SubscribeButton'
 import { CardFormModal } from '../components/card/CardFormModal'
@@ -30,6 +31,7 @@ export function DeckDetailPage() {
   const dateLocale = toIntlLocale(i18n.language)
   const { deckId } = useParams<{ deckId: string }>()
   const navigate = useNavigate()
+  const currentUserId = useAuthStore((s) => s.user?.id)
 
   const { cards, loading: cardsLoading, fetchCards } = useCardStore()
   const { pendingCounts, syncing, syncSubscribedDeck, fetchPendingCount } = useSyncStore()
@@ -114,6 +116,9 @@ export function DeckDetailPage() {
   // cards.length so a create/delete re-checks the boundary + per-deck count.
   const archive = useArchiveThreshold(deckId, {
     enabled: !!deck && !deck.is_readonly,
+    // A subscribed (non-owned) deck can be study-locked as a whole when over cap
+    // (mig 138) — surface its locked count in the deck note even though it's readonly.
+    subscribed: !!deck && !!currentUserId && deck.user_id !== currentUserId,
     refreshKey: cards.length,
   })
 

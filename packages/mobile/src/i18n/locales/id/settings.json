@@ -168,7 +168,26 @@
     "upgradeSoon": "Langganan akan segera hadir.",
     "cancelPending": "Langganan akan berakhir — akses hingga {{date}}",
     "countUnlimited": "{{owned}} / Tak terbatas",
-    "planNoteUnlimited": "Batas kartu milikmu tak terbatas."
+    "planNoteUnlimited": "Batas kartu milikmu tak terbatas.",
+    "detail": {
+      "title": "Penyimpanan kartu",
+      "subtitle": "Kartu milik dan kartu langganan dihitung dalam batas paket. Dek resmi tidak dihitung.",
+      "own": "Kartu saya",
+      "subscribed": "Langganan",
+      "official": "Dek resmi",
+      "officialNote": "Tidak dihitung dalam batas",
+      "archived": "Diarsipkan",
+      "archivedNote": "Belajar terkunci",
+      "archivedCount": "{{count}} diarsipkan",
+      "remaining": "{{count}} tersisa",
+      "percentUsed": "{{percent}}% terpakai",
+      "nearLimit": "Mendekati batas",
+      "atLimit": "Batas tercapai",
+      "planUnlimited": "Paket tak terbatas",
+      "planCards": "Paket {{limit}} kartu",
+      "unlimitedTitle": "Penyimpanan tak terbatas",
+      "lifetimeTotal": "{{count}} kartu"
+    }
   },
   "groups": {
     "account": "Akun",

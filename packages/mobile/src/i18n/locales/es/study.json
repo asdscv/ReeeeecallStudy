@@ -121,5 +121,10 @@
     "got_it": "Got It",
     "unknown": "Unknown",
     "known": "Known"
+  },
+  "subscriptionLocked": {
+    "title": "Estudio bloqueado",
+    "desc": "Este mazo suscrito supera tu límite de tarjetas. Suscríbete o aumenta tu límite para estudiarlo — tus tarjetas se conservan.",
+    "back": "Volver al mazo"
   }
 }

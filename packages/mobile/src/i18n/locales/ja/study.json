@@ -121,5 +121,10 @@
     "got_it": "Got It",
     "unknown": "Unknown",
     "known": "Known"
+  },
+  "subscriptionLocked": {
+    "title": "学習ロック",
+    "desc": "この登録済みデッキはカードの上限を超えています。登録するか上限を上げると学習できます。カードはそのまま保存されます。",
+    "back": "デッキに戻る"
   }
 }
