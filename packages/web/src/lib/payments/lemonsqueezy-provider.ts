@@ -18,15 +18,16 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 //
 // Because Lemon Squeezy is Merchant of Record, the PRICE lives on the LS
 // product/variant, NOT in this code. The owner MUST set each LS variant's price to
-// match our billing_products catalog (₩1,000 / ₩5,000 / ₩10,000 credit packs and
-// ₩4,900 Pro-monthly) — otherwise the buyer is charged a figure that disagrees
-// with what confirm_payment grants.
+// match our billing_products catalog (three credit packs + the two card-storage
+// subscriptions: sub_5k_monthly and sub_unlimited_monthly) — otherwise the buyer is
+// charged a figure that disagrees with what confirm_payment grants.
 //
 // ── OWNER GO-LIVE CHECKLIST (the only work left before this charges real money) ──
-//   1. Create a Lemon Squeezy STORE, then a PRODUCT + VARIANT per catalog entry,
-//      each priced to match billing_products:
-//        credits_1000      → ₩1,000     credits_5000   → ₩5,000
-//        credits_10000     → ₩10,000    sub_pro_monthly→ ₩4,900 (monthly subscription)
+//   1. Create a Lemon Squeezy STORE, then a PRODUCT + VARIANT per ACTIVE catalog entry
+//      (the store currency is USD; prices need not numerically equal the ₩ catalog —
+//      grants key off the variant→product map, never the amount):
+//        credits_1000 / credits_5000 / credits_10000  (one-time credit packs)
+//        sub_5k_monthly (5,000-card plan) / sub_unlimited_monthly (unlimited)  (monthly subs)
 //   2. Set these WEB env vars (Cloudflare Pages project vars / .env — Vite exposes
 //      any `VITE_`-prefixed var to the client bundle at build time):
 //        VITE_LEMONSQUEEZY_STORE    = reeeeecall            (the store SUBDOMAIN only,

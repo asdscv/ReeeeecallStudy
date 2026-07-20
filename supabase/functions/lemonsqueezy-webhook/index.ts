@@ -44,7 +44,8 @@
 //   order_created (credit_pack)   → confirm_payment(3-arg)      (credit_pack intent only)
 //   order_created (subscription)  → NO-OP ack 200               (subscription_created grants)
 //   subscription_created          → activate_subscription_from_intent    (records sub id)
-//   subscription_updated          → sync_subscription(map(status), renews_at, cancelled)
+//   subscription_updated          → sync_subscription_plan(variant→product, status, …) when
+//                                    the variant maps (plan change), else sync_subscription
 //   subscription_cancelled        → sync_subscription('canceled', ends_at, cancel=true)
 //   subscription_resumed          → sync_subscription('active',  renews_at, cancel=false)
 //   subscription_unpaused         → sync_subscription('active',  renews_at, cancel=false)
@@ -275,6 +276,23 @@ function verifyVariant(
   return null
 }
 
+// PLAN-CHANGE support (AUDIT FIX, mig 134): resolve WHICH of our catalog products the
+// subscription now points at, from the payload's variant id via LEMONSQUEEZY_VARIANT_MAP.
+// Returns null (→ caller falls back to a status-only sync_subscription) when the map is
+// unset/invalid or the variant is unmapped — so behaviour is unchanged unless the map is
+// configured and the variant is recognised. Used by subscription_updated to keep
+// product_id/tier/card_limit in sync when a user upgrades/downgrades in the LS portal.
+function mappedProductForVariant(
+  event: string,
+  attrs: Record<string, unknown>,
+  vm: VariantMapState,
+): string | null {
+  if (vm.kind !== 'map') return null
+  const variantId = purchasedVariantId(event, attrs)
+  const mapped = variantId ? vm.map[variantId] : undefined
+  return mapped || null
+}
+
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
@@ -347,6 +365,21 @@ Deno.serve(async (req) => {
     sb.rpc('sync_subscription', {
       p_provider: 'lemonsqueezy',
       p_provider_subscription_id: subId,
+      p_status: status,
+      p_period_end: periodEnd,
+      p_cancel_at_period_end: cancel,
+    }) as unknown as Promise<RpcResult>
+
+  // Plan-aware lifecycle update (mig 134): like syncSub but ALSO sets the new catalog
+  // product's product_id/tier/card_limit — used on subscription_updated when the payload
+  // variant maps to one of our products, so an in-portal plan change re-derives the cap.
+  const syncSubPlan = (
+    subId: string, productId: string, status: string, periodEnd: string | null, cancel: boolean | null,
+  ) =>
+    sb.rpc('sync_subscription_plan', {
+      p_provider: 'lemonsqueezy',
+      p_provider_subscription_id: subId,
+      p_product_id: productId,
       p_status: status,
       p_period_end: periodEnd,
       p_cancel_at_period_end: cancel,
@@ -447,6 +480,15 @@ Deno.serve(async (req) => {
         // Unknown LS status — don't guess; ACK so LS stops retrying.
         console.warn('[lemonsqueezy-webhook] subscription_updated unmapped status:', attrs.status)
         return json({ received: true, event, unmappedStatus: attrs.status ?? null }, 200)
+      }
+      // PLAN-CHANGE (mig 134): an upgrade/downgrade in the LS portal fires
+      // subscription_updated with the NEW variant_id. If we can map it to one of our
+      // products, apply the plan (product_id/tier/card_limit) so the enforced card cap
+      // follows what the user now pays; else fall back to a status-only sync (unchanged
+      // behaviour when LEMONSQUEEZY_VARIANT_MAP is unset/unmapped).
+      const planProduct = mappedProductForVariant(event, attrs, variantMap)
+      if (planProduct) {
+        return lifecycleResult(await syncSubPlan(dataId, planProduct, status, renewsAt, cancelled), event)
       }
       return lifecycleResult(await syncSub(dataId, status, renewsAt, cancelled), event)
     }

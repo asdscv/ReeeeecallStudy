@@ -205,7 +205,11 @@
     "faq": "FAQ",
     "blog": "インサイト",
     "help": "ヘルプ",
-    "language": "言語"
+    "language": "言語",
+    "legal": "法的情報",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "refund": "返金ポリシー"
   },
   "floatingCta": "今すぐ始める",
   "faq": {

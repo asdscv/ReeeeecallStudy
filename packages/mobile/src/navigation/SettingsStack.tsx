@@ -7,7 +7,7 @@ import { AIGenerateScreen } from '../screens/AIGenerateScreen'
 // 복원 시: 아래 import 및 <Stack.Screen name="Paywall"> 주석 해제.
 // 연관: SettingsScreen "Upgrade to Pro" 버튼, navigation/types.ts Paywall 타입
 // ─────────────────────────────────────────────────────────────────────────
-// import { PaywallScreen } from '../screens/PaywallScreen'
+import { PaywallScreen } from '../screens/PaywallScreen'
 import { GuideScreen } from '../screens/GuideScreen'
 import { TemplatesListScreen } from '../screens/TemplatesListScreen'
 import { TemplateEditScreen } from '../screens/TemplateEditScreen'
@@ -23,8 +23,8 @@ export function SettingsStack() {
     <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
       <Stack.Screen name="SettingsHome" component={SettingsScreen} />
       <Stack.Screen name="AIGenerate" component={AIGenerateScreen} />
-      {/* [SUBSCRIPTION-HIDDEN] Paywall 라우트 — 복원 시 주석 해제 */}
-      {/* <Stack.Screen name="Paywall" component={PaywallScreen} /> */}
+      {/* Paywall 라우트 — 화면 자체는 SUBSCRIPTION_UI_ENABLED로 게이트됨(꺼지면 빈 화면). */}
+      <Stack.Screen name="Paywall" component={PaywallScreen} />
       <Stack.Screen name="Guide" component={GuideScreen} />
       <Stack.Screen name="TemplatesList" component={TemplatesListScreen} />
       <Stack.Screen name="TemplateEdit" component={TemplateEditScreen} />

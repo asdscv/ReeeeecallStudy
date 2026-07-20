@@ -33,8 +33,9 @@
 //   RENEWAL / UNCANCELLATION / PRODUCT_CHANGE
 //                                → sync_subscription_by_user(active,  new expiry, cancel=false)
 //   CANCELLATION (auto-renew off)→ sync_subscription('canceled', expiry, cancel=true)
-//   CANCELLATION (CUSTOMER_SUPPORT refund) / REFUND / CHARGEBACK
-//                                → revoke_subscription → status='refunded' (drop access now)
+//   CANCELLATION (CUSTOMER_SUPPORT refund) → revoke_subscription (drop access now)
+//   REFUND / CHARGEBACK          → subscription: revoke_subscription; consumable credit
+//                                  pack: clawback_ai_credits_by_ref (mig 134, reverse grant)
 //   EXPIRATION                   → sync_subscription('expired')
 //   BILLING_ISSUE                → sync_subscription('past_due')
 //   SUBSCRIPTION_PAUSED          → sync_subscription('paused')
@@ -111,6 +112,7 @@ interface RCEvent {
   app_user_id?: string
   product_id?: string
   original_transaction_id?: string
+  transaction_id?: string
   expiration_at_ms?: number
   cancellation_reason?: string
   [k: string]: unknown
@@ -172,6 +174,11 @@ Deno.serve(async (req) => {
   // subscription rows. Absent → we ack 200 without writing (see ackNoSubKey guards below).
   const subKey =
     typeof event.original_transaction_id === 'string' ? event.original_transaction_id : ''
+  // Stable store TRANSACTION key for CONSUMABLE credit-pack grants + their refunds (mig
+  // 134): a consumable has no subscription row, so its refund is matched by this key, not
+  // by a sub id. Prefer original_transaction_id, fall back to transaction_id.
+  const txnKey =
+    subKey || (typeof event.transaction_id === 'string' ? event.transaction_id : '')
   const periodEnd = msToIso(event.expiration_at_ms)
 
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
@@ -232,13 +239,27 @@ Deno.serve(async (req) => {
       if (!Number.isFinite(microWon) || microWon <= 0) {
         return json({ error: 'Invalid product', code: 'BAD_REQUEST' }, 400)
       }
-      // Idempotency key: the RC event id (unique per delivery), falling back to the
-      // original_transaction_id. subKey is no longer a shared product id, so if both are
-      // absent we refuse rather than grant without any dedupe key (a retry would double-credit).
-      const creditRef = event.id || subKey
+      // Idempotency key: anchor on the store TRANSACTION key (mig 134) so a later REFUND
+      // can reverse THIS exact grant (clawback_ai_credits_by_ref keys on the same ref).
+      // Only when no transaction key exists do we fall back to the RC event id — that grant
+      // is then NOT refund-matchable (logged). 'rc:'/'rcev:' namespace the two ref shapes.
+      // If neither exists we refuse rather than grant with no dedupe key (retry would double-credit).
+      const creditRef = txnKey ? 'rc:' + txnKey : (event.id ? 'rcev:' + event.id : '')
       if (!creditRef) {
         console.error('[revenuecat-webhook]', type, 'credit_pack missing idempotency ref — refusing')
         return json({ error: 'Missing idempotency ref', code: 'BAD_REQUEST' }, 400)
+      }
+      if (!txnKey) {
+        console.warn('[revenuecat-webhook]', type, 'credit_pack granted on event-id ref (no transaction key) — a refund cannot be auto-clawed for', creditRef)
+      }
+      // Refund-before-grant guard (mig 134): if a REFUND already arrived and tombstoned this
+      // ref, do NOT grant — the purchase was refunded before we processed the grant. Keeps
+      // money conserved regardless of RevenueCat's delivery order.
+      const { data: tomb } = await sb
+        .from('ai_credit_ledger').select('id').eq('ref', 'refund:' + creditRef).limit(1).maybeSingle()
+      if (tomb) {
+        console.warn('[revenuecat-webhook]', type, 'credit_pack already refunded before grant — skipping:', creditRef)
+        return json({ received: true, type, kind: 'credit_pack', ignored: 'already_refunded' }, 200)
       }
       const { data, error } = await sb.rpc('add_ai_credits', {
         p_user_id: appUserId,
@@ -267,6 +288,42 @@ Deno.serve(async (req) => {
     return json({ received: true, type, kind: 'subscription', ...(data ?? {}) }, 200)
   }
 
+  // ── REFUND / CHARGEBACK — subscription (revoke) OR consumable credit pack (clawback) ──
+  // A refund can hit a subscription (drop the raised card cap now) OR a one-time consumable
+  // credit pack (reverse the granted micro-WON). Disambiguate by the mapped product's kind:
+  //   credit_pack → clawback_ai_credits_by_ref('rc:'+txnKey) (mig 134, idempotent)
+  //   subscription / unknown → revoke_subscription (unchanged; sub is the common case)
+  // The consumable clawback is keyed on the SAME store transaction key the grant used, so a
+  // grant that fell back to an event-id ref (no txnKey) cannot be auto-clawed — see the grant
+  // warning above. (Mobile IAP is dormant; this MUST be sandbox-verified at IAP launch.)
+  const refundOrClawback = async () => {
+    const ourProductId = storeProductId ? parseProductMap()[storeProductId] : undefined
+    let kind: string | null = null
+    if (ourProductId) {
+      const { data: prod, error } = await sb
+        .from('billing_products').select('kind').eq('id', ourProductId).maybeSingle()
+      if (error) {
+        console.error('[revenuecat-webhook] refund product lookup failed (', ourProductId, '):', error.message)
+        return json({ error: 'Refund failed', code: 'REFUND_ERROR' }, 500) // RC retries
+      }
+      kind = prod?.kind ?? null
+    }
+    if (kind === 'credit_pack') {
+      if (!txnKey) {
+        console.warn('[revenuecat-webhook]', type, 'credit_pack refund with no transaction key — cannot match grant; acking')
+        return json({ received: true, type, ignored: 'no_txn_key' }, 200)
+      }
+      const { data, error } = await sb.rpc('clawback_ai_credits_by_ref', {
+        p_user_id: UUID_RE.test(appUserId) ? appUserId : null,
+        p_ref: 'rc:' + txnKey,
+      })
+      if (error) return rpcErrorResponse(`clawback_ai_credits_by_ref ${type}`, error.message)
+      return json({ received: true, type, kind: 'credit_pack', ...(typeof data === 'object' && data ? data : {}) }, 200)
+    }
+    // Subscription (or unknown product) → revoke by the per-user subscription key.
+    return await revoke()
+  }
+
   switch (type) {
     // First grant, renewal, un-cancel, and plan change all re-assert an ACTIVE sub for
     // the buyer+product (sync_subscription_by_user upserts, so it works with or without
@@ -287,7 +344,7 @@ Deno.serve(async (req) => {
 
     case 'REFUND':
     case 'CHARGEBACK':
-      return await revoke()
+      return await refundOrClawback()
 
     case 'EXPIRATION':
       return await syncStatus('expired', null)

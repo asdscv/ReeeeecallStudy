@@ -205,7 +205,11 @@
     "faq": "FAQ",
     "blog": "Insights",
     "help": "Help",
-    "language": "Language"
+    "language": "Language",
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy"
   },
   "floatingCta": "Start Now",
   "faq": {

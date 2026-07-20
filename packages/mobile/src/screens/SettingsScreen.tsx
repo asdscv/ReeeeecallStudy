@@ -9,6 +9,7 @@ import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PlanSelector, UNLIMITED_CARD_LIMIT } from '../components/settings/PlanSelector'
+import { SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
 // 복원 시: usePurchases import 복구, isPro stub 제거, planBadge + Subscription 섹션 복원.
@@ -438,10 +439,17 @@ export function SettingsScreen() {
               </Text>
             )}
             {/* Data-driven subscription plan selector (mirrors web). Gated behind the
-                mobile IAP flag — shows plans with a "준비 중" state until IAP ships. */}
-            <View style={{ marginTop: 12 }}>
-              <PlanSelector subscription={subscription} />
-            </View>
+                mobile IAP flag (Apple Guideline 2.1(b)) — NO plan pricing / Select CTA
+                may render until store IAP products exist. Inert until the gate flips;
+                onSelect routes to the Paywall (also gated) to run the purchase flow. */}
+            {SUBSCRIPTION_UI_ENABLED && (
+              <View style={{ marginTop: 12 }}>
+                <PlanSelector
+                  subscription={subscription}
+                  onSelect={() => navigation.navigate('Paywall')}
+                />
+              </View>
+            )}
             {cardUsage.available <= 0 && (
               <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
             )}
