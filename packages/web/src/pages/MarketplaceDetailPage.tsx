@@ -86,26 +86,12 @@ export function MarketplaceDetailPage() {
     const fetchData = async () => {
       setLoading(true)
 
-      // Try fetching with owner profile join
+      // owner_display_name / owner_is_official are denormalized onto the row (mig 054),
+      // so a plain select returns them — no profiles join is needed. The old
+      // `profiles!marketplace_listings_owner_id_fkey(...)` embed 400'd on every load
+      // (that FK targets auth.users, not public.profiles) and always fell through here.
       let typedListing: MarketplaceListing | null = null
-      const { data: listingData } = await supabase
-        .from('marketplace_listings')
-        .select('*, profiles!marketplace_listings_owner_id_fkey(display_name, is_official)')
-        .eq('id', listingId)
-        .single()
-
-      if (listingData) {
-        const profile = (listingData as Record<string, unknown>).profiles as
-          | { display_name: string | null; is_official: boolean }
-          | null
-        typedListing = {
-          ...listingData,
-          profiles: undefined,
-          owner_display_name: profile?.display_name ?? null,
-          owner_is_official: profile?.is_official ?? false,
-        } as MarketplaceListing
-      } else {
-        // Fallback without join
+      {
         const { data: fallbackData } = await supabase
           .from('marketplace_listings')
           .select('*')
