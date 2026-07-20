@@ -33,7 +33,12 @@
     "imageUpload": "Unggah gambar",
     "imageChange": "Ganti gambar",
     "imageHint": "Pilih foto — AI mengubahnya menjadi kartu.",
-    "imagePaidNotice": "Pembuatan gambar menggunakan kredit."
+    "imagePaidNotice": "Pembuatan gambar menggunakan kredit.",
+    "imageAddMore": "Tambah lagi ({{count}}/{{max}})",
+    "inputModeTopicHint": "Jelaskan topik dan AI akan membuat kartunya untukmu.",
+    "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus.",
+    "cardLimitExceeds": "Anda dapat menambahkan maksimal {{available}} kartu lagi — kurangi jumlah atau berlangganan.",
+    "cardLimitReached": "Anda telah mencapai batas kartu — hapus kartu atau berlangganan untuk menambah."
   },
   "deck": {
     "section": "PILIH DEK",

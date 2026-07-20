@@ -38,6 +38,7 @@ const MAX_EXISTING_CARDS_BYTES = 8000      // cap dedup payload size (L2)
 const PROVIDER_RETRY_DELAYS = [2000, 8000] // ms; per-minute provider rate limits
 const PROVIDER_TIMEOUT_MS = 30000          // abort a hung provider call (L1)
 const MAX_IMAGE_BYTES = 7_000_000          // ~5MB image as a base64 data URL (vision)
+const MAX_IMAGES = 8                        // cap images per generation (context + payload)
 
 // ── CORS (origin allowlist; mirror tts) ─────────────────────
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
@@ -156,11 +157,15 @@ const sumUsage = (a: TokenUsage | null, b: TokenUsage | null): TokenUsage | null
     ? { prompt_tokens: a.prompt_tokens + b.prompt_tokens, completion_tokens: a.completion_tokens + b.completion_tokens }
     : null
 
-async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<ProviderResult> {
-  // Vision: the OpenAI-compatible shape carries the image in the user message
-  // as a content array. Plain text uses a string.
-  const userContent = imageUrl
-    ? [{ type: 'text', text: userPrompt }, { type: 'image_url', image_url: { url: imageUrl } }]
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<ProviderResult> {
+  // Vision: the OpenAI-compatible shape carries the image(s) in the user message
+  // as a content array — one text part plus one image_url part per image (the API
+  // accepts multiple images in a single message). Plain text uses a string.
+  const userContent = imageUrls && imageUrls.length
+    ? [
+        { type: 'text', text: userPrompt },
+        ...imageUrls.map((url) => ({ type: 'image_url', image_url: { url } })),
+      ]
     : userPrompt
   const body = {
     model: m.model,
@@ -223,14 +228,14 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 
 // Returns parsed JSON + token usage; one stricter-prompt retry on unparseable
 // output (mirrors callAI). On retry we paid for BOTH calls → SUM the usage.
-async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
-  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrl)
+async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
+  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls)
   try {
     return { json: JSON.parse(stripMarkdownFences(a.content)), usage: a.usage }
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const b = await providerRequest(m, strict, userPrompt, imageUrl)
+    const b = await providerRequest(m, strict, userPrompt, imageUrls)
     return { json: JSON.parse(stripMarkdownFences(b.content)), usage: sumUsage(a.usage, b.usage) }
   }
 }
@@ -331,6 +336,21 @@ function asImage(v: unknown): string | null {
   return v
 }
 
+// Validate an image payload that may be a single `image` string or an `images` array
+// (multi-photo upload). Every item must pass asImage; the list is capped at MAX_IMAGES.
+// Returns null when nothing valid is present or any item is invalid (fail-closed).
+function asImages(images: unknown, image: unknown): string[] | null {
+  const raw = Array.isArray(images) ? images : image != null ? [image] : []
+  if (raw.length === 0 || raw.length > MAX_IMAGES) return null
+  const out: string[] = []
+  for (const it of raw) {
+    const v = asImage(it)
+    if (!v) return null
+    out.push(v)
+  }
+  return out
+}
+
 // ── Handler ─────────────────────────────────────────────────
 Deno.serve(async (req) => {
   const cors = corsHeadersFor(req.headers.get('Origin'))
@@ -368,8 +388,8 @@ Deno.serve(async (req) => {
 
     // ── Image recognition (vision) — ALWAYS paid, separate metering ──
     if (kind === 'image') {
-      const image = asImage(body.image)
-      if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
+      const images = asImages(body.images, body.image)
+      if (!images) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
       const fields = asFields(body.fields)
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
       // Image mode: the MODEL decides how many cards to make from what's actually in
@@ -400,7 +420,7 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
-        const { json: content, usage } = await generate(model, iSys, iUser, image)
+        const { json: content, usage } = await generate(model, iSys, iUser, images)
         if (!resultHasItems(content)) {   // empty vision result → refund, don't charge
           console.error('[ai-generate] image empty result — releasing job', imgMeter.job_ref)
           await releaseJob(userId, imgMeter.job_ref)
@@ -422,8 +442,8 @@ Deno.serve(async (req) => {
     // ALWAYS paid (same metering as image cards). One vision call returns the whole
     // deck; the client reviews + saves it (createDeck + template + cards).
     if (kind === 'image_deck') {
-      const image = asImage(body.image)
-      if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
+      const images = asImages(body.images, body.image)
+      if (!images) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
 
       // Owned-card limit (mig 116): fail fast if the account is already at the cap
       // (there's no room for even one generated card).
@@ -448,7 +468,7 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: dSys, userPrompt: dUser } = buildImageDeckPrompt(uiLang)
       try {
-        const { json: content, usage } = await generate(model, dSys, dUser, image)
+        const { json: content, usage } = await generate(model, dSys, dUser, images)
         if (!resultHasItems(content)) {   // empty deck result → refund, don't charge
           console.error('[ai-generate] image_deck empty result — releasing job', idMeter.job_ref)
           await releaseJob(userId, idMeter.job_ref)

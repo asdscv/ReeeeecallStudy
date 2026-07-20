@@ -33,7 +33,12 @@
     "imageUpload": "Tải ảnh lên",
     "imageChange": "Đổi ảnh",
     "imageHint": "Chọn một ảnh — AI sẽ biến nó thành các thẻ.",
-    "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng."
+    "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng.",
+    "imageAddMore": "Thêm nữa ({{count}}/{{max}})",
+    "inputModeTopicHint": "Mô tả một chủ đề và AI sẽ viết thẻ cho bạn.",
+    "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc.",
+    "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký.",
+    "cardLimitReached": "Bạn đã đạt giới hạn thẻ — xóa thẻ hoặc đăng ký để thêm."
   },
   "deck": {
     "section": "CHỌN BỘ THẺ",

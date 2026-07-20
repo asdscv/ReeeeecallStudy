@@ -2,7 +2,7 @@
   "topUp": {
     "title": "Tambah saldo",
     "subtitle": "Isi saldo untuk membuat kartu AI melebihi kartu gratis harian.",
-    "credits": "Dapatkan saldo ₩{{won}}",
+    "credits": "Dapatkan kredit senilai {{amount}}",
     "buy": "Beli",
     "success": "Saldo ditambahkan.",
     "empty": "Tidak ada paket yang tersedia.",

@@ -53,7 +53,11 @@
     "imageChange": "画像を変更",
     "imageUploadHint": "単語リスト・教科書のページ・ノートの写真を選ぶと、AIがカードに変換します。",
     "imagePaidNotice": "画像生成にはクレジットを使用します（無料枠はありません）。",
-    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。"
+    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。",
+    "imageAddMore": "追加 ({{count}}/{{max}})",
+    "imageRemove": "画像を削除",
+    "inputModeTopicHint": "トピックを入力すると、AIがカードを作成します。",
+    "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。"
   },
   "wallet": {
     "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカードを生成できます",
@@ -123,7 +127,10 @@
         "hint": "ヒント",
         "detail": "詳細"
       }
-    }
+    },
+    "templateDesc": "AIが設計したカード構造です。フィールド名を変更して続行してください。",
+    "deckDesc": "新しいデッキの名前・アイコン・色を確認して続行してください。",
+    "cardsDesc": "生成されたカードを確認してください。テキストを編集し、不要なカードを削除して保存します。"
   },
   "done": {
     "title": "Generation Complete!",

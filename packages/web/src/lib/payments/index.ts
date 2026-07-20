@@ -3,6 +3,7 @@ import { MockProvider } from './mock-provider'
 import { PortOneProvider } from './portone-provider'
 import { LemonsqueezyProvider } from './lemonsqueezy-provider'
 import { TossProvider } from './toss-provider'
+import { isKoreanLocale } from '@reeeeecall/shared/lib/pricing'
 
 export type {
   PaymentProvider,
@@ -80,4 +81,21 @@ export function resolveProvider(id?: PaymentProviderId | null): PaymentProvider 
 /** Back-compat single-value reader (first enabled id, or 'none'). */
 export function paymentProviderId(): PaymentProviderId {
   return enabledProviderIds()[0] ?? 'none'
+}
+
+/**
+ * The provider to charge THIS buyer, chosen by locale so the charged currency
+ * matches the displayed one: Korean buyers → TossPayments (₩), everyone else →
+ * LemonSqueezy ($). Falls back to the first configured provider that supports the
+ * kind when the region-preferred one isn't enabled, and null when none is. This
+ * replaces the manual payment-method picker: region determines the method.
+ */
+export function preferredProviderId(
+  locale: string | undefined | null,
+  kind: 'credit_pack' | 'subscription',
+): PaymentProviderId | null {
+  const available = providersForKind(kind).map((p) => p.id as PaymentProviderId)
+  if (available.length === 0) return null
+  const want: PaymentProviderId = isKoreanLocale(locale) ? 'toss' : 'lemonsqueezy'
+  return available.includes(want) ? want : available[0]
 }

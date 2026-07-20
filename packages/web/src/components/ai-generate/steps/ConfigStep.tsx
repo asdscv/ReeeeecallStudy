@@ -31,7 +31,7 @@ export interface GenerateConfig {
   selectedDeckId?: string
   selectedTemplateId?: string
   imageMode?: 'topic' | 'image'
-  imageDataUrl?: string
+  imageDataUrls?: string[]
 }
 
 const CONTENT_LANGUAGES = [
@@ -83,7 +83,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
   // Input mode (cards_only): type a topic, or upload an image to recognize.
   const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
+  const [imageDataUrls, setImageDataUrls] = useState<string[]>([])
+  const MAX_IMAGES = 8
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Remaining free cards + credit-affordable cards (cost transparency).
@@ -150,33 +151,50 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     setCustomFields(updated)
   }
 
-  const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    // Downscale large photos client-side so the data URL stays well under the
-    // server's image cap (a phone photo is often 4–12MB).
-    const url = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      const MAX_EDGE = 1600
-      const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.max(1, Math.round(img.width * scale))
-      canvas.height = Math.max(1, Math.round(img.height * scale))
-      const ctx = canvas.getContext('2d')
-      if (!ctx) { setImageDataUrl(null); return }
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      setImageDataUrl(canvas.toDataURL('image/jpeg', 0.82))
-    }
-    img.onerror = () => { URL.revokeObjectURL(url); setImageDataUrl(null) }
-    img.src = url
+  // Downscale one photo client-side so the data URL stays well under the server's
+  // image cap (a phone photo is often 4–12MB). Resolves to null on decode failure.
+  const downscale = (file: File): Promise<string | null> =>
+    new Promise((resolve) => {
+      const url = URL.createObjectURL(file)
+      const img = new Image()
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const MAX_EDGE = 1600
+        const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.max(1, Math.round(img.width * scale))
+        canvas.height = Math.max(1, Math.round(img.height * scale))
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return resolve(null)
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', 0.82))
+      }
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null) }
+      img.src = url
+    })
+
+  // Multi-photo upload: process every picked file and APPEND to the current set,
+  // capped at MAX_IMAGES. Users can add photos across several picks; each result is
+  // a downscaled data URL sent to the vision model together.
+  const onPickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    e.target.value = '' // allow re-picking the same file
+    if (files.length === 0) return
+    const room = MAX_IMAGES - imageDataUrls.length
+    if (room <= 0) return
+    const urls = (await Promise.all(files.slice(0, room).map(downscale))).filter(
+      (u): u is string => !!u,
+    )
+    if (urls.length) setImageDataUrls((prev) => [...prev, ...urls].slice(0, MAX_IMAGES))
   }
+
+  const removeImage = (idx: number) =>
+    setImageDataUrls((prev) => prev.filter((_, i) => i !== idx))
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (useImage) {
-      if (!imageDataUrl) return
+      if (imageDataUrls.length === 0) return
       if (!isFullMode && !selectedDeckId) return  // cards_only needs a target deck
     } else {
       if (!topic.trim()) return
@@ -202,7 +220,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         ? selectedDeck.default_template_id
         : undefined,
       imageMode: useImage ? 'image' : 'topic',
-      imageDataUrl: useImage ? imageDataUrl ?? undefined : undefined,
+      imageDataUrls: useImage ? imageDataUrls : undefined,
     })
   }
 
@@ -212,7 +230,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const canSubmit = cardsOnlyNeedsTemplate
     ? false
     : useImage
-      ? !!imageDataUrl && (isFullMode || !!selectedDeckId)
+      ? imageDataUrls.length > 0 && (isFullMode || !!selectedDeckId)
       : topic.trim() && (isFullMode || selectedDeckId)
 
   // Free-remaining + prepaid ₩ wallet line (metered billing). Image mode is paid-only.
@@ -310,6 +328,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             </button>
           ))}
         </div>
+        {/* Explain what the selected input mode does. */}
+        <p className="text-[11px] text-muted-foreground -mt-1">
+          {t(useImage ? 'config.inputModeImageHint' : 'config.inputModeTopicHint')}
+        </p>
 
         {/* Topic input (topic mode, or full mode) */}
         {!useImage && (
@@ -333,19 +355,37 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               ref={fileRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              multiple
               onChange={onPickImage}
               className="hidden"
             />
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-border hover:border-brand/50 hover:bg-accent/30 transition cursor-pointer text-muted-foreground text-sm"
+              disabled={imageDataUrls.length >= MAX_IMAGES}
+              className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-border hover:border-brand/50 hover:bg-accent/30 transition cursor-pointer text-muted-foreground text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ImageUp size={28} />
-              {imageDataUrl ? t('config.imageChange') : t('config.imageUpload')}
+              {imageDataUrls.length > 0
+                ? t('config.imageAddMore', { count: imageDataUrls.length, max: MAX_IMAGES })
+                : t('config.imageUpload')}
             </button>
-            {imageDataUrl && (
-              <img src={imageDataUrl} alt="" className="mt-2 max-h-44 rounded-xl border border-border mx-auto" />
+            {imageDataUrls.length > 0 && (
+              <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {imageDataUrls.map((src, i) => (
+                  <div key={i} className="relative">
+                    <img src={src} alt="" className="h-20 w-full rounded-lg border border-border object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      aria-label={t('config.imageRemove')}
+                      className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground/80 text-[11px] text-background hover:bg-foreground"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
             <p className="text-[11px] text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
             <p className="text-[11px] text-amber-600 mt-0.5">{t('config.imagePaidNotice')}</p>
@@ -523,7 +563,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       <button
         type="submit"
-        disabled={!canSubmit || (!useImage && limit.exceeds(cardCount))}
+        disabled={!canSubmit || (useImage ? limit.reached : limit.exceeds(cardCount))}
         className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}

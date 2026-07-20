@@ -43,8 +43,8 @@ interface AIGenerateState {
   generateTemplate: () => Promise<void>
   generateDeck: () => Promise<void>
   generateCards: () => Promise<void>
-  generateCardsFromImage: (image: string) => Promise<void>
-  generateDeckFromImage: (image: string) => Promise<void>
+  generateCardsFromImage: (images: string[]) => Promise<void>
+  generateDeckFromImage: (images: string[]) => Promise<void>
   saveAll: () => Promise<void>
 
   editGeneratedTemplate: (t: GeneratedTemplate) => void
@@ -276,7 +276,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   },
 
   // Image recognition (vision): one uploaded image → cards (always paid, Phase 1b).
-  generateCardsFromImage: async (image: string) => {
+  generateCardsFromImage: async (images: string[]) => {
     set({ currentStep: 'generating_cards', error: null })
     try {
       const uiLang = i18next.language
@@ -300,7 +300,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       }
       if (!fields || fields.length === 0) throw new Error('INVALID_RESPONSE')
 
-      const { content } = await callServerAI({ kind: 'image', image, uiLang, fields, cardCount })
+      const { content } = await callServerAI({ kind: 'image', images, uiLang, fields, cardCount })
       const result = validateCardsResponse(content, fields.map((f) => f.key))
       if (result.valid.length === 0) throw new Error('ALL_CARDS_INVALID')
       set({
@@ -318,11 +318,11 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   // three generated states (mode='full') and route to card review; saveAll then
   // creates the deck + template + cards. Default front/back layouts are injected when
   // the model omits them (front = first field, back = the rest).
-  generateDeckFromImage: async (image: string) => {
+  generateDeckFromImage: async (images: string[]) => {
     set({ currentStep: 'generating_deck', error: null })
     try {
       const uiLang = i18next.language
-      const { content } = await callServerAI({ kind: 'image_deck', image, uiLang })
+      const { content } = await callServerAI({ kind: 'image_deck', images, uiLang })
       const deck = validateDeckResponse(content)
 
       const rawTmpl = ((content as Record<string, unknown>)?.template ?? {}) as Record<string, unknown>

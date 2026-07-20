@@ -4,8 +4,8 @@ import { Loader2, Check, ExternalLink } from 'lucide-react'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { supabase } from '../../lib/supabase'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
-import { providersForKind } from '../../lib/payments'
-import { PaymentMethodModal } from './PaymentMethodModal'
+import { preferredProviderId } from '../../lib/payments'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
 // A card_limit at or above this sentinel means "unlimited" for DISPLAY only. The DB
 // stores/uses card_limit as a normal integer cap (e.g. sub_unlimited_monthly = 2e9,
@@ -86,9 +86,10 @@ export function PlanSelector() {
   }, [products.length, fetchProducts, fetchSubscription])
 
   const locale = toIntlLocale(i18n.language)
-  // Display currency is USD (the LemonSqueezy store charges USD; Toss shows the KRW
-  // amount at its own checkout).
-  const fmtUsd = (cents: number | null) => `$${((cents ?? 0) / 100).toFixed(2)}`
+  // Price follows the buyer's locale: ₩ for Korean (charged via Toss), $ for everyone
+  // else (charged via LemonSqueezy's USD store) — so what's shown equals what's charged.
+  const fmtPrice = (p: (typeof products)[number]) =>
+    formatProductPrice(p, i18n.language, locale)
 
   const plans = products
     .filter((p) => p.kind === 'subscription' && p.isActive)
@@ -104,11 +105,10 @@ export function PlanSelector() {
   // route them to the portal button below. (The server also rejects a second LS checkout.)
   const lockPlanSwitch = PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'lemonsqueezy'
 
-  // With one provider, subscribe directly; with 2+ (Toss + LemonSqueezy), pick a method.
-  const [pickerProduct, setPickerProduct] = useState<string | null>(null)
+  // Region decides the payment method (and thus currency): Korean → Toss, else →
+  // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
   const beginCheckout = (productId: string) => {
-    if (providersForKind('subscription').length > 1) setPickerProduct(productId)
-    else void startCheckout(productId)
+    void startCheckout(productId, preferredProviderId(i18n.language, 'subscription') ?? undefined)
   }
 
   // Toss subscriptions have no hosted portal — we run the recurring charge, so cancel /
@@ -159,8 +159,8 @@ export function PlanSelector() {
             : t('plans.cardLimit', { limit: (p.cardLimit ?? 0).toLocaleString(locale) })
           const priceLabel =
             p.period === 'monthly'
-              ? `${fmtUsd(p.priceUsdCents)} ${t('plans.perMonth')}`
-              : fmtUsd(p.priceUsdCents)
+              ? `${fmtPrice(p)} ${t('plans.perMonth')}`
+              : fmtPrice(p)
           const processing = checkoutStatus === 'processing' && checkoutProductId === p.id
 
           return (
@@ -273,13 +273,6 @@ export function PlanSelector() {
       {PAYMENTS_ACTIVE && checkoutIsPlan && error === 'checkout_failed' && (
         <p className="mt-2 text-xs text-destructive">{t('checkout.failed')}</p>
       )}
-
-      <PaymentMethodModal
-        open={pickerProduct !== null}
-        productId={pickerProduct}
-        kind="subscription"
-        onClose={() => setPickerProduct(null)}
-      />
     </div>
   )
 }

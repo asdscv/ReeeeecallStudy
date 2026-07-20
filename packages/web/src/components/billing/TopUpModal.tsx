@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import {
@@ -9,9 +9,8 @@ import {
   DialogDescription,
 } from '../ui/dialog'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
-import { providersForKind } from '../../lib/payments'
-import { PaymentMethodModal } from './PaymentMethodModal'
-import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
+import { preferredProviderId } from '../../lib/payments'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { toIntlLocale } from '../../lib/locale-utils'
 
 interface TopUpModalProps {
@@ -47,7 +46,11 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
   }, [open, fetchProducts, clearComingSoon])
 
   const dateLocale = toIntlLocale(i18n.language)
-  const fmtWon = (won: number) => `₩${won.toLocaleString(dateLocale)}`
+  // Price + credit worth follow the buyer's locale: ₩ for Korean (charged via Toss),
+  // $ for everyone else (charged via LemonSqueezy's USD store). The credit worth of a
+  // pack equals its price, so reuse the same currency-aware formatter for both.
+  const fmtPrice = (p: (typeof products)[number]) =>
+    formatProductPrice(p, i18n.language, dateLocale)
 
   const creditPacks = products
     .filter((p) => p.kind === 'credit_pack')
@@ -55,11 +58,10 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
 
   const showComingSoon = !PAYMENTS_ACTIVE || comingSoon
 
-  // With one provider, buy directly; with 2+ (e.g. Toss + LemonSqueezy), pick a method.
-  const [pickerProduct, setPickerProduct] = useState<string | null>(null)
+  // Region decides the payment method (and thus currency): Korean → Toss, else →
+  // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
   const beginCheckout = (productId: string) => {
-    if (providersForKind('credit_pack').length > 1) setPickerProduct(productId)
-    else void startCheckout(productId)
+    void startCheckout(productId, preferredProviderId(i18n.language, 'credit_pack') ?? undefined)
   }
 
   return (
@@ -117,7 +119,6 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
         ) : (
           <ul className="space-y-2">
             {creditPacks.map((p) => {
-              const creditsWon = microWonToWon(p.creditsMicroWon ?? 0)
               return (
                 <li
                   key={p.id}
@@ -125,10 +126,10 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
                 >
                   <div>
                     <p className="text-base font-semibold text-foreground tabular-nums">
-                      {fmtWon(p.priceKrw)}
+                      {fmtPrice(p)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {t('topUp.credits', { won: creditsWon.toLocaleString(dateLocale) })}
+                      {t('topUp.credits', { amount: fmtPrice(p) })}
                     </p>
                   </div>
                   {(() => {
@@ -156,12 +157,6 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
             })}
           </ul>
         )}
-        <PaymentMethodModal
-          open={pickerProduct !== null}
-          productId={pickerProduct}
-          kind="credit_pack"
-          onClose={() => setPickerProduct(null)}
-        />
       </DialogContent>
     </Dialog>
   )

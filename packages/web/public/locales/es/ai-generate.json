@@ -53,7 +53,11 @@
     "imageChange": "Cambiar imagen",
     "imageUploadHint": "Elige una foto de una lista de palabras, una página de libro de texto o apuntes: la IA la convierte en tarjetas.",
     "imagePaidNotice": "La generación con imágenes usa créditos (sin nivel gratuito).",
-    "cardLimitExceeds": "Puedes añadir como máximo {{available}} tarjeta(s) más — reduce la cantidad o suscríbete."
+    "cardLimitExceeds": "Puedes añadir como máximo {{available}} tarjeta(s) más — reduce la cantidad o suscríbete.",
+    "imageAddMore": "Añadir más ({{count}}/{{max}})",
+    "imageRemove": "Quitar imagen",
+    "inputModeTopicHint": "Describe un tema y la IA escribe las tarjetas por ti.",
+    "inputModeImageHint": "Sube fotos de una página de libro, lista de vocabulario o apuntes: la IA las convierte en tarjetas. Puedes elegir varias a la vez."
   },
   "wallet": {
     "summary": "{{free}} tarjetas gratuitas + {{credits}} de pago disponibles hoy",
@@ -123,7 +127,10 @@
         "hint": "Sugerencia",
         "detail": "Detalle"
       }
-    }
+    },
+    "templateDesc": "La IA diseñó esta estructura de tarjeta. Renombra los campos si quieres y continúa.",
+    "deckDesc": "Revisa el nombre, icono y color de tu nuevo mazo y continúa.",
+    "cardsDesc": "Revisa las tarjetas generadas. Edita el texto, elimina las que no quieras y guarda."
   },
   "done": {
     "title": "Generation Complete!",

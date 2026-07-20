@@ -53,7 +53,11 @@
     "imageChange": "更换图片",
     "imageUploadHint": "选择一张单词列表、教科书页面或笔记的照片——AI 会将其转化为卡片。",
     "imagePaidNotice": "图片生成需要消耗点数（无免费额度）。",
-    "cardLimitExceeds": "最多还能添加 {{available}} 张 — 减少数量或订阅。"
+    "cardLimitExceeds": "最多还能添加 {{available}} 张 — 减少数量或订阅。",
+    "imageAddMore": "继续添加 ({{count}}/{{max}})",
+    "imageRemove": "删除图片",
+    "inputModeTopicHint": "输入主题，AI 会为你生成卡片。",
+    "inputModeImageHint": "上传课本页面、单词表或笔记的照片，AI 会识别并生成卡片。可一次选择多张。"
   },
   "wallet": {
     "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",
@@ -123,7 +127,10 @@
         "hint": "提示",
         "detail": "详情"
       }
-    }
+    },
+    "templateDesc": "这是 AI 设计的卡片结构。可重命名字段后继续。",
+    "deckDesc": "查看新卡组的名称、图标和颜色，然后继续。",
+    "cardsDesc": "查看生成的卡片。可编辑文字、删除不需要的卡片，然后保存。"
   },
   "done": {
     "title": "Generation Complete!",

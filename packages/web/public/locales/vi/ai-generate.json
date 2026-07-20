@@ -53,7 +53,11 @@
     "imageChange": "Đổi hình ảnh",
     "imageUploadHint": "Chọn ảnh chụp danh sách từ vựng, trang sách giáo khoa hoặc ghi chú — AI sẽ chuyển thành thẻ.",
     "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng (không có gói miễn phí).",
-    "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký."
+    "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký.",
+    "imageAddMore": "Thêm nữa ({{count}}/{{max}})",
+    "imageRemove": "Xóa ảnh",
+    "inputModeTopicHint": "Mô tả một chủ đề và AI sẽ viết thẻ cho bạn.",
+    "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc."
   },
   "wallet": {
     "summary": "Hôm nay còn {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
@@ -123,7 +127,10 @@
         "hint": "Gợi ý",
         "detail": "Chi tiết"
       }
-    }
+    },
+    "templateDesc": "AI đã thiết kế cấu trúc thẻ này. Đổi tên trường nếu muốn rồi tiếp tục.",
+    "deckDesc": "Xem lại tên, biểu tượng và màu của bộ thẻ mới rồi tiếp tục.",
+    "cardsDesc": "Xem lại các thẻ đã tạo. Chỉnh sửa nội dung, xóa thẻ không muốn rồi lưu."
   },
   "done": {
     "title": "Generation Complete!",
