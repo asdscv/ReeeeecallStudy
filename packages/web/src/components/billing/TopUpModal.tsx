@@ -61,7 +61,7 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
   // Region decides the payment method (and thus currency): Korean → Toss, else →
   // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
   const beginCheckout = (productId: string) => {
-    void startCheckout(productId, preferredProviderId(i18n.language, 'credit_pack') ?? undefined)
+    void startCheckout(productId, preferredProviderId(i18n.language))
   }
 
   return (

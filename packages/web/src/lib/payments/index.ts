@@ -90,12 +90,13 @@ export function paymentProviderId(): PaymentProviderId {
  * kind when the region-preferred one isn't enabled, and null when none is. This
  * replaces the manual payment-method picker: region determines the method.
  */
-export function preferredProviderId(
-  locale: string | undefined | null,
-  kind: 'credit_pack' | 'subscription',
-): PaymentProviderId | null {
-  const available = providersForKind(kind).map((p) => p.id as PaymentProviderId)
-  if (available.length === 0) return null
-  const want: PaymentProviderId = isKoreanLocale(locale) ? 'toss' : 'lemonsqueezy'
-  return available.includes(want) ? want : available[0]
+export function preferredProviderId(locale: string | undefined | null): PaymentProviderId {
+  // Region → currency-matched provider: Korea pays ₩ via Toss, everyone else pays $ via
+  // LemonSqueezy (its USD store). Always return the region-matched id and pass it to
+  // startCheckout REGARDLESS of whether it's configured — resolveProvider returns null
+  // (→ "coming soon", no charge) when it isn't. This guarantees the charged currency
+  // always equals the DISPLAYED one; we never silently fall back to the other provider
+  // and charge in a currency the buyer didn't see. price_krw and price_usd_cents are
+  // independent, non-FX-linked catalog columns, so a mismatch is a real bait-and-switch.
+  return isKoreanLocale(locale) ? 'toss' : 'lemonsqueezy'
 }

@@ -108,7 +108,7 @@ export function PlanSelector() {
   // Region decides the payment method (and thus currency): Korean → Toss, else →
   // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
   const beginCheckout = (productId: string) => {
-    void startCheckout(productId, preferredProviderId(i18n.language, 'subscription') ?? undefined)
+    void startCheckout(productId, preferredProviderId(i18n.language))
   }
 
   // Toss subscriptions have no hosted portal — we run the recurring charge, so cancel /
