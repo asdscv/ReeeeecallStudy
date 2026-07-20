@@ -225,5 +225,10 @@
     "decksUnit": " decks",
     "cardsUnit": " cards",
     "swipeHint": "In swipe mode, swipe left/right to rate cards."
+  },
+  "subscriptionLocked": {
+    "title": "Belajar terkunci",
+    "desc": "Dek langganan ini melebihi batas kartumu. Berlangganan atau naikkan batasmu untuk mempelajarinya — kartumu tetap tersimpan.",
+    "back": "Kembali ke Dek"
   }
 }

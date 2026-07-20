@@ -148,7 +148,26 @@
     "upgradeSoon": "Subscription is coming soon.",
     "unlimited": "Unlimited",
     "countUnlimited": "{{owned}} / Unlimited",
-    "planNoteUnlimited": "Your plan includes unlimited owned cards."
+    "planNoteUnlimited": "Your plan includes unlimited owned cards.",
+    "detail": {
+      "title": "Card storage",
+      "subtitle": "Owned + subscribed cards count toward your plan. Official decks don’t count.",
+      "own": "My cards",
+      "subscribed": "Subscribed",
+      "official": "Official decks",
+      "officialNote": "Excluded from limit",
+      "archived": "Archived",
+      "archivedNote": "Study locked",
+      "archivedCount": "{{count}} archived",
+      "remaining": "{{count}} remaining",
+      "percentUsed": "{{percent}}% used",
+      "nearLimit": "Approaching limit",
+      "atLimit": "Limit reached",
+      "planUnlimited": "Unlimited plan",
+      "planCards": "{{limit}} card plan",
+      "unlimitedTitle": "Unlimited storage",
+      "lifetimeTotal": "{{count}} cards"
+    }
   },
   "groups": {
     "account": "Account",

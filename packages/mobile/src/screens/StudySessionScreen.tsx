@@ -65,7 +65,7 @@ export function StudySessionScreen() {
   const {
     phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
-    undoLastRating, lastRatedCard,
+    undoLastRating, lastRatedCard, subscriptionLocked,
   } = useStudy()
 
   // Profile settings (TTS + answer mode)
@@ -112,6 +112,14 @@ export function StudySessionScreen() {
 
   // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
+    // Over-cap subscribed deck → study-locked (mig 140): don't route to the summary,
+    // explain it and go back. Cards stay viewable in the deck.
+    if (subscriptionLocked) {
+      Alert.alert(t('subscriptionLocked.title'), t('subscriptionLocked.desc'), [
+        { text: t('subscriptionLocked.back'), onPress: () => navigation.goBack() },
+      ])
+      return
+    }
     if (phase === 'completed') {
       navigation.replace('StudySummary')
     } else if (phase === 'idle' && sessionStats.cardsStudied > 0) {
@@ -119,7 +127,7 @@ export function StudySessionScreen() {
     } else if (phase === 'idle') {
       navigation.goBack()
     }
-  }, [phase, navigation, sessionStats.cardsStudied])
+  }, [phase, subscriptionLocked, navigation, sessionStats.cardsStudied, t])
 
   // Reset animations on card change
   useEffect(() => {

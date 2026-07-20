@@ -13,6 +13,7 @@ import type { HomeStackParamList, MainTabParamList } from '../navigation/types'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
 import { shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
 import { OnboardingModal } from '../components/OnboardingModal'
+import { CardUsageCard } from '../components/settings/CardUsageCard'
 import { getMobileSupabase } from '../adapters'
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>
@@ -136,6 +137,9 @@ export function DashboardScreen() {
                 </View>
               </View>
             </View>
+
+            {/* Card-storage usage — at-a-glance meter → full detail modal */}
+            <CardUsageCard />
 
             {/* Gamification widgets — modular components */}
             {levelInfo && (

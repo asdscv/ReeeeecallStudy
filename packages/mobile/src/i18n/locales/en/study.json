@@ -121,5 +121,10 @@
     "got_it": "Got It",
     "unknown": "Unknown",
     "known": "Known"
+  },
+  "subscriptionLocked": {
+    "title": "Study locked",
+    "desc": "This subscribed deck is over your card limit. Subscribe or raise your limit to study it — your cards stay saved.",
+    "back": "Back to deck"
   }
 }

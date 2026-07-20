@@ -148,7 +148,26 @@
     "upgradeSoon": "購読は近日公開予定です。",
     "unlimited": "無制限",
     "countUnlimited": "{{owned}} / 無制限",
-    "planNoteUnlimited": "現在のプランではカードを無制限に保存できます。"
+    "planNoteUnlimited": "現在のプランではカードを無制限に保存できます。",
+    "detail": {
+      "title": "カード保存容量",
+      "subtitle": "所有カードと購読カードがプランの上限に含まれます。公式デッキは対象外です。",
+      "own": "マイカード",
+      "subscribed": "購読中",
+      "official": "公式デッキ",
+      "officialNote": "上限対象外",
+      "archived": "アーカイブ済み",
+      "archivedNote": "学習ロック中",
+      "archivedCount": "{{count}} 枚アーカイブ",
+      "remaining": "残り {{count}} 枚",
+      "percentUsed": "{{percent}}% 使用",
+      "nearLimit": "上限に接近",
+      "atLimit": "上限に到達",
+      "planUnlimited": "無制限プラン",
+      "planCards": "{{limit}} 枚プラン",
+      "unlimitedTitle": "無制限ストレージ",
+      "lifetimeTotal": "{{count}} 枚"
+    }
   },
   "groups": {
     "account": "アカウント",

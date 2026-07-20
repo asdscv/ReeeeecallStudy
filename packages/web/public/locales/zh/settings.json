@@ -148,7 +148,26 @@
     "upgradeSoon": "订阅即将推出。",
     "unlimited": "无限",
     "countUnlimited": "{{owned}} / 无限",
-    "planNoteUnlimited": "您的方案可无限存储卡片。"
+    "planNoteUnlimited": "您的方案可无限存储卡片。",
+    "detail": {
+      "title": "卡片存储",
+      "subtitle": "拥有和订阅的卡片都计入方案上限。官方卡组不计入。",
+      "own": "我的卡片",
+      "subscribed": "已订阅",
+      "official": "官方卡组",
+      "officialNote": "不计入上限",
+      "archived": "已归档",
+      "archivedNote": "学习已锁定",
+      "archivedCount": "已归档 {{count}} 张",
+      "remaining": "剩余 {{count}} 张",
+      "percentUsed": "已用 {{percent}}%",
+      "nearLimit": "接近上限",
+      "atLimit": "已达上限",
+      "planUnlimited": "无限方案",
+      "planCards": "{{limit}} 张方案",
+      "unlimitedTitle": "无限存储",
+      "lifetimeTotal": "{{count}} 张"
+    }
   },
   "groups": {
     "account": "账户",

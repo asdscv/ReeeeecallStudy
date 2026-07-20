@@ -87,6 +87,7 @@ export function useStudy() {
     queue: store.queue,
     currentIndex: store.currentIndex,
     lastRatedCard: store.lastRatedCard,
+    subscriptionLocked: store.subscriptionLocked,
     // Actions
     startSession,
     flipCard,

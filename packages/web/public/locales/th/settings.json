@@ -148,7 +148,26 @@
     "upgradeSoon": "การสมัครสมาชิกจะเปิดให้ใช้เร็วๆ นี้",
     "unlimited": "ไม่จำกัด",
     "countUnlimited": "{{owned}} / ไม่จำกัด",
-    "planNoteUnlimited": "แพ็กเกจของคุณจัดเก็บการ์ดได้ไม่จำกัด"
+    "planNoteUnlimited": "แพ็กเกจของคุณจัดเก็บการ์ดได้ไม่จำกัด",
+    "detail": {
+      "title": "พื้นที่จัดเก็บการ์ด",
+      "subtitle": "การ์ดที่เป็นเจ้าของและที่สมัครสมาชิกนับรวมในแผนของคุณ ชุดการ์ดทางการไม่ถูกนับ",
+      "own": "การ์ดของฉัน",
+      "subscribed": "สมัครสมาชิกแล้ว",
+      "official": "ชุดการ์ดทางการ",
+      "officialNote": "ไม่นับรวมในขีดจำกัด",
+      "archived": "เก็บถาวรแล้ว",
+      "archivedNote": "ล็อกการเรียน",
+      "archivedCount": "เก็บถาวร {{count}} ใบ",
+      "remaining": "เหลือ {{count}} ใบ",
+      "percentUsed": "ใช้ไป {{percent}}%",
+      "nearLimit": "ใกล้ถึงขีดจำกัด",
+      "atLimit": "ถึงขีดจำกัดแล้ว",
+      "planUnlimited": "แผนไม่จำกัด",
+      "planCards": "แผน {{limit}} ใบ",
+      "unlimitedTitle": "จัดเก็บไม่จำกัด",
+      "lifetimeTotal": "{{count}} ใบ"
+    }
   },
   "groups": {
     "account": "บัญชี",

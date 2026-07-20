@@ -60,9 +60,14 @@ export interface ArchiveThreshold {
  */
 export function useArchiveThreshold(
   deckId: string | undefined,
-  opts?: { enabled?: boolean; refreshKey?: number },
+  opts?: { enabled?: boolean; refreshKey?: number; subscribed?: boolean },
 ): ArchiveThreshold {
-  const enabled = opts?.enabled ?? true
+  // A SUBSCRIBED (non-owned) deck can be study-locked as a WHOLE when the account is
+  // over its cap (mig 140) — get_deck_archived_count returns its full card count then.
+  // We still fetch that count for the deck-level note, but the per-card owned-threshold
+  // isArchived must NOT be applied to a subscribed deck's (publisher-owned) cards.
+  const subscribed = opts?.subscribed ?? false
+  const enabled = (opts?.enabled ?? true) || subscribed
   const refreshKey = opts?.refreshKey ?? 0
 
   const [threshold, setThreshold] = useState<string | null>(cachedThreshold)
@@ -98,7 +103,9 @@ export function useArchiveThreshold(
     }
   }, [deckId, enabled, refreshKey])
 
-  const thresholdMs = enabled && threshold ? new Date(threshold).getTime() : null
+  // Per-card badge only for OWNED decks (owned created_at boundary). Subscribed decks
+  // lock whole-deck, surfaced via archivedCount + the deck note, not per card.
+  const thresholdMs = enabled && !subscribed && threshold ? new Date(threshold).getTime() : null
   const isArchived = (createdAt: string) =>
     thresholdMs != null && new Date(createdAt).getTime() > thresholdMs
 

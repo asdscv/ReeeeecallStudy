@@ -26,11 +26,43 @@ const deckCache = createStaleCache({ ttlMs: 5 * 60 * 1000 })
 // get_owned_card_usage RPC per row. A FORCED refresh (delete / limit-rejection)
 // always runs so a user who frees space is never left wrongly blocked.
 let cardUsageFetchedAt = 0
+let cardUsageDetailFetchedAt = 0
+
+// Detailed usage (get_card_usage_detail) is an unbounded full-count scan, only needed
+// while a usage PANEL is actually mounted. Components that render it register interest
+// on mount and release on unmount; refreshCardUsage then re-fetches the detail ONLY
+// when at least one panel is live — so a card create/delete on a screen with no panel
+// pays nothing extra.
+let cardUsageDetailInterest = 0
+export function registerCardUsageDetailInterest(): void { cardUsageDetailInterest++ }
+export function releaseCardUsageDetailInterest(): void {
+  cardUsageDetailInterest = Math.max(0, cardUsageDetailInterest - 1)
+}
+export function hasCardUsageDetailInterest(): boolean { return cardUsageDetailInterest > 0 }
 
 export interface CardUsage {
   owned: number
   limit: number
   available: number
+}
+
+/**
+ * Detailed owned-card usage breakdown (get_card_usage_detail RPC, mig 137) for the
+ * big-tech usage panel. `usedTotal` === CardUsage.owned; the split behind it:
+ *  - ownedOwn        cards in decks you OWN (non-official)
+ *  - ownedSubscribed cards in decks you SUBSCRIBE to (non-official; count per mig 118)
+ *  - officialExcluded cards in official-certified decks — EXCLUDED from the cap (info)
+ *  - archivedTotal   owned non-official cards ARCHIVED from study (over-cap, account-wide)
+ */
+export interface CardUsageDetail {
+  ownedOwn: number
+  ownedSubscribed: number
+  usedTotal: number
+  officialExcluded: number
+  limit: number
+  available: number
+  isUnlimited: boolean
+  archivedTotal: number
 }
 
 interface DeckState {
@@ -41,6 +73,8 @@ interface DeckState {
   error: string | null
   /** Owned-card usage vs the account cap (mig 116). null until fetched. */
   cardUsage: CardUsage | null
+  /** Detailed usage breakdown (mig 137) for the usage panel. null until fetched. */
+  cardUsageDetail: CardUsageDetail | null
 
   fetchDecks: (opts?: { force?: boolean }) => Promise<void>
   fetchStats: (userId: string, opts?: { force?: boolean }) => Promise<void>
@@ -48,6 +82,9 @@ interface DeckState {
   /** Refresh owned-card usage (get_owned_card_usage RPC). `force` bypasses the
    *  rapid-call dedupe (use after a delete / limit-rejection). */
   fetchCardUsage: (opts?: { force?: boolean }) => Promise<void>
+  /** Refresh the detailed usage breakdown (get_card_usage_detail RPC). `force`
+   *  bypasses the rapid-call dedupe. */
+  fetchCardUsageDetail: (opts?: { force?: boolean }) => Promise<void>
   /**
    * Guarantee the current user has the default card templates, then refetch.
    * Self-heals accounts created before migration 036 whose signup trigger
@@ -80,6 +117,7 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   loading: false,
   error: null,
   cardUsage: null,
+  cardUsageDetail: null,
 
   invalidate: (key) => deckCache.invalidate(key),
 
@@ -88,9 +126,34 @@ export const useDeckStore = create<DeckState>((set, get) => ({
     if (!opts?.force && now - cardUsageFetchedAt < 2000) return  // dedupe rapid calls
     cardUsageFetchedAt = now
     const { data, error } = await supabase.rpc('get_owned_card_usage').maybeSingle()
-    if (error || !data) return
+    if (error || !data) { cardUsageFetchedAt = 0; return }  // let a retry through, don't dedupe a failure
     const row = data as { owned: number; card_limit: number; available: number }
     set({ cardUsage: { owned: row.owned, limit: row.card_limit, available: row.available } })
+  },
+
+  fetchCardUsageDetail: async (opts) => {
+    const now = Date.now()
+    if (!opts?.force && now - cardUsageDetailFetchedAt < 2000) return  // dedupe rapid calls
+    cardUsageDetailFetchedAt = now
+    const { data, error } = await supabase.rpc('get_card_usage_detail')
+    if (error || !data) { cardUsageDetailFetchedAt = 0; return }  // let a retry through
+    const r = data as {
+      owned_own: number; owned_subscribed: number; used_total: number
+      official_excluded: number; card_limit: number; available: number
+      is_unlimited: boolean; archived_total: number
+    }
+    set({
+      cardUsageDetail: {
+        ownedOwn: r.owned_own,
+        ownedSubscribed: r.owned_subscribed,
+        usedTotal: r.used_total,
+        officialExcluded: r.official_excluded,
+        limit: r.card_limit,
+        available: r.available,
+        isUnlimited: r.is_unlimited,
+        archivedTotal: r.archived_total,
+      },
+    })
   },
 
   fetchDecks: async (opts) => {
