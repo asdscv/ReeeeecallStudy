@@ -303,7 +303,8 @@
       "amount": "Importe",
       "status": "Estado",
       "paidAt": "Pagado el",
-      "empty": "No se encontraron pagos."
+      "empty": "No se encontraron pagos.",
+      "actions": "Acciones"
     },
     "user": {
       "title": "Buscar usuario",
@@ -337,7 +338,14 @@
       "prev": "Anterior",
       "next": "Siguiente"
     },
-    "actionError": "Acción fallida: {{error}}"
+    "actionError": "Acción fallida: {{error}}",
+    "refund": {
+      "button": "Reembolsar",
+      "confirmTitle": "¿Emitir reembolso?",
+      "confirmCreditPack": "¿Reembolsar {{amount}} a {{email}}? Esto devuelve el dinero a la tarjeta del cliente.",
+      "confirmSubscription": "¿Reembolsar el último cargo de esta suscripción a {{email}} y revocar el acceso?",
+      "realMoneyNote": "Esto llama al proveedor de pagos y mueve dinero real. No se puede deshacer aquí."
+    }
   },
   "official": {
     "title": "Official Accounts",
