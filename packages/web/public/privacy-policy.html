@@ -25,6 +25,7 @@
     <li><strong>Study Data:</strong> Flashcards, decks, study logs, review history, SRS scheduling data</li>
     <li><strong>Usage Data:</strong> Page views, session duration, feature usage (anonymized analytics)</li>
     <li><strong>Device Data:</strong> Device type, OS version, app version (for crash reporting and compatibility)</li>
+    <li><strong>Payment Data:</strong> When you buy a subscription or credit pack, the payment is handled by our payment processors (see Third-Party Services below). We receive a record of the purchase (product, amount, status) but never your full card number — card details are entered on and held by the processor.</li>
   </ul>
 
   <h2>2. How We Use Your Information</h2>
@@ -37,12 +38,16 @@
   </ul>
 
   <h2>3. Data Storage & Security</h2>
-  <p>Your data is stored securely on Supabase (hosted on AWS in the Oceania region). We use Row Level Security (RLS) to ensure users can only access their own data. AI provider API keys are encrypted with AES-256 and stored locally on your device — never on our servers.</p>
+  <p>Your data is stored securely on Supabase (hosted on AWS in the Oceania region). We use Row Level Security (RLS) to ensure users can only access their own data.</p>
+  <p><strong>AI card generation:</strong> When you use AI to generate flashcards, the text (and, for image-based generation, the image) you submit is sent to our AI provider to produce the cards. Generated content is returned to your account; we do not use your submitted content to train models. If you choose to supply your own AI provider API key, it is encrypted at rest and used solely to fulfill your own generation requests.</p>
 
   <h2>4. Third-Party Services</h2>
   <ul>
     <li><strong>Supabase:</strong> Authentication and database hosting</li>
-    <li><strong>RevenueCat:</strong> Subscription management (Pro plan)</li>
+    <li><strong>Lemon Squeezy:</strong> Web payment processing and subscription billing (Merchant of Record — collects and remits applicable taxes)</li>
+    <li><strong>TossPayments:</strong> Web payment processing for Korean-won (KRW) purchases</li>
+    <li><strong>RevenueCat, Apple App Store, Google Play:</strong> In-app purchase and subscription management on mobile</li>
+    <li><strong>Google (Gemini):</strong> AI flashcard generation — content you submit for generation is sent to this provider to produce cards</li>
     <li><strong>Apple/Google:</strong> Social login (Sign in with Apple, Google OAuth)</li>
     <li><strong>Cloudflare:</strong> Web hosting and CDN</li>
   </ul>

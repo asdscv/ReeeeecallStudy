@@ -33,7 +33,10 @@ Catalog (already seeded in `billing_products`): `credits_1000` (₩1,000), `cred
 3. Set the Vite BUILD env (Cloudflare → Worker → **Settings → Build → Build variables**,
    NOT the runtime "Variables and secrets"; VITE_ is inlined at `vite build`):
    ```
-   VITE_PAYMENT_PROVIDER=lemonsqueezy
+   # PRIMARY provider var is the PLURAL comma-list (order = default/primary first). To offer
+   # BOTH web providers as a checkout CHOICE use e.g. `toss,lemonsqueezy`. The singular
+   # VITE_PAYMENT_PROVIDER is only a legacy one-element fallback (used when the plural is unset).
+   VITE_PAYMENT_PROVIDERS=lemonsqueezy          # or e.g. toss,lemonsqueezy for a choice
    VITE_PAYMENTS_ENABLED=true
    VITE_LEMONSQUEEZY_STORE=<store-subdomain>               # e.g. sapiotrix → sapiotrix.lemonsqueezy.com
    # value = product_id → variant SLUG (UUID), the /checkout/buy/<SLUG> path — NOT numeric id
@@ -54,6 +57,37 @@ Catalog (already seeded in `billing_products`): `credits_1000` (₩1,000), `cred
      ```
 5. Each subscription/product → set the post-purchase **Redirect URL** to
    `https://<app>/settings?pay=success` (so the app refreshes the wallet on return).
+
+---
+
+## 1b) Web — TossPayments (토스페이먼츠) — optional second web provider
+
+Toss is a Korean PG (charges in **KRW**, not a Merchant of Record — you handle tax). It is a
+fully-wired SECOND web checkout provider; a buyer picks Toss or LemonSqueezy at checkout when
+both are enabled. Going live with Toss needs a **TossPayments merchant contract** (사업자 등록 +
+가맹 심사) to obtain LIVE keys — until then the `test_ck_`/`test_sk_` test keys drive the flow in
+test mode only (no real charge).
+
+1. Sign up at TossPayments, complete the merchant onboarding, and get the **client key** and
+   **secret key** (test → `test_ck_…`/`test_sk_…`; live → `live_ck_…`/`live_sk_…`).
+2. Set the Cloudflare **BUILD** vars (same place as the LS ones above):
+   ```
+   VITE_PAYMENT_PROVIDERS=toss,lemonsqueezy      # add 'toss' (order = default first)
+   VITE_TOSS_CLIENT_KEY=<test_ck_… → live_ck_…>  # baked into the bundle; go-live = swap to live_ck_
+   ```
+3. Set the Supabase edge **secrets**:
+   ```
+   supabase secrets set TOSS_SECRET_KEY=<test_sk_… → live_sk_…>   # server confirm/billing charge
+   supabase secrets set TOSS_RENEW_SECRET=<any strong string>     # auth for the daily renew cron
+   supabase secrets set TOSS_ENABLED=true                         # (already set)
+   ```
+4. Edge fns (already deployed): `toss-confirm` (one-time credit-pack confirm), `toss-billing`
+   (subscription billing-key auth + first charge), `toss-renew` (daily cron charges due Toss subs
+   — Toss has no hosted auto-renew, WE run it), `toss-webhook`. The renew cron is the GitHub
+   workflow `.github/workflows/toss-renew.yml` (needs the `TOSS_RENEW_SECRET` + functions URL as
+   repo secrets) — confirm it is scheduled/enabled once live.
+5. GO-LIVE swap: replace `VITE_TOSS_CLIENT_KEY` (build var) `test_ck_`→`live_ck_` AND
+   `TOSS_SECRET_KEY` (secret) `test_sk_`→`live_sk_`, then redeploy the web (VITE keys bake at build).
 
 ---
 

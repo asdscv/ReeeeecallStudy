@@ -205,7 +205,11 @@
     "faq": "FAQ",
     "blog": "인사이트",
     "help": "도움말",
-    "language": "언어"
+    "language": "언어",
+    "legal": "법적 고지",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침",
+    "refund": "환불정책"
   },
   "floatingCta": "지금 시작하기",
   "faq": {

@@ -205,7 +205,11 @@
     "faq": "Preguntas Frecuentes",
     "blog": "Artículos",
     "help": "Ayuda",
-    "language": "Idioma"
+    "language": "Idioma",
+    "legal": "Legal",
+    "terms": "Términos del Servicio",
+    "privacy": "Política de Privacidad",
+    "refund": "Política de Reembolso"
   },
   "floatingCta": "Comenzar Ahora",
   "faq": {

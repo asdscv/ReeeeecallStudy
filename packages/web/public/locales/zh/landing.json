@@ -205,7 +205,11 @@
     "faq": "FAQ",
     "blog": "学习洞察",
     "help": "帮助",
-    "language": "语言"
+    "language": "语言",
+    "legal": "法律信息",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "refund": "退款政策"
   },
   "floatingCta": "立即开始",
   "faq": {
