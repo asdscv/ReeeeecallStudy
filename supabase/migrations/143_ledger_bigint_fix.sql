@@ -1,5 +1,5 @@
 -- ============================================================================
--- 142: Fix get_ai_credit_ledger overflow — return delta/balance_after as bigint.
+-- 143: Fix get_ai_credit_ledger overflow — return delta/balance_after as bigint.
 --
 -- mig 130 declared the paginated ledger RPC's OUT columns as `integer`, but
 -- mig 114 widened ai_credit_ledger.delta and .balance_after to `bigint` (they
