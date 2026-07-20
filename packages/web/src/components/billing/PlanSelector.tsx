@@ -98,6 +98,12 @@ export function PlanSelector() {
   const currentProductId = subscription?.productId ?? null
   const currentProvider = subscription?.provider ?? null
 
+  // (P-H5) A live LemonSqueezy (Merchant-of-Record) subscriber must change plans through the
+  // hosted portal — NOT by opening a fresh checkout, which would start a SECOND, independently
+  // -billed LS subscription (double-charge). So lock the per-plan Select for LS subscribers and
+  // route them to the portal button below. (The server also rejects a second LS checkout.)
+  const lockPlanSwitch = PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'lemonsqueezy'
+
   // With one provider, subscribe directly; with 2+ (Toss + LemonSqueezy), pick a method.
   const [pickerProduct, setPickerProduct] = useState<string | null>(null)
   const beginCheckout = (productId: string) => {
@@ -181,9 +187,15 @@ export function PlanSelector() {
               </div>
               <button
                 type="button"
-                onClick={() => beginCheckout(p.id)}
-                disabled={isCurrent || processing}
-                title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
+                onClick={() => { if (lockPlanSwitch && !isCurrent) { void openPortal() } else { beginCheckout(p.id) } }}
+                disabled={isCurrent || processing || (lockPlanSwitch && portalLoading)}
+                title={
+                  isCurrent
+                    ? undefined
+                    : lockPlanSwitch
+                      ? t('manageSubscription.hint')
+                      : PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')
+                }
                 className={
                   isCurrent
                     ? 'cursor-not-allowed rounded-lg bg-accent px-4 py-2 text-sm font-medium text-muted-foreground'
@@ -195,9 +207,11 @@ export function PlanSelector() {
                 {processing && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isCurrent
                   ? t('plans.current')
-                  : PAYMENTS_ACTIVE
-                    ? t('plans.select')
-                    : t('comingSoon.badge')}
+                  : lockPlanSwitch
+                    ? t('manageSubscription.button')
+                    : PAYMENTS_ACTIVE
+                      ? t('plans.select')
+                      : t('comingSoon.badge')}
               </button>
             </li>
           )

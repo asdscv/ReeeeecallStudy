@@ -130,6 +130,10 @@ const resetStore = () =>
     srsQueueManager: null,
     crammingManager: null,
     maxCardPosition: 0,
+    // Reset the completion guard — it leaks true across tests otherwise (a prior
+    // endSession sets it), making a later endSession a silent no-op.
+    sessionSaved: false,
+    lastRatedCard: null,
   })
 
 beforeEach(() => {

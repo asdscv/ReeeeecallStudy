@@ -289,3 +289,8 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_rls_test.sql
+
+      - name: Run payment edge-case hardening assertions (mig 144 — terminal guard / retire / clawback / transfer)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/payment_edgecase_test.sql

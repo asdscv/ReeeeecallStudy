@@ -4,6 +4,8 @@ import { test, expect } from '../fixtures/test-helpers'
 // user is seeded AT the cap (5 owned / cap 5) by /tmp/cl_seed.sh, so the panels must
 // render the real get_card_usage_detail breakdown + the "Limit reached" state.
 
+test.use({ channel: 'chrome', video: 'off', trace: 'off', screenshot: 'off' })
+
 test.describe('Card-limit UI (live local Supabase, user at cap 5/5)', () => {
   test('Dashboard surfaces the card-storage usage card in the at-cap state', async ({ page }) => {
     // fixture already logged in → lands on the dashboard
