@@ -192,7 +192,8 @@ export function AIGenerateScreen() {
 
   // Image-recognition mode — cards_only only (needs the deck's template fields).
   const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
+  const [imageDataUrls, setImageDataUrls] = useState<string[]>([])
+  const MAX_IMAGES = 8
   const [affordable, setAffordable] = useState<Affordable | null>(null)
   const countTouched = useRef(false)   // once the user edits the count, stop auto-defaulting it
 
@@ -234,28 +235,18 @@ export function AIGenerateScreen() {
     return unsub
   }, [navigation, step, t])
 
-  // Clear a stale uploaded image when the deck changes (prevents an accidental
-  // paid re-generation with a previously-picked photo).
-  useEffect(() => { setImageDataUrl(null) }, [selectedDeckId])
+  // Clear stale uploaded images when the deck changes (prevents an accidental
+  // paid re-generation with previously-picked photos).
+  useEffect(() => { setImageDataUrls([]) }, [selectedDeckId])
 
-  const pickImage = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
-    if (!perm.granted) {
-      Alert.alert(t('alert.errorTitle'), t('alert.permissionDenied'))
-      return
-    }
-    // Pick the raw asset (no base64 yet) — we downscale dimensions + recompress
-    // ourselves so a multi-MP phone photo becomes a small JPEG instead of being
-    // rejected by the size cap. Mirrors the web canvas ≤1600px downscale.
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 })
-    if (res.canceled || !res.assets?.[0]?.uri) return
-    const asset = res.assets[0]
+  // Downscale one picked asset to a small JPEG data URL (≤1600px longer side,
+  // recompressed) so a multi-MP phone photo clears the size cap. Null on failure.
+  const downscaleAsset = async (asset: ImagePicker.ImagePickerAsset): Promise<string | null> => {
     try {
       const MAX_DIM = 1600
       const w = asset.width || 0
       const h = asset.height || 0
       const longer = Math.max(w, h)
-      // Resize the longer side to MAX_DIM (ratio preserved); never upscale.
       const actions: ImageManipulator.Action[] =
         longer > MAX_DIM ? [{ resize: w >= h ? { width: MAX_DIM } : { height: MAX_DIM } }] : []
       const out = await ImageManipulator.manipulateAsync(asset.uri, actions, {
@@ -263,17 +254,40 @@ export function AIGenerateScreen() {
         format: ImageManipulator.SaveFormat.JPEG,
         base64: true,
       })
-      if (!out.base64) { Alert.alert(t('alert.errorTitle'), t('alert.selectImageError')); return }
+      if (!out.base64) return null
       const dataUrl = `data:image/jpeg;base64,${out.base64}`
-      if (dataUrl.length > 6_500_000) {
-        Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
-        return
-      }
-      setImageDataUrl(dataUrl)
+      return dataUrl.length > 6_500_000 ? null : dataUrl
     } catch {
-      Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
+      return null
     }
   }
+
+  const pickImage = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!perm.granted) {
+      Alert.alert(t('alert.errorTitle'), t('alert.permissionDenied'))
+      return
+    }
+    const room = MAX_IMAGES - imageDataUrls.length
+    if (room <= 0) return
+    // Multi-select up to the remaining room; each asset is downscaled + recompressed
+    // ourselves (mirrors the web canvas ≤1600px path) and appended to the set.
+    const res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: room,
+    })
+    if (res.canceled || !res.assets?.length) return
+    const urls = (await Promise.all(res.assets.slice(0, room).map(downscaleAsset))).filter(
+      (u): u is string => !!u,
+    )
+    if (urls.length === 0) { Alert.alert(t('alert.errorTitle'), t('alert.selectImageError')); return }
+    setImageDataUrls((prev) => [...prev, ...urls].slice(0, MAX_IMAGES))
+  }
+
+  const removeImage = (idx: number) =>
+    setImageDataUrls((prev) => prev.filter((_, i) => i !== idx))
 
   const handleGenerate = async () => {
     // A cards_only deck with no template can't accept generated cards — block
@@ -283,7 +297,7 @@ export function AIGenerateScreen() {
       return
     }
     if (useImage) {
-      if (!imageDataUrl) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
+      if (imageDataUrls.length === 0) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
     } else if (!topic.trim()) {
       Alert.alert(t('alert.errorTitle'), t('alert.enterTopic'))
       return
@@ -315,9 +329,9 @@ export function AIGenerateScreen() {
 
       if (useImage) {
         if (selectedDeckId) {
-          await store.generateCardsFromImage(imageDataUrl!)  // add cards to the deck
+          await store.generateCardsFromImage(imageDataUrls)  // add cards to the deck
         } else {
-          await store.generateDeckFromImage(imageDataUrl!)   // image → a whole new deck
+          await store.generateDeckFromImage(imageDataUrls)   // image(s) → a whole new deck
         }
       } else {
         if (!selectedDeckId) {
@@ -357,7 +371,7 @@ export function AIGenerateScreen() {
     store.reset()
     setStep('config')
     setTopic('')
-    setImageDataUrl(null)
+    setImageDataUrls([])
     setImageMode('topic')
   }
 
@@ -459,6 +473,9 @@ export function AIGenerateScreen() {
                 ))}
               </View>
             )}
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: -4, marginBottom: 4 }]}>
+              {t(useImage ? 'content.inputModeImageHint' : 'content.inputModeTopicHint')}
+            </Text>
 
             {!useImage ? (
               <TextInput
@@ -476,15 +493,31 @@ export function AIGenerateScreen() {
                 <TouchableOpacity
                   testID="ai-image-pick"
                   onPress={pickImage}
-                  style={[styles.dropZone, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                  disabled={imageDataUrls.length >= MAX_IMAGES}
+                  style={[styles.dropZone, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated, opacity: imageDataUrls.length >= MAX_IMAGES ? 0.5 : 1 }]}
                 >
                   <Text style={{ fontSize: 30, marginBottom: 6 }}>🖼️</Text>
                   <Text style={[theme.typography.body, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    {imageDataUrl ? t('content.imageChange') : t('content.imageUpload')}
+                    {imageDataUrls.length > 0
+                      ? t('content.imageAddMore', { count: imageDataUrls.length, max: MAX_IMAGES })
+                      : t('content.imageUpload')}
                   </Text>
                 </TouchableOpacity>
-                {imageDataUrl && (
-                  <Image source={{ uri: imageDataUrl }} style={{ width: '100%', height: 170, borderRadius: 10, marginTop: 8 }} resizeMode="contain" />
+                {imageDataUrls.length > 0 && (
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                    {imageDataUrls.map((src, i) => (
+                      <View key={i} style={{ position: 'relative' }}>
+                        <Image source={{ uri: src }} style={{ width: 88, height: 88, borderRadius: 8 }} resizeMode="cover" />
+                        <TouchableOpacity
+                          onPress={() => removeImage(i)}
+                          hitSlop={8}
+                          style={{ position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: theme.colors.text, alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <Text style={{ color: theme.colors.background, fontSize: 13, lineHeight: 15 }}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
                 )}
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>{t('content.imageHint')}</Text>
                 <Text style={[theme.typography.caption, { color: palette.yellow[700] }]}>{t('content.imagePaidNotice')}</Text>
@@ -589,11 +622,28 @@ export function AIGenerateScreen() {
               </Text>
             )
           })()}
+          {/* Pre-flight card-limit block: compute count vs remaining room BEFORE
+              spending anything, so an over-limit generation can't start. */}
+          {(() => {
+            const overLimit = useImage ? limit.reached : limit.exceeds(parseInt(cardCount) || 10)
+            if (!overLimit) return null
+            return (
+              <Text style={[theme.typography.caption, { color: theme.colors.error, textAlign: 'center', marginBottom: 4 }]}>
+                {limit.reached
+                  ? t('content.cardLimitReached')
+                  : t('content.cardLimitExceeds', { available: limit.available })}
+              </Text>
+            )
+          })()}
           <Button
             testID="ai-generate-button"
             title={t('generateButton')}
             onPress={handleGenerate}
-            disabled={cardsOnlyNeedsTemplate || (useImage ? !imageDataUrl : !topic.trim())}
+            disabled={
+              cardsOnlyNeedsTemplate ||
+              (useImage ? imageDataUrls.length === 0 : !topic.trim()) ||
+              (useImage ? limit.reached : limit.exceeds(parseInt(cardCount) || 10))
+            }
           />
         </ScrollView>
       </Screen>

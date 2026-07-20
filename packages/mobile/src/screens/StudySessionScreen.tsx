@@ -66,6 +66,7 @@ export function StudySessionScreen() {
     phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
     undoLastRating, lastRatedCard, subscriptionLocked,
+    crammingManager, crammingTimeUp,
   } = useStudy()
 
   // Profile settings (TTS + answer mode)
@@ -128,6 +129,21 @@ export function StudySessionScreen() {
       navigation.goBack()
     }
   }, [phase, subscriptionLocked, navigation, sessionStats.cardsStudied, t])
+
+  // Cramming time-limit countdown — mirror web StudySessionPage so a timed
+  // cramming session auto-ends on mobile too (S-M2). Without this the manager
+  // held the limit but nothing fired it, so the session never auto-completed.
+  useEffect(() => {
+    if (!crammingManager || !crammingManager.hasTimeLimit() || phase !== 'studying') return
+    const interval = setInterval(() => {
+      const remaining = crammingManager.remainingTimeMs()
+      if (remaining != null && remaining <= 0) {
+        crammingTimeUp()
+        clearInterval(interval)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [crammingManager, phase, crammingTimeUp])
 
   // Reset animations on card change
   useEffect(() => {

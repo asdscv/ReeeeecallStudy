@@ -53,6 +53,10 @@ export function useStudy() {
     await store.exitSession()
   }, [store])
 
+  const crammingTimeUp = useCallback(async () => {
+    await store.crammingTimeUp()
+  }, [store])
+
   const undoLastRating = useCallback(() => {
     store.undoLastRating()
     haptics.warning()
@@ -88,12 +92,14 @@ export function useStudy() {
     currentIndex: store.currentIndex,
     lastRatedCard: store.lastRatedCard,
     subscriptionLocked: store.subscriptionLocked,
+    crammingManager: store.crammingManager,
     // Actions
     startSession,
     flipCard,
     rateCard,
     undoLastRating,
     exitSession,
+    crammingTimeUp,
     reset,
   }
 }

@@ -2,7 +2,7 @@
   "topUp": {
     "title": "Nạp thêm số dư",
     "subtitle": "Nạp số dư để tạo thẻ bằng AI vượt quá số thẻ miễn phí mỗi ngày.",
-    "credits": "Nhận ₩{{won}} số dư",
+    "credits": "Nhận {{amount}} tín dụng",
     "buy": "Mua",
     "success": "Đã nạp số dư.",
     "empty": "Không có gói nào khả dụng.",

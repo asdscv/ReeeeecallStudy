@@ -5,6 +5,7 @@ import { Check, ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { supabase } from '../../lib/supabase'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
 // card_limit >= this sentinel means "unlimited" FOR DISPLAY (mig 124). The DB
 // stores a huge real cap (2e9); only the presentation collapses it to the word.
@@ -35,7 +36,7 @@ interface Tier {
 }
 
 export function PricingSection() {
-  const { t } = useTranslation('landing')
+  const { t, i18n } = useTranslation('landing')
   const navigate = useNavigate()
   const prefersReduced = useReducedMotion()
   const [plans, setPlans] = useState<RawPublicPlan[]>([])
@@ -56,8 +57,9 @@ export function PricingSection() {
   // when payments are off, but never render if the flag is not 'true'.
   if (!PAYMENTS_ENABLED) return null
 
-  // Display currency is USD (the LemonSqueezy store charges USD).
-  const fmtUsd = (cents: number) => `$${(cents / 100).toFixed(2)}`
+  // Price follows the visitor's locale: ₩ for Korean, $ for everyone else.
+  const fmtPrice = (p: RawPublicPlan) =>
+    formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents }, i18n.language)
   const isUnlimited = (cardLimit: number) => cardLimit >= UNLIMITED_THRESHOLD
 
   // The card-limit line: "무제한 카드" for the sentinel, else "카드 {{count}}장".
@@ -84,7 +86,7 @@ export function PricingSection() {
     return {
       key: p.id,
       name: unlimited ? t('pricing.plans.unlimited') : t('pricing.plans.standard'),
-      price: t('pricing.pricePerMonth', { price: fmtUsd(p.price_usd_cents) }),
+      price: t('pricing.pricePerMonth', { price: fmtPrice(p) }),
       cardLimitLine: limitLine(p.card_limit),
       blurb: unlimited ? t('pricing.plans.unlimitedBlurb') : t('pricing.plans.standardBlurb'),
       cta: t('pricing.ctaPaid'),

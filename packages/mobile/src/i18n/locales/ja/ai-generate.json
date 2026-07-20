@@ -33,7 +33,12 @@
     "imageUpload": "画像をアップロード",
     "imageChange": "画像を変更",
     "imageHint": "写真を選ぶだけで、AIがカードに変換します。",
-    "imagePaidNotice": "画像生成にはクレジットを使用します。"
+    "imagePaidNotice": "画像生成にはクレジットを使用します。",
+    "imageAddMore": "追加 ({{count}}/{{max}})",
+    "inputModeTopicHint": "トピックを入力すると、AIがカードを作成します。",
+    "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。",
+    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。",
+    "cardLimitReached": "カード上限に達しました — カードを削除するか購読すると追加できます。"
   },
   "deck": {
     "section": "デッキを選択",

@@ -2,7 +2,7 @@
   "topUp": {
     "title": "增加余额",
     "subtitle": "为超出每日免费卡片的 AI 卡片生成充值余额。",
-    "credits": "赠送 ₩{{won}} 余额",
+    "credits": "获得 {{amount}} 的额度",
     "buy": "购买",
     "success": "充值完成。",
     "empty": "暂无可购买的套餐。",

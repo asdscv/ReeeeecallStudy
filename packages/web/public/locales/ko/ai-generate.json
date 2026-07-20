@@ -53,7 +53,11 @@
     "imageChange": "이미지 변경",
     "imageUploadHint": "단어 목록, 교과서 페이지, 필기 사진을 올리면 AI가 카드로 만들어드립니다.",
     "imagePaidNotice": "이미지 생성은 크레딧을 사용합니다 (무료 제공 없음).",
-    "cardLimitExceeds": "최대 {{available}}장만 더 추가할 수 있어요 — 개수를 줄이거나 구독하세요."
+    "cardLimitExceeds": "최대 {{available}}장만 더 추가할 수 있어요 — 개수를 줄이거나 구독하세요.",
+    "imageAddMore": "더 추가 ({{count}}/{{max}})",
+    "imageRemove": "이미지 삭제",
+    "inputModeTopicHint": "주제를 입력하면 AI가 카드를 만들어 줍니다.",
+    "inputModeImageHint": "교과서 페이지·단어 목록·필기 사진을 올리면 AI가 읽어 카드로 만듭니다. 여러 장을 한 번에 선택할 수 있어요."
   },
   "wallet": {
     "summary": "오늘 사용 가능: 무료 {{free}}장 + 유료 {{credits}}장",
@@ -123,7 +127,10 @@
         "hint": "힌트",
         "detail": "상세"
       }
-    }
+    },
+    "templateDesc": "AI가 설계한 카드 구조입니다. 필드 이름을 바꾼 뒤 계속하세요.",
+    "deckDesc": "새 덱의 이름·아이콘·색상을 확인한 뒤 계속하세요.",
+    "cardsDesc": "생성된 카드를 확인하세요. 내용을 수정하거나 원치 않는 카드를 지운 뒤 저장하세요."
   },
   "done": {
     "title": "생성 완료!",

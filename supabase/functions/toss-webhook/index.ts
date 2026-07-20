@@ -49,6 +49,21 @@ Deno.serve(async (req) => {
     return json({ received: true, status: status ?? null }, 200) // only refunds act here
   }
 
+  // PARTIAL vs FULL cancel (P-H3): the re-fetched payment carries balanceAmount (remaining,
+  // = totalAmount − Σ cancels) and a cancels[] history. A FULL cancel leaves balanceAmount 0
+  // (or status CANCELED); a PARTIAL_CANCELED keeps balanceAmount > 0. Treating a partial like
+  // a full cancel wrongly REVOKED the whole subscription / clawed back the FULL credit pack
+  // on a small refund. Only reverse in full on a full cancel; on a partial, keep the sub and
+  // claw back ONLY the refunded portion.
+  const balanceAmount = Number((pay.body as Record<string, unknown> | undefined)?.balanceAmount ?? 0)
+  const isFullCancel = status === 'CANCELED' || balanceAmount === 0
+  const cancels = Array.isArray((pay.body as Record<string, unknown> | undefined)?.cancels)
+    ? ((pay.body as Record<string, unknown>).cancels as Array<Record<string, unknown>>)
+    : []
+  const lastCancel = cancels.length > 0 ? cancels[cancels.length - 1] : null
+  const cancelAmountWon = Number(lastCancel?.cancelAmount ?? 0)
+  const cancelKey = lastCancel?.transactionKey != null ? String(lastCancel.transactionKey) : ''
+
   const svc = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
   // (a) subscription billing charge? billing_invoices records the charge paymentKey.
@@ -60,6 +75,11 @@ Deno.serve(async (req) => {
     .maybeSingle()
   const subId = (inv as { provider_subscription_id?: string } | null)?.provider_subscription_id
   if (subId) {
+    // A PARTIAL refund of a subscription charge must NOT terminate entitlement — keep the sub.
+    if (!isFullCancel) {
+      console.log('[toss-webhook] partial cancel of subscription charge — keeping sub', subId, 'balance', balanceAmount)
+      return json({ received: true, action: 'partial_cancel_subscription_kept', balance: balanceAmount }, 200)
+    }
     const { error } = await svc.rpc('revoke_subscription', {
       p_provider: 'toss',
       p_provider_subscription_id: subId,
@@ -76,10 +96,25 @@ Deno.serve(async (req) => {
     .eq('provider_payment_id', paymentKey)
     .maybeSingle()
   const it = intent as { merchant_uid: string; kind: string; status: string } | null
-  if (it && it.kind === 'credit_pack' && it.status === 'paid') {
-    const { error } = await svc.rpc('clawback_credits', { p_merchant_uid: it.merchant_uid })
-    if (error) console.error('[toss-webhook] clawback failed:', error.message)
-    return json({ received: true, action: 'clawed_back_credits' }, 200)
+  if (it && it.kind === 'credit_pack' && (it.status === 'paid' || it.status === 'refunded')) {
+    if (isFullCancel) {
+      const { error } = await svc.rpc('clawback_credits', { p_merchant_uid: it.merchant_uid })
+      if (error) console.error('[toss-webhook] clawback failed:', error.message)
+      return json({ received: true, action: 'clawed_back_credits' }, 200)
+    }
+    // Partial credit-pack refund → reverse ONLY the refunded portion, idempotent per cancel key.
+    const refundedMicro = Math.round(cancelAmountWon) * 1_000_000
+    if (refundedMicro <= 0 || !cancelKey) {
+      console.warn('[toss-webhook] partial cancel with no resolvable cancel amount/key — acking', paymentKey)
+      return json({ received: true, action: 'partial_cancel_noop' }, 200)
+    }
+    const { error } = await svc.rpc('clawback_credits_partial', {
+      p_merchant_uid: it.merchant_uid,
+      p_amount_micro: refundedMicro,
+      p_ref: it.merchant_uid + ':' + cancelKey,
+    })
+    if (error) console.error('[toss-webhook] partial clawback failed:', error.message)
+    return json({ received: true, action: 'clawed_back_credits_partial', clawed_micro: refundedMicro }, 200)
   }
 
   return json({ received: true, action: 'none' }, 200)

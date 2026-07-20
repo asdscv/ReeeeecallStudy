@@ -9,6 +9,7 @@ import {
   type MySubscription,
 } from '../../services/billing'
 import { SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
 // Card limits at or above this collapse to "unlimited" FOR DISPLAY only — the
 // mig-124 sentinel (sub_unlimited_monthly stores card_limit = 2e9). The DB still
@@ -36,7 +37,7 @@ export function PlanSelector({
   onSelect?: (product: BillingProduct) => void
 }) {
   const theme = useTheme()
-  const { t } = useTranslation('settings')
+  const { t, i18n } = useTranslation('settings')
   const [plans, setPlans] = useState<BillingProduct[] | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
 
@@ -69,12 +70,9 @@ export function PlanSelector({
       ? t('plans.unlimited')
       : t('plans.cardLimit', { limit: (limit ?? 0).toLocaleString() })
 
-  // Price to DISPLAY: the store charges USD, so prefer price_usd_cents; fall back
-  // to ₩ only if a plan row has no USD price configured.
-  const fmtPrice = (p: BillingProduct): string =>
-    p.priceUsdCents != null
-      ? `$${(p.priceUsdCents / 100).toFixed(2)}`
-      : `₩${p.priceKrw.toLocaleString()}`
+  // Price follows the buyer's locale: ₩ for Korean, $ for everyone else — matching
+  // what the region's payment method (Toss / store IAP) actually charges.
+  const fmtPrice = (p: BillingProduct): string => formatProductPrice(p, i18n.language)
 
   const isCurrent = (p: BillingProduct): boolean =>
     subscription?.status === 'active' &&

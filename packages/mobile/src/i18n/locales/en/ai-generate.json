@@ -33,7 +33,12 @@
     "imageUpload": "Upload image",
     "imageChange": "Change image",
     "imageHint": "Pick a photo — AI turns it into cards.",
-    "imagePaidNotice": "Image generation uses credits."
+    "imagePaidNotice": "Image generation uses credits.",
+    "imageAddMore": "Add more ({{count}}/{{max}})",
+    "inputModeTopicHint": "Describe a topic and AI writes the cards for you.",
+    "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once.",
+    "cardLimitExceeds": "You can add at most {{available}} more card(s) — reduce the count or subscribe.",
+    "cardLimitReached": "You've reached your card limit — delete cards or subscribe to add more."
   },
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards today",
