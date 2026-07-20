@@ -1,5 +1,5 @@
 -- ============================================================================
--- 138: Two card-limit follow-ups surfaced by the mig 136/135 audit.
+-- 138: Two card-limit follow-ups surfaced by the mig 136/137 audit.
 --
 -- M1 — accept_invite (private invite) subscribe branch bypassed the owned-card cap.
 --   acquire_listing's subscribe branch enforces check_card_limit (mig 118), but the
