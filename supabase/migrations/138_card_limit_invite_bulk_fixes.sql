@@ -1,16 +1,16 @@
 -- ============================================================================
--- 136: Two card-limit follow-ups surfaced by the mig 134/135 audit.
+-- 138: Two card-limit follow-ups surfaced by the mig 136/135 audit.
 --
 -- M1 — accept_invite (private invite) subscribe branch bypassed the owned-card cap.
 --   acquire_listing's subscribe branch enforces check_card_limit (mig 118), but the
 --   private-invite path never did — a subscriber could accept an arbitrarily large
 --   non-official deck and blow past their cap (study-access only; the cards stay
---   publisher-owned). The mig-134 trigger cannot backstop this: subscribing writes
+--   publisher-owned). The mig-136 trigger cannot backstop this: subscribing writes
 --   deck_shares + user_card_progress, never `cards`. Fix here: pre-check the cap in
 --   accept_invite BEFORE the share is flipped to active (else _owned_card_count, which
 --   counts active subscribe shares, would already include it and self-block).
 --
--- L5 — bulk_insert_cards inserted one row per loop iteration → the mig-134
+-- L5 — bulk_insert_cards inserted one row per loop iteration → the mig-136
 --   FOR-EACH-STATEMENT trigger fired N times, each running the bounded over-cap probe
 --   (O(cap) each) — O(cap × N) redundant work / a direct-RPC DoS surface. Rewrite as a
 --   single set-based INSERT..SELECT so the trigger fires exactly ONCE per call. The
@@ -32,7 +32,7 @@ DECLARE
   v_uid uuid := auth.uid();
   v_share deck_shares%ROWTYPE;
   v_new_deck_id uuid;
-  v_add_count integer;   -- mig 136: non-official cards a subscribe accept would add
+  v_add_count integer;   -- mig 138: non-official cards a subscribe accept would add
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Authentication required';
@@ -50,7 +50,7 @@ BEGIN
     RAISE EXCEPTION 'errors:sharing.cannotAcceptOwn';
   END IF;
 
-  -- ★ mig 136: owned-card cap for the SUBSCRIBE path — enforce BEFORE activating the
+  -- ★ mig 138: owned-card cap for the SUBSCRIBE path — enforce BEFORE activating the
   -- share (once active, _owned_card_count would already include these cards). Mirrors
   -- acquire_listing (mig 118). The COPY/snapshot path is guarded inside
   -- copy_deck_for_user, so only subscribe needs a pre-check here.
@@ -115,7 +115,7 @@ BEGIN
 
   SELECT next_position INTO v_position FROM decks WHERE id = p_deck_id;
 
-  -- Single set-based insert — one statement → the mig-134 AFTER-STATEMENT trigger fires
+  -- Single set-based insert — one statement → the mig-136 AFTER-STATEMENT trigger fires
   -- exactly once. WITH ORDINALITY preserves input order into sort_position.
   WITH items AS (
     SELECT elem, (ord - 1) AS idx

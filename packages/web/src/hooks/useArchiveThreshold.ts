@@ -63,7 +63,7 @@ export function useArchiveThreshold(
   opts?: { enabled?: boolean; refreshKey?: number; subscribed?: boolean },
 ): ArchiveThreshold {
   // A SUBSCRIBED (non-owned) deck can be study-locked as a WHOLE when the account is
-  // over its cap (mig 138) — get_deck_archived_count returns its full card count then.
+  // over its cap (mig 140) — get_deck_archived_count returns its full card count then.
   // We still fetch that count for the deck-level note, but the per-card owned-threshold
   // isArchived must NOT be applied to a subscribed deck's (publisher-owned) cards.
   const subscribed = opts?.subscribed ?? false

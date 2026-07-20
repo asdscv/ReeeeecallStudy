@@ -205,7 +205,11 @@
     "faq": "FAQ",
     "blog": "Wawasan",
     "help": "Bantuan",
-    "language": "Bahasa"
+    "language": "Bahasa",
+    "legal": "Legal",
+    "terms": "Ketentuan Layanan",
+    "privacy": "Kebijakan Privasi",
+    "refund": "Kebijakan Pengembalian Dana"
   },
   "floatingCta": "Mulai Sekarang",
   "faq": {

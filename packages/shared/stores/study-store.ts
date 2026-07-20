@@ -57,7 +57,7 @@ interface StudyState {
   studyState: DeckStudyState | null
   srsSource: SrsSource
   /** True when this deck is a SUBSCRIBED deck study-locked by the over-cap boundary
-   *  (mig 138) — cards stay viewable, but study is gated behind subscribing/upgrading. */
+   *  (mig 140) — cards stay viewable, but study is gated behind subscribing/upgrading. */
   subscriptionLocked: boolean
   userId: string | null
   srsQueueManager: SrsQueueManager | null
@@ -136,7 +136,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       ? getSrsSource({ share_mode: deckData.share_mode, user_id: deckData.user_id, source_owner_id: deckData.source_owner_id }, user.id)
       : 'embedded' as SrsSource
 
-    // Over-cap SUBSCRIBED deck → study-locked (mig 138). The account counts owned +
+    // Over-cap SUBSCRIBED deck → study-locked (mig 140). The account counts owned +
     // subscribed non-official cards toward the cap; when over, the newest subscribed
     // decks are locked from study (cards stay viewable) until the cap rises. Enforce
     // BEFORE building the queue so a locked deck yields no studyable cards.

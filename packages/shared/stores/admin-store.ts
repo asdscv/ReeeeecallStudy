@@ -198,6 +198,7 @@ interface AdminState {
   cancelSubscription: (provider: string, providerSubscriptionId: string, immediate: boolean) => Promise<{ error: string | null }>
   grantSubscription: (userId: string, productId: string, periodEnd: string | null) => Promise<{ error: string | null }>
   adjustWallet: (userId: string, deltaMicro: number, reason: string) => Promise<{ error: string | null }>
+  refundPayment: (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => Promise<{ error: string | null }>
   forceRefresh: (section: SectionKey) => void
 }
 
@@ -678,6 +679,32 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       if (!res?.ok) return { error: 'adjust_failed' }
       adminCache.invalidate('billing')
       get().logAction('adjust_wallet', 'user', userId, { delta_micro: deltaMicro, reason })
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  refundPayment: async (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => {
+    try {
+      // Refund runs through the `admin-refund` Edge fn (calls the payment provider +
+      // reverses our side), NOT an RPC — `functions.invoke` auto-attaches the admin JWT.
+      const { error } = await supabase.functions.invoke('admin-refund', { body: { kind, ref, reason } })
+      if (error) {
+        // supabase-js FunctionsHttpError carries the raw Response in `.context`;
+        // prefer our `{ error }` body over the generic message when present.
+        const ctx = (error as { context?: unknown }).context
+        if (ctx && typeof (ctx as Response).json === 'function') {
+          try {
+            const body = await (ctx as Response).json()
+            if (body && typeof body.error === 'string') return { error: body.error }
+          } catch { /* response wasn't JSON */ }
+        }
+        return { error: extractErrorMessage(error) }
+      }
+      // Wallet clawback / subscription revoke landed → the overview counts are stale.
+      adminCache.invalidate('billing')
+      get().logAction('refund_payment', kind === 'subscription' ? 'subscription' : 'payment', ref, { kind, reason })
       return { error: null }
     } catch (e) {
       return { error: extractErrorMessage(e) }

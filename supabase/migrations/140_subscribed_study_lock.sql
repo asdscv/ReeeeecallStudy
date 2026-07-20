@@ -1,5 +1,5 @@
 -- ============================================================================
--- 138: Over-cap SUBSCRIBED non-official cards are study-locked too (pay to use).
+-- 140: Over-cap SUBSCRIBED non-official cards are study-locked too (pay to use).
 --
 -- Owner intent: the card cap is a monetization gate. mig 118 made non-official
 -- SUBSCRIBED cards COUNT toward the cap, but nothing ever locked them from study —

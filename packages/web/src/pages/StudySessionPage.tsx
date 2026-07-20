@@ -286,7 +286,7 @@ export function StudySessionPage() {
     )
   }
 
-  // Over-cap subscribed deck → study-locked (mig 138). Cards stay viewable; studying
+  // Over-cap subscribed deck → study-locked (mig 140). Cards stay viewable; studying
   // requires raising the card limit (subscribe / upgrade). Distinct from "no cards due".
   if (subscriptionLocked) {
     return (

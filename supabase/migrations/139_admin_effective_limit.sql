@@ -1,7 +1,7 @@
 -- ============================================================================
--- 137: admins get the UNLIMITED effective limit everywhere, in ONE place.
+-- 139: admins get the UNLIMITED effective limit everywhere, in ONE place.
 --
--- check_card_limit (mig 116:76) and the mig-134 insert trigger both bypass
+-- check_card_limit (mig 116:76) and the mig-136 insert trigger both bypass
 -- role='admin' — but the ARCHIVE boundary get_active_card_threshold (mig 126) and the
 -- usage meter derive their limit from _owned_card_limit(uuid), which had NO admin
 -- branch. So an admin with no paid subscription fell back to the global 1000 cap:
@@ -22,7 +22,7 @@ CREATE OR REPLACE FUNCTION public._owned_card_limit(p_owner uuid)
   RETURNS integer LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
 AS $$
   SELECT CASE
-    -- Admins are never capped anywhere (mirror check_card_limit / the mig-134 trigger).
+    -- Admins are never capped anywhere (mirror check_card_limit / the mig-136 trigger).
     WHEN EXISTS (SELECT 1 FROM profiles WHERE id = p_owner AND role = 'admin')
       THEN 2000000000
     ELSE COALESCE(

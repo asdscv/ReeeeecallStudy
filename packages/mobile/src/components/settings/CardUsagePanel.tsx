@@ -5,7 +5,7 @@ import type { CardUsageDetail } from '@reeeeecall/shared/stores/deck-store'
 import { UNLIMITED_CARD_LIMIT } from './PlanSelector'
 
 /**
- * Detailed owned-card usage panel (get_card_usage_detail, mig 135) — the mobile mirror
+ * Detailed owned-card usage panel (get_card_usage_detail, mig 137) — the mobile mirror
  * of web CardUsagePanel. Segmented bar (my cards vs subscribed), utilization %,
  * remaining, and a breakdown naming why the count differs from total cards (official
  * excluded, over-cap excess archived from study). Pure presentation; caller fetches

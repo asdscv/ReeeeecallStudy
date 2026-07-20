@@ -1,5 +1,5 @@
 -- ============================================================================
--- card_limit_guard_test.sql — mig 134 (insert trigger) + mig 135 (usage detail).
+-- card_limit_guard_test.sql — mig 136 (insert trigger) + mig 137 (usage detail).
 --
 --   DRY-RUN  : get_card_usage_detail() reads never mutate; results are consistent.
 --   SMOKE    : an authenticated DIRECT insert under the cap passes; at the cap the
@@ -31,7 +31,7 @@ INSERT INTO profiles (id, role) VALUES
   (:u1,'user'),(:adm,'admin'),(:pub,'user'),(:sys,'user')
 ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role;
 -- sys = the system/official importer (skipped by fixed id). pub = a badge-granted
--- is_official publisher who is NOT the system user → must still be capped (mig 134 skip
+-- is_official publisher who is NOT the system user → must still be capped (mig 136 skip
 -- gates on the system-user id, not the grantable is_official flag).
 UPDATE profiles SET is_official = true WHERE id IN (:sys, :pub);
 
@@ -221,12 +221,12 @@ BEGIN
   ASSERT (j->>'owned_subscribed')::int = 3, 'BREAKDOWN: owned_subscribed=3 (pub deck)';
   ASSERT (j->>'official_excluded')::int = 4,'BREAKDOWN: official_excluded=4 (manifest deck)';
   ASSERT (j->>'card_limit')::int = 1,       'BREAKDOWN: card_limit=1';
-  -- mig 138: archived_total = owned excess (1) + locked subscribed (pub deck, 3;
+  -- mig 140: archived_total = owned excess (1) + locked subscribed (pub deck, 3;
   -- owned=2 fills the cap of 1 → remaining 0 → all subs locked). Official deck excluded.
   ASSERT (j->>'archived_total')::int = 4,   'BREAKDOWN: 1 owned + 3 subscribed archived';
 END $$;
 
--- ════════════════ M1: accept_invite SUBSCRIBE branch enforces the cap (mig 136) ══════
+-- ════════════════ M1: accept_invite SUBSCRIBE branch enforces the cap (mig 138) ══════
 -- Remove u1's subscribe shares, create a PENDING subscribe invite for pub's 3-card
 -- non-official deck, and set a cap where accepting would push u1 over.
 SET session_replication_role = replica;
@@ -292,7 +292,7 @@ BEGIN
   ASSERT n_after = n_before, 'Code#1: net-zero on block';
 END $$;
 
--- ════════════════ Code#2: admin effective limit is unlimited → NOT archived (mig 137) ═
+-- ════════════════ Code#2: admin effective limit is unlimited → NOT archived (mig 139) ═
 -- adm owns > cap cards; with the admin branch in _owned_card_limit, the archive boundary
 -- must be NULL (nothing archived) and the meter must read unlimited.
 SELECT set_config('request.jwt.claim.role', 'authenticated', false);
@@ -310,7 +310,7 @@ BEGIN
   ASSERT (j->>'archived_total')::int = 0,      'Code#2: admin archived_total = 0';
 END $$;
 
--- ════════════════ bulk_insert_cards: set-based (mig 136) inserts all, pre-check blocks ═
+-- ════════════════ bulk_insert_cards: set-based (mig 138) inserts all, pre-check blocks ═
 -- u1 under cap: a bulk insert of 3 cards into u1's own deck succeeds in one statement.
 SELECT set_config('request.jwt.claim.role', 'authenticated', false);
 SELECT set_config('request.jwt.claim.sub',  'e1000000-0000-0000-0000-000000000001', false);

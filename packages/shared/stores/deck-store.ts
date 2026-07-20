@@ -47,7 +47,7 @@ export interface CardUsage {
 }
 
 /**
- * Detailed owned-card usage breakdown (get_card_usage_detail RPC, mig 135) for the
+ * Detailed owned-card usage breakdown (get_card_usage_detail RPC, mig 137) for the
  * big-tech usage panel. `usedTotal` === CardUsage.owned; the split behind it:
  *  - ownedOwn        cards in decks you OWN (non-official)
  *  - ownedSubscribed cards in decks you SUBSCRIBE to (non-official; count per mig 118)
@@ -73,7 +73,7 @@ interface DeckState {
   error: string | null
   /** Owned-card usage vs the account cap (mig 116). null until fetched. */
   cardUsage: CardUsage | null
-  /** Detailed usage breakdown (mig 135) for the usage panel. null until fetched. */
+  /** Detailed usage breakdown (mig 137) for the usage panel. null until fetched. */
   cardUsageDetail: CardUsageDetail | null
 
   fetchDecks: (opts?: { force?: boolean }) => Promise<void>

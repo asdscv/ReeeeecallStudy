@@ -117,7 +117,7 @@ export function DeckDetailPage() {
   const archive = useArchiveThreshold(deckId, {
     enabled: !!deck && !deck.is_readonly,
     // A subscribed (non-owned) deck can be study-locked as a whole when over cap
-    // (mig 138) — surface its locked count in the deck note even though it's readonly.
+    // (mig 140) — surface its locked count in the deck note even though it's readonly.
     subscribed: !!deck && !!currentUserId && deck.user_id !== currentUserId,
     refreshKey: cards.length,
   })

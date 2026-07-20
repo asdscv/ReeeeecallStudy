@@ -1,5 +1,5 @@
 -- ============================================================================
--- 135: get_card_usage_detail() — the breakdown a detailed usage panel needs.
+-- 137: get_card_usage_detail() — the breakdown a detailed usage panel needs.
 --
 -- get_owned_card_usage() (mig 119) returns only {owned, card_limit, available} — a
 -- single merged integer. A "big-tech" usage display wants the split behind that
@@ -17,7 +17,7 @@
 --                      get_deck_archived_count). 0 when not over the cap.
 --
 -- Counting mirrors _owned_card_count (mig 118) + get_active_card_threshold (mig 126)
--- EXACTLY, so the panel, the guard (check_card_limit + trigger, mig 134), and the
+-- EXACTLY, so the panel, the guard (check_card_limit + trigger, mig 136), and the
 -- archive boundary all agree. Official exclusion honors card_limit_settings.
 --
 -- auth.uid()-scoped (NO caller-id param → no IDOR). SECURITY DEFINER + REVOKE anon.
@@ -35,7 +35,7 @@ AS $$
   thr AS (
     SELECT public.get_active_card_threshold() AS ts
   ),
-  -- Effective cap. _owned_card_limit is admin-aware (mig 137 → 2e9 for admins), so this
+  -- Effective cap. _owned_card_limit is admin-aware (mig 139 → 2e9 for admins), so this
   -- single source keeps the meter, the archive boundary, the cap and the trigger in
   -- agreement (admins read unlimited; nothing archived).
   eff AS (

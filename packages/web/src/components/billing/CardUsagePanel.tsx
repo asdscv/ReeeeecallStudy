@@ -4,7 +4,7 @@ import type { CardUsageDetail } from '@reeeeecall/shared/stores/deck-store'
 import { isUnlimitedCardLimit } from './PlanSelector'
 
 /**
- * Detailed owned-card usage panel (get_card_usage_detail, mig 135). Renders the split
+ * Detailed owned-card usage panel (get_card_usage_detail, mig 137). Renders the split
  * behind the single "used" number the meter shows: a segmented bar (my cards vs
  * subscribed), utilization %, remaining, and a breakdown that names WHY the count
  * differs from total cards — official-deck cards are excluded from the cap, and any

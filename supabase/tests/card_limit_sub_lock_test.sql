@@ -1,5 +1,5 @@
 -- ============================================================================
--- card_limit_sub_lock_test.sql — mig 138: over-cap SUBSCRIBED cards are study-locked.
+-- card_limit_sub_lock_test.sql — mig 140: over-cap SUBSCRIBED cards are study-locked.
 --
 -- Model: owned non-official cards keep priority; remaining slots fill with the OLDEST
 -- subscriptions (whole deck); newest overflow subscribed decks are study-locked and

@@ -11,7 +11,7 @@ export function FooterSection() {
     <footer className="border-t border-border bg-background pb-20 sm:pb-0">
       <div className="max-w-6xl mx-auto px-4 py-10 sm:py-14">
         <ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-6">
             {/* Brand column */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-3">
@@ -69,6 +69,30 @@ export function FooterSection() {
                 <li>
                   <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.help', 'Help')}
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal column */}
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-3">
+                {t('footer.legal', 'Legal')}
+              </h4>
+              <ul className="space-y-2 list-none p-0 m-0">
+                <li>
+                  <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                    {t('footer.terms', 'Terms of Service')}
+                  </a>
+                </li>
+                <li>
+                  <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                    {t('footer.privacy', 'Privacy Policy')}
+                  </a>
+                </li>
+                <li>
+                  <a href="/refund-policy.html" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                    {t('footer.refund', 'Refund Policy')}
                   </a>
                 </li>
               </ul>

@@ -112,7 +112,7 @@ export function StudySessionScreen() {
 
   // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
-    // Over-cap subscribed deck → study-locked (mig 138): don't route to the summary,
+    // Over-cap subscribed deck → study-locked (mig 140): don't route to the summary,
     // explain it and go back. Cards stay viewable in the deck.
     if (subscriptionLocked) {
       Alert.alert(t('subscriptionLocked.title'), t('subscriptionLocked.desc'), [

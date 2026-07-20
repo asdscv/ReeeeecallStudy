@@ -1,5 +1,5 @@
 -- ============================================================================
--- 134: HARD-ENFORCE the owned-card limit at the DB layer (defense-in-depth).
+-- 136: HARD-ENFORCE the owned-card limit at the DB layer (defense-in-depth).
 --
 -- WHY. Until now the cap was enforced ONLY inside the SECURITY DEFINER insert RPCs
 -- (reserve_card_positions / bulk_insert_cards / copy_deck_for_user / acquire_listing).

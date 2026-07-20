@@ -180,7 +180,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       .single()
 
     if (error) {
-      // The mig-134 insert trigger can raise PT402/CARD_LIMIT_REACHED here (a direct
+      // The mig-136 insert trigger can raise PT402/CARD_LIMIT_REACHED here (a direct
       // insert past the cap, e.g. a concurrent create that both passed reserve). Route
       // it through the friendly card-limit UX + refresh, like the reserve branch above.
       if (isCardLimitError(error)) { refreshCardUsage(true); set({ error: 'errors:card.limitReached' }) }
@@ -242,7 +242,7 @@ export const useCardStore = create<CardState>((set, get) => ({
       const { error } = await supabase.from('cards').insert(rows)
 
       if (error) {
-        // mig-134 trigger can PT402 a chunk that crosses the cap (concurrent create).
+        // mig-136 trigger can PT402 a chunk that crosses the cap (concurrent create).
         // Map to the friendly key + refresh so earlier committed chunks are reflected.
         if (isCardLimitError(error)) { refreshCardUsage(true); set({ error: 'errors:card.limitReached' }) }
         else set({ error: error.message })
