@@ -95,6 +95,7 @@
     "invalidResponse": "AI mengembalikan respons yang tidak valid. Silakan coba lagi.",
     "networkError": "Kesalahan jaringan. Silakan periksa koneksi Anda dan coba lagi.",
     "serverError": "Pembuatan dengan AI untuk sementara tidak tersedia. Silakan coba lagi nanti.",
+    "emptyResult": "AI tidak menghasilkan kartu. Silakan coba lagi — Anda tidak dikenai biaya.",
     "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
   },
   "config": {

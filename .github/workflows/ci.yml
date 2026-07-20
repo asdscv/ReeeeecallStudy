@@ -274,3 +274,18 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_smoke_test.sql
+
+      - name: Run owned-card limit INSERT-GUARD trigger + usage-detail assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_guard_test.sql
+
+      - name: Run over-cap SUBSCRIBED card study-lock assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_sub_lock_test.sql
+
+      - name: Run card-limit RLS hardening assertions (reactivation guard + deck-ownership)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_rls_test.sql

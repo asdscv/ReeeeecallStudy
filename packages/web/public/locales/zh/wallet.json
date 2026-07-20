@@ -24,7 +24,8 @@
     "refund": "退款",
     "admin_grant": "额度发放",
     "spend_cards": "AI 卡片",
-    "spend_image": "AI 图片"
+    "spend_image": "AI 图片",
+    "admin_adjustment": "调整"
   },
   "cardPlanHint": "卡片上限方案在“卡片存储”中管理。"
 }

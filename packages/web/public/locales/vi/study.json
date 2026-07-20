@@ -225,5 +225,10 @@
     "decksUnit": " decks",
     "cardsUnit": " cards",
     "swipeHint": "In swipe mode, swipe left/right to rate cards."
+  },
+  "subscriptionLocked": {
+    "title": "Khóa học tập",
+    "desc": "Bộ thẻ đã đăng ký này vượt quá giới hạn thẻ của bạn. Đăng ký hoặc tăng giới hạn để học — thẻ của bạn vẫn được lưu.",
+    "back": "Quay lại bộ thẻ"
   }
 }

@@ -87,7 +87,7 @@ export function AIGenerateModal({
     store.setConfig({
       mode: 'cards_only',
       topic: prevTopic,
-      cardCount: 20,
+      cardCount: 10,
       useCustomHtml: false,
       existingTemplateId: templateId,
       existingDeckId: deckId,
@@ -95,7 +95,8 @@ export function AIGenerateModal({
   }
 
   const handleRetry = () => {
-    store.reset()
+    // Preserve the user's config on retry rather than dumping them to a blank form.
+    store.retryFromConfig()
   }
 
   const handleTemplateNext = () => {

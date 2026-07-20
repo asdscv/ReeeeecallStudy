@@ -148,7 +148,26 @@
     "upgradeSoon": "La suscripción estará disponible pronto.",
     "unlimited": "Ilimitado",
     "countUnlimited": "{{owned}} / Ilimitado",
-    "planNoteUnlimited": "Tu plan incluye tarjetas ilimitadas."
+    "planNoteUnlimited": "Tu plan incluye tarjetas ilimitadas.",
+    "detail": {
+      "title": "Almacenamiento de tarjetas",
+      "subtitle": "Las tarjetas propias y suscritas cuentan para tu plan. Los mazos oficiales no cuentan.",
+      "own": "Mis tarjetas",
+      "subscribed": "Suscritas",
+      "official": "Mazos oficiales",
+      "officialNote": "Excluidos del límite",
+      "archived": "Archivadas",
+      "archivedNote": "Estudio bloqueado",
+      "archivedCount": "{{count}} archivadas",
+      "remaining": "{{count}} restantes",
+      "percentUsed": "{{percent}}% usado",
+      "nearLimit": "Cerca del límite",
+      "atLimit": "Límite alcanzado",
+      "planUnlimited": "Plan ilimitado",
+      "planCards": "Plan de {{limit}} tarjetas",
+      "unlimitedTitle": "Almacenamiento ilimitado",
+      "lifetimeTotal": "{{count}} tarjetas"
+    }
   },
   "groups": {
     "account": "Cuenta",

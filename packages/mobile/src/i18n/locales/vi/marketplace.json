@@ -11,7 +11,9 @@
     "history": "Lịch sử",
     "programming": "Lập trình",
     "exam": "Luyện thi",
-    "other": "Khác"
+    "other": "Khác",
+    "general": "Tổng hợp",
+    "trivia": "Kiến thức thú vị"
   },
   "sort": {
     "popular": "Phổ biến",
@@ -97,7 +99,7 @@
     },
     "downloading": "Đang tải xuống...",
     "limitUsage": "Thêm {{count}} thẻ vào giới hạn · còn {{available}}",
-    "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available}}). Xóa thẻ hoặc đăng ký trước.",
+    "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available}}). Giải phóng dung lượng hoặc nâng cấp gói để thêm.",
     "limitOfficialFree": "Bộ thẻ chính thức · không tính vào giới hạn thẻ.",
     "acquireByMode": {
       "subscribe": "Đăng ký theo dõi",

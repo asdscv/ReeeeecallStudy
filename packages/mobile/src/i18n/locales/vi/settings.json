@@ -111,7 +111,7 @@
     "quickStudy": "Học nhanh",
     "aiGenerate": "Tạo bằng AI",
     "invite": "Mời",
-    "shareMessage": "Khám phá ReeeeecallStudy — ứng dụng thẻ ghi nhớ thông minh nhất! https://reeeeecall.com"
+    "shareMessage": "Khám phá ReeeeecallStudy — ứng dụng thẻ ghi nhớ thông minh nhất! https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "Mẫu thẻ",
@@ -168,7 +168,26 @@
     "upgradeSoon": "Đăng ký sắp ra mắt.",
     "cancelPending": "Sắp hủy đăng ký — dùng đến {{date}}",
     "countUnlimited": "{{owned}} / Không giới hạn",
-    "planNoteUnlimited": "Giới hạn thẻ sở hữu của bạn là không giới hạn."
+    "planNoteUnlimited": "Giới hạn thẻ sở hữu của bạn là không giới hạn.",
+    "detail": {
+      "title": "Dung lượng thẻ",
+      "subtitle": "Thẻ sở hữu và thẻ đăng ký được tính vào giới hạn gói. Bộ thẻ chính thức không được tính.",
+      "own": "Thẻ của tôi",
+      "subscribed": "Đã đăng ký",
+      "official": "Bộ thẻ chính thức",
+      "officialNote": "Không tính vào giới hạn",
+      "archived": "Đã lưu trữ",
+      "archivedNote": "Đã khóa học tập",
+      "archivedCount": "Đã lưu trữ {{count}} thẻ",
+      "remaining": "Còn lại {{count}} thẻ",
+      "percentUsed": "Đã dùng {{percent}}%",
+      "nearLimit": "Gần đạt giới hạn",
+      "atLimit": "Đã đạt giới hạn",
+      "planUnlimited": "Gói không giới hạn",
+      "planCards": "Gói {{limit}} thẻ",
+      "unlimitedTitle": "Lưu trữ không giới hạn",
+      "lifetimeTotal": "{{count}} thẻ"
+    }
   },
   "groups": {
     "account": "Tài khoản",

@@ -146,7 +146,11 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "Error del servidor de IA. Vuelva a intentarlo más tarde.",
-    "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más."
+    "emptyResult": "La IA no generó tarjetas. Inténtalo de nuevo: no se te ha cobrado.",
+    "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más.",
+    "insufficientCredits": "Has usado tus tarjetas de IA gratuitas de hoy y no te quedan créditos. Recarga para seguir generando.",
+    "invalidImage": "No se pudo leer esa imagen. Prueba con una foto más pequeña o más nítida.",
+    "quotaExceeded": "Has alcanzado el límite gratuito de generación con IA de hoy. Inténtalo de nuevo mañana."
   },
   "button": {
     "aiGenerate": "AI Generate",

@@ -44,7 +44,7 @@
     "unsubscribeConfirm": "取消订阅此牌组？您的个人学习进度将保留在账户中。",
     "unsubscribeError": "取消订阅失败，请重试。",
     "limitUsage": "将占用 {{count}} 张卡片额度 · 剩余 {{available}} 张",
-    "limitExceeds": "将超出卡片额度（剩余 {{available}} 张）。请先删除卡片或订阅。",
+    "limitExceeds": "将超出卡片额度（剩余 {{available}} 张）。腾出空间或升级方案即可添加。",
     "limitOfficialFree": "官方认证牌组 · 不占用卡片额度。",
     "acquireByMode": {
       "subscribe": "订阅",

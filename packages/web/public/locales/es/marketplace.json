@@ -44,7 +44,7 @@
     "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
     "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo.",
     "limitUsage": "Añade {{count}} tarjetas a tu límite · quedan {{available}}",
-    "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Elimina tarjetas o suscríbete.",
+    "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Libera espacio o mejora tu plan para añadirlo.",
     "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas.",
     "acquireByMode": {
       "subscribe": "Suscribirse",

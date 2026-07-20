@@ -235,6 +235,38 @@ async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: stri
   }
 }
 
+// A generation result is USABLE only if it contains at least one non-empty list of items
+// (cards / fields). Mirrors the client's extraction (it shows the first non-empty array in
+// `content`), so "no items" = nothing the user can use. An empty-but-valid result (e.g.
+// {"cards": []}) must NOT consume the free quota / wallet — the caller releases the job
+// instead of charging. Prevents the "server succeeded + charged, but the user got nothing".
+function resultHasItems(content: unknown): boolean {
+  // An "item" counts only if it carries content — a non-null primitive, or an object with
+  // at least one key. So a degenerate {cards:[{}]} (a structurally-present but empty card)
+  // is treated as empty and NOT charged.
+  const nonEmptyItem = (x: unknown): boolean =>
+    x != null && (typeof x !== 'object' || Object.keys(x as object).length > 0)
+  if (Array.isArray(content)) return content.some(nonEmptyItem)
+  if (content && typeof content === 'object') {
+    for (const v of Object.values(content as Record<string, unknown>)) {
+      if (Array.isArray(v) && v.some(nonEmptyItem)) return true
+    }
+  }
+  return false
+}
+
+// A 'deck' generation returns ARRAYLESS metadata ({name, description, color, icon}) — it is
+// usable when it has a non-empty name (mirrors validateDeckResponse). All other kinds must
+// carry a non-empty list of items (cards / template fields).
+function resultIsUsable(kind: string, content: unknown): boolean {
+  if (kind === 'deck') {
+    const name = content && typeof content === 'object'
+      ? (content as Record<string, unknown>).name : undefined
+    return typeof name === 'string' && name.trim().length > 0
+  }
+  return resultHasItems(content)
+}
+
 // ── Request validation ──────────────────────────────────────
 function asTopic(v: unknown): string | null {
   if (typeof v !== 'string') return null
@@ -369,6 +401,11 @@ Deno.serve(async (req) => {
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
         const { json: content, usage } = await generate(model, iSys, iUser, image)
+        if (!resultHasItems(content)) {   // empty vision result → refund, don't charge
+          console.error('[ai-generate] image empty result — releasing job', imgMeter.job_ref)
+          await releaseJob(userId, imgMeter.job_ref)
+          return json({ error: 'No cards recognized in the image', code: 'AI_EMPTY_RESULT' }, 502, cors)
+        }
         // Post-gen CHARGE: deduct real token cost × markup from the wallet.
         const charge = await chargeGeneration(userId, imgMeter.job_ref, model, usage)  // best-effort, never masks the 200
         return json({ content, balance: charge?.balance ?? null }, 200, cors)
@@ -412,6 +449,11 @@ Deno.serve(async (req) => {
       const { systemPrompt: dSys, userPrompt: dUser } = buildImageDeckPrompt(uiLang)
       try {
         const { json: content, usage } = await generate(model, dSys, dUser, image)
+        if (!resultHasItems(content)) {   // empty deck result → refund, don't charge
+          console.error('[ai-generate] image_deck empty result — releasing job', idMeter.job_ref)
+          await releaseJob(userId, idMeter.job_ref)
+          return json({ error: 'No deck could be built from the image', code: 'AI_EMPTY_RESULT' }, 502, cors)
+        }
         const charge = await chargeGeneration(userId, idMeter.job_ref, model, usage)
         return json({ content, balance: charge?.balance ?? null }, 200, cors)
       } catch (e) {
@@ -505,6 +547,17 @@ Deno.serve(async (req) => {
       await releaseJob(userId, meter.job_ref)
       const code = msg === 'PROVIDER_AUTH' ? 'AI_PROVIDER_AUTH' : 'AI_PROVIDER_ERROR'
       return json({ error: 'Generation failed', code }, 502, cors)
+    }
+
+    // EMPTY-RESULT GUARD: a valid-but-empty result (no cards/items) must NOT consume the
+    // free quota or wallet. Release the reservation and error instead of charging, so a
+    // "server succeeded but produced nothing" never burns the user's daily free allowance.
+    // KIND-AWARE: a 'deck' result is arrayless metadata (usable iff it has a name); template
+    // (fields[]) and cards (cards[]) must carry items. Only refund a TRULY empty result.
+    if (!resultIsUsable(kind, content)) {
+      console.error('[ai-generate] empty/unusable', kind, 'result — releasing job', meter.job_ref)
+      await releaseJob(userId, meter.job_ref)
+      return json({ error: 'Generation returned no usable content', code: 'AI_EMPTY_RESULT' }, 502, cors)
     }
 
     // Post-gen CHARGE: deduct real token cost × markup (paid share) from the wallet.

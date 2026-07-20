@@ -17,6 +17,10 @@ export interface FieldPresetItem {
 
 export type FieldMode = 'auto' | 'manual'
 
+// The free AI-generation daily cap (mirrors the server's _ai_free_cards_per_day = 10).
+// Used to clamp the default card count to today's remaining free allowance.
+const FREE_DAILY_CAP = 10
+
 export interface GenerateConfig {
   topic: string
   cardCount: number
@@ -64,9 +68,13 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const { decks, fetchDecks } = useDeckStore()
   const limit = useCardLimit()
 
-  // Generation config state
+  // Generation config state.
+  // cardCount defaults to today's REMAINING FREE cards (see the affordance effect below)
+  // so a default generation never overshoots the free daily allowance (10/day). Starts at
+  // the free daily cap (10) until the server-authoritative remaining loads.
   const [topic, setTopic] = useState(initialTopic || '')
-  const [cardCount, setCardCount] = useState(20)
+  const [cardCount, setCardCount] = useState(10)
+  const countTouched = useRef(false)   // once the user edits the count, stop auto-defaulting it
   const [useCustomHtml, setUseCustomHtml] = useState(false)
   const [contentLang, setContentLang] = useState('')
 
@@ -112,6 +120,16 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
+
+  // Default the card count to TODAY'S REMAINING FREE cards (clamped to [1, free daily cap])
+  // so a default generation never overshoots the free allowance and silently spends the
+  // wallet. Applies once the server-authoritative affordance loads, and only until the user
+  // edits the count themselves. Image mode is paid-only, so it keeps the manual value.
+  useEffect(() => {
+    if (affordable && !countTouched.current && !useImage) {
+      setCardCount(Math.max(1, Math.min(FREE_DAILY_CAP, affordable.free)))
+    }
+  }, [affordable, useImage])
 
   // Selected deck info
   const selectedDeck: Deck | undefined = decks.find((d) => d.id === selectedDeckId)
@@ -362,6 +380,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             max={100}
             value={cardCount}
             onChange={(e) => {
+              countTouched.current = true   // user set it manually → stop auto-defaulting to remaining-free
               const raw = e.target.value
               setCardCount(raw === '' ? ('' as any) : (parseInt(raw) || 0))
             }}

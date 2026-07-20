@@ -115,7 +115,7 @@
     "quickStudy": "빠른 학습",
     "aiGenerate": "AI 생성",
     "invite": "초대",
-    "shareMessage": "가장 똑똑한 플래시카드 앱, ReeeeecallStudy를 확인해 보세요! https://reeeeecall.com"
+    "shareMessage": "가장 똑똑한 플래시카드 앱, ReeeeecallStudy를 확인해 보세요! https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "카드 템플릿",
@@ -168,7 +168,26 @@
     "upgradeSoon": "구독은 준비 중이에요.",
     "cancelPending": "구독 취소 예정 ({{date}}까지 이용)",
     "countUnlimited": "{{owned}} / 무제한",
-    "planNoteUnlimited": "소유 카드 한도가 무제한이에요."
+    "planNoteUnlimited": "소유 카드 한도가 무제한이에요.",
+    "detail": {
+      "title": "카드 저장 용량",
+      "subtitle": "내 카드와 구독 카드가 플랜 한도에 포함돼요. 공식 덱은 제외됩니다.",
+      "own": "내 카드",
+      "subscribed": "구독 카드",
+      "official": "공식 덱",
+      "officialNote": "한도 제외",
+      "archived": "보관됨",
+      "archivedNote": "학습 잠김",
+      "archivedCount": "{{count}}장 보관됨",
+      "remaining": "{{count}}장 남음",
+      "percentUsed": "{{percent}}% 사용",
+      "nearLimit": "한도 임박",
+      "atLimit": "한도 도달",
+      "planUnlimited": "무제한 플랜",
+      "planCards": "{{limit}}장 플랜",
+      "unlimitedTitle": "무제한 저장",
+      "lifetimeTotal": "{{count}}장"
+    }
   },
   "groups": {
     "account": "계정",

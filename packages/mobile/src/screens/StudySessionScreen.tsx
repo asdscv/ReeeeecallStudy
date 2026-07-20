@@ -65,7 +65,7 @@ export function StudySessionScreen() {
   const {
     phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
-    undoLastRating, lastRatedCard,
+    undoLastRating, lastRatedCard, subscriptionLocked,
   } = useStudy()
 
   // Profile settings (TTS + answer mode)
@@ -112,6 +112,14 @@ export function StudySessionScreen() {
 
   // Navigate on session end — completed → summary, idle → back
   useEffect(() => {
+    // Over-cap subscribed deck → study-locked (mig 140): don't route to the summary,
+    // explain it and go back. Cards stay viewable in the deck.
+    if (subscriptionLocked) {
+      Alert.alert(t('subscriptionLocked.title'), t('subscriptionLocked.desc'), [
+        { text: t('subscriptionLocked.back'), onPress: () => navigation.goBack() },
+      ])
+      return
+    }
     if (phase === 'completed') {
       navigation.replace('StudySummary')
     } else if (phase === 'idle' && sessionStats.cardsStudied > 0) {
@@ -119,7 +127,7 @@ export function StudySessionScreen() {
     } else if (phase === 'idle') {
       navigation.goBack()
     }
-  }, [phase, navigation, sessionStats.cardsStudied])
+  }, [phase, subscriptionLocked, navigation, sessionStats.cardsStudied, t])
 
   // Reset animations on card change
   useEffect(() => {
@@ -391,9 +399,11 @@ export function StudySessionScreen() {
         {/* Rating area — button mode: buttons, swipe mode: hints */}
         {isFlipped && isSwipeMode && (
           <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
+            {/* Labels must match the mode-aware ratings applied in panGesture.onEnd:
+                cramming \u2192 missed/gotIt, srs \u2192 again/good, else \u2192 unknown/known. */}
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t(config?.mode === 'cramming' ? 'rating.missed' : config?.mode === 'srs' ? 'srsRating.again' : 'rating.unknown')}</Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('session.swipe')}</Text>
-            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t(config?.mode === 'cramming' ? 'rating.gotIt' : config?.mode === 'srs' ? 'srsRating.good' : 'rating.known')} {'\u2192'}</Text>
           </View>
         )}
         {isFlipped && !isSwipeMode && (

@@ -225,5 +225,10 @@
     "decksUnit": " decks",
     "cardsUnit": " cards",
     "swipeHint": "In swipe mode, swipe left/right to rate cards."
+  },
+  "subscriptionLocked": {
+    "title": "Estudio bloqueado",
+    "desc": "Este mazo suscrito supera tu límite de tarjetas. Suscríbete o aumenta tu límite para estudiarlo — tus tarjetas se conservan.",
+    "back": "Volver al mazo"
   }
 }

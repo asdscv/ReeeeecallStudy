@@ -9,6 +9,7 @@ import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PlanSelector, UNLIMITED_CARD_LIMIT } from '../components/settings/PlanSelector'
+import { CardUsagePanel } from '../components/settings/CardUsagePanel'
 import { SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
@@ -17,7 +18,11 @@ import { useAuth, useAuthState } from '../hooks'
 // import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import { useThemeStore } from '../stores/theme-store'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import {
+  useDeckStore,
+  registerCardUsageDetailInterest,
+  releaseCardUsageDetailInterest,
+} from '@reeeeecall/shared/stores/deck-store'
 import { localPrefs } from '../utils/local-prefs'
 import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -72,7 +77,14 @@ export function SettingsScreen() {
   const setUserTheme = useThemeStore((s) => s.setUserTheme)
   const cardUsage = useDeckStore((s) => s.cardUsage)
   const fetchCardUsage = useDeckStore((s) => s.fetchCardUsage)
-  useEffect(() => { void fetchCardUsage() }, [fetchCardUsage])
+  const cardUsageDetail = useDeckStore((s) => s.cardUsageDetail)
+  const fetchCardUsageDetail = useDeckStore((s) => s.fetchCardUsageDetail)
+  useEffect(() => {
+    registerCardUsageDetailInterest()
+    void fetchCardUsage()
+    void fetchCardUsageDetail()
+    return () => releaseCardUsageDetailInterest()
+  }, [fetchCardUsage, fetchCardUsageDetail])
   // Surface subscription state on the plan / card-limit section. Auth-scoped RPC
   // (get_my_subscription) — returns null for free users. NOT gated behind the
   // mobile paywall: a sub can be granted by the WEB paywall too, so a user who
@@ -423,14 +435,11 @@ export function SettingsScreen() {
             icon="📇"
             badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned }) : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
           >
-            <View style={{ height: 8, borderRadius: 4, backgroundColor: theme.colors.border, overflow: 'hidden' }}>
-              <View style={{
-                height: '100%', borderRadius: 4,
-                width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%`,
-                backgroundColor: cardUsage.available <= 0 ? theme.colors.error : theme.colors.primary,
-              }} />
-            </View>
-            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.planNoteUnlimited') : t('cardUsage.planNote', { limit: cardUsage.limit })}</Text>
+            {cardUsageDetail ? (
+              <CardUsagePanel detail={cardUsageDetail} />
+            ) : (
+              <View style={{ height: 96, borderRadius: 12, backgroundColor: theme.colors.surface }} />
+            )}
             {subscription?.cancelAtPeriodEnd && subscription.currentPeriodEnd && (
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>
                 {t('cardUsage.cancelPending', {
@@ -441,17 +450,15 @@ export function SettingsScreen() {
             {/* Data-driven subscription plan selector (mirrors web). Gated behind the
                 mobile IAP flag (Apple Guideline 2.1(b)) — NO plan pricing / Select CTA
                 may render until store IAP products exist. Inert until the gate flips;
-                onSelect routes to the Paywall (also gated) to run the purchase flow. */}
+                onSelect routes to the Paywall (also gated) to run the purchase flow.
+                The at-cap "reached" state is shown inside <CardUsagePanel/> above. */}
             {SUBSCRIPTION_UI_ENABLED && (
-              <View style={{ marginTop: 12 }}>
+              <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 16 }}>
                 <PlanSelector
                   subscription={subscription}
                   onSelect={() => navigation.navigate('Paywall')}
                 />
               </View>
-            )}
-            {cardUsage.available <= 0 && (
-              <Text style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}>{t('cardUsage.reached')}</Text>
             )}
           </CollapsibleSection>
         )}
@@ -511,6 +518,31 @@ export function SettingsScreen() {
 
         {/* ── Answer Mode — matches web: standalone card ── */}
         <CollapsibleSection title={t('answerMode.title')} icon="📝">
+          <View style={styles.modeGrid}>
+            {(['button', 'swipe'] as const).map((mode) => {
+              const isActive = profile.answer_mode === mode
+              return (
+                <TouchableOpacity
+                  key={mode}
+                  testID={`settings-answer-${mode}`}
+                  onPress={() => saveProfile({ answer_mode: mode })}
+                  style={[
+                    styles.modeCard,
+                    {
+                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                      borderWidth: isActive ? 2 : 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
+                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
+                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
           <View style={styles.segmentRow}>
             {(['before', 'same', 'after'] as const).map((timing) => {
               const isActive = profile.answer_timing === timing
@@ -542,32 +574,6 @@ export function SettingsScreen() {
 
         {/* ── New Card Limit — standalone card ── */}
         <CollapsibleSection title={t('newCardLimit.title')} icon="🔢">
-          <View style={styles.modeGrid}>
-            {(['button', 'swipe'] as const).map((mode) => {
-              const isActive = profile.answer_mode === mode
-              return (
-                <TouchableOpacity
-                  key={mode}
-                  testID={`settings-answer-${mode}`}
-                  onPress={() => saveProfile({ answer_mode: mode })}
-                  style={[
-                    styles.modeCard,
-                    {
-                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
-                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
-                      borderWidth: isActive ? 2 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
-                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-
           <TextInput
             testID="settings-daily-limit"
             value={String(profile.daily_new_limit)}

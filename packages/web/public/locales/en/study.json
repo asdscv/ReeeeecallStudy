@@ -224,5 +224,10 @@
     "decksUnit": " decks",
     "cardsUnit": " cards",
     "swipeHint": "In swipe mode, swipe left/right to rate cards."
+  },
+  "subscriptionLocked": {
+    "title": "Study locked",
+    "desc": "This subscribed deck is over your card limit. Subscribe or raise your limit to study it — your cards stay saved.",
+    "back": "Back to deck"
   }
 }

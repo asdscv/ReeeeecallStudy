@@ -148,7 +148,26 @@
     "upgradeSoon": "Đăng ký sắp ra mắt.",
     "unlimited": "Không giới hạn",
     "countUnlimited": "{{owned}} / Không giới hạn",
-    "planNoteUnlimited": "Gói của bạn cho phép lưu thẻ không giới hạn."
+    "planNoteUnlimited": "Gói của bạn cho phép lưu thẻ không giới hạn.",
+    "detail": {
+      "title": "Dung lượng thẻ",
+      "subtitle": "Thẻ sở hữu và thẻ đã đăng ký đều tính vào gói của bạn. Bộ thẻ chính thức không tính.",
+      "own": "Thẻ của tôi",
+      "subscribed": "Đã đăng ký",
+      "official": "Bộ thẻ chính thức",
+      "officialNote": "Không tính vào giới hạn",
+      "archived": "Đã lưu trữ",
+      "archivedNote": "Đã khóa học tập",
+      "archivedCount": "{{count}} đã lưu trữ",
+      "remaining": "Còn {{count}}",
+      "percentUsed": "Đã dùng {{percent}}%",
+      "nearLimit": "Sắp đạt giới hạn",
+      "atLimit": "Đã đạt giới hạn",
+      "planUnlimited": "Gói không giới hạn",
+      "planCards": "Gói {{limit}} thẻ",
+      "unlimitedTitle": "Lưu trữ không giới hạn",
+      "lifetimeTotal": "{{count}} thẻ"
+    }
   },
   "groups": {
     "account": "Tài khoản",

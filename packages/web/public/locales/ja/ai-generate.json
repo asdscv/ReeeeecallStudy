@@ -146,7 +146,11 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AIサーバーエラーです。しばらくしてから再度お試しください。",
-    "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。"
+    "emptyResult": "AIがカードを生成できませんでした。もう一度お試しください（料金は発生していません）。",
+    "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。",
+    "insufficientCredits": "本日の無料AIカードを使い切り、クレジットも残っていません。チャージして生成を続けましょう。",
+    "invalidImage": "この画像を読み込めませんでした。より小さく、鮮明な写真でお試しください。",
+    "quotaExceeded": "本日の無料AI生成の上限に達しました。明日またお試しください。"
   },
   "button": {
     "aiGenerate": "AI Generate",

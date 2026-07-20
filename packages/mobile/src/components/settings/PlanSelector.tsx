@@ -57,10 +57,24 @@ export function PlanSelector({
     }
   }, [])
 
+  // Self-gate every call site: while mobile IAP products aren't submitted
+  // (Apple Guideline 2.1(b)) NO plan pricing / Select CTA may render anywhere.
+  // Returning null here — rather than relying on each caller to wrap the tag —
+  // means an ungated call site (e.g. CardUsageModal) can't leak the catalog.
+  // Safe after the hooks above (they always run); the flag is a module constant.
+  if (!SUBSCRIPTION_UI_ENABLED) return null
+
   const fmtLimit = (limit: number | null): string =>
     limit != null && limit >= UNLIMITED_CARD_LIMIT
       ? t('plans.unlimited')
       : t('plans.cardLimit', { limit: (limit ?? 0).toLocaleString() })
+
+  // Price to DISPLAY: the store charges USD, so prefer price_usd_cents; fall back
+  // to ₩ only if a plan row has no USD price configured.
+  const fmtPrice = (p: BillingProduct): string =>
+    p.priceUsdCents != null
+      ? `$${(p.priceUsdCents / 100).toFixed(2)}`
+      : `₩${p.priceKrw.toLocaleString()}`
 
   const isCurrent = (p: BillingProduct): boolean =>
     subscription?.status === 'active' &&
@@ -115,7 +129,7 @@ export function PlanSelector({
             </View>
             <View style={styles.planRight}>
               <Text style={[styles.price, { color: theme.colors.text }]}>
-                {`₩${p.priceKrw.toLocaleString()}`}
+                {fmtPrice(p)}
                 {p.period ? t('plans.perMonth') : ''}
               </Text>
               {current ? (

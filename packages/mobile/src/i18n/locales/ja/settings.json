@@ -111,7 +111,7 @@
     "quickStudy": "クイック学習",
     "aiGenerate": "AI生成",
     "invite": "招待",
-    "shareMessage": "最も賢い単語カードアプリ、ReeeeecallStudy をチェック！ https://reeeeecall.com"
+    "shareMessage": "最も賢い単語カードアプリ、ReeeeecallStudy をチェック！ https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "カードテンプレート",
@@ -168,7 +168,26 @@
     "upgradeSoon": "購読は近日公開予定です。",
     "cancelPending": "解約予定 — {{date}}まで利用できます",
     "countUnlimited": "{{owned}} / 無制限",
-    "planNoteUnlimited": "所有カードの上限は無制限です。"
+    "planNoteUnlimited": "所有カードの上限は無制限です。",
+    "detail": {
+      "title": "カード保存容量",
+      "subtitle": "所有カードと購読カードがプランの上限に含まれます。公式デッキは対象外です。",
+      "own": "所有カード",
+      "subscribed": "購読カード",
+      "official": "公式デッキ",
+      "officialNote": "上限対象外",
+      "archived": "アーカイブ済み",
+      "archivedNote": "学習ロック中",
+      "archivedCount": "{{count}}枚アーカイブ済み",
+      "remaining": "残り{{count}}枚",
+      "percentUsed": "{{percent}}%使用",
+      "nearLimit": "上限間近",
+      "atLimit": "上限に達しました",
+      "planUnlimited": "無制限プラン",
+      "planCards": "{{limit}}枚プラン",
+      "unlimitedTitle": "無制限保存",
+      "lifetimeTotal": "{{count}}枚"
+    }
   },
   "groups": {
     "account": "アカウント",

@@ -7,6 +7,7 @@ import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
+import { useCardStore } from './card-store'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
 
 type Phase = 'idle' | 'loading' | 'studying' | 'completed'
@@ -55,6 +56,9 @@ interface StudyState {
   sessionStats: SessionStats
   studyState: DeckStudyState | null
   srsSource: SrsSource
+  /** True when this deck is a SUBSCRIBED deck study-locked by the over-cap boundary
+   *  (mig 140) — cards stay viewable, but study is gated behind subscribing/upgrading. */
+  subscriptionLocked: boolean
   userId: string | null
   srsQueueManager: SrsQueueManager | null
   crammingManager: CrammingQueueManager | null
@@ -102,6 +106,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   studyState: null,
   userId: null,
   srsSource: 'embedded',
+  subscriptionLocked: false,
   srsQueueManager: null,
   crammingManager: null,
   maxCardPosition: 0,
@@ -120,7 +125,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     const check = guard.check('study_session_start', 'study_sessions_daily')
     if (!check.allowed) { set({ phase: 'idle' }); return }
 
-    set({ phase: 'loading', config })
+    set({ phase: 'loading', config, subscriptionLocked: false })
 
     try {
 
@@ -142,6 +147,18 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     const srsSource = deckData
       ? getSrsSource({ share_mode: deckData.share_mode, user_id: deckData.user_id, source_owner_id: deckData.source_owner_id }, user.id)
       : 'embedded' as SrsSource
+
+    // Over-cap SUBSCRIBED deck → study-locked (mig 140). The account counts owned +
+    // subscribed non-official cards toward the cap; when over, the newest subscribed
+    // decks are locked from study (cards stay viewable) until the cap rises. Enforce
+    // BEFORE building the queue so a locked deck yields no studyable cards.
+    if (srsSource === 'progress_table') {
+      const { data: active } = await supabase.rpc('is_subscribed_deck_active', { p_deck_id: config.deckId })
+      if (active === false) {
+        set({ phase: 'completed', subscriptionLocked: true, srsSource, queue: [], srsQueueManager: null, crammingManager: null, sessionStats: { ...initialStats, totalCards: 0 } })
+        return
+      }
+    }
 
     let template: CardTemplate | null = null
     if (deckData && deckData.default_template_id) {
@@ -778,6 +795,14 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // Prevent duplicate session recording (race between rateCard completion and crammingTimeUp)
     if (sessionSaved) return
     set({ sessionSaved: true })
+
+    // SRS for this deck just changed via study (which writes cards/user_card_progress
+    // directly, bypassing card-store) → drop the cached card list so DeckDetail's
+    // srs_status filter/counts reflect it on next open. Cramming doesn't change SRS.
+    // (Kept in sync with the shared study-store copy — the dual-store pitfall.)
+    if (config.mode !== 'cramming') {
+      useCardStore.getState().invalidateCards(config.deckId)
+    }
 
     // Build metadata for cramming sessions
     let metadata: Record<string, unknown> | undefined

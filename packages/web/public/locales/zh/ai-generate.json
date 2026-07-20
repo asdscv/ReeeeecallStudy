@@ -146,7 +146,11 @@
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AI 服务器错误，请稍后再试。",
-    "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。"
+    "emptyResult": "AI 未生成任何卡片。请重试——未向您收费。",
+    "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。",
+    "insufficientCredits": "您今天的免费AI卡片已用完，且没有剩余点数。请充值以继续生成。",
+    "invalidImage": "无法读取该图片。请尝试更小或更清晰的照片。",
+    "quotaExceeded": "您已达到今日免费AI生成上限。请明天再试。"
   },
   "button": {
     "aiGenerate": "AI Generate",

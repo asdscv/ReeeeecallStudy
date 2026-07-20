@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
-import { useDeckStore } from './deck-store'
+import { useDeckStore, hasCardUsageDetailInterest } from './deck-store'
 import { createStaleCache } from '../lib/cache/stale-cache'
 import type { Card } from '../types/database'
 
@@ -36,6 +36,12 @@ function invalidateDeckStats(): void {
  */
 function refreshCardUsage(force = false): void {
   void useDeckStore.getState().fetchCardUsage({ force })
+  // Only refresh the (unbounded) detail breakdown when a usage panel is actually
+  // mounted — otherwise a create/delete on a panel-less screen would fire a needless
+  // full-count RPC. Panels register interest on mount (see deck-store).
+  if (hasCardUsageDetailInterest()) {
+    void useDeckStore.getState().fetchCardUsageDetail({ force })
+  }
 }
 
 // ── Per-deck card-list cache ─────────────────────────────────────────────────
@@ -174,7 +180,11 @@ export const useCardStore = create<CardState>((set, get) => ({
       .single()
 
     if (error) {
-      set({ error: error.message })
+      // The mig-136 insert trigger can raise PT402/CARD_LIMIT_REACHED here (a direct
+      // insert past the cap, e.g. a concurrent create that both passed reserve). Route
+      // it through the friendly card-limit UX + refresh, like the reserve branch above.
+      if (isCardLimitError(error)) { refreshCardUsage(true); set({ error: 'errors:card.limitReached' }) }
+      else set({ error: error.message })
       return null
     }
 
@@ -232,7 +242,10 @@ export const useCardStore = create<CardState>((set, get) => ({
       const { error } = await supabase.from('cards').insert(rows)
 
       if (error) {
-        set({ error: error.message })
+        // mig-136 trigger can PT402 a chunk that crosses the cap (concurrent create).
+        // Map to the friendly key + refresh so earlier committed chunks are reflected.
+        if (isCardLimitError(error)) { refreshCardUsage(true); set({ error: 'errors:card.limitReached' }) }
+        else set({ error: error.message })
         break
       }
 
@@ -243,9 +256,13 @@ export const useCardStore = create<CardState>((set, get) => ({
     // (next_position 증가는 reserve_card_positions가 원자적으로 처리)
 
     guard.recordSuccess('cards_total', totalInserted)
-    if (!get().error) {
+    // Refresh whenever ANY chunk committed — a mid-loop error (card-limit or transient)
+    // still leaves earlier chunks persisted, so the meter / deck stats / card list must
+    // reflect them. Gating on !error would strand a partial import as stale. The `error`
+    // (if any) stays set for the UI to surface alongside the partial count.
+    if (totalInserted > 0) {
       invalidateDeckStats()
-      refreshCardUsage()
+      refreshCardUsage(true)
       dropDeckCards(deck_id)
       await get().fetchCards(deck_id)
     }

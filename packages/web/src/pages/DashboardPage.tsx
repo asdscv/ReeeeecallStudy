@@ -21,6 +21,7 @@ import { StudyHeatmap } from '../components/dashboard/StudyHeatmap'
 import { ForecastWidget } from '../components/dashboard/ForecastWidget'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { RecentDecks } from '../components/dashboard/RecentDecks'
+import { CardUsageCard } from '../components/billing/CardUsageCard'
 import { AchievementsSummary } from '../components/dashboard/AchievementsSummary'
 import { DailyQuestsWidget } from '../components/dashboard/DailyQuestsWidget'
 import { StreakFreezeWidget } from '../components/dashboard/StreakFreezeWidget'
@@ -137,6 +138,9 @@ export function DashboardPage() {
         streak={streak}
         masteryRate={masteryRate}
       />
+
+      {/* Card-storage usage — at-a-glance meter → full detail modal */}
+      <CardUsageCard />
 
       {/* Achievements + Level */}
       <AchievementsSummary />

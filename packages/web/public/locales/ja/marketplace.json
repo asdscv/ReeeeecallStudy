@@ -44,7 +44,7 @@
     "unsubscribeConfirm": "このデッキの配信を解除しますか？個人の学習進捗はアカウントに残ります。",
     "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。",
     "limitUsage": "カード{{count}}枚が上限に加算されます · 残り{{available}}枚",
-    "limitExceeds": "カード上限を超えます（残り{{available}}枚）。カードを削除するか購読してください。",
+    "limitExceeds": "カード上限を超えます（残り{{available}}枚）。空きを作るかプランをアップグレードすると追加できます。",
     "limitOfficialFree": "公式デッキ · カード上限に含まれません。",
     "acquireByMode": {
       "subscribe": "購読する",

@@ -11,7 +11,9 @@
     "history": "역사",
     "programming": "코드",
     "exam": "시험",
-    "other": "기타"
+    "other": "기타",
+    "general": "일반",
+    "trivia": "상식"
   },
   "sort": {
     "popular": "인기순",
@@ -97,7 +99,7 @@
       "most_helpful": "도움순"
     },
     "limitUsage": "카드 {{count}}장이 한도에 추가돼요 · 남은 {{available}}장",
-    "limitExceeds": "카드 한도를 초과해요 (남은 {{available}}장). 카드를 지우거나 구독하세요.",
+    "limitExceeds": "카드 한도를 초과해요 ({{available}}장 남음). 공간을 확보하거나 플랜을 업그레이드하면 추가할 수 있어요.",
     "limitOfficialFree": "공인 인증 덱 · 카드 한도에 포함되지 않아요.",
     "acquireByMode": {
       "subscribe": "구독하기",

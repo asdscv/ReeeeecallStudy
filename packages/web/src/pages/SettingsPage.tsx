@@ -16,6 +16,8 @@ import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
+import { CardUsagePanel } from '../components/billing/CardUsagePanel'
+import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
 import {
   loadSettings,
   saveSettings,
@@ -50,8 +52,15 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const cardUsage = useDeckStore((s) => s.cardUsage)
   const fetchCardUsage = useDeckStore((s) => s.fetchCardUsage)
+  const cardUsageDetail = useDeckStore((s) => s.cardUsageDetail)
+  const fetchCardUsageDetail = useDeckStore((s) => s.fetchCardUsageDetail)
 
-  useEffect(() => { void fetchCardUsage() }, [fetchCardUsage])
+  useEffect(() => {
+    registerCardUsageDetailInterest()
+    void fetchCardUsage()
+    void fetchCardUsageDetail()
+    return () => releaseCardUsageDetailInterest()
+  }, [fetchCardUsage, fetchCardUsageDetail])
 
   const [loading, setLoading] = useState(true)
 
@@ -251,17 +260,17 @@ export function SettingsPage() {
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => navigate('/quick-study')}
-              className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 transition cursor-pointer text-center"
+              className="bg-orange-50 border border-orange-200 dark:bg-orange-500/15 dark:border-orange-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 dark:hover:bg-orange-500/25 transition cursor-pointer text-center"
             >
-              <Zap className="w-6 h-6 text-orange-600" />
-              <span className="text-sm font-semibold text-orange-700">{t('quickActions.quickStudy', 'Quick Study')}</span>
+              <Zap className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">{t('quickActions.quickStudy', 'Quick Study')}</span>
             </button>
             <button
               onClick={() => navigate('/ai-generate')}
-              className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 transition cursor-pointer text-center"
+              className="bg-purple-50 border border-purple-200 dark:bg-purple-500/15 dark:border-purple-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 dark:hover:bg-purple-500/25 transition cursor-pointer text-center"
             >
-              <Bot className="w-6 h-6 text-purple-600" />
-              <span className="text-sm font-semibold text-purple-700">{t('quickActions.aiGenerate', 'AI Generate')}</span>
+              <Bot className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('quickActions.aiGenerate', 'AI Generate')}</span>
             </button>
             <button
               onClick={() => navigate('/guide')}
@@ -362,25 +371,14 @@ export function SettingsPage() {
                   </span>
                 }
               >
-                {unlimited ? (
-                  <p className="text-sm font-semibold text-brand">{t('cardUsage.unlimited')}</p>
+                {cardUsageDetail ? (
+                  <CardUsagePanel detail={cardUsageDetail} />
                 ) : (
-                  <div className="h-2 rounded-full bg-accent overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${cardUsage.available <= 0 ? 'bg-destructive' : 'bg-brand'}`}
-                      style={{ width: `${Math.min(100, Math.round((cardUsage.owned / Math.max(1, cardUsage.limit)) * 100))}%` }}
-                    />
-                  </div>
+                  <div className="h-24 animate-pulse rounded-xl bg-accent" aria-hidden />
                 )}
-                <p className="text-xs text-muted-foreground mt-3">
-                  {unlimited
-                    ? t('cardUsage.planNoteUnlimited')
-                    : t('cardUsage.planNote', { limit: cardUsage.limit })}
-                </p>
-                <PlanSelector />
-                {!unlimited && cardUsage.available <= 0 && (
-                  <p className="text-xs text-destructive mt-2">{t('cardUsage.reached')}</p>
-                )}
+                <div className="mt-5 border-t border-border pt-4">
+                  <PlanSelector />
+                </div>
               </CollapsibleSection>
             )
           })()}
