@@ -355,7 +355,31 @@ Deno.serve(async (req) => {
     case 'SUBSCRIPTION_PAUSED':
       return await syncStatus('paused', null)
 
-    // TRANSFER, SUBSCRIBER_ALIAS, TEST, etc. — nothing to grant. Ack so RC stops retrying.
+    // TRANSFER: entitlements moved between app_user_ids. The raised card cap must FOLLOW the
+    // user, else it strands on the old id (P-L2). RC sends transferred_from / transferred_to
+    // (arrays of app_user_ids), NOT a sub id — so move by user. Only our-uuid ids are actionable.
+    case 'TRANSFER': {
+      const firstUuid = (v: unknown): string | null => {
+        const arr = Array.isArray(v) ? v : []
+        for (const x of arr) if (typeof x === 'string' && UUID_RE.test(x)) return x
+        return null
+      }
+      const fromUser = firstUuid(event.transferred_from)
+      const toUser = firstUuid(event.transferred_to)
+      if (!fromUser || !toUser) {
+        console.warn('[revenuecat-webhook] TRANSFER with no resolvable our-uuid from/to — acking', event.transferred_from, event.transferred_to)
+        return json({ received: true, type, ignored: 'no_uuid_endpoints' }, 200)
+      }
+      const { data, error } = await sb.rpc('transfer_subscriptions_by_user', {
+        p_provider: PROVIDER,
+        p_from_user: fromUser,
+        p_to_user: toUser,
+      })
+      if (error) return rpcErrorResponse(`transfer_subscriptions_by_user ${type}`, error.message)
+      return json({ received: true, type, ...(typeof data === 'object' && data ? data : {}) }, 200)
+    }
+
+    // SUBSCRIBER_ALIAS, TEST, etc. — nothing to grant. Ack so RC stops retrying.
     default:
       return json({ received: true, type }, 200)
   }

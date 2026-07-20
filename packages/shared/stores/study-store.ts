@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { calculateSRS, getSrsDayStart, type SrsRating } from '../lib/srs'
-import { advanceSequentialReviewPosition, buildSequentialReviewQueue } from '../lib/study-session-utils'
+import { buildSequentialReviewQueue, computeSequentialReviewPositions } from '../lib/study-session-utils'
 import { SrsQueueManager, type QueueCard, type SrsQueueSnapshot } from '../lib/study-queue'
 import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating, type CrammingQueueSnapshot } from '../lib/cramming-queue'
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
@@ -141,8 +141,16 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // decks are locked from study (cards stay viewable) until the cap rises. Enforce
     // BEFORE building the queue so a locked deck yields no studyable cards.
     if (srsSource === 'progress_table') {
-      const { data: active } = await supabase.rpc('is_subscribed_deck_active', { p_deck_id: config.deckId })
-      if (active === false) {
+      // Resolve the over-cap study-lock (mig 140). FAIL-CLOSED (S-L2): a null/error
+      // result must NOT silently unlock a study-locked deck. Retry once; if still
+      // indeterminate, treat as locked. Official + under-cap subscribed decks
+      // return true and study proceeds normally.
+      let active: boolean | null = null
+      for (let attempt = 0; attempt < 2 && active == null; attempt++) {
+        const { data, error } = await supabase.rpc('is_subscribed_deck_active', { p_deck_id: config.deckId })
+        if (!error && data != null) active = data as boolean
+      }
+      if (active !== true) {
         set({ phase: 'completed', subscriptionLocked: true, srsSource, queue: [], srsQueueManager: null, crammingManager: null, sessionStats: { ...initialStats, totalCards: 0 } })
         return
       }
@@ -214,6 +222,28 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       activeThreshold = (thresholdData as string | null) ?? null
     }
 
+    // ── Merged card set for NON-OWNED decks (progress_table) ──────────────────
+    // Subscribed / publisher-owned / official decks keep the VIEWER's own SRS in
+    // user_card_progress, not the embedded cards row. Load the FULL card set + the
+    // viewer's progress ONCE, PAGINATED — PostgREST caps a single response at
+    // max_rows=1000, so the old unpaginated fetches silently truncated large decks:
+    // cards 1001+ were unstudyable and >1000 progress rows were dropped, corrupting
+    // the schedule (S-H1). Every mode below filters THIS merged set so it reflects
+    // the viewer's progress, not the publisher's embedded state (S-M1). Owned decks
+    // (embedded) keep the efficient server-side filtered queries.
+    let mergedAll: Card[] | null = null
+    if (srsSource === 'progress_table') {
+      const [allCards, progressRows] = await Promise.all([
+        fetchAllRows<Card>(() =>
+          supabase.from('cards').select('*').eq('deck_id', config.deckId).order('sort_position', { ascending: true })),
+        fetchAllRows<UserCardProgress>(() =>
+          supabase.from('user_card_progress').select('*').eq('deck_id', config.deckId).eq('user_id', user.id)),
+      ])
+      const progressMap = new Map<string, UserCardProgress>()
+      for (const p of progressRows) progressMap.set(p.card_id, p)
+      mergedAll = allCards.map((card) => mergeCardWithProgress(card, progressMap.get(card.id)) as Card)
+    }
+
     // Build card queue based on mode
     let cards: Card[] = []
     let srsQueueManager: SrsQueueManager | null = null
@@ -228,8 +258,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           .select('daily_new_limit')
           .eq('id', user.id)
           .single()
-        if (profile && (profile as { daily_new_limit: number }).daily_new_limit) {
-          newCardLimit = (profile as { daily_new_limit: number }).daily_new_limit
+        const dnl = (profile as { daily_new_limit: number } | null)?.daily_new_limit
+        if (typeof dnl === 'number' && dnl >= 0) {
+          newCardLimit = dnl  // honor an explicit 0 (= "no new cards today") — S-N1
         }
 
         // Count new cards already studied today (across all sessions)
@@ -248,41 +279,24 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         // Remaining new cards for today
         const remainingNewToday = Math.max(0, newCardLimit - (todayNewCount ?? 0))
 
-        if (srsSource === 'progress_table') {
-          const { data: allCards } = await supabase
-            .from('cards')
-            .select('*')
-            .eq('deck_id', config.deckId)
-            .order('sort_position', { ascending: true })
-
-          const { data: progressData } = await supabase
-            .from('user_card_progress')
-            .select('*')
-            .eq('deck_id', config.deckId)
-            .eq('user_id', user.id)
-
-          const progressMap = new Map<string, UserCardProgress>()
-          for (const p of (progressData ?? []) as UserCardProgress[]) {
-            progressMap.set(p.card_id, p)
-          }
-
-          const mergedCards = ((allCards ?? []) as Card[]).map((card) => {
-            const progress = progressMap.get(card.id)
-            return mergeCardWithProgress(card, progress) as Card
-          })
-
-          const learning = mergedCards.filter(
-            (c) => c.srs_status === 'learning' && c.next_review_at && c.next_review_at <= now
-          )
-          const review = mergedCards.filter(
-            (c) => c.srs_status === 'review' && c.next_review_at && c.next_review_at <= now
-          )
-          const newC = mergedCards.filter((c) => c.srs_status === 'new').slice(0, remainingNewToday)
+        if (mergedAll) {
+          // Non-owned deck: partition the VIEWER's merged progress (S-M1). Due
+          // cards ordered by next_review_at so the most-overdue surface first,
+          // matching the embedded path (S-L1).
+          const byDue = (a: Card, b: Card) => (a.next_review_at ?? '').localeCompare(b.next_review_at ?? '')
+          const learning = mergedAll
+            .filter((c) => c.srs_status === 'learning' && c.next_review_at && c.next_review_at <= now)
+            .sort(byDue)
+          const review = mergedAll
+            .filter((c) => c.srs_status === 'review' && c.next_review_at && c.next_review_at <= now)
+            .sort(byDue)
+          const newC = mergedAll.filter((c) => c.srs_status === 'new').slice(0, remainingNewToday)
 
           cards = [...learning, ...review, ...newC]
         } else {
-          // Embedded: original path
-          const { data: learning } = await withArchiveBoundary(
+          // Embedded (owned): server-filtered. Paginate learning/review so a deck
+          // with >1000 due cards is not truncated at max_rows (S-H1).
+          const learning = await fetchAllRows<Card>(() => withArchiveBoundary(
             supabase
               .from('cards')
               .select('*')
@@ -290,9 +304,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
               .eq('srs_status', 'learning')
               .lte('next_review_at', now),
             activeThreshold,
-          ).order('next_review_at', { ascending: true })
+          ).order('next_review_at', { ascending: true }))
 
-          const { data: review } = await withArchiveBoundary(
+          const review = await fetchAllRows<Card>(() => withArchiveBoundary(
             supabase
               .from('cards')
               .select('*')
@@ -300,8 +314,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
               .eq('srs_status', 'review')
               .lte('next_review_at', now),
             activeThreshold,
-          ).order('next_review_at', { ascending: true })
+          ).order('next_review_at', { ascending: true }))
 
+          // New cards are bounded by the daily limit (small) — a single .limit() is safe.
           const { data: newCards } = await withArchiveBoundary(
             supabase
               .from('cards')
@@ -312,8 +327,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           ).order('sort_position', { ascending: true }).limit(remainingNewToday)
 
           cards = [
-            ...((learning ?? []) as Card[]),
-            ...((review ?? []) as Card[]),
+            ...learning,
+            ...review,
             ...((newCards ?? []) as Card[]),
           ]
         }
@@ -335,16 +350,16 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       case 'sequential_review': {
         if (!typedStudyState) break
 
-        // Fetch all cards for this deck
-        const { data: allDeckCards } = await withArchiveBoundary(
+        // Non-owned → the merged set (viewer progress, S-M1); owned → paginated
+        // server fetch (S-H1). buildSequentialReviewQueue reads srs_status, which
+        // the merged set carries from user_card_progress.
+        const allCards = mergedAll ?? await fetchAllRows<Card>(() => withArchiveBoundary(
           supabase
             .from('cards')
             .select('*')
             .eq('deck_id', config.deckId),
           activeThreshold,
-        ).order('sort_position', { ascending: true })
-
-        const allCards = (allDeckCards ?? []) as Card[]
+        ).order('sort_position', { ascending: true }))
 
         const { newCards, reviewCards } = buildSequentialReviewQueue(
           allCards.map(c => ({ id: c.id, sort_position: c.sort_position, srs_status: c.srs_status })),
@@ -363,23 +378,25 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
 
       case 'random': {
-        let query = supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .neq('srs_status', 'suspended')
-
-        if (config.uploadDateStart) {
-          query = query.gte('created_at', config.uploadDateStart)
+        let pool: Card[]
+        if (mergedAll) {
+          pool = mergedAll.filter((c) => c.srs_status !== 'suspended')
+          if (config.uploadDateStart) pool = pool.filter((c) => c.created_at >= config.uploadDateStart!)
+          if (config.uploadDateEnd) pool = pool.filter((c) => c.created_at <= config.uploadDateEnd!)
+        } else {
+          // Paginate + stable .order() so no page is truncated at max_rows (S-H1).
+          pool = await fetchAllRows<Card>(() => {
+            let q = supabase
+              .from('cards')
+              .select('*')
+              .eq('deck_id', config.deckId)
+              .neq('srs_status', 'suspended')
+            if (config.uploadDateStart) q = q.gte('created_at', config.uploadDateStart)
+            if (config.uploadDateEnd) q = q.lte('created_at', config.uploadDateEnd)
+            return withArchiveBoundary(q, activeThreshold).order('sort_position', { ascending: true })
+          })
         }
-        if (config.uploadDateEnd) {
-          query = query.lte('created_at', config.uploadDateEnd)
-        }
-
-        query = withArchiveBoundary(query, activeThreshold)
-
-        const { data: allCards } = await query
-        const shuffled = shuffleArray((allCards ?? []) as Card[])
+        const shuffled = shuffleArray(pool)
         cards = shuffled.slice(0, config.batchSize)
         break
       }
@@ -387,7 +404,20 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       case 'sequential': {
         if (!typedStudyState) break
 
-        // Try from current position
+        if (mergedAll) {
+          // Non-owned: filter the merged set (viewer progress → suspended, S-M1).
+          const nonSusp = mergedAll.filter((c) => c.srs_status !== 'suspended')  // already sort_position asc
+          let seq = nonSusp.filter((c) => c.sort_position >= typedStudyState.sequential_pos).slice(0, config.batchSize)
+          if (seq.length < config.batchSize) {
+            const ids = new Set(seq.map((c) => c.id))
+            const wrap = nonSusp.filter((c) => !ids.has(c.id)).slice(0, config.batchSize - seq.length)
+            seq = [...seq, ...wrap]
+          }
+          cards = seq
+          break
+        }
+
+        // Embedded: bounded .limit() (batchSize ≤ MAX_BATCH_SIZE) — no truncation risk.
         const { data: seqCards } = await withArchiveBoundary(
           supabase
             .from('cards')
@@ -420,39 +450,41 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
 
       case 'by_date': {
-        let query = supabase
-          .from('cards')
-          .select('*')
-          .eq('deck_id', config.deckId)
-          .neq('srs_status', 'suspended')
-
-        if (config.uploadDateStart) {
-          query = query.gte('created_at', config.uploadDateStart)
+        if (mergedAll) {
+          let pool = mergedAll.filter((c) => c.srs_status !== 'suspended')  // sort_position asc
+          if (config.uploadDateStart) pool = pool.filter((c) => c.created_at >= config.uploadDateStart!)
+          if (config.uploadDateEnd) pool = pool.filter((c) => c.created_at <= config.uploadDateEnd!)
+          cards = pool
+          break
         }
-        if (config.uploadDateEnd) {
-          query = query.lte('created_at', config.uploadDateEnd)
-        }
-
-        query = withArchiveBoundary(query, activeThreshold)
-
-        const { data: dateCards } = await query.order('sort_position', { ascending: true })
-        cards = (dateCards ?? []) as Card[]
+        // Paginate so a large date range is not truncated at max_rows (S-H1).
+        cards = await fetchAllRows<Card>(() => {
+          let q = supabase
+            .from('cards')
+            .select('*')
+            .eq('deck_id', config.deckId)
+            .neq('srs_status', 'suspended')
+          if (config.uploadDateStart) q = q.gte('created_at', config.uploadDateStart)
+          if (config.uploadDateEnd) q = q.lte('created_at', config.uploadDateEnd)
+          return withArchiveBoundary(q, activeThreshold).order('sort_position', { ascending: true })
+        })
         break
       }
 
       case 'cramming': {
-        // Fetch all non-suspended cards
-        const { data: allCrammingCards } = await withArchiveBoundary(
+        // Non-owned → merged set (viewer progress, S-M1); owned → paginated fetch
+        // (S-H1). filterCardsForCramming drops suspended + applies the filter.
+        const pool = mergedAll ?? await fetchAllRows<Card>(() => withArchiveBoundary(
           supabase
             .from('cards')
             .select('*')
             .eq('deck_id', config.deckId)
             .neq('srs_status', 'suspended'),
           activeThreshold,
-        ).order('sort_position', { ascending: true })
+        ).order('sort_position', { ascending: true }))
 
         const crammingFilter = config.crammingFilter ?? { type: 'all' as const }
-        cards = filterCardsForCramming((allCrammingCards ?? []) as Card[], crammingFilter)
+        cards = filterCardsForCramming(pool, crammingFilter)
         break
       }
     }
@@ -518,7 +550,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, studyState, maxCardPosition, userId } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, studyState, userId } = get()
     if (!config || isRating || !userId) return
 
     const isSrsMode = config.mode === 'srs' && srsQueueManager
@@ -591,13 +623,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
     }
 
-    // Per-card position update for sequential_review (sync state update)
-    let updatedStudyState = studyState
-    let posUpdate: Record<string, number> | null = null
-    if (config.mode === 'sequential_review' && studyState) {
-      posUpdate = advanceSequentialReviewPosition(card, maxCardPosition)
-      updatedStudyState = { ...studyState, ...posUpdate }
-    }
+    // (S-L3) sequential_review positions are computed authoritatively in
+    // endSession from the studied queue — NOT written per-card. The old per-card
+    // fire-and-forget UPDATEs had no ordering guarantee, so a delayed earlier write
+    // could regress the saved position. Keep studyState at its session-start value
+    // so endSession's computeSequentialReviewPositions has the right baseline.
+    const updatedStudyState = studyState
 
     // Update stats
     const updatedRatings = { ...sessionStats.ratings }
@@ -751,16 +782,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     console.log('[study-store] INSERT study_log via RPC:', JSON.stringify(studyLogParams))
     dbWrites.push(supabase.rpc('insert_study_log', studyLogParams))
 
-    // Sequential review position save
-    if (posUpdate && studyState) {
-      dbWrites.push(
-        supabase
-          .from('deck_study_state')
-          .update(posUpdate as Record<string, unknown>)
-          .eq('id', studyState.id)
-      )
-    }
-
     Promise.all(dbWrites).then((results) => {
       // Supabase never rejects — errors come in resolved { error } objects
       for (const r of results) {
@@ -852,6 +873,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             } as Record<string, unknown>)
             .eq('id', studyState.id)
         }
+      } else if (config.mode === 'sequential_review' && queue.length > 0) {
+        // (S-L3) Authoritative single write of the final position from the cards
+        // actually studied this session — replaces the removed per-card writes.
+        const typedState = studyState as DeckStudyState
+        const studiedCards = queue.slice(0, sessionStats.cardsStudied)
+        if (studiedCards.length > 0) {
+          const positions = computeSequentialReviewPositions(
+            studiedCards.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
+            { new_start_pos: typedState.new_start_pos, review_start_pos: typedState.review_start_pos },
+            maxCardPosition,
+          )
+          await supabase
+            .from('deck_study_state')
+            .update(positions as Record<string, unknown>)
+            .eq('id', studyState.id)
+        }
       }
     }
 
@@ -895,6 +932,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   undoLastRating: () => {
     const { lastRatedCard, queue, phase, srsQueueManager, crammingManager } = get()
     if (!lastRatedCard || (phase !== 'studying' && phase !== 'completed')) return
+    const wasCompleted = phase === 'completed'
 
     // Restore queue manager internal state from snapshots
     if (lastRatedCard.srsQueueSnapshot && srsQueueManager) {
@@ -919,6 +957,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       sessionStats: lastRatedCard.previousStats,
       lastRatedCard: null,
       cardStartTime: Date.now(),
+      // Undoing from the completion screen must let endSession record a fresh,
+      // corrected session — otherwise the sessionSaved guard makes re-completion a
+      // no-op and leaves a stale study_sessions row (S-L4).
+      ...(wasCompleted ? { sessionSaved: false } : {}),
     })
   },
 
@@ -962,6 +1004,27 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 function withArchiveBoundary<Q>(query: Q, threshold: string | null): Q {
   if (!threshold) return query
   return (query as unknown as { lte(column: string, value: string): Q }).lte('created_at', threshold)
+}
+
+/**
+ * Fetch EVERY row of a query, defeating PostgREST's max_rows (1000) response cap
+ * by paging with .range(). `makeQuery` MUST return a fresh builder each call (a
+ * supabase query is a one-shot thenable) with its .order() already applied so the
+ * pages are stable. Without this, large decks silently truncated the study queue —
+ * cards past row 1000 were unstudyable and progress rows were dropped (S-H1). The
+ * 500k backstop caps runaway loops far above any real deck size.
+ */
+async function fetchAllRows<T>(makeQuery: () => unknown, pageSize = 1000): Promise<T[]> {
+  const out: T[] = []
+  for (let offset = 0; offset < 500_000; offset += pageSize) {
+    const builder = makeQuery() as { range: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }> }
+    const { data, error } = await builder.range(offset, offset + pageSize - 1)
+    if (error) break
+    const rows = data ?? []
+    out.push(...rows)
+    if (rows.length < pageSize) break
+  }
+  return out
 }
 
 function shuffleArray<T>(array: T[]): T[] {
