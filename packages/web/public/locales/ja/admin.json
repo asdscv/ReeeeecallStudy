@@ -303,7 +303,8 @@
       "amount": "金額",
       "status": "ステータス",
       "paidAt": "支払日時",
-      "empty": "支払いが見つかりません。"
+      "empty": "支払いが見つかりません。",
+      "actions": "操作"
     },
     "user": {
       "title": "ユーザー検索",
@@ -337,7 +338,14 @@
       "prev": "前へ",
       "next": "次へ"
     },
-    "actionError": "操作に失敗しました: {{error}}"
+    "actionError": "操作に失敗しました: {{error}}",
+    "refund": {
+      "button": "返金",
+      "confirmTitle": "返金しますか？",
+      "confirmCreditPack": "{{email}} さんに {{amount}} を返金しますか？お客様のカードに実際に返金されます。",
+      "confirmSubscription": "{{email}} さんのサブスクリプションの最新の請求を返金し、アクセスを取り消しますか？",
+      "realMoneyNote": "決済代行会社を呼び出し、実際にお金が移動します。ここでは元に戻せません。"
+    }
   },
   "official": {
     "title": "Official Accounts",

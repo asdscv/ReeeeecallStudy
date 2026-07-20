@@ -303,7 +303,8 @@
       "amount": "金额",
       "status": "状态",
       "paidAt": "支付时间",
-      "empty": "未找到支付记录。"
+      "empty": "未找到支付记录。",
+      "actions": "操作"
     },
     "user": {
       "title": "用户查询",
@@ -337,7 +338,14 @@
       "prev": "上一页",
       "next": "下一页"
     },
-    "actionError": "操作失败：{{error}}"
+    "actionError": "操作失败：{{error}}",
+    "refund": {
+      "button": "退款",
+      "confirmTitle": "确认退款？",
+      "confirmCreditPack": "向 {{email}} 退款 {{amount}}？款项将退回客户的银行卡。",
+      "confirmSubscription": "为 {{email}} 退还该订阅的最近一次扣款并撤销访问权限？",
+      "realMoneyNote": "此操作将调用支付服务商并转移真实资金，无法在此撤销。"
+    }
   },
   "official": {
     "title": "Official Accounts",

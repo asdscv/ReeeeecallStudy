@@ -303,7 +303,8 @@
       "amount": "금액",
       "status": "상태",
       "paidAt": "결제 시각",
-      "empty": "결제 내역이 없습니다."
+      "empty": "결제 내역이 없습니다.",
+      "actions": "작업"
     },
     "user": {
       "title": "사용자 조회",
@@ -337,7 +338,14 @@
       "prev": "이전",
       "next": "다음"
     },
-    "actionError": "작업 실패: {{error}}"
+    "actionError": "작업 실패: {{error}}",
+    "refund": {
+      "button": "환불",
+      "confirmTitle": "환불하시겠어요?",
+      "confirmCreditPack": "{{email}} 님에게 {{amount}} 환불할까요? 고객 카드로 실제 환불됩니다.",
+      "confirmSubscription": "{{email}} 님 구독의 최근 결제를 환불하고 접근을 회수할까요?",
+      "realMoneyNote": "결제 대행사를 호출해 실제 돈이 이동합니다. 여기서 되돌릴 수 없어요."
+    }
   },
   "official": {
     "title": "공식 계정",

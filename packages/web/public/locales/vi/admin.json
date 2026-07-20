@@ -303,7 +303,8 @@
       "amount": "Số tiền",
       "status": "Trạng thái",
       "paidAt": "Thanh toán lúc",
-      "empty": "Không tìm thấy thanh toán."
+      "empty": "Không tìm thấy thanh toán.",
+      "actions": "Hành động"
     },
     "user": {
       "title": "Tra cứu người dùng",
@@ -337,7 +338,14 @@
       "prev": "Trước",
       "next": "Sau"
     },
-    "actionError": "Thao tác thất bại: {{error}}"
+    "actionError": "Thao tác thất bại: {{error}}",
+    "refund": {
+      "button": "Hoàn tiền",
+      "confirmTitle": "Thực hiện hoàn tiền?",
+      "confirmCreditPack": "Hoàn {{amount}} cho {{email}}? Số tiền sẽ được trả lại vào thẻ của khách hàng.",
+      "confirmSubscription": "Hoàn tiền lần thanh toán gần nhất của gói đăng ký này cho {{email}} và thu hồi quyền truy cập?",
+      "realMoneyNote": "Thao tác này gọi đến nhà cung cấp thanh toán và chuyển tiền thật. Không thể hoàn tác tại đây."
+    }
   },
   "official": {
     "title": "Official Accounts",
