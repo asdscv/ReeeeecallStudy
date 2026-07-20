@@ -95,6 +95,7 @@
     "invalidResponse": "La IA devolvió una respuesta no válida. Inténtalo de nuevo.",
     "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
     "serverError": "La generación con IA no está disponible temporalmente. Inténtalo de nuevo más tarde.",
+    "emptyResult": "La IA no generó tarjetas. Inténtalo de nuevo: no se te ha cobrado.",
     "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más."
   },
   "config": {
