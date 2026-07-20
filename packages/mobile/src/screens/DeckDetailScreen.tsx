@@ -495,7 +495,7 @@ export function DeckDetailScreen() {
           (mirrors CardLimitNotice / settings card-usage). */}
       {archivedCount > 0 && (
         <View
-          style={[styles.archivedNote, { backgroundColor: palette.yellow[100], borderColor: theme.colors.warning }]}
+          style={[styles.archivedNote, { backgroundColor: theme.colors.warning + '1A', borderColor: theme.colors.warning }]}
           testID="deck-archived-note"
         >
           <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>

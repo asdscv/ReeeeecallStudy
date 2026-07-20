@@ -11,7 +11,9 @@
     "history": "历史",
     "programming": "编程",
     "exam": "考试备考",
-    "other": "其他"
+    "other": "其他",
+    "general": "综合",
+    "trivia": "知识问答"
   },
   "sort": {
     "popular": "热门",

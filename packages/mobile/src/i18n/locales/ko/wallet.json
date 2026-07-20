@@ -24,6 +24,7 @@
     "refund": "환불",
     "admin_grant": "크레딧 지급",
     "spend_cards": "AI 카드",
-    "spend_image": "AI 이미지"
+    "spend_image": "AI 이미지",
+    "admin_adjustment": "조정"
   }
 }

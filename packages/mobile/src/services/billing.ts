@@ -23,6 +23,11 @@ export interface BillingProduct {
   kind: BillingProductKind
   title: string
   priceKrw: number
+  /**
+   * USD price in cents (mig 128/129). The LemonSqueezy/IAP store charges USD, so
+   * this — NOT priceKrw (a stale mig-124 placeholder) — is the price to DISPLAY.
+   */
+  priceUsdCents: number | null
   /** credit_pack only — micro-WON granted on purchase (null for subscriptions). */
   creditsMicroWon: number | null
   /** subscription only — tier name (null for credit packs). */
@@ -81,6 +86,7 @@ interface RawProduct {
   kind: string
   title: string
   price_krw: number
+  price_usd_cents: number | null
   credits_micro_won: number | null
   tier: string | null
   card_limit: number | null
@@ -95,6 +101,7 @@ function mapProduct(r: RawProduct): BillingProduct {
     kind: (r.kind as BillingProductKind),
     title: String(r.title),
     priceKrw: Number(r.price_krw ?? 0),
+    priceUsdCents: r.price_usd_cents == null ? null : Number(r.price_usd_cents),
     // bigint returned as a JSON number; every configured pack is <= 1e10 (safe).
     creditsMicroWon: r.credits_micro_won == null ? null : Number(r.credits_micro_won),
     tier: r.tier ?? null,

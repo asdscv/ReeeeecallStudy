@@ -399,9 +399,11 @@ export function StudySessionScreen() {
         {/* Rating area — button mode: buttons, swipe mode: hints */}
         {isFlipped && isSwipeMode && (
           <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
+            {/* Labels must match the mode-aware ratings applied in panGesture.onEnd:
+                cramming \u2192 missed/gotIt, srs \u2192 again/good, else \u2192 unknown/known. */}
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t(config?.mode === 'cramming' ? 'rating.missed' : config?.mode === 'srs' ? 'srsRating.again' : 'rating.unknown')}</Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('session.swipe')}</Text>
-            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t(config?.mode === 'cramming' ? 'rating.gotIt' : config?.mode === 'srs' ? 'srsRating.good' : 'rating.known')} {'\u2192'}</Text>
           </View>
         )}
         {isFlipped && !isSwipeMode && (

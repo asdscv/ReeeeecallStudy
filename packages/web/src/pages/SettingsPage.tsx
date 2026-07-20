@@ -260,17 +260,17 @@ export function SettingsPage() {
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => navigate('/quick-study')}
-              className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 transition cursor-pointer text-center"
+              className="bg-orange-50 border border-orange-200 dark:bg-orange-500/15 dark:border-orange-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 dark:hover:bg-orange-500/25 transition cursor-pointer text-center"
             >
-              <Zap className="w-6 h-6 text-orange-600" />
-              <span className="text-sm font-semibold text-orange-700">{t('quickActions.quickStudy', 'Quick Study')}</span>
+              <Zap className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">{t('quickActions.quickStudy', 'Quick Study')}</span>
             </button>
             <button
               onClick={() => navigate('/ai-generate')}
-              className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 transition cursor-pointer text-center"
+              className="bg-purple-50 border border-purple-200 dark:bg-purple-500/15 dark:border-purple-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 dark:hover:bg-purple-500/25 transition cursor-pointer text-center"
             >
-              <Bot className="w-6 h-6 text-purple-600" />
-              <span className="text-sm font-semibold text-purple-700">{t('quickActions.aiGenerate', 'AI Generate')}</span>
+              <Bot className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('quickActions.aiGenerate', 'AI Generate')}</span>
             </button>
             <button
               onClick={() => navigate('/guide')}

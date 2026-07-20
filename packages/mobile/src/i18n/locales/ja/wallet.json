@@ -24,6 +24,7 @@
     "refund": "返金",
     "admin_grant": "クレジット付与",
     "spend_cards": "AIカード",
-    "spend_image": "AI画像"
+    "spend_image": "AI画像",
+    "admin_adjustment": "調整"
   }
 }

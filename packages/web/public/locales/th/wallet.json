@@ -24,7 +24,8 @@
     "refund": "คืนเงิน",
     "admin_grant": "ให้เครดิต",
     "spend_cards": "การ์ด AI",
-    "spend_image": "รูปภาพ AI"
+    "spend_image": "รูปภาพ AI",
+    "admin_adjustment": "การปรับยอด"
   },
   "cardPlanHint": "แพ็กเกจจำกัดการ์ดจัดการได้ในพื้นที่จัดเก็บการ์ด"
 }

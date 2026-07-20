@@ -11,7 +11,9 @@
     "history": "역사",
     "programming": "코드",
     "exam": "시험",
-    "other": "기타"
+    "other": "기타",
+    "general": "일반",
+    "trivia": "상식"
   },
   "sort": {
     "popular": "인기순",

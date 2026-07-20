@@ -147,7 +147,10 @@
     "retry": "Try Again",
     "serverError": "Kesalahan server AI. Silakan coba lagi nanti.",
     "emptyResult": "AI tidak menghasilkan kartu. Silakan coba lagi — Anda tidak dikenai biaya.",
-    "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
+    "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak.",
+    "insufficientCredits": "Anda telah menggunakan kartu AI gratis hari ini dan tidak memiliki kredit tersisa. Isi ulang untuk terus membuat kartu.",
+    "invalidImage": "Tidak dapat membaca gambar tersebut. Silakan coba foto yang lebih kecil atau lebih jelas.",
+    "quotaExceeded": "Anda telah mencapai batas pembuatan AI gratis hari ini. Silakan coba lagi besok."
   },
   "button": {
     "aiGenerate": "AI Generate",

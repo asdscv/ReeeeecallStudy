@@ -11,7 +11,9 @@
     "history": "Historia",
     "programming": "Programación",
     "exam": "Preparación de exámenes",
-    "other": "Otros"
+    "other": "Otros",
+    "general": "General",
+    "trivia": "Trivia"
   },
   "sort": {
     "popular": "Popular",

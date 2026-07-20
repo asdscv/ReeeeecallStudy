@@ -173,3 +173,52 @@ describe('validateCardsResponse', () => {
     expect(result.valid[0].field_values.field_meaning).toBe('')
   })
 })
+
+// Regression guard for the image_deck (image → new deck) path. buildImageDeckPrompt
+// returns semantic field keys (front/back/term/…) and NO layouts, so ai-generate-store's
+// generateDeckFromImage must (a) build object layouts against the REKEYED keys and
+// (b) remap each card's field_values from the raw semantic key to the rekeyed key —
+// otherwise it charges the user and then throws INVALID_RESPONSE / ALL_CARDS_INVALID.
+describe('image_deck template/card key alignment', () => {
+  const modelPayload = {
+    name: 'Biology Terms',
+    template: { name: 'Term/Def', fields: [{ key: 'term', name: 'Term' }, { key: 'definition', name: 'Definition' }] },
+    cards: [{ field_values: { term: 'Mitosis', definition: 'Cell division' } }],
+  }
+
+  it('the OLD approach (bare-string layout fallback) throws — proving the trap', () => {
+    const rawTmpl = modelPayload.template
+    const keys = rawTmpl.fields.map((f) => f.key)
+    expect(() =>
+      validateTemplateResponse({ name: rawTmpl.name, fields: rawTmpl.fields, front_layout: keys.slice(0, 1), back_layout: keys.slice(1) }),
+    ).toThrow('INVALID_RESPONSE')
+  })
+
+  it('object layouts keyed to the rekeyed field keys + remapped card values validate', () => {
+    const rawTmpl = modelPayload.template
+    const normFields = rawTmpl.fields.filter((f) => !!f && typeof f === 'object').slice(0, 6)
+    const rawKeys = normFields.map((f) => (typeof f.key === 'string' ? f.key : ''))
+    const effectiveKeys = rawKeys.map((k, i) => (k.startsWith('field_') ? k : `field_${i}`))
+
+    const template = validateTemplateResponse({
+      name: rawTmpl.name,
+      fields: normFields,
+      front_layout: effectiveKeys.slice(0, 1).map((k) => ({ field_key: k, style: 'primary' })),
+      back_layout: effectiveKeys.slice(1).map((k) => ({ field_key: k, style: 'primary' })),
+    })
+    expect(template.fields.map((f) => f.key)).toEqual(['field_0', 'field_1'])
+    expect(template.front_layout).toHaveLength(1)
+
+    const remapped = {
+      cards: modelPayload.cards.map((card) => {
+        const fv = card.field_values as Record<string, unknown>
+        const field_values: Record<string, unknown> = {}
+        effectiveKeys.forEach((ek, i) => { field_values[ek] = fv[ek] ?? fv[rawKeys[i]] ?? '' })
+        return { ...card, field_values }
+      }),
+    }
+    const result = validateCardsResponse(remapped, template.fields.map((f) => f.key))
+    expect(result.valid).toHaveLength(1)
+    expect(result.valid[0].field_values).toEqual({ field_0: 'Mitosis', field_1: 'Cell division' })
+  })
+})

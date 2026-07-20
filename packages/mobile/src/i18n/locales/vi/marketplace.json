@@ -11,7 +11,9 @@
     "history": "Lịch sử",
     "programming": "Lập trình",
     "exam": "Luyện thi",
-    "other": "Khác"
+    "other": "Khác",
+    "general": "Tổng hợp",
+    "trivia": "Kiến thức thú vị"
   },
   "sort": {
     "popular": "Phổ biến",
