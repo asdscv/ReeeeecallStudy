@@ -2,7 +2,7 @@
   "topUp": {
     "title": "Añadir saldo",
     "subtitle": "Recarga saldo para generar tarjetas con IA más allá de las gratuitas diarias.",
-    "credits": "Recibe ₩{{won}} en saldo",
+    "credits": "Obtén {{amount}} en créditos",
     "buy": "Comprar",
     "success": "Saldo añadido.",
     "empty": "No hay paquetes disponibles.",

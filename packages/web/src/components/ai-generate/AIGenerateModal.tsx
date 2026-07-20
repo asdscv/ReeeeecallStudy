@@ -56,12 +56,13 @@ export function AIGenerateModal({
       existingDeckId: deckId,
     })
 
-    if (currentMode === 'full' && cfg.imageMode === 'image' && cfg.imageDataUrl) {
-      store.generateDeckFromImage(cfg.imageDataUrl)  // image → a whole new deck (one vision call)
+    const images = cfg.imageDataUrls ?? []
+    if (currentMode === 'full' && cfg.imageMode === 'image' && images.length) {
+      store.generateDeckFromImage(images)  // image(s) → a whole new deck (one vision call)
     } else if (currentMode === 'full') {
       store.generateTemplate()
-    } else if (cfg.imageMode === 'image' && cfg.imageDataUrl) {
-      store.generateCardsFromImage(cfg.imageDataUrl)
+    } else if (cfg.imageMode === 'image' && images.length) {
+      store.generateCardsFromImage(images)
     } else {
       // cards_only — go straight to cards
       store.generateCards()

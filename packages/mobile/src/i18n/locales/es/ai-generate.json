@@ -33,7 +33,12 @@
     "imageUpload": "Subir imagen",
     "imageChange": "Cambiar imagen",
     "imageHint": "Elige una foto: la IA la convierte en tarjetas.",
-    "imagePaidNotice": "La generación con imágenes usa créditos."
+    "imagePaidNotice": "La generación con imágenes usa créditos.",
+    "imageAddMore": "Añadir más ({{count}}/{{max}})",
+    "inputModeTopicHint": "Describe un tema y la IA escribe las tarjetas por ti.",
+    "inputModeImageHint": "Sube fotos de una página de libro, lista de vocabulario o apuntes: la IA las convierte en tarjetas. Puedes elegir varias a la vez.",
+    "cardLimitExceeds": "Puedes añadir como máximo {{available}} tarjeta(s) más — reduce la cantidad o suscríbete.",
+    "cardLimitReached": "Has alcanzado tu límite de tarjetas — elimina tarjetas o suscríbete para añadir más."
   },
   "deck": {
     "section": "SELECCIONAR MAZO",

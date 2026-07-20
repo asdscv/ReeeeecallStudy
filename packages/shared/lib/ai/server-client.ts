@@ -27,14 +27,14 @@ export type ServerGenerateRequest =
     }
   | {
       kind: 'image'
-      image: string // base64 data URL of the uploaded image
+      images: string[] // base64 data URLs of the uploaded image(s), max 8
       uiLang: string
       fields: GeneratedTemplateField[]
       cardCount: number
     }
   | {
-      kind: 'image_deck' // image → a whole new deck (metadata + template + cards) in one vision call
-      image: string // base64 data URL of the uploaded image
+      kind: 'image_deck' // image(s) → a whole new deck (metadata + template + cards) in one vision call
+      images: string[] // base64 data URLs of the uploaded image(s), max 8
       uiLang: string
     }
 

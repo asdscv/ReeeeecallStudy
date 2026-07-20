@@ -2,7 +2,7 @@
   "topUp": {
     "title": "Add credits",
     "subtitle": "Top up credits for AI card generation beyond the daily free cards.",
-    "credits": "Get ₩{{won}} in credits",
+    "credits": "Get {{amount}} in credits",
     "buy": "Buy",
     "success": "Credits added.",
     "empty": "No credit packs available.",

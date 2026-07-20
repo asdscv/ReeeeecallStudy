@@ -85,12 +85,13 @@ export function AIGeneratePage() {
       existingDeckId: deckId,
     })
 
-    if (mode === 'full' && cfg.imageMode === 'image' && cfg.imageDataUrl) {
-      store.generateDeckFromImage(cfg.imageDataUrl)  // image → a whole new deck (one vision call)
+    const images = cfg.imageDataUrls ?? []
+    if (mode === 'full' && cfg.imageMode === 'image' && images.length) {
+      store.generateDeckFromImage(images)  // image(s) → a whole new deck (one vision call)
     } else if (mode === 'full') {
       store.generateTemplate()
-    } else if (cfg.imageMode === 'image' && cfg.imageDataUrl) {
-      store.generateCardsFromImage(cfg.imageDataUrl)
+    } else if (cfg.imageMode === 'image' && images.length) {
+      store.generateCardsFromImage(images)
     } else {
       store.generateCards()
     }

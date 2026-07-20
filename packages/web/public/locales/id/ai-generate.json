@@ -53,7 +53,11 @@
     "imageChange": "Ganti gambar",
     "imageUploadHint": "Pilih foto daftar kata, halaman buku teks, atau catatan — AI akan mengubahnya menjadi kartu.",
     "imagePaidNotice": "Pembuatan dari gambar menggunakan kredit (tidak ada tingkat gratis).",
-    "cardLimitExceeds": "Anda dapat menambahkan maksimal {{available}} kartu lagi — kurangi jumlah atau berlangganan."
+    "cardLimitExceeds": "Anda dapat menambahkan maksimal {{available}} kartu lagi — kurangi jumlah atau berlangganan.",
+    "imageAddMore": "Tambah lagi ({{count}}/{{max}})",
+    "imageRemove": "Hapus gambar",
+    "inputModeTopicHint": "Jelaskan topik dan AI akan membuat kartunya untukmu.",
+    "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus."
   },
   "wallet": {
     "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",
@@ -123,7 +127,10 @@
         "hint": "Petunjuk",
         "detail": "Detail"
       }
-    }
+    },
+    "templateDesc": "AI merancang struktur kartu ini. Ganti nama bidang jika perlu, lalu lanjutkan.",
+    "deckDesc": "Tinjau nama, ikon, dan warna dek barumu, lalu lanjutkan.",
+    "cardsDesc": "Tinjau kartu yang dibuat. Edit teks, hapus yang tidak diinginkan, lalu simpan."
   },
   "done": {
     "title": "Generation Complete!",
