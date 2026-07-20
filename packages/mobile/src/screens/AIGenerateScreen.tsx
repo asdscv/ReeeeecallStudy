@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
@@ -194,6 +194,7 @@ export function AIGenerateScreen() {
   const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
   const [affordable, setAffordable] = useState<Affordable | null>(null)
+  const countTouched = useRef(false)   // once the user edits the count, stop auto-defaulting it
 
   // Image recognition works with OR without a deck: with a deck → add cards; without
   // a deck (new deck) → recognize the image into a whole new deck (kind='image_deck').
@@ -208,6 +209,15 @@ export function AIGenerateScreen() {
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
+
+  // Default the card count to today's REMAINING FREE cards (clamped to [1, 10]) so a default
+  // generation never overshoots the free daily allowance. Applies once the server-authoritative
+  // affordance loads and only until the user edits the count. (Parity with web ConfigStep.)
+  useEffect(() => {
+    if (affordable && !countTouched.current && !useImage) {
+      setCardCount(String(Math.max(1, Math.min(10, affordable.free))))
+    }
+  }, [affordable, useImage])
 
   // Guard leaving mid-flow — the Android HARDWARE back button (and iOS swipe / any
   // goBack) would otherwise pop the whole wizard and silently discard the generated
@@ -503,6 +513,7 @@ export function AIGenerateScreen() {
                 testID="ai-card-count"
                 value={cardCount}
                 onChangeText={(v) => {
+                  countTouched.current = true   // user set it → stop auto-defaulting to remaining-free
                   setCardCount(v.replace(/[^0-9]/g, ''))
                 }}
                 onBlur={() => {
