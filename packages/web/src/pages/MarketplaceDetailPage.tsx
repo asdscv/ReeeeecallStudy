@@ -63,6 +63,10 @@ export function MarketplaceDetailPage() {
   useEffect(() => { void useDeckStore.getState().fetchCardUsage() }, [])
 
   const [listing, setListing] = useState<MarketplaceListing | null>(null)
+  // Whether THIS deck is an official-certified deck (in official_deck_manifest) — the
+  // real cap-exclusion signal. NOT the publisher's is_official badge: a badge-granted
+  // publisher's own non-manifest deck DOES count toward the limit (mig 118).
+  const [isOfficialDeck, setIsOfficialDeck] = useState(false)
   const [previewCards, setPreviewCards] = useState<Card[]>([])
   const [previewSampleFields, setPreviewSampleFields] = useState<
     PublicListingPreview['sample_fields']
@@ -116,6 +120,15 @@ export function MarketplaceDetailPage() {
       }
 
       setListing(typedListing)
+
+      // Cap-exclusion is per-DECK (official_deck_manifest membership), not the
+      // publisher's is_official flag. Manifest has a public read policy.
+      const { data: manifestRow } = await supabase
+        .from('official_deck_manifest')
+        .select('deck_id')
+        .eq('deck_id', typedListing.deck_id)
+        .maybeSingle()
+      setIsOfficialDeck(!!manifestRow)
 
       // Card preview — try public RPC first (works for everyone via SECURITY
       // DEFINER), then fall back to direct `cards` query (only succeeds for the
@@ -252,7 +265,7 @@ export function MarketplaceDetailPage() {
 
   const isOwner = user?.id === listing.owner_id
   // Non-official acquisitions count toward the 1000-card cap (mig 118); official decks don't.
-  const countsTowardLimit = !listing.owner_is_official
+  const countsTowardLimit = !isOfficialDeck
   const wouldExceed = countsTowardLimit && limit.exceeds(listing.card_count)
   const displayFields = template?.fields ?? []
 

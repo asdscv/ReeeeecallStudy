@@ -44,7 +44,7 @@
     "unsubscribeError": "Failed to unsubscribe. Please try again.",
     "unsubscribed": "Unsubscribed",
     "limitUsage": "Adds {{count}} cards toward your limit · {{available}} left",
-    "limitExceeds": "This would exceed your card limit ({{available}} left). Delete cards or subscribe first.",
+    "limitExceeds": "This would exceed your card limit ({{available}} left). Free up space or upgrade your plan to add it.",
     "limitOfficialFree": "Official deck — doesn't count toward your card limit.",
     "acquireByMode": {
       "subscribe": "Subscribe",

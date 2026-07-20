@@ -97,7 +97,7 @@
     },
     "downloading": "Mengunduh...",
     "limitUsage": "Menambah {{count}} kartu ke batas Anda · sisa {{available}}",
-    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Hapus kartu atau berlangganan.",
+    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Kosongkan ruang atau tingkatkan paket untuk menambahkannya.",
     "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu.",
     "acquireByMode": {
       "subscribe": "Berlangganan",
