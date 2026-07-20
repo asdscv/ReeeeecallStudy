@@ -514,8 +514,8 @@ export function MarketplaceDetailScreen() {
                     <Badge label={t('detail.cardsBadge', { count: listing.card_count ?? 0 })} variant="neutral" />
                     <Badge label={t('detail.viewsBadge', { count: (listing as any).view_count ?? 0 })} variant="neutral" />
                     <Badge label={t('detail.usersBadge', { count: listing.acquire_count ?? 0 })} variant="primary" />
-                    {(listing as any).category && <Badge label={(listing as any).category} variant="neutral" />}
-                    {listing.share_mode && <Badge label={listing.share_mode} variant="success" />}
+                    {(listing as any).category && <Badge label={t(`categories.${(listing as any).category}`, { defaultValue: (listing as any).category })} variant="neutral" />}
+                    {listing.share_mode && <Badge label={t(`shareMode.${listing.share_mode}`, { defaultValue: listing.share_mode })} variant="success" />}
                   </View>
                   {(listing as any).review_count > 0 && (
                     <Text style={[theme.typography.bodySmall, { color: palette.yellow[500] }]}>

@@ -518,6 +518,31 @@ export function SettingsScreen() {
 
         {/* ── Answer Mode — matches web: standalone card ── */}
         <CollapsibleSection title={t('answerMode.title')} icon="📝">
+          <View style={styles.modeGrid}>
+            {(['button', 'swipe'] as const).map((mode) => {
+              const isActive = profile.answer_mode === mode
+              return (
+                <TouchableOpacity
+                  key={mode}
+                  testID={`settings-answer-${mode}`}
+                  onPress={() => saveProfile({ answer_mode: mode })}
+                  style={[
+                    styles.modeCard,
+                    {
+                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                      borderWidth: isActive ? 2 : 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
+                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
+                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
           <View style={styles.segmentRow}>
             {(['before', 'same', 'after'] as const).map((timing) => {
               const isActive = profile.answer_timing === timing
@@ -549,32 +574,6 @@ export function SettingsScreen() {
 
         {/* ── New Card Limit — standalone card ── */}
         <CollapsibleSection title={t('newCardLimit.title')} icon="🔢">
-          <View style={styles.modeGrid}>
-            {(['button', 'swipe'] as const).map((mode) => {
-              const isActive = profile.answer_mode === mode
-              return (
-                <TouchableOpacity
-                  key={mode}
-                  testID={`settings-answer-${mode}`}
-                  onPress={() => saveProfile({ answer_mode: mode })}
-                  style={[
-                    styles.modeCard,
-                    {
-                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
-                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
-                      borderWidth: isActive ? 2 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
-                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-
           <TextInput
             testID="settings-daily-limit"
             value={String(profile.daily_new_limit)}

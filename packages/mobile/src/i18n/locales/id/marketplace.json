@@ -11,7 +11,9 @@
     "history": "Sejarah",
     "programming": "Pemrograman",
     "exam": "Persiapan Ujian",
-    "other": "Lainnya"
+    "other": "Lainnya",
+    "general": "Umum",
+    "trivia": "Trivia"
   },
   "sort": {
     "popular": "Populer",

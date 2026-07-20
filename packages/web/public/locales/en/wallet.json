@@ -24,7 +24,8 @@
     "refund": "Refund",
     "admin_grant": "Credit grant",
     "spend_cards": "AI cards",
-    "spend_image": "AI image"
+    "spend_image": "AI image",
+    "admin_adjustment": "Adjustment"
   },
   "cardPlanHint": "Card-limit plans are managed in Card storage."
 }

@@ -95,7 +95,8 @@ export function AIGenerateModal({
   }
 
   const handleRetry = () => {
-    store.reset()
+    // Preserve the user's config on retry rather than dumping them to a blank form.
+    store.retryFromConfig()
   }
 
   const handleTemplateNext = () => {

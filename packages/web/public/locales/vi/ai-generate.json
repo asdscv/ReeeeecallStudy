@@ -147,7 +147,10 @@
     "retry": "Try Again",
     "serverError": "Lỗi máy chủ AI. Vui lòng thử lại sau.",
     "emptyResult": "AI không tạo được thẻ nào. Vui lòng thử lại — bạn không bị tính phí.",
-    "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm."
+    "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm.",
+    "insufficientCredits": "Bạn đã dùng hết số thẻ AI miễn phí hôm nay và không còn tín dụng nào. Hãy nạp thêm để tiếp tục tạo thẻ.",
+    "invalidImage": "Không thể đọc được hình ảnh đó. Vui lòng thử một ảnh nhỏ hơn hoặc rõ hơn.",
+    "quotaExceeded": "Bạn đã đạt đến giới hạn tạo bằng AI miễn phí của hôm nay. Vui lòng thử lại vào ngày mai."
   },
   "button": {
     "aiGenerate": "AI Generate",

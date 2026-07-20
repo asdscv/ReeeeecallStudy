@@ -361,6 +361,15 @@ export function AIGenerateScreen() {
     setImageMode('topic')
   }
 
+  // Retry after an error: clear only the store's results/error and return to the
+  // config step, KEEPING the user's local config (topic / picked image / mode) so
+  // they don't have to re-enter everything — especially painful after a paid image
+  // error where handleReset would also drop the chosen image.
+  const handleRetry = () => {
+    store.retryFromConfig()
+    setStep('config')
+  }
+
   // ── Config Step ──
   if (step === 'config') {
     return (
@@ -685,7 +694,7 @@ export function AIGenerateScreen() {
           {store.error ?? t('errorStep.default')}
         </Text>
         <View style={styles.doneActions}>
-          <Button title={t('errorStep.retry')} onPress={handleReset} />
+          <Button title={t('errorStep.retry')} onPress={handleRetry} />
           <Button title={t('errorStep.back')} variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </View>

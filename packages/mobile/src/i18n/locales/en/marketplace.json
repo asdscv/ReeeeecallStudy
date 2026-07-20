@@ -11,7 +11,9 @@
     "history": "History",
     "programming": "Code",
     "exam": "Exam",
-    "other": "Other"
+    "other": "Other",
+    "general": "General",
+    "trivia": "Trivia"
   },
   "sort": {
     "popular": "Popular",

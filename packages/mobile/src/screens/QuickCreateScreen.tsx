@@ -58,6 +58,11 @@ export function QuickCreateScreen() {
   // Synchronous in-flight guard (`loading` state commits asynchronously, so a
   // fast double-tap could enter handleSubmit twice and create two decks).
   const submitting = useRef(false)
+  // Set synchronously right before a successful navigation.replace. react-navigation
+  // fires `beforeRemove` synchronously during replace — before React commits the queued
+  // setCreatedCardCount — so the listener's closure still sees createdCardCount===0 and
+  // would delete the deck we just filled. This ref lets cleanupOrphanDeck bail on success.
+  const succeeded = useRef(false)
 
   useEffect(() => {
     setCreatedDeckId(null)
@@ -86,6 +91,7 @@ export function QuickCreateScreen() {
     // Deck is created before its cards; if creation succeeded but no card ever
     // landed (createdCardCount === 0), abandoning the flow (cancel / preset
     // switch) would leave an empty orphan deck. Delete it; decks with cards stay.
+    if (succeeded.current) return
     if (createdDeckId && createdCardCount === 0) void deleteDeck(createdDeckId)
   }
   // The Cancel button calls cleanupOrphanDeck, but the header back arrow AND the
@@ -207,6 +213,7 @@ export function QuickCreateScreen() {
       // template from deck-store, TTL-gated) refetch and see the new one instead
       // of falling back to a default-template shape.
       useDeckStore.getState().invalidate('templates')
+      succeeded.current = true // guard the beforeRemove listener firing during replace
       navigation.replace('DeckDetail', { deckId })
     } finally {
       setLoading(false)

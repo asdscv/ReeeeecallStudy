@@ -289,7 +289,7 @@ export function AIGeneratePage() {
           <div className="p-5 sm:p-8">
             <ErrorStep
               error={store.error}
-              onRetry={handleReset}
+              onRetry={() => store.retryFromConfig()}
               onBack={handleReset}
             />
           </div>
