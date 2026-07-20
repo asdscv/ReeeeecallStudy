@@ -140,6 +140,8 @@ export function usePurchases() {
   }, [refreshSubscription])
 
   const restore = useCallback(async () => {
+    // [SUBSCRIPTION-HIDDEN] no-op while the whole flow is gated off (match purchase()).
+    if (!SUBSCRIPTION_UI_ENABLED) return { success: false, error: 'disabled' as const }
     setPurchasing(true)
     try {
       const result = await purchaseService.restore()

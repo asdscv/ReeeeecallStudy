@@ -205,7 +205,11 @@
     "faq": "Câu hỏi thường gặp",
     "blog": "Bài viết",
     "help": "Trợ giúp",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "legal": "Pháp lý",
+    "terms": "Điều khoản Dịch vụ",
+    "privacy": "Chính sách Bảo mật",
+    "refund": "Chính sách Hoàn tiền"
   },
   "floatingCta": "Bắt đầu ngay",
   "faq": {

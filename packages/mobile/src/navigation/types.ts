@@ -65,8 +65,8 @@ export type MarketplaceStackParamList = {
 export type SettingsStackParamList = {
   SettingsHome: undefined
   AIGenerate: undefined
-  // [SUBSCRIPTION-HIDDEN] 구독 기능 심사 보류 — 복원 시 주석 해제
-  // Paywall: undefined
+  // Paywall 화면은 SUBSCRIPTION_UI_ENABLED 게이트로 비활성(꺼지면 빈 화면 렌더)
+  Paywall: undefined
   Guide: undefined
   TemplatesList: undefined
   TemplateEdit: { templateId?: string }
