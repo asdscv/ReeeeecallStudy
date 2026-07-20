@@ -303,7 +303,8 @@
       "amount": "Jumlah",
       "status": "Status",
       "paidAt": "Dibayar Pada",
-      "empty": "Tidak ada pembayaran ditemukan."
+      "empty": "Tidak ada pembayaran ditemukan.",
+      "actions": "Tindakan"
     },
     "user": {
       "title": "Cari Pengguna",
@@ -337,7 +338,14 @@
       "prev": "Sebelumnya",
       "next": "Berikutnya"
     },
-    "actionError": "Tindakan gagal: {{error}}"
+    "actionError": "Tindakan gagal: {{error}}",
+    "refund": {
+      "button": "Refund",
+      "confirmTitle": "Terbitkan refund?",
+      "confirmCreditPack": "Refund {{amount}} ke {{email}}? Ini mengembalikan uang ke kartu pelanggan.",
+      "confirmSubscription": "Refund tagihan terakhir langganan ini untuk {{email}} dan cabut akses?",
+      "realMoneyNote": "Ini memanggil penyedia pembayaran dan memindahkan uang sungguhan. Tidak dapat dibatalkan di sini."
+    }
   },
   "official": {
     "title": "Official Accounts",

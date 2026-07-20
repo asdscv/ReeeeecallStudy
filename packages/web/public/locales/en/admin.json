@@ -303,7 +303,8 @@
       "amount": "Amount",
       "status": "Status",
       "paidAt": "Paid At",
-      "empty": "No payments found."
+      "empty": "No payments found.",
+      "actions": "Actions"
     },
     "user": {
       "title": "User Lookup",
@@ -337,7 +338,14 @@
       "prev": "Previous",
       "next": "Next"
     },
-    "actionError": "Action failed: {{error}}"
+    "actionError": "Action failed: {{error}}",
+    "refund": {
+      "button": "Refund",
+      "confirmTitle": "Issue refund?",
+      "confirmCreditPack": "Refund {{amount}} to {{email}}? This returns the money to the customer's card.",
+      "confirmSubscription": "Refund this subscription's latest charge for {{email}} and revoke access?",
+      "realMoneyNote": "This calls the payment provider and moves real money. It cannot be undone here."
+    }
   },
   "official": {
     "title": "Official Accounts",

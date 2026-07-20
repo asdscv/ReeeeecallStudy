@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
 import { useAdminStore } from '../../stores/admin-store'
-import type { AdminSubscriptionRow } from '../../stores/admin-store'
+import type { AdminSubscriptionRow, AdminPaymentRow } from '../../stores/admin-store'
 import { useBillingStore } from '../../stores/billing-store'
 import { confirm } from '../../stores/confirm-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
@@ -41,7 +41,7 @@ export function AdminBillingPage() {
     billingOverviewLoading, billingSubsLoading, billingPaymentsLoading,
     billingError,
     fetchBillingOverview, fetchBillingSubscriptions, fetchBillingPayments,
-    cancelSubscription, forceRefresh,
+    cancelSubscription, refundPayment, forceRefresh,
   } = useAdminStore()
 
   const [statusFilter, setStatusFilter] = useState('')
@@ -81,6 +81,44 @@ export function AdminBillingPage() {
     setActionError(null)
     setBusyId(row.id)
     const { error } = await cancelSubscription(row.provider, row.provider_subscription_id, immediate)
+    setBusyId(null)
+    if (error) {
+      setActionError(t('billing.actionError', { error }))
+    } else {
+      fetchBillingSubscriptions(statusFilter || undefined, subsPage, PAGE_SIZE)
+      fetchBillingOverview()
+    }
+  }
+
+  const doRefundCreditPack = async (row: AdminPaymentRow) => {
+    const ok = await confirm({
+      title: t('billing.refund.confirmTitle'),
+      message: `${t('billing.refund.confirmCreditPack', { amount: fmtKrw(row.amount_krw), email: row.email || row.user_id })}\n\n${t('billing.refund.realMoneyNote')}`,
+      danger: true,
+    })
+    if (!ok) return
+    setActionError(null)
+    setBusyId(row.merchant_uid)
+    const { error } = await refundPayment('credit_pack', row.merchant_uid)
+    setBusyId(null)
+    if (error) {
+      setActionError(t('billing.actionError', { error }))
+    } else {
+      fetchBillingPayments(payPage, PAGE_SIZE)
+      fetchBillingOverview()
+    }
+  }
+
+  const doRefundSubscription = async (row: AdminSubscriptionRow) => {
+    const ok = await confirm({
+      title: t('billing.refund.confirmTitle'),
+      message: `${t('billing.refund.confirmSubscription', { email: row.email || row.user_id })}\n\n${t('billing.refund.realMoneyNote')}`,
+      danger: true,
+    })
+    if (!ok) return
+    setActionError(null)
+    setBusyId(row.id)
+    const { error } = await refundPayment('subscription', row.id)
     setBusyId(null)
     if (error) {
       setActionError(t('billing.actionError', { error }))
@@ -202,6 +240,14 @@ export function AdminBillingPage() {
                         >
                           {busyId === row.id ? '...' : t('billing.subscriptions.cancelImmediate')}
                         </button>
+                        <button
+                          type="button"
+                          disabled={busyId === row.id || !row.provider_subscription_id}
+                          onClick={() => doRefundSubscription(row)}
+                          className="px-2 py-0.5 text-xs rounded border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 cursor-pointer disabled:opacity-40 disabled:cursor-default"
+                        >
+                          {t('billing.refund.button')}
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -234,6 +280,7 @@ export function AdminBillingPage() {
                   <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-muted-foreground">{t('billing.payments.amount')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.status')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.paidAt')}</th>
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -251,10 +298,24 @@ export function AdminBillingPage() {
                       </span>
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">{row.paid_at ? formatLocalDateTime(row.paid_at, dateLocale) : '-'}</td>
+                    <td className="px-4 py-2">
+                      {row.status === 'paid' && row.kind === 'credit_pack' ? (
+                        <button
+                          type="button"
+                          disabled={busyId === row.merchant_uid}
+                          onClick={() => doRefundCreditPack(row)}
+                          className="px-2 py-0.5 text-xs rounded border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 cursor-pointer disabled:opacity-40 disabled:cursor-default"
+                        >
+                          {busyId === row.merchant_uid ? '...' : t('billing.refund.button')}
+                        </button>
+                      ) : (
+                        <span className="text-content-tertiary">-</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
                 {billingPayments.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-content-tertiary">{t('billing.payments.empty')}</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-content-tertiary">{t('billing.payments.empty')}</td></tr>
                 )}
               </tbody>
             </table>
