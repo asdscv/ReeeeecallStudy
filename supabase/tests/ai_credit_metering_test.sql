@@ -104,26 +104,27 @@ BEGIN
   SELECT balance INTO b0 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
 
   -- C1: charge the PAID job (free_cards=4,paid_cards=2 → paid_share=1/3). gemini-flash-lite
-  --     1000/500 tok → cost_won=405000; price = round(405000 * 1/3 * 5) = 675000; deduct.
+  --     1000/500 tok → cost=300 micro-USD (usd_won_rate=1, mig 145); price =
+  --     round(300 * 1/3 * 5) = 500 micro-USD; deduct.
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_paid, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
   SELECT price_micro_won, charged INTO pr, ch FROM ai_generation_jobs WHERE id=j_paid;
-  ASSERT pr = 675000, format('C1 price %s', pr);
-  ASSERT b1 = b0 - 675000, format('C1 balance %s (from %s)', b1, b0);
+  ASSERT pr = 500, format('C1 price %s', pr);
+  ASSERT b1 = b0 - 500, format('C1 balance %s (from %s)', b1, b0);
   ASSERT ch = true, 'C1 charged';
-  SELECT count(*) INTO n FROM ai_credit_ledger WHERE ref=j_paid AND reason='spend' AND delta=-675000;
+  SELECT count(*) INTO n FROM ai_credit_ledger WHERE ref=j_paid AND reason='spend' AND delta=-500;
   ASSERT n = 1, format('C1 spend ledger row %s', n);
 
   -- C2: idempotent — re-charge the same job is a no-op (balance unchanged)
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_paid, 'gemini','gemini-2.5-flash-lite', 9999, 9999);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
-  ASSERT b1 = b0 - 675000, format('C2 idempotent balance %s', b1);
+  ASSERT b1 = b0 - 500, format('C2 idempotent balance %s', b1);
 
   -- C3: charge a FREE-only job (paid_share=0) → price 0, wallet unchanged
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_free, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT price_micro_won INTO pr FROM ai_generation_jobs WHERE id=j_free;
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
-  ASSERT pr = 0 AND b1 = b0 - 675000, format('C3 free price %s balance %s', pr, b1);
+  ASSERT pr = 0 AND b1 = b0 - 500, format('C3 free price %s balance %s', pr, b1);
 END $$;
 
 -- C4: charge is service_role/admin only

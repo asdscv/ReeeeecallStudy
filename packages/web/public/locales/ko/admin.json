@@ -327,11 +327,11 @@
       "confirmGrantTitle": "구독 지급",
       "confirmGrant": "이 사용자에게 \"{{product}}\"을(를) 지급하시겠어요?",
       "adjustWallet": "충전금 조정",
-      "adjustAmount": "금액 (₩, + 지급 / − 회수)",
+      "adjustAmount": "금액 ($, + 지급 / − 회수)",
       "adjustReason": "사유",
       "adjustSubmit": "적용",
       "confirmAdjustTitle": "충전금 조정",
-      "confirmAdjust": "이 사용자의 충전금을 ₩{{amount}}만큼 조정하시겠어요?"
+      "confirmAdjust": "이 사용자의 충전금을 ${{amount}}만큼 조정하시겠어요?"
     },
     "pagination": {
       "page": "{{page}} 페이지",

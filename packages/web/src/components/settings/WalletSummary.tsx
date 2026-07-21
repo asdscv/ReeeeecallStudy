@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
-import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
-import { toIntlLocale } from '../../lib/locale-utils'
+import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { TopUpModal } from '../billing/TopUpModal'
 import { CreditLedgerList } from './CreditLedgerList'
@@ -13,7 +12,7 @@ import { CreditLedgerList } from './CreditLedgerList'
 // only mounts this when expanded. Top-up opens TopUpModal (payment gated OFF until a
 // provider is wired — the modal shows a coming-soon state).
 export function WalletSummary() {
-  const { t, i18n } = useTranslation('wallet')
+  const { t } = useTranslation('wallet')
   // Read from the billing store so a successful top-up (which calls fetchWallet)
   // reflects here without a manual reload.
   const summary = useBillingStore((s) => s.wallet)
@@ -22,9 +21,6 @@ export function WalletSummary() {
   const [topUpOpen, setTopUpOpen] = useState(false)
 
   useEffect(() => { void fetchWallet() }, [fetchWallet])
-
-  const dateLocale = toIntlLocale(i18n.language)
-  const fmtWon = (won: number) => `₩${won.toLocaleString(dateLocale)}`
 
   if (!summary && (walletState === 'loading' || walletState === 'idle')) {
     return <div className="flex items-center justify-center py-8 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin" /></div>
@@ -38,7 +34,6 @@ export function WalletSummary() {
     )
   }
 
-  const balanceWon = microWonToWon(summary.balanceMicroWon)
   const freePct = Math.min(100, Math.round((summary.freeUsedToday / Math.max(1, summary.freeLimit)) * 100))
 
   return (
@@ -46,7 +41,7 @@ export function WalletSummary() {
       {/* Balance */}
       <div>
         <p className="text-xs text-muted-foreground mb-1">{t('balance.title')}</p>
-        <div className="text-3xl font-bold text-foreground tabular-nums">{fmtWon(balanceWon)}</div>
+        <div className="text-3xl font-bold text-foreground tabular-nums">{formatUsdMicro(summary.balanceMicroWon)}</div>
         <p className="text-xs text-muted-foreground mt-1">{t('balance.hint')}</p>
         <p className="text-xs text-content-tertiary mt-1">{t('cardPlanHint')}</p>
         <button

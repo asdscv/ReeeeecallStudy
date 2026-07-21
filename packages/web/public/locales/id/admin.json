@@ -327,11 +327,11 @@
       "confirmGrantTitle": "Beri langganan",
       "confirmGrant": "Beri \"{{product}}\" ke pengguna ini?",
       "adjustWallet": "Sesuaikan Dompet",
-      "adjustAmount": "Jumlah (₩, + kredit / − tarik kembali)",
+      "adjustAmount": "Jumlah ($, + kredit / − tarik kembali)",
       "adjustReason": "Alasan",
       "adjustSubmit": "Terapkan",
       "confirmAdjustTitle": "Sesuaikan dompet",
-      "confirmAdjust": "Sesuaikan dompet pengguna ini sebesar ₩{{amount}}?"
+      "confirmAdjust": "Sesuaikan dompet pengguna ini sebesar ${{amount}}?"
     },
     "pagination": {
       "page": "Halaman {{page}}",

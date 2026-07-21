@@ -327,11 +327,11 @@
       "confirmGrantTitle": "มอบการสมัครสมาชิก",
       "confirmGrant": "มอบ \"{{product}}\" ให้ผู้ใช้นี้หรือไม่",
       "adjustWallet": "ปรับกระเป๋าเงิน",
-      "adjustAmount": "จำนวนเงิน (₩, + เพิ่ม / − เรียกคืน)",
+      "adjustAmount": "จำนวนเงิน ($, + เพิ่ม / − เรียกคืน)",
       "adjustReason": "เหตุผล",
       "adjustSubmit": "ใช้",
       "confirmAdjustTitle": "ปรับกระเป๋าเงิน",
-      "confirmAdjust": "ปรับกระเป๋าเงินของผู้ใช้นี้ ₩{{amount}} หรือไม่"
+      "confirmAdjust": "ปรับกระเป๋าเงินของผู้ใช้นี้ ${{amount}} หรือไม่"
     },
     "pagination": {
       "page": "หน้า {{page}}",

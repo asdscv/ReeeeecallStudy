@@ -89,7 +89,7 @@ export function PlanSelector() {
   // Price follows the buyer's locale: ₩ for Korean (charged via Toss), $ for everyone
   // else (charged via LemonSqueezy's USD store) — so what's shown equals what's charged.
   const fmtPrice = (p: (typeof products)[number]) =>
-    formatProductPrice(p, i18n.language, locale)
+    formatProductPrice(p)
 
   const plans = products
     .filter((p) => p.kind === 'subscription' && p.isActive)
@@ -108,7 +108,7 @@ export function PlanSelector() {
   // Region decides the payment method (and thus currency): Korean → Toss, else →
   // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
   const beginCheckout = (productId: string) => {
-    void startCheckout(productId, preferredProviderId(i18n.language))
+    void startCheckout(productId, preferredProviderId())
   }
 
   // Toss subscriptions have no hosted portal — we run the recurring charge, so cancel /

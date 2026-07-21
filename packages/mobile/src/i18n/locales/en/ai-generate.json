@@ -45,7 +45,7 @@
     "creditsOnly": "{{credits}} paid cards available",
     "empty": "You’ve used today’s free cards",
     "unknown": "Balance unavailable",
-    "balance": "₩{{won}} balance (~{{cards}} cards)",
+    "balance": "{{amount}} balance (~{{cards}} cards)",
     "freeOnly": "{{free}} free cards left today",
     "imagePaid": "Image generation is paid — top up your balance to continue."
   },

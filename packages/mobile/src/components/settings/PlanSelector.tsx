@@ -72,7 +72,7 @@ export function PlanSelector({
 
   // Price follows the buyer's locale: ₩ for Korean, $ for everyone else — matching
   // what the region's payment method (Toss / store IAP) actually charges.
-  const fmtPrice = (p: BillingProduct): string => formatProductPrice(p, i18n.language)
+  const fmtPrice = (p: BillingProduct): string => formatProductPrice(p)
 
   const isCurrent = (p: BillingProduct): boolean =>
     subscription?.status === 'active' &&

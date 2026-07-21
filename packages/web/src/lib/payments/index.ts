@@ -3,7 +3,6 @@ import { MockProvider } from './mock-provider'
 import { PortOneProvider } from './portone-provider'
 import { LemonsqueezyProvider } from './lemonsqueezy-provider'
 import { TossProvider } from './toss-provider'
-import { isKoreanLocale } from '@reeeeecall/shared/lib/pricing'
 
 export type {
   PaymentProvider,
@@ -84,19 +83,11 @@ export function paymentProviderId(): PaymentProviderId {
 }
 
 /**
- * The provider to charge THIS buyer, chosen by locale so the charged currency
- * matches the displayed one: Korean buyers → TossPayments (₩), everyone else →
- * LemonSqueezy ($). Falls back to the first configured provider that supports the
- * kind when the region-preferred one isn't enabled, and null when none is. This
- * replaces the manual payment-method picker: region determines the method.
+ * The provider to charge every buyer. The store settles USD everywhere via
+ * LemonSqueezy (Toss/₩ dropped), so this is always 'lemonsqueezy'. Passed to
+ * startCheckout regardless of whether it's configured — resolveProvider returns null
+ * (→ "coming soon", no charge) when it isn't.
  */
-export function preferredProviderId(locale: string | undefined | null): PaymentProviderId {
-  // Region → currency-matched provider: Korea pays ₩ via Toss, everyone else pays $ via
-  // LemonSqueezy (its USD store). Always return the region-matched id and pass it to
-  // startCheckout REGARDLESS of whether it's configured — resolveProvider returns null
-  // (→ "coming soon", no charge) when it isn't. This guarantees the charged currency
-  // always equals the DISPLAYED one; we never silently fall back to the other provider
-  // and charge in a currency the buyer didn't see. price_krw and price_usd_cents are
-  // independent, non-FX-linked catalog columns, so a mismatch is a real bait-and-switch.
-  return isKoreanLocale(locale) ? 'toss' : 'lemonsqueezy'
+export function preferredProviderId(): PaymentProviderId {
+  return 'lemonsqueezy'
 }
