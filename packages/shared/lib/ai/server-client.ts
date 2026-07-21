@@ -97,7 +97,7 @@ export async function getAiGenerationQuota(): Promise<AiGenerationQuota> {
 
 export interface AiWallet {
   balanceMicroWon: number      // prepaid balance in micro-WON (1e-6 KRW)
-  estPricePerCardMicro: number // approximate ₩ (micro) charged per PAID card (for the UI quote)
+  estPricePerCardMicro: number // approximate micro-USD charged per PAID card (for the UI quote)
 }
 
 // Caller's prepaid micro-WON wallet (metered billing, mig 114). The server is
@@ -166,7 +166,7 @@ export interface AiWalletSummary {
   ledger: WalletLedgerEntry[]
 }
 
-// Full wallet snapshot for the user-facing Wallet/Usage screen: prepaid ₩ balance,
+// Full wallet snapshot for the user-facing Wallet/Usage screen: prepaid $ balance,
 // today's free-tier usage, and recent ledger rows. The ledger + balance tables are
 // deny-all RLS, so this SECURITY DEFINER RPC (mig 117, auth.uid()-scoped) is the
 // only read path. Returns null on a transient error so the screen shows a retry

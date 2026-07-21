@@ -20,7 +20,7 @@ export const UNLIMITED_CARD_LIMIT = 1_000_000_000
  * Data-driven subscription PLAN SELECTOR for the mobile Settings card-limit
  * section. Mirrors the web plan list: pulls the ACTIVE `subscription` products
  * from get_billing_products (mig 119/124 catalog), ordered by sort_order, and
- * renders each as title + card-limit ("무제한" when >= 1e9, else the number) + ₩
+ * renders each as title + card-limit ("무제한" when >= 1e9, else the number) + $
  * price + a Select button. Fully data-driven — no plan is hardcoded, so plans
  * added / edited / retired as catalog rows flow through with no code change.
  *

@@ -7,7 +7,7 @@ import { TopUpModal } from '../billing/TopUpModal'
 import { CreditLedgerList } from './CreditLedgerList'
 
 // AI wallet / usage content for the Settings accordion section (충전금·사용량):
-// prepaid ₩ balance, today's free-tier usage, and recent spend/top-up history
+// prepaid $ balance, today's free-tier usage, and recent spend/top-up history
 // (get_ai_wallet_summary, mig 117). Fetches on mount — the parent CollapsibleSection
 // only mounts this when expanded. Top-up opens TopUpModal (payment gated OFF until a
 // provider is wired — the modal shows a coming-soon state).

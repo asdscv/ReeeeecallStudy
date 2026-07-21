@@ -18,7 +18,7 @@ interface TopUpModalProps {
 }
 
 /**
- * Credit top-up sheet: lists the `credit_pack` catalog (₩ price + credits granted)
+ * Credit top-up sheet: lists the `credit_pack` catalog ($ price + credits granted)
  * with a buy button per pack. When no provider is wired (PAYMENTS_ACTIVE=false),
  * `startCheckout` flips a `comingSoon` flag and this shows a "준비 중" banner instead
  * of calling any provider. With a provider live (VITE_PAYMENTS_ENABLED=true +

@@ -9,7 +9,7 @@ import {
 } from '@reeeeecall/shared/lib/ai/server-client'
 
 // AI wallet / usage content for the mobile Settings accordion (충전금·사용량):
-// ₩ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig
+// $ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig
 // 117). The parent CollapsibleSection only mounts this when expanded. Top-up disabled
 // (payment Phase 2 on hold). Mirrors the web WalletSummary.
 export function WalletSummary() {
