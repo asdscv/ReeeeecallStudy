@@ -202,24 +202,24 @@ SELECT set_config('request.jwt.claim.sub','f4000000-0000-0000-0000-0000000000b4'
 DO $$
 DECLARE v_mu text; v_res json;
 BEGIN
-  v_mu := (public.create_payment_intent('credits_10000'))->>'merchant_uid';  -- 1e10 micro-WON
+  v_mu := (public.create_payment_intent('credits_10000'))->>'merchant_uid';  -- 9,990,000 micro-USD ($9.99, mig 145)
   PERFORM set_config('request.jwt.claim.role','service_role',false);
   PERFORM public.confirm_payment(v_mu,'toss','pay10k');
 
-  -- partial reverse 3e9, idempotent per cancel key
-  v_res := public.clawback_credits_partial(v_mu, 3000000000, v_mu||':k1');
-  ASSERT (v_res->>'clawed_micro')::bigint = 3000000000, 'partial claws 3e9';
+  -- partial reverse $3 (3,000,000 micro-USD), idempotent per cancel key
+  v_res := public.clawback_credits_partial(v_mu, 3000000, v_mu||':k1');
+  ASSERT (v_res->>'clawed_micro')::bigint = 3000000, 'partial claws $3';
   ASSERT (SELECT status FROM payment_intents WHERE merchant_uid=v_mu) = 'paid', 'still paid after partial';
-  v_res := public.clawback_credits_partial(v_mu, 3000000000, v_mu||':k1');
+  v_res := public.clawback_credits_partial(v_mu, 3000000, v_mu||':k1');
   ASSERT (v_res->>'already') = 'true', 'partial idempotent on cancel key';
 
-  -- full clawback claws only the REMAINDER (1e10 − 3e9 = 7e9), not the full 1e10 (P-H3 cap)
+  -- full clawback claws only the REMAINDER (9,990,000 − 3,000,000 = 6,990,000), not the full grant (P-H3 cap)
   v_res := public.clawback_credits(v_mu);
-  ASSERT (v_res->>'clawed_micro')::bigint = 7000000000, 'full clawback caps at remainder (P-H3)';
+  ASSERT (v_res->>'clawed_micro')::bigint = 6990000, 'full clawback caps at remainder (P-H3)';
   ASSERT (SELECT status FROM payment_intents WHERE merchant_uid=v_mu) = 'refunded', 'intent refunded after full';
-  -- total reversed across ledger = exactly 1e10
+  -- total reversed across ledger = exactly the granted 9,990,000
   ASSERT (SELECT -SUM(delta) FROM ai_credit_ledger WHERE reason='refund'
-            AND (ref='refund:'||v_mu OR ref LIKE 'refund:'||v_mu||':%')) = 10000000000,
+            AND (ref='refund:'||v_mu OR ref LIKE 'refund:'||v_mu||':%')) = 9990000,
          'total reversed = granted amount exactly';
 END $$;
 
