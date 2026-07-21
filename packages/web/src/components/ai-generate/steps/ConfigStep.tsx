@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ImageUp } from 'lucide-react'
 import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { useAuthStore } from '../../../stores/auth-store'
 import { useDeckStore } from '../../../stores/deck-store'
 import { CardLimitBlock } from '../../card/CardLimitBlock'
 import type { GenerateMode } from '../../../lib/ai/types'
@@ -66,7 +67,18 @@ interface ConfigStepProps {
 export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showModeSelect, onModeChange }: ConfigStepProps) {
   const { t } = useTranslation('ai-generate')
   const { decks, fetchDecks } = useDeckStore()
+  const userId = useAuthStore((s) => s.user?.id)
   const limit = useCardLimit()
+
+  // ONLY decks the user OWNS and can edit can receive new cards. `decks` also holds
+  // SUBSCRIBED decks (owned by a publisher via a marketplace/share, is_readonly copies
+  // too) — saving into one fails server-side at reserve_card_positions with "deck not
+  // found or not owned", which the UI mislabels as a generic AI error. Offering only
+  // owned+editable decks as AI targets prevents that whole failure class.
+  const targetDecks = useMemo(
+    () => decks.filter((d) => d.user_id === userId && !d.is_readonly),
+    [decks, userId],
+  )
 
   // Generation config state.
   // cardCount defaults to today's REMAINING FREE cards (see the affordance effect below)
@@ -117,6 +129,15 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     if (existingDeckId) setSelectedDeckId(existingDeckId)
   }, [existingDeckId])
 
+  // Clear a selection that isn't an owned+editable deck (e.g. a preselected subscribed
+  // deck, or one that stopped qualifying) once the deck list has loaded — so a target
+  // the save path would reject can never stay selected.
+  useEffect(() => {
+    if (selectedDeckId && targetDecks.length > 0 && !targetDecks.some((d) => d.id === selectedDeckId)) {
+      setSelectedDeckId('')
+    }
+  }, [selectedDeckId, targetDecks])
+
   // Load the remaining-free + credit affordance once (server is authoritative).
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
@@ -132,8 +153,8 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     }
   }, [affordable, useImage])
 
-  // Selected deck info
-  const selectedDeck: Deck | undefined = decks.find((d) => d.id === selectedDeckId)
+  // Selected deck info (only owned+editable decks are selectable — see targetDecks)
+  const selectedDeck: Deck | undefined = targetDecks.find((d) => d.id === selectedDeckId)
 
   const addCustomField = () => {
     if (customFields.length >= 6) return
@@ -253,6 +274,17 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               ? balanceText()
               : t('wallet.empty')
 
+  // Owned-card limit line: how much room is left until the cap. UNLIMITED plans
+  // (sentinel limit >= 1e9, mig 124) show a dedicated string instead of a huge number.
+  // Shown once usage is KNOWN and the cap isn't already reached (the CardLimitBlock
+  // below covers the reached case).
+  const usage = limit.cardUsage
+  const cardsLeftText = !usage || limit.reached
+    ? null
+    : usage.limit >= 1_000_000_000
+      ? t('wallet.cardLimitUnlimited')
+      : t('wallet.cardLimit', { available: Math.max(0, usage.available), limit: usage.limit })
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Mode select */}
@@ -297,13 +329,15 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               }`}
             >
               <option value="">{t('config.selectDeck')}</option>
-              {decks.map((d) => (
+              {targetDecks.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.icon} {d.name}
                 </option>
               ))}
             </select>
-            {!selectedDeckId && (
+            {targetDecks.length === 0 && !isFullMode ? (
+              <p className="text-xs text-muted-foreground mt-0.5">{t('config.noOwnedDecks')}</p>
+            ) : !selectedDeckId && (
               <p className="text-xs text-destructive mt-0.5">{t('config.selectDeckRequired')}</p>
             )}
             {cardsOnlyNeedsTemplate && (
@@ -550,9 +584,14 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         </fieldset>
       )}
 
-      {walletText && (
-        <div className="flex justify-center">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{walletText}</span>
+      {(walletText || cardsLeftText) && (
+        <div className="flex flex-wrap justify-center gap-2">
+          {walletText && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{walletText}</span>
+          )}
+          {cardsLeftText && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{cardsLeftText}</span>
+          )}
         </div>
       )}
 

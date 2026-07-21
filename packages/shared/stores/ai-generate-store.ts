@@ -87,6 +87,7 @@ const ERROR_FALLBACKS: Record<string, string> = {
   serverError: 'AI generation is temporarily unavailable. Please try again later.',
   emptyResult: "The AI generated no cards. Please try again — you weren't charged.",
   cardLimitReached: "You've reached your card limit. Delete cards or subscribe to save more.",
+  deckNotOwned: "That deck can't receive new cards. Choose a deck you own.",
 }
 
 function t(key: string): string {
@@ -104,6 +105,10 @@ function mapError(err: unknown): string {
   // Card-limit rejection at save time (saveAll throws the card-store error key) — tell
   // the user to delete/subscribe, not "try again later" (retry would keep failing).
   if (msg === 'errors:card.limitReached' || msg === 'CARD_LIMIT_REACHED') return t('cardLimitReached')
+  // Save-time ownership rejection (reserve_card_positions) — the target deck isn't the
+  // user's (e.g. a subscribed deck slipped in, or it was deleted mid-flow). "Try again
+  // later" would keep failing; tell the user to pick a deck they own.
+  if (msg === 'deck not found or not owned') return t('deckNotOwned')
   if (msg === 'BAD_REQUEST') return t('invalidImage')
   if (msg === 'AI_INSUFFICIENT_CREDITS' || msg === 'AI_QUOTA_EXCEEDED') return t('insufficientCredits')
   if (msg === 'AI_RATE_CAP' || msg === 'RATE_LIMITED') return t('rateLimited')

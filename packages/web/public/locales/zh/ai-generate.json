@@ -57,7 +57,8 @@
     "imageAddMore": "继续添加 ({{count}}/{{max}})",
     "imageRemove": "删除图片",
     "inputModeTopicHint": "输入主题，AI 会为你生成卡片。",
-    "inputModeImageHint": "上传课本页面、单词表或笔记的照片，AI 会识别并生成卡片。可一次选择多张。"
+    "inputModeImageHint": "上传课本页面、单词表或笔记的照片，AI 会识别并生成卡片。可一次选择多张。",
+    "noOwnedDecks": "你还没有自己的卡组 — 请先创建一个卡组，再向其中添加 AI 卡片。"
   },
   "wallet": {
     "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",
@@ -66,7 +67,9 @@
     "empty": "今天的免费卡片已用完",
     "unknown": "暂时无法获取余额",
     "balance": "余额 {{amount}}（约{{cards}}张）",
-    "imagePaid": "图片生成为付费功能 — 请充值后继续。"
+    "imagePaid": "图片生成为付费功能 — 请充值后继续。",
+    "cardLimit": "卡片额度 剩余 {{available}}/{{limit}}",
+    "cardLimitUnlimited": "卡片额度无限"
   },
   "wizard": {
     "setup": "Setup",
@@ -157,7 +160,8 @@
     "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。",
     "insufficientCredits": "您今天的免费AI卡片已用完，且没有剩余点数。请充值以继续生成。",
     "invalidImage": "无法读取该图片。请尝试更小或更清晰的照片。",
-    "quotaExceeded": "您已达到今日免费AI生成上限。请明天再试。"
+    "quotaExceeded": "您已达到今日免费AI生成上限。请明天再试。",
+    "deckNotOwned": "该卡组无法添加新卡片。请选择你拥有的卡组。"
   },
   "button": {
     "aiGenerate": "AI Generate",
