@@ -58,6 +58,8 @@ export interface AdminPaymentRow {
   product_id: string | null
   kind: string
   amount_krw: number
+  /** Charged amount in micro-USD (mig 147); format with formatUsdMicro. */
+  amount_micro: number
   status: string
   provider: string | null
   provider_payment_id: string | null
@@ -93,6 +95,8 @@ export interface AdminUserBillingPayment {
   product_id: string | null
   kind: string
   amount_krw: number
+  /** Charged amount in micro-USD (mig 147); format with formatUsdMicro. */
+  amount_micro: number
   status: string
   paid_at: string | null
   created_at: string
