@@ -57,7 +57,8 @@
     "imageAddMore": "Añadir más ({{count}}/{{max}})",
     "imageRemove": "Quitar imagen",
     "inputModeTopicHint": "Describe un tema y la IA escribe las tarjetas por ti.",
-    "inputModeImageHint": "Sube fotos de una página de libro, lista de vocabulario o apuntes: la IA las convierte en tarjetas. Puedes elegir varias a la vez."
+    "inputModeImageHint": "Sube fotos de una página de libro, lista de vocabulario o apuntes: la IA las convierte en tarjetas. Puedes elegir varias a la vez.",
+    "noOwnedDecks": "Aún no tienes mazos propios: crea un mazo primero y luego añádele tarjetas con IA."
   },
   "wallet": {
     "summary": "{{free}} tarjetas gratuitas + {{credits}} de pago disponibles hoy",
@@ -66,7 +67,9 @@
     "empty": "Has usado tus tarjetas gratis de hoy",
     "unknown": "Saldo no disponible en este momento",
     "balance": "Saldo {{amount}} (~{{cards}} tarjetas)",
-    "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar."
+    "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar.",
+    "cardLimit": "{{available}} de {{limit}} tarjetas disponibles",
+    "cardLimitUnlimited": "Tarjetas ilimitadas"
   },
   "wizard": {
     "setup": "Setup",
@@ -157,7 +160,8 @@
     "cardLimitReached": "Has alcanzado tu límite de tarjetas. Elimina tarjetas o suscríbete para guardar más.",
     "insufficientCredits": "Has usado tus tarjetas de IA gratuitas de hoy y no te quedan créditos. Recarga para seguir generando.",
     "invalidImage": "No se pudo leer esa imagen. Prueba con una foto más pequeña o más nítida.",
-    "quotaExceeded": "Has alcanzado el límite gratuito de generación con IA de hoy. Inténtalo de nuevo mañana."
+    "quotaExceeded": "Has alcanzado el límite gratuito de generación con IA de hoy. Inténtalo de nuevo mañana.",
+    "deckNotOwned": "Ese mazo no puede recibir tarjetas nuevas. Elige un mazo que sea tuyo."
   },
   "button": {
     "aiGenerate": "AI Generate",

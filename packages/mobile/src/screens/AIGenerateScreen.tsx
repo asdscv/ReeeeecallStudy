@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
@@ -8,7 +8,7 @@ import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../com
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
 import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
-import { useDecks } from '../hooks'
+import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
 
 // AI generation runs on our server key (metered free tier) — no provider/API
@@ -178,7 +178,17 @@ export function AIGenerateScreen() {
   const navigation = useNavigation()
   const store = useAIGenerateStore()
   const { decks } = useDecks()
+  const { user } = useAuthState()
   const limit = useCardLimit()
+
+  // ONLY decks the user OWNS and can edit can receive new cards. `decks` also holds
+  // SUBSCRIBED decks (owned by a publisher) and readonly copies — saving into one fails
+  // server-side at reserve_card_positions ("deck not found or not owned"), surfaced as a
+  // generic error. Offer only owned+editable decks as AI targets (parity with web ConfigStep).
+  const targetDecks = useMemo(
+    () => decks.filter((d) => d.user_id === user?.id && !d.is_readonly),
+    [decks, user?.id],
+  )
 
   const [step, setStep] = useState<WizardStep>('config')
 
@@ -204,8 +214,16 @@ export function AIGenerateScreen() {
   // cards_only adds cards INTO an existing deck, so they must use that deck's
   // own template — never an arbitrary global templates[0], whose fields wouldn't
   // match the deck. A deck with no default_template_id can't accept AI cards yet.
-  const selectedDeck = decks.find((d) => d.id === selectedDeckId)
+  const selectedDeck = targetDecks.find((d) => d.id === selectedDeckId)
   const cardsOnlyNeedsTemplate = !!selectedDeckId && !selectedDeck?.default_template_id
+
+  // Clear a selection that isn't an owned+editable deck once the deck list has loaded,
+  // so a target the save path would reject can never stay selected.
+  useEffect(() => {
+    if (selectedDeckId && targetDecks.length > 0 && !targetDecks.some((d) => d.id === selectedDeckId)) {
+      setSelectedDeckId('')
+    }
+  }, [selectedDeckId, targetDecks])
 
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
@@ -423,7 +441,7 @@ export function AIGenerateScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 testID="ai-mode-cards"
-                onPress={() => { if (decks.length > 0) setSelectedDeckId(decks[0].id) }}
+                onPress={() => { if (targetDecks.length > 0) setSelectedDeckId(targetDecks[0].id) }}
                 style={[
                   styles.modeCard,
                   {
@@ -571,7 +589,7 @@ export function AIGenerateScreen() {
           </View>
 
           {/* Deck selector — only when "Cards Only" mode */}
-          {selectedDeckId && decks.length > 0 && (
+          {selectedDeckId && targetDecks.length > 0 && (
             <>
               <View style={styles.sectionLabelRow}>
                 <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('deck.section')}</Text>
@@ -582,14 +600,14 @@ export function AIGenerateScreen() {
                   onPress={() => setShowDeckPicker(true)}
                 >
                   <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
-                    {(() => { const d = decks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : t('deck.select') })()}
+                    {(() => { const d = targetDecks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : t('deck.select') })()}
                   </Text>
                   <Text style={{ color: theme.colors.textTertiary }}>{'\u25BE'}</Text>
                 </TouchableOpacity>
                 <DropdownPicker
                   visible={showDeckPicker}
                   onClose={() => setShowDeckPicker(false)}
-                  options={decks.map(d => ({ value: d.id, label: `${d.icon} ${d.name}` }))}
+                  options={targetDecks.map(d => ({ value: d.id, label: `${d.icon} ${d.name}` }))}
                   selectedValue={selectedDeckId}
                   onSelect={setSelectedDeckId}
                 />

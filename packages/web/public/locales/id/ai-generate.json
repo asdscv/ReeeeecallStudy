@@ -57,7 +57,8 @@
     "imageAddMore": "Tambah lagi ({{count}}/{{max}})",
     "imageRemove": "Hapus gambar",
     "inputModeTopicHint": "Jelaskan topik dan AI akan membuat kartunya untukmu.",
-    "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus."
+    "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus.",
+    "noOwnedDecks": "Kamu belum punya dek sendiri — buat dek dulu, lalu tambahkan kartu AI ke dalamnya."
   },
   "wallet": {
     "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",
@@ -66,7 +67,9 @@
     "empty": "Kartu gratis hari ini sudah habis",
     "unknown": "Saldo tidak tersedia saat ini",
     "balance": "Saldo {{amount}} (~{{cards}} kartu)",
-    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan."
+    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan.",
+    "cardLimit": "{{available}} dari {{limit}} kartu tersisa",
+    "cardLimitUnlimited": "Kartu tak terbatas"
   },
   "wizard": {
     "setup": "Setup",
@@ -157,7 +160,8 @@
     "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak.",
     "insufficientCredits": "Anda telah menggunakan kartu AI gratis hari ini dan tidak memiliki kredit tersisa. Isi ulang untuk terus membuat kartu.",
     "invalidImage": "Tidak dapat membaca gambar tersebut. Silakan coba foto yang lebih kecil atau lebih jelas.",
-    "quotaExceeded": "Anda telah mencapai batas pembuatan AI gratis hari ini. Silakan coba lagi besok."
+    "quotaExceeded": "Anda telah mencapai batas pembuatan AI gratis hari ini. Silakan coba lagi besok.",
+    "deckNotOwned": "Dek itu tidak bisa menerima kartu baru. Pilih dek milikmu sendiri."
   },
   "button": {
     "aiGenerate": "AI Generate",

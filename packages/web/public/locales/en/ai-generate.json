@@ -57,7 +57,8 @@
     "imageAddMore": "Add more ({{count}}/{{max}})",
     "imageRemove": "Remove image",
     "inputModeTopicHint": "Describe a topic and AI writes the cards for you.",
-    "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once."
+    "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once.",
+    "noOwnedDecks": "You don’t own any decks yet — create a deck first, then add AI cards to it."
   },
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards available today",
@@ -66,7 +67,9 @@
     "empty": "You’ve used today’s free cards",
     "unknown": "Balance unavailable right now",
     "balance": "{{amount}} balance (~{{cards}} cards)",
-    "imagePaid": "Image generation is paid — top up your balance to continue."
+    "imagePaid": "Image generation is paid — top up your balance to continue.",
+    "cardLimit": "{{available}} of {{limit}} cards left",
+    "cardLimitUnlimited": "Unlimited card capacity"
   },
   "wizard": {
     "setup": "Setup",
@@ -157,7 +160,8 @@
     "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more.",
     "insufficientCredits": "You've used today's free AI cards and have no credits left. Top up to keep generating.",
     "invalidImage": "Couldn't read that image. Please try a smaller or clearer photo.",
-    "quotaExceeded": "You've reached today's free AI generation limit. Please try again tomorrow."
+    "quotaExceeded": "You've reached today's free AI generation limit. Please try again tomorrow.",
+    "deckNotOwned": "That deck can’t receive new cards. Choose a deck you own."
   },
   "button": {
     "aiGenerate": "AI Generate",

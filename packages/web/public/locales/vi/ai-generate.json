@@ -57,7 +57,8 @@
     "imageAddMore": "Thêm nữa ({{count}}/{{max}})",
     "imageRemove": "Xóa ảnh",
     "inputModeTopicHint": "Mô tả một chủ đề và AI sẽ viết thẻ cho bạn.",
-    "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc."
+    "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc.",
+    "noOwnedDecks": "Bạn chưa sở hữu bộ thẻ nào — hãy tạo một bộ thẻ trước, rồi thêm thẻ AI vào đó."
   },
   "wallet": {
     "summary": "Hôm nay còn {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
@@ -66,7 +67,9 @@
     "empty": "Bạn đã dùng hết thẻ miễn phí hôm nay",
     "unknown": "Hiện không thể xem số dư",
     "balance": "Số dư {{amount}} (~{{cards}} thẻ)",
-    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục."
+    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục.",
+    "cardLimit": "Còn {{available}}/{{limit}} thẻ",
+    "cardLimitUnlimited": "Thẻ không giới hạn"
   },
   "wizard": {
     "setup": "Setup",
@@ -157,7 +160,8 @@
     "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm.",
     "insufficientCredits": "Bạn đã dùng hết số thẻ AI miễn phí hôm nay và không còn tín dụng nào. Hãy nạp thêm để tiếp tục tạo thẻ.",
     "invalidImage": "Không thể đọc được hình ảnh đó. Vui lòng thử một ảnh nhỏ hơn hoặc rõ hơn.",
-    "quotaExceeded": "Bạn đã đạt đến giới hạn tạo bằng AI miễn phí của hôm nay. Vui lòng thử lại vào ngày mai."
+    "quotaExceeded": "Bạn đã đạt đến giới hạn tạo bằng AI miễn phí của hôm nay. Vui lòng thử lại vào ngày mai.",
+    "deckNotOwned": "Bộ thẻ đó không thể thêm thẻ mới. Hãy chọn bộ thẻ bạn sở hữu."
   },
   "button": {
     "aiGenerate": "AI Generate",
