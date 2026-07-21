@@ -23,7 +23,7 @@ export function isUnlimitedCardLimit(limit: number | null | undefined): boolean 
  * Reads the subscription catalog from the billing store (`get_billing_products`),
  * filtered to `kind === 'subscription' && isActive` and sorted by `sortOrder`, so a
  * new/edited/removed plan is a catalog row change alone — no code edit here. Each row
- * shows title, card limit ("무제한" when >= 1e9, else the formatted number), the ₩
+ * shows title, card limit ("무제한" when >= 1e9, else the formatted number), the $
  * price, and a Select button → `startCheckout(plan.id)`. The user's current plan
  * (matched by `subscription.productId`) is highlighted and its button disabled.
  *
