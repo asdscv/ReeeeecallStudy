@@ -327,11 +327,11 @@
       "confirmGrantTitle": "Cấp gói đăng ký",
       "confirmGrant": "Cấp \"{{product}}\" cho người dùng này?",
       "adjustWallet": "Điều chỉnh ví",
-      "adjustAmount": "Số tiền (₩, + cấp / − thu hồi)",
+      "adjustAmount": "Số tiền ($, + cấp / − thu hồi)",
       "adjustReason": "Lý do",
       "adjustSubmit": "Áp dụng",
       "confirmAdjustTitle": "Điều chỉnh ví",
-      "confirmAdjust": "Điều chỉnh ví của người dùng này ₩{{amount}}?"
+      "confirmAdjust": "Điều chỉnh ví của người dùng này ${{amount}}?"
     },
     "pagination": {
       "page": "Trang {{page}}",

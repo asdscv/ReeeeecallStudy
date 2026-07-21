@@ -11,7 +11,6 @@ import {
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { preferredProviderId } from '../../lib/payments'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
-import { toIntlLocale } from '../../lib/locale-utils'
 
 interface TopUpModalProps {
   open: boolean
@@ -27,7 +26,7 @@ interface TopUpModalProps {
  * provider.checkout flow and reflect processing / success / canceled state.
  */
 export function TopUpModal({ open, onClose }: TopUpModalProps) {
-  const { t, i18n } = useTranslation('billing')
+  const { t } = useTranslation('billing')
   const products = useBillingStore((s) => s.products)
   const loading = useBillingStore((s) => s.loading)
   const error = useBillingStore((s) => s.error)
@@ -45,12 +44,8 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
     }
   }, [open, fetchProducts, clearComingSoon])
 
-  const dateLocale = toIntlLocale(i18n.language)
-  // Price + credit worth follow the buyer's locale: ₩ for Korean (charged via Toss),
-  // $ for everyone else (charged via LemonSqueezy's USD store). The credit worth of a
-  // pack equals its price, so reuse the same currency-aware formatter for both.
-  const fmtPrice = (p: (typeof products)[number]) =>
-    formatProductPrice(p, i18n.language, dateLocale)
+  // Price + credit worth are both USD (the credit worth of a pack equals its price).
+  const fmtPrice = (p: (typeof products)[number]) => formatProductPrice(p)
 
   const creditPacks = products
     .filter((p) => p.kind === 'credit_pack')
@@ -61,7 +56,7 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
   // Region decides the payment method (and thus currency): Korean → Toss, else →
   // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
   const beginCheckout = (productId: string) => {
-    void startCheckout(productId, preferredProviderId(i18n.language))
+    void startCheckout(productId, preferredProviderId())
   }
 
   return (

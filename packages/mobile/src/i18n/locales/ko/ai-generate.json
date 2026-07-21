@@ -45,7 +45,7 @@
     "creditsOnly": "유료 카드 {{credits}}장 사용 가능",
     "empty": "오늘 무료 카드를 다 썼어요",
     "unknown": "잔액을 확인할 수 없습니다",
-    "balance": "충전잔액 ₩{{won}} (약 {{cards}}장)",
+    "balance": "충전잔액 {{amount}} (약 {{cards}}장)",
     "freeOnly": "오늘 남은 무료 카드 {{free}}장",
     "imagePaid": "이미지 생성은 유료예요 — 계속하려면 충전이 필요해요."
   },

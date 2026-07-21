@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import {
-  microWonToWon,
+  formatUsdMicro,
   getAiCreditLedger,
   type WalletLedgerRow,
 } from '@reeeeecall/shared/lib/ai/server-client'
@@ -24,7 +24,6 @@ export function CreditLedgerList({ refreshKey }: { refreshKey?: number | string 
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
   const dateLocale = toIntlLocale(i18n.language)
-  const fmtWon = (won: number) => `₩${won.toLocaleString(dateLocale)}`
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(dateLocale, {
       month: 'short',
@@ -99,7 +98,7 @@ export function CreditLedgerList({ refreshKey }: { refreshKey?: number | string 
                   className={`text-sm font-semibold tabular-nums ${positive ? 'text-success' : 'text-destructive'}`}
                 >
                   {positive ? '+' : '−'}
-                  {fmtWon(microWonToWon(Math.abs(e.delta)))}
+                  {formatUsdMicro(Math.abs(e.delta))}
                 </span>
               </li>
             )

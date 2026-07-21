@@ -55,11 +55,8 @@ export function PaymentHistory() {
       hour: '2-digit',
       minute: '2-digit',
     })
-  // Each row renders in the currency it was CHARGED — Toss=KRW (₩), LemonSqueezy=USD ($).
-  const fmtAmount = (r: HistoryRow) =>
-    r.currency === 'krw'
-      ? `₩${(r.amountKrw ?? 0).toLocaleString(dateLocale)}`
-      : `$${((r.amountUsdCents ?? 0) / 100).toFixed(2)}`
+  // The store charges USD everywhere (LemonSqueezy) → always render $.
+  const fmtAmount = (r: HistoryRow) => `$${((r.amountUsdCents ?? 0) / 100).toFixed(2)}`
 
   const loadMore = useCallback(async () => {
     if (busyRef.current || !hasMore) return

@@ -74,7 +74,7 @@
     "creditsOnly": "{{credits}} kartu berbayar tersedia",
     "empty": "Kartu gratis hari ini sudah habis",
     "unknown": "Saldo tidak tersedia",
-    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)",
+    "balance": "Saldo {{amount}} (~{{cards}} kartu)",
     "freeOnly": "{{free}} kartu gratis tersisa hari ini",
     "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan."
   },

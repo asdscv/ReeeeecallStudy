@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useAdminStore } from '../../stores/admin-store'
 import type { AdminSubscriptionRow, AdminPaymentRow } from '../../stores/admin-store'
 import { useBillingStore } from '../../stores/billing-store'
@@ -50,7 +50,7 @@ export function AdminBillingPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  const fmtMicro = (micro: number) => `₩${microWonToWon(micro).toLocaleString(dateLocale)}`
+  const fmtMicro = (micro: number) => formatUsdMicro(micro)
   const fmtKrw = (won: number) => `₩${(won ?? 0).toLocaleString(dateLocale)}`
 
   useEffect(() => { fetchBillingOverview() }, [fetchBillingOverview])
@@ -390,7 +390,7 @@ function UserBillingPanel() {
 
   const subProducts = useMemo(() => products.filter((p) => p.kind === 'subscription'), [products])
 
-  const fmtMicro = (micro: number) => `₩${microWonToWon(micro).toLocaleString(dateLocale)}`
+  const fmtMicro = (micro: number) => formatUsdMicro(micro)
   const fmtKrw = (won: number) => `₩${(won ?? 0).toLocaleString(dateLocale)}`
 
   const idValid = UUID_RE.test(userId.trim())
@@ -514,7 +514,7 @@ function UserBillingPanel() {
                 >
                   <option value="">{t('billing.user.grantProduct')}</option>
                   {subProducts.map((p) => (
-                    <option key={p.id} value={p.id}>{p.title} · {fmtKrw(p.priceKrw)}</option>
+                    <option key={p.id} value={p.id}>{p.title} · ${((p.priceUsdCents ?? 0) / 100).toFixed(2)}</option>
                   ))}
                 </select>
                 <label className="block text-[11px] text-muted-foreground">{t('billing.user.grantPeriodEnd')}</label>

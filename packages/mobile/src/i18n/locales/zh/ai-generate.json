@@ -74,7 +74,7 @@
     "creditsOnly": "可用 {{credits}} 张付费卡片",
     "empty": "今天的免费卡片已用完",
     "unknown": "余额不可用",
-    "balance": "余额 ₩{{won}}（约{{cards}}张）",
+    "balance": "余额 {{amount}}（约{{cards}}张）",
     "freeOnly": "今日剩余 {{free}} 张免费卡片",
     "imagePaid": "图片生成为付费功能 — 请充值后继续。"
   },
