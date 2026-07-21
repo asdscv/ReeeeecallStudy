@@ -327,11 +327,11 @@
       "confirmGrantTitle": "发放订阅",
       "confirmGrant": "向此用户发放“{{product}}”？",
       "adjustWallet": "调整钱包",
-      "adjustAmount": "金额（₩，+ 发放 / − 扣回）",
+      "adjustAmount": "金额（$，+ 发放 / − 扣回）",
       "adjustReason": "原因",
       "adjustSubmit": "应用",
       "confirmAdjustTitle": "调整钱包",
-      "confirmAdjust": "将此用户的钱包调整 ₩{{amount}}？"
+      "confirmAdjust": "将此用户的钱包调整 ${{amount}}？"
     },
     "pagination": {
       "page": "第 {{page}} 页",

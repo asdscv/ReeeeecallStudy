@@ -65,7 +65,7 @@
     "creditsOnly": "有料カードを{{credits}}枚生成できます",
     "empty": "本日の無料カードを使い切りました",
     "unknown": "現在、残高を取得できません",
-    "balance": "残高 ₩{{won}}（約{{cards}}枚）",
+    "balance": "残高 {{amount}}（約{{cards}}枚）",
     "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。"
   },
   "wizard": {

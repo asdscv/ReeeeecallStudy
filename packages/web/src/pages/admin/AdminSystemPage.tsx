@@ -4,6 +4,7 @@ import { useAdminStore } from '../../stores/admin-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
 import { computeConversionRate } from '../../lib/admin-stats'
+import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 
 function ProgressBar({ label, value, max, color = 'blue' }: { label: string; value: number; max: number; color?: string }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0
@@ -90,9 +91,7 @@ export function AdminSystemPage() {
   const stats = systemStats
 
   const contentPublishRate = stats ? computeConversionRate(stats.published_contents, stats.total_contents) : 0
-  // AI credit wallet (balances are micro-WON, 1e-6 KRW → whole ₩ for display)
-  const walletBalanceWon = Math.floor((stats?.total_wallet_balance ?? 0) / 1_000_000)
-  const aiSpentWon = Math.floor((stats?.total_ai_spent ?? 0) / 1_000_000)
+  // AI credit wallet — balances are micro-USD (mig 145); format as $.
   const aiCardsToday = (stats?.ai_cards_free_today ?? 0) + (stats?.ai_cards_paid_today ?? 0)
 
   return (
@@ -113,8 +112,8 @@ export function AdminSystemPage() {
       <div className="bg-card rounded-xl border border-border p-4">
         <h3 className="text-sm font-medium text-foreground mb-4">{t('system.aiCreditWallet')}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <AdminStatCard icon="💰" label={t('system.totalWalletBalance')} value={`₩${walletBalanceWon.toLocaleString()}`} color="green" />
-          <AdminStatCard icon="💸" label={t('system.totalAiSpent')} value={`₩${aiSpentWon.toLocaleString()}`} color="orange" />
+          <AdminStatCard icon="💰" label={t('system.totalWalletBalance')} value={formatUsdMicro(stats?.total_wallet_balance ?? 0)} color="green" />
+          <AdminStatCard icon="💸" label={t('system.totalAiSpent')} value={formatUsdMicro(stats?.total_ai_spent ?? 0)} color="orange" />
           <AdminStatCard icon="👛" label={t('system.activeWallets')} value={stats?.active_wallets ?? 0} color="blue" />
           <AdminStatCard
             icon="🤖"

@@ -36,7 +36,7 @@ interface Tier {
 }
 
 export function PricingSection() {
-  const { t, i18n } = useTranslation('landing')
+  const { t } = useTranslation('landing')
   const navigate = useNavigate()
   const prefersReduced = useReducedMotion()
   const [plans, setPlans] = useState<RawPublicPlan[]>([])
@@ -59,7 +59,7 @@ export function PricingSection() {
 
   // Price follows the visitor's locale: ₩ for Korean, $ for everyone else.
   const fmtPrice = (p: RawPublicPlan) =>
-    formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents }, i18n.language)
+    formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents })
   const isUnlimited = (cardLimit: number) => cardLimit >= UNLIMITED_THRESHOLD
 
   // The card-limit line: "무제한 카드" for the sentinel, else "카드 {{count}}장".

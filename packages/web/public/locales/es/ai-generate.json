@@ -65,7 +65,7 @@
     "creditsOnly": "{{credits}} tarjetas de pago disponibles",
     "empty": "Has usado tus tarjetas gratis de hoy",
     "unknown": "Saldo no disponible en este momento",
-    "balance": "Saldo ₩{{won}} (~{{cards}} tarjetas)",
+    "balance": "Saldo {{amount}} (~{{cards}} tarjetas)",
     "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar."
   },
   "wizard": {

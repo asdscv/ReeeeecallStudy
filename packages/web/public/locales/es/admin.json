@@ -327,11 +327,11 @@
       "confirmGrantTitle": "Conceder suscripción",
       "confirmGrant": "¿Conceder \"{{product}}\" a este usuario?",
       "adjustWallet": "Ajustar cartera",
-      "adjustAmount": "Importe (₩, + crédito / − recuperación)",
+      "adjustAmount": "Importe ($, + crédito / − recuperación)",
       "adjustReason": "Motivo",
       "adjustSubmit": "Aplicar",
       "confirmAdjustTitle": "Ajustar cartera",
-      "confirmAdjust": "¿Ajustar la cartera de este usuario en ₩{{amount}}?"
+      "confirmAdjust": "¿Ajustar la cartera de este usuario en ${{amount}}?"
     },
     "pagination": {
       "page": "Página {{page}}",

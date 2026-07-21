@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import {
   getAiWalletSummary,
-  microWonToWon,
+  formatUsdMicro,
   type AiWalletSummary,
 } from '@reeeeecall/shared/lib/ai/server-client'
 
@@ -26,7 +26,6 @@ export function WalletSummary() {
   }, [])
   useEffect(() => { load() }, [load])
 
-  const fmtWon = (won: number) => `₩${won.toLocaleString()}`
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
@@ -44,7 +43,6 @@ export function WalletSummary() {
     )
   }
 
-  const balanceWon = microWonToWon(summary.balanceMicroWon)
   const freePct = Math.min(100, Math.round((summary.freeUsedToday / Math.max(1, summary.freeLimit)) * 100))
 
   return (
@@ -52,7 +50,7 @@ export function WalletSummary() {
       {/* Balance */}
       <View>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('balance.title')}</Text>
-        <Text style={[styles.balance, { color: theme.colors.text }]}>{fmtWon(balanceWon)}</Text>
+        <Text style={[styles.balance, { color: theme.colors.text }]}>{formatUsdMicro(summary.balanceMicroWon)}</Text>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>{t('balance.hint')}</Text>
         <View style={[styles.btn, { backgroundColor: theme.colors.border, marginTop: 10, opacity: 0.7 }]}>
           <Text style={{ color: theme.colors.textSecondary, fontWeight: '600' }}>{t('balance.topUp')}</Text>
@@ -95,7 +93,7 @@ export function WalletSummary() {
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{fmtDate(e.createdAt)}</Text>
                 </View>
                 <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
-                  {positive ? '+' : '−'}{fmtWon(microWonToWon(Math.abs(e.delta)))}
+                  {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
                 </Text>
               </View>
             )

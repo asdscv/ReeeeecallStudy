@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ImageUp } from 'lucide-react'
-import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDeckStore } from '../../../stores/deck-store'
 import { CardLimitBlock } from '../../card/CardLimitBlock'
@@ -233,20 +233,23 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       ? imageDataUrls.length > 0 && (isFullMode || !!selectedDeckId)
       : topic.trim() && (isFullMode || selectedDeckId)
 
-  // Free-remaining + prepaid ₩ wallet line (metered billing). Image mode is paid-only.
-  const balanceWon = affordable?.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1_000_000) : 0
-  const balanceText = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable!.paid })
+  // Free-remaining + prepaid USD wallet line (metered billing). Image mode is paid-only.
+  // Use the micro-USD amount for the >0 checks — a sub-dollar balance ($0.50) must not
+  // floor to 0 and read as "empty".
+  const balanceMicro = affordable?.balanceMicroWon ?? 0
+  const hasBalance = balanceMicro > 0
+  const balanceText = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro), cards: affordable!.paid })
   const walletText = !affordable
     ? null
     : !affordable.walletKnown
       ? t('wallet.unknown')
       : useImage
-        ? (balanceWon > 0 ? balanceText() : t('wallet.imagePaid'))
-        : affordable.free > 0 && balanceWon > 0
+        ? (hasBalance ? balanceText() : t('wallet.imagePaid'))
+        : affordable.free > 0 && hasBalance
           ? `${t('wallet.freeOnly', { free: affordable.free })} · ${balanceText()}`
           : affordable.free > 0
             ? t('wallet.freeOnly', { free: affordable.free })
-            : balanceWon > 0
+            : hasBalance
               ? balanceText()
               : t('wallet.empty')
 

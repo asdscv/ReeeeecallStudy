@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
-import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDecks } from '../hooks'
 import { useTheme, palette } from '../theme'
@@ -603,17 +603,18 @@ export function AIGenerateScreen() {
           )}
 
           {affordable && (() => {
-            const balanceWon = affordable.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1000000) : 0
-            const bal = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable.paid })
+            const balanceMicro = affordable.balanceMicroWon ?? 0
+            const hasBalance = balanceMicro > 0
+            const bal = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro), cards: affordable.paid })
             const text = !affordable.walletKnown
               ? t('wallet.unknown')
               : useImage
-                ? (balanceWon > 0 ? bal() : t('wallet.imagePaid'))
-                : affordable.free > 0 && balanceWon > 0
+                ? (hasBalance ? bal() : t('wallet.imagePaid'))
+                : affordable.free > 0 && hasBalance
                   ? `${t('wallet.freeOnly', { free: affordable.free })} · ${bal()}`
                   : affordable.free > 0
                     ? t('wallet.freeOnly', { free: affordable.free })
-                    : balanceWon > 0
+                    : hasBalance
                       ? bal()
                       : t('wallet.empty')
             return (

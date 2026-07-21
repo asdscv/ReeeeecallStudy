@@ -327,11 +327,11 @@
       "confirmGrantTitle": "Grant subscription",
       "confirmGrant": "Grant \"{{product}}\" to this user?",
       "adjustWallet": "Adjust Wallet",
-      "adjustAmount": "Amount (₩, + credit / − claw-back)",
+      "adjustAmount": "Amount ($, + credit / − claw-back)",
       "adjustReason": "Reason",
       "adjustSubmit": "Apply",
       "confirmAdjustTitle": "Adjust wallet",
-      "confirmAdjust": "Adjust this user's wallet by ₩{{amount}}?"
+      "confirmAdjust": "Adjust this user's wallet by ${{amount}}?"
     },
     "pagination": {
       "page": "Page {{page}}",

@@ -327,11 +327,11 @@
       "confirmGrantTitle": "サブスク付与",
       "confirmGrant": "このユーザーに「{{product}}」を付与しますか？",
       "adjustWallet": "ウォレット調整",
-      "adjustAmount": "金額（₩、+ 付与 / − 回収）",
+      "adjustAmount": "金額（$、+ 付与 / − 回収）",
       "adjustReason": "理由",
       "adjustSubmit": "適用",
       "confirmAdjustTitle": "ウォレット調整",
-      "confirmAdjust": "このユーザーのウォレットを ₩{{amount}} 調整しますか？"
+      "confirmAdjust": "このユーザーのウォレットを ${{amount}} 調整しますか？"
     },
     "pagination": {
       "page": "{{page}} ページ",

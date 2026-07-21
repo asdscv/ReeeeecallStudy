@@ -65,7 +65,7 @@
     "creditsOnly": "Còn {{credits}} thẻ trả phí",
     "empty": "Bạn đã dùng hết thẻ miễn phí hôm nay",
     "unknown": "Hiện không thể xem số dư",
-    "balance": "Số dư ₩{{won}} (~{{cards}} thẻ)",
+    "balance": "Số dư {{amount}} (~{{cards}} thẻ)",
     "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục."
   },
   "wizard": {
