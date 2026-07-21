@@ -37,7 +37,7 @@ export function PlanSelector({
   onSelect?: (product: BillingProduct) => void
 }) {
   const theme = useTheme()
-  const { t, i18n } = useTranslation('settings')
+  const { t } = useTranslation('settings')
   const [plans, setPlans] = useState<BillingProduct[] | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
 
@@ -70,8 +70,7 @@ export function PlanSelector({
       ? t('plans.unlimited')
       : t('plans.cardLimit', { limit: (limit ?? 0).toLocaleString() })
 
-  // Price follows the buyer's locale: ₩ for Korean, $ for everyone else — matching
-  // what the region's payment method (Toss / store IAP) actually charges.
+  // Price is always USD (the store charges USD everywhere; ₩/Toss dropped).
   const fmtPrice = (p: BillingProduct): string => formatProductPrice(p)
 
   const isCurrent = (p: BillingProduct): boolean =>

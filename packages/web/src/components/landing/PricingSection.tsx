@@ -57,7 +57,7 @@ export function PricingSection() {
   // when payments are off, but never render if the flag is not 'true'.
   if (!PAYMENTS_ENABLED) return null
 
-  // Price follows the visitor's locale: ₩ for Korean, $ for everyone else.
+  // Price is always USD — the store charges USD everywhere (Toss/₩ dropped).
   const fmtPrice = (p: RawPublicPlan) =>
     formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents })
   const isUnlimited = (cardLimit: number) => cardLimit >= UNLIMITED_THRESHOLD

@@ -53,8 +53,8 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
 
   const showComingSoon = !PAYMENTS_ACTIVE || comingSoon
 
-  // Region decides the payment method (and thus currency): Korean → Toss, else →
-  // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
+  // LemonSqueezy is the only payment provider (Toss/₩ dropped); preferredProviderId()
+  // always resolves to it, and the displayed $ price is what it charges.
   const beginCheckout = (productId: string) => {
     void startCheckout(productId, preferredProviderId())
   }

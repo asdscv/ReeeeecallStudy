@@ -137,12 +137,8 @@ export async function getAffordableCards(): Promise<Affordable> {
 
 // The wallet is denominated in micro-USD (1 unit = 1e-6 USD) since mig 145 — the AI
 // provider bills USD, so there's no FX hop. The `*MicroWon` field names are kept for
-// churn reasons; their unit is micro-USD. This returns whole dollars (float, keeps
-// cents) from a micro-USD amount.
-export function microUsdToUsd(micro: number): number {
-  return (micro || 0) / 1_000_000
-}
-
+// churn reasons; their unit is micro-USD, which the UI renders via formatUsdMicro.
+//
 // Format a micro-USD amount as a `$` string. Balances render 2 decimals ($1.48);
 // tiny per-card spends (< $0.01) render up to 4 so they never floor to "$0.00".
 // `sign` prefixes +/− (for ledger deltas).
