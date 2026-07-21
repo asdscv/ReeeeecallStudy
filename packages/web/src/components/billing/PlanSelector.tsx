@@ -86,8 +86,7 @@ export function PlanSelector() {
   }, [products.length, fetchProducts, fetchSubscription])
 
   const locale = toIntlLocale(i18n.language)
-  // Price follows the buyer's locale: ₩ for Korean (charged via Toss), $ for everyone
-  // else (charged via LemonSqueezy's USD store) — so what's shown equals what's charged.
+  // Price is always USD — the store charges USD everywhere (LemonSqueezy; Toss/₩ dropped).
   const fmtPrice = (p: (typeof products)[number]) =>
     formatProductPrice(p)
 
@@ -105,8 +104,8 @@ export function PlanSelector() {
   // route them to the portal button below. (The server also rejects a second LS checkout.)
   const lockPlanSwitch = PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'lemonsqueezy'
 
-  // Region decides the payment method (and thus currency): Korean → Toss, else →
-  // LemonSqueezy. No manual method picker — display and charge stay in lockstep.
+  // LemonSqueezy is the only payment provider (Toss/₩ dropped); preferredProviderId()
+  // always resolves to it, and the displayed $ price is what it charges.
   const beginCheckout = (productId: string) => {
     void startCheckout(productId, preferredProviderId())
   }

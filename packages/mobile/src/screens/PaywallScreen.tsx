@@ -15,6 +15,7 @@ import { Screen, Button, ScreenHeader } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 import type { BillingProduct } from '../services/billing'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 
@@ -78,9 +79,9 @@ export function PaywallScreen() {
 
   const formatPrice = (product: BillingProduct, pkg: any): string => {
     // Prefer the store-localized price string when the IAP package is loaded
-    // (Apple/Google want the store price shown); fall back to the catalog KRW.
+    // (Apple/Google want the store price shown); fall back to the catalog USD price.
     if (pkg?.product?.priceString) return pkg.product.priceString
-    const price = `₩${product.priceKrw.toLocaleString()}`
+    const price = formatProductPrice(product)
     return product.period === 'month' ? `${price}${t('catalog.perMonth')}` : price
   }
 
