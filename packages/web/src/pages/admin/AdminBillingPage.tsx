@@ -51,7 +51,6 @@ export function AdminBillingPage() {
   const [actionError, setActionError] = useState<string | null>(null)
 
   const fmtMicro = (micro: number) => formatUsdMicro(micro)
-  const fmtKrw = (won: number) => `₩${(won ?? 0).toLocaleString(dateLocale)}`
 
   useEffect(() => { fetchBillingOverview() }, [fetchBillingOverview])
   useEffect(() => { fetchBillingSubscriptions(statusFilter || undefined, subsPage, PAGE_SIZE) }, [fetchBillingSubscriptions, statusFilter, subsPage])
@@ -93,7 +92,7 @@ export function AdminBillingPage() {
   const doRefundCreditPack = async (row: AdminPaymentRow) => {
     const ok = await confirm({
       title: t('billing.refund.confirmTitle'),
-      message: `${t('billing.refund.confirmCreditPack', { amount: fmtKrw(row.amount_krw), email: row.email || row.user_id })}\n\n${t('billing.refund.realMoneyNote')}`,
+      message: `${t('billing.refund.confirmCreditPack', { amount: fmtMicro(row.amount_micro), email: row.email || row.user_id })}\n\n${t('billing.refund.realMoneyNote')}`,
       danger: true,
     })
     if (!ok) return
@@ -291,7 +290,7 @@ export function AdminBillingPage() {
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">{row.product_id ?? '-'}</td>
                     <td className="px-4 py-2 text-muted-foreground">{t(`billing.kind.${row.kind}`, row.kind)}</td>
-                    <td className="px-4 py-2 text-right text-foreground tabular-nums">{fmtKrw(row.amount_krw)}</td>
+                    <td className="px-4 py-2 text-right text-foreground tabular-nums">{fmtMicro(row.amount_micro)}</td>
                     <td className="px-4 py-2">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${PAY_STATUS_STYLES[row.status] ?? 'bg-accent text-foreground'}`}>
                         {t(`billing.payStatus.${row.status}`, row.status)}
@@ -391,7 +390,6 @@ function UserBillingPanel() {
   const subProducts = useMemo(() => products.filter((p) => p.kind === 'subscription'), [products])
 
   const fmtMicro = (micro: number) => formatUsdMicro(micro)
-  const fmtKrw = (won: number) => `₩${(won ?? 0).toLocaleString(dateLocale)}`
 
   const idValid = UUID_RE.test(userId.trim())
 
@@ -613,7 +611,7 @@ function UserBillingPanel() {
                         <tr key={p.merchant_uid}>
                           <td className="px-3 py-1.5 text-muted-foreground">{p.product_id ?? '-'}</td>
                           <td className="px-3 py-1.5 text-muted-foreground">{t(`billing.kind.${p.kind}`, p.kind)}</td>
-                          <td className="px-3 py-1.5 text-right text-foreground tabular-nums">{fmtKrw(p.amount_krw)}</td>
+                          <td className="px-3 py-1.5 text-right text-foreground tabular-nums">{fmtMicro(p.amount_micro)}</td>
                           <td className="px-3 py-1.5">
                             <span className={`inline-block px-1.5 py-0.5 rounded-full ${PAY_STATUS_STYLES[p.status] ?? 'bg-accent text-foreground'}`}>
                               {t(`billing.payStatus.${p.status}`, p.status)}
