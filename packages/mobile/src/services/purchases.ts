@@ -1,27 +1,27 @@
 // ─────────────────────────────────────────────────────────────────────────
-// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응
-// 이 서비스는 현재 호출되지 않음 (usePurchases 훅도 미사용).
-// 코드는 유지하되 UI 진입점 차단만으로 구독 기능 비활성화.
-// 복원 시 추가 설정 필요:
-//   - EXPO_PUBLIC_REVENUECAT_IOS_KEY / EXPO_PUBLIC_REVENUECAT_ANDROID_KEY
-//   - RevenueCat 대시보드 entitlement "pro" + App Store Connect 상품 매핑
+// Mobile IAP (RevenueCat) — re-enabled for integration (react-native-purchases
+// v10, New-Architecture ready). NOTE: this is a CODE integration + test build.
+// Real purchases still need the owner-side store setup — see the OWNER GO-LIVE
+// CHECKLIST below (ASC/Play products, RevenueCat offering/entitlement/keys,
+// webhook secrets, Google Play payment profile, App Store re-review).
 // ─────────────────────────────────────────────────────────────────────────
-// [SUBSCRIPTION-HIDDEN] react-native-purchases 제거됨 (네이티브 모듈 크래시 원인).
-// 복원 시: pnpm add react-native-purchases --filter mobile 후 아래 타입/import 복구.
-type PurchasesPackage = any
-type CustomerInfo = any
-type PurchasesOffering = any
+// Types come from the SDK via `import type` (erased at runtime, so it can never
+// be the native-load crash source). The SDK OBJECT is still loaded through a
+// DEFENSIVE require below — if the native module ever fails to link, the whole
+// service degrades to no-ops instead of crashing at import.
+import type { PurchasesPackage, CustomerInfo, PurchasesOffering } from 'react-native-purchases'
 import { Platform } from 'react-native'
 
-// Lazy-load react-native-purchases — 현재 패키지 제거 상태, require는 항상 실패
-let Purchases: any = null
-let LOG_LEVEL: any = null
+// Defensive runtime load of react-native-purchases. Present now (installed), but
+// keep the try/catch so a native-link failure degrades gracefully to no-ops.
+let Purchases: typeof import('react-native-purchases').default | null = null
+let LOG_LEVEL: typeof import('react-native-purchases').LOG_LEVEL | null = null
 try {
   const mod = require('react-native-purchases')
   Purchases = mod.default ?? mod.Purchases
   LOG_LEVEL = mod.LOG_LEVEL
 } catch {
-  // react-native-purchases 제거 상태 — 정상 동작
+  // native module absent/unlinked — service no-ops (should not happen once built)
 }
 
 // RevenueCat API keys — set via environment or constants
@@ -90,6 +90,13 @@ export const MERCHANT_UID_ATTRIBUTE = 'merchant_uid'
 // flipping it to true (after the restore steps in PaywallScreen's header) is
 // the single switch that un-hides the flow. Nothing renders while false.
 // ─────────────────────────────────────────────────────────────────────────
+// VERIFIED (test build, 2026-07-21): with this flipped to `true` on a native
+// build carrying react-native-purchases v10, the SDK configures with the iOS key,
+// Purchases.logIn(<supabase uid>) aliases app_user_id correctly, and the Paywall
+// renders + calls GetOfferings (200). It only returns empty offerings until the
+// owner registers the store products (see OWNER GO-LIVE CHECKLIST above). Kept
+// FALSE in the repo (Apple Guideline 2.1(b) — no live paywall without approved
+// IAP products); flipping to true is the owner's final go-live switch.
 export const SUBSCRIPTION_UI_ENABLED = false
 
 /**
