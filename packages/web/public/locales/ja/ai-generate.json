@@ -57,7 +57,8 @@
     "imageAddMore": "追加 ({{count}}/{{max}})",
     "imageRemove": "画像を削除",
     "inputModeTopicHint": "トピックを入力すると、AIがカードを作成します。",
-    "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。"
+    "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。",
+    "noOwnedDecks": "編集できるデッキがまだありません — 先にデッキを作成してから AI カードを追加してください。"
   },
   "wallet": {
     "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカードを生成できます",
@@ -66,7 +67,9 @@
     "empty": "本日の無料カードを使い切りました",
     "unknown": "現在、残高を取得できません",
     "balance": "残高 {{amount}}（約{{cards}}枚）",
-    "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。"
+    "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。",
+    "cardLimit": "カード枠 残り {{available}}/{{limit}}",
+    "cardLimitUnlimited": "カード枠 無制限"
   },
   "wizard": {
     "setup": "Setup",
@@ -157,7 +160,8 @@
     "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。",
     "insufficientCredits": "本日の無料AIカードを使い切り、クレジットも残っていません。チャージして生成を続けましょう。",
     "invalidImage": "この画像を読み込めませんでした。より小さく、鮮明な写真でお試しください。",
-    "quotaExceeded": "本日の無料AI生成の上限に達しました。明日またお試しください。"
+    "quotaExceeded": "本日の無料AI生成の上限に達しました。明日またお試しください。",
+    "deckNotOwned": "そのデッキにはカードを追加できません。自分のデッキを選んでください。"
   },
   "button": {
     "aiGenerate": "AI Generate",
