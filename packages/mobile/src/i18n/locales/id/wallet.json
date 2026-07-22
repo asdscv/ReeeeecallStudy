@@ -26,5 +26,11 @@
     "spend_cards": "Kartu AI",
     "spend_image": "Gambar AI",
     "admin_adjustment": "Penyesuaian"
+  },
+  "credits": {
+    "title": "Beli Kredit AI",
+    "creditLabel": "Kredit AI {{value}}",
+    "confirming": "Pembayaran diterima — kredit akan segera muncul.",
+    "unavailable": "Paket kredit ini sedang tidak tersedia."
   }
 }

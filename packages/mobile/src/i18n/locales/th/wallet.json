@@ -26,5 +26,11 @@
     "spend_cards": "การ์ด AI",
     "spend_image": "รูปภาพ AI",
     "admin_adjustment": "การปรับยอด"
+  },
+  "credits": {
+    "title": "ซื้อเครดิต AI",
+    "creditLabel": "เครดิต AI {{value}}",
+    "confirming": "ชำระเงินสำเร็จ — เครดิตจะปรากฏในไม่ช้า",
+    "unavailable": "ขณะนี้ยังไม่สามารถซื้อแพ็กเครดิตนี้ได้"
   }
 }

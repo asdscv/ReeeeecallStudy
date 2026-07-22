@@ -26,5 +26,11 @@
     "spend_cards": "AI cards",
     "spend_image": "AI image",
     "admin_adjustment": "Adjustment"
+  },
+  "credits": {
+    "title": "Buy AI Credits",
+    "creditLabel": "{{value}} AI credit",
+    "confirming": "Payment received — your credits will appear shortly.",
+    "unavailable": "This credit pack isn't available right now."
   }
 }

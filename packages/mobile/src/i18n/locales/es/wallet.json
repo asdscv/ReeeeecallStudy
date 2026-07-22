@@ -26,5 +26,11 @@
     "spend_cards": "Tarjetas de IA",
     "spend_image": "Imagen de IA",
     "admin_adjustment": "Ajuste"
+  },
+  "credits": {
+    "title": "Comprar créditos de IA",
+    "creditLabel": "{{value}} en créditos de IA",
+    "confirming": "Pago recibido: tus créditos aparecerán en breve.",
+    "unavailable": "Este paquete de créditos no está disponible ahora."
   }
 }

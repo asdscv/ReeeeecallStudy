@@ -249,24 +249,30 @@ class PurchaseService {
    *      (provider,provider_ref). See mig 119 webhookPayload contract.
    *   4) The client just RE-FETCHES getMySubscription()/get_owned_card_usage
    *      to reflect the granted state (usePurchases.refreshSubscription()).
-   * The `success` returned here only means the store charge + RevenueCat
-   * entitlement went through — it is NOT proof our DB was updated.
+   * `success` = the store transaction COMPLETED (settled, not cancelled/errored) —
+   * it is the ONLY success signal for a CONSUMABLE credit pack, which grants no
+   * entitlement (so `isPro` stays false for it). `isPro` is reported SEPARATELY for
+   * the subscription flow. Neither proves our DB was updated — the credits /
+   * subscription grant happens SERVER-SIDE via the RevenueCat webhook; the client
+   * just re-polls (wallet / getMySubscription).
    */
   async purchase(pkg: PurchasesPackage): Promise<{
     success: boolean
+    isPro: boolean
     customerInfo?: CustomerInfo
     error?: string
   }> {
-    if (!Purchases) return { success: false, error: 'Purchases not available' }
+    if (!Purchases) return { success: false, isPro: false, error: 'Purchases not available' }
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg)
       const isPro = customerInfo.entitlements.active[PRO_ENTITLEMENT] !== undefined
-      return { success: isPro, customerInfo }
+      // success = transaction settled (works for consumables too); isPro is separate.
+      return { success: true, isPro, customerInfo }
     } catch (e: any) {
       if (e.userCancelled) {
-        return { success: false, error: 'cancelled' }
+        return { success: false, isPro: false, error: 'cancelled' }
       }
-      return { success: false, error: e.message ?? 'Purchase failed' }
+      return { success: false, isPro: false, error: e.message ?? 'Purchase failed' }
     }
   }
 

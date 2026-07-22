@@ -26,5 +26,11 @@
     "spend_cards": "Thẻ AI",
     "spend_image": "Ảnh AI",
     "admin_adjustment": "Điều chỉnh"
+  },
+  "credits": {
+    "title": "Mua tín dụng AI",
+    "creditLabel": "{{value}} tín dụng AI",
+    "confirming": "Đã nhận thanh toán — tín dụng sẽ sớm xuất hiện.",
+    "unavailable": "Gói tín dụng này hiện không khả dụng."
   }
 }

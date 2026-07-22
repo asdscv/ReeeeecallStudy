@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Alert } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import {
@@ -7,6 +7,11 @@ import {
   formatUsdMicro,
   type AiWalletSummary,
 } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { Button } from '../ui'
+import { usePurchases } from '../../hooks/usePurchases'
+import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
+import type { BillingProduct } from '../../services/billing'
 
 // AI wallet / usage content for the mobile Settings accordion (충전금·사용량):
 // $ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig
@@ -25,6 +30,34 @@ export function WalletSummary() {
     })
   }, [])
   useEffect(() => { load() }, [load])
+
+  // Credit-pack top-up (mobile IAP, consumable). The catalog + store package come
+  // from usePurchases (short-circuits to empty while the payment gate is off).
+  const { products, offering, purchasing, purchase } = usePurchases()
+  const creditPacks = products
+    .filter((p) => p.kind === 'credit_pack')
+    .sort((a, b) => (a.priceUsdCents ?? 0) - (b.priceUsdCents ?? 0))
+
+  // Show the STORE-localized price the buyer actually pays (Apple/Google charge in
+  // local currency), falling back to the catalog USD if the package hasn't loaded.
+  const storePrice = (product: BillingProduct): string =>
+    purchaseService.findPackageForProduct(offering, product.id)?.product?.priceString
+      ?? formatProductPrice(product)
+
+  const buyPack = async (product: BillingProduct) => {
+    const pkg = purchaseService.findPackageForProduct(offering, product.id)
+    if (!pkg) { Alert.alert(t('credits.title'), t('credits.unavailable')); return }
+    // purchase() settles the store transaction; the credit GRANT lands server-side
+    // via the RevenueCat webhook (add_ai_credits, idempotent). Re-poll the wallet so
+    // the new balance shows once the webhook has processed.
+    const result = await purchase(pkg, product)
+    if (result.success) {
+      load()
+      Alert.alert(t('credits.title'), t('credits.confirming'))
+    } else if (result.error && result.error !== 'cancelled' && result.error !== 'disabled') {
+      Alert.alert(t('credits.title'), result.error)
+    }
+  }
 
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -52,9 +85,32 @@ export function WalletSummary() {
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('balance.title')}</Text>
         <Text style={[styles.balance, { color: theme.colors.text }]}>{formatUsdMicro(summary.balanceMicroWon)}</Text>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>{t('balance.hint')}</Text>
-        <View style={[styles.btn, { backgroundColor: theme.colors.border, marginTop: 10, opacity: 0.7 }]}>
-          <Text style={{ color: theme.colors.textSecondary, fontWeight: '600' }}>{t('balance.topUp')}</Text>
-        </View>
+
+        {SUBSCRIPTION_UI_ENABLED && creditPacks.length > 0 ? (
+          <View style={{ marginTop: 14, gap: 8 }}>
+            <Text style={[styles.subTitle, { color: theme.colors.text }]}>{t('credits.title')}</Text>
+            {creditPacks.map((pack) => (
+              <View key={pack.id} style={styles.packRow}>
+                {/* what you GET (fixed USD credit) — the price BELOW is what you PAY
+                    (store-localized, may differ by country) */}
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {t('credits.creditLabel', { value: pack.title })}
+                </Text>
+                <Button
+                  testID={`wallet-buy-${pack.id}`}
+                  title={storePrice(pack)}
+                  size="sm"
+                  onPress={() => buyPack(pack)}
+                  loading={purchasing}
+                />
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={[styles.btn, { backgroundColor: theme.colors.border, marginTop: 10, opacity: 0.7 }]}>
+            <Text style={{ color: theme.colors.textSecondary, fontWeight: '600' }}>{t('balance.topUp')}</Text>
+          </View>
+        )}
       </View>
 
       {/* Free today */}
@@ -111,5 +167,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   bar: { height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: 'rgba(128,128,128,0.2)' },
   btn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, alignItems: 'center', alignSelf: 'flex-start' },
+  packRow: { gap: 4 },
   ledgerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 },
 })

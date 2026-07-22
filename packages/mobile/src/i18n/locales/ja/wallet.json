@@ -26,5 +26,11 @@
     "spend_cards": "AIカード",
     "spend_image": "AI画像",
     "admin_adjustment": "調整"
+  },
+  "credits": {
+    "title": "AIクレジット購入",
+    "creditLabel": "{{value}} 分のAIクレジット",
+    "confirming": "決済完了 — まもなくクレジットが反映されます。",
+    "unavailable": "現在このクレジットパックは購入できません。"
   }
 }
