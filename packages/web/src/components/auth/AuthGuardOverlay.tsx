@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
-import { Brain, BarChart3, Infinity as InfinityIcon } from 'lucide-react'
+import { Brain, BarChart3, Sparkles } from 'lucide-react'
 
 /**
  * MockBrowserPreview — AppPreviewSection(랜딩)에서 복사 후 AuthGuard용으로 수정
@@ -194,7 +194,9 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
 const FEATURES = [
   { icon: Brain, key: 'srs' },
   { icon: BarChart3, key: 'stats' },
-  { icon: InfinityIcon, key: 'unlimited' },
+  // AI card generation — a real, current feature. (Was a misleading "Unlimited Decks":
+  // decks are uncapped but CARDS are limited, so it implied unlimited capacity.)
+  { icon: Sparkles, key: 'ai' },
 ] as const
 
 // Delay (seconds) before the mock preview blurs and CTA appears
