@@ -27,7 +27,7 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 //      (the store currency is USD; prices need not numerically equal the ₩ catalog —
 //      grants key off the variant→product map, never the amount):
 //        credits_1000 / credits_5000 / credits_10000  (one-time credit packs)
-//        sub_5k_monthly (5,000-card plan) / sub_unlimited_monthly (unlimited)  (monthly subs)
+//        sub_5k_monthly (5,000-card plan) / sub_unlimited_monthly (100,000-card plan)  (monthly subs)
 //   2. Set these WEB env vars (Cloudflare Pages project vars / .env — Vite exposes
 //      any `VITE_`-prefixed var to the client bundle at build time):
 //        VITE_LEMONSQUEEZY_STORE    = reeeeecall            (the store SUBDOMAIN only,
@@ -84,18 +84,6 @@ function parseVariants(raw: string): Record<string, string> {
   return out
 }
 
-// Best-effort read of the signed-in user's email to prefill checkout[email]. It is
-// purely a UX nicety (buyer doesn't retype it); the grant never depends on it, so
-// any failure/absence simply omits the param.
-async function currentUserEmail(): Promise<string | null> {
-  try {
-    const { data } = await supabase.auth.getSession()
-    return data.session?.user?.email ?? null
-  } catch {
-    return null
-  }
-}
-
 export class LemonsqueezyProvider implements PaymentProvider {
   readonly id = 'lemonsqueezy'
   readonly redirects = true // hosted checkout on <store>.lemonsqueezy.com
@@ -108,28 +96,29 @@ export class LemonsqueezyProvider implements PaymentProvider {
   supports(): boolean { return true }
 
   async checkout(intent: PaymentIntent, target?: Window | null): Promise<CheckoutResult> {
-    const store = String(import.meta.env.VITE_LEMONSQUEEZY_STORE ?? '').trim()
-    const variants = parseVariants(String(import.meta.env.VITE_LEMONSQUEEZY_VARIANTS ?? ''))
-    const variantId = variants[intent.productId]
-    if (!store || !variantId) {
-      // Missing store or no variant mapped for this product → fail loud. The billing
-      // store catches this and shows a checkout error rather than silently pretending
-      // the payment happened.
-      throw new Error(NOT_CONFIGURED)
+    // ── Why a server round-trip (not a static buy link) ──────────────────────────
+    // This store's STATIC buy links (/checkout/buy/<slug>) render in TEST mode even
+    // though the store is fully live (Setup complete, test mode off) — a LemonSqueezy
+    // static-buy-link quirk. Only checkouts CREATED via the API with test_mode:false
+    // render LIVE. So we ask the `lemonsqueezy-checkout` edge fn (which holds the secret
+    // LS API key) to mint a live checkout for OUR intent: it verifies we own the intent,
+    // maps product→variant server-side, tags merchant_uid into custom data, and returns
+    // the hosted URL. The webhook path (meta.custom_data.merchant_uid → confirm_payment)
+    // is unchanged — only the checkout URL's origin moved from a static link to an API
+    // object. (VITE_LEMONSQUEEZY_STORE/VARIANTS remain the client "configured" gate via
+    // isAvailable(); the variant SLUGS are no longer used to build the URL.)
+    if (!this.isAvailable()) throw new Error(NOT_CONFIGURED)
+
+    const { data, error } = await supabase.functions.invoke<{ url?: string }>(
+      'lemonsqueezy-checkout',
+      { body: { merchant_uid: intent.merchantUid } },
+    )
+    const url = data?.url
+    if (error || !url) {
+      // Fail loud — the billing store catches this and shows a checkout error rather
+      // than silently pretending the payment happened.
+      throw new Error(`CHECKOUT_FAILED: ${error?.message ?? 'no checkout url returned'}`)
     }
-
-    // Build the hosted-checkout URL (variantId here is the variant SLUG/UUID, not the
-    // numeric id — the numeric id 404s on this path):
-    //   https://<store>.lemonsqueezy.com/checkout/buy/<variant-slug>
-    //     ?checkout[custom][merchant_uid]=<merchant_uid>   ← returns as meta.custom_data.merchant_uid
-    //     &checkout[email]=<email>                          ← optional prefill (UX only)
-    // URLSearchParams percent-encodes the bracket keys; Lemon Squeezy decodes them.
-    const params = new URLSearchParams()
-    params.set('checkout[custom][merchant_uid]', intent.merchantUid)
-    const email = await currentUserEmail()
-    if (email) params.set('checkout[email]', email)
-
-    const url = `https://${store}.lemonsqueezy.com/checkout/buy/${variantId}?${params.toString()}`
 
     // Open the hosted checkout in the blank tab the billing store pre-opened within the
     // click gesture, so the app tab stays put and the store can poll the intent for the
