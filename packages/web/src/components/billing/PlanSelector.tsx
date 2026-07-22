@@ -5,6 +5,7 @@ import { toIntlLocale } from '../../lib/locale-utils'
 import { supabase } from '../../lib/supabase'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { preferredProviderId } from '../../lib/payments'
+import { writeCheckoutLoadingTab } from '../../lib/payments/checkout-tab'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
 // A card_limit at or above this sentinel means "unlimited" for DISPLAY only. The DB
@@ -56,6 +57,7 @@ export function PlanSelector() {
     if (portalLoading) return
     setPortalError(false)
     const tab = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null
+    writeCheckoutLoadingTab(tab)
     setPortalLoading(true)
     try {
       const { data, error } = await supabase.functions.invoke('subscription-portal', {
