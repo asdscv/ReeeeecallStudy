@@ -29,7 +29,7 @@ const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
 const FEATURES = [
   { icon: '🗂️', title: 'Card Storage', free: '1,000 cards', pro: 'Up to 100,000 cards' },
   { icon: '🧠', title: 'All Study Modes', free: 'SRS + Sequential', pro: 'All 4 modes' },
-  { icon: '🤖', title: 'AI Card Generation', free: '5/month', pro: 'Unlimited' },
+  { icon: '🤖', title: 'AI Card Generation', free: '10 cards/day', pro: '10/day + credits' },
   { icon: '🔊', title: 'Premium TTS', free: 'Basic', pro: 'Edge TTS HD' },
   { icon: '📊', title: 'Advanced Analytics', free: 'Basic stats', pro: 'Charts + Forecast' },
   { icon: '🏪', title: 'Marketplace Publishing', free: 'Download only', pro: 'Upload + Revenue share' },
