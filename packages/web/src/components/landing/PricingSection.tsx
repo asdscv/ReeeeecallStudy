@@ -87,9 +87,10 @@ export function PricingSection() {
   const paidTiers: Tier[] = plans.map((p, i) => {
     return {
       key: p.id,
-      // Rank-based name: first paid tier = Standard, any higher tier = Pro. (No plan is
-      // "unlimited" now; the exact card count is on cardLimitLine below.)
-      name: i === 0 ? t('pricing.plans.standard') : t('pricing.plans.pro'),
+      // Plan name = the DB title ("Standard" / "Pro"), the single source of truth shared
+      // with the Settings PlanSelector + mobile Paywall (they all read billing_products.title).
+      // Plan names are proper nouns → NOT translated; the exact card count is on cardLimitLine.
+      name: p.title,
       price: t('pricing.pricePerMonth', { price: fmtPrice(p) }),
       cardLimitLine: limitLine(p.card_limit),
       blurb: t('pricing.plans.standardBlurb'),
