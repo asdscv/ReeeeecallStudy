@@ -6,9 +6,9 @@
   "done": "Done",
   "back": "Back",
   "features": {
-    "unlimitedDecks": { "title": "Unlimited Decks & Cards", "free": "5 decks, 3K cards", "pro": "Unlimited" },
+    "cardStorage": { "title": "Card Storage", "free": "1,000 cards", "pro": "Up to 100,000 cards" },
     "allModes": { "title": "All Study Modes", "free": "SRS + Sequential", "pro": "All 4 modes" },
-    "aiGeneration": { "title": "AI Card Generation", "free": "5/month", "pro": "Unlimited" },
+    "aiGeneration": { "title": "AI Card Generation", "free": "10 cards/day", "pro": "10/day + credits" },
     "premiumTts": { "title": "Premium TTS", "free": "Basic", "pro": "Edge TTS HD" },
     "analytics": { "title": "Advanced Analytics", "free": "Basic stats", "pro": "Charts + Forecast" },
     "marketplace": { "title": "Marketplace Publishing", "free": "Download only", "pro": "Upload + Revenue share" }

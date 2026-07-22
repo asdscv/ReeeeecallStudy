@@ -6,9 +6,9 @@
   "done": "Selesai",
   "back": "Kembali",
   "features": {
-    "unlimitedDecks": { "title": "Deck & Kartu Tak Terbatas", "free": "5 deck, 3K kartu", "pro": "Tak terbatas" },
+    "cardStorage": { "title": "Penyimpanan Kartu", "free": "1.000 kartu", "pro": "Hingga 100.000 kartu" },
     "allModes": { "title": "Semua Mode Belajar", "free": "SRS + Berurutan", "pro": "Semua 4 mode" },
-    "aiGeneration": { "title": "AI Buat Kartu", "free": "5/bulan", "pro": "Tak terbatas" },
+    "aiGeneration": { "title": "AI Buat Kartu", "free": "10 kartu/hari", "pro": "10/hari + kredit" },
     "premiumTts": { "title": "TTS Premium", "free": "Dasar", "pro": "Edge TTS HD" },
     "analytics": { "title": "Analitik Lanjutan", "free": "Statistik dasar", "pro": "Grafik + Prediksi" },
     "marketplace": { "title": "Publikasi Marketplace", "free": "Unduh saja", "pro": "Unggah + Bagi hasil" }

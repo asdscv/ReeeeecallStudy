@@ -6,9 +6,9 @@
   "done": "เสร็จ",
   "back": "กลับ",
   "features": {
-    "unlimitedDecks": { "title": "สำรับและการ์ดไม่จำกัด", "free": "5 สำรับ, 3K การ์ด", "pro": "ไม่จำกัด" },
+    "cardStorage": { "title": "พื้นที่จัดเก็บการ์ด", "free": "1,000 ใบ", "pro": "สูงสุด 100,000 ใบ" },
     "allModes": { "title": "โหมดเรียนทั้งหมด", "free": "SRS + ตามลำดับ", "pro": "ทั้ง 4 โหมด" },
-    "aiGeneration": { "title": "AI สร้างการ์ด", "free": "5/เดือน", "pro": "ไม่จำกัด" },
+    "aiGeneration": { "title": "AI สร้างการ์ด", "free": "10 ใบ/วัน", "pro": "10 ใบ/วัน + เครดิต" },
     "premiumTts": { "title": "TTS พรีเมียม", "free": "พื้นฐาน", "pro": "Edge TTS HD" },
     "analytics": { "title": "การวิเคราะห์ขั้นสูง", "free": "สถิติพื้นฐาน", "pro": "แผนภูมิ + การคาดการณ์" },
     "marketplace": { "title": "เผยแพร่ใน Marketplace", "free": "ดาวน์โหลดเท่านั้น", "pro": "อัปโหลด + แบ่งรายได้" }

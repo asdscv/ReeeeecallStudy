@@ -6,9 +6,9 @@
   "done": "Xong",
   "back": "Quay lai",
   "features": {
-    "unlimitedDecks": { "title": "Khong gioi han Bo & The", "free": "5 bo, 3K the", "pro": "Khong gioi han" },
+    "cardStorage": { "title": "Luu tru the", "free": "1.000 the", "pro": "Toi da 100.000 the" },
     "allModes": { "title": "Tat ca che do hoc", "free": "SRS + Tuan tu", "pro": "Tat ca 4 che do" },
-    "aiGeneration": { "title": "AI Tao the", "free": "5/thang", "pro": "Khong gioi han" },
+    "aiGeneration": { "title": "AI Tao the", "free": "10 the/ngay", "pro": "10/ngay + tin dung" },
     "premiumTts": { "title": "TTS Cao cap", "free": "Co ban", "pro": "Edge TTS HD" },
     "analytics": { "title": "Phan tich nang cao", "free": "Thong ke co ban", "pro": "Bieu do + Du bao" },
     "marketplace": { "title": "Xuat ban Marketplace", "free": "Chi tai ve", "pro": "Tai len + Chia se doanh thu" }

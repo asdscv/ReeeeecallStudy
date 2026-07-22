@@ -6,9 +6,9 @@
   "done": "完成",
   "back": "返回",
   "features": {
-    "unlimitedDecks": { "title": "无限卡组和卡片", "free": "5个卡组，3千张", "pro": "无限" },
+    "cardStorage": { "title": "卡片存储", "free": "1,000张", "pro": "最多100,000张" },
     "allModes": { "title": "所有学习模式", "free": "SRS + 顺序", "pro": "全部4种模式" },
-    "aiGeneration": { "title": "AI卡片生成", "free": "每月5次", "pro": "无限" },
+    "aiGeneration": { "title": "AI卡片生成", "free": "每天10张", "pro": "每天10张 + 额度" },
     "premiumTts": { "title": "高级TTS", "free": "基础", "pro": "Edge TTS HD" },
     "analytics": { "title": "高级分析", "free": "基础统计", "pro": "图表 + 预测" },
     "marketplace": { "title": "市场发布", "free": "仅下载", "pro": "上传 + 收益分成" }

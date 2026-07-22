@@ -6,9 +6,9 @@
   "done": "Listo",
   "back": "Volver",
   "features": {
-    "unlimitedDecks": { "title": "Mazos y Tarjetas Ilimitados", "free": "5 mazos, 3K tarjetas", "pro": "Ilimitado" },
+    "cardStorage": { "title": "Almacenamiento de tarjetas", "free": "1000 tarjetas", "pro": "Hasta 100 000 tarjetas" },
     "allModes": { "title": "Todos los Modos de Estudio", "free": "SRS + Secuencial", "pro": "Los 4 modos" },
-    "aiGeneration": { "title": "Generación de Tarjetas con IA", "free": "5/mes", "pro": "Ilimitado" },
+    "aiGeneration": { "title": "Generación de Tarjetas con IA", "free": "10 tarjetas/día", "pro": "10/día + créditos" },
     "premiumTts": { "title": "TTS Premium", "free": "Básico", "pro": "Edge TTS HD" },
     "analytics": { "title": "Análisis Avanzado", "free": "Estadísticas básicas", "pro": "Gráficos + Pronóstico" },
     "marketplace": { "title": "Publicar en Marketplace", "free": "Solo descarga", "pro": "Subir + Reparto de ingresos" }

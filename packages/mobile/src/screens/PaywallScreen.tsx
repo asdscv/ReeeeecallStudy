@@ -26,14 +26,18 @@ const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
   default: 'https://play.google.com/store/account/subscriptions',
 })
 
-const FEATURES = [
-  { icon: '🗂️', title: 'Card Storage', free: '1,000 cards', pro: 'Up to 100,000 cards' },
-  { icon: '🧠', title: 'All Study Modes', free: 'SRS + Sequential', pro: 'All 4 modes' },
-  { icon: '🤖', title: 'AI Card Generation', free: '10 cards/day', pro: '10/day + credits' },
-  { icon: '🔊', title: 'Premium TTS', free: 'Basic', pro: 'Edge TTS HD' },
-  { icon: '📊', title: 'Advanced Analytics', free: 'Basic stats', pro: 'Charts + Forecast' },
-  { icon: '🏪', title: 'Marketplace Publishing', free: 'Download only', pro: 'Upload + Revenue share' },
-]
+// Feature comparison rows. Copy is i18n (paywall.json `features.*`, 8 locales) so the
+// paywall is translated; only the emoji + the i18n key live here. Values track the current
+// model (Free 1,000 cards / 10 AI cards a day; Pro 100,000 / 10 a day + credits).
+const FEATURE_KEYS = ['cardStorage', 'allModes', 'aiGeneration', 'premiumTts', 'analytics', 'marketplace'] as const
+const FEATURE_ICONS: Record<(typeof FEATURE_KEYS)[number], string> = {
+  cardStorage: '🗂️',
+  allModes: '🧠',
+  aiGeneration: '🤖',
+  premiumTts: '🔊',
+  analytics: '📊',
+  marketplace: '🏪',
+}
 
 export function PaywallScreen() {
   const theme = useTheme()
@@ -65,7 +69,7 @@ export function PaywallScreen() {
           <Text style={styles.emoji}>✅</Text>
           <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('youArePro')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-            You have access to all premium features.
+            {t('proDesc')}
           </Text>
         </View>
       </Screen>
@@ -114,42 +118,43 @@ export function PaywallScreen() {
   const handleRestore = async () => {
     const result = await restore()
     if (result.success) {
-      Alert.alert('Restored!', 'Your Pro subscription has been restored.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
+      Alert.alert(t('welcomePro'), t('restored'), [
+        { text: t('done'), onPress: () => navigation.goBack() },
       ])
     } else {
-      Alert.alert('No Purchase Found', 'No previous subscription was found to restore.')
+      Alert.alert(t('restorePurchase'), t('noRestoreFound'))
     }
   }
 
   return (
     <Screen safeArea padding={false} testID="paywall-screen">
-      <ScreenHeader title="Upgrade to Pro" mode="back" />
+      <ScreenHeader title={t('title')} mode="back" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.crown}>👑</Text>
           <Text style={[theme.typography.h1, { color: theme.colors.text, textAlign: 'center' }]}>
-            Upgrade to Pro
+            {t('title')}
           </Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-            Unlock the full power of ReeeeecallStudy
+            {t('subtitle')}
           </Text>
         </View>
 
-        {/* Feature Comparison */}
+        {/* Feature Comparison. "Free" / "Pro" column labels stay literal (plan names are
+            proper nouns, not translated); the feature copy is i18n. */}
         <View style={styles.features}>
-          {FEATURES.map((feat) => (
-            <View key={feat.title} style={[styles.featureRow, { borderColor: theme.colors.border }]}>
-              <Text style={styles.featureIcon}>{feat.icon}</Text>
+          {FEATURE_KEYS.map((key) => (
+            <View key={key} style={[styles.featureRow, { borderColor: theme.colors.border }]}>
+              <Text style={styles.featureIcon}>{FEATURE_ICONS[key]}</Text>
               <View style={styles.featureInfo}>
-                <Text style={[theme.typography.label, { color: theme.colors.text }]}>{feat.title}</Text>
+                <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t(`features.${key}.title`)}</Text>
                 <View style={styles.comparisonRow}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                    Free: {feat.free}
+                    Free: {t(`features.${key}.free`)}
                   </Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    Pro: {feat.pro}
+                    Pro: {t(`features.${key}.pro`)}
                   </Text>
                 </View>
               </View>
@@ -198,7 +203,7 @@ export function PaywallScreen() {
               style={[theme.typography.caption, { color: theme.colors.primary }]}
               onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
             >
-              Privacy Policy
+              {t('privacyPolicy')}
             </Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
             <Text
@@ -206,7 +211,7 @@ export function PaywallScreen() {
               style={[theme.typography.caption, { color: theme.colors.primary }]}
               onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
             >
-              Terms of Service
+              {t('termsOfService')}
             </Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
             <Text
@@ -214,7 +219,7 @@ export function PaywallScreen() {
               style={[theme.typography.caption, { color: theme.colors.primary }]}
               onPress={() => Linking.openURL(MANAGE_SUBSCRIPTIONS_URL)}
             >
-              Manage Subscription
+              {t('manageSubscription')}
             </Text>
           </View>
         </View>
