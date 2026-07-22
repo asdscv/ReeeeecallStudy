@@ -274,10 +274,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               ? balanceText()
               : t('wallet.empty')
 
-  // Owned-card limit line: how much room is left until the cap. UNLIMITED plans
-  // (sentinel limit >= 1e9, mig 124) show a dedicated string instead of a huge number.
-  // Shown once usage is KNOWN and the cap isn't already reached (the CardLimitBlock
-  // below covers the reached case).
+  // Owned-card limit line: how much room is left until the cap. A limit >= 1e9 is the
+  // "unlimited" sentinel — since mig 148 no plan is unlimited (top plan caps at 100,000),
+  // so this only shows the dedicated string for admins (effective limit 2e9). Shown once
+  // usage is KNOWN and the cap isn't already reached (the CardLimitBlock covers reached).
   const usage = limit.cardUsage
   const cardsLeftText = !usage || limit.reached
     ? null

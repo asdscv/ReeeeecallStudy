@@ -27,7 +27,7 @@ const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
 })
 
 const FEATURES = [
-  { icon: '♾️', title: 'Unlimited Decks & Cards', free: '5 decks, 3K cards', pro: 'Unlimited' },
+  { icon: '🗂️', title: 'Card Storage', free: '1,000 cards', pro: 'Up to 100,000 cards' },
   { icon: '🧠', title: 'All Study Modes', free: 'SRS + Sequential', pro: 'All 4 modes' },
   { icon: '🤖', title: 'AI Card Generation', free: '5/month', pro: 'Unlimited' },
   { icon: '🔊', title: 'Premium TTS', free: 'Basic', pro: 'Edge TTS HD' },
