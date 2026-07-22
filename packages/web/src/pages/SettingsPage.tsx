@@ -354,10 +354,10 @@ export function SettingsPage() {
 
           {/* ── Card storage usage (owned-card limit, mig 116) ── */}
           {cardUsage && (() => {
-            // A card_limit >= 1e9 is the "unlimited" sentinel (mig 124's 2e9 plan). It
-            // is a normal integer cap in the DB; here we only collapse it to a word and
-            // skip the progress bar so an Unlimited plan never renders a broken/near-
-            // empty meter.
+            // A card_limit >= 1e9 is the "unlimited" sentinel. Since mig 148 no plan is
+            // unlimited (the top plan caps at 100,000) — this only fires for admins
+            // (effective limit 2e9, mig 139): collapse to a word + skip the progress bar
+            // so their meter never renders a broken/near-empty bar.
             const unlimited = isUnlimitedCardLimit(cardUsage.limit)
             return (
               <CollapsibleSection

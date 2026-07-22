@@ -11,9 +11,9 @@ import {
 import { SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
-// Card limits at or above this collapse to "unlimited" FOR DISPLAY only — the
-// mig-124 sentinel (sub_unlimited_monthly stores card_limit = 2e9). The DB still
-// treats it as a plain integer cap; only the presentation layer shows the word.
+// Card limits at or above this collapse to "unlimited" FOR DISPLAY only. As of mig 148
+// NO plan is unlimited (the top plan caps at 100,000); this now only fires for admins,
+// whose effective limit stays 2e9 (mig 139). Presentation-only — never gate server-side.
 export const UNLIMITED_CARD_LIMIT = 1_000_000_000
 
 /**

@@ -27,7 +27,7 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 //      (the store currency is USD; prices need not numerically equal the ₩ catalog —
 //      grants key off the variant→product map, never the amount):
 //        credits_1000 / credits_5000 / credits_10000  (one-time credit packs)
-//        sub_5k_monthly (5,000-card plan) / sub_unlimited_monthly (unlimited)  (monthly subs)
+//        sub_5k_monthly (5,000-card plan) / sub_unlimited_monthly (100,000-card plan)  (monthly subs)
 //   2. Set these WEB env vars (Cloudflare Pages project vars / .env — Vite exposes
 //      any `VITE_`-prefixed var to the client bundle at build time):
 //        VITE_LEMONSQUEEZY_STORE    = reeeeecall            (the store SUBDOMAIN only,

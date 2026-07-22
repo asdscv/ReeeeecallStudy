@@ -7,8 +7,10 @@ import { supabase } from '../../lib/supabase'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
-// card_limit >= this sentinel means "unlimited" FOR DISPLAY (mig 124). The DB
-// stores a huge real cap (2e9); only the presentation collapses it to the word.
+// card_limit >= this sentinel means "unlimited" FOR DISPLAY. As of mig 148 NO catalog
+// plan is unlimited (the top plan is capped at 100,000); this only fires for admins,
+// whose effective limit stays 2e9 (mig 139). Kept so an admin-facing surface still reads
+// "무제한" rather than a huge number.
 const UNLIMITED_THRESHOLD = 1_000_000_000
 // Free tier is static on the landing (from card_limit_settings; not a catalog row).
 const FREE_CARD_LIMIT = 1000
@@ -69,8 +71,9 @@ export function PricingSection() {
       : t('pricing.upToCards', { count: cardLimit })
 
   // Free tier is static; paid tiers are fetched (data-driven — a new catalog row
-  // appears here automatically). Plan NAME + blurb derive from the card_limit so
-  // no plan is hardcoded: unlimited-class → "무제한", any other paid → "스탠다드".
+  // appears here automatically). Paid tiers are named by rank (first = Standard, higher
+  // = Pro) since the catalog now has two finite card-count plans (5,000 / 100,000) — no
+  // "unlimited" plan anymore; the card count itself is shown on the cardLimitLine.
   const freeTier: Tier = {
     key: 'free',
     name: t('pricing.plans.free'),
@@ -82,13 +85,14 @@ export function PricingSection() {
   }
 
   const paidTiers: Tier[] = plans.map((p, i) => {
-    const unlimited = isUnlimited(p.card_limit)
     return {
       key: p.id,
-      name: unlimited ? t('pricing.plans.unlimited') : t('pricing.plans.standard'),
+      // Rank-based name: first paid tier = Standard, any higher tier = Pro. (No plan is
+      // "unlimited" now; the exact card count is on cardLimitLine below.)
+      name: i === 0 ? t('pricing.plans.standard') : t('pricing.plans.pro'),
       price: t('pricing.pricePerMonth', { price: fmtPrice(p) }),
       cardLimitLine: limitLine(p.card_limit),
-      blurb: unlimited ? t('pricing.plans.unlimitedBlurb') : t('pricing.plans.standardBlurb'),
+      blurb: t('pricing.plans.standardBlurb'),
       cta: t('pricing.ctaPaid'),
       // Highlight the first paid tier as the recommended one.
       featured: i === 0,
