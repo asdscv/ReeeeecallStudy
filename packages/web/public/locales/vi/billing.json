@@ -31,7 +31,8 @@
     "unlimited": "Thẻ không giới hạn",
     "perMonth": "/tháng",
     "select": "Chọn",
-    "current": "Gói hiện tại"
+    "current": "Gói hiện tại",
+    "popular": "Phổ biến"
   },
   "paymentHistory": {
     "title": "Lịch sử thanh toán",

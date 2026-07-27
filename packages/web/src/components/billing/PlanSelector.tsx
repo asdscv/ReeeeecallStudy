@@ -147,6 +147,8 @@ export function PlanSelector() {
   // global (a credit-pack top-up in WalletSummary shares it), so only surface
   // success/failed when the in-flight product is one of the subscription plans.
   const checkoutIsPlan = plans.some((p) => p.id === checkoutProductId)
+  // Highlight the highest-tier plan (largest card allowance) as "popular".
+  const topLimit = Math.max(...plans.map((p) => p.cardLimit ?? 0))
 
   return (
     <div className="mt-4">
@@ -154,6 +156,7 @@ export function PlanSelector() {
       <ul className="space-y-2">
         {plans.map((p) => {
           const isCurrent = currentProductId != null && p.id === currentProductId
+          const popular = !isCurrent && (p.cardLimit ?? 0) === topLimit && plans.length > 1
           const unlimited = isUnlimitedCardLimit(p.cardLimit)
           const limitLabel = unlimited
             ? t('plans.unlimited')
@@ -167,17 +170,26 @@ export function PlanSelector() {
           return (
             <li
               key={p.id}
-              className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
-                isCurrent ? 'border-brand bg-brand/5' : 'border-border bg-card'
+              className={`flex items-center justify-between rounded-xl border px-4 py-3.5 transition-colors ${
+                isCurrent
+                  ? 'border-brand bg-brand/5'
+                  : popular
+                    ? 'border-brand/60 bg-card ring-1 ring-brand/20'
+                    : 'border-border bg-card'
               }`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground">{p.title}</p>
+                  <p className="text-[15px] font-semibold text-foreground">{p.title}</p>
                   {isCurrent && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-[11px] font-medium text-brand">
                       <Check className="h-3 w-3" />
                       {t('plans.current')}
+                    </span>
+                  )}
+                  {popular && (
+                    <span className="inline-flex items-center rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                      {t('plans.popular', 'Popular')}
                     </span>
                   )}
                 </div>

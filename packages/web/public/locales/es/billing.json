@@ -31,7 +31,8 @@
     "unlimited": "Tarjetas ilimitadas",
     "perMonth": "/mes",
     "select": "Elegir",
-    "current": "Plan actual"
+    "current": "Plan actual",
+    "popular": "Popular"
   },
   "paymentHistory": {
     "title": "Historial de pagos",
