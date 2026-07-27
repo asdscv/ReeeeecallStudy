@@ -38,14 +38,18 @@ export function WalletSummary() {
     .filter((p) => p.kind === 'credit_pack')
     .sort((a, b) => (a.priceUsdCents ?? 0) - (b.priceUsdCents ?? 0))
 
+  // The store IAP id to purchase for this platform (billing_product_skus, mig 151);
+  // fall back to the internal id when no SKU row is registered yet.
+  const storeSku = (product: BillingProduct): string => product.storeProductId ?? product.id
+
   // Show the STORE-localized price the buyer actually pays (Apple/Google charge in
   // local currency), falling back to the catalog USD if the package hasn't loaded.
   const storePrice = (product: BillingProduct): string =>
-    purchaseService.findPackageForProduct(offering, product.id)?.product?.priceString
+    purchaseService.findPackageForProduct(offering, storeSku(product))?.product?.priceString
       ?? formatProductPrice(product)
 
   const buyPack = async (product: BillingProduct) => {
-    const pkg = purchaseService.findPackageForProduct(offering, product.id)
+    const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
     if (!pkg) { Alert.alert(t('credits.title'), t('credits.unavailable')); return }
     // purchase() settles the store transaction; the credit GRANT lands server-side
     // via the RevenueCat webhook (add_ai_credits, idempotent). Re-poll the wallet so

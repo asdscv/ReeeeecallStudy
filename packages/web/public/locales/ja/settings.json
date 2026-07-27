@@ -158,15 +158,15 @@
       "officialNote": "上限対象外",
       "archived": "アーカイブ済み",
       "archivedNote": "学習ロック中",
-      "archivedCount": "{{count}} 枚アーカイブ",
-      "remaining": "残り {{count}} 枚",
+      "archivedCount": "{{count, number}} 枚アーカイブ",
+      "remaining": "残り {{count, number}} 枚",
       "percentUsed": "{{percent}}% 使用",
       "nearLimit": "上限に接近",
       "atLimit": "上限に到達",
       "planUnlimited": "無制限プラン",
       "planCards": "{{limit}} 枚プラン",
       "unlimitedTitle": "無制限ストレージ",
-      "lifetimeTotal": "{{count}} 枚"
+      "lifetimeTotal": "{{count, number}} 枚"
     }
   },
   "groups": {

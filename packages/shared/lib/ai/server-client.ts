@@ -145,7 +145,8 @@ export async function getAffordableCards(): Promise<Affordable> {
 export function formatUsdMicro(micro: number, opts?: { sign?: boolean }): string {
   const abs = Math.abs(micro || 0) / 1_000_000
   const decimals = abs > 0 && abs < 0.01 ? 4 : 2
-  const s = `$${abs.toFixed(decimals)}`
+  // Group thousands with commas so large balances read as $1,000,000.00, not $1000000.00.
+  const s = `$${abs.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`
   if (opts?.sign) return ((micro || 0) < 0 ? '−' : '+') + s
   return s
 }

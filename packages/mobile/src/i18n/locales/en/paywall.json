@@ -27,7 +27,9 @@
   "productsUnavailable": "Subscription products are currently unavailable. Please try again later.",
   "checkout": {
     "startFailed": "Couldn't start checkout. Please try again.",
-    "confirming": "Payment received — your account will update once it's confirmed."
+    "confirming": "Payment received — your account will update once it's confirmed.",
+    "errorTitle": "Purchase failed",
+    "errorGeneric": "Something went wrong with your purchase. Please try again."
   },
   "catalog": {
     "perMonth": "/month",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "Privacy Policy",
   "termsOfService": "Terms of Service",
-  "manageSubscription": "Manage Subscription"
+  "manageSubscription": "Manage Subscription",
+  "legalDisclaimer": "Payment will be charged to your {{account}} account at confirmation of purchase. Your subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours before the end of the current period. You can manage or cancel your subscription in your account settings on the {{store}} after purchase."
 }

@@ -13,6 +13,7 @@
 // goes through the store IAP layer (RevenueCat, see services/purchases.ts) and
 // entitlement grants happen SERVER-SIDE via the payment-webhook — never here.
 // ─────────────────────────────────────────────────────────────────────────
+import { Platform } from 'react-native'
 import { getMobileSupabase } from '../adapters'
 
 export type BillingProductKind = 'credit_pack' | 'subscription'
@@ -38,6 +39,14 @@ export interface BillingProduct {
   period: string | null
   sortOrder: number
   isActive: boolean
+  /**
+   * The store IAP product id to purchase for THIS platform (App Store / Play), resolved
+   * server-side from the billing_product_skus catalog (mig 151) by get_billing_products(
+   * Platform.OS). This is the identifier passed to purchaseService.findPackageForProduct —
+   * decoupling the store SKU from our internal `id`. Null when no active SKU is registered
+   * for this platform (then callers fall back to `id`).
+   */
+  storeProductId: string | null
 }
 
 /**
@@ -93,6 +102,8 @@ interface RawProduct {
   period: string | null
   sort_order: number
   is_active: boolean
+  // Added by get_billing_products(p_platform) (mig 151); absent from the no-arg overload.
+  store_product_id?: string | null
 }
 
 function mapProduct(r: RawProduct): BillingProduct {
@@ -109,6 +120,7 @@ function mapProduct(r: RawProduct): BillingProduct {
     period: r.period ?? null,
     sortOrder: Number(r.sort_order ?? 0),
     isActive: r.is_active !== false,
+    storeProductId: r.store_product_id == null ? null : String(r.store_product_id),
   }
 }
 
@@ -119,7 +131,10 @@ function mapProduct(r: RawProduct): BillingProduct {
  */
 export async function getBillingProducts(): Promise<BillingProduct[]> {
   const supabase = getMobileSupabase()
-  const { data, error } = await supabase.rpc('get_billing_products')
+  // Pass this platform so the catalog carries each product's store IAP id
+  // (get_billing_products(p_platform), mig 151). The RPC's no-arg overload is unaffected;
+  // an unknown platform simply yields null store_product_id, so this is always safe.
+  const { data, error } = await supabase.rpc('get_billing_products', { p_platform: Platform.OS })
   if (error || !data) return []
   const rows = (Array.isArray(data) ? data : []) as RawProduct[]
   return rows.map(mapProduct)

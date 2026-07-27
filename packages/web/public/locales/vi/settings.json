@@ -158,15 +158,15 @@
       "officialNote": "Không tính vào giới hạn",
       "archived": "Đã lưu trữ",
       "archivedNote": "Đã khóa học tập",
-      "archivedCount": "{{count}} đã lưu trữ",
-      "remaining": "Còn {{count}}",
+      "archivedCount": "{{count, number}} đã lưu trữ",
+      "remaining": "Còn {{count, number}}",
       "percentUsed": "Đã dùng {{percent}}%",
       "nearLimit": "Sắp đạt giới hạn",
       "atLimit": "Đã đạt giới hạn",
       "planUnlimited": "Gói không giới hạn",
       "planCards": "Gói {{limit}} thẻ",
       "unlimitedTitle": "Lưu trữ không giới hạn",
-      "lifetimeTotal": "{{count}} thẻ"
+      "lifetimeTotal": "{{count, number}} thẻ"
     }
   },
   "groups": {

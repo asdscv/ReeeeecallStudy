@@ -13,6 +13,7 @@ import { ThemeToggle } from '../components/common/ThemeToggle'
 import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
+import { PrivacyDataSection } from '../components/settings/PrivacyDataSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
@@ -342,6 +343,9 @@ export function SettingsPage() {
               )}
             </div>
           </CollapsibleSection>
+          <CollapsibleSection title={t('privacy.title', 'Privacy & data')} icon={<span className="text-base">🔒</span>}>
+            <PrivacyDataSection />
+          </CollapsibleSection>
         </div>
 
         {/* ── Credits & Usage ── */}
@@ -367,7 +371,7 @@ export function SettingsPage() {
                   <span className="text-sm text-muted-foreground tabular-nums">
                     {unlimited
                       ? t('cardUsage.countUnlimited', { owned: cardUsage.owned.toLocaleString() })
-                      : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
+                      : t('cardUsage.count', { owned: cardUsage.owned.toLocaleString(), limit: cardUsage.limit.toLocaleString() })}
                   </span>
                 }
               >

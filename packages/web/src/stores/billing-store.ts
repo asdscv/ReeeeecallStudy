@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { writeCheckoutLoadingTab } from '../lib/payments/checkout-tab'
 import { useDeckStore } from './deck-store'
 import { getAiWalletSummary, type AiWalletSummary } from '@reeeeecall/shared/lib/ai/server-client'
 import {
@@ -287,6 +288,9 @@ export const useBillingStore = create<BillingState>((set, get) => ({
       provider.redirects && typeof window !== 'undefined'
         ? window.open('about:blank', '_blank')
         : null
+    // Paint a spinner into the blank tab so the user doesn't see about:blank while the
+    // hosted checkout is created server-side (~1s). Replaced by the checkout on redirect.
+    writeCheckoutLoadingTab(checkoutTab)
 
     // 1) Server snapshots price + kind into a 'pending' intent and returns a fresh
     //    merchant_uid. The client can neither pick the price nor self-grant.

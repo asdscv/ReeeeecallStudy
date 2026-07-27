@@ -80,13 +80,13 @@
     "permissionTitle": "ต้องการสิทธิ์"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "การสมัครสมาชิก",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for more cards",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "แผนฟรี",
+    "proDesc": "ปลดล็อกฟีเจอร์พรีเมียมทั้งหมด",
+    "freeDesc": "อัปเกรดเพื่อเพิ่มการ์ด",
+    "upgradeToPro": "อัปเกรดเป็น Pro",
+    "manageSubscription": "จัดการการสมัครสมาชิก"
   },
   "legal": {
     "title": "Legal",
@@ -178,15 +178,15 @@
       "officialNote": "ไม่นับรวมในขีดจำกัด",
       "archived": "เก็บถาวรแล้ว",
       "archivedNote": "ล็อกการเรียน",
-      "archivedCount": "เก็บถาวรแล้ว {{count}} ใบ",
-      "remaining": "เหลือ {{count}} ใบ",
+      "archivedCount": "เก็บถาวรแล้ว {{count, number}} ใบ",
+      "remaining": "เหลือ {{count, number}} ใบ",
       "percentUsed": "ใช้ไปแล้ว {{percent}}%",
       "nearLimit": "ใกล้ถึงขีดจำกัด",
       "atLimit": "ถึงขีดจำกัดแล้ว",
       "planUnlimited": "แผนไม่จำกัด",
       "planCards": "แผน {{limit}} ใบ",
       "unlimitedTitle": "จัดเก็บไม่จำกัด",
-      "lifetimeTotal": "{{count}} ใบ"
+      "lifetimeTotal": "{{count, number}} ใบ"
     }
   },
   "groups": {

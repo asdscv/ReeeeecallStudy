@@ -80,13 +80,13 @@
     "permissionTitle": "需要权限"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "订阅",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for more cards",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "免费方案",
+    "proDesc": "已解锁所有高级功能",
+    "freeDesc": "升级以获得更多卡片",
+    "upgradeToPro": "升级到 Pro",
+    "manageSubscription": "管理订阅"
   },
   "legal": {
     "title": "Legal",
@@ -178,15 +178,15 @@
       "officialNote": "不计入上限",
       "archived": "已归档",
       "archivedNote": "学习已锁定",
-      "archivedCount": "已归档 {{count}} 张",
-      "remaining": "剩余 {{count}} 张",
+      "archivedCount": "已归档 {{count, number}} 张",
+      "remaining": "剩余 {{count, number}} 张",
       "percentUsed": "已用 {{percent}}%",
       "nearLimit": "接近上限",
       "atLimit": "已达上限",
       "planUnlimited": "无限方案",
       "planCards": "{{limit}} 张方案",
       "unlimitedTitle": "无限存储",
-      "lifetimeTotal": "{{count}} 张"
+      "lifetimeTotal": "{{count, number}} 张"
     }
   },
   "groups": {

@@ -27,7 +27,9 @@
   "productsUnavailable": "San pham dang ky hien khong kha dung. Vui long thu lai sau.",
   "checkout": {
     "startFailed": "Khong the bat dau thanh toan. Vui long thu lai.",
-    "confirming": "Da nhan thanh toan — tai khoan cua ban se cap nhat sau khi xac nhan."
+    "confirming": "Da nhan thanh toan — tai khoan cua ban se cap nhat sau khi xac nhan.",
+    "errorTitle": "Mua không thành công",
+    "errorGeneric": "Đã xảy ra sự cố khi mua. Vui lòng thử lại."
   },
   "catalog": {
     "perMonth": "/thang",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "Chinh sach Bao mat",
   "termsOfService": "Dieu khoan Dich vu",
-  "manageSubscription": "Quan ly Dang ky"
+  "manageSubscription": "Quan ly Dang ky",
+  "legalDisclaimer": "Khoản thanh toán sẽ được tính vào tài khoản {{account}} của bạn khi xác nhận mua. Gói đăng ký của bạn tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kết thúc kỳ hiện tại. Tài khoản của bạn sẽ bị tính phí gia hạn trong vòng 24 giờ trước khi kết thúc kỳ hiện tại. Bạn có thể quản lý hoặc hủy gói đăng ký trong phần cài đặt tài khoản trên {{store}} sau khi mua."
 }

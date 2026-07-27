@@ -27,7 +27,9 @@
   "productsUnavailable": "현재 구독 상품을 이용할 수 없습니다. 나중에 다시 시도해주세요.",
   "checkout": {
     "startFailed": "결제를 시작할 수 없습니다. 다시 시도해주세요.",
-    "confirming": "결제가 접수되었습니다. 확인이 완료되면 계정에 반영됩니다."
+    "confirming": "결제가 접수되었습니다. 확인이 완료되면 계정에 반영됩니다.",
+    "errorTitle": "구매 실패",
+    "errorGeneric": "구매 중 문제가 발생했습니다. 다시 시도해 주세요."
   },
   "catalog": {
     "perMonth": "/월",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "개인정보처리방침",
   "termsOfService": "이용약관",
-  "manageSubscription": "구독 관리"
+  "manageSubscription": "구독 관리",
+  "legalDisclaimer": "구매를 확정하면 {{account}} 계정으로 요금이 청구됩니다. 구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다. 현재 기간이 끝나기 24시간 이내에 갱신 요금이 청구됩니다. 구매 후 {{store}}의 계정 설정에서 구독을 관리하거나 취소할 수 있습니다."
 }

@@ -8,6 +8,7 @@ import { getDeviceType } from '../lib/device-info'
 import { categorizeReferrer } from '../lib/referrer'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
 import { logAnalyticsError } from '../lib/analytics-logger'
+import { isAnalyticsOptedOut } from '../lib/analytics-consent'
 import { useScrollDepthTracking } from './useScrollDepthTracking'
 
 // Module-level tracker persists across re-renders within same page lifecycle
@@ -20,6 +21,7 @@ export function useContentViewTracking(contentId: string | undefined) {
 
   useEffect(() => {
     if (!contentId) return
+    if (isAnalyticsOptedOut()) return
 
     // Bot filtering
     if (isBot(navigator.userAgent)) return

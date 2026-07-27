@@ -623,7 +623,7 @@ export function AIGenerateScreen() {
           {affordable && (() => {
             const balanceMicro = affordable.balanceMicroWon ?? 0
             const hasBalance = balanceMicro > 0
-            const bal = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro), cards: affordable.paid })
+            const bal = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro), cards: affordable.paid.toLocaleString() })
             const text = !affordable.walletKnown
               ? t('wallet.unknown')
               : useImage
@@ -679,9 +679,11 @@ export function AIGenerateScreen() {
           <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>
             {step === 'generating' ? t('progress.generating') : t('progress.saving')}
           </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-            {store.progress.done}/{store.progress.total}
-          </Text>
+          {store.progress.total > 0 && (
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
+              {store.progress.done.toLocaleString()}/{store.progress.total.toLocaleString()}
+            </Text>
+          )}
         </View>
       </Screen>
     )

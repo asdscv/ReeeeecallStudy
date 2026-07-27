@@ -233,7 +233,23 @@
     "totalAiSpent": "合計利用額",
     "activeWallets": "クレジット保有ユーザー",
     "aiCardsToday": "本日のAIカード",
-    "aiCardsTodayBreakdown": "無料 {{free}} · 有料 {{paid}}"
+    "aiCardsTodayBreakdown": "無料 {{free}} · 有料 {{paid}}",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓"
+    }
   },
   "billing": {
     "title": "課金管理",

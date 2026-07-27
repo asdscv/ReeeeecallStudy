@@ -158,15 +158,15 @@
       "officialNote": "한도 제외",
       "archived": "보관됨",
       "archivedNote": "학습 잠김",
-      "archivedCount": "{{count}}장 보관됨",
-      "remaining": "{{count}}장 남음",
+      "archivedCount": "{{count, number}}장 보관됨",
+      "remaining": "{{count, number}}장 남음",
       "percentUsed": "{{percent}}% 사용",
       "nearLimit": "한도 임박",
       "atLimit": "한도 도달",
       "planUnlimited": "무제한 플랜",
       "planCards": "{{limit}}장 플랜",
       "unlimitedTitle": "무제한 저장",
-      "lifetimeTotal": "{{count}}장"
+      "lifetimeTotal": "{{count, number}}장"
     }
   },
   "groups": {

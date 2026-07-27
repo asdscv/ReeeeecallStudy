@@ -92,7 +92,7 @@ export function CardUsageCard() {
         {detail.archivedTotal > 0 && (
           <p className="mt-2 flex items-center gap-1 text-[11px] text-warning">
             <Archive className="h-3 w-3" />
-            {t('cardUsage.detail.archivedCount', '{{count}} archived', { count: detail.archivedTotal })}
+            {t('cardUsage.detail.archivedCount', '{{count, number}} archived', { count: detail.archivedTotal })}
           </p>
         )}
       </button>

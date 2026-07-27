@@ -27,7 +27,9 @@
   "productsUnavailable": "Produk langganan saat ini tidak tersedia. Silakan coba lagi nanti.",
   "checkout": {
     "startFailed": "Tidak dapat memulai pembayaran. Silakan coba lagi.",
-    "confirming": "Pembayaran diterima — akun Anda akan diperbarui setelah dikonfirmasi."
+    "confirming": "Pembayaran diterima — akun Anda akan diperbarui setelah dikonfirmasi.",
+    "errorTitle": "Pembelian gagal",
+    "errorGeneric": "Terjadi masalah saat pembelian. Silakan coba lagi."
   },
   "catalog": {
     "perMonth": "/bulan",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "Kebijakan Privasi",
   "termsOfService": "Ketentuan Layanan",
-  "manageSubscription": "Kelola Langganan"
+  "manageSubscription": "Kelola Langganan",
+  "legalDisclaimer": "Pembayaran akan dibebankan ke akun {{account}} Anda saat konfirmasi pembelian. Langganan Anda diperpanjang secara otomatis kecuali dibatalkan setidaknya 24 jam sebelum akhir periode saat ini. Akun Anda akan dikenai biaya perpanjangan dalam 24 jam sebelum akhir periode saat ini. Anda dapat mengelola atau membatalkan langganan di pengaturan akun pada {{store}} setelah pembelian."
 }

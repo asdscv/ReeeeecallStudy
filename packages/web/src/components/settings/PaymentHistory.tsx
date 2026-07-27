@@ -55,8 +55,12 @@ export function PaymentHistory() {
       hour: '2-digit',
       minute: '2-digit',
     })
-  // The store charges USD everywhere (LemonSqueezy) → always render $.
-  const fmtAmount = (r: HistoryRow) => `$${((r.amountUsdCents ?? 0) / 100).toFixed(2)}`
+  // The store charges USD everywhere (LemonSqueezy) → render $ with thousands commas.
+  // Fall back to ₩ for any legacy row that only carries amount_krw, so it never shows $0.00.
+  const fmtAmount = (r: HistoryRow) =>
+    r.amountUsdCents != null
+      ? `$${(r.amountUsdCents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : `₩${(r.amountKrw ?? 0).toLocaleString('ko-KR')}`
 
   const loadMore = useCallback(async () => {
     if (busyRef.current || !hasMore) return

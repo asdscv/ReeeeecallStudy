@@ -158,15 +158,15 @@
       "officialNote": "ไม่นับรวมในขีดจำกัด",
       "archived": "เก็บถาวรแล้ว",
       "archivedNote": "ล็อกการเรียน",
-      "archivedCount": "เก็บถาวร {{count}} ใบ",
-      "remaining": "เหลือ {{count}} ใบ",
+      "archivedCount": "เก็บถาวร {{count, number}} ใบ",
+      "remaining": "เหลือ {{count, number}} ใบ",
       "percentUsed": "ใช้ไป {{percent}}%",
       "nearLimit": "ใกล้ถึงขีดจำกัด",
       "atLimit": "ถึงขีดจำกัดแล้ว",
       "planUnlimited": "แผนไม่จำกัด",
       "planCards": "แผน {{limit}} ใบ",
       "unlimitedTitle": "จัดเก็บไม่จำกัด",
-      "lifetimeTotal": "{{count}} ใบ"
+      "lifetimeTotal": "{{count, number}} ใบ"
     }
   },
   "groups": {

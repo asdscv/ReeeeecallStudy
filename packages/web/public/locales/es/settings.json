@@ -158,15 +158,15 @@
       "officialNote": "Excluidos del límite",
       "archived": "Archivadas",
       "archivedNote": "Estudio bloqueado",
-      "archivedCount": "{{count}} archivadas",
-      "remaining": "{{count}} restantes",
+      "archivedCount": "{{count, number}} archivadas",
+      "remaining": "{{count, number}} restantes",
       "percentUsed": "{{percent}}% usado",
       "nearLimit": "Cerca del límite",
       "atLimit": "Límite alcanzado",
       "planUnlimited": "Plan ilimitado",
       "planCards": "Plan de {{limit}} tarjetas",
       "unlimitedTitle": "Almacenamiento ilimitado",
-      "lifetimeTotal": "{{count}} tarjetas"
+      "lifetimeTotal": "{{count, number}} tarjetas"
     }
   },
   "groups": {

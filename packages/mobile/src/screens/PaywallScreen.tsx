@@ -89,9 +89,13 @@ export function PaywallScreen() {
     return product.period === 'month' ? `${price}${t('catalog.perMonth')}` : price
   }
 
+  // The store IAP id to purchase for this platform (billing_product_skus, mig 151);
+  // fall back to the internal id when no SKU row is registered yet.
+  const storeSku = (product: BillingProduct): string => product.storeProductId ?? product.id
+
   const handlePurchaseProduct = async (product: BillingProduct) => {
-    // Map the backend product id -> the store package to actually charge.
-    const pkg = purchaseService.findPackageForProduct(offering, product.id)
+    // Map the backend product -> the store package (by its store SKU) to actually charge.
+    const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
     if (!pkg) {
       Alert.alert(t('title'), t('catalog.purchaseUnavailable'))
       return
@@ -111,7 +115,9 @@ export function PaywallScreen() {
     } else if (result.error === 'intent_failed') {
       Alert.alert(t('title'), t('checkout.startFailed'))
     } else if (result.error && result.error !== 'cancelled' && result.error !== 'disabled') {
-      Alert.alert(t('back'), result.error)
+      // Show a friendly, localized message; keep the raw store/RC error for dev logs.
+      if (__DEV__) console.warn('[paywall] purchase failed:', result.error)
+      Alert.alert(t('checkout.errorTitle'), t('checkout.errorGeneric'))
     }
   }
 
@@ -165,7 +171,7 @@ export function PaywallScreen() {
         {/* Pricing — driven by the server catalog (get_billing_products) */}
         <View style={styles.pricing}>
           {subscriptionProducts.map((product, i) => {
-            const pkg = purchaseService.findPackageForProduct(offering, product.id)
+            const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
             return (
               <Button
                 key={product.id}
@@ -194,8 +200,13 @@ export function PaywallScreen() {
             onPress={handleRestore}
             loading={purchasing}
           />
+          {/* Apple/Google-mandated auto-renewal disclosure. i18n (paywall.legalDisclaimer,
+              8 locales); the store proper nouns are interpolated, not translated. */}
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-            Payment will be charged to your {Platform.OS === 'ios' ? 'Apple ID' : 'Google'} account at confirmation of purchase. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the {Platform.OS === 'ios' ? 'App Store' : 'Play Store'} after purchase.
+            {t('legalDisclaimer', {
+              account: Platform.OS === 'ios' ? 'Apple ID' : 'Google',
+              store: Platform.OS === 'ios' ? 'App Store' : 'Play Store',
+            })}
           </Text>
           <View style={styles.legalLinks}>
             <Text

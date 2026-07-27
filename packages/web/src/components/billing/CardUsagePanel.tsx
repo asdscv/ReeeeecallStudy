@@ -67,7 +67,7 @@ export function CardUsagePanel({ detail, planName, className = '' }: CardUsagePa
               {t('cardUsage.detail.unlimitedTitle', 'Unlimited storage')}
             </p>
             <p className="text-xs text-muted-foreground">
-              {t('cardUsage.detail.lifetimeTotal', '{{count}} cards', { count: used })}
+              {t('cardUsage.detail.lifetimeTotal', '{{count, number}} cards', { count: used })}
             </p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function CardUsagePanel({ detail, planName, className = '' }: CardUsagePa
           <p className={`mt-2 text-xs tabular-nums ${atLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
             {atLimit
               ? t('cardUsage.reached')
-              : t('cardUsage.detail.remaining', '{{count}} remaining', {
+              : t('cardUsage.detail.remaining', '{{count, number}} remaining', {
                   count: detail.available,
                 })}
           </p>

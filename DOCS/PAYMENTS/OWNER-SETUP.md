@@ -5,8 +5,41 @@ fail-closed** — nothing charges until you do the steps below. Web = **LemonSqu
 (Merchant of Record, handles global tax). Mobile = **Apple/Google IAP via RevenueCat**
 (mandatory for digital goods). Both grant into the same wallet/subscription backend.
 
-Catalog (already seeded in `billing_products`): `credits_1000` (₩1,000), `credits_5000`
-(₩5,000), `credits_10000` (₩10,000), `sub_pro_monthly` (₩4,900 → card limit 1000→10000).
+Catalog (already seeded in `billing_products`, all USD): `credits_1000` ($0.99), `credits_5000`
+($4.99), `credits_10000` ($9.99) — one-time AI-credit packs, granted at **face value 1:1**
+(mig 145: $0.99 tops up $0.99); `sub_5k_monthly` ("Standard", $3.99/mo → 5,000 cards),
+`sub_unlimited_monthly` ("Pro", $19.99/mo → 100,000 cards). These internal ids are **stable
+and never change** — the store SKUs (below) map TO them.
+
+---
+
+## 0) Store-SKU catalog — the single source of truth (mig 151)
+
+The mapping between a **store product id** (what App Store / Play / LemonSqueezy call the
+product) and our **internal `billing_products.id`** lives in ONE table,
+`billing_product_skus`, keyed `(platform, store_product_id) → product_id`. Registering or
+rotating a store product is now a single call — **no secret edit, no redeploy, no app
+rebuild**:
+
+```sql
+-- Register / rotate a store SKU (admin or service_role). Re-pointing an internal product at
+-- a NEW store id auto-retires the previous active one (its unique-active index).
+select set_store_product_sku('ios',         'ai_credit_099', 'credits_1000');
+select set_store_product_sku('android',     'ai_credit_099', 'credits_1000');
+select set_store_product_sku('lemonsqueezy','<live variant id>', 'credits_1000');
+-- deactivate a retired SKU explicitly if needed:
+select set_store_product_sku('ios','<old id>','credits_1000', false);
+```
+
+- **iOS/Android credit + subscription SKUs are pre-seeded** by mig 151 (`ai_credit_099/499/999`
+  for the packs; `sub_5k_monthly_v2` / `sub_unlimited_monthly_v3` for the plans). You only
+  call `set_store_product_sku` if you change a store id later.
+- **LemonSqueezy is NOT pre-seeded** (its live variant ids differ from test mode and are
+  known only to you) → register them with `set_store_product_sku('lemonsqueezy', …)` at
+  go-live.
+- The webhooks read this table **DB-first** and fall back to the legacy env maps
+  (`REVENUECAT_PRODUCT_MAP`, `LEMONSQUEEZY_VARIANT_MAP`) only when a SKU isn't registered —
+  so the env vars below are now **optional/legacy**; the DB catalog is authoritative.
 
 ---
 
@@ -96,21 +129,48 @@ test mode only (no real charge).
 > Digital goods MUST use the stores' in-app purchase. The paywall UI stays HIDDEN until
 > IAP products exist (this is what caused the earlier Apple 2.1(b) rejection).
 
-1. **App Store Connect**: create In-App Purchase products (auto-renewable subscription for
-   Pro, consumables for credit packs). **Play Console**: create the equivalent
-   subscription + in-app products. Submit them.
-2. **RevenueCat**: create a project, add the App Store + Play apps, and add the store
-   products as RevenueCat products/entitlements. Note each RevenueCat product id.
-3. RevenueCat → Integrations → **Webhooks**:
+1. **App Store Connect** — create the In-App Purchase products with the **exact store ids**
+   mig 151 seeded (so no `set_store_product_sku` call is needed):
+   - **Consumable** credit packs (⚠️ MUST be Consumable — re-purchasable; a Non-Consumable
+     can only be bought once and never re-charged):
+     - `ai_credit_099` — display name **"AI Credit $0.99"** — price tier **Tier 1 ($0.99)**
+     - `ai_credit_499` — display name **"AI Credit $4.99"** — price tier **$4.99**
+     - `ai_credit_999` — display name **"AI Credit $9.99"** — price tier **$9.99**
+   - **Auto-renewable subscriptions**: `sub_5k_monthly_v2` ("Standard", $3.99/mo),
+     `sub_unlimited_monthly_v3` ("Pro", $19.99/mo) — one subscription group, Pro the higher
+     tier. (These already exist from the earlier setup.)
+   > The app shows the user's LOCAL currency automatically — you pick the **price tier**
+   > (e.g. the "$0.99" tier), the stores localize it (₩/¥/€…). We grant the **USD face value**
+   > ($0.99) regardless of what the buyer's local tier charges.
+   > ⚠️ If a wrongly-typed (Non-Consumable) `credits_*`/`ai_credit_*` already exists, you can't
+   > change its type or reuse its id — create the Consumable under the id above and leave/delete
+   > the bad one (Apple permanently reserves used ids, hence the fresh `ai_credit_*` names).
+2. **Play Console**: create the **same ids** as managed **consumable** in-app products +
+   the two subscriptions. Google does not reserve types, but keep ids identical to iOS.
+3. **RevenueCat**: create a project, add the App Store + Play apps, add the store products,
+   and put them in an **Offering** whose packages expose those store products. Attach the two
+   subscriptions to the **`pro`** entitlement; credit packs get NO entitlement (consumables —
+   the webhook tops up the wallet). The app matches packages by the **store product id**
+   (`BillingProduct.storeProductId` from `get_billing_products(platform)`), so you do NOT need
+   to hand-set package identifiers to our internal ids anymore.
+4. RevenueCat → Integrations → **Webhooks**:
    - URL: `https://<project-ref>.functions.supabase.co/revenuecat-webhook`
    - Authorization header value: a random secret → set both sides:
      `supabase secrets set REVENUECAT_WEBHOOK_AUTH=<same-value>`
-   - Product map (store product id → our catalog id):
-     `supabase secrets set REVENUECAT_PRODUCT_MAP='{"<rc_pro_monthly>":"sub_pro_monthly","<rc_credits_5000>":"credits_5000"}'`
-4. In the app, set the RevenueCat public SDK key + un-hide the paywall gate (the code
-   already calls `Purchases.logIn(<our user id>)` so the webhook can map the buyer).
-5. `eas build` a new mobile build (payment/paywall are native → OTA won't ship them) and
+   - **Product map is now optional** — the webhook resolves store id → our id from the mig-151
+     SKU catalog first. `REVENUECAT_PRODUCT_MAP` is only a legacy fallback for store ids not in
+     the catalog; leave it unset if you used the seeded ids.
+5. In the app, set the RevenueCat public SDK key + un-hide the paywall gate
+   (`SUBSCRIPTION_UI_ENABLED`); the code already calls `Purchases.logIn(<our user id>)` so the
+   webhook can map the buyer.
+6. `eas build` a new mobile build (payment/paywall are native → OTA won't ship them) and
    submit to both stores.
+
+### Web credit packs — no recreation needed
+LemonSqueezy one-time products have no consumable/non-consumable distinction, so the existing
+web credit products keep working. Only (a) optionally rename their display to "AI Credit $0.99"
+for consistency, and (b) register their live variant ids in the SKU catalog:
+`select set_store_product_sku('lemonsqueezy','<variant id>','credits_1000');` (etc.).
 
 ---
 

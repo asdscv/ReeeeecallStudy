@@ -433,7 +433,7 @@ export function SettingsScreen() {
           <CollapsibleSection
             title={t('cardUsage.title')}
             icon="📇"
-            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned }) : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
+            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned.toLocaleString() }) : t('cardUsage.count', { owned: cardUsage.owned.toLocaleString(), limit: cardUsage.limit.toLocaleString() })}</Text>}
           >
             {cardUsageDetail ? (
               <CardUsagePanel detail={cardUsageDetail} />
@@ -860,29 +860,29 @@ export function SettingsScreen() {
         {/* ──────────────────────────────────────────────────────────────────── */}
         {/*
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Subscription</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('subscription.title')}</Text>
           <View style={[styles.subCard, {
             backgroundColor: isPro ? theme.colors.successLight : theme.colors.surface,
             borderColor: isPro ? theme.colors.success : theme.colors.border,
           }]}>
             <Text style={[theme.typography.h3, { color: theme.colors.text }]}>
-              {isPro ? 'Pro' : 'Free Plan'}
+              {isPro ? t('subscription.pro') : t('subscription.freePlan')}
             </Text>
             <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-              {isPro ? 'All premium features unlocked' : 'Upgrade for unlimited access'}
+              {isPro ? t('subscription.proDesc') : t('subscription.freeDesc')}
             </Text>
           </View>
           {!isPro && (
             <Button
               testID="settings-upgrade"
-              title="Upgrade to Pro"
+              title={t('subscription.upgradeToPro')}
               onPress={() => navigation.navigate('Paywall')}
             />
           )}
           {isPro && (
             <Button
               testID="settings-manage-subscription"
-              title="Manage Subscription"
+              title={t('subscription.manageSubscription')}
               variant="outline"
               onPress={() => Linking.openURL(MANAGE_SUBSCRIPTIONS_URL)}
             />

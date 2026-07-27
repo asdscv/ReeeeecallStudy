@@ -27,7 +27,9 @@
   "productsUnavailable": "Los productos de suscripción no están disponibles actualmente. Inténtalo más tarde.",
   "checkout": {
     "startFailed": "No se pudo iniciar el pago. Inténtalo de nuevo.",
-    "confirming": "Pago recibido: tu cuenta se actualizará una vez confirmado."
+    "confirming": "Pago recibido: tu cuenta se actualizará una vez confirmado.",
+    "errorTitle": "Error en la compra",
+    "errorGeneric": "Ocurrió un problema con tu compra. Inténtalo de nuevo."
   },
   "catalog": {
     "perMonth": "/mes",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "Política de Privacidad",
   "termsOfService": "Términos de Servicio",
-  "manageSubscription": "Gestionar Suscripción"
+  "manageSubscription": "Gestionar Suscripción",
+  "legalDisclaimer": "Se realizará el cargo en tu cuenta de {{account}} al confirmar la compra. Tu suscripción se renueva automáticamente a menos que la canceles al menos 24 horas antes de que finalice el período actual. Se cobrará la renovación en tu cuenta dentro de las 24 horas anteriores al final del período actual. Puedes gestionar o cancelar tu suscripción en los ajustes de tu cuenta en {{store}} después de la compra."
 }

@@ -80,13 +80,13 @@
     "permissionTitle": "権限が必要です"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "サブスクリプション",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for more cards",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "無料プラン",
+    "proDesc": "すべてのプレミアム機能が利用可能",
+    "freeDesc": "カードを増やすにはアップグレード",
+    "upgradeToPro": "Proにアップグレード",
+    "manageSubscription": "サブスクリプションを管理"
   },
   "legal": {
     "title": "Legal",
@@ -178,15 +178,15 @@
       "officialNote": "上限対象外",
       "archived": "アーカイブ済み",
       "archivedNote": "学習ロック中",
-      "archivedCount": "{{count}}枚アーカイブ済み",
-      "remaining": "残り{{count}}枚",
+      "archivedCount": "{{count, number}}枚アーカイブ済み",
+      "remaining": "残り{{count, number}}枚",
       "percentUsed": "{{percent}}%使用",
       "nearLimit": "上限間近",
       "atLimit": "上限に達しました",
       "planUnlimited": "無制限プラン",
       "planCards": "{{limit}}枚プラン",
       "unlimitedTitle": "無制限保存",
-      "lifetimeTotal": "{{count}}枚"
+      "lifetimeTotal": "{{count, number}}枚"
     }
   },
   "groups": {

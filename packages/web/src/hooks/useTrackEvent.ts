@@ -6,6 +6,7 @@ import { viewRateLimiter } from '../lib/view-rate-limiter'
 import { normalizePagePath } from '../lib/page-tracking'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
 import { logAnalyticsError } from '../lib/analytics-logger'
+import { isAnalyticsOptedOut } from '../lib/analytics-consent'
 
 /**
  * Returns a function to track custom analytics events.
@@ -15,6 +16,7 @@ import { logAnalyticsError } from '../lib/analytics-logger'
 export function useTrackEvent() {
   return useCallback((event: AnalyticsEvent) => {
     if (isBot(navigator.userAgent)) return
+    if (isAnalyticsOptedOut()) return
 
     const result = validateEvent(event)
     if (!result.valid || !result.event) return
