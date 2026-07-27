@@ -185,6 +185,32 @@ class PurchaseService {
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────────
+  // ⚠️ STORE PRODUCT IDs DIFFER PER PLATFORM — DO NOT ASSUME iOS === Android.
+  // (2026-07-27) The App Store and Play store-ids are NOT identical for the two
+  // subscriptions. This is intentional and permanent; the DB SKU map absorbs it.
+  //
+  //   internal billing_products.id | iOS App Store id  | Google Play id
+  //   ─────────────────────────────┼───────────────────┼────────────────────────────
+  //   credits_1000                 | ai_credit_099     | ai_credit_099
+  //   credits_5000                 | ai_credit_499     | ai_credit_499
+  //   credits_10000                | ai_credit_999     | ai_credit_999
+  //   sub_5k_monthly  (Standard)   | standard_monthly  | sub_standard_monthly:monthly
+  //   sub_unlimited_monthly (Pro)  | pro_monthly       | sub_pro_monthly:monthly
+  //
+  // WHY the iOS sub ids are `standard_monthly`/`pro_monthly` and NOT the tidy
+  // `sub_standard_monthly`/`sub_pro_monthly` Google uses: those two iOS ids were
+  // created then deleted on App Store Connect, and **Apple PERMANENTLY reserves a
+  // deleted product id** (recreate → 409 "product ID has already been used"). They
+  // are burned forever, so iOS had to fall back to the un-prefixed form. Do NOT try
+  // to "fix" this back to sub_*_monthly on iOS — it is impossible. Google Play ids
+  // stay in the sub_*_monthly(:basePlan) form.
+  //
+  // Nothing in the app hardcodes these strings: the store id arrives per-platform
+  // from get_billing_products(Platform.OS) → billing_product_skus (mig 151), and RC
+  // packages are keyed by lookup_key = internal id. So this divergence is confined
+  // to the DB SKU rows + the RevenueCat dashboard. See memory project-mobile-iap.
+  // ───────────────────────────────────────────────────────────────────────
   /**
    * Find the RevenueCat package for a given STORE product identifier — i.e. the
    * billing_product_skus.store_product_id for this platform (mig 151), surfaced to the
