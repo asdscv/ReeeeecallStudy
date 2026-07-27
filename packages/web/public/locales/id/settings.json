@@ -176,5 +176,17 @@
     "preferences": "Preferensi",
     "data": "Data"
   },
-  "subtitle": "Kelola akun, kredit, dan preferensi belajar Anda."
+  "subtitle": "Kelola akun, kredit, dan preferensi belajar Anda.",
+  "privacy": {
+    "title": "Privacy & data",
+    "analyticsTitle": "Usage analytics",
+    "analyticsHint": "Help improve the app with anonymous usage data",
+    "trackingOn": "Allowed",
+    "trackingOff": "Off",
+    "deleteAccount": "Delete my account",
+    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirmBtn": "Delete permanently",
+    "cancel": "Cancel",
+    "deleteFailed": "Could not delete your account. Please try again."
+  }
 }

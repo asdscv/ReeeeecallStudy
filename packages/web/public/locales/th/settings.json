@@ -176,5 +176,17 @@
     "preferences": "การตั้งค่า",
     "data": "ข้อมูล"
   },
-  "subtitle": "จัดการบัญชี เครดิต และการตั้งค่าการเรียนของคุณ"
+  "subtitle": "จัดการบัญชี เครดิต และการตั้งค่าการเรียนของคุณ",
+  "privacy": {
+    "title": "Privacy & data",
+    "analyticsTitle": "Usage analytics",
+    "analyticsHint": "Help improve the app with anonymous usage data",
+    "trackingOn": "Allowed",
+    "trackingOff": "Off",
+    "deleteAccount": "Delete my account",
+    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirmBtn": "Delete permanently",
+    "cancel": "Cancel",
+    "deleteFailed": "Could not delete your account. Please try again."
+  }
 }

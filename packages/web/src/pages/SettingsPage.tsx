@@ -13,6 +13,7 @@ import { ThemeToggle } from '../components/common/ThemeToggle'
 import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
+import { PrivacyDataSection } from '../components/settings/PrivacyDataSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
@@ -341,6 +342,9 @@ export function SettingsPage() {
                 <p className="text-xs text-success mt-1">{t('profile.nameAvailable')}</p>
               )}
             </div>
+          </CollapsibleSection>
+          <CollapsibleSection title={t('privacy.title', 'Privacy & data')} icon={<span className="text-base">🔒</span>}>
+            <PrivacyDataSection />
           </CollapsibleSection>
         </div>
 

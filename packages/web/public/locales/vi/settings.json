@@ -176,5 +176,17 @@
     "preferences": "Tùy chọn",
     "data": "Dữ liệu"
   },
-  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn."
+  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn.",
+  "privacy": {
+    "title": "Privacy & data",
+    "analyticsTitle": "Usage analytics",
+    "analyticsHint": "Help improve the app with anonymous usage data",
+    "trackingOn": "Allowed",
+    "trackingOff": "Off",
+    "deleteAccount": "Delete my account",
+    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirmBtn": "Delete permanently",
+    "cancel": "Cancel",
+    "deleteFailed": "Could not delete your account. Please try again."
+  }
 }
