@@ -206,6 +206,7 @@
     "current": "Plan actual",
     "comingSoon": "Próximamente",
     "empty": "No hay planes disponibles.",
-    "loadError": "No se pudieron cargar los planes."
+    "loadError": "No se pudieron cargar los planes.",
+    "popular": "POPULAR"
   }
 }

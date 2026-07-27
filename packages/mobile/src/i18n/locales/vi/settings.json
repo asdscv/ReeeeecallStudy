@@ -206,6 +206,7 @@
     "current": "Gói hiện tại",
     "comingSoon": "Sắp ra mắt",
     "empty": "Chưa có gói nào.",
-    "loadError": "Không tải được gói."
+    "loadError": "Không tải được gói.",
+    "popular": "PHỔ BIẾN"
   }
 }

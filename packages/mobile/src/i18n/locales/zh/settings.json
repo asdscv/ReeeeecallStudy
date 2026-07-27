@@ -206,6 +206,7 @@
     "current": "当前方案",
     "comingSoon": "即将推出",
     "empty": "暂无可用方案。",
-    "loadError": "无法加载方案。"
+    "loadError": "无法加载方案。",
+    "popular": "热门"
   }
 }

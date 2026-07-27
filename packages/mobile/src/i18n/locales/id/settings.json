@@ -206,6 +206,7 @@
     "current": "Paket saat ini",
     "comingSoon": "Segera hadir",
     "empty": "Belum ada paket.",
-    "loadError": "Gagal memuat paket."
+    "loadError": "Gagal memuat paket.",
+    "popular": "POPULER"
   }
 }

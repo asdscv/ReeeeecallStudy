@@ -206,6 +206,7 @@
     "current": "Current plan",
     "comingSoon": "Coming soon",
     "empty": "No plans available.",
-    "loadError": "Couldn’t load plans."
+    "loadError": "Couldn’t load plans.",
+    "popular": "POPULAR"
   }
 }

@@ -323,7 +323,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.account')}</GroupLabel>
 
         {/* ── a) Profile — centered avatar like web ── */}
-        <CollapsibleSection title={t('profile.title')} icon="👤">
+        <CollapsibleSection title={t('profile.title')} icon="👤" tint="#3B82F6">
           <View style={styles.profileCentered}>
             <View style={[styles.avatarCircle, { backgroundColor: theme.colors.primary }]}>
               <Text style={styles.avatarText}>{userInitial}</Text>
@@ -424,7 +424,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.billing')}</GroupLabel>
 
         {/* AI wallet / usage (충전금·사용량) */}
-        <CollapsibleSection title={tWallet('title')} icon="💳">
+        <CollapsibleSection title={tWallet('title')} icon="💳" tint="#22C55E">
           <WalletSummary />
         </CollapsibleSection>
 
@@ -432,7 +432,7 @@ export function SettingsScreen() {
         {cardUsage && (
           <CollapsibleSection
             title={t('cardUsage.title')}
-            icon="📇"
+            icon="📇" tint="#6366F1"
             badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned.toLocaleString() }) : t('cardUsage.count', { owned: cardUsage.owned.toLocaleString(), limit: cardUsage.limit.toLocaleString() })}</Text>}
           >
             {cardUsageDetail ? (
@@ -447,19 +447,23 @@ export function SettingsScreen() {
                 })}
               </Text>
             )}
-            {/* Data-driven subscription plan selector (mirrors web). Gated behind the
-                mobile IAP flag (Apple Guideline 2.1(b)) — NO plan pricing / Select CTA
-                may render until store IAP products exist. Inert until the gate flips;
-                onSelect routes to the Paywall (also gated) to run the purchase flow.
-                The at-cap "reached" state is shown inside <CardUsagePanel/> above. */}
-            {SUBSCRIPTION_UI_ENABLED && (
-              <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 16 }}>
-                <PlanSelector
-                  subscription={subscription}
-                  onSelect={() => navigation.navigate('Paywall')}
-                />
-              </View>
-            )}
+            {/* NOTE: the subscription PlanSelector used to live HERE, buried inside this
+                collapsed card-usage accordion, so users couldn't find the purchase/subscribe
+                entry ("설정에 구독 관련 아무것도 없다"). It now renders as its own top-level
+                "Subscription" section below (mirrors web SettingsPage's inline <PlanSelector/>). */}
+          </CollapsibleSection>
+        )}
+
+        {/* ── Subscription / plans (top-level, visible — mirrors web) ──
+            Data-driven plan selector (Standard / Pro). Gated behind the mobile IAP flag
+            (Apple Guideline 2.1(b)). defaultOpen so the plans + Select CTA are visible
+            without expanding; onSelect routes to the (registered) Paywall purchase flow. */}
+        {SUBSCRIPTION_UI_ENABLED && (
+          <CollapsibleSection title={t('subscription.title')} icon="⭐" tint="#F59E0B" defaultOpen>
+            <PlanSelector
+              subscription={subscription}
+              onSelect={() => navigation.navigate('Paywall')}
+            />
           </CollapsibleSection>
         )}
 
@@ -517,7 +521,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.study')}</GroupLabel>
 
         {/* ── Answer Mode — matches web: standalone card ── */}
-        <CollapsibleSection title={t('answerMode.title')} icon="📝">
+        <CollapsibleSection title={t('answerMode.title')} icon="📝" tint="#0EA5E9">
           <View style={styles.modeGrid}>
             {(['button', 'swipe'] as const).map((mode) => {
               const isActive = profile.answer_mode === mode
@@ -573,7 +577,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── New Card Limit — standalone card ── */}
-        <CollapsibleSection title={t('newCardLimit.title')} icon="🔢">
+        <CollapsibleSection title={t('newCardLimit.title')} icon="🔢" tint="#14B8A6">
           <TextInput
             testID="settings-daily-limit"
             value={String(profile.daily_new_limit)}
@@ -594,7 +598,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── Auto TTS Reading — standalone card ── */}
-        <CollapsibleSection title={t('tts.title')} icon="🔊">
+        <CollapsibleSection title={t('tts.title')} icon="🔊" tint="#A855F7">
           <View style={styles.switchRow}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('tts.enable')}</Text>
             <Switch
@@ -657,7 +661,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── Daily Study Goal — standalone like web ── */}
-        <CollapsibleSection title={t('dailyGoal.title')} icon="🎯">
+        <CollapsibleSection title={t('dailyGoal.title')} icon="🎯" tint="#EF4444">
           <TextInput
             testID="settings-daily-goal"
             value={profile.daily_study_goal != null ? String(profile.daily_study_goal) : ''}
@@ -684,7 +688,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── d) SRS Configuration ── */}
-        <CollapsibleSection title={t('srsConfig.title')} icon="🧠">
+        <CollapsibleSection title={t('srsConfig.title')} icon="🧠" tint="#8B5CF6">
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
             {t('srsConfig.description')}
           </Text>
@@ -754,7 +758,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.preferences')}</GroupLabel>
 
         {/* ── f) Language ── */}
-        <CollapsibleSection title={t('language.title')} icon="🌐">
+        <CollapsibleSection title={t('language.title')} icon="🌐" tint="#06B6D4">
           <TouchableOpacity
             testID="settings-lang-dropdown"
             onPress={() => setLangDropdownOpen(true)}
@@ -801,7 +805,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── Theme ── */}
-        <CollapsibleSection title={t('theme.title')} icon="🎨">
+        <CollapsibleSection title={t('theme.title')} icon="🎨" tint="#EC4899">
           <View style={styles.segmentRow}>
             {(['light', 'dark', 'system'] as const).map((mode) => {
               const isActive = themeMode === mode
@@ -836,7 +840,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── g) Notifications ── */}
-        <CollapsibleSection title={t('notifications.title')} icon="🔔">
+        <CollapsibleSection title={t('notifications.title')} icon="🔔" tint="#F97316">
           <View style={styles.switchRow}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('notifications.dailyReminder')}</Text>
             <Switch
@@ -893,7 +897,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.data')}</GroupLabel>
 
         {/* ── i) Export My Data — matches web ── */}
-        <CollapsibleSection title={t('export.title')} icon="📥">
+        <CollapsibleSection title={t('export.title')} icon="📥" tint="#64748B">
           {[
             { key: 'stats', icon: '📊', labelKey: 'export.stats' },
             { key: 'sessions', icon: '📅', labelKey: 'export.sessions' },
@@ -1000,7 +1004,7 @@ export function SettingsScreen() {
  * Category group label — small uppercase heading above a group of sections
  */
 function GroupLabel({ children, theme }: { children: React.ReactNode; theme: ReturnType<typeof useTheme> }) {
-  return <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: theme.colors.textSecondary, marginTop: 20, marginBottom: 8, marginLeft: 4 }}>{children}</Text>
+  return <Text style={{ fontSize: 12.5, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: theme.colors.textTertiary, marginTop: 26, marginBottom: 10, marginLeft: 6 }}>{children}</Text>
 }
 
 /**
@@ -1044,8 +1048,11 @@ const styles = StyleSheet.create({
   },
   quickActionLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
 
-  // Section card
-  card: { borderRadius: 12, borderWidth: 1, padding: 16, marginBottom: 12, gap: 12 },
+  // Section card — matches CollapsibleSection (radius, hairline border, subtle depth)
+  card: {
+    borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, padding: 16, marginBottom: 10, gap: 12,
+    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+  },
   sectionTitle: { fontSize: 17, fontWeight: '600' },
   sectionBody: { gap: 12 },
   fieldLabel: { fontSize: 13, fontWeight: '500', marginBottom: 4 },

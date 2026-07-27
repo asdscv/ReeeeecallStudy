@@ -286,7 +286,7 @@ export function SettingsPage() {
         {/* ── Account ── */}
         <div className="space-y-3">
           <GroupLabel>{t('groups.account', 'Account')}</GroupLabel>
-          <CollapsibleSection title={t('profile.title')} icon={<User className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('profile.title')} icon={<User className="w-[18px] h-[18px]" />} tint="#3B82F6">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center shrink-0">
                 <span className="text-2xl font-bold text-white">{userInitial}</span>
@@ -343,7 +343,7 @@ export function SettingsPage() {
               )}
             </div>
           </CollapsibleSection>
-          <CollapsibleSection title={t('privacy.title', 'Privacy & data')} icon={<span className="text-base">🔒</span>}>
+          <CollapsibleSection title={t('privacy.title', 'Privacy & data')} icon={<span className="text-lg">🔒</span>} tint="#64748B">
             <PrivacyDataSection />
           </CollapsibleSection>
         </div>
@@ -352,7 +352,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.billing', 'Credits & Usage')}</GroupLabel>
           {/* ── Wallet ── */}
-          <CollapsibleSection title={tWallet('title')} icon={<span className="text-base">💳</span>}>
+          <CollapsibleSection title={tWallet('title')} icon={<span className="text-lg">💳</span>} tint="#22C55E">
             <WalletSummary />
           </CollapsibleSection>
 
@@ -366,7 +366,7 @@ export function SettingsPage() {
             return (
               <CollapsibleSection
                 title={t('cardUsage.title')}
-                icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
+                icon={<CreditCard className="w-[18px] h-[18px]" />} tint="#6366F1"
                 badge={
                   <span className="text-sm text-muted-foreground tabular-nums">
                     {unlimited
@@ -390,7 +390,7 @@ export function SettingsPage() {
           {/* ── Payment history (orders + subscriptions) ── */}
           <CollapsibleSection
             title={tBilling('paymentHistory.title')}
-            icon={<span className="text-base">🧾</span>}
+            icon={<span className="text-lg">🧾</span>} tint="#8B5CF6"
           >
             <PaymentHistory />
           </CollapsibleSection>
@@ -400,7 +400,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.study', 'Study')}</GroupLabel>
           {/* ── Study Settings ── */}
-          <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-base">📝</span>}>
+          <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-lg">📝</span>} tint="#0EA5E9">
 
           {/* Answer Mode cards */}
           <div className="grid grid-cols-2 gap-3 mb-5">
@@ -542,7 +542,7 @@ export function SettingsPage() {
         </CollapsibleSection>
 
           {/* ── Daily Study Goal ── */}
-          <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-[18px] h-[18px]" />} tint="#EF4444">
             <p className="text-sm text-muted-foreground mb-3">{t('goal.description', 'Set a daily study target in minutes. Leave empty for no goal.')}</p>
             <div className="flex items-center gap-3">
               <input
@@ -573,7 +573,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.preferences', 'Preferences')}</GroupLabel>
           {/* ── Language ── */}
-          <CollapsibleSection title={t('language.title')} icon={<Globe className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('language.title')} icon={<Globe className="w-[18px] h-[18px]" />} tint="#06B6D4">
             <select
               value={i18n.language}
               onChange={(e) => changeLanguage(e.target.value)}
@@ -589,7 +589,7 @@ export function SettingsPage() {
           </CollapsibleSection>
 
           {/* ── Theme ── */}
-          <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-[18px] h-[18px]" />} tint="#EC4899">
             <p className="text-sm text-muted-foreground mb-3">{t('theme.description')}</p>
             <ThemeToggle theme={theme} onChange={setTheme} />
           </CollapsibleSection>
@@ -599,7 +599,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.data', 'Data')}</GroupLabel>
           {/* ── Data Export ── */}
-          <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-[18px] h-[18px]" />} tint="#64748B">
             <UserStatsExport />
           </CollapsibleSection>
         </div>
