@@ -233,7 +233,23 @@
     "totalAiSpent": "Total Terpakai",
     "activeWallets": "Pengguna dengan Kredit",
     "aiCardsToday": "Kartu AI Hari Ini",
-    "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} berbayar"
+    "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} berbayar",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓"
+    }
   },
   "billing": {
     "title": "Manajemen Penagihan",
