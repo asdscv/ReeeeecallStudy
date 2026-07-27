@@ -176,5 +176,8 @@
     "preferences": "偏好设置",
     "data": "数据"
   },
-  "subtitle": "管理你的账户、额度和学习偏好。"
+  "subtitle": "管理你的账户、额度和学习偏好。",
+  "subscription": {
+    "title": "订阅"
+  }
 }

@@ -380,12 +380,20 @@ export function SettingsPage() {
                 ) : (
                   <div className="h-24 animate-pulse rounded-xl bg-accent" aria-hidden />
                 )}
-                <div className="mt-5 border-t border-border pt-4">
-                  <PlanSelector />
-                </div>
               </CollapsibleSection>
             )
           })()}
+
+          {/* ── Subscription / plans — own visible section (was buried inside the
+               collapsed card-usage accordion, so the purchase entry was hard to find).
+               defaultOpen so plans + Select CTAs show without expanding. ── */}
+          <CollapsibleSection
+            title={t('subscription.title', 'Subscription')}
+            icon={<span className="text-lg">⭐</span>} tint="#F59E0B"
+            defaultOpen
+          >
+            <PlanSelector />
+          </CollapsibleSection>
 
           {/* ── Payment history (orders + subscriptions) ── */}
           <CollapsibleSection

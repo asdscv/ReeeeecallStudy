@@ -176,5 +176,8 @@
     "preferences": "Tùy chọn",
     "data": "Dữ liệu"
   },
-  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn."
+  "subtitle": "Quản lý tài khoản, tín dụng và tùy chọn học tập của bạn.",
+  "subscription": {
+    "title": "Đăng ký"
+  }
 }

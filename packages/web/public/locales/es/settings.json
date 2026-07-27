@@ -176,5 +176,8 @@
     "preferences": "Preferencias",
     "data": "Datos"
   },
-  "subtitle": "Gestiona tu cuenta, créditos y preferencias de estudio."
+  "subtitle": "Gestiona tu cuenta, créditos y preferencias de estudio.",
+  "subscription": {
+    "title": "Suscripción"
+  }
 }

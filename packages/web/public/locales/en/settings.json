@@ -176,5 +176,8 @@
     "preferences": "Preferences",
     "data": "Data"
   },
-  "subtitle": "Manage your account, credits, and study preferences."
+  "subtitle": "Manage your account, credits, and study preferences.",
+  "subscription": {
+    "title": "Subscription"
+  }
 }
