@@ -97,7 +97,7 @@ export const MERCHANT_UID_ATTRIBUTE = 'merchant_uid'
 // owner registers the store products (see OWNER GO-LIVE CHECKLIST above). Kept
 // FALSE in the repo (Apple Guideline 2.1(b) — no live paywall without approved
 // IAP products); flipping to true is the owner's final go-live switch.
-export const SUBSCRIPTION_UI_ENABLED = false
+export const SUBSCRIPTION_UI_ENABLED = true
 
 /**
  * RevenueCat service — single entry point for all purchase operations.
@@ -186,16 +186,18 @@ class PurchaseService {
   }
 
   /**
-   * Find the RevenueCat package that corresponds to a backend product id
-   * (billing_products.id, e.g. 'sub_pro_monthly' / 'credits_1000'). Match is
-   * by store product identifier or package identifier — configure these to
-   * equal the backend id in the RevenueCat dashboard so the server catalog
-   * (get_billing_products) stays the single source of truth for what exists.
+   * Find the RevenueCat package for a given STORE product identifier — i.e. the
+   * billing_product_skus.store_product_id for this platform (mig 151), surfaced to the
+   * client as BillingProduct.storeProductId by get_billing_products(Platform.OS). Callers
+   * pass `product.storeProductId ?? product.id` (the internal id is the legacy fallback
+   * when no SKU row is registered). Matches on the RC store-product identifier OR the RC
+   * package identifier. The store↔internal mapping now lives in the DB catalog, so this no
+   * longer depends on the RevenueCat package identifier being hand-set to our internal id.
    */
-  findPackageForProduct(offering: PurchasesOffering | null, productId: string): PurchasesPackage | null {
+  findPackageForProduct(offering: PurchasesOffering | null, storeProductId: string): PurchasesPackage | null {
     const pkgs: any[] = offering?.availablePackages ?? []
     return (
-      pkgs.find((p) => p?.product?.identifier === productId || p?.identifier === productId) ?? null
+      pkgs.find((p) => p?.product?.identifier === storeProductId || p?.identifier === storeProductId) ?? null
     )
   }
 
