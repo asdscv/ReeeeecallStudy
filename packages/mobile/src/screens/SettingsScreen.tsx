@@ -467,56 +467,16 @@ export function SettingsScreen() {
           </CollapsibleSection>
         )}
 
-        {/* ── Templates ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            testID="settings-templates-link"
-            onPress={() => navigation.navigate('TemplatesList')}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('templates.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('templates.description')}
-              </Text>
-            </View>
-            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-          </TouchableOpacity>
-        </SectionCard>
-
-        {/* ── Sharing ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            testID="settings-my-shares-link"
-            onPress={() => navigation.navigate('MyShares')}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('shares.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('shares.description')}
-              </Text>
-            </View>
-            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-          </TouchableOpacity>
-        </SectionCard>
-
-        {/* ── Publisher Dashboard ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            testID="settings-publisher-stats-link"
-            onPress={() => navigation.navigate('PublisherStats')}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('publisher.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('publisher.description')}
-              </Text>
-            </View>
-            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-          </TouchableOpacity>
-        </SectionCard>
+        {/* ── Templates / Sharing / Publisher — tiled nav rows (match tiled sections) ── */}
+        <NavRow theme={theme} testID="settings-templates-link" icon="🗂️" tint="#6366F1"
+          title={t('templates.title')} description={t('templates.description')}
+          onPress={() => navigation.navigate('TemplatesList')} />
+        <NavRow theme={theme} testID="settings-my-shares-link" icon="🔗" tint="#0EA5E9"
+          title={t('shares.title')} description={t('shares.description')}
+          onPress={() => navigation.navigate('MyShares')} />
+        <NavRow theme={theme} testID="settings-publisher-stats-link" icon="📊" tint="#A855F7"
+          title={t('publisher.title')} description={t('publisher.description')}
+          onPress={() => navigation.navigate('PublisherStats')} />
 
         <GroupLabel theme={theme}>{t('groups.study')}</GroupLabel>
 
@@ -1020,6 +980,33 @@ function SectionCard({ children, theme }: {
   )
 }
 
+// Tapable navigation row with a colored icon tile — matches CollapsibleSection headers
+// so nav links (Templates / Shares / Publisher) share the same grouped-settings look.
+function NavRow({ icon, tint, title, description, onPress, testID, theme }: {
+  icon: string; tint: string; title: string; description?: string
+  onPress: () => void; testID?: string; theme: ReturnType<typeof useTheme>
+}) {
+  return (
+    <TouchableOpacity
+      testID={testID}
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={[styles.card, styles.navRow, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+    >
+      <View style={[styles.navTile, { backgroundColor: tint + '24' }]}>
+        <Text style={{ fontSize: 17 }}>{icon}</Text>
+      </View>
+      <View style={{ flex: 1, gap: 1 }}>
+        <Text style={{ fontSize: 15.5, fontWeight: '600', letterSpacing: -0.2, color: theme.colors.text }} numberOfLines={1}>{title}</Text>
+        {description ? (
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]} numberOfLines={1}>{description}</Text>
+        ) : null}
+      </View>
+      <Text style={{ fontSize: 22, fontWeight: '500', color: theme.colors.textTertiary }}>›</Text>
+    </TouchableOpacity>
+  )
+}
+
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 16, paddingBottom: 40 },
 
@@ -1053,6 +1040,8 @@ const styles = StyleSheet.create({
     borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, padding: 16, marginBottom: 10, gap: 12,
     shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
   },
+  navRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13, paddingHorizontal: 14 },
+  navTile: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   sectionTitle: { fontSize: 17, fontWeight: '600' },
   sectionBody: { gap: 12 },
   fieldLabel: { fontSize: 13, fontWeight: '500', marginBottom: 4 },
