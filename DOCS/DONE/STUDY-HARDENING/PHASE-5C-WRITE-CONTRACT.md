@@ -1,6 +1,6 @@
 # Study Hardening Phase 5C — Contract: Remove Legacy Write Paths
 
-상태: IMPLEMENTED — local validation complete, PR pending
+상태: DONE — PR #339, 최종 CI 7 checks green
 
 ## 0. 설계 편차 (구현 중 정정)
 
@@ -145,6 +145,9 @@ web/mobile typecheck, targeted lint, 학습 회귀 tests, production build.
 - Rollback: down SQL 실제 적용 후 권한 복구·함수 상태 assertion **7/7**, 이후 fresh reset + integration 34/34 재통과
 - web `tsc -b --noEmit`, mobile `tsc --noEmit`, targeted ESLint, production build 통과
 - 프로덕션 배포·migration 실행 없음
+- 구현 commit: `697aa0c chore(study): close direct study write paths`
+- PR: https://github.com/asdscv/ReeeeecallStudy/pull/339
+- 원격 CI: 7 checks 전부 SUCCESS(재시도 없이 1회 통과)
 
 ### 기존 test 갱신
 
