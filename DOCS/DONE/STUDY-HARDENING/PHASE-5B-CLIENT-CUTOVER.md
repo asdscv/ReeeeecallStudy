@@ -1,6 +1,6 @@
 # Study Hardening Phase 5B — Client Cutover to Atomic Persistence
 
-상태: IMPLEMENTED — local validation complete, PR pending
+상태: DONE — PR #338, 최종 CI 7 checks green
 
 기준선: `origin/develop@44c804f` (P5A migration 160 merged)
 
@@ -172,6 +172,9 @@ client-only 변경이므로 이 PR revert만으로 기존 write 경로로 복귀
 - shared/web `persistence-id.ts`·`srs-access.ts` byte parity, store의 apply/finalize 블록 문자 단위 일치
 - Production build 성공(3,238 modules 규모, 기존 chunk-size warning만 존재)
 - 프로덕션 배포·migration 실행 없음
+- 구현 commit: `b6247e0 feat(study): persist ratings through atomic RPCs`
+- PR: https://github.com/asdscv/ReeeeecallStudy/pull/338
+- 원격 CI: Lint + Typecheck, Unit Tests, Integration (Supabase), Architecture Guard, Migration Safety, AI Credit Metering, Workers Builds **7 checks 전부 SUCCESS**(재시도 없이 1회 통과)
 
 ### 건너뛴 단계
 
