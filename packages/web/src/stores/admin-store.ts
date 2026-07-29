@@ -8,4 +8,8 @@ export type {
   AdminUserBillingSubscription,
   AdminUserBillingLedgerEntry,
   AdminUserBillingPayment,
+  BillingChannel,
+  BillingPlatform,
+  RefundResult,
+  RefundEligibility,
 } from '@reeeeecall/shared/stores/admin-store'

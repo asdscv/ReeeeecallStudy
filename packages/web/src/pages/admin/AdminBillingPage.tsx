@@ -507,7 +507,12 @@ export function AdminBillingPage() {
  * a warning rather than guessed at, because guessing "Android" on an Apple purchase
  * would put a money-refund button on a row that cannot honour it.
  */
-function ChannelBadge({ channel, t }: { channel: string; t: (k: string, o?: object) => string }) {
+function ChannelBadge({ channel, t }: {
+  channel: string
+  // Same shape Pager uses — i18next's TFunction, not a hand-rolled signature,
+  // which `tsc -b` rejects as incompatible.
+  t: ReturnType<typeof useTranslation>['t']
+}) {
   return (
     <span
       className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CHANNEL_STYLES[channel] ?? 'bg-accent text-foreground'}`}
