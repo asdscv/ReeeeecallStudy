@@ -6,9 +6,9 @@
   "done": "完成",
   "back": "返回",
   "features": {
-    "unlimitedDecks": { "title": "无限卡组和卡片", "free": "5个卡组，3千张", "pro": "无限" },
+    "cardStorage": { "title": "卡片存储", "free": "1,000张", "pro": "最多100,000张" },
     "allModes": { "title": "所有学习模式", "free": "SRS + 顺序", "pro": "全部4种模式" },
-    "aiGeneration": { "title": "AI卡片生成", "free": "每月5次", "pro": "无限" },
+    "aiGeneration": { "title": "AI卡片生成", "free": "每天10张", "pro": "每天10张 + 额度" },
     "premiumTts": { "title": "高级TTS", "free": "基础", "pro": "Edge TTS HD" },
     "analytics": { "title": "高级分析", "free": "基础统计", "pro": "图表 + 预测" },
     "marketplace": { "title": "市场发布", "free": "仅下载", "pro": "上传 + 收益分成" }
@@ -27,7 +27,9 @@
   "productsUnavailable": "订阅产品当前不可用，请稍后重试。",
   "checkout": {
     "startFailed": "无法开始结账，请重试。",
-    "confirming": "已收到付款，确认后将更新您的账户。"
+    "confirming": "已收到付款，确认后将更新您的账户。",
+    "errorTitle": "购买失败",
+    "errorGeneric": "购买时出现问题，请重试。"
   },
   "catalog": {
     "perMonth": "/月",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "隐私政策",
   "termsOfService": "服务条款",
-  "manageSubscription": "管理订阅"
+  "manageSubscription": "管理订阅",
+  "legalDisclaimer": "确认购买后，将向您的{{account}}账户收取费用。除非在当前周期结束前至少24小时取消，否则订阅将自动续订。将在当前周期结束前24小时内向您的账户收取续订费用。购买后，您可以在{{store}}的账户设置中管理或取消订阅。"
 }

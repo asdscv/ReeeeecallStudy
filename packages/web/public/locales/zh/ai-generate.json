@@ -66,10 +66,10 @@
     "creditsOnly": "可用 {{credits}} 张付费卡片",
     "empty": "今天的免费卡片已用完",
     "unknown": "暂时无法获取余额",
-    "balance": "余额 {{amount}}（约{{cards}}张）",
+    "balance": "余额 {{amount}}",
     "imagePaid": "图片生成为付费功能 — 请充值后继续。",
     "cardLimit": "卡片额度 剩余 {{available}}/{{limit}}",
-    "cardLimitUnlimited": "卡片额度无限"
+    "cardLimitUnlimited": "无卡片数量上限（管理员）"
   },
   "wizard": {
     "setup": "Setup",

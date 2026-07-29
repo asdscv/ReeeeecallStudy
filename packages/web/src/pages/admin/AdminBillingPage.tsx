@@ -12,6 +12,14 @@ import { formatLocalDate, formatLocalDateTime } from '../../lib/date-utils'
 
 const PAGE_SIZE = 50
 
+// Payments is a live append-only log, so it uses a load-more list inside a bounded,
+// sticky-header scroll pane instead of numbered pages: offset paging over a table that
+// grows shifts rows between pages (a payment lands → page 2 repeats what page 1 showed),
+// and an admin scanning for one charge shouldn't have to remember which page it was on.
+// One pane, one scroll, "load more" at the bottom, and the table never pushes the User
+// Lookup panel below the fold.
+const PAY_PAGE_SIZE = 25
+
 const SUB_STATUSES = ['active', 'canceled', 'grace', 'past_due', 'expired', 'refunded'] as const
 
 const SUB_STATUS_STYLES: Record<string, string> = {
@@ -37,7 +45,7 @@ export function AdminBillingPage() {
   const { t, i18n } = useTranslation('admin')
   const dateLocale = toIntlLocale(i18n.language)
   const {
-    billingOverview, billingSubscriptions, billingPayments,
+    billingOverview, billingSubscriptions, billingPayments, billingPaymentsHasMore,
     billingOverviewLoading, billingSubsLoading, billingPaymentsLoading,
     billingError,
     fetchBillingOverview, fetchBillingSubscriptions, fetchBillingPayments,
@@ -54,13 +62,26 @@ export function AdminBillingPage() {
 
   useEffect(() => { fetchBillingOverview() }, [fetchBillingOverview])
   useEffect(() => { fetchBillingSubscriptions(statusFilter || undefined, subsPage, PAGE_SIZE) }, [fetchBillingSubscriptions, statusFilter, subsPage])
-  useEffect(() => { fetchBillingPayments(payPage, PAGE_SIZE) }, [fetchBillingPayments, payPage])
+  // Payments loads page 0 once; later pages are APPENDED by the load-more button.
+  useEffect(() => { fetchBillingPayments(0, PAY_PAGE_SIZE) }, [fetchBillingPayments])
+
+  // Reload the payments list from the top, collapsing back to a single page.
+  const reloadPayments = () => {
+    setPayPage(0)
+    fetchBillingPayments(0, PAY_PAGE_SIZE)
+  }
+
+  const loadMorePayments = () => {
+    const next = payPage + 1
+    setPayPage(next)
+    fetchBillingPayments(next, PAY_PAGE_SIZE, true)
+  }
 
   const refreshAll = () => {
     forceRefresh('billing')
     fetchBillingOverview()
     fetchBillingSubscriptions(statusFilter || undefined, subsPage, PAGE_SIZE)
-    fetchBillingPayments(payPage, PAGE_SIZE)
+    reloadPayments()
   }
 
   const doCancel = async (row: AdminSubscriptionRow, immediate: boolean) => {
@@ -103,7 +124,7 @@ export function AdminBillingPage() {
     if (error) {
       setActionError(t('billing.actionError', { error }))
     } else {
-      fetchBillingPayments(payPage, PAGE_SIZE)
+      reloadPayments()
       fetchBillingOverview()
     }
   }
@@ -128,7 +149,6 @@ export function AdminBillingPage() {
   }
 
   const subsHasNext = billingSubscriptions.length === PAGE_SIZE
-  const payHasNext = billingPayments.length === PAGE_SIZE
 
   if (billingError && !billingOverview) {
     return <AdminErrorState error={billingError} onRetry={refreshAll} />
@@ -263,15 +283,22 @@ export function AdminBillingPage() {
 
       {/* ── Payments ── */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="px-4 py-3 border-b border-border">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-2">
           <h3 className="text-sm font-medium text-foreground">{t('billing.payments.title')}</h3>
+          {billingPayments.length > 0 && (
+            <span className="text-[11px] text-content-tertiary tabular-nums">
+              {t('billing.payments.loadedCount', { total: billingPayments.length })}
+            </span>
+          )}
         </div>
         {billingPaymentsLoading && billingPayments.length === 0 ? (
           <p className="text-sm text-content-tertiary py-8 text-center">{t('loading')}</p>
         ) : (
-          <div className="overflow-x-auto">
+          // Bounded pane so a long payment log can't push the User Lookup panel off the
+          // page; the header row stays pinned while the body scrolls.
+          <div className="max-h-[26rem] overflow-auto overscroll-contain">
             <table className="w-full text-sm">
-              <thead className="bg-muted">
+              <thead className="bg-muted sticky top-0 z-10">
                 <tr>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.email')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.product')}</th>
@@ -320,7 +347,18 @@ export function AdminBillingPage() {
             </table>
           </div>
         )}
-        <Pager page={payPage} hasNext={payHasNext} onChange={setPayPage} t={t} />
+        {billingPaymentsHasMore && (
+          <div className="px-4 py-3 border-t border-border flex justify-center">
+            <button
+              type="button"
+              onClick={loadMorePayments}
+              disabled={billingPaymentsLoading}
+              className="px-3 py-1.5 text-xs font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted transition cursor-pointer disabled:opacity-40 disabled:cursor-default"
+            >
+              {billingPaymentsLoading ? t('loading') : t('billing.pagination.loadMore')}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── User lookup ── */}

@@ -23,6 +23,7 @@
 // from LEMONSQUEEZY_VARIANT_MAP and never sets a price (the LS variant carries it).
 
 import { createClient } from '@supabase/supabase-js'
+import { opsGate } from '../_shared/ops-gate.ts'
 
 const ENV = (k: string) => Deno.env.get(k)
 
@@ -60,8 +61,8 @@ async function verifyUser(authHeader: string | null): Promise<{ id: string; emai
 }
 
 // Invert LEMONSQUEEZY_VARIANT_MAP ({"<variant id>":"<product id>"}) → product_id → variant_id.
-// Returns null when unset/malformed so the fn fails closed (never mints a wrong checkout).
-function productToVariant(): Record<string, string> | null {
+// Legacy fallback only (see resolveVariantForProduct). Returns null when unset/malformed.
+function envProductToVariant(): Record<string, string> | null {
   const raw = ENV('LEMONSQUEEZY_VARIANT_MAP')
   if (!raw) return null
   try {
@@ -75,6 +76,37 @@ function productToVariant(): Record<string, string> | null {
   } catch {
     return null
   }
+}
+
+// Resolve the LS variant id to check out for an internal product_id. DB-FIRST
+// (billing_product_skus, mig 151: the single source of truth for the store↔internal
+// mapping) → the active LemonSqueezy SKU's store_product_id IS the variant id. Falls back
+// to the LEMONSQUEEZY_VARIANT_MAP env map so an env-only deployment is unchanged. Returns
+// null when neither knows the product (caller fails closed → UNMAPPED_PRODUCT).
+async function resolveVariantForProduct(
+  // deno-lint-ignore no-explicit-any -- injected service-role client (createClient's
+  // inferred generics don't match ReturnType<typeof createClient>; runtime shape is fine).
+  sb: any,
+  productId: string,
+): Promise<string | null> {
+  try {
+    const { data, error } = await sb
+      .from('billing_product_skus')
+      .select('store_product_id')
+      .eq('platform', 'lemonsqueezy')
+      .eq('product_id', productId)
+      .eq('is_active', true)
+      .limit(1)
+      .maybeSingle()
+    if (error) {
+      console.error('[lemonsqueezy-checkout] billing_product_skus read failed — using env map:', error.message)
+    } else if (data?.store_product_id) {
+      return String(data.store_product_id)
+    }
+  } catch (e) {
+    console.error('[lemonsqueezy-checkout] billing_product_skus read threw — using env map:', (e as Error)?.message)
+  }
+  return envProductToVariant()?.[productId] ?? null
 }
 
 Deno.serve(async (req) => {
@@ -101,6 +133,12 @@ Deno.serve(async (req) => {
   // Look up the server-authoritative intent (service role bypasses RLS) and assert the
   // caller owns it — a checkout may only be minted for the requester's own intent.
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
+
+  // Ops gate (mig 153): maintenance / payments kill switch / ban — halt checkout
+  // server-side without a redeploy, and never mint a checkout for a banned account.
+  const gate = await opsGate(sb, { userId: user.id, requirePayments: true })
+  if (gate) return json({ error: gate.message, code: gate.code }, gate.status, cors)
+
   const { data: intent, error: lookupErr } = await sb
     .from('payment_intents')
     .select('product_id, user_id, status')
@@ -116,11 +154,15 @@ Deno.serve(async (req) => {
     return json({ error: 'Not your intent', code: 'FORBIDDEN' }, 403, cors)
   }
 
-  const variantMap = productToVariant()
-  const variantId = variantMap ? variantMap[intent.product_id] : undefined
+  // Resolve which LS VARIANT to check out for this intent's product. DB-FIRST
+  // (billing_product_skus, mig 151 — the single source of truth) with the
+  // LEMONSQUEEZY_VARIANT_MAP env map as a backward-compatible fallback, so the owner can
+  // register live variant ids via set_store_product_sku without editing a secret, and the
+  // existing env-only setup keeps working until they do.
+  const variantId = await resolveVariantForProduct(sb, intent.product_id)
   if (!variantId) {
     console.error('[lemonsqueezy-checkout] no variant mapped for product', intent.product_id,
-      '(set LEMONSQUEEZY_VARIANT_MAP)')
+      '(register via set_store_product_sku or set LEMONSQUEEZY_VARIANT_MAP)')
     return json({ error: 'Product not purchasable', code: 'UNMAPPED_PRODUCT' }, 500, cors)
   }
 

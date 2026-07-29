@@ -96,6 +96,7 @@ function msToIso(ms: unknown): string | null {
   return Number.isFinite(n) && n > 0 ? new Date(n).toISOString() : null
 }
 
+// Legacy fallback map (REVENUECAT_PRODUCT_MAP env secret): store IAP id → our product id.
 function parseProductMap(): Record<string, string> {
   const raw = ENV('REVENUECAT_PRODUCT_MAP')
   if (!raw) return {}
@@ -104,6 +105,49 @@ function parseProductMap(): Record<string, string> {
     if (obj && typeof obj === 'object') return obj as Record<string, string>
   } catch { /* invalid JSON — treated as empty, unmapped products 400 below */ }
   return {}
+}
+
+// RevenueCat's `store` field → our billing_product_skus.platform value. Unknown/absent →
+// null (resolve_store_product then matches any platform, resolving only if unambiguous —
+// and our credit/sub ids are shared across ios+android, so a null store still resolves).
+function platformFromStore(store: unknown): string | null {
+  switch (typeof store === 'string' ? store.toUpperCase() : '') {
+    case 'APP_STORE':
+    case 'MAC_APP_STORE':
+      return 'ios'
+    case 'PLAY_STORE':
+      return 'android'
+    default:
+      return null
+  }
+}
+
+// Resolve a store IAP product id → our billing_products.id. DB-FIRST (billing_product_skus,
+// mig 151 — the single source of truth) via resolve_store_product, then the
+// REVENUECAT_PRODUCT_MAP env map as a backward-compatible fallback. Returns '' when neither
+// knows the product (caller 400s / acks). Once SKUs are seeded no env secret is needed.
+async function resolveOurProduct(
+  // deno-lint-ignore no-explicit-any -- the injected service-role client (createClient's
+  // inferred generics don't match ReturnType<typeof createClient>; runtime shape is fine).
+  sb: any,
+  store: unknown,
+  storeProductId: string,
+): Promise<string> {
+  if (!storeProductId) return ''
+  try {
+    const { data, error } = await sb.rpc('resolve_store_product', {
+      p_platform: platformFromStore(store),
+      p_store_product_id: storeProductId,
+    })
+    if (error) {
+      console.error('[revenuecat-webhook] resolve_store_product failed — using env map:', error.message)
+    } else if (typeof data === 'string' && data) {
+      return data
+    }
+  } catch (e) {
+    console.error('[revenuecat-webhook] resolve_store_product threw — using env map:', (e as Error)?.message)
+  }
+  return parseProductMap()[storeProductId] ?? ''
 }
 
 interface RCEvent {
@@ -216,7 +260,7 @@ Deno.serve(async (req) => {
       console.warn('[revenuecat-webhook]', type, 'non-uuid app_user_id, ignoring:', appUserId)
       return json({ received: true, type, ignored: 'anonymous_or_invalid_user' }, 200)
     }
-    const ourProductId = parseProductMap()[storeProductId]
+    const ourProductId = await resolveOurProduct(sb, event.store, storeProductId)
     if (!ourProductId) {
       console.error('[revenuecat-webhook]', type, 'unmapped product:', storeProductId)
       return json({ error: 'Unmapped product', code: 'BAD_REQUEST' }, 400)
@@ -297,7 +341,7 @@ Deno.serve(async (req) => {
   // grant that fell back to an event-id ref (no txnKey) cannot be auto-clawed — see the grant
   // warning above. (Mobile IAP is dormant; this MUST be sandbox-verified at IAP launch.)
   const refundOrClawback = async () => {
-    const ourProductId = storeProductId ? parseProductMap()[storeProductId] : undefined
+    const ourProductId = storeProductId ? await resolveOurProduct(sb, event.store, storeProductId) : ''
     let kind: string | null = null
     if (ourProductId) {
       const { data: prod, error } = await sb

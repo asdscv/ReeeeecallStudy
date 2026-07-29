@@ -294,3 +294,8 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/payment_edgecase_test.sql
+
+      - name: Run store-SKU catalog assertions (mig 151 — resolve / set / get_billing_products(platform) / unique-active)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/billing_sku_catalog_test.sql

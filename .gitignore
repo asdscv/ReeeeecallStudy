@@ -61,3 +61,6 @@ STUDY_DATA/*.tmp
 # commit of ~2GB of regenerable build artifacts.
 /android/
 /ios/
+
+# Claude Code personal settings (never commit)
+.claude/settings.local.json

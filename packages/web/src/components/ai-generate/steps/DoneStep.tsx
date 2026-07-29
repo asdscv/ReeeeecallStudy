@@ -41,7 +41,7 @@ export function DoneStep({
       {/* Summary cards */}
       <div className="flex justify-center gap-3">
         {templateName && (
-          <div className="px-3 py-2 bg-purple-50 rounded-lg text-center">
+          <div className="px-3 py-2 bg-purple-500/10 rounded-lg text-center">
             <p className="text-[10px] uppercase text-purple-500 font-semibold">{t('done.template')}</p>
             <p className="text-sm font-medium text-foreground mt-0.5">{templateName}</p>
           </div>

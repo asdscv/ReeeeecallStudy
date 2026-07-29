@@ -9,13 +9,20 @@ import { ChevronDown } from 'lucide-react'
  */
 export function CollapsibleSection({
   title,
+  subtitle,
   icon,
+  tint,
   badge,
   defaultOpen = false,
   children,
 }: {
   title: string
+  subtitle?: string
   icon?: ReactNode
+  /** Accent color (hex) for the icon tile — gives each section a consistent
+   *  color identity (the signature grouped-settings look). Icon inherits it via
+   *  currentColor, so pass icons WITHOUT their own text-color class. */
+  tint?: string
   badge?: ReactNode
   defaultOpen?: boolean
   children: ReactNode
@@ -34,15 +41,21 @@ export function CollapsibleSection({
         type="button"
         onClick={toggle}
         aria-expanded={open}
-        className="group w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-4 text-left cursor-pointer rounded-2xl transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+        className="group w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left cursor-pointer rounded-2xl transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
       >
         <div className="flex items-center gap-3 min-w-0">
           {icon && (
-            <span className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-accent/60 text-muted-foreground group-hover:bg-accent transition-colors">
+            <span
+              className={`shrink-0 flex items-center justify-center w-9 h-9 rounded-[11px] transition-colors ${tint ? '' : 'bg-accent/60 text-muted-foreground group-hover:bg-accent'}`}
+              style={tint ? { backgroundColor: tint + '24', color: tint } : undefined}
+            >
               {icon}
             </span>
           )}
-          <h2 className="text-sm sm:text-[15px] font-semibold text-foreground truncate">{title}</h2>
+          <div className="min-w-0">
+            <h2 className="text-sm sm:text-[15px] font-semibold text-foreground truncate leading-tight">{title}</h2>
+            {subtitle && <p className="text-xs text-muted-foreground truncate mt-0.5">{subtitle}</p>}
+          </div>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
           {badge}

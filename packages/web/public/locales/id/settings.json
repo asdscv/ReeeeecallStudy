@@ -147,8 +147,8 @@
     "upgrade": "Tingkatkan (segera hadir)",
     "upgradeSoon": "Langganan akan segera hadir.",
     "unlimited": "Tanpa batas",
-    "countUnlimited": "{{owned}} / Tanpa batas",
-    "planNoteUnlimited": "Paket Anda mencakup kartu tanpa batas.",
+    "countUnlimited": "{{owned}} · Tanpa batas",
+    "planNoteUnlimited": "Akun admin — penyimpanan kartu tidak dibatasi.",
     "detail": {
       "title": "Penyimpanan kartu",
       "subtitle": "Kartu milik sendiri dan langganan dihitung dalam paket Anda. Dek resmi tidak dihitung.",
@@ -158,15 +158,15 @@
       "officialNote": "Tidak dihitung dalam batas",
       "archived": "Diarsipkan",
       "archivedNote": "Belajar terkunci",
-      "archivedCount": "{{count}} diarsipkan",
-      "remaining": "{{count}} tersisa",
+      "archivedCount": "{{count, number}} diarsipkan",
+      "remaining": "{{count, number}} tersisa",
       "percentUsed": "{{percent}}% terpakai",
       "nearLimit": "Mendekati batas",
       "atLimit": "Batas tercapai",
-      "planUnlimited": "Paket tanpa batas",
+      "planUnlimited": "Akun admin",
       "planCards": "Paket {{limit}} kartu",
-      "unlimitedTitle": "Penyimpanan tanpa batas",
-      "lifetimeTotal": "{{count}} kartu"
+      "unlimitedTitle": "Tanpa batas kartu",
+      "lifetimeTotal": "{{count, number}} kartu"
     }
   },
   "groups": {
@@ -188,5 +188,8 @@
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
     "deleteFailed": "Could not delete your account. Please try again."
+  },
+  "subscription": {
+    "title": "Langganan"
   }
 }

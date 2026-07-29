@@ -31,7 +31,8 @@
     "unlimited": "การ์ดไม่จำกัด",
     "perMonth": "/เดือน",
     "select": "เลือก",
-    "current": "แพ็กเกจปัจจุบัน"
+    "current": "แพ็กเกจปัจจุบัน",
+    "popular": "ยอดนิยม"
   },
   "paymentHistory": {
     "title": "ประวัติการชำระเงิน",

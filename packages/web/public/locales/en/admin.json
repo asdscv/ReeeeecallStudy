@@ -320,7 +320,8 @@
       "status": "Status",
       "paidAt": "Paid At",
       "empty": "No payments found.",
-      "actions": "Actions"
+      "actions": "Actions",
+      "loadedCount": "{{total}} loaded"
     },
     "user": {
       "title": "User Lookup",
@@ -352,7 +353,8 @@
     "pagination": {
       "page": "Page {{page}}",
       "prev": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "loadMore": "Load more"
     },
     "actionError": "Action failed: {{error}}",
     "refund": {

@@ -7,6 +7,7 @@ import {
   registerCardUsageDetailInterest,
   releaseCardUsageDetailInterest,
 } from '@reeeeecall/shared/stores/deck-store'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import { UNLIMITED_CARD_LIMIT } from './PlanSelector'
 import { CardUsageModal } from './CardUsageModal'
 
@@ -73,9 +74,9 @@ export function CardUsageCard() {
         </View>
 
         <View style={styles.numRow}>
-          <Text style={[styles.big, { color: atLimit ? c.error : c.text }]}>{detail.usedTotal.toLocaleString()}</Text>
+          <Text style={[styles.big, { color: atLimit ? c.error : c.text }]}>{formatCount(detail.usedTotal)}</Text>
           <Text style={[theme.typography.caption, { color: c.textSecondary, marginLeft: 4 }]}>
-            {unlimited ? t('cardUsage.detail.planUnlimited') : `/ ${detail.limit.toLocaleString()}`}
+            {unlimited ? t('cardUsage.detail.planUnlimited') : `/ ${formatCount(detail.limit)}`}
           </Text>
         </View>
 

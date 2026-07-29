@@ -5,9 +5,7 @@
 // 구독 기능 복원 시: SettingsScreen에서 usePurchases import + isPro 사용 복구.
 // ─────────────────────────────────────────────────────────────────────────
 import { useState, useEffect, useCallback } from 'react'
-// [SUBSCRIPTION-HIDDEN] react-native-purchases 제거됨 — 타입 any로 대체
-type PurchasesPackage = any
-type PurchasesOffering = any
+import type { PurchasesPackage, PurchasesOffering } from 'react-native-purchases'
 import { purchaseService, PRO_ENTITLEMENT, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 import { getBillingProducts, getMySubscription, createPaymentIntent, type BillingProduct, type MySubscription } from '../services/billing'
 import { useAuthState } from './useAuthState'
@@ -117,7 +115,10 @@ export function usePurchases() {
       const result = await purchaseService.purchase(pkg)
 
       if (result.success) {
-        setIsPro(true)
+        // Only flip local Pro state when the purchase actually carries the `pro`
+        // entitlement (a SUBSCRIPTION). A CONSUMABLE credit pack settles with
+        // success=true but isPro=false — it must NOT mark the user Pro.
+        if (result.isPro) setIsPro(true)
         // ── Step 4: the DB entitlement is granted SERVER-SIDE only.
         // TODO(payment-webhook / IAP): the successful store transaction must be
         // mapped to `intent.merchantUid` and drive the confirm path:

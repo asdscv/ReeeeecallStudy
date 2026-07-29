@@ -31,7 +31,8 @@
     "unlimited": "Kartu tanpa batas",
     "perMonth": "/bln",
     "select": "Pilih",
-    "current": "Paket saat ini"
+    "current": "Paket saat ini",
+    "popular": "Populer"
   },
   "paymentHistory": {
     "title": "Riwayat pembayaran",

@@ -88,7 +88,7 @@
     "pro": "Pro",
     "freePlan": "Free Plan",
     "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
+    "freeDesc": "Upgrade for more cards",
     "upgradeToPro": "Upgrade to Pro",
     "manageSubscription": "Manage Subscription"
   },
@@ -167,8 +167,8 @@
     "upgrade": "Upgrade (coming soon)",
     "upgradeSoon": "Subscription is coming soon.",
     "cancelPending": "Subscription ending — access until {{date}}.",
-    "countUnlimited": "{{owned}} / Unlimited",
-    "planNoteUnlimited": "Your owned-card limit is unlimited.",
+    "countUnlimited": "{{owned}} · No limit",
+    "planNoteUnlimited": "Admin account — card storage isn't capped.",
     "detail": {
       "title": "Card storage",
       "subtitle": "Owned + subscribed cards count toward your plan. Official decks don’t count.",
@@ -178,15 +178,15 @@
       "officialNote": "Excluded from limit",
       "archived": "Archived",
       "archivedNote": "Study locked",
-      "archivedCount": "{{count}} archived",
-      "remaining": "{{count}} remaining",
+      "archivedCount": "{{count, number}} archived",
+      "remaining": "{{count, number}} remaining",
       "percentUsed": "{{percent}}% used",
       "nearLimit": "Approaching limit",
       "atLimit": "Limit reached",
-      "planUnlimited": "Unlimited plan",
+      "planUnlimited": "Admin account",
       "planCards": "{{limit}} card plan",
-      "unlimitedTitle": "Unlimited storage",
-      "lifetimeTotal": "{{count}} cards"
+      "unlimitedTitle": "No card limit",
+      "lifetimeTotal": "{{count, number}} cards"
     }
   },
   "groups": {
@@ -206,6 +206,23 @@
     "current": "Current plan",
     "comingSoon": "Coming soon",
     "empty": "No plans available.",
-    "loadError": "Couldn’t load plans."
+    "loadError": "Couldn’t load plans.",
+    "popular": "POPULAR"
+  },
+  "paymentHistory": {
+    "title": "Payment history",
+    "empty": "No payments yet.",
+    "refunded": "Refunded",
+    "loadMore": "Load more",
+    "error": "Couldn't load your payment history.",
+    "retry": "Retry",
+    "kind": {
+      "credit_pack": "Credits",
+      "subscription": "Subscription"
+    },
+    "reason": {
+      "renewal": "Renewal",
+      "updated": "Plan change"
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import type { CardUsageDetail } from '@reeeeecall/shared/stores/deck-store'
 import { UNLIMITED_CARD_LIMIT } from './PlanSelector'
 
@@ -25,9 +26,12 @@ export function CardUsagePanel({ detail }: { detail: CardUsageDetail }) {
   const atLimit = !unlimited && detail.available <= 0
   const nearLimit = !unlimited && !atLimit && pct >= 80
 
+  // `unlimited` is the limit >= 1e9 sentinel. Since mig 148 no PLAN is unlimited (top
+  // plan caps at 100,000), so this only fires for admin/operator accounts (effective
+  // limit 2e9, mig 139) — the strings name it as the admin override, not a plan.
   const plan = unlimited
     ? t('cardUsage.detail.planUnlimited')
-    : t('cardUsage.detail.planCards', { limit: limit.toLocaleString() })
+    : t('cardUsage.detail.planCards', { limit: formatCount(limit) })
 
   return (
     <View>
@@ -61,8 +65,8 @@ export function CardUsagePanel({ detail }: { detail: CardUsageDetail }) {
       ) : (
         <>
           <View style={styles.numberRow}>
-            <Text style={[styles.bigNumber, { color: atLimit ? c.error : c.text }]}>{used.toLocaleString()}</Text>
-            <Text style={[theme.typography.caption, { color: c.textSecondary, marginLeft: 4 }]}>/ {limit.toLocaleString()}</Text>
+            <Text style={[styles.bigNumber, { color: atLimit ? c.error : c.text }]}>{formatCount(used)}</Text>
+            <Text style={[theme.typography.caption, { color: c.textSecondary, marginLeft: 4 }]}>/ {formatCount(limit)}</Text>
             <Text style={[theme.typography.caption, { color: c.textSecondary, marginLeft: 'auto' }]}>
               {t('cardUsage.detail.percentUsed', { percent: pct })}
             </Text>
@@ -109,7 +113,7 @@ function BreakdownRow({
       <View style={[styles.dot, { backgroundColor: dot }]} />
       <Text style={[theme.typography.body, { color }]}>{label}</Text>
       {note ? <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginLeft: 6 }]}>· {note}</Text> : null}
-      <Text style={[theme.typography.body, { fontWeight: '700',color, marginLeft: 'auto' }]}>{value.toLocaleString()}</Text>
+      <Text style={[theme.typography.body, { fontWeight: '700',color, marginLeft: 'auto' }]}>{formatCount(value)}</Text>
     </View>
   )
 }

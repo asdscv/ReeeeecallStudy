@@ -147,8 +147,8 @@
     "upgrade": "อัปเกรด (เร็วๆ นี้)",
     "upgradeSoon": "การสมัครสมาชิกจะเปิดให้ใช้เร็วๆ นี้",
     "unlimited": "ไม่จำกัด",
-    "countUnlimited": "{{owned}} / ไม่จำกัด",
-    "planNoteUnlimited": "แพ็กเกจของคุณจัดเก็บการ์ดได้ไม่จำกัด",
+    "countUnlimited": "{{owned}} · ไม่จำกัด",
+    "planNoteUnlimited": "บัญชีผู้ดูแล — ไม่จำกัดจำนวนการ์ดที่จัดเก็บ",
     "detail": {
       "title": "พื้นที่จัดเก็บการ์ด",
       "subtitle": "การ์ดที่เป็นเจ้าของและที่สมัครสมาชิกนับรวมในแผนของคุณ ชุดการ์ดทางการไม่ถูกนับ",
@@ -158,15 +158,15 @@
       "officialNote": "ไม่นับรวมในขีดจำกัด",
       "archived": "เก็บถาวรแล้ว",
       "archivedNote": "ล็อกการเรียน",
-      "archivedCount": "เก็บถาวร {{count}} ใบ",
-      "remaining": "เหลือ {{count}} ใบ",
+      "archivedCount": "เก็บถาวร {{count, number}} ใบ",
+      "remaining": "เหลือ {{count, number}} ใบ",
       "percentUsed": "ใช้ไป {{percent}}%",
       "nearLimit": "ใกล้ถึงขีดจำกัด",
       "atLimit": "ถึงขีดจำกัดแล้ว",
-      "planUnlimited": "แผนไม่จำกัด",
+      "planUnlimited": "บัญชีผู้ดูแล",
       "planCards": "แผน {{limit}} ใบ",
-      "unlimitedTitle": "จัดเก็บไม่จำกัด",
-      "lifetimeTotal": "{{count}} ใบ"
+      "unlimitedTitle": "ไม่จำกัดจำนวนการ์ด",
+      "lifetimeTotal": "{{count, number}} ใบ"
     }
   },
   "groups": {
@@ -188,5 +188,8 @@
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
     "deleteFailed": "Could not delete your account. Please try again."
+  },
+  "subscription": {
+    "title": "การสมัครสมาชิก"
   }
 }

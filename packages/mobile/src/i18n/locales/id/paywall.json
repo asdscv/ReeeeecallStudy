@@ -6,9 +6,9 @@
   "done": "Selesai",
   "back": "Kembali",
   "features": {
-    "unlimitedDecks": { "title": "Deck & Kartu Tak Terbatas", "free": "5 deck, 3K kartu", "pro": "Tak terbatas" },
+    "cardStorage": { "title": "Penyimpanan Kartu", "free": "1.000 kartu", "pro": "Hingga 100.000 kartu" },
     "allModes": { "title": "Semua Mode Belajar", "free": "SRS + Berurutan", "pro": "Semua 4 mode" },
-    "aiGeneration": { "title": "AI Buat Kartu", "free": "5/bulan", "pro": "Tak terbatas" },
+    "aiGeneration": { "title": "AI Buat Kartu", "free": "10 kartu/hari", "pro": "10/hari + kredit" },
     "premiumTts": { "title": "TTS Premium", "free": "Dasar", "pro": "Edge TTS HD" },
     "analytics": { "title": "Analitik Lanjutan", "free": "Statistik dasar", "pro": "Grafik + Prediksi" },
     "marketplace": { "title": "Publikasi Marketplace", "free": "Unduh saja", "pro": "Unggah + Bagi hasil" }
@@ -27,7 +27,9 @@
   "productsUnavailable": "Produk langganan saat ini tidak tersedia. Silakan coba lagi nanti.",
   "checkout": {
     "startFailed": "Tidak dapat memulai pembayaran. Silakan coba lagi.",
-    "confirming": "Pembayaran diterima — akun Anda akan diperbarui setelah dikonfirmasi."
+    "confirming": "Pembayaran diterima — akun Anda akan diperbarui setelah dikonfirmasi.",
+    "errorTitle": "Pembelian gagal",
+    "errorGeneric": "Terjadi masalah saat pembelian. Silakan coba lagi."
   },
   "catalog": {
     "perMonth": "/bulan",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "Kebijakan Privasi",
   "termsOfService": "Ketentuan Layanan",
-  "manageSubscription": "Kelola Langganan"
+  "manageSubscription": "Kelola Langganan",
+  "legalDisclaimer": "Pembayaran akan dibebankan ke akun {{account}} Anda saat konfirmasi pembelian. Langganan Anda diperpanjang secara otomatis kecuali dibatalkan setidaknya 24 jam sebelum akhir periode saat ini. Akun Anda akan dikenai biaya perpanjangan dalam 24 jam sebelum akhir periode saat ini. Anda dapat mengelola atau membatalkan langganan di pengaturan akun pada {{store}} setelah pembelian."
 }

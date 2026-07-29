@@ -80,13 +80,13 @@
     "permissionTitle": "需要权限"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "订阅",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "免费方案",
+    "proDesc": "已解锁所有高级功能",
+    "freeDesc": "升级以获得更多卡片",
+    "upgradeToPro": "升级到 Pro",
+    "manageSubscription": "管理订阅"
   },
   "legal": {
     "title": "Legal",
@@ -167,8 +167,8 @@
     "upgrade": "升级（即将推出）",
     "upgradeSoon": "订阅即将推出。",
     "cancelPending": "订阅将取消 — 可使用至 {{date}}",
-    "countUnlimited": "{{owned}} / 无限制",
-    "planNoteUnlimited": "你的持有卡片上限为无限制。",
+    "countUnlimited": "{{owned}} · 无上限",
+    "planNoteUnlimited": "管理员账号 — 卡片存储数量不受限制。",
     "detail": {
       "title": "卡片存储",
       "subtitle": "持有和订阅的卡片计入方案上限。官方卡组不计入。",
@@ -178,15 +178,15 @@
       "officialNote": "不计入上限",
       "archived": "已归档",
       "archivedNote": "学习已锁定",
-      "archivedCount": "已归档 {{count}} 张",
-      "remaining": "剩余 {{count}} 张",
+      "archivedCount": "已归档 {{count, number}} 张",
+      "remaining": "剩余 {{count, number}} 张",
       "percentUsed": "已用 {{percent}}%",
       "nearLimit": "接近上限",
       "atLimit": "已达上限",
-      "planUnlimited": "无限方案",
+      "planUnlimited": "管理员账号",
       "planCards": "{{limit}} 张方案",
-      "unlimitedTitle": "无限存储",
-      "lifetimeTotal": "{{count}} 张"
+      "unlimitedTitle": "无卡片数量上限",
+      "lifetimeTotal": "{{count, number}} 张"
     }
   },
   "groups": {
@@ -206,6 +206,23 @@
     "current": "当前方案",
     "comingSoon": "即将推出",
     "empty": "暂无可用方案。",
-    "loadError": "无法加载方案。"
+    "loadError": "无法加载方案。",
+    "popular": "热门"
+  },
+  "paymentHistory": {
+    "title": "付款记录",
+    "empty": "暂无付款记录。",
+    "refunded": "已退款",
+    "loadMore": "加载更多",
+    "error": "无法加载付款记录。",
+    "retry": "重试",
+    "kind": {
+      "credit_pack": "点数",
+      "subscription": "订阅"
+    },
+    "reason": {
+      "renewal": "续订",
+      "updated": "更改方案"
+    }
   }
 }

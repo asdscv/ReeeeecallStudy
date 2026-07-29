@@ -31,7 +31,8 @@
     "unlimited": "無制限のカード",
     "perMonth": "/月",
     "select": "選択",
-    "current": "現在のプラン"
+    "current": "現在のプラン",
+    "popular": "人気"
   },
   "paymentHistory": {
     "title": "支払い履歴",

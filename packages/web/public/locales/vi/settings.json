@@ -147,8 +147,8 @@
     "upgrade": "Nâng cấp (sắp có)",
     "upgradeSoon": "Đăng ký sắp ra mắt.",
     "unlimited": "Không giới hạn",
-    "countUnlimited": "{{owned}} / Không giới hạn",
-    "planNoteUnlimited": "Gói của bạn cho phép lưu thẻ không giới hạn.",
+    "countUnlimited": "{{owned}} · Không giới hạn",
+    "planNoteUnlimited": "Tài khoản quản trị — không giới hạn số thẻ lưu trữ.",
     "detail": {
       "title": "Dung lượng thẻ",
       "subtitle": "Thẻ sở hữu và thẻ đã đăng ký đều tính vào gói của bạn. Bộ thẻ chính thức không tính.",
@@ -158,15 +158,15 @@
       "officialNote": "Không tính vào giới hạn",
       "archived": "Đã lưu trữ",
       "archivedNote": "Đã khóa học tập",
-      "archivedCount": "{{count}} đã lưu trữ",
-      "remaining": "Còn {{count}}",
+      "archivedCount": "{{count, number}} đã lưu trữ",
+      "remaining": "Còn {{count, number}}",
       "percentUsed": "Đã dùng {{percent}}%",
       "nearLimit": "Sắp đạt giới hạn",
       "atLimit": "Đã đạt giới hạn",
-      "planUnlimited": "Gói không giới hạn",
+      "planUnlimited": "Tài khoản quản trị",
       "planCards": "Gói {{limit}} thẻ",
-      "unlimitedTitle": "Lưu trữ không giới hạn",
-      "lifetimeTotal": "{{count}} thẻ"
+      "unlimitedTitle": "Không giới hạn số thẻ",
+      "lifetimeTotal": "{{count, number}} thẻ"
     }
   },
   "groups": {
@@ -188,5 +188,8 @@
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
     "deleteFailed": "Could not delete your account. Please try again."
+  },
+  "subscription": {
+    "title": "Đăng ký"
   }
 }

@@ -148,3 +148,21 @@ turn on paid only once the payment webhook (§2) + pack SKUs exist. The free tie
   `lib/ai/ai-client.ts`, `secure-storage/*`, `provider-registry`. Remove in a cleanup pass.
 - **L4 (cosmetic):** request-cap (23514) and insufficient-credits both surface as 429/402 with
   message-only distinction — fine; tighten copy if desired.
+
+## 5. Admin revenue-reporting caveat  (accuracy, post-launch — low)
+
+The admin billing dashboard sums **catalog USD** as "revenue" (`get_admin_billing_kpis` →
+`SUM(price_usd_cents * 10000)` / `payment_intents.amount_micro_won`, mig 145/147). That figure is
+the LIST price we advertise, **not the actual net we receive**. For a mobile IAP the real receipt is:
+
+    현지 통화 결제액  −  애플/구글 수수료(≈15–30%)  −  환율 스프레드  =  실수령 순액
+
+So a "$0.99 pack" shows as $0.99 revenue, but nets us ≈ $0.70 (or less). **Money movement is
+correct** — the user is granted exactly the catalog USD and deductions are real-usage USD; this is
+purely a *reporting* gap. Ledger/wallet math is unaffected.
+
+Fix when settlement accuracy is needed (not before launch): capture the store's reported
+proceeds (RevenueCat `price`/`currency` + `store` in the webhook, or App Store/Play payout
+reports) into a `net_proceeds_micro_usd` column on `payment_intents`, and add a "net revenue"
+KPI alongside the gross/list figure. Until then, treat the admin revenue number as **gross list
+price**, not net receipts.

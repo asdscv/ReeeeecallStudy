@@ -4,6 +4,7 @@
 // POST /tts  { text, lang, voice? }  →  audio/mpeg binary
 
 import { createClient } from '@supabase/supabase-js'
+import { opsGate } from '../_shared/ops-gate.ts'
 
 // ── Constants ────────────────────────────────────────────────
 const TRUSTED_CLIENT_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4'
@@ -198,6 +199,19 @@ Deno.serve(async (req) => {
     if (!userId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Ops gate (mig 153): maintenance / ban / burst rate limit.
+    const sbAdmin = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+    const gate = await opsGate(sbAdmin, { userId, rateKey: `tts:${userId}`, rateLimit: 120, rateWindowSec: 60 })
+    if (gate) {
+      return new Response(JSON.stringify({ error: gate.message, code: gate.code }), {
+        status: gate.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

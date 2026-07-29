@@ -320,7 +320,8 @@
       "status": "Estado",
       "paidAt": "Pagado el",
       "empty": "No se encontraron pagos.",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "loadedCount": "{{total}} cargados"
     },
     "user": {
       "title": "Buscar usuario",
@@ -352,7 +353,8 @@
     "pagination": {
       "page": "Página {{page}}",
       "prev": "Anterior",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "loadMore": "Cargar más"
     },
     "actionError": "Acción fallida: {{error}}",
     "refund": {

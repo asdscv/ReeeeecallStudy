@@ -173,6 +173,9 @@ interface AdminState {
   billingOverview: AdminBillingOverview | null
   billingSubscriptions: AdminSubscriptionRow[]
   billingPayments: AdminPaymentRow[]
+  /** The last payments page came back FULL → at least one more page exists. Derived from
+   *  the raw RPC row count, not billingPayments.length, which de-dupes on append. */
+  billingPaymentsHasMore: boolean
   billingUser: AdminUserBilling | null
   billingOverviewLoading: boolean
   billingSubsLoading: boolean
@@ -197,7 +200,9 @@ interface AdminState {
   // Billing
   fetchBillingOverview: () => Promise<void>
   fetchBillingSubscriptions: (status?: string, page?: number, pageSize?: number) => Promise<void>
-  fetchBillingPayments: (page?: number, pageSize?: number) => Promise<void>
+  /** `append` keeps the rows already loaded and adds the page after them (load-more
+   *  list) instead of replacing them (page-flip). */
+  fetchBillingPayments: (page?: number, pageSize?: number, append?: boolean) => Promise<void>
   fetchUserBilling: (userId: string) => Promise<void>
   clearUserBilling: () => void
   cancelSubscription: (provider: string, providerSubscriptionId: string, immediate: boolean) => Promise<{ error: string | null }>
@@ -267,6 +272,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   billingOverview: null,
   billingSubscriptions: [],
   billingPayments: [],
+  billingPaymentsHasMore: false,
   billingUser: null,
   billingOverviewLoading: false,
   billingSubsLoading: false,
@@ -618,7 +624,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  fetchBillingPayments: async (page = 0, pageSize = 50) => {
+  fetchBillingPayments: async (page = 0, pageSize = 50, append = false) => {
     if (get().billingPaymentsLoading) return
     set({ billingPaymentsLoading: true, billingError: null })
     try {
@@ -627,7 +633,19 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         p_offset: page * pageSize,
       })
       if (error) throw error
-      set({ billingPayments: (data as AdminPaymentRow[] | null) ?? [] })
+      const rows = (data as AdminPaymentRow[] | null) ?? []
+      const hasMore = rows.length === pageSize
+      // De-dupe on merchant_uid: offset paging over a live table can repeat a row when
+      // a new payment lands between two page fetches, and React keys must stay unique.
+      set(append
+        ? (s) => {
+            const seen = new Set(s.billingPayments.map((r) => r.merchant_uid))
+            return {
+              billingPayments: [...s.billingPayments, ...rows.filter((r) => !seen.has(r.merchant_uid))],
+              billingPaymentsHasMore: hasMore,
+            }
+          }
+        : { billingPayments: rows, billingPaymentsHasMore: hasMore })
     } catch (e) {
       set({ billingError: extractErrorMessage(e) })
     } finally {

@@ -15,6 +15,6 @@ export interface PricedProduct {
  * amount is never blank/$0.
  */
 export function formatProductPrice(p: PricedProduct): string {
-  if (p.priceUsdCents != null) return `$${(p.priceUsdCents / 100).toFixed(2)}`
+  if (p.priceUsdCents != null) return `$${(p.priceUsdCents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   return `₩${p.priceKrw.toLocaleString('ko-KR')}`
 }

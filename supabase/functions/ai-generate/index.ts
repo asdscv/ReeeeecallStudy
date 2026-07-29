@@ -23,6 +23,7 @@ import {
   type GeneratedTemplateField,
 } from '../_shared/ai-prompts.ts'
 import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
+import { opsGate } from '../_shared/ops-gate.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
 // see _shared/ai-providers.ts. Switching provider/model needs no code change.
@@ -362,6 +363,12 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get('Authorization')
     const userId = await verifyUser(authHeader)
     if (!userId) return json({ error: 'Unauthorized' }, 401, cors)
+
+    // Ops gate (mig 153): maintenance / AI kill switch / ban / burst rate limit.
+    const gate = await opsGate(sbServiceRole(), {
+      userId, requireAI: true, rateKey: `aigen:${userId}`, rateLimit: 20, rateWindowSec: 60,
+    })
+    if (gate) return json({ error: gate.message, code: gate.code }, gate.status, cors)
 
     const body = await req.json().catch(() => null) as Record<string, any> | null
     if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
