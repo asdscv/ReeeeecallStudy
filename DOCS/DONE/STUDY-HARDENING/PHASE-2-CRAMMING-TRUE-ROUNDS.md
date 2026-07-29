@@ -3,7 +3,7 @@
 작성일: 2026-07-29  
 기준선: `origin/develop@e3d6c5f`  
 브랜치: `fix/cramming-true-rounds`  
-상태: ACTIVE
+상태: COMPLETE — PR #333
 
 ## 문제
 
@@ -153,5 +153,5 @@ manager와 tests를 함께 revert한다. DB rollback은 필요 없다. 이전 �
 - [x] web/mobile typecheck 통과
 - [x] production build 통과: final build 3.65s
 - [x] targeted lint/diff check 통과
-- [ ] PR CI green
-- [ ] `DOCS/DONE/STUDY-HARDENING/PHASE-2-CRAMMING-TRUE-ROUNDS.md` 이동
+- [x] PR #333 CI green: Lint + Typecheck, Unit Tests, Integration, Architecture, Migration Safety, AI Credit Metering, Workers build
+- [x] `DOCS/DONE/STUDY-HARDENING/PHASE-2-CRAMMING-TRUE-ROUNDS.md` 이동
