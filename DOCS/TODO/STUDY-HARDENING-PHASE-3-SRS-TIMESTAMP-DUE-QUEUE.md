@@ -1,6 +1,6 @@
 # Study Hardening Phase 3 — Timestamp-based SRS Learning Queue
 
-상태: DESIGN — implementation pending
+상태: IMPLEMENTED — local verified, PR/CI pending
 
 ## 1. 목적
 
@@ -65,7 +65,7 @@ interface SrsQueueSnapshot {
 ```
 
 - constructor는 optional `clock: () => number`를 받고 기본값은 `Date.now`다.
-- `rateCard(result: SrsResult)`는 현재 ready card를 1회 소비하고, learning 결과만 갱신된 SRS state와 함께 delayed queue에 schedule한다.
+- `rateCard(rating: SrsRating | string, result?: SrsResult)`는 현재 ready card를 1회 소비하고, 전달된 결과가 learning일 때만 갱신된 SRS state와 함께 delayed queue에 schedule한다. `rating` 자체는 재출제 여부를 결정하지 않으며, result가 없는 기존 non-scheduling 호출은 단순 advance한다.
 - delayed queue는 `(dueAt ASC, sequence ASC)`로 정렬해 동일 timestamp에서도 결정적 순서를 보장한다.
 - `promoteDueCards()`는 due 항목을 cursor 위치에 삽입하여 남아 있는 review/new보다 먼저 표시한다.
 - `remaining()`은 현재 시각에 ready인 카드만 센다. 미래 delayed 카드는 세션이 기다릴 의무가 없으므로 진행률 denominator에 포함하지 않는다.
@@ -133,3 +133,23 @@ queue manager, 두 store 연결부, phase 테스트를 revert한다. schema/data
 - web/mobile typecheck, targeted lint, diff check, production build Green
 - PR CI 7개 Green 후 `develop` merge
 - phase 문서를 `DOCS/DONE/STUDY-HARDENING/PHASE-3-SRS-TIMESTAMP-DUE-QUEUE.md`로 이동하고 master P3 checkbox 갱신
+
+## 11. 구현 및 로컬 검증 증거
+
+상태: IMPLEMENTED — local verified, PR/CI pending
+
+- 설계 commit: `ac6021c docs(study): design phase 3 timestamp queue`
+- Red: 신규 timestamp manager 9 tests 중 6 failures / 3 passes로 기존 fixed-gap 결함 재현
+- Green: timestamp manager 9/9, 기존 queue 포함 26/26
+- store integration: one-card Good가 정확히 `2026-01-01T00:10:00.000Z`를 queue와 `cards.update`에 동일 저장하고 현재 session은 완료
+- 분할 study regression: 17 files / 230 tests passed
+  - SRS/queue/store core: 5 files / 87 tests
+  - access/validation/pagination/progress: 4 files / 37 tests
+  - sequential helpers/stores: 4 files / 62 tests
+  - phase0/guardrails/cramming: 4 files / 44 tests
+- web TypeScript: `tsc -b --noEmit` passed
+- mobile TypeScript: `tsc --noEmit` passed
+- targeted ESLint passed
+- shared/web `study-queue.ts` byte-identical (`cmp`) and `git diff --check` passed
+- web production build passed in 3.38s
+- independent review: APPROVED; due boundary, promotion order, future-only completion, snapshot, stats, store result 전달에 blocker/high/medium 없음
