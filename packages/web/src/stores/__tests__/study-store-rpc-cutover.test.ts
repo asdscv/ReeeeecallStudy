@@ -497,6 +497,62 @@ describe('study-store atomic persistence cutover', () => {
     expect(order).toEqual(['apply', 'undo'])
   })
 
+  it('passes cramming analytics to finalize instead of updating the session row', async () => {
+    const crammingManager = {
+      currentRound: () => 2,
+      masteryPercentage: () => 100,
+      isAllMastered: () => true,
+      getHardestCards: () => [{ cardId: 'card-1', missedCount: 1 }],
+    }
+
+    useStudyStore.setState({
+      phase: 'studying',
+      config: { deckId: 'deck-1', mode: 'cramming', batchSize: 1 },
+      queue: [makeCard()],
+      currentIndex: 1,
+      userId: 'user-1',
+      sessionStats: { totalCards: 1, cardsStudied: 2, ratings: { got_it: 2 }, totalDurationMs: 500 },
+      sessionStartedAt: new Date('2026-01-01T00:00:00.000Z').getTime(),
+      clientSessionId: 'session-uuid-12',
+      sessionSaved: false,
+      // Only the analytics accessors endSession uses are needed here.
+      crammingManager: crammingManager as unknown as never,
+    })
+
+    await useStudyStore.getState().endSession()
+
+    const finalize = rpcCalls('finalize_study_session')
+    expect(finalize).toHaveLength(1)
+    expect(finalize[0].p_metadata).toEqual({
+      cramming: {
+        rounds: 2,
+        mastery_percentage: 100,
+        all_mastered: true,
+        hardest_cards: [{ card_id: 'card-1', missed_count: 1 }],
+      },
+    })
+    // study_sessions is server-written only after migration 161.
+    expect(mockSupabase.writes.filter(w => w.table === 'study_sessions')).toHaveLength(0)
+  })
+
+  it('sends a null metadata payload for non-cramming sessions', async () => {
+    useStudyStore.setState({
+      phase: 'studying',
+      config: { deckId: 'deck-1', mode: 'random', batchSize: 1 },
+      queue: [makeCard()],
+      currentIndex: 1,
+      userId: 'user-1',
+      sessionStats: { totalCards: 1, cardsStudied: 1, ratings: { next: 1 }, totalDurationMs: 100 },
+      sessionStartedAt: new Date('2026-01-01T00:00:00.000Z').getTime(),
+      clientSessionId: 'session-uuid-13',
+      sessionSaved: false,
+    })
+
+    await useStudyStore.getState().endSession()
+
+    expect(rpcCalls('finalize_study_session')[0].p_metadata).toBeNull()
+  })
+
   it('generates a client session id when a session starts', async () => {
     expect(useStudyStore.getState().clientSessionId).toBeNull()
     await useStudyStore.getState().initSession({ deckId: 'deck-1', mode: 'srs', batchSize: 1 })

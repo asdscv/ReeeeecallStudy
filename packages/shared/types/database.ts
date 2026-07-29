@@ -384,11 +384,16 @@ export interface Database {
           p_started_at: string
           p_cursor_before?: Json | null
           p_cursor_after?: Json | null
+          p_metadata?: Json | null
         }
         Returns: Json
       }
       undo_study_rating: {
         Args: { p_event_id: string }
+        Returns: Json
+      }
+      reset_card_srs: {
+        Args: { p_card_id: string }
         Returns: Json
       }
     }

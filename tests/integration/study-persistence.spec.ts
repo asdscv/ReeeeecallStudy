@@ -540,7 +540,9 @@ describe('study persistence RPCs — atomicity, idempotency, security', () => {
       p_new_srs: null,
       p_review_duration_ms: 10,
     })).error).toBeNull()
-    expect((await owner.client.from('deck_study_state').update({ sequential_pos: 7 }).eq('id', seed.stateId)).error)
+    // Migration 161 revoked client cursor UPDATE, so the concurrent advance is
+    // simulated through the server role — the invariant under test is unchanged.
+    expect((await admin.from('deck_study_state').update({ sequential_pos: 7 }).eq('id', seed.stateId)).error)
       .toBeNull()
 
     const finalize = await owner.client.rpc('finalize_study_session', {
@@ -564,10 +566,12 @@ describe('study persistence RPCs — atomicity, idempotency, security', () => {
     const owner = await createUser('trigger')
     const seed = await seedOwnedDeck(owner)
 
+    // Clients can no longer write SRS columns (migration 161); the compatibility
+    // trigger still has to guard server-role and edge-function writes.
     expect((await owner.client.from('cards').update({ tags: ['unchanged-srs'] }).eq('id', seed.cardId)).error).toBeNull()
     expect((await admin.from('cards').select('srs_revision').eq('id', seed.cardId).single()).data)
       .toEqual({ srs_revision: 0 })
-    expect((await owner.client.from('cards').update({ repetitions: 1 }).eq('id', seed.cardId)).error).toBeNull()
+    expect((await admin.from('cards').update({ repetitions: 1 }).eq('id', seed.cardId)).error).toBeNull()
     expect((await admin.from('cards').select('srs_revision').eq('id', seed.cardId).single()).data)
       .toEqual({ srs_revision: 1 })
   })
