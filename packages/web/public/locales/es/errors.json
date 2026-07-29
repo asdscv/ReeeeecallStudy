@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "Límite de solicitudes alcanzado.",
     "cannotDeleteDefault": "La plantilla predeterminada no se puede eliminar.",
-    "inUseByDecks": "No se puede eliminar — {{count}} mazo(s) usan esta plantilla."
+    "inUseByDecks": "No se puede eliminar — {{count, number}} mazo(s) usan esta plantilla."
   },
   "marketplace": {
     "listingNotFound": "Publicación no encontrada.",

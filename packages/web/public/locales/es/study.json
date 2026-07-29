@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "Estudio rápido",
     "noDecks": "Sin mazos. Por favor crea un mazo primero.",
-    "cardCount": "{{count}} tarjetas",
-    "newCards": "Nuevas {{count}}",
-    "reviewCards": "Repaso {{count}}",
+    "cardCount": "{{count, number}} tarjetas",
+    "newCards": "Nuevas {{count, number}}",
+    "reviewCards": "Repaso {{count, number}}",
     "selectDate": "Selecciona una fecha para estudiar",
     "setBatchSize": "Establecer tamaño del lote",
     "selectMode": "Selecciona un modo de estudio",
     "startStudy": "Comenzar estudio",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count}} tarjetas",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count, number}} tarjetas",
     "batchSize": "Tamaño del lote",
     "batchSizeDesc": "Tarjetas a estudiar por sesión ({{min}}~{{max}})",
     "batchSizeDescReview": "Tarjetas de repaso por sesión — todas las nuevas incluidas ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "Configuración de estudio",
-    "deckInfo": "{{icon}} {{name}} · {{count}} tarjetas",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}} tarjetas",
     "studyMode": "Modo de estudio",
     "selectUploadDate": "Seleccionar fecha de subida",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count}} tarjetas"
+    "uploadDate": "{{year}}/{{month}}/{{day}} Subida: {{count, number}} tarjetas"
   },
   "session": {
     "loading": "Cargando...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10min",
-    "minutes": "{{count}}min",
-    "hours": "{{count}}h",
+    "minutes": "{{count, number}}min",
+    "hours": "{{count, number}}h",
     "oneDay": "1d",
-    "days": "{{count}}d",
-    "months": "{{count}}m",
-    "years": "{{count}}a"
+    "days": "{{count, number}}d",
+    "months": "{{count, number}}m",
+    "years": "{{count, number}}a"
   },
   "srsRating": {
     "again": "Otra vez",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "Límite de tiempo",
       "none": "Sin límite",
-      "minutes": "{{count}} min"
+      "minutes": "{{count, number}} min"
     },
     "shuffle": {
       "title": "Mezclar tarjetas",
@@ -175,7 +175,7 @@
       "masteryRate": "Tasa de dominio",
       "cardsStudied": "Tarjetas estudiadas",
       "hardestCards": "Tarjetas más difíciles",
-      "missedTimes": "fallada {{count}}x",
+      "missedTimes": "fallada {{count, number}}x",
       "noSrsImpact": "Esta sesión no afectó tu horario SRS.",
       "sessionEnded": "Sesión finalizada",
       "crammingAgain": "Estudiar intensivo de nuevo",
@@ -218,9 +218,9 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards",
+    "cards": "{{count, number}} cards",
     "selectHint": "Select decks to study together",
     "decksUnit": " decks",
     "cardsUnit": " cards",

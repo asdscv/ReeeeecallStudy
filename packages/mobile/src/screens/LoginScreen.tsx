@@ -117,7 +117,10 @@ export function LoginScreen() {
                 testID="login-error-text"
                 style={[theme.typography.bodySmall, { color: theme.colors.error }]}
               >
-                {error}
+                {/* useAuth returns an i18n KEY from localizeAuthError ("errors:auth.…")
+                    for known Supabase failures and the raw message otherwise — so
+                    translate, falling back to the message. Matches the web pattern. */}
+                {t(error, { defaultValue: error })}
               </Text>
             ) : null}
 

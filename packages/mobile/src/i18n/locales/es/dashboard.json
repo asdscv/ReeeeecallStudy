@@ -55,7 +55,7 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count, number}}days",
+  "streakDays": "{{count, number}} días",
   "quickStudy": {
     "title": "Estudio rápido",
     "dueToday": "{{count, number}} tarjetas para hoy",

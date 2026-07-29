@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "Batas permintaan tercapai.",
     "cannotDeleteDefault": "Templat bawaan tidak dapat dihapus.",
-    "inUseByDecks": "Tidak dapat menghapus — {{count}} dek menggunakan templat ini."
+    "inUseByDecks": "Tidak dapat menghapus — {{count, number}} dek menggunakan templat ini."
   },
   "marketplace": {
     "listingNotFound": "Daftar tidak ditemukan.",

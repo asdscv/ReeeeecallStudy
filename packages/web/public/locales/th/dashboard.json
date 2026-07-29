@@ -8,7 +8,7 @@
   },
   "dailyChart": {
     "title": "ปริมาณการเรียนรายวัน",
-    "total": "ทั้งหมด {{count}} ครั้ง",
+    "total": "ทั้งหมด {{count, number}} ครั้ง",
     "noData": "ยังไม่มีบันทึกการเรียน",
     "tooltipTimes": "{{value}} ครั้ง",
     "tooltipLabel": "เรียน"
@@ -23,19 +23,19 @@
     "title": "สถานะสำรับ",
     "noDecks": "ยังไม่มีสำรับ สร้างสำรับใหม่เลย!",
     "goToDecks": "ไปยังการจัดการสำรับ",
-    "cardCount": "{{count}} การ์ด",
-    "newCards": "ใหม่ {{count}}",
-    "reviewCards": "ทบทวน {{count}}",
+    "cardCount": "{{count, number}} การ์ด",
+    "newCards": "ใหม่ {{count, number}}",
+    "reviewCards": "ทบทวน {{count, number}}",
     "study": "เรียน"
   },
   "quickStudy": {
-    "dueCount": "{{count}} การ์ดที่ต้องทบทวนวันนี้",
+    "dueCount": "{{count, number}} การ์ดที่ต้องทบทวนวันนี้",
     "startSession": "เริ่มเรียน"
   },
   "heatmap": {
     "title": "ฮีทแมปการเรียน",
     "noStudy": "ไม่มีการเรียน",
-    "studyCount": "{{date}}: {{count}} ครั้ง",
-    "tooltip": "{{date}}: {{count}} ครั้ง"
+    "studyCount": "{{date}}: {{count, number}} ครั้ง",
+    "tooltip": "{{date}}: {{count, number}} ครั้ง"
   }
 }

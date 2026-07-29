@@ -16,25 +16,25 @@
   "noMatch": "No records matching filter.",
   "deletedDeck": "Deleted Deck",
   "deckProgress": {
-    "total": "{{count}} cards",
-    "notStudied": "Not Studied {{count}}",
-    "learning": "Learning {{count}}",
-    "review": "Review {{count}}"
+    "total": "{{count, number}} cards",
+    "notStudied": "Not Studied {{count, number}}",
+    "learning": "Learning {{count, number}}",
+    "review": "Review {{count, number}}"
   },
   "session": {
-    "intervalDays": "{{count}}d",
-    "reviewCount": "{{count}} reviews",
-    "cardCount": "{{count}} cards",
-    "logCount": "{{count}} logs",
+    "intervalDays": "{{count, number}}d",
+    "reviewCount": "{{count, number}} reviews",
+    "cardCount": "{{count, number}} cards",
+    "logCount": "{{count, number}} logs",
     "intervalChange": "{{prev}}d → {{next}}d",
     "paginationInfo": "{{start}}-{{end}} of {{total}}"
   },
   "sessionCard": {
-    "cardsStudied": "{{count}} cards studied"
+    "cardsStudied": "{{count, number}} cards studied"
   },
   "sessionDetail": {
     "backToHistory": "Study History",
-    "cardsStudied": "{{count}} cards studied",
+    "cardsStudied": "{{count, number}} cards studied",
     "performance": "Performance {{value}}%",
     "loadingDetails": "Loading details...",
     "noDetails": "No details.",
@@ -57,31 +57,31 @@
   },
   "overview": {
     "sessions": "Sessions",
-    "sessionsValue": "{{count}} sessions",
+    "sessionsValue": "{{count, number}} sessions",
     "studyCards": "Study Cards",
-    "cardsValue": "{{count}} cards",
+    "cardsValue": "{{count, number}} cards",
     "totalTime": "Total Study Time",
     "avgPerformance": "Avg Performance",
     "streak": "Study Streak",
-    "streakValue": "{{count}} days"
+    "streakValue": "{{count, number}} days"
   },
   "chart": {
-    "countPercent": "{{count}} ({{percent}}%)"
+    "countPercent": "{{count, number}} ({{percent}}%)"
   },
   "charts": {
     "studyVolume": "Study Volume",
     "volumeSummary": "{{sessions}} sessions / {{cards}} cards",
     "noDataForPeriod": "No study records for this period",
     "sessionDuration": "Avg Session Duration",
-    "sessionCount": "{{count}} sessions",
+    "sessionCount": "{{count, number}} sessions",
     "avgDuration": "Avg Duration",
     "ratingDistribution": "Rating Distribution",
-    "ratingTotal": "Total {{count}}",
+    "ratingTotal": "Total {{count, number}}",
     "noRatingData": "No rating data",
     "modeBreakdown": "Mode Breakdown",
     "noModeData": "No mode data",
-    "sessionCountLabel": "{{count}} sessions",
-    "cardCountLabel": "{{count}} cards",
+    "sessionCountLabel": "{{count, number}} sessions",
+    "cardCountLabel": "{{count, number}} cards",
     "performance": "Performance"
   },
   "ratingGroups": {

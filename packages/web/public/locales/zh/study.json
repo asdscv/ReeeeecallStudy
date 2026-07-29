@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "快速学习",
     "noDecks": "暂无牌组，请先创建一个牌组。",
-    "cardCount": "{{count}} 张卡片",
-    "newCards": "新卡 {{count}}",
-    "reviewCards": "复习 {{count}}",
+    "cardCount": "{{count, number}} 张卡片",
+    "newCards": "新卡 {{count, number}}",
+    "reviewCards": "复习 {{count, number}}",
     "selectDate": "选择学习日期",
     "setBatchSize": "设置批次大小",
     "selectMode": "选择学习模式",
     "startStudy": "开始学习",
-    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片",
+    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count, number}} 张卡片",
     "batchSize": "批次大小",
     "batchSizeDesc": "每次学习的卡片数量 ({{min}}~{{max}})",
     "batchSizeDescReview": "每次复习的卡片数量 — 所有新卡自动包含 ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "学习设置",
-    "deckInfo": "{{icon}} {{name}} · {{count}} 张卡片",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}} 张卡片",
     "studyMode": "学习模式",
     "selectUploadDate": "选择上传日期",
-    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count}} 张卡片"
+    "uploadDate": "{{year}}/{{month}}/{{day}} 上传：{{count, number}} 张卡片"
   },
   "session": {
     "loading": "加载中...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10分钟",
-    "minutes": "{{count}}分钟",
-    "hours": "{{count}}小时",
+    "minutes": "{{count, number}}分钟",
+    "hours": "{{count, number}}小时",
     "oneDay": "1天",
-    "days": "{{count}}天",
-    "months": "{{count}}月",
-    "years": "{{count}}年"
+    "days": "{{count, number}}天",
+    "months": "{{count, number}}月",
+    "years": "{{count, number}}年"
   },
   "srsRating": {
     "again": "重来",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "时间限制",
       "none": "无限制",
-      "minutes": "{{count}} 分钟"
+      "minutes": "{{count, number}} 分钟"
     },
     "shuffle": {
       "title": "打乱卡片",
@@ -175,7 +175,7 @@
       "masteryRate": "掌握率",
       "cardsStudied": "学习卡片数",
       "hardestCards": "最难的卡片",
-      "missedTimes": "错误 {{count}} 次",
+      "missedTimes": "错误 {{count, number}} 次",
       "noSrsImpact": "此次学习不影响 SRS 复习计划。",
       "sessionEnded": "学习结束",
       "crammingAgain": "再次突击",
@@ -218,9 +218,9 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards",
+    "cards": "{{count, number}} cards",
     "selectHint": "Select decks to study together",
     "decksUnit": " decks",
     "cardsUnit": " cards",

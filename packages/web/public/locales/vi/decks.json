@@ -7,9 +7,9 @@
   "deleteConfirm": "Bộ thẻ \"{{name}}\" và tất cả thẻ sẽ bị xóa. Không thể hoàn tác.",
   "detail": {
     "backToList": "← Danh sách bộ thẻ",
-    "totalCards": "Tổng {{count}} thẻ",
-    "newCards": "Mới {{count}}",
-    "reviewCards": "Ôn tập {{count}}",
+    "totalCards": "Tổng {{count, number}} thẻ",
+    "newCards": "Mới {{count, number}}",
+    "reviewCards": "Ôn tập {{count, number}}",
     "startStudy": "Bắt đầu học",
     "edit": "Sửa",
     "share": "Chia sẻ",
@@ -24,7 +24,7 @@
     },
     "searchPlaceholder": "Tìm kiếm thẻ...",
     "allStatus": "Tất cả trạng thái",
-    "selectedCount": "Đã chọn {{count}}",
+    "selectedCount": "Đã chọn {{count, number}}",
     "noCards": "Không có thẻ. Hãy thử thêm thẻ.",
     "addFirstCard": "+ Thêm thẻ đầu tiên",
     "importCards": "Nhập CSV/JSON",
@@ -35,11 +35,11 @@
       "status": "Trạng thái",
       "addedDate": "Đã thêm"
     },
-    "perPage": "{{count}} mỗi trang",
+    "perPage": "{{count, number}} mỗi trang",
     "deleteCard": "Xóa thẻ",
     "deleteCardConfirm": "Xóa thẻ này? Không thể hoàn tác.",
     "bulkDelete": "Xóa hàng loạt thẻ",
-    "bulkDeleteConfirm": "Xóa {{count}} thẻ đã chọn? Không thể hoàn tác.",
+    "bulkDeleteConfirm": "Xóa {{count, number}} thẻ đã chọn? Không thể hoàn tác.",
     "noStudyRecords": "Không có hồ sơ học tập",
     "aiCards": "AI Cards",
     "versionHistory": "Lịch sử phiên bản",
@@ -52,7 +52,7 @@
     "versionCards": "thẻ",
     "archived": {
       "badge": "Đã lưu trữ · khóa học tập",
-      "note": "{{count}} thẻ bị lưu trữ do vượt giới hạn — bạn vẫn có thể xem. Đăng ký để học lại."
+      "note": "{{count, number}} thẻ bị lưu trữ do vượt giới hạn — bạn vẫn có thể xem. Đăng ký để học lại."
     }
   },
   "settings": {
@@ -82,12 +82,12 @@
     "totalCards": "Tổng số thẻ",
     "masteryRate": "Tỷ lệ thành thạo",
     "streak": "Chuỗi học tập",
-    "streakValue": "{{count}} ngày",
+    "streakValue": "{{count, number}} ngày",
     "avgInterval": "Khoảng cách TB",
-    "intervalValue": "{{count}} ngày",
+    "intervalValue": "{{count, number}} ngày",
     "statusDistribution": "Phân bố trạng thái",
     "noCards": "Không có thẻ",
-    "cardsValue": "{{count}} thẻ",
+    "cardsValue": "{{count, number}} thẻ",
     "nameRequired": "Vui lòng nhập tên bộ thẻ.",
     "saved": "Đã lưu bộ thẻ."
   },
@@ -115,26 +115,26 @@
     "masteryRate": "Tỷ lệ thành thạo",
     "avgEase": "Hệ số dễ TB",
     "avgInterval": "Khoảng cách TB",
-    "days": "{{count}} ngày",
+    "days": "{{count, number}} ngày",
     "statusDistribution": "Phân bố trạng thái",
     "noCards": "Không có thẻ",
-    "cardCount": "{{count}} thẻ",
+    "cardCount": "{{count, number}} thẻ",
     "dailyStudy": "Lượng học hàng ngày (30 ngày)",
     "dailyVolume": "Lượng học hàng ngày (30 ngày)",
     "loading": "Đang tải...",
     "noStudyRecords": "Không có hồ sơ học tập",
-    "studyCount": "{{count}} lượt ôn tập",
+    "studyCount": "{{count, number}} lượt ôn tập",
     "study": "Học tập"
   },
   "uploadDate": {
     "noCards": "Không có thẻ.",
-    "cardCount": "{{count}} thẻ"
+    "cardCount": "{{count, number}} thẻ"
   },
   "card": {
     "noStudyRecord": "Không có hồ sơ học tập",
-    "totalCards": "{{count}} thẻ",
-    "newCards": "Mới {{count}}",
-    "review": "Ôn tập {{count}}",
+    "totalCards": "{{count, number}} thẻ",
+    "newCards": "Mới {{count, number}}",
+    "review": "Ôn tập {{count, number}}",
     "edit": "Sửa",
     "delete": "Xóa",
     "startStudy": "Học",
@@ -156,7 +156,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",

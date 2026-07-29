@@ -52,7 +52,7 @@
   },
   "units": {
     "cards": "장",
-    "cardsSuffix": "{{count}}장",
+    "cardsSuffix": "{{count, number}}장",
     "sessions": "세션",
     "items": "개",
     "days": "일",
@@ -61,11 +61,11 @@
     "seconds": "초",
     "times": "회",
     "percent": "{{value}}%",
-    "decksCount": "{{count}}개"
+    "decksCount": "{{count, number}}개"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}}개씩"
+    "perPage": "{{count, number}}개씩"
   },
   "timePeriod": {
     "1d": "1일",
@@ -120,7 +120,7 @@
     "cardTemplate": {
       "title": "카드 템플릿",
       "description": "이미 준비된 템플릿이 있어요. 카드에 사용할 템플릿을 선택하세요.",
-      "fields": "필드 {{count}}개",
+      "fields": "필드 {{count, number}}개",
       "useTemplate": "이 템플릿 사용"
     },
     "addCards": {
@@ -248,7 +248,7 @@
   },
   "streakFreeze": {
     "title": "연속 학습 보호",
-    "available": "{{count}}개 보유",
+    "available": "{{count, number}}개 보유",
     "used": "오늘 연속 학습이 보호되었습니다!",
     "earned": "연속 학습 보호권을 획득했습니다!"
   },

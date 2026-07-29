@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "クイック学習",
     "noDecks": "デッキがありません。まずデッキを作成してください。",
-    "cardCount": "{{count}}枚",
-    "newCards": "新規 {{count}}",
-    "reviewCards": "復習 {{count}}",
+    "cardCount": "{{count, number}}枚",
+    "newCards": "新規 {{count, number}}",
+    "reviewCards": "復習 {{count, number}}",
     "selectDate": "学習する日付を選択",
     "setBatchSize": "バッチサイズを設定",
     "selectMode": "学習モードを選択",
     "startStudy": "学習開始",
-    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚",
+    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count, number}}枚",
     "batchSize": "バッチサイズ",
     "batchSizeDesc": "1セッションあたりの学習カード数（{{min}}〜{{max}}）",
     "batchSizeDescReview": "1セッションあたりの復習カード数 — 新規カードはすべて含まれます（{{min}}〜{{max}}）",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "学習設定",
-    "deckInfo": "{{icon}} {{name}} · {{count}}枚",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}}枚",
     "studyMode": "学習モード",
     "selectUploadDate": "アップロード日を選択",
-    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count}}枚"
+    "uploadDate": "{{year}}/{{month}}/{{day}} アップロード：{{count, number}}枚"
   },
   "session": {
     "loading": "読み込み中...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10分",
-    "minutes": "{{count}}分",
-    "hours": "{{count}}時間",
+    "minutes": "{{count, number}}分",
+    "hours": "{{count, number}}時間",
     "oneDay": "1日",
-    "days": "{{count}}日",
-    "months": "{{count}}ヶ月",
-    "years": "{{count}}年"
+    "days": "{{count, number}}日",
+    "months": "{{count, number}}ヶ月",
+    "years": "{{count, number}}年"
   },
   "srsRating": {
     "again": "もう一度",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "制限時間",
       "none": "制限なし",
-      "minutes": "{{count}}分"
+      "minutes": "{{count, number}}分"
     },
     "shuffle": {
       "title": "カードをシャッフル",
@@ -175,7 +175,7 @@
       "masteryRate": "マスター率",
       "cardsStudied": "学習カード数",
       "hardestCards": "最も難しいカード",
-      "missedTimes": "{{count}}回間違い",
+      "missedTimes": "{{count, number}}回間違い",
       "noSrsImpact": "このセッションはSRSスケジュールに影響しません。",
       "sessionEnded": "セッション終了",
       "crammingAgain": "もう一度詰め込み",
@@ -218,9 +218,9 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards",
+    "cards": "{{count, number}} cards",
     "selectHint": "Select decks to study together",
     "decksUnit": " decks",
     "cardsUnit": " cards",

@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "Request limit reached.",
     "cannotDeleteDefault": "Default template cannot be deleted.",
-    "inUseByDecks": "Cannot delete — {{count}} deck(s) use this template."
+    "inUseByDecks": "Cannot delete — {{count, number}} deck(s) use this template."
   },
   "marketplace": {
     "listingNotFound": "Listing not found.",

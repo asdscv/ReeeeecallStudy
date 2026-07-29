@@ -55,7 +55,7 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count, number}}days",
+  "streakDays": "{{count, number}}天",
   "quickStudy": {
     "title": "快速学习",
     "dueToday": "今天有 {{count, number}} 张待复习",
