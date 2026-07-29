@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "อนุญาตให้การซื้อในแซนด์บ็อกซ์ให้เครดิต",
+      "sandboxGrantsHint": "ปิด: อีเวนต์แซนด์บ็อกซ์ของ RevenueCat จะถูกรับไว้แต่ไม่ให้อะไรเลย เปิดเฉพาะตอนทดสอบ — การซื้อในแซนด์บ็อกซ์ไม่มีค่าใช้จ่าย"
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "คืนเงินผ่าน Lemon Squeezy API ได้",
         "web_toss": "ยกเลิกการชำระเงินผ่าน Toss API ได้",
         "admin": "เป็นการมอบให้ฟรี ไม่เคยมีการเรียกเก็บเงิน"
-      }
+      },
+      "sandbox": "แซนด์บ็อกซ์",
+      "sandboxHint": "การซื้อทดสอบจากแซนด์บ็อกซ์ของสโตร์ — ฟรี และไม่ถูกนับเป็นรายได้"
     }
   },
   "official": {

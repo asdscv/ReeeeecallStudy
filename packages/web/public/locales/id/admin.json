@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "Izinkan pembelian sandbox memberi kredit",
+      "sandboxGrantsHint": "OFF: event sandbox RevenueCat diterima tapi tidak memberi apa pun. Nyalakan hanya saat menguji — pembelian sandbox itu gratis."
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "Bisa direfund lewat API Lemon Squeezy.",
         "web_toss": "Bisa dibatalkan lewat API Toss.",
         "admin": "Pemberian gratis — tidak pernah ada uang yang ditagih."
-      }
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Pembelian uji coba dari sandbox toko — gratis, dan tidak pernah dihitung sebagai pendapatan."
     }
   },
   "official": {

@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "Sandbox purchases can grant credits",
+      "sandboxGrantsHint": "OFF: RevenueCat sandbox events are acked but grant nothing. Turn ON only for a test run — sandbox purchases are free."
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "Refundable through the Lemon Squeezy API.",
         "web_toss": "Cancellable through the Toss API.",
         "admin": "Comp grant — no money was ever charged."
-      }
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Test purchase from the store sandbox — free, and never counted as revenue."
     }
   },
   "official": {

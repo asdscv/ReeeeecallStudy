@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "允许沙盒购买发放点数",
+      "sandboxGrantsHint": "关闭：RevenueCat 沙盒事件仅被接收，不发放任何内容。仅在测试时开启 — 沙盒购买是免费的。"
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "可通过 Lemon Squeezy API 退款。",
         "web_toss": "可通过 Toss API 取消付款。",
         "admin": "赠予记录，从未实际扣款。"
-      }
+      },
+      "sandbox": "沙盒",
+      "sandboxHint": "来自商店沙盒的测试购买 — 免费，且绝不计入收入。"
     }
   },
   "official": {
