@@ -338,8 +338,23 @@ Deno.serve(async (req) => {
       // Refund-before-grant guard (mig 134): if a REFUND already arrived and tombstoned this
       // ref, do NOT grant — the purchase was refunded before we processed the grant. Keeps
       // money conserved regardless of RevenueCat's delivery order.
-      const { data: tomb } = await sb
-        .from('ai_credit_ledger').select('id').eq('ref', 'refund:' + creditRef).limit(1).maybeSingle()
+      //
+      // Goes through credit_grant_is_refunded (mig 158), NOT a direct table read:
+      // ai_credit_ledger is RPC-only (mig 109 — RLS on, no table grants), so the
+      // previous `.from('ai_credit_ledger')` query answered 42501 permission denied
+      // on EVERY call. Its error was discarded, so the guard silently never fired and
+      // late grants credited refunded purchases.
+      //
+      // And FAIL CLOSED if the check itself errors: 500 makes RevenueCat retry, which
+      // is safe (the grant is idempotent on creditRef). Granting on a failed refund
+      // check is how the money leaked in the first place.
+      const { data: tomb, error: tombErr } = await sb.rpc('credit_grant_is_refunded', {
+        p_ref: creditRef,
+      })
+      if (tombErr) {
+        console.error('[revenuecat-webhook] credit_grant_is_refunded failed — refusing to grant:', tombErr.message)
+        return json({ error: 'Refund check failed', code: 'GRANT_ERROR' }, 500)
+      }
       if (tomb) {
         console.warn('[revenuecat-webhook]', type, 'credit_pack already refunded before grant — skipping:', creditRef)
         return json({ received: true, type, kind: 'credit_pack', ignored: 'already_refunded' }, 200)
