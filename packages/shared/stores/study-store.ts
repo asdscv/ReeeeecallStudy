@@ -655,8 +655,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
 
       if (srsQueueManager) {
-        const shouldRequeue = srsResult?.srs_status === 'learning'
-        srsQueueManager.rateCard(rating as SrsRating, shouldRequeue)
+        srsQueueManager.rateCard(rating as SrsRating, srsResult)
       }
     }
 
