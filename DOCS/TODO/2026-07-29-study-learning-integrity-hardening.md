@@ -335,7 +335,7 @@ Master 문서의 모든 checkbox와 PR/commit/test evidence를 채운 뒤
 ## 15. 진행 체크리스트
 
 - [x] P0 master design 작성
-- [ ] P1 guardrails
+- [x] P1 guardrails — PR #332, local 265 study tests + 86 final core tests, 7 CI checks green
 - [ ] P2 cramming true rounds
 - [ ] P3 SRS due queue
 - [ ] P4 sequential safety

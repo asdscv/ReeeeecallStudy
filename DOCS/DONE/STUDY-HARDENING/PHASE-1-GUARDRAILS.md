@@ -3,7 +3,7 @@
 작성일: 2026-07-29  
 기준선: `origin/develop@c4a593f`  
 브랜치: `fix/study-guardrails`  
-상태: ACTIVE
+상태: COMPLETE — PR #332
 
 ## 목표
 
@@ -73,7 +73,7 @@
 - [x] web/mobile typecheck 통과
 - [x] production build 통과: Vite 3,238 modules, 최종 build 4.39s
 - [x] targeted lint/diff check 통과
-- [ ] PR CI green
-- [ ] `DOCS/DONE/STUDY-HARDENING/PHASE-1-GUARDRAILS.md` 이동
+- [x] PR #332 CI green: Lint + Typecheck, Unit Tests, Integration, Architecture, Migration Safety, AI Credit Metering, Workers build
+- [x] `DOCS/DONE/STUDY-HARDENING/PHASE-1-GUARDRAILS.md` 이동
 
 참고: 로컬 전체 웹 Vitest는 기존 비학습 부채로 2,041 tests가 통과하고 96 tests가 실패했다. 실패는 Supabase mock 초기화, Node `localStorage`, guide/layout/i18n 등 P1 비변경 파일에 한정되며, P1 학습 회귀 suite는 전부 통과했다.
