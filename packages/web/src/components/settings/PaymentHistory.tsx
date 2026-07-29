@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
+import { formatCount, formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { supabase } from '../../lib/supabase'
 import { toIntlLocale } from '../../lib/locale-utils'
 
@@ -37,7 +38,9 @@ interface RawHistoryRow {
 // subscription purchase, AND recurring subscription RENEWALS, merged chronologically
 // by get_my_payment_history (mig 131): payment_intents (initial, both kinds) ∪
 // billing_invoices (billing_reason <> 'initial'). Keyset pagination on created_at
-// (pass the oldest row's timestamp as the cursor), infinite scroll.
+// (pass the oldest row's timestamp as the cursor), infinite scroll inside a BOUNDED
+// pane (same rationale as CreditLedgerList: page-flip pagination makes you hunt for a
+// receipt, unbounded growth buries the rest of Settings).
 export function PaymentHistory() {
   const { t, i18n } = useTranslation('billing')
   const [rows, setRows] = useState<HistoryRow[]>([])
@@ -45,6 +48,7 @@ export function PaymentHistory() {
   const [hasMore, setHasMore] = useState(true)
   const busyRef = useRef(false)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const paneRef = useRef<HTMLDivElement | null>(null)
 
   const dateLocale = toIntlLocale(i18n.language)
   const fmtDate = (iso: string) =>
@@ -55,8 +59,13 @@ export function PaymentHistory() {
       hour: '2-digit',
       minute: '2-digit',
     })
-  // The store charges USD everywhere (LemonSqueezy) → always render $.
-  const fmtAmount = (r: HistoryRow) => `$${((r.amountUsdCents ?? 0) / 100).toFixed(2)}`
+  // The store charges USD everywhere (LemonSqueezy) → render $ with thousands commas via
+  // the shared micro-USD formatter (cents → micro is ×10_000). Fall back to ₩ for any
+  // legacy row that only carries amount_krw, so it never shows $0.00.
+  const fmtAmount = (r: HistoryRow) =>
+    r.amountUsdCents != null
+      ? formatUsdMicro(r.amountUsdCents * 10_000)
+      : `₩${formatCount(r.amountKrw ?? 0)}`
 
   const loadMore = useCallback(async () => {
     if (busyRef.current || !hasMore) return
@@ -94,7 +103,7 @@ export function PaymentHistory() {
       (entries) => {
         if (entries[0]?.isIntersecting) void loadMore()
       },
-      { rootMargin: '120px' },
+      { root: paneRef.current, rootMargin: '120px' },
     )
     io.observe(el)
     return () => io.disconnect()
@@ -112,7 +121,9 @@ export function PaymentHistory() {
   }
 
   return (
-    <div>
+    // Bounded pane: ~5 rows tall, scrolls to the rest; older pages load as you reach
+    // the bottom. overscroll-contain keeps the page behind it still.
+    <div ref={paneRef} className="max-h-72 overflow-y-auto overscroll-contain pr-1">
       <ul className="divide-y divide-border">
         {rows.map((r) => {
           // 'renewal'/'updated' invoices get a badge; the initial purchase (order) has none.

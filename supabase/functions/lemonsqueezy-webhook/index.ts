@@ -210,7 +210,9 @@ type VariantMapState =
   | { kind: 'invalid' }           // configured but unparseable → FAIL CLOSED (never grant)
   | { kind: 'map'; map: Record<string, string> }
 
-function loadVariantMap(): VariantMapState {
+// Parse the LEMONSQUEEZY_VARIANT_MAP env secret ({"<variant id>":"<product id>"}) into
+// the legacy fallback map. Kept separate so the DB layer (below) can merge over it.
+function loadEnvVariantMap(): VariantMapState {
   const raw = ENV('LEMONSQUEEZY_VARIANT_MAP')
   if (!raw) return { kind: 'unset' }
   try {
@@ -224,6 +226,45 @@ function loadVariantMap(): VariantMapState {
     }
   } catch { /* fall through to invalid */ }
   return { kind: 'invalid' }
+}
+
+// DB-FIRST variant→product map (mig 151): the billing_product_skus table is the single
+// source of truth for the store↔internal mapping. Read the active LemonSqueezy SKUs and
+// MERGE them over the LEMONSQUEEZY_VARIANT_MAP env fallback so:
+//   * once the owner registers LS variants via set_store_product_sku, no env secret is
+//     needed (and DB rows win over any stale env entry);
+//   * with no DB rows, behaviour is byte-for-byte the legacy env map (web untouched).
+// The DB read failing (never expected) leaves the env map as-is rather than blanking it.
+// Returns 'map' whenever EITHER source yields entries; stays 'unset'/'invalid' from env
+// only when the DB adds nothing (preserves the fail-closed contract in verifyVariant).
+async function loadVariantMap(
+  // deno-lint-ignore no-explicit-any -- injected service-role client (createClient's
+  // inferred generics don't match ReturnType<typeof createClient>; runtime shape is fine).
+  sb: any,
+): Promise<VariantMapState> {
+  const env = loadEnvVariantMap()
+  let dbMap: Record<string, string> = {}
+  try {
+    const { data, error } = await sb
+      .from('billing_product_skus')
+      .select('store_product_id, product_id')
+      .eq('platform', 'lemonsqueezy')
+      .eq('is_active', true)
+    if (error) {
+      console.error('[lemonsqueezy-webhook] billing_product_skus read failed — using env map only:', error.message)
+    } else if (Array.isArray(data)) {
+      for (const row of data as Array<{ store_product_id: string; product_id: string }>) {
+        if (row.store_product_id && row.product_id) dbMap[String(row.store_product_id)] = String(row.product_id)
+      }
+    }
+  } catch (e) {
+    console.error('[lemonsqueezy-webhook] billing_product_skus read threw — using env map only:', (e as Error)?.message)
+  }
+  const dbKeys = Object.keys(dbMap)
+  if (dbKeys.length === 0) return env  // no DB rows → legacy env behaviour verbatim
+  // Merge: env base, DB overrides/augments (DB is authoritative).
+  const base = env.kind === 'map' ? env.map : {}
+  return { kind: 'map', map: { ...base, ...dbMap } }
 }
 
 // The LS variant id the buyer actually purchased, per event shape:
@@ -337,8 +378,9 @@ Deno.serve(async (req) => {
 
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
-  // Server-side variant→product map (AUDIT FIX #2), parsed once per request.
-  const variantMap = loadVariantMap()
+  // Server-side variant→product map (AUDIT FIX #2): DB-first (billing_product_skus, mig
+  // 151) merged over the LEMONSQUEEZY_VARIANT_MAP env fallback, resolved once per request.
+  const variantMap = await loadVariantMap(sb)
 
   // Look up the server-authoritative intent (kind + product_id) for a merchant_uid.
   // Distinguishes a real DB error (retryable → 500) from an absent intent (bad payload

@@ -233,7 +233,23 @@
     "totalAiSpent": "总消耗",
     "activeWallets": "有额度的用户",
     "aiCardsToday": "今日 AI 卡片",
-    "aiCardsTodayBreakdown": "免费 {{free}} · 付费 {{paid}}"
+    "aiCardsTodayBreakdown": "免费 {{free}} · 付费 {{paid}}",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓"
+    }
   },
   "billing": {
     "title": "计费管理",
@@ -304,7 +320,8 @@
       "status": "状态",
       "paidAt": "支付时间",
       "empty": "未找到支付记录。",
-      "actions": "操作"
+      "actions": "操作",
+      "loadedCount": "已加载 {{total}} 条"
     },
     "user": {
       "title": "用户查询",
@@ -336,7 +353,8 @@
     "pagination": {
       "page": "第 {{page}} 页",
       "prev": "上一页",
-      "next": "下一页"
+      "next": "下一页",
+      "loadMore": "加载更多"
     },
     "actionError": "操作失败：{{error}}",
     "refund": {

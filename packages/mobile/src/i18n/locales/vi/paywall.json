@@ -6,9 +6,9 @@
   "done": "Xong",
   "back": "Quay lai",
   "features": {
-    "unlimitedDecks": { "title": "Khong gioi han Bo & The", "free": "5 bo, 3K the", "pro": "Khong gioi han" },
+    "cardStorage": { "title": "Luu tru the", "free": "1.000 the", "pro": "Toi da 100.000 the" },
     "allModes": { "title": "Tat ca che do hoc", "free": "SRS + Tuan tu", "pro": "Tat ca 4 che do" },
-    "aiGeneration": { "title": "AI Tao the", "free": "5/thang", "pro": "Khong gioi han" },
+    "aiGeneration": { "title": "AI Tao the", "free": "10 the/ngay", "pro": "10/ngay + tin dung" },
     "premiumTts": { "title": "TTS Cao cap", "free": "Co ban", "pro": "Edge TTS HD" },
     "analytics": { "title": "Phan tich nang cao", "free": "Thong ke co ban", "pro": "Bieu do + Du bao" },
     "marketplace": { "title": "Xuat ban Marketplace", "free": "Chi tai ve", "pro": "Tai len + Chia se doanh thu" }
@@ -27,7 +27,9 @@
   "productsUnavailable": "San pham dang ky hien khong kha dung. Vui long thu lai sau.",
   "checkout": {
     "startFailed": "Khong the bat dau thanh toan. Vui long thu lai.",
-    "confirming": "Da nhan thanh toan — tai khoan cua ban se cap nhat sau khi xac nhan."
+    "confirming": "Da nhan thanh toan — tai khoan cua ban se cap nhat sau khi xac nhan.",
+    "errorTitle": "Mua không thành công",
+    "errorGeneric": "Đã xảy ra sự cố khi mua. Vui lòng thử lại."
   },
   "catalog": {
     "perMonth": "/thang",
@@ -35,5 +37,6 @@
   },
   "privacyPolicy": "Chinh sach Bao mat",
   "termsOfService": "Dieu khoan Dich vu",
-  "manageSubscription": "Quan ly Dang ky"
+  "manageSubscription": "Quan ly Dang ky",
+  "legalDisclaimer": "Khoản thanh toán sẽ được tính vào tài khoản {{account}} của bạn khi xác nhận mua. Gói đăng ký của bạn tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kết thúc kỳ hiện tại. Tài khoản của bạn sẽ bị tính phí gia hạn trong vòng 24 giờ trước khi kết thúc kỳ hiện tại. Bạn có thể quản lý hoặc hủy gói đăng ký trong phần cài đặt tài khoản trên {{store}} sau khi mua."
 }

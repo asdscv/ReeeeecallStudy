@@ -161,6 +161,7 @@ interface AdminState {
   systemStats: AdminSystemStats | null
   systemLoading: boolean
   systemError: string | null
+  systemFlags: SystemFlags | null
 
   // Audit Log
   auditLogs: AdminAuditLog[]
@@ -172,6 +173,9 @@ interface AdminState {
   billingOverview: AdminBillingOverview | null
   billingSubscriptions: AdminSubscriptionRow[]
   billingPayments: AdminPaymentRow[]
+  /** The last payments page came back FULL → at least one more page exists. Derived from
+   *  the raw RPC row count, not billingPayments.length, which de-dupes on append. */
+  billingPaymentsHasMore: boolean
   billingUser: AdminUserBilling | null
   billingOverviewLoading: boolean
   billingSubsLoading: boolean
@@ -196,14 +200,29 @@ interface AdminState {
   // Billing
   fetchBillingOverview: () => Promise<void>
   fetchBillingSubscriptions: (status?: string, page?: number, pageSize?: number) => Promise<void>
-  fetchBillingPayments: (page?: number, pageSize?: number) => Promise<void>
+  /** `append` keeps the rows already loaded and adds the page after them (load-more
+   *  list) instead of replacing them (page-flip). */
+  fetchBillingPayments: (page?: number, pageSize?: number, append?: boolean) => Promise<void>
   fetchUserBilling: (userId: string) => Promise<void>
   clearUserBilling: () => void
   cancelSubscription: (provider: string, providerSubscriptionId: string, immediate: boolean) => Promise<{ error: string | null }>
   grantSubscription: (userId: string, productId: string, periodEnd: string | null) => Promise<{ error: string | null }>
   adjustWallet: (userId: string, deltaMicro: number, reason: string) => Promise<{ error: string | null }>
   refundPayment: (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => Promise<{ error: string | null }>
+  // System flags / kill switches (mig 153)
+  fetchSystemFlags: () => Promise<void>
+  setSystemFlags: (patch: Partial<SystemFlags>) => Promise<{ error: string | null }>
+  setListingActive: (listingId: string, active: boolean) => Promise<{ error: string | null }>
   forceRefresh: (section: SectionKey) => void
+}
+
+// Runtime operational switches (mig 153 system_flags). Read via get_system_flags,
+// written via admin_set_system_flags (admin-gated).
+export interface SystemFlags {
+  maintenance_mode: boolean
+  maintenance_message: string | null
+  ai_generation_enabled: boolean
+  payments_enabled: boolean
 }
 
 
@@ -243,6 +262,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   systemStats: null,
   systemLoading: false,
   systemError: null,
+  systemFlags: null,
 
   auditLogs: [],
   auditTotal: 0,
@@ -252,6 +272,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   billingOverview: null,
   billingSubscriptions: [],
   billingPayments: [],
+  billingPaymentsHasMore: false,
   billingUser: null,
   billingOverviewLoading: false,
   billingSubsLoading: false,
@@ -603,7 +624,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  fetchBillingPayments: async (page = 0, pageSize = 50) => {
+  fetchBillingPayments: async (page = 0, pageSize = 50, append = false) => {
     if (get().billingPaymentsLoading) return
     set({ billingPaymentsLoading: true, billingError: null })
     try {
@@ -612,7 +633,19 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         p_offset: page * pageSize,
       })
       if (error) throw error
-      set({ billingPayments: (data as AdminPaymentRow[] | null) ?? [] })
+      const rows = (data as AdminPaymentRow[] | null) ?? []
+      const hasMore = rows.length === pageSize
+      // De-dupe on merchant_uid: offset paging over a live table can repeat a row when
+      // a new payment lands between two page fetches, and React keys must stay unique.
+      set(append
+        ? (s) => {
+            const seen = new Set(s.billingPayments.map((r) => r.merchant_uid))
+            return {
+              billingPayments: [...s.billingPayments, ...rows.filter((r) => !seen.has(r.merchant_uid))],
+              billingPaymentsHasMore: hasMore,
+            }
+          }
+        : { billingPayments: rows, billingPaymentsHasMore: hasMore })
     } catch (e) {
       set({ billingError: extractErrorMessage(e) })
     } finally {
@@ -709,6 +742,47 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       // Wallet clawback / subscription revoke landed → the overview counts are stale.
       adminCache.invalidate('billing')
       get().logAction('refund_payment', kind === 'subscription' ? 'subscription' : 'payment', ref, { kind, reason })
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // ── System flags / kill switches (mig 153) ──────────────────────────────
+  fetchSystemFlags: async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_system_flags')
+      if (error) return
+      set({ systemFlags: data as SystemFlags })
+    } catch { /* leave prior value */ }
+  },
+
+  setSystemFlags: async (patch: Partial<SystemFlags>) => {
+    try {
+      const { data, error } = await supabase.rpc('admin_set_system_flags', {
+        p_maintenance_mode: patch.maintenance_mode ?? null,
+        p_maintenance_message: patch.maintenance_message ?? null,
+        p_ai_generation_enabled: patch.ai_generation_enabled ?? null,
+        p_payments_enabled: patch.payments_enabled ?? null,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      set({ systemFlags: data as SystemFlags })
+      get().logAction('set_system_flags', 'system', 'system_flags', patch as Record<string, unknown>)
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  setListingActive: async (listingId: string, active: boolean) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_listing_active', {
+        p_listing_id: listingId,
+        p_active: active,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      adminCache.invalidate('market')
+      get().logAction(active ? 'restore_listing' : 'takedown_listing', 'listing', listingId)
       return { error: null }
     } catch (e) {
       return { error: extractErrorMessage(e) }

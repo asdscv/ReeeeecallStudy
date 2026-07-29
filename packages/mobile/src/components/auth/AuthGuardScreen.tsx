@@ -20,7 +20,9 @@ const ORBS = [
 const FEATURE_KEYS = [
   { icon: '🧠', key: 'srs' },
   { icon: '📊', key: 'stats' },
-  { icon: '∞', key: 'unlimited' },
+  // AI card generation — a real feature. (Was a misleading "무제한 덱 / Unlimited Decks":
+  // decks are uncapped but CARDS are limited, so it implied unlimited capacity.)
+  { icon: '🤖', key: 'ai' },
 ]
 
 interface Props {

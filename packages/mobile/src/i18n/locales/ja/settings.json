@@ -80,13 +80,13 @@
     "permissionTitle": "権限が必要です"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "サブスクリプション",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "無料プラン",
+    "proDesc": "すべてのプレミアム機能が利用可能",
+    "freeDesc": "カードを増やすにはアップグレード",
+    "upgradeToPro": "Proにアップグレード",
+    "manageSubscription": "サブスクリプションを管理"
   },
   "legal": {
     "title": "Legal",
@@ -167,8 +167,8 @@
     "upgrade": "アップグレード（近日公開）",
     "upgradeSoon": "購読は近日公開予定です。",
     "cancelPending": "解約予定 — {{date}}まで利用できます",
-    "countUnlimited": "{{owned}} / 無制限",
-    "planNoteUnlimited": "所有カードの上限は無制限です。",
+    "countUnlimited": "{{owned}} · 上限なし",
+    "planNoteUnlimited": "管理者アカウント — カード保存数に上限はありません。",
     "detail": {
       "title": "カード保存容量",
       "subtitle": "所有カードと購読カードがプランの上限に含まれます。公式デッキは対象外です。",
@@ -178,15 +178,15 @@
       "officialNote": "上限対象外",
       "archived": "アーカイブ済み",
       "archivedNote": "学習ロック中",
-      "archivedCount": "{{count}}枚アーカイブ済み",
-      "remaining": "残り{{count}}枚",
+      "archivedCount": "{{count, number}}枚アーカイブ済み",
+      "remaining": "残り{{count, number}}枚",
       "percentUsed": "{{percent}}%使用",
       "nearLimit": "上限間近",
       "atLimit": "上限に達しました",
-      "planUnlimited": "無制限プラン",
+      "planUnlimited": "管理者アカウント",
       "planCards": "{{limit}}枚プラン",
-      "unlimitedTitle": "無制限保存",
-      "lifetimeTotal": "{{count}}枚"
+      "unlimitedTitle": "カード枚数の上限なし",
+      "lifetimeTotal": "{{count, number}}枚"
     }
   },
   "groups": {
@@ -206,6 +206,23 @@
     "current": "現在のプラン",
     "comingSoon": "準備中",
     "empty": "利用できるプランがありません。",
-    "loadError": "プランを読み込めませんでした。"
+    "loadError": "プランを読み込めませんでした。",
+    "popular": "人気"
+  },
+  "paymentHistory": {
+    "title": "購入履歴",
+    "empty": "購入履歴はまだありません。",
+    "refunded": "返金済み",
+    "loadMore": "もっと見る",
+    "error": "購入履歴を読み込めませんでした。",
+    "retry": "再試行",
+    "kind": {
+      "credit_pack": "クレジット",
+      "subscription": "サブスク"
+    },
+    "reason": {
+      "renewal": "更新",
+      "updated": "プラン変更"
+    }
   }
 }

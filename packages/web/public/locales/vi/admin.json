@@ -233,7 +233,23 @@
     "totalAiSpent": "Tổng đã dùng",
     "activeWallets": "Người dùng có tín dụng",
     "aiCardsToday": "Thẻ AI hôm nay",
-    "aiCardsTodayBreakdown": "{{free}} miễn phí · {{paid}} trả phí"
+    "aiCardsTodayBreakdown": "{{free}} miễn phí · {{paid}} trả phí",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓"
+    }
   },
   "billing": {
     "title": "Quản lý thanh toán",
@@ -304,7 +320,8 @@
       "status": "Trạng thái",
       "paidAt": "Thanh toán lúc",
       "empty": "Không tìm thấy thanh toán.",
-      "actions": "Hành động"
+      "actions": "Hành động",
+      "loadedCount": "Đã tải {{total}}"
     },
     "user": {
       "title": "Tra cứu người dùng",
@@ -336,7 +353,8 @@
     "pagination": {
       "page": "Trang {{page}}",
       "prev": "Trước",
-      "next": "Sau"
+      "next": "Sau",
+      "loadMore": "Tải thêm"
     },
     "actionError": "Thao tác thất bại: {{error}}",
     "refund": {

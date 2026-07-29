@@ -341,6 +341,7 @@
     "plans": {
       "free": "Free",
       "standard": "Standard",
+      "pro": "Pro",
       "unlimited": "Unlimited",
       "freeBlurb": "A free plan that's perfect to get started",
       "standardBlurb": "Expand your learning with more cards",

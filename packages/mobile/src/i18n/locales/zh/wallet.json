@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "使用记录",
-    "empty": "暂无使用记录。"
+    "empty": "暂无使用记录。",
+    "showAll": "查看全部 {{total}} 条",
+    "showLess": "收起"
   },
   "reason": {
     "purchase": "充值",
@@ -26,5 +28,11 @@
     "spend_cards": "AI 卡片",
     "spend_image": "AI 图片",
     "admin_adjustment": "调整"
+  },
+  "credits": {
+    "title": "购买 AI 额度",
+    "creditLabel": "{{value}} AI 额度",
+    "confirming": "支付完成 — 额度即将到账。",
+    "unavailable": "此额度包暂时无法购买。"
   }
 }

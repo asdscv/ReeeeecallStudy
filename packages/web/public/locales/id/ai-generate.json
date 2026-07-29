@@ -66,10 +66,10 @@
     "creditsOnly": "{{credits}} kartu berbayar tersedia",
     "empty": "Kartu gratis hari ini sudah habis",
     "unknown": "Saldo tidak tersedia saat ini",
-    "balance": "Saldo {{amount}} (~{{cards}} kartu)",
+    "balance": "Saldo {{amount}}",
     "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan.",
     "cardLimit": "{{available}} dari {{limit}} kartu tersisa",
-    "cardLimitUnlimited": "Kartu tak terbatas"
+    "cardLimitUnlimited": "Tanpa batas kartu (admin)"
   },
   "wizard": {
     "setup": "Setup",

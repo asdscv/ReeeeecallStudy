@@ -9,6 +9,7 @@ import { categorizeReferrer } from '../lib/referrer'
 import { viewRateLimiter } from '../lib/view-rate-limiter'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
 import { logAnalyticsError } from '../lib/analytics-logger'
+import { isAnalyticsOptedOut } from '../lib/analytics-consent'
 
 /**
  * Track page views on route changes.
@@ -20,6 +21,7 @@ export function usePageTracking() {
 
   useEffect(() => {
     if (isBot(navigator.userAgent)) return
+    if (isAnalyticsOptedOut()) return
 
     const path = normalizePagePath(location.pathname)
     if (!shouldTrackPage(path)) return

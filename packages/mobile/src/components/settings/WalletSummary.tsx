@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Alert } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import {
@@ -7,6 +7,14 @@ import {
   formatUsdMicro,
   type AiWalletSummary,
 } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { Button } from '../ui'
+import { usePurchases } from '../../hooks/usePurchases'
+import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
+import type { BillingProduct } from '../../services/billing'
+
+// Ledger rows shown before the "show all" toggle.
+const HISTORY_PREVIEW = 5
 
 // AI wallet / usage content for the mobile Settings accordion (충전금·사용량):
 // $ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig
@@ -17,6 +25,7 @@ export function WalletSummary() {
   const { t, i18n } = useTranslation('wallet')
   const [summary, setSummary] = useState<AiWalletSummary | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [historyExpanded, setHistoryExpanded] = useState(false)
 
   const load = useCallback(() => {
     setState('loading')
@@ -25,6 +34,38 @@ export function WalletSummary() {
     })
   }, [])
   useEffect(() => { load() }, [load])
+
+  // Credit-pack top-up (mobile IAP, consumable). The catalog + store package come
+  // from usePurchases (short-circuits to empty while the payment gate is off).
+  const { products, offering, purchasing, purchase } = usePurchases()
+  const creditPacks = products
+    .filter((p) => p.kind === 'credit_pack')
+    .sort((a, b) => (a.priceUsdCents ?? 0) - (b.priceUsdCents ?? 0))
+
+  // The store IAP id to purchase for this platform (billing_product_skus, mig 151);
+  // fall back to the internal id when no SKU row is registered yet.
+  const storeSku = (product: BillingProduct): string => product.storeProductId ?? product.id
+
+  // Show the STORE-localized price the buyer actually pays (Apple/Google charge in
+  // local currency), falling back to the catalog USD if the package hasn't loaded.
+  const storePrice = (product: BillingProduct): string =>
+    purchaseService.findPackageForProduct(offering, storeSku(product))?.product?.priceString
+      ?? formatProductPrice(product)
+
+  const buyPack = async (product: BillingProduct) => {
+    const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
+    if (!pkg) { Alert.alert(t('credits.title'), t('credits.unavailable')); return }
+    // purchase() settles the store transaction; the credit GRANT lands server-side
+    // via the RevenueCat webhook (add_ai_credits, idempotent). Re-poll the wallet so
+    // the new balance shows once the webhook has processed.
+    const result = await purchase(pkg, product)
+    if (result.success) {
+      load()
+      Alert.alert(t('credits.title'), t('credits.confirming'))
+    } else if (result.error && result.error !== 'cancelled' && result.error !== 'disabled') {
+      Alert.alert(t('credits.title'), result.error)
+    }
+  }
 
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -52,9 +93,32 @@ export function WalletSummary() {
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('balance.title')}</Text>
         <Text style={[styles.balance, { color: theme.colors.text }]}>{formatUsdMicro(summary.balanceMicroWon)}</Text>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>{t('balance.hint')}</Text>
-        <View style={[styles.btn, { backgroundColor: theme.colors.border, marginTop: 10, opacity: 0.7 }]}>
-          <Text style={{ color: theme.colors.textSecondary, fontWeight: '600' }}>{t('balance.topUp')}</Text>
-        </View>
+
+        {SUBSCRIPTION_UI_ENABLED && creditPacks.length > 0 ? (
+          <View style={{ marginTop: 14, gap: 8 }}>
+            <Text style={[styles.subTitle, { color: theme.colors.text }]}>{t('credits.title')}</Text>
+            {creditPacks.map((pack) => (
+              <View key={pack.id} style={styles.packRow}>
+                {/* what you GET (fixed USD credit) — the price BELOW is what you PAY
+                    (store-localized, may differ by country) */}
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {t('credits.creditLabel', { value: pack.title })}
+                </Text>
+                <Button
+                  testID={`wallet-buy-${pack.id}`}
+                  title={storePrice(pack)}
+                  size="sm"
+                  onPress={() => buyPack(pack)}
+                  loading={purchasing}
+                />
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={[styles.btn, { backgroundColor: theme.colors.border, marginTop: 10, opacity: 0.7 }]}>
+            <Text style={{ color: theme.colors.textSecondary, fontWeight: '600' }}>{t('balance.topUp')}</Text>
+          </View>
+        )}
       </View>
 
       {/* Free today */}
@@ -75,29 +139,49 @@ export function WalletSummary() {
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('free.note')}</Text>
       </View>
 
-      {/* History */}
+      {/* History — collapsed to the most recent HISTORY_PREVIEW entries with a
+          show-all toggle, rather than paginated. Settings is one long ScrollView, so
+          dumping all 30 ledger rows buried every section below it; and page-flipping
+          inside a scrolling page is worse on touch than one expand tap. The list is
+          server-capped at 30 (mig 117), so expanded is still bounded. */}
       <View style={{ paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
         <Text style={[styles.subTitle, { color: theme.colors.text, marginBottom: 8 }]}>{t('history.title')}</Text>
         {summary.ledger.length === 0 ? (
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 8 }]}>{t('history.empty')}</Text>
         ) : (
-          summary.ledger.map((e, i) => {
-            const positive = e.delta >= 0
-            return (
-              <View
-                key={i}
-                style={[styles.ledgerRow, { borderTopColor: theme.colors.border, borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth }]}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t(`reason.${e.reason}`, { defaultValue: e.reason })}</Text>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{fmtDate(e.createdAt)}</Text>
+          <>
+            {(historyExpanded ? summary.ledger : summary.ledger.slice(0, HISTORY_PREVIEW)).map((e, i) => {
+              const positive = e.delta >= 0
+              return (
+                <View
+                  key={i}
+                  style={[styles.ledgerRow, { borderTopColor: theme.colors.border, borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth }]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t(`reason.${e.reason}`, { defaultValue: e.reason })}</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{fmtDate(e.createdAt)}</Text>
+                  </View>
+                  <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
+                    {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
+                  </Text>
                 </View>
-                <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
-                  {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
+              )
+            })}
+            {summary.ledger.length > HISTORY_PREVIEW && (
+              <TouchableOpacity
+                testID="wallet-history-toggle"
+                onPress={() => setHistoryExpanded((v) => !v)}
+                style={[styles.historyToggle, { borderTopColor: theme.colors.border }]}
+                accessibilityRole="button"
+              >
+                <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
+                  {historyExpanded
+                    ? t('history.showLess')
+                    : t('history.showAll', { total: summary.ledger.length })}
                 </Text>
-              </View>
-            )
-          })
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
     </View>
@@ -111,5 +195,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   bar: { height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: 'rgba(128,128,128,0.2)' },
   btn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, alignItems: 'center', alignSelf: 'flex-start' },
+  packRow: { gap: 4 },
   ledgerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 },
+  historyToggle: { paddingTop: 10, alignItems: 'center', borderTopWidth: StyleSheet.hairlineWidth },
 })

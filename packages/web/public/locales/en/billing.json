@@ -31,7 +31,8 @@
     "unlimited": "Unlimited cards",
     "perMonth": "/mo",
     "select": "Select",
-    "current": "Current plan"
+    "current": "Current plan",
+    "popular": "Popular"
   },
   "paymentHistory": {
     "title": "Payment history",

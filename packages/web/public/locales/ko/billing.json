@@ -31,7 +31,8 @@
     "unlimited": "무제한 카드",
     "perMonth": "/월",
     "select": "선택",
-    "current": "현재 플랜"
+    "current": "현재 플랜",
+    "popular": "인기"
   },
   "paymentHistory": {
     "title": "결제 내역",

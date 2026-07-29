@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "Usage history",
-    "empty": "No usage yet."
+    "empty": "No usage yet.",
+    "showAll": "Show all {{total}}",
+    "showLess": "Show less"
   },
   "reason": {
     "purchase": "Top-up",
@@ -26,5 +28,11 @@
     "spend_cards": "AI cards",
     "spend_image": "AI image",
     "admin_adjustment": "Adjustment"
+  },
+  "credits": {
+    "title": "Buy AI Credits",
+    "creditLabel": "{{value}} AI credit",
+    "confirming": "Payment received — your credits will appear shortly.",
+    "unavailable": "This credit pack isn't available right now."
   }
 }

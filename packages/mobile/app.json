@@ -23,7 +23,10 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "com.reeeeecall.study",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "com.android.vending.BILLING"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

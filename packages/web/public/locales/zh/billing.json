@@ -31,7 +31,8 @@
     "unlimited": "无限卡片",
     "perMonth": "/月",
     "select": "选择",
-    "current": "当前方案"
+    "current": "当前方案",
+    "popular": "热门"
   },
   "paymentHistory": {
     "title": "支付记录",
