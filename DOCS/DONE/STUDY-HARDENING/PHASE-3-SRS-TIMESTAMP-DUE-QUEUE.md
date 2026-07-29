@@ -1,6 +1,6 @@
 # Study Hardening Phase 3 — Timestamp-based SRS Learning Queue
 
-상태: IMPLEMENTED — local verified, PR/CI pending
+상태: COMPLETE — PR #334, 7 CI checks green
 
 ## 1. 목적
 
@@ -136,7 +136,7 @@ queue manager, 두 store 연결부, phase 테스트를 revert한다. schema/data
 
 ## 11. 구현 및 로컬 검증 증거
 
-상태: IMPLEMENTED — local verified, PR/CI pending
+상태: COMPLETE — PR #334, 7 CI checks green
 
 - 설계 commit: `ac6021c docs(study): design phase 3 timestamp queue`
 - Red: 신규 timestamp manager 9 tests 중 6 failures / 3 passes로 기존 fixed-gap 결함 재현
@@ -153,3 +153,6 @@ queue manager, 두 store 연결부, phase 테스트를 revert한다. schema/data
 - shared/web `study-queue.ts` byte-identical (`cmp`) and `git diff --check` passed
 - web production build passed in 3.38s
 - independent review: APPROVED; due boundary, promotion order, future-only completion, snapshot, stats, store result 전달에 blocker/high/medium 없음
+- PR: https://github.com/asdscv/ReeeeecallStudy/pull/334
+- Remote CI: initial Supabase startup이 upstream 502로 실패했으나 같은 commit의 failed job rerun에서 통과; 최종 7 checks 모두 green
+- 완료 문서 위치: `DOCS/DONE/STUDY-HARDENING/PHASE-3-SRS-TIMESTAMP-DUE-QUEUE.md`
