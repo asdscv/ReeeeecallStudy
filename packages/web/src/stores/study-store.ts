@@ -968,6 +968,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         p_started_at: new Date(sessionStartedAt).toISOString(),
         p_cursor_before: cursorBefore,
         p_cursor_after: cursorAfter,
+        // (P5C) study_sessions is server-written only now; analytics ride along in the
+        // same transaction and are merged UNDER the server's study_persistence key.
+        p_metadata: metadata ?? null,
       })
 
       if (error) {
@@ -979,25 +982,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             message: error.message,
           },
         })
-      } else if (metadata) {
-        // The RPC owns metadata.study_persistence; merge cramming analytics on top of
-        // it rather than replacing the object.
-        const { data: saved } = await supabase
-          .from('study_sessions')
-          .select('id, metadata')
-          .eq('user_id', userId)
-          .eq('client_session_id', clientSessionId)
-          .single()
-        const savedRow = saved as { id: string; metadata: Record<string, unknown> | null } | null
-        if (savedRow) {
-          const { error: metaError } = await supabase
-            .from('study_sessions')
-            .update({ metadata: { ...(savedRow.metadata ?? {}), ...metadata } } as Record<string, unknown>)
-            .eq('id', savedRow.id)
-          if (metaError) {
-            console.error('[study-store] session metadata merge failed:', metaError.message)
-          }
-        }
       }
     }
 

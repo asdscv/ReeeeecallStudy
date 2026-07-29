@@ -1,6 +1,18 @@
 # Study Hardening Phase 5C — Contract: Remove Legacy Write Paths
 
-상태: DESIGN — implementation pending
+상태: IMPLEMENTED — local validation complete, PR pending
+
+## 0. 설계 편차 (구현 중 정정)
+
+설계 3.1은 rolling 배포 안전판으로 **6-인자 오버로드를 유지**한다고 했으나, 실제로는 위험했다.
+7-인자 버전의 `p_metadata`에 default가 있으므로 6-인자 named 호출이 두 함수 모두에 매칭되어
+`function is not unique`가 된다. 또한 기존 6-인자 함수는 `p_cursor_before/after`에 default를
+갖고 있어 default 없는 delegate로 교체하면 `42P13 cannot remove parameter defaults`가 난다
+(실제로 첫 migration 적용이 이 오류로 실패했다).
+
+정정: **6-인자 함수를 DROP하고 default를 가진 7-인자 함수 하나만 둔다.** P5B 클라이언트의 6-인자
+named 호출은 default로 채워져 그대로 동작하므로 rolling 안전성은 유지된다. 이 동작을 계약 test로
+고정했다("keeps the 6-argument finalize overload working for rolling clients").
 
 기준선: `origin/develop@223c418` (P5A migration 160 + P5B client cutover merged)
 
@@ -117,6 +129,27 @@ reset_card_srs(p_card_id uuid) RETURNS jsonb
 
 추가 검증: fresh reset 2회, marketplace integration, catalog 권한 assertion(컬럼 단위 포함),
 web/mobile typecheck, targeted lint, 학습 회귀 tests, production build.
+
+## 7.1 실행 증거 (2026-07-30)
+
+- Design-first commit: `6fc405f docs(study): design phase 5c write contract`
+- Red (migration 161 전): `study-write-contract.spec.ts` **10 failed / 1 passed** — 직접 write가 전부 허용되고
+  `insert_study_log`/`reset_card_srs`/`p_metadata`가 없어 `PGRST202`
+- Green: contract **11/11**, 기존 `study-persistence.spec.ts` **17/17**, `marketplace-acquire.spec.ts` **6/6**
+  (총 3 files / **34 tests**)
+- Store 회귀 6 files / **33 tests**, cutover focused **15/15**(cramming metadata 전달 test 2건 추가)
+- Catalog 권한 assertion **28/28**: column-level revoke/grant, log/session write 차단, SELECT 유지,
+  cursor 차단·batch size 허용, `insert_study_log` 제거, 6-인자 부재/7-인자 존재, `reset_card_srs`
+  definer·search_path·anon denial, anon 차단, service_role 유지
+- Migration safety: 최종 chain `supabase db reset --no-seed` 연속 **2회** 성공
+- Rollback: down SQL 실제 적용 후 권한 복구·함수 상태 assertion **7/7**, 이후 fresh reset + integration 34/34 재통과
+- web `tsc -b --noEmit`, mobile `tsc --noEmit`, targeted ESLint, production build 통과
+- 프로덕션 배포·migration 실행 없음
+
+### 기존 test 갱신
+
+P5A test 2건이 상황 설정을 위해 클라이언트 직접 write를 사용했다. 계약이 바뀌었으므로 검증 대상
+불변조건(cursor staleness 감지, revision bump trigger)은 그대로 두고 `service_role` 경로로 갱신했다.
 
 ## 7. Rollback
 

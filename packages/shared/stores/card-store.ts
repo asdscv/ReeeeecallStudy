@@ -346,17 +346,10 @@ export const useCardStore = create<CardState>((set, get) => ({
   },
 
   resetSRS: async (id) => {
-    const { error } = await supabase
-      .from('cards')
-      .update({
-        srs_status: 'new',
-        ease_factor: 2.5,
-        interval_days: 0,
-        repetitions: 0,
-        next_review_at: null,
-        last_reviewed_at: null,
-      } as Record<string, unknown>)
-      .eq('id', id)
+    // (P5C) SRS columns are no longer client-writable. reset_card_srs performs the
+    // reset for the owned card or the caller's progress row and keeps the revision
+    // moving forward so in-flight ratings fail closed instead of resurrecting state.
+    const { error } = await supabase.rpc('reset_card_srs', { p_card_id: id })
 
     if (error) {
       set({ error: error.message })
