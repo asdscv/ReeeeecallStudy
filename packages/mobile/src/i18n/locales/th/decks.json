@@ -10,9 +10,9 @@
   "aiGenerate": "AI Generate",
   "detail": {
     "backToList": "← รายการสำรับ",
-    "totalCards": "ทั้งหมด {{count}} การ์ด",
-    "newCards": "ใหม่ {{count}}",
-    "reviewCards": "ทบทวน {{count}}",
+    "totalCards": "ทั้งหมด {{count, number}} การ์ด",
+    "newCards": "ใหม่ {{count, number}}",
+    "reviewCards": "ทบทวน {{count, number}}",
     "startStudy": "เริ่มเรียน",
     "edit": "แก้ไข",
     "share": "แชร์",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
@@ -218,17 +218,17 @@
     "selectMode": "เลือก",
     "selectAll": "เลือกทั้งหมด",
     "deselectAll": "ยกเลิกการเลือกทั้งหมด",
-    "selectedCount": "เลือกแล้ว {{count}}",
+    "selectedCount": "เลือกแล้ว {{count, number}}",
     "deleteSelected": "ลบรายการที่เลือก",
     "deleteCardsTitle": "ลบการ์ด",
-    "deleteCardsConfirm": "ลบการ์ดที่เลือก {{count}} ใบ? ไม่สามารถเลิกทำได้",
+    "deleteCardsConfirm": "ลบการ์ดที่เลือก {{count, number}} ใบ? ไม่สามารถเลิกทำได้",
     "perPage": "ต่อหน้า:",
     "prevPage": "← ก่อนหน้า",
     "nextPage": "ถัดไป →",
     "pageOf": "หน้า {{current}} จาก {{total}}",
-    "showingRange": "แสดง {{from}}–{{to}} จาก {{total}} การ์ด",
+    "showingRange": "แสดง {{from, number}}–{{to, number}} จาก {{total, number}} การ์ด",
     "archivedBadge": "เก็บถาวรแล้ว · ล็อกการเรียน",
-    "archivedNote": "มี {{count}} ใบถูกเก็บถาวรเพราะเกินขีดจำกัด — ยังดูได้ตามปกติ สมัครสมาชิกเพื่อกลับมาเรียนอีกครั้ง",
+    "archivedNote": "มี {{count, number}} ใบถูกเก็บถาวรเพราะเกินขีดจำกัด — ยังดูได้ตามปกติ สมัครสมาชิกเพื่อกลับมาเรียนอีกครั้ง",
     "archivedSubscribe": "สมัครสมาชิก (เร็ว ๆ นี้)"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "วันนี้",
     "yesterday": "เมื่อวาน",
-    "daysAgo": "{{count}} วันที่แล้ว",
+    "daysAgo": "{{count, number}} วันที่แล้ว",
     "monthAgo": "1 เดือนที่แล้ว",
-    "monthsAgo": "{{count}} เดือนที่แล้ว"
+    "monthsAgo": "{{count, number}} เดือนที่แล้ว"
   },
   "templatesList": {
     "cannotDeleteTitle": "ลบไม่ได้",

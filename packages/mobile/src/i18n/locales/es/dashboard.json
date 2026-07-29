@@ -18,16 +18,16 @@
     "title": "Estado de mazos",
     "noDecks": "Sin mazos aún. ¡Crea uno!",
     "goToDecks": "Ir a gestión de mazos",
-    "cardCount": "{{count}} tarjetas",
-    "newCards": "Nuevas {{count}}",
-    "reviewCards": "Repaso {{count}}",
+    "cardCount": "{{count, number}} tarjetas",
+    "newCards": "Nuevas {{count, number}}",
+    "reviewCards": "Repaso {{count, number}}",
     "study": "Estudiar"
   },
   "heatmap": {
     "title": "Mapa de calor de estudio"
   },
   "gamification": {
-    "freezes": "{{count}} freezes left",
+    "freezes": "{{count, number}} freezes left",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,23 +42,23 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count}} cards",
-    "sessions": "Complete {{count}} sessions",
-    "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores",
+    "cards": "Study {{count, number}} cards",
+    "sessions": "Complete {{count, number}} sessions",
+    "time": "Study for {{count, number}} minutes",
+    "perfect": "Get {{count, number}} perfect scores",
     "completed": "Completado"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "motivational": "Keep going! You're doing great!"
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days",
+  "streakDays": "{{count, number}}days",
   "quickStudy": {
     "title": "Estudio rápido",
-    "dueToday": "{{count}} tarjetas para hoy",
+    "dueToday": "{{count, number}} tarjetas para hoy",
     "startSession": "Inicia una sesión de estudio"
   }
 }

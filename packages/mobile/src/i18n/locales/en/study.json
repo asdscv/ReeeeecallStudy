@@ -50,7 +50,7 @@
     "modalSubtitleDate": "Select date",
     "modalSubtitleCramming": "Cramming options",
     "modalSubtitleBatch": "Set batch size",
-    "dateCardCount": "{{date}} — {{count}} cards",
+    "dateCardCount": "{{date}} — {{count, number}} cards",
     "backToModeSelect": "Back to mode select",
     "cancel": "Cancel"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "Time Limit",
       "none": "No Limit",
-      "minutes": "{{count}} min"
+      "minutes": "{{count, number}} min"
     },
     "shuffle": {
       "title": "Shuffle Cards"

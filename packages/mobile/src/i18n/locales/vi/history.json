@@ -34,14 +34,14 @@
     "performance": "Hiệu suất"
   },
   "cardDetails": "Chi tiết thẻ",
-  "logsCount": "{{count}} bản ghi",
+  "logsCount": "{{count, number}} bản ghi",
   "loadingDetails": "Đang tải chi tiết...",
   "noLogs": "Không có nhật ký chi tiết cho phiên này",
   "deletedCard": "(Thẻ đã xóa)",
   "noContent": "(Không có nội dung)",
   "deckProgress": "Tiến độ bộ thẻ",
-  "sessionsCount": "{{count}} phiên",
-  "cardsCount": "{{count}} thẻ",
+  "sessionsCount": "{{count, number}} phiên",
+  "cardsCount": "{{count, number}} thẻ",
   "cardsFraction": "{{studied}}/{{total}} thẻ",
   "ratingDistribution": "Phân bố đánh giá",
   "overview": {

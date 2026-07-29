@@ -34,14 +34,14 @@
     "performance": "Performance"
   },
   "cardDetails": "Card Details",
-  "logsCount": "{{count}} logs",
+  "logsCount": "{{count, number}} logs",
   "loadingDetails": "Loading details...",
   "noLogs": "No detailed logs available for this session",
   "deletedCard": "(Deleted card)",
   "noContent": "(No content)",
   "deckProgress": "Deck Progress",
-  "sessionsCount": "{{count}} sessions",
-  "cardsCount": "{{count}} cards",
+  "sessionsCount": "{{count, number}} sessions",
+  "cardsCount": "{{count, number}} cards",
   "cardsFraction": "{{studied}}/{{total}} cards",
   "ratingDistribution": "Rating Distribution",
   "overview": {

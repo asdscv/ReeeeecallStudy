@@ -2,6 +2,9 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { Platform, NativeModules } from 'react-native'
 import { localPrefs } from '../utils/local-prefs'
+// Dependency-free on purpose — imported during i18n init, long before initSupabase() runs,
+// so it must not drag in the Supabase client the way lib/ai/server-client would.
+import { formatCount } from '@reeeeecall/shared/lib/format-number'
 
 // ── Supported languages: to add a new language, add an entry below + locale folder ──
 
@@ -204,6 +207,18 @@ i18n
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   })
+
+// i18next's built-in `number` formatter routes through Intl.NumberFormat — which on a Hermes
+// build without full ICU silently drops thousands separators, the same failure that shipped
+// "$1000000.00" to the wallet. Override it with the app's Intl-free grouping so a locale
+// string like "{{count, number}} archived" can never render "100000 archived" next to a
+// formatCount()-rendered "100,000" in the same component.
+//
+// Only `number` is overridden (it is the only format spec any mobile locale uses), and the
+// call sites keep passing a real number for `count`, so i18next plural selection is untouched.
+i18n.services.formatter?.add('number', (value) =>
+  typeof value === 'number' ? formatCount(value) : String(value ?? ''),
+)
 
 // Persist every language change so the choice survives an app restart. This
 // fires for the Settings picker AND for the profile-load sync (DB value from

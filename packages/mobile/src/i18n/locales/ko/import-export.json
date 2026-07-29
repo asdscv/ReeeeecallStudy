@@ -4,7 +4,7 @@
   "importCSV": "CSV 가져오기",
   "importJSON": "JSON 가져오기",
   "importHint": "CSV: 첫 줄 = 필드명, 각 줄 = 카드 1장\nJSON: 객체 배열 또는 { cards: [...] }",
-  "importSuccess": "\"{{name}}\"에서 {{count}}장의 카드를 가져왔습니다",
+  "importSuccess": "\"{{name}}\"에서 {{count, number}}장의 카드를 가져왔습니다",
   "importFailed": "CSV 파일 가져오기에 실패했습니다",
   "importJsonFailed": "JSON 파일 파싱에 실패했습니다",
   "csvEmpty": "CSV 파일이 비어있거나 데이터 행이 없습니다",
@@ -18,7 +18,7 @@
   "errorTitle": "오류",
   "successTitle": "완료",
   "noCardsTitle": "카드 없음",
-  "deckCardCount": "{{deck}} · 카드 {{count}}장",
+  "deckCardCount": "{{deck}} · 카드 {{count, number}}장",
   "back": "뒤로",
-  "importPartial": "{{count}}장 저장 후 중단됐어요."
+  "importPartial": "{{count, number}}장 저장 후 중단됐어요."
 }

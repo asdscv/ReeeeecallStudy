@@ -23,8 +23,8 @@
     "topRated": "Nilai tertinggi"
   },
   "listing": {
-    "cardCount": "{{count}} kartu",
-    "userCount": "{{count}} pengguna"
+    "cardCount": "{{count, number}} kartu",
+    "userCount": "{{count, number}} pengguna"
   },
   "detail": {
     "back": "← Marketplace",
@@ -46,10 +46,10 @@
     "edited": "(diedit)",
     "helpful": "Membantu",
     "byAuthor": "oleh {{name}}",
-    "cardsBadge": "{{count}} kartu",
-    "viewsBadge": "{{count}} dilihat",
-    "usersBadge": "{{count}} pengguna",
-    "reviewsCount": "({{count}} ulasan)",
+    "cardsBadge": "{{count, number}} kartu",
+    "viewsBadge": "{{count, number}} dilihat",
+    "usersBadge": "{{count, number}} pengguna",
+    "reviewsCount": "({{count, number}} ulasan)",
     "previewCards": "Pratinjau Kartu",
     "ratingsReviews": "Peringkat & Ulasan",
     "editReview": "Edit Ulasan",
@@ -57,7 +57,7 @@
     "writeAReview": "Tulis Ulasan",
     "acquireToReview": "Dapatkan dek ini untuk menulis ulasan",
     "noReviewsYet": "Belum ada ulasan",
-    "reviewCountLabel": "{{count}} ulasan",
+    "reviewCountLabel": "{{count, number}} ulasan",
     "loading": "Memuat...",
     "loadMoreReviews": "Muat ulasan lainnya",
     "reportReason": "Alasan",
@@ -98,8 +98,8 @@
       "most_helpful": "Membantu"
     },
     "downloading": "Mengunduh...",
-    "limitUsage": "Menambah {{count}} kartu ke batas Anda · sisa {{available}}",
-    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Kosongkan ruang atau tingkatkan paket untuk menambahkannya.",
+    "limitUsage": "Menambah {{count, number}} kartu ke batas Anda · sisa {{available, number}}",
+    "limitExceeds": "Akan melebihi batas kartu ({{available, number}} sisa). Kosongkan ruang atau tingkatkan paket untuk menambahkannya.",
     "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu.",
     "acquireByMode": {
       "subscribe": "Berlangganan",

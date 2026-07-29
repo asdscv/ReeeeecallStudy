@@ -34,7 +34,7 @@
     "imageChange": "Change image",
     "imageHint": "Pick a photo — AI turns it into cards.",
     "imagePaidNotice": "Image generation uses credits.",
-    "imageAddMore": "Add more ({{count}}/{{max}})",
+    "imageAddMore": "Add more ({{count, number}}/{{max}})",
     "inputModeTopicHint": "Describe a topic and AI writes the cards for you.",
     "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once.",
     "cardLimitExceeds": "You can add at most {{available}} more card(s) — reduce the count or subscribe.",
@@ -60,8 +60,8 @@
   },
   "review": {
     "title": "Review Cards",
-    "generatedCount": "{{count}} cards generated",
-    "save": "Save {{count}} Cards",
+    "generatedCount": "{{count, number}} cards generated",
+    "save": "Save {{count, number}} Cards",
     "regenerate": "Regenerate",
     "cardDone": "Done",
     "remove": "Remove"

@@ -97,7 +97,17 @@ export const MERCHANT_UID_ATTRIBUTE = 'merchant_uid'
 // owner registers the store products (see OWNER GO-LIVE CHECKLIST above). Kept
 // FALSE in the repo (Apple Guideline 2.1(b) — no live paywall without approved
 // IAP products); flipping to true is the owner's final go-live switch.
-export const SUBSCRIPTION_UI_ENABLED = true
+//
+// …AND the switch is ANDed with "is the SDK actually in this binary". react-native-purchases
+// is a NATIVE module, so it only exists in a build made after it was added to package.json —
+// but JS reaches users a second way: an EAS OTA update, which can land this bundle on an
+// OLDER binary that has no such module. There `Purchases` is null (the require above fails),
+// every purchase call no-ops, and a hardcoded `true` would render plan prices and a Select
+// CTA that can never transact — a dead end for the user and an Apple 2.1(b) problem.
+// Deriving the flag makes that impossible by construction: no SDK ⇒ no purchase UI.
+const OWNER_GO_LIVE_SWITCH = true
+const PURCHASES_SDK_PRESENT = Purchases != null
+export const SUBSCRIPTION_UI_ENABLED = OWNER_GO_LIVE_SWITCH && PURCHASES_SDK_PRESENT
 
 /**
  * RevenueCat service — single entry point for all purchase operations.

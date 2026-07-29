@@ -38,7 +38,7 @@
     "copyLink": "Sao chép liên kết",
     "newLink": "Liên kết mới",
     "linkHint": "Bất kỳ ai có liên kết này đều có thể chấp nhận lời mời và truy cập bộ thẻ.",
-    "existingShares": "Lượt chia sẻ hiện có ({{count}})",
+    "existingShares": "Lượt chia sẻ hiện có ({{count, number}})",
     "noShares": "Chưa có lượt chia sẻ nào. Hãy tạo liên kết mời ở trên."
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "Mở một bộ thẻ và nhấn \"Chia sẻ\" để tạo liên kết mời.",
     "emptyReceived": "Chưa có ai chia sẻ bộ thẻ với bạn.",
     "activePending": "{{activeCount}} đang hoạt động · {{pendingCount}} đang chờ",
-    "viewAll": "Xem tất cả {{count}} lượt chia sẻ",
+    "viewAll": "Xem tất cả {{count, number}} lượt chia sẻ",
     "unknownDeck": "Bộ thẻ không xác định"
   },
   "publish": {

@@ -38,7 +38,7 @@
     "copyLink": "คัดลอกลิงก์",
     "newLink": "ลิงก์ใหม่",
     "linkHint": "ใครก็ตามที่มีลิงก์นี้สามารถยอมรับคำเชิญและเข้าถึงเด็คได้",
-    "existingShares": "การแชร์ที่มีอยู่ ({{count}})",
+    "existingShares": "การแชร์ที่มีอยู่ ({{count, number}})",
     "noShares": "ยังไม่มีการแชร์ สร้างลิงก์เชิญด้านบน"
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "ไปที่เด็คแล้วแตะ \"แชร์\" เพื่อสร้างลิงก์เชิญ",
     "emptyReceived": "ยังไม่มีใครแชร์เด็คกับคุณ",
     "activePending": "ใช้งานอยู่ {{activeCount}} · รอดำเนินการ {{pendingCount}}",
-    "viewAll": "ดูการแชร์ทั้งหมด {{count}} รายการ",
+    "viewAll": "ดูการแชร์ทั้งหมด {{count, number}} รายการ",
     "unknownDeck": "เด็คที่ไม่รู้จัก"
   },
   "publish": {
