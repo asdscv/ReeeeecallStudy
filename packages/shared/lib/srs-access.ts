@@ -19,6 +19,7 @@ export interface UserCardProgress {
   repetitions: number
   next_review_at: string | null
   last_reviewed_at: string | null
+  srs_revision?: number
   created_at: string
   updated_at: string
 }
@@ -38,6 +39,7 @@ export interface CardWithProgress {
   next_review_at: string | null
   last_reviewed_at: string | null
   created_at: string
+  srs_revision?: number
   updated_at: string
 }
 
@@ -56,6 +58,7 @@ export interface CardData {
   next_review_at: string | null
   last_reviewed_at: string | null
   created_at: string
+  srs_revision?: number
   updated_at: string
 }
 
@@ -92,6 +95,8 @@ export function mergeCardWithProgress(
       repetitions: 0,
       next_review_at: null,
       last_reviewed_at: null,
+      // No progress row yet → the RPC compares against the default revision 0.
+      srs_revision: 0,
     }
   }
 
@@ -103,5 +108,8 @@ export function mergeCardWithProgress(
     repetitions: progress.repetitions,
     next_review_at: progress.next_review_at,
     last_reviewed_at: progress.last_reviewed_at,
+    // Progress-sourced SRS must carry its own revision so apply_study_rating
+    // validates against user_card_progress, not the publisher's card row.
+    srs_revision: progress.srs_revision ?? 0,
   }
 }

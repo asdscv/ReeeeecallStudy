@@ -1,6 +1,6 @@
 # Study Hardening Phase 5B — Client Cutover to Atomic Persistence
 
-상태: DESIGN — implementation pending
+상태: IMPLEMENTED — local validation complete, PR pending
 
 기준선: `origin/develop@44c804f` (P5A migration 160 merged)
 
@@ -135,6 +135,50 @@ Red로 먼저 실패시킬 계약:
 ## 8. Rollback
 
 client-only 변경이므로 이 PR revert만으로 기존 write 경로로 복귀한다. migration 160은 additive로 남는다.
+
+## 8.1 구현 중 발견해 수정한 결함 (Zero-Defect 감사)
+
+설계 시점에 없던 다음 결함들을 감사 단계에서 발견해 수정했다. 각 항목은 재현 test를 동반한다.
+
+1. **finalize가 apply를 앞질러 마지막 rating이 유실됨 (Blocker급).**
+   `rateCard`의 apply는 fire-and-forget인데 `endSession`은 곧바로 finalize를 호출했다. finalize가
+   먼저 commit되면 서버 집계가 마지막 rating을 빼먹고, 뒤늦게 도착한 apply는 P5A의 종료된-session
+   가드에 걸려 `55000`으로 거부되어 그 rating이 영구 손실된다.
+2. **undo가 자신이 보상할 apply보다 먼저 도착하면 `P0002`로 실패.**
+   위와 같은 원인이다.
+   → 1·2를 `persistenceChain`(순서 보장 직렬화)으로 해결했다. finalize는 체인을 drain한 뒤 호출하고,
+   undo는 체인 뒤에 큐잉된다. 체인은 절대 reject하지 않으므로 한 링크의 실패가 이후 저장을 막지 않는다.
+3. **undo 후 다음 rating이 `PT409`로 거부됨.**
+   서버 undo는 이전 SRS 값을 복원하되 revision은 `current+1`로 **증가**시킨다. 로컬 queue는 이전
+   revision으로 복원되므로 다음 rating의 expected revision이 stale해진다.
+   → undo 응답의 `applied_revision`을 queue 카드에 반영한다.
+4. **구독 덱에서 progress row가 없으면 rating이 유실됨.**
+   기존 client는 `user_card_progress.upsert`로 행을 만들었지만 `apply_study_rating`은 없는 행을
+   `P0002`로 거부한다. publisher가 카드를 추가하고 subscriber sync가 아직 돌지 않은 창에서 발생한다.
+   → session 시작 시 누락 행이 있으면 기존 idempotent RPC `init_subscriber_progress`로 1회 보강한다.
+5. **session key 누락 시 저장 포기는 데이터 손실.**
+   초기 구현은 `clientSessionId`가 없으면 저장을 건너뛰었다. 학습 데이터를 잃는 쪽이 더 나쁘므로,
+   키를 새로 발급해 store에 저장하고 그 키로 저장한다(이후 rating이 같은 집계에 묶인다).
+
+## 8.2 실행 증거 (2026-07-30)
+
+- Design-first commit: `4b1b8c2 docs(study): design phase 5b client cutover`
+- Red: `study-store-rpc-cutover.test.ts` **9 failed / 0 passed** (cutover 미구현 상태)
+- Green: cutover focused **13/13** (위 1~5 재현 test 포함)
+- Store 회귀 6 files / **33 tests**: guardrails, cramming rounds, SRS timestamp, sequential, sequential_review
+- Lib 회귀 9 files / **158 tests**: srs, phase0, srs-access, cramming-queue, validation, progress, cursor safety, queue, timestamp queue
+- 기존 회귀 중 legacy write를 검증하던 assertion은 새 RPC 계약으로 갱신했다(동작 검증은 유지).
+- web `tsc -b --noEmit`, mobile `tsc --noEmit`, targeted ESLint 통과
+- shared/web `persistence-id.ts`·`srs-access.ts` byte parity, store의 apply/finalize 블록 문자 단위 일치
+- Production build 성공(3,238 modules 규모, 기존 chunk-size warning만 존재)
+- 프로덕션 배포·migration 실행 없음
+
+### 건너뛴 단계
+
+독립 subagent review를 2회 시도했으나 모두 서비스 throttle로 실패했다
+(request_id `d0b1cef8-f886-4728-bd0e-5dcc416ff8df`, `f11f881f-9f5d-4158-b1cd-3a735b0b8534`).
+대체로 구현자 자체 3단계 감사(Deep Dive → Double-Check → Lockdown)를 수행해 8.1의 5건을 찾아 수정했고,
+mirror 동일성·legacy write 잔존 여부를 기계적으로 검증했다. 외부 리뷰어 승인은 받지 못했다.
 
 ## 9. 완료 조건
 
