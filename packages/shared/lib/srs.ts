@@ -91,8 +91,8 @@ function addMinutes(date: Date, minutes: number): Date {
 /** Get effective learning steps, with fallback for backward compat */
 function getSteps(settings: SrsSettings): number[] {
   const steps = settings.learning_steps
-  if (!steps || steps.length === 0) return []
-  return steps
+  if (steps === undefined) return [...(DEFAULT_SRS_SETTINGS.learning_steps ?? [1, 10])]
+  return [...steps]
 }
 
 // ── Core SRS Calculation ────────────────────────────────

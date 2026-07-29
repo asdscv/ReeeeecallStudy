@@ -36,7 +36,7 @@ export function clampBatchSize(value: number): number {
   return Math.max(MIN_BATCH_SIZE, Math.min(MAX_BATCH_SIZE, Math.round(value)))
 }
 
-// ─── Sequential Review Queue Builder ────────────────────────
+// ─── Sequential Queue Builders ──────────────────────────────
 
 interface SeqCard {
   id: string
@@ -44,14 +44,68 @@ interface SeqCard {
   srs_status: 'new' | 'learning' | 'review' | 'suspended'
 }
 
+function compareSequentialCards(a: SeqCard, b: SeqCard): number {
+  if (a.sort_position !== b.sort_position) return a.sort_position - b.sort_position
+  if (a.id === b.id) return 0
+  return a.id < b.id ? -1 : 1
+}
+
+function stableUnique<T extends SeqCard>(cards: T[]): T[] {
+  const seen = new Set<string>()
+  return [...cards]
+    .sort(compareSequentialCards)
+    .filter(card => {
+      if (seen.has(card.id)) return false
+      seen.add(card.id)
+      return true
+    })
+}
+
+/** Take at least requested cards without splitting the boundary position group. */
+function takeTieSafe<T extends SeqCard>(sortedCards: T[], requested: number): T[] {
+  if (sortedCards.length === 0 || requested <= 0) return []
+
+  const limit = Math.floor(requested)
+  if (limit >= sortedCards.length) return [...sortedCards]
+
+  const boundaryPosition = sortedCards[limit - 1].sort_position
+  let end = limit
+  while (end < sortedCards.length && sortedCards[end].sort_position === boundaryPosition) {
+    end++
+  }
+  return sortedCards.slice(0, end)
+}
+
+/** Select from cursor onward, then wrap once before cursor if the batch is short. */
+function selectCyclicTieSafe<T extends SeqCard>(cards: T[], cursor: number, requested: number): T[] {
+  if (requested <= 0) return []
+
+  const sorted = stableUnique(cards)
+  const primary = sorted.filter(card => card.sort_position >= cursor)
+  const selected = takeTieSafe(primary, requested)
+  if (selected.length >= requested) return selected
+
+  const selectedIds = new Set(selected.map(card => card.id))
+  const beforeCursor = sorted.filter(
+    card => card.sort_position < cursor && !selectedIds.has(card.id),
+  )
+  const wrapped = takeTieSafe(beforeCursor, requested - selected.length)
+  return [...selected, ...wrapped]
+}
+
+/** Build a plain sequential queue with stable, tie-safe, one-wrap selection. */
+export function buildSequentialQueue<T extends SeqCard>(
+  allCards: T[],
+  cursor: number,
+  batchSize: number,
+): T[] {
+  const eligible = allCards.filter(card => card.srs_status !== 'suspended')
+  return selectCyclicTieSafe(eligible, cursor, batchSize)
+}
+
 /**
- * Build the sequential review queue with wrap-around support.
- *
- * Logic:
- * 1. Fetch new cards (srs_status='new') starting from new_start_pos
- * 2. Fetch review cards (non-new, non-suspended) starting from review_start_pos
- * 3. If no new cards AND no review cards from current positions, wrap around to 0
- * 4. Returns { newCards, reviewCards } for the session
+ * Build the sequential review queue with stable, tie-safe wrap-around support.
+ * New and review cursors each get one cyclic pass; no ID can repeat in a result.
  */
 export function buildSequentialReviewQueue<T extends SeqCard>(
   allCards: T[],
@@ -63,46 +117,20 @@ export function buildSequentialReviewQueue<T extends SeqCard>(
     return { newCards: [], reviewCards: [] }
   }
 
-  const sorted = [...allCards].sort((a, b) => a.sort_position - b.sort_position)
+  const newEligible = allCards.filter(card => card.srs_status === 'new')
+  const newCards = selectCyclicTieSafe(newEligible, state.new_start_pos, newBatchSize)
 
-  // --- New cards ---
-  const newCards = sorted
-    .filter(c => c.srs_status === 'new' && c.sort_position >= state.new_start_pos)
-    .slice(0, newBatchSize)
-
-  // --- Review cards ---
-  const reviewable = sorted.filter(c => c.srs_status !== 'new' && c.srs_status !== 'suspended')
-
-  let reviewCards: T[]
-
-  if (newCards.length > 0) {
-    if (state.new_start_pos > state.review_start_pos) {
-      // Normal: review the window [review_start_pos, new_start_pos)
-      reviewCards = reviewable
-        .filter(c => c.sort_position >= state.review_start_pos && c.sort_position < state.new_start_pos)
-        .slice(0, reviewBatchSize)
-    } else {
-      // Initial state or positions overlap: review from review_start_pos with no upper bound
-      reviewCards = reviewable
-        .filter(c => c.sort_position >= state.review_start_pos)
-        .slice(0, reviewBatchSize)
-    }
-  } else {
-    // No new cards — review from review_start_pos onward
-    reviewCards = reviewable
-      .filter(c => c.sort_position >= state.review_start_pos)
-      .slice(0, reviewBatchSize)
-
-    // Wrap around: if we got fewer than the batch size, fill from the beginning
-    if (reviewCards.length < reviewBatchSize && reviewable.length > 0) {
-      const remaining = reviewBatchSize - reviewCards.length
-      const selectedIds = new Set(reviewCards.map(c => c.id))
-      const wrapCards = reviewable
-        .filter(c => !selectedIds.has(c.id))
-        .slice(0, remaining)
-      reviewCards = [...reviewCards, ...wrapCards]
-    }
-  }
+  const reviewable = allCards.filter(
+    card => card.srs_status !== 'new' && card.srs_status !== 'suspended',
+  )
+  const reviewWindow = newCards.length > 0 && state.new_start_pos > state.review_start_pos
+    ? reviewable.filter(card => card.sort_position < state.new_start_pos)
+    : reviewable
+  const reviewCards = selectCyclicTieSafe(
+    reviewWindow,
+    state.review_start_pos,
+    reviewBatchSize,
+  )
 
   return { newCards, reviewCards }
 }
@@ -126,6 +154,29 @@ export function advanceSequentialReviewPosition(
   return { review_start_pos: nextPos > maxCardPosition ? 0 : nextPos }
 }
 
+// ─── Plain Sequential Position Computation ──────────────────
+
+/** Compute the next plain sequential cursor without skipping a partially studied tie group. */
+export function computeSequentialPosition(
+  queue: Pick<Card, 'sort_position'>[],
+  cardsStudied: number,
+  currentCursor: number,
+  maxCardPosition: number,
+): number {
+  const studiedCount = Math.max(0, Math.min(queue.length, Math.floor(cardsStudied)))
+  const nextUnstudied = queue[studiedCount]
+  if (nextUnstudied) return nextUnstudied.sort_position
+
+  const studiedCards = queue.slice(0, studiedCount)
+  if (studiedCards.length === 0) return currentCursor
+
+  const wrappedCards = studiedCards.filter(card => card.sort_position < currentCursor)
+  const nextPosition = wrappedCards.length > 0
+    ? Math.max(...wrappedCards.map(card => card.sort_position)) + 1
+    : Math.max(...studiedCards.map(card => card.sort_position)) + 1
+  return nextPosition > maxCardPosition ? 0 : nextPosition
+}
+
 // ─── Position Computation ───────────────────────────────────
 
 /**
@@ -138,7 +189,7 @@ export function advanceSequentialReviewPosition(
  *
  * @param maxCardPosition - Maximum sort_position across all cards in the deck (for wrap detection)
  */
-export function computeSequentialReviewPositions(
+function computeStudiedSequentialReviewPositions(
   queue: Pick<Card, 'sort_position' | 'srs_status'>[],
   currentState: Pick<DeckStudyState, 'new_start_pos' | 'review_start_pos'>,
   maxCardPosition?: number,
@@ -193,4 +244,30 @@ export function computeSequentialReviewPositions(
     new_start_pos: currentState.new_start_pos,
     review_start_pos: shouldWrap ? 0 : nextReviewPos,
   }
+}
+
+/**
+ * Compute sequential-review cursors from the cards actually studied, while
+ * retaining the next unstudied tie position on an early exit.
+ */
+export function computeSequentialReviewPositions(
+  queue: Pick<Card, 'sort_position' | 'srs_status'>[],
+  currentState: Pick<DeckStudyState, 'new_start_pos' | 'review_start_pos'>,
+  maxCardPosition?: number,
+  cardsStudied: number = queue.length,
+): { new_start_pos: number; review_start_pos: number } {
+  const studiedCount = Math.max(0, Math.min(queue.length, Math.floor(cardsStudied)))
+  const studiedCards = queue.slice(0, studiedCount)
+  const positions = computeStudiedSequentialReviewPositions(
+    studiedCards,
+    currentState,
+    maxCardPosition,
+  )
+  const nextUnstudied = queue[studiedCount]
+  if (!nextUnstudied) return positions
+
+  if (nextUnstudied.srs_status === 'new') {
+    return { ...positions, new_start_pos: nextUnstudied.sort_position }
+  }
+  return { ...positions, review_start_pos: nextUnstudied.sort_position }
 }

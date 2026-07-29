@@ -3,6 +3,18 @@ import { supabase } from './supabase'
 import type { SrsResult } from './srs.ts'
 import type { Card, StudyMode } from '../types/database.ts'
 
+/**
+ * Minimal RPC surface required to persist a rating. Callers pass their own
+ * Supabase client so the helper never depends on which client instance a
+ * platform initialized.
+ */
+export interface AtomicRatingClient {
+  rpc(
+    name: string,
+    params: Record<string, unknown>,
+  ): PromiseLike<{ data: unknown; error: { message: string } | null }>
+}
+
 export interface AtomicRatingInput {
   card: Card
   deckId: string
@@ -11,6 +23,8 @@ export interface AtomicRatingInput {
   durationMs: number
   srsResult: SrsResult | null
   clientRatingId: string
+  /** Defaults to the shared client for callers that already use it. */
+  client?: AtomicRatingClient
 }
 
 export interface AtomicRatingState {
@@ -38,8 +52,9 @@ export function createClientRatingId(): string {
 
 export async function persistAtomicRating(input: AtomicRatingInput): Promise<AtomicRatingResult> {
   const result = input.srsResult
+  const client: AtomicRatingClient = input.client ?? (supabase as unknown as AtomicRatingClient)
   try {
-    const { data, error } = await supabase.rpc('rate_card_and_log', {
+    const { data, error } = await client.rpc('rate_card_and_log', {
       p_card_id: input.card.id,
       p_deck_id: input.deckId,
       p_study_mode: input.mode,

@@ -131,6 +131,7 @@ export interface Database {
           repetitions: number
           next_review_at: string | null
           last_reviewed_at: string | null
+          srs_revision?: number
           created_at: string
           updated_at: string
         }
@@ -147,6 +148,8 @@ export interface Database {
           interval_days?: number
           repetitions?: number
           next_review_at?: string | null
+          last_reviewed_at?: string | null
+          srs_revision?: number
         }
         Update: Partial<Database['public']['Tables']['cards']['Insert']>
       }
@@ -174,6 +177,80 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['deck_study_state']['Insert']>
       }
+      user_card_progress: {
+        Row: {
+          id: string
+          user_id: string
+          card_id: string
+          deck_id: string
+          srs_status: SrsStatus
+          ease_factor: number
+          interval_days: number
+          repetitions: number
+          next_review_at: string | null
+          last_reviewed_at: string | null
+          srs_revision?: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          card_id: string
+          deck_id: string
+          srs_status?: SrsStatus
+          ease_factor?: number
+          interval_days?: number
+          repetitions?: number
+          next_review_at?: string | null
+          last_reviewed_at?: string | null
+          srs_revision?: number
+        }
+        Update: Partial<Database['public']['Tables']['user_card_progress']['Insert']>
+      }
+      study_rating_events: {
+        Row: {
+          id: string
+          user_id: string
+          session_id: string
+          session_sequence: number
+          card_id: string
+          deck_id: string
+          study_mode: StudyMode
+          rating: string
+          srs_source: StudySrsSource
+          expected_revision: number | null
+          applied_revision: number | null
+          previous_srs: Json | null
+          new_srs: Json | null
+          review_duration_ms: number | null
+          status: StudyRatingEventStatus
+          created_at: string
+          updated_at: string
+          undone_at: string | null
+        }
+        Insert: {
+          id: string
+          user_id: string
+          session_id: string
+          session_sequence: number
+          card_id: string
+          deck_id: string
+          study_mode: StudyMode
+          rating: string
+          srs_source: StudySrsSource
+          expected_revision?: number | null
+          applied_revision?: number | null
+          previous_srs?: Json | null
+          new_srs?: Json | null
+          review_duration_ms?: number | null
+          status?: StudyRatingEventStatus
+          created_at?: string
+          updated_at?: string
+          undone_at?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['study_rating_events']['Insert']>
+      }
       study_logs: {
         Row: {
           id: string
@@ -188,6 +265,7 @@ export interface Database {
           new_ease: number | null
           review_duration_ms: number | null
           prev_srs_status: string | null
+          rating_event_id?: string | null
           studied_at: string
         }
         Insert: {
@@ -203,6 +281,7 @@ export interface Database {
           new_ease?: number | null
           review_duration_ms?: number | null
           prev_srs_status?: string | null
+          rating_event_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['study_logs']['Insert']>
       }
@@ -218,6 +297,7 @@ export interface Database {
           ratings: Record<string, number>
           started_at: string
           completed_at: string
+          client_session_id?: string | null
           metadata?: Record<string, unknown>
         }
         Insert: {
@@ -231,6 +311,7 @@ export interface Database {
           ratings: Record<string, number>
           started_at: string
           completed_at?: string
+          client_session_id?: string | null
           metadata?: Record<string, unknown>
         }
         Update: Partial<Database['public']['Tables']['study_sessions']['Insert']>
@@ -279,6 +360,38 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['user_sessions']['Insert']>
       }
     }
+    Functions: {
+      apply_study_rating: {
+        Args: {
+          p_event_id: string
+          p_client_session_id: string
+          p_card_id: string
+          p_deck_id: string
+          p_study_mode: string
+          p_rating: string
+          p_srs_source: StudySrsSource
+          p_expected_revision?: number | null
+          p_new_srs?: Json | null
+          p_review_duration_ms?: number | null
+        }
+        Returns: Json
+      }
+      finalize_study_session: {
+        Args: {
+          p_client_session_id: string
+          p_deck_id: string
+          p_study_mode: string
+          p_started_at: string
+          p_cursor_before?: Json | null
+          p_cursor_after?: Json | null
+        }
+        Returns: Json
+      }
+      undo_study_rating: {
+        Args: { p_event_id: string }
+        Returns: Json
+      }
+    }
   }
 }
 
@@ -288,6 +401,8 @@ export type SrsStatus = 'new' | 'learning' | 'review' | 'suspended'
 export type LayoutMode = 'default' | 'custom'
 export type ShareMode = 'copy' | 'subscribe' | 'snapshot'
 export type ShareStatus = 'pending' | 'active' | 'revoked' | 'declined'
+export type StudySrsSource = 'embedded' | 'progress_table' | 'none'
+export type StudyRatingEventStatus = 'applied' | 'undone'
 
 export type TemplateField = {
   key: string
@@ -329,6 +444,7 @@ export type CardTemplate = Database['public']['Tables']['card_templates']['Row']
 export type Deck = Database['public']['Tables']['decks']['Row']
 export type Card = Database['public']['Tables']['cards']['Row']
 export type DeckStudyState = Database['public']['Tables']['deck_study_state']['Row']
+export type StudyRatingEvent = Database['public']['Tables']['study_rating_events']['Row']
 export type StudyLog = Database['public']['Tables']['study_logs']['Row']
 export type StudySession = Database['public']['Tables']['study_sessions']['Row']
 export type Subscription = Database['public']['Tables']['subscriptions']['Row']
@@ -525,6 +641,7 @@ export type UserCardProgress = {
   repetitions: number
   next_review_at: string | null
   last_reviewed_at: string | null
+  srs_revision?: number
   created_at: string
   updated_at: string
 }

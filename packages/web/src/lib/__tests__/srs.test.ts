@@ -202,14 +202,18 @@ describe('calculateSRS — Learning Phase', () => {
     })
   })
 
-  describe('no learning_steps property — backward compat', () => {
+  describe('no learning_steps property — backward compat fallback', () => {
     const legacySettings: SrsSettings = { again_days: 0, hard_days: 1, good_days: 1, easy_days: 4 }
 
-    it('good on new card → directly to review (no steps)', () => {
+    it('good on new card → uses default [1, 10] steps', () => {
       const card = makeSrsCard({ srs_status: 'new' })
       const result = calculateSRS(card, 'good', legacySettings)
 
-      expect(result.srs_status).toBe('review')
+      expect(result.srs_status).toBe('learning')
+      expect(result.repetitions).toBe(1)
+      const delayMs = new Date(result.next_review_at).getTime() - Date.now()
+      expect(delayMs).toBeGreaterThan(9 * 60 * 1000)
+      expect(delayMs).toBeLessThan(11 * 60 * 1000)
     })
   })
 })
@@ -582,7 +586,7 @@ describe('calculateSRS — again lapse uses learning_steps[0]', () => {
     expect(nextReview - now).toBeLessThan(6 * 60 * 1000)
   })
 
-  it('review card again, again_days=0, no learning_steps → fallback +10min', () => {
+  it('review card again, again_days=0, no learning_steps → default [1,10] first step (+1min)', () => {
     const settings: SrsSettings = { again_days: 0, hard_days: 1, good_days: 1, easy_days: 4 }
     const card = makeSrsCard({ srs_status: 'review', ease_factor: 2.5, repetitions: 3, interval_days: 10 })
     const result = calculateSRS(card, 'again', settings)
@@ -590,8 +594,8 @@ describe('calculateSRS — again lapse uses learning_steps[0]', () => {
     expect(result.srs_status).toBe('learning')
     const nextReview = new Date(result.next_review_at).getTime()
     const now = Date.now()
-    expect(nextReview - now).toBeGreaterThan(9 * 60 * 1000)
-    expect(nextReview - now).toBeLessThan(11 * 60 * 1000)
+    expect(nextReview - now).toBeGreaterThan(0.5 * 60 * 1000)
+    expect(nextReview - now).toBeLessThan(2 * 60 * 1000)
   })
 
   it('review card again, again_days=0, learning_steps=[] → fallback +10min', () => {
