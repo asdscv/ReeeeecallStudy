@@ -299,3 +299,15 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/billing_sku_catalog_test.sql
+
+      # This list is explicit, not a glob, so a new suite is invisible to CI until it
+      # is added here — refund_policy_test.sql shipped in #320 and never ran.
+      - name: Run refund channel + policy assertions (migs 156/157 — iOS revoke-only vs Play refundable, eligibility verdicts)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/refund_policy_test.sql
+
+      - name: Run credit refund-guard assertions (mig 158 — refund-before-grant tombstone is actually readable)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/credit_refund_guard_test.sql
