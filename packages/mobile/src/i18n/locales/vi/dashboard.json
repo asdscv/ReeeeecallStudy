@@ -55,7 +55,7 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count, number}}days",
+  "streakDays": "{{count, number}} ngày",
   "quickStudy": {
     "title": "Học nhanh",
     "dueToday": "{{count, number}} thẻ cần học hôm nay",
