@@ -114,16 +114,16 @@ describe('study-store timestamp-based SRS queue', () => {
     expect(manager.remaining()).toBe(0)
     expect(manager.isComplete()).toBe(true)
 
-    const cardUpdate = mockSupabase.updates.find(update => update.table === 'cards')
-    expect(cardUpdate?.payload).toMatchObject({
+    // P5B: the SRS row is written inside apply_study_rating, not by a direct update.
+    expect(mockSupabase.updates.find(update => update.table === 'cards')).toBeUndefined()
+    const applied = mockSupabase.rpc.mock.calls
+      .filter(([name]) => name === 'apply_study_rating')
+      .map(([, params]) => params as { p_rating: string; p_new_srs: Record<string, unknown> })
+    expect(applied.map(p => p.p_rating)).toEqual(['good'])
+    expect(applied[0].p_new_srs).toMatchObject({
       srs_status: 'learning',
       repetitions: 1,
       next_review_at: expectedDue,
     })
-
-    const loggedRatings = mockSupabase.rpc.mock.calls
-      .filter(([name]) => name === 'insert_study_log')
-      .map(([, params]) => (params as { p_rating: string }).p_rating)
-    expect(loggedRatings).toEqual(['good'])
   })
 })

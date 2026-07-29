@@ -117,8 +117,9 @@ describe('study-store cramming true rounds', () => {
 
     expect(mockSupabase.from).not.toHaveBeenCalledWith('cards')
     expect(mockSupabase.from).not.toHaveBeenCalledWith('user_card_progress')
+    // P5B: ratings persist through the atomic apply_study_rating RPC.
     const loggedRatings = mockSupabase.rpc.mock.calls
-      .filter(([name]) => name === 'insert_study_log')
+      .filter(([name]) => name === 'apply_study_rating')
       .map(([, params]) => (params as { p_rating: string }).p_rating)
     expect(loggedRatings).toEqual(['got_it', 'missed', 'got_it'])
   })
