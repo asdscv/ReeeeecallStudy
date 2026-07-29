@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
-import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { getAffordableCards, formatUsdMicro, formatCount, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
@@ -683,7 +683,7 @@ export function AIGenerateScreen() {
           </Text>
           {store.progress.total > 0 && (
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-              {store.progress.done.toLocaleString()}/{store.progress.total.toLocaleString()}
+              {formatCount(store.progress.done)}/{formatCount(store.progress.total)}
             </Text>
           )}
         </View>

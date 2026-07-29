@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import {
   xpInCurrentLevel,
   xpToNextLevel,
@@ -81,7 +82,7 @@ export function AchievementsScreen() {
               </Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={[{ fontSize: 22, fontWeight: '700', color: theme.colors.text }]}>{xp.toLocaleString()}</Text>
+              <Text style={[{ fontSize: 22, fontWeight: '700', color: theme.colors.text }]}>{formatCount(xp)}</Text>
               <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('achievements.totalXp')}</Text>
             </View>
           </View>

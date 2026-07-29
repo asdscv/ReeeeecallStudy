@@ -4,6 +4,7 @@
 // provider key, meters the per-account daily free quota, and builds the prompt
 // server-side. `supabase.functions.invoke` auto-attaches the user's session JWT.
 import { supabase } from '../supabase'
+import { groupThousands } from '../format-number'
 import type { FieldHint } from './prompts'
 import type { GeneratedTemplateField } from './types'
 
@@ -150,23 +151,10 @@ export function formatUsdMicro(micro: number, opts?: { sign?: boolean }): string
   return s
 }
 
-// Comma-group the integer part of an already-formatted decimal string, WITHOUT Intl.
-// toLocaleString('en-US', …) is the obvious way, but React Native's Hermes can ship
-// without full ICU, where it silently drops the separators — that's how "$1000000.00"
-// reached the UI. A regex over the fixed-decimal string behaves the same everywhere.
-function groupThousands(s: string): string {
-  const dot = s.indexOf('.')
-  const int = dot < 0 ? s : s.slice(0, dot)
-  const frac = dot < 0 ? '' : s.slice(dot)
-  return int.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + frac
-}
-
-// Comma-group a plain count (card counts, quotas). Same Intl-free guarantee as
-// formatUsdMicro — prefer this over `n.toLocaleString()` for numbers rendered on mobile.
-export function formatCount(n: number): string {
-  const v = Math.trunc(n || 0)
-  return (v < 0 ? '−' : '') + groupThousands(String(Math.abs(v)))
-}
+// Grouping lives in ../format-number so the non-AI modules (pricing.ts) can share it
+// instead of re-deriving the regex. Re-exported here because every mobile/web call site
+// already imports formatCount from this path.
+export { formatCount } from '../format-number'
 
 export interface WalletLedgerEntry {
   delta: number         // micro-WON; +grant/+refund, -spend

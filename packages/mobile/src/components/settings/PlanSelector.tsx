@@ -10,6 +10,7 @@ import {
 } from '../../services/billing'
 import { SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 
 // Card limits at or above this collapse to "unlimited" FOR DISPLAY only. As of mig 148
 // NO plan is unlimited (the top plan caps at 100,000); this now only fires for admins,
@@ -68,7 +69,7 @@ export function PlanSelector({
   const fmtLimit = (limit: number | null): string =>
     limit != null && limit >= UNLIMITED_CARD_LIMIT
       ? t('plans.unlimited')
-      : t('plans.cardLimit', { limit: (limit ?? 0).toLocaleString() })
+      : t('plans.cardLimit', { limit: formatCount(limit ?? 0) })
 
   // Price is always USD (the store charges USD everywhere; ₩/Toss dropped).
   const fmtPrice = (p: BillingProduct): string => formatProductPrice(p)

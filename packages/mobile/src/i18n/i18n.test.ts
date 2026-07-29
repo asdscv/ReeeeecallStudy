@@ -93,6 +93,32 @@ for (const lang of SUPPORTED_LANGS) {
   }
 }
 
+// ── Test 5: every {{x, <fmt>}} spec used in a locale has an Intl-free override ──
+// i18next's built-in formatters go through Intl, which silently drops thousands separators
+// on a Hermes build without full ICU. src/i18n/index.ts overrides `number` for that reason;
+// this guards both directions — the override must not disappear while locales rely on it,
+// and a NEW format spec must not be introduced without an override.
+console.log('[Test 5] Locale format specs have Intl-free overrides')
+{
+  const specs = new Set<string>()
+  for (const lang of SUPPORTED_LANGS) {
+    for (const ns of NAMESPACES) {
+      const file = path.join(LOCALES_DIR, lang, `${ns}.json`)
+      if (!fs.existsSync(file)) continue
+      const raw = fs.readFileSync(file, 'utf-8')
+      for (const m of raw.matchAll(/\{\{\s*[a-zA-Z0-9_]+\s*,\s*([a-zA-Z]+)/g)) specs.add(m[1])
+    }
+  }
+  const config = fs.readFileSync(path.join(__dirname, 'index.ts'), 'utf-8')
+  for (const spec of specs) {
+    assert(
+      new RegExp(`formatter\\??\\.add\\(\\s*['"\`]${spec}['"\`]`).test(config),
+      `locales use {{x, ${spec}}} but src/i18n/index.ts registers no Intl-free '${spec}' formatter ` +
+        `— on a Hermes build without full ICU it would silently drop separators`,
+    )
+  }
+}
+
 // ── Summary ──
 console.log(`\n✅ Passed: ${passed}`)
 if (failed > 0) {
