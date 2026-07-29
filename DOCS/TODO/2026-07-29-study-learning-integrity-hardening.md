@@ -336,7 +336,7 @@ Master 문서의 모든 checkbox와 PR/commit/test evidence를 채운 뒤
 
 - [x] P0 master design 작성
 - [x] P1 guardrails — PR #332, local 265 study tests + 86 final core tests, 7 CI checks green
-- [ ] P2 cramming true rounds
+- [x] P2 cramming true rounds — PR #333, local 17 files / 270 study tests, 7 CI checks green
 - [ ] P3 SRS due queue
 - [ ] P4 sequential safety
 - [ ] P5A persistence expand
