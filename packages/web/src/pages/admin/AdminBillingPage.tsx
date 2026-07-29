@@ -328,7 +328,7 @@ export function AdminBillingPage() {
                     </td>
                     <td className="px-4 py-2 text-muted-foreground tabular-nums">{row.card_limit?.toLocaleString(dateLocale) ?? '-'}</td>
                     <td className="px-4 py-2 text-muted-foreground">{row.current_period_end ? formatLocalDate(row.current_period_end, dateLocale) : '-'}</td>
-                    <td className="px-4 py-2"><ChannelBadge channel={row.channel} t={t} /></td>
+                    <td className="px-4 py-2"><ChannelBadge channel={row.channel} environment={row.environment} t={t} /></td>
                     <td className="px-4 py-2">
                       <div className="flex flex-wrap gap-1.5">
                         <button
@@ -437,7 +437,7 @@ export function AdminBillingPage() {
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">{row.product_id ?? '-'}</td>
                     <td className="px-4 py-2 text-muted-foreground">{t(`billing.kind.${row.kind}`, row.kind)}</td>
-                    <td className="px-4 py-2"><ChannelBadge channel={row.channel} t={t} /></td>
+                    <td className="px-4 py-2"><ChannelBadge channel={row.channel} environment={row.environment} t={t} /></td>
                     <td className="px-4 py-2 text-right text-foreground tabular-nums">{fmtMicro(row.amount_micro)}</td>
                     <td className="px-4 py-2">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${PAY_STATUS_STYLES[row.status] ?? 'bg-accent text-foreground'}`}>
@@ -507,8 +507,10 @@ export function AdminBillingPage() {
  * a warning rather than guessed at, because guessing "Android" on an Apple purchase
  * would put a money-refund button on a row that cannot honour it.
  */
-function ChannelBadge({ channel, t }: {
+function ChannelBadge({ channel, environment, t }: {
   channel: string
+  /** 'sandbox' rows are free test purchases (mig 159) — mark them loudly. */
+  environment?: 'production' | 'sandbox'
   // Same shape Pager uses — i18next's TFunction, not a hand-rolled signature,
   // which `tsc -b` rejects as incompatible.
   t: ReturnType<typeof useTranslation>['t']
@@ -519,6 +521,14 @@ function ChannelBadge({ channel, t }: {
       title={t(`billing.channel.hint.${channel}`, { defaultValue: '' }) || undefined}
     >
       {t(`billing.channel.${channel}`, { defaultValue: channel })}
+      {environment === 'sandbox' && (
+        <span
+          className="ml-1 px-1 rounded bg-warning/25 text-warning font-semibold"
+          title={t('billing.channel.sandboxHint')}
+        >
+          {t('billing.channel.sandbox')}
+        </span>
+      )}
     </span>
   )
 }

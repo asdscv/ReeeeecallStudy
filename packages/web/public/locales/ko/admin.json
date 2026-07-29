@@ -248,7 +248,9 @@
       "message": "점검 안내 메시지",
       "messagePlaceholder": "점검 중 사용자에게 표시",
       "save": "저장",
-      "saved": "저장됨 ✓"
+      "saved": "저장됨 ✓",
+      "sandboxGrants": "샌드박스 구매에 크레딧 지급 허용",
+      "sandboxGrantsHint": "OFF: RevenueCat 샌드박스 이벤트를 받기만 하고 아무것도 지급하지 않습니다. 테스트할 때만 켜세요 — 샌드박스 구매는 무료입니다."
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "Lemon Squeezy API로 환불할 수 있어요.",
         "web_toss": "토스 API로 결제 취소할 수 있어요.",
         "admin": "무상 지급 건이라 결제된 돈이 없어요."
-      }
+      },
+      "sandbox": "샌드박스",
+      "sandboxHint": "스토어 샌드박스 테스트 구매 — 무료이며 매출에 절대 집계되지 않습니다."
     }
   },
   "official": {

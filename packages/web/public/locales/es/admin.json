@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "Permitir que las compras sandbox otorguen créditos",
+      "sandboxGrantsHint": "OFF: los eventos sandbox de RevenueCat se aceptan pero no otorgan nada. Actívalo solo para una prueba: las compras sandbox son gratuitas."
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "Reembolsable mediante la API de Lemon Squeezy.",
         "web_toss": "Cancelable mediante la API de Toss.",
         "admin": "Concesión gratuita: nunca se cobró dinero."
-      }
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Compra de prueba desde el sandbox de la tienda: gratuita y nunca contada como ingreso."
     }
   },
   "official": {

@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "Cho phép giao dịch sandbox cấp tín dụng",
+      "sandboxGrantsHint": "TẮT: sự kiện sandbox của RevenueCat được nhận nhưng không cấp gì. Chỉ bật khi chạy thử — giao dịch sandbox là miễn phí."
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "Có thể hoàn tiền qua API Lemon Squeezy.",
         "web_toss": "Có thể huỷ thanh toán qua API Toss.",
         "admin": "Khoản cấp miễn phí — chưa từng thu tiền."
-      }
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Giao dịch thử từ sandbox của cửa hàng — miễn phí và không bao giờ tính vào doanh thu."
     }
   },
   "official": {

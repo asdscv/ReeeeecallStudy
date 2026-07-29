@@ -35,6 +35,15 @@
 //   failure leaves the row unattributed, which the admin UI reads as 'mobile_unknown'
 //   and treats as revoke-only (never claiming a money refund it cannot perform).
 //
+// SANDBOX vs PRODUCTION (mig 159). RevenueCat tags every event with `environment`.
+//   A sandbox purchase is FREE and made from a tester account you create yourself,
+//   but it used to run the SAME grant path as a real one — real micro-USD credited
+//   to a real account, indistinguishable afterwards, and counted in MRR. Now the
+//   environment is recorded on the row, sandbox grants are gated behind the
+//   default-off system_flags.sandbox_grants_enabled kill switch, and the admin
+//   overview keeps sandbox out of every business metric while still reporting it.
+//   Anything not explicitly SANDBOX is treated as production.
+//
 // EVENT → RPC (event.type):
 //   INITIAL_PURCHASE / NON_RENEWING_PURCHASE (subscription product)
 //                                → sync_subscription_by_user(active,  expiry, cancel=false)
@@ -67,8 +76,12 @@
 //     Integrations → Webhooks → + New webhook
 //       URL                     https://<project-ref>.functions.supabase.co/revenuecat-webhook
 //       Authorization header    Bearer <REVENUECAT_WEBHOOK_AUTH>   (paste the same token)
-//       Environment             Production (add a second for Sandbox if desired)
+//       Environment             Both Production and Sandbox
+//       App / Event type        All apps / All events
+//       Paywall events          OFF (we handle none; they would be pure log noise)
 //     Save; RevenueCat sends every subscriber event to this URL with that header.
+//     Selecting "Both" is safe: sandbox events are ACKed but grant NOTHING until an
+//     admin flips system_flags.sandbox_grants_enabled on for a test run (mig 159).
 //   And in the app: call Purchases.logIn(<supabase user id>) so app_user_id == our uid.
 //
 // Deploy: config.toml sets verify_jwt = false (RevenueCat, not a user JWT, calls this);
@@ -169,6 +182,8 @@ interface RCEvent {
   transaction_id?: string
   expiration_at_ms?: number
   cancellation_reason?: string
+  /** 'SANDBOX' | 'PRODUCTION' — see the environment note in the header. */
+  environment?: string
   [k: string]: unknown
 }
 
@@ -245,21 +260,55 @@ Deno.serve(async (req) => {
   // both platforms. So record it here, the one place that knows (mig 156).
   const platform = platformFromStore(event.store)
 
-  // Attribute a subscription row to its store. Best-effort and non-fatal: the grant
-  // itself already succeeded, and a missing platform degrades to 'mobile_unknown',
-  // which the admin UI treats as the SAFE case (revoke-only, no money API claimed).
+  // WHICH ENVIRONMENT this event came from. A sandbox purchase is FREE and made
+  // from a tester account, but it used to flow through the exact same grant path as
+  // a real one — real micro-USD credited to a real account, indistinguishable
+  // afterwards, and counted in MRR. mig 159 makes it a recorded property, gates it
+  // behind a default-off kill switch, and keeps it out of every business metric.
+  // Anything not explicitly SANDBOX is treated as production (fail toward recording
+  // money as real, never toward silently discarding it).
+  const environment = String(event.environment ?? '').toUpperCase() === 'SANDBOX'
+    ? 'sandbox'
+    : 'production'
+
+  // Attribute a row to its store AND environment. Best-effort and non-fatal: the
+  // grant itself already succeeded, and a missing platform degrades to
+  // 'mobile_unknown', which the admin UI treats as the SAFE case (revoke-only, no
+  // money API claimed).
   const tagSubscriptionPlatform = async (): Promise<void> => {
-    if (!platform || !subKey) return
+    if (!subKey || (!platform && environment === 'production')) return
     const { error } = await sb.rpc('set_subscription_platform', {
-      p_provider: PROVIDER, p_provider_subscription_id: subKey, p_platform: platform,
+      p_provider: PROVIDER, p_provider_subscription_id: subKey,
+      p_platform: platform, p_environment: environment,
     })
     if (error) console.error('[revenuecat-webhook] set_subscription_platform failed:', error.message)
   }
 
   const tagCreditGrantPlatform = async (ref: string): Promise<void> => {
-    if (!platform || !ref) return
-    const { error } = await sb.rpc('set_credit_grant_platform', { p_ref: ref, p_platform: platform })
+    if (!ref) return
+    const { error } = await sb.rpc('set_credit_grant_platform', {
+      p_ref: ref, p_platform: platform, p_environment: environment,
+    })
     if (error) console.error('[revenuecat-webhook] set_credit_grant_platform failed:', error.message)
+  }
+
+  // Sandbox grants are OFF by default (mig 159). Enabling the RevenueCat sandbox
+  // webhook — which you must do to test IAP at all — therefore cannot mint credits
+  // on its own; an admin opens the switch for a test run and closes it after.
+  //
+  // FAIL CLOSED on a failed lookup: if we cannot confirm sandbox grants are allowed,
+  // we do not grant. A 500 makes RevenueCat retry, which is safe because every grant
+  // is idempotent on its ref.
+  const sandboxGrantBlocked = async (): Promise<Response | null> => {
+    if (environment !== 'sandbox') return null
+    const { data, error } = await sb.rpc('sandbox_grants_enabled')
+    if (error) {
+      console.error('[revenuecat-webhook] sandbox_grants_enabled failed — refusing to grant:', error.message)
+      return json({ error: 'Sandbox check failed', code: 'GRANT_ERROR' }, 500)
+    }
+    if (data === true) return null
+    console.warn('[revenuecat-webhook]', type, 'SANDBOX event ignored — sandbox grants are disabled')
+    return json({ received: true, type, environment, ignored: 'sandbox_grants_disabled' }, 200)
   }
 
   // ── LIFECYCLE (UPDATE-only, matched by provider + subKey; no product/user needed) ──
@@ -293,6 +342,11 @@ Deno.serve(async (req) => {
 
   // ── GRANT / RENEW (needs the buyer + product; disambiguate credit_pack vs sub) ──
   const grant = async () => {
+    // Gate FIRST — before resolving products or touching the wallet — so a blocked
+    // sandbox event costs one cheap flag read and changes nothing.
+    const blocked = await sandboxGrantBlocked()
+    if (blocked) return blocked
+
     // app_user_id must be OUR supabase uid (set via Purchases.logIn). A RevenueCat
     // anonymous id ($RCAnonymousID:…) can't be attributed → ack 200, don't retry.
     if (!UUID_RE.test(appUserId)) {
@@ -370,7 +424,7 @@ Deno.serve(async (req) => {
       // payment record, so the store has to be stamped on the ledger or the admin
       // payment list cannot show which store sold it (mig 156).
       await tagCreditGrantPlatform(creditRef)
-      return json({ received: true, type, kind: 'credit_pack', balance_micro_won: data ?? null, platform }, 200)
+      return json({ received: true, type, kind: 'credit_pack', balance_micro_won: data ?? null, platform, environment }, 200)
     }
 
     // SUBSCRIPTION product → UPSERT the sub as active for this user/product, keyed by the
@@ -388,7 +442,7 @@ Deno.serve(async (req) => {
     })
     if (error) return rpcErrorResponse(`sync_subscription_by_user ${type}`, error.message)
     await tagSubscriptionPlatform()
-    return json({ received: true, type, kind: 'subscription', platform, ...(data ?? {}) }, 200)
+    return json({ received: true, type, kind: 'subscription', platform, environment, ...(data ?? {}) }, 200)
   }
 
   // ── REFUND / CHARGEBACK — subscription (revoke) OR consumable credit pack (clawback) ──

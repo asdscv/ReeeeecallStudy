@@ -160,7 +160,7 @@ export function AdminSystemPage() {
 // Runtime kill switches (mig 153). Toggles take effect immediately (edge fns read the
 // flag per request). Green = healthy (AI/payments ON, maintenance OFF); red = the switch
 // is in its incident/off position.
-type FlagKey = 'ai_generation_enabled' | 'payments_enabled' | 'maintenance_mode'
+type FlagKey = 'ai_generation_enabled' | 'payments_enabled' | 'maintenance_mode' | 'sandbox_grants_enabled'
 
 function SystemControls() {
   const { t } = useTranslation('admin')
@@ -192,6 +192,9 @@ function SystemControls() {
     { key: 'ai_generation_enabled', label: t('system.controls.aiEnabled'), hint: t('system.controls.aiHint'), goodWhenOn: true },
     { key: 'payments_enabled', label: t('system.controls.paymentsEnabled'), hint: t('system.controls.paymentsHint'), goodWhenOn: true },
     { key: 'maintenance_mode', label: t('system.controls.maintenance'), hint: t('system.controls.maintenanceHint'), goodWhenOn: false },
+    // goodWhenOn:false — ON means free sandbox purchases can mint real credits, which
+    // is a deliberate, temporary test posture, not the healthy resting state.
+    { key: 'sandbox_grants_enabled', label: t('system.controls.sandboxGrants'), hint: t('system.controls.sandboxGrantsHint'), goodWhenOn: false },
   ]
 
   return (
