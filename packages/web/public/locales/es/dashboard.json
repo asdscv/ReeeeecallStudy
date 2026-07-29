@@ -8,7 +8,7 @@
   },
   "dailyChart": {
     "title": "Volumen de estudio diario",
-    "total": "Total {{count}} veces",
+    "total": "Total {{count, number}} veces",
     "noData": "Sin registros de estudio aún",
     "tooltipTimes": "{{value}} veces",
     "tooltipLabel": "Estudio"
@@ -23,19 +23,19 @@
     "title": "Estado de mazos",
     "noDecks": "Sin mazos aún. ¡Crea uno!",
     "goToDecks": "Ir a gestión de mazos",
-    "cardCount": "{{count}} tarjetas",
-    "newCards": "Nuevas {{count}}",
-    "reviewCards": "Repaso {{count}}",
+    "cardCount": "{{count, number}} tarjetas",
+    "newCards": "Nuevas {{count, number}}",
+    "reviewCards": "Repaso {{count, number}}",
     "study": "Estudiar"
   },
   "quickStudy": {
-    "dueCount": "{{count}} tarjetas para hoy",
+    "dueCount": "{{count, number}} tarjetas para hoy",
     "startSession": "Iniciar sesión de estudio"
   },
   "heatmap": {
     "title": "Mapa de calor de estudio",
     "noStudy": "Sin estudio",
-    "studyCount": "{{date}}: {{count}} estudios",
-    "tooltip": "{{date}}: {{count}} estudios"
+    "studyCount": "{{date}}: {{count, number}} estudios",
+    "tooltip": "{{date}}: {{count, number}} estudios"
   }
 }

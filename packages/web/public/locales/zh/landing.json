@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "受到全球学习者的信赖",
     "subtitle": "加入数千名更聪明地学习的学生行列",
-    "liveActivity": "正有{{count}}人在学习",
+    "liveActivity": "正有{{count, number}}人在学习",
     "userCountLabel": "活跃用户",
     "cardsStudiedLabel": "已学卡片",
     "decksCreatedLabel": "已创建牌组",
@@ -334,7 +334,7 @@
     "freePrice": "免费",
     "pricePerMonth": "{{price}}/月",
     "unlimitedCards": "无限卡片",
-    "upToCards": "最多 {{count}} 张卡片",
+    "upToCards": "最多 {{count, number}} 张卡片",
     "ctaFree": "免费开始",
     "ctaPaid": "立即开始",
     "note": "注册并登录后可在设置中完成付款。",

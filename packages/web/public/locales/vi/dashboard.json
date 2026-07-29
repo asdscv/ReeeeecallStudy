@@ -8,7 +8,7 @@
   },
   "dailyChart": {
     "title": "Lượng học hàng ngày",
-    "total": "Tổng cộng {{count}} lần",
+    "total": "Tổng cộng {{count, number}} lần",
     "noData": "Chưa có hồ sơ học tập",
     "tooltipTimes": "{{value}} lần",
     "tooltipLabel": "Học tập"
@@ -23,19 +23,19 @@
     "title": "Trạng thái bộ thẻ",
     "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ!",
     "goToDecks": "Đến quản lý bộ thẻ",
-    "cardCount": "{{count}} thẻ",
-    "newCards": "Mới {{count}}",
-    "reviewCards": "Ôn tập {{count}}",
+    "cardCount": "{{count, number}} thẻ",
+    "newCards": "Mới {{count, number}}",
+    "reviewCards": "Ôn tập {{count, number}}",
     "study": "Học"
   },
   "quickStudy": {
-    "dueCount": "{{count}} thẻ cần ôn hôm nay",
+    "dueCount": "{{count, number}} thẻ cần ôn hôm nay",
     "startSession": "Bắt đầu học"
   },
   "heatmap": {
     "title": "Bản đồ nhiệt học tập",
     "noStudy": "Không học",
-    "studyCount": "{{date}}: {{count}} lần học",
-    "tooltip": "{{date}}: {{count}} lần học"
+    "studyCount": "{{date}}: {{count, number}} lần học",
+    "tooltip": "{{date}}: {{count, number}} lần học"
   }
 }

@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "Dipercaya oleh Pelajar di Seluruh Dunia",
     "subtitle": "Bergabunglah dengan ribuan siswa yang belajar lebih cerdas",
-    "liveActivity": "{{count}} orang sedang belajar sekarang",
+    "liveActivity": "{{count, number}} orang sedang belajar sekarang",
     "userCountLabel": "Pengguna Aktif",
     "cardsStudiedLabel": "Kartu Dipelajari",
     "decksCreatedLabel": "Dek Dibuat",
@@ -334,7 +334,7 @@
     "freePrice": "Gratis",
     "pricePerMonth": "{{price}}/bln",
     "unlimitedCards": "Kartu tanpa batas",
-    "upToCards": "Hingga {{count}} kartu",
+    "upToCards": "Hingga {{count, number}} kartu",
     "ctaFree": "Mulai gratis",
     "ctaPaid": "Mulai sekarang",
     "note": "Pembayaran dilakukan setelah mendaftar, di Pengaturan.",

@@ -8,7 +8,7 @@
   },
   "dailyChart": {
     "title": "Daily Study Volume",
-    "total": "Total {{count}} times",
+    "total": "Total {{count, number}} times",
     "noData": "No study records yet",
     "tooltipTimes": "{{value}} times",
     "tooltipLabel": "Study"
@@ -23,19 +23,19 @@
     "title": "Deck Status",
     "noDecks": "No decks yet. Create one!",
     "goToDecks": "Go to Deck Management",
-    "cardCount": "{{count}} cards",
-    "newCards": "New {{count}}",
-    "reviewCards": "Review {{count}}",
+    "cardCount": "{{count, number}} cards",
+    "newCards": "New {{count, number}}",
+    "reviewCards": "Review {{count, number}}",
     "study": "Study"
   },
   "quickStudy": {
-    "dueCount": "{{count}} cards due today",
+    "dueCount": "{{count, number}} cards due today",
     "startSession": "Start a study session"
   },
   "heatmap": {
     "title": "Study Heatmap",
     "noStudy": "No study",
-    "studyCount": "{{date}}: {{count}} studies",
-    "tooltip": "{{date}}: {{count}} studies"
+    "studyCount": "{{date}}: {{count, number}} studies",
+    "tooltip": "{{date}}: {{count, number}} studies"
   }
 }

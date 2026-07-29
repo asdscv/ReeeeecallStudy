@@ -7,9 +7,9 @@
   "deleteConfirm": "牌组「{{name}}」及其所有卡片将被删除，此操作不可撤销。",
   "detail": {
     "backToList": "← 牌组列表",
-    "totalCards": "共 {{count}} 张卡片",
-    "newCards": "新卡 {{count}}",
-    "reviewCards": "复习 {{count}}",
+    "totalCards": "共 {{count, number}} 张卡片",
+    "newCards": "新卡 {{count, number}}",
+    "reviewCards": "复习 {{count, number}}",
     "startStudy": "开始学习",
     "edit": "编辑",
     "share": "分享",
@@ -24,7 +24,7 @@
     },
     "searchPlaceholder": "搜索卡片...",
     "allStatus": "全部状态",
-    "selectedCount": "已选 {{count}} 张",
+    "selectedCount": "已选 {{count, number}} 张",
     "noCards": "暂无卡片，试着添加一张吧。",
     "addFirstCard": "+ 添加第一张卡片",
     "importCards": "导入 CSV/JSON",
@@ -35,11 +35,11 @@
       "status": "状态",
       "addedDate": "添加日期"
     },
-    "perPage": "每页 {{count}} 条",
+    "perPage": "每页 {{count, number}} 条",
     "deleteCard": "删除卡片",
     "deleteCardConfirm": "确定删除此卡片？此操作不可撤销。",
     "bulkDelete": "批量删除卡片",
-    "bulkDeleteConfirm": "确定删除 {{count}} 张选中的卡片？此操作不可撤销。",
+    "bulkDeleteConfirm": "确定删除 {{count, number}} 张选中的卡片？此操作不可撤销。",
     "noStudyRecords": "暂无学习记录",
     "aiCards": "AI Cards",
     "versionHistory": "版本历史",
@@ -52,7 +52,7 @@
     "versionCards": "张",
     "archived": {
       "badge": "已归档 · 学习锁定",
-      "note": "有 {{count}} 张卡片因超出上限被归档 — 你仍可查看。订阅后即可再次学习。"
+      "note": "有 {{count, number}} 张卡片因超出上限被归档 — 你仍可查看。订阅后即可再次学习。"
     }
   },
   "settings": {
@@ -82,12 +82,12 @@
     "totalCards": "卡片总数",
     "masteryRate": "掌握率",
     "streak": "连续学习",
-    "streakValue": "{{count}} 天",
+    "streakValue": "{{count, number}} 天",
     "avgInterval": "平均间隔",
-    "intervalValue": "{{count}} 天",
+    "intervalValue": "{{count, number}} 天",
     "statusDistribution": "状态分布",
     "noCards": "暂无卡片",
-    "cardsValue": "{{count}} 张卡片",
+    "cardsValue": "{{count, number}} 张卡片",
     "nameRequired": "请输入牌组名称。",
     "saved": "牌组已保存。"
   },
@@ -115,26 +115,26 @@
     "masteryRate": "掌握率",
     "avgEase": "平均难度系数",
     "avgInterval": "平均间隔",
-    "days": "{{count}} 天",
+    "days": "{{count, number}} 天",
     "statusDistribution": "状态分布",
     "noCards": "暂无卡片",
-    "cardCount": "{{count}} 张卡片",
+    "cardCount": "{{count, number}} 张卡片",
     "dailyStudy": "每日学习量（30天）",
     "dailyVolume": "每日学习量（30天）",
     "loading": "加载中...",
     "noStudyRecords": "暂无学习记录",
-    "studyCount": "{{count}} 次复习",
+    "studyCount": "{{count, number}} 次复习",
     "study": "学习"
   },
   "uploadDate": {
     "noCards": "暂无卡片。",
-    "cardCount": "{{count}} 张卡片"
+    "cardCount": "{{count, number}} 张卡片"
   },
   "card": {
     "noStudyRecord": "暂无学习记录",
-    "totalCards": "{{count}} 张卡片",
-    "newCards": "新卡 {{count}}",
-    "review": "复习 {{count}}",
+    "totalCards": "{{count, number}} 张卡片",
+    "newCards": "新卡 {{count, number}}",
+    "review": "复习 {{count, number}}",
     "edit": "编辑",
     "delete": "删除",
     "startStudy": "学习",
@@ -156,7 +156,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",

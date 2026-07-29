@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "Được tin dùng bởi người học trên toàn thế giới",
     "subtitle": "Tham gia cùng hàng nghìn học sinh đang học thông minh hơn",
-    "liveActivity": "{{count}} người đang học ngay bây giờ",
+    "liveActivity": "{{count, number}} người đang học ngay bây giờ",
     "userCountLabel": "Người dùng hoạt động",
     "cardsStudiedLabel": "Thẻ đã học",
     "decksCreatedLabel": "Bộ thẻ đã tạo",
@@ -334,7 +334,7 @@
     "freePrice": "Miễn phí",
     "pricePerMonth": "{{price}}/tháng",
     "unlimitedCards": "Thẻ không giới hạn",
-    "upToCards": "Tối đa {{count}} thẻ",
+    "upToCards": "Tối đa {{count, number}} thẻ",
     "ctaFree": "Bắt đầu miễn phí",
     "ctaPaid": "Bắt đầu ngay",
     "note": "Thanh toán được thực hiện sau khi đăng ký, trong phần Cài đặt.",

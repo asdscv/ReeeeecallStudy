@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "Đã đạt giới hạn yêu cầu.",
     "cannotDeleteDefault": "Không thể xóa mẫu mặc định.",
-    "inUseByDecks": "Không thể xóa — {{count}} bộ thẻ đang sử dụng mẫu này."
+    "inUseByDecks": "Không thể xóa — {{count, number}} bộ thẻ đang sử dụng mẫu này."
   },
   "marketplace": {
     "listingNotFound": "Không tìm thấy danh sách.",

@@ -55,7 +55,7 @@
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count, number}}days",
+  "streakDays": "{{count, number}} hari",
   "quickStudy": {
     "title": "Belajar Cepat",
     "dueToday": "{{count, number}} kartu jatuh tempo hari ini",

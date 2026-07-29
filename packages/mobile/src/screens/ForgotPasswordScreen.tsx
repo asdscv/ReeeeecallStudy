@@ -100,7 +100,8 @@ export function ForgotPasswordScreen() {
                 testID="forgot-password-error-text"
                 style={[theme.typography.bodySmall, { color: theme.colors.error }]}
               >
-                {error}
+                {/* i18n key from localizeAuthError, or a raw message — see LoginScreen. */}
+                {t(error, { defaultValue: error })}
               </Text>
             ) : null}
 

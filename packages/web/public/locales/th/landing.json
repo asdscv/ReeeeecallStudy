@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "ได้รับความไว้วางใจจากผู้เรียนทั่วโลก",
     "subtitle": "ร่วมกับนักเรียนนับพันที่เรียนอย่างชาญฉลาดยิ่งขึ้น",
-    "liveActivity": "{{count}} คนกำลังเรียนอยู่ตอนนี้",
+    "liveActivity": "{{count, number}} คนกำลังเรียนอยู่ตอนนี้",
     "userCountLabel": "ผู้ใช้ที่ใช้งาน",
     "cardsStudiedLabel": "การ์ดที่เรียน",
     "decksCreatedLabel": "สำรับที่สร้าง",
@@ -334,7 +334,7 @@
     "freePrice": "ฟรี",
     "pricePerMonth": "{{price}}/เดือน",
     "unlimitedCards": "การ์ดไม่จำกัด",
-    "upToCards": "สูงสุด {{count}} การ์ด",
+    "upToCards": "สูงสุด {{count, number}} การ์ด",
     "ctaFree": "เริ่มใช้งานฟรี",
     "ctaPaid": "เริ่มต้นใช้งาน",
     "note": "ชำระเงินได้หลังสมัครสมาชิก ในหน้าการตั้งค่า",

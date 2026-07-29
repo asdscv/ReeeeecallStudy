@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { formatCount } from '@reeeeecall/shared/lib/format-number'
 
 interface StatsSummaryCardsProps {
   totalCards: number
@@ -10,9 +11,11 @@ interface StatsSummaryCardsProps {
 export function StatsSummaryCards({ totalCards, dueToday, streak, masteryRate }: StatsSummaryCardsProps) {
   const { t } = useTranslation(['dashboard', 'common'])
   const items = [
-    { label: t('dashboard:stats.totalCards'), value: totalCards, color: 'text-foreground' },
-    { label: t('dashboard:stats.todayReview'), value: dueToday, color: 'text-warning' },
-    { label: t('dashboard:stats.streak'), value: `${streak}${t('common:units.days')}`, color: 'text-success' },
+    // Counts are rendered raw into JSX here (no i18next interpolation to format them),
+    // so group them explicitly — a 2,500-card account showed "2500".
+    { label: t('dashboard:stats.totalCards'), value: formatCount(totalCards), color: 'text-foreground' },
+    { label: t('dashboard:stats.todayReview'), value: formatCount(dueToday), color: 'text-warning' },
+    { label: t('dashboard:stats.streak'), value: `${formatCount(streak)}${t('common:units.days')}`, color: 'text-success' },
     { label: t('dashboard:stats.masteryRate'), value: `${masteryRate}%`, color: 'text-brand' },
   ]
 

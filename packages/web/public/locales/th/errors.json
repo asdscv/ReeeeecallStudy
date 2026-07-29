@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว",
     "cannotDeleteDefault": "ไม่สามารถลบเทมเพลตเริ่มต้นได้",
-    "inUseByDecks": "ไม่สามารถลบได้ — มี {{count}} สำรับที่ใช้เทมเพลตนี้"
+    "inUseByDecks": "ไม่สามารถลบได้ — มี {{count, number}} สำรับที่ใช้เทมเพลตนี้"
   },
   "marketplace": {
     "listingNotFound": "ไม่พบรายการ",

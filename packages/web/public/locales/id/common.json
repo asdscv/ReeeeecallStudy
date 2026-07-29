@@ -51,7 +51,7 @@
   },
   "units": {
     "cards": "kartu",
-    "cardsSuffix": "{{count}} kartu",
+    "cardsSuffix": "{{count, number}} kartu",
     "sessions": "sesi",
     "items": "item",
     "days": "hari",
@@ -60,11 +60,11 @@
     "seconds": "dtk",
     "times": "kali",
     "percent": "{{value}}%",
-    "decksCount": "{{count}} dek"
+    "decksCount": "{{count, number}} dek"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} per halaman"
+    "perPage": "{{count, number}} per halaman"
   },
   "timePeriod": {
     "1d": "1H",
@@ -120,7 +120,7 @@
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
+      "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
@@ -248,7 +248,7 @@
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

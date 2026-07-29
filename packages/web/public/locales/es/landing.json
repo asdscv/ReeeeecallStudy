@@ -189,7 +189,7 @@
   "trustBadges": {
     "srs": "SRS Inteligente",
     "sharing": "Compartir Mazos",
-    "languages": "{{count}} Idiomas",
+    "languages": "{{count, number}} Idiomas",
     "allDevices": "Todos los Dispositivos",
     "import": "Importar CSV y API"
   },
@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "La Confianza de Estudiantes en Todo el Mundo",
     "subtitle": "Únete a miles de estudiantes que aprenden de forma más inteligente",
-    "liveActivity": "{{count}} personas estudiando ahora mismo",
+    "liveActivity": "{{count, number}} personas estudiando ahora mismo",
     "userCountLabel": "Usuarios Activos",
     "cardsStudiedLabel": "Tarjetas Estudiadas",
     "decksCreatedLabel": "Mazos Creados",
@@ -334,7 +334,7 @@
     "freePrice": "Gratis",
     "pricePerMonth": "{{price}}/mes",
     "unlimitedCards": "Tarjetas ilimitadas",
-    "upToCards": "Hasta {{count}} tarjetas",
+    "upToCards": "Hasta {{count, number}} tarjetas",
     "ctaFree": "Empezar gratis",
     "ctaPaid": "Comenzar",
     "note": "El pago se realiza tras registrarte, en Ajustes.",

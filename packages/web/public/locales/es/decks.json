@@ -7,9 +7,9 @@
   "deleteConfirm": "El mazo \"{{name}}\" y todas sus tarjetas serán eliminados. Esto no se puede deshacer.",
   "detail": {
     "backToList": "← Lista de mazos",
-    "totalCards": "Total {{count}} tarjetas",
-    "newCards": "Nuevas {{count}}",
-    "reviewCards": "Repaso {{count}}",
+    "totalCards": "Total {{count, number}} tarjetas",
+    "newCards": "Nuevas {{count, number}}",
+    "reviewCards": "Repaso {{count, number}}",
     "startStudy": "Comenzar estudio",
     "edit": "Editar",
     "share": "Compartir",
@@ -24,7 +24,7 @@
     },
     "searchPlaceholder": "Buscar tarjetas...",
     "allStatus": "Todos los estados",
-    "selectedCount": "{{count}} seleccionadas",
+    "selectedCount": "{{count, number}} seleccionadas",
     "noCards": "Sin tarjetas. Intenta añadir una tarjeta.",
     "addFirstCard": "+ Añadir primera tarjeta",
     "importCards": "Importar CSV/JSON",
@@ -35,11 +35,11 @@
       "status": "Estado",
       "addedDate": "Añadida"
     },
-    "perPage": "{{count}} por página",
+    "perPage": "{{count, number}} por página",
     "deleteCard": "Eliminar tarjeta",
     "deleteCardConfirm": "¿Eliminar esta tarjeta? Esto no se puede deshacer.",
     "bulkDelete": "Eliminar tarjetas en lote",
-    "bulkDeleteConfirm": "¿Eliminar {{count}} tarjetas seleccionadas? Esto no se puede deshacer.",
+    "bulkDeleteConfirm": "¿Eliminar {{count, number}} tarjetas seleccionadas? Esto no se puede deshacer.",
     "noStudyRecords": "Sin registros de estudio",
     "aiCards": "AI Cards",
     "versionHistory": "Historial de versiones",
@@ -52,7 +52,7 @@
     "versionCards": "tarjetas",
     "archived": {
       "badge": "Archivada · estudio bloqueado",
-      "note": "{{count}} tarjetas están archivadas por superar tu límite: aún puedes verlas. Suscríbete para volver a estudiarlas."
+      "note": "{{count, number}} tarjetas están archivadas por superar tu límite: aún puedes verlas. Suscríbete para volver a estudiarlas."
     }
   },
   "settings": {
@@ -82,12 +82,12 @@
     "totalCards": "Total de tarjetas",
     "masteryRate": "Tasa de dominio",
     "streak": "Racha de estudio",
-    "streakValue": "{{count}} días",
+    "streakValue": "{{count, number}} días",
     "avgInterval": "Intervalo promedio",
-    "intervalValue": "{{count}} días",
+    "intervalValue": "{{count, number}} días",
     "statusDistribution": "Distribución de estados",
     "noCards": "Sin tarjetas",
-    "cardsValue": "{{count}} tarjetas",
+    "cardsValue": "{{count, number}} tarjetas",
     "nameRequired": "Por favor ingresa un nombre para el mazo.",
     "saved": "Mazo guardado."
   },
@@ -115,26 +115,26 @@
     "masteryRate": "Tasa de dominio",
     "avgEase": "Facilidad promedio",
     "avgInterval": "Intervalo promedio",
-    "days": "{{count}} días",
+    "days": "{{count, number}} días",
     "statusDistribution": "Distribución de estados",
     "noCards": "Sin tarjetas",
-    "cardCount": "{{count}} tarjetas",
+    "cardCount": "{{count, number}} tarjetas",
     "dailyStudy": "Volumen de estudio diario (30 días)",
     "dailyVolume": "Volumen de estudio diario (30 días)",
     "loading": "Cargando...",
     "noStudyRecords": "Sin registros de estudio",
-    "studyCount": "{{count}} repasos",
+    "studyCount": "{{count, number}} repasos",
     "study": "Estudio"
   },
   "uploadDate": {
     "noCards": "Sin tarjetas.",
-    "cardCount": "{{count}} tarjetas"
+    "cardCount": "{{count, number}} tarjetas"
   },
   "card": {
     "noStudyRecord": "Sin registro de estudio",
-    "totalCards": "{{count}} tarjetas",
-    "newCards": "Nuevas {{count}}",
-    "review": "Repaso {{count}}",
+    "totalCards": "{{count, number}} tarjetas",
+    "newCards": "Nuevas {{count, number}}",
+    "review": "Repaso {{count, number}}",
     "edit": "Editar",
     "delete": "Eliminar",
     "startStudy": "Estudiar",
@@ -156,7 +156,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",

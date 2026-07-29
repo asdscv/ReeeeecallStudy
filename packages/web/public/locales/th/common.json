@@ -51,7 +51,7 @@
   },
   "units": {
     "cards": "การ์ด",
-    "cardsSuffix": "{{count}} การ์ด",
+    "cardsSuffix": "{{count, number}} การ์ด",
     "sessions": "เซสชัน",
     "items": "รายการ",
     "days": "วัน",
@@ -60,11 +60,11 @@
     "seconds": "วินาที",
     "times": "ครั้ง",
     "percent": "{{value}}%",
-    "decksCount": "{{count}} เด็ค"
+    "decksCount": "{{count, number}} เด็ค"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} ต่อหน้า"
+    "perPage": "{{count, number}} ต่อหน้า"
   },
   "timePeriod": {
     "1d": "1 วัน",
@@ -120,7 +120,7 @@
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
+      "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
@@ -248,7 +248,7 @@
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

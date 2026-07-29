@@ -24,13 +24,13 @@
     "snapshot": "Instantánea"
   },
   "listing": {
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios"
+    "cardCount": "{{count, number}} tarjetas",
+    "userCount": "{{count, number}} usuarios"
   },
   "detail": {
     "back": "← Mercado",
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios",
+    "cardCount": "{{count, number}} tarjetas",
+    "userCount": "{{count, number}} usuarios",
     "getDeck": "Obtener este mazo",
     "importing": "Importando...",
     "cardPreview": "Vista previa de tarjetas (máx 10)",
@@ -43,7 +43,7 @@
     "unsubscribed": "Suscripción cancelada",
     "unsubscribeConfirm": "¿Cancelar la suscripción a esta colección? Tu progreso de estudio personal permanecerá en tu cuenta.",
     "unsubscribeError": "No se pudo cancelar la suscripción. Inténtalo de nuevo.",
-    "limitUsage": "Añade {{count}} tarjetas a tu límite · quedan {{available}}",
+    "limitUsage": "Añade {{count, number}} tarjetas a tu límite · quedan {{available}}",
     "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Libera espacio o mejora tu plan para añadirlo.",
     "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas.",
     "acquireByMode": {
@@ -63,8 +63,8 @@
     "defaultDescription": "Mazo de tarjetas en ReeeeecallStudy",
     "sampleCards": "Tarjetas de muestra",
     "viewInMarket": "Ver en el mercado",
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios",
+    "cardCount": "{{count, number}} tarjetas",
+    "userCount": "{{count, number}} usuarios",
     "by": "por {{name}}",
     "blurredNotice": "Inicia sesión para ver todas las tarjetas de este mazo",
     "ctaLogin": "Inicia sesión para obtener este mazo",
@@ -202,13 +202,13 @@
       "actions": "Acciones"
     },
     "timeAgo": {
-      "minutesAgo": "hace {{count}} min",
-      "hoursAgo": "hace {{count}} h",
-      "daysAgo": "hace {{count}} d"
+      "minutesAgo": "hace {{count, number}} min",
+      "hoursAgo": "hace {{count, number}} h",
+      "daysAgo": "hace {{count, number}} d"
     }
   },
-  "reviewCount_one": "{{count}} reseña",
-  "reviewCount_other": "{{count}} reseñas",
-  "rateStar_one": "Calificar {{count}} estrella",
-  "rateStar_other": "Calificar {{count}} estrellas"
+  "reviewCount_one": "{{count, number}} reseña",
+  "reviewCount_other": "{{count, number}} reseñas",
+  "rateStar_one": "Calificar {{count, number}} estrella",
+  "rateStar_other": "Calificar {{count, number}} estrellas"
 }

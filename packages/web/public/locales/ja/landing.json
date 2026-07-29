@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "世界中の学習者に信頼されています",
     "subtitle": "よりスマートに学ぶ数千人の学生に参加しましょう",
-    "liveActivity": "現在{{count}}人が学習中",
+    "liveActivity": "現在{{count, number}}人が学習中",
     "userCountLabel": "アクティブユーザー",
     "cardsStudiedLabel": "学習済みカード",
     "decksCreatedLabel": "作成されたデッキ",
@@ -334,7 +334,7 @@
     "freePrice": "無料",
     "pricePerMonth": "{{price}}/月",
     "unlimitedCards": "無制限のカード",
-    "upToCards": "カード {{count}}枚まで",
+    "upToCards": "カード {{count, number}}枚まで",
     "ctaFree": "無料で始める",
     "ctaPaid": "始める",
     "note": "お支払いは登録後、設定画面で行えます。",
