@@ -145,13 +145,13 @@ manager와 tests를 함께 revert한다. DB rollback은 필요 없다. 이전 �
 
 ## 완료 증거
 
-- [ ] 설계 commit
-- [ ] Red 재현
-- [ ] manager 구현 green
-- [ ] web/shared parity
-- [ ] study regression
-- [ ] web/mobile typecheck
-- [ ] production build
-- [ ] targeted lint/diff check
+- [x] 설계 commit: `279fe6c`
+- [x] Red 재현: 22 tests 중 true-round 관련 10 failures
+- [x] manager 구현 green: 23/23 tests
+- [x] web/shared parity: byte-identical source + scenario parity test
+- [x] study regression: 분할 실행 17 files, 270 tests 통과
+- [x] web/mobile typecheck 통과
+- [x] production build 통과: final build 3.65s
+- [x] targeted lint/diff check 통과
 - [ ] PR CI green
 - [ ] `DOCS/DONE/STUDY-HARDENING/PHASE-2-CRAMMING-TRUE-ROUNDS.md` 이동
