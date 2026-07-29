@@ -119,7 +119,7 @@
       "good": "Bien",
       "easy": "Fácil"
     },
-    "periodDay": "{{count}}d",
+    "periodDay": "{{count, number}}d",
     "minuteShort": "{{value}}m"
   },
   "market": {
@@ -456,7 +456,7 @@
     "colDetails": "Detalles",
     "colIP": "IP",
     "pageInfo": "Página {{page}}",
-    "showing": "mostrando {{count}} entradas",
+    "showing": "mostrando {{count, number}} entradas",
     "prevPage": "Anterior",
     "nextPage": "Siguiente",
     "unknownAdmin": "Desconocido",

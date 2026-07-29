@@ -119,7 +119,7 @@
       "good": "良好",
       "easy": "简单"
     },
-    "periodDay": "{{count}}天",
+    "periodDay": "{{count, number}}天",
     "minuteShort": "{{value}}分"
   },
   "market": {
@@ -456,7 +456,7 @@
     "colDetails": "详情",
     "colIP": "IP",
     "pageInfo": "第 {{page}} 页",
-    "showing": "显示 {{count}} 条",
+    "showing": "显示 {{count, number}} 条",
     "prevPage": "上一页",
     "nextPage": "下一页",
     "unknownAdmin": "未知",

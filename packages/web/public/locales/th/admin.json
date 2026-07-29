@@ -119,7 +119,7 @@
       "good": "ดี",
       "easy": "ง่าย"
     },
-    "periodDay": "{{count}} วัน",
+    "periodDay": "{{count, number}} วัน",
     "minuteShort": "{{value}} นาที"
   },
   "market": {
@@ -456,7 +456,7 @@
     "colDetails": "รายละเอียด",
     "colIP": "IP",
     "pageInfo": "หน้า {{page}}",
-    "showing": "แสดง {{count}} รายการ",
+    "showing": "แสดง {{count, number}} รายการ",
     "prevPage": "ก่อนหน้า",
     "nextPage": "ถัดไป",
     "unknownAdmin": "ไม่ทราบ",

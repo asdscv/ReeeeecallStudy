@@ -119,7 +119,7 @@
       "good": "Baik",
       "easy": "Mudah"
     },
-    "periodDay": "{{count}}hr",
+    "periodDay": "{{count, number}}hr",
     "minuteShort": "{{value}}m"
   },
   "market": {
@@ -456,7 +456,7 @@
     "colDetails": "Detail",
     "colIP": "IP",
     "pageInfo": "Halaman {{page}}",
-    "showing": "menampilkan {{count}} entri",
+    "showing": "menampilkan {{count, number}} entri",
     "prevPage": "Sebelumnya",
     "nextPage": "Berikutnya",
     "unknownAdmin": "Tidak diketahui",
