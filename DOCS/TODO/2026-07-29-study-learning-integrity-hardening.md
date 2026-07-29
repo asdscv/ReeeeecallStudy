@@ -160,7 +160,7 @@ builder/helper revert. DB cursor 값은 기존 integer라 호환된다.
 
 ## 8. P5A — Persistence Expand (migration 160)
 
-진행: **local implementation + TDD + migration/rollback/security review 완료, PR pending** (`feat/study-persistence-expand`, design `7708354`).
+진행: **완료.** `feat/study-persistence-expand`, 설계 `7708354`, 구현 `54cb6da`, PR #336, 최종 CI 7 checks green. 문서는 `DOCS/DONE/STUDY-HARDENING/PHASE-5A-PERSISTENCE-EXPAND.md`. 프로덕션 migration은 실행하지 않았다. 다음은 P5B client cutover.
 
 ### Additive schema
 

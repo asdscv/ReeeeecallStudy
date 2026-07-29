@@ -1,6 +1,6 @@
 # Study Hardening Phase 5A — Atomic Persistence Expand
 
-상태: IMPLEMENTED — local validation/review complete, PR pending
+상태: DONE — PR #336 merged path, 최종 CI 7 checks green
 
 ## 1. 목적
 
@@ -159,6 +159,9 @@ Static migration checks는 함수 search_path/grant/RLS/index/down-script 존재
 - Production build: 3,238 modules, **3.23s** 성공(기존 chunk-size warning만 존재).
 - 독립 SQL/security review: **APPROVED**, Blocker/High/Medium 없음. 발견된 Low `SQL NULL` vs JSON `null` non-sequential retry를 즉시 수정하고 regression test를 추가했다.
 - 프로덕션 migration/deploy는 실행하지 않았다.
+- 구현 commit: `54cb6da feat(study): add atomic rating persistence RPCs`
+- PR: https://github.com/asdscv/ReeeeecallStudy/pull/336
+- 원격 CI: 첫 실행의 Integration (Supabase)는 `db reset` 컨테이너 재시작 직후 upstream `Error status 502`로 실패했다(migration 160까지 적용 완료, test 미시작). 실패 job만 rerun한 뒤 Lint + Typecheck, Unit Tests, Integration (Supabase), Architecture Guard, Migration Safety, AI Credit Metering, Workers Builds **7 checks 전부 SUCCESS**.
 
 ### 구현 중 추가 hardening
 
