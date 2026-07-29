@@ -55,11 +55,6 @@ ${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" 
 ${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight"/>
   </url>
-  <url>
-    <loc>${SITE_URL}/docs/api</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
 </urlset>`
   return xmlResponse(xml)
 }

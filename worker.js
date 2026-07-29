@@ -14,23 +14,6 @@ import { handleRSSFeed } from './worker-modules/seo/feeds.js'
 import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
 import { isUiLocale } from './worker-modules/locale-policy.js'
 
-const SUPABASE_BASE = 'https://ixdapelfikaneexnskfm.supabase.co/functions/v1/api'
-
-// L4/L5: the worker fronts /api/* for browsers, so it (not the edge function) is
-// the real CORS boundary. Echo only allowlisted origins; for anything else
-// return our canonical origin (≠ caller → the browser blocks). Non-browser
-// callers (server-side rc_ consumers) ignore CORS. Keep in sync with the
-// ALLOWED_ORIGINS default in supabase/functions/{api,tts}/index.ts.
-const ALLOWED_ORIGINS = ['https://reeeeecallstudy.xyz', 'http://localhost:5173']
-function corsAllowOrigin(request) {
-  const origin = request.headers.get('Origin')
-  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-}
-
-// Extensionless legal pages. Cloudflare Assets serves the real
-// /privacy-policy.html and /terms-of-service.html at these clean URLs (verified:
-// 200 with the real page body), but the bot 404 branch below would otherwise
-// reject the extensionless form. Let bots fall through to ASSETS for the real page.
 const SPA_BOT_PASSTHROUGH = new Set(['/privacy-policy', '/terms-of-service'])
 
 // ─── Bot handler dispatch ────────────────────────────────────────────────────
@@ -130,52 +113,12 @@ export default {
             return handleBotNotFound()
           }
         }
-        // docs-api and other types fall through to SPA
       }
       // Known clean-URL static pages → fall through to ASSETS for the real
       // .html (served at the clean URL by Cloudflare), not a 404
       else if (!url.pathname.match(/\.\w+$/) && !SPA_BOT_PASSTHROUGH.has(url.pathname)) {
         return handleBotNotFound()
       }
-    }
-
-    // /api/* → Supabase Edge Function proxy
-    if (url.pathname.startsWith('/api/')) {
-      if (request.method === 'OPTIONS') {
-        return new Response(null, {
-          headers: {
-            'Access-Control-Allow-Origin': corsAllowOrigin(request),
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-            'Access-Control-Max-Age': '86400',
-            'Vary': 'Origin',
-          },
-        })
-      }
-
-      const subpath = url.pathname.slice('/api/'.length)
-      const target = `${SUPABASE_BASE}/${subpath}${url.search}`
-
-      const headers = new Headers(request.headers)
-      headers.delete('host')
-
-      const res = await fetch(target, {
-        method: request.method,
-        headers,
-        body: request.method !== 'GET' && request.method !== 'HEAD'
-          ? request.body
-          : undefined,
-      })
-
-      const responseHeaders = new Headers(res.headers)
-      responseHeaders.set('Access-Control-Allow-Origin', corsAllowOrigin(request))
-      responseHeaders.append('Vary', 'Origin')
-
-      return new Response(res.body, {
-        status: res.status,
-        statusText: res.statusText,
-        headers: responseHeaders,
-      })
     }
 
     // Static assets + SPA fallback

@@ -31,7 +31,6 @@ ReeeeecallStudy supports 8 languages: English, Korean (한국어), Chinese Simpl
 - [RSS Feed](https://reeeeecallstudy.xyz/feed.xml): Subscribe to latest learning articles
 - [Atom Feed](https://reeeeecallstudy.xyz/feed.atom): Atom format feed
 - [JSON Feed](https://reeeeecallstudy.xyz/feed.json): JSON format feed
-- [API Documentation](https://reeeeecallstudy.xyz/docs/api): Public REST API docs
 - [Sitemap](https://reeeeecallstudy.xyz/sitemap.xml): All indexed pages
 
 ## Learning Insights Topics

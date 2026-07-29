@@ -9,6 +9,7 @@ import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
 import { useCardStore } from './card-store'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
+import { createClientRatingId, persistAtomicRating } from '@reeeeecall/shared/lib/atomic-rating'
 
 type Phase = 'idle' | 'loading' | 'studying' | 'completed'
 
@@ -31,6 +32,7 @@ interface SessionStats {
 }
 
 interface LastRatedCard {
+  clientRatingId: string
   cardId: string
   previousCard: Card
   rating: string
@@ -65,6 +67,7 @@ interface StudyState {
   maxCardPosition: number
   lastRatedCard: LastRatedCard | null
   sessionSaved: boolean
+  persistenceError: string | null
 
   // Pause/Resume state
   isPaused: boolean
@@ -112,6 +115,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   maxCardPosition: 0,
   lastRatedCard: null,
   sessionSaved: false,
+  persistenceError: null,
 
   // Pause/Resume
   isPaused: false,
@@ -547,6 +551,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       sessionStartedAt: Date.now(),
       sessionStats: { ...initialStats, totalCards: cards.length },
       sessionSaved: false,
+      persistenceError: null,
     })
 
     } catch (err) {
@@ -562,7 +567,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isPaused, studyState, userId } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsQueueManager, crammingManager, isRating, isPaused, studyState, userId } = get()
     if (!config || isRating || isPaused || !userId) return
 
     const isSrsMode = config.mode === 'srs' && srsQueueManager
@@ -582,11 +587,17 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     if (!card) return
 
-    // Save undo state before rating (including queue manager snapshots)
+    const priorPending = get().lastRatedCard
+    const clientRatingId = priorPending?.cardId === card.id && priorPending.rating === rating
+      ? priorPending.clientRatingId
+      : createClientRatingId()
+
+    // Save undo/retry state before rating (including queue manager snapshots)
     set({
       isRating: true,
       exitDirection: getRatingExitDirection(rating),
       lastRatedCard: {
+        clientRatingId,
         cardId: card.id,
         previousCard: { ...card },
         rating,
@@ -599,8 +610,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     })
 
     const durationMs = Date.now() - cardStartTime
-    let newInterval = card.interval_days
-    let newEase = card.ease_factor
     let updatedQueue = queue
     let srsResult: ReturnType<typeof calculateSRS> | null = null
 
@@ -612,8 +621,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     } else if (config.mode === 'srs') {
       // SRS mode: calculate SRS synchronously
       srsResult = calculateSRS(card, rating as SrsRating, srsSettings ?? undefined)
-      newInterval = srsResult.interval_days
-      newEase = srsResult.ease_factor
 
       const queueIndex = queue.findIndex(c => c.id === card!.id)
       if (queueIndex >= 0) {
@@ -661,9 +668,36 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       ? srsQueueManager!.studiedCount() + srsQueueManager!.remaining()
       : sessionStats.totalCards
 
-    // ★ Optimistic UI update — set state BEFORE DB writes ★
-    // Brief delay so :active press effect is visible before buttons unmount
+    const persistence = await persistAtomicRating({
+      card,
+      deckId: config.deckId,
+      mode: config.mode,
+      rating,
+      durationMs,
+      srsResult,
+      clientRatingId,
+    })
+    if (!persistence.ok) {
+      const snapshot = get().lastRatedCard
+      if (snapshot?.srsQueueSnapshot && srsQueueManager) srsQueueManager.restore(snapshot.srsQueueSnapshot)
+      if (snapshot?.crammingSnapshot && crammingManager) crammingManager.restore(snapshot.crammingSnapshot)
+      const authoritativeQueue = persistence.code === 'STALE_STATE'
+        ? queue.map((item) => item.id === card!.id ? { ...item, ...persistence.currentState } : item)
+        : queue
+      useCardStore.getState().invalidateCards(config.deckId)
+      set({
+        queue: authoritativeQueue,
+        isRating: false,
+        exitDirection: null,
+        persistenceError: persistence.code,
+        ...(persistence.code === 'STALE_STATE' ? { lastRatedCard: null } : {}),
+      })
+      return
+    }
+
+    // Advance only after the atomic progress+log transaction succeeds.
     await new Promise(r => setTimeout(r, 120))
+    set({ persistenceError: null })
 
     if (isComplete) {
       set({
@@ -737,72 +771,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         },
       })
     }
-
-    // ★ Background DB writes (fire-and-forget) ★
-    const dbWrites: PromiseLike<unknown>[] = []
-
-    // SRS DB update
-    if (config.mode === 'srs' && srsResult) {
-      if (srsSource === 'progress_table') {
-        dbWrites.push(
-          supabase
-            .from('user_card_progress')
-            .upsert({
-              user_id: userId,
-              card_id: card.id,
-              deck_id: config.deckId,
-              ease_factor: srsResult.ease_factor,
-              interval_days: srsResult.interval_days,
-              repetitions: srsResult.repetitions,
-              srs_status: srsResult.srs_status,
-              next_review_at: srsResult.next_review_at,
-              last_reviewed_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            } as Record<string, unknown>, { onConflict: 'user_id,card_id' })
-        )
-      } else {
-        dbWrites.push(
-          supabase
-            .from('cards')
-            .update({
-              ease_factor: srsResult.ease_factor,
-              interval_days: srsResult.interval_days,
-              repetitions: srsResult.repetitions,
-              srs_status: srsResult.srs_status,
-              next_review_at: srsResult.next_review_at,
-              last_reviewed_at: new Date().toISOString(),
-            } as Record<string, unknown>)
-            .eq('id', card.id)
-        )
-      }
-    }
-
-    // Study log — use RPC to bypass PostgREST schema cache miss (PGRST204) for prev_srs_status
-    const studyLogParams = {
-      p_user_id: userId,
-      p_card_id: card.id,
-      p_deck_id: config.deckId,
-      p_study_mode: config.mode,
-      p_rating: rating,
-      p_prev_interval: card.interval_days,
-      p_new_interval: newInterval,
-      p_prev_ease: card.ease_factor,
-      p_new_ease: newEase,
-      p_review_duration_ms: durationMs,
-      p_prev_srs_status: card.srs_status,
-    }
-    console.log('[study-store] INSERT study_log via RPC:', JSON.stringify(studyLogParams))
-    dbWrites.push(supabase.rpc('insert_study_log', studyLogParams))
-
-    Promise.all(dbWrites).then((results) => {
-      // Supabase never rejects — errors come in resolved { error } objects
-      for (const r of results) {
-        const res = r as { error?: { message: string; code?: string } } | undefined
-        if (res?.error) {
-          console.error('[study-store] DB write error:', res.error.message, res.error.code)
-        }
-      }
-    }).catch(err => console.error('[study-store] DB write failed:', err))
 
     // endSession also fire-and-forget
     if (isComplete) {
@@ -1018,6 +986,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       maxCardPosition: 0,
       lastRatedCard: null,
       sessionSaved: false,
+      persistenceError: null,
       isPaused: false,
       pauseStartTime: null,
       totalPausedMs: 0,

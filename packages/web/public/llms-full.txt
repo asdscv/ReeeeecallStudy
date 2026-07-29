@@ -98,14 +98,6 @@ Content URLs: https://reeeeecallstudy.xyz/insight/{slug}?lang={locale}
 - **Analytics**: Custom event tracking (page views, content views, scroll depth, UTM)
 - **Charts**: Recharts (admin dashboard)
 
-## API
-
-ReeeeecallStudy provides a public REST API documented at /docs/api for:
-- Deck listing and search
-- Card retrieval
-- Public content access
-- Marketplace browsing
-
 ## Frequently Asked Questions
 
 **Q: What is spaced repetition?**
@@ -137,6 +129,5 @@ A: The Learning Insights blog publishes daily articles about evidence-based lear
 - Atom: https://reeeeecallstudy.xyz/feed.atom
 - JSON Feed: https://reeeeecallstudy.xyz/feed.json
 - Sitemap: https://reeeeecallstudy.xyz/sitemap.xml
-- API Docs: https://reeeeecallstudy.xyz/docs/api
 - Email: admin@reeeeecallstudy.xyz
 - Twitter/X: https://x.com/reeeeecallstudy

@@ -103,9 +103,7 @@
   },
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
-    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
-    "apiDocs": "Tài liệu API",
-    "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
   },
   "quickActions": {
     "quickStudy": "Học nhanh",

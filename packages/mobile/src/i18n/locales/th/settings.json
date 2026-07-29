@@ -103,9 +103,7 @@
   },
   "links": {
     "userGuide": "คู่มือผู้ใช้",
-    "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์",
-    "apiDocs": "เอกสาร API",
-    "apiDocsDesc": "API endpoints การยืนยันตัวตน ตัวอย่างการใช้งาน"
+    "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์"
   },
   "quickActions": {
     "quickStudy": "เรียนด่วน",

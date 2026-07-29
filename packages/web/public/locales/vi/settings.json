@@ -8,17 +8,11 @@
   "autoSaved": "Đã tự động lưu",
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
-    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
-    "apiDocs": "Tài liệu API",
-    "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
   },
   "guide": {
     "title": "Hướng dẫn sử dụng",
     "desc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
-  },
-  "apiDocs": {
-    "title": "Tài liệu API",
-    "desc": "Điểm cuối API, xác thực, ví dụ sử dụng"
   },
   "profile": {
     "title": "Hồ sơ",

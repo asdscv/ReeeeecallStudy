@@ -103,9 +103,7 @@
   },
   "links": {
     "userGuide": "ユーザーガイド",
-    "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
-    "apiDocs": "APIドキュメント",
-    "apiDocsDesc": "APIエンドポイント、認証、使用例"
+    "userGuideDesc": "機能ガイド、学習のコツ、共有方法"
   },
   "quickActions": {
     "quickStudy": "クイック学習",

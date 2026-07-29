@@ -62,19 +62,6 @@ describe('GuideItem link support', () => {
       expect(item.link).toBeUndefined()
     }
   })
-
-  it('link with href should be a valid external URL', () => {
-    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
-    const docsItem = apiSection!.items.find((i) => i.link?.href)
-    expect(docsItem).toBeDefined()
-    expect(docsItem!.link!.href).toMatch(/^https?:\/\//)
-  })
-
-  it('link label should be an i18n key', () => {
-    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
-    const docsItem = apiSection!.items.find((i) => i.link)
-    expect(docsItem!.link!.label).toContain('sections.')
-  })
 })
 
 describe('searchGuide', () => {

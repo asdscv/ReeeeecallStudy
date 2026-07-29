@@ -38,11 +38,22 @@ export type ServerGenerateRequest =
       images: string[] // base64 data URLs of the uploaded image(s), max 8
       uiLang: string
     }
+  | {
+      kind: 'remediation'
+      action: 'explain' | 'compare' | 'hint' | 'generate' | 'evaluate' | 'recommend'
+      uiLang: string
+      goalId?: string
+      activityId?: string
+      attemptId?: string
+      cardIds?: string[]
+      conceptIds?: string[]
+    }
 
 export interface ServerGenerateResult {
   content: Record<string, unknown>
   remainingFree?: number // text generation
-  balance?: number       // image generation (credits left after the charge)
+  balance?: number       // image/remediation generation (balance after charge)
+  enrichmentId?: string  // remediation preview persisted by the service role
 }
 
 // supabase-js FunctionsHttpError carries the raw Response in `.context`; read our
@@ -53,8 +64,10 @@ async function extractErrorCode(error: unknown): Promise<string> {
   const ctx = (error as { context?: unknown }).context
   if (ctx && typeof (ctx as Response).json === 'function') {
     try {
-      const body = await (ctx as Response).json()
-      if (body && typeof body.code === 'string') return body.code
+      const body = await (ctx as Response).json() as unknown
+      if (body && typeof body === 'object' && typeof (body as { code?: unknown }).code === 'string') {
+        return (body as { code: string }).code
+      }
     } catch {
       /* response wasn't JSON */
     }
@@ -73,6 +86,7 @@ export async function callServerAI(req: ServerGenerateRequest): Promise<ServerGe
     content: result.content,
     remainingFree: typeof result.remainingFree === 'number' ? result.remainingFree : undefined,
     balance: typeof result.balance === 'number' ? result.balance : undefined,
+    enrichmentId: typeof result.enrichmentId === 'string' ? result.enrichmentId : undefined,
   }
 }
 

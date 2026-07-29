@@ -75,7 +75,7 @@
       "태그 기반 검색 및 필터링",
       "덱 공유 & 커뮤니티 마켓플레이스",
       "상세한 학습 통계 및 분석",
-      "API 키로 외부 연동 가능"
+      "개인화 계획과 적응형 보강 학습"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "태그 기반 검색 및 필터링",
     "5": "덱 공유 & 커뮤니티 마켓플레이스",
     "6": "상세한 학습 통계 및 분석",
-    "7": "API 키로 외부 연동 가능"
+    "7": "개인화 계획과 적응형 보강 학습"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "덱 공유",
     "languages": "7개 언어",
     "allDevices": "모든 기기",
-    "import": "CSV & API 업로드"
+    "import": "CSV & JSON 업로드"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API 문서",
     "tagline": "간격 반복 기반 스마트 플래시카드 학습 플랫폼",
     "product": "제품",
     "resources": "리소스",

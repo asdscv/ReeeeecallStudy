@@ -19,11 +19,6 @@ export const PAGE_ROUTES = [
     handler: 'listing',
     extract: (match) => ({ listingId: match[1] }),
   },
-  {
-    pattern: /^\/docs\/api\/?$/,
-    handler: 'docs-api',
-    extract: () => ({}),
-  },
 ]
 
 export function matchBotRoute(pathname) {

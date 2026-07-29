@@ -107,9 +107,7 @@
   },
   "links": {
     "userGuide": "User Guide",
-    "userGuideDesc": "Feature guide, learning tips, sharing methods",
-    "apiDocs": "API Documentation",
-    "apiDocsDesc": "API endpoints, authentication, usage examples"
+    "userGuideDesc": "Feature guide, learning tips, sharing methods"
   },
   "quickActions": {
     "quickStudy": "Quick Study",

@@ -8,17 +8,11 @@
   "autoSaved": "Tersimpan otomatis",
   "links": {
     "userGuide": "Panduan Pengguna",
-    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
-    "apiDocs": "Dokumentasi API",
-    "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
+    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi"
   },
   "guide": {
     "title": "Panduan Pengguna",
     "desc": "Panduan fitur, kiat belajar, cara berbagi"
-  },
-  "apiDocs": {
-    "title": "Dokumentasi API",
-    "desc": "Endpoint API, autentikasi, contoh penggunaan"
   },
   "profile": {
     "title": "Profil",
