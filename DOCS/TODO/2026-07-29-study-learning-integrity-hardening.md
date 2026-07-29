@@ -68,7 +68,7 @@ P5A/P5B/P5C는 expand → cutover/backfill → contract 3-PR 패턴이다. P5A m
   - finite batch, valid local date range, finite non-negative time, filter payload 검증
 - `rateCard`는 `phase==='studying'`, `isFlipped`, valid normalized rating을 확인한다.
 - `fetchAllRows`를 shared 순수 helper로 추출하고 어느 페이지든 오류면 throw한다.
-- `getSteps`는 missing/empty일 때 `DEFAULT_SRS_SETTINGS.learning_steps`를 복사해 반환한다.
+- `getSteps`는 `learning_steps` 속성이 누락된 경우 `DEFAULT_SRS_SETTINGS.learning_steps`를 복사해 반환한다. 명시적 빈 배열은 학습 단계 비활성화 의미로 유지한다.
 - 모바일 cramming 진행률은 attempts/unique가 아니라 `masteryPercentage()`를 사용하고 0..100으로 clamp한다.
 
 ### Tests

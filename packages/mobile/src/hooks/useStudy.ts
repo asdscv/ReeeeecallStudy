@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
 import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import { calculateStudyProgress } from '@reeeeecall/shared/lib/study-progress'
 import { haptics } from '../utils/haptics'
 
 /**
@@ -73,9 +74,12 @@ export function useStudy() {
     }
     return store.queue[store.currentIndex] ?? null
   }, [store.config, store.crammingManager, store.queue, store.currentIndex])
-  const progress = store.queue.length > 0
-    ? Math.round((store.sessionStats.cardsStudied / store.sessionStats.totalCards) * 100)
-    : 0
+  const progress = calculateStudyProgress(
+    store.config?.mode ?? 'random',
+    store.sessionStats.cardsStudied,
+    store.sessionStats.totalCards,
+    store.crammingManager?.masteryPercentage(),
+  )
 
   return {
     // State

@@ -9,7 +9,7 @@
 
 1. store 경계에서 mode/config/rating을 검증한다.
 2. pagination 중간 오류를 partial success로 반환하지 않는다.
-3. legacy 덱의 누락/빈 `learning_steps`를 `[1, 10]`으로 fallback한다.
+3. legacy 덱에서 `learning_steps` 속성이 누락된 경우만 `[1, 10]`으로 fallback하고, 명시적 빈 배열은 학습 단계 비활성화로 유지한다.
 4. 모바일 cramming 진행률이 attempts 때문에 100%를 넘지 않게 한다.
 
 ## 설계
@@ -42,7 +42,7 @@
 
 ### Learning steps
 
-`getSteps`는 missing 또는 empty에서 `DEFAULT_SRS_SETTINGS.learning_steps`의 복사본을 사용한다.
+`getSteps`는 `learning_steps` 속성이 누락된 경우 `DEFAULT_SRS_SETTINGS.learning_steps`의 복사본을 사용한다. 명시적 빈 배열은 기존 의미대로 학습 단계를 비활성화한다.
 명시적 custom steps는 유지한다. 입력 settings를 mutation하지 않는다.
 
 ### Mobile progress
@@ -55,7 +55,7 @@
 
 - validation unit: mode별 valid/invalid, alias, NaN/Infinity/negative, malformed filter/date
 - pagination unit: 1 page, multi page, page 1/2 error, null data, exact page boundary
-- SRS: missing/empty/custom learning steps
+- SRS: missing-property fallback / explicit-empty preservation / custom learning steps
 - store: unflipped/wrong phase/invalid rating에서 manager·DB 무호출
 - mobile progress helper: 3 attempts/2 unique에서도 <=100
 - 기존 study suites, web/mobile typecheck, build, targeted lint
@@ -67,11 +67,13 @@
 
 ## 완료 증거
 
-- [ ] Red tests 추가
-- [ ] 구현 green
-- [ ] targeted/full study tests
-- [ ] web/mobile typecheck
-- [ ] production build
-- [ ] targeted lint/diff check
+- [x] Red tests 추가: missing shared policies, unflipped/phase/rating guards, missing steps, progress overflow 재현
+- [x] 구현 green: P1 핵심 5 files, 86 tests 통과
+- [x] targeted/full study tests: 15 files, 265 tests 통과(최종 pagination 경계 포함 핵심 suite 86 tests 재통과)
+- [x] web/mobile typecheck 통과
+- [x] production build 통과: Vite 3,238 modules, 최종 build 4.39s
+- [x] targeted lint/diff check 통과
 - [ ] PR CI green
 - [ ] `DOCS/DONE/STUDY-HARDENING/PHASE-1-GUARDRAILS.md` 이동
+
+참고: 로컬 전체 웹 Vitest는 기존 비학습 부채로 2,041 tests가 통과하고 96 tests가 실패했다. 실패는 Supabase mock 초기화, Node `localStorage`, guide/layout/i18n 등 P1 비변경 파일에 한정되며, P1 학습 회귀 suite는 전부 통과했다.

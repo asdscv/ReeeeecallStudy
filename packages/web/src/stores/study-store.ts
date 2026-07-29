@@ -7,6 +7,8 @@ import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { normalizeRatingForMode, normalizeStudyConfig } from '@reeeeecall/shared/lib/study-validation'
 import { useCardStore } from './card-store'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
 
@@ -121,6 +123,40 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   initSession: async (config: StudyConfig) => {
     // Prevent double-init (React StrictMode / effect re-runs)
     if (get().phase === 'loading') return
+
+    try {
+      config = normalizeStudyConfig(config)
+    } catch (err) {
+      console.error('[study-store] invalid study config:', err)
+      const now = Date.now()
+      set({
+        phase: 'completed',
+        config: null,
+        template: null,
+        srsSettings: null,
+        userId: null,
+        srsSource: 'embedded',
+        subscriptionLocked: false,
+        queue: [],
+        currentIndex: 0,
+        isFlipped: false,
+        isRating: false,
+        exitDirection: null,
+        cardStartTime: now,
+        sessionStartedAt: now,
+        sessionStats: { ...initialStats },
+        studyState: null,
+        srsQueueManager: null,
+        crammingManager: null,
+        maxCardPosition: 0,
+        lastRatedCard: null,
+        sessionSaved: false,
+        isPaused: false,
+        pauseStartTime: null,
+        totalPausedMs: 0,
+      })
+      return
+    }
 
     const check = guard.check('study_session_start', 'study_sessions_daily')
     if (!check.allowed) { set({ phase: 'idle' }); return }
@@ -562,8 +598,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isPaused, studyState, userId } = get()
-    if (!config || isRating || isPaused || !userId) return
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isFlipped, phase, isPaused, studyState, userId } = get()
+    if (!config || isRating || !isFlipped || phase !== 'studying' || isPaused || !userId) return
+
+    const normalizedRating = normalizeRatingForMode(config.mode, rating)
+    if (!normalizedRating) return
+    rating = normalizedRating
 
     const isSrsMode = config.mode === 'srs' && srsQueueManager
     const isCrammingMode = config.mode === 'cramming' && crammingManager
@@ -1039,27 +1079,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 function withArchiveBoundary<Q>(query: Q, threshold: string | null): Q {
   if (!threshold) return query
   return (query as unknown as { lte(column: string, value: string): Q }).lte('created_at', threshold)
-}
-
-/**
- * Fetch EVERY row of a query, defeating PostgREST's max_rows (1000) response cap
- * by paging with .range(). `makeQuery` MUST return a fresh builder each call (a
- * supabase query is a one-shot thenable) with its .order() already applied so the
- * pages are stable. Without this, large decks silently truncated the study queue —
- * cards past row 1000 were unstudyable and progress rows were dropped (S-H1). The
- * 500k backstop caps runaway loops far above any real deck size.
- */
-async function fetchAllRows<T>(makeQuery: () => unknown, pageSize = 1000): Promise<T[]> {
-  const out: T[] = []
-  for (let offset = 0; offset < 500_000; offset += pageSize) {
-    const builder = makeQuery() as { range: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }> }
-    const { data, error } = await builder.range(offset, offset + pageSize - 1)
-    if (error) break
-    const rows = data ?? []
-    out.push(...rows)
-    if (rows.length < pageSize) break
-  }
-  return out
 }
 
 function shuffleArray<T>(array: T[]): T[] {
