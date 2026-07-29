@@ -38,7 +38,7 @@
     "copyLink": "Copiar enlace",
     "newLink": "Nuevo enlace",
     "linkHint": "Cualquier persona con este enlace puede aceptar la invitación y acceder al mazo.",
-    "existingShares": "Comparticiones existentes ({{count}})",
+    "existingShares": "Comparticiones existentes ({{count, number}})",
     "noShares": "Aún no hay comparticiones. Genera un enlace de invitación arriba."
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "Ve a un mazo y toca \"Compartir\" para crear un enlace de invitación.",
     "emptyReceived": "Nadie ha compartido un mazo contigo todavía.",
     "activePending": "{{activeCount}} activos · {{pendingCount}} pendientes",
-    "viewAll": "Ver las {{count}} comparticiones",
+    "viewAll": "Ver las {{count, number}} comparticiones",
     "unknownDeck": "Mazo desconocido"
   },
   "publish": {

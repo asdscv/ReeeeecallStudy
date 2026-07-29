@@ -38,7 +38,7 @@
     "copyLink": "Copy Link",
     "newLink": "New Link",
     "linkHint": "Anyone with this link can accept the invite and get access to the deck.",
-    "existingShares": "Existing Shares ({{count}})",
+    "existingShares": "Existing Shares ({{count, number}})",
     "noShares": "No shares yet. Generate an invite link above."
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "Go to a deck and tap \"Share\" to create an invite link.",
     "emptyReceived": "No one has shared a deck with you yet.",
     "activePending": "{{activeCount}} active · {{pendingCount}} pending",
-    "viewAll": "View all {{count}} shares",
+    "viewAll": "View all {{count, number}} shares",
     "unknownDeck": "Unknown Deck"
   },
   "publish": {

@@ -34,7 +34,7 @@
     "imageChange": "更换图片",
     "imageHint": "选择一张照片，AI会将其转换为卡片。",
     "imagePaidNotice": "图片生成需要消耗点数。",
-    "imageAddMore": "继续添加 ({{count}}/{{max}})",
+    "imageAddMore": "继续添加 ({{count, number}}/{{max}})",
     "inputModeTopicHint": "输入主题，AI 会为你生成卡片。",
     "inputModeImageHint": "上传课本页面、单词表或笔记的照片，AI 会识别并生成卡片。可一次选择多张。",
     "cardLimitExceeds": "最多还能添加 {{available}} 张 — 减少数量或订阅。",
@@ -51,8 +51,8 @@
   },
   "review": {
     "title": "检查卡片",
-    "generatedCount": "已生成{{count}}张卡片",
-    "save": "保存{{count}}张卡片",
+    "generatedCount": "已生成{{count, number}}张卡片",
+    "save": "保存{{count, number}}张卡片",
     "regenerate": "重新生成",
     "cardDone": "完成",
     "remove": "删除"

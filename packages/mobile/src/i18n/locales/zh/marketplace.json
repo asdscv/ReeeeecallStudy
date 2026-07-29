@@ -23,8 +23,8 @@
     "topRated": "评分最高"
   },
   "listing": {
-    "cardCount": "{{count}} 张卡片",
-    "userCount": "{{count}} 位用户"
+    "cardCount": "{{count, number}} 张卡片",
+    "userCount": "{{count, number}} 位用户"
   },
   "detail": {
     "back": "← 市场",
@@ -46,10 +46,10 @@
     "edited": "(已编辑)",
     "helpful": "有帮助",
     "byAuthor": "作者：{{name}}",
-    "cardsBadge": "{{count}} 张卡片",
-    "viewsBadge": "{{count}} 次浏览",
-    "usersBadge": "{{count}} 人使用",
-    "reviewsCount": "（{{count}} 条评价）",
+    "cardsBadge": "{{count, number}} 张卡片",
+    "viewsBadge": "{{count, number}} 次浏览",
+    "usersBadge": "{{count, number}} 人使用",
+    "reviewsCount": "（{{count, number}} 条评价）",
     "previewCards": "卡片预览",
     "ratingsReviews": "评分与评价",
     "editReview": "编辑评价",
@@ -57,7 +57,7 @@
     "writeAReview": "写评价",
     "acquireToReview": "获取此卡组后即可发表评价",
     "noReviewsYet": "暂无评价",
-    "reviewCountLabel": "{{count}} 条评价",
+    "reviewCountLabel": "{{count, number}} 条评价",
     "loading": "加载中...",
     "loadMoreReviews": "查看更多评价",
     "reportReason": "原因",
@@ -98,8 +98,8 @@
       "most_helpful": "最有帮助"
     },
     "downloading": "下载中...",
-    "limitUsage": "将占用 {{count}} 张卡片额度 · 剩余 {{available}} 张",
-    "limitExceeds": "将超出卡片额度（剩余 {{available}} 张）。腾出空间或升级方案即可添加。",
+    "limitUsage": "将占用 {{count, number}} 张卡片额度 · 剩余 {{available, number}} 张",
+    "limitExceeds": "将超出卡片额度（剩余 {{available, number}} 张）。腾出空间或升级方案即可添加。",
     "limitOfficialFree": "官方认证牌组 · 不占用卡片额度。",
     "acquireByMode": {
       "subscribe": "订阅",

@@ -4,7 +4,7 @@
   "importCSV": "Import CSV",
   "importJSON": "Import JSON",
   "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
-  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importSuccess": "Imported {{count, number}} cards from \"{{name}}\"",
   "importFailed": "Failed to import CSV file",
   "importJsonFailed": "Failed to parse JSON file",
   "csvEmpty": "CSV file is empty or has no data rows",
@@ -18,7 +18,7 @@
   "errorTitle": "Kesalahan",
   "successTitle": "Berhasil",
   "noCardsTitle": "Tidak ada kartu",
-  "deckCardCount": "{{deck}} · {{count}} kartu",
+  "deckCardCount": "{{deck}} · {{count, number}} kartu",
   "back": "Kembali",
-  "importPartial": "{{count}} kartu tersimpan sebelum berhenti."
+  "importPartial": "{{count, number}} kartu tersimpan sebelum berhenti."
 }

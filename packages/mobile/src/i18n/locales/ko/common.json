@@ -46,7 +46,7 @@
   },
   "units": {
     "cards": "장",
-    "cardsSuffix": "{{count}}장",
+    "cardsSuffix": "{{count, number}}장",
     "sessions": "세션",
     "days": "일",
     "hours": "시간",

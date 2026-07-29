@@ -34,7 +34,7 @@
     "imageChange": "Đổi ảnh",
     "imageHint": "Chọn một ảnh — AI sẽ biến nó thành các thẻ.",
     "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng.",
-    "imageAddMore": "Thêm nữa ({{count}}/{{max}})",
+    "imageAddMore": "Thêm nữa ({{count, number}}/{{max}})",
     "inputModeTopicHint": "Mô tả một chủ đề và AI sẽ viết thẻ cho bạn.",
     "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc.",
     "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký.",
@@ -51,8 +51,8 @@
   },
   "review": {
     "title": "Xem lại thẻ",
-    "generatedCount": "Đã tạo {{count}} thẻ",
-    "save": "Lưu {{count}} thẻ",
+    "generatedCount": "Đã tạo {{count, number}} thẻ",
+    "save": "Lưu {{count, number}} thẻ",
     "regenerate": "Tạo lại",
     "cardDone": "Xong",
     "remove": "Xóa"

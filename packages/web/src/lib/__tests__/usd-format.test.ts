@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { formatUsdMicro, formatCount } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
 // Regression guard for thousands grouping. Both helpers group WITHOUT Intl on purpose:
 // toLocaleString('en-US', …) silently drops separators on a Hermes build without full
@@ -37,5 +38,27 @@ describe('formatCount', () => {
   it('handles zero and negatives', () => {
     expect(formatCount(0)).toBe('0')
     expect(formatCount(-1_234)).toBe('−1,234')
+  })
+
+  it('never leaks a non-finite value into the UI', () => {
+    expect(formatCount(NaN)).toBe('0')
+    expect(formatCount(Infinity)).toBe('0')
+  })
+})
+
+// formatProductPrice renders on the MOBILE paywall/plan cards too, so it carries the same
+// Intl-free requirement as the helpers above — it used to call toLocaleString('en-US', …).
+describe('formatProductPrice', () => {
+  it('groups thousands without Intl', () => {
+    expect(formatProductPrice({ priceKrw: 0, priceUsdCents: 1_234_567_89 })).toBe('$1,234,567.89')
+    expect(formatProductPrice({ priceKrw: 0, priceUsdCents: 1_999 })).toBe('$19.99')
+  })
+
+  it('always shows exactly two decimals', () => {
+    expect(formatProductPrice({ priceKrw: 0, priceUsdCents: 500 })).toBe('$5.00')
+  })
+
+  it('falls back to grouped ₩ when a row has no USD price', () => {
+    expect(formatProductPrice({ priceKrw: 1_500_000, priceUsdCents: null })).toBe('₩1,500,000')
   })
 })

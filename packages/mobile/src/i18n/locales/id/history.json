@@ -34,14 +34,14 @@
     "performance": "Performa"
   },
   "cardDetails": "Detail Kartu",
-  "logsCount": "{{count}} catatan",
+  "logsCount": "{{count, number}} catatan",
   "loadingDetails": "Memuat detail...",
   "noLogs": "Tidak ada catatan detail untuk sesi ini",
   "deletedCard": "(Kartu dihapus)",
   "noContent": "(Tidak ada konten)",
   "deckProgress": "Progres Dek",
-  "sessionsCount": "{{count}} sesi",
-  "cardsCount": "{{count}} kartu",
+  "sessionsCount": "{{count, number}} sesi",
+  "cardsCount": "{{count, number}} kartu",
   "cardsFraction": "{{studied}}/{{total}} kartu",
   "ratingDistribution": "Distribusi Penilaian",
   "overview": {

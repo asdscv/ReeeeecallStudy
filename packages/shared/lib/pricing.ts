@@ -1,3 +1,5 @@
+import { groupThousands, formatCount } from './format-number'
+
 // ── Buyer-facing price currency ────────────────────────────────────────────
 // The store charges USD everywhere (LemonSqueezy, a USD-settling Merchant of Record;
 // Toss/₩ was dropped). So every price — and the AI-credit wallet — is displayed in $.
@@ -15,6 +17,8 @@ export interface PricedProduct {
  * amount is never blank/$0.
  */
 export function formatProductPrice(p: PricedProduct): string {
-  if (p.priceUsdCents != null) return `$${(p.priceUsdCents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  return `₩${p.priceKrw.toLocaleString('ko-KR')}`
+  // Grouped WITHOUT Intl: this renders on mobile, where a Hermes build without full ICU
+  // silently drops `toLocaleString` separators (see lib/format-number).
+  if (p.priceUsdCents != null) return `$${groupThousands((p.priceUsdCents / 100).toFixed(2))}`
+  return `₩${formatCount(p.priceKrw)}`
 }

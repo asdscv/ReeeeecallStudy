@@ -34,7 +34,7 @@
     "imageChange": "画像を変更",
     "imageHint": "写真を選ぶだけで、AIがカードに変換します。",
     "imagePaidNotice": "画像生成にはクレジットを使用します。",
-    "imageAddMore": "追加 ({{count}}/{{max}})",
+    "imageAddMore": "追加 ({{count, number}}/{{max}})",
     "inputModeTopicHint": "トピックを入力すると、AIがカードを作成します。",
     "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。",
     "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。",
@@ -51,8 +51,8 @@
   },
   "review": {
     "title": "カードを確認",
-    "generatedCount": "{{count}}枚のカードを生成しました",
-    "save": "{{count}}枚を保存",
+    "generatedCount": "{{count, number}}枚のカードを生成しました",
+    "save": "{{count, number}}枚を保存",
     "regenerate": "再生成",
     "cardDone": "完了",
     "remove": "削除"

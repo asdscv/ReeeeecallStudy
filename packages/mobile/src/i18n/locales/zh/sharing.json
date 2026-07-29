@@ -38,7 +38,7 @@
     "copyLink": "复制链接",
     "newLink": "新建链接",
     "linkHint": "任何拥有此链接的人都可以接受邀请并访问该卡组。",
-    "existingShares": "现有共享 ({{count}})",
+    "existingShares": "现有共享 ({{count, number}})",
     "noShares": "暂无共享。请在上方生成邀请链接。"
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "进入卡组并点按“共享”以创建邀请链接。",
     "emptyReceived": "还没有人与您共享卡组。",
     "activePending": "{{activeCount}} 已激活 · {{pendingCount}} 待处理",
-    "viewAll": "查看全部 {{count}} 个共享",
+    "viewAll": "查看全部 {{count, number}} 个共享",
     "unknownDeck": "未知卡组"
   },
   "publish": {

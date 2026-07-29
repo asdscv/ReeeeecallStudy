@@ -38,7 +38,7 @@
     "copyLink": "Salin Tautan",
     "newLink": "Tautan Baru",
     "linkHint": "Siapa pun yang memiliki tautan ini dapat menerima undangan dan mengakses dek.",
-    "existingShares": "Berbagi yang Ada ({{count}})",
+    "existingShares": "Berbagi yang Ada ({{count, number}})",
     "noShares": "Belum ada berbagi. Buat tautan undangan di atas."
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "Buka dek dan ketuk \"Bagikan\" untuk membuat tautan undangan.",
     "emptyReceived": "Belum ada yang membagikan dek dengan Anda.",
     "activePending": "{{activeCount}} aktif · {{pendingCount}} menunggu",
-    "viewAll": "Lihat semua {{count}} berbagi",
+    "viewAll": "Lihat semua {{count, number}} berbagi",
     "unknownDeck": "Dek Tidak Dikenal"
   },
   "publish": {

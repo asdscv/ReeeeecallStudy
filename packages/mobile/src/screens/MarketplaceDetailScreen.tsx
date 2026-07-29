@@ -554,11 +554,11 @@ export function MarketplaceDetailScreen() {
                       </Text>
                     ) : wouldExceed ? (
                       <Text style={{ fontSize: 12, color: theme.colors.error, marginTop: 8 }}>
-                        {t('detail.limitExceeds', { count: listing.card_count ?? 0, available: limit.available, defaultValue: 'This would exceed your card limit ({{available}} left). Delete cards or subscribe first.' })}
+                        {t('detail.limitExceeds', { count: listing.card_count ?? 0, available: limit.available, defaultValue: 'This would exceed your card limit ({{available, number}} left). Delete cards or subscribe first.' })}
                       </Text>
                     ) : Number.isFinite(limit.available) ? (
                       <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginTop: 8 }}>
-                        {t('detail.limitUsage', { count: listing.card_count ?? 0, available: limit.available, defaultValue: 'Adds {{count}} cards toward your limit · {{available}} left' })}
+                        {t('detail.limitUsage', { count: listing.card_count ?? 0, available: limit.available, defaultValue: 'Adds {{count, number}} cards toward your limit · {{available, number}} left' })}
                       </Text>
                     ) : null
                   )}
