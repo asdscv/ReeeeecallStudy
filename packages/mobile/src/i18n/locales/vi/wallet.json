@@ -34,5 +34,9 @@
     "creditLabel": "{{value}} tín dụng AI",
     "confirming": "Đã nhận thanh toán — tín dụng sẽ sớm xuất hiện.",
     "unavailable": "Gói tín dụng này hiện không khả dụng."
+  },
+  "consent": {
+    "creditPack": "Tôi đồng ý rằng tín dụng được cấp ngay lập tức, và khi đã dùng bất kỳ phần nào thì tôi mất quyền rút lui khỏi giao dịch này.",
+    "policyLink": "Chính sách hoàn tiền"
   }
 }

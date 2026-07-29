@@ -362,7 +362,51 @@
       "confirmTitle": "Thực hiện hoàn tiền?",
       "confirmCreditPack": "Hoàn {{amount}} cho {{email}}? Số tiền sẽ được trả lại vào thẻ của khách hàng.",
       "confirmSubscription": "Hoàn tiền lần thanh toán gần nhất của gói đăng ký này cho {{email}} và thu hồi quyền truy cập?",
-      "realMoneyNote": "Thao tác này gọi đến nhà cung cấp thanh toán và chuyển tiền thật. Không thể hoàn tác tại đây."
+      "realMoneyNote": "Thao tác này gọi đến nhà cung cấp thanh toán và chuyển tiền thật. Không thể hoàn tác tại đây.",
+      "confirmRevokeTitle": "Thu hồi quyền truy cập?",
+      "buttonRevokeOnly": "Thu hồi quyền truy cập",
+      "revokeOnlyIosNote": "Không có tiền nào được chuyển. Chỉ thu hồi quyền truy cập — Apple xử lý hoàn tiền App Store. Hãy hướng dẫn khách yêu cầu Apple, hoặc duyệt trong App Store Connect.",
+      "revokeOnlyUnknownNote": "Không có tiền nào được chuyển. Bản ghi này không lưu cửa hàng nên có thể là giao dịch App Store — chỉ thu hồi quyền truy cập. Hãy xác minh cửa hàng trước khi hứa hoàn tiền.",
+      "revokeOnlyHint": "Chỉ quyền truy cập — kênh này do cửa hàng hoàn tiền, không phải chúng ta.",
+      "policyEligible": "Chính sách: được hoàn tiền (trong {{days}} ngày và chưa dùng).",
+      "policyIneligible": "Chính sách: không được hoàn tiền — {{reason}}.",
+      "consentMissing": "Giao dịch này không có bản ghi thông báo quyền rút lui, nên lấy lý do \"đã sử dụng\" để từ chối là chưa vững.",
+      "statutoryOverride": "Quyền rút lui theo luật (Hàn Quốc 7 ngày / EU-Anh 14 ngày) vẫn có thể buộc phải hoàn tiền.",
+      "resultRefunded": "Đã hoàn tiền — tiền đã trả lại và quyền truy cập đã bị thu hồi.",
+      "resultRevokedOnly": "Đã thu hồi quyền truy cập. Thao tác này không chuyển khoản tiền nào.",
+      "reason": {
+        "eligible": "được hoàn tiền",
+        "not_found": "không tìm thấy bản ghi",
+        "not_paid": "thanh toán chưa hoàn tất",
+        "already_refunded": "đã hoàn tiền",
+        "outside_window": "quá thời hạn hoàn tiền",
+        "already_used": "đã sử dụng",
+        "renewal_charge": "khoản gia hạn (ngoài phạm vi chính sách)"
+      }
+    },
+    "channel": {
+      "column": "Kênh",
+      "web_lemonsqueezy": "Web · Lemon Squeezy",
+      "web_toss": "Web · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "Di động · không rõ cửa hàng",
+      "admin": "Quản trị viên cấp",
+      "paymentsHint": "Khoản thanh toán qua web và Google Play có thể hoàn tiền tại đây. Với App Store chỉ có thể thu hồi quyền truy cập — Apple mới là bên hoàn tiền.",
+      "filter": {
+        "all": "Tất cả",
+        "web": "Web",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple xử lý hoàn tiền App Store. Ở đây chỉ có thể thu hồi quyền truy cập.",
+        "android": "Có thể hoàn tiền Google Play ngay từ đây.",
+        "mobile_unknown": "Bản ghi có trước khi theo dõi cửa hàng. Được xem như App Store — hãy xác minh trước khi hứa hoàn tiền.",
+        "web_lemonsqueezy": "Có thể hoàn tiền qua API Lemon Squeezy.",
+        "web_toss": "Có thể huỷ thanh toán qua API Toss.",
+        "admin": "Khoản cấp miễn phí — chưa từng thu tiền."
+      }
     }
   },
   "official": {
@@ -465,7 +509,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "Đóng"
   },
   "retry": "Thử lại",
   "noData": "Không có dữ liệu",

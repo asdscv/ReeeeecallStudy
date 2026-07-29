@@ -6,12 +6,36 @@
   "done": "완료",
   "back": "뒤로",
   "features": {
-    "cardStorage": { "title": "카드 저장", "free": "1,000장", "pro": "최대 100,000장" },
-    "allModes": { "title": "모든 학습 모드", "free": "SRS + 순차", "pro": "4가지 모드" },
-    "aiGeneration": { "title": "AI 카드 생성", "free": "하루 10장", "pro": "하루 10장 + 크레딧" },
-    "premiumTts": { "title": "프리미엄 TTS", "free": "기본", "pro": "Edge TTS HD" },
-    "analytics": { "title": "고급 분석", "free": "기본 통계", "pro": "차트 + 예측" },
-    "marketplace": { "title": "마켓플레이스 게시", "free": "다운로드만", "pro": "업로드 + 수익 공유" }
+    "cardStorage": {
+      "title": "카드 저장",
+      "free": "1,000장",
+      "pro": "최대 100,000장"
+    },
+    "allModes": {
+      "title": "모든 학습 모드",
+      "free": "SRS + 순차",
+      "pro": "4가지 모드"
+    },
+    "aiGeneration": {
+      "title": "AI 카드 생성",
+      "free": "하루 10장",
+      "pro": "하루 10장 + 크레딧"
+    },
+    "premiumTts": {
+      "title": "프리미엄 TTS",
+      "free": "기본",
+      "pro": "Edge TTS HD"
+    },
+    "analytics": {
+      "title": "고급 분석",
+      "free": "기본 통계",
+      "pro": "차트 + 예측"
+    },
+    "marketplace": {
+      "title": "마켓플레이스 게시",
+      "free": "다운로드만",
+      "pro": "업로드 + 수익 공유"
+    }
   },
   "free": "무료",
   "pro": "Pro",
@@ -38,5 +62,14 @@
   "privacyPolicy": "개인정보처리방침",
   "termsOfService": "이용약관",
   "manageSubscription": "구독 관리",
-  "legalDisclaimer": "구매를 확정하면 {{account}} 계정으로 요금이 청구됩니다. 구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다. 현재 기간이 끝나기 24시간 이내에 갱신 요금이 청구됩니다. 구매 후 {{store}}의 계정 설정에서 구독을 관리하거나 취소할 수 있습니다."
+  "legalDisclaimer": "구매를 확정하면 {{account}} 계정으로 요금이 청구됩니다. 구독은 현재 기간이 끝나기 최소 24시간 전에 취소하지 않으면 자동으로 갱신됩니다. 현재 기간이 끝나기 24시간 이내에 갱신 요금이 청구됩니다. 구매 후 {{store}}의 계정 설정에서 구독을 관리하거나 취소할 수 있습니다.",
+  "consent": {
+    "subscription": "플랜이 즉시 시작되며, 유료 혜택을 사용하면 이 구매에 대한 청약철회권이 소멸한다는 데 동의합니다.",
+    "policyLink": "환불 정책"
+  },
+  "refund": {
+    "request": "환불 요청",
+    "title": "환불 요청",
+    "submitted": "Apple에 환불 요청을 보냈어요. 승인 여부는 Apple이 결정하며 이메일로 알려줍니다. 승인되면 이용 권한은 자동으로 회수돼요."
+  }
 }

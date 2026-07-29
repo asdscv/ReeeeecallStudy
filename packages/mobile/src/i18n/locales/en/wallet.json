@@ -34,5 +34,9 @@
     "creditLabel": "{{value}} AI credit",
     "confirming": "Payment received — your credits will appear shortly.",
     "unavailable": "This credit pack isn't available right now."
+  },
+  "consent": {
+    "creditPack": "I agree that the credits are made available immediately, and that once I use any of them I lose my right to withdraw from this purchase.",
+    "policyLink": "Refund policy"
   }
 }

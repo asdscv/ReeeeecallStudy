@@ -362,7 +362,51 @@
       "confirmTitle": "确认退款？",
       "confirmCreditPack": "向 {{email}} 退款 {{amount}}？款项将退回客户的银行卡。",
       "confirmSubscription": "为 {{email}} 退还该订阅的最近一次扣款并撤销访问权限？",
-      "realMoneyNote": "此操作将调用支付服务商并转移真实资金，无法在此撤销。"
+      "realMoneyNote": "此操作将调用支付服务商并转移真实资金，无法在此撤销。",
+      "confirmRevokeTitle": "收回访问权限？",
+      "buttonRevokeOnly": "收回访问权限",
+      "revokeOnlyIosNote": "不会转移任何资金，仅收回访问权限 — App Store 退款由 Apple 处理。请引导客户向 Apple 申请退款，或在 App Store Connect 中批准。",
+      "revokeOnlyUnknownNote": "不会转移任何资金。此记录未保存商店信息，可能是 App Store 购买，因此仅收回访问权限。承诺退款前请先确认商店。",
+      "revokeOnlyHint": "仅收回权限 — 此渠道的退款由商店处理，而非我们。",
+      "policyEligible": "政策：可退款（{{days}} 天内且未使用）。",
+      "policyIneligible": "政策：不可退款 — {{reason}}。",
+      "consentMissing": "此次购买没有撤回权告知记录，因此以“已使用”为由拒绝的依据较弱。",
+      "statutoryOverride": "法定冷静期（韩国 7 天 / 欧盟·英国 14 天）仍可能要求退款。",
+      "resultRefunded": "已退款 — 资金已退回，访问权限已收回。",
+      "resultRevokedOnly": "已收回访问权限。此操作未转移任何资金。",
+      "reason": {
+        "eligible": "可退款",
+        "not_found": "未找到记录",
+        "not_paid": "付款从未完成",
+        "already_refunded": "已退款",
+        "outside_window": "已超出退款期限",
+        "already_used": "已使用",
+        "renewal_charge": "续订扣款（不在政策范围内）"
+      }
+    },
+    "channel": {
+      "column": "渠道",
+      "web_lemonsqueezy": "网页 · Lemon Squeezy",
+      "web_toss": "网页 · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "移动端 · 商店未知",
+      "admin": "管理员赠予",
+      "paymentsHint": "网页和 Google Play 的付款可在此退款。App Store 付款只能收回访问权限，退款由 Apple 处理。",
+      "filter": {
+        "all": "全部",
+        "web": "网页",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "App Store 退款由 Apple 处理，这里只能收回访问权限。",
+        "android": "Google Play 退款可从这里直接发起。",
+        "mobile_unknown": "该记录早于商店追踪功能。按 App Store 处理，承诺退款前请先确认。",
+        "web_lemonsqueezy": "可通过 Lemon Squeezy API 退款。",
+        "web_toss": "可通过 Toss API 取消付款。",
+        "admin": "赠予记录，从未实际扣款。"
+      }
     }
   },
   "official": {
@@ -465,7 +509,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "关闭"
   },
   "retry": "重试",
   "noData": "暂无数据",

@@ -78,5 +78,11 @@
       "unknown_order": "Pesanan ini tidak ditemukan.",
       "already_processed": "Pesanan ini sudah diproses."
     }
+  },
+  "consent": {
+    "creditPack": "Saya setuju bahwa kredit langsung tersedia, dan begitu saya memakainya saya kehilangan hak untuk membatalkan pembelian ini.",
+    "subscription": "Saya setuju bahwa paket saya langsung dimulai, dan begitu saya memakai manfaat berbayarnya saya kehilangan hak untuk membatalkan pembelian ini.",
+    "policyLink": "Kebijakan refund",
+    "required": "Mohon setujui pemberitahuan di atas sebelum membeli."
   }
 }

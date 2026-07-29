@@ -239,6 +239,41 @@ export async function createPaymentIntent(productId: string): Promise<PaymentInt
   }
 }
 
+/**
+ * Record that the buyer was shown the withdrawal-right disclosure BEFORE paying
+ * (mig 157 `record_purchase_consent`).
+ *
+ * Korea's 전자상거래법 only allows restricting withdrawal for digital content once
+ * use has begun where that restriction was disclosed beforehand; the EU/UK rule needs
+ * express consent to immediate performance plus acknowledgement that the withdrawal
+ * right is lost. Both are evidentiary — without a record, "you already used it" is not
+ * a defensible reason to refuse a refund, which is why refund_eligibility surfaces
+ * `consent_recorded` to the admin.
+ *
+ * The server stamps the timestamp and the policy version, so a client cannot back-date
+ * a consent to fit a later dispute. Store IAP purchases have no merchant_uid at consent
+ * time, so the record is tied to the user + product instead.
+ *
+ * Best-effort by design: a logging failure must not strand a buyer mid-purchase, and
+ * its absence only weakens OUR position, never the customer's.
+ */
+export async function recordPurchaseConsent(
+  productId: string,
+  merchantUid?: string | null,
+): Promise<void> {
+  try {
+    const supabase = getMobileSupabase()
+    const { error } = await supabase.rpc('record_purchase_consent', {
+      p_product_id: productId,
+      p_platform: Platform.OS === 'ios' ? 'ios' : 'android',
+      p_merchant_uid: merchantUid ?? null,
+    })
+    if (error && __DEV__) console.warn('[billing] record_purchase_consent failed:', error.message)
+  } catch (e) {
+    if (__DEV__) console.warn('[billing] record_purchase_consent threw:', e)
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Payment / order history (결제 내역) — mig 131 `get_my_payment_history`.
 //

@@ -8,24 +8,36 @@
 //   2. admin_refund_target(kind, ref) is called with the CALLER'S JWT (user client) — its
 //      is_admin() guard authorizes the request AND returns the provider + the exact ids to
 //      refund. A non-admin caller → 42501 → 403. Unknown target → 404.
-//   3. Provider money refund (service-role secrets):
+//   3. Provider money refund (service-role secrets), dispatched on the CHANNEL — not
+//      the provider — because RevenueCat fronts two stores with opposite capabilities
+//      (mig 156 records which):
 //        lemonsqueezy credit_pack  → POST /v1/orders/{order_id}/refund
 //        lemonsqueezy subscription → POST /v1/subscription-invoices/{invoice_id}/refund
 //        toss (either)             → POST /v1/payments/{paymentKey}/cancel
-//        revenuecat / admin        → no provider money API here (IAP refunds are Apple/Google;
-//                                     admin comp grants moved no money) → internal reversal only.
+//        android (either)          → POST androidpublisher .../orders/{orderId}:refund?revoke=true
+//        ios                       → NOTHING. Apple exposes no developer refund API;
+//                                     the money refund is Apple's to issue. We revoke
+//                                     access and say so — we never report a refund.
+//        mobile_unknown            → treated as ios (fail safe): a row with no recorded
+//                                     store might be Apple, so never claim a refund.
+//        admin comp                → no money ever moved → internal reversal only.
 //   4. Internal reversal (service-role, idempotent):
-//        credit_pack  → clawback_credits(merchant_uid)
-//        subscription → revoke_subscription(provider, provider_subscription_id)
+//        credit_pack (web intent)  → clawback_credits(merchant_uid)
+//        credit_pack (IAP ledger)  → clawback_ai_credits_by_ref(ref)   ← no intent exists
+//        subscription              → revoke_subscription(provider, provider_subscription_id)
 //
 // FAIL-CLOSED: a provider refund with the provider's secret UNSET → 503 (never silently
 // "refund" without moving money). A provider API error → 502 with the provider status.
+// `providerRefunded` in the response is the ONLY truth about whether money moved; the
+// admin UI must render it rather than assuming a 200 means a refund.
 //
 // Deploy: verify_jwt=true (needs the admin's JWT). Secrets: LEMONSQUEEZY_API_KEY (LS),
-// TOSS_SECRET_KEY (Toss). ALLOWED_ORIGINS for CORS.
+// TOSS_SECRET_KEY (Toss), GOOGLE_PLAY_SERVICE_ACCOUNT + GOOGLE_PLAY_PACKAGE_NAME
+// (Play — see _shared/google-play.ts for the Play Console grants). ALLOWED_ORIGINS for CORS.
 
 import { createClient } from '@supabase/supabase-js'
 import { tossCancelPayment } from '../_shared/toss.ts'
+import { DEFAULT_PACKAGE_NAME, playAlreadyRefunded, playRefundOrder } from '../_shared/google-play.ts'
 
 const ENV = (k: string) => Deno.env.get(k)
 
@@ -96,12 +108,31 @@ interface Target {
   reason?: string
   kind?: 'credit_pack' | 'subscription'
   provider?: string
+  /** 'web' | 'ios' | 'android' | null — the store, recorded by mig 156. */
+  platform?: string | null
+  /** 'web_lemonsqueezy' | 'web_toss' | 'ios' | 'android' | 'mobile_unknown' | 'admin' */
+  channel?: string
+  /** Whether OUR server can issue this channel's money refund at all. */
+  can_refund_money?: boolean
+  /** credit_pack only: 'payment_intent' (web) | 'credit_ledger' (mobile IAP). */
+  source?: string
   user_id?: string
   merchant_uid?: string
   provider_payment_id?: string | null
   provider_subscription_id?: string | null
   latest_invoice_id?: string | null
   status?: string
+}
+
+// A mobile IAP credit pack's "merchant_uid" is its LEDGER ref, which the RevenueCat
+// webhook namespaces: 'rc:<store transaction id>' for a real store transaction, or
+// 'rcev:<RevenueCat event id>' when the event carried no transaction key at all.
+// Only the former is a Play order id. An 'rcev:' grant is NOT refundable at the
+// store — returning null makes the caller say so instead of posting a bogus id.
+function playOrderIdFromRef(ref: string | null | undefined): string | null {
+  if (!ref) return null
+  if (ref.startsWith('rcev:')) return null
+  return ref.startsWith('rc:') ? ref.slice(3) : ref
 }
 
 Deno.serve(async (req) => {
@@ -141,6 +172,10 @@ Deno.serve(async (req) => {
   if (!target?.ok) return json({ error: 'Refund target not found', reason: target?.reason ?? 'not_found', code: 'NOT_FOUND' }, 404, cors)
 
   const provider = target.provider ?? ''
+  // Dispatch on the CHANNEL, not the provider: 'revenuecat' covers both stores, and
+  // only one of them (Play) has a refund API. mig 156 derives this server-side, so a
+  // pre-156 row with no recorded store arrives as 'mobile_unknown' → treated as Apple.
+  const channel = target.channel ?? (provider === 'revenuecat' ? 'mobile_unknown' : provider)
   const sb = createClient(url, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
   // 2) PROVIDER money refund (fail-closed on a missing secret).
@@ -209,10 +244,67 @@ Deno.serve(async (req) => {
     // Toss: a 'refunded' sub is excluded from get_due_toss_renewals (mig 132), so the revoke
     // below already stops future charges — no extra provider cancel needed.
 
-  } else {
-    // revenuecat (Apple/Google issue the money) or admin comp (no money moved) → internal only.
+  } else if (channel === 'android') {
+    // GOOGLE PLAY — the one store whose refunds we can issue ourselves.
+    const saJson = ENV('GOOGLE_PLAY_SERVICE_ACCOUNT')
+    if (!saJson) return json({ error: 'Google Play not configured', code: 'NOT_CONFIGURED' }, 503, cors)
+    const pkg = ENV('GOOGLE_PLAY_PACKAGE_NAME') || DEFAULT_PACKAGE_NAME
+
+    // The Play order id. For a consumable it is the ledger ref's store transaction;
+    // for a subscription it is the ORIGINAL order (original_transaction_id), which is
+    // also exactly the charge our policy allows refunding — renewals are out of scope
+    // (mig 157 refund_eligibility returns 'renewal_charge' for those).
+    const orderId = kind === 'credit_pack'
+      ? playOrderIdFromRef(target.provider_payment_id ?? target.merchant_uid)
+      : playOrderIdFromRef(target.provider_subscription_id)
+
+    if (!orderId) {
+      // No usable store order id. For a subscription we can still drop access; for a
+      // consumable there is nothing to revoke, so report it rather than claim success.
+      if (kind === 'subscription') {
+        return await revokeOnly('no_play_order_id; access revoked — issue the money refund in the Play Console')
+      }
+      return json({
+        error: 'This grant has no Google Play order id (it was recorded from an event id), ' +
+               'so it cannot be refunded via the API — refund it in the Play Console',
+        code: 'NO_STORE_ORDER_ID',
+      }, 409, cors)
+    }
+
+    // revoke=true also cancels a subscription, so Play cannot renew and re-charge a
+    // customer whose money we just returned (our terminal-state guard would refuse to
+    // re-entitle them — charged with NO access).
+    const r = await playRefundOrder(saJson, pkg, orderId, { revoke: true, nowSec: Math.floor(Date.now() / 1000) })
+    if (r.notConfigured) return json({ error: 'Google Play not configured', code: 'NOT_CONFIGURED' }, 503, cors)
+    const already = !r.ok && playAlreadyRefunded(r)
+    if (!r.ok && !already) {
+      console.error('[admin-refund] Play refund failed:', r.status, JSON.stringify(r.body))
+      return json({ error: 'Provider refund failed', code: 'PROVIDER_ERROR', providerStatus: r.status, providerBody: r.body }, 502, cors)
+    }
+    providerRefunded = true
+    providerResult = { provider: 'google_play', orderId, status: r.status, alreadyRefunded: !!already, revoked: true }
+
+  } else if (channel === 'ios' || channel === 'mobile_unknown') {
+    // APPLE — there is no developer refund API. Apple alone issues App Store refunds
+    // (the user requests one via reportaproblem.apple.com or the in-app refund sheet),
+    // and RevenueCat's REFUND webhook then reconciles our side automatically. All we
+    // can do here is revoke access, so we must NOT report a money movement.
+    // 'mobile_unknown' (a row predating mig 156) lands here on purpose: it might be an
+    // Apple purchase, and claiming a refund we cannot make is the worse failure.
     providerRefunded = false
-    providerResult = { provider: provider || 'none', skipped: true, note: 'no server-side provider refund for this provider' }
+    providerResult = {
+      provider: 'revenuecat',
+      channel,
+      skipped: true,
+      note: channel === 'ios'
+        ? 'Apple issues App Store refunds; access revoked only. Ask the user to request the refund from Apple, or approve it in App Store Connect.'
+        : 'Store not recorded for this row, so it may be an Apple purchase; access revoked only. Verify the store before promising a refund.',
+    }
+
+  } else {
+    // Admin comp grant (no money ever moved) or an unrecognised provider.
+    providerRefunded = false
+    providerResult = { provider: provider || 'none', channel, skipped: true, note: 'no server-side provider refund for this channel' }
   }
 
   // 3) Internal reversal (idempotent — the provider webhook may also do it). If it FAILS after a
@@ -221,8 +313,21 @@ Deno.serve(async (req) => {
   let internal: unknown
   let reversalError: string | null = null
   if (kind === 'credit_pack') {
-    const { data, error } = await sb.rpc('clawback_credits', { p_merchant_uid: target.merchant_uid })
-    if (error) { reversalError = error.message; console.error('[admin-refund] clawback_credits error:', error.message) }
+    // Two different clawbacks, because the two channels record the purchase differently:
+    // a web pack has a payment_intents row (clawback_credits keys on merchant_uid), a
+    // mobile IAP consumable has ONLY a ledger grant (clawback_ai_credits_by_ref keys on
+    // the ledger ref — mig 134). Using the web one on an IAP pack finds no intent and
+    // reverses nothing, which would leave the credits granted after a real refund.
+    const viaLedger = target.source === 'credit_ledger'
+    const { data, error } = viaLedger
+      ? await sb.rpc('clawback_ai_credits_by_ref', {
+          p_user_id: target.user_id ?? null, p_ref: target.merchant_uid,
+        })
+      : await sb.rpc('clawback_credits', { p_merchant_uid: target.merchant_uid })
+    if (error) {
+      reversalError = error.message
+      console.error(`[admin-refund] ${viaLedger ? 'clawback_ai_credits_by_ref' : 'clawback_credits'} error:`, error.message)
+    }
     internal = error ? { error: error.message } : data
   } else {
     const { data, error } = await sb.rpc('revoke_subscription', {
@@ -240,5 +345,10 @@ Deno.serve(async (req) => {
     }, 500, cors)
   }
 
-  return json({ ok: true, kind, provider, providerRefunded, provider_result: providerResult, internal }, 200, cors)
+  // `providerRefunded` distinguishes "money returned" from "access revoked only" — the
+  // admin UI MUST surface it, since a 200 alone does not mean the customer was paid back.
+  return json({
+    ok: true, kind, provider, channel, platform: target.platform ?? null,
+    providerRefunded, provider_result: providerResult, internal,
+  }, 200, cors)
 })

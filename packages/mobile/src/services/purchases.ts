@@ -323,6 +323,38 @@ class PurchaseService {
   }
 
   /**
+   * Open Apple's in-app refund sheet for the active entitlement (StoreKit 2,
+   * iOS 15+). Returns 'unavailable' on Android, on older iOS, or when the SDK
+   * isn't loaded — the caller then falls back to a web link.
+   *
+   * WHY THIS EXISTS. Apple gives developers no API to ISSUE a refund; only the
+   * customer can request one and only Apple decides. The nearest thing we can
+   * offer is this sheet, which starts that request without the user leaving the
+   * app. Everything after it is Apple's: if they approve, RevenueCat sends a
+   * REFUND webhook and revenuecat-webhook reverses our side automatically.
+   *
+   * The return value is therefore NOT "refunded" — it is only how the request
+   * was submitted, so the UI must never report a refund on the strength of it.
+   */
+  async beginRefundRequest(): Promise<{ status: 'success' | 'userCancelled' | 'unavailable' | 'error'; error?: string }> {
+    if (!Purchases || Platform.OS !== 'ios') return { status: 'unavailable' }
+    const fn = (Purchases as any).beginRefundRequestForActiveEntitlement
+    if (typeof fn !== 'function') return { status: 'unavailable' }
+    try {
+      const result = await fn.call(Purchases)
+      // RC returns a RefundRequestStatus enum; its string forms differ across
+      // versions, so match loosely and treat anything unrecognised as submitted.
+      const s = String(result ?? '').toLowerCase()
+      if (s.includes('cancel')) return { status: 'userCancelled' }
+      if (s.includes('error')) return { status: 'error' }
+      return { status: 'success' }
+    } catch (e: any) {
+      // Pre-iOS-15 devices and simulator builds throw rather than return.
+      return { status: 'unavailable', error: e?.message }
+    }
+  }
+
+  /**
    * Get current customer info.
    */
   async getCustomerInfo(): Promise<CustomerInfo | null> {

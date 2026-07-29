@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, Pressable, Linking } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import {
@@ -11,10 +11,13 @@ import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { Button } from '../ui'
 import { usePurchases } from '../../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
+import { recordPurchaseConsent } from '../../services/billing'
 import type { BillingProduct } from '../../services/billing'
 
 // Ledger rows shown before the "show all" toggle.
 const HISTORY_PREVIEW = 5
+
+const REFUND_POLICY_URL = 'https://reeeeecallstudy.xyz/refund-policy.html'
 
 // AI wallet / usage content for the mobile Settings accordion (충전금·사용량):
 // $ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig
@@ -26,6 +29,10 @@ export function WalletSummary() {
   const [summary, setSummary] = useState<AiWalletSummary | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
   const [historyExpanded, setHistoryExpanded] = useState(false)
+  // Withdrawal-right disclosure, required before the pack buttons unlock. Credits are
+  // consumable digital content: KR 전자상거래법 / EU-UK only let us treat a used pack as
+  // non-refundable if the buyer saw this notice BEFORE paying (mig 157).
+  const [consented, setConsented] = useState(false)
 
   const load = useCallback(() => {
     setState('loading')
@@ -55,6 +62,9 @@ export function WalletSummary() {
   const buyPack = async (product: BillingProduct) => {
     const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
     if (!pkg) { Alert.alert(t('credits.title'), t('credits.unavailable')); return }
+    // Stamp the disclosure BEFORE the store charge — mig 157 only counts a consent
+    // recorded before the purchase, since one written afterwards proves nothing.
+    await recordPurchaseConsent(product.id)
     // purchase() settles the store transaction; the credit GRANT lands server-side
     // via the RevenueCat webhook (add_ai_credits, idempotent). Re-poll the wallet so
     // the new balance shows once the webhook has processed.
@@ -97,6 +107,26 @@ export function WalletSummary() {
         {SUBSCRIPTION_UI_ENABLED && creditPacks.length > 0 ? (
           <View style={{ marginTop: 14, gap: 8 }}>
             <Text style={[styles.subTitle, { color: theme.colors.text }]}>{t('credits.title')}</Text>
+            <Pressable
+              testID="wallet-consent"
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: consented }}
+              onPress={() => setConsented((v) => !v)}
+              style={[styles.consent, { borderColor: theme.colors.border }]}
+            >
+              <Text style={[styles.consentBox, { color: consented ? theme.colors.primary : theme.colors.textTertiary }]}>
+                {consented ? '☑' : '☐'}
+              </Text>
+              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, flex: 1 }]}>
+                {t('consent.creditPack')}{' '}
+                <Text
+                  style={{ color: theme.colors.primary, textDecorationLine: 'underline' }}
+                  onPress={() => Linking.openURL(REFUND_POLICY_URL)}
+                >
+                  {t('consent.policyLink')}
+                </Text>
+              </Text>
+            </Pressable>
             {creditPacks.map((pack) => (
               <View key={pack.id} style={styles.packRow}>
                 {/* what you GET (fixed USD credit) — the price BELOW is what you PAY
@@ -110,6 +140,7 @@ export function WalletSummary() {
                   size="sm"
                   onPress={() => buyPack(pack)}
                   loading={purchasing}
+                  disabled={!consented}
                 />
               </View>
             ))}
@@ -196,6 +227,8 @@ const styles = StyleSheet.create({
   bar: { height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: 'rgba(128,128,128,0.2)' },
   btn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, alignItems: 'center', alignSelf: 'flex-start' },
   packRow: { gap: 4 },
+  consent: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 10, borderWidth: 1, borderRadius: 10 },
+  consentBox: { fontSize: 18, lineHeight: 20 },
   ledgerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 },
   historyToggle: { paddingTop: 10, alignItems: 'center', borderTopWidth: StyleSheet.hairlineWidth },
 })

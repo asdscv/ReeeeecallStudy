@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import {
@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from '../ui/dialog'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
+import { PurchaseConsent } from './PurchaseConsent'
 import { preferredProviderId } from '../../lib/payments'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
@@ -36,6 +37,9 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
   const fetchProducts = useBillingStore((s) => s.fetchProducts)
   const startCheckout = useBillingStore((s) => s.startCheckout)
   const clearComingSoon = useBillingStore((s) => s.clearComingSoon)
+  // Withdrawal-right disclosure. Required before any buy button is enabled — see
+  // PurchaseConsent for why this is a legal prerequisite, not a nicety.
+  const [consented, setConsented] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -134,8 +138,15 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
                       <button
                         type="button"
                         onClick={() => beginCheckout(p.id)}
-                        disabled={processing}
-                        title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
+                        // Payments live → the disclosure must be ticked first. When
+                        // payments are off the button is just a "coming soon" chip, so
+                        // gating it on a consent nobody can act on would be nonsense.
+                        disabled={processing || (PAYMENTS_ACTIVE && !consented)}
+                        title={
+                          !PAYMENTS_ACTIVE ? t('comingSoon.title')
+                            : !consented ? t('consent.required')
+                            : undefined
+                        }
                         className={
                           PAYMENTS_ACTIVE
                             ? 'flex items-center gap-1.5 cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-hover disabled:opacity-60'
@@ -151,6 +162,10 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
               )
             })}
           </ul>
+        )}
+
+        {PAYMENTS_ACTIVE && creditPacks.length > 0 && (
+          <PurchaseConsent kind="credit_pack" checked={consented} onChange={setConsented} id="topup-consent" />
         )}
       </DialogContent>
     </Dialog>
