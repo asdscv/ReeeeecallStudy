@@ -160,6 +160,8 @@ builder/helper revert. DB cursor 값은 기존 integer라 호환된다.
 
 ## 8. P5A — Persistence Expand (migration 160)
 
+진행: **완료.** `feat/study-persistence-expand`, 설계 `7708354`, 구현 `54cb6da`, PR #336, 최종 CI 7 checks green. 문서는 `DOCS/DONE/STUDY-HARDENING/PHASE-5A-PERSISTENCE-EXPAND.md`. 프로덕션 migration은 실행하지 않았다. 다음은 P5B client cutover.
+
 ### Additive schema
 
 - `cards.srs_revision BIGINT NOT NULL DEFAULT 0`
@@ -168,7 +170,8 @@ builder/helper revert. DB cursor 값은 기존 integer라 호환된다.
 - `study_sessions.client_session_id UUID NULL`
 - `study_rating_events`
   - `id UUID PRIMARY KEY` (client event id)
-  - `user_id`, `session_id`, `card_id`, `deck_id`, `study_mode`, `rating`, `srs_source`
+  - `user_id`, `session_id`, `session_sequence`, `card_id`, `deck_id`, `study_mode`, `rating`, `srs_source`
+  - advisory lock 순서로 `session_sequence=max+1`, unique `(user_id,session_id,session_sequence)`
   - `expected_revision`, `applied_revision`
   - `previous_srs JSONB`, `new_srs JSONB`
   - `review_duration_ms`, `status applied|undone`, timestamps
