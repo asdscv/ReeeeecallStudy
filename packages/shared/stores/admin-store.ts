@@ -66,6 +66,8 @@ export interface AdminSubscriptionRow {
   channel: BillingChannel
   /** Server's verdict on whether a real money refund is possible for this channel. */
   can_refund_money: boolean
+  /** 'sandbox' rows are test purchases — never counted as revenue (mig 159). */
+  environment: 'production' | 'sandbox'
 }
 
 export interface AdminPaymentRow {
@@ -85,6 +87,7 @@ export interface AdminPaymentRow {
   platform: BillingPlatform | null
   channel: BillingChannel
   can_refund_money: boolean
+  environment: 'production' | 'sandbox'
 }
 
 /**
@@ -289,6 +292,12 @@ export interface SystemFlags {
   maintenance_message: string | null
   ai_generation_enabled: boolean
   payments_enabled: boolean
+  /**
+   * Whether a RevenueCat SANDBOX purchase may grant anything (mig 159). OFF by
+   * default: the sandbox webhook can stay enabled permanently, and test purchases
+   * are acked-and-ignored until an admin opens this for a test run.
+   */
+  sandbox_grants_enabled: boolean
 }
 
 
@@ -846,6 +855,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         p_maintenance_message: patch.maintenance_message ?? null,
         p_ai_generation_enabled: patch.ai_generation_enabled ?? null,
         p_payments_enabled: patch.payments_enabled ?? null,
+        p_sandbox_grants_enabled: patch.sandbox_grants_enabled ?? null,
       })
       if (error) return { error: extractErrorMessage(error) }
       set({ systemFlags: data as SystemFlags })

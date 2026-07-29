@@ -248,7 +248,9 @@
       "message": "Maintenance message",
       "messagePlaceholder": "Shown to users during maintenance",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "sandboxGrants": "サンドボックス購入へのクレジット付与を許可",
+      "sandboxGrantsHint": "OFF: RevenueCat のサンドボックスイベントは受信のみで何も付与しません。テスト時のみ ON にしてください（サンドボックス購入は無料です）。"
     }
   },
   "billing": {
@@ -406,7 +408,9 @@
         "web_lemonsqueezy": "Lemon Squeezy API で返金できます。",
         "web_toss": "Toss API で決済を取り消せます。",
         "admin": "無償付与のため、実際の請求はありません。"
-      }
+      },
+      "sandbox": "サンドボックス",
+      "sandboxHint": "ストアのサンドボックスによるテスト購入 — 無料で、売上には一切計上されません。"
     }
   },
   "official": {

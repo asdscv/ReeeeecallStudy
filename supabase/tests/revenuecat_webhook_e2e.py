@@ -43,6 +43,9 @@ U_IOS = "b7000000-0000-0000-0000-0000000000a1"
 U_AND = "b7000000-0000-0000-0000-0000000000a2"
 U_TOMB = "b7000000-0000-0000-0000-0000000000a3"
 U_NOTX = "b7000000-0000-0000-0000-0000000000a4"
+U_SBX  = "b7000000-0000-0000-0000-0000000000a5"
+U_PROD = "b7000000-0000-0000-0000-0000000000a6"
+U_ADM  = "b7000000-0000-0000-0000-0000000000a7"
 
 fails = []
 
@@ -76,9 +79,9 @@ def check(name: str, got, want):
 sql(f"""
 SET session_replication_role = replica;
 INSERT INTO auth.users (id) VALUES
-  ('{U_IOS}'),('{U_AND}'),('{U_TOMB}'),('{U_NOTX}') ON CONFLICT DO NOTHING;
-DELETE FROM ai_credit_ledger  WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}');
-DELETE FROM ai_credit_balance WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}');
+  ('{U_IOS}'),('{U_AND}'),('{U_TOMB}'),('{U_NOTX}'),('{U_SBX}'),('{U_PROD}'),('{U_ADM}') ON CONFLICT DO NOTHING;
+DELETE FROM ai_credit_ledger  WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}','{U_SBX}','{U_PROD}','{U_ADM}');
+DELETE FROM ai_credit_balance WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}','{U_SBX}','{U_PROD}','{U_ADM}');
 """)
 
 grant_micro = int(sql("select credits_micro_won from billing_products where id='credits_1000'"))
@@ -147,12 +150,37 @@ st, body = post({"type": "REFUND", "id": "evt-7", "app_user_id": U_NOTX,
 check("refund acked but cannot match", body.get("ignored"), "no_txn_key")
 check("credits NOT clawed back (known gap)", sql(f"select balance from ai_credit_balance where user_id='{U_NOTX}'"), str(grant_micro))
 
+
+print("\n8) SANDBOX purchase while the kill switch is OFF (default) → grants nothing")
+sql("SET session_replication_role = replica; UPDATE system_flags SET sandbox_grants_enabled = false WHERE id = 1;")
+st, body = post(pack_event(id="evt-8", user=U_SBX, transaction_id="SBX-1", environment="SANDBOX"))
+check("HTTP 200 (acked, not retried)", st, 200)
+check("ignored as sandbox", body.get("ignored"), "sandbox_grants_disabled")
+check("no ledger row at all", sql(f"select count(*) from ai_credit_ledger where user_id='{U_SBX}'"), "0")
+
+print("\n9) same event with the switch ON → grants, but tagged sandbox")
+sql("SET session_replication_role = replica; UPDATE system_flags SET sandbox_grants_enabled = true WHERE id = 1;")
+st, body = post(pack_event(id="evt-9", user=U_SBX, transaction_id="SBX-1", environment="SANDBOX"))
+check("HTTP 200", st, 200)
+check("reported as sandbox", body.get("environment"), "sandbox")
+check("ledger environment = sandbox", sql(f"select environment from ai_credit_ledger where user_id='{U_SBX}' and delta>0"), "sandbox")
+
+# NOTE: the admin_billing_overview sandbox-exclusion assertions live in
+# sandbox_environment_test.sql — is_admin() needs a session-scoped JWT claim, and
+# each sql() call here is a separate psql process, so the claim would not survive.
+sql("SET session_replication_role = replica; UPDATE system_flags SET sandbox_grants_enabled = false WHERE id = 1;")
+
+print("\n11) an event with NO environment field is treated as production")
+st, body = post(pack_event(id="evt-11", user=U_PROD, transaction_id="PROD-1"))
+check("defaults to production", body.get("environment"), "production")
+check("ledger environment = production", sql(f"select environment from ai_credit_ledger where user_id='{U_PROD}' and delta>0"), "production")
+
 # ── cleanup ────────────────────────────────────────────────────────────────
 sql(f"""
 SET session_replication_role = replica;
-DELETE FROM ai_credit_ledger  WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}');
-DELETE FROM ai_credit_balance WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}');
-DELETE FROM auth.users        WHERE id      IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}');
+DELETE FROM ai_credit_ledger  WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}','{U_SBX}','{U_PROD}','{U_ADM}');
+DELETE FROM ai_credit_balance WHERE user_id IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}','{U_SBX}','{U_PROD}','{U_ADM}');
+DELETE FROM auth.users        WHERE id      IN ('{U_IOS}','{U_AND}','{U_TOMB}','{U_NOTX}','{U_SBX}','{U_PROD}','{U_ADM}');
 """)
 
 print("\n" + ("ALL PASS" if not fails else f"FAILURES: {fails}"))
