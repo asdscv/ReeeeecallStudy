@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { calculateSRS, getSrsDayStart, type SrsRating } from '../lib/srs'
-import { buildSequentialReviewQueue, computeSequentialReviewPositions } from '../lib/study-session-utils'
+import { buildSequentialQueue, buildSequentialReviewQueue, computeSequentialPosition, computeSequentialReviewPositions } from '../lib/study-session-utils'
 import { SrsQueueManager, type QueueCard, type SrsQueueSnapshot } from '../lib/study-queue'
 import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type CrammingRating, type CrammingQueueSnapshot } from '../lib/cramming-queue'
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
@@ -437,48 +437,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       case 'sequential': {
         if (!typedStudyState) break
 
-        if (mergedAll) {
-          // Non-owned: filter the merged set (viewer progress → suspended, S-M1).
-          const nonSusp = mergedAll.filter((c) => c.srs_status !== 'suspended')  // already sort_position asc
-          let seq = nonSusp.filter((c) => c.sort_position >= typedStudyState.sequential_pos).slice(0, config.batchSize)
-          if (seq.length < config.batchSize) {
-            const ids = new Set(seq.map((c) => c.id))
-            const wrap = nonSusp.filter((c) => !ids.has(c.id)).slice(0, config.batchSize - seq.length)
-            seq = [...seq, ...wrap]
-          }
-          cards = seq
-          break
-        }
-
-        // Embedded: bounded .limit() (batchSize ≤ MAX_BATCH_SIZE) — no truncation risk.
-        const { data: seqCards } = await withArchiveBoundary(
+        // Use the same complete eligible set for owned and non-owned decks so a
+        // server-side limit cannot split a duplicate sort_position group.
+        const sequentialPool = mergedAll ?? await fetchAllRows<Card>(() => withArchiveBoundary(
           supabase
             .from('cards')
             .select('*')
             .eq('deck_id', config.deckId)
-            .neq('srs_status', 'suspended')
-            .gte('sort_position', typedStudyState.sequential_pos),
+            .neq('srs_status', 'suspended'),
           activeThreshold,
-        ).order('sort_position', { ascending: true }).limit(config.batchSize)
+        ).order('sort_position', { ascending: true }).order('id', { ascending: true }))
 
-        cards = (seqCards ?? []) as Card[]
-
-        // Wrap around: fill remaining from beginning if partial batch
-        if (cards.length < config.batchSize) {
-          const remaining = config.batchSize - cards.length
-          const existingIds = new Set(cards.map(c => c.id))
-          const { data: wrapCards } = await withArchiveBoundary(
-            supabase
-              .from('cards')
-              .select('*')
-              .eq('deck_id', config.deckId)
-              .neq('srs_status', 'suspended'),
-            activeThreshold,
-          ).order('sort_position', { ascending: true }).limit(remaining)
-
-          const uniqueWrapCards = ((wrapCards ?? []) as Card[]).filter(c => !existingIds.has(c.id))
-          cards = [...cards, ...uniqueWrapCards]
-        }
+        cards = buildSequentialQueue(
+          sequentialPool,
+          typedStudyState.sequential_pos,
+          config.batchSize,
+        )
         break
       }
 
@@ -888,37 +862,28 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     if (studyState) {
       if (config.mode === 'sequential' && queue.length > 0) {
         const typedState = studyState as DeckStudyState
-        // Only consider cards actually studied (sequential processes in order, so slice is exact)
-        const studiedCards = queue.slice(0, sessionStats.cardsStudied)
-
-        if (studiedCards.length > 0) {
-          const wrappedCards = studiedCards.filter(c => c.sort_position < typedState.sequential_pos)
-
-          let nextPos: number
-          if (wrappedCards.length > 0) {
-            nextPos = Math.max(...wrappedCards.map(c => c.sort_position)) + 1
-          } else {
-            const maxPos = Math.max(...studiedCards.map(c => c.sort_position))
-            nextPos = maxPos + 1
-          }
-
+        if (sessionStats.cardsStudied > 0) {
+          const nextPos = computeSequentialPosition(
+            queue,
+            sessionStats.cardsStudied,
+            typedState.sequential_pos,
+            maxCardPosition,
+          )
           await supabase
             .from('deck_study_state')
-            .update({
-              sequential_pos: nextPos > maxCardPosition ? 0 : nextPos,
-            } as Record<string, unknown>)
+            .update({ sequential_pos: nextPos } as Record<string, unknown>)
             .eq('id', studyState.id)
         }
       } else if (config.mode === 'sequential_review' && queue.length > 0) {
-        // (S-L3) Authoritative single write of the final position from the cards
-        // actually studied this session — replaces the removed per-card writes.
+        // (S-L3) Authoritative single write of the final position. Passing the
+        // full queue retains a partially studied duplicate-position group.
         const typedState = studyState as DeckStudyState
-        const studiedCards = queue.slice(0, sessionStats.cardsStudied)
-        if (studiedCards.length > 0) {
+        if (sessionStats.cardsStudied > 0) {
           const positions = computeSequentialReviewPositions(
-            studiedCards.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
+            queue.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
             { new_start_pos: typedState.new_start_pos, review_start_pos: typedState.review_start_pos },
             maxCardPosition,
+            sessionStats.cardsStudied,
           )
           await supabase
             .from('deck_study_state')

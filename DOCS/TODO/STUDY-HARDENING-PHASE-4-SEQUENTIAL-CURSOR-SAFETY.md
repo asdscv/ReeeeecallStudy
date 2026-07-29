@@ -1,6 +1,6 @@
 # Study Hardening Phase 4 — Sequential Cursor Safety
 
-상태: DESIGN — implementation pending
+상태: IMPLEMENTED — local verified, PR/CI pending
 
 ## 1. 목적
 
@@ -116,3 +116,25 @@ helper와 두 store queue construction을 revert한다. cursor DB 값과 schema�
 - 분할 study regression, web/mobile typecheck, lint, diff, build Green
 - 독립 review blocker/high/medium 없음
 - PR CI 7개 Green 후 merge, DONE 이동, branch/worktree cleanup
+
+## 10. 구현 중 추가 Deep Dive 수정
+
+Tie-safe loading만으로는 충분하지 않았다. 사용자가 duplicate-position group 중간에서 세션을 종료하면 기존 `max(studied position)+1` cursor가 같은 position의 미학습 card를 건너뛴다. 따라서 plain/review cursor 계산은 full session queue와 `cardsStudied`를 받아 다음 미학습 card가 있으면 그 card의 `sort_position`을 그대로 저장한다. 다음 session에서 이미 평가한 동률 card가 일부 재노출될 수 있지만 영구 누락보다 안전하며, 아직 미학습인 tie member를 보장한다.
+
+## 11. 구현 및 로컬 검증 증거
+
+상태: IMPLEMENTED — local verified, PR/CI pending
+
+- 설계 commit: `d903320 docs(study): design phase 4 cursor safety`
+- initial Red: 9 tests 중 8 failures / 1 pass
+- Deep Dive Red: partial-tie early exit 3/3 failures
+- core Green: 5 files / 74 tests
+- 분할 study regression: 18 files / 242 tests passed
+  - cursor/helper/store core: 5 files / 74 tests
+  - SRS/queue/store: 5 files / 87 tests
+  - access/validation/pagination/progress: 4 files / 37 tests
+  - phase0/guardrails/cramming: 4 files / 44 tests
+- web/mobile TypeScript passed
+- targeted ESLint, `git diff --check`, shared/web helper byte parity passed
+- web production build passed in 3.27s
+- independent review: APPROVED; tie boundary, cyclic wrap, partial-tie early exit에 blocker/high/medium 없음
