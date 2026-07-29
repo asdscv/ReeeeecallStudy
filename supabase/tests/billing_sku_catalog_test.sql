@@ -1,5 +1,6 @@
 -- ============================================================================
--- billing_sku_catalog_test.sql — mig 151 store-SKU catalog assertions.
+-- billing_sku_catalog_test.sql — store-SKU catalog assertions (mig 151 machinery,
+-- mig 155 catalog contents: the clean per-platform subscription store ids).
 --
 -- Drives the DB-centric store↔internal product mapping directly:
 --   resolve_store_product   (service_role): found / platform-null-unambiguous /
@@ -30,13 +31,30 @@ SET session_replication_role = DEFAULT;
 SELECT set_config('request.jwt.claim.role','service_role',false);
 DO $$
 BEGIN
-  -- seeded (mig 151): ai_credit_099 → credits_1000 on ios AND android
+  -- consumables — seeded (mig 151), untouched by 155: ai_credit_099 → credits_1000 on ios AND android
   ASSERT public.resolve_store_product('ios','ai_credit_099') = 'credits_1000',
     'resolve ios ai_credit_099 → credits_1000';
   ASSERT public.resolve_store_product('android','ai_credit_999') = 'credits_10000',
     'resolve android ai_credit_999 → credits_10000';
-  ASSERT public.resolve_store_product('ios','sub_5k_monthly_v2') = 'sub_5k_monthly',
-    'resolve ios subscription SKU → sub_5k_monthly';
+
+  -- subscriptions — the mig-151 placeholders (sub_5k_monthly_v2 / sub_unlimited_monthly_v3) were
+  -- RETIRED by mig 155, which activated clean ids that DIFFER PER PLATFORM on purpose: the tidy
+  -- `sub_*_monthly` ids were created-then-deleted on App Store Connect and Apple reserves them
+  -- permanently, so iOS uses bare ids while Google uses `<sub>:<base-plan>`. Pin all four.
+  ASSERT public.resolve_store_product('ios','standard_monthly') = 'sub_5k_monthly',
+    'resolve ios standard_monthly → sub_5k_monthly (mig 155)';
+  ASSERT public.resolve_store_product('ios','pro_monthly') = 'sub_unlimited_monthly',
+    'resolve ios pro_monthly → sub_unlimited_monthly (mig 155)';
+  ASSERT public.resolve_store_product('android','sub_standard_monthly:monthly') = 'sub_5k_monthly',
+    'resolve android sub_standard_monthly:monthly → sub_5k_monthly (mig 155)';
+  ASSERT public.resolve_store_product('android','sub_pro_monthly:monthly') = 'sub_unlimited_monthly',
+    'resolve android sub_pro_monthly:monthly → sub_unlimited_monthly (mig 155)';
+
+  -- the retired placeholders must stay inactive (resolve excludes is_active=false)
+  ASSERT public.resolve_store_product('ios','sub_5k_monthly_v2') IS NULL,
+    'mig-151 placeholder sub_5k_monthly_v2 retired by mig 155';
+  ASSERT public.resolve_store_product('ios','sub_unlimited_monthly_v3') IS NULL,
+    'mig-151 placeholder sub_unlimited_monthly_v3 retired by mig 155';
 
   -- platform NULL: ios+android both map ai_credit_499 → credits_5000 → UNAMBIGUOUS
   ASSERT public.resolve_store_product(NULL,'ai_credit_499') = 'credits_5000',

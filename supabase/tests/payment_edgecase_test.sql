@@ -11,7 +11,7 @@
 --         activate refuses a non-pending intent
 --   P-M3  create_payment_intent REUSES an existing pending subscription intent
 --   P-H5  a live LemonSqueezy subscriber can't open a new subscription checkout
---   P-L4  the unlimited plan makes get_active_card_threshold return NULL
+--   P-L4  the top plan carries a FINITE cap (mig 148) — no unlimited short-circuit
 --   P-H3  clawback_credits caps at (granted − already-clawed); clawback_credits_partial
 --         reverses a specific amount, idempotent per cancel ref
 --   P-L2  transfer_subscriptions_by_user moves a user's subs (RevenueCat TRANSFER)
@@ -179,21 +179,70 @@ BEGIN
   END;
 END $$;
 
--- ═══ P-L4: the unlimited plan makes get_active_card_threshold return NULL ═══
+-- ═══ P-L4: the top plan carries a FINITE cap (mig 148) — no unlimited short-circuit ═══
+-- Before mig 148 the top plan seeded card_limit 2e9, which tripped the >= 1e9 sentinel in
+-- get_active_card_threshold: it returned NULL *without scanning*. Mig 148 capped the plan at
+-- 100,000, so it now behaves like any other paid tier — the cap is real and the archive
+-- threshold is computed by an actual scan. The 2e9 sentinel survives only for admins
+-- (mig 139 _owned_card_limit CASE); that branch stays covered by card_limit_guard_test.sql.
 SELECT set_config('request.jwt.claim.role','service_role',false);
 SET session_replication_role = replica;
 INSERT INTO card_templates (id,user_id,name) VALUES ('f4000000-0000-0000-0000-00000000ff07', :b7,'T7');
 INSERT INTO decks (id,user_id,name) VALUES ('f4d00000-0000-0000-0000-000000000007', :b7,'D7');
-INSERT INTO cards (deck_id,user_id,template_id,sort_position) SELECT 'f4d00000-0000-0000-0000-000000000007', :b7,'f4000000-0000-0000-0000-00000000ff07',g FROM generate_series(1,5) g;
+-- Stagger created_at: now() is fixed for the whole txn, so a plain DEFAULT would give all 5
+-- cards the SAME timestamp and the archive boundary (an ORDER BY created_at OFFSET) would be
+-- ambiguous — "cards newer than the boundary" would count 0 and prove nothing.
+INSERT INTO cards (deck_id,user_id,template_id,sort_position,created_at)
+SELECT 'f4d00000-0000-0000-0000-000000000007', :b7,'f4000000-0000-0000-0000-00000000ff07',
+       g, now() - (10 - g) * interval '1 minute'
+FROM generate_series(1,5) g;
 SET session_replication_role = DEFAULT;
 DO $$ BEGIN
+  ASSERT (SELECT card_limit FROM billing_products WHERE id='sub_unlimited_monthly') = 100000,
+         'top-plan catalog row carries the finite mig-148 cap (not the retired 2e9 seed)';
   PERFORM public.grant_subscription('f4000000-0000-0000-0000-0000000000b7'::uuid,'sub_unlimited_monthly','test','UNL7', now()+interval '30 days');
+  ASSERT (SELECT card_limit FROM billing_subscriptions
+            WHERE user_id='f4000000-0000-0000-0000-0000000000b7' AND status='active') = 100000,
+         'grant_subscription copies the product cap onto the subscription row (P-L4)';
 END $$;
 SELECT set_config('request.jwt.claim.role','authenticated',false);
 SELECT set_config('request.jwt.claim.sub','f4000000-0000-0000-0000-0000000000b7',false);
-DO $$ BEGIN
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b7'::uuid) = 2000000000, 'unlimited cap';
-  ASSERT public.get_active_card_threshold() IS NULL, 'unlimited → threshold NULL (P-L4)';
+DO $$
+DECLARE j json;
+BEGIN
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b7'::uuid) = 100000,
+         'top-plan effective cap = 100,000 (P-L4)';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b7'::uuid) < 1000000000,
+         'top plan sits BELOW the 1e9 sentinel → the cap is enforced, not short-circuited';
+  -- honest meter: a paid plan must never be advertised as unlimited
+  j := public.get_card_usage_detail();
+  ASSERT (j->>'is_unlimited')::boolean = false, 'top plan is NOT reported unlimited (P-L4)';
+  ASSERT (j->>'card_limit')::int = 100000,      'meter reports the 100,000 cap (P-L4)';
+  ASSERT public.get_active_card_threshold() IS NULL,
+         'under cap → nothing to archive (P-L4)';
+END $$;
+
+-- …and the boundary REALLY materializes once the limit is exceeded — exactly what the old 2e9
+-- sentinel made impossible. Squeeze b7's own subscription cap to 3 (< the 5 cards owned).
+SELECT set_config('request.jwt.claim.role','service_role',false);
+UPDATE billing_subscriptions SET card_limit = 3 WHERE user_id = :b7 AND status = 'active';
+SELECT set_config('request.jwt.claim.role','authenticated',false);
+DO $$
+DECLARE v_thr timestamptz; j json;
+BEGIN
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b7'::uuid) = 3,
+         'squeezed subscription cap applies (P-L4)';
+  ASSERT public._owned_card_over_cap('f4000000-0000-0000-0000-0000000000b7'::uuid) = true,
+         'finite plan over cap → _owned_card_over_cap true, no sentinel bypass (P-L4)';
+  v_thr := public.get_active_card_threshold();
+  ASSERT v_thr IS NOT NULL,
+         'a finite cap runs the threshold scan (the 2e9 plan never reached it)';
+  ASSERT (SELECT count(*) FROM cards c JOIN decks d ON d.id = c.deck_id
+           WHERE d.user_id = 'f4000000-0000-0000-0000-0000000000b7'
+             AND c.created_at > v_thr) = 2,
+         'exactly the 2 newest of 5 cards fall outside the 3-card boundary (P-L4)';
+  j := public.get_card_usage_detail();
+  ASSERT (j->>'archived_total')::int = 2, 'meter reports 2 archived under the finite cap (P-L4)';
 END $$;
 
 -- ═══ P-H3: clawback cap + partial clawback (money = bigint micro-WON) ═══
