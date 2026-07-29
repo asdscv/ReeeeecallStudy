@@ -75,7 +75,7 @@ export function CardUsageCard() {
           </span>
           <span className="text-xs text-muted-foreground tabular-nums">
             {unlimited
-              ? t('cardUsage.detail.planUnlimited', 'Unlimited plan')
+              ? t('cardUsage.detail.planUnlimited', 'Admin account')
               : `/ ${detail.limit.toLocaleString()}`}
           </span>
         </div>

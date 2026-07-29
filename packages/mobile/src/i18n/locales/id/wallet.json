@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "Riwayat penggunaan",
-    "empty": "Belum ada penggunaan."
+    "empty": "Belum ada penggunaan.",
+    "showAll": "Lihat semua {{total}}",
+    "showLess": "Tampilkan lebih sedikit"
   },
   "reason": {
     "purchase": "Isi ulang",

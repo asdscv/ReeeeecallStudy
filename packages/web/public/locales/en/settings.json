@@ -147,8 +147,8 @@
     "upgrade": "Upgrade (coming soon)",
     "upgradeSoon": "Subscription is coming soon.",
     "unlimited": "Unlimited",
-    "countUnlimited": "{{owned}} / Unlimited",
-    "planNoteUnlimited": "Your plan includes unlimited owned cards.",
+    "countUnlimited": "{{owned}} · No limit",
+    "planNoteUnlimited": "Admin account — card storage isn't capped.",
     "detail": {
       "title": "Card storage",
       "subtitle": "Owned + subscribed cards count toward your plan. Official decks don’t count.",
@@ -163,9 +163,9 @@
       "percentUsed": "{{percent}}% used",
       "nearLimit": "Approaching limit",
       "atLimit": "Limit reached",
-      "planUnlimited": "Unlimited plan",
+      "planUnlimited": "Admin account",
       "planCards": "{{limit}} card plan",
-      "unlimitedTitle": "Unlimited storage",
+      "unlimitedTitle": "No card limit",
       "lifetimeTotal": "{{count, number}} cards"
     }
   },

@@ -66,10 +66,10 @@
     "creditsOnly": "มีการ์ดแบบชำระเงิน {{credits}} ใบ",
     "empty": "ใช้การ์ดฟรีของวันนี้หมดแล้ว",
     "unknown": "ไม่สามารถดูยอดคงเหลือได้ในขณะนี้",
-    "balance": "ยอดคงเหลือ {{amount}} (~{{cards}} การ์ด)",
+    "balance": "ยอดคงเหลือ {{amount}}",
     "imagePaid": "การสร้างจากรูปภาพเป็นแบบเสียเงิน — เติมเงินเพื่อดำเนินการต่อ",
     "cardLimit": "เหลือ {{available}} จาก {{limit}} การ์ด",
-    "cardLimitUnlimited": "การ์ดไม่จำกัด"
+    "cardLimitUnlimited": "ไม่จำกัดจำนวนการ์ด (ผู้ดูแล)"
   },
   "wizard": {
     "setup": "Setup",

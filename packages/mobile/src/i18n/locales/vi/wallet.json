@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "Lịch sử sử dụng",
-    "empty": "Chưa có mức sử dụng."
+    "empty": "Chưa có mức sử dụng.",
+    "showAll": "Xem tất cả {{total}}",
+    "showLess": "Thu gọn"
   },
   "reason": {
     "purchase": "Nạp thêm",

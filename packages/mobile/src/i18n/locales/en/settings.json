@@ -167,8 +167,8 @@
     "upgrade": "Upgrade (coming soon)",
     "upgradeSoon": "Subscription is coming soon.",
     "cancelPending": "Subscription ending — access until {{date}}.",
-    "countUnlimited": "{{owned}} / Unlimited",
-    "planNoteUnlimited": "Your owned-card limit is unlimited.",
+    "countUnlimited": "{{owned}} · No limit",
+    "planNoteUnlimited": "Admin account — card storage isn't capped.",
     "detail": {
       "title": "Card storage",
       "subtitle": "Owned + subscribed cards count toward your plan. Official decks don’t count.",
@@ -183,9 +183,9 @@
       "percentUsed": "{{percent}}% used",
       "nearLimit": "Approaching limit",
       "atLimit": "Limit reached",
-      "planUnlimited": "Unlimited plan",
+      "planUnlimited": "Admin account",
       "planCards": "{{limit}} card plan",
-      "unlimitedTitle": "Unlimited storage",
+      "unlimitedTitle": "No card limit",
       "lifetimeTotal": "{{count, number}} cards"
     }
   },
@@ -208,5 +208,21 @@
     "empty": "No plans available.",
     "loadError": "Couldn’t load plans.",
     "popular": "POPULAR"
+  },
+  "paymentHistory": {
+    "title": "Payment history",
+    "empty": "No payments yet.",
+    "refunded": "Refunded",
+    "loadMore": "Load more",
+    "error": "Couldn't load your payment history.",
+    "retry": "Retry",
+    "kind": {
+      "credit_pack": "Credits",
+      "subscription": "Subscription"
+    },
+    "reason": {
+      "renewal": "Renewal",
+      "updated": "Plan change"
+    }
   }
 }

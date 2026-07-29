@@ -320,7 +320,8 @@
       "status": "Trạng thái",
       "paidAt": "Thanh toán lúc",
       "empty": "Không tìm thấy thanh toán.",
-      "actions": "Hành động"
+      "actions": "Hành động",
+      "loadedCount": "Đã tải {{total}}"
     },
     "user": {
       "title": "Tra cứu người dùng",
@@ -352,7 +353,8 @@
     "pagination": {
       "page": "Trang {{page}}",
       "prev": "Trước",
-      "next": "Sau"
+      "next": "Sau",
+      "loadMore": "Tải thêm"
     },
     "actionError": "Thao tác thất bại: {{error}}",
     "refund": {

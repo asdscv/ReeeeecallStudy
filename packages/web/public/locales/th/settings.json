@@ -147,8 +147,8 @@
     "upgrade": "อัปเกรด (เร็วๆ นี้)",
     "upgradeSoon": "การสมัครสมาชิกจะเปิดให้ใช้เร็วๆ นี้",
     "unlimited": "ไม่จำกัด",
-    "countUnlimited": "{{owned}} / ไม่จำกัด",
-    "planNoteUnlimited": "แพ็กเกจของคุณจัดเก็บการ์ดได้ไม่จำกัด",
+    "countUnlimited": "{{owned}} · ไม่จำกัด",
+    "planNoteUnlimited": "บัญชีผู้ดูแล — ไม่จำกัดจำนวนการ์ดที่จัดเก็บ",
     "detail": {
       "title": "พื้นที่จัดเก็บการ์ด",
       "subtitle": "การ์ดที่เป็นเจ้าของและที่สมัครสมาชิกนับรวมในแผนของคุณ ชุดการ์ดทางการไม่ถูกนับ",
@@ -163,9 +163,9 @@
       "percentUsed": "ใช้ไป {{percent}}%",
       "nearLimit": "ใกล้ถึงขีดจำกัด",
       "atLimit": "ถึงขีดจำกัดแล้ว",
-      "planUnlimited": "แผนไม่จำกัด",
+      "planUnlimited": "บัญชีผู้ดูแล",
       "planCards": "แผน {{limit}} ใบ",
-      "unlimitedTitle": "จัดเก็บไม่จำกัด",
+      "unlimitedTitle": "ไม่จำกัดจำนวนการ์ด",
       "lifetimeTotal": "{{count, number}} ใบ"
     }
   },

@@ -623,7 +623,9 @@ export function AIGenerateScreen() {
           {affordable && (() => {
             const balanceMicro = affordable.balanceMicroWon ?? 0
             const hasBalance = balanceMicro > 0
-            const bal = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro), cards: affordable.paid.toLocaleString() })
+            // Balance only — no "≈ N cards" estimate. Metered pricing/markup can be
+            // retuned at any time, so a headline card count would be a stale promise.
+            const bal = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro) })
             const text = !affordable.walletKnown
               ? t('wallet.unknown')
               : useImage

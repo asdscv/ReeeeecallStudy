@@ -257,9 +257,14 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   // Free-remaining + prepaid USD wallet line (metered billing). Image mode is paid-only.
   // Use the micro-USD amount for the >0 checks — a sub-dollar balance ($0.50) must not
   // floor to 0 and read as "empty".
+  //
+  // Deliberately shows the BALANCE ONLY, never a "≈ N cards" estimate: pricing is
+  // metered (per-token × markup) and the markup can be retuned at any time, so a
+  // headline card count would be a promise we can't keep. `affordable.paid`/`.total`
+  // still drive the affordability gate in ai-generate-store; they just aren't advertised.
   const balanceMicro = affordable?.balanceMicroWon ?? 0
   const hasBalance = balanceMicro > 0
-  const balanceText = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro), cards: affordable!.paid })
+  const balanceText = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro) })
   const walletText = !affordable
     ? null
     : !affordable.walletKnown

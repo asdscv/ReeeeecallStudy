@@ -167,8 +167,8 @@
     "upgrade": "Tingkatkan (segera hadir)",
     "upgradeSoon": "Langganan akan segera hadir.",
     "cancelPending": "Langganan akan berakhir — akses hingga {{date}}",
-    "countUnlimited": "{{owned}} / Tak terbatas",
-    "planNoteUnlimited": "Batas kartu milikmu tak terbatas.",
+    "countUnlimited": "{{owned}} · Tanpa batas",
+    "planNoteUnlimited": "Akun admin — penyimpanan kartu tidak dibatasi.",
     "detail": {
       "title": "Penyimpanan kartu",
       "subtitle": "Kartu milik dan kartu langganan dihitung dalam batas paket. Dek resmi tidak dihitung.",
@@ -183,9 +183,9 @@
       "percentUsed": "{{percent}}% terpakai",
       "nearLimit": "Mendekati batas",
       "atLimit": "Batas tercapai",
-      "planUnlimited": "Paket tak terbatas",
+      "planUnlimited": "Akun admin",
       "planCards": "Paket {{limit}} kartu",
-      "unlimitedTitle": "Penyimpanan tak terbatas",
+      "unlimitedTitle": "Tanpa batas kartu",
       "lifetimeTotal": "{{count, number}} kartu"
     }
   },
@@ -208,5 +208,21 @@
     "empty": "Belum ada paket.",
     "loadError": "Gagal memuat paket.",
     "popular": "POPULER"
+  },
+  "paymentHistory": {
+    "title": "Riwayat pembayaran",
+    "empty": "Belum ada pembayaran.",
+    "refunded": "Dikembalikan",
+    "loadMore": "Muat lebih banyak",
+    "error": "Tidak dapat memuat riwayat pembayaran Anda.",
+    "retry": "Coba lagi",
+    "kind": {
+      "credit_pack": "Kredit",
+      "subscription": "Langganan"
+    },
+    "reason": {
+      "renewal": "Perpanjangan",
+      "updated": "Ubah paket"
+    }
   }
 }

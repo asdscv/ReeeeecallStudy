@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "Usage history",
-    "empty": "No usage yet."
+    "empty": "No usage yet.",
+    "showAll": "Show all {{total}}",
+    "showLess": "Show less"
   },
   "reason": {
     "purchase": "Top-up",

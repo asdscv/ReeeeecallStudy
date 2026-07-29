@@ -239,6 +239,81 @@ export async function createPaymentIntent(productId: string): Promise<PaymentInt
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Payment / order history (결제 내역) — mig 131 `get_my_payment_history`.
+//
+// Merges chronologically, auth.uid()-scoped: payment_intents (the INITIAL purchase of
+// either kind — this is where a store IAP lands once the RevenueCat webhook calls
+// confirm_payment on the intent the client created) ∪ billing_invoices with
+// billing_reason <> 'initial' (recurring RENEWALS, which never create an intent).
+// So an App Store / Play subscription shows both its first charge and every renewal.
+//
+// Keyset pagination on created_at: pass the OLDEST row you hold as `before` to get the
+// next older page. The RPC clamps p_limit to [1,100].
+// ─────────────────────────────────────────────────────────────────────────
+
+export interface PaymentHistoryRow {
+  /** merchant_uid (intent) or invoice id — unique only WITH `source`. */
+  ref: string
+  /** 'intent' | 'invoice' — which table the row came from. */
+  source: string
+  title: string
+  kind: string
+  /** Charged amount in USD cents; null on a legacy ₩-only row. */
+  amountUsdCents: number | null
+  amountKrw: number | null
+  currency: string
+  /** 'initial' | 'renewal' | 'updated' | null — drives the badge next to the title. */
+  billingReason: string | null
+  status: string
+  createdAt: string
+}
+
+interface RawPaymentHistoryRow {
+  ref: string
+  source: string
+  product_id: string
+  title: string
+  kind: string
+  amount_usd_cents: number | null
+  amount_krw: number | null
+  currency: string
+  billing_reason: string | null
+  status: string
+  created_at: string
+}
+
+/**
+ * One page of the caller's payment history, newest first. `before` is the createdAt of
+ * the oldest row already held (omit for the first page).
+ *
+ * Returns null on a transient error — deliberately NOT [] like getBillingProducts:
+ * "no receipts" and "we couldn't reach the server" must not look the same to someone
+ * who just paid, so the caller shows a retry state instead of "No payments yet".
+ */
+export async function getMyPaymentHistory(limit = 10, before?: string | null): Promise<PaymentHistoryRow[] | null> {
+  const supabase = getMobileSupabase()
+  const { data, error } = await supabase.rpc('get_my_payment_history', {
+    p_limit: limit,
+    p_before: before ?? null,
+  })
+  if (error) return null
+  if (!data) return []
+  const rows = (Array.isArray(data) ? data : []) as RawPaymentHistoryRow[]
+  return rows.map((r) => ({
+    ref: String(r.ref),
+    source: String(r.source),
+    title: String(r.title ?? ''),
+    kind: String(r.kind),
+    amountUsdCents: r.amount_usd_cents == null ? null : Number(r.amount_usd_cents),
+    amountKrw: r.amount_krw == null ? null : Number(r.amount_krw),
+    currency: r.currency ?? 'usd',
+    billingReason: r.billing_reason ?? null,
+    status: String(r.status),
+    createdAt: String(r.created_at),
+  }))
+}
+
 /** Convenience selectors over a catalog array. */
 export const selectSubscriptions = (products: BillingProduct[]): BillingProduct[] =>
   products.filter((p) => p.kind === 'subscription')

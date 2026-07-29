@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "使用记录",
-    "empty": "暂无使用记录。"
+    "empty": "暂无使用记录。",
+    "showAll": "查看全部 {{total}} 条",
+    "showLess": "收起"
   },
   "reason": {
     "purchase": "充值",

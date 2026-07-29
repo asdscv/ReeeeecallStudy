@@ -10,6 +10,7 @@ import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PlanSelector, UNLIMITED_CARD_LIMIT } from '../components/settings/PlanSelector'
 import { CardUsagePanel } from '../components/settings/CardUsagePanel'
+import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
@@ -29,6 +30,7 @@ import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 import { getMySubscription, type MySubscription } from '../services/billing'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 
@@ -433,7 +435,7 @@ export function SettingsScreen() {
           <CollapsibleSection
             title={t('cardUsage.title')}
             icon="📇" tint="#6366F1"
-            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned.toLocaleString() }) : t('cardUsage.count', { owned: cardUsage.owned.toLocaleString(), limit: cardUsage.limit.toLocaleString() })}</Text>}
+            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: formatCount(cardUsage.owned) }) : t('cardUsage.count', { owned: formatCount(cardUsage.owned), limit: formatCount(cardUsage.limit) })}</Text>}
           >
             {cardUsageDetail ? (
               <CardUsagePanel detail={cardUsageDetail} />
@@ -466,6 +468,14 @@ export function SettingsScreen() {
             />
           </CollapsibleSection>
         )}
+
+        {/* ── Payment history (orders + renewals) — mirrors web SettingsPage. NOT gated on
+             SUBSCRIPTION_UI_ENABLED: that flag hides the BUY entry points, but someone who
+             already paid (on any platform, incl. web) must always be able to see their
+             receipts. Collapsed by default; the RPC only runs once expanded. ── */}
+        <CollapsibleSection title={t('paymentHistory.title')} icon="🧾" tint="#8B5CF6">
+          <PaymentHistory />
+        </CollapsibleSection>
 
         {/* Templates / My Shares / Publisher moved OUT of Settings (they navigate to
             other screens — Settings is for config only). Reachable from the drawer. */}

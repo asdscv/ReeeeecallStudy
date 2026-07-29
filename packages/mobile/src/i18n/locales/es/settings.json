@@ -167,8 +167,8 @@
     "upgrade": "Mejorar (próximamente)",
     "upgradeSoon": "La suscripción estará disponible pronto.",
     "cancelPending": "Suscripción por cancelar — acceso hasta {{date}}",
-    "countUnlimited": "{{owned}} / Ilimitado",
-    "planNoteUnlimited": "Tu límite de tarjetas es ilimitado.",
+    "countUnlimited": "{{owned}} · Sin límite",
+    "planNoteUnlimited": "Cuenta de administrador: el almacenamiento de tarjetas no tiene límite.",
     "detail": {
       "title": "Almacenamiento de tarjetas",
       "subtitle": "Las tarjetas propias y suscritas cuentan para tu plan. Los mazos oficiales no cuentan.",
@@ -183,9 +183,9 @@
       "percentUsed": "{{percent}}% usado",
       "nearLimit": "Cerca del límite",
       "atLimit": "Límite alcanzado",
-      "planUnlimited": "Plan ilimitado",
+      "planUnlimited": "Cuenta de administrador",
       "planCards": "Plan de {{limit}} tarjetas",
-      "unlimitedTitle": "Almacenamiento ilimitado",
+      "unlimitedTitle": "Sin límite de tarjetas",
       "lifetimeTotal": "{{count, number}} tarjetas"
     }
   },
@@ -208,5 +208,21 @@
     "empty": "No hay planes disponibles.",
     "loadError": "No se pudieron cargar los planes.",
     "popular": "POPULAR"
+  },
+  "paymentHistory": {
+    "title": "Historial de pagos",
+    "empty": "Aún no hay pagos.",
+    "refunded": "Reembolsado",
+    "loadMore": "Cargar más",
+    "error": "No se pudo cargar tu historial de pagos.",
+    "retry": "Reintentar",
+    "kind": {
+      "credit_pack": "Créditos",
+      "subscription": "Suscripción"
+    },
+    "reason": {
+      "renewal": "Renovación",
+      "updated": "Cambio de plan"
+    }
   }
 }

@@ -320,7 +320,8 @@
       "status": "상태",
       "paidAt": "결제 시각",
       "empty": "결제 내역이 없습니다.",
-      "actions": "작업"
+      "actions": "작업",
+      "loadedCount": "{{total}}건 불러옴"
     },
     "user": {
       "title": "사용자 조회",
@@ -352,7 +353,8 @@
     "pagination": {
       "page": "{{page}} 페이지",
       "prev": "이전",
-      "next": "다음"
+      "next": "다음",
+      "loadMore": "더 보기"
     },
     "actionError": "작업 실패: {{error}}",
     "refund": {

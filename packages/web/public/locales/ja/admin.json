@@ -320,7 +320,8 @@
       "status": "ステータス",
       "paidAt": "支払日時",
       "empty": "支払いが見つかりません。",
-      "actions": "操作"
+      "actions": "操作",
+      "loadedCount": "{{total}}件 読み込み済み"
     },
     "user": {
       "title": "ユーザー検索",
@@ -352,7 +353,8 @@
     "pagination": {
       "page": "{{page}} ページ",
       "prev": "前へ",
-      "next": "次へ"
+      "next": "次へ",
+      "loadMore": "さらに読み込む"
     },
     "actionError": "操作に失敗しました: {{error}}",
     "refund": {

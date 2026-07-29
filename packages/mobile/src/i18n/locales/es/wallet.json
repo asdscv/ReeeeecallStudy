@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "Historial de uso",
-    "empty": "Aún no hay uso."
+    "empty": "Aún no hay uso.",
+    "showAll": "Ver los {{total}}",
+    "showLess": "Ver menos"
   },
   "reason": {
     "purchase": "Recarga",

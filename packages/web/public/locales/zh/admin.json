@@ -320,7 +320,8 @@
       "status": "状态",
       "paidAt": "支付时间",
       "empty": "未找到支付记录。",
-      "actions": "操作"
+      "actions": "操作",
+      "loadedCount": "已加载 {{total}} 条"
     },
     "user": {
       "title": "用户查询",
@@ -352,7 +353,8 @@
     "pagination": {
       "page": "第 {{page}} 页",
       "prev": "上一页",
-      "next": "下一页"
+      "next": "下一页",
+      "loadMore": "加载更多"
     },
     "actionError": "操作失败：{{error}}",
     "refund": {

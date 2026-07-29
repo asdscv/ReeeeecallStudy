@@ -13,6 +13,9 @@ import { usePurchases } from '../../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
 import type { BillingProduct } from '../../services/billing'
 
+// Ledger rows shown before the "show all" toggle.
+const HISTORY_PREVIEW = 5
+
 // AI wallet / usage content for the mobile Settings accordion (충전금·사용량):
 // $ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig
 // 117). The parent CollapsibleSection only mounts this when expanded. Top-up disabled
@@ -22,6 +25,7 @@ export function WalletSummary() {
   const { t, i18n } = useTranslation('wallet')
   const [summary, setSummary] = useState<AiWalletSummary | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [historyExpanded, setHistoryExpanded] = useState(false)
 
   const load = useCallback(() => {
     setState('loading')
@@ -135,29 +139,49 @@ export function WalletSummary() {
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('free.note')}</Text>
       </View>
 
-      {/* History */}
+      {/* History — collapsed to the most recent HISTORY_PREVIEW entries with a
+          show-all toggle, rather than paginated. Settings is one long ScrollView, so
+          dumping all 30 ledger rows buried every section below it; and page-flipping
+          inside a scrolling page is worse on touch than one expand tap. The list is
+          server-capped at 30 (mig 117), so expanded is still bounded. */}
       <View style={{ paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
         <Text style={[styles.subTitle, { color: theme.colors.text, marginBottom: 8 }]}>{t('history.title')}</Text>
         {summary.ledger.length === 0 ? (
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 8 }]}>{t('history.empty')}</Text>
         ) : (
-          summary.ledger.map((e, i) => {
-            const positive = e.delta >= 0
-            return (
-              <View
-                key={i}
-                style={[styles.ledgerRow, { borderTopColor: theme.colors.border, borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth }]}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t(`reason.${e.reason}`, { defaultValue: e.reason })}</Text>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{fmtDate(e.createdAt)}</Text>
+          <>
+            {(historyExpanded ? summary.ledger : summary.ledger.slice(0, HISTORY_PREVIEW)).map((e, i) => {
+              const positive = e.delta >= 0
+              return (
+                <View
+                  key={i}
+                  style={[styles.ledgerRow, { borderTopColor: theme.colors.border, borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth }]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t(`reason.${e.reason}`, { defaultValue: e.reason })}</Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{fmtDate(e.createdAt)}</Text>
+                  </View>
+                  <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
+                    {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
+                  </Text>
                 </View>
-                <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
-                  {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
+              )
+            })}
+            {summary.ledger.length > HISTORY_PREVIEW && (
+              <TouchableOpacity
+                testID="wallet-history-toggle"
+                onPress={() => setHistoryExpanded((v) => !v)}
+                style={[styles.historyToggle, { borderTopColor: theme.colors.border }]}
+                accessibilityRole="button"
+              >
+                <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
+                  {historyExpanded
+                    ? t('history.showLess')
+                    : t('history.showAll', { total: summary.ledger.length })}
                 </Text>
-              </View>
-            )
-          })
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
     </View>
@@ -173,4 +197,5 @@ const styles = StyleSheet.create({
   btn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, alignItems: 'center', alignSelf: 'flex-start' },
   packRow: { gap: 4 },
   ledgerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 },
+  historyToggle: { paddingTop: 10, alignItems: 'center', borderTopWidth: StyleSheet.hairlineWidth },
 })
