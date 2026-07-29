@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "Quick Study",
     "noDecks": "No decks. Please create a deck first.",
-    "cardCount": "{{count}} cards",
-    "newCards": "New {{count}}",
-    "reviewCards": "Review {{count}}",
+    "cardCount": "{{count, number}} cards",
+    "newCards": "New {{count, number}}",
+    "reviewCards": "Review {{count, number}}",
     "selectDate": "Select a date to study",
     "setBatchSize": "Set batch size",
     "selectMode": "Select a study mode",
     "startStudy": "Start Study",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count}} cards",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count, number}} cards",
     "batchSize": "Batch Size",
     "batchSizeDesc": "Cards to study per session ({{min}}~{{max}})",
     "batchSizeDescReview": "Review cards per session — all new cards included ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "Study Setup",
-    "deckInfo": "{{icon}} {{name}} · {{count}} cards",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}} cards",
     "studyMode": "Study Mode",
     "selectUploadDate": "Select Upload Date",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count}} cards"
+    "uploadDate": "{{year}}/{{month}}/{{day}} Upload: {{count, number}} cards"
   },
   "session": {
     "loading": "Loading...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10min",
-    "minutes": "{{count}}min",
-    "hours": "{{count}}h",
+    "minutes": "{{count, number}}min",
+    "hours": "{{count, number}}h",
     "oneDay": "1d",
-    "days": "{{count}}d",
-    "months": "{{count}}mo",
-    "years": "{{count}}y"
+    "days": "{{count, number}}d",
+    "months": "{{count, number}}mo",
+    "years": "{{count, number}}y"
   },
   "srsRating": {
     "again": "Again",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "Time Limit",
       "none": "No Limit",
-      "minutes": "{{count}} min"
+      "minutes": "{{count, number}} min"
     },
     "shuffle": {
       "title": "Shuffle Cards",
@@ -175,7 +175,7 @@
       "masteryRate": "Mastery Rate",
       "cardsStudied": "Cards Studied",
       "hardestCards": "Hardest Cards",
-      "missedTimes": "missed {{count}}x",
+      "missedTimes": "missed {{count, number}}x",
       "noSrsImpact": "This session did not affect your SRS schedule.",
       "sessionEnded": "Session Ended",
       "crammingAgain": "Cram Again",

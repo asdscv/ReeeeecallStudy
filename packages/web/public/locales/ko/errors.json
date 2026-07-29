@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "요청 제한에 도달했습니다.",
     "cannotDeleteDefault": "기본 템플릿은 삭제할 수 없습니다.",
-    "inUseByDecks": "이 템플릿을 사용하는 덱이 {{count}}개 있어 삭제할 수 없습니다."
+    "inUseByDecks": "이 템플릿을 사용하는 덱이 {{count, number}}개 있어 삭제할 수 없습니다."
   },
   "marketplace": {
     "listingNotFound": "리스팅을 찾을 수 없습니다.",

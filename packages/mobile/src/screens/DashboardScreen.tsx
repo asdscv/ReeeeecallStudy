@@ -15,6 +15,7 @@ import { shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
 import { OnboardingModal } from '../components/OnboardingModal'
 import { CardUsageCard } from '../components/settings/CardUsageCard'
 import { getMobileSupabase } from '../adapters'
+import { formatCount } from '@reeeeecall/shared/lib/format-number'
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>
 
@@ -119,11 +120,13 @@ export function DashboardScreen() {
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.totalCards')}</Text>
-                  <Text style={[styles.statValue, { color: theme.colors.text }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{totalCards}</Text>
+                  {/* Raw JSX numbers — no i18next interpolation to group them, so format
+                      explicitly (a 2,500-card account rendered "2500"). */}
+                  <Text style={[styles.statValue, { color: theme.colors.text }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{formatCount(totalCards)}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('stats.todayReview')}</Text>
-                  <Text style={[styles.statValue, { color: palette.yellow[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{totalDue}</Text>
+                  <Text style={[styles.statValue, { color: palette.yellow[600] }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{formatCount(totalDue)}</Text>
                 </View>
               </View>
               <View style={styles.statsRow}>

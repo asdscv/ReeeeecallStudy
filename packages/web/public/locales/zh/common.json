@@ -51,7 +51,7 @@
   },
   "units": {
     "cards": "张卡片",
-    "cardsSuffix": "{{count}} 张卡片",
+    "cardsSuffix": "{{count, number}} 张卡片",
     "sessions": "次学习",
     "items": "项",
     "days": "天",
@@ -60,11 +60,11 @@
     "seconds": "秒",
     "times": "次",
     "percent": "{{value}}%",
-    "decksCount": "{{count}} 个卡组"
+    "decksCount": "{{count, number}} 个卡组"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "每页 {{count}} 条"
+    "perPage": "每页 {{count, number}} 条"
   },
   "timePeriod": {
     "1d": "1天",
@@ -120,7 +120,7 @@
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
+      "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
@@ -248,7 +248,7 @@
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

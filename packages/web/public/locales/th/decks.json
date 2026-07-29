@@ -7,9 +7,9 @@
   "deleteConfirm": "สำรับ \"{{name}}\" และการ์ดทั้งหมดจะถูกลบ ไม่สามารถเลิกทำได้",
   "detail": {
     "backToList": "← รายการสำรับ",
-    "totalCards": "ทั้งหมด {{count}} การ์ด",
-    "newCards": "ใหม่ {{count}}",
-    "reviewCards": "ทบทวน {{count}}",
+    "totalCards": "ทั้งหมด {{count, number}} การ์ด",
+    "newCards": "ใหม่ {{count, number}}",
+    "reviewCards": "ทบทวน {{count, number}}",
     "startStudy": "เริ่มเรียน",
     "edit": "แก้ไข",
     "share": "แชร์",
@@ -24,7 +24,7 @@
     },
     "searchPlaceholder": "ค้นหาการ์ด...",
     "allStatus": "สถานะทั้งหมด",
-    "selectedCount": "เลือก {{count}} รายการ",
+    "selectedCount": "เลือก {{count, number}} รายการ",
     "noCards": "ไม่มีการ์ด ลองเพิ่มการ์ดดู",
     "addFirstCard": "+ เพิ่มการ์ดแรก",
     "importCards": "นำเข้า CSV/JSON",
@@ -35,11 +35,11 @@
       "status": "สถานะ",
       "addedDate": "เพิ่มเมื่อ"
     },
-    "perPage": "{{count}} ต่อหน้า",
+    "perPage": "{{count, number}} ต่อหน้า",
     "deleteCard": "ลบการ์ด",
     "deleteCardConfirm": "ลบการ์ดนี้? ไม่สามารถเลิกทำได้",
     "bulkDelete": "ลบการ์ดหลายรายการ",
-    "bulkDeleteConfirm": "ลบ {{count}} การ์ดที่เลือก? ไม่สามารถเลิกทำได้",
+    "bulkDeleteConfirm": "ลบ {{count, number}} การ์ดที่เลือก? ไม่สามารถเลิกทำได้",
     "noStudyRecords": "ไม่มีบันทึกการเรียน",
     "aiCards": "AI Cards",
     "versionHistory": "ประวัติเวอร์ชัน",
@@ -52,7 +52,7 @@
     "versionCards": "การ์ด",
     "archived": {
       "badge": "เก็บถาวรแล้ว · ล็อกการเรียน",
-      "note": "การ์ด {{count}} ใบถูกเก็บถาวรเพราะเกินขีดจำกัด — คุณยังดูได้ สมัครสมาชิกเพื่อกลับมาเรียนอีกครั้ง"
+      "note": "การ์ด {{count, number}} ใบถูกเก็บถาวรเพราะเกินขีดจำกัด — คุณยังดูได้ สมัครสมาชิกเพื่อกลับมาเรียนอีกครั้ง"
     }
   },
   "settings": {
@@ -82,12 +82,12 @@
     "totalCards": "การ์ดทั้งหมด",
     "masteryRate": "อัตราความชำนาญ",
     "streak": "สถิติเรียนต่อเนื่อง",
-    "streakValue": "{{count}} วัน",
+    "streakValue": "{{count, number}} วัน",
     "avgInterval": "ช่วงเวลาเฉลี่ย",
-    "intervalValue": "{{count}} วัน",
+    "intervalValue": "{{count, number}} วัน",
     "statusDistribution": "การกระจายสถานะ",
     "noCards": "ไม่มีการ์ด",
-    "cardsValue": "{{count}} การ์ด",
+    "cardsValue": "{{count, number}} การ์ด",
     "nameRequired": "กรุณากรอกชื่อสำรับ",
     "saved": "บันทึกสำรับแล้ว"
   },
@@ -115,26 +115,26 @@
     "masteryRate": "อัตราความชำนาญ",
     "avgEase": "ค่าความง่ายเฉลี่ย",
     "avgInterval": "ช่วงเวลาเฉลี่ย",
-    "days": "{{count}} วัน",
+    "days": "{{count, number}} วัน",
     "statusDistribution": "การกระจายสถานะ",
     "noCards": "ไม่มีการ์ด",
-    "cardCount": "{{count}} การ์ด",
+    "cardCount": "{{count, number}} การ์ด",
     "dailyStudy": "ปริมาณการเรียนรายวัน (30 วัน)",
     "dailyVolume": "ปริมาณการเรียนรายวัน (30 วัน)",
     "loading": "กำลังโหลด...",
     "noStudyRecords": "ไม่มีบันทึกการเรียน",
-    "studyCount": "{{count}} ครั้งทบทวน",
+    "studyCount": "{{count, number}} ครั้งทบทวน",
     "study": "เรียน"
   },
   "uploadDate": {
     "noCards": "ไม่มีการ์ด",
-    "cardCount": "{{count}} การ์ด"
+    "cardCount": "{{count, number}} การ์ด"
   },
   "card": {
     "noStudyRecord": "ไม่มีบันทึกการเรียน",
-    "totalCards": "{{count}} การ์ด",
-    "newCards": "ใหม่ {{count}}",
-    "review": "ทบทวน {{count}}",
+    "totalCards": "{{count, number}} การ์ด",
+    "newCards": "ใหม่ {{count, number}}",
+    "review": "ทบทวน {{count, number}}",
     "edit": "แก้ไข",
     "delete": "ลบ",
     "startStudy": "เรียน",
@@ -156,7 +156,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",

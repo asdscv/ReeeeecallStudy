@@ -24,13 +24,13 @@
     "snapshot": "スナップショット"
   },
   "listing": {
-    "cardCount": "{{count}}枚",
-    "userCount": "{{count}}人"
+    "cardCount": "{{count, number}}枚",
+    "userCount": "{{count, number}}人"
   },
   "detail": {
     "back": "← マーケットプレイス",
-    "cardCount": "{{count}}枚",
-    "userCount": "{{count}}人",
+    "cardCount": "{{count, number}}枚",
+    "userCount": "{{count, number}}人",
     "getDeck": "このデッキを取得",
     "importing": "インポート中...",
     "cardPreview": "カードプレビュー（最大10枚）",
@@ -43,7 +43,7 @@
     "unsubscribed": "配信解除しました",
     "unsubscribeConfirm": "このデッキの配信を解除しますか？個人の学習進捗はアカウントに残ります。",
     "unsubscribeError": "配信解除に失敗しました。もう一度お試しください。",
-    "limitUsage": "カード{{count}}枚が上限に加算されます · 残り{{available}}枚",
+    "limitUsage": "カード{{count, number}}枚が上限に加算されます · 残り{{available}}枚",
     "limitExceeds": "カード上限を超えます（残り{{available}}枚）。空きを作るかプランをアップグレードすると追加できます。",
     "limitOfficialFree": "公式デッキ · カード上限に含まれません。",
     "acquireByMode": {
@@ -63,8 +63,8 @@
     "defaultDescription": "ReeeeecallStudyのフラッシュカードデッキ",
     "sampleCards": "サンプルカード",
     "viewInMarket": "マーケットプレイスで見る",
-    "cardCount": "{{count}}枚",
-    "userCount": "{{count}}人",
+    "cardCount": "{{count, number}}枚",
+    "userCount": "{{count, number}}人",
     "by": "{{name}}",
     "blurredNotice": "ログインするとこのデッキのすべてのカードを見ることができます",
     "ctaLogin": "ログインしてデッキを取得",
@@ -202,13 +202,13 @@
       "actions": "操作"
     },
     "timeAgo": {
-      "minutesAgo": "{{count}}分前",
-      "hoursAgo": "{{count}}時間前",
-      "daysAgo": "{{count}}日前"
+      "minutesAgo": "{{count, number}}分前",
+      "hoursAgo": "{{count, number}}時間前",
+      "daysAgo": "{{count, number}}日前"
     }
   },
-  "reviewCount_one": "{{count}}件のレビュー",
-  "reviewCount_other": "{{count}}件のレビュー",
-  "rateStar_one": "{{count}}つ星で評価",
-  "rateStar_other": "{{count}}つ星で評価"
+  "reviewCount_one": "{{count, number}}件のレビュー",
+  "reviewCount_other": "{{count, number}}件のレビュー",
+  "rateStar_one": "{{count, number}}つ星で評価",
+  "rateStar_other": "{{count, number}}つ星で評価"
 }

@@ -7,9 +7,9 @@
   "deleteConfirm": "Dek \"{{name}}\" dan semua kartu akan dihapus. Tindakan ini tidak dapat dibatalkan.",
   "detail": {
     "backToList": "← Daftar Dek",
-    "totalCards": "Total {{count}} kartu",
-    "newCards": "Baru {{count}}",
-    "reviewCards": "Ulasan {{count}}",
+    "totalCards": "Total {{count, number}} kartu",
+    "newCards": "Baru {{count, number}}",
+    "reviewCards": "Ulasan {{count, number}}",
     "startStudy": "Mulai Belajar",
     "edit": "Edit",
     "share": "Bagikan",
@@ -24,7 +24,7 @@
     },
     "searchPlaceholder": "Cari kartu...",
     "allStatus": "Semua Status",
-    "selectedCount": "{{count}} dipilih",
+    "selectedCount": "{{count, number}} dipilih",
     "noCards": "Tidak ada kartu. Coba tambahkan kartu.",
     "addFirstCard": "+ Tambah Kartu Pertama",
     "importCards": "Impor CSV/JSON",
@@ -35,11 +35,11 @@
       "status": "Status",
       "addedDate": "Ditambahkan"
     },
-    "perPage": "{{count}} per halaman",
+    "perPage": "{{count, number}} per halaman",
     "deleteCard": "Hapus Kartu",
     "deleteCardConfirm": "Hapus kartu ini? Tindakan ini tidak dapat dibatalkan.",
     "bulkDelete": "Hapus Kartu Massal",
-    "bulkDeleteConfirm": "Hapus {{count}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
+    "bulkDeleteConfirm": "Hapus {{count, number}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
     "noStudyRecords": "Tidak ada catatan belajar",
     "aiCards": "AI Cards",
     "versionHistory": "Riwayat Versi",
@@ -52,7 +52,7 @@
     "versionCards": "kartu",
     "archived": {
       "badge": "Diarsipkan · belajar terkunci",
-      "note": "{{count}} kartu diarsipkan karena melebihi batas — kamu masih bisa melihatnya. Berlangganan untuk mempelajarinya lagi."
+      "note": "{{count, number}} kartu diarsipkan karena melebihi batas — kamu masih bisa melihatnya. Berlangganan untuk mempelajarinya lagi."
     }
   },
   "settings": {
@@ -82,12 +82,12 @@
     "totalCards": "Total Kartu",
     "masteryRate": "Tingkat Penguasaan",
     "streak": "Rentetan Belajar",
-    "streakValue": "{{count}} hari",
+    "streakValue": "{{count, number}} hari",
     "avgInterval": "Interval Rata-rata",
-    "intervalValue": "{{count}} hari",
+    "intervalValue": "{{count, number}} hari",
     "statusDistribution": "Distribusi Status",
     "noCards": "Tidak ada kartu",
-    "cardsValue": "{{count}} kartu",
+    "cardsValue": "{{count, number}} kartu",
     "nameRequired": "Silakan masukkan nama dek.",
     "saved": "Dek disimpan."
   },
@@ -115,26 +115,26 @@
     "masteryRate": "Tingkat Penguasaan",
     "avgEase": "Kemudahan Rata-rata",
     "avgInterval": "Interval Rata-rata",
-    "days": "{{count}} hari",
+    "days": "{{count, number}} hari",
     "statusDistribution": "Distribusi Status",
     "noCards": "Tidak ada kartu",
-    "cardCount": "{{count}} kartu",
+    "cardCount": "{{count, number}} kartu",
     "dailyStudy": "Volume Belajar Harian (30 hari)",
     "dailyVolume": "Volume Belajar Harian (30 hari)",
     "loading": "Memuat...",
     "noStudyRecords": "Tidak ada catatan belajar",
-    "studyCount": "{{count}} ulasan",
+    "studyCount": "{{count, number}} ulasan",
     "study": "Belajar"
   },
   "uploadDate": {
     "noCards": "Tidak ada kartu.",
-    "cardCount": "{{count}} kartu"
+    "cardCount": "{{count, number}} kartu"
   },
   "card": {
     "noStudyRecord": "Tidak ada catatan belajar",
-    "totalCards": "{{count}} kartu",
-    "newCards": "Baru {{count}}",
-    "review": "Ulasan {{count}}",
+    "totalCards": "{{count, number}} kartu",
+    "newCards": "Baru {{count, number}}",
+    "review": "Ulasan {{count, number}}",
     "edit": "Edit",
     "delete": "Hapus",
     "startStudy": "Belajar",
@@ -156,7 +156,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",

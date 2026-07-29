@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "Belajar Cepat",
     "noDecks": "Tidak ada dek. Silakan buat dek terlebih dahulu.",
-    "cardCount": "{{count}} kartu",
-    "newCards": "Baru {{count}}",
-    "reviewCards": "Ulasan {{count}}",
+    "cardCount": "{{count, number}} kartu",
+    "newCards": "Baru {{count, number}}",
+    "reviewCards": "Ulasan {{count, number}}",
     "selectDate": "Pilih tanggal untuk belajar",
     "setBatchSize": "Atur ukuran batch",
     "selectMode": "Pilih mode belajar",
     "startStudy": "Mulai Belajar",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count, number}} kartu",
     "batchSize": "Ukuran Batch",
     "batchSizeDesc": "Kartu yang dipelajari per sesi ({{min}}~{{max}})",
     "batchSizeDescReview": "Kartu ulasan per sesi — semua kartu baru disertakan ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "Pengaturan Belajar",
-    "deckInfo": "{{icon}} {{name}} · {{count}} kartu",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}} kartu",
     "studyMode": "Mode Belajar",
     "selectUploadDate": "Pilih Tanggal Unggahan",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count}} kartu"
+    "uploadDate": "{{year}}/{{month}}/{{day}} Unggahan: {{count, number}} kartu"
   },
   "session": {
     "loading": "Memuat...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10mnt",
-    "minutes": "{{count}}mnt",
-    "hours": "{{count}}j",
+    "minutes": "{{count, number}}mnt",
+    "hours": "{{count, number}}j",
     "oneDay": "1hr",
-    "days": "{{count}}hr",
-    "months": "{{count}}bl",
-    "years": "{{count}}th"
+    "days": "{{count, number}}hr",
+    "months": "{{count, number}}bl",
+    "years": "{{count, number}}th"
   },
   "srsRating": {
     "again": "Ulangi",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "Batas Waktu",
       "none": "Tanpa Batas",
-      "minutes": "{{count}} menit"
+      "minutes": "{{count, number}} menit"
     },
     "shuffle": {
       "title": "Acak Kartu",
@@ -175,7 +175,7 @@
       "masteryRate": "Tingkat Penguasaan",
       "cardsStudied": "Kartu Dipelajari",
       "hardestCards": "Kartu Tersulit",
-      "missedTimes": "terlewat {{count}}x",
+      "missedTimes": "terlewat {{count, number}}x",
       "noSrsImpact": "Sesi ini tidak memengaruhi jadwal SRS Anda.",
       "sessionEnded": "Sesi Berakhir",
       "crammingAgain": "Jejalkan Lagi",
@@ -218,9 +218,9 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards",
+    "cards": "{{count, number}} cards",
     "selectHint": "Select decks to study together",
     "decksUnit": " decks",
     "cardsUnit": " cards",

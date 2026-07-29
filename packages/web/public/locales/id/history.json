@@ -16,25 +16,25 @@
   "noMatch": "Tidak ada catatan yang sesuai dengan filter.",
   "deletedDeck": "Dek Dihapus",
   "deckProgress": {
-    "total": "{{count}} kartu",
-    "notStudied": "Belum Dipelajari {{count}}",
-    "learning": "Sedang Dipelajari {{count}}",
-    "review": "Ulasan {{count}}"
+    "total": "{{count, number}} kartu",
+    "notStudied": "Belum Dipelajari {{count, number}}",
+    "learning": "Sedang Dipelajari {{count, number}}",
+    "review": "Ulasan {{count, number}}"
   },
   "session": {
-    "intervalDays": "{{count}}hr",
-    "reviewCount": "{{count}} ulasan",
-    "cardCount": "{{count}} kartu",
-    "logCount": "{{count}} log",
+    "intervalDays": "{{count, number}}hr",
+    "reviewCount": "{{count, number}} ulasan",
+    "cardCount": "{{count, number}} kartu",
+    "logCount": "{{count, number}} log",
     "intervalChange": "{{prev}}hr → {{next}}hr",
     "paginationInfo": "{{start}}-{{end}} dari {{total}}"
   },
   "sessionCard": {
-    "cardsStudied": "{{count}} kartu dipelajari"
+    "cardsStudied": "{{count, number}} kartu dipelajari"
   },
   "sessionDetail": {
     "backToHistory": "Riwayat Belajar",
-    "cardsStudied": "{{count}} kartu dipelajari",
+    "cardsStudied": "{{count, number}} kartu dipelajari",
     "performance": "Performa {{value}}%",
     "loadingDetails": "Memuat detail...",
     "noDetails": "Tidak ada detail.",
@@ -57,31 +57,31 @@
   },
   "overview": {
     "sessions": "Sesi",
-    "sessionsValue": "{{count}} sesi",
+    "sessionsValue": "{{count, number}} sesi",
     "studyCards": "Kartu Dipelajari",
-    "cardsValue": "{{count}} kartu",
+    "cardsValue": "{{count, number}} kartu",
     "totalTime": "Total Waktu Belajar",
     "avgPerformance": "Performa Rata-rata",
     "streak": "Rentetan Belajar",
-    "streakValue": "{{count}} hari"
+    "streakValue": "{{count, number}} hari"
   },
   "chart": {
-    "countPercent": "{{count}} ({{percent}}%)"
+    "countPercent": "{{count, number}} ({{percent}}%)"
   },
   "charts": {
     "studyVolume": "Volume Belajar",
     "volumeSummary": "{{sessions}} sesi / {{cards}} kartu",
     "noDataForPeriod": "Tidak ada catatan belajar untuk periode ini",
     "sessionDuration": "Durasi Sesi Rata-rata",
-    "sessionCount": "{{count}} sesi",
+    "sessionCount": "{{count, number}} sesi",
     "avgDuration": "Durasi Rata-rata",
     "ratingDistribution": "Distribusi Penilaian",
-    "ratingTotal": "Total {{count}}",
+    "ratingTotal": "Total {{count, number}}",
     "noRatingData": "Tidak ada data penilaian",
     "modeBreakdown": "Rincian Mode",
     "noModeData": "Tidak ada data mode",
-    "sessionCountLabel": "{{count}} sesi",
-    "cardCountLabel": "{{count}} kartu",
+    "sessionCountLabel": "{{count, number}} sesi",
+    "cardCountLabel": "{{count, number}} kartu",
     "performance": "Performa"
   },
   "ratingGroups": {

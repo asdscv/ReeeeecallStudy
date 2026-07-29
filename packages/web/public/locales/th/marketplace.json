@@ -24,13 +24,13 @@
     "snapshot": "สแนปช็อต"
   },
   "listing": {
-    "cardCount": "{{count}} การ์ด",
-    "userCount": "{{count}} ผู้ใช้"
+    "cardCount": "{{count, number}} การ์ด",
+    "userCount": "{{count, number}} ผู้ใช้"
   },
   "detail": {
     "back": "← ตลาด",
-    "cardCount": "{{count}} การ์ด",
-    "userCount": "{{count}} ผู้ใช้",
+    "cardCount": "{{count, number}} การ์ด",
+    "userCount": "{{count, number}} ผู้ใช้",
     "getDeck": "รับสำรับนี้",
     "importing": "กำลังนำเข้า...",
     "cardPreview": "ตัวอย่างการ์ด (สูงสุด 10)",
@@ -43,7 +43,7 @@
     "unsubscribed": "ยกเลิกการสมัครสมาชิกแล้ว",
     "unsubscribeConfirm": "ยกเลิกการสมัครสมาชิกชุดการ์ดนี้? ความคืบหน้าการเรียนรู้ส่วนตัวของคุณจะยังคงอยู่ในบัญชี",
     "unsubscribeError": "ยกเลิกการสมัครสมาชิกล้มเหลว กรุณาลองอีกครั้ง",
-    "limitUsage": "เพิ่ม {{count}} การ์ดในขีดจำกัด · เหลือ {{available}}",
+    "limitUsage": "เพิ่ม {{count, number}} การ์ดในขีดจำกัด · เหลือ {{available}}",
     "limitExceeds": "จะเกินขีดจำกัดการ์ด (เหลือ {{available}}) เพิ่มพื้นที่ว่างหรืออัปเกรดแผนเพื่อเพิ่ม",
     "limitOfficialFree": "เด็คทางการ · ไม่นับรวมในขีดจำกัดการ์ด",
     "acquireByMode": {
@@ -63,8 +63,8 @@
     "defaultDescription": "สำรับแฟลชการ์ดบน ReeeeecallStudy",
     "sampleCards": "ตัวอย่างการ์ด",
     "viewInMarket": "ดูในตลาด",
-    "cardCount": "{{count}} การ์ด",
-    "userCount": "{{count}} ผู้ใช้",
+    "cardCount": "{{count, number}} การ์ด",
+    "userCount": "{{count, number}} ผู้ใช้",
     "by": "โดย {{name}}",
     "blurredNotice": "เข้าสู่ระบบเพื่อดูการ์ดทั้งหมดในสำรับนี้",
     "ctaLogin": "เข้าสู่ระบบเพื่อรับสำรับนี้",
@@ -202,13 +202,13 @@
       "actions": "การดำเนินการ"
     },
     "timeAgo": {
-      "minutesAgo": "{{count}} นาทีที่แล้ว",
-      "hoursAgo": "{{count}} ชม.ที่แล้ว",
-      "daysAgo": "{{count}} วันที่แล้ว"
+      "minutesAgo": "{{count, number}} นาทีที่แล้ว",
+      "hoursAgo": "{{count, number}} ชม.ที่แล้ว",
+      "daysAgo": "{{count, number}} วันที่แล้ว"
     }
   },
-  "reviewCount_one": "{{count}} รีวิว",
-  "reviewCount_other": "{{count}} รีวิว",
-  "rateStar_one": "ให้คะแนน {{count}} ดาว",
-  "rateStar_other": "ให้คะแนน {{count}} ดาว"
+  "reviewCount_one": "{{count, number}} รีวิว",
+  "reviewCount_other": "{{count, number}} รีวิว",
+  "rateStar_one": "ให้คะแนน {{count, number}} ดาว",
+  "rateStar_other": "ให้คะแนน {{count, number}} ดาว"
 }

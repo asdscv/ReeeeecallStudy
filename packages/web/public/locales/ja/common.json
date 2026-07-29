@@ -51,7 +51,7 @@
   },
   "units": {
     "cards": "枚",
-    "cardsSuffix": "{{count}}枚",
+    "cardsSuffix": "{{count, number}}枚",
     "sessions": "回",
     "items": "件",
     "days": "日",
@@ -60,11 +60,11 @@
     "seconds": "秒",
     "times": "回",
     "percent": "{{value}}%",
-    "decksCount": "{{count}}個"
+    "decksCount": "{{count, number}}個"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}}件ずつ表示"
+    "perPage": "{{count, number}}件ずつ表示"
   },
   "timePeriod": {
     "1d": "1日",
@@ -120,7 +120,7 @@
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
+      "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
@@ -248,7 +248,7 @@
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

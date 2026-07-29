@@ -52,7 +52,7 @@
   },
   "units": {
     "cards": "cards",
-    "cardsSuffix": "{{count}} cards",
+    "cardsSuffix": "{{count, number}} cards",
     "sessions": "sessions",
     "items": "items",
     "days": "days",
@@ -61,11 +61,11 @@
     "seconds": "sec",
     "times": "times",
     "percent": "{{value}}%",
-    "decksCount": "{{count}} decks"
+    "decksCount": "{{count, number}} decks"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} per page"
+    "perPage": "{{count, number}} per page"
   },
   "timePeriod": {
     "1d": "1D",
@@ -120,7 +120,7 @@
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
+      "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
@@ -248,7 +248,7 @@
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

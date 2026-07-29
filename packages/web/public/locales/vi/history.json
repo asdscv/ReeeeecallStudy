@@ -16,25 +16,25 @@
   "noMatch": "Không có hồ sơ phù hợp với bộ lọc.",
   "deletedDeck": "Bộ thẻ đã xóa",
   "deckProgress": {
-    "total": "{{count}} thẻ",
-    "notStudied": "Chưa học {{count}}",
-    "learning": "Đang học {{count}}",
-    "review": "Ôn tập {{count}}"
+    "total": "{{count, number}} thẻ",
+    "notStudied": "Chưa học {{count, number}}",
+    "learning": "Đang học {{count, number}}",
+    "review": "Ôn tập {{count, number}}"
   },
   "session": {
-    "intervalDays": "{{count}} ngày",
-    "reviewCount": "{{count}} lượt ôn tập",
-    "cardCount": "{{count}} thẻ",
-    "logCount": "{{count}} nhật ký",
+    "intervalDays": "{{count, number}} ngày",
+    "reviewCount": "{{count, number}} lượt ôn tập",
+    "cardCount": "{{count, number}} thẻ",
+    "logCount": "{{count, number}} nhật ký",
     "intervalChange": "{{prev}} ngày → {{next}} ngày",
     "paginationInfo": "{{start}}-{{end}} trong {{total}}"
   },
   "sessionCard": {
-    "cardsStudied": "Đã học {{count}} thẻ"
+    "cardsStudied": "Đã học {{count, number}} thẻ"
   },
   "sessionDetail": {
     "backToHistory": "Lịch sử học tập",
-    "cardsStudied": "Đã học {{count}} thẻ",
+    "cardsStudied": "Đã học {{count, number}} thẻ",
     "performance": "Hiệu suất {{value}}%",
     "loadingDetails": "Đang tải chi tiết...",
     "noDetails": "Không có chi tiết.",
@@ -57,31 +57,31 @@
   },
   "overview": {
     "sessions": "Phiên",
-    "sessionsValue": "{{count}} phiên",
+    "sessionsValue": "{{count, number}} phiên",
     "studyCards": "Thẻ đã học",
-    "cardsValue": "{{count}} thẻ",
+    "cardsValue": "{{count, number}} thẻ",
     "totalTime": "Tổng thời gian học",
     "avgPerformance": "Hiệu suất TB",
     "streak": "Chuỗi học tập",
-    "streakValue": "{{count}} ngày"
+    "streakValue": "{{count, number}} ngày"
   },
   "chart": {
-    "countPercent": "{{count}} ({{percent}}%)"
+    "countPercent": "{{count, number}} ({{percent}}%)"
   },
   "charts": {
     "studyVolume": "Lượng học tập",
     "volumeSummary": "{{sessions}} phiên / {{cards}} thẻ",
     "noDataForPeriod": "Không có hồ sơ học tập cho giai đoạn này",
     "sessionDuration": "Thời lượng phiên TB",
-    "sessionCount": "{{count}} phiên",
+    "sessionCount": "{{count, number}} phiên",
     "avgDuration": "Thời lượng TB",
     "ratingDistribution": "Phân bố đánh giá",
-    "ratingTotal": "Tổng {{count}}",
+    "ratingTotal": "Tổng {{count, number}}",
     "noRatingData": "Không có dữ liệu đánh giá",
     "modeBreakdown": "Phân tích chế độ",
     "noModeData": "Không có dữ liệu chế độ",
-    "sessionCountLabel": "{{count}} phiên",
-    "cardCountLabel": "{{count}} thẻ",
+    "sessionCountLabel": "{{count, number}} phiên",
+    "cardCountLabel": "{{count, number}} thẻ",
     "performance": "Hiệu suất"
   },
   "ratingGroups": {

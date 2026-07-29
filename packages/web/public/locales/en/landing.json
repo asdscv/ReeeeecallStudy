@@ -251,7 +251,7 @@
   "socialProof": {
     "title": "Trusted by Learners Worldwide",
     "subtitle": "Join thousands of students studying smarter",
-    "liveActivity": "{{count}} people studying right now",
+    "liveActivity": "{{count, number}} people studying right now",
     "userCountLabel": "Active Users",
     "cardsStudiedLabel": "Cards Studied",
     "decksCreatedLabel": "Decks Created",
@@ -334,7 +334,7 @@
     "freePrice": "Free",
     "pricePerMonth": "{{price}}/mo",
     "unlimitedCards": "Unlimited cards",
-    "upToCards": "Up to {{count}} cards",
+    "upToCards": "Up to {{count, number}} cards",
     "ctaFree": "Start free",
     "ctaPaid": "Get started",
     "note": "Checkout happens after sign-up, in Settings.",
