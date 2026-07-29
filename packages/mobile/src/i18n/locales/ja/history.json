@@ -34,14 +34,14 @@
     "performance": "成績"
   },
   "cardDetails": "カード詳細",
-  "logsCount": "{{count}}件の記録",
+  "logsCount": "{{count, number}}件の記録",
   "loadingDetails": "詳細を読み込み中...",
   "noLogs": "このセッションの詳細な記録はありません",
   "deletedCard": "(削除されたカード)",
   "noContent": "(内容なし)",
   "deckProgress": "デッキの進捗",
-  "sessionsCount": "{{count}}セッション",
-  "cardsCount": "{{count}}枚",
+  "sessionsCount": "{{count, number}}セッション",
+  "cardsCount": "{{count, number}}枚",
   "cardsFraction": "{{studied}}/{{total}}枚",
   "ratingDistribution": "評価の分布",
   "overview": {

@@ -50,7 +50,7 @@
     "modalSubtitleDate": "เลือกวันที่",
     "modalSubtitleCramming": "ตัวเลือกอัดเข้าหัว",
     "modalSubtitleBatch": "ตั้งค่าขนาดชุด",
-    "dateCardCount": "{{date}} — {{count}} การ์ด",
+    "dateCardCount": "{{date}} — {{count, number}} การ์ด",
     "backToModeSelect": "กลับไปเลือกโหมด",
     "cancel": "ยกเลิก"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "จำกัดเวลา",
       "none": "ไม่จำกัด",
-      "minutes": "{{count}} นาที"
+      "minutes": "{{count, number}} นาที"
     },
     "shuffle": {
       "title": "สลับการ์ด"

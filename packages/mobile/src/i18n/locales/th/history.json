@@ -34,14 +34,14 @@
     "performance": "ประสิทธิภาพ"
   },
   "cardDetails": "รายละเอียดการ์ด",
-  "logsCount": "{{count}} รายการ",
+  "logsCount": "{{count, number}} รายการ",
   "loadingDetails": "กำลังโหลดรายละเอียด...",
   "noLogs": "ไม่มีบันทึกรายละเอียดสำหรับเซสชันนี้",
   "deletedCard": "(การ์ดที่ถูกลบ)",
   "noContent": "(ไม่มีเนื้อหา)",
   "deckProgress": "ความคืบหน้าชุดการ์ด",
-  "sessionsCount": "{{count}} เซสชัน",
-  "cardsCount": "{{count}} การ์ด",
+  "sessionsCount": "{{count, number}} เซสชัน",
+  "cardsCount": "{{count, number}} การ์ด",
   "cardsFraction": "{{studied}}/{{total}} การ์ด",
   "ratingDistribution": "การกระจายคะแนน",
   "overview": {

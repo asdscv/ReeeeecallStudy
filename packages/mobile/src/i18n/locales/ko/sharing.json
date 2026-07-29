@@ -38,7 +38,7 @@
     "copyLink": "링크 복사",
     "newLink": "새 링크",
     "linkHint": "이 링크가 있는 사람은 누구나 초대를 수락하고 덱에 접근할 수 있습니다.",
-    "existingShares": "기존 공유 ({{count}})",
+    "existingShares": "기존 공유 ({{count, number}})",
     "noShares": "아직 공유가 없습니다. 위에서 초대 링크를 생성하세요."
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "덱으로 이동해 \"공유\"를 눌러 초대 링크를 만드세요.",
     "emptyReceived": "아직 나와 덱을 공유한 사람이 없습니다.",
     "activePending": "활성 {{activeCount}}개 · 대기 {{pendingCount}}개",
-    "viewAll": "전체 {{count}}개 공유 보기",
+    "viewAll": "전체 {{count, number}}개 공유 보기",
     "unknownDeck": "알 수 없는 덱"
   },
   "publish": {

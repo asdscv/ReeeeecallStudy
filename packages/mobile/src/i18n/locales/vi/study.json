@@ -50,7 +50,7 @@
     "modalSubtitleDate": "Chọn ngày",
     "modalSubtitleCramming": "Tùy chọn nhồi nhét",
     "modalSubtitleBatch": "Đặt kích thước lô",
-    "dateCardCount": "{{date}} — {{count}} thẻ",
+    "dateCardCount": "{{date}} — {{count, number}} thẻ",
     "backToModeSelect": "Quay lại chọn chế độ",
     "cancel": "Hủy"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "Giới hạn thời gian",
       "none": "Không giới hạn",
-      "minutes": "{{count}} phút"
+      "minutes": "{{count, number}} phút"
     },
     "shuffle": {
       "title": "Xáo trộn thẻ"

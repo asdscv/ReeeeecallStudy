@@ -45,7 +45,7 @@
   },
   "units": {
     "cards": "การ์ด",
-    "cardsSuffix": "{{count}} การ์ด",
+    "cardsSuffix": "{{count, number}} การ์ด",
     "sessions": "เซสชัน",
     "days": "วัน",
     "hours": "ชม.",

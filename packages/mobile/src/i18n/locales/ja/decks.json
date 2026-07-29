@@ -10,9 +10,9 @@
   "aiGenerate": "AI Generate",
   "detail": {
     "backToList": "← デッキ一覧",
-    "totalCards": "合計{{count}}枚",
-    "newCards": "新規 {{count}}",
-    "reviewCards": "復習 {{count}}",
+    "totalCards": "合計{{count, number}}枚",
+    "newCards": "新規 {{count, number}}",
+    "reviewCards": "復習 {{count, number}}",
     "startStudy": "学習開始",
     "edit": "編集",
     "share": "共有",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
@@ -218,17 +218,17 @@
     "selectMode": "選択",
     "selectAll": "すべて選択",
     "deselectAll": "選択解除",
-    "selectedCount": "{{count}}件選択中",
+    "selectedCount": "{{count, number}}件選択中",
     "deleteSelected": "選択した項目を削除",
     "deleteCardsTitle": "カードを削除",
-    "deleteCardsConfirm": "選択した{{count}}枚のカードを削除しますか？元に戻せません。",
+    "deleteCardsConfirm": "選択した{{count, number}}枚のカードを削除しますか？元に戻せません。",
     "perPage": "1ページあたり:",
     "prevPage": "← 前へ",
     "nextPage": "次へ →",
     "pageOf": "{{total}}ページ中{{current}}ページ",
-    "showingRange": "{{total}}枚中{{from}}–{{to}}を表示",
+    "showingRange": "{{total, number}}枚中{{from, number}}–{{to, number}}を表示",
     "archivedBadge": "アーカイブ済み · 学習ロック",
-    "archivedNote": "上限を超えた{{count}}枚がアーカイブされました — カードはそのまま閲覧できます。購読すると再び学習できます。",
+    "archivedNote": "上限を超えた{{count, number}}枚がアーカイブされました — カードはそのまま閲覧できます。購読すると再び学習できます。",
     "archivedSubscribe": "購読する（近日公開）"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "今日",
     "yesterday": "昨日",
-    "daysAgo": "{{count}}日前",
+    "daysAgo": "{{count, number}}日前",
     "monthAgo": "1か月前",
-    "monthsAgo": "{{count}}か月前"
+    "monthsAgo": "{{count, number}}か月前"
   },
   "templatesList": {
     "cannotDeleteTitle": "削除できません",

@@ -46,7 +46,7 @@
   },
   "units": {
     "cards": "cards",
-    "cardsSuffix": "{{count}} cards",
+    "cardsSuffix": "{{count, number}} cards",
     "sessions": "sessions",
     "days": "days",
     "hours": "h",

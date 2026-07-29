@@ -23,8 +23,8 @@
     "topRated": "高評価"
   },
   "listing": {
-    "cardCount": "{{count}}枚",
-    "userCount": "{{count}}人"
+    "cardCount": "{{count, number}}枚",
+    "userCount": "{{count, number}}人"
   },
   "detail": {
     "back": "← マーケットプレイス",
@@ -46,10 +46,10 @@
     "edited": "(編集済み)",
     "helpful": "役に立った",
     "byAuthor": "作成者: {{name}}",
-    "cardsBadge": "{{count}}枚",
-    "viewsBadge": "閲覧 {{count}}",
-    "usersBadge": "{{count}}人が利用中",
-    "reviewsCount": "(レビュー{{count}}件)",
+    "cardsBadge": "{{count, number}}枚",
+    "viewsBadge": "閲覧 {{count, number}}",
+    "usersBadge": "{{count, number}}人が利用中",
+    "reviewsCount": "(レビュー{{count, number}}件)",
     "previewCards": "カードのプレビュー",
     "ratingsReviews": "評価とレビュー",
     "editReview": "レビューを編集",
@@ -57,7 +57,7 @@
     "writeAReview": "レビューを書く",
     "acquireToReview": "このデッキを取得するとレビューを投稿できます",
     "noReviewsYet": "まだレビューがありません",
-    "reviewCountLabel": "レビュー{{count}}件",
+    "reviewCountLabel": "レビュー{{count, number}}件",
     "loading": "読み込み中...",
     "loadMoreReviews": "レビューをもっと見る",
     "reportReason": "理由",
@@ -98,8 +98,8 @@
       "most_helpful": "参考になった順"
     },
     "downloading": "ダウンロード中...",
-    "limitUsage": "カード{{count}}枚が上限に加算されます · 残り{{available}}枚",
-    "limitExceeds": "カード上限を超えます（残り{{available}}枚）。空きを作るかプランをアップグレードすると追加できます。",
+    "limitUsage": "カード{{count, number}}枚が上限に加算されます · 残り{{available, number}}枚",
+    "limitExceeds": "カード上限を超えます（残り{{available, number}}枚）。空きを作るかプランをアップグレードすると追加できます。",
     "limitOfficialFree": "公式デッキ · カード上限に含まれません。",
     "acquireByMode": {
       "subscribe": "購読する",

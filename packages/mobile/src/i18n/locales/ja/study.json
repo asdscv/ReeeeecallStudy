@@ -50,7 +50,7 @@
     "modalSubtitleDate": "日付を選択",
     "modalSubtitleCramming": "詰め込みオプション",
     "modalSubtitleBatch": "バッチサイズを設定",
-    "dateCardCount": "{{date}} — カード{{count}}枚",
+    "dateCardCount": "{{date}} — カード{{count, number}}枚",
     "backToModeSelect": "モード選択に戻る",
     "cancel": "キャンセル"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "制限時間",
       "none": "制限なし",
-      "minutes": "{{count}}分"
+      "minutes": "{{count, number}}分"
     },
     "shuffle": {
       "title": "カードをシャッフル"

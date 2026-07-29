@@ -45,7 +45,7 @@
   },
   "units": {
     "cards": "枚",
-    "cardsSuffix": "{{count}}枚",
+    "cardsSuffix": "{{count, number}}枚",
     "sessions": "回",
     "days": "日",
     "hours": "時間",

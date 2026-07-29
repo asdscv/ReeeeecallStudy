@@ -50,7 +50,7 @@
     "modalSubtitleDate": "Selecciona la fecha",
     "modalSubtitleCramming": "Opciones de estudio intensivo",
     "modalSubtitleBatch": "Configura el tamaño del lote",
-    "dateCardCount": "{{date}} — {{count}} tarjetas",
+    "dateCardCount": "{{date}} — {{count, number}} tarjetas",
     "backToModeSelect": "Volver a la selección de modo",
     "cancel": "Cancelar"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "Límite de tiempo",
       "none": "Sin límite",
-      "minutes": "{{count}} min"
+      "minutes": "{{count, number}} min"
     },
     "shuffle": {
       "title": "Mezclar tarjetas"

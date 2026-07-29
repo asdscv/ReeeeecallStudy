@@ -4,7 +4,7 @@
   "importCSV": "Import CSV",
   "importJSON": "Import JSON",
   "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
-  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importSuccess": "Imported {{count, number}} cards from \"{{name}}\"",
   "importFailed": "Failed to import CSV file",
   "importJsonFailed": "Failed to parse JSON file",
   "csvEmpty": "CSV file is empty or has no data rows",
@@ -18,7 +18,7 @@
   "errorTitle": "错误",
   "successTitle": "成功",
   "noCardsTitle": "没有卡片",
-  "deckCardCount": "{{deck}} · {{count}} 张卡片",
+  "deckCardCount": "{{deck}} · {{count, number}} 张卡片",
   "back": "返回",
-  "importPartial": "已保存 {{count}} 张后停止。"
+  "importPartial": "已保存 {{count, number}} 张后停止。"
 }

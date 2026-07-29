@@ -45,7 +45,7 @@
   },
   "units": {
     "cards": "thẻ",
-    "cardsSuffix": "{{count}} thẻ",
+    "cardsSuffix": "{{count, number}} thẻ",
     "sessions": "phiên",
     "days": "ngày",
     "hours": "giờ",

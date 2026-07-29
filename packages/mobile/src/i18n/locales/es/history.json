@@ -34,14 +34,14 @@
     "performance": "Rendimiento"
   },
   "cardDetails": "Detalles de la tarjeta",
-  "logsCount": "{{count}} registros",
+  "logsCount": "{{count, number}} registros",
   "loadingDetails": "Cargando detalles...",
   "noLogs": "No hay registros detallados para esta sesión",
   "deletedCard": "(Tarjeta eliminada)",
   "noContent": "(Sin contenido)",
   "deckProgress": "Progreso del mazo",
-  "sessionsCount": "{{count}} sesiones",
-  "cardsCount": "{{count}} tarjetas",
+  "sessionsCount": "{{count, number}} sesiones",
+  "cardsCount": "{{count, number}} tarjetas",
   "cardsFraction": "{{studied}}/{{total}} tarjetas",
   "ratingDistribution": "Distribución de valoraciones",
   "overview": {

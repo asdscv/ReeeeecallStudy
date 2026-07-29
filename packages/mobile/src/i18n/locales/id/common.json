@@ -45,7 +45,7 @@
   },
   "units": {
     "cards": "kartu",
-    "cardsSuffix": "{{count}} kartu",
+    "cardsSuffix": "{{count, number}} kartu",
     "sessions": "sesi",
     "days": "hari",
     "hours": "j",
