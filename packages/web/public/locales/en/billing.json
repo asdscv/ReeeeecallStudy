@@ -78,5 +78,11 @@
       "unknown_order": "Couldn't find this order.",
       "already_processed": "This order was already processed."
     }
+  },
+  "consent": {
+    "creditPack": "I agree that the credits are made available immediately, and that once I use any of them I lose my right to withdraw from this purchase.",
+    "subscription": "I agree that my plan starts immediately, and that once I use the paid benefit I lose my right to withdraw from this purchase.",
+    "policyLink": "Refund policy",
+    "required": "Please confirm the notice above before purchasing."
   }
 }

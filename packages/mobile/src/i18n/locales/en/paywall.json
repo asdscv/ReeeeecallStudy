@@ -6,12 +6,36 @@
   "done": "Done",
   "back": "Back",
   "features": {
-    "cardStorage": { "title": "Card Storage", "free": "1,000 cards", "pro": "Up to 100,000 cards" },
-    "allModes": { "title": "All Study Modes", "free": "SRS + Sequential", "pro": "All 4 modes" },
-    "aiGeneration": { "title": "AI Card Generation", "free": "10 cards/day", "pro": "10/day + credits" },
-    "premiumTts": { "title": "Premium TTS", "free": "Basic", "pro": "Edge TTS HD" },
-    "analytics": { "title": "Advanced Analytics", "free": "Basic stats", "pro": "Charts + Forecast" },
-    "marketplace": { "title": "Marketplace Publishing", "free": "Download only", "pro": "Upload + Revenue share" }
+    "cardStorage": {
+      "title": "Card Storage",
+      "free": "1,000 cards",
+      "pro": "Up to 100,000 cards"
+    },
+    "allModes": {
+      "title": "All Study Modes",
+      "free": "SRS + Sequential",
+      "pro": "All 4 modes"
+    },
+    "aiGeneration": {
+      "title": "AI Card Generation",
+      "free": "10 cards/day",
+      "pro": "10/day + credits"
+    },
+    "premiumTts": {
+      "title": "Premium TTS",
+      "free": "Basic",
+      "pro": "Edge TTS HD"
+    },
+    "analytics": {
+      "title": "Advanced Analytics",
+      "free": "Basic stats",
+      "pro": "Charts + Forecast"
+    },
+    "marketplace": {
+      "title": "Marketplace Publishing",
+      "free": "Download only",
+      "pro": "Upload + Revenue share"
+    }
   },
   "free": "Free",
   "pro": "Pro",
@@ -38,5 +62,14 @@
   "privacyPolicy": "Privacy Policy",
   "termsOfService": "Terms of Service",
   "manageSubscription": "Manage Subscription",
-  "legalDisclaimer": "Payment will be charged to your {{account}} account at confirmation of purchase. Your subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours before the end of the current period. You can manage or cancel your subscription in your account settings on the {{store}} after purchase."
+  "legalDisclaimer": "Payment will be charged to your {{account}} account at confirmation of purchase. Your subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours before the end of the current period. You can manage or cancel your subscription in your account settings on the {{store}} after purchase.",
+  "consent": {
+    "subscription": "I agree that my plan starts immediately, and that once I use the paid benefit I lose my right to withdraw from this purchase.",
+    "policyLink": "Refund policy"
+  },
+  "refund": {
+    "request": "Request a refund",
+    "title": "Refund request",
+    "submitted": "Your refund request was sent to Apple. Apple decides the outcome and will email you; if it is approved your access is removed automatically."
+  }
 }

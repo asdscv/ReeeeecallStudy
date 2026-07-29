@@ -304,6 +304,21 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     }
     const intent = mapPaymentIntent(data as RawPaymentIntent)
 
+    // 1b) Record that the buyer was shown the withdrawal-right disclosure BEFORE paying
+    //     (mig 157). Korea's 전자상거래법 only lets us restrict withdrawal for digital
+    //     content once use has begun if that restriction was disclosed beforehand, and
+    //     the EU equivalent needs express consent to immediate performance — both are
+    //     evidentiary, so the refusal is unenforceable without a record. The checkout UI
+    //     gates the button on the checkbox; this is the server-stamped proof.
+    //     Best-effort: a logging failure must not strand a buyer mid-checkout, and the
+    //     absence of a record only weakens OUR position, never the customer's.
+    const { error: consentErr } = await supabase.rpc('record_purchase_consent', {
+      p_product_id: productId,
+      p_platform: 'web',
+      p_merchant_uid: intent.merchantUid,
+    })
+    if (consentErr) console.error('[billing] record_purchase_consent failed:', consentErr.message)
+
     // 2) Open the provider checkout with THAT merchant_uid + amount. The provider's
     //    server webhook (→ payment-webhook → confirm_payment) is what actually
     //    grants; this only tells us how the client-side flow resolved.

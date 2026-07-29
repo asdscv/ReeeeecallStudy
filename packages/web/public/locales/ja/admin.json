@@ -119,7 +119,7 @@
       "good": "良い",
       "easy": "簡単"
     },
-    "periodDay": "{{count}}日",
+    "periodDay": "{{count, number}}日",
     "minuteShort": "{{value}}分"
   },
   "market": {
@@ -362,7 +362,51 @@
       "confirmTitle": "返金しますか？",
       "confirmCreditPack": "{{email}} さんに {{amount}} を返金しますか？お客様のカードに実際に返金されます。",
       "confirmSubscription": "{{email}} さんのサブスクリプションの最新の請求を返金し、アクセスを取り消しますか？",
-      "realMoneyNote": "決済代行会社を呼び出し、実際にお金が移動します。ここでは元に戻せません。"
+      "realMoneyNote": "決済代行会社を呼び出し、実際にお金が移動します。ここでは元に戻せません。",
+      "confirmRevokeTitle": "アクセスを取り消しますか？",
+      "buttonRevokeOnly": "アクセス取り消し",
+      "revokeOnlyIosNote": "お金は動きません。アクセスを取り消すだけです — App Store の返金は Apple が行います。お客様に Apple への返金申請を案内するか、App Store Connect で承認してください。",
+      "revokeOnlyUnknownNote": "お金は動きません。この行はストアが記録されておらず App Store の購入の可能性があるため、アクセスのみ取り消します。返金を約束する前にストアを確認してください。",
+      "revokeOnlyHint": "アクセスのみ — このチャネルの返金は当社ではなくストアが行います。",
+      "policyEligible": "ポリシー: 返金可能（{{days}}日以内・未使用）。",
+      "policyIneligible": "ポリシー: 返金不可 — {{reason}}。",
+      "consentMissing": "この購入には撤回権の告知記録がないため、「使用済み」を理由に断るのは根拠が弱いです。",
+      "statutoryOverride": "法定のクーリングオフ（韓国7日 / EU・英国14日）により返金が必要な場合があります。",
+      "resultRefunded": "返金しました — 実際に返金され、アクセスも取り消されました。",
+      "resultRevokedOnly": "アクセスを取り消しました。この操作でお金は動いていません。",
+      "reason": {
+        "eligible": "返金可能",
+        "not_found": "記録が見つかりません",
+        "not_paid": "決済が完了していません",
+        "already_refunded": "返金済み",
+        "outside_window": "返金期間を過ぎています",
+        "already_used": "使用済み",
+        "renewal_charge": "更新課金（ポリシー対象外）"
+      }
+    },
+    "channel": {
+      "column": "チャネル",
+      "web_lemonsqueezy": "ウェブ · Lemon Squeezy",
+      "web_toss": "ウェブ · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "モバイル · ストア不明",
+      "admin": "管理者付与",
+      "paymentsHint": "ウェブと Google Play の決済はここで返金できます。App Store の決済はアクセス取り消しのみで、返金は Apple が行います。",
+      "filter": {
+        "all": "すべて",
+        "web": "ウェブ",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "App Store の返金は Apple が行います。ここではアクセス取り消しのみ可能です。",
+        "android": "Google Play の返金はここから実行できます。",
+        "mobile_unknown": "ストア記録の導入前に保存された行です。App Store として扱うため、返金を約束する前に確認してください。",
+        "web_lemonsqueezy": "Lemon Squeezy API で返金できます。",
+        "web_toss": "Toss API で決済を取り消せます。",
+        "admin": "無償付与のため、実際の請求はありません。"
+      }
     }
   },
   "official": {
@@ -456,7 +500,7 @@
     "colDetails": "詳細",
     "colIP": "IP",
     "pageInfo": "{{page}} ページ",
-    "showing": "{{count}} 件表示",
+    "showing": "{{count, number}} 件表示",
     "prevPage": "前へ",
     "nextPage": "次へ",
     "unknownAdmin": "不明",
@@ -465,7 +509,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "閉じる"
   },
   "retry": "再試行",
   "noData": "データがありません",

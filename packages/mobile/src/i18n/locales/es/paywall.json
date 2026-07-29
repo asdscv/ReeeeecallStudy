@@ -6,12 +6,36 @@
   "done": "Listo",
   "back": "Volver",
   "features": {
-    "cardStorage": { "title": "Almacenamiento de tarjetas", "free": "1000 tarjetas", "pro": "Hasta 100 000 tarjetas" },
-    "allModes": { "title": "Todos los Modos de Estudio", "free": "SRS + Secuencial", "pro": "Los 4 modos" },
-    "aiGeneration": { "title": "Generación de Tarjetas con IA", "free": "10 tarjetas/día", "pro": "10/día + créditos" },
-    "premiumTts": { "title": "TTS Premium", "free": "Básico", "pro": "Edge TTS HD" },
-    "analytics": { "title": "Análisis Avanzado", "free": "Estadísticas básicas", "pro": "Gráficos + Pronóstico" },
-    "marketplace": { "title": "Publicar en Marketplace", "free": "Solo descarga", "pro": "Subir + Reparto de ingresos" }
+    "cardStorage": {
+      "title": "Almacenamiento de tarjetas",
+      "free": "1000 tarjetas",
+      "pro": "Hasta 100 000 tarjetas"
+    },
+    "allModes": {
+      "title": "Todos los Modos de Estudio",
+      "free": "SRS + Secuencial",
+      "pro": "Los 4 modos"
+    },
+    "aiGeneration": {
+      "title": "Generación de Tarjetas con IA",
+      "free": "10 tarjetas/día",
+      "pro": "10/día + créditos"
+    },
+    "premiumTts": {
+      "title": "TTS Premium",
+      "free": "Básico",
+      "pro": "Edge TTS HD"
+    },
+    "analytics": {
+      "title": "Análisis Avanzado",
+      "free": "Estadísticas básicas",
+      "pro": "Gráficos + Pronóstico"
+    },
+    "marketplace": {
+      "title": "Publicar en Marketplace",
+      "free": "Solo descarga",
+      "pro": "Subir + Reparto de ingresos"
+    }
   },
   "free": "Gratis",
   "pro": "Pro",
@@ -38,5 +62,14 @@
   "privacyPolicy": "Política de Privacidad",
   "termsOfService": "Términos de Servicio",
   "manageSubscription": "Gestionar Suscripción",
-  "legalDisclaimer": "Se realizará el cargo en tu cuenta de {{account}} al confirmar la compra. Tu suscripción se renueva automáticamente a menos que la canceles al menos 24 horas antes de que finalice el período actual. Se cobrará la renovación en tu cuenta dentro de las 24 horas anteriores al final del período actual. Puedes gestionar o cancelar tu suscripción en los ajustes de tu cuenta en {{store}} después de la compra."
+  "legalDisclaimer": "Se realizará el cargo en tu cuenta de {{account}} al confirmar la compra. Tu suscripción se renueva automáticamente a menos que la canceles al menos 24 horas antes de que finalice el período actual. Se cobrará la renovación en tu cuenta dentro de las 24 horas anteriores al final del período actual. Puedes gestionar o cancelar tu suscripción en los ajustes de tu cuenta en {{store}} después de la compra.",
+  "consent": {
+    "subscription": "Acepto que mi plan comienza de inmediato y que, en cuanto use la ventaja de pago, pierdo el derecho de desistimiento de esta compra.",
+    "policyLink": "Política de reembolsos"
+  },
+  "refund": {
+    "request": "Solicitar un reembolso",
+    "title": "Solicitud de reembolso",
+    "submitted": "Tu solicitud de reembolso se envió a Apple. Apple decide el resultado y te escribirá por correo; si se aprueba, tu acceso se retira automáticamente."
+  }
 }

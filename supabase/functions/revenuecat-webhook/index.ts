@@ -25,6 +25,16 @@
 //   match/sync/revoke a DIFFERENT user's row. An event that carries no
 //   original_transaction_id is ACKed 200 without writing (never falls back to product_id).
 //
+// STORE ATTRIBUTION (mig 156). RevenueCat fronts BOTH stores under one provider
+//   ('revenuecat'), but they are not interchangeable: Google Play exposes a developer
+//   refund API and Apple does not, so the admin tooling must know WHICH store sold a
+//   given row. `event.store` is the only place that knows — the product id cannot be
+//   used, since mig 151 maps the credit packs to the SAME store id on ios and android.
+//   Every grant and lifecycle event therefore stamps 'ios'/'android' via
+//   set_subscription_platform / set_credit_grant_platform. Both are best-effort: a
+//   failure leaves the row unattributed, which the admin UI reads as 'mobile_unknown'
+//   and treats as revoke-only (never claiming a money refund it cannot perform).
+//
 // EVENT → RPC (event.type):
 //   INITIAL_PURCHASE / NON_RENEWING_PURCHASE (subscription product)
 //                                → sync_subscription_by_user(active,  expiry, cancel=false)
@@ -227,6 +237,31 @@ Deno.serve(async (req) => {
 
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
+  // WHICH STORE this event came from ('ios' | 'android' | null). RevenueCat fronts
+  // BOTH stores under the single provider 'revenuecat', so without this every mobile
+  // row is indistinguishable — and the two stores are NOT interchangeable for refunds
+  // (Play has a developer refund API, Apple does not). It cannot be recovered later
+  // from the product either: mig 151 maps the credit packs to the SAME store id on
+  // both platforms. So record it here, the one place that knows (mig 156).
+  const platform = platformFromStore(event.store)
+
+  // Attribute a subscription row to its store. Best-effort and non-fatal: the grant
+  // itself already succeeded, and a missing platform degrades to 'mobile_unknown',
+  // which the admin UI treats as the SAFE case (revoke-only, no money API claimed).
+  const tagSubscriptionPlatform = async (): Promise<void> => {
+    if (!platform || !subKey) return
+    const { error } = await sb.rpc('set_subscription_platform', {
+      p_provider: PROVIDER, p_provider_subscription_id: subKey, p_platform: platform,
+    })
+    if (error) console.error('[revenuecat-webhook] set_subscription_platform failed:', error.message)
+  }
+
+  const tagCreditGrantPlatform = async (ref: string): Promise<void> => {
+    if (!platform || !ref) return
+    const { error } = await sb.rpc('set_credit_grant_platform', { p_ref: ref, p_platform: platform })
+    if (error) console.error('[revenuecat-webhook] set_credit_grant_platform failed:', error.message)
+  }
+
   // ── LIFECYCLE (UPDATE-only, matched by provider + subKey; no product/user needed) ──
   const syncStatus = async (status: string, cancelAtPeriodEnd: boolean | null) => {
     if (!subKey) return ackNoSubKey(type)
@@ -238,6 +273,10 @@ Deno.serve(async (req) => {
       p_cancel_at_period_end: cancelAtPeriodEnd,
     })
     if (error) return rpcErrorResponse(`sync_subscription ${type}`, error.message)
+    // Every lifecycle event carries the store too, so this doubles as a BACKFILL for
+    // rows granted before mig 156 existed: the first renewal/cancel/expire to arrive
+    // stamps the platform on a row that had none.
+    await tagSubscriptionPlatform()
     // {ok:false, reason:'not_found'} is NOT an error — ack 200, do not create.
     return json({ received: true, type, ...(data ?? {}) }, 200)
   }
@@ -312,7 +351,11 @@ Deno.serve(async (req) => {
         p_ref: creditRef,
       })
       if (error) return rpcErrorResponse(`add_ai_credits ${type}`, error.message)
-      return json({ received: true, type, kind: 'credit_pack', balance_micro_won: data ?? null }, 200)
+      // An IAP consumable opens NO payment_intents row — the ledger grant IS the
+      // payment record, so the store has to be stamped on the ledger or the admin
+      // payment list cannot show which store sold it (mig 156).
+      await tagCreditGrantPlatform(creditRef)
+      return json({ received: true, type, kind: 'credit_pack', balance_micro_won: data ?? null, platform }, 200)
     }
 
     // SUBSCRIPTION product → UPSERT the sub as active for this user/product, keyed by the
@@ -329,7 +372,8 @@ Deno.serve(async (req) => {
       p_cancel_at_period_end: false,
     })
     if (error) return rpcErrorResponse(`sync_subscription_by_user ${type}`, error.message)
-    return json({ received: true, type, kind: 'subscription', ...(data ?? {}) }, 200)
+    await tagSubscriptionPlatform()
+    return json({ received: true, type, kind: 'subscription', platform, ...(data ?? {}) }, 200)
   }
 
   // ── REFUND / CHARGEBACK — subscription (revoke) OR consumable credit pack (clawback) ──
