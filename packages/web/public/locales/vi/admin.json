@@ -119,7 +119,7 @@
       "good": "Tốt",
       "easy": "Dễ"
     },
-    "periodDay": "{{count}} ngày",
+    "periodDay": "{{count, number}} ngày",
     "minuteShort": "{{value}} phút"
   },
   "market": {
@@ -456,7 +456,7 @@
     "colDetails": "Chi tiết",
     "colIP": "IP",
     "pageInfo": "Trang {{page}}",
-    "showing": "hiển thị {{count}} mục",
+    "showing": "hiển thị {{count, number}} mục",
     "prevPage": "Trước",
     "nextPage": "Tiếp",
     "unknownAdmin": "Không rõ",
