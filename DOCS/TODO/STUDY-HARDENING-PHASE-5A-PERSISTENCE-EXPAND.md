@@ -1,6 +1,6 @@
 # Study Hardening Phase 5A — Atomic Persistence Expand
 
-상태: DESIGN — implementation pending
+상태: IMPLEMENTED — local validation/review complete, PR pending
 
 ## 1. 목적
 
@@ -19,7 +19,8 @@
   - `study_sessions(user_id,client_session_id) WHERE client_session_id IS NOT NULL`
 - `study_rating_events`
   - `id uuid PRIMARY KEY` — client event id, globally unique
-  - `user_id uuid NOT NULL`, `session_id uuid NOT NULL`, `card_id`, `deck_id`
+  - `user_id uuid NOT NULL`, `session_id uuid NOT NULL`, `session_sequence bigint NOT NULL`, `card_id`, `deck_id`
+  - session advisory lock 아래에서 `session_sequence=max+1`, unique `(user_id,session_id,session_sequence)`
   - `study_mode`, `rating`, `srs_source` (`embedded|progress_table|none`)
   - `expected_revision`, `applied_revision`
   - `previous_srs jsonb`, `new_srs jsonb`
@@ -112,7 +113,8 @@ undo_study_rating(p_event_id uuid) RETURNS jsonb
 - auth/access: `42501`
 - invalid payload/source/mode/rating: `22023`
 - event payload collision: `23505`
-- stale revision/cursor: `40001`
+- stale revision/cursor: `PT409` (PostgREST HTTP 409 custom SQLSTATE)
+  - 설계 시 `40001`을 계획했으나 local PostgREST가 serialization failure로 재시도한 뒤 60초에 연결을 종료해 structured error를 반환하지 않았다. `PT409`는 즉시 conflict를 반환하면서 동일 transaction rollback/net-zero 의미를 유지한다.
 - missing card/event/state: `P0002`
 - non-latest undo: `55000`
 
@@ -138,6 +140,33 @@ undo_study_rating(p_event_id uuid) RETURNS jsonb
 - legacy direct SRS update trigger +1, non-SRS update no bump
 
 Static migration checks는 함수 search_path/grant/RLS/index/down-script 존재를 확인한다.
+
+### 실행 증거 (2026-07-29/30)
+
+- Design-first commit: `7708354 docs(study): design phase 5a persistence expand`
+- Red (migration 160 전 real DB): 1 file, **8 failed / 1 passed**. `PGRST202` missing RPC와 missing revision/table contract를 재현했다.
+- Green (최종 fresh DB): `tests/integration/study-persistence.spec.ts` **17/17**.
+  - embedded/progress-table atomic apply+undo, concurrent duplicate, event collision
+  - malformed/missing/null/fractional/timestamp payload의 `22023` net-zero
+  - stale revision/cursor `PT409`, non-latest undo, finalized-session late apply 차단
+  - sequential/non-sequential finalize retry, server aggregate, cursor restore, inaccessible deck denial
+  - anon EXECUTE denial, RPC-only ledger writes, SELECT-own RLS, legacy revision trigger
+- 기존 marketplace real-DB regression: `marketplace-acquire.spec.ts` **6/6**.
+- Migration safety: 최종 migration chain `supabase db reset --no-seed` 연속 2회 성공.
+- Rollback: down SQL을 local DB에 실제 적용하고 3 RPC/table/4 additive columns 제거 assertion **8/8**, 이후 fresh reset 및 persistence **17/17** 재통과.
+- Applied-catalog security assertions **20/20**: `SECURITY DEFINER`, `search_path=public`, anon revoke/authenticated grant, SELECT-only RLS, direct DML denial, indexes/columns/triggers.
+- Types/static: web `tsc -b --noEmit`, mobile `tsc --noEmit`, root-config targeted ESLint, shared/web DB type byte parity 통과.
+- Production build: 3,238 modules, **3.23s** 성공(기존 chunk-size warning만 존재).
+- 독립 SQL/security review: **APPROVED**, Blocker/High/Medium 없음. 발견된 Low `SQL NULL` vs JSON `null` non-sequential retry를 즉시 수정하고 regression test를 추가했다.
+- 프로덕션 migration/deploy는 실행하지 않았다.
+
+### 구현 중 추가 hardening
+
+- transaction 시작시각 `now()`가 advisory lock 획득 순서와 다를 수 있으므로 durable `session_sequence`로 latest undo를 결정한다.
+- finalized/reopened session UUID에는 duplicate event retry만 허용하고 새 event를 `55000`으로 차단해 server aggregate가 stale해지지 않게 한다.
+- finalize는 owned/active-shared deck access를 검증한다.
+- Supabase CLI 2.107 fresh DB의 누락된 service-role defaults를 touched/regression-read tables의 explicit SELECT grant로 보정했다.
+- DB Row types의 새 필드는 P5A rolling-client expand compatibility를 위해 optional로 노출하고, P5B에서 client cutover 후 required contract로 좁힌다.
 
 ## 7. Rollback
 
