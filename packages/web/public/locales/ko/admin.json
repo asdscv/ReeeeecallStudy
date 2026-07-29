@@ -362,7 +362,51 @@
       "confirmTitle": "환불하시겠어요?",
       "confirmCreditPack": "{{email}} 님에게 {{amount}} 환불할까요? 고객 카드로 실제 환불됩니다.",
       "confirmSubscription": "{{email}} 님 구독의 최근 결제를 환불하고 접근을 회수할까요?",
-      "realMoneyNote": "결제 대행사를 호출해 실제 돈이 이동합니다. 여기서 되돌릴 수 없어요."
+      "realMoneyNote": "결제 대행사를 호출해 실제 돈이 이동합니다. 여기서 되돌릴 수 없어요.",
+      "confirmRevokeTitle": "접근을 회수할까요?",
+      "buttonRevokeOnly": "접근 회수",
+      "revokeOnlyIosNote": "돈은 이동하지 않아요. 접근만 회수됩니다 — App Store 환불은 Apple이 처리해요. 고객에게 Apple로 환불을 요청하도록 안내하거나, App Store Connect에서 승인하세요.",
+      "revokeOnlyUnknownNote": "돈은 이동하지 않아요. 이 건은 스토어가 기록되지 않아 App Store 결제일 수 있어서 접근만 회수합니다. 환불을 약속하기 전에 스토어를 확인하세요.",
+      "revokeOnlyHint": "접근 회수 전용 — 이 채널의 환불은 우리가 아니라 스토어가 처리해요.",
+      "policyEligible": "정책: 환불 가능 ({{days}}일 이내 · 미사용).",
+      "policyIneligible": "정책: 환불 불가 — {{reason}}.",
+      "consentMissing": "이 결제에는 청약철회권 고지 기록이 없어서 \"이미 사용함\"을 근거로 거절하기엔 약해요.",
+      "statutoryOverride": "법정 청약철회권(한국 7일 / EU·영국 14일)에 따라 환불해야 할 수도 있어요.",
+      "resultRefunded": "환불 완료 — 실제로 돈이 반환되고 접근이 회수됐어요.",
+      "resultRevokedOnly": "접근을 회수했어요. 이 작업으로 이동한 돈은 없습니다.",
+      "reason": {
+        "eligible": "환불 가능",
+        "not_found": "내역을 찾을 수 없음",
+        "not_paid": "결제가 완료된 적 없음",
+        "already_refunded": "이미 환불됨",
+        "outside_window": "환불 기간 경과",
+        "already_used": "이미 사용함",
+        "renewal_charge": "갱신 결제 (정책 대상 아님)"
+      }
+    },
+    "channel": {
+      "column": "채널",
+      "web_lemonsqueezy": "웹 · Lemon Squeezy",
+      "web_toss": "웹 · 토스",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "모바일 · 스토어 미상",
+      "admin": "관리자 지급",
+      "paymentsHint": "웹과 Google Play 결제는 여기서 환불할 수 있어요. App Store 결제는 접근 회수만 가능하고, 환불은 Apple이 처리합니다.",
+      "filter": {
+        "all": "전체",
+        "web": "웹",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "App Store 환불은 Apple이 처리합니다. 여기서는 접근 회수만 가능해요.",
+        "android": "Google Play 환불은 여기서 바로 처리할 수 있어요.",
+        "mobile_unknown": "스토어 기록이 생기기 전에 저장된 건이에요. App Store로 간주하니, 환불을 약속하기 전에 확인하세요.",
+        "web_lemonsqueezy": "Lemon Squeezy API로 환불할 수 있어요.",
+        "web_toss": "토스 API로 결제 취소할 수 있어요.",
+        "admin": "무상 지급 건이라 결제된 돈이 없어요."
+      }
     }
   },
   "official": {
@@ -465,7 +509,8 @@
   "common": {
     "refresh": "새로고침",
     "lastUpdated": "{{time}} 업데이트",
-    "exportCsv": "CSV 내보내기"
+    "exportCsv": "CSV 내보내기",
+    "dismiss": "닫기"
   },
   "retry": "재시도",
   "noData": "데이터가 없습니다",

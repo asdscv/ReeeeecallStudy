@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useAdminStore } from '../../stores/admin-store'
-import type { AdminSubscriptionRow, AdminPaymentRow } from '../../stores/admin-store'
+import type {
+  AdminSubscriptionRow, AdminPaymentRow, BillingPlatform, RefundResult,
+} from '../../stores/admin-store'
 import { useBillingStore } from '../../stores/billing-store'
 import { confirm } from '../../stores/confirm-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
@@ -41,6 +43,22 @@ const PAY_STATUS_STYLES: Record<string, string> = {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+// Sales channels (mig 156). The colour split is deliberate: green/blue channels are
+// the ones we can actually refund from here, grey ones are revoke-only. An admin
+// should be able to tell at a glance which button they are about to press.
+const CHANNEL_STYLES: Record<string, string> = {
+  web_lemonsqueezy: 'bg-info/15 text-info',
+  web_toss: 'bg-info/15 text-info',
+  android: 'bg-success/15 text-success',
+  ios: 'bg-accent text-muted-foreground',
+  mobile_unknown: 'bg-warning/15 text-warning',
+  admin: 'bg-accent text-muted-foreground',
+}
+
+// Channel filter for the payments pane. `null` = every channel. 'web' collapses both
+// web providers, matching admin_list_payments' p_platform argument.
+const PAY_PLATFORMS = [null, 'web', 'ios', 'android'] as const
+
 export function AdminBillingPage() {
   const { t, i18n } = useTranslation('admin')
   const dateLocale = toIntlLocale(i18n.language)
@@ -49,32 +67,46 @@ export function AdminBillingPage() {
     billingOverviewLoading, billingSubsLoading, billingPaymentsLoading,
     billingError,
     fetchBillingOverview, fetchBillingSubscriptions, fetchBillingPayments,
-    cancelSubscription, refundPayment, forceRefresh,
+    cancelSubscription, refundPayment, checkRefundEligibility, forceRefresh,
   } = useAdminStore()
 
   const [statusFilter, setStatusFilter] = useState('')
   const [subsPage, setSubsPage] = useState(0)
   const [payPage, setPayPage] = useState(0)
+  const [payPlatform, setPayPlatform] = useState<BillingPlatform | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  // Success feedback has to distinguish "money returned" from "access revoked only" —
+  // on iOS the refund call succeeds without any money moving.
+  const [actionNotice, setActionNotice] = useState<string | null>(null)
 
   const fmtMicro = (micro: number) => formatUsdMicro(micro)
 
   useEffect(() => { fetchBillingOverview() }, [fetchBillingOverview])
   useEffect(() => { fetchBillingSubscriptions(statusFilter || undefined, subsPage, PAGE_SIZE) }, [fetchBillingSubscriptions, statusFilter, subsPage])
   // Payments loads page 0 once; later pages are APPENDED by the load-more button.
-  useEffect(() => { fetchBillingPayments(0, PAY_PAGE_SIZE) }, [fetchBillingPayments])
+  useEffect(() => { fetchBillingPayments(0, PAY_PAGE_SIZE, false, null) }, [fetchBillingPayments])
+
+  // Switching the channel filter restarts from page 0 — the offsets are per-filter, so
+  // carrying the old page over would skip rows. Done in the handler rather than an
+  // effect on payPlatform: setting state inside an effect just to re-fetch causes a
+  // cascading render, and the click already knows both the new filter and the reset.
+  const changePayPlatform = (p: BillingPlatform | null) => {
+    setPayPlatform(p)
+    setPayPage(0)
+    fetchBillingPayments(0, PAY_PAGE_SIZE, false, p)
+  }
 
   // Reload the payments list from the top, collapsing back to a single page.
   const reloadPayments = () => {
     setPayPage(0)
-    fetchBillingPayments(0, PAY_PAGE_SIZE)
+    fetchBillingPayments(0, PAY_PAGE_SIZE, false, payPlatform)
   }
 
   const loadMorePayments = () => {
     const next = payPage + 1
     setPayPage(next)
-    fetchBillingPayments(next, PAY_PAGE_SIZE, true)
+    fetchBillingPayments(next, PAY_PAGE_SIZE, true, payPlatform)
   }
 
   const refreshAll = () => {
@@ -110,39 +142,86 @@ export function AdminBillingPage() {
     }
   }
 
+  // What the button will ACTUALLY do on this channel. Getting this wrong is the whole
+  // bug this screen used to have: it showed "this moves real money" on every row,
+  // including App Store purchases where nothing moves and only access is revoked.
+  const channelNote = (canRefundMoney: boolean, channel: string) =>
+    canRefundMoney
+      ? t('billing.refund.realMoneyNote')
+      : channel === 'mobile_unknown'
+        ? t('billing.refund.revokeOnlyUnknownNote')
+        : t('billing.refund.revokeOnlyIosNote')
+
+  // Ask the server for the policy verdict (mig 157) and render it as a line in the
+  // confirm dialog. Advisory only — statutory cooling-off rights can require a refund
+  // the policy declines, so an ineligible verdict never disables the button.
+  const eligibilityNote = async (kind: 'credit_pack' | 'subscription', ref: string): Promise<string> => {
+    const { eligibility } = await checkRefundEligibility(kind, ref)
+    if (!eligibility?.ok) return ''
+    if (eligibility.eligible) return `\n\n✅ ${t('billing.refund.policyEligible', { days: eligibility.window_days ?? 14 })}`
+    const reason = t(`billing.refund.reason.${eligibility.reason_code}`, {
+      defaultValue: eligibility.reason_code,
+    })
+    let note = `\n\n⚠️ ${t('billing.refund.policyIneligible', { reason })}`
+    // A missing consent record means the "used ⇒ non-refundable" rule was never
+    // disclosed to this buyer, so leaning on it is legally weak in KR/EU.
+    if (eligibility.reason_code === 'already_used' && eligibility.consent_recorded === false) {
+      note += `\n${t('billing.refund.consentMissing')}`
+    }
+    if (eligibility.statutory_note) note += `\n${t('billing.refund.statutoryOverride')}`
+    return note
+  }
+
+  // Report what happened, never "refunded" by default: providerRefunded is the only
+  // signal that money actually moved.
+  const reportRefundResult = (result: RefundResult | undefined) => {
+    if (result?.providerRefunded) {
+      setActionNotice(t('billing.refund.resultRefunded'))
+    } else {
+      const note = typeof result?.provider_result?.note === 'string' ? result.provider_result.note : ''
+      setActionNotice(`${t('billing.refund.resultRevokedOnly')}${note ? ` — ${note}` : ''}`)
+    }
+  }
+
   const doRefundCreditPack = async (row: AdminPaymentRow) => {
+    const verdict = await eligibilityNote('credit_pack', row.merchant_uid)
     const ok = await confirm({
-      title: t('billing.refund.confirmTitle'),
-      message: `${t('billing.refund.confirmCreditPack', { amount: fmtMicro(row.amount_micro), email: row.email || row.user_id })}\n\n${t('billing.refund.realMoneyNote')}`,
+      title: row.can_refund_money ? t('billing.refund.confirmTitle') : t('billing.refund.confirmRevokeTitle'),
+      message: `${t('billing.refund.confirmCreditPack', { amount: fmtMicro(row.amount_micro), email: row.email || row.user_id })}\n\n${channelNote(row.can_refund_money, row.channel)}${verdict}`,
       danger: true,
     })
     if (!ok) return
     setActionError(null)
+    setActionNotice(null)
     setBusyId(row.merchant_uid)
-    const { error } = await refundPayment('credit_pack', row.merchant_uid)
+    const { error, result } = await refundPayment('credit_pack', row.merchant_uid)
     setBusyId(null)
     if (error) {
       setActionError(t('billing.actionError', { error }))
     } else {
+      reportRefundResult(result)
       reloadPayments()
       fetchBillingOverview()
     }
   }
 
   const doRefundSubscription = async (row: AdminSubscriptionRow) => {
+    const verdict = await eligibilityNote('subscription', row.id)
     const ok = await confirm({
-      title: t('billing.refund.confirmTitle'),
-      message: `${t('billing.refund.confirmSubscription', { email: row.email || row.user_id })}\n\n${t('billing.refund.realMoneyNote')}`,
+      title: row.can_refund_money ? t('billing.refund.confirmTitle') : t('billing.refund.confirmRevokeTitle'),
+      message: `${t('billing.refund.confirmSubscription', { email: row.email || row.user_id })}\n\n${channelNote(row.can_refund_money, row.channel)}${verdict}`,
       danger: true,
     })
     if (!ok) return
     setActionError(null)
+    setActionNotice(null)
     setBusyId(row.id)
-    const { error } = await refundPayment('subscription', row.id)
+    const { error, result } = await refundPayment('subscription', row.id)
     setBusyId(null)
     if (error) {
       setActionError(t('billing.actionError', { error }))
     } else {
+      reportRefundResult(result)
       fetchBillingSubscriptions(statusFilter || undefined, subsPage, PAGE_SIZE)
       fetchBillingOverview()
     }
@@ -171,6 +250,15 @@ export function AdminBillingPage() {
       {actionError && (
         <div role="alert" className="bg-destructive/10 border border-destructive/30 rounded-lg px-4 py-2 text-sm text-destructive">
           {actionError}
+        </div>
+      )}
+
+      {actionNotice && (
+        <div role="status" className="bg-info/10 border border-info/30 rounded-lg px-4 py-2 text-sm text-info flex items-start justify-between gap-3">
+          <span>{actionNotice}</span>
+          <button type="button" onClick={() => setActionNotice(null)} className="text-xs underline cursor-pointer shrink-0">
+            {t('common.dismiss', { defaultValue: 'Dismiss' })}
+          </button>
         </div>
       )}
 
@@ -221,7 +309,7 @@ export function AdminBillingPage() {
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.subscriptions.status')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.subscriptions.cardLimit')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.subscriptions.periodEnd')}</th>
-                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.subscriptions.provider')}</th>
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.channel.column')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.subscriptions.actions')}</th>
                 </tr>
               </thead>
@@ -240,7 +328,7 @@ export function AdminBillingPage() {
                     </td>
                     <td className="px-4 py-2 text-muted-foreground tabular-nums">{row.card_limit?.toLocaleString(dateLocale) ?? '-'}</td>
                     <td className="px-4 py-2 text-muted-foreground">{row.current_period_end ? formatLocalDate(row.current_period_end, dateLocale) : '-'}</td>
-                    <td className="px-4 py-2 text-muted-foreground">{row.provider ?? '-'}</td>
+                    <td className="px-4 py-2"><ChannelBadge channel={row.channel} t={t} /></td>
                     <td className="px-4 py-2">
                       <div className="flex flex-wrap gap-1.5">
                         <button
@@ -259,13 +347,21 @@ export function AdminBillingPage() {
                         >
                           {busyId === row.id ? '...' : t('billing.subscriptions.cancelImmediate')}
                         </button>
+                        {/* Label the action for what it does on THIS channel: on the App
+                            Store we can only revoke access, so calling it "Refund" would
+                            tell the admin a customer was paid back when they were not. */}
                         <button
                           type="button"
                           disabled={busyId === row.id || !row.provider_subscription_id}
                           onClick={() => doRefundSubscription(row)}
-                          className="px-2 py-0.5 text-xs rounded border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 cursor-pointer disabled:opacity-40 disabled:cursor-default"
+                          title={row.can_refund_money ? undefined : t('billing.refund.revokeOnlyHint')}
+                          className={`px-2 py-0.5 text-xs rounded border cursor-pointer disabled:opacity-40 disabled:cursor-default ${
+                            row.can_refund_money
+                              ? 'border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20'
+                              : 'border-border text-muted-foreground hover:bg-muted'
+                          }`}
                         >
-                          {t('billing.refund.button')}
+                          {row.can_refund_money ? t('billing.refund.button') : t('billing.refund.buttonRevokeOnly')}
                         </button>
                       </div>
                     </td>
@@ -283,13 +379,36 @@ export function AdminBillingPage() {
 
       {/* ── Payments ── */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-2">
-          <h3 className="text-sm font-medium text-foreground">{t('billing.payments.title')}</h3>
-          {billingPayments.length > 0 && (
-            <span className="text-[11px] text-content-tertiary tabular-nums">
-              {t('billing.payments.loadedCount', { total: billingPayments.length })}
-            </span>
-          )}
+        <div className="px-4 py-3 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-medium text-foreground">{t('billing.payments.title')}</h3>
+            <p className="text-[11px] text-content-tertiary mt-0.5">{t('billing.channel.paymentsHint')}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Channel filter. Mobile store purchases are NOT payment_intents rows —
+                IAP credit packs live only in the credit ledger — so this list is a
+                union of both sources (mig 156) and the filter spans them. */}
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              {PAY_PLATFORMS.map((p) => (
+                <button
+                  key={p ?? 'all'}
+                  type="button"
+                  onClick={() => changePayPlatform(p)}
+                  aria-pressed={payPlatform === p}
+                  className={`px-2.5 py-1 text-xs cursor-pointer transition ${
+                    payPlatform === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'
+                  }`}
+                >
+                  {t(`billing.channel.filter.${p ?? 'all'}`)}
+                </button>
+              ))}
+            </div>
+            {billingPayments.length > 0 && (
+              <span className="text-[11px] text-content-tertiary tabular-nums">
+                {t('billing.payments.loadedCount', { total: billingPayments.length })}
+              </span>
+            )}
+          </div>
         </div>
         {billingPaymentsLoading && billingPayments.length === 0 ? (
           <p className="text-sm text-content-tertiary py-8 text-center">{t('loading')}</p>
@@ -303,6 +422,7 @@ export function AdminBillingPage() {
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.email')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.product')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.kind')}</th>
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.channel.column')}</th>
                   <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-muted-foreground">{t('billing.payments.amount')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.status')}</th>
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{t('billing.payments.paidAt')}</th>
@@ -317,6 +437,7 @@ export function AdminBillingPage() {
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">{row.product_id ?? '-'}</td>
                     <td className="px-4 py-2 text-muted-foreground">{t(`billing.kind.${row.kind}`, row.kind)}</td>
+                    <td className="px-4 py-2"><ChannelBadge channel={row.channel} t={t} /></td>
                     <td className="px-4 py-2 text-right text-foreground tabular-nums">{fmtMicro(row.amount_micro)}</td>
                     <td className="px-4 py-2">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${PAY_STATUS_STYLES[row.status] ?? 'bg-accent text-foreground'}`}>
@@ -330,9 +451,16 @@ export function AdminBillingPage() {
                           type="button"
                           disabled={busyId === row.merchant_uid}
                           onClick={() => doRefundCreditPack(row)}
-                          className="px-2 py-0.5 text-xs rounded border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 cursor-pointer disabled:opacity-40 disabled:cursor-default"
+                          title={row.can_refund_money ? undefined : t('billing.refund.revokeOnlyHint')}
+                          className={`px-2 py-0.5 text-xs rounded border cursor-pointer disabled:opacity-40 disabled:cursor-default ${
+                            row.can_refund_money
+                              ? 'border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20'
+                              : 'border-border text-muted-foreground hover:bg-muted'
+                          }`}
                         >
-                          {busyId === row.merchant_uid ? '...' : t('billing.refund.button')}
+                          {busyId === row.merchant_uid
+                            ? '...'
+                            : row.can_refund_money ? t('billing.refund.button') : t('billing.refund.buttonRevokeOnly')}
                         </button>
                       ) : (
                         <span className="text-content-tertiary">-</span>
@@ -341,7 +469,7 @@ export function AdminBillingPage() {
                   </tr>
                 ))}
                 {billingPayments.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-content-tertiary">{t('billing.payments.empty')}</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-8 text-center text-sm text-content-tertiary">{t('billing.payments.empty')}</td></tr>
                 )}
               </tbody>
             </table>
@@ -364,6 +492,34 @@ export function AdminBillingPage() {
       {/* ── User lookup ── */}
       <UserBillingPanel />
     </div>
+  )
+}
+
+/* ─────────────────────────── ChannelBadge ─────────────────────────── */
+
+/**
+ * The sales channel of a billing row (mig 156). Replaces the old raw `provider`
+ * column, which showed 'revenuecat' for both stores and so hid the one distinction
+ * that changes what an admin can do: Google Play refunds are issuable from here,
+ * App Store refunds are not.
+ *
+ * 'mobile_unknown' marks a row written before the store was recorded. It is shown as
+ * a warning rather than guessed at, because guessing "Android" on an Apple purchase
+ * would put a money-refund button on a row that cannot honour it.
+ */
+function ChannelBadge({ channel, t }: {
+  channel: string
+  // Same shape Pager uses — i18next's TFunction, not a hand-rolled signature,
+  // which `tsc -b` rejects as incompatible.
+  t: ReturnType<typeof useTranslation>['t']
+}) {
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CHANNEL_STYLES[channel] ?? 'bg-accent text-foreground'}`}
+      title={t(`billing.channel.hint.${channel}`, { defaultValue: '' }) || undefined}
+    >
+      {t(`billing.channel.${channel}`, { defaultValue: channel })}
+    </span>
   )
 }
 

@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
+import { PurchaseConsent } from './PurchaseConsent'
 
 /**
  * Card-limit "upgrade" CTA → subscribe to the cheapest active subscription plan.
@@ -37,6 +38,8 @@ export function SubscribeButton() {
   const subscription = useBillingStore((s) => s.subscription)
   const fetchProducts = useBillingStore((s) => s.fetchProducts)
   const fetchSubscription = useBillingStore((s) => s.fetchSubscription)
+  // Withdrawal-right disclosure — see PurchaseConsent for why it gates the CTA.
+  const [consented, setConsented] = useState(false)
 
   // Load on mount, reusing the store's cache: only fetch the catalog if it's empty
   // (PlanSelector / TopUpModal may already have populated it).
@@ -77,11 +80,19 @@ export function SubscribeButton() {
 
   return (
     <div>
+      {PAYMENTS_ACTIVE && (
+        <PurchaseConsent kind="subscription" checked={consented} onChange={setConsented} id="subscribe-consent" />
+      )}
       <button
         type="button"
         onClick={() => void startCheckout(targetPlanId)}
-        disabled={processing}
-        title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
+        // Payments live → the withdrawal-right disclosure must be ticked first.
+        disabled={processing || (PAYMENTS_ACTIVE && !consented)}
+        title={
+          !PAYMENTS_ACTIVE ? t('comingSoon.title')
+            : !consented ? t('consent.required')
+            : undefined
+        }
         className={
           PAYMENTS_ACTIVE
             ? 'mt-2 flex items-center gap-1.5 cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-hover disabled:opacity-60'

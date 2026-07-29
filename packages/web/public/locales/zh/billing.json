@@ -78,5 +78,11 @@
       "unknown_order": "找不到此订单。",
       "already_processed": "此订单已处理。"
     }
+  },
+  "consent": {
+    "creditPack": "我同意点数将立即发放，且一旦使用任何点数，即失去本次购买的撤回权。",
+    "subscription": "我同意套餐立即生效，且一旦使用付费权益，即失去本次购买的撤回权。",
+    "policyLink": "退款政策",
+    "required": "请先确认以上告知内容再购买。"
   }
 }

@@ -6,12 +6,36 @@
   "done": "Xong",
   "back": "Quay lai",
   "features": {
-    "cardStorage": { "title": "Luu tru the", "free": "1.000 the", "pro": "Toi da 100.000 the" },
-    "allModes": { "title": "Tat ca che do hoc", "free": "SRS + Tuan tu", "pro": "Tat ca 4 che do" },
-    "aiGeneration": { "title": "AI Tao the", "free": "10 the/ngay", "pro": "10/ngay + tin dung" },
-    "premiumTts": { "title": "TTS Cao cap", "free": "Co ban", "pro": "Edge TTS HD" },
-    "analytics": { "title": "Phan tich nang cao", "free": "Thong ke co ban", "pro": "Bieu do + Du bao" },
-    "marketplace": { "title": "Xuat ban Marketplace", "free": "Chi tai ve", "pro": "Tai len + Chia se doanh thu" }
+    "cardStorage": {
+      "title": "Luu tru the",
+      "free": "1.000 the",
+      "pro": "Toi da 100.000 the"
+    },
+    "allModes": {
+      "title": "Tat ca che do hoc",
+      "free": "SRS + Tuan tu",
+      "pro": "Tat ca 4 che do"
+    },
+    "aiGeneration": {
+      "title": "AI Tao the",
+      "free": "10 the/ngay",
+      "pro": "10/ngay + tin dung"
+    },
+    "premiumTts": {
+      "title": "TTS Cao cap",
+      "free": "Co ban",
+      "pro": "Edge TTS HD"
+    },
+    "analytics": {
+      "title": "Phan tich nang cao",
+      "free": "Thong ke co ban",
+      "pro": "Bieu do + Du bao"
+    },
+    "marketplace": {
+      "title": "Xuat ban Marketplace",
+      "free": "Chi tai ve",
+      "pro": "Tai len + Chia se doanh thu"
+    }
   },
   "free": "Mien phi",
   "pro": "Pro",
@@ -38,5 +62,14 @@
   "privacyPolicy": "Chinh sach Bao mat",
   "termsOfService": "Dieu khoan Dich vu",
   "manageSubscription": "Quan ly Dang ky",
-  "legalDisclaimer": "Khoản thanh toán sẽ được tính vào tài khoản {{account}} của bạn khi xác nhận mua. Gói đăng ký của bạn tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kết thúc kỳ hiện tại. Tài khoản của bạn sẽ bị tính phí gia hạn trong vòng 24 giờ trước khi kết thúc kỳ hiện tại. Bạn có thể quản lý hoặc hủy gói đăng ký trong phần cài đặt tài khoản trên {{store}} sau khi mua."
+  "legalDisclaimer": "Khoản thanh toán sẽ được tính vào tài khoản {{account}} của bạn khi xác nhận mua. Gói đăng ký của bạn tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kết thúc kỳ hiện tại. Tài khoản của bạn sẽ bị tính phí gia hạn trong vòng 24 giờ trước khi kết thúc kỳ hiện tại. Bạn có thể quản lý hoặc hủy gói đăng ký trong phần cài đặt tài khoản trên {{store}} sau khi mua.",
+  "consent": {
+    "subscription": "Tôi đồng ý rằng gói của tôi bắt đầu ngay lập tức, và khi đã dùng quyền lợi trả phí thì tôi mất quyền rút lui khỏi giao dịch này.",
+    "policyLink": "Chính sách hoàn tiền"
+  },
+  "refund": {
+    "request": "Yêu cầu hoàn tiền",
+    "title": "Yêu cầu hoàn tiền",
+    "submitted": "Đã gửi yêu cầu hoàn tiền tới Apple. Apple quyết định kết quả và sẽ gửi email cho bạn; nếu được duyệt, quyền truy cập sẽ tự động bị thu hồi."
+  }
 }

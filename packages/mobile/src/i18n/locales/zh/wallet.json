@@ -34,5 +34,9 @@
     "creditLabel": "{{value}} AI 额度",
     "confirming": "支付完成 — 额度即将到账。",
     "unavailable": "此额度包暂时无法购买。"
+  },
+  "consent": {
+    "creditPack": "我同意点数将立即发放，且一旦使用任何点数，即失去本次购买的撤回权。",
+    "policyLink": "退款政策"
   }
 }

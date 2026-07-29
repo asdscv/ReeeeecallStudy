@@ -6,12 +6,36 @@
   "done": "Selesai",
   "back": "Kembali",
   "features": {
-    "cardStorage": { "title": "Penyimpanan Kartu", "free": "1.000 kartu", "pro": "Hingga 100.000 kartu" },
-    "allModes": { "title": "Semua Mode Belajar", "free": "SRS + Berurutan", "pro": "Semua 4 mode" },
-    "aiGeneration": { "title": "AI Buat Kartu", "free": "10 kartu/hari", "pro": "10/hari + kredit" },
-    "premiumTts": { "title": "TTS Premium", "free": "Dasar", "pro": "Edge TTS HD" },
-    "analytics": { "title": "Analitik Lanjutan", "free": "Statistik dasar", "pro": "Grafik + Prediksi" },
-    "marketplace": { "title": "Publikasi Marketplace", "free": "Unduh saja", "pro": "Unggah + Bagi hasil" }
+    "cardStorage": {
+      "title": "Penyimpanan Kartu",
+      "free": "1.000 kartu",
+      "pro": "Hingga 100.000 kartu"
+    },
+    "allModes": {
+      "title": "Semua Mode Belajar",
+      "free": "SRS + Berurutan",
+      "pro": "Semua 4 mode"
+    },
+    "aiGeneration": {
+      "title": "AI Buat Kartu",
+      "free": "10 kartu/hari",
+      "pro": "10/hari + kredit"
+    },
+    "premiumTts": {
+      "title": "TTS Premium",
+      "free": "Dasar",
+      "pro": "Edge TTS HD"
+    },
+    "analytics": {
+      "title": "Analitik Lanjutan",
+      "free": "Statistik dasar",
+      "pro": "Grafik + Prediksi"
+    },
+    "marketplace": {
+      "title": "Publikasi Marketplace",
+      "free": "Unduh saja",
+      "pro": "Unggah + Bagi hasil"
+    }
   },
   "free": "Gratis",
   "pro": "Pro",
@@ -38,5 +62,14 @@
   "privacyPolicy": "Kebijakan Privasi",
   "termsOfService": "Ketentuan Layanan",
   "manageSubscription": "Kelola Langganan",
-  "legalDisclaimer": "Pembayaran akan dibebankan ke akun {{account}} Anda saat konfirmasi pembelian. Langganan Anda diperpanjang secara otomatis kecuali dibatalkan setidaknya 24 jam sebelum akhir periode saat ini. Akun Anda akan dikenai biaya perpanjangan dalam 24 jam sebelum akhir periode saat ini. Anda dapat mengelola atau membatalkan langganan di pengaturan akun pada {{store}} setelah pembelian."
+  "legalDisclaimer": "Pembayaran akan dibebankan ke akun {{account}} Anda saat konfirmasi pembelian. Langganan Anda diperpanjang secara otomatis kecuali dibatalkan setidaknya 24 jam sebelum akhir periode saat ini. Akun Anda akan dikenai biaya perpanjangan dalam 24 jam sebelum akhir periode saat ini. Anda dapat mengelola atau membatalkan langganan di pengaturan akun pada {{store}} setelah pembelian.",
+  "consent": {
+    "subscription": "Saya setuju bahwa paket saya langsung dimulai, dan begitu saya memakai manfaat berbayarnya saya kehilangan hak untuk membatalkan pembelian ini.",
+    "policyLink": "Kebijakan refund"
+  },
+  "refund": {
+    "request": "Ajukan refund",
+    "title": "Pengajuan refund",
+    "submitted": "Pengajuan refund dikirim ke Apple. Apple yang memutuskan hasilnya dan akan mengirim email; jika disetujui, akses kamu dicabut otomatis."
+  }
 }

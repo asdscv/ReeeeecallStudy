@@ -78,5 +78,11 @@
       "unknown_order": "Không tìm thấy đơn hàng này.",
       "already_processed": "Đơn hàng này đã được xử lý."
     }
+  },
+  "consent": {
+    "creditPack": "Tôi đồng ý rằng tín dụng được cấp ngay lập tức, và khi đã dùng bất kỳ phần nào thì tôi mất quyền rút lui khỏi giao dịch này.",
+    "subscription": "Tôi đồng ý rằng gói của tôi bắt đầu ngay lập tức, và khi đã dùng quyền lợi trả phí thì tôi mất quyền rút lui khỏi giao dịch này.",
+    "policyLink": "Chính sách hoàn tiền",
+    "required": "Vui lòng xác nhận thông báo ở trên trước khi mua."
   }
 }

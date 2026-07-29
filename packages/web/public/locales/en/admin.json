@@ -362,7 +362,51 @@
       "confirmTitle": "Issue refund?",
       "confirmCreditPack": "Refund {{amount}} to {{email}}? This returns the money to the customer's card.",
       "confirmSubscription": "Refund this subscription's latest charge for {{email}} and revoke access?",
-      "realMoneyNote": "This calls the payment provider and moves real money. It cannot be undone here."
+      "realMoneyNote": "This calls the payment provider and moves real money. It cannot be undone here.",
+      "confirmRevokeTitle": "Revoke access?",
+      "buttonRevokeOnly": "Revoke access",
+      "revokeOnlyIosNote": "No money moves. This only revokes access — Apple issues App Store refunds. Ask the customer to request one from Apple, or approve it in App Store Connect.",
+      "revokeOnlyUnknownNote": "No money moves. This row's store was never recorded, so it may be an App Store purchase — access is revoked only. Verify the store before promising a refund.",
+      "revokeOnlyHint": "Access only — this channel's refund is issued by the store, not by us.",
+      "policyEligible": "Policy: refundable (within {{days}} days and unused).",
+      "policyIneligible": "Policy: not refundable — {{reason}}.",
+      "consentMissing": "No withdrawal-right notice was recorded for this purchase, so \"already used\" is weak grounds to refuse.",
+      "statutoryOverride": "Statutory cooling-off rights (KR 7d / EU-UK 14d) may still require a refund.",
+      "resultRefunded": "Refund issued — the money was returned and access revoked.",
+      "resultRevokedOnly": "Access revoked. This action moved no money.",
+      "reason": {
+        "eligible": "refundable",
+        "not_found": "record not found",
+        "not_paid": "payment never settled",
+        "already_refunded": "already refunded",
+        "outside_window": "past the refund window",
+        "already_used": "already used",
+        "renewal_charge": "renewal charge (outside policy scope)"
+      }
+    },
+    "channel": {
+      "column": "Channel",
+      "web_lemonsqueezy": "Web · Lemon Squeezy",
+      "web_toss": "Web · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "Mobile · store unknown",
+      "admin": "Admin grant",
+      "paymentsHint": "Web and Google Play charges can be refunded here. App Store charges can only have access revoked — Apple issues those refunds.",
+      "filter": {
+        "all": "All",
+        "web": "Web",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple issues App Store refunds. We can only revoke access.",
+        "android": "Google Play refunds can be issued from here.",
+        "mobile_unknown": "Recorded before store tracking existed. Treated as App Store — verify before promising a refund.",
+        "web_lemonsqueezy": "Refundable through the Lemon Squeezy API.",
+        "web_toss": "Cancellable through the Toss API.",
+        "admin": "Comp grant — no money was ever charged."
+      }
     }
   },
   "official": {
@@ -465,7 +509,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "Dismiss"
   },
   "retry": "Retry",
   "noData": "No data available",

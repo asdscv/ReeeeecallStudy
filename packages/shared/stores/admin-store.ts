@@ -36,6 +36,19 @@ export interface AdminBillingOverview {
   refunds_30d: number
 }
 
+/**
+ * Sales channel of a billing row (mig 156). `provider` is NOT enough: RevenueCat
+ * fronts both stores under provider='revenuecat', and they differ in the one way
+ * that matters to an admin — whether WE can issue the money refund.
+ *   web_lemonsqueezy / web_toss / android → yes, via API
+ *   ios                                   → no; Apple alone issues App Store refunds
+ *   mobile_unknown                        → row predates mig 156; treated as ios
+ */
+export type BillingChannel =
+  | 'web_lemonsqueezy' | 'web_toss' | 'ios' | 'android' | 'mobile_unknown' | 'admin'
+
+export type BillingPlatform = 'web' | 'ios' | 'android'
+
 export interface AdminSubscriptionRow {
   id: string
   user_id: string
@@ -49,6 +62,10 @@ export interface AdminSubscriptionRow {
   cancel_at_period_end: boolean
   created_at: string
   updated_at: string
+  platform: BillingPlatform | null
+  channel: BillingChannel
+  /** Server's verdict on whether a real money refund is possible for this channel. */
+  can_refund_money: boolean
 }
 
 export interface AdminPaymentRow {
@@ -65,6 +82,52 @@ export interface AdminPaymentRow {
   provider_payment_id: string | null
   paid_at: string | null
   created_at: string
+  platform: BillingPlatform | null
+  channel: BillingChannel
+  can_refund_money: boolean
+}
+
+/**
+ * What admin-refund actually did. `providerRefunded` is the ONLY truth about money:
+ * an iOS row returns ok:true with providerRefunded:false because access was revoked
+ * but Apple — not us — issues the refund. Rendering a 200 as "refunded" would tell
+ * the admin a customer was paid back when they were not.
+ */
+export interface RefundResult {
+  ok: boolean
+  kind: string
+  provider: string | null
+  channel: BillingChannel
+  platform: BillingPlatform | null
+  providerRefunded: boolean
+  provider_result?: { note?: string; skipped?: boolean } & Record<string, unknown>
+  internal?: unknown
+  note?: string
+}
+
+/**
+ * Policy verdict from refund_eligibility (mig 157). Advisory: it never blocks a
+ * refund, because statutory cooling-off rights can override it.
+ */
+export interface RefundEligibility {
+  ok: boolean
+  eligible: boolean
+  reason_code:
+    | 'eligible' | 'not_found' | 'not_paid' | 'already_refunded'
+    | 'outside_window' | 'already_used' | 'renewal_charge'
+  kind?: string
+  platform?: BillingPlatform | null
+  channel?: BillingChannel
+  can_refund_money?: boolean
+  purchased_at?: string | null
+  days_since?: number | null
+  window_days?: number
+  within_window?: boolean
+  unused?: boolean
+  /** False ⇒ the buyer was never shown the withdrawal-right notice; treat 'already_used' as advisory. */
+  consent_recorded?: boolean
+  detail?: Record<string, unknown>
+  statutory_note?: string | null
 }
 
 export interface AdminUserBillingSubscription {
@@ -201,14 +264,17 @@ interface AdminState {
   fetchBillingOverview: () => Promise<void>
   fetchBillingSubscriptions: (status?: string, page?: number, pageSize?: number) => Promise<void>
   /** `append` keeps the rows already loaded and adds the page after them (load-more
-   *  list) instead of replacing them (page-flip). */
-  fetchBillingPayments: (page?: number, pageSize?: number, append?: boolean) => Promise<void>
+   *  list) instead of replacing them (page-flip). `platform` narrows the list to one
+   *  sales channel ('web' | 'ios' | 'android'); omit for all channels. */
+  fetchBillingPayments: (page?: number, pageSize?: number, append?: boolean, platform?: BillingPlatform | null) => Promise<void>
   fetchUserBilling: (userId: string) => Promise<void>
   clearUserBilling: () => void
   cancelSubscription: (provider: string, providerSubscriptionId: string, immediate: boolean) => Promise<{ error: string | null }>
   grantSubscription: (userId: string, productId: string, periodEnd: string | null) => Promise<{ error: string | null }>
   adjustWallet: (userId: string, deltaMicro: number, reason: string) => Promise<{ error: string | null }>
-  refundPayment: (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => Promise<{ error: string | null }>
+  refundPayment: (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => Promise<{ error: string | null; result?: RefundResult }>
+  /** Policy verdict for a would-be refund (mig 157). Advisory — never blocks. */
+  checkRefundEligibility: (kind: 'credit_pack' | 'subscription', ref: string) => Promise<{ error: string | null; eligibility?: RefundEligibility }>
   // System flags / kill switches (mig 153)
   fetchSystemFlags: () => Promise<void>
   setSystemFlags: (patch: Partial<SystemFlags>) => Promise<{ error: string | null }>
@@ -624,13 +690,14 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  fetchBillingPayments: async (page = 0, pageSize = 50, append = false) => {
+  fetchBillingPayments: async (page = 0, pageSize = 50, append = false, platform = null) => {
     if (get().billingPaymentsLoading) return
     set({ billingPaymentsLoading: true, billingError: null })
     try {
       const { data, error } = await supabase.rpc('admin_list_payments', {
         p_limit: pageSize,
         p_offset: page * pageSize,
+        p_platform: platform,
       })
       if (error) throw error
       const rows = (data as AdminPaymentRow[] | null) ?? []
@@ -726,7 +793,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     try {
       // Refund runs through the `admin-refund` Edge fn (calls the payment provider +
       // reverses our side), NOT an RPC — `functions.invoke` auto-attaches the admin JWT.
-      const { error } = await supabase.functions.invoke('admin-refund', { body: { kind, ref, reason } })
+      const { data, error } = await supabase.functions.invoke('admin-refund', { body: { kind, ref, reason } })
       if (error) {
         // supabase-js FunctionsHttpError carries the raw Response in `.context`;
         // prefer our `{ error }` body over the generic message when present.
@@ -741,8 +808,23 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       }
       // Wallet clawback / subscription revoke landed → the overview counts are stale.
       adminCache.invalidate('billing')
-      get().logAction('refund_payment', kind === 'subscription' ? 'subscription' : 'payment', ref, { kind, reason })
-      return { error: null }
+      const result = (data ?? undefined) as RefundResult | undefined
+      // Log what ACTUALLY happened, not just that the button was pressed: on iOS the
+      // call succeeds while no money moves, and the audit trail has to say which.
+      get().logAction('refund_payment', kind === 'subscription' ? 'subscription' : 'payment', ref, {
+        kind, reason, channel: result?.channel, providerRefunded: result?.providerRefunded ?? false,
+      })
+      return { error: null, result }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  checkRefundEligibility: async (kind: 'credit_pack' | 'subscription', ref: string) => {
+    try {
+      const { data, error } = await supabase.rpc('refund_eligibility', { p_kind: kind, p_ref: ref })
+      if (error) throw error
+      return { error: null, eligibility: (data ?? undefined) as RefundEligibility | undefined }
     } catch (e) {
       return { error: extractErrorMessage(e) }
     }

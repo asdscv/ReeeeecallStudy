@@ -362,7 +362,51 @@
       "confirmTitle": "¿Emitir reembolso?",
       "confirmCreditPack": "¿Reembolsar {{amount}} a {{email}}? Esto devuelve el dinero a la tarjeta del cliente.",
       "confirmSubscription": "¿Reembolsar el último cargo de esta suscripción a {{email}} y revocar el acceso?",
-      "realMoneyNote": "Esto llama al proveedor de pagos y mueve dinero real. No se puede deshacer aquí."
+      "realMoneyNote": "Esto llama al proveedor de pagos y mueve dinero real. No se puede deshacer aquí.",
+      "confirmRevokeTitle": "¿Revocar el acceso?",
+      "buttonRevokeOnly": "Revocar acceso",
+      "revokeOnlyIosNote": "No se mueve dinero. Solo se revoca el acceso: Apple emite los reembolsos de App Store. Pide al cliente que lo solicite a Apple, o apruébalo en App Store Connect.",
+      "revokeOnlyUnknownNote": "No se mueve dinero. No se registró la tienda de este cargo, así que podría ser una compra de App Store: solo se revoca el acceso. Verifica la tienda antes de prometer un reembolso.",
+      "revokeOnlyHint": "Solo acceso: en este canal el reembolso lo emite la tienda, no nosotros.",
+      "policyEligible": "Política: reembolsable (dentro de {{days}} días y sin usar).",
+      "policyIneligible": "Política: no reembolsable — {{reason}}.",
+      "consentMissing": "No se registró el aviso del derecho de desistimiento para esta compra, así que «ya usado» es un motivo débil para negarse.",
+      "statutoryOverride": "Los derechos legales de desistimiento (KR 7 d / UE-RU 14 d) aún pueden exigir un reembolso.",
+      "resultRefunded": "Reembolso emitido: se devolvió el dinero y se revocó el acceso.",
+      "resultRevokedOnly": "Acceso revocado. Esta acción no movió dinero.",
+      "reason": {
+        "eligible": "reembolsable",
+        "not_found": "registro no encontrado",
+        "not_paid": "el pago nunca se completó",
+        "already_refunded": "ya reembolsado",
+        "outside_window": "fuera del plazo de reembolso",
+        "already_used": "ya utilizado",
+        "renewal_charge": "cargo de renovación (fuera de la política)"
+      }
+    },
+    "channel": {
+      "column": "Canal",
+      "web_lemonsqueezy": "Web · Lemon Squeezy",
+      "web_toss": "Web · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "Móvil · tienda desconocida",
+      "admin": "Concesión de admin",
+      "paymentsHint": "Los cargos de web y Google Play se pueden reembolsar aquí. En los de App Store solo se puede revocar el acceso: los reembolsos los emite Apple.",
+      "filter": {
+        "all": "Todos",
+        "web": "Web",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple emite los reembolsos de App Store. Aquí solo podemos revocar el acceso.",
+        "android": "Los reembolsos de Google Play se pueden emitir desde aquí.",
+        "mobile_unknown": "Registro anterior al seguimiento de tienda. Se trata como App Store: verifícalo antes de prometer un reembolso.",
+        "web_lemonsqueezy": "Reembolsable mediante la API de Lemon Squeezy.",
+        "web_toss": "Cancelable mediante la API de Toss.",
+        "admin": "Concesión gratuita: nunca se cobró dinero."
+      }
     }
   },
   "official": {
@@ -465,7 +509,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "Cerrar"
   },
   "retry": "Reintentar",
   "noData": "Sin datos disponibles",
