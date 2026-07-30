@@ -4,8 +4,8 @@ vi.mock('i18next', () => ({
   default: { t: (key: string, opts?: Record<string, unknown>) => opts?.count !== undefined ? `${key}:${opts.count}` : key },
 }))
 
-import { calculateSRS, previewIntervals, nextDayBoundary, formatMinutes, getSrsDayStart } from '../srs'
-import type { SrsCardData } from '../srs'
+import { calculateSRS, previewIntervals, nextDayBoundary, formatMinutes, getSrsDayStart } from '@reeeeecall/shared/lib/srs'
+import type { SrsCardData } from '@reeeeecall/shared/lib/srs'
 import type { Card, SrsSettings } from '../../types/database'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
 

@@ -3,7 +3,7 @@ import {
   CrammingQueueManager,
   filterCardsForCramming,
   type CrammingConfig,
-} from '../cramming-queue'
+} from '@reeeeecall/shared/lib/cramming-queue'
 import { CrammingQueueManager as SharedCrammingQueueManager } from '@reeeeecall/shared/lib/cramming-queue'
 import type { Card } from '../../types/database'
 

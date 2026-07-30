@@ -27,25 +27,30 @@ const mockSupabase = vi.hoisted(() => {
   }
 })
 
-vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+  supabase: mockSupabase,
+  getSupabase: () => mockSupabase,
+  initSupabase: vi.fn(),
+}))
 
-vi.mock('../../lib/rate-limit-instance', () => ({
+vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({
   guard: {
     check: vi.fn().mockReturnValue({ allowed: true }),
     recordSuccess: vi.fn(),
   },
 }))
 
-vi.mock('../../lib/srs', () => ({
+vi.mock('@reeeeecall/shared/lib/srs', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@reeeeecall/shared/lib/srs')>()),
   calculateSRS: vi.fn(),
 }))
 
-vi.mock('../../lib/srs-access', () => ({
+vi.mock('@reeeeecall/shared/lib/srs-access', () => ({
   getSrsSource: vi.fn().mockReturnValue('embedded'),
   mergeCardWithProgress: vi.fn(),
 }))
 
-import { useStudyStore } from '../study-store'
+import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
 import type { Card, DeckStudyState } from '../../types/database'
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -136,6 +141,9 @@ const resetStore = () =>
     // Reset the completion guard — it leaks true across tests otherwise (a prior
     // endSession sets it), making a later endSession a silent no-op.
     sessionSaved: false,
+    // Same leak for the finalize marker: a stale true routes endSession onto
+    // refresh_study_session (P6) instead of finalize.
+    sessionFinalized: false,
     lastRatedCard: null,
   })
 

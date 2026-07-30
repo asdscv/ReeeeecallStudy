@@ -32,6 +32,14 @@ const makeCards = (count: number) =>
     tags: ['test'],
   }))
 
+/** Awaitable RPC result that also supports the `.maybeSingle()` chain. */
+function rpcResult(value: { data: unknown; error: { message: string } | null }) {
+  return Object.assign(Promise.resolve(value), {
+    maybeSingle: () => Promise.resolve(value),
+    single: () => Promise.resolve(value),
+  })
+}
+
 function setupMocks(insertError: { message: string } | null = null) {
   mockSupabase.auth.getUser.mockResolvedValue({
     data: { user: { id: 'user-1' } },
@@ -39,7 +47,9 @@ function setupMocks(insertError: { message: string } | null = null) {
   })
 
   // reserve_card_positions RPC (mig 105) — returns the starting sort_position.
-  mockSupabase.rpc.mockResolvedValue({ data: 0, error: null })
+  // createCards also refreshes the card-usage RPC, which chains .maybeSingle();
+  // a plain resolved value made that throw an unhandled rejection.
+  mockSupabase.rpc.mockImplementation(() => rpcResult({ data: 0, error: null }))
 
   mockSupabase.from.mockImplementation((table: string) => {
     if (table === 'decks') {
@@ -93,7 +103,7 @@ describe('createCards (bulk)', () => {
 
   it('should return 0 and set error when reserve_card_positions fails', async () => {
     setupMocks()
-    mockSupabase.rpc.mockResolvedValue({ data: null, error: { message: 'deck not found or not owned' } })
+    mockSupabase.rpc.mockImplementation(() => rpcResult({ data: null, error: { message: 'deck not found or not owned' } }))
 
     const result = await useCardStore.getState().createCards({
       deck_id: 'deck-1',

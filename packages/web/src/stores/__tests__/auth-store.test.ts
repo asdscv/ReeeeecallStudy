@@ -18,8 +18,24 @@ const mockSupabase = vi.hoisted(() => ({
 }))
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
+// The store under test is a re-export of the shared one, which imports the shared
+// client — mocking only the web path left the real (uninitialised) client in place,
+// so every assertion saw zero calls.
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+  supabase: mockSupabase,
+  getSupabase: () => mockSupabase,
+  initSupabase: vi.fn(),
+}))
 
 import { useAuthStore, _resetAuthStoreInternals } from '../auth-store'
+import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
+
+// initialize() drives the subscription store; keep its real actions restorable so a
+// test that swaps one in cannot leak into the next.
+const realSubscriptionActions = {
+  registerSession: useSubscriptionStore.getState().registerSession,
+  fetchSubscription: useSubscriptionStore.getState().fetchSubscription,
+}
 
 // ─── Helpers ────────────────────────────────────────────────
 const resetStore = () =>
@@ -32,6 +48,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   resetStore()
   _resetAuthStoreInternals()
+  useSubscriptionStore.setState({ ...realSubscriptionActions })
 })
 
 // ─── initialize ─────────────────────────────────────────────
@@ -47,6 +64,24 @@ describe('initialize', () => {
     expect(state.user).toBe(fakeUser)
     expect(state.session).toBe(fakeSession)
     expect(state.loading).toBe(false)
+  })
+
+  it('keeps the session when a post-login side effect throws', async () => {
+    mockSupabase.auth.getSession.mockResolvedValue({
+      data: { session: fakeSession },
+    })
+    // The device adapter throws when adapters are not initialised, and that escaped
+    // registerSession into initialize()'s catch — signing the user out of a session
+    // the server had accepted.
+    const failing = vi.fn().mockRejectedValue(new Error('Adapters not initialized'))
+    useSubscriptionStore.setState({ registerSession: failing as never })
+
+    await useAuthStore.getState().initialize()
+
+    expect(failing).toHaveBeenCalledTimes(1)
+    expect(useAuthStore.getState().user).toBe(fakeUser)
+    expect(useAuthStore.getState().session).toBe(fakeSession)
+    expect(useAuthStore.getState().loading).toBe(false)
   })
 
   it('should set user to null when no session exists', async () => {

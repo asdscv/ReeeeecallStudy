@@ -2,7 +2,7 @@
 
 작성일: 2026-07-29  
 기준선: `origin/develop@af38ad8`  
-상태: **ACTIVE — 순차 PR 실행 중**  
+상태: **DONE — P0~P8 전부 merge (PR #332~#344)**  
 표준: `DOCS/STANDARD/ARCHITECTURE.md`
 
 ## 1. 목표와 완료 조건
@@ -342,9 +342,29 @@ Master 문서의 모든 checkbox와 PR/commit/test evidence를 채운 뒤
 - [x] P2 cramming true rounds — PR #333, local 17 files / 270 study tests, 7 CI checks green
 - [x] P3 SRS due queue — PR #334, local 17 files / 230 study tests, independent review approved, 7 CI checks green
 - [x] P4 sequential safety — PR #335, local 18 files / 242 study tests, independent review approved, 7 CI checks green
-- [ ] P5A persistence expand
-- [ ] P5B rating cutover
-- [ ] P5C persistence contract
-- [ ] P6 persistent undo/session idempotency
-- [ ] P7 shared single source
-- [ ] P8 lockdown + master doc DONE
+- [x] P5A persistence expand — PR #336, migration 160 atomic rating RPCs
+- [x] P5B rating cutover — PR #338, 클라이언트가 RPC로만 write
+- [x] P5C persistence contract — PR #339, 직접 write 경로 차단(migration 161)
+- [x] P6 persistent undo/session idempotency — PR #340, migration 162(refresh + reopened apply),
+      store 9 / integration 43 tests, 독립 감사 APPROVED, 7 CI checks green
+- [x] P7 shared single source — PR #343, web 사본 6개 삭제 + parity guard(check-arch),
+      web 전수 128 files / 2180 tests, 7 CI checks green
+- [x] P8 lockdown + master doc DONE — PR #344, `tests/integration/study-lockdown.spec.ts`
+      (smoke / net-zero / dry-run), integration 5 files 48 tests, 7 CI checks green
+
+### P8 lockdown 실행 증거 (worktree `wt-p8` @ `43bf6ad`)
+
+| # | 항목 | 결과 |
+|---|---|---|
+| 1 | 학습 targeted vitest | 17 files / **239 tests** pass |
+| 2 | web 전수 vitest (셸 `VITE_*` 제거로 CI 환경 재현) | 128 files / **2180 tests** pass, unhandled 0 |
+| 3 | web `tsc -b --noEmit`, mobile `tsc --noEmit` | 무오류 |
+| 4 | web lint | 154 problems — baseline과 동일(신규 0). CI 상 informational |
+| 5 | web production build | `vite build` 성공 |
+| 6 | local Supabase `db reset --no-seed` 2회 | 두 번 모두 162까지 적용, 오류 없음 |
+| 7 | study integration | 5 files / **48 tests** pass |
+| 8 | smoke | owned: apply→finalize→undo→re-rate→refresh = session row 1개·log 1개·event(applied+undone) / subscribed: progress row만 이동, publisher card 불변 |
+| 9 | net-zero | stale `PT409`, malformed `22023`, 종료 세션 `55000`, 없는 event undo `P0002`, 타인 apply `42501`·finalize `42501`·undo/refresh `P0002` → **6개 학습 테이블 fingerprint 완전 동일**. fingerprint 민감도도 같은 테스트에서 증명 |
+| 10 | dry-run | queue 구성·history/analytics read 경로 전체 실행 후 fingerprint 동일 |
+| 11 | git status / schema drift | 워크트리 clean(신규 spec 외), 학습 RPC 5개 모두 DB 존재 |
+| — | Architecture Guard | 통과 + 사본 재생성 시 exit 1 확인 |

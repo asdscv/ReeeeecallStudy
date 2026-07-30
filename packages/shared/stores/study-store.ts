@@ -84,11 +84,18 @@ interface StudyState {
    *  they depend on. A finalize that commits first would drop the last rating from the
    *  server aggregate and make the late apply fail as "session already closed". */
   persistenceChain: Promise<void>
+  /** 'pending' while a server undo is in flight. Undo is only reflected locally after
+   *  the server accepts it, so the UI must block competing actions meanwhile. */
+  undoState: 'idle' | 'pending'
+  /** True once finalize_study_session has created this session's row. A second
+   *  finalize is a no-op server-side (idempotent by session id), so a session that
+   *  undo reopened must be corrected through refresh_study_session instead. */
+  sessionFinalized: boolean
 
   initSession: (config: StudyConfig) => Promise<void>
   flipCard: () => void
   rateCard: (rating: string) => Promise<void>
-  undoLastRating: () => void
+  undoLastRating: () => Promise<void>
   endSession: () => Promise<void>
   exitSession: () => Promise<void>
   crammingTimeUp: () => Promise<void>
@@ -127,6 +134,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   clientSessionId: null,
   persistenceError: null,
   persistenceChain: Promise.resolve(),
+  undoState: 'idle',
+  sessionFinalized: false,
 
   initSession: async (config: StudyConfig) => {
     // Prevent double-init (React StrictMode / effect re-runs)
@@ -162,6 +171,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         clientSessionId: null,
         persistenceError: null,
         persistenceChain: Promise.resolve(),
+        undoState: 'idle',
+        sessionFinalized: false,
       })
       return
     }
@@ -177,6 +188,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       clientSessionId: newPersistenceId(),
       persistenceError: null,
       persistenceChain: Promise.resolve(),
+      undoState: 'idle',
+      sessionFinalized: false,
     })
 
     try {
@@ -608,8 +621,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isFlipped, phase, studyState, userId, clientSessionId } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isFlipped, phase, studyState, userId, clientSessionId, undoState } = get()
     if (!config || isRating || !isFlipped || phase !== 'studying' || !userId) return
+    // A rating landing while an undo is still in flight would be applied against the
+    // pre-undo SRS revision and rejected (PT409), or worse, ordered after the undo and
+    // silently undone with it. Wait for the undo to settle.
+    if (undoState === 'pending') return
 
     const normalizedRating = normalizeRatingForMode(config.mode, rating)
     if (!normalizedRating) return
@@ -875,7 +892,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   endSession: async () => {
-    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved, clientSessionId } = get()
+    const { config, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved, clientSessionId, sessionFinalized, phase } = get()
     if (!config || !userId) return
     // Prevent duplicate session recording (race between rateCard completion and crammingTimeUp)
     if (sessionSaved) return
@@ -915,21 +932,31 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       // the server already has, and it closes the session against later applies.
       await get().persistenceChain
 
+      // An undo can settle while this finalize waits its turn in the chain, so the
+      // cursor inputs are re-read: the entry-time snapshot would push the cursor past
+      // cards the user just took back.
+      const { sessionStats: settledStats, queue: settledQueue } = get()
+      if (settledStats.cardsStudied === 0) {
+        // Everything was undone: there is nothing to record. Same phase rule as below.
+        if (phase === 'studying' || get().phase !== 'studying') set({ phase: 'completed' })
+        return
+      }
+
       let cursorBefore: Record<string, number> | null = null
       let cursorAfter: Record<string, number> | null = null
 
-      if (config.mode === 'sequential' && studyState && queue.length > 0) {
+      if (config.mode === 'sequential' && studyState && settledQueue.length > 0) {
         const typedState = studyState as DeckStudyState
         cursorBefore = { sequential_pos: typedState.sequential_pos }
         cursorAfter = {
           sequential_pos: computeSequentialPosition(
-            queue,
-            sessionStats.cardsStudied,
+            settledQueue,
+            settledStats.cardsStudied,
             typedState.sequential_pos,
             maxCardPosition,
           ),
         }
-      } else if (config.mode === 'sequential_review' && studyState && queue.length > 0) {
+      } else if (config.mode === 'sequential_review' && studyState && settledQueue.length > 0) {
         // (S-L3) Authoritative single write of the final position. Passing the
         // full queue retains a partially studied duplicate-position group.
         const typedState = studyState as DeckStudyState
@@ -938,27 +965,38 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           review_start_pos: typedState.review_start_pos,
         }
         cursorAfter = computeSequentialReviewPositions(
-          queue.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
+          settledQueue.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
           { new_start_pos: typedState.new_start_pos, review_start_pos: typedState.review_start_pos },
           maxCardPosition,
-          sessionStats.cardsStudied,
+          settledStats.cardsStudied,
         )
       }
 
-      const { error } = await supabase.rpc('finalize_study_session', {
-        p_client_session_id: clientSessionId,
-        p_deck_id: config.deckId,
-        p_study_mode: config.mode,
-        p_started_at: new Date(sessionStartedAt).toISOString(),
-        p_cursor_before: cursorBefore,
-        p_cursor_after: cursorAfter,
-        // (P5C) study_sessions is server-written only now; analytics ride along in the
-        // same transaction and are merged UNDER the server's study_persistence key.
-        p_metadata: metadata ?? null,
-      })
+      const { error } = sessionFinalized
+        // (P6) The row already exists, so finalize would return the FIRST result and
+        // leave the aggregate describing the attempt the user undid. refresh
+        // recomputes from the applied events and re-advances the cursor undo rewound.
+        ? await supabase.rpc('refresh_study_session', {
+          p_client_session_id: clientSessionId,
+          p_cursor_before: cursorBefore,
+          p_cursor_after: cursorAfter,
+          p_metadata: metadata ?? null,
+        })
+        : await supabase.rpc('finalize_study_session', {
+          p_client_session_id: clientSessionId,
+          p_deck_id: config.deckId,
+          p_study_mode: config.mode,
+          p_started_at: new Date(sessionStartedAt).toISOString(),
+          p_cursor_before: cursorBefore,
+          p_cursor_after: cursorAfter,
+          // (P5C) study_sessions is server-written only now; analytics ride along in the
+          // same transaction and are merged UNDER the server's study_persistence key.
+          p_metadata: metadata ?? null,
+        })
 
       if (error) {
-        console.error('[study-store] finalize_study_session failed:', error.message, error.code)
+        const rpcName = sessionFinalized ? 'refresh_study_session' : 'finalize_study_session'
+        console.error(`[study-store] ${rpcName} failed:`, error.message, error.code)
         set({
           persistenceError: {
             scope: 'session',
@@ -966,15 +1004,24 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             message: error.message,
           },
         })
+      } else {
+        // Only a confirmed write may switch later completions onto the refresh path:
+        // a failed finalize left no row, and finalize is safe to retry.
+        set({ sessionFinalized: true })
       }
     }
 
-    set({ phase: 'completed' })
+    // An undo from the completion screen can move the user back into the session
+    // while this finalize is in flight; forcing 'completed' here would yank them to
+    // the summary screen. A direct endSession call (exit / time-up) still completes.
+    if (phase === 'studying' || get().phase !== 'studying') set({ phase: 'completed' })
   },
 
   exitSession: async () => {
-    const { phase, isRating, sessionStats, cardStartTime } = get()
+    const { phase, isRating, sessionStats, cardStartTime, undoState } = get()
     if (phase !== 'studying' || isRating) return
+    // Ending mid-undo would finalize against stats the undo is about to take back.
+    if (undoState === 'pending') return
     if (sessionStats.cardsStudied === 0) return
 
     const currentCardDuration = Date.now() - cardStartTime
@@ -989,10 +1036,12 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   crammingTimeUp: async () => {
-    const { config, phase, isRating, sessionStats, cardStartTime } = get()
+    const { config, phase, isRating, sessionStats, cardStartTime, undoState } = get()
     if (!config || config.mode !== 'cramming') return
     // Guard: skip if already completed or a rating is in progress
     if (phase !== 'studying' || isRating) return
+    // Ending mid-undo would finalize against stats the undo is about to take back.
+    if (undoState === 'pending') return
 
     // Account for the time spent on the current (unrated) card
     const currentCardDuration = Date.now() - cardStartTime
@@ -1006,12 +1055,68 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     await get().endSession()
   },
 
-  undoLastRating: () => {
-    const { lastRatedCard, queue, phase, srsQueueManager, crammingManager } = get()
+  undoLastRating: async () => {
+    const { lastRatedCard, phase, isRating, undoState } = get()
     if (!lastRatedCard || (phase !== 'studying' && phase !== 'completed')) return
+    // A rating mid-flight owns the snapshot we would restore, and a second undo
+    // would send the same event twice while the first is still deciding.
+    if (isRating || undoState === 'pending') return
     const wasCompleted = phase === 'completed'
 
+    set({ undoState: 'pending' })
+
+    // Compensate the persisted rating BEFORE touching the UI: a local rollback the
+    // server refuses leaves the screen claiming an undo the DB never made, and the
+    // next rating of that card would then be recorded twice.
+    // undo_study_rating is idempotent and only accepts the session's latest event.
+    const undoEventId = lastRatedCard.ratingEventId
+    let restoredRevision: number | null = null
+
+    if (undoEventId) {
+      let accepted = true
+      const undoRating = async () => {
+        const { data, error } = await supabase.rpc('undo_study_rating', { p_event_id: undoEventId })
+        if (error) {
+          accepted = false
+          console.error('[study-store] undo_study_rating failed:', error.message, error.code)
+          set({
+            persistenceError: {
+              scope: 'undo',
+              code: (error as { code?: string }).code ?? null,
+              message: error.message,
+            },
+          })
+          return
+        }
+        // undo restores the previous SRS values but keeps the revision moving
+        // forward. Adopting it prevents the next rating of this card from being
+        // rejected as stale (PT409). An already-undone event returns the same
+        // payload, so a retry is a success too.
+        const revision = (data as { applied_revision?: number | null } | null)?.applied_revision
+        if (typeof revision === 'number') restoredRevision = revision
+      }
+
+      // Queued behind the apply for this event; otherwise undo can arrive first and
+      // fail with P0002 while the UI has already rolled back.
+      const queued = get().persistenceChain
+        .then(undoRating)
+        .catch(err => {
+          accepted = false
+          console.error('[study-store] persistence chain error:', err)
+        })
+      set({ persistenceChain: queued })
+      await queued
+
+      if (!accepted) {
+        // Keep the rated state: it is what the server still holds, and lastRatedCard
+        // stays so the user can retry the undo.
+        set({ undoState: 'idle' })
+        return
+      }
+    }
+
     // Restore queue manager internal state from snapshots
+    const { queue, srsQueueManager, crammingManager } = get()
     if (lastRatedCard.srsQueueSnapshot && srsQueueManager) {
       srsQueueManager.restore(lastRatedCard.srsQueueSnapshot)
     }
@@ -1019,9 +1124,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       crammingManager.restore(lastRatedCard.crammingSnapshot)
     }
 
-    // Restore the card's previous state in the queue
+    // Restore the card's previous state in the queue, carrying the revision the
+    // server moved to (the snapshot predates both the apply and the undo).
     const updatedQueue = queue.map(c =>
-      c.id === lastRatedCard.cardId ? { ...lastRatedCard.previousCard } : c
+      c.id === lastRatedCard.cardId
+        ? {
+          ...lastRatedCard.previousCard,
+          ...(restoredRevision !== null ? { srs_revision: restoredRevision } : {}),
+        }
+        : c
     )
 
     set({
@@ -1034,50 +1145,52 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       sessionStats: lastRatedCard.previousStats,
       lastRatedCard: null,
       cardStartTime: Date.now(),
-      // Undoing from the completion screen must let endSession record a fresh,
-      // corrected session — otherwise the sessionSaved guard makes re-completion a
-      // no-op and leaves a stale study_sessions row (S-L4).
+      // Undoing from the completion screen must let endSession record the corrected
+      // session — otherwise the sessionSaved guard makes re-completion a no-op and
+      // leaves the discarded attempt's study_sessions row (S-L4). The row itself is
+      // corrected through refresh_study_session, not a second finalize.
       ...(wasCompleted ? { sessionSaved: false } : {}),
     })
 
-    // Compensate the persisted rating so DB SRS/log state matches the restored UI.
-    // undo_study_rating is idempotent and only accepts the session's latest event.
-    const undoEventId = lastRatedCard.ratingEventId
-    if (undoEventId) {
-      const undoRating = async () => {
-        const { data, error } = await supabase.rpc('undo_study_rating', { p_event_id: undoEventId })
-        if (!error) {
-          // undo restores the previous SRS values but keeps the revision moving
-          // forward. Adopting it prevents the next rating of this card from being
-          // rejected as stale (PT409).
-          const restoredRevision = (data as { applied_revision?: number | null } | null)?.applied_revision
-          if (typeof restoredRevision === 'number') {
-            set({
-              queue: get().queue.map(c =>
-                c.id === lastRatedCard.cardId ? { ...c, srs_revision: restoredRevision } : c),
-            })
-          }
-        }
+    // Undoing the session's ONLY rating leaves a finalized row describing a session
+    // that no longer happened — a 0-card, 0-minute entry in history and analytics.
+    // refresh discards it; a later completion then finalizes a fresh row. undoState
+    // stays 'pending' until this settles so a new rating cannot race the delete.
+    const sessionIdToDiscard = get().clientSessionId
+    if (wasCompleted && get().sessionFinalized && sessionIdToDiscard
+        && lastRatedCard.previousStats.cardsStudied === 0) {
+      const discardSession = async () => {
+        const { data, error } = await supabase.rpc('refresh_study_session', {
+          p_client_session_id: sessionIdToDiscard,
+          p_cursor_before: null,
+          p_cursor_after: null,
+          p_metadata: null,
+        })
         if (error) {
-          console.error('[study-store] undo_study_rating failed:', error.message, error.code)
+          console.error('[study-store] refresh_study_session failed:', error.message, error.code)
           set({
             persistenceError: {
-              scope: 'undo',
+              scope: 'session',
               code: (error as { code?: string }).code ?? null,
               message: error.message,
             },
           })
+          return
+        }
+        // Only an actual delete may clear the marker: if a rating slipped in, the
+        // server refreshed instead, and the row still has to be corrected by refresh.
+        if ((data as { status?: string } | null)?.status === 'discarded') {
+          set({ sessionFinalized: false })
         }
       }
-
-      // Queued behind the apply for this event; otherwise undo can arrive first and
-      // fail with P0002 while the UI has already rolled back.
-      set({
-        persistenceChain: get().persistenceChain
-          .then(undoRating)
-          .catch(err => console.error('[study-store] persistence chain error:', err)),
-      })
+      const queued = get().persistenceChain
+        .then(discardSession)
+        .catch(err => console.error('[study-store] persistence chain error:', err))
+      set({ persistenceChain: queued })
+      await queued
     }
+
+    set({ undoState: 'idle' })
   },
 
   reset: () => {
@@ -1105,6 +1218,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       clientSessionId: null,
       persistenceError: null,
       persistenceChain: Promise.resolve(),
+      undoState: 'idle',
+      sessionFinalized: false,
     })
   },
 }))

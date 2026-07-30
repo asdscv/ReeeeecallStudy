@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { X, Undo2, Keyboard, Lock } from 'lucide-react'
-import { useStudyStore } from '../stores/study-store'
+import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useAchievementStore } from '../stores/achievement-store'
 import { supabase } from '../lib/supabase'
@@ -23,7 +23,7 @@ import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak, type TTSOptions } from '../lib/tts'
 import { loadSettings, shouldShowButtons, getDirectionsForMode, type StudyInputSettings, type SwipeDirectionMap } from '../lib/study-input-settings'
-import type { CrammingFilter } from '../lib/cramming-queue'
+import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
 import type { StudyMode, Profile } from '../types/database'
 
 export function StudySessionPage() {
@@ -46,6 +46,7 @@ export function StudySessionPage() {
     crammingManager,
     exitDirection,
     lastRatedCard,
+    undoState,
     initSession,
     flipCard,
     rateCard,
@@ -232,11 +233,12 @@ export function StudySessionPage() {
   }, [flipCard])
 
   const handleUndo = useCallback(() => {
-    if (!lastRatedCard) return
-    undoLastRating()
-    setShowUndo(false)
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
-  }, [lastRatedCard, undoLastRating])
+    if (!lastRatedCard || undoState === 'pending') return
+    // Do NOT hide the button here: the undo is only real once the server accepts it,
+    // and a rejected undo has to stay retryable. The lastRatedCard effect hides it
+    // when the undo actually lands.
+    void undoLastRating()
+  }, [lastRatedCard, undoState, undoLastRating])
 
   const handleToggleShortcuts = useCallback(() => {
     setShowShortcuts(prev => !prev)
@@ -482,7 +484,9 @@ export function StudySessionPage() {
         <div className="fixed bottom-6 left-6 z-20">
           <button
             onClick={handleUndo}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg shadow-md hover:bg-muted transition-colors cursor-pointer"
+            disabled={undoState === 'pending'}
+            aria-busy={undoState === 'pending'}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg shadow-md hover:bg-muted transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Undo2 className="w-4 h-4" />
             {t('session.undo')}

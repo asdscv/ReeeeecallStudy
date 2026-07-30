@@ -19,8 +19,8 @@ vi.mock('i18next', () => ({
   default: { t: (key: string, opts?: Record<string, unknown>) => opts?.count !== undefined ? `${key}:${opts.count}` : key },
 }))
 
-import { calculateSRS } from '../srs'
-import type { SrsCardData } from '../srs'
+import { calculateSRS } from '@reeeeecall/shared/lib/srs'
+import type { SrsCardData } from '@reeeeecall/shared/lib/srs'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
 
 const settings = { ...DEFAULT_SRS_SETTINGS }
