@@ -2,25 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
+import { capturedAuthHash } from '../../lib/auth-callback-hash'
 
-// Module-level hash capture — executes synchronously on module load,
-// before Supabase async processing can strip the URL hash via replaceState.
-// Email link click = full page load → this module is freshly loaded.
-let _capturedHash = window.location.hash
-
-/** Override captured hash — for tests only */
-export function _setCapturedHash(hash: string) {
-  _capturedHash = hash
-}
 
 export function AuthCallback() {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const navigatedRef = useRef(false)
 
-  // Derive hash error synchronously during render — _capturedHash is module-level
+  // Derive hash error synchronously during render — capturedAuthHash() is module-level
   // and never changes, so this avoids an effect-based setState (cascading render).
-  const params = _capturedHash ? new URLSearchParams(_capturedHash.substring(1)) : null
+  const params = capturedAuthHash() ? new URLSearchParams(capturedAuthHash().substring(1)) : null
   const capturedType = params?.get('type') ?? null
   const hashErrorCode = params?.get('error_code') ?? null
   const hashErrorDesc = params?.get('error_description') ?? null

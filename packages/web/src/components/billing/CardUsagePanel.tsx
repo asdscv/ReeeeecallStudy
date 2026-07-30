@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Archive, Layers, Users, ShieldCheck, Infinity as InfinityIcon } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import type { CardUsageDetail } from '@reeeeecall/shared/stores/deck-store'
-import { isUnlimitedCardLimit } from './PlanSelector'
+import { isUnlimitedCardLimit } from '../../lib/card-limit'
 
 /**
  * Detailed owned-card usage panel (get_card_usage_detail, mig 137). Renders the split

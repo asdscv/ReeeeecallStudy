@@ -10,8 +10,8 @@ import {
 import { useDeckStore } from '../../stores/deck-store'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
 import type { Deck } from '../../types/database'
-import { DeckSettingsForm, COLORS, ICONS } from './DeckSettingsForm'
-import type { DeckSettingsFormValues } from './DeckSettingsForm'
+import { DeckSettingsForm } from './DeckSettingsForm'
+import { COLORS, ICONS, type DeckSettingsFormValues } from '../../lib/deck-settings'
 
 interface DeckFormModalProps {
   open: boolean

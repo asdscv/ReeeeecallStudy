@@ -4,7 +4,7 @@ import { Trophy, Lock, ChevronDown, ChevronUp } from 'lucide-react'
 import { useAchievementStore } from '../stores/achievement-store'
 import type { Achievement } from '../stores/achievement-store'
 import { supabase } from '../lib/supabase'
-import { AchievementIcon, CategoryIcon } from '../lib/achievement-icons'
+import { AchievementIcon, CategoryIcon } from '../components/achievements/AchievementIcon'
 
 // ── Helpers ──
 
