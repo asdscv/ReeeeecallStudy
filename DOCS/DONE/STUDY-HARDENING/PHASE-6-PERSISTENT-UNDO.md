@@ -1,6 +1,43 @@
 # Study Hardening Phase 6 — Persistent Undo & Session Idempotency
 
-상태: IMPLEMENTED — review/PR pending
+상태: DONE — PR #340, 최종 CI 7 checks green
+
+## 0. 설계 편차 (구현 중 정정)
+
+설계 §4의 초기 판단 세 가지가 틀렸고, 구현 중 실 DB 검증으로 드러났다.
+
+1. **"cursor는 건드리지 않는다" → 틀렸다.** `undo_study_rating`은 reopen 시 cursor를 그 session의
+   `cursor_before`로 **되돌린다**(mig 160). refresh가 다시 전진시키지 않으면 sequential ·
+   sequential_review 세션의 진도가 조용히 사라진다. 그래서 `refresh_study_session`은
+   `p_cursor_before/p_cursor_after/p_metadata`를 받아 finalize와 같은 규칙(형태 검증 +
+   `cursor_before` 일치 아니면 `PT409`)으로 cursor를 재전진시킨다.
+2. **refresh만으로는 P6가 성립하지 않는다.** `apply_study_rating`은 session row가 존재하면
+   모든 평가를 `55000`으로 거부하므로 **undo 후 재평가 자체가 서버에서 불가능**했다
+   (통합 테스트에서 `Study session is already closed`로 드러났다). migration 162가
+   `metadata.study_persistence.status = 'reopened'`인 session에만 예외를 낸다.
+3. **모든 평가를 되돌린 세션은 row를 남기면 안 된다.** reopen된 세션을 그대로 두면
+   history/analytics에 0장·0분 세션이 찍힌다. refresh가 applied event 0건이면 row를 DELETE하고
+   `status='discarded'`를 반환한다. 클라이언트는 undo 시점에 이 경로를 호출하고
+   `sessionFinalized`를 되돌려 다음 완료가 새 row를 finalize하게 한다.
+
+추가로 구현 중 발견한 부수 결함 두 건을 같이 고쳤다(§4-3):
+`endSession`이 진입 시점 stats/queue 스냅샷으로 cursor를 계산해 되돌린 카드만큼 cursor가 더
+전진하던 문제, 그리고 진행 중 undo가 세션으로 복귀시켰는데 `endSession`이 `phase='completed'`를
+다시 씌워 완료 화면으로 튕기던 문제.
+
+## 0-1. 완료 기록
+
+- 설계 commit: `f18083a docs(study): design phase 6 persistent undo`
+- 구현 commit: `6dddf2d feat(study): make undo persistent — server first, then the UI`
+- PR: https://github.com/asdscv/ReeeeecallStudy/pull/340 (merge `44a0253`)
+- 원격 CI: 7 checks 전부 SUCCESS(재시도 없이 1회 통과)
+- 로컬 검증: store 9 tests, study-store 회귀 44 tests, integration 43 tests(신규 9 포함),
+  web `tsc -b` / `vite build` / mobile `tsc` green, fresh `supabase db reset` 2회,
+  rollback 스크립트 실행 → 162 재적용까지 실제 확인
+- 독립 review: 서브에이전트 감사 APPROVED (Deep Dive / Double-Check / Lockdown 3단계,
+  blocker·major 없음). 지적된 minor 1건은 P6 범위 밖의 기존 dual-store 차이
+  (`shared` store에 `isPaused` 가드 없음 — mobile에 pause 기능이 없어 해당 없음).
+
 
 기준선: `origin/develop@51a4259` (P5A/P5B/P5C merged)
 
@@ -163,8 +200,8 @@ integration `tests/integration/study-session-refresh.spec.ts` (신규, real DB, 
 - [x] store 9 tests Green, integration 43 tests Green(신규 9 포함), study-store 회귀 44 Green
 - [x] web `tsc -b` Green, 변경 파일 eslint Green, `vite build` Green, mobile `tsc` Green
 - [x] fresh reset 2회 + rollback/재적용 검증
-- [ ] 독립 review(throttle 시 자체 3단계 감사로 대체하고 기록)
-- [ ] PR 최종 CI 7 checks green, develop merge, 문서 DONE 이동, worktree 정리
+- [x] 독립 review — 서브에이전트 3단계 감사 APPROVED (§0-1)
+- [x] PR 최종 CI 7 checks green, develop merge, 문서 DONE 이동, worktree 정리
 - [x] 프로덕션 배포·migration 실행 없음
 
 ### 남은 사전 결함(P6 범위 밖, 기록만)

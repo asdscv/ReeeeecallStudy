@@ -342,9 +342,10 @@ Master 문서의 모든 checkbox와 PR/commit/test evidence를 채운 뒤
 - [x] P2 cramming true rounds — PR #333, local 17 files / 270 study tests, 7 CI checks green
 - [x] P3 SRS due queue — PR #334, local 17 files / 230 study tests, independent review approved, 7 CI checks green
 - [x] P4 sequential safety — PR #335, local 18 files / 242 study tests, independent review approved, 7 CI checks green
-- [ ] P5A persistence expand
-- [ ] P5B rating cutover
-- [ ] P5C persistence contract
-- [ ] P6 persistent undo/session idempotency
+- [x] P5A persistence expand — PR #336, migration 160 atomic rating RPCs
+- [x] P5B rating cutover — PR #338, 클라이언트가 RPC로만 write
+- [x] P5C persistence contract — PR #339, 직접 write 경로 차단(migration 161)
+- [x] P6 persistent undo/session idempotency — PR #340, migration 162(refresh + reopened apply),
+      store 9 / integration 43 tests, 독립 감사 APPROVED, 7 CI checks green
 - [ ] P7 shared single source
 - [ ] P8 lockdown + master doc DONE
