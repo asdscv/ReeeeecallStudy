@@ -87,8 +87,8 @@ export function MarketplacePage() {
                   <div className="flex items-center gap-1 mb-2">
                     <span className="text-xs text-muted-foreground truncate">{listing.owner_display_name}</span>
                     <OfficialBadge
-                      badgeType={(listing as any).badge_type || 'verified'}
-                      badgeColor={(listing as any).badge_color}
+                      badgeType={listing.badge_type || 'verified'}
+                      badgeColor={listing.badge_color}
                       size="sm"
                     />
                   </div>

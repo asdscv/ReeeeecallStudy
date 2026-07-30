@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import type { SrsSettings, CardTemplate } from '../../types/database'
 import { LEARNING_LANGUAGES, NATIVE_LANGUAGES, STUDY_LEVELS } from '../../lib/marketplace'
 import { COLORS, ICONS, SRS_FIELDS, type DeckSettingsFormValues } from '../../lib/deck-settings'
+import { numericInputOr, parseNumericInput } from '../../lib/numeric-input'
 
 interface DeckSettingsFormProps {
   values: DeckSettingsFormValues
@@ -248,7 +249,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           value={srsSettings.max_interval_days ?? 365}
           onChange={(e) => {
             const raw = e.target.value
-            update({ srsSettings: { ...srsSettings, max_interval_days: raw === '' ? ('' as any) : (parseInt(raw) || 0) } })
+            update({ srsSettings: { ...srsSettings, max_interval_days: numericInputOr(parseNumericInput(raw), 0) } })
           }}
           onBlur={() => {
             const n = typeof srsSettings.max_interval_days === 'number' ? srsSettings.max_interval_days : 365

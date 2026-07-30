@@ -8,6 +8,7 @@ import { useDeckStore } from '../../../stores/deck-store'
 import { CardLimitBlock } from '../../card/CardLimitBlock'
 import type { GenerateMode } from '../../../lib/ai/types'
 import type { Deck } from '../../../types/database'
+import { numericInputOr, parseNumericInput, type NumericInputValue } from '../../../lib/numeric-input'
 
 // ─── Exported types ────────────────────────────────────────
 
@@ -85,7 +86,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   // so a default generation never overshoots the free daily allowance (10/day). Starts at
   // the free daily cap (10) until the server-authoritative remaining loads.
   const [topic, setTopic] = useState(initialTopic || '')
-  const [cardCount, setCardCount] = useState(10)
+  const [cardCount, setCardCount] = useState<NumericInputValue>(10)
   // State, not a ref: the auto-default below is decided during render, and a ref read
   // there is both a lint violation and a stale-value risk.
   const [countTouched, setCountTouched] = useState(false)   // user edited the count → stop auto-defaulting
@@ -237,14 +238,19 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       if (!isFullMode && !selectedDeckId) return
     }
 
+    // An empty count box is not a generation request. It used to be typed away with
+    // `'' as any` and reached the server as an empty string.
+    const requestedCards = numericInputOr(cardCount, 0)
+    if (!useImage && requestedCards < 1) return
+
     // Owned-card limit pre-flight (mig 116): don't spend AI cost/quota generating
     // cards that can't be saved. In image mode the count is model-decided, so only
     // block when there's NO room at all. Server still enforces at save.
-    if (useImage ? limit.reached : limit.exceeds(cardCount)) return
+    if (useImage ? limit.reached : limit.exceeds(requestedCards)) return
 
     onStart({
       topic,
-      cardCount,
+      cardCount: requestedCards,
       useCustomHtml,
       contentLang,
       fieldMode,
@@ -479,7 +485,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             onChange={(e) => {
               setCountTouched(true)   // user set it manually → stop auto-defaulting to remaining-free
               const raw = e.target.value
-              setCardCount(raw === '' ? ('' as any) : (parseInt(raw) || 0))
+              setCardCount(parseNumericInput(raw))
             }}
             onBlur={() => {
               const n = typeof cardCount === 'number' ? cardCount : parseInt(String(cardCount)) || 1
@@ -617,7 +623,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       {limit.reached ? (
         <CardLimitBlock />
-      ) : !useImage && limit.exceeds(cardCount) ? (
+      ) : !useImage && limit.exceeds(numericInputOr(cardCount, 0)) ? (
         <p className="text-xs text-center text-destructive">
           {t('config.cardLimitExceeds', { available: limit.available })}
         </p>
@@ -625,7 +631,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       <button
         type="submit"
-        disabled={!canSubmit || (useImage ? limit.reached : limit.exceeds(cardCount))}
+        disabled={!canSubmit || (useImage ? limit.reached : limit.exceeds(numericInputOr(cardCount, 0)))}
         className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}
