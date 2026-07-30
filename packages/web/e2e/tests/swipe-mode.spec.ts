@@ -1,4 +1,7 @@
 import { test, expect } from '../fixtures/test-helpers'
+import type { Page } from '@playwright/test'
+import type { QuickStudyPage } from '../pages/quick-study.page'
+import type { StudySessionPage } from '../pages/study-session.page'
 
 test.describe('Swipe Mode — Card Gestures', () => {
 
@@ -7,9 +10,9 @@ test.describe('Swipe Mode — Card Gestures', () => {
    * Returns false if no cards are available (test should skip).
    */
   async function setupSwipeSession(
-    quickStudyPage: Awaited<ReturnType<typeof import('../fixtures/test-helpers')['test']['step']>> extends never ? never : any,
-    studySessionPage: any,
-    page: any,
+    quickStudyPage: QuickStudyPage,
+    studySessionPage: StudySessionPage,
+    page: Page,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
     await page.waitForTimeout(1000)
@@ -199,9 +202,9 @@ test.describe('Swipe Mode — Card Gestures', () => {
 test.describe('Swipe Mode — Overlay Visibility', () => {
 
   async function setupSwipeSession(
-    quickStudyPage: any,
-    studySessionPage: any,
-    page: any,
+    quickStudyPage: QuickStudyPage,
+    studySessionPage: StudySessionPage,
+    page: Page,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
     await page.waitForTimeout(1000)

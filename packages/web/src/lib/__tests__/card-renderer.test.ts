@@ -2,6 +2,15 @@ import { describe, it, expect } from 'vitest'
 import { renderCardFace } from '../card-renderer'
 import type { CardTemplate, Card, TemplateField } from '../../types/database'
 
+/**
+ * A template row as it exists BEFORE the layout_mode migration (column absent or
+ * null, or carrying a value the enum no longer knows). renderCardFace must fall back
+ * to the default layout for all three, so the tests need to express them.
+ */
+type PreMigrationTemplate = Omit<CardTemplate, 'layout_mode'> & {
+  layout_mode?: string | null
+}
+
 // ── Helpers ──────────────────────────────────────────
 
 function makeTemplate(overrides?: Partial<CardTemplate>): CardTemplate {
@@ -69,7 +78,7 @@ describe('renderCardFace — default mode', () => {
   it('should return mode "default" when layout_mode is undefined', () => {
     // Simulates old templates before migration (layout_mode missing from DB)
     const template = makeTemplate()
-    ;(template as any).layout_mode = undefined
+    ;(template as PreMigrationTemplate).layout_mode = undefined
     const card = makeCard()
     const result = renderCardFace(template, card, 'front')
     expect(result.mode).toBe('default')
@@ -192,7 +201,7 @@ describe('renderCardFace — custom mode', () => {
 describe('renderCardFace — resolveTemplateLayoutMode edge cases', () => {
   it('should treat null layout_mode as default', () => {
     const template = makeTemplate()
-    ;(template as any).layout_mode = null
+    ;(template as PreMigrationTemplate).layout_mode = null
     const card = makeCard()
     const result = renderCardFace(template, card, 'front')
     expect(result.mode).toBe('default')
@@ -200,7 +209,7 @@ describe('renderCardFace — resolveTemplateLayoutMode edge cases', () => {
 
   it('should treat any non-"custom" string as default', () => {
     const template = makeTemplate()
-    ;(template as any).layout_mode = 'something_else'
+    ;(template as PreMigrationTemplate).layout_mode = 'something_else'
     const card = makeCard()
     const result = renderCardFace(template, card, 'front')
     expect(result.mode).toBe('default')
