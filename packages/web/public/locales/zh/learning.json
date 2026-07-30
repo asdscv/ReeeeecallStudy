@@ -1,0 +1,98 @@
+{
+  "today": {
+    "title": "今日计划",
+    "manageGoals": "管理目标",
+    "selectGoal": "选择目标",
+    "budget": "每天 {{count, number}} 分钟",
+    "progress": "{{total, number}} 个中完成 {{done, number}} 个",
+    "generate": "生成今日计划",
+    "generating": "生成中…",
+    "regenerate": "重新生成计划",
+    "regenerating": "重新生成中…",
+    "completedNote": "此计划已完成，今天无法重新生成。",
+    "empty": {
+      "noGoal": "您还没有进行中的学习目标。目标用于设定每日学习时间和计划所用的牌组。",
+      "createGoal": "创建目标",
+      "noDecks": "此目标没有关联的牌组，无法生成计划。",
+      "attachDecks": "关联牌组",
+      "nothingDue": "今天这些牌组中没有需要复习的内容。"
+    },
+    "item": {
+      "study": "学习",
+      "untitled": "（无内容）",
+      "minutes": "约 {{count, number}} 分钟"
+    },
+    "reason": {
+      "due": "到期复习",
+      "recentFailure": "最近答错",
+      "slowResponse": "回答较慢",
+      "goalRelevance": "目标相关度",
+      "importance": "重要程度",
+      "balanced": "均衡搭配"
+    },
+    "error": {
+      "limitExceeded": "今天的计划重建次数已用完，请明天再试。",
+      "completedPlan": "已完成的计划无法覆盖。",
+      "goalGone": "该目标已不可用。",
+      "invalidInput": "部分数值超出范围，计划未能保存。",
+      "authRequired": "请重新登录。",
+      "forbidden": "您没有访问权限。",
+      "unknown": "计划生成失败，请重试。"
+    }
+  },
+  "goals": {
+    "title": "学习目标",
+    "subtitle": "目标包含每日学习时间和计划所用的牌组。",
+    "todayLink": "今日计划",
+    "create": "新建目标",
+    "edit": "编辑",
+    "archive": "归档",
+    "dailyMinutes": "每天 {{count, number}} 分钟",
+    "deckCount": "{{count, number}} 个牌组",
+    "targetDate": "目标日期 {{date}}",
+    "noDecksWarning": "未关联牌组，暂时无法生成计划。",
+    "archiveConfirmTitle": "归档此目标？",
+    "archiveConfirmMessage": "\"{{title}}\" 将不再纳入计划，且无法再编辑。",
+    "status": {
+      "paused": "已暂停",
+      "completed": "已完成",
+      "archived": "已归档"
+    },
+    "empty": {
+      "title": "暂无目标",
+      "body": "创建目标后即可获取每日计划。"
+    },
+    "error": {
+      "limitExceeded": "已达到目标数量上限。",
+      "notFound": "该目标不存在或已归档。",
+      "invalidInput": "请检查目标名称和每日学习时间。",
+      "conflict": "该目标的当前状态不允许此操作。",
+      "authRequired": "请重新登录。",
+      "forbidden": "您没有访问权限。",
+      "unknown": "出了点问题，请重试。"
+    }
+  },
+  "form": {
+    "createTitle": "新建目标",
+    "editTitle": "编辑目标",
+    "domain": "学科",
+    "domainName": {
+      "language": "语言学习",
+      "labor-law": "劳动法"
+    },
+    "goalTitle": "目标名称",
+    "goalTitlePlaceholder": "例如：通过 JLPT N2",
+    "dailyMinutes": "每日学习时间（分钟）",
+    "targetDate": "目标日期（可选）",
+    "decks": "学习牌组",
+    "decksHint": "计划将根据所选牌组中的卡片生成。",
+    "noDecks": "您还没有牌组。",
+    "cancel": "取消",
+    "save": "保存",
+    "saving": "保存中…",
+    "error": {
+      "title": "请输入 1–500 个字符的目标名称。",
+      "dailyMinutes": "每日学习时间须在 1–1440 分钟之间。"
+    }
+  }
+}

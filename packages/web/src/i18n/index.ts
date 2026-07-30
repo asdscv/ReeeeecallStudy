@@ -32,6 +32,7 @@ i18n
       'ai-generate',
       'wallet',
       'billing',
+      'learning',
     ],
     defaultNS: 'common',
 

@@ -334,6 +334,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_engine_test.sql
 
+      - name: Run learning goal-link assertions (mig 172 — deck/concept entitlement, replace-all atomicity)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_goal_links_test.sql
+
       - name: Run AI remediation assertions (mig 168 — job classification, access, service-only persistence)
         env:
           PGPASSWORD: postgres
