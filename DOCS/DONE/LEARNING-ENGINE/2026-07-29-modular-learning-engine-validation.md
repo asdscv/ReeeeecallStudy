@@ -1,5 +1,6 @@
 # Modular Learning Engine — Implementation Validation and Audit
 
+**Status:** Merged as `ac74b45` via PR #337, all seven CI checks green.  
 **Date:** 2026-07-29, revalidated 2026-07-30 after merging `origin/develop`  
 **Branch/worktree:** `feat/modular-learning-engine-foundation` in `modular-learning-engine`  
 **Base:** cut from `af38ad8`; merged up to `origin/develop` `97a5399`  
@@ -7,7 +8,7 @@
 
 Atomic study recording is **out of scope**: it converged on develop's `apply_study_rating` contract (migrations 160/161/162) and this branch's competing migration 166 was dropped on merge. See design §8.1.
 
-No commit to a protected branch, no push, no deployment, no remote migration, and no remote data operation was performed. All database evidence below is from the local Supabase instance.
+No deployment, no remote migration, and no remote data operation was performed. All database evidence below is from the local Supabase instance; production migration is a separate authorized step.
 
 ## 1. Zero-Defect Audit
 

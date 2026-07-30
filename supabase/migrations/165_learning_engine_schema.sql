@@ -5,7 +5,7 @@
 --         learning_goal_decks, learning_goal_concepts, answer_attempts,
 --         daily_plans, daily_plan_items, study_recommendations, user_enrichments
 --
--- Design: DOCS/TODO/2026-07-29-modular-learning-engine-design.md §7, §21
+-- Design: DOCS/DONE/LEARNING-ENGINE/2026-07-29-modular-learning-engine-design.md §7, §21
 -- Architecture: DOCS/STANDARD/ARCHITECTURE.md §2
 --
 -- Principles:
