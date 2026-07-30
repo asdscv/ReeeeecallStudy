@@ -316,6 +316,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/credit_refund_guard_test.sql
 
+      - name: Run credit clawback REVERSAL assertions (mig 173 — REFUND_REVERSED restores exactly, tombstone stops blocking)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/credit_clawback_reversal_test.sql
+
       - name: Run sandbox isolation assertions (mig 159 — kill switch + sandbox never counts as money)
         env:
           PGPASSWORD: postgres
