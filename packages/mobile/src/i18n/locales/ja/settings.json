@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "カード生成用のAIプロバイダーを設定します。キーはサーバーで暗号化され、デバイス間で同期されます。",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "APIキーはサーバーで暗号化（pgcrypto + Vault、平文保存なし）され、Web・モバイル間で同期されます。",
-    "configured": "設定済み",
-    "notSet": "未設定",
-    "model": "モデル",
-    "saving": "保存中...",
-    "delete": "削除",
-    "deletedTitle": "削除しました",
-    "saveSuccess": "{{provider}} APIキーを保存しました。",
-    "saveError": "APIキーの保存に失敗しました。",
-    "removed": "{{provider}} APIキーを削除しました。"
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",

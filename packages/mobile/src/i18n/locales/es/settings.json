@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "Configura proveedores de IA para generar tarjetas. Las claves se cifran en el servidor y se sincronizan entre dispositivos.",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "Las claves API se cifran en el servidor (pgcrypto + Vault, nunca en texto plano) y se sincronizan entre web y móvil.",
-    "configured": "Configurado",
-    "notSet": "Sin configurar",
-    "model": "Modelo",
-    "saving": "Guardando...",
-    "delete": "Eliminar",
-    "deletedTitle": "Eliminado",
-    "saveSuccess": "Clave API de {{provider}} guardada.",
-    "saveError": "No se pudo guardar la clave API.",
-    "removed": "Clave API de {{provider}} eliminada."
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",

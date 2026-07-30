@@ -218,23 +218,7 @@
             "/images/guide/ai-generate/mobile-01-page.png"
           ],
           "title": "Apa itu Buat Otomatis dengan AI?",
-          "body": "Buat kartu otomatis dengan AI. Masukkan topik dan AI menghasilkan semuanya untuk Anda.\n\nPenyedia yang didukung: Google Gemini (gratis!), OpenAI, xAI/Grok, Anthropic.\n\nKunci API Anda hanya disimpan di perangkat Anda — tidak pernah dikirim ke server kami."
-        },
-        "apiKey": {
-          "images": [
-            "/images/guide/ai-generate/mobile-02-config.png"
-          ],
-          "title": "Menyiapkan Kunci API",
-          "body": "Dapatkan kunci API dari penyedia pilihan Anda:\n• Google Gemini (GRATIS): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nMasukkan kunci di pengaturan Buat dengan AI. Kunci disimpan secara lokal di perangkat Anda.\n\n💡 Kami merekomendasikan Google Gemini 2.5 Flash — sepenuhnya gratis!"
-        },
-        "geminiSetup": {
-          "images": [
-            "/images/guide/gemini-api/02-get-api-key.png",
-            "/images/guide/gemini-api/03-create-api-key.png",
-            "/images/guide/gemini-api/05-api-key-created.png"
-          ],
-          "title": "🎯 Kunci API Gemini Gratis (Direkomendasikan)",
-          "body": "Gemini 2.5 Flash 100% GRATIS — tanpa kartu kredit!\n\nBatas gratis: 15 permintaan/menit, 1.500 permintaan/hari, 1 juta token/menit\n\nCara mendapatkan kunci:\n1. Buka aistudio.google.com\n2. Masuk dengan akun Google\n3. Klik \"Get API Key\" di bilah sisi\n4. Klik \"Create API Key\"\n5. Pilih \"Create API key in new project\"\n6. Salin kunci (diawali \"AIza...\")\n\nCara memakai di ReeeeecallStudy:\n1. Buka halaman Buat dengan AI\n2. Pilih penyedia \"Google Gemini\"\n3. Tempel kunci API Anda\n4. Pilih model \"Gemini 2.5 Flash\"\n5. Masukkan topik dan buat!\n\nMengapa Gemini Flash?\n• 💰 Gratis — tanpa pengaturan tagihan\n• ⚡ Cepat — 50 kartu dalam hitungan detik\n• 🎯 Akurat — bagus untuk edukasi\n• 🌍 Mendukung semua bahasa\n• 📚 1.500 permintaan harian — ribuan kartu"
+          "body": "Buat kartu secara otomatis dengan AI. Masukkan topik dan AI akan membuat semuanya untuk Anda.\n\nTidak perlu kunci API atau pengaturan apa pun — proses berjalan di server kami.\n\nAnda mendapat kartu AI gratis setiap hari. Selebihnya akan dipotong dari saldo kredit Anda."
         },
         "fullGeneration": {
           "images": [

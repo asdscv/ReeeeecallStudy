@@ -924,10 +924,6 @@ const styles = StyleSheet.create({
   modeRow: { flexDirection: 'row', gap: 10 },
   modeCard: { flex: 1, borderRadius: 12, borderWidth: 1.5, paddingVertical: 14, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center' },
   dropZone: { borderRadius: 14, borderWidth: 2, borderStyle: 'dashed', paddingVertical: 28, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
-  // AI Provider
-  providerCard: { borderRadius: 12, padding: 16, alignItems: 'center', gap: 10 },
-  providerOption: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1 } as const,
-  settingsLink: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1 },
   // Dropdown
   dropdown: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5 },
   section: { gap: 8 },

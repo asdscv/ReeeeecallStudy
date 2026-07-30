@@ -13,12 +13,6 @@
     "full": "Full (Template + Deck + Cards)",
     "cardsOnly": "Add Cards to Existing Deck"
   },
-  "provider": {
-    "section": "AI PROVIDER",
-    "notice": "AI generation uses your own API key for each provider. Add or manage keys in Settings.",
-    "none": "No AI providers configured",
-    "addInSettings": "Add in Settings"
-  },
   "content": {
     "section": "CONTENT SETTINGS",
     "topicLabel": "Topic",
@@ -81,7 +75,6 @@
   "alert": {
     "errorTitle": "Error",
     "enterTopic": "Please enter a topic",
-    "configureProvider": "Please configure an AI provider in Settings first.",
     "saveFailed": "Failed to save generated cards",
     "imageRequired": "Please select an image first.",
     "selectImageError": "That image is too large or couldn't be read. Try a smaller photo.",

@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "Atur penyedia AI untuk membuat kartu. Kunci dienkripsi di server dan disinkronkan antar perangkat.",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "Kunci API dienkripsi di server (pgcrypto + Vault, tidak pernah teks biasa) dan disinkronkan antara web dan seluler.",
-    "configured": "Terkonfigurasi",
-    "notSet": "Belum diatur",
-    "model": "Model",
-    "saving": "Menyimpan...",
-    "delete": "Hapus",
-    "deletedTitle": "Terhapus",
-    "saveSuccess": "Kunci API {{provider}} tersimpan.",
-    "saveError": "Gagal menyimpan kunci API.",
-    "removed": "Kunci API {{provider}} dihapus."
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
