@@ -121,7 +121,7 @@ export function ForgotPasswordScreen() {
               testID="forgot-password-back"
             >
               <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
-                {'← '}{t('backToLogin', { ns: 'common', defaultValue: 'Back to Login' })}
+                {'← '}{t('backToLogin')}
               </Text>
             </TouchableOpacity>
           </View>

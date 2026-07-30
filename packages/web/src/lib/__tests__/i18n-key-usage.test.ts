@@ -102,14 +102,19 @@ function scan(srcDir: string, localeDirs: string[], defaultNs: string): ScanResu
     for (const [a, set] of Object.entries(aliasSets)) aliasNs[a] = set.size === 1 ? [...set][0] : null
     const aliasGroup = Object.keys(aliasNs).map((a) => a.replace(/\$/g, '\\$')).join('|')
 
-    // ALIAS('key' ...) — the alias resolves the namespace; 'ns:key' overrides.
+    // ALIAS('key' ...) — the alias resolves the namespace; 'ns:key' and an inline
+    // `{ ns: 'x' }` option override it. Ignoring that option made the scanner
+    // attribute `t('shares.title', { ns: 'settings' })` to the hook's namespace and
+    // report a key that resolves perfectly well at runtime.
     if (aliasGroup) {
-      for (const m of text.matchAll(new RegExp(`\\b(${aliasGroup})\\(\\s*(['"])([^'"$\\n]+?)\\2`, 'g'))) {
+      for (const m of text.matchAll(new RegExp(`\\b(${aliasGroup})\\(\\s*(['"])([^'"$\\n]+?)\\2([^)]*)`, 'g'))) {
         const raw = m[3]
         // Skip dynamic/concat artifacts: `t('categories.' + value)` captures the
         // literal prefix "categories." which is not a real key.
         if (!raw || raw.includes('${') || raw.endsWith('.')) continue
+        const inlineNs = m[4]?.match(/\bns\s*:\s*['"]([^'"]+)['"]/)?.[1]
         if (raw.includes(':')) { const [ns, ...rest] = raw.split(':'); check(ns, rest.join(':')) }
+        else if (inlineNs) { check(inlineNs, raw) }
         else { const ns = aliasNs[m[1]]; if (ns) check(ns, raw) } // null = ambiguous alias → skip bare key
       }
     }
