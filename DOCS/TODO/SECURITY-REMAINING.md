@@ -6,6 +6,10 @@
 > **완료 기록**: [`DOCS/DONE/2026-06-26-security-remediation.md`](../DONE/2026-06-26-security-remediation.md)
 > **prod ref**: `ixdapelfikaneexnskfm` (Management API SQL; 자격증명은 메모리 `reference_credentials`)
 
+> **2026-07-30 확인**: 코드 작업 잔여 **0**. 남은 H1c·L6·Auth M3/M4/M5 는 전부
+> **프로덕션 액션 또는 제품 결정 게이트**다(구 RPC DROP 은 모바일 OTA 채택률,
+> `uri_allow_list` 는 로컬 개발 편의, Auth 하드닝은 가입/로그인 UX 변경).
+> 자율 진행 대상이 아니므로 소유자 결정까지 TODO 에 남긴다.
 ---
 
 ## 완료 (이 라운드, 2026-06-26)
