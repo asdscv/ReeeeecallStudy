@@ -1,9 +1,9 @@
 # Modular General-Purpose Learning Engine
 
-- **Status:** Proposed for implementation
-- **Date:** 2026-07-29
+- **Status:** Implemented; migrations 165/167/168/169 applied locally only
+- **Date:** 2026-07-29 (revised 2026-07-30 after merging `origin/develop`)
 - **Branch:** `feat/modular-learning-engine-foundation`
-- **Base:** `origin/develop` at `af38ad8`
+- **Base:** cut from `origin/develop` at `af38ad8`; merged up to `97a5399`
 - **Architecture standard:** [`DOCS/STANDARD/ARCHITECTURE.md`](../STANDARD/ARCHITECTURE.md)
 
 ## 1. Decision summary
@@ -27,7 +27,7 @@ The first implementation is additive:
 1. Preserve `cards`, `user_card_progress`, `study_logs`, existing queues, official decks, marketplace acquisition, and all existing `StudyMode` behavior.
 2. Add generic goals, concepts, activities, attempts, daily plans, recommendations, sources, and user-specific enrichments.
 3. Introduce a framework-independent shared domain with ports, registries, deterministic planning, and evaluators.
-4. Replace the current split SRS-progress/log write with an atomic `rate_card_and_log` RPC in both web and shared/mobile study stores.
+4. Rely on a single atomic SRS-progress/log write. This started as a new `rate_card_and_log` RPC here; it converged on `origin/develop`'s `apply_study_rating` contract instead (§8.1). This workstream adds no rating RPC and no store rating changes.
 5. Extend the existing structured server-side AI endpoint with verified, ownership-checked remediation requests rather than a raw-prompt proxy.
 6. Ship without a new end-user UI. The new API remains a dark-launched foundation until a later UI workstream consumes it. No new `system_flags` column is needed for dormant code/data.
 7. Leave explicit media and evaluator extension points for future listening and speaking, but do not implement capture, STT, pronunciation scoring, or audio exercises now.
@@ -36,7 +36,7 @@ The first implementation is additive:
 
 The existing system has mature card authoring, SRS, official decks, marketplace distribution, study history, and metered AI generation. It does not yet model goals, concepts, non-card activities, structured answer attempts, evaluator results, or personalized plans. `PersonalAnalyticsPage` currently redirects to `/history`, and its dormant calculations are deck-level heuristics rather than a personalization product.
 
-The immediate reliability gap is more fundamental: in both `packages/shared/stores/study-store.ts` and `packages/web/src/stores/study-store.ts`, an SRS progress update and `insert_study_log` are separate fire-and-forget writes collected by `Promise.all`. Either write can succeed alone. Reliable planning and adaptation cannot be built on review history that can diverge from SRS state.
+The immediate reliability gap that motivated this design was more fundamental: both study stores issued an SRS progress update and `insert_study_log` as separate fire-and-forget writes collected by `Promise.all`, so either write could succeed alone. Reliable planning and adaptation cannot be built on review history that can diverge from SRS state. That gap is now **closed upstream** by develop's `apply_study_rating` contract (§8.1); this document keeps the requirement as an invariant rather than as work to do.
 
 The engine therefore starts with reliable atomic recording, deterministic planning, and explicit contracts. AI augments those contracts; it does not own the plan or become a prerequisite for studying.
 
@@ -151,9 +151,16 @@ concept = deck:<deck_id> until curated metadata exists
 
 This fallback permits planning over current decks without a full backfill. Curated domain metadata can later replace the fallback one card or official content release at a time.
 
-### 5.3 Existing store duplication
+### 5.3 Existing store duplication — resolved upstream
 
-Mobile imports `@reeeeecall/shared/stores/study-store`; web has an exceptional duplicate at `packages/web/src/stores/study-store.ts`. This workstream changes the atomic rating call in both copies and adds a parity test/guard. Store unification is a separate refactor because changing the web import boundary while changing persistence semantics would multiply regression risk.
+This section originally recorded web's exceptional duplicate at
+`packages/web/src/stores/study-store.ts` alongside the shared store mobile imports, and
+deferred unification as too risky to combine with a persistence change.
+
+`origin/develop` has since unified them (phase 7, PR #343): the web duplicate and web's
+duplicate `srs`/`study-queue`/`cramming-queue`/`study-session-utils` libs are deleted, and
+web imports the shared implementation. There is one study engine now, so this workstream
+needs no dual-store parity guard and no per-copy rating change.
 
 ## 6. Module architecture
 
@@ -235,14 +242,19 @@ interface LearningDomainAdapter {
 
 The core planner owns universal mechanics; adapters supply weights, constraints, and content policy.
 
-## 7. Data model (expand migrations 165–168)
+## 7. Data model (expand migrations 165, 167–168)
 
-The expand work is split so schema, atomic legacy recording, learning RPCs, and AI metering can be reviewed and tested independently:
+The expand work is split so schema, learning RPCs, and AI metering can be reviewed and tested independently:
 
 - `165_learning_engine_schema.sql` — tables, indexes, RLS, read policies, direct-write revokes.
-- `166_atomic_study_recording.sql` — `rate_card_and_log`, idempotency support, legacy RPC grant hardening.
 - `167_learning_engine_rpcs.sql` — goal, plan, attempt, and enrichment-status write RPCs.
 - `168_ai_remediation_metering.sql` — remediation reservation/job classification and service-only enrichment persistence.
+
+Atomic legacy rating is **not** part of this workstream's migrations. `origin/develop`
+landed it first as `160_study_rating_rpc_expand.sql` + `161_study_write_contract.sql`
+(`apply_study_rating`, `study_rating_events`, `undo_study_rating`,
+`finalize_study_session`, `reset_card_srs`). This branch's competing
+`166_atomic_study_recording.sql` was dropped on merge; see §8.1.
 
 No existing applied migration is edited. All new tables use UUID primary keys, timestamps, indexes for user/date and concept queries, RLS, and no client write policies.
 
@@ -379,33 +391,39 @@ No RPC writes enrichment into `cards`, official manifests, or shared activities 
 
 ## 8. Database RPC contracts
 
-### 8.1 Atomic legacy rating: `rate_card_and_log`
+### 8.1 Atomic legacy rating: converged on `apply_study_rating` (develop)
 
-Purpose: atomically persist an SRS state transition and its study log.
+**Status: superseded. This workstream ships no rating RPC.**
 
-Inputs include:
+The original plan here was a new `rate_card_and_log` RPC in migration 166. While this
+branch was in flight, `origin/develop` completed the same goal through its own
+expand → cutover → contract sequence (PRs #336, #338, #339) and now owns the single
+atomic rating path:
 
-- card/deck id, study mode, rating
-- previous SRS snapshot (`status`, interval, ease, repetitions)
-- new SRS snapshot for SRS mode
-- duration and optional `client_rating_id` for idempotency
+- `apply_study_rating` — writes SRS state, appends a `study_rating_events` ledger row,
+  and inserts the study log in one transaction;
+- `study_rating_events` — append-only event ledger keyed by client event id;
+- `undo_study_rating` — persistent, revision-checked undo of the latest event;
+- `finalize_study_session` — server-derived session finalization and cursor advance;
+- `reset_card_srs` — forward-moving revision reset for owned cards and subscriber rows;
+- migration 161 revokes the direct client write paths at column level.
 
-Transaction:
+Keeping both would have meant two writes per rating and, worse, an authenticated
+`SECURITY DEFINER` function writing SRS state *outside* the rating-event ledger and
+revision checks that migration 161 exists to enforce. Migration 166, its rollback, and
+`packages/shared/lib/atomic-rating.ts` were therefore dropped on merge, and both study
+stores use develop's path verbatim.
 
-1. Require authenticated caller and validate mode/rating against current study-log constraints.
-2. Lock card row.
-3. Verify card belongs to deck.
-4. Verify either caller owns the deck/card, or caller has an active `subscribe` share and `is_subscribed_deck_active(deck_id)` is true.
-5. Choose progress source by deck/card ownership, matching `getSrsSource`: owned updates `cards`; non-owned upserts caller's `user_card_progress`.
-6. Lock/read current authoritative progress and compare the supplied previous snapshot. Reject stale transitions with a conflict code rather than overwriting newer progress.
-7. Validate new SRS bounds/status and update progress only for SRS mode.
-8. Insert `study_logs` using the authoritative previous state and supplied new state.
-9. Return the stored state/log id/source.
-10. Commit together or roll back together.
+What this workstream still relies on from that contract is unchanged and remains an
+invariant (§4.3 item 7): a legacy SRS rating updates progress and records its log in
+one transaction, stale transitions are rejected instead of overwriting newer progress,
+and a replayed client event id returns the prior result without a second log. The
+learning-engine SQL regression test asserts those properties against
+`apply_study_rating` so the learning schema is proven to coexist with the contract
+rather than restating a removed function.
 
-For non-SRS modes, no SRS state changes; the log insert remains atomic by itself. Duplicate `client_rating_id` returns the prior result without a second log.
-
-The old `insert_study_log` function remains temporarily for compatibility but receives explicit revoke/grant hardening. Once both supported clients use `rate_card_and_log`, later contract cleanup can remove it in a separate migration.
+`insert_study_log` is not merely revoke-hardened here — develop's migration 161 removed
+it outright. Nothing in this workstream re-adds it.
 
 ### 8.2 Goal RPCs
 
@@ -758,7 +776,8 @@ No new external telemetry provider is required. Logging must redact response and
 
 1. Add migration 165 tables/RPCs and security tests. No existing table is removed.
 2. Add shared core and tests; no UI calls it yet.
-3. Move both study stores to `rate_card_and_log`. Keep the old RPC temporarily.
+3. Atomic rating: nothing to do here. `origin/develop` already cut both stores over to
+   `apply_study_rating` and removed `insert_study_log` in its migration 161 (§8.1).
 4. Add planner/evaluators/adapters and repository adapter.
 5. Add remediation endpoint kind behind explicit request use; no UI exposes it.
 6. Validate web/mobile/shared and SQL tests.
@@ -773,7 +792,7 @@ No new external telemetry provider is required. Logging must redact response and
 
 ### 16.3 Rollback
 
-Rollback artifacts under `supabase/rollbacks/160_*.down.sql` through `163_*.down.sql` may drop only newly introduced functions/tables after first disabling consumers. The atomic-recording rollback must restore/harden the prior `insert_study_log` grant if `rate_card_and_log` is removed. Rollbacks do not revert unrelated existing data tables or older applied migrations.
+Rollback artifacts under `supabase/rollbacks/165_*.down.sql`, `167_*.down.sql`, `168_*.down.sql`, and `169_*.down.sql` may drop only newly introduced functions/tables after first disabling consumers. They do not touch develop's rating contract (migrations 160/161) and do not revert unrelated existing data tables or older applied migrations. There is no `insert_study_log` grant to restore: develop's migration 161 removed that function, and no rollback here re-adds it.
 
 Once real goal/attempt data exists, production rollback should disable consumers and retain tables rather than destructively drop user data. Destructive production rollback requires an explicit backup and operator decision.
 
@@ -795,11 +814,14 @@ No `system_flags.learning_engine_enabled` column is added in this foundation bec
 
 ### 17.2 Store compatibility tests
 
-- web/shared study stores call `rate_card_and_log` once per rating
-- no direct card/progress update or `insert_study_log` call remains in `rateCard`
-- error/conflict handling invalidates/refetches rather than silently succeeding
-- existing sequential/cramming/session behavior remains green
-- parity guard prevents the dual stores from drifting in atomic payload semantics
+The rating path and its tests belong to develop's contract, not this workstream (§8.1).
+This branch owns no store rating change, so it asserts only that it did not regress the
+existing engine:
+
+- existing sequential/cramming/sequential-review/SRS-timestamp/persistent-undo suites remain green
+- develop's `study-store-rpc-cutover` suite (single `apply_study_rating` call per rating,
+  no direct card/progress write, conflict refetch, retry-id reuse) remains green unmodified
+- no dual-store parity guard is needed: phase 7 left one shared implementation (§5.3)
 
 ### 17.3 SQL tests
 
@@ -863,13 +885,13 @@ Accept when:
 
 Deliver:
 
-- atomic rating RPC and both-store integration
 - deterministic planner
-- goal/plan/attempt repository adapter and write RPCs
+- goal/plan/attempt repository adapter and write RPCs (migration 167)
+- no rating RPC: atomic recording is develop's `apply_study_rating` (§8.1)
 
 Accept when:
 
-- progress/log cannot diverge under tested failure/conflict cases
+- progress/log cannot diverge under tested failure/conflict cases (asserted against `apply_study_rating`)
 - identical planner inputs produce identical output
 - planner works on legacy cards without metadata backfill
 
@@ -932,8 +954,8 @@ Accept when all discovered blockers are fixed or explicitly reported with failin
 - Data backfill and analytics dashboards.
 - FSRS shadow scoring after reliable review history is sufficient.
 - Listening and speaking implementation/privacy review.
-- Shared/web study-store unification.
-- Contract cleanup of legacy direct-write policies and `insert_study_log` after supported clients migrate.
+- ~~Shared/web study-store unification.~~ Done upstream by develop phase 7 (PR #343).
+- ~~Contract cleanup of legacy direct-write policies and `insert_study_log`.~~ Done upstream by develop migration 161 (PR #339).
 - External labor-law source acquisition, legal citation review, and official content QA.
 
 ## 20. Final architecture decisions
@@ -947,7 +969,7 @@ Accept when all discovered blockers are fixed or explicitly reported with failin
 | Derived mastery, not mutable concept score | Prevents stale aggregate truth and permits algorithm evolution |
 | Pure deterministic planner | Testable, explainable, available without AI |
 | Runtime string registries | Extensible without locking DB enums too early |
-| Atomic SRS rating/log RPC | Reliable evidence is prerequisite to personalization |
+| Atomic SRS rating/log RPC (develop's `apply_study_rating`, not a second one here) | Reliable evidence is prerequisite to personalization; one write path avoids bypassing the event ledger |
 | Structured remediation request with server fetch | Prevents raw-prompt proxy abuse and cross-user data leakage |
 | User-specific enrichment | Protects official/shared content and supports preview/acceptance metrics |
 | No new product flag in dormant foundation | Avoids expanding the five-argument system flag RPC for code no UI invokes |
@@ -959,14 +981,18 @@ An independent design review found no critical issue and approved requirement co
 
 ### 21.1 Atomic conflict and persistence UX
 
-`rateCard` will not advance the in-memory queue before `rate_card_and_log` succeeds. The client may retain the current 120ms press animation, but it awaits the RPC while `isRating=true`.
+These persistence-UX rules were written for this branch's own rating RPC. They are now
+satisfied by develop's `apply_study_rating` path (§8.1) and are retained as the
+**acceptance criteria that path must keep meeting**, not as work items here.
+
+`rateCard` will not advance the in-memory queue before the rating RPC succeeds. The client may retain the current 120ms press animation, but it awaits the RPC while `isRating=true`.
 
 - Success: apply the precomputed local SRS result and advance normally.
 - PostgreSQL serialization/stale-state conflict: invalidate card/progress caches, refetch/reinitialize the current session from authoritative state, keep the user on an active session, and expose a typed retryable persistence error. Do not write through the legacy split path.
-- Network/other persistence error: leave the current card unadvanced, reset `isRating=false`, expose a retryable error, and allow the same rating to be retried with the same `client_rating_id`.
+- Network/other persistence error: leave the current card unadvanced, reset `isRating=false`, expose a retryable error, and allow the same rating to be retried with the same client event id.
 - Duplicate response after a lost acknowledgement: the RPC returns the idempotently stored result and the client advances once.
 
-Both stores add identical tests for success, stale conflict/refetch, transport failure/no-advance, and duplicate idempotent success.
+Develop's `study-store-rpc-cutover` suite covers success, stale conflict/refetch, transport failure/no-advance, and duplicate idempotent success. Since phase 7 there is one store to test, not two.
 
 ### 21.2 Operational hard caps (not product entitlements)
 
