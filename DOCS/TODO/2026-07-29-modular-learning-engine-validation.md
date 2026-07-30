@@ -75,7 +75,10 @@ Re-run in full on 2026-07-30 after merging `origin/develop` `97a5399`. Every row
 | — `study-write-contract.spec.ts` | 11 passed |
 | Learning engine SQL integration | `ALL_LEARNING_ENGINE_TESTS_PASSED`, exit 0 |
 | AI remediation SQL integration | exit 0 (9 `ASSERT`s + 4 raise-guards) |
-| SQL harness negative control | intentional `ASSERT 1=2` → exit 1, so green is meaningful |
+| Learning engine **smoke** SQL | `ALL_LEARNING_SMOKE_TESTS_PASSED`, 9/9 steps |
+| Learning engine **net-zero** SQL | `ALL_LEARNING_NET_ZERO_TESTS_PASSED`, 37 rejection cases + quota integrity |
+| Learning migration **dry run** | `LEARNING_DRY_RUN_PASSED` — 0 → 12 tables/13 fns → 0 residue → idempotent re-revert → restored |
+| SQL harness negative controls | bad assert → exit 1; `before` phase on an applied DB → exit 1; unexpected success → flagged |
 | Migrations 165/167/168/169 local apply | each exit 0, applied in order on top of develop's 160/161/162 |
 | Web TypeScript (`tsconfig.app.json`) | passed |
 | Mobile TypeScript | passed |
@@ -90,6 +93,7 @@ Migration NOTICEs during 168/169 apply (`ai_generation_jobs_job_kind_check ... s
 
 ## 3. Known Baselines Outside This Change
 
+- **CI registration gap found and fixed.** `.github/workflows/ci.yml` lists SQL suites explicitly (the file itself warns that "a new suite is invisible to CI until it is added here"). `learning_engine_test.sql` and `ai_remediation_test.sql` shipped with this branch but were never registered, so they had only ever been run by hand. Both are now wired into the `ai-credit-tests` job together with the new smoke, net-zero, and dry-run suites.
 - Full `packages/shared` typecheck reports 18 errors: DOM/Crypto typing (`CryptoKey`, `AlgorithmIdentifier`, `KeyUsage`, `Crypto`), browser `window` references in old shared stores, and old `admin-store` error narrowing. All 18 sit in six files — `adapters/crypto.ts`, `lib/ai/secure-storage/crypto/aes-gcm-crypto.ts`, `lib/persistence-id.ts`, `stores/admin-store.ts`, `stores/auth-store.ts`, `stores/subscription-store.ts` — and every one of those files is byte-identical to `origin/develop`, so this branch introduces zero new type errors. `packages/shared/learning/` reports 0 errors. (`lib/persistence-id.ts` arrived from develop commit `b6247e0`.)
 - DB lint still reports only the pre-existing ambiguous `id` references in `public.admin_get_reports` and `public.get_deck_versions`; no new learning/remediation function is reported.
 - `tests/integration/vitest.config.ts` sets `include: ['**/*.spec.ts']` without a `root`, so invoking it from the repository root also collects `packages/mobile/__tests__/e2e/**` WebdriverIO specs, which fail with `describe is not defined`. The file is byte-identical to `origin/develop`, so this is a pre-existing config defect, not a regression here. Passing an explicit `tests/integration` path scopes the run correctly.

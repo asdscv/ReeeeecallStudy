@@ -309,3 +309,35 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/sandbox_environment_test.sql
+
+      # ── Learning engine (migs 165/167/168) ──────────────────────────────
+      # These shipped with the learning-engine PR and were not wired here, so
+      # they never ran on CI. Registered explicitly, like every suite above.
+      - name: Run learning engine assertions (migs 165/167 — atomicity, idempotency, lifecycle vs apply_study_rating)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_engine_test.sql
+
+      - name: Run AI remediation assertions (mig 168 — job classification, access, service-only persistence)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/ai_remediation_test.sql
+
+      - name: Run learning engine SMOKE assertions (goal → plan → attempt → rollup → remediation → enrichment)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_smoke_test.sql
+
+      - name: Run learning engine NET-ZERO assertions (every rejected call changes nothing, quota included)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_net_zero_test.sql
+
+      # Runs last in this job: it reverts and re-applies migrations 165/167/168/169
+      # against the throwaway service database to prove the rollback artifacts
+      # leave zero residue, then restores them.
+      - name: Run learning migration DRY RUN (apply → rollback → zero residue → restore)
+        env:
+          PGPASSWORD: postgres
+          DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: ./scripts/dry-run-learning-migrations.sh
