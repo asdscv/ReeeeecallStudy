@@ -79,13 +79,16 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   registerSession: async () => {
-    let deviceId = get().currentDeviceId
-    if (!deviceId) {
-      deviceId = getDeviceId()
-      set({ currentDeviceId: deviceId })
-    }
-    const deviceName = getDeviceName()
     try {
+      // Inside the try: the device adapter can throw (uninitialised adapters,
+      // secure-storage failure) and that used to escape into auth-store's
+      // initialize(), which then treated a valid session as no session.
+      let deviceId = get().currentDeviceId
+      if (!deviceId) {
+        deviceId = getDeviceId()
+        set({ currentDeviceId: deviceId })
+      }
+      const deviceName = getDeviceName()
       const { data, error } = await supabase.rpc('register_session', {
         p_device_id: deviceId,
         p_device_name: deviceName,
@@ -115,12 +118,13 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   sendHeartbeat: async () => {
-    let deviceId = get().currentDeviceId
-    if (!deviceId) {
-      deviceId = getDeviceId()
-      set({ currentDeviceId: deviceId })
-    }
     try {
+      // Device resolution inside the try for the same reason as registerSession.
+      let deviceId = get().currentDeviceId
+      if (!deviceId) {
+        deviceId = getDeviceId()
+        set({ currentDeviceId: deviceId })
+      }
       const { data, error } = await supabase.rpc('session_heartbeat', {
         p_device_id: deviceId,
       })
