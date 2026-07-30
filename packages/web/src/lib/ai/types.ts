@@ -1,54 +1,10 @@
-// ─── Generated Data Types ───────────────────────────────────────────────
-
-export interface GeneratedTemplateField {
-  key: string
-  name: string
-  type: 'text'
-  order: number
-  tts_enabled?: boolean
-  tts_lang?: string
-}
-
-export interface GeneratedLayoutItem {
-  field_key: string
-  style: 'primary' | 'secondary' | 'hint' | 'detail'
-  font_size?: number
-}
-
-export interface GeneratedTemplate {
-  name: string
-  fields: GeneratedTemplateField[]
-  front_layout: GeneratedLayoutItem[]
-  back_layout: GeneratedLayoutItem[]
-  layout_mode: 'default' | 'custom'
-  front_html: string
-  back_html: string
-}
-
-export interface GeneratedDeck {
-  name: string
-  description: string
-  color: string
-  icon: string
-}
-
-export interface GeneratedCard {
-  field_values: Record<string, string>
-  tags: string[]
-}
-
-// ─── Generate Mode ──────────────────────────────────────────────────────
-
-export type GenerateMode = 'full' | 'cards_only'
-
-export type GenerateStep =
-  | 'config'
-  | 'generating_template'
-  | 'review_template'
-  | 'generating_deck'
-  | 'review_deck'
-  | 'generating_cards'
-  | 'review_cards'
-  | 'saving'
-  | 'done'
-  | 'error'
+// Re-export from shared — single source of truth.
+//
+// This file used to be a byte-identical COPY of the shared types. A duplicate that
+// happens to agree today is the same hazard the `prompts.ts` copy turned into: it
+// silently drifted and lost the Chinese template/card rules, and only its own test
+// noticed nothing because that test also read the copy.
+export type {
+  GenerateMode, GeneratedTemplateField, GeneratedLayoutItem, GeneratedTemplate,
+  GeneratedDeck, GeneratedCard, GenerateStep,
+} from '@reeeeecall/shared/lib/ai/types'

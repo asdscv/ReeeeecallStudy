@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { validateTemplateResponse, validateDeckResponse, validateCardsResponse } from '../validators'
+// Retargeted at the CANONICAL validators (packages/shared/lib/ai/validators.ts), the
+// ones ai-generate-store calls. Web's byte-identical copy is deleted; a duplicate that
+// agrees today is how the prompts copy silently drifted.
+import {
+  validateTemplateResponse, validateDeckResponse, validateCardsResponse,
+} from '@reeeeecall/shared/lib/ai/validators'
 
 describe('validateTemplateResponse', () => {
   it('validates a correct template', () => {
