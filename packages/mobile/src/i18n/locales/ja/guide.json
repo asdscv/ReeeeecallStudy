@@ -218,23 +218,7 @@
             "/images/guide/ai-generate/mobile-01-page.png"
           ],
           "title": "AI自動生成とは？",
-          "body": "AIを使ってフラッシュカードを自動作成します。トピックを入力すれば、AIがすべて生成します。\n\n対応プロバイダー：Google Gemini（無料！）、OpenAI、xAI/Grok、Anthropic。\n\nAPIキーはお使いのデバイスにのみ保存され、当社のサーバーには送信されません。"
-        },
-        "apiKey": {
-          "images": [
-            "/images/guide/ai-generate/mobile-02-config.png"
-          ],
-          "title": "APIキーの設定",
-          "body": "お好みのプロバイダーからAPIキーを取得してください：\n• Google Gemini（無料）：aistudio.google.com → Get API Key\n• OpenAI：platform.openai.com → API Keys\n• xAI/Grok：console.x.ai → API Keys\n\nAI生成の設定でキーを入力します。キーはお使いのデバイスにローカル保存されます。\n\n💡 おすすめはGoogle Gemini 2.5 Flash — 完全無料です！"
-        },
-        "geminiSetup": {
-          "images": [
-            "/images/guide/gemini-api/02-get-api-key.png",
-            "/images/guide/gemini-api/03-create-api-key.png",
-            "/images/guide/gemini-api/05-api-key-created.png"
-          ],
-          "title": "🎯 無料のGemini APIキー（おすすめ）",
-          "body": "Gemini 2.5 Flashは100％無料 — クレジットカード不要！\n\n無料枠：15リクエスト/分、1,500リクエスト/日、100万トークン/分\n\nキーの取得方法：\n1. aistudio.google.com にアクセス\n2. Googleアカウントでログイン\n3. サイドバーの「Get API Key」をクリック\n4. 「Create API Key」をクリック\n5. 「Create API key in new project」を選択\n6. キーをコピー（「AIza...」で始まります）\n\nReeeeecallStudyでの使い方：\n1. AI生成ページを開く\n2. プロバイダーで「Google Gemini」を選択\n3. APIキーを貼り付け\n4. 「Gemini 2.5 Flash」モデルを選択\n5. トピックを入力して生成！\n\nGemini Flashをおすすめする理由：\n• 💰 無料 — 課金設定不要\n• ⚡ 高速 — 50枚を数秒で\n• 🎯 正確 — 学習に最適\n• 🌍 全言語対応\n• 📚 1日1,500リクエスト — 何千枚ものカード"
+          "body": "AIを使ってフラッシュカードを自動作成します。トピックを入力すれば、AIがすべて生成します。\n\nAPIキーの取得や設定は不要 — 生成は当社のサーバーで実行されます。\n\n毎日無料のAIカードが利用でき、超過分はチャージ残高から差し引かれます。"
         },
         "fullGeneration": {
           "images": [

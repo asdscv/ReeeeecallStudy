@@ -48,7 +48,7 @@ const ITEM_KEYS: Record<string, string[]> = {
   marketplace: ['what', 'getting', 'publishing'],
   history: ['viewing', 'dashboardStats'],
   settings: ['profile', 'srsLimit', 'answerMode', 'autoTts'],
-  aiGenerate: ['what', 'apiKey', 'geminiSetup', 'fullGeneration'],
+  aiGenerate: ['what', 'fullGeneration'],
   tips: ['daily', 'again', 'concise', 'tags'],
 }
 

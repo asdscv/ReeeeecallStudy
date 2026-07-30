@@ -5,7 +5,7 @@
 > changes; cite it in design docs under `DOCS/TODO`.
 
 ## 1. Monorepo layout
-- `packages/shared` — framework-agnostic core (stores, lib, ai, secure-storage).
+- `packages/shared` — framework-agnostic core (stores, lib, ai).
   **Web re-exports shared stores/lib** — a shared change affects web + its tests.
 - `packages/web` — React + Vite. `packages/mobile` — React Native/Expo.
 - `supabase/` — `migrations/`, `functions/` (Deno edge), `rollbacks/`.
