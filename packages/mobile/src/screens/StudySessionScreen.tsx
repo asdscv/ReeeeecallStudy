@@ -65,7 +65,7 @@ export function StudySessionScreen() {
   const {
     phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
-    undoLastRating, lastRatedCard, subscriptionLocked,
+    undoLastRating, undoState, lastRatedCard, subscriptionLocked,
     crammingManager, crammingTimeUp,
   } = useStudy()
 
@@ -273,9 +273,11 @@ export function StudySessionScreen() {
   }
 
   const handleUndo = () => {
-    undoLastRating()
-    setShowUndo(false)
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    if (undoState === 'pending') return
+    // Do NOT hide the button here: the undo is only real once the server accepts it,
+    // and a rejected undo has to stay retryable. The lastRatedCard effect hides it
+    // when the undo actually lands.
+    void undoLastRating()
   }
 
   const handleExit = () => {
@@ -401,7 +403,8 @@ export function StudySessionScreen() {
           <View style={styles.undoRow}>
             <TouchableOpacity
               onPress={handleUndo}
-              style={[styles.undoBtn, { borderColor: theme.colors.border }]}
+              disabled={undoState === 'pending'}
+              style={[styles.undoBtn, { borderColor: theme.colors.border, opacity: undoState === 'pending' ? 0.6 : 1 }]}
               activeOpacity={0.7}
               {...testProps('study-undo-button')}
             >
