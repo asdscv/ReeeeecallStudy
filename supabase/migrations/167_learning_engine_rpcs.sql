@@ -1,7 +1,7 @@
 -- ============================================================================
 -- 167: LEARNING ENGINE RPCS — Goal, Plan, Attempt, Enrichment write RPCs
 --
--- Design: DOCS/TODO/2026-07-29-modular-learning-engine-design.md §8.2–8.5, §21
+-- Design: DOCS/DONE/LEARNING-ENGINE/2026-07-29-modular-learning-engine-design.md §8.2–8.5, §21
 --
 -- Delivers:
 --   1. learning_usage_daily table for rate-limiting (deny-all base grants).

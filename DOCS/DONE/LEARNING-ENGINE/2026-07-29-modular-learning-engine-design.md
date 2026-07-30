@@ -1,10 +1,10 @@
 # Modular General-Purpose Learning Engine
 
-- **Status:** Implemented; migrations 165/167/168/169 applied locally only
-- **Date:** 2026-07-29 (revised 2026-07-30 after merging `origin/develop`)
+- **Status:** Merged. PR #337, merge commit `ac74b45`. Migrations applied locally only — production migration not run.
+- **Date:** 2026-07-29 (revised 2026-07-30 after merging `origin/develop`; closed on merge)
 - **Branch:** `feat/modular-learning-engine-foundation`
 - **Base:** cut from `origin/develop` at `af38ad8`; merged up to `97a5399`
-- **Architecture standard:** [`DOCS/STANDARD/ARCHITECTURE.md`](../STANDARD/ARCHITECTURE.md)
+- **Architecture standard:** [`DOCS/STANDARD/ARCHITECTURE.md`](../../STANDARD/ARCHITECTURE.md)
 
 ## 1. Decision summary
 
@@ -945,7 +945,9 @@ Accept when:
 2. **Double-Check:** concurrency, idempotency, compatibility, side effects, cost accounting.
 3. **Lockdown:** RLS/grants/IDOR, payload bounds, error paths, unsupported capabilities.
 
-Accept when all discovered blockers are fixed or explicitly reported with failing evidence. Do not move this document to `DOCS/DONE` until merge; this session will not commit or merge unless requested.
+Accept when all discovered blockers are fixed or explicitly reported with failing evidence.
+
+**Closed.** The audit ran, its findings are recorded in the validation document, and PR #337 merged as `ac74b45` with all seven CI checks green. This document moved to `DOCS/DONE/LEARNING-ENGINE/` on merge, as this section originally required. Production migration and deployment remain deliberately outside this workstream.
 
 ## 19. Deferred work
 
