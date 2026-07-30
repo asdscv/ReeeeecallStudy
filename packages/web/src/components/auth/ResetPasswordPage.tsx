@@ -11,16 +11,16 @@ export function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [sessionChecked, setSessionChecked] = useState(false)
   const updatePassword = useAuthStore((s) => s.updatePassword)
   const session = useAuthStore((s) => s.session)
   const navigate = useNavigate()
 
+  // Derived from session — no need for separate state (avoids effect-based setState).
+  const sessionChecked = !!session
+
   useEffect(() => {
     if (!session) {
       navigate('/auth/login', { replace: true })
-    } else {
-      setSessionChecked(true)
     }
   }, [session, navigate])
 

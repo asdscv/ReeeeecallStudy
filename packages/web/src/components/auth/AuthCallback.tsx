@@ -16,24 +16,23 @@ export function _setCapturedHash(hash: string) {
 export function AuthCallback() {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
-  const [error, setError] = useState<string | null>(null)
   const navigatedRef = useRef(false)
 
+  // Derive hash error synchronously during render — _capturedHash is module-level
+  // and never changes, so this avoids an effect-based setState (cascading render).
+  const params = _capturedHash ? new URLSearchParams(_capturedHash.substring(1)) : null
+  const capturedType = params?.get('type') ?? null
+  const hashErrorCode = params?.get('error_code') ?? null
+  const hashErrorDesc = params?.get('error_description') ?? null
+  const hashError = hashErrorCode
+    ? t(`callback.errors.${hashErrorCode}`, { defaultValue: hashErrorDesc?.replace(/\+/g, ' ') || t('callback.errors.default') })
+    : null
+
+  const [error, setError] = useState<string | null>(hashError)
+
   useEffect(() => {
-    const params = _capturedHash ? new URLSearchParams(_capturedHash.substring(1)) : null
-    const capturedType = params?.get('type') ?? null
-
-    // Check for error in hash params
-    if (params) {
-      const errorCode = params.get('error_code')
-      const errorDesc = params.get('error_description')
-
-      if (errorCode) {
-        const errorKey = `callback.errors.${errorCode}`
-        setError(t(errorKey, { defaultValue: errorDesc?.replace(/\+/g, ' ') || t('callback.errors.default') }))
-        return
-      }
-    }
+    // Hash error already derived at render time; skip subscription setup.
+    if (hashErrorCode) return
 
     const isRecovery = capturedType === 'recovery'
 
@@ -77,7 +76,7 @@ export function AuthCallback() {
       subscription.unsubscribe()
       clearTimeout(timeout)
     }
-  }, [navigate])
+  }, [navigate, capturedType, hashErrorCode, t])
 
   if (error) {
     return (

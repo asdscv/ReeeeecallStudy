@@ -86,12 +86,14 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   // the free daily cap (10) until the server-authoritative remaining loads.
   const [topic, setTopic] = useState(initialTopic || '')
   const [cardCount, setCardCount] = useState(10)
-  const countTouched = useRef(false)   // once the user edits the count, stop auto-defaulting it
+  // State, not a ref: the auto-default below is decided during render, and a ref read
+  // there is both a lint violation and a stale-value risk.
+  const [countTouched, setCountTouched] = useState(false)   // user edited the count → stop auto-defaulting
   const [useCustomHtml, setUseCustomHtml] = useState(false)
   const [contentLang, setContentLang] = useState('')
 
   // Deck selector (cards_only mode)
-  const [selectedDeckId, setSelectedDeckId] = useState(existingDeckId || '')
+  const [selectedDeckIdInput, setSelectedDeckId] = useState(existingDeckId || '')
 
   // Input mode (cards_only): type a topic, or upload an image to recognize.
   const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
@@ -121,22 +123,30 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     }
   }, [isFullMode, decks.length, fetchDecks])
 
-  useEffect(() => {
+  // Sync topic from prop change without an effect (avoids cascading render).
+  // React "storing information from previous renders" pattern.
+  const [prevInitialTopic, setPrevInitialTopic] = useState(initialTopic)
+  if (initialTopic !== prevInitialTopic) {
+    setPrevInitialTopic(initialTopic)
     if (initialTopic) setTopic(initialTopic)
-  }, [initialTopic])
+  }
 
-  useEffect(() => {
+  // Sync selectedDeckId from prop change without an effect (avoids cascading render).
+  const [prevExistingDeckId, setPrevExistingDeckId] = useState(existingDeckId)
+  if (existingDeckId !== prevExistingDeckId) {
+    setPrevExistingDeckId(existingDeckId)
     if (existingDeckId) setSelectedDeckId(existingDeckId)
-  }, [existingDeckId])
+  }
 
-  // Clear a selection that isn't an owned+editable deck (e.g. a preselected subscribed
-  // deck, or one that stopped qualifying) once the deck list has loaded — so a target
-  // the save path would reject can never stay selected.
-  useEffect(() => {
-    if (selectedDeckId && targetDecks.length > 0 && !targetDecks.some((d) => d.id === selectedDeckId)) {
-      setSelectedDeckId('')
-    }
-  }, [selectedDeckId, targetDecks])
+
+  // A selection that isn't an owned+editable deck (a preselected subscribed deck, or one
+  // that stopped qualifying) is DERIVED away rather than cleared after the fact: clearing
+  // needed an extra render pass and only ran when the deck list changed, so a selection
+  // arriving later stayed invalid until the list moved again.
+  const selectedDeckId = selectedDeckIdInput && targetDecks.length > 0
+    && !targetDecks.some((d) => d.id === selectedDeckIdInput)
+    ? ''
+    : selectedDeckIdInput
 
   // Load the remaining-free + credit affordance once (server is authoritative).
   useEffect(() => {
@@ -147,11 +157,16 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   // so a default generation never overshoots the free allowance and silently spends the
   // wallet. Applies once the server-authoritative affordance loads, and only until the user
   // edits the count themselves. Image mode is paid-only, so it keeps the manual value.
-  useEffect(() => {
-    if (affordable && !countTouched.current && !useImage) {
+  // Render-time adjustment avoids effect-based setState (cascading render).
+  // Tracks useImage too: the old effect listed it as a dependency, so leaving image mode
+  // after the affordance loaded re-applied the free-quota default.
+  const [prevAffordance, setPrevAffordance] = useState({ affordable, useImage })
+  if (affordable !== prevAffordance.affordable || useImage !== prevAffordance.useImage) {
+    setPrevAffordance({ affordable, useImage })
+    if (affordable && !countTouched && !useImage) {
       setCardCount(Math.max(1, Math.min(FREE_DAILY_CAP, affordable.free)))
     }
-  }, [affordable, useImage])
+  }
 
   // Selected deck info (only owned+editable decks are selectable — see targetDecks)
   const selectedDeck: Deck | undefined = targetDecks.find((d) => d.id === selectedDeckId)
@@ -462,7 +477,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             max={100}
             value={cardCount}
             onChange={(e) => {
-              countTouched.current = true   // user set it manually → stop auto-defaulting to remaining-free
+              setCountTouched(true)   // user set it manually → stop auto-defaulting to remaining-free
               const raw = e.target.value
               setCardCount(raw === '' ? ('' as any) : (parseInt(raw) || 0))
             }}
