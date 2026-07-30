@@ -110,6 +110,9 @@ const resetStore = () =>
     // Reset the completion guard so each test's endSession actually runs (it leaks
     // true across tests otherwise, making a later endSession a silent no-op).
     sessionSaved: false,
+    // Same leak for the finalize marker: a stale true routes endSession onto
+    // refresh_study_session (P6) instead of finalize.
+    sessionFinalized: false,
     lastRatedCard: null,
   })
 

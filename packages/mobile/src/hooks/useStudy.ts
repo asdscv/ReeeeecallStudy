@@ -58,9 +58,12 @@ export function useStudy() {
     await store.crammingTimeUp()
   }, [store])
 
-  const undoLastRating = useCallback(() => {
-    store.undoLastRating()
+  const undoLastRating = useCallback(async () => {
+    if (store.undoState === 'pending') return
     haptics.warning()
+    // Awaits the server compensation: the local rollback only happens if the DB
+    // accepts it, so callers must not assume the state changed on return.
+    await store.undoLastRating()
   }, [store])
 
   const reset = useCallback(() => {
@@ -95,6 +98,7 @@ export function useStudy() {
     queue: store.queue,
     currentIndex: store.currentIndex,
     lastRatedCard: store.lastRatedCard,
+    undoState: store.undoState,
     subscriptionLocked: store.subscriptionLocked,
     crammingManager: store.crammingManager,
     // Actions

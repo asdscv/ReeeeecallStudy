@@ -46,6 +46,7 @@ export function StudySessionPage() {
     crammingManager,
     exitDirection,
     lastRatedCard,
+    undoState,
     initSession,
     flipCard,
     rateCard,
@@ -232,11 +233,12 @@ export function StudySessionPage() {
   }, [flipCard])
 
   const handleUndo = useCallback(() => {
-    if (!lastRatedCard) return
-    undoLastRating()
-    setShowUndo(false)
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
-  }, [lastRatedCard, undoLastRating])
+    if (!lastRatedCard || undoState === 'pending') return
+    // Do NOT hide the button here: the undo is only real once the server accepts it,
+    // and a rejected undo has to stay retryable. The lastRatedCard effect hides it
+    // when the undo actually lands.
+    void undoLastRating()
+  }, [lastRatedCard, undoState, undoLastRating])
 
   const handleToggleShortcuts = useCallback(() => {
     setShowShortcuts(prev => !prev)
@@ -482,7 +484,9 @@ export function StudySessionPage() {
         <div className="fixed bottom-6 left-6 z-20">
           <button
             onClick={handleUndo}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg shadow-md hover:bg-muted transition-colors cursor-pointer"
+            disabled={undoState === 'pending'}
+            aria-busy={undoState === 'pending'}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-card border border-border rounded-lg shadow-md hover:bg-muted transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Undo2 className="w-4 h-4" />
             {t('session.undo')}
