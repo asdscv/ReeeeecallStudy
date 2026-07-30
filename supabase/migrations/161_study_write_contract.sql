@@ -7,12 +7,15 @@
 -- state, logs, sessions, and cursors directly, defeating revision checks,
 -- server-side aggregation, and the rating-event ledger.
 --
--- This migration closes those paths. Table-wide UPDATE is NOT removed — card
--- editing and batch-size tuning stay client-side — so the revokes are
--- COLUMN-LEVEL and re-grant exactly the columns clients still own.
+-- EXPAND phase only. The two legitimate direct writes are moved onto RPCs here
+-- (cramming session metadata, per-card SRS reset) so a client can be cut over
+-- BEFORE anything is taken away. Closing the direct write paths — the part that
+-- breaks any still-running pre-cutover client — is migration 171, which must be
+-- applied only AFTER the cutover build is serving.
 --
--- Two legitimate direct writes are moved onto RPCs first (they would otherwise
--- break): cramming session metadata and per-card SRS reset.
+-- Split rationale: prod ran a pre-cutover build while 160-162 were unapplied, so
+-- applying expand+contract in one shot would have dropped `insert_study_log` and
+-- revoked table writes out from under the live app.
 -- ============================================================================
 
 -- ── 1) finalize_study_session gains client metadata ─────────────────────────
@@ -211,10 +214,6 @@ BEGIN
 END;
 $$;
 
--- ── 3) Drop the superseded log RPC ─────────────────────────────────────────
--- apply_study_rating writes study_logs inside the rating transaction and links the
--- row to its rating event; a standalone log insert can only create orphans.
-DROP FUNCTION IF EXISTS public.insert_study_log(uuid,uuid,uuid,text,text,integer,integer,real,real,integer,text);
 
 -- ── 4) Function grants ─────────────────────────────────────────────────────
 REVOKE EXECUTE ON FUNCTION public.finalize_study_session(uuid,uuid,text,timestamptz,jsonb,jsonb,jsonb)
@@ -223,29 +222,3 @@ REVOKE EXECUTE ON FUNCTION public.reset_card_srs(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.finalize_study_session(uuid,uuid,text,timestamptz,jsonb,jsonb,jsonb)
   TO authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.reset_card_srs(uuid) TO authenticated, service_role;
-
--- ── 5) Close the direct write paths ────────────────────────────────────────
--- cards: keep content editing, remove SRS + revision writes.
-REVOKE UPDATE ON TABLE public.cards FROM anon, authenticated;
-GRANT UPDATE (field_values, tags, sort_position, template_id, updated_at)
-  ON TABLE public.cards TO authenticated;
-
--- user_card_progress: every column is SRS state → no client UPDATE at all.
--- INSERT stays: init_subscriber_progress / acquire seeding run as the caller in
--- some paths, and a bare insert cannot forge SRS state (defaults + RLS own-row).
-REVOKE UPDATE ON TABLE public.user_card_progress FROM anon, authenticated;
-
--- study_logs / study_sessions: history is server-written only. SELECT stays so
--- analytics pages keep working.
-REVOKE INSERT, UPDATE, DELETE ON TABLE public.study_logs FROM anon, authenticated;
-REVOKE INSERT, UPDATE, DELETE ON TABLE public.study_sessions FROM anon, authenticated;
-
--- deck_study_state: cursors belong to finalize_study_session; batch sizes stay
--- client-tunable. INSERT stays for session bootstrap.
-REVOKE UPDATE ON TABLE public.deck_study_state FROM anon, authenticated;
-GRANT UPDATE (new_batch_size, review_batch_size, updated_at)
-  ON TABLE public.deck_study_state TO authenticated;
-
--- Server/edge paths keep full access.
-GRANT ALL ON TABLE public.cards, public.user_card_progress, public.study_logs,
-  public.study_sessions, public.deck_study_state TO service_role;
