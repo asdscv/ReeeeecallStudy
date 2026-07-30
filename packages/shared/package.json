@@ -9,6 +9,8 @@
     "./types/*": "./types/*",
     "./lib/*": "./lib/*",
     "./stores/*": "./stores/*",
+    "./learning": "./learning/index.ts",
+    "./learning/*": "./learning/*",
     "./adapters/*": "./adapters/*",
     "./adapters": "./adapters/index.ts",
     "./design-tokens": "./design-tokens/index.ts",

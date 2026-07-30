@@ -8,17 +8,11 @@
   "autoSaved": "저장됨",
   "links": {
     "userGuide": "사용법 가이드",
-    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
-    "apiDocs": "API 문서",
-    "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법"
   },
   "guide": {
     "title": "사용법 가이드",
     "desc": "기능 설명, 학습 팁, 공유 방법"
-  },
-  "apiDocs": {
-    "title": "API 문서",
-    "desc": "API 엔드포인트, 인증, 사용 예시"
   },
   "profile": {
     "title": "프로필",

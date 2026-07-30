@@ -8,17 +8,11 @@
   "autoSaved": "Saved",
   "links": {
     "userGuide": "User Guide",
-    "userGuideDesc": "Feature guide, learning tips, sharing methods",
-    "apiDocs": "API Documentation",
-    "apiDocsDesc": "API endpoints, authentication, usage examples"
+    "userGuideDesc": "Feature guide, learning tips, sharing methods"
   },
   "guide": {
     "title": "User Guide",
     "desc": "Feature guide, learning tips, sharing methods"
-  },
-  "apiDocs": {
-    "title": "API Documentation",
-    "desc": "API endpoints, authentication, usage examples"
   },
   "profile": {
     "title": "Profile",

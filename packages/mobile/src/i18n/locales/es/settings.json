@@ -103,9 +103,7 @@
   },
   "links": {
     "userGuide": "Guía de usuario",
-    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
-    "apiDocs": "Documentación API",
-    "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
   },
   "quickActions": {
     "quickStudy": "Estudio rápido",

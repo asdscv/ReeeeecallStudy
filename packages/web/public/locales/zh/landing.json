@@ -75,7 +75,7 @@
       "基于标签的搜索和筛选",
       "牌组分享与社区市场",
       "详细的学习统计与分析",
-      "通过 API 密钥进行外部集成"
+      "个性化计划与自适应补强学习"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "基于标签的搜索和筛选",
     "5": "牌组分享与社区市场",
     "6": "详细的学习统计与分析",
-    "7": "通过 API 密钥进行外部集成"
+    "7": "个性化计划与自适应补强学习"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "牌组共享",
     "languages": "7种语言",
     "allDevices": "全设备支持",
-    "import": "CSV & API导入"
+    "import": "CSV 与 JSON 导入"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API 文档",
     "tagline": "基于间隔重复的智能闪卡学习平台",
     "product": "产品",
     "resources": "资源",

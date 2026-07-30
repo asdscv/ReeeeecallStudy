@@ -4,6 +4,7 @@
 > **Created**: 2026-06-26 · **Updated**: 2026-06-26
 > **Status**: 🎉 **actionable 항목 전부 완료·배포** (H1·H2·H3·H4·N1·M1·L4·L5). 남은 건 **게이트/제품결정 대기**(H1c·L6·Auth)뿐.
 > **완료 기록**: [`DOCS/DONE/2026-06-26-security-remediation.md`](../DONE/2026-06-26-security-remediation.md)
+> **2026-07-29 update:** customer/developer `rc_` REST API was retired. Migration 117 removed `api_keys`/`resolve_api_key`; migration 169 is the idempotent contract close. H4 below is retained only as historical remediation context and is no longer an active surface.
 > **prod ref**: `ixdapelfikaneexnskfm` (Management API SQL; 자격증명은 메모리 `reference_credentials`)
 
 > **2026-07-30 확인**: 코드 작업 잔여 **0**. 남은 H1c·L6·Auth M3/M4/M5 는 전부
@@ -20,7 +21,7 @@
 | **H4** | REST API 핸들러 cross-tenant 자기-스코프 하드닝 + deleteTemplate 404 게이트 + mig 107(resolve_api_key service_role EXECUTE 복원) + cross-tenant 통합테스트(CI 9/9 실행) | #176/#177 · 107 |
 | 정리 | orphan `vault.secrets('ai_key_encryption_secret')` 삭제(073 잔재, 값 불일치·참조 0 = 데드) | prod 직접 |
 
-> **H4 핵심 발견(미변경)**: prod REST API는 플랫폼 게이트웨이 `verify_jwt=true`로 raw `rc_` 키가 핸들러 도달 전 차단됨(`UNAUTHORIZED_INVALID_JWT_FORMAT`) → **외부 비기능/노출 0**. verify_jwt를 끄는 건 공개 API를 *노출*하는 제품 결정이라 하지 않음. 하드닝은 활성화 시 안전 보장.
+> **H4 retirement note (2026-07-29):** this hardened-but-dormant endpoint was subsequently removed rather than enabled. No `rc_` gateway/authentication path remains.
 
 ---
 
@@ -49,7 +50,7 @@ H1a/b 완료·배포로 클라(web 즉시, mobile OTA)는 `ai-keys` Edge 경유.
 | 스토리지 버킷 제한(mig 100) | ✅ prod 적용 확인 (card-images/content-images 5MB jpeg/png/webp, card-audio 10MB mpeg/ogg/wav) |
 | `vault.secrets` 잔여행 | ✅ 데드 orphan 1건 삭제 완료 |
 | pg_cron / pg_net | 미설치 확인 (DB cron/SSRF 표면 없음) |
-| verify_jwt 배포설정 | `api`=true(게이트웨이가 rc_ 차단 → 외부 비기능), `tts`/`ai-keys`=true(유저 JWT로 동작). config.toml에 per-fn override 없음 — 플랫폼 기본. |
+| verify_jwt 배포설정 | 고객 `api` endpoint는 제거됨. `tts`/`ai-keys`는 유저 JWT로 동작. config.toml에 customer API override 없음. |
 | MFA 등록 | TOTP enroll/verify **가능**(max 10), 단 **미강제**. admin 강제 정책 없음 → Auth 하드닝(보류)과 함께 검토. |
 | Edge prod 시크릿 | `AI_KEY_PASSPHRASE`·`ALLOWED_ORIGINS`·`SUPABASE_*` 정상. 불필요/노출 키 없음. |
 

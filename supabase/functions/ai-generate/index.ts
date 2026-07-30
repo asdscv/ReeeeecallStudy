@@ -24,6 +24,7 @@ import {
 } from '../_shared/ai-prompts.ts'
 import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
 import { opsGate } from '../_shared/ops-gate.ts'
+import { buildRemediationPrompt, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
 // see _shared/ai-providers.ts. Switching provider/model needs no code change.
@@ -374,7 +375,7 @@ Deno.serve(async (req) => {
     if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
 
     const kind = body.kind
-    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck') {
+    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck' && kind !== 'remediation') {
       return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
     }
     const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
@@ -392,6 +393,97 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { Authorization: authHeader! } } },
     )
+
+    // ── Structured learning remediation — always paid, user-specific preview ──
+    if (kind === 'remediation') {
+      const refs = parseRemediationRefs(body)
+      if (!refs) return json({ error: 'Invalid remediation references', code: 'BAD_REQUEST' }, 400, cors)
+
+      const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_remediation', {
+        p_action: refs.action,
+        p_goal_id: refs.goalId,
+        p_activity_id: refs.activityId,
+        p_attempt_id: refs.attemptId,
+        p_card_ids: refs.cardIds,
+        p_concept_ids: refs.conceptIds,
+      })
+      if (reserveError) {
+        if (reserveError.code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+        if (reserveError.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+        if (reserveError.code === '42501') return json({ error: 'Learning reference not accessible', code: 'FORBIDDEN' }, 403, cors)
+        console.error('[ai-generate] remediation reserve error:', reserveError.message)
+        return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const meter = (reserveRaw ?? {}) as { job_ref?: string }
+      const service = sbServiceRole()
+
+      try {
+        const [goalResult, activityResult, attemptResult, cardsResult, conceptsResult] = await Promise.all([
+          refs.goalId ? service.from('learning_goals').select('id, domain_id, title, target, settings').eq('id', refs.goalId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.activityId ? service.from('learning_activities').select('id, title, instructions, stimulus, expected_response, rubric, config, source_id, concept_id').eq('id', refs.activityId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.attemptId ? service.from('answer_attempts').select('id, activity_type, response_type, evaluator_type, response, normalized_score, evaluator_result, feedback, created_at').eq('id', refs.attemptId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.cardIds.length ? service.from('cards').select('id, field_values, tags').in('id', refs.cardIds) : Promise.resolve({ data: [], error: null }),
+          refs.conceptIds.length ? service.from('learning_concepts').select('id, domain_id, title, description, source_id, metadata').in('id', refs.conceptIds) : Promise.resolve({ data: [], error: null }),
+        ])
+        const contextError = [goalResult, activityResult, attemptResult, cardsResult, conceptsResult].find((item) => item.error)?.error
+        if (contextError) throw new Error(`CONTEXT_LOAD:${contextError.message}`)
+
+        const concepts = (conceptsResult.data ?? []) as Array<Record<string, unknown>>
+        const activity = activityResult.data as Record<string, unknown> | null
+        const sourceIds = [...new Set([
+          ...(typeof activity?.source_id === 'string' ? [activity.source_id] : []),
+          ...concepts.flatMap((concept) => typeof concept.source_id === 'string' ? [concept.source_id] : []),
+        ])]
+        const sourceResult = sourceIds.length
+          ? await service.from('content_sources').select('id, title, citation, metadata').in('id', sourceIds)
+          : { data: [], error: null }
+        if (sourceResult.error) throw new Error(`CONTEXT_LOAD:${sourceResult.error.message}`)
+        const sources = (sourceResult.data ?? []) as Array<{ id: string; title: string; citation: string | null; metadata?: unknown }>
+        const context = {
+          goal: goalResult.data,
+          activity: activityResult.data,
+          attempt: attemptResult.data,
+          cards: cardsResult.data ?? [],
+          concepts,
+          sources,
+        }
+        const prompt = buildRemediationPrompt(refs, context)
+        if (prompt.requireGrounding && sources.length === 0) throw new Error('GROUNDING_SOURCE_REQUIRED')
+
+        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+        const validated = validateRemediationResult(generated.json, refs, sources.map((source) => source.id), prompt.requireGrounding)
+        if (!validated.valid) throw new Error(`INVALID_REMEDIATION:${validated.reason}`)
+
+        const { data: enrichmentId, error: persistenceError } = await service.rpc('persist_ai_remediation', {
+          p_user_id: userId,
+          p_action: refs.action,
+          p_content: validated.content,
+          p_source_refs: validated.sourceIds,
+          p_goal_id: refs.goalId,
+          p_concept_id: refs.conceptIds[0] ?? null,
+          p_card_id: refs.cardIds[0] ?? null,
+          p_activity_id: refs.activityId,
+          p_request_fingerprint: JSON.stringify(refs).slice(0, 128),
+          p_model_version: model.model,
+          p_provider: model.provider,
+          p_prompt_version: 'remediation-v1',
+        })
+        if (persistenceError || typeof enrichmentId !== 'string') throw new Error(`PERSISTENCE:${persistenceError?.message ?? 'missing id'}`)
+
+        const charge = await chargeGeneration(userId, meter.job_ref, model, generated.usage)
+        return json({ content: validated.content, enrichmentId, balance: charge?.balance ?? null }, 200, cors)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'UNKNOWN'
+        console.error('[ai-generate] remediation failure:', message)
+        await releaseJob(userId, meter.job_ref)
+        const status = message.startsWith('CONTEXT_LOAD') || message === 'GROUNDING_SOURCE_REQUIRED' ? 400 : 502
+        const code = message === 'GROUNDING_SOURCE_REQUIRED' ? 'AI_GROUNDING_REQUIRED'
+          : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
+          : message.startsWith('INVALID_REMEDIATION:') ? 'AI_INVALID_RESULT'
+          : 'AI_PROVIDER_ERROR'
+        return json({ error: 'Remediation failed', code }, status, cors)
+      }
+    }
 
     // ── Image recognition (vision) — ALWAYS paid, separate metering ──
     if (kind === 'image') {

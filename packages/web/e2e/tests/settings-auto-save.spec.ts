@@ -418,25 +418,6 @@ test.describe('Settings — Mobile UI', () => {
 // ════════════════════════════════════════════════════════════
 
 test.describe('Settings — PC UI', () => {
-  test('guide link cards display in 2-column grid', async ({ page }) => {
-    await goToSettings(page)
-
-    const guideBtn = page.locator('button').filter({ hasText: /User Guide|사용법/i })
-    const apiDocsBtn = page.locator('button').filter({ hasText: /API/i })
-
-    const guideBox = await guideBtn.boundingBox()
-    const apiBox = await apiDocsBtn.boundingBox()
-
-    expect(guideBox).toBeTruthy()
-    expect(apiBox).toBeTruthy()
-
-    if (guideBox && apiBox) {
-      // On PC, they should be side by side (same Y, different X)
-      const sameRow = Math.abs(guideBox.y - apiBox.y) < 10
-      console.log(`[pc] Guide links same row: ${sameRow} (y diff: ${Math.abs(guideBox.y - apiBox.y)})`)
-    }
-  })
-
   test('language buttons show in 4-column grid on PC', async ({ page }) => {
     await goToSettings(page)
 

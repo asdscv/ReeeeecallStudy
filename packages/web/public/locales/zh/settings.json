@@ -8,17 +8,11 @@
   "autoSaved": "已自动保存",
   "links": {
     "userGuide": "用户指南",
-    "userGuideDesc": "功能说明、学习技巧、分享方法",
-    "apiDocs": "API 文档",
-    "apiDocsDesc": "API 端点、认证、使用示例"
+    "userGuideDesc": "功能说明、学习技巧、分享方法"
   },
   "guide": {
     "title": "用户指南",
     "desc": "功能说明、学习技巧、分享方法"
-  },
-  "apiDocs": {
-    "title": "API 文档",
-    "desc": "API 端点、认证、使用示例"
   },
   "profile": {
     "title": "个人资料",

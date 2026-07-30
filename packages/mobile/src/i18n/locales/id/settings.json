@@ -103,9 +103,7 @@
   },
   "links": {
     "userGuide": "Panduan Pengguna",
-    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
-    "apiDocs": "Dokumentasi API",
-    "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
+    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi"
   },
   "quickActions": {
     "quickStudy": "Belajar cepat",
