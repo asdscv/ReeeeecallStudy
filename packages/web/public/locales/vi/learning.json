@@ -1,0 +1,98 @@
+{
+  "today": {
+    "title": "Kế hoạch hôm nay",
+    "manageGoals": "Quản lý mục tiêu",
+    "selectGoal": "Chọn mục tiêu",
+    "budget": "{{count, number}} phút/ngày",
+    "progress": "{{done, number}} / {{total, number}} hoàn thành",
+    "generate": "Tạo kế hoạch hôm nay",
+    "generating": "Đang tạo…",
+    "regenerate": "Tạo lại kế hoạch",
+    "regenerating": "Đang tạo lại…",
+    "completedNote": "Kế hoạch này đã hoàn thành nên không thể tạo lại hôm nay.",
+    "empty": {
+      "noGoal": "Bạn chưa có mục tiêu học tập nào đang hoạt động. Mục tiêu xác định số phút mỗi ngày và các bộ thẻ dùng để lập kế hoạch.",
+      "createGoal": "Tạo mục tiêu",
+      "noDecks": "Mục tiêu này chưa có bộ thẻ nào, không có gì để lập kế hoạch.",
+      "attachDecks": "Gắn bộ thẻ",
+      "nothingDue": "Hôm nay không có thẻ nào cần ôn tập trong các bộ thẻ này."
+    },
+    "item": {
+      "study": "Học",
+      "untitled": "(không có nội dung)",
+      "minutes": "~{{count, number}} phút"
+    },
+    "reason": {
+      "due": "Đến hạn ôn tập",
+      "recentFailure": "Trả lời sai gần đây",
+      "slowResponse": "Trả lời chậm",
+      "goalRelevance": "Liên quan đến mục tiêu",
+      "importance": "Mức quan trọng",
+      "balanced": "Phân bổ cân bằng"
+    },
+    "error": {
+      "limitExceeded": "Bạn đã dùng hết số lần tạo lại kế hoạch hôm nay. Hãy thử lại vào ngày mai.",
+      "completedPlan": "Kế hoạch đã hoàn thành không thể ghi đè.",
+      "goalGone": "Mục tiêu đó không còn khả dụng.",
+      "invalidInput": "Không thể lưu kế hoạch vì một số giá trị ngoài phạm vi.",
+      "authRequired": "Vui lòng đăng nhập lại.",
+      "forbidden": "Bạn không có quyền truy cập.",
+      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
+    }
+  },
+  "goals": {
+    "title": "Mục tiêu học tập",
+    "subtitle": "Mục tiêu chứa số phút mỗi ngày và các bộ thẻ dùng để xây dựng kế hoạch.",
+    "todayLink": "Kế hoạch hôm nay",
+    "create": "Mục tiêu mới",
+    "edit": "Sửa",
+    "archive": "Lưu trữ",
+    "dailyMinutes": "{{count, number}} phút/ngày",
+    "deckCount": "{{count, number}} bộ thẻ",
+    "targetDate": "Mục tiêu {{date}}",
+    "noDecksWarning": "Chưa gắn bộ thẻ — chưa thể lập kế hoạch.",
+    "archiveConfirmTitle": "Lưu trữ mục tiêu này?",
+    "archiveConfirmMessage": "\"{{title}}\" sẽ không còn được lập kế hoạch và không thể chỉnh sửa.",
+    "status": {
+      "paused": "Tạm dừng",
+      "completed": "Hoàn thành",
+      "archived": "Đã lưu trữ"
+    },
+    "empty": {
+      "title": "Chưa có mục tiêu nào",
+      "body": "Tạo mục tiêu để bắt đầu nhận kế hoạch hàng ngày."
+    },
+    "error": {
+      "limitExceeded": "Bạn đã đạt số lượng mục tiêu tối đa.",
+      "notFound": "Mục tiêu đó không tồn tại hoặc đã được lưu trữ.",
+      "invalidInput": "Vui lòng kiểm tra tên mục tiêu và số phút mỗi ngày.",
+      "conflict": "Thay đổi này không được phép với trạng thái hiện tại của mục tiêu.",
+      "authRequired": "Vui lòng đăng nhập lại.",
+      "forbidden": "Bạn không có quyền truy cập.",
+      "unknown": "Đã xảy ra lỗi. Vui lòng thử lại."
+    }
+  },
+  "form": {
+    "createTitle": "Mục tiêu mới",
+    "editTitle": "Sửa mục tiêu",
+    "domain": "Lĩnh vực",
+    "domainName": {
+      "language": "Học ngôn ngữ",
+      "labor-law": "Luật lao động"
+    },
+    "goalTitle": "Tên mục tiêu",
+    "goalTitlePlaceholder": "VD: Đạt JLPT N2",
+    "dailyMinutes": "Số phút mỗi ngày",
+    "targetDate": "Ngày mục tiêu (tùy chọn)",
+    "decks": "Bộ thẻ để học",
+    "decksHint": "Kế hoạch được xây dựng từ các thẻ trong những bộ thẻ này.",
+    "noDecks": "Bạn chưa có bộ thẻ nào.",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saving": "Đang lưu…",
+    "error": {
+      "title": "Nhập tên mục tiêu (1–500 ký tự).",
+      "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440."
+    }
+  }
+}

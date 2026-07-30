@@ -1,0 +1,98 @@
+{
+  "today": {
+    "title": "今日のプラン",
+    "manageGoals": "目標を管理",
+    "selectGoal": "目標を選択",
+    "budget": "1日 {{count, number}} 分",
+    "progress": "{{total, number}} 件中 {{done, number}} 件完了",
+    "generate": "今日のプランを作成",
+    "generating": "作成中…",
+    "regenerate": "プランを再作成",
+    "regenerating": "再作成中…",
+    "completedNote": "このプランは完了済みのため、今日は再作成できません。",
+    "empty": {
+      "noGoal": "進行中の学習目標がありません。目標では1日の学習時間とプランに使うデッキを設定します。",
+      "createGoal": "目標を作成",
+      "noDecks": "この目標にはデッキが紐付いていないため、プランを作成できません。",
+      "attachDecks": "デッキを紐付ける",
+      "nothingDue": "今日これらのデッキで復習すべきカードはありません。"
+    },
+    "item": {
+      "study": "学習",
+      "untitled": "（テキストなし）",
+      "minutes": "約 {{count, number}} 分"
+    },
+    "reason": {
+      "due": "復習期限",
+      "recentFailure": "最近の不正解",
+      "slowResponse": "回答が遅い",
+      "goalRelevance": "目標との関連度",
+      "importance": "重要度",
+      "balanced": "バランス配分"
+    },
+    "error": {
+      "limitExceeded": "今日のプラン再作成回数の上限に達しました。明日またお試しください。",
+      "completedPlan": "完了済みのプランは上書きできません。",
+      "goalGone": "その目標はもう利用できません。",
+      "invalidInput": "一部の値が範囲外のため、プランを保存できませんでした。",
+      "authRequired": "再度ログインしてください。",
+      "forbidden": "アクセス権限がありません。",
+      "unknown": "プランを作成できませんでした。もう一度お試しください。"
+    }
+  },
+  "goals": {
+    "title": "学習目標",
+    "subtitle": "目標には1日の学習時間とプランに使うデッキが含まれます。",
+    "todayLink": "今日のプラン",
+    "create": "新しい目標",
+    "edit": "編集",
+    "archive": "アーカイブ",
+    "dailyMinutes": "1日 {{count, number}} 分",
+    "deckCount": "{{count, number}} デッキ",
+    "targetDate": "目標日 {{date}}",
+    "noDecksWarning": "デッキが紐付いていないため、まだプランを作成できません。",
+    "archiveConfirmTitle": "この目標をアーカイブしますか？",
+    "archiveConfirmMessage": "\"{{title}}\" はプランに使われなくなり、編集もできなくなります。",
+    "status": {
+      "paused": "一時停止",
+      "completed": "完了",
+      "archived": "アーカイブ済み"
+    },
+    "empty": {
+      "title": "まだ目標がありません",
+      "body": "目標を作成すると毎日のプランが届きます。"
+    },
+    "error": {
+      "limitExceeded": "目標数の上限に達しました。",
+      "notFound": "その目標は存在しないかアーカイブ済みです。",
+      "invalidInput": "目標名と1日の学習時間を確認してください。",
+      "conflict": "この目標の現在の状態では許可されない変更です。",
+      "authRequired": "再度ログインしてください。",
+      "forbidden": "アクセス権限がありません。",
+      "unknown": "問題が発生しました。もう一度お試しください。"
+    }
+  },
+  "form": {
+    "createTitle": "新しい目標",
+    "editTitle": "目標を編集",
+    "domain": "分野",
+    "domainName": {
+      "language": "語学学習",
+      "labor-law": "労働法"
+    },
+    "goalTitle": "目標名",
+    "goalTitlePlaceholder": "例：JLPT N2 合格",
+    "dailyMinutes": "1日の学習時間（分）",
+    "targetDate": "目標日（任意）",
+    "decks": "学習デッキ",
+    "decksHint": "プランは選択したデッキのカードから作成されます。",
+    "noDecks": "デッキがまだありません。",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "saving": "保存中…",
+    "error": {
+      "title": "目標名を1〜500文字で入力してください。",
+      "dailyMinutes": "1日の学習時間は1〜1440分の範囲で指定してください。"
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "today": {
+    "title": "Today's plan",
+    "manageGoals": "Manage goals",
+    "selectGoal": "Select a goal",
+    "budget": "{{count, number}} min/day",
+    "progress": "{{done, number}} of {{total, number}} done",
+    "generate": "Build today's plan",
+    "generating": "Building…",
+    "regenerate": "Rebuild plan",
+    "regenerating": "Rebuilding…",
+    "completedNote": "This plan is finished, so it can't be rebuilt today.",
+    "empty": {
+      "noGoal": "You don't have an active learning goal yet. A goal sets your daily minutes and the decks to plan over.",
+      "createGoal": "Create a goal",
+      "noDecks": "This goal has no decks attached, so there is nothing to plan.",
+      "attachDecks": "Attach decks",
+      "nothingDue": "Nothing is due in these decks today."
+    },
+    "item": {
+      "study": "Study",
+      "untitled": "(no text)",
+      "minutes": "~{{count, number}} min"
+    },
+    "reason": {
+      "due": "Due for review",
+      "recentFailure": "Recently missed",
+      "slowResponse": "Slow to answer",
+      "goalRelevance": "Goal relevance",
+      "importance": "Importance",
+      "balanced": "Balanced mix"
+    },
+    "error": {
+      "limitExceeded": "You've hit today's limit for rebuilding plans. Try again tomorrow.",
+      "completedPlan": "A finished plan can't be overwritten.",
+      "goalGone": "That goal is no longer available.",
+      "invalidInput": "The plan couldn't be saved because some values were out of range.",
+      "authRequired": "Please sign in again.",
+      "forbidden": "You don't have access to that.",
+      "unknown": "The plan couldn't be built. Please try again."
+    }
+  },
+  "goals": {
+    "title": "Learning goals",
+    "subtitle": "A goal holds your daily minutes and the decks your plan is built from.",
+    "todayLink": "Today's plan",
+    "create": "New goal",
+    "edit": "Edit",
+    "archive": "Archive",
+    "dailyMinutes": "{{count, number}} min/day",
+    "deckCount": "{{count, number}} decks",
+    "targetDate": "Target {{date}}",
+    "noDecksWarning": "No decks attached — this goal can't be planned yet.",
+    "archiveConfirmTitle": "Archive this goal?",
+    "archiveConfirmMessage": "\"{{title}}\" will stop being planned and can no longer be edited.",
+    "status": {
+      "paused": "Paused",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "empty": {
+      "title": "No goals yet",
+      "body": "Create a goal to start getting a daily plan."
+    },
+    "error": {
+      "limitExceeded": "You've reached the maximum number of goals.",
+      "notFound": "That goal is missing or archived.",
+      "invalidInput": "Please check the title and daily minutes.",
+      "conflict": "That change isn't allowed for this goal's current state.",
+      "authRequired": "Please sign in again.",
+      "forbidden": "You don't have access to that.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "form": {
+    "createTitle": "New goal",
+    "editTitle": "Edit goal",
+    "domain": "Subject",
+    "domainName": {
+      "language": "Language",
+      "labor-law": "Labour law"
+    },
+    "goalTitle": "Goal name",
+    "goalTitlePlaceholder": "e.g. Pass JLPT N2",
+    "dailyMinutes": "Minutes per day",
+    "targetDate": "Target date (optional)",
+    "decks": "Decks to study",
+    "decksHint": "Your plan is built from the cards in these decks.",
+    "noDecks": "You have no decks yet.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "error": {
+      "title": "Enter a goal name (1–500 characters).",
+      "dailyMinutes": "Minutes per day must be between 1 and 1440."
+    }
+  }
+}

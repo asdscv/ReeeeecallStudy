@@ -1,0 +1,98 @@
+{
+  "today": {
+    "title": "Rencana hari ini",
+    "manageGoals": "Kelola tujuan",
+    "selectGoal": "Pilih tujuan",
+    "budget": "{{count, number}} menit/hari",
+    "progress": "{{done, number}} dari {{total, number}} selesai",
+    "generate": "Buat rencana hari ini",
+    "generating": "Membuat…",
+    "regenerate": "Buat ulang rencana",
+    "regenerating": "Membuat ulang…",
+    "completedNote": "Rencana ini sudah selesai, tidak bisa dibuat ulang hari ini.",
+    "empty": {
+      "noGoal": "Anda belum memiliki tujuan belajar yang aktif. Tujuan menentukan menit harian dan dek yang digunakan untuk perencanaan.",
+      "createGoal": "Buat tujuan",
+      "noDecks": "Tujuan ini tidak memiliki dek, jadi tidak ada yang bisa direncanakan.",
+      "attachDecks": "Hubungkan dek",
+      "nothingDue": "Tidak ada kartu yang perlu diulas hari ini di dek-dek ini."
+    },
+    "item": {
+      "study": "Belajar",
+      "untitled": "(tidak ada teks)",
+      "minutes": "~{{count, number}} menit"
+    },
+    "reason": {
+      "due": "Waktunya mengulang",
+      "recentFailure": "Baru saja salah",
+      "slowResponse": "Lambat menjawab",
+      "goalRelevance": "Relevansi tujuan",
+      "importance": "Tingkat penting",
+      "balanced": "Campuran seimbang"
+    },
+    "error": {
+      "limitExceeded": "Anda telah mencapai batas pembuatan ulang rencana hari ini. Coba lagi besok.",
+      "completedPlan": "Rencana yang sudah selesai tidak bisa ditimpa.",
+      "goalGone": "Tujuan tersebut tidak lagi tersedia.",
+      "invalidInput": "Rencana tidak bisa disimpan karena beberapa nilai di luar jangkauan.",
+      "authRequired": "Silakan masuk lagi.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
+    }
+  },
+  "goals": {
+    "title": "Tujuan belajar",
+    "subtitle": "Tujuan berisi menit harian dan dek yang digunakan untuk menyusun rencana Anda.",
+    "todayLink": "Rencana hari ini",
+    "create": "Tujuan baru",
+    "edit": "Edit",
+    "archive": "Arsipkan",
+    "dailyMinutes": "{{count, number}} menit/hari",
+    "deckCount": "{{count, number}} dek",
+    "targetDate": "Target {{date}}",
+    "noDecksWarning": "Belum ada dek yang dihubungkan — belum bisa membuat rencana.",
+    "archiveConfirmTitle": "Arsipkan tujuan ini?",
+    "archiveConfirmMessage": "\"{{title}}\" tidak akan direncanakan lagi dan tidak bisa diedit.",
+    "status": {
+      "paused": "Dijeda",
+      "completed": "Selesai",
+      "archived": "Diarsipkan"
+    },
+    "empty": {
+      "title": "Belum ada tujuan",
+      "body": "Buat tujuan untuk mulai mendapatkan rencana harian."
+    },
+    "error": {
+      "limitExceeded": "Anda telah mencapai jumlah maksimum tujuan.",
+      "notFound": "Tujuan tersebut tidak ditemukan atau sudah diarsipkan.",
+      "invalidInput": "Periksa nama tujuan dan menit harian.",
+      "conflict": "Perubahan itu tidak diizinkan untuk status tujuan saat ini.",
+      "authRequired": "Silakan masuk lagi.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "unknown": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  },
+  "form": {
+    "createTitle": "Tujuan baru",
+    "editTitle": "Edit tujuan",
+    "domain": "Bidang",
+    "domainName": {
+      "language": "Belajar bahasa",
+      "labor-law": "Hukum ketenagakerjaan"
+    },
+    "goalTitle": "Nama tujuan",
+    "goalTitlePlaceholder": "mis. Lulus JLPT N2",
+    "dailyMinutes": "Menit per hari",
+    "targetDate": "Tanggal target (opsional)",
+    "decks": "Dek untuk dipelajari",
+    "decksHint": "Rencana Anda dibangun dari kartu-kartu di dek ini.",
+    "noDecks": "Anda belum memiliki dek.",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "saving": "Menyimpan…",
+    "error": {
+      "title": "Masukkan nama tujuan (1–500 karakter).",
+      "dailyMinutes": "Menit per hari harus antara 1 dan 1440."
+    }
+  }
+}
