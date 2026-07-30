@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase'
 import { utcToLocalDateKey, localDateToUTCRange, todayDateKey } from '../lib/date-utils'
 import { DatePicker } from '../components/study/DatePicker'
 import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
-import type { CrammingFilter } from '../lib/cramming-queue'
+import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
 import {
   STUDY_MODE_OPTIONS,
   DEFAULT_BATCH_SIZE,
@@ -15,7 +15,7 @@ import {
   MAX_BATCH_SIZE,
   isBatchSizeConfigurable,
   clampBatchSize,
-} from '../lib/study-session-utils'
+} from '@reeeeecall/shared/lib/study-session-utils'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { CardGridSkeleton } from '../components/common/Skeleton'
 import { MultiDeckSelector } from '../components/study/MultiDeckSelector'
