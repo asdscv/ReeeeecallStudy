@@ -48,8 +48,8 @@
 | P3 | `fix/srs-due-queue` | timestamp-based learning eligibility | 없음 |
 | P4 | `fix/sequential-cursor-safety` | tie-safe batch + cyclic starvation prevention | 없음 |
 | P5A | `feat/study-rating-rpc-expand` | additive event/revision/session schema + RPC | migration 160 |
-| P5B | `feat/study-rating-rpc-cutover` | client rating을 새 RPC로 전환 | 없음 |
-| P5C | `chore/study-rating-rpc-contract` | legacy log write 경로 제거·권한 축소 | migration 161 |
+| P5B | `feat/study-rating-rpc-cutover` | client rating을 새 RPC로 전환 (완료, PR #338) | 없음 |
+| P5C | `chore/study-rating-rpc-contract` | legacy log write 경로 제거·권한 축소 (완료, PR #339) | migration 161 |
 | P6 | `feat/study-persistent-undo` | persistent undo + idempotent finalize/cursor | P5A RPC 사용 |
 | P7 | `refactor/study-shared-source` | web local 구현을 shared re-export로 축소 | 없음 |
 | P8 | `test/study-hardening-lockdown` | 통합 smoke/net-zero/dry-run, master doc DONE | 필요 시 test-only |

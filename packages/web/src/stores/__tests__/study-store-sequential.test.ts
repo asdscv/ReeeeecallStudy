@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // ─── Supabase mock (HOISTED — runs before imports) ──────────
 const mockSupabase = vi.hoisted(() => {
   const chainable = () => {
-    const chain: Record<string, any> = {}
+    const chain: Record<string, unknown> = {}
     chain.select = vi.fn().mockReturnValue(chain)
     chain.eq = vi.fn().mockReturnValue(chain)
     chain.neq = vi.fn().mockReturnValue(chain)
@@ -23,6 +23,7 @@ const mockSupabase = vi.hoisted(() => {
       getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
     },
     from: vi.fn().mockImplementation(() => chainable()),
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
   }
 })
 
@@ -108,6 +109,8 @@ function setupSequentialSession(opts: {
     maxCardPosition: opts.maxCardPosition,
     srsQueueManager: null,
     crammingManager: null,
+    // P5B: finalize_study_session is keyed by the client session id.
+    clientSessionId: 'client-session-1',
   })
 }
 
@@ -144,22 +147,16 @@ beforeEach(() => {
 // ─── endSession: sequential mode position calculation ────────
 
 describe('endSession — sequential mode early exit bug fix', () => {
+  // P5B: the cursor is no longer written by a direct deck_study_state update — it
+  // travels as finalize_study_session's cursor_after inside the same transaction as
+  // the session row. Collect that payload instead.
   function setupMockAndGetUpdateCalls() {
     const updateCalls: unknown[] = []
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return {
-          update: vi.fn().mockImplementation((data: unknown) => {
-            updateCalls.push(data)
-            return { eq: updateEq }
-          }),
-        }
+    mockSupabase.rpc.mockImplementation((name: string, params: Record<string, unknown>) => {
+      if (name === 'finalize_study_session') {
+        updateCalls.push(params.p_cursor_after)
       }
-      // study_sessions insert
-      const chain: Record<string, any> = {}
-      chain.insert = vi.fn().mockResolvedValue({ data: null, error: null })
-      return chain
+      return Promise.resolve({ data: null, error: null })
     })
     return updateCalls
   }

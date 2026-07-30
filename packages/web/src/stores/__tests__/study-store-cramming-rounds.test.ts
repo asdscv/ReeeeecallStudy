@@ -12,11 +12,7 @@ const mockSupabase = vi.hoisted(() => {
   return {
     auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }) },
     from: vi.fn().mockImplementation(() => chainable()),
-    rpc: vi.fn().mockImplementation((name: string) =>
-      name === 'rate_card_and_log'
-        ? Promise.resolve({ data: { ok: true, log_id: `log-${name}`, idempotent: false }, error: null })
-        : Promise.resolve({ data: null, error: null })
-    ),
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
   }
 })
 
@@ -121,8 +117,9 @@ describe('study-store cramming true rounds', () => {
 
     expect(mockSupabase.from).not.toHaveBeenCalledWith('cards')
     expect(mockSupabase.from).not.toHaveBeenCalledWith('user_card_progress')
+    // P5B: ratings persist through the atomic apply_study_rating RPC.
     const loggedRatings = mockSupabase.rpc.mock.calls
-      .filter(([name]) => name === 'rate_card_and_log')
+      .filter(([name]) => name === 'apply_study_rating')
       .map(([, params]) => (params as { p_rating: string }).p_rating)
     expect(loggedRatings).toEqual(['got_it', 'missed', 'got_it'])
   })

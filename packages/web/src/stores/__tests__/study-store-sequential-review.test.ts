@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // ─── Supabase mock (HOISTED — runs before imports) ──────────
 const mockSupabase = vi.hoisted(() => {
   const chainable = () => {
-    const chain: Record<string, any> = {}
+    const chain: Record<string, unknown> = {}
     chain.select = vi.fn().mockReturnValue(chain)
     chain.eq = vi.fn().mockReturnValue(chain)
     chain.neq = vi.fn().mockReturnValue(chain)
@@ -241,27 +241,23 @@ describe('endSession — sequential_review position saved authoritatively (S-L3)
       studyState: { ...fakeStudyState, new_start_pos: 0, review_start_pos: 0 },
       maxCardPosition: 39,
       crammingManager: null,
+      clientSessionId: 'client-session-1',
     })
 
-    const updateCalls: unknown[] = []
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return {
-          update: vi.fn().mockImplementation((data: unknown) => {
-            updateCalls.push(data)
-            return { eq: updateEq }
-          }),
-        }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
+    // P5B: the cursor moves inside finalize_study_session, guarded by cursor_before,
+    // so there is exactly one atomic write instead of a separate table update.
+    const finalizeCalls: Array<Record<string, unknown>> = []
+    mockSupabase.rpc.mockImplementation((name: string, params: Record<string, unknown>) => {
+      if (name === 'finalize_study_session') finalizeCalls.push(params)
+      return Promise.resolve({ data: null, error: null })
     })
 
     await useStudyStore.getState().endSession()
 
-    // Exactly one authoritative write, with the recomputed positions.
-    expect(updateCalls).toEqual([{ new_start_pos: 0, review_start_pos: 7 }])
-    expect(updateEq).toHaveBeenCalledWith('id', 'state-1')
+    expect(finalizeCalls).toHaveLength(1)
+    expect(finalizeCalls[0].p_cursor_before).toEqual({ new_start_pos: 0, review_start_pos: 0 })
+    expect(finalizeCalls[0].p_cursor_after).toEqual({ new_start_pos: 0, review_start_pos: 7 })
+    expect(mockSupabase.from).not.toHaveBeenCalledWith('deck_study_state')
   })
 
   it('should still save deck_study_state for sequential mode in endSession', async () => {
@@ -278,21 +274,21 @@ describe('endSession — sequential_review position saved authoritatively (S-L3)
       studyState: { ...fakeStudyState, sequential_pos: 5 },
       maxCardPosition: 39,
       crammingManager: null,
+      clientSessionId: 'client-session-2',
     })
 
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: updateFn }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
+    const finalizeCalls: Array<Record<string, unknown>> = []
+    mockSupabase.rpc.mockImplementation((name: string, params: Record<string, unknown>) => {
+      if (name === 'finalize_study_session') finalizeCalls.push(params)
+      return Promise.resolve({ data: null, error: null })
     })
 
     await useStudyStore.getState().endSession()
 
-    // sequential mode SHOULD still update sequential_pos
-    expect(updateFn).toHaveBeenCalledWith({ sequential_pos: 7 })
+    // sequential mode SHOULD still advance sequential_pos — now as cursor_after.
+    expect(finalizeCalls).toHaveLength(1)
+    expect(finalizeCalls[0].p_cursor_before).toEqual({ sequential_pos: 5 })
+    expect(finalizeCalls[0].p_cursor_after).toEqual({ sequential_pos: 7 })
   })
 })
 

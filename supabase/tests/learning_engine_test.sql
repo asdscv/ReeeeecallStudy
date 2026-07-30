@@ -1,4 +1,7 @@
--- Learning engine atomicity/idempotency/lifecycle regression tests (migrations 160–162).
+-- Learning engine atomicity/idempotency/lifecycle regression tests (migrations 165, 167).
+-- The rating assertions target apply_study_rating from migration 160, which owns the
+-- single atomic rating write path; this file guards that the learning-engine schema
+-- and RPCs coexist with that contract.
 \set ON_ERROR_STOP on
 BEGIN;
 
@@ -38,25 +41,31 @@ SET LOCAL session_replication_role = origin;
 SELECT set_config('request.jwt.claim.role', 'authenticated', true);
 SELECT set_config('request.jwt.claim.sub', 'a1000000-0000-4000-8000-000000000001', true);
 
--- Atomic owned-card update + log, stale-state no-write, and complete-payload idempotency.
+-- Atomic owned-card update + log, stale-revision rejection, and event idempotency.
+-- The rating path itself is owned by migration 160 (apply_study_rating); these
+-- assertions guard that the learning-engine schema coexists with it and that the
+-- single atomic write contract still holds once learning tables are installed.
 DO $$
 DECLARE
   first_result jsonb;
   duplicate_result jsonb;
-  stale_result jsonb;
   log_count integer;
   card_row cards%ROWTYPE;
+  v_session uuid := 'a1600000-0000-4000-8000-000000000001';
+  v_new_srs jsonb := jsonb_build_object(
+    'srs_status', 'review', 'ease_factor', 2.6, 'interval_days', 1,
+    'repetitions', 1, 'next_review_at', '2026-07-31T00:00:00Z',
+    'last_reviewed_at', '2026-07-30T00:00:00Z'
+  );
 BEGIN
-  first_result := rate_card_and_log(
+  first_result := apply_study_rating(
+    'a1500000-0000-4000-8000-000000000001', v_session,
     'a1300000-0000-4000-8000-000000000001',
     'a1200000-0000-4000-8000-000000000001',
-    'srs', 'good',
-    'new', 0, 2.5, 0,
-    'review', 1, 2.6, 1, '2026-07-30T00:00:00Z',
-    1000, 'a1500000-0000-4000-8000-000000000001'
+    'srs', 'good', 'embedded', 0, v_new_srs, 1000
   );
-  ASSERT (first_result->>'ok')::boolean, first_result::text;
-  ASSERT NOT COALESCE((first_result->>'idempotent')::boolean, false), first_result::text;
+  ASSERT first_result->>'status' = 'applied', first_result::text;
+  ASSERT (first_result->>'applied_revision')::bigint = 1, first_result::text;
 
   SELECT * INTO card_row FROM cards WHERE id = 'a1300000-0000-4000-8000-000000000001';
   SELECT count(*) INTO log_count FROM study_logs
@@ -68,16 +77,22 @@ BEGIN
     'owned card SRS state was not updated atomically';
   ASSERT log_count = 1, format('expected one atomic log, found %s', log_count);
 
-  stale_result := rate_card_and_log(
-    'a1300000-0000-4000-8000-000000000001',
-    'a1200000-0000-4000-8000-000000000001',
-    'srs', 'again',
-    'new', 0, 2.5, 0,
-    'learning', 0, 2.5, 0, '2026-07-29T23:00:00Z',
-    800, 'a1500000-0000-4000-8000-000000000002'
-  );
-  ASSERT NOT (stale_result->>'ok')::boolean
-    AND stale_result->>'code' = 'STALE_STATE', stale_result::text;
+  -- Stale revision: another writer already advanced the card, so this must not write.
+  BEGIN
+    PERFORM apply_study_rating(
+      'a1500000-0000-4000-8000-000000000002', v_session,
+      'a1300000-0000-4000-8000-000000000001',
+      'a1200000-0000-4000-8000-000000000001',
+      'srs', 'again', 'embedded', 0,
+      jsonb_build_object(
+        'srs_status', 'learning', 'ease_factor', 2.5, 'interval_days', 0,
+        'repetitions', 0, 'next_review_at', '2026-07-30T00:10:00Z',
+        'last_reviewed_at', '2026-07-30T00:00:00Z'
+      ), 800
+    );
+    RAISE EXCEPTION 'expected stale revision rejection';
+  EXCEPTION WHEN SQLSTATE 'PT409' THEN NULL;
+  END;
   SELECT count(*) INTO log_count FROM study_logs
    WHERE user_id = 'a1000000-0000-4000-8000-000000000001';
   SELECT * INTO card_row FROM cards WHERE id = 'a1300000-0000-4000-8000-000000000001';
@@ -85,34 +100,32 @@ BEGIN
   ASSERT card_row.srs_status = 'review' AND card_row.interval_days = 1,
     'stale rating changed card state';
 
-  duplicate_result := rate_card_and_log(
+  -- Same event id + identical payload replays without a second write.
+  duplicate_result := apply_study_rating(
+    'a1500000-0000-4000-8000-000000000001', v_session,
     'a1300000-0000-4000-8000-000000000001',
     'a1200000-0000-4000-8000-000000000001',
-    'srs', 'good',
-    'new', 0, 2.5, 0,
-    'review', 1, 2.6, 1, '2026-07-30T00:00:00Z',
-    1000, 'a1500000-0000-4000-8000-000000000001'
+    'srs', 'good', 'embedded', 0, v_new_srs, 1000
   );
-  ASSERT (duplicate_result->>'idempotent')::boolean, duplicate_result::text;
+  ASSERT duplicate_result->>'status' = 'applied', duplicate_result::text;
   SELECT count(*) INTO log_count FROM study_logs
    WHERE user_id = 'a1000000-0000-4000-8000-000000000001';
   ASSERT log_count = 1, 'duplicate rating inserted another log';
 
+  -- Same event id + changed payload is a client bug and must be rejected.
   BEGIN
-    PERFORM rate_card_and_log(
+    PERFORM apply_study_rating(
+      'a1500000-0000-4000-8000-000000000001', v_session,
       'a1300000-0000-4000-8000-000000000001',
       'a1200000-0000-4000-8000-000000000001',
-      'srs', 'good',
-      'new', 0, 2.5, 0,
-      'review', 1, 2.6, 1, '2026-07-30T00:00:00Z',
-      1001, 'a1500000-0000-4000-8000-000000000001'
+      'srs', 'good', 'embedded', 0, v_new_srs, 1001
     );
     RAISE EXCEPTION 'expected changed rating payload rejection';
-  EXCEPTION WHEN SQLSTATE 'P0007' THEN NULL;
+  EXCEPTION WHEN SQLSTATE '23505' THEN NULL;
   END;
 END $$;
 
--- Non-SRS records a log without changing progress and retries idempotently.
+-- Non-SRS records a log without changing progress and replays idempotently.
 DO $$
 DECLARE
   before_row cards%ROWTYPE;
@@ -120,41 +133,41 @@ DECLARE
   result jsonb;
   duplicate_result jsonb;
   log_count integer;
+  v_session uuid := 'a1600000-0000-4000-8000-000000000001';
 BEGIN
   SELECT * INTO before_row FROM cards WHERE id = 'a1300000-0000-4000-8000-000000000001';
-  result := rate_card_and_log(
+  result := apply_study_rating(
+    'a1500000-0000-4000-8000-000000000003', v_session,
     'a1300000-0000-4000-8000-000000000001',
     'a1200000-0000-4000-8000-000000000001',
-    'sequential_review', 'known',
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    500, 'a1500000-0000-4000-8000-000000000003'
+    'sequential_review', 'known', 'none', NULL, NULL, 500
   );
-  duplicate_result := rate_card_and_log(
+  duplicate_result := apply_study_rating(
+    'a1500000-0000-4000-8000-000000000003', v_session,
     'a1300000-0000-4000-8000-000000000001',
     'a1200000-0000-4000-8000-000000000001',
-    'sequential_review', 'known',
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    500, 'a1500000-0000-4000-8000-000000000003'
+    'sequential_review', 'known', 'none', NULL, NULL, 500
   );
   SELECT * INTO after_row FROM cards WHERE id = 'a1300000-0000-4000-8000-000000000001';
   SELECT count(*) INTO log_count FROM study_logs
    WHERE user_id = 'a1000000-0000-4000-8000-000000000001';
-  ASSERT (result->>'ok')::boolean AND (duplicate_result->>'idempotent')::boolean;
+  ASSERT result->>'status' = 'applied' AND duplicate_result->>'status' = 'applied',
+    format('%s / %s', result::text, duplicate_result::text);
   ASSERT before_row.srs_status = after_row.srs_status
     AND before_row.interval_days = after_row.interval_days
     AND before_row.repetitions = after_row.repetitions
     AND before_row.ease_factor = after_row.ease_factor,
     'non-SRS rating changed SRS state';
-  ASSERT log_count = 2, format('non-SRS retry log count should be 2 total, found %s', log_count);
+  ASSERT log_count = 2, format('non-SRS replay log count should be 2 total, found %s', log_count);
 END $$;
 
 -- RPC privilege lockdown.
 DO $$ BEGIN
   ASSERT NOT has_function_privilege(
     'anon',
-    'public.rate_card_and_log(uuid,uuid,text,text,text,integer,real,integer,text,integer,real,integer,timestamptz,integer,uuid)',
+    'public.apply_study_rating(uuid,uuid,uuid,uuid,text,text,text,bigint,jsonb,integer)',
     'EXECUTE'
-  ), 'anon can execute rate_card_and_log';
+  ), 'anon can execute apply_study_rating';
   ASSERT NOT has_function_privilege(
     'anon',
     'public.create_learning_goal(text,text,integer,date,jsonb,jsonb)',

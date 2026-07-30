@@ -18,11 +18,7 @@ const mockSupabase = vi.hoisted(() => {
     updates,
     auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }) },
     from: vi.fn((table: string) => chainable(table)),
-    rpc: vi.fn().mockImplementation((name: string) =>
-      name === 'rate_card_and_log'
-        ? Promise.resolve({ data: { ok: true, log_id: `log-${name}`, idempotent: false }, error: null })
-        : Promise.resolve({ data: null, error: null })
-    ),
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
   }
 })
 
@@ -118,21 +114,16 @@ describe('study-store timestamp-based SRS queue', () => {
     expect(manager.remaining()).toBe(0)
     expect(manager.isComplete()).toBe(true)
 
-    // SRS state is now written by the atomic rate_card_and_log RPC, never by a
-    // separate direct table update.
-    expect(mockSupabase.updates.some(update => update.table === 'cards')).toBe(false)
-    expect(mockSupabase.updates.some(update => update.table === 'user_card_progress')).toBe(false)
-
-    const ratingCalls = mockSupabase.rpc.mock.calls.filter(([name]) => name === 'rate_card_and_log')
-    expect(ratingCalls).toHaveLength(1)
-    expect(ratingCalls[0][1]).toMatchObject({
-      p_card_id: 'card-1',
-      p_deck_id: 'deck-1',
-      p_study_mode: 'srs',
-      p_rating: 'good',
-      p_new_srs_status: 'learning',
-      p_new_repetitions: 1,
-      p_new_next_review_at: expectedDue,
+    // P5B: the SRS row is written inside apply_study_rating, not by a direct update.
+    expect(mockSupabase.updates.find(update => update.table === 'cards')).toBeUndefined()
+    const applied = mockSupabase.rpc.mock.calls
+      .filter(([name]) => name === 'apply_study_rating')
+      .map(([, params]) => params as { p_rating: string; p_new_srs: Record<string, unknown> })
+    expect(applied.map(p => p.p_rating)).toEqual(['good'])
+    expect(applied[0].p_new_srs).toMatchObject({
+      srs_status: 'learning',
+      repetitions: 1,
+      next_review_at: expectedDue,
     })
   })
 })

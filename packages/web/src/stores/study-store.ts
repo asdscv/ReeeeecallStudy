@@ -8,10 +8,10 @@ import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-di
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
 import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { newPersistenceId } from '../lib/persistence-id'
 import { normalizeRatingForMode, normalizeStudyConfig } from '@reeeeecall/shared/lib/study-validation'
 import { useCardStore } from './card-store'
 import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from '../types/database'
-import { createClientRatingId, persistAtomicRating } from '@reeeeecall/shared/lib/atomic-rating'
 
 type Phase = 'idle' | 'loading' | 'studying' | 'completed'
 
@@ -34,8 +34,9 @@ interface SessionStats {
 }
 
 interface LastRatedCard {
-  clientRatingId: string
   cardId: string
+  /** Server rating-event id (apply_study_rating) so undo can compensate the DB. */
+  ratingEventId: string | null
   previousCard: Card
   rating: string
   previousIndex: number
@@ -43,6 +44,12 @@ interface LastRatedCard {
   timestamp: number
   srsQueueSnapshot: SrsQueueSnapshot | null
   crammingSnapshot: CrammingQueueSnapshot | null
+}
+
+interface PersistenceError {
+  scope: 'rating' | 'session' | 'undo'
+  code: string | null
+  message: string
 }
 
 interface StudyState {
@@ -69,7 +76,14 @@ interface StudyState {
   maxCardPosition: number
   lastRatedCard: LastRatedCard | null
   sessionSaved: boolean
-  persistenceError: string | null
+  /** Idempotency key for this study session's rating events and finalize call. */
+  clientSessionId: string | null
+  /** Last persistence failure surfaced by the atomic RPCs (fail-visible, no silent retry). */
+  persistenceError: PersistenceError | null
+  /** Serializes the persistence RPCs so finalize/undo can never overtake the apply
+   *  they depend on. A finalize that commits first would drop the last rating from the
+   *  server aggregate and make the late apply fail as "session already closed". */
+  persistenceChain: Promise<void>
 
   // Pause/Resume state
   isPaused: boolean
@@ -117,7 +131,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   maxCardPosition: 0,
   lastRatedCard: null,
   sessionSaved: false,
+  clientSessionId: null,
   persistenceError: null,
+  persistenceChain: Promise.resolve(),
 
   // Pause/Resume
   isPaused: false,
@@ -155,6 +171,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         maxCardPosition: 0,
         lastRatedCard: null,
         sessionSaved: false,
+        clientSessionId: null,
+        persistenceError: null,
+        persistenceChain: Promise.resolve(),
         isPaused: false,
         pauseStartTime: null,
         totalPausedMs: 0,
@@ -165,7 +184,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     const check = guard.check('study_session_start', 'study_sessions_daily')
     if (!check.allowed) { set({ phase: 'idle' }); return }
 
-    set({ phase: 'loading', config, subscriptionLocked: false })
+    set({
+      phase: 'loading',
+      config,
+      subscriptionLocked: false,
+      // One idempotency key per session: rating events and finalize share it.
+      clientSessionId: newPersistenceId(),
+      persistenceError: null,
+      persistenceChain: Promise.resolve(),
+    })
 
     try {
 
@@ -291,8 +318,28 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         fetchAllRows<UserCardProgress>(() =>
           supabase.from('user_card_progress').select('*').eq('deck_id', config.deckId).eq('user_id', user.id)),
       ])
-      const progressMap = new Map<string, UserCardProgress>()
+      let progressMap = new Map<string, UserCardProgress>()
       for (const p of progressRows) progressMap.set(p.card_id, p)
+
+      // (P5B) apply_study_rating writes the EXISTING progress row and rejects a
+      // missing one — the pre-cutover client papered over this with an upsert. A
+      // publisher can add cards between subscriber syncs, so seed the gaps once per
+      // session with the idempotent init RPC; otherwise those ratings would be lost.
+      if (allCards.some(card => !progressMap.has(card.id))) {
+        const { error: seedError } = await supabase.rpc('init_subscriber_progress', {
+          p_user_id: user.id,
+          p_deck_id: config.deckId,
+        })
+        if (seedError) {
+          console.error('[study-store] init_subscriber_progress failed:', seedError.message)
+        } else {
+          const reloaded = await fetchAllRows<UserCardProgress>(() =>
+            supabase.from('user_card_progress').select('*').eq('deck_id', config.deckId).eq('user_id', user.id))
+          progressMap = new Map<string, UserCardProgress>()
+          for (const p of reloaded) progressMap.set(p.card_id, p)
+        }
+      }
+
       mergedAll = allCards.map((card) => mergeCardWithProgress(card, progressMap.get(card.id)) as Card)
     }
 
@@ -317,7 +364,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
         // Count new cards already studied today (across all sessions)
         // Uses SRS day boundary (4AM) instead of midnight for consistency
-        // prev_srs_status is written via insert_study_log RPC (bypasses PostgREST schema cache)
+        // prev_srs_status is derived server-side by apply_study_rating from previous_srs
         const todayStart = getSrsDayStart()
         const { count: todayNewCount } = await supabase
           .from('study_logs')
@@ -561,7 +608,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       sessionStartedAt: Date.now(),
       sessionStats: { ...initialStats, totalCards: cards.length },
       sessionSaved: false,
-      persistenceError: null,
     })
 
     } catch (err) {
@@ -577,7 +623,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   rateCard: async (rating: string) => {
-    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsQueueManager, crammingManager, isRating, isFlipped, phase, isPaused, studyState, userId } = get()
+    const { queue, currentIndex, config, cardStartTime, sessionStats, srsSettings, srsSource, srsQueueManager, crammingManager, isRating, isFlipped, phase, isPaused, studyState, userId, clientSessionId } = get()
     if (!config || isRating || !isFlipped || phase !== 'studying' || isPaused || !userId) return
 
     const normalizedRating = normalizeRatingForMode(config.mode, rating)
@@ -601,18 +647,17 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     if (!card) return
 
-    const priorPending = get().lastRatedCard
-    const clientRatingId = priorPending?.cardId === card.id && priorPending.rating === rating
-      ? priorPending.clientRatingId
-      : createClientRatingId()
+    // One event id per rating: it is the server idempotency key, so it must be
+    // allocated before any side effect and reused by undo.
+    const ratingEventId = newPersistenceId()
 
-    // Save undo/retry state before rating (including queue manager snapshots)
+    // Save undo state before rating (including queue manager snapshots)
     set({
       isRating: true,
       exitDirection: getRatingExitDirection(rating),
       lastRatedCard: {
-        clientRatingId,
         cardId: card.id,
+        ratingEventId,
         previousCard: { ...card },
         rating,
         previousIndex: currentIndex,
@@ -624,6 +669,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     })
 
     const durationMs = Date.now() - cardStartTime
+    // One timestamp for the optimistic queue update and the persisted payload so
+    // local and server SRS state cannot disagree by a few milliseconds.
+    const ratedAt = new Date().toISOString()
+    // (P5B) prev/new interval + ease are derived server-side from previous_srs/new_srs
+    // inside apply_study_rating, so the client no longer tracks them for the log row.
     let updatedQueue = queue
     let srsResult: ReturnType<typeof calculateSRS> | null = null
 
@@ -646,7 +696,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           repetitions: srsResult.repetitions,
           srs_status: srsResult.srs_status as Card['srs_status'],
           next_review_at: srsResult.next_review_at,
-          last_reviewed_at: new Date().toISOString(),
+          last_reviewed_at: ratedAt,
         }
       }
 
@@ -681,37 +731,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       ? srsQueueManager!.studiedCount() + srsQueueManager!.remaining()
       : sessionStats.totalCards
 
-    const persistence = await persistAtomicRating({
-      card,
-      deckId: config.deckId,
-      mode: config.mode,
-      rating,
-      durationMs,
-      srsResult,
-      clientRatingId,
-      client: supabase,
-    })
-    if (!persistence.ok) {
-      const snapshot = get().lastRatedCard
-      if (snapshot?.srsQueueSnapshot && srsQueueManager) srsQueueManager.restore(snapshot.srsQueueSnapshot)
-      if (snapshot?.crammingSnapshot && crammingManager) crammingManager.restore(snapshot.crammingSnapshot)
-      const authoritativeQueue = persistence.code === 'STALE_STATE'
-        ? queue.map((item) => item.id === card!.id ? { ...item, ...persistence.currentState } : item)
-        : queue
-      useCardStore.getState().invalidateCards(config.deckId)
-      set({
-        queue: authoritativeQueue,
-        isRating: false,
-        exitDirection: null,
-        persistenceError: persistence.code,
-        ...(persistence.code === 'STALE_STATE' ? { lastRatedCard: null } : {}),
-      })
-      return
-    }
-
-    // Advance only after the atomic progress+log transaction succeeds.
+    // ★ Optimistic UI update — set state BEFORE DB writes ★
+    // Brief delay so :active press effect is visible before buttons unmount
     await new Promise(r => setTimeout(r, 120))
-    set({ persistenceError: null })
 
     if (isComplete) {
       set({
@@ -786,6 +808,81 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       })
     }
 
+    // ★ Background persistence — ONE atomic, idempotent RPC ★
+    // apply_study_rating commits the SRS row, the rating event, and the study log
+    // in a single transaction (migration 160). Splitting them (the pre-P5B path)
+    // allowed partial success, duplicate logs, and stale overwrites.
+    const isSrsPersist = config.mode === 'srs' && srsResult !== null
+    const persistSource = isSrsPersist ? srsSource : 'none'
+    const expectedRevision = isSrsPersist ? (card.srs_revision ?? 0) : null
+    const newSrsPayload = isSrsPersist && srsResult
+      ? {
+          srs_status: srsResult.srs_status,
+          ease_factor: srsResult.ease_factor,
+          interval_days: srsResult.interval_days,
+          repetitions: srsResult.repetitions,
+          next_review_at: srsResult.next_review_at,
+          last_reviewed_at: ratedAt,
+        }
+      : null
+
+    // initSession always assigns the session key; if it is somehow missing, mint and
+    // store one rather than dropping the rating — losing a user's study data is worse
+    // than a session row that starts mid-session. Storing it keeps every later rating
+    // of this session under the same aggregate.
+    let persistSessionId = clientSessionId
+    if (!persistSessionId) {
+      console.warn('[study-store] client session id missing; issuing a replacement')
+      persistSessionId = newPersistenceId()
+      set({ clientSessionId: persistSessionId })
+    }
+
+    const applyRating = async () => {
+      const { data, error } = await supabase.rpc('apply_study_rating', {
+        p_event_id: ratingEventId,
+        p_client_session_id: persistSessionId,
+        p_card_id: card.id,
+        p_deck_id: config.deckId,
+        p_study_mode: config.mode,
+        p_rating: rating,
+        p_srs_source: persistSource,
+        p_expected_revision: expectedRevision,
+        p_new_srs: newSrsPayload,
+        p_review_duration_ms: durationMs,
+      })
+
+      if (error) {
+        // Never retry here: PT409 means another device already advanced the card and
+        // re-sending would clobber it; 22023/42501/55000 are not retryable either.
+        console.error('[study-store] apply_study_rating failed:', error.message, error.code)
+        set({
+          persistenceError: {
+            scope: 'rating',
+            code: (error as { code?: string }).code ?? null,
+            message: error.message,
+          },
+        })
+        return
+      }
+
+      // Keep the local expected revision in step with the server so the next
+      // rating of this card is not rejected as stale.
+      const appliedRevision = (data as { applied_revision?: number | null } | null)?.applied_revision
+      if (typeof appliedRevision === 'number') {
+        set({
+          queue: get().queue.map(c => (c.id === card.id ? { ...c, srs_revision: appliedRevision } : c)),
+        })
+      }
+    }
+
+    // Never let the chain reject: a failed link must not block later persistence.
+    set({
+      persistenceChain: get().persistenceChain
+        .then(applyRating)
+        .catch(err => console.error('[study-store] persistence chain error:', err)),
+    })
+
+
     // endSession also fire-and-forget
     if (isComplete) {
       get().endSession().catch(err => console.error('[study-store] endSession failed:', err))
@@ -793,7 +890,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   endSession: async () => {
-    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved } = get()
+    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved, clientSessionId } = get()
     if (!config || !userId) return
     // Prevent duplicate session recording (race between rateCard completion and crammingTimeUp)
     if (sessionSaved) return
@@ -824,57 +921,67 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
     }
 
-    // Save study session record
-    if (sessionStats.cardsStudied > 0) {
-      await supabase
-        .from('study_sessions')
-        .insert({
-          user_id: userId,
-          deck_id: config.deckId,
-          study_mode: config.mode,
-          cards_studied: sessionStats.cardsStudied,
-          total_cards: sessionStats.totalCards,
-          total_duration_ms: sessionStats.totalDurationMs,
-          ratings: sessionStats.ratings,
-          started_at: new Date(sessionStartedAt).toISOString(),
-          completed_at: new Date().toISOString(),
-          ...(metadata ? { metadata } : {}),
-        } as Record<string, unknown>)
-    }
+    // ★ Atomic finalize — server aggregates + cursor in ONE transaction ★
+    // finalize_study_session is idempotent per (user, client session id) and rejects a
+    // cursor that no longer matches the DB, so a retry cannot double-count a session
+    // or move the cursor twice. Client stats stay UI-only; the server recomputes them
+    // from the applied rating events.
+    if (sessionStats.cardsStudied > 0 && clientSessionId) {
+      // Drain queued rating writes first: finalize_study_session aggregates the events
+      // the server already has, and it closes the session against later applies.
+      await get().persistenceChain
 
-    // Update deck_study_state based on mode (requires studyState)
-    // Note: sequential_review positions are saved per-card in rateCard()
-    if (studyState) {
-      if (config.mode === 'sequential' && queue.length > 0) {
+      let cursorBefore: Record<string, number> | null = null
+      let cursorAfter: Record<string, number> | null = null
+
+      if (config.mode === 'sequential' && studyState && queue.length > 0) {
         const typedState = studyState as DeckStudyState
-        if (sessionStats.cardsStudied > 0) {
-          const nextPos = computeSequentialPosition(
+        cursorBefore = { sequential_pos: typedState.sequential_pos }
+        cursorAfter = {
+          sequential_pos: computeSequentialPosition(
             queue,
             sessionStats.cardsStudied,
             typedState.sequential_pos,
             maxCardPosition,
-          )
-          await supabase
-            .from('deck_study_state')
-            .update({ sequential_pos: nextPos } as Record<string, unknown>)
-            .eq('id', studyState.id)
+          ),
         }
-      } else if (config.mode === 'sequential_review' && queue.length > 0) {
+      } else if (config.mode === 'sequential_review' && studyState && queue.length > 0) {
         // (S-L3) Authoritative single write of the final position. Passing the
         // full queue retains a partially studied duplicate-position group.
         const typedState = studyState as DeckStudyState
-        if (sessionStats.cardsStudied > 0) {
-          const positions = computeSequentialReviewPositions(
-            queue.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
-            { new_start_pos: typedState.new_start_pos, review_start_pos: typedState.review_start_pos },
-            maxCardPosition,
-            sessionStats.cardsStudied,
-          )
-          await supabase
-            .from('deck_study_state')
-            .update(positions as Record<string, unknown>)
-            .eq('id', studyState.id)
+        cursorBefore = {
+          new_start_pos: typedState.new_start_pos,
+          review_start_pos: typedState.review_start_pos,
         }
+        cursorAfter = computeSequentialReviewPositions(
+          queue.map(c => ({ sort_position: c.sort_position, srs_status: c.srs_status })),
+          { new_start_pos: typedState.new_start_pos, review_start_pos: typedState.review_start_pos },
+          maxCardPosition,
+          sessionStats.cardsStudied,
+        )
+      }
+
+      const { error } = await supabase.rpc('finalize_study_session', {
+        p_client_session_id: clientSessionId,
+        p_deck_id: config.deckId,
+        p_study_mode: config.mode,
+        p_started_at: new Date(sessionStartedAt).toISOString(),
+        p_cursor_before: cursorBefore,
+        p_cursor_after: cursorAfter,
+        // (P5C) study_sessions is server-written only now; analytics ride along in the
+        // same transaction and are merged UNDER the server's study_persistence key.
+        p_metadata: metadata ?? null,
+      })
+
+      if (error) {
+        console.error('[study-store] finalize_study_session failed:', error.message, error.code)
+        set({
+          persistenceError: {
+            scope: 'session',
+            code: (error as { code?: string }).code ?? null,
+            message: error.message,
+          },
+        })
       }
     }
 
@@ -967,6 +1074,45 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       // no-op and leaves a stale study_sessions row (S-L4).
       ...(wasCompleted ? { sessionSaved: false } : {}),
     })
+
+    // Compensate the persisted rating so DB SRS/log state matches the restored UI.
+    // undo_study_rating is idempotent and only accepts the session's latest event.
+    const undoEventId = lastRatedCard.ratingEventId
+    if (undoEventId) {
+      const undoRating = async () => {
+        const { data, error } = await supabase.rpc('undo_study_rating', { p_event_id: undoEventId })
+        if (!error) {
+          // undo restores the previous SRS values but keeps the revision moving
+          // forward. Adopting it prevents the next rating of this card from being
+          // rejected as stale (PT409).
+          const restoredRevision = (data as { applied_revision?: number | null } | null)?.applied_revision
+          if (typeof restoredRevision === 'number') {
+            set({
+              queue: get().queue.map(c =>
+                c.id === lastRatedCard.cardId ? { ...c, srs_revision: restoredRevision } : c),
+            })
+          }
+        }
+        if (error) {
+          console.error('[study-store] undo_study_rating failed:', error.message, error.code)
+          set({
+            persistenceError: {
+              scope: 'undo',
+              code: (error as { code?: string }).code ?? null,
+              message: error.message,
+            },
+          })
+        }
+      }
+
+      // Queued behind the apply for this event; otherwise undo can arrive first and
+      // fail with P0002 while the UI has already rolled back.
+      set({
+        persistenceChain: get().persistenceChain
+          .then(undoRating)
+          .catch(err => console.error('[study-store] persistence chain error:', err)),
+      })
+    }
   },
 
   reset: () => {
@@ -991,7 +1137,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       maxCardPosition: 0,
       lastRatedCard: null,
       sessionSaved: false,
+      clientSessionId: null,
       persistenceError: null,
+      persistenceChain: Promise.resolve(),
       isPaused: false,
       pauseStartTime: null,
       totalPausedMs: 0,
