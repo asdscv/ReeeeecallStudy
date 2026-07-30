@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getSrsSource, mergeCardWithProgress } from '../srs-access'
+import { getSrsSource, mergeCardWithProgress } from '@reeeeecall/shared/lib/srs-access'
 
 describe('getSrsSource', () => {
   it('should return "embedded" for a deck with no share_mode', () => {

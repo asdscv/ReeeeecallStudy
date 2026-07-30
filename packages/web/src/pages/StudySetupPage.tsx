@@ -11,9 +11,9 @@ import {
   MIN_BATCH_SIZE,
   MAX_BATCH_SIZE,
   isBatchSizeConfigurable,
-} from '../lib/study-session-utils'
+} from '@reeeeecall/shared/lib/study-session-utils'
 import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
-import type { CrammingFilter } from '../lib/cramming-queue'
+import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck, StudyMode } from '../types/database'
 
