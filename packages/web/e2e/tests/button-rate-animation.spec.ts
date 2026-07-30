@@ -74,7 +74,6 @@ test.describe('Button Rating — unknown/known buttons in all non-SRS modes', ()
 
   test('Keyboard ArrowLeft triggers unknown rating', async ({
     quickStudyPage,
-    studySessionPage,
     page,
   }) => {
     await quickStudyPage.navigate()
