@@ -6,6 +6,10 @@ Builds on the completed engineering: [2026-07-01-ai-server-generation.md](../DON
 Everything below is what's **left**. None of it blocks the shipped engineering; it's the
 business/economic layer + external rails + ops + minor cleanup.
 
+> **2026-07-30 확인**: 엔지니어링(Phase 0/1a/1b + metered billing + 이미지 UI + 테스트/CI/e2e)은
+> `develop` 에 들어가 있다. 남은 §1 Phase 1(마진 ON)·§2 결제 provider 연동·§3 프로덕션 GO-LIVE 는
+> **소유자의 사업 숫자·외부 계약·실제 과금**에 걸려 있어 자율 진행 대상이 아니다.
+> §4/§5(저우선 UI 정리·리포팅 정확도)만 코드 작업이며, 과금 모델 확정 후 함께 다루는 것이 안전하다.
 ---
 
 ## 1. Cost / margin / pricing layer  ✅ Phase 0 + METERED BILLING SHIPPED to develop / ⏳ payment pending

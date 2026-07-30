@@ -89,6 +89,12 @@ jobs:
         working-directory: packages/web
         run: npx vitest run --reporter=verbose
 
+      # The Cloudflare worker modules (SEO handlers, locale policy, sitemap, content
+      # pipeline) are outside packages/*, so no job ran their 123 tests — the locale
+      # policy's noindex/hreflang/sitemap guarantees had no CI guard at all.
+      - name: Vitest — worker modules
+        run: pnpm test:worker
+
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,6 +1,13 @@
 # Design: Extensible SEO Locale Policy (insight 언어 정책)
 
-> Author: autonomous agent · Branch: `feat/seo-locale-policy` · Status: IN PROGRESS
+> Author: autonomous agent · Branch: `feat/seo-locale-policy` · Status: **DONE**
+>
+> 구현·감사는 §9 에 기록된 대로 `develop` 에 들어가 있다(`worker-modules/locale-policy.js`,
+> 핸들러 noindex 스레딩, sitemap/hreflang 필터, `renderJsonLd` 중앙화).
+> 마지막으로 남아 있던 항목은 §7 의 **CI 보강** 하나였고 PR #346 에서 닫았다:
+> `worker-modules/vitest.config.js` + 루트 `pnpm test:worker` + CI `Vitest — worker modules` 스텝.
+> 그때까지 이 정책의 noindex/hreflang/sitemap 보장은 **CI 가드가 전혀 없었다**(worker-modules 가
+> `packages/*` 밖이라 어떤 잡도 123개 테스트를 돌리지 않았다).
 > Goal: 인사이트(블로그) 자동생성을 **한/영만**으로 좁히고, 기존 마이너 언어 페이지를
 > **noindex**(삭제 X)하여 site-wide 품질 희석을 제거한다. **나중에 1줄로 재확장 가능**하도록
 > 플러그인형 단일 진실원천으로 설계한다.
