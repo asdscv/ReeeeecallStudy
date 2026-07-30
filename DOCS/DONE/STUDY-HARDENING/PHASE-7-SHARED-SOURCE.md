@@ -1,6 +1,25 @@
 # Study Hardening Phase 7 — Shared Single Source
 
-상태: DESIGN — implementation pending
+상태: DONE — PR #343, 최종 CI 7 checks green
+
+## 0. 완료 기록
+
+- 설계 commit: `262726f docs(study): design phase 7 shared single source`
+- 구현 commit: `7a4fc74 refactor(study): one implementation of the study engine, not two`
+- PR: https://github.com/asdscv/ReeeeecallStudy/pull/343 (merge `43bf6ad`)
+- 검증: web 전수 vitest 128 files / 2180 tests, 학습 store suite 7종 44 tests,
+  web `tsc -b` / `vite build` / mobile `tsc` 무오류, Architecture Guard 통과 +
+  사본 재생성 시 exit 1 확인, 신규 lint 오류 0
+- 독립 review: 서브에이전트가 throttle(`request was throttled`)로 실패 → 규범에 따라
+  자체 3단계 감사로 대체하고 기록한다.
+  - Deep Dive: 삭제 직전 사본(`HEAD~1`)과 shared 를 전량 diff — lib 4개 byte-identical,
+    `srs.ts` 주석 2줄, store 는 pause/resume 과 import 경로 표기뿐. 버려진 동작 없음.
+  - Double-Check: `pauseSession|resumeSession|isPaused|totalPausedMs` 전수 grep —
+    product·test·E2E·문서 참조 0건(node_modules 잡음만). 삭제 모듈의 상대 import 잔존 0건.
+    store 테스트가 shared 를 실제로 검증하는 근거: `rpc-cutover` 의 RPC 호출 assertion 7건이
+    통과 — mock 이 안 걸렸다면 0-call 로 실패한다.
+  - Lockdown: parity guard 를 실제 실행해 통과 확인, 사본을 되살려 exit 1 확인 후 제거.
+
 
 기준선: `origin/develop@7195c50` (P6 merged + web vitest baseline green)
 
@@ -75,9 +94,9 @@ CI 가 막는다 — 사람이 미러링을 기억해야 하는 상태로 되돌
 
 ## 6. 완료 조건
 
-- 설계 commit 선행
-- web 사본 6개 삭제, product/테스트 import 전환, parity guard 추가
-- 위 테스트 전부 Green, 신규 lint/tsc 오류 0
-- 독립 review
-- PR 최종 CI 7 checks green, develop merge, 문서 DONE 이동, worktree 정리
-- 프로덕션 배포·migration 없음 (이 페이즈는 DB 변경 없음)
+- [x] 설계 commit 선행
+- [x] web 사본 6개 삭제, product/테스트 import 전환, parity guard 추가
+- [x] 위 테스트 전부 Green, 신규 lint/tsc 오류 0
+- [x] 독립 review — throttle 로 자체 3단계 감사 대체(§0)
+- [x] PR 최종 CI 7 checks green, develop merge, 문서 DONE 이동, worktree 정리
+- [x] 프로덕션 배포·migration 없음 (이 페이즈는 DB 변경 없음)
