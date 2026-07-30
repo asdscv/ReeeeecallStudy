@@ -75,7 +75,7 @@
       "Tìm kiếm và lọc dựa trên thẻ gắn",
       "Chia sẻ bộ thẻ & chợ cộng đồng",
       "Thống kê và phân tích học tập chi tiết",
-      "Tích hợp bên ngoài qua khóa API"
+      "Kế hoạch cá nhân hóa và ôn tập thích ứng"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "Tìm kiếm và lọc dựa trên thẻ gắn",
     "5": "Chia sẻ bộ thẻ & chợ cộng đồng",
     "6": "Thống kê và phân tích học tập chi tiết",
-    "7": "Tích hợp bên ngoài qua khóa API"
+    "7": "Kế hoạch cá nhân hóa và ôn tập thích ứng"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "Chia sẻ bộ thẻ",
     "languages": "7 Ngôn ngữ",
     "allDevices": "Mọi thiết bị",
-    "import": "Nhập CSV & API"
+    "import": "Nhập CSV & JSON"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
-    "apiDocs": "Tài liệu API",
     "tagline": "Nền tảng học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
     "product": "Sản phẩm",
     "resources": "Tài nguyên",

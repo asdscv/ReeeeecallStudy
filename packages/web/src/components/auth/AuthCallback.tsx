@@ -2,38 +2,29 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
+import { capturedAuthHash } from '../../lib/auth-callback-hash'
 
-// Module-level hash capture — executes synchronously on module load,
-// before Supabase async processing can strip the URL hash via replaceState.
-// Email link click = full page load → this module is freshly loaded.
-let _capturedHash = window.location.hash
-
-/** Override captured hash — for tests only */
-export function _setCapturedHash(hash: string) {
-  _capturedHash = hash
-}
 
 export function AuthCallback() {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
-  const [error, setError] = useState<string | null>(null)
   const navigatedRef = useRef(false)
 
+  // Derive hash error synchronously during render — capturedAuthHash() is module-level
+  // and never changes, so this avoids an effect-based setState (cascading render).
+  const params = capturedAuthHash() ? new URLSearchParams(capturedAuthHash().substring(1)) : null
+  const capturedType = params?.get('type') ?? null
+  const hashErrorCode = params?.get('error_code') ?? null
+  const hashErrorDesc = params?.get('error_description') ?? null
+  const hashError = hashErrorCode
+    ? t(`callback.errors.${hashErrorCode}`, { defaultValue: hashErrorDesc?.replace(/\+/g, ' ') || t('callback.errors.default') })
+    : null
+
+  const [error, setError] = useState<string | null>(hashError)
+
   useEffect(() => {
-    const params = _capturedHash ? new URLSearchParams(_capturedHash.substring(1)) : null
-    const capturedType = params?.get('type') ?? null
-
-    // Check for error in hash params
-    if (params) {
-      const errorCode = params.get('error_code')
-      const errorDesc = params.get('error_description')
-
-      if (errorCode) {
-        const errorKey = `callback.errors.${errorCode}`
-        setError(t(errorKey, { defaultValue: errorDesc?.replace(/\+/g, ' ') || t('callback.errors.default') }))
-        return
-      }
-    }
+    // Hash error already derived at render time; skip subscription setup.
+    if (hashErrorCode) return
 
     const isRecovery = capturedType === 'recovery'
 
@@ -77,7 +68,7 @@ export function AuthCallback() {
       subscription.unsubscribe()
       clearTimeout(timeout)
     }
-  }, [navigate])
+  }, [navigate, capturedType, hashErrorCode, t])
 
   if (error) {
     return (

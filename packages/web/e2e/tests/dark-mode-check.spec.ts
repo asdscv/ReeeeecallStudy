@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test-helpers';
+import { test } from '../fixtures/test-helpers';
 
 const PAGES = [
   { name: 'dashboard', path: '/dashboard' },

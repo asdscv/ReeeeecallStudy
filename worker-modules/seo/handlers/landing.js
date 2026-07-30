@@ -111,7 +111,6 @@ ${faqHtml}
 <nav>
 <a href="${SITE_URL}/landing">${lang === 'ko' ? '홈' : 'Home'}</a>
 <a href="${SITE_URL}/insight">${lang === 'ko' ? '인사이트' : 'Insights'}</a>
-<a href="${SITE_URL}/docs/api">API</a>
 </nav>
 </footer>`
 

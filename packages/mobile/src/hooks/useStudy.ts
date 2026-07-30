@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
 import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import { calculateStudyProgress } from '@reeeeecall/shared/lib/study-progress'
 import { haptics } from '../utils/haptics'
 
 /**
@@ -57,9 +58,12 @@ export function useStudy() {
     await store.crammingTimeUp()
   }, [store])
 
-  const undoLastRating = useCallback(() => {
-    store.undoLastRating()
+  const undoLastRating = useCallback(async () => {
+    if (store.undoState === 'pending') return
     haptics.warning()
+    // Awaits the server compensation: the local rollback only happens if the DB
+    // accepts it, so callers must not assume the state changed on return.
+    await store.undoLastRating()
   }, [store])
 
   const reset = useCallback(() => {
@@ -73,9 +77,12 @@ export function useStudy() {
     }
     return store.queue[store.currentIndex] ?? null
   }, [store.config, store.crammingManager, store.queue, store.currentIndex])
-  const progress = store.queue.length > 0
-    ? Math.round((store.sessionStats.cardsStudied / store.sessionStats.totalCards) * 100)
-    : 0
+  const progress = calculateStudyProgress(
+    store.config?.mode ?? 'random',
+    store.sessionStats.cardsStudied,
+    store.sessionStats.totalCards,
+    store.crammingManager?.masteryPercentage(),
+  )
 
   return {
     // State
@@ -91,6 +98,7 @@ export function useStudy() {
     queue: store.queue,
     currentIndex: store.currentIndex,
     lastRatedCard: store.lastRatedCard,
+    undoState: store.undoState,
     subscriptionLocked: store.subscriptionLocked,
     crammingManager: store.crammingManager,
     // Actions

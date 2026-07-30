@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "Cấu hình nhà cung cấp AI để tạo thẻ. Khóa được mã hóa trên máy chủ và đồng bộ giữa các thiết bị.",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "Khóa API được mã hóa trên máy chủ (pgcrypto + Vault, không lưu dạng thô) và đồng bộ giữa web và di động.",
-    "configured": "Đã cấu hình",
-    "notSet": "Chưa đặt",
-    "model": "Mô hình",
-    "saving": "Đang lưu...",
-    "delete": "Xóa",
-    "deletedTitle": "Đã xóa",
-    "saveSuccess": "Đã lưu khóa API {{provider}}.",
-    "saveError": "Không lưu được khóa API.",
-    "removed": "Đã xóa khóa API {{provider}}."
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -103,9 +83,7 @@
   },
   "links": {
     "userGuide": "Hướng dẫn sử dụng",
-    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ",
-    "apiDocs": "Tài liệu API",
-    "apiDocsDesc": "Điểm cuối API, xác thực, ví dụ sử dụng"
+    "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
   },
   "quickActions": {
     "quickStudy": "Học nhanh",

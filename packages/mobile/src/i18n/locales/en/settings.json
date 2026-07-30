@@ -56,26 +56,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "Configure AI providers for card generation. Keys are encrypted on our servers and synced across your devices.",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "API keys are encrypted on our servers (pgcrypto + Vault, never stored in plain text) and synced across your web and mobile devices.",
-    "configured": "Configured",
-    "notSet": "Not Set",
-    "model": "Model",
-    "saving": "Saving...",
-    "delete": "Delete",
-    "deletedTitle": "Deleted",
-    "saveSuccess": "{{provider}} API key saved successfully.",
-    "saveError": "Failed to save API key.",
-    "removed": "{{provider}} API key removed."
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -107,9 +87,7 @@
   },
   "links": {
     "userGuide": "User Guide",
-    "userGuideDesc": "Feature guide, learning tips, sharing methods",
-    "apiDocs": "API Documentation",
-    "apiDocsDesc": "API endpoints, authentication, usage examples"
+    "userGuideDesc": "Feature guide, learning tips, sharing methods"
   },
   "quickActions": {
     "quickStudy": "Quick Study",

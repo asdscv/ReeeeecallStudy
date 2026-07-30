@@ -206,12 +206,10 @@ export function DeckDetailPage() {
     fetchData()
   }, [deckId, navigate, fetchCards, fetchPendingCount])
 
-  // 삭제 후 currentPage가 totalPages를 초과할 때 자동 보정
-  useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setCurrentPage(totalPages)
-    }
-  }, [totalPages, currentPage])
+  // Render-time page clamp: avoids synchronous setState in effect (pattern #2).
+  if (totalPages > 0 && currentPage > totalPages) {
+    setCurrentPage(totalPages)
+  }
 
   // indeterminate 체크박스 DOM 동기화
   useEffect(() => {

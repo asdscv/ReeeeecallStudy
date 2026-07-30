@@ -13,12 +13,6 @@
     "full": "Completo (Plantilla + Mazo + Tarjetas)",
     "cardsOnly": "Añadir tarjetas a un mazo existente"
   },
-  "provider": {
-    "section": "PROVEEDOR DE IA",
-    "notice": "La generación con IA usa tu propia clave API para cada proveedor. Añade o gestiona claves en Ajustes.",
-    "none": "No hay proveedores de IA configurados",
-    "addInSettings": "Añadir en Ajustes"
-  },
   "content": {
     "section": "AJUSTES DE CONTENIDO",
     "topicLabel": "Tema",
@@ -81,7 +75,6 @@
   "alert": {
     "errorTitle": "Error",
     "enterTopic": "Por favor, introduce un tema",
-    "configureProvider": "Por favor, configura primero un proveedor de IA en Ajustes.",
     "saveFailed": "No se pudieron guardar las tarjetas generadas",
     "imageRequired": "Por favor, selecciona primero una imagen.",
     "selectImageError": "Esa imagen es demasiado grande o no se pudo leer. Prueba con una foto más pequeña.",

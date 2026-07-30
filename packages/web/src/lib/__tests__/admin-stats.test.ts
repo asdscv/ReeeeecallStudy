@@ -369,8 +369,8 @@ describe('extractErrorMessage', () => {
   })
 
   it('extracts message from plain object with message property (PostgrestError-like)', () => {
-    const pgError = { message: 'relation "api_keys" does not exist', details: '', hint: '', code: '42P01' }
-    expect(extractErrorMessage(pgError)).toBe('relation "api_keys" does not exist')
+    const pgError = { message: 'relation "missing_table" does not exist', details: '', hint: '', code: '42P01' }
+    expect(extractErrorMessage(pgError)).toBe('relation "missing_table" does not exist')
   })
 
   it('handles string error', () => {

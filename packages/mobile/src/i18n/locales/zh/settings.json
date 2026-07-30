@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "配置用于卡片生成的AI提供商。密钥在服务器端加密并跨设备同步。",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "API密钥在服务器端加密（pgcrypto + Vault，绝不明文存储），并在网页和移动设备间同步。",
-    "configured": "已配置",
-    "notSet": "未设置",
-    "model": "模型",
-    "saving": "正在保存...",
-    "delete": "删除",
-    "deletedTitle": "已删除",
-    "saveSuccess": "{{provider}} API密钥已保存。",
-    "saveError": "保存API密钥失败。",
-    "removed": "{{provider}} API密钥已删除。"
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -103,9 +83,7 @@
   },
   "links": {
     "userGuide": "用户指南",
-    "userGuideDesc": "功能说明、学习技巧、分享方法",
-    "apiDocs": "API 文档",
-    "apiDocsDesc": "API 端点、认证、使用示例"
+    "userGuideDesc": "功能说明、学习技巧、分享方法"
   },
   "quickActions": {
     "quickStudy": "快速学习",

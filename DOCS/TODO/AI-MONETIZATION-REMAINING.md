@@ -6,6 +6,10 @@ Builds on the completed engineering: [2026-07-01-ai-server-generation.md](../DON
 Everything below is what's **left**. None of it blocks the shipped engineering; it's the
 business/economic layer + external rails + ops + minor cleanup.
 
+> **2026-07-30 확인**: 엔지니어링(Phase 0/1a/1b + metered billing + 이미지 UI + 테스트/CI/e2e)은
+> `develop` 에 들어가 있다. 남은 §1 Phase 1(마진 ON)·§2 결제 provider 연동·§3 프로덕션 GO-LIVE 는
+> **소유자의 사업 숫자·외부 계약·실제 과금**에 걸려 있어 자율 진행 대상이 아니다.
+> §4/§5(저우선 UI 정리·리포팅 정확도)만 코드 작업이며, 과금 모델 확정 후 함께 다루는 것이 안전하다.
 ---
 
 ## 1. Cost / margin / pricing layer  ✅ Phase 0 + METERED BILLING SHIPPED to develop / ⏳ payment pending
@@ -141,11 +145,28 @@ turn on paid only once the payment webhook (§2) + pack SKUs exist. The free tie
 ## 4. Deferred UI + cleanup  (low)
 
 - **Credit top-up button** — lands with payment 1c.
-- **Mobile dead styles:** `SettingsScreen.tsx` still has orphaned `aiProviderCard` / `aiProviderHeader` /
-  `aiProviderLeft` StyleSheet entries (lines ~1027–1030) left after the BYOK section was removed — delete.
-- **Dead AI code (non-gen-path):** `packages/web/src/lib/ai/prompts.ts` is a **stale duplicate** of the
-  canonical `packages/shared/lib/ai/prompts.ts` (missing Chinese/non-empty rules); plus unreferenced
-  `lib/ai/ai-client.ts`, `secure-storage/*`, `provider-registry`. Remove in a cleanup pass.
+- **✅ BYOK removal finished (2026-07-30, branch `chore/remove-byok`)** — the "connect your own AI
+  provider key" feature is **retired end to end**, not just off the generation path:
+  - **Customer-facing copy**: the mobile guide still shipped an *"API 키 설정"* + *"무료 Gemini API 키 발급"*
+    walkthrough in all 8 locales (rendered by `GuideScreen`), and the web guide's `ai-generate.what` /
+    `fullGenerate` bodies still told users to paste a key. Both rewritten to server-side generation
+    (free daily cards + credit balance).
+  - **Dead i18n**: mobile `settings.json` `aiProviders` block ×8 deleted (web locales were already clean).
+  - **Dead code**: web + shared `lib/ai/{secure-storage/**,providers/**,provider-registry,ai-client,
+    ai-key-storage}` + their tests deleted; BYOK-only types pruned from both `lib/ai/types.ts`;
+    unreferenced duplicate `shared/lib/guide-content.ts` (still had `apiKeySetup`/`geminiSetup` pointing at
+    i18n keys and screenshots that no longer exist) deleted.
+  - **Backend**: `supabase/functions/ai-keys` deleted + mig **170** drops `user_ai_provider_keys`, the 6
+    RPCs, and the plaintext-passphrase table `_ai_encryption_config` (closes SECURITY-REMAINING **H1c**).
+  - **E2E**: `ai-provider-settings.spec.ts` deleted; `ai-generate` / `capture-guide-screenshots` specs
+    de-BYOK'd (gate `E2E_GROK_API_KEY` → `E2E_AI_GENERATION`).
+  - Note: the `SettingsScreen.tsx` orphaned `aiProviderCard/Header/Left` styles this doc previously listed
+    were **already gone** — that entry was stale.
+  - ⚠️ Owner-gated prod steps: apply mig 170, `supabase functions delete ai-keys`, delete the
+    `AI_KEY_PASSPHRASE` edge secret.
+- **Dead AI code (remaining, non-BYOK):** `packages/web/src/lib/ai/prompts.ts` is still a **stale duplicate**
+  of the canonical `packages/shared/lib/ai/prompts.ts` (missing Chinese/non-empty rules). Not on the
+  generation path; resync or delete in a separate pass.
 - **L4 (cosmetic):** request-cap (23514) and insufficient-credits both surface as 429/402 with
   message-only distinction — fine; tighten copy if desired.
 

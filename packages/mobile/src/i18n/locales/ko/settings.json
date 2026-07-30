@@ -56,26 +56,6 @@
     "goodInterval": "Good 간격 (일)",
     "easyInterval": "Easy 간격 (일)"
   },
-  "aiProviders": {
-    "title": "AI 프로바이더",
-    "description": "카드 생성을 위한 AI 프로바이더를 설정합니다. 키는 서버에서 암호화되어 기기 간 동기화됩니다.",
-    "configure": "설정",
-    "cancel": "취소",
-    "apiKey": "API 키",
-    "apiKeyPlaceholder": "API 키를 입력하세요...",
-    "models": "모델",
-    "save": "저장",
-    "securityNote": "API 키는 서버에서 암호화(pgcrypto + Vault, 평문 저장 안 함)되어 웹/모바일 기기 간 동기화됩니다.",
-    "configured": "설정됨",
-    "notSet": "미설정",
-    "model": "모델",
-    "saving": "저장 중...",
-    "delete": "삭제",
-    "deletedTitle": "삭제됨",
-    "saveSuccess": "{{provider}} API 키가 저장되었습니다.",
-    "saveError": "API 키 저장에 실패했습니다.",
-    "removed": "{{provider}} API 키가 삭제되었습니다."
-  },
   "notifications": {
     "title": "알림",
     "dailyReminder": "일일 학습 알림",
@@ -107,9 +87,7 @@
   },
   "links": {
     "userGuide": "사용법 가이드",
-    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
-    "apiDocs": "API 문서",
-    "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법"
   },
   "quickActions": {
     "quickStudy": "빠른 학습",

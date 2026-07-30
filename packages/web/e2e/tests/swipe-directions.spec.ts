@@ -1,10 +1,11 @@
 import { test, expect } from '../fixtures/test-helpers'
+import type { Page } from '@playwright/test'
 
 /**
  * Helper: select a study mode by its text label instead of emoji.
  * The modal buttons contain text like "SRS (Spaced Repetition)", "Random", etc.
  */
-async function selectModeByText(page: any, modeText: string) {
+async function selectModeByText(page: Page, modeText: string) {
   const modal = page.locator('.fixed.inset-0')
   const modeButton = modal.getByRole('button').filter({ hasText: new RegExp(modeText, 'i') })
   await modeButton.click()

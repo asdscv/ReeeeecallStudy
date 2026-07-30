@@ -213,8 +213,14 @@ export function StudyHistoryPage() {
     [deckProgress, deckScope]
   )
 
-  // Reset page when filters change
-  useEffect(() => { setCurrentPage(1) }, [period, deckScope])
+  // Reset page when filters change — render-time adjustment avoids effect-based setState.
+  const [prevPeriod, setPrevPeriod] = useState(period)
+  const [prevDeckScope, setPrevDeckScope] = useState(deckScope)
+  if (period !== prevPeriod || deckScope !== prevDeckScope) {
+    setPrevPeriod(period)
+    setPrevDeckScope(deckScope)
+    setCurrentPage(1)
+  }
 
   if (loading) {
     return (

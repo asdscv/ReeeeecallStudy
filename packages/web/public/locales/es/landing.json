@@ -75,7 +75,7 @@
       "Búsqueda y filtrado basado en etiquetas",
       "Compartir mazos y mercado comunitario",
       "Estadísticas y análisis detallados de aprendizaje",
-      "Integración externa mediante clave API"
+      "Planes personalizados y refuerzo adaptativo"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "Búsqueda y filtrado basado en etiquetas",
     "5": "Compartir mazos y mercado comunitario",
     "6": "Estadísticas y análisis detallados de aprendizaje",
-    "7": "Integración externa mediante clave API"
+    "7": "Planes personalizados y refuerzo adaptativo"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "Compartir Mazos",
     "languages": "{{count, number}} Idiomas",
     "allDevices": "Todos los Dispositivos",
-    "import": "Importar CSV y API"
+    "import": "Importar CSV y JSON"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados.",
-    "apiDocs": "Documentación API",
     "tagline": "Plataforma inteligente de aprendizaje con tarjetas y repetición espaciada",
     "product": "Producto",
     "resources": "Recursos",

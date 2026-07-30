@@ -4,9 +4,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockRpc = vi.fn(); void mockRpc
 const mockFrom = vi.fn(); void mockFrom
 
-// Chainable query builder mock
-function createQueryBuilder(resolvedValue: unknown = { data: [], error: null }) {
-  const builder: Record<string, ReturnType<typeof vi.fn>> = {}
+// Chainable query builder mock with thenable support. An intersection, not an
+// interface extending the index signature: `then` is not a vi.fn and TS rejects the
+// narrower member on a string index type.
+type ThenableBuilder = Record<string, ReturnType<typeof vi.fn>> & {
+  then: (resolve: (v: unknown) => void) => Promise<unknown>
+}
+
+function createQueryBuilder(resolvedValue: unknown = { data: [], error: null }): ThenableBuilder {
+  const builder = {} as ThenableBuilder
   const methods = ['select', 'insert', 'update', 'delete', 'eq', 'in', 'order', 'range', 'limit', 'single', 'maybeSingle']
   methods.forEach((m) => {
     builder[m] = vi.fn(() => {
@@ -17,8 +23,7 @@ function createQueryBuilder(resolvedValue: unknown = { data: [], error: null }) 
       return builder
     })
   })
-  // Make the builder thenable
-  ;(builder as any).then = (resolve: (v: unknown) => void) => Promise.resolve(resolvedValue).then(resolve)
+  builder.then = (resolve: (v: unknown) => void) => Promise.resolve(resolvedValue).then(resolve)
   return builder
 }
 
@@ -31,48 +36,66 @@ const mockSupabase = vi.hoisted(() => ({
 }))
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
+// The store under test is a re-export of the shared one, which imports the shared
+// client — mocking only the web path left the real (uninitialised) client in place,
+// so every assertion saw zero calls.
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+  supabase: mockSupabase,
+  getSupabase: () => mockSupabase,
+  initSupabase: vi.fn(),
+}))
 
 // Import the store after mocking
 import { useReviewsStore } from '../reviews-store'
+import type { MarketplaceReview, ReviewStats } from '../../types/database'
 
 // ─── Helpers ────────────────────────────────────────────────
 const fakeUser = { id: 'user-1', email: 'test@test.com' }
 const fakeListingId = 'listing-1'
 
-const fakeReview = {
-  id: 'review-1',
-  listing_id: fakeListingId,
-  user_id: 'user-1',
-  rating: 4,
-  title: 'Great deck!',
-  body: 'Really helpful for studying.',
-  is_edited: false,
-  helpful_count: 2,
-  created_at: '2024-01-15T10:00:00Z',
-  updated_at: '2024-01-15T10:00:00Z',
-  profiles: { display_name: 'TestUser' },
+function review(over: Partial<MarketplaceReview> = {}): MarketplaceReview {
+  return {
+    id: 'review-1',
+    listing_id: fakeListingId,
+    user_id: 'user-1',
+    rating: 4,
+    title: 'Great deck!',
+    body: 'Really helpful for studying.',
+    is_edited: false,
+    helpful_count: 2,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    user_display_name: 'TestUser',
+    ...over,
+  }
 }
 
-const fakeReview2 = {
-  ...fakeReview,
+function stats(over: Partial<ReviewStats> = {}): ReviewStats {
+  return {
+    avg_rating: 4.5,
+    review_count: 2,
+    rating_1: 0,
+    rating_2: 0,
+    rating_3: 0,
+    rating_4: 1,
+    rating_5: 1,
+    ...over,
+  }
+}
+
+const fakeReview: MarketplaceReview = review()
+
+const fakeReview2: MarketplaceReview = review({
   id: 'review-2',
   user_id: 'user-2',
   rating: 5,
   title: 'Excellent',
   body: null,
   helpful_count: 0,
-  profiles: { display_name: 'OtherUser' },
-}
+  user_display_name: 'OtherUser',
+})
 
-const fakeStats = {
-  avg_rating: 4.5,
-  review_count: 2,
-  rating_1: 0,
-  rating_2: 0,
-  rating_3: 0,
-  rating_4: 1,
-  rating_5: 1,
-}
+const fakeStats: ReviewStats = stats()
 
 function resetStore() {
   useReviewsStore.getState().reset()
@@ -295,8 +318,8 @@ describe('deleteReview', () => {
   it('should call delete_review RPC and return true on success', async () => {
     // Set up a known review in state so listingId can be found
     useReviewsStore.setState({
-      reviews: [fakeReview as any],
-      userReview: fakeReview as any,
+      reviews: [fakeReview],
+      userReview: fakeReview,
     })
     mockSupabase.rpc.mockResolvedValue({ data: null, error: null })
     const qb = createQueryBuilder({ data: [], error: null })
@@ -324,7 +347,7 @@ describe('deleteReview', () => {
 describe('markHelpful', () => {
   it('should call mark_review_helpful RPC and optimistically update', async () => {
     useReviewsStore.setState({
-      reviews: [{ ...fakeReview, helpful_count: 2 } as any],
+      reviews: [review({ helpful_count: 2 })],
       userHelpfuls: new Set<string>(),
     })
     mockSupabase.rpc.mockResolvedValue({ data: null, error: null })
@@ -341,7 +364,7 @@ describe('markHelpful', () => {
 
   it('should skip if already marked as helpful', async () => {
     useReviewsStore.setState({
-      reviews: [fakeReview as any],
+      reviews: [fakeReview],
       userHelpfuls: new Set(['review-1']),
     })
 
@@ -353,7 +376,7 @@ describe('markHelpful', () => {
 
   it('should set error on failure', async () => {
     useReviewsStore.setState({
-      reviews: [fakeReview as any],
+      reviews: [fakeReview],
       userHelpfuls: new Set<string>(),
     })
     mockSupabase.rpc.mockResolvedValue({ data: null, error: { message: 'Cannot mark own review' } })
@@ -419,9 +442,9 @@ describe('loadMore', () => {
 describe('reset', () => {
   it('should clear all state', () => {
     useReviewsStore.setState({
-      reviews: [fakeReview as any],
-      stats: fakeStats as any,
-      userReview: fakeReview as any,
+      reviews: [fakeReview],
+      stats: fakeStats,
+      userReview: fakeReview,
       userHelpfuls: new Set(['review-1']),
       loading: true,
       submitting: true,

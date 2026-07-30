@@ -1,0 +1,11 @@
+{
+  // The Playwright suite was outside every tsconfig, so its types were never checked
+  // and fixtures drifted to `any`. It cannot join tsconfig.app.json (different globals
+  // and no DOM-app assumptions), so it gets its own project.
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["e2e"]
+}

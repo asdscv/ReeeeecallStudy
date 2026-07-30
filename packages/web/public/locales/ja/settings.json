@@ -8,17 +8,11 @@
   "autoSaved": "自動保存しました",
   "links": {
     "userGuide": "ユーザーガイド",
-    "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
-    "apiDocs": "APIドキュメント",
-    "apiDocsDesc": "APIエンドポイント、認証、使用例"
+    "userGuideDesc": "機能ガイド、学習のコツ、共有方法"
   },
   "guide": {
     "title": "ユーザーガイド",
     "desc": "機能ガイド、学習のコツ、共有方法"
-  },
-  "apiDocs": {
-    "title": "APIドキュメント",
-    "desc": "APIエンドポイント、認証、使用例"
   },
   "profile": {
     "title": "プロフィール",

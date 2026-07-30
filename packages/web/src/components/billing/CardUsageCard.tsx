@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CreditCard, ChevronRight, Archive } from 'lucide-react'
 import { useDeckStore } from '../../stores/deck-store'
 import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
-import { isUnlimitedCardLimit } from './PlanSelector'
+import { isUnlimitedCardLimit } from '../../lib/card-limit'
 import { CardUsageModal } from './CardUsageModal'
 
 /**

@@ -7,16 +7,8 @@ import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { preferredProviderId } from '../../lib/payments'
 import { writeCheckoutLoadingTab } from '../../lib/payments/checkout-tab'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { isUnlimitedCardLimit } from '../../lib/card-limit'
 
-// A card_limit at or above this sentinel means "unlimited" for DISPLAY only. As of
-// mig 148 NO subscription plan is unlimited (the top plan caps at 100,000); this now
-// only collapses to "무제한 / Unlimited" for admins, whose effective limit is 2e9
-// (mig 139). Never special-case this server-side.
-export const UNLIMITED_CARD_LIMIT = 1_000_000_000 // 1e9
-
-export function isUnlimitedCardLimit(limit: number | null | undefined): boolean {
-  return limit != null && limit >= UNLIMITED_CARD_LIMIT
-}
 
 /**
  * Data-driven subscription plan selector for the card-storage Settings section.

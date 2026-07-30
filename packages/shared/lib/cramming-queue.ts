@@ -36,12 +36,8 @@ export interface CrammingQueueSnapshot {
   round: number
   cardStates: Map<string, CrammingCardState>
   roundUniqueTotal: number
+  nextRoundMissed: Set<string>
 }
-
-// ─── Constants ──────────────────────────────────────────
-
-/** How many cards to skip before showing a re-inserted "missed" card */
-const REQUEUE_GAP = 2
 
 // ─── Filter ─────────────────────────────────────────────
 
@@ -87,34 +83,33 @@ function shuffleArray<T>(array: T[]): T[] {
 // ─── CrammingQueueManager ───────────────────────────────
 
 /**
- * Manages a cramming study session with round-based mastery.
+ * Manages a cramming session as discrete rounds.
  *
- * Key behaviors:
- * - Round 1: all filtered cards (optionally shuffled)
- * - Within a round: "missed" cards are re-inserted after REQUEUE_GAP cards
- * - Round transition: only cards that were never "got_it" in the round move to next round
- * - Session completes when all cards are mastered OR time limit reached
- * - Does NOT modify SRS state
+ * Each unique card is rated exactly once per round. Cards rated `missed`
+ * become the next round; cards rated `got_it` are permanently mastered.
+ * The manager never modifies SRS state.
  */
 export class CrammingQueueManager {
-  private queue: string[] // card IDs (may contain duplicates from re-queue)
+  private queue: string[] // fixed unique card IDs for the current round
   private cursor: number = 0
   private round: number = 1
   private readonly cardStates: Map<string, CrammingCardState>
-  private readonly allCardIds: string[] // original full set
+  private readonly allCardIds: string[] // original unique set, first-seen order
   private readonly shouldShuffle: boolean
   private readonly timeLimitMs: number | null
   private readonly startTime: number
-  private roundUniqueTotal: number // unique cards at start of round
+  private roundUniqueTotal: number
+  private nextRoundMissed: Set<string> = new Set()
 
   constructor(cardIds: string[], config: CrammingConfig) {
-    this.allCardIds = [...cardIds]
+    const uniqueCardIds = [...new Set(cardIds)]
+    this.allCardIds = uniqueCardIds
     this.shouldShuffle = config.shuffleCards
     this.timeLimitMs = config.timeLimitMinutes != null ? config.timeLimitMinutes * 60 * 1000 : null
     this.startTime = Date.now()
     this.cardStates = new Map()
 
-    for (const id of cardIds) {
+    for (const id of uniqueCardIds) {
       this.cardStates.set(id, {
         cardId: id,
         totalAttempts: 0,
@@ -124,9 +119,8 @@ export class CrammingQueueManager {
       })
     }
 
-    // Initialize round 1 queue
-    this.queue = this.shouldShuffle ? shuffleArray(cardIds) : [...cardIds]
-    this.roundUniqueTotal = cardIds.length
+    this.queue = this.shouldShuffle ? shuffleArray(uniqueCardIds) : [...uniqueCardIds]
+    this.roundUniqueTotal = uniqueCardIds.length
   }
 
   /** Get the current card ID without side effects */
@@ -136,8 +130,10 @@ export class CrammingQueueManager {
     return this.queue[this.cursor] ?? null
   }
 
-  /** Rate the current card and advance, auto-advancing round if needed */
+  /** Rate the current card once and advance to the next card or round. */
   rateCard(rating: CrammingRating): void {
+    if (this.isSessionComplete()) return
+
     const cardId = this.queue[this.cursor]
     if (!cardId) return
 
@@ -147,19 +143,13 @@ export class CrammingQueueManager {
 
     if (rating === 'missed') {
       state.missedCount++
-      // Re-insert after REQUEUE_GAP cards
-      const insertAt = Math.min(this.cursor + 1 + REQUEUE_GAP, this.queue.length)
-      this.queue.splice(insertAt, 0, cardId)
-    } else {
-      // got_it
-      if (state.masteredInRound === null) {
-        state.masteredInRound = this.round
-      }
+      this.nextRoundMissed.add(cardId)
+    } else if (state.masteredInRound === null) {
+      state.masteredInRound = this.round
     }
 
     this.cursor++
 
-    // Auto-advance round if current round is exhausted
     if (this.cursor >= this.queue.length && !this._isAllMasteredOrTimedOut()) {
       this._advanceRound()
     }
@@ -174,19 +164,16 @@ export class CrammingQueueManager {
     return this.isAllMastered()
   }
 
-  /** Advance to the next round with only unmastered cards */
+  /** Advance with exactly the cards missed in the completed round. */
   private _advanceRound(): void {
-    const unmasteredIds = this.allCardIds.filter(id => {
-      const state = this.cardStates.get(id)!
-      return state.masteredInRound === null
-    })
-
-    if (unmasteredIds.length === 0) return // All mastered
+    const missedIds = [...this.nextRoundMissed]
+    if (missedIds.length === 0) return
 
     this.round++
     this.cursor = 0
-    this.queue = this.shouldShuffle ? shuffleArray(unmasteredIds) : [...unmasteredIds]
-    this.roundUniqueTotal = unmasteredIds.length
+    this.queue = this.shouldShuffle ? shuffleArray(missedIds) : missedIds
+    this.roundUniqueTotal = missedIds.length
+    this.nextRoundMissed = new Set()
   }
 
   /** Whether the session is complete (all mastered or time limit reached) */
@@ -204,18 +191,9 @@ export class CrammingQueueManager {
     return this.round
   }
 
-  /** Number of unique unmastered cards remaining in current round */
+  /** Number of cards not yet rated in the current round. */
   remainingInRound(): number {
-    // Count unique card IDs from cursor onwards that haven't been mastered yet
-    const remaining = new Set<string>()
-    for (let i = this.cursor; i < this.queue.length; i++) {
-      const id = this.queue[i]
-      const state = this.cardStates.get(id)
-      if (state && state.masteredInRound === null) {
-        remaining.add(id)
-      }
-    }
-    return remaining.size
+    return Math.max(0, this.queue.length - this.cursor)
   }
 
   /** Total unique cards in current round at start */
@@ -237,7 +215,7 @@ export class CrammingQueueManager {
   getHardestCards(n: number = 5): CrammingCardState[] {
     return [...this.cardStates.values()]
       .filter(s => s.missedCount > 0)
-      .sort((a, b) => b.missedCount - a.missedCount)
+      .sort((a, b) => b.missedCount - a.missedCount || a.cardId.localeCompare(b.cardId))
       .slice(0, n)
   }
 
@@ -292,6 +270,7 @@ export class CrammingQueueManager {
       round: this.round,
       cardStates,
       roundUniqueTotal: this.roundUniqueTotal,
+      nextRoundMissed: new Set(this.nextRoundMissed),
     }
   }
 
@@ -301,6 +280,7 @@ export class CrammingQueueManager {
     this.cursor = snap.cursor
     this.round = snap.round
     this.roundUniqueTotal = snap.roundUniqueTotal
+    this.nextRoundMissed = new Set(snap.nextRoundMissed)
     this.cardStates.clear()
     for (const [k, v] of snap.cardStates) {
       this.cardStates.set(k, { ...v })

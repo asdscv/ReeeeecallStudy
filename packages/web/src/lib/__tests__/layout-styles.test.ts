@@ -3,6 +3,7 @@ import {
   getLayoutItemStyle,
   FONT_SIZE_OPTIONS,
   DEFAULT_FONT_SIZES,
+  type StyleName,
 } from '../layout-styles'
 
 // ═══════════════════════════════════════════════════════
@@ -52,30 +53,39 @@ describe('DEFAULT_FONT_SIZES', () => {
 // ═══════════════════════════════════════════════════════
 
 describe('getLayoutItemStyle', () => {
+  // The card text colours moved from the hardcoded gray palette to semantic tokens
+  // so cards stay legible in dark mode. A regression to `text-gray-*` would look
+  // fine in light mode and unreadable in dark, so guard the whole set.
+  it('uses semantic colour tokens, never the raw gray palette', () => {
+    for (const style of ['primary', 'secondary', 'hint', 'detail', 'media'] as const) {
+      expect(getLayoutItemStyle(style).className).not.toMatch(/text-gray-\d/)
+    }
+  })
+
   it('should return className and fontSize for primary style', () => {
     const result = getLayoutItemStyle('primary')
     expect(result.className).toContain('font-bold')
-    expect(result.className).toContain('text-gray-900')
+    expect(result.className).toContain('text-foreground')
     expect(result.fontSize).toBe(DEFAULT_FONT_SIZES.primary)
   })
 
   it('should return className for secondary style', () => {
     const result = getLayoutItemStyle('secondary')
     expect(result.className).toContain('font-semibold')
-    expect(result.className).toContain('text-gray-700')
+    expect(result.className).toContain('text-foreground/80')
     expect(result.fontSize).toBe(DEFAULT_FONT_SIZES.secondary)
   })
 
   it('should return className for hint style', () => {
     const result = getLayoutItemStyle('hint')
     expect(result.className).toContain('italic')
-    expect(result.className).toContain('text-gray-400')
+    expect(result.className).toContain('text-muted-foreground')
     expect(result.fontSize).toBe(DEFAULT_FONT_SIZES.hint)
   })
 
   it('should return className for detail style', () => {
     const result = getLayoutItemStyle('detail')
-    expect(result.className).toContain('text-gray-600')
+    expect(result.className).toContain('text-muted-foreground')
     expect(result.fontSize).toBe(DEFAULT_FONT_SIZES.detail)
   })
 
@@ -96,7 +106,9 @@ describe('getLayoutItemStyle', () => {
   })
 
   it('should fallback to primary style for unknown style', () => {
-    const result = getLayoutItemStyle('unknown_style' as any)
+    // Deliberately outside StyleName: the DB can hold a style this build does not
+    // know, and the renderer must fall back rather than crash.
+    const result = getLayoutItemStyle('unknown_style' as unknown as StyleName)
     expect(result.className).toContain('font-bold')
     expect(result.fontSize).toBe(DEFAULT_FONT_SIZES.primary)
   })

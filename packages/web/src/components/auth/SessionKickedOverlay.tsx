@@ -119,22 +119,23 @@ export function SessionKickedOverlay() {
   const signOut = useAuthStore((s) => s.signOut)
   const user = useAuthStore((s) => s.user)
   const [reclaiming, setReclaiming] = useState(false)
-  const [showContent, setShowContent] = useState(false)
+  const [delayPassed, setDelayPassed] = useState(false)
 
   // Only show for logged-in users with invalid sessions
   const shouldShow = user && !sessionValid
 
+  // Derived, not stored: the state only ever said "the entry delay has passed", and
+  // tracking it in an effect meant mounting into an already-kicked session with reduced
+  // motion never revealed the content at all.
+  const showContent = Boolean(shouldShow) && (prefersReduced || delayPassed)
+
   useEffect(() => {
-    if (!shouldShow) {
-      setShowContent(false)
-      return
+    if (!shouldShow || prefersReduced) return
+    const timer = setTimeout(() => setDelayPassed(true), 300)
+    return () => {
+      clearTimeout(timer)
+      setDelayPassed(false)
     }
-    if (prefersReduced) {
-      setShowContent(true)
-      return
-    }
-    const timer = setTimeout(() => setShowContent(true), 300)
-    return () => clearTimeout(timer)
   }, [shouldShow, prefersReduced])
 
   if (!shouldShow) return null

@@ -322,16 +322,6 @@ test.describe('Admin Dashboard', () => {
       expect(await dots.count()).toBeGreaterThanOrEqual(2)
     })
 
-    test('API keys section with progress bars', async ({ page }) => {
-      const apiSection = page.getByText(/API Key Management|API 키 관리/)
-      await expect(apiSection).toBeVisible({ timeout: 10_000 })
-      // Progress bars
-      const bars = page.locator('.bg-gray-200.rounded-full.h-2')
-      await page.waitForTimeout(2000)
-      const count = await bars.count()
-      expect(count).toBeGreaterThanOrEqual(0)
-    })
-
     test('content pipeline section renders', async ({ page }) => {
       const pipeline = page.getByText(/Content Pipeline|콘텐츠 파이프라인/).last()
       await pipeline.scrollIntoViewIfNeeded()

@@ -218,23 +218,7 @@
             "/images/guide/ai-generate/mobile-01-page.png"
           ],
           "title": "什么是 AI 自动生成？",
-          "body": "使用 AI 自动创建卡片。输入主题，AI 会为你生成一切。\n\n支持的服务商：Google Gemini（免费！）、OpenAI、xAI/Grok、Anthropic。\n\n你的 API 密钥仅存储在本机，绝不会发送到我们的服务器。"
-        },
-        "apiKey": {
-          "images": [
-            "/images/guide/ai-generate/mobile-02-config.png"
-          ],
-          "title": "设置 API 密钥",
-          "body": "从你偏好的服务商获取 API 密钥：\n• Google Gemini（免费）：aistudio.google.com → Get API Key\n• OpenAI：platform.openai.com → API Keys\n• xAI/Grok：console.x.ai → API Keys\n\n在 AI 生成设置中输入密钥。密钥保存在本机。\n\n💡 推荐 Google Gemini 2.5 Flash — 完全免费！"
-        },
-        "geminiSetup": {
-          "images": [
-            "/images/guide/gemini-api/02-get-api-key.png",
-            "/images/guide/gemini-api/03-create-api-key.png",
-            "/images/guide/gemini-api/05-api-key-created.png"
-          ],
-          "title": "🎯 免费 Gemini API 密钥（推荐）",
-          "body": "Gemini 2.5 Flash 完全免费 — 无需信用卡！\n\n免费额度：15 次/分钟，1,500 次/天，100 万 tokens/分钟\n\n获取密钥的步骤：\n1. 访问 aistudio.google.com\n2. 使用 Google 账户登录\n3. 点击侧边栏的「Get API Key」\n4. 点击「Create API Key」\n5. 选择「Create API key in new project」\n6. 复制密钥（以「AIza...」开头）\n\n在 ReeeeecallStudy 中使用：\n1. 打开 AI 生成页面\n2. 服务商选择「Google Gemini」\n3. 粘贴你的 API 密钥\n4. 选择「Gemini 2.5 Flash」模型\n5. 输入主题并生成！\n\n为什么选择 Gemini Flash？\n• 💰 免费 — 无需开通计费\n• ⚡ 快速 — 几秒生成 50 张\n• 🎯 准确 — 非常适合教育\n• 🌍 支持所有语言\n• 📚 每天 1,500 次请求 — 数千张卡片"
+          "body": "使用 AI 自动创建闪卡。输入主题，AI 会为你生成全部内容。\n\n无需 API 密钥或任何设置 — 生成在我们的服务器上运行。\n\n每天都有免费的 AI 卡片额度，超出部分将从你的充值余额中扣除。"
         },
         "fullGeneration": {
           "images": [

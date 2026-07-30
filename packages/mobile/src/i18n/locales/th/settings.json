@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "ตั้งค่าผู้ให้บริการ AI สำหรับสร้างการ์ด คีย์ถูกเข้ารหัสบนเซิร์ฟเวอร์และซิงก์ข้ามอุปกรณ์",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "คีย์ API ถูกเข้ารหัสบนเซิร์ฟเวอร์ (pgcrypto + Vault ไม่เก็บแบบข้อความธรรมดา) และซิงก์ระหว่างเว็บและมือถือ",
-    "configured": "ตั้งค่าแล้ว",
-    "notSet": "ยังไม่ตั้ง",
-    "model": "โมเดล",
-    "saving": "กำลังบันทึก...",
-    "delete": "ลบ",
-    "deletedTitle": "ลบแล้ว",
-    "saveSuccess": "บันทึกคีย์ API {{provider}} แล้ว",
-    "saveError": "บันทึกคีย์ API ไม่สำเร็จ",
-    "removed": "ลบคีย์ API {{provider}} แล้ว"
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -103,9 +83,7 @@
   },
   "links": {
     "userGuide": "คู่มือผู้ใช้",
-    "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์",
-    "apiDocs": "เอกสาร API",
-    "apiDocsDesc": "API endpoints การยืนยันตัวตน ตัวอย่างการใช้งาน"
+    "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์"
   },
   "quickActions": {
     "quickStudy": "เรียนด่วน",

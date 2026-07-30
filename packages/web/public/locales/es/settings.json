@@ -8,17 +8,11 @@
   "autoSaved": "Guardado automáticamente",
   "links": {
     "userGuide": "Guía de usuario",
-    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
-    "apiDocs": "Documentación API",
-    "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
   },
   "guide": {
     "title": "Guía de usuario",
     "desc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
-  },
-  "apiDocs": {
-    "title": "Documentación API",
-    "desc": "Endpoints API, autenticación, ejemplos de uso"
   },
   "profile": {
     "title": "Perfil",

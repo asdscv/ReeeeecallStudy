@@ -1,4 +1,6 @@
 import { test, expect } from '../fixtures/test-helpers'
+import type { Page } from '@playwright/test'
+import type { QuickStudyPage } from '../pages/quick-study.page'
 
 test.describe('Sequential Review — Resume After Mid-Session Exit', () => {
 
@@ -7,8 +9,8 @@ test.describe('Sequential Review — Resume After Mid-Session Exit', () => {
    * Returns false if no cards are available.
    */
   async function startSequentialReview(
-    quickStudyPage: any,
-    page: any,
+    quickStudyPage: QuickStudyPage,
+    page: Page,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
     await quickStudyPage.selectFirstDeck()
@@ -27,7 +29,7 @@ test.describe('Sequential Review — Resume After Mid-Session Exit', () => {
   /**
    * Get the visible card text (front or back).
    */
-  async function getCardText(page: any): Promise<string> {
+  async function getCardText(page: Page): Promise<string> {
     const card = page.locator('.rounded-2xl').first()
     return (await card.textContent() ?? '').trim()
   }

@@ -1,4 +1,13 @@
 import { test, expect } from '../fixtures/test-helpers'
+import type { Page } from '@playwright/test'
+import type { QuickStudyPage } from '../pages/quick-study.page'
+
+// Augment window for TTS cancel spy used in tests
+declare global {
+  interface Window {
+    __ttsCancelCount?: number
+  }
+}
 
 /**
  * E2E tests for study UX improvements:
@@ -9,7 +18,7 @@ import { test, expect } from '../fixtures/test-helpers'
  */
 
 // ── Helper: flip and rate "known" via UI click. Returns true if session is still active. ──
-async function flipAndRateKnown(page: any): Promise<boolean> {
+async function flipAndRateKnown(page: Page): Promise<boolean> {
   // Click "Tap to flip" hint or the card body to flip
   const tapToFlip = page.locator('text=/Tap to flip|탭하여 뒤집기|눌러서/i')
   if (await tapToFlip.isVisible({ timeout: 2000 }).catch(() => false)) {
@@ -35,8 +44,8 @@ async function flipAndRateKnown(page: any): Promise<boolean> {
 
 // ── Helper: start a study session (random mode, fast) ──────
 async function startRandomStudy(
-  quickStudyPage: any,
-  page: any,
+  quickStudyPage: QuickStudyPage,
+  page: Page,
 ): Promise<boolean> {
   await quickStudyPage.navigate()
   await quickStudyPage.selectFirstDeck()
@@ -478,11 +487,11 @@ test.describe('TTS During Study', () => {
 
     // Inject a spy on speechSynthesis.cancel
     await page.evaluate(() => {
-      (window as any).__ttsCancelCount = 0
+      window.__ttsCancelCount = 0
       const original = window.speechSynthesis?.cancel?.bind(window.speechSynthesis)
       if (window.speechSynthesis && original) {
         window.speechSynthesis.cancel = () => {
-          (window as any).__ttsCancelCount++;
+          window.__ttsCancelCount = (window.__ttsCancelCount ?? 0) + 1
           original()
         }
       }
@@ -508,7 +517,7 @@ test.describe('TTS During Study', () => {
     await page.waitForTimeout(1000)
 
     // Check that cancel was called (stopSpeaking on complete)
-    const cancelCount = await page.evaluate(() => (window as any).__ttsCancelCount ?? 0)
+    const cancelCount = await page.evaluate(() => window.__ttsCancelCount ?? 0)
     console.log(`[tts-stop] speechSynthesis.cancel called ${cancelCount} times during session`)
     // At minimum, cancel is called during rating transitions + completion
     expect(cancelCount).toBeGreaterThan(0)

@@ -75,7 +75,7 @@
       "Tag-based search and filtering",
       "Deck sharing & community marketplace",
       "Detailed learning statistics and analysis",
-      "External integration via API key"
+      "Personalized plans and adaptive remediation"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "Tag-based search and filtering",
     "5": "Deck sharing & community marketplace",
     "6": "Detailed learning statistics and analysis",
-    "7": "External integration via API key"
+    "7": "Personalized plans and adaptive remediation"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "Deck Sharing",
     "languages": "7 Languages",
     "allDevices": "All Devices",
-    "import": "CSV & API Import"
+    "import": "CSV & JSON Import"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API Docs",
     "tagline": "Smart flashcard learning platform with spaced repetition",
     "product": "Product",
     "resources": "Resources",

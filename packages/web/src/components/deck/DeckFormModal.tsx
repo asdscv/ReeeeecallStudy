@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -10,8 +10,8 @@ import {
 import { useDeckStore } from '../../stores/deck-store'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
 import type { Deck } from '../../types/database'
-import { DeckSettingsForm, COLORS, ICONS } from './DeckSettingsForm'
-import type { DeckSettingsFormValues } from './DeckSettingsForm'
+import { DeckSettingsForm } from './DeckSettingsForm'
+import { COLORS, ICONS, type DeckSettingsFormValues } from '../../lib/deck-settings'
 
 interface DeckFormModalProps {
   open: boolean
@@ -36,7 +36,12 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
   })
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
+  // Sync form state from props during render to avoid effect-driven cascading renders
+  // `null` until the first sync: seeding it with the current props skipped the initial
+  // population the effect used to do, so opening the edit modal showed an empty form.
+  const [prevDeps, setPrevDeps] = useState<{ editDeck: Deck | null | undefined; open: boolean; templates: typeof templates } | null>(null)
+  if (!prevDeps || editDeck !== prevDeps.editDeck || open !== prevDeps.open || templates !== prevDeps.templates) {
+    setPrevDeps({ editDeck, open, templates })
     if (editDeck) {
       setFormValues({
         name: editDeck.name,
@@ -62,7 +67,7 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         srsSettings: { ...DEFAULT_SRS_SETTINGS },
       })
     }
-  }, [editDeck, open, templates])
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

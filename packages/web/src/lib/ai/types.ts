@@ -1,36 +1,3 @@
-// ─── AI Provider Types ──────────────────────────────────────────────────
-
-export interface AIProviderConfig {
-  id: string
-  name: string
-  baseUrl: string
-  models: AIModel[]
-}
-
-export interface AIModel {
-  id: string
-  name: string
-}
-
-export interface AIConfig {
-  providerId: string
-  apiKey: string
-  model: string
-  baseUrl?: string
-}
-
-export interface AIRequestOptions {
-  systemPrompt: string
-  userPrompt: string
-  temperature?: number
-  maxTokens?: number
-}
-
-export interface AIResponse {
-  content: string
-  usage?: { promptTokens: number; completionTokens: number }
-}
-
 // ─── Generated Data Types ───────────────────────────────────────────────
 
 export interface GeneratedTemplateField {
