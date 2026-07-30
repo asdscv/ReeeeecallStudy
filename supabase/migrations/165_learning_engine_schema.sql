@@ -1,5 +1,5 @@
 -- ============================================================================
--- 160: MODULAR LEARNING ENGINE — Schema Foundation (expand-only)
+-- 165: MODULAR LEARNING ENGINE — Schema Foundation (expand-only)
 --
 -- Tables: learning_goals, content_sources, learning_concepts, learning_activities,
 --         learning_goal_decks, learning_goal_concepts, answer_attempts,

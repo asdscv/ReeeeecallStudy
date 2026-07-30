@@ -1,4 +1,4 @@
--- 163: paid AI remediation metering and service-only enrichment persistence.
+-- 168: paid AI remediation metering and service-only enrichment persistence.
 -- Additive extension of the existing reserve -> generate -> charge/release pipeline.
 BEGIN;
 

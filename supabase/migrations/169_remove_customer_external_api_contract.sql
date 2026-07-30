@@ -1,4 +1,4 @@
--- 164: Defense-in-depth contract removal for the retired customer rc_ REST API.
+-- 169: Defense-in-depth contract removal for the retired customer rc_ REST API.
 -- Migration 117 already removed these objects on the normal history. This migration
 -- closes drifted environments idempotently without touching internal app rate limits.
 BEGIN;

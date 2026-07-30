@@ -1,5 +1,5 @@
 -- ============================================================================
--- 161: ATOMIC STUDY RECORDING — rate_card_and_log RPC + idempotency support
+-- 166: ATOMIC STUDY RECORDING — rate_card_and_log RPC + idempotency support
 --
 -- Design: DOCS/TODO/2026-07-29-modular-learning-engine-design.md §8, §21
 --

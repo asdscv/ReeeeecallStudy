@@ -1,5 +1,5 @@
 -- ============================================================================
--- Rollback: 161_atomic_study_recording
+-- Rollback: 166_atomic_study_recording
 -- Removes rate_card_and_log RPC, client_rating_id column/index.
 -- Restores insert_study_log PUBLIC/anon grants to pre-161 state.
 -- Does NOT touch any other existing table, column, or function.

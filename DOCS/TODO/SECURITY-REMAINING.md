@@ -4,7 +4,7 @@
 > **Created**: 2026-06-26 · **Updated**: 2026-06-26
 > **Status**: 🎉 **actionable 항목 전부 완료·배포** (H1·H2·H3·H4·N1·M1·L4·L5). 남은 건 **게이트/제품결정 대기**(H1c·L6·Auth)뿐.
 > **완료 기록**: [`DOCS/DONE/2026-06-26-security-remediation.md`](../DONE/2026-06-26-security-remediation.md)
-> **2026-07-29 update:** customer/developer `rc_` REST API was retired. Migration 117 removed `api_keys`/`resolve_api_key`; migration 164 is the idempotent contract close. H4 below is retained only as historical remediation context and is no longer an active surface.
+> **2026-07-29 update:** customer/developer `rc_` REST API was retired. Migration 117 removed `api_keys`/`resolve_api_key`; migration 169 is the idempotent contract close. H4 below is retained only as historical remediation context and is no longer an active surface.
 > **prod ref**: `ixdapelfikaneexnskfm` (Management API SQL; 자격증명은 메모리 `reference_credentials`)
 
 ---

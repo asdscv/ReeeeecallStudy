@@ -1,5 +1,5 @@
 -- ============================================================================
--- Rollback: 162_learning_engine_rpcs
+-- Rollback: 167_learning_engine_rpcs
 -- Drops all functions and the learning_usage_daily table created by mig 162.
 -- Does NOT touch any other existing table, column, function, or policy.
 -- For local/dev rollback. Run manually if needed.

@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-29  
 **Branch/worktree:** `feat/modular-learning-engine-foundation` in `modular-learning-engine`  
-**Scope:** migrations 160–164, shared learning core, atomic study recording, planner/evaluators/domain adapters, AI remediation, customer external API removal, web/mobile compatibility.
+**Scope:** migrations 165–169, shared learning core, atomic study recording, planner/evaluators/domain adapters, AI remediation, customer external API removal, web/mobile compatibility.
 
 No commit, push, deployment, remote migration, or remote data operation was performed.
 
@@ -12,8 +12,8 @@ No commit, push, deployment, remote migration, or remote data operation was perf
 
 The initial implementation audit found and corrected:
 
-- rating retries compared only a partial payload; migration 161 now stores/compares the full client rating payload and serializes `(user, client_rating_id)` retries with an advisory transaction lock;
-- attempt retries compared only target/type fields; migration 162 now compares goal/targets, response, score, evaluator result, feedback, hints, duration, and evaluator version, with an advisory lock on `(user, client_attempt_id)`;
+- rating retries compared only a partial payload; migration 166 now stores/compares the full client rating payload and serializes `(user, client_rating_id)` retries with an advisory transaction lock;
+- attempt retries compared only target/type fields; migration 167 now compares goal/targets, response, score, evaluator result, feedback, hints, duration, and evaluator version, with an advisory lock on `(user, client_attempt_id)`;
 - plan-item attempt validation omitted activity/response/evaluator snapshots; all are now checked;
 - goal create/unarchive cap checks were not serialized and lifecycle transitions were too loose; per-user advisory locking, a stable transition graph, archived immutability, and unarchive cap enforcement were added;
 - plan saves did not explicitly reject empty `reason_code`, out-of-range priority, or non-positive duration and did not normalize JSON `null` payloads; all are now explicit;
@@ -64,7 +64,7 @@ Final checks confirm:
 | Worker customer API removal + sitemap Vitest | 4/4 passed |
 | Learning engine SQL integration | `ALL_LEARNING_ENGINE_TESTS_PASSED` |
 | AI remediation SQL integration | passed, including access/billing/release/persistence guards |
-| Migrations 160–164 local apply | passed in ordered local `psql` chain |
+| Migrations 165–169 local apply | passed in ordered local `psql` chain |
 | Web TypeScript | passed |
 | Mobile TypeScript | passed |
 | Learning core strict TypeScript | passed |
@@ -82,7 +82,7 @@ The web build emits only the existing large main-chunk warning.
 
 - Full `packages/shared` typecheck still reports pre-existing DOM/Crypto typing (`CryptoKey`, `AlgorithmIdentifier`, `KeyUsage`), browser `window` references in old shared stores, and old `admin-store` error narrowing. Targeted new-code, web, and mobile checks pass.
 - DB lint still reports only the pre-existing ambiguous `id` references in `public.admin_get_reports` and `public.get_deck_versions`; no new learning/remediation function is reported.
-- The local Supabase instance is shared by worktrees and was concurrently reset during validation. To avoid stale/interleaved state, final SQL evidence was produced by one uninterrupted cleanup → migrations 160–164 apply → AI test → learning test chain. No remote database was touched.
+- The local Supabase instance is shared by worktrees and was concurrently reset during validation. To avoid stale/interleaved state, final SQL evidence was produced by one uninterrupted cleanup → migrations 165–169 apply → AI test → learning test chain. No remote database was touched.
 
 ## 4. External Follow-up
 

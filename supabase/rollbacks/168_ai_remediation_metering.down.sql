@@ -1,4 +1,4 @@
--- Rollback 163. Enrichment rows are retained; only the new execution contract is removed.
+-- Rollback 168. Enrichment rows are retained; only the new execution contract is removed.
 BEGIN;
 DROP FUNCTION IF EXISTS public.persist_ai_remediation(uuid, text, jsonb, uuid[], uuid, uuid, uuid, uuid, text, text, text, text);
 DROP FUNCTION IF EXISTS public.reserve_ai_remediation(text, uuid, uuid, uuid, uuid[], uuid[]);

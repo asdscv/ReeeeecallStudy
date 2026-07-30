@@ -1,5 +1,5 @@
 -- ============================================================================
--- Rollback: 160_learning_engine_schema
+-- Rollback: 165_learning_engine_schema
 -- Drops all objects created by mig 160 in dependency-reverse order.
 -- Does NOT touch any existing table, column, function, or policy.
 -- For local/dev rollback. Not auto-applied; run manually if needed.

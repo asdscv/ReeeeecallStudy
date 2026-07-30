@@ -44,7 +44,7 @@ Retained and explicitly out of scope:
 1. Remove orphaned customer API documentation and tests.
 2. Remove guide/settings/footer/landing and SEO sitemap/bot-footer references in every locale/surface while preserving JSON parity.
 3. Remove stale E2E assertions.
-4. Add migration `164_remove_customer_external_api_contract.sql` as an idempotent security contract:
+4. Add migration `169_remove_customer_external_api_contract.sql` as an idempotent security contract:
    - revoke all execution on `resolve_api_key(text)` if a drifted environment still has it;
    - drop `resolve_api_key(text)`;
    - drop `api_keys CASCADE`;
@@ -53,7 +53,7 @@ Retained and explicitly out of scope:
 
 ## 4. Security and data handling
 
-`api_keys` was already removed by migration 117. Migration 164 is defense-in-depth for drifted databases and is intentionally destructive. No remote migration is run by this work. Before applying to an environment that predates migration 117, operators should export only metadata needed for audit/notification; raw keys cannot be recovered from hashes and must not be backed up as plaintext. Users would need newly issued credentials if the feature were ever reintroduced.
+`api_keys` was already removed by migration 117. Migration 169 is defense-in-depth for drifted databases and is intentionally destructive. No remote migration is run by this work. Before applying to an environment that predates migration 117, operators should export only metadata needed for audit/notification; raw keys cannot be recovered from hashes and must not be backed up as plaintext. Users would need newly issued credentials if the feature were ever reintroduced.
 
 No project code, keys, user data, or database contents are transmitted externally during implementation.
 
@@ -77,7 +77,7 @@ No project code, keys, user data, or database contents are transmitted externall
 
 1. A customer cannot create, view, use, or discover an `rc_` API key in app code or documentation.
 2. No customer API edge endpoint exists or is configured.
-3. No customer API schema/function/grant remains after migration 164.
+3. No customer API schema/function/grant remains after migration 169.
 4. Internal app JWT functions and internal rate limiting are unchanged.
 5. All locales and tests are updated consistently.
 6. No commit, push, deployment, or remote migration occurs.

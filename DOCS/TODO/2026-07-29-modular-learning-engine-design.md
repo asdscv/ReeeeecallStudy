@@ -235,14 +235,14 @@ interface LearningDomainAdapter {
 
 The core planner owns universal mechanics; adapters supply weights, constraints, and content policy.
 
-## 7. Data model (expand migrations 160–163)
+## 7. Data model (expand migrations 165–168)
 
 The expand work is split so schema, atomic legacy recording, learning RPCs, and AI metering can be reviewed and tested independently:
 
-- `160_learning_engine_schema.sql` — tables, indexes, RLS, read policies, direct-write revokes.
-- `161_atomic_study_recording.sql` — `rate_card_and_log`, idempotency support, legacy RPC grant hardening.
-- `162_learning_engine_rpcs.sql` — goal, plan, attempt, and enrichment-status write RPCs.
-- `163_ai_remediation_metering.sql` — remediation reservation/job classification and service-only enrichment persistence.
+- `165_learning_engine_schema.sql` — tables, indexes, RLS, read policies, direct-write revokes.
+- `166_atomic_study_recording.sql` — `rate_card_and_log`, idempotency support, legacy RPC grant hardening.
+- `167_learning_engine_rpcs.sql` — goal, plan, attempt, and enrichment-status write RPCs.
+- `168_ai_remediation_metering.sql` — remediation reservation/job classification and service-only enrichment persistence.
 
 No existing applied migration is edited. All new tables use UUID primary keys, timestamps, indexes for user/date and concept queries, RLS, and no client write policies.
 
@@ -756,7 +756,7 @@ No new external telemetry provider is required. Logging must redact response and
 
 ### 16.1 Expand-first rollout
 
-1. Add migration 160 tables/RPCs and security tests. No existing table is removed.
+1. Add migration 165 tables/RPCs and security tests. No existing table is removed.
 2. Add shared core and tests; no UI calls it yet.
 3. Move both study stores to `rate_card_and_log`. Keep the old RPC temporarily.
 4. Add planner/evaluators/adapters and repository adapter.
@@ -850,7 +850,7 @@ Deliver:
 - core domain types/errors/validators
 - repository/media/enrichment ports
 - registries
-- migration 160 and rollback artifact
+- migration 165 and rollback artifact
 - database type additions
 
 Accept when:
@@ -985,7 +985,7 @@ These are safety ceilings, not marketed limits. Future tier entitlements must be
 
 Remediation is a paid AI capability from the first implementation and does **not** consume or inflate the existing “free generated cards per day” count.
 
-Migration 163 adds explicit remediation job classification/billable-fraction metadata to the existing AI job ledger and a new authenticated `reserve_ai_remediation(p_action)` RPC. The RPC:
+Migration 168 adds explicit remediation job classification/billable-fraction metadata to the existing AI job ledger and a new authenticated `reserve_ai_remediation(p_action)` RPC. The RPC:
 
 1. validates the universal action;
 2. uses the existing per-day request abuse counter;
