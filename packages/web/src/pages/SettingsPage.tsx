@@ -16,7 +16,8 @@ import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { PrivacyDataSection } from '../components/settings/PrivacyDataSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PaymentHistory } from '../components/settings/PaymentHistory'
-import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
+import { PlanSelector } from '../components/billing/PlanSelector'
+import { isUnlimitedCardLimit } from '../lib/card-limit'
 import { CardUsagePanel } from '../components/billing/CardUsagePanel'
 import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
 import {
@@ -25,6 +26,7 @@ import {
   type StudyInputSettings,
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
+import { numericInputOr, parseNumericInput, type NumericInputValue } from '../lib/numeric-input'
 
 /** Auto-save a single profile field to DB */
 async function autoSaveProfile(
@@ -68,7 +70,7 @@ export function SettingsPage() {
   // Form state
   const [displayName, setDisplayName] = useState('')
   const [savedDisplayName, setSavedDisplayName] = useState('')
-  const [dailyNewLimit, setDailyNewLimit] = useState(20)
+  const [dailyNewLimit, setDailyNewLimit] = useState<NumericInputValue>(20)
   const [savedDailyNewLimit, setSavedDailyNewLimit] = useState(20)
   const [dailyGoal, setDailyGoal] = useState<number | null>(null)
   const [ttsEnabled, setTtsEnabled] = useState(false)
@@ -193,10 +195,13 @@ export function SettingsPage() {
   // SRS: save button
   const handleSaveSrs = async () => {
     if (!user) return
+    // An empty box is not a value to persist; fall back to the saved limit rather
+    // than writing an empty string (what the previous `'' as any` cast allowed).
+    const limitToSave = numericInputOr(dailyNewLimit, savedDailyNewLimit)
     setSrsSaving(true)
-    const ok = await autoSaveProfile(user.id, 'daily_new_limit', dailyNewLimit)
+    const ok = await autoSaveProfile(user.id, 'daily_new_limit', limitToSave)
     if (ok) {
-      setSavedDailyNewLimit(dailyNewLimit)
+      setSavedDailyNewLimit(limitToSave)
       toast.success(t('autoSaved'))
     }
     setSrsSaving(false)
@@ -293,11 +298,9 @@ export function SettingsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-muted-foreground mb-1">{user?.email}</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                  false /* isPro -- add when available */
-                    ? 'bg-success/10 text-success border border-success/30'
-                    : 'bg-accent text-muted-foreground border border-border'
-                }`}>
+                {/* Only the free badge exists today; the paid variant returns with the
+                    plan flag rather than as a dead `false ?` branch. */}
+                <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-accent text-muted-foreground border border-border">
                   {t('plan.free')}
                 </span>
               </div>
@@ -457,7 +460,7 @@ export function SettingsPage() {
                 value={dailyNewLimit}
                 onChange={(e) => {
                   const raw = e.target.value
-                  setDailyNewLimit(raw === '' ? '' as any : parseInt(raw) || 0)
+                  setDailyNewLimit(parseNumericInput(raw))
                 }}
                 onBlur={() => {
                   const n = typeof dailyNewLimit === 'number' ? dailyNewLimit : parseInt(String(dailyNewLimit)) || 1

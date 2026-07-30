@@ -2,7 +2,8 @@ import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { AuthCallback, _setCapturedHash } from '../AuthCallback'
+import { AuthCallback } from '../AuthCallback'
+import { _setCapturedHash } from '../../../lib/auth-callback-hash'
 
 // ─── Mocks ──────────────────────────────────────────────────
 const mockNavigate = vi.fn()

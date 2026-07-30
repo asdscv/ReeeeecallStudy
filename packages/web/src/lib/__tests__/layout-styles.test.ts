@@ -3,6 +3,7 @@ import {
   getLayoutItemStyle,
   FONT_SIZE_OPTIONS,
   DEFAULT_FONT_SIZES,
+  type StyleName,
 } from '../layout-styles'
 
 // ═══════════════════════════════════════════════════════
@@ -105,7 +106,9 @@ describe('getLayoutItemStyle', () => {
   })
 
   it('should fallback to primary style for unknown style', () => {
-    const result = getLayoutItemStyle('unknown_style' as any)
+    // Deliberately outside StyleName: the DB can hold a style this build does not
+    // know, and the renderer must fall back rather than crash.
+    const result = getLayoutItemStyle('unknown_style' as unknown as StyleName)
     expect(result.className).toContain('font-bold')
     expect(result.fontSize).toBe(DEFAULT_FONT_SIZES.primary)
   })

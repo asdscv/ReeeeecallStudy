@@ -20,7 +20,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
 
   let supabaseUrl = ''
   let headers: Record<string, string> = {}
-  let testDeckId: string | null = null
 
   async function captureCredentials(page: import('@playwright/test').Page) {
     await page.route('**/rest/v1/**', async (route) => {
@@ -96,7 +95,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
       { front: 'Apple', back: 'A red fruit' },
       { front: 'Dog', back: 'A loyal animal' },
     ])
-    testDeckId = deckId
 
     await page.goto(`/decks/${deckId}/study?mode=srs&batchSize=20`)
 
@@ -155,7 +153,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
     await expect(page.locator('text=/Easy|쉬움/i').first()).toBeVisible()
 
     await cleanup(page, deckId)
-    testDeckId = null
   })
 
   // ────────────────────────────────────────────────────────────
@@ -169,7 +166,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
       { front: 'Fish', back: 'A water animal' },
       { front: 'Bear', back: 'A large mammal' },
     ])
-    testDeckId = deckId
 
     await page.goto(`/decks/${deckId}/study?mode=srs&batchSize=20`)
     await expect(page.locator('text=/Tap to flip|탭하여 뒤집기/i')).toBeVisible({ timeout: 15_000 })
@@ -220,7 +216,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
     await expect(page.locator('text=/Again|다시/i').first()).toBeVisible()
 
     await cleanup(page, deckId)
-    testDeckId = null
   })
 
   // ────────────────────────────────────────────────────────────
@@ -232,7 +227,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
       { front: 'Sun', back: 'A star' },
       { front: 'Moon', back: 'Earth satellite' },
     ])
-    testDeckId = deckId
 
     // Verify initial state: all cards are 'new'
     const before = await queryCards(page, deckId)
@@ -277,7 +271,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
     await expect(noCards.first()).toBeVisible({ timeout: 15_000 })
 
     await cleanup(page, deckId)
-    testDeckId = null
   })
 
   // ────────────────────────────────────────────────────────────
@@ -288,7 +281,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
     const { deckId } = await createTestDeck(page, [
       { front: 'Hello', back: 'A greeting' },
     ])
-    testDeckId = deckId
 
     // Go to QuickStudy page
     await page.goto('/quick-study')
@@ -329,7 +321,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
     await expect(page.locator('text=/Complete|완료/i').first()).toBeVisible({ timeout: 10_000 })
 
     await cleanup(page, deckId)
-    testDeckId = null
   })
 
   // ────────────────────────────────────────────────────────────
@@ -342,7 +333,6 @@ test.describe('SRS Study Flow — Full Logic', () => {
       { front: 'Blue', back: 'Color of sky' },
       { front: 'Green', back: 'Color of grass' },
     ])
-    testDeckId = deckId
 
     await page.goto(`/decks/${deckId}/study?mode=srs&batchSize=20`)
     await expect(page.locator('text=/Tap to flip|탭하여 뒤집기/i')).toBeVisible({ timeout: 15_000 })
@@ -388,6 +378,5 @@ test.describe('SRS Study Flow — Full Logic', () => {
     expect(bodyText).toMatch(/Easy|쉬움/)
 
     await cleanup(page, deckId)
-    testDeckId = null
   })
 })

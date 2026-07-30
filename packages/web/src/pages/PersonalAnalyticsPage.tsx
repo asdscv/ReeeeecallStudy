@@ -28,21 +28,6 @@ export function PersonalAnalyticsContent() {
   const [progressData, setProgressData] = useState<ProgressPoint[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!user) return
-    const load = async () => {
-      setLoading(true)
-      await Promise.all([
-        loadRetentionCurve(user.id),
-        loadWeakTopics(user.id),
-        loadTimeDistribution(user.id),
-        loadModeEffectiveness(user.id),
-        loadProgress(user.id),
-      ])
-      setLoading(false)
-    }
-    load()
-  }, [user])
 
   async function loadRetentionCurve(userId: string) {
     const { data: cards } = await supabase
@@ -181,6 +166,25 @@ export function PersonalAnalyticsContent() {
       })
     )
   }
+
+  // Declared after the loaders on purpose: the React Compiler rejects reading a
+  // function before its declaration, and hoisting made the effect fire against
+  // identifiers it could not verify.
+  useEffect(() => {
+    if (!user) return
+    const load = async () => {
+      setLoading(true)
+      await Promise.all([
+        loadRetentionCurve(user.id),
+        loadWeakTopics(user.id),
+        loadTimeDistribution(user.id),
+        loadModeEffectiveness(user.id),
+        loadProgress(user.id),
+      ])
+      setLoading(false)
+    }
+    load()
+  }, [user])
 
   if (loading) {
     return (

@@ -244,17 +244,20 @@ export function StudySessionPage() {
     setShowShortcuts(prev => !prev)
   }, [])
 
-  // Show undo button for 5 seconds after rating
+  // Show undo button for 5 seconds after rating — render-time adjustment (pattern #2)
+  // avoids synchronous setState in effect; timer callback setState is async (allowed).
+  const [prevLastRatedCard, setPrevLastRatedCard] = useState(lastRatedCard)
+  if (lastRatedCard !== prevLastRatedCard) {
+    setPrevLastRatedCard(lastRatedCard)
+    setShowUndo(!!lastRatedCard)
+  }
+
   useEffect(() => {
-    if (lastRatedCard) {
-      setShowUndo(true)
-      if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
-      undoTimerRef.current = setTimeout(() => {
-        setShowUndo(false)
-      }, 5000)
-    } else {
+    if (!lastRatedCard) return
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    undoTimerRef.current = setTimeout(() => {
       setShowUndo(false)
-    }
+    }, 5000)
     return () => {
       if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
     }

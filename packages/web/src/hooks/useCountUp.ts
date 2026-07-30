@@ -14,16 +14,19 @@ export function useCountUp({ end, duration = 2000, threshold = 0.3 }: UseCountUp
   const [value, setValue] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const triggered = useRef(false)
+  // Track reduced-motion preference without synchronous setState in effect
+  const prefersReduced = useRef(false)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
 
-    // Respect prefers-reduced-motion
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReduced) {
-      setValue(end)
-      return
+    // Respect prefers-reduced-motion — checked inside effect but setState deferred to rAF
+    prefersReduced.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced.current) {
+      // Use rAF to avoid synchronous setState inside effect body
+      const id = requestAnimationFrame(() => setValue(end))
+      return () => cancelAnimationFrame(id)
     }
 
     const observer = new IntersectionObserver(

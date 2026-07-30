@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/test-helpers'
+import type { Page } from '@playwright/test'
 
 /**
  * E2E tests for Settings page auto-save UX:
@@ -11,7 +12,7 @@ import { test, expect } from '../fixtures/test-helpers'
  */
 
 // ── Helper: go to settings and wait for load ──
-async function goToSettings(page: any) {
+async function goToSettings(page: Page) {
   await page.goto('/settings')
   await page.waitForTimeout(2000)
 }

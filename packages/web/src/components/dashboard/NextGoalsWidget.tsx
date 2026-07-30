@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
-import { CategoryIcon } from '../../lib/achievement-icons'
+import { CategoryIcon } from '../achievements/AchievementIcon'
 
 interface Goal {
   category: string

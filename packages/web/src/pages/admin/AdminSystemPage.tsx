@@ -172,7 +172,13 @@ function SystemControls() {
   const [msgSaved, setMsgSaved] = useState(false)
 
   useEffect(() => { fetchSystemFlags() }, [fetchSystemFlags])
-  useEffect(() => { if (flags) setMsg(flags.maintenance_message ?? '') }, [flags])
+  // Sync local msg state with store flags — render-time adjustment (pattern #2)
+  // avoids synchronous setState inside an effect.
+  const [prevFlags, setPrevFlags] = useState(flags)
+  if (flags !== prevFlags) {
+    setPrevFlags(flags)
+    if (flags) setMsg(flags.maintenance_message ?? '')
+  }
 
   if (!flags) return null
 

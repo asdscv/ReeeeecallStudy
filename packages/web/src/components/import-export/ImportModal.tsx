@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -60,6 +60,28 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
     downloadFile(csv, 'text/csv;charset=utf-8', `${template.name}_template.csv`)
   }, [template])
 
+  // Reset state during render when modal opens to avoid effect-driven cascading renders
+  // Starts false so mounting with the modal already open still resets, the way the
+  // effect did on its first run.
+  const [prevOpen, setPrevOpen] = useState(false)
+  if (open && !prevOpen) {
+    setPrevOpen(open)
+    setStep('upload')
+    setCsvHeaders([])
+    setFieldMapping({})
+    setParsedCards([])
+    setInvalidCount(0)
+    setDuplicateCount(0)
+    setDuplicateMode('skip')
+    setProgress({ done: 0, total: 0 })
+    setResult({ added: 0, skipped: 0, total: 0 })
+    setError(null)
+    setDragOver(false)
+    try { sessionStorage.removeItem('__import_csv_raw') } catch { /* private browsing */ }
+  } else if (open !== prevOpen) {
+    setPrevOpen(open)
+  }
+
   const resetState = useCallback(() => {
     setStep('upload')
     setCsvHeaders([])
@@ -74,11 +96,6 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
     setDragOver(false)
     try { sessionStorage.removeItem('__import_csv_raw') } catch { /* private browsing */ }
   }, [])
-
-  // open → true 전환 시 상태 초기화 (close 시가 아님 → flash 방지)
-  useEffect(() => {
-    if (open) resetState()
-  }, [open, resetState])
 
   const handleClose = () => {
     onClose()

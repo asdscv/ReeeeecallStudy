@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StarRating } from './StarRating'
 import type { MarketplaceReview } from '../../types/database'
@@ -23,13 +23,16 @@ export function ReviewForm({
   const [title, setTitle] = useState(existingReview?.title ?? '')
   const [body, setBody] = useState(existingReview?.body ?? '')
 
-  useEffect(() => {
+  // Sync form state from prop during render to avoid effect-driven cascading renders
+  const [prevReview, setPrevReview] = useState(existingReview)
+  if (existingReview !== prevReview) {
+    setPrevReview(existingReview)
     if (existingReview) {
       setRating(existingReview.rating)
       setTitle(existingReview.title ?? '')
       setBody(existingReview.body ?? '')
     }
-  }, [existingReview])
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

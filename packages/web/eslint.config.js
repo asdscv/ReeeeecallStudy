@@ -19,5 +19,18 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // The codebase marks a deliberately unused binding with a leading underscore —
+      // a callback parameter kept for signature shape, a positional argument an
+      // adapter must accept but does not need. Deleting those names would lose the
+      // documentation; renaming them to nothing is not possible for middle
+      // parameters. Recognise the convention instead of carrying 19 exceptions.
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      }],
+    },
   },
 ])

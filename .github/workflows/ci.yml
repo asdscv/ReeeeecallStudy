@@ -40,12 +40,17 @@ jobs:
       - name: Web typecheck
         run: pnpm --filter @reeeeecall/web exec tsc -b --noEmit
 
-      # Lint is currently informational — develop has pre-existing eslint
-      # debt (no-explicit-any, no-unused-vars, react-hooks/rules-of-hooks).
-      # Tracked for cleanup in a dedicated PR; this workflow doesn't gate on it.
-      - name: Web lint (informational)
+      # The Playwright suite is in no other tsconfig, so without this nothing ever
+      # type-checked it and its fixtures drifted to `any`.
+      - name: Web e2e typecheck
+        run: pnpm --filter @reeeeecall/web typecheck:e2e
+
+      # Strict gate. It was informational while develop carried 148 eslint errors;
+      # those are cleared (6 were real defects, the rest missing types and
+      # effect-driven state), so the escape hatch comes off and the debt cannot
+      # silently return.
+      - name: Web lint
         run: pnpm --filter @reeeeecall/web lint
-        continue-on-error: true
       - name: Mobile typecheck (regression guard for marketplace scope)
         run: |
           set +e

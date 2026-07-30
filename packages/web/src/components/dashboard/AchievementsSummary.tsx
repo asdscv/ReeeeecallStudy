@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 import { useAchievementStore } from '../../stores/achievement-store'
-import { AchievementIcon } from '../../lib/achievement-icons'
+import { AchievementIcon } from '../achievements/AchievementIcon'
 
 function xpForLevel(level: number): number {
   return (level - 1) * 150
