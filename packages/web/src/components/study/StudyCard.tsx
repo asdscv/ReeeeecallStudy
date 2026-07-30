@@ -196,7 +196,9 @@ export function StudyCard({
         // Only capture pointer for mouse — touch has implicit capture,
         // and setPointerCapture on touch causes pointercancel on mobile browsers.
         if (e.pointerType === 'mouse') {
-          try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
+          // Some browsers reject capture for a pointer that already ended; swipe
+          // tracking works without it, so a failure here is not worth reporting.
+          try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch { /* capture is best-effort */ }
         }
       } else {
         committedRef.current = 'scroll'
@@ -211,7 +213,7 @@ export function StudyCard({
 
   function handlePointerUp(e: React.PointerEvent) {
     if (committedRef.current === 'swipe' && e.pointerType === 'mouse') {
-      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch {}
+      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch { /* nothing to release */ }
     }
 
     const origin = pointerOriginRef.current

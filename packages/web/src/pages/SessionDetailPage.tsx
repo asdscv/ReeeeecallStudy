@@ -425,11 +425,13 @@ function CardDetailTable({ logs, isSrs }: { logs: LogWithCard[]; isSrs: boolean 
 
 // ── Helpers ──
 
+// Not a component: read translations off the i18next instance, the way RatingBadge
+// below already does. Calling useTranslation here only worked because the helper
+// happened to be invoked during render.
 function getCardPreview(card?: Card): string {
-  const { t } = useTranslation('history')
-  if (!card) return t('sessionDetail.deletedCard')
+  if (!card) return i18next.t('history:sessionDetail.deletedCard')
   const values = Object.values(card.field_values)
-  if (values.length === 0) return t('sessionDetail.noContent')
+  if (values.length === 0) return i18next.t('history:sessionDetail.noContent')
   const front = values[0]?.slice(0, 40) || ''
   const back = values[1]?.slice(0, 30) || ''
   if (back) return `${front} → ${back}`

@@ -293,11 +293,9 @@ export function SettingsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-muted-foreground mb-1">{user?.email}</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                  false /* isPro -- add when available */
-                    ? 'bg-success/10 text-success border border-success/30'
-                    : 'bg-accent text-muted-foreground border border-border'
-                }`}>
+                {/* Only the free badge exists today; the paid variant returns with the
+                    plan flag rather than as a dead `false ?` branch. */}
+                <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-accent text-muted-foreground border border-border">
                   {t('plan.free')}
                 </span>
               </div>
