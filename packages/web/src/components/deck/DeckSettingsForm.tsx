@@ -175,7 +175,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         <label className="block text-sm font-medium text-foreground mb-1">
           {t('nativeLanguage.label', { ns: 'marketplace' })}
           <span className="ml-2 text-xs font-normal text-muted-foreground">
-            {t('nativeLanguage.multiHint', { ns: 'marketplace', defaultValue: 'Select all that apply' })}
+            {t('nativeLanguage.multiHint', { ns: 'decks' })}
           </span>
         </label>
         <div className="flex flex-wrap gap-2">

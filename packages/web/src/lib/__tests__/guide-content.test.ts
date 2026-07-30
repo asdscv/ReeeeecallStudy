@@ -63,17 +63,16 @@ describe('GuideItem link support', () => {
     }
   })
 
-  it('link with href should be a valid external URL', () => {
-    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
-    const docsItem = apiSection!.items.find((i) => i.link?.href)
-    expect(docsItem).toBeDefined()
-    expect(docsItem!.link!.href).toMatch(/^https?:\/\//)
-  })
-
-  it('link label should be an i18n key', () => {
-    const apiSection = GUIDE_SECTIONS.find((s) => s.id === 'api')
-    const docsItem = apiSection!.items.find((i) => i.link)
-    expect(docsItem!.link!.label).toContain('sections.')
+  // These two used to read the `api` section, the only one that carried a link.
+  // That section went away with the API feature (af149bd) and the assertions kept
+  // dereferencing it. Assert the contract over whatever links exist instead, so the
+  // guard survives the next link being added — or removed.
+  it('every item link points outward and labels itself with an i18n key', () => {
+    const linkedItems = GUIDE_SECTIONS.flatMap((s) => s.items).filter((i) => i.link)
+    for (const item of linkedItems) {
+      expect(item.link!.href).toMatch(/^https?:\/\//)
+      expect(item.link!.label).toContain('sections.')
+    }
   })
 })
 

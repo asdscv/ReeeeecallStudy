@@ -75,21 +75,14 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
 
-      # Strict gate — marketplace acquire scope tests must pass.
-      # Pre-existing failures in unrelated suites (guide.json i18n, etc.)
-      # are tracked as tech debt and fixed in dedicated PRs, not here.
-      - name: Vitest — marketplace acquire scope (REQUIRED)
-        working-directory: packages/web
-        run: |
-          npx vitest run \
-            src/stores/__tests__/marketplace-acquire-atomic.test.ts \
-            src/stores/__tests__/deck-store-subscriptions.test.ts
-
-      # Full suite — informational only; tracks debt without blocking.
-      - name: Vitest — full suite (informational)
+      # Strict gate — the whole suite. It used to be informational because develop
+      # carried 75 failures and 6 suites that never loaded; those were harness
+      # defects (mocks that never applied, missing test env, unusable localStorage),
+      # not product debt, and they hid a real auth bug. Now that the suite is green
+      # it gates, so the debt cannot come back silently.
+      - name: Vitest — full suite
         working-directory: packages/web
         run: npx vitest run --reporter=verbose
-        continue-on-error: true
 
       - name: Upload coverage
         if: always()
