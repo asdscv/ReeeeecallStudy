@@ -64,6 +64,14 @@ reversal). No change needed.
 
 ---
 
+## Prod migration state (2026-07-31)
+Prod is synced to **mig 171**. This release applied `160 → 161(expand) → 162 → 165 → 167 → 168 → 169 → 170`
+**before** promoting `develop`→`main`, then `171` (contract) **after** the cutover build was serving —
+because 161-as-written bundled expand+contract and would have dropped `insert_study_log` / revoked the
+direct study writes out from under the still-live pre-cutover build (hence the 161/171 split, PR #351).
+Verified on prod: cutover RPCs reachable by `authenticated`, `insert_study_log` → PGRST202, direct
+`study_logs`/`user_card_progress` writes → 42501, `cards` content columns still writable.
+
 ## Note on git drift
 Prod DB has migs 148–154 applied; the migration **files** live on the `feat/mobile-iap-integration`
 branch (committed) and reconcile to `main` when that branch merges. Web ops changes (Pack A UI,

@@ -162,8 +162,8 @@ turn on paid only once the payment webhook (§2) + pack SKUs exist. The free tie
     de-BYOK'd (gate `E2E_GROK_API_KEY` → `E2E_AI_GENERATION`).
   - Note: the `SettingsScreen.tsx` orphaned `aiProviderCard/Header/Left` styles this doc previously listed
     were **already gone** — that entry was stale.
-  - ⚠️ Owner-gated prod steps: apply mig 170, `supabase functions delete ai-keys`, delete the
-    `AI_KEY_PASSPHRASE` edge secret.
+  - **✅ prod done (2026-07-31)**: mig 170 applied, `ai-keys` edge function deleted (endpoint → 404),
+    `AI_KEY_PASSPHRASE` secret removed. Shipped to `main` (PR #349 → #352). SECURITY-REMAINING **H1c is closed**.
 - **Dead AI code (remaining, non-BYOK):** `packages/web/src/lib/ai/prompts.ts` is still a **stale duplicate**
   of the canonical `packages/shared/lib/ai/prompts.ts` (missing Chinese/non-empty rules). Not on the
   generation path; resync or delete in a separate pass.
