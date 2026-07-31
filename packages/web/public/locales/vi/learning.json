@@ -20,7 +20,8 @@
     "item": {
       "study": "Học",
       "untitled": "(không có nội dung)",
-      "minutes": "~{{count, number}} phút"
+      "minutes": "~{{count, number}} phút",
+      "recorded": "Đã ghi lại"
     },
     "reason": {
       "due": "Đến hạn ôn tập",
@@ -38,7 +39,14 @@
       "authRequired": "Vui lòng đăng nhập lại.",
       "forbidden": "Bạn không có quyền truy cập.",
       "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
-    }
+    },
+    "rate": {
+      "again": "Không biết",
+      "partial": "Chưa chắc",
+      "known": "Đã biết",
+      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
+    },
+    "insightsLink": "Phân tích"
   },
   "goals": {
     "title": "Mục tiêu học tập",
@@ -93,6 +101,75 @@
     "error": {
       "title": "Nhập tên mục tiêu (1–500 ký tự).",
       "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440."
+    }
+  },
+  "history": {
+    "title": "Lần làm gần đây ({{count, number}})",
+    "itemFallback": "Lần làm {{type}}",
+    "score": {
+      "unknown": "Chưa có điểm"
+    }
+  },
+  "enrichment": {
+    "explainCta": "Giải thích (tín dụng)",
+    "requesting": "Đang hỏi…",
+    "costHint": "Sử dụng tín dụng AI từ ví của bạn",
+    "action": {
+      "explain": "Giải thích AI",
+      "hint": "Gợi ý học tập"
+    },
+    "sources": "Nguồn",
+    "noSources": "Câu trả lời này không dựa trên nguồn.",
+    "empty": "Mô hình không trả về nội dung khả dụng.",
+    "chargedNote": "Đã tính phí — bỏ đi cũng không hoàn lại tín dụng.",
+    "keep": "Giữ lại",
+    "discard": "Bỏ",
+    "later": "Quyết định sau",
+    "saving": "Đang lưu…",
+    "error": {
+      "BAD_REQUEST": "Yêu cầu không hợp lệ.",
+      "FORBIDDEN": "Bạn không có quyền truy cập thẻ này.",
+      "GROUNDING_REQUIRED": "Không tìm thấy nguồn trích dẫn nên câu trả lời đã bị từ chối thay vì bịa đặt.",
+      "INSUFFICIENT_CREDITS": "Không đủ tín dụng AI. Hãy nạp thêm để tiếp tục.",
+      "INVALID_RESULT": "Câu trả lời không sử dụng được. Vui lòng thử lại.",
+      "NETWORK": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
+      "NOT_CONFIGURED": "Tạo nội dung AI chưa được bật trên máy chủ này.",
+      "PROVIDER_ERROR": "Dịch vụ AI gặp sự cố. Vui lòng thử lại.",
+      "RATE_CAP": "Bạn đã dùng hết giới hạn yêu cầu AI hôm nay. Hãy thử lại vào ngày mai.",
+      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+    }
+  },
+  "insights": {
+    "title": "Phân tích học tập",
+    "noData": "Chưa có dữ liệu",
+    "attempts": "Lần làm (30 ngày)",
+    "accuracy": "Độ chính xác",
+    "notScoredYet": "Chưa có lần nào được chấm điểm",
+    "typicalTime": "Thời gian thường",
+    "seconds": "{{count, number}}s",
+    "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
+    "weakTitle": "Cần xem lại",
+    "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
+    "weakEmpty": "Không có thẻ nào tụt lại.",
+    "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
+    "attemptCount": "{{count, number}} lần làm",
+    "adherenceTitle": "Kế hoạch hàng ngày (14 ngày)",
+    "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
+    "noPlanItems": "Không có mục nào được lên kế hoạch",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập."
+  },
+  "recommend": {
+    "title": "Gợi ý",
+    "hint": "Chấp nhận sẽ tăng ưu tiên của thẻ đó trong kế hoạch tiếp theo.",
+    "regenerate": "Làm mới",
+    "accept": "Chấp nhận",
+    "dismiss": "Bỏ qua",
+    "empty": "Chưa có gợi ý. Hãy làm mới sau khi có vài lần làm bài.",
+    "status": {
+      "accepted": "Đã chấp nhận",
+      "dismissed": "Đã bỏ qua",
+      "expired": "Đã hết hạn"
     }
   }
 }

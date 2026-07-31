@@ -20,7 +20,8 @@
     "item": {
       "study": "Belajar",
       "untitled": "(tidak ada teks)",
-      "minutes": "~{{count, number}} menit"
+      "minutes": "~{{count, number}} menit",
+      "recorded": "Tercatat"
     },
     "reason": {
       "due": "Waktunya mengulang",
@@ -38,7 +39,14 @@
       "authRequired": "Silakan masuk lagi.",
       "forbidden": "Anda tidak memiliki akses.",
       "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
-    }
+    },
+    "rate": {
+      "again": "Tidak tahu",
+      "partial": "Ragu",
+      "known": "Tahu",
+      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
+    },
+    "insightsLink": "Analisis"
   },
   "goals": {
     "title": "Tujuan belajar",
@@ -93,6 +101,75 @@
     "error": {
       "title": "Masukkan nama tujuan (1–500 karakter).",
       "dailyMinutes": "Menit per hari harus antara 1 dan 1440."
+    }
+  },
+  "history": {
+    "title": "Percobaan terbaru ({{count, number}})",
+    "itemFallback": "Percobaan {{type}}",
+    "score": {
+      "unknown": "Tanpa skor"
+    }
+  },
+  "enrichment": {
+    "explainCta": "Jelaskan (kredit)",
+    "requesting": "Menanyakan…",
+    "costHint": "Menggunakan kredit AI dari dompet Anda",
+    "action": {
+      "explain": "Penjelasan AI",
+      "hint": "Petunjuk belajar"
+    },
+    "sources": "Sumber",
+    "noSources": "Jawaban ini tidak berdasarkan sumber.",
+    "empty": "Model tidak mengembalikan konten yang bisa digunakan.",
+    "chargedNote": "Sudah dikenakan biaya — membuang tidak mengembalikan kredit.",
+    "keep": "Simpan",
+    "discard": "Buang",
+    "later": "Putuskan nanti",
+    "saving": "Menyimpan…",
+    "error": {
+      "BAD_REQUEST": "Permintaan tidak valid.",
+      "FORBIDDEN": "Anda tidak memiliki akses ke kartu ini.",
+      "GROUNDING_REQUIRED": "Tidak ditemukan sumber yang dapat dikutip, sehingga jawaban ditolak alih-alih dikarang.",
+      "INSUFFICIENT_CREDITS": "Kredit AI tidak cukup. Isi ulang untuk melanjutkan.",
+      "INVALID_RESULT": "Jawaban yang dikembalikan tidak bisa digunakan. Silakan coba lagi.",
+      "NETWORK": "Kesalahan jaringan. Periksa koneksi Anda.",
+      "NOT_CONFIGURED": "Pembuatan AI belum diaktifkan di server ini.",
+      "PROVIDER_ERROR": "Layanan AI gagal. Silakan coba lagi.",
+      "RATE_CAP": "Anda telah mencapai batas permintaan AI hari ini. Coba lagi besok.",
+      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  },
+  "insights": {
+    "title": "Analisis pembelajaran",
+    "noData": "Belum ada data",
+    "attempts": "Percobaan (30 hari)",
+    "accuracy": "Akurasi",
+    "notScoredYet": "Belum ada yang dinilai",
+    "typicalTime": "Waktu biasa",
+    "seconds": "{{count, number}}d",
+    "adherence": "Kepatuhan rencana (14 hari)",
+    "weakTitle": "Perlu dilihat lagi",
+    "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
+    "weakEmpty": "Tidak ada yang tertinggal.",
+    "cardFallback": "(kartu tidak ada di rencana hari ini)",
+    "attemptCount": "{{count, number}} percobaan",
+    "adherenceTitle": "Rencana harian (14 hari)",
+    "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
+    "noPlanItems": "Tidak ada yang direncanakan",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar."
+  },
+  "recommend": {
+    "title": "Rekomendasi",
+    "hint": "Menerima akan menaikkan prioritas kartu itu di rencana berikutnya.",
+    "regenerate": "Segarkan",
+    "accept": "Terima",
+    "dismiss": "Abaikan",
+    "empty": "Belum ada rekomendasi. Segarkan setelah ada beberapa percobaan.",
+    "status": {
+      "accepted": "Diterima",
+      "dismissed": "Diabaikan",
+      "expired": "Kedaluwarsa"
     }
   }
 }

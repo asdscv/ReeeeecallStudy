@@ -201,7 +201,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs,
 
-    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate'],
+    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate', 'learning'],
     defaultNS: 'common',
 
     interpolation: { escapeValue: false },

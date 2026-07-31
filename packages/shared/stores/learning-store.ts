@@ -15,6 +15,10 @@ import { supabase } from '../lib/supabase'
 import {
   buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
 } from '../lib/learning-candidates'
+import { callServerAI } from '../lib/ai/server-client'
+import {
+  summarizeLearning, type InsightAttempt, type InsightPlan, type LearningInsights,
+} from '../lib/learning-insights'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card } from '../types/database'
@@ -70,7 +74,13 @@ export interface DailyPlanItemRow {
   reason_code: string
   priority: number | null
   estimated_minutes: number | null
-  status: 'pending' | 'done' | 'skipped' | string
+  /**
+   * Server vocabulary, not ours: mig 165 constrains this to
+   * CHECK (status IN ('pending','completed','skipped')) and record_answer_attempt writes
+   * 'completed'. Phase 1 typed it as 'done' and the UI compared against that, so a finished
+   * item never rendered as finished. Keep these three spellings exact.
+   */
+  status: 'pending' | 'completed' | 'skipped'
 }
 
 /**
@@ -150,6 +160,118 @@ export interface PlanCardRef {
   field_values: Record<string, string>
 }
 
+export interface AttemptRow {
+  id: string
+  goal_id: string | null
+  card_id: string | null
+  activity_id: string | null
+  plan_item_id: string | null
+  activity_type: string
+  evaluator_type: string
+  normalized_score: number | null
+  duration_ms: number
+  created_at: string
+}
+
+/**
+ * What the user reported about a plan item they just worked on.
+ *
+ * `score` is a self-rating on 0..1 — the legacy-card projection is
+ * `recall / self_rate / self_rate` (design §5.2), so the learner IS the evaluator here.
+ * It is NOT an SRS rating: `apply_study_rating` (mig 160) remains the single authority for
+ * scheduling, and recording an attempt deliberately does not touch interval/ease. The two
+ * are different questions — "when should I see this again" vs "how did this attempt go".
+ */
+export interface AttemptInput {
+  planItem: DailyPlanItemRow
+  goalId: string
+  score: number
+  durationMs?: number
+  /** Stable per attempt: the RPC is idempotent on it, so a retry cannot double-record. */
+  clientAttemptId: string
+}
+
+/**
+ * A remediation the server generated, charged for, and persisted as a PREVIEW.
+ *
+ * The money is already spent by the time this exists — `ai-generate` reserves before
+ * generating and charges after (mig 168). Accepting or rejecting only decides whether the
+ * content is kept, so "reject" is not a refund and the UI must not imply that it is.
+ */
+export interface EnrichmentPreview {
+  enrichmentId: string
+  action: RemediationAction
+  content: Record<string, unknown>
+  /** Source citations the server validated. Labor-law content cannot be ungrounded. */
+  sources: EnrichmentSource[]
+  /** Wallet balance in micro-USD after the charge, when the server reported it. */
+  balance: number | null
+}
+
+export interface RecommendationRow {
+  id: string
+  goal_id: string | null
+  card_id: string | null
+  concept_id: string | null
+  activity_id: string | null
+  action_type: string
+  provider: string
+  reason: string | null
+  algorithm_version: string | null
+  status: 'pending' | 'accepted' | 'dismissed' | 'expired'
+  created_at: string
+}
+
+/** The deterministic producer's version, recorded on every row it writes. */
+export const WEAK_CARD_RECOMMENDER_VERSION = 'weak-card-v1'
+
+export interface EnrichmentSource {
+  title?: string
+  url?: string
+  clause?: string
+  id?: string
+}
+
+/** Actions the Phase 3 UI offers. The server supports more (compare / generate /
+ *  evaluate / recommend); those need context this screen does not have yet. */
+export type RemediationAction = 'explain' | 'hint'
+
+/**
+ * Everything the enrichment call can fail with, kept distinct because the user's next
+ * action differs per case: top up, wait for tomorrow, or nothing they can do.
+ */
+export type EnrichmentErrorCode =
+  | 'INSUFFICIENT_CREDITS'   // AI_INSUFFICIENT_CREDITS — 402, wallet empty
+  | 'RATE_CAP'               // AI_RATE_CAP — 429, today's request cap
+  | 'GROUNDING_REQUIRED'     // AI_GROUNDING_REQUIRED — refused rather than cite nothing
+  | 'INVALID_RESULT'         // AI_INVALID_RESULT — model returned something unusable
+  | 'PROVIDER_ERROR'         // AI_PROVIDER_ERROR / AI_PROVIDER_AUTH
+  | 'NOT_CONFIGURED'         // AI_NOT_CONFIGURED — no provider key on this deployment
+  | 'FORBIDDEN'              // reference not accessible
+  | 'BAD_REQUEST'
+  | 'NETWORK'
+  | 'UNKNOWN'
+
+function toEnrichmentError(e: unknown): EnrichmentErrorCode {
+  // callServerAI throws `new Error(<server code>)`, so the message IS the code.
+  const code = e instanceof Error ? e.message : String(e)
+  switch (code) {
+    case 'AI_INSUFFICIENT_CREDITS': return 'INSUFFICIENT_CREDITS'
+    case 'AI_RATE_CAP': return 'RATE_CAP'
+    case 'AI_GROUNDING_REQUIRED': return 'GROUNDING_REQUIRED'
+    case 'AI_INVALID_RESULT': return 'INVALID_RESULT'
+    case 'AI_PROVIDER_ERROR':
+    case 'AI_PROVIDER_AUTH': return 'PROVIDER_ERROR'
+    case 'AI_NOT_CONFIGURED': return 'NOT_CONFIGURED'
+    case 'FORBIDDEN': return 'FORBIDDEN'
+    case 'BAD_REQUEST': return 'BAD_REQUEST'
+    case 'NETWORK_ERROR': return 'NETWORK'
+    // AI_PERSISTENCE_ERROR and AI_METER_ERROR are server faults the user cannot act on;
+    // they are surfaced as UNKNOWN rather than pretending to be actionable.
+    default: return 'UNKNOWN'
+  }
+}
+
 export interface PlanContext {
   /** IANA zone, e.g. 'Asia/Seoul'. Supplied by the platform layer: shared code must
    *  not depend on Intl (the mobile bundle is deliberately Intl-free). */
@@ -192,6 +314,25 @@ interface LearningState {
   /** Set when the goal has no decks attached: there is nothing to plan over. */
   planBlockedReason: 'no_decks' | 'no_candidates' | null
 
+  /** Plan-item id currently being recorded, so one row can show progress alone. */
+  recordingItemId: string | null
+  attempts: AttemptRow[]
+  attemptsLoading: boolean
+
+  /** The preview being shown. Null when nothing is open. */
+  enrichment: EnrichmentPreview | null
+  /** Card id the request is running for, so one row can show its own spinner. */
+  enrichmentPendingCardId: string | null
+  enrichmentError: EnrichmentErrorCode | null
+  enrichmentSaving: boolean
+
+  insights: LearningInsights | null
+  insightsLoading: boolean
+
+  recommendations: RecommendationRow[]
+  recommendationsLoading: boolean
+  recommendationBusyId: string | null
+
   fetchGoals: () => Promise<void>
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
@@ -200,6 +341,20 @@ interface LearningState {
 
   fetchPlan: (goalId: string, planDate: string) => Promise<void>
   generatePlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
+  recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
+  fetchAttempts: (goalId: string) => Promise<void>
+  requestEnrichment: (input: {
+    action: RemediationAction
+    goalId: string
+    cardId: string
+    uiLang: string
+  }) => Promise<boolean>
+  resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
+  dismissEnrichment: () => void
+  fetchInsights: (goalId: string) => Promise<void>
+  fetchRecommendations: (goalId: string) => Promise<void>
+  regenerateRecommendations: (goalId: string) => Promise<boolean>
+  resolveRecommendation: (id: string, status: 'accepted' | 'dismissed') => Promise<boolean>
   reset: () => void
 }
 
@@ -214,6 +369,18 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planGenerating: false,
   planError: null,
   planBlockedReason: null,
+  recordingItemId: null,
+  attempts: [],
+  attemptsLoading: false,
+  enrichment: null,
+  enrichmentPendingCardId: null,
+  enrichmentError: null,
+  enrichmentSaving: false,
+  insights: null,
+  insightsLoading: false,
+  recommendations: [],
+  recommendationsLoading: false,
+  recommendationBusyId: null,
 
   fetchGoals: async () => {
     if (get().goalsLoading) return
@@ -440,11 +607,26 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const deckImportance: Record<string, number> = {}
       for (const link of goal.decks) deckImportance[link.deck_id] = link.importance
 
+      // Accepted recommendations (mig 174) raise contentImportance, which is what makes
+      // "accept" change anything. Read fresh rather than trusting whatever the insights
+      // screen last loaded: the plan must reflect decisions made since.
+      const { data: acceptedRows } = await supabase
+        .from('study_recommendations')
+        .select('card_id')
+        .eq('goal_id', goal.id)
+        .eq('status', 'accepted')
+        .not('card_id', 'is', null)
+        .limit(200)
+      const acceptedCardIds = (acceptedRows ?? [])
+        .map((row) => (row as { card_id: string | null }).card_id)
+        .filter((id): id is string => !!id)
+
       const candidates = buildCandidatesFromCards({
         cards,
         recentLogs: (logRows ?? []) as CandidateStudyLog[],
         deckImportance,
         now: ctx.now,
+        acceptedCardIds,
       })
 
       const output = buildDailyPlan({
@@ -503,9 +685,314 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /**
+   * Record what happened on one plan item.
+   *
+   * `record_answer_attempt` (mig 167) does the whole write atomically: it inserts the
+   * attempt, marks the item `completed` with its `completion_attempt_id`, and advances
+   * `daily_plans.completed_items / completed_minutes / status`. So this must NOT try to
+   * patch those rows itself — it calls the RPC and re-reads.
+   *
+   * Two server contracts shape the arguments:
+   *   * the attempt must match the plan item's SNAPSHOT exactly (goal, activity, card, and
+   *     all three type fields) or the RPC raises P0007. We therefore send the values from
+   *     the stored item rather than re-deriving them, because a re-derivation that drifts
+   *     would fail at write time instead of at review time;
+   *   * `client_attempt_id` makes it idempotent — replaying the same id returns the first
+   *     result, while reusing it with a DIFFERENT payload is a caller bug and raises P0007.
+   *     The caller therefore owns the id for the lifetime of one attempt.
+   */
+  recordAttempt: async (input, planDate) => {
+    if (get().recordingItemId) return false
+    const item = input.planItem
+    set({ recordingItemId: item.id, planError: null })
+    try {
+      const score = Math.min(1, Math.max(0, input.score))
+      const { error } = await supabase.rpc('record_answer_attempt', {
+        p_client_attempt_id: input.clientAttemptId,
+        p_activity_type: item.activity_type,
+        p_response_type: item.response_type,
+        p_evaluator_type: item.evaluator_type,
+        p_response: { self_rated: score },
+        p_goal_id: input.goalId,
+        p_activity_id: item.activity_id,
+        p_card_id: item.card_id,
+        p_plan_item_id: item.id,
+        p_normalized_score: score,
+        p_evaluator_result: { evaluator: 'self_rate', score },
+        p_duration_ms: input.durationMs ?? 0,
+        p_evaluator_version: 'self-rate-v1',
+      })
+      if (error) throw error
+      // Re-read: the server owns the item status and the plan aggregates.
+      await get().fetchPlan(input.goalId, planDate)
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    } finally {
+      set({ recordingItemId: null })
+    }
+  },
+
+  /** Recent attempts for a goal — the review surface. Owner-scoped by RLS. */
+  fetchAttempts: async (goalId) => {
+    set({ attemptsLoading: true })
+    try {
+      const { data, error } = await supabase
+        .from('answer_attempts')
+        .select('id, goal_id, card_id, activity_id, plan_item_id, activity_type, evaluator_type, normalized_score, duration_ms, created_at')
+        .eq('goal_id', goalId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (error) throw error
+      set({ attempts: (data ?? []) as AttemptRow[] })
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+    } finally {
+      set({ attemptsLoading: false })
+    }
+  },
+
+  /**
+   * Ask the server for a remediation on one card, and hold the result as a preview.
+   *
+   * This SPENDS MONEY. `ai-generate` reserves against the wallet before calling the model
+   * and charges the real token cost after (mig 168), so the caller must only reach here on
+   * an explicit user action — and the UI has to say it costs credits BEFORE the click, not
+   * after the charge.
+   *
+   * The server persists the result as `user_enrichments.status = 'preview'` and returns its
+   * id; accepting or rejecting is a separate decision (`resolveEnrichment`). Rejecting is
+   * NOT a refund — the generation already happened.
+   */
+  requestEnrichment: async (input) => {
+    if (get().enrichmentPendingCardId) return false
+    set({ enrichmentPendingCardId: input.cardId, enrichmentError: null, enrichment: null })
+    try {
+      const result = await callServerAI({
+        kind: 'remediation',
+        action: input.action,
+        uiLang: input.uiLang,
+        goalId: input.goalId,
+        cardIds: [input.cardId],
+      })
+      // No enrichment id means the server could not persist the preview, so there is
+      // nothing to accept later. Surfacing it as an error beats showing content that
+      // silently cannot be kept.
+      if (!result.enrichmentId) {
+        set({ enrichmentError: 'UNKNOWN' })
+        return false
+      }
+      const rawSources = (result.content as { sources?: unknown }).sources
+      set({
+        enrichment: {
+          enrichmentId: result.enrichmentId,
+          action: input.action,
+          content: result.content,
+          sources: Array.isArray(rawSources) ? rawSources as EnrichmentSource[] : [],
+          balance: typeof result.balance === 'number' ? result.balance : null,
+        },
+      })
+      return true
+    } catch (e) {
+      set({ enrichmentError: toEnrichmentError(e) })
+      return false
+    } finally {
+      set({ enrichmentPendingCardId: null })
+    }
+  },
+
+  /**
+   * Keep or discard the open preview.
+   *
+   * `set_user_enrichment_status` only allows a transition OUT OF 'preview' (P0007
+   * otherwise) — the closed statuses are terminal. So a double-click on Accept is a
+   * server-side conflict, not a silent second write, and the store closes the preview on
+   * success either way.
+   */
+  resolveEnrichment: async (status) => {
+    const current = get().enrichment
+    if (!current || get().enrichmentSaving) return false
+    set({ enrichmentSaving: true, enrichmentError: null })
+    try {
+      const { error } = await supabase.rpc('set_user_enrichment_status', {
+        p_enrichment_id: current.enrichmentId,
+        p_status: status,
+      })
+      if (error) throw error
+      set({ enrichment: null })
+      return true
+    } catch (e) {
+      const code = (e as { code?: string }).code
+      // P0007 means it was already finalized — the user's intent is satisfied, so close
+      // the preview instead of trapping them behind an error they cannot clear.
+      if (code === 'P0007') {
+        set({ enrichment: null })
+        return true
+      }
+      set({ enrichmentError: 'UNKNOWN' })
+      return false
+    } finally {
+      set({ enrichmentSaving: false })
+    }
+  },
+
+  /**
+   * Load the diagnostics window for a goal: attempts and plans, aggregated by a pure
+   * function so the arithmetic is testable without a database.
+   *
+   * Windows differ on purpose. Attempts look back 30 days because accuracy needs volume;
+   * plans look back 14 because adherence is a habit question and a three-week-old miss says
+   * nothing about this week.
+   */
+  fetchInsights: async (goalId) => {
+    if (get().insightsLoading) return
+    set({ insightsLoading: true })
+    try {
+      const now = Date.now()
+      const attemptsSince = new Date(now - 30 * 86_400_000).toISOString()
+      const plansSince = new Date(now - 14 * 86_400_000).toISOString().slice(0, 10)
+
+      const [attemptsResult, plansResult] = await Promise.all([
+        supabase
+          .from('answer_attempts')
+          .select('card_id, normalized_score, duration_ms, created_at')
+          .eq('goal_id', goalId)
+          .gte('created_at', attemptsSince)
+          .order('created_at', { ascending: false })
+          .limit(2000)
+          .returns<InsightAttempt[]>(),
+        supabase
+          .from('daily_plans')
+          .select('plan_date, total_items, completed_items')
+          .eq('goal_id', goalId)
+          .gte('plan_date', plansSince)
+          .returns<InsightPlan[]>(),
+      ])
+      if (attemptsResult.error) throw attemptsResult.error
+      if (plansResult.error) throw plansResult.error
+
+      set({ insights: summarizeLearning({
+        attempts: attemptsResult.data ?? [],
+        plans: plansResult.data ?? [],
+      }) })
+    } catch (e) {
+      set({ planError: toLearningError(e), insights: null })
+    } finally {
+      set({ insightsLoading: false })
+    }
+  },
+
+  /** Recommendations for a goal, newest first. Owner-scoped by RLS. */
+  fetchRecommendations: async (goalId) => {
+    set({ recommendationsLoading: true })
+    try {
+      const { data, error } = await supabase
+        .from('study_recommendations')
+        .select('id, goal_id, card_id, concept_id, activity_id, action_type, provider, reason, algorithm_version, status, created_at')
+        .eq('goal_id', goalId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+        .returns<RecommendationRow[]>()
+      if (error) throw error
+      set({ recommendations: data ?? [] })
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+    } finally {
+      set({ recommendationsLoading: false })
+    }
+  },
+
+  /**
+   * Produce the current suggestion set for a goal from the diagnostics window.
+   *
+   * The producer is deliberately DETERMINISTIC and versioned (`weak-card-v1`), like the
+   * daily planner: the same attempt history yields the same suggestions, and the version
+   * is stored on every row so the quality of one producer can be compared with another's
+   * later (design §11.5). Nothing here calls the model — an AI producer can write the same
+   * table under a different `provider` without a schema change.
+   *
+   * `set_study_recommendations` replaces only the PENDING rows, so a regeneration cannot
+   * erase what the learner already accepted or dismissed. That is enforced server-side; the
+   * client is free to re-send its full current set.
+   */
+  regenerateRecommendations: async (goalId) => {
+    const insights = get().insights
+    if (!insights) {
+      // Diagnostics are the input. Producing from nothing would emit an empty set and wipe
+      // the current pending suggestions for no reason.
+      return false
+    }
+    set({ planError: null })
+    try {
+      const items = insights.weakCards.map((card) => ({
+        card_id: card.cardId,
+        action_type: 'review_card',
+        // The evidence travels with the suggestion, so the UI can say WHY without
+        // recomputing it and a stored row stays explainable months later.
+        reason: `mean ${Math.round(card.meanScore * 100)}% over ${card.attempts} attempts`,
+        payload: { mean_score: card.meanScore, attempts: card.attempts },
+      }))
+      const { error } = await supabase.rpc('set_study_recommendations', {
+        p_goal_id: goalId,
+        p_items: items,
+        p_provider: 'algorithm',
+        p_algorithm_version: WEAK_CARD_RECOMMENDER_VERSION,
+      })
+      if (error) throw error
+      await get().fetchRecommendations(goalId)
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    }
+  },
+
+  /**
+   * Accept or dismiss one suggestion.
+   *
+   * Accepting is not decoration: `generatePlan` reads accepted card ids and raises their
+   * `contentImportance`, so the decision changes tomorrow's plan. Dismissing keeps the
+   * suggestion from being re-proposed, because the server preserves non-pending rows.
+   *
+   * Both states are terminal server-side (P0007 on a second transition), which the store
+   * treats as success — the learner's intent is already recorded, and an unclearable error
+   * would be the wrong reading of that code.
+   */
+  resolveRecommendation: async (id, status) => {
+    if (get().recommendationBusyId) return false
+    set({ recommendationBusyId: id, planError: null })
+    try {
+      const { error } = await supabase.rpc('set_study_recommendation_status', {
+        p_recommendation_id: id,
+        p_status: status,
+      })
+      if (error && (error as { code?: string }).code !== 'P0007') throw error
+      set({
+        recommendations: get().recommendations.map((rec) =>
+          rec.id === id ? { ...rec, status } : rec),
+      })
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    } finally {
+      set({ recommendationBusyId: null })
+    }
+  },
+
+  /** Close the preview without deciding. It stays 'preview' server-side and can be
+   *  resolved later; the money is spent either way. */
+  dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
+
   reset: () => set({
     goals: [], goalsLoading: false, goalsError: null,
     plan: null, planItems: [], planCards: {}, planLoading: false, planGenerating: false,
     planError: null, planBlockedReason: null,
+    recordingItemId: null, attempts: [], attemptsLoading: false,
+    enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
+    enrichmentSaving: false, insights: null, insightsLoading: false,
+    recommendations: [], recommendationsLoading: false, recommendationBusyId: null,
   }),
 }))

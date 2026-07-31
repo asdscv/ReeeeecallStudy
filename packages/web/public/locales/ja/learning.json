@@ -20,7 +20,8 @@
     "item": {
       "study": "学習",
       "untitled": "（テキストなし）",
-      "minutes": "約 {{count, number}} 分"
+      "minutes": "約 {{count, number}} 分",
+      "recorded": "記録済み"
     },
     "reason": {
       "due": "復習期限",
@@ -38,7 +39,14 @@
       "authRequired": "再度ログインしてください。",
       "forbidden": "アクセス権限がありません。",
       "unknown": "プランを作成できませんでした。もう一度お試しください。"
-    }
+    },
+    "rate": {
+      "again": "わからない",
+      "partial": "あいまい",
+      "known": "わかった",
+      "hint": "試行の記録のみです — 復習スケジュールは変わりません。"
+    },
+    "insightsLink": "学習診断"
   },
   "goals": {
     "title": "学習目標",
@@ -93,6 +101,75 @@
     "error": {
       "title": "目標名を1〜500文字で入力してください。",
       "dailyMinutes": "1日の学習時間は1〜1440分の範囲で指定してください。"
+    }
+  },
+  "history": {
+    "title": "最近の試行 ({{count, number}})",
+    "itemFallback": "{{type}} の試行",
+    "score": {
+      "unknown": "スコアなし"
+    }
+  },
+  "enrichment": {
+    "explainCta": "解説（クレジット）",
+    "requesting": "問い合わせ中…",
+    "costHint": "ウォレットのAIクレジットを使用します",
+    "action": {
+      "explain": "AI解説",
+      "hint": "学習ヒント"
+    },
+    "sources": "出典",
+    "noSources": "この回答はソースに基づいていません。",
+    "empty": "モデルから利用可能な内容が返されませんでした。",
+    "chargedNote": "すでに課金済みです — 破棄してもクレジットは返金されません。",
+    "keep": "保持",
+    "discard": "破棄",
+    "later": "あとで決める",
+    "saving": "保存中…",
+    "error": {
+      "BAD_REQUEST": "無効なリクエストです。",
+      "FORBIDDEN": "このカードへのアクセス権限がありません。",
+      "GROUNDING_REQUIRED": "引用可能なソースが見つからなかったため、捏造を避けて回答を拒否しました。",
+      "INSUFFICIENT_CREDITS": "AIクレジットが不足しています。チャージしてから続けてください。",
+      "INVALID_RESULT": "回答が利用できない形式で返されました。もう一度お試しください。",
+      "NETWORK": "ネットワークエラーです。接続を確認してください。",
+      "NOT_CONFIGURED": "このサーバーではAI生成が有効になっていません。",
+      "PROVIDER_ERROR": "AIサービスでエラーが発生しました。もう一度お試しください。",
+      "RATE_CAP": "本日のAIリクエスト上限に達しました。明日もう一度お試しください。",
+      "UNKNOWN": "問題が発生しました。もう一度お試しください。"
+    }
+  },
+  "insights": {
+    "title": "学習診断",
+    "noData": "データなし",
+    "attempts": "試行回数 (30日)",
+    "accuracy": "正答率",
+    "notScoredYet": "まだスコアのある試行がありません",
+    "typicalTime": "平均所要時間",
+    "seconds": "{{count, number}}秒",
+    "adherence": "プラン達成率 (14日)",
+    "weakTitle": "もう一度確認",
+    "weakHint": "試行2回以上で平均60%未満のカードです。",
+    "weakEmpty": "遅れているカードはありません。",
+    "cardFallback": "（今日のプランに含まれていないカード）",
+    "attemptCount": "{{count, number}} 回試行",
+    "adherenceTitle": "日別プラン (14日)",
+    "adherenceEmpty": "この期間にプランがありません。",
+    "noPlanItems": "計画された項目なし",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。"
+  },
+  "recommend": {
+    "title": "おすすめ",
+    "hint": "受け入れると次のプランでそのカードの優先度が上がります。",
+    "regenerate": "更新",
+    "accept": "受け入れる",
+    "dismiss": "無視",
+    "empty": "まだおすすめはありません。試行がたまったら更新してください。",
+    "status": {
+      "accepted": "受け入れ済み",
+      "dismissed": "無視済み",
+      "expired": "期限切れ"
     }
   }
 }

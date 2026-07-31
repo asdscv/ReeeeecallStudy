@@ -18,6 +18,7 @@ const NAMESPACES = [
   'common', 'auth', 'dashboard', 'decks', 'study',
   'marketplace', 'settings', 'history', 'import-export',
   'guide', 'errors', 'paywall', 'update',
+  'learning',
 ] as const
 
 let passed = 0

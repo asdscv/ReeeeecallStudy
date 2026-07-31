@@ -20,7 +20,8 @@
     "item": {
       "study": "Study",
       "untitled": "(no text)",
-      "minutes": "~{{count, number}} min"
+      "minutes": "~{{count, number}} min",
+      "recorded": "Recorded"
     },
     "reason": {
       "due": "Due for review",
@@ -38,7 +39,14 @@
       "authRequired": "Please sign in again.",
       "forbidden": "You don't have access to that.",
       "unknown": "The plan couldn't be built. Please try again."
-    }
+    },
+    "rate": {
+      "again": "Didn't know",
+      "partial": "Partly",
+      "known": "Knew it",
+      "hint": "Records your attempt — it does not change the review schedule."
+    },
+    "insightsLink": "Insights"
   },
   "goals": {
     "title": "Learning goals",
@@ -93,6 +101,75 @@
     "error": {
       "title": "Enter a goal name (1–500 characters).",
       "dailyMinutes": "Minutes per day must be between 1 and 1440."
+    }
+  },
+  "history": {
+    "title": "Recent attempts ({{count, number}})",
+    "itemFallback": "{{type}} attempt",
+    "score": {
+      "unknown": "Not scored"
+    }
+  },
+  "enrichment": {
+    "explainCta": "Explain (credits)",
+    "requesting": "Asking…",
+    "costHint": "Uses AI credits from your wallet",
+    "action": {
+      "explain": "AI explanation",
+      "hint": "Study hint"
+    },
+    "sources": "Sources",
+    "noSources": "This answer is not source-based.",
+    "empty": "The model returned nothing usable.",
+    "chargedNote": "Already charged — discarding does not refund the credits.",
+    "keep": "Keep",
+    "discard": "Discard",
+    "later": "Decide later",
+    "saving": "Saving…",
+    "error": {
+      "BAD_REQUEST": "That request was not valid.",
+      "FORBIDDEN": "You don't have access to that card.",
+      "GROUNDING_REQUIRED": "No citable source was found, so the answer was refused rather than made up.",
+      "INSUFFICIENT_CREDITS": "Not enough AI credits. Top up to continue.",
+      "INVALID_RESULT": "The answer came back unusable. Please try again.",
+      "NETWORK": "Network error. Check your connection.",
+      "NOT_CONFIGURED": "AI generation is not enabled on this server.",
+      "PROVIDER_ERROR": "The AI service failed. Please try again.",
+      "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    }
+  },
+  "insights": {
+    "title": "Learning insights",
+    "noData": "No data yet",
+    "attempts": "Attempts (30d)",
+    "accuracy": "Accuracy",
+    "notScoredYet": "Nothing scored yet",
+    "typicalTime": "Typical time",
+    "seconds": "{{count, number}}s",
+    "adherence": "Plan adherence (14d)",
+    "weakTitle": "Worth another look",
+    "weakHint": "Cards with at least two attempts averaging under 60%.",
+    "weakEmpty": "Nothing is falling behind.",
+    "cardFallback": "(card not in today’s plan)",
+    "attemptCount": "{{count, number}} attempts",
+    "adherenceTitle": "Daily plans (14d)",
+    "adherenceEmpty": "No plans in this window.",
+    "noPlanItems": "Nothing planned",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History."
+  },
+  "recommend": {
+    "title": "Recommendations",
+    "hint": "Accepting one raises that card’s priority in your next plan.",
+    "regenerate": "Refresh",
+    "accept": "Accept",
+    "dismiss": "Dismiss",
+    "empty": "No recommendations yet. Refresh once you have a few attempts.",
+    "status": {
+      "accepted": "Accepted",
+      "dismissed": "Dismissed",
+      "expired": "Expired"
     }
   }
 }

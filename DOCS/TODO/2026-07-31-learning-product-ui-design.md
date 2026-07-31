@@ -256,11 +256,49 @@ credit cost before the call and handle `AI_INSUFFICIENT_CREDITS` / `AI_RATE_CAP`
 `AI_GROUNDING_REQUIRED` distinctly. Grounding matters: labor-law content without a citation is
 refused server-side, and the UI has to explain why rather than showing a generic failure.
 
-**Phase 4 — diagnostics + recommendations.** Surface `study_recommendations` and a per-concept
-mastery view; this is where `PersonalAnalyticsPage`'s redirect to `/history` finally becomes a
-real page.
+**Phase 4 — diagnostics.** Shipped as diagnostics only, and two things in the original
+sentence were wrong:
 
-**Phase 5 — mobile parity.** Same store, native screens, Intl-free timezone handling.
+* **`study_recommendations` has no producer.** Nothing in the repo writes it — no RPC, no
+  code, only the table, its RLS SELECT policy and two indexes. A "recommended for you" feed
+  would therefore be permanently empty. Writing a producer is a design decision about WHO
+  recommends (a deterministic, versioned client algorithm like the planner, or the AI
+  remediation path) and it is deferred rather than faked. That is **Phase 4b**, now shipped:
+  mig 174 adds `set_study_recommendations` (replaces only the PENDING set, so an accept or a
+  dismiss survives every regeneration) and `set_study_recommendation_status` (terminal, like
+  the enrichment one). The first producer is the deterministic `weak-card-v1` algorithm, and
+  an ACCEPTED recommendation raises that card's `contentImportance` in the next plan — which
+  is the only reason the row is worth storing at all.
+* **`PersonalAnalyticsPage` did not need resurrecting.** Analytics already lives as a tab
+  inside `/history` (`PersonalAnalyticsContent`, lazy-loaded there); the page-level export is
+  a redirect *because* of that, not as a placeholder. Rebuilding it would have produced a
+  second answer to the same question.
+
+What shipped instead: `/learning/insights`, derived from the engine's own records —
+`answer_attempts` (30 days) and `daily_plans` (14 days) — with attempts, accuracy, typical
+answer time, plan adherence per day and overall, and the cards worth another look. A
+per-concept mastery view is not possible yet for the current data: legacy cards project with
+`concept_id = null` (design §5.2), so there are no concepts to aggregate until curated
+content exists.
+
+**Phase 5 — mobile parity.** Shipped: `LearningTodayScreen` (plan, self-rating, enrichment)
+and `LearningGoalsScreen` (list, create with deck picker, archive), reached from the drawer.
+The shared store drives both platforms, so none of its rules are re-implemented natively.
+
+Two things this phase changed outside mobile:
+* `learning-plan-date` moved from the web package to `shared/lib` and was split — the DATE is
+  computed from `Date`'s local getters (no ICU), while the ZONE is an `Intl` attempt that
+  falls back to a real `UTC±HH:MM` offset label. Defaulting to `'UTC'` would have recorded a
+  zone the user is not in; an offset says what was actually used. Web now re-exports it, so
+  the two platforms cannot drift about which day it is.
+* `packages/mobile/tsconfig.json` gained `allowImportingTsExtensions` (with `noEmit`), which
+  `tsconfig.app.json` already had: `shared/learning/**` imports with explicit `.ts`
+  extensions, and mobile only started traversing into it now.
+
+5b (shipped): `LearningInsightsScreen` — the same diagnostics and the same recommendation
+accept/dismiss loop, reached from the today screen's header. It renders the identical pure
+aggregation, so "no data is not zero" holds on both platforms by construction rather than by
+two implementations agreeing.
 
 Out of scope for all phases here (unchanged from design §19): curated concept authoring, the
 official content pipeline, FSRS shadow scoring, listening/speaking, and any production

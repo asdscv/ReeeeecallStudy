@@ -2,6 +2,13 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    // `packages/shared/learning/**` imports with explicit `.ts` extensions (the module was
+    // written that way and the web app already sets this flag in tsconfig.app.json). Mobile
+    // only started traversing into it when the learning screens landed, so the flag has to
+    // match. Safe here because mobile typechecks with `--noEmit`; TypeScript only rejects
+    // the combination when it is emitting.
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "paths": {
       "@reeeeecall/shared/*": ["../shared/*"]
     }

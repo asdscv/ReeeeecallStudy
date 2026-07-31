@@ -12,6 +12,9 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+const { mockCallServerAI } = vi.hoisted(() => ({ mockCallServerAI: vi.fn() }))
+vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({ callServerAI: mockCallServerAI }))
+
 const { mockFrom, mockRpc, mockGetUser, mockSupabase } = vi.hoisted(() => {
   const from = vi.fn()
   const rpc = vi.fn()
@@ -37,7 +40,7 @@ import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
 function q(result: unknown) {
   const settled = Promise.resolve(result)
   const builder: Record<string, unknown> = {}
-  for (const method of ['select', 'eq', 'neq', 'in', 'or', 'gte', 'order', 'limit', 'returns']) {
+  for (const method of ['select', 'eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
     builder[method] = () => builder
   }
   builder.maybeSingle = () => settled
@@ -243,7 +246,342 @@ describe('generatePlan', () => {
   })
 })
 
-// ── goal writes ────────────────────────────────────────────────────────────
+// ── recordAttempt / fetchAttempts (Phase 2) ────────────────────────────────
+describe('recordAttempt', () => {
+  const planItem = {
+    id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
+    concept_id: null, activity_type: 'recall', stimulus_type: 'text',
+    response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'due',
+    priority: 0.7, estimated_minutes: 0.5, status: 'pending' as const,
+  }
+
+  it('sends the plan item snapshot verbatim, because the RPC compares against it', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+
+    const ok = await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-1', durationMs: 4200,
+    }, '2026-07-31')
+
+    expect(ok).toBe(true)
+    const [name, args] = mockRpc.mock.calls[0] as [string, Record<string, unknown>]
+    expect(name).toBe('record_answer_attempt')
+    // record_answer_attempt raises P0007 unless goal / activity / card and all three type
+    // fields match the stored item, so these must come from the item, not be re-derived.
+    expect(args).toMatchObject({
+      p_client_attempt_id: 'att-1',
+      p_plan_item_id: 'item-1',
+      p_goal_id: 'goal-1',
+      p_activity_id: null,
+      p_card_id: 'card-1',
+      p_activity_type: 'recall',
+      p_response_type: 'self_rate',
+      p_evaluator_type: 'self_rate',
+      p_normalized_score: 1,
+      p_duration_ms: 4200,
+    })
+  })
+
+  it('clamps the score into 0..1 rather than letting the RPC reject it', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+
+    await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 4, clientAttemptId: 'att-2',
+    }, '2026-07-31')
+
+    expect((mockRpc.mock.calls[0][1] as Record<string, unknown>).p_normalized_score).toBe(1)
+  })
+
+  it('re-reads the plan instead of patching item status locally', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', {
+      data: { id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+        algorithm_version: 'daily-plan-v1', input_fingerprint: 'f', status: 'completed',
+        budget_minutes: 20, completed_minutes: 1, completed_items: 1, total_items: 1 },
+      error: null,
+    })
+    queue('daily_plan_items', { data: [{ ...planItem, status: 'completed' }], error: null })
+
+    await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-3',
+    }, '2026-07-31')
+
+    // The server owns the item status and the plan aggregates (it updates both atomically).
+    expect(useLearningStore.getState().planItems[0].status).toBe('completed')
+    expect(useLearningStore.getState().plan?.completed_items).toBe(1)
+  })
+
+  it('maps a snapshot mismatch to CONFLICT so the UI can say what happened', async () => {
+    mockRpc.mockResolvedValue({
+      data: null,
+      error: { code: 'P0007', message: 'Attempt targets do not match the plan item snapshot' },
+    })
+
+    const ok = await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-4',
+    }, '2026-07-31')
+
+    expect(ok).toBe(false)
+    expect(useLearningStore.getState().planError?.code).toBe('CONFLICT')
+    expect(useLearningStore.getState().recordingItemId).toBeNull()
+  })
+
+  it('ignores a second concurrent record instead of double-writing', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+
+    const first = useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-5',
+    }, '2026-07-31')
+    const second = await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 0, clientAttemptId: 'att-6',
+    }, '2026-07-31')
+    await first
+
+    expect(second).toBe(false)
+    expect(mockRpc.mock.calls.filter(([n]) => n === 'record_answer_attempt')).toHaveLength(1)
+  })
+})
+
+describe('fetchAttempts', () => {
+  it('loads the goal\'s attempts', async () => {
+    queue('answer_attempts', {
+      data: [{ id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
+        plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+        normalized_score: 0.5, duration_ms: 1000, created_at: '2026-07-31T00:00:00.000Z' }],
+      error: null,
+    })
+
+    await useLearningStore.getState().fetchAttempts('goal-1')
+
+    expect(useLearningStore.getState().attempts).toHaveLength(1)
+    expect(useLearningStore.getState().attemptsLoading).toBe(false)
+  })
+})
+// ── enrichment (Phase 3, paid) ─────────────────────────────────────────────
+describe('requestEnrichment', () => {
+  const ok = {
+    content: { explanation: 'because', sources: [{ title: '근로기준법', clause: '제56조' }] },
+    enrichmentId: 'enr-1',
+    balance: 12345,
+  }
+
+  it('asks the server and holds the result as a preview', async () => {
+    mockCallServerAI.mockResolvedValue(ok)
+
+    const done = await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+
+    expect(done).toBe(true)
+    expect(mockCallServerAI).toHaveBeenCalledWith({
+      kind: 'remediation', action: 'explain', uiLang: 'ko',
+      goalId: 'goal-1', cardIds: ['card-1'],
+    })
+    const preview = useLearningStore.getState().enrichment
+    expect(preview?.enrichmentId).toBe('enr-1')
+    expect(preview?.sources).toHaveLength(1)
+    expect(preview?.balance).toBe(12345)
+    expect(useLearningStore.getState().enrichmentPendingCardId).toBeNull()
+  })
+
+  it('refuses to show content it cannot let the user keep', async () => {
+    // No enrichment id → the preview was never persisted, so Accept would have nothing to
+    // act on. Showing the text anyway would promise something we cannot deliver.
+    mockCallServerAI.mockResolvedValue({ content: { explanation: 'x' } })
+
+    const done = await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+
+    expect(done).toBe(false)
+    expect(useLearningStore.getState().enrichment).toBeNull()
+    expect(useLearningStore.getState().enrichmentError).toBe('UNKNOWN')
+  })
+
+  it('keeps every server failure distinguishable, because the next action differs', async () => {
+    const cases: Array<[string, string]> = [
+      ['AI_INSUFFICIENT_CREDITS', 'INSUFFICIENT_CREDITS'],  // top up
+      ['AI_RATE_CAP', 'RATE_CAP'],                          // wait for tomorrow
+      ['AI_GROUNDING_REQUIRED', 'GROUNDING_REQUIRED'],      // refused, not broken
+      ['AI_INVALID_RESULT', 'INVALID_RESULT'],
+      ['AI_PROVIDER_ERROR', 'PROVIDER_ERROR'],
+      ['AI_NOT_CONFIGURED', 'NOT_CONFIGURED'],
+      ['FORBIDDEN', 'FORBIDDEN'],
+      ['BAD_REQUEST', 'BAD_REQUEST'],
+      ['NETWORK_ERROR', 'NETWORK'],
+      ['AI_PERSISTENCE_ERROR', 'UNKNOWN'],                  // server fault, not actionable
+    ]
+    for (const [serverCode, expected] of cases) {
+      mockCallServerAI.mockRejectedValueOnce(new Error(serverCode))
+      await useLearningStore.getState().requestEnrichment({
+        action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+      })
+      expect(useLearningStore.getState().enrichmentError, serverCode).toBe(expected)
+    }
+  })
+
+  it('ignores a second request while one is in flight (each call costs money)', async () => {
+    mockCallServerAI.mockResolvedValue(ok)
+
+    const first = useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+    const second = await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+    await first
+
+    expect(second).toBe(false)
+    expect(mockCallServerAI).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('resolveEnrichment', () => {
+  beforeEach(() => {
+    useLearningStore.setState({
+      enrichment: { enrichmentId: 'enr-1', action: 'explain', content: {}, sources: [], balance: null },
+    })
+  })
+
+  it('keeps the preview via the RPC and closes it', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    const done = await useLearningStore.getState().resolveEnrichment('accepted')
+
+    expect(done).toBe(true)
+    expect(mockRpc).toHaveBeenCalledWith('set_user_enrichment_status', {
+      p_enrichment_id: 'enr-1', p_status: 'accepted',
+    })
+    expect(useLearningStore.getState().enrichment).toBeNull()
+  })
+
+  it('treats an already-finalized preview as done rather than trapping the user', async () => {
+    // set_user_enrichment_status only allows a transition OUT of 'preview' (P0007
+    // otherwise). A double-click must not leave an error the user cannot clear.
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Enrichment status is already finalized' },
+    })
+
+    const done = await useLearningStore.getState().resolveEnrichment('accepted')
+
+    expect(done).toBe(true)
+    expect(useLearningStore.getState().enrichment).toBeNull()
+    expect(useLearningStore.getState().enrichmentError).toBeNull()
+  })
+
+  it('does nothing when there is no open preview', async () => {
+    useLearningStore.setState({ enrichment: null })
+
+    expect(await useLearningStore.getState().resolveEnrichment('rejected')).toBe(false)
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+})
+
+// ── recommendations (Phase 4b) ─────────────────────────────────────────────
+describe('recommendations', () => {
+  const insights = {
+    attemptCount: 6, scoredCount: 6, accuracy: 0.5, medianDurationMs: 5000,
+    weakCards: [
+      { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
+      { cardId: 'card-2', attempts: 2, meanScore: 0.5 },
+    ],
+    adherence: [], overallAdherence: null,
+  }
+
+  it('produces a versioned, deterministic set from the diagnostics', async () => {
+    useLearningStore.setState({ insights })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('study_recommendations', { data: [], error: null })
+
+    const ok = await useLearningStore.getState().regenerateRecommendations('goal-1')
+
+    expect(ok).toBe(true)
+    const [name, args] = mockRpc.mock.calls[0] as [string, Record<string, unknown>]
+    expect(name).toBe('set_study_recommendations')
+    expect(args.p_goal_id).toBe('goal-1')
+    // The producer is recorded so one source's quality can later be compared with another's.
+    expect(args.p_provider).toBe('algorithm')
+    expect(args.p_algorithm_version).toBe('weak-card-v1')
+
+    const items = args.p_items as Array<Record<string, unknown>>
+    expect(items).toHaveLength(2)
+    expect(items[0]).toMatchObject({ card_id: 'card-1', action_type: 'review_card' })
+    // The evidence travels with the row, so a stored suggestion stays explainable later.
+    expect(items[0].reason).toBe('mean 20% over 3 attempts')
+    expect(items[0].payload).toEqual({ mean_score: 0.2, attempts: 3 })
+  })
+
+  it('refuses to produce with no diagnostics loaded', async () => {
+    useLearningStore.setState({ insights: null })
+
+    const ok = await useLearningStore.getState().regenerateRecommendations('goal-1')
+
+    // An empty set would REPLACE the pending suggestions server-side, so producing from
+    // nothing would silently wipe the feed.
+    expect(ok).toBe(false)
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('accepts a suggestion and reflects it locally', async () => {
+    useLearningStore.setState({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    const ok = await useLearningStore.getState().resolveRecommendation('rec-1', 'accepted')
+
+    expect(ok).toBe(true)
+    expect(mockRpc).toHaveBeenCalledWith('set_study_recommendation_status', {
+      p_recommendation_id: 'rec-1', p_status: 'accepted',
+    })
+    expect(useLearningStore.getState().recommendations[0].status).toBe('accepted')
+    expect(useLearningStore.getState().recommendationBusyId).toBeNull()
+  })
+
+  it('treats an already-decided suggestion as done rather than an error', async () => {
+    useLearningStore.setState({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+    // Both closed states are terminal server-side; a stale tab must not trap the user.
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Recommendation is already accepted' },
+    })
+
+    const ok = await useLearningStore.getState().resolveRecommendation('rec-1', 'dismissed')
+
+    expect(ok).toBe(true)
+    expect(useLearningStore.getState().planError).toBeNull()
+  })
+
+  it('feeds accepted cards into the next plan, which is what makes accepting matter', async () => {
+    queue('cards', { data: [cardRow('card-1'), cardRow('card-2')], error: null })
+    queue('study_logs', { data: [], error: null })
+    queue('study_recommendations', { data: [{ card_id: 'card-2' }], error: null })
+    queue('daily_plans', { data: null, error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    await useLearningStore.getState().generatePlan(
+      goalWithDecks([{ deck_id: 'deck-1', importance: 0.5 }]), CTX)
+
+    const save = mockRpc.mock.calls.find(([n]) => n === 'save_daily_plan')
+    expect(save).toBeTruthy()
+    const items = (save![1] as Record<string, unknown>).p_items as Array<Record<string, unknown>>
+    // card-2 was accepted, so its priority must exceed the otherwise-identical card-1.
+    const byCard = new Map(items.map((i) => [i.card_id, i.priority as number]))
+    expect(byCard.get('card-2')).toBeGreaterThan(byCard.get('card-1') as number)
+  })
+})
+
 describe('goal writes', () => {
   it('creates a goal and then attaches its decks', async () => {
     mockRpc.mockResolvedValue({ data: { ok: true, goal_id: 'goal-9' }, error: null })

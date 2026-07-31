@@ -20,7 +20,8 @@
     "item": {
       "study": "学习",
       "untitled": "（无内容）",
-      "minutes": "约 {{count, number}} 分钟"
+      "minutes": "约 {{count, number}} 分钟",
+      "recorded": "已记录"
     },
     "reason": {
       "due": "到期复习",
@@ -38,7 +39,14 @@
       "authRequired": "请重新登录。",
       "forbidden": "您没有访问权限。",
       "unknown": "计划生成失败，请重试。"
-    }
+    },
+    "rate": {
+      "again": "不知道",
+      "partial": "不确定",
+      "known": "知道",
+      "hint": "仅记录本次作答 — 不会改变复习计划。"
+    },
+    "insightsLink": "诊断"
   },
   "goals": {
     "title": "学习目标",
@@ -93,6 +101,75 @@
     "error": {
       "title": "请输入 1–500 个字符的目标名称。",
       "dailyMinutes": "每日学习时间须在 1–1440 分钟之间。"
+    }
+  },
+  "history": {
+    "title": "最近作答 ({{count, number}})",
+    "itemFallback": "{{type}} 作答",
+    "score": {
+      "unknown": "未评分"
+    }
+  },
+  "enrichment": {
+    "explainCta": "解释（额度）",
+    "requesting": "请求中…",
+    "costHint": "将使用你钱包中的 AI 额度",
+    "action": {
+      "explain": "AI 解释",
+      "hint": "学习提示"
+    },
+    "sources": "来源",
+    "noSources": "此回答不基于来源。",
+    "empty": "模型未返回可用内容。",
+    "chargedNote": "已扣费 — 即使丢弃也不会退还额度。",
+    "keep": "保留",
+    "discard": "丢弃",
+    "later": "稍后决定",
+    "saving": "保存中…",
+    "error": {
+      "BAD_REQUEST": "请求无效。",
+      "FORBIDDEN": "你没有访问该卡片的权限。",
+      "GROUNDING_REQUIRED": "未找到可引用的来源，为避免编造内容已拒绝回答。",
+      "INSUFFICIENT_CREDITS": "AI 额度不足，请充值后继续。",
+      "INVALID_RESULT": "回答内容不可用，请重试。",
+      "NETWORK": "网络错误，请检查连接。",
+      "NOT_CONFIGURED": "此服务器未启用 AI 生成功能。",
+      "PROVIDER_ERROR": "AI 服务出错，请重试。",
+      "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
+      "UNKNOWN": "出了点问题，请重试。"
+    }
+  },
+  "insights": {
+    "title": "学习诊断",
+    "noData": "暂无数据",
+    "attempts": "作答次数 (30天)",
+    "accuracy": "正确率",
+    "notScoredYet": "尚无评分记录",
+    "typicalTime": "通常用时",
+    "seconds": "{{count, number}}秒",
+    "adherence": "计划执行率 (14天)",
+    "weakTitle": "值得再看",
+    "weakHint": "作答至少2次且平均低于60%的卡片。",
+    "weakEmpty": "没有落后的卡片。",
+    "cardFallback": "（不在今日计划中）",
+    "attemptCount": "{{count, number}} 次作答",
+    "adherenceTitle": "每日计划 (14天)",
+    "adherenceEmpty": "此时间段内没有计划。",
+    "noPlanItems": "无计划项目",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。"
+  },
+  "recommend": {
+    "title": "推荐",
+    "hint": "接受后，该卡片在下次计划中的优先级会提高。",
+    "regenerate": "刷新",
+    "accept": "接受",
+    "dismiss": "忽略",
+    "empty": "暂无推荐。积累几次作答后再刷新。",
+    "status": {
+      "accepted": "已接受",
+      "dismissed": "已忽略",
+      "expired": "已过期"
     }
   }
 }
