@@ -14,7 +14,12 @@
 // missing evidence: zero is a real signal ("definitely not due", "never fails"), so
 // using it for "we don't know" would systematically bury new or unlogged cards. The
 // neutral value is 0.5 unless a different value is justified below.
+//
+// `reviewValue` is the one feature whose no-evidence value is NULL rather than a number: the
+// planner can renormalise around a missing memory estimate (daily-plan-v2), so there is no need
+// to pick a stand-in for a card that has no forgetting curve yet.
 import { activitiesForLegacyCard } from '../learning/adapters/index.ts'
+import { estimateMemory } from '../learning/application/memory.ts'
 import type { PlannerCandidate } from '../learning/domain/index.ts'
 import type { Card } from '../types/database.ts'
 
@@ -194,6 +199,13 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
     const [activity] = activitiesForLegacyCard({ card, persistedActivities: [] })
     const importance = input.deckImportance[card.deck_id]
     const accepted = acceptedCards.has(card.id)
+    // Memory state from the legacy SRS row. `reviewValue` stays null for a card with no
+    // interval or no last review — the planner renormalises rather than inventing a number.
+    const memory = estimateMemory({
+      intervalDays: card.interval_days,
+      lastReviewedAt: card.last_reviewed_at,
+      now: input.now,
+    })
 
     return {
       candidateId: `card:${card.id}`,
@@ -206,6 +218,7 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
       responseTimePenalty: responseTimePenaltyFor(cardMedian, baseline),
       goalRelevance: typeof importance === 'number' ? clamp01(importance) : NEUTRAL,
       contentImportance: accepted ? ACCEPTED_CONTENT_IMPORTANCE : NEUTRAL,
+      reviewValue: memory.reviewValue,
       estimatedMinutes: RECALL_MINUTES,
       difficulty: null,
     }

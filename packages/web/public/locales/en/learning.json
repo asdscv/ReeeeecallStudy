@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "Due for review",
+      "memoryRisk": "At risk of forgetting",
       "recentFailure": "Recently missed",
       "slowResponse": "Slow to answer",
       "goalRelevance": "Goal relevance",

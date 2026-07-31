@@ -145,6 +145,7 @@
       "due": "Waktunya mengulang",
       "goalRelevance": "Relevansi tujuan",
       "importance": "Tingkat penting",
+      "memoryRisk": "Hampir terlupakan",
       "recentFailure": "Baru saja salah",
       "slowResponse": "Lambat menjawab"
     },

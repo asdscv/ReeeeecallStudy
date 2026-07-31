@@ -176,7 +176,9 @@ describe('generatePlan', () => {
     expect(args.p_goal_id).toBe('goal-1')
     expect(args.p_plan_date).toBe('2026-07-31')
     expect(args.p_timezone).toBe('Asia/Seoul')
-    expect(args.p_algorithm_version).toBe('daily-plan-v1')
+    // The literal, not the imported constant: a weight change without a version bump is the
+    // defect this pins, and comparing the constant to itself would never catch it.
+    expect(args.p_algorithm_version).toBe('daily-plan-v2')
     expect(args.p_budget_minutes).toBe(20)
     expect(String(args.p_input_fingerprint)).toMatch(/^fnv1a32:/)
 

@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "復習期限",
+      "memoryRisk": "忘れかけ",
       "recentFailure": "最近の不正解",
       "slowResponse": "回答が遅い",
       "goalRelevance": "目標との関連度",

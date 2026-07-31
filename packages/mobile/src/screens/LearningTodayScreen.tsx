@@ -41,6 +41,7 @@ const SELF_RATINGS: ReadonlyArray<{ score: number; key: string; id: string }> = 
 
 const REASON_KEY: Record<string, string> = {
   due: 'today.reason.due',
+  memory_risk: 'today.reason.memoryRisk',
   recent_failure: 'today.reason.recentFailure',
   slow_response: 'today.reason.slowResponse',
   goal_relevance: 'today.reason.goalRelevance',
