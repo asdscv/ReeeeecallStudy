@@ -208,6 +208,23 @@ export interface EnrichmentPreview {
   balance: number | null
 }
 
+export interface RecommendationRow {
+  id: string
+  goal_id: string | null
+  card_id: string | null
+  concept_id: string | null
+  activity_id: string | null
+  action_type: string
+  provider: string
+  reason: string | null
+  algorithm_version: string | null
+  status: 'pending' | 'accepted' | 'dismissed' | 'expired'
+  created_at: string
+}
+
+/** The deterministic producer's version, recorded on every row it writes. */
+export const WEAK_CARD_RECOMMENDER_VERSION = 'weak-card-v1'
+
 export interface EnrichmentSource {
   title?: string
   url?: string
@@ -312,6 +329,10 @@ interface LearningState {
   insights: LearningInsights | null
   insightsLoading: boolean
 
+  recommendations: RecommendationRow[]
+  recommendationsLoading: boolean
+  recommendationBusyId: string | null
+
   fetchGoals: () => Promise<void>
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
@@ -331,6 +352,9 @@ interface LearningState {
   resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
   dismissEnrichment: () => void
   fetchInsights: (goalId: string) => Promise<void>
+  fetchRecommendations: (goalId: string) => Promise<void>
+  regenerateRecommendations: (goalId: string) => Promise<boolean>
+  resolveRecommendation: (id: string, status: 'accepted' | 'dismissed') => Promise<boolean>
   reset: () => void
 }
 
@@ -354,6 +378,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   enrichmentSaving: false,
   insights: null,
   insightsLoading: false,
+  recommendations: [],
+  recommendationsLoading: false,
+  recommendationBusyId: null,
 
   fetchGoals: async () => {
     if (get().goalsLoading) return
@@ -580,11 +607,26 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const deckImportance: Record<string, number> = {}
       for (const link of goal.decks) deckImportance[link.deck_id] = link.importance
 
+      // Accepted recommendations (mig 174) raise contentImportance, which is what makes
+      // "accept" change anything. Read fresh rather than trusting whatever the insights
+      // screen last loaded: the plan must reflect decisions made since.
+      const { data: acceptedRows } = await supabase
+        .from('study_recommendations')
+        .select('card_id')
+        .eq('goal_id', goal.id)
+        .eq('status', 'accepted')
+        .not('card_id', 'is', null)
+        .limit(200)
+      const acceptedCardIds = (acceptedRows ?? [])
+        .map((row) => (row as { card_id: string | null }).card_id)
+        .filter((id): id is string => !!id)
+
       const candidates = buildCandidatesFromCards({
         cards,
         recentLogs: (logRows ?? []) as CandidateStudyLog[],
         deckImportance,
         now: ctx.now,
+        acceptedCardIds,
       })
 
       const output = buildDailyPlan({
@@ -842,6 +884,104 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /** Recommendations for a goal, newest first. Owner-scoped by RLS. */
+  fetchRecommendations: async (goalId) => {
+    set({ recommendationsLoading: true })
+    try {
+      const { data, error } = await supabase
+        .from('study_recommendations')
+        .select('id, goal_id, card_id, concept_id, activity_id, action_type, provider, reason, algorithm_version, status, created_at')
+        .eq('goal_id', goalId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+        .returns<RecommendationRow[]>()
+      if (error) throw error
+      set({ recommendations: data ?? [] })
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+    } finally {
+      set({ recommendationsLoading: false })
+    }
+  },
+
+  /**
+   * Produce the current suggestion set for a goal from the diagnostics window.
+   *
+   * The producer is deliberately DETERMINISTIC and versioned (`weak-card-v1`), like the
+   * daily planner: the same attempt history yields the same suggestions, and the version
+   * is stored on every row so the quality of one producer can be compared with another's
+   * later (design §11.5). Nothing here calls the model — an AI producer can write the same
+   * table under a different `provider` without a schema change.
+   *
+   * `set_study_recommendations` replaces only the PENDING rows, so a regeneration cannot
+   * erase what the learner already accepted or dismissed. That is enforced server-side; the
+   * client is free to re-send its full current set.
+   */
+  regenerateRecommendations: async (goalId) => {
+    const insights = get().insights
+    if (!insights) {
+      // Diagnostics are the input. Producing from nothing would emit an empty set and wipe
+      // the current pending suggestions for no reason.
+      return false
+    }
+    set({ planError: null })
+    try {
+      const items = insights.weakCards.map((card) => ({
+        card_id: card.cardId,
+        action_type: 'review_card',
+        // The evidence travels with the suggestion, so the UI can say WHY without
+        // recomputing it and a stored row stays explainable months later.
+        reason: `mean ${Math.round(card.meanScore * 100)}% over ${card.attempts} attempts`,
+        payload: { mean_score: card.meanScore, attempts: card.attempts },
+      }))
+      const { error } = await supabase.rpc('set_study_recommendations', {
+        p_goal_id: goalId,
+        p_items: items,
+        p_provider: 'algorithm',
+        p_algorithm_version: WEAK_CARD_RECOMMENDER_VERSION,
+      })
+      if (error) throw error
+      await get().fetchRecommendations(goalId)
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    }
+  },
+
+  /**
+   * Accept or dismiss one suggestion.
+   *
+   * Accepting is not decoration: `generatePlan` reads accepted card ids and raises their
+   * `contentImportance`, so the decision changes tomorrow's plan. Dismissing keeps the
+   * suggestion from being re-proposed, because the server preserves non-pending rows.
+   *
+   * Both states are terminal server-side (P0007 on a second transition), which the store
+   * treats as success — the learner's intent is already recorded, and an unclearable error
+   * would be the wrong reading of that code.
+   */
+  resolveRecommendation: async (id, status) => {
+    if (get().recommendationBusyId) return false
+    set({ recommendationBusyId: id, planError: null })
+    try {
+      const { error } = await supabase.rpc('set_study_recommendation_status', {
+        p_recommendation_id: id,
+        p_status: status,
+      })
+      if (error && (error as { code?: string }).code !== 'P0007') throw error
+      set({
+        recommendations: get().recommendations.map((rec) =>
+          rec.id === id ? { ...rec, status } : rec),
+      })
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    } finally {
+      set({ recommendationBusyId: null })
+    }
+  },
+
   /** Close the preview without deciding. It stays 'preview' server-side and can be
    *  resolved later; the money is spent either way. */
   dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
@@ -853,5 +993,6 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     recordingItemId: null, attempts: [], attemptsLoading: false,
     enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
     enrichmentSaving: false, insights: null, insightsLoading: false,
+    recommendations: [], recommendationsLoading: false, recommendationBusyId: null,
   }),
 }))

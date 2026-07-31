@@ -158,5 +158,18 @@
     "noPlanItems": "계획된 항목 없음",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다."
+  },
+  "recommend": {
+    "title": "추천",
+    "hint": "수락하면 다음 플랜에서 그 카드의 우선순위가 올라갑니다.",
+    "regenerate": "새로 만들기",
+    "accept": "수락",
+    "dismiss": "무시",
+    "empty": "추천이 없습니다. 시도가 몇 번 쌓이면 새로 만들어 보세요.",
+    "status": {
+      "accepted": "수락됨",
+      "dismissed": "무시됨",
+      "expired": "만료됨"
+    }
   }
 }

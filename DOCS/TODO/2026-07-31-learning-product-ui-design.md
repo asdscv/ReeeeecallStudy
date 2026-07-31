@@ -263,7 +263,12 @@ sentence were wrong:
   code, only the table, its RLS SELECT policy and two indexes. A "recommended for you" feed
   would therefore be permanently empty. Writing a producer is a design decision about WHO
   recommends (a deterministic, versioned client algorithm like the planner, or the AI
-  remediation path) and it is deferred rather than faked. That is **Phase 4b**.
+  remediation path) and it is deferred rather than faked. That is **Phase 4b**, now shipped:
+  mig 174 adds `set_study_recommendations` (replaces only the PENDING set, so an accept or a
+  dismiss survives every regeneration) and `set_study_recommendation_status` (terminal, like
+  the enrichment one). The first producer is the deterministic `weak-card-v1` algorithm, and
+  an ACCEPTED recommendation raises that card's `contentImportance` in the next plan — which
+  is the only reason the row is worth storing at all.
 * **`PersonalAnalyticsPage` did not need resurrecting.** Analytics already lives as a tab
   inside `/history` (`PersonalAnalyticsContent`, lazy-loaded there); the page-level export is
   a redirect *because* of that, not as a placeholder. Rebuilding it would have produced a

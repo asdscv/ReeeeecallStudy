@@ -158,5 +158,18 @@
     "noPlanItems": "Nothing planned",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History."
+  },
+  "recommend": {
+    "title": "Recommendations",
+    "hint": "Accepting one raises that card’s priority in your next plan.",
+    "regenerate": "Refresh",
+    "accept": "Accept",
+    "dismiss": "Dismiss",
+    "empty": "No recommendations yet. Refresh once you have a few attempts.",
+    "status": {
+      "accepted": "Accepted",
+      "dismissed": "Dismissed",
+      "expired": "Expired"
+    }
   }
 }

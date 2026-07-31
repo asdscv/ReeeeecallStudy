@@ -40,7 +40,7 @@ import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
 function q(result: unknown) {
   const settled = Promise.resolve(result)
   const builder: Record<string, unknown> = {}
-  for (const method of ['select', 'eq', 'neq', 'in', 'or', 'gte', 'order', 'limit', 'returns']) {
+  for (const method of ['select', 'eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
     builder[method] = () => builder
   }
   builder.maybeSingle = () => settled
@@ -476,6 +476,109 @@ describe('resolveEnrichment', () => {
 
     expect(await useLearningStore.getState().resolveEnrichment('rejected')).toBe(false)
     expect(mockRpc).not.toHaveBeenCalled()
+  })
+})
+
+// ── recommendations (Phase 4b) ─────────────────────────────────────────────
+describe('recommendations', () => {
+  const insights = {
+    attemptCount: 6, scoredCount: 6, accuracy: 0.5, medianDurationMs: 5000,
+    weakCards: [
+      { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
+      { cardId: 'card-2', attempts: 2, meanScore: 0.5 },
+    ],
+    adherence: [], overallAdherence: null,
+  }
+
+  it('produces a versioned, deterministic set from the diagnostics', async () => {
+    useLearningStore.setState({ insights })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('study_recommendations', { data: [], error: null })
+
+    const ok = await useLearningStore.getState().regenerateRecommendations('goal-1')
+
+    expect(ok).toBe(true)
+    const [name, args] = mockRpc.mock.calls[0] as [string, Record<string, unknown>]
+    expect(name).toBe('set_study_recommendations')
+    expect(args.p_goal_id).toBe('goal-1')
+    // The producer is recorded so one source's quality can later be compared with another's.
+    expect(args.p_provider).toBe('algorithm')
+    expect(args.p_algorithm_version).toBe('weak-card-v1')
+
+    const items = args.p_items as Array<Record<string, unknown>>
+    expect(items).toHaveLength(2)
+    expect(items[0]).toMatchObject({ card_id: 'card-1', action_type: 'review_card' })
+    // The evidence travels with the row, so a stored suggestion stays explainable later.
+    expect(items[0].reason).toBe('mean 20% over 3 attempts')
+    expect(items[0].payload).toEqual({ mean_score: 0.2, attempts: 3 })
+  })
+
+  it('refuses to produce with no diagnostics loaded', async () => {
+    useLearningStore.setState({ insights: null })
+
+    const ok = await useLearningStore.getState().regenerateRecommendations('goal-1')
+
+    // An empty set would REPLACE the pending suggestions server-side, so producing from
+    // nothing would silently wipe the feed.
+    expect(ok).toBe(false)
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('accepts a suggestion and reflects it locally', async () => {
+    useLearningStore.setState({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    const ok = await useLearningStore.getState().resolveRecommendation('rec-1', 'accepted')
+
+    expect(ok).toBe(true)
+    expect(mockRpc).toHaveBeenCalledWith('set_study_recommendation_status', {
+      p_recommendation_id: 'rec-1', p_status: 'accepted',
+    })
+    expect(useLearningStore.getState().recommendations[0].status).toBe('accepted')
+    expect(useLearningStore.getState().recommendationBusyId).toBeNull()
+  })
+
+  it('treats an already-decided suggestion as done rather than an error', async () => {
+    useLearningStore.setState({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+    // Both closed states are terminal server-side; a stale tab must not trap the user.
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Recommendation is already accepted' },
+    })
+
+    const ok = await useLearningStore.getState().resolveRecommendation('rec-1', 'dismissed')
+
+    expect(ok).toBe(true)
+    expect(useLearningStore.getState().planError).toBeNull()
+  })
+
+  it('feeds accepted cards into the next plan, which is what makes accepting matter', async () => {
+    queue('cards', { data: [cardRow('card-1'), cardRow('card-2')], error: null })
+    queue('study_logs', { data: [], error: null })
+    queue('study_recommendations', { data: [{ card_id: 'card-2' }], error: null })
+    queue('daily_plans', { data: null, error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    await useLearningStore.getState().generatePlan(
+      goalWithDecks([{ deck_id: 'deck-1', importance: 0.5 }]), CTX)
+
+    const save = mockRpc.mock.calls.find(([n]) => n === 'save_daily_plan')
+    expect(save).toBeTruthy()
+    const items = (save![1] as Record<string, unknown>).p_items as Array<Record<string, unknown>>
+    // card-2 was accepted, so its priority must exceed the otherwise-identical card-1.
+    const byCard = new Map(items.map((i) => [i.card_id, i.priority as number]))
+    expect(byCard.get('card-2')).toBeGreaterThan(byCard.get('card-1') as number)
   })
 })
 

@@ -215,6 +215,29 @@ describe('buildCandidatesFromCards', () => {
     }
   })
 
+  it('raises contentImportance for a card whose recommendation was accepted', () => {
+    // This is the whole point of storing an accepted recommendation: without the boost the
+    // accept would be a row nobody reads.
+    const [plain, accepted] = buildCandidatesFromCards({
+      cards: [card({ id: 'a' }), card({ id: 'b' })],
+      recentLogs: [], deckImportance: {}, now: NOW,
+      acceptedCardIds: ['b'],
+    })
+    expect(plain.contentImportance).toBe(0.5)
+    expect(accepted.contentImportance).toBe(0.9)
+    // Not 1.0 on purpose — a suggestion must not outrank the evidence that a card is due.
+    expect(accepted.contentImportance).toBeLessThan(1)
+  })
+
+  it('ignores accepted ids that are not in the candidate set', () => {
+    const [only] = buildCandidatesFromCards({
+      cards: [card({ id: 'a' })],
+      recentLogs: [], deckImportance: {}, now: NOW,
+      acceptedCardIds: ['zzz'],
+    })
+    expect(only.contentImportance).toBe(0.5)
+  })
+
   it('returns nothing for no cards (a goal with no attached decks plans nothing)', () => {
     expect(buildCandidatesFromCards({ cards: [], recentLogs: [], deckImportance: {}, now: NOW }))
       .toEqual([])

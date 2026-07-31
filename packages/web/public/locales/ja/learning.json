@@ -158,5 +158,18 @@
     "noPlanItems": "計画された項目なし",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。"
+  },
+  "recommend": {
+    "title": "おすすめ",
+    "hint": "受け入れると次のプランでそのカードの優先度が上がります。",
+    "regenerate": "更新",
+    "accept": "受け入れる",
+    "dismiss": "無視",
+    "empty": "まだおすすめはありません。試行がたまったら更新してください。",
+    "status": {
+      "accepted": "受け入れ済み",
+      "dismissed": "無視済み",
+      "expired": "期限切れ"
+    }
   }
 }
