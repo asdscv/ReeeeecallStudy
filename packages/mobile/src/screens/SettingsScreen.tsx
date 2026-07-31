@@ -389,28 +389,14 @@ export function SettingsScreen() {
           )}
         </CollapsibleSection>
 
-        {/* ── b) Quick Actions — circles like web ── */}
+        {/* ── b) Quick Actions ──
+            Settings does not jump to other screens. The study and AI-generate circles that
+            used to sit here navigated OUT of Settings (one of them cross-stack, via
+            getParent()), which is what the "설정에서 다른 메뉴로 이동" complaint was about.
+            Both destinations are reachable where they belong: AI generate from the drawer,
+            the deck list and deck detail; study from its own tab. Invite stays — it opens the
+            OS share sheet and returns, it does not leave Settings. */}
         <View style={styles.quickActionsRow}>
-          <TouchableOpacity
-            testID="settings-quick-study"
-            onPress={() => { const nav = navigation.getParent() as any; nav?.navigate('StudyTab') }}
-            style={styles.quickActionItem}
-          >
-            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-              <Text style={{ fontSize: 22 }}>{'\u26A1'}</Text>
-            </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.quickStudy')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="settings-ai-generate"
-            onPress={() => navigation.navigate('AIGenerate')}
-            style={styles.quickActionItem}
-          >
-            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-              <Text style={{ fontSize: 22 }}>{'\uD83E\uDD16'}</Text>
-            </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.aiGenerate')}</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             testID="settings-invite-link"
             onPress={() => Share.share({ message: t('quickActions.shareMessage') })}
@@ -858,28 +844,11 @@ export function SettingsScreen() {
 
         <GroupLabel theme={theme}>{t('groups.data')}</GroupLabel>
 
-        {/* ── i) Export My Data — matches web ── */}
-        <CollapsibleSection title={t('export.title')} icon="📥" tint="#64748B">
-          {[
-            { key: 'stats', icon: '📊', labelKey: 'export.stats' },
-            { key: 'sessions', icon: '📅', labelKey: 'export.sessions' },
-            { key: 'decks', icon: '📚', labelKey: 'export.decks' },
-            { key: 'cards', icon: '🃏', labelKey: 'export.cards' },
-          ].map((item) => (
-            <TouchableOpacity
-              key={item.key}
-              testID={`settings-export-${item.key}`}
-              onPress={() => navigation.navigate('ImportExport' as never)}
-              style={[styles.exportRow, { borderColor: theme.colors.border }]}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <Text style={{ fontSize: 18 }}>{item.icon}</Text>
-                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{t(item.labelKey)}</Text>
-              </View>
-              <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-            </TouchableOpacity>
-          ))}
-        </CollapsibleSection>
+        {/* Export My Data lived here as four rows (stats / sessions / decks / cards) that all
+            navigated to the SAME ImportExport screen — and cross-stack, with an `as never`
+            cast, because that screen belongs to the Decks stack. Removed with the other
+            navigation rows. Import/export is reached from a deck (DeckDetail has three entry
+            points), which is where it operates anyway. */}
 
         {/* ── j) Legal (compact inline links) ── */}
         <View style={styles.legalRow}>
@@ -1112,8 +1081,4 @@ const styles = StyleSheet.create({
   segmentLabel: { fontSize: 14, fontWeight: '600' },
 
   // Export
-  exportRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1,
-  },
 })
