@@ -53,6 +53,12 @@ Consequences, stated plainly:
 history of a card), which means an affordance in the study/attempt path, not another button on the
 plan row — and a decision about what the learner is charged for at that moment.
 
+> **2026-07-31, later the same day:** the server half of this is now written on
+> `feat/attempt-grounded-remediation` (migration 175 + edge function + shared store + a pure
+> attempt-selection rule, verified against a local DB). The two client call sites quoted above are
+> **still unchanged** — they change in that workstream's PR B. When PR B lands, this section
+> describes history, not the current state; check the linked design doc's §10 before trusting it.
+
 ## 3. Also not wired: AI evaluation of free-text answers
 
 `AiEvaluatorAdapter` exists (`packages/shared/learning/evaluators/evaluators.ts:98`) and is
@@ -72,8 +78,9 @@ for content that has not been authored, not a defect.
 
 ## 5. Prioritized next steps
 
-**① Attempt-grounded remediation** *(recommended first)*
-Send `attemptId` and let the learner request `explain` / `hint` / `compare` **from a failed attempt**.
+**① Attempt-grounded remediation** *(recommended first — **IN PROGRESS**, design +
+progress in [attempt-grounded-remediation](./2026-07-31-attempt-grounded-remediation-design.md))*
+Send `attemptId` and let the learner request `explain` / `hint` **from a failed attempt**.
 Server side is already built and metered; the work is the product surface and the pricing moment.
 - Scope: attempt-history entry point (web + mobile), action picker, `requestEnrichment` signature,
   cost-before-call copy per action.
@@ -82,6 +89,14 @@ Server side is already built and metered; the work is the product surface and th
   distinct messages; do not add a generic failure path.
 - Test: an attempt-scoped request must be refused when the attempt is not the caller's
   (`reserve_ai_remediation` already checks; pin it in SQL), and the prompt must carry the attempt.
+- **Correction found while implementing.** This entry originally listed `compare` as one of the
+  actions to unlock. It is not reachable: an attempt stores `{ self_rated: score }` and no learner
+  text, so there is nothing to compare against. Only `explain` and `hint` become reachable, and
+  `compare` joins `evaluate` in waiting for free-text responses.
+- **Second finding.** `user_enrichments` has no `attempt_id` and `persist_ai_remediation` had no
+  parameter for one, so a grounded answer could not record which failure it was about
+  (`request_fingerprint` is a 128-char truncation, not provenance). Migration 175 closes that in
+  the same workstream.
 
 **② AI evaluation for free-text responses**
 Blocked on curated activities (`expected_response` / `rubric`). Wiring it before that content exists

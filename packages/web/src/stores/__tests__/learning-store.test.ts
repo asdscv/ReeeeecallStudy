@@ -12,8 +12,12 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { mockCallServerAI } = vi.hoisted(() => ({ mockCallServerAI: vi.fn() }))
-vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({ callServerAI: mockCallServerAI }))
+const { mockCallServerAI, mockGetAiWallet } = vi.hoisted(() => ({
+  mockCallServerAI: vi.fn(), mockGetAiWallet: vi.fn(),
+}))
+vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({
+  callServerAI: mockCallServerAI, getAiWallet: mockGetAiWallet,
+}))
 
 const { mockFrom, mockRpc, mockGetUser, mockSupabase } = vi.hoisted(() => {
   const from = vi.fn()
@@ -437,6 +441,63 @@ describe('requestEnrichment', () => {
 
     expect(second).toBe(false)
     expect(mockCallServerAI).toHaveBeenCalledTimes(1)
+  })
+
+  it('grounds the request in the attempt the caller named', async () => {
+    // The whole point of the feature: without this id the model explains the card in the
+    // abstract and can never say "you have missed this four times".
+    mockCallServerAI.mockResolvedValue(ok)
+
+    await useLearningStore.getState().requestEnrichment({
+      action: 'hint', goalId: 'goal-1', cardId: 'card-1', attemptId: 'att-9', uiLang: 'ko',
+    })
+
+    expect(mockCallServerAI).toHaveBeenCalledWith({
+      kind: 'remediation', action: 'hint', uiLang: 'ko',
+      goalId: 'goal-1', cardIds: ['card-1'], attemptId: 'att-9',
+    })
+  })
+
+  it('omits the key entirely when there is no attempt, rather than sending null', async () => {
+    // `parseRemediationRefs` treats a present-but-null attemptId as a supplied value and the
+    // edge function rejects it as a malformed uuid — so the card-scoped button, which has no
+    // attempt, would start failing. toHaveBeenCalledWith cannot catch this (deep equality
+    // ignores undefined-valued keys), so assert on the key list.
+    mockCallServerAI.mockResolvedValue(ok)
+
+    await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', attemptId: null, uiLang: 'ko',
+    })
+
+    const payload = mockCallServerAI.mock.calls[0][0] as Record<string, unknown>
+    expect(Object.keys(payload)).not.toContain('attemptId')
+  })
+})
+
+describe('loadEnrichmentQuote', () => {
+  it('reads what one remediation costs and where it comes from', async () => {
+    // reserve_ai_remediation books exactly one paid card-equivalent, so the wallet's
+    // per-card estimate is the per-request estimate.
+    mockGetAiWallet.mockResolvedValue({ balanceMicroWon: 1_480_000, estPricePerCardMicro: 3_880 })
+
+    await useLearningStore.getState().loadEnrichmentQuote()
+
+    expect(useLearningStore.getState().enrichmentQuote)
+      .toEqual({ estPriceMicro: 3_880, balanceMicro: 1_480_000 })
+  })
+
+  it('leaves the feature usable when the wallet cannot be read', async () => {
+    // Null, never a zeroed quote: rendering $0.00 would understate a real charge, and a
+    // wallet read that fails must not stop a learner who has credits from asking.
+    mockGetAiWallet.mockResolvedValue(null)
+    mockCallServerAI.mockResolvedValue({ content: { explanation: 'because' }, enrichmentId: 'enr-1' })
+
+    await useLearningStore.getState().loadEnrichmentQuote()
+
+    expect(useLearningStore.getState().enrichmentQuote).toBeNull()
+    expect(await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })).toBe(true)
   })
 })
 

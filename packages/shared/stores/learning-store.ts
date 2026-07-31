@@ -16,7 +16,7 @@ import { supabase } from '../lib/supabase'
 import {
   buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
 } from '../lib/learning-candidates'
-import { callServerAI } from '../lib/ai/server-client'
+import { callServerAI, getAiWallet } from '../lib/ai/server-client'
 import {
   summarizeLearning, type InsightAttempt, type InsightPlan, type LearningInsights,
 } from '../lib/learning-insights'
@@ -239,6 +239,19 @@ export interface EnrichmentSource {
 export type RemediationAction = 'explain' | 'hint'
 
 /**
+ * The price of one remediation, in micro-USD, plus the balance it comes out of.
+ *
+ * `reserve_ai_remediation` books exactly one paid card-equivalent per request
+ * (`paid_cards = 1, billable_fraction = 1.0`, mig 168), so the wallet's per-card estimate IS
+ * the per-request estimate. It is an ESTIMATE: the real charge is the model's actual token cost,
+ * settled after the call, and the UI must not present it as a fixed price.
+ */
+export interface EnrichmentQuote {
+  estPriceMicro: number
+  balanceMicro: number
+}
+
+/**
  * Everything the enrichment call can fail with, kept distinct because the user's next
  * action differs per case: top up, wait for tomorrow, or nothing they can do.
  */
@@ -334,6 +347,14 @@ interface LearningState {
   enrichmentPendingCardId: string | null
   enrichmentError: EnrichmentErrorCode | null
   enrichmentSaving: boolean
+  /**
+   * What one remediation costs, read before the call.
+   *
+   * Null means "we could not read the wallet" — which the UI renders as no number at all, never
+   * as $0.00. A quote that fails must not block a learner who has credits, and must not claim a
+   * price of zero for something that charges.
+   */
+  enrichmentQuote: EnrichmentQuote | null
 
   insights: LearningInsights | null
   insightsLoading: boolean
@@ -371,8 +392,18 @@ interface LearningState {
     action: RemediationAction
     goalId: string
     cardId: string
+    /**
+     * The attempt this request is grounded in, when the caller has one.
+     *
+     * Optional: an explanation of a card the learner has not attempted yet is still a
+     * legitimate request. The store never derives this — a paid call must not depend on a
+     * heuristic about which attempt the learner probably meant (design §5).
+     */
+    attemptId?: string | null
     uiLang: string
   }) => Promise<boolean>
+  /** Read the wallet so the UI can state the cost BEFORE the click. */
+  loadEnrichmentQuote: () => Promise<void>
   resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
   dismissEnrichment: () => void
   fetchInsights: (goalId: string) => Promise<void>
@@ -411,6 +442,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   enrichmentPendingCardId: null,
   enrichmentError: null,
   enrichmentSaving: false,
+  enrichmentQuote: null,
   insights: null,
   insightsLoading: false,
   insightsGoalId: null,
@@ -839,6 +871,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         uiLang: input.uiLang,
         goalId: input.goalId,
         cardIds: [input.cardId],
+        // Omitted entirely when absent: the edge function rejects a malformed uuid, and
+        // sending `null` for "no attempt" would be a different request shape than the one
+        // `parseRemediationRefs` treats as "not supplied".
+        ...(input.attemptId ? { attemptId: input.attemptId } : {}),
       })
       // No enrichment id means the server could not persist the preview, so there is
       // nothing to accept later. Surfacing it as an error beats showing content that
@@ -864,6 +900,23 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     } finally {
       set({ enrichmentPendingCardId: null })
     }
+  },
+
+  /**
+   * Read the price of one remediation before offering it.
+   *
+   * Fails SILENTLY into `null`: a wallet read that times out must not stop a learner with
+   * credits from asking a question, and the alternative — rendering 0 — would understate a
+   * real charge. The server remains authoritative and rejects an empty wallet with
+   * `AI_INSUFFICIENT_CREDITS`, which already has its own message.
+   */
+  loadEnrichmentQuote: async () => {
+    const wallet = await getAiWallet()
+    set({
+      enrichmentQuote: wallet
+        ? { estPriceMicro: wallet.estPricePerCardMicro, balanceMicro: wallet.balanceMicroWon }
+        : null,
+    })
   },
 
   /**
@@ -1086,7 +1139,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       planError: null, planBlockedReason: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
       enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
-      enrichmentSaving: false,
+      enrichmentSaving: false, enrichmentQuote: null,
       insights: null, insightsLoading: false, insightsGoalId: null, insightsError: null,
       recommendations: [], recommendationsLoading: false, recommendationsGoalId: null,
       recommendationBusyId: null,

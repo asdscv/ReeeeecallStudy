@@ -2,7 +2,7 @@
 # ============================================================================
 # Dry run for the learning-engine migrations.
 #
-#   before → apply 165,167,168,169 → after_apply → rollback → after_rollback
+#   before → apply 165,167,168,169,176 → after_apply → rollback → after_rollback
 #
 # Proves two things about the shipped artifacts (not copies of them):
 #   1. the migrations apply cleanly in order on top of develop's contract;
@@ -26,9 +26,16 @@ MIGRATIONS=(
   167_learning_engine_rpcs
   168_ai_remediation_metering
   169_remove_customer_external_api_contract
+  176_enrichment_attempt_provenance
 )
 # Rollbacks run in reverse dependency order.
+#
+# 176 MUST be reverted before 168. It replaced 168's 12-argument
+# `persist_ai_remediation` with a 13-argument one, and 168's rollback drops that function
+# by its exact 12-argument signature — so reverting 168 first would leave the 13-arg
+# function behind, and the zero-residue assertion would (correctly) fail.
 ROLLBACKS=(
+  176_enrichment_attempt_provenance.down
   169_remove_customer_external_api_contract.down
   168_ai_remediation_metering.down
   167_learning_engine_rpcs.down

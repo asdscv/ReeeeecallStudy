@@ -421,7 +421,7 @@ Deno.serve(async (req) => {
         const [goalResult, activityResult, attemptResult, cardsResult, conceptsResult] = await Promise.all([
           refs.goalId ? service.from('learning_goals').select('id, domain_id, title, target, settings').eq('id', refs.goalId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
           refs.activityId ? service.from('learning_activities').select('id, title, instructions, stimulus, expected_response, rubric, config, source_id, concept_id').eq('id', refs.activityId).maybeSingle() : Promise.resolve({ data: null, error: null }),
-          refs.attemptId ? service.from('answer_attempts').select('id, activity_type, response_type, evaluator_type, response, normalized_score, evaluator_result, feedback, created_at').eq('id', refs.attemptId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.attemptId ? service.from('answer_attempts').select('id, card_id, activity_type, response_type, evaluator_type, response, normalized_score, evaluator_result, feedback, hints_used, duration_ms, created_at').eq('id', refs.attemptId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
           refs.cardIds.length ? service.from('cards').select('id, field_values, tags').in('id', refs.cardIds) : Promise.resolve({ data: [], error: null }),
           refs.conceptIds.length ? service.from('learning_concepts').select('id, domain_id, title, description, source_id, metadata').in('id', refs.conceptIds) : Promise.resolve({ data: [], error: null }),
         ])
@@ -439,10 +439,40 @@ Deno.serve(async (req) => {
           : { data: [], error: null }
         if (sourceResult.error) throw new Error(`CONTEXT_LOAD:${sourceResult.error.message}`)
         const sources = (sourceResult.data ?? []) as Array<{ id: string; title: string; citation: string | null; metadata?: unknown }>
+        // The failure PATTERN, not just this one failure. Scores and timestamps only, capped at
+        // 5, one indexed user-scoped query — so a learner with thousands of attempts cannot
+        // widen the prompt, and nothing the learner wrote leaves the request it belongs to.
+        // Only fetched when the request is attempt-grounded AND names a card: without a card
+        // there is no "same item" to build a history for.
+        // Keyed on the card the ATTEMPT is on — not the card the request happens to name. Those
+        // can differ (mig 176 rejects that pair, but only later, at the write), and a history
+        // built from the wrong card would hand the model a "failure pattern" for another item.
+        // An attempt against an activity rather than a card has no same-card history at all.
+        const attemptCardId = (attemptResult.data as { card_id?: string | null } | null)?.card_id ?? null
+        const historyCardId = refs.attemptId ? attemptCardId : null
+        let attemptHistory: Array<{ normalized_score: number | null; created_at: string }> = []
+        if (historyCardId) {
+          const historyResult = await service
+            .from('answer_attempts')
+            .select('normalized_score, created_at')
+            .eq('user_id', userId)
+            .eq('card_id', historyCardId)
+            .order('created_at', { ascending: false })
+            .limit(5)
+          // A missing history must not fail a paid request the learner already reserved credits
+          // for: it is context, not a precondition. Log and continue with an empty list.
+          if (historyResult.error) console.error('[ai-generate] attempt history read failed:', historyResult.error.message)
+          else attemptHistory = (historyResult.data ?? []) as Array<{ normalized_score: number | null; created_at: string }>
+        }
+        // `buildRemediationPrompt` serializes this whole object and TRUNCATES at 64KB, so key
+        // order decides what survives. attemptHistory sits next to the attempt it belongs to
+        // rather than last: `sources` carries arbitrary metadata and can be large, and the
+        // evidence a grounded request was paid for must not be the first thing cut.
         const context = {
           goal: goalResult.data,
           activity: activityResult.data,
           attempt: attemptResult.data,
+          attemptHistory,
           cards: cardsResult.data ?? [],
           concepts,
           sources,
@@ -466,7 +496,10 @@ Deno.serve(async (req) => {
           p_request_fingerprint: JSON.stringify(refs).slice(0, 128),
           p_model_version: model.model,
           p_provider: model.provider,
-          p_prompt_version: 'remediation-v1',
+          p_prompt_version: 'remediation-v2',
+          // Provenance (mig 176). `request_fingerprint` is a 128-char truncation and cannot be
+          // relied on to say which failure this answer was about.
+          p_attempt_id: refs.attemptId,
         })
         if (persistenceError || typeof enrichmentId !== 'string') throw new Error(`PERSISTENCE:${persistenceError?.message ?? 'missing id'}`)
 
