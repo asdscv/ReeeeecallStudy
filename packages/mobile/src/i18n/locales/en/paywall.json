@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "Card Storage",
-      "free": "1,000 cards",
-      "pro": "Up to 100,000 cards"
+      "free": "{{count, number}} cards",
+      "pro": "Up to {{count, number}} cards",
+      "freeUnknown": "Limited storage",
+      "proUnknown": "Expanded storage"
     },
     "allModes": {
       "title": "All Study Modes",
@@ -18,8 +20,10 @@
     },
     "aiGeneration": {
       "title": "AI Card Generation",
-      "free": "10 cards/day",
-      "pro": "10/day + credits"
+      "free": "{{count, number}} cards/day",
+      "pro": "{{count, number}}/day + credits",
+      "freeUnknown": "Daily free allowance",
+      "proUnknown": "Daily allowance + credits"
     },
     "premiumTts": {
       "title": "Premium TTS",

@@ -141,6 +141,40 @@ export async function getBillingProducts(): Promise<BillingProduct[]> {
 }
 
 /**
+ * The free-tier limits a pricing surface has to state: the owned-card cap and the
+ * daily AI quota. Both are admin-settable (mig 154 / mig 177), which is exactly why
+ * they must not be written into copy.
+ */
+export interface PlanLimits {
+  /** `card_limit_settings.max_owned_cards`. */
+  freeCardLimit: number
+  /** `ai_pricing_settings.free_cards_per_day`. */
+  freeAiCardsPerDay: number
+}
+
+/**
+ * Read the free-tier limits (mig 179 `get_plan_limits`).
+ *
+ * Returns `null` — never a guess — when the value cannot be read or the config row
+ * is missing. The caller's job is then to say NOTHING about the number, because the
+ * failure mode this replaces is precisely a plausible-looking stale figure on a
+ * screen that is asking someone for money. A wrong cap is worse than no cap.
+ */
+export async function getPlanLimits(): Promise<PlanLimits | null> {
+  const supabase = getMobileSupabase()
+  const { data, error } = await supabase.rpc('get_plan_limits')
+  if (error || !data) return null
+  const row = data as { free_card_limit?: number | null; free_ai_cards_per_day?: number | null }
+  // Both or neither: a table that shows one real number beside one blank cell reads
+  // as a broken screen, and the two come from the same round trip anyway.
+  if (row.free_card_limit == null || row.free_ai_cards_per_day == null) return null
+  return {
+    freeCardLimit: Number(row.free_card_limit),
+    freeAiCardsPerDay: Number(row.free_ai_cards_per_day),
+  }
+}
+
+/**
  * Fetch the caller's currently-active subscription, or null if they are on the
  * free plan (or on a transient error — callers should treat null as "free").
  */

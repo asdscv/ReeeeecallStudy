@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "카드 저장",
-      "free": "1,000장",
-      "pro": "최대 100,000장"
+      "free": "{{count, number}}장",
+      "pro": "최대 {{count, number}}장",
+      "freeUnknown": "저장 용량 제한",
+      "proUnknown": "확장된 저장 용량"
     },
     "allModes": {
       "title": "모든 학습 모드",
@@ -18,8 +20,10 @@
     },
     "aiGeneration": {
       "title": "AI 카드 생성",
-      "free": "하루 10장",
-      "pro": "하루 10장 + 크레딧"
+      "free": "하루 {{count, number}}장",
+      "pro": "하루 {{count, number}}장 + 크레딧",
+      "freeUnknown": "매일 무료 제공량",
+      "proUnknown": "매일 무료 제공량 + 크레딧"
     },
     "premiumTts": {
       "title": "프리미엄 TTS",

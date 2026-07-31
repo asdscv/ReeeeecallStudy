@@ -347,6 +347,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin_growth_levers_test.sql
 
+      - name: Run public plan-limit assertions (mig 179 — public read, free-tier not per-user, no knob leak)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/public_plan_limits_test.sql
+
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so
       # they never ran on CI. Registered explicitly, like every suite above.
