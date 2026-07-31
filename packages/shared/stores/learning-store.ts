@@ -16,6 +16,9 @@ import {
   buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
 } from '../lib/learning-candidates'
 import { callServerAI } from '../lib/ai/server-client'
+import {
+  summarizeLearning, type InsightAttempt, type InsightPlan, type LearningInsights,
+} from '../lib/learning-insights'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card } from '../types/database'
@@ -306,6 +309,9 @@ interface LearningState {
   enrichmentError: EnrichmentErrorCode | null
   enrichmentSaving: boolean
 
+  insights: LearningInsights | null
+  insightsLoading: boolean
+
   fetchGoals: () => Promise<void>
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
@@ -324,6 +330,7 @@ interface LearningState {
   }) => Promise<boolean>
   resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
   dismissEnrichment: () => void
+  fetchInsights: (goalId: string) => Promise<void>
   reset: () => void
 }
 
@@ -345,6 +352,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   enrichmentPendingCardId: null,
   enrichmentError: null,
   enrichmentSaving: false,
+  insights: null,
+  insightsLoading: false,
 
   fetchGoals: async () => {
     if (get().goalsLoading) return
@@ -787,6 +796,52 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /**
+   * Load the diagnostics window for a goal: attempts and plans, aggregated by a pure
+   * function so the arithmetic is testable without a database.
+   *
+   * Windows differ on purpose. Attempts look back 30 days because accuracy needs volume;
+   * plans look back 14 because adherence is a habit question and a three-week-old miss says
+   * nothing about this week.
+   */
+  fetchInsights: async (goalId) => {
+    if (get().insightsLoading) return
+    set({ insightsLoading: true })
+    try {
+      const now = Date.now()
+      const attemptsSince = new Date(now - 30 * 86_400_000).toISOString()
+      const plansSince = new Date(now - 14 * 86_400_000).toISOString().slice(0, 10)
+
+      const [attemptsResult, plansResult] = await Promise.all([
+        supabase
+          .from('answer_attempts')
+          .select('card_id, normalized_score, duration_ms, created_at')
+          .eq('goal_id', goalId)
+          .gte('created_at', attemptsSince)
+          .order('created_at', { ascending: false })
+          .limit(2000)
+          .returns<InsightAttempt[]>(),
+        supabase
+          .from('daily_plans')
+          .select('plan_date, total_items, completed_items')
+          .eq('goal_id', goalId)
+          .gte('plan_date', plansSince)
+          .returns<InsightPlan[]>(),
+      ])
+      if (attemptsResult.error) throw attemptsResult.error
+      if (plansResult.error) throw plansResult.error
+
+      set({ insights: summarizeLearning({
+        attempts: attemptsResult.data ?? [],
+        plans: plansResult.data ?? [],
+      }) })
+    } catch (e) {
+      set({ planError: toLearningError(e), insights: null })
+    } finally {
+      set({ insightsLoading: false })
+    }
+  },
+
   /** Close the preview without deciding. It stays 'preview' server-side and can be
    *  resolved later; the money is spent either way. */
   dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
@@ -797,6 +852,6 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     planError: null, planBlockedReason: null,
     recordingItemId: null, attempts: [], attemptsLoading: false,
     enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
-    enrichmentSaving: false,
+    enrichmentSaving: false, insights: null, insightsLoading: false,
   }),
 }))

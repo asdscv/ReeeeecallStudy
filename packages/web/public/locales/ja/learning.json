@@ -45,7 +45,8 @@
       "partial": "あいまい",
       "known": "わかった",
       "hint": "試行の記録のみです — 復習スケジュールは変わりません。"
-    }
+    },
+    "insightsLink": "学習診断"
   },
   "goals": {
     "title": "学習目標",
@@ -137,5 +138,25 @@
       "RATE_CAP": "本日のAIリクエスト上限に達しました。明日もう一度お試しください。",
       "UNKNOWN": "問題が発生しました。もう一度お試しください。"
     }
+  },
+  "insights": {
+    "title": "学習診断",
+    "noData": "データなし",
+    "attempts": "試行回数 (30日)",
+    "accuracy": "正答率",
+    "notScoredYet": "まだスコアのある試行がありません",
+    "typicalTime": "平均所要時間",
+    "seconds": "{{count, number}}秒",
+    "adherence": "プラン達成率 (14日)",
+    "weakTitle": "もう一度確認",
+    "weakHint": "試行2回以上で平均60%未満のカードです。",
+    "weakEmpty": "遅れているカードはありません。",
+    "cardFallback": "（今日のプランに含まれていないカード）",
+    "attemptCount": "{{count, number}} 回試行",
+    "adherenceTitle": "日別プラン (14日)",
+    "adherenceEmpty": "この期間にプランがありません。",
+    "noPlanItems": "計画された項目なし",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。"
   }
 }

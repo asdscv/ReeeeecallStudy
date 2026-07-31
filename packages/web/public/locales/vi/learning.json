@@ -45,7 +45,8 @@
       "partial": "Chưa chắc",
       "known": "Đã biết",
       "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
-    }
+    },
+    "insightsLink": "Phân tích"
   },
   "goals": {
     "title": "Mục tiêu học tập",
@@ -137,5 +138,25 @@
       "RATE_CAP": "Bạn đã dùng hết giới hạn yêu cầu AI hôm nay. Hãy thử lại vào ngày mai.",
       "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
     }
+  },
+  "insights": {
+    "title": "Phân tích học tập",
+    "noData": "Chưa có dữ liệu",
+    "attempts": "Lần làm (30 ngày)",
+    "accuracy": "Độ chính xác",
+    "notScoredYet": "Chưa có lần nào được chấm điểm",
+    "typicalTime": "Thời gian thường",
+    "seconds": "{{count, number}}s",
+    "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
+    "weakTitle": "Cần xem lại",
+    "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
+    "weakEmpty": "Không có thẻ nào tụt lại.",
+    "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
+    "attemptCount": "{{count, number}} lần làm",
+    "adherenceTitle": "Kế hoạch hàng ngày (14 ngày)",
+    "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
+    "noPlanItems": "Không có mục nào được lên kế hoạch",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập."
   }
 }

@@ -45,7 +45,8 @@
       "partial": "Ragu",
       "known": "Tahu",
       "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
-    }
+    },
+    "insightsLink": "Analisis"
   },
   "goals": {
     "title": "Tujuan belajar",
@@ -137,5 +138,25 @@
       "RATE_CAP": "Anda telah mencapai batas permintaan AI hari ini. Coba lagi besok.",
       "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
     }
+  },
+  "insights": {
+    "title": "Analisis pembelajaran",
+    "noData": "Belum ada data",
+    "attempts": "Percobaan (30 hari)",
+    "accuracy": "Akurasi",
+    "notScoredYet": "Belum ada yang dinilai",
+    "typicalTime": "Waktu biasa",
+    "seconds": "{{count, number}}d",
+    "adherence": "Kepatuhan rencana (14 hari)",
+    "weakTitle": "Perlu dilihat lagi",
+    "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
+    "weakEmpty": "Tidak ada yang tertinggal.",
+    "cardFallback": "(kartu tidak ada di rencana hari ini)",
+    "attemptCount": "{{count, number}} percobaan",
+    "adherenceTitle": "Rencana harian (14 hari)",
+    "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
+    "noPlanItems": "Tidak ada yang direncanakan",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar."
   }
 }

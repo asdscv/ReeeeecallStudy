@@ -45,7 +45,8 @@
       "partial": "애매함",
       "known": "알았음",
       "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다."
-    }
+    },
+    "insightsLink": "진단"
   },
   "goals": {
     "title": "학습 목표",
@@ -137,5 +138,25 @@
       "RATE_CAP": "오늘의 AI 요청 한도를 모두 썼습니다. 내일 다시 시도해 주세요.",
       "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요."
     }
+  },
+  "insights": {
+    "title": "학습 진단",
+    "noData": "데이터 없음",
+    "attempts": "시도 (30일)",
+    "accuracy": "정답률",
+    "notScoredYet": "아직 채점된 시도 없음",
+    "typicalTime": "보통 소요",
+    "seconds": "{{count, number}}초",
+    "adherence": "플랜 이행률 (14일)",
+    "weakTitle": "다시 볼 카드",
+    "weakHint": "시도 2회 이상, 평균 60% 미만인 카드입니다.",
+    "weakEmpty": "뒤처지는 카드가 없습니다.",
+    "cardFallback": "(오늘 플랜에 없는 카드)",
+    "attemptCount": "시도 {{count, number}}회",
+    "adherenceTitle": "일별 플랜 (14일)",
+    "adherenceEmpty": "이 기간에 플랜이 없습니다.",
+    "noPlanItems": "계획된 항목 없음",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다."
   }
 }
