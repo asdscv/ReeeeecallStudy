@@ -148,15 +148,21 @@ jobs:
           SUPABASE_LOCAL_URL: http://127.0.0.1:54321
           SUPABASE_ANON_KEY: ${{ steps.keys.outputs.anon }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ steps.keys.outputs.svc }}
-        # Run from repo root — vitest resolves include paths from cwd. Use the
-        # web package's vitest binary (the only place it's installed).
+        # Run from repo root — vitest.config.ts resolves its include glob from
+        # the cwd. Resolve the binary first and run once: the previous
+        # `A || B` form re-ran the whole suite whenever a test failed, not just
+        # when the binary was missing.
         run: |
-          ./node_modules/.bin/vitest run \
-            --config tests/integration/vitest.config.ts \
-            tests/integration \
-            || packages/web/node_modules/.bin/vitest run \
-              --config tests/integration/vitest.config.ts \
-              tests/integration
+          if [ -x ./node_modules/.bin/vitest ]; then
+            VITEST=./node_modules/.bin/vitest
+          elif [ -x packages/web/node_modules/.bin/vitest ]; then
+            VITEST=packages/web/node_modules/.bin/vitest
+          else
+            echo "::error::vitest binary not found in root or packages/web"
+            exit 1
+          fi
+          echo "using $VITEST"
+          "$VITEST" run --config tests/integration/vitest.config.ts tests/integration
 
       - name: Stop Supabase
         if: always()
