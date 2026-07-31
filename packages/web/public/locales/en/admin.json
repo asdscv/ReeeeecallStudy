@@ -251,6 +251,24 @@
       "saved": "Saved ✓",
       "sandboxGrants": "Sandbox purchases can grant credits",
       "sandboxGrantsHint": "OFF: RevenueCat sandbox events are acked but grant nothing. Turn ON only for a test run — sandbox purchases are free."
+    },
+    "levers": {
+      "title": "Growth levers",
+      "desc": "Applied immediately, no redeploy. Each field saves on its own.",
+      "freeQuota": "Free AI cards per day",
+      "freeQuotaHint": "Free cards per user per day. Clients follow this server value.",
+      "cardCap": "Owned-card cap per account",
+      "cardCapHint": "Creating or saving cards is blocked past this number.",
+      "countOfficial": "Count official-deck cards toward the cap",
+      "countOfficialHint": "On: cards from subscribed official decks also count.",
+      "wonPerCredit": "Price per credit",
+      "wonPerCreditHint": "Must mirror the IAP / credit-pack price.",
+      "targetMargin": "Target margin (bps)",
+      "targetMarginHint": "Currently {{pct}}. It is a divisor in the charging formula, so 10000 (=100%) is not allowed.",
+      "errRange": "Enter a whole number between {{min}} and {{max}}.",
+      "errNonNegative": "Enter a whole number of 0 or more.",
+      "errMargin": "Margin must be at most {{max}} bps. 10000 (=100%) divides the charging formula by zero, which would charge nothing.",
+      "updated": "Last changed — pricing/quota: {{ai}} · card cap: {{cards}}"
     }
   },
   "billing": {

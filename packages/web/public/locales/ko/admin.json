@@ -251,6 +251,24 @@
       "saved": "저장됨 ✓",
       "sandboxGrants": "샌드박스 구매에 크레딧 지급 허용",
       "sandboxGrantsHint": "OFF: RevenueCat 샌드박스 이벤트를 받기만 하고 아무것도 지급하지 않습니다. 테스트할 때만 켜세요 — 샌드박스 구매는 무료입니다."
+    },
+    "levers": {
+      "title": "성장 레버 설정",
+      "desc": "재배포 없이 즉시 반영됩니다. 각 항목은 따로 저장됩니다.",
+      "freeQuota": "AI 무료 생성 한도 (1일)",
+      "freeQuotaHint": "유저당 하루 무료 카드 수. 클라이언트는 서버값을 그대로 따릅니다.",
+      "cardCap": "계정당 보유 카드 상한",
+      "cardCapHint": "이 수를 넘기면 카드 생성·저장이 막힙니다.",
+      "countOfficial": "공식 덱 카드도 상한에 포함",
+      "countOfficialHint": "켜면 구독한 공식 덱 카드까지 상한에 계산됩니다.",
+      "wonPerCredit": "크레딧당 단가",
+      "wonPerCreditHint": "IAP·크레딧팩 판매가와 반드시 일치해야 합니다.",
+      "targetMargin": "목표 마진 (bps)",
+      "targetMarginHint": "현재 {{pct}}. 과금식의 나눗셈에 직접 쓰이므로 10000(=100%)은 사용할 수 없습니다.",
+      "errRange": "{{min}} 이상 {{max}} 이하의 정수를 입력하세요.",
+      "errNonNegative": "0 이상의 정수를 입력하세요.",
+      "errMargin": "마진은 {{max}} bps 이하여야 합니다. 10000(=100%)은 과금식을 0으로 나누게 되어 무과금이 됩니다.",
+      "updated": "최근 변경 — 가격/쿼터: {{ai}} · 카드 상한: {{cards}}"
     }
   },
   "billing": {

@@ -228,6 +228,9 @@ interface AdminState {
   systemLoading: boolean
   systemError: string | null
   systemFlags: SystemFlags | null
+  /** Pack B config levers (mig 154 setters + mig 177 getter). null until read. */
+  growthLevers: GrowthLevers | null
+  growthLeversError: string | null
 
   // Audit Log
   auditLogs: AdminAuditLog[]
@@ -281,6 +284,11 @@ interface AdminState {
   // System flags / kill switches (mig 153)
   fetchSystemFlags: () => Promise<void>
   setSystemFlags: (patch: Partial<SystemFlags>) => Promise<{ error: string | null }>
+  // Pack B growth levers (mig 154 setters, mig 177 read path)
+  fetchGrowthLevers: () => Promise<void>
+  setAiFreeQuota: (cardsPerDay: number) => Promise<{ error: string | null }>
+  setCardLimit: (maxOwnedCards: number | null, countOfficial: boolean | null) => Promise<{ error: string | null }>
+  setAiPricing: (patch: { wonPerCredit?: number; targetMarginBps?: number }) => Promise<{ error: string | null }>
   setListingActive: (listingId: string, active: boolean) => Promise<{ error: string | null }>
   forceRefresh: (section: SectionKey) => void
 }
@@ -298,6 +306,34 @@ export interface SystemFlags {
    * are acked-and-ignored until an admin opens this for a test run.
    */
   sandbox_grants_enabled: boolean
+}
+
+/**
+ * Config values an admin can change without a deploy (Pack B, mig 154).
+ *
+ * Read through `admin_get_growth_levers` (mig 177) rather than a table select:
+ * `ai_pricing_settings` and `card_limit_settings` are RLS-enabled with zero
+ * policies, so the SECURITY DEFINER RPC is the only read path.
+ *
+ * `usd_won_rate` is deliberately absent — mig 149 pins it with
+ * CHECK (usd_won_rate = 1), so an editable field could only fail.
+ */
+export interface GrowthLevers {
+  /** Free AI cards per user per day. Enforced by _ai_free_cards_per_day(). */
+  free_cards_per_day: number
+  /** Micro-currency per credit. Must mirror the IAP/credit-pack price. */
+  won_per_credit: number
+  /**
+   * Target margin in basis points. A LIVE DIVISOR in the charging path
+   * (markup = 10000 / (10000 - bps)), so 10000 (=100%) is rejected by the setter.
+   */
+  target_margin_bps: number
+  ai_settings_updated_at: string | null
+  /** Owned-card cap per account. */
+  max_owned_cards: number
+  /** Whether subscribed official-deck cards count toward the cap. */
+  count_official_cards: boolean
+  card_limit_updated_at: string | null
 }
 
 
@@ -338,6 +374,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   systemLoading: false,
   systemError: null,
   systemFlags: null,
+  growthLevers: null,
+  growthLeversError: null,
 
   auditLogs: [],
   auditTotal: 0,
@@ -860,6 +898,74 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       if (error) return { error: extractErrorMessage(error) }
       set({ systemFlags: data as SystemFlags })
       get().logAction('set_system_flags', 'system', 'system_flags', patch as Record<string, unknown>)
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // ── Pack B growth levers (mig 154 setters + mig 177 read path) ──────────
+  // Every setter RE-READS through fetchGrowthLevers instead of trusting its own
+  // return value. The three setters return three different shapes (an integer, a
+  // card_limit_settings row, an ai_pricing_settings row), and one of them carries
+  // the pinned usd_won_rate we deliberately do not model. One authoritative read
+  // path keeps the form showing what the database actually holds — which matters
+  // more than a round trip on a page an admin opens rarely.
+  fetchGrowthLevers: async () => {
+    try {
+      const { data, error } = await supabase.rpc('admin_get_growth_levers')
+      if (error) return set({ growthLeversError: extractErrorMessage(error) })
+      set({ growthLevers: data as GrowthLevers, growthLeversError: null })
+    } catch (e) {
+      set({ growthLeversError: extractErrorMessage(e) })
+    }
+  },
+
+  setAiFreeQuota: async (cardsPerDay: number) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_ai_free_quota', {
+        p_free_cards_per_day: cardsPerDay,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      get().logAction('set_ai_free_quota', 'system', 'ai_pricing_settings', { free_cards_per_day: cardsPerDay })
+      await get().fetchGrowthLevers()
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // Both args are nullable because the RPC COALESCEs: passing null leaves that
+  // column alone, so the UI can save one field without resetting the other.
+  setCardLimit: async (maxOwnedCards: number | null, countOfficial: boolean | null) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_card_limit', {
+        p_max_owned_cards: maxOwnedCards,
+        p_count_official: countOfficial,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      get().logAction('set_card_limit', 'system', 'card_limit_settings', {
+        max_owned_cards: maxOwnedCards, count_official: countOfficial,
+      })
+      await get().fetchGrowthLevers()
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // usd_won_rate is never sent: mig 149 pins it to 1, so passing anything else
+  // would be rejected. Omitted keys stay null → COALESCE keeps the stored value.
+  setAiPricing: async (patch: { wonPerCredit?: number; targetMarginBps?: number }) => {
+    try {
+      const { error } = await supabase.rpc('set_ai_pricing_settings', {
+        p_won_per_credit: patch.wonPerCredit ?? null,
+        p_target_margin_bps: patch.targetMarginBps ?? null,
+        p_usd_won_rate: null,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      get().logAction('set_ai_pricing', 'system', 'ai_pricing_settings', patch as Record<string, unknown>)
+      await get().fetchGrowthLevers()
       return { error: null }
     } catch (e) {
       return { error: extractErrorMessage(e) }

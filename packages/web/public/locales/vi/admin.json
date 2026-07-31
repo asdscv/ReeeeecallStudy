@@ -251,6 +251,24 @@
       "saved": "Saved ✓",
       "sandboxGrants": "Cho phép giao dịch sandbox cấp tín dụng",
       "sandboxGrantsHint": "TẮT: sự kiện sandbox của RevenueCat được nhận nhưng không cấp gì. Chỉ bật khi chạy thử — giao dịch sandbox là miễn phí."
+    },
+    "levers": {
+      "title": "Đòn đẩy tăng trưởng",
+      "desc": "Áp dụng ngay, không cần triển khai lại. Mỗi mục lưu riêng.",
+      "freeQuota": "Số thẻ AI miễn phí mỗi ngày",
+      "freeQuotaHint": "Số thẻ miễn phí mỗi người mỗi ngày. Ứng dụng theo giá trị này từ máy chủ.",
+      "cardCap": "Giới hạn thẻ sở hữu mỗi tài khoản",
+      "cardCapHint": "Vượt số này sẽ không thể tạo hoặc lưu thẻ.",
+      "countOfficial": "Tính cả thẻ của bộ chính thức vào giới hạn",
+      "countOfficialHint": "Bật: thẻ từ bộ chính thức đã đăng ký cũng được tính.",
+      "wonPerCredit": "Giá mỗi tín dụng",
+      "wonPerCreditHint": "Phải trùng với giá IAP / gói tín dụng.",
+      "targetMargin": "Biên lợi nhuận mục tiêu (bps)",
+      "targetMarginHint": "Hiện tại {{pct}}. Đây là số chia trong công thức tính phí, nên không được đặt 10000 (=100%).",
+      "errRange": "Nhập số nguyên từ {{min}} đến {{max}}.",
+      "errNonNegative": "Nhập số nguyên từ 0 trở lên.",
+      "errMargin": "Biên lợi nhuận tối đa {{max}} bps. 10000 (=100%) khiến công thức chia cho 0 và sẽ không tính phí.",
+      "updated": "Thay đổi gần nhất — giá/hạn mức: {{ai}} · giới hạn thẻ: {{cards}}"
     }
   },
   "billing": {
