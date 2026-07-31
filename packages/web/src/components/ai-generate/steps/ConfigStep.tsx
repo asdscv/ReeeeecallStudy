@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ImageUp } from 'lucide-react'
 import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { defaultCardCount, MAX_CARD_COUNT } from '@reeeeecall/shared/lib/ai/card-count'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useAuthStore } from '../../../stores/auth-store'
 import { useDeckStore } from '../../../stores/deck-store'
@@ -18,10 +19,6 @@ export interface FieldPresetItem {
 }
 
 export type FieldMode = 'auto' | 'manual'
-
-// The free AI-generation daily cap (mirrors the server's _ai_free_cards_per_day = 10).
-// Used to clamp the default card count to today's remaining free allowance.
-const FREE_DAILY_CAP = 10
 
 export interface GenerateConfig {
   topic: string
@@ -154,10 +151,13 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
 
-  // Default the card count to TODAY'S REMAINING FREE cards (clamped to [1, free daily cap])
-  // so a default generation never overshoots the free allowance and silently spends the
-  // wallet. Applies once the server-authoritative affordance loads, and only until the user
-  // edits the count themselves. Image mode is paid-only, so it keeps the manual value.
+  // Default the card count to TODAY'S REMAINING FREE cards so a default generation never
+  // overshoots the free allowance and silently spends the wallet. The bound comes from the
+  // SERVER (`get_ai_generation_quota` returns remaining = free_limit − used), so raising the
+  // quota via admin_set_ai_free_quota is followed here with no deploy — see
+  // shared/lib/ai/card-count.ts. Applies once the server-authoritative affordance loads, and
+  // only until the user edits the count themselves. Image mode is paid-only, so it keeps the
+  // manual value.
   // Render-time adjustment avoids effect-based setState (cascading render).
   // Tracks useImage too: the old effect listed it as a dependency, so leaving image mode
   // after the affordance loaded re-applied the free-quota default.
@@ -165,7 +165,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   if (affordable !== prevAffordance.affordable || useImage !== prevAffordance.useImage) {
     setPrevAffordance({ affordable, useImage })
     if (affordable && !countTouched && !useImage) {
-      setCardCount(Math.max(1, Math.min(FREE_DAILY_CAP, affordable.free)))
+      setCardCount(defaultCardCount(affordable.free))
     }
   }
 
@@ -480,7 +480,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
           <input
             type="number"
             min={1}
-            max={100}
+            max={MAX_CARD_COUNT}
             value={cardCount}
             onChange={(e) => {
               setCountTouched(true)   // user set it manually → stop auto-defaulting to remaining-free
@@ -489,12 +489,12 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             }}
             onBlur={() => {
               const n = typeof cardCount === 'number' ? cardCount : parseInt(String(cardCount)) || 1
-              setCardCount(Math.max(1, Math.min(100, n)))
+              setCardCount(Math.max(1, Math.min(MAX_CARD_COUNT, n)))
             }}
             className="w-full px-3 py-2 rounded-xl border border-border text-sm outline-none focus:border-brand bg-card"
-            placeholder={t('config.cardCountPlaceholder', { min: 1, max: 100 })}
+            placeholder={t('config.cardCountPlaceholder', { min: 1, max: MAX_CARD_COUNT })}
           />
-          <p className="text-xs text-content-tertiary mt-1">{t('config.cardCountHint', { min: 1, max: 100 })}</p>
+          <p className="text-xs text-content-tertiary mt-1">{t('config.cardCountHint', { min: 1, max: MAX_CARD_COUNT })}</p>
         </div>
       </fieldset>
 
