@@ -1,7 +1,7 @@
 # Attempt-Grounded Remediation
 
-- **Status:** PR A **MERGED** (#377, `c498ae0`, all 7 checks green).
-  PR B **open at #378**, awaiting CI. See §10 and §11.
+- **Status:** **BOTH MERGED.** PR A #377 (`c498ae0`), PR B #378 (`a9e89fe`), each 7/7 green.
+  A follow-up fix landed on top of B — `a8d054c`, see §11.6. See §10 and §11.
 - **Implements:** [ai-personalization-gaps](./2026-07-31-ai-personalization-gaps.md) §5 ①.
 - **Base:** branched at `origin/develop` `8008259`; develop merged in at `d1e4b21` (which is why
   the migration is numbered 178, not 175 — see §10.1). Branch `feat/attempt-grounded-remediation`.
@@ -284,7 +284,7 @@ Merged as #377, `c498ae0`, all seven checks green.
 
 ---
 
-## 11. PR B — the surfaces (open at #378)
+## 11. PR B — the surfaces (MERGED, #378)
 
 ### 11.1 One deliberate divergence from §6
 
@@ -346,3 +346,31 @@ re-run by hand whenever a `Learning*.tsx` changes, because its Tests 6 and 8 rea
 `{ self_rated: score }`, so there is no learner text to compare or grade. No string on either
 platform says or implies the AI read an answer the learner wrote, and the prompt forbids the
 model from claiming it.
+
+### 11.6 One defect survived the review that found its sibling — `a8d054c`
+
+§11.3 records that the web attempt LIST was made goal-scoped. The plan row's `explain`, added
+in the same change, kept reading the **unfiltered** array:
+
+```ts
+attemptId: latestAttemptForCard(attempts, item.card_id)?.id   // ← not goalAttempts
+```
+
+Same defect, one call site over. `fetchAttempts` only flips `attemptsLoading`; it never clears
+`attempts`, so for one round trip after a goal switch the previous goal's rows are still there.
+A card in both goals' decks then makes `latestAttemptForCard` return the **other goal's**
+attempt, and the paid request stores provenance that misdescribes the answer.
+
+**The server cannot catch this one.** Mig 178's pair check asks only that the attempt and the
+enrichment name the same CARD — and they do. It is the GOAL that differs, and nothing checks
+it. A stored `attempt_id` reads as verified, so a plausible wrong one is worse than none.
+
+Fixed by lifting the same `goal_id` filter into the page component. Two tests added, both
+mutation-checked: restoring `attempts` in place of `goalAttempts` turns the goal test red, and
+deleting the `attemptId` line turns the grounding test red — the latter had **no coverage at
+all** before, so §8's "the plan row becomes attempt-grounded" row was unpinned on web.
+
+Worth carrying forward: the goal filter is a property of *every* read of `attempts`, not of the
+list component. A third call site would reintroduce it. The shared helper takes whatever array
+it is handed — it cannot enforce this — so the filter has to live where `attempts` is
+destructured, on both platforms.
