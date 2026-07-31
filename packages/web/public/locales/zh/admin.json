@@ -251,6 +251,24 @@
       "saved": "Saved ✓",
       "sandboxGrants": "允许沙盒购买发放点数",
       "sandboxGrantsHint": "关闭：RevenueCat 沙盒事件仅被接收，不发放任何内容。仅在测试时开启 — 沙盒购买是免费的。"
+    },
+    "levers": {
+      "title": "增长杠杆设置",
+      "desc": "无需重新部署，立即生效。每项单独保存。",
+      "freeQuota": "每日 AI 免费生成上限",
+      "freeQuotaHint": "每位用户每天的免费卡片数。客户端会跟随该服务器值。",
+      "cardCap": "每账户持有卡片上限",
+      "cardCapHint": "超过该数量后将无法创建或保存卡片。",
+      "countOfficial": "官方卡组的卡片也计入上限",
+      "countOfficialHint": "开启：已订阅官方卡组的卡片也会计入上限。",
+      "wonPerCredit": "每点数单价",
+      "wonPerCreditHint": "必须与 IAP / 点数包售价一致。",
+      "targetMargin": "目标毛利（bps）",
+      "targetMarginHint": "当前 {{pct}}。它是计费公式的除数，因此不能设为 10000（=100%）。",
+      "errRange": "请输入 {{min}} 到 {{max}} 之间的整数。",
+      "errNonNegative": "请输入不小于 0 的整数。",
+      "errMargin": "毛利最多为 {{max}} bps。10000（=100%）会让计费公式除以零，导致不计费。",
+      "updated": "最近修改 — 价格/额度：{{ai}} · 卡片上限：{{cards}}"
     }
   },
   "billing": {

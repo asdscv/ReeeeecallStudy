@@ -251,6 +251,24 @@
       "saved": "Saved ✓",
       "sandboxGrants": "サンドボックス購入へのクレジット付与を許可",
       "sandboxGrantsHint": "OFF: RevenueCat のサンドボックスイベントは受信のみで何も付与しません。テスト時のみ ON にしてください（サンドボックス購入は無料です）。"
+    },
+    "levers": {
+      "title": "グロースレバー設定",
+      "desc": "再デプロイなしで即時反映されます。項目ごとに保存します。",
+      "freeQuota": "AI無料生成の上限（1日）",
+      "freeQuotaHint": "ユーザーごとの1日の無料カード数。クライアントはサーバー値に従います。",
+      "cardCap": "アカウントごとの保有カード上限",
+      "cardCapHint": "この数を超えるとカードの作成・保存がブロックされます。",
+      "countOfficial": "公式デッキのカードも上限に含める",
+      "countOfficialHint": "オン：購読した公式デッキのカードも上限に数えます。",
+      "wonPerCredit": "クレジット単価",
+      "wonPerCreditHint": "IAP・クレジットパックの価格と一致させる必要があります。",
+      "targetMargin": "目標マージン（bps）",
+      "targetMarginHint": "現在 {{pct}}。課金式の除数に使われるため 10000（=100%）は使用できません。",
+      "errRange": "{{min}} 以上 {{max}} 以下の整数を入力してください。",
+      "errNonNegative": "0 以上の整数を入力してください。",
+      "errMargin": "マージンは {{max}} bps 以下にしてください。10000（=100%）は課金式をゼロ除算にし、課金されなくなります。",
+      "updated": "最終変更 — 価格/上限: {{ai}} · カード上限: {{cards}}"
     }
   },
   "billing": {
