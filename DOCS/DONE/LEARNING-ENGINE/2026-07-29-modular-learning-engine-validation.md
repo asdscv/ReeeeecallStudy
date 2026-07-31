@@ -8,7 +8,10 @@
 
 Atomic study recording is **out of scope**: it converged on develop's `apply_study_rating` contract (migrations 160/161/162) and this branch's competing migration 166 was dropped on merge. See design §8.1.
 
-No deployment, no remote migration, and no remote data operation was performed. All database evidence below is from the local Supabase instance; production migration is a separate authorized step.
+No deployment, no remote migration, and no remote data operation was performed **as part of this
+change**. All database evidence below is from the local Supabase instance. Production migration was a
+separate authorized step and has since happened: 165/167/168/169 are applied to production (verified
+2026-07-31 via `supabase migration list --linked`).
 
 ## 1. Zero-Defect Audit
 

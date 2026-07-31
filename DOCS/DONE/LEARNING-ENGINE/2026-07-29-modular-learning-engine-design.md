@@ -1,6 +1,10 @@
 # Modular General-Purpose Learning Engine
 
-- **Status:** Merged. PR #337, merge commit `ac74b45`. Migrations applied locally only — production migration not run.
+- **Status:** Merged. PR #337, merge commit `ac74b45`.
+- **Production:** migrations 165/167/168/169 **are applied to production** — verified 2026-07-31 with
+  `supabase migration list --linked` (zero local-only rows). This line previously said "production
+  migration not run", which was true when the PR merged and stopped being true afterwards. The product
+  UI over this engine landed separately (mig 172, PR #354).
 - **Date:** 2026-07-29 (revised 2026-07-30 after merging `origin/develop`; closed on merge)
 - **Branch:** `feat/modular-learning-engine-foundation`
 - **Base:** cut from `origin/develop` at `af38ad8`; merged up to `97a5399`
