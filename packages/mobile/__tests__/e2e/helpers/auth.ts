@@ -123,9 +123,29 @@ async function isLoginScreenVisible(): Promise<boolean> {
  * Log in with test credentials before tests that require authentication.
  * Waits for the app to finish loading (auth guard / splash screen) before checking state.
  */
+/**
+ * A fresh install opens on the auth guard — a marketing gate whose two buttons both lead to
+ * the login form. It is not the login screen, so `isLoginScreenVisible()` does not match it,
+ * and a run that starts there used to sit on it until the timeout and then fail every
+ * assertion with "screen not found".
+ */
+async function passAuthGuardIfShown(): Promise<boolean> {
+  for (const id of ['auth-guard-login', 'auth-guard-get-started']) {
+    const el = $(`~${id}`)
+    if (await el.isDisplayed().catch(() => false)) {
+      console.log(`[auth] Auth guard shown — tapping ${id}`)
+      await el.click().catch(() => {})
+      await browser.pause(1200)
+      return true
+    }
+  }
+  return false
+}
+
 export async function loginIfNeeded() {
   // Dismiss any Android system dialogs (ANR/crash) that may block the UI
   await dismissAndroidDialogs()
+  await passAuthGuardIfShown()
 
   // Wait for the app to settle — auth loading / splash screen may take a while
   // Poll for up to 20 seconds until either login screen or main screen appears
@@ -143,6 +163,9 @@ export async function loginIfNeeded() {
       console.log(`[auth] Already logged in (found ${foundTab})`)
       return
     }
+
+    // The guard can appear a beat after launch, once the session check resolves.
+    if (await passAuthGuardIfShown()) continue
 
     loginScreenVisible = await isLoginScreenVisible()
     if (loginScreenVisible) {

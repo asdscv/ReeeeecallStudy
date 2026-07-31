@@ -78,7 +78,9 @@
       "authRequired": "再度ログインしてください。",
       "forbidden": "アクセス権限がありません。",
       "unknown": "問題が発生しました。もう一度お試しください。"
-    }
+    },
+    "deckCount_one": "{{count, number}} デッキ",
+    "deckCount_other": "{{count, number}} デッキ"
   },
   "form": {
     "createTitle": "新しい目標",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "この期間にプランがありません。",
     "noPlanItems": "計画された項目なし",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。"
+    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
+    "attemptCount_one": "{{count, number}} 回試行",
+    "attemptCount_other": "{{count, number}} 回試行"
   },
   "recommend": {
     "title": "おすすめ",

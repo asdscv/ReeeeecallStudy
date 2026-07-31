@@ -49,9 +49,20 @@
     "create": "Mục tiêu mới",
     "dailyMinutes": "{{count, number}} phút/ngày",
     "deckCount": "{{count, number}} bộ thẻ",
+    "deckCount_one": "{{count, number}} bộ thẻ",
+    "deckCount_other": "{{count, number}} bộ thẻ",
     "empty": {
       "body": "Tạo mục tiêu để bắt đầu nhận kế hoạch hàng ngày.",
       "title": "Chưa có mục tiêu nào"
+    },
+    "error": {
+      "authRequired": "Vui lòng đăng nhập lại.",
+      "conflict": "Thay đổi này không được phép với trạng thái hiện tại của mục tiêu.",
+      "forbidden": "Bạn không có quyền truy cập.",
+      "invalidInput": "Vui lòng kiểm tra tên mục tiêu và số phút mỗi ngày.",
+      "limitExceeded": "Bạn đã đạt số lượng mục tiêu tối đa.",
+      "notFound": "Mục tiêu đó không tồn tại hoặc đã được lưu trữ.",
+      "unknown": "Đã xảy ra lỗi. Vui lòng thử lại."
     },
     "noDecksWarning": "Chưa gắn bộ thẻ — chưa thể lập kế hoạch.",
     "status": {
@@ -64,10 +75,16 @@
   "insights": {
     "accuracy": "Độ chính xác",
     "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
+    "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
+    "adherenceTitle": "Kế hoạch hàng ngày (14 ngày)",
     "attemptCount": "{{count, number}} lần làm",
+    "attemptCount_one": "{{count, number}} lần làm",
+    "attemptCount_other": "{{count, number}} lần làm",
     "attempts": "Lần làm (30 ngày)",
     "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Chưa có dữ liệu",
+    "noPlanItems": "Không có mục nào được lên kế hoạch",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
     "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
     "seconds": "{{count, number}}s",
@@ -98,17 +115,30 @@
       "noGoal": "Bạn chưa có mục tiêu học tập nào đang hoạt động. Mục tiêu xác định số phút mỗi ngày và các bộ thẻ dùng để lập kế hoạch.",
       "nothingDue": "Hôm nay không có thẻ nào cần ôn tập trong các bộ thẻ này."
     },
+    "error": {
+      "authRequired": "Vui lòng đăng nhập lại.",
+      "completedPlan": "Kế hoạch đã hoàn thành không thể ghi đè.",
+      "forbidden": "Bạn không có quyền truy cập.",
+      "goalGone": "Mục tiêu đó không còn khả dụng.",
+      "invalidInput": "Không thể lưu kế hoạch vì một số giá trị ngoài phạm vi.",
+      "limitExceeded": "Bạn đã dùng hết số lần tạo lại kế hoạch hôm nay. Hãy thử lại vào ngày mai.",
+      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
+    },
     "generate": "Tạo kế hoạch hôm nay",
     "generating": "Đang tạo…",
     "insightsLink": "Phân tích",
     "item": {
+      "minutes": "~{{count, number}} phút",
       "recorded": "Đã ghi lại",
       "untitled": "(không có nội dung)"
     },
     "manageGoals": "Quản lý mục tiêu",
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
     "rate": {
-      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
+      "again": "Không biết",
+      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập.",
+      "known": "Đã biết",
+      "partial": "Chưa chắc"
     },
     "reason": {
       "balanced": "Phân bổ cân bằng",

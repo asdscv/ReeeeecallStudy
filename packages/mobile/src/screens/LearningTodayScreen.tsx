@@ -1,11 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, RefreshControl,
+  AppState, Modal, Pressable,
+} from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
+import { testProps } from '../utils/testProps'
 import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
 import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
+import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import * as Crypto from 'expo-crypto'
 import type { SettingsStackParamList } from '../navigation/types'
 
@@ -23,11 +29,14 @@ import type { SettingsStackParamList } from '../navigation/types'
  * The one thing mobile must do differently is the plan date: `currentPlanContext` computes
  * it from the device's local calendar and falls back to a UTC-offset label when the Hermes
  * build has no ICU, instead of importing `Intl` (see shared/lib/learning-plan-date).
+ *
+ * And because a phone screen is usually resumed rather than opened, the plan date is kept
+ * live instead of being frozen at mount — see `planDate` below.
  */
-const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
-  { score: 0, key: 'today.rate.again' },
-  { score: 0.5, key: 'today.rate.partial' },
-  { score: 1, key: 'today.rate.known' },
+const SELF_RATINGS: ReadonlyArray<{ score: number; key: string; id: string }> = [
+  { score: 0, key: 'today.rate.again', id: 'again' },
+  { score: 0.5, key: 'today.rate.partial', id: 'partial' },
+  { score: 1, key: 'today.rate.known', id: 'known' },
 ]
 
 const REASON_KEY: Record<string, string> = {
@@ -39,20 +48,48 @@ const REASON_KEY: Record<string, string> = {
   balanced: 'today.reason.balanced',
 }
 
+const MIN_TOUCH = 44
+const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
+
 export function LearningTodayScreen() {
   const { t, i18n } = useTranslation('learning')
+  const { t: tCommon } = useTranslation('common')
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
   const {
     goals, goalsLoading, fetchGoals,
-    plan, planItems, planCards, planLoading, planGenerating, planError, planBlockedReason,
+    plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
+    planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, recordAttempt,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     resolveEnrichment, dismissEnrichment,
   } = useLearningStore()
 
   const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
-  const ctx = useMemo(() => currentPlanContext(), [])
+  const [refreshing, setRefreshing] = useState(false)
+
+  /**
+   * The plan date, kept live.
+   *
+   * Freezing it at mount was wrong on a phone: this screen is normally resumed, not opened,
+   * so an app left overnight kept asking for YESTERDAY's plan and a rating would have been
+   * recorded against it. The state only changes when the calendar date actually changes, so
+   * the fetch effect below does not re-run on every tick.
+   */
+  const [planDate, setPlanDate] = useState(() => currentPlanContext().planDate)
+  useEffect(() => {
+    const sync = () => setPlanDate((prev) => {
+      const next = currentPlanContext().planDate
+      return next === prev ? prev : next
+    })
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') sync()
+    })
+    // Also catches a rollover while the screen simply stays open.
+    const timer = setInterval(sync, 60_000)
+    return () => { subscription.remove(); clearInterval(timer) }
+  }, [])
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
 
@@ -61,8 +98,22 @@ export function LearningTodayScreen() {
   const goal = active.find((g) => g.id === goalId)
 
   useEffect(() => {
-    if (goalId) void fetchPlan(goalId, ctx.planDate)
-  }, [goalId, ctx.planDate, fetchPlan])
+    if (goalId) void fetchPlan(goalId, planDate)
+  }, [goalId, planDate, fetchPlan])
+
+  const reload = useCallback(async () => {
+    if (!goalId) return
+    setRefreshing(true)
+    try { await fetchPlan(goalId, planDate) } finally { setRefreshing(false) }
+  }, [goalId, planDate, fetchPlan])
+
+  /**
+   * Generation reads a FRESH context, never the rendered one: `ctx.now` is the due-card
+   * cutoff, and reusing a value captured minutes ago would plan against a stale clock.
+   */
+  const regenerate = useCallback(() => {
+    if (goal) void generatePlan(goal, currentPlanContext())
+  }, [goal, generatePlan])
 
   const errorKey = (code: string): string => {
     switch (code) {
@@ -77,18 +128,30 @@ export function LearningTodayScreen() {
   }
 
   return (
-    <Screen>
+    <Screen padding={false} testID="learning-today-screen">
       <ScreenHeader
         title={t('today.title')}
         mode="drawer"
         rightContent={
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <TouchableOpacity onPress={() => navigation.navigate('LearningInsights')} testID="learning-insights-link">
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LearningInsights')}
+              style={styles.headerLink}
+              hitSlop={HIT_SLOP}
+              accessibilityRole="button"
+              {...testProps('learning-insights-link')}
+            >
               <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
                 {t('today.insightsLink')}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('LearningGoals')} testID="learning-manage-goals">
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LearningGoals')}
+              style={styles.headerLink}
+              hitSlop={HIT_SLOP}
+              accessibilityRole="button"
+              {...testProps('learning-manage-goals')}
+            >
               <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
                 {t('today.manageGoals')}
               </Text>
@@ -97,7 +160,12 @@ export function LearningTodayScreen() {
         }
       />
 
-      <ScrollView contentContainerStyle={styles.body}>
+      <ScrollView
+        contentContainerStyle={styles.body}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={() => void reload()} tintColor={theme.colors.primary} />
+        }
+      >
         {goalsLoading && goals.length === 0 ? (
           <ActivityIndicator />
         ) : active.length === 0 ? (
@@ -117,20 +185,29 @@ export function LearningTodayScreen() {
           <>
             {active.length > 1 && (
               <View style={styles.goalRow}>
-                {active.map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    onPress={() => setGoalOverrideId(option.id)}
-                    style={[styles.chip, {
-                      borderColor: option.id === goalId ? theme.colors.primary : theme.colors.border,
-                      backgroundColor: theme.colors.surface,
-                    }]}
-                  >
-                    <Text style={[theme.typography.caption, {
-                      color: option.id === goalId ? theme.colors.primary : theme.colors.textSecondary,
-                    }]}>{option.title}</Text>
-                  </TouchableOpacity>
-                ))}
+                {active.map((option, index) => {
+                  const selected = option.id === goalId
+                  return (
+                    <TouchableOpacity
+                      key={option.id}
+                      onPress={() => setGoalOverrideId(option.id)}
+                      style={[styles.chip, {
+                        borderColor: selected ? theme.colors.primary : theme.colors.border,
+                        borderWidth: selected ? 2 : 1,
+                        backgroundColor: theme.colors.surface,
+                      }]}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
+                      {...testProps(`learning-today-goal-${index}`)}
+                    >
+                      <Text style={[theme.typography.caption, {
+                        color: selected ? theme.colors.primary : theme.colors.textSecondary,
+                      }]}>
+                        {selected ? '\u2713 ' : ''}{option.title}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                })}
               </View>
             )}
 
@@ -145,9 +222,30 @@ export function LearningTodayScreen() {
             )}
 
             {planError && (
-              <Text style={[theme.typography.caption, { color: theme.colors.error }]} testID="learning-plan-error">
-                {t(errorKey(planError.code))}
-              </Text>
+              <View
+                style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.error }]}
+                {...testProps('learning-plan-error', true)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
+                  {t(errorKey(planError.code))}
+                </Text>
+                {/* A code alone is not a next step. LIMIT_EXCEEDED is the one failure a retry
+                    cannot help with — the cap is per day — so it is the one case with no
+                    button, instead of a button that is guaranteed to fail again. */}
+                {planError.code !== 'LIMIT_EXCEEDED' && (
+                  <TouchableOpacity
+                    onPress={() => void reload()}
+                    style={styles.touchRow}
+                    hitSlop={HIT_SLOP}
+                    accessibilityRole="button"
+                    {...testProps('learning-plan-retry')}
+                  >
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                      {tCommon('actions.retry')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
             {enrichmentError && (
               <Text style={[theme.typography.caption, { color: theme.colors.error }]} testID="learning-enrichment-error">
@@ -170,14 +268,20 @@ export function LearningTodayScreen() {
               <ActivityIndicator />
             ) : plan ? (
               <>
-                {planItems.map((item) => {
+                {planItems.map((item, index) => {
                   const card = item.card_id ? planCards[item.card_id] : undefined
-                  const label = card ? Object.values(card.field_values)[0] ?? '' : ''
+                  // NOT `Object.values(...)[0]` — jsonb key order is Postgres's, not the
+                  // template's, so that can show the answer instead of the prompt.
+                  const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
                   const done = item.status === 'completed'
+                  // One attempt write at a time in the store, so every row's ratings go
+                  // inert together rather than looking tappable and doing nothing.
+                  const recording = recordingItemId !== null
                   return (
                     <View
                       key={item.id}
                       style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                      {...testProps(`learning-plan-item-${index}`, true)}
                     >
                       <Text
                         style={[theme.typography.bodySmall, {
@@ -189,11 +293,20 @@ export function LearningTodayScreen() {
                         {label || t('today.item.untitled')}
                       </Text>
                       <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                        {`${item.position}. `}
                         {t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
+                        {/* The planner budgets the day in minutes, so the row that spends the
+                            budget should say what it costs — web already showed this. */}
+                        {item.estimated_minutes !== null
+                          ? ` · ${t('today.item.minutes', { count: item.estimated_minutes })}`
+                          : ''}
                       </Text>
 
                       {done ? (
-                        <Text style={[theme.typography.caption, { color: theme.colors.success, marginTop: 6 }]}>
+                        <Text
+                          style={[theme.typography.caption, { color: theme.colors.success, marginTop: 6 }]}
+                          {...testProps(`learning-item-recorded-${index}`)}
+                        >
                           {t('today.item.recorded')}
                         </Text>
                       ) : (
@@ -202,7 +315,7 @@ export function LearningTodayScreen() {
                             {SELF_RATINGS.map((rating) => (
                               <TouchableOpacity
                                 key={rating.key}
-                                disabled={recordingItemId === item.id}
+                                disabled={recording}
                                 onPress={() => {
                                   if (!goalId) return
                                   void recordAttempt({
@@ -210,9 +323,16 @@ export function LearningTodayScreen() {
                                     goalId,
                                     score: rating.score,
                                     clientAttemptId: Crypto.randomUUID(),
-                                  }, ctx.planDate)
+                                  }, planDate)
                                 }}
-                                style={[styles.rateBtn, { borderColor: theme.colors.border }]}
+                                style={[
+                                  styles.rateBtn,
+                                  { borderColor: theme.colors.border },
+                                  recording && styles.disabled,
+                                ]}
+                                accessibilityRole="button"
+                                accessibilityState={{ disabled: recording }}
+                                {...testProps(`learning-rate-${rating.id}-${index}`)}
                               >
                                 <Text style={[theme.typography.caption, { color: theme.colors.text }]}>
                                   {t(rating.key)}
@@ -228,11 +348,19 @@ export function LearningTodayScreen() {
 
                       {item.card_id && goalId && (
                         <TouchableOpacity
-                          disabled={enrichmentPendingCardId === item.card_id}
+                          disabled={enrichmentPendingCardId !== null}
                           onPress={() => void requestEnrichment({
                             action: 'explain', goalId, cardId: item.card_id as string, uiLang: i18n.language,
                           })}
-                          style={{ marginTop: 8 }}
+                          style={[
+                            styles.touchRow,
+                            { marginTop: 4 },
+                            enrichmentPendingCardId !== null && styles.disabled,
+                          ]}
+                          hitSlop={HIT_SLOP}
+                          accessibilityRole="button"
+                          accessibilityState={{ disabled: enrichmentPendingCardId !== null }}
+                          {...testProps(`learning-enrich-${index}`)}
                         >
                           <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
                             {enrichmentPendingCardId === item.card_id
@@ -247,9 +375,15 @@ export function LearningTodayScreen() {
 
                 <TouchableOpacity
                   disabled={planGenerating || plan.status === 'completed'}
-                  onPress={() => { if (goal) void generatePlan(goal, ctx) }}
-                  style={[styles.secondaryBtn, { borderColor: theme.colors.border }]}
-                  testID="learning-regenerate"
+                  onPress={regenerate}
+                  style={[
+                    styles.secondaryBtn,
+                    { borderColor: theme.colors.border },
+                    (planGenerating || plan.status === 'completed') && styles.disabled,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: planGenerating || plan.status === 'completed' }}
+                  {...testProps('learning-regenerate')}
                 >
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
                     {planGenerating ? t('today.regenerating') : t('today.regenerate')}
@@ -259,9 +393,15 @@ export function LearningTodayScreen() {
             ) : !planBlockedReason ? (
               <TouchableOpacity
                 disabled={planGenerating || !goal}
-                onPress={() => { if (goal) void generatePlan(goal, ctx) }}
-                style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
-                testID="learning-generate"
+                onPress={regenerate}
+                style={[
+                  styles.primaryBtn,
+                  { backgroundColor: theme.colors.primary },
+                  (planGenerating || !goal) && styles.disabled,
+                ]}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: planGenerating || !goal }}
+                {...testProps('learning-generate')}
               >
                 <Text style={[theme.typography.bodySmall, { color: '#fff' }]}>
                   {planGenerating ? t('today.generating') : t('today.generate')}
@@ -273,76 +413,154 @@ export function LearningTodayScreen() {
       </ScrollView>
 
       {/* Enrichment preview. The charge already happened, so this asks whether to KEEP the
-          result — it never implies that discarding refunds anything. */}
-      {enrichment && (
-        <View style={[styles.sheet, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-          <ScrollView style={{ maxHeight: 320 }}>
-            {Object.entries(enrichment.content)
-              .filter(([key]) => key !== 'sources')
-              .map(([key, value]) => (
-                <View key={key} style={{ marginBottom: 8 }}>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{key}</Text>
-                  <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                    {Array.isArray(value)
-                      ? value.map((v) => (typeof v === 'object' && v !== null
-                        ? Object.values(v as Record<string, unknown>).filter((x) => typeof x === 'string').join(' — ')
-                        : String(v))).join('\n')
-                      : typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}
-                  </Text>
-                </View>
+          result — it never implies that discarding refunds anything.
+
+          A real Modal, not an absolutely-positioned View: as a plain overlay the list behind
+          it stayed scrollable and tappable (a rating could be recorded "through" the sheet),
+          the Android back button popped the whole screen instead of closing the sheet, and a
+          screen reader walked straight past it into the content underneath. */}
+      <Modal
+        visible={!!enrichment}
+        transparent
+        animationType="fade"
+        onRequestClose={dismissEnrichment}
+        statusBarTranslucent
+      >
+        <Pressable
+          style={styles.backdrop}
+          onPress={dismissEnrichment}
+          accessibilityRole="button"
+          accessibilityLabel={tCommon('actions.close')}
+          {...testProps('learning-enrichment-backdrop')}
+        />
+        {enrichment && (
+          <View
+            style={[
+              styles.sheet,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+                bottom: Math.max(insets.bottom, 12),
+              },
+            ]}
+            accessibilityViewIsModal
+            {...testProps('learning-enrichment-sheet', true)}
+          >
+            <ScrollView style={{ maxHeight: 320 }}>
+              {Object.entries(enrichment.content)
+                .filter(([key]) => key !== 'sources')
+                .map(([key, value]) => (
+                  <View key={key} style={{ marginBottom: 8 }}>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{key}</Text>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                      {renderEnrichmentValue(value)}
+                    </Text>
+                  </View>
+                ))}
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                {t('enrichment.sources')}
+              </Text>
+              {enrichment.sources.length === 0 ? (
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                  {t('enrichment.noSources')}
+                </Text>
+              ) : enrichment.sources.map((source, i) => (
+                <Text key={`${source.id ?? source.title ?? 'source'}-${i}`} style={[theme.typography.caption, { color: theme.colors.text }]}>
+                  {source.title || source.clause || source.id}
+                  {source.clause && source.title ? ` · ${source.clause}` : ''}
+                </Text>
               ))}
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-              {t('enrichment.sources')}
-            </Text>
-            {enrichment.sources.length === 0 ? (
-              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                {t('enrichment.noSources')}
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}>
+                {t('enrichment.chargedNote')}
               </Text>
-            ) : enrichment.sources.map((source, i) => (
-              <Text key={i} style={[theme.typography.caption, { color: theme.colors.text }]}>
-                {source.title || source.clause || source.id}
-                {source.clause && source.title ? ` · ${source.clause}` : ''}
-              </Text>
-            ))}
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}>
-              {t('enrichment.chargedNote')}
-            </Text>
-          </ScrollView>
-          <View style={styles.sheetActions}>
-            <TouchableOpacity onPress={dismissEnrichment}>
-              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                {t('enrichment.later')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => void resolveEnrichment('rejected')}>
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                {t('enrichment.discard')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => void resolveEnrichment('accepted')}>
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
-                {t('enrichment.keep')}
-              </Text>
-            </TouchableOpacity>
+            </ScrollView>
+            <View style={styles.sheetActions}>
+              <TouchableOpacity
+                onPress={dismissEnrichment}
+                style={styles.touchRow}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                {...testProps('learning-enrichment-later')}
+              >
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                  {t('enrichment.later')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => void resolveEnrichment('rejected')}
+                style={styles.touchRow}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                {...testProps('learning-enrichment-discard')}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                  {t('enrichment.discard')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => void resolveEnrichment('accepted')}
+                style={styles.touchRow}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                {...testProps('learning-enrichment-keep')}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                  {t('enrichment.keep')}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      )}
+        )}
+      </Modal>
     </Screen>
   )
+}
+
+/**
+ * Render one enrichment field for a human.
+ *
+ * The previous fallback was `JSON.stringify`, which showed braces and quotes to someone who
+ * had just paid for the answer. An unrecognised shape is flattened to its readable leaves
+ * instead, and only a value with nothing readable in it is dropped.
+ */
+function renderEnrichmentValue(value: unknown): string {
+  const leaves = (input: unknown): string[] => {
+    if (input === null || input === undefined) return []
+    if (typeof input === 'string') return input.trim() ? [input] : []
+    if (typeof input === 'number' || typeof input === 'boolean') return [String(input)]
+    if (Array.isArray(input)) return input.flatMap(leaves)
+    if (typeof input === 'object') return Object.values(input as Record<string, unknown>).flatMap(leaves)
+    return []
+  }
+  return Array.isArray(value) ? value.map((v) => leaves(v).join(' — ')).filter(Boolean).join('\n')
+    : leaves(value).join('\n')
 }
 
 const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 48 },
   card: { padding: 12, borderRadius: 12, borderWidth: 1 },
+  headerActions: { flexDirection: 'row', gap: 4 },
+  headerLink: { minHeight: 32, paddingHorizontal: 6, justifyContent: 'center' },
   goalRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
+  // 44pt is the iOS HIG minimum and 48dp Material's; a 12px caption inside 6px of padding
+  // was 28, which is a mis-tap on a moving train.
+  chip: {
+    paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
+    justifyContent: 'center',
+  },
   rateRow: { flexDirection: 'row', gap: 6, marginTop: 8 },
-  rateBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
-  primaryBtn: { marginTop: 10, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
-  secondaryBtn: { marginTop: 4, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center' },
+  rateBtn: {
+    paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 8, borderWidth: 1,
+    justifyContent: 'center', alignItems: 'center', flex: 1,
+  },
+  primaryBtn: { marginTop: 10, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  secondaryBtn: { marginTop: 4, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  touchRow: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: 4 },
+  disabled: { opacity: 0.5 },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' },
   sheet: {
-    position: 'absolute', left: 12, right: 12, bottom: 12,
+    position: 'absolute', left: 12, right: 12,
     padding: 12, borderRadius: 16, borderWidth: 1,
   },
-  sheetActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 16, marginTop: 10 },
+  sheetActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 12, marginTop: 6 },
 })

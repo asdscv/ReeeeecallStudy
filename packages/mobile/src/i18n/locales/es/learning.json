@@ -49,9 +49,20 @@
     "create": "Nuevo objetivo",
     "dailyMinutes": "{{count, number}} min/día",
     "deckCount": "{{count, number}} mazos",
+    "deckCount_one": "{{count, number}} mazo",
+    "deckCount_other": "{{count, number}} mazos",
     "empty": {
       "body": "Crea un objetivo para empezar a recibir un plan diario.",
       "title": "Aún no hay objetivos"
+    },
+    "error": {
+      "authRequired": "Inicia sesión de nuevo.",
+      "conflict": "Ese cambio no está permitido para el estado actual de este objetivo.",
+      "forbidden": "No tienes acceso a eso.",
+      "invalidInput": "Revisa el nombre y los minutos diarios.",
+      "limitExceeded": "Has alcanzado el número máximo de objetivos.",
+      "notFound": "Ese objetivo no existe o fue archivado.",
+      "unknown": "Algo salió mal. Inténtalo de nuevo."
     },
     "noDecksWarning": "No hay mazos asociados — aún no se puede generar un plan.",
     "status": {
@@ -64,10 +75,16 @@
   "insights": {
     "accuracy": "Precisión",
     "adherence": "Cumplimiento del plan (14 días)",
+    "adherenceEmpty": "No hay planes en este período.",
+    "adherenceTitle": "Planes diarios (14 días)",
     "attemptCount": "{{count, number}} intentos",
+    "attemptCount_one": "{{count, number}} intento",
+    "attemptCount_other": "{{count, number}} intentos",
     "attempts": "Intentos (30 días)",
     "cardFallback": "(tarjeta no incluida en el plan de hoy)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Sin datos aún",
+    "noPlanItems": "Nada planificado",
     "notScoredYet": "Nada puntuado aún",
     "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
     "seconds": "{{count, number}}s",
@@ -98,17 +115,30 @@
       "noGoal": "Aún no tienes un objetivo de aprendizaje activo. Un objetivo establece tus minutos diarios y los mazos para planificar.",
       "nothingDue": "Hoy no hay tarjetas pendientes en estos mazos."
     },
+    "error": {
+      "authRequired": "Inicia sesión de nuevo.",
+      "completedPlan": "Un plan terminado no se puede sobrescribir.",
+      "forbidden": "No tienes acceso a eso.",
+      "goalGone": "Ese objetivo ya no está disponible.",
+      "invalidInput": "No se pudo guardar el plan porque algunos valores estaban fuera de rango.",
+      "limitExceeded": "Has alcanzado el límite de reconstrucciones de hoy. Inténtalo mañana.",
+      "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
+    },
     "generate": "Crear plan de hoy",
     "generating": "Creando…",
     "insightsLink": "Diagnóstico",
     "item": {
+      "minutes": "~{{count, number}} min",
       "recorded": "Registrado",
       "untitled": "(sin texto)"
     },
     "manageGoals": "Gestionar objetivos",
     "progress": "{{done, number}} de {{total, number}} completados",
     "rate": {
-      "hint": "Registra tu intento; no cambia el calendario de repaso."
+      "again": "No lo sabía",
+      "hint": "Registra tu intento; no cambia el calendario de repaso.",
+      "known": "Lo sabía",
+      "partial": "A medias"
     },
     "reason": {
       "balanced": "Mezcla equilibrada",

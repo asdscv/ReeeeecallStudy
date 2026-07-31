@@ -78,7 +78,9 @@
       "authRequired": "다시 로그인해 주세요.",
       "forbidden": "접근 권한이 없습니다.",
       "unknown": "문제가 발생했습니다. 다시 시도해 주세요."
-    }
+    },
+    "deckCount_one": "덱 {{count, number}}개",
+    "deckCount_other": "덱 {{count, number}}개"
   },
   "form": {
     "createTitle": "새 목표",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "이 기간에 플랜이 없습니다.",
     "noPlanItems": "계획된 항목 없음",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다."
+    "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다.",
+    "attemptCount_one": "시도 {{count, number}}회",
+    "attemptCount_other": "시도 {{count, number}}회"
   },
   "recommend": {
     "title": "추천",

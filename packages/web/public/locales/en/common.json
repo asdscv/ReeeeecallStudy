@@ -41,7 +41,8 @@
     "show": "Show",
     "hide": "Hide",
     "startStudy": "Start Study",
-    "logout": "Logout"
+    "logout": "Logout",
+    "retry": "Retry"
   },
   "status": {
     "loading": "Loading...",

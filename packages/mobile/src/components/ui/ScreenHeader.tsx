@@ -86,6 +86,10 @@ export function ScreenHeader({
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         accessibilityLabel={leftLabel}
         accessibilityRole="button"
+        // Every screen has this control and none of them could address it: a test that
+        // needed to leave a pushed screen had no handle, and on iOS there is no hardware
+        // back to fall back on.
+        testID={mode === 'drawer' ? 'screen-header-menu' : 'screen-header-back'}
       >
         <Text style={[styles.leftIcon, { color: theme.colors.text }]}>
           {leftIcon}

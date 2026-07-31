@@ -78,7 +78,9 @@
       "authRequired": "กรุณาเข้าสู่ระบบอีกครั้ง",
       "forbidden": "คุณไม่มีสิทธิ์เข้าถึง",
       "unknown": "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง"
-    }
+    },
+    "deckCount_one": "{{count, number}} สำรับ",
+    "deckCount_other": "{{count, number}} สำรับ"
   },
   "form": {
     "createTitle": "เป้าหมายใหม่",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "ไม่มีแผนในช่วงเวลานี้",
     "noPlanItems": "ไม่มีรายการที่วางแผนไว้",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "อ้างอิงจากการทำและแผนของเป้าหมายนี้ สถิติ SRS ระดับสำรับอยู่ในประวัติการเรียน"
+    "scopeNote": "อ้างอิงจากการทำและแผนของเป้าหมายนี้ สถิติ SRS ระดับสำรับอยู่ในประวัติการเรียน",
+    "attemptCount_one": "{{count, number}} ครั้ง",
+    "attemptCount_other": "{{count, number}} ครั้ง"
   },
   "recommend": {
     "title": "คำแนะนำ",

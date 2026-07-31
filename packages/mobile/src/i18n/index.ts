@@ -25,6 +25,7 @@ const resources = {
     update: require('./locales/en/update.json'),
     sharing: require('./locales/en/sharing.json'),
     'ai-generate': require('./locales/en/ai-generate.json'),
+    learning: require('./locales/en/learning.json'),
     wallet: require('./locales/en/wallet.json'),
   },
   ko: {
@@ -43,6 +44,7 @@ const resources = {
     update: require('./locales/ko/update.json'),
     sharing: require('./locales/ko/sharing.json'),
     'ai-generate': require('./locales/ko/ai-generate.json'),
+    learning: require('./locales/ko/learning.json'),
     wallet: require('./locales/ko/wallet.json'),
   },
   ja: {
@@ -61,6 +63,7 @@ const resources = {
     update: require('./locales/ja/update.json'),
     sharing: require('./locales/ja/sharing.json'),
     'ai-generate': require('./locales/ja/ai-generate.json'),
+    learning: require('./locales/ja/learning.json'),
     wallet: require('./locales/ja/wallet.json'),
   },
   zh: {
@@ -79,6 +82,7 @@ const resources = {
     update: require('./locales/zh/update.json'),
     sharing: require('./locales/zh/sharing.json'),
     'ai-generate': require('./locales/zh/ai-generate.json'),
+    learning: require('./locales/zh/learning.json'),
     wallet: require('./locales/zh/wallet.json'),
   },
   vi: {
@@ -97,6 +101,7 @@ const resources = {
     update: require('./locales/vi/update.json'),
     sharing: require('./locales/vi/sharing.json'),
     'ai-generate': require('./locales/vi/ai-generate.json'),
+    learning: require('./locales/vi/learning.json'),
     wallet: require('./locales/vi/wallet.json'),
   },
   th: {
@@ -115,6 +120,7 @@ const resources = {
     update: require('./locales/th/update.json'),
     sharing: require('./locales/th/sharing.json'),
     'ai-generate': require('./locales/th/ai-generate.json'),
+    learning: require('./locales/th/learning.json'),
     wallet: require('./locales/th/wallet.json'),
   },
   id: {
@@ -133,6 +139,7 @@ const resources = {
     update: require('./locales/id/update.json'),
     sharing: require('./locales/id/sharing.json'),
     'ai-generate': require('./locales/id/ai-generate.json'),
+    learning: require('./locales/id/learning.json'),
     wallet: require('./locales/id/wallet.json'),
   },
   es: {
@@ -151,6 +158,7 @@ const resources = {
     update: require('./locales/es/update.json'),
     sharing: require('./locales/es/sharing.json'),
     'ai-generate': require('./locales/es/ai-generate.json'),
+    learning: require('./locales/es/learning.json'),
     wallet: require('./locales/es/wallet.json'),
   },
 }

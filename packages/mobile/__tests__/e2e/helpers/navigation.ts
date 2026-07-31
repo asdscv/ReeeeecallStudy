@@ -7,6 +7,8 @@ const DRAWER_TEST_IDS: Record<string, string> = {
   'Quick Study': 'drawer-quick-study',
   Dashboard: 'drawer-dashboard',
   Study: 'drawer-study-group',
+  // Nested under the Study group, same as the AI/Decks/Cards entries below.
+  'Learning Plan': 'drawer-learning-plan',
   'AI Generate': 'drawer-ai-generate',
   Decks: 'drawer-decks',
   Cards: 'drawer-cards',
@@ -65,7 +67,7 @@ export async function openDrawer() {
  * Navigate to a screen via the drawer menu using testIDs (language-independent).
  */
 export async function navigateToDrawerItem(itemName: string) {
-  const studyGroupItems = ['AI Generate', 'Decks', 'Cards', 'Marketplace', 'History']
+  const studyGroupItems = ['Learning Plan', 'AI Generate', 'Decks', 'Cards', 'Marketplace', 'History']
   const needsStudyGroup = studyGroupItems.includes(itemName)
 
   const opened = await openDrawer()

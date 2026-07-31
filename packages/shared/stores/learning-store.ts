@@ -11,6 +11,7 @@
 // with `save_daily_plan`, and then RE-READS the saved plan so the UI renders the
 // database's version of the plan rather than a local object that might differ.
 import { create } from 'zustand'
+import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
 import {
   buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
@@ -157,6 +158,7 @@ const LOG_ROW_LIMIT = 2000
 export interface PlanCardRef {
   id: string
   deck_id: string
+  template_id: string | null
   field_values: Record<string, string>
 }
 
@@ -308,6 +310,13 @@ interface LearningState {
   planItems: DailyPlanItemRow[]
   /** Cards referenced by the current plan's items, by card id. */
   planCards: Record<string, PlanCardRef>
+  /**
+   * Field keys per template, in the order the template says to read them.
+   *
+   * Needed because `field_values` is jsonb: Postgres returns its keys in its own order, so
+   * "the first value" can be the ANSWER — see shared/lib/card-prompt.
+   */
+  planTemplateFields: TemplateFieldOrder
   planLoading: boolean
   planGenerating: boolean
   planError: LearningError | null
@@ -328,9 +337,24 @@ interface LearningState {
 
   insights: LearningInsights | null
   insightsLoading: boolean
+  /**
+   * Which goal the numbers in `insights` belong to.
+   *
+   * The screen lets a learner switch goals, and attributing one goal's accuracy to another
+   * is worse than showing nothing — so the goal travels with the data instead of being
+   * inferred from whatever the selector happens to hold when the render runs.
+   */
+  insightsGoalId: string | null
+  /**
+   * Diagnostics failures have their own channel. `planError` drives the today screen's
+   * banner, so routing a diagnostics failure there would make an unrelated screen claim
+   * the plan is broken.
+   */
+  insightsError: LearningError | null
 
   recommendations: RecommendationRow[]
   recommendationsLoading: boolean
+  recommendationsGoalId: string | null
   recommendationBusyId: string | null
 
   fetchGoals: () => Promise<void>
@@ -358,6 +382,16 @@ interface LearningState {
   reset: () => void
 }
 
+/**
+ * Request generations for the two goal-scoped loaders.
+ *
+ * Kept outside the store on purpose: they are bookkeeping for in-flight work, not state any
+ * view should re-render on. Comparing the generation after every await is what makes goal
+ * switching correct — see `fetchInsights`.
+ */
+let insightsRequestSeq = 0
+let recommendationsRequestSeq = 0
+
 export const useLearningStore = create<LearningState>((set, get) => ({
   goals: [],
   goalsLoading: false,
@@ -365,6 +399,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   plan: null,
   planItems: [],
   planCards: {},
+  planTemplateFields: {},
   planLoading: false,
   planGenerating: false,
   planError: null,
@@ -378,8 +413,11 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   enrichmentSaving: false,
   insights: null,
   insightsLoading: false,
+  insightsGoalId: null,
+  insightsError: null,
   recommendations: [],
   recommendationsLoading: false,
+  recommendationsGoalId: null,
   recommendationBusyId: null,
 
   fetchGoals: async () => {
@@ -534,19 +572,44 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // since the plan was written.
       const cardIds = items.map((item) => item.card_id).filter((id): id is string => !!id)
       let planCards: Record<string, PlanCardRef> = {}
+      let planTemplateFields: TemplateFieldOrder = {}
       if (cardIds.length > 0) {
         const { data: cardRefs, error: refErr } = await supabase
           .from('cards')
-          .select('id, deck_id, field_values')
+          .select('id, deck_id, template_id, field_values')
           .in('id', cardIds)
           .returns<PlanCardRef[]>()
         if (refErr) throw refErr
         planCards = Object.fromEntries((cardRefs ?? []).map((card) => [card.id, card]))
+
+        // The templates decide which field is the prompt. Without them the row can show the
+        // answer, which is the one thing that makes a plan row worthless. A failure here is
+        // NOT fatal: card-prompt falls back to conventional keys, so the plan still renders.
+        const templateIds = [...new Set(
+          (cardRefs ?? []).map((card) => card.template_id).filter((id): id is string => !!id),
+        )]
+        if (templateIds.length > 0) {
+          const { data: templates } = await supabase
+            .from('card_templates')
+            .select('id, fields')
+            .in('id', templateIds)
+            .returns<Array<{ id: string; fields: Array<{ key: string; order?: number }> }>>()
+          planTemplateFields = Object.fromEntries((templates ?? []).map((template) => [
+            template.id,
+            [...(template.fields ?? [])]
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map((field) => field.key)
+              .filter((key): key is string => typeof key === 'string'),
+          ]))
+        }
       }
 
-      set({ plan: planRow as DailyPlanRow, planItems: items, planCards })
+      set({ plan: planRow as DailyPlanRow, planItems: items, planCards, planTemplateFields })
     } catch (e) {
-      set({ planError: toLearningError(e), plan: null, planItems: [], planCards: {} })
+      set({
+        planError: toLearningError(e), plan: null, planItems: [], planCards: {},
+        planTemplateFields: {},
+      })
     } finally {
       set({ planLoading: false })
     }
@@ -847,8 +910,11 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    * nothing about this week.
    */
   fetchInsights: async (goalId) => {
-    if (get().insightsLoading) return
-    set({ insightsLoading: true })
+    // Latest-wins, NOT first-wins. A busy-flag early return would drop the goal the learner
+    // just selected and leave the previous goal's numbers under the new goal's label; a
+    // plain overwrite would let a slow earlier response land last and do the same thing.
+    const seq = ++insightsRequestSeq
+    set({ insightsLoading: true, insightsError: null })
     try {
       const now = Date.now()
       const attemptsSince = new Date(now - 30 * 86_400_000).toISOString()
@@ -870,22 +936,28 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           .gte('plan_date', plansSince)
           .returns<InsightPlan[]>(),
       ])
+      if (seq !== insightsRequestSeq) return
       if (attemptsResult.error) throw attemptsResult.error
       if (plansResult.error) throw plansResult.error
 
-      set({ insights: summarizeLearning({
-        attempts: attemptsResult.data ?? [],
-        plans: plansResult.data ?? [],
-      }) })
+      set({
+        insights: summarizeLearning({
+          attempts: attemptsResult.data ?? [],
+          plans: plansResult.data ?? [],
+        }),
+        insightsGoalId: goalId,
+      })
     } catch (e) {
-      set({ planError: toLearningError(e), insights: null })
+      if (seq !== insightsRequestSeq) return
+      set({ insightsError: toLearningError(e), insights: null, insightsGoalId: goalId })
     } finally {
-      set({ insightsLoading: false })
+      if (seq === insightsRequestSeq) set({ insightsLoading: false })
     }
   },
 
   /** Recommendations for a goal, newest first. Owner-scoped by RLS. */
   fetchRecommendations: async (goalId) => {
+    const seq = ++recommendationsRequestSeq
     set({ recommendationsLoading: true })
     try {
       const { data, error } = await supabase
@@ -895,12 +967,14 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         .order('created_at', { ascending: false })
         .limit(50)
         .returns<RecommendationRow[]>()
+      if (seq !== recommendationsRequestSeq) return
       if (error) throw error
-      set({ recommendations: data ?? [] })
+      set({ recommendations: data ?? [], recommendationsGoalId: goalId })
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      if (seq !== recommendationsRequestSeq) return
+      set({ insightsError: toLearningError(e) })
     } finally {
-      set({ recommendationsLoading: false })
+      if (seq === recommendationsRequestSeq) set({ recommendationsLoading: false })
     }
   },
 
@@ -956,26 +1030,40 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    * `contentImportance`, so the decision changes tomorrow's plan. Dismissing keeps the
    * suggestion from being re-proposed, because the server preserves non-pending rows.
    *
-   * Both states are terminal server-side (P0007 on a second transition), which the store
-   * treats as success — the learner's intent is already recorded, and an unclearable error
-   * would be the wrong reading of that code.
+   * Both states are terminal server-side (P0007 on a second transition). That is not an
+   * error the learner can act on — the decision is already recorded — but it is also NOT a
+   * licence to claim the status THIS tab asked for: the row may have been accepted elsewhere
+   * while this one asked to dismiss it. So P0007 re-reads the goal's rows and adopts the
+   * server's truth instead of rendering a state the server does not hold.
    */
   resolveRecommendation: async (id, status) => {
     if (get().recommendationBusyId) return false
-    set({ recommendationBusyId: id, planError: null })
+    const target = get().recommendations.find((rec) => rec.id === id)
+    set({ recommendationBusyId: id, insightsError: null })
     try {
       const { error } = await supabase.rpc('set_study_recommendation_status', {
         p_recommendation_id: id,
         p_status: status,
       })
-      if (error && (error as { code?: string }).code !== 'P0007') throw error
+      const alreadyDecided = !!error && (error as { code?: string }).code === 'P0007'
+      if (error && !alreadyDecided) throw error
+
+      if (alreadyDecided) {
+        set({ recommendationBusyId: null })
+        // Re-read only when the row tells us which goal to re-read. A suggestion with no
+        // goal cannot be refetched, so the safer move is to leave the list untouched rather
+        // than assert a status the server may not hold.
+        if (target?.goal_id) await get().fetchRecommendations(target.goal_id)
+        return true
+      }
+
       set({
         recommendations: get().recommendations.map((rec) =>
           rec.id === id ? { ...rec, status } : rec),
       })
       return true
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      set({ insightsError: toLearningError(e) })
       return false
     } finally {
       set({ recommendationBusyId: null })
@@ -986,13 +1074,22 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    *  resolved later; the money is spent either way. */
   dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
 
-  reset: () => set({
-    goals: [], goalsLoading: false, goalsError: null,
-    plan: null, planItems: [], planCards: {}, planLoading: false, planGenerating: false,
-    planError: null, planBlockedReason: null,
-    recordingItemId: null, attempts: [], attemptsLoading: false,
-    enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
-    enrichmentSaving: false, insights: null, insightsLoading: false,
-    recommendations: [], recommendationsLoading: false, recommendationBusyId: null,
-  }),
+  reset: () => {
+    // Bump both generations so any response still in flight is recognised as superseded and
+    // cannot repopulate the store after a logout.
+    insightsRequestSeq++
+    recommendationsRequestSeq++
+    set({
+      goals: [], goalsLoading: false, goalsError: null,
+      plan: null, planItems: [], planCards: {}, planTemplateFields: {},
+      planLoading: false, planGenerating: false,
+      planError: null, planBlockedReason: null,
+      recordingItemId: null, attempts: [], attemptsLoading: false,
+      enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
+      enrichmentSaving: false,
+      insights: null, insightsLoading: false, insightsGoalId: null, insightsError: null,
+      recommendations: [], recommendationsLoading: false, recommendationsGoalId: null,
+      recommendationBusyId: null,
+    })
+  },
 }))

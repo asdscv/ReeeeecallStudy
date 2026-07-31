@@ -40,7 +40,8 @@
     "show": "Tampilkan",
     "hide": "Sembunyikan",
     "startStudy": "Mulai Belajar",
-    "logout": "Keluar"
+    "logout": "Keluar",
+    "retry": "Coba lagi"
   },
   "status": {
     "loading": "Memuat...",

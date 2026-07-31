@@ -35,7 +35,10 @@ const emptyInsights = {
 const renderPage = (over: StoreState = {}) => {
   storeState.current = {
     goals: [goal], goalsLoading: false, fetchGoals: vi.fn(),
-    insights: emptyInsights, insightsLoading: false, fetchInsights: vi.fn(),
+    // `insightsGoalId` tags the numbers with the goal they describe. The page refuses to
+    // render stats whose tag does not match the selected goal, so the harness must set it.
+    insights: emptyInsights, insightsLoading: false, insightsGoalId: 'goal-1',
+    insightsError: null, fetchInsights: vi.fn(),
     planCards: {},
     recommendations: [], recommendationBusyId: null,
     fetchRecommendations: vi.fn(), regenerateRecommendations: vi.fn(),
@@ -54,6 +57,26 @@ describe('LearningInsightsPage', () => {
 
     expect(state.fetchGoals).toHaveBeenCalled()
     expect(state.fetchInsights).toHaveBeenCalledWith('goal-1')
+  })
+
+  it('will not show one goal\'s numbers under another goal\'s label', () => {
+    // The loader resolved for a goal the learner has since switched away from. Showing those
+    // stats would be the same class of lie as printing 0% for "no data".
+    renderPage({
+      insights: { ...emptyInsights, attemptCount: 9, scoredCount: 9, accuracy: 1 },
+      insightsGoalId: 'goal-OTHER',
+    })
+
+    expect(screen.queryByText('100%')).not.toBeInTheDocument()
+    expect(screen.queryByText('9')).not.toBeInTheDocument()
+  })
+
+  it('offers a retry when the diagnostics could not be loaded', () => {
+    renderPage({ insights: null, insightsGoalId: null, insightsError: { code: 'NETWORK', message: 'x' } })
+
+    // Previously this state rendered nothing at all: a blank screen with no way out.
+    expect(screen.getByTestId('learning-insights-error')).toBeInTheDocument()
+    expect(screen.getByText('actions.retry')).toBeInTheDocument()
   })
 
   it('says "no data" instead of 0% when nothing has been scored', () => {
