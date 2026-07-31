@@ -1,0 +1,95 @@
+{
+  "enrichment": {
+    "chargedNote": "已扣费 — 即使丢弃也不会退还额度。",
+    "costHint": "将使用你钱包中的 AI 额度",
+    "discard": "丢弃",
+    "error": {
+      "BAD_REQUEST": "请求无效。",
+      "FORBIDDEN": "你没有访问该卡片的权限。",
+      "GROUNDING_REQUIRED": "未找到可引用的来源，为避免编造内容已拒绝回答。",
+      "INSUFFICIENT_CREDITS": "AI 额度不足，请充值后继续。",
+      "INVALID_RESULT": "回答内容不可用，请重试。",
+      "NETWORK": "网络错误，请检查连接。",
+      "NOT_CONFIGURED": "此服务器未启用 AI 生成功能。",
+      "PROVIDER_ERROR": "AI 服务出错，请重试。",
+      "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
+      "UNKNOWN": "出了点问题，请重试。"
+    },
+    "explainCta": "解释（额度）",
+    "keep": "保留",
+    "later": "稍后决定",
+    "noSources": "此回答不基于来源。",
+    "requesting": "请求中…",
+    "sources": "来源"
+  },
+  "form": {
+    "cancel": "取消",
+    "dailyMinutes": "每日学习时间（分钟）",
+    "decks": "学习牌组",
+    "decksHint": "计划将根据所选牌组中的卡片生成。",
+    "domain": "学科",
+    "domainName": {
+      "labor-law": "劳动法",
+      "language": "语言学习"
+    },
+    "error": {
+      "dailyMinutes": "每日学习时间须在 1–1440 分钟之间。",
+      "title": "请输入 1–500 个字符的目标名称。"
+    },
+    "goalTitle": "目标名称",
+    "goalTitlePlaceholder": "例如：通过 JLPT N2",
+    "noDecks": "您还没有牌组。",
+    "save": "保存",
+    "saving": "保存中…"
+  },
+  "goals": {
+    "archive": "归档",
+    "archiveConfirmMessage": "\"{{title}}\" 将不再纳入计划，且无法再编辑。",
+    "archiveConfirmTitle": "归档此目标？",
+    "create": "新建目标",
+    "dailyMinutes": "每天 {{count, number}} 分钟",
+    "deckCount": "{{count, number}} 个牌组",
+    "empty": {
+      "body": "创建目标后即可获取每日计划。",
+      "title": "暂无目标"
+    },
+    "noDecksWarning": "未关联牌组，暂时无法生成计划。",
+    "status": {
+      "archived": "已归档",
+      "completed": "已完成",
+      "paused": "已暂停"
+    },
+    "title": "学习目标"
+  },
+  "today": {
+    "budget": "每天 {{count, number}} 分钟",
+    "empty": {
+      "createGoal": "创建目标",
+      "noDecks": "此目标没有关联的牌组，无法生成计划。",
+      "noGoal": "您还没有进行中的学习目标。目标用于设定每日学习时间和计划所用的牌组。",
+      "nothingDue": "今天这些牌组中没有需要复习的内容。"
+    },
+    "generate": "生成今日计划",
+    "generating": "生成中…",
+    "item": {
+      "recorded": "已记录",
+      "untitled": "（无内容）"
+    },
+    "manageGoals": "管理目标",
+    "progress": "{{total, number}} 个中完成 {{done, number}} 个",
+    "rate": {
+      "hint": "仅记录本次作答 — 不会改变复习计划。"
+    },
+    "reason": {
+      "balanced": "均衡搭配",
+      "due": "到期复习",
+      "goalRelevance": "目标相关度",
+      "importance": "重要程度",
+      "recentFailure": "最近答错",
+      "slowResponse": "回答较慢"
+    },
+    "regenerate": "重新生成计划",
+    "regenerating": "重新生成中…",
+    "title": "今日计划"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "enrichment": {
+    "chargedNote": "Already charged — discarding does not refund the credits.",
+    "costHint": "Uses AI credits from your wallet",
+    "discard": "Discard",
+    "error": {
+      "BAD_REQUEST": "That request was not valid.",
+      "FORBIDDEN": "You don't have access to that card.",
+      "GROUNDING_REQUIRED": "No citable source was found, so the answer was refused rather than made up.",
+      "INSUFFICIENT_CREDITS": "Not enough AI credits. Top up to continue.",
+      "INVALID_RESULT": "The answer came back unusable. Please try again.",
+      "NETWORK": "Network error. Check your connection.",
+      "NOT_CONFIGURED": "AI generation is not enabled on this server.",
+      "PROVIDER_ERROR": "The AI service failed. Please try again.",
+      "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    },
+    "explainCta": "Explain (credits)",
+    "keep": "Keep",
+    "later": "Decide later",
+    "noSources": "This answer is not source-based.",
+    "requesting": "Asking…",
+    "sources": "Sources"
+  },
+  "form": {
+    "cancel": "Cancel",
+    "dailyMinutes": "Minutes per day",
+    "decks": "Decks to study",
+    "decksHint": "Your plan is built from the cards in these decks.",
+    "domain": "Subject",
+    "domainName": {
+      "labor-law": "Labour law",
+      "language": "Language"
+    },
+    "error": {
+      "dailyMinutes": "Minutes per day must be between 1 and 1440.",
+      "title": "Enter a goal name (1–500 characters)."
+    },
+    "goalTitle": "Goal name",
+    "goalTitlePlaceholder": "e.g. Pass JLPT N2",
+    "noDecks": "You have no decks yet.",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "goals": {
+    "archive": "Archive",
+    "archiveConfirmMessage": "\"{{title}}\" will stop being planned and can no longer be edited.",
+    "archiveConfirmTitle": "Archive this goal?",
+    "create": "New goal",
+    "dailyMinutes": "{{count, number}} min/day",
+    "deckCount": "{{count, number}} decks",
+    "empty": {
+      "body": "Create a goal to start getting a daily plan.",
+      "title": "No goals yet"
+    },
+    "noDecksWarning": "No decks attached — this goal can't be planned yet.",
+    "status": {
+      "archived": "Archived",
+      "completed": "Completed",
+      "paused": "Paused"
+    },
+    "title": "Learning goals"
+  },
+  "today": {
+    "budget": "{{count, number}} min/day",
+    "empty": {
+      "createGoal": "Create a goal",
+      "noDecks": "This goal has no decks attached, so there is nothing to plan.",
+      "noGoal": "You don't have an active learning goal yet. A goal sets your daily minutes and the decks to plan over.",
+      "nothingDue": "Nothing is due in these decks today."
+    },
+    "generate": "Build today's plan",
+    "generating": "Building…",
+    "item": {
+      "recorded": "Recorded",
+      "untitled": "(no text)"
+    },
+    "manageGoals": "Manage goals",
+    "progress": "{{done, number}} of {{total, number}} done",
+    "rate": {
+      "hint": "Records your attempt — it does not change the review schedule."
+    },
+    "reason": {
+      "balanced": "Balanced mix",
+      "due": "Due for review",
+      "goalRelevance": "Goal relevance",
+      "importance": "Importance",
+      "recentFailure": "Recently missed",
+      "slowResponse": "Slow to answer"
+    },
+    "regenerate": "Rebuild plan",
+    "regenerating": "Rebuilding…",
+    "title": "Today's plan"
+  }
+}
