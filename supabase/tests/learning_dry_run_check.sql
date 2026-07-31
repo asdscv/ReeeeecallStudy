@@ -1,5 +1,5 @@
 -- ============================================================================
--- Dry-run test: migrations 165/167/168/169 apply → rollback → zero residue.
+-- Dry-run test: migrations 165/167/168/169/178 apply → rollback → zero residue.
 --
 -- Purpose: prove the rollback artifacts actually undo the migrations, so a
 -- failed rollout can be backed out without leaving orphaned tables, functions,
