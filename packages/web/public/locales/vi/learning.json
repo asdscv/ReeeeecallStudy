@@ -20,7 +20,7 @@
     "item": {
       "study": "Học",
       "untitled": "(không có nội dung)",
-      "minutes": "~{{count, number}} phút",
+      "minutes": "~{{count, decimal}} phút",
       "recorded": "Đã ghi lại"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "Độ chính xác",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
     "typicalTime": "Thời gian thường",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
     "weakTitle": "Cần xem lại",
     "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",

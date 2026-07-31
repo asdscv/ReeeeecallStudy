@@ -192,8 +192,16 @@ export async function loginIfNeeded() {
     return
   }
 
-  const email = process.env.E2E_TEST_EMAIL || 'luke@rictax.kr'
-  const password = process.env.E2E_TEST_PASSWORD || 'qpffkwldh35!'
+  // Credentials from the environment only — they used to sit here as literal defaults,
+  // committed to the repository. Failing loudly beats silently logging in as a real account.
+  const email = process.env.E2E_TEST_EMAIL
+  const password = process.env.E2E_TEST_PASSWORD
+  if (!email || !password) {
+    throw new Error(
+      'Missing E2E_TEST_EMAIL / E2E_TEST_PASSWORD. They are no longer committed — export them ' +
+      'or put them in packages/mobile/.env.test before running the suite.',
+    )
+  }
   console.log(`[auth] Logging in as ${email}`)
 
   // Wait for login form elements to be fully ready before interacting

@@ -27,3 +27,18 @@ export function formatCount(n: number): string {
   const v = Math.trunc(Number.isFinite(n) ? n : 0)
   return (v < 0 ? '−' : '') + groupThousands(String(Math.abs(v)))
 }
+
+/**
+ * Comma-group a number that is allowed to be fractional, to `places` decimals.
+ *
+ * `formatCount` TRUNCATES, which is correct for a card count and wrong for anything the
+ * code deliberately computed a fraction of: a 30-second plan item rendered through it read
+ * "~0 min", which is not an estimate, it is a false statement. A trailing `.0` is dropped so
+ * a whole number still reads as one.
+ */
+export function formatDecimal(n: number, places = 1): string {
+  if (!Number.isFinite(n)) return '0'
+  const fixed = Math.abs(n).toFixed(Math.max(0, Math.trunc(places)))
+  const trimmed = fixed.includes('.') ? fixed.replace(/\.?0+$/, '') : fixed
+  return (n < 0 ? '−' : '') + groupThousands(trimmed === '' ? '0' : trimmed)
+}

@@ -20,7 +20,7 @@
     "item": {
       "study": "Estudiar",
       "untitled": "(sin texto)",
-      "minutes": "~{{count, number}} min",
+      "minutes": "~{{count, decimal}} min",
       "recorded": "Registrado"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "Precisión",
     "notScoredYet": "Nada puntuado aún",
     "typicalTime": "Tiempo habitual",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "adherence": "Cumplimiento del plan (14 días)",
     "weakTitle": "Vale otra mirada",
     "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",

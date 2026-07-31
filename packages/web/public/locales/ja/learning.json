@@ -20,7 +20,7 @@
     "item": {
       "study": "学習",
       "untitled": "（テキストなし）",
-      "minutes": "約 {{count, number}} 分",
+      "minutes": "約 {{count, decimal}} 分",
       "recorded": "記録済み"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "正答率",
     "notScoredYet": "まだスコアのある試行がありません",
     "typicalTime": "平均所要時間",
-    "seconds": "{{count, number}}秒",
+    "seconds": "{{count, decimal}}秒",
     "adherence": "プラン達成率 (14日)",
     "weakTitle": "もう一度確認",
     "weakHint": "試行2回以上で平均60%未満のカードです。",

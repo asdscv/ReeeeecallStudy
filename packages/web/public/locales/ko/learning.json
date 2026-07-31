@@ -20,7 +20,7 @@
     "item": {
       "study": "학습",
       "untitled": "(내용 없음)",
-      "minutes": "약 {{count, number}}분",
+      "minutes": "약 {{count, decimal}}분",
       "recorded": "기록됨"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "정답률",
     "notScoredYet": "아직 채점된 시도 없음",
     "typicalTime": "보통 소요",
-    "seconds": "{{count, number}}초",
+    "seconds": "{{count, decimal}}초",
     "adherence": "플랜 이행률 (14일)",
     "weakTitle": "다시 볼 카드",
     "weakHint": "시도 2회 이상, 평균 60% 미만인 카드입니다.",

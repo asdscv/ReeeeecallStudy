@@ -87,7 +87,7 @@
     "noPlanItems": "Nothing planned",
     "notScoredYet": "Nothing scored yet",
     "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History.",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "title": "Learning insights",
     "typicalTime": "Typical time",
     "weakEmpty": "Nothing is falling behind.",
@@ -128,7 +128,7 @@
     "generating": "Building…",
     "insightsLink": "Insights",
     "item": {
-      "minutes": "~{{count, number}} min",
+      "minutes": "~{{count, decimal}} min",
       "recorded": "Recorded",
       "untitled": "(no text)"
     },

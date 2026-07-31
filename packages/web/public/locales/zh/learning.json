@@ -20,7 +20,7 @@
     "item": {
       "study": "学习",
       "untitled": "（无内容）",
-      "minutes": "约 {{count, number}} 分钟",
+      "minutes": "约 {{count, decimal}} 分钟",
       "recorded": "已记录"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "正确率",
     "notScoredYet": "尚无评分记录",
     "typicalTime": "通常用时",
-    "seconds": "{{count, number}}秒",
+    "seconds": "{{count, decimal}}秒",
     "adherence": "计划执行率 (14天)",
     "weakTitle": "值得再看",
     "weakHint": "作答至少2次且平均低于60%的卡片。",

@@ -87,7 +87,7 @@
     "noPlanItems": "Tidak ada yang direncanakan",
     "notScoredYet": "Belum ada yang dinilai",
     "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
-    "seconds": "{{count, number}}d",
+    "seconds": "{{count, decimal}}d",
     "title": "Analisis pembelajaran",
     "typicalTime": "Waktu biasa",
     "weakEmpty": "Tidak ada yang tertinggal.",
@@ -128,7 +128,7 @@
     "generating": "Membuat…",
     "insightsLink": "Analisis",
     "item": {
-      "minutes": "~{{count, number}} menit",
+      "minutes": "~{{count, decimal}} menit",
       "recorded": "Tercatat",
       "untitled": "(tidak ada teks)"
     },

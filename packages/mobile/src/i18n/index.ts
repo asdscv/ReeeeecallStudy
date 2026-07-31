@@ -4,7 +4,7 @@ import { Platform, NativeModules } from 'react-native'
 import { localPrefs } from '../utils/local-prefs'
 // Dependency-free on purpose — imported during i18n init, long before initSupabase() runs,
 // so it must not drag in the Supabase client the way lib/ai/server-client would.
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount, formatDecimal } from '@reeeeecall/shared/lib/format-number'
 
 // ── Supported languages: to add a new language, add an entry below + locale folder ──
 
@@ -224,6 +224,11 @@ i18n
 //
 // Only `number` is overridden (it is the only format spec any mobile locale uses), and the
 // call sites keep passing a real number for `count`, so i18next plural selection is untouched.
+// `decimal` is for values the code deliberately computed a fraction of. Routing them
+// through `number` truncated them: a 30-second plan item read "~0 min".
+i18n.services.formatter?.add('decimal', (value) =>
+  typeof value === 'number' ? formatDecimal(value, 1) : String(value ?? ''),
+)
 i18n.services.formatter?.add('number', (value) =>
   typeof value === 'number' ? formatCount(value) : String(value ?? ''),
 )

@@ -293,7 +293,9 @@ export function LearningTodayScreen() {
                         {label || t('today.item.untitled')}
                       </Text>
                       <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-                        {`${item.position}. `}
+                        {/* `position` is 0-based in the row; web renders `position + 1` and the two screens
+                            must not number the same plan differently. */}
+                        {`${item.position + 1}. `}
                         {t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
                         {/* The planner budgets the day in minutes, so the row that spends the
                             budget should say what it costs — web already showed this. */}

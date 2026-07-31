@@ -87,7 +87,7 @@
     "noPlanItems": "Không có mục nào được lên kế hoạch",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
     "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "title": "Phân tích học tập",
     "typicalTime": "Thời gian thường",
     "weakEmpty": "Không có thẻ nào tụt lại.",
@@ -128,7 +128,7 @@
     "generating": "Đang tạo…",
     "insightsLink": "Phân tích",
     "item": {
-      "minutes": "~{{count, number}} phút",
+      "minutes": "~{{count, decimal}} phút",
       "recorded": "Đã ghi lại",
       "untitled": "(không có nội dung)"
     },
