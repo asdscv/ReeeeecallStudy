@@ -1,7 +1,7 @@
 # Attempt-Grounded Remediation
 
-- **Status:** PR A **complete and verified locally** (whole CI SQL job reproduced green on a fresh
-  DB); commit/merge pending. PR B **not started.** See §10 for the exact line.
+- **Status:** PR A **MERGED** (#377, `c498ae0`, all 7 checks green).
+  PR B **open at #378**, awaiting CI. See §10 and §11.
 - **Implements:** [ai-personalization-gaps](./2026-07-31-ai-personalization-gaps.md) §5 ①.
 - **Base:** branched at `origin/develop` `8008259`; develop merged in at `d1e4b21` (which is why
   the migration is numbered 178, not 175 — see §10.1). Branch `feat/attempt-grounded-remediation`.
@@ -278,24 +278,71 @@ Verified by running, not by reading:
   assertion fails; renaming `p_attempt_id` (with an explicit DROP, since `CREATE OR REPLACE`
   refuses to rename a parameter) → the PostgREST-binding assertion fails
 
-### PR A — what is left
+### PR A — DONE
 
-1. Commit + push + PR + merge cycle.
+Merged as #377, `c498ae0`, all seven checks green.
 
-### PR B — not started
+---
 
-1. **Web**: action menu (`explain` / `hint`) on `AttemptHistory` rows where
-   `attemptNeedsRemediation(attempt)`, passing `attemptId`; quote line; in-flight disabling.
-2. **Mobile**: `LearningTodayScreen` has no attempt list at all — add the compact list, call
-   `fetchAttempts`, same menu, same rule.
-3. **i18n**: new keys in 8 locales × 2 platforms (`enrichment.action.*`, `enrichment.quote`,
-   `enrichment.groundedHint`, mobile `history.*` if the list needs its own strings).
-4. **Tests**: UI tests per design §8 (menu only for sub-"known" attempts, ids passed, quote
-   rendered), and the i18n guards must stay green.
+## 11. PR B — the surfaces (open at #378)
 
-### Known constraint to carry into PR B
+### 11.1 One deliberate divergence from §6
 
-`compare` and `evaluate` stay unreachable, by design (§2): today's attempts store
-`{ self_rated: score }`, so there is no learner text to compare or grade. The PR B copy must not
-imply the AI saw an answer the learner never wrote — the prompt already forbids the model from
-claiming it.
+§6 says "action menu". PR B ships **two inline text buttons** on each remediable row instead.
+The repo has no popover primitive — no `@radix-ui/react-dropdown-menu`, no popover, and
+`role="menu"` appears zero times anywhere — while inline text buttons are already the pattern on
+these exact screens (the plan row's explain CTA, the insights page's accept/dismiss). Two actions
+do not pay for a new dependency plus a focus trap and a click-outside listener. Recorded here
+rather than diverging quietly.
+
+### 11.2 What shipped
+
+| | |
+|---|---|
+| Web | `AttemptHistory` rows where `attemptNeedsRemediation(attempt) && attempt.card_id` gain `explain` / `hint`, passing that row's `attempt.id`; quote line; global in-flight disabling | `packages/web/src/pages/learning/LearningTodayPage.tsx` |
+| Mobile | the attempt list **did not exist** — `attempts`, `fetchAttempts`, `enrichmentQuote` and `loadEnrichmentQuote` were unreferenced in all of `packages/mobile/src`. New compact list + the same two actions + the same rule | `packages/mobile/src/screens/LearningTodayScreen.tsx` |
+| i18n | `enrichment.quote` + `enrichment.groundedHint` in all 16 files. Mobile also needed `enrichment.action.*` and the whole `history` root **backfilled** — mobile's `learning.json` was 18 keys behind web's — plus `history.title_one`/`_other`, which mobile's Test 8 requires | 16 locale files + `packages/mobile/src/i18n/i18n.test.ts` (`FAMILIES`) |
+
+`{{price}}` / `{{balance}}` are pre-formatted by `formatUsdMicro` at the call site. No new
+i18next format spec: only `number` and `decimal` are registered, and mobile's Test 5 fails the
+build the moment a third appears.
+
+### 11.3 Defects caught in review, fixed before merge
+
+1. **Cross-goal spend (the serious one).** The web list rendered `attempts` straight from the
+   store. `fetchAttempts` never clears it — it only flips `attemptsLoading` — so after a goal
+   switch the previous goal's rows stayed painted, carrying real card and attempt ids. A click
+   would have bought an explanation of a card from the goal the learner had just left. Both
+   platforms filter by `goal_id` now.
+2. **Silently dropped clicks.** The web plan-row button stayed enabled during an attempt-grounded
+   request; the store drops any second request while one runs, so it looked clickable and did
+   nothing. Disabled on the global flag now, with the per-card check kept only for the label.
+3. **The fresh miss never appeared.** Web never refetched attempts after a rating, so the miss
+   just recorded — the one this feature exists to explain — was not in the list.
+4. **Stale balance.** The web quote was read once per mount, so "$X left" quoted the pre-purchase
+   figure for the rest of the session. It re-reads when a request settles.
+5. **Two rows, one request.** Both platforms keyed the pending note on the CARD, so a learner who
+   missed the same card twice — exactly this feature's user — saw both rows claim to be the one
+   request in flight. Keyed on the attempt now.
+6. **Accessibility.** `groundedHint` was a `title` tooltip, which reaches neither keyboard nor
+   touch users; it is visible text now. And up to twenty buttons shared two accessible names —
+   each names its own row now.
+7. **Miscount.** The heading counted all 50 loaded attempts above a list of ten.
+
+### 11.4 Verified
+
+web vitest **2413 pass** · web `tsc -b` 0 · mobile `tsc` 0 · mobile i18n **478 pass** · locale key
+parity checked independently (web 138 keys × 8, mobile 127 × 8) · no competitor names and no
+"unlimited"-family claims in any of the 16 files · no new `Intl` use on a mobile screen.
+Mutation-tested: dropping the goal filter, the per-row `aria-label`, or the per-attempt pending
+key each turns its own test red.
+
+`packages/mobile/src/i18n/i18n.test.ts` is **not in CI** — it is a manual gate, and it must be
+re-run by hand whenever a `Learning*.tsx` changes, because its Tests 6 and 8 read those files.
+
+### 11.5 The constraint that still holds
+
+`compare` and `evaluate` remain unreachable, by design (§2): attempts store
+`{ self_rated: score }`, so there is no learner text to compare or grade. No string on either
+platform says or implies the AI read an answer the learner wrote, and the prompt forbids the
+model from claiming it.

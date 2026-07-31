@@ -121,6 +121,8 @@
       "explain": "AI explanation",
       "hint": "Study hint"
     },
+    "quote": "About {{price}} per request · {{balance}} left",
+    "groundedHint": "Answers this attempt, not just the card",
     "sources": "Sources",
     "noSources": "This answer is not source-based.",
     "empty": "The model returned nothing usable.",

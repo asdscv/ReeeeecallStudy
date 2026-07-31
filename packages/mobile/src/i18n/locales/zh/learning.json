@@ -1,5 +1,9 @@
 {
   "enrichment": {
+    "action": {
+      "explain": "AI 解释",
+      "hint": "学习提示"
+    },
     "chargedNote": "已扣费 — 即使丢弃也不会退还额度。",
     "costHint": "将使用你钱包中的 AI 额度",
     "discard": "丢弃",
@@ -16,9 +20,11 @@
       "UNKNOWN": "出了点问题，请重试。"
     },
     "explainCta": "解释（额度）",
+    "groundedHint": "解答针对本次作答，而不只是这张卡片",
     "keep": "保留",
     "later": "稍后决定",
     "noSources": "此回答不基于来源。",
+    "quote": "每次请求约 {{price}} · 余额 {{balance}}",
     "requesting": "请求中…",
     "sources": "来源"
   },
@@ -71,6 +77,15 @@
       "paused": "已暂停"
     },
     "title": "学习目标"
+  },
+  "history": {
+    "itemFallback": "{{type}} 作答",
+    "score": {
+      "unknown": "未评分"
+    },
+    "title": "最近作答 ({{count, number}})",
+    "title_one": "最近作答 ({{count, number}})",
+    "title_other": "最近作答 ({{count, number}})"
   },
   "insights": {
     "accuracy": "正确率",

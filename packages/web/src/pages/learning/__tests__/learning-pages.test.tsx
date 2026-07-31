@@ -61,13 +61,19 @@ const baseState = (over: StoreState = {}): StoreState => ({
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
-  recordAttempt: vi.fn(),
+  // These two return `Promise<boolean>` in the real store and the page chains off both —
+  // refetching attempts after a rating, and clearing the row spinner after a request. A bare
+  // vi.fn() returns undefined, so the mock has to keep the promise or the page throws on a
+  // path that works in production.
+  recordAttempt: vi.fn().mockResolvedValue(true),
   fetchAttempts: vi.fn(),
   enrichment: null,
   enrichmentPendingCardId: null,
   enrichmentError: null,
   enrichmentSaving: false,
-  requestEnrichment: vi.fn(),
+  enrichmentQuote: null,
+  requestEnrichment: vi.fn().mockResolvedValue(true),
+  loadEnrichmentQuote: vi.fn().mockResolvedValue(undefined),
   resolveEnrichment: vi.fn(),
   dismissEnrichment: vi.fn(),
   ...over,
@@ -263,6 +269,147 @@ describe('attempt history', () => {
 
     expect(screen.queryByText('history.title')).not.toBeInTheDocument()
   })
+
+  // ── attempt-grounded remediation (paid) ──────────────────────────────────
+  //
+  // The point of grounding is that the answer is about ONE failure, so these assert the
+  // attempt id travels with the request — a card id alone would produce the generic
+  // explanation the plan row already offers, at the same price.
+  const missed = {
+    id: 'a-missed', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
+    plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+  }
+  const partial = { ...missed, id: 'a-partial', card_id: 'card-2', normalized_score: 0.5 }
+  const known = { ...missed, id: 'a-known', card_id: 'card-3', normalized_score: 1 }
+  const unscored = { ...missed, id: 'a-unscored', card_id: 'card-4', normalized_score: null }
+  const cardless = { ...missed, id: 'a-cardless', card_id: null }
+
+  it('offers remediation only on attempts the learner did not already recall', () => {
+    renderToday({ attempts: [missed, partial, known, unscored] })
+
+    // A miss and a partial have a premise; "known" does not, and an unscored attempt is not
+    // evidence of a miss — paying to explain either would be selling an answer to a question
+    // the learner never asked.
+    expect(screen.getAllByRole('button', { name: /^enrichment\.action\.explain/ })).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: /^enrichment\.action\.hint/ })).toHaveLength(2)
+  })
+
+  it('does not offer it on an attempt with no card', () => {
+    renderToday({ attempts: [cardless] })
+
+    expect(screen.queryByRole('button', { name: /^enrichment\.action\.explain/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^enrichment\.action\.hint/ })).not.toBeInTheDocument()
+  })
+
+  it('grounds the request in THAT attempt, not just its card', async () => {
+    const state = renderToday({ attempts: [missed] })
+
+    await userEvent.click(screen.getByRole('button', { name: /^enrichment\.action\.explain/ }))
+
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', attemptId: 'a-missed',
+      uiLang: expect.any(String),
+    })
+  })
+
+  it('sends the hint action from the same row, with the same grounding', async () => {
+    const state = renderToday({ attempts: [partial] })
+
+    await userEvent.click(screen.getByRole('button', { name: /^enrichment\.action\.hint/ }))
+
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'hint', goalId: 'goal-1', cardId: 'card-2', attemptId: 'a-partial',
+      uiLang: expect.any(String),
+    })
+  })
+
+  it('says the answer is about this attempt, not the card in general', () => {
+    renderToday({ attempts: [missed] })
+
+    // VISIBLE text, not a `title` tooltip: a tooltip never appears on keyboard focus or on
+    // touch, so the sentence explaining what the charge buys would reach nobody on a phone.
+    expect(screen.getByText(/enrichment\.groundedHint/)).toBeInTheDocument()
+  })
+
+  it('names the item each paid button belongs to', () => {
+    // Every row offers the same two labels. Without the row in the accessible name, a screen
+    // reader user hears twenty buttons with two names between them and cannot tell which one
+    // spends credits on which item.
+    renderToday({ attempts: [missed] })
+
+    expect(screen.getByRole('button', { name: /^enrichment\.action\.explain — / })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^enrichment\.action\.hint — / })).toBeInTheDocument()
+  })
+
+  it('shows only THIS goal\'s attempts, because a stale row would spend credits', () => {
+    // `fetchAttempts` does not clear `attempts` — it only flips `attemptsLoading` — so after a
+    // goal switch the previous goal's rows stay painted until the new read lands. Those rows
+    // carry real card and attempt ids, so a click would buy an explanation of a card from the
+    // goal the learner just left.
+    const otherGoal = { ...missed, id: 'a-other', goal_id: 'goal-2', card_id: 'card-9' }
+    renderToday({ attempts: [otherGoal] })
+
+    expect(screen.queryByText('history.title')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^enrichment\.action\.explain/ })).not.toBeInTheDocument()
+  })
+
+  it('states the price before the click when the wallet could be read', () => {
+    const state = renderToday({
+      attempts: [missed],
+      enrichmentQuote: { estPriceMicro: 3880, balanceMicro: 1480000 },
+    })
+
+    expect(state.loadEnrichmentQuote).toHaveBeenCalledTimes(1)
+    // Regex, not an exact string: the price shares its paragraph with the grounding sentence.
+    expect(screen.getByText(/enrichment\.quote/)).toBeInTheDocument()
+  })
+
+  it('renders NO number at all when the wallet could not be read', () => {
+    renderToday({ attempts: [missed], enrichmentQuote: null })
+
+    // Not "$0.00": a free-looking price on something that charges is the one wrong answer.
+    expect(screen.queryByText(/enrichment\.quote/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/\$/)).not.toBeInTheDocument()
+    // …and the feature still works, because a failed quote must not gate a paid action the
+    // learner has credits for.
+    expect(screen.getByRole('button', { name: /^enrichment\.action\.explain/ })).toBeEnabled()
+  })
+
+  it('does not read the wallet for a learner who is never offered remediation', () => {
+    const state = renderToday({ attempts: [known, unscored] })
+
+    expect(state.loadEnrichmentQuote).not.toHaveBeenCalled()
+  })
+
+  it('disables every row while one request is in flight', () => {
+    // The store's guard is global — a second click anywhere is dropped and returns false — so
+    // no row may look clickable while a request runs.
+    renderToday({ attempts: [missed, partial], enrichmentPendingCardId: 'card-2' })
+
+    for (const button of screen.getAllByRole('button', { name: /^enrichment\.action\./ })) {
+      expect(button).toBeDisabled()
+    }
+  })
+
+  it('marks the row that is waiting, not every row that shares its card', async () => {
+    // Two misses on the SAME card — precisely the learner this feature exists for. The store
+    // tracks only the pending CARD, so keying the note on it would make both rows claim to be
+    // the one request in flight.
+    const sameCardAgain = { ...missed, id: 'a-missed-2', created_at: '2026-07-30T03:00:00.000Z' }
+    let settle: (ok: boolean) => void = () => {}
+    const inFlight = new Promise<boolean>((resolve) => { settle = resolve })
+
+    renderToday({
+      attempts: [missed, sameCardAgain],
+      requestEnrichment: vi.fn().mockReturnValue(inFlight),
+    })
+
+    await userEvent.click(screen.getAllByRole('button', { name: /^enrichment\.action\.explain/ })[0])
+
+    expect(screen.getAllByText('enrichment.requesting')).toHaveLength(1)
+    settle(true)
+  })
 })
 
 // ── enrichment UI (Phase 3, paid) ──────────────────────────────────────────
@@ -308,6 +455,41 @@ describe('enrichment', () => {
     renderToday({ plan: planRow, planItems: [{ ...planItem, card_id: null, activity_id: 'act-1' }] })
 
     expect(screen.queryByRole('button', { name: 'enrichment.explainCta' })).not.toBeInTheDocument()
+  })
+
+  // Design §6: the plan-row button stays card-scoped, and becomes attempt-grounded once that
+  // item HAS an attempt. Without this the web plan row buys the generic answer at the price
+  // the phone charges for a grounded one, and mig 178's `attempt_id` is written NULL.
+  const attemptOnCard1 = {
+    id: 'a-1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
+    plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+  }
+
+  it('grounds the plan row in this card’s latest attempt once it has one', async () => {
+    const state = withPlan({ attempts: [attemptOnCard1] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
+
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', attemptId: 'a-1',
+      uiLang: expect.any(String),
+    })
+  })
+
+  it('never grounds it in another goal’s attempt on the same card', async () => {
+    // `fetchAttempts` does not clear `attempts` on a goal switch, so the previous goal's rows
+    // survive one round trip. A card in both goals' decks would otherwise ground this paid
+    // request in the goal the learner just left — and the server cannot catch it, because
+    // mig 178's pair check only asks that attempt and enrichment name the same CARD.
+    const state = withPlan({ attempts: [{ ...attemptOnCard1, id: 'a-other', goal_id: 'goal-2' }] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
+
+    // No `attemptId` KEY at all — not `undefined`, which the store would forward as a field.
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: expect.any(String),
+    })
   })
 
   it('disables the row being requested', () => {

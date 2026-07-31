@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { useLearningStore, type LearningGoalWithDecks } from '../../stores/learning-store'
+import {
+  useLearningStore,
+  type LearningGoalWithDecks, type AttemptRow, type RemediationAction,
+} from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
+import { attemptNeedsRemediation, latestAttemptForCard } from '@reeeeecall/shared/lib/learning-attempt-selection'
+import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
 
@@ -26,6 +31,22 @@ const REASON_KEY: Record<string, string> = {
   balanced: 'today.reason.balanced',
 }
 
+/** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
+const ATTEMPT_ROWS = 10
+
+/**
+ * The two remediation actions an attempt can honestly ground.
+ *
+ * `compare` and `evaluate` are deliberately absent: an attempt stores `{ self_rated: score }` —
+ * a rating, not anything the learner wrote — so there is no answer to compare or to grade.
+ * The labels say what the model produces ("AI explanation" / "Study hint"), never that it read
+ * a response, because it did not.
+ */
+const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; labelKey: string }> = [
+  { action: 'explain', labelKey: 'enrichment.action.explain' },
+  { action: 'hint', labelKey: 'enrichment.action.hint' },
+]
+
 /** Self-rating choices for a legacy recall item (evaluator_type = self_rate). */
 const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
   { score: 0, key: 'today.rate.again' },
@@ -33,7 +54,7 @@ const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
   { score: 1, key: 'today.rate.known' },
 ]
 
-function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, onRate, recording, onExplain, explaining }: {
+function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, onRate, recording, onExplain, explaining, busy }: {
   position: number
   cardText: string
   deckId: string | null
@@ -43,7 +64,10 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
   onRate: (score: number) => void
   recording: boolean
   onExplain: (() => void) | null
+  /** This row's card is the one being fetched — drives the label. */
   explaining: boolean
+  /** ANY request is in flight — drives the disabled state, because the store drops seconds. */
+  busy: boolean
 }) {
   const { t } = useTranslation('learning')
   return (
@@ -72,7 +96,7 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
                click — not in an error afterwards. */
             <button
               type="button"
-              disabled={explaining}
+              disabled={busy}
               onClick={onExplain}
               title={t('enrichment.costHint')}
               className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
@@ -118,13 +142,58 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
 
 /** Recent attempts for the selected goal — the review surface for Phase 2. */
 function AttemptHistory({ goalId }: { goalId: string }) {
-  const { t } = useTranslation('learning')
-  const { attempts, attemptsLoading, planCards, planTemplateFields, fetchAttempts } = useLearningStore()
+  const { t, i18n } = useTranslation('learning')
+  const {
+    attempts, attemptsLoading, planCards, planTemplateFields, fetchAttempts,
+    requestEnrichment, enrichmentPendingCardId, enrichmentQuote, loadEnrichmentQuote,
+  } = useLearningStore()
 
   useEffect(() => { void fetchAttempts(goalId) }, [goalId, fetchAttempts])
 
-  if (attemptsLoading && attempts.length === 0) return null
-  if (attempts.length === 0) return null
+  // Filtered by goal, NOT rendered straight from the store. `fetchAttempts` never clears
+  // `attempts` — it only flips `attemptsLoading` — so after a goal switch the previous goal's
+  // rows stay painted until the new read lands. Those rows carry real card and attempt ids, so
+  // clicking one would spend credits explaining a card from the goal the learner just left.
+  const goalAttempts = useMemo(
+    () => attempts.filter((attempt) => attempt.goal_id === goalId),
+    [attempts, goalId],
+  )
+  // The store loads 50; the list shows 10. Everything below counts the VISIBLE rows, so the
+  // heading, the price line and the wallet read all describe what is actually on screen.
+  const visibleAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
+
+  /**
+   * Paid remediation is offered only where there is a premise for it: a miss or a partial
+   * recall, on a row that actually names a card. An attempt the learner just said they KNEW
+   * has nothing to remediate, and charging for one would be selling an answer to a question
+   * the learner did not ask.
+   */
+  const canRemediate = (attempt: AttemptRow): boolean =>
+    attemptNeedsRemediation(attempt) && Boolean(attempt.card_id)
+  const offersRemediation = visibleAttempts.some(canRemediate)
+
+  // Read the wallet only once a row that can be acted on exists — a learner who is never
+  // offered remediation should never trigger a wallet call — and RE-read it when a request
+  // finishes, because that request just debited the balance this line is quoting. Keyed on
+  // `enrichmentPendingCardId` returning to null, which is exactly "a request just settled".
+  useEffect(() => {
+    if (!offersRemediation || enrichmentPendingCardId !== null) return
+    void loadEnrichmentQuote()
+  }, [offersRemediation, enrichmentPendingCardId, loadEnrichmentQuote])
+
+  // The store's in-flight guard is GLOBAL (`if (get().enrichmentPendingCardId) return false`),
+  // so a second click anywhere is silently dropped. Disable every button while one request is
+  // running rather than let a row look clickable and do nothing.
+  const requestBusy = enrichmentPendingCardId !== null
+
+  // Which ROW is waiting, not which card. The store only tracks the pending CARD, and the
+  // learner this feature is for — someone who missed the same card twice — has two rows
+  // sharing one card_id. Keying the indicator on the card would make both of them claim to
+  // be the request in flight.
+  const [requestingAttemptId, setRequestingAttemptId] = useState<string | null>(null)
+
+  if (attemptsLoading && goalAttempts.length === 0) return null
+  if (goalAttempts.length === 0) return null
 
   const scoreKey = (score: number | null): string => {
     if (score === null) return 'history.score.unknown'
@@ -136,22 +205,71 @@ function AttemptHistory({ goalId }: { goalId: string }) {
   return (
     <div className="pt-2">
       <h2 className="text-sm font-medium text-foreground">
-        {t('history.title', { count: attempts.length })}
+        {t('history.title', { count: visibleAttempts.length })}
       </h2>
+      {/* What the charge buys, as VISIBLE text rather than a `title` tooltip — a tooltip never
+          reaches a keyboard or touch user, and it is the sentence that tells the learner the
+          answer is about one attempt rather than the card in general. */}
+      {offersRemediation && (
+        <p className="mt-0.5 text-[11px] text-content-tertiary">
+          {t('enrichment.groundedHint')}
+          {/* The price is stated before the click, never in an error afterwards. A quote that
+              could not be read renders NOTHING — `$0.00` would be a lie in the direction that
+              costs the learner money. */}
+          {enrichmentQuote && (
+            <> · {t('enrichment.quote', {
+              price: formatUsdMicro(enrichmentQuote.estPriceMicro),
+              balance: formatUsdMicro(enrichmentQuote.balanceMicro),
+            })}</>
+          )}
+        </p>
+      )}
       <ul className="mt-2 space-y-1">
-        {attempts.slice(0, 10).map((attempt) => {
+        {visibleAttempts.map((attempt) => {
           const card = attempt.card_id ? planCards[attempt.card_id] : undefined
           const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
+          const remediable = canRemediate(attempt)
+          const pending = requestingAttemptId === attempt.id
+          const rowName = label || t('history.itemFallback', { type: attempt.activity_type })
           return (
             <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2 bg-card rounded-lg border border-border">
-              <span className="text-xs text-foreground truncate">
-                {label || t('history.itemFallback', { type: attempt.activity_type })}
-              </span>
+              <span className="text-xs text-foreground truncate">{rowName}</span>
               <span className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-content-tertiary">{t(scoreKey(attempt.normalized_score))}</span>
                 <span className="text-[11px] text-content-tertiary">
                   {new Date(attempt.created_at).toLocaleString()}
                 </span>
+                {/* The progress note sits on the row rather than on a button: the store knows
+                    only that A request is running, not which of the two actions it was. */}
+                {pending && (
+                  <span className="text-xs text-content-tertiary">{t('enrichment.requesting')}</span>
+                )}
+                {remediable && REMEDIATION_ACTIONS.map(({ action, labelKey }) => (
+                  <button
+                    key={action}
+                    type="button"
+                    disabled={requestBusy}
+                    onClick={() => {
+                      setRequestingAttemptId(attempt.id)
+                      void requestEnrichment({
+                        action,
+                        goalId,
+                        // Non-null by `canRemediate`; the id is what makes the answer about
+                        // THIS failure instead of the card in general.
+                        cardId: attempt.card_id as string,
+                        attemptId: attempt.id,
+                        uiLang: i18n.language,
+                      }).finally(() => setRequestingAttemptId(null))
+                    }}
+                    // Every row offers the same two labels, so the text alone would give up to
+                    // 20 buttons two accessible names between them. The name has to say which
+                    // item is being paid for.
+                    aria-label={`${t(labelKey)} — ${rowName}`}
+                    className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
+                  >
+                    {t(labelKey)}
+                  </button>
+                ))}
               </span>
             </li>
           )
@@ -168,6 +286,7 @@ export function LearningTodayPage() {
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    attempts, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
   } = useLearningStore()
   const { i18n } = useTranslation('learning')
@@ -197,6 +316,21 @@ export function LearningTodayPage() {
 
   const goal: LearningGoalWithDecks | undefined =
     plannableGoals.find((candidate) => candidate.id === selectedGoalId)
+
+  /**
+   * The same goal filter `AttemptHistory` applies, for the same reason — and it has to be
+   * here too, not only there. `fetchAttempts` never clears `attempts`, so after a goal switch
+   * the previous goal's rows survive one round trip. A card that belongs to both goals' decks
+   * would then let the plan row ground a paid request in the OTHER goal's attempt, and the
+   * server cannot catch it: `persist_ai_remediation`'s pair check only asks that the attempt
+   * and the enrichment name the same CARD (mig 178), which that attempt does. The result is a
+   * stored `attempt_id` that misdescribes the answer — worse than none, because provenance
+   * reads as verified.
+   */
+  const goalAttempts = useMemo(
+    () => attempts.filter((attempt) => attempt.goal_id === selectedGoalId),
+    [attempts, selectedGoalId],
+  )
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
@@ -316,11 +450,19 @@ export function LearningTodayPage() {
                   done={item.status === 'completed'}
                   recording={recordingItemId === item.id}
                   explaining={enrichmentPendingCardId === item.card_id}
+                  // Disabled on the GLOBAL flag, not just this card: the store drops any second
+                  // request while one is running, so a full-opacity button on another row would
+                  // look clickable and silently do nothing.
+                  busy={enrichmentPendingCardId !== null}
                   onExplain={item.card_id && selectedGoalId ? () => {
                     void requestEnrichment({
                       action: 'explain',
                       goalId: selectedGoalId,
                       cardId: item.card_id as string,
+                      // Grounded once the item HAS an attempt (design §6) — same rule mobile
+                      // uses, so the two platforms cannot buy different answers for the same
+                      // card. Undefined when there is none, and the store omits the key.
+                      attemptId: latestAttemptForCard(goalAttempts, item.card_id)?.id,
                       uiLang: i18n.language,
                     })
                   } : null}
@@ -329,12 +471,17 @@ export function LearningTodayPage() {
                     // One id per attempt, generated at click time: the RPC is idempotent on
                     // it, so a retry of THIS attempt cannot double-record, while a different
                     // attempt gets a different id.
+                    // Refresh the attempt list too: `recordAttempt` re-reads only the plan, so
+                    // without this the miss the learner JUST recorded — the one this whole
+                    // feature exists to explain — never appears in the list below.
                     void recordAttempt({
                       planItem: item,
                       goalId: selectedGoalId,
                       score,
                       clientAttemptId: crypto.randomUUID(),
-                    }, ctx.planDate)
+                    }, ctx.planDate).then((ok) => {
+                      if (ok && selectedGoalId) void fetchAttempts(selectedGoalId)
+                    })
                   }}
                 />
               )

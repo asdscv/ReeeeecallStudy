@@ -9,9 +9,12 @@ import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
-import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
+import { useLearningStore, type RemediationAction } from '@reeeeecall/shared/stores/learning-store'
 import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
+import { attemptNeedsRemediation, latestAttemptForCard } from '@reeeeecall/shared/lib/learning-attempt-selection'
+import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import * as Crypto from 'expo-crypto'
 import type { SettingsStackParamList } from '../navigation/types'
 
@@ -52,6 +55,40 @@ const REASON_KEY: Record<string, string> = {
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 
+/**
+ * The remediation actions a learner can actually buy.
+ *
+ * Two, not six. An attempt stores `{ self_rated: score }` — a rating, with nothing the
+ * learner wrote — so `compare` and `evaluate` have no answer to work from and are
+ * deliberately unreachable. Nothing here may imply the model read a response that does not
+ * exist; it read the score and the card.
+ *
+ * Two actions are rendered as two inline text links rather than a menu: the repo has no
+ * dropdown primitive, and every other action on these screens is an inline link.
+ */
+const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; key: string; id: string }> = [
+  { action: 'explain', key: 'enrichment.action.explain', id: 'explain' },
+  { action: 'hint', key: 'enrichment.action.hint', id: 'hint' },
+]
+
+/** How many recent attempts the list shows — the same window as web's `AttemptHistory`. */
+const ATTEMPT_ROWS = 10
+
+/**
+ * Score → band label, using web's thresholds verbatim so the same attempt cannot read
+ * "Partly" on the phone and "Knew it" in the browser.
+ *
+ * Deliberately NOT `KNOWN_SCORE_THRESHOLD`, even though 0.75 appears in both: that constant
+ * gates what a learner can be CHARGED for, and aliasing it here would let a cosmetic tweak to
+ * a label silently change who gets offered a paid request.
+ */
+const scoreKey = (score: number | null): string => {
+  if (score === null) return 'history.score.unknown'
+  if (score >= 0.75) return 'today.rate.known'
+  if (score >= 0.25) return 'today.rate.partial'
+  return 'today.rate.again'
+}
+
 export function LearningTodayScreen() {
   const { t, i18n } = useTranslation('learning')
   const { t: tCommon } = useTranslation('common')
@@ -63,7 +100,9 @@ export function LearningTodayScreen() {
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    attempts, attemptsLoading, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
+    enrichmentQuote, loadEnrichmentQuote,
     resolveEnrichment, dismissEnrichment,
   } = useLearningStore()
 
@@ -102,11 +141,65 @@ export function LearningTodayScreen() {
     if (goalId) void fetchPlan(goalId, planDate)
   }, [goalId, planDate, fetchPlan])
 
+  /**
+   * Attempts are goal-scoped, not date-scoped, so this deliberately does NOT depend on
+   * `planDate` — a rollover at midnight must not re-query a list that did not change.
+   */
+  useEffect(() => {
+    if (goalId) void fetchAttempts(goalId)
+  }, [goalId, fetchAttempts])
+
   const reload = useCallback(async () => {
     if (!goalId) return
     setRefreshing(true)
-    try { await fetchPlan(goalId, planDate) } finally { setRefreshing(false) }
-  }, [goalId, planDate, fetchPlan])
+    // Both, not just the plan. Pulling to refresh a screen that then refreshes half of
+    // itself is worse than not offering the gesture: the attempt list would keep showing a
+    // stale score next to a paid action grounded in it.
+    try {
+      await Promise.all([fetchPlan(goalId, planDate), fetchAttempts(goalId)])
+    } finally { setRefreshing(false) }
+  }, [goalId, planDate, fetchPlan, fetchAttempts])
+
+  /**
+   * This goal's attempts.
+   *
+   * Filtered by `goal_id`, not merely sliced: `fetchAttempts` leaves the previous goal's rows
+   * in place until the new read lands, so for one round trip after a goal switch the list
+   * would show another goal's misses under this goal's heading — and a tap in that window
+   * would spend credits explaining a card the learner is no longer looking at. In the steady
+   * state the filter is a no-op, which is exactly what it should be.
+   */
+  const goalAttempts = useMemo(
+    () => attempts.filter((attempt) => attempt.goal_id === goalId),
+    [attempts, goalId],
+  )
+  const recentAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
+  // Which ROW is waiting, not which card. The store tracks only the pending CARD, and the
+  // learner this feature targets — someone who missed the same card twice — has two remediable
+  // rows sharing one card_id. Keying on the card makes both claim to be the request in flight.
+  const [requestingAttemptId, setRequestingAttemptId] = useState<string | null>(null)
+
+  /** Is any visible row worth paying to remediate? Drives the price line, and only it. */
+  const canRemediate = useMemo(
+    () => recentAttempts.some((attempt) => attempt.card_id !== null && attemptNeedsRemediation(attempt)),
+    [recentAttempts],
+  )
+
+  /**
+   * Read the price, but only when there is something to spend it on.
+   *
+   * `loadEnrichmentQuote` is a wallet RPC, so this fires on TRANSITIONS, never per render:
+   * once when a remediable row first appears, and again each time a request finishes
+   * (`enrichmentPendingCardId` back to null) — because the balance moved, and a number that
+   * was true one purchase ago is still a wrong number.
+   *
+   * A failed read leaves the quote `null`, which renders NO price at all. Never `$0.00`: the
+   * only error here that costs a learner money is understating what a request costs.
+   */
+  useEffect(() => {
+    if (!canRemediate || enrichmentPendingCardId !== null) return
+    void loadEnrichmentQuote()
+  }, [canRemediate, enrichmentPendingCardId, loadEnrichmentQuote])
 
   /**
    * Generation reads a FRESH context, never the rendered one: `ctx.now` is the due-card
@@ -321,12 +414,16 @@ export function LearningTodayScreen() {
                                 disabled={recording}
                                 onPress={() => {
                                   if (!goalId) return
+                                  // `recordAttempt` re-reads the PLAN only, so without this the
+                                  // attempt list below would not show the rating that was just
+                                  // given — exactly the moment it matters, since a fresh miss is
+                                  // the thing a learner would pay to have explained.
                                   void recordAttempt({
                                     planItem: item,
                                     goalId,
                                     score: rating.score,
                                     clientAttemptId: Crypto.randomUUID(),
-                                  }, planDate)
+                                  }, planDate).then((ok) => { if (ok) void fetchAttempts(goalId) })
                                 }}
                                 style={[
                                   styles.rateBtn,
@@ -354,6 +451,14 @@ export function LearningTodayScreen() {
                           disabled={enrichmentPendingCardId !== null}
                           onPress={() => void requestEnrichment({
                             action: 'explain', goalId, cardId: item.card_id as string, uiLang: i18n.language,
+                            // Grounded once this card has been attempted, card-scoped until
+                            // then — an explanation of a card nobody has tried yet is still a
+                            // legitimate request. The shared helper picks the attempt so this
+                            // row and the history rows below can never ground the same card in
+                            // two different attempts. `undefined` when there is none: the store
+                            // omits the key entirely rather than sending `null`, which the
+                            // server reads as a different request shape.
+                            attemptId: latestAttemptForCard(goalAttempts, item.card_id)?.id,
                           })}
                           style={[
                             styles.touchRow,
@@ -410,6 +515,123 @@ export function LearningTodayScreen() {
                   {planGenerating ? t('today.generating') : t('today.generate')}
                 </Text>
               </TouchableOpacity>
+            ) : null}
+
+            {/* Recent attempts — the review surface, and the only place a paid request can be
+                grounded in a specific miss rather than in the card alone.
+
+                No timestamp beyond the local date: `toLocaleString` is `Intl`, which these
+                screens do not use (an ICU-less Hermes build has no `Intl` at all), and the
+                list is already newest-first, so the day is the only part that adds anything. */}
+            {attemptsLoading && goalAttempts.length === 0 ? (
+              <ActivityIndicator {...testProps('learning-attempts-loading')} />
+            ) : recentAttempts.length > 0 ? (
+              <View style={styles.attemptSection} {...testProps('learning-attempt-history', true)}>
+                {/* Counts the rows ON SCREEN, not everything loaded — the store fetches 50 and
+                    this shows ten, so counting the former would print "(40)" above ten rows.
+                    `{{count, number}}` with a real number — the Intl-free formatter registered
+                    in src/i18n does the grouping. */}
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('history.title', { count: recentAttempts.length })}
+                </Text>
+
+                {/* The price, before the tap. `enrichmentQuote === null` means the wallet
+                    could not be read — then NO number is shown at all, because "$0.00" for
+                    something that charges is the one error a learner cannot recover from. */}
+                {canRemediate && enrichmentQuote !== null && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textTertiary }]}
+                    {...testProps('learning-attempt-quote')}
+                  >
+                    {t('enrichment.quote', {
+                      price: formatUsdMicro(enrichmentQuote.estPriceMicro),
+                      balance: formatUsdMicro(enrichmentQuote.balanceMicro),
+                    })}
+                  </Text>
+                )}
+
+                {recentAttempts.map((attempt, index) => {
+                  const cardId = attempt.card_id
+                  const card = cardId ? planCards[cardId] : undefined
+                  // Only today's plan cards are loaded, so an older attempt has no label to
+                  // show — hence the fallback, rather than a blank row.
+                  const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
+                  // A miss or a partial recall only. Offering to explain something the learner
+                  // just said they knew would be selling an answer with no question, and a
+                  // never-scored attempt is not evidence of a miss either.
+                  const remediable = attemptNeedsRemediation(attempt)
+                  // One request at a time, globally — the store short-circuits a second one, so
+                  // every row's actions go inert together instead of looking tappable.
+                  const busy = enrichmentPendingCardId !== null
+                  return (
+                    <View
+                      key={attempt.id}
+                      style={[styles.attemptRow, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                      {...testProps(`learning-attempt-${index}`, true)}
+                    >
+                      <View style={styles.attemptHead}>
+                        <Text
+                          style={[theme.typography.caption, { color: theme.colors.text, flex: 1 }]}
+                          numberOfLines={1}
+                        >
+                          {label || t('history.itemFallback', { type: attempt.activity_type })}
+                        </Text>
+                        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                          {t(scoreKey(attempt.normalized_score))}
+                        </Text>
+                      </View>
+                      <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                        {utcToLocalDateKey(attempt.created_at)}
+                      </Text>
+
+                      {remediable && cardId && goalId && (
+                        requestingAttemptId === attempt.id ? (
+                          <Text
+                            style={[theme.typography.caption, { color: theme.colors.textTertiary }]}
+                            {...testProps(`learning-attempt-pending-${index}`)}
+                          >
+                            {t('enrichment.requesting')}
+                          </Text>
+                        ) : (
+                          <>
+                            <View style={styles.attemptActions}>
+                              {REMEDIATION_ACTIONS.map((entry) => (
+                                <TouchableOpacity
+                                  key={entry.id}
+                                  disabled={busy}
+                                  onPress={() => {
+                                    setRequestingAttemptId(attempt.id)
+                                    void requestEnrichment({
+                                      action: entry.action,
+                                      goalId,
+                                      cardId,
+                                      // What makes the answer about THIS miss, not the card.
+                                      attemptId: attempt.id,
+                                      uiLang: i18n.language,
+                                    }).finally(() => setRequestingAttemptId(null))
+                                  }}
+                                  style={[styles.touchRow, busy && styles.disabled]}
+                                  hitSlop={HIT_SLOP}
+                                  accessibilityRole="button"
+                                  accessibilityState={{ disabled: busy }}
+                                  {...testProps(`learning-attempt-${entry.id}-${index}`)}
+                                >
+                                  <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                                    {t(entry.key)}
+                                  </Text>
+                                </TouchableOpacity>
+                              ))}
+                            </View>
+                            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                              {t('enrichment.groundedHint')}
+                            </Text>
+                          </>
+                        )
+                      )}
+                    </View>
+                  )
+                })}
+              </View>
             ) : null}
           </>
         )}
@@ -559,6 +781,12 @@ const styles = StyleSheet.create({
   primaryBtn: { marginTop: 10, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   secondaryBtn: { marginTop: 4, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   touchRow: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: 4 },
+  // The attempt list. `alignItems: 'center'` lives on the ROW (a flex row), never on the
+  // ScrollView's contentContainer — there it truncates long labels instead of centring them.
+  attemptSection: { gap: 6, marginTop: 6 },
+  attemptRow: { padding: 10, borderRadius: 10, borderWidth: 1, gap: 2 },
+  attemptHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  attemptActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   disabled: { opacity: 0.5 },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' },
   sheet: {

@@ -121,6 +121,8 @@
       "explain": "Explicación IA",
       "hint": "Pista de estudio"
     },
+    "quote": "Unos {{price}} por solicitud · quedan {{balance}}",
+    "groundedHint": "Responde a este intento, no solo a la tarjeta",
     "sources": "Fuentes",
     "noSources": "Esta respuesta no está basada en fuentes.",
     "empty": "El modelo no devolvió nada utilizable.",

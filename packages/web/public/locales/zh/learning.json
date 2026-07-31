@@ -121,6 +121,8 @@
       "explain": "AI 解释",
       "hint": "学习提示"
     },
+    "quote": "每次请求约 {{price}} · 余额 {{balance}}",
+    "groundedHint": "解答针对本次作答，而不只是这张卡片",
     "sources": "来源",
     "noSources": "此回答不基于来源。",
     "empty": "模型未返回可用内容。",
