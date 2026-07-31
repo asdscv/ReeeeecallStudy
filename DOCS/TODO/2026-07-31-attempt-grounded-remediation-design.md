@@ -3,8 +3,9 @@
 - **Status:** PR A **complete and verified locally** (whole CI SQL job reproduced green on a fresh
   DB); commit/merge pending. PR B **not started.** See §10 for the exact line.
 - **Implements:** [ai-personalization-gaps](./2026-07-31-ai-personalization-gaps.md) §5 ①.
-- **Base:** `origin/develop` `8008259`, branch `feat/attempt-grounded-remediation`.
-- **Splits as:** **PR A** server + store contract (mig 176, edge fn, shared store, SQL tests).
+- **Base:** branched at `origin/develop` `8008259`; develop merged in at `d1e4b21` (which is why
+  the migration is numbered 178, not 175 — see §10.1). Branch `feat/attempt-grounded-remediation`.
+- **Splits as:** **PR A** server + store contract (mig 178, edge fn, shared store, SQL tests).
   **PR B** the surfaces (web attempt rows, mobile attempt list, i18n, UI tests). B depends on A.
 
 ---
@@ -66,7 +67,7 @@ indexed query (`idx_answer_attempts_card`, user-filtered) and it is capped, so a
 `prompt_version` moves to `remediation-v2`. The column exists so a stored enrichment says which
 prompt produced it; reusing `v1` for a different prompt would make that column a lie.
 
-## 4. Migration 176 — record what the answer was grounded in
+## 4. Migration 178 — record what the answer was grounded in
 
 `user_enrichments` has `goal_id / concept_id / card_id / activity_id` but **no `attempt_id`**, and
 `persist_ai_remediation` has no parameter for one. `request_fingerprint` is
@@ -154,14 +155,14 @@ already has an attempt (completed items). No new button on the plan row.
   attemptId)` cache existed; it does not, and PR B must not assume a repeat click is free.
   When a cache is added it has to key on `(cardId, attemptId)`, never on the card alone: a
   grounded explanation is about one failure and must not be replayed as if it were about the
-  card. `attempt_id` (mig 176) is what makes that key expressible; the 128-char truncated
+  card. `attempt_id` (mig 178) is what makes that key expressible; the 128-char truncated
   fingerprint could not.
 
 ## 8. Testing
 
 | Layer | What is pinned | Where |
 |---|---|---|
-| SQL (mig 176) | `attempt_id` persists; a foreign attempt is rejected `42501` by both `reserve_ai_remediation` and `persist_ai_remediation`; the old 12-arg function no longer exists (no silent-drop overload); grants restored | `supabase/tests/ai_remediation_test.sql` (extended) |
+| SQL (mig 178) | `attempt_id` persists; a foreign attempt is rejected `42501` by both `reserve_ai_remediation` and `persist_ai_remediation`; the old 12-arg function no longer exists (no silent-drop overload); grants restored | `supabase/tests/ai_remediation_test.sql` (extended) |
 | Pure helper | newest attempt wins, deterministic tie-break, `null` when the card has none, ignores other cards | `learning-attempt-selection.test.ts` (new) |
 | Store | `attemptId` reaches the edge payload; omitting it sends no key; quote loads and a failed quote leaves the feature usable; each errcode still maps to its own state | `learning-store.test.ts` (extended) |
 | UI | the menu appears only for attempts scored below "known"; `explain`/`hint` pass the attempt id; the quote renders; a request in flight disables the menu | `learning-pages.test.tsx` (extended) |
@@ -170,7 +171,7 @@ already has an attempt (completed items). No new button on the plan row.
 ## 9. Rollout
 
 PR A is inert on its own: the new column is nullable, the new parameter defaults to `NULL`, and no
-client sends an attempt yet. PR B turns it on. Production still lacks the learning chain (165–176),
+client sends an attempt yet. PR B turns it on. Production still lacks the learning chain (165–178),
 which is owner-gated and unchanged by this workstream. Rollback is reverting B, then A; the column
 can stay (additive, nullable) if only B is reverted.
 
@@ -182,8 +183,8 @@ can stay (additive, nullable) if only B is reverted.
 
 | Done | Where |
 |---|---|
-| mig 176: `user_enrichments.attempt_id` (+ index), `persist_ai_remediation` recreated with `p_attempt_id` and an ownership check, old 12-arg function dropped, grants re-issued | `supabase/migrations/176_enrichment_attempt_provenance.sql` |
-| Rollback script, marked destructive (dropping the column discards provenance) | `supabase/rollbacks/176_enrichment_attempt_provenance.down.sql` |
+| mig 178: `user_enrichments.attempt_id` (+ index), `persist_ai_remediation` recreated with `p_attempt_id` and an ownership check, old 12-arg function dropped, grants re-issued | `supabase/migrations/178_enrichment_attempt_provenance.sql` |
+| Rollback script, marked destructive (dropping the column discards provenance) | `supabase/rollbacks/178_enrichment_attempt_provenance.down.sql` |
 | Prompt: `attemptHistory` (≤5, score+timestamp only) in the context contract, plus explicit instructions to USE the attempt as evidence and to never claim to know an answer the learner never wrote | `supabase/functions/_shared/ai-remediation.ts` |
 | Edge fn: attempt row now also carries `hints_used` / `duration_ms`; same-card attempt history query (capped, user-scoped, failure is non-fatal); `p_attempt_id` persisted; `prompt_version` → `remediation-v2` | `supabase/functions/ai-generate/index.ts` |
 | Store: `requestEnrichment({ ..., attemptId? })` passthrough (key omitted when absent), `enrichmentQuote` + `loadEnrichmentQuote()` (fails to `null`, never renders a price of 0), reset covers the quote | `packages/shared/stores/learning-store.ts` |
@@ -197,16 +198,27 @@ can stay (additive, nullable) if only B is reverted.
 
 ### 10.1 Defects found while finishing PR A — all fixed
 
-1. **The migration number collided.** It was written as `175`, but `175_admin_list_payments_refund_status.sql`
-   had already merged (PR #371). Two migrations sharing a number is not something CI catches —
-   the glob applies both — so it would have reached prod as a permanently ambiguous ordering.
-   Renumbered to **176** everywhere (file, rollback, SQL test, edge fn comment, this doc).
+1. **The migration number collided — twice.** It was written as `175`, but
+   `175_admin_list_payments_refund_status.sql` had already merged (#371). Renumbered to `176` —
+   which then collided too, because `176_drop_dead_session_override.sql` (#372) and
+   `177_admin_growth_levers_read.sql` (#375) landed on develop while this branch was in flight.
+   Final number is **178**, after merging develop in.
+
+   Worth recording precisely, because the two CI jobs disagree about whether this is an error:
+   the **plain `psql` loop** in the AI-metering job applies both files happily (the glob just
+   sorts them), which is why a local reproduction of that job stayed green through the whole
+   first round. **`supabase db reset`** (Migration Safety / Integration) does catch it —
+   `supabase_migrations.schema_migrations` has a unique key on the numeric version, so the second
+   `176` died on `duplicate key value violates unique constraint "schema_migrations_pkey"`.
+   The lesson for the next migration on this repo: **`git fetch` develop and check the highest
+   number immediately before pushing**, because a number that was free when the branch started
+   may not be when it merges.
 2. **The learning dry run would have failed CI.** `scripts/dry-run-learning-migrations.sh` reverts
    165/167/168/169, and `168.down` drops `persist_ai_remediation` by its exact **12-argument**
    signature. This migration replaces that function with a **13-argument** one, which the drop
    therefore misses, so the function survived the rollback and
    `learning_dry_run_check.sql` failed with `[before] expected a clean slate, found 1 learning
-   functions`. Fixed by adding 176 to the script's `MIGRATIONS`/`ROLLBACKS`, reverted before 168.
+   functions`. Fixed by adding 178 to the script's `MIGRATIONS`/`ROLLBACKS`, reverted before 168.
 3. **The rollback was not idempotent.** Its `ALTER TABLE user_enrichments DROP COLUMN` aborted on
    the dry run's second revert pass, which runs after 165 has already dropped the table — the
    exact "backing out a half-applied rollout must not itself fail" property that phase exists to
@@ -230,7 +242,7 @@ can stay (additive, nullable) if only B is reverted.
    `(cardId, attemptId)`". `request_fingerprint` is written and never read by anything. Corrected
    — PR B must not assume a repeat click is free.
 
-Also wrapped 176 in `BEGIN/COMMIT` (as mig 168 is): it DROPs the only function that can persist a
+Also wrapped 178 in `BEGIN/COMMIT` (as mig 168 is): it DROPs the only function that can persist a
 paid remediation, so a failure between the drop and the create would leave every paid call
 charging the wallet and then failing to store its result. And `EnrichmentQuote` was missing from
 web's `learning-store` re-export facade, which PR B needs to render the quote.
@@ -248,13 +260,13 @@ Verified by running, not by reading:
 - a **fresh** database bootstrapped and stepped through the whole CI SQL job: all migrations apply
   in order, **21/21** SQL suites pass, and the learning dry run passes last — `LEARNING_DRY_RUN_PASSED`
 - exactly one `persist_ai_remediation` (13 args); `anon` f / `authenticated` f / `service_role` t
-- re-applying 176 on top of itself is a no-op (every step `IF EXISTS`/`IF NOT EXISTS`)
+- re-applying 178 on top of itself is a no-op (every step `IF EXISTS`/`IF NOT EXISTS`)
 - the rollback restores mig 168's function body **byte-for-byte** (diffed, not eyeballed)
 - `deno check` clean on `ai-generate/index.ts` and `_shared/ai-remediation.ts` (deno 2.9.3 IS
   available locally — an earlier note in this repo's history said it was not)
 - **mutation-tested, each fix individually reverted and confirmed red:**
   storing `NULL` instead of `p_attempt_id` → `attempt provenance was not stored`;
-  dropping 176 from the dry run's rollback list → `[before] expected a clean slate, found 1
+  dropping 178 from the dry run's rollback list → `[before] expected a clean slate, found 1
   learning functions`; removing `IF EXISTS` → `ERROR: relation "user_enrichments" does not exist`;
   always sending `attemptId` → the payload-shape test fails; a zeroed quote instead of `null` →
   the "wallet cannot be read" test fails; removing the pair check → `expected rejection of an

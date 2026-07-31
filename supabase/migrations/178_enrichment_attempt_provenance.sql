@@ -1,5 +1,5 @@
 -- ============================================================================
--- 176: record WHICH attempt a paid remediation was grounded in
+-- 178: record WHICH attempt a paid remediation was grounded in
 -- ============================================================================
 --
 -- `reserve_ai_remediation` (mig 168) has always accepted `p_attempt_id` and ownership-checked

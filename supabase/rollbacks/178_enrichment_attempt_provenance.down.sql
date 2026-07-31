@@ -1,5 +1,5 @@
 -- ============================================================================
--- Down migration for 176_enrichment_attempt_provenance
+-- Down migration for 178_enrichment_attempt_provenance
 -- For local/dev rollback. Not auto-applied; run manually if needed.
 --
 -- Restores mig 168's 12-argument `persist_ai_remediation` and drops the attempt column.

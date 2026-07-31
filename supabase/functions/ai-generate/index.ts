@@ -445,7 +445,7 @@ Deno.serve(async (req) => {
         // Only fetched when the request is attempt-grounded AND names a card: without a card
         // there is no "same item" to build a history for.
         // Keyed on the card the ATTEMPT is on — not the card the request happens to name. Those
-        // can differ (mig 176 rejects that pair, but only later, at the write), and a history
+        // can differ (mig 178 rejects that pair, but only later, at the write), and a history
         // built from the wrong card would hand the model a "failure pattern" for another item.
         // An attempt against an activity rather than a card has no same-card history at all.
         const attemptCardId = (attemptResult.data as { card_id?: string | null } | null)?.card_id ?? null
@@ -497,7 +497,7 @@ Deno.serve(async (req) => {
           p_model_version: model.model,
           p_provider: model.provider,
           p_prompt_version: 'remediation-v2',
-          // Provenance (mig 176). `request_fingerprint` is a 128-char truncation and cannot be
+          // Provenance (mig 178). `request_fingerprint` is a 128-char truncation and cannot be
           // relied on to say which failure this answer was about.
           p_attempt_id: refs.attemptId,
         })

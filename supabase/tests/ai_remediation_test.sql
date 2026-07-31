@@ -42,7 +42,7 @@ END $$;
 DO $$ BEGIN
   ASSERT NOT has_function_privilege('anon', 'public.reserve_ai_remediation(text,uuid,uuid,uuid,uuid[],uuid[])', 'EXECUTE'), 'anon reserve grant';
   ASSERT has_function_privilege('authenticated', 'public.reserve_ai_remediation(text,uuid,uuid,uuid,uuid[],uuid[])', 'EXECUTE'), 'authenticated reserve grant';
-  -- Signature is the 13-arg one since mig 176 (+ p_attempt_id). The drop-and-recreate loses
+  -- Signature is the 13-arg one since mig 178 (+ p_attempt_id). The drop-and-recreate loses
   -- mig 168's grants, so these two assertions are what catch a forgotten re-GRANT.
   -- anon as well as authenticated: default privileges grant EXECUTE to BOTH client roles
   -- directly, so revoking one and forgetting the other still leaves the function reachable.
@@ -121,7 +121,7 @@ BEGIN
   EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
 
--- ── mig 176: attempt provenance ─────────────────────────────────────────────
+-- ── mig 178: attempt provenance ─────────────────────────────────────────────
 --
 -- The whole point of grounding a paid answer in an attempt is being able to say later WHICH
 -- failure it was about. A truncated request_fingerprint cannot do that, so the column is what
