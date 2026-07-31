@@ -59,7 +59,7 @@ reversal). No change needed.
 | **Disposable-email denylist at signup** | A bad list blocks real signups. | BEFORE INSERT trigger / Auth hook reading a small config table. |
 | **Credit expiry** (breakage / deferred-revenue) | Policy + must disclose in ToS first. | Optional `valid_until` + scheduled sweep, off by default. |
 | **Push / broadcast announcements** | Larger feature (persist expo tokens + broadcast fn + consent). | Own project. |
-| **Dead code**: `admin_set_session_override` / `max_sessions_override` (mig 048/049, ignored by mig 093) | Pure cleanup, no urgency. | DROP the fn + column, or re-wire into `register_session` if you want per-tier device counts. |
+| ~~**Dead code**: `admin_set_session_override` / `max_sessions_override`~~ | ✅ **DONE (mig 176)** — dropped. It was not inert but *misleading*: the function still passed its `is_admin()` gate and still answered `{"success": true}` while changing nothing, because mig 093's one-session-per-platform rewrite never read the key (confirmed against `pg_proc`: the only mention left was its own writer). It also wrote to the legacy `subscriptions` table, so even a re-wire would have read the wrong place. The dead JSONB key is stripped too — printed to the apply log first — so a future per-tier device-count feature cannot silently inherit overrides set months earlier. `session_override_removed_test.sql` re-proves the live limiter after the removal. |
 | **Account deletion grace window** (soft-delete before purge) | Changes destructive semantics — needs care. | Make `delete_user_account` soft-delete + a scheduled purge. |
 
 ---
