@@ -40,12 +40,17 @@ jobs:
       - name: Web typecheck
         run: pnpm --filter @reeeeecall/web exec tsc -b --noEmit
 
-      # Lint is currently informational — develop has pre-existing eslint
-      # debt (no-explicit-any, no-unused-vars, react-hooks/rules-of-hooks).
-      # Tracked for cleanup in a dedicated PR; this workflow doesn't gate on it.
-      - name: Web lint (informational)
+      # The Playwright suite is in no other tsconfig, so without this nothing ever
+      # type-checked it and its fixtures drifted to `any`.
+      - name: Web e2e typecheck
+        run: pnpm --filter @reeeeecall/web typecheck:e2e
+
+      # Strict gate. It was informational while develop carried 148 eslint errors;
+      # those are cleared (6 were real defects, the rest missing types and
+      # effect-driven state), so the escape hatch comes off and the debt cannot
+      # silently return.
+      - name: Web lint
         run: pnpm --filter @reeeeecall/web lint
-        continue-on-error: true
       - name: Mobile typecheck (regression guard for marketplace scope)
         run: |
           set +e
@@ -75,21 +80,20 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
 
-      # Strict gate — marketplace acquire scope tests must pass.
-      # Pre-existing failures in unrelated suites (guide.json i18n, etc.)
-      # are tracked as tech debt and fixed in dedicated PRs, not here.
-      - name: Vitest — marketplace acquire scope (REQUIRED)
-        working-directory: packages/web
-        run: |
-          npx vitest run \
-            src/stores/__tests__/marketplace-acquire-atomic.test.ts \
-            src/stores/__tests__/deck-store-subscriptions.test.ts
-
-      # Full suite — informational only; tracks debt without blocking.
-      - name: Vitest — full suite (informational)
+      # Strict gate — the whole suite. It used to be informational because develop
+      # carried 75 failures and 6 suites that never loaded; those were harness
+      # defects (mocks that never applied, missing test env, unusable localStorage),
+      # not product debt, and they hid a real auth bug. Now that the suite is green
+      # it gates, so the debt cannot come back silently.
+      - name: Vitest — full suite
         working-directory: packages/web
         run: npx vitest run --reporter=verbose
-        continue-on-error: true
+
+      # The Cloudflare worker modules (SEO handlers, locale policy, sitemap, content
+      # pipeline) are outside packages/*, so no job ran their 123 tests — the locale
+      # policy's noindex/hreflang/sitemap guarantees had no CI guard at all.
+      - name: Vitest — worker modules
+        run: pnpm test:worker
 
       - name: Upload coverage
         if: always()
@@ -284,3 +288,97 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_sub_lock_test.sql
+
+      - name: Run card-limit RLS hardening assertions (reactivation guard + deck-ownership)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/card_limit_rls_test.sql
+
+      - name: Run payment edge-case hardening assertions (mig 144 — terminal guard / retire / clawback / transfer)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/payment_edgecase_test.sql
+
+      - name: Run store-SKU catalog assertions (mig 151 — resolve / set / get_billing_products(platform) / unique-active)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/billing_sku_catalog_test.sql
+
+      # This list is explicit, not a glob, so a new suite is invisible to CI until it
+      # is added here — refund_policy_test.sql shipped in #320 and never ran.
+      - name: Run refund channel + policy assertions (migs 156/157 — iOS revoke-only vs Play refundable, eligibility verdicts)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/refund_policy_test.sql
+
+      - name: Run credit refund-guard assertions (mig 158 — refund-before-grant tombstone is actually readable)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/credit_refund_guard_test.sql
+
+      - name: Run credit clawback REVERSAL assertions (mig 173 — REFUND_REVERSED restores exactly, tombstone stops blocking)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/credit_clawback_reversal_test.sql
+
+      - name: Run sandbox isolation assertions (mig 159 — kill switch + sandbox never counts as money)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/sandbox_environment_test.sql
+
+      - name: Run admin payment-list refund-status assertions (mig 175 — a refunded pack must not list as paid)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin_payment_refund_status_test.sql
+
+      - name: Run session-override removal assertions (mig 176 — dead key gone, one-session-per-platform intact)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/session_override_removed_test.sql
+
+      - name: Run growth-lever assertions (mig 177 — read path, setter round trips, refused bounds)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin_growth_levers_test.sql
+
+      # ── Learning engine (migs 165/167/168) ──────────────────────────────
+      # These shipped with the learning-engine PR and were not wired here, so
+      # they never ran on CI. Registered explicitly, like every suite above.
+      - name: Run learning engine assertions (migs 165/167 — atomicity, idempotency, lifecycle vs apply_study_rating)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_engine_test.sql
+
+      - name: Run learning goal-link assertions (mig 172 — deck/concept entitlement, replace-all atomicity)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_goal_links_test.sql
+
+      - name: Run study recommendation assertions (mig 174 — decisions survive regeneration, terminal states)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/study_recommendation_test.sql
+
+      - name: Run AI remediation assertions (mig 168 — job classification, access, service-only persistence)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/ai_remediation_test.sql
+
+      - name: Run learning engine SMOKE assertions (goal → plan → attempt → rollup → remediation → enrichment)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_smoke_test.sql
+
+      - name: Run learning engine NET-ZERO assertions (every rejected call changes nothing, quota included)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_net_zero_test.sql
+
+      # Runs last in this job: it reverts and re-applies migrations 165/167/168/169
+      # against the throwaway service database to prove the rollback artifacts
+      # leave zero residue, then restores them.
+      - name: Run learning migration DRY RUN (apply → rollback → zero residue → restore)
+        env:
+          PGPASSWORD: postgres
+          DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: ./scripts/dry-run-learning-migrations.sh

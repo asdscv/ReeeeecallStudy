@@ -218,23 +218,7 @@
             "/images/guide/ai-generate/mobile-01-page.png"
           ],
           "title": "¿Qué es la generación automática con IA?",
-          "body": "Crea tarjetas automáticamente con IA. Escribe un tema y la IA genera todo por ti.\n\nProveedores compatibles: Google Gemini (¡gratis!), OpenAI, xAI/Grok, Anthropic.\n\nTu clave de API se guarda solo en tu dispositivo, nunca se envía a nuestros servidores."
-        },
-        "apiKey": {
-          "images": [
-            "/images/guide/ai-generate/mobile-02-config.png"
-          ],
-          "title": "Configurar la clave de API",
-          "body": "Obtén una clave de API de tu proveedor preferido:\n• Google Gemini (GRATIS): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nIntroduce la clave en los ajustes de Generación con IA. Las claves se guardan localmente en tu dispositivo.\n\n💡 Recomendamos Google Gemini 2.5 Flash, ¡completamente gratis!"
-        },
-        "geminiSetup": {
-          "images": [
-            "/images/guide/gemini-api/02-get-api-key.png",
-            "/images/guide/gemini-api/03-create-api-key.png",
-            "/images/guide/gemini-api/05-api-key-created.png"
-          ],
-          "title": "🎯 Clave de API de Gemini gratis (recomendado)",
-          "body": "Gemini 2.5 Flash es 100% GRATIS, ¡sin tarjeta de crédito!\n\nLímites gratuitos: 15 sol./min, 1.500 sol./día, 1M tokens/min\n\nCómo obtener tu clave:\n1. Ve a aistudio.google.com\n2. Inicia sesión con tu cuenta de Google\n3. Haz clic en \"Get API Key\" en la barra lateral\n4. Haz clic en \"Create API Key\"\n5. Selecciona \"Create API key in new project\"\n6. Copia la clave (empieza por \"AIza...\")\n\nCómo usarla en ReeeeecallStudy:\n1. Abre la página de Generación con IA\n2. Selecciona \"Google Gemini\" como proveedor\n3. Pega tu clave de API\n4. Elige el modelo \"Gemini 2.5 Flash\"\n5. ¡Escribe un tema y genera!\n\n¿Por qué Gemini Flash?\n• 💰 Gratis, sin configurar facturación\n• ⚡ Rápido, 50 tarjetas en segundos\n• 🎯 Preciso, ideal para educación\n• 🌍 Compatible con todos los idiomas\n• 📚 1.500 solicitudes diarias, miles de tarjetas"
+          "body": "Crea tarjetas automáticamente con IA. Escribe un tema y la IA generará todo por ti.\n\nNo necesitas clave de API ni configuración: la generación se ejecuta en nuestros servidores.\n\nCada día recibes tarjetas de IA gratis; más allá de eso, se descuenta de tu saldo de créditos."
         },
         "fullGeneration": {
           "images": [

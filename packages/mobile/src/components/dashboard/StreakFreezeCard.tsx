@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../../theme'
 import type { FreezeInfo } from '../../hooks/useGamification'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 
 interface StreakFreezeCardProps {
   freezeInfo: FreezeInfo
@@ -23,7 +24,7 @@ export function StreakFreezeCard({ freezeInfo, totalXp }: StreakFreezeCardProps)
         </Text>
         {totalXp != null && totalXp > 0 && (
           <Text style={[styles.xpText, { color: palette.yellow[600] }]}>
-            +{totalXp.toLocaleString()} XP
+            +{formatCount(totalXp)} XP
           </Text>
         )}
       </View>

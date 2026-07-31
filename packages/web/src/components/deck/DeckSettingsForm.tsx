@@ -1,32 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import type { SrsSettings, CardTemplate } from '../../types/database'
 import { LEARNING_LANGUAGES, NATIVE_LANGUAGES, STUDY_LEVELS } from '../../lib/marketplace'
-
-export const COLORS = [
-  '#3B82F6', '#EF4444', '#22C55E', '#F59E0B',
-  '#8B5CF6', '#EC4899', '#06B6D4', '#6B7280',
-]
-
-export const ICONS = ['📚', '📖', '🇨🇳', '🇺🇸', '🇯🇵', '🧠', '💡', '📝']
-
-export const SRS_FIELDS: { key: keyof SrsSettings; labelKey: string; color: string }[] = [
-  { key: 'again_days', labelKey: 'study:srsRating.again', color: 'text-destructive' },
-  { key: 'hard_days', labelKey: 'study:srsRating.hard', color: 'text-warning' },
-  { key: 'good_days', labelKey: 'study:srsRating.good', color: 'text-brand' },
-  { key: 'easy_days', labelKey: 'study:srsRating.easy', color: 'text-success' },
-]
-
-export interface DeckSettingsFormValues {
-  name: string
-  description: string
-  color: string
-  icon: string
-  templateId: string
-  learningLanguage: string
-  nativeLanguages: string[]
-  studyLevel: string
-  srsSettings: SrsSettings
-}
+import { COLORS, ICONS, SRS_FIELDS, type DeckSettingsFormValues } from '../../lib/deck-settings'
+import { numericInputOr, parseNumericInput } from '../../lib/numeric-input'
 
 interface DeckSettingsFormProps {
   values: DeckSettingsFormValues
@@ -175,7 +151,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
         <label className="block text-sm font-medium text-foreground mb-1">
           {t('nativeLanguage.label', { ns: 'marketplace' })}
           <span className="ml-2 text-xs font-normal text-muted-foreground">
-            {t('nativeLanguage.multiHint', { ns: 'marketplace', defaultValue: 'Select all that apply' })}
+            {t('nativeLanguage.multiHint', { ns: 'decks' })}
           </span>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -273,7 +249,7 @@ export function DeckSettingsForm({ values, onChange, templates }: DeckSettingsFo
           value={srsSettings.max_interval_days ?? 365}
           onChange={(e) => {
             const raw = e.target.value
-            update({ srsSettings: { ...srsSettings, max_interval_days: raw === '' ? ('' as any) : (parseInt(raw) || 0) } })
+            update({ srsSettings: { ...srsSettings, max_interval_days: numericInputOr(parseNumericInput(raw), 0) } })
           }}
           onBlur={() => {
             const n = typeof srsSettings.max_interval_days === 'number' ? srsSettings.max_interval_days : 365

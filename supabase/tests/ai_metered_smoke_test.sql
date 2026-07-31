@@ -41,7 +41,7 @@ DO $$ DECLARE j jsonb; jr text; b0 bigint; b1 bigint; BEGIN
   PERFORM charge_ai_generation(auth.uid(), jr, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id=auth.uid();
   ASSERT b1 < b0, format('SMOKE wallet debited %s → %s', b0, b1);
-  ASSERT b1 = b0 - 675000, format('SMOKE charged 675000 (paid_share 1/3), got %s', b0 - b1);  -- price for jr
+  ASSERT b1 = b0 - 500, format('SMOKE charged 500 (paid_share 1/3), got %s', b0 - b1);  -- price for jr
 END $$;
 
 -- ════════════════════════════ NET-ZERO ════════════════════════════
@@ -74,24 +74,24 @@ SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE p record; n0 int; n1 int; BEGIN
   SELECT count(*) INTO n0 FROM ai_cost_ledger;
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
-  ASSERT p.cost_won_micros = 405000 AND p.price_won_micros = 2025000 AND p.margin_bps = 8000,
+  ASSERT p.cost_won_micros = 300 AND p.price_won_micros = 1500 AND p.margin_bps = 8000,
     format('DRY-RUN flash-lite %s', p);
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash', 1000, 800);
-  -- cost_usd=(1000*300000+800*2500000)/1e6=2300; cost_won=3105000; price=×5=15525000
-  ASSERT p.price_won_micros = 15525000, format('DRY-RUN flash %s', p.price_won_micros);
+  -- cost_usd=(1000*300000+800*2500000)/1e6=2300; cost_won=2300; price=×5=11500
+  ASSERT p.price_won_micros = 11500, format('DRY-RUN flash %s', p.price_won_micros);
   SELECT count(*) INTO n1 FROM ai_cost_ledger;
   ASSERT n0 = n1, 'DRY-RUN wrote nothing';
 END $$;
 
 -- ════════════════════════════ EST-PRICE (mig 115) ════════════════════════════
 -- refresh_ai_est_price calibrates from the real (non-estimated) per-paid-card price.
--- Only real charged row is the SMOKE charge: price 675000 / 2 paid = 337500.
+-- Only real charged row is the SMOKE charge: price 500 / 2 paid = 250.
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE v bigint; setv bigint; BEGIN
   v := refresh_ai_est_price();
-  ASSERT v = 337500, format('EST-PRICE refreshed to avg per-paid-card, got %s', v);
+  ASSERT v = 250, format('EST-PRICE refreshed to avg per-paid-card, got %s', v);
   SELECT est_price_per_card_micro INTO setv FROM ai_pricing_settings WHERE id=1;
-  ASSERT setv = 337500, format('EST-PRICE setting updated, got %s', setv);
+  ASSERT setv = 250, format('EST-PRICE setting updated, got %s', setv);
 END $$;
 SELECT set_config('request.jwt.claim.role', 'authenticated', false);
 DO $$ BEGIN

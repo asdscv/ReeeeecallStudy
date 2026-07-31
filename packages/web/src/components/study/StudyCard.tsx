@@ -75,44 +75,58 @@ export function StudyCard({
   const swipeEnabled = inputSettings ? shouldEnableSwipe(inputSettings) : false
   const dirs = swipeDirections ?? DEFAULT_DIRECTIONS
 
-  // ── 2D flip animation ──────────────────────────────────
+  // ── 2D flip animation (render-time state + timer effect) ──────────
   // No CSS 3D at all. Fade out → swap content → fade in.
   // Card body has ZERO transforms when idle → iOS momentum scroll works.
-  // Timer managed via ref to avoid cleanup-clears-timer bug.
-  useEffect(() => {
-    const target = isFlipped ? 'back' : 'front'
-
-    // Cancel any in-flight fade
-    if (fadeTimerRef.current) {
-      clearTimeout(fadeTimerRef.current)
-      fadeTimerRef.current = null
+  // State transitions at render time avoid synchronous setState in effects.
+  // Timer lifecycle in effect since refs cannot be accessed during render.
+  const [prevIsFlipped, setPrevIsFlipped] = useState(isFlipped)
+  const flipTarget = isFlipped ? 'back' : 'front'
+  if (isFlipped !== prevIsFlipped) {
+    setPrevIsFlipped(isFlipped)
+    if (displaySide !== flipTarget) {
+      setIsFading(true)
+    } else {
       setIsFading(false)
     }
+  }
 
+  // Timer manages the delayed side swap; only async setState in callback (allowed).
+  useEffect(() => {
+    const target = isFlipped ? 'back' : 'front'
     if (displaySide === target) return
-
-    setIsFading(true)
+    // Cancel previous timer on re-entry (rapid flips)
+    if (fadeTimerRef.current) { clearTimeout(fadeTimerRef.current); fadeTimerRef.current = null }
     fadeTimerRef.current = setTimeout(() => {
       fadeTimerRef.current = null
       setDisplaySide(target)
       setIsFading(false)
     }, 150)
-  }, [isFlipped, displaySide]) // isFading intentionally excluded — it's output, not input
+    return () => {
+      if (fadeTimerRef.current) { clearTimeout(fadeTimerRef.current); fadeTimerRef.current = null }
+    }
+  }, [isFlipped, displaySide])
 
   // ── Reset ALL state when card changes ──────────────────
+  // State resets during render (pattern #2) to avoid set-state-in-effect;
+  // ref resets stay in effect since refs must not be accessed during render.
+  const [prevCardId, setPrevCardId] = useState(card.id)
+  if (prevCardId !== card.id) {
+    setPrevCardId(card.id)
+    setSwipeDelta({ x: 0, y: 0 })
+    setPreview(null)
+    setIsSwiping(false)
+    setDisplaySide('front')
+    setIsFading(false)
+  }
+
   useEffect(() => {
-    if (prevCardIdRef.current !== card.id) {
-      prevCardIdRef.current = card.id
-      pointerOriginRef.current = null
-      deltaRef.current = { x: 0, y: 0 }
-      committedRef.current = 'none'
-      if (fadeTimerRef.current) { clearTimeout(fadeTimerRef.current); fadeTimerRef.current = null }
-      setSwipeDelta({ x: 0, y: 0 })
-      setPreview(null)
-      setIsSwiping(false)
-      setDisplaySide('front')
-      setIsFading(false)
-    }
+    // Ref cleanup runs in effect to satisfy react-hooks/refs rule.
+    prevCardIdRef.current = card.id
+    pointerOriginRef.current = null
+    deltaRef.current = { x: 0, y: 0 }
+    committedRef.current = 'none'
+    if (fadeTimerRef.current) { clearTimeout(fadeTimerRef.current); fadeTimerRef.current = null }
   }, [card.id])
 
   // Resolve card face content
@@ -196,7 +210,9 @@ export function StudyCard({
         // Only capture pointer for mouse — touch has implicit capture,
         // and setPointerCapture on touch causes pointercancel on mobile browsers.
         if (e.pointerType === 'mouse') {
-          try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch {}
+          // Some browsers reject capture for a pointer that already ended; swipe
+          // tracking works without it, so a failure here is not worth reporting.
+          try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId) } catch { /* capture is best-effort */ }
         }
       } else {
         committedRef.current = 'scroll'
@@ -211,7 +227,7 @@ export function StudyCard({
 
   function handlePointerUp(e: React.PointerEvent) {
     if (committedRef.current === 'swipe' && e.pointerType === 'mouse') {
-      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch {}
+      try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId) } catch { /* nothing to release */ }
     }
 
     const origin = pointerOriginRef.current

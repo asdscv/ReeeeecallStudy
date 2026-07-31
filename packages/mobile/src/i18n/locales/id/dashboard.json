@@ -18,16 +18,16 @@
     "title": "Status Dek",
     "noDecks": "Belum ada dek. Buat satu!",
     "goToDecks": "Ke Manajemen Dek",
-    "cardCount": "{{count}} kartu",
-    "newCards": "Baru {{count}}",
-    "reviewCards": "Ulasan {{count}}",
+    "cardCount": "{{count, number}} kartu",
+    "newCards": "Baru {{count, number}}",
+    "reviewCards": "Ulasan {{count, number}}",
     "study": "Belajar"
   },
   "heatmap": {
     "title": "Peta Panas Belajar"
   },
   "gamification": {
-    "freezes": "{{count}} freezes left",
+    "freezes": "{{count, number}} freezes left",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,23 +42,23 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count}} cards",
-    "sessions": "Complete {{count}} sessions",
-    "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores",
+    "cards": "Study {{count, number}} cards",
+    "sessions": "Complete {{count, number}} sessions",
+    "time": "Study for {{count, number}} minutes",
+    "perfect": "Get {{count, number}} perfect scores",
     "completed": "Selesai"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "motivational": "Keep going! You're doing great!"
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days",
+  "streakDays": "{{count, number}} hari",
   "quickStudy": {
     "title": "Belajar Cepat",
-    "dueToday": "{{count}} kartu jatuh tempo hari ini",
+    "dueToday": "{{count, number}} kartu jatuh tempo hari ini",
     "startSession": "Mulai sesi belajar"
   }
 }

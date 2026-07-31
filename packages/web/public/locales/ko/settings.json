@@ -8,17 +8,11 @@
   "autoSaved": "저장됨",
   "links": {
     "userGuide": "사용법 가이드",
-    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
-    "apiDocs": "API 문서",
-    "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법"
   },
   "guide": {
     "title": "사용법 가이드",
     "desc": "기능 설명, 학습 팁, 공유 방법"
-  },
-  "apiDocs": {
-    "title": "API 문서",
-    "desc": "API 엔드포인트, 인증, 사용 예시"
   },
   "profile": {
     "title": "프로필",
@@ -147,8 +141,8 @@
     "upgrade": "업그레이드 (준비 중)",
     "upgradeSoon": "구독은 준비 중이에요.",
     "unlimited": "무제한",
-    "countUnlimited": "{{owned}}장 / 무제한",
-    "planNoteUnlimited": "현재 플랜은 카드를 무제한으로 저장할 수 있어요.",
+    "countUnlimited": "{{owned}}장 · 제한 없음",
+    "planNoteUnlimited": "관리자 계정 — 카드 저장 개수에 제한이 없습니다.",
     "detail": {
       "title": "카드 저장 용량",
       "subtitle": "소유 카드와 구독 카드가 플랜 한도에 포함돼요. 공식 덱은 제외돼요.",
@@ -158,15 +152,15 @@
       "officialNote": "한도 제외",
       "archived": "보관됨",
       "archivedNote": "학습 잠김",
-      "archivedCount": "{{count}}장 보관됨",
-      "remaining": "{{count}}장 남음",
+      "archivedCount": "{{count, number}}장 보관됨",
+      "remaining": "{{count, number}}장 남음",
       "percentUsed": "{{percent}}% 사용",
       "nearLimit": "한도 임박",
       "atLimit": "한도 도달",
-      "planUnlimited": "무제한 플랜",
+      "planUnlimited": "관리자 계정",
       "planCards": "{{limit}}장 플랜",
-      "unlimitedTitle": "무제한 저장",
-      "lifetimeTotal": "{{count}}장"
+      "unlimitedTitle": "카드 개수 제한 없음",
+      "lifetimeTotal": "{{count, number}}장"
     }
   },
   "groups": {
@@ -176,5 +170,20 @@
     "preferences": "환경설정",
     "data": "데이터"
   },
-  "subtitle": "계정, 충전금, 학습 환경설정을 관리하세요."
+  "subtitle": "계정, 충전금, 학습 환경설정을 관리하세요.",
+  "privacy": {
+    "title": "개인정보 및 데이터",
+    "analyticsTitle": "사용 분석",
+    "analyticsHint": "익명 사용 데이터로 앱 개선에 참여합니다",
+    "trackingOn": "허용됨",
+    "trackingOff": "끔",
+    "deleteAccount": "계정 삭제",
+    "deleteConfirm": "계정, 덱, 카드, 학습 기록이 영구 삭제됩니다. 되돌릴 수 없습니다.",
+    "deleteConfirmBtn": "영구 삭제",
+    "cancel": "취소",
+    "deleteFailed": "계정 삭제에 실패했습니다. 다시 시도해 주세요."
+  },
+  "subscription": {
+    "title": "구독"
+  }
 }

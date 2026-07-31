@@ -10,9 +10,9 @@
   "aiGenerate": "AI Generate",
   "detail": {
     "backToList": "← 牌组列表",
-    "totalCards": "共 {{count}} 张卡片",
-    "newCards": "新卡 {{count}}",
-    "reviewCards": "复习 {{count}}",
+    "totalCards": "共 {{count, number}} 张卡片",
+    "newCards": "新卡 {{count, number}}",
+    "reviewCards": "复习 {{count, number}}",
     "startStudy": "开始学习",
     "edit": "编辑",
     "share": "分享",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
@@ -218,17 +218,17 @@
     "selectMode": "选择",
     "selectAll": "全选",
     "deselectAll": "取消全选",
-    "selectedCount": "已选 {{count}} 张",
+    "selectedCount": "已选 {{count, number}} 张",
     "deleteSelected": "删除所选",
     "deleteCardsTitle": "删除卡片",
-    "deleteCardsConfirm": "删除所选的 {{count}} 张卡片？此操作不可撤销。",
+    "deleteCardsConfirm": "删除所选的 {{count, number}} 张卡片？此操作不可撤销。",
     "perPage": "每页:",
     "prevPage": "← 上一页",
     "nextPage": "下一页 →",
     "pageOf": "第 {{current}} 页 / 共 {{total}} 页",
-    "showingRange": "显示第 {{from}}–{{to}} 张，共 {{total}} 张卡片",
+    "showingRange": "显示第 {{from, number}}–{{to, number}} 张，共 {{total, number}} 张卡片",
     "archivedBadge": "已归档 · 学习已锁定",
-    "archivedNote": "{{count}} 张卡片因超出上限被归档 — 仍可查看。订阅后即可重新学习。",
+    "archivedNote": "{{count, number}} 张卡片因超出上限被归档 — 仍可查看。订阅后即可重新学习。",
     "archivedSubscribe": "订阅（即将推出）"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "今天",
     "yesterday": "昨天",
-    "daysAgo": "{{count}} 天前",
+    "daysAgo": "{{count, number}} 天前",
     "monthAgo": "1 个月前",
-    "monthsAgo": "{{count}} 个月前"
+    "monthsAgo": "{{count, number}} 个月前"
   },
   "templatesList": {
     "cannotDeleteTitle": "无法删除",

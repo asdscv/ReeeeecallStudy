@@ -11,6 +11,7 @@
     "admin": "Admin",
     "guide": "Guía",
     "aiGenerate": "AI Generate",
+    "learningPlan": "Plan de estudio",
     "achievements": "Logros",
     "publisherStats": "Estadísticas del editor",
     "wallet": "Cartera"
@@ -45,7 +46,7 @@
   },
   "units": {
     "cards": "tarjetas",
-    "cardsSuffix": "{{count}} tarjetas",
+    "cardsSuffix": "{{count, number}} tarjetas",
     "sessions": "sesiones",
     "days": "días",
     "hours": "h",
@@ -257,5 +258,8 @@
       "V",
       ""
     ]
+  },
+  "shares": {
+    "title": "Mis compartidos"
   }
 }

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // ─── Supabase mock (HOISTED — runs before imports) ──────────
 const mockSupabase = vi.hoisted(() => {
   const chainable = () => {
-    const chain: Record<string, any> = {}
+    const chain: Record<string, unknown> = {}
     chain.select = vi.fn().mockReturnValue(chain)
     chain.eq = vi.fn().mockReturnValue(chain)
     chain.neq = vi.fn().mockReturnValue(chain)
@@ -23,13 +23,20 @@ const mockSupabase = vi.hoisted(() => {
       getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
     },
     from: vi.fn().mockImplementation(() => chainable()),
+    // rateCard persists the study log via an RPC (insert_study_log) — mock it so the
+    // fire-and-forget write resolves instead of throwing "rpc is not a function".
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
   }
 })
 
-vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+  supabase: mockSupabase,
+  getSupabase: () => mockSupabase,
+  initSupabase: vi.fn(),
+}))
 
 // Mock rate limiter
-vi.mock('../../lib/rate-limit-instance', () => ({
+vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({
   guard: {
     check: vi.fn().mockReturnValue({ allowed: true }),
     recordSuccess: vi.fn(),
@@ -37,17 +44,18 @@ vi.mock('../../lib/rate-limit-instance', () => ({
 }))
 
 // Mock SRS utilities (not needed for sequential_review)
-vi.mock('../../lib/srs', () => ({
+vi.mock('@reeeeecall/shared/lib/srs', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@reeeeecall/shared/lib/srs')>()),
   calculateSRS: vi.fn(),
 }))
 
-vi.mock('../../lib/srs-access', () => ({
+vi.mock('@reeeeecall/shared/lib/srs-access', () => ({
   getSrsSource: vi.fn().mockReturnValue('embedded'),
   mergeCardWithProgress: vi.fn(),
 }))
 
-import { useStudyStore } from '../study-store'
-import { advanceSequentialReviewPosition } from '../../lib/study-session-utils'
+import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
+import { advanceSequentialReviewPosition } from '@reeeeecall/shared/lib/study-session-utils'
 import type { Card, DeckStudyState } from '../../types/database'
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -104,6 +112,13 @@ const resetStore = () =>
     srsQueueManager: null,
     crammingManager: null,
     maxCardPosition: 0,
+    // Reset the completion guard so each test's endSession actually runs (it leaks
+    // true across tests otherwise, making a later endSession a silent no-op).
+    sessionSaved: false,
+    // Same leak for the finalize marker: a stale true routes endSession onto
+    // refresh_study_session (P6) instead of finalize.
+    sessionFinalized: false,
+    lastRatedCard: null,
   })
 
 beforeEach(() => {
@@ -111,9 +126,13 @@ beforeEach(() => {
   resetStore()
 })
 
-// ─── rateCard: per-card position saving ─────────────────────
+// ─── rateCard: sequential_review does NOT persist position per-card (S-L3) ──────────
+// The old design fired a per-card deck_study_state UPDATE from rateCard, with no ordering
+// guarantee — a delayed earlier write could regress the saved position. The position is now
+// computed authoritatively once in endSession, so rateCard must NOT write deck_study_state
+// and must NOT mutate the in-memory studyState (endSession needs the session-start baseline).
 
-describe('rateCard — sequential_review per-card position saving', () => {
+describe('rateCard — sequential_review does NOT persist position per-card (S-L3)', () => {
   function setupSequentialReviewSession(cards: Card[], studyState: DeckStudyState, maxPos: number) {
     useStudyStore.setState({
       phase: 'studying',
@@ -133,90 +152,58 @@ describe('rateCard — sequential_review per-card position saving', () => {
     })
   }
 
-  it('should update deck_study_state in DB when rating a new card', async () => {
-    const cards = [makeCard('c1', 5, 'new'), makeCard('c2', 6, 'new')]
-    setupSequentialReviewSession(cards, { ...fakeStudyState }, 39)
-
-    // Track the update call
+  function trackUpdates() {
+    const updateCalls: unknown[] = []
     const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
     mockSupabase.from.mockImplementation((table: string) => {
       if (table === 'deck_study_state') {
-        return { update: updateFn }
+        return {
+          update: vi.fn().mockImplementation((data: unknown) => {
+            updateCalls.push(data)
+            return { eq: updateEq }
+          }),
+        }
       }
-      // study_logs insert
       return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
     })
+    return updateCalls
+  }
+
+  it('does NOT write deck_study_state when rating a new card', async () => {
+    const cards = [makeCard('c1', 5, 'new'), makeCard('c2', 6, 'new')]
+    setupSequentialReviewSession(cards, { ...fakeStudyState }, 39)
+    const updateCalls = trackUpdates()
 
     await useStudyStore.getState().rateCard('known')
     await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
-    // Verify deck_study_state.update was called with correct position
-    expect(mockSupabase.from).toHaveBeenCalledWith('deck_study_state')
-    expect(updateFn).toHaveBeenCalledWith({ new_start_pos: 6 })
-    expect(updateEq).toHaveBeenCalledWith('id', 'state-1')
+    expect(updateCalls).toEqual([])
   })
 
-  it('should update deck_study_state in DB when rating a review card', async () => {
+  it('does NOT write deck_study_state when rating a review card', async () => {
     const cards = [makeCard('c1', 10, 'review'), makeCard('c2', 11, 'review')]
     setupSequentialReviewSession(cards, { ...fakeStudyState, new_start_pos: 50, review_start_pos: 10 }, 39)
-
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: updateFn }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
-    })
+    const updateCalls = trackUpdates()
 
     await useStudyStore.getState().rateCard('unknown')
     await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
-    expect(updateFn).toHaveBeenCalledWith({ review_start_pos: 11 })
-    expect(updateEq).toHaveBeenCalledWith('id', 'state-1')
+    expect(updateCalls).toEqual([])
   })
 
-  it('should wrap review_start_pos to 0 when past maxCardPosition', async () => {
-    const cards = [makeCard('c1', 39, 'review')]
-    setupSequentialReviewSession(cards, { ...fakeStudyState, review_start_pos: 39 }, 39)
-
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: updateFn }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
-    })
-
-    await useStudyStore.getState().rateCard('known')
-    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
-
-    expect(updateFn).toHaveBeenCalledWith({ review_start_pos: 0 })
-  })
-
-  it('should update local studyState after DB save', async () => {
+  it('leaves the in-memory studyState at its session-start baseline (no per-card mutation)', async () => {
     const cards = [makeCard('c1', 5, 'new'), makeCard('c2', 6, 'new')]
     setupSequentialReviewSession(cards, { ...fakeStudyState, new_start_pos: 5 }, 39)
-
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: vi.fn().mockReturnValue({ eq: updateEq }) }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
-    })
+    trackUpdates()
 
     await useStudyStore.getState().rateCard('known')
     await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
-    // Local studyState should be updated
-    const state = useStudyStore.getState()
-    expect(state.studyState!.new_start_pos).toBe(6)
+    // studyState is NOT advanced per-card — endSession recomputes from the baseline.
+    expect(useStudyStore.getState().studyState!.new_start_pos).toBe(5)
   })
 
-  it('should NOT update deck_study_state for non-sequential_review modes', async () => {
+  it('does NOT write deck_study_state for non-sequential_review modes either', async () => {
     const cards = [makeCard('c1', 5, 'new'), makeCard('c2', 6, 'new')]
     useStudyStore.setState({
       phase: 'studying',
@@ -234,66 +221,19 @@ describe('rateCard — sequential_review per-card position saving', () => {
       srsQueueManager: null,
       crammingManager: null,
     })
-
-    const updateFn = vi.fn()
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: updateFn }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
-    })
+    const updateCalls = trackUpdates()
 
     await useStudyStore.getState().rateCard('next')
     await new Promise(r => setTimeout(r, 0)) // flush background DB writes
 
-    // deck_study_state.update should NOT have been called
-    expect(updateFn).not.toHaveBeenCalled()
-  })
-
-  it('should save positions for consecutive cards correctly', async () => {
-    const cards = [
-      makeCard('c1', 0, 'review'),
-      makeCard('c2', 1, 'review'),
-      makeCard('c3', 2, 'review'),
-    ]
-    setupSequentialReviewSession(cards, { ...fakeStudyState, review_start_pos: 0 }, 39)
-
-    const updateCalls: unknown[] = []
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return {
-          update: vi.fn().mockImplementation((data: unknown) => {
-            updateCalls.push(data)
-            return { eq: updateEq }
-          }),
-        }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
-    })
-
-    // Rate card 1
-    await useStudyStore.getState().rateCard('known')
-    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
-    // Rate card 2
-    await useStudyStore.getState().rateCard('known')
-    await new Promise(r => setTimeout(r, 0)) // flush background DB writes
-
-    // Should have 2 DB updates with incrementing positions
-    expect(updateCalls).toEqual([
-      { review_start_pos: 1 },
-      { review_start_pos: 2 },
-    ])
-
-    // Local state should reflect latest position
-    expect(useStudyStore.getState().studyState!.review_start_pos).toBe(2)
+    expect(updateCalls).toEqual([])
   })
 })
 
-// ─── endSession: sequential_review block removed ────────────
+// ─── endSession: sequential_review positions saved authoritatively (S-L3) ───────────
 
-describe('endSession — sequential_review positions NOT saved', () => {
-  it('should NOT call deck_study_state.update for sequential_review in endSession', async () => {
+describe('endSession — sequential_review position saved authoritatively (S-L3)', () => {
+  it('writes the recomputed position ONCE for sequential_review in endSession', async () => {
     const cards = [makeCard('c1', 5, 'review'), makeCard('c2', 6, 'review')]
 
     useStudyStore.setState({
@@ -303,26 +243,29 @@ describe('endSession — sequential_review positions NOT saved', () => {
       currentIndex: 1,
       userId: 'user-1',
       sessionStartedAt: Date.now() - 5000,
+      // session-start baseline: review_start_pos 0 → studied review cards at 5 and 6 →
+      // computeSequentialReviewPositions advances review_start_pos to max(5,6)+1 = 7.
       sessionStats: { totalCards: 2, cardsStudied: 2, ratings: { known: 2 }, totalDurationMs: 3000 },
-      studyState: { ...fakeStudyState, review_start_pos: 7 },
+      studyState: { ...fakeStudyState, new_start_pos: 0, review_start_pos: 0 },
       maxCardPosition: 39,
       crammingManager: null,
+      clientSessionId: 'client-session-1',
     })
 
-    const updateFn = vi.fn()
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: updateFn }
-      }
-      // study_sessions insert
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
+    // P5B: the cursor moves inside finalize_study_session, guarded by cursor_before,
+    // so there is exactly one atomic write instead of a separate table update.
+    const finalizeCalls: Array<Record<string, unknown>> = []
+    mockSupabase.rpc.mockImplementation((name: string, params: Record<string, unknown>) => {
+      if (name === 'finalize_study_session') finalizeCalls.push(params)
+      return Promise.resolve({ data: null, error: null })
     })
 
     await useStudyStore.getState().endSession()
 
-    // endSession should NOT update deck_study_state for sequential_review
-    // (positions are already saved per-card in rateCard)
-    expect(updateFn).not.toHaveBeenCalled()
+    expect(finalizeCalls).toHaveLength(1)
+    expect(finalizeCalls[0].p_cursor_before).toEqual({ new_start_pos: 0, review_start_pos: 0 })
+    expect(finalizeCalls[0].p_cursor_after).toEqual({ new_start_pos: 0, review_start_pos: 7 })
+    expect(mockSupabase.from).not.toHaveBeenCalledWith('deck_study_state')
   })
 
   it('should still save deck_study_state for sequential mode in endSession', async () => {
@@ -339,21 +282,21 @@ describe('endSession — sequential_review positions NOT saved', () => {
       studyState: { ...fakeStudyState, sequential_pos: 5 },
       maxCardPosition: 39,
       crammingManager: null,
+      clientSessionId: 'client-session-2',
     })
 
-    const updateEq = vi.fn().mockResolvedValue({ data: null, error: null })
-    const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
-    mockSupabase.from.mockImplementation((table: string) => {
-      if (table === 'deck_study_state') {
-        return { update: updateFn }
-      }
-      return { insert: vi.fn().mockResolvedValue({ data: null, error: null }) }
+    const finalizeCalls: Array<Record<string, unknown>> = []
+    mockSupabase.rpc.mockImplementation((name: string, params: Record<string, unknown>) => {
+      if (name === 'finalize_study_session') finalizeCalls.push(params)
+      return Promise.resolve({ data: null, error: null })
     })
 
     await useStudyStore.getState().endSession()
 
-    // sequential mode SHOULD still update sequential_pos
-    expect(updateFn).toHaveBeenCalledWith({ sequential_pos: 7 })
+    // sequential mode SHOULD still advance sequential_pos — now as cursor_after.
+    expect(finalizeCalls).toHaveLength(1)
+    expect(finalizeCalls[0].p_cursor_before).toEqual({ sequential_pos: 5 })
+    expect(finalizeCalls[0].p_cursor_after).toEqual({ sequential_pos: 7 })
   })
 })
 

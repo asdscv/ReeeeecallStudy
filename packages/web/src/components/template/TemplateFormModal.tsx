@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -45,7 +45,12 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'fields' | 'front' | 'back'>('fields')
 
-  useEffect(() => {
+  // Sync form state from props during render to avoid effect-driven cascading renders
+  // `null` until the first sync — see DeckFormModal: seeding with the current props
+  // skipped the initial population and the edit modal opened empty.
+  const [prevDeps, setPrevDeps] = useState<{ editTemplate: CardTemplate | null | undefined; open: boolean } | null>(null)
+  if (!prevDeps || editTemplate !== prevDeps.editTemplate || open !== prevDeps.open) {
+    setPrevDeps({ editTemplate, open })
     if (editTemplate) {
       setName(editTemplate.name)
       setFields([...editTemplate.fields])
@@ -61,7 +66,7 @@ export function TemplateFormModal({ open, onClose, editTemplate }: TemplateFormM
       setBackLayout([{ field_key: 'back', style: 'primary' }])
     }
     setActiveTab('fields')
-  }, [editTemplate, open])
+  }
 
   // Field management
   const addField = () => {

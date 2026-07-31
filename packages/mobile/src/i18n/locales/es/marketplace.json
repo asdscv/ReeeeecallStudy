@@ -11,7 +11,9 @@
     "history": "Historia",
     "programming": "Programación",
     "exam": "Preparación de exámenes",
-    "other": "Otros"
+    "other": "Otros",
+    "general": "General",
+    "trivia": "Trivia"
   },
   "sort": {
     "popular": "Popular",
@@ -21,8 +23,8 @@
     "topRated": "Mejor valorado"
   },
   "listing": {
-    "cardCount": "{{count}} tarjetas",
-    "userCount": "{{count}} usuarios"
+    "cardCount": "{{count, number}} tarjetas",
+    "userCount": "{{count, number}} usuarios"
   },
   "detail": {
     "back": "← Mercado",
@@ -44,10 +46,10 @@
     "edited": "(editado)",
     "helpful": "Útil",
     "byAuthor": "por {{name}}",
-    "cardsBadge": "{{count}} tarjetas",
-    "viewsBadge": "{{count}} vistas",
-    "usersBadge": "{{count}} usuarios",
-    "reviewsCount": "({{count}} reseñas)",
+    "cardsBadge": "{{count, number}} tarjetas",
+    "viewsBadge": "{{count, number}} vistas",
+    "usersBadge": "{{count, number}} usuarios",
+    "reviewsCount": "({{count, number}} reseñas)",
     "previewCards": "Vista previa de tarjetas",
     "ratingsReviews": "Valoraciones y reseñas",
     "editReview": "Editar reseña",
@@ -55,7 +57,7 @@
     "writeAReview": "Escribir una reseña",
     "acquireToReview": "Obtén este mazo para dejar una reseña",
     "noReviewsYet": "Aún no hay reseñas",
-    "reviewCountLabel": "{{count}} reseñas",
+    "reviewCountLabel": "{{count, number}} reseñas",
     "loading": "Cargando...",
     "loadMoreReviews": "Cargar más reseñas",
     "reportReason": "Motivo",
@@ -96,8 +98,8 @@
       "most_helpful": "Útiles"
     },
     "downloading": "Descargando...",
-    "limitUsage": "Añade {{count}} tarjetas a tu límite · quedan {{available}}",
-    "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available}}). Elimina tarjetas o suscríbete.",
+    "limitUsage": "Añade {{count, number}} tarjetas a tu límite · quedan {{available, number}}",
+    "limitExceeds": "Superaría tu límite de tarjetas (quedan {{available, number}}). Libera espacio o mejora tu plan para añadirlo.",
     "limitOfficialFree": "Mazo oficial · no cuenta para tu límite de tarjetas.",
     "acquireByMode": {
       "subscribe": "Suscribirse",

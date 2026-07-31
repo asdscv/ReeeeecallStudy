@@ -20,6 +20,9 @@ import { DeckDetailPage } from './pages/DeckDetailPage'
 import { StudySetupPage } from './pages/StudySetupPage'
 import { TemplateEditPage } from './pages/TemplateEditPage'
 import { QuickStudyPage } from './pages/QuickStudyPage'
+import { LearningTodayPage } from './pages/learning/LearningTodayPage'
+import { LearningGoalsPage } from './pages/learning/LearningGoalsPage'
+import { LearningInsightsPage } from './pages/learning/LearningInsightsPage'
 import { StudyHistoryPage } from './pages/StudyHistoryPage'
 import { SessionDetailPage } from './pages/SessionDetailPage'
 import { DeckSharePage } from './pages/DeckSharePage'
@@ -260,6 +263,9 @@ function App() {
             >
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/quick-study" element={<QuickStudyPage />} />
+              <Route path="/learning" element={<LearningTodayPage />} />
+              <Route path="/learning/goals" element={<LearningGoalsPage />} />
+              <Route path="/learning/insights" element={<LearningInsightsPage />} />
               <Route path="/history" element={<StudyHistoryPage />} />
               <Route path="/history/detail" element={<SessionDetailPage />} />
               <Route path="/ai-generate" element={<AIGeneratePage />} />

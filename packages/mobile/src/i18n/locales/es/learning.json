@@ -1,0 +1,156 @@
+{
+  "enrichment": {
+    "chargedNote": "Ya se cobró — descartar no reembolsa los créditos.",
+    "costHint": "Utiliza créditos de IA de tu billetera",
+    "discard": "Descartar",
+    "error": {
+      "BAD_REQUEST": "La solicitud no es válida.",
+      "FORBIDDEN": "No tienes acceso a esa tarjeta.",
+      "GROUNDING_REQUIRED": "No se encontró una fuente citable, por lo que se rechazó la respuesta en vez de inventarla.",
+      "INSUFFICIENT_CREDITS": "Créditos de IA insuficientes. Recarga para continuar.",
+      "INVALID_RESULT": "La respuesta llegó en un formato inutilizable. Inténtalo de nuevo.",
+      "NETWORK": "Error de red. Comprueba tu conexión.",
+      "NOT_CONFIGURED": "La generación con IA no está habilitada en este servidor.",
+      "PROVIDER_ERROR": "El servicio de IA falló. Inténtalo de nuevo.",
+      "RATE_CAP": "Has alcanzado el límite diario de solicitudes de IA. Inténtalo mañana.",
+      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "explainCta": "Explicar (créditos)",
+    "keep": "Conservar",
+    "later": "Decidir después",
+    "noSources": "Esta respuesta no está basada en fuentes.",
+    "requesting": "Consultando…",
+    "sources": "Fuentes"
+  },
+  "form": {
+    "cancel": "Cancelar",
+    "dailyMinutes": "Minutos por día",
+    "decks": "Mazos a estudiar",
+    "decksHint": "Tu plan se construye con las tarjetas de estos mazos.",
+    "domain": "Materia",
+    "domainName": {
+      "labor-law": "Derecho laboral",
+      "language": "Idiomas"
+    },
+    "error": {
+      "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440.",
+      "title": "Introduce un nombre de objetivo (1–500 caracteres)."
+    },
+    "goalTitle": "Nombre del objetivo",
+    "goalTitlePlaceholder": "p. ej. Aprobar el JLPT N2",
+    "noDecks": "Aún no tienes mazos.",
+    "save": "Guardar",
+    "saving": "Guardando…"
+  },
+  "goals": {
+    "archive": "Archivar",
+    "archiveConfirmMessage": "\"{{title}}\" dejará de planificarse y no podrá editarse.",
+    "archiveConfirmTitle": "¿Archivar este objetivo?",
+    "create": "Nuevo objetivo",
+    "dailyMinutes": "{{count, number}} min/día",
+    "deckCount": "{{count, number}} mazos",
+    "deckCount_one": "{{count, number}} mazo",
+    "deckCount_other": "{{count, number}} mazos",
+    "empty": {
+      "body": "Crea un objetivo para empezar a recibir un plan diario.",
+      "title": "Aún no hay objetivos"
+    },
+    "error": {
+      "authRequired": "Inicia sesión de nuevo.",
+      "conflict": "Ese cambio no está permitido para el estado actual de este objetivo.",
+      "forbidden": "No tienes acceso a eso.",
+      "invalidInput": "Revisa el nombre y los minutos diarios.",
+      "limitExceeded": "Has alcanzado el número máximo de objetivos.",
+      "notFound": "Ese objetivo no existe o fue archivado.",
+      "unknown": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "noDecksWarning": "No hay mazos asociados — aún no se puede generar un plan.",
+    "status": {
+      "archived": "Archivado",
+      "completed": "Completado",
+      "paused": "En pausa"
+    },
+    "title": "Objetivos de aprendizaje"
+  },
+  "insights": {
+    "accuracy": "Precisión",
+    "adherence": "Cumplimiento del plan (14 días)",
+    "adherenceEmpty": "No hay planes en este período.",
+    "adherenceTitle": "Planes diarios (14 días)",
+    "attemptCount": "{{count, number}} intentos",
+    "attemptCount_one": "{{count, number}} intento",
+    "attemptCount_other": "{{count, number}} intentos",
+    "attempts": "Intentos (30 días)",
+    "cardFallback": "(tarjeta no incluida en el plan de hoy)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "noData": "Sin datos aún",
+    "noPlanItems": "Nada planificado",
+    "notScoredYet": "Nada puntuado aún",
+    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
+    "seconds": "{{count, decimal}}s",
+    "title": "Diagnóstico de aprendizaje",
+    "typicalTime": "Tiempo habitual",
+    "weakEmpty": "Nada se está quedando atrás.",
+    "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",
+    "weakTitle": "Vale otra mirada"
+  },
+  "recommend": {
+    "accept": "Aceptar",
+    "dismiss": "Descartar",
+    "empty": "Aún no hay recomendaciones. Actualiza cuando tengas algunos intentos.",
+    "hint": "Aceptar una sube la prioridad de esa tarjeta en tu próximo plan.",
+    "regenerate": "Actualizar",
+    "status": {
+      "accepted": "Aceptada",
+      "dismissed": "Descartada",
+      "expired": "Caducada"
+    },
+    "title": "Recomendaciones"
+  },
+  "today": {
+    "budget": "{{count, number}} min/día",
+    "empty": {
+      "createGoal": "Crear un objetivo",
+      "noDecks": "Este objetivo no tiene mazos asociados, así que no hay nada que planificar.",
+      "noGoal": "Aún no tienes un objetivo de aprendizaje activo. Un objetivo establece tus minutos diarios y los mazos para planificar.",
+      "nothingDue": "Hoy no hay tarjetas pendientes en estos mazos."
+    },
+    "error": {
+      "authRequired": "Inicia sesión de nuevo.",
+      "completedPlan": "Un plan terminado no se puede sobrescribir.",
+      "forbidden": "No tienes acceso a eso.",
+      "goalGone": "Ese objetivo ya no está disponible.",
+      "invalidInput": "No se pudo guardar el plan porque algunos valores estaban fuera de rango.",
+      "limitExceeded": "Has alcanzado el límite de reconstrucciones de hoy. Inténtalo mañana.",
+      "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
+    },
+    "generate": "Crear plan de hoy",
+    "generating": "Creando…",
+    "insightsLink": "Diagnóstico",
+    "item": {
+      "minutes": "~{{count, decimal}} min",
+      "recorded": "Registrado",
+      "untitled": "(sin texto)"
+    },
+    "manageGoals": "Gestionar objetivos",
+    "progress": "{{done, number}} de {{total, number}} completados",
+    "rate": {
+      "again": "No lo sabía",
+      "hint": "Registra tu intento; no cambia el calendario de repaso.",
+      "known": "Lo sabía",
+      "partial": "A medias"
+    },
+    "reason": {
+      "balanced": "Mezcla equilibrada",
+      "due": "Pendiente de repaso",
+      "goalRelevance": "Relevancia del objetivo",
+      "importance": "Importancia",
+      "memoryRisk": "A punto de olvidarse",
+      "recentFailure": "Fallo reciente",
+      "slowResponse": "Respuesta lenta"
+    },
+    "regenerate": "Recrear plan",
+    "regenerating": "Recreando…",
+    "title": "Plan de hoy"
+  }
+}

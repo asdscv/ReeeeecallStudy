@@ -38,9 +38,13 @@ export function PublisherDashboardPage() {
     fetchPublisherStats()
   }, [fetchPublisherStats])
 
+  // Hoisted so the manual dependency matches what the compiler infers — an
+  // optional-chained member expression in the dep array reads as a different
+  // dependency and makes the compiler skip optimizing the whole component.
+  const listings = stats?.listings
   const sortedListings = useMemo(() => {
-    if (!stats?.listings) return []
-    return [...stats.listings].sort((a, b) => {
+    if (!listings) return []
+    return [...listings].sort((a, b) => {
       const dir = sortDir === 'asc' ? 1 : -1
       switch (sortKey) {
         case 'title': return dir * a.title.localeCompare(b.title)
@@ -52,7 +56,7 @@ export function PublisherDashboardPage() {
         default: return 0
       }
     })
-  }, [stats?.listings, sortKey, sortDir])
+  }, [listings, sortKey, sortDir])
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {

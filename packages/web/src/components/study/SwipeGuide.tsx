@@ -21,11 +21,19 @@ const DIRECTION_CONFIG: Record<Direction, { arrow: string; position: string }> =
 }
 
 export function SwipeGuide({ directions, visible }: SwipeGuideProps) {
-  const [show, setShow] = useState(false)
+  // Initialised from the prop: mounting with visible=true used to show the hint via the
+  // effect, and starting at false would have swallowed the first card's hint.
+  const [show, setShow] = useState(visible)
+
+  // Sync show state from visible prop during render to avoid effect-driven cascading renders
+  const [prevVisible, setPrevVisible] = useState(visible)
+  if (visible !== prevVisible) {
+    setPrevVisible(visible)
+    setShow(visible)
+  }
 
   useEffect(() => {
-    if (!visible) { setShow(false); return }
-    setShow(true)
+    if (!visible) return
     const timer = setTimeout(() => setShow(false), 2000)
     return () => clearTimeout(timer)
   }, [visible])

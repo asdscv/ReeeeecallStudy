@@ -218,23 +218,7 @@
             "/images/guide/ai-generate/mobile-01-page.png"
           ],
           "title": "การสร้างอัตโนมัติด้วย AI คืออะไร?",
-          "body": "สร้างการ์ดอัตโนมัติด้วย AI เพียงพิมพ์หัวข้อ แล้ว AI จะสร้างทุกอย่างให้คุณ\n\nผู้ให้บริการที่รองรับ: Google Gemini (ฟรี!), OpenAI, xAI/Grok, Anthropic\n\nคีย์ API ของคุณจะถูกเก็บไว้บนอุปกรณ์เท่านั้น ไม่ส่งไปยังเซิร์ฟเวอร์ของเรา"
-        },
-        "apiKey": {
-          "images": [
-            "/images/guide/ai-generate/mobile-02-config.png"
-          ],
-          "title": "ตั้งค่าคีย์ API",
-          "body": "รับคีย์ API จากผู้ให้บริการที่คุณต้องการ:\n• Google Gemini (ฟรี): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nกรอกคีย์ในการตั้งค่าสร้างด้วย AI คีย์จะถูกเก็บไว้ในเครื่องของคุณ\n\n💡 เราแนะนำ Google Gemini 2.5 Flash — ฟรีทั้งหมด!"
-        },
-        "geminiSetup": {
-          "images": [
-            "/images/guide/gemini-api/02-get-api-key.png",
-            "/images/guide/gemini-api/03-create-api-key.png",
-            "/images/guide/gemini-api/05-api-key-created.png"
-          ],
-          "title": "🎯 คีย์ API Gemini ฟรี (แนะนำ)",
-          "body": "Gemini 2.5 Flash ฟรี 100% — ไม่ต้องใช้บัตรเครดิต!\n\nขีดจำกัดฟรี: 15 คำขอ/นาที, 1,500 คำขอ/วัน, 1 ล้านโทเค็น/นาที\n\nวิธีรับคีย์:\n1. ไปที่ aistudio.google.com\n2. ลงชื่อเข้าใช้ด้วยบัญชี Google\n3. คลิก \"Get API Key\" ที่แถบด้านข้าง\n4. คลิก \"Create API Key\"\n5. เลือก \"Create API key in new project\"\n6. คัดลอกคีย์ (ขึ้นต้นด้วย \"AIza...\")\n\nวิธีใช้ใน ReeeeecallStudy:\n1. เปิดหน้าสร้างด้วย AI\n2. เลือกผู้ให้บริการ \"Google Gemini\"\n3. วางคีย์ API ของคุณ\n4. เลือกโมเดล \"Gemini 2.5 Flash\"\n5. พิมพ์หัวข้อแล้วสร้าง!\n\nทำไมต้อง Gemini Flash?\n• 💰 ฟรี — ไม่ต้องตั้งค่าการเรียกเก็บเงิน\n• ⚡ เร็ว — 50 การ์ดในไม่กี่วินาที\n• 🎯 แม่นยำ — เหมาะกับการศึกษา\n• 🌍 รองรับทุกภาษา\n• 📚 1,500 คำขอต่อวัน — การ์ดนับพันใบ"
+          "body": "สร้างการ์ดคำศัพท์อัตโนมัติด้วย AI แค่ใส่หัวข้อ AI จะสร้างทุกอย่างให้คุณ\n\nไม่ต้องใช้ API key หรือตั้งค่าใด ๆ — การสร้างทำงานบนเซิร์ฟเวอร์ของเรา\n\nคุณได้รับการ์ด AI ฟรีทุกวัน ส่วนที่เกินจะหักจากยอดเครดิตของคุณ"
         },
         "fullGeneration": {
           "images": [

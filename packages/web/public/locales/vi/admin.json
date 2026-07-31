@@ -119,7 +119,7 @@
       "good": "Tốt",
       "easy": "Dễ"
     },
-    "periodDay": "{{count}} ngày",
+    "periodDay": "{{count, number}} ngày",
     "minuteShort": "{{value}} phút"
   },
   "market": {
@@ -233,7 +233,43 @@
     "totalAiSpent": "Tổng đã dùng",
     "activeWallets": "Người dùng có tín dụng",
     "aiCardsToday": "Thẻ AI hôm nay",
-    "aiCardsTodayBreakdown": "{{free}} miễn phí · {{paid}} trả phí"
+    "aiCardsTodayBreakdown": "{{free}} miễn phí · {{paid}} trả phí",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓",
+      "sandboxGrants": "Cho phép giao dịch sandbox cấp tín dụng",
+      "sandboxGrantsHint": "TẮT: sự kiện sandbox của RevenueCat được nhận nhưng không cấp gì. Chỉ bật khi chạy thử — giao dịch sandbox là miễn phí."
+    },
+    "levers": {
+      "title": "Đòn đẩy tăng trưởng",
+      "desc": "Áp dụng ngay, không cần triển khai lại. Mỗi mục lưu riêng.",
+      "freeQuota": "Số thẻ AI miễn phí mỗi ngày",
+      "freeQuotaHint": "Số thẻ miễn phí mỗi người mỗi ngày. Ứng dụng theo giá trị này từ máy chủ.",
+      "cardCap": "Giới hạn thẻ sở hữu mỗi tài khoản",
+      "cardCapHint": "Vượt số này sẽ không thể tạo hoặc lưu thẻ.",
+      "countOfficial": "Tính cả thẻ của bộ chính thức vào giới hạn",
+      "countOfficialHint": "Bật: thẻ từ bộ chính thức đã đăng ký cũng được tính.",
+      "wonPerCredit": "Giá mỗi tín dụng",
+      "wonPerCreditHint": "Phải trùng với giá IAP / gói tín dụng.",
+      "targetMargin": "Biên lợi nhuận mục tiêu (bps)",
+      "targetMarginHint": "Hiện tại {{pct}}. Đây là số chia trong công thức tính phí, nên không được đặt 10000 (=100%).",
+      "errRange": "Nhập số nguyên từ {{min}} đến {{max}}.",
+      "errNonNegative": "Nhập số nguyên từ 0 trở lên.",
+      "errMargin": "Biên lợi nhuận tối đa {{max}} bps. 10000 (=100%) khiến công thức chia cho 0 và sẽ không tính phí.",
+      "updated": "Thay đổi gần nhất — giá/hạn mức: {{ai}} · giới hạn thẻ: {{cards}}"
+    }
   },
   "billing": {
     "title": "Quản lý thanh toán",
@@ -304,7 +340,8 @@
       "status": "Trạng thái",
       "paidAt": "Thanh toán lúc",
       "empty": "Không tìm thấy thanh toán.",
-      "actions": "Hành động"
+      "actions": "Hành động",
+      "loadedCount": "Đã tải {{total}}"
     },
     "user": {
       "title": "Tra cứu người dùng",
@@ -327,16 +364,17 @@
       "confirmGrantTitle": "Cấp gói đăng ký",
       "confirmGrant": "Cấp \"{{product}}\" cho người dùng này?",
       "adjustWallet": "Điều chỉnh ví",
-      "adjustAmount": "Số tiền (₩, + cấp / − thu hồi)",
+      "adjustAmount": "Số tiền ($, + cấp / − thu hồi)",
       "adjustReason": "Lý do",
       "adjustSubmit": "Áp dụng",
       "confirmAdjustTitle": "Điều chỉnh ví",
-      "confirmAdjust": "Điều chỉnh ví của người dùng này ₩{{amount}}?"
+      "confirmAdjust": "Điều chỉnh ví của người dùng này ${{amount}}?"
     },
     "pagination": {
       "page": "Trang {{page}}",
       "prev": "Trước",
-      "next": "Sau"
+      "next": "Sau",
+      "loadMore": "Tải thêm"
     },
     "actionError": "Thao tác thất bại: {{error}}",
     "refund": {
@@ -344,7 +382,53 @@
       "confirmTitle": "Thực hiện hoàn tiền?",
       "confirmCreditPack": "Hoàn {{amount}} cho {{email}}? Số tiền sẽ được trả lại vào thẻ của khách hàng.",
       "confirmSubscription": "Hoàn tiền lần thanh toán gần nhất của gói đăng ký này cho {{email}} và thu hồi quyền truy cập?",
-      "realMoneyNote": "Thao tác này gọi đến nhà cung cấp thanh toán và chuyển tiền thật. Không thể hoàn tác tại đây."
+      "realMoneyNote": "Thao tác này gọi đến nhà cung cấp thanh toán và chuyển tiền thật. Không thể hoàn tác tại đây.",
+      "confirmRevokeTitle": "Thu hồi quyền truy cập?",
+      "buttonRevokeOnly": "Thu hồi quyền truy cập",
+      "revokeOnlyIosNote": "Không có tiền nào được chuyển. Chỉ thu hồi quyền truy cập — Apple xử lý hoàn tiền App Store. Hãy hướng dẫn khách yêu cầu Apple, hoặc duyệt trong App Store Connect.",
+      "revokeOnlyUnknownNote": "Không có tiền nào được chuyển. Bản ghi này không lưu cửa hàng nên có thể là giao dịch App Store — chỉ thu hồi quyền truy cập. Hãy xác minh cửa hàng trước khi hứa hoàn tiền.",
+      "revokeOnlyHint": "Chỉ quyền truy cập — kênh này do cửa hàng hoàn tiền, không phải chúng ta.",
+      "policyEligible": "Chính sách: được hoàn tiền (trong {{days}} ngày và chưa dùng).",
+      "policyIneligible": "Chính sách: không được hoàn tiền — {{reason}}.",
+      "consentMissing": "Giao dịch này không có bản ghi thông báo quyền rút lui, nên lấy lý do \"đã sử dụng\" để từ chối là chưa vững.",
+      "statutoryOverride": "Quyền rút lui theo luật (Hàn Quốc 7 ngày / EU-Anh 14 ngày) vẫn có thể buộc phải hoàn tiền.",
+      "resultRefunded": "Đã hoàn tiền — tiền đã trả lại và quyền truy cập đã bị thu hồi.",
+      "resultRevokedOnly": "Đã thu hồi quyền truy cập. Thao tác này không chuyển khoản tiền nào.",
+      "reason": {
+        "eligible": "được hoàn tiền",
+        "not_found": "không tìm thấy bản ghi",
+        "not_paid": "thanh toán chưa hoàn tất",
+        "already_refunded": "đã hoàn tiền",
+        "outside_window": "quá thời hạn hoàn tiền",
+        "already_used": "đã sử dụng",
+        "renewal_charge": "khoản gia hạn (ngoài phạm vi chính sách)"
+      }
+    },
+    "channel": {
+      "column": "Kênh",
+      "web_lemonsqueezy": "Web · Lemon Squeezy",
+      "web_toss": "Web · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "Di động · không rõ cửa hàng",
+      "admin": "Quản trị viên cấp",
+      "paymentsHint": "Khoản thanh toán qua web và Google Play có thể hoàn tiền tại đây. Với App Store chỉ có thể thu hồi quyền truy cập — Apple mới là bên hoàn tiền.",
+      "filter": {
+        "all": "Tất cả",
+        "web": "Web",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple xử lý hoàn tiền App Store. Ở đây chỉ có thể thu hồi quyền truy cập.",
+        "android": "Có thể hoàn tiền Google Play ngay từ đây.",
+        "mobile_unknown": "Bản ghi có trước khi theo dõi cửa hàng. Được xem như App Store — hãy xác minh trước khi hứa hoàn tiền.",
+        "web_lemonsqueezy": "Có thể hoàn tiền qua API Lemon Squeezy.",
+        "web_toss": "Có thể huỷ thanh toán qua API Toss.",
+        "admin": "Khoản cấp miễn phí — chưa từng thu tiền."
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Giao dịch thử từ sandbox của cửa hàng — miễn phí và không bao giờ tính vào doanh thu."
     }
   },
   "official": {
@@ -438,7 +522,7 @@
     "colDetails": "Chi tiết",
     "colIP": "IP",
     "pageInfo": "Trang {{page}}",
-    "showing": "hiển thị {{count}} mục",
+    "showing": "hiển thị {{count, number}} mục",
     "prevPage": "Trước",
     "nextPage": "Tiếp",
     "unknownAdmin": "Không rõ",
@@ -447,7 +531,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "Đóng"
   },
   "retry": "Thử lại",
   "noData": "Không có dữ liệu",

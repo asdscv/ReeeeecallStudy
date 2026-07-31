@@ -1,6 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { SettingsScreen } from '../screens/SettingsScreen'
 import { AIGenerateScreen } from '../screens/AIGenerateScreen'
+import { LearningTodayScreen } from '../screens/LearningTodayScreen'
+import { LearningGoalsScreen } from '../screens/LearningGoalsScreen'
+import { LearningInsightsScreen } from '../screens/LearningInsightsScreen'
 // ─────────────────────────────────────────────────────────────────────────
 // [SUBSCRIPTION-HIDDEN] 구독 기능 심사 보류 — 2026-04-15
 // Apple Guideline 2.1(b) 대응: IAP products 미제출 상태에서 구독 UI 노출 금지.
@@ -23,6 +26,9 @@ export function SettingsStack() {
     <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
       <Stack.Screen name="SettingsHome" component={SettingsScreen} />
       <Stack.Screen name="AIGenerate" component={AIGenerateScreen} />
+      <Stack.Screen name="LearningToday" component={LearningTodayScreen} />
+      <Stack.Screen name="LearningGoals" component={LearningGoalsScreen} />
+      <Stack.Screen name="LearningInsights" component={LearningInsightsScreen} />
       {/* Paywall 라우트 — 화면 자체는 SUBSCRIPTION_UI_ENABLED로 게이트됨(꺼지면 빈 화면). */}
       <Stack.Screen name="Paywall" component={PaywallScreen} />
       <Stack.Screen name="Guide" component={GuideScreen} />

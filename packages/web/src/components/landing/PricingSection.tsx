@@ -5,9 +5,12 @@ import { Check, ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { supabase } from '../../lib/supabase'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
-// card_limit >= this sentinel means "unlimited" FOR DISPLAY (mig 124). The DB
-// stores a huge real cap (2e9); only the presentation collapses it to the word.
+// card_limit >= this sentinel means "unlimited" FOR DISPLAY. As of mig 148 NO catalog
+// plan is unlimited (the top plan is capped at 100,000); this only fires for admins,
+// whose effective limit stays 2e9 (mig 139). Kept so an admin-facing surface still reads
+// "무제한" rather than a huge number.
 const UNLIMITED_THRESHOLD = 1_000_000_000
 // Free tier is static on the landing (from card_limit_settings; not a catalog row).
 const FREE_CARD_LIMIT = 1000
@@ -56,8 +59,9 @@ export function PricingSection() {
   // when payments are off, but never render if the flag is not 'true'.
   if (!PAYMENTS_ENABLED) return null
 
-  // Display currency is USD (the LemonSqueezy store charges USD).
-  const fmtUsd = (cents: number) => `$${(cents / 100).toFixed(2)}`
+  // Price is always USD — the store charges USD everywhere (Toss/₩ dropped).
+  const fmtPrice = (p: RawPublicPlan) =>
+    formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents })
   const isUnlimited = (cardLimit: number) => cardLimit >= UNLIMITED_THRESHOLD
 
   // The card-limit line: "무제한 카드" for the sentinel, else "카드 {{count}}장".
@@ -67,8 +71,9 @@ export function PricingSection() {
       : t('pricing.upToCards', { count: cardLimit })
 
   // Free tier is static; paid tiers are fetched (data-driven — a new catalog row
-  // appears here automatically). Plan NAME + blurb derive from the card_limit so
-  // no plan is hardcoded: unlimited-class → "무제한", any other paid → "스탠다드".
+  // appears here automatically). Paid tiers are named by rank (first = Standard, higher
+  // = Pro) since the catalog now has two finite card-count plans (5,000 / 100,000) — no
+  // "unlimited" plan anymore; the card count itself is shown on the cardLimitLine.
   const freeTier: Tier = {
     key: 'free',
     name: t('pricing.plans.free'),
@@ -80,13 +85,15 @@ export function PricingSection() {
   }
 
   const paidTiers: Tier[] = plans.map((p, i) => {
-    const unlimited = isUnlimited(p.card_limit)
     return {
       key: p.id,
-      name: unlimited ? t('pricing.plans.unlimited') : t('pricing.plans.standard'),
-      price: t('pricing.pricePerMonth', { price: fmtUsd(p.price_usd_cents) }),
+      // Plan name = the DB title ("Standard" / "Pro"), the single source of truth shared
+      // with the Settings PlanSelector + mobile Paywall (they all read billing_products.title).
+      // Plan names are proper nouns → NOT translated; the exact card count is on cardLimitLine.
+      name: p.title,
+      price: t('pricing.pricePerMonth', { price: fmtPrice(p) }),
       cardLimitLine: limitLine(p.card_limit),
-      blurb: unlimited ? t('pricing.plans.unlimitedBlurb') : t('pricing.plans.standardBlurb'),
+      blurb: t('pricing.plans.standardBlurb'),
       cta: t('pricing.ctaPaid'),
       // Highlight the first paid tier as the recommended one.
       featured: i === 0,

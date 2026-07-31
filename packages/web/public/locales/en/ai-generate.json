@@ -1,18 +1,11 @@
 {
   "title": "AI Generate",
   "config": {
-    "model": "Model",
     "topic": "Topic",
     "topicPlaceholder": "e.g., JLPT N3 Japanese vocabulary, Korean history timeline",
     "cardCount": "Number of cards",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
-    "customEndpoint": "Custom Endpoint",
-    "selectProvider": "Select a provider",
-    "noProvidersConfigured": "No AI providers configured",
-    "goToSettings": "Add in Settings",
-    "manageInSettings": "Manage providers:",
-    "settings": "Settings",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
@@ -22,7 +15,6 @@
     "targetDeck": "Target Deck",
     "selectDeck": "Select a deck...",
     "selectDeckRequired": "Please select a deck to add cards to.",
-    "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
     "contentLang": "Content Language",
@@ -53,7 +45,12 @@
     "imageUploadHint": "Pick a photo of a word list, textbook page, or notes — AI turns it into cards.",
     "imagePaidNotice": "Image generation uses credits (no free tier).",
     "deckNoTemplate": "This deck has no card template yet — open it and add a card once to set one up.",
-    "cardLimitExceeds": "You can add at most {{available}} more card(s) — reduce the count or subscribe."
+    "cardLimitExceeds": "You can add at most {{available}} more card(s) — reduce the count or subscribe.",
+    "imageAddMore": "Add more ({{count, number}}/{{max}})",
+    "imageRemove": "Remove image",
+    "inputModeTopicHint": "Describe a topic and AI writes the cards for you.",
+    "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once.",
+    "noOwnedDecks": "You don’t own any decks yet — create a deck first, then add AI cards to it."
   },
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards available today",
@@ -61,8 +58,10 @@
     "creditsOnly": "{{credits}} paid cards available",
     "empty": "You’ve used today’s free cards",
     "unknown": "Balance unavailable right now",
-    "balance": "₩{{won}} balance (~{{cards}} cards)",
-    "imagePaid": "Image generation is paid — top up your balance to continue."
+    "balance": "{{amount}} balance",
+    "imagePaid": "Image generation is paid — top up your balance to continue.",
+    "cardLimit": "{{available}} of {{limit}} cards left",
+    "cardLimitUnlimited": "No card limit (admin)"
   },
   "wizard": {
     "setup": "Setup",
@@ -93,11 +92,11 @@
     "deckIcon": "Icon",
     "deckColor": "Color",
     "cardsReviewTitle": "Review Cards",
-    "cardsTitle": "{{count}} cards generated",
-    "filteredWarning": "{{count}} invalid cards were filtered out",
+    "cardsTitle": "{{count, number}} cards generated",
+    "filteredWarning": "{{count, number}} invalid cards were filtered out",
     "regenerate": "Regenerate",
     "next": "Next",
-    "save": "Save {{count}} cards",
+    "save": "Save {{count, number}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
     "removeCard": "Remove",
     "tts": {
@@ -123,7 +122,10 @@
         "hint": "Hint",
         "detail": "Detail"
       }
-    }
+    },
+    "templateDesc": "AI designed this card structure. Rename fields if you like, then continue.",
+    "deckDesc": "Review your new deck's name, icon, and color, then continue.",
+    "cardsDesc": "Review the generated cards. Edit any text, remove ones you don't want, then save."
   },
   "done": {
     "title": "Generation Complete!",
@@ -137,17 +139,19 @@
   },
   "errors": {
     "title": "Error",
-    "noApiKey": "Please set up your AI API key first.",
-    "invalidApiKey": "Invalid API key. Please check your key.",
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
-    "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
+    "networkError": "Network error. Please check your connection and try again.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AI server error. Please try again later.",
     "emptyResult": "The AI generated no cards. Please try again — you weren't charged.",
-    "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more."
+    "cardLimitReached": "You’ve reached your card limit. Delete cards or subscribe to save more.",
+    "insufficientCredits": "You've used today's free AI cards and have no credits left. Top up to keep generating.",
+    "invalidImage": "Couldn't read that image. Please try a smaller or clearer photo.",
+    "quotaExceeded": "You've reached today's free AI generation limit. Please try again tomorrow.",
+    "deckNotOwned": "That deck can’t receive new cards. Choose a deck you own."
   },
   "button": {
     "aiGenerate": "AI Generate",

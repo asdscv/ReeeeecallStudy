@@ -81,3 +81,13 @@ export function resolveProvider(id?: PaymentProviderId | null): PaymentProvider 
 export function paymentProviderId(): PaymentProviderId {
   return enabledProviderIds()[0] ?? 'none'
 }
+
+/**
+ * The provider to charge every buyer. The store settles USD everywhere via
+ * LemonSqueezy (Toss/₩ dropped), so this is always 'lemonsqueezy'. Passed to
+ * startCheckout regardless of whether it's configured — resolveProvider returns null
+ * (→ "coming soon", no charge) when it isn't.
+ */
+export function preferredProviderId(): PaymentProviderId {
+  return 'lemonsqueezy'
+}

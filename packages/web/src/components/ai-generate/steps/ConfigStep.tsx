@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ImageUp } from 'lucide-react'
-import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { getAffordableCards, formatUsdMicro, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { defaultCardCount, MAX_CARD_COUNT } from '@reeeeecall/shared/lib/ai/card-count'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { useAuthStore } from '../../../stores/auth-store'
 import { useDeckStore } from '../../../stores/deck-store'
 import { CardLimitBlock } from '../../card/CardLimitBlock'
 import type { GenerateMode } from '../../../lib/ai/types'
 import type { Deck } from '../../../types/database'
+import { numericInputOr, parseNumericInput, type NumericInputValue } from '../../../lib/numeric-input'
 
 // ─── Exported types ────────────────────────────────────────
 
@@ -16,10 +19,6 @@ export interface FieldPresetItem {
 }
 
 export type FieldMode = 'auto' | 'manual'
-
-// The free AI-generation daily cap (mirrors the server's _ai_free_cards_per_day = 10).
-// Used to clamp the default card count to today's remaining free allowance.
-const FREE_DAILY_CAP = 10
 
 export interface GenerateConfig {
   topic: string
@@ -31,7 +30,7 @@ export interface GenerateConfig {
   selectedDeckId?: string
   selectedTemplateId?: string
   imageMode?: 'topic' | 'image'
-  imageDataUrl?: string
+  imageDataUrls?: string[]
 }
 
 const CONTENT_LANGUAGES = [
@@ -66,24 +65,38 @@ interface ConfigStepProps {
 export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showModeSelect, onModeChange }: ConfigStepProps) {
   const { t } = useTranslation('ai-generate')
   const { decks, fetchDecks } = useDeckStore()
+  const userId = useAuthStore((s) => s.user?.id)
   const limit = useCardLimit()
+
+  // ONLY decks the user OWNS and can edit can receive new cards. `decks` also holds
+  // SUBSCRIBED decks (owned by a publisher via a marketplace/share, is_readonly copies
+  // too) — saving into one fails server-side at reserve_card_positions with "deck not
+  // found or not owned", which the UI mislabels as a generic AI error. Offering only
+  // owned+editable decks as AI targets prevents that whole failure class.
+  const targetDecks = useMemo(
+    () => decks.filter((d) => d.user_id === userId && !d.is_readonly),
+    [decks, userId],
+  )
 
   // Generation config state.
   // cardCount defaults to today's REMAINING FREE cards (see the affordance effect below)
   // so a default generation never overshoots the free daily allowance (10/day). Starts at
   // the free daily cap (10) until the server-authoritative remaining loads.
   const [topic, setTopic] = useState(initialTopic || '')
-  const [cardCount, setCardCount] = useState(10)
-  const countTouched = useRef(false)   // once the user edits the count, stop auto-defaulting it
+  const [cardCount, setCardCount] = useState<NumericInputValue>(10)
+  // State, not a ref: the auto-default below is decided during render, and a ref read
+  // there is both a lint violation and a stale-value risk.
+  const [countTouched, setCountTouched] = useState(false)   // user edited the count → stop auto-defaulting
   const [useCustomHtml, setUseCustomHtml] = useState(false)
   const [contentLang, setContentLang] = useState('')
 
   // Deck selector (cards_only mode)
-  const [selectedDeckId, setSelectedDeckId] = useState(existingDeckId || '')
+  const [selectedDeckIdInput, setSelectedDeckId] = useState(existingDeckId || '')
 
   // Input mode (cards_only): type a topic, or upload an image to recognize.
   const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
+  const [imageDataUrls, setImageDataUrls] = useState<string[]>([])
+  const MAX_IMAGES = 8
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Remaining free cards + credit-affordable cards (cost transparency).
@@ -108,31 +121,56 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     }
   }, [isFullMode, decks.length, fetchDecks])
 
-  useEffect(() => {
+  // Sync topic from prop change without an effect (avoids cascading render).
+  // React "storing information from previous renders" pattern.
+  const [prevInitialTopic, setPrevInitialTopic] = useState(initialTopic)
+  if (initialTopic !== prevInitialTopic) {
+    setPrevInitialTopic(initialTopic)
     if (initialTopic) setTopic(initialTopic)
-  }, [initialTopic])
+  }
 
-  useEffect(() => {
+  // Sync selectedDeckId from prop change without an effect (avoids cascading render).
+  const [prevExistingDeckId, setPrevExistingDeckId] = useState(existingDeckId)
+  if (existingDeckId !== prevExistingDeckId) {
+    setPrevExistingDeckId(existingDeckId)
     if (existingDeckId) setSelectedDeckId(existingDeckId)
-  }, [existingDeckId])
+  }
+
+
+  // A selection that isn't an owned+editable deck (a preselected subscribed deck, or one
+  // that stopped qualifying) is DERIVED away rather than cleared after the fact: clearing
+  // needed an extra render pass and only ran when the deck list changed, so a selection
+  // arriving later stayed invalid until the list moved again.
+  const selectedDeckId = selectedDeckIdInput && targetDecks.length > 0
+    && !targetDecks.some((d) => d.id === selectedDeckIdInput)
+    ? ''
+    : selectedDeckIdInput
 
   // Load the remaining-free + credit affordance once (server is authoritative).
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
 
-  // Default the card count to TODAY'S REMAINING FREE cards (clamped to [1, free daily cap])
-  // so a default generation never overshoots the free allowance and silently spends the
-  // wallet. Applies once the server-authoritative affordance loads, and only until the user
-  // edits the count themselves. Image mode is paid-only, so it keeps the manual value.
-  useEffect(() => {
-    if (affordable && !countTouched.current && !useImage) {
-      setCardCount(Math.max(1, Math.min(FREE_DAILY_CAP, affordable.free)))
+  // Default the card count to TODAY'S REMAINING FREE cards so a default generation never
+  // overshoots the free allowance and silently spends the wallet. The bound comes from the
+  // SERVER (`get_ai_generation_quota` returns remaining = free_limit − used), so raising the
+  // quota via admin_set_ai_free_quota is followed here with no deploy — see
+  // shared/lib/ai/card-count.ts. Applies once the server-authoritative affordance loads, and
+  // only until the user edits the count themselves. Image mode is paid-only, so it keeps the
+  // manual value.
+  // Render-time adjustment avoids effect-based setState (cascading render).
+  // Tracks useImage too: the old effect listed it as a dependency, so leaving image mode
+  // after the affordance loaded re-applied the free-quota default.
+  const [prevAffordance, setPrevAffordance] = useState({ affordable, useImage })
+  if (affordable !== prevAffordance.affordable || useImage !== prevAffordance.useImage) {
+    setPrevAffordance({ affordable, useImage })
+    if (affordable && !countTouched && !useImage) {
+      setCardCount(defaultCardCount(affordable.free))
     }
-  }, [affordable, useImage])
+  }
 
-  // Selected deck info
-  const selectedDeck: Deck | undefined = decks.find((d) => d.id === selectedDeckId)
+  // Selected deck info (only owned+editable decks are selectable — see targetDecks)
+  const selectedDeck: Deck | undefined = targetDecks.find((d) => d.id === selectedDeckId)
 
   const addCustomField = () => {
     if (customFields.length >= 6) return
@@ -150,47 +188,69 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
     setCustomFields(updated)
   }
 
-  const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    // Downscale large photos client-side so the data URL stays well under the
-    // server's image cap (a phone photo is often 4–12MB).
-    const url = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      const MAX_EDGE = 1600
-      const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.max(1, Math.round(img.width * scale))
-      canvas.height = Math.max(1, Math.round(img.height * scale))
-      const ctx = canvas.getContext('2d')
-      if (!ctx) { setImageDataUrl(null); return }
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      setImageDataUrl(canvas.toDataURL('image/jpeg', 0.82))
-    }
-    img.onerror = () => { URL.revokeObjectURL(url); setImageDataUrl(null) }
-    img.src = url
+  // Downscale one photo client-side so the data URL stays well under the server's
+  // image cap (a phone photo is often 4–12MB). Resolves to null on decode failure.
+  const downscale = (file: File): Promise<string | null> =>
+    new Promise((resolve) => {
+      const url = URL.createObjectURL(file)
+      const img = new Image()
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const MAX_EDGE = 1600
+        const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.max(1, Math.round(img.width * scale))
+        canvas.height = Math.max(1, Math.round(img.height * scale))
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return resolve(null)
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', 0.82))
+      }
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null) }
+      img.src = url
+    })
+
+  // Multi-photo upload: process every picked file and APPEND to the current set,
+  // capped at MAX_IMAGES. Users can add photos across several picks; each result is
+  // a downscaled data URL sent to the vision model together.
+  const onPickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    e.target.value = '' // allow re-picking the same file
+    if (files.length === 0) return
+    const room = MAX_IMAGES - imageDataUrls.length
+    if (room <= 0) return
+    const urls = (await Promise.all(files.slice(0, room).map(downscale))).filter(
+      (u): u is string => !!u,
+    )
+    if (urls.length) setImageDataUrls((prev) => [...prev, ...urls].slice(0, MAX_IMAGES))
   }
+
+  const removeImage = (idx: number) =>
+    setImageDataUrls((prev) => prev.filter((_, i) => i !== idx))
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (useImage) {
-      if (!imageDataUrl) return
+      if (imageDataUrls.length === 0) return
       if (!isFullMode && !selectedDeckId) return  // cards_only needs a target deck
     } else {
       if (!topic.trim()) return
       if (!isFullMode && !selectedDeckId) return
     }
 
+    // An empty count box is not a generation request. It used to be typed away with
+    // `'' as any` and reached the server as an empty string.
+    const requestedCards = numericInputOr(cardCount, 0)
+    if (!useImage && requestedCards < 1) return
+
     // Owned-card limit pre-flight (mig 116): don't spend AI cost/quota generating
     // cards that can't be saved. In image mode the count is model-decided, so only
     // block when there's NO room at all. Server still enforces at save.
-    if (useImage ? limit.reached : limit.exceeds(cardCount)) return
+    if (useImage ? limit.reached : limit.exceeds(requestedCards)) return
 
     onStart({
       topic,
-      cardCount,
+      cardCount: requestedCards,
       useCustomHtml,
       contentLang,
       fieldMode,
@@ -202,7 +262,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         ? selectedDeck.default_template_id
         : undefined,
       imageMode: useImage ? 'image' : 'topic',
-      imageDataUrl: useImage ? imageDataUrl ?? undefined : undefined,
+      imageDataUrls: useImage ? imageDataUrls : undefined,
     })
   }
 
@@ -212,25 +272,44 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   const canSubmit = cardsOnlyNeedsTemplate
     ? false
     : useImage
-      ? !!imageDataUrl && (isFullMode || !!selectedDeckId)
+      ? imageDataUrls.length > 0 && (isFullMode || !!selectedDeckId)
       : topic.trim() && (isFullMode || selectedDeckId)
 
-  // Free-remaining + prepaid ₩ wallet line (metered billing). Image mode is paid-only.
-  const balanceWon = affordable?.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1_000_000) : 0
-  const balanceText = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable!.paid })
+  // Free-remaining + prepaid USD wallet line (metered billing). Image mode is paid-only.
+  // Use the micro-USD amount for the >0 checks — a sub-dollar balance ($0.50) must not
+  // floor to 0 and read as "empty".
+  //
+  // Deliberately shows the BALANCE ONLY, never a "≈ N cards" estimate: pricing is
+  // metered (per-token × markup) and the markup can be retuned at any time, so a
+  // headline card count would be a promise we can't keep. `affordable.paid`/`.total`
+  // still drive the affordability gate in ai-generate-store; they just aren't advertised.
+  const balanceMicro = affordable?.balanceMicroWon ?? 0
+  const hasBalance = balanceMicro > 0
+  const balanceText = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro) })
   const walletText = !affordable
     ? null
     : !affordable.walletKnown
       ? t('wallet.unknown')
       : useImage
-        ? (balanceWon > 0 ? balanceText() : t('wallet.imagePaid'))
-        : affordable.free > 0 && balanceWon > 0
+        ? (hasBalance ? balanceText() : t('wallet.imagePaid'))
+        : affordable.free > 0 && hasBalance
           ? `${t('wallet.freeOnly', { free: affordable.free })} · ${balanceText()}`
           : affordable.free > 0
             ? t('wallet.freeOnly', { free: affordable.free })
-            : balanceWon > 0
+            : hasBalance
               ? balanceText()
               : t('wallet.empty')
+
+  // Owned-card limit line: how much room is left until the cap. A limit >= 1e9 is the
+  // "unlimited" sentinel — since mig 148 no plan is unlimited (top plan caps at 100,000),
+  // so this only shows the dedicated string for admins (effective limit 2e9). Shown once
+  // usage is KNOWN and the cap isn't already reached (the CardLimitBlock covers reached).
+  const usage = limit.cardUsage
+  const cardsLeftText = !usage || limit.reached
+    ? null
+    : usage.limit >= 1_000_000_000
+      ? t('wallet.cardLimitUnlimited')
+      : t('wallet.cardLimit', { available: Math.max(0, usage.available), limit: usage.limit })
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -276,13 +355,15 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               }`}
             >
               <option value="">{t('config.selectDeck')}</option>
-              {decks.map((d) => (
+              {targetDecks.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.icon} {d.name}
                 </option>
               ))}
             </select>
-            {!selectedDeckId && (
+            {targetDecks.length === 0 && !isFullMode ? (
+              <p className="text-xs text-muted-foreground mt-0.5">{t('config.noOwnedDecks')}</p>
+            ) : !selectedDeckId && (
               <p className="text-xs text-destructive mt-0.5">{t('config.selectDeckRequired')}</p>
             )}
             {cardsOnlyNeedsTemplate && (
@@ -310,6 +391,10 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
             </button>
           ))}
         </div>
+        {/* Explain what the selected input mode does. */}
+        <p className="text-[11px] text-muted-foreground -mt-1">
+          {t(useImage ? 'config.inputModeImageHint' : 'config.inputModeTopicHint')}
+        </p>
 
         {/* Topic input (topic mode, or full mode) */}
         {!useImage && (
@@ -333,19 +418,37 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               ref={fileRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              multiple
               onChange={onPickImage}
               className="hidden"
             />
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-border hover:border-brand/50 hover:bg-accent/30 transition cursor-pointer text-muted-foreground text-sm"
+              disabled={imageDataUrls.length >= MAX_IMAGES}
+              className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-border hover:border-brand/50 hover:bg-accent/30 transition cursor-pointer text-muted-foreground text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ImageUp size={28} />
-              {imageDataUrl ? t('config.imageChange') : t('config.imageUpload')}
+              {imageDataUrls.length > 0
+                ? t('config.imageAddMore', { count: imageDataUrls.length, max: MAX_IMAGES })
+                : t('config.imageUpload')}
             </button>
-            {imageDataUrl && (
-              <img src={imageDataUrl} alt="" className="mt-2 max-h-44 rounded-xl border border-border mx-auto" />
+            {imageDataUrls.length > 0 && (
+              <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {imageDataUrls.map((src, i) => (
+                  <div key={i} className="relative">
+                    <img src={src} alt="" className="h-20 w-full rounded-lg border border-border object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      aria-label={t('config.imageRemove')}
+                      className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground/80 text-[11px] text-background hover:bg-foreground"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
             <p className="text-[11px] text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
             <p className="text-[11px] text-amber-600 mt-0.5">{t('config.imagePaidNotice')}</p>
@@ -377,21 +480,21 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
           <input
             type="number"
             min={1}
-            max={100}
+            max={MAX_CARD_COUNT}
             value={cardCount}
             onChange={(e) => {
-              countTouched.current = true   // user set it manually → stop auto-defaulting to remaining-free
+              setCountTouched(true)   // user set it manually → stop auto-defaulting to remaining-free
               const raw = e.target.value
-              setCardCount(raw === '' ? ('' as any) : (parseInt(raw) || 0))
+              setCardCount(parseNumericInput(raw))
             }}
             onBlur={() => {
               const n = typeof cardCount === 'number' ? cardCount : parseInt(String(cardCount)) || 1
-              setCardCount(Math.max(1, Math.min(100, n)))
+              setCardCount(Math.max(1, Math.min(MAX_CARD_COUNT, n)))
             }}
             className="w-full px-3 py-2 rounded-xl border border-border text-sm outline-none focus:border-brand bg-card"
-            placeholder={t('config.cardCountPlaceholder', { min: 1, max: 100 })}
+            placeholder={t('config.cardCountPlaceholder', { min: 1, max: MAX_CARD_COUNT })}
           />
-          <p className="text-xs text-content-tertiary mt-1">{t('config.cardCountHint', { min: 1, max: 100 })}</p>
+          <p className="text-xs text-content-tertiary mt-1">{t('config.cardCountHint', { min: 1, max: MAX_CARD_COUNT })}</p>
         </div>
       </fieldset>
 
@@ -507,15 +610,20 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
         </fieldset>
       )}
 
-      {walletText && (
-        <div className="flex justify-center">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{walletText}</span>
+      {(walletText || cardsLeftText) && (
+        <div className="flex flex-wrap justify-center gap-2">
+          {walletText && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{walletText}</span>
+          )}
+          {cardsLeftText && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-xs text-muted-foreground">{cardsLeftText}</span>
+          )}
         </div>
       )}
 
       {limit.reached ? (
         <CardLimitBlock />
-      ) : !useImage && limit.exceeds(cardCount) ? (
+      ) : !useImage && limit.exceeds(numericInputOr(cardCount, 0)) ? (
         <p className="text-xs text-center text-destructive">
           {t('config.cardLimitExceeds', { available: limit.available })}
         </p>
@@ -523,7 +631,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
 
       <button
         type="submit"
-        disabled={!canSubmit || (!useImage && limit.exceeds(cardCount))}
+        disabled={!canSubmit || (useImage ? limit.reached : limit.exceeds(numericInputOr(cardCount, 0)))}
         className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}

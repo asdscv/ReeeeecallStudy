@@ -13,12 +13,6 @@
     "full": "Full (Template + Deck + Cards)",
     "cardsOnly": "Add Cards to Existing Deck"
   },
-  "provider": {
-    "section": "AI PROVIDER",
-    "notice": "AI generation uses your own API key for each provider. Add or manage keys in Settings.",
-    "none": "No AI providers configured",
-    "addInSettings": "Add in Settings"
-  },
   "content": {
     "section": "CONTENT SETTINGS",
     "topicLabel": "Topic",
@@ -33,14 +27,19 @@
     "imageUpload": "Upload image",
     "imageChange": "Change image",
     "imageHint": "Pick a photo — AI turns it into cards.",
-    "imagePaidNotice": "Image generation uses credits."
+    "imagePaidNotice": "Image generation uses credits.",
+    "imageAddMore": "Add more ({{count, number}}/{{max}})",
+    "inputModeTopicHint": "Describe a topic and AI writes the cards for you.",
+    "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once.",
+    "cardLimitExceeds": "You can add at most {{available}} more card(s) — reduce the count or subscribe.",
+    "cardLimitReached": "You've reached your card limit — delete cards or subscribe to add more."
   },
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards today",
     "creditsOnly": "{{credits}} paid cards available",
     "empty": "You’ve used today’s free cards",
     "unknown": "Balance unavailable",
-    "balance": "₩{{won}} balance (~{{cards}} cards)",
+    "balance": "{{amount}} balance",
     "freeOnly": "{{free}} free cards left today",
     "imagePaid": "Image generation is paid — top up your balance to continue."
   },
@@ -55,8 +54,8 @@
   },
   "review": {
     "title": "Review Cards",
-    "generatedCount": "{{count}} cards generated",
-    "save": "Save {{count}} Cards",
+    "generatedCount": "{{count, number}} cards generated",
+    "save": "Save {{count, number}} Cards",
     "regenerate": "Regenerate",
     "cardDone": "Done",
     "remove": "Remove"
@@ -76,7 +75,6 @@
   "alert": {
     "errorTitle": "Error",
     "enterTopic": "Please enter a topic",
-    "configureProvider": "Please configure an AI provider in Settings first.",
     "saveFailed": "Failed to save generated cards",
     "imageRequired": "Please select an image first.",
     "selectImageError": "That image is too large or couldn't be read. Try a smaller photo.",

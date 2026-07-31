@@ -18,16 +18,16 @@
     "title": "Recent Decks",
     "noDecks": "No decks yet. Go to Decks tab to create one!",
     "goToDecks": "Go to Deck Management",
-    "cardCount": "{{count}} cards",
-    "newCards": "{{count}} new",
-    "reviewCards": "{{count}} due",
+    "cardCount": "{{count, number}} cards",
+    "newCards": "{{count, number}} new",
+    "reviewCards": "{{count, number}} due",
     "study": "Study"
   },
   "heatmap": {
     "title": "Study Heatmap"
   },
   "gamification": {
-    "freezes": "{{count}} freezes left",
+    "freezes": "{{count, number}} freezes left",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,23 +42,23 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count}} cards",
-    "sessions": "Complete {{count}} sessions",
-    "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores",
+    "cards": "Study {{count, number}} cards",
+    "sessions": "Complete {{count, number}} sessions",
+    "time": "Study for {{count, number}} minutes",
+    "perfect": "Get {{count, number}} perfect scores",
     "completed": "Completed"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "motivational": "Keep going! You're doing great!"
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days",
+  "streakDays": "{{count, number}} days",
   "quickStudy": {
     "title": "Quick Study",
-    "dueToday": "{{count}} cards due today",
+    "dueToday": "{{count, number}} cards due today",
     "startSession": "Start a study session"
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { View, Image, Text, Animated, Easing, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { testProps } from '../../utils/testProps'
 import { palette } from '../../theme'
 
 const { width: W, height: H } = Dimensions.get('window')
@@ -20,7 +21,9 @@ const ORBS = [
 const FEATURE_KEYS = [
   { icon: '🧠', key: 'srs' },
   { icon: '📊', key: 'stats' },
-  { icon: '∞', key: 'unlimited' },
+  // AI card generation — a real feature. (Was a misleading "무제한 덱 / Unlimited Decks":
+  // decks are uncapped but CARDS are limited, so it implied unlimited capacity.)
+  { icon: '🤖', key: 'ai' },
 ]
 
 interface Props {
@@ -180,12 +183,28 @@ export function AuthGuardScreen({ onLogin }: Props) {
             ))}
           </View>
 
-          {/* CTA Buttons */}
-          <TouchableOpacity style={s.ctaPrimary} onPress={onLogin} activeOpacity={0.8}>
+          {/* CTA Buttons.
+
+              Both lead to the same place, so they are addressable separately anyway: this is
+              the FIRST screen a new install shows, and without ids an automated run cannot
+              get past it — which is exactly how it blocked the iOS E2E suite. */}
+          <TouchableOpacity
+            style={s.ctaPrimary}
+            onPress={onLogin}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            {...testProps('auth-guard-get-started')}
+          >
             <Text style={s.ctaPrimaryText}>{t('authGuard.ctaButton')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={s.ctaSecondary} onPress={onLogin} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={s.ctaSecondary}
+            onPress={onLogin}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            {...testProps('auth-guard-login')}
+          >
             <Text style={s.ctaSecondaryText}>{t('authGuard.loginButton')}</Text>
           </TouchableOpacity>
         </View>

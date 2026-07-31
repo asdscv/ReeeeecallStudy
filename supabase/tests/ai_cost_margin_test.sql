@@ -35,12 +35,12 @@ INSERT INTO public.ai_generation_jobs (id, user_id, usage_date, free_cards, paid
 -- ════════════════════════════════════════════════════════════════════════════
 -- P. preview_ai_cost — DRY RUN of the metered price (no wallet write)
 -- ════════════════════════════════════════════════════════════════════════════
--- P1: gemini-flash-lite 1000/500 → cost_won 405000; markup 5 → price 2,025,000; margin 80%
+-- P1: gemini-flash-lite 1000/500 → cost_won 300; markup 5 → price 2,025,000; margin 80%
 DO $$ DECLARE p record; BEGIN
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
-  ASSERT p.cost_won_micros = 405000, format('P1 cost %s', p.cost_won_micros);
-  ASSERT p.price_won_micros = 2025000, format('P1 price %s', p.price_won_micros);
-  ASSERT p.margin_won_micros = 1620000, format('P1 margin %s', p.margin_won_micros);
+  ASSERT p.cost_won_micros = 300, format('P1 cost %s', p.cost_won_micros);
+  ASSERT p.price_won_micros = 1500, format('P1 price %s', p.price_won_micros);
+  ASSERT p.margin_won_micros = 1200, format('P1 margin %s', p.margin_won_micros);
   ASSERT p.margin_bps = 8000, format('P1 bps %s', p.margin_bps);
   ASSERT p.estimated = false AND p.rate_missing = false, 'P1 flags';
 END $$;
@@ -74,26 +74,26 @@ SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_paid', 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_paid';
-  ASSERT r.cost_won_micros = 405000 AND r.price_won_micros = 2025000, format('CH1 %s/%s', r.cost_won_micros, r.price_won_micros);
+  ASSERT r.cost_won_micros = 300 AND r.price_won_micros = 1500, format('CH1 %s/%s', r.cost_won_micros, r.price_won_micros);
   ASSERT r.margin_bps = 8000, format('CH1 bps %s', r.margin_bps);
 END $$;
 
--- CH2: mixed job (paid_share 1/3) → price = round(405000/3*5) = 675000; margin vs FULL cost (free CAC drag)
+-- CH2: mixed job (paid_share 1/3) → price = round(300/3*5) = 500; margin vs FULL cost (free CAC drag)
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_mix', 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_mix';
-  ASSERT r.price_won_micros = 675000, format('CH2 price %s', r.price_won_micros);
-  ASSERT r.cost_won_micros = 405000, format('CH2 full cost %s', r.cost_won_micros);  -- full call cost recorded
-  -- margin = price - FULL cost = 675000 - 405000 = 270000 (blended, free cards drag it below 80%)
-  ASSERT r.margin_won_micros = 270000, format('CH2 blended margin %s', r.margin_won_micros);
+  ASSERT r.price_won_micros = 500, format('CH2 price %s', r.price_won_micros);
+  ASSERT r.cost_won_micros = 300, format('CH2 full cost %s', r.cost_won_micros);  -- full call cost recorded
+  -- margin = price - FULL cost = 500 - 300 = 200 (blended, free cards drag it below 80%)
+  ASSERT r.margin_won_micros = 200, format('CH2 blended margin %s', r.margin_won_micros);
 END $$;
 
 -- CH3: image job → paid_share 1 → price = cost×5
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_img', 'gemini','gemini-2.5-flash', 1000, 800);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_img';
-  -- cost_usd=(1000*300000+800*2500000)/1e6=2300; cost_won=round(2300*1350)=3105000; price=×5=15525000
-  ASSERT r.cost_won_micros = 3105000 AND r.price_won_micros = 15525000, format('CH3 %s/%s', r.cost_won_micros, r.price_won_micros);
+  -- cost_usd=(1000*300000+800*2500000)/1e6=2300; cost_won=2300 (rate 1, mig 145); price=×5=11500
+  ASSERT r.cost_won_micros = 2300 AND r.price_won_micros = 11500, format('CH3 %s/%s', r.cost_won_micros, r.price_won_micros);
   ASSERT r.margin_bps = 8000, format('CH3 bps %s', r.margin_bps);
 END $$;
 
@@ -114,7 +114,7 @@ END $$;
 DO $$ DECLARE p record; BEGIN
   PERFORM set_ai_pricing_settings(p_target_margin_bps => 9000);
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
-  ASSERT p.price_won_micros = 4050000, format('E1 markup10 price %s', p.price_won_micros);  -- 405000*10
+  ASSERT p.price_won_micros = 3000, format('E1 markup10 price %s', p.price_won_micros);  -- 300*10
   ASSERT p.margin_bps = 9000, format('E1 bps %s', p.margin_bps);
   PERFORM set_ai_pricing_settings(p_target_margin_bps => 8000);  -- restore
 END $$;
@@ -125,8 +125,8 @@ DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_new', 'gemini','gemini-2.5-pro', 1000, 1000);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_new';
   ASSERT r.rate_missing = false, 'E2 uses new rate';
-  -- cost_usd=(1000*1250000+1000*10000000)/1e6=11250; cost_won=round(11250*1350)=15187500; price=×5=75937500
-  ASSERT r.cost_won_micros = 15187500 AND r.price_won_micros = 75937500, format('E2 %s/%s', r.cost_won_micros, r.price_won_micros);
+  -- cost_usd=(1000*1250000+1000*10000000)/1e6=11250; cost_won=11250 (rate 1, mig 145); price=×5=56250
+  ASSERT r.cost_won_micros = 11250 AND r.price_won_micros = 56250, format('E2 %s/%s', r.cost_won_micros, r.price_won_micros);
 END $$;
 
 -- E3: 100% margin (10000 bps) is rejected — it would make markup divide by zero
@@ -153,8 +153,8 @@ DO $$ DECLARE row record; found boolean := false; BEGIN
     found := true;
     ASSERT row.jobs = 3, format('F2 jobs %s', row.jobs);                    -- jc_paid, jc_mix, jc_zero
     ASSERT row.unknown_cost_jobs = 1, format('F2 estimated %s', row.unknown_cost_jobs);  -- jc_zero
-    -- price sum (non-estimated): jc_paid 2,025,000 + jc_mix 675,000 = 2,700,000
-    ASSERT row.price_won_micros = 2700000, format('F2 price %s', row.price_won_micros);
+    -- price sum (non-estimated): jc_paid 1,500 + jc_mix 500 = 2,000 (micro-USD, rate 1)
+    ASSERT row.price_won_micros = 2000, format('F2 price %s', row.price_won_micros);
   END LOOP;
   ASSERT found, 'F2 group present';
 END $$;

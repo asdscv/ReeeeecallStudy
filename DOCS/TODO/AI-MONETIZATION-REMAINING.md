@@ -6,6 +6,24 @@ Builds on the completed engineering: [2026-07-01-ai-server-generation.md](../DON
 Everything below is what's **left**. None of it blocks the shipped engineering; it's the
 business/economic layer + external rails + ops + minor cleanup.
 
+> **2026-07-30 확인**: 엔지니어링(Phase 0/1a/1b + metered billing + 이미지 UI + 테스트/CI/e2e)은
+> `develop` 에 들어가 있다. 남은 §1 Phase 1(마진 ON)·§2 결제 provider 연동·§3 프로덕션 GO-LIVE 는
+> **소유자의 사업 숫자·외부 계약·실제 과금**에 걸려 있어 자율 진행 대상이 아니다.
+> §4/§5(저우선 UI 정리·리포팅 정확도)만 코드 작업이며, 과금 모델 확정 후 함께 다루는 것이 안전하다.
+
+> **2026-07-31 재감사 (§2·§3 전면 개정, §4 마감, §5 보강).** 이 문서의 §2·§3 은 코드 현실보다
+> 몇 달 뒤처져 있었다 — §2 는 "webhook NOT built / provider not chosen" 이라고 적혀 있었지만
+> LemonSqueezy·Toss·RevenueCat 웹훅과 SKU 카탈로그·환불 정책·샌드박스 격리(mig 151~159)가 전부
+> 들어가 있었고, §3 은 이미 오래 전에 적용된 마이그레이션 108–115 를 "적용하라"고 지시하고 있었다
+> (그 중 mig 114 는 지갑을 TRUNCATE 한다 — stale 체크리스트가 위험한 이유).
+>
+> 같은 감사에서 **실제 머니 버그**를 찾아 고쳤다: RevenueCat 환불이 한 번도 클로백되지 않고 있었다
+> (§2, PR #350). §4 의 죽은 코드 항목은 닫혔고(#349 + 2026-07-31 후속), §5 에는 순액 리포팅을
+> `payment_intents` 컬럼으로 만들면 모바일 절반을 놓친다는 사실과, 환불된 크레딧팩이 어드민
+> 목록에서 여전히 `paid` 로 보이는 별건 버그를 적었다.
+>
+> ⚠️ **이 문서는 프로덕션 상태의 근거가 아니다.** §3 의 표는 과거 PR 기록의 요약일 뿐이며,
+> 무엇을 적용하기 전에 실제 DB 를 확인해야 한다.
 ---
 
 ## 1. Cost / margin / pricing layer  ✅ Phase 0 + METERED BILLING SHIPPED to develop / ⏳ payment pending
@@ -81,70 +99,199 @@ cards/day uncapped? daily budget?) + FX update cadence.
 
 ---
 
-## 2. Payment rails — Phase 1c  (server seam READY / provider integration = EXTERNAL)
+## 2. Payment rails — Phase 1c  ✅ BUILT (web + mobile) / ⏳ provider accounts + go-live are owner work
 
-- **Strategy A (store-compliant):** web = **PortOne** (카드/카카오/네이버/토스); mobile = **Apple IAP +
-  Google Play Billing via RevenueCat**, consumable **₩ packs**. One micro-WON wallet unifies web+app.
-- **Server seam is DONE + tested:** a verified payment top-up = **`add_ai_credits(p_user_id, p_micro_won,
-  'purchase', p_ref)`** (service_role, **idempotent on `p_ref`** = the payment id → webhook retries can't
-  double-credit; `p_micro_won` = **pack ₩ × 1_000_000**). Metered billing then deducts real cost from that
-  balance. So 1c's only new server piece is the **verify→grant webhook**.
-- **The webhook (per provider) — NOT built (security-sensitive, provider not chosen):** it mints wallet
-  balance = money, so it MUST be **fail-closed**: reject unless the provider's verification is configured +
-  passes. Contract per provider:
-  - **PortOne (web):** on the client `onSuccess`, POST `{imp_uid, merchant_uid}` → server calls PortOne
-    `GET /payments/{imp_uid}` (with the PortOne API secret) → confirm `status=paid` + amount matches the SKU →
-    `add_ai_credits(uid, sku_won×1e6, 'purchase', imp_uid)`.
-  - **RevenueCat (mobile IAP):** RevenueCat **webhook** (INITIAL_PURCHASE / NON_RENEWING_PURCHASE) with the
-    `Authorization` shared-secret header → map product_id→₩ → `add_ai_credits(uid, won×1e6, 'purchase', event.id)`.
-    (⚠️ RevenueCat currently DISABLED after a prior Apple reject — investigate the rejection cause first.)
-- **External deps (not engineering):** PortOne merchant + API secret; App Store / Play product (SKU) setup +
-  **Apple review**; the pack tiers/₩ prices (owner). Korea bans in-app out-links → mobile **must** use IAP
-  (~15–30%, small-biz 15%); metered margin (~80%) absorbs the store cut.
-- **✅ Server webhook BUILT + tested + audited:** `supabase/functions/payment-webhook/index.ts` —
-  **fail-closed** (503 until `PAYMENT_WEBHOOK_SECRET` set), **HMAC-SHA256-gated** (constant-time verify over
-  the raw body → 401 on bad/missing sig), grants `add_ai_credits(user, ₩×1e6, 'purchase', payment_id)`
-  (**idempotent** on the payment id), amount-capped (₩1M) + strict-integer + UUID-validated. `verify_jwt=false`
-  (a provider, not a user, calls it — the HMAC is the auth). Local e2e `payment_webhook_e2e.sh` **11/11**
-  (fail-closed / bad-sig 401 / valid→grant / idempotent redelivery / stacking / bad-payload 400). Adversarial
-  audit → **airtight core, no attacker bypass** (can't forge/replay-mint without the secret).
-- **⚠️ Remaining for a real provider (the `verifySignature` seam):** the default is hex-HMAC over the raw body
-  with header `x-webhook-signature`. PortOne v2 is **svix** (`webhook-signature`, base64, over `${id}.${ts}.${body}`)
-  and RevenueCat uses an **`Authorization` shared-secret** — both currently **fail-closed (reject), not open**, so
-  swapping in the real scheme is safe + required. When the provider's signature does NOT cover the amount
-  (RevenueCat), replace the trusted body amount with server-side re-verification (PortOne `GET /payments/{id}`
-  or a `product_id`→₩ SKU table) + a timestamp/nonce freshness window.
+> **Rewritten 2026-07-31.** This section described a plan ("provider not chosen", "webhook NOT
+> built") that the repo overtook months of work ago. What is actually in `develop` today:
+>
+> | Rail | Code | Verification |
+> |---|---|---|
+> | Web checkout | `lib/payments/{lemonsqueezy,toss,portone,mock}-provider.ts` behind a `VITE_PAYMENT_PROVIDERS` registry (first id = primary) | provider unit tests |
+> | Web webhooks | `lemonsqueezy-webhook`, `toss-webhook` (+ `toss-billing` / `toss-confirm` / `toss-renew`) | `payment_edgecase_test.sql`, `billing_sku_catalog_test.sql` |
+> | Mobile IAP | `services/purchases.ts` (RevenueCat SDK) + `WalletSummary` | `revenuecat_webhook_e2e.py` |
+> | Mobile webhook | `revenuecat-webhook` — fail-closed on `REVENUECAT_WEBHOOK_AUTH`, per-user `original_transaction_id` keying, store + environment attribution | `revenuecat_webhook_e2e.py` (60 assertions), `sandbox_environment_test.sql` |
+> | Generic seam | `payment-webhook` (HMAC-SHA256, fail-closed until `PAYMENT_WEBHOOK_SECRET`) — kept for a provider that has no dedicated function | `payment_webhook_e2e.sh` 11/11 |
+> | Credit top-up UI | web `components/billing/TopUpModal.tsx`, mobile `WalletSummary` | web vitest |
+> | SKU catalog | mig 151 + 155 (`billing_product_skus`, `resolve_store_product`, platform-specific ids) | `billing_sku_catalog_test.sql` |
+> | Channel / refund policy | mig 156 (`platform`, `_billing_channel`), mig 157 (refund eligibility; iOS is revoke-only, Play has a money API) | `refund_policy_test.sql` |
+> | Refund-before-grant guard | mig 158 `credit_grant_is_refunded()` | `credit_refund_guard_test.sql` |
+> | Sandbox isolation | mig 159 (`environment` column, default-off `sandbox_grants_enabled`, sandbox out of every business metric) | `sandbox_environment_test.sql` |
+>
+> The original plan's PortOne-only web assumption did not survive: web ships LemonSqueezy and
+> Toss adapters as well, and which of them is live is an env decision, not a code change.
+
+**Money bug found and fixed while auditing this (PR #350, mig 173).** RevenueCat has **no
+`REFUND` event type** — a store refund arrives as `CANCELLATION` with
+`cancel_reason=CUSTOMER_SUPPORT` and a negative `price`. The webhook branched on
+`event.cancellation_reason`, a key RevenueCat does not send, so **every real refund fell into
+the plain auto-renew-off arm**: a refunded credit pack was never clawed back and a refunded
+subscription kept its raised card cap until period end. The e2e suite was green because it
+synthesised `type: "REFUND"`, the one shape that never arrives. Reproduced against the served
+function (purchase → 990000, refund → still 990000, zero reversal rows). The same PR adds
+`REFUND_REVERSED` handling (`reverse_credit_clawback`, mig 173) — previously unhandled, so a
+store-reversed refund left the customer paid-up with nothing and no code path could restore it.
+
+**⏳ What is genuinely left here, and none of it is engineering:**
+
+- App Store / Play Console product setup and **Apple review** for the consumable packs;
+- the RevenueCat project + `REVENUECAT_WEBHOOK_AUTH` secret, and pointing the webhook at the
+  deployed function (sandbox first — mig 159 makes leaving the sandbox webhook on permanently
+  safe, because its events are acked and grant nothing until an admin opens the kill switch);
+- the payment provider account(s) for web + their secrets;
+- the pack tiers and prices (owner decision, §1).
+
+**⚠️ Still true about the generic `payment-webhook` seam:** its default is hex-HMAC over the raw
+body with header `x-webhook-signature`. A provider that signs differently (PortOne v2 is svix
+over `${id}.${ts}.${body}`) currently **fails closed**, which is the safe direction, but the
+scheme has to be swapped in before that provider can be used. Where the signature does not cover
+the amount, the body amount must be replaced by server-side re-verification (the dedicated
+LemonSqueezy / Toss / RevenueCat functions already resolve the amount from the DB catalog, not
+from the payload).
 
 ## 3. Production deployment — GO-LIVE CHECKLIST  ⚠️ OWNER-GATED (outward-facing, real money)
 
-**Everything is code-ready; this is the one high-stakes step an agent must NOT run unattended** — it
-changes the prod DB schema (DROPs the old charging RPCs), deploys the edge fn, and promotes `develop`→`main`
-which **auto-deploys the web app to real users**. Do it deliberately, ideally behind a launch flag. Until
-done, prod generation returns a graceful `503 AI_NOT_CONFIGURED`.
+> **Rewritten 2026-07-31.** The old checklist told the owner to apply migrations 108–115,
+> which the repo's own deployment records say happened long ago. Keeping a stale checklist
+> here is worse than having none: it invites re-running a migration that TRUNCATEs the wallet.
+>
+> **Do not trust a document for prod state — read the database.** The section below was verified
+> against the remote history table on 2026-07-31 (`supabase migration list --linked`), and doing so
+> corrected two claims this file had inherited from earlier PRs. Re-read it before applying anything;
+> it goes stale the moment someone pushes.
 
-**Order (do NOT reorder — set the key + apply migs BEFORE promoting to main):**
-1. `supabase secrets set AI_GENERATION_PROVIDER_KEY=<gemini key>` (registry defaults to **gemini**, ~6× cheaper
-   than Grok; the owner-provided Gemini key is in the gitignored `.env.local` — never in the repo).
-   Verified usage-measurement works for BOTH providers (text + vision) so `ai_cost_ledger` prices either.
-2. **Apply migrations 108–115 to prod** ⚠️ **mig 114 has `TRUNCATE ai_credit_balance, ai_credit_ledger`** —
-   safe now (prod has NO AI-wallet data, feature never served), but **confirm prod wallets are empty first**
-   and NEVER re-run 114 after real balances exist. (Metered charging: 114; est-price calibration: 115.)
-3. `supabase functions deploy ai-generate`.
-4. **Then** promote `develop`→`main` (web auto-deploys on main push). Mobile image features need a new
-   **native EAS build** (expo-image-picker + expo-image-manipulator are native) — not OTA.
-5. Post-deploy: run one real paid gen (top up a test wallet via `add_ai_credits`, generate, confirm the
-   micro-WON deduction + a `spend` ledger row); wire the nightly Cloudflare-cron to    `refresh_ai_est_price()` (pg_cron not installed). A blind reconcile sweep was intentionally NOT built (would wrong-charge failed-but-unreleased gens without a delivery marker); the edge fn does an inline charge retry instead, and a rare lost charge is eaten as under-charge.
+**What is on prod (history table, read 2026-07-31 — not a guess)**
 
-**Recommend a staged launch:** keep the free 10/day live first (wallet empty → paid path 402s cleanly),
-turn on paid only once the payment webhook (§2) + pack SKUs exist. The free tier alone is safe to ship now.
+| Migrations | Record |
+|---|---|
+| 108–115 (metered wallet, cost ledger, est-price) | shipped with the AI generation rollout |
+| 148–155 (card cap, plan names, SKU catalog, quotas, flags) | `DOCS/TODO/HANDOFF-2026-07-29-billing-ui-deploy.md` — "148–155 전부 적용됨", confirmed pre-deploy |
+| 161 + 171 (study write contract, expand → contract) | #351 / #353 |
+| 170 (drop `user_ai_provider_keys`, BYOK retirement) | #353 — "prod done (2026-07-31)", `ai-keys` endpoint now 404 |
+
+**Verified against the database on 2026-07-31 — prod is fully migrated (through 173)**
+
+`supabase migration list --linked` shows **zero** local-only rows: every migration in the repo,
+001 through 173, is in the remote history table. Two corrections to what this document said before:
+
+- **165–169 (the learning engine) were already applied.** The learning design and validation
+  documents state they were deliberately unrun, and this section repeated that claim. It was
+  stale — the remote history has them. Nothing in this repo is a substitute for reading
+  `migration list`.
+- **172 and 173 were applied on 2026-07-31** (`supabase db push --linked`, after a `--dry-run`
+  that confirmed those two were the only pending files). Both are `CREATE OR REPLACE FUNCTION`
+  plus REVOKE/GRANT — no schema change, no data change, so they are re-runnable.
+  Post-apply check through PostgREST with the anon key: `set_learning_goal_decks`,
+  `set_learning_goal_concepts` and `reverse_credit_clawback` all answer **42501 permission
+  denied** (they exist, and anon cannot execute them — the intended posture), while a control
+  call to a made-up function name answers `PGRST202`, proving the check discriminates.
+
+⚠️ **mig 114 must NEVER be re-run.** It contains `TRUNCATE ai_credit_balance, ai_credit_ledger`.
+It was safe exactly once, when prod had no wallet data. It is not safe again.
+
+**Remaining go-live order (unchanged where it still applies)**
+
+1. `supabase secrets set AI_GENERATION_PROVIDER_KEY=<gemini key>` (registry defaults to **gemini**,
+   ~6× cheaper than Grok; the owner-provided key lives in the gitignored `.env.local`, never the repo).
+   Usage measurement is verified for both providers (text + vision), so `ai_cost_ledger` prices either.
+2. `supabase functions deploy ai-generate` — plus `revenuecat-webhook` when mobile IAP goes live, and
+   whichever web payment webhook the enabled provider needs (§2).
+3. **Then** promote `develop`→`main` (web auto-deploys on a main push). Native mobile changes need a
+   new EAS build; JS-only changes reach existing installs by OTA (see the handoff doc — this was
+   mis-stated once before and the difference decides whether users get anything at all).
+4. Post-deploy: one real paid generation (top up a test wallet via `add_ai_credits`, generate, confirm
+   the micro-USD deduction and its `spend` ledger row); wire the nightly Cloudflare cron to
+   `refresh_ai_est_price()` (pg_cron is not installed). A blind reconcile sweep was intentionally NOT
+   built — without a delivery marker it would wrong-charge failed-but-unreleased generations; the edge
+   function retries the charge inline instead and a rare lost charge is eaten as an under-charge.
+5. Mobile paid rails additionally need the sandbox run described in §2 **before** the kill switch is
+   opened for production grants.
+
+**Staged launch still recommended:** the free 10/day tier is safe on its own (an empty wallet 402s
+cleanly on the paid path); turn paid on only once the provider accounts and pack SKUs exist.
 
 ## 4. Deferred UI + cleanup  (low)
 
-- **Credit top-up button** — lands with payment 1c.
-- **Mobile dead styles:** `SettingsScreen.tsx` still has orphaned `aiProviderCard` / `aiProviderHeader` /
-  `aiProviderLeft` StyleSheet entries (lines ~1027–1030) left after the BYOK section was removed — delete.
-- **Dead AI code (non-gen-path):** `packages/web/src/lib/ai/prompts.ts` is a **stale duplicate** of the
-  canonical `packages/shared/lib/ai/prompts.ts` (missing Chinese/non-empty rules); plus unreferenced
-  `lib/ai/ai-client.ts`, `secure-storage/*`, `provider-registry`. Remove in a cleanup pass.
+- **✅ Credit top-up button — shipped.** Web `components/billing/TopUpModal.tsx` (lists the
+  `credit_pack` catalog with $ price + credits granted) and mobile `WalletSummary`.
+- **✅ BYOK removal finished (2026-07-30, branch `chore/remove-byok`)** — the "connect your own AI
+  provider key" feature is **retired end to end**, not just off the generation path:
+  - **Customer-facing copy**: the mobile guide still shipped an *"API 키 설정"* + *"무료 Gemini API 키 발급"*
+    walkthrough in all 8 locales (rendered by `GuideScreen`), and the web guide's `ai-generate.what` /
+    `fullGenerate` bodies still told users to paste a key. Both rewritten to server-side generation
+    (free daily cards + credit balance).
+  - **Dead i18n**: mobile `settings.json` `aiProviders` block ×8 deleted (web locales were already clean).
+  - **Dead code**: web + shared `lib/ai/{secure-storage/**,providers/**,provider-registry,ai-client,
+    ai-key-storage}` + their tests deleted; BYOK-only types pruned from both `lib/ai/types.ts`;
+    unreferenced duplicate `shared/lib/guide-content.ts` (still had `apiKeySetup`/`geminiSetup` pointing at
+    i18n keys and screenshots that no longer exist) deleted.
+  - **Backend**: `supabase/functions/ai-keys` deleted + mig **170** drops `user_ai_provider_keys`, the 6
+    RPCs, and the plaintext-passphrase table `_ai_encryption_config` (closes SECURITY-REMAINING **H1c**).
+  - **E2E**: `ai-provider-settings.spec.ts` deleted; `ai-generate` / `capture-guide-screenshots` specs
+    de-BYOK'd (gate `E2E_GROK_API_KEY` → `E2E_AI_GENERATION`).
+  - Note: the `SettingsScreen.tsx` orphaned `aiProviderCard/Header/Left` styles this doc previously listed
+    were **already gone** — that entry was stale.
+  - **✅ prod done (2026-07-31)**: mig 170 applied, `ai-keys` edge function deleted (endpoint → 404),
+    `AI_KEY_PASSPHRASE` secret removed. Shipped to `main` (PR #349 → #352). SECURITY-REMAINING **H1c is closed**.
+- **✅ Dead AI code (non-BYOK) — done 2026-07-31.** `packages/web/src/lib/ai/prompts.ts` and
+  `validators.ts` were imported by nothing but their own tests, and `prompts.ts` had already drifted
+  from the canonical `shared/lib/ai/prompts.ts` (it had lost the Chinese template/card rules, so a
+  Chinese deck built through it would have had no dedicated 汉字 field). Both deleted; `types.ts`
+  became a re-export (seven live web components import it); both test suites RETARGETED at the
+  canonical modules rather than deleted with the copies — they were that code's only coverage.
+  Three assertions were added for exactly what the drift had lost.
 - **L4 (cosmetic):** request-cap (23514) and insufficient-credits both surface as 429/402 with
   message-only distinction — fine; tighten copy if desired.
+
+## 5. Admin revenue-reporting caveat  (accuracy, post-launch — low)
+
+The admin billing dashboard sums **catalog USD** as "revenue". Two corrections to what this
+section said before, both verified against the schema on 2026-07-31 (`pg_proc` in a fully
+migrated DB):
+
+- **There is no `get_admin_billing_kpis`.** The function this section named does not exist —
+  the only billing aggregate is **`admin_billing_overview`** (latest body: mig 159).
+- **The mobile half is not overstated, it is ABSENT.** `paid_revenue_30d_micro` reads
+  `payment_intents` alone (`WHERE pi.status = 'paid'`), and an IAP consumable opens no
+  `payment_intents` row — so credit packs bought on iOS/Android contribute **zero** revenue,
+  and `mrr_micro_won` counts only subscriptions. A *web* refund does drop out correctly
+  (`pi.status` becomes `refunded`), so there is no "refunded row still counted" bug here;
+  the gap is missing rows, not wrong ones.
+
+That still leaves the original point: what is reported is the LIST price we advertise, **not the
+actual net we receive**. For a mobile IAP the real receipt is:
+
+    현지 통화 결제액  −  애플/구글 수수료(≈15–30%)  −  환율 스프레드  =  실수령 순액
+
+So a "$0.99 pack" shows as $0.99 revenue, but nets us ≈ $0.70 (or less). **Money movement is
+correct** — the user is granted exactly the catalog USD and deductions are real-usage USD; this is
+purely a *reporting* gap. Ledger/wallet math is unaffected.
+
+Fix when settlement accuracy is needed (not before launch). Two notes for whoever picks this up,
+both learned while auditing the RevenueCat webhook on 2026-07-31:
+
+- **`payment_intents` is the wrong home for the mobile half.** An IAP consumable opens **no**
+  `payment_intents` row — the `ai_credit_ledger` grant *is* the payment record (that is why mig 156
+  stamps `platform` on the ledger). A `net_proceeds_micro_usd` column on `payment_intents` would
+  therefore capture web receipts only. A provider-agnostic settlement table keyed on
+  `(provider, provider_event_id)` — linkable to a ledger ref, a subscription id, or a merchant_uid —
+  covers both shapes, and RevenueCat hands over everything it needs: `price` (USD, negative on a
+  refund), `currency`, `price_in_purchased_currency`, `tax_percentage`, `commission_percentage`
+  (all documented as "Sometimes" present, so parse defensively and record what is missing rather
+  than assuming zero).
+- **✅ FIXED (mig 175) — the smaller reporting bug in the same area:** `admin_list_payments`
+  hard-coded `status = 'paid'` for every credit-pack row it lists (mig 156's body, carried into
+  mig 159), so a **refunded** pack still showed as paid in the admin payment list. Worse than the
+  pill: `AdminBillingPage` gates the refund button on `status === 'paid' && kind === 'credit_pack'`,
+  so the list offered a **Refund** button for money already returned (the path is idempotent, so
+  nothing moved twice — but the confirm dialog quoted the full amount as refundable). mig 175
+  derives the status from the ledger via `credit_grant_is_refunded()` — deliberately reusing the
+  money path's verdict rather than re-implementing the `refund:` / `reversal:` namespace rule — so a
+  standing refund reads `refunded` and a store-reversed one (`REFUND_REVERSED`) reads `paid` again.
+  Covered by `supabase/tests/admin_payment_refund_status_test.sql` (wired into the CI
+  `ai-credit-tests` job), which asserts the transition both ways and pins list-vs-guard agreement.
+  The web `payment_intents` arm was never affected — it reads its real `pi.status`.
+  **Not** touched by this fix: `admin_billing_overview` still reports gross catalog price, and it
+  never saw mobile credit packs at all (see the correction above). That is the net-proceeds gap,
+  and it needs the settlement decision, not a patch.
+
+Until then, treat the admin revenue number as **gross list price**, not net receipts.

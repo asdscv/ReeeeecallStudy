@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "Configura proveedores de IA para generar tarjetas. Las claves se cifran en el servidor y se sincronizan entre dispositivos.",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "Las claves API se cifran en el servidor (pgcrypto + Vault, nunca en texto plano) y se sincronizan entre web y móvil.",
-    "configured": "Configurado",
-    "notSet": "Sin configurar",
-    "model": "Modelo",
-    "saving": "Guardando...",
-    "delete": "Eliminar",
-    "deletedTitle": "Eliminado",
-    "saveSuccess": "Clave API de {{provider}} guardada.",
-    "saveError": "No se pudo guardar la clave API.",
-    "removed": "Clave API de {{provider}} eliminada."
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -80,13 +60,13 @@
     "permissionTitle": "Permiso requerido"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "Suscripción",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "Plan Gratis",
+    "proDesc": "Todas las funciones premium desbloqueadas",
+    "freeDesc": "Mejora para más tarjetas",
+    "upgradeToPro": "Mejorar a Pro",
+    "manageSubscription": "Gestionar suscripción"
   },
   "legal": {
     "title": "Legal",
@@ -103,15 +83,11 @@
   },
   "links": {
     "userGuide": "Guía de usuario",
-    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
-    "apiDocs": "Documentación API",
-    "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
   },
   "quickActions": {
-    "quickStudy": "Estudio rápido",
-    "aiGenerate": "Generar IA",
     "invite": "Invitar",
-    "shareMessage": "¡Descubre ReeeeecallStudy, la app de tarjetas más inteligente! https://reeeeecall.com"
+    "shareMessage": "¡Descubre ReeeeecallStudy, la app de tarjetas más inteligente! https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "Plantillas de tarjetas",
@@ -140,13 +116,6 @@
     "dark": "Oscuro",
     "system": "Sistema"
   },
-  "export": {
-    "title": "Exportar mis datos",
-    "stats": "Estadísticas",
-    "sessions": "Sesiones de estudio",
-    "decks": "Mazos",
-    "cards": "Tarjetas"
-  },
   "alerts": {
     "error": "Error"
   },
@@ -167,8 +136,8 @@
     "upgrade": "Mejorar (próximamente)",
     "upgradeSoon": "La suscripción estará disponible pronto.",
     "cancelPending": "Suscripción por cancelar — acceso hasta {{date}}",
-    "countUnlimited": "{{owned}} / Ilimitado",
-    "planNoteUnlimited": "Tu límite de tarjetas es ilimitado.",
+    "countUnlimited": "{{owned}} · Sin límite",
+    "planNoteUnlimited": "Cuenta de administrador: el almacenamiento de tarjetas no tiene límite.",
     "detail": {
       "title": "Almacenamiento de tarjetas",
       "subtitle": "Las tarjetas propias y suscritas cuentan para tu plan. Los mazos oficiales no cuentan.",
@@ -178,15 +147,15 @@
       "officialNote": "Excluidos del límite",
       "archived": "Archivadas",
       "archivedNote": "Estudio bloqueado",
-      "archivedCount": "{{count}} archivadas",
-      "remaining": "{{count}} restantes",
+      "archivedCount": "{{count, number}} archivadas",
+      "remaining": "{{count, number}} restantes",
       "percentUsed": "{{percent}}% usado",
       "nearLimit": "Cerca del límite",
       "atLimit": "Límite alcanzado",
-      "planUnlimited": "Plan ilimitado",
+      "planUnlimited": "Cuenta de administrador",
       "planCards": "Plan de {{limit}} tarjetas",
-      "unlimitedTitle": "Almacenamiento ilimitado",
-      "lifetimeTotal": "{{count}} tarjetas"
+      "unlimitedTitle": "Sin límite de tarjetas",
+      "lifetimeTotal": "{{count, number}} tarjetas"
     }
   },
   "groups": {
@@ -206,6 +175,23 @@
     "current": "Plan actual",
     "comingSoon": "Próximamente",
     "empty": "No hay planes disponibles.",
-    "loadError": "No se pudieron cargar los planes."
+    "loadError": "No se pudieron cargar los planes.",
+    "popular": "POPULAR"
+  },
+  "paymentHistory": {
+    "title": "Historial de pagos",
+    "empty": "Aún no hay pagos.",
+    "refunded": "Reembolsado",
+    "loadMore": "Cargar más",
+    "error": "No se pudo cargar tu historial de pagos.",
+    "retry": "Reintentar",
+    "kind": {
+      "credit_pack": "Créditos",
+      "subscription": "Suscripción"
+    },
+    "reason": {
+      "renewal": "Renovación",
+      "updated": "Cambio de plan"
+    }
   }
 }

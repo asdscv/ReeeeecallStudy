@@ -9,10 +9,9 @@ import {
   DialogDescription,
 } from '../ui/dialog'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
-import { providersForKind } from '../../lib/payments'
-import { PaymentMethodModal } from './PaymentMethodModal'
-import { microWonToWon } from '@reeeeecall/shared/lib/ai/server-client'
-import { toIntlLocale } from '../../lib/locale-utils'
+import { PurchaseConsent } from './PurchaseConsent'
+import { preferredProviderId } from '../../lib/payments'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 
 interface TopUpModalProps {
   open: boolean
@@ -20,7 +19,7 @@ interface TopUpModalProps {
 }
 
 /**
- * Credit top-up sheet: lists the `credit_pack` catalog (₩ price + credits granted)
+ * Credit top-up sheet: lists the `credit_pack` catalog ($ price + credits granted)
  * with a buy button per pack. When no provider is wired (PAYMENTS_ACTIVE=false),
  * `startCheckout` flips a `comingSoon` flag and this shows a "준비 중" banner instead
  * of calling any provider. With a provider live (VITE_PAYMENTS_ENABLED=true +
@@ -28,7 +27,7 @@ interface TopUpModalProps {
  * provider.checkout flow and reflect processing / success / canceled state.
  */
 export function TopUpModal({ open, onClose }: TopUpModalProps) {
-  const { t, i18n } = useTranslation('billing')
+  const { t } = useTranslation('billing')
   const products = useBillingStore((s) => s.products)
   const loading = useBillingStore((s) => s.loading)
   const error = useBillingStore((s) => s.error)
@@ -38,6 +37,9 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
   const fetchProducts = useBillingStore((s) => s.fetchProducts)
   const startCheckout = useBillingStore((s) => s.startCheckout)
   const clearComingSoon = useBillingStore((s) => s.clearComingSoon)
+  // Withdrawal-right disclosure. Required before any buy button is enabled — see
+  // PurchaseConsent for why this is a legal prerequisite, not a nicety.
+  const [consented, setConsented] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -46,8 +48,8 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
     }
   }, [open, fetchProducts, clearComingSoon])
 
-  const dateLocale = toIntlLocale(i18n.language)
-  const fmtWon = (won: number) => `₩${won.toLocaleString(dateLocale)}`
+  // Price + credit worth are both USD (the credit worth of a pack equals its price).
+  const fmtPrice = (p: (typeof products)[number]) => formatProductPrice(p)
 
   const creditPacks = products
     .filter((p) => p.kind === 'credit_pack')
@@ -55,11 +57,10 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
 
   const showComingSoon = !PAYMENTS_ACTIVE || comingSoon
 
-  // With one provider, buy directly; with 2+ (e.g. Toss + LemonSqueezy), pick a method.
-  const [pickerProduct, setPickerProduct] = useState<string | null>(null)
+  // LemonSqueezy is the only payment provider (Toss/₩ dropped); preferredProviderId()
+  // always resolves to it, and the displayed $ price is what it charges.
   const beginCheckout = (productId: string) => {
-    if (providersForKind('credit_pack').length > 1) setPickerProduct(productId)
-    else void startCheckout(productId)
+    void startCheckout(productId, preferredProviderId())
   }
 
   return (
@@ -117,7 +118,6 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
         ) : (
           <ul className="space-y-2">
             {creditPacks.map((p) => {
-              const creditsWon = microWonToWon(p.creditsMicroWon ?? 0)
               return (
                 <li
                   key={p.id}
@@ -125,10 +125,10 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
                 >
                   <div>
                     <p className="text-base font-semibold text-foreground tabular-nums">
-                      {fmtWon(p.priceKrw)}
+                      {fmtPrice(p)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {t('topUp.credits', { won: creditsWon.toLocaleString(dateLocale) })}
+                      {t('topUp.credits', { amount: fmtPrice(p) })}
                     </p>
                   </div>
                   {(() => {
@@ -138,8 +138,15 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
                       <button
                         type="button"
                         onClick={() => beginCheckout(p.id)}
-                        disabled={processing}
-                        title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
+                        // Payments live → the disclosure must be ticked first. When
+                        // payments are off the button is just a "coming soon" chip, so
+                        // gating it on a consent nobody can act on would be nonsense.
+                        disabled={processing || (PAYMENTS_ACTIVE && !consented)}
+                        title={
+                          !PAYMENTS_ACTIVE ? t('comingSoon.title')
+                            : !consented ? t('consent.required')
+                            : undefined
+                        }
                         className={
                           PAYMENTS_ACTIVE
                             ? 'flex items-center gap-1.5 cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-hover disabled:opacity-60'
@@ -156,12 +163,10 @@ export function TopUpModal({ open, onClose }: TopUpModalProps) {
             })}
           </ul>
         )}
-        <PaymentMethodModal
-          open={pickerProduct !== null}
-          productId={pickerProduct}
-          kind="credit_pack"
-          onClose={() => setPickerProduct(null)}
-        />
+
+        {PAYMENTS_ACTIVE && creditPacks.length > 0 && (
+          <PurchaseConsent kind="credit_pack" checked={consented} onChange={setConsented} id="topup-consent" />
+        )}
       </DialogContent>
     </Dialog>
   )

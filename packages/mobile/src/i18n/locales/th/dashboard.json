@@ -18,16 +18,16 @@
     "title": "สถานะสำรับ",
     "noDecks": "ยังไม่มีสำรับ สร้างสำรับใหม่เลย!",
     "goToDecks": "ไปยังการจัดการสำรับ",
-    "cardCount": "{{count}} การ์ด",
-    "newCards": "ใหม่ {{count}}",
-    "reviewCards": "ทบทวน {{count}}",
+    "cardCount": "{{count, number}} การ์ด",
+    "newCards": "ใหม่ {{count, number}}",
+    "reviewCards": "ทบทวน {{count, number}}",
     "study": "เรียน"
   },
   "heatmap": {
     "title": "ฮีทแมปการเรียน"
   },
   "gamification": {
-    "freezes": "{{count}} freezes left",
+    "freezes": "{{count, number}} freezes left",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,23 +42,23 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count}} cards",
-    "sessions": "Complete {{count}} sessions",
-    "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores",
+    "cards": "Study {{count, number}} cards",
+    "sessions": "Complete {{count, number}} sessions",
+    "time": "Study for {{count, number}} minutes",
+    "perfect": "Get {{count, number}} perfect scores",
     "completed": "เสร็จแล้ว"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "motivational": "Keep going! You're doing great!"
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days",
+  "streakDays": "{{count, number}} วัน",
   "quickStudy": {
     "title": "เรียนแบบเร็ว",
-    "dueToday": "มีการ์ดต้องทบทวนวันนี้ {{count}} ใบ",
+    "dueToday": "มีการ์ดต้องทบทวนวันนี้ {{count, number}} ใบ",
     "startSession": "เริ่มเซสชันการเรียน"
   }
 }

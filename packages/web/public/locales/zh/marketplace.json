@@ -24,13 +24,13 @@
     "snapshot": "快照"
   },
   "listing": {
-    "cardCount": "{{count}} 张卡片",
-    "userCount": "{{count}} 位用户"
+    "cardCount": "{{count, number}} 张卡片",
+    "userCount": "{{count, number}} 位用户"
   },
   "detail": {
     "back": "← 市场",
-    "cardCount": "{{count}} 张卡片",
-    "userCount": "{{count}} 位用户",
+    "cardCount": "{{count, number}} 张卡片",
+    "userCount": "{{count, number}} 位用户",
     "getDeck": "获取此牌组",
     "importing": "导入中...",
     "cardPreview": "卡片预览（最多 10 张）",
@@ -43,8 +43,8 @@
     "unsubscribed": "已取消订阅",
     "unsubscribeConfirm": "取消订阅此牌组？您的个人学习进度将保留在账户中。",
     "unsubscribeError": "取消订阅失败，请重试。",
-    "limitUsage": "将占用 {{count}} 张卡片额度 · 剩余 {{available}} 张",
-    "limitExceeds": "将超出卡片额度（剩余 {{available}} 张）。请先删除卡片或订阅。",
+    "limitUsage": "将占用 {{count, number}} 张卡片额度 · 剩余 {{available}} 张",
+    "limitExceeds": "将超出卡片额度（剩余 {{available}} 张）。腾出空间或升级方案即可添加。",
     "limitOfficialFree": "官方认证牌组 · 不占用卡片额度。",
     "acquireByMode": {
       "subscribe": "订阅",
@@ -63,8 +63,8 @@
     "defaultDescription": "ReeeeecallStudy 上的闪卡牌组",
     "sampleCards": "示例卡片",
     "viewInMarket": "在市场中查看",
-    "cardCount": "{{count}} 张卡片",
-    "userCount": "{{count}} 位用户",
+    "cardCount": "{{count, number}} 张卡片",
+    "userCount": "{{count, number}} 位用户",
     "by": "作者：{{name}}",
     "blurredNotice": "登录即可查看此牌组的全部卡片",
     "ctaLogin": "登录以获取此牌组",
@@ -202,13 +202,13 @@
       "actions": "操作"
     },
     "timeAgo": {
-      "minutesAgo": "{{count}}分钟前",
-      "hoursAgo": "{{count}}小时前",
-      "daysAgo": "{{count}}天前"
+      "minutesAgo": "{{count, number}}分钟前",
+      "hoursAgo": "{{count, number}}小时前",
+      "daysAgo": "{{count, number}}天前"
     }
   },
-  "reviewCount_one": "{{count}} 条评价",
-  "reviewCount_other": "{{count}} 条评价",
-  "rateStar_one": "评 {{count}} 星",
-  "rateStar_other": "评 {{count}} 星"
+  "reviewCount_one": "{{count, number}} 条评价",
+  "reviewCount_other": "{{count, number}} 条评价",
+  "rateStar_one": "评 {{count, number}} 星",
+  "rateStar_other": "评 {{count, number}} 星"
 }

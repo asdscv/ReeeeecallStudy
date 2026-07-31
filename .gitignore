@@ -41,6 +41,11 @@ blob-report/
 # Apple private keys
 AuthKey_*.p8
 
+# Service-account keys for the Supabase edge functions (secret — never commit).
+# The runtime reads these from Supabase Edge Function SECRETS, not from disk; the
+# local copy exists only so the secret can be re-registered without re-issuing a key.
+supabase/.secrets/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -61,3 +66,6 @@ STUDY_DATA/*.tmp
 # commit of ~2GB of regenerable build artifacts.
 /android/
 /ios/
+
+# Claude Code personal settings (never commit)
+.claude/settings.local.json

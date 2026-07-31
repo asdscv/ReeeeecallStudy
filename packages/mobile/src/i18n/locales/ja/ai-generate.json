@@ -13,12 +13,6 @@
     "full": "フル（テンプレート + デッキ + カード）",
     "cardsOnly": "既存デッキにカードを追加"
   },
-  "provider": {
-    "section": "AIプロバイダー",
-    "notice": "AI生成にはプロバイダーごとにご自身のAPIキーが必要です。設定でキーを追加・管理してください。",
-    "none": "設定済みのAIプロバイダーがありません",
-    "addInSettings": "設定で追加"
-  },
   "content": {
     "section": "コンテンツ設定",
     "topicLabel": "トピック",
@@ -33,7 +27,12 @@
     "imageUpload": "画像をアップロード",
     "imageChange": "画像を変更",
     "imageHint": "写真を選ぶだけで、AIがカードに変換します。",
-    "imagePaidNotice": "画像生成にはクレジットを使用します。"
+    "imagePaidNotice": "画像生成にはクレジットを使用します。",
+    "imageAddMore": "追加 ({{count, number}}/{{max}})",
+    "inputModeTopicHint": "トピックを入力すると、AIがカードを作成します。",
+    "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。",
+    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。",
+    "cardLimitReached": "カード上限に達しました — カードを削除するか購読すると追加できます。"
   },
   "deck": {
     "section": "デッキを選択",
@@ -46,8 +45,8 @@
   },
   "review": {
     "title": "カードを確認",
-    "generatedCount": "{{count}}枚のカードを生成しました",
-    "save": "{{count}}枚を保存",
+    "generatedCount": "{{count, number}}枚のカードを生成しました",
+    "save": "{{count, number}}枚を保存",
     "regenerate": "再生成",
     "cardDone": "完了",
     "remove": "削除"
@@ -69,14 +68,13 @@
     "creditsOnly": "有料カード{{credits}}枚が利用可能",
     "empty": "本日の無料カードを使い切りました",
     "unknown": "残高を取得できません",
-    "balance": "残高 ₩{{won}}（約{{cards}}枚）",
+    "balance": "残高 {{amount}}",
     "freeOnly": "本日の無料カードは残り{{free}}枚です",
     "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。"
   },
   "alert": {
     "errorTitle": "エラー",
     "enterTopic": "トピックを入力してください",
-    "configureProvider": "先に設定でAIプロバイダーを設定してください。",
     "saveFailed": "生成したカードの保存に失敗しました",
     "imageRequired": "先に画像を選択してください。",
     "selectImageError": "この画像は大きすぎるか、読み込めませんでした。小さい写真でお試しください。",
@@ -93,7 +91,7 @@
     "quotaExceeded": "本日の無料AI生成の上限に達しました。明日またお試しください。",
     "rateLimited": "リクエストが制限されています。しばらく待ってから再度お試しください。",
     "invalidResponse": "AIから無効な応答が返されました。もう一度お試しください。",
-    "networkError": "ネットワークエラーです。接続を確認して再度お試しください。",
+    "networkError": "ネットワークエラーです。接続を確認して、もう一度お試しください。",
     "serverError": "AI生成は一時的にご利用いただけません。後ほど再度お試しください。",
     "emptyResult": "AIがカードを生成できませんでした。もう一度お試しください（料金は発生していません）。",
     "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。"

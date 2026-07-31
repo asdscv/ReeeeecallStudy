@@ -1,18 +1,11 @@
 {
   "title": "AI Generate",
   "config": {
-    "model": "Model",
     "topic": "Topic",
     "topicPlaceholder": "vd: từ vựng tiếng Nhật JLPT N3, dòng thời gian lịch sử Hàn Quốc",
     "cardCount": "Số thẻ",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
-    "customEndpoint": "Custom Endpoint",
-    "selectProvider": "Chọn nhà cung cấp",
-    "noProvidersConfigured": "Chưa cấu hình nhà cung cấp AI",
-    "goToSettings": "Thêm trong Cài đặt",
-    "manageInSettings": "Quản lý nhà cung cấp:",
-    "settings": "Cài đặt",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
@@ -23,7 +16,6 @@
     "targetDeck": "Bộ thẻ đích",
     "selectDeck": "Chọn một bộ thẻ...",
     "selectDeckRequired": "Vui lòng chọn một bộ thẻ để thêm thẻ vào.",
-    "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
     "contentLang": "Content Language",
@@ -53,7 +45,12 @@
     "imageChange": "Đổi hình ảnh",
     "imageUploadHint": "Chọn ảnh chụp danh sách từ vựng, trang sách giáo khoa hoặc ghi chú — AI sẽ chuyển thành thẻ.",
     "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng (không có gói miễn phí).",
-    "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký."
+    "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký.",
+    "imageAddMore": "Thêm nữa ({{count, number}}/{{max}})",
+    "imageRemove": "Xóa ảnh",
+    "inputModeTopicHint": "Mô tả một chủ đề và AI sẽ viết thẻ cho bạn.",
+    "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc.",
+    "noOwnedDecks": "Bạn chưa sở hữu bộ thẻ nào — hãy tạo một bộ thẻ trước, rồi thêm thẻ AI vào đó."
   },
   "wallet": {
     "summary": "Hôm nay còn {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",
@@ -61,8 +58,10 @@
     "creditsOnly": "Còn {{credits}} thẻ trả phí",
     "empty": "Bạn đã dùng hết thẻ miễn phí hôm nay",
     "unknown": "Hiện không thể xem số dư",
-    "balance": "Số dư ₩{{won}} (~{{cards}} thẻ)",
-    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục."
+    "balance": "Số dư {{amount}}",
+    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục.",
+    "cardLimit": "Còn {{available}}/{{limit}} thẻ",
+    "cardLimitUnlimited": "Không giới hạn số thẻ (quản trị)"
   },
   "wizard": {
     "setup": "Setup",
@@ -93,11 +92,11 @@
     "deckIcon": "Icon",
     "deckColor": "Color",
     "cardsReviewTitle": "Review Cards",
-    "cardsTitle": "{{count}} cards generated",
-    "filteredWarning": "{{count}} invalid cards were filtered out",
+    "cardsTitle": "{{count, number}} cards generated",
+    "filteredWarning": "{{count, number}} invalid cards were filtered out",
     "regenerate": "Regenerate",
     "next": "Next",
-    "save": "Save {{count}} cards",
+    "save": "Save {{count, number}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
     "removeCard": "Remove",
     "tts": {
@@ -123,7 +122,10 @@
         "hint": "Gợi ý",
         "detail": "Chi tiết"
       }
-    }
+    },
+    "templateDesc": "AI đã thiết kế cấu trúc thẻ này. Đổi tên trường nếu muốn rồi tiếp tục.",
+    "deckDesc": "Xem lại tên, biểu tượng và màu của bộ thẻ mới rồi tiếp tục.",
+    "cardsDesc": "Xem lại các thẻ đã tạo. Chỉnh sửa nội dung, xóa thẻ không muốn rồi lưu."
   },
   "done": {
     "title": "Generation Complete!",
@@ -137,17 +139,19 @@
   },
   "errors": {
     "title": "Error",
-    "noApiKey": "Please set up your AI API key first.",
-    "invalidApiKey": "Invalid API key. Please check your key.",
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
-    "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
+    "networkError": "Network error. Please check your connection and try again.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "Lỗi máy chủ AI. Vui lòng thử lại sau.",
     "emptyResult": "AI không tạo được thẻ nào. Vui lòng thử lại — bạn không bị tính phí.",
-    "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm."
+    "cardLimitReached": "Bạn đã đạt giới hạn thẻ. Xóa thẻ hoặc đăng ký để lưu thêm.",
+    "insufficientCredits": "Bạn đã dùng hết số thẻ AI miễn phí hôm nay và không còn tín dụng nào. Hãy nạp thêm để tiếp tục tạo thẻ.",
+    "invalidImage": "Không thể đọc được hình ảnh đó. Vui lòng thử một ảnh nhỏ hơn hoặc rõ hơn.",
+    "quotaExceeded": "Bạn đã đạt đến giới hạn tạo bằng AI miễn phí của hôm nay. Vui lòng thử lại vào ngày mai.",
+    "deckNotOwned": "Bộ thẻ đó không thể thêm thẻ mới. Hãy chọn bộ thẻ bạn sở hữu."
   },
   "button": {
     "aiGenerate": "AI Generate",

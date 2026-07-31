@@ -11,6 +11,7 @@
     "admin": "Quản trị",
     "guide": "Hướng dẫn",
     "aiGenerate": "AI Generate",
+    "learningPlan": "Kế hoạch học",
     "achievements": "Thành tích",
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
@@ -39,7 +40,8 @@
     "show": "Hiện",
     "hide": "Ẩn",
     "startStudy": "Bắt đầu học",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "retry": "Thử lại"
   },
   "status": {
     "loading": "Đang tải...",
@@ -51,7 +53,7 @@
   },
   "units": {
     "cards": "thẻ",
-    "cardsSuffix": "{{count}} thẻ",
+    "cardsSuffix": "{{count, number}} thẻ",
     "sessions": "phiên",
     "items": "mục",
     "days": "ngày",
@@ -60,11 +62,11 @@
     "seconds": "giây",
     "times": "lần",
     "percent": "{{value}}%",
-    "decksCount": "{{count}} bộ thẻ"
+    "decksCount": "{{count, number}} bộ thẻ"
   },
   "pagination": {
     "rangeOf": "{{start}}~{{end}} / {{total}}",
-    "perPage": "{{count}} mỗi trang"
+    "perPage": "{{count, number}} mỗi trang"
   },
   "timePeriod": {
     "1d": "1N",
@@ -120,7 +122,7 @@
     "cardTemplate": {
       "title": "Your Card Templates",
       "description": "These templates are already set up for you. Pick one for your cards.",
-      "fields": "{{count}} fields",
+      "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
@@ -248,7 +250,7 @@
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

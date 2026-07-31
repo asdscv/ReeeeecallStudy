@@ -9,12 +9,15 @@
 //   4) SettingsScreen.tsx의 Subscription 섹션 + plan 배지 주석 해제
 //   5) 이 파일은 추가 수정 불필요 (자체는 정상 동작)
 // ─────────────────────────────────────────────────────────────────────────
-import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, Platform } from 'react-native'
+import { useState } from 'react'
+import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, Platform, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, Button, ScreenHeader } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
+import { recordPurchaseConsent } from '../services/billing'
 import type { BillingProduct } from '../services/billing'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 
@@ -24,21 +27,55 @@ const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
   ios: 'https://apps.apple.com/account/subscriptions',
   default: 'https://play.google.com/store/account/subscriptions',
 })
+const REFUND_POLICY_URL = 'https://reeeeecallstudy.xyz/refund-policy.html'
+// Where a refund is actually requested. Neither store lets the developer issue one
+// from here: Apple decides every App Store refund, and a Play refund outside our
+// policy window is Google's call. On iOS we prefer the in-app StoreKit sheet and
+// only fall back to this page when it is unavailable (pre-iOS-15, or no active
+// entitlement to attach the request to).
+const REFUND_REQUEST_URL = Platform.select({
+  ios: 'https://reportaproblem.apple.com',
+  default: 'https://play.google.com/store/account/orderhistory',
+})
 
-const FEATURES = [
-  { icon: '♾️', title: 'Unlimited Decks & Cards', free: '5 decks, 3K cards', pro: 'Unlimited' },
-  { icon: '🧠', title: 'All Study Modes', free: 'SRS + Sequential', pro: 'All 4 modes' },
-  { icon: '🤖', title: 'AI Card Generation', free: '5/month', pro: 'Unlimited' },
-  { icon: '🔊', title: 'Premium TTS', free: 'Basic', pro: 'Edge TTS HD' },
-  { icon: '📊', title: 'Advanced Analytics', free: 'Basic stats', pro: 'Charts + Forecast' },
-  { icon: '🏪', title: 'Marketplace Publishing', free: 'Download only', pro: 'Upload + Revenue share' },
-]
+// Feature comparison rows. Copy is i18n (paywall.json `features.*`, 8 locales) so the
+// paywall is translated; only the emoji + the i18n key live here. Values track the current
+// model (Free 1,000 cards / 10 AI cards a day; Pro 100,000 / 10 a day + credits).
+const FEATURE_KEYS = ['cardStorage', 'allModes', 'aiGeneration', 'premiumTts', 'analytics', 'marketplace'] as const
+const FEATURE_ICONS: Record<(typeof FEATURE_KEYS)[number], string> = {
+  cardStorage: '🗂️',
+  allModes: '🧠',
+  aiGeneration: '🤖',
+  premiumTts: '🔊',
+  analytics: '📊',
+  marketplace: '🏪',
+}
 
 export function PaywallScreen() {
   const theme = useTheme()
   const { t } = useTranslation('paywall')
   const navigation = useNavigation()
   const { isPro, offering, products, loading, purchasing, purchase, restore } = usePurchases()
+  // Withdrawal-right disclosure — ticked before any purchase button is enabled.
+  // KR 전자상거래법 / EU-UK both require this to be shown BEFORE the charge for the
+  // "used ⇒ non-refundable" rule to hold; see recordPurchaseConsent.
+  const [consented, setConsented] = useState(false)
+
+  // Start a store refund REQUEST. Deliberately never phrased as "refund issued":
+  // Apple and Google decide, and our side only reconciles afterwards when their
+  // webhook arrives.
+  const handleRefundRequest = async () => {
+    if (Platform.OS === 'ios') {
+      const r = await purchaseService.beginRefundRequest()
+      if (r.status === 'success') {
+        Alert.alert(t('refund.title'), t('refund.submitted'))
+        return
+      }
+      if (r.status === 'userCancelled') return
+      // 'unavailable' (pre-iOS-15 / no active entitlement) or an error → web fallback.
+    }
+    void Linking.openURL(REFUND_REQUEST_URL)
+  }
 
   // [SUBSCRIPTION-HIDDEN] belt-and-suspenders: the Paywall route is also removed
   // from the navigation stack, but if ever reached while gated, render nothing.
@@ -64,7 +101,16 @@ export function PaywallScreen() {
           <Text style={styles.emoji}>✅</Text>
           <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('youArePro')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-            You have access to all premium features.
+            {t('proDesc')}
+          </Text>
+          {/* An active subscriber is exactly who needs the refund route, and this
+              screen is otherwise a dead end for them. */}
+          <Text
+            testID="paywall-request-refund-pro"
+            style={[theme.typography.caption, { color: theme.colors.primary }]}
+            onPress={handleRefundRequest}
+          >
+            {t('refund.request')}
           </Text>
         </View>
       </Screen>
@@ -78,19 +124,27 @@ export function PaywallScreen() {
 
   const formatPrice = (product: BillingProduct, pkg: any): string => {
     // Prefer the store-localized price string when the IAP package is loaded
-    // (Apple/Google want the store price shown); fall back to the catalog KRW.
+    // (Apple/Google want the store price shown); fall back to the catalog USD price.
     if (pkg?.product?.priceString) return pkg.product.priceString
-    const price = `₩${product.priceKrw.toLocaleString()}`
+    const price = formatProductPrice(product)
     return product.period === 'month' ? `${price}${t('catalog.perMonth')}` : price
   }
 
+  // The store IAP id to purchase for this platform (billing_product_skus, mig 151);
+  // fall back to the internal id when no SKU row is registered yet.
+  const storeSku = (product: BillingProduct): string => product.storeProductId ?? product.id
+
   const handlePurchaseProduct = async (product: BillingProduct) => {
-    // Map the backend product id -> the store package to actually charge.
-    const pkg = purchaseService.findPackageForProduct(offering, product.id)
+    // Map the backend product -> the store package (by its store SKU) to actually charge.
+    const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
     if (!pkg) {
       Alert.alert(t('title'), t('catalog.purchaseUnavailable'))
       return
     }
+    // Record the disclosure the buyer just ticked BEFORE the store charge, so the
+    // evidence predates the payment (mig 157 only counts a consent stamped before
+    // the purchase — a record written afterwards proves nothing).
+    await recordPurchaseConsent(product.id)
     // Pass the backend product so usePurchases opens a server-side payment
     // intent (create_payment_intent) before charging — the merchantUid it
     // returns is what the payment-webhook later reconciles the grant against.
@@ -106,49 +160,52 @@ export function PaywallScreen() {
     } else if (result.error === 'intent_failed') {
       Alert.alert(t('title'), t('checkout.startFailed'))
     } else if (result.error && result.error !== 'cancelled' && result.error !== 'disabled') {
-      Alert.alert(t('back'), result.error)
+      // Show a friendly, localized message; keep the raw store/RC error for dev logs.
+      if (__DEV__) console.warn('[paywall] purchase failed:', result.error)
+      Alert.alert(t('checkout.errorTitle'), t('checkout.errorGeneric'))
     }
   }
 
   const handleRestore = async () => {
     const result = await restore()
     if (result.success) {
-      Alert.alert('Restored!', 'Your Pro subscription has been restored.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
+      Alert.alert(t('welcomePro'), t('restored'), [
+        { text: t('done'), onPress: () => navigation.goBack() },
       ])
     } else {
-      Alert.alert('No Purchase Found', 'No previous subscription was found to restore.')
+      Alert.alert(t('restorePurchase'), t('noRestoreFound'))
     }
   }
 
   return (
     <Screen safeArea padding={false} testID="paywall-screen">
-      <ScreenHeader title="Upgrade to Pro" mode="back" />
+      <ScreenHeader title={t('title')} mode="back" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.crown}>👑</Text>
           <Text style={[theme.typography.h1, { color: theme.colors.text, textAlign: 'center' }]}>
-            Upgrade to Pro
+            {t('title')}
           </Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
-            Unlock the full power of ReeeeecallStudy
+            {t('subtitle')}
           </Text>
         </View>
 
-        {/* Feature Comparison */}
+        {/* Feature Comparison. "Free" / "Pro" column labels stay literal (plan names are
+            proper nouns, not translated); the feature copy is i18n. */}
         <View style={styles.features}>
-          {FEATURES.map((feat) => (
-            <View key={feat.title} style={[styles.featureRow, { borderColor: theme.colors.border }]}>
-              <Text style={styles.featureIcon}>{feat.icon}</Text>
+          {FEATURE_KEYS.map((key) => (
+            <View key={key} style={[styles.featureRow, { borderColor: theme.colors.border }]}>
+              <Text style={styles.featureIcon}>{FEATURE_ICONS[key]}</Text>
               <View style={styles.featureInfo}>
-                <Text style={[theme.typography.label, { color: theme.colors.text }]}>{feat.title}</Text>
+                <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t(`features.${key}.title`)}</Text>
                 <View style={styles.comparisonRow}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                    Free: {feat.free}
+                    Free: {t(`features.${key}.free`)}
                   </Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    Pro: {feat.pro}
+                    Pro: {t(`features.${key}.pro`)}
                   </Text>
                 </View>
               </View>
@@ -156,10 +213,36 @@ export function PaywallScreen() {
           ))}
         </View>
 
+        {/* Pre-purchase withdrawal-right disclosure. Required before the buy buttons
+            unlock: KR 전자상거래법 and the EU/UK cooling-off rules only let us treat a
+            used purchase as non-refundable if the buyer saw this BEFOREHAND. */}
+        {subscriptionProducts.length > 0 && (
+          <Pressable
+            testID="paywall-consent"
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: consented }}
+            onPress={() => setConsented((v) => !v)}
+            style={[styles.consent, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}
+          >
+            <Text style={[styles.consentBox, { color: consented ? theme.colors.primary : theme.colors.textTertiary }]}>
+              {consented ? '☑' : '☐'}
+            </Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, flex: 1 }]}>
+              {t('consent.subscription')}{' '}
+              <Text
+                style={{ color: theme.colors.primary, textDecorationLine: 'underline' }}
+                onPress={() => Linking.openURL(REFUND_POLICY_URL)}
+              >
+                {t('consent.policyLink')}
+              </Text>
+            </Text>
+          </Pressable>
+        )}
+
         {/* Pricing — driven by the server catalog (get_billing_products) */}
         <View style={styles.pricing}>
           {subscriptionProducts.map((product, i) => {
-            const pkg = purchaseService.findPackageForProduct(offering, product.id)
+            const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
             return (
               <Button
                 key={product.id}
@@ -168,6 +251,7 @@ export function PaywallScreen() {
                 variant={i === 0 ? 'primary' : 'outline'}
                 onPress={() => handlePurchaseProduct(product)}
                 loading={purchasing}
+                disabled={!consented}
               />
             )
           })}
@@ -188,8 +272,13 @@ export function PaywallScreen() {
             onPress={handleRestore}
             loading={purchasing}
           />
+          {/* Apple/Google-mandated auto-renewal disclosure. i18n (paywall.legalDisclaimer,
+              8 locales); the store proper nouns are interpolated, not translated. */}
           <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]}>
-            Payment will be charged to your {Platform.OS === 'ios' ? 'Apple ID' : 'Google'} account at confirmation of purchase. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the {Platform.OS === 'ios' ? 'App Store' : 'Play Store'} after purchase.
+            {t('legalDisclaimer', {
+              account: Platform.OS === 'ios' ? 'Apple ID' : 'Google',
+              store: Platform.OS === 'ios' ? 'App Store' : 'Play Store',
+            })}
           </Text>
           <View style={styles.legalLinks}>
             <Text
@@ -197,7 +286,7 @@ export function PaywallScreen() {
               style={[theme.typography.caption, { color: theme.colors.primary }]}
               onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
             >
-              Privacy Policy
+              {t('privacyPolicy')}
             </Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
             <Text
@@ -205,7 +294,7 @@ export function PaywallScreen() {
               style={[theme.typography.caption, { color: theme.colors.primary }]}
               onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
             >
-              Terms of Service
+              {t('termsOfService')}
             </Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
             <Text
@@ -213,7 +302,18 @@ export function PaywallScreen() {
               style={[theme.typography.caption, { color: theme.colors.primary }]}
               onPress={() => Linking.openURL(MANAGE_SUBSCRIPTIONS_URL)}
             >
-              Manage Subscription
+              {t('manageSubscription')}
+            </Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}> | </Text>
+            {/* Store refunds are requested, not granted, from here — see
+                handleRefundRequest. Giving the user this route directly is the only
+                lever we have on iOS, and it takes the CS load off support email. */}
+            <Text
+              testID="paywall-request-refund"
+              style={[theme.typography.caption, { color: theme.colors.primary }]}
+              onPress={handleRefundRequest}
+            >
+              {t('refund.request')}
             </Text>
           </View>
         </View>
@@ -233,7 +333,9 @@ const styles = StyleSheet.create({
   featureIcon: { fontSize: 24, width: 36, textAlign: 'center' },
   featureInfo: { flex: 1, gap: 4 },
   comparisonRow: { flexDirection: 'row', gap: 12 },
-  pricing: { gap: 10, marginTop: 24 },
+  consent: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 24, padding: 12, borderWidth: 1, borderRadius: 12 },
+  consentBox: { fontSize: 18, lineHeight: 20 },
+  pricing: { gap: 10, marginTop: 12 },
   footer: { gap: 12, marginTop: 24, alignItems: 'center' },
   legalLinks: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' },
 })

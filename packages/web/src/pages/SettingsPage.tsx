@@ -13,9 +13,11 @@ import { ThemeToggle } from '../components/common/ThemeToggle'
 import { UserStatsExport } from '../components/settings/UserStatsExport'
 import { ReminderSettings } from '../components/settings/ReminderSettings'
 import { CollapsibleSection } from '../components/settings/CollapsibleSection'
+import { PrivacyDataSection } from '../components/settings/PrivacyDataSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PaymentHistory } from '../components/settings/PaymentHistory'
-import { PlanSelector, isUnlimitedCardLimit } from '../components/billing/PlanSelector'
+import { PlanSelector } from '../components/billing/PlanSelector'
+import { isUnlimitedCardLimit } from '../lib/card-limit'
 import { CardUsagePanel } from '../components/billing/CardUsagePanel'
 import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
 import {
@@ -24,6 +26,7 @@ import {
   type StudyInputSettings,
 } from '../lib/study-input-settings'
 import type { Profile } from '../types/database'
+import { numericInputOr, parseNumericInput, type NumericInputValue } from '../lib/numeric-input'
 
 /** Auto-save a single profile field to DB */
 async function autoSaveProfile(
@@ -67,7 +70,7 @@ export function SettingsPage() {
   // Form state
   const [displayName, setDisplayName] = useState('')
   const [savedDisplayName, setSavedDisplayName] = useState('')
-  const [dailyNewLimit, setDailyNewLimit] = useState(20)
+  const [dailyNewLimit, setDailyNewLimit] = useState<NumericInputValue>(20)
   const [savedDailyNewLimit, setSavedDailyNewLimit] = useState(20)
   const [dailyGoal, setDailyGoal] = useState<number | null>(null)
   const [ttsEnabled, setTtsEnabled] = useState(false)
@@ -192,10 +195,13 @@ export function SettingsPage() {
   // SRS: save button
   const handleSaveSrs = async () => {
     if (!user) return
+    // An empty box is not a value to persist; fall back to the saved limit rather
+    // than writing an empty string (what the previous `'' as any` cast allowed).
+    const limitToSave = numericInputOr(dailyNewLimit, savedDailyNewLimit)
     setSrsSaving(true)
-    const ok = await autoSaveProfile(user.id, 'daily_new_limit', dailyNewLimit)
+    const ok = await autoSaveProfile(user.id, 'daily_new_limit', limitToSave)
     if (ok) {
-      setSavedDailyNewLimit(dailyNewLimit)
+      setSavedDailyNewLimit(limitToSave)
       toast.success(t('autoSaved'))
     }
     setSrsSaving(false)
@@ -260,17 +266,17 @@ export function SettingsPage() {
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => navigate('/quick-study')}
-              className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 transition cursor-pointer text-center"
+              className="bg-orange-50 border border-orange-200 dark:bg-orange-500/15 dark:border-orange-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-orange-100 dark:hover:bg-orange-500/25 transition cursor-pointer text-center"
             >
-              <Zap className="w-6 h-6 text-orange-600" />
-              <span className="text-sm font-semibold text-orange-700">{t('quickActions.quickStudy', 'Quick Study')}</span>
+              <Zap className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">{t('quickActions.quickStudy', 'Quick Study')}</span>
             </button>
             <button
               onClick={() => navigate('/ai-generate')}
-              className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 transition cursor-pointer text-center"
+              className="bg-purple-50 border border-purple-200 dark:bg-purple-500/15 dark:border-purple-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 dark:hover:bg-purple-500/25 transition cursor-pointer text-center"
             >
-              <Bot className="w-6 h-6 text-purple-600" />
-              <span className="text-sm font-semibold text-purple-700">{t('quickActions.aiGenerate', 'AI Generate')}</span>
+              <Bot className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('quickActions.aiGenerate', 'AI Generate')}</span>
             </button>
             <button
               onClick={() => navigate('/guide')}
@@ -285,18 +291,16 @@ export function SettingsPage() {
         {/* ── Account ── */}
         <div className="space-y-3">
           <GroupLabel>{t('groups.account', 'Account')}</GroupLabel>
-          <CollapsibleSection title={t('profile.title')} icon={<User className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('profile.title')} icon={<User className="w-[18px] h-[18px]" />} tint="#3B82F6">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center shrink-0">
                 <span className="text-2xl font-bold text-white">{userInitial}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-muted-foreground mb-1">{user?.email}</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                  false /* isPro -- add when available */
-                    ? 'bg-success/10 text-success border border-success/30'
-                    : 'bg-accent text-muted-foreground border border-border'
-                }`}>
+                {/* Only the free badge exists today; the paid variant returns with the
+                    plan flag rather than as a dead `false ?` branch. */}
+                <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-accent text-muted-foreground border border-border">
                   {t('plan.free')}
                 </span>
               </div>
@@ -342,32 +346,35 @@ export function SettingsPage() {
               )}
             </div>
           </CollapsibleSection>
+          <CollapsibleSection title={t('privacy.title', 'Privacy & data')} icon={<span className="text-lg">🔒</span>} tint="#64748B">
+            <PrivacyDataSection />
+          </CollapsibleSection>
         </div>
 
         {/* ── Credits & Usage ── */}
         <div className="space-y-3">
           <GroupLabel>{t('groups.billing', 'Credits & Usage')}</GroupLabel>
           {/* ── Wallet ── */}
-          <CollapsibleSection title={tWallet('title')} icon={<span className="text-base">💳</span>}>
+          <CollapsibleSection title={tWallet('title')} icon={<span className="text-lg">💳</span>} tint="#22C55E">
             <WalletSummary />
           </CollapsibleSection>
 
           {/* ── Card storage usage (owned-card limit, mig 116) ── */}
           {cardUsage && (() => {
-            // A card_limit >= 1e9 is the "unlimited" sentinel (mig 124's 2e9 plan). It
-            // is a normal integer cap in the DB; here we only collapse it to a word and
-            // skip the progress bar so an Unlimited plan never renders a broken/near-
-            // empty meter.
+            // A card_limit >= 1e9 is the "unlimited" sentinel. Since mig 148 no plan is
+            // unlimited (the top plan caps at 100,000) — this only fires for admins
+            // (effective limit 2e9, mig 139): collapse to a word + skip the progress bar
+            // so their meter never renders a broken/near-empty bar.
             const unlimited = isUnlimitedCardLimit(cardUsage.limit)
             return (
               <CollapsibleSection
                 title={t('cardUsage.title')}
-                icon={<CreditCard className="w-5 h-5 text-muted-foreground" />}
+                icon={<CreditCard className="w-[18px] h-[18px]" />} tint="#6366F1"
                 badge={
                   <span className="text-sm text-muted-foreground tabular-nums">
                     {unlimited
                       ? t('cardUsage.countUnlimited', { owned: cardUsage.owned.toLocaleString() })
-                      : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}
+                      : t('cardUsage.count', { owned: cardUsage.owned.toLocaleString(), limit: cardUsage.limit.toLocaleString() })}
                   </span>
                 }
               >
@@ -376,17 +383,25 @@ export function SettingsPage() {
                 ) : (
                   <div className="h-24 animate-pulse rounded-xl bg-accent" aria-hidden />
                 )}
-                <div className="mt-5 border-t border-border pt-4">
-                  <PlanSelector />
-                </div>
               </CollapsibleSection>
             )
           })()}
 
+          {/* ── Subscription / plans — own visible section (was buried inside the
+               collapsed card-usage accordion, so the purchase entry was hard to find).
+               defaultOpen so plans + Select CTAs show without expanding. ── */}
+          <CollapsibleSection
+            title={t('subscription.title', 'Subscription')}
+            icon={<span className="text-lg">⭐</span>} tint="#F59E0B"
+            defaultOpen
+          >
+            <PlanSelector />
+          </CollapsibleSection>
+
           {/* ── Payment history (orders + subscriptions) ── */}
           <CollapsibleSection
             title={tBilling('paymentHistory.title')}
-            icon={<span className="text-base">🧾</span>}
+            icon={<span className="text-lg">🧾</span>} tint="#8B5CF6"
           >
             <PaymentHistory />
           </CollapsibleSection>
@@ -396,7 +411,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.study', 'Study')}</GroupLabel>
           {/* ── Study Settings ── */}
-          <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-base">📝</span>}>
+          <CollapsibleSection title={t('answerMode.title')} icon={<span className="text-lg">📝</span>} tint="#0EA5E9">
 
           {/* Answer Mode cards */}
           <div className="grid grid-cols-2 gap-3 mb-5">
@@ -445,7 +460,7 @@ export function SettingsPage() {
                 value={dailyNewLimit}
                 onChange={(e) => {
                   const raw = e.target.value
-                  setDailyNewLimit(raw === '' ? '' as any : parseInt(raw) || 0)
+                  setDailyNewLimit(parseNumericInput(raw))
                 }}
                 onBlur={() => {
                   const n = typeof dailyNewLimit === 'number' ? dailyNewLimit : parseInt(String(dailyNewLimit)) || 1
@@ -538,7 +553,7 @@ export function SettingsPage() {
         </CollapsibleSection>
 
           {/* ── Daily Study Goal ── */}
-          <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('goal.title', 'Daily Study Goal')} icon={<Target className="w-[18px] h-[18px]" />} tint="#EF4444">
             <p className="text-sm text-muted-foreground mb-3">{t('goal.description', 'Set a daily study target in minutes. Leave empty for no goal.')}</p>
             <div className="flex items-center gap-3">
               <input
@@ -569,7 +584,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.preferences', 'Preferences')}</GroupLabel>
           {/* ── Language ── */}
-          <CollapsibleSection title={t('language.title')} icon={<Globe className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('language.title')} icon={<Globe className="w-[18px] h-[18px]" />} tint="#06B6D4">
             <select
               value={i18n.language}
               onChange={(e) => changeLanguage(e.target.value)}
@@ -585,7 +600,7 @@ export function SettingsPage() {
           </CollapsibleSection>
 
           {/* ── Theme ── */}
-          <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('theme.title')} icon={<Palette className="w-[18px] h-[18px]" />} tint="#EC4899">
             <p className="text-sm text-muted-foreground mb-3">{t('theme.description')}</p>
             <ThemeToggle theme={theme} onChange={setTheme} />
           </CollapsibleSection>
@@ -595,7 +610,7 @@ export function SettingsPage() {
         <div className="space-y-3">
           <GroupLabel>{t('groups.data', 'Data')}</GroupLabel>
           {/* ── Data Export ── */}
-          <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-5 h-5 text-muted-foreground" />}>
+          <CollapsibleSection title={t('export.title', 'Export My Data')} icon={<Download className="w-[18px] h-[18px]" />} tint="#64748B">
             <UserStatsExport />
           </CollapsibleSection>
         </div>

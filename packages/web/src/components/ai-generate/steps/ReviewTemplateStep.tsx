@@ -41,6 +41,7 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
 
   return (
     <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">{t('review.templateDesc')}</p>
       {/* Template name */}
       <div>
         <label className="block text-sm font-medium text-foreground mb-1">

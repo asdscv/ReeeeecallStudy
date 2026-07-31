@@ -108,6 +108,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {studyGroupOpen && (
           <View>
+            <MenuItem icon="🎯" label={t('nav.learningPlan')} indent active={isActive('LearningToday')} theme={theme}
+              onPress={() => go('SettingsTab', 'LearningToday')} testID="drawer-learning-plan" />
             <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={isActive('AIGenerate')} theme={theme}
               onPress={() => go('SettingsTab', 'AIGenerate')} testID="drawer-ai-generate" />
             <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
@@ -118,6 +120,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
               onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
             <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent active={isActive('PublisherStats')} theme={theme}
               onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
+            <MenuItem icon="🔗" label={t('shares.title', { ns: 'settings', defaultValue: 'My Shares' })} indent active={isActive('MyShares')} theme={theme}
+              onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
             <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={isActive('StudyHistory')} theme={theme}
               onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
           </View>

@@ -6,8 +6,26 @@
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ixdapelfikaneexnskfm.supabase.co'
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_4F7XKb_Cifh2rujOiyP9RQ_ZU3HjQsV'
 
-const E2E_EMAIL = process.env.E2E_TEST_EMAIL || 'luke@rictax.kr'
-const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD || 'qpffkwldh35!'
+/**
+ * Test-account credentials come from the environment ONLY.
+ *
+ * These used to carry a real account's email and password as literal defaults, committed to
+ * the repository — anyone with read access had a working login. The web harness already
+ * required the env vars and threw without them (`e2e/auth.setup.ts`); mobile was the outlier.
+ *
+ * Removing them from HEAD does not remove them from history, so the account's password has to
+ * be rotated separately.
+ */
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(
+      `Missing ${name}. E2E credentials are not committed — export E2E_TEST_EMAIL and ` +
+      'E2E_TEST_PASSWORD (or put them in packages/mobile/.env.test) before running the suite.',
+    )
+  }
+  return value
+}
 
 let cachedToken: string | null = null
 let cachedUserId: string | null = null
@@ -21,7 +39,10 @@ async function getAuthToken(): Promise<{ token: string; userId: string }> {
       'apikey': SUPABASE_ANON_KEY,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email: E2E_EMAIL, password: E2E_PASSWORD }),
+    body: JSON.stringify({
+      email: requireEnv('E2E_TEST_EMAIL'),
+      password: requireEnv('E2E_TEST_PASSWORD'),
+    }),
   })
   const data = await res.json()
   cachedToken = data.access_token

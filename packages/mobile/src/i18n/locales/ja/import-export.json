@@ -4,7 +4,7 @@
   "importCSV": "Import CSV",
   "importJSON": "Import JSON",
   "importHint": "CSV: first row = field names, each row = one card\nJSON: array of objects or { cards: [...] }",
-  "importSuccess": "Imported {{count}} cards from \"{{name}}\"",
+  "importSuccess": "Imported {{count, number}} cards from \"{{name}}\"",
   "importFailed": "Failed to import CSV file",
   "importJsonFailed": "Failed to parse JSON file",
   "csvEmpty": "CSV file is empty or has no data rows",
@@ -18,7 +18,7 @@
   "errorTitle": "エラー",
   "successTitle": "完了",
   "noCardsTitle": "カードがありません",
-  "deckCardCount": "{{deck}} · {{count}}枚のカード",
+  "deckCardCount": "{{deck}} · {{count, number}}枚のカード",
   "back": "戻る",
-  "importPartial": "{{count}} 枚保存後に停止しました。"
+  "importPartial": "{{count, number}} 枚保存後に停止しました。"
 }

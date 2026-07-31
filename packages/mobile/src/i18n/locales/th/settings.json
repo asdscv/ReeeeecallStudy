@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "ตั้งค่าผู้ให้บริการ AI สำหรับสร้างการ์ด คีย์ถูกเข้ารหัสบนเซิร์ฟเวอร์และซิงก์ข้ามอุปกรณ์",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "คีย์ API ถูกเข้ารหัสบนเซิร์ฟเวอร์ (pgcrypto + Vault ไม่เก็บแบบข้อความธรรมดา) และซิงก์ระหว่างเว็บและมือถือ",
-    "configured": "ตั้งค่าแล้ว",
-    "notSet": "ยังไม่ตั้ง",
-    "model": "โมเดล",
-    "saving": "กำลังบันทึก...",
-    "delete": "ลบ",
-    "deletedTitle": "ลบแล้ว",
-    "saveSuccess": "บันทึกคีย์ API {{provider}} แล้ว",
-    "saveError": "บันทึกคีย์ API ไม่สำเร็จ",
-    "removed": "ลบคีย์ API {{provider}} แล้ว"
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -80,13 +60,13 @@
     "permissionTitle": "ต้องการสิทธิ์"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "การสมัครสมาชิก",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "แผนฟรี",
+    "proDesc": "ปลดล็อกฟีเจอร์พรีเมียมทั้งหมด",
+    "freeDesc": "อัปเกรดเพื่อเพิ่มการ์ด",
+    "upgradeToPro": "อัปเกรดเป็น Pro",
+    "manageSubscription": "จัดการการสมัครสมาชิก"
   },
   "legal": {
     "title": "Legal",
@@ -103,15 +83,11 @@
   },
   "links": {
     "userGuide": "คู่มือผู้ใช้",
-    "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์",
-    "apiDocs": "เอกสาร API",
-    "apiDocsDesc": "API endpoints การยืนยันตัวตน ตัวอย่างการใช้งาน"
+    "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์"
   },
   "quickActions": {
-    "quickStudy": "เรียนด่วน",
-    "aiGenerate": "สร้างด้วย AI",
     "invite": "เชิญ",
-    "shareMessage": "มาดู ReeeeecallStudy แอปบัตรคำที่ฉลาดที่สุด! https://reeeeecall.com"
+    "shareMessage": "มาดู ReeeeecallStudy แอปบัตรคำที่ฉลาดที่สุด! https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "เทมเพลตการ์ด",
@@ -140,13 +116,6 @@
     "dark": "มืด",
     "system": "ระบบ"
   },
-  "export": {
-    "title": "ส่งออกข้อมูล",
-    "stats": "สถิติการเรียน",
-    "sessions": "เซสชันเรียน",
-    "decks": "เด็ค",
-    "cards": "การ์ด"
-  },
   "alerts": {
     "error": "ผิดพลาด"
   },
@@ -167,8 +136,8 @@
     "upgrade": "อัปเกรด (เร็วๆ นี้)",
     "upgradeSoon": "การสมัครสมาชิกจะเปิดให้ใช้เร็วๆ นี้",
     "cancelPending": "การสมัครกำลังจะสิ้นสุด — ใช้ได้ถึง {{date}}",
-    "countUnlimited": "{{owned}} / ไม่จำกัด",
-    "planNoteUnlimited": "ขีดจำกัดการ์ดที่คุณเป็นเจ้าของคือไม่จำกัด",
+    "countUnlimited": "{{owned}} · ไม่จำกัด",
+    "planNoteUnlimited": "บัญชีผู้ดูแล — ไม่จำกัดจำนวนการ์ดที่จัดเก็บ",
     "detail": {
       "title": "พื้นที่จัดเก็บการ์ด",
       "subtitle": "การ์ดที่เป็นเจ้าของและการ์ดที่สมัครสมาชิกจะนับรวมในขีดจำกัดแผน เด็คทางการไม่นับรวม",
@@ -178,15 +147,15 @@
       "officialNote": "ไม่นับรวมในขีดจำกัด",
       "archived": "เก็บถาวรแล้ว",
       "archivedNote": "ล็อกการเรียน",
-      "archivedCount": "เก็บถาวรแล้ว {{count}} ใบ",
-      "remaining": "เหลือ {{count}} ใบ",
+      "archivedCount": "เก็บถาวรแล้ว {{count, number}} ใบ",
+      "remaining": "เหลือ {{count, number}} ใบ",
       "percentUsed": "ใช้ไปแล้ว {{percent}}%",
       "nearLimit": "ใกล้ถึงขีดจำกัด",
       "atLimit": "ถึงขีดจำกัดแล้ว",
-      "planUnlimited": "แผนไม่จำกัด",
+      "planUnlimited": "บัญชีผู้ดูแล",
       "planCards": "แผน {{limit}} ใบ",
-      "unlimitedTitle": "จัดเก็บไม่จำกัด",
-      "lifetimeTotal": "{{count}} ใบ"
+      "unlimitedTitle": "ไม่จำกัดจำนวนการ์ด",
+      "lifetimeTotal": "{{count, number}} ใบ"
     }
   },
   "groups": {
@@ -206,6 +175,23 @@
     "current": "แพ็กเกจปัจจุบัน",
     "comingSoon": "เร็ว ๆ นี้",
     "empty": "ยังไม่มีแพ็กเกจ",
-    "loadError": "โหลดแพ็กเกจไม่สำเร็จ"
+    "loadError": "โหลดแพ็กเกจไม่สำเร็จ",
+    "popular": "ยอดนิยม"
+  },
+  "paymentHistory": {
+    "title": "ประวัติการชำระเงิน",
+    "empty": "ยังไม่มีการชำระเงิน",
+    "refunded": "คืนเงินแล้ว",
+    "loadMore": "โหลดเพิ่ม",
+    "error": "โหลดประวัติการชำระเงินไม่สำเร็จ",
+    "retry": "ลองอีกครั้ง",
+    "kind": {
+      "credit_pack": "เครดิต",
+      "subscription": "การสมัครสมาชิก"
+    },
+    "reason": {
+      "renewal": "ต่ออายุ",
+      "updated": "เปลี่ยนแพ็กเกจ"
+    }
   }
 }

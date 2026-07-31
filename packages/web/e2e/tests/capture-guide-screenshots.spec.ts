@@ -1,15 +1,15 @@
 /**
  * Capture AI Generate feature screenshots for the user guide.
- * Run: npx playwright test capture-guide-screenshots --project=chromium
+ * Generation runs server-side on our provider key — no client API key input.
+ * Run: E2E_AI_GENERATION=1 npx playwright test capture-guide-screenshots --project=chromium
  */
 import { test } from '@playwright/test'
 
-const GROK_API_KEY = process.env.E2E_GROK_API_KEY ?? ''
 const OUTPUT_DIR = 'public/images/guide/ai-generate'
 
 test.describe('Capture AI Generate Screenshots', () => {
   test('PC screenshots', async ({ browser }) => {
-    test.skip(!process.env.E2E_GROK_API_KEY, 'Grok API key required')
+    test.skip(!process.env.E2E_AI_GENERATION, 'E2E_AI_GENERATION=1 required (live server-side generation)')
     test.setTimeout(180_000)
     const context = await browser.newContext({
       viewport: { width: 1280, height: 800 },
@@ -21,11 +21,8 @@ test.describe('Capture AI Generate Screenshots', () => {
     await page.waitForTimeout(2000)
     await page.screenshot({ path: `${OUTPUT_DIR}/pc-01-page.png` })
 
-    await page.locator('select').first().selectOption('xai')
-    await page.locator('input[type="password"]').fill(GROK_API_KEY)
-    await page.locator('fieldset').first().locator('select').nth(1).selectOption('grok-3-mini')
     await page.locator('input[type="text"]').first().fill('JLPT N5 일본어 단어')
-    await page.locator('input[type="range"]').fill('10')
+    await page.locator('input[type="number"]').fill('10')
     await page.waitForTimeout(500)
     await page.screenshot({ path: `${OUTPUT_DIR}/pc-02-config.png` })
 
@@ -56,7 +53,7 @@ test.describe('Capture AI Generate Screenshots', () => {
   })
 
   test('Mobile screenshots', async ({ browser }) => {
-    test.skip(!process.env.E2E_GROK_API_KEY, 'Grok API key required')
+    test.skip(!process.env.E2E_AI_GENERATION, 'E2E_AI_GENERATION=1 required (live server-side generation)')
     test.setTimeout(180_000)
     const context = await browser.newContext({
       viewport: { width: 390, height: 844 },
@@ -69,11 +66,8 @@ test.describe('Capture AI Generate Screenshots', () => {
     await page.waitForTimeout(2000)
     await page.screenshot({ path: `${OUTPUT_DIR}/mobile-01-page.png` })
 
-    await page.locator('select').first().selectOption('xai')
-    await page.locator('input[type="password"]').fill(GROK_API_KEY)
-    await page.locator('fieldset').first().locator('select').nth(1).selectOption('grok-3-mini')
     await page.locator('input[type="text"]').first().fill('JLPT N5 일본어 단어')
-    await page.locator('input[type="range"]').fill('10')
+    await page.locator('input[type="number"]').fill('10')
     await page.waitForTimeout(500)
     await page.screenshot({ path: `${OUTPUT_DIR}/mobile-02-config.png`, fullPage: true })
 

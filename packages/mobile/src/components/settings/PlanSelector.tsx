@@ -9,17 +9,19 @@ import {
   type MySubscription,
 } from '../../services/billing'
 import { SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 
-// Card limits at or above this collapse to "unlimited" FOR DISPLAY only — the
-// mig-124 sentinel (sub_unlimited_monthly stores card_limit = 2e9). The DB still
-// treats it as a plain integer cap; only the presentation layer shows the word.
+// Card limits at or above this collapse to "unlimited" FOR DISPLAY only. As of mig 148
+// NO plan is unlimited (the top plan caps at 100,000); this now only fires for admins,
+// whose effective limit stays 2e9 (mig 139). Presentation-only — never gate server-side.
 export const UNLIMITED_CARD_LIMIT = 1_000_000_000
 
 /**
  * Data-driven subscription PLAN SELECTOR for the mobile Settings card-limit
  * section. Mirrors the web plan list: pulls the ACTIVE `subscription` products
  * from get_billing_products (mig 119/124 catalog), ordered by sort_order, and
- * renders each as title + card-limit ("무제한" when >= 1e9, else the number) + ₩
+ * renders each as title + card-limit ("무제한" when >= 1e9, else the number) + $
  * price + a Select button. Fully data-driven — no plan is hardcoded, so plans
  * added / edited / retired as catalog rows flow through with no code change.
  *
@@ -57,10 +59,20 @@ export function PlanSelector({
     }
   }, [])
 
+  // Self-gate every call site: while mobile IAP products aren't submitted
+  // (Apple Guideline 2.1(b)) NO plan pricing / Select CTA may render anywhere.
+  // Returning null here — rather than relying on each caller to wrap the tag —
+  // means an ungated call site (e.g. CardUsageModal) can't leak the catalog.
+  // Safe after the hooks above (they always run); the flag is a module constant.
+  if (!SUBSCRIPTION_UI_ENABLED) return null
+
   const fmtLimit = (limit: number | null): string =>
     limit != null && limit >= UNLIMITED_CARD_LIMIT
       ? t('plans.unlimited')
-      : t('plans.cardLimit', { limit: (limit ?? 0).toLocaleString() })
+      : t('plans.cardLimit', { limit: formatCount(limit ?? 0) })
+
+  // Price is always USD (the store charges USD everywhere; ₩/Toss dropped).
+  const fmtPrice = (p: BillingProduct): string => formatProductPrice(p)
 
   const isCurrent = (p: BillingProduct): boolean =>
     subscription?.status === 'active' &&
@@ -89,11 +101,15 @@ export function PlanSelector({
     )
   }
 
+  // Highlight the highest-tier plan (largest card allowance) as "popular".
+  const topLimit = Math.max(...plans.map((p) => p.cardLimit ?? 0))
+
   return (
     <View style={styles.container}>
-      <Text style={[styles.heading, { color: theme.colors.text }]}>{t('plans.title')}</Text>
       {plans.map((p) => {
         const current = isCurrent(p)
+        const popular = !current && (p.cardLimit ?? 0) === topLimit && plans.length > 1
+        const accent = current || popular
         return (
           <View
             key={p.id}
@@ -101,22 +117,31 @@ export function PlanSelector({
             style={[
               styles.planRow,
               {
-                borderColor: current ? theme.colors.primary : theme.colors.border,
+                borderColor: accent ? theme.colors.primary : theme.colors.border,
                 backgroundColor: current ? theme.colors.primaryLight : theme.colors.surface,
-                borderWidth: current ? 2 : 1,
+                borderWidth: accent ? 1.5 : StyleSheet.hairlineWidth,
               },
             ]}
           >
             <View style={styles.planInfo}>
-              <Text style={[styles.planTitle, { color: theme.colors.text }]}>{p.title}</Text>
+              <View style={styles.planTitleRow}>
+                <Text style={[styles.planTitle, { color: theme.colors.text }]}>{p.title}</Text>
+                {popular && (
+                  <View style={[styles.popularPill, { backgroundColor: theme.colors.primary }]}>
+                    <Text style={styles.popularText}>{t('plans.popular', 'POPULAR')}</Text>
+                  </View>
+                )}
+              </View>
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                 {fmtLimit(p.cardLimit)}
               </Text>
             </View>
             <View style={styles.planRight}>
               <Text style={[styles.price, { color: theme.colors.text }]}>
-                {`₩${p.priceKrw.toLocaleString()}`}
-                {p.period ? t('plans.perMonth') : ''}
+                {fmtPrice(p)}
+                <Text style={[styles.pricePeriod, { color: theme.colors.textSecondary }]}>
+                  {p.period ? t('plans.perMonth') : ''}
+                </Text>
               </Text>
               {current ? (
                 <View style={[styles.currentBadge, { backgroundColor: theme.colors.primary }]}>
@@ -126,6 +151,7 @@ export function PlanSelector({
                 <TouchableOpacity
                   testID={`settings-plan-select-${p.id}`}
                   disabled={!SUBSCRIPTION_UI_ENABLED}
+                  activeOpacity={0.85}
                   onPress={() => {
                     if (SUBSCRIPTION_UI_ENABLED) onSelect?.(p)
                   }}
@@ -158,23 +184,27 @@ export function PlanSelector({
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 10, marginTop: 4 },
+  container: { gap: 10, marginTop: 2 },
   center: { paddingVertical: 16, alignItems: 'center' },
-  heading: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
   planRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    padding: 12,
-    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 14,
   },
-  planInfo: { flex: 1, gap: 2 },
-  planTitle: { fontSize: 15, fontWeight: '600' },
-  planRight: { alignItems: 'flex-end', gap: 6 },
-  price: { fontSize: 15, fontWeight: '700' },
-  selectBtn: { paddingVertical: 7, paddingHorizontal: 14, borderRadius: 8 },
-  selectText: { fontSize: 13, fontWeight: '600' },
+  planInfo: { flex: 1, gap: 3 },
+  planTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  planTitle: { fontSize: 15.5, fontWeight: '700', letterSpacing: -0.2 },
+  popularPill: { paddingVertical: 2, paddingHorizontal: 7, borderRadius: 6 },
+  popularText: { fontSize: 9.5, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.4 },
+  planRight: { alignItems: 'flex-end', gap: 7 },
+  price: { fontSize: 16, fontWeight: '800', letterSpacing: -0.3 },
+  pricePeriod: { fontSize: 12, fontWeight: '500' },
+  selectBtn: { paddingVertical: 8, paddingHorizontal: 18, borderRadius: 10, minWidth: 78, alignItems: 'center' },
+  selectText: { fontSize: 13.5, fontWeight: '700' },
   currentBadge: { paddingVertical: 5, paddingHorizontal: 12, borderRadius: 8 },
   currentBadgeText: { fontSize: 12, fontWeight: '600', color: '#FFFFFF' },
 })

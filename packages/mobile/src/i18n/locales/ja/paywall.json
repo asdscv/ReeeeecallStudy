@@ -6,12 +6,36 @@
   "done": "完了",
   "back": "戻る",
   "features": {
-    "unlimitedDecks": { "title": "無制限のデッキ＆カード", "free": "5デッキ、3千枚", "pro": "無制限" },
-    "allModes": { "title": "全学習モード", "free": "SRS + 順次", "pro": "全4モード" },
-    "aiGeneration": { "title": "AIカード生成", "free": "月5回", "pro": "無制限" },
-    "premiumTts": { "title": "プレミアムTTS", "free": "基本", "pro": "Edge TTS HD" },
-    "analytics": { "title": "高度な分析", "free": "基本統計", "pro": "チャート + 予測" },
-    "marketplace": { "title": "マーケットプレイス公開", "free": "ダウンロードのみ", "pro": "アップロード + 収益分配" }
+    "cardStorage": {
+      "title": "カード保存",
+      "free": "1,000枚",
+      "pro": "最大100,000枚"
+    },
+    "allModes": {
+      "title": "全学習モード",
+      "free": "SRS + 順次",
+      "pro": "全4モード"
+    },
+    "aiGeneration": {
+      "title": "AIカード生成",
+      "free": "1日10枚",
+      "pro": "1日10枚 + クレジット"
+    },
+    "premiumTts": {
+      "title": "プレミアムTTS",
+      "free": "基本",
+      "pro": "Edge TTS HD"
+    },
+    "analytics": {
+      "title": "高度な分析",
+      "free": "基本統計",
+      "pro": "チャート + 予測"
+    },
+    "marketplace": {
+      "title": "マーケットプレイス公開",
+      "free": "ダウンロードのみ",
+      "pro": "アップロード + 収益分配"
+    }
   },
   "free": "無料",
   "pro": "Pro",
@@ -27,7 +51,9 @@
   "productsUnavailable": "現在サブスクリプション商品をご利用いただけません。後ほどお試しください。",
   "checkout": {
     "startFailed": "決済を開始できませんでした。もう一度お試しください。",
-    "confirming": "お支払いを受け付けました。確認が完了するとアカウントに反映されます。"
+    "confirming": "お支払いを受け付けました。確認が完了するとアカウントに反映されます。",
+    "errorTitle": "購入に失敗しました",
+    "errorGeneric": "購入中に問題が発生しました。もう一度お試しください。"
   },
   "catalog": {
     "perMonth": "/月",
@@ -35,5 +61,15 @@
   },
   "privacyPolicy": "プライバシーポリシー",
   "termsOfService": "利用規約",
-  "manageSubscription": "サブスクリプション管理"
+  "manageSubscription": "サブスクリプション管理",
+  "legalDisclaimer": "購入を確定すると、{{account}}アカウントに料金が請求されます。現在の期間が終了する少なくとも24時間前に解約しない限り、サブスクリプションは自動的に更新されます。現在の期間終了前の24時間以内に更新料金が請求されます。購入後、{{store}}のアカウント設定からサブスクリプションを管理または解約できます。",
+  "consent": {
+    "subscription": "プランが直ちに開始され、有料の特典を利用した時点でこの購入の撤回権が消滅することに同意します。",
+    "policyLink": "返金ポリシー"
+  },
+  "refund": {
+    "request": "返金をリクエスト",
+    "title": "返金リクエスト",
+    "submitted": "Apple に返金リクエストを送信しました。可否は Apple が判断し、メールで通知されます。承認された場合、アクセス権は自動的に取り消されます。"
+  }
 }

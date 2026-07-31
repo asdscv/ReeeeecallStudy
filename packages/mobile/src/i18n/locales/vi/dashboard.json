@@ -18,16 +18,16 @@
     "title": "Trạng thái bộ thẻ",
     "noDecks": "Chưa có bộ thẻ nào. Hãy tạo một bộ!",
     "goToDecks": "Đến quản lý bộ thẻ",
-    "cardCount": "{{count}} thẻ",
-    "newCards": "Mới {{count}}",
-    "reviewCards": "Ôn tập {{count}}",
+    "cardCount": "{{count, number}} thẻ",
+    "newCards": "Mới {{count, number}}",
+    "reviewCards": "Ôn tập {{count, number}}",
     "study": "Học"
   },
   "heatmap": {
     "title": "Bản đồ nhiệt học tập"
   },
   "gamification": {
-    "freezes": "{{count}} freezes left",
+    "freezes": "{{count, number}} freezes left",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,23 +42,23 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count}} cards",
-    "sessions": "Complete {{count}} sessions",
-    "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores",
+    "cards": "Study {{count, number}} cards",
+    "sessions": "Complete {{count, number}} sessions",
+    "time": "Study for {{count, number}} minutes",
+    "perfect": "Get {{count, number}} perfect scores",
     "completed": "Hoàn thành"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "motivational": "Keep going! You're doing great!"
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days",
+  "streakDays": "{{count, number}} ngày",
   "quickStudy": {
     "title": "Học nhanh",
-    "dueToday": "{{count}} thẻ cần học hôm nay",
+    "dueToday": "{{count, number}} thẻ cần học hôm nay",
     "startSession": "Bắt đầu một phiên học"
   }
 }

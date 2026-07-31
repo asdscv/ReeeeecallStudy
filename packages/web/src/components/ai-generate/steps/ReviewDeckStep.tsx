@@ -18,6 +18,7 @@ export function ReviewDeckStep({ deck, onChange, onRegenerate, onNext }: ReviewD
 
   return (
     <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">{t('review.deckDesc')}</p>
       {/* Preview */}
       <div className="flex items-center gap-3 p-4 bg-muted rounded-xl">
         <span className="text-3xl">{deck.icon}</span>

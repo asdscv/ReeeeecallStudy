@@ -11,7 +11,9 @@
     "history": "History",
     "programming": "Code",
     "exam": "Exam",
-    "other": "Other"
+    "other": "Other",
+    "general": "General",
+    "trivia": "Trivia"
   },
   "sort": {
     "popular": "Popular",
@@ -21,8 +23,8 @@
     "topRated": "Top Rated"
   },
   "listing": {
-    "cardCount": "{{count}} cards",
-    "userCount": "{{count}} users"
+    "cardCount": "{{count, number}} cards",
+    "userCount": "{{count, number}} users"
   },
   "detail": {
     "back": "Back to Marketplace",
@@ -45,10 +47,10 @@
     "edited": "(edited)",
     "helpful": "Helpful",
     "byAuthor": "by {{name}}",
-    "cardsBadge": "{{count}} cards",
-    "viewsBadge": "{{count}} views",
-    "usersBadge": "{{count}} users",
-    "reviewsCount": "({{count}} reviews)",
+    "cardsBadge": "{{count, number}} cards",
+    "viewsBadge": "{{count, number}} views",
+    "usersBadge": "{{count, number}} users",
+    "reviewsCount": "({{count, number}} reviews)",
     "previewCards": "Preview Cards",
     "ratingsReviews": "Ratings & Reviews",
     "editReview": "Edit Review",
@@ -56,7 +58,7 @@
     "writeAReview": "Write a Review",
     "acquireToReview": "Acquire this deck to leave a review",
     "noReviewsYet": "No reviews yet",
-    "reviewCountLabel": "{{count}} reviews",
+    "reviewCountLabel": "{{count, number}} reviews",
     "loading": "Loading...",
     "loadMoreReviews": "Load more reviews",
     "reportReason": "Reason",
@@ -96,8 +98,8 @@
       "lowest": "Lowest",
       "most_helpful": "Helpful"
     },
-    "limitUsage": "Adds {{count}} cards toward your limit · {{available}} left",
-    "limitExceeds": "This would exceed your card limit ({{available}} left). Delete cards or subscribe first.",
+    "limitUsage": "Adds {{count, number}} cards toward your limit · {{available, number}} left",
+    "limitExceeds": "This would exceed your card limit ({{available, number}} left). Free up space or upgrade your plan to add it.",
     "limitOfficialFree": "Official deck — doesn't count toward your card limit.",
     "acquireByMode": {
       "subscribe": "Subscribe",

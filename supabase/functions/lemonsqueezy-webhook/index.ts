@@ -210,7 +210,9 @@ type VariantMapState =
   | { kind: 'invalid' }           // configured but unparseable → FAIL CLOSED (never grant)
   | { kind: 'map'; map: Record<string, string> }
 
-function loadVariantMap(): VariantMapState {
+// Parse the LEMONSQUEEZY_VARIANT_MAP env secret ({"<variant id>":"<product id>"}) into
+// the legacy fallback map. Kept separate so the DB layer (below) can merge over it.
+function loadEnvVariantMap(): VariantMapState {
   const raw = ENV('LEMONSQUEEZY_VARIANT_MAP')
   if (!raw) return { kind: 'unset' }
   try {
@@ -224,6 +226,45 @@ function loadVariantMap(): VariantMapState {
     }
   } catch { /* fall through to invalid */ }
   return { kind: 'invalid' }
+}
+
+// DB-FIRST variant→product map (mig 151): the billing_product_skus table is the single
+// source of truth for the store↔internal mapping. Read the active LemonSqueezy SKUs and
+// MERGE them over the LEMONSQUEEZY_VARIANT_MAP env fallback so:
+//   * once the owner registers LS variants via set_store_product_sku, no env secret is
+//     needed (and DB rows win over any stale env entry);
+//   * with no DB rows, behaviour is byte-for-byte the legacy env map (web untouched).
+// The DB read failing (never expected) leaves the env map as-is rather than blanking it.
+// Returns 'map' whenever EITHER source yields entries; stays 'unset'/'invalid' from env
+// only when the DB adds nothing (preserves the fail-closed contract in verifyVariant).
+async function loadVariantMap(
+  // deno-lint-ignore no-explicit-any -- injected service-role client (createClient's
+  // inferred generics don't match ReturnType<typeof createClient>; runtime shape is fine).
+  sb: any,
+): Promise<VariantMapState> {
+  const env = loadEnvVariantMap()
+  let dbMap: Record<string, string> = {}
+  try {
+    const { data, error } = await sb
+      .from('billing_product_skus')
+      .select('store_product_id, product_id')
+      .eq('platform', 'lemonsqueezy')
+      .eq('is_active', true)
+    if (error) {
+      console.error('[lemonsqueezy-webhook] billing_product_skus read failed — using env map only:', error.message)
+    } else if (Array.isArray(data)) {
+      for (const row of data as Array<{ store_product_id: string; product_id: string }>) {
+        if (row.store_product_id && row.product_id) dbMap[String(row.store_product_id)] = String(row.product_id)
+      }
+    }
+  } catch (e) {
+    console.error('[lemonsqueezy-webhook] billing_product_skus read threw — using env map only:', (e as Error)?.message)
+  }
+  const dbKeys = Object.keys(dbMap)
+  if (dbKeys.length === 0) return env  // no DB rows → legacy env behaviour verbatim
+  // Merge: env base, DB overrides/augments (DB is authoritative).
+  const base = env.kind === 'map' ? env.map : {}
+  return { kind: 'map', map: { ...base, ...dbMap } }
 }
 
 // The LS variant id the buyer actually purchased, per event shape:
@@ -243,10 +284,11 @@ function purchasedVariantId(event: string, attrs: Record<string, unknown>): stri
   return vid == null || vid === '' ? null : String(vid)
 }
 
-// Returns null when the purchased variant is verified to match the intent's product (or
-// when verification is deliberately SKIPPED because the map is UNSET), else a 400 Response
-// that REFUSES the grant. SAFE DEFAULT: skip-on-unset (fail open) but fail CLOSED on a
-// set-but-malformed map and on any concrete mismatch.
+// Returns null when the purchased variant is verified to match the intent's product, else a
+// 400 Response that REFUSES the grant. FAIL-CLOSED on the money path (P-H4): an UNSET map,
+// a set-but-malformed map, and any concrete mismatch all refuse to grant. (Reaching here
+// means the fn is live — the signing secret is set — so an unset variant map is a
+// misconfiguration that must not silently grant.)
 function verifyVariant(
   event: string,
   attrs: Record<string, unknown>,
@@ -254,11 +296,12 @@ function verifyVariant(
   vm: VariantMapState,
 ): Response | null {
   if (vm.kind === 'unset') {
-    // Documented fail-OPEN-only-on-UNSET (the safe default): with no map we can't re-derive
-    // the product from the payload, but the intent is still server-authoritative on price +
-    // product, so the base posture holds. Warn loudly so this isn't left unset in prod.
-    console.warn('[lemonsqueezy-webhook] LEMONSQUEEZY_VARIANT_MAP unset — skipping variant/product assertion for', event, '(intent product:', intentProductId, ')')
-    return null
+    // FAIL-CLOSED on unset (P-H4): reaching here means the webhook is LIVE (the signing
+    // secret is set — the fn 503s without it). A live money path with NO variant map can't
+    // verify the buyer paid for the plan the intent names, so a tampered cheap-variant
+    // checkout could claim an expensive plan's cap. Refuse to grant until the map is set.
+    console.error('[lemonsqueezy-webhook] LEMONSQUEEZY_VARIANT_MAP unset while live — refusing to grant', event, '(set the variant→product map)')
+    return json({ error: 'Variant map not configured', code: 'VARIANT_MAP_UNSET' }, 400)
   }
   if (vm.kind === 'invalid') {
     // Set but unparseable = operator INTENDED verification but mis-typed it → fail closed.
@@ -335,8 +378,9 @@ Deno.serve(async (req) => {
 
   const sb = createClient(ENV('SUPABASE_URL')!, ENV('SUPABASE_SERVICE_ROLE_KEY')!)
 
-  // Server-side variant→product map (AUDIT FIX #2), parsed once per request.
-  const variantMap = loadVariantMap()
+  // Server-side variant→product map (AUDIT FIX #2): DB-first (billing_product_skus, mig
+  // 151) merged over the LEMONSQUEEZY_VARIANT_MAP env fallback, resolved once per request.
+  const variantMap = await loadVariantMap(sb)
 
   // Look up the server-authoritative intent (kind + product_id) for a merchant_uid.
   // Distinguishes a real DB error (retryable → 500) from an absent intent (bad payload
@@ -490,6 +534,16 @@ Deno.serve(async (req) => {
       if (planProduct) {
         return lifecycleResult(await syncSubPlan(dataId, planProduct, status, renewsAt, cancelled), event)
       }
+      // No product resolved from the variant. If the map IS configured (map/invalid), this is
+      // a variant we can't map — a status-only sync would silently KEEP a stale card cap on a
+      // downgrade (P-M1). Fail closed (500 → LS retries) + alert so the owner adds the mapping.
+      if (variantMap.kind !== 'unset') {
+        console.error('[lemonsqueezy-webhook] subscription_updated variant UNMAPPED — refusing status-only sync to avoid a stale card cap. variant=', purchasedVariantId(event, attrs), '— add it to LEMONSQUEEZY_VARIANT_MAP')
+        return json({ error: 'Variant unmapped on plan change', code: 'VARIANT_UNMAPPED' }, 500)
+      }
+      // Map unset shouldn't occur post-grant (grants now require the map, P-H4). Last-resort
+      // status-only sync, logged loudly so the stale-cap risk is visible.
+      console.warn('[lemonsqueezy-webhook] subscription_updated with LEMONSQUEEZY_VARIANT_MAP unset — status-only sync (card cap may be stale). Set the map.')
       return lifecycleResult(await syncSub(dataId, status, renewsAt, cancelled), event)
     }
 

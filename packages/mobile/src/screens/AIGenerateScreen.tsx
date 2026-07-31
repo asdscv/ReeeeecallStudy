@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, StyleSheet, TextInput as RNTextInput, Modal, Pressable, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
-import { getAffordableCards, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { getAffordableCards, formatUsdMicro, formatCount, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { defaultCardCount, MAX_CARD_COUNT } from '@reeeeecall/shared/lib/ai/card-count'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
-import { useDecks } from '../hooks'
+import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
 
 // AI generation runs on our server key (metered free tier) — no provider/API
@@ -178,7 +179,17 @@ export function AIGenerateScreen() {
   const navigation = useNavigation()
   const store = useAIGenerateStore()
   const { decks } = useDecks()
+  const { user } = useAuthState()
   const limit = useCardLimit()
+
+  // ONLY decks the user OWNS and can edit can receive new cards. `decks` also holds
+  // SUBSCRIBED decks (owned by a publisher) and readonly copies — saving into one fails
+  // server-side at reserve_card_positions ("deck not found or not owned"), surfaced as a
+  // generic error. Offer only owned+editable decks as AI targets (parity with web ConfigStep).
+  const targetDecks = useMemo(
+    () => decks.filter((d) => d.user_id === user?.id && !d.is_readonly),
+    [decks, user?.id],
+  )
 
   const [step, setStep] = useState<WizardStep>('config')
 
@@ -192,7 +203,8 @@ export function AIGenerateScreen() {
 
   // Image-recognition mode — cards_only only (needs the deck's template fields).
   const [imageMode, setImageMode] = useState<'topic' | 'image'>('topic')
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
+  const [imageDataUrls, setImageDataUrls] = useState<string[]>([])
+  const MAX_IMAGES = 8
   const [affordable, setAffordable] = useState<Affordable | null>(null)
   const countTouched = useRef(false)   // once the user edits the count, stop auto-defaulting it
 
@@ -203,19 +215,30 @@ export function AIGenerateScreen() {
   // cards_only adds cards INTO an existing deck, so they must use that deck's
   // own template — never an arbitrary global templates[0], whose fields wouldn't
   // match the deck. A deck with no default_template_id can't accept AI cards yet.
-  const selectedDeck = decks.find((d) => d.id === selectedDeckId)
+  const selectedDeck = targetDecks.find((d) => d.id === selectedDeckId)
   const cardsOnlyNeedsTemplate = !!selectedDeckId && !selectedDeck?.default_template_id
+
+  // Clear a selection that isn't an owned+editable deck once the deck list has loaded,
+  // so a target the save path would reject can never stay selected.
+  useEffect(() => {
+    if (selectedDeckId && targetDecks.length > 0 && !targetDecks.some((d) => d.id === selectedDeckId)) {
+      setSelectedDeckId('')
+    }
+  }, [selectedDeckId, targetDecks])
 
   useEffect(() => {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
 
-  // Default the card count to today's REMAINING FREE cards (clamped to [1, 10]) so a default
-  // generation never overshoots the free daily allowance. Applies once the server-authoritative
-  // affordance loads and only until the user edits the count. (Parity with web ConfigStep.)
+  // Default the card count to today's REMAINING FREE cards so a default generation never
+  // overshoots the free daily allowance. The bound comes from the SERVER
+  // (`get_ai_generation_quota` returns remaining = free_limit − used), so raising the quota
+  // via admin_set_ai_free_quota is followed here without an OTA — see
+  // shared/lib/ai/card-count.ts. Applies once the server-authoritative affordance loads and
+  // only until the user edits the count. (Parity with web ConfigStep.)
   useEffect(() => {
     if (affordable && !countTouched.current && !useImage) {
-      setCardCount(String(Math.max(1, Math.min(10, affordable.free))))
+      setCardCount(String(defaultCardCount(affordable.free)))
     }
   }, [affordable, useImage])
 
@@ -234,28 +257,18 @@ export function AIGenerateScreen() {
     return unsub
   }, [navigation, step, t])
 
-  // Clear a stale uploaded image when the deck changes (prevents an accidental
-  // paid re-generation with a previously-picked photo).
-  useEffect(() => { setImageDataUrl(null) }, [selectedDeckId])
+  // Clear stale uploaded images when the deck changes (prevents an accidental
+  // paid re-generation with previously-picked photos).
+  useEffect(() => { setImageDataUrls([]) }, [selectedDeckId])
 
-  const pickImage = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
-    if (!perm.granted) {
-      Alert.alert(t('alert.errorTitle'), t('alert.permissionDenied'))
-      return
-    }
-    // Pick the raw asset (no base64 yet) — we downscale dimensions + recompress
-    // ourselves so a multi-MP phone photo becomes a small JPEG instead of being
-    // rejected by the size cap. Mirrors the web canvas ≤1600px downscale.
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 })
-    if (res.canceled || !res.assets?.[0]?.uri) return
-    const asset = res.assets[0]
+  // Downscale one picked asset to a small JPEG data URL (≤1600px longer side,
+  // recompressed) so a multi-MP phone photo clears the size cap. Null on failure.
+  const downscaleAsset = async (asset: ImagePicker.ImagePickerAsset): Promise<string | null> => {
     try {
       const MAX_DIM = 1600
       const w = asset.width || 0
       const h = asset.height || 0
       const longer = Math.max(w, h)
-      // Resize the longer side to MAX_DIM (ratio preserved); never upscale.
       const actions: ImageManipulator.Action[] =
         longer > MAX_DIM ? [{ resize: w >= h ? { width: MAX_DIM } : { height: MAX_DIM } }] : []
       const out = await ImageManipulator.manipulateAsync(asset.uri, actions, {
@@ -263,17 +276,40 @@ export function AIGenerateScreen() {
         format: ImageManipulator.SaveFormat.JPEG,
         base64: true,
       })
-      if (!out.base64) { Alert.alert(t('alert.errorTitle'), t('alert.selectImageError')); return }
+      if (!out.base64) return null
       const dataUrl = `data:image/jpeg;base64,${out.base64}`
-      if (dataUrl.length > 6_500_000) {
-        Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
-        return
-      }
-      setImageDataUrl(dataUrl)
+      return dataUrl.length > 6_500_000 ? null : dataUrl
     } catch {
-      Alert.alert(t('alert.errorTitle'), t('alert.selectImageError'))
+      return null
     }
   }
+
+  const pickImage = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!perm.granted) {
+      Alert.alert(t('alert.errorTitle'), t('alert.permissionDenied'))
+      return
+    }
+    const room = MAX_IMAGES - imageDataUrls.length
+    if (room <= 0) return
+    // Multi-select up to the remaining room; each asset is downscaled + recompressed
+    // ourselves (mirrors the web canvas ≤1600px path) and appended to the set.
+    const res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: room,
+    })
+    if (res.canceled || !res.assets?.length) return
+    const urls = (await Promise.all(res.assets.slice(0, room).map(downscaleAsset))).filter(
+      (u): u is string => !!u,
+    )
+    if (urls.length === 0) { Alert.alert(t('alert.errorTitle'), t('alert.selectImageError')); return }
+    setImageDataUrls((prev) => [...prev, ...urls].slice(0, MAX_IMAGES))
+  }
+
+  const removeImage = (idx: number) =>
+    setImageDataUrls((prev) => prev.filter((_, i) => i !== idx))
 
   const handleGenerate = async () => {
     // A cards_only deck with no template can't accept generated cards — block
@@ -283,7 +319,7 @@ export function AIGenerateScreen() {
       return
     }
     if (useImage) {
-      if (!imageDataUrl) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
+      if (imageDataUrls.length === 0) { Alert.alert(t('alert.errorTitle'), t('alert.imageRequired')); return }
     } else if (!topic.trim()) {
       Alert.alert(t('alert.errorTitle'), t('alert.enterTopic'))
       return
@@ -315,9 +351,9 @@ export function AIGenerateScreen() {
 
       if (useImage) {
         if (selectedDeckId) {
-          await store.generateCardsFromImage(imageDataUrl!)  // add cards to the deck
+          await store.generateCardsFromImage(imageDataUrls)  // add cards to the deck
         } else {
-          await store.generateDeckFromImage(imageDataUrl!)   // image → a whole new deck
+          await store.generateDeckFromImage(imageDataUrls)   // image(s) → a whole new deck
         }
       } else {
         if (!selectedDeckId) {
@@ -357,8 +393,17 @@ export function AIGenerateScreen() {
     store.reset()
     setStep('config')
     setTopic('')
-    setImageDataUrl(null)
+    setImageDataUrls([])
     setImageMode('topic')
+  }
+
+  // Retry after an error: clear only the store's results/error and return to the
+  // config step, KEEPING the user's local config (topic / picked image / mode) so
+  // they don't have to re-enter everything — especially painful after a paid image
+  // error where handleReset would also drop the chosen image.
+  const handleRetry = () => {
+    store.retryFromConfig()
+    setStep('config')
   }
 
   // ── Config Step ──
@@ -400,7 +445,7 @@ export function AIGenerateScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 testID="ai-mode-cards"
-                onPress={() => { if (decks.length > 0) setSelectedDeckId(decks[0].id) }}
+                onPress={() => { if (targetDecks.length > 0) setSelectedDeckId(targetDecks[0].id) }}
                 style={[
                   styles.modeCard,
                   {
@@ -450,6 +495,9 @@ export function AIGenerateScreen() {
                 ))}
               </View>
             )}
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: -4, marginBottom: 4 }]}>
+              {t(useImage ? 'content.inputModeImageHint' : 'content.inputModeTopicHint')}
+            </Text>
 
             {!useImage ? (
               <TextInput
@@ -467,15 +515,31 @@ export function AIGenerateScreen() {
                 <TouchableOpacity
                   testID="ai-image-pick"
                   onPress={pickImage}
-                  style={[styles.dropZone, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated }]}
+                  disabled={imageDataUrls.length >= MAX_IMAGES}
+                  style={[styles.dropZone, { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceElevated, opacity: imageDataUrls.length >= MAX_IMAGES ? 0.5 : 1 }]}
                 >
                   <Text style={{ fontSize: 30, marginBottom: 6 }}>🖼️</Text>
                   <Text style={[theme.typography.body, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    {imageDataUrl ? t('content.imageChange') : t('content.imageUpload')}
+                    {imageDataUrls.length > 0
+                      ? t('content.imageAddMore', { count: imageDataUrls.length, max: MAX_IMAGES })
+                      : t('content.imageUpload')}
                   </Text>
                 </TouchableOpacity>
-                {imageDataUrl && (
-                  <Image source={{ uri: imageDataUrl }} style={{ width: '100%', height: 170, borderRadius: 10, marginTop: 8 }} resizeMode="contain" />
+                {imageDataUrls.length > 0 && (
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                    {imageDataUrls.map((src, i) => (
+                      <View key={i} style={{ position: 'relative' }}>
+                        <Image source={{ uri: src }} style={{ width: 88, height: 88, borderRadius: 8 }} resizeMode="cover" />
+                        <TouchableOpacity
+                          onPress={() => removeImage(i)}
+                          hitSlop={8}
+                          style={{ position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: theme.colors.text, alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <Text style={{ color: theme.colors.background, fontSize: 13, lineHeight: 15 }}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
                 )}
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>{t('content.imageHint')}</Text>
                 <Text style={[theme.typography.caption, { color: palette.yellow[700] }]}>{t('content.imagePaidNotice')}</Text>
@@ -518,7 +582,7 @@ export function AIGenerateScreen() {
                 }}
                 onBlur={() => {
                   const n = parseInt(cardCount) || 1
-                  setCardCount(String(Math.min(Math.max(n, 1), 100)))
+                  setCardCount(String(Math.min(Math.max(n, 1), MAX_CARD_COUNT)))
                 }}
                 keyboardType="number-pad"
                 placeholder={t('content.cardCountPlaceholder')}
@@ -529,7 +593,7 @@ export function AIGenerateScreen() {
           </View>
 
           {/* Deck selector — only when "Cards Only" mode */}
-          {selectedDeckId && decks.length > 0 && (
+          {selectedDeckId && targetDecks.length > 0 && (
             <>
               <View style={styles.sectionLabelRow}>
                 <Text style={[styles.sectionLabel, { color: palette.blue[600] }]}>{t('deck.section')}</Text>
@@ -540,14 +604,14 @@ export function AIGenerateScreen() {
                   onPress={() => setShowDeckPicker(true)}
                 >
                   <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
-                    {(() => { const d = decks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : t('deck.select') })()}
+                    {(() => { const d = targetDecks.find(dk => dk.id === selectedDeckId); return d ? `${d.icon} ${d.name}` : t('deck.select') })()}
                   </Text>
                   <Text style={{ color: theme.colors.textTertiary }}>{'\u25BE'}</Text>
                 </TouchableOpacity>
                 <DropdownPicker
                   visible={showDeckPicker}
                   onClose={() => setShowDeckPicker(false)}
-                  options={decks.map(d => ({ value: d.id, label: `${d.icon} ${d.name}` }))}
+                  options={targetDecks.map(d => ({ value: d.id, label: `${d.icon} ${d.name}` }))}
                   selectedValue={selectedDeckId}
                   onSelect={setSelectedDeckId}
                 />
@@ -561,17 +625,20 @@ export function AIGenerateScreen() {
           )}
 
           {affordable && (() => {
-            const balanceWon = affordable.balanceMicroWon ? Math.floor(affordable.balanceMicroWon / 1000000) : 0
-            const bal = () => t('wallet.balance', { won: balanceWon.toLocaleString(), cards: affordable.paid })
+            const balanceMicro = affordable.balanceMicroWon ?? 0
+            const hasBalance = balanceMicro > 0
+            // Balance only — no "≈ N cards" estimate. Metered pricing/markup can be
+            // retuned at any time, so a headline card count would be a stale promise.
+            const bal = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro) })
             const text = !affordable.walletKnown
               ? t('wallet.unknown')
               : useImage
-                ? (balanceWon > 0 ? bal() : t('wallet.imagePaid'))
-                : affordable.free > 0 && balanceWon > 0
+                ? (hasBalance ? bal() : t('wallet.imagePaid'))
+                : affordable.free > 0 && hasBalance
                   ? `${t('wallet.freeOnly', { free: affordable.free })} · ${bal()}`
                   : affordable.free > 0
                     ? t('wallet.freeOnly', { free: affordable.free })
-                    : balanceWon > 0
+                    : hasBalance
                       ? bal()
                       : t('wallet.empty')
             return (
@@ -580,11 +647,28 @@ export function AIGenerateScreen() {
               </Text>
             )
           })()}
+          {/* Pre-flight card-limit block: compute count vs remaining room BEFORE
+              spending anything, so an over-limit generation can't start. */}
+          {(() => {
+            const overLimit = useImage ? limit.reached : limit.exceeds(parseInt(cardCount) || 10)
+            if (!overLimit) return null
+            return (
+              <Text style={[theme.typography.caption, { color: theme.colors.error, textAlign: 'center', marginBottom: 4 }]}>
+                {limit.reached
+                  ? t('content.cardLimitReached')
+                  : t('content.cardLimitExceeds', { available: limit.available })}
+              </Text>
+            )
+          })()}
           <Button
             testID="ai-generate-button"
             title={t('generateButton')}
             onPress={handleGenerate}
-            disabled={cardsOnlyNeedsTemplate || (useImage ? !imageDataUrl : !topic.trim())}
+            disabled={
+              cardsOnlyNeedsTemplate ||
+              (useImage ? imageDataUrls.length === 0 : !topic.trim()) ||
+              (useImage ? limit.reached : limit.exceeds(parseInt(cardCount) || 10))
+            }
           />
         </ScrollView>
       </Screen>
@@ -601,9 +685,11 @@ export function AIGenerateScreen() {
           <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 16 }]}>
             {step === 'generating' ? t('progress.generating') : t('progress.saving')}
           </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
-            {store.progress.done}/{store.progress.total}
-          </Text>
+          {store.progress.total > 0 && (
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
+              {formatCount(store.progress.done)}/{formatCount(store.progress.total)}
+            </Text>
+          )}
         </View>
       </Screen>
     )
@@ -685,7 +771,7 @@ export function AIGenerateScreen() {
           {store.error ?? t('errorStep.default')}
         </Text>
         <View style={styles.doneActions}>
-          <Button title={t('errorStep.retry')} onPress={handleReset} />
+          <Button title={t('errorStep.retry')} onPress={handleRetry} />
           <Button title={t('errorStep.back')} variant="secondary" onPress={() => navigation.goBack()} />
         </View>
       </View>
@@ -842,10 +928,6 @@ const styles = StyleSheet.create({
   modeRow: { flexDirection: 'row', gap: 10 },
   modeCard: { flex: 1, borderRadius: 12, borderWidth: 1.5, paddingVertical: 14, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center' },
   dropZone: { borderRadius: 14, borderWidth: 2, borderStyle: 'dashed', paddingVertical: 28, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
-  // AI Provider
-  providerCard: { borderRadius: 12, padding: 16, alignItems: 'center', gap: 10 },
-  providerOption: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1 } as const,
-  settingsLink: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1 },
   // Dropdown
   dropdown: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5 },
   section: { gap: 8 },

@@ -1,0 +1,180 @@
+{
+  "today": {
+    "title": "Rencana hari ini",
+    "manageGoals": "Kelola tujuan",
+    "selectGoal": "Pilih tujuan",
+    "budget": "{{count, number}} menit/hari",
+    "progress": "{{done, number}} dari {{total, number}} selesai",
+    "generate": "Buat rencana hari ini",
+    "generating": "Membuat…",
+    "regenerate": "Buat ulang rencana",
+    "regenerating": "Membuat ulang…",
+    "completedNote": "Rencana ini sudah selesai, tidak bisa dibuat ulang hari ini.",
+    "empty": {
+      "noGoal": "Anda belum memiliki tujuan belajar yang aktif. Tujuan menentukan menit harian dan dek yang digunakan untuk perencanaan.",
+      "createGoal": "Buat tujuan",
+      "noDecks": "Tujuan ini tidak memiliki dek, jadi tidak ada yang bisa direncanakan.",
+      "attachDecks": "Hubungkan dek",
+      "nothingDue": "Tidak ada kartu yang perlu diulas hari ini di dek-dek ini."
+    },
+    "item": {
+      "study": "Belajar",
+      "untitled": "(tidak ada teks)",
+      "minutes": "~{{count, decimal}} menit",
+      "recorded": "Tercatat"
+    },
+    "reason": {
+      "due": "Waktunya mengulang",
+      "memoryRisk": "Hampir terlupakan",
+      "recentFailure": "Baru saja salah",
+      "slowResponse": "Lambat menjawab",
+      "goalRelevance": "Relevansi tujuan",
+      "importance": "Tingkat penting",
+      "balanced": "Campuran seimbang"
+    },
+    "error": {
+      "limitExceeded": "Anda telah mencapai batas pembuatan ulang rencana hari ini. Coba lagi besok.",
+      "completedPlan": "Rencana yang sudah selesai tidak bisa ditimpa.",
+      "goalGone": "Tujuan tersebut tidak lagi tersedia.",
+      "invalidInput": "Rencana tidak bisa disimpan karena beberapa nilai di luar jangkauan.",
+      "authRequired": "Silakan masuk lagi.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
+    },
+    "rate": {
+      "again": "Tidak tahu",
+      "partial": "Ragu",
+      "known": "Tahu",
+      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
+    },
+    "insightsLink": "Analisis"
+  },
+  "goals": {
+    "title": "Tujuan belajar",
+    "subtitle": "Tujuan berisi menit harian dan dek yang digunakan untuk menyusun rencana Anda.",
+    "todayLink": "Rencana hari ini",
+    "create": "Tujuan baru",
+    "edit": "Edit",
+    "archive": "Arsipkan",
+    "dailyMinutes": "{{count, number}} menit/hari",
+    "deckCount": "{{count, number}} dek",
+    "targetDate": "Target {{date}}",
+    "noDecksWarning": "Belum ada dek yang dihubungkan — belum bisa membuat rencana.",
+    "archiveConfirmTitle": "Arsipkan tujuan ini?",
+    "archiveConfirmMessage": "\"{{title}}\" tidak akan direncanakan lagi dan tidak bisa diedit.",
+    "status": {
+      "paused": "Dijeda",
+      "completed": "Selesai",
+      "archived": "Diarsipkan"
+    },
+    "empty": {
+      "title": "Belum ada tujuan",
+      "body": "Buat tujuan untuk mulai mendapatkan rencana harian."
+    },
+    "error": {
+      "limitExceeded": "Anda telah mencapai jumlah maksimum tujuan.",
+      "notFound": "Tujuan tersebut tidak ditemukan atau sudah diarsipkan.",
+      "invalidInput": "Periksa nama tujuan dan menit harian.",
+      "conflict": "Perubahan itu tidak diizinkan untuk status tujuan saat ini.",
+      "authRequired": "Silakan masuk lagi.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "unknown": "Terjadi kesalahan. Silakan coba lagi."
+    },
+    "deckCount_one": "{{count, number}} dek",
+    "deckCount_other": "{{count, number}} dek"
+  },
+  "form": {
+    "createTitle": "Tujuan baru",
+    "editTitle": "Edit tujuan",
+    "domain": "Bidang",
+    "domainName": {
+      "language": "Belajar bahasa",
+      "labor-law": "Hukum ketenagakerjaan"
+    },
+    "goalTitle": "Nama tujuan",
+    "goalTitlePlaceholder": "mis. Lulus JLPT N2",
+    "dailyMinutes": "Menit per hari",
+    "targetDate": "Tanggal target (opsional)",
+    "decks": "Dek untuk dipelajari",
+    "decksHint": "Rencana Anda dibangun dari kartu-kartu di dek ini.",
+    "noDecks": "Anda belum memiliki dek.",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "saving": "Menyimpan…",
+    "error": {
+      "title": "Masukkan nama tujuan (1–500 karakter).",
+      "dailyMinutes": "Menit per hari harus antara 1 dan 1440."
+    }
+  },
+  "history": {
+    "title": "Percobaan terbaru ({{count, number}})",
+    "itemFallback": "Percobaan {{type}}",
+    "score": {
+      "unknown": "Tanpa skor"
+    }
+  },
+  "enrichment": {
+    "explainCta": "Jelaskan (kredit)",
+    "requesting": "Menanyakan…",
+    "costHint": "Menggunakan kredit AI dari dompet Anda",
+    "action": {
+      "explain": "Penjelasan AI",
+      "hint": "Petunjuk belajar"
+    },
+    "sources": "Sumber",
+    "noSources": "Jawaban ini tidak berdasarkan sumber.",
+    "empty": "Model tidak mengembalikan konten yang bisa digunakan.",
+    "chargedNote": "Sudah dikenakan biaya — membuang tidak mengembalikan kredit.",
+    "keep": "Simpan",
+    "discard": "Buang",
+    "later": "Putuskan nanti",
+    "saving": "Menyimpan…",
+    "error": {
+      "BAD_REQUEST": "Permintaan tidak valid.",
+      "FORBIDDEN": "Anda tidak memiliki akses ke kartu ini.",
+      "GROUNDING_REQUIRED": "Tidak ditemukan sumber yang dapat dikutip, sehingga jawaban ditolak alih-alih dikarang.",
+      "INSUFFICIENT_CREDITS": "Kredit AI tidak cukup. Isi ulang untuk melanjutkan.",
+      "INVALID_RESULT": "Jawaban yang dikembalikan tidak bisa digunakan. Silakan coba lagi.",
+      "NETWORK": "Kesalahan jaringan. Periksa koneksi Anda.",
+      "NOT_CONFIGURED": "Pembuatan AI belum diaktifkan di server ini.",
+      "PROVIDER_ERROR": "Layanan AI gagal. Silakan coba lagi.",
+      "RATE_CAP": "Anda telah mencapai batas permintaan AI hari ini. Coba lagi besok.",
+      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  },
+  "insights": {
+    "title": "Analisis pembelajaran",
+    "noData": "Belum ada data",
+    "attempts": "Percobaan (30 hari)",
+    "accuracy": "Akurasi",
+    "notScoredYet": "Belum ada yang dinilai",
+    "typicalTime": "Waktu biasa",
+    "seconds": "{{count, decimal}}d",
+    "adherence": "Kepatuhan rencana (14 hari)",
+    "weakTitle": "Perlu dilihat lagi",
+    "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
+    "weakEmpty": "Tidak ada yang tertinggal.",
+    "cardFallback": "(kartu tidak ada di rencana hari ini)",
+    "attemptCount": "{{count, number}} percobaan",
+    "adherenceTitle": "Rencana harian (14 hari)",
+    "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
+    "noPlanItems": "Tidak ada yang direncanakan",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
+    "attemptCount_one": "{{count, number}} percobaan",
+    "attemptCount_other": "{{count, number}} percobaan"
+  },
+  "recommend": {
+    "title": "Rekomendasi",
+    "hint": "Menerima akan menaikkan prioritas kartu itu di rencana berikutnya.",
+    "regenerate": "Segarkan",
+    "accept": "Terima",
+    "dismiss": "Abaikan",
+    "empty": "Belum ada rekomendasi. Segarkan setelah ada beberapa percobaan.",
+    "status": {
+      "accepted": "Diterima",
+      "dismissed": "Diabaikan",
+      "expired": "Kedaluwarsa"
+    }
+  }
+}

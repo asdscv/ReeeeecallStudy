@@ -1,0 +1,156 @@
+{
+  "enrichment": {
+    "chargedNote": "すでに課金済みです — 破棄してもクレジットは返金されません。",
+    "costHint": "ウォレットのAIクレジットを使用します",
+    "discard": "破棄",
+    "error": {
+      "BAD_REQUEST": "無効なリクエストです。",
+      "FORBIDDEN": "このカードへのアクセス権限がありません。",
+      "GROUNDING_REQUIRED": "引用可能なソースが見つからなかったため、捏造を避けて回答を拒否しました。",
+      "INSUFFICIENT_CREDITS": "AIクレジットが不足しています。チャージしてから続けてください。",
+      "INVALID_RESULT": "回答が利用できない形式で返されました。もう一度お試しください。",
+      "NETWORK": "ネットワークエラーです。接続を確認してください。",
+      "NOT_CONFIGURED": "このサーバーではAI生成が有効になっていません。",
+      "PROVIDER_ERROR": "AIサービスでエラーが発生しました。もう一度お試しください。",
+      "RATE_CAP": "本日のAIリクエスト上限に達しました。明日もう一度お試しください。",
+      "UNKNOWN": "問題が発生しました。もう一度お試しください。"
+    },
+    "explainCta": "解説（クレジット）",
+    "keep": "保持",
+    "later": "あとで決める",
+    "noSources": "この回答はソースに基づいていません。",
+    "requesting": "問い合わせ中…",
+    "sources": "出典"
+  },
+  "form": {
+    "cancel": "キャンセル",
+    "dailyMinutes": "1日の学習時間（分）",
+    "decks": "学習デッキ",
+    "decksHint": "プランは選択したデッキのカードから作成されます。",
+    "domain": "分野",
+    "domainName": {
+      "labor-law": "労働法",
+      "language": "語学学習"
+    },
+    "error": {
+      "dailyMinutes": "1日の学習時間は1〜1440分の範囲で指定してください。",
+      "title": "目標名を1〜500文字で入力してください。"
+    },
+    "goalTitle": "目標名",
+    "goalTitlePlaceholder": "例：JLPT N2 合格",
+    "noDecks": "デッキがまだありません。",
+    "save": "保存",
+    "saving": "保存中…"
+  },
+  "goals": {
+    "archive": "アーカイブ",
+    "archiveConfirmMessage": "\"{{title}}\" はプランに使われなくなり、編集もできなくなります。",
+    "archiveConfirmTitle": "この目標をアーカイブしますか？",
+    "create": "新しい目標",
+    "dailyMinutes": "1日 {{count, number}} 分",
+    "deckCount": "{{count, number}} デッキ",
+    "deckCount_one": "{{count, number}} デッキ",
+    "deckCount_other": "{{count, number}} デッキ",
+    "empty": {
+      "body": "目標を作成すると毎日のプランが届きます。",
+      "title": "まだ目標がありません"
+    },
+    "error": {
+      "authRequired": "再度ログインしてください。",
+      "conflict": "この目標の現在の状態では許可されない変更です。",
+      "forbidden": "アクセス権限がありません。",
+      "invalidInput": "目標名と1日の学習時間を確認してください。",
+      "limitExceeded": "目標数の上限に達しました。",
+      "notFound": "その目標は存在しないかアーカイブ済みです。",
+      "unknown": "問題が発生しました。もう一度お試しください。"
+    },
+    "noDecksWarning": "デッキが紐付いていないため、まだプランを作成できません。",
+    "status": {
+      "archived": "アーカイブ済み",
+      "completed": "完了",
+      "paused": "一時停止"
+    },
+    "title": "学習目標"
+  },
+  "insights": {
+    "accuracy": "正答率",
+    "adherence": "プラン達成率 (14日)",
+    "adherenceEmpty": "この期間にプランがありません。",
+    "adherenceTitle": "日別プラン (14日)",
+    "attemptCount": "{{count, number}} 回試行",
+    "attemptCount_one": "{{count, number}} 回試行",
+    "attemptCount_other": "{{count, number}} 回試行",
+    "attempts": "試行回数 (30日)",
+    "cardFallback": "（今日のプランに含まれていないカード）",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "noData": "データなし",
+    "noPlanItems": "計画された項目なし",
+    "notScoredYet": "まだスコアのある試行がありません",
+    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
+    "seconds": "{{count, decimal}}秒",
+    "title": "学習診断",
+    "typicalTime": "平均所要時間",
+    "weakEmpty": "遅れているカードはありません。",
+    "weakHint": "試行2回以上で平均60%未満のカードです。",
+    "weakTitle": "もう一度確認"
+  },
+  "recommend": {
+    "accept": "受け入れる",
+    "dismiss": "無視",
+    "empty": "まだおすすめはありません。試行がたまったら更新してください。",
+    "hint": "受け入れると次のプランでそのカードの優先度が上がります。",
+    "regenerate": "更新",
+    "status": {
+      "accepted": "受け入れ済み",
+      "dismissed": "無視済み",
+      "expired": "期限切れ"
+    },
+    "title": "おすすめ"
+  },
+  "today": {
+    "budget": "1日 {{count, number}} 分",
+    "empty": {
+      "createGoal": "目標を作成",
+      "noDecks": "この目標にはデッキが紐付いていないため、プランを作成できません。",
+      "noGoal": "進行中の学習目標がありません。目標では1日の学習時間とプランに使うデッキを設定します。",
+      "nothingDue": "今日これらのデッキで復習すべきカードはありません。"
+    },
+    "error": {
+      "authRequired": "再度ログインしてください。",
+      "completedPlan": "完了済みのプランは上書きできません。",
+      "forbidden": "アクセス権限がありません。",
+      "goalGone": "その目標はもう利用できません。",
+      "invalidInput": "一部の値が範囲外のため、プランを保存できませんでした。",
+      "limitExceeded": "今日のプラン再作成回数の上限に達しました。明日またお試しください。",
+      "unknown": "プランを作成できませんでした。もう一度お試しください。"
+    },
+    "generate": "今日のプランを作成",
+    "generating": "作成中…",
+    "insightsLink": "学習診断",
+    "item": {
+      "minutes": "約 {{count, decimal}} 分",
+      "recorded": "記録済み",
+      "untitled": "（テキストなし）"
+    },
+    "manageGoals": "目標を管理",
+    "progress": "{{total, number}} 件中 {{done, number}} 件完了",
+    "rate": {
+      "again": "わからない",
+      "hint": "試行の記録のみです — 復習スケジュールは変わりません。",
+      "known": "わかった",
+      "partial": "あいまい"
+    },
+    "reason": {
+      "balanced": "バランス配分",
+      "due": "復習期限",
+      "goalRelevance": "目標との関連度",
+      "importance": "重要度",
+      "memoryRisk": "忘れかけ",
+      "recentFailure": "最近の不正解",
+      "slowResponse": "回答が遅い"
+    },
+    "regenerate": "プランを再作成",
+    "regenerating": "再作成中…",
+    "title": "今日のプラン"
+  }
+}

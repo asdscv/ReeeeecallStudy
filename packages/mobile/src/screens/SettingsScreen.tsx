@@ -10,6 +10,7 @@ import { CollapsibleSection } from '../components/settings/CollapsibleSection'
 import { WalletSummary } from '../components/settings/WalletSummary'
 import { PlanSelector, UNLIMITED_CARD_LIMIT } from '../components/settings/PlanSelector'
 import { CardUsagePanel } from '../components/settings/CardUsagePanel'
+import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
@@ -29,6 +30,7 @@ import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 import { getMySubscription, type MySubscription } from '../services/billing'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 
@@ -323,7 +325,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.account')}</GroupLabel>
 
         {/* ── a) Profile — centered avatar like web ── */}
-        <CollapsibleSection title={t('profile.title')} icon="👤">
+        <CollapsibleSection title={t('profile.title')} icon="👤" tint="#3B82F6">
           <View style={styles.profileCentered}>
             <View style={[styles.avatarCircle, { backgroundColor: theme.colors.primary }]}>
               <Text style={styles.avatarText}>{userInitial}</Text>
@@ -387,28 +389,14 @@ export function SettingsScreen() {
           )}
         </CollapsibleSection>
 
-        {/* ── b) Quick Actions — circles like web ── */}
+        {/* ── b) Quick Actions ──
+            Settings does not jump to other screens. The study and AI-generate circles that
+            used to sit here navigated OUT of Settings (one of them cross-stack, via
+            getParent()), which is what the "설정에서 다른 메뉴로 이동" complaint was about.
+            Both destinations are reachable where they belong: AI generate from the drawer,
+            the deck list and deck detail; study from its own tab. Invite stays — it opens the
+            OS share sheet and returns, it does not leave Settings. */}
         <View style={styles.quickActionsRow}>
-          <TouchableOpacity
-            testID="settings-quick-study"
-            onPress={() => { const nav = navigation.getParent() as any; nav?.navigate('StudyTab') }}
-            style={styles.quickActionItem}
-          >
-            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-              <Text style={{ fontSize: 22 }}>{'\u26A1'}</Text>
-            </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.quickStudy')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            testID="settings-ai-generate"
-            onPress={() => navigation.navigate('AIGenerate')}
-            style={styles.quickActionItem}
-          >
-            <View style={[styles.quickActionCircle, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-              <Text style={{ fontSize: 22 }}>{'\uD83E\uDD16'}</Text>
-            </View>
-            <Text style={[styles.quickActionLabel, { color: theme.colors.text }]}>{t('quickActions.aiGenerate')}</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             testID="settings-invite-link"
             onPress={() => Share.share({ message: t('quickActions.shareMessage') })}
@@ -424,7 +412,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.billing')}</GroupLabel>
 
         {/* AI wallet / usage (충전금·사용량) */}
-        <CollapsibleSection title={tWallet('title')} icon="💳">
+        <CollapsibleSection title={tWallet('title')} icon="💳" tint="#22C55E">
           <WalletSummary />
         </CollapsibleSection>
 
@@ -432,8 +420,8 @@ export function SettingsScreen() {
         {cardUsage && (
           <CollapsibleSection
             title={t('cardUsage.title')}
-            icon="📇"
-            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: cardUsage.owned }) : t('cardUsage.count', { owned: cardUsage.owned, limit: cardUsage.limit })}</Text>}
+            icon="📇" tint="#6366F1"
+            badge={<Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{cardUsage.limit >= UNLIMITED_CARD_LIMIT ? t('cardUsage.countUnlimited', { owned: formatCount(cardUsage.owned) }) : t('cardUsage.count', { owned: formatCount(cardUsage.owned), limit: formatCount(cardUsage.limit) })}</Text>}
           >
             {cardUsageDetail ? (
               <CardUsagePanel detail={cardUsageDetail} />
@@ -447,77 +435,66 @@ export function SettingsScreen() {
                 })}
               </Text>
             )}
-            {/* Data-driven subscription plan selector (mirrors web). Gated behind the
-                mobile IAP flag (Apple Guideline 2.1(b)) — NO plan pricing / Select CTA
-                may render until store IAP products exist. Inert until the gate flips;
-                onSelect routes to the Paywall (also gated) to run the purchase flow.
-                The at-cap "reached" state is shown inside <CardUsagePanel/> above. */}
-            {SUBSCRIPTION_UI_ENABLED && (
-              <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 16 }}>
-                <PlanSelector
-                  subscription={subscription}
-                  onSelect={() => navigation.navigate('Paywall')}
-                />
-              </View>
-            )}
+            {/* NOTE: the subscription PlanSelector used to live HERE, buried inside this
+                collapsed card-usage accordion, so users couldn't find the purchase/subscribe
+                entry ("설정에 구독 관련 아무것도 없다"). It now renders as its own top-level
+                "Subscription" section below (mirrors web SettingsPage's inline <PlanSelector/>). */}
           </CollapsibleSection>
         )}
 
-        {/* ── Templates ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            testID="settings-templates-link"
-            onPress={() => navigation.navigate('TemplatesList')}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('templates.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('templates.description')}
-              </Text>
-            </View>
-            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-          </TouchableOpacity>
-        </SectionCard>
+        {/* ── Subscription / plans (top-level, visible — mirrors web) ──
+            Data-driven plan selector (Standard / Pro). Gated behind the mobile IAP flag
+            (Apple Guideline 2.1(b)). defaultOpen so the plans + Select CTA are visible
+            without expanding; onSelect routes to the (registered) Paywall purchase flow. */}
+        {SUBSCRIPTION_UI_ENABLED && (
+          <CollapsibleSection title={t('subscription.title')} icon="⭐" tint="#F59E0B" defaultOpen>
+            <PlanSelector
+              subscription={subscription}
+              onSelect={() => navigation.navigate('Paywall')}
+            />
+          </CollapsibleSection>
+        )}
 
-        {/* ── Sharing ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            testID="settings-my-shares-link"
-            onPress={() => navigation.navigate('MyShares')}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('shares.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('shares.description')}
-              </Text>
-            </View>
-            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-          </TouchableOpacity>
-        </SectionCard>
+        {/* ── Payment history (orders + renewals) — mirrors web SettingsPage. NOT gated on
+             SUBSCRIPTION_UI_ENABLED: that flag hides the BUY entry points, but someone who
+             already paid (on any platform, incl. web) must always be able to see their
+             receipts. Collapsed by default; the RPC only runs once expanded. ── */}
+        <CollapsibleSection title={t('paymentHistory.title')} icon="🧾" tint="#8B5CF6">
+          <PaymentHistory />
+        </CollapsibleSection>
 
-        {/* ── Publisher Dashboard ── */}
-        <SectionCard theme={theme}>
-          <TouchableOpacity
-            testID="settings-publisher-stats-link"
-            onPress={() => navigation.navigate('PublisherStats')}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('publisher.title')}</Text>
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('publisher.description')}
-              </Text>
-            </View>
-            <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-          </TouchableOpacity>
-        </SectionCard>
+        {/* Templates / My Shares / Publisher moved OUT of Settings (they navigate to
+            other screens — Settings is for config only). Reachable from the drawer. */}
 
         <GroupLabel theme={theme}>{t('groups.study')}</GroupLabel>
 
         {/* ── Answer Mode — matches web: standalone card ── */}
-        <CollapsibleSection title={t('answerMode.title')} icon="📝">
+        <CollapsibleSection title={t('answerMode.title')} icon="📝" tint="#0EA5E9">
+          <View style={styles.modeGrid}>
+            {(['button', 'swipe'] as const).map((mode) => {
+              const isActive = profile.answer_mode === mode
+              return (
+                <TouchableOpacity
+                  key={mode}
+                  testID={`settings-answer-${mode}`}
+                  onPress={() => saveProfile({ answer_mode: mode })}
+                  style={[
+                    styles.modeCard,
+                    {
+                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
+                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                      borderWidth: isActive ? 2 : 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
+                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
+                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
           <View style={styles.segmentRow}>
             {(['before', 'same', 'after'] as const).map((timing) => {
               const isActive = profile.answer_timing === timing
@@ -548,33 +525,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── New Card Limit — standalone card ── */}
-        <CollapsibleSection title={t('newCardLimit.title')} icon="🔢">
-          <View style={styles.modeGrid}>
-            {(['button', 'swipe'] as const).map((mode) => {
-              const isActive = profile.answer_mode === mode
-              return (
-                <TouchableOpacity
-                  key={mode}
-                  testID={`settings-answer-${mode}`}
-                  onPress={() => saveProfile({ answer_mode: mode })}
-                  style={[
-                    styles.modeCard,
-                    {
-                      backgroundColor: isActive ? theme.colors.primaryLight : theme.colors.surfaceElevated,
-                      borderColor: isActive ? theme.colors.primary : theme.colors.border,
-                      borderWidth: isActive ? 2 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.modeEmoji}>{mode === 'button' ? '👆' : '👋'}</Text>
-                  <Text style={[styles.modeLabel, { color: isActive ? theme.colors.primary : theme.colors.text }]}>
-                    {mode === 'button' ? t('answerMode.button') : t('answerMode.swipe')}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-
+        <CollapsibleSection title={t('newCardLimit.title')} icon="🔢" tint="#14B8A6">
           <TextInput
             testID="settings-daily-limit"
             value={String(profile.daily_new_limit)}
@@ -595,7 +546,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── Auto TTS Reading — standalone card ── */}
-        <CollapsibleSection title={t('tts.title')} icon="🔊">
+        <CollapsibleSection title={t('tts.title')} icon="🔊" tint="#A855F7">
           <View style={styles.switchRow}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('tts.enable')}</Text>
             <Switch
@@ -658,7 +609,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── Daily Study Goal — standalone like web ── */}
-        <CollapsibleSection title={t('dailyGoal.title')} icon="🎯">
+        <CollapsibleSection title={t('dailyGoal.title')} icon="🎯" tint="#EF4444">
           <TextInput
             testID="settings-daily-goal"
             value={profile.daily_study_goal != null ? String(profile.daily_study_goal) : ''}
@@ -685,7 +636,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── d) SRS Configuration ── */}
-        <CollapsibleSection title={t('srsConfig.title')} icon="🧠">
+        <CollapsibleSection title={t('srsConfig.title')} icon="🧠" tint="#8B5CF6">
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
             {t('srsConfig.description')}
           </Text>
@@ -755,7 +706,7 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.preferences')}</GroupLabel>
 
         {/* ── f) Language ── */}
-        <CollapsibleSection title={t('language.title')} icon="🌐">
+        <CollapsibleSection title={t('language.title')} icon="🌐" tint="#06B6D4">
           <TouchableOpacity
             testID="settings-lang-dropdown"
             onPress={() => setLangDropdownOpen(true)}
@@ -802,7 +753,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── Theme ── */}
-        <CollapsibleSection title={t('theme.title')} icon="🎨">
+        <CollapsibleSection title={t('theme.title')} icon="🎨" tint="#EC4899">
           <View style={styles.segmentRow}>
             {(['light', 'dark', 'system'] as const).map((mode) => {
               const isActive = themeMode === mode
@@ -837,7 +788,7 @@ export function SettingsScreen() {
         </CollapsibleSection>
 
         {/* ── g) Notifications ── */}
-        <CollapsibleSection title={t('notifications.title')} icon="🔔">
+        <CollapsibleSection title={t('notifications.title')} icon="🔔" tint="#F97316">
           <View style={styles.switchRow}>
             <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('notifications.dailyReminder')}</Text>
             <Switch
@@ -861,29 +812,29 @@ export function SettingsScreen() {
         {/* ──────────────────────────────────────────────────────────────────── */}
         {/*
         <SectionCard theme={theme}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Subscription</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{t('subscription.title')}</Text>
           <View style={[styles.subCard, {
             backgroundColor: isPro ? theme.colors.successLight : theme.colors.surface,
             borderColor: isPro ? theme.colors.success : theme.colors.border,
           }]}>
             <Text style={[theme.typography.h3, { color: theme.colors.text }]}>
-              {isPro ? 'Pro' : 'Free Plan'}
+              {isPro ? t('subscription.pro') : t('subscription.freePlan')}
             </Text>
             <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-              {isPro ? 'All premium features unlocked' : 'Upgrade for unlimited access'}
+              {isPro ? t('subscription.proDesc') : t('subscription.freeDesc')}
             </Text>
           </View>
           {!isPro && (
             <Button
               testID="settings-upgrade"
-              title="Upgrade to Pro"
+              title={t('subscription.upgradeToPro')}
               onPress={() => navigation.navigate('Paywall')}
             />
           )}
           {isPro && (
             <Button
               testID="settings-manage-subscription"
-              title="Manage Subscription"
+              title={t('subscription.manageSubscription')}
               variant="outline"
               onPress={() => Linking.openURL(MANAGE_SUBSCRIPTIONS_URL)}
             />
@@ -893,28 +844,11 @@ export function SettingsScreen() {
 
         <GroupLabel theme={theme}>{t('groups.data')}</GroupLabel>
 
-        {/* ── i) Export My Data — matches web ── */}
-        <CollapsibleSection title={t('export.title')} icon="📥">
-          {[
-            { key: 'stats', icon: '📊', labelKey: 'export.stats' },
-            { key: 'sessions', icon: '📅', labelKey: 'export.sessions' },
-            { key: 'decks', icon: '📚', labelKey: 'export.decks' },
-            { key: 'cards', icon: '🃏', labelKey: 'export.cards' },
-          ].map((item) => (
-            <TouchableOpacity
-              key={item.key}
-              testID={`settings-export-${item.key}`}
-              onPress={() => navigation.navigate('ImportExport' as never)}
-              style={[styles.exportRow, { borderColor: theme.colors.border }]}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <Text style={{ fontSize: 18 }}>{item.icon}</Text>
-                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{t(item.labelKey)}</Text>
-              </View>
-              <Text style={{ color: theme.colors.textTertiary }}>{'>'}</Text>
-            </TouchableOpacity>
-          ))}
-        </CollapsibleSection>
+        {/* Export My Data lived here as four rows (stats / sessions / decks / cards) that all
+            navigated to the SAME ImportExport screen — and cross-stack, with an `as never`
+            cast, because that screen belongs to the Decks stack. Removed with the other
+            navigation rows. Import/export is reached from a deck (DeckDetail has three entry
+            points), which is where it operates anyway. */}
 
         {/* ── j) Legal (compact inline links) ── */}
         <View style={styles.legalRow}>
@@ -1001,7 +935,7 @@ export function SettingsScreen() {
  * Category group label — small uppercase heading above a group of sections
  */
 function GroupLabel({ children, theme }: { children: React.ReactNode; theme: ReturnType<typeof useTheme> }) {
-  return <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: theme.colors.textSecondary, marginTop: 20, marginBottom: 8, marginLeft: 4 }}>{children}</Text>
+  return <Text style={{ fontSize: 12.5, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: theme.colors.textTertiary, marginTop: 26, marginBottom: 10, marginLeft: 6 }}>{children}</Text>
 }
 
 /**
@@ -1045,8 +979,11 @@ const styles = StyleSheet.create({
   },
   quickActionLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
 
-  // Section card
-  card: { borderRadius: 12, borderWidth: 1, padding: 16, marginBottom: 12, gap: 12 },
+  // Section card — matches CollapsibleSection (radius, hairline border, subtle depth)
+  card: {
+    borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, padding: 16, marginBottom: 10, gap: 12,
+    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+  },
   sectionTitle: { fontSize: 17, fontWeight: '600' },
   sectionBody: { gap: 12 },
   fieldLabel: { fontSize: 13, fontWeight: '500', marginBottom: 4 },
@@ -1144,8 +1081,4 @@ const styles = StyleSheet.create({
   segmentLabel: { fontSize: 14, fontWeight: '600' },
 
   // Export
-  exportRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1,
-  },
 })

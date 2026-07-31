@@ -10,9 +10,9 @@
   "aiGenerate": "AI 생성",
   "detail": {
     "backToList": "덱 목록",
-    "totalCards": "{{count}}장",
-    "newCards": "새 {{count}}",
-    "reviewCards": "복습 {{count}}",
+    "totalCards": "{{count, number}}장",
+    "newCards": "새 {{count, number}}",
+    "reviewCards": "복습 {{count, number}}",
     "startStudy": "학습 시작",
     "edit": "편집",
     "share": "공유",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "동기화",
     "syncing": "동기화 중...",
-    "pendingChanges": "{{count}}개 변경사항",
+    "pendingChanges": "{{count, number}}개 변경사항",
     "lastSynced": "마지막 동기화: {{time}}",
     "neverSynced": "동기화 안 됨",
     "syncComplete": "동기화 완료: {{added}}개 추가, {{removed}}개 제거",
@@ -218,17 +218,17 @@
     "selectMode": "선택",
     "selectAll": "전체 선택",
     "deselectAll": "선택 해제",
-    "selectedCount": "{{count}}개 선택됨",
+    "selectedCount": "{{count, number}}개 선택됨",
     "deleteSelected": "선택 항목 삭제",
     "deleteCardsTitle": "카드 삭제",
-    "deleteCardsConfirm": "선택한 카드 {{count}}장을 삭제할까요? 되돌릴 수 없습니다.",
+    "deleteCardsConfirm": "선택한 카드 {{count, number}}장을 삭제할까요? 되돌릴 수 없습니다.",
     "perPage": "페이지당:",
     "prevPage": "← 이전",
     "nextPage": "다음 →",
     "pageOf": "{{total}} 중 {{current}} 페이지",
-    "showingRange": "{{total}}장 중 {{from}}–{{to}} 표시",
+    "showingRange": "{{total, number}}장 중 {{from, number}}–{{to, number}} 표시",
     "archivedBadge": "보관됨 · 학습 잠김",
-    "archivedNote": "{{count}}장이 한도 초과로 보관됨 — 카드는 그대로 볼 수 있어요. 구독하면 다시 학습할 수 있어요.",
+    "archivedNote": "{{count, number}}장이 한도 초과로 보관됨 — 카드는 그대로 볼 수 있어요. 구독하면 다시 학습할 수 있어요.",
     "archivedSubscribe": "구독하기 (곧 오픈)"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "오늘",
     "yesterday": "어제",
-    "daysAgo": "{{count}}일 전",
+    "daysAgo": "{{count, number}}일 전",
     "monthAgo": "1개월 전",
-    "monthsAgo": "{{count}}개월 전"
+    "monthsAgo": "{{count, number}}개월 전"
   },
   "templatesList": {
     "cannotDeleteTitle": "삭제할 수 없음",

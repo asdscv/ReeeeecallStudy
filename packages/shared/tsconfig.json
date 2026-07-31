@@ -9,5 +9,5 @@
     "allowImportingTsExtensions": true,
     "moduleDetection": "force"
   },
-  "include": ["types", "lib", "stores", "adapters", "design-tokens"]
+  "include": ["types", "lib", "stores", "adapters", "design-tokens", "learning"]
 }

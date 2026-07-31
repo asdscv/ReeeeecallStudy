@@ -2,10 +2,16 @@
 
 > **Version**: 2.0
 > **Created**: 2026-06-26 · **Updated**: 2026-06-26
-> **Status**: 🎉 **actionable 항목 전부 완료·배포** (H1·H2·H3·H4·N1·M1·L4·L5). 남은 건 **게이트/제품결정 대기**(H1c·L6·Auth)뿐.
+> **Status**: 🎉 **actionable 항목 전부 완료·배포** (H1(+H1c)·H2·H3·H4·N1·M1·L4·L5). 남은 건 **게이트/제품결정 대기**(L6·Auth)뿐.
 > **완료 기록**: [`DOCS/DONE/2026-06-26-security-remediation.md`](../DONE/2026-06-26-security-remediation.md)
+> **2026-07-29 update:** customer/developer `rc_` REST API was retired. Migration 117 removed `api_keys`/`resolve_api_key`; migration 169 is the idempotent contract close. H4 below is retained only as historical remediation context and is no longer an active surface.
 > **prod ref**: `ixdapelfikaneexnskfm` (Management API SQL; 자격증명은 메모리 `reference_credentials`)
 
+> **2026-07-30 확인**: 코드 작업 잔여 **0**. 남은 H1c·L6·Auth M3/M4/M5 는 전부
+> **프로덕션 액션 또는 제품 결정 게이트**다(`uri_allow_list` 는 로컬 개발 편의,
+> Auth 하드닝은 가입/로그인 UX 변경). 자율 진행 대상이 아니므로 소유자 결정까지 TODO 에 남긴다.
+> **H1c 종결(2026-07-31)**: BYOK 폐기 — 코드 제거 + mig 170 prod 적용 + `ai-keys` 함수 삭제 +
+> `AI_KEY_PASSPHRASE` 시크릿 삭제까지 **전부 완료**. 남은 보안 TODO 는 L6·Auth(제품 결정)뿐.
 ---
 
 ## 완료 (이 라운드, 2026-06-26)
@@ -16,16 +22,21 @@
 | **H4** | REST API 핸들러 cross-tenant 자기-스코프 하드닝 + deleteTemplate 404 게이트 + mig 107(resolve_api_key service_role EXECUTE 복원) + cross-tenant 통합테스트(CI 9/9 실행) | #176/#177 · 107 |
 | 정리 | orphan `vault.secrets('ai_key_encryption_secret')` 삭제(073 잔재, 값 불일치·참조 0 = 데드) | prod 직접 |
 
-> **H4 핵심 발견(미변경)**: prod REST API는 플랫폼 게이트웨이 `verify_jwt=true`로 raw `rc_` 키가 핸들러 도달 전 차단됨(`UNAUTHORIZED_INVALID_JWT_FORMAT`) → **외부 비기능/노출 0**. verify_jwt를 끄는 건 공개 API를 *노출*하는 제품 결정이라 하지 않음. 하드닝은 활성화 시 안전 보장.
+> **H4 retirement note (2026-07-29):** this hardened-but-dormant endpoint was subsequently removed rather than enabled. No `rc_` gateway/authentication path remains.
 
 ---
 
 ## 남은 항목 (게이트/보류 — 코드 작업 아님)
 
-### H1c — 구 AI키 RPC + `_ai_encryption_config` DROP  ⏸ 배포·채택 게이트
-H1a/b 완료·배포로 클라(web 즉시, mobile OTA)는 `ai-keys` Edge 경유. 구 RPC(`get/upsert/delete_ai_provider_key`) + 평문 패스프레이즈 테이블 `_ai_encryption_config`는 폴백 잔류. **at-rest 평문 패스프레이즈는 H1c까지 완전히 닫히지 않음.**
-- **게이트**: 구 모바일 빌드가 구 RPC(→ 테이블 읽기)를 호출 가능 → OTA runtimeVersion 게이팅상 구 빌드 잔존. **충분한 OTA 채택 마진 전 DROP 금지**(드롭 시 미갱신 유저 AI키 기능 중단). **구체 날짜 없음** — 채택률 확인 후 진행.
-- **절차**: 구 RPC 호출 로그가 0 수렴 확인 → `DROP FUNCTION get/upsert/delete_ai_provider_key`(구 시그니처) + `DROP TABLE _ai_encryption_config`(하위호환 불가 → 클라 전환 완료 후에만). (선택) 패스프레이즈 로테이션 + 전수 재암호화.
+### H1c — 구 AI키 RPC + `_ai_encryption_config` DROP  ✅ **완료·prod 반영 (2026-07-31)**
+**BYOK(고객이 자기 AI 프로바이더 키를 등록) 기능을 폐기**했다. 서버측 생성(우리 키 + 미터링)이 그 자리를 대체했고,
+클라이언트(web/mobile)·Edge 함수·i18n·가이드 문구까지 전부 제거됐다 (PR #349, `main` 배포 완료).
+- **mig 170 prod 적용 완료** — 구 RPC 3종(`get/upsert/delete_ai_provider_key`) + service-role `_secure` RPC 3종(mig 104)
+  + `user_ai_provider_keys` + **평문 패스프레이즈 테이블 `_ai_encryption_config`** 전부 DROP.
+  → **at-rest 평문 패스프레이즈 표면 완전 폐쇄.** 저장돼 있던 고객 프로바이더 키도 함께 삭제(기능 폐기에 따른 의도된 동작).
+- **`ai-keys` Edge 함수 삭제 완료** (`supabase functions delete ai-keys`; `POST /functions/v1/ai-keys` → 404 확인).
+- **Edge 시크릿 `AI_KEY_PASSPHRASE` 삭제 완료** (`secrets list` 에 `AI_GENERATION_PROVIDER_KEY` 만 잔존).
+- 검증: prod PostgREST 스키마에 `user_ai_provider_keys`/`api_keys`/`rpc/get_ai_provider_keys`/`rpc/upsert_ai_provider_key` 미노출.
 
 ### L6 — prod `uri_allow_list`에서 `localhost:5173` 제거  ⏸ 보류(사용자 결정 2026-06-25)
 제거 시 로컬→prod Supabase OAuth 개발이 깨짐. 잔여 리스크 낮음. 별도 dev 프로젝트 마련 시 재검토.
@@ -45,8 +56,8 @@ H1a/b 완료·배포로 클라(web 즉시, mobile OTA)는 `ai-keys` Edge 경유.
 | 스토리지 버킷 제한(mig 100) | ✅ prod 적용 확인 (card-images/content-images 5MB jpeg/png/webp, card-audio 10MB mpeg/ogg/wav) |
 | `vault.secrets` 잔여행 | ✅ 데드 orphan 1건 삭제 완료 |
 | pg_cron / pg_net | 미설치 확인 (DB cron/SSRF 표면 없음) |
-| verify_jwt 배포설정 | `api`=true(게이트웨이가 rc_ 차단 → 외부 비기능), `tts`/`ai-keys`=true(유저 JWT로 동작). config.toml에 per-fn override 없음 — 플랫폼 기본. |
+| verify_jwt 배포설정 | 고객 `api` endpoint는 제거됨. `tts`는 유저 JWT로 동작(`ai-keys`는 BYOK 폐기와 함께 삭제). config.toml에 customer API override 없음. |
 | MFA 등록 | TOTP enroll/verify **가능**(max 10), 단 **미강제**. admin 강제 정책 없음 → Auth 하드닝(보류)과 함께 검토. |
-| Edge prod 시크릿 | `AI_KEY_PASSPHRASE`·`ALLOWED_ORIGINS`·`SUPABASE_*` 정상. 불필요/노출 키 없음. |
+| Edge prod 시크릿 | `ALLOWED_ORIGINS`·`SUPABASE_*` 정상. 불필요/노출 키 없음. `AI_KEY_PASSPHRASE`는 **삭제 완료**(H1c 종결). |
 
 남은 미감사: 라이브 스토리지 업로드 정책 런타임 테스트(제한값은 확인됨, 실제 거부 동작은 미테스트) — 저우선.

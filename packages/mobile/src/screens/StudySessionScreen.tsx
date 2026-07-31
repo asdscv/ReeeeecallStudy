@@ -65,7 +65,8 @@ export function StudySessionScreen() {
   const {
     phase, currentCard, isFlipped, isRating, template, config,
     sessionStats, progress, flipCard, rateCard, exitSession,
-    undoLastRating, lastRatedCard, subscriptionLocked,
+    undoLastRating, undoState, lastRatedCard, subscriptionLocked,
+    crammingManager, crammingTimeUp,
   } = useStudy()
 
   // Profile settings (TTS + answer mode)
@@ -128,6 +129,21 @@ export function StudySessionScreen() {
       navigation.goBack()
     }
   }, [phase, subscriptionLocked, navigation, sessionStats.cardsStudied, t])
+
+  // Cramming time-limit countdown — mirror web StudySessionPage so a timed
+  // cramming session auto-ends on mobile too (S-M2). Without this the manager
+  // held the limit but nothing fired it, so the session never auto-completed.
+  useEffect(() => {
+    if (!crammingManager || !crammingManager.hasTimeLimit() || phase !== 'studying') return
+    const interval = setInterval(() => {
+      const remaining = crammingManager.remainingTimeMs()
+      if (remaining != null && remaining <= 0) {
+        crammingTimeUp()
+        clearInterval(interval)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [crammingManager, phase, crammingTimeUp])
 
   // Reset animations on card change
   useEffect(() => {
@@ -257,9 +273,11 @@ export function StudySessionScreen() {
   }
 
   const handleUndo = () => {
-    undoLastRating()
-    setShowUndo(false)
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    if (undoState === 'pending') return
+    // Do NOT hide the button here: the undo is only real once the server accepts it,
+    // and a rejected undo has to stay retryable. The lastRatedCard effect hides it
+    // when the undo actually lands.
+    void undoLastRating()
   }
 
   const handleExit = () => {
@@ -385,7 +403,8 @@ export function StudySessionScreen() {
           <View style={styles.undoRow}>
             <TouchableOpacity
               onPress={handleUndo}
-              style={[styles.undoBtn, { borderColor: theme.colors.border }]}
+              disabled={undoState === 'pending'}
+              style={[styles.undoBtn, { borderColor: theme.colors.border, opacity: undoState === 'pending' ? 0.6 : 1 }]}
               activeOpacity={0.7}
               {...testProps('study-undo-button')}
             >
@@ -399,9 +418,11 @@ export function StudySessionScreen() {
         {/* Rating area — button mode: buttons, swipe mode: hints */}
         {isFlipped && isSwipeMode && (
           <View style={[styles.swipeRatingHint, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t('srsRating.again')}</Text>
+            {/* Labels must match the mode-aware ratings applied in panGesture.onEnd:
+                cramming \u2192 missed/gotIt, srs \u2192 again/good, else \u2192 unknown/known. */}
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.again }]}>{'\u2190'} {t(config?.mode === 'cramming' ? 'rating.missed' : config?.mode === 'srs' ? 'srsRating.again' : 'rating.unknown')}</Text>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>{t('session.swipe')}</Text>
-            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t('srsRating.good')} {'\u2192'}</Text>
+            <Text style={[theme.typography.caption, { color: RATING_COLORS.good }]}>{t(config?.mode === 'cramming' ? 'rating.gotIt' : config?.mode === 'srs' ? 'srsRating.good' : 'rating.known')} {'\u2192'}</Text>
           </View>
         )}
         {isFlipped && !isSwipeMode && (

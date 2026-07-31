@@ -100,7 +100,8 @@ export function ForgotPasswordScreen() {
                 testID="forgot-password-error-text"
                 style={[theme.typography.bodySmall, { color: theme.colors.error }]}
               >
-                {error}
+                {/* i18n key from localizeAuthError, or a raw message — see LoginScreen. */}
+                {t(error, { defaultValue: error })}
               </Text>
             ) : null}
 
@@ -120,7 +121,7 @@ export function ForgotPasswordScreen() {
               testID="forgot-password-back"
             >
               <Text style={[theme.typography.body, { color: theme.colors.primary }]}>
-                {'← '}{t('backToLogin', { ns: 'common', defaultValue: 'Back to Login' })}
+                {'← '}{t('backToLogin')}
               </Text>
             </TouchableOpacity>
           </View>

@@ -213,7 +213,7 @@ export function buildImageCardsPrompt(
     ? '내용은 이미지에 보이는 언어를 따르세요.'
     : 'Use the language shown in the image for the content.'
 
-  const systemPrompt = `You are a flashcard content creator. You are given an IMAGE (a textbook page, vocabulary list, handwritten notes, or slides). Extract the study material that is ACTUALLY in the image and turn it into flashcards.
+  const systemPrompt = `You are a flashcard content creator. You are given ONE OR MORE IMAGES (textbook pages, vocabulary lists, handwritten notes, or slides). Extract the study material that is ACTUALLY in the image(s) — across ALL of them — and turn it into flashcards.
 Respond with a single JSON object.
 
 JSON schema:
@@ -225,8 +225,8 @@ JSON schema:
 
 Rules:
 - Each card's field_values must have these exact keys: ${fieldDesc}
-- Base every card ONLY on content visible in the image — do NOT invent unrelated material.
-- Create ONE card per distinct study item ACTUALLY in the image (maximum ${cardCount}). Do NOT pad to a fixed number — if the image has 5 items make 5 cards, if it has 18 make 18. Let the image decide the count.
+- Base every card ONLY on content visible in the image(s) — do NOT invent unrelated material.
+- Create ONE card per distinct study item ACTUALLY in the image(s) (maximum ${cardCount}), combining items from every image. Do NOT pad to a fixed number — if there are 5 items make 5 cards, if there are 18 make 18. Let the images decide the count.
 - Every field_values key must have a non-empty value.
 - tags: 1-3 short tags per card
 - ${langNote}`
@@ -244,7 +244,7 @@ export function buildImageDeckPrompt(uiLang: string) {
     ? '덱 이름과 설명은 한국어로 작성하고, 카드 내용은 이미지에 보이는 언어를 따르세요.'
     : 'Write the deck name and description in English; use the language shown in the image for card content.'
 
-  const systemPrompt = `You are a flashcard deck creator with vision. You are given an IMAGE (a textbook page, vocabulary list, handwritten notes, or slides). Recognize the study material that is ACTUALLY in the image and turn it into a COMPLETE flashcard deck: deck metadata, a card template, and cards.
+  const systemPrompt = `You are a flashcard deck creator with vision. You are given ONE OR MORE IMAGES (textbook pages, vocabulary lists, handwritten notes, or slides) that belong to the SAME study material. Recognize the study material that is ACTUALLY in the image(s) — across ALL of them — and turn it into a COMPLETE flashcard deck: deck metadata, a card template, and cards.
 Respond with a single JSON object.
 
 JSON schema:

@@ -80,10 +80,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           loading: false,
         })
         if (session?.user) {
-          await useAuthStore.getState().fetchRole()
-          // Initialize subscription & register session
-          await useSubscriptionStore.getState().fetchSubscription()
-          await useSubscriptionStore.getState().registerSession()
+          // Post-login side effects are advisory. They used to share the outer
+          // catch, so a single failure here (device adapter, subscription RPC,
+          // network blip) wiped a perfectly valid session and the UI showed the
+          // user as signed out.
+          try {
+            await useAuthStore.getState().fetchRole()
+            // Initialize subscription & register session
+            await useSubscriptionStore.getState().fetchSubscription()
+            await useSubscriptionStore.getState().registerSession()
+          } catch (err) {
+            console.error('[auth-store] post-session initialization failed:', err)
+          }
         }
       } catch {
         set({ session: null, user: null, loading: false })
@@ -108,9 +116,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           })
 
           if (newUser) {
-            await useAuthStore.getState().fetchRole()
-            await useSubscriptionStore.getState().fetchSubscription()
-            await useSubscriptionStore.getState().registerSession()
+            // Same rule as initialize(): advisory work must not break the session.
+            try {
+              await useAuthStore.getState().fetchRole()
+              await useSubscriptionStore.getState().fetchSubscription()
+              await useSubscriptionStore.getState().registerSession()
+            } catch (err) {
+              console.error('[auth-store] post-session initialization failed:', err)
+            }
           } else {
             set({ role: null, isOfficial: false })
           }

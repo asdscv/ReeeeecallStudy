@@ -46,39 +46,21 @@ export const useMarketplaceStore = create<MarketplaceState>((set, get) => ({
     if (!listingsCache.shouldFetch('listings', opts)) return
     set({ loading: true, error: null })
 
-    // Fetch listings with owner profile info via join
+    // owner_display_name / owner_is_official are DENORMALIZED onto marketplace_listings
+    // (mig 054), so a plain select returns them — no profiles join is needed. The old
+    // `profiles!marketplace_listings_owner_id_fkey(...)` embed 400'd (PGRST200) on EVERY
+    // load because that FK targets auth.users, not public.profiles, so it always fell
+    // back to this same plain select anyway — just after a wasted failed request.
     const { data, error } = await supabase
       .from('marketplace_listings')
-      .select('*, profiles!marketplace_listings_owner_id_fkey(display_name, is_official)')
+      .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
 
     if (error) {
-      // Fallback: fetch without join if foreign key name doesn't match
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('marketplace_listings')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-
-      if (fallbackError) {
-        set({ error: fallbackError.message, loading: false })
-      } else {
-        set({ listings: (fallbackData ?? []) as MarketplaceListing[], loading: false })
-        listingsCache.markFetched('listings')
-      }
+      set({ error: error.message, loading: false })
     } else {
-      // Flatten the joined profile data
-      const listings = (data ?? []).map((row: Record<string, unknown>) => {
-        const profile = row.profiles as { display_name: string | null; is_official: boolean } | null
-        return {
-          ...row,
-          profiles: undefined,
-          owner_display_name: profile?.display_name ?? null,
-          owner_is_official: profile?.is_official ?? false,
-        }
-      }) as unknown as MarketplaceListing[]
-      set({ listings, loading: false })
+      set({ listings: (data ?? []) as MarketplaceListing[], loading: false })
       listingsCache.markFetched('listings')
     }
   },

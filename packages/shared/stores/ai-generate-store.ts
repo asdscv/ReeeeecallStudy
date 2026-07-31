@@ -43,8 +43,8 @@ interface AIGenerateState {
   generateTemplate: () => Promise<void>
   generateDeck: () => Promise<void>
   generateCards: () => Promise<void>
-  generateCardsFromImage: (image: string) => Promise<void>
-  generateDeckFromImage: (image: string) => Promise<void>
+  generateCardsFromImage: (images: string[]) => Promise<void>
+  generateDeckFromImage: (images: string[]) => Promise<void>
   saveAll: () => Promise<void>
 
   editGeneratedTemplate: (t: GeneratedTemplate) => void
@@ -53,6 +53,7 @@ interface AIGenerateState {
   removeGeneratedCard: (index: number) => void
 
   reset: () => void
+  retryFromConfig: () => void
 }
 
 const initialState = {
@@ -86,12 +87,16 @@ const ERROR_FALLBACKS: Record<string, string> = {
   serverError: 'AI generation is temporarily unavailable. Please try again later.',
   emptyResult: "The AI generated no cards. Please try again — you weren't charged.",
   cardLimitReached: "You've reached your card limit. Delete cards or subscribe to save more.",
+  deckNotOwned: "That deck can't receive new cards. Choose a deck you own.",
 }
 
 function t(key: string): string {
-  const result = i18next.t(`ai-generate:errors.${key}`)
-  // i18next returns the key itself if namespace is missing
-  if (result === `ai-generate:errors.${key}` || !result) return ERROR_FALLBACKS[key] ?? key
+  const nsKey = `errors.${key}`
+  const result = i18next.t(`ai-generate:${nsKey}`)
+  // On a miss i18next returns the namespace-STRIPPED key ('errors.<key>'), not the full
+  // 'ai-generate:errors.<key>'. Guard against both so a missing locale key falls back to
+  // the English ERROR_FALLBACKS instead of surfacing the raw key string to the user.
+  if (!result || result === nsKey || result === `ai-generate:${nsKey}`) return ERROR_FALLBACKS[key] ?? key
   return result
 }
 
@@ -100,6 +105,10 @@ function mapError(err: unknown): string {
   // Card-limit rejection at save time (saveAll throws the card-store error key) — tell
   // the user to delete/subscribe, not "try again later" (retry would keep failing).
   if (msg === 'errors:card.limitReached' || msg === 'CARD_LIMIT_REACHED') return t('cardLimitReached')
+  // Save-time ownership rejection (reserve_card_positions) — the target deck isn't the
+  // user's (e.g. a subscribed deck slipped in, or it was deleted mid-flow). "Try again
+  // later" would keep failing; tell the user to pick a deck they own.
+  if (msg === 'deck not found or not owned') return t('deckNotOwned')
   if (msg === 'BAD_REQUEST') return t('invalidImage')
   if (msg === 'AI_INSUFFICIENT_CREDITS' || msg === 'AI_QUOTA_EXCEEDED') return t('insufficientCredits')
   if (msg === 'AI_RATE_CAP' || msg === 'RATE_LIMITED') return t('rateLimited')
@@ -272,7 +281,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   },
 
   // Image recognition (vision): one uploaded image → cards (always paid, Phase 1b).
-  generateCardsFromImage: async (image: string) => {
+  generateCardsFromImage: async (images: string[]) => {
     set({ currentStep: 'generating_cards', error: null })
     try {
       const uiLang = i18next.language
@@ -296,7 +305,7 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
       }
       if (!fields || fields.length === 0) throw new Error('INVALID_RESPONSE')
 
-      const { content } = await callServerAI({ kind: 'image', image, uiLang, fields, cardCount })
+      const { content } = await callServerAI({ kind: 'image', images, uiLang, fields, cardCount })
       const result = validateCardsResponse(content, fields.map((f) => f.key))
       if (result.valid.length === 0) throw new Error('ALL_CARDS_INVALID')
       set({
@@ -314,26 +323,53 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
   // three generated states (mode='full') and route to card review; saveAll then
   // creates the deck + template + cards. Default front/back layouts are injected when
   // the model omits them (front = first field, back = the rest).
-  generateDeckFromImage: async (image: string) => {
+  generateDeckFromImage: async (images: string[]) => {
     set({ currentStep: 'generating_deck', error: null })
     try {
       const uiLang = i18next.language
-      const { content } = await callServerAI({ kind: 'image_deck', image, uiLang })
+      const { content } = await callServerAI({ kind: 'image_deck', images, uiLang })
       const deck = validateDeckResponse(content)
 
       const rawTmpl = ((content as Record<string, unknown>)?.template ?? {}) as Record<string, unknown>
-      const tmplFields = Array.isArray(rawTmpl.fields) ? rawTmpl.fields : []
-      const keys = (tmplFields as Array<Record<string, unknown>>)
-        .map((f) => f?.key)
-        .filter((k): k is string => typeof k === 'string')
+      // Mirror validateFields' normalization (drop non-objects, cap at 6) and its rekeying
+      // rule (any key not already 'field_'-prefixed becomes field_<i>) so we know the
+      // template keys BEFORE validation. The single vision call keys both the template
+      // fields and each card's field_values by semantic names (front/back/term/…), so we
+      // must (a) build object layouts against the REKEYED keys — bare strings are dropped
+      // by validateLayout, and (b) remap card field_values from the raw semantic key to the
+      // rekeyed key by position, or validateCardsResponse filters every card out.
+      const normFields = (Array.isArray(rawTmpl.fields) ? rawTmpl.fields : [])
+        .filter((f): f is Record<string, unknown> => !!f && typeof f === 'object')
+        .slice(0, 6)
+      const rawKeys = normFields.map((f) => (typeof f.key === 'string' ? f.key : ''))
+      const effectiveKeys = rawKeys.map((k, i) => (k.startsWith('field_') ? k : `field_${i}`))
+
       const template = validateTemplateResponse({
         name: typeof rawTmpl.name === 'string' && rawTmpl.name ? rawTmpl.name : deck.name,
-        fields: tmplFields,
-        front_layout: Array.isArray(rawTmpl.front_layout) && rawTmpl.front_layout.length ? rawTmpl.front_layout : keys.slice(0, 1),
-        back_layout: Array.isArray(rawTmpl.back_layout) && rawTmpl.back_layout.length ? rawTmpl.back_layout : keys.slice(1),
+        fields: normFields,
+        front_layout: Array.isArray(rawTmpl.front_layout) && rawTmpl.front_layout.length
+          ? rawTmpl.front_layout
+          : effectiveKeys.slice(0, 1).map((k) => ({ field_key: k, style: 'primary' })),
+        back_layout: Array.isArray(rawTmpl.back_layout) && rawTmpl.back_layout.length
+          ? rawTmpl.back_layout
+          : effectiveKeys.slice(1).map((k) => ({ field_key: k, style: 'primary' })),
       })
 
-      const result = validateCardsResponse(content, template.fields.map((f) => f.key))
+      const rawCards = Array.isArray((content as Record<string, unknown>)?.cards)
+        ? ((content as Record<string, unknown>).cards as Array<Record<string, unknown>>)
+        : []
+      const remapped = {
+        cards: rawCards.map((card) => {
+          const fv = (card?.field_values ?? {}) as Record<string, unknown>
+          const field_values: Record<string, unknown> = {}
+          effectiveKeys.forEach((ek, i) => {
+            const rawKey = rawKeys[i]
+            field_values[ek] = fv[ek] ?? (rawKey ? fv[rawKey] : undefined) ?? ''
+          })
+          return { ...card, field_values }
+        }),
+      }
+      const result = validateCardsResponse(remapped, template.fields.map((f) => f.key))
       if (result.valid.length === 0) throw new Error('ALL_CARDS_INVALID')
 
       set({
@@ -436,5 +472,24 @@ export const useAIGenerateStore = create<AIGenerateState>((set, get) => ({
 
   reset: () => {
     set({ ...initialState })
+  },
+
+  // Return to the config step for another attempt, PRESERVING the user's config
+  // (topic/count/language/hints/mode/existing ids). Only the generated results,
+  // progress, and error are cleared — a full reset() would dump the user back to a
+  // blank form and discard everything they typed, which is punishing after a paid
+  // image error where they'd also have to re-pick the image.
+  retryFromConfig: () => {
+    set({
+      generatedTemplate: null,
+      generatedDeck: null,
+      generatedCards: null,
+      filteredCardCount: 0,
+      createdTemplateId: null,
+      createdDeckId: null,
+      currentStep: 'config',
+      progress: { done: 0, total: 0 },
+      error: null,
+    })
   },
 }))

@@ -75,7 +75,7 @@
       "Búsqueda y filtrado basado en etiquetas",
       "Compartir mazos y mercado comunitario",
       "Estadísticas y análisis detallados de aprendizaje",
-      "Integración externa mediante clave API"
+      "Planes personalizados y refuerzo adaptativo"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "Búsqueda y filtrado basado en etiquetas",
     "5": "Compartir mazos y mercado comunitario",
     "6": "Estadísticas y análisis detallados de aprendizaje",
-    "7": "Integración externa mediante clave API"
+    "7": "Planes personalizados y refuerzo adaptativo"
   },
   "metrics": {
     "efficiency": {
@@ -189,13 +189,12 @@
   "trustBadges": {
     "srs": "SRS Inteligente",
     "sharing": "Compartir Mazos",
-    "languages": "{{count}} Idiomas",
+    "languages": "{{count, number}} Idiomas",
     "allDevices": "Todos los Dispositivos",
-    "import": "Importar CSV y API"
+    "import": "Importar CSV y JSON"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados.",
-    "apiDocs": "Documentación API",
     "tagline": "Plataforma inteligente de aprendizaje con tarjetas y repetición espaciada",
     "product": "Producto",
     "resources": "Recursos",
@@ -251,7 +250,7 @@
   "socialProof": {
     "title": "La Confianza de Estudiantes en Todo el Mundo",
     "subtitle": "Únete a miles de estudiantes que aprenden de forma más inteligente",
-    "liveActivity": "{{count}} personas estudiando ahora mismo",
+    "liveActivity": "{{count, number}} personas estudiando ahora mismo",
     "userCountLabel": "Usuarios Activos",
     "cardsStudiedLabel": "Tarjetas Estudiadas",
     "decksCreatedLabel": "Mazos Creados",
@@ -334,13 +333,14 @@
     "freePrice": "Gratis",
     "pricePerMonth": "{{price}}/mes",
     "unlimitedCards": "Tarjetas ilimitadas",
-    "upToCards": "Hasta {{count}} tarjetas",
+    "upToCards": "Hasta {{count, number}} tarjetas",
     "ctaFree": "Empezar gratis",
     "ctaPaid": "Comenzar",
     "note": "El pago se realiza tras registrarte, en Ajustes.",
     "plans": {
       "free": "Gratis",
       "standard": "Estándar",
+      "pro": "Pro",
       "unlimited": "Ilimitado",
       "freeBlurb": "Un plan gratuito perfecto para empezar",
       "standardBlurb": "Amplía tu aprendizaje con más tarjetas",

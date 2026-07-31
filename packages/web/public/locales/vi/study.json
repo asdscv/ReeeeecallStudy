@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "Học nhanh",
     "noDecks": "Không có bộ thẻ. Vui lòng tạo bộ thẻ trước.",
-    "cardCount": "{{count}} thẻ",
-    "newCards": "Mới {{count}}",
-    "reviewCards": "Ôn tập {{count}}",
+    "cardCount": "{{count, number}} thẻ",
+    "newCards": "Mới {{count, number}}",
+    "reviewCards": "Ôn tập {{count, number}}",
     "selectDate": "Chọn ngày để học",
     "setBatchSize": "Đặt kích thước lô",
     "selectMode": "Chọn chế độ học",
     "startStudy": "Bắt đầu học",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ",
+    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count, number}} thẻ",
     "batchSize": "Kích thước lô",
     "batchSizeDesc": "Số thẻ học mỗi phiên ({{min}}~{{max}})",
     "batchSizeDescReview": "Số thẻ ôn tập mỗi phiên — tất cả thẻ mới đều được bao gồm ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "Thiết lập học tập",
-    "deckInfo": "{{icon}} {{name}} · {{count}} thẻ",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}} thẻ",
     "studyMode": "Chế độ học",
     "selectUploadDate": "Chọn ngày tải lên",
-    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count}} thẻ"
+    "uploadDate": "{{year}}/{{month}}/{{day}} Tải lên: {{count, number}} thẻ"
   },
   "session": {
     "loading": "Đang tải...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10 phút",
-    "minutes": "{{count}} phút",
-    "hours": "{{count}} giờ",
+    "minutes": "{{count, number}} phút",
+    "hours": "{{count, number}} giờ",
     "oneDay": "1 ngày",
-    "days": "{{count}} ngày",
-    "months": "{{count}} tháng",
-    "years": "{{count}} năm"
+    "days": "{{count, number}} ngày",
+    "months": "{{count, number}} tháng",
+    "years": "{{count, number}} năm"
   },
   "srsRating": {
     "again": "Lại",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "Giới hạn thời gian",
       "none": "Không giới hạn",
-      "minutes": "{{count}} phút"
+      "minutes": "{{count, number}} phút"
     },
     "shuffle": {
       "title": "Xáo trộn thẻ",
@@ -175,7 +175,7 @@
       "masteryRate": "Tỷ lệ thành thạo",
       "cardsStudied": "Thẻ đã học",
       "hardestCards": "Thẻ khó nhất",
-      "missedTimes": "sai {{count}} lần",
+      "missedTimes": "sai {{count, number}} lần",
       "noSrsImpact": "Phiên này không ảnh hưởng đến lịch SRS của bạn.",
       "sessionEnded": "Phiên đã kết thúc",
       "crammingAgain": "Nhồi nhét lại",
@@ -218,9 +218,9 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards",
+    "cards": "{{count, number}} cards",
     "selectHint": "Select decks to study together",
     "decksUnit": " decks",
     "cardsUnit": " cards",

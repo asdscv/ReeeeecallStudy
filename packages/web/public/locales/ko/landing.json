@@ -75,7 +75,7 @@
       "태그 기반 검색 및 필터링",
       "덱 공유 & 커뮤니티 마켓플레이스",
       "상세한 학습 통계 및 분석",
-      "API 키로 외부 연동 가능"
+      "개인화 계획과 적응형 보강 학습"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "태그 기반 검색 및 필터링",
     "5": "덱 공유 & 커뮤니티 마켓플레이스",
     "6": "상세한 학습 통계 및 분석",
-    "7": "API 키로 외부 연동 가능"
+    "7": "개인화 계획과 적응형 보강 학습"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "덱 공유",
     "languages": "7개 언어",
     "allDevices": "모든 기기",
-    "import": "CSV & API 업로드"
+    "import": "CSV & JSON 업로드"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API 문서",
     "tagline": "간격 반복 기반 스마트 플래시카드 학습 플랫폼",
     "product": "제품",
     "resources": "리소스",
@@ -251,7 +250,7 @@
   "socialProof": {
     "title": "전 세계 학습자들이 신뢰합니다",
     "subtitle": "더 스마트하게 공부하는 수천 명의 학생에 합류하세요",
-    "liveActivity": "지금 {{count}}명이 공부 중입니다",
+    "liveActivity": "지금 {{count, number}}명이 공부 중입니다",
     "userCountLabel": "활성 사용자",
     "cardsStudiedLabel": "학습한 카드",
     "decksCreatedLabel": "생성된 덱",
@@ -334,13 +333,14 @@
     "freePrice": "무료",
     "pricePerMonth": "{{price}}/월",
     "unlimitedCards": "무제한 카드",
-    "upToCards": "카드 {{count}}장",
+    "upToCards": "카드 {{count, number}}장",
     "ctaFree": "무료로 시작하기",
     "ctaPaid": "시작하기",
     "note": "결제는 가입 후 설정에서 진행됩니다.",
     "plans": {
       "free": "무료",
       "standard": "스탠다드",
+      "pro": "프로",
       "unlimited": "무제한",
       "freeBlurb": "부담 없이 시작하기 좋은 기본 플랜",
       "standardBlurb": "더 많은 카드로 학습을 확장하세요",

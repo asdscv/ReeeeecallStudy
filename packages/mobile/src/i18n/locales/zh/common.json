@@ -11,6 +11,7 @@
     "admin": "管理",
     "guide": "指南",
     "aiGenerate": "AI Generate",
+    "learningPlan": "学习计划",
     "achievements": "成就",
     "publisherStats": "发布者统计",
     "wallet": "钱包"
@@ -45,7 +46,7 @@
   },
   "units": {
     "cards": "张卡片",
-    "cardsSuffix": "{{count}} 张卡片",
+    "cardsSuffix": "{{count, number}} 张卡片",
     "sessions": "次学习",
     "days": "天",
     "hours": "小时",
@@ -257,5 +258,8 @@
       "五",
       ""
     ]
+  },
+  "shares": {
+    "title": "我的分享"
   }
 }

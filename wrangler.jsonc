@@ -20,5 +20,33 @@
   // Secrets needed: wrangler secret put XAI_API_KEY / SUPABASE_SERVICE_KEY
   "triggers": {
     "crons": ["0 6 * * *"]
+  },
+
+  // ── Staging environment ──────────────────────────────────────────────
+  // A separate Worker (reeeeecallstudy-staging.<subdomain>.workers.dev) that serves
+  // the SAME built SPA against the SAME prod Supabase backend — so real accounts,
+  // decks and shares reproduce production behaviour for pre-merge web testing.
+  // Deploy: `pnpm build && wrangler deploy --env staging`.
+  // NOTE: named-env config is NOT inherited from the top level in wrangler — the
+  // non-inheritable keys (vars, assets, triggers) are redefined here explicitly.
+  // Crons are disabled on staging (empty list) so it never runs the daily pipeline.
+  "env": {
+    "staging": {
+      "name": "reeeeecallstudy-staging",
+      "assets": {
+        "directory": "./packages/web/dist",
+        "not_found_handling": "single-page-application",
+        "binding": "ASSETS",
+        "run_worker_first": true
+      },
+      "vars": {
+        "SUPABASE_URL": "https://ixdapelfikaneexnskfm.supabase.co",
+        "XAI_MODEL": "grok-3-mini",
+        "XAI_BASE_URL": "https://api.x.ai/v1"
+      },
+      "triggers": {
+        "crons": []
+      }
+    }
   }
 }

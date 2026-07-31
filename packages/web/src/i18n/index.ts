@@ -1,5 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import { formatDecimal } from '@reeeeecall/shared/lib/format-number'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import HttpBackend from 'i18next-http-backend'
 
@@ -32,6 +33,7 @@ i18n
       'ai-generate',
       'wallet',
       'billing',
+      'learning',
     ],
     defaultNS: 'common',
 
@@ -56,5 +58,13 @@ i18n
       useSuspense: true,
     },
   })
+
+// Mirror the mobile app's Intl-free formatters so the SHARED locale strings mean the same
+// thing on both platforms. `{{x, decimal}}` is used where the value is deliberately
+// fractional; mobile cannot route those through Intl (an ICU-less Hermes build drops the
+// separators silently), and a spec registered on only one platform would render differently.
+i18n.services.formatter?.add('decimal', (value) =>
+  typeof value === 'number' ? formatDecimal(value, 1) : String(value ?? ''),
+)
 
 export default i18n

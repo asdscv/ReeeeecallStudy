@@ -1,27 +1,27 @@
 // ─────────────────────────────────────────────────────────────────────────
-// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응
-// 이 서비스는 현재 호출되지 않음 (usePurchases 훅도 미사용).
-// 코드는 유지하되 UI 진입점 차단만으로 구독 기능 비활성화.
-// 복원 시 추가 설정 필요:
-//   - EXPO_PUBLIC_REVENUECAT_IOS_KEY / EXPO_PUBLIC_REVENUECAT_ANDROID_KEY
-//   - RevenueCat 대시보드 entitlement "pro" + App Store Connect 상품 매핑
+// Mobile IAP (RevenueCat) — re-enabled for integration (react-native-purchases
+// v10, New-Architecture ready). NOTE: this is a CODE integration + test build.
+// Real purchases still need the owner-side store setup — see the OWNER GO-LIVE
+// CHECKLIST below (ASC/Play products, RevenueCat offering/entitlement/keys,
+// webhook secrets, Google Play payment profile, App Store re-review).
 // ─────────────────────────────────────────────────────────────────────────
-// [SUBSCRIPTION-HIDDEN] react-native-purchases 제거됨 (네이티브 모듈 크래시 원인).
-// 복원 시: pnpm add react-native-purchases --filter mobile 후 아래 타입/import 복구.
-type PurchasesPackage = any
-type CustomerInfo = any
-type PurchasesOffering = any
+// Types come from the SDK via `import type` (erased at runtime, so it can never
+// be the native-load crash source). The SDK OBJECT is still loaded through a
+// DEFENSIVE require below — if the native module ever fails to link, the whole
+// service degrades to no-ops instead of crashing at import.
+import type { PurchasesPackage, CustomerInfo, PurchasesOffering } from 'react-native-purchases'
 import { Platform } from 'react-native'
 
-// Lazy-load react-native-purchases — 현재 패키지 제거 상태, require는 항상 실패
-let Purchases: any = null
-let LOG_LEVEL: any = null
+// Defensive runtime load of react-native-purchases. Present now (installed), but
+// keep the try/catch so a native-link failure degrades gracefully to no-ops.
+let Purchases: typeof import('react-native-purchases').default | null = null
+let LOG_LEVEL: typeof import('react-native-purchases').LOG_LEVEL | null = null
 try {
   const mod = require('react-native-purchases')
   Purchases = mod.default ?? mod.Purchases
   LOG_LEVEL = mod.LOG_LEVEL
 } catch {
-  // react-native-purchases 제거 상태 — 정상 동작
+  // native module absent/unlinked — service no-ops (should not happen once built)
 }
 
 // RevenueCat API keys — set via environment or constants
@@ -90,7 +90,24 @@ export const MERCHANT_UID_ATTRIBUTE = 'merchant_uid'
 // flipping it to true (after the restore steps in PaywallScreen's header) is
 // the single switch that un-hides the flow. Nothing renders while false.
 // ─────────────────────────────────────────────────────────────────────────
-export const SUBSCRIPTION_UI_ENABLED = false
+// VERIFIED (test build, 2026-07-21): with this flipped to `true` on a native
+// build carrying react-native-purchases v10, the SDK configures with the iOS key,
+// Purchases.logIn(<supabase uid>) aliases app_user_id correctly, and the Paywall
+// renders + calls GetOfferings (200). It only returns empty offerings until the
+// owner registers the store products (see OWNER GO-LIVE CHECKLIST above). Kept
+// FALSE in the repo (Apple Guideline 2.1(b) — no live paywall without approved
+// IAP products); flipping to true is the owner's final go-live switch.
+//
+// …AND the switch is ANDed with "is the SDK actually in this binary". react-native-purchases
+// is a NATIVE module, so it only exists in a build made after it was added to package.json —
+// but JS reaches users a second way: an EAS OTA update, which can land this bundle on an
+// OLDER binary that has no such module. There `Purchases` is null (the require above fails),
+// every purchase call no-ops, and a hardcoded `true` would render plan prices and a Select
+// CTA that can never transact — a dead end for the user and an Apple 2.1(b) problem.
+// Deriving the flag makes that impossible by construction: no SDK ⇒ no purchase UI.
+const OWNER_GO_LIVE_SWITCH = true
+const PURCHASES_SDK_PRESENT = Purchases != null
+export const SUBSCRIPTION_UI_ENABLED = OWNER_GO_LIVE_SWITCH && PURCHASES_SDK_PRESENT
 
 /**
  * RevenueCat service — single entry point for all purchase operations.
@@ -178,17 +195,45 @@ class PurchaseService {
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────────
+  // ⚠️ STORE PRODUCT IDs DIFFER PER PLATFORM — DO NOT ASSUME iOS === Android.
+  // (2026-07-27) The App Store and Play store-ids are NOT identical for the two
+  // subscriptions. This is intentional and permanent; the DB SKU map absorbs it.
+  //
+  //   internal billing_products.id | iOS App Store id  | Google Play id
+  //   ─────────────────────────────┼───────────────────┼────────────────────────────
+  //   credits_1000                 | ai_credit_099     | ai_credit_099
+  //   credits_5000                 | ai_credit_499     | ai_credit_499
+  //   credits_10000                | ai_credit_999     | ai_credit_999
+  //   sub_5k_monthly  (Standard)   | standard_monthly  | sub_standard_monthly:monthly
+  //   sub_unlimited_monthly (Pro)  | pro_monthly       | sub_pro_monthly:monthly
+  //
+  // WHY the iOS sub ids are `standard_monthly`/`pro_monthly` and NOT the tidy
+  // `sub_standard_monthly`/`sub_pro_monthly` Google uses: those two iOS ids were
+  // created then deleted on App Store Connect, and **Apple PERMANENTLY reserves a
+  // deleted product id** (recreate → 409 "product ID has already been used"). They
+  // are burned forever, so iOS had to fall back to the un-prefixed form. Do NOT try
+  // to "fix" this back to sub_*_monthly on iOS — it is impossible. Google Play ids
+  // stay in the sub_*_monthly(:basePlan) form.
+  //
+  // Nothing in the app hardcodes these strings: the store id arrives per-platform
+  // from get_billing_products(Platform.OS) → billing_product_skus (mig 151), and RC
+  // packages are keyed by lookup_key = internal id. So this divergence is confined
+  // to the DB SKU rows + the RevenueCat dashboard. See memory project-mobile-iap.
+  // ───────────────────────────────────────────────────────────────────────
   /**
-   * Find the RevenueCat package that corresponds to a backend product id
-   * (billing_products.id, e.g. 'sub_pro_monthly' / 'credits_1000'). Match is
-   * by store product identifier or package identifier — configure these to
-   * equal the backend id in the RevenueCat dashboard so the server catalog
-   * (get_billing_products) stays the single source of truth for what exists.
+   * Find the RevenueCat package for a given STORE product identifier — i.e. the
+   * billing_product_skus.store_product_id for this platform (mig 151), surfaced to the
+   * client as BillingProduct.storeProductId by get_billing_products(Platform.OS). Callers
+   * pass `product.storeProductId ?? product.id` (the internal id is the legacy fallback
+   * when no SKU row is registered). Matches on the RC store-product identifier OR the RC
+   * package identifier. The store↔internal mapping now lives in the DB catalog, so this no
+   * longer depends on the RevenueCat package identifier being hand-set to our internal id.
    */
-  findPackageForProduct(offering: PurchasesOffering | null, productId: string): PurchasesPackage | null {
+  findPackageForProduct(offering: PurchasesOffering | null, storeProductId: string): PurchasesPackage | null {
     const pkgs: any[] = offering?.availablePackages ?? []
     return (
-      pkgs.find((p) => p?.product?.identifier === productId || p?.identifier === productId) ?? null
+      pkgs.find((p) => p?.product?.identifier === storeProductId || p?.identifier === storeProductId) ?? null
     )
   }
 
@@ -242,24 +287,30 @@ class PurchaseService {
    *      (provider,provider_ref). See mig 119 webhookPayload contract.
    *   4) The client just RE-FETCHES getMySubscription()/get_owned_card_usage
    *      to reflect the granted state (usePurchases.refreshSubscription()).
-   * The `success` returned here only means the store charge + RevenueCat
-   * entitlement went through — it is NOT proof our DB was updated.
+   * `success` = the store transaction COMPLETED (settled, not cancelled/errored) —
+   * it is the ONLY success signal for a CONSUMABLE credit pack, which grants no
+   * entitlement (so `isPro` stays false for it). `isPro` is reported SEPARATELY for
+   * the subscription flow. Neither proves our DB was updated — the credits /
+   * subscription grant happens SERVER-SIDE via the RevenueCat webhook; the client
+   * just re-polls (wallet / getMySubscription).
    */
   async purchase(pkg: PurchasesPackage): Promise<{
     success: boolean
+    isPro: boolean
     customerInfo?: CustomerInfo
     error?: string
   }> {
-    if (!Purchases) return { success: false, error: 'Purchases not available' }
+    if (!Purchases) return { success: false, isPro: false, error: 'Purchases not available' }
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg)
       const isPro = customerInfo.entitlements.active[PRO_ENTITLEMENT] !== undefined
-      return { success: isPro, customerInfo }
+      // success = transaction settled (works for consumables too); isPro is separate.
+      return { success: true, isPro, customerInfo }
     } catch (e: any) {
       if (e.userCancelled) {
-        return { success: false, error: 'cancelled' }
+        return { success: false, isPro: false, error: 'cancelled' }
       }
-      return { success: false, error: e.message ?? 'Purchase failed' }
+      return { success: false, isPro: false, error: e.message ?? 'Purchase failed' }
     }
   }
 
@@ -278,6 +329,38 @@ class PurchaseService {
       return { success: isPro, customerInfo: info }
     } catch (e: any) {
       return { success: false, error: e.message ?? 'Restore failed' }
+    }
+  }
+
+  /**
+   * Open Apple's in-app refund sheet for the active entitlement (StoreKit 2,
+   * iOS 15+). Returns 'unavailable' on Android, on older iOS, or when the SDK
+   * isn't loaded — the caller then falls back to a web link.
+   *
+   * WHY THIS EXISTS. Apple gives developers no API to ISSUE a refund; only the
+   * customer can request one and only Apple decides. The nearest thing we can
+   * offer is this sheet, which starts that request without the user leaving the
+   * app. Everything after it is Apple's: if they approve, RevenueCat sends a
+   * REFUND webhook and revenuecat-webhook reverses our side automatically.
+   *
+   * The return value is therefore NOT "refunded" — it is only how the request
+   * was submitted, so the UI must never report a refund on the strength of it.
+   */
+  async beginRefundRequest(): Promise<{ status: 'success' | 'userCancelled' | 'unavailable' | 'error'; error?: string }> {
+    if (!Purchases || Platform.OS !== 'ios') return { status: 'unavailable' }
+    const fn = (Purchases as any).beginRefundRequestForActiveEntitlement
+    if (typeof fn !== 'function') return { status: 'unavailable' }
+    try {
+      const result = await fn.call(Purchases)
+      // RC returns a RefundRequestStatus enum; its string forms differ across
+      // versions, so match loosely and treat anything unrecognised as submitted.
+      const s = String(result ?? '').toLowerCase()
+      if (s.includes('cancel')) return { status: 'userCancelled' }
+      if (s.includes('error')) return { status: 'error' }
+      return { status: 'success' }
+    } catch (e: any) {
+      // Pre-iOS-15 devices and simulator builds throw rather than return.
+      return { status: 'unavailable', error: e?.message }
     }
   }
 

@@ -11,7 +11,9 @@
     "history": "Lịch sử",
     "programming": "Lập trình",
     "exam": "Luyện thi",
-    "other": "Khác"
+    "other": "Khác",
+    "general": "Tổng hợp",
+    "trivia": "Kiến thức thú vị"
   },
   "sort": {
     "popular": "Phổ biến",
@@ -21,8 +23,8 @@
     "topRated": "Đánh giá cao"
   },
   "listing": {
-    "cardCount": "{{count}} thẻ",
-    "userCount": "{{count}} người dùng"
+    "cardCount": "{{count, number}} thẻ",
+    "userCount": "{{count, number}} người dùng"
   },
   "detail": {
     "back": "← Chợ ứng dụng",
@@ -44,10 +46,10 @@
     "edited": "(đã chỉnh sửa)",
     "helpful": "Hữu ích",
     "byAuthor": "bởi {{name}}",
-    "cardsBadge": "{{count}} thẻ",
-    "viewsBadge": "{{count}} lượt xem",
-    "usersBadge": "{{count}} người dùng",
-    "reviewsCount": "({{count}} đánh giá)",
+    "cardsBadge": "{{count, number}} thẻ",
+    "viewsBadge": "{{count, number}} lượt xem",
+    "usersBadge": "{{count, number}} người dùng",
+    "reviewsCount": "({{count, number}} đánh giá)",
     "previewCards": "Xem trước thẻ",
     "ratingsReviews": "Xếp hạng & Đánh giá",
     "editReview": "Sửa đánh giá",
@@ -55,7 +57,7 @@
     "writeAReview": "Viết đánh giá",
     "acquireToReview": "Nhận bộ thẻ này để viết đánh giá",
     "noReviewsYet": "Chưa có đánh giá nào",
-    "reviewCountLabel": "{{count}} đánh giá",
+    "reviewCountLabel": "{{count, number}} đánh giá",
     "loading": "Đang tải...",
     "loadMoreReviews": "Xem thêm đánh giá",
     "reportReason": "Lý do",
@@ -96,8 +98,8 @@
       "most_helpful": "Hữu ích"
     },
     "downloading": "Đang tải xuống...",
-    "limitUsage": "Thêm {{count}} thẻ vào giới hạn · còn {{available}}",
-    "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available}}). Xóa thẻ hoặc đăng ký trước.",
+    "limitUsage": "Thêm {{count, number}} thẻ vào giới hạn · còn {{available, number}}",
+    "limitExceeds": "Sẽ vượt giới hạn thẻ (còn {{available, number}}). Giải phóng dung lượng hoặc nâng cấp gói để thêm.",
     "limitOfficialFree": "Bộ thẻ chính thức · không tính vào giới hạn thẻ.",
     "acquireByMode": {
       "subscribe": "Đăng ký theo dõi",

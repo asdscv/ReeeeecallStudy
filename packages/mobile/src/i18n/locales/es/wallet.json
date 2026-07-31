@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "Historial de uso",
-    "empty": "Aún no hay uso."
+    "empty": "Aún no hay uso.",
+    "showAll": "Ver los {{total}}",
+    "showLess": "Ver menos"
   },
   "reason": {
     "purchase": "Recarga",
@@ -24,6 +26,17 @@
     "refund": "Reembolso",
     "admin_grant": "Crédito otorgado",
     "spend_cards": "Tarjetas de IA",
-    "spend_image": "Imagen de IA"
+    "spend_image": "Imagen de IA",
+    "admin_adjustment": "Ajuste"
+  },
+  "credits": {
+    "title": "Comprar créditos de IA",
+    "creditLabel": "{{value}} en créditos de IA",
+    "confirming": "Pago recibido: tus créditos aparecerán en breve.",
+    "unavailable": "Este paquete de créditos no está disponible ahora."
+  },
+  "consent": {
+    "creditPack": "Acepto que los créditos se entregan de inmediato y que, en cuanto use alguno, pierdo el derecho de desistimiento de esta compra.",
+    "policyLink": "Política de reembolsos"
   }
 }

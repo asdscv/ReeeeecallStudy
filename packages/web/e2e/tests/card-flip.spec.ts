@@ -1,4 +1,6 @@
 import { test, expect } from '../fixtures/test-helpers'
+import type { Page } from '@playwright/test'
+import type { QuickStudyPage } from '../pages/quick-study.page'
 
 test.describe('Card Flip — Visibility & Animation', () => {
 
@@ -7,8 +9,8 @@ test.describe('Card Flip — Visibility & Animation', () => {
    * Returns false if no cards are available.
    */
   async function setupStudySession(
-    quickStudyPage: any,
-    page: any,
+    quickStudyPage: QuickStudyPage,
+    page: Page,
   ): Promise<boolean> {
     await quickStudyPage.navigate()
     await quickStudyPage.selectFirstDeck()

@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "เรียนด่วน",
     "noDecks": "ไม่มีสำรับ กรุณาสร้างสำรับก่อน",
-    "cardCount": "{{count}} การ์ด",
-    "newCards": "ใหม่ {{count}}",
-    "reviewCards": "ทบทวน {{count}}",
+    "cardCount": "{{count, number}} การ์ด",
+    "newCards": "ใหม่ {{count, number}}",
+    "reviewCards": "ทบทวน {{count, number}}",
     "selectDate": "เลือกวันที่เพื่อเรียน",
     "setBatchSize": "กำหนดขนาดชุด",
     "selectMode": "เลือกโหมดการเรียน",
     "startStudy": "เริ่มเรียน",
-    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count}} การ์ด",
+    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count, number}} การ์ด",
     "batchSize": "ขนาดชุด",
     "batchSizeDesc": "จำนวนการ์ดต่อเซสชัน ({{min}}~{{max}})",
     "batchSizeDescReview": "จำนวนการ์ดทบทวนต่อเซสชัน — การ์ดใหม่ทั้งหมดรวมอยู่ด้วย ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "ตั้งค่าการเรียน",
-    "deckInfo": "{{icon}} {{name}} · {{count}} การ์ด",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}} การ์ด",
     "studyMode": "โหมดการเรียน",
     "selectUploadDate": "เลือกวันที่อัปโหลด",
-    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count}} การ์ด"
+    "uploadDate": "{{year}}/{{month}}/{{day}} อัปโหลด: {{count, number}} การ์ด"
   },
   "session": {
     "loading": "กำลังโหลด...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10 นาที",
-    "minutes": "{{count}} นาที",
-    "hours": "{{count}} ชม.",
+    "minutes": "{{count, number}} นาที",
+    "hours": "{{count, number}} ชม.",
     "oneDay": "1 วัน",
-    "days": "{{count}} วัน",
-    "months": "{{count}} เดือน",
-    "years": "{{count}} ปี"
+    "days": "{{count, number}} วัน",
+    "months": "{{count, number}} เดือน",
+    "years": "{{count, number}} ปี"
   },
   "srsRating": {
     "again": "อีกครั้ง",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "จำกัดเวลา",
       "none": "ไม่จำกัด",
-      "minutes": "{{count}} นาที"
+      "minutes": "{{count, number}} นาที"
     },
     "shuffle": {
       "title": "สลับการ์ด",
@@ -175,7 +175,7 @@
       "masteryRate": "อัตราความชำนาญ",
       "cardsStudied": "จำนวนการ์ดที่เรียน",
       "hardestCards": "การ์ดที่ยากที่สุด",
-      "missedTimes": "พลาด {{count}} ครั้ง",
+      "missedTimes": "พลาด {{count, number}} ครั้ง",
       "noSrsImpact": "เซสชันนี้ไม่ส่งผลต่อตารางเวลา SRS ของคุณ",
       "sessionEnded": "เซสชันสิ้นสุดแล้ว",
       "crammingAgain": "อัดเข้าหัวอีกครั้ง",
@@ -218,9 +218,9 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
     "noDecks": "No decks found.",
-    "selected": "{{count}} decks selected ({{cards}} cards)",
+    "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
-    "cards": "{{count}} cards",
+    "cards": "{{count, number}} cards",
     "selectHint": "Select decks to study together",
     "decksUnit": " decks",
     "cardsUnit": " cards",

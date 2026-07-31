@@ -11,6 +11,7 @@
     "admin": "Admin",
     "guide": "Panduan",
     "aiGenerate": "AI Generate",
+    "learningPlan": "Rencana belajar",
     "achievements": "Pencapaian",
     "publisherStats": "Statistik Penerbit",
     "wallet": "Dompet"
@@ -45,7 +46,7 @@
   },
   "units": {
     "cards": "kartu",
-    "cardsSuffix": "{{count}} kartu",
+    "cardsSuffix": "{{count, number}} kartu",
     "sessions": "sesi",
     "days": "hari",
     "hours": "j",
@@ -257,5 +258,8 @@
       "J",
       ""
     ]
+  },
+  "shares": {
+    "title": "Berbagi Saya"
   }
 }

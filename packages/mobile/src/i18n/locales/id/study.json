@@ -50,7 +50,7 @@
     "modalSubtitleDate": "Pilih tanggal",
     "modalSubtitleCramming": "Opsi menjejalkan",
     "modalSubtitleBatch": "Atur ukuran batch",
-    "dateCardCount": "{{date}} — {{count}} kartu",
+    "dateCardCount": "{{date}} — {{count, number}} kartu",
     "backToModeSelect": "Kembali ke pilihan mode",
     "cancel": "Batal"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "Batas Waktu",
       "none": "Tanpa Batas",
-      "minutes": "{{count}} menit"
+      "minutes": "{{count, number}} menit"
     },
     "shuffle": {
       "title": "Acak Kartu"

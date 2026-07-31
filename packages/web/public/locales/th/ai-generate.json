@@ -1,18 +1,11 @@
 {
   "title": "AI Generate",
   "config": {
-    "model": "Model",
     "topic": "Topic",
     "topicPlaceholder": "เช่น คำศัพท์ภาษาญี่ปุ่น JLPT N3, เส้นเวลาประวัติศาสตร์เกาหลี",
     "cardCount": "จำนวนการ์ด",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
-    "customEndpoint": "Custom Endpoint",
-    "selectProvider": "เลือกผู้ให้บริการ",
-    "noProvidersConfigured": "ยังไม่ได้ตั้งค่าผู้ให้บริการ AI",
-    "goToSettings": "เพิ่มในการตั้งค่า",
-    "manageInSettings": "จัดการผู้ให้บริการ:",
-    "settings": "การตั้งค่า",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
@@ -23,7 +16,6 @@
     "targetDeck": "เด็คปลายทาง",
     "selectDeck": "เลือกเด็ค...",
     "selectDeckRequired": "โปรดเลือกเด็คที่จะเพิ่มการ์ด",
-    "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
     "contentLang": "Content Language",
@@ -53,7 +45,12 @@
     "imageChange": "เปลี่ยนรูปภาพ",
     "imageUploadHint": "เลือกรูปภาพของรายการคำศัพท์ หน้าหนังสือเรียน หรือโน้ต — AI จะแปลงเป็นการ์ดให้",
     "imagePaidNotice": "การสร้างจากรูปภาพใช้เครดิต (ไม่มีระดับฟรี)",
-    "cardLimitExceeds": "เพิ่มได้อีกสูงสุด {{available}} การ์ด — ลดจำนวนหรือสมัครสมาชิก"
+    "cardLimitExceeds": "เพิ่มได้อีกสูงสุด {{available}} การ์ด — ลดจำนวนหรือสมัครสมาชิก",
+    "imageAddMore": "เพิ่มอีก ({{count, number}}/{{max}})",
+    "imageRemove": "ลบรูปภาพ",
+    "inputModeTopicHint": "อธิบายหัวข้อ แล้ว AI จะสร้างการ์ดให้คุณ",
+    "inputModeImageHint": "อัปโหลดรูปหน้าหนังสือ รายการคำศัพท์ หรือโน้ต — AI จะอ่านและสร้างเป็นการ์ด เลือกได้หลายรูปพร้อมกัน",
+    "noOwnedDecks": "คุณยังไม่มีเด็คของตัวเอง — สร้างเด็คก่อน แล้วค่อยเพิ่มการ์ด AI"
   },
   "wallet": {
     "summary": "วันนี้มีการ์ดฟรี {{free}} ใบ + การ์ดแบบชำระเงิน {{credits}} ใบ",
@@ -61,8 +58,10 @@
     "creditsOnly": "มีการ์ดแบบชำระเงิน {{credits}} ใบ",
     "empty": "ใช้การ์ดฟรีของวันนี้หมดแล้ว",
     "unknown": "ไม่สามารถดูยอดคงเหลือได้ในขณะนี้",
-    "balance": "ยอดคงเหลือ ₩{{won}} (~{{cards}} การ์ด)",
-    "imagePaid": "การสร้างจากรูปภาพเป็นแบบเสียเงิน — เติมเงินเพื่อดำเนินการต่อ"
+    "balance": "ยอดคงเหลือ {{amount}}",
+    "imagePaid": "การสร้างจากรูปภาพเป็นแบบเสียเงิน — เติมเงินเพื่อดำเนินการต่อ",
+    "cardLimit": "เหลือ {{available}} จาก {{limit}} การ์ด",
+    "cardLimitUnlimited": "ไม่จำกัดจำนวนการ์ด (ผู้ดูแล)"
   },
   "wizard": {
     "setup": "Setup",
@@ -93,11 +92,11 @@
     "deckIcon": "Icon",
     "deckColor": "Color",
     "cardsReviewTitle": "Review Cards",
-    "cardsTitle": "{{count}} cards generated",
-    "filteredWarning": "{{count}} invalid cards were filtered out",
+    "cardsTitle": "{{count, number}} cards generated",
+    "filteredWarning": "{{count, number}} invalid cards were filtered out",
     "regenerate": "Regenerate",
     "next": "Next",
-    "save": "Save {{count}} cards",
+    "save": "Save {{count, number}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
     "removeCard": "Remove",
     "tts": {
@@ -123,7 +122,10 @@
         "hint": "คำใบ้",
         "detail": "รายละเอียด"
       }
-    }
+    },
+    "templateDesc": "AI ออกแบบโครงสร้างการ์ดนี้ เปลี่ยนชื่อฟิลด์ได้ตามต้องการ แล้วดำเนินการต่อ",
+    "deckDesc": "ตรวจสอบชื่อ ไอคอน และสีของชุดการ์ดใหม่ แล้วดำเนินการต่อ",
+    "cardsDesc": "ตรวจสอบการ์ดที่สร้าง แก้ไขข้อความ ลบการ์ดที่ไม่ต้องการ แล้วบันทึก"
   },
   "done": {
     "title": "Generation Complete!",
@@ -137,17 +139,19 @@
   },
   "errors": {
     "title": "Error",
-    "noApiKey": "Please set up your AI API key first.",
-    "invalidApiKey": "Invalid API key. Please check your key.",
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
-    "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
+    "networkError": "Network error. Please check your connection and try again.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์ AI โปรดลองอีกครั้งในภายหลัง",
     "emptyResult": "AI ไม่ได้สร้างการ์ด โปรดลองอีกครั้ง — ไม่มีการเรียกเก็บเงิน",
-    "cardLimitReached": "คุณถึงขีดจำกัดการ์ดแล้ว ลบการ์ดหรือสมัครสมาชิกเพื่อบันทึกเพิ่ม"
+    "cardLimitReached": "คุณถึงขีดจำกัดการ์ดแล้ว ลบการ์ดหรือสมัครสมาชิกเพื่อบันทึกเพิ่ม",
+    "insufficientCredits": "คุณใช้บัตรคำ AI ฟรีของวันนี้หมดแล้วและไม่มีเครดิตเหลืออยู่ เติมเครดิตเพื่อสร้างต่อ",
+    "invalidImage": "ไม่สามารถอ่านรูปภาพนี้ได้ กรุณาใช้รูปที่เล็กลงหรือคมชัดกว่านี้",
+    "quotaExceeded": "คุณใช้สิทธิ์สร้างด้วย AI ฟรีของวันนี้ครบแล้ว กรุณาลองใหม่อีกครั้งในวันพรุ่งนี้",
+    "deckNotOwned": "เด็คนั้นเพิ่มการ์ดใหม่ไม่ได้ กรุณาเลือกเด็คของคุณเอง"
   },
   "button": {
     "aiGenerate": "AI Generate",

@@ -24,7 +24,7 @@ export function LevelUpCelebration() {
   const [visible, setVisible] = useState(false)
   const [displayLevel, setDisplayLevel] = useState(0)
   const [particles, setParticles] = useState<Particle[]>([])
-  const prevLevelRef = useRef(level)
+  const [prevLevelState, setPrevLevelState] = useState(level)
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const dismiss = useCallback(() => {
@@ -35,40 +35,42 @@ export function LevelUpCelebration() {
     }
   }, [])
 
-  // Detect level change
-  useEffect(() => {
-    const prevLevel = prevLevelRef.current
-    prevLevelRef.current = level
-
-    // Only trigger on actual level up (not initial load or decrease)
+  // Detect level change during render — avoids effect-based setState (cascading render).
+  // Only pure state updates here; impure particle generation is in a separate effect.
+  if (prevLevelState !== level) {
+    const prevLevel = prevLevelState
+    setPrevLevelState(level)
     if (prevLevel > 0 && level > prevLevel) {
       setDisplayLevel(level)
       setVisible(true)
-
-      // Generate confetti particles
-      const newParticles: Particle[] = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
-        id: i,
-        x: 50 + (Math.random() - 0.5) * 20,
-        y: 50 + (Math.random() - 0.5) * 10,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        size: 4 + Math.random() * 8,
-        angle: Math.random() * 360,
-        speed: 2 + Math.random() * 6,
-        rotation: Math.random() * 360,
-        rotSpeed: (Math.random() - 0.5) * 20,
-      }))
-      setParticles(newParticles)
-
-      // Auto-dismiss after 3s
-      dismissTimerRef.current = setTimeout(dismiss, AUTO_DISMISS_MS)
     }
-  }, [level, dismiss])
+  }
 
+  // Generate confetti particles + auto-dismiss timer when celebration becomes visible.
+  // Particles use Math.random (impure), so they cannot be computed during render.
+  // Wrapped in queueMicrotask to make it asynchronous (avoids set-state-in-effect).
   useEffect(() => {
+    if (!visible) return
+    queueMicrotask(() => {
+      setParticles(
+        Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+          id: i,
+          x: 50 + (Math.random() - 0.5) * 20,
+          y: 50 + (Math.random() - 0.5) * 10,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          size: 4 + Math.random() * 8,
+          angle: Math.random() * 360,
+          speed: 2 + Math.random() * 6,
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 20,
+        })),
+      )
+    })
+    dismissTimerRef.current = setTimeout(dismiss, AUTO_DISMISS_MS)
     return () => {
       if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
     }
-  }, [])
+  }, [visible, dismiss])
 
   if (!visible) return null
 

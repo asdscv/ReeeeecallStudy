@@ -8,7 +8,7 @@
   },
   "dailyChart": {
     "title": "Volume Belajar Harian",
-    "total": "Total {{count}} kali",
+    "total": "Total {{count, number}} kali",
     "noData": "Belum ada catatan belajar",
     "tooltipTimes": "{{value}} kali",
     "tooltipLabel": "Belajar"
@@ -23,19 +23,19 @@
     "title": "Status Dek",
     "noDecks": "Belum ada dek. Buat satu!",
     "goToDecks": "Ke Manajemen Dek",
-    "cardCount": "{{count}} kartu",
-    "newCards": "Baru {{count}}",
-    "reviewCards": "Ulasan {{count}}",
+    "cardCount": "{{count, number}} kartu",
+    "newCards": "Baru {{count, number}}",
+    "reviewCards": "Ulasan {{count, number}}",
     "study": "Belajar"
   },
   "quickStudy": {
-    "dueCount": "{{count}} kartu untuk diulang hari ini",
+    "dueCount": "{{count, number}} kartu untuk diulang hari ini",
     "startSession": "Mulai sesi belajar"
   },
   "heatmap": {
     "title": "Peta Panas Belajar",
     "noStudy": "Tidak belajar",
-    "studyCount": "{{date}}: {{count}} kali belajar",
-    "tooltip": "{{date}}: {{count}} kali belajar"
+    "studyCount": "{{date}}: {{count, number}} kali belajar",
+    "tooltip": "{{date}}: {{count, number}} kali belajar"
   }
 }

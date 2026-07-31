@@ -218,23 +218,7 @@
             "/images/guide/ai-generate/mobile-01-page.png"
           ],
           "title": "Tự động tạo bằng AI là gì?",
-          "body": "Tự động tạo thẻ bằng AI. Nhập một chủ đề và AI sẽ tạo mọi thứ cho bạn.\n\nNhà cung cấp được hỗ trợ: Google Gemini (miễn phí!), OpenAI, xAI/Grok, Anthropic.\n\nKhóa API của bạn chỉ lưu trên thiết bị, không bao giờ gửi đến máy chủ của chúng tôi."
-        },
-        "apiKey": {
-          "images": [
-            "/images/guide/ai-generate/mobile-02-config.png"
-          ],
-          "title": "Thiết lập khóa API",
-          "body": "Lấy khóa API từ nhà cung cấp bạn thích:\n• Google Gemini (MIỄN PHÍ): aistudio.google.com → Get API Key\n• OpenAI: platform.openai.com → API Keys\n• xAI/Grok: console.x.ai → API Keys\n\nNhập khóa trong cài đặt Tạo bằng AI. Khóa được lưu cục bộ trên thiết bị của bạn.\n\n💡 Chúng tôi khuyên dùng Google Gemini 2.5 Flash — hoàn toàn miễn phí!"
-        },
-        "geminiSetup": {
-          "images": [
-            "/images/guide/gemini-api/02-get-api-key.png",
-            "/images/guide/gemini-api/03-create-api-key.png",
-            "/images/guide/gemini-api/05-api-key-created.png"
-          ],
-          "title": "🎯 Khóa API Gemini miễn phí (khuyến nghị)",
-          "body": "Gemini 2.5 Flash hoàn toàn MIỄN PHÍ — không cần thẻ tín dụng!\n\nGiới hạn miễn phí: 15 yêu cầu/phút, 1.500 yêu cầu/ngày, 1 triệu token/phút\n\nCách lấy khóa:\n1. Truy cập aistudio.google.com\n2. Đăng nhập bằng tài khoản Google\n3. Nhấp \"Get API Key\" ở thanh bên\n4. Nhấp \"Create API Key\"\n5. Chọn \"Create API key in new project\"\n6. Sao chép khóa (bắt đầu bằng \"AIza...\")\n\nCách dùng trong ReeeeecallStudy:\n1. Mở trang Tạo bằng AI\n2. Chọn nhà cung cấp \"Google Gemini\"\n3. Dán khóa API của bạn\n4. Chọn mô hình \"Gemini 2.5 Flash\"\n5. Nhập chủ đề và tạo!\n\nTại sao chọn Gemini Flash?\n• 💰 Miễn phí — không cần thiết lập thanh toán\n• ⚡ Nhanh — 50 thẻ trong vài giây\n• 🎯 Chính xác — rất phù hợp cho giáo dục\n• 🌍 Hỗ trợ mọi ngôn ngữ\n• 📚 1.500 yêu cầu mỗi ngày — hàng nghìn thẻ"
+          "body": "Tạo thẻ ghi nhớ tự động bằng AI. Chỉ cần nhập chủ đề, AI sẽ tạo mọi thứ cho bạn.\n\nKhông cần API key hay thiết lập gì — quá trình tạo chạy trên máy chủ của chúng tôi.\n\nMỗi ngày bạn được tặng số thẻ AI miễn phí; phần vượt quá sẽ trừ vào số dư tín dụng của bạn."
         },
         "fullGeneration": {
           "images": [

@@ -15,7 +15,9 @@ export const test = base.extend<{
   exportModalPage: ExportModalPage
 }>({
   // Fresh login for every test — bypasses single-session limitation
-  page: async ({ page }, use) => {
+  // Playwright names the second fixture argument freely; calling it `use` collides
+  // with React's `use` hook and trips react-hooks/rules-of-hooks on every fixture.
+  page: async ({ page }, runTest) => {
     const email = process.env.E2E_TEST_EMAIL
     const password = process.env.E2E_TEST_PASSWORD
     if (email && password) {
@@ -28,16 +30,16 @@ export const test = base.extend<{
         return !path.includes('/auth') && !path.includes('/landing')
       }, { timeout: 15_000 }).catch(() => {})
     }
-    await use(page)
+    await runTest(page)
   },
-  quickStudyPage: async ({ page }, use) => {
-    await use(new QuickStudyPage(page))
+  quickStudyPage: async ({ page }, runTest) => {
+    await runTest(new QuickStudyPage(page))
   },
-  studySessionPage: async ({ page }, use) => {
-    await use(new StudySessionPage(page))
+  studySessionPage: async ({ page }, runTest) => {
+    await runTest(new StudySessionPage(page))
   },
-  exportModalPage: async ({ page }, use) => {
-    await use(new ExportModalPage(page))
+  exportModalPage: async ({ page }, runTest) => {
+    await runTest(new ExportModalPage(page))
   },
 })
 

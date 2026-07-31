@@ -7,6 +7,17 @@ import type { CardTemplate, TemplateField, LayoutMode } from '../../types/databa
  * extracts layout_mode from templates in all edge cases.
  */
 
+/**
+ * A row as it exists BEFORE the layout_mode / *_html migration: those columns are
+ * absent or null. The production readers must cope with it, so the tests have to be
+ * able to express it without reaching for `any`.
+ */
+type PreMigrationTemplate = Omit<CardTemplate, 'layout_mode' | 'front_html' | 'back_html'> & {
+  layout_mode?: LayoutMode | string | null
+  front_html?: string | null
+  back_html?: string | null
+}
+
 // This mirrors the initialization logic in TemplateEditPage's useEffect
 function resolveTemplateState(template: CardTemplate | null) {
   if (!template) {
@@ -81,22 +92,22 @@ describe('resolveTemplateState', () => {
 
   it('should fallback to "default" when layout_mode is undefined (pre-migration)', () => {
     const template = makeTemplate()
-    ;(template as any).layout_mode = undefined
+    ;(template as PreMigrationTemplate).layout_mode = undefined
     const result = resolveTemplateState(template)
     expect(result.layoutMode).toBe('default')
   })
 
   it('should fallback to "default" when layout_mode is null', () => {
     const template = makeTemplate()
-    ;(template as any).layout_mode = null
+    ;(template as PreMigrationTemplate).layout_mode = null
     const result = resolveTemplateState(template)
     expect(result.layoutMode).toBe('default')
   })
 
   it('should handle undefined front_html/back_html (pre-migration)', () => {
     const template = makeTemplate()
-    ;(template as any).front_html = undefined
-    ;(template as any).back_html = undefined
+    ;(template as PreMigrationTemplate).front_html = undefined
+    ;(template as PreMigrationTemplate).back_html = undefined
     const result = resolveTemplateState(template)
     expect(result.frontHtml).toBe('')
     expect(result.backHtml).toBe('')

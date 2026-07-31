@@ -34,14 +34,14 @@
   "quickStudy": {
     "title": "빠른 학습",
     "noDecks": "덱이 없습니다. 먼저 덱을 만들어주세요.",
-    "cardCount": "{{count}}장",
-    "newCards": "새 {{count}}",
-    "reviewCards": "복습 {{count}}",
+    "cardCount": "{{count, number}}장",
+    "newCards": "새 {{count, number}}",
+    "reviewCards": "복습 {{count, number}}",
     "selectDate": "학습할 날짜를 선택하세요",
     "setBatchSize": "배치 크기를 설정하세요",
     "selectMode": "학습 모드를 선택하세요",
     "startStudy": "학습 시작",
-    "uploadDate": "{{year}}년 {{month}}월 {{day}}일 업로드: {{count}}장",
+    "uploadDate": "{{year}}년 {{month}}월 {{day}}일 업로드: {{count, number}}장",
     "batchSize": "배치 크기",
     "batchSizeDesc": "한 세션에 학습할 카드 수 ({{min}}~{{max}})",
     "batchSizeDescReview": "복습할 카드 수 — 새 카드는 모두 포함 ({{min}}~{{max}})",
@@ -50,10 +50,10 @@
   },
   "setup": {
     "title": "학습 설정",
-    "deckInfo": "{{icon}} {{name}} · {{count}}장",
+    "deckInfo": "{{icon}} {{name}} · {{count, number}}장",
     "studyMode": "학습 모드",
     "selectUploadDate": "업로드 날짜 선택",
-    "uploadDate": "{{year}}년 {{month}}월 {{day}}일 업로드: {{count}}장"
+    "uploadDate": "{{year}}년 {{month}}월 {{day}}일 업로드: {{count, number}}장"
   },
   "session": {
     "loading": "로딩 중...",
@@ -131,12 +131,12 @@
   },
   "interval": {
     "lessThanTenMin": "< 10분",
-    "minutes": "{{count}}분",
-    "hours": "{{count}}시간",
+    "minutes": "{{count, number}}분",
+    "hours": "{{count, number}}시간",
     "oneDay": "1일",
-    "days": "{{count}}일",
-    "months": "{{count}}개월",
-    "years": "{{count}}년"
+    "days": "{{count, number}}일",
+    "months": "{{count, number}}개월",
+    "years": "{{count, number}}년"
   },
   "srsRating": {
     "again": "다시",
@@ -161,7 +161,7 @@
     "timeLimit": {
       "title": "시간 제한",
       "none": "제한 없음",
-      "minutes": "{{count}}분"
+      "minutes": "{{count, number}}분"
     },
     "shuffle": {
       "title": "카드 섞기",
@@ -175,7 +175,7 @@
       "masteryRate": "마스터율",
       "cardsStudied": "학습 카드 수",
       "hardestCards": "가장 어려운 카드",
-      "missedTimes": "{{count}}회 틀림",
+      "missedTimes": "{{count, number}}회 틀림",
       "noSrsImpact": "이 세션은 SRS 일정에 영향을 주지 않았습니다.",
       "sessionEnded": "세션 종료",
       "crammingAgain": "다시 벼락치기",

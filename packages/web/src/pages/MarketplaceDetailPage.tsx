@@ -63,6 +63,10 @@ export function MarketplaceDetailPage() {
   useEffect(() => { void useDeckStore.getState().fetchCardUsage() }, [])
 
   const [listing, setListing] = useState<MarketplaceListing | null>(null)
+  // Whether THIS deck is an official-certified deck (in official_deck_manifest) — the
+  // real cap-exclusion signal. NOT the publisher's is_official badge: a badge-granted
+  // publisher's own non-manifest deck DOES count toward the limit (mig 118).
+  const [isOfficialDeck, setIsOfficialDeck] = useState(false)
   const [previewCards, setPreviewCards] = useState<Card[]>([])
   const [previewSampleFields, setPreviewSampleFields] = useState<
     PublicListingPreview['sample_fields']
@@ -82,26 +86,12 @@ export function MarketplaceDetailPage() {
     const fetchData = async () => {
       setLoading(true)
 
-      // Try fetching with owner profile join
+      // owner_display_name / owner_is_official are denormalized onto the row (mig 054),
+      // so a plain select returns them — no profiles join is needed. The old
+      // `profiles!marketplace_listings_owner_id_fkey(...)` embed 400'd on every load
+      // (that FK targets auth.users, not public.profiles) and always fell through here.
       let typedListing: MarketplaceListing | null = null
-      const { data: listingData } = await supabase
-        .from('marketplace_listings')
-        .select('*, profiles!marketplace_listings_owner_id_fkey(display_name, is_official)')
-        .eq('id', listingId)
-        .single()
-
-      if (listingData) {
-        const profile = (listingData as Record<string, unknown>).profiles as
-          | { display_name: string | null; is_official: boolean }
-          | null
-        typedListing = {
-          ...listingData,
-          profiles: undefined,
-          owner_display_name: profile?.display_name ?? null,
-          owner_is_official: profile?.is_official ?? false,
-        } as MarketplaceListing
-      } else {
-        // Fallback without join
+      {
         const { data: fallbackData } = await supabase
           .from('marketplace_listings')
           .select('*')
@@ -116,6 +106,15 @@ export function MarketplaceDetailPage() {
       }
 
       setListing(typedListing)
+
+      // Cap-exclusion is per-DECK (official_deck_manifest membership), not the
+      // publisher's is_official flag. Manifest has a public read policy.
+      const { data: manifestRow } = await supabase
+        .from('official_deck_manifest')
+        .select('deck_id')
+        .eq('deck_id', typedListing.deck_id)
+        .maybeSingle()
+      setIsOfficialDeck(!!manifestRow)
 
       // Card preview — try public RPC first (works for everyone via SECURITY
       // DEFINER), then fall back to direct `cards` query (only succeeds for the
@@ -252,7 +251,7 @@ export function MarketplaceDetailPage() {
 
   const isOwner = user?.id === listing.owner_id
   // Non-official acquisitions count toward the 1000-card cap (mig 118); official decks don't.
-  const countsTowardLimit = !listing.owner_is_official
+  const countsTowardLimit = !isOfficialDeck
   const wouldExceed = countsTowardLimit && limit.exceeds(listing.card_count)
   const displayFields = template?.fields ?? []
 

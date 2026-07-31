@@ -1,18 +1,11 @@
 {
   "title": "AI Generate",
   "config": {
-    "model": "Model",
     "topic": "Topic",
     "topicPlaceholder": "mis., kosakata Jepang JLPT N3, garis waktu sejarah Korea",
     "cardCount": "Jumlah kartu",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
-    "customEndpoint": "Custom Endpoint",
-    "selectProvider": "Pilih penyedia",
-    "noProvidersConfigured": "Belum ada penyedia AI yang dikonfigurasi",
-    "goToSettings": "Tambahkan di Pengaturan",
-    "manageInSettings": "Kelola penyedia:",
-    "settings": "Pengaturan",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
@@ -23,7 +16,6 @@
     "targetDeck": "Deck Tujuan",
     "selectDeck": "Pilih deck...",
     "selectDeckRequired": "Silakan pilih deck untuk menambahkan kartu.",
-    "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
     "contentLang": "Content Language",
@@ -53,7 +45,12 @@
     "imageChange": "Ganti gambar",
     "imageUploadHint": "Pilih foto daftar kata, halaman buku teks, atau catatan — AI akan mengubahnya menjadi kartu.",
     "imagePaidNotice": "Pembuatan dari gambar menggunakan kredit (tidak ada tingkat gratis).",
-    "cardLimitExceeds": "Anda dapat menambahkan maksimal {{available}} kartu lagi — kurangi jumlah atau berlangganan."
+    "cardLimitExceeds": "Anda dapat menambahkan maksimal {{available}} kartu lagi — kurangi jumlah atau berlangganan.",
+    "imageAddMore": "Tambah lagi ({{count, number}}/{{max}})",
+    "imageRemove": "Hapus gambar",
+    "inputModeTopicHint": "Jelaskan topik dan AI akan membuat kartunya untukmu.",
+    "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus.",
+    "noOwnedDecks": "Kamu belum punya dek sendiri — buat dek dulu, lalu tambahkan kartu AI ke dalamnya."
   },
   "wallet": {
     "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",
@@ -61,8 +58,10 @@
     "creditsOnly": "{{credits}} kartu berbayar tersedia",
     "empty": "Kartu gratis hari ini sudah habis",
     "unknown": "Saldo tidak tersedia saat ini",
-    "balance": "Saldo ₩{{won}} (~{{cards}} kartu)",
-    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan."
+    "balance": "Saldo {{amount}}",
+    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan.",
+    "cardLimit": "{{available}} dari {{limit}} kartu tersisa",
+    "cardLimitUnlimited": "Tanpa batas kartu (admin)"
   },
   "wizard": {
     "setup": "Setup",
@@ -93,11 +92,11 @@
     "deckIcon": "Icon",
     "deckColor": "Color",
     "cardsReviewTitle": "Review Cards",
-    "cardsTitle": "{{count}} cards generated",
-    "filteredWarning": "{{count}} invalid cards were filtered out",
+    "cardsTitle": "{{count, number}} cards generated",
+    "filteredWarning": "{{count, number}} invalid cards were filtered out",
     "regenerate": "Regenerate",
     "next": "Next",
-    "save": "Save {{count}} cards",
+    "save": "Save {{count, number}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
     "removeCard": "Remove",
     "tts": {
@@ -123,7 +122,10 @@
         "hint": "Petunjuk",
         "detail": "Detail"
       }
-    }
+    },
+    "templateDesc": "AI merancang struktur kartu ini. Ganti nama bidang jika perlu, lalu lanjutkan.",
+    "deckDesc": "Tinjau nama, ikon, dan warna dek barumu, lalu lanjutkan.",
+    "cardsDesc": "Tinjau kartu yang dibuat. Edit teks, hapus yang tidak diinginkan, lalu simpan."
   },
   "done": {
     "title": "Generation Complete!",
@@ -137,17 +139,19 @@
   },
   "errors": {
     "title": "Error",
-    "noApiKey": "Please set up your AI API key first.",
-    "invalidApiKey": "Invalid API key. Please check your key.",
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
-    "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
+    "networkError": "Network error. Please check your connection and try again.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "Kesalahan server AI. Silakan coba lagi nanti.",
     "emptyResult": "AI tidak menghasilkan kartu. Silakan coba lagi — Anda tidak dikenai biaya.",
-    "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak."
+    "cardLimitReached": "Anda telah mencapai batas kartu. Hapus kartu atau berlangganan untuk menyimpan lebih banyak.",
+    "insufficientCredits": "Anda telah menggunakan kartu AI gratis hari ini dan tidak memiliki kredit tersisa. Isi ulang untuk terus membuat kartu.",
+    "invalidImage": "Tidak dapat membaca gambar tersebut. Silakan coba foto yang lebih kecil atau lebih jelas.",
+    "quotaExceeded": "Anda telah mencapai batas pembuatan AI gratis hari ini. Silakan coba lagi besok.",
+    "deckNotOwned": "Dek itu tidak bisa menerima kartu baru. Pilih dek milikmu sendiri."
   },
   "button": {
     "aiGenerate": "AI Generate",

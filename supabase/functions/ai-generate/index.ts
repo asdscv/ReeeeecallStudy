@@ -23,6 +23,8 @@ import {
   type GeneratedTemplateField,
 } from '../_shared/ai-prompts.ts'
 import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
+import { opsGate } from '../_shared/ops-gate.ts'
+import { buildRemediationPrompt, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
 // see _shared/ai-providers.ts. Switching provider/model needs no code change.
@@ -38,6 +40,7 @@ const MAX_EXISTING_CARDS_BYTES = 8000      // cap dedup payload size (L2)
 const PROVIDER_RETRY_DELAYS = [2000, 8000] // ms; per-minute provider rate limits
 const PROVIDER_TIMEOUT_MS = 30000          // abort a hung provider call (L1)
 const MAX_IMAGE_BYTES = 7_000_000          // ~5MB image as a base64 data URL (vision)
+const MAX_IMAGES = 8                        // cap images per generation (context + payload)
 
 // ── CORS (origin allowlist; mirror tts) ─────────────────────
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
@@ -156,11 +159,15 @@ const sumUsage = (a: TokenUsage | null, b: TokenUsage | null): TokenUsage | null
     ? { prompt_tokens: a.prompt_tokens + b.prompt_tokens, completion_tokens: a.completion_tokens + b.completion_tokens }
     : null
 
-async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<ProviderResult> {
-  // Vision: the OpenAI-compatible shape carries the image in the user message
-  // as a content array. Plain text uses a string.
-  const userContent = imageUrl
-    ? [{ type: 'text', text: userPrompt }, { type: 'image_url', image_url: { url: imageUrl } }]
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<ProviderResult> {
+  // Vision: the OpenAI-compatible shape carries the image(s) in the user message
+  // as a content array — one text part plus one image_url part per image (the API
+  // accepts multiple images in a single message). Plain text uses a string.
+  const userContent = imageUrls && imageUrls.length
+    ? [
+        { type: 'text', text: userPrompt },
+        ...imageUrls.map((url) => ({ type: 'image_url', image_url: { url } })),
+      ]
     : userPrompt
   const body = {
     model: m.model,
@@ -223,14 +230,14 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 
 // Returns parsed JSON + token usage; one stricter-prompt retry on unparseable
 // output (mirrors callAI). On retry we paid for BOTH calls → SUM the usage.
-async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrl?: string): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
-  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrl)
+async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
+  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls)
   try {
     return { json: JSON.parse(stripMarkdownFences(a.content)), usage: a.usage }
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const b = await providerRequest(m, strict, userPrompt, imageUrl)
+    const b = await providerRequest(m, strict, userPrompt, imageUrls)
     return { json: JSON.parse(stripMarkdownFences(b.content)), usage: sumUsage(a.usage, b.usage) }
   }
 }
@@ -331,6 +338,21 @@ function asImage(v: unknown): string | null {
   return v
 }
 
+// Validate an image payload that may be a single `image` string or an `images` array
+// (multi-photo upload). Every item must pass asImage; the list is capped at MAX_IMAGES.
+// Returns null when nothing valid is present or any item is invalid (fail-closed).
+function asImages(images: unknown, image: unknown): string[] | null {
+  const raw = Array.isArray(images) ? images : image != null ? [image] : []
+  if (raw.length === 0 || raw.length > MAX_IMAGES) return null
+  const out: string[] = []
+  for (const it of raw) {
+    const v = asImage(it)
+    if (!v) return null
+    out.push(v)
+  }
+  return out
+}
+
 // ── Handler ─────────────────────────────────────────────────
 Deno.serve(async (req) => {
   const cors = corsHeadersFor(req.headers.get('Origin'))
@@ -343,11 +365,17 @@ Deno.serve(async (req) => {
     const userId = await verifyUser(authHeader)
     if (!userId) return json({ error: 'Unauthorized' }, 401, cors)
 
+    // Ops gate (mig 153): maintenance / AI kill switch / ban / burst rate limit.
+    const gate = await opsGate(sbServiceRole(), {
+      userId, requireAI: true, rateKey: `aigen:${userId}`, rateLimit: 20, rateWindowSec: 60,
+    })
+    if (gate) return json({ error: gate.message, code: gate.code }, gate.status, cors)
+
     const body = await req.json().catch(() => null) as Record<string, any> | null
     if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
 
     const kind = body.kind
-    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck') {
+    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck' && kind !== 'remediation') {
       return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
     }
     const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
@@ -366,10 +394,134 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader! } } },
     )
 
+    // ── Structured learning remediation — always paid, user-specific preview ──
+    if (kind === 'remediation') {
+      const refs = parseRemediationRefs(body)
+      if (!refs) return json({ error: 'Invalid remediation references', code: 'BAD_REQUEST' }, 400, cors)
+
+      const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_remediation', {
+        p_action: refs.action,
+        p_goal_id: refs.goalId,
+        p_activity_id: refs.activityId,
+        p_attempt_id: refs.attemptId,
+        p_card_ids: refs.cardIds,
+        p_concept_ids: refs.conceptIds,
+      })
+      if (reserveError) {
+        if (reserveError.code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+        if (reserveError.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+        if (reserveError.code === '42501') return json({ error: 'Learning reference not accessible', code: 'FORBIDDEN' }, 403, cors)
+        console.error('[ai-generate] remediation reserve error:', reserveError.message)
+        return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const meter = (reserveRaw ?? {}) as { job_ref?: string }
+      const service = sbServiceRole()
+
+      try {
+        const [goalResult, activityResult, attemptResult, cardsResult, conceptsResult] = await Promise.all([
+          refs.goalId ? service.from('learning_goals').select('id, domain_id, title, target, settings').eq('id', refs.goalId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.activityId ? service.from('learning_activities').select('id, title, instructions, stimulus, expected_response, rubric, config, source_id, concept_id').eq('id', refs.activityId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.attemptId ? service.from('answer_attempts').select('id, card_id, activity_type, response_type, evaluator_type, response, normalized_score, evaluator_result, feedback, hints_used, duration_ms, created_at').eq('id', refs.attemptId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
+          refs.cardIds.length ? service.from('cards').select('id, field_values, tags').in('id', refs.cardIds) : Promise.resolve({ data: [], error: null }),
+          refs.conceptIds.length ? service.from('learning_concepts').select('id, domain_id, title, description, source_id, metadata').in('id', refs.conceptIds) : Promise.resolve({ data: [], error: null }),
+        ])
+        const contextError = [goalResult, activityResult, attemptResult, cardsResult, conceptsResult].find((item) => item.error)?.error
+        if (contextError) throw new Error(`CONTEXT_LOAD:${contextError.message}`)
+
+        const concepts = (conceptsResult.data ?? []) as Array<Record<string, unknown>>
+        const activity = activityResult.data as Record<string, unknown> | null
+        const sourceIds = [...new Set([
+          ...(typeof activity?.source_id === 'string' ? [activity.source_id] : []),
+          ...concepts.flatMap((concept) => typeof concept.source_id === 'string' ? [concept.source_id] : []),
+        ])]
+        const sourceResult = sourceIds.length
+          ? await service.from('content_sources').select('id, title, citation, metadata').in('id', sourceIds)
+          : { data: [], error: null }
+        if (sourceResult.error) throw new Error(`CONTEXT_LOAD:${sourceResult.error.message}`)
+        const sources = (sourceResult.data ?? []) as Array<{ id: string; title: string; citation: string | null; metadata?: unknown }>
+        // The failure PATTERN, not just this one failure. Scores and timestamps only, capped at
+        // 5, one indexed user-scoped query — so a learner with thousands of attempts cannot
+        // widen the prompt, and nothing the learner wrote leaves the request it belongs to.
+        // Only fetched when the request is attempt-grounded AND names a card: without a card
+        // there is no "same item" to build a history for.
+        // Keyed on the card the ATTEMPT is on — not the card the request happens to name. Those
+        // can differ (mig 178 rejects that pair, but only later, at the write), and a history
+        // built from the wrong card would hand the model a "failure pattern" for another item.
+        // An attempt against an activity rather than a card has no same-card history at all.
+        const attemptCardId = (attemptResult.data as { card_id?: string | null } | null)?.card_id ?? null
+        const historyCardId = refs.attemptId ? attemptCardId : null
+        let attemptHistory: Array<{ normalized_score: number | null; created_at: string }> = []
+        if (historyCardId) {
+          const historyResult = await service
+            .from('answer_attempts')
+            .select('normalized_score, created_at')
+            .eq('user_id', userId)
+            .eq('card_id', historyCardId)
+            .order('created_at', { ascending: false })
+            .limit(5)
+          // A missing history must not fail a paid request the learner already reserved credits
+          // for: it is context, not a precondition. Log and continue with an empty list.
+          if (historyResult.error) console.error('[ai-generate] attempt history read failed:', historyResult.error.message)
+          else attemptHistory = (historyResult.data ?? []) as Array<{ normalized_score: number | null; created_at: string }>
+        }
+        // `buildRemediationPrompt` serializes this whole object and TRUNCATES at 64KB, so key
+        // order decides what survives. attemptHistory sits next to the attempt it belongs to
+        // rather than last: `sources` carries arbitrary metadata and can be large, and the
+        // evidence a grounded request was paid for must not be the first thing cut.
+        const context = {
+          goal: goalResult.data,
+          activity: activityResult.data,
+          attempt: attemptResult.data,
+          attemptHistory,
+          cards: cardsResult.data ?? [],
+          concepts,
+          sources,
+        }
+        const prompt = buildRemediationPrompt(refs, context)
+        if (prompt.requireGrounding && sources.length === 0) throw new Error('GROUNDING_SOURCE_REQUIRED')
+
+        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+        const validated = validateRemediationResult(generated.json, refs, sources.map((source) => source.id), prompt.requireGrounding)
+        if (!validated.valid) throw new Error(`INVALID_REMEDIATION:${validated.reason}`)
+
+        const { data: enrichmentId, error: persistenceError } = await service.rpc('persist_ai_remediation', {
+          p_user_id: userId,
+          p_action: refs.action,
+          p_content: validated.content,
+          p_source_refs: validated.sourceIds,
+          p_goal_id: refs.goalId,
+          p_concept_id: refs.conceptIds[0] ?? null,
+          p_card_id: refs.cardIds[0] ?? null,
+          p_activity_id: refs.activityId,
+          p_request_fingerprint: JSON.stringify(refs).slice(0, 128),
+          p_model_version: model.model,
+          p_provider: model.provider,
+          p_prompt_version: 'remediation-v2',
+          // Provenance (mig 178). `request_fingerprint` is a 128-char truncation and cannot be
+          // relied on to say which failure this answer was about.
+          p_attempt_id: refs.attemptId,
+        })
+        if (persistenceError || typeof enrichmentId !== 'string') throw new Error(`PERSISTENCE:${persistenceError?.message ?? 'missing id'}`)
+
+        const charge = await chargeGeneration(userId, meter.job_ref, model, generated.usage)
+        return json({ content: validated.content, enrichmentId, balance: charge?.balance ?? null }, 200, cors)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'UNKNOWN'
+        console.error('[ai-generate] remediation failure:', message)
+        await releaseJob(userId, meter.job_ref)
+        const status = message.startsWith('CONTEXT_LOAD') || message === 'GROUNDING_SOURCE_REQUIRED' ? 400 : 502
+        const code = message === 'GROUNDING_SOURCE_REQUIRED' ? 'AI_GROUNDING_REQUIRED'
+          : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
+          : message.startsWith('INVALID_REMEDIATION:') ? 'AI_INVALID_RESULT'
+          : 'AI_PROVIDER_ERROR'
+        return json({ error: 'Remediation failed', code }, status, cors)
+      }
+    }
+
     // ── Image recognition (vision) — ALWAYS paid, separate metering ──
     if (kind === 'image') {
-      const image = asImage(body.image)
-      if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
+      const images = asImages(body.images, body.image)
+      if (!images) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
       const fields = asFields(body.fields)
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
       // Image mode: the MODEL decides how many cards to make from what's actually in
@@ -400,7 +552,7 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
-        const { json: content, usage } = await generate(model, iSys, iUser, image)
+        const { json: content, usage } = await generate(model, iSys, iUser, images)
         if (!resultHasItems(content)) {   // empty vision result → refund, don't charge
           console.error('[ai-generate] image empty result — releasing job', imgMeter.job_ref)
           await releaseJob(userId, imgMeter.job_ref)
@@ -422,8 +574,8 @@ Deno.serve(async (req) => {
     // ALWAYS paid (same metering as image cards). One vision call returns the whole
     // deck; the client reviews + saves it (createDeck + template + cards).
     if (kind === 'image_deck') {
-      const image = asImage(body.image)
-      if (!image) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
+      const images = asImages(body.images, body.image)
+      if (!images) return json({ error: 'Invalid image', code: 'BAD_REQUEST' }, 400, cors)
 
       // Owned-card limit (mig 116): fail fast if the account is already at the cap
       // (there's no room for even one generated card).
@@ -448,7 +600,7 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: dSys, userPrompt: dUser } = buildImageDeckPrompt(uiLang)
       try {
-        const { json: content, usage } = await generate(model, dSys, dUser, image)
+        const { json: content, usage } = await generate(model, dSys, dUser, images)
         if (!resultHasItems(content)) {   // empty deck result → refund, don't charge
           console.error('[ai-generate] image_deck empty result — releasing job', idMeter.job_ref)
           await releaseJob(userId, idMeter.job_ref)

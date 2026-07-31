@@ -11,6 +11,7 @@
     "admin": "Quản trị",
     "guide": "Hướng dẫn",
     "aiGenerate": "AI Generate",
+    "learningPlan": "Kế hoạch học",
     "achievements": "Thành tích",
     "publisherStats": "Thống kê nhà xuất bản",
     "wallet": "Ví"
@@ -45,7 +46,7 @@
   },
   "units": {
     "cards": "thẻ",
-    "cardsSuffix": "{{count}} thẻ",
+    "cardsSuffix": "{{count, number}} thẻ",
     "sessions": "phiên",
     "days": "ngày",
     "hours": "giờ",
@@ -257,5 +258,8 @@
       "6",
       ""
     ]
+  },
+  "shares": {
+    "title": "Chia sẻ của tôi"
   }
 }

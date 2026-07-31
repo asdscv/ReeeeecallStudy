@@ -8,17 +8,11 @@
   "autoSaved": "已自动保存",
   "links": {
     "userGuide": "用户指南",
-    "userGuideDesc": "功能说明、学习技巧、分享方法",
-    "apiDocs": "API 文档",
-    "apiDocsDesc": "API 端点、认证、使用示例"
+    "userGuideDesc": "功能说明、学习技巧、分享方法"
   },
   "guide": {
     "title": "用户指南",
     "desc": "功能说明、学习技巧、分享方法"
-  },
-  "apiDocs": {
-    "title": "API 文档",
-    "desc": "API 端点、认证、使用示例"
   },
   "profile": {
     "title": "个人资料",
@@ -147,8 +141,8 @@
     "upgrade": "升级（即将推出）",
     "upgradeSoon": "订阅即将推出。",
     "unlimited": "无限",
-    "countUnlimited": "{{owned}} / 无限",
-    "planNoteUnlimited": "您的方案可无限存储卡片。",
+    "countUnlimited": "{{owned}} · 无上限",
+    "planNoteUnlimited": "管理员账号 — 卡片存储数量不受限制。",
     "detail": {
       "title": "卡片存储",
       "subtitle": "拥有和订阅的卡片都计入方案上限。官方卡组不计入。",
@@ -158,15 +152,15 @@
       "officialNote": "不计入上限",
       "archived": "已归档",
       "archivedNote": "学习已锁定",
-      "archivedCount": "已归档 {{count}} 张",
-      "remaining": "剩余 {{count}} 张",
+      "archivedCount": "已归档 {{count, number}} 张",
+      "remaining": "剩余 {{count, number}} 张",
       "percentUsed": "已用 {{percent}}%",
       "nearLimit": "接近上限",
       "atLimit": "已达上限",
-      "planUnlimited": "无限方案",
+      "planUnlimited": "管理员账号",
       "planCards": "{{limit}} 张方案",
-      "unlimitedTitle": "无限存储",
-      "lifetimeTotal": "{{count}} 张"
+      "unlimitedTitle": "无卡片数量上限",
+      "lifetimeTotal": "{{count, number}} 张"
     }
   },
   "groups": {
@@ -176,5 +170,20 @@
     "preferences": "偏好设置",
     "data": "数据"
   },
-  "subtitle": "管理你的账户、额度和学习偏好。"
+  "subtitle": "管理你的账户、额度和学习偏好。",
+  "privacy": {
+    "title": "Privacy & data",
+    "analyticsTitle": "Usage analytics",
+    "analyticsHint": "Help improve the app with anonymous usage data",
+    "trackingOn": "Allowed",
+    "trackingOff": "Off",
+    "deleteAccount": "Delete my account",
+    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirmBtn": "Delete permanently",
+    "cancel": "Cancel",
+    "deleteFailed": "Could not delete your account. Please try again."
+  },
+  "subscription": {
+    "title": "订阅"
+  }
 }

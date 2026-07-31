@@ -119,7 +119,7 @@
       "good": "ดี",
       "easy": "ง่าย"
     },
-    "periodDay": "{{count}} วัน",
+    "periodDay": "{{count, number}} วัน",
     "minuteShort": "{{value}} นาที"
   },
   "market": {
@@ -233,7 +233,43 @@
     "totalAiSpent": "ใช้ไปทั้งหมด",
     "activeWallets": "ผู้ใช้ที่มีเครดิต",
     "aiCardsToday": "การ์ด AI วันนี้",
-    "aiCardsTodayBreakdown": "ฟรี {{free}} · จ่าย {{paid}}"
+    "aiCardsTodayBreakdown": "ฟรี {{free}} · จ่าย {{paid}}",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓",
+      "sandboxGrants": "อนุญาตให้การซื้อในแซนด์บ็อกซ์ให้เครดิต",
+      "sandboxGrantsHint": "ปิด: อีเวนต์แซนด์บ็อกซ์ของ RevenueCat จะถูกรับไว้แต่ไม่ให้อะไรเลย เปิดเฉพาะตอนทดสอบ — การซื้อในแซนด์บ็อกซ์ไม่มีค่าใช้จ่าย"
+    },
+    "levers": {
+      "title": "ตัวปรับการเติบโต",
+      "desc": "มีผลทันทีโดยไม่ต้องดีพลอยใหม่ แต่ละช่องบันทึกแยกกัน",
+      "freeQuota": "จำนวนการ์ด AI ฟรีต่อวัน",
+      "freeQuotaHint": "การ์ดฟรีต่อผู้ใช้ต่อวัน แอปจะใช้ค่านี้จากเซิร์ฟเวอร์",
+      "cardCap": "เพดานจำนวนการ์ดต่อบัญชี",
+      "cardCapHint": "เกินจำนวนนี้จะไม่สามารถสร้างหรือบันทึกการ์ดได้",
+      "countOfficial": "นับการ์ดจากชุดอย่างเป็นทางการในเพดานด้วย",
+      "countOfficialHint": "เปิด: การ์ดจากชุดอย่างเป็นทางการที่สมัครไว้จะถูกนับด้วย",
+      "wonPerCredit": "ราคาต่อเครดิต",
+      "wonPerCreditHint": "ต้องตรงกับราคา IAP / แพ็กเครดิต",
+      "targetMargin": "มาร์จิ้นเป้าหมาย (bps)",
+      "targetMarginHint": "ปัจจุบัน {{pct}} ค่านี้เป็นตัวหารในสูตรคิดเงิน จึงไม่อนุญาต 10000 (=100%)",
+      "errRange": "กรอกจำนวนเต็มระหว่าง {{min}} ถึง {{max}}",
+      "errNonNegative": "กรอกจำนวนเต็มตั้งแต่ 0 ขึ้นไป",
+      "errMargin": "มาร์จิ้นต้องไม่เกิน {{max}} bps ค่า 10000 (=100%) จะทำให้สูตรหารด้วยศูนย์และไม่คิดเงินเลย",
+      "updated": "แก้ไขล่าสุด — ราคา/โควตา: {{ai}} · เพดานการ์ด: {{cards}}"
+    }
   },
   "billing": {
     "title": "การจัดการการเรียกเก็บเงิน",
@@ -304,7 +340,8 @@
       "status": "สถานะ",
       "paidAt": "ชำระเมื่อ",
       "empty": "ไม่พบการชำระเงิน",
-      "actions": "การดำเนินการ"
+      "actions": "การดำเนินการ",
+      "loadedCount": "โหลดแล้ว {{total}} รายการ"
     },
     "user": {
       "title": "ค้นหาผู้ใช้",
@@ -327,16 +364,17 @@
       "confirmGrantTitle": "มอบการสมัครสมาชิก",
       "confirmGrant": "มอบ \"{{product}}\" ให้ผู้ใช้นี้หรือไม่",
       "adjustWallet": "ปรับกระเป๋าเงิน",
-      "adjustAmount": "จำนวนเงิน (₩, + เพิ่ม / − เรียกคืน)",
+      "adjustAmount": "จำนวนเงิน ($, + เพิ่ม / − เรียกคืน)",
       "adjustReason": "เหตุผล",
       "adjustSubmit": "ใช้",
       "confirmAdjustTitle": "ปรับกระเป๋าเงิน",
-      "confirmAdjust": "ปรับกระเป๋าเงินของผู้ใช้นี้ ₩{{amount}} หรือไม่"
+      "confirmAdjust": "ปรับกระเป๋าเงินของผู้ใช้นี้ ${{amount}} หรือไม่"
     },
     "pagination": {
       "page": "หน้า {{page}}",
       "prev": "ก่อนหน้า",
-      "next": "ถัดไป"
+      "next": "ถัดไป",
+      "loadMore": "โหลดเพิ่ม"
     },
     "actionError": "การดำเนินการล้มเหลว: {{error}}",
     "refund": {
@@ -344,7 +382,53 @@
       "confirmTitle": "ยืนยันการคืนเงิน?",
       "confirmCreditPack": "คืนเงิน {{amount}} ให้ {{email}} หรือไม่? เงินจะถูกคืนเข้าบัตรของลูกค้า",
       "confirmSubscription": "คืนเงินการเรียกเก็บล่าสุดของการสมัครสมาชิกนี้ให้ {{email}} และเพิกถอนสิทธิ์การเข้าถึงหรือไม่?",
-      "realMoneyNote": "การดำเนินการนี้จะเรียกใช้ผู้ให้บริการชำระเงินและโอนเงินจริง ไม่สามารถย้อนกลับได้ที่นี่"
+      "realMoneyNote": "การดำเนินการนี้จะเรียกใช้ผู้ให้บริการชำระเงินและโอนเงินจริง ไม่สามารถย้อนกลับได้ที่นี่",
+      "confirmRevokeTitle": "เพิกถอนสิทธิ์ใช่ไหม",
+      "buttonRevokeOnly": "เพิกถอนสิทธิ์",
+      "revokeOnlyIosNote": "ไม่มีการโอนเงิน เป็นเพียงการเพิกถอนสิทธิ์ — Apple เป็นผู้คืนเงิน App Store แนะนำให้ลูกค้าขอคืนเงินกับ Apple หรืออนุมัติใน App Store Connect",
+      "revokeOnlyUnknownNote": "ไม่มีการโอนเงิน รายการนี้ไม่ได้บันทึกสโตร์ไว้ จึงอาจเป็นการซื้อผ่าน App Store — เพิกถอนเฉพาะสิทธิ์ ตรวจสอบสโตร์ก่อนรับปากเรื่องคืนเงิน",
+      "revokeOnlyHint": "เฉพาะสิทธิ์ — การคืนเงินของช่องทางนี้ดำเนินการโดยสโตร์ ไม่ใช่เรา",
+      "policyEligible": "นโยบาย: คืนเงินได้ (ภายใน {{days}} วันและยังไม่ได้ใช้)",
+      "policyIneligible": "นโยบาย: คืนเงินไม่ได้ — {{reason}}",
+      "consentMissing": "การซื้อนี้ไม่มีบันทึกการแจ้งสิทธิ์ยกเลิก การอ้าง \"ใช้ไปแล้ว\" เพื่อปฏิเสธจึงมีน้ำหนักน้อย",
+      "statutoryOverride": "สิทธิ์ยกเลิกตามกฎหมาย (เกาหลี 7 วัน / EU-UK 14 วัน) อาจยังบังคับให้ต้องคืนเงิน",
+      "resultRefunded": "คืนเงินแล้ว — เงินถูกคืนและเพิกถอนสิทธิ์เรียบร้อย",
+      "resultRevokedOnly": "เพิกถอนสิทธิ์แล้ว การทำรายการนี้ไม่มีการโอนเงิน",
+      "reason": {
+        "eligible": "คืนเงินได้",
+        "not_found": "ไม่พบรายการ",
+        "not_paid": "การชำระเงินไม่เคยสำเร็จ",
+        "already_refunded": "คืนเงินแล้ว",
+        "outside_window": "เกินระยะเวลาคืนเงิน",
+        "already_used": "ใช้ไปแล้ว",
+        "renewal_charge": "ค่าต่ออายุ (อยู่นอกขอบเขตนโยบาย)"
+      }
+    },
+    "channel": {
+      "column": "ช่องทาง",
+      "web_lemonsqueezy": "เว็บ · Lemon Squeezy",
+      "web_toss": "เว็บ · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "มือถือ · ไม่ทราบสโตร์",
+      "admin": "ผู้ดูแลมอบให้",
+      "paymentsHint": "การชำระเงินผ่านเว็บและ Google Play คืนเงินได้ที่นี่ ส่วน App Store ทำได้เพียงเพิกถอนสิทธิ์ — Apple เป็นผู้คืนเงิน",
+      "filter": {
+        "all": "ทั้งหมด",
+        "web": "เว็บ",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple เป็นผู้คืนเงิน App Store ที่นี่ทำได้เพียงเพิกถอนสิทธิ์",
+        "android": "คืนเงิน Google Play ได้จากที่นี่โดยตรง",
+        "mobile_unknown": "รายการนี้บันทึกก่อนมีการเก็บข้อมูลสโตร์ ถือเป็น App Store — ตรวจสอบก่อนรับปากเรื่องคืนเงิน",
+        "web_lemonsqueezy": "คืนเงินผ่าน Lemon Squeezy API ได้",
+        "web_toss": "ยกเลิกการชำระเงินผ่าน Toss API ได้",
+        "admin": "เป็นการมอบให้ฟรี ไม่เคยมีการเรียกเก็บเงิน"
+      },
+      "sandbox": "แซนด์บ็อกซ์",
+      "sandboxHint": "การซื้อทดสอบจากแซนด์บ็อกซ์ของสโตร์ — ฟรี และไม่ถูกนับเป็นรายได้"
     }
   },
   "official": {
@@ -438,7 +522,7 @@
     "colDetails": "รายละเอียด",
     "colIP": "IP",
     "pageInfo": "หน้า {{page}}",
-    "showing": "แสดง {{count}} รายการ",
+    "showing": "แสดง {{count, number}} รายการ",
     "prevPage": "ก่อนหน้า",
     "nextPage": "ถัดไป",
     "unknownAdmin": "ไม่ทราบ",
@@ -447,7 +531,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "ปิด"
   },
   "retry": "ลองอีกครั้ง",
   "noData": "ไม่มีข้อมูล",

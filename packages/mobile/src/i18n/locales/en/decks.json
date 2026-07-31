@@ -10,9 +10,9 @@
   "aiGenerate": "AI Generate",
   "detail": {
     "backToList": "Deck List",
-    "totalCards": "{{count}} cards",
-    "newCards": "{{count}} new",
-    "reviewCards": "{{count}} due",
+    "totalCards": "{{count, number}} cards",
+    "newCards": "{{count, number}} new",
+    "reviewCards": "{{count, number}} due",
     "startStudy": "Start Study",
     "edit": "Edit",
     "share": "Share",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
@@ -218,17 +218,17 @@
     "selectMode": "Select",
     "selectAll": "Select All",
     "deselectAll": "Deselect All",
-    "selectedCount": "{{count}} selected",
+    "selectedCount": "{{count, number}} selected",
     "deleteSelected": "Delete Selected",
     "deleteCardsTitle": "Delete Cards",
-    "deleteCardsConfirm": "Delete {{count}} selected cards? This cannot be undone.",
+    "deleteCardsConfirm": "Delete {{count, number}} selected cards? This cannot be undone.",
     "perPage": "Per page:",
     "prevPage": "← Prev",
     "nextPage": "Next →",
     "pageOf": "Page {{current}} of {{total}}",
-    "showingRange": "Showing {{from}}–{{to}} of {{total}} cards",
+    "showingRange": "Showing {{from, number}}–{{to, number}} of {{total, number}} cards",
     "archivedBadge": "Archived · Study locked",
-    "archivedNote": "{{count}} cards archived over your limit — you can still view them. Subscribe to study them again.",
+    "archivedNote": "{{count, number}} cards archived over your limit — you can still view them. Subscribe to study them again.",
     "archivedSubscribe": "Subscribe (coming soon)"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "Today",
     "yesterday": "Yesterday",
-    "daysAgo": "{{count}} days ago",
+    "daysAgo": "{{count, number}} days ago",
     "monthAgo": "1 month ago",
-    "monthsAgo": "{{count}} months ago"
+    "monthsAgo": "{{count, number}} months ago"
   },
   "templatesList": {
     "cannotDeleteTitle": "Cannot Delete",

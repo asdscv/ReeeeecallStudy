@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "使用履歴",
-    "empty": "まだ使用履歴がありません。"
+    "empty": "まだ使用履歴がありません。",
+    "showAll": "すべて表示（{{total}}件）",
+    "showLess": "閉じる"
   },
   "reason": {
     "purchase": "チャージ",
@@ -24,6 +26,17 @@
     "refund": "返金",
     "admin_grant": "クレジット付与",
     "spend_cards": "AIカード",
-    "spend_image": "AI画像"
+    "spend_image": "AI画像",
+    "admin_adjustment": "調整"
+  },
+  "credits": {
+    "title": "AIクレジット購入",
+    "creditLabel": "{{value}} 分のAIクレジット",
+    "confirming": "決済完了 — まもなくクレジットが反映されます。",
+    "unavailable": "現在このクレジットパックは購入できません。"
+  },
+  "consent": {
+    "creditPack": "クレジットが直ちに付与され、一度でも使用した時点でこの購入の撤回権が消滅することに同意します。",
+    "policyLink": "返金ポリシー"
   }
 }

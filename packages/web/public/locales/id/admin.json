@@ -119,7 +119,7 @@
       "good": "Baik",
       "easy": "Mudah"
     },
-    "periodDay": "{{count}}hr",
+    "periodDay": "{{count, number}}hr",
     "minuteShort": "{{value}}m"
   },
   "market": {
@@ -233,7 +233,43 @@
     "totalAiSpent": "Total Terpakai",
     "activeWallets": "Pengguna dengan Kredit",
     "aiCardsToday": "Kartu AI Hari Ini",
-    "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} berbayar"
+    "aiCardsTodayBreakdown": "{{free}} gratis · {{paid}} berbayar",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓",
+      "sandboxGrants": "Izinkan pembelian sandbox memberi kredit",
+      "sandboxGrantsHint": "OFF: event sandbox RevenueCat diterima tapi tidak memberi apa pun. Nyalakan hanya saat menguji — pembelian sandbox itu gratis."
+    },
+    "levers": {
+      "title": "Tuas pertumbuhan",
+      "desc": "Berlaku langsung, tanpa deploy ulang. Setiap kolom disimpan terpisah.",
+      "freeQuota": "Kartu AI gratis per hari",
+      "freeQuotaHint": "Kartu gratis per pengguna per hari. Klien mengikuti nilai server ini.",
+      "cardCap": "Batas kartu per akun",
+      "cardCapHint": "Membuat atau menyimpan kartu diblokir di atas angka ini.",
+      "countOfficial": "Hitung kartu dek resmi ke dalam batas",
+      "countOfficialHint": "Aktif: kartu dari dek resmi yang dilangganan juga dihitung.",
+      "wonPerCredit": "Harga per kredit",
+      "wonPerCreditHint": "Harus sama dengan harga IAP / paket kredit.",
+      "targetMargin": "Target margin (bps)",
+      "targetMarginHint": "Saat ini {{pct}}. Nilai ini pembagi dalam formula penagihan, jadi 10000 (=100%) tidak diizinkan.",
+      "errRange": "Masukkan bilangan bulat antara {{min}} dan {{max}}.",
+      "errNonNegative": "Masukkan bilangan bulat 0 atau lebih.",
+      "errMargin": "Margin maksimal {{max}} bps. 10000 (=100%) membagi formula dengan nol sehingga tidak menagih apa pun.",
+      "updated": "Terakhir diubah — harga/kuota: {{ai}} · batas kartu: {{cards}}"
+    }
   },
   "billing": {
     "title": "Manajemen Penagihan",
@@ -304,7 +340,8 @@
       "status": "Status",
       "paidAt": "Dibayar Pada",
       "empty": "Tidak ada pembayaran ditemukan.",
-      "actions": "Tindakan"
+      "actions": "Tindakan",
+      "loadedCount": "{{total}} dimuat"
     },
     "user": {
       "title": "Cari Pengguna",
@@ -327,16 +364,17 @@
       "confirmGrantTitle": "Beri langganan",
       "confirmGrant": "Beri \"{{product}}\" ke pengguna ini?",
       "adjustWallet": "Sesuaikan Dompet",
-      "adjustAmount": "Jumlah (₩, + kredit / − tarik kembali)",
+      "adjustAmount": "Jumlah ($, + kredit / − tarik kembali)",
       "adjustReason": "Alasan",
       "adjustSubmit": "Terapkan",
       "confirmAdjustTitle": "Sesuaikan dompet",
-      "confirmAdjust": "Sesuaikan dompet pengguna ini sebesar ₩{{amount}}?"
+      "confirmAdjust": "Sesuaikan dompet pengguna ini sebesar ${{amount}}?"
     },
     "pagination": {
       "page": "Halaman {{page}}",
       "prev": "Sebelumnya",
-      "next": "Berikutnya"
+      "next": "Berikutnya",
+      "loadMore": "Muat lebih banyak"
     },
     "actionError": "Tindakan gagal: {{error}}",
     "refund": {
@@ -344,7 +382,53 @@
       "confirmTitle": "Terbitkan refund?",
       "confirmCreditPack": "Refund {{amount}} ke {{email}}? Ini mengembalikan uang ke kartu pelanggan.",
       "confirmSubscription": "Refund tagihan terakhir langganan ini untuk {{email}} dan cabut akses?",
-      "realMoneyNote": "Ini memanggil penyedia pembayaran dan memindahkan uang sungguhan. Tidak dapat dibatalkan di sini."
+      "realMoneyNote": "Ini memanggil penyedia pembayaran dan memindahkan uang sungguhan. Tidak dapat dibatalkan di sini.",
+      "confirmRevokeTitle": "Cabut akses?",
+      "buttonRevokeOnly": "Cabut akses",
+      "revokeOnlyIosNote": "Tidak ada uang yang berpindah. Ini hanya mencabut akses — Apple yang menerbitkan refund App Store. Minta pelanggan mengajukan ke Apple, atau setujui di App Store Connect.",
+      "revokeOnlyUnknownNote": "Tidak ada uang yang berpindah. Toko untuk baris ini tidak tercatat sehingga bisa jadi pembelian App Store — hanya akses yang dicabut. Pastikan tokonya sebelum menjanjikan refund.",
+      "revokeOnlyHint": "Hanya akses — refund kanal ini diterbitkan oleh toko, bukan oleh kita.",
+      "policyEligible": "Kebijakan: bisa direfund (dalam {{days}} hari dan belum dipakai).",
+      "policyIneligible": "Kebijakan: tidak bisa direfund — {{reason}}.",
+      "consentMissing": "Tidak ada catatan pemberitahuan hak pembatalan untuk pembelian ini, jadi alasan \"sudah dipakai\" lemah untuk menolak.",
+      "statutoryOverride": "Hak pembatalan menurut undang-undang (KR 7 hari / UE-UK 14 hari) tetap bisa mewajibkan refund.",
+      "resultRefunded": "Refund diterbitkan — uang dikembalikan dan akses dicabut.",
+      "resultRevokedOnly": "Akses dicabut. Tindakan ini tidak memindahkan uang.",
+      "reason": {
+        "eligible": "bisa direfund",
+        "not_found": "catatan tidak ditemukan",
+        "not_paid": "pembayaran tidak pernah selesai",
+        "already_refunded": "sudah direfund",
+        "outside_window": "melewati batas waktu refund",
+        "already_used": "sudah dipakai",
+        "renewal_charge": "tagihan perpanjangan (di luar kebijakan)"
+      }
+    },
+    "channel": {
+      "column": "Kanal",
+      "web_lemonsqueezy": "Web · Lemon Squeezy",
+      "web_toss": "Web · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "Seluler · toko tidak diketahui",
+      "admin": "Pemberian admin",
+      "paymentsHint": "Pembayaran web dan Google Play bisa direfund di sini. Pembayaran App Store hanya bisa dicabut aksesnya — Apple yang menerbitkan refund-nya.",
+      "filter": {
+        "all": "Semua",
+        "web": "Web",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple yang menerbitkan refund App Store. Di sini kita hanya bisa mencabut akses.",
+        "android": "Refund Google Play bisa diterbitkan dari sini.",
+        "mobile_unknown": "Baris ini dibuat sebelum pelacakan toko ada. Diperlakukan sebagai App Store — pastikan dulu sebelum menjanjikan refund.",
+        "web_lemonsqueezy": "Bisa direfund lewat API Lemon Squeezy.",
+        "web_toss": "Bisa dibatalkan lewat API Toss.",
+        "admin": "Pemberian gratis — tidak pernah ada uang yang ditagih."
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Pembelian uji coba dari sandbox toko — gratis, dan tidak pernah dihitung sebagai pendapatan."
     }
   },
   "official": {
@@ -438,7 +522,7 @@
     "colDetails": "Detail",
     "colIP": "IP",
     "pageInfo": "Halaman {{page}}",
-    "showing": "menampilkan {{count}} entri",
+    "showing": "menampilkan {{count, number}} entri",
     "prevPage": "Sebelumnya",
     "nextPage": "Berikutnya",
     "unknownAdmin": "Tidak diketahui",
@@ -447,7 +531,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "Tutup"
   },
   "retry": "Coba Lagi",
   "noData": "Tidak ada data tersedia",

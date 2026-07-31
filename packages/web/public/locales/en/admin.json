@@ -119,7 +119,7 @@
       "good": "Good",
       "easy": "Easy"
     },
-    "periodDay": "{{count}}d",
+    "periodDay": "{{count, number}}d",
     "minuteShort": "{{value}}m"
   },
   "market": {
@@ -233,7 +233,43 @@
     "totalAiSpent": "Total Spent",
     "activeWallets": "Users with Credits",
     "aiCardsToday": "AI Cards Today",
-    "aiCardsTodayBreakdown": "{{free}} free · {{paid}} paid"
+    "aiCardsTodayBreakdown": "{{free}} free · {{paid}} paid",
+    "controls": {
+      "title": "System controls",
+      "desc": "Emergency kill switches — changes take effect immediately.",
+      "aiEnabled": "AI generation",
+      "aiHint": "Turn off instantly during a cost or abuse spike",
+      "paymentsEnabled": "Payments",
+      "paymentsHint": "Halt checkout server-side (no redeploy)",
+      "maintenance": "Maintenance mode",
+      "maintenanceHint": "Blocks AI generation & checkout (503)",
+      "on": "ON",
+      "off": "OFF",
+      "message": "Maintenance message",
+      "messagePlaceholder": "Shown to users during maintenance",
+      "save": "Save",
+      "saved": "Saved ✓",
+      "sandboxGrants": "Sandbox purchases can grant credits",
+      "sandboxGrantsHint": "OFF: RevenueCat sandbox events are acked but grant nothing. Turn ON only for a test run — sandbox purchases are free."
+    },
+    "levers": {
+      "title": "Growth levers",
+      "desc": "Applied immediately, no redeploy. Each field saves on its own.",
+      "freeQuota": "Free AI cards per day",
+      "freeQuotaHint": "Free cards per user per day. Clients follow this server value.",
+      "cardCap": "Owned-card cap per account",
+      "cardCapHint": "Creating or saving cards is blocked past this number.",
+      "countOfficial": "Count official-deck cards toward the cap",
+      "countOfficialHint": "On: cards from subscribed official decks also count.",
+      "wonPerCredit": "Price per credit",
+      "wonPerCreditHint": "Must mirror the IAP / credit-pack price.",
+      "targetMargin": "Target margin (bps)",
+      "targetMarginHint": "Currently {{pct}}. It is a divisor in the charging formula, so 10000 (=100%) is not allowed.",
+      "errRange": "Enter a whole number between {{min}} and {{max}}.",
+      "errNonNegative": "Enter a whole number of 0 or more.",
+      "errMargin": "Margin must be at most {{max}} bps. 10000 (=100%) divides the charging formula by zero, which would charge nothing.",
+      "updated": "Last changed — pricing/quota: {{ai}} · card cap: {{cards}}"
+    }
   },
   "billing": {
     "title": "Billing",
@@ -304,7 +340,8 @@
       "status": "Status",
       "paidAt": "Paid At",
       "empty": "No payments found.",
-      "actions": "Actions"
+      "actions": "Actions",
+      "loadedCount": "{{total}} loaded"
     },
     "user": {
       "title": "User Lookup",
@@ -327,16 +364,17 @@
       "confirmGrantTitle": "Grant subscription",
       "confirmGrant": "Grant \"{{product}}\" to this user?",
       "adjustWallet": "Adjust Wallet",
-      "adjustAmount": "Amount (₩, + credit / − claw-back)",
+      "adjustAmount": "Amount ($, + credit / − claw-back)",
       "adjustReason": "Reason",
       "adjustSubmit": "Apply",
       "confirmAdjustTitle": "Adjust wallet",
-      "confirmAdjust": "Adjust this user's wallet by ₩{{amount}}?"
+      "confirmAdjust": "Adjust this user's wallet by ${{amount}}?"
     },
     "pagination": {
       "page": "Page {{page}}",
       "prev": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "loadMore": "Load more"
     },
     "actionError": "Action failed: {{error}}",
     "refund": {
@@ -344,7 +382,53 @@
       "confirmTitle": "Issue refund?",
       "confirmCreditPack": "Refund {{amount}} to {{email}}? This returns the money to the customer's card.",
       "confirmSubscription": "Refund this subscription's latest charge for {{email}} and revoke access?",
-      "realMoneyNote": "This calls the payment provider and moves real money. It cannot be undone here."
+      "realMoneyNote": "This calls the payment provider and moves real money. It cannot be undone here.",
+      "confirmRevokeTitle": "Revoke access?",
+      "buttonRevokeOnly": "Revoke access",
+      "revokeOnlyIosNote": "No money moves. This only revokes access — Apple issues App Store refunds. Ask the customer to request one from Apple, or approve it in App Store Connect.",
+      "revokeOnlyUnknownNote": "No money moves. This row's store was never recorded, so it may be an App Store purchase — access is revoked only. Verify the store before promising a refund.",
+      "revokeOnlyHint": "Access only — this channel's refund is issued by the store, not by us.",
+      "policyEligible": "Policy: refundable (within {{days}} days and unused).",
+      "policyIneligible": "Policy: not refundable — {{reason}}.",
+      "consentMissing": "No withdrawal-right notice was recorded for this purchase, so \"already used\" is weak grounds to refuse.",
+      "statutoryOverride": "Statutory cooling-off rights (KR 7d / EU-UK 14d) may still require a refund.",
+      "resultRefunded": "Refund issued — the money was returned and access revoked.",
+      "resultRevokedOnly": "Access revoked. This action moved no money.",
+      "reason": {
+        "eligible": "refundable",
+        "not_found": "record not found",
+        "not_paid": "payment never settled",
+        "already_refunded": "already refunded",
+        "outside_window": "past the refund window",
+        "already_used": "already used",
+        "renewal_charge": "renewal charge (outside policy scope)"
+      }
+    },
+    "channel": {
+      "column": "Channel",
+      "web_lemonsqueezy": "Web · Lemon Squeezy",
+      "web_toss": "Web · Toss",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "Mobile · store unknown",
+      "admin": "Admin grant",
+      "paymentsHint": "Web and Google Play charges can be refunded here. App Store charges can only have access revoked — Apple issues those refunds.",
+      "filter": {
+        "all": "All",
+        "web": "Web",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "Apple issues App Store refunds. We can only revoke access.",
+        "android": "Google Play refunds can be issued from here.",
+        "mobile_unknown": "Recorded before store tracking existed. Treated as App Store — verify before promising a refund.",
+        "web_lemonsqueezy": "Refundable through the Lemon Squeezy API.",
+        "web_toss": "Cancellable through the Toss API.",
+        "admin": "Comp grant — no money was ever charged."
+      },
+      "sandbox": "SANDBOX",
+      "sandboxHint": "Test purchase from the store sandbox — free, and never counted as revenue."
     }
   },
   "official": {
@@ -438,7 +522,7 @@
     "colDetails": "Details",
     "colIP": "IP",
     "pageInfo": "Page {{page}}",
-    "showing": "showing {{count}} entries",
+    "showing": "showing {{count, number}} entries",
     "prevPage": "Previous",
     "nextPage": "Next",
     "unknownAdmin": "Unknown",
@@ -447,7 +531,8 @@
   "common": {
     "refresh": "Refresh",
     "lastUpdated": "Updated {{time}}",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "dismiss": "Dismiss"
   },
   "retry": "Retry",
   "noData": "No data available",

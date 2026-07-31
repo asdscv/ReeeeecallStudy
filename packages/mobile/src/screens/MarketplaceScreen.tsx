@@ -13,6 +13,7 @@ import {
   getTrendingListingIds,
   type MarketplaceListingData,
   type SortBy,
+  MARKETPLACE_CATEGORIES,
   SHARE_MODES,
   DATE_RANGE_OPTIONS,
   LEARNING_LANGUAGES,
@@ -25,17 +26,17 @@ import type { MarketplaceStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<MarketplaceStackParamList, 'MarketplaceHome'>
 
-// Labels resolved via i18n (`marketplace.categories.*` / `marketplace.sort.*`)
-// at render time; only value + key live here. (Previously hardcoded English.)
+// Derived from the SHARED source of truth so web/mobile stay in sync — the old
+// hardcoded list drifted and dropped 'general' (the DEFAULT category of every
+// published deck) and 'trivia', making those decks unfilterable on mobile. The
+// shared labelKeys are namespaced ('marketplace:…'); strip the prefix since this
+// screen's `t` is already bound to the marketplace namespace. 'All' is prepended.
 const CATEGORIES: { value: string; labelKey: string }[] = [
   { value: '', labelKey: 'categories.all' },
-  { value: 'language', labelKey: 'categories.language' },
-  { value: 'science', labelKey: 'categories.science' },
-  { value: 'math', labelKey: 'categories.math' },
-  { value: 'history', labelKey: 'categories.history' },
-  { value: 'programming', labelKey: 'categories.programming' },
-  { value: 'exam', labelKey: 'categories.exam' },
-  { value: 'other', labelKey: 'categories.other' },
+  ...MARKETPLACE_CATEGORIES.map((c) => ({
+    value: c.value,
+    labelKey: c.labelKey.replace('marketplace:', ''),
+  })),
 ]
 
 const SORT_OPTIONS: { value: SortBy; labelKey: string }[] = [
@@ -503,7 +504,7 @@ export function MarketplaceScreen() {
             <ListSkeleton count={5} />
           ) : error ? (
             <EmptyState
-              icon="\u26A0\uFE0F"
+              icon={'\u26A0\uFE0F'}
               title={t('loadError', { defaultValue: "Couldn't load decks" })}
               description={t('loadErrorHint', { defaultValue: 'Check your connection and try again.' })}
               actionTitle={t('common:actions.retry', { defaultValue: 'Retry' })}
@@ -511,7 +512,7 @@ export function MarketplaceScreen() {
             />
           ) : (
             <EmptyState
-              icon="\uD83C\uDFEA"
+              icon={'\uD83C\uDFEA'}
               title={t('noResults', { defaultValue: 'No decks found' })}
               description={t('noResultsHint', { defaultValue: 'Try a different search or category' })}
             />

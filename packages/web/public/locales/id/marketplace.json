@@ -24,13 +24,13 @@
     "snapshot": "Snapshot"
   },
   "listing": {
-    "cardCount": "{{count}} kartu",
-    "userCount": "{{count}} pengguna"
+    "cardCount": "{{count, number}} kartu",
+    "userCount": "{{count, number}} pengguna"
   },
   "detail": {
     "back": "← Marketplace",
-    "cardCount": "{{count}} kartu",
-    "userCount": "{{count}} pengguna",
+    "cardCount": "{{count, number}} kartu",
+    "userCount": "{{count, number}} pengguna",
     "getDeck": "Dapatkan Dek Ini",
     "importing": "Mengimpor...",
     "cardPreview": "Pratinjau Kartu (maks 10)",
@@ -43,8 +43,8 @@
     "unsubscribed": "Berhasil berhenti berlangganan",
     "unsubscribeConfirm": "Berhenti berlangganan dari dek ini? Kemajuan belajar pribadi Anda akan tetap ada di akun.",
     "unsubscribeError": "Gagal berhenti berlangganan. Silakan coba lagi.",
-    "limitUsage": "Menambah {{count}} kartu ke batas Anda · sisa {{available}}",
-    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Hapus kartu atau berlangganan.",
+    "limitUsage": "Menambah {{count, number}} kartu ke batas Anda · sisa {{available}}",
+    "limitExceeds": "Akan melebihi batas kartu ({{available}} sisa). Kosongkan ruang atau tingkatkan paket untuk menambahkannya.",
     "limitOfficialFree": "Dek resmi · tidak dihitung ke batas kartu.",
     "acquireByMode": {
       "subscribe": "Berlangganan",
@@ -63,8 +63,8 @@
     "defaultDescription": "Dek kartu kilat di ReeeeecallStudy",
     "sampleCards": "Contoh Kartu",
     "viewInMarket": "Lihat di Marketplace",
-    "cardCount": "{{count}} kartu",
-    "userCount": "{{count}} pengguna",
+    "cardCount": "{{count, number}} kartu",
+    "userCount": "{{count, number}} pengguna",
     "by": "oleh {{name}}",
     "blurredNotice": "Masuk untuk melihat semua kartu di dek ini",
     "ctaLogin": "Masuk untuk mendapatkan dek ini",
@@ -202,13 +202,13 @@
       "actions": "Tindakan"
     },
     "timeAgo": {
-      "minutesAgo": "{{count}} mnt lalu",
-      "hoursAgo": "{{count}} jam lalu",
-      "daysAgo": "{{count}} hr lalu"
+      "minutesAgo": "{{count, number}} mnt lalu",
+      "hoursAgo": "{{count, number}} jam lalu",
+      "daysAgo": "{{count, number}} hr lalu"
     }
   },
-  "reviewCount_one": "{{count}} ulasan",
-  "reviewCount_other": "{{count}} ulasan",
-  "rateStar_one": "Beri {{count}} bintang",
-  "rateStar_other": "Beri {{count}} bintang"
+  "reviewCount_one": "{{count, number}} ulasan",
+  "reviewCount_other": "{{count, number}} ulasan",
+  "rateStar_one": "Beri {{count, number}} bintang",
+  "rateStar_other": "Beri {{count, number}} bintang"
 }

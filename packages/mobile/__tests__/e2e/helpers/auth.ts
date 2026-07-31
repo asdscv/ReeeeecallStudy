@@ -123,9 +123,29 @@ async function isLoginScreenVisible(): Promise<boolean> {
  * Log in with test credentials before tests that require authentication.
  * Waits for the app to finish loading (auth guard / splash screen) before checking state.
  */
+/**
+ * A fresh install opens on the auth guard — a marketing gate whose two buttons both lead to
+ * the login form. It is not the login screen, so `isLoginScreenVisible()` does not match it,
+ * and a run that starts there used to sit on it until the timeout and then fail every
+ * assertion with "screen not found".
+ */
+async function passAuthGuardIfShown(): Promise<boolean> {
+  for (const id of ['auth-guard-login', 'auth-guard-get-started']) {
+    const el = $(`~${id}`)
+    if (await el.isDisplayed().catch(() => false)) {
+      console.log(`[auth] Auth guard shown — tapping ${id}`)
+      await el.click().catch(() => {})
+      await browser.pause(1200)
+      return true
+    }
+  }
+  return false
+}
+
 export async function loginIfNeeded() {
   // Dismiss any Android system dialogs (ANR/crash) that may block the UI
   await dismissAndroidDialogs()
+  await passAuthGuardIfShown()
 
   // Wait for the app to settle — auth loading / splash screen may take a while
   // Poll for up to 20 seconds until either login screen or main screen appears
@@ -143,6 +163,9 @@ export async function loginIfNeeded() {
       console.log(`[auth] Already logged in (found ${foundTab})`)
       return
     }
+
+    // The guard can appear a beat after launch, once the session check resolves.
+    if (await passAuthGuardIfShown()) continue
 
     loginScreenVisible = await isLoginScreenVisible()
     if (loginScreenVisible) {
@@ -169,8 +192,16 @@ export async function loginIfNeeded() {
     return
   }
 
-  const email = process.env.E2E_TEST_EMAIL || 'luke@rictax.kr'
-  const password = process.env.E2E_TEST_PASSWORD || 'qpffkwldh35!'
+  // Credentials from the environment only — they used to sit here as literal defaults,
+  // committed to the repository. Failing loudly beats silently logging in as a real account.
+  const email = process.env.E2E_TEST_EMAIL
+  const password = process.env.E2E_TEST_PASSWORD
+  if (!email || !password) {
+    throw new Error(
+      'Missing E2E_TEST_EMAIL / E2E_TEST_PASSWORD. They are no longer committed — export them ' +
+      'or put them in packages/mobile/.env.test before running the suite.',
+    )
+  }
   console.log(`[auth] Logging in as ${email}`)
 
   // Wait for login form elements to be fully ready before interacting

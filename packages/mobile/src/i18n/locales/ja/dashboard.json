@@ -18,16 +18,16 @@
     "title": "デッキ状況",
     "noDecks": "デッキがまだありません。作成しましょう！",
     "goToDecks": "デッキ管理へ",
-    "cardCount": "{{count}}枚",
-    "newCards": "新規 {{count}}",
-    "reviewCards": "復習 {{count}}",
+    "cardCount": "{{count, number}}枚",
+    "newCards": "新規 {{count, number}}",
+    "reviewCards": "復習 {{count, number}}",
     "study": "学習"
   },
   "heatmap": {
     "title": "学習ヒートマップ"
   },
   "gamification": {
-    "freezes": "{{count}} freezes left",
+    "freezes": "{{count, number}} freezes left",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,23 +42,23 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count}} cards",
-    "sessions": "Complete {{count}} sessions",
-    "time": "Study for {{count}} minutes",
-    "perfect": "Get {{count}} perfect scores",
+    "cards": "Study {{count, number}} cards",
+    "sessions": "Complete {{count, number}} sessions",
+    "time": "Study for {{count, number}} minutes",
+    "perfect": "Get {{count, number}} perfect scores",
     "completed": "完了"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count}} available",
+    "available": "{{count, number}} available",
     "motivational": "Keep going! You're doing great!"
   },
   "studyHistory": "Study History",
   "studyHistoryDesc": "View sessions, stats, and progress",
-  "streakDays": "{{count}}days",
+  "streakDays": "{{count, number}}日",
   "quickStudy": {
     "title": "クイック学習",
-    "dueToday": "今日の復習カード {{count}}枚",
+    "dueToday": "今日の復習カード {{count, number}}枚",
     "startSession": "学習を始めましょう"
   }
 }

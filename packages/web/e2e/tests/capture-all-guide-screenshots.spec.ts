@@ -2,7 +2,7 @@
  * Capture screenshots for ALL guide sections (PC + Mobile).
  * Run: npx playwright test capture-all-guide-screenshots --project=chromium
  */
-import { test, type Page } from '@playwright/test'
+import { test, type Page, type Browser } from '@playwright/test'
 
 const IMG = 'public/images/guide'
 
@@ -40,7 +40,7 @@ async function dismissSessionKick(page: Page) {
 }
 
 async function pcAndMobile(
-  browser: any,
+  browser: Browser,
   name: string,
   fn: (page: Page) => Promise<void>,
 ) {

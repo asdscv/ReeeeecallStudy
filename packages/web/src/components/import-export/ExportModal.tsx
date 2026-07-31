@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Dialog,
@@ -41,16 +41,19 @@ export function ExportModal({ open, onClose, deck, template, cards }: ExportModa
   const [isExporting, setIsExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const resetState = useCallback(() => {
+  // Reset state during render when modal opens to avoid effect-driven cascading renders
+  // Starts false so mounting with the modal already open still resets, the way the
+  // effect did on its first run.
+  const [prevOpen, setPrevOpen] = useState(false)
+  if (open && !prevOpen) {
+    setPrevOpen(open)
     setMode(hasCards ? 'cards' : 'template')
     setFormat('csv')
     setIsExporting(false)
     setError(null)
-  }, [hasCards])
-
-  useEffect(() => {
-    if (open) resetState()
-  }, [open, resetState])
+  } else if (open !== prevOpen) {
+    setPrevOpen(open)
+  }
 
   const handleExport = () => {
     if (isExporting || !template) return

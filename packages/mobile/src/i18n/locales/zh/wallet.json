@@ -16,7 +16,9 @@
   },
   "history": {
     "title": "使用记录",
-    "empty": "暂无使用记录。"
+    "empty": "暂无使用记录。",
+    "showAll": "查看全部 {{total}} 条",
+    "showLess": "收起"
   },
   "reason": {
     "purchase": "充值",
@@ -24,6 +26,17 @@
     "refund": "退款",
     "admin_grant": "额度发放",
     "spend_cards": "AI 卡片",
-    "spend_image": "AI 图片"
+    "spend_image": "AI 图片",
+    "admin_adjustment": "调整"
+  },
+  "credits": {
+    "title": "购买 AI 额度",
+    "creditLabel": "{{value}} AI 额度",
+    "confirming": "支付完成 — 额度即将到账。",
+    "unavailable": "此额度包暂时无法购买。"
+  },
+  "consent": {
+    "creditPack": "我同意点数将立即发放，且一旦使用任何点数，即失去本次购买的撤回权。",
+    "policyLink": "退款政策"
   }
 }

@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "Atur penyedia AI untuk membuat kartu. Kunci dienkripsi di server dan disinkronkan antar perangkat.",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "Kunci API dienkripsi di server (pgcrypto + Vault, tidak pernah teks biasa) dan disinkronkan antara web dan seluler.",
-    "configured": "Terkonfigurasi",
-    "notSet": "Belum diatur",
-    "model": "Model",
-    "saving": "Menyimpan...",
-    "delete": "Hapus",
-    "deletedTitle": "Terhapus",
-    "saveSuccess": "Kunci API {{provider}} tersimpan.",
-    "saveError": "Gagal menyimpan kunci API.",
-    "removed": "Kunci API {{provider}} dihapus."
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -80,13 +60,13 @@
     "permissionTitle": "Izin diperlukan"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "Langganan",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "Paket Gratis",
+    "proDesc": "Semua fitur premium terbuka",
+    "freeDesc": "Tingkatkan untuk lebih banyak kartu",
+    "upgradeToPro": "Tingkatkan ke Pro",
+    "manageSubscription": "Kelola Langganan"
   },
   "legal": {
     "title": "Legal",
@@ -103,15 +83,11 @@
   },
   "links": {
     "userGuide": "Panduan Pengguna",
-    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi",
-    "apiDocs": "Dokumentasi API",
-    "apiDocsDesc": "Endpoint API, autentikasi, contoh penggunaan"
+    "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi"
   },
   "quickActions": {
-    "quickStudy": "Belajar cepat",
-    "aiGenerate": "Buat dgn AI",
     "invite": "Undang",
-    "shareMessage": "Coba ReeeeecallStudy — aplikasi kartu flash tercerdas! https://reeeeecall.com"
+    "shareMessage": "Coba ReeeeecallStudy — aplikasi kartu flash tercerdas! https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "Templat kartu",
@@ -140,13 +116,6 @@
     "dark": "Gelap",
     "system": "Sistem"
   },
-  "export": {
-    "title": "Ekspor data saya",
-    "stats": "Statistik belajar",
-    "sessions": "Sesi belajar",
-    "decks": "Dek",
-    "cards": "Kartu"
-  },
   "alerts": {
     "error": "Galat"
   },
@@ -167,8 +136,8 @@
     "upgrade": "Tingkatkan (segera hadir)",
     "upgradeSoon": "Langganan akan segera hadir.",
     "cancelPending": "Langganan akan berakhir — akses hingga {{date}}",
-    "countUnlimited": "{{owned}} / Tak terbatas",
-    "planNoteUnlimited": "Batas kartu milikmu tak terbatas.",
+    "countUnlimited": "{{owned}} · Tanpa batas",
+    "planNoteUnlimited": "Akun admin — penyimpanan kartu tidak dibatasi.",
     "detail": {
       "title": "Penyimpanan kartu",
       "subtitle": "Kartu milik dan kartu langganan dihitung dalam batas paket. Dek resmi tidak dihitung.",
@@ -178,15 +147,15 @@
       "officialNote": "Tidak dihitung dalam batas",
       "archived": "Diarsipkan",
       "archivedNote": "Belajar terkunci",
-      "archivedCount": "{{count}} diarsipkan",
-      "remaining": "{{count}} tersisa",
+      "archivedCount": "{{count, number}} diarsipkan",
+      "remaining": "{{count, number}} tersisa",
       "percentUsed": "{{percent}}% terpakai",
       "nearLimit": "Mendekati batas",
       "atLimit": "Batas tercapai",
-      "planUnlimited": "Paket tak terbatas",
+      "planUnlimited": "Akun admin",
       "planCards": "Paket {{limit}} kartu",
-      "unlimitedTitle": "Penyimpanan tak terbatas",
-      "lifetimeTotal": "{{count}} kartu"
+      "unlimitedTitle": "Tanpa batas kartu",
+      "lifetimeTotal": "{{count, number}} kartu"
     }
   },
   "groups": {
@@ -206,6 +175,23 @@
     "current": "Paket saat ini",
     "comingSoon": "Segera hadir",
     "empty": "Belum ada paket.",
-    "loadError": "Gagal memuat paket."
+    "loadError": "Gagal memuat paket.",
+    "popular": "POPULER"
+  },
+  "paymentHistory": {
+    "title": "Riwayat pembayaran",
+    "empty": "Belum ada pembayaran.",
+    "refunded": "Dikembalikan",
+    "loadMore": "Muat lebih banyak",
+    "error": "Tidak dapat memuat riwayat pembayaran Anda.",
+    "retry": "Coba lagi",
+    "kind": {
+      "credit_pack": "Kredit",
+      "subscription": "Langganan"
+    },
+    "reason": {
+      "renewal": "Perpanjangan",
+      "updated": "Ubah paket"
+    }
   }
 }

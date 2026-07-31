@@ -50,7 +50,7 @@
     "modalSubtitleDate": "날짜 선택",
     "modalSubtitleCramming": "벼락치기 옵션",
     "modalSubtitleBatch": "묶음 크기 설정",
-    "dateCardCount": "{{date}} — 카드 {{count}}장",
+    "dateCardCount": "{{date}} — 카드 {{count, number}}장",
     "backToModeSelect": "모드 선택으로 돌아가기",
     "cancel": "취소"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "시간 제한",
       "none": "제한 없음",
-      "minutes": "{{count}}분"
+      "minutes": "{{count, number}}분"
     },
     "shuffle": {
       "title": "카드 섞기"

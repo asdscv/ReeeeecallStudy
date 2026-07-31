@@ -13,7 +13,7 @@
  *   0 — clean
  *   1 — violations found
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const ROOT = join(import.meta.dirname ?? __dirname, '..')
@@ -70,4 +70,34 @@ if (violations > 0) {
   console.error(`\n${violations} architecture violation(s) found.`)
   process.exit(1)
 }
-console.log('✓ Architecture guard passed (domain layer is clean).')
+
+// ── Rule 2: the study logic has exactly one implementation ──────────────────
+// `packages/web` used to carry a byte-near-identical copy of the study engine.
+// Every change had to be mirrored by hand, and a missed mirror was invisible:
+// web tests exercised the web copy, so mobile could silently keep old behaviour.
+// P7 deleted the copy. Re-adding any of these paths — even as a re-export shim,
+// which is what split the supabase mock paths and broke 68 tests before #342 —
+// fails here.
+const SINGLE_SOURCE_ONLY = [
+  'packages/web/src/lib/srs.ts',
+  'packages/web/src/lib/study-queue.ts',
+  'packages/web/src/lib/cramming-queue.ts',
+  'packages/web/src/lib/study-session-utils.ts',
+  'packages/web/src/lib/srs-access.ts',
+  'packages/web/src/stores/study-store.ts',
+]
+
+let duplicates = 0
+for (const rel of SINGLE_SOURCE_ONLY) {
+  if (existsSync(join(ROOT, rel))) {
+    console.error(`✗ ${rel} re-appeared — study logic lives only in packages/shared`)
+    duplicates++
+  }
+}
+
+if (duplicates > 0) {
+  console.error(`\n${duplicates} duplicated study module(s) found. Import from @reeeeecall/shared instead.`)
+  process.exit(1)
+}
+
+console.log('✓ Architecture guard passed (domain layer is clean, study logic is single-source).')

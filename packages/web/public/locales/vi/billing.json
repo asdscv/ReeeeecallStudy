@@ -2,7 +2,7 @@
   "topUp": {
     "title": "Nạp thêm số dư",
     "subtitle": "Nạp số dư để tạo thẻ bằng AI vượt quá số thẻ miễn phí mỗi ngày.",
-    "credits": "Nhận ₩{{won}} số dư",
+    "credits": "Nhận {{amount}} tín dụng",
     "buy": "Mua",
     "success": "Đã nạp số dư.",
     "empty": "Không có gói nào khả dụng.",
@@ -31,7 +31,8 @@
     "unlimited": "Thẻ không giới hạn",
     "perMonth": "/tháng",
     "select": "Chọn",
-    "current": "Gói hiện tại"
+    "current": "Gói hiện tại",
+    "popular": "Phổ biến"
   },
   "paymentHistory": {
     "title": "Lịch sử thanh toán",
@@ -77,5 +78,11 @@
       "unknown_order": "Không tìm thấy đơn hàng này.",
       "already_processed": "Đơn hàng này đã được xử lý."
     }
+  },
+  "consent": {
+    "creditPack": "Tôi đồng ý rằng tín dụng được cấp ngay lập tức, và khi đã dùng bất kỳ phần nào thì tôi mất quyền rút lui khỏi giao dịch này.",
+    "subscription": "Tôi đồng ý rằng gói của tôi bắt đầu ngay lập tức, và khi đã dùng quyền lợi trả phí thì tôi mất quyền rút lui khỏi giao dịch này.",
+    "policyLink": "Chính sách hoàn tiền",
+    "required": "Vui lòng xác nhận thông báo ở trên trước khi mua."
   }
 }

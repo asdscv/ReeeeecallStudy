@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { Card, SrsSettings } from '../../types/database'
-import { previewIntervals, type SrsRating } from '../../lib/srs'
+import { previewIntervals, type SrsRating } from '@reeeeecall/shared/lib/srs'
 
 interface SrsRatingButtonsProps {
   card: Card

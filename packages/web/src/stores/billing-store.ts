@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { writeCheckoutLoadingTab } from '../lib/payments/checkout-tab'
 import { useDeckStore } from './deck-store'
 import { getAiWalletSummary, type AiWalletSummary } from '@reeeeecall/shared/lib/ai/server-client'
 import {
@@ -287,6 +288,9 @@ export const useBillingStore = create<BillingState>((set, get) => ({
       provider.redirects && typeof window !== 'undefined'
         ? window.open('about:blank', '_blank')
         : null
+    // Paint a spinner into the blank tab so the user doesn't see about:blank while the
+    // hosted checkout is created server-side (~1s). Replaced by the checkout on redirect.
+    writeCheckoutLoadingTab(checkoutTab)
 
     // 1) Server snapshots price + kind into a 'pending' intent and returns a fresh
     //    merchant_uid. The client can neither pick the price nor self-grant.
@@ -299,6 +303,21 @@ export const useBillingStore = create<BillingState>((set, get) => ({
       return
     }
     const intent = mapPaymentIntent(data as RawPaymentIntent)
+
+    // 1b) Record that the buyer was shown the withdrawal-right disclosure BEFORE paying
+    //     (mig 157). Korea's 전자상거래법 only lets us restrict withdrawal for digital
+    //     content once use has begun if that restriction was disclosed beforehand, and
+    //     the EU equivalent needs express consent to immediate performance — both are
+    //     evidentiary, so the refusal is unenforceable without a record. The checkout UI
+    //     gates the button on the checkbox; this is the server-stamped proof.
+    //     Best-effort: a logging failure must not strand a buyer mid-checkout, and the
+    //     absence of a record only weakens OUR position, never the customer's.
+    const { error: consentErr } = await supabase.rpc('record_purchase_consent', {
+      p_product_id: productId,
+      p_platform: 'web',
+      p_merchant_uid: intent.merchantUid,
+    })
+    if (consentErr) console.error('[billing] record_purchase_consent failed:', consentErr.message)
 
     // 2) Open the provider checkout with THAT merchant_uid + amount. The provider's
     //    server webhook (→ payment-webhook → confirm_payment) is what actually

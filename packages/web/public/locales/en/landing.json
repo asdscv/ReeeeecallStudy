@@ -75,7 +75,7 @@
       "Tag-based search and filtering",
       "Deck sharing & community marketplace",
       "Detailed learning statistics and analysis",
-      "External integration via API key"
+      "Personalized plans and adaptive remediation"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "Tag-based search and filtering",
     "5": "Deck sharing & community marketplace",
     "6": "Detailed learning statistics and analysis",
-    "7": "External integration via API key"
+    "7": "Personalized plans and adaptive remediation"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "Deck Sharing",
     "languages": "7 Languages",
     "allDevices": "All Devices",
-    "import": "CSV & API Import"
+    "import": "CSV & JSON Import"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
-    "apiDocs": "API Docs",
     "tagline": "Smart flashcard learning platform with spaced repetition",
     "product": "Product",
     "resources": "Resources",
@@ -251,7 +250,7 @@
   "socialProof": {
     "title": "Trusted by Learners Worldwide",
     "subtitle": "Join thousands of students studying smarter",
-    "liveActivity": "{{count}} people studying right now",
+    "liveActivity": "{{count, number}} people studying right now",
     "userCountLabel": "Active Users",
     "cardsStudiedLabel": "Cards Studied",
     "decksCreatedLabel": "Decks Created",
@@ -334,13 +333,14 @@
     "freePrice": "Free",
     "pricePerMonth": "{{price}}/mo",
     "unlimitedCards": "Unlimited cards",
-    "upToCards": "Up to {{count}} cards",
+    "upToCards": "Up to {{count, number}} cards",
     "ctaFree": "Start free",
     "ctaPaid": "Get started",
     "note": "Checkout happens after sign-up, in Settings.",
     "plans": {
       "free": "Free",
       "standard": "Standard",
+      "pro": "Pro",
       "unlimited": "Unlimited",
       "freeBlurb": "A free plan that's perfect to get started",
       "standardBlurb": "Expand your learning with more cards",

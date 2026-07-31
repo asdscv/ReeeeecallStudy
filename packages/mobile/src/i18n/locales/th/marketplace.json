@@ -11,7 +11,9 @@
     "history": "ประวัติศาสตร์",
     "programming": "การเขียนโปรแกรม",
     "exam": "เตรียมสอบ",
-    "other": "อื่นๆ"
+    "other": "อื่นๆ",
+    "general": "ทั่วไป",
+    "trivia": "ความรู้ทั่วไป"
   },
   "sort": {
     "popular": "ยอดนิยม",
@@ -21,8 +23,8 @@
     "topRated": "คะแนนสูงสุด"
   },
   "listing": {
-    "cardCount": "{{count}} การ์ด",
-    "userCount": "{{count}} ผู้ใช้"
+    "cardCount": "{{count, number}} การ์ด",
+    "userCount": "{{count, number}} ผู้ใช้"
   },
   "detail": {
     "back": "← ตลาด",
@@ -44,10 +46,10 @@
     "edited": "(แก้ไขแล้ว)",
     "helpful": "มีประโยชน์",
     "byAuthor": "โดย {{name}}",
-    "cardsBadge": "{{count}} การ์ด",
-    "viewsBadge": "{{count}} การดู",
-    "usersBadge": "{{count}} ผู้ใช้",
-    "reviewsCount": "({{count}} รีวิว)",
+    "cardsBadge": "{{count, number}} การ์ด",
+    "viewsBadge": "{{count, number}} การดู",
+    "usersBadge": "{{count, number}} ผู้ใช้",
+    "reviewsCount": "({{count, number}} รีวิว)",
     "previewCards": "ดูตัวอย่างการ์ด",
     "ratingsReviews": "คะแนนและรีวิว",
     "editReview": "แก้ไขรีวิว",
@@ -55,7 +57,7 @@
     "writeAReview": "เขียนรีวิว",
     "acquireToReview": "รับสำรับนี้เพื่อเขียนรีวิว",
     "noReviewsYet": "ยังไม่มีรีวิว",
-    "reviewCountLabel": "{{count}} รีวิว",
+    "reviewCountLabel": "{{count, number}} รีวิว",
     "loading": "กำลังโหลด...",
     "loadMoreReviews": "ดูรีวิวเพิ่มเติม",
     "reportReason": "เหตุผล",
@@ -96,8 +98,8 @@
       "most_helpful": "มีประโยชน์"
     },
     "downloading": "กำลังดาวน์โหลด...",
-    "limitUsage": "เพิ่ม {{count}} การ์ดในขีดจำกัด · เหลือ {{available}}",
-    "limitExceeds": "จะเกินขีดจำกัดการ์ด (เหลือ {{available}}) ลบการ์ดหรือสมัครสมาชิกก่อน",
+    "limitUsage": "เพิ่ม {{count, number}} การ์ดในขีดจำกัด · เหลือ {{available, number}}",
+    "limitExceeds": "จะเกินขีดจำกัดการ์ด (เหลือ {{available, number}}) เพิ่มพื้นที่ว่างหรืออัปเกรดแผนเพื่อเพิ่ม",
     "limitOfficialFree": "เด็คทางการ · ไม่นับรวมในขีดจำกัดการ์ด",
     "acquireByMode": {
       "subscribe": "สมัครติดตาม",

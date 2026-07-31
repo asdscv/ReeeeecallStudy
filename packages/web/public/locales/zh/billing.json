@@ -2,7 +2,7 @@
   "topUp": {
     "title": "增加余额",
     "subtitle": "为超出每日免费卡片的 AI 卡片生成充值余额。",
-    "credits": "赠送 ₩{{won}} 余额",
+    "credits": "获得 {{amount}} 的额度",
     "buy": "购买",
     "success": "充值完成。",
     "empty": "暂无可购买的套餐。",
@@ -31,7 +31,8 @@
     "unlimited": "无限卡片",
     "perMonth": "/月",
     "select": "选择",
-    "current": "当前方案"
+    "current": "当前方案",
+    "popular": "热门"
   },
   "paymentHistory": {
     "title": "支付记录",
@@ -77,5 +78,11 @@
       "unknown_order": "找不到此订单。",
       "already_processed": "此订单已处理。"
     }
+  },
+  "consent": {
+    "creditPack": "我同意点数将立即发放，且一旦使用任何点数，即失去本次购买的撤回权。",
+    "subscription": "我同意套餐立即生效，且一旦使用付费权益，即失去本次购买的撤回权。",
+    "policyLink": "退款政策",
+    "required": "请先确认以上告知内容再购买。"
   }
 }

@@ -2,7 +2,7 @@
   "topUp": {
     "title": "Añadir saldo",
     "subtitle": "Recarga saldo para generar tarjetas con IA más allá de las gratuitas diarias.",
-    "credits": "Recibe ₩{{won}} en saldo",
+    "credits": "Obtén {{amount}} en créditos",
     "buy": "Comprar",
     "success": "Saldo añadido.",
     "empty": "No hay paquetes disponibles.",
@@ -31,7 +31,8 @@
     "unlimited": "Tarjetas ilimitadas",
     "perMonth": "/mes",
     "select": "Elegir",
-    "current": "Plan actual"
+    "current": "Plan actual",
+    "popular": "Popular"
   },
   "paymentHistory": {
     "title": "Historial de pagos",
@@ -77,5 +78,11 @@
       "unknown_order": "No se encontró este pedido.",
       "already_processed": "Este pedido ya fue procesado."
     }
+  },
+  "consent": {
+    "creditPack": "Acepto que los créditos se entregan de inmediato y que, en cuanto use alguno, pierdo el derecho de desistimiento de esta compra.",
+    "subscription": "Acepto que mi plan comienza de inmediato y que, en cuanto use la ventaja de pago, pierdo el derecho de desistimiento de esta compra.",
+    "policyLink": "Política de reembolsos",
+    "required": "Confirma el aviso anterior antes de comprar."
   }
 }

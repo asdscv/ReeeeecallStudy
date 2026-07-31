@@ -75,7 +75,7 @@
       "Pencarian dan penyaringan berbasis tag",
       "Berbagi dek & marketplace komunitas",
       "Statistik dan analisis pembelajaran terperinci",
-      "Integrasi eksternal melalui kunci API"
+      "Rencana personal dan remediasi adaptif"
     ]
   },
   "benefitsSection": {
@@ -91,7 +91,7 @@
     "4": "Pencarian dan penyaringan berbasis tag",
     "5": "Berbagi dek & marketplace komunitas",
     "6": "Statistik dan analisis pembelajaran terperinci",
-    "7": "Integrasi eksternal melalui kunci API"
+    "7": "Rencana personal dan remediasi adaptif"
   },
   "metrics": {
     "efficiency": {
@@ -191,11 +191,10 @@
     "sharing": "Berbagi Dek",
     "languages": "7 Bahasa",
     "allDevices": "Semua Perangkat",
-    "import": "Impor CSV & API"
+    "import": "Impor CSV & JSON"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Hak cipta dilindungi.",
-    "apiDocs": "Dokumentasi API",
     "tagline": "Platform pembelajaran kartu kilat cerdas dengan pengulangan berjarak",
     "product": "Produk",
     "resources": "Sumber Daya",
@@ -251,7 +250,7 @@
   "socialProof": {
     "title": "Dipercaya oleh Pelajar di Seluruh Dunia",
     "subtitle": "Bergabunglah dengan ribuan siswa yang belajar lebih cerdas",
-    "liveActivity": "{{count}} orang sedang belajar sekarang",
+    "liveActivity": "{{count, number}} orang sedang belajar sekarang",
     "userCountLabel": "Pengguna Aktif",
     "cardsStudiedLabel": "Kartu Dipelajari",
     "decksCreatedLabel": "Dek Dibuat",
@@ -334,13 +333,14 @@
     "freePrice": "Gratis",
     "pricePerMonth": "{{price}}/bln",
     "unlimitedCards": "Kartu tanpa batas",
-    "upToCards": "Hingga {{count}} kartu",
+    "upToCards": "Hingga {{count, number}} kartu",
     "ctaFree": "Mulai gratis",
     "ctaPaid": "Mulai sekarang",
     "note": "Pembayaran dilakukan setelah mendaftar, di Pengaturan.",
     "plans": {
       "free": "Gratis",
       "standard": "Standar",
+      "pro": "Pro",
       "unlimited": "Tanpa Batas",
       "freeBlurb": "Paket gratis yang cocok untuk memulai",
       "standardBlurb": "Perluas pembelajaran dengan lebih banyak kartu",

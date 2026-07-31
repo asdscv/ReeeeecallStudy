@@ -1,18 +1,11 @@
 {
   "title": "AI Generate",
   "config": {
-    "model": "Model",
     "topic": "Topic",
     "topicPlaceholder": "例：JLPT N3の日本語語彙、韓国史の年表",
     "cardCount": "カード枚数",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
-    "customEndpoint": "Custom Endpoint",
-    "selectProvider": "プロバイダーを選択",
-    "noProvidersConfigured": "AIプロバイダーが設定されていません",
-    "goToSettings": "設定で追加する",
-    "manageInSettings": "プロバイダー管理：",
-    "settings": "設定",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
@@ -23,7 +16,6 @@
     "targetDeck": "対象デッキ",
     "selectDeck": "デッキを選択...",
     "selectDeckRequired": "カードを追加するデッキを選択してください。",
-    "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
     "contentLang": "Content Language",
@@ -53,7 +45,12 @@
     "imageChange": "画像を変更",
     "imageUploadHint": "単語リスト・教科書のページ・ノートの写真を選ぶと、AIがカードに変換します。",
     "imagePaidNotice": "画像生成にはクレジットを使用します（無料枠はありません）。",
-    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。"
+    "cardLimitExceeds": "あと最大 {{available}} 枚まで追加できます — 枚数を減らすか購読してください。",
+    "imageAddMore": "追加 ({{count, number}}/{{max}})",
+    "imageRemove": "画像を削除",
+    "inputModeTopicHint": "トピックを入力すると、AIがカードを作成します。",
+    "inputModeImageHint": "教科書のページ・単語リスト・ノートの写真をアップロードすると、AIが読み取ってカードにします。複数枚を一度に選べます。",
+    "noOwnedDecks": "編集できるデッキがまだありません — 先にデッキを作成してから AI カードを追加してください。"
   },
   "wallet": {
     "summary": "本日は無料{{free}}枚＋有料{{credits}}枚のカードを生成できます",
@@ -61,8 +58,10 @@
     "creditsOnly": "有料カードを{{credits}}枚生成できます",
     "empty": "本日の無料カードを使い切りました",
     "unknown": "現在、残高を取得できません",
-    "balance": "残高 ₩{{won}}（約{{cards}}枚）",
-    "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。"
+    "balance": "残高 {{amount}}",
+    "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。",
+    "cardLimit": "カード枠 残り {{available}}/{{limit}}",
+    "cardLimitUnlimited": "カード枚数の上限なし（管理者）"
   },
   "wizard": {
     "setup": "Setup",
@@ -93,11 +92,11 @@
     "deckIcon": "Icon",
     "deckColor": "Color",
     "cardsReviewTitle": "Review Cards",
-    "cardsTitle": "{{count}} cards generated",
-    "filteredWarning": "{{count}} invalid cards were filtered out",
+    "cardsTitle": "{{count, number}} cards generated",
+    "filteredWarning": "{{count, number}} invalid cards were filtered out",
     "regenerate": "Regenerate",
     "next": "Next",
-    "save": "Save {{count}} cards",
+    "save": "Save {{count, number}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
     "removeCard": "Remove",
     "tts": {
@@ -123,7 +122,10 @@
         "hint": "ヒント",
         "detail": "詳細"
       }
-    }
+    },
+    "templateDesc": "AIが設計したカード構造です。フィールド名を変更して続行してください。",
+    "deckDesc": "新しいデッキの名前・アイコン・色を確認して続行してください。",
+    "cardsDesc": "生成されたカードを確認してください。テキストを編集し、不要なカードを削除して保存します。"
   },
   "done": {
     "title": "Generation Complete!",
@@ -137,17 +139,19 @@
   },
   "errors": {
     "title": "Error",
-    "noApiKey": "Please set up your AI API key first.",
-    "invalidApiKey": "Invalid API key. Please check your key.",
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
-    "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
+    "networkError": "Network error. Please check your connection and try again.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AIサーバーエラーです。しばらくしてから再度お試しください。",
     "emptyResult": "AIがカードを生成できませんでした。もう一度お試しください（料金は発生していません）。",
-    "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。"
+    "cardLimitReached": "カード上限に達しました。カードを削除するか購読すると保存できます。",
+    "insufficientCredits": "本日の無料AIカードを使い切り、クレジットも残っていません。チャージして生成を続けましょう。",
+    "invalidImage": "この画像を読み込めませんでした。より小さく、鮮明な写真でお試しください。",
+    "quotaExceeded": "本日の無料AI生成の上限に達しました。明日またお試しください。",
+    "deckNotOwned": "そのデッキにはカードを追加できません。自分のデッキを選んでください。"
   },
   "button": {
     "aiGenerate": "AI Generate",

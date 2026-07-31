@@ -56,26 +56,6 @@
     "goodInterval": "Good 간격 (일)",
     "easyInterval": "Easy 간격 (일)"
   },
-  "aiProviders": {
-    "title": "AI 프로바이더",
-    "description": "카드 생성을 위한 AI 프로바이더를 설정합니다. 키는 서버에서 암호화되어 기기 간 동기화됩니다.",
-    "configure": "설정",
-    "cancel": "취소",
-    "apiKey": "API 키",
-    "apiKeyPlaceholder": "API 키를 입력하세요...",
-    "models": "모델",
-    "save": "저장",
-    "securityNote": "API 키는 서버에서 암호화(pgcrypto + Vault, 평문 저장 안 함)되어 웹/모바일 기기 간 동기화됩니다.",
-    "configured": "설정됨",
-    "notSet": "미설정",
-    "model": "모델",
-    "saving": "저장 중...",
-    "delete": "삭제",
-    "deletedTitle": "삭제됨",
-    "saveSuccess": "{{provider}} API 키가 저장되었습니다.",
-    "saveError": "API 키 저장에 실패했습니다.",
-    "removed": "{{provider}} API 키가 삭제되었습니다."
-  },
   "notifications": {
     "title": "알림",
     "dailyReminder": "일일 학습 알림",
@@ -88,7 +68,7 @@
     "pro": "프로",
     "freePlan": "무료 플랜",
     "proDesc": "모든 프리미엄 기능 사용 가능",
-    "freeDesc": "무제한 접근을 위해 업그레이드",
+    "freeDesc": "카드를 더 늘리려면 업그레이드",
     "upgradeToPro": "프로로 업그레이드",
     "manageSubscription": "구독 관리"
   },
@@ -107,15 +87,11 @@
   },
   "links": {
     "userGuide": "사용법 가이드",
-    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법",
-    "apiDocs": "API 문서",
-    "apiDocsDesc": "API 엔드포인트, 인증, 사용 예시"
+    "userGuideDesc": "기능 설명, 학습 팁, 공유 방법"
   },
   "quickActions": {
-    "quickStudy": "빠른 학습",
-    "aiGenerate": "AI 생성",
     "invite": "초대",
-    "shareMessage": "가장 똑똑한 플래시카드 앱, ReeeeecallStudy를 확인해 보세요! https://reeeeecall.com"
+    "shareMessage": "가장 똑똑한 플래시카드 앱, ReeeeecallStudy를 확인해 보세요! https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "카드 템플릿",
@@ -144,13 +120,6 @@
     "dark": "다크",
     "system": "시스템"
   },
-  "export": {
-    "title": "내 데이터 내보내기",
-    "stats": "학습 통계",
-    "sessions": "학습 세션",
-    "decks": "덱",
-    "cards": "카드"
-  },
   "alerts": {
     "error": "오류"
   },
@@ -167,8 +136,8 @@
     "upgrade": "업그레이드 (준비 중)",
     "upgradeSoon": "구독은 준비 중이에요.",
     "cancelPending": "구독 취소 예정 ({{date}}까지 이용)",
-    "countUnlimited": "{{owned}} / 무제한",
-    "planNoteUnlimited": "소유 카드 한도가 무제한이에요.",
+    "countUnlimited": "{{owned}}장 · 제한 없음",
+    "planNoteUnlimited": "관리자 계정 — 카드 저장 개수에 제한이 없습니다.",
     "detail": {
       "title": "카드 저장 용량",
       "subtitle": "내 카드와 구독 카드가 플랜 한도에 포함돼요. 공식 덱은 제외됩니다.",
@@ -178,15 +147,15 @@
       "officialNote": "한도 제외",
       "archived": "보관됨",
       "archivedNote": "학습 잠김",
-      "archivedCount": "{{count}}장 보관됨",
-      "remaining": "{{count}}장 남음",
+      "archivedCount": "{{count, number}}장 보관됨",
+      "remaining": "{{count, number}}장 남음",
       "percentUsed": "{{percent}}% 사용",
       "nearLimit": "한도 임박",
       "atLimit": "한도 도달",
-      "planUnlimited": "무제한 플랜",
+      "planUnlimited": "관리자 계정",
       "planCards": "{{limit}}장 플랜",
-      "unlimitedTitle": "무제한 저장",
-      "lifetimeTotal": "{{count}}장"
+      "unlimitedTitle": "카드 개수 제한 없음",
+      "lifetimeTotal": "{{count, number}}장"
     }
   },
   "groups": {
@@ -206,6 +175,23 @@
     "current": "현재 플랜",
     "comingSoon": "준비 중",
     "empty": "이용 가능한 플랜이 없어요.",
-    "loadError": "플랜을 불러오지 못했어요."
+    "loadError": "플랜을 불러오지 못했어요.",
+    "popular": "인기"
+  },
+  "paymentHistory": {
+    "title": "결제 내역",
+    "empty": "아직 결제 내역이 없어요.",
+    "refunded": "환불됨",
+    "loadMore": "더 보기",
+    "error": "결제 내역을 불러오지 못했어요.",
+    "retry": "다시 시도",
+    "kind": {
+      "credit_pack": "충전금",
+      "subscription": "구독"
+    },
+    "reason": {
+      "renewal": "갱신",
+      "updated": "플랜 변경"
+    }
   }
 }

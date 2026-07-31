@@ -10,9 +10,9 @@
   "aiGenerate": "AI Generate",
   "detail": {
     "backToList": "← Lista de mazos",
-    "totalCards": "Total {{count}} tarjetas",
-    "newCards": "Nuevas {{count}}",
-    "reviewCards": "Repaso {{count}}",
+    "totalCards": "Total {{count, number}} tarjetas",
+    "newCards": "Nuevas {{count, number}}",
+    "reviewCards": "Repaso {{count, number}}",
     "startStudy": "Comenzar estudio",
     "edit": "Editar",
     "share": "Compartir",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
@@ -218,17 +218,17 @@
     "selectMode": "Seleccionar",
     "selectAll": "Seleccionar todo",
     "deselectAll": "Deseleccionar todo",
-    "selectedCount": "{{count}} seleccionadas",
+    "selectedCount": "{{count, number}} seleccionadas",
     "deleteSelected": "Eliminar seleccionadas",
     "deleteCardsTitle": "Eliminar tarjetas",
-    "deleteCardsConfirm": "¿Eliminar {{count}} tarjetas seleccionadas? Esto no se puede deshacer.",
+    "deleteCardsConfirm": "¿Eliminar {{count, number}} tarjetas seleccionadas? Esto no se puede deshacer.",
     "perPage": "Por página:",
     "prevPage": "← Anterior",
     "nextPage": "Siguiente →",
     "pageOf": "Página {{current}} de {{total}}",
-    "showingRange": "Mostrando {{from}}–{{to}} de {{total}} tarjetas",
+    "showingRange": "Mostrando {{from, number}}–{{to, number}} de {{total, number}} tarjetas",
     "archivedBadge": "Archivadas · Estudio bloqueado",
-    "archivedNote": "{{count}} tarjetas archivadas por superar tu límite — aún puedes verlas. Suscríbete para volver a estudiarlas.",
+    "archivedNote": "{{count, number}} tarjetas archivadas por superar tu límite — aún puedes verlas. Suscríbete para volver a estudiarlas.",
     "archivedSubscribe": "Suscribirse (próximamente)"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "Hoy",
     "yesterday": "Ayer",
-    "daysAgo": "Hace {{count}} días",
+    "daysAgo": "Hace {{count, number}} días",
     "monthAgo": "Hace 1 mes",
-    "monthsAgo": "Hace {{count}} meses"
+    "monthsAgo": "Hace {{count, number}} meses"
   },
   "templatesList": {
     "cannotDeleteTitle": "No se puede eliminar",

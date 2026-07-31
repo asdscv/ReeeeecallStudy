@@ -50,7 +50,7 @@
   "template": {
     "rateLimitReached": "リクエスト上限に達しました。",
     "cannotDeleteDefault": "デフォルトテンプレートは削除できません。",
-    "inUseByDecks": "削除できません — {{count}}個のデッキがこのテンプレートを使用しています。"
+    "inUseByDecks": "削除できません — {{count, number}}個のデッキがこのテンプレートを使用しています。"
   },
   "marketplace": {
     "listingNotFound": "リスティングが見つかりません。",

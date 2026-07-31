@@ -119,7 +119,7 @@
       "good": "좋음",
       "easy": "쉬움"
     },
-    "periodDay": "{{count}}일",
+    "periodDay": "{{count, number}}일",
     "minuteShort": "{{value}}분"
   },
   "market": {
@@ -233,7 +233,43 @@
     "totalAiSpent": "총 사용액",
     "activeWallets": "크레딧 보유 사용자",
     "aiCardsToday": "오늘 AI 카드",
-    "aiCardsTodayBreakdown": "무료 {{free}} · 유료 {{paid}}"
+    "aiCardsTodayBreakdown": "무료 {{free}} · 유료 {{paid}}",
+    "controls": {
+      "title": "시스템 제어",
+      "desc": "긴급 킬스위치 — 즉시 적용됩니다.",
+      "aiEnabled": "AI 생성",
+      "aiHint": "비용/어뷰징 급증 시 즉시 차단",
+      "paymentsEnabled": "결제",
+      "paymentsHint": "서버측 결제 중단 (재배포 없음)",
+      "maintenance": "점검 모드",
+      "maintenanceHint": "AI 생성·결제 차단 (503)",
+      "on": "켜짐",
+      "off": "꺼짐",
+      "message": "점검 안내 메시지",
+      "messagePlaceholder": "점검 중 사용자에게 표시",
+      "save": "저장",
+      "saved": "저장됨 ✓",
+      "sandboxGrants": "샌드박스 구매에 크레딧 지급 허용",
+      "sandboxGrantsHint": "OFF: RevenueCat 샌드박스 이벤트를 받기만 하고 아무것도 지급하지 않습니다. 테스트할 때만 켜세요 — 샌드박스 구매는 무료입니다."
+    },
+    "levers": {
+      "title": "성장 레버 설정",
+      "desc": "재배포 없이 즉시 반영됩니다. 각 항목은 따로 저장됩니다.",
+      "freeQuota": "AI 무료 생성 한도 (1일)",
+      "freeQuotaHint": "유저당 하루 무료 카드 수. 클라이언트는 서버값을 그대로 따릅니다.",
+      "cardCap": "계정당 보유 카드 상한",
+      "cardCapHint": "이 수를 넘기면 카드 생성·저장이 막힙니다.",
+      "countOfficial": "공식 덱 카드도 상한에 포함",
+      "countOfficialHint": "켜면 구독한 공식 덱 카드까지 상한에 계산됩니다.",
+      "wonPerCredit": "크레딧당 단가",
+      "wonPerCreditHint": "IAP·크레딧팩 판매가와 반드시 일치해야 합니다.",
+      "targetMargin": "목표 마진 (bps)",
+      "targetMarginHint": "현재 {{pct}}. 과금식의 나눗셈에 직접 쓰이므로 10000(=100%)은 사용할 수 없습니다.",
+      "errRange": "{{min}} 이상 {{max}} 이하의 정수를 입력하세요.",
+      "errNonNegative": "0 이상의 정수를 입력하세요.",
+      "errMargin": "마진은 {{max}} bps 이하여야 합니다. 10000(=100%)은 과금식을 0으로 나누게 되어 무과금이 됩니다.",
+      "updated": "최근 변경 — 가격/쿼터: {{ai}} · 카드 상한: {{cards}}"
+    }
   },
   "billing": {
     "title": "결제 관리",
@@ -304,7 +340,8 @@
       "status": "상태",
       "paidAt": "결제 시각",
       "empty": "결제 내역이 없습니다.",
-      "actions": "작업"
+      "actions": "작업",
+      "loadedCount": "{{total}}건 불러옴"
     },
     "user": {
       "title": "사용자 조회",
@@ -327,16 +364,17 @@
       "confirmGrantTitle": "구독 지급",
       "confirmGrant": "이 사용자에게 \"{{product}}\"을(를) 지급하시겠어요?",
       "adjustWallet": "충전금 조정",
-      "adjustAmount": "금액 (₩, + 지급 / − 회수)",
+      "adjustAmount": "금액 ($, + 지급 / − 회수)",
       "adjustReason": "사유",
       "adjustSubmit": "적용",
       "confirmAdjustTitle": "충전금 조정",
-      "confirmAdjust": "이 사용자의 충전금을 ₩{{amount}}만큼 조정하시겠어요?"
+      "confirmAdjust": "이 사용자의 충전금을 ${{amount}}만큼 조정하시겠어요?"
     },
     "pagination": {
       "page": "{{page}} 페이지",
       "prev": "이전",
-      "next": "다음"
+      "next": "다음",
+      "loadMore": "더 보기"
     },
     "actionError": "작업 실패: {{error}}",
     "refund": {
@@ -344,7 +382,53 @@
       "confirmTitle": "환불하시겠어요?",
       "confirmCreditPack": "{{email}} 님에게 {{amount}} 환불할까요? 고객 카드로 실제 환불됩니다.",
       "confirmSubscription": "{{email}} 님 구독의 최근 결제를 환불하고 접근을 회수할까요?",
-      "realMoneyNote": "결제 대행사를 호출해 실제 돈이 이동합니다. 여기서 되돌릴 수 없어요."
+      "realMoneyNote": "결제 대행사를 호출해 실제 돈이 이동합니다. 여기서 되돌릴 수 없어요.",
+      "confirmRevokeTitle": "접근을 회수할까요?",
+      "buttonRevokeOnly": "접근 회수",
+      "revokeOnlyIosNote": "돈은 이동하지 않아요. 접근만 회수됩니다 — App Store 환불은 Apple이 처리해요. 고객에게 Apple로 환불을 요청하도록 안내하거나, App Store Connect에서 승인하세요.",
+      "revokeOnlyUnknownNote": "돈은 이동하지 않아요. 이 건은 스토어가 기록되지 않아 App Store 결제일 수 있어서 접근만 회수합니다. 환불을 약속하기 전에 스토어를 확인하세요.",
+      "revokeOnlyHint": "접근 회수 전용 — 이 채널의 환불은 우리가 아니라 스토어가 처리해요.",
+      "policyEligible": "정책: 환불 가능 ({{days}}일 이내 · 미사용).",
+      "policyIneligible": "정책: 환불 불가 — {{reason}}.",
+      "consentMissing": "이 결제에는 청약철회권 고지 기록이 없어서 \"이미 사용함\"을 근거로 거절하기엔 약해요.",
+      "statutoryOverride": "법정 청약철회권(한국 7일 / EU·영국 14일)에 따라 환불해야 할 수도 있어요.",
+      "resultRefunded": "환불 완료 — 실제로 돈이 반환되고 접근이 회수됐어요.",
+      "resultRevokedOnly": "접근을 회수했어요. 이 작업으로 이동한 돈은 없습니다.",
+      "reason": {
+        "eligible": "환불 가능",
+        "not_found": "내역을 찾을 수 없음",
+        "not_paid": "결제가 완료된 적 없음",
+        "already_refunded": "이미 환불됨",
+        "outside_window": "환불 기간 경과",
+        "already_used": "이미 사용함",
+        "renewal_charge": "갱신 결제 (정책 대상 아님)"
+      }
+    },
+    "channel": {
+      "column": "채널",
+      "web_lemonsqueezy": "웹 · Lemon Squeezy",
+      "web_toss": "웹 · 토스",
+      "ios": "iOS · App Store",
+      "android": "Android · Play",
+      "mobile_unknown": "모바일 · 스토어 미상",
+      "admin": "관리자 지급",
+      "paymentsHint": "웹과 Google Play 결제는 여기서 환불할 수 있어요. App Store 결제는 접근 회수만 가능하고, 환불은 Apple이 처리합니다.",
+      "filter": {
+        "all": "전체",
+        "web": "웹",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "hint": {
+        "ios": "App Store 환불은 Apple이 처리합니다. 여기서는 접근 회수만 가능해요.",
+        "android": "Google Play 환불은 여기서 바로 처리할 수 있어요.",
+        "mobile_unknown": "스토어 기록이 생기기 전에 저장된 건이에요. App Store로 간주하니, 환불을 약속하기 전에 확인하세요.",
+        "web_lemonsqueezy": "Lemon Squeezy API로 환불할 수 있어요.",
+        "web_toss": "토스 API로 결제 취소할 수 있어요.",
+        "admin": "무상 지급 건이라 결제된 돈이 없어요."
+      },
+      "sandbox": "샌드박스",
+      "sandboxHint": "스토어 샌드박스 테스트 구매 — 무료이며 매출에 절대 집계되지 않습니다."
     }
   },
   "official": {
@@ -438,7 +522,7 @@
     "colDetails": "상세",
     "colIP": "IP",
     "pageInfo": "{{page}} 페이지",
-    "showing": "{{count}}건 표시",
+    "showing": "{{count, number}}건 표시",
     "prevPage": "이전",
     "nextPage": "다음",
     "unknownAdmin": "알 수 없음",
@@ -447,7 +531,8 @@
   "common": {
     "refresh": "새로고침",
     "lastUpdated": "{{time}} 업데이트",
-    "exportCsv": "CSV 내보내기"
+    "exportCsv": "CSV 내보내기",
+    "dismiss": "닫기"
   },
   "retry": "재시도",
   "noData": "데이터가 없습니다",

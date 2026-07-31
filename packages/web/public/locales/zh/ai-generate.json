@@ -1,18 +1,11 @@
 {
   "title": "AI Generate",
   "config": {
-    "model": "Model",
     "topic": "Topic",
     "topicPlaceholder": "例如：JLPT N3 日语词汇、韩国历史年表",
     "cardCount": "卡片数量",
     "customHtml": "Custom HTML layout",
     "customHtmlDesc": "Generate custom HTML for card front/back (advanced)",
-    "customEndpoint": "Custom Endpoint",
-    "selectProvider": "请选择提供商",
-    "noProvidersConfigured": "未配置 AI 提供商",
-    "goToSettings": "前往设置添加",
-    "manageInSettings": "管理提供商：",
-    "settings": "设置",
     "startGenerate": "Start Generating",
     "modeLabel": "Generation Mode",
     "mode": {
@@ -23,7 +16,6 @@
     "selectDeck": "选择一个卡组...",
     "selectDeckRequired": "请选择要添加卡片的卡组。",
     "deckNoTemplate": "此卡组还没有卡片模板——请打开它并添加一张卡片以完成设置。",
-    "providerSection": "AI Provider",
     "contentSection": "Content Settings",
     "templateSection": "Template Settings",
     "contentLang": "Content Language",
@@ -53,7 +45,12 @@
     "imageChange": "更换图片",
     "imageUploadHint": "选择一张单词列表、教科书页面或笔记的照片——AI 会将其转化为卡片。",
     "imagePaidNotice": "图片生成需要消耗点数（无免费额度）。",
-    "cardLimitExceeds": "最多还能添加 {{available}} 张 — 减少数量或订阅。"
+    "cardLimitExceeds": "最多还能添加 {{available}} 张 — 减少数量或订阅。",
+    "imageAddMore": "继续添加 ({{count, number}}/{{max}})",
+    "imageRemove": "删除图片",
+    "inputModeTopicHint": "输入主题，AI 会为你生成卡片。",
+    "inputModeImageHint": "上传课本页面、单词表或笔记的照片，AI 会识别并生成卡片。可一次选择多张。",
+    "noOwnedDecks": "你还没有自己的卡组 — 请先创建一个卡组，再向其中添加 AI 卡片。"
   },
   "wallet": {
     "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",
@@ -61,8 +58,10 @@
     "creditsOnly": "可用 {{credits}} 张付费卡片",
     "empty": "今天的免费卡片已用完",
     "unknown": "暂时无法获取余额",
-    "balance": "余额 ₩{{won}}（约{{cards}}张）",
-    "imagePaid": "图片生成为付费功能 — 请充值后继续。"
+    "balance": "余额 {{amount}}",
+    "imagePaid": "图片生成为付费功能 — 请充值后继续。",
+    "cardLimit": "卡片额度 剩余 {{available}}/{{limit}}",
+    "cardLimitUnlimited": "无卡片数量上限（管理员）"
   },
   "wizard": {
     "setup": "Setup",
@@ -93,11 +92,11 @@
     "deckIcon": "Icon",
     "deckColor": "Color",
     "cardsReviewTitle": "Review Cards",
-    "cardsTitle": "{{count}} cards generated",
-    "filteredWarning": "{{count}} invalid cards were filtered out",
+    "cardsTitle": "{{count, number}} cards generated",
+    "filteredWarning": "{{count, number}} invalid cards were filtered out",
     "regenerate": "Regenerate",
     "next": "Next",
-    "save": "Save {{count}} cards",
+    "save": "Save {{count, number}} cards",
     "editTip": "You can edit in more detail after saving via the template edit page.",
     "removeCard": "Remove",
     "tts": {
@@ -123,7 +122,10 @@
         "hint": "提示",
         "detail": "详情"
       }
-    }
+    },
+    "templateDesc": "这是 AI 设计的卡片结构。可重命名字段后继续。",
+    "deckDesc": "查看新卡组的名称、图标和颜色，然后继续。",
+    "cardsDesc": "查看生成的卡片。可编辑文字、删除不需要的卡片，然后保存。"
   },
   "done": {
     "title": "Generation Complete!",
@@ -137,17 +139,19 @@
   },
   "errors": {
     "title": "Error",
-    "noApiKey": "Please set up your AI API key first.",
-    "invalidApiKey": "Invalid API key. Please check your key.",
     "rateLimited": "Rate limited. Please wait a moment and try again.",
     "invalidResponse": "AI returned an invalid response. Please try again.",
-    "networkError": "Network error. This might be a CORS issue — try a different provider or check your API key.",
+    "networkError": "Network error. Please check your connection and try again.",
     "description": "Something went wrong during generation. You can try again.",
     "back": "Go Back",
     "retry": "Try Again",
     "serverError": "AI 服务器错误，请稍后再试。",
     "emptyResult": "AI 未生成任何卡片。请重试——未向您收费。",
-    "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。"
+    "cardLimitReached": "已达卡片上限。删除卡片或订阅以保存更多。",
+    "insufficientCredits": "您今天的免费AI卡片已用完，且没有剩余点数。请充值以继续生成。",
+    "invalidImage": "无法读取该图片。请尝试更小或更清晰的照片。",
+    "quotaExceeded": "您已达到今日免费AI生成上限。请明天再试。",
+    "deckNotOwned": "该卡组无法添加新卡片。请选择你拥有的卡组。"
   },
   "button": {
     "aiGenerate": "AI Generate",

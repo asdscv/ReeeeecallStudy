@@ -4,18 +4,11 @@ import { Loader2, Check, ExternalLink } from 'lucide-react'
 import { toIntlLocale } from '../../lib/locale-utils'
 import { supabase } from '../../lib/supabase'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
-import { providersForKind } from '../../lib/payments'
-import { PaymentMethodModal } from './PaymentMethodModal'
+import { preferredProviderId } from '../../lib/payments'
+import { writeCheckoutLoadingTab } from '../../lib/payments/checkout-tab'
+import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { isUnlimitedCardLimit } from '../../lib/card-limit'
 
-// A card_limit at or above this sentinel means "unlimited" for DISPLAY only. The DB
-// stores/uses card_limit as a normal integer cap (e.g. sub_unlimited_monthly = 2e9,
-// mig 124); ONLY the presentation layer collapses big caps to the word
-// "무제한 / Unlimited". Never special-case this server-side.
-export const UNLIMITED_CARD_LIMIT = 1_000_000_000 // 1e9
-
-export function isUnlimitedCardLimit(limit: number | null | undefined): boolean {
-  return limit != null && limit >= UNLIMITED_CARD_LIMIT
-}
 
 /**
  * Data-driven subscription plan selector for the card-storage Settings section.
@@ -23,7 +16,7 @@ export function isUnlimitedCardLimit(limit: number | null | undefined): boolean 
  * Reads the subscription catalog from the billing store (`get_billing_products`),
  * filtered to `kind === 'subscription' && isActive` and sorted by `sortOrder`, so a
  * new/edited/removed plan is a catalog row change alone — no code edit here. Each row
- * shows title, card limit ("무제한" when >= 1e9, else the formatted number), the ₩
+ * shows title, card limit ("무제한" when >= 1e9, else the formatted number), the $
  * price, and a Select button → `startCheckout(plan.id)`. The user's current plan
  * (matched by `subscription.productId`) is highlighted and its button disabled.
  *
@@ -56,6 +49,7 @@ export function PlanSelector() {
     if (portalLoading) return
     setPortalError(false)
     const tab = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null
+    writeCheckoutLoadingTab(tab)
     setPortalLoading(true)
     try {
       const { data, error } = await supabase.functions.invoke('subscription-portal', {
@@ -86,9 +80,9 @@ export function PlanSelector() {
   }, [products.length, fetchProducts, fetchSubscription])
 
   const locale = toIntlLocale(i18n.language)
-  // Display currency is USD (the LemonSqueezy store charges USD; Toss shows the KRW
-  // amount at its own checkout).
-  const fmtUsd = (cents: number | null) => `$${((cents ?? 0) / 100).toFixed(2)}`
+  // Price is always USD — the store charges USD everywhere (LemonSqueezy; Toss/₩ dropped).
+  const fmtPrice = (p: (typeof products)[number]) =>
+    formatProductPrice(p)
 
   const plans = products
     .filter((p) => p.kind === 'subscription' && p.isActive)
@@ -98,11 +92,16 @@ export function PlanSelector() {
   const currentProductId = subscription?.productId ?? null
   const currentProvider = subscription?.provider ?? null
 
-  // With one provider, subscribe directly; with 2+ (Toss + LemonSqueezy), pick a method.
-  const [pickerProduct, setPickerProduct] = useState<string | null>(null)
+  // (P-H5) A live LemonSqueezy (Merchant-of-Record) subscriber must change plans through the
+  // hosted portal — NOT by opening a fresh checkout, which would start a SECOND, independently
+  // -billed LS subscription (double-charge). So lock the per-plan Select for LS subscribers and
+  // route them to the portal button below. (The server also rejects a second LS checkout.)
+  const lockPlanSwitch = PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'lemonsqueezy'
+
+  // LemonSqueezy is the only payment provider (Toss/₩ dropped); preferredProviderId()
+  // always resolves to it, and the displayed $ price is what it charges.
   const beginCheckout = (productId: string) => {
-    if (providersForKind('subscription').length > 1) setPickerProduct(productId)
-    else void startCheckout(productId)
+    void startCheckout(productId, preferredProviderId())
   }
 
   // Toss subscriptions have no hosted portal — we run the recurring charge, so cancel /
@@ -140,6 +139,8 @@ export function PlanSelector() {
   // global (a credit-pack top-up in WalletSummary shares it), so only surface
   // success/failed when the in-flight product is one of the subscription plans.
   const checkoutIsPlan = plans.some((p) => p.id === checkoutProductId)
+  // Highlight the highest-tier plan (largest card allowance) as "popular".
+  const topLimit = Math.max(...plans.map((p) => p.cardLimit ?? 0))
 
   return (
     <div className="mt-4">
@@ -147,30 +148,40 @@ export function PlanSelector() {
       <ul className="space-y-2">
         {plans.map((p) => {
           const isCurrent = currentProductId != null && p.id === currentProductId
+          const popular = !isCurrent && (p.cardLimit ?? 0) === topLimit && plans.length > 1
           const unlimited = isUnlimitedCardLimit(p.cardLimit)
           const limitLabel = unlimited
             ? t('plans.unlimited')
             : t('plans.cardLimit', { limit: (p.cardLimit ?? 0).toLocaleString(locale) })
           const priceLabel =
             p.period === 'monthly'
-              ? `${fmtUsd(p.priceUsdCents)} ${t('plans.perMonth')}`
-              : fmtUsd(p.priceUsdCents)
+              ? `${fmtPrice(p)} ${t('plans.perMonth')}`
+              : fmtPrice(p)
           const processing = checkoutStatus === 'processing' && checkoutProductId === p.id
 
           return (
             <li
               key={p.id}
-              className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
-                isCurrent ? 'border-brand bg-brand/5' : 'border-border bg-card'
+              className={`flex items-center justify-between rounded-xl border px-4 py-3.5 transition-colors ${
+                isCurrent
+                  ? 'border-brand bg-brand/5'
+                  : popular
+                    ? 'border-brand/60 bg-card ring-1 ring-brand/20'
+                    : 'border-border bg-card'
               }`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground">{p.title}</p>
+                  <p className="text-[15px] font-semibold text-foreground">{p.title}</p>
                   {isCurrent && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-[11px] font-medium text-brand">
                       <Check className="h-3 w-3" />
                       {t('plans.current')}
+                    </span>
+                  )}
+                  {popular && (
+                    <span className="inline-flex items-center rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                      {t('plans.popular', 'Popular')}
                     </span>
                   )}
                 </div>
@@ -181,9 +192,15 @@ export function PlanSelector() {
               </div>
               <button
                 type="button"
-                onClick={() => beginCheckout(p.id)}
-                disabled={isCurrent || processing}
-                title={PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')}
+                onClick={() => { if (lockPlanSwitch && !isCurrent) { void openPortal() } else { beginCheckout(p.id) } }}
+                disabled={isCurrent || processing || (lockPlanSwitch && portalLoading)}
+                title={
+                  isCurrent
+                    ? undefined
+                    : lockPlanSwitch
+                      ? t('manageSubscription.hint')
+                      : PAYMENTS_ACTIVE ? undefined : t('comingSoon.title')
+                }
                 className={
                   isCurrent
                     ? 'cursor-not-allowed rounded-lg bg-accent px-4 py-2 text-sm font-medium text-muted-foreground'
@@ -195,9 +212,11 @@ export function PlanSelector() {
                 {processing && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isCurrent
                   ? t('plans.current')
-                  : PAYMENTS_ACTIVE
-                    ? t('plans.select')
-                    : t('comingSoon.badge')}
+                  : lockPlanSwitch
+                    ? t('manageSubscription.button')
+                    : PAYMENTS_ACTIVE
+                      ? t('plans.select')
+                      : t('comingSoon.badge')}
               </button>
             </li>
           )
@@ -259,13 +278,6 @@ export function PlanSelector() {
       {PAYMENTS_ACTIVE && checkoutIsPlan && error === 'checkout_failed' && (
         <p className="mt-2 text-xs text-destructive">{t('checkout.failed')}</p>
       )}
-
-      <PaymentMethodModal
-        open={pickerProduct !== null}
-        productId={pickerProduct}
-        kind="subscription"
-        onClose={() => setPickerProduct(null)}
-      />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Archive, Layers, Users, ShieldCheck, Infinity as InfinityIcon } from 'lucide-react'
+import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import type { CardUsageDetail } from '@reeeeecall/shared/stores/deck-store'
-import { isUnlimitedCardLimit } from './PlanSelector'
+import { isUnlimitedCardLimit } from '../../lib/card-limit'
 
 /**
  * Detailed owned-card usage panel (get_card_usage_detail, mig 137). Renders the split
@@ -31,11 +32,16 @@ export function CardUsagePanel({ detail, planName, className = '' }: CardUsagePa
   const atLimit = !unlimited && detail.available <= 0
   const nearLimit = !unlimited && !atLimit && pct >= 80
 
+  // `unlimited` is the limit >= 1e9 sentinel. Since mig 148 no PLAN is unlimited (the
+  // top plan caps at 100,000), so this branch only fires for admin/operator accounts
+  // (effective limit 2e9, mig 139). Label it as the admin override it is — calling it
+  // an "Unlimited plan" advertises a plan that no longer exists and contradicts the
+  // Standard/Pro card right below it.
   const plan =
     planName ??
     (unlimited
-      ? t('cardUsage.detail.planUnlimited', 'Unlimited plan')
-      : t('cardUsage.detail.planCards', '{{limit}} card plan', { limit: limit.toLocaleString() }))
+      ? t('cardUsage.detail.planUnlimited', 'Admin account')
+      : t('cardUsage.detail.planCards', '{{limit}} card plan', { limit: formatCount(limit) }))
 
   return (
     <div className={className}>
@@ -64,10 +70,10 @@ export function CardUsagePanel({ detail, planName, className = '' }: CardUsagePa
           <InfinityIcon className="w-6 h-6 text-brand shrink-0" />
           <div>
             <p className="text-sm font-semibold text-foreground">
-              {t('cardUsage.detail.unlimitedTitle', 'Unlimited storage')}
+              {t('cardUsage.detail.unlimitedTitle', 'No card limit')}
             </p>
             <p className="text-xs text-muted-foreground">
-              {t('cardUsage.detail.lifetimeTotal', '{{count}} cards', { count: used })}
+              {t('cardUsage.detail.lifetimeTotal', '{{count, number}} cards', { count: used })}
             </p>
           </div>
         </div>
@@ -108,7 +114,7 @@ export function CardUsagePanel({ detail, planName, className = '' }: CardUsagePa
           <p className={`mt-2 text-xs tabular-nums ${atLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
             {atLimit
               ? t('cardUsage.reached')
-              : t('cardUsage.detail.remaining', '{{count}} remaining', {
+              : t('cardUsage.detail.remaining', '{{count, number}} remaining', {
                   count: detail.available,
                 })}
           </p>

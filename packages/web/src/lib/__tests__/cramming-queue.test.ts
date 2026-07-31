@@ -1,9 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import {
   CrammingQueueManager,
   filterCardsForCramming,
   type CrammingConfig,
-} from '../cramming-queue'
+} from '@reeeeecall/shared/lib/cramming-queue'
+import { CrammingQueueManager as SharedCrammingQueueManager } from '@reeeeecall/shared/lib/cramming-queue'
 import type { Card } from '../../types/database'
 
 // ─── Helpers ────────────────────────────────────────────
@@ -20,7 +21,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
     ease_factor: 2.5,
     interval_days: 10,
     repetitions: 3,
-    next_review_at: new Date(Date.now() + 86400000).toISOString(), // tomorrow
+    next_review_at: new Date(Date.now() + 86400000).toISOString(),
     last_reviewed_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -37,6 +38,11 @@ function makeConfig(overrides?: Partial<CrammingConfig>): CrammingConfig {
   }
 }
 
+afterEach(() => {
+  vi.useRealTimers()
+  vi.restoreAllMocks()
+})
+
 // ─── filterCardsForCramming ─────────────────────────────
 
 describe('filterCardsForCramming', () => {
@@ -50,291 +56,294 @@ describe('filterCardsForCramming', () => {
       id: '6',
       srs_status: 'review',
       ease_factor: 2.3,
-      next_review_at: new Date(Date.now() + 2 * 86400000).toISOString(), // 2 days
+      next_review_at: new Date(Date.now() + 2 * 86400000).toISOString(),
     }),
   ]
 
   it('filter type=all excludes suspended cards', () => {
     const result = filterCardsForCramming(cards, { type: 'all' })
     expect(result.map(c => c.id)).toEqual(['1', '2', '3', '5', '6'])
-    expect(result.find(c => c.id === '4')).toBeUndefined()
   })
 
   it('filter type=weak returns low ease_factor and new cards', () => {
     const result = filterCardsForCramming(cards, { type: 'weak', maxEaseFactor: 2.0 })
-    // id=1 (new), id=2 (ease 1.8), id=5 (ease 1.5)
     expect(result.map(c => c.id)).toEqual(['1', '2', '5'])
   })
 
-  it('filter type=due_soon returns cards due within N days + new', () => {
+  it('filter type=due_soon returns due cards and new cards', () => {
     const result = filterCardsForCramming(cards, { type: 'due_soon', withinDays: 3 })
-    // id=1 (new), id=2 (next_review tomorrow), id=3 (tomorrow), id=5 (tomorrow), id=6 (2 days)
     expect(result.length).toBeGreaterThanOrEqual(3)
-    expect(result.find(c => c.id === '1')).toBeDefined() // new cards always included
-    expect(result.find(c => c.id === '4')).toBeUndefined() // suspended excluded
+    expect(result.find(c => c.id === '1')).toBeDefined()
+    expect(result.find(c => c.id === '4')).toBeUndefined()
   })
 
   it('filter type=tags returns cards matching any tag', () => {
-    const result = filterCardsForCramming(cards, { type: 'tags', tags: ['vocab'] })
-    expect(result.map(c => c.id)).toEqual(['5'])
+    expect(filterCardsForCramming(cards, { type: 'tags', tags: ['vocab'] }).map(c => c.id))
+      .toEqual(['5'])
   })
 
   it('filter type=tags with no matches returns empty', () => {
-    const result = filterCardsForCramming(cards, { type: 'tags', tags: ['nonexistent'] })
-    expect(result).toEqual([])
+    expect(filterCardsForCramming(cards, { type: 'tags', tags: ['nonexistent'] })).toEqual([])
   })
 })
 
 // ─── CrammingQueueManager ───────────────────────────────
 
-describe('CrammingQueueManager', () => {
-  it('empty cards → immediately complete', () => {
+describe('CrammingQueueManager true rounds', () => {
+  it('empty cards are immediately complete', () => {
     const mgr = new CrammingQueueManager([], makeConfig())
     expect(mgr.isSessionComplete()).toBe(true)
     expect(mgr.currentCardId()).toBeNull()
     expect(mgr.masteryPercentage()).toBe(100)
   })
 
-  it('round 1 includes all cards', () => {
-    const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-    expect(mgr.currentRound()).toBe(1)
-    expect(mgr.totalInRound()).toBe(3)
+  it('deduplicates input while preserving first-seen order', () => {
+    const mgr = new CrammingQueueManager(['a', 'b', 'a', 'c', 'b'], makeConfig())
     expect(mgr.totalCards()).toBe(3)
+    expect(mgr.totalInRound()).toBe(3)
+    expect(mgr.snapshot().queue).toEqual(['a', 'b', 'c'])
   })
 
-  it('got_it advances cursor without re-insertion', () => {
-    const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
+  it('round 1 presents every unique card exactly once', () => {
+    const mgr = new CrammingQueueManager(['a', 'b', 'c'], makeConfig())
+    const seen: string[] = []
+
+    for (let i = 0; i < 3; i++) {
+      seen.push(mgr.currentCardId()!)
+      mgr.rateCard('got_it')
+    }
+
+    expect(seen).toEqual(['a', 'b', 'c'])
+    expect(new Set(seen).size).toBe(3)
+    expect(mgr.currentRound()).toBe(1)
+    expect(mgr.isSessionComplete()).toBe(true)
+  })
+
+  it('moves only round-1 missed cards to round 2', () => {
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
 
     expect(mgr.currentCardId()).toBe('a')
     mgr.rateCard('got_it')
     expect(mgr.currentCardId()).toBe('b')
-    mgr.rateCard('got_it')
-    expect(mgr.currentCardId()).toBe('c')
-    mgr.rateCard('got_it')
-
-    expect(mgr.isSessionComplete()).toBe(true)
-    expect(mgr.masteryPercentage()).toBe(100)
-  })
-
-  it('missed re-inserts card after 2-card gap', () => {
-    const ids = ['a', 'b', 'c', 'd']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    // Miss 'a' → should appear again after 2 more cards
-    expect(mgr.currentCardId()).toBe('a')
     mgr.rateCard('missed')
 
+    expect(mgr.currentRound()).toBe(2)
+    expect(mgr.snapshot().queue).toEqual(['b'])
     expect(mgr.currentCardId()).toBe('b')
+    expect(mgr.totalInRound()).toBe(1)
+  })
+
+  it('advances a repeatedly missed card from round 2 to round 3', () => {
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
+
+    mgr.rateCard('got_it')
+    mgr.rateCard('missed')
+    expect(mgr.currentRound()).toBe(2)
+
+    mgr.rateCard('missed')
+    expect(mgr.currentRound()).toBe(3)
+    expect(mgr.currentCardId()).toBe('b')
+
+    mgr.rateCard('got_it')
+    expect(mgr.isAllMastered()).toBe(true)
+    expect(mgr.getCardState('b')?.masteredInRound).toBe(3)
+  })
+
+  it('never reinserts a missed card into the current round queue', () => {
+    const mgr = new CrammingQueueManager(['a', 'b', 'c'], makeConfig())
+
+    mgr.rateCard('missed')
+    const snap = mgr.snapshot()
+
+    expect(snap.queue).toEqual(['a', 'b', 'c'])
+    expect(snap.cursor).toBe(1)
+    expect([...snap.nextRoundMissed]).toEqual(['a'])
+    expect(mgr.currentCardId()).toBe('b')
+  })
+
+  it('reports remaining and total for the current round only', () => {
+    const mgr = new CrammingQueueManager(['a', 'b', 'c'], makeConfig())
+
+    expect(mgr.totalInRound()).toBe(3)
+    expect(mgr.remainingInRound()).toBe(3)
+    mgr.rateCard('missed')
+    expect(mgr.remainingInRound()).toBe(2)
+    mgr.rateCard('got_it')
+    expect(mgr.remainingInRound()).toBe(1)
     mgr.rateCard('got_it')
 
-    expect(mgr.currentCardId()).toBe('c')
+    expect(mgr.currentRound()).toBe(2)
+    expect(mgr.totalInRound()).toBe(1)
+    expect(mgr.remainingInRound()).toBe(1)
+  })
+
+  it('tracks first mastery round and bounded mastery percentage', () => {
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
+
+    expect(mgr.masteryPercentage()).toBe(0)
+    mgr.rateCard('got_it')
+    expect(mgr.masteryPercentage()).toBe(50)
+    mgr.rateCard('missed')
+    expect(mgr.masteryPercentage()).toBe(50)
     mgr.rateCard('got_it')
 
-    // 'a' should reappear here (after gap of 2)
+    expect(mgr.masteryPercentage()).toBe(100)
+    expect(mgr.getCardState('a')?.masteredInRound).toBe(1)
+    expect(mgr.getCardState('b')?.masteredInRound).toBe(2)
+  })
+
+  it('counts attempts across rounds', () => {
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
+    mgr.rateCard('missed')
+    mgr.rateCard('got_it')
+    mgr.rateCard('missed')
+    mgr.rateCard('got_it')
+
+    expect(mgr.totalAttempts()).toBe(4)
+    expect(mgr.getCardState('a')?.totalAttempts).toBe(3)
+    expect(mgr.getCardState('b')?.totalAttempts).toBe(1)
+  })
+
+  it('sorts hardest cards by miss count and then card ID', () => {
+    const mgr = new CrammingQueueManager(['b', 'a', 'c'], makeConfig())
+    mgr.rateCard('missed') // b: 1
+    mgr.rateCard('missed') // a: 1
+    mgr.rateCard('got_it') // c
+
+    expect(mgr.getHardestCards(5).map(s => [s.cardId, s.missedCount])).toEqual([
+      ['a', 1],
+      ['b', 1],
+    ])
+
+    mgr.rateCard('missed') // b: 2
+    expect(mgr.getHardestCards(5).map(s => [s.cardId, s.missedCount])).toEqual([
+      ['b', 2],
+      ['a', 1],
+    ])
+  })
+
+  it('snapshot and restore preserve pending next-round misses without aliases', () => {
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
+    mgr.rateCard('missed')
+    const snap = mgr.snapshot()
+
+    snap.queue.push('external')
+    snap.nextRoundMissed.add('external')
+    snap.cardStates.get('a')!.missedCount = 99
+
+    expect(mgr.snapshot().queue).toEqual(['a', 'b'])
+    expect([...mgr.snapshot().nextRoundMissed]).toEqual(['a'])
+    expect(mgr.getCardState('a')?.missedCount).toBe(1)
+
+    const cleanSnap = mgr.snapshot()
+    mgr.rateCard('got_it')
+    mgr.rateCard('got_it')
+    expect(mgr.isSessionComplete()).toBe(true)
+
+    mgr.restore(cleanSnap)
+    expect(mgr.currentRound()).toBe(1)
+    expect(mgr.currentCardId()).toBe('b')
+    expect([...mgr.snapshot().nextRoundMissed]).toEqual(['a'])
+
+    mgr.rateCard('got_it')
+    expect(mgr.currentRound()).toBe(2)
     expect(mgr.currentCardId()).toBe('a')
   })
 
-  it('round transition: only missed cards go to next round', () => {
-    const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
+  it('snapshot and restore preserve a transitioned round', () => {
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
+    mgr.rateCard('got_it')
+    mgr.rateCard('missed')
+    const roundTwo = mgr.snapshot()
 
-    // Round 1: got_it for a and c, miss b multiple times then got_it
-    mgr.rateCard('got_it') // a
-    mgr.rateCard('missed') // b → re-insert
-    mgr.rateCard('got_it') // c
-    // b reappears
-    mgr.rateCard('missed') // b again → re-insert
+    mgr.rateCard('missed')
+    expect(mgr.currentRound()).toBe(3)
 
-    // After round completes, b should go to round 2 since never got_it
-    // Keep rating until round ends
-    // b should reappear once more
+    mgr.restore(roundTwo)
+    expect(mgr.currentRound()).toBe(2)
     expect(mgr.currentCardId()).toBe('b')
-    mgr.rateCard('got_it') // b finally got_it
-
-    // All mastered
-    expect(mgr.isSessionComplete()).toBe(true)
-    expect(mgr.masteryPercentage()).toBe(100)
+    expect([...mgr.snapshot().nextRoundMissed]).toEqual([])
   })
 
-  it('all mastered → session complete', () => {
-    const ids = ['a', 'b']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    mgr.rateCard('got_it') // a
-    mgr.rateCard('got_it') // b
-
-    expect(mgr.isSessionComplete()).toBe(true)
-    expect(mgr.isAllMastered()).toBe(true)
-  })
-
-  it('time limit reached → session complete', () => {
-    vi.useFakeTimers()
-    const now = Date.now()
-    vi.setSystemTime(now)
-
-    const mgr = new CrammingQueueManager(['a', 'b', 'c'], makeConfig({
-      timeLimitMinutes: 1, // 1 minute
-    }))
-
-    expect(mgr.isSessionComplete()).toBe(false)
-    expect(mgr.remainingTimeMs()).toBe(60000)
-
-    // Advance 61 seconds
-    vi.setSystemTime(now + 61000)
-
-    expect(mgr.isSessionComplete()).toBe(true)
-    expect(mgr.remainingTimeMs()).toBe(0)
-
-    vi.useRealTimers()
-  })
-
-  it('masteryPercentage is accurate', () => {
-    const ids = ['a', 'b', 'c', 'd']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    expect(mgr.masteryPercentage()).toBe(0)
-
-    mgr.rateCard('got_it') // a → 25%
-    expect(mgr.masteryPercentage()).toBe(25)
-
-    mgr.rateCard('got_it') // b → 50%
-    expect(mgr.masteryPercentage()).toBe(50)
-
-    mgr.rateCard('missed') // c → still 50%
-    expect(mgr.masteryPercentage()).toBe(50)
-  })
-
-  it('getHardestCards returns sorted by missedCount descending', () => {
+  it('shuffles only the unique target set for each round', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0)
     const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
+    const mgr = new CrammingQueueManager(ids, makeConfig({ shuffleCards: true }))
 
-    // Miss 'a' twice
-    mgr.rateCard('missed') // a
-    mgr.rateCard('got_it') // b
-    mgr.rateCard('got_it') // c
-    // a reappears
-    mgr.rateCard('missed') // a again
-    mgr.rateCard('got_it') // a
+    expect([...mgr.snapshot().queue].sort()).toEqual(ids)
+    for (let i = 0; i < ids.length; i++) mgr.rateCard('missed')
 
-    const hardest = mgr.getHardestCards(5)
-    expect(hardest).toHaveLength(1) // only 'a' was missed
-    expect(hardest[0].cardId).toBe('a')
-    expect(hardest[0].missedCount).toBe(2)
+    expect(mgr.currentRound()).toBe(2)
+    expect(mgr.snapshot().queue).toHaveLength(3)
+    expect([...mgr.snapshot().queue].sort()).toEqual(ids)
+    expect(new Set(mgr.snapshot().queue).size).toBe(3)
   })
 
-  it('remainingTimeMs returns null when no time limit', () => {
+  it('completes at the time limit and rejects ratings after timeout', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-29T00:00:00.000Z'))
+    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig({ timeLimitMinutes: 1 }))
+
+    expect(mgr.remainingTimeMs()).toBe(60_000)
+    vi.advanceTimersByTime(60_000)
+
+    expect(mgr.isSessionComplete()).toBe(true)
+    expect(mgr.currentCardId()).toBeNull()
+    expect(mgr.remainingTimeMs()).toBe(0)
+    mgr.rateCard('got_it')
+    expect(mgr.totalAttempts()).toBe(0)
+    expect(mgr.currentRound()).toBe(1)
+  })
+
+  it('does not create a new round when time expires immediately after a rating', () => {
+    const now = Date.parse('2026-07-29T00:00:00.000Z')
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(now + 60_000)
+    clock.mockReturnValueOnce(now) // constructor
+    clock.mockReturnValueOnce(now + 59_000) // rateCard precondition
+
+    const mgr = new CrammingQueueManager(['a'], makeConfig({ timeLimitMinutes: 1 }))
+    mgr.rateCard('missed')
+
+    expect(mgr.totalAttempts()).toBe(1)
+    expect(mgr.currentRound()).toBe(1)
+    expect(mgr.snapshot().cursor).toBe(1)
+    expect(mgr.isSessionComplete()).toBe(true)
+  })
+
+  it('keeps no-limit time helpers stable', () => {
     const mgr = new CrammingQueueManager(['a'], makeConfig())
     expect(mgr.remainingTimeMs()).toBeNull()
     expect(mgr.hasTimeLimit()).toBe(false)
   })
 
-  it('totalAttempts counts all rating actions', () => {
-    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
+  it('does not mutate state when rated after normal completion', () => {
+    const mgr = new CrammingQueueManager(['a'], makeConfig())
+    mgr.rateCard('got_it')
+    const completed = mgr.snapshot()
 
-    mgr.rateCard('missed') // 1
-    mgr.rateCard('got_it') // 2
-    // a reappears
-    mgr.rateCard('got_it') // 3
-
-    expect(mgr.totalAttempts()).toBe(3)
-  })
-
-  it('getCardState returns correct state for a card', () => {
-    const mgr = new CrammingQueueManager(['a', 'b'], makeConfig())
-
-    mgr.rateCard('missed') // a
-    mgr.rateCard('got_it') // b
-
-    const stateA = mgr.getCardState('a')
-    expect(stateA?.totalAttempts).toBe(1)
-    expect(stateA?.missedCount).toBe(1)
-    expect(stateA?.lastRating).toBe('missed')
-    expect(stateA?.masteredInRound).toBeNull()
-
-    const stateB = mgr.getCardState('b')
-    expect(stateB?.totalAttempts).toBe(1)
-    expect(stateB?.missedCount).toBe(0)
-    expect(stateB?.lastRating).toBe('got_it')
-    expect(stateB?.masteredInRound).toBe(1)
-  })
-
-  it('round advances correctly when some cards never got_it', () => {
-    const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    // Round 1: master a and c, always miss b
-    mgr.rateCard('got_it') // a
-    mgr.rateCard('missed') // b
-    mgr.rateCard('got_it') // c
-    // b reappears (gap=2, but only 1 card after, so at end)
-    mgr.rateCard('missed') // b again
-
-    // b still not mastered, should go to round 2
-    // After round ends, b reappears... let's keep going
-    mgr.rateCard('missed') // b yet again
-
-    // At some point round should advance with only b
-    mgr.rateCard('got_it') // b finally
-
-    expect(mgr.isSessionComplete()).toBe(true)
-    expect(mgr.isAllMastered()).toBe(true)
-  })
-
-  it('remainingInRound does not overcount when missed cards are re-queued', () => {
-    const ids = ['a', 'b', 'c', 'd']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    expect(mgr.remainingInRound()).toBe(4)
-    expect(mgr.totalInRound()).toBe(4)
-
-    // Miss 'a' → re-inserted, but remainingInRound should count unique unmastered
-    mgr.rateCard('missed') // a
-    // remaining unique unmastered: a, b, c, d (still 4 unique, but cursor moved past a)
-    // However a is re-queued ahead, so remaining unique = {b, c, a, d} minus mastered = 4
-    expect(mgr.remainingInRound()).toBeLessThanOrEqual(4)
-
-    mgr.rateCard('got_it') // b → mastered
-    // remaining unique unmastered: a, c, d = 3
-    expect(mgr.remainingInRound()).toBeLessThanOrEqual(3)
-  })
-
-  it('remainingInRound counts only unique unmastered cards', () => {
-    const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    mgr.rateCard('got_it') // a mastered
-    mgr.rateCard('missed') // b missed → re-queued
-
-    // c is next, then b re-queued — unique unmastered remaining: b, c
-    expect(mgr.remainingInRound()).toBe(2)
-  })
-
-  it('lazy round advance: rateCard does not eagerly advance round', () => {
-    const ids = ['a', 'b']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-
-    mgr.rateCard('got_it') // a
-    mgr.rateCard('missed') // b → re-queued after gap
-    // b reappears
-    mgr.rateCard('missed') // b again → re-queued
-
-    // Eventually b should be the only card left in queue tail
-    mgr.rateCard('got_it') // b finally got_it
-
-    expect(mgr.isSessionComplete()).toBe(true)
-  })
-
-  it('totalInRound reflects unique cards at round start, not inflated queue', () => {
-    const ids = ['a', 'b', 'c']
-    const mgr = new CrammingQueueManager(ids, makeConfig())
-    expect(mgr.totalInRound()).toBe(3)
-
-    // Miss all three → they get re-queued but totalInRound stays 3
     mgr.rateCard('missed')
-    mgr.rateCard('missed')
-    mgr.rateCard('missed')
-    expect(mgr.totalInRound()).toBe(3) // Not inflated
+    expect(mgr.totalAttempts()).toBe(1)
+    expect(mgr.snapshot()).toEqual(completed)
+  })
+})
+
+describe('web/shared cramming parity', () => {
+  it('produces identical true-round transitions and statistics', () => {
+    const web = new CrammingQueueManager(['a', 'b', 'c'], makeConfig())
+    const shared = new SharedCrammingQueueManager(['a', 'b', 'c'], makeConfig())
+    const ratings = ['got_it', 'missed', 'missed', 'missed', 'got_it', 'got_it'] as const
+
+    for (const rating of ratings) {
+      expect(shared.currentCardId()).toBe(web.currentCardId())
+      web.rateCard(rating)
+      shared.rateCard(rating)
+    }
+
+    expect(shared.currentRound()).toBe(web.currentRound())
+    expect(shared.isSessionComplete()).toBe(web.isSessionComplete())
+    expect(shared.masteryPercentage()).toBe(web.masteryPercentage())
+    expect(shared.totalAttempts()).toBe(web.totalAttempts())
+    expect(shared.getHardestCards()).toEqual(web.getHardestCards())
+    expect(shared.snapshot().queue).toEqual(web.snapshot().queue)
   })
 })

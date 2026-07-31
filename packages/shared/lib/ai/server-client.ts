@@ -4,6 +4,7 @@
 // provider key, meters the per-account daily free quota, and builds the prompt
 // server-side. `supabase.functions.invoke` auto-attaches the user's session JWT.
 import { supabase } from '../supabase'
+import { groupThousands } from '../format-number'
 import type { FieldHint } from './prompts'
 import type { GeneratedTemplateField } from './types'
 
@@ -27,21 +28,32 @@ export type ServerGenerateRequest =
     }
   | {
       kind: 'image'
-      image: string // base64 data URL of the uploaded image
+      images: string[] // base64 data URLs of the uploaded image(s), max 8
       uiLang: string
       fields: GeneratedTemplateField[]
       cardCount: number
     }
   | {
-      kind: 'image_deck' // image → a whole new deck (metadata + template + cards) in one vision call
-      image: string // base64 data URL of the uploaded image
+      kind: 'image_deck' // image(s) → a whole new deck (metadata + template + cards) in one vision call
+      images: string[] // base64 data URLs of the uploaded image(s), max 8
       uiLang: string
+    }
+  | {
+      kind: 'remediation'
+      action: 'explain' | 'compare' | 'hint' | 'generate' | 'evaluate' | 'recommend'
+      uiLang: string
+      goalId?: string
+      activityId?: string
+      attemptId?: string
+      cardIds?: string[]
+      conceptIds?: string[]
     }
 
 export interface ServerGenerateResult {
   content: Record<string, unknown>
   remainingFree?: number // text generation
-  balance?: number       // image generation (credits left after the charge)
+  balance?: number       // image/remediation generation (balance after charge)
+  enrichmentId?: string  // remediation preview persisted by the service role
 }
 
 // supabase-js FunctionsHttpError carries the raw Response in `.context`; read our
@@ -52,8 +64,10 @@ async function extractErrorCode(error: unknown): Promise<string> {
   const ctx = (error as { context?: unknown }).context
   if (ctx && typeof (ctx as Response).json === 'function') {
     try {
-      const body = await (ctx as Response).json()
-      if (body && typeof body.code === 'string') return body.code
+      const body = await (ctx as Response).json() as unknown
+      if (body && typeof body === 'object' && typeof (body as { code?: unknown }).code === 'string') {
+        return (body as { code: string }).code
+      }
     } catch {
       /* response wasn't JSON */
     }
@@ -72,6 +86,7 @@ export async function callServerAI(req: ServerGenerateRequest): Promise<ServerGe
     content: result.content,
     remainingFree: typeof result.remainingFree === 'number' ? result.remainingFree : undefined,
     balance: typeof result.balance === 'number' ? result.balance : undefined,
+    enrichmentId: typeof result.enrichmentId === 'string' ? result.enrichmentId : undefined,
   }
 }
 
@@ -97,7 +112,7 @@ export async function getAiGenerationQuota(): Promise<AiGenerationQuota> {
 
 export interface AiWallet {
   balanceMicroWon: number      // prepaid balance in micro-WON (1e-6 KRW)
-  estPricePerCardMicro: number // approximate ₩ (micro) charged per PAID card (for the UI quote)
+  estPricePerCardMicro: number // approximate micro-USD charged per PAID card (for the UI quote)
 }
 
 // Caller's prepaid micro-WON wallet (metered billing, mig 114). The server is
@@ -135,10 +150,25 @@ export async function getAffordableCards(): Promise<Affordable> {
   return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true, balanceMicroWon: w.balanceMicroWon }
 }
 
-// micro-WON (1 unit = 1e-6 KRW) → whole ₩. All wallet money is stored in micro-WON.
-export function microWonToWon(micro: number): number {
-  return Math.floor((micro || 0) / 1_000_000)
+// The wallet is denominated in micro-USD (1 unit = 1e-6 USD) since mig 145 — the AI
+// provider bills USD, so there's no FX hop. The `*MicroWon` field names are kept for
+// churn reasons; their unit is micro-USD, which the UI renders via formatUsdMicro.
+//
+// Format a micro-USD amount as a `$` string. Balances render 2 decimals ($1.48);
+// tiny per-card spends (< $0.01) render up to 4 so they never floor to "$0.00".
+// `sign` prefixes +/− (for ledger deltas).
+export function formatUsdMicro(micro: number, opts?: { sign?: boolean }): string {
+  const abs = Math.abs(micro || 0) / 1_000_000
+  const decimals = abs > 0 && abs < 0.01 ? 4 : 2
+  const s = `$${groupThousands(abs.toFixed(decimals))}`
+  if (opts?.sign) return ((micro || 0) < 0 ? '−' : '+') + s
+  return s
 }
+
+// Grouping lives in ../format-number so the non-AI modules (pricing.ts) can share it
+// instead of re-deriving the regex. Re-exported here because every mobile/web call site
+// already imports formatCount from this path.
+export { formatCount } from '../format-number'
 
 export interface WalletLedgerEntry {
   delta: number         // micro-WON; +grant/+refund, -spend
@@ -156,7 +186,7 @@ export interface AiWalletSummary {
   ledger: WalletLedgerEntry[]
 }
 
-// Full wallet snapshot for the user-facing Wallet/Usage screen: prepaid ₩ balance,
+// Full wallet snapshot for the user-facing Wallet/Usage screen: prepaid $ balance,
 // today's free-tier usage, and recent ledger rows. The ledger + balance tables are
 // deny-all RLS, so this SECURITY DEFINER RPC (mig 117, auth.uid()-scoped) is the
 // only read path. Returns null on a transient error so the screen shows a retry

@@ -52,26 +52,6 @@
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
-  "aiProviders": {
-    "title": "AI Providers",
-    "description": "カード生成用のAIプロバイダーを設定します。キーはサーバーで暗号化され、デバイス間で同期されます。",
-    "configure": "Configure",
-    "cancel": "Cancel",
-    "apiKey": "API Key",
-    "apiKeyPlaceholder": "Enter your API key...",
-    "models": "Models",
-    "save": "Save",
-    "securityNote": "APIキーはサーバーで暗号化（pgcrypto + Vault、平文保存なし）され、Web・モバイル間で同期されます。",
-    "configured": "設定済み",
-    "notSet": "未設定",
-    "model": "モデル",
-    "saving": "保存中...",
-    "delete": "削除",
-    "deletedTitle": "削除しました",
-    "saveSuccess": "{{provider}} APIキーを保存しました。",
-    "saveError": "APIキーの保存に失敗しました。",
-    "removed": "{{provider}} APIキーを削除しました。"
-  },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
@@ -80,13 +60,13 @@
     "permissionTitle": "権限が必要です"
   },
   "subscription": {
-    "title": "Subscription",
+    "title": "サブスクリプション",
     "pro": "Pro",
-    "freePlan": "Free Plan",
-    "proDesc": "All premium features unlocked",
-    "freeDesc": "Upgrade for unlimited access",
-    "upgradeToPro": "Upgrade to Pro",
-    "manageSubscription": "Manage Subscription"
+    "freePlan": "無料プラン",
+    "proDesc": "すべてのプレミアム機能が利用可能",
+    "freeDesc": "カードを増やすにはアップグレード",
+    "upgradeToPro": "Proにアップグレード",
+    "manageSubscription": "サブスクリプションを管理"
   },
   "legal": {
     "title": "Legal",
@@ -103,15 +83,11 @@
   },
   "links": {
     "userGuide": "ユーザーガイド",
-    "userGuideDesc": "機能ガイド、学習のコツ、共有方法",
-    "apiDocs": "APIドキュメント",
-    "apiDocsDesc": "APIエンドポイント、認証、使用例"
+    "userGuideDesc": "機能ガイド、学習のコツ、共有方法"
   },
   "quickActions": {
-    "quickStudy": "クイック学習",
-    "aiGenerate": "AI生成",
     "invite": "招待",
-    "shareMessage": "最も賢い単語カードアプリ、ReeeeecallStudy をチェック！ https://reeeeecall.com"
+    "shareMessage": "最も賢い単語カードアプリ、ReeeeecallStudy をチェック！ https://reeeeecallstudy.xyz"
   },
   "templates": {
     "title": "カードテンプレート",
@@ -140,13 +116,6 @@
     "dark": "ダーク",
     "system": "システム"
   },
-  "export": {
-    "title": "データをエクスポート",
-    "stats": "学習統計",
-    "sessions": "学習セッション",
-    "decks": "デッキ",
-    "cards": "カード"
-  },
   "alerts": {
     "error": "エラー"
   },
@@ -167,8 +136,8 @@
     "upgrade": "アップグレード（近日公開）",
     "upgradeSoon": "購読は近日公開予定です。",
     "cancelPending": "解約予定 — {{date}}まで利用できます",
-    "countUnlimited": "{{owned}} / 無制限",
-    "planNoteUnlimited": "所有カードの上限は無制限です。",
+    "countUnlimited": "{{owned}} · 上限なし",
+    "planNoteUnlimited": "管理者アカウント — カード保存数に上限はありません。",
     "detail": {
       "title": "カード保存容量",
       "subtitle": "所有カードと購読カードがプランの上限に含まれます。公式デッキは対象外です。",
@@ -178,15 +147,15 @@
       "officialNote": "上限対象外",
       "archived": "アーカイブ済み",
       "archivedNote": "学習ロック中",
-      "archivedCount": "{{count}}枚アーカイブ済み",
-      "remaining": "残り{{count}}枚",
+      "archivedCount": "{{count, number}}枚アーカイブ済み",
+      "remaining": "残り{{count, number}}枚",
       "percentUsed": "{{percent}}%使用",
       "nearLimit": "上限間近",
       "atLimit": "上限に達しました",
-      "planUnlimited": "無制限プラン",
+      "planUnlimited": "管理者アカウント",
       "planCards": "{{limit}}枚プラン",
-      "unlimitedTitle": "無制限保存",
-      "lifetimeTotal": "{{count}}枚"
+      "unlimitedTitle": "カード枚数の上限なし",
+      "lifetimeTotal": "{{count, number}}枚"
     }
   },
   "groups": {
@@ -206,6 +175,23 @@
     "current": "現在のプラン",
     "comingSoon": "準備中",
     "empty": "利用できるプランがありません。",
-    "loadError": "プランを読み込めませんでした。"
+    "loadError": "プランを読み込めませんでした。",
+    "popular": "人気"
+  },
+  "paymentHistory": {
+    "title": "購入履歴",
+    "empty": "購入履歴はまだありません。",
+    "refunded": "返金済み",
+    "loadMore": "もっと見る",
+    "error": "購入履歴を読み込めませんでした。",
+    "retry": "再試行",
+    "kind": {
+      "credit_pack": "クレジット",
+      "subscription": "サブスク"
+    },
+    "reason": {
+      "renewal": "更新",
+      "updated": "プラン変更"
+    }
   }
 }

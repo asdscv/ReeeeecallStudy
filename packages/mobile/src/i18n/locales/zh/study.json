@@ -50,7 +50,7 @@
     "modalSubtitleDate": "选择日期",
     "modalSubtitleCramming": "突击选项",
     "modalSubtitleBatch": "设置批次大小",
-    "dateCardCount": "{{date}} — {{count}} 张卡片",
+    "dateCardCount": "{{date}} — {{count, number}} 张卡片",
     "backToModeSelect": "返回模式选择",
     "cancel": "取消"
   },
@@ -64,7 +64,7 @@
     "timeLimit": {
       "title": "时间限制",
       "none": "无限制",
-      "minutes": "{{count}} 分钟"
+      "minutes": "{{count, number}} 分钟"
     },
     "shuffle": {
       "title": "打乱卡片"

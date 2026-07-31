@@ -10,9 +10,9 @@
   "aiGenerate": "AI Generate",
   "detail": {
     "backToList": "← Daftar Dek",
-    "totalCards": "Total {{count}} kartu",
-    "newCards": "Baru {{count}}",
-    "reviewCards": "Ulasan {{count}}",
+    "totalCards": "Total {{count, number}} kartu",
+    "newCards": "Baru {{count, number}}",
+    "reviewCards": "Ulasan {{count, number}}",
     "startStudy": "Mulai Belajar",
     "edit": "Edit",
     "share": "Bagikan",
@@ -68,7 +68,7 @@
   "sync": {
     "button": "Sync",
     "syncing": "Syncing...",
-    "pendingChanges": "{{count}} pending",
+    "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
     "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
@@ -218,17 +218,17 @@
     "selectMode": "Pilih",
     "selectAll": "Pilih Semua",
     "deselectAll": "Batal Pilih Semua",
-    "selectedCount": "{{count}} dipilih",
+    "selectedCount": "{{count, number}} dipilih",
     "deleteSelected": "Hapus yang Dipilih",
     "deleteCardsTitle": "Hapus Kartu",
-    "deleteCardsConfirm": "Hapus {{count}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
+    "deleteCardsConfirm": "Hapus {{count, number}} kartu yang dipilih? Tindakan ini tidak dapat dibatalkan.",
     "perPage": "Per halaman:",
     "prevPage": "← Sebelumnya",
     "nextPage": "Berikutnya →",
     "pageOf": "Halaman {{current}} dari {{total}}",
-    "showingRange": "Menampilkan {{from}}–{{to}} dari {{total}} kartu",
+    "showingRange": "Menampilkan {{from, number}}–{{to, number}} dari {{total, number}} kartu",
     "archivedBadge": "Diarsipkan · Belajar terkunci",
-    "archivedNote": "{{count}} kartu diarsipkan karena melebihi batas — kamu tetap bisa melihatnya. Berlangganan untuk belajar lagi.",
+    "archivedNote": "{{count, number}} kartu diarsipkan karena melebihi batas — kamu tetap bisa melihatnya. Berlangganan untuk belajar lagi.",
     "archivedSubscribe": "Berlangganan (segera hadir)"
   },
   "deckEdit": {
@@ -254,9 +254,9 @@
   "relativeDate": {
     "today": "Hari ini",
     "yesterday": "Kemarin",
-    "daysAgo": "{{count}} hari lalu",
+    "daysAgo": "{{count, number}} hari lalu",
     "monthAgo": "1 bulan lalu",
-    "monthsAgo": "{{count}} bulan lalu"
+    "monthsAgo": "{{count, number}} bulan lalu"
   },
   "templatesList": {
     "cannotDeleteTitle": "Tidak Dapat Dihapus",

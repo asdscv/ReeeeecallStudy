@@ -36,6 +36,19 @@ export interface AdminBillingOverview {
   refunds_30d: number
 }
 
+/**
+ * Sales channel of a billing row (mig 156). `provider` is NOT enough: RevenueCat
+ * fronts both stores under provider='revenuecat', and they differ in the one way
+ * that matters to an admin — whether WE can issue the money refund.
+ *   web_lemonsqueezy / web_toss / android → yes, via API
+ *   ios                                   → no; Apple alone issues App Store refunds
+ *   mobile_unknown                        → row predates mig 156; treated as ios
+ */
+export type BillingChannel =
+  | 'web_lemonsqueezy' | 'web_toss' | 'ios' | 'android' | 'mobile_unknown' | 'admin'
+
+export type BillingPlatform = 'web' | 'ios' | 'android'
+
 export interface AdminSubscriptionRow {
   id: string
   user_id: string
@@ -49,6 +62,12 @@ export interface AdminSubscriptionRow {
   cancel_at_period_end: boolean
   created_at: string
   updated_at: string
+  platform: BillingPlatform | null
+  channel: BillingChannel
+  /** Server's verdict on whether a real money refund is possible for this channel. */
+  can_refund_money: boolean
+  /** 'sandbox' rows are test purchases — never counted as revenue (mig 159). */
+  environment: 'production' | 'sandbox'
 }
 
 export interface AdminPaymentRow {
@@ -58,11 +77,60 @@ export interface AdminPaymentRow {
   product_id: string | null
   kind: string
   amount_krw: number
+  /** Charged amount in micro-USD (mig 147); format with formatUsdMicro. */
+  amount_micro: number
   status: string
   provider: string | null
   provider_payment_id: string | null
   paid_at: string | null
   created_at: string
+  platform: BillingPlatform | null
+  channel: BillingChannel
+  can_refund_money: boolean
+  environment: 'production' | 'sandbox'
+}
+
+/**
+ * What admin-refund actually did. `providerRefunded` is the ONLY truth about money:
+ * an iOS row returns ok:true with providerRefunded:false because access was revoked
+ * but Apple — not us — issues the refund. Rendering a 200 as "refunded" would tell
+ * the admin a customer was paid back when they were not.
+ */
+export interface RefundResult {
+  ok: boolean
+  kind: string
+  provider: string | null
+  channel: BillingChannel
+  platform: BillingPlatform | null
+  providerRefunded: boolean
+  provider_result?: { note?: string; skipped?: boolean } & Record<string, unknown>
+  internal?: unknown
+  note?: string
+}
+
+/**
+ * Policy verdict from refund_eligibility (mig 157). Advisory: it never blocks a
+ * refund, because statutory cooling-off rights can override it.
+ */
+export interface RefundEligibility {
+  ok: boolean
+  eligible: boolean
+  reason_code:
+    | 'eligible' | 'not_found' | 'not_paid' | 'already_refunded'
+    | 'outside_window' | 'already_used' | 'renewal_charge'
+  kind?: string
+  platform?: BillingPlatform | null
+  channel?: BillingChannel
+  can_refund_money?: boolean
+  purchased_at?: string | null
+  days_since?: number | null
+  window_days?: number
+  within_window?: boolean
+  unused?: boolean
+  /** False ⇒ the buyer was never shown the withdrawal-right notice; treat 'already_used' as advisory. */
+  consent_recorded?: boolean
+  detail?: Record<string, unknown>
+  statutory_note?: string | null
 }
 
 export interface AdminUserBillingSubscription {
@@ -93,6 +161,8 @@ export interface AdminUserBillingPayment {
   product_id: string | null
   kind: string
   amount_krw: number
+  /** Charged amount in micro-USD (mig 147); format with formatUsdMicro. */
+  amount_micro: number
   status: string
   paid_at: string | null
   created_at: string
@@ -157,6 +227,10 @@ interface AdminState {
   systemStats: AdminSystemStats | null
   systemLoading: boolean
   systemError: string | null
+  systemFlags: SystemFlags | null
+  /** Pack B config levers (mig 154 setters + mig 177 getter). null until read. */
+  growthLevers: GrowthLevers | null
+  growthLeversError: string | null
 
   // Audit Log
   auditLogs: AdminAuditLog[]
@@ -168,6 +242,9 @@ interface AdminState {
   billingOverview: AdminBillingOverview | null
   billingSubscriptions: AdminSubscriptionRow[]
   billingPayments: AdminPaymentRow[]
+  /** The last payments page came back FULL → at least one more page exists. Derived from
+   *  the raw RPC row count, not billingPayments.length, which de-dupes on append. */
+  billingPaymentsHasMore: boolean
   billingUser: AdminUserBilling | null
   billingOverviewLoading: boolean
   billingSubsLoading: boolean
@@ -192,14 +269,71 @@ interface AdminState {
   // Billing
   fetchBillingOverview: () => Promise<void>
   fetchBillingSubscriptions: (status?: string, page?: number, pageSize?: number) => Promise<void>
-  fetchBillingPayments: (page?: number, pageSize?: number) => Promise<void>
+  /** `append` keeps the rows already loaded and adds the page after them (load-more
+   *  list) instead of replacing them (page-flip). `platform` narrows the list to one
+   *  sales channel ('web' | 'ios' | 'android'); omit for all channels. */
+  fetchBillingPayments: (page?: number, pageSize?: number, append?: boolean, platform?: BillingPlatform | null) => Promise<void>
   fetchUserBilling: (userId: string) => Promise<void>
   clearUserBilling: () => void
   cancelSubscription: (provider: string, providerSubscriptionId: string, immediate: boolean) => Promise<{ error: string | null }>
   grantSubscription: (userId: string, productId: string, periodEnd: string | null) => Promise<{ error: string | null }>
   adjustWallet: (userId: string, deltaMicro: number, reason: string) => Promise<{ error: string | null }>
-  refundPayment: (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => Promise<{ error: string | null }>
+  refundPayment: (kind: 'credit_pack' | 'subscription', ref: string, reason?: string) => Promise<{ error: string | null; result?: RefundResult }>
+  /** Policy verdict for a would-be refund (mig 157). Advisory — never blocks. */
+  checkRefundEligibility: (kind: 'credit_pack' | 'subscription', ref: string) => Promise<{ error: string | null; eligibility?: RefundEligibility }>
+  // System flags / kill switches (mig 153)
+  fetchSystemFlags: () => Promise<void>
+  setSystemFlags: (patch: Partial<SystemFlags>) => Promise<{ error: string | null }>
+  // Pack B growth levers (mig 154 setters, mig 177 read path)
+  fetchGrowthLevers: () => Promise<void>
+  setAiFreeQuota: (cardsPerDay: number) => Promise<{ error: string | null }>
+  setCardLimit: (maxOwnedCards: number | null, countOfficial: boolean | null) => Promise<{ error: string | null }>
+  setAiPricing: (patch: { wonPerCredit?: number; targetMarginBps?: number }) => Promise<{ error: string | null }>
+  setListingActive: (listingId: string, active: boolean) => Promise<{ error: string | null }>
   forceRefresh: (section: SectionKey) => void
+}
+
+// Runtime operational switches (mig 153 system_flags). Read via get_system_flags,
+// written via admin_set_system_flags (admin-gated).
+export interface SystemFlags {
+  maintenance_mode: boolean
+  maintenance_message: string | null
+  ai_generation_enabled: boolean
+  payments_enabled: boolean
+  /**
+   * Whether a RevenueCat SANDBOX purchase may grant anything (mig 159). OFF by
+   * default: the sandbox webhook can stay enabled permanently, and test purchases
+   * are acked-and-ignored until an admin opens this for a test run.
+   */
+  sandbox_grants_enabled: boolean
+}
+
+/**
+ * Config values an admin can change without a deploy (Pack B, mig 154).
+ *
+ * Read through `admin_get_growth_levers` (mig 177) rather than a table select:
+ * `ai_pricing_settings` and `card_limit_settings` are RLS-enabled with zero
+ * policies, so the SECURITY DEFINER RPC is the only read path.
+ *
+ * `usd_won_rate` is deliberately absent — mig 149 pins it with
+ * CHECK (usd_won_rate = 1), so an editable field could only fail.
+ */
+export interface GrowthLevers {
+  /** Free AI cards per user per day. Enforced by _ai_free_cards_per_day(). */
+  free_cards_per_day: number
+  /** Micro-currency per credit. Must mirror the IAP/credit-pack price. */
+  won_per_credit: number
+  /**
+   * Target margin in basis points. A LIVE DIVISOR in the charging path
+   * (markup = 10000 / (10000 - bps)), so 10000 (=100%) is rejected by the setter.
+   */
+  target_margin_bps: number
+  ai_settings_updated_at: string | null
+  /** Owned-card cap per account. */
+  max_owned_cards: number
+  /** Whether subscribed official-deck cards count toward the cap. */
+  count_official_cards: boolean
+  card_limit_updated_at: string | null
 }
 
 
@@ -239,6 +373,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   systemStats: null,
   systemLoading: false,
   systemError: null,
+  systemFlags: null,
+  growthLevers: null,
+  growthLeversError: null,
 
   auditLogs: [],
   auditTotal: 0,
@@ -248,6 +385,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   billingOverview: null,
   billingSubscriptions: [],
   billingPayments: [],
+  billingPaymentsHasMore: false,
   billingUser: null,
   billingOverviewLoading: false,
   billingSubsLoading: false,
@@ -599,16 +737,29 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  fetchBillingPayments: async (page = 0, pageSize = 50) => {
+  fetchBillingPayments: async (page = 0, pageSize = 50, append = false, platform = null) => {
     if (get().billingPaymentsLoading) return
     set({ billingPaymentsLoading: true, billingError: null })
     try {
       const { data, error } = await supabase.rpc('admin_list_payments', {
         p_limit: pageSize,
         p_offset: page * pageSize,
+        p_platform: platform,
       })
       if (error) throw error
-      set({ billingPayments: (data as AdminPaymentRow[] | null) ?? [] })
+      const rows = (data as AdminPaymentRow[] | null) ?? []
+      const hasMore = rows.length === pageSize
+      // De-dupe on merchant_uid: offset paging over a live table can repeat a row when
+      // a new payment lands between two page fetches, and React keys must stay unique.
+      set(append
+        ? (s) => {
+            const seen = new Set(s.billingPayments.map((r) => r.merchant_uid))
+            return {
+              billingPayments: [...s.billingPayments, ...rows.filter((r) => !seen.has(r.merchant_uid))],
+              billingPaymentsHasMore: hasMore,
+            }
+          }
+        : { billingPayments: rows, billingPaymentsHasMore: hasMore })
     } catch (e) {
       set({ billingError: extractErrorMessage(e) })
     } finally {
@@ -689,7 +840,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     try {
       // Refund runs through the `admin-refund` Edge fn (calls the payment provider +
       // reverses our side), NOT an RPC — `functions.invoke` auto-attaches the admin JWT.
-      const { error } = await supabase.functions.invoke('admin-refund', { body: { kind, ref, reason } })
+      const { data, error } = await supabase.functions.invoke('admin-refund', { body: { kind, ref, reason } })
       if (error) {
         // supabase-js FunctionsHttpError carries the raw Response in `.context`;
         // prefer our `{ error }` body over the generic message when present.
@@ -704,7 +855,132 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       }
       // Wallet clawback / subscription revoke landed → the overview counts are stale.
       adminCache.invalidate('billing')
-      get().logAction('refund_payment', kind === 'subscription' ? 'subscription' : 'payment', ref, { kind, reason })
+      const result = (data ?? undefined) as RefundResult | undefined
+      // Log what ACTUALLY happened, not just that the button was pressed: on iOS the
+      // call succeeds while no money moves, and the audit trail has to say which.
+      get().logAction('refund_payment', kind === 'subscription' ? 'subscription' : 'payment', ref, {
+        kind, reason, channel: result?.channel, providerRefunded: result?.providerRefunded ?? false,
+      })
+      return { error: null, result }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  checkRefundEligibility: async (kind: 'credit_pack' | 'subscription', ref: string) => {
+    try {
+      const { data, error } = await supabase.rpc('refund_eligibility', { p_kind: kind, p_ref: ref })
+      if (error) throw error
+      return { error: null, eligibility: (data ?? undefined) as RefundEligibility | undefined }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // ── System flags / kill switches (mig 153) ──────────────────────────────
+  fetchSystemFlags: async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_system_flags')
+      if (error) return
+      set({ systemFlags: data as SystemFlags })
+    } catch { /* leave prior value */ }
+  },
+
+  setSystemFlags: async (patch: Partial<SystemFlags>) => {
+    try {
+      const { data, error } = await supabase.rpc('admin_set_system_flags', {
+        p_maintenance_mode: patch.maintenance_mode ?? null,
+        p_maintenance_message: patch.maintenance_message ?? null,
+        p_ai_generation_enabled: patch.ai_generation_enabled ?? null,
+        p_payments_enabled: patch.payments_enabled ?? null,
+        p_sandbox_grants_enabled: patch.sandbox_grants_enabled ?? null,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      set({ systemFlags: data as SystemFlags })
+      get().logAction('set_system_flags', 'system', 'system_flags', patch as Record<string, unknown>)
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // ── Pack B growth levers (mig 154 setters + mig 177 read path) ──────────
+  // Every setter RE-READS through fetchGrowthLevers instead of trusting its own
+  // return value. The three setters return three different shapes (an integer, a
+  // card_limit_settings row, an ai_pricing_settings row), and one of them carries
+  // the pinned usd_won_rate we deliberately do not model. One authoritative read
+  // path keeps the form showing what the database actually holds — which matters
+  // more than a round trip on a page an admin opens rarely.
+  fetchGrowthLevers: async () => {
+    try {
+      const { data, error } = await supabase.rpc('admin_get_growth_levers')
+      if (error) return set({ growthLeversError: extractErrorMessage(error) })
+      set({ growthLevers: data as GrowthLevers, growthLeversError: null })
+    } catch (e) {
+      set({ growthLeversError: extractErrorMessage(e) })
+    }
+  },
+
+  setAiFreeQuota: async (cardsPerDay: number) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_ai_free_quota', {
+        p_free_cards_per_day: cardsPerDay,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      get().logAction('set_ai_free_quota', 'system', 'ai_pricing_settings', { free_cards_per_day: cardsPerDay })
+      await get().fetchGrowthLevers()
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // Both args are nullable because the RPC COALESCEs: passing null leaves that
+  // column alone, so the UI can save one field without resetting the other.
+  setCardLimit: async (maxOwnedCards: number | null, countOfficial: boolean | null) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_card_limit', {
+        p_max_owned_cards: maxOwnedCards,
+        p_count_official: countOfficial,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      get().logAction('set_card_limit', 'system', 'card_limit_settings', {
+        max_owned_cards: maxOwnedCards, count_official: countOfficial,
+      })
+      await get().fetchGrowthLevers()
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  // usd_won_rate is never sent: mig 149 pins it to 1, so passing anything else
+  // would be rejected. Omitted keys stay null → COALESCE keeps the stored value.
+  setAiPricing: async (patch: { wonPerCredit?: number; targetMarginBps?: number }) => {
+    try {
+      const { error } = await supabase.rpc('set_ai_pricing_settings', {
+        p_won_per_credit: patch.wonPerCredit ?? null,
+        p_target_margin_bps: patch.targetMarginBps ?? null,
+        p_usd_won_rate: null,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      get().logAction('set_ai_pricing', 'system', 'ai_pricing_settings', patch as Record<string, unknown>)
+      await get().fetchGrowthLevers()
+      return { error: null }
+    } catch (e) {
+      return { error: extractErrorMessage(e) }
+    }
+  },
+
+  setListingActive: async (listingId: string, active: boolean) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_listing_active', {
+        p_listing_id: listingId,
+        p_active: active,
+      })
+      if (error) return { error: extractErrorMessage(error) }
+      adminCache.invalidate('market')
+      get().logAction(active ? 'restore_listing' : 'takedown_listing', 'listing', listingId)
       return { error: null }
     } catch (e) {
       return { error: extractErrorMessage(e) }

@@ -34,14 +34,14 @@
     "performance": "성과"
   },
   "cardDetails": "카드 상세",
-  "logsCount": "기록 {{count}}개",
+  "logsCount": "기록 {{count, number}}개",
   "loadingDetails": "상세 정보를 불러오는 중...",
   "noLogs": "이 세션에 대한 상세 기록이 없습니다",
   "deletedCard": "(삭제된 카드)",
   "noContent": "(내용 없음)",
   "deckProgress": "덱 진도",
-  "sessionsCount": "세션 {{count}}회",
-  "cardsCount": "{{count}}장",
+  "sessionsCount": "세션 {{count, number}}회",
+  "cardsCount": "{{count, number}}장",
   "cardsFraction": "{{studied}}/{{total}}장",
   "ratingDistribution": "평가 분포",
   "overview": {

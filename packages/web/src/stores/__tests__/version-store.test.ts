@@ -6,6 +6,14 @@ const mockSupabase = vi.hoisted(() => ({
 }))
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
+// The store under test is a re-export of the shared one, which imports the shared
+// client — mocking only the web path left the real (uninitialised) client in place,
+// so every assertion saw zero calls.
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+  supabase: mockSupabase,
+  getSupabase: () => mockSupabase,
+  initSupabase: vi.fn(),
+}))
 
 import { useVersionStore } from '../version-store'
 

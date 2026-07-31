@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Search, ChevronDown, ChevronUp, ArrowLeft, ExternalLink, Link2, RotateCcw } from 'lucide-react'
@@ -24,11 +24,18 @@ function SectionCard({
   t: (key: string) => string
   onCopyLink: (sectionId: string) => void
 }) {
-  const [open, setOpen] = useState(defaultOpen)
+  // forceOpen is honoured on the first render too: a deep link is already set when the
+  // page mounts, and the effect this replaced ran on mount.
+  const [open, setOpen] = useState(defaultOpen || forceOpen)
 
-  useEffect(() => {
-    if (forceOpen) setOpen(true)
-  }, [forceOpen])
+  // Render-time adjustment: force open without effect-based setState (pattern #2).
+  const [prevForceOpen, setPrevForceOpen] = useState(forceOpen)
+  if (forceOpen && forceOpen !== prevForceOpen) {
+    setPrevForceOpen(forceOpen)
+    setOpen(true)
+  } else if (forceOpen !== prevForceOpen) {
+    setPrevForceOpen(forceOpen)
+  }
 
   return (
     <div
@@ -152,29 +159,37 @@ export function GuidePage() {
   const filtered = searchGuide(query, t)
   const isSearching = query.trim().length > 0
 
-  // Handle hash-based deep link on mount and hash change
-  const handleHash = useCallback(() => {
-    const hash = location.hash.replace('#', '')
-    if (hash && GUIDE_SECTIONS.some((s) => s.id === hash)) {
-      setOpenSectionId(hash)
-      setHighlightedId(hash)
-      // Scroll after DOM update
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          const el = sectionRefs.current[hash]
-          if (!el) return
-          const y = el.getBoundingClientRect().top + window.scrollY - 72
-          window.scrollTo({ top: y, behavior: 'smooth' })
-        }, 100)
-      })
-      // Remove highlight after animation
-      setTimeout(() => setHighlightedId(null), 3000)
+  // Handle hash-based deep link: render-time state adjustment (pattern #2)
+  // avoids synchronous setState in effect while preserving scroll behavior.
+  // `null` until the first pass: seeding it with the current hash meant a deep link that
+  // was already in the URL at mount never opened its section.
+  const [prevHash, setPrevHash] = useState<string | null>(null)
+  const hashTarget = location.hash.replace('#', '')
+  if (location.hash !== prevHash) {
+    setPrevHash(location.hash)
+    if (hashTarget && GUIDE_SECTIONS.some((s) => s.id === hashTarget)) {
+      setOpenSectionId(hashTarget)
+      setHighlightedId(hashTarget)
     }
-  }, [location.hash])
+  }
 
+  // Side effects (scroll + delayed highlight removal) still need an effect
   useEffect(() => {
-    handleHash()
-  }, [handleHash])
+    const hash = location.hash.replace('#', '')
+    if (!hash || !GUIDE_SECTIONS.some((s) => s.id === hash)) return
+    // Scroll after DOM update
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const el = sectionRefs.current[hash]
+        if (!el) return
+        const y = el.getBoundingClientRect().top + window.scrollY - 72
+        window.scrollTo({ top: y, behavior: 'smooth' })
+      }, 100)
+    })
+    // Remove highlight after animation
+    const timer = setTimeout(() => setHighlightedId(null), 3000)
+    return () => clearTimeout(timer)
+  }, [location.hash])
 
   const scrollToSection = (id: string) => {
     // Update URL hash without full navigation

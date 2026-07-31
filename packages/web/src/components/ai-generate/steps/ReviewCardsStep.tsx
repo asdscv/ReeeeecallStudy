@@ -24,6 +24,7 @@ export function ReviewCardsStep({ cards, fields, filteredCount, onChange, onRemo
 
   return (
     <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">{t('review.cardsDesc')}</p>
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium text-foreground">
           {t('review.cardsTitle', { count: cards.length })}

@@ -11,6 +11,7 @@
     "admin": "管理者",
     "guide": "ガイド",
     "aiGenerate": "AI Generate",
+    "learningPlan": "学習プラン",
     "achievements": "実績",
     "publisherStats": "パブリッシャー統計",
     "wallet": "ウォレット"
@@ -45,7 +46,7 @@
   },
   "units": {
     "cards": "枚",
-    "cardsSuffix": "{{count}}枚",
+    "cardsSuffix": "{{count, number}}枚",
     "sessions": "回",
     "days": "日",
     "hours": "時間",
@@ -257,5 +258,8 @@
       "金",
       ""
     ]
+  },
+  "shares": {
+    "title": "共有"
   }
 }

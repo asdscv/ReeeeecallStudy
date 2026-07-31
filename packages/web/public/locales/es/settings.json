@@ -8,17 +8,11 @@
   "autoSaved": "Guardado automáticamente",
   "links": {
     "userGuide": "Guía de usuario",
-    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir",
-    "apiDocs": "Documentación API",
-    "apiDocsDesc": "Endpoints API, autenticación, ejemplos de uso"
+    "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
   },
   "guide": {
     "title": "Guía de usuario",
     "desc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
-  },
-  "apiDocs": {
-    "title": "Documentación API",
-    "desc": "Endpoints API, autenticación, ejemplos de uso"
   },
   "profile": {
     "title": "Perfil",
@@ -147,8 +141,8 @@
     "upgrade": "Mejorar (próximamente)",
     "upgradeSoon": "La suscripción estará disponible pronto.",
     "unlimited": "Ilimitado",
-    "countUnlimited": "{{owned}} / Ilimitado",
-    "planNoteUnlimited": "Tu plan incluye tarjetas ilimitadas.",
+    "countUnlimited": "{{owned}} · Sin límite",
+    "planNoteUnlimited": "Cuenta de administrador: el almacenamiento de tarjetas no tiene límite.",
     "detail": {
       "title": "Almacenamiento de tarjetas",
       "subtitle": "Las tarjetas propias y suscritas cuentan para tu plan. Los mazos oficiales no cuentan.",
@@ -158,15 +152,15 @@
       "officialNote": "Excluidos del límite",
       "archived": "Archivadas",
       "archivedNote": "Estudio bloqueado",
-      "archivedCount": "{{count}} archivadas",
-      "remaining": "{{count}} restantes",
+      "archivedCount": "{{count, number}} archivadas",
+      "remaining": "{{count, number}} restantes",
       "percentUsed": "{{percent}}% usado",
       "nearLimit": "Cerca del límite",
       "atLimit": "Límite alcanzado",
-      "planUnlimited": "Plan ilimitado",
+      "planUnlimited": "Cuenta de administrador",
       "planCards": "Plan de {{limit}} tarjetas",
-      "unlimitedTitle": "Almacenamiento ilimitado",
-      "lifetimeTotal": "{{count}} tarjetas"
+      "unlimitedTitle": "Sin límite de tarjetas",
+      "lifetimeTotal": "{{count, number}} tarjetas"
     }
   },
   "groups": {
@@ -176,5 +170,20 @@
     "preferences": "Preferencias",
     "data": "Datos"
   },
-  "subtitle": "Gestiona tu cuenta, créditos y preferencias de estudio."
+  "subtitle": "Gestiona tu cuenta, créditos y preferencias de estudio.",
+  "privacy": {
+    "title": "Privacy & data",
+    "analyticsTitle": "Usage analytics",
+    "analyticsHint": "Help improve the app with anonymous usage data",
+    "trackingOn": "Allowed",
+    "trackingOff": "Off",
+    "deleteAccount": "Delete my account",
+    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirmBtn": "Delete permanently",
+    "cancel": "Cancel",
+    "deleteFailed": "Could not delete your account. Please try again."
+  },
+  "subscription": {
+    "title": "Suscripción"
+  }
 }

@@ -11,6 +11,7 @@
     "admin": "Admin",
     "guide": "Guide",
     "aiGenerate": "AI Generate",
+    "learningPlan": "Learning plan",
     "publisherStats": "Publisher Stats",
     "achievements": "Achievements",
     "wallet": "Wallet"
@@ -46,7 +47,7 @@
   },
   "units": {
     "cards": "cards",
-    "cardsSuffix": "{{count}} cards",
+    "cardsSuffix": "{{count, number}} cards",
     "sessions": "sessions",
     "days": "days",
     "hours": "h",
@@ -257,5 +258,8 @@
       "F",
       ""
     ]
+  },
+  "shares": {
+    "title": "My Shares"
   }
 }

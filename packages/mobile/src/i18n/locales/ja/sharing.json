@@ -38,7 +38,7 @@
     "copyLink": "リンクをコピー",
     "newLink": "新しいリンク",
     "linkHint": "このリンクを持っている人は誰でも招待を受け入れてデッキにアクセスできます。",
-    "existingShares": "既存の共有 ({{count}})",
+    "existingShares": "既存の共有 ({{count, number}})",
     "noShares": "まだ共有はありません。上から招待リンクを生成してください。"
   },
   "revokeAlert": {
@@ -57,7 +57,7 @@
     "emptySentHint": "デッキを開いて「共有」をタップすると招待リンクを作成できます。",
     "emptyReceived": "まだ誰もあなたにデッキを共有していません。",
     "activePending": "有効 {{activeCount}} · 保留中 {{pendingCount}}",
-    "viewAll": "{{count}}件の共有をすべて表示",
+    "viewAll": "{{count, number}}件の共有をすべて表示",
     "unknownDeck": "不明なデッキ"
   },
   "publish": {

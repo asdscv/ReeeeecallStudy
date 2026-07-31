@@ -1,6 +1,18 @@
 import i18next from 'i18next'
 import type { ContentDetail } from '../types/content-blocks'
 import { SEO } from './seo-config'
+import type {
+  JsonLdArticle,
+  JsonLdBreadcrumbList,
+  JsonLdCollectionPage,
+  JsonLdWebApplication,
+  JsonLdOrganizationFull,
+  JsonLdWebSite,
+  JsonLdFAQPage,
+  JsonLdHowTo,
+  JsonLdLearningResource,
+  JsonLdHreflangAlternate,
+} from './seo/json-ld'
 
 function insightUrl(slug: string, locale?: string) {
   const langSuffix = locale && locale !== 'en' ? `?lang=${locale}` : ''
@@ -18,8 +30,8 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
   es: 'Spanish',
 }
 
-export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string[]) {
-  const jsonLd: Record<string, unknown> = {
+export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string[]): JsonLdArticle {
+  const jsonLd: JsonLdArticle = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: article.meta_title || article.title,
@@ -68,7 +80,7 @@ export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string
   return jsonLd
 }
 
-export function buildBreadcrumbJsonLd(article: ContentDetail) {
+export function buildBreadcrumbJsonLd(article: ContentDetail): JsonLdBreadcrumbList {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -95,7 +107,7 @@ export function buildBreadcrumbJsonLd(article: ContentDetail) {
   }
 }
 
-export function buildCollectionPageJsonLd() {
+export function buildCollectionPageJsonLd(): JsonLdCollectionPage {
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -127,7 +139,7 @@ export function buildCollectionPageJsonLd() {
   }
 }
 
-export function buildWebApplicationJsonLd() {
+export function buildWebApplicationJsonLd(): JsonLdWebApplication {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -162,9 +174,9 @@ export function buildWebApplicationJsonLd() {
   }
 }
 
-export function buildStaticHreflangAlternates(path: string) {
+export function buildStaticHreflangAlternates(path: string): JsonLdHreflangAlternate[] {
   // Only indexable locales get hreflang — minor languages are noindex now.
-  const alternates: { lang: string; href: string }[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
+  const alternates: JsonLdHreflangAlternate[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
     lang: locale as string,
     href: `${SEO.SITE_URL}${path}?lang=${locale}`,
   }))
@@ -172,9 +184,9 @@ export function buildStaticHreflangAlternates(path: string) {
   return alternates
 }
 
-export function buildHreflangAlternates(slug: string) {
+export function buildHreflangAlternates(slug: string): JsonLdHreflangAlternate[] {
   // Only indexable locales get hreflang — minor languages are noindex now.
-  const alternates: { lang: string; href: string }[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
+  const alternates: JsonLdHreflangAlternate[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
     lang: locale as string,
     href: `${SEO.SITE_URL}/insight/${slug}?lang=${locale}`,
   }))
@@ -182,7 +194,7 @@ export function buildHreflangAlternates(slug: string) {
   return alternates
 }
 
-export function buildOrganizationJsonLd() {
+export function buildOrganizationJsonLd(): JsonLdOrganizationFull {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -209,7 +221,7 @@ export function buildOrganizationJsonLd() {
   }
 }
 
-export function buildWebSiteJsonLd() {
+export function buildWebSiteJsonLd(): JsonLdWebSite {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -225,7 +237,7 @@ export function buildWebSiteJsonLd() {
   }
 }
 
-export function buildFAQJsonLd(questions: Array<{ question: string; answer: string }>) {
+export function buildFAQJsonLd(questions: Array<{ question: string; answer: string }>): JsonLdFAQPage | null {
   if (questions.length === 0) return null
 
   return {
@@ -246,7 +258,7 @@ export function buildHowToJsonLd(
   name: string,
   steps: Array<{ name: string; text: string }>,
   totalTime?: string,
-) {
+): JsonLdHowTo {
   return {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -261,7 +273,7 @@ export function buildHowToJsonLd(
   }
 }
 
-export function buildLearningResourceJsonLd(article: ContentDetail) {
+export function buildLearningResourceJsonLd(article: ContentDetail): JsonLdLearningResource {
   return {
     '@context': 'https://schema.org',
     '@type': 'LearningResource',
