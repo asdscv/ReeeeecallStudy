@@ -18,7 +18,8 @@
 **OPS-READINESS 의 Deferred 항목 중 "코드 작업"으로 분류됐던 4건은 전부 처리·머지됐다.**
 PR 5건 모두 CI 7/7 green. 남은 것은 §2(새로 발견) 와 §4(소유자 결정)뿐이다.
 
-마이그레이션 175·176·177 사용 → **다음 빈 번호는 178.**
+~~마이그레이션 175·176·177 사용 → **다음 빈 번호는 178.**~~
+→ **낡음.** 178 은 PR A(#377), 179 는 #379 가 썼다. **다음 빈 번호는 180** (§5.1).
 
 ---
 
@@ -114,7 +115,13 @@ vitest **143 파일 / 2384 테스트 PASS**. i18n 8개 로케일 × 16키 완전
 
 ## 2. 남은 코드 작업 (이번 패스에서 새로 발견 / 의도적 미진행)
 
-### 2.1 모바일 페이월 문구가 설정값을 하드코딩 (신규 발견, 미처리)
+### 2.1 모바일 페이월 문구가 설정값을 하드코딩 — ✅ **완료 (#379, mig 179)**
+
+> 아래는 발견 당시의 기록. 실제 수정과 **진단의 정정 두 건**은 §5.3 참조:
+> `cardStorage.pro` 는 "고칠 수 없다"가 아니라 카탈로그에서 바로 나왔고, 반대로
+> `cardStorage.free` 는 "지금 고칠 수 있다"가 아니라 **읽기 경로가 없어** mig 179 가 필요했다.
+> 그리고 이 화면은 §5.4 대로 **숨겨져 있지 않았다.**
+
 `packages/mobile/src/i18n/locales/*/paywall.json` 의 **8개 로케일**:
 - `features.aiGeneration.free = "하루 10장"` → 무료 쿼터의 하드코딩 사본
 - `features.aiGeneration.pro = "하루 10장 + 크레딧"`
@@ -185,7 +192,8 @@ vitest **143 파일 / 2384 테스트 PASS**. i18n 8개 로케일 × 16키 완전
 
 ⚠️ **mig 114 절대 재실행 금지** — `TRUNCATE ai_credit_balance, ai_credit_ledger` 포함.
 ⚠️ prod 상태는 문서가 아니라 **`supabase migration list --linked`** 로 확인.
-⚠️ **prod 는 mig 173 까지 동기화됨** → 이번 패스의 **175 / 176 / 177 은 아직 prod 미적용.**
+⚠️ ~~**prod 는 mig 173 까지 동기화됨**~~ → **낡음. 2026-08-01 `supabase migration list --linked`
+확인 결과 prod 는 174 까지 적용돼 있다.** 미적용은 **175 / 176 / 177 / 178 / 179** (§5.1).
 
 **승격 대기:** `origin/develop` 이 `origin/main` 보다 앞서 있고, 그 안에
 `7dbec02 fix(mobile): bump expo.version to 1.0.4` — **모든 iOS 업로드를 막고 있던** 수정이 있다.
@@ -201,3 +209,122 @@ vitest **143 파일 / 2384 테스트 PASS**. i18n 8개 로케일 × 16키 완전
 **per-plan AI 엔타이틀먼트**(유료 티어에 더 큰 무료 쿼터 — §2.1 페이월 문구가 여기 걸려 있다),
 할인/쿠폰/무료체험, 쿼터 리셋 타임존(UTC→Asia/Seoul, 리셋 회계가 바뀜), 일회용 이메일 denylist,
 크레딧 만료(ToS 고지 선행), 푸시/공지 브로드캐스트, 계정삭제 grace window(파괴적 의미 변경).
+
+---
+
+## 5. 후속 패스 (2026-08-01) — 워크트리에 남아 있던 것들
+
+착수 시점 `origin/develop` = `c498ae0`. 이 패스는 **새 기능을 시작하지 않았고**, 앞 패스가
+워크트리·스테일 PR 형태로 남긴 것을 찾아 끝냈다.
+
+| PR | 내용 | 어디서 발견 | 상태 |
+|---|---|---|---|
+| #348 | `tests/integration` vitest 스코프 + CI 바이너리 해석 | 워크트리 `modular-learning-engine`, PR이 **12일간 열린 채 방치** | ✅ 머지 |
+| #292 | Android 12 스플래시 로고 잘림 | 7/20부터 열린 채 방치, 체크는 green이었음 | ✅ 머지 |
+| #378 | **PR B** — attempt-grounded remediation UI (web+mobile) | 워크트리 `wt-mem`에 **커밋되지 않은 채** 존재 | ✅ 머지 |
+| #379 | 모바일 페이월 하드코딩 제거 (mig 179) | 아래 §2.1 | ✅ 머지 |
+
+**§2.1 은 이제 완료다.** 남은 코드 작업은 §2.2 / §2.3 뿐이며 둘 다 의도적 보류(하나는 무인
+리팩토링 부적합, 하나는 정산 설계 결정 필요)다.
+
+### 5.1 문서가 낡아 있던 두 지점 — 본문 정정함
+
+- **마이그레이션 번호**: "다음 빈 번호는 178" → 178은 PR A(#377)가, 179는 #379가 썼다.
+  **다음 빈 번호는 180.**
+- **prod 상태**: "prod 는 mig 173 까지" → `supabase migration list --linked` 확인 결과
+  **174까지 적용돼 있다.** 미적용은 **175 / 176 / 177 / 178 / 179**.
+
+### 5.2 PR B 는 "작성 완료 + 미커밋" 상태였다
+
+설계 문서 §10 은 "PR B — not started" 라고 적혀 있었으나, 실제로는 web 페이지 / mobile 화면
+(+213줄) / 8개 로케일 × 2플랫폼 / 테스트가 `wt-mem` 워크트리에 **커밋되지 않은 채** 있었다.
+그대로 커밋했으면 CI는 통과했을 것이다 — tsc/vitest 모두 green 이었으므로. 그래서 5개 렌즈로
+리뷰를 돌렸고 **20건 제기 → 16건 확인 / 4건 반증**, 확인된 것을 고치고 머지했다.
+
+돈이 걸린 결함 위주로:
+
+1. **웹이 attempt 를 goal 로 필터링하지 않았다** (3개 렌즈가 독립적으로 도달). `fetchAttempts`
+   는 `attemptsLoading` 만 켜고 `attempts` 를 비우지 않는다 → 목표 전환 후 한 라운드트립 동안
+   **직전 목표의 행이 그대로 그려진다**. 그 행에는 진짜 card/attempt id 가 있어서, 클릭하면
+   방금 떠난 목표의 카드를 설명하는 데 크레딧이 나간다.
+2. **웹 plan-row `explain` 이 `attemptId` 를 보내지 않았다.** 모바일은 보냈다. 즉 mig 178 의
+   provenance 가 웹에서만 항상 NULL 이고, 같은 값을 내고 일반 답변을 받는다(설계 §6 위반).
+3. **평가 직후 attempt 목록이 갱신되지 않았다.** `recordAttempt` 는 plan 만 다시 읽는다 →
+   방금 틀린 카드, 즉 **이 기능이 존재하는 이유인 바로 그 순간**에 근거 요청이 불가능했다.
+4. **지갑 시세를 마운트당 1회만 읽었다** → 구매 후에도 세션 내내 구매 전 잔액을 표시.
+
+1·2·3 은 모바일이 이미 올바르게 구현한 것을 웹이 놓친 **플랫폼 비대칭**이었다. 특히 2는
+1의 수정이 들어간 뒤에도 plan-row 만 필터를 우회하고 있어서 별도 커밋(`a8d054c`)으로 잡았고,
+테스트 2개를 뮤테이션 검증했다(수정을 되돌리면 각각 red).
+
+**서버는 이걸 못 잡는다**: mig 178 의 pair check 는 attempt 와 enrichment 가 같은 **카드**를
+가리키는지만 본다. 다른 건 **goal** 이고 아무도 검사하지 않으므로, 그럴듯하지만 틀린
+`attempt_id` 가 저장된다. 검증된 것처럼 읽히는 provenance 는 없느니만 못하다.
+
+### 5.3 §2.1 페이월 — 핸드오프의 진단 중 한 줄은 틀렸다
+
+앞 패스는 "`.pro` 문구는 per-plan AI 엔타이틀먼트(§4.5)에 걸려 있어 고칠 수 없다"고 적었다.
+그건 **AI 행에만** 해당한다. `cardStorage.pro` 는 이미 로드돼 있는 상품 카탈로그
+(`BillingProduct.cardLimit` 최댓값)에서 바로 나온다 — 추가 왕복 없음.
+
+반대로 `cardStorage.free` 는 "지금 서버값 보간으로 고칠 수 있다"고 적혀 있었지만 **읽을 방법이
+없었다**: `card_limit_settings` 는 정책 0개 RLS 이고 공개 getter 가 없다. 그래서 mig 179
+`get_plan_limits()` 를 추가했다(`anon`+`authenticated`, mig 125 `get_public_plans()` 와 같은 자세).
+
+⚠️ **함정 하나를 SQL 로 못박았다**: `_owned_card_limit(uuid)` / `get_owned_card_usage()` 는
+**사용자별 유효 한도**다. 어드민에게는 `2000000000` 을, 기간이 남은 해지 구독자에게는 플랜 상한을
+돌려준다. 페이월에 쓰면 어드민 화면에 "Free: 2,000,000,000 cards" 가 찍힌다. deck-store 가 이미
+노출하고 있어서 손이 가기 쉬운 오답이라, 주석이 아니라 테스트로 막았다.
+
+AI 행은 **두 칸이 같은 서버값을 인용**하도록 했다. 유료 플랜이 AI 쿼터를 올리지 않는 것이 현재
+사실이므로(`_ai_free_cards_per_day()` 는 사용자 인자를 받지 않는다) 더 큰 Pro 숫자는 창작이 된다.
+이렇게 두면 쿼터를 바꿔도 두 칸이 서로 모순되지 않으며, **§4.5 결정을 미리 내리지 않는다.**
+다만 그 행은 여전히 크레딧이 Pro 혜택인 것처럼 읽히는데(크레딧팩은 무료 사용자도 산다) 이건
+카피/제품 판단이라 손대지 않았다.
+
+읽기 실패 시에는 숫자 없는 문구(`*Unknown`: "Limited storage" / "매일 무료 제공량")로 떨어진다.
+**폴백 상수를 두지 않았다** — 그럴듯한 낡은 숫자가 결제 화면에 뜨는 것이 바로 이번에 없앤 실패
+모드이고, 에러 경로로 되살리면 그대로 남는 것이기 때문이다.
+
+### 5.4 그 화면은 숨겨져 있지 않았다
+
+`PaywallScreen.tsx` 헤더는 2026-04-15 애플 리젝 이후 "네비게이션 스택에서 제거됨, 접근 경로 없음"
+이라고 주장하고 있었다. **오래전부터 사실이 아니다** — `SettingsStack.tsx` 가 라우트를 등록하고
+`SettingsScreen` 이 두 곳에서 `navigate('Paywall')` 한다. 남은 게이트는 런타임
+`SUBSCRIPTION_UI_ENABLED` 뿐이고 `OWNER_GO_LIVE_SWITCH = true` 다. 헤더를 정정했다.
+
+즉 §2.1 은 이론적 문제가 아니라 **실기기 빌드에서 사용자에게 보이는 가격 고지**였다.
+
+### 5.5 부수적으로 기록해 둔 것 (고치지 않음)
+
+- `card_limit_settings` / `ai_pricing_settings` 는 **테이블 레벨 SELECT 권한이 anon /
+  authenticated 에 아직 붙어 있다**. 새는 건 없다 — 막고 있는 것은 정책 0개 RLS 다. 다만
+  `DISABLE ROW LEVEL SECURITY` 한 줄이면 의미가 생긴다. 그래서 새 스위트는 권한이 아니라
+  **실효 읽기가 0행인지** + **RLS 가 켜져 있고 정책이 0개인지**를 검사한다.
+- `vi/paywall.json` 은 파일 전체가 무성조("Luu tru the", "Toi da"). 기존 문제라 새 문구도 같은
+  스타일로 맞췄다(반만 고치지 않기 위해). 별도 패스가 필요하다.
+- 웹 랜딩 비교표에도 같은 두 리터럴이 하드코딩돼 있다. `get_plan_limits()` 를 `anon` 에게 연
+  이유가 이것이라, 마이그레이션 없이 고칠 수 있다.
+
+### 5.6 검증 환경
+
+- 워크트리: `wt-paywall` (신규), `wt-mem` (PR B)
+- 검증 DB: docker `postgres:15`, 호스트 포트 **55447** — 작업 후 컨테이너 제거함.
+  ⚠️ **55432 는 여전히 다른 프로젝트의 `pg-mem` 컨테이너다.**
+- 클린 DB에 **179개 마이그레이션 전부 적용 → ci.yml 순서대로 SQL 스위트 24/24 PASS**
+- `public_plan_limits_test.sql` 뮤테이션 5종 전부 red 확인
+- web `tsc -b` 0 / vitest **144 파일 2415 테스트** / mobile `tsc` 0 / paywall.json 8로케일 55키 동일
+- 페이월 문구는 **실제 i18next + Intl-free 포매터로 8개 로케일 전부 렌더**해서 확인:
+  기본값에서는 기존 카피와 글자 그대로 같고, 쿼터를 50으로 올리면 8개 로케일이 모두 따라간다.
+
+### 5.7 워크트리 현황 (정리 대상)
+
+| 워크트리 | 브랜치 | 상태 |
+|---|---|---|
+| `develop` (주 작업본) | `fix/mobile-intl-free-numbers` @ `636e71c` | **아주 오래된 브랜치를 체크아웃 중.** 미커밋 변경은 `kind:'remediation'` + `deckId` 기반 **초기 프로토타입**으로, 지금 develop 의 goal/attempt 기반 구현이 이미 대체했다. 버려도 되는 것으로 확인함 |
+| `wt-mem` | `feat/attempt-grounded-remediation-ui` | 머지됨 (#378) — 제거 가능 |
+| `modular-learning-engine` | `fix/integration-vitest-scope` | 머지됨 (#348) — 제거 가능 |
+| `wt-settings` | `fix/mobile-settings-nav-rows` | 머지됨 (#357) — 제거 가능 |
+| `wt-verify` | `verify/byok-e2e` | 머지됨. `packages/web/e2e/tests/zz-byok-removed.spec.ts` 가 untracked 로 남아 있음 — 라이브 빌드 대상 임시 검증 스펙 |
+| `official-deck-korean-copy` | `fix/official-deck-korean-copy` | **작업 중 — 건드리지 말 것.** CSV 21개 미커밋 수정 + `DOCS/TODO/OFFICIAL-DECK-KOREAN-COPY-AUDIT.md` + `row_data_*.py` 15개 |
+| `wt-phase4` | (워크트리 아님) | `packages/web/.vite` 캐시만 남은 고아 디렉터리 |
