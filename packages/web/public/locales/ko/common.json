@@ -41,7 +41,8 @@
     "show": "보기",
     "hide": "숨기기",
     "startStudy": "학습 시작",
-    "logout": "로그아웃"
+    "logout": "로그아웃",
+    "retry": "다시 시도"
   },
   "status": {
     "loading": "로딩 중...",

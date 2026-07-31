@@ -78,7 +78,9 @@
       "authRequired": "请重新登录。",
       "forbidden": "您没有访问权限。",
       "unknown": "出了点问题，请重试。"
-    }
+    },
+    "deckCount_one": "{{count, number}} 个牌组",
+    "deckCount_other": "{{count, number}} 个牌组"
   },
   "form": {
     "createTitle": "新建目标",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "此时间段内没有计划。",
     "noPlanItems": "无计划项目",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。"
+    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
+    "attemptCount_one": "{{count, number}} 次作答",
+    "attemptCount_other": "{{count, number}} 次作答"
   },
   "recommend": {
     "title": "推荐",

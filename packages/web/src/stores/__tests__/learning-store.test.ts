@@ -563,6 +563,36 @@ describe('recommendations', () => {
     expect(useLearningStore.getState().planError).toBeNull()
   })
 
+  it('adopts the server state when the suggestion was already decided elsewhere', async () => {
+    useLearningStore.setState({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+    // The row was ACCEPTED elsewhere; this tab asks to dismiss it and gets P0007.
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Recommendation is already accepted' },
+    })
+    queue('study_recommendations', {
+      data: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'accepted', created_at: '2026-07-31T00:00:00Z',
+      }],
+      error: null,
+    })
+
+    const ok = await useLearningStore.getState().resolveRecommendation('rec-1', 'dismissed')
+
+    // Not an error — the decision is already recorded, so the user is not trapped.
+    expect(ok).toBe(true)
+    // But the store must NOT claim the status this tab asked for. Writing 'dismissed' here
+    // would render a state the server does not hold, and the row would flip on next load.
+    expect(useLearningStore.getState().recommendations[0].status).toBe('accepted')
+  })
+
   it('feeds accepted cards into the next plan, which is what makes accepting matter', async () => {
     queue('cards', { data: [cardRow('card-1'), cardRow('card-2')], error: null })
     queue('study_logs', { data: [], error: null })
@@ -579,6 +609,95 @@ describe('recommendations', () => {
     // card-2 was accepted, so its priority must exceed the otherwise-identical card-1.
     const byCard = new Map(items.map((i) => [i.card_id, i.priority as number]))
     expect(byCard.get('card-2')).toBeGreaterThan(byCard.get('card-1') as number)
+  })
+})
+
+// ── fetchInsights: switching goals ─────────────────────────────────────────
+//
+// The screen lets a learner switch between active goals, and the numbers it shows are the
+// harshest thing this product says to anyone. Attributing one goal's accuracy to another is
+// a worse lie than showing nothing, so the loader has to be correct under overlap — not
+// merely "not crash".
+describe('fetchInsights — switching goals while a load is in flight', () => {
+  /**
+   * A `from()` implementation that records which goal each query filtered on, and holds the
+   * first N invocations open until released. Two invocations make up ONE fetchInsights call
+   * (answer_attempts + daily_plans).
+   */
+  function gatedFrom(heldInvocations: number, firstResult: unknown = { data: [], error: null }) {
+    const filteredGoalIds: string[] = []
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let invocation = 0
+
+    mockFrom.mockImplementation(() => {
+      const held = invocation++ < heldInvocations
+      const builder: Record<string, unknown> = {}
+      for (const method of ['select', 'eq', 'gte', 'order', 'limit', 'returns']) {
+        builder[method] = (...args: unknown[]) => {
+          if (method === 'eq' && args[0] === 'goal_id') filteredGoalIds.push(String(args[1]))
+          return builder
+        }
+      }
+      builder.then = (onOk: unknown, onErr: unknown) => {
+        const settled = held
+          ? gate.then(() => firstResult)
+          : Promise.resolve({ data: [], error: null })
+        return settled.then(onOk as never, onErr as never)
+      }
+      return builder
+    })
+
+    return { filteredGoalIds, release }
+  }
+
+  it('does not drop the second goal, which would leave the first goal\'s numbers on screen', async () => {
+    const { filteredGoalIds, release } = gatedFrom(2)
+
+    const first = useLearningStore.getState().fetchInsights('goal-1')
+    // The learner taps the other goal chip before the first load lands.
+    const second = useLearningStore.getState().fetchInsights('goal-2')
+    release()
+    await Promise.all([first, second])
+
+    // A busy-flag early return here is not a harmless optimisation: the chip would show
+    // goal-2 selected while the stats below still belong to goal-1.
+    expect(filteredGoalIds).toContain('goal-2')
+    expect(useLearningStore.getState().insightsGoalId).toBe('goal-2')
+  })
+
+  it('discards a superseded response instead of letting it overwrite the current goal', async () => {
+    // goal-1 resolves LAST and carries data that would read as 100% accuracy.
+    const { release } = gatedFrom(2, {
+      data: [{
+        card_id: 'card-1', normalized_score: 1, duration_ms: 1000,
+        created_at: '2026-07-30T00:00:00.000Z',
+      }],
+      error: null,
+    })
+
+    const first = useLearningStore.getState().fetchInsights('goal-1')
+    const second = useLearningStore.getState().fetchInsights('goal-2')
+    await second          // goal-2 (no attempts) lands first
+    release()
+    await first           // the stale goal-1 response arrives afterwards
+
+    const state = useLearningStore.getState()
+    expect(state.insightsGoalId).toBe('goal-2')
+    // goal-2 has no scored attempts, so accuracy must stay "no data" — not goal-1's 100%.
+    expect(state.insights?.accuracy).toBeNull()
+  })
+
+  it('reports a diagnostics failure on its own channel, not the plan\'s', async () => {
+    queue('answer_attempts', { data: null, error: { code: '42501', message: 'denied' } })
+
+    await useLearningStore.getState().fetchInsights('goal-1')
+
+    const state = useLearningStore.getState()
+    expect(state.insightsError?.code).toBe('FORBIDDEN')
+    expect(state.insights).toBeNull()
+    // planError drives the today screen's banner; a diagnostics failure must not appear there.
+    expect(state.planError).toBeNull()
   })
 })
 

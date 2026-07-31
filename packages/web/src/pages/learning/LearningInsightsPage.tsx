@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useLearningStore } from '../../stores/learning-store'
+import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
 /**
@@ -25,13 +26,33 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
   )
 }
 
+/**
+ * Diagnostics failures reuse the plan screen's strings: the code set is the same, and a
+ * second copy of "you are not signed in" would only be a second thing to keep in sync.
+ */
+function insightsErrorKey(code: string): string {
+  switch (code) {
+    case 'LIMIT_EXCEEDED': return 'today.error.limitExceeded'
+    case 'NOT_FOUND': return 'today.error.goalGone'
+    case 'INVALID_INPUT': return 'today.error.invalidInput'
+    case 'AUTH_REQUIRED': return 'today.error.authRequired'
+    case 'FORBIDDEN': return 'today.error.forbidden'
+    default: return 'today.error.unknown'
+  }
+}
+
 export function LearningInsightsPage() {
   const { t } = useTranslation('learning')
+  const { t: tCommon } = useTranslation('common')
   const {
-    goals, goalsLoading, fetchGoals, insights, insightsLoading, fetchInsights, planCards,
+    goals, goalsLoading, fetchGoals, insights, insightsGoalId, insightsError,
+    fetchInsights, planCards, planTemplateFields,
     recommendations, recommendationBusyId, fetchRecommendations, regenerateRecommendations,
     resolveRecommendation,
   } = useLearningStore()
+  // The store takes one recommendation write at a time, so a row-scoped disable left the
+  // other rows looking clickable while they silently did nothing.
+  const busy = recommendationBusyId !== null
   const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
@@ -88,9 +109,30 @@ export function LearningInsightsPage() {
         </select>
       )}
 
-      {insightsLoading && !insights ? (
-        <ListSkeleton />
-      ) : !insights ? null : (
+      {/* A failed load used to render nothing at all — no message, no way to retry. */}
+      {insightsError && (
+        <div
+          className="p-3 rounded-lg border border-danger/40 bg-card"
+          role="alert"
+          data-testid="learning-insights-error"
+        >
+          <p className="text-sm text-danger">{t(insightsErrorKey(insightsError.code))}</p>
+          <button
+            type="button"
+            onClick={() => { if (selectedGoalId) { void fetchInsights(selectedGoalId) } }}
+            className="mt-1 text-sm text-primary hover:underline cursor-pointer"
+          >
+            {tCommon('actions.retry')}
+          </button>
+        </div>
+      )}
+
+      {/* The numbers belong to `insightsGoalId`. Rendering them under another goal's label
+          would be a worse lie than a skeleton — this screen's whole contract is that a
+          number it shows is true of the goal it is shown under. */}
+      {!insights || insightsGoalId !== selectedGoalId ? (
+        insightsError ? null : <ListSkeleton />
+      ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Stat label={t('insights.attempts')} value={String(insights.attemptCount)} />
@@ -112,7 +154,7 @@ export function LearningInsightsPage() {
               <ul className="mt-2 space-y-1">
                 {insights.weakCards.map((card) => {
                   const ref = planCards[card.cardId]
-                  const label = ref ? Object.values(ref.field_values)[0] ?? '' : ''
+                  const label = cardPromptLabel(ref?.field_values, ref?.template_id, planTemplateFields)
                   return (
                     <li key={card.cardId} className="flex items-center justify-between gap-3 px-3 py-2 bg-card rounded-lg border border-border">
                       <span className="text-xs text-foreground truncate">
@@ -183,7 +225,7 @@ export function LearningInsightsPage() {
               <ul className="mt-2 space-y-1">
                 {recommendations.map((rec) => {
                   const ref = rec.card_id ? planCards[rec.card_id] : undefined
-                  const label = ref ? Object.values(ref.field_values)[0] ?? '' : ''
+                  const label = cardPromptLabel(ref?.field_values, ref?.template_id, planTemplateFields)
                   return (
                     <li key={rec.id} className="px-3 py-2 bg-card rounded-lg border border-border">
                       <div className="flex items-center justify-between gap-3">
@@ -194,7 +236,7 @@ export function LearningInsightsPage() {
                           <span className="flex items-center gap-2 shrink-0">
                             <button
                               type="button"
-                              disabled={recommendationBusyId === rec.id}
+                              disabled={busy}
                               onClick={() => void resolveRecommendation(rec.id, 'accepted')}
                               className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
                             >
@@ -202,7 +244,7 @@ export function LearningInsightsPage() {
                             </button>
                             <button
                               type="button"
-                              disabled={recommendationBusyId === rec.id}
+                              disabled={busy}
                               onClick={() => void resolveRecommendation(rec.id, 'dismissed')}
                               className="text-xs text-content-tertiary hover:underline cursor-pointer disabled:opacity-50"
                             >

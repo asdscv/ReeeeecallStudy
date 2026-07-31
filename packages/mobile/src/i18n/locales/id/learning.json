@@ -49,9 +49,20 @@
     "create": "Tujuan baru",
     "dailyMinutes": "{{count, number}} menit/hari",
     "deckCount": "{{count, number}} dek",
+    "deckCount_one": "{{count, number}} dek",
+    "deckCount_other": "{{count, number}} dek",
     "empty": {
       "body": "Buat tujuan untuk mulai mendapatkan rencana harian.",
       "title": "Belum ada tujuan"
+    },
+    "error": {
+      "authRequired": "Silakan masuk lagi.",
+      "conflict": "Perubahan itu tidak diizinkan untuk status tujuan saat ini.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "invalidInput": "Periksa nama tujuan dan menit harian.",
+      "limitExceeded": "Anda telah mencapai jumlah maksimum tujuan.",
+      "notFound": "Tujuan tersebut tidak ditemukan atau sudah diarsipkan.",
+      "unknown": "Terjadi kesalahan. Silakan coba lagi."
     },
     "noDecksWarning": "Belum ada dek yang dihubungkan — belum bisa membuat rencana.",
     "status": {
@@ -64,10 +75,16 @@
   "insights": {
     "accuracy": "Akurasi",
     "adherence": "Kepatuhan rencana (14 hari)",
+    "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
+    "adherenceTitle": "Rencana harian (14 hari)",
     "attemptCount": "{{count, number}} percobaan",
+    "attemptCount_one": "{{count, number}} percobaan",
+    "attemptCount_other": "{{count, number}} percobaan",
     "attempts": "Percobaan (30 hari)",
     "cardFallback": "(kartu tidak ada di rencana hari ini)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Belum ada data",
+    "noPlanItems": "Tidak ada yang direncanakan",
     "notScoredYet": "Belum ada yang dinilai",
     "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
     "seconds": "{{count, number}}d",
@@ -98,17 +115,30 @@
       "noGoal": "Anda belum memiliki tujuan belajar yang aktif. Tujuan menentukan menit harian dan dek yang digunakan untuk perencanaan.",
       "nothingDue": "Tidak ada kartu yang perlu diulas hari ini di dek-dek ini."
     },
+    "error": {
+      "authRequired": "Silakan masuk lagi.",
+      "completedPlan": "Rencana yang sudah selesai tidak bisa ditimpa.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "goalGone": "Tujuan tersebut tidak lagi tersedia.",
+      "invalidInput": "Rencana tidak bisa disimpan karena beberapa nilai di luar jangkauan.",
+      "limitExceeded": "Anda telah mencapai batas pembuatan ulang rencana hari ini. Coba lagi besok.",
+      "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
+    },
     "generate": "Buat rencana hari ini",
     "generating": "Membuat…",
     "insightsLink": "Analisis",
     "item": {
+      "minutes": "~{{count, number}} menit",
       "recorded": "Tercatat",
       "untitled": "(tidak ada teks)"
     },
     "manageGoals": "Kelola tujuan",
     "progress": "{{done, number}} dari {{total, number}} selesai",
     "rate": {
-      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
+      "again": "Tidak tahu",
+      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan.",
+      "known": "Tahu",
+      "partial": "Ragu"
     },
     "reason": {
       "balanced": "Campuran seimbang",

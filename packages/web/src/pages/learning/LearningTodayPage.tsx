@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useLearningStore, type LearningGoalWithDecks } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
+import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
 
@@ -117,7 +118,7 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
 /** Recent attempts for the selected goal — the review surface for Phase 2. */
 function AttemptHistory({ goalId }: { goalId: string }) {
   const { t } = useTranslation('learning')
-  const { attempts, attemptsLoading, planCards, fetchAttempts } = useLearningStore()
+  const { attempts, attemptsLoading, planCards, planTemplateFields, fetchAttempts } = useLearningStore()
 
   useEffect(() => { void fetchAttempts(goalId) }, [goalId, fetchAttempts])
 
@@ -139,7 +140,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
       <ul className="mt-2 space-y-1">
         {attempts.slice(0, 10).map((attempt) => {
           const card = attempt.card_id ? planCards[attempt.card_id] : undefined
-          const label = card ? Object.values(card.field_values)[0] ?? '' : ''
+          const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
           return (
             <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2 bg-card rounded-lg border border-border">
               <span className="text-xs text-foreground truncate">
@@ -163,7 +164,8 @@ export function LearningTodayPage() {
   const { t } = useTranslation('learning')
   const {
     goals, goalsLoading, fetchGoals,
-    plan, planItems, planCards, planLoading, planGenerating, planError, planBlockedReason,
+    plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
+    planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, recordAttempt,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
   } = useLearningStore()
@@ -301,7 +303,7 @@ export function LearningTodayPage() {
           <ul className="space-y-2">
             {planItems.map((item) => {
               const card = item.card_id ? planCards[item.card_id] : undefined
-              const firstField = card ? Object.values(card.field_values)[0] ?? '' : ''
+              const firstField = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
               return (
                 <PlanItemRow
                   key={item.id}

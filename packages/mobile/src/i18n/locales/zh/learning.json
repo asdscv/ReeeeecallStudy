@@ -49,9 +49,20 @@
     "create": "新建目标",
     "dailyMinutes": "每天 {{count, number}} 分钟",
     "deckCount": "{{count, number}} 个牌组",
+    "deckCount_one": "{{count, number}} 个牌组",
+    "deckCount_other": "{{count, number}} 个牌组",
     "empty": {
       "body": "创建目标后即可获取每日计划。",
       "title": "暂无目标"
+    },
+    "error": {
+      "authRequired": "请重新登录。",
+      "conflict": "该目标的当前状态不允许此操作。",
+      "forbidden": "您没有访问权限。",
+      "invalidInput": "请检查目标名称和每日学习时间。",
+      "limitExceeded": "已达到目标数量上限。",
+      "notFound": "该目标不存在或已归档。",
+      "unknown": "出了点问题，请重试。"
     },
     "noDecksWarning": "未关联牌组，暂时无法生成计划。",
     "status": {
@@ -64,10 +75,16 @@
   "insights": {
     "accuracy": "正确率",
     "adherence": "计划执行率 (14天)",
+    "adherenceEmpty": "此时间段内没有计划。",
+    "adherenceTitle": "每日计划 (14天)",
     "attemptCount": "{{count, number}} 次作答",
+    "attemptCount_one": "{{count, number}} 次作答",
+    "attemptCount_other": "{{count, number}} 次作答",
     "attempts": "作答次数 (30天)",
     "cardFallback": "（不在今日计划中）",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "暂无数据",
+    "noPlanItems": "无计划项目",
     "notScoredYet": "尚无评分记录",
     "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
     "seconds": "{{count, number}}秒",
@@ -98,17 +115,30 @@
       "noGoal": "您还没有进行中的学习目标。目标用于设定每日学习时间和计划所用的牌组。",
       "nothingDue": "今天这些牌组中没有需要复习的内容。"
     },
+    "error": {
+      "authRequired": "请重新登录。",
+      "completedPlan": "已完成的计划无法覆盖。",
+      "forbidden": "您没有访问权限。",
+      "goalGone": "该目标已不可用。",
+      "invalidInput": "部分数值超出范围，计划未能保存。",
+      "limitExceeded": "今天的计划重建次数已用完，请明天再试。",
+      "unknown": "计划生成失败，请重试。"
+    },
     "generate": "生成今日计划",
     "generating": "生成中…",
     "insightsLink": "诊断",
     "item": {
+      "minutes": "约 {{count, number}} 分钟",
       "recorded": "已记录",
       "untitled": "（无内容）"
     },
     "manageGoals": "管理目标",
     "progress": "{{total, number}} 个中完成 {{done, number}} 个",
     "rate": {
-      "hint": "仅记录本次作答 — 不会改变复习计划。"
+      "again": "不知道",
+      "hint": "仅记录本次作答 — 不会改变复习计划。",
+      "known": "知道",
+      "partial": "不确定"
     },
     "reason": {
       "balanced": "均衡搭配",

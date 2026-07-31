@@ -78,7 +78,9 @@
       "authRequired": "Inicia sesión de nuevo.",
       "forbidden": "No tienes acceso a eso.",
       "unknown": "Algo salió mal. Inténtalo de nuevo."
-    }
+    },
+    "deckCount_one": "{{count, number}} mazo",
+    "deckCount_other": "{{count, number}} mazos"
   },
   "form": {
     "createTitle": "Nuevo objetivo",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "No hay planes en este período.",
     "noPlanItems": "Nada planificado",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial."
+    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
+    "attemptCount_one": "{{count, number}} intento",
+    "attemptCount_other": "{{count, number}} intentos"
   },
   "recommend": {
     "title": "Recomendaciones",

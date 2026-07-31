@@ -78,7 +78,9 @@
       "authRequired": "Vui lòng đăng nhập lại.",
       "forbidden": "Bạn không có quyền truy cập.",
       "unknown": "Đã xảy ra lỗi. Vui lòng thử lại."
-    }
+    },
+    "deckCount_one": "{{count, number}} bộ thẻ",
+    "deckCount_other": "{{count, number}} bộ thẻ"
   },
   "form": {
     "createTitle": "Mục tiêu mới",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
     "noPlanItems": "Không có mục nào được lên kế hoạch",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập."
+    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
+    "attemptCount_one": "{{count, number}} lần làm",
+    "attemptCount_other": "{{count, number}} lần làm"
   },
   "recommend": {
     "title": "Gợi ý",

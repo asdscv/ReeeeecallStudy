@@ -78,7 +78,9 @@
       "authRequired": "Silakan masuk lagi.",
       "forbidden": "Anda tidak memiliki akses.",
       "unknown": "Terjadi kesalahan. Silakan coba lagi."
-    }
+    },
+    "deckCount_one": "{{count, number}} dek",
+    "deckCount_other": "{{count, number}} dek"
   },
   "form": {
     "createTitle": "Tujuan baru",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
     "noPlanItems": "Tidak ada yang direncanakan",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar."
+    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
+    "attemptCount_one": "{{count, number}} percobaan",
+    "attemptCount_other": "{{count, number}} percobaan"
   },
   "recommend": {
     "title": "Rekomendasi",

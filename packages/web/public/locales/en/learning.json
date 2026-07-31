@@ -78,7 +78,9 @@
       "authRequired": "Please sign in again.",
       "forbidden": "You don't have access to that.",
       "unknown": "Something went wrong. Please try again."
-    }
+    },
+    "deckCount_one": "{{count, number}} deck",
+    "deckCount_other": "{{count, number}} decks"
   },
   "form": {
     "createTitle": "New goal",
@@ -157,7 +159,9 @@
     "adherenceEmpty": "No plans in this window.",
     "noPlanItems": "Nothing planned",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History."
+    "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History.",
+    "attemptCount_one": "{{count, number}} attempt",
+    "attemptCount_other": "{{count, number}} attempts"
   },
   "recommend": {
     "title": "Recommendations",

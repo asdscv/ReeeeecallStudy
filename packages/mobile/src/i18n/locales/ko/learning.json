@@ -49,9 +49,20 @@
     "create": "새 목표",
     "dailyMinutes": "하루 {{count, number}}분",
     "deckCount": "덱 {{count, number}}개",
+    "deckCount_one": "덱 {{count, number}}개",
+    "deckCount_other": "덱 {{count, number}}개",
     "empty": {
       "body": "목표를 만들면 매일 플랜을 받을 수 있습니다.",
       "title": "아직 목표가 없습니다"
+    },
+    "error": {
+      "authRequired": "다시 로그인해 주세요.",
+      "conflict": "현재 목표 상태에서는 허용되지 않는 변경입니다.",
+      "forbidden": "접근 권한이 없습니다.",
+      "invalidInput": "목표 이름과 하루 학습 시간을 확인해 주세요.",
+      "limitExceeded": "목표 개수 상한에 도달했습니다.",
+      "notFound": "해당 목표가 없거나 보관되었습니다.",
+      "unknown": "문제가 발생했습니다. 다시 시도해 주세요."
     },
     "noDecksWarning": "연결된 덱이 없어 아직 플랜을 만들 수 없습니다.",
     "status": {
@@ -64,10 +75,16 @@
   "insights": {
     "accuracy": "정답률",
     "adherence": "플랜 이행률 (14일)",
+    "adherenceEmpty": "이 기간에 플랜이 없습니다.",
+    "adherenceTitle": "일별 플랜 (14일)",
     "attemptCount": "시도 {{count, number}}회",
+    "attemptCount_one": "시도 {{count, number}}회",
+    "attemptCount_other": "시도 {{count, number}}회",
     "attempts": "시도 (30일)",
     "cardFallback": "(오늘 플랜에 없는 카드)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "데이터 없음",
+    "noPlanItems": "계획된 항목 없음",
     "notScoredYet": "아직 채점된 시도 없음",
     "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다.",
     "seconds": "{{count, number}}초",
@@ -98,17 +115,30 @@
       "noGoal": "진행 중인 학습 목표가 없습니다. 목표는 하루 학습 시간과 플랜에 쓸 덱을 정합니다.",
       "nothingDue": "오늘 이 덱들에서 복습할 카드가 없습니다."
     },
+    "error": {
+      "authRequired": "다시 로그인해 주세요.",
+      "completedPlan": "완료된 플랜은 덮어쓸 수 없습니다.",
+      "forbidden": "접근 권한이 없습니다.",
+      "goalGone": "해당 목표를 더 이상 사용할 수 없습니다.",
+      "invalidInput": "값이 허용 범위를 벗어나 플랜을 저장하지 못했습니다.",
+      "limitExceeded": "오늘의 플랜 재생성 한도를 모두 썼습니다. 내일 다시 시도해 주세요.",
+      "unknown": "플랜을 만들지 못했습니다. 다시 시도해 주세요."
+    },
     "generate": "오늘 플랜 만들기",
     "generating": "만드는 중…",
     "insightsLink": "진단",
     "item": {
+      "minutes": "약 {{count, number}}분",
       "recorded": "기록됨",
       "untitled": "(내용 없음)"
     },
     "manageGoals": "목표 관리",
     "progress": "{{total, number}}개 중 {{done, number}}개 완료",
     "rate": {
-      "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다."
+      "again": "모름",
+      "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다.",
+      "known": "알았음",
+      "partial": "애매함"
     },
     "reason": {
       "balanced": "균형 배분",

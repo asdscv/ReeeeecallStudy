@@ -49,9 +49,20 @@
     "create": "新しい目標",
     "dailyMinutes": "1日 {{count, number}} 分",
     "deckCount": "{{count, number}} デッキ",
+    "deckCount_one": "{{count, number}} デッキ",
+    "deckCount_other": "{{count, number}} デッキ",
     "empty": {
       "body": "目標を作成すると毎日のプランが届きます。",
       "title": "まだ目標がありません"
+    },
+    "error": {
+      "authRequired": "再度ログインしてください。",
+      "conflict": "この目標の現在の状態では許可されない変更です。",
+      "forbidden": "アクセス権限がありません。",
+      "invalidInput": "目標名と1日の学習時間を確認してください。",
+      "limitExceeded": "目標数の上限に達しました。",
+      "notFound": "その目標は存在しないかアーカイブ済みです。",
+      "unknown": "問題が発生しました。もう一度お試しください。"
     },
     "noDecksWarning": "デッキが紐付いていないため、まだプランを作成できません。",
     "status": {
@@ -64,10 +75,16 @@
   "insights": {
     "accuracy": "正答率",
     "adherence": "プラン達成率 (14日)",
+    "adherenceEmpty": "この期間にプランがありません。",
+    "adherenceTitle": "日別プラン (14日)",
     "attemptCount": "{{count, number}} 回試行",
+    "attemptCount_one": "{{count, number}} 回試行",
+    "attemptCount_other": "{{count, number}} 回試行",
     "attempts": "試行回数 (30日)",
     "cardFallback": "（今日のプランに含まれていないカード）",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "データなし",
+    "noPlanItems": "計画された項目なし",
     "notScoredYet": "まだスコアのある試行がありません",
     "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
     "seconds": "{{count, number}}秒",
@@ -98,17 +115,30 @@
       "noGoal": "進行中の学習目標がありません。目標では1日の学習時間とプランに使うデッキを設定します。",
       "nothingDue": "今日これらのデッキで復習すべきカードはありません。"
     },
+    "error": {
+      "authRequired": "再度ログインしてください。",
+      "completedPlan": "完了済みのプランは上書きできません。",
+      "forbidden": "アクセス権限がありません。",
+      "goalGone": "その目標はもう利用できません。",
+      "invalidInput": "一部の値が範囲外のため、プランを保存できませんでした。",
+      "limitExceeded": "今日のプラン再作成回数の上限に達しました。明日またお試しください。",
+      "unknown": "プランを作成できませんでした。もう一度お試しください。"
+    },
     "generate": "今日のプランを作成",
     "generating": "作成中…",
     "insightsLink": "学習診断",
     "item": {
+      "minutes": "約 {{count, number}} 分",
       "recorded": "記録済み",
       "untitled": "（テキストなし）"
     },
     "manageGoals": "目標を管理",
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "rate": {
-      "hint": "試行の記録のみです — 復習スケジュールは変わりません。"
+      "again": "わからない",
+      "hint": "試行の記録のみです — 復習スケジュールは変わりません。",
+      "known": "わかった",
+      "partial": "あいまい"
     },
     "reason": {
       "balanced": "バランス配分",
