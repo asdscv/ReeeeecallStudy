@@ -243,7 +243,119 @@ describe('generatePlan', () => {
   })
 })
 
-// ── goal writes ────────────────────────────────────────────────────────────
+// ── recordAttempt / fetchAttempts (Phase 2) ────────────────────────────────
+describe('recordAttempt', () => {
+  const planItem = {
+    id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
+    concept_id: null, activity_type: 'recall', stimulus_type: 'text',
+    response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'due',
+    priority: 0.7, estimated_minutes: 0.5, status: 'pending' as const,
+  }
+
+  it('sends the plan item snapshot verbatim, because the RPC compares against it', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+
+    const ok = await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-1', durationMs: 4200,
+    }, '2026-07-31')
+
+    expect(ok).toBe(true)
+    const [name, args] = mockRpc.mock.calls[0] as [string, Record<string, unknown>]
+    expect(name).toBe('record_answer_attempt')
+    // record_answer_attempt raises P0007 unless goal / activity / card and all three type
+    // fields match the stored item, so these must come from the item, not be re-derived.
+    expect(args).toMatchObject({
+      p_client_attempt_id: 'att-1',
+      p_plan_item_id: 'item-1',
+      p_goal_id: 'goal-1',
+      p_activity_id: null,
+      p_card_id: 'card-1',
+      p_activity_type: 'recall',
+      p_response_type: 'self_rate',
+      p_evaluator_type: 'self_rate',
+      p_normalized_score: 1,
+      p_duration_ms: 4200,
+    })
+  })
+
+  it('clamps the score into 0..1 rather than letting the RPC reject it', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+
+    await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 4, clientAttemptId: 'att-2',
+    }, '2026-07-31')
+
+    expect((mockRpc.mock.calls[0][1] as Record<string, unknown>).p_normalized_score).toBe(1)
+  })
+
+  it('re-reads the plan instead of patching item status locally', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', {
+      data: { id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+        algorithm_version: 'daily-plan-v1', input_fingerprint: 'f', status: 'completed',
+        budget_minutes: 20, completed_minutes: 1, completed_items: 1, total_items: 1 },
+      error: null,
+    })
+    queue('daily_plan_items', { data: [{ ...planItem, status: 'completed' }], error: null })
+
+    await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-3',
+    }, '2026-07-31')
+
+    // The server owns the item status and the plan aggregates (it updates both atomically).
+    expect(useLearningStore.getState().planItems[0].status).toBe('completed')
+    expect(useLearningStore.getState().plan?.completed_items).toBe(1)
+  })
+
+  it('maps a snapshot mismatch to CONFLICT so the UI can say what happened', async () => {
+    mockRpc.mockResolvedValue({
+      data: null,
+      error: { code: 'P0007', message: 'Attempt targets do not match the plan item snapshot' },
+    })
+
+    const ok = await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-4',
+    }, '2026-07-31')
+
+    expect(ok).toBe(false)
+    expect(useLearningStore.getState().planError?.code).toBe('CONFLICT')
+    expect(useLearningStore.getState().recordingItemId).toBeNull()
+  })
+
+  it('ignores a second concurrent record instead of double-writing', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+
+    const first = useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 1, clientAttemptId: 'att-5',
+    }, '2026-07-31')
+    const second = await useLearningStore.getState().recordAttempt({
+      planItem, goalId: 'goal-1', score: 0, clientAttemptId: 'att-6',
+    }, '2026-07-31')
+    await first
+
+    expect(second).toBe(false)
+    expect(mockRpc.mock.calls.filter(([n]) => n === 'record_answer_attempt')).toHaveLength(1)
+  })
+})
+
+describe('fetchAttempts', () => {
+  it('loads the goal\'s attempts', async () => {
+    queue('answer_attempts', {
+      data: [{ id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
+        plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+        normalized_score: 0.5, duration_ms: 1000, created_at: '2026-07-31T00:00:00.000Z' }],
+      error: null,
+    })
+
+    await useLearningStore.getState().fetchAttempts('goal-1')
+
+    expect(useLearningStore.getState().attempts).toHaveLength(1)
+    expect(useLearningStore.getState().attemptsLoading).toBe(false)
+  })
+})
 describe('goal writes', () => {
   it('creates a goal and then attaches its decks', async () => {
     mockRpc.mockResolvedValue({ data: { ok: true, goal_id: 'goal-9' }, error: null })

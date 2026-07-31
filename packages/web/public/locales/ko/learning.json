@@ -20,7 +20,8 @@
     "item": {
       "study": "학습",
       "untitled": "(내용 없음)",
-      "minutes": "약 {{count, number}}분"
+      "minutes": "약 {{count, number}}분",
+      "recorded": "기록됨"
     },
     "reason": {
       "due": "복습 시점",
@@ -38,6 +39,12 @@
       "authRequired": "다시 로그인해 주세요.",
       "forbidden": "접근 권한이 없습니다.",
       "unknown": "플랜을 만들지 못했습니다. 다시 시도해 주세요."
+    },
+    "rate": {
+      "again": "모름",
+      "partial": "애매함",
+      "known": "알았음",
+      "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다."
     }
   },
   "goals": {
@@ -93,6 +100,13 @@
     "error": {
       "title": "목표 이름을 1~500자로 입력해 주세요.",
       "dailyMinutes": "하루 학습 시간은 1~1440분 사이여야 합니다."
+    }
+  },
+  "history": {
+    "title": "최근 시도 ({{count, number}})",
+    "itemFallback": "{{type}} 시도",
+    "score": {
+      "unknown": "점수 없음"
     }
   }
 }

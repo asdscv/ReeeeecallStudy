@@ -20,7 +20,8 @@
     "item": {
       "study": "学习",
       "untitled": "（无内容）",
-      "minutes": "约 {{count, number}} 分钟"
+      "minutes": "约 {{count, number}} 分钟",
+      "recorded": "已记录"
     },
     "reason": {
       "due": "到期复习",
@@ -38,6 +39,12 @@
       "authRequired": "请重新登录。",
       "forbidden": "您没有访问权限。",
       "unknown": "计划生成失败，请重试。"
+    },
+    "rate": {
+      "again": "不知道",
+      "partial": "不确定",
+      "known": "知道",
+      "hint": "仅记录本次作答 — 不会改变复习计划。"
     }
   },
   "goals": {
@@ -93,6 +100,13 @@
     "error": {
       "title": "请输入 1–500 个字符的目标名称。",
       "dailyMinutes": "每日学习时间须在 1–1440 分钟之间。"
+    }
+  },
+  "history": {
+    "title": "最近作答 ({{count, number}})",
+    "itemFallback": "{{type}} 作答",
+    "score": {
+      "unknown": "未评分"
     }
   }
 }

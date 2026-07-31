@@ -20,7 +20,8 @@
     "item": {
       "study": "Belajar",
       "untitled": "(tidak ada teks)",
-      "minutes": "~{{count, number}} menit"
+      "minutes": "~{{count, number}} menit",
+      "recorded": "Tercatat"
     },
     "reason": {
       "due": "Waktunya mengulang",
@@ -38,6 +39,12 @@
       "authRequired": "Silakan masuk lagi.",
       "forbidden": "Anda tidak memiliki akses.",
       "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
+    },
+    "rate": {
+      "again": "Tidak tahu",
+      "partial": "Ragu",
+      "known": "Tahu",
+      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
     }
   },
   "goals": {
@@ -93,6 +100,13 @@
     "error": {
       "title": "Masukkan nama tujuan (1–500 karakter).",
       "dailyMinutes": "Menit per hari harus antara 1 dan 1440."
+    }
+  },
+  "history": {
+    "title": "Percobaan terbaru ({{count, number}})",
+    "itemFallback": "Percobaan {{type}}",
+    "score": {
+      "unknown": "Tanpa skor"
     }
   }
 }

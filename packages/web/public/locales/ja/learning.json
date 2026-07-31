@@ -20,7 +20,8 @@
     "item": {
       "study": "学習",
       "untitled": "（テキストなし）",
-      "minutes": "約 {{count, number}} 分"
+      "minutes": "約 {{count, number}} 分",
+      "recorded": "記録済み"
     },
     "reason": {
       "due": "復習期限",
@@ -38,6 +39,12 @@
       "authRequired": "再度ログインしてください。",
       "forbidden": "アクセス権限がありません。",
       "unknown": "プランを作成できませんでした。もう一度お試しください。"
+    },
+    "rate": {
+      "again": "わからない",
+      "partial": "あいまい",
+      "known": "わかった",
+      "hint": "試行の記録のみです — 復習スケジュールは変わりません。"
     }
   },
   "goals": {
@@ -93,6 +100,13 @@
     "error": {
       "title": "目標名を1〜500文字で入力してください。",
       "dailyMinutes": "1日の学習時間は1〜1440分の範囲で指定してください。"
+    }
+  },
+  "history": {
+    "title": "最近の試行 ({{count, number}})",
+    "itemFallback": "{{type}} の試行",
+    "score": {
+      "unknown": "スコアなし"
     }
   }
 }

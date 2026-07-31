@@ -70,7 +70,13 @@ export interface DailyPlanItemRow {
   reason_code: string
   priority: number | null
   estimated_minutes: number | null
-  status: 'pending' | 'done' | 'skipped' | string
+  /**
+   * Server vocabulary, not ours: mig 165 constrains this to
+   * CHECK (status IN ('pending','completed','skipped')) and record_answer_attempt writes
+   * 'completed'. Phase 1 typed it as 'done' and the UI compared against that, so a finished
+   * item never rendered as finished. Keep these three spellings exact.
+   */
+  status: 'pending' | 'completed' | 'skipped'
 }
 
 /**
@@ -150,6 +156,37 @@ export interface PlanCardRef {
   field_values: Record<string, string>
 }
 
+export interface AttemptRow {
+  id: string
+  goal_id: string | null
+  card_id: string | null
+  activity_id: string | null
+  plan_item_id: string | null
+  activity_type: string
+  evaluator_type: string
+  normalized_score: number | null
+  duration_ms: number
+  created_at: string
+}
+
+/**
+ * What the user reported about a plan item they just worked on.
+ *
+ * `score` is a self-rating on 0..1 — the legacy-card projection is
+ * `recall / self_rate / self_rate` (design §5.2), so the learner IS the evaluator here.
+ * It is NOT an SRS rating: `apply_study_rating` (mig 160) remains the single authority for
+ * scheduling, and recording an attempt deliberately does not touch interval/ease. The two
+ * are different questions — "when should I see this again" vs "how did this attempt go".
+ */
+export interface AttemptInput {
+  planItem: DailyPlanItemRow
+  goalId: string
+  score: number
+  durationMs?: number
+  /** Stable per attempt: the RPC is idempotent on it, so a retry cannot double-record. */
+  clientAttemptId: string
+}
+
 export interface PlanContext {
   /** IANA zone, e.g. 'Asia/Seoul'. Supplied by the platform layer: shared code must
    *  not depend on Intl (the mobile bundle is deliberately Intl-free). */
@@ -192,6 +229,11 @@ interface LearningState {
   /** Set when the goal has no decks attached: there is nothing to plan over. */
   planBlockedReason: 'no_decks' | 'no_candidates' | null
 
+  /** Plan-item id currently being recorded, so one row can show progress alone. */
+  recordingItemId: string | null
+  attempts: AttemptRow[]
+  attemptsLoading: boolean
+
   fetchGoals: () => Promise<void>
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
@@ -200,6 +242,8 @@ interface LearningState {
 
   fetchPlan: (goalId: string, planDate: string) => Promise<void>
   generatePlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
+  recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
+  fetchAttempts: (goalId: string) => Promise<void>
   reset: () => void
 }
 
@@ -214,6 +258,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planGenerating: false,
   planError: null,
   planBlockedReason: null,
+  recordingItemId: null,
+  attempts: [],
+  attemptsLoading: false,
 
   fetchGoals: async () => {
     if (get().goalsLoading) return
@@ -503,9 +550,79 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /**
+   * Record what happened on one plan item.
+   *
+   * `record_answer_attempt` (mig 167) does the whole write atomically: it inserts the
+   * attempt, marks the item `completed` with its `completion_attempt_id`, and advances
+   * `daily_plans.completed_items / completed_minutes / status`. So this must NOT try to
+   * patch those rows itself — it calls the RPC and re-reads.
+   *
+   * Two server contracts shape the arguments:
+   *   * the attempt must match the plan item's SNAPSHOT exactly (goal, activity, card, and
+   *     all three type fields) or the RPC raises P0007. We therefore send the values from
+   *     the stored item rather than re-deriving them, because a re-derivation that drifts
+   *     would fail at write time instead of at review time;
+   *   * `client_attempt_id` makes it idempotent — replaying the same id returns the first
+   *     result, while reusing it with a DIFFERENT payload is a caller bug and raises P0007.
+   *     The caller therefore owns the id for the lifetime of one attempt.
+   */
+  recordAttempt: async (input, planDate) => {
+    if (get().recordingItemId) return false
+    const item = input.planItem
+    set({ recordingItemId: item.id, planError: null })
+    try {
+      const score = Math.min(1, Math.max(0, input.score))
+      const { error } = await supabase.rpc('record_answer_attempt', {
+        p_client_attempt_id: input.clientAttemptId,
+        p_activity_type: item.activity_type,
+        p_response_type: item.response_type,
+        p_evaluator_type: item.evaluator_type,
+        p_response: { self_rated: score },
+        p_goal_id: input.goalId,
+        p_activity_id: item.activity_id,
+        p_card_id: item.card_id,
+        p_plan_item_id: item.id,
+        p_normalized_score: score,
+        p_evaluator_result: { evaluator: 'self_rate', score },
+        p_duration_ms: input.durationMs ?? 0,
+        p_evaluator_version: 'self-rate-v1',
+      })
+      if (error) throw error
+      // Re-read: the server owns the item status and the plan aggregates.
+      await get().fetchPlan(input.goalId, planDate)
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    } finally {
+      set({ recordingItemId: null })
+    }
+  },
+
+  /** Recent attempts for a goal — the review surface. Owner-scoped by RLS. */
+  fetchAttempts: async (goalId) => {
+    set({ attemptsLoading: true })
+    try {
+      const { data, error } = await supabase
+        .from('answer_attempts')
+        .select('id, goal_id, card_id, activity_id, plan_item_id, activity_type, evaluator_type, normalized_score, duration_ms, created_at')
+        .eq('goal_id', goalId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (error) throw error
+      set({ attempts: (data ?? []) as AttemptRow[] })
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+    } finally {
+      set({ attemptsLoading: false })
+    }
+  },
+
   reset: () => set({
     goals: [], goalsLoading: false, goalsError: null,
     plan: null, planItems: [], planCards: {}, planLoading: false, planGenerating: false,
     planError: null, planBlockedReason: null,
+    recordingItemId: null, attempts: [], attemptsLoading: false,
   }),
 }))
