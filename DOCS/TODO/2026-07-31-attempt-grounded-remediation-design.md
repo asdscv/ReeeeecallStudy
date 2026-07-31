@@ -53,11 +53,16 @@ attemptHistory   up to 5 most recent attempts on THE SAME CARD for this user:
 0 (mig 167:656-657), the store never sends `p_hints_used` at all, and neither rating button —
 `LearningTodayPage.tsx:332` nor `LearningTodayScreen.tsx:324` — passes a duration. So they are a
 constant, not a signal. They are still *selected*, because they cost nothing and start working
-the day a caller populates them, but the prompt only invites the model to use them when they are
-actually non-zero; otherwise it is explicitly told **not** to infer speed or help from them.
-Instructing a model to reason from a column that is always zero is how you get "you answered
-this instantly, so…" about a learner who did no such thing — a fabricated claim in the one
-feature whose whole premise is grounding.
+the day a caller populates them — but they are **stripped from the prompt payload** while they
+hold the default, and named as evidence only once they carry a real value.
+
+Stripped rather than explained away: `duration_ms: 0` is not an absent signal a model can
+discount, it is the assertion "answered in 0 ms", and `hints_used: 0` is outright false once a
+learner has bought a hint (the `hint` action never increments it). A model cannot misread a field
+it was never given, whereas "ignore this field" is only ever a request. Instructing a model to
+reason from a column that is always zero is how you get "you answered this instantly, so…" about
+a learner who did no such thing — a fabricated claim in the one feature whose whole premise is
+grounding.
 
 `attemptHistory` is what turns a single failure into a pattern ("4 of the last 5 were misses"),
 and it is deliberately **scores and timestamps only** — no responses, no feedback text. It is one
@@ -183,15 +188,14 @@ can stay (additive, nullable) if only B is reverted.
 
 | Done | Where |
 |---|---|
-| mig 178: `user_enrichments.attempt_id` (+ index), `persist_ai_remediation` recreated with `p_attempt_id` and an ownership check, old 12-arg function dropped, grants re-issued | `supabase/migrations/178_enrichment_attempt_provenance.sql` |
+| mig 178: `user_enrichments.attempt_id` (+ index), `persist_ai_remediation` recreated with `p_attempt_id`, an ownership check and a card/attempt pair check, old 12-arg function dropped, grants re-issued, whole thing wrapped in a transaction | `supabase/migrations/178_enrichment_attempt_provenance.sql` |
 | Rollback script, marked destructive (dropping the column discards provenance) | `supabase/rollbacks/178_enrichment_attempt_provenance.down.sql` |
 | Prompt: `attemptHistory` (≤5, score+timestamp only) in the context contract, plus explicit instructions to USE the attempt as evidence and to never claim to know an answer the learner never wrote | `supabase/functions/_shared/ai-remediation.ts` |
-| Edge fn: attempt row now also carries `hints_used` / `duration_ms`; same-card attempt history query (capped, user-scoped, failure is non-fatal); `p_attempt_id` persisted; `prompt_version` → `remediation-v2` | `supabase/functions/ai-generate/index.ts` |
+| Edge fn: attempt row now also carries `card_id` / `hints_used` / `duration_ms`; same-card attempt history query (capped, user-scoped, keyed on the *attempt's* card, failure is non-fatal); `attemptHistory` placed next to `attempt` so the 64KB truncation cuts bulk sources first; `p_attempt_id` persisted; `prompt_version` → `remediation-v2` | `supabase/functions/ai-generate/index.ts` |
 | Store: `requestEnrichment({ ..., attemptId? })` passthrough (key omitted when absent), `enrichmentQuote` + `loadEnrichmentQuote()` (fails to `null`, never renders a price of 0), reset covers the quote | `packages/shared/stores/learning-store.ts` |
 | Pure helper `latestAttemptForCard` / `attemptNeedsRemediation` (+ `KNOWN_SCORE_THRESHOLD`) — the shared rule for which attempt a paid call is grounded in | `packages/shared/lib/learning-attempt-selection.ts` |
 | Helper tests (11 cases: newest wins, deterministic tie-break, undatable row never wins, other cards ignored, "unknown score is not a miss") | `packages/web/src/lib/__tests__/learning-attempt-selection.test.ts` |
-| SQL test: provenance stored, `prompt_version` recorded, foreign attempt rejected on BOTH `persist` (service-role path) and `reserve` (auth path), `ON DELETE SET NULL` keeps a paid answer alive, exactly one `persist_ai_remediation` with 13 args, grants restored | `supabase/tests/ai_remediation_test.sql` |
-
+| SQL test: provenance stored, `prompt_version` recorded, foreign attempt rejected on BOTH `persist` (service-role path) and `reserve` (auth path) — each with a positive control so a rejection cannot be blamed on auth — a card/attempt mismatch rejected while an activity-only attempt is still accepted, `ON DELETE SET NULL` keeps a paid answer alive, exactly one `persist_ai_remediation` with 13 args, `p_attempt_id` still exposed under that name (PostgREST binds by name), grants restored for `anon` too | `supabase/tests/ai_remediation_test.sql` |
 | Store tests: the attempt id reaches the edge payload, the key is *absent* (not null) when not supplied, the quote loads, and a failed quote leaves the feature usable | `packages/web/src/stores/__tests__/learning-store.test.ts` |
 | Prompt-contract tests: grounding text appears only with an attempt, the model is never told it saw an answer, placeholder effort fields are stripped, real ones are kept, and `attemptHistory` reaches the payload — the edge module is importable from web vitest, so this needs no deno harness | `packages/web/src/lib/__tests__/ai-remediation.test.ts` |
 | Dry run extended to cover this migration, reverting it **before** 168 | `scripts/dry-run-learning-migrations.sh`, `supabase/tests/learning_dry_run_check.sql` |
