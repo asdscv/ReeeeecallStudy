@@ -45,7 +45,8 @@
       "partial": "A medias",
       "known": "Lo sabía",
       "hint": "Registra tu intento; no cambia el calendario de repaso."
-    }
+    },
+    "insightsLink": "Diagnóstico"
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
@@ -137,5 +138,25 @@
       "RATE_CAP": "Has alcanzado el límite diario de solicitudes de IA. Inténtalo mañana.",
       "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
     }
+  },
+  "insights": {
+    "title": "Diagnóstico de aprendizaje",
+    "noData": "Sin datos aún",
+    "attempts": "Intentos (30 días)",
+    "accuracy": "Precisión",
+    "notScoredYet": "Nada puntuado aún",
+    "typicalTime": "Tiempo habitual",
+    "seconds": "{{count, number}}s",
+    "adherence": "Cumplimiento del plan (14 días)",
+    "weakTitle": "Vale otra mirada",
+    "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",
+    "weakEmpty": "Nada se está quedando atrás.",
+    "cardFallback": "(tarjeta no incluida en el plan de hoy)",
+    "attemptCount": "{{count, number}} intentos",
+    "adherenceTitle": "Planes diarios (14 días)",
+    "adherenceEmpty": "No hay planes en este período.",
+    "noPlanItems": "Nada planificado",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial."
   }
 }

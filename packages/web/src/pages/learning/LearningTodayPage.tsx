@@ -230,9 +230,14 @@ export function LearningTodayPage() {
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-lg font-medium text-foreground">{t('today.title')}</h1>
-        <Link to="/learning/goals" className="text-xs text-primary hover:underline">
-          {t('today.manageGoals')}
-        </Link>
+        <span className="flex items-center gap-3">
+          <Link to="/learning/insights" className="text-xs text-primary hover:underline">
+            {t('today.insightsLink')}
+          </Link>
+          <Link to="/learning/goals" className="text-xs text-primary hover:underline">
+            {t('today.manageGoals')}
+          </Link>
+        </span>
       </div>
 
       {plannableGoals.length > 1 && (

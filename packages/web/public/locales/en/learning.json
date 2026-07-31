@@ -45,7 +45,8 @@
       "partial": "Partly",
       "known": "Knew it",
       "hint": "Records your attempt — it does not change the review schedule."
-    }
+    },
+    "insightsLink": "Insights"
   },
   "goals": {
     "title": "Learning goals",
@@ -137,5 +138,25 @@
       "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
       "UNKNOWN": "Something went wrong. Please try again."
     }
+  },
+  "insights": {
+    "title": "Learning insights",
+    "noData": "No data yet",
+    "attempts": "Attempts (30d)",
+    "accuracy": "Accuracy",
+    "notScoredYet": "Nothing scored yet",
+    "typicalTime": "Typical time",
+    "seconds": "{{count, number}}s",
+    "adherence": "Plan adherence (14d)",
+    "weakTitle": "Worth another look",
+    "weakHint": "Cards with at least two attempts averaging under 60%.",
+    "weakEmpty": "Nothing is falling behind.",
+    "cardFallback": "(card not in today’s plan)",
+    "attemptCount": "{{count, number}} attempts",
+    "adherenceTitle": "Daily plans (14d)",
+    "adherenceEmpty": "No plans in this window.",
+    "noPlanItems": "Nothing planned",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History."
   }
 }

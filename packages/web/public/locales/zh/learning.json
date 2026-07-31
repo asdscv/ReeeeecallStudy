@@ -45,7 +45,8 @@
       "partial": "不确定",
       "known": "知道",
       "hint": "仅记录本次作答 — 不会改变复习计划。"
-    }
+    },
+    "insightsLink": "诊断"
   },
   "goals": {
     "title": "学习目标",
@@ -137,5 +138,25 @@
       "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
       "UNKNOWN": "出了点问题，请重试。"
     }
+  },
+  "insights": {
+    "title": "学习诊断",
+    "noData": "暂无数据",
+    "attempts": "作答次数 (30天)",
+    "accuracy": "正确率",
+    "notScoredYet": "尚无评分记录",
+    "typicalTime": "通常用时",
+    "seconds": "{{count, number}}秒",
+    "adherence": "计划执行率 (14天)",
+    "weakTitle": "值得再看",
+    "weakHint": "作答至少2次且平均低于60%的卡片。",
+    "weakEmpty": "没有落后的卡片。",
+    "cardFallback": "（不在今日计划中）",
+    "attemptCount": "{{count, number}} 次作答",
+    "adherenceTitle": "每日计划 (14天)",
+    "adherenceEmpty": "此时间段内没有计划。",
+    "noPlanItems": "无计划项目",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
+    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。"
   }
 }

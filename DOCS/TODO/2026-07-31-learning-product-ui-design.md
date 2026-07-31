@@ -256,9 +256,25 @@ credit cost before the call and handle `AI_INSUFFICIENT_CREDITS` / `AI_RATE_CAP`
 `AI_GROUNDING_REQUIRED` distinctly. Grounding matters: labor-law content without a citation is
 refused server-side, and the UI has to explain why rather than showing a generic failure.
 
-**Phase 4 — diagnostics + recommendations.** Surface `study_recommendations` and a per-concept
-mastery view; this is where `PersonalAnalyticsPage`'s redirect to `/history` finally becomes a
-real page.
+**Phase 4 — diagnostics.** Shipped as diagnostics only, and two things in the original
+sentence were wrong:
+
+* **`study_recommendations` has no producer.** Nothing in the repo writes it — no RPC, no
+  code, only the table, its RLS SELECT policy and two indexes. A "recommended for you" feed
+  would therefore be permanently empty. Writing a producer is a design decision about WHO
+  recommends (a deterministic, versioned client algorithm like the planner, or the AI
+  remediation path) and it is deferred rather than faked. That is **Phase 4b**.
+* **`PersonalAnalyticsPage` did not need resurrecting.** Analytics already lives as a tab
+  inside `/history` (`PersonalAnalyticsContent`, lazy-loaded there); the page-level export is
+  a redirect *because* of that, not as a placeholder. Rebuilding it would have produced a
+  second answer to the same question.
+
+What shipped instead: `/learning/insights`, derived from the engine's own records —
+`answer_attempts` (30 days) and `daily_plans` (14 days) — with attempts, accuracy, typical
+answer time, plan adherence per day and overall, and the cards worth another look. A
+per-concept mastery view is not possible yet for the current data: legacy cards project with
+`concept_id = null` (design §5.2), so there are no concepts to aggregate until curated
+content exists.
 
 **Phase 5 — mobile parity.** Same store, native screens, Intl-free timezone handling.
 
