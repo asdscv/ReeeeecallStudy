@@ -108,5 +108,34 @@
     "score": {
       "unknown": "Not scored"
     }
+  },
+  "enrichment": {
+    "explainCta": "Explain (credits)",
+    "requesting": "Asking…",
+    "costHint": "Uses AI credits from your wallet",
+    "action": {
+      "explain": "AI explanation",
+      "hint": "Study hint"
+    },
+    "sources": "Sources",
+    "noSources": "This answer is not source-based.",
+    "empty": "The model returned nothing usable.",
+    "chargedNote": "Already charged — discarding does not refund the credits.",
+    "keep": "Keep",
+    "discard": "Discard",
+    "later": "Decide later",
+    "saving": "Saving…",
+    "error": {
+      "BAD_REQUEST": "That request was not valid.",
+      "FORBIDDEN": "You don't have access to that card.",
+      "GROUNDING_REQUIRED": "No citable source was found, so the answer was refused rather than made up.",
+      "INSUFFICIENT_CREDITS": "Not enough AI credits. Top up to continue.",
+      "INVALID_RESULT": "The answer came back unusable. Please try again.",
+      "NETWORK": "Network error. Check your connection.",
+      "NOT_CONFIGURED": "AI generation is not enabled on this server.",
+      "PROVIDER_ERROR": "The AI service failed. Please try again.",
+      "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    }
   }
 }

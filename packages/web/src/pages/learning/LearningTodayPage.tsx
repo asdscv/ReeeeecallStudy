@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useLearningStore, type LearningGoalWithDecks } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { ListSkeleton } from '../../components/common/Skeleton'
+import { EnrichmentModal } from './EnrichmentModal'
 
 /**
  * Today's plan for one goal.
@@ -30,7 +31,7 @@ const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
   { score: 1, key: 'today.rate.known' },
 ]
 
-function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, onRate, recording }: {
+function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, onRate, recording, onExplain, explaining }: {
   position: number
   cardText: string
   deckId: string | null
@@ -39,6 +40,8 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
   done: boolean
   onRate: (score: number) => void
   recording: boolean
+  onExplain: (() => void) | null
+  explaining: boolean
 }) {
   const { t } = useTranslation('learning')
   return (
@@ -60,14 +63,30 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
             </div>
           </div>
         </div>
-        {deckId && (
-          <Link
-            to={`/decks/${deckId}/study/setup`}
-            className="text-xs text-primary hover:underline shrink-0"
-          >
-            {t('today.item.study')}
-          </Link>
-        )}
+        <span className="flex items-center gap-3 shrink-0">
+          {onExplain && (
+            /* Paid: the server reserves against the wallet before the model call and charges
+               the real token cost after, so the label has to say it costs credits BEFORE the
+               click — not in an error afterwards. */
+            <button
+              type="button"
+              disabled={explaining}
+              onClick={onExplain}
+              title={t('enrichment.costHint')}
+              className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
+            >
+              {explaining ? t('enrichment.requesting') : t('enrichment.explainCta')}
+            </button>
+          )}
+          {deckId && (
+            <Link
+              to={`/decks/${deckId}/study/setup`}
+              className="text-xs text-primary hover:underline"
+            >
+              {t('today.item.study')}
+            </Link>
+          )}
+        </span>
       </div>
 
       {/* Self-rating records the attempt. It does NOT reschedule the card: SRS scheduling
@@ -146,7 +165,9 @@ export function LearningTodayPage() {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planLoading, planGenerating, planError, planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
   } = useLearningStore()
+  const { i18n } = useTranslation('learning')
 
   // The chosen goal is an OVERRIDE, not mirrored state: deriving the default from the
   // loaded goals avoids a set-state-in-effect (the repo forbids driving state from
@@ -258,6 +279,14 @@ export function LearningTodayPage() {
         </div>
       )}
 
+      {enrichmentError && (
+        <div role="alert" className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
+          {t(`enrichment.error.${enrichmentError}`)}
+        </div>
+      )}
+
+      {enrichment && <EnrichmentModal preview={enrichment} />}
+
       {selectedGoalId && <AttemptHistory goalId={selectedGoalId} />}
 
       {planLoading ? (
@@ -278,6 +307,15 @@ export function LearningTodayPage() {
                   minutes={item.estimated_minutes}
                   done={item.status === 'completed'}
                   recording={recordingItemId === item.id}
+                  explaining={enrichmentPendingCardId === item.card_id}
+                  onExplain={item.card_id && selectedGoalId ? () => {
+                    void requestEnrichment({
+                      action: 'explain',
+                      goalId: selectedGoalId,
+                      cardId: item.card_id as string,
+                      uiLang: i18n.language,
+                    })
+                  } : null}
                   onRate={(score) => {
                     if (!selectedGoalId) return
                     // One id per attempt, generated at click time: the RPC is idempotent on

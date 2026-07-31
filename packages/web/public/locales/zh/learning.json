@@ -108,5 +108,34 @@
     "score": {
       "unknown": "未评分"
     }
+  },
+  "enrichment": {
+    "explainCta": "解释（额度）",
+    "requesting": "请求中…",
+    "costHint": "将使用你钱包中的 AI 额度",
+    "action": {
+      "explain": "AI 解释",
+      "hint": "学习提示"
+    },
+    "sources": "来源",
+    "noSources": "此回答不基于来源。",
+    "empty": "模型未返回可用内容。",
+    "chargedNote": "已扣费 — 即使丢弃也不会退还额度。",
+    "keep": "保留",
+    "discard": "丢弃",
+    "later": "稍后决定",
+    "saving": "保存中…",
+    "error": {
+      "BAD_REQUEST": "请求无效。",
+      "FORBIDDEN": "你没有访问该卡片的权限。",
+      "GROUNDING_REQUIRED": "未找到可引用的来源，为避免编造内容已拒绝回答。",
+      "INSUFFICIENT_CREDITS": "AI 额度不足，请充值后继续。",
+      "INVALID_RESULT": "回答内容不可用，请重试。",
+      "NETWORK": "网络错误，请检查连接。",
+      "NOT_CONFIGURED": "此服务器未启用 AI 生成功能。",
+      "PROVIDER_ERROR": "AI 服务出错，请重试。",
+      "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
+      "UNKNOWN": "出了点问题，请重试。"
+    }
   }
 }

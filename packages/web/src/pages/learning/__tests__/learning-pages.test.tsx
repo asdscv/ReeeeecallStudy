@@ -7,7 +7,7 @@
  * day. The rest cover the states a user can actually get stuck in (no goal, no decks,
  * nothing due, quota spent) — each of which has to say something different.
  */
-import { render, screen } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
@@ -63,6 +63,13 @@ const baseState = (over: StoreState = {}): StoreState => ({
   attemptsLoading: false,
   recordAttempt: vi.fn(),
   fetchAttempts: vi.fn(),
+  enrichment: null,
+  enrichmentPendingCardId: null,
+  enrichmentError: null,
+  enrichmentSaving: false,
+  requestEnrichment: vi.fn(),
+  resolveEnrichment: vi.fn(),
+  dismissEnrichment: vi.fn(),
   ...over,
 })
 
@@ -255,6 +262,114 @@ describe('attempt history', () => {
     renderToday({ attempts: [] })
 
     expect(screen.queryByText('history.title')).not.toBeInTheDocument()
+  })
+})
+
+// ── enrichment UI (Phase 3, paid) ──────────────────────────────────────────
+describe('enrichment', () => {
+  const planItem = {
+    id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
+    concept_id: null, activity_type: 'recall', stimulus_type: 'text',
+    response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'due',
+    priority: 0.7, estimated_minutes: 0.5, status: 'pending' as const,
+  }
+  const planRow = {
+    id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+    algorithm_version: 'daily-plan-v1', input_fingerprint: 'f', status: 'pending',
+    budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: 1,
+  }
+  const withPlan = (over: StoreState = {}) => renderToday({
+    plan: planRow, planItems: [planItem],
+    planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+    ...over,
+  })
+
+  it('labels the request as costing credits BEFORE it is clicked', () => {
+    withPlan()
+
+    // The charge happens server-side before the user sees any result, so the cost cannot
+    // be disclosed in an error afterwards.
+    const cta = screen.getByRole('button', { name: 'enrichment.explainCta' })
+    expect(cta).toBeInTheDocument()
+    expect(cta).toHaveAttribute('title', 'enrichment.costHint')
+  })
+
+  it('requests an explanation for that card only', async () => {
+    const state = withPlan()
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
+
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: expect.any(String),
+    })
+  })
+
+  it('does not offer it on a row with no card', () => {
+    renderToday({ plan: planRow, planItems: [{ ...planItem, card_id: null, activity_id: 'act-1' }] })
+
+    expect(screen.queryByRole('button', { name: 'enrichment.explainCta' })).not.toBeInTheDocument()
+  })
+
+  it('disables the row being requested', () => {
+    withPlan({ enrichmentPendingCardId: 'card-1' })
+
+    expect(screen.getByRole('button', { name: 'enrichment.requesting' })).toBeDisabled()
+  })
+
+  it('renders each failure with its own message', () => {
+    for (const code of ['INSUFFICIENT_CREDITS', 'RATE_CAP', 'GROUNDING_REQUIRED']) {
+      const { unmount } = render(<div />)
+      unmount()
+      withPlan({ enrichmentError: code })
+      expect(screen.getByRole('alert')).toHaveTextContent(`enrichment.error.${code}`)
+      cleanup()
+    }
+  })
+
+  it('shows the result with its citations and says the charge already happened', () => {
+    withPlan({
+      enrichment: {
+        enrichmentId: 'enr-1', action: 'explain', balance: 1000,
+        content: { explanation: '연장근로 가산수당', key_points: ['50% 가산'] },
+        sources: [{ title: '근로기준법', clause: '제56조' }],
+      },
+    })
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText('연장근로 가산수당')).toBeInTheDocument()
+    expect(screen.getByText('50% 가산')).toBeInTheDocument()
+    expect(screen.getByText('근로기준법')).toBeInTheDocument()
+    // Rejecting is not a refund — the copy has to say so.
+    expect(screen.getByText('enrichment.chargedNote')).toBeInTheDocument()
+  })
+
+  it('says an answer is not source-based instead of leaving citations blank', () => {
+    withPlan({
+      enrichment: {
+        enrichmentId: 'enr-1', action: 'explain', balance: null,
+        content: { explanation: 'x' }, sources: [],
+      },
+    })
+
+    expect(screen.getByText('enrichment.noSources')).toBeInTheDocument()
+  })
+
+  it('keeps or discards through the store, and can defer the decision', async () => {
+    const state = withPlan({
+      enrichment: {
+        enrichmentId: 'enr-1', action: 'explain', balance: null,
+        content: { explanation: 'x' }, sources: [],
+      },
+    })
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.keep' }))
+    expect(state.resolveEnrichment).toHaveBeenCalledWith('accepted')
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.discard' }))
+    expect(state.resolveEnrichment).toHaveBeenCalledWith('rejected')
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.later' }))
+    expect(state.dismissEnrichment).toHaveBeenCalled()
   })
 })
 
