@@ -87,7 +87,7 @@
     "noPlanItems": "Nada planificado",
     "notScoredYet": "Nada puntuado aún",
     "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "title": "Diagnóstico de aprendizaje",
     "typicalTime": "Tiempo habitual",
     "weakEmpty": "Nada se está quedando atrás.",
@@ -128,7 +128,7 @@
     "generating": "Creando…",
     "insightsLink": "Diagnóstico",
     "item": {
-      "minutes": "~{{count, number}} min",
+      "minutes": "~{{count, decimal}} min",
       "recorded": "Registrado",
       "untitled": "(sin texto)"
     },

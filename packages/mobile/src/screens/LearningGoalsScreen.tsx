@@ -252,7 +252,7 @@ export function LearningGoalsScreen() {
               accessibilityState={{ disabled: submitting }}
               {...testProps('learning-goal-save')}
             >
-              <Text style={[theme.typography.bodySmall, { color: '#fff' }]}>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
                 {submitting ? t('form.saving') : t('form.save')}
               </Text>
             </TouchableOpacity>

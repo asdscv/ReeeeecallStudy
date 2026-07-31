@@ -32,6 +32,8 @@ yarn-error.*
 
 # local env files
 .env*.local
+# E2E credentials — never committed (the helpers read them from here)
+.env.test
 
 # typescript
 *.tsbuildinfo

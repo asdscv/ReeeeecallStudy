@@ -87,7 +87,7 @@
     "noPlanItems": "ไม่มีรายการที่วางแผนไว้",
     "notScoredYet": "ยังไม่มีการทำที่ถูกให้คะแนน",
     "scopeNote": "อ้างอิงจากการทำและแผนของเป้าหมายนี้ สถิติ SRS ระดับสำรับอยู่ในประวัติการเรียน",
-    "seconds": "{{count, number}} วินาที",
+    "seconds": "{{count, decimal}} วินาที",
     "title": "วิเคราะห์การเรียน",
     "typicalTime": "เวลาโดยทั่วไป",
     "weakEmpty": "ไม่มีการ์ดที่ตามไม่ทัน",
@@ -128,7 +128,7 @@
     "generating": "กำลังสร้าง…",
     "insightsLink": "วิเคราะห์",
     "item": {
-      "minutes": "~{{count, number}} นาที",
+      "minutes": "~{{count, decimal}} นาที",
       "recorded": "บันทึกแล้ว",
       "untitled": "(ไม่มีข้อความ)"
     },

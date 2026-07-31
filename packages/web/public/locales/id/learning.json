@@ -20,7 +20,7 @@
     "item": {
       "study": "Belajar",
       "untitled": "(tidak ada teks)",
-      "minutes": "~{{count, number}} menit",
+      "minutes": "~{{count, decimal}} menit",
       "recorded": "Tercatat"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "Akurasi",
     "notScoredYet": "Belum ada yang dinilai",
     "typicalTime": "Waktu biasa",
-    "seconds": "{{count, number}}d",
+    "seconds": "{{count, decimal}}d",
     "adherence": "Kepatuhan rencana (14 hari)",
     "weakTitle": "Perlu dilihat lagi",
     "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",

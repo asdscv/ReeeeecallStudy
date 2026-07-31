@@ -2,6 +2,13 @@
  * WebDriverIO shared config for Appium E2E tests.
  * Platform-specific configs extend this (wdio.ios.conf.ts, wdio.android.conf.ts).
  */
+import dotenv from 'dotenv'
+import path from 'path'
+
+// E2E credentials are no longer committed. `.env.test` is gitignored and is the documented
+// place for them; without this the helpers throw and the whole suite is unrunnable locally.
+dotenv.config({ path: path.resolve(__dirname, '.env.test') })
+
 export const config: WebdriverIO.Config = {
   runner: 'local',
   tsConfigPath: './tsconfig.json',

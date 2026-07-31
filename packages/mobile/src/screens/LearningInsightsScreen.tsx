@@ -126,7 +126,7 @@ export function LearningInsightsScreen() {
               accessibilityRole="button"
               {...testProps('learning-insights-create-goal')}
             >
-              <Text style={[theme.typography.bodySmall, { color: '#fff' }]}>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
                 {t('today.empty.createGoal')}
               </Text>
             </TouchableOpacity>

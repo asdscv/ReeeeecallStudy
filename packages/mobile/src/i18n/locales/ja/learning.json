@@ -87,7 +87,7 @@
     "noPlanItems": "計画された項目なし",
     "notScoredYet": "まだスコアのある試行がありません",
     "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
-    "seconds": "{{count, number}}秒",
+    "seconds": "{{count, decimal}}秒",
     "title": "学習診断",
     "typicalTime": "平均所要時間",
     "weakEmpty": "遅れているカードはありません。",
@@ -128,7 +128,7 @@
     "generating": "作成中…",
     "insightsLink": "学習診断",
     "item": {
-      "minutes": "約 {{count, number}} 分",
+      "minutes": "約 {{count, decimal}} 分",
       "recorded": "記録済み",
       "untitled": "（テキストなし）"
     },

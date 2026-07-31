@@ -87,7 +87,7 @@
     "noPlanItems": "无计划项目",
     "notScoredYet": "尚无评分记录",
     "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
-    "seconds": "{{count, number}}秒",
+    "seconds": "{{count, decimal}}秒",
     "title": "学习诊断",
     "typicalTime": "通常用时",
     "weakEmpty": "没有落后的卡片。",
@@ -128,7 +128,7 @@
     "generating": "生成中…",
     "insightsLink": "诊断",
     "item": {
-      "minutes": "约 {{count, number}} 分钟",
+      "minutes": "约 {{count, decimal}} 分钟",
       "recorded": "已记录",
       "untitled": "（无内容）"
     },

@@ -1,1 +1,4 @@
 packages/web/public/sitemap.xml
+
+# E2E credentials — never committed
+.env.test

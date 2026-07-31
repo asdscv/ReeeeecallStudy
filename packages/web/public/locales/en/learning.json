@@ -20,7 +20,7 @@
     "item": {
       "study": "Study",
       "untitled": "(no text)",
-      "minutes": "~{{count, number}} min",
+      "minutes": "~{{count, decimal}} min",
       "recorded": "Recorded"
     },
     "reason": {
@@ -148,7 +148,7 @@
     "accuracy": "Accuracy",
     "notScoredYet": "Nothing scored yet",
     "typicalTime": "Typical time",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "adherence": "Plan adherence (14d)",
     "weakTitle": "Worth another look",
     "weakHint": "Cards with at least two attempts averaging under 60%.",
