@@ -31,6 +31,9 @@ const REASON_KEY: Record<string, string> = {
   balanced: 'today.reason.balanced',
 }
 
+/** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
+const ATTEMPT_ROWS = 10
+
 /**
  * The two remediation actions an attempt can honestly ground.
  *
@@ -39,9 +42,6 @@ const REASON_KEY: Record<string, string> = {
  * The labels say what the model produces ("AI explanation" / "Study hint"), never that it read
  * a response, because it did not.
  */
-/** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
-const ATTEMPT_ROWS = 10
-
 const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; labelKey: string }> = [
   { action: 'explain', labelKey: 'enrichment.action.explain' },
   { action: 'hint', labelKey: 'enrichment.action.hint' },
@@ -317,6 +317,21 @@ export function LearningTodayPage() {
   const goal: LearningGoalWithDecks | undefined =
     plannableGoals.find((candidate) => candidate.id === selectedGoalId)
 
+  /**
+   * The same goal filter `AttemptHistory` applies, for the same reason — and it has to be
+   * here too, not only there. `fetchAttempts` never clears `attempts`, so after a goal switch
+   * the previous goal's rows survive one round trip. A card that belongs to both goals' decks
+   * would then let the plan row ground a paid request in the OTHER goal's attempt, and the
+   * server cannot catch it: `persist_ai_remediation`'s pair check only asks that the attempt
+   * and the enrichment name the same CARD (mig 178), which that attempt does. The result is a
+   * stored `attempt_id` that misdescribes the answer — worse than none, because provenance
+   * reads as verified.
+   */
+  const goalAttempts = useMemo(
+    () => attempts.filter((attempt) => attempt.goal_id === selectedGoalId),
+    [attempts, selectedGoalId],
+  )
+
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
   if (plannableGoals.length === 0) {
@@ -447,7 +462,7 @@ export function LearningTodayPage() {
                       // Grounded once the item HAS an attempt (design §6) — same rule mobile
                       // uses, so the two platforms cannot buy different answers for the same
                       // card. Undefined when there is none, and the store omits the key.
-                      attemptId: latestAttemptForCard(attempts, item.card_id)?.id,
+                      attemptId: latestAttemptForCard(goalAttempts, item.card_id)?.id,
                       uiLang: i18n.language,
                     })
                   } : null}

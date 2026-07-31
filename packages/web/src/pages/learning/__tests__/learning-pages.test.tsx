@@ -457,6 +457,41 @@ describe('enrichment', () => {
     expect(screen.queryByRole('button', { name: 'enrichment.explainCta' })).not.toBeInTheDocument()
   })
 
+  // Design §6: the plan-row button stays card-scoped, and becomes attempt-grounded once that
+  // item HAS an attempt. Without this the web plan row buys the generic answer at the price
+  // the phone charges for a grounded one, and mig 178's `attempt_id` is written NULL.
+  const attemptOnCard1 = {
+    id: 'a-1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
+    plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+  }
+
+  it('grounds the plan row in this card’s latest attempt once it has one', async () => {
+    const state = withPlan({ attempts: [attemptOnCard1] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
+
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', attemptId: 'a-1',
+      uiLang: expect.any(String),
+    })
+  })
+
+  it('never grounds it in another goal’s attempt on the same card', async () => {
+    // `fetchAttempts` does not clear `attempts` on a goal switch, so the previous goal's rows
+    // survive one round trip. A card in both goals' decks would otherwise ground this paid
+    // request in the goal the learner just left — and the server cannot catch it, because
+    // mig 178's pair check only asks that attempt and enrichment name the same CARD.
+    const state = withPlan({ attempts: [{ ...attemptOnCard1, id: 'a-other', goal_id: 'goal-2' }] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
+
+    // No `attemptId` KEY at all — not `undefined`, which the store would forward as a field.
+    expect(state.requestEnrichment).toHaveBeenCalledWith({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: expect.any(String),
+    })
+  })
+
   it('disables the row being requested', () => {
     withPlan({ enrichmentPendingCardId: 'card-1' })
 
