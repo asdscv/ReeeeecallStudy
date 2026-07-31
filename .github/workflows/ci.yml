@@ -331,6 +331,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin_payment_refund_status_test.sql
 
+      - name: Run session-override removal assertions (mig 176 — dead key gone, one-session-per-platform intact)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/session_override_removed_test.sql
+
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so
       # they never ran on CI. Registered explicitly, like every suite above.
