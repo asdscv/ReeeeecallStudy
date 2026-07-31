@@ -4,15 +4,22 @@
 `DOCS/TODO/AI-MONETIZATION-REMAINING.md` 의 미완 항목 중 **소유자 결정이 필요 없는 코드 작업만**
 자율 진행. 결정이 필요한 것은 손대지 않고 아래 §4 에 모아둔다.
 
-기준 커밋: `origin/develop` = `eb0411d`. 워크스트림 하나에 브랜치 하나.
-**브랜치는 로컬에만 있고 push/PR 하지 않았다** (명시 지시 대기).
+기준 커밋: 착수 시점 `origin/develop` = `eb0411d`. 워크스트림 하나에 브랜치 하나.
+
+**머지 상태 (2026-07-31):** §1 의 두 워크스트림은 **PR #371 · #372 로 `develop` 에 머지 완료**
+(CI 7/7 green 각각 확인). §2 의 두 워크스트림은 미착수 — `fix/free-quota-from-server` 브랜치는
+생성만 되어 있고 커밋이 없다.
+
+> **머지 중 발견한 것:** WS3 와 WS4 는 둘 다 `.github/workflows/ci.yml` 의 sandbox 스텝 **직후**에
+> 새 스텝을 추가해서 충돌했다. 두 스텝을 모두 살려 마이그레이션 번호 순서로 정렬해 해소했다.
+> 앞으로 같은 잡에 스텝을 추가하는 워크스트림이 여러 개 병행되면 같은 충돌이 난다.
 
 ---
 
 ## 1. 완료 — 검증까지 끝난 것
 
 ### WS3 · 환불된 크레딧팩이 어드민 목록에서 `paid` 로 표시 (돈 관련)
-브랜치 `fix/admin-payments-refunded-status` · 커밋 `3eebbfe`
+브랜치 `fix/admin-payments-refunded-status` · 커밋 `3eebbfe` · **PR #371 머지 완료**
 
 | 파일 | 내용 |
 |---|---|
@@ -51,7 +58,7 @@
   8개 로케일에 이미 있음.
 
 ### WS4 · 데드코드 `admin_set_session_override` / `max_sessions_override`
-브랜치 `chore/drop-session-override-deadcode` · 커밋 `4214f5d`
+브랜치 `chore/drop-session-override-deadcode` · 커밋 `4214f5d` · **PR #372 머지 완료**
 
 | 파일 | 내용 |
 |---|---|
@@ -95,7 +102,7 @@ web/mobile grep 도 깨끗함.
 
 > 아래 조사 결과는 다시 파지 않도록 그대로 옮겨 적었다.
 
-### WS2 · `free_limit` 하드코딩 제거 (브랜치 `fix/free-quota-from-server` — 아직 빈 브랜치)
+### WS2 · `free_limit` 하드코딩 제거 (브랜치 `fix/free-quota-from-server` — 로컬, 커밋 0)
 
 대상:
 - `packages/web/src/components/ai-generate/steps/ConfigStep.tsx:24` — `const FREE_DAILY_CAP = 10`,
@@ -196,9 +203,9 @@ UI 가 현재값을 보여줄 수 없으므로 **admin 게이트 getter 를 새�
 prod 에 지갑 데이터가 없던 시점에 딱 한 번 안전했다.
 ⚠️ prod 상태는 문서가 아니라 **DB(`supabase migration list --linked`)를 읽어서** 확인할 것.
 
-**승격 대기 중 주목할 커밋:** `origin/develop` 이 `origin/main` 보다 7커밋 앞서 있고, 그 안에
-`7dbec02 fix(mobile): bump expo.version to 1.0.4` — **모든 iOS 업로드를 막고 있던** 수정이 있다.
-나머지는 학습로직 관련. (JS-only 변경은 OTA 로 기존 설치에 도달하지만 네이티브 변경은 새 EAS 빌드 필요.)
+**승격 대기 중 주목할 커밋:** `origin/develop` 이 `origin/main` 보다 **16커밋** 앞서 있고
+(이 패스의 mig 175/176 포함), 그 안에 `7dbec02 fix(mobile): bump expo.version to 1.0.4` —
+**모든 iOS 업로드를 막고 있던** 수정이 있다. 나머지는 학습로직 관련. (JS-only 변경은 OTA 로 기존 설치에 도달하지만 네이티브 변경은 새 EAS 빌드 필요.)
 
 ### 4.4 보안 — 코드 잔여 0, 제품 결정 대기
 - **L6** — prod `uri_allow_list` 에서 `localhost:5173` 제거. 제거하면 로컬→prod OAuth 개발이
