@@ -145,6 +145,7 @@
       "due": "Đến hạn ôn tập",
       "goalRelevance": "Liên quan đến mục tiêu",
       "importance": "Mức quan trọng",
+      "memoryRisk": "Sắp quên",
       "recentFailure": "Trả lời sai gần đây",
       "slowResponse": "Trả lời chậm"
     },

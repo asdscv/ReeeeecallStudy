@@ -15,9 +15,10 @@ import { EnrichmentModal } from './EnrichmentModal'
  * and then start failing for the rest of the day. Reading is automatic; writing is not.
  */
 
-/** Planner reason codes (daily-plan-v1) → the phrase shown on the row. */
+/** Planner reason codes (daily-plan-v2) → the phrase shown on the row. */
 const REASON_KEY: Record<string, string> = {
   due: 'today.reason.due',
+  memory_risk: 'today.reason.memoryRisk',
   recent_failure: 'today.reason.recentFailure',
   slow_response: 'today.reason.slowResponse',
   goal_relevance: 'today.reason.goalRelevance',

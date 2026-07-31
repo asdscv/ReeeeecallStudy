@@ -145,6 +145,7 @@
       "due": "Pendiente de repaso",
       "goalRelevance": "Relevancia del objetivo",
       "importance": "Importancia",
+      "memoryRisk": "A punto de olvidarse",
       "recentFailure": "Fallo reciente",
       "slowResponse": "Respuesta lenta"
     },

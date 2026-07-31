@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "Đến hạn ôn tập",
+      "memoryRisk": "Sắp quên",
       "recentFailure": "Trả lời sai gần đây",
       "slowResponse": "Trả lời chậm",
       "goalRelevance": "Liên quan đến mục tiêu",

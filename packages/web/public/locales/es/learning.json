@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "Pendiente de repaso",
+      "memoryRisk": "A punto de olvidarse",
       "recentFailure": "Fallo reciente",
       "slowResponse": "Respuesta lenta",
       "goalRelevance": "Relevancia del objetivo",

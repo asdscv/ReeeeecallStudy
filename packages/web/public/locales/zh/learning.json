@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "到期复习",
+      "memoryRisk": "即将忘记",
       "recentFailure": "最近答错",
       "slowResponse": "回答较慢",
       "goalRelevance": "目标相关度",

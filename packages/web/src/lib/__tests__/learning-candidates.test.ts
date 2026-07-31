@@ -29,7 +29,9 @@ function card(over: Partial<Card> & { id: string }): Card {
     sort_position: 1,
     srs_status: over.srs_status ?? 'review',
     ease_factor: 2.5,
-    interval_days: 3,
+    // `in` rather than `??`: interval_days = 0 is a real state (a learning-step card) and one
+    // the memory model treats as "no stability", so it must survive the fixture.
+    interval_days: 'interval_days' in over ? (over.interval_days as number) : 3,
     repetitions: 2,
     next_review_at: over.next_review_at ?? NOW,
     last_reviewed_at: over.last_reviewed_at ?? null,
@@ -241,5 +243,56 @@ describe('buildCandidatesFromCards', () => {
   it('returns nothing for no cards (a goal with no attached decks plans nothing)', () => {
     expect(buildCandidatesFromCards({ cards: [], recentLogs: [], deckImportance: {}, now: NOW }))
       .toEqual([])
+  })
+})
+
+describe('reviewValue (memory model, daily-plan-v2)', () => {
+  const one = (over: Partial<Card> & { id: string }) =>
+    buildCandidatesFromCards({ cards: [card(over)], recentLogs: [], deckImportance: {}, now: NOW })[0]
+
+  it('derives the review value from interval_days and last_reviewed_at', () => {
+    // Reviewed exactly one interval ago → retrievability 0.9 → the peak of the value curve.
+    const candidate = one({ id: 'c1', interval_days: 10, last_reviewed_at: '2026-07-21T00:00:00.000Z' })
+    expect(candidate.reviewValue).toBeCloseTo(1, 12)
+  })
+
+  it('is null for a card the learner has never reviewed', () => {
+    // Not 0 and not 0.5: the planner renormalises around a missing estimate, and a fabricated
+    // number here is exactly the "implicit evidence" the design forbids.
+    expect(one({ id: 'c2', last_reviewed_at: null }).reviewValue).toBeNull()
+  })
+
+  it('is null for a card with no interval to bridge from', () => {
+    expect(one({ id: 'c3', interval_days: 0, last_reviewed_at: '2026-07-21T00:00:00.000Z' }).reviewValue).toBeNull()
+  })
+
+  it('ranks a freshly due card above one long overdue, and both above a just-reviewed one', () => {
+    // next_review_at is set to what the legacy scheduler would have written (last review +
+    // interval), so the two features are compared on the same card, not on a contrived row.
+    const freshlyDue = one({
+      id: 'c4', interval_days: 10,
+      last_reviewed_at: '2026-07-21T00:00:00.000Z', next_review_at: NOW,
+    })
+    const longOverdue = one({
+      id: 'c5', interval_days: 10,
+      last_reviewed_at: '2026-01-01T00:00:00.000Z', next_review_at: '2026-01-11T00:00:00.000Z',
+    })
+    const justReviewed = one({
+      id: 'c6', interval_days: 10,
+      last_reviewed_at: NOW, next_review_at: '2026-08-10T00:00:00.000Z',
+    })
+    expect(freshlyDue.reviewValue as number).toBeGreaterThan(longOverdue.reviewValue as number)
+    expect(longOverdue.reviewValue as number).toBeGreaterThan(justReviewed.reviewValue as number)
+    // dueUrgency alone would have ordered the first two the other way round — that is the
+    // v1 defect the memory model corrects.
+    expect(longOverdue.dueUrgency).toBeGreaterThan(freshlyDue.dueUrgency)
+  })
+
+  it('leaves the other features untouched', () => {
+    const candidate = one({ id: 'c7', interval_days: 10, last_reviewed_at: '2026-07-21T00:00:00.000Z' })
+    expect(candidate.estimatedMinutes).toBe(RECALL_MINUTES)
+    expect(candidate.recentFailure).toBeCloseTo(0.3, 12)   // no logs → the documented default
+    expect(candidate.responseTimePenalty).toBeCloseTo(0.5, 12)
+    expect(candidate.goalRelevance).toBeCloseTo(0.5, 12)
   })
 })

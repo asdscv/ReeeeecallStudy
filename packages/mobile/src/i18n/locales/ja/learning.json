@@ -145,6 +145,7 @@
       "due": "復習期限",
       "goalRelevance": "目標との関連度",
       "importance": "重要度",
+      "memoryRisk": "忘れかけ",
       "recentFailure": "最近の不正解",
       "slowResponse": "回答が遅い"
     },

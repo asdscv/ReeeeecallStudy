@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "Waktunya mengulang",
+      "memoryRisk": "Hampir terlupakan",
       "recentFailure": "Baru saja salah",
       "slowResponse": "Lambat menjawab",
       "goalRelevance": "Relevansi tujuan",

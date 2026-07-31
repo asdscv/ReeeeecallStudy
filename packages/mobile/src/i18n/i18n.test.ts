@@ -166,7 +166,7 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
       'PROVIDER_ERROR', 'BAD_REQUEST', 'NETWORK', 'UNKNOWN',
     ],
     'today.reason': [
-      'due', 'recentFailure', 'slowResponse', 'goalRelevance', 'importance', 'balanced',
+      'due', 'memoryRisk', 'recentFailure', 'slowResponse', 'goalRelevance', 'importance', 'balanced',
     ],
   }
   for (const [prefix, values] of Object.entries(FAMILIES)) {

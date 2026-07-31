@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "복습 시점",
+      "memoryRisk": "잊기 직전",
       "recentFailure": "최근 오답",
       "slowResponse": "응답 지연",
       "goalRelevance": "목표 관련도",
