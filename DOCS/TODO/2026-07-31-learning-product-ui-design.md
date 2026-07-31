@@ -295,7 +295,10 @@ Two things this phase changed outside mobile:
   `tsconfig.app.json` already had: `shared/learning/**` imports with explicit `.ts`
   extensions, and mobile only started traversing into it now.
 
-Deferred to 5b: the insights screen on mobile.
+5b (shipped): `LearningInsightsScreen` — the same diagnostics and the same recommendation
+accept/dismiss loop, reached from the today screen's header. It renders the identical pure
+aggregation, so "no data is not zero" holds on both platforms by construction rather than by
+two implementations agreeing.
 
 Out of scope for all phases here (unchanged from design §19): curated concept authoring, the
 official content pipeline, FSRS shadow scoring, listening/speaking, and any production

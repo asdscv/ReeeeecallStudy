@@ -61,6 +61,35 @@
     },
     "title": "Objetivos de aprendizaje"
   },
+  "insights": {
+    "accuracy": "Precisión",
+    "adherence": "Cumplimiento del plan (14 días)",
+    "attemptCount": "{{count, number}} intentos",
+    "attempts": "Intentos (30 días)",
+    "cardFallback": "(tarjeta no incluida en el plan de hoy)",
+    "noData": "Sin datos aún",
+    "notScoredYet": "Nada puntuado aún",
+    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
+    "seconds": "{{count, number}}s",
+    "title": "Diagnóstico de aprendizaje",
+    "typicalTime": "Tiempo habitual",
+    "weakEmpty": "Nada se está quedando atrás.",
+    "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",
+    "weakTitle": "Vale otra mirada"
+  },
+  "recommend": {
+    "accept": "Aceptar",
+    "dismiss": "Descartar",
+    "empty": "Aún no hay recomendaciones. Actualiza cuando tengas algunos intentos.",
+    "hint": "Aceptar una sube la prioridad de esa tarjeta en tu próximo plan.",
+    "regenerate": "Actualizar",
+    "status": {
+      "accepted": "Aceptada",
+      "dismissed": "Descartada",
+      "expired": "Caducada"
+    },
+    "title": "Recomendaciones"
+  },
   "today": {
     "budget": "{{count, number}} min/día",
     "empty": {
@@ -71,6 +100,7 @@
     },
     "generate": "Crear plan de hoy",
     "generating": "Creando…",
+    "insightsLink": "Diagnóstico",
     "item": {
       "recorded": "Registrado",
       "untitled": "(sin texto)"

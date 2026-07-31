@@ -61,6 +61,35 @@
     },
     "title": "学習目標"
   },
+  "insights": {
+    "accuracy": "正答率",
+    "adherence": "プラン達成率 (14日)",
+    "attemptCount": "{{count, number}} 回試行",
+    "attempts": "試行回数 (30日)",
+    "cardFallback": "（今日のプランに含まれていないカード）",
+    "noData": "データなし",
+    "notScoredYet": "まだスコアのある試行がありません",
+    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
+    "seconds": "{{count, number}}秒",
+    "title": "学習診断",
+    "typicalTime": "平均所要時間",
+    "weakEmpty": "遅れているカードはありません。",
+    "weakHint": "試行2回以上で平均60%未満のカードです。",
+    "weakTitle": "もう一度確認"
+  },
+  "recommend": {
+    "accept": "受け入れる",
+    "dismiss": "無視",
+    "empty": "まだおすすめはありません。試行がたまったら更新してください。",
+    "hint": "受け入れると次のプランでそのカードの優先度が上がります。",
+    "regenerate": "更新",
+    "status": {
+      "accepted": "受け入れ済み",
+      "dismissed": "無視済み",
+      "expired": "期限切れ"
+    },
+    "title": "おすすめ"
+  },
   "today": {
     "budget": "1日 {{count, number}} 分",
     "empty": {
@@ -71,6 +100,7 @@
     },
     "generate": "今日のプランを作成",
     "generating": "作成中…",
+    "insightsLink": "学習診断",
     "item": {
       "recorded": "記録済み",
       "untitled": "（テキストなし）"

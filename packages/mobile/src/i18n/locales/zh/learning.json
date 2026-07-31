@@ -61,6 +61,35 @@
     },
     "title": "学习目标"
   },
+  "insights": {
+    "accuracy": "正确率",
+    "adherence": "计划执行率 (14天)",
+    "attemptCount": "{{count, number}} 次作答",
+    "attempts": "作答次数 (30天)",
+    "cardFallback": "（不在今日计划中）",
+    "noData": "暂无数据",
+    "notScoredYet": "尚无评分记录",
+    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
+    "seconds": "{{count, number}}秒",
+    "title": "学习诊断",
+    "typicalTime": "通常用时",
+    "weakEmpty": "没有落后的卡片。",
+    "weakHint": "作答至少2次且平均低于60%的卡片。",
+    "weakTitle": "值得再看"
+  },
+  "recommend": {
+    "accept": "接受",
+    "dismiss": "忽略",
+    "empty": "暂无推荐。积累几次作答后再刷新。",
+    "hint": "接受后，该卡片在下次计划中的优先级会提高。",
+    "regenerate": "刷新",
+    "status": {
+      "accepted": "已接受",
+      "dismissed": "已忽略",
+      "expired": "已过期"
+    },
+    "title": "推荐"
+  },
   "today": {
     "budget": "每天 {{count, number}} 分钟",
     "empty": {
@@ -71,6 +100,7 @@
     },
     "generate": "生成今日计划",
     "generating": "生成中…",
+    "insightsLink": "诊断",
     "item": {
       "recorded": "已记录",
       "untitled": "（无内容）"

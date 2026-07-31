@@ -61,6 +61,35 @@
     },
     "title": "Tujuan belajar"
   },
+  "insights": {
+    "accuracy": "Akurasi",
+    "adherence": "Kepatuhan rencana (14 hari)",
+    "attemptCount": "{{count, number}} percobaan",
+    "attempts": "Percobaan (30 hari)",
+    "cardFallback": "(kartu tidak ada di rencana hari ini)",
+    "noData": "Belum ada data",
+    "notScoredYet": "Belum ada yang dinilai",
+    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
+    "seconds": "{{count, number}}d",
+    "title": "Analisis pembelajaran",
+    "typicalTime": "Waktu biasa",
+    "weakEmpty": "Tidak ada yang tertinggal.",
+    "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
+    "weakTitle": "Perlu dilihat lagi"
+  },
+  "recommend": {
+    "accept": "Terima",
+    "dismiss": "Abaikan",
+    "empty": "Belum ada rekomendasi. Segarkan setelah ada beberapa percobaan.",
+    "hint": "Menerima akan menaikkan prioritas kartu itu di rencana berikutnya.",
+    "regenerate": "Segarkan",
+    "status": {
+      "accepted": "Diterima",
+      "dismissed": "Diabaikan",
+      "expired": "Kedaluwarsa"
+    },
+    "title": "Rekomendasi"
+  },
   "today": {
     "budget": "{{count, number}} menit/hari",
     "empty": {
@@ -71,6 +100,7 @@
     },
     "generate": "Buat rencana hari ini",
     "generating": "Membuat…",
+    "insightsLink": "Analisis",
     "item": {
       "recorded": "Tercatat",
       "untitled": "(tidak ada teks)"

@@ -61,6 +61,35 @@
     },
     "title": "Learning goals"
   },
+  "insights": {
+    "accuracy": "Accuracy",
+    "adherence": "Plan adherence (14d)",
+    "attemptCount": "{{count, number}} attempts",
+    "attempts": "Attempts (30d)",
+    "cardFallback": "(card not in today’s plan)",
+    "noData": "No data yet",
+    "notScoredYet": "Nothing scored yet",
+    "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History.",
+    "seconds": "{{count, number}}s",
+    "title": "Learning insights",
+    "typicalTime": "Typical time",
+    "weakEmpty": "Nothing is falling behind.",
+    "weakHint": "Cards with at least two attempts averaging under 60%.",
+    "weakTitle": "Worth another look"
+  },
+  "recommend": {
+    "accept": "Accept",
+    "dismiss": "Dismiss",
+    "empty": "No recommendations yet. Refresh once you have a few attempts.",
+    "hint": "Accepting one raises that card’s priority in your next plan.",
+    "regenerate": "Refresh",
+    "status": {
+      "accepted": "Accepted",
+      "dismissed": "Dismissed",
+      "expired": "Expired"
+    },
+    "title": "Recommendations"
+  },
   "today": {
     "budget": "{{count, number}} min/day",
     "empty": {
@@ -71,6 +100,7 @@
     },
     "generate": "Build today's plan",
     "generating": "Building…",
+    "insightsLink": "Insights",
     "item": {
       "recorded": "Recorded",
       "untitled": "(no text)"

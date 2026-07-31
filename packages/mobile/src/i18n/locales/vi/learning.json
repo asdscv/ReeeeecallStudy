@@ -61,6 +61,35 @@
     },
     "title": "Mục tiêu học tập"
   },
+  "insights": {
+    "accuracy": "Độ chính xác",
+    "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
+    "attemptCount": "{{count, number}} lần làm",
+    "attempts": "Lần làm (30 ngày)",
+    "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
+    "noData": "Chưa có dữ liệu",
+    "notScoredYet": "Chưa có lần nào được chấm điểm",
+    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
+    "seconds": "{{count, number}}s",
+    "title": "Phân tích học tập",
+    "typicalTime": "Thời gian thường",
+    "weakEmpty": "Không có thẻ nào tụt lại.",
+    "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
+    "weakTitle": "Cần xem lại"
+  },
+  "recommend": {
+    "accept": "Chấp nhận",
+    "dismiss": "Bỏ qua",
+    "empty": "Chưa có gợi ý. Hãy làm mới sau khi có vài lần làm bài.",
+    "hint": "Chấp nhận sẽ tăng ưu tiên của thẻ đó trong kế hoạch tiếp theo.",
+    "regenerate": "Làm mới",
+    "status": {
+      "accepted": "Đã chấp nhận",
+      "dismissed": "Đã bỏ qua",
+      "expired": "Đã hết hạn"
+    },
+    "title": "Gợi ý"
+  },
   "today": {
     "budget": "{{count, number}} phút/ngày",
     "empty": {
@@ -71,6 +100,7 @@
     },
     "generate": "Tạo kế hoạch hôm nay",
     "generating": "Đang tạo…",
+    "insightsLink": "Phân tích",
     "item": {
       "recorded": "Đã ghi lại",
       "untitled": "(không có nội dung)"

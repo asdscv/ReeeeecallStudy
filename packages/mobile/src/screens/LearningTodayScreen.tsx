@@ -82,11 +82,18 @@ export function LearningTodayScreen() {
         title={t('today.title')}
         mode="drawer"
         rightContent={
-          <TouchableOpacity onPress={() => navigation.navigate('LearningGoals')} testID="learning-manage-goals">
-            <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-              {t('today.manageGoals')}
-            </Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('LearningInsights')} testID="learning-insights-link">
+              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                {t('today.insightsLink')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('LearningGoals')} testID="learning-manage-goals">
+              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                {t('today.manageGoals')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         }
       />
 
