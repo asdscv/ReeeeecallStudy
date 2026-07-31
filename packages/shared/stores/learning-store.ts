@@ -15,6 +15,7 @@ import { supabase } from '../lib/supabase'
 import {
   buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
 } from '../lib/learning-candidates'
+import { callServerAI } from '../lib/ai/server-client'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card } from '../types/database'
@@ -187,6 +188,70 @@ export interface AttemptInput {
   clientAttemptId: string
 }
 
+/**
+ * A remediation the server generated, charged for, and persisted as a PREVIEW.
+ *
+ * The money is already spent by the time this exists — `ai-generate` reserves before
+ * generating and charges after (mig 168). Accepting or rejecting only decides whether the
+ * content is kept, so "reject" is not a refund and the UI must not imply that it is.
+ */
+export interface EnrichmentPreview {
+  enrichmentId: string
+  action: RemediationAction
+  content: Record<string, unknown>
+  /** Source citations the server validated. Labor-law content cannot be ungrounded. */
+  sources: EnrichmentSource[]
+  /** Wallet balance in micro-USD after the charge, when the server reported it. */
+  balance: number | null
+}
+
+export interface EnrichmentSource {
+  title?: string
+  url?: string
+  clause?: string
+  id?: string
+}
+
+/** Actions the Phase 3 UI offers. The server supports more (compare / generate /
+ *  evaluate / recommend); those need context this screen does not have yet. */
+export type RemediationAction = 'explain' | 'hint'
+
+/**
+ * Everything the enrichment call can fail with, kept distinct because the user's next
+ * action differs per case: top up, wait for tomorrow, or nothing they can do.
+ */
+export type EnrichmentErrorCode =
+  | 'INSUFFICIENT_CREDITS'   // AI_INSUFFICIENT_CREDITS — 402, wallet empty
+  | 'RATE_CAP'               // AI_RATE_CAP — 429, today's request cap
+  | 'GROUNDING_REQUIRED'     // AI_GROUNDING_REQUIRED — refused rather than cite nothing
+  | 'INVALID_RESULT'         // AI_INVALID_RESULT — model returned something unusable
+  | 'PROVIDER_ERROR'         // AI_PROVIDER_ERROR / AI_PROVIDER_AUTH
+  | 'NOT_CONFIGURED'         // AI_NOT_CONFIGURED — no provider key on this deployment
+  | 'FORBIDDEN'              // reference not accessible
+  | 'BAD_REQUEST'
+  | 'NETWORK'
+  | 'UNKNOWN'
+
+function toEnrichmentError(e: unknown): EnrichmentErrorCode {
+  // callServerAI throws `new Error(<server code>)`, so the message IS the code.
+  const code = e instanceof Error ? e.message : String(e)
+  switch (code) {
+    case 'AI_INSUFFICIENT_CREDITS': return 'INSUFFICIENT_CREDITS'
+    case 'AI_RATE_CAP': return 'RATE_CAP'
+    case 'AI_GROUNDING_REQUIRED': return 'GROUNDING_REQUIRED'
+    case 'AI_INVALID_RESULT': return 'INVALID_RESULT'
+    case 'AI_PROVIDER_ERROR':
+    case 'AI_PROVIDER_AUTH': return 'PROVIDER_ERROR'
+    case 'AI_NOT_CONFIGURED': return 'NOT_CONFIGURED'
+    case 'FORBIDDEN': return 'FORBIDDEN'
+    case 'BAD_REQUEST': return 'BAD_REQUEST'
+    case 'NETWORK_ERROR': return 'NETWORK'
+    // AI_PERSISTENCE_ERROR and AI_METER_ERROR are server faults the user cannot act on;
+    // they are surfaced as UNKNOWN rather than pretending to be actionable.
+    default: return 'UNKNOWN'
+  }
+}
+
 export interface PlanContext {
   /** IANA zone, e.g. 'Asia/Seoul'. Supplied by the platform layer: shared code must
    *  not depend on Intl (the mobile bundle is deliberately Intl-free). */
@@ -234,6 +299,13 @@ interface LearningState {
   attempts: AttemptRow[]
   attemptsLoading: boolean
 
+  /** The preview being shown. Null when nothing is open. */
+  enrichment: EnrichmentPreview | null
+  /** Card id the request is running for, so one row can show its own spinner. */
+  enrichmentPendingCardId: string | null
+  enrichmentError: EnrichmentErrorCode | null
+  enrichmentSaving: boolean
+
   fetchGoals: () => Promise<void>
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
@@ -244,6 +316,14 @@ interface LearningState {
   generatePlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
+  requestEnrichment: (input: {
+    action: RemediationAction
+    goalId: string
+    cardId: string
+    uiLang: string
+  }) => Promise<boolean>
+  resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
+  dismissEnrichment: () => void
   reset: () => void
 }
 
@@ -261,6 +341,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
+  enrichment: null,
+  enrichmentPendingCardId: null,
+  enrichmentError: null,
+  enrichmentSaving: false,
 
   fetchGoals: async () => {
     if (get().goalsLoading) return
@@ -619,10 +703,100 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /**
+   * Ask the server for a remediation on one card, and hold the result as a preview.
+   *
+   * This SPENDS MONEY. `ai-generate` reserves against the wallet before calling the model
+   * and charges the real token cost after (mig 168), so the caller must only reach here on
+   * an explicit user action — and the UI has to say it costs credits BEFORE the click, not
+   * after the charge.
+   *
+   * The server persists the result as `user_enrichments.status = 'preview'` and returns its
+   * id; accepting or rejecting is a separate decision (`resolveEnrichment`). Rejecting is
+   * NOT a refund — the generation already happened.
+   */
+  requestEnrichment: async (input) => {
+    if (get().enrichmentPendingCardId) return false
+    set({ enrichmentPendingCardId: input.cardId, enrichmentError: null, enrichment: null })
+    try {
+      const result = await callServerAI({
+        kind: 'remediation',
+        action: input.action,
+        uiLang: input.uiLang,
+        goalId: input.goalId,
+        cardIds: [input.cardId],
+      })
+      // No enrichment id means the server could not persist the preview, so there is
+      // nothing to accept later. Surfacing it as an error beats showing content that
+      // silently cannot be kept.
+      if (!result.enrichmentId) {
+        set({ enrichmentError: 'UNKNOWN' })
+        return false
+      }
+      const rawSources = (result.content as { sources?: unknown }).sources
+      set({
+        enrichment: {
+          enrichmentId: result.enrichmentId,
+          action: input.action,
+          content: result.content,
+          sources: Array.isArray(rawSources) ? rawSources as EnrichmentSource[] : [],
+          balance: typeof result.balance === 'number' ? result.balance : null,
+        },
+      })
+      return true
+    } catch (e) {
+      set({ enrichmentError: toEnrichmentError(e) })
+      return false
+    } finally {
+      set({ enrichmentPendingCardId: null })
+    }
+  },
+
+  /**
+   * Keep or discard the open preview.
+   *
+   * `set_user_enrichment_status` only allows a transition OUT OF 'preview' (P0007
+   * otherwise) — the closed statuses are terminal. So a double-click on Accept is a
+   * server-side conflict, not a silent second write, and the store closes the preview on
+   * success either way.
+   */
+  resolveEnrichment: async (status) => {
+    const current = get().enrichment
+    if (!current || get().enrichmentSaving) return false
+    set({ enrichmentSaving: true, enrichmentError: null })
+    try {
+      const { error } = await supabase.rpc('set_user_enrichment_status', {
+        p_enrichment_id: current.enrichmentId,
+        p_status: status,
+      })
+      if (error) throw error
+      set({ enrichment: null })
+      return true
+    } catch (e) {
+      const code = (e as { code?: string }).code
+      // P0007 means it was already finalized — the user's intent is satisfied, so close
+      // the preview instead of trapping them behind an error they cannot clear.
+      if (code === 'P0007') {
+        set({ enrichment: null })
+        return true
+      }
+      set({ enrichmentError: 'UNKNOWN' })
+      return false
+    } finally {
+      set({ enrichmentSaving: false })
+    }
+  },
+
+  /** Close the preview without deciding. It stays 'preview' server-side and can be
+   *  resolved later; the money is spent either way. */
+  dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
+
   reset: () => set({
     goals: [], goalsLoading: false, goalsError: null,
     plan: null, planItems: [], planCards: {}, planLoading: false, planGenerating: false,
     planError: null, planBlockedReason: null,
     recordingItemId: null, attempts: [], attemptsLoading: false,
+    enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
+    enrichmentSaving: false,
   }),
 }))

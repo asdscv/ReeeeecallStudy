@@ -12,6 +12,9 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+const { mockCallServerAI } = vi.hoisted(() => ({ mockCallServerAI: vi.fn() }))
+vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({ callServerAI: mockCallServerAI }))
+
 const { mockFrom, mockRpc, mockGetUser, mockSupabase } = vi.hoisted(() => {
   const from = vi.fn()
   const rpc = vi.fn()
@@ -356,6 +359,126 @@ describe('fetchAttempts', () => {
     expect(useLearningStore.getState().attemptsLoading).toBe(false)
   })
 })
+// ── enrichment (Phase 3, paid) ─────────────────────────────────────────────
+describe('requestEnrichment', () => {
+  const ok = {
+    content: { explanation: 'because', sources: [{ title: '근로기준법', clause: '제56조' }] },
+    enrichmentId: 'enr-1',
+    balance: 12345,
+  }
+
+  it('asks the server and holds the result as a preview', async () => {
+    mockCallServerAI.mockResolvedValue(ok)
+
+    const done = await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+
+    expect(done).toBe(true)
+    expect(mockCallServerAI).toHaveBeenCalledWith({
+      kind: 'remediation', action: 'explain', uiLang: 'ko',
+      goalId: 'goal-1', cardIds: ['card-1'],
+    })
+    const preview = useLearningStore.getState().enrichment
+    expect(preview?.enrichmentId).toBe('enr-1')
+    expect(preview?.sources).toHaveLength(1)
+    expect(preview?.balance).toBe(12345)
+    expect(useLearningStore.getState().enrichmentPendingCardId).toBeNull()
+  })
+
+  it('refuses to show content it cannot let the user keep', async () => {
+    // No enrichment id → the preview was never persisted, so Accept would have nothing to
+    // act on. Showing the text anyway would promise something we cannot deliver.
+    mockCallServerAI.mockResolvedValue({ content: { explanation: 'x' } })
+
+    const done = await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+
+    expect(done).toBe(false)
+    expect(useLearningStore.getState().enrichment).toBeNull()
+    expect(useLearningStore.getState().enrichmentError).toBe('UNKNOWN')
+  })
+
+  it('keeps every server failure distinguishable, because the next action differs', async () => {
+    const cases: Array<[string, string]> = [
+      ['AI_INSUFFICIENT_CREDITS', 'INSUFFICIENT_CREDITS'],  // top up
+      ['AI_RATE_CAP', 'RATE_CAP'],                          // wait for tomorrow
+      ['AI_GROUNDING_REQUIRED', 'GROUNDING_REQUIRED'],      // refused, not broken
+      ['AI_INVALID_RESULT', 'INVALID_RESULT'],
+      ['AI_PROVIDER_ERROR', 'PROVIDER_ERROR'],
+      ['AI_NOT_CONFIGURED', 'NOT_CONFIGURED'],
+      ['FORBIDDEN', 'FORBIDDEN'],
+      ['BAD_REQUEST', 'BAD_REQUEST'],
+      ['NETWORK_ERROR', 'NETWORK'],
+      ['AI_PERSISTENCE_ERROR', 'UNKNOWN'],                  // server fault, not actionable
+    ]
+    for (const [serverCode, expected] of cases) {
+      mockCallServerAI.mockRejectedValueOnce(new Error(serverCode))
+      await useLearningStore.getState().requestEnrichment({
+        action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+      })
+      expect(useLearningStore.getState().enrichmentError, serverCode).toBe(expected)
+    }
+  })
+
+  it('ignores a second request while one is in flight (each call costs money)', async () => {
+    mockCallServerAI.mockResolvedValue(ok)
+
+    const first = useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+    const second = await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })
+    await first
+
+    expect(second).toBe(false)
+    expect(mockCallServerAI).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('resolveEnrichment', () => {
+  beforeEach(() => {
+    useLearningStore.setState({
+      enrichment: { enrichmentId: 'enr-1', action: 'explain', content: {}, sources: [], balance: null },
+    })
+  })
+
+  it('keeps the preview via the RPC and closes it', async () => {
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    const done = await useLearningStore.getState().resolveEnrichment('accepted')
+
+    expect(done).toBe(true)
+    expect(mockRpc).toHaveBeenCalledWith('set_user_enrichment_status', {
+      p_enrichment_id: 'enr-1', p_status: 'accepted',
+    })
+    expect(useLearningStore.getState().enrichment).toBeNull()
+  })
+
+  it('treats an already-finalized preview as done rather than trapping the user', async () => {
+    // set_user_enrichment_status only allows a transition OUT of 'preview' (P0007
+    // otherwise). A double-click must not leave an error the user cannot clear.
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Enrichment status is already finalized' },
+    })
+
+    const done = await useLearningStore.getState().resolveEnrichment('accepted')
+
+    expect(done).toBe(true)
+    expect(useLearningStore.getState().enrichment).toBeNull()
+    expect(useLearningStore.getState().enrichmentError).toBeNull()
+  })
+
+  it('does nothing when there is no open preview', async () => {
+    useLearningStore.setState({ enrichment: null })
+
+    expect(await useLearningStore.getState().resolveEnrichment('rejected')).toBe(false)
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+})
+
 describe('goal writes', () => {
   it('creates a goal and then attaches its decks', async () => {
     mockRpc.mockResolvedValue({ data: { ok: true, goal_id: 'goal-9' }, error: null })

@@ -108,5 +108,34 @@
     "score": {
       "unknown": "Tanpa skor"
     }
+  },
+  "enrichment": {
+    "explainCta": "Jelaskan (kredit)",
+    "requesting": "Menanyakan…",
+    "costHint": "Menggunakan kredit AI dari dompet Anda",
+    "action": {
+      "explain": "Penjelasan AI",
+      "hint": "Petunjuk belajar"
+    },
+    "sources": "Sumber",
+    "noSources": "Jawaban ini tidak berdasarkan sumber.",
+    "empty": "Model tidak mengembalikan konten yang bisa digunakan.",
+    "chargedNote": "Sudah dikenakan biaya — membuang tidak mengembalikan kredit.",
+    "keep": "Simpan",
+    "discard": "Buang",
+    "later": "Putuskan nanti",
+    "saving": "Menyimpan…",
+    "error": {
+      "BAD_REQUEST": "Permintaan tidak valid.",
+      "FORBIDDEN": "Anda tidak memiliki akses ke kartu ini.",
+      "GROUNDING_REQUIRED": "Tidak ditemukan sumber yang dapat dikutip, sehingga jawaban ditolak alih-alih dikarang.",
+      "INSUFFICIENT_CREDITS": "Kredit AI tidak cukup. Isi ulang untuk melanjutkan.",
+      "INVALID_RESULT": "Jawaban yang dikembalikan tidak bisa digunakan. Silakan coba lagi.",
+      "NETWORK": "Kesalahan jaringan. Periksa koneksi Anda.",
+      "NOT_CONFIGURED": "Pembuatan AI belum diaktifkan di server ini.",
+      "PROVIDER_ERROR": "Layanan AI gagal. Silakan coba lagi.",
+      "RATE_CAP": "Anda telah mencapai batas permintaan AI hari ini. Coba lagi besok.",
+      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+    }
   }
 }

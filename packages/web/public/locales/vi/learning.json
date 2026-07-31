@@ -108,5 +108,34 @@
     "score": {
       "unknown": "Chưa có điểm"
     }
+  },
+  "enrichment": {
+    "explainCta": "Giải thích (tín dụng)",
+    "requesting": "Đang hỏi…",
+    "costHint": "Sử dụng tín dụng AI từ ví của bạn",
+    "action": {
+      "explain": "Giải thích AI",
+      "hint": "Gợi ý học tập"
+    },
+    "sources": "Nguồn",
+    "noSources": "Câu trả lời này không dựa trên nguồn.",
+    "empty": "Mô hình không trả về nội dung khả dụng.",
+    "chargedNote": "Đã tính phí — bỏ đi cũng không hoàn lại tín dụng.",
+    "keep": "Giữ lại",
+    "discard": "Bỏ",
+    "later": "Quyết định sau",
+    "saving": "Đang lưu…",
+    "error": {
+      "BAD_REQUEST": "Yêu cầu không hợp lệ.",
+      "FORBIDDEN": "Bạn không có quyền truy cập thẻ này.",
+      "GROUNDING_REQUIRED": "Không tìm thấy nguồn trích dẫn nên câu trả lời đã bị từ chối thay vì bịa đặt.",
+      "INSUFFICIENT_CREDITS": "Không đủ tín dụng AI. Hãy nạp thêm để tiếp tục.",
+      "INVALID_RESULT": "Câu trả lời không sử dụng được. Vui lòng thử lại.",
+      "NETWORK": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
+      "NOT_CONFIGURED": "Tạo nội dung AI chưa được bật trên máy chủ này.",
+      "PROVIDER_ERROR": "Dịch vụ AI gặp sự cố. Vui lòng thử lại.",
+      "RATE_CAP": "Bạn đã dùng hết giới hạn yêu cầu AI hôm nay. Hãy thử lại vào ngày mai.",
+      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+    }
   }
 }
