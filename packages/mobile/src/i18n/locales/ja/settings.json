@@ -86,8 +86,6 @@
     "userGuideDesc": "機能ガイド、学習のコツ、共有方法"
   },
   "quickActions": {
-    "quickStudy": "クイック学習",
-    "aiGenerate": "AI生成",
     "invite": "招待",
     "shareMessage": "最も賢い単語カードアプリ、ReeeeecallStudy をチェック！ https://reeeeecallstudy.xyz"
   },
@@ -117,13 +115,6 @@
     "light": "ライト",
     "dark": "ダーク",
     "system": "システム"
-  },
-  "export": {
-    "title": "データをエクスポート",
-    "stats": "学習統計",
-    "sessions": "学習セッション",
-    "decks": "デッキ",
-    "cards": "カード"
   },
   "alerts": {
     "error": "エラー"

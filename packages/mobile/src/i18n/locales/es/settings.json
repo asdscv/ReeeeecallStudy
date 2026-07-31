@@ -86,8 +86,6 @@
     "userGuideDesc": "Guía de funciones, consejos de aprendizaje, métodos de compartir"
   },
   "quickActions": {
-    "quickStudy": "Estudio rápido",
-    "aiGenerate": "Generar IA",
     "invite": "Invitar",
     "shareMessage": "¡Descubre ReeeeecallStudy, la app de tarjetas más inteligente! https://reeeeecallstudy.xyz"
   },
@@ -117,13 +115,6 @@
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Sistema"
-  },
-  "export": {
-    "title": "Exportar mis datos",
-    "stats": "Estadísticas",
-    "sessions": "Sesiones de estudio",
-    "decks": "Mazos",
-    "cards": "Tarjetas"
   },
   "alerts": {
     "error": "Error"
