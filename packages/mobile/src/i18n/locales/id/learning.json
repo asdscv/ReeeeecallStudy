@@ -1,5 +1,9 @@
 {
   "enrichment": {
+    "action": {
+      "explain": "Penjelasan AI",
+      "hint": "Petunjuk belajar"
+    },
     "chargedNote": "Sudah dikenakan biaya — membuang tidak mengembalikan kredit.",
     "costHint": "Menggunakan kredit AI dari dompet Anda",
     "discard": "Buang",
@@ -16,9 +20,11 @@
       "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
     },
     "explainCta": "Jelaskan (kredit)",
+    "groundedHint": "Menjawab percobaan ini, bukan hanya kartunya",
     "keep": "Simpan",
     "later": "Putuskan nanti",
     "noSources": "Jawaban ini tidak berdasarkan sumber.",
+    "quote": "Sekitar {{price}} per permintaan · sisa {{balance}}",
     "requesting": "Menanyakan…",
     "sources": "Sumber"
   },
@@ -71,6 +77,15 @@
       "paused": "Dijeda"
     },
     "title": "Tujuan belajar"
+  },
+  "history": {
+    "itemFallback": "Percobaan {{type}}",
+    "score": {
+      "unknown": "Tanpa skor"
+    },
+    "title": "Percobaan terbaru ({{count, number}})",
+    "title_one": "Percobaan terbaru ({{count, number}})",
+    "title_other": "Percobaan terbaru ({{count, number}})"
   },
   "insights": {
     "accuracy": "Akurasi",

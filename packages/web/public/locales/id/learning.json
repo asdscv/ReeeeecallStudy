@@ -121,6 +121,8 @@
       "explain": "Penjelasan AI",
       "hint": "Petunjuk belajar"
     },
+    "quote": "Sekitar {{price}} per permintaan · sisa {{balance}}",
+    "groundedHint": "Menjawab percobaan ini, bukan hanya kartunya",
     "sources": "Sumber",
     "noSources": "Jawaban ini tidak berdasarkan sumber.",
     "empty": "Model tidak mengembalikan konten yang bisa digunakan.",

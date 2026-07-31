@@ -121,6 +121,8 @@
       "explain": "AI 설명",
       "hint": "학습 힌트"
     },
+    "quote": "요청당 약 {{price}} · 잔액 {{balance}}",
+    "groundedHint": "카드가 아니라 이 시도에 맞춰 답합니다",
     "sources": "출처",
     "noSources": "이 답변은 출처 기반이 아닙니다.",
     "empty": "모델이 사용 가능한 내용을 주지 않았습니다.",

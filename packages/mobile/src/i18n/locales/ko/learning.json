@@ -1,5 +1,9 @@
 {
   "enrichment": {
+    "action": {
+      "explain": "AI 설명",
+      "hint": "학습 힌트"
+    },
     "chargedNote": "이미 과금됐습니다 — 버려도 크레딧은 환불되지 않습니다.",
     "costHint": "지갑의 AI 크레딧을 사용합니다",
     "discard": "버리기",
@@ -16,9 +20,11 @@
       "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요."
     },
     "explainCta": "설명 (크레딧)",
+    "groundedHint": "카드가 아니라 이 시도에 맞춰 답합니다",
     "keep": "보관",
     "later": "나중에 결정",
     "noSources": "이 답변은 출처 기반이 아닙니다.",
+    "quote": "요청당 약 {{price}} · 잔액 {{balance}}",
     "requesting": "요청 중…",
     "sources": "출처"
   },
@@ -71,6 +77,15 @@
       "paused": "일시중지"
     },
     "title": "학습 목표"
+  },
+  "history": {
+    "itemFallback": "{{type}} 시도",
+    "score": {
+      "unknown": "점수 없음"
+    },
+    "title": "최근 시도 ({{count, number}})",
+    "title_one": "최근 시도 ({{count, number}})",
+    "title_other": "최근 시도 ({{count, number}})"
   },
   "insights": {
     "accuracy": "정답률",

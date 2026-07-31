@@ -1,5 +1,9 @@
 {
   "enrichment": {
+    "action": {
+      "explain": "Explicación IA",
+      "hint": "Pista de estudio"
+    },
     "chargedNote": "Ya se cobró — descartar no reembolsa los créditos.",
     "costHint": "Utiliza créditos de IA de tu billetera",
     "discard": "Descartar",
@@ -16,9 +20,11 @@
       "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
     },
     "explainCta": "Explicar (créditos)",
+    "groundedHint": "Responde a este intento, no solo a la tarjeta",
     "keep": "Conservar",
     "later": "Decidir después",
     "noSources": "Esta respuesta no está basada en fuentes.",
+    "quote": "Unos {{price}} por solicitud · quedan {{balance}}",
     "requesting": "Consultando…",
     "sources": "Fuentes"
   },
@@ -71,6 +77,15 @@
       "paused": "En pausa"
     },
     "title": "Objetivos de aprendizaje"
+  },
+  "history": {
+    "itemFallback": "Intento de {{type}}",
+    "score": {
+      "unknown": "Sin puntuación"
+    },
+    "title": "Intentos recientes ({{count, number}})",
+    "title_one": "Intento reciente ({{count, number}})",
+    "title_other": "Intentos recientes ({{count, number}})"
   },
   "insights": {
     "accuracy": "Precisión",

@@ -1,5 +1,9 @@
 {
   "enrichment": {
+    "action": {
+      "explain": "AI解説",
+      "hint": "学習ヒント"
+    },
     "chargedNote": "すでに課金済みです — 破棄してもクレジットは返金されません。",
     "costHint": "ウォレットのAIクレジットを使用します",
     "discard": "破棄",
@@ -16,9 +20,11 @@
       "UNKNOWN": "問題が発生しました。もう一度お試しください。"
     },
     "explainCta": "解説（クレジット）",
+    "groundedHint": "カードではなく、この試行に合わせて回答します",
     "keep": "保持",
     "later": "あとで決める",
     "noSources": "この回答はソースに基づいていません。",
+    "quote": "1回あたり約 {{price}} · 残高 {{balance}}",
     "requesting": "問い合わせ中…",
     "sources": "出典"
   },
@@ -71,6 +77,15 @@
       "paused": "一時停止"
     },
     "title": "学習目標"
+  },
+  "history": {
+    "itemFallback": "{{type}} の試行",
+    "score": {
+      "unknown": "スコアなし"
+    },
+    "title": "最近の試行 ({{count, number}})",
+    "title_one": "最近の試行 ({{count, number}})",
+    "title_other": "最近の試行 ({{count, number}})"
   },
   "insights": {
     "accuracy": "正答率",

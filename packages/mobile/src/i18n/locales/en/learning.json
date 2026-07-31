@@ -1,5 +1,9 @@
 {
   "enrichment": {
+    "action": {
+      "explain": "AI explanation",
+      "hint": "Study hint"
+    },
     "chargedNote": "Already charged — discarding does not refund the credits.",
     "costHint": "Uses AI credits from your wallet",
     "discard": "Discard",
@@ -16,9 +20,11 @@
       "UNKNOWN": "Something went wrong. Please try again."
     },
     "explainCta": "Explain (credits)",
+    "groundedHint": "Answers this attempt, not just the card",
     "keep": "Keep",
     "later": "Decide later",
     "noSources": "This answer is not source-based.",
+    "quote": "About {{price}} per request · {{balance}} left",
     "requesting": "Asking…",
     "sources": "Sources"
   },
@@ -71,6 +77,15 @@
       "paused": "Paused"
     },
     "title": "Learning goals"
+  },
+  "history": {
+    "itemFallback": "{{type}} attempt",
+    "score": {
+      "unknown": "Not scored"
+    },
+    "title": "Recent attempts ({{count, number}})",
+    "title_one": "Recent attempt ({{count, number}})",
+    "title_other": "Recent attempts ({{count, number}})"
   },
   "insights": {
     "accuracy": "Accuracy",

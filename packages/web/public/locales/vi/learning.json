@@ -121,6 +121,8 @@
       "explain": "Giải thích AI",
       "hint": "Gợi ý học tập"
     },
+    "quote": "Khoảng {{price}} mỗi yêu cầu · số dư {{balance}}",
+    "groundedHint": "Trả lời cho lần làm này, không chỉ cho thẻ",
     "sources": "Nguồn",
     "noSources": "Câu trả lời này không dựa trên nguồn.",
     "empty": "Mô hình không trả về nội dung khả dụng.",
