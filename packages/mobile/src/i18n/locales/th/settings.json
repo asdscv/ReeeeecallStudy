@@ -86,8 +86,6 @@
     "userGuideDesc": "คู่มือฟีเจอร์ เคล็ดลับการเรียน วิธีการแชร์"
   },
   "quickActions": {
-    "quickStudy": "เรียนด่วน",
-    "aiGenerate": "สร้างด้วย AI",
     "invite": "เชิญ",
     "shareMessage": "มาดู ReeeeecallStudy แอปบัตรคำที่ฉลาดที่สุด! https://reeeeecallstudy.xyz"
   },
@@ -117,13 +115,6 @@
     "light": "สว่าง",
     "dark": "มืด",
     "system": "ระบบ"
-  },
-  "export": {
-    "title": "ส่งออกข้อมูล",
-    "stats": "สถิติการเรียน",
-    "sessions": "เซสชันเรียน",
-    "decks": "เด็ค",
-    "cards": "การ์ด"
   },
   "alerts": {
     "error": "ผิดพลาด"

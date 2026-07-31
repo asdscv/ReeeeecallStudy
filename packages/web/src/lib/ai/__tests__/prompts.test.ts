@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { buildTemplatePrompt, buildDeckPrompt, buildCardsPrompt } from '../prompts'
+// Retargeted at the CANONICAL prompts (packages/shared/lib/ai/prompts.ts), which is
+// what ai-generate-store actually calls. This suite used to import web's own copy —
+// a copy that had already drifted and lost the Chinese template/card rules, so the
+// test was green while the live prompts were untested. The copy is now deleted.
+import {
+  buildTemplatePrompt, buildDeckPrompt, buildCardsPrompt,
+} from '@reeeeecall/shared/lib/ai/prompts'
 
 describe('buildTemplatePrompt', () => {
   it('returns system and user prompts', () => {
@@ -84,5 +90,29 @@ describe('buildCardsPrompt', () => {
   it('does not include dedup when no existing cards', () => {
     const { systemPrompt } = buildCardsPrompt('test', fields, 10)
     expect(systemPrompt).not.toContain('EXISTING CARDS')
+  })
+})
+
+// ─── The rules the deleted duplicate had lost ───────────────────────────────
+// web/src/lib/ai/prompts.ts was a stale copy missing exactly this: the Chinese
+// character/pinyin guidance. Its own test passed because it read the copy. These
+// assertions exist so a future divergence between the canonical prompts and what the
+// product needs fails here instead of shipping Chinese decks with no 汉字 field.
+describe('Chinese language rules (canonical prompts only)', () => {
+  it('demands a dedicated character field and a separate pinyin field for zh-CN', () => {
+    const { systemPrompt } = buildTemplatePrompt('HSK 4', 'en', false, 'zh-CN')
+    expect(systemPrompt).toContain('Simplified Chinese')
+    expect(systemPrompt).toContain('pinyin')
+  })
+
+  it('uses Traditional characters for zh-TW', () => {
+    const { systemPrompt } = buildTemplatePrompt('TOCFL', 'en', false, 'zh-TW')
+    expect(systemPrompt).toContain('Traditional Chinese')
+  })
+
+  it('says nothing about Chinese for a non-Chinese deck', () => {
+    const { systemPrompt } = buildTemplatePrompt('JLPT N3', 'en', false, 'ja')
+    expect(systemPrompt).not.toContain('Simplified Chinese')
+    expect(systemPrompt).not.toContain('Traditional Chinese')
   })
 })

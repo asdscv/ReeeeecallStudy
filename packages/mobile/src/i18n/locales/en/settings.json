@@ -90,8 +90,6 @@
     "userGuideDesc": "Feature guide, learning tips, sharing methods"
   },
   "quickActions": {
-    "quickStudy": "Quick Study",
-    "aiGenerate": "AI Generate",
     "invite": "Invite",
     "shareMessage": "Check out ReeeeecallStudy — the smartest flashcard app! https://reeeeecallstudy.xyz"
   },
@@ -121,13 +119,6 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
-  },
-  "export": {
-    "title": "Export My Data",
-    "stats": "Study Statistics",
-    "sessions": "Study Sessions",
-    "decks": "Decks",
-    "cards": "Cards"
   },
   "alerts": {
     "error": "Error"

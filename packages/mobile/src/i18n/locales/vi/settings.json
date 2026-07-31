@@ -86,8 +86,6 @@
     "userGuideDesc": "Hướng dẫn tính năng, mẹo học tập, phương pháp chia sẻ"
   },
   "quickActions": {
-    "quickStudy": "Học nhanh",
-    "aiGenerate": "Tạo bằng AI",
     "invite": "Mời",
     "shareMessage": "Khám phá ReeeeecallStudy — ứng dụng thẻ ghi nhớ thông minh nhất! https://reeeeecallstudy.xyz"
   },
@@ -117,13 +115,6 @@
     "light": "Sáng",
     "dark": "Tối",
     "system": "Hệ thống"
-  },
-  "export": {
-    "title": "Xuất dữ liệu",
-    "stats": "Thống kê học",
-    "sessions": "Phiên học",
-    "decks": "Bộ thẻ",
-    "cards": "Thẻ"
   },
   "alerts": {
     "error": "Lỗi"

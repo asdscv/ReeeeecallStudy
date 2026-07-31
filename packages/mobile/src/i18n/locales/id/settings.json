@@ -86,8 +86,6 @@
     "userGuideDesc": "Panduan fitur, kiat belajar, cara berbagi"
   },
   "quickActions": {
-    "quickStudy": "Belajar cepat",
-    "aiGenerate": "Buat dgn AI",
     "invite": "Undang",
     "shareMessage": "Coba ReeeeecallStudy — aplikasi kartu flash tercerdas! https://reeeeecallstudy.xyz"
   },
@@ -117,13 +115,6 @@
     "light": "Terang",
     "dark": "Gelap",
     "system": "Sistem"
-  },
-  "export": {
-    "title": "Ekspor data saya",
-    "stats": "Statistik belajar",
-    "sessions": "Sesi belajar",
-    "decks": "Dek",
-    "cards": "Kartu"
   },
   "alerts": {
     "error": "Galat"

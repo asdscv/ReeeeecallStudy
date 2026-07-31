@@ -1,0 +1,98 @@
+{
+  "today": {
+    "title": "Plan de hoy",
+    "manageGoals": "Gestionar objetivos",
+    "selectGoal": "Seleccionar un objetivo",
+    "budget": "{{count, number}} min/día",
+    "progress": "{{done, number}} de {{total, number}} completados",
+    "generate": "Crear plan de hoy",
+    "generating": "Creando…",
+    "regenerate": "Recrear plan",
+    "regenerating": "Recreando…",
+    "completedNote": "Este plan ya se completó, no se puede recrear hoy.",
+    "empty": {
+      "noGoal": "Aún no tienes un objetivo de aprendizaje activo. Un objetivo establece tus minutos diarios y los mazos para planificar.",
+      "createGoal": "Crear un objetivo",
+      "noDecks": "Este objetivo no tiene mazos asociados, así que no hay nada que planificar.",
+      "attachDecks": "Asociar mazos",
+      "nothingDue": "Hoy no hay tarjetas pendientes en estos mazos."
+    },
+    "item": {
+      "study": "Estudiar",
+      "untitled": "(sin texto)",
+      "minutes": "~{{count, number}} min"
+    },
+    "reason": {
+      "due": "Pendiente de repaso",
+      "recentFailure": "Fallo reciente",
+      "slowResponse": "Respuesta lenta",
+      "goalRelevance": "Relevancia del objetivo",
+      "importance": "Importancia",
+      "balanced": "Mezcla equilibrada"
+    },
+    "error": {
+      "limitExceeded": "Has alcanzado el límite de reconstrucciones de hoy. Inténtalo mañana.",
+      "completedPlan": "Un plan terminado no se puede sobrescribir.",
+      "goalGone": "Ese objetivo ya no está disponible.",
+      "invalidInput": "No se pudo guardar el plan porque algunos valores estaban fuera de rango.",
+      "authRequired": "Inicia sesión de nuevo.",
+      "forbidden": "No tienes acceso a eso.",
+      "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
+    }
+  },
+  "goals": {
+    "title": "Objetivos de aprendizaje",
+    "subtitle": "Un objetivo contiene tus minutos diarios y los mazos con los que se construye tu plan.",
+    "todayLink": "Plan de hoy",
+    "create": "Nuevo objetivo",
+    "edit": "Editar",
+    "archive": "Archivar",
+    "dailyMinutes": "{{count, number}} min/día",
+    "deckCount": "{{count, number}} mazos",
+    "targetDate": "Fecha objetivo {{date}}",
+    "noDecksWarning": "No hay mazos asociados — aún no se puede generar un plan.",
+    "archiveConfirmTitle": "¿Archivar este objetivo?",
+    "archiveConfirmMessage": "\"{{title}}\" dejará de planificarse y no podrá editarse.",
+    "status": {
+      "paused": "En pausa",
+      "completed": "Completado",
+      "archived": "Archivado"
+    },
+    "empty": {
+      "title": "Aún no hay objetivos",
+      "body": "Crea un objetivo para empezar a recibir un plan diario."
+    },
+    "error": {
+      "limitExceeded": "Has alcanzado el número máximo de objetivos.",
+      "notFound": "Ese objetivo no existe o fue archivado.",
+      "invalidInput": "Revisa el nombre y los minutos diarios.",
+      "conflict": "Ese cambio no está permitido para el estado actual de este objetivo.",
+      "authRequired": "Inicia sesión de nuevo.",
+      "forbidden": "No tienes acceso a eso.",
+      "unknown": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
+  "form": {
+    "createTitle": "Nuevo objetivo",
+    "editTitle": "Editar objetivo",
+    "domain": "Materia",
+    "domainName": {
+      "language": "Idiomas",
+      "labor-law": "Derecho laboral"
+    },
+    "goalTitle": "Nombre del objetivo",
+    "goalTitlePlaceholder": "p. ej. Aprobar el JLPT N2",
+    "dailyMinutes": "Minutos por día",
+    "targetDate": "Fecha objetivo (opcional)",
+    "decks": "Mazos a estudiar",
+    "decksHint": "Tu plan se construye con las tarjetas de estos mazos.",
+    "noDecks": "Aún no tienes mazos.",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "error": {
+      "title": "Introduce un nombre de objetivo (1–500 caracteres).",
+      "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440."
+    }
+  }
+}

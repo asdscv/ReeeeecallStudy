@@ -90,8 +90,6 @@
     "userGuideDesc": "기능 설명, 학습 팁, 공유 방법"
   },
   "quickActions": {
-    "quickStudy": "빠른 학습",
-    "aiGenerate": "AI 생성",
     "invite": "초대",
     "shareMessage": "가장 똑똑한 플래시카드 앱, ReeeeecallStudy를 확인해 보세요! https://reeeeecallstudy.xyz"
   },
@@ -121,13 +119,6 @@
     "light": "라이트",
     "dark": "다크",
     "system": "시스템"
-  },
-  "export": {
-    "title": "내 데이터 내보내기",
-    "stats": "학습 통계",
-    "sessions": "학습 세션",
-    "decks": "덱",
-    "cards": "카드"
   },
   "alerts": {
     "error": "오류"

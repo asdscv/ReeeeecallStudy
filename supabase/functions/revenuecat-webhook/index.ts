@@ -44,17 +44,38 @@
 //   overview keeps sandbox out of every business metric while still reporting it.
 //   Anything not explicitly SANDBOX is treated as production.
 //
+// HOW A REFUND ACTUALLY ARRIVES (and how this used to be wrong).
+//   RevenueCat's webhook has NO `REFUND` or `CHARGEBACK` event type. A store refund is
+//   delivered as `CANCELLATION` carrying `cancel_reason: "CUSTOMER_SUPPORT"` and a
+//   NEGATIVE `price` (RevenueCat "Event Types and Fields" / "Sample Events"; the
+//   cancellation-reason table defines CUSTOMER_SUPPORT as "customer received a refund").
+//   This function used to read `event.cancellation_reason` — a key RevenueCat does not
+//   send — so the comparison was always undefined !== 'CUSTOMER_SUPPORT' and every
+//   refund fell into the plain auto-renew-off branch:
+//     * a refunded credit pack was NEVER clawed back (money out, credits kept), and
+//     * a refunded subscription kept its raised card cap until period end.
+//   The local e2e "passed" because it synthesised `type: "REFUND"`, which RevenueCat
+//   never sends, so the dead branch was the only one ever exercised. Reproduced against
+//   the served function: purchase → balance 990000, then the real CANCELLATION refund
+//   shape → balance still 990000, zero reversal rows.
+//   Refund detection now reads `cancel_reason` (with `cancellation_reason` kept as a
+//   legacy alias) OR a negative price on a CANCELLATION, and the legacy REFUND /
+//   CHARGEBACK types are still accepted in case a project is on an older delivery.
+//
 // EVENT → RPC (event.type):
 //   INITIAL_PURCHASE / NON_RENEWING_PURCHASE (subscription product)
 //                                → sync_subscription_by_user(active,  expiry, cancel=false)
 //   NON_RENEWING_PURCHASE (credit_pack product)
 //                                → add_ai_credits(credits_micro_won, 'purchase', event.id)
-//   RENEWAL / UNCANCELLATION / PRODUCT_CHANGE
+//   RENEWAL / UNCANCELLATION / PRODUCT_CHANGE / SUBSCRIPTION_EXTENDED
 //                                → sync_subscription_by_user(active,  new expiry, cancel=false)
 //   CANCELLATION (auto-renew off)→ sync_subscription('canceled', expiry, cancel=true)
-//   CANCELLATION (CUSTOMER_SUPPORT refund) → revoke_subscription (drop access now)
-//   REFUND / CHARGEBACK          → subscription: revoke_subscription; consumable credit
-//                                  pack: clawback_ai_credits_by_ref (mig 134, reverse grant)
+//   CANCELLATION (refund: cancel_reason=CUSTOMER_SUPPORT or price < 0)
+//                                → subscription: revoke_subscription; consumable credit
+//                                  pack: clawback_ai_credits_by_ref (mig 134)
+//   REFUND / CHARGEBACK (legacy) → same refund handling as above
+//   REFUND_REVERSED              → subscription: sync_subscription_by_user(active);
+//                                  consumable: reverse_credit_clawback (mig 173)
 //   EXPIRATION                   → sync_subscription('expired')
 //   BILLING_ISSUE                → sync_subscription('past_due')
 //   SUBSCRIPTION_PAUSED          → sync_subscription('paused')
@@ -181,7 +202,15 @@ interface RCEvent {
   original_transaction_id?: string
   transaction_id?: string
   expiration_at_ms?: number
+  /**
+   * Reason for a CANCELLATION. `cancel_reason` is what RevenueCat actually sends
+   * (see the refund note in the header); `cancellation_reason` is kept only as a
+   * legacy alias so an older delivery is still understood.
+   */
+  cancel_reason?: string
   cancellation_reason?: string
+  /** USD price. NEGATIVE on a refund, 0 on a free trial, null/absent if unknown. */
+  price?: number
   /** 'SANDBOX' | 'PRODUCTION' — see the environment note in the header. */
   environment?: string
   [k: string]: unknown
@@ -270,6 +299,20 @@ Deno.serve(async (req) => {
   const environment = String(event.environment ?? '').toUpperCase() === 'SANDBOX'
     ? 'sandbox'
     : 'production'
+
+  // IS THIS EVENT A REFUND? RevenueCat delivers store refunds as CANCELLATION with
+  // cancel_reason=CUSTOMER_SUPPORT and a negative price — there is no REFUND event
+  // type (see the refund note in the header; reading the non-existent
+  // `cancellation_reason` key is what made every refund a no-op).
+  //
+  // Two independent signals, either is sufficient:
+  //   * cancel_reason CUSTOMER_SUPPORT — RevenueCat's definition of "was refunded";
+  //   * price < 0 — the store returned money, whatever the reason string says.
+  // `cancel_reason` is documented as "Sometimes" present, so relying on it alone
+  // would put money correctness on an optional key.
+  const cancelReason = String(event.cancel_reason ?? event.cancellation_reason ?? '').toUpperCase()
+  const priceIsNegative = typeof event.price === 'number' && Number.isFinite(event.price) && event.price < 0
+  const isRefundCancellation = cancelReason === 'CUSTOMER_SUPPORT' || priceIsNegative
 
   // Attribute a row to its store AND environment. Best-effort and non-fatal: the
   // grant itself already succeeded, and a missing platform degrades to
@@ -445,7 +488,9 @@ Deno.serve(async (req) => {
     return json({ received: true, type, kind: 'subscription', platform, environment, ...(data ?? {}) }, 200)
   }
 
-  // ── REFUND / CHARGEBACK — subscription (revoke) OR consumable credit pack (clawback) ──
+  // ── REFUND — subscription (revoke) OR consumable credit pack (clawback) ─────────────
+  // Reached from CANCELLATION when the event says the store returned money (see
+  // isRefundCancellation), and from the legacy REFUND / CHARGEBACK types.
   // A refund can hit a subscription (drop the raised card cap now) OR a one-time consumable
   // credit pack (reverse the granted micro-WON). Disambiguate by the mapped product's kind:
   //   credit_pack → clawback_ai_credits_by_ref('rc:'+txnKey) (mig 134, idempotent)
@@ -453,18 +498,25 @@ Deno.serve(async (req) => {
   // The consumable clawback is keyed on the SAME store transaction key the grant used, so a
   // grant that fell back to an event-id ref (no txnKey) cannot be auto-clawed — see the grant
   // warning above. (Mobile IAP is dormant; this MUST be sandbox-verified at IAP launch.)
-  const refundOrClawback = async () => {
+  // Resolve the mapped product's kind: 'credit_pack' | 'subscription' | null when the
+  // store product is unknown to us. Returns a Response on a LOOKUP FAILURE so the caller
+  // can 500 and let RevenueCat retry — guessing the kind would either claw back the wrong
+  // thing or claw back nothing. Every downstream write is idempotent, so a retry is safe.
+  const productKind = async (tag: string): Promise<string | null | Response> => {
     const ourProductId = storeProductId ? await resolveOurProduct(sb, event.store, storeProductId) : ''
-    let kind: string | null = null
-    if (ourProductId) {
-      const { data: prod, error } = await sb
-        .from('billing_products').select('kind').eq('id', ourProductId).maybeSingle()
-      if (error) {
-        console.error('[revenuecat-webhook] refund product lookup failed (', ourProductId, '):', error.message)
-        return json({ error: 'Refund failed', code: 'REFUND_ERROR' }, 500) // RC retries
-      }
-      kind = prod?.kind ?? null
+    if (!ourProductId) return null
+    const { data: prod, error } = await sb
+      .from('billing_products').select('kind').eq('id', ourProductId).maybeSingle()
+    if (error) {
+      console.error(`[revenuecat-webhook] ${tag} product lookup failed (`, ourProductId, '):', error.message)
+      return json({ error: 'Refund handling failed', code: 'REFUND_ERROR' }, 500) // RC retries
     }
+    return prod?.kind ?? null
+  }
+
+  const refundOrClawback = async () => {
+    const kind = await productKind('refund')
+    if (kind instanceof Response) return kind
     if (kind === 'credit_pack') {
       if (!txnKey) {
         console.warn('[revenuecat-webhook]', type, 'credit_pack refund with no transaction key — cannot match grant; acking')
@@ -481,6 +533,32 @@ Deno.serve(async (req) => {
     return await revoke()
   }
 
+  // ── REFUND_REVERSED — the store undid a refund, so the money is ours again ──────────
+  // App Store only. Without this the customer has paid and holds nothing: the clawback
+  // (or the refund-before-grant tombstone) stands forever and no code path can undo it.
+  //   credit_pack → reverse_credit_clawback (mig 173): restores EXACTLY what was clawed
+  //                 back, idempotent on 'reversal:<ref>', and lifts the tombstone so a
+  //                 late grant redelivery is no longer refused.
+  //   subscription → re-assert ACTIVE through the normal grant path (idempotent upsert).
+  const reverseRefund = async () => {
+    const kind = await productKind('refund reversal')
+    if (kind instanceof Response) return kind
+    if (kind === 'credit_pack') {
+      if (!txnKey) {
+        console.warn('[revenuecat-webhook]', type, 'credit_pack refund reversal with no transaction key — cannot match grant; acking')
+        return json({ received: true, type, ignored: 'no_txn_key' }, 200)
+      }
+      const { data, error } = await sb.rpc('reverse_credit_clawback', {
+        p_user_id: UUID_RE.test(appUserId) ? appUserId : null,
+        p_ref: 'rc:' + txnKey,
+      })
+      if (error) return rpcErrorResponse(`reverse_credit_clawback ${type}`, error.message)
+      return json({ received: true, type, kind: 'credit_pack', ...(typeof data === 'object' && data ? data : {}) }, 200)
+    }
+    // Subscription (or unknown product) → the grant path re-upserts it as active.
+    return await grant()
+  }
+
   switch (type) {
     // First grant, renewal, un-cancel, and plan change all re-assert an ACTIVE sub for
     // the buyer+product (sync_subscription_by_user upserts, so it works with or without
@@ -490,18 +568,29 @@ Deno.serve(async (req) => {
     case 'RENEWAL':
     case 'UNCANCELLATION':
     case 'PRODUCT_CHANGE':
+    // The store pushed the current period's expiry back (App Store / Play server API,
+    // or a Play renewal deferred by <24h). Same re-assert-active write as a renewal;
+    // without it the raised card cap expires while the customer still has the period.
+    case 'SUBSCRIPTION_EXTENDED':
       return await grant()
 
-    // Auto-renew turned off: keep access until the period end, but a refund via support
-    // (or an explicit REFUND/CHARGEBACK) drops access immediately.
+    // Auto-renew turned off: keep access until the period end. BUT a refund arrives as
+    // this same event type (cancel_reason=CUSTOMER_SUPPORT and/or a negative price), and
+    // then access must drop now and a consumable credit pack must be clawed back — see
+    // the refund note in the header for the key-name bug this replaces.
     case 'CANCELLATION':
-      return event.cancellation_reason === 'CUSTOMER_SUPPORT'
-        ? await revoke()
+      return isRefundCancellation
+        ? await refundOrClawback()
         : await syncStatus('canceled', true)
 
+    // Not current RevenueCat event types (a refund comes through CANCELLATION), kept so
+    // an older delivery or a replayed archive is still handled correctly.
     case 'REFUND':
     case 'CHARGEBACK':
       return await refundOrClawback()
+
+    case 'REFUND_REVERSED':
+      return await reverseRefund()
 
     case 'EXPIRATION':
       return await syncStatus('expired', null)

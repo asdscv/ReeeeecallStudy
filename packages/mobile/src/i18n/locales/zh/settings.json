@@ -86,8 +86,6 @@
     "userGuideDesc": "功能说明、学习技巧、分享方法"
   },
   "quickActions": {
-    "quickStudy": "快速学习",
-    "aiGenerate": "AI生成",
     "invite": "邀请",
     "shareMessage": "快来看看最聪明的闪卡应用 ReeeeecallStudy！ https://reeeeecallstudy.xyz"
   },
@@ -117,13 +115,6 @@
     "light": "浅色",
     "dark": "深色",
     "system": "系统"
-  },
-  "export": {
-    "title": "导出我的数据",
-    "stats": "学习统计",
-    "sessions": "学习记录",
-    "decks": "卡组",
-    "cards": "卡片"
   },
   "alerts": {
     "error": "错误"
