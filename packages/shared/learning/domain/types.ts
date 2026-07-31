@@ -268,6 +268,16 @@ export interface PlannerCandidate {
   readonly responseTimePenalty: number
   readonly goalRelevance: number
   readonly contentImportance: number
+  /**
+   * How much a review right now is worth given the estimated forgetting curve, 0..1,
+   * peaking below certainty (see `application/memory.ts`).
+   *
+   * Optional AND nullable on purpose: `undefined` (a caller that does not compute it) and
+   * `null` (a card whose memory state cannot be estimated — new, never reviewed, no interval)
+   * mean the same thing to the planner, which renormalises the remaining weights instead of
+   * substituting a neutral value. A number here is never a guess.
+   */
+  readonly reviewValue?: number | null
   readonly estimatedMinutes: number
   readonly difficulty: Difficulty | null
 }

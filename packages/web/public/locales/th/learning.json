@@ -25,6 +25,7 @@
     },
     "reason": {
       "due": "ถึงกำหนดทบทวน",
+      "memoryRisk": "ใกล้ลืม",
       "recentFailure": "ตอบผิดเมื่อเร็ว ๆ นี้",
       "slowResponse": "ตอบช้า",
       "goalRelevance": "ความเกี่ยวข้องกับเป้าหมาย",
