@@ -276,7 +276,21 @@ per-concept mastery view is not possible yet for the current data: legacy cards 
 `concept_id = null` (design §5.2), so there are no concepts to aggregate until curated
 content exists.
 
-**Phase 5 — mobile parity.** Same store, native screens, Intl-free timezone handling.
+**Phase 5 — mobile parity.** Shipped: `LearningTodayScreen` (plan, self-rating, enrichment)
+and `LearningGoalsScreen` (list, create with deck picker, archive), reached from the drawer.
+The shared store drives both platforms, so none of its rules are re-implemented natively.
+
+Two things this phase changed outside mobile:
+* `learning-plan-date` moved from the web package to `shared/lib` and was split — the DATE is
+  computed from `Date`'s local getters (no ICU), while the ZONE is an `Intl` attempt that
+  falls back to a real `UTC±HH:MM` offset label. Defaulting to `'UTC'` would have recorded a
+  zone the user is not in; an offset says what was actually used. Web now re-exports it, so
+  the two platforms cannot drift about which day it is.
+* `packages/mobile/tsconfig.json` gained `allowImportingTsExtensions` (with `noEmit`), which
+  `tsconfig.app.json` already had: `shared/learning/**` imports with explicit `.ts`
+  extensions, and mobile only started traversing into it now.
+
+Deferred to 5b: the insights screen on mobile.
 
 Out of scope for all phases here (unchanged from design §19): curated concept authoring, the
 official content pipeline, FSRS shadow scoring, listening/speaking, and any production

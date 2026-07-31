@@ -65,6 +65,8 @@ export type MarketplaceStackParamList = {
 export type SettingsStackParamList = {
   SettingsHome: undefined
   AIGenerate: undefined
+  LearningToday: undefined
+  LearningGoals: undefined
   // Paywall 화면은 SUBSCRIPTION_UI_ENABLED 게이트로 비활성(꺼지면 빈 화면 렌더)
   Paywall: undefined
   Guide: undefined
