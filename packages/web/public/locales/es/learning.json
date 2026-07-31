@@ -20,7 +20,8 @@
     "item": {
       "study": "Estudiar",
       "untitled": "(sin texto)",
-      "minutes": "~{{count, number}} min"
+      "minutes": "~{{count, number}} min",
+      "recorded": "Registrado"
     },
     "reason": {
       "due": "Pendiente de repaso",
@@ -38,6 +39,12 @@
       "authRequired": "Inicia sesión de nuevo.",
       "forbidden": "No tienes acceso a eso.",
       "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
+    },
+    "rate": {
+      "again": "No lo sabía",
+      "partial": "A medias",
+      "known": "Lo sabía",
+      "hint": "Registra tu intento; no cambia el calendario de repaso."
     }
   },
   "goals": {
@@ -93,6 +100,13 @@
     "error": {
       "title": "Introduce un nombre de objetivo (1–500 caracteres).",
       "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440."
+    }
+  },
+  "history": {
+    "title": "Intentos recientes ({{count, number}})",
+    "itemFallback": "Intento de {{type}}",
+    "score": {
+      "unknown": "Sin puntuación"
     }
   }
 }

@@ -20,7 +20,8 @@
     "item": {
       "study": "Học",
       "untitled": "(không có nội dung)",
-      "minutes": "~{{count, number}} phút"
+      "minutes": "~{{count, number}} phút",
+      "recorded": "Đã ghi lại"
     },
     "reason": {
       "due": "Đến hạn ôn tập",
@@ -38,6 +39,12 @@
       "authRequired": "Vui lòng đăng nhập lại.",
       "forbidden": "Bạn không có quyền truy cập.",
       "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
+    },
+    "rate": {
+      "again": "Không biết",
+      "partial": "Chưa chắc",
+      "known": "Đã biết",
+      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
     }
   },
   "goals": {
@@ -93,6 +100,13 @@
     "error": {
       "title": "Nhập tên mục tiêu (1–500 ký tự).",
       "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440."
+    }
+  },
+  "history": {
+    "title": "Lần làm gần đây ({{count, number}})",
+    "itemFallback": "Lần làm {{type}}",
+    "score": {
+      "unknown": "Chưa có điểm"
     }
   }
 }
