@@ -178,7 +178,7 @@ export function LearningTodayScreen() {
               style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
               testID="learning-create-goal"
             >
-              <Text style={[theme.typography.bodySmall, { color: '#fff' }]}>{t('today.empty.createGoal')}</Text>
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.empty.createGoal')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -405,7 +405,7 @@ export function LearningTodayScreen() {
                 accessibilityState={{ disabled: planGenerating || !goal }}
                 {...testProps('learning-generate')}
               >
-                <Text style={[theme.typography.bodySmall, { color: '#fff' }]}>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
                   {planGenerating ? t('today.generating') : t('today.generate')}
                 </Text>
               </TouchableOpacity>
