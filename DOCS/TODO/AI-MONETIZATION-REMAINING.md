@@ -154,11 +154,12 @@ from the payload).
 > which the repo's own deployment records say happened long ago. Keeping a stale checklist
 > here is worse than having none: it invites re-running a migration that TRUNCATEs the wallet.
 >
-> **This document cannot be trusted as the prod state.** Nothing here is verified against the
-> production database — it only summarises what earlier PRs recorded. Re-read the actual
-> `supabase_migrations` state before applying anything.
+> **Do not trust a document for prod state — read the database.** The section below was verified
+> against the remote history table on 2026-07-31 (`supabase migration list --linked`), and doing so
+> corrected two claims this file had inherited from earlier PRs. Re-read it before applying anything;
+> it goes stale the moment someone pushes.
 
-**What the records say is already on prod**
+**What is on prod (history table, read 2026-07-31 — not a guess)**
 
 | Migrations | Record |
 |---|---|
@@ -167,13 +168,25 @@ from the payload).
 | 161 + 171 (study write contract, expand → contract) | #351 / #353 |
 | 170 (drop `user_ai_provider_keys`, BYOK retirement) | #353 — "prod done (2026-07-31)", `ai-keys` endpoint now 404 |
 
-**Not applied, deliberately**
+**Verified against the database on 2026-07-31 — prod is fully migrated (through 173)**
 
-- **165–169 — the learning engine.** Stated as unrun in the learning design and validation
-  documents, and it stays that way until the owner authorises it.
-- **172 (goal↔deck writers, PR #354)** and **173 (credit clawback reversal, PR #350)** — open PRs.
-- ⚠️ **mig 114 must NEVER be re-run.** It contains `TRUNCATE ai_credit_balance, ai_credit_ledger`.
-  It was safe exactly once, when prod had no wallet data. It is not safe again.
+`supabase migration list --linked` shows **zero** local-only rows: every migration in the repo,
+001 through 173, is in the remote history table. Two corrections to what this document said before:
+
+- **165–169 (the learning engine) were already applied.** The learning design and validation
+  documents state they were deliberately unrun, and this section repeated that claim. It was
+  stale — the remote history has them. Nothing in this repo is a substitute for reading
+  `migration list`.
+- **172 and 173 were applied on 2026-07-31** (`supabase db push --linked`, after a `--dry-run`
+  that confirmed those two were the only pending files). Both are `CREATE OR REPLACE FUNCTION`
+  plus REVOKE/GRANT — no schema change, no data change, so they are re-runnable.
+  Post-apply check through PostgREST with the anon key: `set_learning_goal_decks`,
+  `set_learning_goal_concepts` and `reverse_credit_clawback` all answer **42501 permission
+  denied** (they exist, and anon cannot execute them — the intended posture), while a control
+  call to a made-up function name answers `PGRST202`, proving the check discriminates.
+
+⚠️ **mig 114 must NEVER be re-run.** It contains `TRUNCATE ai_credit_balance, ai_credit_ledger`.
+It was safe exactly once, when prod had no wallet data. It is not safe again.
 
 **Remaining go-live order (unchanged where it still applies)**
 
