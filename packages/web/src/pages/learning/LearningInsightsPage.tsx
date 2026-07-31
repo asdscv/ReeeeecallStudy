@@ -27,7 +27,11 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 
 export function LearningInsightsPage() {
   const { t } = useTranslation('learning')
-  const { goals, goalsLoading, fetchGoals, insights, insightsLoading, fetchInsights, planCards } = useLearningStore()
+  const {
+    goals, goalsLoading, fetchGoals, insights, insightsLoading, fetchInsights, planCards,
+    recommendations, recommendationBusyId, fetchRecommendations, regenerateRecommendations,
+    resolveRecommendation,
+  } = useLearningStore()
   const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
@@ -40,6 +44,10 @@ export function LearningInsightsPage() {
   useEffect(() => {
     if (selectedGoalId) void fetchInsights(selectedGoalId)
   }, [selectedGoalId, fetchInsights])
+
+  useEffect(() => {
+    if (selectedGoalId) void fetchRecommendations(selectedGoalId)
+  }, [selectedGoalId, fetchRecommendations])
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
@@ -146,6 +154,73 @@ export function LearningInsightsPage() {
                     </span>
                   </li>
                 ))}
+              </ul>
+            )}
+          </div>
+
+          {/* ── Recommendations (mig 174) ──
+              Producing is explicit: it replaces the PENDING set, so a background regenerate
+              would silently churn what the learner is looking at. Accepting raises the
+              card's contentImportance for the next plan — that is what makes the decision
+              worth storing at all. */}
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-medium text-foreground">{t('recommend.title')}</h2>
+              <button
+                type="button"
+                onClick={() => { if (selectedGoalId) void regenerateRecommendations(selectedGoalId) }}
+                disabled={!insights || insights.weakCards.length === 0}
+                className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50 disabled:no-underline"
+              >
+                {t('recommend.regenerate')}
+              </button>
+            </div>
+            <p className="text-[11px] text-content-tertiary mt-0.5">{t('recommend.hint')}</p>
+
+            {recommendations.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">{t('recommend.empty')}</p>
+            ) : (
+              <ul className="mt-2 space-y-1">
+                {recommendations.map((rec) => {
+                  const ref = rec.card_id ? planCards[rec.card_id] : undefined
+                  const label = ref ? Object.values(ref.field_values)[0] ?? '' : ''
+                  return (
+                    <li key={rec.id} className="px-3 py-2 bg-card rounded-lg border border-border">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-foreground truncate">
+                          {label || t('insights.cardFallback')}
+                        </span>
+                        {rec.status === 'pending' ? (
+                          <span className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              disabled={recommendationBusyId === rec.id}
+                              onClick={() => void resolveRecommendation(rec.id, 'accepted')}
+                              className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
+                            >
+                              {t('recommend.accept')}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={recommendationBusyId === rec.id}
+                              onClick={() => void resolveRecommendation(rec.id, 'dismissed')}
+                              className="text-xs text-content-tertiary hover:underline cursor-pointer disabled:opacity-50"
+                            >
+                              {t('recommend.dismiss')}
+                            </button>
+                          </span>
+                        ) : (
+                          <span className="text-xs text-content-tertiary shrink-0">
+                            {t(`recommend.status.${rec.status}`)}
+                          </span>
+                        )}
+                      </div>
+                      {rec.reason && (
+                        <p className="mt-0.5 text-[11px] text-content-tertiary">{rec.reason}</p>
+                      )}
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>

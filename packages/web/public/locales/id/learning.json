@@ -158,5 +158,18 @@
     "noPlanItems": "Tidak ada yang direncanakan",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar."
+  },
+  "recommend": {
+    "title": "Rekomendasi",
+    "hint": "Menerima akan menaikkan prioritas kartu itu di rencana berikutnya.",
+    "regenerate": "Segarkan",
+    "accept": "Terima",
+    "dismiss": "Abaikan",
+    "empty": "Belum ada rekomendasi. Segarkan setelah ada beberapa percobaan.",
+    "status": {
+      "accepted": "Diterima",
+      "dismissed": "Diabaikan",
+      "expired": "Kedaluwarsa"
+    }
   }
 }

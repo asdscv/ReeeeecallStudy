@@ -158,5 +158,18 @@
     "noPlanItems": "无计划项目",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。"
+  },
+  "recommend": {
+    "title": "推荐",
+    "hint": "接受后，该卡片在下次计划中的优先级会提高。",
+    "regenerate": "刷新",
+    "accept": "接受",
+    "dismiss": "忽略",
+    "empty": "暂无推荐。积累几次作答后再刷新。",
+    "status": {
+      "accepted": "已接受",
+      "dismissed": "已忽略",
+      "expired": "已过期"
+    }
   }
 }

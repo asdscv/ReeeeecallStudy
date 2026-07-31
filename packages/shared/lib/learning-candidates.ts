@@ -34,6 +34,17 @@ export interface CandidateInput {
   readonly deckImportance: Readonly<Record<string, number>>
   /** ISO instant used as "now"; passed in so the result is deterministic in tests. */
   readonly now: string
+  /**
+   * Cards the learner ACCEPTED a recommendation for (mig 174).
+   *
+   * This is what makes accepting a recommendation mean something: without it the accept
+   * would be a row nobody reads. It raises `contentImportance` — the feature that is
+   * otherwise flat at 0.5 because no curated content metadata exists yet (design §5.2) —
+   * so an accepted card competes better for tomorrow's budget. It does NOT force selection:
+   * a recommendation is a suggestion, and overriding due-urgency entirely would let a
+   * single accept crowd out everything the learner actually has to review.
+   */
+  readonly acceptedCardIds?: readonly string[]
 }
 
 /** Minutes we assume a single legacy recall item takes. */
@@ -50,6 +61,14 @@ const FAILURE_RATING = 2
 
 /** Neutral value for a feature with no evidence (design §9.2). */
 const NEUTRAL = 0.5
+
+/**
+ * contentImportance for a card the learner accepted a recommendation for.
+ *
+ * 0.9 rather than 1.0: it is 0.10 of the priority weight, so this moves a card up without
+ * pretending the learner's accept outranks the evidence that the card is due.
+ */
+const ACCEPTED_CONTENT_IMPORTANCE = 0.9
 
 /**
  * recentFailure's no-evidence value. Lower than NEUTRAL on purpose: a card with no
@@ -164,6 +183,7 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
   }
 
   const cards = [...input.cards].sort((a, b) => a.id.localeCompare(b.id))
+  const acceptedCards = new Set(input.acceptedCardIds ?? [])
 
   return cards.map((card) => {
     const logs = logsByCard.get(card.id) ?? []
@@ -173,6 +193,7 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
     // The adapter decides the activity shape; a legacy card projects to recall.
     const [activity] = activitiesForLegacyCard({ card, persistedActivities: [] })
     const importance = input.deckImportance[card.deck_id]
+    const accepted = acceptedCards.has(card.id)
 
     return {
       candidateId: `card:${card.id}`,
@@ -184,7 +205,7 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
       recentFailure: recentFailureFor(logs),
       responseTimePenalty: responseTimePenaltyFor(cardMedian, baseline),
       goalRelevance: typeof importance === 'number' ? clamp01(importance) : NEUTRAL,
-      contentImportance: NEUTRAL, // flat until curated content metadata exists (design §5.2)
+      contentImportance: accepted ? ACCEPTED_CONTENT_IMPORTANCE : NEUTRAL,
       estimatedMinutes: RECALL_MINUTES,
       difficulty: null,
     }

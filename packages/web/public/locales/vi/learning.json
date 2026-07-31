@@ -158,5 +158,18 @@
     "noPlanItems": "Không có mục nào được lên kế hoạch",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập."
+  },
+  "recommend": {
+    "title": "Gợi ý",
+    "hint": "Chấp nhận sẽ tăng ưu tiên của thẻ đó trong kế hoạch tiếp theo.",
+    "regenerate": "Làm mới",
+    "accept": "Chấp nhận",
+    "dismiss": "Bỏ qua",
+    "empty": "Chưa có gợi ý. Hãy làm mới sau khi có vài lần làm bài.",
+    "status": {
+      "accepted": "Đã chấp nhận",
+      "dismissed": "Đã bỏ qua",
+      "expired": "Đã hết hạn"
+    }
   }
 }

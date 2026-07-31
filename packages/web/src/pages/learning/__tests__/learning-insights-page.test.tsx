@@ -6,6 +6,7 @@
  * sentences, and one `?? 0` in a template turns the second into the first.
  */
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -36,6 +37,9 @@ const renderPage = (over: StoreState = {}) => {
     goals: [goal], goalsLoading: false, fetchGoals: vi.fn(),
     insights: emptyInsights, insightsLoading: false, fetchInsights: vi.fn(),
     planCards: {},
+    recommendations: [], recommendationBusyId: null,
+    fetchRecommendations: vi.fn(), regenerateRecommendations: vi.fn(),
+    resolveRecommendation: vi.fn(),
     ...over,
   }
   render(<MemoryRouter><LearningInsightsPage /></MemoryRouter>)
@@ -140,6 +144,59 @@ describe('LearningInsightsPage', () => {
     expect(screen.getByText('today.empty.noGoal')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'today.empty.createGoal' }))
       .toHaveAttribute('href', '/learning/goals')
+  })
+
+  it('cannot produce recommendations with nothing weak to recommend', () => {
+    renderPage({ insights: { ...emptyInsights, weakCards: [] } })
+
+    // Producing replaces the pending set server-side, so an empty producer run would wipe
+    // the feed for no reason.
+    expect(screen.getByRole('button', { name: 'recommend.regenerate' })).toBeDisabled()
+    expect(screen.getByText('recommend.empty')).toBeInTheDocument()
+  })
+
+  it('produces on an explicit press only', async () => {
+    const state = renderPage({
+      insights: { ...emptyInsights, weakCards: [{ cardId: 'card-1', attempts: 3, meanScore: 0.2 }] },
+    })
+
+    expect(state.regenerateRecommendations).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'recommend.regenerate' }))
+    expect(state.regenerateRecommendations).toHaveBeenCalledWith('goal-1')
+  })
+
+  it('offers accept and dismiss on a pending suggestion, with its evidence', async () => {
+    const state = renderPage({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: 'mean 20% over 3 attempts',
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+      planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+    })
+
+    expect(screen.getByText('猫')).toBeInTheDocument()
+    expect(screen.getByText('mean 20% over 3 attempts')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'recommend.accept' }))
+    expect(state.resolveRecommendation).toHaveBeenCalledWith('rec-1', 'accepted')
+
+    await userEvent.click(screen.getByRole('button', { name: 'recommend.dismiss' }))
+    expect(state.resolveRecommendation).toHaveBeenCalledWith('rec-1', 'dismissed')
+  })
+
+  it('shows a decided suggestion as decided, with no way to change it', () => {
+    renderPage({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'dismissed', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+
+    // The decision is terminal server-side; the UI must not offer an action that would 409.
+    expect(screen.getByText('recommend.status.dismissed')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'recommend.accept' })).not.toBeInTheDocument()
   })
 
   it('states what the page does not cover, so the numbers are not mistaken for SRS stats', () => {

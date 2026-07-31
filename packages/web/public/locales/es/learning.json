@@ -158,5 +158,18 @@
     "noPlanItems": "Nada planificado",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial."
+  },
+  "recommend": {
+    "title": "Recomendaciones",
+    "hint": "Aceptar una sube la prioridad de esa tarjeta en tu próximo plan.",
+    "regenerate": "Actualizar",
+    "accept": "Aceptar",
+    "dismiss": "Descartar",
+    "empty": "Aún no hay recomendaciones. Actualiza cuando tengas algunos intentos.",
+    "status": {
+      "accepted": "Aceptada",
+      "dismissed": "Descartada",
+      "expired": "Caducada"
+    }
   }
 }
