@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "Almacenamiento de tarjetas",
-      "free": "1000 tarjetas",
-      "pro": "Hasta 100 000 tarjetas"
+      "free": "{{count, number}} tarjetas",
+      "pro": "Hasta {{count, number}} tarjetas",
+      "freeUnknown": "Almacenamiento limitado",
+      "proUnknown": "Almacenamiento ampliado"
     },
     "allModes": {
       "title": "Todos los Modos de Estudio",
@@ -18,8 +20,10 @@
     },
     "aiGeneration": {
       "title": "Generación de Tarjetas con IA",
-      "free": "10 tarjetas/día",
-      "pro": "10/día + créditos"
+      "free": "{{count, number}} tarjetas/día",
+      "pro": "{{count, number}}/día + créditos",
+      "freeUnknown": "Cuota diaria gratuita",
+      "proUnknown": "Cuota diaria + créditos"
     },
     "premiumTts": {
       "title": "TTS Premium",
