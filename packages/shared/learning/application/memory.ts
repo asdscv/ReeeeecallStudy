@@ -22,12 +22,10 @@
 //
 // FSRS's stability-increase function rises as R at review time FALLS — "the best time to
 // review your material is when you almost forgot it, provided that you succeeded in recalling
-// it". Both halves of that sentence matter, and they pull in opposite directions: waiting
-// longer means a bigger gain if you succeed and a lapse if you do not. So the value of
-// scheduling a review peaks at a target retrievability strictly below 1, and falls away on both
-// sides — steeply above it (an item you certainly know teaches nothing, so the value reaches 0)
-// and gently below it, where it FLOORS rather than collapses (an item you have probably
-// forgotten still needs relearning; it is just more expensive than one caught at the peak).
+// it". That sentence justifies a scheduler's CHOICE of interval. It does not decide the order
+// of a day's queue, and this module was originally built as if it did: value peaked at the
+// target retention and fell away on BOTH sides, so the cards the learner had most nearly lost
+// scored lowest. See `reviewValue` for why that is now monotone instead.
 //
 // ## What this module deliberately does NOT do
 //
@@ -56,25 +54,24 @@ export const FSRS_FACTOR = 19 / 81
 export const DEFAULT_TARGET_RETENTION = 0.9
 
 /**
- * How much more forgiving the value curve is BELOW the target than above it.
+ * The value of a review at exactly the target retention — a card that is due right now.
  *
- * Above the target the item is over-learned and a review buys almost nothing; below it the
- * item is at risk and a review still buys relearning. 1 would make the curve symmetric, which
- * would rank a certainly-known item as highly as one at the same distance on the risky side.
- *
- * A consequence to be aware of rather than surprised by: with 2.5 the at-risk side never
- * reaches 0 — at R = 0 the value is 1 − 0.9/2.25 = 0.6 (see `REVIEW_VALUE_AT_ZERO_RECALL`).
- * A forgotten item is worth less than one caught at the peak, and clearly more than one you
- * are certain to know. Zero would mean "not worth relearning", which is never true.
+ * It is not 1 because the maximum belongs to a card the learner has probably already lost
+ * (see `reviewValue`). It is high because being due is the scheduler's own statement that this
+ * is the right day, and it sets the slope on both sides: above the target the value falls to 0
+ * across only `1 - target` of retrievability, below it the remaining `1 - VALUE_AT_TARGET`
+ * spreads across the whole `target`. With 0.75 and a 0.9 target that is a 27:1 asymmetry —
+ * over-learned cards are punished hard, at-risk cards separated gently.
  */
-const BELOW_TARGET_TOLERANCE = 2.5
+export const REVIEW_VALUE_AT_TARGET = 0.75
 
 /**
- * The value floor on the at-risk side: `1 - t/(t · TOLERANCE)` = `1 - 1/TOLERANCE`, which is
- * independent of the target. Exported so the test pins the floor instead of restating the
- * arithmetic.
+ * The value of a review for a card whose estimated recall has reached 0.
+ *
+ * 1, the maximum. Kept as a named export because it is the half of the curve that reverses an
+ * earlier decision, and a test should pin it rather than restate the arithmetic.
  */
-export const REVIEW_VALUE_AT_ZERO_RECALL = 1 - 1 / BELOW_TARGET_TOLERANCE
+export const REVIEW_VALUE_AT_ZERO_RECALL = 1
 
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value)
@@ -125,13 +122,74 @@ export function elapsedDaysBetween(
 }
 
 /**
- * How much a review right now is worth, 0..1, peaking at `target`.
+ * Elapsed days measured from the SCHEDULE rather than from the last review.
  *
- * The shape encodes the two halves of FSRS's finding: value rises as recall gets less certain,
- * but stops rising once recall is unlikely enough that the review becomes relearning. Above the
- * target the penalty is the full distance, reaching 0 at certainty; below it the distance is
- * discounted by `BELOW_TARGET_TOLERANCE` and the curve settles on
- * `REVIEW_VALUE_AT_ZERO_RECALL`, so a risky item always outranks a certain one.
+ * `next_review_at` is the scheduler's own statement of when this card reaches the target
+ * retention. Reading it directly — `elapsed = interval + (now − due)` — makes the value curve's
+ * knee land exactly on the day the card becomes due, for every card, whatever hour the learner
+ * studies. Reconstructing the same instant from `last_reviewed_at + interval` does not, because
+ * the two are allowed to disagree, and in this app they always do:
+ *
+ *   `nextDayBoundary` (lib/srs.ts) snaps every review to 04:00 local, so a card studied at
+ *   21:00 comes due after `interval − 17/24` days, not `interval`. The shortfall is divided by
+ *   the interval, so it is worst exactly where it matters most: measured against
+ *   `last_reviewed_at`, a due 1-day card studied at 21:00 scored 0.5394 while a due 30-day card
+ *   scored 0.9857 — the planner systematically preferred mature cards over ones the learner had
+ *   just started learning, and only for learners who study in the evening.
+ *
+ * The same disagreement is produced by rescheduling, manual date edits, and cramming logs that
+ * update `last_reviewed_at` without touching the interval. Trusting the due stamp removes all of
+ * them at once.
+ *
+ * Returns null when there is no usable due stamp, no interval to anchor against, or no review
+ * to anchor FROM; the caller falls back to `elapsedDaysBetween`.
+ */
+export function scheduleAnchoredElapsedDays(input: {
+  readonly intervalDays: number | null | undefined
+  readonly lastReviewedAt: string | null | undefined
+  readonly nextReviewAt: string | null | undefined
+  readonly now: string
+}): number | null {
+  // No review to anchor FROM. A never-reviewed card still carries a `next_review_at` — new
+  // cards are given one so they surface in a queue — and reading that as a forgetting curve
+  // would invent a memory estimate for a card the learner has never seen, which is the exact
+  // "implicit evidence" the design forbids (§9.2).
+  if (!input.lastReviewedAt) return null
+  if (!isFiniteNumber(input.intervalDays) || input.intervalDays <= 0) return null
+  const sinceDue = elapsedDaysBetween(input.nextReviewAt, input.now)
+  if (sinceDue === null) return null
+  return input.intervalDays + sinceDue
+}
+
+/**
+ * How much a review right now is worth, 0..1. Monotone NON-INCREASING in `r`.
+ *
+ * ## Why monotone, when this used to peak at the target
+ *
+ * The peaked version scored a card at exactly the target retention 1.0 and a card the learner
+ * had almost certainly forgotten 0.6. Three independent reasons say that is the wrong ordering
+ * for a QUEUE (it remains the right idea for choosing an interval, which is the scheduler's
+ * job, not this module's):
+ *
+ *  1. The reason code this feature justifies is literally `memory_risk`. Under the peaked curve
+ *     its highest value went to cards that are NOT at risk — the explanation shown to the
+ *     learner disagreed with the arithmetic that produced it.
+ *  2. Mainstream practice for review ORDER is FSRS/Anki's "relative overdueness": lowest
+ *     retrievability first, because those cards are closest to being lost outright.
+ *  3. The product surface says "cards you are most likely to forget, first". Under the peaked
+ *     curve that sentence was false, and no wording of a pricing page could make it true.
+ *
+ * The cost is acknowledged rather than hidden: a card at R ≈ 0 is expensive to relearn, so the
+ * minutes it consumes buy less than a card caught near the target. That is a real tradeoff, and
+ * it is the lesser one — the alternative ranks a card the learner has lost behind one they are
+ * certain of.
+ *
+ * ## Shape
+ *
+ * Piecewise linear with a knee at `target`:
+ *   r = 1       → 0                        (certain knowledge; a review teaches nothing)
+ *   r = target  → REVIEW_VALUE_AT_TARGET   (due exactly now)
+ *   r = 0       → 1                        (probably lost; relearn before it is gone)
  *
  * Returns null for a null retrievability, so an unknown card contributes NOTHING to this
  * feature rather than a fabricated middle value — the planner renormalises around it.
@@ -144,13 +202,12 @@ export function reviewValue(
   const t = Math.min(0.99, Math.max(0.01, isFiniteNumber(target) ? target : DEFAULT_TARGET_RETENTION))
   const clamped = Math.min(1, Math.max(0, r))
   if (clamped >= t) {
-    // Over-learned side: 1 at the target, 0 at certainty.
+    // Over-learned side: REVIEW_VALUE_AT_TARGET at the target, 0 at certainty.
     const span = 1 - t
-    return span <= 0 ? 1 : Math.max(0, 1 - (clamped - t) / span)
+    return span <= 0 ? REVIEW_VALUE_AT_TARGET : REVIEW_VALUE_AT_TARGET * ((1 - clamped) / span)
   }
-  // At-risk side: 1 at the target, decaying more slowly toward 0 recall.
-  const span = t * BELOW_TARGET_TOLERANCE
-  return Math.max(0, 1 - (t - clamped) / span)
+  // At-risk side: REVIEW_VALUE_AT_TARGET at the target, rising to 1 as recall reaches 0.
+  return REVIEW_VALUE_AT_TARGET + (1 - REVIEW_VALUE_AT_TARGET) * ((t - clamped) / t)
 }
 
 /**
@@ -164,12 +221,19 @@ export interface MemoryEstimate {
   readonly elapsedDays: number | null
   readonly retrievability: number | null
   readonly reviewValue: number | null
+  /** Which clock `elapsedDays` came from. Reported so a diagnostic can say, not for scoring. */
+  readonly elapsedSource: 'schedule' | 'last_review' | 'unknown'
 }
 
 /** Estimate memory state for a card from whatever the legacy SRS row holds. */
 export function estimateMemory(input: {
   readonly intervalDays?: number | null
   readonly lastReviewedAt?: string | null
+  /**
+   * The scheduler's due stamp. Preferred over `lastReviewedAt` when present — see
+   * `scheduleAnchoredElapsedDays` for why reconstructing it instead is measurably wrong here.
+   */
+  readonly nextReviewAt?: string | null
   readonly now: string
   readonly stabilityDays?: number | null
   readonly targetRetention?: number
@@ -179,7 +243,16 @@ export function estimateMemory(input: {
   const stabilityDays = isFiniteNumber(input.stabilityDays) && input.stabilityDays > 0
     ? input.stabilityDays
     : stabilityFromInterval(input.intervalDays)
-  const elapsedDays = elapsedDaysBetween(input.lastReviewedAt, input.now)
+  // The anchor uses `intervalDays`, not `stabilityDays`: it is answering "where is this card
+  // relative to the day the SCHEDULER chose", and the scheduler chose that day from the
+  // interval. A fitted stability then converts that position into a recall probability.
+  const anchored = scheduleAnchoredElapsedDays({
+    intervalDays: input.intervalDays,
+    lastReviewedAt: input.lastReviewedAt,
+    nextReviewAt: input.nextReviewAt,
+    now: input.now,
+  })
+  const elapsedDays = anchored ?? elapsedDaysBetween(input.lastReviewedAt, input.now)
   const r = stabilityDays === null || elapsedDays === null
     ? null
     : retrievability(elapsedDays, stabilityDays)
@@ -188,5 +261,6 @@ export function estimateMemory(input: {
     elapsedDays,
     retrievability: r,
     reviewValue: reviewValue(r, input.targetRetention),
+    elapsedSource: anchored !== null ? 'schedule' : (elapsedDays !== null ? 'last_review' : 'unknown'),
   }
 }
