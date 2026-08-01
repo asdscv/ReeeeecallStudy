@@ -78,7 +78,7 @@ for content that has not been authored, not a defect.
 
 ## 5. Prioritized next steps
 
-**① Attempt-grounded remediation** *(recommended first — **IN PROGRESS**, design +
+**① Attempt-grounded remediation** *(**DONE** — #377/#378; design +
 progress in [attempt-grounded-remediation](./2026-07-31-attempt-grounded-remediation-design.md))*
 Send `attemptId` and let the learner request `explain` / `hint` **from a failed attempt**.
 Server side is already built and metered; the work is the product surface and the pricing moment.
@@ -90,17 +90,35 @@ Server side is already built and metered; the work is the product surface and th
 - Test: an attempt-scoped request must be refused when the attempt is not the caller's
   (`reserve_ai_remediation` already checks; pin it in SQL), and the prompt must carry the attempt.
 - **Correction found while implementing.** This entry originally listed `compare` as one of the
-  actions to unlock. It is not reachable: an attempt stores `{ self_rated: score }` and no learner
-  text, so there is nothing to compare against. Only `explain` and `hint` become reachable, and
-  `compare` joins `evaluate` in waiting for free-text responses.
+  actions to unlock. It was not reachable then: an attempt stored `{ self_rated: score }` and no
+  learner text, so there was nothing to compare against. Only `explain` and `hint` became
+  reachable in #377/#378.
+- **Superseded 2026-08-01.** #392 added typed answers and #394 shipped `compare` on top of them,
+  grounded in the template's *declared* answer field (`resolveCardAnswerFaces`) and refusing —
+  never degrading — when either half is missing. `compare` no longer waits on anything;
+  `evaluate` still does, for the reasons in ② and in
+  [compare-evaluate-feasibility](./2026-08-01-compare-evaluate-feasibility.md) §2.
+- **Third finding, 2026-08-01.** The constraint this entry describes was never ENFORCED: it lived
+  in a client type alias, while `parseRemediationRefs` and both SQL allowlists accepted all six
+  actions. A hand-rolled `compare` reserved, charged, and returned an invented comparison.
+  `SERVED_REMEDIATION_ACTIONS` (#383) is now the authority. A TypeScript union is not access
+  control.
 - **Second finding.** `user_enrichments` has no `attempt_id` and `persist_ai_remediation` had no
   parameter for one, so a grounded answer could not record which failure it was about
   (`request_fingerprint` is a 128-char truncation, not provenance). Migration 175 closes that in
   the same workstream.
 
-**② AI evaluation for free-text responses**
+**② AI evaluation for free-text responses** *(still blocked, and typed answers did NOT unblock it)*
 Blocked on curated activities (`expected_response` / `rubric`). Wiring it before that content exists
 would produce an evaluator with nothing to evaluate. Revisit with concept authoring.
+
+Worth stating precisely, because #392 makes it tempting: free text was necessary for `evaluate`
+but nowhere near sufficient. It must return a GRADE, and there is still no grader wired
+(`AiEvaluatorAdapter` has no `RemediationProvider` implementation), nothing ever writes
+`learning_activities.rubric`, and `validateRemediationResult` does not require a score — so it
+would validate and charge for prose with no grade in it. Its output would also feed
+`normalized_score`, which steers the next day's plan: a decision about who owns the curriculum,
+not a prompt change.
 
 **③ An AI recommendation producer, ALONGSIDE `weak-card-v1`**
 mig 174 already stores `provider` + `algorithm_version`, so add `provider='ai'` rows rather than
@@ -110,5 +128,19 @@ this stays deferred.
 
 ## 6. Out of scope for all three
 
-Production migration of the learning chain (165–174) is still owner-gated, unchanged by this
-document. Nothing here needs new tables, new grants, or a service-role key in the client.
+Nothing here needs new tables, new grants, or a service-role key in the client.
+
+Production migration of the learning chain was owner-gated when this was written; it is **done**
+— 165–179 are applied and verified on prod (2026-08-01), including mig 178's attempt provenance.
+
+## 7. Closed out — 2026-08-01
+
+① is shipped. ② is correctly still blocked, on content rather than on code. ③ is correctly still
+deferred, on a pricing decision rather than on engineering.
+
+What this document could not have known, and what the same pass found instead: the RANKER those
+features feed was inert in production. `recentFailure` was a dead constant (#387), `reviewValue`
+was constant or inverted (#388), and the planner read the publisher's schedule instead of the
+learner's on the decks holding 99.7% of all cards (#389). Personalising the AI on top of a
+ranking that returned one score for every card would have been decorating a broken foundation.
+Evidence and measurements: [learning-logic-sellability](./2026-08-01-learning-logic-sellability.md).
