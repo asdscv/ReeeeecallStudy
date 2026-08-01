@@ -270,10 +270,13 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
     const importance = input.deckImportance[card.deck_id]
     const accepted = acceptedCards.has(card.id)
     // Memory state from the legacy SRS row. `reviewValue` stays null for a card with no
-    // interval or no last review — the planner renormalises rather than inventing a number.
+    // interval — the planner renormalises rather than inventing a number. `next_review_at` is
+    // passed so the value curve's knee lands on the day the scheduler actually made the card
+    // due, instead of one shifted by the 04:00 review-day snap (see memory.ts).
     const memory = estimateMemory({
       intervalDays: card.interval_days,
       lastReviewedAt: card.last_reviewed_at,
+      nextReviewAt: card.next_review_at,
       now: input.now,
     })
 

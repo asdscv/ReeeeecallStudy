@@ -13,6 +13,7 @@ import {
   baselineDurationMs, RECALL_MINUTES,
   type CandidateStudyLog,
 } from '@reeeeecall/shared/lib/learning-candidates'
+import { REVIEW_VALUE_AT_TARGET } from '@reeeeecall/shared/learning'
 import type { Card } from '@reeeeecall/shared/types/database'
 
 const NOW = '2026-07-31T00:00:00.000Z'
@@ -298,9 +299,11 @@ describe('reviewValue (memory model, daily-plan-v2)', () => {
     buildCandidatesFromCards({ cards: [card(over)], recentLogs: [], deckImportance: {}, now: NOW })[0]
 
   it('derives the review value from interval_days and last_reviewed_at', () => {
-    // Reviewed exactly one interval ago → retrievability 0.9 → the peak of the value curve.
+    // Reviewed exactly one interval ago → retrievability 0.9 → the KNEE of the value curve,
+    // which is REVIEW_VALUE_AT_TARGET and no longer the maximum. The maximum belongs to a card
+    // the learner has probably already lost; see memory.ts `reviewValue`.
     const candidate = one({ id: 'c1', interval_days: 10, last_reviewed_at: '2026-07-21T00:00:00.000Z' })
-    expect(candidate.reviewValue).toBeCloseTo(1, 12)
+    expect(candidate.reviewValue).toBeCloseTo(REVIEW_VALUE_AT_TARGET, 12)
   })
 
   it('is null for a card the learner has never reviewed', () => {
@@ -313,9 +316,14 @@ describe('reviewValue (memory model, daily-plan-v2)', () => {
     expect(one({ id: 'c3', interval_days: 0, last_reviewed_at: '2026-07-21T00:00:00.000Z' }).reviewValue).toBeNull()
   })
 
-  it('ranks a freshly due card above one long overdue, and both above a just-reviewed one', () => {
-    // next_review_at is set to what the legacy scheduler would have written (last review +
-    // interval), so the two features are compared on the same card, not on a contrived row.
+  it('ranks the most-forgotten card first, then the freshly due, then one needing nothing', () => {
+    // REVERSED, deliberately. This test previously asserted `freshlyDue > longOverdue`, which
+    // put the card the learner had most likely lost BELOW one that was merely due — while the
+    // reason code the feature emits is named `memory_risk` and the UI says "at risk of
+    // forgetting". The arithmetic now agrees with both.
+    //
+    // next_review_at is what the legacy scheduler would have written (last review + interval),
+    // so the features are compared on the same card rather than a contrived row.
     const freshlyDue = one({
       id: 'c4', interval_days: 10,
       last_reviewed_at: '2026-07-21T00:00:00.000Z', next_review_at: NOW,
@@ -328,11 +336,33 @@ describe('reviewValue (memory model, daily-plan-v2)', () => {
       id: 'c6', interval_days: 10,
       last_reviewed_at: NOW, next_review_at: '2026-08-10T00:00:00.000Z',
     })
-    expect(freshlyDue.reviewValue as number).toBeGreaterThan(longOverdue.reviewValue as number)
-    expect(longOverdue.reviewValue as number).toBeGreaterThan(justReviewed.reviewValue as number)
-    // dueUrgency alone would have ordered the first two the other way round — that is the
-    // v1 defect the memory model corrects.
+
+    expect(longOverdue.reviewValue as number).toBeGreaterThan(freshlyDue.reviewValue as number)
+    expect(freshlyDue.reviewValue as number).toBeGreaterThan(justReviewed.reviewValue as number)
+    // A card due exactly now sits on the knee; one needing nothing is worth nothing to review.
+    expect(freshlyDue.reviewValue).toBeCloseTo(REVIEW_VALUE_AT_TARGET, 12)
+    expect(justReviewed.reviewValue).toBeCloseTo(0, 12)
+    // `reviewValue` and `dueUrgency` now agree on the overdue card. They are still different
+    // features: dueUrgency saturates on absolute lateness, reviewValue on lateness RELATIVE to
+    // the card's own interval — which is what the next test pins.
     expect(longOverdue.dueUrgency).toBeGreaterThan(freshlyDue.dueUrgency)
+  })
+
+  it('measures lateness relative to the card\'s own interval, which dueUrgency cannot', () => {
+    // Three days late on a 1-day card is a near-total loss; three days late on a 90-day card is
+    // nothing. `dueUrgency` sees one number — "3 days late" — and scores them identically. This
+    // is the whole reason the memory model earns its 0.25 weight.
+    const shortLate = one({
+      id: 'c8', interval_days: 1,
+      last_reviewed_at: '2026-07-27T00:00:00.000Z', next_review_at: '2026-07-28T00:00:00.000Z',
+    })
+    const longLate = one({
+      id: 'c9', interval_days: 90,
+      last_reviewed_at: '2026-04-29T00:00:00.000Z', next_review_at: '2026-07-28T00:00:00.000Z',
+    })
+
+    expect(shortLate.dueUrgency).toBeCloseTo(longLate.dueUrgency, 12)
+    expect(shortLate.reviewValue as number).toBeGreaterThan(longLate.reviewValue as number)
   })
 
   it('leaves the other features untouched', () => {
