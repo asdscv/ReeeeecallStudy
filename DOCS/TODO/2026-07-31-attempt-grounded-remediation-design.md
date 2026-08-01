@@ -337,8 +337,10 @@ parity checked independently (web 138 keys × 8, mobile 127 × 8) · no competit
 Mutation-tested: dropping the goal filter, the per-row `aria-label`, or the per-attempt pending
 key each turns its own test red.
 
-`packages/mobile/src/i18n/i18n.test.ts` is **not in CI** — it is a manual gate, and it must be
-re-run by hand whenever a `Learning*.tsx` changes, because its Tests 6 and 8 read those files.
+`packages/mobile/src/i18n/i18n.test.ts` **was** a manual gate when this shipped — no job ran it,
+even though its Tests 6 and 8 read `Learning*.tsx` and so can break from a screen change alone.
+It is **now wired into CI** as a step of the `unit-tests` job, so this is no longer something a
+future PR has to remember.
 
 ### 11.5 The constraint that still holds
 

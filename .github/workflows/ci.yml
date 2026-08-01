@@ -95,6 +95,21 @@ jobs:
       - name: Vitest — worker modules
         run: pnpm test:worker
 
+      # Mobile's own i18n suite, which no job ran. `i18n-key-usage.test.ts` (in the web
+      # suite above) reaches into packages/mobile and covers key parity, but NOT the four
+      # things only this file checks: that every `{{x, spec}}` in a locale has an Intl-free
+      # formatter registered (Hermes can ship without full ICU, and an unregistered spec
+      # silently drops thousands separators); that counted strings have _one/_other where
+      # the language inflects; that every namespace in `ns[]` is require()d for every
+      # language; and the FAMILIES table for keys built by interpolation.
+      #
+      # It is a plain script (console.log + process.exit(1)), not vitest, so it gets its own
+      # step. Run from packages/web because that is where `tsx` is installed — the test
+      # resolves every path from `__dirname`, so the working directory does not matter.
+      - name: i18n — mobile locale suite
+        working-directory: packages/web
+        run: npx tsx ../mobile/src/i18n/i18n.test.ts
+
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@v4
