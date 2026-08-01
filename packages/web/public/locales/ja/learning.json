@@ -47,6 +47,11 @@
       "known": "わかった",
       "hint": "試行の記録のみです — 復習スケジュールは変わりません。"
     },
+    "answer": {
+      "label": "あなたの答え（任意）",
+      "placeholder": "覚えている内容を入力してください",
+      "note": "試行の記録と一緒に保存されます。採点はされず、評価は自分で選びます。"
+    },
     "insightsLink": "学習診断"
   },
   "goals": {
@@ -109,6 +114,7 @@
   "history": {
     "title": "最近の試行 ({{count, number}})",
     "itemFallback": "{{type}} の試行",
+    "youWrote": "入力した答え: {{text}}",
     "score": {
       "unknown": "スコアなし"
     }

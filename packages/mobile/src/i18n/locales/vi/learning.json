@@ -85,7 +85,8 @@
     },
     "title": "Lần làm gần đây ({{count, number}})",
     "title_one": "Lần làm gần đây ({{count, number}})",
-    "title_other": "Lần làm gần đây ({{count, number}})"
+    "title_other": "Lần làm gần đây ({{count, number}})",
+    "youWrote": "Bạn đã viết: {{text}}"
   },
   "insights": {
     "accuracy": "Độ chính xác",
@@ -123,6 +124,11 @@
     "title": "Gợi ý"
   },
   "today": {
+    "answer": {
+      "label": "Câu trả lời của bạn (không bắt buộc)",
+      "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá.",
+      "placeholder": "Nhập những gì bạn còn nhớ"
+    },
     "budget": "{{count, number}} phút/ngày",
     "empty": {
       "createGoal": "Tạo mục tiêu",

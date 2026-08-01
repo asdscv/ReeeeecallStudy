@@ -85,7 +85,8 @@
     },
     "title": "최근 시도 ({{count, number}})",
     "title_one": "최근 시도 ({{count, number}})",
-    "title_other": "최근 시도 ({{count, number}})"
+    "title_other": "최근 시도 ({{count, number}})",
+    "youWrote": "작성한 답: {{text}}"
   },
   "insights": {
     "accuracy": "정답률",
@@ -123,6 +124,11 @@
     "title": "추천"
   },
   "today": {
+    "answer": {
+      "label": "내가 쓴 답 (선택)",
+      "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다.",
+      "placeholder": "기억나는 대로 입력하세요"
+    },
     "budget": "하루 {{count, number}}분",
     "empty": {
       "createGoal": "목표 만들기",

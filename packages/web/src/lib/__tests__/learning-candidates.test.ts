@@ -11,10 +11,11 @@ import { describe, it, expect } from 'vitest'
 import {
   buildCandidatesFromCards, dueUrgencyFor, recentFailureFor, responseTimePenaltyFor,
   baselineDurationMs, RECALL_MINUTES,
+  legacyCardItemShape, planItemAnswerPayload, ANSWER_FACE_RESOLVER, TYPED_ANSWER_MAX_CHARS,
   type CandidateStudyLog,
 } from '@reeeeecall/shared/lib/learning-candidates'
 import { REVIEW_VALUE_AT_TARGET } from '@reeeeecall/shared/learning'
-import type { Card } from '@reeeeecall/shared/types/database'
+import type { Card, CardTemplate } from '@reeeeecall/shared/types/database'
 
 const NOW = '2026-07-31T00:00:00.000Z'
 const NOW_MS = Date.parse(NOW)
@@ -371,5 +372,113 @@ describe('reviewValue (memory model, daily-plan-v2)', () => {
     expect(candidate.recentFailure).toBeCloseTo(0.3, 12)   // no logs → the documented default
     expect(candidate.responseTimePenalty).toBeCloseTo(0.5, 12)
     expect(candidate.goalRelevance).toBeCloseTo(0.5, 12)
+  })
+})
+
+// ── legacyCardItemShape — which items can be answered by typing ──────────────
+//
+// The rule this pins is the SUBSET rule: `response_type` becomes 'text' only when the card's
+// template declares both faces unambiguously. Getting it wrong in the permissive direction puts
+// an input box on a card whose answer nobody can name — which is the premise a later paid
+// `compare` would be grounded in, so the wrong reference is the expensive failure, not the
+// missing one.
+describe('legacyCardItemShape', () => {
+  const template = (over: Partial<CardTemplate> = {}): CardTemplate => ({
+    id: 'tpl-1', user_id: 'user-1', name: 'Basic',
+    fields: [
+      { key: 'front', name: 'Front', type: 'text', order: 0 },
+      { key: 'back', name: 'Back', type: 'text', order: 1 },
+    ],
+    front_layout: [{ field_key: 'front', style: 'primary' }],
+    back_layout: [{ field_key: 'back', style: 'primary' }],
+    created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z',
+    ...over,
+  } as CardTemplate)
+
+  const subject = card({ id: 'c1', field_values: { front: 'apple', back: '사과' } })
+
+  it('asks for a typed answer when the template says which field is the answer', () => {
+    const shape = legacyCardItemShape(subject, template())
+
+    expect(shape.responseType).toBe('text')
+    expect(shape.answerFaces).toEqual({ promptKeys: ['front'], referenceKeys: ['back'] })
+    // `exact` would mark a correct paraphrase wrong, and that score feeds insights →
+    // recommendations → the next plan. The learner stays the evaluator.
+    expect(shape.evaluatorType).toBe('self_rate')
+    expect(shape.activityType).toBe('recall')
+    expect(shape.stimulusType).toBe('text')
+  })
+
+  it('stays a plain self-rating when no template is available', () => {
+    // The subscriber case: a shared template is readable only when it is the deck's default
+    // (mig 009), so "absent" is a normal state and must degrade to the pre-existing behaviour.
+    expect(legacyCardItemShape(subject).responseType).toBe('self_rate')
+    expect(legacyCardItemShape(subject, null).responseType).toBe('self_rate')
+    expect(legacyCardItemShape(subject).answerFaces).toBeNull()
+  })
+
+  it('stays a plain self-rating when the template declares no answer face', () => {
+    // `back_layout` defaults to '[]' (mig 001), so this is the COMMON case, not an exotic one.
+    expect(legacyCardItemShape(subject, template({ back_layout: [] })).responseType).toBe('self_rate')
+  })
+
+  it('refuses a non-text answer field rather than comparing words to audio', () => {
+    const audioBack = template({
+      fields: [
+        { key: 'front', name: 'Front', type: 'text', order: 0 },
+        { key: 'back', name: 'Sound', type: 'audio', order: 1 },
+      ],
+    })
+
+    expect(legacyCardItemShape(subject, audioBack).responseType).toBe('self_rate')
+  })
+
+  it('refuses when the answer is the question', () => {
+    const overlapping = template({ back_layout: [{ field_key: 'front', style: 'primary' }] })
+
+    expect(legacyCardItemShape(subject, overlapping).responseType).toBe('self_rate')
+  })
+
+  it('refuses when the layout names keys the card does not have', () => {
+    const sparse = card({ id: 'c2', field_values: { front: 'apple', back: '' } })
+
+    expect(legacyCardItemShape(sparse, template()).responseType).toBe('self_rate')
+  })
+})
+
+describe('planItemAnswerPayload', () => {
+  it('records the resolved keys and the rule that resolved them', () => {
+    const payload = planItemAnswerPayload({
+      activityType: 'recall', stimulusType: 'text', responseType: 'text',
+      evaluatorType: 'self_rate',
+      answerFaces: { promptKeys: ['front'], referenceKeys: ['back', 'example_back'] },
+    })
+
+    // The keys alone are not auditable: they only mean something together with the rule that
+    // produced them, which is why the resolver id travels with them.
+    expect(payload).toEqual({
+      typed_answer: {
+        resolver: ANSWER_FACE_RESOLVER,
+        prompt_keys: ['front'],
+        reference_keys: ['back', 'example_back'],
+      },
+    })
+  })
+
+  it('is null when there was no decision to record', () => {
+    // Null, not `{}`: the store omits the key entirely so `save_daily_plan` keeps writing its
+    // own default for every item that is not a typed one.
+    expect(planItemAnswerPayload({
+      activityType: 'recall', stimulusType: 'text', responseType: 'self_rate',
+      evaluatorType: 'self_rate', answerFaces: null,
+    })).toBeNull()
+  })
+
+  it('caps a typed answer far below the server limit, in characters', () => {
+    // mig 167 rejects a response over 64 KiB with P0006 — the code the UI renders as "you've hit
+    // today's limit for rebuilding plans". The client cap has to bite first, and with room for
+    // multi-byte scripts: 2000 Korean characters is ~6 KB.
+    expect(TYPED_ANSWER_MAX_CHARS).toBe(2000)
+    expect(new TextEncoder().encode('가'.repeat(TYPED_ANSWER_MAX_CHARS)).length).toBeLessThan(65536)
   })
 })

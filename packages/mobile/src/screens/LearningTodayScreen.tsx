@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, RefreshControl,
-  AppState, Modal, Pressable,
+  View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator,
+  RefreshControl, AppState, Modal, Pressable,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
@@ -12,7 +12,10 @@ import { testProps } from '../utils/testProps'
 import { useLearningStore, type RemediationAction } from '@reeeeecall/shared/stores/learning-store'
 import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
-import { attemptNeedsRemediation, latestAttemptForCard } from '@reeeeecall/shared/lib/learning-attempt-selection'
+import {
+  attemptNeedsRemediation, attemptTypedAnswer, latestAttemptForCard,
+} from '@reeeeecall/shared/lib/learning-attempt-selection'
+import { TYPED_ANSWER_MAX_CHARS } from '@reeeeecall/shared/lib/learning-candidates'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import * as Crypto from 'expo-crypto'
@@ -56,14 +59,15 @@ const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 
 /**
- * The remediation actions a learner can actually buy.
+ * The remediation actions the SERVER serves.
  *
- * Two, not six. An attempt stores `{ self_rated: score }` — a rating, with nothing the
- * learner wrote — so `compare` and `evaluate` have no answer to work from and are
- * deliberately unreachable. Nothing here may imply the model read a response that does not
- * exist; it read the score and the card.
+ * Two, not six. `compare` and `evaluate` are refused by the edge function's `SERVED_ACTIONS`
+ * list (Stage 0 of the compare/evaluate plan), so offering them here would spend credits on a
+ * rejected request. It is no longer true that there is nothing to compare — a typed item stores
+ * `{ self_rated, text }` — what is missing is the server-resolved reference answer.
  *
- * Two actions are rendered as two inline text links rather than a menu: the repo has no
+ * Nothing here may imply the model read an answer: these two are grounded in the score and the
+ * card. Two actions are rendered as two inline text links rather than a menu: the repo has no
  * dropdown primitive, and every other action on these screens is an inline link.
  */
 const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; key: string; id: string }> = [
@@ -108,6 +112,17 @@ export function LearningTodayScreen() {
 
   const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  /**
+   * Answers in progress, keyed by plan-item id.
+   *
+   * One map on the screen rather than state inside each row: the rows are produced by a `.map`
+   * in this component's render, and a hook cannot live in a loop. Keyed by item id, not index,
+   * so re-reading the plan cannot move one row's text onto another.
+   *
+   * Cleared per item once its attempt is recorded — the row becomes "Recorded" and its input
+   * disappears, so keeping the string would only leak into a rebuilt plan that reuses the id.
+   */
+  const [answers, setAnswers] = useState<Record<string, string>>({})
 
   /**
    * The plan date, kept live.
@@ -407,6 +422,39 @@ export function LearningTodayScreen() {
                         </Text>
                       ) : (
                         <>
+                          {/* Typed recall. Gated on the item's own snapshot — the column
+                              `record_answer_attempt` compares against — so an input can never
+                              appear where sending text would be rejected. The three rating
+                              buttons stay: nothing grades the text, the learner still judges. */}
+                          {item.response_type === 'text' && (
+                            <>
+                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}>
+                                {t('today.answer.label')}
+                              </Text>
+                              <TextInput
+                                value={answers[item.id] ?? ''}
+                                onChangeText={(text) => setAnswers((prev) => ({ ...prev, [item.id]: text }))}
+                                editable={!recording}
+                                multiline
+                                // Capped where the learner can see the input stop, not as the
+                                // server's 64 KiB rejection — which shares an error code with
+                                // the plan-save cap and would read as an unrelated message.
+                                maxLength={TYPED_ANSWER_MAX_CHARS}
+                                placeholder={t('today.answer.placeholder')}
+                                placeholderTextColor={theme.colors.textTertiary}
+                                style={[styles.answerInput, {
+                                  color: theme.colors.text,
+                                  borderColor: theme.colors.border,
+                                  backgroundColor: theme.colors.background,
+                                }]}
+                                accessibilityLabel={t('today.answer.label')}
+                                {...testProps(`learning-answer-${index}`)}
+                              />
+                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                                {t('today.answer.note')}
+                              </Text>
+                            </>
+                          )}
                           <View style={styles.rateRow}>
                             {SELF_RATINGS.map((rating) => (
                               <TouchableOpacity
@@ -418,12 +466,26 @@ export function LearningTodayScreen() {
                                   // attempt list below would not show the rating that was just
                                   // given — exactly the moment it matters, since a fresh miss is
                                   // the thing a learner would pay to have explained.
+                                  //
+                                  // The id is minted here, together with the text: `p_response`
+                                  // is part of the RPC's idempotency comparison, so an id made
+                                  // before the answer was final turns an edit into a P0007.
                                   void recordAttempt({
                                     planItem: item,
                                     goalId,
                                     score: rating.score,
+                                    text: answers[item.id],
                                     clientAttemptId: Crypto.randomUUID(),
-                                  }, planDate).then((ok) => { if (ok) void fetchAttempts(goalId) })
+                                  }, planDate).then((ok) => {
+                                    if (!ok) return
+                                    setAnswers((prev) => {
+                                      if (!(item.id in prev)) return prev
+                                      const next = { ...prev }
+                                      delete next[item.id]
+                                      return next
+                                    })
+                                    void fetchAttempts(goalId)
+                                  })
                                 }}
                                 style={[
                                   styles.rateBtn,
@@ -560,6 +622,10 @@ export function LearningTodayScreen() {
                   // just said they knew would be selling an answer with no question, and a
                   // never-scored attempt is not evidence of a miss either.
                   const remediable = attemptNeedsRemediation(attempt)
+                  // Read back from the stored response, not inferred from the plan item: an
+                  // older attempt's item may be gone, and only the row itself knows whether it
+                  // holds an answer.
+                  const typedAnswer = attemptTypedAnswer(attempt)
                   // One request at a time, globally — the store short-circuits a second one, so
                   // every row's actions go inert together instead of looking tappable.
                   const busy = enrichmentPendingCardId !== null
@@ -583,6 +649,18 @@ export function LearningTodayScreen() {
                       <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
                         {utcToLocalDateKey(attempt.created_at)}
                       </Text>
+                      {/* What the learner wrote, when they wrote anything — the honesty check:
+                          a later paid `compare` is grounded in exactly this string, so it has
+                          to be visible before anyone pays for an answer about it. */}
+                      {typedAnswer && (
+                        <Text
+                          style={[theme.typography.caption, { color: theme.colors.textSecondary }]}
+                          numberOfLines={2}
+                          {...testProps(`learning-attempt-answer-${index}`)}
+                        >
+                          {t('history.youWrote', { text: typedAnswer })}
+                        </Text>
+                      )}
 
                       {remediable && cardId && goalId && (
                         requestingAttemptId === attempt.id ? (
@@ -774,6 +852,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rateRow: { flexDirection: 'row', gap: 6, marginTop: 8 },
+  // Two lines tall by default and it grows: a recall answer is short, and a box the height of
+  // the card would suggest an essay is wanted. `minHeight` keeps the tap target usable.
+  answerInput: {
+    marginTop: 4, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8,
+    minHeight: MIN_TOUCH, maxHeight: 120, fontSize: 14, textAlignVertical: 'top',
+  },
   rateBtn: {
     paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 8, borderWidth: 1,
     justifyContent: 'center', alignItems: 'center', flex: 1,

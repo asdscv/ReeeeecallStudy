@@ -85,7 +85,8 @@
     },
     "title": "การทำล่าสุด ({{count, number}})",
     "title_one": "การทำล่าสุด ({{count, number}})",
-    "title_other": "การทำล่าสุด ({{count, number}})"
+    "title_other": "การทำล่าสุด ({{count, number}})",
+    "youWrote": "คุณเขียนว่า: {{text}}"
   },
   "insights": {
     "accuracy": "ความถูกต้อง",
@@ -123,6 +124,11 @@
     "title": "คำแนะนำ"
   },
   "today": {
+    "answer": {
+      "label": "คำตอบของคุณ (ไม่บังคับ)",
+      "note": "บันทึกไว้พร้อมการทำครั้งนี้ ไม่มีการให้คะแนน — คุณยังประเมินตัวเองเอง",
+      "placeholder": "พิมพ์สิ่งที่คุณจำได้"
+    },
     "budget": "{{count, number}} นาที/วัน",
     "empty": {
       "createGoal": "สร้างเป้าหมาย",

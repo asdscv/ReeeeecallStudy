@@ -47,6 +47,11 @@
       "known": "알았음",
       "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다."
     },
+    "answer": {
+      "label": "내가 쓴 답 (선택)",
+      "placeholder": "기억나는 대로 입력하세요",
+      "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다."
+    },
     "insightsLink": "진단"
   },
   "goals": {
@@ -109,6 +114,7 @@
   "history": {
     "title": "최근 시도 ({{count, number}})",
     "itemFallback": "{{type}} 시도",
+    "youWrote": "작성한 답: {{text}}",
     "score": {
       "unknown": "점수 없음"
     }

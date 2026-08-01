@@ -85,7 +85,8 @@
     },
     "title": "最近作答 ({{count, number}})",
     "title_one": "最近作答 ({{count, number}})",
-    "title_other": "最近作答 ({{count, number}})"
+    "title_other": "最近作答 ({{count, number}})",
+    "youWrote": "你写的答案：{{text}}"
   },
   "insights": {
     "accuracy": "正确率",
@@ -123,6 +124,11 @@
     "title": "推荐"
   },
   "today": {
+    "answer": {
+      "label": "你的答案（可选）",
+      "note": "与本次作答一同保存。不评分，仍由你自己评价。",
+      "placeholder": "输入你记得的内容"
+    },
     "budget": "每天 {{count, number}} 分钟",
     "empty": {
       "createGoal": "创建目标",

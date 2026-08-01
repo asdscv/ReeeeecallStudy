@@ -57,3 +57,27 @@ export function attemptNeedsRemediation(attempt: AttemptRow | null | undefined):
   const score = attempt.normalized_score
   return typeof score === 'number' && Number.isFinite(score) && score < KNOWN_SCORE_THRESHOLD
 }
+
+/**
+ * What the learner actually typed on this attempt, or null when there is nothing.
+ *
+ * Two conditions, both required, and both about not inventing an answer:
+ *   * `response_type` must be `'text'` — an item that only ever asked for a rating cannot have
+ *     a typed answer, whatever else happens to sit in its `response` jsonb;
+ *   * `response.text` must be a non-empty string after trimming — the store never writes an
+ *     empty one, so anything else is a row from a different writer and must not be displayed
+ *     as the learner's words.
+ *
+ * It lives here, next to the remediation predicate, because the two are asked together: a paid
+ * `compare` needs an attempt that both misses AND has text in it, and the two platforms have to
+ * agree on what "has text" means or one of them will offer to compare against nothing.
+ */
+export function attemptTypedAnswer(
+  attempt: Pick<AttemptRow, 'response_type' | 'response'> | null | undefined,
+): string | null {
+  if (!attempt || attempt.response_type !== 'text') return null
+  const raw = (attempt.response as { text?: unknown } | null | undefined)?.text
+  if (typeof raw !== 'string') return null
+  const text = raw.trim()
+  return text === '' ? null : text
+}

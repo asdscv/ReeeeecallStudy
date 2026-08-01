@@ -44,14 +44,24 @@ import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
 function q(result: unknown) {
   const settled = Promise.resolve(result)
   const builder: Record<string, unknown> = {}
-  for (const method of ['select', 'eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
+  for (const method of ['eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
     builder[method] = () => builder
+  }
+  // Recorded, not just returned: the column list is the contract with PostgREST, and a column
+  // left out of it is silently absent from the row rather than a type error. A mock that
+  // fabricates the row cannot notice — so the select string itself has to be assertable.
+  builder.select = (columns?: unknown) => {
+    selectedColumns.push(typeof columns === 'string' ? columns : '')
+    return builder
   }
   builder.maybeSingle = () => settled
   builder.then = (onOk: unknown, onErr: unknown) =>
     settled.then(onOk as never, onErr as never)
   return builder
 }
+
+/** Every `select(...)` argument this test's supabase stub was handed, in call order. */
+let selectedColumns: string[] = []
 
 /** Per-table FIFO queue of results, so one action can read several tables in order. */
 let tableResults: Record<string, unknown[]> = {}
@@ -89,6 +99,7 @@ const deckRow = (over: Record<string, unknown> = {}) =>
 beforeEach(() => {
   vi.clearAllMocks()
   tableResults = {}
+  selectedColumns = []
   mockFrom.mockImplementation((table: string) => {
     const pending = tableResults[table]
     const next = pending && pending.length > 0 ? pending.shift() : { data: [], error: null }
@@ -311,6 +322,78 @@ describe('generatePlan', () => {
     const saves = mockRpc.mock.calls.filter(([name]) => name === 'save_daily_plan')
     expect(saves).toHaveLength(1)
   })
+
+  // ── typed answers (Stage 2) ──────────────────────────────────────────────
+  //
+  // An item becomes typeable only because its TEMPLATE says which field is the answer. The
+  // dangerous direction is permissive: an input box on a card whose answer nobody can name
+  // becomes the premise for a later paid comparison against nothing.
+  describe('typed-answer items', () => {
+    const basicTemplate = {
+      id: 'tpl-1',
+      fields: [
+        { key: 'front', name: 'Front', type: 'text', order: 0 },
+        { key: 'back', name: 'Back', type: 'text', order: 1 },
+      ],
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [{ field_key: 'back', style: 'primary' }],
+    }
+
+    async function generateWith(templates: unknown[]) {
+      queue('cards', { data: [cardRow('card-1')], error: null })
+      queue('card_templates', { data: templates, error: null })
+      queue('study_logs', { data: [], error: null })
+      mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+      queue('daily_plans', { data: null, error: null })
+
+      await useLearningStore.getState().generatePlan(
+        goalWithDecks([{ deck_id: 'deck-1', importance: 0.9 }]), CTX)
+      const args = mockRpc.mock.calls[0][1] as Record<string, unknown>
+      return (args.p_items as Array<Record<string, unknown>>)[0]
+    }
+
+    it('asks for text, and records which fields it decided on', async () => {
+      const item = await generateWith([basicTemplate])
+
+      expect(item.response_type).toBe('text')
+      // Still self-rated: nothing grades the text, so the learner remains the evaluator.
+      expect(item.evaluator_type).toBe('self_rate')
+      // `payload` is the audit trail — the plan says which key it called the reference, so a
+      // template edited tomorrow cannot rewrite what today's plan meant.
+      expect(item.payload).toEqual({
+        typed_answer: {
+          resolver: 'card-answer-v1',
+          prompt_keys: ['front'],
+          reference_keys: ['back'],
+        },
+      })
+    })
+
+    it('reads the layouts, not just the field order, from card_templates', async () => {
+      await generateWith([basicTemplate])
+
+      // Without `back_layout` there is no declared answer, and the only remaining way to pick
+      // one is jsonb key order — which is inverted for every official word card.
+      expect(selectedColumns).toContain('id, fields, front_layout, back_layout')
+    })
+
+    it('stays a self-rating when the template cannot be read', async () => {
+      // The subscriber case (mig 009 shares a template only as a deck default) and the
+      // request-failed case land here together. Fail-closed: no input box, no payload.
+      const item = await generateWith([])
+
+      expect(item.response_type).toBe('self_rate')
+      expect(item.payload).toBeUndefined()
+    })
+
+    it('stays a self-rating when the template declares no answer face', async () => {
+      // `back_layout` defaults to '[]', so this is the ordinary case for hand-made templates.
+      const item = await generateWith([{ ...basicTemplate, back_layout: [] }])
+
+      expect(item.response_type).toBe('self_rate')
+      expect(item.payload).toBeUndefined()
+    })
+  })
 })
 
 // ── recordAttempt / fetchAttempts (Phase 2) ────────────────────────────────
@@ -409,13 +492,64 @@ describe('recordAttempt', () => {
     expect(second).toBe(false)
     expect(mockRpc.mock.calls.filter(([n]) => n === 'record_answer_attempt')).toHaveLength(1)
   })
+
+  // ── the typed answer itself ───────────────────────────────────────────────
+  //
+  // `p_response` is part of the RPC's idempotency comparison, so its exact shape is a contract,
+  // not a detail: the same `client_attempt_id` with a different response raises P0007.
+  describe('typed answer', () => {
+    const typedItem = { ...planItem, response_type: 'text' }
+    const responseOf = (call = 0) =>
+      (mockRpc.mock.calls[call][1] as Record<string, unknown>).p_response
+
+    async function record(input: { planItem: typeof planItem; text?: string; score?: number }) {
+      mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+      queue('daily_plans', { data: null, error: null })
+      await useLearningStore.getState().recordAttempt({
+        planItem: input.planItem, goalId: 'goal-1', score: input.score ?? 0,
+        text: input.text, clientAttemptId: 'att-typed',
+      }, '2026-07-31')
+    }
+
+    it('stores what the learner wrote next to the rating', async () => {
+      await record({ planItem: typedItem, text: '사과', score: 0.5 })
+
+      expect(responseOf()).toEqual({ self_rated: 0.5, text: '사과' })
+    })
+
+    it('trims, and omits the key entirely when nothing was typed', async () => {
+      await record({ planItem: typedItem, text: '  \n ' })
+
+      // `{ self_rated }` — the shape every attempt has had since Phase 2 — rather than
+      // `text: ''`. "Typed nothing" and "was never asked" must read the same downstream, so no
+      // later feature can mistake an empty string for an answer it can compare against.
+      expect(responseOf()).toEqual({ self_rated: 0 })
+    })
+
+    it('ignores text on an item that only asked for a rating', async () => {
+      // The item's snapshot is what the row CLAIMS to hold. Writing prose under a `self_rate`
+      // item would make that claim false, and the read-back helper would then have to guess.
+      await record({ planItem, text: 'apple' })
+
+      expect(responseOf()).toEqual({ self_rated: 0 })
+    })
+
+    it('caps the answer before the server has to reject it', async () => {
+      await record({ planItem: typedItem, text: 'a'.repeat(5_000) })
+
+      // mig 167 rejects a response over 64 KiB with P0006 — the same code as the plan-save cap,
+      // which the UI renders as a message about rebuilding plans. The cap has to bite here.
+      expect((responseOf() as { text: string }).text).toHaveLength(2_000)
+    })
+  })
 })
 
 describe('fetchAttempts', () => {
   it('loads the goal\'s attempts', async () => {
     queue('answer_attempts', {
       data: [{ id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
-        plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+        plan_item_id: 'item-1', activity_type: 'recall', response_type: 'self_rate',
+        evaluator_type: 'self_rate', response: { self_rated: 0.5 },
         normalized_score: 0.5, duration_ms: 1000, created_at: '2026-07-31T00:00:00.000Z' }],
       error: null,
     })
@@ -424,6 +558,20 @@ describe('fetchAttempts', () => {
 
     expect(useLearningStore.getState().attempts).toHaveLength(1)
     expect(useLearningStore.getState().attemptsLoading).toBe(false)
+  })
+
+  it('reads back the response and its type, or the history row cannot show it', async () => {
+    // Asserted on the SELECT string because that is where the mistake would live: a column left
+    // out is simply absent from the row, with no type error and no failing render — the answer
+    // would just never appear, and a later paid `compare` would have no way to tell an attempt
+    // with text from one without.
+    queue('answer_attempts', { data: [], error: null })
+
+    await useLearningStore.getState().fetchAttempts('goal-1')
+
+    const [columns] = selectedColumns
+    expect(columns).toContain('response_type')
+    expect(columns).toContain('response,')
   })
 })
 // ── enrichment (Phase 3, paid) ─────────────────────────────────────────────

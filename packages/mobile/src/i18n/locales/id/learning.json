@@ -85,7 +85,8 @@
     },
     "title": "Percobaan terbaru ({{count, number}})",
     "title_one": "Percobaan terbaru ({{count, number}})",
-    "title_other": "Percobaan terbaru ({{count, number}})"
+    "title_other": "Percobaan terbaru ({{count, number}})",
+    "youWrote": "Kamu menulis: {{text}}"
   },
   "insights": {
     "accuracy": "Akurasi",
@@ -123,6 +124,11 @@
     "title": "Rekomendasi"
   },
   "today": {
+    "answer": {
+      "label": "Jawaban kamu (opsional)",
+      "note": "Disimpan bersama percobaan ini. Tidak dinilai — penilaian tetap dari kamu.",
+      "placeholder": "Tulis apa yang kamu ingat"
+    },
     "budget": "{{count, number}} menit/hari",
     "empty": {
       "createGoal": "Buat tujuan",

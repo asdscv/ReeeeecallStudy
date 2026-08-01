@@ -233,6 +233,76 @@ describe('recording an attempt', () => {
     expect(screen.getByRole('button', { name: 'today.rate.known' })).toBeDisabled()
   })
 
+  // ── typed answers (Stage 2) ───────────────────────────────────────────────
+  //
+  // The input appears only where the plan row says `response_type === 'text'`. That is the same
+  // column `record_answer_attempt` compares against, so a box that appeared anywhere else would
+  // collect an answer the RPC then refuses to store.
+  describe('typed answer', () => {
+    const typedItem = { ...planItem, response_type: 'text' }
+
+    it('offers a field to write in when the item asks for one', () => {
+      renderToday({ plan: planRow, planItems: [typedItem] })
+
+      const field = screen.getByRole('textbox', { name: 'today.answer.label' })
+      expect(field).toBeInTheDocument()
+      // The learner has to be told what this text is for. Nothing grades it, and the same three
+      // rating buttons are still what records the attempt.
+      expect(screen.getByText('today.answer.note')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'today.rate.known' })).toBeInTheDocument()
+    })
+
+    it('does not offer one on a self-rating item', () => {
+      renderToday({ plan: planRow, planItems: [planItem] })
+
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    })
+
+    it('does not offer one on an item already recorded', () => {
+      renderToday({ plan: planRow, planItems: [{ ...typedItem, status: 'completed' as const }] })
+
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    })
+
+    it('sends what was written together with the rating', async () => {
+      const state = renderToday({ plan: planRow, planItems: [typedItem] })
+
+      await userEvent.type(screen.getByRole('textbox', { name: 'today.answer.label' }), '사과')
+      await userEvent.click(screen.getByRole('button', { name: 'today.rate.partial' }))
+
+      const [input] = (state.recordAttempt as ReturnType<typeof vi.fn>).mock.calls[0]
+      expect(input.text).toBe('사과')
+      expect(input.score).toBe(0.5)
+    })
+
+    it('keeps each row\'s answer to itself', async () => {
+      const second = { ...typedItem, id: 'item-2', position: 1, card_id: 'card-2' }
+      const state = renderToday({
+        plan: { ...planRow, total_items: 2 }, planItems: [typedItem, second],
+      })
+
+      const fields = screen.getAllByRole('textbox', { name: 'today.answer.label' })
+      await userEvent.type(fields[0], 'first')
+      await userEvent.click(screen.getAllByRole('button', { name: 'today.rate.known' })[1])
+
+      // The second row must not submit the first row's words — that would attribute an answer
+      // to a card the learner never wrote it for, and a later paid comparison would be grounded
+      // in it.
+      const [input] = (state.recordAttempt as ReturnType<typeof vi.fn>).mock.calls[0]
+      expect(input.planItem.id).toBe('item-2')
+      expect(input.text).toBe('')
+    })
+
+    it('stops the input at the cap the server would reject past', async () => {
+      renderToday({ plan: planRow, planItems: [typedItem] })
+
+      // maxLength, not a truncation after the fact: the learner sees the field stop rather than
+      // discovering later that part of the answer was dropped.
+      expect(screen.getByRole('textbox', { name: 'today.answer.label' }))
+        .toHaveAttribute('maxLength', '2000')
+    })
+  })
+
   it('leaves other rows usable while one is recording', () => {
     const second = { ...planItem, id: 'item-2', position: 1 }
     renderToday({ plan: { ...planRow, total_items: 2 }, planItems: [planItem, second], recordingItemId: 'item-1' })
@@ -268,6 +338,34 @@ describe('attempt history', () => {
     renderToday({ attempts: [] })
 
     expect(screen.queryByText('history.title')).not.toBeInTheDocument()
+  })
+
+  it('shows the learner exactly what was stored as their answer', () => {
+    // The honesty check on typed answers: a later paid `compare` is grounded in this string, so
+    // it has to be on screen before anyone can pay for an answer about it.
+    renderToday({
+      attempts: [
+        { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
+          activity_type: 'recall', response_type: 'text', evaluator_type: 'self_rate',
+          response: { self_rated: 0, text: 'apfel' }, normalized_score: 0,
+          duration_ms: 0, created_at: '2026-07-31T01:00:00.000Z' },
+      ],
+    })
+
+    expect(screen.getByText('history.youWrote')).toBeInTheDocument()
+  })
+
+  it('says nothing about an answer on an attempt that has none', () => {
+    renderToday({
+      attempts: [
+        { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
+          activity_type: 'recall', response_type: 'self_rate', evaluator_type: 'self_rate',
+          response: { self_rated: 0 }, normalized_score: 0,
+          duration_ms: 0, created_at: '2026-07-31T01:00:00.000Z' },
+      ],
+    })
+
+    expect(screen.queryByText('history.youWrote')).not.toBeInTheDocument()
   })
 
   // ── attempt-grounded remediation (paid) ──────────────────────────────────
