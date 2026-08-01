@@ -216,7 +216,7 @@ export function reviewValue(
  * `retrievability` is null exactly when it cannot be computed (new card, no last review, no
  * interval). Callers must propagate the null rather than substituting a number.
  */
-export interface MemoryEstimate {
+interface MemoryEstimate {
   readonly stabilityDays: number | null
   readonly elapsedDays: number | null
   readonly retrievability: number | null

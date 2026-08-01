@@ -1,28 +1,22 @@
 /**
- * Domain error types for the modular learning engine.
+ * Domain error types for the learning engine.
  *
  * Typed errors enable exhaustive handling without leaking infrastructure details.
  * No framework/Supabase/Zustand imports.
+ *
+ * Nine further factories lived here — `notFoundError`, `unauthorizedError`, `conflictError`,
+ * `staleStateError`, `duplicateError`, `unsupportedCapabilityError`, `quotaExceededError`,
+ * `persistenceError`, `providerError` — with no caller anywhere. They described the failure
+ * modes of a repository/port layer that was never wired to Supabase, and they went with it.
+ * Add one back alongside the `throw` that needs it.
  */
 
 // ─── Error codes ────────────────────────────────────────────────────────────
 
 export type LearningErrorCode =
   | 'VALIDATION_ERROR'
-  | 'NOT_FOUND'
-  | 'UNAUTHORIZED'
-  | 'CONFLICT'
-  | 'STALE_STATE'
-  | 'DUPLICATE'
-  | 'UNSUPPORTED_CAPABILITY'
-  | 'BUDGET_EXHAUSTED'
-  | 'QUOTA_EXCEEDED'
-  | 'PROVIDER_ERROR'
   | 'INVALID_REGISTRY_ID'
   | 'DUPLICATE_REGISTRATION'
-  | 'PERSISTENCE_ERROR'
-  | 'NETWORK_ERROR'
-  | 'UNKNOWN_ERROR'
 
 // ─── Base error ─────────────────────────────────────────────────────────────
 
@@ -42,45 +36,12 @@ export class LearningError extends Error {
 
 // ─── Specialized error factories ────────────────────────────────────────────
 
+/** Thrown by `buildDailyPlan` for a malformed activity mix, budget, or timestamp. */
 export function validationError(message: string, details?: Record<string, unknown>): LearningError {
   return new LearningError('VALIDATION_ERROR', message, details)
 }
 
-export function notFoundError(entity: string, id: string): LearningError {
-  return new LearningError('NOT_FOUND', `${entity} not found: ${id}`, { entity, id })
-}
-
-export function unauthorizedError(message: string): LearningError {
-  return new LearningError('UNAUTHORIZED', message)
-}
-
-export function conflictError(message: string, details?: Record<string, unknown>): LearningError {
-  return new LearningError('CONFLICT', message, details)
-}
-
-export function staleStateError(message: string, details?: Record<string, unknown>): LearningError {
-  return new LearningError('STALE_STATE', message, details)
-}
-
-export function duplicateError(message: string, details?: Record<string, unknown>): LearningError {
-  return new LearningError('DUPLICATE', message, details)
-}
-
-export function unsupportedCapabilityError(capability: string, type: string): LearningError {
-  return new LearningError(
-    'UNSUPPORTED_CAPABILITY',
-    `Unsupported ${capability}: ${type}. Register an adapter before use.`,
-    { capability, type },
-  )
-}
-
-export function quotaExceededError(resource: string, limit: number): LearningError {
-  return new LearningError('QUOTA_EXCEEDED', `Quota exceeded for ${resource} (limit: ${limit})`, {
-    resource,
-    limit,
-  })
-}
-
+/** Thrown by `LearningDomainRegistry.register` on a repeat id. */
 export function duplicateRegistrationError(registryName: string, id: string): LearningError {
   return new LearningError(
     'DUPLICATE_REGISTRATION',
@@ -89,18 +50,11 @@ export function duplicateRegistrationError(registryName: string, id: string): Le
   )
 }
 
+/** Thrown by `LearningDomainRegistry.get` for an id this build does not ship. */
 export function invalidRegistryIdError(registryName: string, id: string): LearningError {
   return new LearningError(
     'INVALID_REGISTRY_ID',
     `Unknown id in ${registryName}: "${id}"`,
     { registryName, id },
   )
-}
-
-export function persistenceError(message: string, details?: Record<string, unknown>): LearningError {
-  return new LearningError('PERSISTENCE_ERROR', message, details)
-}
-
-export function providerError(message: string, details?: Record<string, unknown>): LearningError {
-  return new LearningError('PROVIDER_ERROR', message, details)
 }
