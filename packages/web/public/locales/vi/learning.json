@@ -94,6 +94,7 @@
     "editTitle": "Sửa mục tiêu",
     "domain": "Lĩnh vực",
     "domainName": {
+      "general": "Học tổng quát",
       "language": "Học ngôn ngữ",
       "labor-law": "Luật lao động"
     },

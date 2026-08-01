@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { availableDomainIds } from '@reeeeecall/shared/learning'
 import {
   DECK_PRIORITY_LEVELS, DEFAULT_DECK_PRIORITY, importanceForPriority, priorityForImportance,
   type DeckPriority,
@@ -16,8 +17,12 @@ import { useDeckStore } from '../../stores/deck-store'
  *
  * The domain is a fixed choice, not free text: `domain_id` selects a registered domain
  * adapter, and a typo would create a goal no adapter can plan for.
+ *
+ * The list comes from the shared registry, NOT a local constant. It used to be
+ * `['language','labor-law']` hard-coded here and again in the mobile screen, so shipping a new
+ * subject meant editing both screens — while `LearningDomainRegistry`, which exists to prevent
+ * exactly that, had no importers at all.
  */
-const DOMAINS = ['language', 'labor-law'] as const
 
 export interface GoalFormValues {
   domainId: string
@@ -35,8 +40,10 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
 }) {
   const { t } = useTranslation('learning')
   const { decks, fetchDecks } = useDeckStore()
+  // Whatever this build registered. Adding a domain is one entry in the shared catalog.
+  const domains = useMemo(() => availableDomainIds(), [])
 
-  const [domainId, setDomainId] = useState(goal?.domain_id ?? DOMAINS[0])
+  const [domainId, setDomainId] = useState(goal?.domain_id ?? availableDomainIds()[0])
   const [title, setTitle] = useState(goal?.title ?? '')
   const [dailyMinutes, setDailyMinutes] = useState(goal?.daily_minutes ?? 20)
   const [targetDate, setTargetDate] = useState(goal?.target_date ?? '')
@@ -102,8 +109,8 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
             disabled={!!goal}   // domain fixes which adapter plans the goal; changing it would invalidate its plans
             className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg cursor-pointer disabled:opacity-60"
           >
-            {DOMAINS.map((domain) => (
-              <option key={domain} value={domain}>{t(`form.domainName.${domain}`)}</option>
+            {domains.map((domain) => (
+              <option key={domain} value={domain}>{t(`form.domainName.${domain}`, { defaultValue: domain })}</option>
             ))}
           </select>
         </label>

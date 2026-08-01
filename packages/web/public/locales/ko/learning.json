@@ -94,6 +94,7 @@
     "editTitle": "목표 수정",
     "domain": "분야",
     "domainName": {
+      "general": "일반 학습",
       "language": "언어",
       "labor-law": "노동법"
     },

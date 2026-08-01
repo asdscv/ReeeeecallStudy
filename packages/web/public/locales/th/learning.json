@@ -94,6 +94,7 @@
     "editTitle": "แก้ไขเป้าหมาย",
     "domain": "สาขาวิชา",
     "domainName": {
+      "general": "การเรียนทั่วไป",
       "language": "เรียนภาษา",
       "labor-law": "กฎหมายแรงงาน"
     },

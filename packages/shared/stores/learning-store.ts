@@ -26,6 +26,7 @@ import {
 } from '../lib/learning-card-sources'
 import type { UserCardProgress } from '../lib/srs-access'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
+import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card, LayoutItem, TemplateField } from '../types/database'
 
@@ -870,13 +871,23 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         acceptedCardIds,
       })
 
+      // The goal's domain decides the plan shape. This call used to pass neither, so every
+      // learner got `DEFAULT_MIX` regardless of what they said they were studying and the
+      // adapters' `defaultPlanMix` / `supportedActivityTypes` had no production caller at all.
+      //
+      // Both are `undefined` for a domain this build does not ship — a goal row can name any
+      // non-empty string — and `buildDailyPlan` reads that as "use the defaults", so an
+      // unrecognised domain still gets a plan instead of an empty one.
       const output = buildDailyPlan({
         goal: toDomainGoal(goal, userId),
         candidates,
         budgetMinutes: goal.daily_minutes,
+        activityMix: activityMixForDomain(goal.domain_id),
         now: ctx.now,
         timezone: ctx.timezone,
         algorithmVersion: DAILY_PLANNER_VERSION,
+      }, {
+        supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
       })
       if (output.items.length === 0) {
         set({ planBlockedReason: 'no_candidates' })

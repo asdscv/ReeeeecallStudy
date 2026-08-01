@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
+import { availableDomainIds } from '@reeeeecall/shared/learning'
 import {
   DECK_PRIORITY_LEVELS, DEFAULT_DECK_PRIORITY, importanceForPriority, type DeckPriority,
 } from '@reeeeecall/shared/lib/learning-deck-priority'
@@ -24,7 +25,14 @@ import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
  * a typo would create a goal no adapter can plan for. Archived goals are not listed — the
  * RPCs reject them, so listing one would only offer dead actions.
  */
-const DOMAINS = ['language', 'labor-law'] as const
+/**
+ * Domains come from the shared registry, not a local constant.
+ *
+ * This was `['language','labor-law']` hard-coded here AND in the web goal form, so shipping a
+ * new subject meant editing both — while `LearningDomainRegistry`, built to prevent exactly
+ * that, had no importers. One entry in the shared catalog now reaches both screens.
+ */
+const DOMAINS = availableDomainIds()
 
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
@@ -176,7 +184,7 @@ export function LearningGoalsScreen() {
                     <Text style={[theme.typography.caption, {
                       color: selected ? theme.colors.primary : theme.colors.textSecondary,
                     }]}>
-                      {selected ? '\u2713 ' : ''}{t(`form.domainName.${domain}`)}
+                      {selected ? '\u2713 ' : ''}{t(`form.domainName.${domain}`, { defaultValue: domain })}
                     </Text>
                   </TouchableOpacity>
                 )
@@ -351,7 +359,10 @@ const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 48 },
   card: { padding: 12, borderRadius: 12, borderWidth: 1 },
   headerLink: { minHeight: 32, paddingHorizontal: 6, justifyContent: 'center' },
-  chipRow: { flexDirection: 'row', gap: 6, marginTop: 6 },
+  // `flexWrap` because the row is now as long as the registry, not fixed at two. Without it a
+  // third domain pushes the last chip off-screen — worse in the locales with the longest names
+  // (id "Hukum ketenagakerjaan", th "การเรียนทั่วไป"), which is where nobody would look.
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
   chip: {
     paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
     justifyContent: 'center',
