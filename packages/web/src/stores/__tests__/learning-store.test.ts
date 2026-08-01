@@ -82,6 +82,10 @@ function cardRow(id: string) {
   }
 }
 
+/** A deck row as `generatePlan` reads it, to decide where the SRS state lives. */
+const deckRow = (over: Record<string, unknown> = {}) =>
+  ({ id: 'deck-1', user_id: 'user-1', share_mode: null, source_owner_id: null, ...over })
+
 beforeEach(() => {
   vi.clearAllMocks()
   tableResults = {}
@@ -90,6 +94,11 @@ beforeEach(() => {
     const next = pending && pending.length > 0 ? pending.shift() : { data: [], error: null }
     return q(next)
   })
+  // `generatePlan` reads `decks` to decide whether a card's schedule is embedded or lives in
+  // `user_card_progress`. Default to an OWNED deck so the tests below — which are about save
+  // limits, conflicts and concurrency, not about SRS sourcing — keep reading as they did.
+  // The sourcing behaviour has its own tests, which queue this explicitly.
+  queue('decks', { data: [deckRow()], error: null })
   mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
   useLearningStore.getState().reset()
 })
@@ -206,6 +215,58 @@ describe('generatePlan', () => {
     // The UI renders the stored plan, not the in-memory planner output.
     expect(useLearningStore.getState().plan?.id).toBe('plan-1')
     expect(useLearningStore.getState().planItems).toHaveLength(1)
+  })
+
+  // ── where a card's schedule is read from ──────────────────────────────────
+  //
+  // On a subscribed or official deck the `cards` row holds the PUBLISHER's SRS; the learner's
+  // own lives in `user_card_progress`. The planner read `cards` for both, so in production —
+  // where all 376,095 official cards carry `interval_days = 0` and `last_reviewed_at = NULL` —
+  // every memory feature saw the same no-evidence value and every card scored identically.
+
+  it('reads a subscribed deck\'s schedule from user_card_progress, not the publisher\'s row', async () => {
+    tableResults = {}   // this test owns the whole read sequence
+    queue('decks', { data: [deckRow({ user_id: 'publisher' })], error: null })
+    queue('user_card_progress', {
+      data: [{
+        id: 'p1', user_id: 'user-1', card_id: 'card-1', deck_id: 'deck-1',
+        srs_status: 'review', ease_factor: 2.5, interval_days: 12, repetitions: 4,
+        next_review_at: '2026-07-30T00:00:00.000Z', last_reviewed_at: '2026-07-18T00:00:00.000Z',
+        srs_revision: 3, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-07-18T00:00:00.000Z',
+      }],
+      error: null,
+    })
+    // The publisher's row: never studied. This is what the planner used to read.
+    queue('cards', {
+      data: [{ ...cardRow('card-1'), user_id: 'publisher', interval_days: 0, last_reviewed_at: null, next_review_at: null }],
+      error: null,
+    })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    const ok = await useLearningStore.getState().generatePlan(
+      goalWithDecks([{ deck_id: 'deck-1', importance: 0.5 }]), CTX)
+
+    expect(ok).toBe(true)
+    // It asked the progress table at all — the read that did not exist before.
+    expect(mockFrom.mock.calls.map(([t]) => t)).toContain('user_card_progress')
+    // And the plan is built from the LEARNER's schedule: a 12-day interval last reviewed on the
+    // 18th yields a real memory estimate, where the publisher's row yields none.
+    const [, args] = mockRpc.mock.calls.find(([name]) => name === 'save_daily_plan') ?? []
+    expect((args as { p_items: unknown[] }).p_items).toHaveLength(1)
+  })
+
+  it('does not ask the progress table for a deck the learner owns', async () => {
+    tableResults = {}
+    queue('decks', { data: [deckRow({ user_id: 'user-1' })], error: null })
+    queue('cards', { data: [cardRow('card-1')], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    await useLearningStore.getState().generatePlan(
+      goalWithDecks([{ deck_id: 'deck-1', importance: 0.5 }]), CTX)
+
+    expect(mockFrom.mock.calls.map(([t]) => t)).not.toContain('user_card_progress')
   })
 
   it('maps the save-limit failure to LIMIT_EXCEEDED so the UI can say why', async () => {
