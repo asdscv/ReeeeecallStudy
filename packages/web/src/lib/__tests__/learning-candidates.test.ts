@@ -46,7 +46,7 @@ function card(over: Partial<Card> & { id: string }): Card {
 function log(over: Partial<CandidateStudyLog> & { card_id: string }): CandidateStudyLog {
   return {
     card_id: over.card_id,
-    rating: 'rating' in over ? (over.rating as number | null) : 3,
+    rating: 'rating' in over ? (over.rating as string | number | null) : 3,
     review_duration_ms: 'review_duration_ms' in over ? (over.review_duration_ms as number | null) : 5_000,
     studied_at: over.studied_at ?? '2026-07-30T00:00:00.000Z',
   }
@@ -95,8 +95,13 @@ describe('recentFailureFor', () => {
     expect(recentFailureFor(logs)).toBeCloseTo(0.4, 6)
   })
 
-  it('counts Again and Hard as failures, Good and Easy as not', () => {
-    expect(recentFailureFor([1, 2].map((r) => log({ card_id: 'c1', rating: r })))).toBe(1)
+  it('grades Hard between a lapse and a success rather than calling it a failure', () => {
+    // Changed deliberately from "hard counts as a failure". The scheduler INCREASES the
+    // interval on `hard` (srs.ts review phase: ×1.2), so scoring it 1 would have the planner
+    // and the scheduler disagree about the same event; scoring it 0 would erase the only
+    // signal separating a card barely recalled from one known cold.
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'hard' })])).toBe(0.5)
+    expect(recentFailureFor([1, 2].map((r) => log({ card_id: 'c1', rating: r })))).toBe(0.75)
     expect(recentFailureFor([3, 4].map((r) => log({ card_id: 'c1', rating: r })))).toBe(0)
   })
 
@@ -105,6 +110,48 @@ describe('recentFailureFor', () => {
     // not keep a since-mastered card at the top of the plan forever.
     const logs = [3, 3, 3, 3, 3, 1].map((rating) => log({ card_id: 'c1', rating }))
     expect(recentFailureFor(logs)).toBe(0)
+  })
+
+  // ── the TEXT vocabulary the database actually stores ───────────────────────
+  //
+  // `study_logs.rating` is TEXT (CHECK constraint, mig 071). This interface declared it
+  // `number | null` and the store cast the rows to match, so the old `typeof === 'number'`
+  // filter was false for every row production has ever held: a 0.25-weight feature returned
+  // its no-evidence constant 0.3 for a card being failed every single day, and nothing in the
+  // type system or the tests said so.
+
+  it('reads the SRS text ratings production actually stores', () => {
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'again' })])).toBe(1)
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'good' })])).toBe(0)
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'easy' })])).toBe(0)
+  })
+
+  it('reads the non-SRS study modes too', () => {
+    // sequential_review says known/unknown; cramming says got_it/missed (migs 035, 071).
+    // These are the only ratings a learner using those modes ever produces.
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'unknown' })])).toBe(1)
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'missed' })])).toBe(1)
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'known' })])).toBe(0)
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'got_it' })])).toBe(0)
+  })
+
+  it('does not let browse events dilute the failures they are mixed with', () => {
+    // `next`/`viewed` are navigation, not judgement. Averaging them in as zeros would read
+    // as clean successes; keeping them in the window would push the real lapse out of it.
+    const logs = ['next', 'viewed', 'next', 'viewed', 'next', 'again']
+      .map((rating) => log({ card_id: 'c1', rating }))
+    expect(recentFailureFor(logs)).toBe(1)
+  })
+
+  it('treats an unrecognized rating as no evidence, never as a success', () => {
+    // A rating added by a future migration must not quietly lower the priority of a card the
+    // learner is failing — which is what counting it as 0 would do.
+    expect(recentFailureFor([log({ card_id: 'c1', rating: 'suspended_by_v3' })])).toBe(0.3)
+    expect(recentFailureFor([log({ card_id: 'c1', rating: '' })])).toBe(0.3)
+    expect(recentFailureFor([
+      log({ card_id: 'c1', rating: 'suspended_by_v3' }),
+      log({ card_id: 'c1', rating: 'again' }),
+    ])).toBe(1)
   })
 })
 
@@ -174,13 +221,13 @@ describe('buildCandidatesFromCards', () => {
     const cards = [card({ id: 'c1' }), card({ id: 'c2' })]
     const recentLogs = [
       // c1: six logs, the OLDEST is the failure → outside the window once sorted
-      log({ card_id: 'c1', rating: 1, studied_at: '2026-01-01T00:00:00.000Z' }),
-      ...[3, 3, 3, 3, 3].map((rating, i) => log({
+      log({ card_id: 'c1', rating: 'again', studied_at: '2026-01-01T00:00:00.000Z' }),
+      ...['good', 'good', 'good', 'good', 'good'].map((rating, i) => log({
         card_id: 'c1', rating, studied_at: `2026-07-${20 + i}T00:00:00.000Z`,
       })),
-      // c2: both logs are failures
-      log({ card_id: 'c2', rating: 1 }),
-      log({ card_id: 'c2', rating: 2 }),
+      // c2: both logs are outright lapses
+      log({ card_id: 'c2', rating: 'again' }),
+      log({ card_id: 'c2', rating: 'unknown' }),
     ]
     const [c1, c2] = buildCandidatesFromCards({ cards, recentLogs, deckImportance: {}, now: NOW })
     expect(c1.recentFailure).toBe(0)

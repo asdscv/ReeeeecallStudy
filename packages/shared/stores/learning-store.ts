@@ -690,6 +690,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       }
 
       const since = new Date(Date.parse(ctx.now) - LOG_WINDOW_DAYS * 86_400_000).toISOString()
+      // `.returns` rather than a cast at the call site: the cast is what let `rating` be
+      // declared `number` while the column is TEXT, which silently pinned `recentFailure` to
+      // its no-evidence constant. If the columns and the interface disagree again, this line
+      // is where the compiler says so.
       const { data: logRows, error: logErr } = await supabase
         .from('study_logs')
         .select('card_id, rating, review_duration_ms, studied_at')
@@ -697,6 +701,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         .gte('studied_at', since)
         .order('studied_at', { ascending: false })
         .limit(LOG_ROW_LIMIT)
+        .returns<CandidateStudyLog[]>()
       if (logErr) throw logErr
 
       const deckImportance: Record<string, number> = {}
@@ -718,7 +723,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
 
       const candidates = buildCandidatesFromCards({
         cards,
-        recentLogs: (logRows ?? []) as CandidateStudyLog[],
+        recentLogs: logRows ?? [],
         deckImportance,
         now: ctx.now,
         acceptedCardIds,
