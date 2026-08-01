@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { buildRemediationPrompt, parseRemediationRefs, validateRemediationResult } from '../../../../../supabase/functions/_shared/ai-remediation.ts'
+import {
+  buildRemediationPrompt, parseRemediationRefs, validateRemediationResult,
+  REMEDIATION_ACTIONS, SERVED_REMEDIATION_ACTIONS,
+} from '../../../../../supabase/functions/_shared/ai-remediation.ts'
 
 const id = '11111111-1111-4111-8111-111111111111'
 
@@ -11,8 +14,39 @@ describe('AI remediation contracts', () => {
     expect(parseRemediationRefs({ action: 'hint' })).toBeNull()
   })
 
+  // ── which actions this server will actually run ───────────────────────────
+  //
+  // This was previously enforced ONLY by a client type alias, which constrains our UI and
+  // nothing about the request an authenticated caller can POST.
+  it('refuses an action it cannot perform honestly, before any wallet is touched', () => {
+    // Every one of these is in the protocol vocabulary and passes the SQL allowlists, so the
+    // edge function is the only thing standing between them and a charged, invented answer.
+    for (const action of ['compare', 'evaluate', 'generate', 'recommend']) {
+      expect(parseRemediationRefs({ action, goalId: id }), action).toBeNull()
+    }
+  })
+
+  it('serves exactly the two actions an attempt can ground', () => {
+    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'hint'])
+    for (const action of SERVED_REMEDIATION_ACTIONS) {
+      expect(parseRemediationRefs({ action, goalId: id }), action).not.toBeNull()
+    }
+  })
+
+  it('keeps the served list a strict subset of the protocol vocabulary', () => {
+    // The SQL allowlists (reserve/persist) accept all six by design — they are the protocol
+    // layer. A served action outside that set would be refused by the database after being
+    // charged, which is the worst of both.
+    for (const action of SERVED_REMEDIATION_ACTIONS) {
+      expect(REMEDIATION_ACTIONS, action).toContain(action)
+    }
+    expect(SERVED_REMEDIATION_ACTIONS.length).toBeLessThan(REMEDIATION_ACTIONS.length)
+  })
+
   it('requires source grounding for labor law', () => {
-    const refs = parseRemediationRefs({ action: 'compare', goalId: id })!
+    // Was written against `compare`, which the server no longer serves. Grounding is
+    // action-independent, so the assertion is unchanged — only the action it rides on.
+    const refs = parseRemediationRefs({ action: 'explain', goalId: id })!
     const prompt = buildRemediationPrompt(refs, { goal: { domain_id: 'labor-law' }, activity: null, attempt: null, cards: [], concepts: [], sources: [{ id, title: 'Act', citation: '§1' }] })
     expect(prompt.requireGrounding).toBe(true)
     expect(prompt.systemPrompt).toContain('Never invent source IDs')

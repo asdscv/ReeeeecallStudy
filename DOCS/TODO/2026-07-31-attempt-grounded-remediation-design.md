@@ -342,12 +342,29 @@ even though its Tests 6 and 8 read `Learning*.tsx` and so can break from a scree
 It is **now wired into CI** as a step of the `unit-tests` job, so this is no longer something a
 future PR has to remember.
 
-### 11.5 The constraint that still holds
+### 11.5 The constraint that still holds — and that was NOT actually enforced
 
 `compare` and `evaluate` remain unreachable, by design (§2): attempts store
 `{ self_rated: score }`, so there is no learner text to compare or grade. No string on either
 platform says or implies the AI read an answer the learner wrote, and the prompt forbids the
 model from claiming it.
+
+**Correction (2026-08-01).** When this was written the constraint was enforced *only* by the
+client type alias `RemediationAction = 'explain' | 'hint'`. That constrains our own UI and
+nothing about the request an authenticated caller can POST: `parseRemediationRefs` accepted all
+six actions, and both SQL allowlists (`168:43`, `178:62`) accept all six. So `action: 'compare'`
+reserved against the learner's wallet, called the model, and returned a comparison against an
+answer that does not exist — invented, and charged for.
+
+Fixed by `SERVED_REMEDIATION_ACTIONS` in `supabase/functions/_shared/ai-remediation.ts`, checked
+in `parseRemediationRefs` before the reserve. The SQL allowlists stay wide on purpose: they are
+the protocol layer, and narrowing them would cost a migration for no extra guarantee once the
+edge function refuses.
+
+The same pass fixed `activitiesForLegacyCard`, which set `expectedResponse` to the FRONT when it
+could not find a back — making the expected answer identical to the question. It now returns
+`null`. Nothing grades against it today, which is exactly why it needed pinning before something
+does.
 
 ### 11.6 One defect survived the review that found its sibling — `a8d054c`
 
