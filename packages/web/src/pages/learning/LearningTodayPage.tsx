@@ -50,9 +50,25 @@ const ATTEMPT_ROWS = 10
  * The labels say what the model produces ("AI explanation" / "Study hint"), never that it read
  * an answer, because these two are grounded in the score and the card.
  */
-const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; labelKey: string }> = [
-  { action: 'explain', labelKey: 'enrichment.action.explain' },
-  { action: 'hint', labelKey: 'enrichment.action.hint' },
+const REMEDIATION_ACTIONS: ReadonlyArray<{
+  action: RemediationAction
+  labelKey: string
+  /**
+   * Whether this action can be honestly offered for a given attempt.
+   *
+   * Per-action rather than one shared condition, because `compare` has a premise the other two
+   * do not: it needs the learner's own words. The server refuses an ungrounded compare, so a
+   * button that spends a request to earn a refusal is worse than no button at all.
+   */
+  offeredFor: (attempt: AttemptRow) => boolean
+}> = [
+  { action: 'explain', labelKey: 'enrichment.action.explain', offeredFor: () => true },
+  { action: 'hint', labelKey: 'enrichment.action.hint', offeredFor: () => true },
+  {
+    action: 'compare',
+    labelKey: 'enrichment.action.compare',
+    offeredFor: (attempt) => attemptTypedAnswer(attempt) !== null,
+  },
 ]
 
 /** Self-rating choices for a legacy recall item (evaluator_type = self_rate). */
@@ -323,7 +339,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
                 {pending && (
                   <span className="text-xs text-content-tertiary">{t('enrichment.requesting')}</span>
                 )}
-                {remediable && REMEDIATION_ACTIONS.map(({ action, labelKey }) => (
+                {remediable && REMEDIATION_ACTIONS.filter(({ offeredFor }) => offeredFor(attempt)).map(({ action, labelKey }) => (
                   <button
                     key={action}
                     type="button"

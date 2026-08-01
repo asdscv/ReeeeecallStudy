@@ -293,9 +293,16 @@ export interface EnrichmentSource {
   id?: string
 }
 
-/** Actions the Phase 3 UI offers. The server supports more (compare / generate /
- *  evaluate / recommend); those need context this screen does not have yet. */
-export type RemediationAction = 'explain' | 'hint'
+/**
+ * Actions the UI offers. Must stay a subset of `SERVED_REMEDIATION_ACTIONS` on the server —
+ * that list, not this one, is what actually gates a charge.
+ *
+ * `compare` is offered ONLY on an attempt that carries the learner's typed answer
+ * (`attemptTypedAnswer`), because the server refuses an ungrounded one and a button that spends
+ * a request to get a refusal is worse than no button. `evaluate` / `generate` / `recommend`
+ * remain unserved.
+ */
+export type RemediationAction = 'explain' | 'hint' | 'compare'
 
 /**
  * The price of one remediation, in micro-USD, plus the balance it comes out of.
@@ -318,6 +325,8 @@ export type EnrichmentErrorCode =
   | 'INSUFFICIENT_CREDITS'   // AI_INSUFFICIENT_CREDITS — 402, wallet empty
   | 'RATE_CAP'               // AI_RATE_CAP — 429, today's request cap
   | 'GROUNDING_REQUIRED'     // AI_GROUNDING_REQUIRED — refused rather than cite nothing
+  | 'COMPARE_NO_ANSWER'      // AI_COMPARE_NO_ANSWER — nothing typed to compare; the learner can fix this
+  | 'COMPARE_NO_REFERENCE'   // AI_COMPARE_NO_REFERENCE — the card never declared an answer field
   | 'INVALID_RESULT'         // AI_INVALID_RESULT — model returned something unusable
   | 'PROVIDER_ERROR'         // AI_PROVIDER_ERROR / AI_PROVIDER_AUTH
   | 'NOT_CONFIGURED'         // AI_NOT_CONFIGURED — no provider key on this deployment
@@ -333,6 +342,8 @@ function toEnrichmentError(e: unknown): EnrichmentErrorCode {
     case 'AI_INSUFFICIENT_CREDITS': return 'INSUFFICIENT_CREDITS'
     case 'AI_RATE_CAP': return 'RATE_CAP'
     case 'AI_GROUNDING_REQUIRED': return 'GROUNDING_REQUIRED'
+    case 'AI_COMPARE_NO_ANSWER': return 'COMPARE_NO_ANSWER'
+    case 'AI_COMPARE_NO_REFERENCE': return 'COMPARE_NO_REFERENCE'
     case 'AI_INVALID_RESULT': return 'INVALID_RESULT'
     case 'AI_PROVIDER_ERROR':
     case 'AI_PROVIDER_AUTH': return 'PROVIDER_ERROR'

@@ -126,7 +126,8 @@
     "costHint": "지갑의 AI 크레딧을 사용합니다",
     "action": {
       "explain": "AI 설명",
-      "hint": "학습 힌트"
+      "hint": "학습 힌트",
+      "compare": "내 답과 비교"
     },
     "quote": "요청당 약 {{price}} · 잔액 {{balance}}",
     "groundedHint": "카드가 아니라 이 시도에 맞춰 답합니다",
@@ -148,7 +149,9 @@
       "NOT_CONFIGURED": "이 서버에서는 AI 생성이 활성화되지 않았습니다.",
       "PROVIDER_ERROR": "AI 서비스에 문제가 있었습니다. 다시 시도해 주세요.",
       "RATE_CAP": "오늘의 AI 요청 한도를 모두 썼습니다. 내일 다시 시도해 주세요.",
-      "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요."
+      "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요.",
+      "COMPARE_NO_ANSWER": "먼저 답을 입력해 주세요 — 비교할 내용이 아직 없습니다.",
+      "COMPARE_NO_REFERENCE": "이 카드는 어느 필드가 정답인지 지정하지 않아, 비교할 기준이 없습니다."
     }
   },
   "insights": {

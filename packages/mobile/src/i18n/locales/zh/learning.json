@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "对比我的答案",
       "explain": "AI 解释",
       "hint": "学习提示"
     },
@@ -9,6 +10,8 @@
     "discard": "丢弃",
     "error": {
       "BAD_REQUEST": "请求无效。",
+      "COMPARE_NO_ANSWER": "请先写下你的答案——目前还没有可对比的内容。",
+      "COMPARE_NO_REFERENCE": "这张卡片没有标明哪个字段是答案，因此没有可对比的基准。",
       "FORBIDDEN": "你没有访问该卡片的权限。",
       "GROUNDING_REQUIRED": "未找到可引用的来源，为避免编造内容已拒绝回答。",
       "INSUFFICIENT_CREDITS": "AI 额度不足，请充值后继续。",

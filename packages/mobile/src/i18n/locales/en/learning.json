@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "Compare my answer",
       "explain": "AI explanation",
       "hint": "Study hint"
     },
@@ -9,6 +10,8 @@
     "discard": "Discard",
     "error": {
       "BAD_REQUEST": "That request was not valid.",
+      "COMPARE_NO_ANSWER": "Write your answer first — there is nothing to compare yet.",
+      "COMPARE_NO_REFERENCE": "This card does not mark which field is the answer, so there is nothing to compare against.",
       "FORBIDDEN": "You don't have access to that card.",
       "GROUNDING_REQUIRED": "No citable source was found, so the answer was refused rather than made up.",
       "INSUFFICIENT_CREDITS": "Not enough AI credits. Top up to continue.",

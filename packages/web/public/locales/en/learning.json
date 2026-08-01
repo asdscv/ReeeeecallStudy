@@ -126,7 +126,8 @@
     "costHint": "Uses AI credits from your wallet",
     "action": {
       "explain": "AI explanation",
-      "hint": "Study hint"
+      "hint": "Study hint",
+      "compare": "Compare my answer"
     },
     "quote": "About {{price}} per request · {{balance}} left",
     "groundedHint": "Answers this attempt, not just the card",
@@ -148,7 +149,9 @@
       "NOT_CONFIGURED": "AI generation is not enabled on this server.",
       "PROVIDER_ERROR": "The AI service failed. Please try again.",
       "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
-      "UNKNOWN": "Something went wrong. Please try again."
+      "UNKNOWN": "Something went wrong. Please try again.",
+      "COMPARE_NO_ANSWER": "Write your answer first — there is nothing to compare yet.",
+      "COMPARE_NO_REFERENCE": "This card does not mark which field is the answer, so there is nothing to compare against."
     }
   },
   "insights": {

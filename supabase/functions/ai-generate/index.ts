@@ -24,7 +24,8 @@ import {
 } from '../_shared/ai-prompts.ts'
 import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
 import { opsGate } from '../_shared/ops-gate.ts'
-import { buildRemediationPrompt, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
+import { buildRemediationPrompt, compareGroundingError, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
+import { resolveCardAnswerFaces } from '../_shared/card-answer.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
 // see _shared/ai-providers.ts. Switching provider/model needs no code change.
@@ -422,7 +423,7 @@ Deno.serve(async (req) => {
           refs.goalId ? service.from('learning_goals').select('id, domain_id, title, target, settings').eq('id', refs.goalId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
           refs.activityId ? service.from('learning_activities').select('id, title, instructions, stimulus, expected_response, rubric, config, source_id, concept_id').eq('id', refs.activityId).maybeSingle() : Promise.resolve({ data: null, error: null }),
           refs.attemptId ? service.from('answer_attempts').select('id, card_id, activity_type, response_type, evaluator_type, response, normalized_score, evaluator_result, feedback, hints_used, duration_ms, created_at').eq('id', refs.attemptId).eq('user_id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
-          refs.cardIds.length ? service.from('cards').select('id, field_values, tags').in('id', refs.cardIds) : Promise.resolve({ data: [], error: null }),
+          refs.cardIds.length ? service.from('cards').select('id, template_id, field_values, tags').in('id', refs.cardIds) : Promise.resolve({ data: [], error: null }),
           refs.conceptIds.length ? service.from('learning_concepts').select('id, domain_id, title, description, source_id, metadata').in('id', refs.conceptIds) : Promise.resolve({ data: [], error: null }),
         ])
         const contextError = [goalResult, activityResult, attemptResult, cardsResult, conceptsResult].find((item) => item.error)?.error
@@ -468,11 +469,46 @@ Deno.serve(async (req) => {
         // order decides what survives. attemptHistory sits next to the attempt it belongs to
         // rather than last: `sources` carries arbitrary metadata and can be large, and the
         // evidence a grounded request was paid for must not be the first thing cut.
+        // The expected answer for `compare`, resolved SERVER-side from the template the card
+        // declares. Service-role reads it, so a subscriber whose RLS hides a non-default
+        // template still gets a grounded comparison — and the client never gets to say what the
+        // right answer is. `resolveCardAnswerFaces` returns null rather than guessing a field.
+        let expectedAnswer: { keys: string[]; text: string } | null = null
+        if (refs.action === 'compare' && attemptCardId) {
+          const answerCard = (cardsResult.data ?? []).find((row) => (row as { id: string }).id === attemptCardId) as
+            { id: string; template_id: string | null; field_values: Record<string, string> } | undefined
+          if (answerCard?.template_id) {
+            const templateResult = await service
+              .from('card_templates')
+              .select('id, fields, front_layout, back_layout')
+              .eq('id', answerCard.template_id)
+              .maybeSingle()
+            if (templateResult.error) console.error('[ai-generate] template read failed:', templateResult.error.message)
+            const faces = resolveCardAnswerFaces(templateResult.data as never, answerCard as never)
+            if (faces) {
+              const text = faces.referenceKeys.map((key) => answerCard.field_values[key].trim()).join(' / ')
+              if (text !== '') expectedAnswer = { keys: [...faces.referenceKeys], text }
+            }
+          }
+        }
+
+        // Refuse BEFORE the model call, and inside the try so `releaseJob` reverses the
+        // reservation. Charging for `compare` and returning a generic explanation is the exact
+        // dishonesty this action was held back to avoid, so it is never a silent degrade.
+        if (refs.action === 'compare') {
+          const ungrounded = compareGroundingError(attemptResult.data, expectedAnswer)
+          if (ungrounded) throw new Error(`COMPARE_UNGROUNDED:${ungrounded}`)
+        }
+
+        // `buildRemediationPrompt` serializes this whole object and TRUNCATES at 64KB, so key
+        // order decides what survives. The comparison's two sides sit next to the attempt, ahead
+        // of `sources`, which carries arbitrary metadata and can be large.
         const context = {
           goal: goalResult.data,
           activity: activityResult.data,
           attempt: attemptResult.data,
           attemptHistory,
+          expectedAnswer,
           cards: cardsResult.data ?? [],
           concepts,
           sources,
@@ -496,7 +532,7 @@ Deno.serve(async (req) => {
           p_request_fingerprint: JSON.stringify(refs).slice(0, 128),
           p_model_version: model.model,
           p_provider: model.provider,
-          p_prompt_version: 'remediation-v2',
+          p_prompt_version: 'remediation-v3',
           // Provenance (mig 178). `request_fingerprint` is a 128-char truncation and cannot be
           // relied on to say which failure this answer was about.
           p_attempt_id: refs.attemptId,
@@ -509,8 +545,16 @@ Deno.serve(async (req) => {
         const message = error instanceof Error ? error.message : 'UNKNOWN'
         console.error('[ai-generate] remediation failure:', message)
         await releaseJob(userId, meter.job_ref)
-        const status = message.startsWith('CONTEXT_LOAD') || message === 'GROUNDING_SOURCE_REQUIRED' ? 400 : 502
+        // An ungrounded compare is the CALLER's situation, not a provider fault: 400, and with
+        // its own code per reason. "Write your answer first" and "this card never marked which
+        // field is the answer" need different words — one the learner can act on, one they
+        // cannot — and collapsing them into a generic failure is how a support ticket is born.
+        const ungroundedCompare = message.startsWith('COMPARE_UNGROUNDED:')
+        const status = message.startsWith('CONTEXT_LOAD') || message === 'GROUNDING_SOURCE_REQUIRED'
+          || ungroundedCompare ? 400 : 502
         const code = message === 'GROUNDING_SOURCE_REQUIRED' ? 'AI_GROUNDING_REQUIRED'
+          : message === 'COMPARE_UNGROUNDED:NO_LEARNER_ANSWER' ? 'AI_COMPARE_NO_ANSWER'
+          : message === 'COMPARE_UNGROUNDED:NO_REFERENCE_ANSWER' ? 'AI_COMPARE_NO_REFERENCE'
           : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
           : message.startsWith('INVALID_REMEDIATION:') ? 'AI_INVALID_RESULT'
           : 'AI_PROVIDER_ERROR'
