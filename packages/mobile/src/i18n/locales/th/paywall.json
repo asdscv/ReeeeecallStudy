@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "พื้นที่จัดเก็บการ์ด",
-      "free": "1,000 ใบ",
-      "pro": "สูงสุด 100,000 ใบ"
+      "free": "{{count, number}} ใบ",
+      "pro": "สูงสุด {{count, number}} ใบ",
+      "freeUnknown": "พื้นที่จัดเก็บมีจำกัด",
+      "proUnknown": "พื้นที่จัดเก็บมากขึ้น"
     },
     "allModes": {
       "title": "โหมดเรียนทั้งหมด",
@@ -18,8 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI สร้างการ์ด",
-      "free": "10 ใบ/วัน",
-      "pro": "10 ใบ/วัน + เครดิต"
+      "free": "{{count, number}} ใบ/วัน · ซื้อเครดิตได้",
+      "pro": "เท่ากับ Free · ซื้อเครดิตได้",
+      "freeUnknown": "โควตาฟรีรายวัน · ซื้อเครดิตได้"
     },
     "premiumTts": {
       "title": "TTS พรีเมียม",

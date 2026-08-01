@@ -66,6 +66,40 @@ App Store Connect → **Business** / developer.apple.com/account 에서 아래�
 
 → 게이트 해소 후 `eas submit` 재시도하면 통과.
 
+### 2-2b. ⚠️ **이미 출시된 버전으로는 새 빌드를 올릴 수 없다** — TestFlight 가 조용히 멈추는 이유
+
+2026-07-31 확인: TestFlight 가 **빌드 46(6/30)에 한 달 넘게 멈춰 있었다.** 그동안 빌드
+48·49·50·51·52 를 만들고 `eas submit` 도 돌렸고, EAS 는 **`status=FINISHED`** 를 돌려줬다.
+그런데 **ASC 에는 46 이후 아무것도 없다.**
+
+원인은 자격증명도 계정 게이트도 아니다:
+
+```
+appStoreVersions:  1.0.3 → state = READY_FOR_SALE   (2026-06-30, 빌드 46 으로 출시)
+app.json:          expo.version = "1.0.3"           ← 48~52 전부 같은 값
+```
+
+**Apple 은 CFBundleShortVersionString(=`expo.version`)이 이미 READY_FOR_SALE 인 버전의 새
+빌드를 받지 않는다.** EAS 도 한 번은 이 에러를 그대로 보여줬다:
+
+```
+SUBMISSION_SERVICE_IOS_OLD_APP_VERSION
+  You've already submitted this version of the app.
+  Versions are identified by CFBundleShortVersionString from Info.plist (expo.version).
+```
+
+**`FINISHED` 를 성공으로 읽으면 안 된다.** EAS 의 `FINISHED` 는 transporter 업로드까지만
+뜻하고, 그 뒤 Apple 의 비동기 ingest 에서 버려지면 EAS 쪽엔 아무 흔적도 남지 않는다.
+Android(Play)는 `versionCode` 만 단조증가하면 되므로 `versionName` 을 재사용해도 통과한다 —
+그래서 **Android 만 정상으로 보이는 비대칭**이 생겼다.
+
+**규칙: 스토어에 나간 버전 문자열은 재사용 금지.** 출시했으면 `expo.version` 을 올리고 빌드한다.
+- 검증 명령(§부록 A): `GET /v1/apps/{id}/appStoreVersions` → `versionString` 이 `READY_FOR_SALE`
+  이면 그 값으로는 더 못 올린다.
+- `runtimeVersion.policy = "appVersion"` 이므로 **버전을 올리면 OTA 런타임도 갈라진다.**
+  기존 설치(런타임 `1.0.3`)는 새 버전(`1.0.4`) 채널의 OTA 를 받지 않는다 — 정상 동작이고,
+  구버전 사용자에게 급히 고칠 게 있으면 그쪽 런타임으로 따로 쏴야 한다.
+
 ### 2-3. 대안 — EAS 우회 직접 업로드 (altool)
 EAS가 원인을 안 보여줄 때, 빌드 IPA를 **App Store Connect에 직접 업로드**하며 **진짜 Apple 에러를 그 자리에서** 볼 수 있다. 단 **앱이 속한 팀(issuer `d27e6eb1`)의 유효한 ASC API 키**가 필요:
 1. ASC → Users and Access → **Integrations → App Store Connect API** → **새 Team 키(App Manager 역할)** 생성 → `.p8` 다운로드 + **Key ID** + 상단 **Issuer ID** 확보.
@@ -165,7 +199,16 @@ query($a:String!){ account{ byName(accountName:$a){ appStoreConnectApiKeys{ keyI
 ## 요약 체크리스트
 - [x] iOS: License Agreement 동의 → (EU면) DSA trader → 현지법 compliance → `eas submit ios` — **2026-06-30 통과(빌드 44→TestFlight)**
 - [x] Android: SA 키 생성(GCP) → **Play Console에서 SA 이메일 권한 부여** → `eas submit android` — **2026-06-30 통과(빌드 35→internal draft)**
-- [ ] 제출 성공 후: 각 콘솔에서 트랙 롤아웃 + 심사 (사용자 도달은 별도) ← **여기 남음**
+- [x] Android 내부테스트 롤아웃 — **2026-07-31 완료.** internal 트랙 release `1.0.3` versionCode `46`
+      을 Play API 로 `draft` → `completed` 커밋(릴리즈 노트 ko-KR/en-US 포함). 재조회로 확인:
+      `internal: completed | 1.0.3 (46) | codes=['46']`. 46 은 iOS 52 와 같은 커밋(`c557df6d`)이라
+      **결제 SDK(`react-native-purchases`) 포함 빌드**다.
+      → `releaseStatus: draft`(§3-4)는 **의도된 검토 게이트**이므로 그대로 둔다. 제출할 때마다
+      이 롤아웃 한 단계가 필요하다는 뜻이고, 이걸 잊으면 테스터에게 아무것도 안 간다.
+- [ ] iOS TestFlight — **버전 재사용 때문에 한 달간 막혀 있었다(§2-2b).** `expo.version` 을
+      `1.0.4` 로 올렸으므로 새 빌드부터 정상 업로드된다. 남은 일: 1.0.4 네이티브 빌드 → `eas submit`
+      → ASC 처리 완료 → 테스터 추가.
+- [ ] 제출 성공 후: 각 콘솔에서 트랙 롤아웃 + 심사 (사용자 도달은 별도)
   - iOS: TestFlight 처리 완료 후 테스터 추가 / App Store 정식출시는 스토어 등록정보+심사
   - Android: internal 트랙 **draft → rollout** (Play Console "출시 시작" 또는 Play API로 release status를 `completed`로 commit)
 

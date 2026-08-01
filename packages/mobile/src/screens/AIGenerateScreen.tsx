@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
 import { getAffordableCards, formatUsdMicro, formatCount, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
+import { defaultCardCount, MAX_CARD_COUNT } from '@reeeeecall/shared/lib/ai/card-count'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
@@ -229,12 +230,15 @@ export function AIGenerateScreen() {
     getAffordableCards().then(setAffordable).catch(() => {})
   }, [])
 
-  // Default the card count to today's REMAINING FREE cards (clamped to [1, 10]) so a default
-  // generation never overshoots the free daily allowance. Applies once the server-authoritative
-  // affordance loads and only until the user edits the count. (Parity with web ConfigStep.)
+  // Default the card count to today's REMAINING FREE cards so a default generation never
+  // overshoots the free daily allowance. The bound comes from the SERVER
+  // (`get_ai_generation_quota` returns remaining = free_limit − used), so raising the quota
+  // via admin_set_ai_free_quota is followed here without an OTA — see
+  // shared/lib/ai/card-count.ts. Applies once the server-authoritative affordance loads and
+  // only until the user edits the count. (Parity with web ConfigStep.)
   useEffect(() => {
     if (affordable && !countTouched.current && !useImage) {
-      setCardCount(String(Math.max(1, Math.min(10, affordable.free))))
+      setCardCount(String(defaultCardCount(affordable.free)))
     }
   }, [affordable, useImage])
 
@@ -578,7 +582,7 @@ export function AIGenerateScreen() {
                 }}
                 onBlur={() => {
                   const n = parseInt(cardCount) || 1
-                  setCardCount(String(Math.min(Math.max(n, 1), 100)))
+                  setCardCount(String(Math.min(Math.max(n, 1), MAX_CARD_COUNT)))
                 }}
                 keyboardType="number-pad"
                 placeholder={t('content.cardCountPlaceholder')}

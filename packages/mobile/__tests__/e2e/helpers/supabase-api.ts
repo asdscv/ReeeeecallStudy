@@ -7,30 +7,25 @@ const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ixdapelfik
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_4F7XKb_Cifh2rujOiyP9RQ_ZU3HjQsV'
 
 /**
- * Test-account credentials come from the environment, and there is no fallback.
+ * Test-account credentials come from the environment ONLY.
  *
- * There used to be one: a real account's email and password sat here as `||` literals, in a
- * PUBLIC repository, so anyone reading the file had a working prod login. A default that is a
- * live credential is not a convenience, it is a published secret — the web harness has always
- * required these vars and thrown without them, so this is the existing policy, not a new one.
+ * These used to carry a real account's email and password as literal defaults, committed to
+ * the repository — anyone with read access had a working login. The web harness already
+ * required the env vars and threw without them (`e2e/auth.setup.ts`); mobile was the outlier.
  *
- * Failing here is the point. A silent fallback would let the suite keep passing against a
- * shared account long after anyone noticed the vars were missing.
+ * Removing them from HEAD does not remove them from history, so the account's password has to
+ * be rotated separately.
  */
-function requiredEnv(name: string): string {
+function requireEnv(name: string): string {
   const value = process.env[name]
   if (!value) {
     throw new Error(
-      `[e2e] ${name} is not set. Export it (or put it in packages/mobile/.env.test, which is ` +
-      `gitignored) before running the E2E suite. There is deliberately no default: the previous ` +
-      `default was a real account's credentials committed to a public repo.`,
+      `Missing ${name}. E2E credentials are not committed — export E2E_TEST_EMAIL and ` +
+      'E2E_TEST_PASSWORD (or put them in packages/mobile/.env.test) before running the suite.',
     )
   }
   return value
 }
-
-const E2E_EMAIL = requiredEnv('E2E_TEST_EMAIL')
-const E2E_PASSWORD = requiredEnv('E2E_TEST_PASSWORD')
 
 let cachedToken: string | null = null
 let cachedUserId: string | null = null
@@ -44,7 +39,10 @@ async function getAuthToken(): Promise<{ token: string; userId: string }> {
       'apikey': SUPABASE_ANON_KEY,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email: E2E_EMAIL, password: E2E_PASSWORD }),
+    body: JSON.stringify({
+      email: requireEnv('E2E_TEST_EMAIL'),
+      password: requireEnv('E2E_TEST_PASSWORD'),
+    }),
   })
   const data = await res.json()
   cachedToken = data.access_token

@@ -1,22 +1,22 @@
 // ─────────────────────────────────────────────────────────────────────────
-// [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple 심사 리젝 대응 (Guideline 2.1(b))
-// 이 화면은 현재 네비게이션 스택에서 제거됨 (SettingsStack.tsx 참조).
-// 접근 경로 없음 → 코드는 유지하되 리뷰어가 UI로 도달할 수 없음.
-// 복원 단계:
-//   1) App Store Connect에 IAP products 등록 + review 제출
-//   2) RevenueCat 대시보드 세팅 + API 키 .env/EAS Secrets 등록
-//   3) SettingsStack.tsx 및 navigation/types.ts의 Paywall 라우트 주석 해제
-//   4) SettingsScreen.tsx의 Subscription 섹션 + plan 배지 주석 해제
-//   5) 이 파일은 추가 수정 불필요 (자체는 정상 동작)
+// 이 화면은 2026-04-15 Apple 심사 리젝(Guideline 2.1(b)) 대응으로 한때 스택에서
+// 빠져 있었으나, 지금은 **복원되어 도달 가능하다** — SettingsStack.tsx 가 Paywall
+// 라우트를 등록하고 SettingsScreen 이 두 곳에서 navigate('Paywall') 한다.
+// 남은 게이트는 런타임 하나뿐: SUBSCRIPTION_UI_ENABLED
+// (= OWNER_GO_LIVE_SWITCH && RevenueCat SDK 존재). 꺼져 있으면 빈 화면.
+//
+// 즉 실기기 빌드에서 이 표는 **사용자에게 보이는 가격 고지**다. 여기 숫자가 틀리면
+// 결제 화면이 거짓말을 하는 것이므로, 카드 한도와 AI 무료 쿼터는 카피가 아니라
+// 서버에서 읽는다(아래 FEATURE_KEYS 주석 참조).
 // ─────────────────────────────────────────────────────────────────────────
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, Linking, Platform, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Screen, Button, ScreenHeader } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
-import { recordPurchaseConsent } from '../services/billing'
-import type { BillingProduct } from '../services/billing'
+import { recordPurchaseConsent, getPlanLimits } from '../services/billing'
+import type { BillingProduct, PlanLimits } from '../services/billing'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
@@ -39,9 +39,21 @@ const REFUND_REQUEST_URL = Platform.select({
 })
 
 // Feature comparison rows. Copy is i18n (paywall.json `features.*`, 8 locales) so the
-// paywall is translated; only the emoji + the i18n key live here. Values track the current
-// model (Free 1,000 cards / 10 AI cards a day; Pro 100,000 / 10 a day + credits).
+// paywall is translated; only the emoji + the i18n key live here.
+//
+// The two NUMERIC rows are interpolated from the server, not written into the copy:
+// `cardStorage` from card_limit_settings (free) and the product catalog (pro),
+// `aiGeneration` from ai_pricing_settings. Both are admin-settable — mig 154 made the
+// AI quota a setting and mig 177 put both behind an admin UI — so a literal in
+// paywall.json is a number that goes stale the first time someone uses that panel, on
+// the one screen whose job is telling a person what they are buying.
 const FEATURE_KEYS = ['cardStorage', 'allModes', 'aiGeneration', 'premiumTts', 'analytics', 'marketplace'] as const
+/**
+ * The CELLS whose copy carries a server number, and therefore need a `*Unknown` twin to fall
+ * back to. Per cell, not per row: `aiGeneration.pro` says "Same as Free", which needs no number
+ * and stays true under any quota — so it has nothing to fall back FROM.
+ */
+const NUMERIC_CELLS = new Set(['cardStorage.free', 'cardStorage.pro', 'aiGeneration.free'])
 const FEATURE_ICONS: Record<(typeof FEATURE_KEYS)[number], string> = {
   cardStorage: '🗂️',
   allModes: '🧠',
@@ -61,6 +73,21 @@ export function PaywallScreen() {
   // "used ⇒ non-refundable" rule to hold; see recordPurchaseConsent.
   const [consented, setConsented] = useState(false)
 
+  /**
+   * The free-tier numbers the comparison table quotes (mig 179).
+   *
+   * `undefined` = still reading, `null` = could not be read. The distinction matters: the
+   * screen already blocks on a spinner while the catalog loads, so folding this read into
+   * that same gate means the table is never painted with a number it is about to replace.
+   * A failed read falls through to the number-free copy, never to a guess.
+   */
+  const [planLimits, setPlanLimits] = useState<PlanLimits | null | undefined>(undefined)
+  useEffect(() => {
+    let cancelled = false
+    void getPlanLimits().then((limits) => { if (!cancelled) setPlanLimits(limits) })
+    return () => { cancelled = true }
+  }, [])
+
   // Start a store refund REQUEST. Deliberately never phrased as "refund issued":
   // Apple and Google decide, and our side only reconciles afterwards when their
   // webhook arrives.
@@ -77,13 +104,15 @@ export function PaywallScreen() {
     void Linking.openURL(REFUND_REQUEST_URL)
   }
 
-  // [SUBSCRIPTION-HIDDEN] belt-and-suspenders: the Paywall route is also removed
-  // from the navigation stack, but if ever reached while gated, render nothing.
+  // The route IS reachable, so this gate is the only thing standing between a reviewer and
+  // a purchase surface while the store side is not live. Render nothing rather than a table.
   if (!SUBSCRIPTION_UI_ENABLED) {
     return <Screen testID="paywall-screen"><View style={styles.center} /></Screen>
   }
 
-  if (loading) {
+  // One gate for both reads: a table painted with a placeholder that swaps to a real cap a
+  // moment later is a worse first impression than a spinner that resolves once.
+  if (loading || planLimits === undefined) {
     return (
       <Screen testID="paywall-screen">
         <View style={styles.center}>
@@ -121,6 +150,61 @@ export function PaywallScreen() {
   // products exist + their display metadata. Subscriptions render as pricing
   // buttons; the actual store charge is matched to a RevenueCat package by id.
   const subscriptionProducts = products.filter((p) => p.kind === 'subscription')
+
+  /**
+   * The Pro card cap = the highest cap any active subscription grants, which is what the
+   * "Pro" column of a Free-vs-Pro table means. Read from the catalog already in hand, so
+   * this costs no extra round trip and cannot disagree with the plan buttons below.
+   *
+   * `null` when the catalog did not load — the row then says what Pro does without
+   * naming a number, rather than inventing one.
+   */
+  const proCardLimit = subscriptionProducts.reduce<number | null>(
+    (best, p) => (p.cardLimit != null && (best === null || p.cardLimit > best) ? p.cardLimit : best),
+    null,
+  )
+
+  /**
+   * The interpolation values for the numeric CELLS, keyed by `<feature>.<column>`.
+   *
+   * A cell with no entry is called as `t(key, undefined)`, which is just `t(key)` — every
+   * static cell is untouched.
+   *
+   * `count` stays a real `number`: src/i18n registers an Intl-free `number` formatter
+   * (`formatCount`) because an ICU-less Hermes build has no `Intl`, and handing it a
+   * pre-formatted string would silently skip the grouping and render "100000".
+   *
+   * **The AI row's Pro cell carries no number.** A paid plan does not raise the AI quota —
+   * `_ai_free_cards_per_day()` takes no user argument, and a subscription grants `card_limit`
+   * only — so it says "Same as Free", which needs no interpolation and cannot go stale. Both
+   * cells also name credits, because credit packs are NOT plan-gated (`create_payment_intent`
+   * checks auth and an active product, nothing else): naming them under Pro alone would
+   * advertise an exclusivity that does not exist, which is the defect this row had.
+   */
+  type FeatureKey = (typeof FEATURE_KEYS)[number]
+  const counts: Record<string, { count: number }> = {}
+  if (planLimits) {
+    counts['cardStorage.free'] = { count: planLimits.freeCardLimit }
+    counts['aiGeneration.free'] = { count: planLimits.freeAiCardsPerDay }
+  }
+  if (proCardLimit !== null) counts['cardStorage.pro'] = { count: proCardLimit }
+
+  /**
+   * `features.<key>.<column>` interpolated when the number is known, `...Unknown` when it is
+   * not. The fallback copy is deliberately number-free ("Limited storage") rather than a
+   * hardcoded default: a stale-but-plausible figure on a purchase screen is the exact failure
+   * this screen's copy exists to avoid, and re-adding it as an error path would keep it.
+   *
+   * Static cells never take that branch — their copy has no placeholder and no `*Unknown`
+   * twin, so they render exactly as written.
+   */
+  const featureValue = (key: FeatureKey, column: 'free' | 'pro'): string => {
+    const cell = `${key}.${column}`
+    const opts = counts[cell]
+    if (opts) return t(`features.${cell}`, opts)
+    if (NUMERIC_CELLS.has(cell)) return t(`features.${cell}Unknown`)
+    return t(`features.${cell}`)
+  }
 
   const formatPrice = (product: BillingProduct, pkg: any): string => {
     // Prefer the store-localized price string when the IAP package is loaded
@@ -202,10 +286,10 @@ export function PaywallScreen() {
                 <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t(`features.${key}.title`)}</Text>
                 <View style={styles.comparisonRow}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                    Free: {t(`features.${key}.free`)}
+                    Free: {featureValue(key, 'free')}
                   </Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    Pro: {t(`features.${key}.pro`)}
+                    Pro: {featureValue(key, 'pro')}
                   </Text>
                 </View>
               </View>

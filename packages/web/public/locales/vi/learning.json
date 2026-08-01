@@ -20,11 +20,12 @@
     "item": {
       "study": "Học",
       "untitled": "(không có nội dung)",
-      "minutes": "~{{count, number}} phút",
+      "minutes": "~{{count, decimal}} phút",
       "recorded": "Đã ghi lại"
     },
     "reason": {
       "due": "Đến hạn ôn tập",
+      "memoryRisk": "Sắp quên",
       "recentFailure": "Trả lời sai gần đây",
       "slowResponse": "Trả lời chậm",
       "goalRelevance": "Liên quan đến mục tiêu",
@@ -46,7 +47,13 @@
       "known": "Đã biết",
       "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
     },
-    "insightsLink": "Phân tích"
+    "answer": {
+      "label": "Câu trả lời của bạn (không bắt buộc)",
+      "placeholder": "Nhập những gì bạn còn nhớ",
+      "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá."
+    },
+    "insightsLink": "Phân tích",
+    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này"
   },
   "goals": {
     "title": "Mục tiêu học tập",
@@ -78,7 +85,9 @@
       "authRequired": "Vui lòng đăng nhập lại.",
       "forbidden": "Bạn không có quyền truy cập.",
       "unknown": "Đã xảy ra lỗi. Vui lòng thử lại."
-    }
+    },
+    "deckCount_one": "{{count, number}} bộ thẻ",
+    "deckCount_other": "{{count, number}} bộ thẻ"
   },
   "form": {
     "createTitle": "Mục tiêu mới",
@@ -101,11 +110,19 @@
     "error": {
       "title": "Nhập tên mục tiêu (1–500 ký tự).",
       "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440."
+    },
+    "deckPriority": {
+      "label": "Mức ưu tiên",
+      "low": "Thấp",
+      "normal": "Bình thường",
+      "high": "Cao",
+      "hint": "Bộ thẻ ưu tiên cao sẽ xuất hiện trước khi ngày đã kín."
     }
   },
   "history": {
     "title": "Lần làm gần đây ({{count, number}})",
     "itemFallback": "Lần làm {{type}}",
+    "youWrote": "Bạn đã viết: {{text}}",
     "score": {
       "unknown": "Chưa có điểm"
     }
@@ -116,8 +133,11 @@
     "costHint": "Sử dụng tín dụng AI từ ví của bạn",
     "action": {
       "explain": "Giải thích AI",
-      "hint": "Gợi ý học tập"
+      "hint": "Gợi ý học tập",
+      "compare": "So với câu trả lời của tôi"
     },
+    "quote": "Khoảng {{price}} mỗi yêu cầu · số dư {{balance}}",
+    "groundedHint": "Trả lời cho lần làm này, không chỉ cho thẻ",
     "sources": "Nguồn",
     "noSources": "Câu trả lời này không dựa trên nguồn.",
     "empty": "Mô hình không trả về nội dung khả dụng.",
@@ -136,7 +156,9 @@
       "NOT_CONFIGURED": "Tạo nội dung AI chưa được bật trên máy chủ này.",
       "PROVIDER_ERROR": "Dịch vụ AI gặp sự cố. Vui lòng thử lại.",
       "RATE_CAP": "Bạn đã dùng hết giới hạn yêu cầu AI hôm nay. Hãy thử lại vào ngày mai.",
-      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại.",
+      "COMPARE_NO_ANSWER": "Hãy viết câu trả lời trước — chưa có gì để so sánh.",
+      "COMPARE_NO_REFERENCE": "Thẻ này không đánh dấu trường nào là đáp án, nên không có gì để đối chiếu."
     }
   },
   "insights": {
@@ -146,7 +168,7 @@
     "accuracy": "Độ chính xác",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
     "typicalTime": "Thời gian thường",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
     "weakTitle": "Cần xem lại",
     "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
@@ -157,7 +179,9 @@
     "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
     "noPlanItems": "Không có mục nào được lên kế hoạch",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập."
+    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
+    "attemptCount_one": "{{count, number}} lần làm",
+    "attemptCount_other": "{{count, number}} lần làm"
   },
   "recommend": {
     "title": "Gợi ý",

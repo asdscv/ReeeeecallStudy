@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react'
+import {
+  DECK_PRIORITY_LEVELS, DEFAULT_DECK_PRIORITY, importanceForPriority, priorityForImportance,
+  type DeckPriority,
+} from '@reeeeecall/shared/lib/learning-deck-priority'
 import { useTranslation } from 'react-i18next'
 import type { LearningGoalWithDecks, GoalDeckLink } from '../../stores/learning-store'
 import { useDeckStore } from '../../stores/deck-store'
@@ -39,6 +43,13 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   const [deckIds, setDeckIds] = useState<Set<string>>(
     new Set((goal?.decks ?? []).map((link) => link.deck_id)),
   )
+  // Kept separately from the selection so unchecking a deck and changing its mind does not
+  // silently reset the level the learner had already chosen for it.
+  const [deckPriority, setDeckPriority] = useState<Record<string, DeckPriority>>(
+    Object.fromEntries((goal?.decks ?? []).map((link) => [
+      link.deck_id, priorityForImportance(link.importance),
+    ])),
+  )
   const [localError, setLocalError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
@@ -68,10 +79,10 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
       title: trimmed,
       dailyMinutes,
       targetDate: targetDate || null,
-      // Importance is uniform in Phase 1: there is no product concept for weighting a
-      // deck yet, and inventing a hidden default other than the neutral 0.5 would tilt
-      // the planner for reasons the user never chose.
-      decks: [...deckIds].map((deck_id) => ({ deck_id, importance: 0.5 })),
+      decks: [...deckIds].map((deck_id) => ({
+        deck_id,
+        importance: importanceForPriority(deckPriority[deck_id] ?? DEFAULT_DECK_PRIORITY),
+      })),
     })
   }
 
@@ -137,15 +148,46 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
             {decks.length === 0 ? (
               <p className="text-xs text-content-tertiary">{t('form.noDecks')}</p>
             ) : decks.map((deck) => (
-              <label key={deck.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={deckIds.has(deck.id)}
-                  onChange={() => toggleDeck(deck.id)}
-                  className="cursor-pointer"
-                />
-                <span className="truncate">{deck.name}</span>
-              </label>
+              <div key={deck.id} className="flex items-center justify-between gap-2">
+                <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={deckIds.has(deck.id)}
+                    onChange={() => toggleDeck(deck.id)}
+                    className="cursor-pointer"
+                  />
+                  <span className="truncate">{deck.name}</span>
+                </label>
+                {/* Only for decks that are actually in the goal: a priority on a deck the
+                    learner has not chosen is a control with nothing to act on. */}
+                {deckIds.has(deck.id) && (
+                  <div
+                    role="radiogroup"
+                    aria-label={`${t('form.deckPriority.label')} — ${deck.name}`}
+                    className="flex shrink-0 gap-1"
+                  >
+                    {DECK_PRIORITY_LEVELS.map((level) => {
+                      const selected = (deckPriority[deck.id] ?? DEFAULT_DECK_PRIORITY) === level
+                      return (
+                        <button
+                          key={level}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          onClick={() => setDeckPriority((current) => ({ ...current, [deck.id]: level }))}
+                          className={`text-xs px-2 py-0.5 rounded border cursor-pointer ${
+                            selected
+                              ? 'border-primary text-primary'
+                              : 'border-border text-content-tertiary'
+                          }`}
+                        >
+                          {t(`form.deckPriority.${level}`)}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>

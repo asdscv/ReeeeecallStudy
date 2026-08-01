@@ -251,6 +251,24 @@
       "saved": "Saved ✓",
       "sandboxGrants": "Permitir que las compras sandbox otorguen créditos",
       "sandboxGrantsHint": "OFF: los eventos sandbox de RevenueCat se aceptan pero no otorgan nada. Actívalo solo para una prueba: las compras sandbox son gratuitas."
+    },
+    "levers": {
+      "title": "Palancas de crecimiento",
+      "desc": "Se aplica de inmediato, sin redespliegue. Cada campo se guarda por separado.",
+      "freeQuota": "Tarjetas de IA gratis por día",
+      "freeQuotaHint": "Tarjetas gratis por usuario y día. Los clientes siguen este valor del servidor.",
+      "cardCap": "Límite de tarjetas por cuenta",
+      "cardCapHint": "Crear o guardar tarjetas se bloquea por encima de este número.",
+      "countOfficial": "Contar las tarjetas de mazos oficiales en el límite",
+      "countOfficialHint": "Activado: las tarjetas de mazos oficiales suscritos también cuentan.",
+      "wonPerCredit": "Precio por crédito",
+      "wonPerCreditHint": "Debe coincidir con el precio del IAP / paquete de créditos.",
+      "targetMargin": "Margen objetivo (bps)",
+      "targetMarginHint": "Actualmente {{pct}}. Es un divisor en la fórmula de cobro, así que 10000 (=100%) no está permitido.",
+      "errRange": "Introduce un número entero entre {{min}} y {{max}}.",
+      "errNonNegative": "Introduce un número entero de 0 o más.",
+      "errMargin": "El margen debe ser como máximo {{max}} bps. 10000 (=100%) divide la fórmula por cero y no cobraría nada.",
+      "updated": "Último cambio — precios/cupo: {{ai}} · límite de tarjetas: {{cards}}"
     }
   },
   "billing": {

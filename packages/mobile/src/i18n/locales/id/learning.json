@@ -1,10 +1,17 @@
 {
   "enrichment": {
+    "action": {
+      "compare": "Bandingkan jawabanku",
+      "explain": "Penjelasan AI",
+      "hint": "Petunjuk belajar"
+    },
     "chargedNote": "Sudah dikenakan biaya — membuang tidak mengembalikan kredit.",
     "costHint": "Menggunakan kredit AI dari dompet Anda",
     "discard": "Buang",
     "error": {
       "BAD_REQUEST": "Permintaan tidak valid.",
+      "COMPARE_NO_ANSWER": "Tulis jawabanmu dulu — belum ada yang bisa dibandingkan.",
+      "COMPARE_NO_REFERENCE": "Kartu ini tidak menandai bidang mana yang jadi jawaban, jadi tidak ada pembandingnya.",
       "FORBIDDEN": "Anda tidak memiliki akses ke kartu ini.",
       "GROUNDING_REQUIRED": "Tidak ditemukan sumber yang dapat dikutip, sehingga jawaban ditolak alih-alih dikarang.",
       "INSUFFICIENT_CREDITS": "Kredit AI tidak cukup. Isi ulang untuk melanjutkan.",
@@ -16,15 +23,24 @@
       "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
     },
     "explainCta": "Jelaskan (kredit)",
+    "groundedHint": "Menjawab percobaan ini, bukan hanya kartunya",
     "keep": "Simpan",
     "later": "Putuskan nanti",
     "noSources": "Jawaban ini tidak berdasarkan sumber.",
+    "quote": "Sekitar {{price}} per permintaan · sisa {{balance}}",
     "requesting": "Menanyakan…",
     "sources": "Sumber"
   },
   "form": {
     "cancel": "Batal",
     "dailyMinutes": "Menit per hari",
+    "deckPriority": {
+      "high": "Tinggi",
+      "hint": "Dek berprioritas tinggi muncul lebih dulu saat harimu penuh.",
+      "label": "Prioritas",
+      "low": "Rendah",
+      "normal": "Normal"
+    },
     "decks": "Dek untuk dipelajari",
     "decksHint": "Rencana Anda dibangun dari kartu-kartu di dek ini.",
     "domain": "Bidang",
@@ -49,9 +65,20 @@
     "create": "Tujuan baru",
     "dailyMinutes": "{{count, number}} menit/hari",
     "deckCount": "{{count, number}} dek",
+    "deckCount_one": "{{count, number}} dek",
+    "deckCount_other": "{{count, number}} dek",
     "empty": {
       "body": "Buat tujuan untuk mulai mendapatkan rencana harian.",
       "title": "Belum ada tujuan"
+    },
+    "error": {
+      "authRequired": "Silakan masuk lagi.",
+      "conflict": "Perubahan itu tidak diizinkan untuk status tujuan saat ini.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "invalidInput": "Periksa nama tujuan dan menit harian.",
+      "limitExceeded": "Anda telah mencapai jumlah maksimum tujuan.",
+      "notFound": "Tujuan tersebut tidak ditemukan atau sudah diarsipkan.",
+      "unknown": "Terjadi kesalahan. Silakan coba lagi."
     },
     "noDecksWarning": "Belum ada dek yang dihubungkan — belum bisa membuat rencana.",
     "status": {
@@ -61,16 +88,32 @@
     },
     "title": "Tujuan belajar"
   },
+  "history": {
+    "itemFallback": "Percobaan {{type}}",
+    "score": {
+      "unknown": "Tanpa skor"
+    },
+    "title": "Percobaan terbaru ({{count, number}})",
+    "title_one": "Percobaan terbaru ({{count, number}})",
+    "title_other": "Percobaan terbaru ({{count, number}})",
+    "youWrote": "Kamu menulis: {{text}}"
+  },
   "insights": {
     "accuracy": "Akurasi",
     "adherence": "Kepatuhan rencana (14 hari)",
+    "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
+    "adherenceTitle": "Rencana harian (14 hari)",
     "attemptCount": "{{count, number}} percobaan",
+    "attemptCount_one": "{{count, number}} percobaan",
+    "attemptCount_other": "{{count, number}} percobaan",
     "attempts": "Percobaan (30 hari)",
     "cardFallback": "(kartu tidak ada di rencana hari ini)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Belum ada data",
+    "noPlanItems": "Tidak ada yang direncanakan",
     "notScoredYet": "Belum ada yang dinilai",
     "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
-    "seconds": "{{count, number}}d",
+    "seconds": "{{count, decimal}}d",
     "title": "Analisis pembelajaran",
     "typicalTime": "Waktu biasa",
     "weakEmpty": "Tidak ada yang tertinggal.",
@@ -91,6 +134,11 @@
     "title": "Rekomendasi"
   },
   "today": {
+    "answer": {
+      "label": "Jawaban kamu (opsional)",
+      "note": "Disimpan bersama percobaan ini. Tidak dinilai — penilaian tetap dari kamu.",
+      "placeholder": "Tulis apa yang kamu ingat"
+    },
     "budget": "{{count, number}} menit/hari",
     "empty": {
       "createGoal": "Buat tujuan",
@@ -98,26 +146,41 @@
       "noGoal": "Anda belum memiliki tujuan belajar yang aktif. Tujuan menentukan menit harian dan dek yang digunakan untuk perencanaan.",
       "nothingDue": "Tidak ada kartu yang perlu diulas hari ini di dek-dek ini."
     },
+    "error": {
+      "authRequired": "Silakan masuk lagi.",
+      "completedPlan": "Rencana yang sudah selesai tidak bisa ditimpa.",
+      "forbidden": "Anda tidak memiliki akses.",
+      "goalGone": "Tujuan tersebut tidak lagi tersedia.",
+      "invalidInput": "Rencana tidak bisa disimpan karena beberapa nilai di luar jangkauan.",
+      "limitExceeded": "Anda telah mencapai batas pembuatan ulang rencana hari ini. Coba lagi besok.",
+      "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
+    },
     "generate": "Buat rencana hari ini",
     "generating": "Membuat…",
     "insightsLink": "Analisis",
     "item": {
+      "minutes": "~{{count, decimal}} menit",
       "recorded": "Tercatat",
       "untitled": "(tidak ada teks)"
     },
     "manageGoals": "Kelola tujuan",
     "progress": "{{done, number}} dari {{total, number}} selesai",
     "rate": {
-      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
+      "again": "Tidak tahu",
+      "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan.",
+      "known": "Tahu",
+      "partial": "Ragu"
     },
     "reason": {
       "balanced": "Campuran seimbang",
       "due": "Waktunya mengulang",
       "goalRelevance": "Relevansi tujuan",
       "importance": "Tingkat penting",
+      "memoryRisk": "Hampir terlupakan",
       "recentFailure": "Baru saja salah",
       "slowResponse": "Lambat menjawab"
     },
+    "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini",
     "regenerate": "Buat ulang rencana",
     "regenerating": "Membuat ulang…",
     "title": "Rencana hari ini"

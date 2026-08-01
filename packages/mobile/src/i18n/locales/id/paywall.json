@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "Penyimpanan Kartu",
-      "free": "1.000 kartu",
-      "pro": "Hingga 100.000 kartu"
+      "free": "{{count, number}} kartu",
+      "pro": "Hingga {{count, number}} kartu",
+      "freeUnknown": "Penyimpanan terbatas",
+      "proUnknown": "Penyimpanan lebih besar"
     },
     "allModes": {
       "title": "Semua Mode Belajar",
@@ -18,8 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI Buat Kartu",
-      "free": "10 kartu/hari",
-      "pro": "10/hari + kredit"
+      "free": "{{count, number}} kartu/hari · kredit tersedia",
+      "pro": "Sama seperti Free · kredit tersedia",
+      "freeUnknown": "Kuota gratis harian · kredit tersedia"
     },
     "premiumTts": {
       "title": "TTS Premium",

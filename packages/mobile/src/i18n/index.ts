@@ -4,7 +4,7 @@ import { Platform, NativeModules } from 'react-native'
 import { localPrefs } from '../utils/local-prefs'
 // Dependency-free on purpose — imported during i18n init, long before initSupabase() runs,
 // so it must not drag in the Supabase client the way lib/ai/server-client would.
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount, formatDecimal } from '@reeeeecall/shared/lib/format-number'
 
 // ── Supported languages: to add a new language, add an entry below + locale folder ──
 
@@ -25,6 +25,7 @@ const resources = {
     update: require('./locales/en/update.json'),
     sharing: require('./locales/en/sharing.json'),
     'ai-generate': require('./locales/en/ai-generate.json'),
+    learning: require('./locales/en/learning.json'),
     wallet: require('./locales/en/wallet.json'),
   },
   ko: {
@@ -43,6 +44,7 @@ const resources = {
     update: require('./locales/ko/update.json'),
     sharing: require('./locales/ko/sharing.json'),
     'ai-generate': require('./locales/ko/ai-generate.json'),
+    learning: require('./locales/ko/learning.json'),
     wallet: require('./locales/ko/wallet.json'),
   },
   ja: {
@@ -61,6 +63,7 @@ const resources = {
     update: require('./locales/ja/update.json'),
     sharing: require('./locales/ja/sharing.json'),
     'ai-generate': require('./locales/ja/ai-generate.json'),
+    learning: require('./locales/ja/learning.json'),
     wallet: require('./locales/ja/wallet.json'),
   },
   zh: {
@@ -79,6 +82,7 @@ const resources = {
     update: require('./locales/zh/update.json'),
     sharing: require('./locales/zh/sharing.json'),
     'ai-generate': require('./locales/zh/ai-generate.json'),
+    learning: require('./locales/zh/learning.json'),
     wallet: require('./locales/zh/wallet.json'),
   },
   vi: {
@@ -97,6 +101,7 @@ const resources = {
     update: require('./locales/vi/update.json'),
     sharing: require('./locales/vi/sharing.json'),
     'ai-generate': require('./locales/vi/ai-generate.json'),
+    learning: require('./locales/vi/learning.json'),
     wallet: require('./locales/vi/wallet.json'),
   },
   th: {
@@ -115,6 +120,7 @@ const resources = {
     update: require('./locales/th/update.json'),
     sharing: require('./locales/th/sharing.json'),
     'ai-generate': require('./locales/th/ai-generate.json'),
+    learning: require('./locales/th/learning.json'),
     wallet: require('./locales/th/wallet.json'),
   },
   id: {
@@ -133,6 +139,7 @@ const resources = {
     update: require('./locales/id/update.json'),
     sharing: require('./locales/id/sharing.json'),
     'ai-generate': require('./locales/id/ai-generate.json'),
+    learning: require('./locales/id/learning.json'),
     wallet: require('./locales/id/wallet.json'),
   },
   es: {
@@ -151,6 +158,7 @@ const resources = {
     update: require('./locales/es/update.json'),
     sharing: require('./locales/es/sharing.json'),
     'ai-generate': require('./locales/es/ai-generate.json'),
+    learning: require('./locales/es/learning.json'),
     wallet: require('./locales/es/wallet.json'),
   },
 }
@@ -216,6 +224,11 @@ i18n
 //
 // Only `number` is overridden (it is the only format spec any mobile locale uses), and the
 // call sites keep passing a real number for `count`, so i18next plural selection is untouched.
+// `decimal` is for values the code deliberately computed a fraction of. Routing them
+// through `number` truncated them: a 30-second plan item read "~0 min".
+i18n.services.formatter?.add('decimal', (value) =>
+  typeof value === 'number' ? formatDecimal(value, 1) : String(value ?? ''),
+)
 i18n.services.formatter?.add('number', (value) =>
   typeof value === 'number' ? formatCount(value) : String(value ?? ''),
 )

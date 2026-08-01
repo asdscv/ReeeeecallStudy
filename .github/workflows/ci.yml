@@ -95,6 +95,21 @@ jobs:
       - name: Vitest — worker modules
         run: pnpm test:worker
 
+      # Mobile's own i18n suite, which no job ran. `i18n-key-usage.test.ts` (in the web
+      # suite above) reaches into packages/mobile and covers key parity, but NOT the four
+      # things only this file checks: that every `{{x, spec}}` in a locale has an Intl-free
+      # formatter registered (Hermes can ship without full ICU, and an unregistered spec
+      # silently drops thousands separators); that counted strings have _one/_other where
+      # the language inflects; that every namespace in `ns[]` is require()d for every
+      # language; and the FAMILIES table for keys built by interpolation.
+      #
+      # It is a plain script (console.log + process.exit(1)), not vitest, so it gets its own
+      # step. Run from packages/web because that is where `tsx` is installed — the test
+      # resolves every path from `__dirname`, so the working directory does not matter.
+      - name: i18n — mobile locale suite
+        working-directory: packages/web
+        run: npx tsx ../mobile/src/i18n/i18n.test.ts
+
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@v4
@@ -148,15 +163,21 @@ jobs:
           SUPABASE_LOCAL_URL: http://127.0.0.1:54321
           SUPABASE_ANON_KEY: ${{ steps.keys.outputs.anon }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ steps.keys.outputs.svc }}
-        # Run from repo root — vitest resolves include paths from cwd. Use the
-        # web package's vitest binary (the only place it's installed).
+        # Run from repo root — vitest.config.ts resolves its include glob from
+        # the cwd. Resolve the binary first and run once: the previous
+        # `A || B` form re-ran the whole suite whenever a test failed, not just
+        # when the binary was missing.
         run: |
-          ./node_modules/.bin/vitest run \
-            --config tests/integration/vitest.config.ts \
-            tests/integration \
-            || packages/web/node_modules/.bin/vitest run \
-              --config tests/integration/vitest.config.ts \
-              tests/integration
+          if [ -x ./node_modules/.bin/vitest ]; then
+            VITEST=./node_modules/.bin/vitest
+          elif [ -x packages/web/node_modules/.bin/vitest ]; then
+            VITEST=packages/web/node_modules/.bin/vitest
+          else
+            echo "::error::vitest binary not found in root or packages/web"
+            exit 1
+          fi
+          echo "using $VITEST"
+          "$VITEST" run --config tests/integration/vitest.config.ts tests/integration
 
       - name: Stop Supabase
         if: always()
@@ -325,6 +346,31 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/sandbox_environment_test.sql
+
+      - name: Run admin payment-list refund-status assertions (mig 175 — a refunded pack must not list as paid)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin_payment_refund_status_test.sql
+
+      - name: Run session-override removal assertions (mig 176 — dead key gone, one-session-per-platform intact)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/session_override_removed_test.sql
+
+      - name: Run growth-lever assertions (mig 177 — read path, setter round trips, refused bounds)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin_growth_levers_test.sql
+
+      - name: Run public plan-limit assertions (mig 179 — public read, free-tier not per-user, no knob leak)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/public_plan_limits_test.sql
+
+      - name: Run account-deletion assertions (mig 180 — blockers cleared, money retained, purge gated)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_test.sql
 
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so

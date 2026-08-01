@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "カード保存",
-      "free": "1,000枚",
-      "pro": "最大100,000枚"
+      "free": "{{count, number}}枚",
+      "pro": "最大{{count, number}}枚",
+      "freeUnknown": "保存容量に上限あり",
+      "proUnknown": "拡張された保存容量"
     },
     "allModes": {
       "title": "全学習モード",
@@ -18,8 +20,9 @@
     },
     "aiGeneration": {
       "title": "AIカード生成",
-      "free": "1日10枚",
-      "pro": "1日10枚 + クレジット"
+      "free": "1日{{count, number}}枚 · クレジット購入可",
+      "pro": "無料と同じ · クレジット購入可",
+      "freeUnknown": "毎日の無料枠 · クレジット購入可"
     },
     "premiumTts": {
       "title": "プレミアムTTS",

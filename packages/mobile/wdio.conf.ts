@@ -2,6 +2,13 @@
  * WebDriverIO shared config for Appium E2E tests.
  * Platform-specific configs extend this (wdio.ios.conf.ts, wdio.android.conf.ts).
  */
+import dotenv from 'dotenv'
+import path from 'path'
+
+// E2E credentials are no longer committed. `.env.test` is gitignored and is the documented
+// place for them; without this the helpers throw and the whole suite is unrunnable locally.
+dotenv.config({ path: path.resolve(__dirname, '.env.test') })
+
 export const config: WebdriverIO.Config = {
   runner: 'local',
   tsConfigPath: './tsconfig.json',
@@ -21,6 +28,7 @@ export const config: WebdriverIO.Config = {
     './__tests__/e2e/specs/features.spec.ts',
     './__tests__/e2e/specs/monetization.spec.ts',
     './__tests__/e2e/specs/remaining-features.spec.ts',
+    './__tests__/e2e/specs/learning.spec.ts',
     './__tests__/e2e/specs/study.spec.ts',  // LAST — creates separate Supabase auth session
   ],
   exclude: [],
@@ -39,6 +47,21 @@ export const config: WebdriverIO.Config = {
   mochaOpts: {
     ui: 'bdd',
     timeout: 120000,
+  },
+
+  /**
+   * Replace Node's global fetch dispatcher with one from the undici that `webdriver` bundles.
+   *
+   * Node 26 installs an internal `Dispatcher1Wrapper` as the global dispatcher. `webdriver@9`
+   * decides "anything whose constructor is not Agent/MockAgent must be a user-supplied
+   * dispatcher" and forwards it into ITS OWN copy of undici, which rejects the foreign object
+   * with `UND_ERR_INVALID_ARG`. The request never leaves the process — Appium logs nothing at
+   * all, and the only symptom is "Failed to create a session", which is why this took a
+   * bisect of the bundle to find. Handing it a real `Agent` puts wdio back on its own path.
+   */
+  beforeSession: async function () {
+    const { Agent, setGlobalDispatcher } = await import('undici')
+    setGlobalDispatcher(new Agent())
   },
 
   // Login + navigate to Home before each spec file

@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "Luu tru the",
-      "free": "1.000 the",
-      "pro": "Toi da 100.000 the"
+      "free": "{{count, number}} the",
+      "pro": "Toi da {{count, number}} the",
+      "freeUnknown": "Dung luong gioi han",
+      "proUnknown": "Dung luong mo rong"
     },
     "allModes": {
       "title": "Tat ca che do hoc",
@@ -18,8 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI Tao the",
-      "free": "10 the/ngay",
-      "pro": "10/ngay + tin dung"
+      "free": "{{count, number}} the/ngay · co the mua tin dung",
+      "pro": "Giong Free · co the mua tin dung",
+      "freeUnknown": "Han muc mien phi hang ngay · co the mua tin dung"
     },
     "premiumTts": {
       "title": "TTS Cao cap",

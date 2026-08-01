@@ -40,7 +40,8 @@
     "show": "Mostrar",
     "hide": "Ocultar",
     "startStudy": "Comenzar estudio",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "retry": "Reintentar"
   },
   "status": {
     "loading": "Cargando...",

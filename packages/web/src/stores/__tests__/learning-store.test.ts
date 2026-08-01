@@ -12,8 +12,12 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { mockCallServerAI } = vi.hoisted(() => ({ mockCallServerAI: vi.fn() }))
-vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({ callServerAI: mockCallServerAI }))
+const { mockCallServerAI, mockGetAiWallet } = vi.hoisted(() => ({
+  mockCallServerAI: vi.fn(), mockGetAiWallet: vi.fn(),
+}))
+vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({
+  callServerAI: mockCallServerAI, getAiWallet: mockGetAiWallet,
+}))
 
 const { mockFrom, mockRpc, mockGetUser, mockSupabase } = vi.hoisted(() => {
   const from = vi.fn()
@@ -40,14 +44,24 @@ import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
 function q(result: unknown) {
   const settled = Promise.resolve(result)
   const builder: Record<string, unknown> = {}
-  for (const method of ['select', 'eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
+  for (const method of ['eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
     builder[method] = () => builder
+  }
+  // Recorded, not just returned: the column list is the contract with PostgREST, and a column
+  // left out of it is silently absent from the row rather than a type error. A mock that
+  // fabricates the row cannot notice — so the select string itself has to be assertable.
+  builder.select = (columns?: unknown) => {
+    selectedColumns.push(typeof columns === 'string' ? columns : '')
+    return builder
   }
   builder.maybeSingle = () => settled
   builder.then = (onOk: unknown, onErr: unknown) =>
     settled.then(onOk as never, onErr as never)
   return builder
 }
+
+/** Every `select(...)` argument this test's supabase stub was handed, in call order. */
+let selectedColumns: string[] = []
 
 /** Per-table FIFO queue of results, so one action can read several tables in order. */
 let tableResults: Record<string, unknown[]> = {}
@@ -78,14 +92,24 @@ function cardRow(id: string) {
   }
 }
 
+/** A deck row as `generatePlan` reads it, to decide where the SRS state lives. */
+const deckRow = (over: Record<string, unknown> = {}) =>
+  ({ id: 'deck-1', user_id: 'user-1', share_mode: null, source_owner_id: null, ...over })
+
 beforeEach(() => {
   vi.clearAllMocks()
   tableResults = {}
+  selectedColumns = []
   mockFrom.mockImplementation((table: string) => {
     const pending = tableResults[table]
     const next = pending && pending.length > 0 ? pending.shift() : { data: [], error: null }
     return q(next)
   })
+  // `generatePlan` reads `decks` to decide whether a card's schedule is embedded or lives in
+  // `user_card_progress`. Default to an OWNED deck so the tests below — which are about save
+  // limits, conflicts and concurrency, not about SRS sourcing — keep reading as they did.
+  // The sourcing behaviour has its own tests, which queue this explicitly.
+  queue('decks', { data: [deckRow()], error: null })
   mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
   useLearningStore.getState().reset()
 })
@@ -176,7 +200,9 @@ describe('generatePlan', () => {
     expect(args.p_goal_id).toBe('goal-1')
     expect(args.p_plan_date).toBe('2026-07-31')
     expect(args.p_timezone).toBe('Asia/Seoul')
-    expect(args.p_algorithm_version).toBe('daily-plan-v1')
+    // The literal, not the imported constant: a weight change without a version bump is the
+    // defect this pins, and comparing the constant to itself would never catch it.
+    expect(args.p_algorithm_version).toBe('daily-plan-v2')
     expect(args.p_budget_minutes).toBe(20)
     expect(String(args.p_input_fingerprint)).toMatch(/^fnv1a32:/)
 
@@ -200,6 +226,58 @@ describe('generatePlan', () => {
     // The UI renders the stored plan, not the in-memory planner output.
     expect(useLearningStore.getState().plan?.id).toBe('plan-1')
     expect(useLearningStore.getState().planItems).toHaveLength(1)
+  })
+
+  // ── where a card's schedule is read from ──────────────────────────────────
+  //
+  // On a subscribed or official deck the `cards` row holds the PUBLISHER's SRS; the learner's
+  // own lives in `user_card_progress`. The planner read `cards` for both, so in production —
+  // where all 376,095 official cards carry `interval_days = 0` and `last_reviewed_at = NULL` —
+  // every memory feature saw the same no-evidence value and every card scored identically.
+
+  it('reads a subscribed deck\'s schedule from user_card_progress, not the publisher\'s row', async () => {
+    tableResults = {}   // this test owns the whole read sequence
+    queue('decks', { data: [deckRow({ user_id: 'publisher' })], error: null })
+    queue('user_card_progress', {
+      data: [{
+        id: 'p1', user_id: 'user-1', card_id: 'card-1', deck_id: 'deck-1',
+        srs_status: 'review', ease_factor: 2.5, interval_days: 12, repetitions: 4,
+        next_review_at: '2026-07-30T00:00:00.000Z', last_reviewed_at: '2026-07-18T00:00:00.000Z',
+        srs_revision: 3, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-07-18T00:00:00.000Z',
+      }],
+      error: null,
+    })
+    // The publisher's row: never studied. This is what the planner used to read.
+    queue('cards', {
+      data: [{ ...cardRow('card-1'), user_id: 'publisher', interval_days: 0, last_reviewed_at: null, next_review_at: null }],
+      error: null,
+    })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    const ok = await useLearningStore.getState().generatePlan(
+      goalWithDecks([{ deck_id: 'deck-1', importance: 0.5 }]), CTX)
+
+    expect(ok).toBe(true)
+    // It asked the progress table at all — the read that did not exist before.
+    expect(mockFrom.mock.calls.map(([t]) => t)).toContain('user_card_progress')
+    // And the plan is built from the LEARNER's schedule: a 12-day interval last reviewed on the
+    // 18th yields a real memory estimate, where the publisher's row yields none.
+    const [, args] = mockRpc.mock.calls.find(([name]) => name === 'save_daily_plan') ?? []
+    expect((args as { p_items: unknown[] }).p_items).toHaveLength(1)
+  })
+
+  it('does not ask the progress table for a deck the learner owns', async () => {
+    tableResults = {}
+    queue('decks', { data: [deckRow({ user_id: 'user-1' })], error: null })
+    queue('cards', { data: [cardRow('card-1')], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+
+    await useLearningStore.getState().generatePlan(
+      goalWithDecks([{ deck_id: 'deck-1', importance: 0.5 }]), CTX)
+
+    expect(mockFrom.mock.calls.map(([t]) => t)).not.toContain('user_card_progress')
   })
 
   it('maps the save-limit failure to LIMIT_EXCEEDED so the UI can say why', async () => {
@@ -243,6 +321,78 @@ describe('generatePlan', () => {
     expect(second).toBe(false)
     const saves = mockRpc.mock.calls.filter(([name]) => name === 'save_daily_plan')
     expect(saves).toHaveLength(1)
+  })
+
+  // ── typed answers (Stage 2) ──────────────────────────────────────────────
+  //
+  // An item becomes typeable only because its TEMPLATE says which field is the answer. The
+  // dangerous direction is permissive: an input box on a card whose answer nobody can name
+  // becomes the premise for a later paid comparison against nothing.
+  describe('typed-answer items', () => {
+    const basicTemplate = {
+      id: 'tpl-1',
+      fields: [
+        { key: 'front', name: 'Front', type: 'text', order: 0 },
+        { key: 'back', name: 'Back', type: 'text', order: 1 },
+      ],
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [{ field_key: 'back', style: 'primary' }],
+    }
+
+    async function generateWith(templates: unknown[]) {
+      queue('cards', { data: [cardRow('card-1')], error: null })
+      queue('card_templates', { data: templates, error: null })
+      queue('study_logs', { data: [], error: null })
+      mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+      queue('daily_plans', { data: null, error: null })
+
+      await useLearningStore.getState().generatePlan(
+        goalWithDecks([{ deck_id: 'deck-1', importance: 0.9 }]), CTX)
+      const args = mockRpc.mock.calls[0][1] as Record<string, unknown>
+      return (args.p_items as Array<Record<string, unknown>>)[0]
+    }
+
+    it('asks for text, and records which fields it decided on', async () => {
+      const item = await generateWith([basicTemplate])
+
+      expect(item.response_type).toBe('text')
+      // Still self-rated: nothing grades the text, so the learner remains the evaluator.
+      expect(item.evaluator_type).toBe('self_rate')
+      // `payload` is the audit trail — the plan says which key it called the reference, so a
+      // template edited tomorrow cannot rewrite what today's plan meant.
+      expect(item.payload).toEqual({
+        typed_answer: {
+          resolver: 'card-answer-v1',
+          prompt_keys: ['front'],
+          reference_keys: ['back'],
+        },
+      })
+    })
+
+    it('reads the layouts, not just the field order, from card_templates', async () => {
+      await generateWith([basicTemplate])
+
+      // Without `back_layout` there is no declared answer, and the only remaining way to pick
+      // one is jsonb key order — which is inverted for every official word card.
+      expect(selectedColumns).toContain('id, fields, front_layout, back_layout')
+    })
+
+    it('stays a self-rating when the template cannot be read', async () => {
+      // The subscriber case (mig 009 shares a template only as a deck default) and the
+      // request-failed case land here together. Fail-closed: no input box, no payload.
+      const item = await generateWith([])
+
+      expect(item.response_type).toBe('self_rate')
+      expect(item.payload).toBeUndefined()
+    })
+
+    it('stays a self-rating when the template declares no answer face', async () => {
+      // `back_layout` defaults to '[]', so this is the ordinary case for hand-made templates.
+      const item = await generateWith([{ ...basicTemplate, back_layout: [] }])
+
+      expect(item.response_type).toBe('self_rate')
+      expect(item.payload).toBeUndefined()
+    })
   })
 })
 
@@ -342,13 +492,64 @@ describe('recordAttempt', () => {
     expect(second).toBe(false)
     expect(mockRpc.mock.calls.filter(([n]) => n === 'record_answer_attempt')).toHaveLength(1)
   })
+
+  // ── the typed answer itself ───────────────────────────────────────────────
+  //
+  // `p_response` is part of the RPC's idempotency comparison, so its exact shape is a contract,
+  // not a detail: the same `client_attempt_id` with a different response raises P0007.
+  describe('typed answer', () => {
+    const typedItem = { ...planItem, response_type: 'text' }
+    const responseOf = (call = 0) =>
+      (mockRpc.mock.calls[call][1] as Record<string, unknown>).p_response
+
+    async function record(input: { planItem: typeof planItem; text?: string; score?: number }) {
+      mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+      queue('daily_plans', { data: null, error: null })
+      await useLearningStore.getState().recordAttempt({
+        planItem: input.planItem, goalId: 'goal-1', score: input.score ?? 0,
+        text: input.text, clientAttemptId: 'att-typed',
+      }, '2026-07-31')
+    }
+
+    it('stores what the learner wrote next to the rating', async () => {
+      await record({ planItem: typedItem, text: '사과', score: 0.5 })
+
+      expect(responseOf()).toEqual({ self_rated: 0.5, text: '사과' })
+    })
+
+    it('trims, and omits the key entirely when nothing was typed', async () => {
+      await record({ planItem: typedItem, text: '  \n ' })
+
+      // `{ self_rated }` — the shape every attempt has had since Phase 2 — rather than
+      // `text: ''`. "Typed nothing" and "was never asked" must read the same downstream, so no
+      // later feature can mistake an empty string for an answer it can compare against.
+      expect(responseOf()).toEqual({ self_rated: 0 })
+    })
+
+    it('ignores text on an item that only asked for a rating', async () => {
+      // The item's snapshot is what the row CLAIMS to hold. Writing prose under a `self_rate`
+      // item would make that claim false, and the read-back helper would then have to guess.
+      await record({ planItem, text: 'apple' })
+
+      expect(responseOf()).toEqual({ self_rated: 0 })
+    })
+
+    it('caps the answer before the server has to reject it', async () => {
+      await record({ planItem: typedItem, text: 'a'.repeat(5_000) })
+
+      // mig 167 rejects a response over 64 KiB with P0006 — the same code as the plan-save cap,
+      // which the UI renders as a message about rebuilding plans. The cap has to bite here.
+      expect((responseOf() as { text: string }).text).toHaveLength(2_000)
+    })
+  })
 })
 
 describe('fetchAttempts', () => {
   it('loads the goal\'s attempts', async () => {
     queue('answer_attempts', {
       data: [{ id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
-        plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
+        plan_item_id: 'item-1', activity_type: 'recall', response_type: 'self_rate',
+        evaluator_type: 'self_rate', response: { self_rated: 0.5 },
         normalized_score: 0.5, duration_ms: 1000, created_at: '2026-07-31T00:00:00.000Z' }],
       error: null,
     })
@@ -357,6 +558,20 @@ describe('fetchAttempts', () => {
 
     expect(useLearningStore.getState().attempts).toHaveLength(1)
     expect(useLearningStore.getState().attemptsLoading).toBe(false)
+  })
+
+  it('reads back the response and its type, or the history row cannot show it', async () => {
+    // Asserted on the SELECT string because that is where the mistake would live: a column left
+    // out is simply absent from the row, with no type error and no failing render — the answer
+    // would just never appear, and a later paid `compare` would have no way to tell an attempt
+    // with text from one without.
+    queue('answer_attempts', { data: [], error: null })
+
+    await useLearningStore.getState().fetchAttempts('goal-1')
+
+    const [columns] = selectedColumns
+    expect(columns).toContain('response_type')
+    expect(columns).toContain('response,')
   })
 })
 // ── enrichment (Phase 3, paid) ─────────────────────────────────────────────
@@ -435,6 +650,63 @@ describe('requestEnrichment', () => {
 
     expect(second).toBe(false)
     expect(mockCallServerAI).toHaveBeenCalledTimes(1)
+  })
+
+  it('grounds the request in the attempt the caller named', async () => {
+    // The whole point of the feature: without this id the model explains the card in the
+    // abstract and can never say "you have missed this four times".
+    mockCallServerAI.mockResolvedValue(ok)
+
+    await useLearningStore.getState().requestEnrichment({
+      action: 'hint', goalId: 'goal-1', cardId: 'card-1', attemptId: 'att-9', uiLang: 'ko',
+    })
+
+    expect(mockCallServerAI).toHaveBeenCalledWith({
+      kind: 'remediation', action: 'hint', uiLang: 'ko',
+      goalId: 'goal-1', cardIds: ['card-1'], attemptId: 'att-9',
+    })
+  })
+
+  it('omits the key entirely when there is no attempt, rather than sending null', async () => {
+    // `parseRemediationRefs` treats a present-but-null attemptId as a supplied value and the
+    // edge function rejects it as a malformed uuid — so the card-scoped button, which has no
+    // attempt, would start failing. toHaveBeenCalledWith cannot catch this (deep equality
+    // ignores undefined-valued keys), so assert on the key list.
+    mockCallServerAI.mockResolvedValue(ok)
+
+    await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', attemptId: null, uiLang: 'ko',
+    })
+
+    const payload = mockCallServerAI.mock.calls[0][0] as Record<string, unknown>
+    expect(Object.keys(payload)).not.toContain('attemptId')
+  })
+})
+
+describe('loadEnrichmentQuote', () => {
+  it('reads what one remediation costs and where it comes from', async () => {
+    // reserve_ai_remediation books exactly one paid card-equivalent, so the wallet's
+    // per-card estimate is the per-request estimate.
+    mockGetAiWallet.mockResolvedValue({ balanceMicroWon: 1_480_000, estPricePerCardMicro: 3_880 })
+
+    await useLearningStore.getState().loadEnrichmentQuote()
+
+    expect(useLearningStore.getState().enrichmentQuote)
+      .toEqual({ estPriceMicro: 3_880, balanceMicro: 1_480_000 })
+  })
+
+  it('leaves the feature usable when the wallet cannot be read', async () => {
+    // Null, never a zeroed quote: rendering $0.00 would understate a real charge, and a
+    // wallet read that fails must not stop a learner who has credits from asking.
+    mockGetAiWallet.mockResolvedValue(null)
+    mockCallServerAI.mockResolvedValue({ content: { explanation: 'because' }, enrichmentId: 'enr-1' })
+
+    await useLearningStore.getState().loadEnrichmentQuote()
+
+    expect(useLearningStore.getState().enrichmentQuote).toBeNull()
+    expect(await useLearningStore.getState().requestEnrichment({
+      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: 'ko',
+    })).toBe(true)
   })
 })
 
@@ -563,6 +835,36 @@ describe('recommendations', () => {
     expect(useLearningStore.getState().planError).toBeNull()
   })
 
+  it('adopts the server state when the suggestion was already decided elsewhere', async () => {
+    useLearningStore.setState({
+      recommendations: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+      }],
+    })
+    // The row was ACCEPTED elsewhere; this tab asks to dismiss it and gets P0007.
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Recommendation is already accepted' },
+    })
+    queue('study_recommendations', {
+      data: [{
+        id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
+        action_type: 'review_card', provider: 'algorithm', reason: null,
+        algorithm_version: 'weak-card-v1', status: 'accepted', created_at: '2026-07-31T00:00:00Z',
+      }],
+      error: null,
+    })
+
+    const ok = await useLearningStore.getState().resolveRecommendation('rec-1', 'dismissed')
+
+    // Not an error — the decision is already recorded, so the user is not trapped.
+    expect(ok).toBe(true)
+    // But the store must NOT claim the status this tab asked for. Writing 'dismissed' here
+    // would render a state the server does not hold, and the row would flip on next load.
+    expect(useLearningStore.getState().recommendations[0].status).toBe('accepted')
+  })
+
   it('feeds accepted cards into the next plan, which is what makes accepting matter', async () => {
     queue('cards', { data: [cardRow('card-1'), cardRow('card-2')], error: null })
     queue('study_logs', { data: [], error: null })
@@ -579,6 +881,95 @@ describe('recommendations', () => {
     // card-2 was accepted, so its priority must exceed the otherwise-identical card-1.
     const byCard = new Map(items.map((i) => [i.card_id, i.priority as number]))
     expect(byCard.get('card-2')).toBeGreaterThan(byCard.get('card-1') as number)
+  })
+})
+
+// ── fetchInsights: switching goals ─────────────────────────────────────────
+//
+// The screen lets a learner switch between active goals, and the numbers it shows are the
+// harshest thing this product says to anyone. Attributing one goal's accuracy to another is
+// a worse lie than showing nothing, so the loader has to be correct under overlap — not
+// merely "not crash".
+describe('fetchInsights — switching goals while a load is in flight', () => {
+  /**
+   * A `from()` implementation that records which goal each query filtered on, and holds the
+   * first N invocations open until released. Two invocations make up ONE fetchInsights call
+   * (answer_attempts + daily_plans).
+   */
+  function gatedFrom(heldInvocations: number, firstResult: unknown = { data: [], error: null }) {
+    const filteredGoalIds: string[] = []
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let invocation = 0
+
+    mockFrom.mockImplementation(() => {
+      const held = invocation++ < heldInvocations
+      const builder: Record<string, unknown> = {}
+      for (const method of ['select', 'eq', 'gte', 'order', 'limit', 'returns']) {
+        builder[method] = (...args: unknown[]) => {
+          if (method === 'eq' && args[0] === 'goal_id') filteredGoalIds.push(String(args[1]))
+          return builder
+        }
+      }
+      builder.then = (onOk: unknown, onErr: unknown) => {
+        const settled = held
+          ? gate.then(() => firstResult)
+          : Promise.resolve({ data: [], error: null })
+        return settled.then(onOk as never, onErr as never)
+      }
+      return builder
+    })
+
+    return { filteredGoalIds, release }
+  }
+
+  it('does not drop the second goal, which would leave the first goal\'s numbers on screen', async () => {
+    const { filteredGoalIds, release } = gatedFrom(2)
+
+    const first = useLearningStore.getState().fetchInsights('goal-1')
+    // The learner taps the other goal chip before the first load lands.
+    const second = useLearningStore.getState().fetchInsights('goal-2')
+    release()
+    await Promise.all([first, second])
+
+    // A busy-flag early return here is not a harmless optimisation: the chip would show
+    // goal-2 selected while the stats below still belong to goal-1.
+    expect(filteredGoalIds).toContain('goal-2')
+    expect(useLearningStore.getState().insightsGoalId).toBe('goal-2')
+  })
+
+  it('discards a superseded response instead of letting it overwrite the current goal', async () => {
+    // goal-1 resolves LAST and carries data that would read as 100% accuracy.
+    const { release } = gatedFrom(2, {
+      data: [{
+        card_id: 'card-1', normalized_score: 1, duration_ms: 1000,
+        created_at: '2026-07-30T00:00:00.000Z',
+      }],
+      error: null,
+    })
+
+    const first = useLearningStore.getState().fetchInsights('goal-1')
+    const second = useLearningStore.getState().fetchInsights('goal-2')
+    await second          // goal-2 (no attempts) lands first
+    release()
+    await first           // the stale goal-1 response arrives afterwards
+
+    const state = useLearningStore.getState()
+    expect(state.insightsGoalId).toBe('goal-2')
+    // goal-2 has no scored attempts, so accuracy must stay "no data" — not goal-1's 100%.
+    expect(state.insights?.accuracy).toBeNull()
+  })
+
+  it('reports a diagnostics failure on its own channel, not the plan\'s', async () => {
+    queue('answer_attempts', { data: null, error: { code: '42501', message: 'denied' } })
+
+    await useLearningStore.getState().fetchInsights('goal-1')
+
+    const state = useLearningStore.getState()
+    expect(state.insightsError?.code).toBe('FORBIDDEN')
+    expect(state.insights).toBeNull()
+    // planError drives the today screen's banner; a diagnostics failure must not appear there.
+    expect(state.planError).toBeNull()
   })
 })
 

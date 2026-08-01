@@ -251,6 +251,24 @@
       "saved": "Saved ✓",
       "sandboxGrants": "Izinkan pembelian sandbox memberi kredit",
       "sandboxGrantsHint": "OFF: event sandbox RevenueCat diterima tapi tidak memberi apa pun. Nyalakan hanya saat menguji — pembelian sandbox itu gratis."
+    },
+    "levers": {
+      "title": "Tuas pertumbuhan",
+      "desc": "Berlaku langsung, tanpa deploy ulang. Setiap kolom disimpan terpisah.",
+      "freeQuota": "Kartu AI gratis per hari",
+      "freeQuotaHint": "Kartu gratis per pengguna per hari. Klien mengikuti nilai server ini.",
+      "cardCap": "Batas kartu per akun",
+      "cardCapHint": "Membuat atau menyimpan kartu diblokir di atas angka ini.",
+      "countOfficial": "Hitung kartu dek resmi ke dalam batas",
+      "countOfficialHint": "Aktif: kartu dari dek resmi yang dilangganan juga dihitung.",
+      "wonPerCredit": "Harga per kredit",
+      "wonPerCreditHint": "Harus sama dengan harga IAP / paket kredit.",
+      "targetMargin": "Target margin (bps)",
+      "targetMarginHint": "Saat ini {{pct}}. Nilai ini pembagi dalam formula penagihan, jadi 10000 (=100%) tidak diizinkan.",
+      "errRange": "Masukkan bilangan bulat antara {{min}} dan {{max}}.",
+      "errNonNegative": "Masukkan bilangan bulat 0 atau lebih.",
+      "errMargin": "Margin maksimal {{max}} bps. 10000 (=100%) membagi formula dengan nol sehingga tidak menagih apa pun.",
+      "updated": "Terakhir diubah — harga/kuota: {{ai}} · batas kartu: {{cards}}"
     }
   },
   "billing": {

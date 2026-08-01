@@ -8,8 +8,10 @@
   "features": {
     "cardStorage": {
       "title": "卡片存储",
-      "free": "1,000张",
-      "pro": "最多100,000张"
+      "free": "{{count, number}}张",
+      "pro": "最多{{count, number}}张",
+      "freeUnknown": "存储有上限",
+      "proUnknown": "更大的存储空间"
     },
     "allModes": {
       "title": "所有学习模式",
@@ -18,8 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI卡片生成",
-      "free": "每天10张",
-      "pro": "每天10张 + 额度"
+      "free": "每天{{count, number}}张 · 可购买点数",
+      "pro": "与免费版相同 · 可购买点数",
+      "freeUnknown": "每日免费额度 · 可购买点数"
     },
     "premiumTts": {
       "title": "高级TTS",

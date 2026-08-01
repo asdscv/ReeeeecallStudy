@@ -20,11 +20,12 @@
     "item": {
       "study": "学习",
       "untitled": "（无内容）",
-      "minutes": "约 {{count, number}} 分钟",
+      "minutes": "约 {{count, decimal}} 分钟",
       "recorded": "已记录"
     },
     "reason": {
       "due": "到期复习",
+      "memoryRisk": "即将忘记",
       "recentFailure": "最近答错",
       "slowResponse": "回答较慢",
       "goalRelevance": "目标相关度",
@@ -46,7 +47,13 @@
       "known": "知道",
       "hint": "仅记录本次作答 — 不会改变复习计划。"
     },
-    "insightsLink": "诊断"
+    "answer": {
+      "label": "你的答案（可选）",
+      "placeholder": "输入你记得的内容",
+      "note": "与本次作答一同保存。不评分，仍由你自己评价。"
+    },
+    "insightsLink": "诊断",
+    "recallChance": "你现在还记得的概率约 {{percent}}%"
   },
   "goals": {
     "title": "学习目标",
@@ -78,7 +85,9 @@
       "authRequired": "请重新登录。",
       "forbidden": "您没有访问权限。",
       "unknown": "出了点问题，请重试。"
-    }
+    },
+    "deckCount_one": "{{count, number}} 个牌组",
+    "deckCount_other": "{{count, number}} 个牌组"
   },
   "form": {
     "createTitle": "新建目标",
@@ -101,11 +110,19 @@
     "error": {
       "title": "请输入 1–500 个字符的目标名称。",
       "dailyMinutes": "每日学习时间须在 1–1440 分钟之间。"
+    },
+    "deckPriority": {
+      "label": "优先级",
+      "low": "低",
+      "normal": "普通",
+      "high": "高",
+      "hint": "当一天的额度排满时，优先级高的卡组会先出现。"
     }
   },
   "history": {
     "title": "最近作答 ({{count, number}})",
     "itemFallback": "{{type}} 作答",
+    "youWrote": "你写的答案：{{text}}",
     "score": {
       "unknown": "未评分"
     }
@@ -116,8 +133,11 @@
     "costHint": "将使用你钱包中的 AI 额度",
     "action": {
       "explain": "AI 解释",
-      "hint": "学习提示"
+      "hint": "学习提示",
+      "compare": "对比我的答案"
     },
+    "quote": "每次请求约 {{price}} · 余额 {{balance}}",
+    "groundedHint": "解答针对本次作答，而不只是这张卡片",
     "sources": "来源",
     "noSources": "此回答不基于来源。",
     "empty": "模型未返回可用内容。",
@@ -136,7 +156,9 @@
       "NOT_CONFIGURED": "此服务器未启用 AI 生成功能。",
       "PROVIDER_ERROR": "AI 服务出错，请重试。",
       "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
-      "UNKNOWN": "出了点问题，请重试。"
+      "UNKNOWN": "出了点问题，请重试。",
+      "COMPARE_NO_ANSWER": "请先写下你的答案——目前还没有可对比的内容。",
+      "COMPARE_NO_REFERENCE": "这张卡片没有标明哪个字段是答案，因此没有可对比的基准。"
     }
   },
   "insights": {
@@ -146,7 +168,7 @@
     "accuracy": "正确率",
     "notScoredYet": "尚无评分记录",
     "typicalTime": "通常用时",
-    "seconds": "{{count, number}}秒",
+    "seconds": "{{count, decimal}}秒",
     "adherence": "计划执行率 (14天)",
     "weakTitle": "值得再看",
     "weakHint": "作答至少2次且平均低于60%的卡片。",
@@ -157,7 +179,9 @@
     "adherenceEmpty": "此时间段内没有计划。",
     "noPlanItems": "无计划项目",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。"
+    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
+    "attemptCount_one": "{{count, number}} 次作答",
+    "attemptCount_other": "{{count, number}} 次作答"
   },
   "recommend": {
     "title": "推荐",

@@ -1,10 +1,17 @@
 {
   "enrichment": {
+    "action": {
+      "compare": "So với câu trả lời của tôi",
+      "explain": "Giải thích AI",
+      "hint": "Gợi ý học tập"
+    },
     "chargedNote": "Đã tính phí — bỏ đi cũng không hoàn lại tín dụng.",
     "costHint": "Sử dụng tín dụng AI từ ví của bạn",
     "discard": "Bỏ",
     "error": {
       "BAD_REQUEST": "Yêu cầu không hợp lệ.",
+      "COMPARE_NO_ANSWER": "Hãy viết câu trả lời trước — chưa có gì để so sánh.",
+      "COMPARE_NO_REFERENCE": "Thẻ này không đánh dấu trường nào là đáp án, nên không có gì để đối chiếu.",
       "FORBIDDEN": "Bạn không có quyền truy cập thẻ này.",
       "GROUNDING_REQUIRED": "Không tìm thấy nguồn trích dẫn nên câu trả lời đã bị từ chối thay vì bịa đặt.",
       "INSUFFICIENT_CREDITS": "Không đủ tín dụng AI. Hãy nạp thêm để tiếp tục.",
@@ -16,15 +23,24 @@
       "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
     },
     "explainCta": "Giải thích (tín dụng)",
+    "groundedHint": "Trả lời cho lần làm này, không chỉ cho thẻ",
     "keep": "Giữ lại",
     "later": "Quyết định sau",
     "noSources": "Câu trả lời này không dựa trên nguồn.",
+    "quote": "Khoảng {{price}} mỗi yêu cầu · số dư {{balance}}",
     "requesting": "Đang hỏi…",
     "sources": "Nguồn"
   },
   "form": {
     "cancel": "Hủy",
     "dailyMinutes": "Số phút mỗi ngày",
+    "deckPriority": {
+      "high": "Cao",
+      "hint": "Bộ thẻ ưu tiên cao sẽ xuất hiện trước khi ngày đã kín.",
+      "label": "Mức ưu tiên",
+      "low": "Thấp",
+      "normal": "Bình thường"
+    },
     "decks": "Bộ thẻ để học",
     "decksHint": "Kế hoạch được xây dựng từ các thẻ trong những bộ thẻ này.",
     "domain": "Lĩnh vực",
@@ -49,9 +65,20 @@
     "create": "Mục tiêu mới",
     "dailyMinutes": "{{count, number}} phút/ngày",
     "deckCount": "{{count, number}} bộ thẻ",
+    "deckCount_one": "{{count, number}} bộ thẻ",
+    "deckCount_other": "{{count, number}} bộ thẻ",
     "empty": {
       "body": "Tạo mục tiêu để bắt đầu nhận kế hoạch hàng ngày.",
       "title": "Chưa có mục tiêu nào"
+    },
+    "error": {
+      "authRequired": "Vui lòng đăng nhập lại.",
+      "conflict": "Thay đổi này không được phép với trạng thái hiện tại của mục tiêu.",
+      "forbidden": "Bạn không có quyền truy cập.",
+      "invalidInput": "Vui lòng kiểm tra tên mục tiêu và số phút mỗi ngày.",
+      "limitExceeded": "Bạn đã đạt số lượng mục tiêu tối đa.",
+      "notFound": "Mục tiêu đó không tồn tại hoặc đã được lưu trữ.",
+      "unknown": "Đã xảy ra lỗi. Vui lòng thử lại."
     },
     "noDecksWarning": "Chưa gắn bộ thẻ — chưa thể lập kế hoạch.",
     "status": {
@@ -61,16 +88,32 @@
     },
     "title": "Mục tiêu học tập"
   },
+  "history": {
+    "itemFallback": "Lần làm {{type}}",
+    "score": {
+      "unknown": "Chưa có điểm"
+    },
+    "title": "Lần làm gần đây ({{count, number}})",
+    "title_one": "Lần làm gần đây ({{count, number}})",
+    "title_other": "Lần làm gần đây ({{count, number}})",
+    "youWrote": "Bạn đã viết: {{text}}"
+  },
   "insights": {
     "accuracy": "Độ chính xác",
     "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
+    "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
+    "adherenceTitle": "Kế hoạch hàng ngày (14 ngày)",
     "attemptCount": "{{count, number}} lần làm",
+    "attemptCount_one": "{{count, number}} lần làm",
+    "attemptCount_other": "{{count, number}} lần làm",
     "attempts": "Lần làm (30 ngày)",
     "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
+    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Chưa có dữ liệu",
+    "noPlanItems": "Không có mục nào được lên kế hoạch",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
     "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "title": "Phân tích học tập",
     "typicalTime": "Thời gian thường",
     "weakEmpty": "Không có thẻ nào tụt lại.",
@@ -91,6 +134,11 @@
     "title": "Gợi ý"
   },
   "today": {
+    "answer": {
+      "label": "Câu trả lời của bạn (không bắt buộc)",
+      "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá.",
+      "placeholder": "Nhập những gì bạn còn nhớ"
+    },
     "budget": "{{count, number}} phút/ngày",
     "empty": {
       "createGoal": "Tạo mục tiêu",
@@ -98,26 +146,41 @@
       "noGoal": "Bạn chưa có mục tiêu học tập nào đang hoạt động. Mục tiêu xác định số phút mỗi ngày và các bộ thẻ dùng để lập kế hoạch.",
       "nothingDue": "Hôm nay không có thẻ nào cần ôn tập trong các bộ thẻ này."
     },
+    "error": {
+      "authRequired": "Vui lòng đăng nhập lại.",
+      "completedPlan": "Kế hoạch đã hoàn thành không thể ghi đè.",
+      "forbidden": "Bạn không có quyền truy cập.",
+      "goalGone": "Mục tiêu đó không còn khả dụng.",
+      "invalidInput": "Không thể lưu kế hoạch vì một số giá trị ngoài phạm vi.",
+      "limitExceeded": "Bạn đã dùng hết số lần tạo lại kế hoạch hôm nay. Hãy thử lại vào ngày mai.",
+      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
+    },
     "generate": "Tạo kế hoạch hôm nay",
     "generating": "Đang tạo…",
     "insightsLink": "Phân tích",
     "item": {
+      "minutes": "~{{count, decimal}} phút",
       "recorded": "Đã ghi lại",
       "untitled": "(không có nội dung)"
     },
     "manageGoals": "Quản lý mục tiêu",
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
     "rate": {
-      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
+      "again": "Không biết",
+      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập.",
+      "known": "Đã biết",
+      "partial": "Chưa chắc"
     },
     "reason": {
       "balanced": "Phân bổ cân bằng",
       "due": "Đến hạn ôn tập",
       "goalRelevance": "Liên quan đến mục tiêu",
       "importance": "Mức quan trọng",
+      "memoryRisk": "Sắp quên",
       "recentFailure": "Trả lời sai gần đây",
       "slowResponse": "Trả lời chậm"
     },
+    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
     "regenerate": "Tạo lại kế hoạch",
     "regenerating": "Đang tạo lại…",
     "title": "Kế hoạch hôm nay"

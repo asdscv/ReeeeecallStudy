@@ -2,7 +2,7 @@
   "expo": {
     "name": "ReeeeecallStudy",
     "slug": "reeeeecall-study",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "scheme": "reeeeecall",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -55,7 +55,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/logo-icon.png",
+          "image": "./assets/splash-icon-padded.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#0f172a"

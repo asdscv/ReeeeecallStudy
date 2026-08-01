@@ -20,11 +20,12 @@
     "item": {
       "study": "학습",
       "untitled": "(내용 없음)",
-      "minutes": "약 {{count, number}}분",
+      "minutes": "약 {{count, decimal}}분",
       "recorded": "기록됨"
     },
     "reason": {
       "due": "복습 시점",
+      "memoryRisk": "잊기 직전",
       "recentFailure": "최근 오답",
       "slowResponse": "응답 지연",
       "goalRelevance": "목표 관련도",
@@ -46,7 +47,13 @@
       "known": "알았음",
       "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다."
     },
-    "insightsLink": "진단"
+    "answer": {
+      "label": "내가 쓴 답 (선택)",
+      "placeholder": "기억나는 대로 입력하세요",
+      "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다."
+    },
+    "insightsLink": "진단",
+    "recallChance": "지금 기억하고 있을 확률 약 {{percent}}%"
   },
   "goals": {
     "title": "학습 목표",
@@ -78,7 +85,9 @@
       "authRequired": "다시 로그인해 주세요.",
       "forbidden": "접근 권한이 없습니다.",
       "unknown": "문제가 발생했습니다. 다시 시도해 주세요."
-    }
+    },
+    "deckCount_one": "덱 {{count, number}}개",
+    "deckCount_other": "덱 {{count, number}}개"
   },
   "form": {
     "createTitle": "새 목표",
@@ -101,11 +110,19 @@
     "error": {
       "title": "목표 이름을 1~500자로 입력해 주세요.",
       "dailyMinutes": "하루 학습 시간은 1~1440분 사이여야 합니다."
+    },
+    "deckPriority": {
+      "label": "우선순위",
+      "low": "낮음",
+      "normal": "보통",
+      "high": "높음",
+      "hint": "하루가 꽉 찼을 때 우선순위가 높은 덱이 먼저 나옵니다."
     }
   },
   "history": {
     "title": "최근 시도 ({{count, number}})",
     "itemFallback": "{{type}} 시도",
+    "youWrote": "작성한 답: {{text}}",
     "score": {
       "unknown": "점수 없음"
     }
@@ -116,8 +133,11 @@
     "costHint": "지갑의 AI 크레딧을 사용합니다",
     "action": {
       "explain": "AI 설명",
-      "hint": "학습 힌트"
+      "hint": "학습 힌트",
+      "compare": "내 답과 비교"
     },
+    "quote": "요청당 약 {{price}} · 잔액 {{balance}}",
+    "groundedHint": "카드가 아니라 이 시도에 맞춰 답합니다",
     "sources": "출처",
     "noSources": "이 답변은 출처 기반이 아닙니다.",
     "empty": "모델이 사용 가능한 내용을 주지 않았습니다.",
@@ -136,7 +156,9 @@
       "NOT_CONFIGURED": "이 서버에서는 AI 생성이 활성화되지 않았습니다.",
       "PROVIDER_ERROR": "AI 서비스에 문제가 있었습니다. 다시 시도해 주세요.",
       "RATE_CAP": "오늘의 AI 요청 한도를 모두 썼습니다. 내일 다시 시도해 주세요.",
-      "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요."
+      "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요.",
+      "COMPARE_NO_ANSWER": "먼저 답을 입력해 주세요 — 비교할 내용이 아직 없습니다.",
+      "COMPARE_NO_REFERENCE": "이 카드는 어느 필드가 정답인지 지정하지 않아, 비교할 기준이 없습니다."
     }
   },
   "insights": {
@@ -146,7 +168,7 @@
     "accuracy": "정답률",
     "notScoredYet": "아직 채점된 시도 없음",
     "typicalTime": "보통 소요",
-    "seconds": "{{count, number}}초",
+    "seconds": "{{count, decimal}}초",
     "adherence": "플랜 이행률 (14일)",
     "weakTitle": "다시 볼 카드",
     "weakHint": "시도 2회 이상, 평균 60% 미만인 카드입니다.",
@@ -157,7 +179,9 @@
     "adherenceEmpty": "이 기간에 플랜이 없습니다.",
     "noPlanItems": "계획된 항목 없음",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다."
+    "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다.",
+    "attemptCount_one": "시도 {{count, number}}회",
+    "attemptCount_other": "시도 {{count, number}}회"
   },
   "recommend": {
     "title": "추천",

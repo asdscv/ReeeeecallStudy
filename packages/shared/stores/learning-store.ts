@@ -11,17 +11,23 @@
 // with `save_daily_plan`, and then RE-READS the saved plan so the UI renders the
 // database's version of the plan rather than a local object that might differ.
 import { create } from 'zustand'
+import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
 import {
-  buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
+  buildCandidatesFromCards, legacyCardItemShape, planItemAnswerPayload,
+  TYPED_ANSWER_MAX_CHARS, type CandidateStudyLog,
 } from '../lib/learning-candidates'
-import { callServerAI } from '../lib/ai/server-client'
+import { callServerAI, getAiWallet } from '../lib/ai/server-client'
 import {
   summarizeLearning, type InsightAttempt, type InsightPlan, type LearningInsights,
 } from '../lib/learning-insights'
+import {
+  splitDecksBySrsSource, attachProgressToCards, isDueAt, type PlannerDeckMeta,
+} from '../lib/learning-card-sources'
+import type { UserCardProgress } from '../lib/srs-access'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
 import type { LearningGoal } from '../learning/domain/index'
-import type { Card } from '../types/database'
+import type { Card, LayoutItem, TemplateField } from '../types/database'
 
 // ── Row shapes (snake_case, as returned by PostgREST) ───────────────────────
 export interface LearningGoalRow {
@@ -81,6 +87,14 @@ export interface DailyPlanItemRow {
    * item never rendered as finished. Keep these three spellings exact.
    */
   status: 'pending' | 'completed' | 'skipped'
+  /**
+   * What the planner knew when it chose this row, kept so the plan can SHOW its reasoning.
+   *
+   * `recall_probability` is the estimated chance the learner can recall the item right now
+   * (`application/memory.ts`). ABSENT — not null — for a card with no forgetting curve yet,
+   * so "we cannot say" and "we say 0%" stay different things all the way to the screen.
+   */
+  payload?: { recall_probability?: number } | null
 }
 
 /**
@@ -142,6 +156,27 @@ const CARD_COLUMNS =
   + ' created_at, updated_at'
 
 /**
+ * Template columns both plan paths read — ONE constant, deliberately.
+ *
+ * `fields` orders the prompt label (`card-prompt`); `front_layout` / `back_layout` are what
+ * `resolveCardAnswerFaces` reads to decide whether a card can be answered by typing. Two selects
+ * over the same table for two overlapping purposes is how the read path and the write path end
+ * up disagreeing about the same card, so they share this.
+ *
+ * RLS matters here and is left alone on purpose: a subscriber can read a shared template only
+ * when it is the deck's `default_template_id` (mig 009). An unreadable template is simply absent
+ * from the result, the resolver returns null, and the item stays a self-rating. Fail-closed.
+ */
+const TEMPLATE_COLUMNS = 'id, fields, front_layout, back_layout'
+
+interface PlanTemplateRow {
+  id: string
+  fields: TemplateField[]
+  front_layout: LayoutItem[]
+  back_layout: LayoutItem[]
+}
+
+/**
  * Upper bound on the cards pulled for one plan. A plan is one day of work; at
  * RECALL_MINUTES per item even a 1440-minute budget cannot use more than ~2880, and
  * a 500-card slice of the DUE set is far past any realistic daily budget. The cap
@@ -157,6 +192,7 @@ const LOG_ROW_LIMIT = 2000
 export interface PlanCardRef {
   id: string
   deck_id: string
+  template_id: string | null
   field_values: Record<string, string>
 }
 
@@ -167,7 +203,20 @@ export interface AttemptRow {
   activity_id: string | null
   plan_item_id: string | null
   activity_type: string
+  /**
+   * What KIND of response was recorded — `'self_rate'` for a rating alone, `'text'` for a
+   * typed answer. Read back rather than assumed because it is the only thing that says whether
+   * `response.text` is meaningful, and a later paid `compare` must not be offered on a row that
+   * has no answer in it.
+   */
+  response_type: string
   evaluator_type: string
+  /**
+   * The raw response jsonb. `{ self_rated }` always; `{ self_rated, text }` when the learner
+   * typed something. Kept as the stored shape rather than flattened into a `text` field, so the
+   * UI reads exactly what the server holds — and therefore exactly what a model would be shown.
+   */
+  response: Record<string, unknown> | null
   normalized_score: number | null
   duration_ms: number
   created_at: string
@@ -187,6 +236,18 @@ export interface AttemptInput {
   goalId: string
   score: number
   durationMs?: number
+  /**
+   * What the learner typed, when the item asks for it (`planItem.response_type === 'text'`).
+   *
+   * Stored verbatim (trimmed) next to the rating; nothing grades it. It is IGNORED on an item
+   * whose snapshot says `self_rate`, because an item with no input field has no typed answer and
+   * writing one anyway would put text in a row that claims to hold only a rating.
+   *
+   * One retry hazard, owned by the caller: `p_response` is part of the RPC's idempotency
+   * comparison (mig 167), so replaying the SAME `clientAttemptId` with different text raises
+   * P0007. Mint the id at submit time, together with the text — never before it is final.
+   */
+  text?: string
   /** Stable per attempt: the RPC is idempotent on it, so a retry cannot double-record. */
   clientAttemptId: string
 }
@@ -232,9 +293,29 @@ export interface EnrichmentSource {
   id?: string
 }
 
-/** Actions the Phase 3 UI offers. The server supports more (compare / generate /
- *  evaluate / recommend); those need context this screen does not have yet. */
-export type RemediationAction = 'explain' | 'hint'
+/**
+ * Actions the UI offers. Must stay a subset of `SERVED_REMEDIATION_ACTIONS` on the server —
+ * that list, not this one, is what actually gates a charge.
+ *
+ * `compare` is offered ONLY on an attempt that carries the learner's typed answer
+ * (`attemptTypedAnswer`), because the server refuses an ungrounded one and a button that spends
+ * a request to get a refusal is worse than no button. `evaluate` / `generate` / `recommend`
+ * remain unserved.
+ */
+export type RemediationAction = 'explain' | 'hint' | 'compare'
+
+/**
+ * The price of one remediation, in micro-USD, plus the balance it comes out of.
+ *
+ * `reserve_ai_remediation` books exactly one paid card-equivalent per request
+ * (`paid_cards = 1, billable_fraction = 1.0`, mig 168), so the wallet's per-card estimate IS
+ * the per-request estimate. It is an ESTIMATE: the real charge is the model's actual token cost,
+ * settled after the call, and the UI must not present it as a fixed price.
+ */
+export interface EnrichmentQuote {
+  estPriceMicro: number
+  balanceMicro: number
+}
 
 /**
  * Everything the enrichment call can fail with, kept distinct because the user's next
@@ -244,6 +325,8 @@ export type EnrichmentErrorCode =
   | 'INSUFFICIENT_CREDITS'   // AI_INSUFFICIENT_CREDITS — 402, wallet empty
   | 'RATE_CAP'               // AI_RATE_CAP — 429, today's request cap
   | 'GROUNDING_REQUIRED'     // AI_GROUNDING_REQUIRED — refused rather than cite nothing
+  | 'COMPARE_NO_ANSWER'      // AI_COMPARE_NO_ANSWER — nothing typed to compare; the learner can fix this
+  | 'COMPARE_NO_REFERENCE'   // AI_COMPARE_NO_REFERENCE — the card never declared an answer field
   | 'INVALID_RESULT'         // AI_INVALID_RESULT — model returned something unusable
   | 'PROVIDER_ERROR'         // AI_PROVIDER_ERROR / AI_PROVIDER_AUTH
   | 'NOT_CONFIGURED'         // AI_NOT_CONFIGURED — no provider key on this deployment
@@ -259,6 +342,8 @@ function toEnrichmentError(e: unknown): EnrichmentErrorCode {
     case 'AI_INSUFFICIENT_CREDITS': return 'INSUFFICIENT_CREDITS'
     case 'AI_RATE_CAP': return 'RATE_CAP'
     case 'AI_GROUNDING_REQUIRED': return 'GROUNDING_REQUIRED'
+    case 'AI_COMPARE_NO_ANSWER': return 'COMPARE_NO_ANSWER'
+    case 'AI_COMPARE_NO_REFERENCE': return 'COMPARE_NO_REFERENCE'
     case 'AI_INVALID_RESULT': return 'INVALID_RESULT'
     case 'AI_PROVIDER_ERROR':
     case 'AI_PROVIDER_AUTH': return 'PROVIDER_ERROR'
@@ -308,6 +393,13 @@ interface LearningState {
   planItems: DailyPlanItemRow[]
   /** Cards referenced by the current plan's items, by card id. */
   planCards: Record<string, PlanCardRef>
+  /**
+   * Field keys per template, in the order the template says to read them.
+   *
+   * Needed because `field_values` is jsonb: Postgres returns its keys in its own order, so
+   * "the first value" can be the ANSWER — see shared/lib/card-prompt.
+   */
+  planTemplateFields: TemplateFieldOrder
   planLoading: boolean
   planGenerating: boolean
   planError: LearningError | null
@@ -325,12 +417,35 @@ interface LearningState {
   enrichmentPendingCardId: string | null
   enrichmentError: EnrichmentErrorCode | null
   enrichmentSaving: boolean
+  /**
+   * What one remediation costs, read before the call.
+   *
+   * Null means "we could not read the wallet" — which the UI renders as no number at all, never
+   * as $0.00. A quote that fails must not block a learner who has credits, and must not claim a
+   * price of zero for something that charges.
+   */
+  enrichmentQuote: EnrichmentQuote | null
 
   insights: LearningInsights | null
   insightsLoading: boolean
+  /**
+   * Which goal the numbers in `insights` belong to.
+   *
+   * The screen lets a learner switch goals, and attributing one goal's accuracy to another
+   * is worse than showing nothing — so the goal travels with the data instead of being
+   * inferred from whatever the selector happens to hold when the render runs.
+   */
+  insightsGoalId: string | null
+  /**
+   * Diagnostics failures have their own channel. `planError` drives the today screen's
+   * banner, so routing a diagnostics failure there would make an unrelated screen claim
+   * the plan is broken.
+   */
+  insightsError: LearningError | null
 
   recommendations: RecommendationRow[]
   recommendationsLoading: boolean
+  recommendationsGoalId: string | null
   recommendationBusyId: string | null
 
   fetchGoals: () => Promise<void>
@@ -347,8 +462,18 @@ interface LearningState {
     action: RemediationAction
     goalId: string
     cardId: string
+    /**
+     * The attempt this request is grounded in, when the caller has one.
+     *
+     * Optional: an explanation of a card the learner has not attempted yet is still a
+     * legitimate request. The store never derives this — a paid call must not depend on a
+     * heuristic about which attempt the learner probably meant (design §5).
+     */
+    attemptId?: string | null
     uiLang: string
   }) => Promise<boolean>
+  /** Read the wallet so the UI can state the cost BEFORE the click. */
+  loadEnrichmentQuote: () => Promise<void>
   resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
   dismissEnrichment: () => void
   fetchInsights: (goalId: string) => Promise<void>
@@ -358,6 +483,16 @@ interface LearningState {
   reset: () => void
 }
 
+/**
+ * Request generations for the two goal-scoped loaders.
+ *
+ * Kept outside the store on purpose: they are bookkeeping for in-flight work, not state any
+ * view should re-render on. Comparing the generation after every await is what makes goal
+ * switching correct — see `fetchInsights`.
+ */
+let insightsRequestSeq = 0
+let recommendationsRequestSeq = 0
+
 export const useLearningStore = create<LearningState>((set, get) => ({
   goals: [],
   goalsLoading: false,
@@ -365,6 +500,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   plan: null,
   planItems: [],
   planCards: {},
+  planTemplateFields: {},
   planLoading: false,
   planGenerating: false,
   planError: null,
@@ -376,10 +512,14 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   enrichmentPendingCardId: null,
   enrichmentError: null,
   enrichmentSaving: false,
+  enrichmentQuote: null,
   insights: null,
   insightsLoading: false,
+  insightsGoalId: null,
+  insightsError: null,
   recommendations: [],
   recommendationsLoading: false,
+  recommendationsGoalId: null,
   recommendationBusyId: null,
 
   fetchGoals: async () => {
@@ -522,7 +662,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       }
       const { data: itemRows, error: itemErr } = await supabase
         .from('daily_plan_items')
-        .select('id, plan_id, position, activity_id, card_id, concept_id, activity_type, stimulus_type, response_type, evaluator_type, reason_code, priority, estimated_minutes, status')
+        .select('id, plan_id, position, activity_id, card_id, concept_id, activity_type, stimulus_type, response_type, evaluator_type, reason_code, priority, estimated_minutes, status, payload')
         .eq('plan_id', (planRow as DailyPlanRow).id)
         .order('position', { ascending: true })
       if (itemErr) throw itemErr
@@ -534,19 +674,44 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // since the plan was written.
       const cardIds = items.map((item) => item.card_id).filter((id): id is string => !!id)
       let planCards: Record<string, PlanCardRef> = {}
+      let planTemplateFields: TemplateFieldOrder = {}
       if (cardIds.length > 0) {
         const { data: cardRefs, error: refErr } = await supabase
           .from('cards')
-          .select('id, deck_id, field_values')
+          .select('id, deck_id, template_id, field_values')
           .in('id', cardIds)
           .returns<PlanCardRef[]>()
         if (refErr) throw refErr
         planCards = Object.fromEntries((cardRefs ?? []).map((card) => [card.id, card]))
+
+        // The templates decide which field is the prompt. Without them the row can show the
+        // answer, which is the one thing that makes a plan row worthless. A failure here is
+        // NOT fatal: card-prompt falls back to conventional keys, so the plan still renders.
+        const templateIds = [...new Set(
+          (cardRefs ?? []).map((card) => card.template_id).filter((id): id is string => !!id),
+        )]
+        if (templateIds.length > 0) {
+          const { data: templates } = await supabase
+            .from('card_templates')
+            .select(TEMPLATE_COLUMNS)
+            .in('id', templateIds)
+            .returns<PlanTemplateRow[]>()
+          planTemplateFields = Object.fromEntries((templates ?? []).map((template) => [
+            template.id,
+            [...(template.fields ?? [])]
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map((field) => field.key)
+              .filter((key): key is string => typeof key === 'string'),
+          ]))
+        }
       }
 
-      set({ plan: planRow as DailyPlanRow, planItems: items, planCards })
+      set({ plan: planRow as DailyPlanRow, planItems: items, planCards, planTemplateFields })
     } catch (e) {
-      set({ planError: toLearningError(e), plan: null, planItems: [], planCards: {} })
+      set({
+        planError: toLearningError(e), plan: null, planItems: [], planCards: {},
+        planTemplateFields: {},
+      })
     } finally {
       set({ planLoading: false })
     }
@@ -577,24 +742,99 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const userId = userData?.user?.id
       if (!userId) throw { code: 'P0001', message: 'Authentication required' }
 
-      // Only the DUE set: a plan is today's work, and this keeps a large account from
-      // turning generation into a full-table read. `next_review_at IS NULL` is a new
-      // card, which the mapper scores as maximally due.
-      const { data: cardRows, error: cardErr } = await supabase
-        .from('cards')
-        .select(CARD_COLUMNS)
-        .in('deck_id', deckIds)
-        .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
-        .limit(CANDIDATE_CARD_LIMIT)
-        .returns<Card[]>()
-      if (cardErr) throw cardErr
-      const cards = cardRows ?? []
+      // A card's schedule is not always on the card row. Decks the learner OWNS carry SRS
+      // embedded in `cards`; decks they SUBSCRIBED to keep the learner's own schedule in
+      // `user_card_progress` while `cards` holds the PUBLISHER's (mig 009, `getSrsSource`).
+      //
+      // Planning read `cards` for both, so on a subscribed or official deck every memory
+      // feature saw the publisher's untouched row — in production all 376,095 official cards
+      // have `interval_days = 0` and `last_reviewed_at = NULL`. Every card scored identically
+      // and the "personalised" plan was whatever order the rows arrived in.
+      const { data: deckRows, error: deckErr } = await supabase
+        .from('decks')
+        .select('id, user_id, share_mode, source_owner_id')
+        .in('id', deckIds)
+        .returns<PlannerDeckMeta[]>()
+      if (deckErr) throw deckErr
+      const { embeddedDeckIds, progressDeckIds } = splitDecksBySrsSource(deckRows ?? [], userId)
+
+      // Owned decks: the DUE filter goes in the query. A plan is today's work, and this keeps a
+      // large account from turning generation into a full-table read. `next_review_at IS NULL`
+      // is a new card, which the mapper scores as maximally due.
+      const embeddedCards = embeddedDeckIds.length === 0 ? [] : await (async () => {
+        const { data, error } = await supabase
+          .from('cards')
+          .select(CARD_COLUMNS)
+          .in('deck_id', embeddedDeckIds)
+          .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+          .limit(CANDIDATE_CARD_LIMIT)
+          .returns<Card[]>()
+        if (error) throw error
+        return data ?? []
+      })()
+
+      // Subscribed decks: the due filter CANNOT be pushed into the card query, because the
+      // column it would filter on belongs to the publisher. Drive from the progress table
+      // instead — `idx_ucp_user_review` covers exactly this predicate — then read the cards
+      // those rows point at, so the limit is spent on cards that are actually due.
+      const progressCards = progressDeckIds.length === 0 ? [] : await (async () => {
+        const { data: progressRows, error: progressErr } = await supabase
+          .from('user_card_progress')
+          .select('id, user_id, card_id, deck_id, srs_status, ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at, srs_revision, created_at, updated_at')
+          .eq('user_id', userId)
+          .in('deck_id', progressDeckIds)
+          .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+          .limit(CANDIDATE_CARD_LIMIT)
+          .returns<UserCardProgress[]>()
+        if (progressErr) throw progressErr
+        const rows = progressRows ?? []
+        if (rows.length === 0) return []
+        const { data: cardData, error: cardsErr } = await supabase
+          .from('cards')
+          .select(CARD_COLUMNS)
+          .in('id', rows.map((row) => row.card_id))
+          .returns<Card[]>()
+        if (cardsErr) throw cardsErr
+        // Re-checked in memory: a progress row can be seeded with a due date the query matched
+        // on, and `attachProgressToCards` is what puts that date on the card the planner sees.
+        return attachProgressToCards(cardData ?? [], rows)
+          .filter((card) => isDueAt(card.next_review_at, ctx.now))
+      })()
+
+      const cards = [...embeddedCards, ...progressCards].slice(0, CANDIDATE_CARD_LIMIT)
       if (cards.length === 0) {
         set({ planBlockedReason: 'no_candidates' })
         return false
       }
 
+      // The templates of those cards, which decide WHICH items can be answered by typing.
+      //
+      // Read here rather than derived from the cards: only the template author's declared
+      // `front_layout` / `back_layout` can say which field is the answer, and guessing from
+      // jsonb key order is inverted for every official word card (shared/lib/card-answer).
+      //
+      // A failure is NOT fatal and deliberately not thrown: an unreadable or missing template
+      // means the plan falls back to what it has always done — a self-rating with no input box.
+      // Failing plan generation because a typing affordance could not be offered would trade a
+      // working feature for a missing one.
+      const templateIds = [...new Set(
+        cards.map((card) => card.template_id).filter((id): id is string => !!id),
+      )]
+      const templatesById = new Map<string, PlanTemplateRow>()
+      if (templateIds.length > 0) {
+        const { data: templateRows } = await supabase
+          .from('card_templates')
+          .select(TEMPLATE_COLUMNS)
+          .in('id', templateIds)
+          .returns<PlanTemplateRow[]>()
+        for (const template of templateRows ?? []) templatesById.set(template.id, template)
+      }
+
       const since = new Date(Date.parse(ctx.now) - LOG_WINDOW_DAYS * 86_400_000).toISOString()
+      // `.returns` rather than a cast at the call site: the cast is what let `rating` be
+      // declared `number` while the column is TEXT, which silently pinned `recentFailure` to
+      // its no-evidence constant. If the columns and the interface disagree again, this line
+      // is where the compiler says so.
       const { data: logRows, error: logErr } = await supabase
         .from('study_logs')
         .select('card_id, rating, review_duration_ms, studied_at')
@@ -602,6 +842,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         .gte('studied_at', since)
         .order('studied_at', { ascending: false })
         .limit(LOG_ROW_LIMIT)
+        .returns<CandidateStudyLog[]>()
       if (logErr) throw logErr
 
       const deckImportance: Record<string, number> = {}
@@ -623,7 +864,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
 
       const candidates = buildCandidatesFromCards({
         cards,
-        recentLogs: (logRows ?? []) as CandidateStudyLog[],
+        recentLogs: logRows ?? [],
         deckImportance,
         now: ctx.now,
         acceptedCardIds,
@@ -643,11 +884,41 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       }
 
       const cardsById = new Map(cards.map((card) => [card.id, card]))
+      // Candidates carry the recall estimate; planner output does not, because the planner does
+      // not score on it (see PlannerCandidate.retrievability). Keyed on candidateId, which is
+      // what the planner preserves through ranking and selection.
+      const recallByCandidate = new Map(
+        candidates
+          .filter((candidate) => typeof candidate.retrievability === 'number')
+          .map((candidate) => [candidate.candidateId, candidate.retrievability as number]),
+      )
       const items = output.items.map((item) => {
         const card = item.cardId ? cardsById.get(item.cardId) : undefined
         const shape = card
-          ? legacyCardItemShape(card)
-          : { activityType: item.activityType, stimulusType: 'text', responseType: 'self_rate', evaluatorType: 'self_rate' }
+          ? legacyCardItemShape(card, card.template_id ? templatesById.get(card.template_id) : null)
+          : {
+            activityType: item.activityType, stimulusType: 'text',
+            responseType: 'self_rate', evaluatorType: 'self_rate', answerFaces: null,
+          }
+        // `payload` carries two independent records, and either can be absent.
+        //
+        // `typed_answer` records WHICH fields the plan called prompt and reference, decided
+        // here and never re-derived: a template edited after today's plan was written must not
+        // change what today's plan meant.
+        //
+        // `recall_probability` is the estimate this row was CHOSEN on, stored so the plan can
+        // SHOW its reasoning instead of only asserting it. Omitted when the estimate is null —
+        // a new card has no forgetting curve, and `recall_probability: null` would render as a
+        // number-shaped absence rather than no claim at all.
+        //
+        // `daily_plan_items.payload` already exists and `save_daily_plan` already writes it
+        // (mig 167), so neither record needs a migration. The key is omitted entirely when BOTH
+        // are absent, so `save_daily_plan` keeps writing its `'{}'` default for every other item.
+        const recall = recallByCandidate.get(item.candidateId)
+        const payload = {
+          ...(planItemAnswerPayload(shape) ?? {}),
+          ...(recall === undefined ? {} : { recall_probability: recall }),
+        }
         return {
           activity_id: item.activityId,
           card_id: item.cardId,
@@ -659,6 +930,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           reason_code: item.reasonCode,
           priority: item.priority,
           estimated_minutes: item.estimatedMinutes,
+          ...(Object.keys(payload).length > 0 ? { payload } : {}),
         }
       })
 
@@ -708,12 +980,31 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     set({ recordingItemId: item.id, planError: null })
     try {
       const score = Math.min(1, Math.max(0, input.score))
+      // The typed answer, if this item asks for one.
+      //
+      // Gated on the ITEM's snapshot, not on whether the caller passed text: `response_type`
+      // is what the row claims to hold, and storing prose under a `self_rate` item would make
+      // that claim false. Trimmed and capped because `record_answer_attempt` rejects a response
+      // over 64 KiB with the same error code as the plan-save cap — a limit the learner would
+      // meet as an unrelated message about rebuilding plans.
+      const typed = item.response_type === 'text'
+      const text = typed
+        ? (input.text ?? '').trim().slice(0, TYPED_ANSWER_MAX_CHARS)
+        : ''
+      // Built BEFORE the call and never re-derived: `p_response` is part of the RPC's
+      // idempotency comparison, so the same `clientAttemptId` with a different response raises
+      // P0007. An empty answer stays `{ self_rated }` — the exact shape every existing attempt
+      // has — rather than `{ self_rated, text: '' }`, so "typed nothing" and "was never asked"
+      // read the same downstream, and no later feature can mistake an empty string for an answer.
+      const response: Record<string, unknown> = text === ''
+        ? { self_rated: score }
+        : { self_rated: score, text }
       const { error } = await supabase.rpc('record_answer_attempt', {
         p_client_attempt_id: input.clientAttemptId,
         p_activity_type: item.activity_type,
         p_response_type: item.response_type,
         p_evaluator_type: item.evaluator_type,
-        p_response: { self_rated: score },
+        p_response: response,
         p_goal_id: input.goalId,
         p_activity_id: item.activity_id,
         p_card_id: item.card_id,
@@ -741,7 +1032,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('answer_attempts')
-        .select('id, goal_id, card_id, activity_id, plan_item_id, activity_type, evaluator_type, normalized_score, duration_ms, created_at')
+        // `response` and `response_type` are read back so the history row can show the learner
+        // exactly what was stored — the honesty check for typed answers, and the only way a
+        // later feature can tell an attempt that HAS an answer from one that does not.
+        .select('id, goal_id, card_id, activity_id, plan_item_id, activity_type, response_type, evaluator_type, response, normalized_score, duration_ms, created_at')
         .eq('goal_id', goalId)
         .order('created_at', { ascending: false })
         .limit(50)
@@ -776,6 +1070,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         uiLang: input.uiLang,
         goalId: input.goalId,
         cardIds: [input.cardId],
+        // Omitted entirely when absent: the edge function rejects a malformed uuid, and
+        // sending `null` for "no attempt" would be a different request shape than the one
+        // `parseRemediationRefs` treats as "not supplied".
+        ...(input.attemptId ? { attemptId: input.attemptId } : {}),
       })
       // No enrichment id means the server could not persist the preview, so there is
       // nothing to accept later. Surfacing it as an error beats showing content that
@@ -801,6 +1099,23 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     } finally {
       set({ enrichmentPendingCardId: null })
     }
+  },
+
+  /**
+   * Read the price of one remediation before offering it.
+   *
+   * Fails SILENTLY into `null`: a wallet read that times out must not stop a learner with
+   * credits from asking a question, and the alternative — rendering 0 — would understate a
+   * real charge. The server remains authoritative and rejects an empty wallet with
+   * `AI_INSUFFICIENT_CREDITS`, which already has its own message.
+   */
+  loadEnrichmentQuote: async () => {
+    const wallet = await getAiWallet()
+    set({
+      enrichmentQuote: wallet
+        ? { estPriceMicro: wallet.estPricePerCardMicro, balanceMicro: wallet.balanceMicroWon }
+        : null,
+    })
   },
 
   /**
@@ -847,8 +1162,11 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    * nothing about this week.
    */
   fetchInsights: async (goalId) => {
-    if (get().insightsLoading) return
-    set({ insightsLoading: true })
+    // Latest-wins, NOT first-wins. A busy-flag early return would drop the goal the learner
+    // just selected and leave the previous goal's numbers under the new goal's label; a
+    // plain overwrite would let a slow earlier response land last and do the same thing.
+    const seq = ++insightsRequestSeq
+    set({ insightsLoading: true, insightsError: null })
     try {
       const now = Date.now()
       const attemptsSince = new Date(now - 30 * 86_400_000).toISOString()
@@ -870,22 +1188,28 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           .gte('plan_date', plansSince)
           .returns<InsightPlan[]>(),
       ])
+      if (seq !== insightsRequestSeq) return
       if (attemptsResult.error) throw attemptsResult.error
       if (plansResult.error) throw plansResult.error
 
-      set({ insights: summarizeLearning({
-        attempts: attemptsResult.data ?? [],
-        plans: plansResult.data ?? [],
-      }) })
+      set({
+        insights: summarizeLearning({
+          attempts: attemptsResult.data ?? [],
+          plans: plansResult.data ?? [],
+        }),
+        insightsGoalId: goalId,
+      })
     } catch (e) {
-      set({ planError: toLearningError(e), insights: null })
+      if (seq !== insightsRequestSeq) return
+      set({ insightsError: toLearningError(e), insights: null, insightsGoalId: goalId })
     } finally {
-      set({ insightsLoading: false })
+      if (seq === insightsRequestSeq) set({ insightsLoading: false })
     }
   },
 
   /** Recommendations for a goal, newest first. Owner-scoped by RLS. */
   fetchRecommendations: async (goalId) => {
+    const seq = ++recommendationsRequestSeq
     set({ recommendationsLoading: true })
     try {
       const { data, error } = await supabase
@@ -895,12 +1219,14 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         .order('created_at', { ascending: false })
         .limit(50)
         .returns<RecommendationRow[]>()
+      if (seq !== recommendationsRequestSeq) return
       if (error) throw error
-      set({ recommendations: data ?? [] })
+      set({ recommendations: data ?? [], recommendationsGoalId: goalId })
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      if (seq !== recommendationsRequestSeq) return
+      set({ insightsError: toLearningError(e) })
     } finally {
-      set({ recommendationsLoading: false })
+      if (seq === recommendationsRequestSeq) set({ recommendationsLoading: false })
     }
   },
 
@@ -956,26 +1282,40 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    * `contentImportance`, so the decision changes tomorrow's plan. Dismissing keeps the
    * suggestion from being re-proposed, because the server preserves non-pending rows.
    *
-   * Both states are terminal server-side (P0007 on a second transition), which the store
-   * treats as success — the learner's intent is already recorded, and an unclearable error
-   * would be the wrong reading of that code.
+   * Both states are terminal server-side (P0007 on a second transition). That is not an
+   * error the learner can act on — the decision is already recorded — but it is also NOT a
+   * licence to claim the status THIS tab asked for: the row may have been accepted elsewhere
+   * while this one asked to dismiss it. So P0007 re-reads the goal's rows and adopts the
+   * server's truth instead of rendering a state the server does not hold.
    */
   resolveRecommendation: async (id, status) => {
     if (get().recommendationBusyId) return false
-    set({ recommendationBusyId: id, planError: null })
+    const target = get().recommendations.find((rec) => rec.id === id)
+    set({ recommendationBusyId: id, insightsError: null })
     try {
       const { error } = await supabase.rpc('set_study_recommendation_status', {
         p_recommendation_id: id,
         p_status: status,
       })
-      if (error && (error as { code?: string }).code !== 'P0007') throw error
+      const alreadyDecided = !!error && (error as { code?: string }).code === 'P0007'
+      if (error && !alreadyDecided) throw error
+
+      if (alreadyDecided) {
+        set({ recommendationBusyId: null })
+        // Re-read only when the row tells us which goal to re-read. A suggestion with no
+        // goal cannot be refetched, so the safer move is to leave the list untouched rather
+        // than assert a status the server may not hold.
+        if (target?.goal_id) await get().fetchRecommendations(target.goal_id)
+        return true
+      }
+
       set({
         recommendations: get().recommendations.map((rec) =>
           rec.id === id ? { ...rec, status } : rec),
       })
       return true
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      set({ insightsError: toLearningError(e) })
       return false
     } finally {
       set({ recommendationBusyId: null })
@@ -986,13 +1326,22 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    *  resolved later; the money is spent either way. */
   dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
 
-  reset: () => set({
-    goals: [], goalsLoading: false, goalsError: null,
-    plan: null, planItems: [], planCards: {}, planLoading: false, planGenerating: false,
-    planError: null, planBlockedReason: null,
-    recordingItemId: null, attempts: [], attemptsLoading: false,
-    enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
-    enrichmentSaving: false, insights: null, insightsLoading: false,
-    recommendations: [], recommendationsLoading: false, recommendationBusyId: null,
-  }),
+  reset: () => {
+    // Bump both generations so any response still in flight is recognised as superseded and
+    // cannot repopulate the store after a logout.
+    insightsRequestSeq++
+    recommendationsRequestSeq++
+    set({
+      goals: [], goalsLoading: false, goalsError: null,
+      plan: null, planItems: [], planCards: {}, planTemplateFields: {},
+      planLoading: false, planGenerating: false,
+      planError: null, planBlockedReason: null,
+      recordingItemId: null, attempts: [], attemptsLoading: false,
+      enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
+      enrichmentSaving: false, enrichmentQuote: null,
+      insights: null, insightsLoading: false, insightsGoalId: null, insightsError: null,
+      recommendations: [], recommendationsLoading: false, recommendationsGoalId: null,
+      recommendationBusyId: null,
+    })
+  },
 }))

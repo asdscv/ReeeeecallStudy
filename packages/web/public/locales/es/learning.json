@@ -20,11 +20,12 @@
     "item": {
       "study": "Estudiar",
       "untitled": "(sin texto)",
-      "minutes": "~{{count, number}} min",
+      "minutes": "~{{count, decimal}} min",
       "recorded": "Registrado"
     },
     "reason": {
       "due": "Pendiente de repaso",
+      "memoryRisk": "A punto de olvidarse",
       "recentFailure": "Fallo reciente",
       "slowResponse": "Respuesta lenta",
       "goalRelevance": "Relevancia del objetivo",
@@ -46,7 +47,13 @@
       "known": "Lo sabía",
       "hint": "Registra tu intento; no cambia el calendario de repaso."
     },
-    "insightsLink": "Diagnóstico"
+    "answer": {
+      "label": "Tu respuesta (opcional)",
+      "placeholder": "Escribe lo que recuerdes",
+      "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya."
+    },
+    "insightsLink": "Diagnóstico",
+    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla"
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
@@ -78,7 +85,9 @@
       "authRequired": "Inicia sesión de nuevo.",
       "forbidden": "No tienes acceso a eso.",
       "unknown": "Algo salió mal. Inténtalo de nuevo."
-    }
+    },
+    "deckCount_one": "{{count, number}} mazo",
+    "deckCount_other": "{{count, number}} mazos"
   },
   "form": {
     "createTitle": "Nuevo objetivo",
@@ -101,11 +110,19 @@
     "error": {
       "title": "Introduce un nombre de objetivo (1–500 caracteres).",
       "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440."
+    },
+    "deckPriority": {
+      "label": "Prioridad",
+      "low": "Baja",
+      "normal": "Normal",
+      "high": "Alta",
+      "hint": "Los mazos con más prioridad aparecen antes cuando el día está lleno."
     }
   },
   "history": {
     "title": "Intentos recientes ({{count, number}})",
     "itemFallback": "Intento de {{type}}",
+    "youWrote": "Escribiste: {{text}}",
     "score": {
       "unknown": "Sin puntuación"
     }
@@ -116,8 +133,11 @@
     "costHint": "Utiliza créditos de IA de tu billetera",
     "action": {
       "explain": "Explicación IA",
-      "hint": "Pista de estudio"
+      "hint": "Pista de estudio",
+      "compare": "Comparar mi respuesta"
     },
+    "quote": "Unos {{price}} por solicitud · quedan {{balance}}",
+    "groundedHint": "Responde a este intento, no solo a la tarjeta",
     "sources": "Fuentes",
     "noSources": "Esta respuesta no está basada en fuentes.",
     "empty": "El modelo no devolvió nada utilizable.",
@@ -136,7 +156,9 @@
       "NOT_CONFIGURED": "La generación con IA no está habilitada en este servidor.",
       "PROVIDER_ERROR": "El servicio de IA falló. Inténtalo de nuevo.",
       "RATE_CAP": "Has alcanzado el límite diario de solicitudes de IA. Inténtalo mañana.",
-      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo.",
+      "COMPARE_NO_ANSWER": "Escribe tu respuesta primero: todavía no hay nada que comparar.",
+      "COMPARE_NO_REFERENCE": "Esta tarjeta no indica qué campo es la respuesta, así que no hay con qué compararla."
     }
   },
   "insights": {
@@ -146,7 +168,7 @@
     "accuracy": "Precisión",
     "notScoredYet": "Nada puntuado aún",
     "typicalTime": "Tiempo habitual",
-    "seconds": "{{count, number}}s",
+    "seconds": "{{count, decimal}}s",
     "adherence": "Cumplimiento del plan (14 días)",
     "weakTitle": "Vale otra mirada",
     "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",
@@ -157,7 +179,9 @@
     "adherenceEmpty": "No hay planes en este período.",
     "noPlanItems": "Nada planificado",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial."
+    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
+    "attemptCount_one": "{{count, number}} intento",
+    "attemptCount_other": "{{count, number}} intentos"
   },
   "recommend": {
     "title": "Recomendaciones",

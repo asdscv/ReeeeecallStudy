@@ -268,6 +268,30 @@ export interface PlannerCandidate {
   readonly responseTimePenalty: number
   readonly goalRelevance: number
   readonly contentImportance: number
+  /**
+   * How much a review right now is worth given the estimated forgetting curve, 0..1,
+   * peaking below certainty (see `application/memory.ts`).
+   *
+   * Optional AND nullable on purpose: `undefined` (a caller that does not compute it) and
+   * `null` (a card whose memory state cannot be estimated — new, never reviewed, no interval)
+   * mean the same thing to the planner, which renormalises the remaining weights instead of
+   * substituting a neutral value. A number here is never a guess.
+   */
+  readonly reviewValue?: number | null
+  /**
+   * Estimated probability the learner can recall this item right now, 0..1.
+   *
+   * Carried for EXPLANATION, never for scoring. `reviewValue` is the ranking feature and is
+   * derived from this; adding this to the planner's `FEATURES` as well would count the same
+   * evidence twice, and would do it with the wrong shape — recall probability is monotone in
+   * time while a review's value is not a straight function of it.
+   *
+   * It exists on the candidate because it is the one number in this whole model a learner can
+   * read without being taught anything ("you have about a 40% chance of remembering this"), and
+   * the plan row is where that belongs. Same optional-and-nullable discipline as `reviewValue`:
+   * a number here is never a guess.
+   */
+  readonly retrievability?: number | null
   readonly estimatedMinutes: number
   readonly difficulty: Difficulty | null
 }

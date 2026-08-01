@@ -20,11 +20,12 @@
     "item": {
       "study": "Belajar",
       "untitled": "(tidak ada teks)",
-      "minutes": "~{{count, number}} menit",
+      "minutes": "~{{count, decimal}} menit",
       "recorded": "Tercatat"
     },
     "reason": {
       "due": "Waktunya mengulang",
+      "memoryRisk": "Hampir terlupakan",
       "recentFailure": "Baru saja salah",
       "slowResponse": "Lambat menjawab",
       "goalRelevance": "Relevansi tujuan",
@@ -46,7 +47,13 @@
       "known": "Tahu",
       "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
     },
-    "insightsLink": "Analisis"
+    "answer": {
+      "label": "Jawaban kamu (opsional)",
+      "placeholder": "Tulis apa yang kamu ingat",
+      "note": "Disimpan bersama percobaan ini. Tidak dinilai — penilaian tetap dari kamu."
+    },
+    "insightsLink": "Analisis",
+    "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini"
   },
   "goals": {
     "title": "Tujuan belajar",
@@ -78,7 +85,9 @@
       "authRequired": "Silakan masuk lagi.",
       "forbidden": "Anda tidak memiliki akses.",
       "unknown": "Terjadi kesalahan. Silakan coba lagi."
-    }
+    },
+    "deckCount_one": "{{count, number}} dek",
+    "deckCount_other": "{{count, number}} dek"
   },
   "form": {
     "createTitle": "Tujuan baru",
@@ -101,11 +110,19 @@
     "error": {
       "title": "Masukkan nama tujuan (1–500 karakter).",
       "dailyMinutes": "Menit per hari harus antara 1 dan 1440."
+    },
+    "deckPriority": {
+      "label": "Prioritas",
+      "low": "Rendah",
+      "normal": "Normal",
+      "high": "Tinggi",
+      "hint": "Dek berprioritas tinggi muncul lebih dulu saat harimu penuh."
     }
   },
   "history": {
     "title": "Percobaan terbaru ({{count, number}})",
     "itemFallback": "Percobaan {{type}}",
+    "youWrote": "Kamu menulis: {{text}}",
     "score": {
       "unknown": "Tanpa skor"
     }
@@ -116,8 +133,11 @@
     "costHint": "Menggunakan kredit AI dari dompet Anda",
     "action": {
       "explain": "Penjelasan AI",
-      "hint": "Petunjuk belajar"
+      "hint": "Petunjuk belajar",
+      "compare": "Bandingkan jawabanku"
     },
+    "quote": "Sekitar {{price}} per permintaan · sisa {{balance}}",
+    "groundedHint": "Menjawab percobaan ini, bukan hanya kartunya",
     "sources": "Sumber",
     "noSources": "Jawaban ini tidak berdasarkan sumber.",
     "empty": "Model tidak mengembalikan konten yang bisa digunakan.",
@@ -136,7 +156,9 @@
       "NOT_CONFIGURED": "Pembuatan AI belum diaktifkan di server ini.",
       "PROVIDER_ERROR": "Layanan AI gagal. Silakan coba lagi.",
       "RATE_CAP": "Anda telah mencapai batas permintaan AI hari ini. Coba lagi besok.",
-      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi.",
+      "COMPARE_NO_ANSWER": "Tulis jawabanmu dulu — belum ada yang bisa dibandingkan.",
+      "COMPARE_NO_REFERENCE": "Kartu ini tidak menandai bidang mana yang jadi jawaban, jadi tidak ada pembandingnya."
     }
   },
   "insights": {
@@ -146,7 +168,7 @@
     "accuracy": "Akurasi",
     "notScoredYet": "Belum ada yang dinilai",
     "typicalTime": "Waktu biasa",
-    "seconds": "{{count, number}}d",
+    "seconds": "{{count, decimal}}d",
     "adherence": "Kepatuhan rencana (14 hari)",
     "weakTitle": "Perlu dilihat lagi",
     "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
@@ -157,7 +179,9 @@
     "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
     "noPlanItems": "Tidak ada yang direncanakan",
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar."
+    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
+    "attemptCount_one": "{{count, number}} percobaan",
+    "attemptCount_other": "{{count, number}} percobaan"
   },
   "recommend": {
     "title": "Rekomendasi",

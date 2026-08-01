@@ -4,6 +4,9 @@
 
 ## Run locally
 
+Run every command from the **repository root** — `vitest.config.ts` resolves its
+`include` glob relative to the working directory.
+
 ```bash
 # 1. start local supabase (requires Docker)
 supabase start
@@ -17,7 +20,7 @@ export SUPABASE_ANON_KEY=$(supabase status -o json | jq -r .ANON_KEY)
 export SUPABASE_SERVICE_ROLE_KEY=$(supabase status -o json | jq -r .SERVICE_ROLE_KEY)
 
 # 4. run
-npx vitest run --config tests/integration/vitest.config.ts
+pnpm exec vitest run --config tests/integration/vitest.config.ts
 ```
 
 When env vars are absent, the suite is skipped (CI-safe).

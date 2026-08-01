@@ -40,7 +40,8 @@
     "show": "Hiện",
     "hide": "Ẩn",
     "startStudy": "Bắt đầu học",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "retry": "Thử lại"
   },
   "status": {
     "loading": "Đang tải...",

@@ -244,9 +244,21 @@ cleanly on the paid path); turn paid on only once the provider accounts and pack
 
 ## 5. Admin revenue-reporting caveat  (accuracy, post-launch — low)
 
-The admin billing dashboard sums **catalog USD** as "revenue" (`get_admin_billing_kpis` →
-`SUM(price_usd_cents * 10000)` / `payment_intents.amount_micro_won`, mig 145/147). That figure is
-the LIST price we advertise, **not the actual net we receive**. For a mobile IAP the real receipt is:
+The admin billing dashboard sums **catalog USD** as "revenue". Two corrections to what this
+section said before, both verified against the schema on 2026-07-31 (`pg_proc` in a fully
+migrated DB):
+
+- **There is no `get_admin_billing_kpis`.** The function this section named does not exist —
+  the only billing aggregate is **`admin_billing_overview`** (latest body: mig 159).
+- **The mobile half is not overstated, it is ABSENT.** `paid_revenue_30d_micro` reads
+  `payment_intents` alone (`WHERE pi.status = 'paid'`), and an IAP consumable opens no
+  `payment_intents` row — so credit packs bought on iOS/Android contribute **zero** revenue,
+  and `mrr_micro_won` counts only subscriptions. A *web* refund does drop out correctly
+  (`pi.status` becomes `refunded`), so there is no "refunded row still counted" bug here;
+  the gap is missing rows, not wrong ones.
+
+That still leaves the original point: what is reported is the LIST price we advertise, **not the
+actual net we receive**. For a mobile IAP the real receipt is:
 
     현지 통화 결제액  −  애플/구글 수수료(≈15–30%)  −  환율 스프레드  =  실수령 순액
 
@@ -266,9 +278,20 @@ both learned while auditing the RevenueCat webhook on 2026-07-31:
   refund), `currency`, `price_in_purchased_currency`, `tax_percentage`, `commission_percentage`
   (all documented as "Sometimes" present, so parse defensively and record what is missing rather
   than assuming zero).
-- **A separate, smaller reporting bug to fix in the same pass:** `admin_list_payments` hard-codes
-  `status = 'paid'` for every credit-pack row it lists (mig 159's body), so a **refunded** pack still
-  shows as paid in the admin payment list. The clawback row exists in the ledger; the list just does
-  not look for it.
+- **✅ FIXED (mig 175) — the smaller reporting bug in the same area:** `admin_list_payments`
+  hard-coded `status = 'paid'` for every credit-pack row it lists (mig 156's body, carried into
+  mig 159), so a **refunded** pack still showed as paid in the admin payment list. Worse than the
+  pill: `AdminBillingPage` gates the refund button on `status === 'paid' && kind === 'credit_pack'`,
+  so the list offered a **Refund** button for money already returned (the path is idempotent, so
+  nothing moved twice — but the confirm dialog quoted the full amount as refundable). mig 175
+  derives the status from the ledger via `credit_grant_is_refunded()` — deliberately reusing the
+  money path's verdict rather than re-implementing the `refund:` / `reversal:` namespace rule — so a
+  standing refund reads `refunded` and a store-reversed one (`REFUND_REVERSED`) reads `paid` again.
+  Covered by `supabase/tests/admin_payment_refund_status_test.sql` (wired into the CI
+  `ai-credit-tests` job), which asserts the transition both ways and pins list-vs-guard agreement.
+  The web `payment_intents` arm was never affected — it reads its real `pi.status`.
+  **Not** touched by this fix: `admin_billing_overview` still reports gross catalog price, and it
+  never saw mobile credit packs at all (see the correction above). That is the net-proceeds gap,
+  and it needs the settlement decision, not a patch.
 
 Until then, treat the admin revenue number as **gross list price**, not net receipts.

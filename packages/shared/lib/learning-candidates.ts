@@ -14,14 +14,33 @@
 // missing evidence: zero is a real signal ("definitely not due", "never fails"), so
 // using it for "we don't know" would systematically bury new or unlogged cards. The
 // neutral value is 0.5 unless a different value is justified below.
+//
+// `reviewValue` is the one feature whose no-evidence value is NULL rather than a number: the
+// planner can renormalise around a missing memory estimate (daily-plan-v2), so there is no need
+// to pick a stand-in for a card that has no forgetting curve yet.
 import { activitiesForLegacyCard } from '../learning/adapters/index.ts'
+import { estimateMemory } from '../learning/application/memory.ts'
 import type { PlannerCandidate } from '../learning/domain/index.ts'
 import type { Card } from '../types/database.ts'
+import {
+  resolveCardAnswerFaces, type CardAnswerTemplate, type CardFaceKeys,
+} from './card-answer.ts'
 
 /** The subset of a study_logs row the mapper needs. */
 export interface CandidateStudyLog {
   readonly card_id: string
-  readonly rating: number | null
+  /**
+   * `study_logs.rating` is TEXT, not a number.
+   *
+   * This was declared `number | null` and the store cast the rows to this interface, so the
+   * compiler had nothing to disagree with — and `recentFailureFor`'s `typeof === 'number'`
+   * filter was false for every row a real database returns. A 0.25-weight feature sat at its
+   * no-evidence constant in production. See `ratingStruggle` for the actual vocabulary.
+   *
+   * Numbers stay accepted because the SM-2 grade scale (1..4) is the natural shape for a
+   * future column and one function should judge both rather than this file breaking again.
+   */
+  readonly rating: string | number | null
   readonly review_duration_ms: number | null
   readonly studied_at: string
 }
@@ -56,8 +75,60 @@ const DUE_SATURATION_DAYS = 7
 /** How many of a card's most recent logs contribute to recentFailure. */
 const RECENT_LOG_WINDOW = 5
 
-/** A rating at or below this counts as a failure (1=Again, 2=Hard in the SRS UI). */
+/** A numeric rating at or below this counts as a full failure (1=Again, 2=Hard in the SRS UI). */
 const FAILURE_RATING = 2
+
+/**
+ * How much each rating says the learner STRUGGLED with the card, 0..1. `null` = not a rating.
+ *
+ * The vocabulary is fixed by the CHECK constraint on `study_logs.rating`
+ * (`071_fix_study_logs_constraints.sql`): again, hard, good, easy, known, unknown, next,
+ * viewed, got_it, missed. Every one of them is named here so a value the database can store is
+ * never silently read as something it is not.
+ *
+ * `hard` is 0.5, not 1. Counting it as a lapse would contradict the scheduler, which on `hard`
+ * INCREASES the interval (`srs.ts` review phase: `interval × 1.2`); counting it as a success
+ * would throw away the only signal that distinguishes a card the learner barely got from one
+ * they knew cold. A graded value is the only reading that agrees with both.
+ *
+ * `next` and `viewed` are navigation, not judgement — they are recorded by the browse/cram
+ * modes where the learner never says whether they recalled anything. They return null so they
+ * leave the DENOMINATOR too: a card flipped past ten times has no failure evidence, and
+ * averaging zeros into it would read as ten clean successes.
+ *
+ * An unrecognized string also returns null. A rating added by a future migration must not be
+ * counted as a success by default — that would quietly lower the priority of cards the learner
+ * is failing, which is the exact defect this function was written to fix.
+ */
+export function ratingStruggle(rating: string | number | null | undefined): number | null {
+  if (typeof rating === 'number') {
+    // SM-2 grade scale, kept for a future numeric column. Below the failure line is a lapse;
+    // at the line ("hard") is the same half-credit the text vocabulary gives it.
+    if (!Number.isFinite(rating)) return null
+    if (rating < FAILURE_RATING) return 1
+    if (rating === FAILURE_RATING) return 0.5
+    return 0
+  }
+  switch (rating) {
+    // Recall failed outright: SRS "Again", sequential-review "unknown", cramming "missed".
+    case 'again':
+    case 'unknown':
+    case 'missed':
+      return 1
+    // Recalled, but with effort.
+    case 'hard':
+      return 0.5
+    // Recall succeeded: SRS good/easy, sequential-review "known", cramming "got_it".
+    case 'good':
+    case 'easy':
+    case 'known':
+    case 'got_it':
+      return 0
+    // Not a judgement of recall (browse/sequential modes), and anything unrecognized.
+    default:
+      return null
+  }
+}
 
 /** Neutral value for a feature with no evidence (design §9.2). */
 const NEUTRAL = 0.5
@@ -101,13 +172,20 @@ export function dueUrgencyFor(nextReviewAt: string | null | undefined, nowMs: nu
   return clamp01(NEUTRAL + (days / span) * NEUTRAL)
 }
 
-/** Share of failures among a card's most recent logs; no logs → NEUTRAL_RECENT_FAILURE. */
+/**
+ * Mean struggle across a card's most recent RATED logs; no rated log → NEUTRAL_RECENT_FAILURE.
+ *
+ * Logs that carry no judgement of recall (`next`, `viewed`, unrecognized values) are dropped
+ * before the window is taken, not after: keeping them would let ten browse events push the one
+ * real lapse out of a 5-log window.
+ */
 export function recentFailureFor(logs: readonly CandidateStudyLog[]): number {
-  const rated = logs.filter((log) => typeof log.rating === 'number')
-  if (rated.length === 0) return NEUTRAL_RECENT_FAILURE
-  const window = rated.slice(0, RECENT_LOG_WINDOW)
-  const failures = window.filter((log) => (log.rating as number) <= FAILURE_RATING).length
-  return clamp01(failures / window.length)
+  const struggles = logs
+    .map((log) => ratingStruggle(log.rating))
+    .filter((value): value is number => value !== null)
+  if (struggles.length === 0) return NEUTRAL_RECENT_FAILURE
+  const window = struggles.slice(0, RECENT_LOG_WINDOW)
+  return clamp01(window.reduce((sum, value) => sum + value, 0) / window.length)
 }
 
 /**
@@ -142,21 +220,86 @@ export interface PlanItemShape {
   readonly stimulusType: string
   readonly responseType: string
   readonly evaluatorType: string
+  /**
+   * The prompt/reference field keys the card's TEMPLATE declared, or null when it did not.
+   *
+   * Non-null is what makes `responseType` `'text'`, and it is carried out of here so the
+   * caller can record the decision on the plan row instead of re-deriving it later from a
+   * template that may since have been edited.
+   */
+  readonly answerFaces: CardFaceKeys | null
 }
+
+/**
+ * Resolver identity stored alongside the keys on a plan item.
+ *
+ * The keys are only meaningful together with the rule that produced them: "the template's
+ * declared faces, refusing when they cannot be known" (shared/lib/card-answer). A stored payload
+ * that does not say which rule wrote it cannot be audited after the rule changes.
+ */
+export const ANSWER_FACE_RESOLVER = 'card-answer-v1'
+
+/**
+ * Ceiling on a typed answer, in characters.
+ *
+ * `record_answer_attempt` rejects a `response` over 64 KiB (mig 167 §21.2) with P0006 — the same
+ * code the plan-save cap uses, which the UI renders as "you've hit today's limit for rebuilding
+ * plans". So the limit has to be enforced where the learner can see it (the input's `maxLength`)
+ * rather than discovered as an unrelated error message. 2000 characters is ~6 KB of Korean or
+ * Japanese, an order of magnitude below the server's cap, and far more than a recall answer.
+ */
+export const TYPED_ANSWER_MAX_CHARS = 2000
 
 /**
  * The stimulus/response/evaluator triple `save_daily_plan` requires for an item.
  * `PlannerCandidate` only carries `activityType`, so this reads the rest back from
  * the same adapter projection the candidate was built from — one source of truth for
  * "what a legacy card is as an activity" rather than constants copied into the store.
+ *
+ * `template` upgrades `responseType` to `'text'` — and ONLY when the template declares both
+ * faces unambiguously (`resolveCardAnswerFaces`). Passing nothing, or a template that does not
+ * declare them, keeps the item exactly as it was before typed answers existed: three rating
+ * buttons and no input. That asymmetry is the feature's safety property — the subset is defined
+ * by what the data can name, not by what the UI would like to offer.
+ *
+ * `evaluatorType` stays `'self_rate'` even for a typed item, which is precise rather than a
+ * hedge: the response IS text and the learner IS still the judge. `exact` would mark a correct
+ * paraphrase wrong, and that score feeds `normalized_score` → insights → recommendations → the
+ * next plan, so a bad grade does not just misinform, it changes what the learner studies.
  */
-export function legacyCardItemShape(card: Card): PlanItemShape {
+export function legacyCardItemShape(card: Card, template?: CardAnswerTemplate | null): PlanItemShape {
   const [activity] = activitiesForLegacyCard({ card, persistedActivities: [] })
+  const answerFaces = resolveCardAnswerFaces(template, card)
   return {
     activityType: activity.activityType,
     stimulusType: activity.stimulusType,
-    responseType: activity.responseType,
+    responseType: answerFaces ? 'text' : activity.responseType,
     evaluatorType: activity.evaluatorType,
+    answerFaces,
+  }
+}
+
+/**
+ * What to store in `daily_plan_items.payload` for an item, or null when there is nothing to say.
+ *
+ * The column exists and has been written as `{}` since mig 165; this is its first real use. It
+ * records WHICH fields the plan treated as prompt and reference at generation time, so the
+ * decision stays auditable after the template is edited or the resolver changes. Null rather
+ * than `{}` so the store can omit the key entirely and `save_daily_plan`'s
+ * `COALESCE(NULLIF(payload,'null'), '{}')` keeps its existing behaviour untouched.
+ *
+ * It is a RECORD, not an input: nothing reads it back to decide what to show. The plan row's
+ * `response_type` is the gate, because that is the column `record_answer_attempt` compares
+ * against, and a second source for the same decision is a second thing that can drift.
+ */
+export function planItemAnswerPayload(shape: PlanItemShape): Record<string, unknown> | null {
+  if (!shape.answerFaces) return null
+  return {
+    typed_answer: {
+      resolver: ANSWER_FACE_RESOLVER,
+      prompt_keys: [...shape.answerFaces.promptKeys],
+      reference_keys: [...shape.answerFaces.referenceKeys],
+    },
   }
 }
 
@@ -194,6 +337,16 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
     const [activity] = activitiesForLegacyCard({ card, persistedActivities: [] })
     const importance = input.deckImportance[card.deck_id]
     const accepted = acceptedCards.has(card.id)
+    // Memory state from the legacy SRS row. `reviewValue` stays null for a card with no
+    // interval — the planner renormalises rather than inventing a number. `next_review_at` is
+    // passed so the value curve's knee lands on the day the scheduler actually made the card
+    // due, instead of one shifted by the 04:00 review-day snap (see memory.ts).
+    const memory = estimateMemory({
+      intervalDays: card.interval_days,
+      lastReviewedAt: card.last_reviewed_at,
+      nextReviewAt: card.next_review_at,
+      now: input.now,
+    })
 
     return {
       candidateId: `card:${card.id}`,
@@ -206,6 +359,9 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
       responseTimePenalty: responseTimePenaltyFor(cardMedian, baseline),
       goalRelevance: typeof importance === 'number' ? clamp01(importance) : NEUTRAL,
       contentImportance: accepted ? ACCEPTED_CONTENT_IMPORTANCE : NEUTRAL,
+      reviewValue: memory.reviewValue,
+      // Display only — the planner does not score on it. See PlannerCandidate.retrievability.
+      retrievability: memory.retrievability,
       estimatedMinutes: RECALL_MINUTES,
       difficulty: null,
     }
