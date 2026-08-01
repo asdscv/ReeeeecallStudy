@@ -18,6 +18,38 @@ describe('learning domain adapters', () => {
     expect(activities[0]?.stimulus).toEqual({ fields: { front: '안녕' } })
   })
 
+  // ── expectedResponse: absent beats wrong ──────────────────────────────────
+  //
+  // Nothing grades against this today (`legacyCardItemShape` discards it), which is exactly
+  // why it needs pinning: the moment something does, "the expected answer is the question"
+  // would be confidently wrong rather than unavailable.
+  it('gives the declared back as the expected answer when the caller names the fields', () => {
+    const [activity] = activitiesForLegacyCard({
+      card, persistedActivities: [], frontFieldKeys: ['front'], backFieldKeys: ['back'],
+    })
+    expect(activity?.expectedResponse).toEqual({ fields: { back: 'hello' } })
+  })
+
+  it('returns NO expected answer rather than echoing the stimulus', () => {
+    // One field, so there is no back to find. The old code fell back to the front, making
+    // expectedResponse identical to stimulus — an answer that is the question.
+    const oneField: Card = { ...card, field_values: { front: '안녕' } }
+
+    const [activity] = activitiesForLegacyCard({ card: oneField, persistedActivities: [] })
+
+    expect(activity?.expectedResponse).toBeNull()
+    expect(activity?.expectedResponse).not.toEqual(activity?.stimulus)
+  })
+
+  it('never lets a positional guess become the expected answer', () => {
+    // No field keys supplied — the only way production calls it (learning-candidates.ts). The
+    // positional pick is a shape-compatibility shim, and jsonb key ordering means it can invert
+    // front and back outright, so it must not be presented as a graded reference.
+    const [activity] = activitiesForLegacyCard({ card, persistedActivities: [] })
+
+    expect(activity?.expectedResponse).not.toEqual(activity?.stimulus)
+  })
+
   it('suppresses synthesized fallback when a persisted recall activity exists', () => {
     const persisted = { ...activitiesForLegacyCard({ card, persistedActivities: [] })[0]!, id: 'persisted', config: { transient: false } }
     expect(activitiesForLegacyCard({ card, persistedActivities: [persisted] })).toEqual([persisted])

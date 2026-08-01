@@ -1,5 +1,35 @@
+/**
+ * The protocol vocabulary — every action name the SQL allowlists accept
+ * (`reserve_ai_remediation`, `persist_ai_remediation`). NOT the list this server will run.
+ */
 export const REMEDIATION_ACTIONS = ['explain', 'compare', 'hint', 'generate', 'evaluate', 'recommend'] as const
 export type RemediationAction = typeof REMEDIATION_ACTIONS[number]
+
+/**
+ * The actions this server will actually perform. Anything else is refused before a wallet is
+ * touched.
+ *
+ * This list exists because the constraint it enforces was previously written down in a CLIENT
+ * type alias (`RemediationAction = 'explain' | 'hint'` in the shared store) and nowhere else.
+ * A TypeScript union constrains our own UI and nothing about the request an authenticated
+ * caller can POST — so `action: 'compare'` reserved against the learner's wallet, called the
+ * model, and returned a comparison of the learner's answer against the expected one. Attempts
+ * store `{ self_rated: score }`: there IS no learner answer, so that comparison was invented,
+ * and the learner paid for it.
+ *
+ * `compare` and `evaluate` are absent deliberately, not accidentally:
+ *   - `compare` needs the learner's own words plus a reference answer that is genuinely the
+ *     expected one. Neither exists yet — no surface captures typed text, and picking a card
+ *     field by position guesses (and for the official word templates guesses INVERTED).
+ *   - `evaluate` must return a grade. There is no grader wired (`AiEvaluatorAdapter` has no
+ *     provider), no rubric is ever written, and `validateRemediationResult` does not require a
+ *     score — so it would validate and charge for prose with no grade in it. Its output would
+ *     also feed `normalized_score`, which steers tomorrow's plan.
+ * `generate` is content authoring, and `recommend` duplicates the free `weak-card-v1` path.
+ *
+ * Widen this ONLY together with the thing that makes the action honest.
+ */
+export const SERVED_REMEDIATION_ACTIONS = ['explain', 'hint'] as const
 
 export interface RemediationRefs {
   action: RemediationAction
@@ -39,7 +69,9 @@ const asUuidList = (value: unknown): string[] | null => {
 }
 
 export function parseRemediationRefs(body: Record<string, unknown>): RemediationRefs | null {
-  if (!REMEDIATION_ACTIONS.includes(body.action as RemediationAction)) return null
+  // Checked against what this server SERVES, not the protocol vocabulary. Refused here, before
+  // `reserve_ai_remediation` runs, so an unserved action cannot reach the wallet at all.
+  if (!(SERVED_REMEDIATION_ACTIONS as readonly string[]).includes(body.action as string)) return null
   const goalId = body.goalId == null ? null : asUuid(body.goalId)
   const activityId = body.activityId == null ? null : asUuid(body.activityId)
   const attemptId = body.attemptId == null ? null : asUuid(body.attemptId)
