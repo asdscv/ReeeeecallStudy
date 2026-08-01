@@ -20,6 +20,10 @@ import { callServerAI, getAiWallet } from '../lib/ai/server-client'
 import {
   summarizeLearning, type InsightAttempt, type InsightPlan, type LearningInsights,
 } from '../lib/learning-insights'
+import {
+  splitDecksBySrsSource, attachProgressToCards, isDueAt, type PlannerDeckMeta,
+} from '../lib/learning-card-sources'
+import type { UserCardProgress } from '../lib/srs-access'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card } from '../types/database'
@@ -672,18 +676,66 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const userId = userData?.user?.id
       if (!userId) throw { code: 'P0001', message: 'Authentication required' }
 
-      // Only the DUE set: a plan is today's work, and this keeps a large account from
-      // turning generation into a full-table read. `next_review_at IS NULL` is a new
-      // card, which the mapper scores as maximally due.
-      const { data: cardRows, error: cardErr } = await supabase
-        .from('cards')
-        .select(CARD_COLUMNS)
-        .in('deck_id', deckIds)
-        .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
-        .limit(CANDIDATE_CARD_LIMIT)
-        .returns<Card[]>()
-      if (cardErr) throw cardErr
-      const cards = cardRows ?? []
+      // A card's schedule is not always on the card row. Decks the learner OWNS carry SRS
+      // embedded in `cards`; decks they SUBSCRIBED to keep the learner's own schedule in
+      // `user_card_progress` while `cards` holds the PUBLISHER's (mig 009, `getSrsSource`).
+      //
+      // Planning read `cards` for both, so on a subscribed or official deck every memory
+      // feature saw the publisher's untouched row — in production all 376,095 official cards
+      // have `interval_days = 0` and `last_reviewed_at = NULL`. Every card scored identically
+      // and the "personalised" plan was whatever order the rows arrived in.
+      const { data: deckRows, error: deckErr } = await supabase
+        .from('decks')
+        .select('id, user_id, share_mode, source_owner_id')
+        .in('id', deckIds)
+        .returns<PlannerDeckMeta[]>()
+      if (deckErr) throw deckErr
+      const { embeddedDeckIds, progressDeckIds } = splitDecksBySrsSource(deckRows ?? [], userId)
+
+      // Owned decks: the DUE filter goes in the query. A plan is today's work, and this keeps a
+      // large account from turning generation into a full-table read. `next_review_at IS NULL`
+      // is a new card, which the mapper scores as maximally due.
+      const embeddedCards = embeddedDeckIds.length === 0 ? [] : await (async () => {
+        const { data, error } = await supabase
+          .from('cards')
+          .select(CARD_COLUMNS)
+          .in('deck_id', embeddedDeckIds)
+          .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+          .limit(CANDIDATE_CARD_LIMIT)
+          .returns<Card[]>()
+        if (error) throw error
+        return data ?? []
+      })()
+
+      // Subscribed decks: the due filter CANNOT be pushed into the card query, because the
+      // column it would filter on belongs to the publisher. Drive from the progress table
+      // instead — `idx_ucp_user_review` covers exactly this predicate — then read the cards
+      // those rows point at, so the limit is spent on cards that are actually due.
+      const progressCards = progressDeckIds.length === 0 ? [] : await (async () => {
+        const { data: progressRows, error: progressErr } = await supabase
+          .from('user_card_progress')
+          .select('id, user_id, card_id, deck_id, srs_status, ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at, srs_revision, created_at, updated_at')
+          .eq('user_id', userId)
+          .in('deck_id', progressDeckIds)
+          .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+          .limit(CANDIDATE_CARD_LIMIT)
+          .returns<UserCardProgress[]>()
+        if (progressErr) throw progressErr
+        const rows = progressRows ?? []
+        if (rows.length === 0) return []
+        const { data: cardData, error: cardsErr } = await supabase
+          .from('cards')
+          .select(CARD_COLUMNS)
+          .in('id', rows.map((row) => row.card_id))
+          .returns<Card[]>()
+        if (cardsErr) throw cardsErr
+        // Re-checked in memory: a progress row can be seeded with a due date the query matched
+        // on, and `attachProgressToCards` is what puts that date on the card the planner sees.
+        return attachProgressToCards(cardData ?? [], rows)
+          .filter((card) => isDueAt(card.next_review_at, ctx.now))
+      })()
+
+      const cards = [...embeddedCards, ...progressCards].slice(0, CANDIDATE_CARD_LIMIT)
       if (cards.length === 0) {
         set({ planBlockedReason: 'no_candidates' })
         return false
