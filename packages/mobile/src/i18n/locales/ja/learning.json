@@ -45,6 +45,7 @@
     "decksHint": "プランは選択したデッキのカードから作成されます。",
     "domain": "分野",
     "domainName": {
+      "general": "一般学習",
       "labor-law": "労働法",
       "language": "語学学習"
     },

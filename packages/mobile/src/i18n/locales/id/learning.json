@@ -45,6 +45,7 @@
     "decksHint": "Rencana Anda dibangun dari kartu-kartu di dek ini.",
     "domain": "Bidang",
     "domainName": {
+      "general": "Studi umum",
       "labor-law": "Hukum ketenagakerjaan",
       "language": "Belajar bahasa"
     },
