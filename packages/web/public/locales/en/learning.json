@@ -110,6 +110,13 @@
     "error": {
       "title": "Enter a goal name (1–500 characters).",
       "dailyMinutes": "Minutes per day must be between 1 and 1440."
+    },
+    "deckPriority": {
+      "label": "Priority",
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "hint": "Higher-priority decks come up sooner when the day is full."
     }
   },
   "history": {

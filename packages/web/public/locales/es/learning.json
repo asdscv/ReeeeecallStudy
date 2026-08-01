@@ -110,6 +110,13 @@
     "error": {
       "title": "Introduce un nombre de objetivo (1–500 caracteres).",
       "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440."
+    },
+    "deckPriority": {
+      "label": "Prioridad",
+      "low": "Baja",
+      "normal": "Normal",
+      "high": "Alta",
+      "hint": "Los mazos con más prioridad aparecen antes cuando el día está lleno."
     }
   },
   "history": {

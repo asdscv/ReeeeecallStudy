@@ -34,6 +34,13 @@
   "form": {
     "cancel": "Hủy",
     "dailyMinutes": "Số phút mỗi ngày",
+    "deckPriority": {
+      "high": "Cao",
+      "hint": "Bộ thẻ ưu tiên cao sẽ xuất hiện trước khi ngày đã kín.",
+      "label": "Mức ưu tiên",
+      "low": "Thấp",
+      "normal": "Bình thường"
+    },
     "decks": "Bộ thẻ để học",
     "decksHint": "Kế hoạch được xây dựng từ các thẻ trong những bộ thẻ này.",
     "domain": "Lĩnh vực",

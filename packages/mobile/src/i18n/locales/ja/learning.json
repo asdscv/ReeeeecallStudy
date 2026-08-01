@@ -34,6 +34,13 @@
   "form": {
     "cancel": "キャンセル",
     "dailyMinutes": "1日の学習時間（分）",
+    "deckPriority": {
+      "high": "高",
+      "hint": "1日の枠が埋まっているとき、優先度の高いデッキが先に出ます。",
+      "label": "優先度",
+      "low": "低",
+      "normal": "標準"
+    },
     "decks": "学習デッキ",
     "decksHint": "プランは選択したデッキのカードから作成されます。",
     "domain": "分野",

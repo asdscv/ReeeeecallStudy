@@ -110,6 +110,13 @@
     "error": {
       "title": "Nhập tên mục tiêu (1–500 ký tự).",
       "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440."
+    },
+    "deckPriority": {
+      "label": "Mức ưu tiên",
+      "low": "Thấp",
+      "normal": "Bình thường",
+      "high": "Cao",
+      "hint": "Bộ thẻ ưu tiên cao sẽ xuất hiện trước khi ngày đã kín."
     }
   },
   "history": {

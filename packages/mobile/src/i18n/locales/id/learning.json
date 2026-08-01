@@ -34,6 +34,13 @@
   "form": {
     "cancel": "Batal",
     "dailyMinutes": "Menit per hari",
+    "deckPriority": {
+      "high": "Tinggi",
+      "hint": "Dek berprioritas tinggi muncul lebih dulu saat harimu penuh.",
+      "label": "Prioritas",
+      "low": "Rendah",
+      "normal": "Normal"
+    },
     "decks": "Dek untuk dipelajari",
     "decksHint": "Rencana Anda dibangun dari kartu-kartu di dek ini.",
     "domain": "Bidang",
