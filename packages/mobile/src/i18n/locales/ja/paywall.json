@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AIカード生成",
-      "free": "1日{{count, number}}枚",
-      "pro": "1日{{count, number}}枚 + クレジット",
-      "freeUnknown": "毎日の無料枠",
-      "proUnknown": "毎日の無料枠 + クレジット"
+      "free": "1日{{count, number}}枚 · クレジット購入可",
+      "pro": "無料と同じ · クレジット購入可",
+      "freeUnknown": "毎日の無料枠 · クレジット購入可"
     },
     "premiumTts": {
       "title": "プレミアムTTS",

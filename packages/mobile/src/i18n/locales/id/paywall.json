@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI Buat Kartu",
-      "free": "{{count, number}} kartu/hari",
-      "pro": "{{count, number}}/hari + kredit",
-      "freeUnknown": "Kuota gratis harian",
-      "proUnknown": "Kuota harian + kredit"
+      "free": "{{count, number}} kartu/hari · kredit tersedia",
+      "pro": "Sama seperti Free · kredit tersedia",
+      "freeUnknown": "Kuota gratis harian · kredit tersedia"
     },
     "premiumTts": {
       "title": "TTS Premium",

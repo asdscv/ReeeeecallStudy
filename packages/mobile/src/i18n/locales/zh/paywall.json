@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI卡片生成",
-      "free": "每天{{count, number}}张",
-      "pro": "每天{{count, number}}张 + 额度",
-      "freeUnknown": "每日免费额度",
-      "proUnknown": "每日额度 + 点数"
+      "free": "每天{{count, number}}张 · 可购买点数",
+      "pro": "与免费版相同 · 可购买点数",
+      "freeUnknown": "每日免费额度 · 可购买点数"
     },
     "premiumTts": {
       "title": "高级TTS",

@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI สร้างการ์ด",
-      "free": "{{count, number}} ใบ/วัน",
-      "pro": "{{count, number}} ใบ/วัน + เครดิต",
-      "freeUnknown": "โควตาฟรีรายวัน",
-      "proUnknown": "โควตารายวัน + เครดิต"
+      "free": "{{count, number}} ใบ/วัน · ซื้อเครดิตได้",
+      "pro": "เท่ากับ Free · ซื้อเครดิตได้",
+      "freeUnknown": "โควตาฟรีรายวัน · ซื้อเครดิตได้"
     },
     "premiumTts": {
       "title": "TTS พรีเมียม",

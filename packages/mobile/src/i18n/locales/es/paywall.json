@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "Generación de Tarjetas con IA",
-      "free": "{{count, number}} tarjetas/día",
-      "pro": "{{count, number}}/día + créditos",
-      "freeUnknown": "Cuota diaria gratuita",
-      "proUnknown": "Cuota diaria + créditos"
+      "free": "{{count, number}} tarjetas/día · créditos disponibles",
+      "pro": "Igual que Free · créditos disponibles",
+      "freeUnknown": "Cuota diaria gratuita · créditos disponibles"
     },
     "premiumTts": {
       "title": "TTS Premium",
