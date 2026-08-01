@@ -45,6 +45,7 @@
     "decksHint": "Tu plan se construye con las tarjetas de estos mazos.",
     "domain": "Materia",
     "domainName": {
+      "general": "Estudio general",
       "labor-law": "Derecho laboral",
       "language": "Idiomas"
     },

@@ -45,6 +45,7 @@
     "decksHint": "Kế hoạch được xây dựng từ các thẻ trong những bộ thẻ này.",
     "domain": "Lĩnh vực",
     "domainName": {
+      "general": "Học tổng quát",
       "labor-law": "Luật lao động",
       "language": "Học ngôn ngữ"
     },

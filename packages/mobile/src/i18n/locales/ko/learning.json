@@ -45,6 +45,7 @@
     "decksHint": "플랜은 선택한 덱의 카드로 만들어집니다.",
     "domain": "분야",
     "domainName": {
+      "general": "일반 학습",
       "labor-law": "노동법",
       "language": "언어"
     },

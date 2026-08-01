@@ -45,6 +45,7 @@
     "decksHint": "Your plan is built from the cards in these decks.",
     "domain": "Subject",
     "domainName": {
+      "general": "General study",
       "labor-law": "Labour law",
       "language": "Language"
     },

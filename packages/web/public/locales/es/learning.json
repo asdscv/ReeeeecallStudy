@@ -94,6 +94,7 @@
     "editTitle": "Editar objetivo",
     "domain": "Materia",
     "domainName": {
+      "general": "Estudio general",
       "language": "Idiomas",
       "labor-law": "Derecho laboral"
     },

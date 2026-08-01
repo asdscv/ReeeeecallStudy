@@ -94,6 +94,7 @@
     "editTitle": "Edit goal",
     "domain": "Subject",
     "domainName": {
+      "general": "General study",
       "language": "Language",
       "labor-law": "Labour law"
     },
