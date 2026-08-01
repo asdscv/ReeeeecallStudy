@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "Comparar mi respuesta",
       "explain": "Explicación IA",
       "hint": "Pista de estudio"
     },
@@ -9,6 +10,8 @@
     "discard": "Descartar",
     "error": {
       "BAD_REQUEST": "La solicitud no es válida.",
+      "COMPARE_NO_ANSWER": "Escribe tu respuesta primero: todavía no hay nada que comparar.",
+      "COMPARE_NO_REFERENCE": "Esta tarjeta no indica qué campo es la respuesta, así que no hay con qué compararla.",
       "FORBIDDEN": "No tienes acceso a esa tarjeta.",
       "GROUNDING_REQUIRED": "No se encontró una fuente citable, por lo que se rechazó la respuesta en vez de inventarla.",
       "INSUFFICIENT_CREDITS": "Créditos de IA insuficientes. Recarga para continuar.",

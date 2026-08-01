@@ -126,7 +126,8 @@
     "costHint": "将使用你钱包中的 AI 额度",
     "action": {
       "explain": "AI 解释",
-      "hint": "学习提示"
+      "hint": "学习提示",
+      "compare": "对比我的答案"
     },
     "quote": "每次请求约 {{price}} · 余额 {{balance}}",
     "groundedHint": "解答针对本次作答，而不只是这张卡片",
@@ -148,7 +149,9 @@
       "NOT_CONFIGURED": "此服务器未启用 AI 生成功能。",
       "PROVIDER_ERROR": "AI 服务出错，请重试。",
       "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
-      "UNKNOWN": "出了点问题，请重试。"
+      "UNKNOWN": "出了点问题，请重试。",
+      "COMPARE_NO_ANSWER": "请先写下你的答案——目前还没有可对比的内容。",
+      "COMPARE_NO_REFERENCE": "这张卡片没有标明哪个字段是答案，因此没有可对比的基准。"
     }
   },
   "insights": {

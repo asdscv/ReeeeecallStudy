@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildRemediationPrompt, parseRemediationRefs, validateRemediationResult,
-  REMEDIATION_ACTIONS, SERVED_REMEDIATION_ACTIONS,
+  REMEDIATION_ACTIONS, SERVED_REMEDIATION_ACTIONS, compareGroundingError,
 } from '../../../../../supabase/functions/_shared/ai-remediation.ts'
 
 const id = '11111111-1111-4111-8111-111111111111'
@@ -21,13 +21,15 @@ describe('AI remediation contracts', () => {
   it('refuses an action it cannot perform honestly, before any wallet is touched', () => {
     // Every one of these is in the protocol vocabulary and passes the SQL allowlists, so the
     // edge function is the only thing standing between them and a charged, invented answer.
-    for (const action of ['compare', 'evaluate', 'generate', 'recommend']) {
+    // `compare` left this list once BOTH halves of its premise existed — typed answers and a
+    // template-declared reference. The rest still have none.
+    for (const action of ['evaluate', 'generate', 'recommend']) {
       expect(parseRemediationRefs({ action, goalId: id }), action).toBeNull()
     }
   })
 
-  it('serves exactly the two actions an attempt can ground', () => {
-    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'hint'])
+  it('serves exactly the actions an attempt can ground', () => {
+    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'hint', 'compare'])
     for (const action of SERVED_REMEDIATION_ACTIONS) {
       expect(parseRemediationRefs({ action, goalId: id }), action).not.toBeNull()
     }
@@ -71,12 +73,57 @@ describe('AI remediation contracts', () => {
   })
 
   it('never lets the model claim to know an answer the learner never wrote', () => {
-    // Attempts store `{ self_rated: n }` — a rating, not a response. Without this line the
-    // model happily writes "your answer confused X with Y" about text that does not exist.
+    // An attempt with a rating and no text. Without this line the model happily writes "your
+    // answer confused X with Y" about text that does not exist.
     const refs = parseRemediationRefs({ action: 'explain', goalId: id })!
     const prompt = buildRemediationPrompt(refs, groundedContext({ normalized_score: 0, response: { self_rated: 0 } }))
-    expect(prompt.systemPrompt).toContain('do NOT')
-    expect(prompt.systemPrompt).toContain('claim to know what the learner wrote')
+    expect(prompt.systemPrompt).toContain('Do NOT claim to')
+    expect(prompt.systemPrompt).toContain('know what they wrote')
+  })
+
+  it('stops disclaiming once the learner HAS written something', () => {
+    // The disclaimer used to fire on "an attempt exists", which is a different question. Once
+    // typed answers started arriving it told the model to deny an answer it had been handed.
+    const refs = parseRemediationRefs({ action: 'explain', goalId: id })!
+    const prompt = buildRemediationPrompt(refs, groundedContext({
+      normalized_score: 0, response: { self_rated: 0, text: 'a fruit' },
+    }))
+
+    expect(prompt.systemPrompt).not.toContain('Do NOT claim to')
+    expect(prompt.systemPrompt).toContain('is what the learner actually wrote')
+  })
+
+  // ── compare: refuse, never degrade ────────────────────────────────────────
+  it('refuses a compare with nothing typed, and one with no reference, distinctly', () => {
+    // Two different situations for the learner: one they can fix by writing an answer, one they
+    // cannot fix at all. A single generic failure would leave them guessing which.
+    expect(compareGroundingError({ response: { self_rated: 0 } }, { text: '사과' }))
+      .toBe('NO_LEARNER_ANSWER')
+    expect(compareGroundingError({ response: { self_rated: 0, text: '   ' } }, { text: '사과' }))
+      .toBe('NO_LEARNER_ANSWER')
+    expect(compareGroundingError({ response: { self_rated: 0, text: 'apple' } }, null))
+      .toBe('NO_REFERENCE_ANSWER')
+    expect(compareGroundingError({ response: { self_rated: 0, text: 'apple' } }, { text: '  ' }))
+      .toBe('NO_REFERENCE_ANSWER')
+  })
+
+  it('allows a compare that has both halves', () => {
+    expect(compareGroundingError({ response: { self_rated: 0, text: 'apple' } }, { text: '사과' }))
+      .toBeNull()
+  })
+
+  it('tells the model to compare against the CARD\'s answer, not its own idea of one', () => {
+    const refs = parseRemediationRefs({ action: 'compare', goalId: id })!
+    const prompt = buildRemediationPrompt(refs, groundedContext(
+      { normalized_score: 0, response: { self_rated: 0, text: 'a red fruit' } },
+      { expectedAnswer: { keys: ['back'], text: '사과' } },
+    ))
+
+    expect(prompt.systemPrompt).toContain('which is the answer THIS CARD')
+    // A paraphrase is correct — the learner is being tested on recall, not on phrasing.
+    expect(prompt.systemPrompt).toContain('means the same thing is CORRECT')
+    // And the reference reaches the model.
+    expect(prompt.userPrompt).toContain('사과')
   })
 
   it('strips hints_used / duration_ms when they are the unpopulated default', () => {

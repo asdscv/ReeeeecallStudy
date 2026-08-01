@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "내 답과 비교",
       "explain": "AI 설명",
       "hint": "학습 힌트"
     },
@@ -9,6 +10,8 @@
     "discard": "버리기",
     "error": {
       "BAD_REQUEST": "잘못된 요청입니다.",
+      "COMPARE_NO_ANSWER": "먼저 답을 입력해 주세요 — 비교할 내용이 아직 없습니다.",
+      "COMPARE_NO_REFERENCE": "이 카드는 어느 필드가 정답인지 지정하지 않아, 비교할 기준이 없습니다.",
       "FORBIDDEN": "해당 카드에 접근 권한이 없습니다.",
       "GROUNDING_REQUIRED": "인용할 출처를 찾지 못해, 지어내지 않고 답변을 거부했습니다.",
       "INSUFFICIENT_CREDITS": "AI 크레딧이 부족합니다. 충전 후 이용해 주세요.",

@@ -126,7 +126,8 @@
     "costHint": "Utiliza créditos de IA de tu billetera",
     "action": {
       "explain": "Explicación IA",
-      "hint": "Pista de estudio"
+      "hint": "Pista de estudio",
+      "compare": "Comparar mi respuesta"
     },
     "quote": "Unos {{price}} por solicitud · quedan {{balance}}",
     "groundedHint": "Responde a este intento, no solo a la tarjeta",
@@ -148,7 +149,9 @@
       "NOT_CONFIGURED": "La generación con IA no está habilitada en este servidor.",
       "PROVIDER_ERROR": "El servicio de IA falló. Inténtalo de nuevo.",
       "RATE_CAP": "Has alcanzado el límite diario de solicitudes de IA. Inténtalo mañana.",
-      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo.",
+      "COMPARE_NO_ANSWER": "Escribe tu respuesta primero: todavía no hay nada que comparar.",
+      "COMPARE_NO_REFERENCE": "Esta tarjeta no indica qué campo es la respuesta, así que no hay con qué compararla."
     }
   },
   "insights": {

@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "Bandingkan jawabanku",
       "explain": "Penjelasan AI",
       "hint": "Petunjuk belajar"
     },
@@ -9,6 +10,8 @@
     "discard": "Buang",
     "error": {
       "BAD_REQUEST": "Permintaan tidak valid.",
+      "COMPARE_NO_ANSWER": "Tulis jawabanmu dulu — belum ada yang bisa dibandingkan.",
+      "COMPARE_NO_REFERENCE": "Kartu ini tidak menandai bidang mana yang jadi jawaban, jadi tidak ada pembandingnya.",
       "FORBIDDEN": "Anda tidak memiliki akses ke kartu ini.",
       "GROUNDING_REQUIRED": "Tidak ditemukan sumber yang dapat dikutip, sehingga jawaban ditolak alih-alih dikarang.",
       "INSUFFICIENT_CREDITS": "Kredit AI tidak cukup. Isi ulang untuk melanjutkan.",

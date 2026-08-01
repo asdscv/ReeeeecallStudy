@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "So với câu trả lời của tôi",
       "explain": "Giải thích AI",
       "hint": "Gợi ý học tập"
     },
@@ -9,6 +10,8 @@
     "discard": "Bỏ",
     "error": {
       "BAD_REQUEST": "Yêu cầu không hợp lệ.",
+      "COMPARE_NO_ANSWER": "Hãy viết câu trả lời trước — chưa có gì để so sánh.",
+      "COMPARE_NO_REFERENCE": "Thẻ này không đánh dấu trường nào là đáp án, nên không có gì để đối chiếu.",
       "FORBIDDEN": "Bạn không có quyền truy cập thẻ này.",
       "GROUNDING_REQUIRED": "Không tìm thấy nguồn trích dẫn nên câu trả lời đã bị từ chối thay vì bịa đặt.",
       "INSUFFICIENT_CREDITS": "Không đủ tín dụng AI. Hãy nạp thêm để tiếp tục.",

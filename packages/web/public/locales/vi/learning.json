@@ -126,7 +126,8 @@
     "costHint": "Sử dụng tín dụng AI từ ví của bạn",
     "action": {
       "explain": "Giải thích AI",
-      "hint": "Gợi ý học tập"
+      "hint": "Gợi ý học tập",
+      "compare": "So với câu trả lời của tôi"
     },
     "quote": "Khoảng {{price}} mỗi yêu cầu · số dư {{balance}}",
     "groundedHint": "Trả lời cho lần làm này, không chỉ cho thẻ",
@@ -148,7 +149,9 @@
       "NOT_CONFIGURED": "Tạo nội dung AI chưa được bật trên máy chủ này.",
       "PROVIDER_ERROR": "Dịch vụ AI gặp sự cố. Vui lòng thử lại.",
       "RATE_CAP": "Bạn đã dùng hết giới hạn yêu cầu AI hôm nay. Hãy thử lại vào ngày mai.",
-      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại.",
+      "COMPARE_NO_ANSWER": "Hãy viết câu trả lời trước — chưa có gì để so sánh.",
+      "COMPARE_NO_REFERENCE": "Thẻ này không đánh dấu trường nào là đáp án, nên không có gì để đối chiếu."
     }
   },
   "insights": {

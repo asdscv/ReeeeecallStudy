@@ -1,6 +1,7 @@
 {
   "enrichment": {
     "action": {
+      "compare": "自分の答えと比較",
       "explain": "AI解説",
       "hint": "学習ヒント"
     },
@@ -9,6 +10,8 @@
     "discard": "破棄",
     "error": {
       "BAD_REQUEST": "無効なリクエストです。",
+      "COMPARE_NO_ANSWER": "先に答えを入力してください — まだ比較するものがありません。",
+      "COMPARE_NO_REFERENCE": "このカードはどの項目が答えかを指定していないため、比較する基準がありません。",
       "FORBIDDEN": "このカードへのアクセス権限がありません。",
       "GROUNDING_REQUIRED": "引用可能なソースが見つからなかったため、捏造を避けて回答を拒否しました。",
       "INSUFFICIENT_CREDITS": "AIクレジットが不足しています。チャージしてから続けてください。",

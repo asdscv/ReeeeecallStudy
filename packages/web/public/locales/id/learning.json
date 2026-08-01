@@ -126,7 +126,8 @@
     "costHint": "Menggunakan kredit AI dari dompet Anda",
     "action": {
       "explain": "Penjelasan AI",
-      "hint": "Petunjuk belajar"
+      "hint": "Petunjuk belajar",
+      "compare": "Bandingkan jawabanku"
     },
     "quote": "Sekitar {{price}} per permintaan · sisa {{balance}}",
     "groundedHint": "Menjawab percobaan ini, bukan hanya kartunya",
@@ -148,7 +149,9 @@
       "NOT_CONFIGURED": "Pembuatan AI belum diaktifkan di server ini.",
       "PROVIDER_ERROR": "Layanan AI gagal. Silakan coba lagi.",
       "RATE_CAP": "Anda telah mencapai batas permintaan AI hari ini. Coba lagi besok.",
-      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+      "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi.",
+      "COMPARE_NO_ANSWER": "Tulis jawabanmu dulu — belum ada yang bisa dibandingkan.",
+      "COMPARE_NO_REFERENCE": "Kartu ini tidak menandai bidang mana yang jadi jawaban, jadi tidak ada pembandingnya."
     }
   },
   "insights": {

@@ -17,19 +17,28 @@ export type RemediationAction = typeof REMEDIATION_ACTIONS[number]
  * store `{ self_rated: score }`: there IS no learner answer, so that comparison was invented,
  * and the learner paid for it.
  *
- * `compare` and `evaluate` are absent deliberately, not accidentally:
- *   - `compare` needs the learner's own words plus a reference answer that is genuinely the
- *     expected one. Neither exists yet — no surface captures typed text, and picking a card
- *     field by position guesses (and for the official word templates guesses INVERTED).
- *   - `evaluate` must return a grade. There is no grader wired (`AiEvaluatorAdapter` has no
- *     provider), no rubric is ever written, and `validateRemediationResult` does not require a
- *     score — so it would validate and charge for prose with no grade in it. Its output would
- *     also feed `normalized_score`, which steers tomorrow's plan.
+ * `compare` joined the list once BOTH halves of its premise existed, and not before:
+ *   - the learner's own words: attempts now store `{ self_rated, text }` when the item was
+ *     answered by typing (`response_type = 'text'`);
+ *   - a reference that is genuinely the expected answer: `resolveCardAnswerFaces` reads the
+ *     template's declared `back_layout` and returns NULL rather than guessing. Picking a card
+ *     field by position is not a weaker version of this — for the official word templates it
+ *     is inverted, so it would mark a correct answer wrong.
+ * Either half missing is a REFUSAL, never a degrade to a generic explanation. See
+ * `compareGroundingError`.
+ *
+ * `evaluate` is still absent, and adding typed answers did not change that: it must return a
+ * GRADE. There is no grader wired (`AiEvaluatorAdapter` has no provider implementation), no
+ * rubric is ever written, and `validateRemediationResult` does not require a score — so it
+ * would validate and charge for prose with no grade in it. Its output would also feed
+ * `normalized_score`, which steers tomorrow's plan; that is a decision about who owns the
+ * curriculum, not a prompt change.
+ *
  * `generate` is content authoring, and `recommend` duplicates the free `weak-card-v1` path.
  *
  * Widen this ONLY together with the thing that makes the action honest.
  */
-export const SERVED_REMEDIATION_ACTIONS = ['explain', 'hint'] as const
+export const SERVED_REMEDIATION_ACTIONS = ['explain', 'hint', 'compare'] as const
 
 export interface RemediationRefs {
   action: RemediationAction
@@ -57,6 +66,33 @@ export interface RemediationContextPayload {
    * learner's own words do not need to travel further than the request that produced them.
    */
   attemptHistory?: Array<{ normalized_score: number | null; created_at: string }>
+  /**
+   * The expected answer, as the card's TEMPLATE AUTHOR declared it.
+   *
+   * Present only when `resolveCardAnswerFaces` could name the answer field(s) — never a
+   * positional guess, which for the official word templates is inverted and would mark a
+   * correct answer wrong. Absent means `compare` is refused, not softened.
+   */
+  expectedAnswer?: { readonly keys: readonly string[]; readonly text: string } | null
+}
+
+/**
+ * Why a `compare` request cannot be grounded, or null when it can.
+ *
+ * Both halves of the premise are checked BEFORE the model is called, and a missing half is a
+ * refusal rather than a fallback to a generic explanation. Degrading silently would charge the
+ * learner for `compare` and hand back `explain` — the failure mode this whole action was held
+ * back to avoid.
+ */
+export function compareGroundingError(
+  attempt: unknown,
+  expectedAnswer: { text: string } | null | undefined,
+): 'NO_LEARNER_ANSWER' | 'NO_REFERENCE_ANSWER' | null {
+  const response = (attempt as { response?: { text?: unknown } } | null)?.response
+  const typed = typeof response?.text === 'string' ? response.text.trim() : ''
+  if (typed === '') return 'NO_LEARNER_ANSWER'
+  if (!expectedAnswer || expectedAnswer.text.trim() === '') return 'NO_REFERENCE_ANSWER'
+  return null
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -104,6 +140,13 @@ export function buildRemediationPrompt(refs: RemediationRefs, context: Remediati
   const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) ? value : 0)
   const EFFORT_FIELDS = ['hints_used', 'duration_ms']
   const hasEffortSignal = attemptGrounded && EFFORT_FIELDS.some((field) => num(attempt[field]) > 0)
+  // Whether the learner actually wrote something, rather than whether an attempt exists. The
+  // old wording fired on "there is an attempt", which is a different question and told the
+  // model to disclaim an answer it HAD been given once typed answers started arriving.
+  const typedAnswer = attemptGrounded && typeof (attempt.response as { text?: unknown } | null)?.text === 'string'
+    ? ((attempt.response as { text: string }).text).trim()
+    : ''
+  const expected = context.expectedAnswer ?? null
   const promptAttempt = attemptGrounded && !hasEffortSignal
     ? Object.fromEntries(Object.entries(attempt).filter(([key]) => !EFFORT_FIELDS.includes(key)))
     : attempt
@@ -126,9 +169,24 @@ export function buildRemediationPrompt(refs: RemediationRefs, context: Remediati
         'Timing and hint counts were not recorded for this attempt and are therefore absent.'
         + ' Never describe how fast the learner answered or how much help they used.',
       ]),
-      'attempt.response may contain only a self-rating and no written answer. In that case do NOT'
-      + " claim to know what the learner wrote, and do not evaluate or compare a non-existent answer;"
-      + ' say what is likely being confused and why, based on the item itself.',
+      ...(typedAnswer === '' ? [
+        'attempt.response contains ONLY a self-rating — the learner wrote nothing. Do NOT claim to'
+        + ' know what they wrote, and do not evaluate or compare a non-existent answer; say what is'
+        + ' likely being confused and why, based on the item itself.',
+      ] : [
+        'attempt.response.text is what the learner actually wrote. Quote it when useful. It is'
+        + ' their words, not a paraphrase, and not something to correct for spelling unless the'
+        + ' spelling is the point of the item.',
+      ]),
+    ] : []),
+    ...(refs.action === 'compare' && expected ? [
+      'Compare attempt.response.text with expectedAnswer.text, which is the answer THIS CARD'
+      + " declares — not your own idea of a good answer. Say what matches, what is missing, and"
+      + ' what is wrong, in that order.',
+      'A different wording that means the same thing is CORRECT. Say so plainly rather than'
+      + ' listing it as a difference; the learner is being tested on recall, not on phrasing.',
+      'Do not invent a third answer. If expectedAnswer.text is itself incomplete, say that'
+      + ' instead of filling the gap from your own knowledge.',
     ] : []),
     requireGrounding
       ? 'Ground all substantive claims in the supplied sources and include at least one valid citation. If sources are insufficient, say so in warnings.'

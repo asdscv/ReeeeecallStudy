@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
-import { useLearningStore, type RemediationAction } from '@reeeeecall/shared/stores/learning-store'
+import { useLearningStore, type AttemptRow, type RemediationAction } from '@reeeeecall/shared/stores/learning-store'
 import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import {
@@ -75,9 +75,25 @@ const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
  * card. Two actions are rendered as two inline text links rather than a menu: the repo has no
  * dropdown primitive, and every other action on these screens is an inline link.
  */
-const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; key: string; id: string }> = [
-  { action: 'explain', key: 'enrichment.action.explain', id: 'explain' },
-  { action: 'hint', key: 'enrichment.action.hint', id: 'hint' },
+const REMEDIATION_ACTIONS: ReadonlyArray<{
+  action: RemediationAction
+  key: string
+  id: string
+  /**
+   * Whether this action can be honestly offered for a given attempt — per action, because
+   * `compare` needs the learner's own words and the other two do not. The server refuses an
+   * ungrounded compare, so offering the button would spend a request to earn a refusal.
+   */
+  offeredFor: (attempt: AttemptRow) => boolean
+}> = [
+  { action: 'explain', key: 'enrichment.action.explain', id: 'explain', offeredFor: () => true },
+  { action: 'hint', key: 'enrichment.action.hint', id: 'hint', offeredFor: () => true },
+  {
+    action: 'compare',
+    key: 'enrichment.action.compare',
+    id: 'compare',
+    offeredFor: (attempt) => attemptTypedAnswer(attempt) !== null,
+  },
 ]
 
 /** How many recent attempts the list shows — the same window as web's `AttemptHistory`. */
@@ -692,7 +708,7 @@ export function LearningTodayScreen() {
                         ) : (
                           <>
                             <View style={styles.attemptActions}>
-                              {REMEDIATION_ACTIONS.map((entry) => (
+                              {REMEDIATION_ACTIONS.filter((entry) => entry.offeredFor(attempt)).map((entry) => (
                                 <TouchableOpacity
                                   key={entry.id}
                                   disabled={busy}

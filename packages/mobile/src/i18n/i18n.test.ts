@@ -164,11 +164,12 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
     'enrichment.error': [
       'INSUFFICIENT_CREDITS', 'RATE_CAP', 'GROUNDING_REQUIRED', 'INVALID_RESULT',
       'PROVIDER_ERROR', 'BAD_REQUEST', 'NETWORK', 'UNKNOWN',
+      'COMPARE_NO_ANSWER', 'COMPARE_NO_REFERENCE',
     ],
     // `RemediationAction` in shared/stores/learning-store.ts. Only these two are reachable:
     // an attempt stores `{ self_rated: score }`, so `compare`/`evaluate` have no learner text
     // to work from and are deliberately not offered.
-    'enrichment.action': ['explain', 'hint'],
+    'enrichment.action': ['explain', 'hint', 'compare'],
     'today.reason': [
       'due', 'memoryRisk', 'recentFailure', 'slowResponse', 'goalRelevance', 'importance', 'balanced',
     ],
