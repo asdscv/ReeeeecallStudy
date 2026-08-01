@@ -26,7 +26,18 @@ import type { Card } from '../types/database.ts'
 /** The subset of a study_logs row the mapper needs. */
 export interface CandidateStudyLog {
   readonly card_id: string
-  readonly rating: number | null
+  /**
+   * `study_logs.rating` is TEXT, not a number.
+   *
+   * This was declared `number | null` and the store cast the rows to this interface, so the
+   * compiler had nothing to disagree with — and `recentFailureFor`'s `typeof === 'number'`
+   * filter was false for every row a real database returns. A 0.25-weight feature sat at its
+   * no-evidence constant in production. See `ratingStruggle` for the actual vocabulary.
+   *
+   * Numbers stay accepted because the SM-2 grade scale (1..4) is the natural shape for a
+   * future column and one function should judge both rather than this file breaking again.
+   */
+  readonly rating: string | number | null
   readonly review_duration_ms: number | null
   readonly studied_at: string
 }
@@ -61,8 +72,60 @@ const DUE_SATURATION_DAYS = 7
 /** How many of a card's most recent logs contribute to recentFailure. */
 const RECENT_LOG_WINDOW = 5
 
-/** A rating at or below this counts as a failure (1=Again, 2=Hard in the SRS UI). */
+/** A numeric rating at or below this counts as a full failure (1=Again, 2=Hard in the SRS UI). */
 const FAILURE_RATING = 2
+
+/**
+ * How much each rating says the learner STRUGGLED with the card, 0..1. `null` = not a rating.
+ *
+ * The vocabulary is fixed by the CHECK constraint on `study_logs.rating`
+ * (`071_fix_study_logs_constraints.sql`): again, hard, good, easy, known, unknown, next,
+ * viewed, got_it, missed. Every one of them is named here so a value the database can store is
+ * never silently read as something it is not.
+ *
+ * `hard` is 0.5, not 1. Counting it as a lapse would contradict the scheduler, which on `hard`
+ * INCREASES the interval (`srs.ts` review phase: `interval × 1.2`); counting it as a success
+ * would throw away the only signal that distinguishes a card the learner barely got from one
+ * they knew cold. A graded value is the only reading that agrees with both.
+ *
+ * `next` and `viewed` are navigation, not judgement — they are recorded by the browse/cram
+ * modes where the learner never says whether they recalled anything. They return null so they
+ * leave the DENOMINATOR too: a card flipped past ten times has no failure evidence, and
+ * averaging zeros into it would read as ten clean successes.
+ *
+ * An unrecognized string also returns null. A rating added by a future migration must not be
+ * counted as a success by default — that would quietly lower the priority of cards the learner
+ * is failing, which is the exact defect this function was written to fix.
+ */
+export function ratingStruggle(rating: string | number | null | undefined): number | null {
+  if (typeof rating === 'number') {
+    // SM-2 grade scale, kept for a future numeric column. Below the failure line is a lapse;
+    // at the line ("hard") is the same half-credit the text vocabulary gives it.
+    if (!Number.isFinite(rating)) return null
+    if (rating < FAILURE_RATING) return 1
+    if (rating === FAILURE_RATING) return 0.5
+    return 0
+  }
+  switch (rating) {
+    // Recall failed outright: SRS "Again", sequential-review "unknown", cramming "missed".
+    case 'again':
+    case 'unknown':
+    case 'missed':
+      return 1
+    // Recalled, but with effort.
+    case 'hard':
+      return 0.5
+    // Recall succeeded: SRS good/easy, sequential-review "known", cramming "got_it".
+    case 'good':
+    case 'easy':
+    case 'known':
+    case 'got_it':
+      return 0
+    // Not a judgement of recall (browse/sequential modes), and anything unrecognized.
+    default:
+      return null
+  }
+}
 
 /** Neutral value for a feature with no evidence (design §9.2). */
 const NEUTRAL = 0.5
@@ -106,13 +169,20 @@ export function dueUrgencyFor(nextReviewAt: string | null | undefined, nowMs: nu
   return clamp01(NEUTRAL + (days / span) * NEUTRAL)
 }
 
-/** Share of failures among a card's most recent logs; no logs → NEUTRAL_RECENT_FAILURE. */
+/**
+ * Mean struggle across a card's most recent RATED logs; no rated log → NEUTRAL_RECENT_FAILURE.
+ *
+ * Logs that carry no judgement of recall (`next`, `viewed`, unrecognized values) are dropped
+ * before the window is taken, not after: keeping them would let ten browse events push the one
+ * real lapse out of a 5-log window.
+ */
 export function recentFailureFor(logs: readonly CandidateStudyLog[]): number {
-  const rated = logs.filter((log) => typeof log.rating === 'number')
-  if (rated.length === 0) return NEUTRAL_RECENT_FAILURE
-  const window = rated.slice(0, RECENT_LOG_WINDOW)
-  const failures = window.filter((log) => (log.rating as number) <= FAILURE_RATING).length
-  return clamp01(failures / window.length)
+  const struggles = logs
+    .map((log) => ratingStruggle(log.rating))
+    .filter((value): value is number => value !== null)
+  if (struggles.length === 0) return NEUTRAL_RECENT_FAILURE
+  const window = struggles.slice(0, RECENT_LOG_WINDOW)
+  return clamp01(window.reduce((sum, value) => sum + value, 0) / window.length)
 }
 
 /**
