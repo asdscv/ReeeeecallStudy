@@ -87,6 +87,14 @@ export interface DailyPlanItemRow {
    * item never rendered as finished. Keep these three spellings exact.
    */
   status: 'pending' | 'completed' | 'skipped'
+  /**
+   * What the planner knew when it chose this row, kept so the plan can SHOW its reasoning.
+   *
+   * `recall_probability` is the estimated chance the learner can recall the item right now
+   * (`application/memory.ts`). ABSENT — not null — for a card with no forgetting curve yet,
+   * so "we cannot say" and "we say 0%" stay different things all the way to the screen.
+   */
+  payload?: { recall_probability?: number } | null
 }
 
 /**
@@ -643,7 +651,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       }
       const { data: itemRows, error: itemErr } = await supabase
         .from('daily_plan_items')
-        .select('id, plan_id, position, activity_id, card_id, concept_id, activity_type, stimulus_type, response_type, evaluator_type, reason_code, priority, estimated_minutes, status')
+        .select('id, plan_id, position, activity_id, card_id, concept_id, activity_type, stimulus_type, response_type, evaluator_type, reason_code, priority, estimated_minutes, status, payload')
         .eq('plan_id', (planRow as DailyPlanRow).id)
         .order('position', { ascending: true })
       if (itemErr) throw itemErr
@@ -865,6 +873,14 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       }
 
       const cardsById = new Map(cards.map((card) => [card.id, card]))
+      // Candidates carry the recall estimate; planner output does not, because the planner does
+      // not score on it (see PlannerCandidate.retrievability). Keyed on candidateId, which is
+      // what the planner preserves through ranking and selection.
+      const recallByCandidate = new Map(
+        candidates
+          .filter((candidate) => typeof candidate.retrievability === 'number')
+          .map((candidate) => [candidate.candidateId, candidate.retrievability as number]),
+      )
       const items = output.items.map((item) => {
         const card = item.cardId ? cardsById.get(item.cardId) : undefined
         const shape = card
@@ -873,11 +889,25 @@ export const useLearningStore = create<LearningState>((set, get) => ({
             activityType: item.activityType, stimulusType: 'text',
             responseType: 'self_rate', evaluatorType: 'self_rate', answerFaces: null,
           }
-        // `payload` records WHICH fields the plan called prompt and reference, decided here and
-        // never re-derived: a template edited after today's plan was written must not change
-        // what today's plan meant. Omitted entirely when there is nothing to record, so
-        // `save_daily_plan` keeps writing its `'{}'` default for every other item.
-        const payload = planItemAnswerPayload(shape)
+        // `payload` carries two independent records, and either can be absent.
+        //
+        // `typed_answer` records WHICH fields the plan called prompt and reference, decided
+        // here and never re-derived: a template edited after today's plan was written must not
+        // change what today's plan meant.
+        //
+        // `recall_probability` is the estimate this row was CHOSEN on, stored so the plan can
+        // SHOW its reasoning instead of only asserting it. Omitted when the estimate is null —
+        // a new card has no forgetting curve, and `recall_probability: null` would render as a
+        // number-shaped absence rather than no claim at all.
+        //
+        // `daily_plan_items.payload` already exists and `save_daily_plan` already writes it
+        // (mig 167), so neither record needs a migration. The key is omitted entirely when BOTH
+        // are absent, so `save_daily_plan` keeps writing its `'{}'` default for every other item.
+        const recall = recallByCandidate.get(item.candidateId)
+        const payload = {
+          ...(planItemAnswerPayload(shape) ?? {}),
+          ...(recall === undefined ? {} : { recall_probability: recall }),
+        }
         return {
           activity_id: item.activityId,
           card_id: item.cardId,
@@ -889,7 +919,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           reason_code: item.reasonCode,
           priority: item.priority,
           estimated_minutes: item.estimatedMinutes,
-          ...(payload ? { payload } : {}),
+          ...(Object.keys(payload).length > 0 ? { payload } : {}),
         }
       })
 

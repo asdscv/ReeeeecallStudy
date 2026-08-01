@@ -170,6 +170,7 @@
       "recentFailure": "Fallo reciente",
       "slowResponse": "Respuesta lenta"
     },
+    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
     "regenerate": "Recrear plan",
     "regenerating": "Recreando…",
     "title": "Plan de hoy"

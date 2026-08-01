@@ -16,6 +16,7 @@ import {
   attemptNeedsRemediation, attemptTypedAnswer, latestAttemptForCard,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { TYPED_ANSWER_MAX_CHARS } from '@reeeeecall/shared/lib/learning-candidates'
+import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import * as Crypto from 'expo-crypto'
@@ -54,6 +55,10 @@ const REASON_KEY: Record<string, string> = {
   importance: 'today.reason.importance',
   balanced: 'today.reason.balanced',
 }
+
+/** What the planner recorded for this row, as whole percent, or null if it recorded none. */
+const planRecallPercent = (item: { payload?: { recall_probability?: number } | null }) =>
+  recallPercent(item.payload?.recall_probability)
 
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
@@ -412,6 +417,20 @@ export function LearningTodayScreen() {
                           ? ` · ${t('today.item.minutes', { count: item.estimated_minutes })}`
                           : ''}
                       </Text>
+
+                      {/* The number the reason is derived from, so "at risk of forgetting" is a
+                          measurement the learner can judge rather than an assertion. Strictly
+                          what the planner recorded — never recomputed from the card row, which
+                          on a subscribed deck belongs to the publisher (#389). Absent for a card
+                          with no forgetting curve yet: a new card is not a forgotten one. */}
+                      {planRecallPercent(item) !== null && (
+                        <Text
+                          style={[theme.typography.caption, { color: theme.colors.textTertiary }]}
+                          {...testProps(`learning-recall-${index}`)}
+                        >
+                          {t('today.recallChance', { percent: planRecallPercent(item) as number })}
+                        </Text>
+                      )}
 
                       {done ? (
                         <Text

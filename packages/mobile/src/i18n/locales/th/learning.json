@@ -170,6 +170,7 @@
       "recentFailure": "ตอบผิดเมื่อเร็ว ๆ นี้",
       "slowResponse": "ตอบช้า"
     },
+    "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%",
     "regenerate": "สร้างแผนใหม่",
     "regenerating": "กำลังสร้างใหม่…",
     "title": "แผนวันนี้"

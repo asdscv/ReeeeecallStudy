@@ -170,6 +170,7 @@
       "recentFailure": "最近の不正解",
       "slowResponse": "回答が遅い"
     },
+    "recallChance": "いま思い出せる確率 約{{percent}}%",
     "regenerate": "プランを再作成",
     "regenerating": "再作成中…",
     "title": "今日のプラン"

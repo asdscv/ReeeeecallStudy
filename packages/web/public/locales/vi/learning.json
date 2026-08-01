@@ -52,7 +52,8 @@
       "placeholder": "Nhập những gì bạn còn nhớ",
       "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá."
     },
-    "insightsLink": "Phân tích"
+    "insightsLink": "Phân tích",
+    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này"
   },
   "goals": {
     "title": "Mục tiêu học tập",

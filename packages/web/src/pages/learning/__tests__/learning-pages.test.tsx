@@ -165,6 +165,41 @@ describe('LearningTodayPage', () => {
       .toHaveAttribute('href', '/decks/deck-7/study/setup')
   })
 
+  // ── the memory model, made visible ────────────────────────────────────────
+  //
+  // Until this shipped, the plan asserted "at risk of forgetting" and showed no number, so the
+  // FSRS work behind it was invisible — and an estimate a learner cannot see is one they cannot
+  // judge.
+  const planWith = (payload: unknown) => ({
+    plan: {
+      id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+      algorithm_version: 'daily-plan-v2', input_fingerprint: 'fnv1a32:abc', status: 'pending',
+      budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: 1,
+    },
+    planItems: [{
+      id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
+      concept_id: null, activity_type: 'recall', stimulus_type: 'text',
+      response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'memory_risk',
+      priority: 0.7, estimated_minutes: 0.5, status: 'pending', payload,
+    }],
+    planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+  })
+
+  it('shows the recall probability the planner chose the row on', () => {
+    renderToday(planWith({ recall_probability: 0.523 }))
+
+    expect(screen.getByText('today.recallChance')).toBeInTheDocument()
+  })
+
+  it('says nothing at all for a card with no forgetting curve', () => {
+    // A new card, or a plan saved before the estimate was recorded. "0%" would tell the learner
+    // they have certainly forgotten something they may never have studied.
+    renderToday(planWith({}))
+
+    expect(screen.queryByText('today.recallChance')).not.toBeInTheDocument()
+    expect(screen.queryByText(/%/)).not.toBeInTheDocument()
+  })
+
   it('will not rebuild a completed plan (the RPC refuses it)', () => {
     renderToday({
       plan: {
