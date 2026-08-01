@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI Tao the",
-      "free": "{{count, number}} the/ngay",
-      "pro": "{{count, number}}/ngay + tin dung",
-      "freeUnknown": "Han muc mien phi hang ngay",
-      "proUnknown": "Han muc hang ngay + tin dung"
+      "free": "{{count, number}} the/ngay · co the mua tin dung",
+      "pro": "Giong Free · co the mua tin dung",
+      "freeUnknown": "Han muc mien phi hang ngay · co the mua tin dung"
     },
     "premiumTts": {
       "title": "TTS Cao cap",

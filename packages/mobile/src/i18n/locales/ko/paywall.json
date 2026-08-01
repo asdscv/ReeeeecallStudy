@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI 카드 생성",
-      "free": "하루 {{count, number}}장",
-      "pro": "하루 {{count, number}}장 + 크레딧",
-      "freeUnknown": "매일 무료 제공량",
-      "proUnknown": "매일 무료 제공량 + 크레딧"
+      "free": "하루 {{count, number}}장 · 크레딧 구매 가능",
+      "pro": "무료와 동일 · 크레딧 구매 가능",
+      "freeUnknown": "매일 무료 제공량 · 크레딧 구매 가능"
     },
     "premiumTts": {
       "title": "프리미엄 TTS",

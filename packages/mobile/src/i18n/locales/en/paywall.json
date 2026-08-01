@@ -20,10 +20,9 @@
     },
     "aiGeneration": {
       "title": "AI Card Generation",
-      "free": "{{count, number}} cards/day",
-      "pro": "{{count, number}}/day + credits",
-      "freeUnknown": "Daily free allowance",
-      "proUnknown": "Daily allowance + credits"
+      "free": "{{count, number}} cards/day · credits available",
+      "pro": "Same as Free · credits available",
+      "freeUnknown": "Daily free allowance · credits available"
     },
     "premiumTts": {
       "title": "Premium TTS",

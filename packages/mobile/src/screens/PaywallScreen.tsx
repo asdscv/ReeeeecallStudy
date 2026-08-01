@@ -48,8 +48,12 @@ const REFUND_REQUEST_URL = Platform.select({
 // paywall.json is a number that goes stale the first time someone uses that panel, on
 // the one screen whose job is telling a person what they are buying.
 const FEATURE_KEYS = ['cardStorage', 'allModes', 'aiGeneration', 'premiumTts', 'analytics', 'marketplace'] as const
-/** The rows whose copy carries a server number, and therefore a `*Unknown` twin. */
-const NUMERIC_FEATURES = new Set<(typeof FEATURE_KEYS)[number]>(['cardStorage', 'aiGeneration'])
+/**
+ * The CELLS whose copy carries a server number, and therefore need a `*Unknown` twin to fall
+ * back to. Per cell, not per row: `aiGeneration.pro` says "Same as Free", which needs no number
+ * and stays true under any quota — so it has nothing to fall back FROM.
+ */
+const NUMERIC_CELLS = new Set(['cardStorage.free', 'cardStorage.pro', 'aiGeneration.free'])
 const FEATURE_ICONS: Record<(typeof FEATURE_KEYS)[number], string> = {
   cardStorage: '🗂️',
   allModes: '🧠',
@@ -161,45 +165,45 @@ export function PaywallScreen() {
   )
 
   /**
-   * The interpolation values for the two numeric rows, keyed by feature.
+   * The interpolation values for the numeric CELLS, keyed by `<feature>.<column>`.
    *
-   * A row with no entry is called as `t(key, undefined)`, which is just `t(key)` — the four
-   * non-numeric rows are untouched.
+   * A cell with no entry is called as `t(key, undefined)`, which is just `t(key)` — every
+   * static cell is untouched.
    *
    * `count` stays a real `number`: src/i18n registers an Intl-free `number` formatter
    * (`formatCount`) because an ICU-less Hermes build has no `Intl`, and handing it a
    * pre-formatted string would silently skip the grouping and render "100000".
    *
-   * The AI row quotes the SAME number in both columns on purpose. A paid plan does not
-   * currently raise the AI quota — `_ai_free_cards_per_day()` takes no user argument, and a
-   * subscription grants `card_limit` only — so a differing Pro figure would be an invention.
-   * Whether Pro SHOULD get a larger quota is an open product decision (per-plan AI
-   * entitlement); until it is answered the two cells at least cannot contradict each other.
+   * **The AI row's Pro cell carries no number.** A paid plan does not raise the AI quota —
+   * `_ai_free_cards_per_day()` takes no user argument, and a subscription grants `card_limit`
+   * only — so it says "Same as Free", which needs no interpolation and cannot go stale. Both
+   * cells also name credits, because credit packs are NOT plan-gated (`create_payment_intent`
+   * checks auth and an active product, nothing else): naming them under Pro alone would
+   * advertise an exclusivity that does not exist, which is the defect this row had.
    */
   type FeatureKey = (typeof FEATURE_KEYS)[number]
-  const freeCounts: Partial<Record<FeatureKey, { count: number }>> = {}
-  const proCounts: Partial<Record<FeatureKey, { count: number }>> = {}
+  const counts: Record<string, { count: number }> = {}
   if (planLimits) {
-    freeCounts.cardStorage = { count: planLimits.freeCardLimit }
-    freeCounts.aiGeneration = { count: planLimits.freeAiCardsPerDay }
-    proCounts.aiGeneration = { count: planLimits.freeAiCardsPerDay }
+    counts['cardStorage.free'] = { count: planLimits.freeCardLimit }
+    counts['aiGeneration.free'] = { count: planLimits.freeAiCardsPerDay }
   }
-  if (proCardLimit !== null) proCounts.cardStorage = { count: proCardLimit }
+  if (proCardLimit !== null) counts['cardStorage.pro'] = { count: proCardLimit }
 
   /**
-   * `features.<key>.free` interpolated when the number is known, `features.<key>.freeUnknown`
-   * when it is not. The fallback copy is deliberately number-free ("Limited storage") rather
-   * than a hardcoded default: a stale-but-plausible figure on a purchase screen is the exact
-   * failure this change exists to remove, and re-adding it as an error path would keep it.
+   * `features.<key>.<column>` interpolated when the number is known, `...Unknown` when it is
+   * not. The fallback copy is deliberately number-free ("Limited storage") rather than a
+   * hardcoded default: a stale-but-plausible figure on a purchase screen is the exact failure
+   * this screen's copy exists to avoid, and re-adding it as an error path would keep it.
    *
-   * The four non-numeric rows never take this branch — their copy has no placeholder and no
-   * `*Unknown` twin, so they render exactly as before.
+   * Static cells never take that branch — their copy has no placeholder and no `*Unknown`
+   * twin, so they render exactly as written.
    */
   const featureValue = (key: FeatureKey, column: 'free' | 'pro'): string => {
-    const opts = (column === 'free' ? freeCounts : proCounts)[key]
-    if (opts) return t(`features.${key}.${column}`, opts)
-    if (NUMERIC_FEATURES.has(key)) return t(`features.${key}.${column}Unknown`)
-    return t(`features.${key}.${column}`)
+    const cell = `${key}.${column}`
+    const opts = counts[cell]
+    if (opts) return t(`features.${cell}`, opts)
+    if (NUMERIC_CELLS.has(cell)) return t(`features.${cell}Unknown`)
+    return t(`features.${cell}`)
   }
 
   const formatPrice = (product: BillingProduct, pkg: any): string => {
