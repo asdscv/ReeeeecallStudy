@@ -21,6 +21,16 @@
 // cannot be compared", never as "use the other face".
 import type { Card, CardTemplate } from '../types/database'
 
+/**
+ * The three template columns this module reads, and nothing else.
+ *
+ * A `Pick` rather than the whole row because the callers that matter cannot supply the whole
+ * row: the plan path selects `id, fields, front_layout, back_layout` from `card_templates` and
+ * has no reason to pull `front_html` or `is_default`. Declaring exactly what is read also means
+ * a future column cannot quietly become load-bearing for the answer decision.
+ */
+export type CardAnswerTemplate = Pick<CardTemplate, 'fields' | 'front_layout' | 'back_layout'>
+
 export interface CardFaceKeys {
   /** Field keys the learner is shown — the question. */
   readonly promptKeys: readonly string[]
@@ -60,7 +70,7 @@ function presentKeys(
  * a learner's paraphrase matches it.
  */
 export function resolveCardAnswerFaces(
-  template: CardTemplate | null | undefined,
+  template: CardAnswerTemplate | null | undefined,
   card: Pick<Card, 'field_values'>,
 ): CardFaceKeys | null {
   if (!template) return null
@@ -85,7 +95,7 @@ export function resolveCardAnswerFaces(
 
 /** The reference answer text itself, joined in layout order, or `null` when unresolvable. */
 export function cardReferenceAnswer(
-  template: CardTemplate | null | undefined,
+  template: CardAnswerTemplate | null | undefined,
   card: Pick<Card, 'field_values'>,
 ): string | null {
   const faces = resolveCardAnswerFaces(template, card)

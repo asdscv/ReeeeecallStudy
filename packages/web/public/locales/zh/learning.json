@@ -47,6 +47,11 @@
       "known": "知道",
       "hint": "仅记录本次作答 — 不会改变复习计划。"
     },
+    "answer": {
+      "label": "你的答案（可选）",
+      "placeholder": "输入你记得的内容",
+      "note": "与本次作答一同保存。不评分，仍由你自己评价。"
+    },
     "insightsLink": "诊断"
   },
   "goals": {
@@ -109,6 +114,7 @@
   "history": {
     "title": "最近作答 ({{count, number}})",
     "itemFallback": "{{type}} 作答",
+    "youWrote": "你写的答案：{{text}}",
     "score": {
       "unknown": "未评分"
     }

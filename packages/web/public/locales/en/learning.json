@@ -47,6 +47,11 @@
       "known": "Knew it",
       "hint": "Records your attempt — it does not change the review schedule."
     },
+    "answer": {
+      "label": "Your answer (optional)",
+      "placeholder": "Type what you remember",
+      "note": "Saved with your attempt. Nothing grades it — you still rate yourself."
+    },
     "insightsLink": "Insights"
   },
   "goals": {
@@ -109,6 +114,7 @@
   "history": {
     "title": "Recent attempts ({{count, number}})",
     "itemFallback": "{{type}} attempt",
+    "youWrote": "You wrote: {{text}}",
     "score": {
       "unknown": "Not scored"
     }

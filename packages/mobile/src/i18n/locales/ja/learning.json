@@ -85,7 +85,8 @@
     },
     "title": "最近の試行 ({{count, number}})",
     "title_one": "最近の試行 ({{count, number}})",
-    "title_other": "最近の試行 ({{count, number}})"
+    "title_other": "最近の試行 ({{count, number}})",
+    "youWrote": "入力した答え: {{text}}"
   },
   "insights": {
     "accuracy": "正答率",
@@ -123,6 +124,11 @@
     "title": "おすすめ"
   },
   "today": {
+    "answer": {
+      "label": "あなたの答え（任意）",
+      "note": "試行の記録と一緒に保存されます。採点はされず、評価は自分で選びます。",
+      "placeholder": "覚えている内容を入力してください"
+    },
     "budget": "1日 {{count, number}} 分",
     "empty": {
       "createGoal": "目標を作成",

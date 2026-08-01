@@ -47,6 +47,11 @@
       "known": "Tahu",
       "hint": "Hanya mencatat percobaan — tidak mengubah jadwal ulasan."
     },
+    "answer": {
+      "label": "Jawaban kamu (opsional)",
+      "placeholder": "Tulis apa yang kamu ingat",
+      "note": "Disimpan bersama percobaan ini. Tidak dinilai — penilaian tetap dari kamu."
+    },
     "insightsLink": "Analisis"
   },
   "goals": {
@@ -109,6 +114,7 @@
   "history": {
     "title": "Percobaan terbaru ({{count, number}})",
     "itemFallback": "Percobaan {{type}}",
+    "youWrote": "Kamu menulis: {{text}}",
     "score": {
       "unknown": "Tanpa skor"
     }

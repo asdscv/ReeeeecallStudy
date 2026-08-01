@@ -85,7 +85,8 @@
     },
     "title": "Recent attempts ({{count, number}})",
     "title_one": "Recent attempt ({{count, number}})",
-    "title_other": "Recent attempts ({{count, number}})"
+    "title_other": "Recent attempts ({{count, number}})",
+    "youWrote": "You wrote: {{text}}"
   },
   "insights": {
     "accuracy": "Accuracy",
@@ -123,6 +124,11 @@
     "title": "Recommendations"
   },
   "today": {
+    "answer": {
+      "label": "Your answer (optional)",
+      "note": "Saved with your attempt. Nothing grades it — you still rate yourself.",
+      "placeholder": "Type what you remember"
+    },
     "budget": "{{count, number}} min/day",
     "empty": {
       "createGoal": "Create a goal",

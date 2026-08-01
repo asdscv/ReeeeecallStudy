@@ -85,7 +85,8 @@
     },
     "title": "Intentos recientes ({{count, number}})",
     "title_one": "Intento reciente ({{count, number}})",
-    "title_other": "Intentos recientes ({{count, number}})"
+    "title_other": "Intentos recientes ({{count, number}})",
+    "youWrote": "Escribiste: {{text}}"
   },
   "insights": {
     "accuracy": "Precisión",
@@ -123,6 +124,11 @@
     "title": "Recomendaciones"
   },
   "today": {
+    "answer": {
+      "label": "Tu respuesta (opcional)",
+      "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya.",
+      "placeholder": "Escribe lo que recuerdes"
+    },
     "budget": "{{count, number}} min/día",
     "empty": {
       "createGoal": "Crear un objetivo",

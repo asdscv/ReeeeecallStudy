@@ -14,7 +14,8 @@ import { create } from 'zustand'
 import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
 import {
-  buildCandidatesFromCards, legacyCardItemShape, type CandidateStudyLog,
+  buildCandidatesFromCards, legacyCardItemShape, planItemAnswerPayload,
+  TYPED_ANSWER_MAX_CHARS, type CandidateStudyLog,
 } from '../lib/learning-candidates'
 import { callServerAI, getAiWallet } from '../lib/ai/server-client'
 import {
@@ -26,7 +27,7 @@ import {
 import type { UserCardProgress } from '../lib/srs-access'
 import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
 import type { LearningGoal } from '../learning/domain/index'
-import type { Card } from '../types/database'
+import type { Card, LayoutItem, TemplateField } from '../types/database'
 
 // ── Row shapes (snake_case, as returned by PostgREST) ───────────────────────
 export interface LearningGoalRow {
@@ -147,6 +148,27 @@ const CARD_COLUMNS =
   + ' created_at, updated_at'
 
 /**
+ * Template columns both plan paths read — ONE constant, deliberately.
+ *
+ * `fields` orders the prompt label (`card-prompt`); `front_layout` / `back_layout` are what
+ * `resolveCardAnswerFaces` reads to decide whether a card can be answered by typing. Two selects
+ * over the same table for two overlapping purposes is how the read path and the write path end
+ * up disagreeing about the same card, so they share this.
+ *
+ * RLS matters here and is left alone on purpose: a subscriber can read a shared template only
+ * when it is the deck's `default_template_id` (mig 009). An unreadable template is simply absent
+ * from the result, the resolver returns null, and the item stays a self-rating. Fail-closed.
+ */
+const TEMPLATE_COLUMNS = 'id, fields, front_layout, back_layout'
+
+interface PlanTemplateRow {
+  id: string
+  fields: TemplateField[]
+  front_layout: LayoutItem[]
+  back_layout: LayoutItem[]
+}
+
+/**
  * Upper bound on the cards pulled for one plan. A plan is one day of work; at
  * RECALL_MINUTES per item even a 1440-minute budget cannot use more than ~2880, and
  * a 500-card slice of the DUE set is far past any realistic daily budget. The cap
@@ -173,7 +195,20 @@ export interface AttemptRow {
   activity_id: string | null
   plan_item_id: string | null
   activity_type: string
+  /**
+   * What KIND of response was recorded — `'self_rate'` for a rating alone, `'text'` for a
+   * typed answer. Read back rather than assumed because it is the only thing that says whether
+   * `response.text` is meaningful, and a later paid `compare` must not be offered on a row that
+   * has no answer in it.
+   */
+  response_type: string
   evaluator_type: string
+  /**
+   * The raw response jsonb. `{ self_rated }` always; `{ self_rated, text }` when the learner
+   * typed something. Kept as the stored shape rather than flattened into a `text` field, so the
+   * UI reads exactly what the server holds — and therefore exactly what a model would be shown.
+   */
+  response: Record<string, unknown> | null
   normalized_score: number | null
   duration_ms: number
   created_at: string
@@ -193,6 +228,18 @@ export interface AttemptInput {
   goalId: string
   score: number
   durationMs?: number
+  /**
+   * What the learner typed, when the item asks for it (`planItem.response_type === 'text'`).
+   *
+   * Stored verbatim (trimmed) next to the rating; nothing grades it. It is IGNORED on an item
+   * whose snapshot says `self_rate`, because an item with no input field has no typed answer and
+   * writing one anyway would put text in a row that claims to hold only a rating.
+   *
+   * One retry hazard, owned by the caller: `p_response` is part of the RPC's idempotency
+   * comparison (mig 167), so replaying the SAME `clientAttemptId` with different text raises
+   * P0007. Mint the id at submit time, together with the text — never before it is final.
+   */
+  text?: string
   /** Stable per attempt: the RPC is idempotent on it, so a retry cannot double-record. */
   clientAttemptId: string
 }
@@ -627,9 +674,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         if (templateIds.length > 0) {
           const { data: templates } = await supabase
             .from('card_templates')
-            .select('id, fields')
+            .select(TEMPLATE_COLUMNS)
             .in('id', templateIds)
-            .returns<Array<{ id: string; fields: Array<{ key: string; order?: number }> }>>()
+            .returns<PlanTemplateRow[]>()
           planTemplateFields = Object.fromEntries((templates ?? []).map((template) => [
             template.id,
             [...(template.fields ?? [])]
@@ -741,6 +788,29 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         return false
       }
 
+      // The templates of those cards, which decide WHICH items can be answered by typing.
+      //
+      // Read here rather than derived from the cards: only the template author's declared
+      // `front_layout` / `back_layout` can say which field is the answer, and guessing from
+      // jsonb key order is inverted for every official word card (shared/lib/card-answer).
+      //
+      // A failure is NOT fatal and deliberately not thrown: an unreadable or missing template
+      // means the plan falls back to what it has always done — a self-rating with no input box.
+      // Failing plan generation because a typing affordance could not be offered would trade a
+      // working feature for a missing one.
+      const templateIds = [...new Set(
+        cards.map((card) => card.template_id).filter((id): id is string => !!id),
+      )]
+      const templatesById = new Map<string, PlanTemplateRow>()
+      if (templateIds.length > 0) {
+        const { data: templateRows } = await supabase
+          .from('card_templates')
+          .select(TEMPLATE_COLUMNS)
+          .in('id', templateIds)
+          .returns<PlanTemplateRow[]>()
+        for (const template of templateRows ?? []) templatesById.set(template.id, template)
+      }
+
       const since = new Date(Date.parse(ctx.now) - LOG_WINDOW_DAYS * 86_400_000).toISOString()
       // `.returns` rather than a cast at the call site: the cast is what let `rating` be
       // declared `number` while the column is TEXT, which silently pinned `recentFailure` to
@@ -798,8 +868,16 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const items = output.items.map((item) => {
         const card = item.cardId ? cardsById.get(item.cardId) : undefined
         const shape = card
-          ? legacyCardItemShape(card)
-          : { activityType: item.activityType, stimulusType: 'text', responseType: 'self_rate', evaluatorType: 'self_rate' }
+          ? legacyCardItemShape(card, card.template_id ? templatesById.get(card.template_id) : null)
+          : {
+            activityType: item.activityType, stimulusType: 'text',
+            responseType: 'self_rate', evaluatorType: 'self_rate', answerFaces: null,
+          }
+        // `payload` records WHICH fields the plan called prompt and reference, decided here and
+        // never re-derived: a template edited after today's plan was written must not change
+        // what today's plan meant. Omitted entirely when there is nothing to record, so
+        // `save_daily_plan` keeps writing its `'{}'` default for every other item.
+        const payload = planItemAnswerPayload(shape)
         return {
           activity_id: item.activityId,
           card_id: item.cardId,
@@ -811,6 +889,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           reason_code: item.reasonCode,
           priority: item.priority,
           estimated_minutes: item.estimatedMinutes,
+          ...(payload ? { payload } : {}),
         }
       })
 
@@ -860,12 +939,31 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     set({ recordingItemId: item.id, planError: null })
     try {
       const score = Math.min(1, Math.max(0, input.score))
+      // The typed answer, if this item asks for one.
+      //
+      // Gated on the ITEM's snapshot, not on whether the caller passed text: `response_type`
+      // is what the row claims to hold, and storing prose under a `self_rate` item would make
+      // that claim false. Trimmed and capped because `record_answer_attempt` rejects a response
+      // over 64 KiB with the same error code as the plan-save cap — a limit the learner would
+      // meet as an unrelated message about rebuilding plans.
+      const typed = item.response_type === 'text'
+      const text = typed
+        ? (input.text ?? '').trim().slice(0, TYPED_ANSWER_MAX_CHARS)
+        : ''
+      // Built BEFORE the call and never re-derived: `p_response` is part of the RPC's
+      // idempotency comparison, so the same `clientAttemptId` with a different response raises
+      // P0007. An empty answer stays `{ self_rated }` — the exact shape every existing attempt
+      // has — rather than `{ self_rated, text: '' }`, so "typed nothing" and "was never asked"
+      // read the same downstream, and no later feature can mistake an empty string for an answer.
+      const response: Record<string, unknown> = text === ''
+        ? { self_rated: score }
+        : { self_rated: score, text }
       const { error } = await supabase.rpc('record_answer_attempt', {
         p_client_attempt_id: input.clientAttemptId,
         p_activity_type: item.activity_type,
         p_response_type: item.response_type,
         p_evaluator_type: item.evaluator_type,
-        p_response: { self_rated: score },
+        p_response: response,
         p_goal_id: input.goalId,
         p_activity_id: item.activity_id,
         p_card_id: item.card_id,
@@ -893,7 +991,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('answer_attempts')
-        .select('id, goal_id, card_id, activity_id, plan_item_id, activity_type, evaluator_type, normalized_score, duration_ms, created_at')
+        // `response` and `response_type` are read back so the history row can show the learner
+        // exactly what was stored — the honesty check for typed answers, and the only way a
+        // later feature can tell an attempt that HAS an answer from one that does not.
+        .select('id, goal_id, card_id, activity_id, plan_item_id, activity_type, response_type, evaluator_type, response, normalized_score, duration_ms, created_at')
         .eq('goal_id', goalId)
         .order('created_at', { ascending: false })
         .limit(50)

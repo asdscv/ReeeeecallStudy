@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
@@ -7,7 +7,10 @@ import {
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
-import { attemptNeedsRemediation, latestAttemptForCard } from '@reeeeecall/shared/lib/learning-attempt-selection'
+import {
+  attemptNeedsRemediation, attemptTypedAnswer, latestAttemptForCard,
+} from '@reeeeecall/shared/lib/learning-attempt-selection'
+import { TYPED_ANSWER_MAX_CHARS } from '@reeeeecall/shared/lib/learning-candidates'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
@@ -35,12 +38,16 @@ const REASON_KEY: Record<string, string> = {
 const ATTEMPT_ROWS = 10
 
 /**
- * The two remediation actions an attempt can honestly ground.
+ * The two remediation actions the SERVER serves.
  *
- * `compare` and `evaluate` are deliberately absent: an attempt stores `{ self_rated: score }` —
- * a rating, not anything the learner wrote — so there is no answer to compare or to grade.
+ * `compare` and `evaluate` are absent because `SERVED_ACTIONS` in the edge function refuses
+ * them (Stage 0 of the compare/evaluate plan) — not, any longer, because there is nothing to
+ * compare: a typed item now stores `{ self_rated, text }`. What is still missing is the
+ * server-side reference answer and the refuse-don't-degrade path, so adding an entry here would
+ * charge the wallet for a request the function rejects.
+ *
  * The labels say what the model produces ("AI explanation" / "Study hint"), never that it read
- * a response, because it did not.
+ * an answer, because these two are grounded in the score and the card.
  */
 const REMEDIATION_ACTIONS: ReadonlyArray<{ action: RemediationAction; labelKey: string }> = [
   { action: 'explain', labelKey: 'enrichment.action.explain' },
@@ -54,14 +61,19 @@ const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
   { score: 1, key: 'today.rate.known' },
 ]
 
-function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, onRate, recording, onExplain, explaining, busy }: {
+function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, typed, onRate, recording, onExplain, explaining, busy }: {
   position: number
   cardText: string
   deckId: string | null
   reasonLabel: string
   minutes: number | null
   done: boolean
-  onRate: (score: number) => void
+  /**
+   * This item asks for a written answer — `response_type === 'text'`, decided at plan time by
+   * the card's template. False keeps the row exactly as it was before typed answers existed.
+   */
+  typed: boolean
+  onRate: (score: number, text: string) => void
   recording: boolean
   onExplain: (() => void) | null
   /** This row's card is the one being fetched — drives the label. */
@@ -70,6 +82,16 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
   busy: boolean
 }) {
   const { t } = useTranslation('learning')
+  /**
+   * The answer in progress, held on the ROW.
+   *
+   * Local because it is not shared state and not worth a store round trip — and because the row
+   * unmounts when the plan is re-read after the attempt is recorded, which clears it for free.
+   */
+  const [answer, setAnswer] = useState('')
+  // Generated, not derived from `position`: two rows must never share an id, and `position` is
+  // reused across plans.
+  const answerFieldId = useId()
   return (
     <li className="p-3 bg-card rounded-lg border border-border">
       <div className="flex items-center justify-between gap-3">
@@ -121,20 +143,49 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, o
       {done ? (
         <p className="mt-2 text-xs text-success">{t('today.item.recorded')}</p>
       ) : (
-        <div className="mt-2 flex items-center gap-2">
-          {SELF_RATINGS.map((rating) => (
-            <button
-              key={rating.key}
-              type="button"
-              disabled={recording}
-              onClick={() => onRate(rating.score)}
-              className="px-2 py-1 text-xs border border-border rounded-md cursor-pointer disabled:opacity-50"
-            >
-              {t(rating.key)}
-            </button>
-          ))}
-          <span className="text-[11px] text-content-tertiary">{t('today.rate.hint')}</span>
-        </div>
+        <>
+          {/* Typed recall — production instead of recognition. Deliberately paired with the
+              SAME three rating buttons rather than replacing them: nothing grades the text, so
+              the learner is still the evaluator, and the buttons are what submits. */}
+          {typed && (
+            <div className="mt-2">
+              <label htmlFor={answerFieldId} className="block text-xs text-content-tertiary">
+                {t('today.answer.label')}
+              </label>
+              <textarea
+                id={answerFieldId}
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                disabled={recording}
+                rows={2}
+                // Enforced HERE, where the learner can see the input stop, rather than as the
+                // server's 64 KiB rejection — which shares its error code with the plan-save
+                // cap and would surface as a message about rebuilding plans.
+                maxLength={TYPED_ANSWER_MAX_CHARS}
+                placeholder={t('today.answer.placeholder')}
+                className="mt-1 w-full px-2 py-1.5 text-sm bg-muted border border-border rounded-md text-foreground disabled:opacity-50"
+              />
+              {/* Says what the text is and is not: stored with the attempt, never graded. A
+                  learner who believes it is being marked would read their own self-rating as a
+                  second opinion on it. */}
+              <p className="mt-0.5 text-[11px] text-content-tertiary">{t('today.answer.note')}</p>
+            </div>
+          )}
+          <div className="mt-2 flex items-center gap-2">
+            {SELF_RATINGS.map((rating) => (
+              <button
+                key={rating.key}
+                type="button"
+                disabled={recording}
+                onClick={() => onRate(rating.score, answer)}
+                className="px-2 py-1 text-xs border border-border rounded-md cursor-pointer disabled:opacity-50"
+              >
+                {t(rating.key)}
+              </button>
+            ))}
+            <span className="text-[11px] text-content-tertiary">{t('today.rate.hint')}</span>
+          </div>
+        </>
       )}
     </li>
   )
@@ -231,9 +282,21 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           const remediable = canRemediate(attempt)
           const pending = requestingAttemptId === attempt.id
           const rowName = label || t('history.itemFallback', { type: attempt.activity_type })
+          // What the learner actually wrote, when they wrote anything. Shown because it is the
+          // honesty check on the whole feature: a later paid `compare` is grounded in exactly
+          // this string, so the learner has to be able to see it before paying for an answer
+          // about it.
+          const typedAnswer = attemptTypedAnswer(attempt)
           return (
             <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2 bg-card rounded-lg border border-border">
-              <span className="text-xs text-foreground truncate">{rowName}</span>
+              <span className="min-w-0">
+                <span className="block text-xs text-foreground truncate">{rowName}</span>
+                {typedAnswer && (
+                  <span className="block text-[11px] text-content-tertiary truncate">
+                    {t('history.youWrote', { text: typedAnswer })}
+                  </span>
+                )}
+              </span>
               <span className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-content-tertiary">{t(scoreKey(attempt.normalized_score))}</span>
                 <span className="text-[11px] text-content-tertiary">
@@ -448,6 +511,10 @@ export function LearningTodayPage() {
                   reasonLabel={t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
                   minutes={item.estimated_minutes}
                   done={item.status === 'completed'}
+                  // The plan row's own snapshot decides this — the same column
+                  // `record_answer_attempt` compares against, so the input can never appear on
+                  // an item the RPC would then reject for sending text.
+                  typed={item.response_type === 'text'}
                   recording={recordingItemId === item.id}
                   explaining={enrichmentPendingCardId === item.card_id}
                   // Disabled on the GLOBAL flag, not just this card: the store drops any second
@@ -466,11 +533,11 @@ export function LearningTodayPage() {
                       uiLang: i18n.language,
                     })
                   } : null}
-                  onRate={(score) => {
+                  onRate={(score, text) => {
                     if (!selectedGoalId) return
-                    // One id per attempt, generated at click time: the RPC is idempotent on
-                    // it, so a retry of THIS attempt cannot double-record, while a different
-                    // attempt gets a different id.
+                    // One id per attempt, generated at click time — TOGETHER with the text.
+                    // `p_response` is part of the RPC's idempotency comparison, so an id minted
+                    // before the answer was final would make a retry with edited text a P0007.
                     // Refresh the attempt list too: `recordAttempt` re-reads only the plan, so
                     // without this the miss the learner JUST recorded — the one this whole
                     // feature exists to explain — never appears in the list below.
@@ -478,6 +545,7 @@ export function LearningTodayPage() {
                       planItem: item,
                       goalId: selectedGoalId,
                       score,
+                      text,
                       clientAttemptId: crypto.randomUUID(),
                     }, ctx.planDate).then((ok) => {
                       if (ok && selectedGoalId) void fetchAttempts(selectedGoalId)

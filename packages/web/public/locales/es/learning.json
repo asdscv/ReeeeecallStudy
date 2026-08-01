@@ -47,6 +47,11 @@
       "known": "Lo sabía",
       "hint": "Registra tu intento; no cambia el calendario de repaso."
     },
+    "answer": {
+      "label": "Tu respuesta (opcional)",
+      "placeholder": "Escribe lo que recuerdes",
+      "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya."
+    },
     "insightsLink": "Diagnóstico"
   },
   "goals": {
@@ -109,6 +114,7 @@
   "history": {
     "title": "Intentos recientes ({{count, number}})",
     "itemFallback": "Intento de {{type}}",
+    "youWrote": "Escribiste: {{text}}",
     "score": {
       "unknown": "Sin puntuación"
     }
