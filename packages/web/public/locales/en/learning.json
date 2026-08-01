@@ -52,7 +52,8 @@
       "placeholder": "Type what you remember",
       "note": "Saved with your attempt. Nothing grades it — you still rate yourself."
     },
-    "insightsLink": "Insights"
+    "insightsLink": "Insights",
+    "recallChance": "About {{percent}}% chance you still recall this"
   },
   "goals": {
     "title": "Learning goals",

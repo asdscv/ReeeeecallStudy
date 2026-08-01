@@ -52,7 +52,8 @@
       "placeholder": "Tulis apa yang kamu ingat",
       "note": "Disimpan bersama percobaan ini. Tidak dinilai — penilaian tetap dari kamu."
     },
-    "insightsLink": "Analisis"
+    "insightsLink": "Analisis",
+    "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini"
   },
   "goals": {
     "title": "Tujuan belajar",

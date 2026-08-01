@@ -170,6 +170,7 @@
       "recentFailure": "Recently missed",
       "slowResponse": "Slow to answer"
     },
+    "recallChance": "About {{percent}}% chance you still recall this",
     "regenerate": "Rebuild plan",
     "regenerating": "Rebuilding…",
     "title": "Today's plan"

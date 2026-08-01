@@ -52,7 +52,8 @@
       "placeholder": "기억나는 대로 입력하세요",
       "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다."
     },
-    "insightsLink": "진단"
+    "insightsLink": "진단",
+    "recallChance": "지금 기억하고 있을 확률 약 {{percent}}%"
   },
   "goals": {
     "title": "학습 목표",

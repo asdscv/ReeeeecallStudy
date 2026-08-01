@@ -360,6 +360,8 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
       goalRelevance: typeof importance === 'number' ? clamp01(importance) : NEUTRAL,
       contentImportance: accepted ? ACCEPTED_CONTENT_IMPORTANCE : NEUTRAL,
       reviewValue: memory.reviewValue,
+      // Display only — the planner does not score on it. See PlannerCandidate.retrievability.
+      retrievability: memory.retrievability,
       estimatedMinutes: RECALL_MINUTES,
       difficulty: null,
     }

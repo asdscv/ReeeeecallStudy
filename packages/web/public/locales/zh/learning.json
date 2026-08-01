@@ -52,7 +52,8 @@
       "placeholder": "输入你记得的内容",
       "note": "与本次作答一同保存。不评分，仍由你自己评价。"
     },
-    "insightsLink": "诊断"
+    "insightsLink": "诊断",
+    "recallChance": "你现在还记得的概率约 {{percent}}%"
   },
   "goals": {
     "title": "学习目标",

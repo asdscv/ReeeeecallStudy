@@ -52,7 +52,8 @@
       "placeholder": "覚えている内容を入力してください",
       "note": "試行の記録と一緒に保存されます。採点はされず、評価は自分で選びます。"
     },
-    "insightsLink": "学習診断"
+    "insightsLink": "学習診断",
+    "recallChance": "いま思い出せる確率 約{{percent}}%"
   },
   "goals": {
     "title": "学習目標",

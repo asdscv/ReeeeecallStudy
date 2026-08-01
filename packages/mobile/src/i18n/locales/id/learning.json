@@ -170,6 +170,7 @@
       "recentFailure": "Baru saja salah",
       "slowResponse": "Lambat menjawab"
     },
+    "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini",
     "regenerate": "Buat ulang rencana",
     "regenerating": "Membuat ulang…",
     "title": "Rencana hari ini"

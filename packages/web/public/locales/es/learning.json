@@ -52,7 +52,8 @@
       "placeholder": "Escribe lo que recuerdes",
       "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya."
     },
-    "insightsLink": "Diagnóstico"
+    "insightsLink": "Diagnóstico",
+    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla"
   },
   "goals": {
     "title": "Objetivos de aprendizaje",

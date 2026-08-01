@@ -170,6 +170,7 @@
       "recentFailure": "最近答错",
       "slowResponse": "回答较慢"
     },
+    "recallChance": "你现在还记得的概率约 {{percent}}%",
     "regenerate": "重新生成计划",
     "regenerating": "重新生成中…",
     "title": "今日计划"

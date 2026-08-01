@@ -12,6 +12,7 @@ import {
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { TYPED_ANSWER_MAX_CHARS } from '@reeeeecall/shared/lib/learning-candidates'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
 
@@ -61,7 +62,7 @@ const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
   { score: 1, key: 'today.rate.known' },
 ]
 
-function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, typed, onRate, recording, onExplain, explaining, busy }: {
+function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, typed, onRate, recording, onExplain, explaining, busy, recallPercent }: {
   position: number
   cardText: string
   deckId: string | null
@@ -76,6 +77,14 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, t
   onRate: (score: number, text: string) => void
   recording: boolean
   onExplain: (() => void) | null
+  /**
+   * Estimated chance the learner still recalls this card, whole percent, or null.
+   *
+   * Null when the card has no forgetting curve yet. The row then says nothing rather than
+   * "0%" — a new card is not a forgotten one, and the difference is the whole point of the
+   * null discipline in the memory model.
+   */
+  recallPercent: number | null
   /** This row's card is the one being fetched — drives the label. */
   explaining: boolean
   /** ANY request is in flight — drives the disabled state, because the store drops seconds. */
@@ -103,6 +112,13 @@ function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, t
             </p>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-xs text-content-tertiary">{reasonLabel}</span>
+              {/* The number the reason is derived from. Shown so "at risk of forgetting" is a
+                  measurement the learner can judge rather than an assertion they must trust. */}
+              {recallPercent !== null && (
+                <span className="text-xs text-content-tertiary">
+                  {t('today.recallChance', { percent: recallPercent })}
+                </span>
+              )}
               {minutes !== null && (
                 <span className="text-xs text-content-tertiary">
                   {t('today.item.minutes', { count: minutes })}
@@ -509,6 +525,12 @@ export function LearningTodayPage() {
                   cardText={firstField}
                   deckId={card?.deck_id ?? null}
                   reasonLabel={t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
+                  // Strictly what the planner recorded when it chose this row. Deliberately NOT
+                  // recomputed from the card here: on a subscribed deck `cards.interval_days`
+                  // is the PUBLISHER's, which is the defect #389 fixed — a fallback would walk
+                  // straight back into it. A plan saved before this feature shows no number,
+                  // which is the honest answer.
+                  recallPercent={recallPercent(item.payload?.recall_probability)}
                   minutes={item.estimated_minutes}
                   done={item.status === 'completed'}
                   // The plan row's own snapshot decides this — the same column

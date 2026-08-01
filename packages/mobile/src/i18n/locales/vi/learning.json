@@ -170,6 +170,7 @@
       "recentFailure": "Trả lời sai gần đây",
       "slowResponse": "Trả lời chậm"
     },
+    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
     "regenerate": "Tạo lại kế hoạch",
     "regenerating": "Đang tạo lại…",
     "title": "Kế hoạch hôm nay"
