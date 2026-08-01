@@ -95,8 +95,7 @@
     "domain": "Materia",
     "domainName": {
       "general": "Estudio general",
-      "language": "Idiomas",
-      "labor-law": "Derecho laboral"
+      "language": "Idiomas"
     },
     "goalTitle": "Nombre del objetivo",
     "goalTitlePlaceholder": "p. ej. Aprobar el JLPT N2",

@@ -95,8 +95,7 @@
     "domain": "Subject",
     "domainName": {
       "general": "General study",
-      "language": "Language",
-      "labor-law": "Labour law"
+      "language": "Language"
     },
     "goalTitle": "Goal name",
     "goalTitlePlaceholder": "e.g. Pass JLPT N2",

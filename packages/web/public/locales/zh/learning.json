@@ -95,8 +95,7 @@
     "domain": "学科",
     "domainName": {
       "general": "通用学习",
-      "language": "语言学习",
-      "labor-law": "劳动法"
+      "language": "语言学习"
     },
     "goalTitle": "目标名称",
     "goalTitlePlaceholder": "例如：通过 JLPT N2",

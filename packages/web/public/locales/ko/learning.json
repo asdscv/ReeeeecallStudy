@@ -95,8 +95,7 @@
     "domain": "분야",
     "domainName": {
       "general": "일반 학습",
-      "language": "언어",
-      "labor-law": "노동법"
+      "language": "언어"
     },
     "goalTitle": "목표 이름",
     "goalTitlePlaceholder": "예: JLPT N2 합격",
