@@ -117,7 +117,7 @@ function reasonCode(candidate: PlannerCandidate): string {
   return features[0]?.[0] ?? 'balanced'
 }
 
-export interface PlannerOptions {
+interface PlannerOptions {
   readonly supportedActivityTypes?: readonly string[]
 }
 
