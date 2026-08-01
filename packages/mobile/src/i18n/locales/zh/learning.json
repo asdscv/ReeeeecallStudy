@@ -34,6 +34,13 @@
   "form": {
     "cancel": "取消",
     "dailyMinutes": "每日学习时间（分钟）",
+    "deckPriority": {
+      "high": "高",
+      "hint": "当一天的额度排满时，优先级高的卡组会先出现。",
+      "label": "优先级",
+      "low": "低",
+      "normal": "普通"
+    },
     "decks": "学习牌组",
     "decksHint": "计划将根据所选牌组中的卡片生成。",
     "domain": "学科",

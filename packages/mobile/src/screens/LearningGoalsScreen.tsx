@@ -7,6 +7,9 @@ import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
+import {
+  DECK_PRIORITY_LEVELS, DEFAULT_DECK_PRIORITY, importanceForPriority, type DeckPriority,
+} from '@reeeeecall/shared/lib/learning-deck-priority'
 import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 
@@ -41,6 +44,9 @@ export function LearningGoalsScreen() {
   const [minutes, setMinutes] = useState('20')
   const [deckIds, setDeckIds] = useState<Set<string>>(new Set())
   const [localError, setLocalError] = useState<string | null>(null)
+  // Separate from the selection set so unchecking a deck and changing one's mind does not
+  // silently discard the level already chosen for it.
+  const [deckPriority, setDeckPriority] = useState<Record<string, DeckPriority>>({})
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
   useEffect(() => { if (creating) void fetchDecks() }, [creating, fetchDecks])
@@ -79,9 +85,10 @@ export function LearningGoalsScreen() {
       domainId,
       title: trimmed,
       dailyMinutes,
-      // Uniform importance: there is no product concept for weighting a deck yet, and a
-      // hidden default other than the neutral 0.5 would tilt the planner unasked.
-      decks: [...deckIds].map((deck_id) => ({ deck_id, importance: 0.5 })),
+      decks: [...deckIds].map((deck_id) => ({
+        deck_id,
+        importance: importanceForPriority(deckPriority[deck_id] ?? DEFAULT_DECK_PRIORITY),
+      })),
     })
     setSubmitting(false)
     if (id) {
@@ -213,8 +220,8 @@ export function LearningGoalsScreen() {
             ) : decks.map((deck, index) => {
               const selected = deckIds.has(deck.id)
               return (
+                <View key={deck.id}>
                 <TouchableOpacity
-                  key={deck.id}
                   onPress={() => setDeckIds((prev) => {
                     const next = new Set(prev)
                     if (next.has(deck.id)) next.delete(deck.id)
@@ -235,6 +242,36 @@ export function LearningGoalsScreen() {
                     {selected ? '\u2713 ' : ''}{deck.name}
                   </Text>
                 </TouchableOpacity>
+                {/* Only for decks actually in the goal: a priority on an unselected deck is a
+                    control with nothing to act on. */}
+                {selected && (
+                  <View style={styles.priorityRow} accessibilityRole="radiogroup"
+                    accessibilityLabel={`${t('form.deckPriority.label')} — ${deck.name}`}>
+                    {DECK_PRIORITY_LEVELS.map((level) => {
+                      const active = (deckPriority[deck.id] ?? DEFAULT_DECK_PRIORITY) === level
+                      return (
+                        <TouchableOpacity
+                          key={level}
+                          onPress={() => setDeckPriority((prev) => ({ ...prev, [deck.id]: level }))}
+                          style={[styles.priorityChip, {
+                            borderColor: active ? theme.colors.primary : theme.colors.border,
+                          }]}
+                          hitSlop={HIT_SLOP}
+                          accessibilityRole="radio"
+                          accessibilityState={{ checked: active }}
+                          {...testProps(`learning-goal-priority-${level}-${index}`)}
+                        >
+                          <Text style={[theme.typography.caption, {
+                            color: active ? theme.colors.primary : theme.colors.textTertiary,
+                          }]}>
+                            {t(`form.deckPriority.${level}`)}
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    })}
+                  </View>
+                )}
+                </View>
               )
             })}
 
@@ -326,6 +363,12 @@ const styles = StyleSheet.create({
   deckRow: {
     marginTop: 6, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10,
     minHeight: MIN_TOUCH, justifyContent: 'center',
+  },
+  // 44pt minimum on every chip — the platform touch target, measured by the E2E spec.
+  priorityRow: { flexDirection: 'row', gap: 6, marginTop: 4, marginBottom: 6 },
+  priorityChip: {
+    paddingHorizontal: 12, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
+    justifyContent: 'center', alignItems: 'center',
   },
   primaryBtn: {
     marginTop: 12, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12,

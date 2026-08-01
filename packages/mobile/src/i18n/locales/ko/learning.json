@@ -34,6 +34,13 @@
   "form": {
     "cancel": "취소",
     "dailyMinutes": "하루 학습 시간(분)",
+    "deckPriority": {
+      "high": "높음",
+      "hint": "하루가 꽉 찼을 때 우선순위가 높은 덱이 먼저 나옵니다.",
+      "label": "우선순위",
+      "low": "낮음",
+      "normal": "보통"
+    },
     "decks": "학습할 덱",
     "decksHint": "플랜은 선택한 덱의 카드로 만들어집니다.",
     "domain": "분야",

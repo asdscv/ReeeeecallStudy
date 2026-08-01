@@ -110,6 +110,13 @@
     "error": {
       "title": "Masukkan nama tujuan (1–500 karakter).",
       "dailyMinutes": "Menit per hari harus antara 1 dan 1440."
+    },
+    "deckPriority": {
+      "label": "Prioritas",
+      "low": "Rendah",
+      "normal": "Normal",
+      "high": "Tinggi",
+      "hint": "Dek berprioritas tinggi muncul lebih dulu saat harimu penuh."
     }
   },
   "history": {

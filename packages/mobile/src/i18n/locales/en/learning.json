@@ -34,6 +34,13 @@
   "form": {
     "cancel": "Cancel",
     "dailyMinutes": "Minutes per day",
+    "deckPriority": {
+      "high": "High",
+      "hint": "Higher-priority decks come up sooner when the day is full.",
+      "label": "Priority",
+      "low": "Low",
+      "normal": "Normal"
+    },
     "decks": "Decks to study",
     "decksHint": "Your plan is built from the cards in these decks.",
     "domain": "Subject",
