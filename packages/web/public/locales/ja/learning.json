@@ -95,8 +95,7 @@
     "domain": "分野",
     "domainName": {
       "general": "一般学習",
-      "language": "語学学習",
-      "labor-law": "労働法"
+      "language": "語学学習"
     },
     "goalTitle": "目標名",
     "goalTitlePlaceholder": "例：JLPT N2 合格",
