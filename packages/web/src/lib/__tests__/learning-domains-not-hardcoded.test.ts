@@ -30,9 +30,7 @@ const SCREENS = [
  * every domain this build ships. The two answers only diverge on a domain that does not exist
  * yet — which is the entire point. Reading the source is the only way to catch it before then.
  *
- * `supabase/functions/_shared/domain-policy.ts` is deliberately NOT here: it is the deployed
- * copy of the data, so naming ids is its job. `learning-domain-catalog.test.ts` holds it to
- * matching the adapters.
+
  */
 const NO_DOMAIN_LITERALS = [
   ...SCREENS,
@@ -84,10 +82,13 @@ describe('domain list is not duplicated into screens', () => {
     }
   })
 
-  it('the server asks the domain whether grounding is required', () => {
+  it('the server grounds on the sources it was given, not on a domain name', () => {
     // `requireGrounding = domainId === 'labor-law' || ...` compiled a single national exam into
-    // the remediation prompt. Policy belongs to the domain, not to an if-statement.
-    expect(code('supabase/functions/_shared/ai-remediation.ts')).toContain('domainRequiresSourceGrounding')
+    // the remediation prompt, and demanded a citation from an allowed-source list that is always
+    // empty — so every request in that domain failed before the model was called. Grounding is
+    // now a fact about the payload, which cannot be wrong about itself.
+    const server = code('supabase/functions/_shared/ai-remediation.ts')
+    expect(server).toContain('const requireGrounding = context.sources.length > 0')
   })
 
   it('the planner call site asks the domain for its plan shape', () => {

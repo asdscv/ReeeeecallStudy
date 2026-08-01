@@ -95,8 +95,7 @@
     "domain": "สาขาวิชา",
     "domainName": {
       "general": "การเรียนทั่วไป",
-      "language": "เรียนภาษา",
-      "labor-law": "กฎหมายแรงงาน"
+      "language": "เรียนภาษา"
     },
     "goalTitle": "ชื่อเป้าหมาย",
     "goalTitlePlaceholder": "เช่น สอบผ่าน JLPT N2",

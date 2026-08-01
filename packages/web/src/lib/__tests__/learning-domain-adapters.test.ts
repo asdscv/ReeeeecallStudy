@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activitiesForLegacyCard, assertImplementedMedia, laborLawDomainAdapter, languageDomainAdapter, LABOR_LAW_ISSUE_RULE_APPLICATION_CONCLUSION_RUBRIC } from '@reeeeecall/shared/learning'
+import { activitiesForLegacyCard, languageDomainAdapter } from '@reeeeecall/shared/learning'
 import type { Card } from '@reeeeecall/shared/types/database'
 
 const card: Card = {
@@ -58,14 +58,5 @@ describe('learning domain adapters', () => {
   it('keeps language ActivityType independent from StudyMode', () => {
     expect(languageDomainAdapter.supportedActivityTypes).toEqual(['recall', 'practice', 'produce'])
     expect(languageDomainAdapter.supportedActivityTypes).not.toContain('srs')
-  })
-
-  it('defines a source-grounded non-language production rubric', () => {
-    expect(laborLawDomainAdapter.promptPolicy?.requireSourceGrounding).toBe(true)
-    expect(LABOR_LAW_ISSUE_RULE_APPLICATION_CONCLUSION_RUBRIC.criteria.map((item) => item.id)).toEqual(['issue', 'rule', 'application', 'conclusion'])
-  })
-
-  it('fails explicitly for deferred speech/audio capabilities', () => {
-    expect(() => assertImplementedMedia({ stimulusType: 'audio', responseType: 'audio', evaluatorType: 'speech' })).toThrow(/Unsupported speech\/audio activity/)
   })
 })

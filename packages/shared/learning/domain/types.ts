@@ -336,13 +336,6 @@ export interface PlannerDiagnostics {
 
 // ─── Goal relevance context ─────────────────────────────────────────────────
 
-export interface GoalRelevanceContext {
-  readonly goal: LearningGoal
-  readonly conceptId: string | null
-  readonly activityType: ActivityType
-  readonly importance: Importance | null
-}
-
 // ─── Validation ─────────────────────────────────────────────────────────────
 
 export interface ValidationResult {
@@ -352,24 +345,28 @@ export interface ValidationResult {
 
 // ─── Domain adapter ─────────────────────────────────────────────────────────
 
-export interface ContentValidator {
-  readonly id: string
-  validate(content: Record<string, unknown>): ValidationResult
-}
-
-export interface PromptPolicy {
-  readonly requireSourceGrounding: boolean
-  readonly educationalWarning: string | null
-  readonly maxPromptTokens: number
-}
-
+/**
+ * What a learning domain is allowed to decide.
+ *
+ * Both members are read by `learning-store` on every plan build, via
+ * `activityMixForDomain` / `supportedActivityTypesForDomain`. Nothing else belongs here: an
+ * adapter that declares something no caller reads is indistinguishable from an adapter that
+ * lies, and this interface had four such members.
+ *
+ * Removed, and why — `validateActivity` and `contentValidators` validated a `LearningActivity`
+ * that is never persisted (`create_private_activity` / `create_private_source` have zero
+ * callers, and production holds 0 rows in `learning_activities`, `learning_concepts`, and
+ * `content_sources`). `scoreGoalRelevance` was shadowed by `learning_goal_decks.importance`,
+ * which is what the ranker actually reads, and would have been a constant anyway because every
+ * candidate `buildCandidatesFromCards` emits is `recall`. `promptPolicy.requireSourceGrounding`
+ * was declared true by exactly one domain and made its remediation UNSATISFIABLE — see
+ * `supabase/functions/_shared/ai-remediation.ts`.
+ *
+ * Add a member back when a caller exists, not before.
+ */
 export interface LearningDomainAdapter {
   readonly id: string
   readonly version: string
   readonly supportedActivityTypes: readonly string[]
   readonly defaultPlanMix: Readonly<Record<string, number>>
-  validateActivity(activity: LearningActivity): ValidationResult
-  scoreGoalRelevance(context: GoalRelevanceContext): number
-  readonly contentValidators?: readonly ContentValidator[]
-  readonly promptPolicy?: PromptPolicy
 }

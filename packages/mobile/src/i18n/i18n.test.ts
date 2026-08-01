@@ -160,7 +160,7 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
   const FAMILIES: Record<string, readonly string[]> = {
     'recommend.status': ['accepted', 'dismissed', 'expired'],
     'goals.status': ['paused', 'completed', 'archived'],
-    'form.domainName': ['language', 'general', 'labor-law'],
+    'form.domainName': ['language', 'general'],
     'enrichment.error': [
       'INSUFFICIENT_CREDITS', 'RATE_CAP', 'GROUNDING_REQUIRED', 'INVALID_RESULT',
       'PROVIDER_ERROR', 'BAD_REQUEST', 'NETWORK', 'UNKNOWN',

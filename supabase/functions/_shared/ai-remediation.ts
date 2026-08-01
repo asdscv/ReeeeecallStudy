@@ -95,7 +95,6 @@ export function compareGroundingError(
   return null
 }
 
-import { domainRequiresSourceGrounding } from './domain-policy.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const asUuid = (value: unknown): string | null => typeof value === 'string' && UUID.test(value) ? value : null
@@ -123,11 +122,18 @@ export function parseRemediationRefs(body: Record<string, unknown>): Remediation
 }
 
 export function buildRemediationPrompt(refs: RemediationRefs, context: RemediationContextPayload): { systemPrompt: string; userPrompt: string; requireGrounding: boolean } {
-  const domainId = context.goal && typeof context.goal === 'object' ? (context.goal as Record<string, unknown>).domain_id : null
-  // Read from the domain's declared policy, not from one vertical's name compiled into the
-  // server. A new subject that needs citations declares it on its adapter; one that does not
-  // needs no edit here at all.
-  const requireGrounding = domainRequiresSourceGrounding(domainId) || context.sources.length > 0
+  // Ground on the sources that are actually present, and on nothing else.
+  //
+  // This used to be OR'd with a per-domain policy flag, which exactly one domain set. That
+  // combination was unsatisfiable: the flag made the prompt demand a citation, while
+  // `validateRemediationResult` only accepts a citation whose `sourceId` is in
+  // `allowedSourceIds` — built from `content_sources`, a table whose three writer RPCs
+  // (`create_private_source` / `_concept` / `_activity`) have no callers and which holds no
+  // rows in production. Every request in that domain failed before the model was even called.
+  //
+  // Sources-only is the honest rule: when a caller starts supplying sources, grounding turns
+  // itself on, and until then nothing promises a citation it cannot produce.
+  const requireGrounding = context.sources.length > 0
   // An attempt is EVIDENCE, and the model has to be told what kind. Without this line it treats
   // the attempt as decoration and produces the same generic explanation it would have produced
   // for the card alone — which is what the learner already paid for once.

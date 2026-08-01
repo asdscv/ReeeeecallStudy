@@ -46,7 +46,6 @@
     "domain": "Subject",
     "domainName": {
       "general": "General study",
-      "labor-law": "Labour law",
       "language": "Language"
     },
     "error": {
