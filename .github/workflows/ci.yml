@@ -367,6 +367,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/public_plan_limits_test.sql
 
+      - name: Run account-deletion assertions (mig 180 — blockers cleared, money retained, purge gated)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_test.sql
+
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so
       # they never ran on CI. Registered explicitly, like every suite above.
