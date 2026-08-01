@@ -6,8 +6,31 @@
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ixdapelfikaneexnskfm.supabase.co'
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_4F7XKb_Cifh2rujOiyP9RQ_ZU3HjQsV'
 
-const E2E_EMAIL = process.env.E2E_TEST_EMAIL || 'luke@rictax.kr'
-const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD || 'qpffkwldh35!'
+/**
+ * Test-account credentials come from the environment, and there is no fallback.
+ *
+ * There used to be one: a real account's email and password sat here as `||` literals, in a
+ * PUBLIC repository, so anyone reading the file had a working prod login. A default that is a
+ * live credential is not a convenience, it is a published secret — the web harness has always
+ * required these vars and thrown without them, so this is the existing policy, not a new one.
+ *
+ * Failing here is the point. A silent fallback would let the suite keep passing against a
+ * shared account long after anyone noticed the vars were missing.
+ */
+function requiredEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(
+      `[e2e] ${name} is not set. Export it (or put it in packages/mobile/.env.test, which is ` +
+      `gitignored) before running the E2E suite. There is deliberately no default: the previous ` +
+      `default was a real account's credentials committed to a public repo.`,
+    )
+  }
+  return value
+}
+
+const E2E_EMAIL = requiredEnv('E2E_TEST_EMAIL')
+const E2E_PASSWORD = requiredEnv('E2E_TEST_PASSWORD')
 
 let cachedToken: string | null = null
 let cachedUserId: string | null = null

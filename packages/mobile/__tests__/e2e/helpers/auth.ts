@@ -169,8 +169,15 @@ export async function loginIfNeeded() {
     return
   }
 
-  const email = process.env.E2E_TEST_EMAIL || 'luke@rictax.kr'
-  const password = process.env.E2E_TEST_PASSWORD || 'qpffkwldh35!'
+  // No literal fallback — see the note in supabase-api.ts. These used to default to a real
+  // account's credentials in a public repository.
+  const email = process.env.E2E_TEST_EMAIL
+  const password = process.env.E2E_TEST_PASSWORD
+  if (!email || !password) {
+    throw new Error(
+      '[e2e] E2E_TEST_EMAIL and E2E_TEST_PASSWORD must be set (see packages/mobile/.env.test).',
+    )
+  }
   console.log(`[auth] Logging in as ${email}`)
 
   // Wait for login form elements to be fully ready before interacting

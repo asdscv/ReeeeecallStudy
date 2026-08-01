@@ -33,7 +33,12 @@ packages/mobile/mobile/
 
 # Playwright
 playwright-report/
-playwright/.auth/
+# `**/` is load-bearing. A pattern containing a non-trailing slash is anchored to the
+# directory holding the .gitignore, so the old `playwright/.auth/` only ever matched
+# <repo-root>/playwright/.auth/ — never packages/web/playwright/.auth/, which is where
+# Playwright actually writes. A saved storage state containing a live Supabase session
+# for a real account was tracked here for months because of that one missing prefix.
+**/playwright/.auth/
 test-results/
 blob-report/
 .env.test
