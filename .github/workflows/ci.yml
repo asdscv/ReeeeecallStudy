@@ -145,10 +145,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Start Supabase (local stack via Docker)
-        run: |
-          supabase start
-          # Apply all migrations to fresh DB (init schema → all RPCs)
-          supabase db reset --no-seed
+        # Brings the stack up and applies all migrations (init schema → all RPCs).
+        # Wrapped because this exact step 5xx'd six times in one afternoon; the
+        # wrapper retries ONLY that signature and fails immediately on anything
+        # else, so a broken migration still reports on the first attempt.
+        run: bash .github/scripts/supabase-up.sh
 
       - name: Capture Supabase keys
         id: keys
@@ -222,9 +223,8 @@ jobs:
           # the local test DB's role grants correct.
           version: 2.95.4
       - name: Reset DB with all migrations
-        run: |
-          supabase start
-          supabase db reset --no-seed
+        # Same upstream-5xx wrapper as the Integration job — see the script header.
+        run: bash .github/scripts/supabase-up.sh
       - name: Idempotency check — running reset twice should pass
         run: supabase db reset --no-seed
       - name: Stop
