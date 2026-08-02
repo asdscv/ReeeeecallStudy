@@ -372,6 +372,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_test.sql
 
+      - name: Run goal-workload assertions (mig 182 — learner's schedule not the publisher's, work owed)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/goal_workload_test.sql
+
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so
       # they never ran on CI. Registered explicitly, like every suite above.
