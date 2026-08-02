@@ -9,7 +9,9 @@ import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
 import { testProps } from '../utils/testProps'
-import { availableDomainIds, projectWorkload } from '@reeeeecall/shared/learning'
+import {
+  availableDomainIds, projectWorkload, EVERY_DAY, studyDaysBetween, perStudyDayMultiplier,
+} from '@reeeeecall/shared/learning'
 import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useAuthStore } from '@reeeeecall/shared/stores/auth-store'
@@ -79,14 +81,33 @@ export function LearningGoalsScreen() {
 
   const daysAvailable = horizonMonths === null ? null : Math.round(horizonMonths * 30.44)
 
+  /**
+   * This screen only CREATES goals — there is no edit mode on mobile — so the rhythm is always
+   * the default until a control for it exists. Named rather than inlined so the scaling below
+   * reads the same on both platforms.
+   */
+  const cadence = EVERY_DAY
+
+  /**
+   * The projection runs over CALENDAR days because that is when reviews come due; studying fewer
+   * days does not reduce the work, it concentrates it. So the per-day figures are scaled up by
+   * the inverse of the study ratio afterwards rather than the horizon being shortened first.
+   */
   const projection = useMemo(() => {
     if (selection.total === 0 || daysAvailable === null) return null
-    return projectWorkload({
+    if (studyDaysBetween(cadence, daysAvailable) < 1) return null
+    const raw = projectWorkload({
       unseenCards: selection.unseen, seenCards: selection.seen, daysAvailable,
       secondsPerCard: ASSUMED_SECONDS_PER_CARD, lapseRate: ASSUMED_LAPSE_RATE,
       consolidationDays: CONSOLIDATION_DAYS,
     })
-  }, [selection.unseen, selection.seen, selection.total, daysAvailable])
+    const perDay = perStudyDayMultiplier(cadence)
+    return {
+      ...raw,
+      averageMinutesPerDay: raw.averageMinutesPerDay * perDay,
+      peakMinutesPerDay: raw.peakMinutesPerDay * perDay,
+    }
+  }, [selection.unseen, selection.seen, selection.total, daysAvailable, cadence])
 
 
   const reload = useCallback(async () => {
