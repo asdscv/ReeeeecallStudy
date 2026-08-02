@@ -82,7 +82,8 @@
     "noModeData": "暂无模式数据",
     "sessionCountLabel": "{{count, number}} 次学习",
     "cardCountLabel": "{{count, number}} 张卡片",
-    "performance": "表现"
+    "performance": "表现",
+    "noSrsEffect": "不影响复习安排"
   },
   "ratingGroups": {
     "srs": "间隔重复",

@@ -82,7 +82,8 @@
     "noModeData": "Không có dữ liệu chế độ",
     "sessionCountLabel": "{{count, number}} phiên",
     "cardCountLabel": "{{count, number}} thẻ",
-    "performance": "Hiệu suất"
+    "performance": "Hiệu suất",
+    "noSrsEffect": "không đổi lịch ôn"
   },
   "ratingGroups": {
     "srs": "Lặp lại ngắt quãng",

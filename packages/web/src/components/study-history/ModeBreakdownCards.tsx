@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { modeFeedsSrsSchedule } from '@reeeeecall/shared/lib/study-mode-scheduling'
 import { getStudyModeLabel, getStudyModeEmoji, formatDuration } from '../../lib/study-history'
 import type { ModeBreakdown, StudyTimeByMode } from '../../lib/study-history-stats'
 
@@ -35,6 +36,13 @@ export function ModeBreakdownCards({ breakdown, timeByMode }: ModeBreakdownCards
                     {getStudyModeLabel(item.mode)}
                   </span>
                   <span className="text-xs text-content-tertiary">{t('charts.sessionCountLabel', { count: item.sessionCount })}</span>
+                  {/* Only SRS reschedules. A learner looking at 500 crammed cards has no other
+                      way to know that none of it moved their review dates or their plan. */}
+                  {!modeFeedsSrsSchedule(item.mode) && (
+                    <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-accent text-content-tertiary">
+                      {t('charts.noSrsEffect')}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                   <span>{t('charts.cardCountLabel', { count: item.totalCards })}</span>

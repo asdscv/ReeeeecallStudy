@@ -82,7 +82,8 @@
     "noModeData": "모드별 데이터가 없습니다",
     "sessionCountLabel": "{{count, number}}세션",
     "cardCountLabel": "{{count, number}}장",
-    "performance": "성과"
+    "performance": "성과",
+    "noSrsEffect": "복습 일정 미반영"
   },
   "ratingGroups": {
     "srs": "간격 반복",

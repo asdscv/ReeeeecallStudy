@@ -290,6 +290,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/ai_metered_smoke_test.sql
 
+      - name: Run mastery-definition assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/mastery_definition_test.sql
+
       - name: Run owned-card limit assertions
         env:
           PGPASSWORD: postgres
