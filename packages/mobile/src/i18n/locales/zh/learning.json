@@ -187,9 +187,7 @@
     "regenerate": "重新生成计划",
     "regenerating": "重新生成中…",
     "title": "今日计划",
-    "backToPlans": "计划列表",
-    "insightsLink": "诊断",
-    "manageGoals": "管理目标"
+    "backToPlans": "计划列表"
   },
   "progress": {
     "title": "进度",

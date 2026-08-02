@@ -4,7 +4,7 @@ import {
   RefreshControl, AppState, Modal, Pressable,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useNavigation, type NavigationProp } from '@react-navigation/native'
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
@@ -120,6 +120,7 @@ export function LearningTodayScreen() {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
+  const route = useRoute<RouteProp<SettingsStackParamList, 'LearningToday'>>()
   const {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
@@ -129,9 +130,9 @@ export function LearningTodayScreen() {
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     enrichmentQuote, loadEnrichmentQuote,
     resolveEnrichment, dismissEnrichment,
+    knowledge, fetchGoalKnowledge,
   } = useLearningStore()
 
-  const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   /**
    * Answers in progress, keyed by plan-item id.
@@ -170,12 +171,29 @@ export function LearningTodayScreen() {
   useEffect(() => { void fetchGoals() }, [fetchGoals])
 
   const active = useMemo(() => goals.filter((g) => g.status === 'active'), [goals])
-  const goalId = active.some((g) => g.id === goalOverrideId) ? goalOverrideId : active[0]?.id ?? null
+  // The plan is addressed by the route now, mirroring web's /learning/:goalId. A route id that
+  // names no plannable goal (archived, deleted) resolves to nothing rather than quietly showing
+  // a different plan under the same navigation entry.
+  const goalId = active.some((g) => g.id === route.params?.goalId) ? route.params.goalId : null
   const goal = active.find((g) => g.id === goalId)
 
   useEffect(() => {
     if (goalId) void fetchPlan(goalId, planDate)
   }, [goalId, planDate, fetchPlan])
+
+  // Judged at the target date when the goal has one — "what will I still know on the day" — and
+  // at today otherwise. Server-aggregated: the plan only ever loads DUE cards.
+  //
+  // The fallback is memoised on purpose. A bare `new Date().toISOString()` is a NEW value every
+  // render, so this effect re-fires, `fetchGoalKnowledge` calls `set()`, the screen (which
+  // subscribes to the whole store) re-renders, and the RPC loops without end — for every goal
+  // with no target date, which the form allows. Web escapes it because its `ctx` is memoised at
+  // mount; this port dropped that.
+  const mountedAt = useMemo(() => new Date().toISOString(), [])
+  const judgedAt = goal?.target_date ? `${goal.target_date}T00:00:00.000Z` : mountedAt
+  useEffect(() => {
+    if (goalId) void fetchGoalKnowledge(goalId, judgedAt)
+  }, [goalId, judgedAt, fetchGoalKnowledge])
 
   /**
    * Attempts are goal-scoped, not date-scoped, so this deliberately does NOT depend on
@@ -259,34 +277,23 @@ export function LearningTodayScreen() {
 
   return (
     <Screen padding={false} testID="learning-today-screen">
+      {/* One way out, and it is back to the list. Two links that both went to the goals screen —
+          one of them labelled "진단" for a screen that no longer exists — was the old shape. */}
       <ScreenHeader
-        title={t('today.title')}
-        mode="drawer"
+        title={goal?.title ?? t('today.title')}
+        mode="back"
         rightContent={
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LearningInsights')}
-              style={styles.headerLink}
-              hitSlop={HIT_SLOP}
-              accessibilityRole="button"
-              {...testProps('learning-insights-link')}
-            >
-              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                {t('today.insightsLink')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LearningGoals')}
-              style={styles.headerLink}
-              hitSlop={HIT_SLOP}
-              accessibilityRole="button"
-              {...testProps('learning-manage-goals')}
-            >
-              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                {t('today.manageGoals')}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('LearningGoals')}
+            style={styles.headerLink}
+            hitSlop={HIT_SLOP}
+            accessibilityRole="button"
+            {...testProps('learning-back-to-plans')}
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+              {t('today.backToPlans')}
+            </Text>
+          </TouchableOpacity>
         }
       />
 
@@ -311,33 +318,53 @@ export function LearningTodayScreen() {
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.empty.createGoal')}</Text>
             </TouchableOpacity>
           </View>
+        ) : !goalId ? (
+          // Goals exist, but this route names none of them — paused, completed, or a nav state
+          // restored from before the plan took a goalId. Without this branch the learner got a
+          // disabled Generate button with the PREVIOUS goal's plan items still on screen, because
+          // the store does not clear `planItems` on a goal change.
+          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+              {t('today.empty.noGoal')}
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LearningGoals')}
+              style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
+              {...testProps('learning-back-to-plans-empty')}
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.backToPlans')}</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <>
-            {active.length > 1 && (
-              <View style={styles.goalRow}>
-                {active.map((option, index) => {
-                  const selected = option.id === goalId
-                  return (
-                    <TouchableOpacity
-                      key={option.id}
-                      onPress={() => setGoalOverrideId(option.id)}
-                      style={[styles.chip, {
-                        borderColor: selected ? theme.colors.primary : theme.colors.border,
-                        borderWidth: selected ? 2 : 1,
-                        backgroundColor: theme.colors.surface,
-                      }]}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected }}
-                      {...testProps(`learning-today-goal-${index}`)}
-                    >
-                      <Text style={[theme.typography.caption, {
-                        color: selected ? theme.colors.primary : theme.colors.textSecondary,
-                      }]}>
-                        {selected ? '\u2713 ' : ''}{option.title}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
+            {/* Where this goal stands. The chip row that used to sit here let you switch plans
+                from inside a plan; the list does that now, and this space says something.
+
+                `testProps(id, true)` is the CONTAINER form. Without the second argument it
+                returns `accessible: true` plus `accessibilityLabel: id`, and being spread last it
+                would overwrite any translated label and collapse the subtree — TalkBack would
+                announce the literal "learning-progress" and neither number inside it. */}
+            {goalId && knowledge[goalId] && knowledge[goalId].total > 0 && (
+              <View
+                style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                {...testProps('learning-progress', true)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {goal?.target_date
+                    ? t('progress.knownAtTarget', {
+                        known: knowledge[goalId].known, total: knowledge[goalId].total, date: goal.target_date,
+                      })
+                    : t('progress.knownNow', {
+                        known: knowledge[goalId].known, total: knowledge[goalId].total,
+                      })}
+                </Text>
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+                  {t('progress.breakdown', {
+                    known: knowledge[goalId].known,
+                    shaky: knowledge[goalId].unknown,
+                    unseen: knowledge[goalId].unseen,
+                  })}
+                </Text>
               </View>
             )}
 
@@ -877,15 +904,9 @@ function renderEnrichmentValue(value: unknown): string {
 const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 48 },
   card: { padding: 12, borderRadius: 12, borderWidth: 1 },
-  headerActions: { flexDirection: 'row', gap: 4 },
   headerLink: { minHeight: 32, paddingHorizontal: 6, justifyContent: 'center' },
-  goalRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   // 44pt is the iOS HIG minimum and 48dp Material's; a 12px caption inside 6px of padding
   // was 28, which is a mis-tap on a moving train.
-  chip: {
-    paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
-    justifyContent: 'center',
-  },
   rateRow: { flexDirection: 'row', gap: 6, marginTop: 8 },
   // Two lines tall by default and it grows: a recall answer is short, and a box the height of
   // the card would suggest an essay is wanted. `minHeight` keeps the tap target usable.

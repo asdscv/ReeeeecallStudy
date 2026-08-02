@@ -187,9 +187,7 @@
     "regenerate": "Tạo lại kế hoạch",
     "regenerating": "Đang tạo lại…",
     "title": "Kế hoạch hôm nay",
-    "backToPlans": "Tất cả kế hoạch",
-    "insightsLink": "Phân tích",
-    "manageGoals": "Quản lý mục tiêu"
+    "backToPlans": "Tất cả kế hoạch"
   },
   "progress": {
     "title": "Tiến độ",

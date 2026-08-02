@@ -108,8 +108,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {studyGroupOpen && (
           <View>
-            <MenuItem icon="🎯" label={t('nav.learningPlan')} indent active={isActive('LearningToday')} theme={theme}
-              onPress={() => go('SettingsTab', 'LearningToday')} testID="drawer-learning-plan" />
+            <MenuItem icon="🎯" label={t('nav.learningPlan')} indent active={isActive('LearningGoals')} theme={theme}
+              onPress={() => go('SettingsTab', 'LearningGoals')} testID="drawer-learning-plan" />
             <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={isActive('AIGenerate')} theme={theme}
               onPress={() => go('SettingsTab', 'AIGenerate')} testID="drawer-ai-generate" />
             <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
