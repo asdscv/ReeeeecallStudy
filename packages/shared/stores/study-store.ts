@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { modeFeedsSrsSchedule } from '../lib/study-mode-scheduling'
 import { calculateSRS, getSrsDayStart, type SrsRating } from '../lib/srs'
 import { buildSequentialQueue, buildSequentialReviewQueue, computeSequentialPosition, computeSequentialReviewPositions } from '../lib/study-session-utils'
 import { SrsQueueManager, type QueueCard, type SrsQueueSnapshot } from '../lib/study-queue'
@@ -814,7 +815,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // apply_study_rating commits the SRS row, the rating event, and the study log
     // in a single transaction (migration 160). Splitting them (the pre-P5B path)
     // allowed partial success, duplicate logs, and stale overwrites.
-    const isSrsPersist = config.mode === 'srs' && srsResult !== null
+    const isSrsPersist = modeFeedsSrsSchedule(config.mode) && srsResult !== null
     const persistSource = isSrsPersist ? srsSource : 'none'
     const expectedRevision = isSrsPersist ? (card.srs_revision ?? 0) : null
     const newSrsPayload = isSrsPersist && srsResult

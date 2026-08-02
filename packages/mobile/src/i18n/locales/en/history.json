@@ -51,5 +51,6 @@
     "performance": "Performance",
     "streak": "Streak",
     "avgDuration": "Avg Duration"
-  }
+  },
+  "noSrsEffect": "no schedule change"
 }

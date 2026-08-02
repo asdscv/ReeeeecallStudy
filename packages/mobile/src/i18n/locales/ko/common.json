@@ -164,8 +164,7 @@
       "deck_share": "첫 덱 공유",
       "marketplace_pub": "마켓에 출판",
       "first_study": "첫 학습 완료",
-      "mastery_50": "50% 숙달",
-      "mastery_90": "90% 숙달"
+      "mastery_50": "카드 50장 숙련"
     },
     "badgeDesc": {
       "streak_3": "3일 연속으로 학습하기",
@@ -182,8 +181,7 @@
       "deck_share": "첫 번째 덱 공유하기",
       "marketplace_pub": "마켓플레이스에 덱 출판하기",
       "first_study": "첫 학습 세션 완료하기",
-      "mastery_50": "전체 카드의 50% 숙달하기",
-      "mastery_90": "전체 카드의 90% 숙달하기"
+      "mastery_50": "카드 50장을 3주 이상 기억 유지"
     }
   },
   "goals": {

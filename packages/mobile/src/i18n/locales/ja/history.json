@@ -51,5 +51,6 @@
     "performance": "成績",
     "streak": "連続記録",
     "avgDuration": "平均時間"
-  }
+  },
+  "noSrsEffect": "復習日程に反映されません"
 }

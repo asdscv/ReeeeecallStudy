@@ -137,8 +137,7 @@
       "deck_share": "First Deck Shared",
       "marketplace_pub": "Published to Marketplace",
       "first_study": "First Study Session",
-      "mastery_50": "50% Mastery",
-      "mastery_90": "90% Mastery"
+      "mastery_50": "50 kartu dikuasai"
     },
     "badgeDesc": {
       "streak_3": "Study 3 days in a row",
@@ -155,8 +154,7 @@
       "deck_share": "Share your first deck",
       "marketplace_pub": "Publish a deck to the marketplace",
       "first_study": "Complete your first study session",
-      "mastery_50": "Reach 50% mastery across all cards",
-      "mastery_90": "Reach 90% mastery across all cards"
+      "mastery_50": "Pertahankan 50 kartu selama tiga minggu atau lebih"
     },
     "tabs": {
       "badges": "Badges",
