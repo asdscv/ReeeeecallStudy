@@ -190,7 +190,16 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
     const data = JSON.parse(
       fs.readFileSync(path.join(LOCALES_DIR, lang, 'learning.json'), 'utf-8'),
     ) as Record<string, unknown>
-    const missing = [...required].filter((key) => typeof lookup(data, key) !== 'string').sort()
+    // A key used with `count` lives in the file ONLY as `key_one` / `key_other` — i18next
+    // picks the suffix at call time, and a bare `key` alongside them would be dead weight it
+    // never reads. Requiring the bare form here reported eight false failures for two keys
+    // that resolve correctly at runtime. Test 8 below enforces the other direction: a
+    // count-interpolated key that is MISSING its plural forms.
+    const present = (key: string) =>
+      typeof lookup(data, key) === 'string'
+      || (typeof lookup(data, `${key}_other`) === 'string'
+        && typeof lookup(data, `${key}_one`) === 'string')
+    const missing = [...required].filter((key) => !present(key)).sort()
     assert(
       missing.length === 0,
       `${lang}/learning.json is missing ${missing.length} key(s) the screens can request: ` +
