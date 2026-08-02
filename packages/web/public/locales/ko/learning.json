@@ -115,7 +115,12 @@
       "newPerDay_one": "하루 새 카드 {{count, number}}장",
       "newPerDay_other": "하루 새 카드 {{count, number}}장",
       "newPerDay": "하루 새 카드 {{count, number}}장"
-    }
+    },
+    "studyDays": "주당 학습 일수",
+    "studyDaysOption_other": "{{count}}일",
+    "newCardsPerDay": "학습일당 새 카드",
+    "newCardsHint": "복습이 먼저입니다. 밀리면 따라잡을 때까지 새 카드가 멈춥니다.",
+    "studyDaysOption_one": "{{count}}일"
   },
   "history": {
     "title": "최근 시도 ({{count, number}})",

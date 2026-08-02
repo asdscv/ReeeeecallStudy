@@ -115,7 +115,12 @@
       "newPerDay_one": "{{count, number}} thẻ mới/ngày",
       "newPerDay_other": "{{count, number}} thẻ mới/ngày",
       "newPerDay": "{{count, number}} thẻ mới/ngày"
-    }
+    },
+    "studyDays": "Số ngày học mỗi tuần",
+    "studyDaysOption_other": "{{count}} ngày",
+    "newCardsPerDay": "Thẻ mới mỗi ngày học",
+    "newCardsHint": "Ôn tập trước. Nếu bạn bị chậm, thẻ mới sẽ tạm dừng cho đến khi bắt kịp.",
+    "studyDaysOption_one": "{{count}} ngày"
   },
   "history": {
     "title": "Lần làm gần đây ({{count, number}})",

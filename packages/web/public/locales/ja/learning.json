@@ -115,7 +115,12 @@
       "newPerDay_one": "1日の新規カード {{count, number}}枚",
       "newPerDay_other": "1日の新規カード {{count, number}}枚",
       "newPerDay": "1日の新規カード {{count, number}}枚"
-    }
+    },
+    "studyDays": "週あたりの学習日数",
+    "studyDaysOption_other": "{{count}}日",
+    "newCardsPerDay": "学習日ごとの新規カード",
+    "newCardsHint": "復習が優先です。遅れている間は新規カードを止めます。",
+    "studyDaysOption_one": "{{count}}日"
   },
   "history": {
     "title": "最近の試行 ({{count, number}})",
