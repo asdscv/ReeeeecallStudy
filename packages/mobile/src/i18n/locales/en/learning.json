@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "Cancel",
-    "dailyMinutes": "Minutes per day",
-    "deckPriority": {
-      "high": "High",
-      "hint": "Higher-priority decks come up sooner when the day is full.",
-      "label": "Priority",
-      "low": "Low",
-      "normal": "Normal"
-    },
     "decks": "Decks to study",
     "decksHint": "Your plan is built from the cards in these decks.",
-    "domain": "Subject",
-    "domainName": {
-      "general": "General study",
-      "language": "Language"
-    },
     "error": {
-      "dailyMinutes": "Minutes per day must be between 1 and 1440.",
-      "title": "Enter a goal name (1–500 characters)."
+      "title": "Enter a goal name (1–500 characters).",
+      "decks": "Pick at least one deck."
     },
     "goalTitle": "Goal name",
     "goalTitlePlaceholder": "e.g. Pass JLPT N2",
     "noDecks": "You have no decks yet.",
     "save": "Save",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "plan": {
+      "title": "Estimated plan",
+      "needDecksAndDate": "Pick decks and a target date to see the daily load.",
+      "minutes": "{{count, number}} min/day",
+      "peak": "Busiest day: {{minutes, number}} min (day {{day, number}})",
+      "byMinutes": "Or set minutes/day",
+      "finishBy": "Finishes around {{date}}",
+      "tooSlow": "That budget cannot keep up with reviews alone.",
+      "srsOnly": "Only SRS-mode study counts toward this plan.",
+      "estimate": "An estimate. It is recalculated daily from your actual results.",
+      "newPerDay_one": "{{count, number}} new card/day",
+      "newPerDay_other": "{{count, number}} new cards/day",
+      "newPerDay": "{{count, number}} new cards/day"
+    },
+    "targetDate": "Target date (optional)",
+    "horizonMonths_one": "{{count, number}} month",
+    "horizonMonths_other": "{{count, number}} months",
+    "horizonMonths": "{{count, number}} months"
   },
   "goals": {
     "archive": "Archive",

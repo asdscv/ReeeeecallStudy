@@ -26,8 +26,16 @@ vi.mock('../../../stores/confirm-store', () => ({
   useConfirmStore: (selector: (s: { confirm: unknown }) => unknown) =>
     selector({ confirm: mockConfirm }),
 }))
+vi.mock('../../../stores/auth-store', () => ({ useAuthStore: () => ({ user: { id: 'user-1' } }) }))
 vi.mock('../../../stores/deck-store', () => ({
-  useDeckStore: () => ({ decks: [{ id: 'deck-1', name: 'Deck one' }], fetchDecks: vi.fn() }),
+  // `stats` mirrors the real store's initial state — GoalFormModal reads it to size the plan
+  // preview from `get_deck_stats`, and an omitted field here is a mock defect, not a
+  // component contract to code defensively around.
+  useDeckStore: () => ({
+    decks: [{ id: 'deck-1', name: 'Deck one' }],
+    stats: [{ deck_id: 'deck-1', deck_name: 'Deck one', total_cards: 40, new_cards: 30, review_cards: 8, learning_cards: 2, last_studied: null }],
+    fetchDecks: vi.fn(), fetchStats: vi.fn(),
+  }),
 }))
 
 import { LearningTodayPage } from '../LearningTodayPage'

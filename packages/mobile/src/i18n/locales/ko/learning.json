@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "취소",
-    "dailyMinutes": "하루 학습 시간(분)",
-    "deckPriority": {
-      "high": "높음",
-      "hint": "하루가 꽉 찼을 때 우선순위가 높은 덱이 먼저 나옵니다.",
-      "label": "우선순위",
-      "low": "낮음",
-      "normal": "보통"
-    },
     "decks": "학습할 덱",
     "decksHint": "플랜은 선택한 덱의 카드로 만들어집니다.",
-    "domain": "분야",
-    "domainName": {
-      "general": "일반 학습",
-      "language": "언어"
-    },
     "error": {
-      "dailyMinutes": "하루 학습 시간은 1~1440분 사이여야 합니다.",
-      "title": "목표 이름을 1~500자로 입력해 주세요."
+      "title": "목표 이름을 1~500자로 입력해 주세요.",
+      "decks": "덱을 하나 이상 선택하세요."
     },
     "goalTitle": "목표 이름",
     "goalTitlePlaceholder": "예: JLPT N2 합격",
     "noDecks": "아직 덱이 없습니다.",
     "save": "저장",
-    "saving": "저장 중…"
+    "saving": "저장 중…",
+    "plan": {
+      "title": "예상 학습 계획",
+      "needDecksAndDate": "덱과 목표 날짜를 정하면 하루 분량을 계산합니다.",
+      "minutes": "하루 {{count, number}}분",
+      "peak": "가장 바쁜 날 {{minutes, number}}분 ({{day, number}}일차)",
+      "byMinutes": "또는 하루 시간으로",
+      "finishBy": "{{date}}쯤 완료",
+      "tooSlow": "이 시간으로는 복습량도 따라잡을 수 없습니다.",
+      "srsOnly": "SRS 모드 학습만 이 계획에 반영됩니다.",
+      "estimate": "추정치이며 실제 성적으로 매일 다시 계산됩니다.",
+      "newPerDay_one": "하루 새 카드 {{count, number}}장",
+      "newPerDay_other": "하루 새 카드 {{count, number}}장",
+      "newPerDay": "하루 새 카드 {{count, number}}장"
+    },
+    "targetDate": "목표일 (선택)",
+    "horizonMonths_one": "{{count, number}}개월 뒤",
+    "horizonMonths_other": "{{count, number}}개월 뒤",
+    "horizonMonths": "{{count, number}}개월 뒤"
   },
   "goals": {
     "archive": "보관",

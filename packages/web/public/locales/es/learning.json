@@ -92,14 +92,8 @@
   "form": {
     "createTitle": "Nuevo objetivo",
     "editTitle": "Editar objetivo",
-    "domain": "Materia",
-    "domainName": {
-      "general": "Estudio general",
-      "language": "Idiomas"
-    },
     "goalTitle": "Nombre del objetivo",
     "goalTitlePlaceholder": "p. ej. Aprobar el JLPT N2",
-    "dailyMinutes": "Minutos por día",
     "targetDate": "Fecha objetivo (opcional)",
     "decks": "Mazos a estudiar",
     "decksHint": "Tu plan se construye con las tarjetas de estos mazos.",
@@ -109,14 +103,21 @@
     "saving": "Guardando…",
     "error": {
       "title": "Introduce un nombre de objetivo (1–500 caracteres).",
-      "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440."
+      "decks": "Elige al menos un mazo."
     },
-    "deckPriority": {
-      "label": "Prioridad",
-      "low": "Baja",
-      "normal": "Normal",
-      "high": "Alta",
-      "hint": "Los mazos con más prioridad aparecen antes cuando el día está lleno."
+    "plan": {
+      "title": "Plan estimado",
+      "needDecksAndDate": "Elige mazos y una fecha objetivo para ver la carga diaria.",
+      "minutes": "{{count, number}} min/día",
+      "peak": "Día más cargado: {{minutes, number}} min (día {{day, number}})",
+      "byMinutes": "O fija min/día",
+      "finishBy": "Termina alrededor del {{date}}",
+      "tooSlow": "Ese tiempo no alcanza ni para los repasos.",
+      "srsOnly": "Solo el estudio en modo SRS cuenta para este plan.",
+      "estimate": "Es una estimación. Se recalcula a diario con tus resultados reales.",
+      "newPerDay_one": "{{count, number}} tarjeta nueva/día",
+      "newPerDay_other": "{{count, number}} tarjetas nuevas/día",
+      "newPerDay": "{{count, number}} tarjetas nuevas/día"
     }
   },
   "history": {

@@ -1,27 +1,31 @@
 import { useEffect, useMemo, useState } from 'react'
-import { availableDomainIds } from '@reeeeecall/shared/learning'
 import {
-  DECK_PRIORITY_LEVELS, DEFAULT_DECK_PRIORITY, importanceForPriority, priorityForImportance,
-  type DeckPriority,
-} from '@reeeeecall/shared/lib/learning-deck-priority'
+  availableDomainIds, projectWorkload, daysForDailyBudget,
+} from '@reeeeecall/shared/learning'
 import { useTranslation } from 'react-i18next'
 import type { LearningGoalWithDecks, GoalDeckLink } from '../../stores/learning-store'
 import { useDeckStore } from '../../stores/deck-store'
+import { useAuthStore } from '../../stores/auth-store'
 
 /**
  * Create/edit form for a learning goal.
  *
- * Client-side validation mirrors the RPC's own bounds (title 1–500, daily minutes
- * 1–1440) so the common mistakes never become a round-trip; the server remains the
- * authority and its errors are still rendered by the caller.
+ * ASKS FOR THREE THINGS. It used to ask for six, and three of them were the app's job:
  *
- * The domain is a fixed choice, not free text: `domain_id` selects a registered domain
- * adapter, and a typo would create a goal no adapter can plan for.
+ *   과목      removed — a provable no-op. The two shipped domain adapters are byte-identical
+ *             apart from their id string, so the choice changed nothing, and the subject is
+ *             already on the deck (learning_language / study_level).
+ *   중요도    removed — 0.20 of the ranking, but a question the learner cannot answer better
+ *             than the app can. Every deck now carries the neutral weight, which makes
+ *             `goalRelevance` constant; `scoreCandidate` renormalises over the features it
+ *             actually used, so the other five simply share the weight. No ordering changes.
+ *   하루 몇 분  INVERTED. The learner cannot know this — it depends on unseen card count and how
+ *             far away the date is, and the app knows both. It is now an OUTPUT.
  *
- * The list comes from the shared registry, NOT a local constant. It used to be
- * `['language','labor-law']` hard-coded here and again in the mobile screen, so shipping a new
- * subject meant editing both screens — while `LearningDomainRegistry`, which exists to prevent
- * exactly that, had no importers at all.
+ * The preview is the point of the screen: decks and a date go in, and the daily cost comes back
+ * before anything is saved. It reports the PEAK as well as the average because the average
+ * alone is a comfortable lie — load piles up behind intake, and a learner who agreed to 34
+ * minutes and met 43 was misled.
  */
 
 export interface GoalFormValues {
@@ -32,6 +36,22 @@ export interface GoalFormValues {
   decks: GoalDeckLink[]
 }
 
+/**
+ * Every deck in a goal carries the same weight now that the learner is not asked to rank them.
+ * Neutral rather than 1.0: `goalRelevance` is clamped to 0..1 and a constant anywhere in range
+ * behaves identically, so the midpoint is the least surprising thing to store.
+ */
+const NEUTRAL_IMPORTANCE = 0.5
+
+/** Days before the target date to stop introducing new cards, so the tail can consolidate. */
+const CONSOLIDATION_DAYS = 14
+
+/** Fallbacks for a learner with no measured history yet. Both refine from real data later. */
+const ASSUMED_SECONDS_PER_CARD = 8
+const ASSUMED_LAPSE_RATE = 0.10
+
+const DAY_MS = 86_400_000
+
 export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   goal: LearningGoalWithDecks | null
   onCancel: () => void
@@ -39,27 +59,21 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   submitting: boolean
 }) {
   const { t } = useTranslation('learning')
-  const { decks, fetchDecks } = useDeckStore()
-  // Whatever this build registered. Adding a domain is one entry in the shared catalog.
-  const domains = useMemo(() => availableDomainIds(), [])
+  const { decks, stats, fetchDecks, fetchStats } = useDeckStore()
+  const { user } = useAuthStore()
 
-  const [domainId, setDomainId] = useState(goal?.domain_id ?? availableDomainIds()[0])
   const [title, setTitle] = useState(goal?.title ?? '')
-  const [dailyMinutes, setDailyMinutes] = useState(goal?.daily_minutes ?? 20)
   const [targetDate, setTargetDate] = useState(goal?.target_date ?? '')
   const [deckIds, setDeckIds] = useState<Set<string>>(
     new Set((goal?.decks ?? []).map((link) => link.deck_id)),
   )
-  // Kept separately from the selection so unchecking a deck and changing its mind does not
-  // silently reset the level the learner had already chosen for it.
-  const [deckPriority, setDeckPriority] = useState<Record<string, DeckPriority>>(
-    Object.fromEntries((goal?.decks ?? []).map((link) => [
-      link.deck_id, priorityForImportance(link.importance),
-    ])),
-  )
+  // The learner may pin either side: a date, or a daily budget. Both are legitimate — "I have
+  // until November" and "I have 30 minutes a day" are the same question from opposite ends.
+  const [budgetMinutes, setBudgetMinutes] = useState<number | null>(null)
   const [localError, setLocalError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
+  useEffect(() => { if (user?.id) void fetchStats(user.id) }, [user?.id, fetchStats])
 
   const toggleDeck = (deckId: string) => {
     setDeckIds((current) => {
@@ -70,28 +84,77 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
     })
   }
 
+  // `get_deck_stats` already breaks cards down by SRS state and covers subscribed decks, so the
+  // estimate uses real counts rather than treating a studied deck as untouched.
+  const selection = useMemo(() => {
+    let unseen = 0, seen = 0
+    for (const row of stats) {
+      if (!deckIds.has(row.deck_id)) continue
+      unseen += row.new_cards
+      seen += row.review_cards + row.learning_cards
+    }
+    return { unseen, seen, total: unseen + seen }
+  }, [stats, deckIds])
+
+  const daysAvailable = useMemo(() => {
+    if (!targetDate) return null
+    const days = Math.ceil((Date.parse(`${targetDate}T00:00:00Z`) - Date.now()) / DAY_MS)
+    return Number.isFinite(days) && days > 0 ? days : null
+  }, [targetDate])
+
+  const workloadInput = {
+    unseenCards: selection.unseen,
+    seenCards: selection.seen,
+    secondsPerCard: ASSUMED_SECONDS_PER_CARD,
+    lapseRate: ASSUMED_LAPSE_RATE,
+    consolidationDays: CONSOLIDATION_DAYS,
+  }
+
+  /** Date-driven: how much per day. Null until there is something to compute from. */
+  const projection = useMemo(() => {
+    if (selection.total === 0 || daysAvailable === null) return null
+    return projectWorkload({ ...workloadInput, daysAvailable })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection.unseen, selection.seen, selection.total, daysAvailable])
+
+  /** Budget-driven: when it finishes. Null when the budget cannot keep up at all. */
+  const daysForBudget = useMemo(() => {
+    if (selection.total === 0 || budgetMinutes === null || budgetMinutes <= 0) return null
+    return daysForDailyBudget({ ...workloadInput, minutesPerDay: budgetMinutes })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection.unseen, selection.seen, selection.total, budgetMinutes])
+
+  const budgetFinishDate = daysForBudget === null
+    ? null
+    : new Date(Date.now() + daysForBudget * DAY_MS).toISOString().slice(0, 10)
+
   const submit = () => {
     const trimmed = title.trim()
     if (trimmed.length < 1 || trimmed.length > 500) {
       setLocalError(t('form.error.title'))
       return
     }
-    if (!Number.isInteger(dailyMinutes) || dailyMinutes < 1 || dailyMinutes > 1440) {
-      setLocalError(t('form.error.dailyMinutes'))
+    if (deckIds.size === 0) {
+      setLocalError(t('form.error.decks'))
       return
     }
     setLocalError(null)
     onSubmit({
-      domainId,
+      // Still sent because `learning_goals.domain_id` is NOT NULL, but no longer asked for. An
+      // existing goal keeps whatever it was created with rather than being silently rewritten.
+      domainId: goal?.domain_id ?? availableDomainIds()[0],
       title: trimmed,
-      dailyMinutes,
+      // The planner's per-day budget. Derived, not typed: the projection when a date is set, the
+      // learner's own figure when they pinned one, and the previous value when editing.
+      dailyMinutes: Math.max(1, Math.min(1440, Math.round(
+        budgetMinutes ?? projection?.averageMinutesPerDay ?? goal?.daily_minutes ?? 20,
+      ))),
       targetDate: targetDate || null,
-      decks: [...deckIds].map((deck_id) => ({
-        deck_id,
-        importance: importanceForPriority(deckPriority[deck_id] ?? DEFAULT_DECK_PRIORITY),
-      })),
+      decks: [...deckIds].map((deck_id) => ({ deck_id, importance: NEUTRAL_IMPORTANCE })),
     })
   }
+
+  const minutes = (value: number) => t('form.plan.minutes', { count: Math.max(1, Math.round(value)) })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -100,20 +163,6 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
         <h2 className="text-base font-medium text-foreground">
           {t(goal ? 'form.editTitle' : 'form.createTitle')}
         </h2>
-
-        <label className="block">
-          <span className="text-xs text-muted-foreground">{t('form.domain')}</span>
-          <select
-            value={domainId}
-            onChange={(e) => setDomainId(e.target.value)}
-            disabled={!!goal}   // domain fixes which adapter plans the goal; changing it would invalidate its plans
-            className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg cursor-pointer disabled:opacity-60"
-          >
-            {domains.map((domain) => (
-              <option key={domain} value={domain}>{t(`form.domainName.${domain}`, { defaultValue: domain })}</option>
-            ))}
-          </select>
-        </label>
 
         <label className="block">
           <span className="text-xs text-muted-foreground">{t('form.goalTitle')}</span>
@@ -126,92 +175,105 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
           />
         </label>
 
-        <label className="block">
-          <span className="text-xs text-muted-foreground">{t('form.dailyMinutes')}</span>
-          <input
-            type="number"
-            min={1}
-            max={1440}
-            value={dailyMinutes}
-            onChange={(e) => setDailyMinutes(Number.parseInt(e.target.value, 10))}
-            className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
-          />
-        </label>
+        <div className="block">
+          <span className="text-xs text-muted-foreground">{t('form.decks')}</span>
+          <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.decksHint')}</p>
+          <div className="mt-1 max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
+            {decks.length === 0 && <p className="text-xs text-content-tertiary">{t('form.noDecks')}</p>}
+            {decks.map((deck) => (
+              <label key={deck.id} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={deckIds.has(deck.id)}
+                  onChange={() => toggleDeck(deck.id)}
+                />
+                <span className="truncate">{deck.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
 
         <label className="block">
           <span className="text-xs text-muted-foreground">{t('form.targetDate')}</span>
           <input
             type="date"
             value={targetDate}
-            onChange={(e) => setTargetDate(e.target.value)}
+            onChange={(e) => { setTargetDate(e.target.value); setBudgetMinutes(null) }}
             className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
           />
         </label>
 
-        <div>
-          <span className="text-xs text-muted-foreground">{t('form.decks')}</span>
-          <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.decksHint')}</p>
-          <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
-            {decks.length === 0 ? (
-              <p className="text-xs text-content-tertiary">{t('form.noDecks')}</p>
-            ) : decks.map((deck) => (
-              <div key={deck.id} className="flex items-center justify-between gap-2">
-                <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer min-w-0">
-                  <input
-                    type="checkbox"
-                    checked={deckIds.has(deck.id)}
-                    onChange={() => toggleDeck(deck.id)}
-                    className="cursor-pointer"
-                  />
-                  <span className="truncate">{deck.name}</span>
-                </label>
-                {/* Only for decks that are actually in the goal: a priority on a deck the
-                    learner has not chosen is a control with nothing to act on. */}
-                {deckIds.has(deck.id) && (
-                  <div
-                    role="radiogroup"
-                    aria-label={`${t('form.deckPriority.label')} — ${deck.name}`}
-                    className="flex shrink-0 gap-1"
-                  >
-                    {DECK_PRIORITY_LEVELS.map((level) => {
-                      const selected = (deckPriority[deck.id] ?? DEFAULT_DECK_PRIORITY) === level
-                      return (
-                        <button
-                          key={level}
-                          type="button"
-                          role="radio"
-                          aria-checked={selected}
-                          onClick={() => setDeckPriority((current) => ({ ...current, [deck.id]: level }))}
-                          className={`text-xs px-2 py-0.5 rounded border cursor-pointer ${
-                            selected
-                              ? 'border-primary text-primary'
-                              : 'border-border text-content-tertiary'
-                          }`}
-                        >
-                          {t(`form.deckPriority.${level}`)}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* ── The plan this goal implies, before it is saved ────────────────── */}
+        <section
+          aria-label={t('form.plan.title')}
+          className="rounded-lg border border-border bg-muted/40 p-3 space-y-1.5"
+        >
+          <h3 className="text-xs font-medium text-foreground">{t('form.plan.title')}</h3>
 
-        {localError && (
-          <p role="alert" className="text-xs text-destructive">{localError}</p>
-        )}
+          {selection.total === 0 || (daysAvailable === null && budgetMinutes === null) ? (
+            <p className="text-[11px] text-content-tertiary">{t('form.plan.needDecksAndDate')}</p>
+          ) : (
+            <>
+              {projection && (
+                <>
+                  <p className="text-sm text-foreground">
+                    {t('form.plan.newPerDay', { count: projection.newCardsPerDay })}
+                    {' · '}
+                    {minutes(projection.averageMinutesPerDay)}
+                  </p>
+                  {/* Stated separately and never averaged away: this is the day the learner has
+                      to actually survive. */}
+                  <p className="text-[11px] text-content-tertiary">
+                    {t('form.plan.peak', {
+                      minutes: Math.round(projection.peakMinutesPerDay),
+                      day: projection.peakDay + 1,
+                    })}
+                  </p>
+                </>
+              )}
+
+              {budgetMinutes !== null && (
+                <p className="text-sm text-foreground">
+                  {budgetFinishDate
+                    ? t('form.plan.finishBy', { date: budgetFinishDate })
+                    : t('form.plan.tooSlow')}
+                </p>
+              )}
+            </>
+          )}
+
+          <div className="flex items-center gap-2 pt-1">
+            <label className="text-[11px] text-content-tertiary flex items-center gap-1">
+              {t('form.plan.byMinutes')}
+              <input
+                type="number"
+                min={1}
+                max={1440}
+                value={budgetMinutes ?? ''}
+                onChange={(e) => setBudgetMinutes(e.target.value ? Number(e.target.value) : null)}
+                className="w-16 px-1.5 py-1 text-xs bg-background border border-border rounded"
+                aria-label={t('form.plan.byMinutes')}
+              />
+            </label>
+          </div>
+
+          {/* Only SRS-mode study feeds the plan — cramming and the sequential modes call
+              apply_study_rating with no SRS payload, so they move nothing here. Said out loud
+              rather than left for the learner to discover from a plan that never changes. */}
+          <p className="text-[11px] text-content-tertiary">{t('form.plan.srsOnly')}</p>
+          <p className="text-[11px] text-content-tertiary">{t('form.plan.estimate')}</p>
+        </section>
+
+        {localError && <p className="text-xs text-danger">{localError}</p>}
 
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={onCancel} className="px-3 py-1.5 text-sm border border-border rounded-lg cursor-pointer">
+          <button onClick={onCancel} className="px-3 py-1.5 text-sm text-muted-foreground">
             {t('form.cancel')}
           </button>
           <button
-            type="button"
             onClick={submit}
             disabled={submitting}
-            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
+            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg disabled:opacity-60"
           >
             {submitting ? t('form.saving') : t('form.save')}
           </button>

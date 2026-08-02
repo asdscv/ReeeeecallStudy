@@ -92,14 +92,8 @@
   "form": {
     "createTitle": "新建目标",
     "editTitle": "编辑目标",
-    "domain": "学科",
-    "domainName": {
-      "general": "通用学习",
-      "language": "语言学习"
-    },
     "goalTitle": "目标名称",
     "goalTitlePlaceholder": "例如：通过 JLPT N2",
-    "dailyMinutes": "每日学习时间（分钟）",
     "targetDate": "目标日期（可选）",
     "decks": "学习牌组",
     "decksHint": "计划将根据所选牌组中的卡片生成。",
@@ -109,14 +103,21 @@
     "saving": "保存中…",
     "error": {
       "title": "请输入 1–500 个字符的目标名称。",
-      "dailyMinutes": "每日学习时间须在 1–1440 分钟之间。"
+      "decks": "请至少选择一个卡组。"
     },
-    "deckPriority": {
-      "label": "优先级",
-      "low": "低",
-      "normal": "普通",
-      "high": "高",
-      "hint": "当一天的额度排满时，优先级高的卡组会先出现。"
+    "plan": {
+      "title": "预计学习计划",
+      "needDecksAndDate": "选择卡组和目标日期后计算每日学习量。",
+      "minutes": "每天 {{count, number}} 分钟",
+      "peak": "最忙的一天 {{minutes, number}} 分钟（第 {{day, number}} 天）",
+      "byMinutes": "或按每日时长",
+      "finishBy": "约在 {{date}} 完成",
+      "tooSlow": "该时长连复习量都跟不上。",
+      "srsOnly": "只有 SRS 模式的学习会计入此计划。",
+      "estimate": "这是估算值，会根据你的实际表现每天重新计算。",
+      "newPerDay_one": "每天新卡 {{count, number}} 张",
+      "newPerDay_other": "每天新卡 {{count, number}} 张",
+      "newPerDay": "每天新卡 {{count, number}} 张"
     }
   },
   "history": {

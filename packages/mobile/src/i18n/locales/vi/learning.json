@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "Hủy",
-    "dailyMinutes": "Số phút mỗi ngày",
-    "deckPriority": {
-      "high": "Cao",
-      "hint": "Bộ thẻ ưu tiên cao sẽ xuất hiện trước khi ngày đã kín.",
-      "label": "Mức ưu tiên",
-      "low": "Thấp",
-      "normal": "Bình thường"
-    },
     "decks": "Bộ thẻ để học",
     "decksHint": "Kế hoạch được xây dựng từ các thẻ trong những bộ thẻ này.",
-    "domain": "Lĩnh vực",
-    "domainName": {
-      "general": "Học tổng quát",
-      "language": "Học ngôn ngữ"
-    },
     "error": {
-      "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440.",
-      "title": "Nhập tên mục tiêu (1–500 ký tự)."
+      "title": "Nhập tên mục tiêu (1–500 ký tự).",
+      "decks": "Hãy chọn ít nhất một bộ thẻ."
     },
     "goalTitle": "Tên mục tiêu",
     "goalTitlePlaceholder": "VD: Đạt JLPT N2",
     "noDecks": "Bạn chưa có bộ thẻ nào.",
     "save": "Lưu",
-    "saving": "Đang lưu…"
+    "saving": "Đang lưu…",
+    "plan": {
+      "title": "Kế hoạch dự kiến",
+      "needDecksAndDate": "Chọn bộ thẻ và ngày mục tiêu để xem khối lượng mỗi ngày.",
+      "minutes": "{{count, number}} phút/ngày",
+      "peak": "Ngày bận nhất: {{minutes, number}} phút (ngày {{day, number}})",
+      "byMinutes": "Hoặc đặt phút/ngày",
+      "finishBy": "Hoàn tất khoảng {{date}}",
+      "tooSlow": "Thời lượng đó không theo kịp cả phần ôn tập.",
+      "srsOnly": "Chỉ việc học ở chế độ SRS được tính vào kế hoạch này.",
+      "estimate": "Đây là ước tính, được tính lại mỗi ngày từ kết quả thực tế của bạn.",
+      "newPerDay_one": "{{count, number}} thẻ mới/ngày",
+      "newPerDay_other": "{{count, number}} thẻ mới/ngày",
+      "newPerDay": "{{count, number}} thẻ mới/ngày"
+    },
+    "targetDate": "Ngày mục tiêu (tùy chọn)",
+    "horizonMonths_one": "{{count, number}} tháng nữa",
+    "horizonMonths_other": "{{count, number}} tháng nữa",
+    "horizonMonths": "{{count, number}} tháng nữa"
   },
   "goals": {
     "archive": "Lưu trữ",
