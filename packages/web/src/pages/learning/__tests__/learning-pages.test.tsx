@@ -75,6 +75,9 @@ const baseState = (over: StoreState = {}): StoreState => ({
   autoGeneratePlan: vi.fn(),
   planAbsentFor: null,
   autoPlanAttempted: {},
+  extendPlan: vi.fn(),
+  planExtending: false,
+  planExtension: null,
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
@@ -267,6 +270,64 @@ describe('LearningTodayPage', () => {
 
     expect(screen.getByRole('button', { name: 'today.regenerate' })).toBeDisabled()
     expect(screen.getByText('today.completedNote')).toBeInTheDocument()
+  })
+
+  // ── "더 하기" ────────────────────────────────────────────────────────────
+  const completedPlan = {
+    plan: {
+      id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+      algorithm_version: 'daily-plan-v1', input_fingerprint: 'fnv1a32:abc', status: 'completed',
+      budget_minutes: 20, completed_minutes: 20, completed_items: 1, total_items: 1,
+    },
+    planItems: [],
+  }
+
+  it('offers more work on a finished day, when rebuilding is refused', async () => {
+    // The day a learner is doing BEST is the day the product had nothing to offer: the plan is
+    // complete, so `save_daily_plan` refuses it, and there was no other way to add work.
+    const state = renderToday(completedPlan)
+
+    const button = screen.getByRole('button', { name: 'today.extend' })
+    expect(button).toBeEnabled()
+
+    await userEvent.click(button)
+    expect(state.extendPlan).toHaveBeenCalledTimes(1)
+    // Never the destructive one.
+    expect(state.generatePlan).not.toHaveBeenCalled()
+  })
+
+  it('says how much tomorrow grows', async () => {
+    // The one cost of "더 하기" the learner cannot see today. Left unsaid, a learner presses it
+    // four times tonight and meets a tripled list tomorrow with no idea why.
+    renderToday({
+      ...completedPlan,
+      planExtension: { appended: 12, newCards: 5, reviewsTomorrow: 5 },
+    })
+
+    expect(screen.getByText(/today\.extendAdded/)).toBeInTheDocument()
+    expect(screen.getByText(/today\.extendTomorrow/)).toBeInTheDocument()
+  })
+
+  it('stays quiet about tomorrow when the extra work is all review', async () => {
+    // Reviews were coming back on their own schedule anyway. Claiming they add load would make
+    // the one sentence that matters into noise the learner learns to skip.
+    renderToday({
+      ...completedPlan,
+      planExtension: { appended: 12, newCards: 0, reviewsTomorrow: 0 },
+    })
+
+    expect(screen.getByText(/today\.extendAdded/)).toBeInTheDocument()
+    expect(screen.queryByText(/today\.extendTomorrow/)).not.toBeInTheDocument()
+  })
+
+  it('says so plainly when there was nothing left to add', async () => {
+    // Otherwise a press that appended zero items looks identical to one that worked.
+    renderToday({
+      ...completedPlan,
+      planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 },
+    })
+
+    expect(screen.getByText('today.extendNothing')).toBeInTheDocument()
   })
 })
 

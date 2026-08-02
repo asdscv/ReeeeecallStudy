@@ -422,7 +422,7 @@ export function LearningTodayPage() {
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
-    recordAttempt,
+    extendPlan, planExtending, planExtension, recordAttempt,
     attempts, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     knowledge, fetchGoalKnowledge,
@@ -659,10 +659,39 @@ export function LearningTodayPage() {
               )
             })}
           </ul>
+          {/* "더 하기" comes FIRST, and is the primary action once the day is done.
+              Rebuilding is the destructive one — it deletes every item and zeroes the day's
+              progress — so the additive option has to be the one that is easier to reach. */}
+          <button
+            type="button"
+            onClick={() => { if (goal) void extendPlan(goal, ctx) }}
+            disabled={planExtending || planGenerating || !goal}
+            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
+          >
+            {planExtending ? t('today.extending') : t('today.extend')}
+          </button>
+
+          {planExtension && (
+            <p className="text-xs text-content-tertiary text-center" aria-live="polite">
+              {planExtension.appended === 0
+                ? t('today.extendNothing')
+                : (
+                  <>
+                    {t('today.extendAdded', { count: planExtension.appended })}
+                    {/* The cost, said out loud. Every card started today comes back tomorrow,
+                        and a button that grows tomorrow's list in silence is how a learner
+                        ends up abandoning a goal they were doing well at. */}
+                    {planExtension.reviewsTomorrow > 0
+                      && ` ${t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })}`}
+                  </>
+                )}
+            </p>
+          )}
+
           <button
             type="button"
             onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={planGenerating || plan.status === 'completed'}
+            disabled={planGenerating || planExtending || plan.status === 'completed'}
             className="w-full px-3 py-2 text-sm border border-border rounded-lg cursor-pointer disabled:opacity-50"
           >
             {planGenerating ? t('today.regenerating') : t('today.regenerate')}

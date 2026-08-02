@@ -126,7 +126,7 @@ export function LearningTodayScreen() {
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
     recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
-    recordAttempt,
+    extendPlan, planExtending, planExtension, recordAttempt,
     attempts, attemptsLoading, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     enrichmentQuote, loadEnrichmentQuote,
@@ -287,6 +287,12 @@ export function LearningTodayScreen() {
   const regenerate = useCallback(() => {
     if (goal) void generatePlan(goal, currentPlanContext())
   }, [goal, generatePlan])
+
+  // A fresh context, like `regenerate` — the screen stays mounted across midnight, so a value
+  // captured at mount would append to yesterday.
+  const studyMore = useCallback(() => {
+    if (goal) void extendPlan(goal, currentPlanContext())
+  }, [goal, extendPlan])
 
   const errorKey = (code: string): string => {
     switch (code) {
@@ -630,16 +636,54 @@ export function LearningTodayScreen() {
                   )
                 })}
 
+                {/* "더 하기" comes FIRST and is the primary action. Rebuilding is the
+                    destructive one — it deletes every item and zeroes the day's progress — so
+                    the additive option has to be the easier one to reach. */}
                 <TouchableOpacity
-                  disabled={planGenerating || plan.status === 'completed'}
+                  disabled={planExtending || planGenerating || !goal}
+                  onPress={studyMore}
+                  style={[
+                    styles.primaryBtn,
+                    { backgroundColor: theme.colors.primary },
+                    (planExtending || planGenerating || !goal) && styles.disabled,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: planExtending || planGenerating || !goal }}
+                  {...testProps('learning-extend')}
+                >
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
+                    {planExtending ? t('today.extending') : t('today.extend')}
+                  </Text>
+                </TouchableOpacity>
+
+                {planExtension && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textSecondary }]}
+                    accessibilityLiveRegion="polite"
+                    {...testProps('learning-extend-result')}
+                  >
+                    {planExtension.appended === 0
+                      ? t('today.extendNothing')
+                      // The cost, said out loud. Every card started today comes back tomorrow,
+                      // and a button that grows tomorrow's list in silence is how a learner
+                      // ends up abandoning a goal they were doing well at.
+                      : t('today.extendAdded', { count: planExtension.appended })
+                        + (planExtension.reviewsTomorrow > 0
+                          ? ' ' + t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })
+                          : '')}
+                  </Text>
+                )}
+
+                <TouchableOpacity
+                  disabled={planGenerating || planExtending || plan.status === 'completed'}
                   onPress={regenerate}
                   style={[
                     styles.secondaryBtn,
                     { borderColor: theme.colors.border },
-                    (planGenerating || plan.status === 'completed') && styles.disabled,
+                    (planGenerating || planExtending || plan.status === 'completed') && styles.disabled,
                   ]}
                   accessibilityRole="button"
-                  accessibilityState={{ disabled: planGenerating || plan.status === 'completed' }}
+                  accessibilityState={{ disabled: planGenerating || planExtending || plan.status === 'completed' }}
                   {...testProps('learning-regenerate')}
                 >
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>

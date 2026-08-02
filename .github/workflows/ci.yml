@@ -387,6 +387,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/goal_workload_test.sql
 
+      - name: Run append-plan assertions (mig 185 — "더 하기" adds without destroying)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/append_plan_test.sql
+
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so
       # they never ran on CI. Registered explicitly, like every suite above.

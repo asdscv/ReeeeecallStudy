@@ -26,7 +26,7 @@ import {
 } from '../lib/learning-card-sources'
 import type { UserCardProgress } from '../lib/srs-access'
 import {
-  buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier,
+  buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier, reviewsAddedTomorrow,
   parseNewCardsPerDay,
 } from '../learning/application/index'
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
@@ -484,6 +484,19 @@ interface LearningState {
    * the day's progress, so that mistake is not recoverable by retrying.
    */
   planAbsentFor: string | null
+  /** True while an append is in flight. Separate from `planGenerating`: the two writes are
+   *  different actions with different buttons, and one spinner for both would disable the
+   *  wrong control. */
+  planExtending: boolean
+  /**
+   * The result of the last "더 하기", or null.
+   *
+   * Kept so the consequence can be STATED rather than implied. Starting new cards is the one
+   * plan decision with a cost the learner cannot see today — every card started now comes back
+   * tomorrow — and a button that silently grows tomorrow's list is how a learner ends up
+   * abandoning a goal they were doing well at.
+   */
+  planExtension: { appended: number; newCards: number; reviewsTomorrow: number } | null
   /**
    * Goal+date keys already attempted automatically, so a failure is never retried in a loop.
    *
@@ -562,6 +575,15 @@ interface LearningState {
    * and the cost of one drifting is a wiped day.
    */
   autoGeneratePlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<void>
+  /**
+   * "더 하기" — add one more block of work to today's plan, keeping everything already done.
+   *
+   * A separate action from `generatePlan` because it is a separate operation on the server:
+   * `save_daily_plan` deletes the day and rewrites it, `append_daily_plan_items` (mig 185)
+   * only inserts. Routing "I want more" through the destructive one is what made this
+   * impossible before — a learner who had done half the plan would have lost the half.
+   */
+  extendPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
   requestEnrichment: (input: {
@@ -600,6 +622,293 @@ interface LearningState {
 let insightsRequestSeq = 0
 let recommendationsRequestSeq = 0
 
+/**
+ * Turn planner output into the row shape `save_daily_plan` / `append_daily_plan_items` accept.
+ *
+ * Shared by both writers. The mapping is where a plan stops being a ranking and becomes a
+ * record: it freezes which template fields were the prompt and the answer, and the recall
+ * estimate the row was chosen on. Two copies of that would eventually freeze two different
+ * things for the same card on the same day.
+ */
+function toPlanItemRows(
+  output: ReturnType<typeof buildDailyPlan>,
+  cards: readonly Card[],
+  templatesById: Map<string, PlanTemplateRow>,
+  candidates: ReturnType<typeof buildCandidatesFromCards>,
+) {
+  const cardsById = new Map(cards.map((card) => [card.id, card]))
+  // Candidates carry the recall estimate; planner output does not, because the planner does
+  // not score on it (see PlannerCandidate.retrievability). Keyed on candidateId, which is
+  // what the planner preserves through ranking and selection.
+  const recallByCandidate = new Map(
+    candidates
+      .filter((candidate) => typeof candidate.retrievability === 'number')
+      .map((candidate) => [candidate.candidateId, candidate.retrievability as number]),
+  )
+  return output.items.map((item) => {
+    const card = item.cardId ? cardsById.get(item.cardId) : undefined
+    const shape = card
+      ? legacyCardItemShape(card, card.template_id ? templatesById.get(card.template_id) : null)
+      : {
+        activityType: item.activityType, stimulusType: 'text',
+        responseType: 'self_rate', evaluatorType: 'self_rate', answerFaces: null,
+      }
+    // `payload` carries two independent records, and either can be absent.
+    //
+    // `typed_answer` records WHICH fields the plan called prompt and reference, decided
+    // here and never re-derived: a template edited after today's plan was written must not
+    // change what today's plan meant.
+    //
+    // `recall_probability` is the estimate this row was CHOSEN on, stored so the plan can
+    // SHOW its reasoning instead of only asserting it. Omitted when the estimate is null —
+    // a new card has no forgetting curve, and `recall_probability: null` would render as a
+    // number-shaped absence rather than no claim at all.
+    //
+    // `daily_plan_items.payload` already exists and `save_daily_plan` already writes it
+    // (mig 167), so neither record needs a migration. The key is omitted entirely when BOTH
+    // are absent, so `save_daily_plan` keeps writing its `'{}'` default for every other item.
+    const recall = recallByCandidate.get(item.candidateId)
+    const payload = {
+      ...(planItemAnswerPayload(shape) ?? {}),
+      ...(recall === undefined ? {} : { recall_probability: recall }),
+    }
+    return {
+      activity_id: item.activityId,
+      card_id: item.cardId,
+      concept_id: item.conceptId,
+      activity_type: shape.activityType,
+      stimulus_type: shape.stimulusType,
+      response_type: shape.responseType,
+      evaluator_type: shape.evaluatorType,
+      reason_code: item.reasonCode,
+      priority: item.priority,
+      estimated_minutes: item.estimatedMinutes,
+      ...(Object.keys(payload).length > 0 ? { payload } : {}),
+    }
+  })
+}
+
+/**
+ * How much work one press of "더 하기" adds, in minutes.
+ *
+ * Ten, not "another day's worth". The learner is already past the amount they said they
+ * wanted, so each press should be small enough to stop after — a 60-minute goal that doubles
+ * on one tap is a decision the learner did not get to make twice.
+ */
+const EXTRA_BLOCK_MINUTES = 10
+
+/** Nothing to exclude — `generatePlan` builds the whole day from scratch. */
+const EMPTY_EXCLUSIONS: ReadonlySet<string> = new Set()
+
+/** What {@link collectPlanInputs} produces, or why it could not. */
+type PlanInputs =
+  | { blocked: 'no_decks' | 'no_candidates' }
+  | {
+    blocked?: undefined
+    deckIds: string[]
+    cards: Card[]
+    templatesById: Map<string, PlanTemplateRow>
+    candidates: ReturnType<typeof buildCandidatesFromCards>
+  }
+
+/**
+ * Gather and score everything the planner can choose from today.
+ *
+ * Extracted so `generatePlan` and `extendPlan` share it instead of holding two copies. What
+ * it does is subtle in several places at once — owned decks carry SRS on the card while
+ * subscribed decks keep it in `user_card_progress`, reviews are fetched most-overdue-first so
+ * a bounded read drops only the least urgent, intake is round-robined so one deck cannot
+ * starve another — and every one of those is a bug that was found and fixed here. A second
+ * copy would not inherit the next fix.
+ *
+ * `excludeCardIds` is the only behavioural difference between the two callers: extending must
+ * not re-offer what is already on today's list.
+ */
+async function collectPlanInputs(
+  goal: LearningGoalWithDecks,
+  ctx: PlanContext,
+  userId: string,
+  excludeCardIds: ReadonlySet<string>,
+): Promise<PlanInputs> {
+  const deckIds = goal.decks.map((link) => link.deck_id)
+  if (deckIds.length === 0) {
+    // Nothing to plan over. Reported rather than thrown: sending an empty item list would
+    // fail server-side validation ("Plan must have at least one item") and surface as a
+    // confusing error instead of a clear empty state.
+    return { blocked: 'no_decks' }
+  }
+
+    // A card's schedule is not always on the card row. Decks the learner OWNS carry SRS
+    // embedded in `cards`; decks they SUBSCRIBED to keep the learner's own schedule in
+    // `user_card_progress` while `cards` holds the PUBLISHER's (mig 009, `getSrsSource`).
+    //
+    // Planning read `cards` for both, so on a subscribed or official deck every memory
+    // feature saw the publisher's untouched row — in production all 376,095 official cards
+    // have `interval_days = 0` and `last_reviewed_at = NULL`. Every card scored identically
+    // and the "personalised" plan was whatever order the rows arrived in.
+    const { data: deckRows, error: deckErr } = await supabase
+      .from('decks')
+      .select('id, user_id, share_mode, source_owner_id')
+      .in('id', deckIds)
+      .returns<PlannerDeckMeta[]>()
+    if (deckErr) throw deckErr
+    const { embeddedDeckIds, progressDeckIds } = splitDecksBySrsSource(deckRows ?? [], userId)
+
+    // Owned decks: the DUE filter goes in the query. A plan is today's work, and this keeps a
+    // large account from turning generation into a full-table read. `next_review_at IS NULL`
+    // is a new card, which the mapper scores as maximally due.
+    const fetchLimit = candidateFetchLimit(goal.daily_minutes)
+
+    // Owed reviews, MOST OVERDUE FIRST. The ordering is what makes a bounded fetch honest:
+    // whatever falls past the limit is strictly less urgent than what was taken, instead of
+    // being whichever rows the database happened to return.
+    const embeddedDue = embeddedDeckIds.length === 0 ? [] : await (async () => {
+      const { data, error } = await supabase
+        .from('cards')
+        .select(CARD_COLUMNS)
+        .in('deck_id', embeddedDeckIds)
+        .not('next_review_at', 'is', null)
+        .lte('next_review_at', ctx.now)
+        .order('next_review_at', { ascending: true })
+        .limit(fetchLimit)
+        .returns<Card[]>()
+      if (error) throw error
+      return data ?? []
+    })()
+
+    // New cards, fetched SEPARATELY and shared across the goal's decks.
+    //
+    // Together with the ordering above this is what fixes the two-deck starvation: previously
+    // one query took an arbitrary N over both decks, so a deck with a large backlog could
+    // supply every row and the other contribute nothing. Intake is now its own budget, spread
+    // round-robin, so every deck in a goal advances.
+    const embeddedNew = embeddedDeckIds.length === 0 ? [] : await (async () => {
+      const perDeckCeiling = Math.max(1, Math.ceil(fetchLimit / embeddedDeckIds.length))
+      const { data, error } = await supabase
+        .from('cards')
+        .select(CARD_COLUMNS)
+        .in('deck_id', embeddedDeckIds)
+        .is('last_reviewed_at', null)
+        // Deterministic, so the same day's plan does not reshuffle between generations.
+        .order('deck_id', { ascending: true })
+        .order('sort_position', { ascending: true })
+        .limit(perDeckCeiling * embeddedDeckIds.length)
+        .returns<Card[]>()
+      if (error) throw error
+      return roundRobinByDeck(data ?? [], fetchLimit)
+    })()
+
+    const embeddedCards = [...embeddedDue, ...embeddedNew]
+
+    // Subscribed decks: the due filter CANNOT be pushed into the card query, because the
+    // column it would filter on belongs to the publisher. Drive from the progress table
+    // instead — `idx_ucp_user_review` covers exactly this predicate — then read the cards
+    // those rows point at, so the limit is spent on cards that are actually due.
+    const progressCards = progressDeckIds.length === 0 ? [] : await (async () => {
+      const { data: progressRows, error: progressErr } = await supabase
+        .from('user_card_progress')
+        .select('id, user_id, card_id, deck_id, srs_status, ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at, srs_revision, created_at, updated_at')
+        .eq('user_id', userId)
+        .in('deck_id', progressDeckIds)
+        .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+        .order('next_review_at', { ascending: true, nullsFirst: false })
+        .limit(fetchLimit)
+        .returns<UserCardProgress[]>()
+      if (progressErr) throw progressErr
+      const rows = progressRows ?? []
+      if (rows.length === 0) return []
+      const { data: cardData, error: cardsErr } = await supabase
+        .from('cards')
+        .select(CARD_COLUMNS)
+        .in('id', rows.map((row) => row.card_id))
+        .returns<Card[]>()
+      if (cardsErr) throw cardsErr
+      // Re-checked in memory: a progress row can be seeded with a due date the query matched
+      // on, and `attachProgressToCards` is what puts that date on the card the planner sees.
+      return attachProgressToCards(cardData ?? [], rows)
+        .filter((card) => isDueAt(card.next_review_at, ctx.now))
+    })()
+
+    // No slice. Each source is already bounded by what the budget can hold, and cutting the
+    // concatenation is what previously let owned decks starve subscribed ones: the tail of the
+    // list was dropped without regard to how urgent it was.
+    const allCards = [...embeddedCards, ...progressCards]
+    // Cards already on today's list are dropped HERE, not left to the server. The RPC skips
+    // duplicates too, but a payload made only of them returns "0 appended", which reads as
+    // "there is nothing more to study" when in fact there is.
+    const cards = excludeCardIds.size === 0
+      ? allCards
+      : allCards.filter((card) => !excludeCardIds.has(card.id))
+    if (cards.length === 0) {
+      return { blocked: 'no_candidates' }
+    }
+
+    // The templates of those cards, which decide WHICH items can be answered by typing.
+    //
+    // Read here rather than derived from the cards: only the template author's declared
+    // `front_layout` / `back_layout` can say which field is the answer, and guessing from
+    // jsonb key order is inverted for every official word card (shared/lib/card-answer).
+    //
+    // A failure is NOT fatal and deliberately not thrown: an unreadable or missing template
+    // means the plan falls back to what it has always done — a self-rating with no input box.
+    // Failing plan generation because a typing affordance could not be offered would trade a
+    // working feature for a missing one.
+    const templateIds = [...new Set(
+      cards.map((card) => card.template_id).filter((id): id is string => !!id),
+    )]
+    const templatesById = new Map<string, PlanTemplateRow>()
+    if (templateIds.length > 0) {
+      const { data: templateRows } = await supabase
+        .from('card_templates')
+        .select(TEMPLATE_COLUMNS)
+        .in('id', templateIds)
+        .returns<PlanTemplateRow[]>()
+      for (const template of templateRows ?? []) templatesById.set(template.id, template)
+    }
+
+    const since = new Date(Date.parse(ctx.now) - LOG_WINDOW_DAYS * 86_400_000).toISOString()
+    // `.returns` rather than a cast at the call site: the cast is what let `rating` be
+    // declared `number` while the column is TEXT, which silently pinned `recentFailure` to
+    // its no-evidence constant. If the columns and the interface disagree again, this line
+    // is where the compiler says so.
+    const { data: logRows, error: logErr } = await supabase
+      .from('study_logs')
+      .select('card_id, rating, review_duration_ms, studied_at')
+      .in('deck_id', deckIds)
+      .gte('studied_at', since)
+      .order('studied_at', { ascending: false })
+      .limit(LOG_ROW_LIMIT)
+      .returns<CandidateStudyLog[]>()
+    if (logErr) throw logErr
+
+    const deckImportance: Record<string, number> = {}
+    for (const link of goal.decks) deckImportance[link.deck_id] = link.importance
+
+    // Accepted recommendations (mig 174) raise contentImportance, which is what makes
+    // "accept" change anything. Read fresh rather than trusting whatever the insights
+    // screen last loaded: the plan must reflect decisions made since.
+    const { data: acceptedRows } = await supabase
+      .from('study_recommendations')
+      .select('card_id')
+      .eq('goal_id', goal.id)
+      .eq('status', 'accepted')
+      .not('card_id', 'is', null)
+      .limit(200)
+    const acceptedCardIds = (acceptedRows ?? [])
+      .map((row) => (row as { card_id: string | null }).card_id)
+      .filter((id): id is string => !!id)
+
+    const candidates = buildCandidatesFromCards({
+      cards,
+      recentLogs: logRows ?? [],
+      deckImportance,
+      now: ctx.now,
+      acceptedCardIds,
+    })
+
+  return { deckIds, cards, templatesById, candidates }
+}
+
 export const useLearningStore = create<LearningState>((set, get) => ({
   goals: [],
   goalsLoading: false,
@@ -613,6 +922,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planError: null,
   planAbsentFor: null,
   autoPlanAttempted: {},
+  planExtending: false,
+  planExtension: null,
   planBlockedReason: null,
   recordingItemId: null,
   attempts: [],
@@ -886,181 +1197,16 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     if (get().planGenerating) return false
     set({ planGenerating: true, planError: null, planBlockedReason: null })
     try {
-      const deckIds = goal.decks.map((link) => link.deck_id)
-      if (deckIds.length === 0) {
-        // Nothing to plan over. Refusing here is deliberate: sending an empty item
-        // list would fail server-side validation ("Plan must have at least one item")
-        // and surface as a confusing error instead of a clear empty state.
-        set({ planBlockedReason: 'no_decks' })
-        return false
-      }
-
       const { data: userData } = await supabase.auth.getUser()
       const userId = userData?.user?.id
       if (!userId) throw { code: 'P0001', message: 'Authentication required' }
 
-      // A card's schedule is not always on the card row. Decks the learner OWNS carry SRS
-      // embedded in `cards`; decks they SUBSCRIBED to keep the learner's own schedule in
-      // `user_card_progress` while `cards` holds the PUBLISHER's (mig 009, `getSrsSource`).
-      //
-      // Planning read `cards` for both, so on a subscribed or official deck every memory
-      // feature saw the publisher's untouched row — in production all 376,095 official cards
-      // have `interval_days = 0` and `last_reviewed_at = NULL`. Every card scored identically
-      // and the "personalised" plan was whatever order the rows arrived in.
-      const { data: deckRows, error: deckErr } = await supabase
-        .from('decks')
-        .select('id, user_id, share_mode, source_owner_id')
-        .in('id', deckIds)
-        .returns<PlannerDeckMeta[]>()
-      if (deckErr) throw deckErr
-      const { embeddedDeckIds, progressDeckIds } = splitDecksBySrsSource(deckRows ?? [], userId)
-
-      // Owned decks: the DUE filter goes in the query. A plan is today's work, and this keeps a
-      // large account from turning generation into a full-table read. `next_review_at IS NULL`
-      // is a new card, which the mapper scores as maximally due.
-      const fetchLimit = candidateFetchLimit(goal.daily_minutes)
-
-      // Owed reviews, MOST OVERDUE FIRST. The ordering is what makes a bounded fetch honest:
-      // whatever falls past the limit is strictly less urgent than what was taken, instead of
-      // being whichever rows the database happened to return.
-      const embeddedDue = embeddedDeckIds.length === 0 ? [] : await (async () => {
-        const { data, error } = await supabase
-          .from('cards')
-          .select(CARD_COLUMNS)
-          .in('deck_id', embeddedDeckIds)
-          .not('next_review_at', 'is', null)
-          .lte('next_review_at', ctx.now)
-          .order('next_review_at', { ascending: true })
-          .limit(fetchLimit)
-          .returns<Card[]>()
-        if (error) throw error
-        return data ?? []
-      })()
-
-      // New cards, fetched SEPARATELY and shared across the goal's decks.
-      //
-      // Together with the ordering above this is what fixes the two-deck starvation: previously
-      // one query took an arbitrary N over both decks, so a deck with a large backlog could
-      // supply every row and the other contribute nothing. Intake is now its own budget, spread
-      // round-robin, so every deck in a goal advances.
-      const embeddedNew = embeddedDeckIds.length === 0 ? [] : await (async () => {
-        const perDeckCeiling = Math.max(1, Math.ceil(fetchLimit / embeddedDeckIds.length))
-        const { data, error } = await supabase
-          .from('cards')
-          .select(CARD_COLUMNS)
-          .in('deck_id', embeddedDeckIds)
-          .is('last_reviewed_at', null)
-          // Deterministic, so the same day's plan does not reshuffle between generations.
-          .order('deck_id', { ascending: true })
-          .order('sort_position', { ascending: true })
-          .limit(perDeckCeiling * embeddedDeckIds.length)
-          .returns<Card[]>()
-        if (error) throw error
-        return roundRobinByDeck(data ?? [], fetchLimit)
-      })()
-
-      const embeddedCards = [...embeddedDue, ...embeddedNew]
-
-      // Subscribed decks: the due filter CANNOT be pushed into the card query, because the
-      // column it would filter on belongs to the publisher. Drive from the progress table
-      // instead — `idx_ucp_user_review` covers exactly this predicate — then read the cards
-      // those rows point at, so the limit is spent on cards that are actually due.
-      const progressCards = progressDeckIds.length === 0 ? [] : await (async () => {
-        const { data: progressRows, error: progressErr } = await supabase
-          .from('user_card_progress')
-          .select('id, user_id, card_id, deck_id, srs_status, ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at, srs_revision, created_at, updated_at')
-          .eq('user_id', userId)
-          .in('deck_id', progressDeckIds)
-          .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
-          .order('next_review_at', { ascending: true, nullsFirst: false })
-          .limit(fetchLimit)
-          .returns<UserCardProgress[]>()
-        if (progressErr) throw progressErr
-        const rows = progressRows ?? []
-        if (rows.length === 0) return []
-        const { data: cardData, error: cardsErr } = await supabase
-          .from('cards')
-          .select(CARD_COLUMNS)
-          .in('id', rows.map((row) => row.card_id))
-          .returns<Card[]>()
-        if (cardsErr) throw cardsErr
-        // Re-checked in memory: a progress row can be seeded with a due date the query matched
-        // on, and `attachProgressToCards` is what puts that date on the card the planner sees.
-        return attachProgressToCards(cardData ?? [], rows)
-          .filter((card) => isDueAt(card.next_review_at, ctx.now))
-      })()
-
-      // No slice. Each source is already bounded by what the budget can hold, and cutting the
-      // concatenation is what previously let owned decks starve subscribed ones: the tail of the
-      // list was dropped without regard to how urgent it was.
-      const cards = [...embeddedCards, ...progressCards]
-      if (cards.length === 0) {
-        set({ planBlockedReason: 'no_candidates' })
+      const inputs = await collectPlanInputs(goal, ctx, userId, EMPTY_EXCLUSIONS)
+      if (inputs.blocked) {
+        set({ planBlockedReason: inputs.blocked })
         return false
       }
-
-      // The templates of those cards, which decide WHICH items can be answered by typing.
-      //
-      // Read here rather than derived from the cards: only the template author's declared
-      // `front_layout` / `back_layout` can say which field is the answer, and guessing from
-      // jsonb key order is inverted for every official word card (shared/lib/card-answer).
-      //
-      // A failure is NOT fatal and deliberately not thrown: an unreadable or missing template
-      // means the plan falls back to what it has always done — a self-rating with no input box.
-      // Failing plan generation because a typing affordance could not be offered would trade a
-      // working feature for a missing one.
-      const templateIds = [...new Set(
-        cards.map((card) => card.template_id).filter((id): id is string => !!id),
-      )]
-      const templatesById = new Map<string, PlanTemplateRow>()
-      if (templateIds.length > 0) {
-        const { data: templateRows } = await supabase
-          .from('card_templates')
-          .select(TEMPLATE_COLUMNS)
-          .in('id', templateIds)
-          .returns<PlanTemplateRow[]>()
-        for (const template of templateRows ?? []) templatesById.set(template.id, template)
-      }
-
-      const since = new Date(Date.parse(ctx.now) - LOG_WINDOW_DAYS * 86_400_000).toISOString()
-      // `.returns` rather than a cast at the call site: the cast is what let `rating` be
-      // declared `number` while the column is TEXT, which silently pinned `recentFailure` to
-      // its no-evidence constant. If the columns and the interface disagree again, this line
-      // is where the compiler says so.
-      const { data: logRows, error: logErr } = await supabase
-        .from('study_logs')
-        .select('card_id, rating, review_duration_ms, studied_at')
-        .in('deck_id', deckIds)
-        .gte('studied_at', since)
-        .order('studied_at', { ascending: false })
-        .limit(LOG_ROW_LIMIT)
-        .returns<CandidateStudyLog[]>()
-      if (logErr) throw logErr
-
-      const deckImportance: Record<string, number> = {}
-      for (const link of goal.decks) deckImportance[link.deck_id] = link.importance
-
-      // Accepted recommendations (mig 174) raise contentImportance, which is what makes
-      // "accept" change anything. Read fresh rather than trusting whatever the insights
-      // screen last loaded: the plan must reflect decisions made since.
-      const { data: acceptedRows } = await supabase
-        .from('study_recommendations')
-        .select('card_id')
-        .eq('goal_id', goal.id)
-        .eq('status', 'accepted')
-        .not('card_id', 'is', null)
-        .limit(200)
-      const acceptedCardIds = (acceptedRows ?? [])
-        .map((row) => (row as { card_id: string | null }).card_id)
-        .filter((id): id is string => !!id)
-
-      const candidates = buildCandidatesFromCards({
-        cards,
-        recentLogs: logRows ?? [],
-        deckImportance,
-        now: ctx.now,
-        acceptedCardIds,
-      })
+      const { cards, templatesById, candidates } = inputs
 
       // The goal's domain decides the plan shape. This call used to pass neither, so every
       // learner got `DEFAULT_MIX` regardless of what they said they were studying and the
@@ -1089,56 +1235,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         return false
       }
 
-      const cardsById = new Map(cards.map((card) => [card.id, card]))
-      // Candidates carry the recall estimate; planner output does not, because the planner does
-      // not score on it (see PlannerCandidate.retrievability). Keyed on candidateId, which is
-      // what the planner preserves through ranking and selection.
-      const recallByCandidate = new Map(
-        candidates
-          .filter((candidate) => typeof candidate.retrievability === 'number')
-          .map((candidate) => [candidate.candidateId, candidate.retrievability as number]),
-      )
-      const items = output.items.map((item) => {
-        const card = item.cardId ? cardsById.get(item.cardId) : undefined
-        const shape = card
-          ? legacyCardItemShape(card, card.template_id ? templatesById.get(card.template_id) : null)
-          : {
-            activityType: item.activityType, stimulusType: 'text',
-            responseType: 'self_rate', evaluatorType: 'self_rate', answerFaces: null,
-          }
-        // `payload` carries two independent records, and either can be absent.
-        //
-        // `typed_answer` records WHICH fields the plan called prompt and reference, decided
-        // here and never re-derived: a template edited after today's plan was written must not
-        // change what today's plan meant.
-        //
-        // `recall_probability` is the estimate this row was CHOSEN on, stored so the plan can
-        // SHOW its reasoning instead of only asserting it. Omitted when the estimate is null —
-        // a new card has no forgetting curve, and `recall_probability: null` would render as a
-        // number-shaped absence rather than no claim at all.
-        //
-        // `daily_plan_items.payload` already exists and `save_daily_plan` already writes it
-        // (mig 167), so neither record needs a migration. The key is omitted entirely when BOTH
-        // are absent, so `save_daily_plan` keeps writing its `'{}'` default for every other item.
-        const recall = recallByCandidate.get(item.candidateId)
-        const payload = {
-          ...(planItemAnswerPayload(shape) ?? {}),
-          ...(recall === undefined ? {} : { recall_probability: recall }),
-        }
-        return {
-          activity_id: item.activityId,
-          card_id: item.cardId,
-          concept_id: item.conceptId,
-          activity_type: shape.activityType,
-          stimulus_type: shape.stimulusType,
-          response_type: shape.responseType,
-          evaluator_type: shape.evaluatorType,
-          reason_code: item.reasonCode,
-          priority: item.priority,
-          estimated_minutes: item.estimatedMinutes,
-          ...(Object.keys(payload).length > 0 ? { payload } : {}),
-        }
-      })
+      const items = toPlanItemRows(output, cards, templatesById, candidates)
 
       const { error: saveErr } = await supabase.rpc('save_daily_plan', {
         p_goal_id: goal.id,
@@ -1160,6 +1257,94 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       return false
     } finally {
       set({ planGenerating: false })
+    }
+  },
+
+  extendPlan: async (goal, ctx) => {
+    const { plan, planItems, planExtending, planGenerating } = get()
+    // Nothing to append TO. The RPC would raise P0003, but the honest reading is that the
+    // caller asked to extend a plan that does not exist — which is a bug, not a user error.
+    if (!plan || planExtending || planGenerating) return false
+
+    set({ planExtending: true, planError: null, planBlockedReason: null, planExtension: null })
+    try {
+      const { data: userData } = await supabase.auth.getUser()
+      const userId = userData?.user?.id
+      if (!userId) throw { code: 'P0001', message: 'Authentication required' }
+
+      const already = new Set(
+        planItems.map((item) => item.card_id).filter((id): id is string => !!id),
+      )
+      const inputs = await collectPlanInputs(goal, ctx, userId, already)
+      if (inputs.blocked) {
+        set({ planBlockedReason: inputs.blocked })
+        return false
+      }
+      const { cards, templatesById, candidates } = inputs
+
+      const output = buildDailyPlan({
+        goal: toDomainGoal(goal, userId),
+        candidates,
+        // A fixed small block, not another full day. "더 하기" is meant to be pressed again if
+        // it was not enough, and each press should be a decision the learner can stop making —
+        // whereas one press that silently doubles a 60-minute goal is not.
+        budgetMinutes: EXTRA_BLOCK_MINUTES,
+        // Deliberately uncapped, unlike the daily plan. The learner has already met the intake
+        // they set for today; refusing to start anything new would make this button do nothing
+        // on the very day it is most wanted — the day they finished early. The cost is stated
+        // instead, in `planExtension`.
+        newCardsPerDay: undefined,
+        activityMix: activityMixForDomain(goal.domain_id),
+        now: ctx.now,
+        timezone: ctx.timezone,
+        algorithmVersion: DAILY_PLANNER_VERSION,
+      }, {
+        supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
+      })
+      if (output.items.length === 0) {
+        set({ planBlockedReason: 'no_candidates' })
+        return false
+      }
+
+      const items = toPlanItemRows(output, cards, templatesById, candidates)
+      const { data, error: appendErr } = await supabase.rpc('append_daily_plan_items', {
+        p_goal_id: goal.id,
+        p_plan_date: ctx.planDate,
+        p_items: items,
+      })
+      if (appendErr) throw appendErr
+
+      const appended = Number((data as { appended?: number } | null)?.appended ?? 0)
+
+      await get().fetchPlan(goal.id, ctx.planDate)
+
+      // Which items were added is read back from the PLAN, not inferred from the payload.
+      // The RPC skips cards already present and reports only how many — and a skip can fall
+      // anywhere in the list, so taking the first `appended` items of what was sent would name
+      // the wrong ones whenever `planItems` was stale (another device, another tab). The rows
+      // that are in the plan now and were not before are exactly the ones that landed.
+      const cardsById = new Map(cards.map((card) => [card.id, card]))
+      const newCards = get().planItems.filter((item) => {
+        if (!item.card_id || already.has(item.card_id)) return false
+        const card = cardsById.get(item.card_id)
+        // A card with no review history is intake. Absent from the map means it came from an
+        // earlier append this session and is not ours to count.
+        return !!card && !card.last_reviewed_at
+      }).length
+
+      set({
+        planExtension: {
+          appended,
+          newCards,
+          reviewsTomorrow: reviewsAddedTomorrow(newCards),
+        },
+      })
+      return appended > 0
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    } finally {
+      set({ planExtending: false })
     }
   },
 
@@ -1585,6 +1770,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // "there is no plan today" about the account that just signed OUT, and a surviving
       // `autoPlanAttempted` would refuse to build one for the account that signed in.
       planAbsentFor: null, autoPlanAttempted: {},
+      planExtending: false, planExtension: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
       enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
       enrichmentSaving: false, enrichmentQuote: null,

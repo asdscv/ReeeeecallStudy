@@ -187,7 +187,14 @@
     "regenerate": "Rebuild plan",
     "regenerating": "Rebuilding…",
     "title": "Today's plan",
-    "backToPlans": "All plans"
+    "backToPlans": "All plans",
+    "extend": "Study more",
+    "extending": "Adding…",
+    "extendAdded_one": "Added {{count, number}} more item.",
+    "extendAdded_other": "Added {{count, number}} more items.",
+    "extendTomorrow_one": "{{count, number}} of them is new, so tomorrow gains that many reviews.",
+    "extendTomorrow_other": "{{count, number}} of them are new, so tomorrow gains that many reviews.",
+    "extendNothing": "There's nothing left to add right now."
   },
   "progress": {
     "title": "Progress",

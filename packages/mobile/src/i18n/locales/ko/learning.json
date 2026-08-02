@@ -187,7 +187,14 @@
     "regenerate": "플랜 다시 만들기",
     "regenerating": "다시 만드는 중…",
     "title": "오늘의 플랜",
-    "backToPlans": "플랜 목록"
+    "backToPlans": "플랜 목록",
+    "extend": "더 하기",
+    "extending": "추가하는 중…",
+    "extendAdded_one": "{{count, number}}개를 더 넣었습니다.",
+    "extendAdded_other": "{{count, number}}개를 더 넣었습니다.",
+    "extendTomorrow_one": "그중 새 카드가 {{count, number}}장이라, 내일 복습이 그만큼 늘어납니다.",
+    "extendTomorrow_other": "그중 새 카드가 {{count, number}}장이라, 내일 복습이 그만큼 늘어납니다.",
+    "extendNothing": "지금 더 넣을 것이 없습니다."
   },
   "progress": {
     "title": "진행 상황",

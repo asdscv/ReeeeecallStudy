@@ -82,13 +82,14 @@ const goalRow = {
 const goalWithDecks = (decks: Array<{ deck_id: string; importance: number }>): LearningGoalWithDecks =>
   ({ ...goalRow, decks })
 
-function cardRow(id: string) {
+function cardRow(id: string, over: Record<string, unknown> = {}) {
   return {
     id, deck_id: 'deck-1', user_id: 'user-1', template_id: 'tpl-1',
     field_values: { front: 'q', back: 'a' }, tags: [], sort_position: 1,
     srs_status: 'review', ease_factor: 2.5, interval_days: 3, repetitions: 2,
     next_review_at: '2026-07-30T00:00:00.000Z', last_reviewed_at: null,
     created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z',
+    ...over,
   }
 }
 
@@ -1022,6 +1023,151 @@ describe('goal writes', () => {
 
     expect(ok).toBe(false)
     expect(useLearningStore.getState().goalsError?.code).toBe('NOT_FOUND')
+  })
+})
+
+// ── extendPlan ─────────────────────────────────────────────────────────────
+//
+// "더 하기". The operation that could not exist before mig 185: the only way to add work to a
+// day was `save_daily_plan`, which deletes every item and zeroes the day's progress — so a
+// learner who had done half the plan and wanted more would have lost the half they did.
+describe('extendPlan', () => {
+  const DECKS = [{ deck_id: 'deck-1', importance: 0.5 }]
+
+  const planRow = (over: Record<string, unknown> = {}) => ({
+    id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+    algorithm_version: 'daily-plan-v1', input_fingerprint: 'fnv1a32:deadbeef',
+    status: 'completed', budget_minutes: 20, completed_minutes: 12, completed_items: 1,
+    total_items: 1, ...over,
+  })
+
+  const itemRow = (id: string, cardId: string, position: number) => ({
+    id, plan_id: 'plan-1', position, activity_id: null, card_id: cardId, concept_id: null,
+    activity_type: 'flashcard_recall', stimulus_type: 'text', response_type: 'self_rate',
+    evaluator_type: 'self_rate', reason_code: 'due', priority: 0.5, estimated_minutes: 0.5,
+    status: 'completed', payload: {},
+  })
+
+  /** A plan already on screen with `card-1` done. */
+  const withPlan = () => {
+    useLearningStore.setState({
+      plan: planRow() as never,
+      planItems: [itemRow('item-1', 'card-1', 0)] as never,
+    })
+  }
+
+  /** The re-read `fetchPlan` performs after a successful append. */
+  const queueReread = (items: unknown[]) => {
+    queue('daily_plans', { data: planRow({ status: 'active', total_items: items.length }), error: null })
+    queue('daily_plan_items', { data: items, error: null })
+    queue('cards', { data: [], error: null })
+  }
+
+  it('refuses when there is no plan to add to', async () => {
+    // Not a user error — the caller asked to extend something that is not there. The RPC
+    // would raise P0003, which would surface as a failure the learner cannot act on.
+    const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(ok).toBe(false)
+    // Not a single query either. Without the guard this falls through to candidate
+    // collection, finds nothing, and reports `no_candidates` — the same outward result for
+    // a completely different reason, which is how "extend" would come to mean "generate".
+    expect(mockFrom).not.toHaveBeenCalled()
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('appends rather than saving — the destructive RPC is never called', async () => {
+    // The whole point. `save_daily_plan` would DELETE every item and reset completed_items.
+    withPlan()
+    queue('cards', { data: [cardRow('card-2')], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 1, skipped: 0 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0), itemRow('item-2', 'card-2', 1)])
+
+    const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(ok).toBe(true)
+    const names = mockRpc.mock.calls.map(([name]) => name)
+    expect(names).toContain('append_daily_plan_items')
+    expect(names).not.toContain('save_daily_plan')
+  })
+
+  it('does not re-offer a card that is already on today\'s list', async () => {
+    // The server skips duplicates, but a payload made only of them returns "0 appended",
+    // which the learner reads as "there is nothing left to study" when there is.
+    withPlan()
+    queue('cards', { data: [cardRow('card-1')], error: null })
+    queue('study_logs', { data: [], error: null })
+
+    const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(ok).toBe(false)
+    expect(useLearningStore.getState().planBlockedReason).toBe('no_candidates')
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('states how much tomorrow grows, counted from the plan the server returned', async () => {
+    // The one cost a learner cannot see today: every new card started now comes back
+    // tomorrow. `card-2` has never been reviewed, so it is intake.
+    withPlan()
+    queue('cards', { data: [cardRow('card-2', { last_reviewed_at: null })], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 1, skipped: 0 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0), itemRow('item-2', 'card-2', 1)])
+
+    await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(useLearningStore.getState().planExtension)
+      .toEqual({ appended: 1, newCards: 1, reviewsTomorrow: 1 })
+  })
+
+  it('counts no new intake when the extra work is all review', async () => {
+    // A card WITH a review history is not intake, so tomorrow does not grow by it.
+    withPlan()
+    queue('cards', { data: [cardRow('card-2', { last_reviewed_at: '2026-07-20T00:00:00.000Z' })], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 1, skipped: 0 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0), itemRow('item-2', 'card-2', 1)])
+
+    await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(useLearningStore.getState().planExtension)
+      .toEqual({ appended: 1, newCards: 0, reviewsTomorrow: 0 })
+  })
+
+  it('reports what the server accepted, not what was sent', async () => {
+    // A stale `planItems` — another device, another tab — means some of the payload is
+    // already there. The server skips those and says so; claiming otherwise would tell the
+    // learner they have work that does not exist.
+    withPlan()
+    queue('cards', { data: [cardRow('card-2'), cardRow('card-3')], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 1, skipped: 1 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0), itemRow('item-2', 'card-2', 1)])
+
+    await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(useLearningStore.getState().planExtension?.appended).toBe(1)
+  })
+
+  it('does not run twice at once', async () => {
+    withPlan()
+    useLearningStore.setState({ planExtending: true })
+
+    const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(ok).toBe(false)
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('clears the last result before starting, so a failure cannot show a stale success', async () => {
+    withPlan()
+    useLearningStore.setState({ planExtension: { appended: 9, newCards: 9, reviewsTomorrow: 9 } })
+    queue('cards', { data: [], error: null })
+
+    await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(useLearningStore.getState().planExtension).toBeNull()
   })
 })
 
