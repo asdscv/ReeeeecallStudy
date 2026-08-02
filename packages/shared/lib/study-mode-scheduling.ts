@@ -10,8 +10,11 @@
 // why. The daily plan reads `next_review_at`, so from its point of view that day did not happen.
 //
 // This lives here rather than inline in the store because the disclosure has to appear where the
-// learner meets it — the goal form, the plan, and the history screen's mode breakdown — and
-// three copies of `mode === 'srs'` is how the fact and the behaviour drift apart.
+// learner meets it, and copies of `mode === 'srs'` are how the fact and the behaviour drift
+// apart. Read today by the store (which decides whether to send an SRS payload) and by the mode
+// breakdown on BOTH history screens (which decides whether to warn). The goal form and the plan
+// state the same thing in prose rather than through this predicate, because they are talking
+// about the plan as a whole rather than about one mode.
 import type { StudyMode } from '../types/database'
 
 /**

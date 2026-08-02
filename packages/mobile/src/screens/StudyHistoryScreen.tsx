@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { modeFeedsSrsSchedule } from '@reeeeecall/shared/lib/study-mode-scheduling'
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -260,6 +261,14 @@ export function StudyHistoryScreen() {
                             <Text style={[theme.typography.caption, { color: palette.blue[600], fontWeight: '500' }]}>
                               {mb.avgPerformance}%
                             </Text>
+                            {/* Only SRS reschedules — every other mode sends `p_new_srs: null`.
+                                Web says so on the same breakdown; without this the two platforms
+                                would disagree about the same screen. */}
+                            {!modeFeedsSrsSchedule(mb.mode) && (
+                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                                {t('noSrsEffect')}
+                              </Text>
+                            )}
                           </View>
                         </View>
                       ))}

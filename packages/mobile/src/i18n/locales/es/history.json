@@ -51,5 +51,6 @@
     "performance": "Rendimiento",
     "streak": "Racha",
     "avgDuration": "Duración media"
-  }
+  },
+  "noSrsEffect": "no cambia el calendario"
 }

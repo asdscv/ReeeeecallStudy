@@ -51,5 +51,6 @@
     "performance": "表现",
     "streak": "连续天数",
     "avgDuration": "平均时长"
-  }
+  },
+  "noSrsEffect": "不影响复习安排"
 }

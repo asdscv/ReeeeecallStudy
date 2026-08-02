@@ -20,10 +20,15 @@
 -- permanent — so the honest question is the one Anki's own statistics ask: has this survived
 -- across weeks. 21 days is Anki's convention and admittedly arbitrary (its author: "there's
 -- nothing special about 21 days in particular"), but it is the shipped dashboard's rule, it is
--- monotone in the way a badge needs, and adopting it makes the two definitions ONE.
+-- and adopting it makes the two definitions ONE.
 --
--- Existing badges are unaffected: `user_achievements` rows persist once inserted, so nobody
--- loses an award. Tightening the rule only changes when the NEXT one fires.
+-- WHAT LEARNERS WILL SEE. No badge is lost — `user_achievements` rows persist once inserted —
+-- but the visible COUNT drops for anyone who had banked cards under the old rule, and the count
+-- is not monotone either way: a lapse sets `interval_days` to 0, so a card can leave the mature
+-- set. `get_next_milestone` reads only the current count, so without help it would offer someone
+-- holding `mastery_1000` a next goal of 50. `get_next_goals` below is therefore changed to floor
+-- the category at the highest milestone already earned, so the next goal is always the next
+-- UNEARNED one.
 -- ============================================================================
 
 BEGIN;
@@ -39,7 +44,6 @@ CREATE OR REPLACE FUNCTION public.mature_card_count(p_user_id uuid)
   RETURNS bigint
   LANGUAGE sql
   STABLE
-  SECURITY DEFINER
   SET search_path = public
 AS $$
   SELECT count(*) FROM cards
@@ -48,8 +52,21 @@ AS $$
     AND interval_days >= 21;
 $$;
 
-REVOKE EXECUTE ON FUNCTION public.mature_card_count(uuid) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.mature_card_count(uuid) TO authenticated;
+-- INVOKER, not DEFINER, and not reachable from PostgREST at all.
+--
+-- The first draft copied 181's REVOKE/GRANT pair without copying what makes it safe: 181's
+-- `get_goal_knowledge` checks ownership in its body, and this helper takes a uuid and checks
+-- nothing. As SECURITY DEFINER granted to `authenticated` it therefore bypassed RLS on `cards`
+-- for ANY id a caller supplied, and user ids are enumerable (`get_leaderboard` returns them).
+-- An authenticated attacker could read a stranger's mature-card count while RLS correctly showed
+-- them zero of the rows behind it — confirmed against a live database before this line changed.
+--
+-- SECURITY INVOKER fixes it properly rather than papering over it with a guard: a direct caller
+-- now sees only what RLS allows them to see, and the two SECURITY DEFINER functions below still
+-- get the full count because they execute as the owner. `service_role` keeps EXECUTE because the
+-- blanket REVOKE would otherwise strip the grant it inherits from PUBLIC.
+REVOKE EXECUTE ON FUNCTION public.mature_card_count(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.mature_card_count(uuid) TO service_role;
 
 -- ── get_next_goals: unchanged except the mastery expression (1 occurrence(s)) ──
 CREATE OR REPLACE FUNCTION public.get_next_goals(p_user_id uuid DEFAULT NULL::uuid)
@@ -62,7 +79,16 @@ DECLARE
   v_uid UUID := COALESCE(p_user_id, auth.uid());
   v_stats RECORD;
 BEGIN
-  IF p_user_id IS NOT NULL AND p_user_id <> auth.uid() AND NOT is_admin() AND auth.role() <> 'service_role' THEN
+  -- `p_user_id <> auth.uid()` evaluates to NULL for an unauthenticated caller, so the whole
+  -- conjunction was NULL and this IF never fired: as `anon`, `check_achievements('<any uuid>')`
+  -- awarded badges and XP to a stranger's account. Confirmed against a live database. Requiring
+  -- a caller identity first is what closes it; `IS DISTINCT FROM` keeps the comparison honest
+  -- even if auth.uid() is somehow null past this point.
+  IF auth.uid() IS NULL AND auth.role() IS DISTINCT FROM 'service_role' THEN
+    RAISE EXCEPTION 'Authentication required' USING ERRCODE = 'P0001';
+  END IF;
+  IF p_user_id IS NOT NULL AND p_user_id IS DISTINCT FROM auth.uid()
+     AND NOT is_admin() AND auth.role() IS DISTINCT FROM 'service_role' THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
 
@@ -90,7 +116,22 @@ BEGIN
       ('time', v_stats.total_time_min),
       ('mastery', v_stats.mastered_cards)
     ) AS t(category, current_value),
-    LATERAL get_next_milestone(t.category, t.current_value) m
+    -- Floored at the highest milestone this learner already HOLDS, not just at their current
+    -- count. `get_next_milestone` reads the count alone, so tightening the mastery rule would
+    -- otherwise hand someone wearing the 1,000-card badge a next goal of 50 — verified before
+    -- this line existed. Achievement ids are `<category>_<value>`, which is how 070 mints them.
+    LATERAL get_next_milestone(
+      t.category,
+      GREATEST(
+        t.current_value,
+        COALESCE((
+          SELECT MAX(NULLIF(regexp_replace(ua.achievement_id, '^' || t.category || '_', ''), ua.achievement_id)::bigint)
+          FROM user_achievements ua
+          WHERE ua.user_id = v_uid
+            AND ua.achievement_id ~ ('^' || t.category || '_[0-9]+$')
+        ), 0)
+      )
+    ) m
   ));
 END;
 $function$;
@@ -111,7 +152,16 @@ DECLARE
   v_next RECORD;
   v_achievement_id TEXT;
 BEGIN
-  IF p_user_id IS NOT NULL AND p_user_id <> auth.uid() AND NOT is_admin() AND auth.role() <> 'service_role' THEN
+  -- `p_user_id <> auth.uid()` evaluates to NULL for an unauthenticated caller, so the whole
+  -- conjunction was NULL and this IF never fired: as `anon`, `check_achievements('<any uuid>')`
+  -- awarded badges and XP to a stranger's account. Confirmed against a live database. Requiring
+  -- a caller identity first is what closes it; `IS DISTINCT FROM` keeps the comparison honest
+  -- even if auth.uid() is somehow null past this point.
+  IF auth.uid() IS NULL AND auth.role() IS DISTINCT FROM 'service_role' THEN
+    RAISE EXCEPTION 'Authentication required' USING ERRCODE = 'P0001';
+  END IF;
+  IF p_user_id IS NOT NULL AND p_user_id IS DISTINCT FROM auth.uid()
+     AND NOT is_admin() AND auth.role() IS DISTINCT FROM 'service_role' THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
 
