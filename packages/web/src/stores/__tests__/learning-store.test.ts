@@ -44,7 +44,7 @@ import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
 function q(result: unknown) {
   const settled = Promise.resolve(result)
   const builder: Record<string, unknown> = {}
-  for (const method of ['eq', 'neq', 'in', 'or', 'not', 'gte', 'order', 'limit', 'returns']) {
+  for (const method of ['eq', 'neq', 'in', 'or', 'not', 'is', 'gte', 'lte', 'order', 'limit', 'returns']) {
     builder[method] = () => builder
   }
   // Recorded, not just returned: the column list is the contract with PostgREST, and a column

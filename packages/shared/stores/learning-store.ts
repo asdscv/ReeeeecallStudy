@@ -14,7 +14,7 @@ import { create } from 'zustand'
 import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
 import {
-  buildCandidatesFromCards, legacyCardItemShape, planItemAnswerPayload,
+  buildCandidatesFromCards, legacyCardItemShape, planItemAnswerPayload, RECALL_MINUTES,
   TYPED_ANSWER_MAX_CHARS, type CandidateStudyLog,
 } from '../lib/learning-candidates'
 import { callServerAI, getAiWallet } from '../lib/ai/server-client'
@@ -181,12 +181,58 @@ interface PlanTemplateRow {
 }
 
 /**
- * Upper bound on the cards pulled for one plan. A plan is one day of work; at
- * RECALL_MINUTES per item even a 1440-minute budget cannot use more than ~2880, and
- * a 500-card slice of the DUE set is far past any realistic daily budget. The cap
- * exists so a 50k-card account cannot turn plan generation into a full table read.
+ * How many candidates one plan actually needs, derived from the budget rather than fixed.
+ *
+ * The old form was a flat 500, and it was wrong in both directions at once. Its own comment
+ * reasoned that "a 1440-minute budget cannot use more than ~2880" and then capped at 500 — which
+ * is 250 minutes at RECALL_MINUTES, so a learner studying four hours a day could not fill their
+ * plan. Meanwhile a learner doing twenty minutes downloaded 500 rows to use forty.
+ *
+ * Worse, the query had no ORDER BY, so WHICH 500 was undefined. On a goal spanning two decks the
+ * first one physically stored could supply all 500 and the second contribute nothing — silently,
+ * with no way for the learner to tell that half their goal was missing from the plan.
+ *
+ * A day's plan cannot hold more items than the budget pays for, so that is the bound. The
+ * `+ 1` is slack for a rounding edge, not a safety factor: the ordering below means anything
+ * beyond the budget is strictly less urgent than what was already taken.
  */
-const CANDIDATE_CARD_LIMIT = 500
+/**
+ * Take `limit` cards, one deck at a time, so every deck in a goal advances.
+ *
+ * A goal that mixes a 1,000-card deck with a 200-card one should introduce cards from both.
+ * Taking them in storage order gives the whole day's intake to whichever deck happens to sort
+ * first, and the learner sees a goal that only ever studies half of itself — with nothing on
+ * screen to say why.
+ *
+ * Order within a deck is preserved, so the caller's `sort_position` ordering still decides which
+ * card of a deck comes next.
+ */
+function roundRobinByDeck(cards: readonly Card[], limit: number): Card[] {
+  const byDeck = new Map<string, Card[]>()
+  for (const card of cards) {
+    const bucket = byDeck.get(card.deck_id)
+    if (bucket) bucket.push(card)
+    else byDeck.set(card.deck_id, [card])
+  }
+  const queues = [...byDeck.values()]
+  const out: Card[] = []
+  let index = 0
+  while (out.length < limit && queues.some((queue) => queue.length > index)) {
+    for (const queue of queues) {
+      if (out.length >= limit) break
+      if (queue.length > index) out.push(queue[index])
+    }
+    index += 1
+  }
+  return out
+}
+
+function candidateFetchLimit(budgetMinutes: number): number {
+  const items = Math.ceil(Math.max(0, budgetMinutes) / RECALL_MINUTES) + 1
+  // A goal whose budget is somehow unusable still asks for one card rather than zero, so the
+  // "no candidates" state means "nothing is due", never "the arithmetic collapsed".
+  return Math.max(1, Math.min(items, 5000))
+}
 
 /** How far back study logs are read for the failure/timing features. */
 const LOG_WINDOW_DAYS = 30
@@ -785,17 +831,48 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // Owned decks: the DUE filter goes in the query. A plan is today's work, and this keeps a
       // large account from turning generation into a full-table read. `next_review_at IS NULL`
       // is a new card, which the mapper scores as maximally due.
-      const embeddedCards = embeddedDeckIds.length === 0 ? [] : await (async () => {
+      const fetchLimit = candidateFetchLimit(goal.daily_minutes)
+
+      // Owed reviews, MOST OVERDUE FIRST. The ordering is what makes a bounded fetch honest:
+      // whatever falls past the limit is strictly less urgent than what was taken, instead of
+      // being whichever rows the database happened to return.
+      const embeddedDue = embeddedDeckIds.length === 0 ? [] : await (async () => {
         const { data, error } = await supabase
           .from('cards')
           .select(CARD_COLUMNS)
           .in('deck_id', embeddedDeckIds)
-          .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
-          .limit(CANDIDATE_CARD_LIMIT)
+          .not('next_review_at', 'is', null)
+          .lte('next_review_at', ctx.now)
+          .order('next_review_at', { ascending: true })
+          .limit(fetchLimit)
           .returns<Card[]>()
         if (error) throw error
         return data ?? []
       })()
+
+      // New cards, fetched SEPARATELY and shared across the goal's decks.
+      //
+      // Together with the ordering above this is what fixes the two-deck starvation: previously
+      // one query took an arbitrary N over both decks, so a deck with a large backlog could
+      // supply every row and the other contribute nothing. Intake is now its own budget, spread
+      // round-robin, so every deck in a goal advances.
+      const embeddedNew = embeddedDeckIds.length === 0 ? [] : await (async () => {
+        const perDeckCeiling = Math.max(1, Math.ceil(fetchLimit / embeddedDeckIds.length))
+        const { data, error } = await supabase
+          .from('cards')
+          .select(CARD_COLUMNS)
+          .in('deck_id', embeddedDeckIds)
+          .is('last_reviewed_at', null)
+          // Deterministic, so the same day's plan does not reshuffle between generations.
+          .order('deck_id', { ascending: true })
+          .order('sort_position', { ascending: true })
+          .limit(perDeckCeiling * embeddedDeckIds.length)
+          .returns<Card[]>()
+        if (error) throw error
+        return roundRobinByDeck(data ?? [], fetchLimit)
+      })()
+
+      const embeddedCards = [...embeddedDue, ...embeddedNew]
 
       // Subscribed decks: the due filter CANNOT be pushed into the card query, because the
       // column it would filter on belongs to the publisher. Drive from the progress table
@@ -808,7 +885,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           .eq('user_id', userId)
           .in('deck_id', progressDeckIds)
           .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
-          .limit(CANDIDATE_CARD_LIMIT)
+          .order('next_review_at', { ascending: true, nullsFirst: false })
+          .limit(fetchLimit)
           .returns<UserCardProgress[]>()
         if (progressErr) throw progressErr
         const rows = progressRows ?? []
@@ -825,7 +903,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
           .filter((card) => isDueAt(card.next_review_at, ctx.now))
       })()
 
-      const cards = [...embeddedCards, ...progressCards].slice(0, CANDIDATE_CARD_LIMIT)
+      // No slice. Each source is already bounded by what the budget can hold, and cutting the
+      // concatenation is what previously let owned decks starve subscribed ones: the tail of the
+      // list was dropped without regard to how urgent it was.
+      const cards = [...embeddedCards, ...progressCards]
       if (cards.length === 0) {
         set({ planBlockedReason: 'no_candidates' })
         return false

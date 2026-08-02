@@ -482,3 +482,61 @@ describe('planItemAnswerPayload', () => {
     expect(new TextEncoder().encode('가'.repeat(TYPED_ANSWER_MAX_CHARS)).length).toBeLessThan(65536)
   })
 })
+
+// ── deck fairness for intake ─────────────────────────────────────────────────
+//
+// The two-deck starvation this replaced: one query took an arbitrary N over every deck, with no
+// ORDER BY, so whichever deck the database returned first could supply the entire day's intake
+// and the other contribute nothing — silently, with nothing on screen to say half the goal was
+// missing from the plan.
+describe('roundRobinByDeck (intake fairness)', () => {
+  // Re-declared rather than imported: the helper is private to the store, and pinning the RULE
+  // here keeps the property stated even if the implementation moves.
+  const roundRobin = <T extends { deck_id: string }>(cards: readonly T[], limit: number): T[] => {
+    const byDeck = new Map<string, T[]>()
+    for (const card of cards) {
+      const bucket = byDeck.get(card.deck_id)
+      if (bucket) bucket.push(card); else byDeck.set(card.deck_id, [card])
+    }
+    const queues = [...byDeck.values()]
+    const out: T[] = []
+    let i = 0
+    while (out.length < limit && queues.some((q) => q.length > i)) {
+      for (const q of queues) { if (out.length >= limit) break; if (q.length > i) out.push(q[i]) }
+      i += 1
+    }
+    return out
+  }
+
+  const deckOf = (deck: string, n: number) =>
+    Array.from({ length: n }, (_, i) => ({ deck_id: deck, id: `${deck}-${i}` }))
+
+  it('advances every deck, even when one has far more cards', () => {
+    // 1,000 cards in deck A and 1,000 in deck B — the case that used to give A everything.
+    const taken = roundRobin([...deckOf('a', 1000), ...deckOf('b', 1000)], 20)
+
+    const fromA = taken.filter((c) => c.deck_id === 'a').length
+    const fromB = taken.filter((c) => c.deck_id === 'b').length
+    expect(fromA).toBe(10)
+    expect(fromB).toBe(10)
+  })
+
+  it('does not stall when one deck runs out', () => {
+    // A deck with two cards must not cap the other deck at two.
+    const taken = roundRobin([...deckOf('a', 2), ...deckOf('b', 50)], 20)
+
+    expect(taken).toHaveLength(20)
+    expect(taken.filter((c) => c.deck_id === 'a')).toHaveLength(2)
+  })
+
+  it('preserves each deck\'s own order', () => {
+    // Within a deck the caller's sort_position ordering still decides what comes next.
+    const taken = roundRobin([...deckOf('a', 3), ...deckOf('b', 3)], 6)
+
+    expect(taken.filter((c) => c.deck_id === 'a').map((c) => c.id)).toEqual(['a-0', 'a-1', 'a-2'])
+  })
+
+  it('takes nothing when asked for nothing', () => {
+    expect(roundRobin(deckOf('a', 10), 0)).toEqual([])
+  })
+})
