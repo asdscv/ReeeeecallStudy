@@ -226,7 +226,11 @@ jobs:
         # Same upstream-5xx wrapper as the Integration job — see the script header.
         run: bash .github/scripts/supabase-up.sh
       - name: Idempotency check — running reset twice should pass
-        run: supabase db reset --no-seed
+        # Same wrapper as the bring-up. This step is not exempt from the flake — it
+        # took a run down on 2026-08-02 with a storage-API timeout — and it retries
+        # on the infrastructure signature ONLY, so a migration that genuinely is not
+        # idempotent still fails on the first try.
+        run: bash .github/scripts/supabase-up.sh reset-only
       - name: Stop
         if: always()
         run: supabase stop || true

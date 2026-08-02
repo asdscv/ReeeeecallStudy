@@ -22,15 +22,33 @@
 #
 # The retry is also LOUD. A ::warning:: on every attempt means a green check that
 # needed two tries still says so in the log, instead of quietly looking clean.
+#
+# MODES. `up` (default) starts the stack and applies the migrations. `reset-only`
+# re-applies them against a stack that is already running — the idempotency check,
+# which exists to prove that resetting twice works. That step was NOT wrapped when
+# this script was written, and on 2026-08-02 it took a CI run down on its own.
 set -uo pipefail
 
+MODE="${1:-up}"
 ATTEMPTS="${SUPABASE_UP_ATTEMPTS:-3}"
 
 # Matched against the CLI's own output. Kept narrow on purpose — this is the exact
 # class observed, and widening it is how a retry starts swallowing real errors.
 # 5xx is the upstream failing to serve; the second alternative is the CLI's wording
 # for the same thing, matched separately in case the numeric prefix ever changes.
-INFRA_RE='Error status 5[0-9][0-9]:|invalid response was received from the upstream server'
+#
+# The third alternative is a DIFFERENT failure from the same family, seen on
+# 2026-08-02 during the second `db reset`:
+#
+#   failed to execute http request: Get "http://127.0.0.1:54321/storage/v1/bucket":
+#   context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+#
+# Not an upstream 5xx — the CLI could not reach a container of the LOCAL stack
+# before its own timeout. Still infrastructure and never code: no migration can
+# make an HTTP client time out talking to the storage API. Matched as the pair
+# (failed request + deadline) rather than on "context deadline exceeded" alone,
+# which is generic enough to appear in a real failure.
+INFRA_RE='Error status 5[0-9][0-9]:|invalid response was received from the upstream server|failed to execute http request:.*context deadline exceeded'
 
 log_file="$(mktemp)"
 trap 'rm -f "$log_file"' EXIT
@@ -38,7 +56,11 @@ trap 'rm -f "$log_file"' EXIT
 for attempt in $(seq 1 "$ATTEMPTS"); do
   # tee so the log still STREAMS to the runner — a several-minute step that prints
   # nothing until it finishes is its own kind of unhelpful.
-  { supabase start && supabase db reset --no-seed; } 2>&1 | tee "$log_file"
+  if [ "$MODE" = "reset-only" ]; then
+    supabase db reset --no-seed 2>&1 | tee "$log_file"
+  else
+    { supabase start && supabase db reset --no-seed; } 2>&1 | tee "$log_file"
+  fi
   code="${PIPESTATUS[0]}"
 
   if [ "$code" -eq 0 ]; then
@@ -59,6 +81,13 @@ for attempt in $(seq 1 "$ATTEMPTS"); do
     # that just died, which fails differently and hides the original cause.
     supabase stop >/dev/null 2>&1 || true
     sleep "$((attempt * 10))"
+    # reset-only was handed a RUNNING stack, and the teardown above just took it
+    # away — so it has to be put back before the next reset. Bringing it up fully
+    # is also the only thing that fixes the failure this mode actually sees: a
+    # storage container that never became reachable.
+    if [ "$MODE" = "reset-only" ]; then
+      supabase start >/dev/null 2>&1 || true
+    fi
   fi
 done
 
