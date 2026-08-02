@@ -125,7 +125,8 @@ export function LearningTodayScreen() {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    extendPlan, planExtending, planExtension, recordAttempt,
     attempts, attemptsLoading, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     enrichmentQuote, loadEnrichmentQuote,
@@ -180,6 +181,30 @@ export function LearningTodayScreen() {
   useEffect(() => {
     if (goalId) void fetchPlan(goalId, planDate)
   }, [goalId, planDate, fetchPlan])
+
+  /**
+   * Same rule as web, from the same store action: build today's plan once the read has come back
+   * empty. Kept in the store rather than duplicated here — the decision has four conditions and
+   * two drifting copies of it would eventually wipe a day's progress.
+   */
+  useEffect(() => {
+    // A FRESH context, like `regenerate` — `now` is the planner's due-card cutoff, and this
+    // screen stays mounted across midnight, so a value captured at mount would plan against a
+    // stale clock.
+    if (goal) void autoGeneratePlan(goal, currentPlanContext())
+  }, [goal, planDate, autoGeneratePlan, planAbsentFor])
+
+  /**
+   * Whether automation still has its turn — the same conditions `autoGeneratePlan` checks.
+   *
+   * Read so the manual button does not flash for a frame between the empty read and the effect
+   * that acts on it. `planDate` rather than a fresh context: the key is a date, and re-reading
+   * the clock here would make this recompute on every render.
+   */
+  const autoWillRun = !!goal
+    && planAbsentFor === `${goal.id}|${planDate}`
+    && !autoPlanAttempted[`${goal.id}|${planDate}`]
+    && !!goal.decks?.length
 
   // Judged at the target date when the goal has one — "what will I still know on the day" — and
   // at today otherwise. Server-aggregated: the plan only ever loads DUE cards.
@@ -262,6 +287,12 @@ export function LearningTodayScreen() {
   const regenerate = useCallback(() => {
     if (goal) void generatePlan(goal, currentPlanContext())
   }, [goal, generatePlan])
+
+  // A fresh context, like `regenerate` — the screen stays mounted across midnight, so a value
+  // captured at mount would append to yesterday.
+  const studyMore = useCallback(() => {
+    if (goal) void extendPlan(goal, currentPlanContext())
+  }, [goal, extendPlan])
 
   const errorKey = (code: string): string => {
     switch (code) {
@@ -605,16 +636,54 @@ export function LearningTodayScreen() {
                   )
                 })}
 
+                {/* "더 하기" comes FIRST and is the primary action. Rebuilding is the
+                    destructive one — it deletes every item and zeroes the day's progress — so
+                    the additive option has to be the easier one to reach. */}
                 <TouchableOpacity
-                  disabled={planGenerating || plan.status === 'completed'}
+                  disabled={planExtending || planGenerating || !goal}
+                  onPress={studyMore}
+                  style={[
+                    styles.primaryBtn,
+                    { backgroundColor: theme.colors.primary },
+                    (planExtending || planGenerating || !goal) && styles.disabled,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: planExtending || planGenerating || !goal }}
+                  {...testProps('learning-extend')}
+                >
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
+                    {planExtending ? t('today.extending') : t('today.extend')}
+                  </Text>
+                </TouchableOpacity>
+
+                {planExtension && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textSecondary }]}
+                    accessibilityLiveRegion="polite"
+                    {...testProps('learning-extend-result')}
+                  >
+                    {planExtension.appended === 0
+                      ? t('today.extendNothing')
+                      // The cost, said out loud. Every card started today comes back tomorrow,
+                      // and a button that grows tomorrow's list in silence is how a learner
+                      // ends up abandoning a goal they were doing well at.
+                      : t('today.extendAdded', { count: planExtension.appended })
+                        + (planExtension.reviewsTomorrow > 0
+                          ? ' ' + t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })
+                          : '')}
+                  </Text>
+                )}
+
+                <TouchableOpacity
+                  disabled={planGenerating || planExtending || plan.status === 'completed'}
                   onPress={regenerate}
                   style={[
                     styles.secondaryBtn,
                     { borderColor: theme.colors.border },
-                    (planGenerating || plan.status === 'completed') && styles.disabled,
+                    (planGenerating || planExtending || plan.status === 'completed') && styles.disabled,
                   ]}
                   accessibilityRole="button"
-                  accessibilityState={{ disabled: planGenerating || plan.status === 'completed' }}
+                  accessibilityState={{ disabled: planGenerating || planExtending || plan.status === 'completed' }}
                   {...testProps('learning-regenerate')}
                 >
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
@@ -622,21 +691,33 @@ export function LearningTodayScreen() {
                   </Text>
                 </TouchableOpacity>
               </>
+            ) : planGenerating || autoWillRun ? (
+              // Building it. Not a button: the learner is being told what is happening, not
+              // asked to make it happen.
+              <Text
+                style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}
+                accessibilityLiveRegion="polite"
+                {...testProps('learning-generating')}
+              >
+                {t('today.generating')}
+              </Text>
             ) : !planBlockedReason ? (
+              // Only reachable once automation has had its turn and produced no plan — a failed
+              // save, or a goal already regenerated today. The button is the way back.
               <TouchableOpacity
-                disabled={planGenerating || !goal}
+                disabled={!goal}
                 onPress={regenerate}
                 style={[
                   styles.primaryBtn,
                   { backgroundColor: theme.colors.primary },
-                  (planGenerating || !goal) && styles.disabled,
+                  !goal && styles.disabled,
                 ]}
                 accessibilityRole="button"
-                accessibilityState={{ disabled: planGenerating || !goal }}
+                accessibilityState={{ disabled: !goal }}
                 {...testProps('learning-generate')}
               >
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
-                  {planGenerating ? t('today.generating') : t('today.generate')}
+                  {t('today.generate')}
                 </Text>
               </TouchableOpacity>
             ) : null}

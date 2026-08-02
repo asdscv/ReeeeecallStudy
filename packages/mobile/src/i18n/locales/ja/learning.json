@@ -187,7 +187,14 @@
     "regenerate": "プランを再作成",
     "regenerating": "再作成中…",
     "title": "今日のプラン",
-    "backToPlans": "プラン一覧"
+    "backToPlans": "プラン一覧",
+    "extend": "もっと学習",
+    "extending": "追加中…",
+    "extendAdded_one": "{{count, number}}件を追加しました。",
+    "extendAdded_other": "{{count, number}}件を追加しました。",
+    "extendTomorrow_one": "うち新規カードが{{count, number}}枚なので、明日の復習がその分増えます。",
+    "extendTomorrow_other": "うち新規カードが{{count, number}}枚なので、明日の復習がその分増えます。",
+    "extendNothing": "今は追加できるものがありません。"
   },
   "progress": {
     "title": "進捗",

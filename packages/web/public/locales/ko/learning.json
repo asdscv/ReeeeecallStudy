@@ -51,7 +51,14 @@
       "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다."
     },
     "recallChance": "지금 기억하고 있을 확률 약 {{percent}}%",
-    "backToPlans": "플랜 목록"
+    "backToPlans": "플랜 목록",
+    "extend": "더 하기",
+    "extending": "추가하는 중…",
+    "extendAdded_one": "{{count, number}}개를 더 넣었습니다.",
+    "extendAdded_other": "{{count, number}}개를 더 넣었습니다.",
+    "extendTomorrow_one": "그중 새 카드가 {{count, number}}장이라, 내일 복습이 그만큼 늘어납니다.",
+    "extendTomorrow_other": "그중 새 카드가 {{count, number}}장이라, 내일 복습이 그만큼 늘어납니다.",
+    "extendNothing": "지금 더 넣을 것이 없습니다."
   },
   "goals": {
     "title": "학습 목표",

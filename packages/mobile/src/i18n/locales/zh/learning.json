@@ -187,7 +187,14 @@
     "regenerate": "重新生成计划",
     "regenerating": "重新生成中…",
     "title": "今日计划",
-    "backToPlans": "计划列表"
+    "backToPlans": "计划列表",
+    "extend": "再学一些",
+    "extending": "正在添加…",
+    "extendAdded_one": "已添加 {{count, number}} 项。",
+    "extendAdded_other": "已添加 {{count, number}} 项。",
+    "extendTomorrow_one": "其中 {{count, number}} 张是新卡，明天的复习会相应增加。",
+    "extendTomorrow_other": "其中 {{count, number}} 张是新卡，明天的复习会相应增加。",
+    "extendNothing": "目前没有可添加的内容。"
   },
   "progress": {
     "title": "进度",

@@ -187,7 +187,14 @@
     "regenerate": "Buat ulang rencana",
     "regenerating": "Membuat ulang…",
     "title": "Rencana hari ini",
-    "backToPlans": "Semua rencana"
+    "backToPlans": "Semua rencana",
+    "extend": "Belajar lagi",
+    "extending": "Menambahkan…",
+    "extendAdded_one": "Menambahkan {{count, number}} item lagi.",
+    "extendAdded_other": "Menambahkan {{count, number}} item lagi.",
+    "extendTomorrow_one": "{{count, number}} di antaranya kartu baru, jadi ulasan besok bertambah sebanyak itu.",
+    "extendTomorrow_other": "{{count, number}} di antaranya kartu baru, jadi ulasan besok bertambah sebanyak itu.",
+    "extendNothing": "Tidak ada lagi yang bisa ditambahkan sekarang."
   },
   "progress": {
     "title": "Kemajuan",

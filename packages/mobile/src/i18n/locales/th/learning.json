@@ -187,7 +187,14 @@
     "regenerate": "สร้างแผนใหม่",
     "regenerating": "กำลังสร้างใหม่…",
     "title": "แผนวันนี้",
-    "backToPlans": "แผนทั้งหมด"
+    "backToPlans": "แผนทั้งหมด",
+    "extend": "เรียนเพิ่ม",
+    "extending": "กำลังเพิ่ม…",
+    "extendAdded_one": "เพิ่มอีก {{count, number}} รายการแล้ว",
+    "extendAdded_other": "เพิ่มอีก {{count, number}} รายการแล้ว",
+    "extendTomorrow_one": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
+    "extendTomorrow_other": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
+    "extendNothing": "ตอนนี้ไม่มีอะไรให้เพิ่มแล้ว"
   },
   "progress": {
     "title": "ความคืบหน้า",

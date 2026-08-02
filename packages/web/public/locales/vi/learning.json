@@ -51,7 +51,14 @@
       "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá."
     },
     "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
-    "backToPlans": "Tất cả kế hoạch"
+    "backToPlans": "Tất cả kế hoạch",
+    "extend": "Học thêm",
+    "extending": "Đang thêm…",
+    "extendAdded_one": "Đã thêm {{count, number}} mục nữa.",
+    "extendAdded_other": "Đã thêm {{count, number}} mục nữa.",
+    "extendTomorrow_one": "Trong đó có {{count, number}} thẻ mới, nên ngày mai sẽ có thêm bấy nhiêu lượt ôn.",
+    "extendTomorrow_other": "Trong đó có {{count, number}} thẻ mới, nên ngày mai sẽ có thêm bấy nhiêu lượt ôn.",
+    "extendNothing": "Hiện không còn gì để thêm."
   },
   "goals": {
     "title": "Mục tiêu học tập",

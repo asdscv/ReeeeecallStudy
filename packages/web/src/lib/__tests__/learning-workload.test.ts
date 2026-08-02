@@ -14,7 +14,9 @@
  * them, so the comparison is the test.
  */
 import { describe, expect, it } from 'vitest'
-import { projectWorkload, daysForDailyBudget, learningAnswers, INTERVALS_DAYS } from '@reeeeecall/shared/learning'
+import {
+  projectWorkload, daysForDailyBudget, learningAnswers, INTERVALS_DAYS, reviewsAddedTomorrow,
+} from '@reeeeecall/shared/learning'
 import { calculateSRS, type SrsCardData } from '@reeeeecall/shared/lib/srs'
 
 const BASE = { secondsPerCard: 8, lapseRate: 0.10, consolidationDays: 14, seenCards: 0 }
@@ -140,5 +142,29 @@ describe('refuses to estimate from nonsense', () => {
     ['NaN days', { daysAvailable: Number.NaN }],
   ])('%s', (_label, override) => {
     expect(() => projectWorkload({ ...BASE, unseenCards: 100, daysAvailable: 30, ...override })).toThrow()
+  })
+})
+
+describe('reviewsAddedTomorrow', () => {
+  it('says every new card comes back tomorrow', () => {
+    // What a learner pressing "더 하기" is actually deciding. Not "about seven reviews over a
+    // year" — true, but not a number anyone can act on tonight.
+    expect(reviewsAddedTomorrow(12)).toBe(12)
+    expect(reviewsAddedTomorrow(1)).toBe(1)
+  })
+
+  it('is zero when nothing new was started', () => {
+    // An extra block made entirely of reviews costs tomorrow nothing: those cards were coming
+    // back on their own schedule regardless.
+    expect(reviewsAddedTomorrow(0)).toBe(0)
+    expect(reviewsAddedTomorrow(-3)).toBe(0)
+    expect(reviewsAddedTomorrow(Number.NaN)).toBe(0)
+  })
+
+  it('is tied to the scheduler\'s first interval, not to the number 1', () => {
+    // The claim is only true because the first rung is one day. Pinned as a dependency so a
+    // scheduler change that moves the first review out makes this test the thing that fails,
+    // rather than the sentence on screen quietly becoming false.
+    expect(INTERVALS_DAYS[0]).toBe(1)
   })
 })

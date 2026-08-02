@@ -243,3 +243,19 @@ export function daysForDailyBudget(
   }
   return answer
 }
+
+/**
+ * How many reviews a batch of newly-started cards adds to TOMORROW.
+ *
+ * All of them, and this is the honest thing to tell a learner pressing "더 하기": the first
+ * rung of the ladder is one day, so every card started today comes back tomorrow. Not "about
+ * seven reviews over a year" — true, but not a number anyone can act on tonight.
+ *
+ * Derived from {@link INTERVALS_DAYS} rather than written as `n`, so it stays correct if the
+ * scheduler's first interval ever stops being one day: a first rung of 3 days would mean these
+ * cards land three days out, and tomorrow's answer becomes zero.
+ */
+export function reviewsAddedTomorrow(newCards: number): number {
+  if (!Number.isFinite(newCards) || newCards <= 0) return 0
+  return INTERVALS_DAYS[0] === 1 ? Math.floor(newCards) : 0
+}

@@ -421,7 +421,8 @@ export function LearningTodayPage() {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    extendPlan, planExtending, planExtension, recordAttempt,
     attempts, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     knowledge, fetchGoalKnowledge,
@@ -455,6 +456,33 @@ export function LearningTodayPage() {
 
   const goal: LearningGoalWithDecks | undefined =
     plannableGoals.find((candidate) => candidate.id === selectedGoalId)
+
+  /**
+   * Build today's plan on open, once the read has come back empty.
+   *
+   * This deliberately reverses the rule the earlier test pinned ("opening the page must not
+   * write a plan"). That guard existed because a naive mount effect would fire on `plan === null`
+   * — which is also the initial state and the failed-read state — and spend the 50-writes-a-day
+   * cap. `autoGeneratePlan` acts only on `planAbsentFor`, a fact only a SUCCESSFUL read sets, and
+   * attempts once per goal per day. The reason to reverse it: a learner opening the app to an
+   * empty screen and a button is being asked to do the one thing the app knows how to do itself.
+   */
+  useEffect(() => {
+    if (goal) void autoGeneratePlan(goal, ctx)
+  }, [goal, ctx, autoGeneratePlan, planAbsentFor])
+
+  /**
+   * Whether automation still has its turn — the same four conditions `autoGeneratePlan` checks.
+   *
+   * Read here so the manual button does not appear for the one frame between the empty read and
+   * the effect that acts on it. Duplicating the conditions is the lesser evil: the alternative is
+   * a store flag written by the effect, which would be a second source of truth for the same
+   * question and could disagree with the one that actually gates the write.
+   */
+  const autoWillRun = !!goal
+    && planAbsentFor === `${goal.id}|${ctx.planDate}`
+    && !autoPlanAttempted[`${goal.id}|${ctx.planDate}`]
+    && !!goal.decks?.length
 
   // Progress is judged at the goal's target date when it has one — "what will I still know on
   // exam day" — and at today otherwise. Server-aggregated: the plan only loads DUE cards.
@@ -631,10 +659,39 @@ export function LearningTodayPage() {
               )
             })}
           </ul>
+          {/* "더 하기" comes FIRST, and is the primary action once the day is done.
+              Rebuilding is the destructive one — it deletes every item and zeroes the day's
+              progress — so the additive option has to be the one that is easier to reach. */}
+          <button
+            type="button"
+            onClick={() => { if (goal) void extendPlan(goal, ctx) }}
+            disabled={planExtending || planGenerating || !goal}
+            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
+          >
+            {planExtending ? t('today.extending') : t('today.extend')}
+          </button>
+
+          {planExtension && (
+            <p className="text-xs text-content-tertiary text-center" aria-live="polite">
+              {planExtension.appended === 0
+                ? t('today.extendNothing')
+                : (
+                  <>
+                    {t('today.extendAdded', { count: planExtension.appended })}
+                    {/* The cost, said out loud. Every card started today comes back tomorrow,
+                        and a button that grows tomorrow's list in silence is how a learner
+                        ends up abandoning a goal they were doing well at. */}
+                    {planExtension.reviewsTomorrow > 0
+                      && ` ${t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })}`}
+                  </>
+                )}
+            </p>
+          )}
+
           <button
             type="button"
             onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={planGenerating || plan.status === 'completed'}
+            disabled={planGenerating || planExtending || plan.status === 'completed'}
             className="w-full px-3 py-2 text-sm border border-border rounded-lg cursor-pointer disabled:opacity-50"
           >
             {planGenerating ? t('today.regenerating') : t('today.regenerate')}
@@ -643,15 +700,23 @@ export function LearningTodayPage() {
             <p className="text-xs text-content-tertiary text-center">{t('today.completedNote')}</p>
           )}
         </>
+      ) : planGenerating || autoWillRun ? (
+        // Building it. No button: the learner is not being asked for anything, they are being
+        // told what is happening.
+        <p className="py-3 text-sm text-center text-muted-foreground" aria-live="polite">
+          {t('today.generating')}
+        </p>
       ) : (
+        // Only reachable once automation has had its turn and produced nothing — a failed save,
+        // or a goal the learner has already regenerated today. The button is the way back.
         !planBlockedReason && (
           <button
             type="button"
             onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={planGenerating || !goal}
+            disabled={!goal}
             className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
           >
-            {planGenerating ? t('today.generating') : t('today.generate')}
+            {t('today.generate')}
           </button>
         )
       )}
