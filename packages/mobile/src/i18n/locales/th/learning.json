@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "ยกเลิก",
-    "dailyMinutes": "นาทีต่อวัน",
-    "deckPriority": {
-      "high": "สูง",
-      "hint": "เด็คที่สำคัญกว่าจะขึ้นก่อนเมื่อวันนั้นเต็มแล้ว",
-      "label": "ลำดับความสำคัญ",
-      "low": "ต่ำ",
-      "normal": "ปกติ"
-    },
     "decks": "สำรับที่จะเรียน",
     "decksHint": "แผนของคุณสร้างจากการ์ดในสำรับเหล่านี้",
-    "domain": "สาขาวิชา",
-    "domainName": {
-      "general": "การเรียนทั่วไป",
-      "language": "เรียนภาษา"
-    },
     "error": {
-      "dailyMinutes": "จำนวนนาทีต่อวันต้องอยู่ระหว่าง 1 ถึง 1440",
-      "title": "กรุณาใส่ชื่อเป้าหมาย (1–500 ตัวอักษร)"
+      "title": "กรุณาใส่ชื่อเป้าหมาย (1–500 ตัวอักษร)",
+      "decks": "เลือกอย่างน้อยหนึ่งชุดการ์ด"
     },
     "goalTitle": "ชื่อเป้าหมาย",
     "goalTitlePlaceholder": "เช่น สอบผ่าน JLPT N2",
     "noDecks": "คุณยังไม่มีสำรับ",
     "save": "บันทึก",
-    "saving": "กำลังบันทึก…"
+    "saving": "กำลังบันทึก…",
+    "plan": {
+      "title": "แผนโดยประมาณ",
+      "needDecksAndDate": "เลือกชุดการ์ดและวันเป้าหมายเพื่อดูปริมาณต่อวัน",
+      "minutes": "{{count, number}} นาที/วัน",
+      "peak": "วันที่หนักที่สุด {{minutes, number}} นาที (วันที่ {{day, number}})",
+      "byMinutes": "หรือกำหนดนาที/วัน",
+      "finishBy": "เสร็จราว {{date}}",
+      "tooSlow": "เวลาเท่านี้ตามการทบทวนไม่ทัน",
+      "srsOnly": "นับเฉพาะการเรียนโหมด SRS เท่านั้นในแผนนี้",
+      "estimate": "เป็นค่าประมาณ คำนวณใหม่ทุกวันจากผลจริงของคุณ",
+      "newPerDay_one": "การ์ดใหม่ {{count, number}} ใบ/วัน",
+      "newPerDay_other": "การ์ดใหม่ {{count, number}} ใบ/วัน",
+      "newPerDay": "การ์ดใหม่ {{count, number}} ใบ/วัน"
+    },
+    "targetDate": "วันเป้าหมาย (ไม่บังคับ)",
+    "horizonMonths_one": "อีก {{count, number}} เดือน",
+    "horizonMonths_other": "อีก {{count, number}} เดือน",
+    "horizonMonths": "อีก {{count, number}} เดือน"
   },
   "goals": {
     "archive": "เก็บถาวร",
@@ -157,13 +162,11 @@
     },
     "generate": "สร้างแผนวันนี้",
     "generating": "กำลังสร้าง…",
-    "insightsLink": "วิเคราะห์",
     "item": {
       "minutes": "~{{count, decimal}} นาที",
       "recorded": "บันทึกแล้ว",
       "untitled": "(ไม่มีข้อความ)"
     },
-    "manageGoals": "จัดการเป้าหมาย",
     "progress": "เสร็จ {{done, number}} จาก {{total, number}}",
     "rate": {
       "again": "ไม่รู้",
@@ -183,6 +186,15 @@
     "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%",
     "regenerate": "สร้างแผนใหม่",
     "regenerating": "กำลังสร้างใหม่…",
-    "title": "แผนวันนี้"
+    "title": "แผนวันนี้",
+    "backToPlans": "แผนทั้งหมด",
+    "insightsLink": "วิเคราะห์",
+    "manageGoals": "จัดการเป้าหมาย"
+  },
+  "progress": {
+    "title": "ความคืบหน้า",
+    "knownNow": "จำได้ {{known, number}} จาก {{total, number}} ใบ",
+    "knownAtTarget": "วันที่ {{date}} จะยังจำได้ {{known, number}} จาก {{total, number}} ใบ",
+    "breakdown": "แม่น {{known, number}} · คลอนแคลน {{shaky, number}} · ยังไม่เริ่ม {{unseen, number}}"
   }
 }

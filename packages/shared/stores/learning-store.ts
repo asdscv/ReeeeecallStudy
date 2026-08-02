@@ -25,7 +25,9 @@ import {
   splitDecksBySrsSource, attachProgressToCards, isDueAt, type PlannerDeckMeta,
 } from '../lib/learning-card-sources'
 import type { UserCardProgress } from '../lib/srs-access'
-import { buildDailyPlan, DAILY_PLANNER_VERSION } from '../learning/application/index'
+import {
+  buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier,
+} from '../learning/application/index'
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card, LayoutItem, TemplateField } from '../types/database'
@@ -232,6 +234,15 @@ export interface AttemptRow {
  * scheduling, and recording an attempt deliberately does not touch interval/ease. The two
  * are different questions — "when should I see this again" vs "how did this attempt go".
  */
+/** Card counts for a goal, as `get_goal_knowledge` reports them. */
+export interface GoalKnowledge {
+  readonly total: number
+  /** Never reviewed. Kept out of both known and unknown — no evidence is not "forgotten". */
+  readonly unseen: number
+  readonly known: number
+  readonly unknown: number
+}
+
 export interface AttemptInput {
   planItem: DailyPlanItemRow
   goalId: string
@@ -427,6 +438,14 @@ interface LearningState {
    */
   enrichmentQuote: EnrichmentQuote | null
 
+  /**
+   * Goal progress from `get_goal_knowledge` (mig 181), keyed by goal id.
+   *
+   * Server-aggregated because the client never holds a goal's full card set — the plan fetches
+   * only DUE cards, capped, so a 10,000-card goal could not be counted here.
+   */
+  knowledge: Record<string, GoalKnowledge>
+  knowledgeLoading: boolean
   insights: LearningInsights | null
   insightsLoading: boolean
   /**
@@ -477,6 +496,7 @@ interface LearningState {
   loadEnrichmentQuote: () => Promise<void>
   resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
   dismissEnrichment: () => void
+  fetchGoalKnowledge: (goalId: string, atISO: string) => Promise<void>
   fetchInsights: (goalId: string) => Promise<void>
   fetchRecommendations: (goalId: string) => Promise<void>
   regenerateRecommendations: (goalId: string) => Promise<boolean>
@@ -514,6 +534,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   enrichmentError: null,
   enrichmentSaving: false,
   enrichmentQuote: null,
+  knowledge: {},
+  knowledgeLoading: false,
   insights: null,
   insightsLoading: false,
   insightsGoalId: null,
@@ -1172,6 +1194,45 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    * plans look back 14 because adherence is a habit question and a three-week-old miss says
    * nothing about this week.
    */
+  /**
+   * How much of this goal the learner would still know at `atISO`.
+   *
+   * The retention rule lives in the kernel, not in SQL: `retentionStabilityMultiplier` collapses
+   * the whole forgetting curve into one scalar the database can compare dates with. Changing the
+   * criterion therefore changes this number too, with no migration.
+   *
+   * Failures are swallowed into a null entry rather than surfaced as a page error — progress is
+   * a header on a screen whose real job is serving today's cards, and a summary that cannot load
+   * must not take the plan down with it.
+   */
+  fetchGoalKnowledge: async (goalId, atISO) => {
+    set({ knowledgeLoading: true })
+    try {
+      const { data, error } = await supabase.rpc('get_goal_knowledge', {
+        p_goal_id: goalId,
+        p_at: atISO,
+        p_stability_multiplier: retentionStabilityMultiplier(),
+      })
+      if (error) throw error
+      const row = (data ?? {}) as Partial<GoalKnowledge>
+      set((state) => ({
+        knowledge: {
+          ...state.knowledge,
+          [goalId]: {
+            total: Number(row.total ?? 0),
+            unseen: Number(row.unseen ?? 0),
+            known: Number(row.known ?? 0),
+            unknown: Number(row.unknown ?? 0),
+          },
+        },
+      }))
+    } catch (e) {
+      console.error('[learning-store] get_goal_knowledge failed:', e)
+    } finally {
+      set({ knowledgeLoading: false })
+    }
+  },
+
   fetchInsights: async (goalId) => {
     // Latest-wins, NOT first-wins. A busy-flag early return would drop the goal the learner
     // just selected and leave the previous goal's numbers under the new goal's label; a

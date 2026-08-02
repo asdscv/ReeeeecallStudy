@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "Kế hoạch hôm nay",
-    "manageGoals": "Quản lý mục tiêu",
-    "selectGoal": "Chọn mục tiêu",
     "budget": "{{count, number}} phút/ngày",
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
     "generate": "Tạo kế hoạch hôm nay",
@@ -52,13 +50,12 @@
       "placeholder": "Nhập những gì bạn còn nhớ",
       "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá."
     },
-    "insightsLink": "Phân tích",
-    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này"
+    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
+    "backToPlans": "Tất cả kế hoạch"
   },
   "goals": {
     "title": "Mục tiêu học tập",
     "subtitle": "Mục tiêu chứa số phút mỗi ngày và các bộ thẻ dùng để xây dựng kế hoạch.",
-    "todayLink": "Kế hoạch hôm nay",
     "create": "Mục tiêu mới",
     "edit": "Sửa",
     "archive": "Lưu trữ",
@@ -92,14 +89,8 @@
   "form": {
     "createTitle": "Mục tiêu mới",
     "editTitle": "Sửa mục tiêu",
-    "domain": "Lĩnh vực",
-    "domainName": {
-      "general": "Học tổng quát",
-      "language": "Học ngôn ngữ"
-    },
     "goalTitle": "Tên mục tiêu",
     "goalTitlePlaceholder": "VD: Đạt JLPT N2",
-    "dailyMinutes": "Số phút mỗi ngày",
     "targetDate": "Ngày mục tiêu (tùy chọn)",
     "decks": "Bộ thẻ để học",
     "decksHint": "Kế hoạch được xây dựng từ các thẻ trong những bộ thẻ này.",
@@ -109,14 +100,21 @@
     "saving": "Đang lưu…",
     "error": {
       "title": "Nhập tên mục tiêu (1–500 ký tự).",
-      "dailyMinutes": "Số phút mỗi ngày phải từ 1 đến 1440."
+      "decks": "Hãy chọn ít nhất một bộ thẻ."
     },
-    "deckPriority": {
-      "label": "Mức ưu tiên",
-      "low": "Thấp",
-      "normal": "Bình thường",
-      "high": "Cao",
-      "hint": "Bộ thẻ ưu tiên cao sẽ xuất hiện trước khi ngày đã kín."
+    "plan": {
+      "title": "Kế hoạch dự kiến",
+      "needDecksAndDate": "Chọn bộ thẻ và ngày mục tiêu để xem khối lượng mỗi ngày.",
+      "minutes": "{{count, number}} phút/ngày",
+      "peak": "Ngày bận nhất: {{minutes, number}} phút (ngày {{day, number}})",
+      "byMinutes": "Hoặc đặt phút/ngày",
+      "finishBy": "Hoàn tất khoảng {{date}}",
+      "tooSlow": "Thời lượng đó không theo kịp cả phần ôn tập.",
+      "srsOnly": "Chỉ việc học ở chế độ SRS được tính vào kế hoạch này.",
+      "estimate": "Đây là ước tính, được tính lại mỗi ngày từ kết quả thực tế của bạn.",
+      "newPerDay_one": "{{count, number}} thẻ mới/ngày",
+      "newPerDay_other": "{{count, number}} thẻ mới/ngày",
+      "newPerDay": "{{count, number}} thẻ mới/ngày"
     }
   },
   "history": {
@@ -195,5 +193,11 @@
       "dismissed": "Đã bỏ qua",
       "expired": "Đã hết hạn"
     }
+  },
+  "progress": {
+    "title": "Tiến độ",
+    "knownNow": "Nhớ {{known, number}} trong {{total, number}} thẻ",
+    "knownAtTarget": "Đến {{date}} vẫn nhớ {{known, number}} trong {{total, number}} thẻ",
+    "breakdown": "Chắc {{known, number}} · Lung lay {{shaky, number}} · Chưa bắt đầu {{unseen, number}}"
   }
 }

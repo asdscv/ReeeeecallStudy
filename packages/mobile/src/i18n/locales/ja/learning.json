@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "キャンセル",
-    "dailyMinutes": "1日の学習時間（分）",
-    "deckPriority": {
-      "high": "高",
-      "hint": "1日の枠が埋まっているとき、優先度の高いデッキが先に出ます。",
-      "label": "優先度",
-      "low": "低",
-      "normal": "標準"
-    },
     "decks": "学習デッキ",
     "decksHint": "プランは選択したデッキのカードから作成されます。",
-    "domain": "分野",
-    "domainName": {
-      "general": "一般学習",
-      "language": "語学学習"
-    },
     "error": {
-      "dailyMinutes": "1日の学習時間は1〜1440分の範囲で指定してください。",
-      "title": "目標名を1〜500文字で入力してください。"
+      "title": "目標名を1〜500文字で入力してください。",
+      "decks": "デッキを1つ以上選んでください。"
     },
     "goalTitle": "目標名",
     "goalTitlePlaceholder": "例：JLPT N2 合格",
     "noDecks": "デッキがまだありません。",
     "save": "保存",
-    "saving": "保存中…"
+    "saving": "保存中…",
+    "plan": {
+      "title": "予想学習プラン",
+      "needDecksAndDate": "デッキと目標日を決めると1日の分量を計算します。",
+      "minutes": "1日 {{count, number}}分",
+      "peak": "最も忙しい日 {{minutes, number}}分（{{day, number}}日目）",
+      "byMinutes": "または1日の時間で",
+      "finishBy": "{{date}}頃に完了",
+      "tooSlow": "この時間では復習量に追いつけません。",
+      "srsOnly": "SRSモードの学習のみこのプランに反映されます。",
+      "estimate": "推定値です。実際の成績から毎日再計算されます。",
+      "newPerDay_one": "1日の新規カード {{count, number}}枚",
+      "newPerDay_other": "1日の新規カード {{count, number}}枚",
+      "newPerDay": "1日の新規カード {{count, number}}枚"
+    },
+    "targetDate": "目標日（任意）",
+    "horizonMonths_one": "{{count, number}}か月後",
+    "horizonMonths_other": "{{count, number}}か月後",
+    "horizonMonths": "{{count, number}}か月後"
   },
   "goals": {
     "archive": "アーカイブ",
@@ -157,13 +162,11 @@
     },
     "generate": "今日のプランを作成",
     "generating": "作成中…",
-    "insightsLink": "学習診断",
     "item": {
       "minutes": "約 {{count, decimal}} 分",
       "recorded": "記録済み",
       "untitled": "（テキストなし）"
     },
-    "manageGoals": "目標を管理",
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "rate": {
       "again": "わからない",
@@ -183,6 +186,15 @@
     "recallChance": "いま思い出せる確率 約{{percent}}%",
     "regenerate": "プランを再作成",
     "regenerating": "再作成中…",
-    "title": "今日のプラン"
+    "title": "今日のプラン",
+    "backToPlans": "プラン一覧",
+    "insightsLink": "学習診断",
+    "manageGoals": "目標を管理"
+  },
+  "progress": {
+    "title": "進捗",
+    "knownNow": "{{total, number}}枚中 {{known, number}}枚を記憶",
+    "knownAtTarget": "{{date}}時点で {{total, number}}枚中 {{known, number}}枚を記憶",
+    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}"
   }
 }

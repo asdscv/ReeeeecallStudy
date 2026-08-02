@@ -27,6 +27,7 @@ MIGRATIONS=(
   168_ai_remediation_metering
   169_remove_customer_external_api_contract
   178_enrichment_attempt_provenance
+  181_goal_knowledge_summary
 )
 # Rollbacks run in reverse dependency order.
 #
@@ -35,6 +36,7 @@ MIGRATIONS=(
 # by its exact 12-argument signature — so reverting 168 first would leave the 13-arg
 # function behind, and the zero-residue assertion would (correctly) fail.
 ROLLBACKS=(
+  181_goal_knowledge_summary.down
   178_enrichment_attempt_provenance.down
   169_remove_customer_external_api_contract.down
   168_ai_remediation_metering.down
