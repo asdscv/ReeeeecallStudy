@@ -187,9 +187,7 @@
     "regenerate": "สร้างแผนใหม่",
     "regenerating": "กำลังสร้างใหม่…",
     "title": "แผนวันนี้",
-    "backToPlans": "แผนทั้งหมด",
-    "insightsLink": "วิเคราะห์",
-    "manageGoals": "จัดการเป้าหมาย"
+    "backToPlans": "แผนทั้งหมด"
   },
   "progress": {
     "title": "ความคืบหน้า",

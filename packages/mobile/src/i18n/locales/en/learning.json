@@ -187,9 +187,7 @@
     "regenerate": "Rebuild plan",
     "regenerating": "Rebuilding…",
     "title": "Today's plan",
-    "backToPlans": "All plans",
-    "insightsLink": "Insights",
-    "manageGoals": "Manage goals"
+    "backToPlans": "All plans"
   },
   "progress": {
     "title": "Progress",

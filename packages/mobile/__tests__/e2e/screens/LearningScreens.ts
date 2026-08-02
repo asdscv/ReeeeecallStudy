@@ -94,9 +94,16 @@ class LearningTodayPO {
     return exists(this.screenId)
   }
 
-  openInsights() { return tap('learning-insights-link') }
-  openGoals() { return tap('learning-manage-goals') }
+  /** The plan's only way out: back to the list. */
+  openGoals() { return tap('learning-back-to-plans') }
   openGoalsFromEmptyState() { return tap('learning-create-goal') }
+
+  /** Goal progress, which replaced the chip row that used to switch plans from inside one. */
+  hasProgress() { return exists('learning-progress') }
+
+  async pageSource(): Promise<string> {
+    return (await browser.getPageSource().catch(() => '')) ?? ''
+  }
 }
 
 class LearningGoalsPO {
@@ -108,8 +115,14 @@ class LearningGoalsPO {
   toggleCreateForm() { return tap('learning-goal-new') }
   hasTitleInput() { return exists('learning-goal-title') }
   hasSaveButton() { return exists('learning-goal-save') }
-  hasDomainChip(domain: 'language' | 'labor-law') { return exists(`learning-goal-domain-${domain}`) }
-  selectDomain(domain: 'language' | 'labor-law') { return tap(`learning-goal-domain-${domain}`) }
+  /**
+   * The form asks for three things now. 과목 was removed (the shipped adapters are identical
+   * apart from their id), 덱별 중요도 was removed (the app can infer it better than the learner),
+   * and 하루 몇 분 became an output — `learning-goal-plan-summary` is where it is reported.
+   */
+  hasHorizonChip(months: 1 | 3 | 6 | 12) { return exists(`learning-goal-horizon-${months}`) }
+  selectHorizon(months: 1 | 3 | 6 | 12) { return tap(`learning-goal-horizon-${months}`) }
+  hasPlanSummary() { return exists('learning-goal-plan-summary') }
 
   async typeTitle(value: string) {
     if (!await waitForId('learning-goal-title', 8000)) return false
@@ -121,26 +134,9 @@ class LearningGoalsPO {
 
   goalCard(index = 0) { return exists(`learning-goal-${index}`) }
   archiveAction(index = 0) { return exists(`learning-goal-archive-${index}`) }
-}
 
-class LearningInsightsPO {
-  readonly screenId = 'learning-insights-screen'
-
-  waitForScreen(timeoutMs = 20000) { return waitForId(this.screenId, timeoutMs) }
-  isDisplayed() { return exists(this.screenId) }
-
-  hasAttempts() { return exists('learning-insights-attempts') }
-  hasAccuracy() { return exists('learning-insights-accuracy') }
-  hasError() { return exists('learning-insights-error') }
-  hasRetry() { return exists('learning-insights-retry') }
-  hasRegenerate() { return exists('learning-recommend-refresh') }
-
-  /** The rendered accuracy string — "no data" and a real 0% must be distinguishable. */
-  async accuracyText(): Promise<string> {
-    if (!await waitForId('learning-insights-accuracy-value', 8000)) return ''
-    const el = await element('learning-insights-accuracy-value')
-    return (await el.getText().catch(() => '')) ?? ''
-  }
+  /** The list is the way into a plan now — the card title opens it. */
+  openPlan(index = 0) { return tap(`learning-goal-open-${index}`) }
 
   async pageSource(): Promise<string> {
     return (await browser.getPageSource().catch(() => '')) ?? ''
@@ -167,4 +163,3 @@ export async function measuredHeight(ids: readonly string[]): Promise<{ id: stri
 
 export const LearningToday = new LearningTodayPO()
 export const LearningGoals = new LearningGoalsPO()
-export const LearningInsights = new LearningInsightsPO()

@@ -4,8 +4,10 @@ import {
   RefreshControl,
 } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
+import type { SettingsStackParamList } from '../navigation/types'
 import { testProps } from '../utils/testProps'
 import { availableDomainIds, projectWorkload } from '@reeeeecall/shared/learning'
 import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
@@ -45,6 +47,7 @@ const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 export function LearningGoalsScreen() {
   const { t } = useTranslation('learning')
   const theme = useTheme()
+  const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
   const { goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal } = useLearningStore()
   const { decks, stats, fetchDecks, fetchStats } = useDeckStore()
   const userId = useAuthStore((state) => state.user?.id)
@@ -352,9 +355,22 @@ export function LearningGoalsScreen() {
             style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
             {...testProps(`learning-goal-${index}`, true)}
           >
-            <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]} numberOfLines={1}>
-              {goal.title}
-            </Text>
+            {/* The card IS the way in. Plans used to be switched from a chip row inside the plan
+                itself; this list opens one instead. Archived goals stay unopenable — the RPCs
+                reject them, so a tap would only surface a confusing NOT_FOUND. */}
+            <TouchableOpacity
+              disabled={goal.status !== 'active'}
+              onPress={() => navigation.navigate('LearningToday', { goalId: goal.id })}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: goal.status !== 'active' }}
+              {...testProps(`learning-goal-open-${index}`)}
+            >
+              <Text style={[theme.typography.bodySmall, {
+                color: goal.status === 'active' ? theme.colors.primary : theme.colors.text,
+              }]} numberOfLines={1}>
+                {goal.title}
+              </Text>
+            </TouchableOpacity>
             <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
               {t('goals.dailyMinutes', { count: goal.daily_minutes })}
               {' · '}

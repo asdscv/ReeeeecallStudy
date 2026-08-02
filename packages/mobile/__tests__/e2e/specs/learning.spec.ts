@@ -1,5 +1,5 @@
 /**
- * Learning engine — the three screens the product's newest surface is made of.
+ * Learning engine — the list, and the plan you open from it.
  *
  * These are deliberately NOT re-tests of the arithmetic: `summarizeLearning` is a pure
  * function with its own unit tests, and re-asserting percentages through a simulator would
@@ -15,7 +15,7 @@
  *      device's own units — 44pt is the iOS HIG minimum, 48dp Material's.
  */
 import { navigateToDrawerItem } from '../helpers/navigation'
-import { LearningToday, LearningGoals, LearningInsights, measuredHeight } from '../screens/LearningScreens'
+import { LearningToday, LearningGoals, measuredHeight } from '../screens/LearningScreens'
 
 /**
  * Any `namespace.key.path` that leaked into rendered text.
@@ -56,15 +56,16 @@ describe('Learning engine screens', () => {
     await browser.pause(1500)
   })
 
-  it('opens today\'s plan from the drawer', async () => {
-    const shown = await LearningToday.waitForScreen()
-    if (!shown) await browser.saveScreenshot('./test-results/learning-today-not-found.png')
+  it('opens the plan LIST from the drawer', async () => {
+    // The drawer used to land inside one plan, chosen for you. It lands on the list now.
+    const shown = await LearningGoals.waitForScreen()
+    if (!shown) await browser.saveScreenshot('./test-results/learning-goals-not-found.png')
     expect(shown).toBe(true)
   })
 
-  it('renders no raw i18n key anywhere on today\'s plan', async () => {
-    await LearningToday.waitForScreen()
-    const leaked = rawKeysInText(await LearningInsights.pageSource())
+  it('renders no raw i18n key anywhere on the plan list', async () => {
+    await LearningGoals.waitForScreen()
+    const leaked = rawKeysInText(await LearningGoals.pageSource())
     if (leaked.length > 0) {
       console.log('[learning] raw keys on today screen:', leaked.join(', '))
       await browser.saveScreenshot('./test-results/learning-today-raw-keys.png')
@@ -72,23 +73,61 @@ describe('Learning engine screens', () => {
     expect(leaked).toEqual([])
   })
 
-  it('offers exactly one of: generate a plan, act on a plan, or create a goal', async () => {
-    await LearningToday.waitForScreen()
+  it('opens the goal form, which asks for three things and answers the fourth', async () => {
+    await LearningGoals.waitForScreen()
+    expect(await LearningGoals.toggleCreateForm()).toBe(true)
+
+    const [title, save, horizon] = await Promise.all([
+      LearningGoals.hasTitleInput(),
+      LearningGoals.hasSaveButton(),
+      LearningGoals.hasHorizonChip(3),
+    ])
+    expect(title).toBe(true)
+    expect(save).toBe(true)
+    // Horizon chips instead of a calendar: a native date picker would mean a new native
+    // dependency, and every release would become a store rebuild rather than an OTA.
+    expect(horizon).toBe(true)
+
+    const leaked = rawKeysInText(await LearningGoals.pageSource())
+    if (leaked.length > 0) console.log('[learning] raw keys on goal form:', leaked.join(', '))
+    expect(leaked).toEqual([])
+
+    await LearningGoals.toggleCreateForm()
+  })
+
+  it('opens a plan from the list, or shows the empty state — never a dead end', async () => {
+    await LearningGoals.waitForScreen()
+    const opened = await LearningGoals.openPlan(0)
+    if (!opened) {
+      // No goals yet. The list must then say so rather than render an empty page.
+      await browser.saveScreenshot('./test-results/learning-goals-empty.png')
+      expect(await LearningGoals.isDisplayed()).toBe(true)
+      return
+    }
+
+    expect(await LearningToday.waitForScreen()).toBe(true)
+
     const [generate, regenerate, createGoal] = await Promise.all([
       LearningToday.hasGenerateAction(),
       LearningToday.hasRegenerateAction(),
       LearningToday.hasCreateGoalCta(),
     ])
-    // A screen with none of the three is a dead end, which is the state this guards against.
+    // A plan offering none of the three is a dead end, which is the state this guards against.
     expect(generate || regenerate || createGoal).toBe(true)
+
+    const leaked = rawKeysInText(await LearningToday.pageSource())
+    if (leaked.length > 0) {
+      console.log('[learning] raw keys on the plan:', leaked.join(', '))
+      await browser.saveScreenshot('./test-results/learning-plan-raw-keys.png')
+    }
+    expect(leaked).toEqual([])
   })
 
   it('sizes the primary action to the platform minimum', async () => {
-    await LearningToday.waitForScreen()
     const min = await minTouchPx()
-
     const { id: measuredId, height: measured } = await measuredHeight([
       'learning-rate-known-0', 'learning-generate', 'learning-regenerate', 'learning-create-goal',
+      'learning-goal-new',
     ])
 
     expect(measured).toBeGreaterThan(0)
@@ -97,59 +136,11 @@ describe('Learning engine screens', () => {
     expect(measured).toBeGreaterThanOrEqual(min - 1)
   })
 
-  it('reaches the diagnostics screen and never leaves accuracy blank', async () => {
-    await LearningToday.waitForScreen()
-    const opened = await LearningToday.openInsights()
-    expect(opened).toBe(true)
-
-    const shown = await LearningInsights.waitForScreen()
-    if (!shown) await browser.saveScreenshot('./test-results/learning-insights-not-found.png')
-    expect(shown).toBe(true)
-
-    // With no goal the screen legitimately shows only the empty state; with a goal it shows
-    // either the numbers or an error with a retry. A screen with none of those is the blank
-    // dead end this asserts against.
-    const [attempts, error, retry] = await Promise.all([
-      LearningInsights.hasAttempts(),
-      LearningInsights.hasError(),
-      LearningInsights.hasRetry(),
-    ])
-    if (attempts) {
-      const accuracy = await LearningInsights.accuracyText()
-      console.log(`[learning] accuracy cell = "${accuracy}"`)
-      // "no data" and "0%" are different statements; an empty cell is neither.
-      expect(accuracy.trim().length).toBeGreaterThan(0)
-    } else if (error) {
-      expect(retry).toBe(true)
-    }
-
-    const leaked = rawKeysInText(await LearningInsights.pageSource())
-    if (leaked.length > 0) console.log('[learning] raw keys on insights:', leaked.join(', '))
-    expect(leaked).toEqual([])
-  })
-
-  it('opens the goal form with every field it needs', async () => {
-    // The previous test left us on the diagnostics screen, which is pushed — the drawer is
-    // not reachable from there.
-    await LearningToday.ensureVisible()
-    const opened = await LearningToday.openGoals() || await LearningToday.openGoalsFromEmptyState()
-    expect(opened).toBe(true)
+  it('gets back to the list from inside a plan', async () => {
+    // The plan has exactly one way out now. Two header links that both went to the same place —
+    // one of them labelled for a screen that no longer exists — was the shape this replaced.
+    if (!await LearningToday.isDisplayed()) return
+    expect(await LearningToday.openGoals()).toBe(true)
     expect(await LearningGoals.waitForScreen()).toBe(true)
-
-    expect(await LearningGoals.toggleCreateForm()).toBe(true)
-    const [title, save, language] = await Promise.all([
-      LearningGoals.hasTitleInput(),
-      LearningGoals.hasSaveButton(),
-      LearningGoals.hasDomainChip('language'),
-    ])
-    expect(title).toBe(true)
-    expect(save).toBe(true)
-    // The domain is a fixed choice because `domain_id` selects a planner adapter; a form
-    // without it would create goals nothing can plan for.
-    expect(language).toBe(true)
-
-    const leaked = rawKeysInText(await LearningInsights.pageSource())
-    if (leaked.length > 0) console.log('[learning] raw keys on goals:', leaked.join(', '))
-    expect(leaked).toEqual([])
   })
 })

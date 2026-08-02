@@ -187,9 +187,7 @@
     "regenerate": "Buat ulang rencana",
     "regenerating": "Membuat ulang…",
     "title": "Rencana hari ini",
-    "backToPlans": "Semua rencana",
-    "insightsLink": "Analisis",
-    "manageGoals": "Kelola tujuan"
+    "backToPlans": "Semua rencana"
   },
   "progress": {
     "title": "Kemajuan",
