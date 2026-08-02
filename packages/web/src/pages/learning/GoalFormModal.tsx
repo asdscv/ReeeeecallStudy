@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   availableDomainIds, projectWorkload, daysForDailyBudget,
+  parseCadence, studyDaysBetween, perStudyDayMultiplier,
 } from '@reeeeecall/shared/learning'
 import { useTranslation } from 'react-i18next'
 import type { LearningGoalWithDecks, GoalDeckLink } from '../../stores/learning-store'
@@ -62,6 +63,13 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   const { decks, stats, fetchDecks, fetchStats } = useDeckStore()
   const { user } = useAuthStore()
 
+  /**
+   * How often this learner studies. Read from the goal rather than asked for: there is no
+   * control for it yet, and every existing goal was planned as if every day were a study day —
+   * which is exactly what `parseCadence` returns for a goal that has never stored one.
+   */
+  const cadence = useMemo(() => parseCadence(goal?.settings), [goal])
+
   const [title, setTitle] = useState(goal?.title ?? '')
   const [targetDate, setTargetDate] = useState(goal?.target_date ?? '')
   const [deckIds, setDeckIds] = useState<Set<string>>(
@@ -110,19 +118,39 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
     consolidationDays: CONSOLIDATION_DAYS,
   }
 
-  /** Date-driven: how much per day. Null until there is something to compute from. */
+  /**
+   * Date-driven: how much per STUDY day.
+   *
+   * The projection runs over calendar days because that is when reviews come due — a card is due
+   * in three days whether or not the learner studies then. Studying fewer days does not reduce
+   * the work, it concentrates it, so the per-day figures are scaled up by the inverse of the
+   * study ratio afterwards rather than the horizon being shortened beforehand.
+   */
   const projection = useMemo(() => {
     if (selection.total === 0 || daysAvailable === null) return null
-    return projectWorkload({ ...workloadInput, daysAvailable })
+    if (studyDaysBetween(cadence, daysAvailable) < 1) return null
+    const raw = projectWorkload({ ...workloadInput, daysAvailable })
+    const perDay = perStudyDayMultiplier(cadence)
+    return {
+      ...raw,
+      averageMinutesPerDay: raw.averageMinutesPerDay * perDay,
+      peakMinutesPerDay: raw.peakMinutesPerDay * perDay,
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection.unseen, selection.seen, selection.total, daysAvailable])
+  }, [selection.unseen, selection.seen, selection.total, daysAvailable, cadence])
 
   /** Budget-driven: when it finishes. Null when the budget cannot keep up at all. */
   const daysForBudget = useMemo(() => {
     if (selection.total === 0 || budgetMinutes === null || budgetMinutes <= 0) return null
-    return daysForDailyBudget({ ...workloadInput, minutesPerDay: budgetMinutes })
+    // The budget is what the learner does IN A SESSION. Spread back over calendar days before
+    // asking how long it takes, or a three-days-a-week learner is told the finish date of
+    // someone studying daily.
+    return daysForDailyBudget({
+      ...workloadInput,
+      minutesPerDay: budgetMinutes / perStudyDayMultiplier(cadence),
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection.unseen, selection.seen, selection.total, budgetMinutes])
+  }, [selection.unseen, selection.seen, selection.total, budgetMinutes, cadence])
 
   const budgetFinishDate = daysForBudget === null
     ? null
