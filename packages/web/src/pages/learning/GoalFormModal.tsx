@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   availableDomainIds, projectWorkload, daysForDailyBudget,
-  parseCadence, studyDaysBetween, perStudyDayMultiplier,
+  parseCadence, parseNewCardsPerDay, studyDaysBetween, perStudyDayMultiplier,
+  DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning'
 import { useTranslation } from 'react-i18next'
 import type { LearningGoalWithDecks, GoalDeckLink } from '../../stores/learning-store'
@@ -35,6 +36,8 @@ export interface GoalFormValues {
   dailyMinutes: number
   targetDate: string | null
   decks: GoalDeckLink[]
+  /** Study rhythm and daily intake limit, stored in `learning_goals.settings`. */
+  settings: Record<string, unknown>
 }
 
 /**
@@ -68,7 +71,24 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
    * control for it yet, and every existing goal was planned as if every day were a study day —
    * which is exactly what `parseCadence` returns for a goal that has never stored one.
    */
-  const cadence = useMemo(() => parseCadence(goal?.settings), [goal])
+  const [studyDays, setStudyDays] = useState(() => parseCadence(goal?.settings).studyDays)
+  /**
+   * The cycle stays 7 until there is a control for it. The stored shape is already general —
+   * `{ cycleDays, studyDays }` says "15 days a month" as easily as "3 a week" — so opening that
+   * up later is a second input, not a migration or a rewrite.
+   */
+  const cadence = useMemo(() => ({ cycleDays: 7, studyDays }), [studyDays])
+
+  /**
+   * New cards to start per study day.
+   *
+   * Twenty is the figure every mainstream SRS ships as its default, and it is a defensible one:
+   * each new card commits the learner to roughly seven reviews over the following year, so 20/day
+   * settles at a few hundred reviews a day rather than an unbounded climb.
+   */
+  const [newCardsPerDay, setNewCardsPerDay] = useState(
+    () => parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
+  )
 
   const [title, setTitle] = useState(goal?.title ?? '')
   const [targetDate, setTargetDate] = useState(goal?.target_date ?? '')
@@ -179,6 +199,9 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
       ))),
       targetDate: targetDate || null,
       decks: [...deckIds].map((deck_id) => ({ deck_id, importance: NEUTRAL_IMPORTANCE })),
+      // Stored whole rather than merged into whatever was there: these two are the only keys
+      // anything writes, and a read-modify-write here would race an edit made on another device.
+      settings: { cadence, newCardsPerDay },
     })
   }
 
@@ -230,6 +253,41 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
             className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
           />
         </label>
+
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="text-xs text-muted-foreground">{t('form.studyDays')}</span>
+            <select
+              value={studyDays}
+              onChange={(e) => setStudyDays(Number(e.target.value))}
+              className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
+            >
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                <option key={n} value={n}>{t('form.studyDaysOption', { count: n })}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="text-xs text-muted-foreground">{t('form.newCardsPerDay')}</span>
+            <input
+              type="number"
+              min={0}
+              max={999}
+              value={newCardsPerDay}
+              onChange={(e) => {
+                // Clamped here rather than on submit: a controlled number input that accepts a
+                // value it will later discard shows the learner a figure the plan never used.
+                const next = Number(e.target.value)
+                setNewCardsPerDay(Number.isFinite(next) ? Math.max(0, Math.min(999, Math.trunc(next))) : 0)
+              }}
+              className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
+            />
+          </label>
+        </div>
+        {/* Said once, plainly, because it is the rule that makes the number safe: intake yields
+            to work already owed, so falling behind pauses new cards instead of compounding. */}
+        <p className="text-[11px] text-content-tertiary">{t('form.newCardsHint')}</p>
 
         {/* ── The plan this goal implies, before it is saved ────────────────── */}
         <section

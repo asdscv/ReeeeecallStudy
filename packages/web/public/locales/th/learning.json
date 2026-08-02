@@ -115,7 +115,12 @@
       "newPerDay_one": "การ์ดใหม่ {{count, number}} ใบ/วัน",
       "newPerDay_other": "การ์ดใหม่ {{count, number}} ใบ/วัน",
       "newPerDay": "การ์ดใหม่ {{count, number}} ใบ/วัน"
-    }
+    },
+    "studyDays": "จำนวนวันเรียนต่อสัปดาห์",
+    "studyDaysOption_other": "{{count}} วัน",
+    "newCardsPerDay": "การ์ดใหม่ต่อวันเรียน",
+    "newCardsHint": "ทบทวนมาก่อน หากตามไม่ทัน การ์ดใหม่จะหยุดจนกว่าคุณจะตามทัน",
+    "studyDaysOption_one": "{{count}} วัน"
   },
   "history": {
     "title": "การทำล่าสุด ({{count, number}})",

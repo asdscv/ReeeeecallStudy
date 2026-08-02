@@ -115,7 +115,12 @@
       "newPerDay_one": "{{count, number}} kartu baru/hari",
       "newPerDay_other": "{{count, number}} kartu baru/hari",
       "newPerDay": "{{count, number}} kartu baru/hari"
-    }
+    },
+    "studyDays": "Hari belajar per minggu",
+    "studyDaysOption_other": "{{count}} hari",
+    "newCardsPerDay": "Kartu baru per hari belajar",
+    "newCardsHint": "Ulangan didahulukan. Jika tertinggal, kartu baru dijeda sampai kamu menyusul.",
+    "studyDaysOption_one": "{{count}} hari"
   },
   "history": {
     "title": "Percobaan terbaru ({{count, number}})",

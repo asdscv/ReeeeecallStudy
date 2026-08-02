@@ -136,3 +136,18 @@ export function parseNewCardsPerDay(raw: unknown): number | undefined {
   if (n < 0 || n > 9999) return undefined
   return n
 }
+
+/**
+ * New cards to start per study day, for a goal that has not chosen a number.
+ *
+ * Twenty is what every mainstream spaced-repetition tool ships, and the arithmetic supports it:
+ * each new card commits the learner to roughly seven reviews over the following year, so 20/day
+ * settles at a few hundred reviews a day rather than climbing without bound.
+ *
+ * It lives here, next to the reader, but is deliberately NOT what `parseNewCardsPerDay` returns
+ * for a goal with nothing stored. That function answers "what did this goal choose", and the
+ * honest answer for an old row is "nothing" — applying a default there would silently cap plans
+ * whose owners never asked for one. This constant is for the FORM, where the learner can see the
+ * number and change it.
+ */
+export const DEFAULT_NEW_CARDS_PER_DAY = 20

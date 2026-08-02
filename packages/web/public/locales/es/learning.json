@@ -115,7 +115,12 @@
       "newPerDay_one": "{{count, number}} tarjeta nueva/día",
       "newPerDay_other": "{{count, number}} tarjetas nuevas/día",
       "newPerDay": "{{count, number}} tarjetas nuevas/día"
-    }
+    },
+    "studyDays": "Días de estudio por semana",
+    "studyDaysOption_one": "{{count}} día",
+    "studyDaysOption_other": "{{count}} días",
+    "newCardsPerDay": "Tarjetas nuevas por día de estudio",
+    "newCardsHint": "Los repasos van primero. Si te atrasas, las tarjetas nuevas se pausan hasta que te pongas al día."
   },
   "history": {
     "title": "Intentos recientes ({{count, number}})",

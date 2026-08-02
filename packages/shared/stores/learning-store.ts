@@ -432,6 +432,15 @@ export interface CreateGoalInput {
   dailyMinutes: number
   targetDate?: string | null
   decks?: GoalDeckLink[]
+  /**
+   * Goal-scoped settings, stored as-is in `learning_goals.settings`.
+   *
+   * The study rhythm and the daily intake limit live here rather than in columns of their own:
+   * the jsonb column has existed since mig 165, both RPCs already accept it, and neither value
+   * is ever queried on — they are read back with the goal and handed to the planner. A column
+   * would buy nothing and cost a migration.
+   */
+  settings?: Record<string, unknown>
 }
 
 export interface UpdateGoalInput {
@@ -439,6 +448,8 @@ export interface UpdateGoalInput {
   title?: string
   dailyMinutes?: number
   targetDate?: string | null
+  /** See CreateGoalInput.settings. Omitted leaves the stored value untouched. */
+  settings?: Record<string, unknown>
   status?: 'active' | 'paused' | 'completed'
   decks?: GoalDeckLink[]
 }
@@ -641,6 +652,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         p_title: input.title,
         p_daily_minutes: input.dailyMinutes,
         p_target_date: input.targetDate ?? null,
+        ...(input.settings ? { p_settings: input.settings } : {}),
       })
       if (error) throw error
       const goalId = (data as { goal_id?: string } | null)?.goal_id ?? null
@@ -672,6 +684,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       if (input.dailyMinutes !== undefined) payload.p_daily_minutes = input.dailyMinutes
       if (input.targetDate !== undefined) payload.p_target_date = input.targetDate
       if (input.status !== undefined) payload.p_status = input.status
+      if (input.settings !== undefined) payload.p_settings = input.settings
       const { error } = await supabase.rpc('update_learning_goal', payload)
       if (error) throw error
       if (input.decks) {

@@ -115,7 +115,12 @@
       "newPerDay_one": "{{count, number}} new card/day",
       "newPerDay_other": "{{count, number}} new cards/day",
       "newPerDay": "{{count, number}} new cards/day"
-    }
+    },
+    "studyDays": "Study days per week",
+    "studyDaysOption_one": "{{count}} day",
+    "studyDaysOption_other": "{{count}} days",
+    "newCardsPerDay": "New cards per study day",
+    "newCardsHint": "Reviews come first. If you fall behind, new cards pause until you catch up."
   },
   "history": {
     "title": "Recent attempts ({{count, number}})",

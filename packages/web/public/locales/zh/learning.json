@@ -115,7 +115,12 @@
       "newPerDay_one": "每天新卡 {{count, number}} 张",
       "newPerDay_other": "每天新卡 {{count, number}} 张",
       "newPerDay": "每天新卡 {{count, number}} 张"
-    }
+    },
+    "studyDays": "每周学习天数",
+    "studyDaysOption_other": "{{count}}天",
+    "newCardsPerDay": "每个学习日的新卡片",
+    "newCardsHint": "先复习。落后时会暂停新卡片，直到赶上为止。",
+    "studyDaysOption_one": "{{count}}天"
   },
   "history": {
     "title": "最近作答 ({{count, number}})",
