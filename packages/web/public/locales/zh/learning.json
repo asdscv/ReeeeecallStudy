@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "今日计划",
-    "manageGoals": "管理目标",
-    "selectGoal": "选择目标",
     "budget": "每天 {{count, number}} 分钟",
     "progress": "{{total, number}} 个中完成 {{done, number}} 个",
     "generate": "生成今日计划",
@@ -52,13 +50,12 @@
       "placeholder": "输入你记得的内容",
       "note": "与本次作答一同保存。不评分，仍由你自己评价。"
     },
-    "insightsLink": "诊断",
-    "recallChance": "你现在还记得的概率约 {{percent}}%"
+    "recallChance": "你现在还记得的概率约 {{percent}}%",
+    "backToPlans": "计划列表"
   },
   "goals": {
     "title": "学习目标",
     "subtitle": "目标包含每日学习时间和计划所用的牌组。",
-    "todayLink": "今日计划",
     "create": "新建目标",
     "edit": "编辑",
     "archive": "归档",
@@ -196,5 +193,11 @@
       "dismissed": "已忽略",
       "expired": "已过期"
     }
+  },
+  "progress": {
+    "title": "进度",
+    "knownNow": "{{total, number}} 张中已记住 {{known, number}} 张",
+    "knownAtTarget": "到 {{date}} 时 {{total, number}} 张中仍记得 {{known, number}} 张",
+    "breakdown": "牢固 {{known, number}} · 动摇 {{shaky, number}} · 未开始 {{unseen, number}}"
   }
 }

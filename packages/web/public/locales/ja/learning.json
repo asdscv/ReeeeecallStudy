@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "今日のプラン",
-    "manageGoals": "目標を管理",
-    "selectGoal": "目標を選択",
     "budget": "1日 {{count, number}} 分",
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "generate": "今日のプランを作成",
@@ -52,13 +50,12 @@
       "placeholder": "覚えている内容を入力してください",
       "note": "試行の記録と一緒に保存されます。採点はされず、評価は自分で選びます。"
     },
-    "insightsLink": "学習診断",
-    "recallChance": "いま思い出せる確率 約{{percent}}%"
+    "recallChance": "いま思い出せる確率 約{{percent}}%",
+    "backToPlans": "プラン一覧"
   },
   "goals": {
     "title": "学習目標",
     "subtitle": "目標には1日の学習時間とプランに使うデッキが含まれます。",
-    "todayLink": "今日のプラン",
     "create": "新しい目標",
     "edit": "編集",
     "archive": "アーカイブ",
@@ -196,5 +193,11 @@
       "dismissed": "無視済み",
       "expired": "期限切れ"
     }
+  },
+  "progress": {
+    "title": "進捗",
+    "knownNow": "{{total, number}}枚中 {{known, number}}枚を記憶",
+    "knownAtTarget": "{{date}}時点で {{total, number}}枚中 {{known, number}}枚を記憶",
+    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}"
   }
 }

@@ -30,7 +30,8 @@
 // adapter members nothing read) but because they are what the dashboard and the achievement
 // migration are being moved OFF of, and the migration needs to name the old rule to replace it.
 import {
-  DEFAULT_TARGET_RETENTION, elapsedDaysBetween, estimateMemory, retrievability, stabilityFromInterval,
+  DEFAULT_TARGET_RETENTION, FSRS_DECAY, FSRS_FACTOR,
+  elapsedDaysBetween, estimateMemory, retrievability, stabilityFromInterval,
 } from './memory.ts'
 import { validationError } from '../domain/errors.ts'
 
@@ -171,6 +172,30 @@ export function easeAboveDefaultCriterion(): KnowledgeCriterion {
     confidence: (card) => (card.srsStatus ? (known(card) ? 1 : 0) : null),
     isKnown: known,
   }
+}
+
+/**
+ * How many multiples of a card's stability may elapse before it drops below `targetRetention`.
+ *
+ * This is the whole forgetting curve, reduced to one number so a database can apply it without
+ * knowing the curve:
+ *
+ *     R(e, S) = (1 + FACTOR·e/S)^DECAY  >=  r
+ *   ⟺ e/S <= (r^(1/DECAY) - 1) / FACTOR
+ *
+ * `get_goal_knowledge` (migration 181) takes this scalar and compares dates. Re-deriving the
+ * curve in SQL would recreate the split this module exists to end — the app already shipped two
+ * definitions of "known" that disagreed.
+ *
+ * At the default target it comes out to exactly 1, which is why "known" reduces to the plainly
+ * readable "not overdue yet". That is a property of FSRS-5's constants, not a coincidence worth
+ * hard-coding: pass a different target and the multiplier moves with it.
+ */
+export function retentionStabilityMultiplier(targetRetention: number = DEFAULT_TARGET_RETENTION): number {
+  if (!Number.isFinite(targetRetention) || targetRetention <= 0 || targetRetention >= 1) {
+    throw validationError('targetRetention must be between 0 and 1 exclusive', { targetRetention })
+  }
+  return (Math.pow(targetRetention, 1 / FSRS_DECAY) - 1) / FSRS_FACTOR
 }
 
 /** Counts every surface reports. One shape, so the numbers cannot disagree between screens. */

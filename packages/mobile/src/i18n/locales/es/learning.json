@@ -162,13 +162,11 @@
     },
     "generate": "Crear plan de hoy",
     "generating": "Creando…",
-    "insightsLink": "Diagnóstico",
     "item": {
       "minutes": "~{{count, decimal}} min",
       "recorded": "Registrado",
       "untitled": "(sin texto)"
     },
-    "manageGoals": "Gestionar objetivos",
     "progress": "{{done, number}} de {{total, number}} completados",
     "rate": {
       "again": "No lo sabía",
@@ -188,6 +186,15 @@
     "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
     "regenerate": "Recrear plan",
     "regenerating": "Recreando…",
-    "title": "Plan de hoy"
+    "title": "Plan de hoy",
+    "backToPlans": "Todos los planes",
+    "insightsLink": "Diagnóstico",
+    "manageGoals": "Gestionar objetivos"
+  },
+  "progress": {
+    "title": "Progreso",
+    "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
+    "knownAtTarget": "{{known, number}} de {{total, number}} tarjetas aún recordadas el {{date}}",
+    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar"
   }
 }

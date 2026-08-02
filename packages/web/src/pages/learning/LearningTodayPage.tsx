@@ -1,9 +1,9 @@
 import { useEffect, useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   useLearningStore,
-  type LearningGoalWithDecks, type AttemptRow, type RemediationAction,
+  type LearningGoalWithDecks, type AttemptRow, type RemediationAction, type GoalKnowledge,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
@@ -374,6 +374,47 @@ function AttemptHistory({ goalId }: { goalId: string }) {
   )
 }
 
+/**
+ * Where a goal stands, in the three numbers that mean something.
+ *
+ * `unseen` is kept out of the ratio rather than counted as unknown: a deck nobody has opened is
+ * "not started", and reporting a confident 0% for it is a different, wronger claim. The bar
+ * therefore measures known against what has actually been attempted, and the untouched remainder
+ * is stated separately.
+ *
+ * There is no "완료" figure here on purpose. Any interval threshold — 21 days, 56, 365 — is a
+ * state lapses knock cards out of daily, so a simulation of this app's scheduler settles at ~99%
+ * and never fills. "Will I know it on the day" can reach 100%, so that is what is shown.
+ */
+function GoalProgress({ knowledge, targetDate }: {
+  knowledge: GoalKnowledge | null
+  targetDate: string | null
+}) {
+  const { t } = useTranslation('learning')
+  if (!knowledge || knowledge.total === 0) return null
+
+  const attempted = knowledge.known + knowledge.unknown
+  const percent = attempted > 0 ? Math.round((knowledge.known / attempted) * 100) : 0
+
+  return (
+    <section className="p-4 bg-card rounded-xl border border-border" aria-label={t('progress.title')}>
+      <p className="text-sm text-foreground">
+        {targetDate
+          ? t('progress.knownAtTarget', { known: knowledge.known, total: knowledge.total, date: targetDate })
+          : t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
+      </p>
+      <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+        <div className="h-full bg-primary" style={{ width: `${percent}%` }} role="presentation" />
+      </div>
+      <p className="mt-1.5 text-[11px] text-content-tertiary">
+        {t('progress.breakdown', {
+          known: knowledge.known, shaky: knowledge.unknown, unseen: knowledge.unseen,
+        })}
+      </p>
+    </section>
+  )
+}
+
 export function LearningTodayPage() {
   const { t } = useTranslation('learning')
   const {
@@ -383,13 +424,13 @@ export function LearningTodayPage() {
     recordingItemId, fetchPlan, generatePlan, recordAttempt,
     attempts, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
+    knowledge, fetchGoalKnowledge,
   } = useLearningStore()
   const { i18n } = useTranslation('learning')
 
-  // The chosen goal is an OVERRIDE, not mirrored state: deriving the default from the
-  // loaded goals avoids a set-state-in-effect (the repo forbids driving state from
-  // effects, and it would also render once with no goal before correcting itself).
-  const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
+  // The goal comes from the URL now, not a dropdown. `/learning` lists the plans and each one
+  // links here, so the three learning screens no longer each ask "which goal?" separately.
+  const { goalId: routeGoalId } = useParams<{ goalId: string }>()
   // One context per mount: the plan date must not drift mid-session, and the planner's
   // `now` is part of its input fingerprint.
   const ctx = useMemo(() => currentPlanContext(), [])
@@ -401,16 +442,26 @@ export function LearningTodayPage() {
     [goals],
   )
 
-  const selectedGoalId = plannableGoals.some((goal) => goal.id === goalOverrideId)
-    ? goalOverrideId
-    : plannableGoals[0]?.id ?? null
+  // An id in the URL that is not a plannable goal (archived, deleted, or someone else's) falls
+  // back to nothing rather than silently showing a different goal's plan under that URL.
+  const selectedGoalId = plannableGoals.some((candidate) => candidate.id === routeGoalId)
+    ? routeGoalId ?? null
+    : null
 
   useEffect(() => {
     if (selectedGoalId) void fetchPlan(selectedGoalId, ctx.planDate)
   }, [selectedGoalId, ctx.planDate, fetchPlan])
 
+
   const goal: LearningGoalWithDecks | undefined =
     plannableGoals.find((candidate) => candidate.id === selectedGoalId)
+
+  // Progress is judged at the goal's target date when it has one — "what will I still know on
+  // exam day" — and at today otherwise. Server-aggregated: the plan only loads DUE cards.
+  const judgedAt = goal?.target_date ? `${goal.target_date}T00:00:00.000Z` : ctx.now
+  useEffect(() => {
+    if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
+  }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
 
   /**
    * The same goal filter `AttemptHistory` applies, for the same reason — and it has to be
@@ -429,17 +480,17 @@ export function LearningTodayPage() {
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
-  if (plannableGoals.length === 0) {
+  if (!selectedGoalId) {
     return (
       <div className="max-w-2xl mx-auto p-4">
         <h1 className="text-lg font-medium text-foreground">{t('today.title')}</h1>
         <div className="mt-4 p-6 bg-card rounded-xl border border-border text-center">
           <p className="text-sm text-muted-foreground">{t('today.empty.noGoal')}</p>
           <Link
-            to="/learning/goals"
+            to="/learning"
             className="inline-block mt-3 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg"
           >
-            {t('today.empty.createGoal')}
+            {t('today.backToPlans')}
           </Link>
         </div>
       </div>
@@ -461,29 +512,16 @@ export function LearningTodayPage() {
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-lg font-medium text-foreground">{t('today.title')}</h1>
-        <span className="flex items-center gap-3">
-          <Link to="/learning/insights" className="text-xs text-primary hover:underline">
-            {t('today.insightsLink')}
-          </Link>
-          <Link to="/learning/goals" className="text-xs text-primary hover:underline">
-            {t('today.manageGoals')}
-          </Link>
-        </span>
+        <h1 className="text-lg font-medium text-foreground truncate">{goal?.title ?? t('today.title')}</h1>
+        <Link to="/learning" className="text-xs text-primary hover:underline shrink-0">
+          {t('today.backToPlans')}
+        </Link>
       </div>
 
-      {plannableGoals.length > 1 && (
-        <select
-          value={selectedGoalId ?? ''}
-          onChange={(e) => setGoalOverrideId(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg cursor-pointer"
-          aria-label={t('today.selectGoal')}
-        >
-          {plannableGoals.map((option) => (
-            <option key={option.id} value={option.id}>{option.title}</option>
-          ))}
-        </select>
-      )}
+      {/* Where this goal actually stands. Judged at the target date when there is one, so the
+          number answers "what will I know on the day" rather than "what do I know right now" —
+          the first is the question a deadline makes people ask. */}
+      <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} targetDate={goal?.target_date ?? null} />
 
       {goal && (
         <div className="p-4 bg-card rounded-xl border border-border">

@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "Rencana hari ini",
-    "manageGoals": "Kelola tujuan",
-    "selectGoal": "Pilih tujuan",
     "budget": "{{count, number}} menit/hari",
     "progress": "{{done, number}} dari {{total, number}} selesai",
     "generate": "Buat rencana hari ini",
@@ -52,13 +50,12 @@
       "placeholder": "Tulis apa yang kamu ingat",
       "note": "Disimpan bersama percobaan ini. Tidak dinilai — penilaian tetap dari kamu."
     },
-    "insightsLink": "Analisis",
-    "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini"
+    "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini",
+    "backToPlans": "Semua rencana"
   },
   "goals": {
     "title": "Tujuan belajar",
     "subtitle": "Tujuan berisi menit harian dan dek yang digunakan untuk menyusun rencana Anda.",
-    "todayLink": "Rencana hari ini",
     "create": "Tujuan baru",
     "edit": "Edit",
     "archive": "Arsipkan",
@@ -196,5 +193,11 @@
       "dismissed": "Diabaikan",
       "expired": "Kedaluwarsa"
     }
+  },
+  "progress": {
+    "title": "Kemajuan",
+    "knownNow": "{{known, number}} dari {{total, number}} kartu dikuasai",
+    "knownAtTarget": "{{known, number}} dari {{total, number}} kartu masih diingat pada {{date}}",
+    "breakdown": "{{known, number}} kuat · {{shaky, number}} goyah · {{unseen, number}} belum mulai"
   }
 }

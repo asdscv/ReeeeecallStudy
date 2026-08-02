@@ -162,13 +162,11 @@
     },
     "generate": "Tạo kế hoạch hôm nay",
     "generating": "Đang tạo…",
-    "insightsLink": "Phân tích",
     "item": {
       "minutes": "~{{count, decimal}} phút",
       "recorded": "Đã ghi lại",
       "untitled": "(không có nội dung)"
     },
-    "manageGoals": "Quản lý mục tiêu",
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
     "rate": {
       "again": "Không biết",
@@ -188,6 +186,15 @@
     "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
     "regenerate": "Tạo lại kế hoạch",
     "regenerating": "Đang tạo lại…",
-    "title": "Kế hoạch hôm nay"
+    "title": "Kế hoạch hôm nay",
+    "backToPlans": "Tất cả kế hoạch",
+    "insightsLink": "Phân tích",
+    "manageGoals": "Quản lý mục tiêu"
+  },
+  "progress": {
+    "title": "Tiến độ",
+    "knownNow": "Nhớ {{known, number}} trong {{total, number}} thẻ",
+    "knownAtTarget": "Đến {{date}} vẫn nhớ {{known, number}} trong {{total, number}} thẻ",
+    "breakdown": "Chắc {{known, number}} · Lung lay {{shaky, number}} · Chưa bắt đầu {{unseen, number}}"
   }
 }

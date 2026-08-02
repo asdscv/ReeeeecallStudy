@@ -10,7 +10,7 @@
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 type StoreState = Record<string, unknown>
 
@@ -49,6 +49,11 @@ const goal = {
 }
 
 const baseState = (over: StoreState = {}): StoreState => ({
+  // Mirrors the real store's initial state. `knowledge` feeds the plan's progress header;
+  // omitting it here is a mock defect, not a reason to make the component defensive.
+  knowledge: {},
+  knowledgeLoading: false,
+  fetchGoalKnowledge: vi.fn(),
   goals: [goal],
   goalsLoading: false,
   goalsError: null,
@@ -89,7 +94,13 @@ const baseState = (over: StoreState = {}): StoreState => ({
 
 const renderToday = (over: StoreState = {}) => {
   storeState.current = baseState(over)
-  render(<MemoryRouter><LearningTodayPage /></MemoryRouter>)
+  // The plan is addressed by URL now — `/learning/:goalId` — instead of being chosen from a
+  // dropdown repeated on three sibling screens.
+  render(
+    <MemoryRouter initialEntries={['/learning/goal-1']}>
+      <Routes><Route path="/learning/:goalId" element={<LearningTodayPage />} /></Routes>
+    </MemoryRouter>,
+  )
   return storeState.current
 }
 
@@ -124,12 +135,14 @@ describe('LearningTodayPage', () => {
     expect(state.generatePlan).toHaveBeenCalledTimes(1)
   })
 
-  it('points a user with no goal at goal creation instead of an empty list', () => {
+  it('sends a URL that names no plannable goal back to the list', () => {
+    // Archived, deleted, or someone else's id. Falling back to "the first goal" would serve a
+    // different plan under this URL, which is worse than an empty state.
     renderToday({ goals: [] })
 
     expect(screen.getByText('today.empty.noGoal')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'today.empty.createGoal' }))
-      .toHaveAttribute('href', '/learning/goals')
+    expect(screen.getByRole('link', { name: 'today.backToPlans' }))
+      .toHaveAttribute('href', '/learning')
     expect(screen.queryByRole('button', { name: 'today.generate' })).not.toBeInTheDocument()
   })
 

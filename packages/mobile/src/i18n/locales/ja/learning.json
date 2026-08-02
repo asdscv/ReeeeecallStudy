@@ -162,13 +162,11 @@
     },
     "generate": "今日のプランを作成",
     "generating": "作成中…",
-    "insightsLink": "学習診断",
     "item": {
       "minutes": "約 {{count, decimal}} 分",
       "recorded": "記録済み",
       "untitled": "（テキストなし）"
     },
-    "manageGoals": "目標を管理",
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "rate": {
       "again": "わからない",
@@ -188,6 +186,15 @@
     "recallChance": "いま思い出せる確率 約{{percent}}%",
     "regenerate": "プランを再作成",
     "regenerating": "再作成中…",
-    "title": "今日のプラン"
+    "title": "今日のプラン",
+    "backToPlans": "プラン一覧",
+    "insightsLink": "学習診断",
+    "manageGoals": "目標を管理"
+  },
+  "progress": {
+    "title": "進捗",
+    "knownNow": "{{total, number}}枚中 {{known, number}}枚を記憶",
+    "knownAtTarget": "{{date}}時点で {{total, number}}枚中 {{known, number}}枚を記憶",
+    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}"
   }
 }

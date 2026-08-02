@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "Plan de hoy",
-    "manageGoals": "Gestionar objetivos",
-    "selectGoal": "Seleccionar un objetivo",
     "budget": "{{count, number}} min/día",
     "progress": "{{done, number}} de {{total, number}} completados",
     "generate": "Crear plan de hoy",
@@ -52,13 +50,12 @@
       "placeholder": "Escribe lo que recuerdes",
       "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya."
     },
-    "insightsLink": "Diagnóstico",
-    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla"
+    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
+    "backToPlans": "Todos los planes"
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
     "subtitle": "Un objetivo contiene tus minutos diarios y los mazos con los que se construye tu plan.",
-    "todayLink": "Plan de hoy",
     "create": "Nuevo objetivo",
     "edit": "Editar",
     "archive": "Archivar",
@@ -196,5 +193,11 @@
       "dismissed": "Descartada",
       "expired": "Caducada"
     }
+  },
+  "progress": {
+    "title": "Progreso",
+    "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
+    "knownAtTarget": "{{known, number}} de {{total, number}} tarjetas aún recordadas el {{date}}",
+    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar"
   }
 }

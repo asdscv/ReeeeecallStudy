@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "Kế hoạch hôm nay",
-    "manageGoals": "Quản lý mục tiêu",
-    "selectGoal": "Chọn mục tiêu",
     "budget": "{{count, number}} phút/ngày",
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
     "generate": "Tạo kế hoạch hôm nay",
@@ -52,13 +50,12 @@
       "placeholder": "Nhập những gì bạn còn nhớ",
       "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá."
     },
-    "insightsLink": "Phân tích",
-    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này"
+    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
+    "backToPlans": "Tất cả kế hoạch"
   },
   "goals": {
     "title": "Mục tiêu học tập",
     "subtitle": "Mục tiêu chứa số phút mỗi ngày và các bộ thẻ dùng để xây dựng kế hoạch.",
-    "todayLink": "Kế hoạch hôm nay",
     "create": "Mục tiêu mới",
     "edit": "Sửa",
     "archive": "Lưu trữ",
@@ -196,5 +193,11 @@
       "dismissed": "Đã bỏ qua",
       "expired": "Đã hết hạn"
     }
+  },
+  "progress": {
+    "title": "Tiến độ",
+    "knownNow": "Nhớ {{known, number}} trong {{total, number}} thẻ",
+    "knownAtTarget": "Đến {{date}} vẫn nhớ {{known, number}} trong {{total, number}} thẻ",
+    "breakdown": "Chắc {{known, number}} · Lung lay {{shaky, number}} · Chưa bắt đầu {{unseen, number}}"
   }
 }

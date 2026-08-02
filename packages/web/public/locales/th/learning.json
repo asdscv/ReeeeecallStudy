@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "แผนวันนี้",
-    "manageGoals": "จัดการเป้าหมาย",
-    "selectGoal": "เลือกเป้าหมาย",
     "budget": "{{count, number}} นาที/วัน",
     "progress": "เสร็จ {{done, number}} จาก {{total, number}}",
     "generate": "สร้างแผนวันนี้",
@@ -52,13 +50,12 @@
       "placeholder": "พิมพ์สิ่งที่คุณจำได้",
       "note": "บันทึกไว้พร้อมการทำครั้งนี้ ไม่มีการให้คะแนน — คุณยังประเมินตัวเองเอง"
     },
-    "insightsLink": "วิเคราะห์",
-    "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%"
+    "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%",
+    "backToPlans": "แผนทั้งหมด"
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",
     "subtitle": "เป้าหมายประกอบด้วยจำนวนนาทีต่อวันและสำรับที่ใช้สร้างแผน",
-    "todayLink": "แผนวันนี้",
     "create": "เป้าหมายใหม่",
     "edit": "แก้ไข",
     "archive": "เก็บถาวร",
@@ -196,5 +193,11 @@
       "dismissed": "ไม่สนใจแล้ว",
       "expired": "หมดอายุ"
     }
+  },
+  "progress": {
+    "title": "ความคืบหน้า",
+    "knownNow": "จำได้ {{known, number}} จาก {{total, number}} ใบ",
+    "knownAtTarget": "วันที่ {{date}} จะยังจำได้ {{known, number}} จาก {{total, number}} ใบ",
+    "breakdown": "แม่น {{known, number}} · คลอนแคลน {{shaky, number}} · ยังไม่เริ่ม {{unseen, number}}"
   }
 }

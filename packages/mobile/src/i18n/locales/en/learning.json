@@ -162,13 +162,11 @@
     },
     "generate": "Build today's plan",
     "generating": "Building…",
-    "insightsLink": "Insights",
     "item": {
       "minutes": "~{{count, decimal}} min",
       "recorded": "Recorded",
       "untitled": "(no text)"
     },
-    "manageGoals": "Manage goals",
     "progress": "{{done, number}} of {{total, number}} done",
     "rate": {
       "again": "Didn't know",
@@ -188,6 +186,15 @@
     "recallChance": "About {{percent}}% chance you still recall this",
     "regenerate": "Rebuild plan",
     "regenerating": "Rebuilding…",
-    "title": "Today's plan"
+    "title": "Today's plan",
+    "backToPlans": "All plans",
+    "insightsLink": "Insights",
+    "manageGoals": "Manage goals"
+  },
+  "progress": {
+    "title": "Progress",
+    "knownNow": "{{known, number}} of {{total, number}} cards known now",
+    "knownAtTarget": "{{known, number}} of {{total, number}} cards still known on {{date}}",
+    "breakdown": "{{known, number}} solid · {{shaky, number}} slipping · {{unseen, number}} not started"
   }
 }

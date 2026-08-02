@@ -162,13 +162,11 @@
     },
     "generate": "生成今日计划",
     "generating": "生成中…",
-    "insightsLink": "诊断",
     "item": {
       "minutes": "约 {{count, decimal}} 分钟",
       "recorded": "已记录",
       "untitled": "（无内容）"
     },
-    "manageGoals": "管理目标",
     "progress": "{{total, number}} 个中完成 {{done, number}} 个",
     "rate": {
       "again": "不知道",
@@ -188,6 +186,15 @@
     "recallChance": "你现在还记得的概率约 {{percent}}%",
     "regenerate": "重新生成计划",
     "regenerating": "重新生成中…",
-    "title": "今日计划"
+    "title": "今日计划",
+    "backToPlans": "计划列表",
+    "insightsLink": "诊断",
+    "manageGoals": "管理目标"
+  },
+  "progress": {
+    "title": "进度",
+    "knownNow": "{{total, number}} 张中已记住 {{known, number}} 张",
+    "knownAtTarget": "到 {{date}} 时 {{total, number}} 张中仍记得 {{known, number}} 张",
+    "breakdown": "牢固 {{known, number}} · 动摇 {{shaky, number}} · 未开始 {{unseen, number}}"
   }
 }

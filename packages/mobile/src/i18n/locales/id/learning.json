@@ -162,13 +162,11 @@
     },
     "generate": "Buat rencana hari ini",
     "generating": "Membuat…",
-    "insightsLink": "Analisis",
     "item": {
       "minutes": "~{{count, decimal}} menit",
       "recorded": "Tercatat",
       "untitled": "(tidak ada teks)"
     },
-    "manageGoals": "Kelola tujuan",
     "progress": "{{done, number}} dari {{total, number}} selesai",
     "rate": {
       "again": "Tidak tahu",
@@ -188,6 +186,15 @@
     "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini",
     "regenerate": "Buat ulang rencana",
     "regenerating": "Membuat ulang…",
-    "title": "Rencana hari ini"
+    "title": "Rencana hari ini",
+    "backToPlans": "Semua rencana",
+    "insightsLink": "Analisis",
+    "manageGoals": "Kelola tujuan"
+  },
+  "progress": {
+    "title": "Kemajuan",
+    "knownNow": "{{known, number}} dari {{total, number}} kartu dikuasai",
+    "knownAtTarget": "{{known, number}} dari {{total, number}} kartu masih diingat pada {{date}}",
+    "breakdown": "{{known, number}} kuat · {{shaky, number}} goyah · {{unseen, number}} belum mulai"
   }
 }

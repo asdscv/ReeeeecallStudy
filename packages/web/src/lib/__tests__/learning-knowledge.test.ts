@@ -13,7 +13,7 @@ import {
   activeKnowledgeCriterion, availableCriterionIds, knowledgeCriterionFor,
   createDefaultKnowledgeRegistry, LEGACY_MATURE_INTERVAL_DAYS,
   knowledgeState, retentionCriterion, intervalCriterion, easeAboveDefaultCriterion,
-  DEFAULT_TARGET_RETENTION,
+  DEFAULT_TARGET_RETENTION, retentionStabilityMultiplier,
 } from '@reeeeecall/shared/learning'
 
 const NOW = '2026-08-01T00:00:00.000Z'
@@ -125,5 +125,37 @@ describe('knowledgeState', () => {
     )
     expect(s.meanConfidence).toBeNull()
     expect(s.unseen).toBe(1)
+  })
+})
+
+describe('retentionStabilityMultiplier', () => {
+  it('is exactly 1 at the default target — which is why "known" reads as "not overdue"', () => {
+    // A property of the FSRS-5 constants, pinned because migration 181's SQL leans on it: the
+    // default rule becomes a plain date comparison, and a drift here would silently reshape
+    // every progress number the server reports.
+    expect(retentionStabilityMultiplier(DEFAULT_TARGET_RETENTION)).toBeCloseTo(1, 6)
+  })
+
+  it('demanding more retention allows less elapsed time, and vice versa', () => {
+    expect(retentionStabilityMultiplier(0.95)).toBeLessThan(1)
+    expect(retentionStabilityMultiplier(0.8)).toBeGreaterThan(1)
+  })
+
+  it('agrees with the criterion it is derived from', () => {
+    // The SQL and the TypeScript must classify the same card the same way. Elapsed exactly at
+    // the multiple is the boundary the database compares with <=, so it must be known.
+    for (const target of [0.8, 0.9, 0.95]) {
+      const k = retentionStabilityMultiplier(target)
+      const interval = 40
+      const atBoundary = card(interval, Math.floor(interval * k))
+      const pastIt = card(interval, Math.ceil(interval * k) + 2)
+      expect(retentionCriterion(target).isKnown(atBoundary, { now: NOW, at: NOW }), `${target} boundary`).toBe(true)
+      expect(retentionCriterion(target).isKnown(pastIt, { now: NOW, at: NOW }), `${target} past`).toBe(false)
+    }
+  })
+
+  it('refuses a nonsense target rather than returning a multiplier for it', () => {
+    expect(() => retentionStabilityMultiplier(0)).toThrow()
+    expect(() => retentionStabilityMultiplier(1)).toThrow()
   })
 })

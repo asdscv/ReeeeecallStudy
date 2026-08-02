@@ -77,7 +77,7 @@ export function LearningGoalsPage() {
           <p className="text-xs text-content-tertiary mt-0.5">{t('goals.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Link to="/learning" className="text-xs text-primary hover:underline">{t('goals.todayLink')}</Link>
+
           <button
             type="button"
             onClick={openCreate}
@@ -107,11 +107,12 @@ export function LearningGoalsPage() {
             <li key={goal.id} className="p-3 bg-card rounded-lg border border-border">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm text-foreground truncate">{goal.title}</p>
+                  {/* The card IS the way in. Plans used to be switched with a dropdown repeated
+                      on three sibling screens; now the list opens one. */}
+                  <Link to={`/learning/${goal.id}`} className="text-sm text-foreground truncate hover:underline block">
+                    {goal.title}
+                  </Link>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <span className="px-1.5 py-0.5 text-xs rounded-full bg-accent text-muted-foreground">
-                      {t(`form.domainName.${goal.domain_id}`, { defaultValue: goal.domain_id })}
-                    </span>
                     <span className="text-xs text-content-tertiary">
                       {t('goals.dailyMinutes', { count: goal.daily_minutes })}
                     </span>
