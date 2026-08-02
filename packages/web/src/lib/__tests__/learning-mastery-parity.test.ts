@@ -1,7 +1,7 @@
 /**
  * The maturity threshold exists in two languages, so it is pinned in both.
  *
- * `mature_card_count` (migration 182) hard-codes 21 days because SQL cannot import a TypeScript
+ * `mature_card_count` (migration 183) hard-codes 21 days because SQL cannot import a TypeScript
  * constant, and `LEGACY_MATURE_INTERVAL_DAYS` is the same number in the criterion catalog. A
  * number living in two places with nothing holding them together is precisely how this codebase
  * ended up with two disagreeing definitions of mastery in the first place — the dashboard's
@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { LEGACY_MATURE_INTERVAL_DAYS } from '@reeeeecall/shared/learning'
 
 const REPO_ROOT = join(__dirname, '../../../../..')
-const MIGRATION = 'supabase/migrations/182_one_mastery_definition.sql'
+const MIGRATION = 'supabase/migrations/183_one_mastery_definition.sql'
 
 describe('the maturity threshold agrees across SQL and TypeScript', () => {
   it('the helper uses exactly the TypeScript constant', () => {

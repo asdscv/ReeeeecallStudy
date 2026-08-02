@@ -1,4 +1,4 @@
--- Rollback for 182. Restores the pre-182 mastery expression in both functions and drops the
+-- Rollback for 183. Restores the pre-182 mastery expression in both functions and drops the
 -- helper. Idempotent: the dry-run applies and reverts repeatedly.
 --
 -- Deliberately re-creates the OLD rule rather than leaving the functions calling a dropped

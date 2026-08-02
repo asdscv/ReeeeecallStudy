@@ -1,4 +1,4 @@
--- One definition of a "mastered" card (migration 182).
+-- One definition of a "mastered" card (migration 183).
 --
 -- The rule this replaces was not a mastery test: `ease_factor` starts at 2.5 and gains +0.05 per
 -- correct review, so `ease_factor > 2.5 AND srs_status = 'review'` fired after a SINGLE right
