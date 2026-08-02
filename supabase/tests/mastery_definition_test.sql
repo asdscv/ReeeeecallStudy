@@ -135,6 +135,70 @@ BEGIN
   RAISE NOTICE 'mastery_definition_test: anon is refused';
 END $$;
 
+-- ── a learner's schedule, resolved to the right owner (migration 184) ────────
+-- Reading `cards` for a subscribed deck does not return a missing number, it returns SOMEONE
+-- ELSE'S. Production holds 14,805 progress rows against 433 owned-card rows, so most study in
+-- this app happens on decks the learner does not own.
+SELECT set_config('request.jwt.claim.role', 'authenticated', false);
+SELECT set_config('request.jwt.claim.sub', 'c1000000-0000-4000-8000-000000000001', false);
+DO $$
+DECLARE
+  v_pub   uuid := 'a9000000-0000-4000-8000-000000000001';
+  v_sub   uuid := 'b9000000-0000-4000-8000-000000000002';
+  v_tmpl  uuid;
+  v_deck  uuid;
+BEGIN
+  INSERT INTO auth.users (id) VALUES (v_pub), (v_sub) ON CONFLICT (id) DO NOTHING;
+  INSERT INTO card_templates (user_id, name, fields)
+    VALUES (v_pub, 'T', '[{"key":"f","name":"F","type":"text"}]'::jsonb) RETURNING id INTO v_tmpl;
+  INSERT INTO decks (user_id, name, default_template_id)
+    VALUES (v_pub, 'Published', v_tmpl) RETURNING id INTO v_deck;
+
+  -- The publisher has studied their own deck to a 200-day interval.
+  INSERT INTO cards (deck_id, user_id, template_id, field_values, srs_status, interval_days, last_reviewed_at)
+  SELECT v_deck, v_pub, v_tmpl, '{"f":"x"}'::jsonb, 'review', 200, now() - INTERVAL '1 day'
+  FROM generate_series(1, 5);
+
+  -- The subscriber has retained three, barely started one, and SUSPENDED one they had already
+  -- pushed to 90 days. The suspended row is what separates the status columns: the publisher's
+  -- card says 'review', the learner's row says 'suspended', and both carry a long interval — so
+  -- resolving `srs_status` from the wrong owner counts a card the learner has shelved.
+  INSERT INTO user_card_progress (user_id, card_id, deck_id, srs_status, interval_days, last_reviewed_at)
+  SELECT v_sub, c.id, c.deck_id, 'review', 90, now() - INTERVAL '1 day'
+  FROM (SELECT id, deck_id FROM cards WHERE deck_id = v_deck LIMIT 3) c;
+  INSERT INTO user_card_progress (user_id, card_id, deck_id, srs_status, interval_days, last_reviewed_at)
+  SELECT v_sub, c.id, c.deck_id, 'learning', 1, now()
+  FROM (SELECT id, deck_id FROM cards WHERE deck_id = v_deck OFFSET 3 LIMIT 1) c;
+  INSERT INTO user_card_progress (user_id, card_id, deck_id, srs_status, interval_days, last_reviewed_at)
+  SELECT v_sub, c.id, c.deck_id, 'suspended', 90, now() - INTERVAL '1 day'
+  FROM (SELECT id, deck_id FROM cards WHERE deck_id = v_deck OFFSET 4) c;
+
+  ASSERT mature_card_count(v_pub) = 5,
+    format('the publisher should see their own schedule, got %s', mature_card_count(v_pub));
+  -- The number that used to be 0, and the number that must never become 5.
+  ASSERT mature_card_count(v_sub) = 3,
+    format('the subscriber should see THEIR schedule, not the publisher''s, got %s', mature_card_count(v_sub));
+  ASSERT (SELECT count(*) FROM learner_card_schedule(v_sub)) = 5,
+    'a subscribed card must appear exactly once — a UNION of both sources would double-count';
+  -- Untouched subscribed cards must still be present, as unseen rather than absent: a total that
+  -- omits what you have not started is not a total.
+  ASSERT (SELECT count(*) FROM learner_card_schedule(v_sub) WHERE interval_days IS NULL OR interval_days < 21) = 1,
+    'the barely-started card must still be counted in the total';
+  ASSERT (SELECT srs_status FROM learner_card_schedule(v_sub) WHERE srs_status = 'suspended') = 'suspended',
+    'the learner''s own status must win over the publisher''s';
+
+  -- The resolver takes a uuid and checks nothing, so RLS is its only protection. Reachable from
+  -- PostgREST it would be the same cross-user read the helper above already had once.
+  ASSERT NOT (SELECT prosecdef FROM pg_proc WHERE proname = 'learner_card_schedule'),
+    'learner_card_schedule is SECURITY DEFINER — it has no ownership guard';
+  ASSERT NOT has_function_privilege('authenticated', 'public.learner_card_schedule(uuid)', 'EXECUTE'),
+    'learner_card_schedule is reachable from PostgREST';
+  ASSERT NOT has_function_privilege('anon', 'public.learner_card_schedule(uuid)', 'EXECUTE'),
+    'learner_card_schedule is reachable by anon';
+
+  RAISE NOTICE 'mastery_definition_test: schedules resolve to the right owner';
+END $$;
+
 -- ── the next goal must never be one the learner already holds ────────────────
 -- `get_next_milestone` reads the current count alone, so tightening the mastery rule would hand
 -- someone wearing the 1,000-card badge a next goal of 50.
