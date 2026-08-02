@@ -125,7 +125,8 @@ export function LearningTodayScreen() {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    recordAttempt,
     attempts, attemptsLoading, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     enrichmentQuote, loadEnrichmentQuote,
@@ -180,6 +181,30 @@ export function LearningTodayScreen() {
   useEffect(() => {
     if (goalId) void fetchPlan(goalId, planDate)
   }, [goalId, planDate, fetchPlan])
+
+  /**
+   * Same rule as web, from the same store action: build today's plan once the read has come back
+   * empty. Kept in the store rather than duplicated here — the decision has four conditions and
+   * two drifting copies of it would eventually wipe a day's progress.
+   */
+  useEffect(() => {
+    // A FRESH context, like `regenerate` — `now` is the planner's due-card cutoff, and this
+    // screen stays mounted across midnight, so a value captured at mount would plan against a
+    // stale clock.
+    if (goal) void autoGeneratePlan(goal, currentPlanContext())
+  }, [goal, planDate, autoGeneratePlan, planAbsentFor])
+
+  /**
+   * Whether automation still has its turn — the same conditions `autoGeneratePlan` checks.
+   *
+   * Read so the manual button does not flash for a frame between the empty read and the effect
+   * that acts on it. `planDate` rather than a fresh context: the key is a date, and re-reading
+   * the clock here would make this recompute on every render.
+   */
+  const autoWillRun = !!goal
+    && planAbsentFor === `${goal.id}|${planDate}`
+    && !autoPlanAttempted[`${goal.id}|${planDate}`]
+    && !!goal.decks?.length
 
   // Judged at the target date when the goal has one — "what will I still know on the day" — and
   // at today otherwise. Server-aggregated: the plan only ever loads DUE cards.
@@ -622,21 +647,33 @@ export function LearningTodayScreen() {
                   </Text>
                 </TouchableOpacity>
               </>
+            ) : planGenerating || autoWillRun ? (
+              // Building it. Not a button: the learner is being told what is happening, not
+              // asked to make it happen.
+              <Text
+                style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}
+                accessibilityLiveRegion="polite"
+                {...testProps('learning-generating')}
+              >
+                {t('today.generating')}
+              </Text>
             ) : !planBlockedReason ? (
+              // Only reachable once automation has had its turn and produced no plan — a failed
+              // save, or a goal already regenerated today. The button is the way back.
               <TouchableOpacity
-                disabled={planGenerating || !goal}
+                disabled={!goal}
                 onPress={regenerate}
                 style={[
                   styles.primaryBtn,
                   { backgroundColor: theme.colors.primary },
-                  (planGenerating || !goal) && styles.disabled,
+                  !goal && styles.disabled,
                 ]}
                 accessibilityRole="button"
-                accessibilityState={{ disabled: planGenerating || !goal }}
+                accessibilityState={{ disabled: !goal }}
                 {...testProps('learning-generate')}
               >
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
-                  {planGenerating ? t('today.generating') : t('today.generate')}
+                  {t('today.generate')}
                 </Text>
               </TouchableOpacity>
             ) : null}

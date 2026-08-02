@@ -1024,3 +1024,185 @@ describe('goal writes', () => {
     expect(useLearningStore.getState().goalsError?.code).toBe('NOT_FOUND')
   })
 })
+
+// ── fetchPlan → planAbsentFor ──────────────────────────────────────────────
+//
+// `plan === null` is three different situations wearing one face: not read yet, read and
+// genuinely empty, read and FAILED. Auto-generation may act on exactly one of them, and
+// `save_daily_plan` is destructive, so the difference has to survive as its own state.
+describe('fetchPlan records WHY there is no plan', () => {
+  const emptyPlanRead = () => {
+    queue('daily_plans', { data: null, error: null })
+  }
+
+  it('records the absence when the server says there is no plan', async () => {
+    emptyPlanRead()
+
+    await useLearningStore.getState().fetchPlan('goal-1', '2026-07-31')
+
+    expect(useLearningStore.getState().plan).toBeNull()
+    expect(useLearningStore.getState().planAbsentFor).toBe('goal-1|2026-07-31')
+  })
+
+  it('records nothing when the read fails', async () => {
+    // The dangerous case. A network blip leaves `plan === null` exactly as a real absence does;
+    // treating it as absence would rebuild a plan the learner is half-way through.
+    queue('daily_plans', { data: null, error: { code: '08006', message: 'connection failure' } })
+
+    await useLearningStore.getState().fetchPlan('goal-1', '2026-07-31')
+
+    expect(useLearningStore.getState().plan).toBeNull()
+    expect(useLearningStore.getState().planError).not.toBeNull()
+    expect(useLearningStore.getState().planAbsentFor).toBeNull()
+  })
+
+  it('clears a previous absence when a plan is found', async () => {
+    // Generating right after a plan appears — a save, a switch back to a goal planned on
+    // another device — would delete the plan that was just read.
+    useLearningStore.setState({ planAbsentFor: 'goal-1|2026-07-31' })
+    queue('daily_plans', {
+      data: {
+        id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+        algorithm_version: 'daily-plan-v1', input_fingerprint: 'fnv1a32:deadbeef',
+        status: 'pending', budget_minutes: 20, completed_minutes: 0, completed_items: 0,
+        total_items: 0,
+      },
+      error: null,
+    })
+    queue('daily_plan_items', { data: [], error: null })
+
+    await useLearningStore.getState().fetchPlan('goal-1', '2026-07-31')
+
+    expect(useLearningStore.getState().plan?.id).toBe('plan-1')
+    expect(useLearningStore.getState().planAbsentFor).toBeNull()
+  })
+
+  it('clears a stale absence for the duration of the next read', async () => {
+    // Between "yesterday had no plan" and today's answer, the state must not still claim an
+    // absence — the screen can mount and ask mid-read.
+    useLearningStore.setState({ planAbsentFor: 'goal-1|2026-07-30' })
+    emptyPlanRead()
+
+    const pending = useLearningStore.getState().fetchPlan('goal-1', '2026-07-31')
+    expect(useLearningStore.getState().planAbsentFor).toBeNull()
+
+    await pending
+    expect(useLearningStore.getState().planAbsentFor).toBe('goal-1|2026-07-31')
+  })
+})
+
+describe('reset', () => {
+  it('clears the plan-absence facts along with the plan', async () => {
+    // These describe one account's day. Left behind, `planAbsentFor` asserts "no plan today"
+    // about the user who signed out, and `autoPlanAttempted` refuses to build one for the user
+    // who signed in.
+    useLearningStore.setState({
+      planAbsentFor: 'goal-1|2026-07-31',
+      autoPlanAttempted: { 'goal-1|2026-07-31': true },
+    })
+
+    useLearningStore.getState().reset()
+
+    expect(useLearningStore.getState().planAbsentFor).toBeNull()
+    expect(useLearningStore.getState().autoPlanAttempted).toEqual({})
+  })
+})
+
+// ── autoGeneratePlan ───────────────────────────────────────────────────────
+//
+// The conditions under which opening the app may write a plan by itself. Each one exists
+// because the write is destructive — `save_daily_plan` deletes every item and zeroes the day's
+// progress — and because the 50-writes-per-UTC-day cap is shared across every goal and cannot be
+// read back by the client. A wrong "yes" costs a learner the work they already did today; a
+// wrong "no" costs them one button press.
+describe('autoGeneratePlan', () => {
+  const DECKS = [{ deck_id: 'deck-1', importance: 0.5 }]
+
+  /** The one state that means "the server was asked, and answered: there is no plan". */
+  const armAbsent = (planDate = CTX.planDate, goalId = 'goal-1') =>
+    useLearningStore.setState({ planAbsentFor: `${goalId}|${planDate}`, autoPlanAttempted: {} })
+
+  it('builds a plan once the server has confirmed there is none', async () => {
+    armAbsent()
+    queue('cards', { data: [], error: null })
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks(DECKS), CTX)
+
+    // It ran: `generatePlan` got as far as reading candidates and found nothing to plan.
+    expect(useLearningStore.getState().planBlockedReason).toBe('no_candidates')
+  })
+
+  it('does nothing when no read has come back yet', async () => {
+    // `planAbsentFor === null` is the initial state, and also what a FAILED read leaves behind.
+    // `plan === null` cannot tell those apart from a real absence — which is why the trigger is
+    // this positive fact and not the absence of a plan.
+    useLearningStore.setState({ planAbsentFor: null, autoPlanAttempted: {} })
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks(DECKS), CTX)
+
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when the absence was recorded for another day', async () => {
+    // Crossing midnight with the screen open. Yesterday's "no plan" says nothing about today,
+    // and acting on it would overwrite a plan the learner may already be part-way through.
+    armAbsent('2026-07-30')
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks(DECKS), CTX)
+
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when the absence was recorded for another goal', async () => {
+    armAbsent(CTX.planDate, 'goal-2')
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks(DECKS), CTX)
+
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('attempts once per goal per day, even after the attempt failed', async () => {
+    // A failure must not retry itself. The cap is shared across every goal and invisible here,
+    // so a retry loop spends the learner\'s own regenerations on an error they cannot see.
+    armAbsent()
+    useLearningStore.setState({ autoPlanAttempted: { [`goal-1|${CTX.planDate}`]: true } })
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks(DECKS), CTX)
+
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('does not spend the one attempt on a goal with no decks', async () => {
+    // `generatePlan` would only set `no_decks` here, but marking the attempt used would mean a
+    // learner who attaches a deck a moment later still faces a button.
+    armAbsent()
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks([]), CTX)
+
+    expect(useLearningStore.getState().autoPlanAttempted).toEqual({})
+  })
+
+  it('writes once when two mounts fire in the same tick', async () => {
+    // StrictMode does exactly this. The attempt is recorded BEFORE the await, so the second
+    // call is already out by guard (2) — which is why this needs no separate in-flight lock.
+    armAbsent()
+    queue('cards', { data: [cardRow('card-1')], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    const auto = useLearningStore.getState().autoGeneratePlan
+
+    await Promise.all([auto(goalWithDecks(DECKS), CTX), auto(goalWithDecks(DECKS), CTX)])
+
+    expect(mockRpc.mock.calls.filter(([name]) => name === 'save_daily_plan')).toHaveLength(1)
+  })
+
+  it('does nothing while the plan is still being read', async () => {
+    // `planAbsentFor` is from the PREVIOUS read; a read in flight may be about to contradict it.
+    armAbsent()
+    useLearningStore.setState({ planLoading: true })
+
+    await useLearningStore.getState().autoGeneratePlan(goalWithDecks(DECKS), CTX)
+
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+})

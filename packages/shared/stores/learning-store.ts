@@ -473,6 +473,25 @@ interface LearningState {
   planLoading: boolean
   planGenerating: boolean
   planError: LearningError | null
+  /**
+   * `goalId|planDate` for which a read COMPLETED and found no plan. Null otherwise.
+   *
+   * A positive fact, because `plan === null` is three different situations wearing one face:
+   * "not fetched yet" (the initial state), "the fetch failed" (the catch below), and "there
+   * genuinely is no plan today". Auto-generation may only act on the third. Acting on the first
+   * would write a plan before knowing whether one exists; acting on the second would overwrite a
+   * real plan whenever the network hiccuped — and `save_daily_plan` deletes every item and zeroes
+   * the day's progress, so that mistake is not recoverable by retrying.
+   */
+  planAbsentFor: string | null
+  /**
+   * Goal+date keys already attempted automatically, so a failure is never retried in a loop.
+   *
+   * `save_daily_plan` is capped at 50 writes per USER per UTC day across every goal, and the
+   * client cannot read how many are left. One automatic attempt per goal per day is the budget
+   * this can safely spend without the learner's own regenerations starting to fail.
+   */
+  autoPlanAttempted: Record<string, true>
   /** Set when the goal has no decks attached: there is nothing to plan over. */
   planBlockedReason: 'no_decks' | 'no_candidates' | null
 
@@ -534,6 +553,15 @@ interface LearningState {
 
   fetchPlan: (goalId: string, planDate: string) => Promise<void>
   generatePlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
+  /**
+   * Build today's plan if — and only if — the server has said there is not one.
+   *
+   * Both screens call this on open instead of showing a button. It is a separate action rather
+   * than a flag on `generatePlan` because the decision has four conditions and all four are
+   * about state the store owns; putting them in a component would mean two copies that drift,
+   * and the cost of one drifting is a wiped day.
+   */
+  autoGeneratePlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<void>
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
   requestEnrichment: (input: {
@@ -583,6 +611,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planLoading: false,
   planGenerating: false,
   planError: null,
+  planAbsentFor: null,
+  autoPlanAttempted: {},
   planBlockedReason: null,
   recordingItemId: null,
   attempts: [],
@@ -730,7 +760,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   },
 
   fetchPlan: async (goalId, planDate) => {
-    set({ planLoading: true, planError: null, planBlockedReason: null })
+    set({ planLoading: true, planError: null, planBlockedReason: null, planAbsentFor: null })
     try {
       const { data: planRow, error: planErr } = await supabase
         .from('daily_plans')
@@ -740,7 +770,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         .maybeSingle()
       if (planErr) throw planErr
       if (!planRow) {
-        set({ plan: null, planItems: [], planCards: {} })
+        // The read succeeded and there is no plan. This is the ONLY place that fact is
+        // established, and the only signal auto-generation is allowed to act on.
+        set({ plan: null, planItems: [], planCards: {}, planAbsentFor: `${goalId}|${planDate}` })
         return
       }
       const { data: itemRows, error: itemErr } = await supabase
@@ -794,6 +826,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       set({
         planError: toLearningError(e), plan: null, planItems: [], planCards: {},
         planTemplateFields: {},
+        // Explicitly NOT absent: a failed read tells us nothing about whether a plan exists.
+        planAbsentFor: null,
       })
     } finally {
       set({ planLoading: false })
@@ -801,12 +835,52 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   },
 
   /**
+   * Build today's plan by itself, when — and only when — the server has confirmed there is none.
+   *
+   * This is the whole reason a learner no longer presses a button: a plan they did not ask for
+   * is the product working, and a plan they have to summon is homework. What makes it safe to
+   * fire from an effect is that the trigger is a POSITIVE fact from the server, not the absence
+   * of one locally. `plan === null` is three situations wearing one face — not read yet, read
+   * and empty, read and failed — and only the middle one may be written over.
+   *
+   * `save_daily_plan` deletes every item and rewrites the day, and it is capped at 50 writes per
+   * user per UTC day across ALL goals, a number the client cannot read back. So the guards below
+   * are not defensive style; each one is a way a learner loses either today's progress or their
+   * ability to plan for the rest of the day.
+   */
+  autoGeneratePlan: async (goal, ctx) => {
+    const key = `${goal.id}|${ctx.planDate}`
+    const state = get()
+
+    // 1. The server has to have SAID there is no plan. `plan === null` also means "not read
+    //    yet" and "the read failed", and generating on either would overwrite a real plan —
+    //    `save_daily_plan` deletes every item and zeroes the day's progress.
+    if (state.planAbsentFor !== key) return
+    // 2. At most one automatic attempt per goal per day. A failure must not retry itself: the
+    //    50-writes-per-day cap is shared across every goal and cannot be read back, so a loop
+    //    would spend the learner's own regenerations on retries that keep failing.
+    if (state.autoPlanAttempted[key]) return
+    // 3. Not while a read is in flight: `planAbsentFor` is from the PREVIOUS read, and the one
+    //    running may be about to contradict it. Generation needs no lock here — `generatePlan`
+    //    holds its own, and a second synchronous call is already stopped by (2), which is set
+    //    before the await.
+    if (state.planLoading) return
+    // 4. A goal with no decks has nothing to plan, and `generatePlan` would only set a blocked
+    //    reason. Checked here so opening such a goal does not burn the one attempt.
+    if (!goal.decks?.length) return
+
+    set({ autoPlanAttempted: { ...state.autoPlanAttempted, [key]: true } })
+    await get().generatePlan(goal, ctx)
+  },
+
+  /**
    * Generate + persist today's plan for a goal.
    *
-   * Called on EXPLICIT intent only (first open of the day, or the user asking for a
-   * new plan) — never from an effect that can re-fire. `save_daily_plan` is capped at
-   * 50 saves per user per day, so a regenerate-on-render loop would burn a real quota
-   * and then start failing.
+   * Called on explicit intent (the learner asking for a new plan) and by
+   * {@link autoGeneratePlan}, which supplies the intent on the day's first open. It does NOT
+   * decide whether generating is appropriate — every check that protects the 50-writes-per-day
+   * cap lives in the caller, so that a deliberate "rebuild my plan" is never refused by a guard
+   * meant for an effect.
    */
   generatePlan: async (goal, ctx) => {
     if (get().planGenerating) return false
@@ -1507,6 +1581,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       plan: null, planItems: [], planCards: {}, planTemplateFields: {},
       planLoading: false, planGenerating: false,
       planError: null, planBlockedReason: null,
+      // Both must go with the plan they describe. A surviving `planAbsentFor` would assert
+      // "there is no plan today" about the account that just signed OUT, and a surviving
+      // `autoPlanAttempted` would refuse to build one for the account that signed in.
+      planAbsentFor: null, autoPlanAttempted: {},
       recordingItemId: null, attempts: [], attemptsLoading: false,
       enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
       enrichmentSaving: false, enrichmentQuote: null,

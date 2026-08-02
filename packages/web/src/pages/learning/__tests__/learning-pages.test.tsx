@@ -40,6 +40,7 @@ vi.mock('../../../stores/deck-store', () => ({
 
 import { LearningTodayPage } from '../LearningTodayPage'
 import { LearningGoalsPage } from '../LearningGoalsPage'
+import { currentPlanContext } from '../../../lib/learning-plan-date'
 
 const goal = {
   id: 'goal-1', domain_id: 'language', title: 'JLPT N2', target_date: null,
@@ -71,6 +72,9 @@ const baseState = (over: StoreState = {}): StoreState => ({
   setGoalDecks: vi.fn(),
   fetchPlan: vi.fn(),
   generatePlan: vi.fn(),
+  autoGeneratePlan: vi.fn(),
+  planAbsentFor: null,
+  autoPlanAttempted: {},
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
@@ -91,6 +95,15 @@ const baseState = (over: StoreState = {}): StoreState => ({
   dismissEnrichment: vi.fn(),
   ...over,
 })
+
+/**
+ * The plan date the page computes for itself.
+ *
+ * Derived from the same function the page uses rather than hardcoded: the key is a LOCAL
+ * calendar date, so a fixed string passes in Seoul and fails in CI's UTC — the kind of test that
+ * only goes red on someone else's machine.
+ */
+const todayKey = () => currentPlanContext().planDate
 
 const renderToday = (over: StoreState = {}) => {
   storeState.current = baseState(over)
@@ -116,21 +129,42 @@ beforeEach(() => {
 })
 
 describe('LearningTodayPage', () => {
-  it('never writes a plan just because the page opened', () => {
+  it('reads on open, and asks the store whether a plan should be built', () => {
+    // REVERSED, deliberately. This used to assert that opening the page never writes a plan,
+    // guarding the 50-saves-per-day cap against a mount effect that fired on `plan === null` —
+    // a value that also means "not read yet" and "the read failed".
+    //
+    // The guard now lives where it can actually be correct: `autoGeneratePlan` acts only on
+    // `planAbsentFor`, which only a SUCCESSFUL read sets, and attempts once per goal per day.
+    // The page therefore always asks, and the store decides. What the page must NOT do is call
+    // `generatePlan` directly on mount, which is what the next assertion pins.
     const state = renderToday()
 
-    // Reading is automatic…
     expect(state.fetchGoals).toHaveBeenCalled()
     expect(state.fetchPlan).toHaveBeenCalledWith('goal-1', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/))
-    // …writing is not. This is the 50-saves-per-day quota guard.
+    expect(state.autoGeneratePlan).toHaveBeenCalled()
+    // Still never the unguarded write.
     expect(state.generatePlan).not.toHaveBeenCalled()
   })
 
-  it('offers to build a plan when none exists, and only then writes', async () => {
-    const state = renderToday()
+  it('says it is building rather than offering a button, while automation still has its turn', async () => {
+    // The state right after an empty read: the effect is about to write. Showing a button here
+    // would flash for a frame and then vanish under the learner's finger.
+    renderToday({ planAbsentFor: 'goal-1|' + todayKey(), autoPlanAttempted: {} })
 
-    const button = screen.getByRole('button', { name: 'today.generate' })
-    await userEvent.click(button)
+    expect(screen.queryByRole('button', { name: 'today.generate' })).not.toBeInTheDocument()
+    expect(screen.getByText('today.generating')).toBeInTheDocument()
+  })
+
+  it('falls back to a button once automation has had its turn and produced nothing', async () => {
+    // The reachable failure path: the one automatic attempt was spent and no plan came back.
+    // Without this the learner has no way to plan for the rest of the day.
+    const state = renderToday({
+      planAbsentFor: 'goal-1|' + todayKey(),
+      autoPlanAttempted: { ['goal-1|' + todayKey()]: true },
+    })
+
+    await userEvent.click(screen.getByRole('button', { name: 'today.generate' }))
 
     expect(state.generatePlan).toHaveBeenCalledTimes(1)
   })
