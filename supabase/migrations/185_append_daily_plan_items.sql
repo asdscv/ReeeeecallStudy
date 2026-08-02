@@ -102,6 +102,18 @@ BEGIN
   -- The plan must already exist. Creating one here would duplicate every decision
   -- `save_daily_plan` makes about timezone, algorithm version and fingerprint —
   -- fields this function has no honest value for, since it did not do the planning.
+  --
+  -- FOR UPDATE serialises two appends to the same plan, which is what keeps the
+  -- `max(position) + 1` below from handing both the same position and violating
+  -- `idx_daily_plan_items_plan_position`.
+  --
+  -- Measured, not assumed: racing two appends 0.3s apart WITHOUT this lock also
+  -- produced 0,1,2 — because the `learning_usage_daily` upsert further down takes a
+  -- row lock on the same (user_id, usage_date) tuple and blocks the second caller
+  -- first. That is incidental. It holds only while the metering happens to run before
+  -- the position is computed, and a plan belongs to one user so there is no other
+  -- serialiser. Keeping the explicit lock means the ordering of an unrelated statement
+  -- is not what stands between a learner and a 500.
   SELECT * INTO v_plan
     FROM daily_plans
    WHERE user_id = v_uid AND goal_id = p_goal_id AND plan_date = p_plan_date
