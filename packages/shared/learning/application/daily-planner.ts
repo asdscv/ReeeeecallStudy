@@ -146,25 +146,56 @@ export function buildDailyPlan(input: PlannerInput, options: PlannerOptions = {}
   const selectedIds = new Set<string>()
   let remaining = input.budgetMinutes
 
-  for (const [activityType, ratio] of Object.entries(mix)) {
-    let classBudget = input.budgetMinutes * ratio
-    const candidates = ranked.filter((candidate) => candidate.activityType === activityType)
-    for (const candidate of candidates) {
-      if (selectedIds.has(candidate.candidateId)) continue
-      const fitsClass = candidate.estimatedMinutes <= classBudget
-      const allowSmallest = !selected.some((item) => item.activityType === activityType) && candidate.estimatedMinutes <= remaining
-      if ((fitsClass || allowSmallest) && candidate.estimatedMinutes <= remaining) {
-        selected.push(candidate); selectedIds.add(candidate.candidateId)
-        classBudget -= candidate.estimatedMinutes; remaining -= candidate.estimatedMinutes
+  /**
+   * Reviews first, new cards with what is left.
+   *
+   * Not a preference — an ordering the schedule depends on. A new card scores `dueUrgency = 1`,
+   * the maximum, because "never seen" is the most overdue a card can be; on raw score it
+   * therefore OUTRANKS a review that is genuinely late. Selecting on score alone let intake win
+   * the budget while owed reviews slipped, and every review that slips comes back tomorrow
+   * alongside the intake that displaced it. That compounds, and the learner has no way to see
+   * why their backlog only grows.
+   *
+   * Splitting the passes makes the failure mode benign instead: when reviews fill the day, the
+   * new-card pass simply finds no budget and intake pauses until the learner is caught up.
+   */
+  const reviews = ranked.filter((candidate) => !candidate.isNew)
+  const fresh = ranked.filter((candidate) => candidate.isNew)
+
+  const takeWithinMix = (pool: readonly PlannerCandidate[], cap: number): void => {
+    let taken = 0
+    for (const [activityType, ratio] of Object.entries(mix)) {
+      let classBudget = input.budgetMinutes * ratio
+      const candidates = pool.filter((candidate) => candidate.activityType === activityType)
+      for (const candidate of candidates) {
+        if (taken >= cap) return
+        if (selectedIds.has(candidate.candidateId)) continue
+        const fitsClass = candidate.estimatedMinutes <= classBudget
+        const allowSmallest = !selected.some((item) => item.activityType === activityType) && candidate.estimatedMinutes <= remaining
+        if ((fitsClass || allowSmallest) && candidate.estimatedMinutes <= remaining) {
+          selected.push(candidate); selectedIds.add(candidate.candidateId); taken += 1
+          classBudget -= candidate.estimatedMinutes; remaining -= candidate.estimatedMinutes
+        }
+      }
+    }
+    // Leftover pass: a class that could not spend its share must not strand the budget.
+    for (const candidate of pool) {
+      if (taken >= cap) return
+      if (!selectedIds.has(candidate.candidateId) && candidate.estimatedMinutes <= remaining) {
+        selected.push(candidate); selectedIds.add(candidate.candidateId); taken += 1
+        remaining -= candidate.estimatedMinutes
       }
     }
   }
 
-  for (const candidate of ranked) {
-    if (!selectedIds.has(candidate.candidateId) && candidate.estimatedMinutes <= remaining) {
-      selected.push(candidate); selectedIds.add(candidate.candidateId); remaining -= candidate.estimatedMinutes
-    }
-  }
+  // Reviews are never capped by the intake limit: they are work already owed, and refusing to
+  // show them would not make them go away.
+  takeWithinMix(reviews, Number.POSITIVE_INFINITY)
+
+  const newCardCap = Number.isFinite(input.newCardsPerDay ?? Number.POSITIVE_INFINITY)
+    ? Math.max(0, Math.floor(input.newCardsPerDay as number))
+    : Number.POSITIVE_INFINITY
+  takeWithinMix(fresh, newCardCap)
 
   selected.sort((a, b) => scoreCandidate(b) - scoreCandidate(a) || a.candidateId.localeCompare(b.candidateId))
   const items: PlannedItem[] = selected.map((candidate, position) => ({

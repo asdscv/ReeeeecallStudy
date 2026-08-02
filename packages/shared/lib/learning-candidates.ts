@@ -362,6 +362,11 @@ export function buildCandidatesFromCards(input: CandidateInput): readonly Planne
       reviewValue: memory.reviewValue,
       // Display only — the planner does not score on it. See PlannerCandidate.retrievability.
       retrievability: memory.retrievability,
+      // Never studied. `last_reviewed_at` rather than `next_review_at`: a card can be given a
+      // due date at creation so it surfaces in a queue, but only a review stamps this one. The
+      // planner spends intake and review budget separately, so getting this wrong would let a
+      // never-seen card be counted as owed work.
+      isNew: !card.last_reviewed_at,
       estimatedMinutes: RECALL_MINUTES,
       difficulty: null,
     }
