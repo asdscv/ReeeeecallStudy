@@ -183,7 +183,14 @@ export function LearningTodayScreen() {
 
   // Judged at the target date when the goal has one — "what will I still know on the day" — and
   // at today otherwise. Server-aggregated: the plan only ever loads DUE cards.
-  const judgedAt = goal?.target_date ? `${goal.target_date}T00:00:00.000Z` : new Date().toISOString()
+  //
+  // The fallback is memoised on purpose. A bare `new Date().toISOString()` is a NEW value every
+  // render, so this effect re-fires, `fetchGoalKnowledge` calls `set()`, the screen (which
+  // subscribes to the whole store) re-renders, and the RPC loops without end — for every goal
+  // with no target date, which the form allows. Web escapes it because its `ctx` is memoised at
+  // mount; this port dropped that.
+  const mountedAt = useMemo(() => new Date().toISOString(), [])
+  const judgedAt = goal?.target_date ? `${goal.target_date}T00:00:00.000Z` : mountedAt
   useEffect(() => {
     if (goalId) void fetchGoalKnowledge(goalId, judgedAt)
   }, [goalId, judgedAt, fetchGoalKnowledge])
@@ -311,13 +318,37 @@ export function LearningTodayScreen() {
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.empty.createGoal')}</Text>
             </TouchableOpacity>
           </View>
+        ) : !goalId ? (
+          // Goals exist, but this route names none of them — paused, completed, or a nav state
+          // restored from before the plan took a goalId. Without this branch the learner got a
+          // disabled Generate button with the PREVIOUS goal's plan items still on screen, because
+          // the store does not clear `planItems` on a goal change.
+          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+              {t('today.empty.noGoal')}
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LearningGoals')}
+              style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
+              {...testProps('learning-back-to-plans-empty')}
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.backToPlans')}</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <>
             {/* Where this goal stands. The chip row that used to sit here let you switch plans
-                from inside a plan; the list does that now, and this space says something. */}
+                from inside a plan; the list does that now, and this space says something.
+
+                `testProps(id, true)` is the CONTAINER form. Without the second argument it
+                returns `accessible: true` plus `accessibilityLabel: id`, and being spread last it
+                would overwrite any translated label and collapse the subtree — TalkBack would
+                announce the literal "learning-progress" and neither number inside it. */}
             {goalId && knowledge[goalId] && knowledge[goalId].total > 0 && (
-              <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-                accessibilityLabel={t('progress.title')} {...testProps('learning-progress')}>
+              <View
+                style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                {...testProps('learning-progress', true)}
+              >
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
                   {goal?.target_date
                     ? t('progress.knownAtTarget', {
@@ -873,15 +904,9 @@ function renderEnrichmentValue(value: unknown): string {
 const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 48 },
   card: { padding: 12, borderRadius: 12, borderWidth: 1 },
-  headerActions: { flexDirection: 'row', gap: 4 },
   headerLink: { minHeight: 32, paddingHorizontal: 6, justifyContent: 'center' },
-  goalRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   // 44pt is the iOS HIG minimum and 48dp Material's; a 12px caption inside 6px of padding
   // was 28, which is a mis-tap on a moving train.
-  chip: {
-    paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
-    justifyContent: 'center',
-  },
   rateRow: { flexDirection: 'row', gap: 6, marginTop: 8 },
   // Two lines tall by default and it grows: a recall answer is short, and a box the height of
   // the card would suggest an essay is wanted. `minHeight` keeps the tap target usable.

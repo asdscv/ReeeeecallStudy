@@ -162,9 +162,13 @@ export function LearningGoalsScreen() {
 
   return (
     <Screen padding={false} keyboard testID="learning-goals-screen">
+      {/* `drawer`, not `back`: this is now the 🎯 drawer destination, and every other one uses
+          the hamburger. With `back` there was no way to reopen the drawer from here, and the
+          arrow popped to SettingsHome — the stack's initial route — rather than anywhere the
+          learner had been. */}
       <ScreenHeader
         title={t('goals.title')}
-        mode="back"
+        mode="drawer"
         rightContent={
           <TouchableOpacity
             onPress={() => setCreating((v) => !v)}
@@ -363,7 +367,10 @@ export function LearningGoalsScreen() {
               onPress={() => navigation.navigate('LearningToday', { goalId: goal.id })}
               accessibilityRole="button"
               accessibilityState={{ disabled: goal.status !== 'active' }}
+              // testProps sets accessibilityLabel to the id on Android, so the label goes AFTER
+              // it — otherwise the list's primary action announces "learning-goal-open-0".
               {...testProps(`learning-goal-open-${index}`)}
+              accessibilityLabel={goal.title}
             >
               <Text style={[theme.typography.bodySmall, {
                 color: goal.status === 'active' ? theme.colors.primary : theme.colors.text,

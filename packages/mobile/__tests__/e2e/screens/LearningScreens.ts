@@ -1,7 +1,7 @@
 /**
- * Page objects for the three learning-engine screens.
+ * Page objects for the learning screens.
  *
- * One file, three objects: they are navigated as a set (today → goals → insights and back),
+ * One file, three objects: they are navigated as a set (the plan list, and the plan you open from it),
  * and splitting them would only duplicate the same platform-selector plumbing three times.
  *
  * Selector note: `testProps()` sets `testID` on both platforms and additionally an
