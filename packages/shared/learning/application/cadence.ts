@@ -115,3 +115,24 @@ export function studyDaysBetween(cadence: StudyCadence, calendarDays: number): n
 export function perStudyDayMultiplier(cadence: StudyCadence): number {
   return cadence.cycleDays / cadence.studyDays
 }
+
+/**
+ * Read the daily intake throttle out of `learning_goals.settings`.
+ *
+ * Returns `undefined` — not a number — when nothing is stored, and `undefined` is what the
+ * planner reads as "uncapped". That is deliberate: every goal saved before this existed planned
+ * without a cap, and inventing one now would silently change the plan of a goal whose owner
+ * never asked for it. The default belongs in the form that creates a goal, where the learner can
+ * see and change it, not in the reader that interprets old rows.
+ *
+ * Zero is honoured, unlike a zero cadence. "Start no new cards, just let me catch up" is a real
+ * and useful state — it is what a learner buried in reviews should be able to ask for.
+ */
+export function parseNewCardsPerDay(raw: unknown): number | undefined {
+  if (raw === null || typeof raw !== 'object') return undefined
+  const value = (raw as { newCardsPerDay?: unknown }).newCardsPerDay
+  if (!Number.isInteger(value)) return undefined
+  const n = value as number
+  if (n < 0 || n > 9999) return undefined
+  return n
+}

@@ -106,6 +106,17 @@ export interface PlannerCandidate {
    * a number here is never a guess.
    */
   readonly retrievability?: number | null
+  /**
+   * The learner has never studied this card.
+   *
+   * Stated explicitly rather than inferred from `reviewValue == null`, which is true for a card
+   * with no usable interval as well — a different thing. The planner needs the difference
+   * because a new card is INTAKE: starting one commits the learner to roughly seven further
+   * reviews over the next year (the ladder in `application/workload.ts`), while a review that is
+   * already owed commits them to nothing new. One is a debt being taken on, the other a debt
+   * being paid, and a plan that treats them alike will bury the learner.
+   */
+  readonly isNew?: boolean
   readonly estimatedMinutes: number
   readonly difficulty: Difficulty | null
 }
@@ -117,6 +128,17 @@ export interface PlannerInput {
   readonly activityMix?: Readonly<Record<string, number>>
   readonly now: string
   readonly timezone: string
+  /**
+   * Most new cards to START today. Reviews are never capped by it.
+   *
+   * This is the only real throttle in a spaced-repetition schedule. Total minutes cannot serve:
+   * a learner who spends an hour on new cards has quietly signed up for hours of review weeks
+   * later, and the number that was agreed to says nothing about it — `workload.ts` measures the
+   * gap as ~9 minutes average against an ~88 minute peak on its reference run.
+   *
+   * Absent means uncapped, which is what every caller did before this existed.
+   */
+  readonly newCardsPerDay?: number
   readonly algorithmVersion: string
 }
 

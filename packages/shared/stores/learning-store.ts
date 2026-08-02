@@ -27,6 +27,7 @@ import {
 import type { UserCardProgress } from '../lib/srs-access'
 import {
   buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier,
+  parseNewCardsPerDay,
 } from '../learning/application/index'
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
@@ -904,6 +905,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         goal: toDomainGoal(goal, userId),
         candidates,
         budgetMinutes: goal.daily_minutes,
+        // The intake throttle, read from the goal's settings. Absent means uncapped, which is
+        // how every goal saved before this behaved — so an existing goal plans exactly as it
+        // did until its owner chooses a number.
+        newCardsPerDay: parseNewCardsPerDay(goal.settings),
         activityMix: activityMixForDomain(goal.domain_id),
         now: ctx.now,
         timezone: ctx.timezone,
