@@ -1,8 +1,8 @@
 {
-  "title": "Proにアップグレード",
-  "subtitle": "ReeeeecallStudyの全機能をアンロック",
-  "youArePro": "Proです！",
-  "proDesc": "すべてのプレミアム機能をご利用いただけます。",
+  "title": "カードをもっと",
+  "subtitle": "有料プランは保存できるカード数を増やします。ほかの機能はすでにすべてお使いいただけます。",
+  "youArePro": "プランが有効です",
+  "proDesc": "カード上限が増えました。学習機能はどのプランでも同じです。",
   "done": "完了",
   "back": "戻る",
   "features": {
@@ -13,41 +13,19 @@
       "freeUnknown": "保存容量に上限あり",
       "proUnknown": "拡張された保存容量"
     },
-    "allModes": {
-      "title": "全学習モード",
-      "free": "SRS + 順次",
-      "pro": "全4モード"
-    },
     "aiGeneration": {
       "title": "AIカード生成",
       "free": "1日{{count, number}}枚 · クレジット購入可",
       "pro": "無料と同じ · クレジット購入可",
       "freeUnknown": "毎日の無料枠 · クレジット購入可"
-    },
-    "premiumTts": {
-      "title": "プレミアムTTS",
-      "free": "基本",
-      "pro": "Edge TTS HD"
-    },
-    "analytics": {
-      "title": "高度な分析",
-      "free": "基本統計",
-      "pro": "チャート + 予測"
-    },
-    "marketplace": {
-      "title": "マーケットプレイス公開",
-      "free": "ダウンロードのみ",
-      "pro": "アップロード + 収益分配"
     }
   },
   "free": "無料",
   "pro": "Pro",
   "monthly": "月額",
-  "annual": "年額",
-  "save40": "40%お得",
   "unavailable": "この地域ではご利用いただけません",
-  "welcomePro": "Proへようこそ！",
-  "welcomeProDesc": "すべてのプレミアム機能をご利用いただけます。",
+  "welcomePro": "プランが有効になりました",
+  "welcomeProDesc": "カード上限が増えました。学習機能はどのプランでも同じです。",
   "restorePurchase": "購入を復元",
   "restored": "Proサブスクリプションが復元されました。",
   "noRestoreFound": "復元可能なサブスクリプションが見つかりません。",
@@ -74,5 +52,6 @@
     "request": "返金をリクエスト",
     "title": "返金リクエスト",
     "submitted": "Apple に返金リクエストを送信しました。可否は Apple が判断し、メールで通知されます。承認された場合、アクセス権は自動的に取り消されます。"
-  }
+  },
+  "everythingElseFree": "すべての学習モード・TTS・統計・マーケットプレイス公開は、どのプランでも無料です。"
 }
