@@ -15,7 +15,10 @@ export function StatsSummaryCards({ totalCards, dueToday, streak, masteryRate }:
     // so group them explicitly — a 2,500-card account showed "2500".
     { label: t('dashboard:stats.totalCards'), value: formatCount(totalCards), color: 'text-foreground' },
     { label: t('dashboard:stats.todayReview'), value: formatCount(dueToday), color: 'text-warning' },
-    { label: t('dashboard:stats.streak'), value: `${formatCount(streak)}${t('common:units.days')}`, color: 'text-success' },
+    // Interpolated, not concatenated. `formatCount(n) + units.days` rendered "0days" in every
+    // space-separated language — the same defect already fixed on mobile, which uses exactly
+    // this key. CJK locales were fine either way, which is why it survived so long.
+    { label: t('dashboard:stats.streak'), value: t('dashboard:stats.streakDays', { count: streak }), color: 'text-success' },
     { label: t('dashboard:stats.masteryRate'), value: `${masteryRate}%`, color: 'text-brand' },
   ]
 

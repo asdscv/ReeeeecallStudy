@@ -4,7 +4,8 @@
     "totalCards": "การ์ดทั้งหมด",
     "todayReview": "ทบทวนวันนี้",
     "streak": "สถิติเรียนต่อเนื่อง",
-    "masteryRate": "อัตราความชำนาญ"
+    "masteryRate": "อัตราความชำนาญ",
+    "streakDays": "{{count, number}} วัน"
   },
   "dailyChart": {
     "title": "ปริมาณการเรียนรายวัน",

@@ -4,7 +4,8 @@
     "totalCards": "전체 카드",
     "todayReview": "오늘 복습",
     "streak": "연속 학습",
-    "masteryRate": "숙달률"
+    "masteryRate": "숙달률",
+    "streakDays": "{{count, number}}일"
   },
   "dailyChart": {
     "title": "일별 학습량",

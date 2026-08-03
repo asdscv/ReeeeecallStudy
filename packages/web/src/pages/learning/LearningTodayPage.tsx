@@ -384,12 +384,15 @@ function AttemptHistory({ goalId }: { goalId: string }) {
  *
  * There is no "완료" figure here on purpose. Any interval threshold — 21 days, 56, 365 — is a
  * state lapses knock cards out of daily, so a simulation of this app's scheduler settles at ~99%
- * and never fills. "Will I know it on the day" can reach 100%, so that is what is shown.
+ * and never fills.
+ *
+ * Nor is there a target-date projection. Judging at the deadline answers "what would I still
+ * know if I stopped today" — a forecast, and a bleak one: on a real account it rendered
+ * "0 of 120 known" for someone who had studied 55 cards, because every interval was shorter than
+ * the time remaining. Worth showing eventually, with the assumption written next to it. Not as
+ * the line that tells a learner where they stand.
  */
-function GoalProgress({ knowledge, targetDate }: {
-  knowledge: GoalKnowledge | null
-  targetDate: string | null
-}) {
+function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
   const { t } = useTranslation('learning')
   if (!knowledge || knowledge.total === 0) return null
 
@@ -399,9 +402,7 @@ function GoalProgress({ knowledge, targetDate }: {
   return (
     <section className="p-4 bg-card rounded-xl border border-border" aria-label={t('progress.title')}>
       <p className="text-sm text-foreground">
-        {targetDate
-          ? t('progress.knownAtTarget', { known: knowledge.known, total: knowledge.total, date: targetDate })
-          : t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
+        {t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
       </p>
       <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
         <div className="h-full bg-primary" style={{ width: `${percent}%` }} role="presentation" />
@@ -486,7 +487,10 @@ export function LearningTodayPage() {
 
   // Progress is judged at the goal's target date when it has one — "what will I still know on
   // exam day" — and at today otherwise. Server-aggregated: the plan only loads DUE cards.
-  const judgedAt = goal?.target_date ? `${goal.target_date}T00:00:00.000Z` : ctx.now
+  // NOW, not the target date. At the deadline this reported "0 of 120 known" for an account
+  // that had studied 55 cards, because the projection assumes you stop today — true, and useless
+  // as a status line. See GoalProgress for where the deadline belongs instead.
+  const judgedAt = ctx.now
   useEffect(() => {
     if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
   }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
@@ -549,7 +553,7 @@ export function LearningTodayPage() {
       {/* Where this goal actually stands. Judged at the target date when there is one, so the
           number answers "what will I know on the day" rather than "what do I know right now" —
           the first is the question a deadline makes people ask. */}
-      <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} targetDate={goal?.target_date ?? null} />
+      <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} />
 
       {goal && (
         <div className="p-4 bg-card rounded-xl border border-border">
