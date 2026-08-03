@@ -63,6 +63,37 @@ jobs:
           exit 0
 
   # ─────────────────────────────────────────────────────────────────────
+  # Job 1b: develop→main promotions must say their migrations were applied
+  #
+  # Merging to main auto-deploys web. If the schema lags the code, the app 404s on the new
+  # RPCs for every user and nothing in CI goes red — the ordering rule lived only in a
+  # runbook, i.e. in whoever remembered to open it.
+  #
+  # An attestation, not a measurement: production's version is not in git, and checking it
+  # for real would mean putting a database credential in a PUBLIC repo's CI — the same
+  # environment where a commit-message injection was found on 2026-08-03. See the script
+  # header for the full argument.
+  # ─────────────────────────────────────────────────────────────────────
+  migration-promotion:
+    name: Migration promotion gate
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Both sides of the comparison have to exist locally.
+          fetch-depth: 0
+      - name: Check migrations were applied before promoting
+        env:
+          # Via env, never interpolated into the script body — a PR description is attacker
+          # controlled, and `${{ }}` inside `run:` makes it code (see deploy-mobile.yml).
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          bash .github/scripts/check-migration-promotion.sh \
+            "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}"
+
+  # ─────────────────────────────────────────────────────────────────────
   # Job 2: Unit tests (vitest)
   # ─────────────────────────────────────────────────────────────────────
   unit-tests:
