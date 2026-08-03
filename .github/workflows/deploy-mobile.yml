@@ -79,10 +79,22 @@ jobs:
         working-directory: packages/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          # Passed as an ENVIRONMENT VARIABLE, never interpolated into the script body.
+          #
+          # `MSG="${{ github.event.head_commit.message }}"` substituted the commit message into
+          # the shell source before bash ever saw it, so the message was CODE. A release titled
+          #     release: 적응형 학습 일정 + "더 하기" + 페이월 정정
+          # closed the opening quote at `"더`, and bash tried to run the rest:
+          #     하기 + 페이월 정정 (migs 181–186): command not found   (exit 127)
+          # The whole deploy failed on a pair of quotation marks in a title.
+          #
+          # A message containing `$(...)` would not have failed — it would have RUN, on a runner
+          # holding EXPO_TOKEN. Anyone who can land a commit could name it accordingly. Through
+          # `env:` the value arrives as data and neither can happen.
+          HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          MSG="${{ github.event.head_commit.message }}"
-          # Truncate to first line to avoid CLI parser issues with multi-line.
-          MSG=$(echo "$MSG" | head -1)
+          # Truncate to the first line: the CLI takes a one-line message.
+          MSG=$(printf '%s' "$HEAD_COMMIT_MESSAGE" | head -1)
           # Fallback for workflow_dispatch (no head_commit) or empty message.
           if [ -z "$MSG" ]; then
             MSG=$(git log -1 --pretty=%s)
