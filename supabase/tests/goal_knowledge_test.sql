@@ -101,6 +101,47 @@ BEGIN
     RAISE EXCEPTION 'expected a missing goal to be reported, not counted as empty';
   EXCEPTION WHEN sqlstate 'P0002' THEN NULL; END;
 
+  -- ── an untouched card in a SUBSCRIBED deck is unseen, not absent ──────────
+  -- The resolver's first version chose its own scope and returned only cards the learner already
+  -- had a progress row for, so a goal over a subscribed deck under-reported its own total. A
+  -- differential run against the pre-resolver function is what caught it (12 where 182 said 14),
+  -- and this is that case, pinned.
+  DECLARE
+    v_pub    uuid := '77770000-0000-4000-8000-000000000007';
+    v_ptmpl  uuid;
+    v_pdeck  uuid;
+    v_goal2  uuid;
+    r2       jsonb;
+  BEGIN
+    INSERT INTO auth.users (id) VALUES (v_pub) ON CONFLICT (id) DO NOTHING;
+    INSERT INTO card_templates (user_id, name, fields)
+      VALUES (v_pub, 'P', '[{"key":"f","name":"F","type":"text"}]'::jsonb) RETURNING id INTO v_ptmpl;
+    INSERT INTO decks (user_id, name, default_template_id)
+      VALUES (v_pub, 'Published', v_ptmpl) RETURNING id INTO v_pdeck;
+    -- Three cards the publisher has studied to 300 days. The learner owns none of them.
+    INSERT INTO cards (deck_id, user_id, template_id, field_values, srs_status, interval_days, last_reviewed_at)
+    SELECT v_pdeck, v_pub, v_ptmpl, '{"f":"s"}'::jsonb, 'review', 300, now() - INTERVAL '1 day'
+    FROM generate_series(1, 3);
+    -- The learner has touched exactly one of them.
+    INSERT INTO user_card_progress (user_id, card_id, deck_id, srs_status, interval_days, last_reviewed_at)
+    SELECT v_owner, c.id, c.deck_id, 'review', 40, now() - INTERVAL '1 day'
+    FROM (SELECT id, deck_id FROM cards WHERE deck_id = v_pdeck LIMIT 1) c;
+
+    INSERT INTO learning_goals (user_id, domain_id, title, daily_minutes)
+      VALUES (v_owner, 'general', 'Subscribed goal', 20) RETURNING id INTO v_goal2;
+    INSERT INTO learning_goal_decks (goal_id, deck_id, importance) VALUES (v_goal2, v_pdeck, 0.5);
+
+    r2 := get_goal_knowledge(v_goal2, v_now, 1.0);
+    ASSERT (r2->>'total')::int = 3,
+      format('all three subscribed cards must count, not just the touched one: %s', r2);
+    ASSERT (r2->>'unseen')::int = 2, format('the two untouched cards must be unseen: %s', r2);
+    -- And the one they DID touch is judged on THEIR 40-day interval, not the publisher's 300.
+    ASSERT (r2->>'known')::int = 1, format('the touched card should be known: %s', r2);
+    r2 := get_goal_knowledge(v_goal2, v_now + INTERVAL '100 days', 1.0);
+    ASSERT (r2->>'known')::int = 0,
+      format('at +100 days a 40-day interval is gone; reading the publisher''s 300 would keep it: %s', r2);
+  END;
+
   RAISE NOTICE 'goal_knowledge_test: all assertions passed';
 END $$;
 

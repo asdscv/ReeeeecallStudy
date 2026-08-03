@@ -210,6 +210,9 @@
     "title": "Progreso",
     "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
     "knownAtTarget": "{{known, number}} de {{total, number}} tarjetas aún recordadas el {{date}}",
-    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar"
+    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar",
+    "daysLeft": "Quedan {{count, number}} días",
+    "daysLeft_one": "Queda {{count, number}} día",
+    "daysLeft_other": "Quedan {{count, number}} días"
   }
 }
