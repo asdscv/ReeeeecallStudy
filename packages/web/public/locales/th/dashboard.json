@@ -5,7 +5,9 @@
     "todayReview": "ทบทวนวันนี้",
     "streak": "สถิติเรียนต่อเนื่อง",
     "masteryRate": "อัตราความชำนาญ",
-    "streakDays": "{{count, number}} วัน"
+    "streakDays": "{{count, number}} วัน",
+    "streakDays_one": "{{count, number}} วัน",
+    "streakDays_other": "{{count, number}} วัน"
   },
   "dailyChart": {
     "title": "ปริมาณการเรียนรายวัน",

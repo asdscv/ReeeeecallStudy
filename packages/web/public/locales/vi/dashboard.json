@@ -5,7 +5,9 @@
     "todayReview": "Ôn tập hôm nay",
     "streak": "Chuỗi học tập",
     "masteryRate": "Tỷ lệ thành thạo",
-    "streakDays": "{{count, number}} ngày"
+    "streakDays": "{{count, number}} ngày",
+    "streakDays_one": "{{count, number}} ngày",
+    "streakDays_other": "{{count, number}} ngày"
   },
   "dailyChart": {
     "title": "Lượng học hàng ngày",

@@ -5,7 +5,9 @@
     "todayReview": "오늘 복습",
     "streak": "연속 학습",
     "masteryRate": "숙달률",
-    "streakDays": "{{count, number}}일"
+    "streakDays": "{{count, number}}일",
+    "streakDays_one": "{{count, number}}일",
+    "streakDays_other": "{{count, number}}일"
   },
   "dailyChart": {
     "title": "일별 학습량",
