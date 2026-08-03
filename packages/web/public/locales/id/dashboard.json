@@ -4,7 +4,10 @@
     "totalCards": "Total Kartu",
     "todayReview": "Ulasan Hari Ini",
     "streak": "Rentetan Belajar",
-    "masteryRate": "Tingkat Penguasaan"
+    "masteryRate": "Tingkat Penguasaan",
+    "streakDays": "{{count, number}} hari",
+    "streakDays_one": "{{count, number}} hari",
+    "streakDays_other": "{{count, number}} hari"
   },
   "dailyChart": {
     "title": "Volume Belajar Harian",

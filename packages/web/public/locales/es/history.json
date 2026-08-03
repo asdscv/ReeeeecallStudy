@@ -82,7 +82,8 @@
     "noModeData": "Sin datos de modo",
     "sessionCountLabel": "{{count, number}} sesiones",
     "cardCountLabel": "{{count, number}} tarjetas",
-    "performance": "Rendimiento"
+    "performance": "Rendimiento",
+    "noSrsEffect": "no cambia el calendario"
   },
   "ratingGroups": {
     "srs": "Repetición espaciada",

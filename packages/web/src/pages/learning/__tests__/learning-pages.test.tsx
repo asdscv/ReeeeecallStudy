@@ -10,7 +10,7 @@
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 type StoreState = Record<string, unknown>
 
@@ -26,12 +26,21 @@ vi.mock('../../../stores/confirm-store', () => ({
   useConfirmStore: (selector: (s: { confirm: unknown }) => unknown) =>
     selector({ confirm: mockConfirm }),
 }))
+vi.mock('../../../stores/auth-store', () => ({ useAuthStore: () => ({ user: { id: 'user-1' } }) }))
 vi.mock('../../../stores/deck-store', () => ({
-  useDeckStore: () => ({ decks: [{ id: 'deck-1', name: 'Deck one' }], fetchDecks: vi.fn() }),
+  // `stats` mirrors the real store's initial state — GoalFormModal reads it to size the plan
+  // preview from `get_deck_stats`, and an omitted field here is a mock defect, not a
+  // component contract to code defensively around.
+  useDeckStore: () => ({
+    decks: [{ id: 'deck-1', name: 'Deck one' }],
+    stats: [{ deck_id: 'deck-1', deck_name: 'Deck one', total_cards: 40, new_cards: 30, review_cards: 8, learning_cards: 2, last_studied: null }],
+    fetchDecks: vi.fn(), fetchStats: vi.fn(),
+  }),
 }))
 
 import { LearningTodayPage } from '../LearningTodayPage'
 import { LearningGoalsPage } from '../LearningGoalsPage'
+import { currentPlanContext } from '../../../lib/learning-plan-date'
 
 const goal = {
   id: 'goal-1', domain_id: 'language', title: 'JLPT N2', target_date: null,
@@ -41,6 +50,11 @@ const goal = {
 }
 
 const baseState = (over: StoreState = {}): StoreState => ({
+  // Mirrors the real store's initial state. `knowledge` feeds the plan's progress header;
+  // omitting it here is a mock defect, not a reason to make the component defensive.
+  knowledge: {},
+  knowledgeLoading: false,
+  fetchGoalKnowledge: vi.fn(),
   goals: [goal],
   goalsLoading: false,
   goalsError: null,
@@ -58,6 +72,12 @@ const baseState = (over: StoreState = {}): StoreState => ({
   setGoalDecks: vi.fn(),
   fetchPlan: vi.fn(),
   generatePlan: vi.fn(),
+  autoGeneratePlan: vi.fn(),
+  planAbsentFor: null,
+  autoPlanAttempted: {},
+  extendPlan: vi.fn(),
+  planExtending: false,
+  planExtension: null,
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
@@ -79,9 +99,24 @@ const baseState = (over: StoreState = {}): StoreState => ({
   ...over,
 })
 
+/**
+ * The plan date the page computes for itself.
+ *
+ * Derived from the same function the page uses rather than hardcoded: the key is a LOCAL
+ * calendar date, so a fixed string passes in Seoul and fails in CI's UTC — the kind of test that
+ * only goes red on someone else's machine.
+ */
+const todayKey = () => currentPlanContext().planDate
+
 const renderToday = (over: StoreState = {}) => {
   storeState.current = baseState(over)
-  render(<MemoryRouter><LearningTodayPage /></MemoryRouter>)
+  // The plan is addressed by URL now — `/learning/:goalId` — instead of being chosen from a
+  // dropdown repeated on three sibling screens.
+  render(
+    <MemoryRouter initialEntries={['/learning/goal-1']}>
+      <Routes><Route path="/learning/:goalId" element={<LearningTodayPage />} /></Routes>
+    </MemoryRouter>,
+  )
   return storeState.current
 }
 
@@ -97,31 +132,54 @@ beforeEach(() => {
 })
 
 describe('LearningTodayPage', () => {
-  it('never writes a plan just because the page opened', () => {
+  it('reads on open, and asks the store whether a plan should be built', () => {
+    // REVERSED, deliberately. This used to assert that opening the page never writes a plan,
+    // guarding the 50-saves-per-day cap against a mount effect that fired on `plan === null` —
+    // a value that also means "not read yet" and "the read failed".
+    //
+    // The guard now lives where it can actually be correct: `autoGeneratePlan` acts only on
+    // `planAbsentFor`, which only a SUCCESSFUL read sets, and attempts once per goal per day.
+    // The page therefore always asks, and the store decides. What the page must NOT do is call
+    // `generatePlan` directly on mount, which is what the next assertion pins.
     const state = renderToday()
 
-    // Reading is automatic…
     expect(state.fetchGoals).toHaveBeenCalled()
     expect(state.fetchPlan).toHaveBeenCalledWith('goal-1', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/))
-    // …writing is not. This is the 50-saves-per-day quota guard.
+    expect(state.autoGeneratePlan).toHaveBeenCalled()
+    // Still never the unguarded write.
     expect(state.generatePlan).not.toHaveBeenCalled()
   })
 
-  it('offers to build a plan when none exists, and only then writes', async () => {
-    const state = renderToday()
+  it('says it is building rather than offering a button, while automation still has its turn', async () => {
+    // The state right after an empty read: the effect is about to write. Showing a button here
+    // would flash for a frame and then vanish under the learner's finger.
+    renderToday({ planAbsentFor: 'goal-1|' + todayKey(), autoPlanAttempted: {} })
 
-    const button = screen.getByRole('button', { name: 'today.generate' })
-    await userEvent.click(button)
+    expect(screen.queryByRole('button', { name: 'today.generate' })).not.toBeInTheDocument()
+    expect(screen.getByText('today.generating')).toBeInTheDocument()
+  })
+
+  it('falls back to a button once automation has had its turn and produced nothing', async () => {
+    // The reachable failure path: the one automatic attempt was spent and no plan came back.
+    // Without this the learner has no way to plan for the rest of the day.
+    const state = renderToday({
+      planAbsentFor: 'goal-1|' + todayKey(),
+      autoPlanAttempted: { ['goal-1|' + todayKey()]: true },
+    })
+
+    await userEvent.click(screen.getByRole('button', { name: 'today.generate' }))
 
     expect(state.generatePlan).toHaveBeenCalledTimes(1)
   })
 
-  it('points a user with no goal at goal creation instead of an empty list', () => {
+  it('sends a URL that names no plannable goal back to the list', () => {
+    // Archived, deleted, or someone else's id. Falling back to "the first goal" would serve a
+    // different plan under this URL, which is worse than an empty state.
     renderToday({ goals: [] })
 
     expect(screen.getByText('today.empty.noGoal')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'today.empty.createGoal' }))
-      .toHaveAttribute('href', '/learning/goals')
+    expect(screen.getByRole('link', { name: 'today.backToPlans' }))
+      .toHaveAttribute('href', '/learning')
     expect(screen.queryByRole('button', { name: 'today.generate' })).not.toBeInTheDocument()
   })
 
@@ -212,6 +270,64 @@ describe('LearningTodayPage', () => {
 
     expect(screen.getByRole('button', { name: 'today.regenerate' })).toBeDisabled()
     expect(screen.getByText('today.completedNote')).toBeInTheDocument()
+  })
+
+  // ── "더 하기" ────────────────────────────────────────────────────────────
+  const completedPlan = {
+    plan: {
+      id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
+      algorithm_version: 'daily-plan-v1', input_fingerprint: 'fnv1a32:abc', status: 'completed',
+      budget_minutes: 20, completed_minutes: 20, completed_items: 1, total_items: 1,
+    },
+    planItems: [],
+  }
+
+  it('offers more work on a finished day, when rebuilding is refused', async () => {
+    // The day a learner is doing BEST is the day the product had nothing to offer: the plan is
+    // complete, so `save_daily_plan` refuses it, and there was no other way to add work.
+    const state = renderToday(completedPlan)
+
+    const button = screen.getByRole('button', { name: 'today.extend' })
+    expect(button).toBeEnabled()
+
+    await userEvent.click(button)
+    expect(state.extendPlan).toHaveBeenCalledTimes(1)
+    // Never the destructive one.
+    expect(state.generatePlan).not.toHaveBeenCalled()
+  })
+
+  it('says how much tomorrow grows', async () => {
+    // The one cost of "더 하기" the learner cannot see today. Left unsaid, a learner presses it
+    // four times tonight and meets a tripled list tomorrow with no idea why.
+    renderToday({
+      ...completedPlan,
+      planExtension: { appended: 12, newCards: 5, reviewsTomorrow: 5 },
+    })
+
+    expect(screen.getByText(/today\.extendAdded/)).toBeInTheDocument()
+    expect(screen.getByText(/today\.extendTomorrow/)).toBeInTheDocument()
+  })
+
+  it('stays quiet about tomorrow when the extra work is all review', async () => {
+    // Reviews were coming back on their own schedule anyway. Claiming they add load would make
+    // the one sentence that matters into noise the learner learns to skip.
+    renderToday({
+      ...completedPlan,
+      planExtension: { appended: 12, newCards: 0, reviewsTomorrow: 0 },
+    })
+
+    expect(screen.getByText(/today\.extendAdded/)).toBeInTheDocument()
+    expect(screen.queryByText(/today\.extendTomorrow/)).not.toBeInTheDocument()
+  })
+
+  it('says so plainly when there was nothing left to add', async () => {
+    // Otherwise a press that appended zero items looks identical to one that worked.
+    renderToday({
+      ...completedPlan,
+      planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 },
+    })
+
+    expect(screen.getByText('today.extendNothing')).toBeInTheDocument()
   })
 })
 

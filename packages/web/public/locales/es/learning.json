@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "Plan de hoy",
-    "manageGoals": "Gestionar objetivos",
-    "selectGoal": "Seleccionar un objetivo",
     "budget": "{{count, number}} min/día",
     "progress": "{{done, number}} de {{total, number}} completados",
     "generate": "Crear plan de hoy",
@@ -52,13 +50,19 @@
       "placeholder": "Escribe lo que recuerdes",
       "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya."
     },
-    "insightsLink": "Diagnóstico",
-    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla"
+    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
+    "backToPlans": "Todos los planes",
+    "extend": "Estudiar más",
+    "extending": "Añadiendo…",
+    "extendAdded_one": "Se añadió {{count, number}} elemento más.",
+    "extendAdded_other": "Se añadieron {{count, number}} elementos más.",
+    "extendTomorrow_one": "{{count, number}} es nueva, así que mañana tendrás ese mismo número de repasos más.",
+    "extendTomorrow_other": "{{count, number}} son nuevas, así que mañana tendrás ese mismo número de repasos más.",
+    "extendNothing": "Ahora mismo no hay nada más que añadir."
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
     "subtitle": "Un objetivo contiene tus minutos diarios y los mazos con los que se construye tu plan.",
-    "todayLink": "Plan de hoy",
     "create": "Nuevo objetivo",
     "edit": "Editar",
     "archive": "Archivar",
@@ -92,14 +96,8 @@
   "form": {
     "createTitle": "Nuevo objetivo",
     "editTitle": "Editar objetivo",
-    "domain": "Materia",
-    "domainName": {
-      "general": "Estudio general",
-      "language": "Idiomas"
-    },
     "goalTitle": "Nombre del objetivo",
     "goalTitlePlaceholder": "p. ej. Aprobar el JLPT N2",
-    "dailyMinutes": "Minutos por día",
     "targetDate": "Fecha objetivo (opcional)",
     "decks": "Mazos a estudiar",
     "decksHint": "Tu plan se construye con las tarjetas de estos mazos.",
@@ -109,15 +107,27 @@
     "saving": "Guardando…",
     "error": {
       "title": "Introduce un nombre de objetivo (1–500 caracteres).",
-      "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440."
+      "decks": "Elige al menos un mazo."
     },
-    "deckPriority": {
-      "label": "Prioridad",
-      "low": "Baja",
-      "normal": "Normal",
-      "high": "Alta",
-      "hint": "Los mazos con más prioridad aparecen antes cuando el día está lleno."
-    }
+    "plan": {
+      "title": "Plan estimado",
+      "needDecksAndDate": "Elige mazos y una fecha objetivo para ver la carga diaria.",
+      "minutes": "{{count, number}} min/día",
+      "peak": "Día más cargado: {{minutes, number}} min (día {{day, number}})",
+      "byMinutes": "O fija min/día",
+      "finishBy": "Termina alrededor del {{date}}",
+      "tooSlow": "Ese tiempo no alcanza ni para los repasos.",
+      "srsOnly": "Solo el estudio en modo SRS cuenta para este plan.",
+      "estimate": "Es una estimación. Se recalcula a diario con tus resultados reales.",
+      "newPerDay_one": "{{count, number}} tarjeta nueva/día",
+      "newPerDay_other": "{{count, number}} tarjetas nuevas/día",
+      "newPerDay": "{{count, number}} tarjetas nuevas/día"
+    },
+    "studyDays": "Días de estudio por semana",
+    "studyDaysOption_one": "{{count}} día",
+    "studyDaysOption_other": "{{count}} días",
+    "newCardsPerDay": "Tarjetas nuevas por día de estudio",
+    "newCardsHint": "Los repasos van primero. Si te atrasas, las tarjetas nuevas se pausan hasta que te pongas al día."
   },
   "history": {
     "title": "Intentos recientes ({{count, number}})",
@@ -195,5 +205,13 @@
       "dismissed": "Descartada",
       "expired": "Caducada"
     }
+  },
+  "progress": {
+    "title": "Progreso",
+    "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
+    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar",
+    "daysLeft": "Quedan {{count, number}} días",
+    "daysLeft_one": "Queda {{count, number}} día",
+    "daysLeft_other": "Quedan {{count, number}} días"
   }
 }

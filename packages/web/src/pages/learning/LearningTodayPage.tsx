@@ -1,9 +1,9 @@
 import { useEffect, useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   useLearningStore,
-  type LearningGoalWithDecks, type AttemptRow, type RemediationAction,
+  type LearningGoalWithDecks, type AttemptRow, type RemediationAction, type GoalKnowledge,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
@@ -374,22 +374,65 @@ function AttemptHistory({ goalId }: { goalId: string }) {
   )
 }
 
+/**
+ * Where a goal stands, in the three numbers that mean something.
+ *
+ * `unseen` is kept out of the ratio rather than counted as unknown: a deck nobody has opened is
+ * "not started", and reporting a confident 0% for it is a different, wronger claim. The bar
+ * therefore measures known against what has actually been attempted, and the untouched remainder
+ * is stated separately.
+ *
+ * There is no "완료" figure here on purpose. Any interval threshold — 21 days, 56, 365 — is a
+ * state lapses knock cards out of daily, so a simulation of this app's scheduler settles at ~99%
+ * and never fills.
+ *
+ * Nor is there a target-date projection. Judging at the deadline answers "what would I still
+ * know if I stopped today" — a forecast, and a bleak one: on a real account it rendered
+ * "0 of 120 known" for someone who had studied 55 cards, because every interval was shorter than
+ * the time remaining. Worth showing eventually, with the assumption written next to it. Not as
+ * the line that tells a learner where they stand.
+ */
+function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
+  const { t } = useTranslation('learning')
+  if (!knowledge || knowledge.total === 0) return null
+
+  const attempted = knowledge.known + knowledge.unknown
+  const percent = attempted > 0 ? Math.round((knowledge.known / attempted) * 100) : 0
+
+  return (
+    <section className="p-4 bg-card rounded-xl border border-border" aria-label={t('progress.title')}>
+      <p className="text-sm text-foreground">
+        {t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
+      </p>
+      <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+        <div className="h-full bg-primary" style={{ width: `${percent}%` }} role="presentation" />
+      </div>
+      <p className="mt-1.5 text-[11px] text-content-tertiary">
+        {t('progress.breakdown', {
+          known: knowledge.known, shaky: knowledge.unknown, unseen: knowledge.unseen,
+        })}
+      </p>
+    </section>
+  )
+}
+
 export function LearningTodayPage() {
   const { t } = useTranslation('learning')
   const {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    extendPlan, planExtending, planExtension, recordAttempt,
     attempts, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
+    knowledge, fetchGoalKnowledge,
   } = useLearningStore()
   const { i18n } = useTranslation('learning')
 
-  // The chosen goal is an OVERRIDE, not mirrored state: deriving the default from the
-  // loaded goals avoids a set-state-in-effect (the repo forbids driving state from
-  // effects, and it would also render once with no goal before correcting itself).
-  const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
+  // The goal comes from the URL now, not a dropdown. `/learning` lists the plans and each one
+  // links here, so the three learning screens no longer each ask "which goal?" separately.
+  const { goalId: routeGoalId } = useParams<{ goalId: string }>()
   // One context per mount: the plan date must not drift mid-session, and the planner's
   // `now` is part of its input fingerprint.
   const ctx = useMemo(() => currentPlanContext(), [])
@@ -401,16 +444,56 @@ export function LearningTodayPage() {
     [goals],
   )
 
-  const selectedGoalId = plannableGoals.some((goal) => goal.id === goalOverrideId)
-    ? goalOverrideId
-    : plannableGoals[0]?.id ?? null
+  // An id in the URL that is not a plannable goal (archived, deleted, or someone else's) falls
+  // back to nothing rather than silently showing a different goal's plan under that URL.
+  const selectedGoalId = plannableGoals.some((candidate) => candidate.id === routeGoalId)
+    ? routeGoalId ?? null
+    : null
 
   useEffect(() => {
     if (selectedGoalId) void fetchPlan(selectedGoalId, ctx.planDate)
   }, [selectedGoalId, ctx.planDate, fetchPlan])
 
+
   const goal: LearningGoalWithDecks | undefined =
     plannableGoals.find((candidate) => candidate.id === selectedGoalId)
+
+  /**
+   * Build today's plan on open, once the read has come back empty.
+   *
+   * This deliberately reverses the rule the earlier test pinned ("opening the page must not
+   * write a plan"). That guard existed because a naive mount effect would fire on `plan === null`
+   * — which is also the initial state and the failed-read state — and spend the 50-writes-a-day
+   * cap. `autoGeneratePlan` acts only on `planAbsentFor`, a fact only a SUCCESSFUL read sets, and
+   * attempts once per goal per day. The reason to reverse it: a learner opening the app to an
+   * empty screen and a button is being asked to do the one thing the app knows how to do itself.
+   */
+  useEffect(() => {
+    if (goal) void autoGeneratePlan(goal, ctx)
+  }, [goal, ctx, autoGeneratePlan, planAbsentFor])
+
+  /**
+   * Whether automation still has its turn — the same four conditions `autoGeneratePlan` checks.
+   *
+   * Read here so the manual button does not appear for the one frame between the empty read and
+   * the effect that acts on it. Duplicating the conditions is the lesser evil: the alternative is
+   * a store flag written by the effect, which would be a second source of truth for the same
+   * question and could disagree with the one that actually gates the write.
+   */
+  const autoWillRun = !!goal
+    && planAbsentFor === `${goal.id}|${ctx.planDate}`
+    && !autoPlanAttempted[`${goal.id}|${ctx.planDate}`]
+    && !!goal.decks?.length
+
+  // Progress is judged at the goal's target date when it has one — "what will I still know on
+  // exam day" — and at today otherwise. Server-aggregated: the plan only loads DUE cards.
+  // NOW, not the target date. At the deadline this reported "0 of 120 known" for an account
+  // that had studied 55 cards, because the projection assumes you stop today — true, and useless
+  // as a status line. See GoalProgress for where the deadline belongs instead.
+  const judgedAt = ctx.now
+  useEffect(() => {
+    if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
+  }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
 
   /**
    * The same goal filter `AttemptHistory` applies, for the same reason — and it has to be
@@ -429,17 +512,17 @@ export function LearningTodayPage() {
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
-  if (plannableGoals.length === 0) {
+  if (!selectedGoalId) {
     return (
       <div className="max-w-2xl mx-auto p-4">
         <h1 className="text-lg font-medium text-foreground">{t('today.title')}</h1>
         <div className="mt-4 p-6 bg-card rounded-xl border border-border text-center">
           <p className="text-sm text-muted-foreground">{t('today.empty.noGoal')}</p>
           <Link
-            to="/learning/goals"
+            to="/learning"
             className="inline-block mt-3 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg"
           >
-            {t('today.empty.createGoal')}
+            {t('today.backToPlans')}
           </Link>
         </div>
       </div>
@@ -461,29 +544,16 @@ export function LearningTodayPage() {
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-lg font-medium text-foreground">{t('today.title')}</h1>
-        <span className="flex items-center gap-3">
-          <Link to="/learning/insights" className="text-xs text-primary hover:underline">
-            {t('today.insightsLink')}
-          </Link>
-          <Link to="/learning/goals" className="text-xs text-primary hover:underline">
-            {t('today.manageGoals')}
-          </Link>
-        </span>
+        <h1 className="text-lg font-medium text-foreground truncate">{goal?.title ?? t('today.title')}</h1>
+        <Link to="/learning" className="text-xs text-primary hover:underline shrink-0">
+          {t('today.backToPlans')}
+        </Link>
       </div>
 
-      {plannableGoals.length > 1 && (
-        <select
-          value={selectedGoalId ?? ''}
-          onChange={(e) => setGoalOverrideId(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg cursor-pointer"
-          aria-label={t('today.selectGoal')}
-        >
-          {plannableGoals.map((option) => (
-            <option key={option.id} value={option.id}>{option.title}</option>
-          ))}
-        </select>
-      )}
+      {/* Where this goal actually stands. Judged at the target date when there is one, so the
+          number answers "what will I know on the day" rather than "what do I know right now" —
+          the first is the question a deadline makes people ask. */}
+      <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} />
 
       {goal && (
         <div className="p-4 bg-card rounded-xl border border-border">
@@ -593,10 +663,39 @@ export function LearningTodayPage() {
               )
             })}
           </ul>
+          {/* "더 하기" comes FIRST, and is the primary action once the day is done.
+              Rebuilding is the destructive one — it deletes every item and zeroes the day's
+              progress — so the additive option has to be the one that is easier to reach. */}
+          <button
+            type="button"
+            onClick={() => { if (goal) void extendPlan(goal, ctx) }}
+            disabled={planExtending || planGenerating || !goal}
+            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
+          >
+            {planExtending ? t('today.extending') : t('today.extend')}
+          </button>
+
+          {planExtension && (
+            <p className="text-xs text-content-tertiary text-center" aria-live="polite">
+              {planExtension.appended === 0
+                ? t('today.extendNothing')
+                : (
+                  <>
+                    {t('today.extendAdded', { count: planExtension.appended })}
+                    {/* The cost, said out loud. Every card started today comes back tomorrow,
+                        and a button that grows tomorrow's list in silence is how a learner
+                        ends up abandoning a goal they were doing well at. */}
+                    {planExtension.reviewsTomorrow > 0
+                      && ` ${t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })}`}
+                  </>
+                )}
+            </p>
+          )}
+
           <button
             type="button"
             onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={planGenerating || plan.status === 'completed'}
+            disabled={planGenerating || planExtending || plan.status === 'completed'}
             className="w-full px-3 py-2 text-sm border border-border rounded-lg cursor-pointer disabled:opacity-50"
           >
             {planGenerating ? t('today.regenerating') : t('today.regenerate')}
@@ -605,15 +704,23 @@ export function LearningTodayPage() {
             <p className="text-xs text-content-tertiary text-center">{t('today.completedNote')}</p>
           )}
         </>
+      ) : planGenerating || autoWillRun ? (
+        // Building it. No button: the learner is not being asked for anything, they are being
+        // told what is happening.
+        <p className="py-3 text-sm text-center text-muted-foreground" aria-live="polite">
+          {t('today.generating')}
+        </p>
       ) : (
+        // Only reachable once automation has had its turn and produced nothing — a failed save,
+        // or a goal the learner has already regenerated today. The button is the way back.
         !planBlockedReason && (
           <button
             type="button"
             onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={planGenerating || !goal}
+            disabled={!goal}
             className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
           >
-            {planGenerating ? t('today.generating') : t('today.generate')}
+            {t('today.generate')}
           </button>
         )
       )}

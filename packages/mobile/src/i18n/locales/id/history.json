@@ -51,5 +51,6 @@
     "performance": "Performa",
     "streak": "Rangkaian",
     "avgDuration": "Durasi Rata-rata"
-  }
+  },
+  "noSrsEffect": "tidak mengubah jadwal"
 }

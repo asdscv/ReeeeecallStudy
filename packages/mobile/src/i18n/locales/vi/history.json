@@ -51,5 +51,6 @@
     "performance": "Hiệu suất",
     "streak": "Chuỗi ngày",
     "avgDuration": "Thời lượng TB"
-  }
+  },
+  "noSrsEffect": "không đổi lịch ôn"
 }

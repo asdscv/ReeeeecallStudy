@@ -174,3 +174,101 @@ describe('planner memory model (daily-plan-v2)', () => {
     expect(a.inputFingerprint).not.toBe(b.inputFingerprint)
   })
 })
+
+// ── intake vs owed work ──────────────────────────────────────────────────────
+//
+// A new card scores `dueUrgency = 1` — "never seen" is the most overdue a card can be — so on
+// raw score it OUTRANKS a review that is genuinely late. That is correct as a measure of urgency
+// and wrong as a selection rule: intake wins the budget, owed reviews slip, and every slipped
+// review returns tomorrow alongside the intake that displaced it. It compounds, and nothing in
+// the product would tell the learner why their backlog only grows.
+describe('reviews before new cards', () => {
+  // Two minutes of budget: room for exactly one three-minute card... so use one-minute cards and
+  // a budget that fits two, which is the smallest setup where "which one wins" is observable.
+  const tight = { ...baseInput, budgetMinutes: 2 }
+  const review = (id: string) =>
+    candidate(id, 'recall', { estimatedMinutes: 1, isNew: false, dueUrgency: 0.6 })
+  const fresh = (id: string) =>
+    candidate(id, 'recall', { estimatedMinutes: 1, isNew: true, dueUrgency: 1 })
+
+  it('spends the budget on owed reviews before starting anything new', () => {
+    const out = buildDailyPlan({ ...tight, candidates: [fresh('n1'), fresh('n2'), review('r1'), review('r2')] })
+
+    // Both slots go to reviews even though the new cards score higher.
+    expect(out.items.map((item) => item.candidateId).sort()).toEqual(['r1', 'r2'])
+  })
+
+  it('starts new cards with whatever the reviews did not use', () => {
+    const out = buildDailyPlan({ ...tight, candidates: [fresh('n1'), fresh('n2'), review('r1')] })
+
+    expect(out.items).toHaveLength(2)
+    expect(out.items.map((item) => item.candidateId)).toContain('r1')
+    expect(out.items.some((item) => item.candidateId.startsWith('n'))).toBe(true)
+  })
+
+  it('pauses intake entirely when reviews fill the day', () => {
+    // The benign failure mode this split exists to produce: buried in reviews, the learner is
+    // not handed new cards on top. Intake resumes by itself once they catch up.
+    const out = buildDailyPlan({ ...tight, candidates: [fresh('n1'), review('r1'), review('r2')] })
+
+    expect(out.items.every((item) => item.candidateId.startsWith('r'))).toBe(true)
+  })
+
+  it('treats a candidate with no isNew flag as a review', () => {
+    // Every caller before this existed omitted the field. Reading `undefined` as "new" would
+    // have made every existing plan intake-capped overnight.
+    const out = buildDailyPlan({
+      ...tight,
+      newCardsPerDay: 0,
+      candidates: [candidate('legacy-1', 'recall', { estimatedMinutes: 1 })],
+    })
+
+    expect(out.items.map((item) => item.candidateId)).toEqual(['legacy-1'])
+  })
+})
+
+describe('daily new-card limit', () => {
+  const roomy = { ...baseInput, budgetMinutes: 100 }
+  const fresh = (id: string) => candidate(id, 'recall', { estimatedMinutes: 1, isNew: true })
+  const review = (id: string) => candidate(id, 'recall', { estimatedMinutes: 1, isNew: false })
+
+  it('starts at most the configured number of new cards', () => {
+    const out = buildDailyPlan({
+      ...roomy, newCardsPerDay: 2,
+      candidates: [fresh('n1'), fresh('n2'), fresh('n3'), fresh('n4'), fresh('n5')],
+    })
+
+    expect(out.items).toHaveLength(2)
+  })
+
+  it('never caps reviews', () => {
+    // Reviews are work already owed. Refusing to show them would not make them go away, it would
+    // only hide how far behind the learner is.
+    const out = buildDailyPlan({
+      ...roomy, newCardsPerDay: 1,
+      candidates: [review('r1'), review('r2'), review('r3'), fresh('n1'), fresh('n2')],
+    })
+
+    const ids = out.items.map((item) => item.candidateId)
+    expect(ids.filter((id) => id.startsWith('r'))).toHaveLength(3)
+    expect(ids.filter((id) => id.startsWith('n'))).toHaveLength(1)
+  })
+
+  it('accepts zero — "let me just catch up"', () => {
+    const out = buildDailyPlan({
+      ...roomy, newCardsPerDay: 0,
+      candidates: [review('r1'), fresh('n1'), fresh('n2')],
+    })
+
+    expect(out.items.map((item) => item.candidateId)).toEqual(['r1'])
+  })
+
+  it('is uncapped when absent, which is how every earlier caller behaved', () => {
+    const out = buildDailyPlan({
+      ...roomy,
+      candidates: [fresh('n1'), fresh('n2'), fresh('n3')],
+    })
+
+    expect(out.items).toHaveLength(3)
+  })
+})

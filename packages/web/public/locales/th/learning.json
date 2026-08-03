@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "แผนวันนี้",
-    "manageGoals": "จัดการเป้าหมาย",
-    "selectGoal": "เลือกเป้าหมาย",
     "budget": "{{count, number}} นาที/วัน",
     "progress": "เสร็จ {{done, number}} จาก {{total, number}}",
     "generate": "สร้างแผนวันนี้",
@@ -52,13 +50,19 @@
       "placeholder": "พิมพ์สิ่งที่คุณจำได้",
       "note": "บันทึกไว้พร้อมการทำครั้งนี้ ไม่มีการให้คะแนน — คุณยังประเมินตัวเองเอง"
     },
-    "insightsLink": "วิเคราะห์",
-    "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%"
+    "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%",
+    "backToPlans": "แผนทั้งหมด",
+    "extend": "เรียนเพิ่ม",
+    "extending": "กำลังเพิ่ม…",
+    "extendAdded_one": "เพิ่มอีก {{count, number}} รายการแล้ว",
+    "extendAdded_other": "เพิ่มอีก {{count, number}} รายการแล้ว",
+    "extendTomorrow_one": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
+    "extendTomorrow_other": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
+    "extendNothing": "ตอนนี้ไม่มีอะไรให้เพิ่มแล้ว"
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",
     "subtitle": "เป้าหมายประกอบด้วยจำนวนนาทีต่อวันและสำรับที่ใช้สร้างแผน",
-    "todayLink": "แผนวันนี้",
     "create": "เป้าหมายใหม่",
     "edit": "แก้ไข",
     "archive": "เก็บถาวร",
@@ -92,14 +96,8 @@
   "form": {
     "createTitle": "เป้าหมายใหม่",
     "editTitle": "แก้ไขเป้าหมาย",
-    "domain": "สาขาวิชา",
-    "domainName": {
-      "general": "การเรียนทั่วไป",
-      "language": "เรียนภาษา"
-    },
     "goalTitle": "ชื่อเป้าหมาย",
     "goalTitlePlaceholder": "เช่น สอบผ่าน JLPT N2",
-    "dailyMinutes": "นาทีต่อวัน",
     "targetDate": "วันเป้าหมาย (ไม่บังคับ)",
     "decks": "สำรับที่จะเรียน",
     "decksHint": "แผนของคุณสร้างจากการ์ดในสำรับเหล่านี้",
@@ -109,15 +107,27 @@
     "saving": "กำลังบันทึก…",
     "error": {
       "title": "กรุณาใส่ชื่อเป้าหมาย (1–500 ตัวอักษร)",
-      "dailyMinutes": "จำนวนนาทีต่อวันต้องอยู่ระหว่าง 1 ถึง 1440"
+      "decks": "เลือกอย่างน้อยหนึ่งชุดการ์ด"
     },
-    "deckPriority": {
-      "label": "ลำดับความสำคัญ",
-      "low": "ต่ำ",
-      "normal": "ปกติ",
-      "high": "สูง",
-      "hint": "เด็คที่สำคัญกว่าจะขึ้นก่อนเมื่อวันนั้นเต็มแล้ว"
-    }
+    "plan": {
+      "title": "แผนโดยประมาณ",
+      "needDecksAndDate": "เลือกชุดการ์ดและวันเป้าหมายเพื่อดูปริมาณต่อวัน",
+      "minutes": "{{count, number}} นาที/วัน",
+      "peak": "วันที่หนักที่สุด {{minutes, number}} นาที (วันที่ {{day, number}})",
+      "byMinutes": "หรือกำหนดนาที/วัน",
+      "finishBy": "เสร็จราว {{date}}",
+      "tooSlow": "เวลาเท่านี้ตามการทบทวนไม่ทัน",
+      "srsOnly": "นับเฉพาะการเรียนโหมด SRS เท่านั้นในแผนนี้",
+      "estimate": "เป็นค่าประมาณ คำนวณใหม่ทุกวันจากผลจริงของคุณ",
+      "newPerDay_one": "การ์ดใหม่ {{count, number}} ใบ/วัน",
+      "newPerDay_other": "การ์ดใหม่ {{count, number}} ใบ/วัน",
+      "newPerDay": "การ์ดใหม่ {{count, number}} ใบ/วัน"
+    },
+    "studyDays": "จำนวนวันเรียนต่อสัปดาห์",
+    "studyDaysOption_other": "{{count}} วัน",
+    "newCardsPerDay": "การ์ดใหม่ต่อวันเรียน",
+    "newCardsHint": "ทบทวนมาก่อน หากตามไม่ทัน การ์ดใหม่จะหยุดจนกว่าคุณจะตามทัน",
+    "studyDaysOption_one": "{{count}} วัน"
   },
   "history": {
     "title": "การทำล่าสุด ({{count, number}})",
@@ -195,5 +205,13 @@
       "dismissed": "ไม่สนใจแล้ว",
       "expired": "หมดอายุ"
     }
+  },
+  "progress": {
+    "title": "ความคืบหน้า",
+    "knownNow": "จำได้ {{known, number}} จาก {{total, number}} ใบ",
+    "breakdown": "แม่น {{known, number}} · คลอนแคลน {{shaky, number}} · ยังไม่เริ่ม {{unseen, number}}",
+    "daysLeft": "เหลือ {{count, number}} วัน",
+    "daysLeft_one": "เหลือ {{count, number}} วัน",
+    "daysLeft_other": "เหลือ {{count, number}} วัน"
   }
 }

@@ -22,6 +22,7 @@ import { ForecastWidget } from '../components/dashboard/ForecastWidget'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { RecentDecks } from '../components/dashboard/RecentDecks'
 import { CardUsageCard } from '../components/billing/CardUsageCard'
+import { LearningPlanWidget } from '../components/dashboard/LearningPlanWidget'
 import { AchievementsSummary } from '../components/dashboard/AchievementsSummary'
 import { DailyQuestsWidget } from '../components/dashboard/DailyQuestsWidget'
 import { StreakFreezeWidget } from '../components/dashboard/StreakFreezeWidget'
@@ -138,6 +139,10 @@ export function DashboardPage() {
         streak={streak}
         masteryRate={masteryRate}
       />
+
+      {/* One line about the learning plan. Renders nothing when there is no plannable goal —
+          a tile that exists only to advertise an unused feature is an ad. */}
+      <LearningPlanWidget />
 
       {/* Card-storage usage — at-a-glance meter → full detail modal */}
       <CardUsageCard />

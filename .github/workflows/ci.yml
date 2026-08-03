@@ -226,7 +226,11 @@ jobs:
         # Same upstream-5xx wrapper as the Integration job — see the script header.
         run: bash .github/scripts/supabase-up.sh
       - name: Idempotency check — running reset twice should pass
-        run: supabase db reset --no-seed
+        # Same wrapper as the bring-up. This step is not exempt from the flake — it
+        # took a run down on 2026-08-02 with a storage-API timeout — and it retries
+        # on the infrastructure signature ONLY, so a migration that genuinely is not
+        # idempotent still fails on the first try.
+        run: bash .github/scripts/supabase-up.sh reset-only
       - name: Stop
         if: always()
         run: supabase stop || true
@@ -289,6 +293,16 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/ai_metered_smoke_test.sql
+
+      - name: Run goal-knowledge assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/goal_knowledge_test.sql
+
+      - name: Run mastery-definition assertions
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/mastery_definition_test.sql
 
       - name: Run owned-card limit assertions
         env:
@@ -371,6 +385,16 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_test.sql
+
+      - name: Run goal-workload assertions (mig 182 — learner's schedule not the publisher's, work owed)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/goal_workload_test.sql
+
+      - name: Run append-plan assertions (mig 185 — "더 하기" adds without destroying)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/append_plan_test.sql
 
       # ── Learning engine (migs 165/167/168) ──────────────────────────────
       # These shipped with the learning-engine PR and were not wired here, so

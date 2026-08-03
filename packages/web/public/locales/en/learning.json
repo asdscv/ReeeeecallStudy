@@ -1,8 +1,6 @@
 {
   "today": {
     "title": "Today's plan",
-    "manageGoals": "Manage goals",
-    "selectGoal": "Select a goal",
     "budget": "{{count, number}} min/day",
     "progress": "{{done, number}} of {{total, number}} done",
     "generate": "Build today's plan",
@@ -52,13 +50,19 @@
       "placeholder": "Type what you remember",
       "note": "Saved with your attempt. Nothing grades it — you still rate yourself."
     },
-    "insightsLink": "Insights",
-    "recallChance": "About {{percent}}% chance you still recall this"
+    "recallChance": "About {{percent}}% chance you still recall this",
+    "backToPlans": "All plans",
+    "extend": "Study more",
+    "extending": "Adding…",
+    "extendAdded_one": "Added {{count, number}} more item.",
+    "extendAdded_other": "Added {{count, number}} more items.",
+    "extendTomorrow_one": "{{count, number}} of them is new, so tomorrow gains that many reviews.",
+    "extendTomorrow_other": "{{count, number}} of them are new, so tomorrow gains that many reviews.",
+    "extendNothing": "There's nothing left to add right now."
   },
   "goals": {
     "title": "Learning goals",
     "subtitle": "A goal holds your daily minutes and the decks your plan is built from.",
-    "todayLink": "Today's plan",
     "create": "New goal",
     "edit": "Edit",
     "archive": "Archive",
@@ -92,14 +96,8 @@
   "form": {
     "createTitle": "New goal",
     "editTitle": "Edit goal",
-    "domain": "Subject",
-    "domainName": {
-      "general": "General study",
-      "language": "Language"
-    },
     "goalTitle": "Goal name",
     "goalTitlePlaceholder": "e.g. Pass JLPT N2",
-    "dailyMinutes": "Minutes per day",
     "targetDate": "Target date (optional)",
     "decks": "Decks to study",
     "decksHint": "Your plan is built from the cards in these decks.",
@@ -109,15 +107,27 @@
     "saving": "Saving…",
     "error": {
       "title": "Enter a goal name (1–500 characters).",
-      "dailyMinutes": "Minutes per day must be between 1 and 1440."
+      "decks": "Pick at least one deck."
     },
-    "deckPriority": {
-      "label": "Priority",
-      "low": "Low",
-      "normal": "Normal",
-      "high": "High",
-      "hint": "Higher-priority decks come up sooner when the day is full."
-    }
+    "plan": {
+      "title": "Estimated plan",
+      "needDecksAndDate": "Pick decks and a target date to see the daily load.",
+      "minutes": "{{count, number}} min/day",
+      "peak": "Busiest day: {{minutes, number}} min (day {{day, number}})",
+      "byMinutes": "Or set minutes/day",
+      "finishBy": "Finishes around {{date}}",
+      "tooSlow": "That budget cannot keep up with reviews alone.",
+      "srsOnly": "Only SRS-mode study counts toward this plan.",
+      "estimate": "An estimate. It is recalculated daily from your actual results.",
+      "newPerDay_one": "{{count, number}} new card/day",
+      "newPerDay_other": "{{count, number}} new cards/day",
+      "newPerDay": "{{count, number}} new cards/day"
+    },
+    "studyDays": "Study days per week",
+    "studyDaysOption_one": "{{count}} day",
+    "studyDaysOption_other": "{{count}} days",
+    "newCardsPerDay": "New cards per study day",
+    "newCardsHint": "Reviews come first. If you fall behind, new cards pause until you catch up."
   },
   "history": {
     "title": "Recent attempts ({{count, number}})",
@@ -195,5 +205,13 @@
       "dismissed": "Dismissed",
       "expired": "Expired"
     }
+  },
+  "progress": {
+    "title": "Progress",
+    "knownNow": "{{known, number}} of {{total, number}} cards known now",
+    "breakdown": "{{known, number}} solid · {{shaky, number}} slipping · {{unseen, number}} not started",
+    "daysLeft": "{{count, number}} days left",
+    "daysLeft_one": "{{count, number}} day left",
+    "daysLeft_other": "{{count, number}} days left"
   }
 }

@@ -82,7 +82,8 @@
     "noModeData": "Tidak ada data mode",
     "sessionCountLabel": "{{count, number}} sesi",
     "cardCountLabel": "{{count, number}} kartu",
-    "performance": "Performa"
+    "performance": "Performa",
+    "noSrsEffect": "tidak mengubah jadwal"
   },
   "ratingGroups": {
     "srs": "Pengulangan Berjarak",

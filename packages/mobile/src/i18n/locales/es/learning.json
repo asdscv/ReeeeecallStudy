@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "Cancelar",
-    "dailyMinutes": "Minutos por día",
-    "deckPriority": {
-      "high": "Alta",
-      "hint": "Los mazos con más prioridad aparecen antes cuando el día está lleno.",
-      "label": "Prioridad",
-      "low": "Baja",
-      "normal": "Normal"
-    },
     "decks": "Mazos a estudiar",
     "decksHint": "Tu plan se construye con las tarjetas de estos mazos.",
-    "domain": "Materia",
-    "domainName": {
-      "general": "Estudio general",
-      "language": "Idiomas"
-    },
     "error": {
-      "dailyMinutes": "Los minutos por día deben estar entre 1 y 1440.",
-      "title": "Introduce un nombre de objetivo (1–500 caracteres)."
+      "title": "Introduce un nombre de objetivo (1–500 caracteres).",
+      "decks": "Elige al menos un mazo."
     },
     "goalTitle": "Nombre del objetivo",
     "goalTitlePlaceholder": "p. ej. Aprobar el JLPT N2",
     "noDecks": "Aún no tienes mazos.",
     "save": "Guardar",
-    "saving": "Guardando…"
+    "saving": "Guardando…",
+    "plan": {
+      "title": "Plan estimado",
+      "needDecksAndDate": "Elige mazos y una fecha objetivo para ver la carga diaria.",
+      "minutes": "{{count, number}} min/día",
+      "peak": "Día más cargado: {{minutes, number}} min (día {{day, number}})",
+      "byMinutes": "O fija min/día",
+      "finishBy": "Termina alrededor del {{date}}",
+      "tooSlow": "Ese tiempo no alcanza ni para los repasos.",
+      "srsOnly": "Solo el estudio en modo SRS cuenta para este plan.",
+      "estimate": "Es una estimación. Se recalcula a diario con tus resultados reales.",
+      "newPerDay_one": "{{count, number}} tarjeta nueva/día",
+      "newPerDay_other": "{{count, number}} tarjetas nuevas/día",
+      "newPerDay": "{{count, number}} tarjetas nuevas/día"
+    },
+    "targetDate": "Fecha objetivo (opcional)",
+    "horizonMonths_one": "En {{count, number}} mes",
+    "horizonMonths_other": "En {{count, number}} meses",
+    "horizonMonths": "En {{count, number}} meses"
   },
   "goals": {
     "archive": "Archivar",
@@ -157,13 +162,11 @@
     },
     "generate": "Crear plan de hoy",
     "generating": "Creando…",
-    "insightsLink": "Diagnóstico",
     "item": {
       "minutes": "~{{count, decimal}} min",
       "recorded": "Registrado",
       "untitled": "(sin texto)"
     },
-    "manageGoals": "Gestionar objetivos",
     "progress": "{{done, number}} de {{total, number}} completados",
     "rate": {
       "again": "No lo sabía",
@@ -183,6 +186,22 @@
     "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
     "regenerate": "Recrear plan",
     "regenerating": "Recreando…",
-    "title": "Plan de hoy"
+    "title": "Plan de hoy",
+    "backToPlans": "Todos los planes",
+    "extend": "Estudiar más",
+    "extending": "Añadiendo…",
+    "extendAdded_one": "Se añadió {{count, number}} elemento más.",
+    "extendAdded_other": "Se añadieron {{count, number}} elementos más.",
+    "extendTomorrow_one": "{{count, number}} es nueva, así que mañana tendrás ese mismo número de repasos más.",
+    "extendTomorrow_other": "{{count, number}} son nuevas, así que mañana tendrás ese mismo número de repasos más.",
+    "extendNothing": "Ahora mismo no hay nada más que añadir."
+  },
+  "progress": {
+    "title": "Progreso",
+    "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
+    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar",
+    "daysLeft": "Quedan {{count, number}} días",
+    "daysLeft_one": "Queda {{count, number}} día",
+    "daysLeft_other": "Quedan {{count, number}} días"
   }
 }

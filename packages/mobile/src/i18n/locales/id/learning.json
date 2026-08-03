@@ -33,30 +33,35 @@
   },
   "form": {
     "cancel": "Batal",
-    "dailyMinutes": "Menit per hari",
-    "deckPriority": {
-      "high": "Tinggi",
-      "hint": "Dek berprioritas tinggi muncul lebih dulu saat harimu penuh.",
-      "label": "Prioritas",
-      "low": "Rendah",
-      "normal": "Normal"
-    },
     "decks": "Dek untuk dipelajari",
     "decksHint": "Rencana Anda dibangun dari kartu-kartu di dek ini.",
-    "domain": "Bidang",
-    "domainName": {
-      "general": "Studi umum",
-      "language": "Belajar bahasa"
-    },
     "error": {
-      "dailyMinutes": "Menit per hari harus antara 1 dan 1440.",
-      "title": "Masukkan nama tujuan (1–500 karakter)."
+      "title": "Masukkan nama tujuan (1–500 karakter).",
+      "decks": "Pilih setidaknya satu dek."
     },
     "goalTitle": "Nama tujuan",
     "goalTitlePlaceholder": "mis. Lulus JLPT N2",
     "noDecks": "Anda belum memiliki dek.",
     "save": "Simpan",
-    "saving": "Menyimpan…"
+    "saving": "Menyimpan…",
+    "plan": {
+      "title": "Perkiraan rencana",
+      "needDecksAndDate": "Pilih dek dan tanggal target untuk melihat beban harian.",
+      "minutes": "{{count, number}} menit/hari",
+      "peak": "Hari tersibuk: {{minutes, number}} menit (hari ke-{{day, number}})",
+      "byMinutes": "Atau tetapkan menit/hari",
+      "finishBy": "Selesai sekitar {{date}}",
+      "tooSlow": "Waktu itu tidak cukup bahkan untuk ulangan.",
+      "srsOnly": "Hanya belajar mode SRS yang dihitung dalam rencana ini.",
+      "estimate": "Perkiraan. Dihitung ulang setiap hari dari hasil nyata Anda.",
+      "newPerDay_one": "{{count, number}} kartu baru/hari",
+      "newPerDay_other": "{{count, number}} kartu baru/hari",
+      "newPerDay": "{{count, number}} kartu baru/hari"
+    },
+    "targetDate": "Tanggal target (opsional)",
+    "horizonMonths_one": "{{count, number}} bulan lagi",
+    "horizonMonths_other": "{{count, number}} bulan lagi",
+    "horizonMonths": "{{count, number}} bulan lagi"
   },
   "goals": {
     "archive": "Arsipkan",
@@ -157,13 +162,11 @@
     },
     "generate": "Buat rencana hari ini",
     "generating": "Membuat…",
-    "insightsLink": "Analisis",
     "item": {
       "minutes": "~{{count, decimal}} menit",
       "recorded": "Tercatat",
       "untitled": "(tidak ada teks)"
     },
-    "manageGoals": "Kelola tujuan",
     "progress": "{{done, number}} dari {{total, number}} selesai",
     "rate": {
       "again": "Tidak tahu",
@@ -183,6 +186,22 @@
     "recallChance": "Sekitar {{percent}}% peluang kamu masih ingat ini",
     "regenerate": "Buat ulang rencana",
     "regenerating": "Membuat ulang…",
-    "title": "Rencana hari ini"
+    "title": "Rencana hari ini",
+    "backToPlans": "Semua rencana",
+    "extend": "Belajar lagi",
+    "extending": "Menambahkan…",
+    "extendAdded_one": "Menambahkan {{count, number}} item lagi.",
+    "extendAdded_other": "Menambahkan {{count, number}} item lagi.",
+    "extendTomorrow_one": "{{count, number}} di antaranya kartu baru, jadi ulasan besok bertambah sebanyak itu.",
+    "extendTomorrow_other": "{{count, number}} di antaranya kartu baru, jadi ulasan besok bertambah sebanyak itu.",
+    "extendNothing": "Tidak ada lagi yang bisa ditambahkan sekarang."
+  },
+  "progress": {
+    "title": "Kemajuan",
+    "knownNow": "{{known, number}} dari {{total, number}} kartu dikuasai",
+    "breakdown": "{{known, number}} kuat · {{shaky, number}} goyah · {{unseen, number}} belum mulai",
+    "daysLeft": "{{count, number}} hari lagi",
+    "daysLeft_one": "{{count, number}} hari lagi",
+    "daysLeft_other": "{{count, number}} hari lagi"
   }
 }

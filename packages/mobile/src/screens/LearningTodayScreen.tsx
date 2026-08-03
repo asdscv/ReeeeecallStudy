@@ -4,7 +4,7 @@ import {
   RefreshControl, AppState, Modal, Pressable,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useNavigation, type NavigationProp } from '@react-navigation/native'
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
@@ -120,18 +120,20 @@ export function LearningTodayScreen() {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
+  const route = useRoute<RouteProp<SettingsStackParamList, 'LearningToday'>>()
   const {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, recordAttempt,
+    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    extendPlan, planExtending, planExtension, recordAttempt,
     attempts, attemptsLoading, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     enrichmentQuote, loadEnrichmentQuote,
     resolveEnrichment, dismissEnrichment,
+    knowledge, fetchGoalKnowledge,
   } = useLearningStore()
 
-  const [goalOverrideId, setGoalOverrideId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   /**
    * Answers in progress, keyed by plan-item id.
@@ -170,12 +172,60 @@ export function LearningTodayScreen() {
   useEffect(() => { void fetchGoals() }, [fetchGoals])
 
   const active = useMemo(() => goals.filter((g) => g.status === 'active'), [goals])
-  const goalId = active.some((g) => g.id === goalOverrideId) ? goalOverrideId : active[0]?.id ?? null
+  // The plan is addressed by the route now, mirroring web's /learning/:goalId. A route id that
+  // names no plannable goal (archived, deleted) resolves to nothing rather than quietly showing
+  // a different plan under the same navigation entry.
+  const goalId = active.some((g) => g.id === route.params?.goalId) ? route.params.goalId : null
   const goal = active.find((g) => g.id === goalId)
 
   useEffect(() => {
     if (goalId) void fetchPlan(goalId, planDate)
   }, [goalId, planDate, fetchPlan])
+
+  /**
+   * Same rule as web, from the same store action: build today's plan once the read has come back
+   * empty. Kept in the store rather than duplicated here — the decision has four conditions and
+   * two drifting copies of it would eventually wipe a day's progress.
+   */
+  useEffect(() => {
+    // A FRESH context, like `regenerate` — `now` is the planner's due-card cutoff, and this
+    // screen stays mounted across midnight, so a value captured at mount would plan against a
+    // stale clock.
+    if (goal) void autoGeneratePlan(goal, currentPlanContext())
+  }, [goal, planDate, autoGeneratePlan, planAbsentFor])
+
+  /**
+   * Whether automation still has its turn — the same conditions `autoGeneratePlan` checks.
+   *
+   * Read so the manual button does not flash for a frame between the empty read and the effect
+   * that acts on it. `planDate` rather than a fresh context: the key is a date, and re-reading
+   * the clock here would make this recompute on every render.
+   */
+  const autoWillRun = !!goal
+    && planAbsentFor === `${goal.id}|${planDate}`
+    && !autoPlanAttempted[`${goal.id}|${planDate}`]
+    && !!goal.decks?.length
+
+  // Judged at the target date when the goal has one — "what will I still know on the day" — and
+  // at today otherwise. Server-aggregated: the plan only ever loads DUE cards.
+  //
+  // The fallback is memoised on purpose. A bare `new Date().toISOString()` is a NEW value every
+  // render, so this effect re-fires, `fetchGoalKnowledge` calls `set()`, the screen (which
+  // subscribes to the whole store) re-renders, and the RPC loops without end — for every goal
+  // with no target date, which the form allows. Web escapes it because its `ctx` is memoised at
+  // mount; this port dropped that.
+  const mountedAt = useMemo(() => new Date().toISOString(), [])
+  // Judged NOW, never at the target date — same rule as the web dashboard, and it has to be the
+  // same or one goal reports two different numbers depending on which device is in your hand.
+  //
+  // Judging at the deadline answers "what would I still know if I stopped today": a forecast,
+  // and a bleak one. On a real account it read "0 of 120 known" for a learner who had studied
+  // 55 cards, because every SRS interval was shorter than the time remaining. Worth showing
+  // eventually with its assumption stated; not as the line that says where you stand.
+  const judgedAt = mountedAt
+  useEffect(() => {
+    if (goalId) void fetchGoalKnowledge(goalId, judgedAt)
+  }, [goalId, judgedAt, fetchGoalKnowledge])
 
   /**
    * Attempts are goal-scoped, not date-scoped, so this deliberately does NOT depend on
@@ -245,6 +295,12 @@ export function LearningTodayScreen() {
     if (goal) void generatePlan(goal, currentPlanContext())
   }, [goal, generatePlan])
 
+  // A fresh context, like `regenerate` — the screen stays mounted across midnight, so a value
+  // captured at mount would append to yesterday.
+  const studyMore = useCallback(() => {
+    if (goal) void extendPlan(goal, currentPlanContext())
+  }, [goal, extendPlan])
+
   const errorKey = (code: string): string => {
     switch (code) {
       case 'LIMIT_EXCEEDED': return 'today.error.limitExceeded'
@@ -259,34 +315,23 @@ export function LearningTodayScreen() {
 
   return (
     <Screen padding={false} testID="learning-today-screen">
+      {/* One way out, and it is back to the list. Two links that both went to the goals screen —
+          one of them labelled "진단" for a screen that no longer exists — was the old shape. */}
       <ScreenHeader
-        title={t('today.title')}
-        mode="drawer"
+        title={goal?.title ?? t('today.title')}
+        mode="back"
         rightContent={
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LearningInsights')}
-              style={styles.headerLink}
-              hitSlop={HIT_SLOP}
-              accessibilityRole="button"
-              {...testProps('learning-insights-link')}
-            >
-              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                {t('today.insightsLink')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LearningGoals')}
-              style={styles.headerLink}
-              hitSlop={HIT_SLOP}
-              accessibilityRole="button"
-              {...testProps('learning-manage-goals')}
-            >
-              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                {t('today.manageGoals')}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('LearningGoals')}
+            style={styles.headerLink}
+            hitSlop={HIT_SLOP}
+            accessibilityRole="button"
+            {...testProps('learning-back-to-plans')}
+          >
+            <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+              {t('today.backToPlans')}
+            </Text>
+          </TouchableOpacity>
         }
       />
 
@@ -311,33 +356,49 @@ export function LearningTodayScreen() {
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.empty.createGoal')}</Text>
             </TouchableOpacity>
           </View>
+        ) : !goalId ? (
+          // Goals exist, but this route names none of them — paused, completed, or a nav state
+          // restored from before the plan took a goalId. Without this branch the learner got a
+          // disabled Generate button with the PREVIOUS goal's plan items still on screen, because
+          // the store does not clear `planItems` on a goal change.
+          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+              {t('today.empty.noGoal')}
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LearningGoals')}
+              style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
+              {...testProps('learning-back-to-plans-empty')}
+            >
+              <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>{t('today.backToPlans')}</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <>
-            {active.length > 1 && (
-              <View style={styles.goalRow}>
-                {active.map((option, index) => {
-                  const selected = option.id === goalId
-                  return (
-                    <TouchableOpacity
-                      key={option.id}
-                      onPress={() => setGoalOverrideId(option.id)}
-                      style={[styles.chip, {
-                        borderColor: selected ? theme.colors.primary : theme.colors.border,
-                        borderWidth: selected ? 2 : 1,
-                        backgroundColor: theme.colors.surface,
-                      }]}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected }}
-                      {...testProps(`learning-today-goal-${index}`)}
-                    >
-                      <Text style={[theme.typography.caption, {
-                        color: selected ? theme.colors.primary : theme.colors.textSecondary,
-                      }]}>
-                        {selected ? '\u2713 ' : ''}{option.title}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
+            {/* Where this goal stands. The chip row that used to sit here let you switch plans
+                from inside a plan; the list does that now, and this space says something.
+
+                `testProps(id, true)` is the CONTAINER form. Without the second argument it
+                returns `accessible: true` plus `accessibilityLabel: id`, and being spread last it
+                would overwrite any translated label and collapse the subtree — TalkBack would
+                announce the literal "learning-progress" and neither number inside it. */}
+            {goalId && knowledge[goalId] && knowledge[goalId].total > 0 && (
+              <View
+                style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                {...testProps('learning-progress', true)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('progress.knownNow', {
+                    known: knowledge[goalId].known, total: knowledge[goalId].total,
+                  })}
+                </Text>
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+                  {t('progress.breakdown', {
+                    known: knowledge[goalId].known,
+                    shaky: knowledge[goalId].unknown,
+                    unseen: knowledge[goalId].unseen,
+                  })}
+                </Text>
               </View>
             )}
 
@@ -578,16 +639,54 @@ export function LearningTodayScreen() {
                   )
                 })}
 
+                {/* "더 하기" comes FIRST and is the primary action. Rebuilding is the
+                    destructive one — it deletes every item and zeroes the day's progress — so
+                    the additive option has to be the easier one to reach. */}
                 <TouchableOpacity
-                  disabled={planGenerating || plan.status === 'completed'}
+                  disabled={planExtending || planGenerating || !goal}
+                  onPress={studyMore}
+                  style={[
+                    styles.primaryBtn,
+                    { backgroundColor: theme.colors.primary },
+                    (planExtending || planGenerating || !goal) && styles.disabled,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: planExtending || planGenerating || !goal }}
+                  {...testProps('learning-extend')}
+                >
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
+                    {planExtending ? t('today.extending') : t('today.extend')}
+                  </Text>
+                </TouchableOpacity>
+
+                {planExtension && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textSecondary }]}
+                    accessibilityLiveRegion="polite"
+                    {...testProps('learning-extend-result')}
+                  >
+                    {planExtension.appended === 0
+                      ? t('today.extendNothing')
+                      // The cost, said out loud. Every card started today comes back tomorrow,
+                      // and a button that grows tomorrow's list in silence is how a learner
+                      // ends up abandoning a goal they were doing well at.
+                      : t('today.extendAdded', { count: planExtension.appended })
+                        + (planExtension.reviewsTomorrow > 0
+                          ? ' ' + t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })
+                          : '')}
+                  </Text>
+                )}
+
+                <TouchableOpacity
+                  disabled={planGenerating || planExtending || plan.status === 'completed'}
                   onPress={regenerate}
                   style={[
                     styles.secondaryBtn,
                     { borderColor: theme.colors.border },
-                    (planGenerating || plan.status === 'completed') && styles.disabled,
+                    (planGenerating || planExtending || plan.status === 'completed') && styles.disabled,
                   ]}
                   accessibilityRole="button"
-                  accessibilityState={{ disabled: planGenerating || plan.status === 'completed' }}
+                  accessibilityState={{ disabled: planGenerating || planExtending || plan.status === 'completed' }}
                   {...testProps('learning-regenerate')}
                 >
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
@@ -595,21 +694,33 @@ export function LearningTodayScreen() {
                   </Text>
                 </TouchableOpacity>
               </>
+            ) : planGenerating || autoWillRun ? (
+              // Building it. Not a button: the learner is being told what is happening, not
+              // asked to make it happen.
+              <Text
+                style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}
+                accessibilityLiveRegion="polite"
+                {...testProps('learning-generating')}
+              >
+                {t('today.generating')}
+              </Text>
             ) : !planBlockedReason ? (
+              // Only reachable once automation has had its turn and produced no plan — a failed
+              // save, or a goal already regenerated today. The button is the way back.
               <TouchableOpacity
-                disabled={planGenerating || !goal}
+                disabled={!goal}
                 onPress={regenerate}
                 style={[
                   styles.primaryBtn,
                   { backgroundColor: theme.colors.primary },
-                  (planGenerating || !goal) && styles.disabled,
+                  !goal && styles.disabled,
                 ]}
                 accessibilityRole="button"
-                accessibilityState={{ disabled: planGenerating || !goal }}
+                accessibilityState={{ disabled: !goal }}
                 {...testProps('learning-generate')}
               >
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse }]}>
-                  {planGenerating ? t('today.generating') : t('today.generate')}
+                  {t('today.generate')}
                 </Text>
               </TouchableOpacity>
             ) : null}
@@ -877,15 +988,9 @@ function renderEnrichmentValue(value: unknown): string {
 const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 48 },
   card: { padding: 12, borderRadius: 12, borderWidth: 1 },
-  headerActions: { flexDirection: 'row', gap: 4 },
   headerLink: { minHeight: 32, paddingHorizontal: 6, justifyContent: 'center' },
-  goalRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   // 44pt is the iOS HIG minimum and 48dp Material's; a 12px caption inside 6px of padding
   // was 28, which is a mis-tap on a moving train.
-  chip: {
-    paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
-    justifyContent: 'center',
-  },
   rateRow: { flexDirection: 'row', gap: 6, marginTop: 8 },
   // Two lines tall by default and it grows: a recall answer is short, and a box the height of
   // the card would suggest an essay is wanted. `minHeight` keeps the tap target usable.

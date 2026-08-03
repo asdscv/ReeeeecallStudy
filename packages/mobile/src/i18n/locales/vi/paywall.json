@@ -1,8 +1,8 @@
 {
-  "title": "Nang cap len Pro",
-  "subtitle": "Mo khoa toan bo tinh nang ReeeeecallStudy",
-  "youArePro": "Ban la Pro!",
-  "proDesc": "Ban co quyen truy cap tat ca tinh nang cao cap.",
+  "title": "Thêm chỗ cho thẻ",
+  "subtitle": "Gói trả phí tăng số thẻ bạn có thể lưu. Mọi thứ khác bạn đã có sẵn.",
+  "youArePro": "Gói của bạn đang hoạt động",
+  "proDesc": "Giới hạn thẻ của bạn đã tăng. Mọi tính năng học tập đều có ở mọi gói.",
   "done": "Xong",
   "back": "Quay lai",
   "features": {
@@ -13,41 +13,19 @@
       "freeUnknown": "Dung luong gioi han",
       "proUnknown": "Dung luong mo rong"
     },
-    "allModes": {
-      "title": "Tat ca che do hoc",
-      "free": "SRS + Tuan tu",
-      "pro": "Tat ca 4 che do"
-    },
     "aiGeneration": {
       "title": "AI Tao the",
       "free": "{{count, number}} the/ngay · co the mua tin dung",
       "pro": "Giong Free · co the mua tin dung",
       "freeUnknown": "Han muc mien phi hang ngay · co the mua tin dung"
-    },
-    "premiumTts": {
-      "title": "TTS Cao cap",
-      "free": "Co ban",
-      "pro": "Edge TTS HD"
-    },
-    "analytics": {
-      "title": "Phan tich nang cao",
-      "free": "Thong ke co ban",
-      "pro": "Bieu do + Du bao"
-    },
-    "marketplace": {
-      "title": "Xuat ban Marketplace",
-      "free": "Chi tai ve",
-      "pro": "Tai len + Chia se doanh thu"
     }
   },
   "free": "Mien phi",
   "pro": "Pro",
   "monthly": "Hang thang",
-  "annual": "Hang nam",
-  "save40": "Tiet kiem 40%",
   "unavailable": "San pham nay khong kha dung tai khu vuc cua ban",
-  "welcomePro": "Chao mung den Pro!",
-  "welcomeProDesc": "Ban da co quyen truy cap tat ca tinh nang cao cap.",
+  "welcomePro": "Gói của bạn đang hoạt động",
+  "welcomeProDesc": "Giới hạn thẻ của bạn đã tăng. Mọi tính năng học tập đều có ở mọi gói.",
   "restorePurchase": "Khoi phuc mua hang",
   "restored": "Da khoi phuc goi Pro.",
   "noRestoreFound": "Khong tim thay goi dang ky truoc do.",
@@ -74,5 +52,6 @@
     "request": "Yêu cầu hoàn tiền",
     "title": "Yêu cầu hoàn tiền",
     "submitted": "Đã gửi yêu cầu hoàn tiền tới Apple. Apple quyết định kết quả và sẽ gửi email cho bạn; nếu được duyệt, quyền truy cập sẽ tự động bị thu hồi."
-  }
+  },
+  "everythingElseFree": "Tất cả chế độ học, TTS, thống kê và đăng lên marketplace đều miễn phí ở mọi gói."
 }

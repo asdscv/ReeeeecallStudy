@@ -160,7 +160,6 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
   const FAMILIES: Record<string, readonly string[]> = {
     'recommend.status': ['accepted', 'dismissed', 'expired'],
     'goals.status': ['paused', 'completed', 'archived'],
-    'form.domainName': ['language', 'general'],
     'enrichment.error': [
       'INSUFFICIENT_CREDITS', 'RATE_CAP', 'GROUNDING_REQUIRED', 'INVALID_RESULT',
       'PROVIDER_ERROR', 'BAD_REQUEST', 'NETWORK', 'UNKNOWN',
@@ -191,7 +190,16 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
     const data = JSON.parse(
       fs.readFileSync(path.join(LOCALES_DIR, lang, 'learning.json'), 'utf-8'),
     ) as Record<string, unknown>
-    const missing = [...required].filter((key) => typeof lookup(data, key) !== 'string').sort()
+    // A key used with `count` lives in the file ONLY as `key_one` / `key_other` — i18next
+    // picks the suffix at call time, and a bare `key` alongside them would be dead weight it
+    // never reads. Requiring the bare form here reported eight false failures for two keys
+    // that resolve correctly at runtime. Test 8 below enforces the other direction: a
+    // count-interpolated key that is MISSING its plural forms.
+    const present = (key: string) =>
+      typeof lookup(data, key) === 'string'
+      || (typeof lookup(data, `${key}_other`) === 'string'
+        && typeof lookup(data, `${key}_one`) === 'string')
+    const missing = [...required].filter((key) => !present(key)).sort()
     assert(
       missing.length === 0,
       `${lang}/learning.json is missing ${missing.length} key(s) the screens can request: ` +
@@ -260,6 +268,7 @@ console.log('[Test 8] Counted strings inflect in languages that inflect')
     'today.budget',        // same string, same reason
     'insights.seconds',    // "3s"
     'today.item.minutes',  // "~3 min" — abbreviation, and the web copy uses the same form
+    'form.plan.minutes',   // "88 min/day" — same unit abbreviation on the plan preview
   ])
 
   const SCREENS_DIR = path.join(__dirname, '..', 'screens')
@@ -297,6 +306,68 @@ console.log('[Test 8] Counted strings inflect in languages that inflect')
           `it would read "1 <plural>". Add both, or list the key as INVARIANT if it is a unit.`,
       )
     }
+  }
+}
+
+// ── Test 9: the paywall promises only what a plan actually changes ───────────
+//
+// This is the screen that takes money, so a row on it is not copy — it is a promise, and a
+// promise the code does not keep lands in the store review and the refund queue.
+//
+// Four rows shipped for months claiming a paid plan unlocked "all study modes", "Edge TTS",
+// "charts + prediction" and "marketplace publishing with revenue share". None of them was
+// gated by anything: `billing_products` carries `card_limit` and nothing else, `isPro` appears
+// only on a Settings badge, `edge_tts` is a free settings toggle, and no revenue-share exists
+// at all. They were removed on 2026-08-03.
+//
+// The test ties the COPY to the CODE in both directions, which is what makes it more than a
+// restatement of a constant: a locale that keeps a stale row fails, and a row added to the
+// screen without copy fails too.
+console.log('[Test 9] Paywall rows match the screen, and the withdrawn claims stay withdrawn')
+{
+  const screen = fs.readFileSync(
+    path.join(__dirname, '..', 'screens', 'PaywallScreen.tsx'), 'utf-8',
+  )
+  const declared = screen.match(/const FEATURE_KEYS = \[([^\]]*)\]/)
+  assert(declared !== null, 'PaywallScreen.tsx no longer declares FEATURE_KEYS — this test cannot see what the paywall shows')
+  const keys = new Set(
+    (declared?.[1] ?? '').match(/'([^']+)'/g)?.map((q) => q.slice(1, -1)) ?? [],
+  )
+  assert(keys.size > 0, 'FEATURE_KEYS parsed as empty')
+
+  // Withdrawn because no code enforces them. Re-adding any of these means first building
+  // the entitlement that makes it true — the row is the last step, not the first.
+  const WITHDRAWN = ['allModes', 'premiumTts', 'analytics', 'marketplace']
+  for (const row of WITHDRAWN) {
+    assert(
+      !keys.has(row),
+      `PaywallScreen shows '${row}' again. A paid plan does not gate it — build the entitlement ` +
+        `before selling it, or the paywall is charging for something every free user already has.`,
+    )
+  }
+
+  for (const lang of SUPPORTED_LANGS) {
+    const file = path.join(LOCALES_DIR, lang, 'paywall.json')
+    if (!fs.existsSync(file)) continue
+    const data = JSON.parse(fs.readFileSync(file, 'utf-8')) as Record<string, unknown>
+    const rows = Object.keys((data.features ?? {}) as Record<string, unknown>)
+
+    const stale = rows.filter((r) => !keys.has(r)).sort()
+    assert(
+      stale.length === 0,
+      `${lang}/paywall.json still has feature row(s) the screen does not show: ${stale.join(', ')}`,
+    )
+    const missing = [...keys].filter((k) => !rows.includes(k)).sort()
+    assert(
+      missing.length === 0,
+      `${lang}/paywall.json has no copy for row(s) the screen shows: ${missing.join(', ')}`,
+    )
+    // The line that keeps a two-row table from reading as "this is all you get".
+    assert(
+      typeof data.everythingElseFree === 'string' && (data.everythingElseFree as string).length > 0,
+      `${lang}/paywall.json is missing 'everythingElseFree' — without it the short table implies ` +
+        `the absent features are paid, which is the same lie pointed the other way.`,
+    )
   }
 }
 

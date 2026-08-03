@@ -82,7 +82,8 @@
     "noModeData": "No mode data",
     "sessionCountLabel": "{{count, number}} sessions",
     "cardCountLabel": "{{count, number}} cards",
-    "performance": "Performance"
+    "performance": "Performance",
+    "noSrsEffect": "no schedule change"
   },
   "ratingGroups": {
     "srs": "Spaced Repetition",

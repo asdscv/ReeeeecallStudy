@@ -295,8 +295,8 @@ Two things this phase changed outside mobile:
   `tsconfig.app.json` already had: `shared/learning/**` imports with explicit `.ts`
   extensions, and mobile only started traversing into it now.
 
-5b (shipped): `LearningInsightsScreen` — the same diagnostics and the same recommendation
-accept/dismiss loop, reached from the today screen's header. It renders the identical pure
+5b (REMOVED 2026-08-02): `LearningInsightsScreen` — the same diagnostics and the same recommendation
+accept/dismiss loop, was reached only from a small "진단" link in the plan header — which is why nobody found it. Absorbed into the plan detail and deleted. It renders the identical pure
 aggregation, so "no data is not zero" holds on both platforms by construction rather than by
 two implementations agreeing.
 

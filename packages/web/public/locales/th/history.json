@@ -82,7 +82,8 @@
     "noModeData": "ไม่มีข้อมูลโหมด",
     "sessionCountLabel": "{{count, number}} เซสชัน",
     "cardCountLabel": "{{count, number}} การ์ด",
-    "performance": "ประสิทธิภาพ"
+    "performance": "ประสิทธิภาพ",
+    "noSrsEffect": "ไม่เปลี่ยนกำหนดทบทวน"
   },
   "ratingGroups": {
     "srs": "การทบทวนแบบเว้นระยะ",

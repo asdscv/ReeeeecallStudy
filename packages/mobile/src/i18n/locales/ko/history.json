@@ -51,5 +51,6 @@
     "performance": "성과",
     "streak": "연속 학습",
     "avgDuration": "평균 시간"
-  }
+  },
+  "noSrsEffect": "복습 일정 미반영"
 }

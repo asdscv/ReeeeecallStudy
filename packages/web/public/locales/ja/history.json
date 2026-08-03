@@ -82,7 +82,8 @@
     "noModeData": "モードデータがありません",
     "sessionCountLabel": "{{count, number}}セッション",
     "cardCountLabel": "{{count, number}}枚",
-    "performance": "パフォーマンス"
+    "performance": "パフォーマンス",
+    "noSrsEffect": "復習日程に反映されません"
   },
   "ratingGroups": {
     "srs": "間隔反復",

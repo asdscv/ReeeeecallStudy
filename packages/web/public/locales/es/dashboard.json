@@ -4,7 +4,10 @@
     "totalCards": "Total de tarjetas",
     "todayReview": "Repaso de hoy",
     "streak": "Racha de estudio",
-    "masteryRate": "Tasa de dominio"
+    "masteryRate": "Tasa de dominio",
+    "streakDays": "{{count, number}} días",
+    "streakDays_one": "{{count, number}} día",
+    "streakDays_other": "{{count, number}} días"
   },
   "dailyChart": {
     "title": "Volumen de estudio diario",

@@ -9,6 +9,13 @@
  *
  * A unit test of the registry cannot catch a screen that ignores the registry. Only reading the
  * screens can.
+ *
+ * The locale-coverage half of this file is GONE, deliberately. It required every registered
+ * domain to be named in all 8 locales x 2 platforms, which was right while the goal form showed
+ * a subject picker. Neither screen shows one now — the two shipped adapters are identical apart
+ * from their id, so the control changed nothing and the subject is already on the deck — and a
+ * test demanding translations for strings no screen renders is exactly the dead weight the rest
+ * of this session was spent removing.
  */
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -29,18 +36,12 @@ const SCREENS = [
  * `requireSourceGrounding` as `domainId === 'labor-law'` there produces IDENTICAL results for
  * every domain this build ships. The two answers only diverge on a domain that does not exist
  * yet — which is the entire point. Reading the source is the only way to catch it before then.
- *
-
  */
 const NO_DOMAIN_LITERALS = [
   ...SCREENS,
   'supabase/functions/_shared/ai-remediation.ts',
   'packages/shared/learning/adapters/domain-catalog.ts',
 ]
-
-/** Both platforms, because the two locale trees are mirrors and drift silently. */
-const LOCALE_DIRS = ['packages/web/public/locales', 'packages/mobile/src/i18n/locales']
-const LOCALES = ['en', 'es', 'id', 'ja', 'ko', 'th', 'vi', 'zh']
 
 /** Strip block and line comments — the history is explained in prose and must not trip this. */
 function code(path: string): string {
@@ -61,24 +62,6 @@ describe('domain list is not duplicated into screens', () => {
     for (const id of availableDomainIds()) {
       expect(source, `${path} hard-codes the domain id "${id}"`).not.toContain(`'${id}'`)
       expect(source, `${path} hard-codes the domain id "${id}"`).not.toContain(`"${id}"`)
-    }
-  })
-
-  it.each(LOCALE_DIRS)('%s names every shipped domain', (dir) => {
-    // The runtime already survives a missing name — the goal form passes `defaultValue: domain`,
-    // so an untranslated domain renders its raw id rather than a missing-key placeholder. That
-    // is deliberate: a new domain must WORK before it is pretty, or adding one costs 16 files.
-    //
-    // This test is the other half of that bargain. Shipping a domain the app cannot say out loud
-    // in seven of its eight languages is exactly the sloppiness the fallback would otherwise
-    // hide, so CI asks for the translation even though users never see a crash without it.
-    for (const locale of LOCALES) {
-      const names = JSON.parse(readFileSync(join(REPO_ROOT, dir, locale, 'learning.json'), 'utf-8'))
-        ?.form?.domainName ?? {}
-      for (const id of availableDomainIds()) {
-        expect(names[id], `${dir}/${locale}/learning.json is missing form.domainName.${id}`)
-          .toEqual(expect.any(String))
-      }
     }
   })
 

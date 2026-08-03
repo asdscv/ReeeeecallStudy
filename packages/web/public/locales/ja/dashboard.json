@@ -4,7 +4,10 @@
     "totalCards": "カード総数",
     "todayReview": "今日の復習",
     "streak": "学習連続日数",
-    "masteryRate": "習得率"
+    "masteryRate": "習得率",
+    "streakDays": "{{count, number}}日",
+    "streakDays_one": "{{count, number}}日",
+    "streakDays_other": "{{count, number}}日"
   },
   "dailyChart": {
     "title": "日別学習量",
