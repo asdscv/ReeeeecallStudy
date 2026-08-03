@@ -210,6 +210,9 @@
     "title": "Kemajuan",
     "knownNow": "{{known, number}} dari {{total, number}} kartu dikuasai",
     "knownAtTarget": "{{known, number}} dari {{total, number}} kartu masih diingat pada {{date}}",
-    "breakdown": "{{known, number}} kuat · {{shaky, number}} goyah · {{unseen, number}} belum mulai"
+    "breakdown": "{{known, number}} kuat · {{shaky, number}} goyah · {{unseen, number}} belum mulai",
+    "daysLeft": "{{count, number}} hari lagi",
+    "daysLeft_one": "{{count, number}} hari lagi",
+    "daysLeft_other": "{{count, number}} hari lagi"
   }
 }

@@ -210,6 +210,9 @@
     "title": "进度",
     "knownNow": "{{total, number}} 张中已记住 {{known, number}} 张",
     "knownAtTarget": "到 {{date}} 时 {{total, number}} 张中仍记得 {{known, number}} 张",
-    "breakdown": "牢固 {{known, number}} · 动摇 {{shaky, number}} · 未开始 {{unseen, number}}"
+    "breakdown": "牢固 {{known, number}} · 动摇 {{shaky, number}} · 未开始 {{unseen, number}}",
+    "daysLeft": "还剩 {{count, number}} 天",
+    "daysLeft_one": "还剩 {{count, number}} 天",
+    "daysLeft_other": "还剩 {{count, number}} 天"
   }
 }

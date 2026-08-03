@@ -210,6 +210,9 @@
     "title": "進捗",
     "knownNow": "{{total, number}}枚中 {{known, number}}枚を記憶",
     "knownAtTarget": "{{date}}時点で {{total, number}}枚中 {{known, number}}枚を記憶",
-    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}"
+    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}",
+    "daysLeft": "残り{{count, number}}日",
+    "daysLeft_one": "残り{{count, number}}日",
+    "daysLeft_other": "残り{{count, number}}日"
   }
 }

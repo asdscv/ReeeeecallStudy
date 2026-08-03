@@ -210,6 +210,9 @@
     "title": "ความคืบหน้า",
     "knownNow": "จำได้ {{known, number}} จาก {{total, number}} ใบ",
     "knownAtTarget": "วันที่ {{date}} จะยังจำได้ {{known, number}} จาก {{total, number}} ใบ",
-    "breakdown": "แม่น {{known, number}} · คลอนแคลน {{shaky, number}} · ยังไม่เริ่ม {{unseen, number}}"
+    "breakdown": "แม่น {{known, number}} · คลอนแคลน {{shaky, number}} · ยังไม่เริ่ม {{unseen, number}}",
+    "daysLeft": "เหลือ {{count, number}} วัน",
+    "daysLeft_one": "เหลือ {{count, number}} วัน",
+    "daysLeft_other": "เหลือ {{count, number}} วัน"
   }
 }
