@@ -1,8 +1,8 @@
 {
-  "title": "Pro로 업그레이드",
-  "subtitle": "ReeeeecallStudy의 모든 기능을 잠금 해제하세요",
-  "youArePro": "Pro입니다!",
-  "proDesc": "모든 프리미엄 기능을 사용할 수 있습니다.",
+  "title": "카드를 더 많이",
+  "subtitle": "유료 플랜은 저장할 수 있는 카드 수를 늘립니다. 나머지 기능은 이미 전부 쓰실 수 있습니다.",
+  "youArePro": "플랜이 적용 중입니다",
+  "proDesc": "카드 한도가 늘어났습니다. 학습 기능은 모든 플랜에서 동일하게 제공됩니다.",
   "done": "완료",
   "back": "뒤로",
   "features": {
@@ -13,41 +13,19 @@
       "freeUnknown": "저장 용량 제한",
       "proUnknown": "확장된 저장 용량"
     },
-    "allModes": {
-      "title": "모든 학습 모드",
-      "free": "SRS + 순차",
-      "pro": "4가지 모드"
-    },
     "aiGeneration": {
       "title": "AI 카드 생성",
       "free": "하루 {{count, number}}장 · 크레딧 구매 가능",
       "pro": "무료와 동일 · 크레딧 구매 가능",
       "freeUnknown": "매일 무료 제공량 · 크레딧 구매 가능"
-    },
-    "premiumTts": {
-      "title": "프리미엄 TTS",
-      "free": "기본",
-      "pro": "Edge TTS HD"
-    },
-    "analytics": {
-      "title": "고급 분석",
-      "free": "기본 통계",
-      "pro": "차트 + 예측"
-    },
-    "marketplace": {
-      "title": "마켓플레이스 게시",
-      "free": "다운로드만",
-      "pro": "업로드 + 수익 공유"
     }
   },
   "free": "무료",
   "pro": "Pro",
   "monthly": "월간",
-  "annual": "연간",
-  "save40": "40% 할인",
   "unavailable": "이 지역에서는 이용할 수 없는 상품입니다",
-  "welcomePro": "Pro에 오신 것을 환영합니다!",
-  "welcomeProDesc": "이제 모든 프리미엄 기능을 사용할 수 있습니다.",
+  "welcomePro": "플랜이 적용되었습니다",
+  "welcomeProDesc": "카드 한도가 늘어났습니다. 학습 기능은 모든 플랜에서 동일하게 제공됩니다.",
   "restorePurchase": "구매 복원",
   "restored": "Pro 구독이 복원되었습니다.",
   "noRestoreFound": "복원할 이전 구독을 찾을 수 없습니다.",
@@ -74,5 +52,6 @@
     "request": "환불 요청",
     "title": "환불 요청",
     "submitted": "Apple에 환불 요청을 보냈어요. 승인 여부는 Apple이 결정하며 이메일로 알려줍니다. 승인되면 이용 권한은 자동으로 회수돼요."
-  }
+  },
+  "everythingElseFree": "모든 학습 모드·TTS·통계·마켓플레이스 게시는 어느 플랜에서나 무료입니다."
 }

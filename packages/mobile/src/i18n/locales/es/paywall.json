@@ -1,8 +1,8 @@
 {
-  "title": "Actualizar a Pro",
-  "subtitle": "Desbloquea todo el poder de ReeeeecallStudy",
-  "youArePro": "¡Eres Pro!",
-  "proDesc": "Tienes acceso a todas las funciones premium.",
+  "title": "Más espacio para tarjetas",
+  "subtitle": "Un plan de pago aumenta cuántas tarjetas puedes guardar. Todo lo demás ya es tuyo.",
+  "youArePro": "Tu plan está activo",
+  "proDesc": "Tu límite de tarjetas ha aumentado. Todas las funciones de estudio están en todos los planes.",
   "done": "Listo",
   "back": "Volver",
   "features": {
@@ -13,41 +13,19 @@
       "freeUnknown": "Almacenamiento limitado",
       "proUnknown": "Almacenamiento ampliado"
     },
-    "allModes": {
-      "title": "Todos los Modos de Estudio",
-      "free": "SRS + Secuencial",
-      "pro": "Los 4 modos"
-    },
     "aiGeneration": {
       "title": "Generación de Tarjetas con IA",
       "free": "{{count, number}} tarjetas/día · créditos disponibles",
       "pro": "Igual que Free · créditos disponibles",
       "freeUnknown": "Cuota diaria gratuita · créditos disponibles"
-    },
-    "premiumTts": {
-      "title": "TTS Premium",
-      "free": "Básico",
-      "pro": "Edge TTS HD"
-    },
-    "analytics": {
-      "title": "Análisis Avanzado",
-      "free": "Estadísticas básicas",
-      "pro": "Gráficos + Pronóstico"
-    },
-    "marketplace": {
-      "title": "Publicar en Marketplace",
-      "free": "Solo descarga",
-      "pro": "Subir + Reparto de ingresos"
     }
   },
   "free": "Gratis",
   "pro": "Pro",
   "monthly": "Mensual",
-  "annual": "Anual",
-  "save40": "Ahorra 40%",
   "unavailable": "Este producto no está disponible en tu región",
-  "welcomePro": "¡Bienvenido a Pro!",
-  "welcomeProDesc": "Ahora tienes acceso a todas las funciones premium.",
+  "welcomePro": "Tu plan está activo",
+  "welcomeProDesc": "Tu límite de tarjetas ha aumentado. Todas las funciones de estudio están en todos los planes.",
   "restorePurchase": "Restaurar Compra",
   "restored": "Tu suscripción Pro ha sido restaurada.",
   "noRestoreFound": "No se encontró ninguna suscripción anterior.",
@@ -74,5 +52,6 @@
     "request": "Solicitar un reembolso",
     "title": "Solicitud de reembolso",
     "submitted": "Tu solicitud de reembolso se envió a Apple. Apple decide el resultado y te escribirá por correo; si se aprueba, tu acceso se retira automáticamente."
-  }
+  },
+  "everythingElseFree": "Todos los modos de estudio, TTS, estadísticas y publicación en el mercado son gratis en cualquier plan."
 }
