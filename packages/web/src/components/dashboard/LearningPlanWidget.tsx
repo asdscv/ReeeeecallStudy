@@ -99,9 +99,7 @@ export function LearningPlanWidget() {
       {state && state.total > 0 ? (
         <>
           <p className="mt-1 text-xs text-muted-foreground">
-            {focus.target_date
-              ? t('progress.knownAtTarget', { known: state.known, total: state.total, date: focus.target_date })
-              : t('progress.knownNow', { known: state.known, total: state.total })}
+            {t('progress.knownNow', { known: state.known, total: state.total })}
           </p>
           <div
             className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden"

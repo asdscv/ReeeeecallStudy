@@ -4,7 +4,8 @@
     "totalCards": "Total Cards",
     "todayReview": "Today's Review",
     "streak": "Study Streak",
-    "masteryRate": "Mastery Rate"
+    "masteryRate": "Mastery Rate",
+    "streakDays": "{{count, number}} days"
   },
   "dailyChart": {
     "title": "Daily Study Volume",

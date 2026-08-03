@@ -4,7 +4,8 @@
     "totalCards": "卡片总数",
     "todayReview": "今日复习",
     "streak": "连续学习",
-    "masteryRate": "掌握率"
+    "masteryRate": "掌握率",
+    "streakDays": "{{count, number}}天"
   },
   "dailyChart": {
     "title": "每日学习量",

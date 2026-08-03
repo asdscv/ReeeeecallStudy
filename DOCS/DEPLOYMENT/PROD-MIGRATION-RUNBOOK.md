@@ -27,14 +27,18 @@ export PROD_DB_URL='postgresql://postgres.ixdapelfikaneexnskfm:<PASSWORD>@aws-1-
 
 ```bash
 # 1) 먼저 읽어보기 — 아무것도 적용하지 않습니다
-./scripts/apply-prod-migrations.sh --from 181 --to 185 --dry-run
+./scripts/apply-prod-migrations.sh --from 181 --to 186 --dry-run
 
 # 2) 적용
-./scripts/apply-prod-migrations.sh --from 181 --to 185
+./scripts/apply-prod-migrations.sh --from 181 --to 186
 ```
 
 스크립트는 **정확히 180에 있지 않으면 실행을 거부합니다.** 건너뛰기도 재적용도
 "아마 괜찮을 것"도 없습니다.
+
+> 범위가 185가 아니라 **186**인 이유: PR #416(대시보드 위젯 + 리졸버 통합)이 나중에
+> 머지되면서 마이그레이션 186이 추가됐습니다. 배포 전에 `ls supabase/migrations/`로
+> 최신 번호를 다시 확인하는 편이 안전합니다 — 이 문서가 뒤처질 수 있습니다.
 
 ## 그 다음
 
@@ -59,6 +63,6 @@ gh workflow run deploy-mobile.yml --ref main -f mode=ota
 ## 이 절차의 검증
 
 `fr` 템플릿에서 prod와 같은 상태(스키마 180 + history 1..180)의 로컬 DB를 만들어
-스크립트로 181→185를 적용한 뒤, SQL 스위트 6종을 전부 통과시켰습니다:
+스크립트로 181→186을 적용한 뒤, SQL 스위트 6종을 전부 통과시켰습니다:
 `goal_knowledge` · `goal_workload` · `mastery_definition` · `append_plan` ·
 `learning_smoke` · `learning_net_zero`. dry-run·잘못된 `--from` 거부·재실행 거부도 확인.
