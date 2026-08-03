@@ -47,7 +47,20 @@ const REFUND_REQUEST_URL = Platform.select({
 // AI quota a setting and mig 177 put both behind an admin UI — so a literal in
 // paywall.json is a number that goes stale the first time someone uses that panel, on
 // the one screen whose job is telling a person what they are buying.
-const FEATURE_KEYS = ['cardStorage', 'allModes', 'aiGeneration', 'premiumTts', 'analytics', 'marketplace'] as const
+// ONLY rows a paid plan actually changes may appear here.
+//
+// Four rows were removed on 2026-08-03 — "모든 학습 모드", "프리미엄 TTS", "고급 분석",
+// "마켓플레이스 게시" — because nothing in this app gates any of them by plan. Verified, not
+// assumed: `billing_products` carries `card_limit` and nothing else, `isPro` appears only on a
+// Settings badge, `edge_tts` is a free settings toggle, there is no plan check on deck
+// publishing, and no revenue-share exists at all. (`subscriptionLocked` in study-store is about
+// a marketplace DECK subscription expiring — a different thing wearing a similar name, which is
+// probably how the rows survived this long.)
+//
+// This is the screen that takes money. A row here is a promise, and a promise the code does not
+// keep is not a copy problem — it is the store listing and the refund queue. Before adding a
+// row, point at the code that enforces it.
+const FEATURE_KEYS = ['cardStorage', 'aiGeneration'] as const
 /**
  * The CELLS whose copy carries a server number, and therefore need a `*Unknown` twin to fall
  * back to. Per cell, not per row: `aiGeneration.pro` says "Same as Free", which needs no number
@@ -56,11 +69,7 @@ const FEATURE_KEYS = ['cardStorage', 'allModes', 'aiGeneration', 'premiumTts', '
 const NUMERIC_CELLS = new Set(['cardStorage.free', 'cardStorage.pro', 'aiGeneration.free'])
 const FEATURE_ICONS: Record<(typeof FEATURE_KEYS)[number], string> = {
   cardStorage: '🗂️',
-  allModes: '🧠',
   aiGeneration: '🤖',
-  premiumTts: '🔊',
-  analytics: '📊',
-  marketplace: '🏪',
 }
 
 export function PaywallScreen() {
@@ -295,6 +304,16 @@ export function PaywallScreen() {
               </View>
             </View>
           ))}
+
+          {/* Says what the removed rows used to imply, but truthfully. Without this a
+              two-row table reads as "this is all you get", when in fact everything absent
+              from the table is already free — which is the better story and the true one. */}
+          <Text
+            testID="paywall-everything-else-free"
+            style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 12 }]}
+          >
+            {t('everythingElseFree')}
+          </Text>
         </View>
 
         {/* Pre-purchase withdrawal-right disclosure. Required before the buy buttons

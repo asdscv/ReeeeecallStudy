@@ -1,8 +1,8 @@
 {
-  "title": "Upgrade ke Pro",
-  "subtitle": "Buka semua fitur ReeeeecallStudy",
-  "youArePro": "Anda Pro!",
-  "proDesc": "Anda memiliki akses ke semua fitur premium.",
+  "title": "Ruang lebih untuk kartu",
+  "subtitle": "Paket berbayar menambah jumlah kartu yang bisa kamu simpan. Selebihnya sudah jadi milikmu.",
+  "youArePro": "Paketmu aktif",
+  "proDesc": "Batas kartumu naik. Semua fitur belajar tersedia di setiap paket.",
   "done": "Selesai",
   "back": "Kembali",
   "features": {
@@ -13,41 +13,19 @@
       "freeUnknown": "Penyimpanan terbatas",
       "proUnknown": "Penyimpanan lebih besar"
     },
-    "allModes": {
-      "title": "Semua Mode Belajar",
-      "free": "SRS + Berurutan",
-      "pro": "Semua 4 mode"
-    },
     "aiGeneration": {
       "title": "AI Buat Kartu",
       "free": "{{count, number}} kartu/hari · kredit tersedia",
       "pro": "Sama seperti Free · kredit tersedia",
       "freeUnknown": "Kuota gratis harian · kredit tersedia"
-    },
-    "premiumTts": {
-      "title": "TTS Premium",
-      "free": "Dasar",
-      "pro": "Edge TTS HD"
-    },
-    "analytics": {
-      "title": "Analitik Lanjutan",
-      "free": "Statistik dasar",
-      "pro": "Grafik + Prediksi"
-    },
-    "marketplace": {
-      "title": "Publikasi Marketplace",
-      "free": "Unduh saja",
-      "pro": "Unggah + Bagi hasil"
     }
   },
   "free": "Gratis",
   "pro": "Pro",
   "monthly": "Bulanan",
-  "annual": "Tahunan",
-  "save40": "Hemat 40%",
   "unavailable": "Produk ini tidak tersedia di wilayah Anda",
-  "welcomePro": "Selamat datang di Pro!",
-  "welcomeProDesc": "Anda sekarang memiliki akses ke semua fitur premium.",
+  "welcomePro": "Paketmu aktif",
+  "welcomeProDesc": "Batas kartumu naik. Semua fitur belajar tersedia di setiap paket.",
   "restorePurchase": "Pulihkan Pembelian",
   "restored": "Langganan Pro telah dipulihkan.",
   "noRestoreFound": "Tidak ditemukan langganan sebelumnya.",
@@ -74,5 +52,6 @@
     "request": "Ajukan refund",
     "title": "Pengajuan refund",
     "submitted": "Pengajuan refund dikirim ke Apple. Apple yang memutuskan hasilnya dan akan mengirim email; jika disetujui, akses kamu dicabut otomatis."
-  }
+  },
+  "everythingElseFree": "Semua mode belajar, TTS, statistik, dan publikasi marketplace gratis di paket mana pun."
 }

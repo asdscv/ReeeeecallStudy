@@ -1,8 +1,8 @@
 {
-  "title": "Upgrade to Pro",
-  "subtitle": "Unlock the full power of ReeeeecallStudy",
-  "youArePro": "You're Pro!",
-  "proDesc": "You have access to all premium features.",
+  "title": "More room for cards",
+  "subtitle": "A paid plan raises how many cards you can keep. Everything else is already yours.",
+  "youArePro": "Your plan is active",
+  "proDesc": "Your card limit is raised. Every study feature is available on every plan.",
   "done": "Done",
   "back": "Back",
   "features": {
@@ -13,41 +13,19 @@
       "freeUnknown": "Limited storage",
       "proUnknown": "Expanded storage"
     },
-    "allModes": {
-      "title": "All Study Modes",
-      "free": "SRS + Sequential",
-      "pro": "All 4 modes"
-    },
     "aiGeneration": {
       "title": "AI Card Generation",
       "free": "{{count, number}} cards/day · credits available",
       "pro": "Same as Free · credits available",
       "freeUnknown": "Daily free allowance · credits available"
-    },
-    "premiumTts": {
-      "title": "Premium TTS",
-      "free": "Basic",
-      "pro": "Edge TTS HD"
-    },
-    "analytics": {
-      "title": "Advanced Analytics",
-      "free": "Basic stats",
-      "pro": "Charts + Forecast"
-    },
-    "marketplace": {
-      "title": "Marketplace Publishing",
-      "free": "Download only",
-      "pro": "Upload + Revenue share"
     }
   },
   "free": "Free",
   "pro": "Pro",
   "monthly": "Monthly",
-  "annual": "Annual",
-  "save40": "Save 40%",
   "unavailable": "This product is not available in your region",
-  "welcomePro": "Welcome to Pro!",
-  "welcomeProDesc": "You now have access to all premium features.",
+  "welcomePro": "Your plan is active",
+  "welcomeProDesc": "Your card limit is raised. Every study feature is available on every plan.",
   "restorePurchase": "Restore Purchase",
   "restored": "Your Pro subscription has been restored.",
   "noRestoreFound": "No previous subscription was found to restore.",
@@ -74,5 +52,6 @@
     "request": "Request a refund",
     "title": "Refund request",
     "submitted": "Your refund request was sent to Apple. Apple decides the outcome and will email you; if it is approved your access is removed automatically."
-  }
+  },
+  "everythingElseFree": "All study modes, TTS, statistics and marketplace publishing are free on every plan."
 }
