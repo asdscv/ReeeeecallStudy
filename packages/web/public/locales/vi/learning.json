@@ -209,7 +209,6 @@
   "progress": {
     "title": "Tiến độ",
     "knownNow": "Nhớ {{known, number}} trong {{total, number}} thẻ",
-    "knownAtTarget": "Đến {{date}} vẫn nhớ {{known, number}} trong {{total, number}} thẻ",
     "breakdown": "Chắc {{known, number}} · Lung lay {{shaky, number}} · Chưa bắt đầu {{unseen, number}}",
     "daysLeft": "Còn {{count, number}} ngày",
     "daysLeft_one": "Còn {{count, number}} ngày",

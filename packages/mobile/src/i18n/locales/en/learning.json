@@ -199,7 +199,6 @@
   "progress": {
     "title": "Progress",
     "knownNow": "{{known, number}} of {{total, number}} cards known now",
-    "knownAtTarget": "{{known, number}} of {{total, number}} cards still known on {{date}}",
     "breakdown": "{{known, number}} solid · {{shaky, number}} slipping · {{unseen, number}} not started",
     "daysLeft": "{{count, number}} days left",
     "daysLeft_one": "{{count, number}} day left",

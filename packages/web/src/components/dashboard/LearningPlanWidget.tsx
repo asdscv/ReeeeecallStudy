@@ -45,17 +45,16 @@ export function LearningPlanWidget() {
     })[0] ?? fallback[0] ?? null
   }, [goals, mountedAt])
 
-  // Judged at the target date when there is one, so the number answers "what will I know on the
-  // day". Built from `mountedAt` rather than a bare `new Date()`: that would be a new value on
-  // every render and the effect below would loop the RPC — the exact defect this work shipped
-  // and then caught on mobile. Depending on `focus` (not `focus?.target_date`) is what the React
-  // Compiler infers; a narrower dep list makes it refuse to optimise the whole component.
-  const judgedAt = useMemo(
-    () => (focus?.target_date
-      ? `${focus.target_date}T00:00:00.000Z`
-      : new Date(mountedAt).toISOString()),
-    [focus, mountedAt],
-  )
+  // Judged NOW, never at the target date — the label beside it says "known now", and the two
+  // have to be the same question. Judging at the deadline answers "what would I still know if I
+  // stopped studying today", which is a forecast and a bleak one: on a real account it rendered
+  // "0 of 120 known" for a learner who had studied 55 cards, because every interval was shorter
+  // than the time remaining. That number is worth showing eventually, with its assumption
+  // written next to it. It is not the line that tells someone where they stand.
+  //
+  // Built from `mountedAt` rather than a bare `new Date()`: that would be a new value every
+  // render and the effect below would loop the RPC.
+  const judgedAt = useMemo(() => new Date(mountedAt).toISOString(), [mountedAt])
 
   useEffect(() => {
     if (focus?.id) void fetchGoalKnowledge(focus.id, judgedAt)

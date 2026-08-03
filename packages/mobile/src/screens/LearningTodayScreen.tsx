@@ -215,7 +215,14 @@ export function LearningTodayScreen() {
   // with no target date, which the form allows. Web escapes it because its `ctx` is memoised at
   // mount; this port dropped that.
   const mountedAt = useMemo(() => new Date().toISOString(), [])
-  const judgedAt = goal?.target_date ? `${goal.target_date}T00:00:00.000Z` : mountedAt
+  // Judged NOW, never at the target date — same rule as the web dashboard, and it has to be the
+  // same or one goal reports two different numbers depending on which device is in your hand.
+  //
+  // Judging at the deadline answers "what would I still know if I stopped today": a forecast,
+  // and a bleak one. On a real account it read "0 of 120 known" for a learner who had studied
+  // 55 cards, because every SRS interval was shorter than the time remaining. Worth showing
+  // eventually with its assumption stated; not as the line that says where you stand.
+  const judgedAt = mountedAt
   useEffect(() => {
     if (goalId) void fetchGoalKnowledge(goalId, judgedAt)
   }, [goalId, judgedAt, fetchGoalKnowledge])
@@ -381,13 +388,9 @@ export function LearningTodayScreen() {
                 {...testProps('learning-progress', true)}
               >
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                  {goal?.target_date
-                    ? t('progress.knownAtTarget', {
-                        known: knowledge[goalId].known, total: knowledge[goalId].total, date: goal.target_date,
-                      })
-                    : t('progress.knownNow', {
-                        known: knowledge[goalId].known, total: knowledge[goalId].total,
-                      })}
+                  {t('progress.knownNow', {
+                    known: knowledge[goalId].known, total: knowledge[goalId].total,
+                  })}
                 </Text>
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
                   {t('progress.breakdown', {
