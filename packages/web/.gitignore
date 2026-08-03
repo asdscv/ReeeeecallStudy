@@ -2,3 +2,8 @@ packages/web/public/sitemap.xml
 
 # E2E credentials — never committed
 .env.test
+playwright.local.config.ts
+
+# Playwright screenshot artifacts — the specs that write them are committed,
+# the images are per-run output and change on every execution.
+playwright/

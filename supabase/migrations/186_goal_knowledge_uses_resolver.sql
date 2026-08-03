@@ -14,21 +14,36 @@
 --   mature_card_count      NULL scope  -> decks owned or touched, account-wide
 --   get_goal_knowledge     the goal's decks, so an untouched subscribed card is still counted
 --
+-- SCOPE CHANGE, stated plainly: 184's library test was CARD-level (`ucp.user_id = p_user_id`),
+-- and the NULL branch here is DECK-level (any progress row in that deck). Touching four cards of
+-- a subscribed deck now puts the whole deck in your library, with the rest unseen rather than
+-- absent. The counted VALUE is unchanged — an untouched card has no schedule and can never be
+-- mature — but the contract moved, and `check_achievements` runs this at the end of every study
+-- session, so it should not be discovered later from a diff.
+--
 -- With scope explicit, `get_goal_knowledge` returns byte-identical results to 182 on the same
 -- data — verified by running both against the same fixture across three (moment, multiplier)
 -- combinations before this was committed.
 --
--- The 1-argument form is dropped rather than kept alongside: two overloads differing only by a
--- defaulted array is how an ambiguous call gets resolved to the wrong one at 3am.
+-- The 1-argument form is dropped, and the 2-argument form takes NO default. Both matter: the
+-- drop keeps one resolver in a fresh database, and the absent default means that if 184 is
+-- replayed on top of 186 the two signatures stay distinguishable instead of making every
+-- one-argument call ambiguous. An audit found that exact replay aborting at CREATE time.
 --
 -- Idempotent: DROP IF EXISTS + CREATE OR REPLACE. No table is touched.
 -- ============================================================================
 
 BEGIN;
 
--- Both callers are re-created below, so dropping this first leaves nothing pointing at a missing
--- function once the transaction commits.
+-- Both callers are re-created below, so dropping these first leaves nothing pointing at a
+-- missing function once the transaction commits.
+--
+-- The 2-argument form is dropped too, not just replaced: `CREATE OR REPLACE` refuses to REMOVE a
+-- parameter default ("cannot remove parameter defaults from existing function"), so re-applying
+-- this migration onto a database that already ran an earlier draft of it would abort. Dropping
+-- both makes the migration idempotent from any prior state.
 DROP FUNCTION IF EXISTS public.learner_card_schedule(uuid);
+DROP FUNCTION IF EXISTS public.learner_card_schedule(uuid, uuid[]);
 
 /**
  * Every card in scope, with its schedule resolved to the right owner.
@@ -39,7 +54,13 @@ DROP FUNCTION IF EXISTS public.learner_card_schedule(uuid);
  */
 CREATE OR REPLACE FUNCTION public.learner_card_schedule(
   p_user_id uuid,
-  p_deck_ids uuid[] DEFAULT NULL
+  -- NO DEFAULT, deliberately. With `DEFAULT NULL` this overload also answers a one-argument
+  -- call, so if 184 is ever replayed onto a database that already has 186 — which
+  -- `scripts/dry-run-learning-migrations.sh` does, and which anyone re-running a single file by
+  -- hand does — both forms exist, 184's `mature_card_count` body becomes ambiguous, and the
+  -- migration aborts at CREATE time with "function ... is not unique". Requiring the argument
+  -- keeps the two signatures distinguishable, so replay in any order is safe.
+  p_deck_ids uuid[]
 )
   RETURNS TABLE (
     card_id uuid,
@@ -75,8 +96,10 @@ AS $$
     END;
 $$;
 
--- SECURITY INVOKER (the default) so a direct caller sees only what RLS allows. The two callers
--- below are SECURITY DEFINER and execute as the owner, so they still see everything they need.
+-- SECURITY INVOKER (the default) so a direct caller sees only what RLS allows, and not granted
+-- to `authenticated` at all. It is reached only from inside `get_goal_knowledge` (SECURITY
+-- DEFINER) and `mature_card_count` — which is itself INVOKER, and works because ITS callers,
+-- `check_achievements` and `get_next_goals`, are DEFINER.
 REVOKE EXECUTE ON FUNCTION public.learner_card_schedule(uuid, uuid[]) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.learner_card_schedule(uuid, uuid[]) TO service_role;
 

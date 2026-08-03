@@ -140,11 +140,11 @@ export function DashboardPage() {
         masteryRate={masteryRate}
       />
 
-      {/* Card-storage usage — at-a-glance meter → full detail modal */}
-      {/* One line about the learning plan, above the storage meter. Renders nothing when there
-          is no plannable goal — a tile that exists only to advertise an unused feature is an ad. */}
+      {/* One line about the learning plan. Renders nothing when there is no plannable goal —
+          a tile that exists only to advertise an unused feature is an ad. */}
       <LearningPlanWidget />
 
+      {/* Card-storage usage — at-a-glance meter → full detail modal */}
       <CardUsageCard />
 
       {/* Achievements + Level */}

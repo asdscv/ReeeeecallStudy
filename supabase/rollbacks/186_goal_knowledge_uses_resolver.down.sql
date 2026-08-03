@@ -1,5 +1,10 @@
 -- Rollback for 186. Restores 182's inline CASE in get_goal_knowledge and 184's single-argument
 -- resolver, so nothing is left pointing at a signature that no longer exists.
+--
+-- ORDER MATTERS: this must run BEFORE 184's rollback. 184's rollback drops only the 1-argument
+-- resolver, so unwinding it first leaves `learner_card_schedule(uuid, uuid[])` orphaned and
+-- silently reverts `mature_card_count` to 183's cards-only body. The repo documents the same
+-- class of constraint for 178-before-168 in scripts/dry-run-learning-migrations.sh.
 BEGIN;
 
 DROP FUNCTION IF EXISTS public.learner_card_schedule(uuid, uuid[]);
